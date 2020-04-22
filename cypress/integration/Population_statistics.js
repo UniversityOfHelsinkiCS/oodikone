@@ -80,7 +80,7 @@ describe('Population Statistics tests', () => {
       cy.contains("Excludes students who haven't enrolled present nor absent")
     })
 
-    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+    cy.contains("Courses of Population").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
       cy.route('/api/v3/courseyearlystats**').as('coursePage')
       cy.contains("Laskennan mallit")
@@ -91,7 +91,7 @@ describe('Population Statistics tests', () => {
     cy.contains("TKT20005")
     cy.go("back")
 
-    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+    cy.contains("Courses of Population").parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "15")
     })
 
@@ -112,7 +112,7 @@ describe('Population Statistics tests', () => {
       checkAmountOfStudents(filteredStudents)
     })
 
-    cy.contains("Courses of Population").parentsUntil(".ui.segment").parent().within(() => {
+    cy.contains("Courses of Population").parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "1")
     })
 
