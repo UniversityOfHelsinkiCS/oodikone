@@ -97,7 +97,8 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
     {
       key: 'name',
       title: 'Name',
-      getRowVal: tag => decorateTagName(tag)
+      getRowVal: tag => tag.tagname,
+      getRowContent: tag => decorateTagName(tag)
     },
     {
       key: 'year',
@@ -107,7 +108,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
     {
       key: 'delete',
       title: 'Delete',
-      getRowVal: tag => (
+      getRowContent: tag => (
         <Form.Field>
           {deleteButton(tag.tag_id)}
           <Confirm
@@ -119,7 +120,8 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
             confirmButton="Confirm"
           />
         </Form.Field>
-      )
+      ),
+      headerProps: { onClick: null, sorted: null }
     }
   ]
 
