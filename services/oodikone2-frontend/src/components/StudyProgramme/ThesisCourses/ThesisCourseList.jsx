@@ -46,7 +46,7 @@ class ThesisCourseList extends Component {
               {
                 key: 'action',
                 title: 'Remove',
-                headerProps: { width: 1, textAlign: 'center' },
+                headerProps: { width: 1, textAlign: 'center', onClick: null, sorted: null },
                 cellProps: { textAlign: 'center' },
                 getRowContent: c => <Button basic icon="trash" onClick={this.handleDelete(c.courseCode)} />
               }

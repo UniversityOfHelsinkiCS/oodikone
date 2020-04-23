@@ -50,7 +50,8 @@ class StudyProgrammeSelector extends Component {
       {
         key: 'programmecode',
         title: 'code',
-        getRowVal: prog => (
+        getRowVal: prog => prog.code,
+        getRowContent: prog => (
           <Link
             style={{
               color: 'black',
@@ -73,7 +74,8 @@ class StudyProgrammeSelector extends Component {
       {
         key: 'programmename',
         title: 'name',
-        getRowVal: prog => (
+        getRowVal: prog => getTextIn(prog.name, language),
+        getRowContent: prog => (
           <Link
             style={{
               color: 'black',
