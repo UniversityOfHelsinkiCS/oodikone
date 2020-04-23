@@ -363,6 +363,7 @@ const ProtoC = () => {
 
   const handleOrgClicked = useCallback(org => {
     setDrilldownOrg(org)
+    setDrilldownProgramme(null)
   }, [])
 
   const handleProgrammeClicked = useCallback(programme => {
