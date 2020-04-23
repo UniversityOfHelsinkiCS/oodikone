@@ -78,7 +78,7 @@ const CourseStatistics = props => {
 
   const panes = getPanes()
   return (
-    <div className="container">
+    <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
         Course Statistics
       </Header>
