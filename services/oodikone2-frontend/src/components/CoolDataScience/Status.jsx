@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message } from 'semantic-ui-react'
 import _ from 'lodash'
+import ReactMarkdown from 'react-markdown'
 import { getTextIn } from '../../common'
 import { callApi } from '../../apiConnection'
+import InfoToolTips from '../../common/InfoToolTips'
 import './status.css'
 
 const getP = (a, b) => {
@@ -130,6 +132,7 @@ const Status = () => {
   const [data, setData] = useState(null)
   const [drillStack, setDrillStack] = useState([])
   const [showSettings, setShowSettings] = useState(false)
+  const { CoolDataScience } = InfoToolTips
 
   useEffect(() => {
     const load = async () => {
@@ -244,6 +247,9 @@ const Status = () => {
           )
         })}
       </div>
+      <Message>
+        <ReactMarkdown source={CoolDataScience.status} escapeHtml={false} />
+      </Message>
     </div>
   )
 }
