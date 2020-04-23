@@ -128,9 +128,10 @@ class PopulationCourseStats extends Component {
   }
 
   static updateCourseStatisticsCriteria(props, state) {
-    const { studentAmountLimit, sortCriteria, codeFilter, reversed } = state
+    const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
     const {
-      courses: { coursestatistics }
+      courses: { coursestatistics },
+      language
     } = props
 
     const studentAmountFilter = ({ stats }) => {
@@ -141,9 +142,17 @@ class PopulationCourseStats extends Component {
       const { code } = course
       return code.toLowerCase().includes(codeFilter.toLowerCase())
     }
+    const courseNameFilter = ({ course }) => {
+      const { name } = course
+      return name[language].toLowerCase().includes(nameFilter.toLowerCase())
+    }
 
     const filteredCourses =
-      coursestatistics && coursestatistics.filter(studentAmountFilter).filter(c => !codeFilter || courseCodeFilter(c))
+      coursestatistics &&
+      coursestatistics
+        .filter(studentAmountFilter)
+        .filter(c => !codeFilter || courseCodeFilter(c))
+        .filter(c => !nameFilter || courseNameFilter(c))
 
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 
@@ -161,21 +170,22 @@ class PopulationCourseStats extends Component {
     reversed: true,
     studentAmountLimit: Math.round(this.props.selectedStudents.length * 0.3),
     codeFilter: '',
+    nameFilter: '',
     activeView: null,
     selectedStudentsLength: 0
   }
 
-  onCodeFilterChange = e => {
+  onFilterChange = (e, field) => {
     const {
       target: { value }
     } = e
     clearTimeout(this.timer)
     this.timer = setTimeout(() => {
-      this.setState({ codeFilter: value })
+      this.setState({ [field]: value })
     }, 1000)
   }
 
-  onSetCodeFilterKeyPress = e => {
+  onSetFilterKeyPress = e => {
     const { key } = e
     const enterKey = 'Enter'
     const isEnterKeyPress = key === enterKey
@@ -246,17 +256,17 @@ class PopulationCourseStats extends Component {
     return selectedCourses.length > 0 && selectedCourses.find(c => course.code === c.code) !== undefined
   }
 
-  renderCodeFilterInputHeaderCell = () => {
+  renderFilterInputHeaderCell = (field, name, colSpan = '') => {
     const { translate } = this.props
     return (
-      <Table.HeaderCell>
-        {translate('populationCourses.code')}
+      <Table.HeaderCell colSpan={colSpan}>
+        {translate(name)}
         <Input
           className="courseCodeInput"
           transparent
           placeholder="(filter here)"
-          onChange={this.onCodeFilterChange}
-          onKeyPress={this.onSetCodeFilterKeyPress}
+          onChange={e => this.onFilterChange(e, field)}
+          onKeyPress={this.onSetFilterKeyPress}
         />
       </Table.HeaderCell>
     )
@@ -291,7 +301,7 @@ class PopulationCourseStats extends Component {
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell colSpan="2" content={translate('populationCourses.course')} />
-          {this.renderCodeFilterInputHeaderCell()}
+          {this.renderFilterInputHeaderCell('codeFilter', 'populationCourses.code')}
           <SortableHeaderCell
             content="Attempts"
             columnName={tableColumnNames.STUDENTS}
@@ -406,8 +416,8 @@ class PopulationCourseStats extends Component {
           <Table.HeaderCell colSpan="2" content={translate('populationCourses.percentageOfPopulation')} />
         </Table.Row>
         <Table.Row>
-          <Table.HeaderCell colSpan="3" content={translate('populationCourses.name')} />
-          {this.renderCodeFilterInputHeaderCell()}
+          {this.renderFilterInputHeaderCell('nameFilter', 'populationCourses.name', '3')}
+          {this.renderFilterInputHeaderCell('codeFilter', 'populationCourses.code')}
           {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.PASSED)}
           {getSortableHeaderCell(translate('populationCourses.passedAfterRetry'), tableColumnNames.RETRY_PASSED)}
           {getSortableHeaderCell(translate('populationCourses.percentage'), tableColumnNames.PERCENTAGE)}

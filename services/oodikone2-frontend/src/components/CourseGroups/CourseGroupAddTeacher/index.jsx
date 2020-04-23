@@ -75,7 +75,7 @@ class CourseGroupAddTeacher extends Component {
       { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
       {
         key: 'icon',
-        getRowVal: () => <Icon name="add user" />,
+        getRowContent: () => <Icon name="add user" />,
         cellProps: { collapsing: true },
         headerProps: { onClick: null, sorted: null }
       }

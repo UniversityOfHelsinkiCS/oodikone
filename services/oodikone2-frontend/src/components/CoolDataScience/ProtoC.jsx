@@ -76,7 +76,6 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
             // use setImmediate so the click handler can finish
             // before datamangels begins so that the browser is responsive
             setImmediate(() => onOrgClicked(clickedOrg))
-            e.point.update()
           }
         }
       }
@@ -148,12 +147,33 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
   })
 }
 
-const makeDrilldownConfig = org => {
+const makeDrilldownConfig = (org, onProgrammeClicked) => {
+  const addPointClickHandler = serie => {
+    serie.point = {
+      events: {
+        click: e => {
+          const clickedProgramme = org.programmes.find(
+            programme => e.point && e.point.custom && programme.code === e.point.custom.code
+          )
+          if (clickedProgramme) {
+            // use setImmediate so the click handler can finish
+            // before datamangels begins so that the browser is responsive
+            setImmediate(() => onProgrammeClicked(clickedProgramme))
+          }
+        }
+      }
+    }
+    return serie
+  }
+
   const series = [
     {
       color: '#7f8c8d',
       name: 'tällä hetkellä peruutettu',
       data: org.programmes.map(p => ({
+        custom: {
+          code: p.code
+        },
         y: p.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
         z: p.currentlyCancelled / p.totalStudents
@@ -163,6 +183,9 @@ const makeDrilldownConfig = org => {
       color: '#ff7979',
       name: 'ei tahdissa',
       data: org.programmes.map(p => ({
+        custom: {
+          code: p.code
+        },
         y: p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled,
         z: (p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled) / p.totalStudents
       }))
@@ -172,6 +195,9 @@ const makeDrilldownConfig = org => {
       color: '#f9ca24',
       name: '4v tahdissa',
       data: org.programmes.map(p => ({
+        custom: {
+          code: p.code
+        },
         y: p.students4y,
         z: p.students4y / p.totalStudents
       }))
@@ -180,11 +206,14 @@ const makeDrilldownConfig = org => {
       color: '#6ab04c',
       name: '3v tahdissa',
       data: org.programmes.map(p => ({
+        custom: {
+          code: p.code
+        },
         y: p.students3y,
         z: p.students3y / p.totalStudents
       }))
     }
-  ]
+  ].map(addPointClickHandler)
 
   return Highcharts.merge(defaultConfig(), {
     title: {
@@ -196,6 +225,60 @@ const makeDrilldownConfig = org => {
     yAxis: {
       title: {
         text: '% ohjelman opiskelijoista'
+      }
+    },
+    series
+  })
+}
+
+const makeStudytrackDrilldownConfig = programme => {
+  const series = [
+    {
+      color: '#7f8c8d',
+      name: 'tällä hetkellä peruutettu',
+      data: programme.studytracks.map(p => ({
+        y: p.currentlyCancelled,
+        // pass % of total as z so we can display it in the tooltip
+        z: p.currentlyCancelled / p.totalStudents
+      }))
+    },
+    {
+      color: '#ff7979',
+      name: 'ei tahdissa',
+      data: programme.studytracks.map(p => ({
+        y: p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled,
+        z: (p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled) / p.totalStudents
+      }))
+    },
+
+    {
+      color: '#f9ca24',
+      name: '4v tahdissa',
+      data: programme.studytracks.map(p => ({
+        y: p.students4y,
+        z: p.students4y / p.totalStudents
+      }))
+    },
+    {
+      color: '#6ab04c',
+      name: '3v tahdissa',
+      data: programme.studytracks.map(p => ({
+        y: p.students3y,
+        z: p.students3y / p.totalStudents
+      }))
+    }
+  ]
+
+  return Highcharts.merge(defaultConfig(), {
+    title: {
+      text: `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
+    },
+    xAxis: {
+      categories: programme.studytracks.map(p => p.name)
+    },
+    yAxis: {
+      title: {
+        text: '% opintosuunnan opiskelijoista'
       }
     },
     series
@@ -217,16 +300,33 @@ const OrgChart = React.memo(({ orgs, onOrgClicked }) => {
   return <ReactHighcharts highcharts={Highcharts} config={makeConfig(orgs, onOrgClicked)} />
 })
 
-const ProgrammeChart = React.memo(({ org }) => {
-  return <ReactHighcharts highcharts={Highcharts} config={makeDrilldownConfig(org)} />
+const ProgrammeChart = React.memo(({ org, onProgrammeClicked }) => {
+  return <ReactHighcharts highcharts={Highcharts} config={makeDrilldownConfig(org, onProgrammeClicked)} />
 })
 
-const ProgrammeDrilldown = ({ org, sorter, sortDir }) => {
+const StudytrackChart = React.memo(({ programme }) => {
+  return <ReactHighcharts highcharts={Highcharts} config={makeStudytrackDrilldownConfig(programme)} />
+})
+
+const ProgrammeDrilldown = ({ org, sorter, sortDir, onProgrammeClicked }) => {
   const orgSortedProgrammes = useMemo(() => {
     return { ...org, programmes: [...org.programmes].sort((a, b) => sorters[sorter](a, b) * sortDir) }
   }, [org, sorter, sortDir])
 
-  return <ProgrammeChart org={orgSortedProgrammes} />
+  return <ProgrammeChart org={orgSortedProgrammes} onProgrammeClicked={onProgrammeClicked} />
+}
+
+const StudytrackDrilldown = ({ programme, sorter, sortDir }) => {
+  if (!programme.studytracks || programme.studytracks.length < 1)
+    return (
+      <Segment>
+        <h3 align="center">no studytrack data available for selected programme</h3>
+      </Segment>
+    )
+  const programmeSortedStudytracks = useMemo(() => {
+    return { ...programme, studytracks: [...programme.studytracks].sort((a, b) => sorters[sorter](a, b) * sortDir) }
+  }, [programme, sorter, sortDir])
+  return <StudytrackChart programme={programmeSortedStudytracks} />
 }
 
 const ProtoC = () => {
@@ -235,6 +335,7 @@ const ProtoC = () => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrg, setDrilldownOrg] = useState(null)
+  const [drilldownProgramme, setDrilldownProgramme] = useState(null)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
@@ -262,6 +363,11 @@ const ProtoC = () => {
 
   const handleOrgClicked = useCallback(org => {
     setDrilldownOrg(org)
+    setDrilldownProgramme(null)
+  }, [])
+
+  const handleProgrammeClicked = useCallback(programme => {
+    setDrilldownProgramme(programme)
   }, [])
 
   const sortedOrgs = useMemo(() => {
@@ -310,7 +416,15 @@ const ProtoC = () => {
         <Loader active={isLoading} />
         {!isLoading && data && <OrgChart orgs={sortedOrgs} onOrgClicked={handleOrgClicked} />}
         {!isLoading && data && drilldownOrg && (
-          <ProgrammeDrilldown org={drilldownOrg} sorter={sorter} sortDir={sortDir} />
+          <ProgrammeDrilldown
+            org={drilldownOrg}
+            sorter={sorter}
+            sortDir={sortDir}
+            onProgrammeClicked={handleProgrammeClicked}
+          />
+        )}
+        {!isLoading && data && drilldownProgramme && (
+          <StudytrackDrilldown programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
         )}
         <div align="center" style={{ margin: '10px' }}>
           <span style={{ border: '1px solid black', padding: '4px' }}>
