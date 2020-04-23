@@ -9,6 +9,7 @@ const userServiceClient = axios.create({
   baseURL: USERSERVICE_URL,
   headers: { secret: process.env.USERSERVICE_SECRET }
 })
+const { getAssociations } = require('../services/studyrights')
 
 const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
 
@@ -51,7 +52,7 @@ const targetCreditsForStartDate = startDate => {
 }
 
 const getTargetStudentCounts = _.memoize(
-  async ({ includeOldAttainments, excludeNonEnrolled }) => {
+  async ({ codes, includeOldAttainments, excludeNonEnrolled }) => {
     return await sequelize.query(
       `
     SELECT
@@ -59,6 +60,7 @@ const getTargetStudentCounts = _.memoize(
         ss.org_name "orgName",
         ss.programme_code "programmeCode",
         ss.programme_name "programmeName",
+        ss.programme_type "programmeType",
         COUNT(ss.studentnumber) "programmeTotalStudents",
         SUM(
              public.is_in_target(
@@ -99,6 +101,7 @@ const getTargetStudentCounts = _.memoize(
             org_name,
             programme_code,
             programme_name,
+            programme_type,
             studystartdate,
             studentnumber,
             SUM(credits) credits,
@@ -112,6 +115,7 @@ const getTargetStudentCounts = _.memoize(
                 org.name->>'fi' org_name,
                 element_details.code programme_code,
                 element_details.name->>'fi' programme_name,
+                element_details.type programme_type,
                 studyright.studystartdate studystartdate,
                 studyright.student_studentnumber studentnumber,
                 credit.credits credits,
@@ -181,15 +185,19 @@ const getTargetStudentCounts = _.memoize(
                 studyright.extentcode = 1 -- Bachelor's
                 AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
                 AND studyright.studystartdate IN ('2017-07-31 21:00:00+00', '2018-07-31 21:00:00+00', '2019-07-31 21:00:00+00')
-                AND element_details.type = 20 -- programme
+                AND element_details.type IN (20,30) -- programme
+                ${codes.length > 0 ? 'AND element_details.code IN (:codes)' : ''}
                 AND transfers.studyrightid IS NULL -- Not transferred within faculty
         ) s
-        GROUP BY (1,2), (3,4), 5, 6
+        GROUP BY (1,2), (3,4) ,5 , 6, 7
     ) ss
-    GROUP BY (1, 2), (3, 4);
+    GROUP BY (1, 2), (3, 4), 5;
     `,
       {
-        type: sequelize.QueryTypes.SELECT
+        type: sequelize.QueryTypes.SELECT,
+        replacements: {
+          codes: codes
+        }
       }
     )
   },
@@ -754,11 +762,55 @@ router.get(
 router.get(
   '/proto-c-data',
   withErr(async (req, res) => {
+    const associations = await getAssociations()
+    const codes = associations.programmes[req.query.code]
+      ? [...associations.programmes[req.query.code].studytracks, req.query.code]
+      : []
+
     const data = await getTargetStudentCounts({
+      codes: codes,
       includeOldAttainments: req.query.include_old_attainments === 'true',
       excludeNonEnrolled: req.query.exclude_non_enrolled === 'true'
     })
-    const mankelid = _(data)
+
+    const programmeData = data.filter(d => d.programmeType !== 30)
+    const studytrackData = data.filter(d => d.programmeType !== 20)
+
+    // mankel through studytracks
+    const studytrackMankelid = _(studytrackData)
+      // seems to return the numerical columns as strings, parse them first
+      .map(programmeRow => ({
+        ...programmeRow,
+        programmeTotalStudents: parseInt(programmeRow.programmeTotalStudents, 10),
+        students3y: parseInt(programmeRow.students3y, 10),
+        // 4y group includes 3y group, make 4y count exclusive:
+        students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
+        currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
+      }))
+      .value()
+
+    // associate studytracks with bachelor programme
+    const studytrackToBachelorProgrammes = Object.keys(associations.programmes).reduce((acc, curr) => {
+      if (!curr.includes('KH')) return acc
+      const studytracksForProgramme = studytrackMankelid.reduce((acc2, studytrackdata) => {
+        if (associations.programmes[curr].studytracks.includes(studytrackdata.programmeCode)) {
+          acc2.push({
+            code: studytrackdata.programmeCode,
+            name: studytrackdata.programmeName,
+            totalStudents: studytrackdata.programmeTotalStudents,
+            students3y: studytrackdata.students3y,
+            students4y: studytrackdata.students4y,
+            currentlyCancelled: studytrackdata.currentlyCancelled
+          })
+        }
+        return acc2
+      }, [])
+      if (studytracksForProgramme) acc[curr] = studytracksForProgramme
+      return acc
+    }, {})
+
+    // combine studytracks data to programme data
+    const newmankelid = _(programmeData)
       // seems to return the numerical columns as strings, parse them first
       .map(programmeRow => ({
         ...programmeRow,
@@ -791,13 +843,14 @@ router.get(
             totalStudents,
             students3y,
             students4y,
-            currentlyCancelled
+            currentlyCancelled,
+            studytracks: studytrackToBachelorProgrammes[code]
           })
         )
       }))
       .value()
 
-    res.json(mankelid)
+    res.json(newmankelid)
   })
 )
 
