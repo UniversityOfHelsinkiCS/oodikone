@@ -6,25 +6,25 @@ import { Dropdown, Tab, Message, Button } from 'semantic-ui-react'
 import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
-import { isNewHYStudyProgramme, textAndDescriptionSearch } from '../../../common'
+import { isNewHYStudyProgramme, textAndDescriptionSearch, getUserIsAdmin } from '../../../common'
+import ProtoC from '../../CoolDataScience/ProtoC'
 
-const Overview = props => {
+const Overview = ({
+  language,
+  throughput,
+  studyprogramme,
+  dispatchGetProductivity,
+  dispatchGetThroughput,
+  history,
+  studyprogrammes,
+  isAdmin
+}) => {
   const [selectedTrack, setTrack] = useState('')
   const [selectedYear, setYear] = useState('')
   const [throughputData, setData] = useState(null)
   const [studytrackOptions, setStudytrackOptions] = useState([])
   const [yearOptions, setYearOptions] = useState([])
   const [activeIndex, setIndex] = useState(0)
-
-  const {
-    language,
-    throughput,
-    studyprogramme,
-    dispatchGetProductivity,
-    dispatchGetThroughput,
-    history,
-    studyprogrammes
-  } = props
 
   useEffect(() => {
     dispatchGetProductivity(studyprogramme)
@@ -94,13 +94,15 @@ const Overview = props => {
         )
         const studytrackYearData = Object.keys(selectedYearData.studytrackdata).reduce((acc, curr) => {
           const studytrack = filteredStudytracks.find(st => st.code === curr)
-          const newStudyTrackObject = {
-            ...selectedYearData.studytrackdata[curr],
-            // oh pls no, pls fix asap
-            // need to fix logic in throughputtable component so that we can name this better
-            year: `${studytrack.name[language]}, ${curr}`
+          if (studytrack) {
+            const newStudyTrackObject = {
+              ...selectedYearData.studytrackdata[curr],
+              // oh pls no, pls fix asap
+              // need to fix logic in throughputtable component so that we can name this better
+              year: `${studytrack.name[language]}, ${curr}`
+            }
+            acc.push(newStudyTrackObject)
           }
-          acc.push(newStudyTrackObject)
           return acc
         }, [])
         const newData = {
@@ -199,7 +201,7 @@ const Overview = props => {
     if (activeIndex === 1) {
       setTrack(studytrackOptions[0].value)
       setYear('')
-    } else {
+    } else if (activeIndex === 0) {
       setYear(yearOptions[0].value)
       setTrack('')
     }
@@ -216,6 +218,13 @@ const Overview = props => {
       render: () => renderTable(false)
     }
   ]
+
+  if (isAdmin)
+    panes.push({
+      menuItem: 'Studytrack Graph',
+      render: () => <ProtoC programme={studyprogramme} />
+    })
+
   return (
     <>
       <Message
@@ -229,6 +238,7 @@ const Overview = props => {
 
 Overview.propTypes = {
   studyprogramme: string.isRequired,
+  isAdmin: bool.isRequired,
   dispatchGetProductivity: func.isRequired,
   dispatchGetThroughput: func.isRequired,
   history: shape({}).isRequired,
@@ -241,9 +251,17 @@ Overview.propTypes = {
   }).isRequired // eslint-disable-line
 }
 
-const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgrammes, settings }) => ({
+const mapStateToProps = ({
+  studyProgrammeThroughput,
+  populationDegreesAndProgrammes,
+  settings,
+  auth: {
+    token: { roles }
+  }
+}) => ({
   throughput: studyProgrammeThroughput,
   studyprogrammes: populationDegreesAndProgrammes.data.programmes || {},
+  isAdmin: getUserIsAdmin(roles),
   language: settings.language
 })
 

@@ -66,17 +66,16 @@ const defaultConfig = () => {
   }
 }
 
-const makeConfig = (sortedOrgs, onOrgClicked) => {
+const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
   const addPointClickHandler = serie => {
     serie.point = {
       events: {
         click: e => {
-          const clickedOrg = sortedOrgs.find(org => e.point && e.point.custom && org.code === e.point.custom.orgCode)
-          if (clickedOrg) {
+          const clickedPoint = sortedData.find(data => e.point && e.point.custom && data.code === e.point.custom.code)
+          if (clickedPoint) {
             // use setImmediate so the click handler can finish
             // before datamangels begins so that the browser is responsive
-            setImmediate(() => onOrgClicked(clickedOrg))
-            e.point.update()
+            setImmediate(() => onPointClicked(clickedPoint))
           }
         }
       }
@@ -88,43 +87,43 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
     {
       color: '#7f8c8d',
       name: 'tällä hetkellä peruutettu',
-      data: sortedOrgs.map(org => ({
-        y: org.currentlyCancelled,
+      data: sortedData.map(data => ({
+        y: data.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
-        z: org.currentlyCancelled / org.totalStudents
+        z: data.currentlyCancelled / data.totalStudents
       }))
     },
     {
       color: '#ff7979',
       name: 'ei tahdissa',
-      data: sortedOrgs.map(org => ({
+      data: sortedData.map(data => ({
         custom: {
-          orgCode: org.code
+          code: data.code
         },
-        y: org.totalStudents - org.students3y - org.students4y - org.currentlyCancelled,
-        z: (org.totalStudents - org.students3y - org.students4y - org.currentlyCancelled) / org.totalStudents
+        y: data.totalStudents - data.students3y - data.students4y - data.currentlyCancelled,
+        z: (data.totalStudents - data.students3y - data.students4y - data.currentlyCancelled) / data.totalStudents
       }))
     },
     {
       color: '#f9ca24',
       name: '4v tahdissa',
-      data: sortedOrgs.map(org => ({
+      data: sortedData.map(data => ({
         custom: {
-          orgCode: org.code
+          code: data.code
         },
-        y: org.students4y,
-        z: org.students4y / org.totalStudents
+        y: data.students4y,
+        z: data.students4y / data.totalStudents
       }))
     },
     {
       color: '#6ab04c',
       name: '3v tahdissa',
-      data: sortedOrgs.map(org => ({
+      data: sortedData.map(data => ({
         custom: {
-          orgCode: org.code
+          code: data.code
         },
-        y: org.students3y,
-        z: org.students3y / org.totalStudents
+        y: data.students3y,
+        z: data.students3y / data.totalStudents
       }))
     }
   ].map(addPointClickHandler)
@@ -136,40 +135,26 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
         display: 'none'
       }
     },
-    responsive: {
-      rules: [
-        {
-          condition: {
-            callback: function() {
-              console.log(series)
-            }
-          },
-          chartOptions: {
-            legend: {
-              enabled: false
-            }
-          }
-        }
-      ]
-    },
     xAxis: {
-      categories: sortedOrgs.map(org => org.name)
+      categories: sortedData.map(data => data.name)
     },
     yAxis: {
       title: {
-        text: '% tiedekunnan opiskelijoista'
+        text: ` ${
+          org ? `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${org.name}` : '% tiedekunnan opiskelijoista'
+        }`
       }
     },
     series
   })
 }
 
-const makeDrilldownConfig = org => {
+const makeNonClickableChartConfig = programme => {
   const series = [
     {
       color: '#7f8c8d',
       name: 'tällä hetkellä peruutettu',
-      data: org.programmes.map(p => ({
+      data: programme.studytracks.map(p => ({
         y: p.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
         z: p.currentlyCancelled / p.totalStudents
@@ -178,7 +163,7 @@ const makeDrilldownConfig = org => {
     {
       color: '#ff7979',
       name: 'ei tahdissa',
-      data: org.programmes.map(p => ({
+      data: programme.studytracks.map(p => ({
         y: p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled,
         z: (p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled) / p.totalStudents
       }))
@@ -187,7 +172,7 @@ const makeDrilldownConfig = org => {
     {
       color: '#f9ca24',
       name: '4v tahdissa',
-      data: org.programmes.map(p => ({
+      data: programme.studytracks.map(p => ({
         y: p.students4y,
         z: p.students4y / p.totalStudents
       }))
@@ -195,7 +180,7 @@ const makeDrilldownConfig = org => {
     {
       color: '#6ab04c',
       name: '3v tahdissa',
-      data: org.programmes.map(p => ({
+      data: programme.studytracks.map(p => ({
         y: p.students3y,
         z: p.students3y / p.totalStudents
       }))
@@ -204,14 +189,14 @@ const makeDrilldownConfig = org => {
 
   return Highcharts.merge(defaultConfig(), {
     title: {
-      text: `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${org.name}`
+      text: `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
     },
     xAxis: {
-      categories: org.programmes.map(p => p.name)
+      categories: programme.studytracks.map(p => p.name)
     },
     yAxis: {
       title: {
-        text: '% ohjelman opiskelijoista'
+        text: '% opintosuunnan opiskelijoista'
       }
     },
     series
@@ -230,27 +215,53 @@ const sorters = {
 }
 
 const OrgChart = React.memo(({ orgs, onOrgClicked }) => {
-  return <ReactHighcharts highcharts={Highcharts} config={makeConfig(orgs, onOrgClicked)} />
+  return <ReactHighcharts highcharts={Highcharts} config={makeClickableChartConfig(orgs, onOrgClicked)} />
 })
 
-const ProgrammeChart = React.memo(({ org }) => {
-  return <ReactHighcharts highcharts={Highcharts} config={makeDrilldownConfig(org)} />
+const ProgrammeChart = React.memo(({ programmes, onProgrammeClicked, org }) => {
+  return (
+    <ReactHighcharts highcharts={Highcharts} config={makeClickableChartConfig(programmes, onProgrammeClicked, org)} />
+  )
 })
 
-const ProgrammeDrilldown = ({ org, sorter, sortDir }) => {
+const StudytrackChart = React.memo(({ programme }) => {
+  return <ReactHighcharts highcharts={Highcharts} config={makeNonClickableChartConfig(programme)} />
+})
+
+const ProgrammeDrilldown = ({ org, sorter, sortDir, onProgrammeClicked }) => {
   const orgSortedProgrammes = useMemo(() => {
     return { ...org, programmes: [...org.programmes].sort((a, b) => sorters[sorter](a, b) * sortDir) }
   }, [org, sorter, sortDir])
 
-  return <ProgrammeChart org={orgSortedProgrammes} />
+  return (
+    <ProgrammeChart
+      programmes={orgSortedProgrammes.programmes}
+      onProgrammeClicked={onProgrammeClicked}
+      org={orgSortedProgrammes}
+    />
+  )
 }
 
-const ProtoC = () => {
+const StudytrackDrilldown = ({ programme, sorter, sortDir }) => {
+  if (!programme.studytracks || programme.studytracks.length < 1)
+    return (
+      <Segment>
+        <h3 align="center">no studytrack data available for selected programme</h3>
+      </Segment>
+    )
+  const programmeSortedStudytracks = useMemo(() => {
+    return { ...programme, studytracks: [...programme.studytracks].sort((a, b) => sorters[sorter](a, b) * sortDir) }
+  }, [programme, sorter, sortDir])
+  return <StudytrackChart programme={programmeSortedStudytracks} />
+}
+
+const ProtoC = ({ programme }) => {
   const [data, setData] = useState(null)
   const [isLoading, setLoading] = useState(true)
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrg, setDrilldownOrg] = useState(null)
+  const [drilldownProgramme, setDrilldownProgramme] = useState(null)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
@@ -260,10 +271,19 @@ const ProtoC = () => {
       setLoading(true)
       const res = await callApi('/cool-data-science/proto-c-data', 'get', null, {
         include_old_attainments: includeOldAttainments.toString(),
-        exclude_non_enrolled: excludeNonEnrolled.toString()
+        exclude_non_enrolled: excludeNonEnrolled.toString(),
+        code: programme
       })
       setData(res.data)
       setLoading(false)
+      // super hax pls fix
+      if (!!programme) {
+        const programmeData = Object.values(res.data).reduce((acc, curr) => {
+          acc.push(...curr.programmes)
+          return acc
+        }, [])[0]
+        setDrilldownProgramme(programmeData)
+      }
     }
 
     load()
@@ -279,6 +299,11 @@ const ProtoC = () => {
 
   const handleOrgClicked = useCallback(org => {
     setDrilldownOrg(org)
+    setDrilldownProgramme(null)
+  }, [])
+
+  const handleProgrammeClicked = useCallback(programme => {
+    setDrilldownProgramme(programme)
   }, [])
 
   const sortedOrgs = useMemo(() => {
@@ -292,69 +317,98 @@ const ProtoC = () => {
 
   const { CoolDataScience } = InfoToolTips
 
+  // create list from sorters and deprecate this
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)
     .sort((a, b) => {
       if (a === 'nimi') return false
       return a > b
     })
+
+  const SorterButtons = () => (
+    <div align="center" style={{ marginTop: '10px' }}>
+      <Button.Group>
+        <Button style={{ cursor: 'default' }} active color="black">
+          Sort by:
+        </Button>
+        {sorterNames.map(sorterName => (
+          <Button
+            basic={sorter !== sorterName}
+            color={sorter === sorterName ? 'blue' : 'black'}
+            key={sorterName}
+            active={sorter === sorterName}
+            onClick={() => handleClick(sorterName)}
+            style={{ borderRadius: '1px' }}
+            icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
+            content={sorterName}
+          />
+        ))}
+      </Button.Group>
+    </div>
+  )
+  // legend and checkboxes, custom legend because highcharts is pita
+  const RenderBelowGraph = () => (
+    <>
+      <div align="center" style={{ margin: '10px' }}>
+        <span style={{ border: '1px solid black', padding: '4px' }}>
+          <Icon style={{ marginLeft: '10px', color: '#6ab04c' }} name="circle" size="small" /> 3v tahdissa
+          <Icon style={{ marginLeft: '10px', color: '#f9ca24' }} name="circle" size="small" /> 4v tahdissa
+          <Icon style={{ marginLeft: '10px', color: '#ff7979' }} name="circle" size="small" /> ei tahdissa
+          <Icon style={{ marginLeft: '10px', color: '#7f8c8d' }} name="circle" size="small" /> tällä hetkellä peruutettu
+        </span>
+      </div>
+      <div align="center">
+        <Checkbox
+          label="Include only at least once enrolled students"
+          onChange={handleExcludeNonEnrolledToggled}
+          checked={excludeNonEnrolled}
+        />
+        <Checkbox
+          style={{ marginLeft: '10px' }}
+          label="Include old attainments"
+          onChange={handleOldAttainmentToggled}
+          checked={includeOldAttainments}
+        />
+      </div>
+      <Message>
+        <ReactMarkdown source={CoolDataScience.protoC} escapeHtml={false} />
+      </Message>
+    </>
+  )
+
+  if (!!programme && drilldownProgramme) {
+    return (
+      <Segment>
+        <SorterButtons />
+        <StudytrackDrilldown programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
+        <RenderBelowGraph />
+      </Segment>
+    )
+  }
+
   return (
     <Segment>
       <div align="center">
         <h2>Prototyyppi: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
-      <div align="center" style={{ marginTop: '10px' }}>
-        <Button.Group>
-          <Button style={{ cursor: 'default' }} active color="black">
-            Sort by:
-          </Button>
-          {sorterNames.map(sorterName => (
-            <Button
-              basic={sorter !== sorterName}
-              color={sorter === sorterName ? 'blue' : 'black'}
-              key={sorterName}
-              active={sorter === sorterName}
-              onClick={() => handleClick(sorterName)}
-              style={{ borderRadius: '1px' }}
-              icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
-              content={sorterName}
-            />
-          ))}
-        </Button.Group>
-      </div>
+      <SorterButtons />
       <Segment placeholder={isLoading} vertical>
         <Dimmer inverted active={isLoading} />
         <Loader active={isLoading} />
         {!isLoading && data && <OrgChart orgs={sortedOrgs} onOrgClicked={handleOrgClicked} />}
         {!isLoading && data && drilldownOrg && (
-          <ProgrammeDrilldown org={drilldownOrg} sorter={sorter} sortDir={sortDir} />
+          <ProgrammeDrilldown
+            org={drilldownOrg}
+            sorter={sorter}
+            sortDir={sortDir}
+            onProgrammeClicked={handleProgrammeClicked}
+          />
         )}
-        <div align="center" style={{ margin: '10px' }}>
-          <span style={{ border: '1px solid black', padding: '4px' }}>
-            <Icon style={{ marginLeft: '10px', color: '#6ab04c' }} name="circle" size="small" /> 3v tahdissa
-            <Icon style={{ marginLeft: '10px', color: '#f9ca24' }} name="circle" size="small" /> 4v tahdissa
-            <Icon style={{ marginLeft: '10px', color: '#ff7979' }} name="circle" size="small" /> ei tahdissa
-            <Icon style={{ marginLeft: '10px', color: '#7f8c8d' }} name="circle" size="small" /> tällä hetkellä
-            peruutettu
-          </span>
-        </div>
-        <div align="center">
-          <Checkbox
-            label="Include only at least once enrolled students"
-            onChange={handleExcludeNonEnrolledToggled}
-            checked={excludeNonEnrolled}
-          />
-          <Checkbox
-            style={{ marginLeft: '10px' }}
-            label="Include old attainments"
-            onChange={handleOldAttainmentToggled}
-            checked={includeOldAttainments}
-          />
-        </div>
+        {!isLoading && data && drilldownProgramme && (
+          <StudytrackDrilldown programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
+        )}
       </Segment>
-      <Message>
-        <ReactMarkdown source={CoolDataScience.protoC} escapeHtml={false} />
-      </Message>
+      <RenderBelowGraph />
     </Segment>
   )
 }

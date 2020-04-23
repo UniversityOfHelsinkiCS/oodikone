@@ -51,7 +51,8 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
     {
       key: 'name',
       title: 'name',
-      getRowVal: ({ code }) => (
+      getRowVal: ({ code }) => code,
+      getRowContent: ({ code }) => (
         <div>
           {' '}
           {getNameOfProgramme(code)} <ShowProgrammeOverView code={code} />

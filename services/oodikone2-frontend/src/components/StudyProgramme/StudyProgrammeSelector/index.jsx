@@ -1,15 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { arrayOf, func, string, bool, shape } from 'prop-types'
+import { arrayOf, string, bool, shape } from 'prop-types'
 import { Loader, Message, Header, Form } from 'semantic-ui-react'
-import { getDegreesAndProgrammes } from '../../../redux/populationDegreesAndProgrammes'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 
 class StudyProgrammeSelector extends Component {
   static propTypes = {
-    getDegreesAndProgrammes: func.isRequired,
     studyprogrammes: arrayOf(shape({ name: shape({}), code: string })),
     selected: bool.isRequired,
     language: string.isRequired
@@ -25,12 +23,6 @@ class StudyProgrammeSelector extends Component {
 
   static defaultProps = {
     studyprogrammes: null
-  }
-
-  componentDidMount() {
-    if (!this.props.studyprogrammes) {
-      this.props.getDegreesAndProgrammes()
-    }
   }
 
   handleFilterChange = value => {
@@ -50,7 +42,8 @@ class StudyProgrammeSelector extends Component {
       {
         key: 'programmecode',
         title: 'code',
-        getRowVal: prog => (
+        getRowVal: prog => prog.code,
+        getRowContent: prog => (
           <Link
             style={{
               color: 'black',
@@ -73,7 +66,8 @@ class StudyProgrammeSelector extends Component {
       {
         key: 'programmename',
         title: 'name',
-        getRowVal: prog => (
+        getRowVal: prog => getTextIn(prog.name, language),
+        getRowContent: prog => (
           <Link
             style={{
               color: 'black',
@@ -159,5 +153,5 @@ const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
 
 export default connect(
   mapStateToProps,
-  { getDegreesAndProgrammes }
+  null
 )(StudyProgrammeSelector)
