@@ -268,24 +268,26 @@ const ProtoC = ({ programme }) => {
 
   useEffect(() => {
     const load = async () => {
-      setLoading(true)
-      const res = await callApi('/cool-data-science/proto-c-data', 'get', null, {
-        include_old_attainments: includeOldAttainments.toString(),
-        exclude_non_enrolled: excludeNonEnrolled.toString(),
-        code: programme
-      })
-      setData(res.data)
-      setLoading(false)
-      // super hax pls fix
       if (!!programme) {
-        const programmeData = Object.values(res.data).reduce((acc, curr) => {
-          acc.push(...curr.programmes)
-          return acc
-        }, [])[0]
-        setDrilldownProgramme(programmeData)
+        setLoading(true)
+        const res = await callApi('/cool-data-science/proto-c-data-programme', 'get', null, {
+          include_old_attainments: includeOldAttainments.toString(),
+          exclude_non_enrolled: excludeNonEnrolled.toString(),
+          code: programme
+        })
+        setDrilldownProgramme(res.data)
+        setLoading(false)
+      } else {
+        setLoading(true)
+        const res = await callApi('/cool-data-science/proto-c-data', 'get', null, {
+          include_old_attainments: includeOldAttainments.toString(),
+          exclude_non_enrolled: excludeNonEnrolled.toString(),
+          code: programme
+        })
+        setData(res.data)
+        setLoading(false)
       }
     }
-
     load()
   }, [includeOldAttainments, excludeNonEnrolled])
 

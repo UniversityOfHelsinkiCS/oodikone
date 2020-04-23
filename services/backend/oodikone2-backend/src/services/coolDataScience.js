@@ -158,7 +158,7 @@ const getTargetStudentCounts = _.memoize(
                 AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
                 AND studyright.studystartdate IN ('2017-07-31 21:00:00+00', '2018-07-31 21:00:00+00', '2019-07-31 21:00:00+00')
                 AND element_details.type IN (20,30) -- programme
-                ${codes.length > 0 ? 'AND element_details.code IN (:codes)' : ''}
+                ${!!codes && codes.length > 0 ? 'AND element_details.code IN (:codes)' : ''}
                 AND transfers.studyrightid IS NULL -- Not transferred within faculty
         ) s
         GROUP BY (1,2), (3,4) ,5 , 6, 7
