@@ -18,7 +18,8 @@ export default {
   suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna. Vain suoritetut ja hyväksiluetut opintopisteet huomioidaan.
   <br> <br>
   Tilannekuvassa voi **porautua** kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. **Asetukset**-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. Valinta **Näytä edelliset vuodet** näyttää
-  vuosittaisen opintopiste-kertymän tähän päivään mennessä vuonna X sekä koko lukuvuoden X opintopisteet muodossa "kerääntymä vuonna X / koko lukuvuoden X opintopisteet".
+  vuosittaisen opintopiste-kertymän tähän päivään mennessä vuonna X sekä koko lukuvuoden X opintopisteet muodossa "\`kerääntymä vuonna X / koko lukuvuoden X opintopisteet\`". Kohdasta **Näytä päivänä** voi valita tarkastelupäivän, joka on
+  oletusarvoisesti tämänhetkinen päivä.
   <br> <br>
   Avoimen yliopiston suorituksia ei vielä lasketa mukaan.
   `
