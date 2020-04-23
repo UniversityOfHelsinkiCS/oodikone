@@ -136,22 +136,6 @@ const makeConfig = (sortedOrgs, onOrgClicked) => {
         display: 'none'
       }
     },
-    responsive: {
-      rules: [
-        {
-          condition: {
-            callback: function() {
-              console.log(series)
-            }
-          },
-          chartOptions: {
-            legend: {
-              enabled: false
-            }
-          }
-        }
-      ]
-    },
     xAxis: {
       categories: sortedOrgs.map(org => org.name)
     },
@@ -268,7 +252,6 @@ const ProtoC = () => {
 
     load()
   }, [includeOldAttainments, excludeNonEnrolled])
-
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
   }, [])
