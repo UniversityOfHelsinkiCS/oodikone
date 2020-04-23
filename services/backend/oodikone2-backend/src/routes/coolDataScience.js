@@ -555,17 +555,20 @@ const mankeliUberData = data =>
     .sort((a, b) => a.name.localeCompare(b.name))
     .value()
 
-const getCurrentStudyYearStartDate = async () =>
-  new Date(
-    (await sequelize.query(
-      `
-    SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < NOW() ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
+const getCurrentStudyYearStartDate = _.memoize(
+  async unixMillis =>
+    new Date(
+      (await sequelize.query(
+        `
+    SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < :a ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
     `,
-      {
-        type: sequelize.QueryTypes.SELECT
-      }
-    ))[0].startdate
-  )
+        {
+          type: sequelize.QueryTypes.SELECT,
+          replacements: { a: new Date(unixMillis) }
+        }
+      ))[0].startdate
+    )
+)
 
 const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum') => {
   return sequelize.query(
@@ -601,7 +604,7 @@ const mergele = (a, b) => {
   return _.mergeWith(a, b, sumMerge)
 }
 
-const makeYearlyCreditsPromises = (now, currentYear, years, getRange, alias = 'sum') => {
+const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum') => {
   return years.map(
     year =>
       new Promise(async res => {
@@ -618,27 +621,24 @@ const makeYearlyCreditsPromises = (now, currentYear, years, getRange, alias = 's
   )
 }
 
-const getStatusStatistics = _.memoize(async () => {
+const getStatusStatistics = _.memoize(async unixMillis => {
   const Y_TO_MS = 31556952000
-  const now = new Date().getTime()
-  const currentAcademicYearStartDate = await getCurrentStudyYearStartDate()
+  const currentAcademicYearStartDate = await getCurrentStudyYearStartDate(unixMillis)
   const currentAcademicYearStartYear = currentAcademicYearStartDate.getFullYear()
   const currentAcademicYearStartTime = currentAcademicYearStartDate.getTime()
 
   const yearRange = _.range(2017, currentAcademicYearStartYear + 1)
   const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
-    now,
     currentAcademicYearStartYear,
     yearRange,
     diff => ({
       from: new Date(currentAcademicYearStartTime - diff * Y_TO_MS),
-      to: new Date(now - diff * Y_TO_MS)
+      to: new Date(unixMillis - diff * Y_TO_MS)
     }),
     'acc'
   )
 
   const yearlyTotalCreditsPromises = makeYearlyCreditsPromises(
-    now,
     currentAcademicYearStartYear,
     yearRange.slice(0, -1),
     diff => ({
@@ -648,6 +648,7 @@ const getStatusStatistics = _.memoize(async () => {
     'total'
   )
 
+  /* Gather all required data */
   const [
     yearlyAccCredits,
     yearlyTotalCredits,
@@ -662,6 +663,7 @@ const getStatusStatistics = _.memoize(async () => {
     userServiceClient.get('/faculty_programmes')
   ])
 
+  /* Construct some helper maps */
   const facultyCodeToFaculty = faculties.reduce((res, curr) => {
     res[curr.code] = curr
     return res
@@ -682,6 +684,7 @@ const getStatusStatistics = _.memoize(async () => {
     return res
   }, {})
 
+  /* Calculate course level stats and group by providers */
   const coursesGroupedByProvider = Object.entries(
     _.groupBy([..._.flatten(yearlyAccCredits), ..._.flatten(yearlyTotalCredits)], 'providercode')
   ).reduce((acc, [providerCode, courseCredits]) => {
@@ -705,6 +708,7 @@ const getStatusStatistics = _.memoize(async () => {
     return acc
   }, {})
 
+  /* Map providers into proper programmes and calculate programme level stats */
   const groupedByProgramme = Object.entries(coursesGroupedByProvider).reduce((acc, [providerCode, courses]) => {
     const programme = providerToProgramme[providerCode]
     const courseValues = Object.values(courses)
@@ -722,6 +726,7 @@ const getStatusStatistics = _.memoize(async () => {
     return acc
   }, {})
 
+  /* Group programmes into faculties and calculate faculty level stats */
   const groupedByFaculty = Object.entries(groupedByProgramme).reduce((acc, [programmeCode, programmeStats]) => {
     const facultyCodes = programmeToFaculties[programmeCode]
     if (!facultyCodes) return acc
@@ -890,9 +895,16 @@ router.get(
 router.get(
   '/status',
   withErr(async (req, res) => {
-    const startOfToday = new Date()
-    startOfToday.setHours(0, 0, 0, 0)
-    const status = await getStatusStatistics(startOfToday.getTime()) // Memoizing by day
+    const { date: unixMillis } = req.query
+    const date = new Date(Number(unixMillis))
+
+    if (isNaN(date.getTime()) || date.getTime() > new Date().getTime()) {
+      return res.status(400).json({ error: 'Invalid date' })
+    }
+
+    // End of day
+    date.setHours(23, 59, 59, 999)
+    const status = await getStatusStatistics(date.getTime())
     res.json(status)
   })
 )

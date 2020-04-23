@@ -231,7 +231,8 @@ class PopulationStudents extends Component {
       {
         key: 'studentnumber',
         title: 'student number',
-        getRowVal: s => (
+        getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
+        getRowContent: s => (
           <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
             {!s.obfuscated ? s.studentNumber : 'hidden'}
           </span>
