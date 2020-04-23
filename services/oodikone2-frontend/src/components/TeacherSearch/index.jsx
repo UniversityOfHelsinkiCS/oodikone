@@ -57,7 +57,7 @@ class TeacherSearch extends Component {
       { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
       {
         key: 'icon',
-        getRowVal: () => <Icon name={this.props.icon} />,
+        getRowContent: () => <Icon name={this.props.icon} />,
         cellProps: { collapsing: true },
         headerProps: { onClick: null, sorted: null }
       }

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
 import _ from 'lodash'
+import moment from 'moment'
+import ReactMarkdown from 'react-markdown'
+import Datetime from 'react-datetime'
 import { getTextIn } from '../../common'
 import { callApi } from '../../apiConnection'
+import InfoToolTips from '../../common/InfoToolTips'
 import './status.css'
 
 const getP = (a, b) => {
@@ -124,23 +128,32 @@ StatusContainer.propTypes = {
   yearlyValues: PropTypes.shape({}).isRequired
 }
 
+const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
+
 const Status = () => {
+  const DATE_FORMAT = 'DD.MM.YYYY'
   const [showYearlyValues, setShowYearlyValues] = useState(false)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
   const [drillStack, setDrillStack] = useState([])
-  const [showSettings, setShowSettings] = useState(false)
+  const [showSettings, setShowSettings] = useState(true)
+  const [selectedDate, setSelectedDate] = useState(moment())
+  const { CoolDataScience } = InfoToolTips
+
+  const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      const res = await callApi('/cool-data-science/status', 'get', null)
-      setData(res.data)
-      setLoading(false)
-    }
+    if (selectedDate && isValidDate(selectedDate)) {
+      const load = async () => {
+        setLoading(true)
+        const res = await callApi('/cool-data-science/status', 'get', null, { date: selectedDate.valueOf() })
+        setData(res.data)
+        setLoading(false)
+      }
 
-    load()
-  }, [])
+      load()
+    }
+  }, [selectedDate])
 
   const handleShowYearlyValuesToggled = () => {
     setShowYearlyValues(!showYearlyValues)
@@ -166,7 +179,7 @@ const Status = () => {
           </span>
         </Accordion.Title>
         <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
-          <Segment>
+          <Segment style={{ display: 'flex', alignItems: 'center' }}>
             <div
               style={{
                 width: '10px',
@@ -183,11 +196,27 @@ const Status = () => {
               }}
             />
             <Checkbox
-              style={{ fontSize: '14px', fontWeight: 'normal' }}
+              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
               label="Näytä edelliset vuodet"
               onChange={handleShowYearlyValuesToggled}
               checked={showYearlyValues}
             />
+            <VerticalLine />
+            <Form>
+              <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.9em' }}>Näytä päivänä:</span>
+                <Datetime
+                  className="status-date-time-input"
+                  dateFormat={DATE_FORMAT}
+                  timeFormat={false}
+                  closeOnSelect
+                  value={selectedDate}
+                  locale="fi"
+                  isValidDate={isValidDate}
+                  onChange={setSelectedDate}
+                />
+              </Form.Field>
+            </Form>
           </Segment>
         </Accordion.Content>
       </Accordion>
@@ -244,6 +273,9 @@ const Status = () => {
           )
         })}
       </div>
+      <Message>
+        <ReactMarkdown source={CoolDataScience.status} escapeHtml={false} />
+      </Message>
     </div>
   )
 }

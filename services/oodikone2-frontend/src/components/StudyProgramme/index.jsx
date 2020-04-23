@@ -22,13 +22,17 @@ import Tags from './Tags'
 import { getThroughput } from '../../redux/throughput'
 import { getProductivity } from '../../redux/productivity'
 import { getPresentStudents, clearPresentStudents } from '../../redux/presentStudents'
+import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
+
 import { callApi } from '../../apiConnection'
 
 const StudyProgramme = props => {
   const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
   useTitle('Study programmes')
 
-  useEffect(() => {}, [])
+  useEffect(() => {
+    props.getDegreesAndProgrammesDispatch()
+  }, [])
 
   const refreshProductivity = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {
@@ -195,7 +199,8 @@ StudyProgramme.propTypes = {
   getThroughputDispatch: func.isRequired,
   isAdmin: bool.isRequired,
   getPresentStudentsDispatch: func.isRequired,
-  clearPresentStudentsDispatch: func.isRequired
+  clearPresentStudentsDispatch: func.isRequired,
+  getDegreesAndProgrammesDispatch: func.isRequired
 }
 
 StudyProgramme.defaultProps = {
@@ -213,7 +218,6 @@ const mapStateToProps = ({
   }
 }) => {
   const programmes = populationDegreesAndProgrammes.data ? populationDegreesAndProgrammes.data.programmes : {}
-
   return {
     programmes,
     language: getActiveLanguage(localize).code,
@@ -229,7 +233,8 @@ export default connect(
     getThroughputDispatch: getThroughput,
     getProductivityDispatch: getProductivity,
     getPresentStudentsDispatch: getPresentStudents,
-    clearPresentStudentsDispatch: clearPresentStudents
+    clearPresentStudentsDispatch: clearPresentStudents,
+    getDegreesAndProgrammesDispatch: getDegreesAndProgrammes
   },
   null,
   {
