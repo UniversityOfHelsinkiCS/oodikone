@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Segment, Loader, Dimmer, Icon, Checkbox } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
 import _ from 'lodash'
+import moment from 'moment'
+import ReactMarkdown from 'react-markdown'
+import Datetime from 'react-datetime'
 import { getTextIn } from '../../common'
 import { callApi } from '../../apiConnection'
+import InfoToolTips from '../../common/InfoToolTips'
 import './status.css'
 
 const getP = (a, b) => {
@@ -39,8 +43,8 @@ const StatusContainer = ({
   }
 
   const plussify = x => {
-    if (x > 0) return `+${x}`
-    return x
+    if (x > 0) return `+${x.toLocaleString('fi')}`
+    return x.toLocaleString('fi')
   }
 
   return (
@@ -50,8 +54,8 @@ const StatusContainer = ({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        maxWidth: '220px',
-        minWidth: '220px',
+        maxWidth: '240px',
+        minWidth: '240px',
         cursor: clickable ? 'pointer' : 'default',
         flex: 1,
         margin: 0
@@ -87,14 +91,21 @@ const StatusContainer = ({
       </div>
       {showYearlyValues && (
         <div style={{ marginTop: '10px', textAlign: 'start' }}>
-          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, sum]) => {
+          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, { acc, total }]) => {
             return (
-              <div style={{ margin: '5px 0' }} key={year}>
+              <div style={{ margin: '5px 0' }} key={`${title}-${year}`}>
                 <span>
                   <b>
                     {year}-{`${Number(year) + 1}`.slice(-2)}:
                   </b>{' '}
-                  {Math.round(sum)}
+                  {acc ? Math.round(acc).toLocaleString('fi') : 0}
+                  {!!total && (
+                    <span>
+                      {' '}
+                      <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>/</span>{' '}
+                      {Math.round(total).toLocaleString('fi')}
+                    </span>
+                  )}
                 </span>
               </div>
             )
@@ -117,22 +128,32 @@ StatusContainer.propTypes = {
   yearlyValues: PropTypes.shape({}).isRequired
 }
 
+const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
+
 const Status = () => {
+  const DATE_FORMAT = 'DD.MM.YYYY'
   const [showYearlyValues, setShowYearlyValues] = useState(false)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
   const [drillStack, setDrillStack] = useState([])
+  const [showSettings, setShowSettings] = useState(true)
+  const [selectedDate, setSelectedDate] = useState(moment())
+  const { CoolDataScience } = InfoToolTips
+
+  const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      const res = await callApi('/cool-data-science/status', 'get', null)
-      setData(res.data)
-      setLoading(false)
-    }
+    if (selectedDate && isValidDate(selectedDate)) {
+      const load = async () => {
+        setLoading(true)
+        const res = await callApi('/cool-data-science/status', 'get', null, { date: selectedDate.valueOf() })
+        setData(res.data)
+        setLoading(false)
+      }
 
-    load()
-  }, [])
+      load()
+    }
+  }, [selectedDate])
 
   const handleShowYearlyValuesToggled = () => {
     setShowYearlyValues(!showYearlyValues)
@@ -146,6 +167,60 @@ const Status = () => {
   const popFromDrillStack = () => {
     const updatedDrillStack = _.dropRight([...drillStack], 1)
     setDrillStack(updatedDrillStack)
+  }
+
+  const renderSettings = () => {
+    return (
+      <Accordion style={{ padding: 0, flex: 1 }}>
+        <Accordion.Title style={{ padding: 0, cursor: 'default' }} active={showSettings}>
+          <span style={{ cursor: 'pointer' }} onClick={() => setShowSettings(!showSettings)}>
+            <Icon name="setting" />
+            <span>Asetukset</span>
+          </span>
+        </Accordion.Title>
+        <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
+          <Segment style={{ display: 'flex', alignItems: 'center' }}>
+            <div
+              style={{
+                width: '10px',
+                height: '10px',
+                background: 'red',
+                transform: 'rotateY(0deg) rotate(45deg)',
+                position: 'absolute',
+                top: '-6px',
+                left: '35px',
+                border: '1px solid #dededf',
+                borderRight: 'none',
+                borderBottom: 'none',
+                backgroundColor: 'white'
+              }}
+            />
+            <Checkbox
+              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+              label="Näytä edelliset vuodet"
+              onChange={handleShowYearlyValuesToggled}
+              checked={showYearlyValues}
+            />
+            <VerticalLine />
+            <Form>
+              <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.9em' }}>Näytä päivänä:</span>
+                <Datetime
+                  className="status-date-time-input"
+                  dateFormat={DATE_FORMAT}
+                  timeFormat={false}
+                  closeOnSelect
+                  value={selectedDate}
+                  locale="fi"
+                  isValidDate={isValidDate}
+                  onChange={setSelectedDate}
+                />
+              </Form.Field>
+            </Form>
+          </Segment>
+        </Accordion.Content>
+      </Accordion>
+    )
   }
 
   if (!data || loading)
@@ -164,20 +239,16 @@ const Status = () => {
   const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
   return (
     <div>
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px' }}>
         {drillStack.length > 0 && (
-          <Icon
-            onClick={popFromDrillStack}
-            style={{ fontSize: '40px', cursor: 'pointer', marginRight: '20px' }}
-            name="arrow left"
-          />
+          <Icon onClick={popFromDrillStack} style={{ fontSize: '40px', cursor: 'pointer' }} name="arrow left" />
         )}
-        <Checkbox label="Show previous years" onChange={handleShowYearlyValuesToggled} checked={showYearlyValues} />
+        {renderSettings()}
       </div>
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 220px)',
+          gridTemplateColumns: 'repeat(auto-fill, 240px)',
           gridTemplateRows: 'repeat(auto-fill) 20px',
           gridGap: '20px'
         }}
@@ -188,9 +259,9 @@ const Status = () => {
           const handleClick = () => pushToDrillStack(stats.drill)
           return (
             <StatusContainer
+              key={code}
               clickable={!!stats.drill}
               handleClick={handleClick}
-              key={code}
               title={getTextIn(stats.name)}
               current={stats.current}
               previous={stats.previous}
@@ -202,6 +273,9 @@ const Status = () => {
           )
         })}
       </div>
+      <Message>
+        <ReactMarkdown source={CoolDataScience.status} escapeHtml={false} />
+      </Message>
     </div>
   )
 }

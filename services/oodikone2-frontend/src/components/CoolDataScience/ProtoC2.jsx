@@ -204,7 +204,7 @@ const sorters = {
   nimi: (a, b) => a.name.localeCompare(b.name),
   '4v tahti': (a, b) => a.students4y - b.students4y,
   '3v tahti': (a, b) => a.students3y - b.students3y,
-  'ei tahdissa': (a, b) => countNotInTarget(a) - countNotInTarget(b),
+  'ei tahdissa': (a, b) => countNotInTarget(a) + a.currentlyCancelled - (countNotInTarget(b) + b.currentlyCancelled),
   peruutettu: (a, b) => a.currentlyCancelled - b.currentlyCancelled
 }
 
