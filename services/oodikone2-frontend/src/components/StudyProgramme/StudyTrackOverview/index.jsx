@@ -219,7 +219,7 @@ const Overview = ({
     }
   ]
 
-  if (isAdmin)
+  if (isAdmin && studyprogramme.includes('KH'))
     panes.push({
       menuItem: 'Studytrack Graph',
       render: () => <ProtoC programme={studyprogramme} />
