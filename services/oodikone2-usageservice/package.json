@@ -30,7 +30,7 @@
     "umzug": "^2.2.0",
     "uuid": "^3.3.2",
     "winston": "^3.2.1",
-    "winston-log2gelf": "^2.0.4",
+    "winston-log2gelf": "^2.3.0",
     "winston-transport": "^4.3.0"
   }
 }
