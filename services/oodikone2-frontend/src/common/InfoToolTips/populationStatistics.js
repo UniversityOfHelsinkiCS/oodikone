@@ -74,7 +74,6 @@ export default {
   },
   CoursesOf: {
     AccordionTitle: `**Courses of population**
-    <br> <br>
     Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.`,
     Infobox: `Courses of population
     <br> <br>
@@ -104,7 +103,7 @@ export default {
     täsmää puolivuosi-lukumäärien summan kanssa, johtuen tuplakirjauksista Oodissa.`
   },
   Students: {
-    AccordionTitle: `**Students:** Taulukko näyttää oletusarvoisesti vain 
+    AccordionTitle: `**Students** Taulukko näyttää oletusarvoisesti vain 
     opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.`,
     Infobox: `**Students:** harmaata "show" painiketta klikkaamalla saa listan kaikista populaation opiskelijoista
     (huom. suodattimet vaikuttavat tähän listaan!). Taulukko näyttää oletusarvoisesti vain 

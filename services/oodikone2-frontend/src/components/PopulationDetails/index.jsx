@@ -70,7 +70,6 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordi
         )}
       </>
     )
-
   return (
     <Segment>
       <Header size="medium" dividing>
@@ -232,7 +231,7 @@ class PopulationDetails extends Component {
               ) : (
                 <Popup
                   trigger={
-                    <span style={{ paddingRight: '70vw', paddingTop: '1vh', paddingBottom: '1vh' }}>
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>
                       {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
                     </span>
                   }
@@ -263,11 +262,7 @@ class PopulationDetails extends Component {
                 <>Credit statistics</>
               ) : (
                 <Popup
-                  trigger={
-                    <span style={{ paddingRight: '70vw', paddingTop: '1vh', paddingBottom: '1vh' }}>
-                      Credit statistics
-                    </span>
-                  }
+                  trigger={<span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>Credit statistics</span>}
                   position="top center"
                   offset="0, 50px"
                   wide="very"
@@ -286,7 +281,7 @@ class PopulationDetails extends Component {
           content: !query.years && (
             <div ref={this.creditGainRef}>
               <CourseStatisticsSegment
-                accordionView={accordionView.AccordionTitle}
+                accordionView={accordionView}
                 samples={samples}
                 selectedStudents={selectedStudents}
                 translate={translate}
@@ -304,11 +299,7 @@ class PopulationDetails extends Component {
                 <>Courses of population</>
               ) : (
                 <Popup
-                  trigger={
-                    <span style={{ paddingRight: '70vw', paddingTop: '1vh', paddingBottom: '1vh' }}>
-                      Courses of population
-                    </span>
-                  }
+                  trigger={<span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>Courses of population</span>}
                   position="top center"
                   offset="0, 50px"
                   wide="very"
@@ -346,7 +337,7 @@ class PopulationDetails extends Component {
               ) : (
                 <Popup
                   trigger={
-                    <span style={{ paddingRight: '70vw', paddingTop: '1vh', paddingBottom: '1vh' }}>
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>
                       Students ({selectedStudents.length})
                     </span>
                   }

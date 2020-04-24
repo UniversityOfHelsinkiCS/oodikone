@@ -9,3 +9,13 @@
 .status-card:hover {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
+
+.status-date-time-input {
+  padding-right: 0;
+  margin-left: 5px;
+}
+
+.status-date-time-input input {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}

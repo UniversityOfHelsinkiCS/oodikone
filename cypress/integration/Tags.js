@@ -25,7 +25,7 @@ describe('Tag tests', () => {
     cy.contains("Study programme").click()
     cy.contains("Overview").click()
     cy.contains("Datatieteen maisteriohjelma").click()
-    cy.get('.attached > :nth-child(6)').click()
+    cy.contains('Tags').click()
   })
 
   it("Tagged population works", () => {
@@ -46,7 +46,7 @@ describe('Tag tests', () => {
     cy.contains(name).find('.level').click()
 
     cy.contains('Credit accumulation (for 2 students)')
-    cy.get(':nth-child(5) > .dividing > :nth-child(1)').click()
+    cy.contains(/^show$/).click()
     cy.contains('014022579')
     cy.contains('011122249')
 

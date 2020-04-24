@@ -231,7 +231,8 @@ class PopulationStudents extends Component {
       {
         key: 'studentnumber',
         title: 'student number',
-        getRowVal: s => (
+        getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
+        getRowContent: s => (
           <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
             {!s.obfuscated ? s.studentNumber : 'hidden'}
           </span>
@@ -758,18 +759,20 @@ class PopulationStudents extends Component {
         <Segment>
           {!this.props.accordionView && (
             <Header dividing>
-              {`Students (${this.props.selectedStudents.length}) `}
-              <Button
-                size="small"
-                onClick={() => {
-                  this.props.toggleStudentListVisibility()
-                  sendAnalytics('Toggle Show students', this.props.showList ? 'hide' : 'show')
-                }}
-              >
-                {toggleLabel}
-              </Button>
-              {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
-              <InfoBox content={Students.Infobox} />
+              <div>
+                {`Students (${this.props.selectedStudents.length}) `}
+                <InfoBox content={Students.Infobox} />
+                <Button
+                  size="small"
+                  onClick={() => {
+                    this.props.toggleStudentListVisibility()
+                    sendAnalytics('Toggle Show students', this.props.showList ? 'hide' : 'show')
+                  }}
+                >
+                  {toggleLabel}
+                </Button>
+                {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
+              </div>
             </Header>
           )}
           {this.renderStudentTable()}
