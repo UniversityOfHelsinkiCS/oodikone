@@ -30,7 +30,8 @@ const StatusContainer = ({
   min1,
   max1,
   showYearlyValues,
-  yearlyValues
+  yearlyValues,
+  showByYear
 }) => {
   const diff = Math.round(current - previous)
   const p = getP(current, previous)
@@ -96,7 +97,8 @@ const StatusContainer = ({
               <div style={{ margin: '5px 0' }} key={`${title}-${year}`}>
                 <span>
                   <b>
-                    {year}-{`${Number(year) + 1}`.slice(-2)}:
+                    {year}
+                    {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
                   </b>{' '}
                   {acc ? Math.round(acc).toLocaleString('fi') : 0}
                   {!!total && (
@@ -125,7 +127,8 @@ StatusContainer.propTypes = {
   min1: PropTypes.number.isRequired,
   max1: PropTypes.number.isRequired,
   showYearlyValues: PropTypes.bool.isRequired,
-  yearlyValues: PropTypes.shape({}).isRequired
+  yearlyValues: PropTypes.shape({}).isRequired,
+  showByYear: PropTypes.bool.isRequired
 }
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
@@ -133,10 +136,11 @@ const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|
 const Status = () => {
   const DATE_FORMAT = 'DD.MM.YYYY'
   const [showYearlyValues, setShowYearlyValues] = useState(false)
+  const [showByYear, setShowByYear] = useState(false)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
   const [drillStack, setDrillStack] = useState([])
-  const [showSettings, setShowSettings] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
   const [selectedDate, setSelectedDate] = useState(moment())
   const { CoolDataScience } = InfoToolTips
 
@@ -146,17 +150,24 @@ const Status = () => {
     if (selectedDate && isValidDate(selectedDate)) {
       const load = async () => {
         setLoading(true)
-        const res = await callApi('/cool-data-science/status', 'get', null, { date: selectedDate.valueOf() })
+        const res = await callApi('/cool-data-science/status', 'get', null, {
+          date: selectedDate.valueOf(),
+          showByYear
+        })
         setData(res.data)
         setLoading(false)
       }
 
       load()
     }
-  }, [selectedDate])
+  }, [selectedDate, showByYear])
 
   const handleShowYearlyValuesToggled = () => {
     setShowYearlyValues(!showYearlyValues)
+  }
+
+  const handleShowByYearToggled = () => {
+    setShowByYear(!showByYear)
   }
 
   const pushToDrillStack = values => {
@@ -200,6 +211,13 @@ const Status = () => {
               label="Näytä edelliset vuodet"
               onChange={handleShowYearlyValuesToggled}
               checked={showYearlyValues}
+            />
+            <VerticalLine />
+            <Checkbox
+              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+              label="Näytä vuositasolla"
+              onChange={handleShowByYearToggled}
+              checked={showByYear}
             />
             <VerticalLine />
             <Form>
@@ -269,6 +287,7 @@ const Status = () => {
               min1={-medianDiff * 2}
               max1={medianDiff * 2}
               yearlyValues={stats.yearly}
+              showByYear={showByYear}
             />
           )
         })}
