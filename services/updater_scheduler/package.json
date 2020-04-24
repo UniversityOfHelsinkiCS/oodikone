@@ -22,7 +22,7 @@
     "node-nats-streaming": "^0.2.6",
     "nodemon": "^1.19.1",
     "winston": "^3.2.1",
-    "winston-log2gelf": "^2.0.4"
+    "winston-log2gelf": "^2.3.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.2",

@@ -1,7 +1,7 @@
 const winston = require('winston')
 const Log2gelf = require('winston-log2gelf')
 const { combine, timestamp, printf, splat } = winston.format
-const { LOG_PORT, LOG_HOST, LOG_HOSTNAME, LOG_PROTOCOL, NODE_ENV } = process.env
+const { LOG_PORT, LOG_HOST, LOG_HOSTNAME, LOG_PROTOCOL, LOG_PATH, NODE_ENV } = process.env
 
 const customFormat = printf(({ level, message, timestamp, ...rest }) => {
   return `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
@@ -16,6 +16,9 @@ if (LOG_PORT && LOG_HOST) {
       host: LOG_HOST,
       port: LOG_PORT,
       protocol: LOG_PROTOCOL || 'http',
+      protocolOptions: {
+        path: LOG_PATH || '/gelf'
+      },
       environment: NODE_ENV,
       service: 'SIS-UPDATER-SCHEDULER'
     })
