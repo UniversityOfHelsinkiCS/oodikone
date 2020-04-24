@@ -105,15 +105,75 @@ router.get(
 )
 
 router.get(
-  '/proto-c-data',
+  '/proto-c-data-programme',
   withErr(async (req, res) => {
     const associations = await getAssociations()
     const codes = associations.programmes[req.query.code]
       ? [...associations.programmes[req.query.code].studytracks, req.query.code]
       : []
-
     const data = await getTargetStudentCounts({
       codes: codes,
+      includeOldAttainments: req.query.include_old_attainments === 'true',
+      excludeNonEnrolled: req.query.exclude_non_enrolled === 'true'
+    })
+    const programmeData = data.find(d => d.programmeType === 20)
+    const studytrackData = data.filter(d => d.programmeType !== 20)
+
+    // mankel through studytracks
+    const studytrackMankelid = _(studytrackData)
+      // seems to return the numerical columns as strings, parse them first
+      .map(programmeRow => ({
+        ...programmeRow,
+        programmeTotalStudents: parseInt(programmeRow.programmeTotalStudents, 10),
+        students3y: parseInt(programmeRow.students3y, 10),
+        // 4y group includes 3y group, make 4y count exclusive:
+        students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
+        currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
+      }))
+      .value()
+
+    // associate studytracks with bachelor programme
+    const studytrackToBachelorProgrammes = Object.keys(associations.programmes).reduce((acc, curr) => {
+      if (!curr.includes('KH')) return acc
+      const studytracksForProgramme = studytrackMankelid.reduce((acc2, studytrackdata) => {
+        if (associations.programmes[curr].studytracks.includes(studytrackdata.programmeCode)) {
+          acc2.push({
+            code: studytrackdata.programmeCode,
+            name: studytrackdata.programmeName,
+            totalStudents: studytrackdata.programmeTotalStudents,
+            students3y: studytrackdata.students3y,
+            students4y: studytrackdata.students4y,
+            currentlyCancelled: studytrackdata.currentlyCancelled
+          })
+        }
+        return acc2
+      }, [])
+      if (studytracksForProgramme) acc[curr] = studytracksForProgramme
+      return acc
+    }, {})
+
+    // combine studytracks data to programme data
+
+    const programmeDataMankeld = {
+      code: programmeData.programmeCode,
+      name: programmeData.programmeName,
+      totalStudents: parseInt(programmeData.programmeTotalStudents, 10),
+      students3y: parseInt(programmeData.students3y, 10),
+      // 4y group includes 3y group, make 4y count exclusive:
+      students4y: parseInt(programmeData.students4y, 10) - parseInt(programmeData.students3y, 10),
+      currentlyCancelled: parseInt(programmeData.currentlyCancelled, 10),
+      studytracks: studytrackToBachelorProgrammes[programmeData.programmeCode]
+    }
+    res.json(programmeDataMankeld)
+  })
+)
+
+router.get(
+  '/proto-c-data',
+  withErr(async (req, res) => {
+    const associations = await getAssociations()
+
+    const data = await getTargetStudentCounts({
       includeOldAttainments: req.query.include_old_attainments === 'true',
       excludeNonEnrolled: req.query.exclude_non_enrolled === 'true'
     })
@@ -235,7 +295,7 @@ router.get(
 router.get(
   '/status',
   withErr(async (req, res) => {
-    const { date: unixMillis } = req.query
+    const { date: unixMillis, showByYear } = req.query
     const date = new Date(Number(unixMillis))
 
     if (isNaN(date.getTime()) || date.getTime() > new Date().getTime()) {
@@ -244,7 +304,7 @@ router.get(
 
     // End of day
     date.setHours(23, 59, 59, 999)
-    const status = await getStatusStatistics(date.getTime())
+    const status = await getStatusStatistics(date.getTime(), showByYear)
     res.json(status)
   })
 )

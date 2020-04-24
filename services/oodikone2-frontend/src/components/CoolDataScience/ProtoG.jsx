@@ -2,10 +2,12 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Table, Form, Dropdown, Icon, Checkbox } from 'semantic-ui-react'
+import { Segment, Loader, Dimmer, Table, Form, Dropdown, Icon, Checkbox, Message } from 'semantic-ui-react'
 import _ from 'lodash'
+import ReactMarkdown from 'react-markdown'
 
 import { callApi } from '../../apiConnection'
+import InfoToolTips from '../../common/InfoToolTips'
 import './protoG.css'
 
 const defaultConfig = () => ({
@@ -202,7 +204,7 @@ const ProtoG = () => {
       setExpandedOrgs({ ...expandedOrgs, [orgCode]: !expandedOrgs[orgCode] })
     }
   }
-
+  const { CoolDataScience } = InfoToolTips
   return (
     <Segment>
       <div style={{ display: 'flex' }}>
@@ -214,6 +216,9 @@ const ProtoG = () => {
           checked={includeOldAttainments}
         />
       </div>
+      <Message>
+        <ReactMarkdown source={CoolDataScience.protoG} escapeHtml={false} />
+      </Message>
 
       <Form onSubmit={preventDefault}>
         <Form.Group inline>
