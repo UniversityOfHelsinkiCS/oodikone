@@ -32,6 +32,6 @@
     "sequelize": "^5.21.3",
     "umzug": "^2.2.0",
     "winston": "^3.2.1",
-    "winston-log2gelf": "^2.1.0"
+    "winston-log2gelf": "^2.3.0"
   }
 }
