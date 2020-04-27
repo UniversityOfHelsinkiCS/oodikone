@@ -9,7 +9,7 @@ import ReactMarkdown from 'react-markdown'
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
 
-const defaultConfig = () => {
+const defaultConfig = (pointer = true) => {
   return {
     chart: {
       type: 'area',
@@ -43,6 +43,7 @@ const defaultConfig = () => {
     },
     plotOptions: {
       area: {
+        cursor: pointer ? 'pointer' : undefined,
         fillOpacity: 0.5,
         stacking: 'percent',
         lineColor: '#ffffff',
@@ -187,7 +188,7 @@ const makeNonClickableChartConfig = programme => {
     }
   ]
 
-  return Highcharts.merge(defaultConfig(), {
+  return Highcharts.merge(defaultConfig(false), {
     title: {
       text: `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
     },
