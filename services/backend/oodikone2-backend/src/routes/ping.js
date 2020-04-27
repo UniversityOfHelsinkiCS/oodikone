@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const { router, wrapper } = require('./router').routerWithWrapper()
 const axios = require('axios')
 
