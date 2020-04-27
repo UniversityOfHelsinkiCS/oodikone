@@ -295,7 +295,7 @@ router.get(
 router.get(
   '/status',
   withErr(async (req, res) => {
-    const { date: unixMillis } = req.query
+    const { date: unixMillis, showByYear } = req.query
     const date = new Date(Number(unixMillis))
 
     if (isNaN(date.getTime()) || date.getTime() > new Date().getTime()) {
@@ -304,7 +304,7 @@ router.get(
 
     // End of day
     date.setHours(23, 59, 59, 999)
-    const status = await getStatusStatistics(date.getTime())
+    const status = await getStatusStatistics(date.getTime(), showByYear)
     res.json(status)
   })
 )

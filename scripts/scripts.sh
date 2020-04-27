@@ -163,7 +163,13 @@ run_anon_full_setup () {
     echo "Init dirs"
     init_dirs
     echo "Getting anon backups from the private repository. "
-    get_anon_oodikone
+
+    if get_anon_oodikone ; then
+        echo "Anon data fetched"
+    else
+        anon_data_error="Could not fetch anonyymioodi. Fetch the latest data with the CLI before running oodikone"
+    fi
+    
     echo "Building images"
     docker-compose-dev build
     echo "Setup oodikone db from dump."
@@ -171,6 +177,9 @@ run_anon_full_setup () {
     db_anon_setup_full
     docker-compose-dev down
     show_instructions
+    if [[ ! -z anon_data_error ]] ; then
+        tput setaf 1; echo "$anon_data_error"; tput sgr0
+    fi
 }
 
 run_e2e_setup () {

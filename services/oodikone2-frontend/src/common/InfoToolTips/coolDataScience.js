@@ -10,7 +10,10 @@ export default {
     Vakiona opintopisteet ennen opinto-oikeutta suodatetaan pois. **Include old attainments** laskee mukaan opiskelijan ennen opinto-oikeuden alkua saadut opintopisteet.
     <br> <br>
     Vakiona opiskelijat jotka eivät ole ilmoittautunut millekkään lukuvuodelle (läsnä tai poissa olevaksi) on sisällytetty laskuihin. **Include only at least once enrolled students** 
-    suodattaa pois opiskelijat jotka eivät ole ollenkaan ilmoittautunut`,
+    suodattaa pois opiskelijat jotka eivät ole ollenkaan ilmoittautunut
+    <br> <br>
+    Graafissa pystyy pisteitä klikkaamalla porautumaan ensin ohjelmatasolle ja edelleen opintosuuntatasolle.
+    `,
   protoC2: `Graafi ottaa huomioon vain opiskelijat joiden opinto-oikeus on alkanut 1.8 joka vuodelta vuoden 2017 jälkeen. 
   Opiskelijat jotka ovat vaihtaneet ohjelmaa tiedekunnan sisällä suodatetaan pois.
   <br> <br>
@@ -22,7 +25,10 @@ export default {
   Vakiona opintopisteet ennen opinto-oikeutta suodatetaan pois. **Include old attainments** laskee mukaan opiskelijan ennen opinto-oikeuden alkua saadut opintopisteet.
   <br> <br>
   Vakiona opiskelijat jotka eivät ole ilmoittautunut millekkään lukuvuodelle (läsnä tai poissa olevaksi) on sisällytetty laskuihin. **Include only at least once enrolled students** 
-  suodattaa pois opiskelijat jotka eivät ole ollenkaan ilmoittautunut`,
+  suodattaa pois opiskelijat jotka eivät ole ollenkaan ilmoittautunut
+  <br> <br>
+  Graafissa pystyy palkkeja klikkaamalla porautumaan kunkin tiedekunnan ohjelmatasolle. Painamalla ohjelmatasolla jotakin palkkia uudelleen pääsee takaisin tiedekuntatasolle.
+  `,
   protoG: `Graafi ottaa huomioon vain opiskelijat joiden opinto-oikeus on alkanut 1.8 joka vuodelta vuoden 2017 jälkeen. 
   Opiskelijat jotka ovat vaihtaneet ohjelmaa tiedekunnan sisällä suodatetaan pois.
   <br> <br>
@@ -38,8 +44,8 @@ export default {
   suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna. Vain suoritetut ja hyväksiluetut opintopisteet huomioidaan.
   <br> <br>
   Tilannekuvassa voi **porautua** kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. **Asetukset**-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. Valinta **Näytä edelliset vuodet** näyttää
-  vuosittaisen opintopiste-kertymän tähän päivään mennessä vuonna X sekä koko lukuvuoden X opintopisteet muodossa "\`kerääntymä vuonna X / koko lukuvuoden X opintopisteet\`". Kohdasta **Näytä päivänä** voi valita tarkastelupäivän, joka on
-  oletusarvoisesti tämänhetkinen päivä.
+  vuosittaisen opintopiste-kertymän tähän päivään mennessä vuonna X sekä koko lukuvuoden X opintopisteet muodossa "\`kerääntymä vuonna X / koko lukuvuoden X opintopisteet\`". Valinta **Näytä vuositasolla** laskee kertymän kalenterivuoden alusta,
+  eikä lukuvuoden alusta. Kohdasta **Näytä päivänä** voi valita tarkastelupäivän, joka on oletusarvoisesti tämänhetkinen päivä.
   <br> <br>
   Avoimen yliopiston suorituksia ei vielä lasketa mukaan.
   `
