@@ -490,6 +490,10 @@ const getCurrentStudyYearStartDate = _.memoize(
     )
 )
 
+const getCurrentYearStartDate = () => {
+  return new Date(new Date().getFullYear(), 0, 1)
+}
+
 const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum') => {
   return sequelize.query(
     `
@@ -541,136 +545,141 @@ const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum') 
   )
 }
 
-const getStatusStatistics = _.memoize(async unixMillis => {
-  const Y_TO_MS = 31556952000
-  const currentAcademicYearStartDate = await getCurrentStudyYearStartDate(unixMillis)
-  const currentAcademicYearStartYear = currentAcademicYearStartDate.getFullYear()
-  const currentAcademicYearStartTime = currentAcademicYearStartDate.getTime()
+const getStatusStatistics = _.memoize(
+  async (unixMillis, showByYear) => {
+    const Y_TO_MS = 31556952000
+    /* Memoize parses booleans into strings... */
+    const startDate = showByYear === 'true' ? getCurrentYearStartDate() : await getCurrentStudyYearStartDate(unixMillis)
+    const startYear = startDate.getFullYear()
+    const startTime = startDate.getTime()
 
-  const yearRange = _.range(2017, currentAcademicYearStartYear + 1)
-  const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
-    currentAcademicYearStartYear,
-    yearRange,
-    diff => ({
-      from: new Date(currentAcademicYearStartTime - diff * Y_TO_MS),
-      to: new Date(unixMillis - diff * Y_TO_MS)
-    }),
-    'acc'
-  )
-
-  const yearlyTotalCreditsPromises = makeYearlyCreditsPromises(
-    currentAcademicYearStartYear,
-    yearRange.slice(0, -1),
-    diff => ({
-      from: new Date(currentAcademicYearStartTime - diff * Y_TO_MS),
-      to: new Date(currentAcademicYearStartTime - (diff - 1) * Y_TO_MS)
-    }),
-    'total'
-  )
-
-  /* Gather all required data */
-  const [
-    yearlyAccCredits,
-    yearlyTotalCredits,
-    elementDetails,
-    faculties,
-    { data: facultyProgrammes }
-  ] = await Promise.all([
-    Promise.all(yearlyAccCreditsPromises),
-    Promise.all(yearlyTotalCreditsPromises),
-    ElementDetails.findAll(),
-    Organisation.findAll(),
-    userServiceClient.get('/faculty_programmes')
-  ])
-
-  /* Construct some helper maps */
-  const facultyCodeToFaculty = faculties.reduce((res, curr) => {
-    res[curr.code] = curr
-    return res
-  }, {})
-
-  const programmeToFaculties = facultyProgrammes.reduce((res, curr) => {
-    if (!res[curr.programme_code]) res[curr.programme_code] = []
-    res[curr.programme_code].push(curr.faculty_code)
-    return res
-  }, {})
-
-  const providerToProgramme = elementDetails.reduce((res, curr) => {
-    const [p] = mapToProviders([curr.code])
-    res[p] = {
-      code: curr.code,
-      name: curr.name
-    }
-    return res
-  }, {})
-
-  /* Calculate course level stats and group by providers */
-  const coursesGroupedByProvider = Object.entries(
-    _.groupBy([..._.flatten(yearlyAccCredits), ..._.flatten(yearlyTotalCredits)], 'providercode')
-  ).reduce((acc, [providerCode, courseCredits]) => {
-    acc[providerCode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
-      (acc, [courseCode, yearlyInstances]) => {
-        acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
-        yearlyInstances.forEach(instance => {
-          if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
-          if (instance.acc !== undefined) {
-            acc[courseCode]['yearly'][instance.year]['acc'] = instance.acc
-          } else {
-            acc[courseCode]['yearly'][instance.year]['total'] = instance.total
-          }
-        })
-        acc[courseCode]['current'] = _.get(acc, [courseCode, 'yearly', currentAcademicYearStartYear, 'acc']) || 0
-        acc[courseCode]['previous'] = _.get(acc, [courseCode, 'yearly', currentAcademicYearStartYear - 1, 'acc']) || 0
-        return acc
-      },
-      {}
+    const yearRange = _.range(2017, startYear + 1)
+    const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
+      startYear,
+      yearRange,
+      diff => ({
+        from: new Date(startTime - diff * Y_TO_MS),
+        to: new Date(unixMillis - diff * Y_TO_MS)
+      }),
+      'acc'
     )
-    return acc
-  }, {})
 
-  /* Map providers into proper programmes and calculate programme level stats */
-  const groupedByProgramme = Object.entries(coursesGroupedByProvider).reduce((acc, [providerCode, courses]) => {
-    const programme = providerToProgramme[providerCode]
-    const courseValues = Object.values(courses)
-    const yearlyValues = courseValues.map(c => c.yearly)
+    const yearlyTotalCreditsPromises = makeYearlyCreditsPromises(
+      startYear,
+      yearRange.slice(0, -1),
+      diff => ({
+        from: new Date(startTime - diff * Y_TO_MS),
+        to: new Date(startTime - (diff - 1) * Y_TO_MS)
+      }),
+      'total'
+    )
 
-    if (programme && programme.code) {
-      acc[programme.code] = {
-        name: programme.name,
-        drill: courses,
-        yearly: _.mergeWith({}, ...yearlyValues, mergele),
-        current: _.sumBy(courseValues, 'current'),
-        previous: _.sumBy(courseValues, 'previous')
+    /* Gather all required data */
+    const [
+      yearlyAccCredits,
+      yearlyTotalCredits,
+      elementDetails,
+      faculties,
+      { data: facultyProgrammes }
+    ] = await Promise.all([
+      Promise.all(yearlyAccCreditsPromises),
+      Promise.all(yearlyTotalCreditsPromises),
+      ElementDetails.findAll(),
+      Organisation.findAll(),
+      userServiceClient.get('/faculty_programmes')
+    ])
+
+    /* Construct some helper maps */
+    const facultyCodeToFaculty = faculties.reduce((res, curr) => {
+      res[curr.code] = curr
+      return res
+    }, {})
+
+    const programmeToFaculties = facultyProgrammes.reduce((res, curr) => {
+      if (!res[curr.programme_code]) res[curr.programme_code] = []
+      res[curr.programme_code].push(curr.faculty_code)
+      return res
+    }, {})
+
+    const providerToProgramme = elementDetails.reduce((res, curr) => {
+      const [p] = mapToProviders([curr.code])
+      res[p] = {
+        code: curr.code,
+        name: curr.name
       }
-    }
-    return acc
-  }, {})
+      return res
+    }, {})
 
-  /* Group programmes into faculties and calculate faculty level stats */
-  const groupedByFaculty = Object.entries(groupedByProgramme).reduce((acc, [programmeCode, programmeStats]) => {
-    const facultyCodes = programmeToFaculties[programmeCode]
-    if (!facultyCodes) return acc
-    facultyCodes.forEach(facultyCode => {
-      if (!facultyCode) return
-      if (!acc[facultyCode]) {
-        acc[facultyCode] = {
-          drill: {},
-          name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
-          yearly: {},
-          current: 0,
-          previous: 0
+    /* Calculate course level stats and group by providers */
+    const coursesGroupedByProvider = Object.entries(
+      _.groupBy([..._.flatten(yearlyAccCredits), ..._.flatten(yearlyTotalCredits)], 'providercode')
+    ).reduce((acc, [providerCode, courseCredits]) => {
+      acc[providerCode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
+        (acc, [courseCode, yearlyInstances]) => {
+          acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
+          yearlyInstances.forEach(instance => {
+            if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
+            if (instance.acc !== undefined) {
+              acc[courseCode]['yearly'][instance.year]['acc'] = instance.acc
+            } else {
+              acc[courseCode]['yearly'][instance.year]['total'] = instance.total
+            }
+          })
+          acc[courseCode]['current'] = _.get(acc, [courseCode, 'yearly', startYear, 'acc']) || 0
+          acc[courseCode]['previous'] = _.get(acc, [courseCode, 'yearly', startYear - 1, 'acc']) || 0
+          return acc
+        },
+        {}
+      )
+      return acc
+    }, {})
+
+    /* Map providers into proper programmes and calculate programme level stats */
+    const groupedByProgramme = Object.entries(coursesGroupedByProvider).reduce((acc, [providerCode, courses]) => {
+      const programme = providerToProgramme[providerCode]
+      const courseValues = Object.values(courses)
+      const yearlyValues = courseValues.map(c => c.yearly)
+
+      if (programme && programme.code) {
+        acc[programme.code] = {
+          name: programme.name,
+          drill: courses,
+          yearly: _.mergeWith({}, ...yearlyValues, mergele),
+          current: _.sumBy(courseValues, 'current'),
+          previous: _.sumBy(courseValues, 'previous')
         }
       }
-      acc[facultyCode]['drill'][programmeCode] = programmeStats
-      acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
-      acc[facultyCode]['current'] += programmeStats.current
-      acc[facultyCode]['previous'] += programmeStats.previous
-    })
-    return acc
-  }, {})
+      return acc
+    }, {})
 
-  return groupedByFaculty
-})
+    /* Group programmes into faculties and calculate faculty level stats */
+    const groupedByFaculty = Object.entries(groupedByProgramme).reduce((acc, [programmeCode, programmeStats]) => {
+      const facultyCodes = programmeToFaculties[programmeCode]
+      if (!facultyCodes) return acc
+      facultyCodes.forEach(facultyCode => {
+        if (!facultyCode) return
+        if (!acc[facultyCode]) {
+          acc[facultyCode] = {
+            drill: {},
+            name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
+            yearly: {},
+            current: 0,
+            previous: 0
+          }
+        }
+        acc[facultyCode]['drill'][programmeCode] = programmeStats
+        acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
+        acc[facultyCode]['current'] += programmeStats.current
+        acc[facultyCode]['previous'] += programmeStats.previous
+      })
+      return acc
+    }, {})
+
+    return groupedByFaculty
+  },
+  /* For memoize */
+  (...args) => JSON.stringify(args)
+)
 
 module.exports = {
   withErr,
