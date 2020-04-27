@@ -13,7 +13,10 @@ if (process.env.LOG_PORT && process.env.LOG_HOST) {
       host: process.env.LOG_HOST,
       port: process.env.LOG_PORT,
       protocol: process.env.LOG_PROTOCOL || 'http',
-      environment: process.env.NODE_ENV
+      environment: process.env.NODE_ENV,
+      protocolOptions: {
+        path: process.env.LOG_PATH || '/gelf'
+      }
     })
   )
 }
