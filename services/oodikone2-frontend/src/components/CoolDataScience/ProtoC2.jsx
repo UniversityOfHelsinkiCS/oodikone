@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-react'
+import ReactMarkdown from 'react-markdown'
 
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
@@ -336,7 +337,9 @@ const ProtoC = () => {
             checked={includeOldAttainments}
           />
         </div>
-        <Message content={CoolDataScience.protoC2} />
+        <Message>
+          <ReactMarkdown source={CoolDataScience.protoC2} escapeHtml={false} />
+        </Message>
       </Segment>
     </Segment>
   )
