@@ -216,10 +216,6 @@ const ProtoG = () => {
           checked={includeOldAttainments}
         />
       </div>
-      <Message>
-        <ReactMarkdown source={CoolDataScience.protoG} escapeHtml={false} />
-      </Message>
-
       <Form onSubmit={preventDefault}>
         <Form.Group inline>
           <Form.Field>
@@ -287,6 +283,9 @@ const ProtoG = () => {
             </Table.Body>
           </Table>
         )}
+        <Message>
+          <ReactMarkdown source={CoolDataScience.protoG} escapeHtml={false} />
+        </Message>
       </Segment>
     </Segment>
   )
