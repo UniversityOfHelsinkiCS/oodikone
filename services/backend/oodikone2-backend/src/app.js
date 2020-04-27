@@ -34,10 +34,6 @@ initializeDatabaseConnection()
     app.use(cors({ credentials: true, origin: conf.frontend_addr }))
     app.use(bodyParser.json())
 
-    app.get('/ping', async (req, res) => {
-      res.json({ data: 'pong' })
-    })
-
     let BASE_URL = ''
     if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
       BASE_URL = '/api'
