@@ -60,6 +60,6 @@ module.exports = (app, url) => {
   app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
   app.use(`${url}/tsa`, tsaAnalytics)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
-  app.use(`${url}/cool-data-science`, auth.roles(['cooldata']), coolDataScience)
+  app.use(`${url}/cool-data-science`, coolDataScience)
   app.use(url, auth.roles(['dev', 'admin']), task)
 }
