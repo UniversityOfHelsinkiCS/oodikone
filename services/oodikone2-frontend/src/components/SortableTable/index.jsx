@@ -1,8 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
 import { useChunk } from '../../common/hooks'
+
+const verticalTitle = title => {
+  const trimmedTitle = title.length > 30 ? `${title.slice(0, 30).trim()}...` : title
+  // https://stackoverflow.com/a/41396815
+  return <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>{trimmedTitle}</div>
+}
+
+const intoCollapsing = column => ({
+  title: verticalTitle(column.headerProps.title),
+  headerProps: { ...column.headerProps, colSpan: 1, rowSpan: 2 },
+  key: column.key,
+  collapsed: true,
+  parent: column.parent
+})
 
 const DIRECTIONS = {
   ASC: 'ascending',
@@ -25,6 +39,20 @@ const SortableTable = ({
   const [collapsed, setCollapsed] = useState({})
   const chunkedData = useChunk(data, chunkifyBy)
 
+  useEffect(() => {
+    const toggle = window.localStorage.getItem('mandatory_toggle')
+    if (!toggle) return
+    const coll = {}
+    columns.forEach(column => {
+      if (!column.parent || !collapsingHeaders || column.key === 'general') return
+
+      if (toggle) {
+        coll[column.headerProps.title] = intoCollapsing(column)
+      }
+    })
+    setCollapsed(coll)
+  }, [])
+
   const handleSort = column => () => {
     if (selected === column) {
       setDirection(direction === DIRECTIONS.ASC ? DIRECTIONS.DESC : DIRECTIONS.ASC)
@@ -38,8 +66,8 @@ const SortableTable = ({
     const { title } = column.headerProps
 
     if (collapsed[title]) {
-      const { title, ...rest } = collapsed
-      setCollapsed(rest)
+      const { [title]: _, ...rest } = collapsed
+      setCollapsed(...rest)
     } else {
       setCollapsed({ ...collapsed, [title]: column })
     }
@@ -54,11 +82,6 @@ const SortableTable = ({
     const sorted = sortBy(chunkedData, [getRowVal])
     return direction === DIRECTIONS.ASC ? sorted : sorted.reverse()
   }
-
-  const verticalTitle = title => (
-    // https://stackoverflow.com/a/41396815
-    <div style={{ writingMode: 'vertical-rl', minWidth: '32px', textAlign: 'left' }}>{title}</div>
-  )
 
   const columnsWithCollapsedHeaders = collapsingHeaders
     ? [
@@ -81,13 +104,7 @@ const SortableTable = ({
                   content={c.title}
                   onClick={
                     c.parent && collapsingHeaders && c.key !== 'general'
-                      ? handleCollapse({
-                          title: verticalTitle(c.headerProps.title),
-                          headerProps: { ...c.headerProps, colSpan: 1, rowSpan: 2 },
-                          key: c.key,
-                          collapsed: true,
-                          parent: c.parent
-                        })
+                      ? handleCollapse(intoCollapsing(c))
                       : handleSort(c.key)
                   }
                   sorted={c.parent ? undefined : sortDirection(c.key)}
