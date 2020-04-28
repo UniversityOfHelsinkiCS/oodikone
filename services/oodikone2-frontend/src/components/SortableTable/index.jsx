@@ -67,7 +67,7 @@ const SortableTable = ({
 
     if (collapsed[title]) {
       const { [title]: _, ...rest } = collapsed
-      setCollapsed(...rest)
+      setCollapsed(rest)
     } else {
       setCollapsed({ ...collapsed, [title]: column })
     }
