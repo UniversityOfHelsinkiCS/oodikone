@@ -11,6 +11,7 @@ wrapper.get('/ping', async (req, res) => {
 
 wrapper.get('/v3/mandatory_courses/:code', async (req, res) => {
   const courses = []
+  const included = new Set()
 
   const dumb_flatten = module => {
     if (module.children) {
@@ -54,14 +55,17 @@ wrapper.get('/v3/mandatory_courses/:code', async (req, res) => {
     } else if (Array.isArray(module)) {
       module.forEach(elem => superFlattenFlatten(elem, label))
     } else if (module.code && !module.code.startsWith('KK')) {
-      courses.push({
-        name: {
-          fi: module.name,
-          en: module.name
-        },
-        code: module.code,
-        label: { id: `${courses.length}`, label, orderNumber: courses.length }
-      })
+      if (!included.has(`${label}${module.code}`)) {
+        included.add(`${label}${module.code}`)
+        courses.push({
+          name: {
+            fi: module.name,
+            en: module.name
+          },
+          code: module.code,
+          label: { id: `${courses.length}`, label, orderNumber: courses.length }
+        })
+      }
     }
   }
 

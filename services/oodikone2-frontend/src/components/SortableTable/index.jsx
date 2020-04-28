@@ -22,7 +22,7 @@ const SortableTable = ({
 }) => {
   const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
   const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
-  const [collapsed, setCollapsed] = useState([])
+  const [collapsed, setCollapsed] = useState({})
   const chunkedData = useChunk(data, chunkifyBy)
 
   const handleSort = column => () => {
@@ -35,10 +35,13 @@ const SortableTable = ({
   }
 
   const handleCollapse = column => () => {
-    if (collapsed.map(c => c.headerProps.title).includes(column.headerProps.title)) {
-      setCollapsed([...collapsed.filter(c => c.headerProps.title !== column.headerProps.title)])
+    const { title } = column.headerProps
+
+    if (collapsed[title]) {
+      const { title, ...rest } = collapsed
+      setCollapsed(rest)
     } else {
-      setCollapsed([...collapsed, column])
+      setCollapsed({ ...collapsed, [title]: column })
     }
   }
 
@@ -59,12 +62,8 @@ const SortableTable = ({
 
   const columnsWithCollapsedHeaders = collapsingHeaders
     ? [
-        ...columns.filter(
-          c =>
-            c.headerProps &&
-            (!collapsed.map(cell => cell.headerProps.title).includes(c.headerProps.title) && !c.collapsed)
-        ),
-        ...collapsed
+        ...columns.filter(c => c.headerProps && (!collapsed[c.headerProps.title] && !c.collapsed)),
+        ...Object.values(collapsed)
       ].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
     : columns
   const sortDirection = name => (selected === name ? direction : null)
@@ -99,9 +98,7 @@ const SortableTable = ({
         )}
         <Table.Row>
           {columns
-            .filter(
-              c => c.child && !(c.title == null) && !collapsed.map(cell => cell.headerProps.title).includes(c.childOf)
-            )
+            .filter(c => c.child && !(c.title == null) && !collapsed[c.childOf])
             .map(c => (
               <Table.HeaderCell
                 key={c.key}
@@ -119,7 +116,7 @@ const SortableTable = ({
             {columns
               .filter(c => !c.parent)
               .map(c => {
-                if (collapsed.map(cell => cell.headerProps.title).includes(c.childOf)) {
+                if (collapsed[c.childOf]) {
                   return null
                 }
                 if (c.key.includes('programmecode') || c.key.includes('programmename')) {
@@ -142,7 +139,7 @@ const SortableTable = ({
                   />
                 )
               })}
-            {collapsed.map(e => (
+            {Object.values(collapsed).map(e => (
               <Table.Cell key={e.key} warning />
             ))}
           </Table.Row>
