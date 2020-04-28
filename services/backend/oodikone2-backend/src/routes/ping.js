@@ -46,11 +46,31 @@ wrapper.get('/v3/mandatory_courses/:code', async (req, res) => {
     }
   }
 
-  const code = req.params.code
-  const response = await axios.get(`http://sis-updater-scheduler:8082/v1/courses/${code}?token=dev`)
+  const superFlattenFlatten = (module, label) => {
+    if (module.children) {
+      module.children.forEach(child => {
+        superFlattenFlatten(child, module.module ? module.module.name : label)
+      })
+    } else if (Array.isArray(module)) {
+      module.forEach(elem => superFlattenFlatten(elem, label))
+    } else if (module.code && !module.code.startsWith('KK')) {
+      courses.push({
+        name: {
+          fi: module.name,
+          en: module.name
+        },
+        code: module.code,
+        label: { id: `${courses.length}`, label, orderNumber: courses.length }
+      })
+    }
+  }
 
-  dumb_flatten(response.data)
-  //better_flatten(response.data.children[0])
+  const code = req.params.code
+  const response = await axios.get(`http://sis-updater-scheduler:8082/v1/courses/${code}?token=dev&superFlatten=true`)
+
+  // dumb_flatten(response.data)
+  // better_flatten(response.data)
+  superFlattenFlatten(response.data)
 
   const byCode = (c1, c2) => c1.code < c2.code ? -1 : 1
 
