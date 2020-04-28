@@ -140,7 +140,7 @@ const Status = () => {
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
   const [drillStack, setDrillStack] = useState([])
-  const [showSettings, setShowSettings] = useState(false)
+  const [showSettings, setShowSettings] = useState(true)
   const [selectedDate, setSelectedDate] = useState(moment())
   const { CoolDataScience } = InfoToolTips
 
@@ -182,7 +182,7 @@ const Status = () => {
 
   const renderSettings = () => {
     return (
-      <Accordion style={{ padding: 0, flex: 1 }}>
+      <Accordion style={{ padding: 0, paddingTop: '10px', flex: 1 }}>
         <Accordion.Title style={{ padding: 0, cursor: 'default' }} active={showSettings}>
           <span style={{ cursor: 'pointer' }} onClick={() => setShowSettings(!showSettings)}>
             <Icon name="setting" />
@@ -261,7 +261,6 @@ const Status = () => {
         {drillStack.length > 0 && (
           <Icon onClick={popFromDrillStack} style={{ fontSize: '40px', cursor: 'pointer' }} name="arrow left" />
         )}
-        {renderSettings()}
       </div>
       <div
         style={{
@@ -292,6 +291,7 @@ const Status = () => {
           )
         })}
       </div>
+      {renderSettings()}
       <Message>
         <ReactMarkdown source={CoolDataScience.status} escapeHtml={false} />
       </Message>

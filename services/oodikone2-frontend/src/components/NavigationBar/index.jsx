@@ -1,5 +1,5 @@
 import React from 'react'
-import { Menu, Dropdown, Button, Icon } from 'semantic-ui-react'
+import { Menu, Dropdown, Button, Icon, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
@@ -36,7 +36,7 @@ const allNavigationItems = {
   courseStatistics: { path: '/coursestatistics', translateId: 'courseStatistics' },
   teachers: { path: '/teachers', translateId: 'teachers', reqRights: ['teachers'] },
   users: { path: '/users', translateId: 'users', reqRights: ['users'] },
-  trends: { path: '/trends', translateId: 'trends', reqRights: ['dev'] },
+  trends: { path: '/trends', translateId: 'trends', tag: 'New!' },
   faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['faculties'] },
   updater: { path: '/updater', translateId: 'updater', reqRights: ['dev', 'admin'] },
   sandbox: { path: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
@@ -84,7 +84,7 @@ const NavigationBar = props => {
   )
 
   const renderNavigationRoutes = () =>
-    Object.values(visibleNavigationItems).map(({ items, path, translateId }) =>
+    Object.values(visibleNavigationItems).map(({ items, path, translateId, tag }) =>
       items ? (
         <Menu.Item
           as={Dropdown}
@@ -103,6 +103,13 @@ const NavigationBar = props => {
       ) : (
         <Menu.Item as={NavLink} key={`menu-item-${path}`} to={path} tabIndex="-1">
           {t(`navigationBar.${translateId}`)}
+          {tag && (
+            <div style={{ position: 'absolute', top: 0, right: 17 }}>
+              <Label style={{ fontSize: '8px' }} color="red" ribbon="right">
+                {tag}
+              </Label>
+            </div>
+          )}
         </Menu.Item>
       )
     )
