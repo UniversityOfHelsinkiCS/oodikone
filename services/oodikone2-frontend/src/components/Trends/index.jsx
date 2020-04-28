@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Segment } from 'semantic-ui-react'
 import { Switch, Route, Link, useRouteMatch, useHistory } from 'react-router-dom'
+import { useTitle } from '../../common/hooks'
 
 import ProtoC from '../CoolDataScience/ProtoC'
 import ProtoC2 from '../CoolDataScience/ProtoC2'
@@ -48,6 +49,7 @@ NavTiles.propTypes = {
 const baseURI = '/trends'
 
 const Trends = () => {
+  useTitle('Trends')
   const history = useHistory()
   const match = useRouteMatch({ path: baseURI, exact: true })
   const exact = !!match

@@ -1,11 +1,13 @@
 const { knexConnection } = require('./db/connection')
 
+let superFlatten = false
+
 function customFlatten(arr) {
   let result = []
 
   for (let elem of arr) {
     if (!Array.isArray(elem) || (!elem[0].module && elem[0].code)) {
-      if (elem.module && elem.children.length === 1) {
+      if (!superFlatten && elem.module && elem.children.length === 1) {
         result.push(elem.children[0])
         continue
       }
@@ -23,7 +25,7 @@ function customFlatten(arr) {
 
 async function creditResolver(rule, n) {
   const data = await resolver(rule.rule, n + 1)
-  if (rule.credits.min < 100 && rule.credits.min > 0) {
+  if (!superFlatten && rule.credits.min < 100 && rule.credits.min > 0) {
     return [
       {
         credits: rule.credits.min,
@@ -58,6 +60,7 @@ async function moduleResolver(rule, n) {
 
   if (mod.type == 'GroupingModule') {
     const module = await moduleRuleResolver(mod, n)
+    if (superFlatten) return customFlatten(module)
     return { module: { id: mod.group_id, code: mod.code, name: mod.name.fi }, children: module }
   }
 
@@ -116,7 +119,8 @@ async function resolver(rule, n) {
   }
 }
 
-const getCourses = async code => {
+const getCourses = async (code, doSuperFlatten) => {
+  superFlatten = doSuperFlatten
   const { knex } = knexConnection
 
   const result = await knex('modules')
@@ -127,7 +131,17 @@ const getCourses = async code => {
   const name = result.name.fi
 
   const data = await resolver(result.rule, 1)
-  const flattened = { module: { id, name }, children: data }
+  const appeared = new Set()
+
+  const filtered = data.filter(d => {
+    if (!d.module) return false
+    if (appeared.has(d.module.id)) {
+      return false
+    }
+    appeared.add(d.module.id)
+    return true
+  })
+  const flattened = { module: { id, name }, children: filtered }
 
   return flattened
 }
