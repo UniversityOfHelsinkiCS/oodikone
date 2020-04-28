@@ -22,6 +22,8 @@ Launch the CLI with the command below and follow the instructions.
 
 Before running cli [make yourself a deployment key](https://developer.github.com/v3/guides/managing-deploy-keys/#setup-2) for Anonyymioodi private repository and put it in your root folder as private.key. This allows you to download the anonymized dumps from the repository.
 
+Install by running
+
 ```
 bash ./scripts/run.sh
 ```
@@ -33,6 +35,8 @@ To get also the full real dataset use `3) Full setup`
 > `1) e2e setup` is designed for use in travis. But you can still try it locally if you want to.
 
 Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visual browser.
+
+The acual oodikone starts to http://localhost:8081/
 
 ## What the CLI does
 

@@ -32,12 +32,12 @@ const customPopulationSearch = require('./routes/customPopulationSearch')
 const coolDataScience = require('./routes/coolDataScience')
 
 module.exports = (app, url) => {
+  app.use(url, ping)
   app.use(shibbolethHeadersFix(['hyGroupCn', 'SHIB_LOGOUT_URL', 'eduPersonAffiliation', 'uid', 'displayName', 'mail']))
   app.use(url, matomoInit)
   app.use(url, log)
   app.use(url, login)
   app.use(`${url}/superlogin`, superlogin)
-  app.use(url, ping)
   app.use(auth.checkAuth, auth.checkRequiredGroup, auth.checkUserBlacklisting, accessLogger, sentryUserId)
   app.use(url, elementdetails)
   app.use(url, courses)
@@ -60,6 +60,6 @@ module.exports = (app, url) => {
   app.use(`${url}/oodi`, auth.roles(['dev']), oodi)
   app.use(`${url}/tsa`, tsaAnalytics)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
-  app.use(`${url}/cool-data-science`, auth.roles(['cooldata']), coolDataScience)
+  app.use(`${url}/cool-data-science`, coolDataScience)
   app.use(url, auth.roles(['dev', 'admin']), task)
 }

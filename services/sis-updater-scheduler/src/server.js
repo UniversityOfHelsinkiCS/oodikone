@@ -53,7 +53,8 @@ app.get('/v1/structure/:code', async (req, res) => {
 
 app.get('/v1/courses/:code', async (req, res) => {
   try {
-    const studyModule = await getCourses(req.params.code)
+    const superFlatten = Boolean(req.query.superFlatten)
+    const studyModule = await getCourses(req.params.code, superFlatten)
     res.json(studyModule)
   } catch (e) {
     console.log(e)

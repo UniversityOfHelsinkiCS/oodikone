@@ -511,7 +511,7 @@ class PopulationStudents extends Component {
             },
             'code'
           ]).map(m => ({
-            key: m.code,
+            key: `${m.label.label}-${m.code}`,
             title: verticalTitle(
               <Fragment>
                 {getTextIn(m.name, this.props.language)}
