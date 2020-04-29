@@ -1,7 +1,7 @@
 import React, { Component, useCallback } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool, shape } from 'prop-types'
-import { Segment, Header, Message, Tab, Accordion, Popup } from 'semantic-ui-react'
+import { Header, Message, Tab, Accordion, Popup } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { flattenDeep, intersection } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
@@ -10,7 +10,6 @@ import ReactMarkdown from 'react-markdown'
 import selectors from '../../selectors/populationDetails'
 import { getTotalCreditsFromCourses, flattenStudyrights } from '../../common'
 import { useTabChangeAnalytics } from '../../common/hooks'
-import PopulationFilters from '../PopulationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import CourseQuarters from '../CourseQuarters'
 import PopulationStudents from '../PopulationStudents'
@@ -19,7 +18,7 @@ import PopulationCreditGainTable from '../PopulationCreditGainTable'
 import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
 
-const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordionView }) => {
+const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
   const { CreditStatistics } = infoTooltips.PopulationStatistics
 
   const renderCreditsGainTab = useCallback(() => {
@@ -46,34 +45,9 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordi
 
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Credit statistics tab')
 
-  if (accordionView)
-    return (
-      <>
-        <Header>
-          <InfoBox content={CreditStatistics.Infobox} />
-        </Header>
-        {samples && (
-          <Tab
-            onTabChange={handleTabChange}
-            menu={{ pointing: true }}
-            panes={[
-              {
-                menuItem: 'Credits gained',
-                render: renderCreditsGainTab
-              },
-              {
-                menuItem: 'Quarters',
-                render: renderQuartersTab
-              }
-            ]}
-          />
-        )}
-      </>
-    )
   return (
-    <Segment>
-      <Header size="medium" dividing>
-        {translate('populationStatistics.creditStatisticsHeader')}
+    <>
+      <Header>
         <InfoBox content={CreditStatistics.Infobox} />
       </Header>
       {samples && (
@@ -92,15 +66,14 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate, accordi
           ]}
         />
       )}
-    </Segment>
+    </>
   )
 }
 
 CourseStatisticsSegment.propTypes = {
   samples: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  translate: func.isRequired,
-  accordionView: bool.isRequired
+  translate: func.isRequired
 }
 
 class PopulationDetails extends Component {
@@ -113,8 +86,7 @@ class PopulationDetails extends Component {
     selectedStudentsByYear: shape({}).isRequired,
     query: shape({}).isRequired,
     tagstudent: arrayOf(shape({})).isRequired,
-    studytracks: shape({}).isRequired,
-    accordionView: bool.isRequired
+    studytracks: shape({}).isRequired
   }
 
   constructor() {
@@ -151,7 +123,7 @@ class PopulationDetails extends Component {
   }
 
   renderCreditGainGraphs = () => {
-    const { samples, translate, selectedStudents, accordionView } = this.props
+    const { samples, translate, selectedStudents } = this.props
     const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
 
     const graphs = (
@@ -164,24 +136,13 @@ class PopulationDetails extends Component {
         selectedStudents={selectedStudents}
       />
     )
-    if (accordionView)
-      return (
-        <>
-          <Header>
-            <InfoBox content={CreditAccumulationGraph.Infobox} />
-          </Header>
-          {samples.length > 0 && graphs}
-        </>
-      )
-
     return (
-      <Segment>
-        <Header size="medium" dividing>
-          {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+      <>
+        <Header>
           <InfoBox content={CreditAccumulationGraph.Infobox} />
         </Header>
         {samples.length > 0 && graphs}
-      </Segment>
+      </>
     )
   }
 
@@ -215,7 +176,7 @@ class PopulationDetails extends Component {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
 
-    const { query, selectedStudents, selectedStudentsByYear, accordionView } = this.props
+    const { query, selectedStudents, selectedStudentsByYear } = this.props
     const { Students, CreditStatistics, CoursesOf, CreditAccumulationGraph } = infoTooltips.PopulationStatistics
 
     const panels = [
@@ -280,12 +241,7 @@ class PopulationDetails extends Component {
         content: {
           content: !query.years && (
             <div ref={this.creditGainRef}>
-              <CourseStatisticsSegment
-                accordionView={accordionView}
-                samples={samples}
-                selectedStudents={selectedStudents}
-                translate={translate}
-              />
+              <CourseStatisticsSegment samples={samples} selectedStudents={selectedStudents} translate={translate} />
             </div>
           )
         }
@@ -318,10 +274,10 @@ class PopulationDetails extends Component {
           content: (
             <div ref={this.courseTableRef}>
               <PopulationCourses
+                accordionView
                 selectedStudents={selectedStudents}
                 selectedStudentsByYear={selectedStudentsByYear}
                 query={query}
-                accordionView={accordionView}
               />
             </div>
           )
@@ -358,40 +314,17 @@ class PopulationDetails extends Component {
         content: {
           content: (
             <div ref={this.studentTableRef}>
-              <PopulationStudents accordionView={accordionView} />
+              <PopulationStudents accordionView />
             </div>
           )
         }
       }
     ]
 
-    if (accordionView)
-      return (
-        <>
-          <Accordion activeIndex={this.state.activeIndex} exclusive={false} styled fluid panels={panels} />
-        </>
-      )
-
     return (
-      <div>
-        <PopulationFilters samples={samples} exclude={this.getExcludedFilters()} accordionView={false} />
-        {this.renderCreditGainGraphs()}
-        {!query.years && (
-          <CourseStatisticsSegment
-            samples={samples}
-            selectedStudents={selectedStudents}
-            translate={translate}
-            accordionView={accordionView}
-          />
-        )}
-        <PopulationCourses
-          selectedStudents={selectedStudents}
-          selectedStudentsByYear={selectedStudentsByYear}
-          query={query}
-          accordionView={accordionView}
-        />
-        <PopulationStudents accordionView={accordionView} />
-      </div>
+      <>
+        <Accordion activeIndex={this.state.activeIndex} exclusive={false} styled fluid panels={panels} />
+      </>
     )
   }
 }
