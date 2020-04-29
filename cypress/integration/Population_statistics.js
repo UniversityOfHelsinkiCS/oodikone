@@ -30,11 +30,11 @@ describe('Population Statistics tests', () => {
 
   const checkAmountOfStudents = (assertion) => {
     let students = 0
-    cy.contains("Credit accumulation").invoke('text').then((text) => {
+    cy.contains("Credit accumulation").click().invoke('text').then((text) => {
       students = Number(text.match(/\d+/g)[0])
       expect(students).to.equal(assertion)
     })
-    cy.contains("Credit accumulation").siblings().within(() => {
+    cy.contains("Credit accumulation").click().siblings().within(() => {
       cy.get(".highcharts-series-group").find("path").should('have.length', students ? (students * 2) + 2 : 0) // For each student there should be 2 paths in the graph + 2 for the scrollbar
     })
   }
@@ -79,8 +79,8 @@ describe('Population Statistics tests', () => {
       cy.contains("Excludes exchange students")
       cy.contains("Excludes students who haven't enrolled present nor absent")
     })
-
-    cy.contains("Courses of Population").parent().within(() => {
+    cy.contains("Courses of population").click({ force: true })
+    cy.contains("Courses of population").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
       cy.route('/api/v3/courseyearlystats**').as('coursePage')
       cy.contains("Laskennan mallit")
@@ -90,8 +90,8 @@ describe('Population Statistics tests', () => {
     })
     cy.contains("TKT20005")
     cy.go("back")
-
-    cy.contains("Courses of Population").parent().within(() => {
+    cy.contains("Courses of population").click({ force: true })
+    cy.contains("Courses of population").click().parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "15")
     })
 
@@ -103,20 +103,21 @@ describe('Population Statistics tests', () => {
     checkAmountOfStudents(29)
 
     let filteredStudents = 1328493
+    cy.contains("Credit statistics").click()
     cy.contains("Credits gained during first").parentsUntil(".tab").get("table").within(() => {
       cy.get("tr").eq(2).find("td").eq(1).invoke("text").then(text => filteredStudents = Number(text))
       cy.route('POST', '/api/v2/populationstatistics/courses**').as('courseData')
-      cy.get("tr").eq(2).click()
+      cy.get("tr").eq(2).find('.filter').click()
       cy.wait('@courseData')
     }).then(() => {
       checkAmountOfStudents(filteredStudents)
     })
-
-    cy.contains("Courses of Population").parent().within(() => {
+    cy.contains("Courses of population").click({ force: true })
+    cy.contains("Courses of population").parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "1")
     })
 
-    cy.contains("button", "show").click()
+    cy.contains("Students (1)").click()
     cy.contains("Student names hidden").click()
     cy.contains("Luoto").siblings().eq(2).click()
     cy.contains("Luoto").invoke('text').then((text) => expect(text).to.equal('Luoto Veli-Matti, 014824094'))
@@ -128,7 +129,7 @@ describe('Population Statistics tests', () => {
   it('Student list checking works as intended', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
-    cy.contains("button", "show").click()
+    cy.contains("Students (29)").click()
     cy.contains("010111264")
     cy.contains("666666666").should('not.exist')
     cy.contains('button', "Check studentnumbers").click()
@@ -289,14 +290,15 @@ describe('Population Statistics tests', () => {
   it('Population statistics wont crash course population', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
-    cy.get(':nth-child(3) > .iconCell > p > .item > .level').click({ force: true })
+    cy.contains("Courses of population").click({ force: true })
+    cy.contains("Lineaarialgebra").siblings().within(() => { cy.get('.level').click() })
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click({ force: true })
   })
 
   it("Empty 'mandatory courses' tab has a link to the page where mandatory courses can be added", () => {
     cy.contains("Select study programme").click().siblings().contains("Kielten kandiohjelma").click()
     cy.contains("See population").click()
-    cy.contains("button", "show").click()
+    cy.contains("Students (5)").click()
     cy.contains("Mandatory courses").click()
     cy.contains("No mandatory courses defined. You can define them here.").find("a").click()
     cy.contains("Kielten kandiohjelma")
@@ -306,7 +308,7 @@ describe('Population Statistics tests', () => {
   it("Empty 'tags' tab has a link to the page where tags can be created", () => {
     cy.contains("Select study programme").click().siblings().contains("Kielten kandiohjelma").click()
     cy.contains("See population").click()
-    cy.contains("button", "show").click()
+    cy.contains("Students (5)").click()
     cy.contains("Mandatory courses").siblings().contains("Tags").click()
     cy.contains("No tags defined. You can define them here.").find("a").click()
     cy.contains("Kielten kandiohjelma")
