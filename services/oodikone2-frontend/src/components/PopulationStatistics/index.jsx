@@ -21,7 +21,7 @@ import selectors from '../../selectors/populationDetails'
 
 const PopulationStatistics = memo(props => {
   const { translate, populationFound, loading, location, history, isAdmin } = props
-  const [accordionView, setAccordion] = useState(false)
+  const [accordionView, setAccordion] = useState(true)
   const [excluded, setExcluded] = useState([])
 
   const { onProgress, progress } = useProgress(loading)
