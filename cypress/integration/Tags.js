@@ -46,7 +46,7 @@ describe('Tag tests', () => {
     cy.contains(name).find('.level').click()
 
     cy.contains('Credit accumulation (for 2 students)')
-    cy.contains(/^show$/).click()
+    cy.contains("Students (2)").click()
     cy.contains('014022579')
     cy.contains('011122249')
 
