@@ -24,7 +24,7 @@ wrapper.get('/v3/mandatory_courses/:code', async (req, res) => {
           en: module.name
         },
         code: module.code,
-        label: { id: `${courses.length}`, label: module.code.replace('-', '').slice(0,4) , orderNumber: courses.length }
+        label: { id: `${courses.length}`, label: module.code.replace('-', '').slice(0, 4), orderNumber: courses.length }
       })
     }
   }
@@ -72,7 +72,7 @@ wrapper.get('/v3/mandatory_courses/:code', async (req, res) => {
   // better_flatten(response.data)
   superFlattenFlatten(response.data)
 
-  const byCode = (c1, c2) => c1.code < c2.code ? -1 : 1
+  const byCode = (c1, c2) => (c1.code < c2.code ? -1 : 1)
 
   courses.sort(byCode)
   res.json(courses)
