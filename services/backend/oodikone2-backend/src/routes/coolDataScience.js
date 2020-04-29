@@ -297,8 +297,10 @@ router.get(
   withErr(async (req, res) => {
     const { date: unixMillis, showByYear } = req.query
     const date = new Date(Number(unixMillis))
+    const endOfToday = new Date()
+    endOfToday.setHours(23, 59, 59, 999)
 
-    if (isNaN(date.getTime()) || date.getTime() > new Date().getTime()) {
+    if (isNaN(date.getTime()) || date.getTime() > endOfToday.getTime()) {
       return res.status(400).json({ error: 'Invalid date' })
     }
 
