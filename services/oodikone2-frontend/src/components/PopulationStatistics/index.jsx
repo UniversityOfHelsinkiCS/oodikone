@@ -18,7 +18,20 @@ import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 
 const PopulationStatistics = memo(props => {
-  const { translate, populationFound, loading, location, history, isAdmin } = props
+  const {
+    translate,
+    selectedStudents,
+    queryIsSet,
+    selectedStudentsByYear,
+    query,
+    samples,
+    populationFound,
+    loading,
+    location,
+    history,
+    isAdmin,
+    isLoading
+  } = props
   // eslint-disable-next-line no-unused-vars
   const [accordionView, setAccordion] = useState(true)
   const [excluded, setExcluded] = useState([])
@@ -83,7 +96,17 @@ const PopulationStatistics = memo(props => {
       </Header>
       <Segment className="contentSegment">
         {renderPopulationSearch()}
-        {location.search !== '' ? <PopulationDetails /> : null}
+        {location.search !== '' ? (
+          <PopulationDetails
+            translate={translate}
+            selectedStudents={selectedStudents}
+            queryIsSet={queryIsSet}
+            selectedStudentsByYear={selectedStudentsByYear}
+            query={query}
+            samples={samples}
+            isLoading={isLoading}
+          />
+        ) : null}
       </Segment>
     </div>
   )

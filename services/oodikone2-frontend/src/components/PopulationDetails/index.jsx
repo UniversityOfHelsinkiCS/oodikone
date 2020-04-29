@@ -84,9 +84,7 @@ class PopulationDetails extends Component {
     queryIsSet: bool.isRequired,
     isLoading: bool.isRequired,
     selectedStudentsByYear: shape({}).isRequired,
-    query: shape({}).isRequired,
-    tagstudent: arrayOf(shape({})).isRequired,
-    studytracks: shape({}).isRequired
+    query: shape({}).isRequired
   }
 
   constructor() {
@@ -146,28 +144,9 @@ class PopulationDetails extends Component {
     )
   }
 
-  getExcludedFilters = () => {
-    const { query, tagstudent, selectedStudents, samples, studytracks } = this.props
-
-    const studyrights = samples.flatMap(student => flattenStudyrights(student.studyrights, query.studyRights.programme))
-    const studytracksInPopulation = intersection(Object.keys(studytracks), studyrights)
-
-    const excludedFilters = []
-
-    if (!query.studentStatuses.includes('CANCELLED')) excludedFilters.push('CanceledStudyright')
-
-    const taggedStudentNumbers = tagstudent.map(tag => tag.studentnumber)
-
-    if (intersection(taggedStudentNumbers, selectedStudents) < 1) excludedFilters.push('TagFilter')
-
-    if (studytracksInPopulation.length < 1) excludedFilters.push('StudytrackFilter')
-
-    return excludedFilters
-  }
-
   render() {
     const { samples, translate, queryIsSet, isLoading } = this.props
-
+    console.log(samples, queryIsSet, isLoading)
     if (isLoading || !queryIsSet) {
       return null
     }
@@ -329,40 +308,4 @@ class PopulationDetails extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  const { samples, selectedStudents, complemented, selectedStudentsByYear } = selectors.makePopulationsToData(state)
-  // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
-  if (samples.length > 0) {
-    const creditsAndDates = samples.map(s => {
-      const passedCourses = s.courses.filter(c => c.passed)
-      const passedCredits = getTotalCreditsFromCourses(passedCourses)
-      const dates = passedCourses.map(c => c.date)
-      const datesWithCredits = passedCourses.filter(c => c.credits > 0).map(c => c.date)
-      return { passedCredits, dates, datesWithCredits }
-    })
-    const credits = creditsAndDates.map(cd => cd.passedCredits)
-    const dates = flattenDeep(creditsAndDates.map(cd => cd.dates)).map(date => new Date(date).getTime())
-    const datesWithCredits = flattenDeep(creditsAndDates.map(cd => cd.datesWithCredits)).map(date =>
-      new Date(date).getTime()
-    )
-    samples.maxCredits = Math.max(...credits)
-    samples.maxDate = Math.max(...dates)
-    samples.minDate = Math.min(...dates)
-    samples.minDateWithCredits = Math.min(...datesWithCredits)
-  }
-
-  return {
-    samples,
-    selectedStudents,
-    selectedStudentsByYear,
-    complemented,
-    translate: getTranslate(state.localize),
-    queryIsSet: !!state.populations.query,
-    isLoading: state.populations.pending === true,
-    query: state.populations.query || {},
-    tagstudent: state.tagstudent.data || {},
-    studytracks: state.populationDegreesAndProgrammes.data.studyTracks || {}
-  }
-}
-
-export default connect(mapStateToProps)(PopulationDetails)
+export default connect(null)(PopulationDetails)
