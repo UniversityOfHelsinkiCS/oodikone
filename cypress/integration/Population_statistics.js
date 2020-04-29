@@ -106,7 +106,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Credits gained during first").parentsUntil(".tab").get("table").within(() => {
       cy.get("tr").eq(2).find("td").eq(1).invoke("text").then(text => filteredStudents = Number(text))
       cy.route('POST', '/api/v2/populationstatistics/courses**').as('courseData')
-      cy.get("tr").eq(2).click()
+      cy.get("tr").eq(2).find('.filter').click()
       cy.wait('@courseData')
     }).then(() => {
       checkAmountOfStudents(filteredStudents)
