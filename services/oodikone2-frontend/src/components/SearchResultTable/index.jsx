@@ -14,7 +14,7 @@ const getHeaderRow = headers => (
   </Table.Header>
 )
 
-const getTableBody = (rows, rowClickFn, selectable) => (
+const getTableBody = (rows, rowClickFn, selectable, actionTrigger) => (
   <Table.Body>
     {rows.map((row, i) => (
       <Table.Row
@@ -25,20 +25,23 @@ const getTableBody = (rows, rowClickFn, selectable) => (
       >
         {Object.values(row).map((value, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <Table.Cell key={`cell-${index}`}>{value}</Table.Cell>
+          <Table.Cell key={`cell-${index}`}>
+            {!!actionTrigger && index === 0 && actionTrigger(row)}
+            {value}
+          </Table.Cell>
         ))}
       </Table.Row>
     ))}
   </Table.Body>
 )
 
-const SearchResultTable = ({ headers, rows, rowClickFn, noResultText, selectable, definition }) => {
+const SearchResultTable = ({ actionTrigger, headers, rows, rowClickFn, noResultText, selectable, definition }) => {
   if (rows.length > 0) {
     return (
       <Segment style={{ maxHeight: '80vh', overflowY: 'auto', padding: 0 }}>
         <Table unstackable selectable={selectable} definition={definition} className="fixed-header">
           {getHeaderRow(headers)}
-          {getTableBody(rows, rowClickFn, selectable)}
+          {getTableBody(rows, rowClickFn, selectable, actionTrigger)}
         </Table>
       </Segment>
     )
@@ -49,7 +52,8 @@ const SearchResultTable = ({ headers, rows, rowClickFn, noResultText, selectable
 SearchResultTable.defaultProps = {
   rowClickFn: () => null,
   selectable: false,
-  definition: false
+  definition: false,
+  actionTrigger: null
 }
 
 SearchResultTable.propTypes = {
@@ -58,7 +62,8 @@ SearchResultTable.propTypes = {
   rowClickFn: func,
   noResultText: string.isRequired,
   selectable: bool,
-  definition: bool
+  definition: bool,
+  actionTrigger: func
 }
 
 export default SearchResultTable

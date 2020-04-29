@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, object, number } from 'prop-types'
-import { Progress } from 'semantic-ui-react'
+import { Progress, Icon, Popup } from 'semantic-ui-react'
 import SearchResultTable from '../SearchResultTable'
 import { getStudentTotalCredits } from '../../common'
 import TSA from '../../common/tsa'
@@ -118,8 +118,26 @@ const PopulationCreditGainTable = ({
     <SearchResultTable
       headers={headers}
       rows={rows}
-      selectable
-      rowClickFn={handleCreditBracketRowClicked}
+      actionTrigger={row => {
+        return (
+          <Popup
+            content={
+              <span>
+                Rajaa opiskelijat ensimmäisen <b>{months}</b> kuukauden aikana saatujen opintopisteiden perusteella:{' '}
+                <b>({row[0]})</b>
+              </span>
+            }
+            trigger={
+              <Icon
+                onClick={() => handleCreditBracketRowClicked(null, row)}
+                style={{ paddingLeft: '15px', marginRight: '25px', cursor: 'pointer' }}
+                name="filter"
+              />
+            }
+            position="top left"
+          />
+        )
+      }}
       noResultText={translate('common.noResults')}
     />
   )
