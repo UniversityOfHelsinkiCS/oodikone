@@ -86,8 +86,7 @@ class PopulationFilters extends Component {
     studyRights: shape({ programme: string, degree: string, studyTrack: string }).isRequired,
     populationFilters: shape({}).isRequired,
     populationSelectedStudentCourses: shape({}).isRequired,
-    populationCourses: shape({}).isRequired,
-    accordionView: bool.isRequired
+    populationCourses: shape({}).isRequired
   }
 
   state = {
@@ -270,7 +269,6 @@ class PopulationFilters extends Component {
       populationCourses,
       tags,
       exclude,
-      accordionView,
       studyRights
     } = this.props
     const { Add } = infotooltips.PopulationStatistics.Filters
@@ -295,20 +293,8 @@ class PopulationFilters extends Component {
       return null
     }
     if (!this.state.visible) {
-      if (accordionView)
-        return (
-          <>
-            <Header>
-              Add filters <InfoBox content={Add} />
-            </Header>
-            <Loader active={selectedPopulationCourses.pending} inline="centered" />
-            <Button onClick={this.handleAddFiltersClicked} disabled={selectedPopulationCourses.pending}>
-              add
-            </Button>
-          </>
-        )
       return (
-        <Segment>
+        <>
           <Header>
             Add filters <InfoBox content={Add} />
           </Header>
@@ -316,63 +302,11 @@ class PopulationFilters extends Component {
           <Button onClick={this.handleAddFiltersClicked} disabled={selectedPopulationCourses.pending}>
             add
           </Button>
-        </Segment>
-      )
-    }
-    if (accordionView)
-      return (
-        <>
-          <Header>
-            Add filters <InfoBox content={Add} />
-          </Header>
-          <div>
-            <Radio
-              toggle
-              label="Advanced filters"
-              checked={this.state.advancedUser}
-              onChange={this.handleAdvancedFiltersChanged}
-            />
-          </div>
-          {unsetFilters.map(filterName => {
-            //eslint-disable-line
-            if (componentFor[filterName]) {
-              // THIS IS KINDA HACKED SOLUTION PLS FIX
-              // this is awful, shame on who ever wrote this, pls fix
-              // when is this going to be fixed?
-              // when the time is right, probably
-              // does this even need fixing though?
-              return React.createElement(componentFor[filterName], {
-                filter: { notSet: true },
-                key: filterName,
-                samples: this.props.samples,
-                transfers,
-                extents,
-                allStudyRights,
-                studyRights
-              })
-            } else if (!(filterName === 'TagFilter' && tags.length < 1)) {
-              return React.createElement(Preset, {
-                filter: {
-                  ...this.state.presetFilters.find(f => f.id === filterName),
-                  notSet: true
-                },
-                key: filterName,
-                destroy: this.destroyFromAllFilters
-              })
-            }
-          })}
-          {exclude.length > 0 ? (
-            <Segment style={{ textAlign: 'center', backgroundColor: 'whitesmoke' }}>
-              Currently there are {exclude.length} hidden filter(s) (
-              {exclude.map(ex => ex.replace(/([a-z0-9])([A-Z])/g, '$1 $2')).join(', ')}) since there are no students
-              that could be filtered with them
-            </Segment>
-          ) : null}
-          <Button onClick={this.handleAddFilterCancelClicked}>cancel</Button>
         </>
       )
+    }
     return (
-      <Segment>
+      <>
         <Header>
           Add filters <InfoBox content={Add} />
         </Header>
@@ -420,7 +354,7 @@ class PopulationFilters extends Component {
           </Segment>
         ) : null}
         <Button onClick={this.handleAddFilterCancelClicked}>cancel</Button>
-      </Segment>
+      </>
     )
   }
 
@@ -431,87 +365,8 @@ class PopulationFilters extends Component {
       return null
     }
 
-    if (this.props.accordionView)
-      return (
-        <>
-          <Header>
-            Filters <InfoBox content={Filters} />
-          </Header>
-          {this.props.filters.map(filter => {
-            if (filter.type !== 'Preset') {
-              return React.createElement(componentFor[filter.type], {
-                filter,
-                key: filter.id,
-                samples: this.props.samples,
-                transfers: this.props.transfers,
-                extents: this.props.extents,
-                allStudyRights,
-                studyRights: this.props.studyRights
-              })
-            }
-            return React.createElement(Preset, {
-              filter,
-              key: filter.id,
-              destroy: this.destroyFromAllFilters
-            })
-          })}
-          <Form>
-            <Form.Group inline>
-              <Form.Field>
-                <label>Show excluded students only</label>
-              </Form.Field>
-              <Form.Field>
-                <Radio toggle checked={this.props.complemented} onClick={this.handleSetComplementFilterClicked} />
-              </Form.Field>
-            </Form.Group>
-          </Form>
-
-          <Button onClick={this.handleClearAllFiltersClicked}>clear all filters</Button>
-          {this.state.advancedUser ? (
-            <Modal
-              trigger={<Button onClick={this.handleSaveFiltersClicked}>Save filters as preset</Button>}
-              open={this.state.modalOpen}
-              onClose={this.handleSaveFiltersModalClosed}
-              size="small"
-            >
-              <Header />
-              <Modal.Content>
-                <Form>
-                  <Form.Field>
-                    <h2> Save current filters as preset </h2>
-                    <em> This filter is saved in this population for future use </em>
-                    <Input placeholder="Name..." maxLength={40} onChange={e => this.handlePresetName(e.target.value)} />
-                  </Form.Field>
-                  <Form.Field>
-                    <em> explain what your filter is doing here </em>
-                    <TextArea
-                      placeholder="Description..."
-                      maxLength={160}
-                      onChange={e => this.handlePresetDescription(e.target.value)}
-                    />
-                  </Form.Field>
-                </Form>
-              </Modal.Content>
-              <Modal.Actions>
-                <Button negative onClick={this.handleSaveFiltersModalCanceled}>
-                  Cancel
-                </Button>
-                <Button
-                  disabled={this.state.presetName === ''}
-                  color="green"
-                  onClick={this.handleSaveFiltersModalSubmit}
-                  inverted
-                >
-                  <Icon name="checkmark" /> Save
-                </Button>
-              </Modal.Actions>
-            </Modal>
-          ) : null}
-        </>
-      )
-
     return (
-      <Segment>
+      <>
         <Header>
           Filters <InfoBox content={Filters} />
         </Header>
@@ -585,7 +440,7 @@ class PopulationFilters extends Component {
             </Modal.Actions>
           </Modal>
         ) : null}
-      </Segment>
+      </>
     )
   }
 
