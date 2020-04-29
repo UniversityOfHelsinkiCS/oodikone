@@ -511,7 +511,7 @@ class PopulationStudents extends Component {
             },
             'code'
           ]).map(m => ({
-            key: `${m.label.label}-${m.code}`,
+            key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
             title: verticalTitle(
               <Fragment>
                 {getTextIn(m.name, this.props.language)}

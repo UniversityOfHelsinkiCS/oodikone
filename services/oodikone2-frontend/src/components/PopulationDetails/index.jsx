@@ -142,7 +142,7 @@ class PopulationDetails extends Component {
 
   render() {
     const { samples, translate, queryIsSet, isLoading } = this.props
-    console.log(samples, queryIsSet, isLoading)
+
     if (isLoading || !queryIsSet) {
       return null
     }
