@@ -54,24 +54,24 @@ const Trends = () => {
   const match = useRouteMatch({ path: baseURI, exact: true })
   const exact = !!match
   if (exact) {
-    history.replace(`${baseURI}/relative`)
+    history.replace(`${baseURI}/status`)
   }
   return (
     <>
       <div style={{ margin: '0 auto', maxWidth: '1000px' }}>
         <NavTiles>
+          <NavTile to={`${baseURI}/status`} title="See current status" imageSrc={statusImg} />
           <NavTile to={`${baseURI}/relative`} title="Compare relative trends" imageSrc={relativeGraphImg} />
           <NavTile to={`${baseURI}/absolute`} title="Compare numerical trends" imageSrc={absoluteGraphImg} />
           <NavTile to={`${baseURI}/timeline`} title="Compare trends over time" imageSrc={timelineGraphImg} />
-          <NavTile to={`${baseURI}/status`} title="See current status" imageSrc={statusImg} />
         </NavTiles>
       </div>
       <div style={{ margin: '0 auto', marginBottom: '300px', maxWidth: '75vw' }}>
         <Switch>
+          <Route exact path={`${baseURI}/status`} component={Status} />
           <Route exact path={`${baseURI}/relative`} component={ProtoC} />
           <Route exact path={`${baseURI}/absolute`} component={ProtoC2} />
           <Route exact path={`${baseURI}/timeline`} component={ProtoG} />
-          <Route exact path={`${baseURI}/status`} component={Status} />
         </Switch>
       </div>
     </>
