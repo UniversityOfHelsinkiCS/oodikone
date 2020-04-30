@@ -79,7 +79,7 @@ describe('Population Statistics tests', () => {
       cy.contains("Excludes exchange students")
       cy.contains("Excludes students who haven't enrolled present nor absent")
     })
-    cy.contains("Courses of population").click()
+    cy.contains("Courses of population").click({ force: true })
     cy.contains("Courses of population").parent().within(() => {
       cy.get("tr").its('length').should('be.gte', 10)
       cy.route('/api/v3/courseyearlystats**').as('coursePage')
@@ -90,7 +90,7 @@ describe('Population Statistics tests', () => {
     })
     cy.contains("TKT20005")
     cy.go("back")
-    cy.contains("Courses of population").click()
+    cy.contains("Courses of population").click({ force: true })
     cy.contains("Courses of population").click().parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "15")
     })
@@ -112,7 +112,7 @@ describe('Population Statistics tests', () => {
     }).then(() => {
       checkAmountOfStudents(filteredStudents)
     })
-    cy.contains("Courses of population").click()
+    cy.contains("Courses of population").click({ force: true })
     cy.contains("Courses of population").parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "1")
     })
@@ -290,7 +290,7 @@ describe('Population Statistics tests', () => {
   it('Population statistics wont crash course population', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
-    cy.contains("Courses of population").click()
+    cy.contains("Courses of population").click({ force: true })
     cy.contains("Lineaarialgebra").siblings().within(() => { cy.get('.level').click() })
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click({ force: true })
   })

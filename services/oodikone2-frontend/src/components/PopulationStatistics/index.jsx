@@ -17,10 +17,22 @@ import { getUserIsAdmin, flattenStudyrights, getTotalCreditsFromCourses } from '
 import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 
-// this code is horrible now and I am kinda sorry for it. Will fix once everything is specced
-
 const PopulationStatistics = memo(props => {
-  const { translate, populationFound, loading, location, history, isAdmin } = props
+  const {
+    translate,
+    selectedStudents,
+    queryIsSet,
+    selectedStudentsByYear,
+    query,
+    samples,
+    populationFound,
+    loading,
+    location,
+    history,
+    isAdmin,
+    isLoading
+  } = props
+  // eslint-disable-next-line no-unused-vars
   const [accordionView, setAccordion] = useState(true)
   const [excluded, setExcluded] = useState([])
 
@@ -63,9 +75,9 @@ const PopulationStatistics = memo(props => {
         <Divider />
         {location.search !== '' ? (
           <>
-            {isAdmin ? <Radio id="accordion-toggle" toggle onChange={() => setAccordion(!accordionView)} /> : null}
+            {isAdmin ? <Radio id="accordion-toggle" toggle onChange={() => console.log('assign something')} /> : null}
             <PopulationSearchHistory history={history} />
-            {!props.isLoading && props.queryIsSet && accordionView && (
+            {!props.isLoading && props.queryIsSet && (
               <>
                 <Divider />
                 <PopulationFilters samples={props.samples} exclude={excluded} accordionView={accordionView} />
@@ -84,7 +96,17 @@ const PopulationStatistics = memo(props => {
       </Header>
       <Segment className="contentSegment">
         {renderPopulationSearch()}
-        {location.search !== '' ? <PopulationDetails accordionView={accordionView} /> : null}
+        {location.search !== '' ? (
+          <PopulationDetails
+            translate={translate}
+            selectedStudents={selectedStudents}
+            queryIsSet={queryIsSet}
+            selectedStudentsByYear={selectedStudentsByYear}
+            query={query}
+            samples={samples}
+            isLoading={isLoading}
+          />
+        ) : null}
       </Segment>
     </div>
   )
@@ -114,6 +136,7 @@ PopulationStatistics.propTypes = {
 }
 
 const mapStateToProps = state => {
+  // haha copied from other place :mintu:
   const { samples, selectedStudents, complemented, selectedStudentsByYear } = selectors.makePopulationsToData(state)
   // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
   if (samples.length > 0) {
