@@ -81,6 +81,28 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
             // before datamangels begins so that the browser is responsive
             setImmediate(() => onPointClicked(clickedPoint))
           }
+        },
+        mouseOver: function(e) {
+          const findLabel = (x, ticks) => {
+            return ticks[x]
+          }
+          const tick = this.series.xAxis ? findLabel(this.x, this.series.xAxis.ticks) : null
+          this.selectedTick = tick
+          if (tick) {
+            tick.label.css({
+              color: 'black',
+              fontWeight: 'bold'
+            })
+          }
+        },
+        mouseOut: function(e) {
+          if (this.selectedTick) {
+            this.selectedTick.label.css({
+              color: '#666666',
+              fontWeight: 'normal'
+            })
+            this.selectedTick = null
+          }
         }
       }
     }
@@ -143,14 +165,36 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
       categories: sortedData.map(data => data.name),
       labels: {
         events: {
-          click: function(){
+          click: function() {
             const clickedLabel = sortedData.find(data => data.name === this.value)
             setImmediate(() => onPointClicked(clickedLabel))
           },
+          mouseover: function() {
+            const findLabel = (x, ticks) => {
+              return ticks[x]
+            }
+            const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
+            this.selectedTick = tick
+            if (tick) {
+              tick.label.css({
+                color: 'black',
+                fontWeight: 'bold'
+              })
+            }
+          },
+          mouseout: function() {
+            if (this.selectedTick) {
+              this.selectedTick.label.css({
+                color: '#666666',
+                fontWeight: 'normal'
+              })
+              this.selectedTick = null
+            }
+          }
         },
         style: {
           cursor: 'pointer'
-        },
+        }
       }
     },
     yAxis: {
@@ -165,6 +209,37 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
 }
 
 const makeNonClickableChartConfig = programme => {
+  const addMouseOverHandler = serie => {
+    serie.point = {
+      events: {
+        mouseOver: function(e) {
+          const findLabel = (x, ticks) => {
+            return ticks[x]
+          }
+          const tick = this.series.xAxis ? findLabel(this.x, this.series.xAxis.ticks) : null
+          this.selectedTick = tick
+
+          if (tick) {
+            tick.label.css({
+              color: 'black',
+              fontWeight: 'bold'
+            })
+          }
+        },
+        mouseOut: function(e) {
+          if (this.selectedTick) {
+            this.selectedTick.label.css({
+              color: 'grey',
+              fontWeight: 'normal'
+            })
+            this.selectedTick = null
+          }
+        }
+      }
+    }
+    return serie
+  }
+
   const series = [
     {
       color: '#7f8c8d',
@@ -200,7 +275,7 @@ const makeNonClickableChartConfig = programme => {
         z: p.students3y / p.totalStudents
       }))
     }
-  ]
+  ].map(addMouseOverHandler)
 
   return Highcharts.merge(defaultConfig(false), {
     title: {
