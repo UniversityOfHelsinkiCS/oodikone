@@ -6,6 +6,7 @@ import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
 import { getTextIn } from '../../common'
+import { useLocalStorage } from '../../common/hooks'
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
 import './status.css'
@@ -135,8 +136,8 @@ const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|
 
 const Status = () => {
   const DATE_FORMAT = 'DD.MM.YYYY'
-  const [showYearlyValues, setShowYearlyValues] = useState(false)
-  const [showByYear, setShowByYear] = useState(false)
+  const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', false)
+  const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
   const [drillStack, setDrillStack] = useState([])

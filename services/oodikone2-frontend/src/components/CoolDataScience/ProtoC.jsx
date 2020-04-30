@@ -5,9 +5,12 @@ import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Checkbox, Button, Message, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
 import ReactMarkdown from 'react-markdown'
+import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
+
+HighchartsCustomEvents(Highcharts)
 
 const defaultConfig = (pointer = true) => {
   return {
@@ -78,6 +81,28 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
             // before datamangels begins so that the browser is responsive
             setImmediate(() => onPointClicked(clickedPoint))
           }
+        },
+        mouseOver: function(e) {
+          const findLabel = (x, ticks) => {
+            return ticks[x]
+          }
+          const tick = this.series.xAxis ? findLabel(this.x, this.series.xAxis.ticks) : null
+          this.selectedTick = tick
+          if (tick) {
+            tick.label.css({
+              color: 'black',
+              fontWeight: 'bold'
+            })
+          }
+        },
+        mouseOut: function(e) {
+          if (this.selectedTick) {
+            this.selectedTick.label.css({
+              color: '#666666',
+              fontWeight: 'normal'
+            })
+            this.selectedTick = null
+          }
         }
       }
     }
@@ -137,7 +162,40 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
       }
     },
     xAxis: {
-      categories: sortedData.map(data => data.name)
+      categories: sortedData.map(data => data.name),
+      labels: {
+        events: {
+          click: function() {
+            const clickedLabel = sortedData.find(data => data.name === this.value)
+            setImmediate(() => onPointClicked(clickedLabel))
+          },
+          mouseover: function() {
+            const findLabel = (x, ticks) => {
+              return ticks[x]
+            }
+            const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
+            this.selectedTick = tick
+            if (tick) {
+              tick.label.css({
+                color: 'black',
+                fontWeight: 'bold'
+              })
+            }
+          },
+          mouseout: function() {
+            if (this.selectedTick) {
+              this.selectedTick.label.css({
+                color: '#666666',
+                fontWeight: 'normal'
+              })
+              this.selectedTick = null
+            }
+          }
+        },
+        style: {
+          cursor: 'pointer'
+        }
+      }
     },
     yAxis: {
       title: {
@@ -151,6 +209,37 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
 }
 
 const makeNonClickableChartConfig = programme => {
+  const addMouseOverHandler = serie => {
+    serie.point = {
+      events: {
+        mouseOver: function(e) {
+          const findLabel = (x, ticks) => {
+            return ticks[x]
+          }
+          const tick = this.series.xAxis ? findLabel(this.x, this.series.xAxis.ticks) : null
+          this.selectedTick = tick
+
+          if (tick) {
+            tick.label.css({
+              color: 'black',
+              fontWeight: 'bold'
+            })
+          }
+        },
+        mouseOut: function(e) {
+          if (this.selectedTick) {
+            this.selectedTick.label.css({
+              color: 'grey',
+              fontWeight: 'normal'
+            })
+            this.selectedTick = null
+          }
+        }
+      }
+    }
+    return serie
+  }
+
   const series = [
     {
       color: '#7f8c8d',
@@ -186,14 +275,14 @@ const makeNonClickableChartConfig = programme => {
         z: p.students3y / p.totalStudents
       }))
     }
-  ]
+  ].map(addMouseOverHandler)
 
   return Highcharts.merge(defaultConfig(false), {
     title: {
       text: `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
     },
     xAxis: {
-      categories: programme.studytracks.map(p => p.name)
+      categories: programme.studytracks.map(data => data.name)
     },
     yAxis: {
       title: {
