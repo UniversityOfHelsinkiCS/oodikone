@@ -5,9 +5,12 @@ import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Checkbox, Button, Message, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
 import ReactMarkdown from 'react-markdown'
+import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
+
+HighchartsCustomEvents(Highcharts)
 
 const defaultConfig = (pointer = true) => {
   return {
@@ -137,7 +140,18 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
       }
     },
     xAxis: {
-      categories: sortedData.map(data => data.name)
+      categories: sortedData.map(data => data.name),
+      labels: {
+        events: {
+          click: function(){
+            const clickedLabel = sortedData.find(data => data.name === this.value)
+            setImmediate(() => onPointClicked(clickedLabel))
+          },
+        },
+        style: {
+          cursor: 'pointer'
+        },
+      }
     },
     yAxis: {
       title: {
@@ -193,7 +207,7 @@ const makeNonClickableChartConfig = programme => {
       text: `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
     },
     xAxis: {
-      categories: programme.studytracks.map(p => p.name)
+      categories: programme.studytracks.map(data => data.name)
     },
     yAxis: {
       title: {
