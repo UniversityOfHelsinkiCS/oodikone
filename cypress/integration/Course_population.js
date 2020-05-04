@@ -35,7 +35,7 @@ describe('Course population tests', () => {
     cy.contains('add').click()
     cy.contains('Select students that have grade')
 
-    cy.contains('Show').click()
+    cy.get('[data-cy="show-student-list-button"]').click()
     cy.contains('013614218')
     cy.contains('014022579')
   })

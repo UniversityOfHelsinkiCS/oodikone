@@ -768,6 +768,7 @@ class PopulationStudents extends Component {
                     this.props.toggleStudentListVisibility()
                     sendAnalytics('Toggle Show students', this.props.showList ? 'Hide' : 'Show')
                   }}
+                  data-cy="show-student-list-button"
                 >
                   {toggleLabel}
                 </Button>
