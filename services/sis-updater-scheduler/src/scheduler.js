@@ -273,9 +273,35 @@ const schedulePurge = async () => {
   }
 }
 
+const scheduleProgrammes = async () => {
+  const { knex } = knexConnection
+
+  const programmes = [
+    'KH50_001'
+    // 'KH50_002',
+    // 'KH50_003',
+    // 'KH50_004',
+    // 'KH50_005',
+  ]
+
+  const modules = await Promise.all(
+    programmes.map(p =>
+      knex('modules')
+        .where({ code: p })
+        .first()
+    )
+  )
+  const entityIds = modules.map(m => m.id)
+
+  console.log('scheduling programmes', entityIds)
+
+  createJobs(entityIds, 'programme_modules')
+}
+
 module.exports = {
   scheduleMeta,
   scheduleStudents,
+  scheduleProgrammes,
   scheduleHourly,
   scheduleWeekly,
   schedulePurge,

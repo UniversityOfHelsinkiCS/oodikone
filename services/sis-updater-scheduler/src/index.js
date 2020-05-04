@@ -7,6 +7,7 @@ const { startServer } = require('./server')
 const {
   scheduleMeta,
   scheduleStudents,
+  scheduleProgrammes,
   scheduleHourly,
   scheduleWeekly,
   schedulePurge,
@@ -36,6 +37,7 @@ knexConnection.on('connect', async () => {
   if (isDev) {
     await scheduleMeta()
     await scheduleStudents()
+    await scheduleProgrammes()
   }
 
   // Monday-Friday at every minute 30
