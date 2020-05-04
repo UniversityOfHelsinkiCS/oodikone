@@ -230,7 +230,7 @@ class PopulationStudents extends Component {
     columns.push(
       {
         key: 'studentnumber',
-        title: 'student number',
+        title: 'Student Number',
         getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
         getRowContent: s => (
           <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
@@ -268,21 +268,21 @@ class PopulationStudents extends Component {
     }
     columns.push({
       key: 'all credits',
-      title: 'all credits',
+      title: 'All Credits',
       getRowVal: s => s.credits
     })
 
     if (!(coursePopulation || customPopulation)) {
       columns.push({
         key: 'transferred from',
-        title: 'transferred from',
+        title: 'Transferred From',
         getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
       })
     }
     if (containsStudyTracks && !(coursePopulation || customPopulation)) {
       columns.push({
         key: 'studytrack',
-        title: 'studytrack',
+        title: 'Study Track',
         getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0]
       })
     }
@@ -303,7 +303,7 @@ class PopulationStudents extends Component {
     }
     columns.push({
       key: 'tags',
-      title: 'tags',
+      title: 'Tags',
       getRowVal: s => (!s.obfuscated ? tags(s.tags) : '')
     })
 
@@ -320,13 +320,13 @@ class PopulationStudents extends Component {
       columns.push(
         {
           key: 'programme',
-          title: 'studyprogramme',
+          title: 'Study Programme',
           getRowVal: s =>
             getTextIn(mainProgramme(s.studyrights, s.studentNumber), this.props.language) || 'No programme'
         },
         {
           key: 'startyear',
-          title: 'start year at university',
+          title: 'Start Year at Uni',
           getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : '')
         }
       )
@@ -335,7 +335,7 @@ class PopulationStudents extends Component {
     if (admin) {
       columns.push({
         key: 'updatedAt',
-        title: 'last updated at',
+        title: 'Last Updated At',
         getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
       })
     }
@@ -737,12 +737,12 @@ class PopulationStudents extends Component {
   }
 
   render() {
-    const { Students } = infotooltips.PopulationStatistics
+    const { Students, CoursePopulationStudents } = infotooltips.PopulationStatistics
     if (this.props.samples.length === 0) {
       return null
     }
 
-    const toggleLabel = this.props.showList ? 'hide' : 'show'
+    const toggleLabel = this.props.showList ? 'Hide' : 'Show'
 
     if (this.props.accordionView)
       return (
@@ -761,12 +761,12 @@ class PopulationStudents extends Component {
             <Header dividing>
               <div>
                 {`Students (${this.props.selectedStudents.length}) `}
-                <InfoBox content={Students.Infobox} />
+                <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : Students.Infobox} />
                 <Button
                   size="small"
                   onClick={() => {
                     this.props.toggleStudentListVisibility()
-                    sendAnalytics('Toggle Show students', this.props.showList ? 'hide' : 'show')
+                    sendAnalytics('Toggle Show students', this.props.showList ? 'Hide' : 'Show')
                   }}
                 >
                   {toggleLabel}
