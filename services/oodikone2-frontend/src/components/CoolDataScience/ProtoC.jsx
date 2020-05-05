@@ -96,7 +96,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
           }
         },
         mouseOut: function(e) {
-          if (this.selectedTick) {
+          if (this.selectedTick && this.selectedTick.label) {
             this.selectedTick.label.css({
               color: '#666666',
               fontWeight: 'normal'
@@ -210,7 +210,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
             }
           },
           mouseout: function() {
-            if (this.selectedTick) {
+            if (this.selectedTick && this.selectedTick.label) {
               this.selectedTick.label.css({
                 color: '#666666',
                 fontWeight: 'normal'
@@ -254,7 +254,7 @@ const makeNonClickableChartConfig = programme => {
           }
         },
         mouseOut: function(e) {
-          if (this.selectedTick) {
+          if (this.selectedTick && this.selectedTick.label) {
             this.selectedTick.label.css({
               color: 'grey',
               fontWeight: 'normal'
@@ -353,7 +353,7 @@ const makeNonClickableChartConfig = programme => {
             }
           },
           mouseout: function() {
-            if (this.selectedTick) {
+            if (this.selectedTick && this.selectedTick.label) {
               this.selectedTick.label.css({
                 color: '#666666',
                 fontWeight: 'normal'
