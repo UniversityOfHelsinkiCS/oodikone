@@ -86,8 +86,6 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
           const findLabel = (x, ticks) => {
             return ticks[x]
           }
-          console.log('y', e.target.y)
-          console.log('x', e.target.x)
           const tick = this.series.xAxis ? findLabel(this.x, this.series.xAxis.ticks) : null
           this.selectedTick = tick
           if (tick) {
