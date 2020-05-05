@@ -3,7 +3,7 @@ import { callController } from '../apiConnection/index'
 export const getMandatoryCourses = id => {
   const prefix = 'GET_MANDATORY_COURSES_'
   const toggle = window.localStorage.getItem('mandatory_toggle')
-  const route = toggle ? `/v3/mandatory_courses/${id}` : `/v2/studyprogrammes/${id}/mandatory_courses`
+  const route = toggle ? `/v3/programme_modules/${id}` : `/v2/studyprogrammes/${id}/mandatory_courses`
   return callController(route, prefix)
 }
 

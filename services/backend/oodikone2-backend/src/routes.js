@@ -30,6 +30,7 @@ const tsaAnalytics = require('./routes/tsaAnalytics')
 const matomoInit = require('./routes/matomo-init')
 const customPopulationSearch = require('./routes/customPopulationSearch')
 const coolDataScience = require('./routes/coolDataScience')
+const programmeModules = require('./routes/programmeModules')
 
 module.exports = (app, url) => {
   app.use(url, ping)
@@ -47,6 +48,7 @@ module.exports = (app, url) => {
   app.use(url, providers)
   app.use(url, semesters)
   app.use(url, tags)
+  app.use(url, programmeModules)
   app.use(`${url}/faculties`, faculties)
   app.use(`${url}/facultystats`, auth.roles(['faculties']), facultyStats)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)

@@ -123,6 +123,9 @@ async function resolver(rule, n) {
 }
 
 const recursiveWrite = async (module, parentId) => {
+  if (Array.isArray(module)) {
+    module.forEach(m => recursiveWrite(m, parentId))
+  }
   if (!module.id) return
   await ProgrammeModule.findOrCreate({
     where: { id: module.id },
