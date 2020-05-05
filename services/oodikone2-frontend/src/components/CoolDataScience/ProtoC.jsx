@@ -96,7 +96,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
           }
         },
         mouseOut: function(e) {
-          if (this.selectedTick) {
+          if (this.selectedTick && this.selectedTick.label) {
             this.selectedTick.label.css({
               color: '#666666',
               fontWeight: 'normal'
@@ -165,16 +165,43 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
       categories: sortedData.map(data => data.name),
       labels: {
         events: {
-          click: function() {
+          click: function(e) {
             const clickedLabel = sortedData.find(data => data.name === this.value)
             setImmediate(() => onPointClicked(clickedLabel))
           },
-          mouseover: function() {
+          mouseover: function(e) {
             const findLabel = (x, ticks) => {
               return ticks[x]
             }
             const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
             this.selectedTick = tick
+
+            const customToolTip = series.reduce((acc, curr) => {
+              const percentage = (curr.data[tick.pos].z * 100).toFixed(1)
+              acc = `${acc} <span style="color:${curr.color}">●</span> ${curr.name}: <b>${percentage}%</b> (${curr.data[tick.pos].y})<br/>`
+              return acc
+            }, `${tick.label.textStr}<br/>`)
+            this.chart.myLabel = this.chart.renderer
+              .label(
+                customToolTip,
+                320,
+                (tick.axis.height / Object.keys(this.axis.ticks).length) * tick.pos,
+                'rectangle'
+              )
+              .css({
+                color: 'black'
+              })
+              .attr({
+                fill: 'white',
+                padding: 8,
+                r: 1,
+                opacity: 0.8,
+                'stroke-width': 1,
+                stroke: 'black'
+              })
+              .add()
+              .toFront()
+
             if (tick) {
               tick.label.css({
                 color: 'black',
@@ -183,12 +210,13 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
             }
           },
           mouseout: function() {
-            if (this.selectedTick) {
+            if (this.selectedTick && this.selectedTick.label) {
               this.selectedTick.label.css({
                 color: '#666666',
                 fontWeight: 'normal'
               })
               this.selectedTick = null
+              this.chart.myLabel.destroy()
             }
           }
         },
@@ -218,7 +246,6 @@ const makeNonClickableChartConfig = programme => {
           }
           const tick = this.series.xAxis ? findLabel(this.x, this.series.xAxis.ticks) : null
           this.selectedTick = tick
-
           if (tick) {
             tick.label.css({
               color: 'black',
@@ -227,7 +254,7 @@ const makeNonClickableChartConfig = programme => {
           }
         },
         mouseOut: function(e) {
-          if (this.selectedTick) {
+          if (this.selectedTick && this.selectedTick.label) {
             this.selectedTick.label.css({
               color: 'grey',
               fontWeight: 'normal'
@@ -282,7 +309,61 @@ const makeNonClickableChartConfig = programme => {
       text: `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
     },
     xAxis: {
-      categories: programme.studytracks.map(data => data.name)
+      categories: programme.studytracks.map(data => data.name),
+      labels: {
+        events: {
+          mouseover: function(e) {
+            const findLabel = (x, ticks) => {
+              return ticks[x]
+            }
+            const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
+            this.selectedTick = tick
+
+            const customToolTip = series.reduce((acc, curr) => {
+              const percentage = (curr.data[tick.pos].z * 100).toFixed(1)
+              acc = `${acc} <span style="color:${curr.color}">●</span> ${curr.name}: <b>${percentage}%</b> (${curr.data[tick.pos].y})<br/>`
+              return acc
+            }, `${tick.label.textStr}<br/>`)
+            this.chart.myLabel = this.chart.renderer
+              .label(
+                customToolTip,
+                320,
+                (tick.axis.height / Object.keys(this.axis.ticks).length) * tick.pos,
+                'rectangle'
+              )
+              .css({
+                color: 'black'
+              })
+              .attr({
+                fill: 'white',
+                padding: 8,
+                r: 1,
+                opacity: 0.8,
+                'stroke-width': 1,
+                stroke: 'black'
+              })
+              .add()
+              .toFront()
+
+            if (tick) {
+              tick.label.css({
+                color: 'black',
+                fontWeight: 'bold'
+              })
+            }
+          },
+          mouseout: function() {
+            if (this.selectedTick && this.selectedTick.label) {
+              this.selectedTick.label.css({
+                color: '#666666',
+                fontWeight: 'normal'
+              })
+              this.selectedTick = null
+              this.chart.myLabel.destroy()
+            }
+          }
+        }
+      }
     },
     yAxis: {
       title: {
