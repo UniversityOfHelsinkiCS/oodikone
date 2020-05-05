@@ -49,7 +49,7 @@ const NavigationBar = props => {
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
     Object.keys(allNavigationItems).forEach(key => {
-      if (key === 'courseStatistics') {
+      if (key === 'courseStatistics' || key === 'populations' || key === 'students') {
         if (!userRoles.includes('admin') && rights.length === 0) {
           return
         }
