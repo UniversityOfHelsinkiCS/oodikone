@@ -19,6 +19,8 @@
 
 .filterCell {
   border-right: 0 !important;
+  display: flex;
+  align-items: center;
 }
 
 .clickableCell {

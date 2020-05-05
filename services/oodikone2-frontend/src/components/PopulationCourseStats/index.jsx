@@ -451,17 +451,25 @@ class PopulationCourseStats extends Component {
           <Popup
             trigger={
               <Table.Cell className="filterCell clickableCell">
+                {isActive ? null : (
+                  <Icon
+                    onClick={() => this.onCourseNameCellClick(code)}
+                    name="add"
+                    size="tiny"
+                    style={{ marginRight: '-2px' }}
+                  />
+                )}
                 <Icon onClick={() => this.onCourseNameCellClick(code)} name={isActive ? 'remove' : 'filter'} />
               </Table.Cell>
             }
             content={
               isActive ? (
                 <span>
-                  Poista rajaus kurssin <b>{getTextIn(name, language).toLowerCase()}</b> perusteella
+                  Poista rajaus kurssin <b>{getTextIn(name, language)}</b> perusteella
                 </span>
               ) : (
                 <span>
-                  Rajaa opiskelijat kurssin <b>{getTextIn(name, language).toLowerCase()}</b> perusteella
+                  Rajaa opiskelijat kurssin <b>{getTextIn(name, language)}</b> perusteella
                 </span>
               )
             }
