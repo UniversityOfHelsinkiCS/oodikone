@@ -72,6 +72,7 @@ dbConnections.on('error', () => {
 
 dbConnections.on('connect', async () => {
   console.log('DB connections established')
+
   const updaterChannel = stan.subscribe(SIS_UPDATER_SCHEDULE_CHANNEL, NATS_GROUP, opts)
   updaterChannel.on('message', handleMessage(updateMsgHandler))
   updaterChannel.on('error', e => {

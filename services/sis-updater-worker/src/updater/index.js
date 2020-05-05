@@ -14,11 +14,13 @@ const {
   ElementDetail,
   StudyrightExtent,
   Studyright,
-  StudyrightElement
+  StudyrightElement,
+  ProgrammeModule
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds } = require('../db')
 const { creditTypeIdsToCreditTypes } = require('./shared')
 const { updateStudents } = require('./updateStudents')
+const { updateProgrammeModules } = require('./updateProgrammeModules')
 const {
   updateOrganisations,
   updateStudyModules,
@@ -40,7 +42,8 @@ const idToHandler = {
   study_levels: updateCourseTypes,
   study_years: updateSemesters,
   credit_types: updateCreditTypes,
-  education_types: updateStudyrightExtents
+  education_types: updateStudyrightExtents,
+  programme_modules: updateProgrammeModules
 }
 
 const update = async ({ entityIds, type }) => {
@@ -61,6 +64,8 @@ const update = async ({ entityIds, type }) => {
     case 'education_types':
     case 'study_levels':
       return await updateHandler(await selectFromByIds(type, entityIds))
+    case 'programme_modules':
+      return await updateHandler(entityIds)
   }
 }
 
@@ -79,7 +84,8 @@ const tableToModel = {
   studyright: Studyright,
   studyright_elements: StudyrightElement,
   studyright_extents: StudyrightExtent,
-  teacher: Teacher
+  teacher: Teacher,
+  programme_modules: ProgrammeModule
 }
 
 const purge = async ({ table, before }) => {
