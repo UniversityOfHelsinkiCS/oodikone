@@ -15,7 +15,7 @@ if (LOG_PORT && LOG_HOST) {
       hostname: LOG_HOSTNAME || 'sis-updater-worker',
       host: LOG_HOST,
       port: LOG_PORT,
-      protocol: LOG_PROTOCOL || 'http',
+      protocol: LOG_PROTOCOL || 'https',
       protocolOptions: {
         path: LOG_PATH || '/gelf'
       },
