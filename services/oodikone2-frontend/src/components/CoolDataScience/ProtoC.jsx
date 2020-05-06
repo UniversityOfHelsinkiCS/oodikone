@@ -170,11 +170,6 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
     },
     xAxis: {
       categories: sortedData.map(data => data.name),
-      events: {
-        mousemove: function() {
-          console.log('heheheh')
-        }
-      },
       labels: {
         events: {
           click: function(e) {
@@ -198,7 +193,6 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
 
             // create custom crosshair line because again
             // highcharts doesnt offer this functionality
-            console.log(tick.label.element.attributes)
             const { chart } = this
             const path = [
               'M',
