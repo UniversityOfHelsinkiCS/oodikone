@@ -7,6 +7,7 @@ import { shape, func, string } from 'prop-types'
 import { removePopulationFilter, alterPopulationCourseFilter } from '../../redux/populationFilters'
 import { getTextIn } from '../../common'
 import Track from './tracking'
+import './populationFilters.css'
 
 class CourseParticipation extends Component {
   static propTypes = {
@@ -34,15 +35,7 @@ class CourseParticipation extends Component {
       inverted={active(type)}
       secondary={active(type)}
       onClick={this.selectField(type)}
-      style={{
-        width: 30,
-        height: 60,
-        fontSize: 13,
-        textAlign: 'center',
-        verticalAlign: 'middle',
-        lineHeight: 1,
-        paddingTop: 15
-      }}
+      className="filter-option"
     >
       {text}
     </Segment>
@@ -60,22 +53,12 @@ class CourseParticipation extends Component {
 
     return (
       <div className="filter-segment">
-        <Segment.Group horizontal size="small">
+        <Segment.Group horizontal size="small" className="filter-row">
           <Popup
             trigger={
-              <Segment style={{ width: '30%', height: 40 }}>
-                <em
-                  style={{
-                    float: 'left',
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
-                    textOverflow: 'ellipsis',
-                    width: '80%'
-                  }}
-                >
-                  {getTextIn(course.course.name, language)}
-                </em>
-                <span style={{ float: 'right' }}>
+              <Segment className="filter-title">
+                <span className="filter-title-text">{getTextIn(course.course.name, language)}</span>
+                <span className="filter-title-icon">
                   <Icon name="remove" onClick={this.clearFilter} />
                 </span>
               </Segment>
