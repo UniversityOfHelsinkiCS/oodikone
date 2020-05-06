@@ -191,14 +191,33 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
               return acc
             }, `${tick.label.textStr}<br/>`)
 
-            // renders custom tooltip. 320 and (tick.axis...) defines the position of tooltip
-            // if you have better ideas/ways to handle this please feel free to fix since
-            // this does not work all that well
+            // create custom crosshair line because again
+            // highcharts doesnt offer this functionality
+            const { chart } = this
+            const path = [
+              'M',
+              chart.plotLeft,
+              Number(tick.label.element.attributes.y.value) - 4.5,
+              'L',
+              chart.plotLeft + chart.plotWidth,
+              Number(tick.label.element.attributes.y.value) - 4.5,
+              'M'
+            ]
+
+            this.chart.customLines = this.chart.renderer
+              .path(path)
+              .attr({
+                'stroke-width': 2,
+                stroke: 'grey'
+              })
+              .add()
+
+            // renders custom tooltip.
             this.chart.myLabel = this.chart.renderer
               .label(
                 customToolTip,
-                320,
-                (tick.axis.height / Object.keys(this.axis.ticks).length) * tick.pos,
+                Number(tick.label.element.attributes.x.value) + 100,
+                Number(tick.label.element.attributes.y.value) - 27,
                 'rectangle'
               )
               .css({
@@ -230,6 +249,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
               })
               this.selectedTick = null
               this.chart.myLabel.destroy()
+              this.chart.customLines.destroy()
             }
           }
         },
@@ -335,6 +355,27 @@ const makeNonClickableChartConfig = programme => {
             const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
             this.selectedTick = tick
 
+            // create custom crosshair line because again
+            // highcharts doesnt offer this functionality
+            const { chart } = this
+            const path = [
+              'M',
+              chart.plotLeft,
+              Number(tick.label.element.attributes.y.value) - 4.5,
+              'L',
+              chart.plotLeft + chart.plotWidth,
+              Number(tick.label.element.attributes.y.value) - 4.5,
+              'M'
+            ]
+
+            this.chart.customLines = this.chart.renderer
+              .path(path)
+              .attr({
+                'stroke-width': 2,
+                stroke: 'grey'
+              })
+              .add()
+
             // create custom tooltip since highcharts does not
             // allow tooltip open on label hover
             const customToolTip = series.reduce((acc, curr) => {
@@ -343,14 +384,12 @@ const makeNonClickableChartConfig = programme => {
               return acc
             }, `${tick.label.textStr}<br/>`)
 
-            // renders custom tooltip. 320 and (tick.axis...) defines the position of tooltip
-            // if you have better ideas/ways to handle this please feel free to fix since
-            // this does not work all that well
+            // renders custom tooltip.
             this.chart.myLabel = this.chart.renderer
               .label(
                 customToolTip,
-                320,
-                (tick.axis.height / Object.keys(this.axis.ticks).length) * tick.pos,
+                Number(tick.label.element.attributes.x.value) + 100,
+                Number(tick.label.element.attributes.y.value) - 27,
                 'rectangle'
               )
               .css({
@@ -382,6 +421,7 @@ const makeNonClickableChartConfig = programme => {
               })
               this.selectedTick = null
               this.chart.myLabel.destroy()
+              this.chart.customLines.destroy()
             }
           }
         }
