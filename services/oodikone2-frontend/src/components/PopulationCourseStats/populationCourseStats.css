@@ -21,15 +21,6 @@
   border-right: 0 !important;
 }
 
-.flexIcon {
-  display: flex;
-  align-items: flex-end;
-}
-
-.flexIcon .add {
-  margin-left: -9px;
-}
-
 .clickableCell {
   cursor: pointer;
 }
