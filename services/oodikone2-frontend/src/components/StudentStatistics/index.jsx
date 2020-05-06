@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { func, shape, string } from 'prop-types'
+import { func, shape, string, arrayOf } from 'prop-types'
 import { getTranslate, getActiveLanguage } from 'react-localize-redux'
-import { Segment, Header } from 'semantic-ui-react'
+import { Segment, Header, Message } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 
 import { findStudents, getStudent, selectStudent } from '../../redux/students'
@@ -10,14 +10,27 @@ import StudentSearch from '../StudentSearch'
 import StudentDetails from '../StudentDetails'
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import { useTitle } from '../../common/hooks'
+import { getUserRoles, checkUserAccess } from '../../common'
 
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
 const StudentStatistics = props => {
-  const { translate, match } = props
+  const { translate, match, userRoles, rights } = props
   const { studentNumber } = match.params
 
   useTitle('Student statistics')
+  checkUserAccess(['student', 'admin'], userRoles)
+
+  if (!checkUserAccess(['student', 'admin'], userRoles) && rights.length < 1)
+    return (
+      <div className="segmentContainer">
+        <Message
+          error
+          color="red"
+          header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi"
+        />
+      </div>
+    )
 
   return (
     <div className="segmentContainer">
@@ -39,7 +52,9 @@ StudentStatistics.propTypes = {
     params: shape({
       studentNumber: string
     })
-  })
+  }),
+  userRoles: arrayOf(string).isRequired,
+  rights: arrayOf(string).isRequired
 }
 
 StudentStatistics.defaultProps = {
@@ -48,7 +63,15 @@ StudentStatistics.defaultProps = {
   }
 }
 
-const mapStateToProps = ({ localize, students }) => ({
+const mapStateToProps = ({
+  localize,
+  students,
+  auth: {
+    token: { roles, rights }
+  }
+}) => ({
+  userRoles: getUserRoles(roles),
+  rights,
   translate: getTranslate(localize),
   currentLanguage: getActiveLanguage(localize).value,
   student: students.data.find(student => student.studentNumber === students.selected)

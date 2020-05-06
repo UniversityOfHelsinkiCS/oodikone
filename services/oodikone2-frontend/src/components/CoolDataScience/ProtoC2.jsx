@@ -223,7 +223,6 @@ const makeConfig = (organisations, sorter, type = 'column') => {
               // drill up
               changeSeries(chart, orgCategories, orgSeries)
             }
-            // setImmediate(() => onPointClicked(clickedLabel))
           },
           mouseover() {
             const findLabel = (x, ticks) => {
@@ -232,6 +231,8 @@ const makeConfig = (organisations, sorter, type = 'column') => {
             const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
             this.selectedTick = tick
 
+            // create custom tooltip since highcharts does not
+            // allow tooltip open on label hover
             const customToolTip = orgSeries.reduce((acc, curr) => {
               const percentage = (curr.data[tick.pos].z * 100).toFixed(1)
               // eslint-disable-next-line no-param-reassign
@@ -239,6 +240,9 @@ const makeConfig = (organisations, sorter, type = 'column') => {
               return acc
             }, `${tick.label.textStr}<br/>`)
 
+            // renders custom tooltip. 320 and (tick.axis...) defines the position of tooltip
+            // if you have better ideas/ways to handle this please feel free to fix since
+            // this does not work all that well
             this.chart.myLabel = this.chart.renderer
               .label(
                 customToolTip,

@@ -451,15 +451,10 @@ class PopulationCourseStats extends Component {
           <Popup
             trigger={
               <Table.Cell className="filterCell clickableCell">
-                {isActive ? null : (
-                  <Icon
-                    onClick={() => this.onCourseNameCellClick(code)}
-                    name="add"
-                    size="tiny"
-                    style={{ marginRight: '-2px' }}
-                  />
-                )}
-                <Icon onClick={() => this.onCourseNameCellClick(code)} name={isActive ? 'remove' : 'filter'} />
+                <span className="flexIcon">
+                  <Icon onClick={() => this.onCourseNameCellClick(code)} name={isActive ? 'remove' : 'filter'} />
+                  {isActive ? null : <Icon onClick={() => this.onCourseNameCellClick(code)} name="add" size="tiny" />}
+                </span>
               </Table.Cell>
             }
             content={

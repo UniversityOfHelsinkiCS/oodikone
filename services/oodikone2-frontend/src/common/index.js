@@ -1,7 +1,7 @@
 import moment from 'moment'
 import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
-import { filter, maxBy, sortBy } from 'lodash'
+import { filter, maxBy, sortBy, intersection } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
 import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
 import toskaLogo from '../assets/toska.png'
@@ -45,6 +45,10 @@ export const images = {
 
 export const getUserRoles = roles => (roles ? roles.map(r => r.group_code) : [])
 export const getUserIsAdmin = roles => getUserRoles(roles).includes('admin')
+
+export const checkUserAccess = (requiredRoles, userRoles) => {
+  return intersection(userRoles, requiredRoles).length > 0
+}
 
 export const containsOnlyNumbers = str => str.match('^\\d+$')
 
