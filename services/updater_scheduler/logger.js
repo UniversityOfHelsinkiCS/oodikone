@@ -9,7 +9,7 @@ if (process.env.LOG_PORT && process.env.LOG_HOST) {
       hostname: process.env.LOG_HOSTNAME || 'UPDATER',
       host: process.env.LOG_HOST,
       port: process.env.LOG_PORT,
-      protocol: process.env.LOG_PROTOCOL || 'http',
+      protocol: process.env.LOG_PROTOCOL || 'https',
       environment: process.env.NODE_ENV,
       protocolOptions: {
         path: process.env.LOG_PATH || '/gelf'

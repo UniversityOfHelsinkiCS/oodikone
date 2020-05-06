@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Header, Segment, Tab } from 'semantic-ui-react'
+import { Header, Segment, Tab, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { bool, shape, func, string } from 'prop-types'
+import { bool, shape, func, string, arrayOf } from 'prop-types'
 import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
@@ -11,6 +11,7 @@ import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
 import { clearCourseStats } from '../../redux/coursestats'
+import { getUserRoles, checkUserAccess } from '../../common'
 
 const MENU = {
   SUM: 'Summary',
@@ -20,7 +21,16 @@ const MENU = {
 }
 
 const CourseStatistics = props => {
-  const { singleCourseStats, clearCourseStats, history, statsIsEmpty, loading, initCourseCode } = props
+  const {
+    singleCourseStats,
+    clearCourseStats,
+    history,
+    statsIsEmpty,
+    loading,
+    initCourseCode,
+    userRoles,
+    rights
+  } = props
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [selected, setSelected] = useState(initCourseCode)
@@ -75,6 +85,16 @@ const CourseStatistics = props => {
       setActiveIndex(activeIndex)
     }
   }
+  if (!checkUserAccess(['courseStatistics', 'admin'], userRoles) && rights.length < 1)
+    return (
+      <div className="segmentContainer">
+        <Message
+          error
+          color="red"
+          header="You have no rights to access any data. If you should have access please contact grp-toska@helsinki.fi"
+        />
+      </div>
+    )
 
   const panes = getPanes()
   return (
@@ -105,12 +125,21 @@ CourseStatistics.propTypes = {
   history: shape({}).isRequired,
   clearCourseStats: func.isRequired,
   loading: bool.isRequired,
-  initCourseCode: string.isRequired
+  initCourseCode: string.isRequired,
+  userRoles: arrayOf(string).isRequired,
+  rights: arrayOf(string).isRequired
 }
 
-const mapStateToProps = ({ courseStats }) => {
+const mapStateToProps = ({
+  courseStats,
+  auth: {
+    token: { roles, rights }
+  }
+}) => {
   const courses = Object.keys(courseStats.data)
   return {
+    userRoles: getUserRoles(roles),
+    rights,
     pending: courseStats.pending,
     error: courseStats.error,
     statsIsEmpty: courses.length === 0,
