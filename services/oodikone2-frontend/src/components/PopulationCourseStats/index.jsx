@@ -15,6 +15,7 @@ import PassingSemesters from './PassingSemesters'
 import './populationCourseStats.css'
 import { getTextIn } from '../../common'
 import TSA from '../../common/tsa'
+import FilterToggleIcon from '../FilterToggleIcon'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
@@ -451,10 +452,7 @@ class PopulationCourseStats extends Component {
           <Popup
             trigger={
               <Table.Cell className="filterCell clickableCell">
-                <span className="flexIcon">
-                  <Icon onClick={() => this.onCourseNameCellClick(code)} name={isActive ? 'remove' : 'filter'} />
-                  {isActive ? null : <Icon onClick={() => this.onCourseNameCellClick(code)} name="add" size="tiny" />}
-                </span>
+                <FilterToggleIcon isActive={isActive} onClick={() => this.onCourseNameCellClick(code)} />
               </Table.Cell>
             }
             content={
