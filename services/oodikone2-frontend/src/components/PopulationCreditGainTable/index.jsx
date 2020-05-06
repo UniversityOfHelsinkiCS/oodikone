@@ -128,11 +128,19 @@ const PopulationCreditGainTable = ({
               </span>
             }
             trigger={
-              <Icon
-                onClick={() => handleCreditBracketRowClicked(null, row)}
-                style={{ paddingLeft: '15px', marginRight: '25px', cursor: 'pointer' }}
-                name="filter"
-              />
+              <>
+                <Icon
+                  onClick={() => handleCreditBracketRowClicked(null, row)}
+                  style={{ marginLeft: '10px', cursor: 'pointer' }}
+                  name="filter"
+                />
+                <Icon
+                  onClick={() => handleCreditBracketRowClicked(null, row)}
+                  name="add"
+                  size="tiny"
+                  style={{ marginLeft: '-9px', marginRight: '25px', cursor: 'pointer' }}
+                />
+              </>
             }
             position="top left"
           />
