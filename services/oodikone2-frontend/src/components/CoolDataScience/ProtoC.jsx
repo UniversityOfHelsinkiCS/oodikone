@@ -32,6 +32,11 @@ const defaultConfig = (pointer = true) => {
       enabled: false
     },
     tooltip: {
+      crosshairs: {
+        enabled: true,
+        color: 'grey',
+        width: '2px'
+      },
       shared: true,
       followPointer: true,
       pointFormatter() {
@@ -108,6 +113,8 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
     }
     return serie
   }
+
+  if (sortedData.length < 2) sortedData.push(...sortedData)
 
   const series = [
     {
@@ -272,6 +279,8 @@ const makeNonClickableChartConfig = programme => {
     }
     return serie
   }
+
+  if (programme.studytracks.length < 2) programme.studytracks.push(...programme.studytracks)
 
   const series = [
     {
