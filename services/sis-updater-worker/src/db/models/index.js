@@ -87,13 +87,13 @@ Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
 ProgrammeModule.belongsToMany(ProgrammeModule, {
   as: 'parents',
   through: ProgrammeModuleChild,
-  foreignKey: 'parent_id'
+  foreignKey: 'parentId'
 })
 
 ProgrammeModule.belongsToMany(ProgrammeModule, {
   as: 'children',
   through: ProgrammeModuleChild,
-  foreignKey: 'child_id'
+  foreignKey: 'childId'
 })
 
 module.exports = {
