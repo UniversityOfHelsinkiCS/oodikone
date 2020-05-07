@@ -32,6 +32,11 @@ const defaultConfig = (pointer = true) => {
       enabled: false
     },
     tooltip: {
+      crosshairs: {
+        enabled: true,
+        color: 'grey',
+        width: '2px'
+      },
       shared: true,
       followPointer: true,
       pointFormatter() {
@@ -86,8 +91,6 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
           const findLabel = (x, ticks) => {
             return ticks[x]
           }
-          console.log('y', e.target.y)
-          console.log('x', e.target.x)
           const tick = this.series.xAxis ? findLabel(this.x, this.series.xAxis.ticks) : null
           this.selectedTick = tick
           if (tick) {
@@ -98,7 +101,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
           }
         },
         mouseOut: function(e) {
-          if (this.selectedTick) {
+          if (this.selectedTick && this.selectedTick.label) {
             this.selectedTick.label.css({
               color: '#666666',
               fontWeight: 'normal'
@@ -110,6 +113,8 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
     }
     return serie
   }
+
+  if (sortedData.length < 2) sortedData.push(...sortedData)
 
   const series = [
     {
@@ -178,16 +183,41 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
             const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
             this.selectedTick = tick
 
+            // create custom tooltip since highcharts does not
+            // allow tooltip open on label hover
             const customToolTip = series.reduce((acc, curr) => {
               const percentage = (curr.data[tick.pos].z * 100).toFixed(1)
               acc = `${acc} <span style="color:${curr.color}">●</span> ${curr.name}: <b>${percentage}%</b> (${curr.data[tick.pos].y})<br/>`
               return acc
             }, `${tick.label.textStr}<br/>`)
+
+            // create custom crosshair line because again
+            // highcharts doesnt offer this functionality
+            const { chart } = this
+            const path = [
+              'M',
+              chart.plotLeft,
+              Number(tick.label.element.attributes.y.value) - 4.5,
+              'L',
+              chart.plotLeft + chart.plotWidth,
+              Number(tick.label.element.attributes.y.value) - 4.5,
+              'M'
+            ]
+
+            this.chart.customLines = this.chart.renderer
+              .path(path)
+              .attr({
+                'stroke-width': 2,
+                stroke: 'grey'
+              })
+              .add()
+
+            // renders custom tooltip.
             this.chart.myLabel = this.chart.renderer
               .label(
                 customToolTip,
-                320,
-                (tick.axis.height / Object.keys(this.axis.ticks).length) * tick.pos,
+                Number(tick.label.element.attributes.x.value) + 100,
+                Number(tick.label.element.attributes.y.value) - 27,
                 'rectangle'
               )
               .css({
@@ -212,13 +242,14 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
             }
           },
           mouseout: function() {
-            if (this.selectedTick) {
+            if (this.selectedTick && this.selectedTick.label) {
               this.selectedTick.label.css({
                 color: '#666666',
                 fontWeight: 'normal'
               })
               this.selectedTick = null
               this.chart.myLabel.destroy()
+              this.chart.customLines.destroy()
             }
           }
         },
@@ -256,7 +287,7 @@ const makeNonClickableChartConfig = programme => {
           }
         },
         mouseOut: function(e) {
-          if (this.selectedTick) {
+          if (this.selectedTick && this.selectedTick.label) {
             this.selectedTick.label.css({
               color: 'grey',
               fontWeight: 'normal'
@@ -268,6 +299,8 @@ const makeNonClickableChartConfig = programme => {
     }
     return serie
   }
+
+  if (programme.studytracks.length < 2) programme.studytracks.push(...programme.studytracks)
 
   const series = [
     {
@@ -318,19 +351,45 @@ const makeNonClickableChartConfig = programme => {
             const findLabel = (x, ticks) => {
               return ticks[x]
             }
+
             const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
             this.selectedTick = tick
 
+            // create custom crosshair line because again
+            // highcharts doesnt offer this functionality
+            const { chart } = this
+            const path = [
+              'M',
+              chart.plotLeft,
+              Number(tick.label.element.attributes.y.value) - 4.5,
+              'L',
+              chart.plotLeft + chart.plotWidth,
+              Number(tick.label.element.attributes.y.value) - 4.5,
+              'M'
+            ]
+
+            this.chart.customLines = this.chart.renderer
+              .path(path)
+              .attr({
+                'stroke-width': 2,
+                stroke: 'grey'
+              })
+              .add()
+
+            // create custom tooltip since highcharts does not
+            // allow tooltip open on label hover
             const customToolTip = series.reduce((acc, curr) => {
               const percentage = (curr.data[tick.pos].z * 100).toFixed(1)
               acc = `${acc} <span style="color:${curr.color}">●</span> ${curr.name}: <b>${percentage}%</b> (${curr.data[tick.pos].y})<br/>`
               return acc
             }, `${tick.label.textStr}<br/>`)
+
+            // renders custom tooltip.
             this.chart.myLabel = this.chart.renderer
               .label(
                 customToolTip,
-                320,
-                (tick.axis.height / Object.keys(this.axis.ticks).length) * tick.pos,
+                Number(tick.label.element.attributes.x.value) + 100,
+                Number(tick.label.element.attributes.y.value) - 27,
                 'rectangle'
               )
               .css({
@@ -355,13 +414,14 @@ const makeNonClickableChartConfig = programme => {
             }
           },
           mouseout: function() {
-            if (this.selectedTick) {
+            if (this.selectedTick && this.selectedTick.label) {
               this.selectedTick.label.css({
                 color: '#666666',
                 fontWeight: 'normal'
               })
               this.selectedTick = null
               this.chart.myLabel.destroy()
+              this.chart.customLines.destroy()
             }
           }
         }

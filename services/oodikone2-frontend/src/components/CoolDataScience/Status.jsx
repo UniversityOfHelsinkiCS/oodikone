@@ -136,7 +136,7 @@ const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|
 
 const Status = () => {
   const DATE_FORMAT = 'DD.MM.YYYY'
-  const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', false)
+  const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
   const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)

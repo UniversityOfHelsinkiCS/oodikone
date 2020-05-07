@@ -4,9 +4,12 @@ import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-react'
 import ReactMarkdown from 'react-markdown'
+import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
+
+HighchartsCustomEvents(Highcharts)
 
 const defaultConfig = () => {
   return {
@@ -83,6 +86,36 @@ const changeSeries = (chart, categories, series) => {
 }
 
 const makeConfig = (organisations, sorter, type = 'column') => {
+  const addMouseOverHandler = serie => {
+    serie.point = {
+      events: {
+        mouseOver() {
+          const findLabel = (x, ticks) => {
+            return ticks[x]
+          }
+          const tick = this.series.xAxis ? findLabel(this.x, this.series.xAxis.ticks) : null
+          this.selectedTick = tick
+          if (tick) {
+            tick.label.css({
+              color: 'black',
+              fontWeight: 'bold'
+            })
+          }
+        },
+        mouseOut() {
+          if (this.selectedTick && this.selectedTick.label) {
+            this.selectedTick.label.css({
+              color: 'grey',
+              fontWeight: 'normal'
+            })
+            this.selectedTick = null
+          }
+        }
+      }
+    }
+    return serie
+  }
+
   const orgSeries = [
     {
       color: '#7f8c8d',
@@ -127,7 +160,7 @@ const makeConfig = (organisations, sorter, type = 'column') => {
         z: org.students3y / org.totalStudents
       }))
     }
-  ]
+  ].map(addMouseOverHandler)
 
   const orgCategories = organisations.map(org => org.name)
 
@@ -136,23 +169,20 @@ const makeConfig = (organisations, sorter, type = 'column') => {
       type
     },
     xAxis: {
-      categories: orgCategories
-    },
-    series: orgSeries,
-    plotOptions: {
-      series: {
-        cursor: 'pointer',
-        point: {
-          events: {
-            click(e) {
-              const { point } = e
-              const { chart } = this.series
-
-              if (point.custom && point.custom.orgCode) {
-                // clicked on top-level, drill down
-                const org = organisations.find(org => org.code === point.custom.orgCode)
-                const programmes = [...org.programmes].sort(sorter)
-                changeSeries(chart, programmes.map(p => p.name), [
+      categories: orgCategories,
+      labels: {
+        events: {
+          click() {
+            const { chart } = this
+            chart.myLabel.destroy()
+            const clickedLabel = organisations.find(data => data.name === this.value)
+            if (clickedLabel) {
+              // clicked on top-level, drill down
+              const programmes = [...clickedLabel.programmes].sort(sorter)
+              changeSeries(
+                chart,
+                programmes.map(p => p.name),
+                [
                   {
                     color: '#7f8c8d',
                     name: 'tällä hetkellä peruutettu',
@@ -187,7 +217,130 @@ const makeConfig = (organisations, sorter, type = 'column') => {
                       z: p.students3y / p.totalStudents
                     }))
                   }
-                ])
+                ].map(addMouseOverHandler)
+              )
+            } else {
+              // drill up
+              changeSeries(chart, orgCategories, orgSeries)
+            }
+          },
+          mouseover() {
+            const findLabel = (x, ticks) => {
+              return ticks[x]
+            }
+            const tick = this.axis ? findLabel(this.pos, this.axis.ticks) : null
+            this.selectedTick = tick
+
+            // create custom tooltip since highcharts does not
+            // allow tooltip open on label hover
+            const customToolTip = orgSeries.reduce((acc, curr) => {
+              const percentage = (curr.data[tick.pos].z * 100).toFixed(1)
+              // eslint-disable-next-line no-param-reassign
+              acc = `${acc} <span style="color:${curr.color}">●</span> ${curr.name}: <b>${curr.data[tick.pos].y}</b> (${percentage}%)<br/>`
+              return acc
+            }, `${tick.label.textStr}<br/>`)
+
+            // renders custom tooltip. 320 and (tick.axis...) defines the position of tooltip
+            // if you have better ideas/ways to handle this please feel free to fix since
+            // this does not work all that well
+            this.chart.myLabel = this.chart.renderer
+              .label(
+                customToolTip,
+                320,
+                (tick.axis.height / Object.keys(this.axis.ticks).length) * tick.pos,
+                'rectangle'
+              )
+              .css({
+                color: 'black'
+              })
+              .attr({
+                fill: 'white',
+                padding: 8,
+                r: 1,
+                opacity: 0.8,
+                'stroke-width': 1,
+                stroke: 'black'
+              })
+              .add()
+              .toFront()
+
+            if (tick) {
+              tick.label.css({
+                color: 'black',
+                fontWeight: 'bold'
+              })
+            }
+          },
+          mouseout() {
+            if (this.selectedTick && this.selectedTick.label) {
+              this.selectedTick.label.css({
+                color: '#666666',
+                fontWeight: 'normal'
+              })
+              this.selectedTick = null
+              this.chart.myLabel.destroy()
+            }
+          }
+        },
+        style: {
+          cursor: 'pointer'
+        }
+      }
+    },
+    series: orgSeries,
+    plotOptions: {
+      series: {
+        cursor: 'pointer',
+        point: {
+          events: {
+            click(e) {
+              const { point } = e
+              const { chart } = this.series
+
+              if (point.custom && point.custom.orgCode) {
+                // clicked on top-level, drill down
+                const org = organisations.find(org => org.code === point.custom.orgCode)
+                const programmes = [...org.programmes].sort(sorter)
+                changeSeries(
+                  chart,
+                  programmes.map(p => p.name),
+                  [
+                    {
+                      color: '#7f8c8d',
+                      name: 'tällä hetkellä peruutettu',
+                      data: programmes.map(p => ({
+                        y: p.currentlyCancelled,
+                        // pass % of total as z so we can display it in the tooltip
+                        z: p.currentlyCancelled / p.totalStudents
+                      }))
+                    },
+                    {
+                      color: '#ff7979',
+                      name: 'ei tahdissa',
+                      data: programmes.map(p => ({
+                        y: p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled,
+                        // pass % of total as z so we can display it in the tooltip
+                        z: (p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled) / p.totalStudents
+                      }))
+                    },
+                    {
+                      color: '#f9ca24',
+                      name: '4v tahdissa',
+                      data: programmes.map(p => ({
+                        y: p.students4y,
+                        z: p.students4y / p.totalStudents
+                      }))
+                    },
+                    {
+                      color: '#6ab04c',
+                      name: '3v tahdissa',
+                      data: programmes.map(p => ({
+                        y: p.students3y,
+                        z: p.students3y / p.totalStudents
+                      }))
+                    }
+                  ].map(addMouseOverHandler)
+                )
               } else {
                 // drill up
                 changeSeries(chart, orgCategories, orgSeries)

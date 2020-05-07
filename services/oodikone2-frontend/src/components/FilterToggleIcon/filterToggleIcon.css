@@ -1,0 +1,12 @@
+.flexIcon {
+  display: flex;
+  align-items: flex-end;
+}
+
+.flexIcon .tiny {
+  margin-left: -9px;
+}
+
+.flexIcon.active .tiny {
+  color: #ff002e;
+}

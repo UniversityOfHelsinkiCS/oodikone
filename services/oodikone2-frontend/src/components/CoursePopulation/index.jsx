@@ -158,6 +158,7 @@ const CoursePopulation = ({
           samples={studentData.students}
           selectedStudents={selectedStudents}
           coursePopulation
+          accordionView={false}
         />
       </Segment>
     </div>
