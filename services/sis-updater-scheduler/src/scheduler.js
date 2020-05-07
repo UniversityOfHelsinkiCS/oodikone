@@ -276,26 +276,13 @@ const schedulePurge = async () => {
 const scheduleProgrammes = async () => {
   const { knex } = knexConnection
 
-  const programmes = [
-    'KH50_001'
-    // 'KH50_002',
-    // 'KH50_003',
-    // 'KH50_004',
-    // 'KH50_005',
-  ]
+  const modules = await knex('modules').where({ type: 'DegreeProgramme' })
 
-  const modules = await Promise.all(
-    programmes.map(p =>
-      knex('modules')
-        .where({ code: p })
-        .first()
-    )
-  )
   const entityIds = modules.map(m => m.id)
 
-  console.log('scheduling programmes', entityIds)
-
   createJobs(entityIds, 'programme_modules')
+    .then(() => console.log('scheduling programmes', entityIds))
+    .catch(e => console.log('YOU IDIOT ', e))
 }
 
 module.exports = {

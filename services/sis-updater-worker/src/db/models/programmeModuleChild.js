@@ -5,14 +5,18 @@ class ProgrammeModuleChild extends Model {}
 
 ProgrammeModuleChild.init(
   {
-    parent_id: {
+    composite: {
+      type: STRING,
+      primaryKey: true
+    },
+    parentId: {
       type: STRING,
       references: {
         model: 'programme_modules',
         key: 'id'
       }
     },
-    child_id: {
+    childId: {
       type: STRING,
       references: {
         model: 'programme_modules',
