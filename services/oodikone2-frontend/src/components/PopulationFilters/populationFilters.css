@@ -1,0 +1,35 @@
+.filter-row {
+  align-items: stretch;
+}
+
+.filter-title {
+  float: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-style: italic;
+  width: 30% !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filter-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filter-title-icon {
+  padding-left: 10px;
+  cursor: pointer;
+}
+
+.filter-option {
+  font-size: 13px !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px !important;
+  cursor: pointer;
+  text-align: center;
+}
