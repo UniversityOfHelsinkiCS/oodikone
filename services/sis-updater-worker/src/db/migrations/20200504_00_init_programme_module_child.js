@@ -3,6 +3,10 @@ const { STRING, DATE } = require('sequelize')
 module.exports = {
   up: async queryInterface => {
     await queryInterface.createTable('programme_module_children', {
+      composite: {
+        type: STRING,
+        primaryKey: true
+      },
       parent_id: {
         type: STRING,
         references: {
