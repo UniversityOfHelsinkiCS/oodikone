@@ -1,4 +1,4 @@
-const { selectFromByIds } = require('../db')
+const { selectFromByIds, bulkCreate } = require('../db')
 const { ProgrammeModule, ProgrammeModuleChild } = require('../db/models')
 
 const { dbConnections } = require('../db/connection')
@@ -9,7 +9,7 @@ function customFlatten(arr) {
   let result = []
 
   for (let elem of arr) {
-    if (!Array.isArray(elem) || (!elem[0].module && elem[0].code)) {
+    if (!Array.isArray(elem) || elem.length === 0 || (!elem[0].module && elem[0].code)) {
       if (!superFlatten && elem.module && elem.children.length === 1) {
         result.push(elem.children[0])
         continue
@@ -54,6 +54,10 @@ async function moduleResolver(rule, n) {
     .orderBy('curriculum_period_ids', 'desc')
     .first()
 
+  if (!mod) {
+    return { error: 'Could not find module' }
+  }
+
   if (mod.type == 'StudyModule') {
     const result = await resolver(mod.rule, n)
     if (mod.code.slice(0, 3) === 'KK-') return null
@@ -85,6 +89,10 @@ async function courseResolver(rule) {
   const course = await knex('course_units')
     .where({ group_id: id })
     .first()
+
+  if (!course) {
+    return { error: 'could not find course' }
+  }
 
   return {
     id: course.group_id,
@@ -122,47 +130,61 @@ async function resolver(rule, n) {
   }
 }
 
+let programmes = {}
+let joins = {}
+
 const recursiveWrite = async (module, parentId) => {
   if (Array.isArray(module)) {
     module.forEach(m => recursiveWrite(m, parentId))
   }
-  if (!module.id) return
-  await ProgrammeModule.findOrCreate({
-    where: { id: module.id },
-    defaults: {
-      id: module.id,
-      code: module.code,
-      name: module.name,
-      type: module.type
-    }
-  })
+  if (!module.id || !module.type) return
+  const newModule = {
+    id: module.id,
+    code: module.code,
+    name: module.name,
+    type: module.type
+  }
 
-  await new ProgrammeModuleChild({
-    parent_id: parentId,
-    child_id: module.id
-  }).save()
+  let join = {
+    composite: `${parentId}-${module.id}`,
+    parentId: parentId,
+    childId: module.id
+  }
+
+  programmes[module.id] = newModule
+  joins[join.composite] = join
 
   if (!module.children) return
   for (const child of module.children) {
-    recursiveWrite(child, module.id)
+    await recursiveWrite(child, module.id)
   }
 }
 
 const updateProgrammeModules = async (entityIds = []) => {
-  await ProgrammeModule.destroy({ where: {}, truncate: true, cascade: true })
+  programmes = {}
+  joins = {}
+
   const topModules = await selectFromByIds('modules', entityIds)
 
-  topModules.forEach(async module => {
-    console.log('STARTING TO WRITE', module)
-    await new ProgrammeModule({
+  for (const module of topModules) {
+    const topModule = {
       id: module.group_id,
       code: module.code,
       name: module.name,
       type: 'module'
-    }).save()
+    }
+    programmes[module.group_id] = topModule
     const submodule = await resolver(module.rule)
-    submodule.forEach(submod => recursiveWrite(submod, module.group_id))
-  })
+    for (const submod of submodule) {
+      await recursiveWrite(submod, module.group_id)
+    }
+  }
+
+  await bulkCreate(ProgrammeModule, Object.values(programmes))
+  // await bulkCreate(ProgrammeModuleChild, Object.values(joins), null, ['composite'])
+  for (const join of Object.values(joins)) {
+    await ProgrammeModuleChild.upsert(join)
+  }
 }
 
 module.exports = { updateProgrammeModules }
