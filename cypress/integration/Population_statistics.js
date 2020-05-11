@@ -90,7 +90,6 @@ describe('Population Statistics tests', () => {
     })
     cy.contains("TKT20005")
     cy.go("back")
-    cy.contains("Courses of population").click({ force: true })
     cy.contains("Courses of population").click().parent().within(() => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "15")
     })
