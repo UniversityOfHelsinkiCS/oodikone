@@ -216,7 +216,7 @@ const Status = () => {
             <VerticalLine />
             <Checkbox
               style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä vuositasolla"
+              label="Näytä kalenterivuosittain"
               onChange={handleShowByYearToggled}
               checked={showByYear}
             />
