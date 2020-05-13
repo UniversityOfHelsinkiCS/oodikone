@@ -13,7 +13,13 @@ const updateSISMetadata = async () => {
   return response.data
 }
 
+const updateSISProgrammes = async () => {
+  const response = await client.get('/v1/programmes', { params: { token: SECRET_TOKEN } })
+  return response.data
+}
+
 module.exports = {
   updateSISMetadata,
-  updateSISStudents
+  updateSISStudents,
+  updateSISProgrammes
 }
