@@ -221,6 +221,18 @@ const scheduleHourly = async () => {
   }
 }
 
+const scheduleProgrammes = async () => {
+  const { knex } = knexConnection
+
+  const modules = await knex('modules').where({ type: 'DegreeProgramme' })
+
+  const entityIds = modules.map(m => m.id)
+
+  createJobs(entityIds, 'programme_modules')
+    .then(() => console.log('scheduling programmes', entityIds))
+    .catch(e => console.log('Failed upadting modules', e))
+}
+
 const scheduleWeekly = async () => {
   try {
     await scheduleMeta()
@@ -271,18 +283,6 @@ const schedulePurge = async () => {
   } catch (e) {
     logger.error({ message: 'Purge scheduling failed', meta: e.stack })
   }
-}
-
-const scheduleProgrammes = async () => {
-  const { knex } = knexConnection
-
-  const modules = await knex('modules').where({ type: 'DegreeProgramme' })
-
-  const entityIds = modules.map(m => m.id)
-
-  createJobs(entityIds, 'programme_modules')
-    .then(() => console.log('scheduling programmes', entityIds))
-    .catch(e => console.log('YOU IDIOT ', e))
 }
 
 module.exports = {

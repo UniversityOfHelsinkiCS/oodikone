@@ -25,6 +25,7 @@ const Updater = () => {
   const refreshStatistics = () => callApi('/updater/refresh_statistics', 'post')
   const updateSISMeta = () => callApi('/updater/update/v2/meta', 'get')
   const updateSISStudents = () => callApi('/updater/update/v2/students', 'get')
+  const updateSISProgrammes = () => callApi('/updater/update/v2/programmes')
   const refreshStatisticsV2 = () => callApi('/updater/refresh_statistic_v2', 'post')
 
   const statusRef = useRef()
@@ -79,6 +80,7 @@ const Updater = () => {
         <Header>SIS STUFF WATCHOUT</Header>
         <Button content="Update SIS Meta" onClick={() => updateSISMeta()} />
         <Button content="Update SIS Students" onClick={() => updateSISStudents()} />
+        <Button content="Update SIS Programmes" onClick={() => updateSISProgrammes()} />
         <Button content="Refresh statistics V2" icon="refresh" onClick={() => refreshStatisticsV2()} />
       </Segment>
       <Header>Status:</Header>
