@@ -32,7 +32,7 @@ For local development with anonymized data use `2) Anon setup` (you can run e2e 
 
 To get also the full real dataset use `3) Full setup`
 
-> `1) e2e setup` is designed for use in travis. But you can still try it locally if you want to.
+> `1) e2e setup` is designed for use in CircleCI. But you can still try it locally if you want to.
 
 Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visual browser.
 
