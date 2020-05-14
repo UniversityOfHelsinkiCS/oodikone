@@ -167,7 +167,7 @@ class PopulationDetails extends Component {
               ) : (
                 <Popup
                   trigger={
-                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
                       {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
                     </span>
                   }
@@ -198,7 +198,11 @@ class PopulationDetails extends Component {
                 <>Credit statistics</>
               ) : (
                 <Popup
-                  trigger={<span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>Credit statistics</span>}
+                  trigger={
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                      Credit statistics
+                    </span>
+                  }
                   position="top center"
                   offset="0, 50px"
                   wide="very"
@@ -230,7 +234,11 @@ class PopulationDetails extends Component {
                 <>Courses of population</>
               ) : (
                 <Popup
-                  trigger={<span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>Courses of population</span>}
+                  trigger={
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                      Courses of population
+                    </span>
+                  }
                   position="top center"
                   offset="0, 50px"
                   wide="very"
@@ -268,7 +276,7 @@ class PopulationDetails extends Component {
               ) : (
                 <Popup
                   trigger={
-                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
                       Students ({selectedStudents.length})
                     </span>
                   }
