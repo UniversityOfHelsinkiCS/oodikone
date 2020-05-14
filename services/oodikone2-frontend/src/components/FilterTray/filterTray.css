@@ -1,0 +1,50 @@
+/** #filter-tray is used repeatedly as a selector to achieve higher specificity
+    without using !important everywhere. */
+#filter-tray {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9002;
+}
+
+#filter-tray-toggle {
+  transform: rotate(-90deg);
+  z-index: 9001;
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform-origin: top left;
+}
+
+#filter-tray .filter-tray-content {
+  display: contents;
+}
+
+#filter-tray .sidebar {
+  width: auto;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+#filter-tray .cards {
+  background-color: #1b1c1d;
+  height: 100vh;
+  align-content: flex-start;
+  justify-content: center;
+  padding-top: 1.5rem;
+}
+
+#filter-tray .card {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: none;
+  box-shadow: none;
+}
+
+#filter-tray .header {
+  color: white;
+}

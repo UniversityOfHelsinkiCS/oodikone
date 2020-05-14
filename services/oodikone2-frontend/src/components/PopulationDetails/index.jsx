@@ -151,7 +151,7 @@ class PopulationDetails extends Component {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
 
-    const { query, selectedStudents, selectedStudentsByYear } = this.props
+    const { query, selectedStudents, allStudents } = this.props
     const { Students, CreditStatistics, CoursesOf, CreditAccumulationGraph } = infoTooltips.PopulationStatistics
 
     const panels = [
@@ -250,8 +250,9 @@ class PopulationDetails extends Component {
             <div ref={this.courseTableRef}>
               <PopulationCourses
                 accordionView
+                allStudents={allStudents}
                 selectedStudents={selectedStudents}
-                selectedStudentsByYear={selectedStudentsByYear}
+                samples={samples}
                 query={query}
               />
             </div>
@@ -289,7 +290,7 @@ class PopulationDetails extends Component {
         content: {
           content: (
             <div ref={this.studentTableRef}>
-              <PopulationStudents accordionView />
+              <PopulationStudents accordionView selectedStudents={selectedStudents} allStudents={allStudents} />
             </div>
           )
         }

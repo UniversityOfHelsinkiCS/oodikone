@@ -30,36 +30,22 @@ const PopulationStatistics = memo(props => {
     loading,
     location,
     history,
-    isAdmin,
-    isLoading
+    isLoading,
+    students
   } = props
-  // eslint-disable-next-line no-unused-vars
-  const [accordionView, setAccordion] = useState(true)
-  const [excluded, setExcluded] = useState([])
-  const [useNewFilters, setUseNewFilters] = useState(false)
-
+  const [filteredStudents, setFilteredStudents] = useState(students)
   const { onProgress, progress } = useProgress(loading)
+
   useTitle('Population statistics')
-  useEffect(() => {
-    if (props.queryIsSet) {
-      const { query, tagstudent, selectedStudents, samples, studytracks } = props
-      const studyrights = samples.flatMap(student =>
-        flattenStudyrights(student.studyrights, query.studyRights.programme)
-      )
-      const studytracksInPopulation = intersection(Object.keys(studytracks), studyrights)
+  console.log(students);
 
-      const excludedFilters = []
-
-      if (!query.studentStatuses.includes('CANCELLED')) excludedFilters.push('CanceledStudyright')
-
-      const taggedStudentNumbers = tagstudent.map(tag => tag.studentnumber)
-
-      if (intersection(taggedStudentNumbers, selectedStudents) < 1) excludedFilters.push('TagFilter')
-
-      if (studytracksInPopulation.length < 1) excludedFilters.push('StudytrackFilter')
-      setExcluded(excludedFilters)
+  const getStudentNumbers = students => {
+    if (!students) {
+      return []
     }
-  }, [props.selectedStudents])
+
+    return students.map(s => s.studentNumber)
+  }
 
   const renderPopulationSearch = () => {
     const { Main } = infoTooltips.PopulationStatistics
@@ -67,6 +53,7 @@ const PopulationStatistics = memo(props => {
       populationFound && history.location.search
         ? translate('populationStatistics.foundTitle')
         : translate('populationStatistics.searchTitle')
+
     return (
       <Segment>
         <Header size="medium">
@@ -75,35 +62,25 @@ const PopulationStatistics = memo(props => {
         </Header>
         <PopulationSearchForm onProgress={onProgress} />
         <Divider />
-        {location.search !== '' ? (
-          <>
-            {/* TODO: filter-rework */}
-            {isAdmin ? <Radio id="accordion-toggle" toggle onChange={() => setUseNewFilters(prev => !prev)} /> : null}
-            <PopulationSearchHistory history={history} />
-            {!props.isLoading && props.queryIsSet && (
-              <>
-                <Divider />
-                <PopulationFilters samples={props.samples} exclude={excluded} accordionView={accordionView} />
-              </>
-            )}
-          </>
-        ) : null}
+        {location.search !== '' ? <PopulationSearchHistory history={history} /> : null}
         <ProgressBar fixed progress={progress} />
       </Segment>
     )
   }
+
   return (
     <div className="segmentContainer">
-      {useNewFilters ? <FilterTray /> : null}
+      <FilterTray setFilteredStudents={setFilteredStudents} allStudents={students} />
       <Header className="segmentTitle" size="large">
         {translate('populationStatistics.header')}
       </Header>
       <Segment className="contentSegment">
         {renderPopulationSearch()}
-        {location.search !== '' ? (
+        {students ? (
           <PopulationDetails
             translate={translate}
-            selectedStudents={selectedStudents}
+            selectedStudents={getStudentNumbers(filteredStudents)}
+            allStudents={students}
             queryIsSet={queryIsSet}
             selectedStudentsByYear={selectedStudentsByYear}
             query={query}
@@ -122,7 +99,6 @@ PopulationStatistics.propTypes = {
   loading: bool.isRequired,
   location: shape({}).isRequired,
   history: shape({}).isRequired,
-  isAdmin: bool.isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   samples: arrayOf(shape({})).isRequired,
   selectedStudents: arrayOf(string).isRequired,
@@ -141,7 +117,7 @@ PopulationStatistics.propTypes = {
 
 const mapStateToProps = state => {
   // haha copied from other place :mintu:
-  const { samples, selectedStudents, complemented, selectedStudentsByYear } = selectors.makePopulationsToData(state)
+  const { samples, selectedStudents, selectedStudentsByYear } = selectors.makePopulationsToData(state)
   // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
   if (samples.length > 0) {
     const creditsAndDates = samples.map(s => {
@@ -161,28 +137,23 @@ const mapStateToProps = state => {
     samples.minDate = Math.min(...dates)
     samples.minDateWithCredits = Math.min(...datesWithCredits)
   }
-  const {
-    localize,
-    populations,
-    auth: {
-      token: { roles }
-    }
-  } = state
+
+  const { localize, populations } = state
+
   return {
     translate: getTranslate(localize),
     currentLanguage: getActiveLanguage(localize).value,
     loading: populations.pending,
     populationFound: populations.data.students !== undefined,
     query: populations.query ? populations.query : {},
-    isAdmin: getUserIsAdmin(roles),
     selectedStudents,
-    complemented,
     queryIsSet: !!populations.query,
     selectedStudentsByYear,
     tagstudent: state.tagstudent.data || {},
     samples,
     studytracks: state.populationDegreesAndProgrammes.data.studyTracks || {},
-    isLoading: populations.pending === true
+    isLoading: populations.pending === true,
+    students: populations.data.students
   }
 }
 
