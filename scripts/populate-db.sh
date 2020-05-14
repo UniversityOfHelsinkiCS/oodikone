@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+
 DIR_PATH=$(dirname $(dirname "$0"))
 SERVICES=(db_sis db)
 BACKUPS=$DIR_PATH/backups
@@ -44,13 +46,14 @@ export -f retry
 export -f drop_create_populate
 mkdir -p backups
 
-echo "Fetching latest staging backup data"
+echo "Fetching latest staging SIS data & OODI demo data"
 scp -r -o ProxyCommand="ssh -W %h:%p melkinpaasi.cs.helsinki.fi" oodikone-staging:/home/tkt_oodi/backups/\{sis-updater-staging.sqz,demo-anon-staging.sqz\} $BACKUPS
 
 echo "Setting up services: ${SERVICES[@]}"
 npm run docker:down --prefix $DIR_PATH
 npm run docker:up --prefix $DIR_PATH -- ${SERVICES[@]}
 
+echo "Populating DB_SIS and DB_ANON"
 echo $DB_SIS_ARGS $DB_ANON_ARGS | xargs -n 3 -P 2 sh -c 'drop_create_populate $1 $2 $3' sh
 
 echo "Cleaning up"
