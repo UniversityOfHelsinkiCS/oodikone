@@ -5,11 +5,16 @@ import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
+
+import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
 import './status.css'
+
+const ANALYTICS_CATEGORY = 'Trends'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const getP = (a, b) => {
   if (a === 0 || b === 0) return 1
@@ -164,21 +169,27 @@ const Status = () => {
   }, [selectedDate, showByYear])
 
   const handleShowYearlyValuesToggled = () => {
+    const yearlyValues = showYearlyValues
     setShowYearlyValues(!showYearlyValues)
+    sendAnalytics(`Show yearly values toggle ${!yearlyValues ? 'on' : 'off'}`, 'Status')
   }
 
   const handleShowByYearToggled = () => {
+    const byYear = showByYear
     setShowByYear(!showByYear)
+    sendAnalytics(`Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
   }
 
   const pushToDrillStack = values => {
     const updatedDrillStack = [...drillStack].concat(values)
     setDrillStack(updatedDrillStack)
+    sendAnalytics('Drilldown clicked', 'Status')
   }
 
   const popFromDrillStack = () => {
     const updatedDrillStack = _.dropRight([...drillStack], 1)
     setDrillStack(updatedDrillStack)
+    sendAnalytics('Drillup clicked', 'Status')
   }
 
   const renderSettings = () => {
