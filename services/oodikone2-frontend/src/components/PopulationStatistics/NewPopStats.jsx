@@ -7,8 +7,7 @@ import { intersection, flattenDeep } from 'lodash'
 
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
-import PopulationDetails from '../PopulationDetails'
-import PopulationFilters from '../PopulationFilters'
+import PopulationDetails from '../PopulationDetails/NewPopDetails'
 import InfoBox from '../InfoBox'
 import ProgressBar from '../ProgressBar'
 

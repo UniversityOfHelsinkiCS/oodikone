@@ -189,6 +189,7 @@ class PopulationSearchHistory extends Component {
               current.isBefore(moment()) &&
               current.isAfter(this.getMinSelection(query.year, query.semesters[1] || query.semesters[0]))
             }
+            className="adv-stats-until"
           />
         </Form.Field>
 
