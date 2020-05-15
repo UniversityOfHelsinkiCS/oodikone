@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { Card, Form, Dropdown } from 'semantic-ui-react'
 
-export default ({ filterControl }) => {
-  const { addFilter, removeFilter, withoutFilter, filteredStudents } = filterControl
-
-  if (!filteredStudents) {
-    return null
-  }
-
+const Gender = ({ filterControl }) => {
+  const { addFilter, removeFilter, withoutFilter } = filterControl
   const [value, setValue] = useState(null)
   const name = 'gender'
 
@@ -52,3 +48,13 @@ export default ({ filterControl }) => {
     </Card>
   )
 }
+
+Gender.propTypes = {
+  filterControl: PropTypes.shape({
+    addFilter: PropTypes.func.isRequired,
+    removeFilter: PropTypes.func.isRequired,
+    withoutFilter: PropTypes.func.isRequired
+  }).isRequired
+}
+
+export default Gender

@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { Card, Form, Dropdown } from 'semantic-ui-react'
 
-export default ({ filterControl }) => {
-  const { addFilter, removeFilter, withoutFilter, filteredStudents } = filterControl
-
-  if (!filteredStudents) {
-    return null
-  }
+const StartYearAtUni = ({ filterControl }) => {
+  const { addFilter, removeFilter, withoutFilter } = filterControl
 
   const [value, setValue] = useState([])
   const name = 'startYearAtUni'
@@ -53,3 +50,13 @@ export default ({ filterControl }) => {
     </Card>
   )
 }
+
+StartYearAtUni.propTypes = {
+  filterControl: PropTypes.shape({
+    addFilter: PropTypes.func.isRequired,
+    removeFilter: PropTypes.func.isRequired,
+    withoutFilter: PropTypes.func.isRequired
+  }).isRequired
+}
+
+export default StartYearAtUni

@@ -58,7 +58,7 @@ const NavigationBar = props => {
           return
         }
       }
-      {/* TODO: filter rework */}
+      /* TODO: filter rework */
       if (key === 'populationsng' && !userRoles.includes('admin')) {
         return
       }

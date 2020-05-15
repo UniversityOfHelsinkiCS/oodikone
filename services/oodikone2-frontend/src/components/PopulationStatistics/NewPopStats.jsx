@@ -1,9 +1,9 @@
-import React, { memo, useState, useEffect } from 'react'
+import React, { memo, useState } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
-import { func, bool, shape, arrayOf, string } from 'prop-types'
-import { Header, Segment, Divider, Radio } from 'semantic-ui-react'
-import { intersection, flattenDeep } from 'lodash'
+import { func, bool, shape, arrayOf, any } from 'prop-types'
+import { Header, Segment, Divider } from 'semantic-ui-react'
+import { flattenDeep } from 'lodash'
 
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
@@ -12,7 +12,7 @@ import InfoBox from '../InfoBox'
 import ProgressBar from '../ProgressBar'
 
 import infoTooltips from '../../common/InfoToolTips'
-import { getUserIsAdmin, flattenStudyrights, getTotalCreditsFromCourses } from '../../common'
+import { getTotalCreditsFromCourses } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
@@ -20,7 +20,6 @@ import FilterTray from '../FilterTray'
 const PopulationStatistics = memo(props => {
   const {
     translate,
-    selectedStudents,
     queryIsSet,
     selectedStudentsByYear,
     query,
@@ -36,7 +35,6 @@ const PopulationStatistics = memo(props => {
   const { onProgress, progress } = useProgress(loading)
 
   useTitle('Population statistics')
-  console.log(students)
 
   const getStudentNumbers = students => {
     if (!students) {
@@ -102,9 +100,9 @@ PopulationStatistics.propTypes = {
   loading: bool.isRequired,
   location: shape({}).isRequired,
   history: shape({}).isRequired,
+  students: arrayOf(any).isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   samples: arrayOf(shape({})).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
   queryIsSet: bool.isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   isLoading: bool.isRequired,
@@ -120,7 +118,7 @@ PopulationStatistics.propTypes = {
 
 const mapStateToProps = state => {
   // haha copied from other place :mintu:
-  const { samples, selectedStudents, selectedStudentsByYear } = selectors.makePopulationsToData(state)
+  const { samples, selectedStudentsByYear } = selectors.makePopulationsToData(state)
   // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
   if (samples.length > 0) {
     const creditsAndDates = samples.map(s => {
@@ -149,14 +147,13 @@ const mapStateToProps = state => {
     loading: populations.pending,
     populationFound: populations.data.students !== undefined,
     query: populations.query ? populations.query : {},
-    selectedStudents,
     queryIsSet: !!populations.query,
     selectedStudentsByYear,
     tagstudent: state.tagstudent.data || {},
     samples,
     studytracks: state.populationDegreesAndProgrammes.data.studyTracks || {},
     isLoading: populations.pending === true,
-    students: populations.data.students
+    students: populations.data.students || []
   }
 }
 

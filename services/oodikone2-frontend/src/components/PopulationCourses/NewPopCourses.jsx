@@ -24,7 +24,6 @@ const PopulationCourses = ({
   accordionView,
   allStudents
 }) => {
-  console.log(populationCourses);
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
     : populationCourses
@@ -44,7 +43,7 @@ const PopulationCourses = ({
         selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
       })
     }
-    console.log(selectedStudentsByYear);
+
     dispatchRefreshFilters()
     gpc({
       ...selectedPopulationCourses.query,
@@ -115,7 +114,8 @@ PopulationCourses.propTypes = {
   getPopulationSelectedStudentCourses: func.isRequired,
   dispatchRefreshFilters: func.isRequired,
   query: shape({}).isRequired,
-  accordionView: bool.isRequired
+  accordionView: bool.isRequired,
+  allStudents: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize, populationFilters }) => ({
