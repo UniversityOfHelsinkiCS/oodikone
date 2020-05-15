@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { Card, Form, Dropdown } from 'semantic-ui-react'
 
 export default ({ filterControl }) => {
-  const { addFilter, removeFilter, withoutFilter } = filterControl
+  const { addFilter, removeFilter, withoutFilter, filteredStudents } = filterControl
+
+  if (!filteredStudents) {
+    return null
+  }
+
   const [value, setValue] = useState(null)
   const name = 'gender'
 
