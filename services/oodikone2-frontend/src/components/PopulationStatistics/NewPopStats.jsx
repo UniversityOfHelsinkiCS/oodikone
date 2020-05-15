@@ -37,7 +37,7 @@ const PopulationStatistics = memo(props => {
   const { onProgress, progress } = useProgress(loading)
 
   useTitle('Population statistics')
-  console.log(students);
+  console.log(students)
 
   const getStudentNumbers = students => {
     if (!students) {
@@ -70,7 +70,11 @@ const PopulationStatistics = memo(props => {
 
   return (
     <div className="segmentContainer">
-      <FilterTray setFilteredStudents={setFilteredStudents} allStudents={students} />
+      <FilterTray
+        setFilteredStudents={setFilteredStudents}
+        filteredStudents={filteredStudents}
+        allStudents={students}
+      />
       <Header className="segmentTitle" size="large">
         {translate('populationStatistics.header')}
       </Header>
