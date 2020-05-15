@@ -30,7 +30,11 @@ const adminerUrls = [
 const allNavigationItems = {
   populations: {
     translateId: 'studyProgramme',
-    items: [{ path: '/populations', translateId: 'class' }, { path: '/study-programme', translateId: 'overview' }]
+    items: [
+      { path: '/populations', translateId: 'class' },
+      { path: '/populationsng', translateId: 'classNew' },
+      { path: '/study-programme', translateId: 'overview' }
+    ]
   },
   students: { path: '/students', translateId: 'students' },
   courseStatistics: { path: '/coursestatistics', translateId: 'courseStatistics' },
@@ -53,6 +57,10 @@ const NavigationBar = props => {
         if (!userRoles.includes('admin') && rights.length === 0) {
           return
         }
+      }
+      /* TODO: filter rework */
+      if (key === 'populationsng' && !userRoles.includes('admin')) {
+        return
       }
       const { reqRights } = allNavigationItems[key]
       if (!reqRights || reqRights.every(r => userRoles.includes(r))) {

@@ -93,6 +93,9 @@
     "class": [
       "Search by class"
     ],
+    "classNew": [
+      "Search by class (new)"
+    ],
     "overview": [
       "Overview"
     ],
