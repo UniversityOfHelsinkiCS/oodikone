@@ -6,9 +6,7 @@ const {
   withErr,
   mankeliUberData,
   getTargetStudentCounts,
-  get3yStudentsWithDrilldownPerYear,
   getStatusStatistics,
-  sorters,
   getUberData
 } = require('../services/coolDataScience')
 const { getAssociations } = require('../services/studyrights')
@@ -256,39 +254,6 @@ router.get(
       .value()
 
     res.json(newmankelid)
-  })
-)
-
-router.get(
-  '/3y-students',
-  withErr(async (req, res) => {
-    const { startDate, sort } = req.query
-    const shouldSort = Object.keys(sorters).includes(sort)
-
-    const rawData = await get3yStudentsWithDrilldownPerYear(startDate)
-    const byOrganization = rawData.reduce((acc, val) => {
-      const programmeTotalStudents = parseInt(val.programmeTotalStudents, 10)
-      const targetStudents = parseInt(val.targetStudents, 10)
-
-      const obj = acc[val.orgCode] || {}
-      obj.code = val.orgCode
-      obj.name = val.orgName
-      obj.programmes = obj.programmes || []
-      obj.programmes.push({
-        name: val.programmeName,
-        totalStudents: programmeTotalStudents,
-        targetStudents: targetStudents
-      })
-      obj.totalStudents = (obj.totalStudents || 0) + programmeTotalStudents
-      obj.targetStudents = (obj.targetStudents || 0) + targetStudents
-      acc[val.orgCode] = obj
-      return acc
-    }, {})
-
-    const data = Object.values(byOrganization)
-    res.json(
-      shouldSort ? data.map(d => ({ ...d, programmes: d.programmes.sort(sorters[sort]) })).sort(sorters[sort]) : data
-    )
   })
 )
 

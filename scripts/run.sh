@@ -26,6 +26,7 @@ options=(
     "Reset real db"
     "Download latest anon db"
     "Download latest real db"
+    "Setup SIS data"
     "Quit"
 )
 
@@ -55,6 +56,9 @@ while true; do
                 ;;
             "Download latest real db")
                 get_oodikone_server_backup
+                ;;
+            "Setup SIS data")
+                ./scripts/populate-db.sh
                 ;;
             "Quit")
                 break 2
