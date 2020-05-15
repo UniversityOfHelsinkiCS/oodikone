@@ -3,36 +3,37 @@ import { Card, Form, Dropdown } from 'semantic-ui-react'
 
 export default ({ filterControl }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
-  const [value, setValue] = useState(null)
-  const name = 'gender'
+  const [value, setValue] = useState([])
+  const name = 'startYearAtUni'
 
   useEffect(() => {
-    if (!value) {
+    if (value.length === 0) {
       removeFilter(name)
     } else {
-      addFilter(name, student => value === student.gender_code)
+      addFilter(name, student => value.some(year => year === new Date(student.started).getFullYear()))
     }
   }, [value])
 
-  const countsByGender = {}
+  const countsByYear = {}
   withoutFilter(name).forEach(student => {
-    const gc = student.gender_code
-    countsByGender[gc] = countsByGender[gc] ? countsByGender[gc] + 1 : 1
+    const year = new Date(student.started).getFullYear()
+    countsByYear[year] = countsByYear[year] ? countsByYear[year] + 1 : 1
   })
 
-  const options = [
-    { key: 'no-filter', text: 'No Filter', value: null },
-    { key: 'female', text: `Female (${countsByGender[2]})`, value: 2 },
-    { key: 'male', text: `Male (${countsByGender[1]})`, value: 1 }
-  ]
+  const options = Object.keys(countsByYear).map(year => ({
+    key: `year-${year}`,
+    text: `${year} (${countsByYear[year]})`,
+    value: Number(year)
+  }))
 
   return (
     <Card>
       <Card.Content>
-        <Card.Header>Gender</Card.Header>
+        <Card.Header>Starting Year at University</Card.Header>
         <Card.Description>
           <Form>
             <Dropdown
+              multiple
               selection
               fluid
               options={options}

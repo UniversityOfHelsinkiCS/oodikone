@@ -4,21 +4,31 @@ import { Sidebar, Segment, Button, Card, Header, Icon } from 'semantic-ui-react'
 import './filterTray.css'
 import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
+import StartYearAtUni from './filters/StartYearAtUni'
 
-export default ({ setFilteredStudents, allStudents }) => {
+export default ({ setFilteredStudents, allStudents, filteredStudents }) => {
   const [open, setOpen] = useState(false)
 
   const [activeFilters, setActiveFilters] = useState({})
 
+  const applyFilters = filters =>
+    Object.values(filters).reduce((students, nextFilter) => students.filter(nextFilter), allStudents)
+
   useEffect(() => {
-    const filters = Object.values(activeFilters)
-    const filtered = filters.reduce((students, nextFilter) => students.filter(nextFilter), allStudents)
-    setFilteredStudents(filtered)
+    setFilteredStudents(applyFilters(activeFilters))
   }, [activeFilters, allStudents])
 
   const addFilter = (name, filterFn) => setActiveFilters(prev => ({ ...prev, [name]: filterFn }))
   const removeFilter = name => setActiveFilters(prev => lodash.omit(prev, name))
-  const filterControl = { addFilter, removeFilter }
+
+  /**
+   * Apply all active filters except for the one named as the argument.
+   * This provides a way for a filter to count objects without itself affecting the sample.
+   * @param {string} name Name of the filter to skip.
+   */
+  const withoutFilter = name => applyFilters(lodash.omit(activeFilters, name))
+
+  const filterControl = { addFilter, removeFilter, withoutFilter, allStudents, filteredStudents }
 
   return (
     <>
@@ -45,6 +55,7 @@ export default ({ setFilteredStudents, allStudents }) => {
               </Header>
               <TotalCredits filterControl={filterControl} />
               <Gender filterControl={filterControl} />
+              <StartYearAtUni filterControl={filterControl} />
             </Card.Group>
             <div>
               <Button secondary onClick={() => setOpen(false)}>
