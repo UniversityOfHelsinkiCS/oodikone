@@ -37,7 +37,6 @@ export const getPopulationSelectedStudentCourses = ({
     selectedStudentsByYear,
     years
   }
-  console.log(selectedStudents);
   return callController(route, prefix, body, 'post', query)
 }
 

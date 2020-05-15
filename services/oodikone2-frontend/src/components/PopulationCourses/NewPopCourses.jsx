@@ -20,10 +20,11 @@ const PopulationCourses = ({
   selectedStudents,
   translate,
   getPopulationSelectedStudentCourses: gpc,
-  selectedStudentsByYear,
   query,
-  accordionView
+  accordionView,
+  allStudents
 }) => {
+  console.log(populationCourses);
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
     : populationCourses
@@ -31,6 +32,19 @@ const PopulationCourses = ({
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = selectedPopulationCourses
   const reloadCourses = () => {
+    // FIXME: lol does this work with an empty object? xD
+    // - no.
+    const selectedStudentsByYear = {}
+
+    if (allStudents && allStudents.length > 0) {
+      allStudents.forEach(student => {
+        if (!selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()]) {
+          selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()] = []
+        }
+        selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
+      })
+    }
+    console.log(selectedStudentsByYear);
     dispatchRefreshFilters()
     gpc({
       ...selectedPopulationCourses.query,
@@ -100,7 +114,6 @@ PopulationCourses.propTypes = {
   selectedStudents: arrayOf(string).isRequired,
   getPopulationSelectedStudentCourses: func.isRequired,
   dispatchRefreshFilters: func.isRequired,
-  selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
   accordionView: bool.isRequired
 }

@@ -16,7 +16,6 @@ import infoTooltips from '../../common/InfoToolTips'
 import { getUserIsAdmin, flattenStudyrights, getTotalCreditsFromCourses } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
-import FilterTray from '../FilterTray'
 
 const PopulationStatistics = memo(props => {
   const {
@@ -36,7 +35,6 @@ const PopulationStatistics = memo(props => {
   // eslint-disable-next-line no-unused-vars
   const [accordionView, setAccordion] = useState(true)
   const [excluded, setExcluded] = useState([])
-  const [useNewFilters, setUseNewFilters] = useState(false)
 
   const { onProgress, progress } = useProgress(loading)
   useTitle('Population statistics')
@@ -77,8 +75,7 @@ const PopulationStatistics = memo(props => {
         <Divider />
         {location.search !== '' ? (
           <>
-            {/* TODO: filter-rework */}
-            {isAdmin ? <Radio id="accordion-toggle" toggle onChange={() => setUseNewFilters(prev => !prev)} /> : null}
+            {isAdmin ? <Radio id="accordion-toggle" toggle onChange={() => console.log('assign something')} /> : null}
             <PopulationSearchHistory history={history} />
             {!props.isLoading && props.queryIsSet && (
               <>
@@ -94,7 +91,6 @@ const PopulationStatistics = memo(props => {
   }
   return (
     <div className="segmentContainer">
-      {useNewFilters ? <FilterTray /> : null}
       <Header className="segmentTitle" size="large">
         {translate('populationStatistics.header')}
       </Header>

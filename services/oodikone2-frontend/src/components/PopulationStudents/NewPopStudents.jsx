@@ -82,11 +82,11 @@ class PopulationStudents extends Component {
 
   containsStudyTracks = () => {
     const { language, populationStatistics } = this.props
-    const students = this.props.samples.reduce((obj, s) => {
+    const students = this.props.allStudents.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
     }, {})
-    this.setState({ students: this.props.samples })
+    this.setState({ students: this.props.allStudents })
     const allStudyrights = this.props.selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
     return allStudyrights
       .map(
@@ -135,7 +135,7 @@ class PopulationStudents extends Component {
 
     const { admin, containsStudyTracks } = this.state
     const { populationStatistics, customPopulation, coursePopulation } = this.props
-    const students = this.props.samples.reduce((obj, s) => {
+    const students = this.props.allStudents.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
     }, {})
@@ -738,7 +738,7 @@ class PopulationStudents extends Component {
 
   render() {
     const { Students, CoursePopulationStudents } = infotooltips.PopulationStatistics
-    if (this.props.samples.length === 0) {
+    if (this.props.allStudents.length === 0) {
       return null
     }
 
@@ -790,7 +790,7 @@ PopulationStudents.defaultProps = {
 }
 
 PopulationStudents.propTypes = {
-  samples: arrayOf(object).isRequired,
+  allStudents: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   toggleStudentListVisibility: func.isRequired,
   showNames: bool.isRequired,
@@ -834,7 +834,6 @@ const mapStateToProps = state => {
     }
   } = state
 
-  const { selectedStudents, samples } = selector.makePopulationsToData(state)
   const mandatoryCodes = populationMandatoryCourses.data.map(c => c.code)
 
   let mandatoryPassed = {}
@@ -858,9 +857,7 @@ const mapStateToProps = state => {
     mandatoryPassed,
     tags: tags.data,
     userRoles: getUserRoles(roles),
-    tagstudent: tagstudent.data,
-    selectedStudents,
-    samples
+    tagstudent: tagstudent.data
   }
 }
 
