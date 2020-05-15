@@ -6,10 +6,14 @@ import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-
 import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
+import TSA from '../../common/tsa'
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
 
 HighchartsCustomEvents(Highcharts)
+
+const ANALYTICS_CATEGORY = 'Trends'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const defaultConfig = () => {
   return {
@@ -178,6 +182,7 @@ const makeConfig = (organisations, sorter, type = 'column') => {
             const clickedLabel = organisations.find(data => data.name === this.value)
             if (clickedLabel) {
               // clicked on top-level, drill down
+              sendAnalytics('Org drilldown clicked', 'ProtoC2')
               const programmes = [...clickedLabel.programmes].sort(sorter)
               changeSeries(
                 chart,
@@ -221,6 +226,7 @@ const makeConfig = (organisations, sorter, type = 'column') => {
               )
             } else {
               // drill up
+              sendAnalytics('Org drillup clicked', 'ProtoC2')
               changeSeries(chart, orgCategories, orgSeries)
             }
           },
@@ -299,6 +305,7 @@ const makeConfig = (organisations, sorter, type = 'column') => {
 
               if (point.custom && point.custom.orgCode) {
                 // clicked on top-level, drill down
+                sendAnalytics('Org drilldown clicked', 'ProtoC2')
                 const org = organisations.find(org => org.code === point.custom.orgCode)
                 const programmes = [...org.programmes].sort(sorter)
                 changeSeries(
@@ -343,6 +350,7 @@ const makeConfig = (organisations, sorter, type = 'column') => {
                 )
               } else {
                 // drill up
+                sendAnalytics('Org drillup clicked', 'ProtoC2')
                 changeSeries(chart, orgCategories, orgSeries)
               }
             }
@@ -419,10 +427,12 @@ const ProtoC = () => {
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
+    sendAnalytics('Toggled old attainments', 'ProtoC2')
   }, [])
 
   const handleExcludeNonEnrolledToggled = useCallback(() => {
     setExcludeNonEnrolled(previous => !previous)
+    sendAnalytics('Toggled non enrolled', 'ProtoC2')
   }, [])
 
   const currentSorter = useCallback((a, b) => sorters[sorter](a, b) * sortDir, [sorter, sortDir])
@@ -436,6 +446,7 @@ const ProtoC = () => {
   const handleClick = sorterName => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
+    sendAnalytics('Sorter clicked', 'ProtoC2')
   }
 
   const sorterNames = Object.keys(sorters)

@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master.svg?style=svg)](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master)
 
-Simple CLI tool for setting up the development environment for Oodikone. The entire development environment runs inside of a Docker network that's defined in the docker-compose.yml file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
+An application for analyzing university data. The entire development environment runs inside of a Docker network that's defined in the docker-compose.yml file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ For local development with anonymized data use `2) Anon setup` (you can run e2e 
 
 To get also the full real dataset use `3) Full setup`
 
-> `1) e2e setup` is designed for use in travis. But you can still try it locally if you want to.
+> `1) e2e setup` is designed for use in CircleCI. But you can still try it locally if you want to.
 
 Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visual browser.
 
@@ -62,7 +62,7 @@ The mapping of ports and environment variables are also defined in the docker-co
 #### With anonymized data:
 
 ```
-npm run docker:up
+npm start
 ```
 
 #### With real data:

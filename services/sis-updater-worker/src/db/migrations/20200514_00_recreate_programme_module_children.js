@@ -1,7 +1,11 @@
 const { STRING, DATE } = require('sequelize')
 
+// Creates the exact same table as in last migration, but because staging data was messed,
+// this has to be done
+
 module.exports = {
   up: async queryInterface => {
+    await queryInterface.dropTable('programme_module_children')
     await queryInterface.createTable('programme_module_children', {
       composite: {
         type: STRING,

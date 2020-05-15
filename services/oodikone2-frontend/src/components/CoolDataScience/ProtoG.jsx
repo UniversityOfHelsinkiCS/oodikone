@@ -6,9 +6,13 @@ import { Segment, Loader, Dimmer, Table, Form, Dropdown, Icon, Checkbox, Message
 import _ from 'lodash'
 import ReactMarkdown from 'react-markdown'
 
+import TSA from '../../common/tsa'
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
 import './protoG.css'
+
+const ANALYTICS_CATEGORY = 'Trends'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const defaultConfig = () => ({
   chart: {
@@ -192,16 +196,19 @@ const ProtoG = () => {
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
+    sendAnalytics('Toggled old attainments', 'ProtoG')
   }, [])
 
   const handleYearChanged = useCallback((e, { value }) => {
     setStartDate(value)
+    sendAnalytics('Year changed', 'ProtoG')
   }, [])
   const preventDefault = useCallback(e => e.preventDefault(), [])
 
   const makeHandleExpando = orgCode => {
     return () => {
       setExpandedOrgs({ ...expandedOrgs, [orgCode]: !expandedOrgs[orgCode] })
+      sendAnalytics('Toggled expanded orgs', 'ProtoG')
     }
   }
   const { CoolDataScience } = InfoToolTips

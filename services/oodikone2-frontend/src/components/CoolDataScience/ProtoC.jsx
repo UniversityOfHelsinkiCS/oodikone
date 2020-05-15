@@ -7,16 +7,20 @@ import _ from 'lodash'
 import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
+import TSA from '../../common/tsa'
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
 
 HighchartsCustomEvents(Highcharts)
 
+const ANALYTICS_CATEGORY = 'Trends'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
+
 const defaultConfig = (pointer = true) => {
   return {
     chart: {
       type: 'area',
-      inverted: true
+      inverted: true,
     },
     credits: {
       text: 'oodikone | TOSKA'
@@ -193,6 +197,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
 
             // create custom crosshair line because again
             // highcharts doesnt offer this functionality
+            // 23.5 for eläin lääkis,pls fix this logic
             const { chart } = this
             const path = [
               'M',
@@ -526,19 +531,23 @@ const ProtoC = ({ programme }) => {
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
+    sendAnalytics('Toggled old attainments', 'ProtoC')
   }, [])
 
   const handleExcludeNonEnrolledToggled = useCallback(() => {
     setExcludeNonEnrolled(previous => !previous)
+    sendAnalytics('Toggled non enrolled', 'ProtoC')
   }, [])
 
   const handleOrgClicked = useCallback(org => {
     setDrilldownOrg(org)
     setDrilldownProgramme(null)
+    sendAnalytics('Org drilldown clicked', 'ProtoC')
   }, [])
 
   const handleProgrammeClicked = useCallback(programme => {
     setDrilldownProgramme(programme)
+    sendAnalytics('Programme drilldown clicked', 'ProtoC')
   }, [])
 
   const sortedOrgs = useMemo(() => {
@@ -548,6 +557,7 @@ const ProtoC = ({ programme }) => {
   const handleClick = sorterName => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
+    sendAnalytics('Sorter clicked', 'ProtoC')
   }
 
   const { CoolDataScience } = InfoToolTips
