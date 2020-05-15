@@ -31,7 +31,6 @@ import infotooltips from '../../common/InfoToolTips'
 import CheckStudentList from '../CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
-import selector from '../../selectors/populationDetails'
 import './populationStudents.css'
 
 const ANALYTICS_CATEGORY = 'Population students'

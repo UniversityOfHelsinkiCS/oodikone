@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import lodash from 'lodash'
 import { Sidebar, Segment, Button, Card, Header, Icon } from 'semantic-ui-react'
 import './filterTray.css'
@@ -6,7 +7,7 @@ import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 
-export default ({ setFilteredStudents, allStudents, filteredStudents }) => {
+const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents }) => {
   const [open, setOpen] = useState(false)
 
   const [activeFilters, setActiveFilters] = useState({})
@@ -68,3 +69,16 @@ export default ({ setFilteredStudents, allStudents, filteredStudents }) => {
     </>
   )
 }
+
+FilterTray.propTypes = {
+  setFilteredStudents: PropTypes.func.isRequired,
+  allStudents: PropTypes.arrayOf(PropTypes.shape({})),
+  filteredStudents: PropTypes.arrayOf(PropTypes.shape({}))
+}
+
+FilterTray.defaultProps = {
+  allStudents: [],
+  filteredStudents: []
+}
+
+export default FilterTray

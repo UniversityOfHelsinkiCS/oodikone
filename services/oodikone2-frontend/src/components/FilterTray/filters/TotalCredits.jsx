@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { Card, Form, Input } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
 
-export default ({ filterControl }) => {
+const TotalCredits = ({ filterControl }) => {
   const [value, setValue] = useState({ min: '', max: '' })
 
   const filterFunctions = {
@@ -42,3 +43,13 @@ export default ({ filterControl }) => {
     </Card>
   )
 }
+
+TotalCredits.propTypes = {
+  filterControl: PropTypes.shape({
+    addFilter: PropTypes.func.isRequired,
+    removeFilter: PropTypes.func.isRequired,
+    withoutFilter: PropTypes.func.isRequired
+  }).isRequired
+}
+
+export default TotalCredits
