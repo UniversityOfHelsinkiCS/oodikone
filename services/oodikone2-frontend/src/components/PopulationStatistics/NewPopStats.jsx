@@ -5,6 +5,7 @@ import { func, bool, shape, arrayOf, any } from 'prop-types'
 import { Header, Segment, Divider, Message } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
 
+import { Link } from 'react-router-dom'
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails/NewPopDetails'
@@ -16,7 +17,6 @@ import { getTotalCreditsFromCourses } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
-import { Link } from 'react-router-dom'
 
 const PopulationStatistics = memo(props => {
   const {
@@ -80,7 +80,8 @@ const PopulationStatistics = memo(props => {
         <Message.Header>Work In Progress</Message.Header>
         <p>
           This page is a new version of Population Statistics. Feel free to use it but be aware that many things are
-          likely to break or be broken. For anything mission critical, you should probably use <Link to="/populations">the old version</Link>.
+          likely to break or be broken. For anything mission critical, you should probably use{' '}
+          <Link to="/populations">the old version</Link>.
         </p>
       </Message>
       <Segment className="contentSegment">
