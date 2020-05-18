@@ -94,11 +94,18 @@ class StudyProgrammeSelector extends Component {
     const bachelorProgrammes = []
     const masterProgrammes = []
     const otherProgrammes = []
-    const filteredStudyprogrammes = studyprogrammes.filter(
-      programme =>
+
+    const filteredStudyprogrammes = studyprogrammes.filter(programme => {
+      if (programme.name[language])
+        return (
+          programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
+          programme.name[language].toLowerCase().includes(filter.toLocaleLowerCase())
+        )
+      return (
         programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
-        programme.name[language].toLowerCase().includes(filter.toLocaleLowerCase())
-    )
+        programme.name.fi.toLowerCase().includes(filter.toLocaleLowerCase())
+      )
+    })
 
     filteredStudyprogrammes.forEach(programme => {
       if (programme.code.includes('MH')) {
