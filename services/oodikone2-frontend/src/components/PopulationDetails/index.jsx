@@ -87,7 +87,8 @@ class PopulationDetails extends Component {
     selectedStudentsByYear: shape({}).isRequired,
     query: shape({}).isRequired,
     activeIndex: arrayOf(number).isRequired,
-    setActiveIndex: func.isRequired
+    setActiveIndex: func.isRequired,
+    mandatoryToggle: bool.isRequired
   }
 
   constructor() {
@@ -297,7 +298,7 @@ class PopulationDetails extends Component {
         content: {
           content: (
             <div ref={this.studentTableRef}>
-              <PopulationStudents accordionView />
+              <PopulationStudents accordionView mandatoryToggle={this.props.mandatoryToggle} />
             </div>
           )
         }
