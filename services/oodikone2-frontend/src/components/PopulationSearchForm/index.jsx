@@ -169,8 +169,12 @@ const PopulationSearchForm = props => {
   }, [location.search])
 
   useEffect(() => {
-    const query = parseQueryFromUrl()
-    fetchPopulation(query)
+    try {
+      const query = parseQueryFromUrl()
+      fetchPopulation(query)
+    } catch (error) {
+      console.log(`not running atte's query :minttu:`)
+    }
   }, [props.mandatoryToggle])
 
   const handleClear = type => {

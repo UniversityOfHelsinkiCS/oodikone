@@ -2,7 +2,7 @@ import React, { memo, useState } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { func, bool, shape, arrayOf, any } from 'prop-types'
-import { Header, Segment, Divider, Message } from 'semantic-ui-react'
+import { Header, Segment, Divider, Message, Radio } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
 
 import { Link } from 'react-router-dom'
@@ -13,7 +13,7 @@ import InfoBox from '../InfoBox'
 import ProgressBar from '../ProgressBar'
 
 import infoTooltips from '../../common/InfoToolTips'
-import { getTotalCreditsFromCourses } from '../../common'
+import { getTotalCreditsFromCourses, getUserIsAdmin } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
@@ -30,10 +30,12 @@ const PopulationStatistics = memo(props => {
     location,
     history,
     isLoading,
-    students
+    students,
+    isAdmin
   } = props
   const [filteredStudents, setFilteredStudents] = useState(students)
   const { onProgress, progress } = useProgress(loading)
+  const [mandatoryToggle, setMandatoryToggle] = useState(Boolean(window.localStorage.getItem('mandatory_toggle')))
 
   useTitle('Population statistics')
 
@@ -58,8 +60,16 @@ const PopulationStatistics = memo(props => {
           {title}
           {(!populationFound || !history.location.search) && <InfoBox content={Main} />}
         </Header>
-        <PopulationSearchForm onProgress={onProgress} />
+        <PopulationSearchForm onProgress={onProgress} mandatoryToggle={mandatoryToggle} />
         <Divider />
+        {isAdmin ? (
+          <Radio
+            id="accordion-toggle"
+            checked={mandatoryToggle}
+            toggle
+            onChange={() => setMandatoryToggle(!mandatoryToggle)}
+          />
+        ) : null}
         {location.search !== '' ? <PopulationSearchHistory history={history} /> : null}
         <ProgressBar fixed progress={progress} />
       </Segment>
@@ -96,6 +106,7 @@ const PopulationStatistics = memo(props => {
             query={query}
             samples={samples}
             isLoading={isLoading}
+            mandatoryToggle={mandatoryToggle}
           />
         ) : null}
       </Segment>
@@ -122,7 +133,8 @@ PopulationStatistics.propTypes = {
   // eslint-disable-next-line react/no-unused-prop-types
   tagstudent: arrayOf(shape({})).isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
-  studytracks: shape({}).isRequired
+  studytracks: shape({}).isRequired,
+  isAdmin: bool.isRequired
 }
 
 const mapStateToProps = state => {
@@ -148,7 +160,13 @@ const mapStateToProps = state => {
     samples.minDateWithCredits = Math.min(...datesWithCredits)
   }
 
-  const { localize, populations } = state
+  const {
+    localize,
+    populations,
+    auth: {
+      token: { roles }
+    }
+  } = state
 
   return {
     translate: getTranslate(localize),
@@ -162,7 +180,8 @@ const mapStateToProps = state => {
     samples,
     studytracks: state.populationDegreesAndProgrammes.data.studyTracks || {},
     isLoading: populations.pending === true,
-    students: populations.data.students || []
+    students: populations.data.students || [],
+    isAdmin: getUserIsAdmin(roles)
   }
 }
 
