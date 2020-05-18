@@ -80,7 +80,8 @@ class PopulationDetails extends Component {
     queryIsSet: bool.isRequired,
     isLoading: bool.isRequired,
     query: shape({}).isRequired,
-    allStudents: arrayOf(object).isRequired
+    allStudents: arrayOf(object).isRequired,
+    mandatoryToggle: bool.isRequired
   }
 
   constructor() {
@@ -290,7 +291,12 @@ class PopulationDetails extends Component {
         content: {
           content: (
             <div ref={this.studentTableRef}>
-              <PopulationStudents accordionView selectedStudents={selectedStudents} allStudents={allStudents} />
+              <PopulationStudents
+                accordionView
+                selectedStudents={selectedStudents}
+                allStudents={allStudents}
+                mandatoryToggle={this.props.mandatoryToggle}
+              />
             </div>
           )
         }

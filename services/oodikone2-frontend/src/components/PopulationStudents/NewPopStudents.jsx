@@ -564,7 +564,7 @@ class PopulationStudents extends Component {
         )
       },
       {
-        menuItem: 'Mandatory courses',
+        menuItem: this.props.mandatoryToggle ? 'Courses' : 'Mandatory Courses',
         render: () => (
           <Tab.Pane>
             <div style={{ display: 'flex' }}>
@@ -816,7 +816,8 @@ PopulationStudents.propTypes = {
   studentToTargetCourseDateMap: shape({}),
   accordionView: bool.isRequired,
   coursePopulation: bool,
-  customPopulation: bool
+  customPopulation: bool,
+  mandatoryToggle: bool.isRequired
 }
 
 const mapStateToProps = state => {
