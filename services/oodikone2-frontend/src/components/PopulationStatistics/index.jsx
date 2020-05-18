@@ -34,6 +34,7 @@ const PopulationStatistics = memo(props => {
   } = props
   // eslint-disable-next-line no-unused-vars
   const [accordionView, setAccordion] = useState(true)
+  const [mandatoryToggle, setMandatoryToggle] = useState(Boolean(window.localStorage.getItem('mandatory_toggle')))
   const [excluded, setExcluded] = useState([])
 
   const { onProgress, progress } = useProgress(loading)
@@ -71,11 +72,18 @@ const PopulationStatistics = memo(props => {
           {title}
           {(!populationFound || !history.location.search) && <InfoBox content={Main} />}
         </Header>
-        <PopulationSearchForm onProgress={onProgress} />
+        <PopulationSearchForm onProgress={onProgress} mandatoryToggle={mandatoryToggle} />
         <Divider />
         {location.search !== '' ? (
           <>
-            {isAdmin ? <Radio id="accordion-toggle" toggle onChange={() => console.log('assign something')} /> : null}
+            {isAdmin ? (
+              <Radio
+                id="accordion-toggle"
+                checked={mandatoryToggle}
+                toggle
+                onChange={() => setMandatoryToggle(!mandatoryToggle)}
+              />
+            ) : null}
             <PopulationSearchHistory history={history} />
             {!props.isLoading && props.queryIsSet && (
               <>
@@ -105,6 +113,7 @@ const PopulationStatistics = memo(props => {
             query={query}
             samples={samples}
             isLoading={isLoading}
+            mandatoryToggle={mandatoryToggle}
           />
         ) : null}
       </Segment>
