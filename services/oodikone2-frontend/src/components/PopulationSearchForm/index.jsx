@@ -115,7 +115,7 @@ const PopulationSearchForm = props => {
         props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
         props.getPopulationCourses(request),
         props.getPopulationFilters(request),
-        props.getMandatoryCourses(formattedQueryParams.studyRights.programme),
+        props.getMandatoryCourses(formattedQueryParams.studyRights.programme, props.mandatoryToggle),
         props.getTagsByStudytrackAction(query.studyRights.programme)
       ])
     )
@@ -167,6 +167,11 @@ const PopulationSearchForm = props => {
       props.resetPopulationFilters()
     }
   }, [location.search])
+
+  useEffect(() => {
+    const query = parseQueryFromUrl()
+    fetchPopulation(query)
+  }, [props.mandatoryToggle])
 
   const handleClear = type => {
     setState({
@@ -649,7 +654,8 @@ PopulationSearchForm.propTypes = {
   tags: oneOfType([arrayOf(shape({ tag_id: string, tagname: string })), object]).isRequired,
   onProgress: func.isRequired,
   clearSelected: func.isRequired,
-  clearPopulations: func.isRequired
+  clearPopulations: func.isRequired,
+  mandatoryToggle: bool.isRequired
 }
 
 const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags }) => {

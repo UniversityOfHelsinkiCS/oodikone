@@ -564,7 +564,7 @@ class PopulationStudents extends Component {
         )
       },
       {
-        menuItem: 'Courses',
+        menuItem: 'Mandatory Courses',
         render: () => (
           <Tab.Pane>
             <div style={{ display: 'flex' }}>
