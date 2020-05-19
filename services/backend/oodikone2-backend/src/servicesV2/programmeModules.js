@@ -7,10 +7,10 @@ const byProgrammeCode = async code => {
   const [result] = await connection.query(
     `
     WITH RECURSIVE children as (
-      SELECT DISTINCT pm.*, NULL::jsonb as label_name, NULL as label_code FROM programme_modules pm
+      SELECT DISTINCT pm.*, NULL::jsonb AS label_name, NULL AS label_code FROM programme_modules pm
       WHERE pm.code = ?
       UNION ALL
-      SELECT pm.*, c.name as label_name, c.code as label_code
+      SELECT pm.*, c.name AS label_name, c.code AS label_code
       FROM children c, programme_modules pm, programme_module_children pmc
       WHERE c.id = pmc.parent_id AND pm.id = pmc.child_id
       GROUP BY pm.id, c.name, c.code
@@ -21,17 +21,17 @@ const byProgrammeCode = async code => {
 
   let order = 0
 
-  const tunk = result.map(course => {
+  const labeled = result.map(module => {
     const label = {
-      id: course.label_name.fi,
-      label: `${course.label_code}\n${course.label_name.fi}`,
+      id: module.label_name.fi,
+      label: `${module.label_code}\n${module.label_name.fi}`,
       orderNumber: order++
     }
 
-    return { ...course, label }
+    return { ...module, label }
   })
 
-  return tunk
+  return labeled
 }
 
 module.exports = { byProgrammeCode }
