@@ -12,6 +12,7 @@ const {
 const { getAssociations } = require('../services/studyrights')
 
 const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
+const CURRENT_DATE = new Date()
 
 router.get('/start-years', async (req, res) => {
   const years = await sequelize.query(
@@ -26,12 +27,13 @@ router.get('/start-years', async (req, res) => {
     WHERE
         studyright.extentcode = 1
         AND studyright.studystartdate >= :startDate
+        AND studyright.studystartdate <= :currentDate
         AND transfers.studyrightid IS NULL
     ORDER BY 1
   `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { startDate: STUDYRIGHT_START_DATE }
+      replacements: { startDate: STUDYRIGHT_START_DATE, currentDate: CURRENT_DATE }
     }
   )
   res.json(years.map(({ studystartdate }) => studystartdate))
