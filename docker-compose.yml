@@ -100,7 +100,7 @@ services:
       DB_URL: postgres://postgres@db:5432/tkt_oodi
       # DB_MAX_CONNECTIONS: 90 # defaults to 5
       DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone
-      SIS_DB_URL: postgres://postgres@db_sis:5432/db_sis
+      SIS_DB_URL: postgres://postgres@localhost:5432/rikki
       # if NODE_ENV === 'test', these are used instead
       TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
       TEST_DB_KONE: postgres://postgres@db_kone:5432/db_kone_test
