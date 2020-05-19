@@ -3,25 +3,11 @@ import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
 import { useChunk } from '../../common/hooks'
+import './populationStudents.css'
 
 const verticalTitle = title => {
   // https://stackoverflow.com/a/41396815
-  return (
-    <div
-      style={{
-        writingMode: 'vertical-rl',
-        width: 'max-content',
-        minWidth: '64px',
-        maxWidth: '64px',
-        maxHeight: '200px',
-        // wordWrap: 'break-word',
-        whiteSpace: 'initial',
-        overflow: 'hidden'
-      }}
-    >
-      {title}
-    </div>
-  )
+  return <div className="tableVerticalTitle">{title}</div>
 }
 
 const intoCollapsing = column => ({
