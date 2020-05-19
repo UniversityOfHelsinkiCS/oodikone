@@ -10,6 +10,7 @@ const verticalTitle = title => {
     <div
       style={{
         writingMode: 'vertical-rl',
+        width: 'max-content',
         minWidth: '64px',
         maxWidth: '64px',
         maxHeight: '200px',
@@ -31,8 +32,7 @@ const intoCollapsing = column => ({
   parent: column.parent
 })
 
-const initialCollapsing = columns => {
-  const toggle = window.localStorage.getItem('mandatory_toggle')
+const initialCollapsing = (columns, toggle) => {
   if (!toggle) return {}
   const coll = {}
   columns.forEach(column => {
@@ -59,11 +59,12 @@ const PopulationCourseTable = ({
   getRowProps,
   getRowKey,
   collapsingHeaders,
-  chunkifyBy
+  chunkifyBy,
+  mandatoryToggle
 }) => {
   const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
   const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
-  const [collapsed, setCollapsed] = useState(initialCollapsing(columns))
+  const [collapsed, setCollapsed] = useState(initialCollapsing(columns, mandatoryToggle))
   const chunkedData = useChunk(data, chunkifyBy)
 
   const handleSort = column => () => {
@@ -201,7 +202,8 @@ PopulationCourseTable.propTypes = {
   defaultsortkey: string,
   collapsingHeaders: bool,
   showNames: bool,
-  chunkifyBy: string
+  chunkifyBy: string,
+  mandatoryToggle: bool.isRequired
 }
 
 PopulationCourseTable.defaultProps = {

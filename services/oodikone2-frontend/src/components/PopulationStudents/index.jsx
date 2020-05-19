@@ -583,7 +583,8 @@ class PopulationStudents extends Component {
                           basic: true,
                           striped: true,
                           singleLine: true,
-                          textAlign: 'center'
+                          textAlign: 'center',
+                          mandatoryToggle: this.props.mandatoryToggle
                         }}
                         collapsingHeaders
                         showNames={this.props.showNames}
