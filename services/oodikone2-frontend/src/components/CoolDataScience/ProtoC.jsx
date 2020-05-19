@@ -566,8 +566,10 @@ const ProtoC = ({ programme }) => {
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)
     .sort((a, b) => {
-      if (a === 'nimi') return false
-      return a > b
+      console.log(a,b)
+      if (b === 'nimi' ) return 1
+      if(a === 'nimi') return -1
+      return a > b ? 1 : -1
     })
 
   const SorterButtons = () => (
