@@ -32,15 +32,12 @@ const intoCollapsing = column => ({
   parent: column.parent
 })
 
-const initialCollapsing = (columns, toggle) => {
-  if (!toggle) return {}
+const initialCollapsing = columns => {
   const coll = {}
   columns.forEach(column => {
     if (!column.parent || column.key === 'general') return
 
-    if (toggle) {
-      coll[column.headerProps.title] = intoCollapsing(column)
-    }
+    coll[column.headerProps.title] = intoCollapsing(column)
   })
   return coll
 }
@@ -59,12 +56,11 @@ const PopulationCourseTable = ({
   getRowProps,
   getRowKey,
   collapsingHeaders,
-  chunkifyBy,
-  mandatoryToggle
+  chunkifyBy
 }) => {
   const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
   const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
-  const [collapsed, setCollapsed] = useState(initialCollapsing(columns, mandatoryToggle))
+  const [collapsed, setCollapsed] = useState(initialCollapsing(columns))
   const chunkedData = useChunk(data, chunkifyBy)
 
   const handleSort = column => () => {
@@ -202,8 +198,7 @@ PopulationCourseTable.propTypes = {
   defaultsortkey: string,
   collapsingHeaders: bool,
   showNames: bool,
-  chunkifyBy: string,
-  mandatoryToggle: bool.isRequired
+  chunkifyBy: string
 }
 
 PopulationCourseTable.defaultProps = {
