@@ -31,6 +31,7 @@ import infotooltips from '../../common/InfoToolTips'
 import CheckStudentList from '../CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
+import PopulationCourseTable from './PopulationCourseTable'
 import './populationStudents.css'
 
 const ANALYTICS_CATEGORY = 'Population students'
@@ -571,23 +572,43 @@ class PopulationStudents extends Component {
               <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
                 {this.props.mandatoryCourses.length > 0 && (
                   <React.Fragment>
-                    <SortableTable
-                      getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
-                      tableProps={{
-                        celled: true,
-                        compact: 'very',
-                        padded: false,
-                        collapsing: true,
-                        basic: true,
-                        striped: true,
-                        singleLine: true,
-                        textAlign: 'center'
-                      }}
-                      collapsingHeaders
-                      showNames={this.props.showNames}
-                      columns={mandatoryCourseColumns}
-                      data={mandatoryCourseData}
-                    />
+                    {this.props.mandatoryToggle ? (
+                      <PopulationCourseTable
+                        getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
+                        tableProps={{
+                          celled: true,
+                          compact: 'very',
+                          padded: false,
+                          collapsing: true,
+                          basic: true,
+                          striped: true,
+                          singleLine: true,
+                          textAlign: 'center'
+                        }}
+                        collapsingHeaders
+                        showNames={this.props.showNames}
+                        columns={mandatoryCourseColumns}
+                        data={mandatoryCourseData}
+                      />
+                    ) : (
+                      <SortableTable
+                        getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
+                        tableProps={{
+                          celled: true,
+                          compact: 'very',
+                          padded: false,
+                          collapsing: true,
+                          basic: true,
+                          striped: true,
+                          singleLine: true,
+                          textAlign: 'center'
+                        }}
+                        collapsingHeaders
+                        showNames={this.props.showNames}
+                        columns={mandatoryCourseColumns}
+                        data={mandatoryCourseData}
+                      />
+                    )}
                   </React.Fragment>
                 )}
               </div>
