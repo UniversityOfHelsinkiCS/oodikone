@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Table } from 'semantic-ui-react'
 import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
@@ -61,6 +61,8 @@ const PopulationCourseTable = ({
   const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
   const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
   const [collapsed, setCollapsed] = useState(initialCollapsing(columns))
+  const [columnsWithCollapsedHeaders, setColumnsWithCollapsedHeaders] = useState(columns)
+  const [sortedRows, setSortedRows] = useState(data)
   const chunkedData = useChunk(data, chunkifyBy)
 
   const handleSort = column => () => {
@@ -83,22 +85,27 @@ const PopulationCourseTable = ({
     }
   }
 
-  const sortedRows = () => {
+  useEffect(() => {
     const column = columns.find(c => c.key === selected)
     if (!column) {
       return chunkedData
     }
     const { getRowVal } = column
     const sorted = sortBy(chunkedData, [getRowVal])
-    return direction === DIRECTIONS.ASC ? sorted : sorted.reverse()
-  }
+    return setSortedRows(direction === DIRECTIONS.ASC ? sorted : sorted.reverse())
+  }, [columns, columnsWithCollapsedHeaders])
 
-  const columnsWithCollapsedHeaders = collapsingHeaders
-    ? [
-        ...columns.filter(c => c.headerProps && (!collapsed[c.headerProps.title] && !c.collapsed)),
-        ...Object.values(collapsed)
-      ].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
-    : columns
+  useEffect(() => {
+    setColumnsWithCollapsedHeaders(
+      collapsingHeaders
+        ? columns
+            .filter(c => c.headerProps && (!collapsed[c.headerProps.title] && !c.collapsed))
+            .sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
+            .concat(Object.values(collapsed).sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber))
+        : columns
+    )
+  }, [collapsed])
+
   const sortDirection = name => (selected === name ? direction : null)
 
   return (
@@ -138,7 +145,7 @@ const PopulationCourseTable = ({
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {sortedRows().map(row => (
+        {sortedRows.map(row => (
           <Table.Row key={getRowKey(row)} {...(getRowProps && getRowProps(row))}>
             {columns
               .filter(c => !c.parent)
