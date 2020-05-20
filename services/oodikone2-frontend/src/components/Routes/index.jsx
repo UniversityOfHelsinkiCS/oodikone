@@ -74,6 +74,7 @@ const Routes = () => (
       <Route exact path={routes.custompopulation} component={CustomPopulation} />
       <Route exact path={routes.updater} component={Updater} />
       <Route path={routes.trends} component={Trends} />
+      <Redirect from="/cool-data-science" to="/trends" />
       <Redirect to="/" />
     </Switch>
   </Suspense>
