@@ -427,12 +427,12 @@ const ProtoC = () => {
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
-    sendAnalytics('Toggled old attainments', 'ProtoC2')
+    sendAnalytics('C2 Toggled old attainments', 'ProtoC2')
   }, [])
 
   const handleExcludeNonEnrolledToggled = useCallback(() => {
     setExcludeNonEnrolled(previous => !previous)
-    sendAnalytics('Toggled non enrolled', 'ProtoC2')
+    sendAnalytics('C2 Toggled non enrolled', 'ProtoC2')
   }, [])
 
   const currentSorter = useCallback((a, b) => sorters[sorter](a, b) * sortDir, [sorter, sortDir])
@@ -446,14 +446,15 @@ const ProtoC = () => {
   const handleClick = sorterName => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
-    sendAnalytics('Sorter clicked', 'ProtoC2')
+    sendAnalytics('C2 Sorter clicked', 'ProtoC2')
   }
 
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)
     .sort((a, b) => {
-      if (a === 'nimi') return false
-      return a > b
+      if (b === 'nimi') return 1
+      if (a === 'nimi') return -1
+      return a > b ? 1 : -1
     })
 
   return (
