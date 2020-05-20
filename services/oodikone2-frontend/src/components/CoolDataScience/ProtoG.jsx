@@ -196,19 +196,19 @@ const ProtoG = () => {
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
-    sendAnalytics('Toggled old attainments', 'ProtoG')
+    sendAnalytics('G Toggled old attainments', 'ProtoG')
   }, [])
 
   const handleYearChanged = useCallback((e, { value }) => {
     setStartDate(value)
-    sendAnalytics('Year changed', 'ProtoG')
+    sendAnalytics('G Year changed', 'ProtoG')
   }, [])
   const preventDefault = useCallback(e => e.preventDefault(), [])
 
   const makeHandleExpando = orgCode => {
     return () => {
       setExpandedOrgs({ ...expandedOrgs, [orgCode]: !expandedOrgs[orgCode] })
-      sendAnalytics('Toggled expanded orgs', 'ProtoG')
+      sendAnalytics('G Toggled expanded orgs', 'ProtoG')
     }
   }
   const { CoolDataScience } = InfoToolTips
