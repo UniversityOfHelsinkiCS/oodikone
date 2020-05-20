@@ -32,6 +32,7 @@ import CheckStudentList from '../CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
 import selector from '../../selectors/populationDetails'
+import PopulationCourseTable from './PopulationCourseTable'
 import './populationStudents.css'
 
 const ANALYTICS_CATEGORY = 'Population students'
@@ -498,7 +499,6 @@ class PopulationStudents extends Component {
     )
 
     const getTotalRowVal = (t, m) => t[m.code]
-
     const mandatoryCourseColumns = [
       ...nameColumns,
       ...labelColumns,
@@ -519,8 +519,8 @@ class PopulationStudents extends Component {
                 {m.code}
               </Fragment>
             ),
-            cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
-            headerProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
+            cellProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
+            headerProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
             getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
             getRowContent: s => {
               if (s.total) return getTotalRowVal(s, m)
@@ -572,23 +572,43 @@ class PopulationStudents extends Component {
               <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
                 {this.props.mandatoryCourses.length > 0 && (
                   <React.Fragment>
-                    <SortableTable
-                      getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
-                      tableProps={{
-                        celled: true,
-                        compact: 'very',
-                        padded: false,
-                        collapsing: true,
-                        basic: true,
-                        striped: true,
-                        singleLine: true,
-                        textAlign: 'center'
-                      }}
-                      collapsingHeaders
-                      showNames={this.props.showNames}
-                      columns={mandatoryCourseColumns}
-                      data={mandatoryCourseData}
-                    />
+                    {this.props.mandatoryToggle ? (
+                      <PopulationCourseTable
+                        getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
+                        tableProps={{
+                          celled: true,
+                          compact: 'very',
+                          padded: false,
+                          collapsing: true,
+                          basic: true,
+                          striped: true,
+                          singleLine: true,
+                          textAlign: 'center'
+                        }}
+                        collapsingHeaders
+                        showNames={this.props.showNames}
+                        columns={mandatoryCourseColumns}
+                        data={mandatoryCourseData}
+                      />
+                    ) : (
+                      <SortableTable
+                        getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
+                        tableProps={{
+                          celled: true,
+                          compact: 'very',
+                          padded: false,
+                          collapsing: true,
+                          basic: true,
+                          striped: true,
+                          singleLine: true,
+                          textAlign: 'center'
+                        }}
+                        collapsingHeaders
+                        showNames={this.props.showNames}
+                        columns={mandatoryCourseColumns}
+                        data={mandatoryCourseData}
+                      />
+                    )}
                   </React.Fragment>
                 )}
               </div>
