@@ -100,6 +100,7 @@ const PopulationStatistics = memo(props => {
           <PopulationDetails
             translate={translate}
             selectedStudents={getStudentNumbers(filteredStudents)}
+            filteredStudents={filteredStudents}
             allStudents={students}
             queryIsSet={queryIsSet}
             selectedStudentsByYear={selectedStudentsByYear}

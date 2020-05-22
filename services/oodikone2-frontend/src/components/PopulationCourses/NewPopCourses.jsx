@@ -22,7 +22,8 @@ const PopulationCourses = ({
   getPopulationSelectedStudentCourses: gpc,
   query,
   accordionView,
-  allStudents
+  allStudents,
+  filteredStudents
 }) => {
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -31,12 +32,10 @@ const PopulationCourses = ({
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = selectedPopulationCourses
   const reloadCourses = () => {
-    // FIXME: lol does this work with an empty object? xD
-    // - no.
     const selectedStudentsByYear = {}
 
-    if (allStudents && allStudents.length > 0) {
-      allStudents.forEach(student => {
+    if (filteredStudents && filteredStudents.length > 0) {
+      filteredStudents.forEach(student => {
         if (!selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()]) {
           selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()] = []
         }
@@ -56,11 +55,17 @@ const PopulationCourses = ({
     })
   }
 
+  /*
   useEffect(() => {
     if (refreshNeeded) {
       reloadCourses()
     }
   }, [refreshNeeded])
+  */
+
+  useEffect(() => {
+    reloadCourses()
+  }, [filteredStudents])
 
   if (accordionView)
     return (
@@ -115,7 +120,8 @@ PopulationCourses.propTypes = {
   dispatchRefreshFilters: func.isRequired,
   query: shape({}).isRequired,
   accordionView: bool.isRequired,
-  allStudents: arrayOf(shape({})).isRequired
+  allStudents: arrayOf(shape({})).isRequired,
+  filteredStudents: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize, populationFilters }) => ({
