@@ -537,11 +537,12 @@ const getMainCodeToDuplicates = async () => {
       ],
       ['asc', 'desc', 'desc']
     )[0]
-    acc[main.code] = {
+    const promisedAcc = await acc
+    promisedAcc[main.code] = {
       maincourse: { code: main.code, name: main.name },
       duplicates: courses.map(c => ({ code: c.code, name: c.name }))
     }
-    return acc
+    return promisedAcc
   }, {})
   return maincodeToDuplicates
 }
