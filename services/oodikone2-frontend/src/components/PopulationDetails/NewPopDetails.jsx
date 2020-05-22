@@ -81,7 +81,8 @@ class PopulationDetails extends Component {
     isLoading: bool.isRequired,
     query: shape({}).isRequired,
     allStudents: arrayOf(object).isRequired,
-    mandatoryToggle: bool.isRequired
+    mandatoryToggle: bool.isRequired,
+    filteredStudents: arrayOf(object).isRequired
   }
 
   constructor() {
@@ -152,7 +153,7 @@ class PopulationDetails extends Component {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
 
-    const { query, selectedStudents, allStudents } = this.props
+    const { query, selectedStudents, allStudents, filteredStudents } = this.props
     const { Students, CreditStatistics, CoursesOf, CreditAccumulationGraph } = infoTooltips.PopulationStatistics
 
     const panels = [
@@ -253,6 +254,7 @@ class PopulationDetails extends Component {
                 accordionView
                 allStudents={allStudents}
                 selectedStudents={selectedStudents}
+                filteredStudents={filteredStudents}
                 samples={samples}
                 query={query}
               />
