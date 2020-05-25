@@ -20,7 +20,7 @@ const defaultConfig = (pointer = true) => {
   return {
     chart: {
       type: 'area',
-      inverted: true,
+      inverted: true
     },
     credits: {
       text: 'oodikone | TOSKA'
@@ -531,23 +531,23 @@ const ProtoC = ({ programme }) => {
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
-    sendAnalytics('Toggled old attainments', 'ProtoC')
+    sendAnalytics('C Toggled old attainments', 'ProtoC')
   }, [])
 
   const handleExcludeNonEnrolledToggled = useCallback(() => {
     setExcludeNonEnrolled(previous => !previous)
-    sendAnalytics('Toggled non enrolled', 'ProtoC')
+    sendAnalytics('C Toggled non enrolled', 'ProtoC')
   }, [])
 
   const handleOrgClicked = useCallback(org => {
     setDrilldownOrg(org)
     setDrilldownProgramme(null)
-    sendAnalytics('Org drilldown clicked', 'ProtoC')
+    sendAnalytics('C Org drilldown clicked', 'ProtoC')
   }, [])
 
   const handleProgrammeClicked = useCallback(programme => {
     setDrilldownProgramme(programme)
-    sendAnalytics('Programme drilldown clicked', 'ProtoC')
+    sendAnalytics('C Programme drilldown clicked', 'ProtoC')
   }, [])
 
   const sortedOrgs = useMemo(() => {
@@ -557,7 +557,7 @@ const ProtoC = ({ programme }) => {
   const handleClick = sorterName => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
-    sendAnalytics('Sorter clicked', 'ProtoC')
+    sendAnalytics('C Sorter clicked', 'ProtoC')
   }
 
   const { CoolDataScience } = InfoToolTips
@@ -566,9 +566,8 @@ const ProtoC = ({ programme }) => {
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)
     .sort((a, b) => {
-      console.log(a,b)
-      if (b === 'nimi' ) return 1
-      if(a === 'nimi') return -1
+      if (b === 'nimi') return 1
+      if (a === 'nimi') return -1
       return a > b ? 1 : -1
     })
 

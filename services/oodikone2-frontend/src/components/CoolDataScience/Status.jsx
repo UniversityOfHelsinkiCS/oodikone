@@ -171,25 +171,25 @@ const Status = () => {
   const handleShowYearlyValuesToggled = () => {
     const yearlyValues = showYearlyValues
     setShowYearlyValues(!showYearlyValues)
-    sendAnalytics(`Show yearly values toggle ${!yearlyValues ? 'on' : 'off'}`, 'Status')
+    sendAnalytics(`S Show yearly values toggle ${!yearlyValues ? 'on' : 'off'}`, 'Status')
   }
 
   const handleShowByYearToggled = () => {
     const byYear = showByYear
     setShowByYear(!showByYear)
-    sendAnalytics(`Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
+    sendAnalytics(`S Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
   }
 
   const pushToDrillStack = values => {
     const updatedDrillStack = [...drillStack].concat(values)
     setDrillStack(updatedDrillStack)
-    sendAnalytics('Drilldown clicked', 'Status')
+    sendAnalytics('S Drilldown clicked', 'Status')
   }
 
   const popFromDrillStack = () => {
     const updatedDrillStack = _.dropRight([...drillStack], 1)
     setDrillStack(updatedDrillStack)
-    sendAnalytics('Drillup clicked', 'Status')
+    sendAnalytics('S Drillup clicked', 'Status')
   }
 
   const renderSettings = () => {
