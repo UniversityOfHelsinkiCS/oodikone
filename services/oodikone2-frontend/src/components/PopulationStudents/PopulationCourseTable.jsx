@@ -103,6 +103,7 @@ const PopulationCourseTable = ({
               .filter(c => !c.child && !(c.title == null))
               .map(c => (
                 <Table.HeaderCell
+                  className="rotatedTableHeader"
                   key={c.key}
                   content={c.title}
                   onClick={
@@ -160,7 +161,7 @@ const PopulationCourseTable = ({
                 )
               })}
             {Object.values(collapsed).map(e => (
-              <Table.Cell key={e.key} warning />
+              <Table.Cell className="tableCell" key={e.key} warning />
             ))}
           </Table.Row>
         ))}

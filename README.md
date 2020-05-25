@@ -38,6 +38,9 @@ Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visua
 
 The acual oodikone starts to http://localhost:8081/
 
+On a fresh install, some features do not work because redis is empty.  
+To populate redis, navigate to http://localhost:8081/updater, and press the 'refresh statistics' -button.
+
 ## What the CLI does
 
 - Builds and runs the Dockerized development environment
