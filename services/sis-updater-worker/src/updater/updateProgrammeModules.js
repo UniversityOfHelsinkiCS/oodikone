@@ -157,7 +157,7 @@ const recursiveWrite = async (module, parentId, order = 0) => {
 
   if (!module.children) return
   for (const child of module.children) {
-    await recursiveWrite(child, module.id)
+    await recursiveWrite(child, module.id, order++)
   }
 }
 
@@ -178,6 +178,9 @@ const updateProgrammeModules = async (entityIds = []) => {
     programmes[module.group_id] = topModule
     const submodule = await resolver(module.rule)
     for (const submod of submodule) {
+      if (module.code === 'KH50_005') {
+        console.log('gsubmodule', submod)
+      }
       let order = 1
       await recursiveWrite(submod, module.group_id, order++)
     }
