@@ -133,17 +133,16 @@ async function resolver(rule, n) {
 let programmes = {}
 let joins = {}
 
-const recursiveWrite = async (module, parentId, order = 0) => {
+const recursiveWrite = async (module, parentId) => {
   if (Array.isArray(module)) {
-    module.forEach(m => recursiveWrite(m, parentId, order++))
+    module.forEach(m => recursiveWrite(m, parentId))
   }
   if (!module.id || !module.type) return
   const newModule = {
     id: module.id,
     code: module.code,
     name: module.name,
-    type: module.type,
-    order: order
+    type: module.type
   }
 
   let join = {
@@ -157,7 +156,8 @@ const recursiveWrite = async (module, parentId, order = 0) => {
 
   if (!module.children) return
   for (const child of module.children) {
-    await recursiveWrite(child, module.id, order++)
+    let childOrder = 0
+    await recursiveWrite(child, module.id, childOrder++)
   }
 }
 
@@ -172,18 +172,18 @@ const updateProgrammeModules = async (entityIds = []) => {
       id: module.group_id,
       code: module.code,
       name: module.name,
-      type: 'module',
-      order: 0
+      type: 'module'
     }
     programmes[module.group_id] = topModule
     const submodule = await resolver(module.rule)
     for (const submod of submodule) {
-      if (module.code === 'KH50_005') {
-        console.log('gsubmodule', submod)
-      }
-      let order = 1
-      await recursiveWrite(submod, module.group_id, order++)
+      recursiveWrite(submod, module.group_id)
     }
+  }
+
+  let order = 0
+  for (let key in programmes) {
+    programmes[key].order = order++
   }
 
   await bulkCreate(ProgrammeModule, Object.values(programmes))
