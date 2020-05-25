@@ -133,16 +133,17 @@ async function resolver(rule, n) {
 let programmes = {}
 let joins = {}
 
-const recursiveWrite = async (module, parentId) => {
+const recursiveWrite = async (module, parentId, order = 0) => {
   if (Array.isArray(module)) {
-    module.forEach(m => recursiveWrite(m, parentId))
+    module.forEach(m => recursiveWrite(m, parentId, order++))
   }
   if (!module.id || !module.type) return
   const newModule = {
     id: module.id,
     code: module.code,
     name: module.name,
-    type: module.type
+    type: module.type,
+    order: order
   }
 
   let join = {
@@ -171,12 +172,14 @@ const updateProgrammeModules = async (entityIds = []) => {
       id: module.group_id,
       code: module.code,
       name: module.name,
-      type: 'module'
+      type: 'module',
+      order: 0
     }
     programmes[module.group_id] = topModule
     const submodule = await resolver(module.rule)
     for (const submod of submodule) {
-      await recursiveWrite(submod, module.group_id)
+      let order = 1
+      await recursiveWrite(submod, module.group_id, order++)
     }
   }
 
