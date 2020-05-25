@@ -13,7 +13,7 @@
     "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
     "lint:css": "stylelint 'src/**/*.css'",
     "lint:js": "eslint --ext .jsx,.js ./",
-    "lintfix": "eslint --ext .jsx,.js --fix ./ && stylelint 'src/**/*.css'",
+    "lintfix": "eslint --ext .jsx,.js --fix ./ && stylelint --fix 'src/**/*.css'",
     "sentry-cli": "sentry-cli",
     "stats": "webpack --json --mode=production --profile --progress > stats.json",
     "test": "npm run lint",

@@ -29,12 +29,16 @@
 .sis-destruction-siren {
   width: 75px;
   height: 75px;
-  animation: .5s infinite running sis-siren;
+  animation: 0.5s infinite running sis-siren;
 }
 
 @keyframes sis-siren {
-  from { transform: rotateZ(0); }
-  to { transform: rotateZ(360deg); }
+  from {
+    transform: rotateZ(0);
+  }
+  to {
+    transform: rotateZ(360deg);
+  }
 }
 
 .sis-danger-zone-button {
@@ -60,13 +64,17 @@
   height: 100%;
   left: 0;
   top: 0;
-  border-radius: .28571429rem;
-  box-shadow: 0px 0px 25px 5px rgba(224,114,40,0.75);
+  border-radius: 0.28571429rem;
+  box-shadow: 0 0 25px 5px rgba(224, 114, 40, 0.75);
   opacity: 1;
   animation: 2s ease-in-out infinite running sis-danger-zone-opacity;
 }
 
 @keyframes sis-danger-zone-opacity {
-  from { opacity: 1; }
-  to { opacity: 0.2 }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.2;
+  }
 }
