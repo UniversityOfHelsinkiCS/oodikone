@@ -7,7 +7,7 @@ import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 
-const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents }) => {
+const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [open, setOpen] = useState(false)
 
   const [activeFilters, setActiveFilters] = useState({})
@@ -33,21 +33,18 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents }) => {
 
   return (
     <>
-      <div id="filter-tray-toggle">
-        <Button secondary onClick={() => setOpen(true)}>
-          Filters
-        </Button>
-      </div>
       <div id="filter-tray">
-        <Sidebar.Pushable as={Segment.Group} raised className="filter-tray-content">
+        <Sidebar.Pushable as="div" raised className="filter-tray-content">
           <Sidebar
             as="div"
-            animation="overlay"
+            animation="uncover"
             icon="labeled"
             onHide={() => setOpen(false)}
             direction="left"
             visible={open}
             width="thin"
+            inverted
+            vertical
           >
             <Card.Group>
               <Header size="large">
@@ -64,6 +61,14 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents }) => {
               </Button>
             </div>
           </Sidebar>
+          <Sidebar.Pusher>
+            <div id="filter-tray-toggle">
+              <Button secondary onClick={() => setOpen(true)}>
+                Filters
+              </Button>
+            </div>
+            {children}
+          </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>
     </>

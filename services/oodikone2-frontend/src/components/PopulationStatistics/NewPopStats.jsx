@@ -77,41 +77,38 @@ const PopulationStatistics = memo(props => {
   }
 
   return (
-    <div className="segmentContainer">
-      <FilterTray
-        setFilteredStudents={setFilteredStudents}
-        filteredStudents={filteredStudents}
-        allStudents={students}
-      />
-      <Header className="segmentTitle" size="large">
-        {translate('populationStatistics.header')}
-      </Header>
-      <Message color="teal" style={{ maxWidth: '50%' }}>
-        <Message.Header>Work In Progress</Message.Header>
-        <p>
-          This page is a new version of Population Statistics. Feel free to use it but be aware that many things are
-          likely to break or be broken. For anything mission critical, you should probably use{' '}
-          <Link to="/populations">the old version</Link>.
-        </p>
-      </Message>
-      <Segment className="contentSegment">
-        {renderPopulationSearch()}
-        {students ? (
-          <PopulationDetails
-            translate={translate}
-            selectedStudents={getStudentNumbers(filteredStudents)}
-            filteredStudents={filteredStudents}
-            allStudents={students}
-            queryIsSet={queryIsSet}
-            selectedStudentsByYear={selectedStudentsByYear}
-            query={query}
-            samples={samples}
-            isLoading={isLoading}
-            mandatoryToggle={mandatoryToggle}
-          />
-        ) : null}
-      </Segment>
-    </div>
+    <FilterTray setFilteredStudents={setFilteredStudents} filteredStudents={filteredStudents} allStudents={students}>
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">
+          {translate('populationStatistics.header')}
+        </Header>
+        <Message color="teal" style={{ maxWidth: '50%' }}>
+          <Message.Header>Work In Progress</Message.Header>
+          <p>
+            This page is a new version of Population Statistics. Feel free to use it but be aware that many things are
+            likely to break or be broken. For anything mission critical, you should probably use{' '}
+            <Link to="/populations">the old version</Link>.
+          </p>
+        </Message>
+        <Segment className="contentSegment">
+          {renderPopulationSearch()}
+          {students ? (
+            <PopulationDetails
+              translate={translate}
+              selectedStudents={getStudentNumbers(filteredStudents)}
+              filteredStudents={filteredStudents}
+              allStudents={students}
+              queryIsSet={queryIsSet}
+              selectedStudentsByYear={selectedStudentsByYear}
+              query={query}
+              samples={samples}
+              isLoading={isLoading}
+              mandatoryToggle={mandatoryToggle}
+            />
+          ) : null}
+        </Segment>
+      </div>
+    </FilterTray>
   )
 })
 

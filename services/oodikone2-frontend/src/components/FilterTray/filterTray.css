@@ -1,5 +1,6 @@
 /** #filter-tray is used repeatedly as a selector to achieve higher specificity
     without using !important everywhere. */
+/*
 #filter-tray {
   display: flex;
   align-items: center;
@@ -48,3 +49,4 @@
 #filter-tray .header {
   color: white;
 }
+*/
