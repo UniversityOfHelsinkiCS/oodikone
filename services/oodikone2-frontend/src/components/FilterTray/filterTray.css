@@ -11,6 +11,7 @@
   left: 0;
   z-index: 9002;
 }
+*/
 
 #filter-tray-toggle {
   transform: rotate(-90deg);
@@ -21,6 +22,7 @@
   transform-origin: top left;
 }
 
+/*
 #filter-tray .filter-tray-content {
   display: contents;
 }
@@ -50,3 +52,15 @@
   color: white;
 }
 */
+
+#filter-tray {
+  margin-top: -15px;
+}
+
+#filter-tray .segmentContainer {
+  margin-left: 35px;
+}
+
+#filter-tray .pushed {
+  margin-right: 350px;
+}
