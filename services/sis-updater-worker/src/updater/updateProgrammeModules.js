@@ -156,7 +156,8 @@ const recursiveWrite = async (module, parentId) => {
 
   if (!module.children) return
   for (const child of module.children) {
-    await recursiveWrite(child, module.id)
+    let childOrder = 0
+    await recursiveWrite(child, module.id, childOrder++)
   }
 }
 
@@ -176,8 +177,13 @@ const updateProgrammeModules = async (entityIds = []) => {
     programmes[module.group_id] = topModule
     const submodule = await resolver(module.rule)
     for (const submod of submodule) {
-      await recursiveWrite(submod, module.group_id)
+      recursiveWrite(submod, module.group_id)
     }
+  }
+
+  let order = 0
+  for (let key in programmes) {
+    programmes[key].order = order++
   }
 
   await bulkCreate(ProgrammeModule, Object.values(programmes))

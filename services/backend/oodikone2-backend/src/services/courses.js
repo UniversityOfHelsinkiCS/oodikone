@@ -13,7 +13,7 @@ const {
   Semester,
   Organisation
 } = require('../models')
-const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
+const { sequelizeKone, CourseDuplicates, MandatoryCourse } = require('../models/models_kone')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../services/course_yearly_stats_counter')
 const _ = require('lodash')
@@ -503,15 +503,32 @@ const getIdToDuplicatesMapWithCourse = () => {
   )
 }
 
+const getMandatoryCourse = courses => {
+  return MandatoryCourse.findOne({
+    attributes: ['course_code'],
+    where: {
+      course_code: {
+        [Op.in]: courses
+      }
+    },
+    raw: true
+  })
+}
+
 const getMainCodeToDuplicates = async () => {
   const all = await getIdToDuplicatesMapWithCourse()
-  const maincodeToDuplicates = Object.values(all).reduce((acc, courses) => {
+  const maincodeToDuplicates = Object.values(all).reduce(async (acc, courses) => {
+    const mandatoryCourse = await getMandatoryCourse(courses.map(course => course.code))
     const main = _.orderBy(
       courses,
       [
         c => {
           if (c.code.match(/^A/)) return 4 // open university codes come last
           if (c.code.match(/^\d/)) return 2 // old numeric codes come second
+          if (mandatoryCourse) {
+            if (mandatoryCourse.course_code === c.code) return 1 // check if course is mandatory course and put it as first
+            return 2 // return as second otherwise
+          }
           if (c.code.match(/^[A-Za-z]/)) return 1 // new letter based codes come first
           return 3 // unknown, comes before open uni?
         },
@@ -520,11 +537,12 @@ const getMainCodeToDuplicates = async () => {
       ],
       ['asc', 'desc', 'desc']
     )[0]
-    acc[main.code] = {
+    const promisedAcc = await acc
+    promisedAcc[main.code] = {
       maincourse: { code: main.code, name: main.name },
       duplicates: courses.map(c => ({ code: c.code, name: c.name }))
     }
-    return acc
+    return promisedAcc
   }, {})
   return maincodeToDuplicates
 }
