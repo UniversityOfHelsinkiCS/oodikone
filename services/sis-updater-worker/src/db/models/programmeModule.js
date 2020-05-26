@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, JSONB } = require('sequelize')
+const { Model, STRING, DATE, INTEGER, JSONB } = require('sequelize')
 const { dbConnections } = require('../connection')
 
 class ProgrammeModule extends Model {}
@@ -17,6 +17,9 @@ ProgrammeModule.init(
     },
     type: {
       type: STRING
+    },
+    order: {
+      type: INTEGER
     },
     createdAt: {
       type: DATE
