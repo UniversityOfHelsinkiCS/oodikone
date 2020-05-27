@@ -68,3 +68,10 @@
 #filter-tray .header {
   color: white;
 }
+
+#filter-close-button {
+  width: 20vw;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}

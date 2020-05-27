@@ -45,13 +45,6 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
               <Gender filterControl={filterControl} />
               <StartYearAtUni filterControl={filterControl} />
             </Card.Group>
-            {/*
-            <div>
-              <Button secondary onClick={() => setOpen(false)}>
-                Close Filters
-              </Button>
-            </div>
-            */}
           </Sidebar>
           <Sidebar.Pusher className={open ? 'pushed' : null}>
             {!open ? (
@@ -65,6 +58,11 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>
+      {open ? (
+        <Button secondary onClick={() => setOpen(false)} id="filter-close-button">
+          Close Filters
+        </Button>
+      ) : null}
     </>
   )
 }
