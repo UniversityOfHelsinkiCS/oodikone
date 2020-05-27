@@ -1,17 +1,5 @@
 /** #filter-tray is used repeatedly as a selector to achieve higher specificity
     without using !important everywhere. */
-/*
-#filter-tray {
-  display: flex;
-  align-items: center;
-  flex-direction: row-reverse;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 9002;
-}
-*/
 
 #filter-tray-toggle {
   transform: rotate(-90deg);
@@ -21,37 +9,6 @@
   top: 50%;
   transform-origin: top left;
 }
-
-/*
-#filter-tray .filter-tray-content {
-  display: contents;
-}
-
-#filter-tray .sidebar {
-  width: auto;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-}
-
-#filter-tray .cards {
-  background-color: #1b1c1d;
-  height: 100vh;
-  align-content: flex-start;
-  justify-content: center;
-  padding-top: 1.5rem;
-}
-
-#filter-tray .card {
-  background-color: rgba(255, 255, 255, 0.08);
-  border: none;
-  box-shadow: none;
-}
-
-#filter-tray .header {
-  color: white;
-}
-*/
 
 #filter-tray {
   margin-top: -15px;
@@ -64,10 +21,11 @@
 
 #filter-tray .pusher {
   margin-left: -19vw;
+  width: 100vw;
 }
 
 #filter-tray .pushed {
-  margin-right: 20vw;
+  margin-right: 17vw;
 }
 
 #filter-tray .segmentContainer {
@@ -81,4 +39,32 @@
   /* I don't know what's up with semantic, let's just hack the width... */
   min-width: 20vw;
   max-width: 20vw;
+  height: 100vh !important;
+  overflow: hidden;
+  background-color: #1a1c1c;
+  padding-top: 2rem;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+#filter-tray .cards {
+  background-color: #1b1c1d;
+  height: 100vh;
+  align-content: flex-start;
+  justify-content: center;
+  padding-top: 1.5rem;
+  margin: 0;
+  width: 100%;
+}
+
+#filter-tray .card {
+  background-color: rgba(255, 255, 255, 0.08);
+  border: none;
+  box-shadow: none;
+}
+
+#filter-tray .header {
+  color: white;
 }

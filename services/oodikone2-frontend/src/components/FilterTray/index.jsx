@@ -54,11 +54,13 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
             */}
           </Sidebar>
           <Sidebar.Pusher className={open ? 'pushed' : null}>
-            <div id="filter-tray-toggle">
-              <Button secondary onClick={() => setOpen(true)}>
-                Filters
-              </Button>
-            </div>
+            {!open ? (
+              <div id="filter-tray-toggle">
+                <Button secondary onClick={() => setOpen(true)}>
+                  Filters
+                </Button>
+              </div>
+            ) : null}
             {children}
           </Sidebar.Pusher>
         </Sidebar.Pushable>
