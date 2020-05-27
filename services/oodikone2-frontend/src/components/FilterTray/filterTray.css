@@ -57,10 +57,28 @@
   margin-top: -15px;
 }
 
-#filter-tray .segmentContainer {
-  margin-left: 35px;
+#filter-tray .pushable {
+  display: flex;
+  overflow: visible;
+}
+
+#filter-tray .pusher {
+  margin-left: -19vw;
 }
 
 #filter-tray .pushed {
-  margin-right: 350px;
+  margin-right: 20vw;
+}
+
+#filter-tray .segmentContainer {
+  margin-left: 35px;
+  width: auto;
+}
+
+#filter-tray .sidebar {
+  position: sticky;
+  top: 0;
+  /* I don't know what's up with semantic, let's just hack the width... */
+  min-width: 20vw;
+  max-width: 20vw;
 }

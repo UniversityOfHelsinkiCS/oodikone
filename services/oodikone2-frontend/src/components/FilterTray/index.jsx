@@ -34,16 +34,8 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
   return (
     <>
       <div id="filter-tray">
-        <Sidebar.Pushable as="div" raised className="filter-tray-content">
-          <Sidebar
-            as="div"
-            animation="uncover"
-            onHide={() => setOpen(false)}
-            direction="left"
-            visible={open}
-            width="wide"
-            vertical
-          >
+        <Sidebar.Pushable as="div">
+          <Sidebar as="div" animation="uncover" onHide={() => setOpen(false)} direction="left" visible={open}>
             <Card.Group>
               <Header size="large">
                 <Icon name="filter" />
@@ -53,11 +45,13 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
               <Gender filterControl={filterControl} />
               <StartYearAtUni filterControl={filterControl} />
             </Card.Group>
+            {/*
             <div>
               <Button secondary onClick={() => setOpen(false)}>
                 Close Filters
               </Button>
             </div>
+            */}
           </Sidebar>
           <Sidebar.Pusher className={open ? 'pushed' : null}>
             <div id="filter-tray-toggle">
