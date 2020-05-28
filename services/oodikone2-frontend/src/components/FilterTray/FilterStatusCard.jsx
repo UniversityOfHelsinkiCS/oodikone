@@ -1,7 +1,8 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Card } from 'semantic-ui-react'
 
-export default ({ noFilters }) => (
+const FilterStatusCard = ({ noFilters }) => (
   <Card id="filter-status">
     <Card.Content>
       {noFilters > 0 ? (
@@ -14,3 +15,9 @@ export default ({ noFilters }) => (
     </Card.Content>
   </Card>
 )
+
+FilterStatusCard.propTypes = {
+  noFilters: PropTypes.number.isRequired
+}
+
+export default FilterStatusCard
