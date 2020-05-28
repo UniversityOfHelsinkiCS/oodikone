@@ -1,9 +1,5 @@
 /* stylelint-disable */
 
-.header {
-  z-index: 9003;
-}
-
 .navBar {
   display: grid !important;
   grid-auto-flow: column !important;
