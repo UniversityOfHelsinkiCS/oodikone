@@ -13,6 +13,21 @@
 #filter-tray-toggle .button {
   width: 100vh;
   border-radius: 0;
+  font-size: 1.2rem;
+  letter-spacing: 0.05rem;
+  text-transform: capitalize;
+  display: flex;
+  justify-content: space-between;
+}
+
+#filter-tray-toggle .button .no-filters {
+  font-size: 1rem;
+  font-weight: normal;
+  font-style: italic;
+  margin-left: 0.4rem;
+  letter-spacing: normal;
+  text-transform: none;
+  vertical-align: top;
 }
 
 #filter-tray {

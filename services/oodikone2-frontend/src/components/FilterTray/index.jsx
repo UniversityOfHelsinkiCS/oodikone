@@ -31,6 +31,8 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
 
   const filterControl = { addFilter, removeFilter, withoutFilter, allStudents, filteredStudents }
 
+  const noFilters = Object.keys(activeFilters).length
+
   return (
     <>
       <div id="filter-tray">
@@ -51,12 +53,18 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
       </div>
       {open ? (
         <Button secondary onClick={() => setOpen(false)} id="filter-close-button">
+          <Icon name="angle double left" />
           Close Filters
         </Button>
       ) : (
         <div id="filter-tray-toggle">
           <Button secondary onClick={() => setOpen(true)}>
-            Filters
+            <Icon name="angle double down" />
+            <div>
+              Filters
+              {noFilters > 0 ? <span className="no-filters">{` (${noFilters} active)`}</span> : null}
+            </div>
+            <Icon name="angle double down" />
           </Button>
         </div>
       )}
