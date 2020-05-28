@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Form, Dropdown } from 'semantic-ui-react'
+import { Card, Form, Radio } from 'semantic-ui-react'
 import ClearFilterButton from '../ClearFilterButton'
 
 const Gender = ({ filterControl }) => {
@@ -22,10 +22,12 @@ const Gender = ({ filterControl }) => {
     countsByGender[gc] = countsByGender[gc] ? countsByGender[gc] + 1 : 1
   })
 
+  // Using this prevents showing undefined.
+  const formatCount = count => (count ? `(${count})` : '')
+
   const options = [
-    { key: 'no-filter', text: 'No Filter', value: null },
-    { key: 'female', text: `Female (${countsByGender[2]})`, value: 2 },
-    { key: 'male', text: `Male (${countsByGender[1]})`, value: 1 }
+    { key: 'female', text: `Female ${formatCount(countsByGender[2])}`, value: 2 },
+    { key: 'male', text: `Male ${formatCount(countsByGender[1])}`, value: 1 }
   ]
 
   return (
@@ -34,20 +36,21 @@ const Gender = ({ filterControl }) => {
         <Card.Header>Gender</Card.Header>
         <Card.Description>
           <Form>
-            <Dropdown
-              selection
-              fluid
-              options={options}
-              button
-              className="mini"
-              placeholder="No Filter"
-              onChange={(_, { value: inputValue }) => setValue(inputValue)}
-            />
+            {options.map(opt => (
+              <Form.Field key={opt.key}>
+                <Radio
+                  label={opt.text}
+                  value={opt.value}
+                  checked={value === opt.value}
+                  onChange={(_, { value: inputValue }) => setValue(inputValue)}
+                />
+              </Form.Field>
+            ))}
           </Form>
         </Card.Description>
       </Card.Content>
       <Card.Content extra>
-        <ClearFilterButton disabled={!value} onClick={null} />
+        <ClearFilterButton disabled={!value} onClick={() => setValue(null)} />
       </Card.Content>
     </Card>
   )
