@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Form, Dropdown } from 'semantic-ui-react'
+import { Card, Form, Dropdown, Button, Icon } from 'semantic-ui-react'
+import ClearFilterButton from '../ClearFilterButton'
 
 const StartYearAtUni = ({ filterControl }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
 
   const [value, setValue] = useState([])
   const name = 'startYearAtUni'
+  const isActive = () => value.length > 0
 
   useEffect(() => {
-    if (value.length === 0) {
+    if (!isActive()) {
       removeFilter(name)
     } else {
       addFilter(name, student => value.some(year => year === new Date(student.started).getFullYear()))
@@ -43,9 +45,13 @@ const StartYearAtUni = ({ filterControl }) => {
               className="mini"
               placeholder="No Filter"
               onChange={(_, { value: inputValue }) => setValue(inputValue)}
+              value={value}
             />
           </Form>
         </Card.Description>
+      </Card.Content>
+      <Card.Content extra>
+        <ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} />
       </Card.Content>
     </Card>
   )

@@ -9,7 +9,7 @@ import StartYearAtUni from './filters/StartYearAtUni'
 import FilterStatusCard from './FilterStatusCard'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
 
   const [activeFilters, setActiveFilters] = useState({})
 
