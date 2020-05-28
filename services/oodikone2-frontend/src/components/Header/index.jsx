@@ -9,7 +9,7 @@ import NavigationBar from '../NavigationBar'
 import './header.css'
 
 const Header = props => (
-  <header className="header" role="banner">
+  <header className="header" role="banner" id="main-menu">
     <NavigationBar translate={props.translate} location={props.location} />
   </header>
 )
