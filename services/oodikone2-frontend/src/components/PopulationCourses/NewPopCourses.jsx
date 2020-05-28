@@ -15,14 +15,13 @@ import { refreshFilters } from '../../redux/populationFilters'
 const PopulationCourses = ({
   populationSelectedStudentCourses,
   populationCourses,
-  refreshNeeded,
   dispatchRefreshFilters,
   selectedStudents,
   translate,
   getPopulationSelectedStudentCourses: gpc,
   query,
   accordionView,
-  allStudents
+  filteredStudents
 }) => {
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -31,12 +30,10 @@ const PopulationCourses = ({
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = selectedPopulationCourses
   const reloadCourses = () => {
-    // FIXME: lol does this work with an empty object? xD
-    // - no.
     const selectedStudentsByYear = {}
 
-    if (allStudents && allStudents.length > 0) {
-      allStudents.forEach(student => {
+    if (filteredStudents && filteredStudents.length > 0) {
+      filteredStudents.forEach(student => {
         if (!selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()]) {
           selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()] = []
         }
@@ -57,10 +54,8 @@ const PopulationCourses = ({
   }
 
   useEffect(() => {
-    if (refreshNeeded) {
-      reloadCourses()
-    }
-  }, [refreshNeeded])
+    reloadCourses()
+  }, [filteredStudents])
 
   if (accordionView)
     return (
@@ -108,14 +103,13 @@ PopulationCourses.defaultPropTypes = {
 PopulationCourses.propTypes = {
   populationSelectedStudentCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
   populationCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
-  refreshNeeded: bool.isRequired,
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   getPopulationSelectedStudentCourses: func.isRequired,
   dispatchRefreshFilters: func.isRequired,
   query: shape({}).isRequired,
   accordionView: bool.isRequired,
-  allStudents: arrayOf(shape({})).isRequired
+  filteredStudents: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize, populationFilters }) => ({
