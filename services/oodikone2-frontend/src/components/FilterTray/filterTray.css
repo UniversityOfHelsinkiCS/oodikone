@@ -91,6 +91,7 @@
 
 #filter-tray .card .extra {
   margin: 0 0 0 auto;
+  padding-top: 0.2rem;
 }
 
 #filter-close-button {
@@ -99,7 +100,7 @@
   bottom: 0;
   left: 0;
   background: rgba(0, 0, 0, 0.3);
-  padding-left: 12px;
+  padding: 1rem 1.5rem 1rem 12px;
 }
 
 #filter-tray #filter-status {
@@ -117,4 +118,13 @@
 
 #filter-status .filters-are-active {
   color: #fff;
+}
+
+#filter-tray .checkbox {
+  margin-left: 0.8rem;
+}
+
+#filter-tray label {
+  color: #fff;
+  font-size: 0.9rem;
 }
