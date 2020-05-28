@@ -6,6 +6,7 @@ import './filterTray.css'
 import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
+import FilterStatusCard from './FilterStatusCard'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [open, setOpen] = useState(false)
@@ -43,6 +44,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
                 <Icon name="filter" />
                 <Header.Content>Filters</Header.Content>
               </Header>
+              <FilterStatusCard noFilters={noFilters} />
               <TotalCredits filterControl={filterControl} />
               <Gender filterControl={filterControl} />
               <StartYearAtUni filterControl={filterControl} />
