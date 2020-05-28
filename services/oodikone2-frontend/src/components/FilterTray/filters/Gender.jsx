@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Form, Dropdown } from 'semantic-ui-react'
+import ClearFilterButton from '../ClearFilterButton'
 
 const Gender = ({ filterControl }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
@@ -44,6 +45,9 @@ const Gender = ({ filterControl }) => {
             />
           </Form>
         </Card.Description>
+      </Card.Content>
+      <Card.Content extra>
+        <ClearFilterButton disabled={!value} onClick={null} />
       </Card.Content>
     </Card>
   )

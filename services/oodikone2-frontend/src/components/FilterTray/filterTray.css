@@ -89,6 +89,10 @@
   color: white;
 }
 
+#filter-tray .card .extra {
+  margin: 0 0 0 auto;
+}
+
 #filter-close-button {
   width: 20vw;
   position: fixed;
@@ -98,7 +102,7 @@
   padding-left: 12px;
 }
 
-#filter-status {
+#filter-tray #filter-status {
   background: none;
   border: 1px solid #2e2e30;
 }
