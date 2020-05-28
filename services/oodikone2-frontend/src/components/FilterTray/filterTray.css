@@ -56,6 +56,7 @@
 #filter-tray .sidebar {
   position: sticky;
   top: 0;
+
   /* I don't know what's up with semantic, let's just hack the width... */
   min-width: 20vw;
   max-width: 20vw;
