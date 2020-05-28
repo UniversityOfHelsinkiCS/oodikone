@@ -6,8 +6,13 @@
   z-index: 9001;
   position: fixed;
   left: 0;
-  top: 50%;
+  top: 100%;
   transform-origin: top left;
+}
+
+#filter-tray-toggle .button {
+  width: 100vh;
+  border-radius: 0;
 }
 
 #filter-tray {
@@ -65,7 +70,7 @@
   box-shadow: none;
 }
 
-#filter-tray .header {
+#filter-tray .cards .header {
   color: white;
 }
 
