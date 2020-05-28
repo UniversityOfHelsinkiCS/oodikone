@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import lodash from 'lodash'
-import { Sidebar, Segment, Button, Card, Header, Icon } from 'semantic-ui-react'
+import { Sidebar, Button, Card, Header, Icon } from 'semantic-ui-react'
 import './filterTray.css'
 import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
@@ -77,7 +77,8 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
 FilterTray.propTypes = {
   setFilteredStudents: PropTypes.func.isRequired,
   allStudents: PropTypes.arrayOf(PropTypes.shape({})),
-  filteredStudents: PropTypes.arrayOf(PropTypes.shape({}))
+  filteredStudents: PropTypes.arrayOf(PropTypes.shape({})),
+  children: PropTypes.element.isRequired
 }
 
 FilterTray.defaultProps = {

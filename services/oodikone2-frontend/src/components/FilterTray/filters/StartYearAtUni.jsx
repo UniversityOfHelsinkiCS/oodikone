@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Form, Dropdown, Button, Icon } from 'semantic-ui-react'
+import { Card, Form, Dropdown } from 'semantic-ui-react'
 import ClearFilterButton from '../ClearFilterButton'
 
 const StartYearAtUni = ({ filterControl }) => {
