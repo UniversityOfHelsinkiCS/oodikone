@@ -7,3 +7,7 @@
 .headerBanner {
   min-height: 100px;
 }
+
+#main-menu {
+  z-index: 9003;
+}
