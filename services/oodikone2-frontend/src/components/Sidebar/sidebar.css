@@ -16,6 +16,9 @@
   align-items: center;
   justify-content: center;
   margin-left: -20vw;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+  z-index: 5;
 }
 
 #oodi-sidebar.sidebar-open .pusher {
@@ -24,6 +27,8 @@
 
 #oodi-sidebar .pushable {
   width: calc(100% - 3.2rem);
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
 }
 
 #oodi-sidebar.sidebar-open .pushable {

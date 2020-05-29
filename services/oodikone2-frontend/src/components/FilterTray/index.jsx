@@ -51,26 +51,23 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
         </Sidebar.Pusher>
         <Sidebar.Pushable>{children}</Sidebar.Pushable>
       </Sidebar>
-      {open ? (
-        <div id="filter-control-panel">
-          <FilterStatusCard noFilters={noFilters} />
-          <Button secondary onClick={() => setOpen(false)} id="filter-close-button">
-            <Icon name="angle double left" />
-            Close Filters
-          </Button>
-        </div>
-      ) : (
-        <div id="filter-tray-toggle">
-          <Button secondary onClick={() => setOpen(true)}>
-            <Icon name="angle double down" />
-            <div>
-              Filters
-              {noFilters > 0 ? <span className="no-filters">{` (${noFilters} active)`}</span> : null}
-            </div>
-            <Icon name="angle double down" />
-          </Button>
-        </div>
-      )}
+      <div id="filter-control-panel" className={open ? 'sidebar-open' : null}>
+        <FilterStatusCard noFilters={noFilters} />
+        <Button secondary onClick={() => setOpen(false)} id="filter-close-button">
+          <Icon name="angle double left" />
+          Close Filters
+        </Button>
+      </div>
+      <div id="filter-tray-toggle">
+        <Button secondary onClick={() => setOpen(true)}>
+          <Icon name="angle double down" />
+          <div>
+            Filters
+            {noFilters > 0 ? <span className="no-filters">{` (${noFilters} active)`}</span> : null}
+          </div>
+          <Icon name="angle double down" />
+        </Button>
+      </div>
     </>
   )
 }
