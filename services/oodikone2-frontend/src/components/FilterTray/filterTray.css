@@ -95,18 +95,26 @@
   padding-top: 0.2rem;
 }
 
-#filter-close-button {
+#filter-tray .checkbox {
+  margin-left: 0.8rem;
+}
+
+#filter-tray label {
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+#filter-control-panel {
   width: 20vw;
   position: fixed;
   bottom: 0;
   left: 0;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1rem 1.5rem 1rem 12px;
+  background-color: #1a1c1c;
 }
 
-#filter-tray #filter-status {
+#filter-status {
   background: none;
-  border: 1px solid #2e2e30;
+  border: none;
 }
 
 #filter-status .description {
@@ -121,11 +129,9 @@
   color: #fff;
 }
 
-#filter-tray .checkbox {
-  margin-left: 0.8rem;
-}
-
-#filter-tray label {
-  color: #fff;
-  font-size: 0.9rem;
+#filter-close-button {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem 1.5rem 1rem 12px;
+  width: 100%;
+  border-radius: 0;
 }
