@@ -72,8 +72,15 @@
   width: 20vw;
   position: fixed;
   bottom: 0;
-  left: 0;
+  left: -20vw;
   background-color: #1a1c1c;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+  z-index: 10;
+}
+
+#filter-control-panel.sidebar-open {
+  left: 0;
 }
 
 #filter-status {
