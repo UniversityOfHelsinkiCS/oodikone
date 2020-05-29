@@ -1,9 +1,8 @@
 /** #filter-tray is used repeatedly as a selector to achieve higher specificity
-    without using !important everywhere. */
+    over semantic-ui without using !important everywhere. */
 
 #filter-tray-toggle {
   transform: rotate(-90deg);
-  z-index: 9001;
   position: fixed;
   left: 0;
   top: 100%;
@@ -31,46 +30,6 @@
 }
 
 #filter-tray {
-  margin-top: -15px;
-}
-
-#filter-tray .pushable {
-  display: flex;
-  overflow: visible;
-}
-
-#filter-tray .pusher {
-  margin-left: -19vw;
-  width: 100vw;
-}
-
-#filter-tray .pushed {
-  margin-right: 17vw;
-}
-
-#filter-tray .segmentContainer {
-  margin-left: 35px;
-  width: auto;
-}
-
-#filter-tray .sidebar {
-  position: sticky;
-  top: 0;
-
-  /* I don't know what's up with semantic, let's just hack the width... */
-  min-width: 20vw;
-  max-width: 20vw;
-  height: 100vh !important;
-  overflow: hidden;
-  background-color: #1a1c1c;
-  padding-top: 2rem;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: center;
-}
-
-#filter-tray .cards {
   background-color: #1b1c1d;
   height: 100vh;
   align-content: flex-start;
@@ -78,6 +37,11 @@
   padding-top: 1.5rem;
   margin: 0;
   width: 100%;
+}
+
+#filter-tray .segmentContainer {
+  margin-left: 35px;
+  width: auto;
 }
 
 #filter-tray .card {
@@ -95,18 +59,33 @@
   padding-top: 0.2rem;
 }
 
-#filter-close-button {
+#filter-tray .checkbox {
+  margin-left: 0.8rem;
+}
+
+#filter-tray label {
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+#filter-control-panel {
   width: 20vw;
   position: fixed;
   bottom: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1rem 1.5rem 1rem 12px;
+  left: -20vw;
+  background-color: #1a1c1c;
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+  z-index: 10;
 }
 
-#filter-tray #filter-status {
+#filter-control-panel.sidebar-open {
+  left: 0;
+}
+
+#filter-status {
   background: none;
-  border: 1px solid #2e2e30;
+  border: none;
 }
 
 #filter-status .description {
@@ -121,11 +100,9 @@
   color: #fff;
 }
 
-#filter-tray .checkbox {
-  margin-left: 0.8rem;
-}
-
-#filter-tray label {
-  color: #fff;
-  font-size: 0.9rem;
+#filter-close-button {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem 1.5rem 1rem 12px;
+  width: 100%;
+  border-radius: 0;
 }
