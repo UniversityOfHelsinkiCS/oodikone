@@ -44,7 +44,6 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
                 <Icon name="filter" />
                 <Header.Content>Filters</Header.Content>
               </Header>
-              <FilterStatusCard noFilters={noFilters} />
               <TotalCredits filterControl={filterControl} />
               <Gender filterControl={filterControl} />
               <StartYearAtUni filterControl={filterControl} />
@@ -54,10 +53,13 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
         </Sidebar.Pushable>
       </div>
       {open ? (
-        <Button secondary onClick={() => setOpen(false)} id="filter-close-button">
-          <Icon name="angle double left" />
-          Close Filters
-        </Button>
+        <div id="filter-control-panel">
+          <FilterStatusCard noFilters={noFilters} />
+          <Button secondary onClick={() => setOpen(false)} id="filter-close-button">
+            <Icon name="angle double left" />
+            Close Filters
+          </Button>
+        </div>
       ) : (
         <div id="filter-tray-toggle">
           <Button secondary onClick={() => setOpen(true)}>
