@@ -58,7 +58,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           Close Filters
         </Button>
       </div>
-      <div id="filter-tray-toggle">
+      <div id="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
         <Button secondary onClick={() => setOpen(true)}>
           <Icon name="angle double down" />
           <div>
