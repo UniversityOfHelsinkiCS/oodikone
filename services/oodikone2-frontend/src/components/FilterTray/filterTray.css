@@ -34,7 +34,7 @@
   height: 100vh;
   align-content: flex-start;
   justify-content: center;
-  padding-top: 1.5rem;
+  padding-top: 2rem;
   margin: 0;
   width: 100%;
 }
@@ -50,7 +50,7 @@
   box-shadow: none;
 }
 
-#filter-tray .cards .header {
+#filter-tray.cards .header {
   color: white;
 }
 
