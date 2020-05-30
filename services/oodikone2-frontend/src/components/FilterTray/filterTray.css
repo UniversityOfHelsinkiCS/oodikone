@@ -54,6 +54,10 @@
   color: white;
 }
 
+#filter-tray.cards > .header {
+  margin-bottom: 1.5rem;
+}
+
 #filter-tray .card .extra {
   margin: 0 0 0 auto;
   padding-top: 0.2rem;
@@ -73,19 +77,40 @@
   position: fixed;
   bottom: 0;
   left: -20vw;
-  background-color: #1a1c1c;
+  background-color: #0e0f0f;
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
   z-index: 10;
+  padding-top: 1rem;
 }
 
 #filter-control-panel.sidebar-open {
   left: 0;
 }
 
+#filter-control-panel button {
+  padding: 1rem 1.5rem 1rem 12px;
+  width: 100%;
+  border-radius: 0;
+}
+
+#filter-control-panel > .checkbox {
+  padding: 1rem;
+}
+
+#filter-control-panel label {
+  color: #fff !important;
+}
+
+#filter-control-panel label:before {
+background-color: #2d2e2f;
+}
+
 #filter-status {
   background: none;
   border: none;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 
 #filter-status .description {
@@ -101,8 +126,5 @@
 }
 
 #filter-close-button {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1rem 1.5rem 1rem 12px;
-  width: 100%;
-  border-radius: 0;
+  background: #1b1c1d;
 }
