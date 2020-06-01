@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Button, Modal, Form, TextArea, Segment, Header } from 'semantic-ui-react'
+import { Button, Modal, Form, TextArea, Segment, Header, Accordion, Popup, Message } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { intersection, difference } from 'lodash'
+import ReactMarkdown from 'react-markdown'
+
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulation } from '../../redux/populations'
@@ -47,6 +49,7 @@ const CustomPopulation = ({
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [name, setName] = useState('')
+  const [activeIndex, setIndex] = useState([])
   const [selectedSearchId, setSelectedSearchId] = useState('')
   const { onProgress, progress } = useProgress(loading)
   useTitle('Custom population')
@@ -119,7 +122,7 @@ const CustomPopulation = ({
   const renderCustomPopulationSearch = () => (
     <Modal
       trigger={
-        <Button size="small" onClick={() => setModal(true)}>
+        <Button size="small" color="blue" onClick={() => setModal(true)}>
           Custom population
         </Button>
       }
@@ -169,6 +172,174 @@ const CustomPopulation = ({
     </Modal>
   )
 
+  const handleClick = index => {
+    const indexes = [...activeIndex].sort()
+    if (indexes.includes(index)) {
+      indexes.splice(indexes.findIndex(ind => ind === index), 1)
+    } else {
+      indexes.push(index)
+    }
+    setIndex(indexes)
+  }
+
+  const panels = [
+    {
+      key: 0,
+      title: {
+        content: (
+          <>
+            {activeIndex.includes(0) ? (
+              <>
+                {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+              </>
+            ) : (
+              <Popup
+                trigger={
+                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                    {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+                  </span>
+                }
+                position="top center"
+                offset="0, 50px"
+                wide="very"
+              >
+                <Popup.Content>
+                  {' '}
+                  <ReactMarkdown
+                    source={infotooltips.PopulationStatistics.CreditAccumulationGraph.AccordionTitle}
+                    escapeHtml={false}
+                  />
+                </Popup.Content>
+              </Popup>
+            )}
+          </>
+        )
+      },
+      onTitleClick: () => handleClick(0),
+      content: {
+        content: (
+          <CreditAccumulationGraphHighCharts
+            students={custompop}
+            selectedStudents={selectedStudents}
+            translate={translate}
+            render={false}
+          />
+        )
+      }
+    },
+    {
+      key: 1,
+      title: {
+        content: (
+          <>
+            {activeIndex.includes(1) ? (
+              <>Programme distribution</>
+            ) : (
+              <Popup
+                trigger={
+                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                    Programme distribution
+                  </span>
+                }
+                position="top center"
+                offset="0, 50px"
+                wide="very"
+              >
+                <Popup.Content>
+                  {' '}
+                  <ReactMarkdown
+                    source={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation}
+                    escapeHtml={false}
+                  />
+                </Popup.Content>
+              </Popup>
+            )}
+          </>
+        )
+      },
+      onTitleClick: () => handleClick(1),
+      content: {
+        content: (
+          <>
+            <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
+            <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
+          </>
+        )
+      }
+    },
+    {
+      key: 2,
+      title: {
+        content: (
+          <>
+            {activeIndex.includes(2) ? (
+              <>Courses of population</>
+            ) : (
+              <Popup
+                trigger={
+                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                    Courses of population
+                  </span>
+                }
+                position="top center"
+                offset="0, 50px"
+                wide="very"
+              >
+                <Popup.Content>
+                  {' '}
+                  <ReactMarkdown
+                    source={infotooltips.PopulationStatistics.CreditDistributionCoursePopulation}
+                    escapeHtml={false}
+                  />
+                </Popup.Content>
+              </Popup>
+            )}
+          </>
+        )
+      },
+      onTitleClick: () => handleClick(2),
+      content: {
+        content: <CustomPopulationCourses selectedStudents={selectedStudents} />
+      }
+    },
+    {
+      key: 3,
+      title: {
+        content: (
+          <>
+            {activeIndex.includes(3) ? (
+              <>Students ({selectedStudents.length})</>
+            ) : (
+              <Popup
+                trigger={
+                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                    Students ({selectedStudents.length})
+                  </span>
+                }
+                position="top center"
+                offset="0, 50px"
+                wide="very"
+              >
+                <Popup.Content>
+                  {' '}
+                  <ReactMarkdown
+                    source={infotooltips.PopulationStatistics.Students.AccordionTitle}
+                    escapeHtml={false}
+                  />
+                </Popup.Content>
+              </Popup>
+            )}
+          </>
+        )
+      },
+      onTitleClick: () => handleClick(3),
+      content: {
+        content: (
+          <PopulationStudents samples={custompop} selectedStudents={selectedStudents} customPopulation accordionView />
+        )
+      }
+    }
+  ]
   const renderCustomPopulation = () => (
     <div>
       {custompop && (
@@ -179,42 +350,26 @@ const CustomPopulation = ({
             : ''}
         </Header>
       )}
-      <Segment>
-        <CustomPopulationFilters samples={custompop} />
-        <Segment>
-          <Header size="medium" dividing>
-            {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
-          </Header>
-          <CreditAccumulationGraphHighCharts
-            students={custompop}
-            selectedStudents={selectedStudents}
-            translate={translate}
-            render={false}
-          />
-        </Segment>
-      </Segment>
-      <Segment>
-        <Header>
-          Programme distribution{' '}
-          <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCustomPopulation} />
-        </Header>
-        <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
-      </Segment>
-      <CustomPopulationCourses selectedStudents={selectedStudents} />
-      <PopulationStudents
-        samples={custompop}
-        selectedStudents={selectedStudents}
-        customPopulation
-        accordionView={false}
-      />
+      <CustomPopulationFilters samples={custompop} />
+      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
     </div>
   )
 
   return (
-    <div>
+    <div className="segmentContainer">
+      <Message style={{ maxWidth: '800px' }}>
+        <Message.Header>Custom population</Message.Header>
+        <p>
+          Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
+          button will open a modal where you can enter a list of studentnumbers. You can also save a custom population
+          by giving it a name and clicking the save button in the modal. It will then appear in the saved populations
+          list. These populations are personal meaning that they will only show to you. You can only search
+          studentnumbers you have access rights to i.e. you have rights to the programme they are in.
+        </p>
+      </Message>
       {renderCustomPopulationSearch()}
       {custompop.length > 0 && customPopulationFlag ? (
-        renderCustomPopulation()
+        <Segment className="contentSegment">{renderCustomPopulation()}</Segment>
       ) : (
         <Segment className="contentSegment">
           <ProgressBar progress={progress} />
