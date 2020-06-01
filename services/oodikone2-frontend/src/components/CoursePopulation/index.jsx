@@ -2,9 +2,11 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool, arrayOf, string } from 'prop-types'
-import { Segment, Header } from 'semantic-ui-react'
+import { Segment, Header, Accordion, Popup } from 'semantic-ui-react'
 import qs from 'query-string'
 import { intersection, difference } from 'lodash'
+import ReactMarkdown from 'react-markdown'
+
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { clearPopulationFilters } from '../../redux/populationFilters'
@@ -44,6 +46,7 @@ const CoursePopulation = ({
   const [headerYears, setYears] = useState('')
   const [dateFrom, setDateFrom] = useState(null)
   const [dateTo, setDateTo] = useState(null)
+  const [activeIndex, setIndex] = useState([])
   useTitle('Course population')
 
   const { onProgress, progress } = useProgress(pending && !studentData.students)
@@ -104,6 +107,196 @@ const CoursePopulation = ({
     )
   }
 
+  const handleClick = index => {
+    const indexes = [...activeIndex].sort()
+    if (indexes.includes(index)) {
+      indexes.splice(indexes.findIndex(ind => ind === index), 1)
+    } else {
+      indexes.push(index)
+    }
+    setIndex(indexes)
+  }
+
+  const panels = [
+    {
+      key: 0,
+      title: {
+        content: (
+          <>
+            {activeIndex.includes(0) ? (
+              <>Grade distribution</>
+            ) : (
+              <Popup
+                trigger={
+                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                    Grade distribution
+                  </span>
+                }
+                position="top center"
+                offset="0, 50px"
+                wide="very"
+              >
+                <Popup.Content>
+                  {' '}
+                  <ReactMarkdown
+                    source={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation}
+                    escapeHtml={false}
+                  />
+                </Popup.Content>
+              </Popup>
+            )}
+          </>
+        )
+      },
+      onTitleClick: () => handleClick(0),
+      content: {
+        content: (
+          <>
+            <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
+            <CoursePopulationGradeDist
+              selectedStudents={selectedStudents}
+              from={dateFrom}
+              to={dateTo}
+              samples={studentData.students}
+              codes={codes}
+            />
+          </>
+        )
+      }
+    },
+    {
+      key: 1,
+      title: {
+        content: (
+          <>
+            {activeIndex.includes(1) ? (
+              <>Programme distribution</>
+            ) : (
+              <Popup
+                trigger={
+                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                    Programme distribution
+                  </span>
+                }
+                position="top center"
+                offset="0, 50px"
+                wide="very"
+              >
+                <Popup.Content>
+                  {' '}
+                  <ReactMarkdown
+                    source={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation}
+                    escapeHtml={false}
+                  />
+                </Popup.Content>
+              </Popup>
+            )}
+          </>
+        )
+      },
+      onTitleClick: () => handleClick(1),
+      content: {
+        content: (
+          <>
+            <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
+            <CustomPopulationProgrammeDist
+              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+              samples={studentData.students}
+              selectedStudents={selectedStudents}
+            />
+          </>
+        )
+      }
+    },
+    {
+      key: 2,
+      title: {
+        content: (
+          <>
+            {activeIndex.includes(2) ? (
+              <>Credit gains</>
+            ) : (
+              <Popup
+                trigger={
+                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                    Credit gains
+                  </span>
+                }
+                position="top center"
+                offset="0, 50px"
+                wide="very"
+              >
+                <Popup.Content>
+                  {' '}
+                  <ReactMarkdown
+                    source={infotooltips.PopulationStatistics.CreditDistributionCoursePopulation}
+                    escapeHtml={false}
+                  />
+                </Popup.Content>
+              </Popup>
+            )}
+          </>
+        )
+      },
+      onTitleClick: () => handleClick(2),
+      content: {
+        content: (
+          <CoursePopulationCreditGainTable
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            selectedStudents={selectedStudents}
+            samples={studentData.students}
+            codes={codes}
+            from={dateFrom}
+            to={dateTo}
+          />
+        )
+      }
+    },
+    {
+      key: 3,
+      title: {
+        content: (
+          <>
+            {activeIndex.includes(3) ? (
+              <>Students ({selectedStudents.length})</>
+            ) : (
+              <Popup
+                trigger={
+                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                    Students ({selectedStudents.length})
+                  </span>
+                }
+                position="top center"
+                offset="0, 50px"
+                wide="very"
+              >
+                <Popup.Content>
+                  {' '}
+                  <ReactMarkdown
+                    source={infotooltips.PopulationStatistics.Students.AccordionTitle}
+                    escapeHtml={false}
+                  />
+                </Popup.Content>
+              </Popup>
+            )}
+          </>
+        )
+      },
+      onTitleClick: () => handleClick(3),
+      content: {
+        content: (
+          <PopulationStudents
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            samples={studentData.students}
+            selectedStudents={selectedStudents}
+            coursePopulation
+            accordionView
+          />
+        )
+      }
+    }
+  ]
+
   return (
     <div className="segmentContainer">
       <Segment className="contentSegment">
@@ -121,45 +314,7 @@ const CoursePopulation = ({
           to={dateTo}
           coursePopulation
         />
-        <Segment>
-          <Header>
-            Grade distribution
-            <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
-          </Header>
-          <CoursePopulationGradeDist
-            selectedStudents={selectedStudents}
-            from={dateFrom}
-            to={dateTo}
-            samples={studentData.students}
-            codes={codes}
-          />
-        </Segment>
-        <Segment>
-          <Header>
-            Programme distribution{' '}
-            <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
-          </Header>
-          <CustomPopulationProgrammeDist
-            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-            samples={studentData.students}
-            selectedStudents={selectedStudents}
-          />
-        </Segment>
-        <CoursePopulationCreditGainTable
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          selectedStudents={selectedStudents}
-          samples={studentData.students}
-          codes={codes}
-          from={dateFrom}
-          to={dateTo}
-        />
-        <PopulationStudents
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          samples={studentData.students}
-          selectedStudents={selectedStudents}
-          coursePopulation
-          accordionView={false}
-        />
+        <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
       </Segment>
     </div>
   )
