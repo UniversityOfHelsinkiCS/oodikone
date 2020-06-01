@@ -26,6 +26,12 @@ BEGIN
   (thesis, '{ "en": "Bachelor thesis" }', 'false')
   ;
 
+  INSERT INTO student
+  ("studentnumber", "createdAt", "updatedAt")
+  VALUES
+  ('012111517', ts, ts)
+  ;
+
   INSERT INTO credit_types
   ("credittypecode", "createdAt", "updatedAt")
   VALUES
@@ -34,15 +40,15 @@ BEGIN
   ;
 
   INSERT INTO credit
-  ("id", "createddate", "lastmodifieddate", "semestercode", "course_code", "credittypecode", "attainment_date", "credits")
+  ("id", "createddate", "lastmodifieddate", "semestercode", "course_code", "credittypecode", "attainment_date", "credits", "student_studentnumber")
   VALUES
-  ('CREDIT_01', ts, ts, 5, course_01, 4, date_2016, 5),
-  ('CREDIT_02', ts, ts, 5, course_01, 10, date_2016, 5),
-  ('CREDIT_03', ts, ts, 5, module_01, 4, date_2016, 20),
-  ('CREDIT_04', ts, ts, 5, course_02, 4, date_2016, 5),
-  ('CREDIT_05', ts, ts, 5, course_01, 4, date_2015, 5),
-  ('CREDIT_06', ts, ts, 5, course_01, 4, date_2015, 5),
-  ('CREDIT_07', ts, ts, 5, thesis, 4, date_2015, 30)
+  ('CREDIT_01', ts, ts, 5, course_01, 4, date_2016, 5, '012111517'),
+  ('CREDIT_02', ts, ts, 5, course_01, 10, date_2016, 5, '012111517'),
+  ('CREDIT_03', ts, ts, 5, module_01, 4, date_2016, 20, '012111517'),
+  ('CREDIT_04', ts, ts, 5, course_02, 4, date_2016, 5, '012111517'),
+  ('CREDIT_05', ts, ts, 5, course_01, 4, date_2015, 5, '012111517'),
+  ('CREDIT_06', ts, ts, 5, course_01, 4, date_2015, 5, '012111517'),
+  ('CREDIT_07', ts, ts, 5, thesis, 4, date_2015, 30, '012111517')
   ;
 
   INSERT INTO providers
@@ -77,11 +83,11 @@ BEGIN
   ;
 
   INSERT INTO studyright_elements
-  ("studyrightid", "code", "createdAt", "updatedAt")
+  ("studyrightid", "code", "createdAt", "updatedAt", "studentnumber")
   VALUES
-  (10, studytrk_01, ts, ts),
-  (11, studytrk_01, ts, ts),
-  (12, studytrk_02, ts, ts)
+  (10, studytrk_01, ts, ts, '012111517'),
+  (11, studytrk_01, ts, ts, '012111517'),
+  (12, studytrk_02, ts, ts, '012111517')
   ;
 
 END $$;

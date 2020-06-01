@@ -189,6 +189,20 @@ const findProgrammeThesisCredits = async code => {
     return acc
   }, {})
 
+  // to fix thesis numbers, (there are students who will do the thesis
+  // for old programme but they will show up in the new one since same course code)
+  // get first studentnumbers that are actually in the new programme
+
+  const studentNumbers = await StudyrightElement.findAll({
+    attributes: ['studentnumber'],
+    where: {
+      code: {
+        [Op.eq]: code
+      }
+    },
+    raw: true
+  }).map(sn => sn.studentnumber)
+
   const credits = await Credit.findAll({
     include: {
       model: Course,
@@ -202,6 +216,9 @@ const findProgrammeThesisCredits = async code => {
     where: {
       credittypecode: {
         [Op.ne]: 10
+      },
+      student_studentnumber: {
+        [Op.in]: studentNumbers
       }
     }
   })
