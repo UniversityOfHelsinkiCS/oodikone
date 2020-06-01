@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea, Segment, Header, Accordion, Popup, Message } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { intersection, difference } from 'lodash'
 import ReactMarkdown from 'react-markdown'
+import scrollToComponent from 'react-scroll-to-component'
 
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
@@ -51,12 +52,27 @@ const CustomPopulation = ({
   const [name, setName] = useState('')
   const [activeIndex, setIndex] = useState([])
   const [selectedSearchId, setSelectedSearchId] = useState('')
+  const [newestIndex, setNewest] = useState(null)
+
   const { onProgress, progress } = useProgress(loading)
+
+  const creditGainRef = useRef()
+  const programmeRef = useRef()
+  const coursesRef = useRef()
+  const studentRef = useRef()
+  const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
+
   useTitle('Custom population')
 
   useEffect(() => {
     getCustomPopulationSearchesDispatch()
   }, [])
+
+  useEffect(() => {
+    if (newestIndex) {
+      scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
+    }
+  }, [activeIndex])
 
   useEffect(() => {
     if (latestCreatedCustomPopulationSearchId) {
@@ -179,6 +195,8 @@ const CustomPopulation = ({
     } else {
       indexes.push(index)
     }
+    if (activeIndex.length < indexes.length) setNewest(index)
+    else setNewest(null)
     setIndex(indexes)
   }
 
@@ -218,12 +236,14 @@ const CustomPopulation = ({
       onTitleClick: () => handleClick(0),
       content: {
         content: (
-          <CreditAccumulationGraphHighCharts
-            students={custompop}
-            selectedStudents={selectedStudents}
-            translate={translate}
-            render={false}
-          />
+          <div ref={creditGainRef}>
+            <CreditAccumulationGraphHighCharts
+              students={custompop}
+              selectedStudents={selectedStudents}
+              translate={translate}
+              render={false}
+            />
+          </div>
         )
       }
     },
@@ -260,10 +280,10 @@ const CustomPopulation = ({
       onTitleClick: () => handleClick(1),
       content: {
         content: (
-          <>
+          <div ref={programmeRef}>
             <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
             <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
-          </>
+          </div>
         )
       }
     },
@@ -299,7 +319,11 @@ const CustomPopulation = ({
       },
       onTitleClick: () => handleClick(2),
       content: {
-        content: <CustomPopulationCourses selectedStudents={selectedStudents} />
+        content: (
+          <div ref={coursesRef}>
+            <CustomPopulationCourses selectedStudents={selectedStudents} />
+          </div>
+        )
       }
     },
     {
@@ -335,7 +359,14 @@ const CustomPopulation = ({
       onTitleClick: () => handleClick(3),
       content: {
         content: (
-          <PopulationStudents samples={custompop} selectedStudents={selectedStudents} customPopulation accordionView />
+          <div ref={studentRef}>
+            <PopulationStudents
+              samples={custompop}
+              selectedStudents={selectedStudents}
+              customPopulation
+              accordionView
+            />
+          </div>
         )
       }
     }
