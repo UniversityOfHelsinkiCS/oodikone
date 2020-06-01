@@ -19,11 +19,15 @@ const names = [
   'mitiaine',
   'rimi',
   'esakemp',
-  'woltsu'
+  'woltsu',
+  'cxcorp',
+  'ajhaa',
+  'joonashak'
 ]
+
 const dummyData = names.map(name => ({
   name,
-  data: [0, 1, 2, 3, 4, 5, 6, 7].reduce((acc, i) => {
+  data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].reduce((acc, i) => {
     acc[i] = (acc[i - 1] || 0) + (random(0, 3) === 0 ? 0 : random(10.0, 100.0))
     return acc
   }, [])
@@ -53,7 +57,7 @@ const AccessDenied = ({ notEnabled, logout }) => {
           constructorType="stockChart"
           config={{
             title: {
-              text: 'Students of Computer Science 2018-2019'
+              text: 'Students of Computer Science 2018-2020'
             },
 
             yAxis: {

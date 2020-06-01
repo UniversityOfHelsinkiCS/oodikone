@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, string, number } from 'prop-types'
-import { Table, Segment, Header, Tab } from 'semantic-ui-react'
+import { Table, Tab } from 'semantic-ui-react'
 import { maxBy } from 'lodash'
 import { getActiveLanguage } from 'react-localize-redux'
 
@@ -151,13 +151,10 @@ const CoursePopulationCreditGainTable = ({
   ]
 
   return (
-    <Segment>
-      <Header>
-        Credit gains
-        <InfoBox content={infotooltips.PopulationStatistics.CreditDistributionCoursePopulation} />
-      </Header>
+    <>
+      <InfoBox content={infotooltips.PopulationStatistics.CreditDistributionCoursePopulation} />
       <Tab panes={panes} />
-    </Segment>
+    </>
   )
 }
 
