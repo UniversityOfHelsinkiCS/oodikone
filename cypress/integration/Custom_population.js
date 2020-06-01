@@ -91,11 +91,7 @@ const containsAmountOfStudents = (amount = 0) => {
 };
 
 const containsSpecificStudents = (studentnumbers = []) => {
-  cy.contains("Students (")
-    .siblings()
-    .get("button")
-    .contains("Show")
-    .click();
+  cy.contains(`Students (${studentnumbers.length})`).click();
 
   studentnumbers.forEach(s => cy.contains(s));
 };
