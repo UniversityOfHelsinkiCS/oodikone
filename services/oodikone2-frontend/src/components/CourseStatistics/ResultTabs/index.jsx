@@ -9,6 +9,10 @@ import Tables from './Panes/tables'
 import { useTabs } from '../../../common/hooks'
 
 import './resultTabs.css'
+import TSA from '../../../common/tsa'
+
+const ANALYTICS_CATEGORY = 'Course Statistics'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const paneViewIndex = {
   TABLE: 0,
@@ -23,12 +27,15 @@ const ResultTabs = props => {
 
   const handleTabChange = (...params) => {
     const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE && viewMode === viewModeNames.GRADES
-
+    const { activeIndex } = params[1]
+    const currentTab = params[1].panes[activeIndex]
+    sendAnalytics(`Current tab '${currentTab.menuItem.content}'`, 'Course statistics')
     setTab(...params)
     setViewMode(resetViewMode ? viewModeNames.CUMULATIVE : viewMode)
   }
 
   const handleModeChange = newViewMode => {
+    sendAnalytics(`Current view mode '${newViewMode}'`, 'Course statistics')
     setViewMode(newViewMode)
   }
 
