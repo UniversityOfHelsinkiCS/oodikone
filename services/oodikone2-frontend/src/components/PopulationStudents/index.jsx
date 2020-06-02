@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab, Grid, Ref, Item } from 'semantic-ui-react'
+import { Button, Icon, Popup, Tab, Grid, Ref, Item } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
@@ -767,42 +767,13 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const toggleLabel = this.props.showList ? 'Hide' : 'Show'
-
-    if (this.props.accordionView)
-      return (
-        <Ref innerRef={this.handleRef}>
-          <>
-            {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
-            <InfoBox content={Students.Infobox} />
-            {this.renderStudentTable()}
-          </>
-        </Ref>
-      )
     return (
       <Ref innerRef={this.handleRef}>
-        <Segment>
-          {!this.props.accordionView && (
-            <Header dividing>
-              <div>
-                {`Students (${this.props.selectedStudents.length}) `}
-                <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : Students.Infobox} />
-                <Button
-                  size="small"
-                  onClick={() => {
-                    this.props.toggleStudentListVisibility()
-                    sendAnalytics('Toggle Show students', this.props.showList ? 'Hide' : 'Show')
-                  }}
-                  data-cy="show-student-list-button"
-                >
-                  {toggleLabel}
-                </Button>
-                {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
-              </div>
-            </Header>
-          )}
+        <>
+          {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
+          <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : Students.Infobox} />
           {this.renderStudentTable()}
-        </Segment>
+        </>
       </Ref>
     )
   }
@@ -817,7 +788,6 @@ PopulationStudents.defaultProps = {
 PopulationStudents.propTypes = {
   samples: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  toggleStudentListVisibility: func.isRequired,
   showNames: bool.isRequired,
   showList: bool.isRequired,
   language: string.isRequired,

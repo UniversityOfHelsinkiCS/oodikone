@@ -10,24 +10,6 @@ const verticalTitle = title => {
   return <div className="tableVerticalTitle">{title}</div>
 }
 
-const intoCollapsing = column => ({
-  title: verticalTitle(column.headerProps.title),
-  headerProps: { ...column.headerProps, colSpan: 1, rowSpan: 2 },
-  key: column.key,
-  collapsed: true,
-  parent: column.parent
-})
-
-const initialCollapsing = columns => {
-  const coll = {}
-  columns.forEach(column => {
-    if (!column.parent || column.key === 'general') return
-
-    coll[column.headerProps.title] = intoCollapsing(column)
-  })
-  return coll
-}
-
 const DIRECTIONS = {
   ASC: 'ascending',
   DESC: 'descending'
@@ -39,15 +21,11 @@ const FlippedCourseTable = ({
   columns,
   data,
   tableProps,
-  getRowProps,
   getRowKey,
-  collapsingHeaders,
   chunkifyBy
 }) => {
   const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
   const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
-  const [collapsed, setCollapsed] = useState(columns)
-  const [columnsWithCollapsedHeaders, setColumnsWithCollapsedHeaders] = useState(columns)
   const [sortedRows, setSortedRows] = useState(data)
   const chunkedData = useChunk(data, chunkifyBy)
 
@@ -57,17 +35,6 @@ const FlippedCourseTable = ({
     } else {
       setSelected(column)
       setDirection(DIRECTIONS.DESC)
-    }
-  }
-
-  const handleCollapse = column => () => {
-    const { title } = column.headerProps
-
-    if (collapsed[title]) {
-      const { [title]: _, ...rest } = collapsed
-      setCollapsed(rest)
-    } else {
-      setCollapsed({ ...collapsed, [title]: column })
     }
   }
 
@@ -81,19 +48,6 @@ const FlippedCourseTable = ({
     const sorted = sortBy(chunkedData, [getRowVal])
     setSortedRows(direction === DIRECTIONS.ASC ? sorted : sorted.reverse())
   }, [selected])
-
-  useEffect(() => {
-    setColumnsWithCollapsedHeaders(
-      !collapsingHeaders
-        ? columns
-            .filter(c => c.headerProps && (!collapsed[c.headerProps.title] && !c.collapsed))
-            .sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
-            .concat(Object.values(collapsed).sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber))
-        : columns
-    )
-  }, [collapsed])
-
-  const sortDirection = name => (selected === name ? direction : null)
 
   return (
     <Table sortable {...tableProps} className="fixed-header" striped>
