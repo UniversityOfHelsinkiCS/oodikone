@@ -315,6 +315,7 @@ class SingleCourseStats extends Component {
         key: 'EXCLUDED',
         size: uniqueExcludedStudents.length,
         students: uniqueExcludedStudents,
+        description: 'All students that are not in primary group selection',
         text: 'Excluded',
         value: 'EXCLUDED'
       })

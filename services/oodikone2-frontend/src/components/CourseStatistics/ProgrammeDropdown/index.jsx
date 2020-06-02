@@ -7,9 +7,9 @@ import ClearableItem from './ClearableItem'
 
 const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...props }) => (
   <Form.Dropdown
-    options={orderBy(options, ['size'], ['desc']).map(({ key, size, value: v, text }) => ({
+    options={orderBy(options, ['size'], ['desc']).map(({ key, size, value: v, text, description }) => ({
       key,
-      content: <DropdownItem name={text} code={key} size={size} />,
+      content: <DropdownItem name={text} code={key} size={size} description={description} />,
       text: !onClear ? text : <ClearableItem name={text} onClear={onClear} />,
       value: v
     }))}
