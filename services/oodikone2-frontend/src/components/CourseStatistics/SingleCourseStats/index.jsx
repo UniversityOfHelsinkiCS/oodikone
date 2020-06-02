@@ -17,6 +17,10 @@ import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
 import { getTextIn } from '../../../common'
 import { getSemesters } from '../../../redux/semesters'
+import TSA from '../../../common/tsa'
+
+const ANALYTICS_CATEGORY = 'Course Statistics'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const countFilteredStudents = (stat, filter) =>
   Object.entries(stat).reduce((acc, entry) => {
@@ -249,6 +253,13 @@ class SingleCourseStats extends Component {
     ) {
       selected = [ALL.value]
     }
+    if (name === 'primary')
+      if (this.state.primary.length > selected.length) sendAnalytics('Primary group removed', 'Course stats')
+      else sendAnalytics('Primary group set', 'Course stats')
+
+    if (name === 'comparison')
+      if (this.state.comparison.length > selected.length) sendAnalytics('Comparison group removed', 'Course stats')
+      else sendAnalytics('Comparison group set', 'Course stats')
 
     this.setState({ [name]: selected })
   }
@@ -261,6 +272,7 @@ class SingleCourseStats extends Component {
     const { fromYear, toYear } = this.state
     if (name === 'fromYear' && value <= toYear) this.setState({ fromYear: value })
     else if (name === 'toYear' && value >= fromYear) this.setState({ toYear: value })
+    sendAnalytics('Changed time frame', 'Course stats')
   }
 
   filteredProgrammeStatistics = () => {
