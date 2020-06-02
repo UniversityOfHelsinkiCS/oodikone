@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-filename-extension */
 import { createSelector } from 'reselect'
 import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy, flatten } from 'lodash'
@@ -56,10 +57,12 @@ const getQueryInfo = createSelector(
   }
 )
 
+// export const newLocal = <Popup content="Students from all programmes" trigger="All" />
 export const ALL = {
   key: 'ALL',
   value: 'ALL',
-  text: 'All'
+  text: 'All',
+  description: 'All students combined'
 }
 
 const mergeStudents = (students1, students2) => {
@@ -105,6 +108,7 @@ const getAllStudyProgrammes = createSelector(
           all[code] = {
             key: code,
             value: code,
+            description: code === 'OTHER' ? 'Students with no associated programme' : '',
             text: getTextIn(name, language),
             students: filteredStudents
           }
