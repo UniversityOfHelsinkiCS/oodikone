@@ -12,6 +12,10 @@ import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
 import { clearCourseStats } from '../../redux/coursestats'
 import { getUserRoles, checkUserAccess } from '../../common'
+import TSA from '../../common/tsa'
+
+const ANALYTICS_CATEGORY = 'Course Statistics'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const MENU = {
   SUM: 'Summary',
@@ -70,6 +74,7 @@ const CourseStatistics = props => {
           icon: 'search',
           position: 'right',
           onClick: () => {
+            sendAnalytics('Clicked new query', 'Course stats')
             history.push('/coursestatistics')
             clearCourseStats()
           }
