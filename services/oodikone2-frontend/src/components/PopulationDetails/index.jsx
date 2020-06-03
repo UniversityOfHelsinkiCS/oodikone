@@ -16,7 +16,6 @@ import infoTooltips from '../../common/InfoToolTips'
 
 const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
   const { CreditStatistics } = infoTooltips.PopulationStatistics
-
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
@@ -40,7 +39,6 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
   }, [samples, selectedStudents, translate])
 
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Credit statistics tab')
-
   return (
     <>
       <Header>
@@ -219,10 +217,12 @@ class PopulationDetails extends Component {
         },
         onTitleClick: () => this.handleClick(1),
         content: {
-          content: !query.years && (
+          content: !query.years ? (
             <div ref={this.creditGainRef}>
               <CourseStatisticsSegment samples={samples} selectedStudents={selectedStudents} translate={translate} />
             </div>
+          ) : (
+            <div>This table is omitted when searching population of multiple years</div>
           )
         }
       },
