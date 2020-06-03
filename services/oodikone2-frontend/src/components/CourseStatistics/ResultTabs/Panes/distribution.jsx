@@ -81,7 +81,7 @@ const getGradeStudSeriesFromStats = stats => {
 
 const Distribution = ({ primary, comparison, viewMode, isRelative }) => {
   const isCumulativeMode = viewMode === viewModeNames.CUMULATIVE
-  const primaryStats = primary.stats.filter(stat => stat.name !== 'Total')
+  const primaryStats = primary.stats.filter(stat => stat.name !== 'Total' || isRelative)
   const statYears = primaryStats.map(year => year.name)
   const comparisonStats = comparison ? comparison.stats : []
 

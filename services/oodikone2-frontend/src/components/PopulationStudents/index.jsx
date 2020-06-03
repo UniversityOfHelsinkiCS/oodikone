@@ -32,7 +32,7 @@ import CheckStudentList from '../CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
 import selector from '../../selectors/populationDetails'
-import PopulationCourseTable from './PopulationCourseTable'
+import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
 
 const ANALYTICS_CATEGORY = 'Population students'
@@ -498,6 +498,16 @@ class PopulationStudents extends Component {
       }))
     )
 
+    const mandatoryTitle = m => {
+      return (
+        <Fragment>
+          {getTextIn(m.name, this.props.language)}
+          <br />
+          {m.code}
+        </Fragment>
+      )
+    }
+
     const getTotalRowVal = (t, m) => t[m.code]
     const mandatoryCourseColumns = [
       ...nameColumns,
@@ -512,13 +522,7 @@ class PopulationStudents extends Component {
             'code'
           ]).map(m => ({
             key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
-            title: verticalTitle(
-              <Fragment>
-                {getTextIn(m.name, this.props.language)}
-                <br />
-                {m.code}
-              </Fragment>
-            ),
+            title: this.props.mandatoryToggle ? mandatoryTitle(m) : verticalTitle(mandatoryTitle(m)),
             cellProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
             headerProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
             getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
@@ -527,7 +531,8 @@ class PopulationStudents extends Component {
               return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
             },
             child: true,
-            childOf: e.label
+            childOf: e.label,
+            code: m.code
           }))
         )
       )
@@ -573,7 +578,7 @@ class PopulationStudents extends Component {
                 {this.props.mandatoryCourses.length > 0 && (
                   <React.Fragment>
                     {this.props.mandatoryToggle ? (
-                      <PopulationCourseTable
+                      <FlippedCourseTable
                         getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
                         tableProps={{
                           celled: true,
