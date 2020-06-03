@@ -2,15 +2,18 @@ import React, { Component, Fragment } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Table, Icon, Label, Header, Loader, Item } from 'semantic-ui-react'
+import { Segment, Table, Icon, Label, Header, Loader, Item, Button } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep, cloneDeep } from 'lodash'
 import moment from 'moment'
+import Highcharts from 'highcharts/highstock'
+import ReactHighcharts from 'react-highcharts'
 import { withRouter, Link } from 'react-router-dom'
+
 import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
 import { getSemesters } from '../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import { byDateDesc, reformatDate, getTextIn } from '../../common'
+import { byDateDesc, reformatDate, getTextIn, getUserIsAdmin } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
 import SortableTable from '../SortableTable'
 import StudentCourseTable from '../StudentCourseTable'
@@ -21,7 +24,9 @@ class StudentDetails extends Component {
     this.state = {
       graphYearStart: null,
       degreename: '',
-      studyrightid: null
+      studyrightid: null,
+      showGradeGraph: false,
+      absolute: false
     }
   }
 
@@ -462,9 +467,55 @@ class StudentDetails extends Component {
     )
   }
 
-  render() {
-    const { translate, student, studentNumber, pending, error, semesters, fetching } = this.props
+  renderGradeGraph = series => {
+    const { absolute } = this.state
+    const options = {
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: 'My chart'
+      },
+      yAxis: {
+        min: 0,
+        max: 5
+      },
+      series: [
+        {
+          data: absolute ? series.grades : series.mean
+        }
+      ]
+    }
+    return (
+      <div align="center">
+        <Button
+          content={absolute ? 'Show mean' : 'Show absolute'}
+          onClick={() => this.setState({ absolute: !absolute })}
+        />
+        <ReactHighcharts highcharts={Highcharts} config={options} />
+      </div>
+    )
+  }
 
+  gradeMeanSeries = student => {
+    const sortedCourses = student.courses.sort(byDateDesc).reverse()
+    const filterCourses = sortedCourses.filter(c => Number(c.grade) && !c.isStudyModuleCredit)
+    const data = filterCourses.reduce(
+      (acc, curr) => {
+        acc.grades.push(Number(curr.grade))
+        acc.dates.push(reformatDate(curr.date, 'DD.MM.YYYY'))
+        const sum = acc.grades.reduce((a, b) => a + b, 0)
+        acc.mean.push(sum / acc.grades.length)
+        return acc
+      },
+      { grades: [], dates: [], mean: [] }
+    )
+    return data
+  }
+
+  render() {
+    const { translate, student, studentNumber, pending, error, semesters, fetching, isAdmin } = this.props
+    const { showGradeGraph } = this.state
     if (fetching) return <Loader active={fetching} />
     if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return null
     if (error) {
@@ -474,9 +525,20 @@ class StudentDetails extends Component {
         </Segment>
       )
     }
+    const series = this.gradeMeanSeries(student)
+
     return (
       <Segment className="contentSegment">
         <StudentInfoCard student={student} translate={translate} />
+        {isAdmin && (
+          <div align="center">
+            <Button
+              content={showGradeGraph ? 'hide grade graph' : 'show grade graph'}
+              onClick={() => this.setState({ showGradeGraph: !showGradeGraph })}
+            />
+          </div>
+        )}
+        {showGradeGraph && this.renderGradeGraph(series)}
         {this.renderCreditsGraph()}
         {this.renderTags()}
         {this.renderStudyRights()}
@@ -527,7 +589,8 @@ StudentDetails.propTypes = {
   semesters: shape({
     semesters: shape({}),
     years: shape({})
-  }).isRequired
+  }).isRequired,
+  isAdmin: bool.isRequired
 }
 
 StudentDetails.defaultProps = {
@@ -535,13 +598,21 @@ StudentDetails.defaultProps = {
   studentNumber: ''
 }
 
-const mapStateToProps = ({ students, localize, semesters }) => ({
+const mapStateToProps = ({
+  students,
+  localize,
+  semesters,
+  auth: {
+    token: { roles }
+  }
+}) => ({
   language: getActiveLanguage(localize).code,
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
   semesters: semesters.data,
-  fetching: students.fetching
+  fetching: students.fetching,
+  isAdmin: getUserIsAdmin(roles)
 })
 
 const mapDispatchToProps = {
