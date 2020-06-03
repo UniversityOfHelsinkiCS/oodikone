@@ -41,12 +41,18 @@ const ResultTabs = props => {
 
   const renderViewModeSelector = () => {
     const isTogglePane = tab !== 0
-
     const getButtonMenu = () => (
       <Menu secondary>
         {Object.values(viewModeNames).map(name => (
           <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
         ))}
+        {viewMode === 'Grades' && (
+          <Menu.Item
+            name={isRelative ? 'Set absolute' : 'Set relative'}
+            active={isRelative}
+            onClick={() => setIsRelative(!isRelative)}
+          />
+        )}
       </Menu>
     )
 
@@ -84,7 +90,15 @@ const ResultTabs = props => {
     const paneMenuItems = [
       {
         menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        renderFn: () => <Tables separate={separate} comparison={comparison} primary={primary} viewMode={viewMode} />
+        renderFn: () => (
+          <Tables
+            separate={separate}
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+            isRelative={isRelative}
+          />
+        )
       },
       {
         menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
