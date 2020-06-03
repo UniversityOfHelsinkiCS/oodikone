@@ -65,7 +65,7 @@ const ResultTabs = props => {
               {viewModeNames.STUDENT}
             </label>
           </div>
-          {props.comparison && (
+          {(tab === 2 || props.comparison) && (
             <div className="toggleContainer">
               <label className="toggleLabel">Absolute</label>
               <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
@@ -93,19 +93,14 @@ const ResultTabs = props => {
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
-            isRelative={isRelative && comparison}
+            isRelative={isRelative && !!comparison}
           />
         )
       },
       {
         menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
         renderFn: () => (
-          <Distribution
-            comparison={comparison}
-            primary={primary}
-            viewMode={viewMode}
-            isRelative={isRelative && comparison}
-          />
+          <Distribution comparison={comparison} primary={primary} viewMode={viewMode} isRelative={isRelative} />
         )
       }
     ]
