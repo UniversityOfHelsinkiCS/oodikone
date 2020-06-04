@@ -9,6 +9,10 @@ import Tables from './Panes/tables'
 import { useTabs } from '../../../common/hooks'
 
 import './resultTabs.css'
+import TSA from '../../../common/tsa'
+
+const ANALYTICS_CATEGORY = 'Course Statistics'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const paneViewIndex = {
   TABLE: 0,
@@ -23,23 +27,32 @@ const ResultTabs = props => {
 
   const handleTabChange = (...params) => {
     const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE && viewMode === viewModeNames.GRADES
-
+    const { activeIndex } = params[1]
+    const currentTab = params[1].panes[activeIndex]
+    sendAnalytics(`Current tab '${currentTab.menuItem.content}'`, 'Course statistics')
     setTab(...params)
     setViewMode(resetViewMode ? viewModeNames.CUMULATIVE : viewMode)
   }
 
   const handleModeChange = newViewMode => {
+    sendAnalytics(`Current view mode '${newViewMode}'`, 'Course statistics')
     setViewMode(newViewMode)
   }
 
   const renderViewModeSelector = () => {
     const isTogglePane = tab !== 0
-
     const getButtonMenu = () => (
       <Menu secondary>
         {Object.values(viewModeNames).map(name => (
           <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
         ))}
+        {viewMode === 'Grades' && (
+          <Menu.Item
+            name={isRelative ? 'Set absolute' : 'Set relative'}
+            active={isRelative}
+            onClick={() => setIsRelative(!isRelative)}
+          />
+        )}
       </Menu>
     )
 
@@ -58,7 +71,7 @@ const ResultTabs = props => {
               {viewModeNames.STUDENT}
             </label>
           </div>
-          {props.comparison && (
+          {(tab === 2 || props.comparison) && (
             <div className="toggleContainer">
               <label className="toggleLabel">Absolute</label>
               <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
@@ -77,7 +90,15 @@ const ResultTabs = props => {
     const paneMenuItems = [
       {
         menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        renderFn: () => <Tables separate={separate} comparison={comparison} primary={primary} viewMode={viewMode} />
+        renderFn: () => (
+          <Tables
+            separate={separate}
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+            isRelative={isRelative}
+          />
+        )
       },
       {
         menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
@@ -86,19 +107,14 @@ const ResultTabs = props => {
             comparison={comparison}
             primary={primary}
             viewMode={viewMode}
-            isRelative={isRelative && comparison}
+            isRelative={isRelative && !!comparison}
           />
         )
       },
       {
         menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
         renderFn: () => (
-          <Distribution
-            comparison={comparison}
-            primary={primary}
-            viewMode={viewMode}
-            isRelative={isRelative && comparison}
-          />
+          <Distribution comparison={comparison} primary={primary} viewMode={viewMode} isRelative={isRelative} />
         )
       }
     ]

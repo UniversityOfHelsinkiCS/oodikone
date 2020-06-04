@@ -1,7 +1,8 @@
 import React, { useEffect, useState, Fragment } from 'react'
-import { withRouter } from 'react-router-dom'
-import { func, string, arrayOf, object, bool, shape } from 'prop-types'
+import { withRouter, Link } from 'react-router-dom'
+import { func, string, arrayOf, object, bool } from 'prop-types'
 import { connect } from 'react-redux'
+
 import { Search, Segment, Container } from 'semantic-ui-react'
 import moment from 'moment'
 
@@ -17,7 +18,6 @@ const StudentSearch = ({
   getStudent,
   clearTimeout: customClearTimeout,
   setTimeout: customSetTimeout,
-  history,
   students,
   studentNumber,
   findStudents,
@@ -41,19 +41,6 @@ const StudentSearch = ({
       getStudent(studentNumber).then(() => resetComponent())
     }
   }, [])
-
-  const handleSearchSelect = student => {
-    const { studentNumber } = student
-    history.push(`/students/${studentNumber}`, { selected: studentNumber })
-    const studentObject = students.find(person => person.studentNumber === studentNumber)
-    const fetched = studentObject ? studentObject.fetched : false
-    if (!fetched) {
-      setLoading(true)
-      getStudent(studentNumber).then(() => resetComponent())
-    } else {
-      resetComponent()
-    }
-  }
 
   const fetchStudentList = searchStr => {
     if (
@@ -105,28 +92,134 @@ const StudentSearch = ({
     }
 
     const columns = [
-      { key: 'studentNumber', title: translate('common.studentNumber'), getRowVal: s => s.studentNumber },
+      {
+        key: 'studentnumber',
+        title: 'Student number',
+        getRowVal: s => s.studentNumber,
+        getRowContent: s => (
+          <Link
+            style={{
+              color: 'black',
+              display: 'inline-block',
+              width: '100%',
+              height: '100%',
+              padding: '.78571429em .78571429em'
+            }}
+            to={`/students/${s.studentNumber}`}
+          >
+            {s.studentNumber}
+          </Link>
+        ),
+        cellProps: {
+          style: {
+            padding: '0'
+          }
+        }
+      },
       {
         key: 'started',
         title: translate('common.started'),
-        getRowContent: s => s.started,
-        getRowVal: s => (s.started === 'Unavailable' ? -Infinity : moment(s.started, 'DD.MM.YYYY').unix())
+        getRowVal: s => (s.started === 'Unavailable' ? -Infinity : moment(s.started, 'DD.MM.YYYY').unix()),
+        getRowContent: s => (
+          <Link
+            style={{
+              color: 'black',
+              display: 'inline-block',
+              width: '100%',
+              height: '100%',
+              padding: '.78571429em .78571429em'
+            }}
+            to={`/students/${s.studentNumber}`}
+          >
+            {s.started}
+          </Link>
+        ),
+        cellProps: {
+          style: {
+            padding: '0'
+          }
+        }
       },
-      { key: 'credits', title: translate('common.credits'), getRowVal: s => s.credits }
+      {
+        key: 'credits',
+        title: 'Credits',
+        getRowVal: s => s.credits,
+        getRowContent: s => (
+          <Link
+            style={{
+              color: 'black',
+              display: 'inline-block',
+              width: '100%',
+              height: '100%',
+              padding: '.78571429em .78571429em'
+            }}
+            to={`/students/${s.studentNumber}`}
+          >
+            {s.credits}
+          </Link>
+        ),
+        cellProps: {
+          style: {
+            padding: '0'
+          }
+        }
+      }
     ]
 
     if (showNames) {
-      columns.push({ key: 'lastname', title: 'last names', getRowVal: s => s.lastname })
-      columns.push({ key: 'firstnames', title: 'given names', getRowVal: s => s.firstnames })
+      columns.push({
+        key: 'lastname',
+        title: 'Last names',
+        getRowVal: s => s.lastname,
+        getRowContent: s => (
+          <Link
+            style={{
+              color: 'black',
+              display: 'inline-block',
+              width: '100%',
+              height: '100%',
+              padding: '.78571429em .78571429em'
+            }}
+            to={`/students/${s.studentNumber}`}
+          >
+            {s.lastname}
+          </Link>
+        ),
+        cellProps: {
+          style: {
+            padding: '0'
+          }
+        }
+      })
+      columns.push({
+        key: 'firstnames',
+        title: 'Given names',
+        getRowVal: s => s.firstnames,
+        getRowContent: s => (
+          <Link
+            style={{
+              color: 'black',
+              display: 'inline-block',
+              width: '100%',
+              height: '100%',
+              padding: '.78571429em .78571429em'
+            }}
+            to={`/students/${s.studentNumber}`}
+          >
+            {s.firstnames}
+          </Link>
+        ),
+        cellProps: {
+          style: {
+            padding: '0'
+          }
+        }
+      })
     }
 
     return (
       <SortableTable
         getRowKey={s => s.studentNumber}
-        getRowProps={s => ({
-          style: { cursor: 'pointer' },
-          onClick: () => handleSearchSelect(s)
-        })}
         tableProps={{ celled: false }}
         columns={columns}
         data={students.slice(0, 200)}
@@ -167,7 +260,6 @@ StudentSearch.propTypes = {
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
   showNames: bool.isRequired,
-  history: shape({}).isRequired,
   pending: bool.isRequired
 }
 StudentSearch.defaultProps = {

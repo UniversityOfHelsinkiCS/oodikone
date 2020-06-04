@@ -30,7 +30,7 @@ export const isThesisSeries = series => series && series.some(s => isThesisGrade
 
 export const absoluteToRelative = all => (p, i) => p / all[i] || 0
 
-export const getThesisGradeSpread = series => {
+export const getThesisGradeSpread = (series, isRelative) => {
   const thesisGradeAccumulator = {
     L: [],
     ECLA: [],
@@ -41,7 +41,7 @@ export const getThesisGradeSpread = series => {
     A: [],
     I: []
   }
-  return series.reduce(
+  const newSeries = series.reduce(
     (acc, cur, i) => {
       const currentEntries = Object.entries(cur)
 
@@ -59,9 +59,20 @@ export const getThesisGradeSpread = series => {
     },
     { ...thesisGradeAccumulator }
   )
+  const total = Object.keys(newSeries).reduce((acc, curr) => {
+    const numOfGrades = newSeries[curr][0]
+    return acc + numOfGrades
+  }, 0)
+
+  const relative = Object.keys(newSeries).reduce((acc, curr) => {
+    acc[curr] = `${Math.round((newSeries[curr][0] / total) * 10000) / 100}%`
+    return acc
+  }, {})
+
+  return isRelative ? relative : newSeries
 }
 
-export const getGradeSpread = series => {
+export const getGradeSpread = (series, isRelative) => {
   const failedKeys = ['Eisa', 'Hyl.', '0', 'Luop']
 
   const baseAccumalator = {
@@ -73,8 +84,7 @@ export const getGradeSpread = series => {
     5: [],
     'Hyv.': []
   }
-
-  return series.reduce(
+  const newSeries = series.reduce(
     (acc, cur, i) => {
       const currentEntries = Object.entries(cur)
       let failed = 0
@@ -96,4 +106,15 @@ export const getGradeSpread = series => {
     },
     { ...baseAccumalator }
   )
+  const total = Object.keys(newSeries).reduce((acc, curr) => {
+    const numOfGrades = newSeries[curr][0]
+    return acc + numOfGrades
+  }, 0)
+
+  const relative = Object.keys(newSeries).reduce((acc, curr) => {
+    acc[curr] = `${Math.round((newSeries[curr][0] / total) * 10000) / 100}%`
+    return acc
+  }, {})
+
+  return isRelative ? relative : newSeries
 }

@@ -35,7 +35,7 @@ describe('Course population tests', () => {
     cy.contains('add').click()
     cy.contains('Select students that have grade')
 
-    cy.get('[data-cy="show-student-list-button"]').click()
+    cy.contains('Students (39)').click()
     cy.contains('013614218')
     cy.contains('014022579')
   })
@@ -56,10 +56,16 @@ describe('Course population tests', () => {
     cy.get(':nth-child(8) > .form > .inline > :nth-child(3) > .ui').click()
 
     cy.contains('Students (all=100)')
-    cy.get(':nth-child(4) > .segment > .selectable > tbody > :nth-child(2) > :nth-child(2)').click()
+    cy.contains('Grade distribution').click()
+    cy.contains("Grades").parentsUntil(".tab").get("table").within(() => {
+      cy.get("tr").eq(2).click()
+    })
+    // cy.get(':nth-child(4) > .segment > .selectable > tbody > :nth-child(2) > :nth-child(2)').click()
     cy.contains('Students (all=17)')
-
-    cy.get(':nth-child(5) > .segment > .selectable > tbody > :nth-child(3) > :nth-child(1)').click()
+    cy.contains('Programme distribution').click()
+    cy.contains("Programmes").parentsUntil(".tab").get("table").eq(1).within(() => {
+      cy.get("tr").eq(2).click()
+    })
     cy.contains('Tietojenkäsittelytieteen kandiohjelma, KH50_005').should('not.exist')
     cy.contains('Students (all=1)')
   })

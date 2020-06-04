@@ -15,7 +15,7 @@ const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
   getRowContent
 })
 
-const getTableData = (stats, isGradeSeries) =>
+const getTableData = (stats, isGradeSeries, isRelative) =>
   stats.map(stat => {
     const {
       name,
@@ -24,7 +24,7 @@ const getTableData = (stats, isGradeSeries) =>
       coursecode
     } = stat
 
-    const spread = isGradeSeries ? getGradeSpread([grades]) : getThesisGradeSpread([grades])
+    const spread = isGradeSeries ? getGradeSpread([grades], isRelative) : getThesisGradeSpread([grades], isRelative)
 
     const attempts = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
     return {
@@ -49,7 +49,7 @@ const getGradeColumns = isGradeSeries =>
       ]
     : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
 
-const GradesTable = ({ stats, name, alternatives, separate }) => {
+const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
   const {
     cumulative: { grades }
   } = stats[0]
@@ -87,7 +87,7 @@ const GradesTable = ({ stats, name, alternatives, separate }) => {
     ...getGradeColumns(isGradeSeries)
   ]
 
-  const data = getTableData(stats, isGradeSeries)
+  const data = getTableData(stats, isGradeSeries, isRelative)
 
   return (
     <div>
@@ -107,7 +107,8 @@ GradesTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
   alternatives: arrayOf(string).isRequired,
-  separate: bool
+  separate: bool,
+  isRelative: bool.isRequired
 }
 
 GradesTable.defaultProps = {
