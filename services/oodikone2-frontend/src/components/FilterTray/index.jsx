@@ -8,6 +8,7 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import FilterStatusCard from './FilterStatusCard'
 import Sidebar from '../Sidebar'
+import FilterControlPanel from './FilterControlPanel'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [open, setOpen] = useState(false)
@@ -51,14 +52,8 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
         </Sidebar.Pusher>
         <Sidebar.Pushable>{children}</Sidebar.Pushable>
       </Sidebar>
-      <div id="filter-control-panel" className={open ? 'sidebar-open' : null}>
-        <FilterStatusCard noFilters={noFilters} />
-        <Button secondary onClick={() => setOpen(false)} id="filter-close-button">
-          <Icon name="angle double left" />
-          Close Filters
-        </Button>
-      </div>
-      <div id="filter-tray-toggle">
+      <FilterControlPanel open={open} setOpen={setOpen} noFilters={noFilters} />
+      <div id="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
         <Button secondary onClick={() => setOpen(true)}>
           <Icon name="angle double down" />
           <div>
