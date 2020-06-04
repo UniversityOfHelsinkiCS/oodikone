@@ -24,3 +24,9 @@
 .clickableCell {
   cursor: pointer;
 }
+
+.menuTab {
+  overflow-y: auto;
+  max-height: 80vh;
+  padding: 0;
+}
