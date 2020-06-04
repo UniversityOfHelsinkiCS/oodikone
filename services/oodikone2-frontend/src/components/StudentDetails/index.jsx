@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Table, Icon, Label, Header, Loader, Item, Button } from 'semantic-ui-react'
+import { Segment, Table, Icon, Label, Header, Loader, Item, Button, Menu } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep, cloneDeep } from 'lodash'
 import moment from 'moment'
 import Highcharts from 'highcharts/highstock'
@@ -26,7 +26,8 @@ class StudentDetails extends Component {
       degreename: '',
       studyrightid: null,
       showGradeGraph: false,
-      absolute: false
+      absolute: false,
+      chunky: false
     }
   }
 
@@ -468,7 +469,9 @@ class StudentDetails extends Component {
   }
 
   renderGradeGraph = series => {
-    const { absolute } = this.state
+    const { absolute, chunky } = this.state
+    const { grades, mean, chunkMeans } = series
+    const shownMean = chunky ? chunkMeans : mean
     const options = {
       chart: {
         type: 'spline'
@@ -482,24 +485,42 @@ class StudentDetails extends Component {
       },
       series: [
         {
-          data: absolute ? series.grades : series.mean
+          data: absolute ? grades : shownMean
         }
       ]
     }
     return (
       <div align="center">
-        <Button
-          content={absolute ? 'Show mean' : 'Show absolute'}
-          onClick={() => this.setState({ absolute: !absolute })}
-        />
+        <Menu compact align="center">
+          <Menu.Item active={absolute} name="Show absolute" onClick={() => this.setState({ absolute: true })} />
+          <Menu.Item
+            active={!absolute && !chunky}
+            name="Show total mean"
+            onClick={() => this.setState({ absolute: false, chunky: false })}
+          />
+          <Menu.Item
+            active={chunky}
+            name="Show chunk mean"
+            onClick={() => this.setState({ absolute: false, chunky: true })}
+          />
+        </Menu>
         <ReactHighcharts highcharts={Highcharts} config={options} />
       </div>
     )
   }
 
+  chunkifyArray = (array, size = 5) => {
+    if (!array) return []
+    const firstChunk = array.slice(0, size) // create the first chunk of the given array
+    if (!firstChunk.length) {
+      return array // this is the base case to terminal the recursive
+    }
+    return [firstChunk].concat(this.chunkifyArray(array.slice(size, array.length), size))
+  }
+
   gradeMeanSeries = student => {
     const sortedCourses = student.courses.sort(byDateDesc).reverse()
-    const filterCourses = sortedCourses.filter(c => Number(c.grade) && !c.isStudyModuleCredit)
+    const filterCourses = sortedCourses.filter(c => Number(c.grade) && !c.isStudyModuleCredit && c.passed)
     const data = filterCourses.reduce(
       (acc, curr) => {
         acc.grades.push(Number(curr.grade))
@@ -510,6 +531,13 @@ class StudentDetails extends Component {
       },
       { grades: [], dates: [], mean: [] }
     )
+    const chunks = this.chunkifyArray(data.grades)
+    const chunkMeans = chunks.reduce((acc, curr) => {
+      const sum = curr.reduce((a, b) => a + b, 0)
+      acc.push(sum / curr.length)
+      return acc
+    }, [])
+    data.chunkMeans = chunkMeans
     return data
   }
 
