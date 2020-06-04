@@ -1,9 +1,10 @@
 import React, { Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Table } from 'semantic-ui-react'
+import { Table, Popup } from 'semantic-ui-react'
 import { number, shape, string, func, bool } from 'prop-types'
 import { getTextIn } from '../../../common'
+import FilterToggleIcon from '../../FilterToggleIcon'
 import '../populationCourseStats.css'
 
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
@@ -68,9 +69,26 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourse
 
   return (
     <Table.Row key={course.code} active={isActive}>
-      <Table.Cell onClick={() => onCourseNameClickFn(course.code)} className="clickableCell">
-        {getTextIn(course.name, activeLanguage)}
-      </Table.Cell>
+      <Popup
+        trigger={
+          <Table.Cell className="filterCell clickableCell">
+            <FilterToggleIcon isActive={isActive} onClick={() => onCourseNameClickFn(course.code)} />
+          </Table.Cell>
+        }
+        content={
+          isActive ? (
+            <span>
+              Poista rajaus kurssin <b>{getTextIn(course.name, activeLanguage)}</b> perusteella
+            </span>
+          ) : (
+            <span>
+              Rajaa opiskelijat kurssin <b>{getTextIn(course.name, activeLanguage)}</b> perusteella
+            </span>
+          )
+        }
+        position="top right"
+      />
+      <Table.Cell className="nameCell">{getTextIn(course.name, activeLanguage)}</Table.Cell>
       <Table.Cell>{course.code}</Table.Cell>
       <Table.Cell>{stats.students}</Table.Cell>
       <Table.Cell>{stats.passed}</Table.Cell>

@@ -282,6 +282,7 @@ class PopulationCourseStats extends Component {
       case 'passingSemester':
         return (
           <PassingSemesters
+            filterInput={this.renderFilterInputHeaderCell}
             courseStatistics={courseStatistics}
             onCourseNameClickFn={this.onCourseNameCellClick}
             isActiveCourseFn={this.isActiveCourse}
@@ -293,7 +294,7 @@ class PopulationCourseStats extends Component {
   }
 
   renderGradeDistributionTable = courseStatistics => {
-    const { translate, language } = this.props
+    const { language } = this.props
     const { sortCriteria, reversed } = this.state
 
     const courseGradesTypes = [1, 2, 3, 4, 5]
@@ -301,7 +302,7 @@ class PopulationCourseStats extends Component {
     const getTableHeader = () => (
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell colSpan="2" content={translate('populationCourses.course')} />
+          {this.renderFilterInputHeaderCell('nameFilter', 'populationCourses.name', '3')}
           {this.renderFilterInputHeaderCell('codeFilter', 'populationCourses.code')}
           <SortableHeaderCell
             content="Attempts"
@@ -323,6 +324,7 @@ class PopulationCourseStats extends Component {
       const { course, grades } = courseStats
       const { name, code } = course
 
+      const isActive = this.isActiveCourse(course)
       let attempts = 0
       let failedGrades = 0
       let otherPassed = 0
@@ -338,11 +340,26 @@ class PopulationCourseStats extends Component {
       }
       return (
         <Table.Row active={this.isActiveCourse(course)}>
-          <Table.Cell
-            onClick={() => this.onCourseNameCellClick(code)}
-            content={getTextIn(name, language)}
-            className="clickableCell"
+          <Popup
+            trigger={
+              <Table.Cell className="filterCell clickableCell">
+                <FilterToggleIcon isActive={isActive} onClick={() => this.onCourseNameCellClick(code)} />
+              </Table.Cell>
+            }
+            content={
+              isActive ? (
+                <span>
+                  Poista rajaus kurssin <b>{getTextIn(name, language)}</b> perusteella
+                </span>
+              ) : (
+                <span>
+                  Rajaa opiskelijat kurssin <b>{getTextIn(name, language)}</b> perusteella
+                </span>
+              )
+            }
+            position="top right"
           />
+          <Table.Cell content={getTextIn(name, language)} className="nameCell" />
           <Table.Cell className="iconCell">
             <p>
               <Item

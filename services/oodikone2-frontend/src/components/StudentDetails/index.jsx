@@ -2,15 +2,18 @@ import React, { Component, Fragment } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Table, Icon, Label, Header, Loader, Item } from 'semantic-ui-react'
+import { Segment, Table, Icon, Label, Header, Loader, Item, Button, Menu } from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep, cloneDeep } from 'lodash'
 import moment from 'moment'
+import Highcharts from 'highcharts/highstock'
+import ReactHighcharts from 'react-highcharts'
 import { withRouter, Link } from 'react-router-dom'
+
 import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
 import { getSemesters } from '../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import { byDateDesc, reformatDate, getTextIn } from '../../common'
+import { byDateDesc, reformatDate, getTextIn, getUserIsAdmin } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
 import SortableTable from '../SortableTable'
 import StudentCourseTable from '../StudentCourseTable'
@@ -21,7 +24,10 @@ class StudentDetails extends Component {
     this.state = {
       graphYearStart: null,
       degreename: '',
-      studyrightid: null
+      studyrightid: null,
+      showGradeGraph: false,
+      absolute: false,
+      chunky: false
     }
   }
 
@@ -462,9 +468,82 @@ class StudentDetails extends Component {
     )
   }
 
-  render() {
-    const { translate, student, studentNumber, pending, error, semesters, fetching } = this.props
+  renderGradeGraph = series => {
+    const { absolute, chunky } = this.state
+    const { grades, mean, chunkMeans } = series
+    const shownMean = chunky ? chunkMeans : mean
+    const options = {
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: 'My chart'
+      },
+      yAxis: {
+        min: 0,
+        max: 5
+      },
+      series: [
+        {
+          data: absolute ? grades : shownMean
+        }
+      ]
+    }
+    return (
+      <div align="center">
+        <Menu compact align="center">
+          <Menu.Item active={absolute} name="Show absolute" onClick={() => this.setState({ absolute: true })} />
+          <Menu.Item
+            active={!absolute && !chunky}
+            name="Show total mean"
+            onClick={() => this.setState({ absolute: false, chunky: false })}
+          />
+          <Menu.Item
+            active={chunky}
+            name="Show chunk mean"
+            onClick={() => this.setState({ absolute: false, chunky: true })}
+          />
+        </Menu>
+        <ReactHighcharts highcharts={Highcharts} config={options} />
+      </div>
+    )
+  }
 
+  chunkifyArray = (array, size = 5) => {
+    if (!array) return []
+    const firstChunk = array.slice(0, size) // create the first chunk of the given array
+    if (!firstChunk.length) {
+      return array // this is the base case to terminal the recursive
+    }
+    return [firstChunk].concat(this.chunkifyArray(array.slice(size, array.length), size))
+  }
+
+  gradeMeanSeries = student => {
+    const sortedCourses = student.courses.sort(byDateDesc).reverse()
+    const filterCourses = sortedCourses.filter(c => Number(c.grade) && !c.isStudyModuleCredit && c.passed)
+    const data = filterCourses.reduce(
+      (acc, curr) => {
+        acc.grades.push(Number(curr.grade))
+        acc.dates.push(reformatDate(curr.date, 'DD.MM.YYYY'))
+        const sum = acc.grades.reduce((a, b) => a + b, 0)
+        acc.mean.push(sum / acc.grades.length)
+        return acc
+      },
+      { grades: [], dates: [], mean: [] }
+    )
+    const chunks = this.chunkifyArray(data.grades)
+    const chunkMeans = chunks.reduce((acc, curr) => {
+      const sum = curr.reduce((a, b) => a + b, 0)
+      acc.push(sum / curr.length)
+      return acc
+    }, [])
+    data.chunkMeans = chunkMeans
+    return data
+  }
+
+  render() {
+    const { translate, student, studentNumber, pending, error, semesters, fetching, isAdmin } = this.props
+    const { showGradeGraph } = this.state
     if (fetching) return <Loader active={fetching} />
     if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return null
     if (error) {
@@ -474,9 +553,20 @@ class StudentDetails extends Component {
         </Segment>
       )
     }
+    const series = this.gradeMeanSeries(student)
+
     return (
       <Segment className="contentSegment">
         <StudentInfoCard student={student} translate={translate} />
+        {isAdmin && (
+          <div align="center">
+            <Button
+              content={showGradeGraph ? 'hide grade graph' : 'show grade graph'}
+              onClick={() => this.setState({ showGradeGraph: !showGradeGraph })}
+            />
+          </div>
+        )}
+        {showGradeGraph && this.renderGradeGraph(series)}
         {this.renderCreditsGraph()}
         {this.renderTags()}
         {this.renderStudyRights()}
@@ -527,7 +617,8 @@ StudentDetails.propTypes = {
   semesters: shape({
     semesters: shape({}),
     years: shape({})
-  }).isRequired
+  }).isRequired,
+  isAdmin: bool.isRequired
 }
 
 StudentDetails.defaultProps = {
@@ -535,13 +626,21 @@ StudentDetails.defaultProps = {
   studentNumber: ''
 }
 
-const mapStateToProps = ({ students, localize, semesters }) => ({
+const mapStateToProps = ({
+  students,
+  localize,
+  semesters,
+  auth: {
+    token: { roles }
+  }
+}) => ({
   language: getActiveLanguage(localize).code,
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
   semesters: semesters.data,
-  fetching: students.fetching
+  fetching: students.fetching,
+  isAdmin: getUserIsAdmin(roles)
 })
 
 const mapDispatchToProps = {
