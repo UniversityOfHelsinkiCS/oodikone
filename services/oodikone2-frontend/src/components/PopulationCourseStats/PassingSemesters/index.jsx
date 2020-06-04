@@ -8,7 +8,8 @@ export default class PassingSemesters extends Component {
   static propTypes = {
     courseStatistics: arrayOf(shape({ course: shape({ code: string }) })).isRequired,
     onCourseNameClickFn: func.isRequired,
-    isActiveCourseFn: func.isRequired
+    isActiveCourseFn: func.isRequired,
+    filterInput: func.isRequired
   }
 
   constructor(props) {
@@ -30,7 +31,7 @@ export default class PassingSemesters extends Component {
   }
 
   render() {
-    const { courseStatistics, onCourseNameClickFn, isActiveCourseFn } = this.props
+    const { courseStatistics, onCourseNameClickFn, isActiveCourseFn, filterInput } = this.props
     return (
       <div>
         <Checkbox
@@ -42,8 +43,9 @@ export default class PassingSemesters extends Component {
         <Table celled className="fixed-header">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Course name</Table.HeaderCell>
-              <Table.HeaderCell>Course code</Table.HeaderCell>
+              {filterInput('nameFilter', 'populationCourses.name', '2')}
+              {filterInput('codeFilter', 'populationCourses.code')}
+
               <Table.HeaderCell>Students</Table.HeaderCell>
               <Table.HeaderCell>Passed</Table.HeaderCell>
 
