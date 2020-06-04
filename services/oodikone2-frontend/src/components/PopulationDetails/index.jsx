@@ -7,12 +7,12 @@ import ReactMarkdown from 'react-markdown'
 
 import { useTabChangeAnalytics, useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import CourseQuarters from '../CourseQuarters'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
 import PopulationCreditGainTable from '../PopulationCreditGainTable'
 import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
+import CourseQuartiles from './CourseQuartiles'
 
 const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
   const { CreditStatistics } = infoTooltips.PopulationStatistics
@@ -30,7 +30,7 @@ const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
   const renderQuartersTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <CourseQuarters
+        <CourseQuartiles
           sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
           translate={translate}
         />
