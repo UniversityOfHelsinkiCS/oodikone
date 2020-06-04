@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Table, Form, Input, Popup, Button, Segment, Icon, Item } from 'semantic-ui-react'
+import { Table, Form, Input, Popup, Icon, Item, Tab } from 'semantic-ui-react'
 import { func, arrayOf, object, number, shape, string, oneOf, bool } from 'prop-types'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { replace, sortBy, orderBy, omit } from 'lodash'
@@ -96,18 +96,11 @@ class PopulationCourseStats extends Component {
     }).isRequired,
     selectedCourses: arrayOf(object).isRequired,
     removePopulationFilterOfCourse: func.isRequired,
-    coursePopulation: bool,
-    customPopulation: bool,
     clearCourseStats: func.isRequired,
     language: string.isRequired,
     pending: bool.isRequired,
     selectedStudents: arrayOf(string).isRequired,
     years: shape({}) // eslint-disable-line
-  }
-
-  static defaultProps = {
-    coursePopulation: false,
-    customPopulation: false
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -522,8 +515,31 @@ class PopulationCourseStats extends Component {
   }
 
   render() {
-    const { courses, translate, pending, coursePopulation, customPopulation } = this.props
-    const { studentAmountLimit } = this.state
+    const { courses, translate, pending } = this.props
+    const { studentAmountLimit, courseStatistics } = this.state
+    const panes = [
+      {
+        menuItem: 'pass/fail',
+        render: () => <div className="menuTab">{this.renderBasicTable(courseStatistics)}</div>
+      },
+      {
+        menuItem: 'grades',
+        render: () => <div className="menuTab">{this.renderGradeDistributionTable(courseStatistics)}</div>
+      },
+      {
+        menuItem: 'when passed',
+        render: () => (
+          <div className="menuTab" style={{ marginTop: '0.5em' }}>
+            <PassingSemesters
+              filterInput={this.renderFilterInputHeaderCell}
+              courseStatistics={courseStatistics}
+              onCourseNameClickFn={this.onCourseNameCellClick}
+              isActiveCourseFn={this.isActiveCourse}
+            />
+          </div>
+        )
+      }
+    ]
     if (!courses) {
       return null
     }
@@ -536,43 +552,9 @@ class PopulationCourseStats extends Component {
           <Form.Field inline>
             <label>{translate('populationCourses.limit')}</label>
             <Input defaultValue={studentAmountLimit} onChange={this.onStudentAmountLimitChange} />
-            {coursePopulation || customPopulation ? null : (
-              <Button
-                active={this.state.activeView === 'passingSemester'}
-                floated="right"
-                onClick={() => {
-                  this.setActiveView('passingSemester')
-                  sendAnalytics('Courses of Population view button clicked', 'when passed')
-                }}
-              >
-                when passed
-              </Button>
-            )}
-            <Button
-              active={this.state.activeView === 'showGradeDistribution'}
-              floated="right"
-              onClick={() => {
-                this.setActiveView('showGradeDistribution')
-                sendAnalytics('Courses of Population view button clicked', 'grades')
-              }}
-            >
-              grades
-            </Button>
-            <Button
-              active={this.state.activeView === null}
-              floated="right"
-              onClick={() => {
-                this.setActiveView(null)
-                sendAnalytics('Courses of Population view button clicked', 'pass/fail')
-              }}
-            >
-              pass/fail
-            </Button>
           </Form.Field>
         </Form>
-        <Segment basic style={{ overflowY: 'auto', maxHeight: '80vh', padding: 0 }}>
-          {this.renderActiveView()}
-        </Segment>
+        <Tab panes={panes} />
       </div>
     )
   }

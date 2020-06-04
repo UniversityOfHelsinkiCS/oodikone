@@ -6,7 +6,7 @@ import { Dropdown, Tab, Message, Button } from 'semantic-ui-react'
 import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
-import { isNewHYStudyProgramme, textAndDescriptionSearch, getUserIsAdmin } from '../../../common'
+import { isNewHYStudyProgramme, textAndDescriptionSearch } from '../../../common'
 import ProtoC from '../../CoolDataScience/ProtoC'
 
 const Overview = ({
@@ -16,8 +16,7 @@ const Overview = ({
   dispatchGetProductivity,
   dispatchGetThroughput,
   history,
-  studyprogrammes,
-  isAdmin
+  studyprogrammes
 }) => {
   const [selectedTrack, setTrack] = useState('')
   const [selectedYear, setYear] = useState('')
@@ -219,7 +218,7 @@ const Overview = ({
     }
   ]
 
-  if (isAdmin && studyprogramme.includes('KH'))
+  if (studyprogramme.includes('KH'))
     panes.push({
       menuItem: 'Studytrack Graph',
       render: () => <ProtoC programme={studyprogramme} />
@@ -238,7 +237,6 @@ const Overview = ({
 
 Overview.propTypes = {
   studyprogramme: string.isRequired,
-  isAdmin: bool.isRequired,
   dispatchGetProductivity: func.isRequired,
   dispatchGetThroughput: func.isRequired,
   history: shape({}).isRequired,
@@ -251,17 +249,9 @@ Overview.propTypes = {
   }).isRequired // eslint-disable-line
 }
 
-const mapStateToProps = ({
-  studyProgrammeThroughput,
-  populationDegreesAndProgrammes,
-  settings,
-  auth: {
-    token: { roles }
-  }
-}) => ({
+const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgrammes, settings }) => ({
   throughput: studyProgrammeThroughput,
   studyprogrammes: populationDegreesAndProgrammes.data.programmes || {},
-  isAdmin: getUserIsAdmin(roles),
   language: settings.language
 })
 
