@@ -282,6 +282,7 @@ class PopulationCourseStats extends Component {
       case 'passingSemester':
         return (
           <PassingSemesters
+            filterInput={this.renderFilterInputHeaderCell}
             courseStatistics={courseStatistics}
             onCourseNameClickFn={this.onCourseNameCellClick}
             isActiveCourseFn={this.isActiveCourse}
@@ -293,7 +294,7 @@ class PopulationCourseStats extends Component {
   }
 
   renderGradeDistributionTable = courseStatistics => {
-    const { translate, language } = this.props
+    const { language } = this.props
     const { sortCriteria, reversed } = this.state
 
     const courseGradesTypes = [1, 2, 3, 4, 5]
@@ -301,7 +302,7 @@ class PopulationCourseStats extends Component {
     const getTableHeader = () => (
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell colSpan="2" content={translate('populationCourses.course')} />
+          {this.renderFilterInputHeaderCell('nameFilter', 'populationCourses.name', '2')}
           {this.renderFilterInputHeaderCell('codeFilter', 'populationCourses.code')}
           <SortableHeaderCell
             content="Attempts"
