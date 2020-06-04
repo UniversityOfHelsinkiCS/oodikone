@@ -6,7 +6,6 @@ import './filterTray.css'
 import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
-import FilterStatusCard from './FilterStatusCard'
 import Sidebar from '../Sidebar'
 import FilterControlPanel from './FilterControlPanel'
 

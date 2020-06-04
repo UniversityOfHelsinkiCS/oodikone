@@ -102,8 +102,8 @@
   color: #fff !important;
 }
 
-#filter-control-panel label:before {
-background-color: #2d2e2f;
+#filter-control-panel label::before {
+  background-color: #2d2e2f;
 }
 
 #filter-status {
