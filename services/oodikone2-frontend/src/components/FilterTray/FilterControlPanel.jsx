@@ -1,4 +1,5 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Button, Icon, Checkbox } from 'semantic-ui-react'
 import FilterStatusCard from './FilterStatusCard'
 
@@ -16,5 +17,11 @@ const FilterControlPanel = ({ open, setOpen, noFilters }) => (
     </Button>
   </div>
 )
+
+FilterControlPanel.propTypes = {
+  open: PropTypes.func.isRequired,
+  setOpen: PropTypes.func.isRequired,
+  noFilters: PropTypes.number.isRequired
+}
 
 export default FilterControlPanel
