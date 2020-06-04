@@ -1,11 +1,11 @@
 import React, { Component, useCallback } from 'react'
 import { connect } from 'react-redux'
-import { func, object, string, arrayOf, bool, shape } from 'prop-types'
+import { func, object, string, arrayOf, bool, shape, number } from 'prop-types'
 import { Header, Message, Tab, Accordion, Popup } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import ReactMarkdown from 'react-markdown'
 
-import { useTabChangeAnalytics } from '../../common/hooks'
+import { useTabChangeAnalytics, useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import CourseQuarters from '../CourseQuarters'
 import PopulationStudents from '../PopulationStudents/NewPopStudents'
@@ -72,6 +72,11 @@ CourseStatisticsSegment.propTypes = {
   translate: func.isRequired
 }
 
+const withActiveIndex = Component => props => {
+  const [activeIndex, setActiveIndex] = useLocalStorage('populationActiveIndex', [])
+  return <Component {...props} activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+}
+
 class PopulationDetails extends Component {
   static propTypes = {
     translate: func.isRequired,
@@ -81,6 +86,8 @@ class PopulationDetails extends Component {
     isLoading: bool.isRequired,
     query: shape({}).isRequired,
     allStudents: arrayOf(object).isRequired,
+    activeIndex: arrayOf(number).isRequired,
+    setActiveIndex: func.isRequired,
     mandatoryToggle: bool.isRequired,
     filteredStudents: arrayOf(object).isRequired
   }
@@ -93,29 +100,22 @@ class PopulationDetails extends Component {
     this.studentTableRef = React.createRef()
   }
 
-  state = {
-    activeIndex: []
-  }
-
-  componentDidUpdate = (prevProps, prevState) => {
-    if (prevState.activeIndex.length < this.state.activeIndex.length) {
-      const foundIndex = this.state.activeIndex.find(index => !prevState.activeIndex.includes(index))
+  componentDidUpdate = prevProps => {
+    if (prevProps.activeIndex.length < this.props.activeIndex.length) {
+      const foundIndex = this.props.activeIndex.find(index => !prevProps.activeIndex.includes(index))
       const refs = [this.creditGraphRef, this.creditGainRef, this.courseTableRef, this.studentTableRef]
       scrollToComponent(refs[foundIndex].current, { align: 'bottom' })
     }
   }
 
   handleClick = index => {
-    this.setState(prevState => {
-      const indexes = [...prevState.activeIndex].sort()
-      if (indexes.includes(index)) {
-        indexes.splice(indexes.findIndex(ind => ind === index), 1)
-      } else {
-        indexes.push(index)
-      }
-
-      return { activeIndex: indexes }
-    })
+    const indexes = [...this.props.activeIndex].sort()
+    if (indexes.includes(index)) {
+      indexes.splice(indexes.findIndex(ind => ind === index), 1)
+    } else {
+      indexes.push(index)
+    }
+    this.props.setActiveIndex(indexes)
   }
 
   renderCreditGainGraphs = () => {
@@ -143,7 +143,7 @@ class PopulationDetails extends Component {
   }
 
   render() {
-    const { samples, translate, queryIsSet, isLoading } = this.props
+    const { samples, translate, queryIsSet, isLoading, activeIndex } = this.props
 
     if (isLoading || !queryIsSet) {
       return null
@@ -162,14 +162,14 @@ class PopulationDetails extends Component {
         title: {
           content: (
             <>
-              {this.state.activeIndex.includes(0) ? (
+              {activeIndex.includes(0) ? (
                 <>
                   {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
                 </>
               ) : (
                 <Popup
                   trigger={
-                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
                       {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
                     </span>
                   }
@@ -196,11 +196,15 @@ class PopulationDetails extends Component {
         title: {
           content: (
             <>
-              {this.state.activeIndex.includes(1) ? (
+              {activeIndex.includes(1) ? (
                 <>Credit statistics</>
               ) : (
                 <Popup
-                  trigger={<span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>Credit statistics</span>}
+                  trigger={
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                      Credit statistics
+                    </span>
+                  }
                   position="top center"
                   offset="0, 50px"
                   wide="very"
@@ -216,10 +220,12 @@ class PopulationDetails extends Component {
         },
         onTitleClick: () => this.handleClick(1),
         content: {
-          content: !query.years && (
+          content: !query.years ? (
             <div ref={this.creditGainRef}>
               <CourseStatisticsSegment samples={samples} selectedStudents={selectedStudents} translate={translate} />
             </div>
+          ) : (
+            <div>This table is omitted when searching population of multiple years</div>
           )
         }
       },
@@ -228,11 +234,15 @@ class PopulationDetails extends Component {
         title: {
           content: (
             <>
-              {this.state.activeIndex.includes(2) ? (
+              {activeIndex.includes(2) ? (
                 <>Courses of population</>
               ) : (
                 <Popup
-                  trigger={<span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>Courses of population</span>}
+                  trigger={
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+                      Courses of population
+                    </span>
+                  }
                   position="top center"
                   offset="0, 50px"
                   wide="very"
@@ -267,12 +277,12 @@ class PopulationDetails extends Component {
         title: {
           content: (
             <>
-              {this.state.activeIndex.includes(3) ? (
+              {activeIndex.includes(3) ? (
                 <>Students ({selectedStudents.length})</>
               ) : (
                 <Popup
                   trigger={
-                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh' }}>
+                    <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
                       Students ({selectedStudents.length})
                     </span>
                   }
@@ -307,10 +317,10 @@ class PopulationDetails extends Component {
 
     return (
       <>
-        <Accordion activeIndex={this.state.activeIndex} exclusive={false} styled fluid panels={panels} />
+        <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
       </>
     )
   }
 }
 
-export default connect(null)(PopulationDetails)
+export default connect(null)(withActiveIndex(PopulationDetails))
