@@ -43,7 +43,7 @@ export default class PassingSemesters extends Component {
         <Table celled className="fixed-header">
           <Table.Header>
             <Table.Row>
-              {filterInput('nameFilter', 'populationCourses.name')}
+              {filterInput('nameFilter', 'populationCourses.name', '2')}
               {filterInput('codeFilter', 'populationCourses.code')}
 
               <Table.HeaderCell>Students</Table.HeaderCell>
