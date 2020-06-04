@@ -2,8 +2,8 @@ import React from 'react'
 import { jStat } from 'jStat'
 import { sortBy } from 'lodash'
 import { func, arrayOf, object } from 'prop-types'
-import SearchResultTable from '../SearchResultTable'
-import { getStudentTotalCredits } from '../../common'
+import SearchResultTable from '../../SearchResultTable'
+import { getStudentTotalCredits } from '../../../common'
 
 const getStudentSampleInSplitQuartiles = students => {
   const sortedStudents = sortBy(students, student => getStudentTotalCredits(student))
@@ -36,7 +36,7 @@ const getCreditStatsForTable = (students, studentsInQuartiles) => [
   ...studentsInQuartiles.map(s => getValues(s))
 ]
 
-const CourseQuartiles = ({ translate, sample }) => {
+const StatisticsTab = ({ translate, sample }) => {
   const quartiles = getStudentSampleInSplitQuartiles(sample)
   const stats = getCreditStatsForTable(sample, quartiles)
 
@@ -61,9 +61,9 @@ const CourseQuartiles = ({ translate, sample }) => {
   return <SearchResultTable headers={headers} rows={rows} noResultText={translate('common.noResults')} definition />
 }
 
-CourseQuartiles.propTypes = {
+StatisticsTab.propTypes = {
   translate: func.isRequired,
   sample: arrayOf(object).isRequired
 }
 
-export default CourseQuartiles
+export default StatisticsTab
