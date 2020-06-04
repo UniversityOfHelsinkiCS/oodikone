@@ -359,7 +359,7 @@ class PopulationCourseStats extends Component {
             }
             position="top right"
           />
-          <Table.Cell content={getTextIn(name, language)} className="nameCell"/>
+          <Table.Cell content={getTextIn(name, language)} className="nameCell" />
           <Table.Cell className="iconCell">
             <p>
               <Item

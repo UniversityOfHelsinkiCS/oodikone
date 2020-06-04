@@ -53,7 +53,7 @@ const FlippedCourseTable = ({
     <Table sortable {...tableProps} className="fixed-header" striped>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell key="general" content={<b>Labels:</b>} style={{ textAlign: 'right' }} />
+          <Table.HeaderCell key="general" content={<b>Students:</b>} colSpan="2" style={{ textAlign: 'right' }} />
           {sortedRows
             .filter(row => row.studentNumber)
             .map(row => (
@@ -66,13 +66,22 @@ const FlippedCourseTable = ({
         </Table.Row>
       </Table.Header>
       <Table.Body>
+        <Table.Row>
+          <Table.Cell>Course</Table.Cell>
+          <Table.Cell>Total</Table.Cell>
+          {sortedRows
+            .filter(row => row.studentNumber)
+            .map(row => (
+              <Table.Cell key={getRowKey(row)} content={columns[2].getRowVal(row)} />
+            ))}
+        </Table.Row>
         {columns
           .filter(col => col.cellProps)
           .filter(col => data[0][col.code] && data[0][col.code] > 0)
           .map(col => (
             <Table.Row key={col.key}>
               <Table.Cell key="name" content={col.title} onClick={() => handleSort(col.key)} />
-
+              <Table.Cell key="totals" content={data[0][col.code]} />
               {sortedRows
                 .filter(row => row.studentNumber)
                 .map(row => (
