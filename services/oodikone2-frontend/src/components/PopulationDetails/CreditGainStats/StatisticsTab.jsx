@@ -1,82 +1,57 @@
 import React from 'react'
 import { jStat } from 'jStat'
-import { sortBy } from 'lodash'
-import { func, arrayOf, object } from 'prop-types'
+import PropTypes from 'prop-types'
 import { Table } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
 
-const getStudentSampleInSplitQuartiles = students => {
-  const sortedStudents = sortBy(students, student => getStudentTotalCredits(student))
-  const quartileSize = Math.floor(sortedStudents.length / 4)
-  return [
-    sortedStudents.slice(0, quartileSize),
-    sortedStudents.slice(quartileSize, quartileSize * 2),
-    sortedStudents.slice(quartileSize * 2, quartileSize * 3),
-    sortedStudents.slice(quartileSize * 3, sortedStudents.length)
-  ]
-}
-
-const getValues = students => {
-  const creditsList = students.map(student => getStudentTotalCredits(student))
-
-  const n2z = value => (isNaN(value) ? 0 : value) // eslint-disable-line
-
-  return {
-    n: creditsList.length,
-    min: n2z(jStat.min(creditsList)),
-    max: n2z(jStat.max(creditsList)),
-    average: n2z(jStat.mean(creditsList)).toFixed(2),
-    median: n2z(jStat.median(creditsList)),
-    standardDeviation: n2z(jStat.stdev(creditsList)).toFixed(2)
-  }
-}
-
 const StatisticsTab = ({ translate, filteredStudents }) => {
   const credits = filteredStudents.map(student => getStudentTotalCredits(student))
+  const formatNumber = (x, decimals) => (Number.isNaN(x) ? 0 : x).toFixed(decimals)
+  const quartiles = jStat.quartiles(credits)
 
   return (
     <Table celled collapsing className="statistics-table">
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell>{`Statistic for n = ${credits.length} Student`}s</Table.HeaderCell>
-          <Table.HeaderCell>Credits Earned in First 35 Months</Table.HeaderCell>
+          <Table.HeaderCell>{`Statistic for n = ${credits.length} Students`}</Table.HeaderCell>
+          <Table.HeaderCell>Credits Earned</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
 
       <Table.Body>
         <Table.Row>
           <Table.Cell>Average</Table.Cell>
-          <Table.Cell>1</Table.Cell>
+          <Table.Cell>{formatNumber(jStat.mean(credits), 2)}</Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>Standard Deviation</Table.Cell>
-          <Table.Cell>1</Table.Cell>
+          <Table.Cell>{formatNumber(jStat.stdev(credits), 2)}</Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>Min</Table.Cell>
-          <Table.Cell>1</Table.Cell>
+          <Table.Cell>{formatNumber(jStat.min(credits), 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>
             Q<sub>1</sub> (25%)
           </Table.Cell>
-          <Table.Cell>1</Table.Cell>
+          <Table.Cell>{formatNumber(quartiles[0], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>
             Q<sub>2</sub> (50%)
           </Table.Cell>
-          <Table.Cell>1</Table.Cell>
+          <Table.Cell>{formatNumber(quartiles[1], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>
             Q<sub>3</sub> (75%)
           </Table.Cell>
-          <Table.Cell>1</Table.Cell>
+          <Table.Cell>{formatNumber(quartiles[2], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>Max</Table.Cell>
-          <Table.Cell>1</Table.Cell>
+          <Table.Cell>{formatNumber(jStat.max(credits), 0)}</Table.Cell>
         </Table.Row>
       </Table.Body>
     </Table>
@@ -84,8 +59,8 @@ const StatisticsTab = ({ translate, filteredStudents }) => {
 }
 
 StatisticsTab.propTypes = {
-  translate: func.isRequired,
-  filteredStudents: arrayOf(object).isRequired
+  translate: PropTypes.func.isRequired,
+  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
 export default StatisticsTab
