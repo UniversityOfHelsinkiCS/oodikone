@@ -478,22 +478,23 @@ class StudentDetails extends Component {
   }
 
   semesterChunkify = (courses, semesterenrollments) => {
-    const { semesters } = this.props
+    const { semesters, language } = this.props
     const semesterChunks = semesterenrollments.reduce((acc, curr) => {
       const currSemester = semesters.semesters[curr.semestercode]
       const filteredcourses = courses.filter(
         c => new Date(currSemester.startdate) < new Date(c.date) && new Date(c.date) < new Date(currSemester.enddate)
       )
-      acc.push(filteredcourses)
+      const grades = { data: filteredcourses, semester: currSemester, numOfCourses: filteredcourses.length }
+      acc.push(grades)
       return acc
     }, [])
     const semesterMeans = semesterChunks.reduce((acc, curr) => {
-      const sum = curr.reduce((a, b) => a + b.grade, 0)
-      if (curr.length > 0)
+      const sum = curr.data.reduce((a, b) => a + b.grade, 0)
+      if (curr.numOfCourses > 0)
         acc.push({
-          name: `${curr.length} courses`,
-          y: sum / curr.length,
-          x: new Date(curr[curr.length - 1].date).getTime()
+          name: getTextIn(curr.semester.name, language),
+          y: sum / curr.numOfCourses,
+          x: new Date(curr.data[curr.numOfCourses - 1].date).getTime()
         })
       return acc
     }, [])
@@ -576,11 +577,12 @@ class StudentDetails extends Component {
     }
     return (
       <div align="center">
-        <Message style={{ maxWidth: '400px' }}>
+        <Message style={{ maxWidth: '600px' }}>
           <Message.Header>Grade graph</Message.Header>
           <p>
             Plotting of grades. Total mean shows how the grade mean has developed during studies. Group mean splits
-            courses into chunks of selected size and takes the mean out of those grades.
+            courses into chunks of selected size and takes the mean out of those grades. Semester mean shows grade mean
+            of courses completed during that semester.
           </p>
         </Message>
         <Menu compact align="center">
