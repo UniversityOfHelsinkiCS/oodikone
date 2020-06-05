@@ -6,59 +6,57 @@ import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
+import './creditGainStats.css'
 
-const CreditGainStats = ({ samples, selectedStudents, translate }) => {
+const CreditGainStats = ({ filteredStudents, translate }) => {
   const { CreditStatistics } = infotooltips.PopulationStatistics
 
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <CreditsGainedTab
-          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
-          translate={translate}
-        />
+        <CreditsGainedTab sample={filteredStudents} translate={translate} />
       </Tab.Pane>
     )
-  }, [samples, selectedStudents, translate])
+  }, [filteredStudents, translate])
 
   const renderQuartersTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <StatisticsTab sample={samples.filter(s => selectedStudents.includes(s.studentNumber))} translate={translate} />
+        <StatisticsTab filteredStudents={filteredStudents} translate={translate} />
       </Tab.Pane>
     )
-  }, [samples, selectedStudents, translate])
+  }, [filteredStudents, translate])
 
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Credit statistics tab')
 
   return (
-    <>
+    <div id="credit-gain-stats">
       <Header>
         <InfoBox content={CreditStatistics.Infobox} />
       </Header>
-      {samples && (
+      {filteredStudents && (
         <Tab
           onTabChange={handleTabChange}
           menu={{ pointing: true }}
           panes={[
             {
-              menuItem: 'Credits gained',
+              menuItem: 'Credits Gained',
               render: renderCreditsGainTab
             },
             {
-              menuItem: 'Quarters',
+              menuItem: translate('creditGainStats.header'),
               render: renderQuartersTab
             }
           ]}
+          data-cy="credit-stats-tab"
         />
       )}
-    </>
+    </div>
   )
 }
 
 CreditGainStats.propTypes = {
-  samples: PropTypes.arrayOf(PropTypes.object).isRequired,
-  selectedStudents: PropTypes.arrayOf(PropTypes.string).isRequired,
+  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
   translate: PropTypes.func.isRequired
 }
 
