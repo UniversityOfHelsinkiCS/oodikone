@@ -504,7 +504,6 @@ class StudentDetails extends Component {
   // probably needs some fixing to be done
   gradeMeanSeries = student => {
     const { chunksize } = this.state
-    console.log(student)
     const sortedCourses = student.courses.sort(byDateDesc).reverse()
     const filterCourses = sortedCourses.filter(c => Number(c.grade) && !c.isStudyModuleCredit && c.passed)
     const data = filterCourses.reduce(
@@ -545,7 +544,7 @@ class StudentDetails extends Component {
     const { chunky, chunksize, semester } = this.state
     const { mean, chunkMeans, semesterMeans } = series
 
-    const options = {
+    const defaultOptions = {
       chart: {
         type: 'spline'
       },
@@ -560,43 +559,19 @@ class StudentDetails extends Component {
       yAxis: {
         min: 1,
         max: 5
-      },
+      }
+    }
+
+    const totalMeanOptions = {
+      ...defaultOptions,
       series: [{ data: mean, name: 'Total mean', seriesThreshold: 150 }]
     }
-    const options2 = {
-      chart: {
-        type: 'spline'
-      },
-      title: {
-        text: 'Grade plot'
-      },
-      xAxis: {
-        type: 'datetime',
-        min: new Date(series.minDate).getTime(),
-        max: new Date(series.maxDate).getTime()
-      },
-      yAxis: {
-        min: 1,
-        max: 5
-      },
+    const chunkMeanOptions = {
+      ...defaultOptions,
       series: chunkMeans
     }
-    const options3 = {
-      chart: {
-        type: 'spline'
-      },
-      title: {
-        text: 'Grade plot'
-      },
-      xAxis: {
-        type: 'datetime',
-        min: new Date(series.minDate).getTime(),
-        max: new Date(series.maxDate).getTime()
-      },
-      yAxis: {
-        min: 1,
-        max: 5
-      },
+    const semesterMeanOptions = {
+      ...defaultOptions,
       series: semesterMeans
     }
     return (
@@ -634,9 +609,9 @@ class StudentDetails extends Component {
             />
           </div>
         )}
-        {!chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={options} />}
-        {chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={options2} />}
-        {!chunky && semester && <ReactHighcharts highcharts={Highcharts} config={options3} />}
+        {!chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={totalMeanOptions} />}
+        {chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={chunkMeanOptions} />}
+        {!chunky && semester && <ReactHighcharts highcharts={Highcharts} config={semesterMeanOptions} />}
       </div>
     )
   }
