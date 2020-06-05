@@ -31,13 +31,14 @@ const getValues = students => {
   }
 }
 
-const StatisticsTab = ({ translate, sample }) => {
+const StatisticsTab = ({ translate, filteredStudents }) => {
+  const credits = filteredStudents.map(student => getStudentTotalCredits(student))
 
   return (
     <Table celled collapsing className="statistics-table">
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell>Statistic for n = 219 Students</Table.HeaderCell>
+          <Table.HeaderCell>{`Statistic for n = ${credits.length} Student`}s</Table.HeaderCell>
           <Table.HeaderCell>Credits Earned in First 35 Months</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
@@ -84,7 +85,7 @@ const StatisticsTab = ({ translate, sample }) => {
 
 StatisticsTab.propTypes = {
   translate: func.isRequired,
-  sample: arrayOf(object).isRequired
+  filteredStudents: arrayOf(object).isRequired
 }
 
 export default StatisticsTab
