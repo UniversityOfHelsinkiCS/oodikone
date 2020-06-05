@@ -1,0 +1,11 @@
+#credit-gain-stats .statistics-table {
+  margin: 0 auto;
+}
+
+#credit-gain-stats .statistics-table tbody td:first-child {
+  font-weight: bold;
+}
+
+#credit-gain-stats .statistics-table tbody td:nth-child(2) {
+  text-align: right;
+}
