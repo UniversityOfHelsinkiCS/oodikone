@@ -340,4 +340,20 @@ describe('Population Statistics tests', () => {
 
     cy.contains('Credit accumulation (for 228 students)')
   })
+  
+  it.only("Credit Statistics, Statistics pane works", () => {
+    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen kandiohjelma").click()
+    cy.contains("See population").click()
+    cy.contains("Credit statistics").click()
+    cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
+
+    cy.get("[data-cy='credit-stats-table-name-header']").should('contain', 'Statistic for n = 219 Students')
+    cy.get("[data-cy='credit-stats-mean']").should('contain', '44.36')
+    cy.get("[data-cy='credit-stats-stdev']").should('contain', '30.77')
+    cy.get("[data-cy='credit-stats-min']").should('contain', '0')
+    cy.get("[data-cy='credit-stats-q1']").should('contain', '17')
+    cy.get("[data-cy='credit-stats-q2']").should('contain', '46')
+    cy.get("[data-cy='credit-stats-q3']").should('contain', '66')
+    cy.get("[data-cy='credit-stats-max']").should('contain', '137')
+  })
 })
