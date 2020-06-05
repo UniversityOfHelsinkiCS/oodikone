@@ -13,7 +13,7 @@ import infotooltips from '../../common/InfoToolTips'
 
 const PopulationQueryCard = ({ translate, population, query, removeSampleFn, units, language, tags }) => {
   const { uuid, year, semesters, months, studentStatuses, tag, years } = query
-  const tagname = tag ? tags.find(t => t.tag_id === tag).tagname : ''
+  const tagname = tag && tags.length > 0 ? tags.find(t => t.tag_id === tag).tagname : ''
   const lowestYear = query.years ? Math.min(...query.years.map(year => Number(year))) : null
   const highestYear = query.years ? Math.max(...query.years.map(year => Number(year))) : null
   const { students } = population
