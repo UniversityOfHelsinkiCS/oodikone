@@ -48,6 +48,7 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
               render: renderQuartersTab
             }
           ]}
+          data-cy="credit-stats-tab"
         />
       )}
     </div>
