@@ -341,7 +341,7 @@ describe('Population Statistics tests', () => {
     cy.contains('Credit accumulation (for 228 students)')
   })
   
-  it.only("Credit Statistics, Statistics pane works", () => {
+  it("Credit Statistics, Statistics pane works", () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen kandiohjelma").click()
     cy.contains("See population").click()
     cy.contains("Credit statistics").click()
