@@ -44,7 +44,7 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
               render: renderCreditsGainTab
             },
             {
-              menuItem: 'Statistics',
+              menuItem: translate('creditGainStats.header'),
               render: renderQuartersTab
             }
           ]}

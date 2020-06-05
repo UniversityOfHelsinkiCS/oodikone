@@ -13,18 +13,20 @@ const StatisticsTab = ({ translate, filteredStudents }) => {
     <Table celled collapsing className="statistics-table">
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell>{`Statistic for n = ${credits.length} Students`}</Table.HeaderCell>
-          <Table.HeaderCell>Credits Earned</Table.HeaderCell>
+          <Table.HeaderCell>
+            {translate('creditGainStats.statsTableNameHeader', { n: credits.length })}
+          </Table.HeaderCell>
+          <Table.HeaderCell>{translate('creditGainStats.statsTableCreditsHeader')}</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
 
       <Table.Body>
         <Table.Row>
-          <Table.Cell>Average</Table.Cell>
+          <Table.Cell>{translate('creditGainStats.statsTableAverage')}</Table.Cell>
           <Table.Cell>{formatNumber(jStat.mean(credits), 2)}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>Standard Deviation</Table.Cell>
+          <Table.Cell>{translate('creditGainStats.statsTableStdDev')}</Table.Cell>
           <Table.Cell>{formatNumber(jStat.stdev(credits), 2)}</Table.Cell>
         </Table.Row>
         <Table.Row>
