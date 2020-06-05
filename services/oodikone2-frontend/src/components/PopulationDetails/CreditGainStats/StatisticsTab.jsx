@@ -2,7 +2,7 @@ import React from 'react'
 import { jStat } from 'jStat'
 import { sortBy } from 'lodash'
 import { func, arrayOf, object } from 'prop-types'
-import SearchResultTable from '../../SearchResultTable'
+import { Table } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
 
 const getStudentSampleInSplitQuartiles = students => {
@@ -31,34 +31,55 @@ const getValues = students => {
   }
 }
 
-const getCreditStatsForTable = (students, studentsInQuartiles) => [
-  getValues(students),
-  ...studentsInQuartiles.map(s => getValues(s))
-]
-
 const StatisticsTab = ({ translate, sample }) => {
-  const quartiles = getStudentSampleInSplitQuartiles(sample)
-  const stats = getCreditStatsForTable(sample, quartiles)
 
-  const headers = [
-    '',
-    `all (n=${stats[0].n})`,
-    `q1, bottom (n=${stats[1].n})`,
-    `q2 (n=${stats[2].n})`,
-    `q3 (n=${stats[3].n})`,
-    `q4, top (n=${stats[3].n})`
-  ]
+  return (
+    <Table celled collapsing className="statistics-table">
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell>Statistic for n = 219 Students</Table.HeaderCell>
+          <Table.HeaderCell>Credits Earned in First 35 Months</Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
 
-  const rows = [
-    ['n', ...stats.map(stat => stat.n)],
-    ['min', ...stats.map(stat => stat.min)],
-    ['max', ...stats.map(stat => stat.max)],
-    ['average', ...stats.map(stat => stat.average)],
-    ['median', ...stats.map(stat => stat.median)],
-    ['standardDeviation', ...stats.map(stat => stat.standardDeviation)]
-  ]
-
-  return <SearchResultTable headers={headers} rows={rows} noResultText={translate('common.noResults')} definition />
+      <Table.Body>
+        <Table.Row>
+          <Table.Cell>Average</Table.Cell>
+          <Table.Cell>1</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Standard Deviation</Table.Cell>
+          <Table.Cell>1</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Min</Table.Cell>
+          <Table.Cell>1</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>
+            Q<sub>1</sub> (25%)
+          </Table.Cell>
+          <Table.Cell>1</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>
+            Q<sub>2</sub> (50%)
+          </Table.Cell>
+          <Table.Cell>1</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>
+            Q<sub>3</sub> (75%)
+          </Table.Cell>
+          <Table.Cell>1</Table.Cell>
+        </Table.Row>
+        <Table.Row>
+          <Table.Cell>Max</Table.Cell>
+          <Table.Cell>1</Table.Cell>
+        </Table.Row>
+      </Table.Body>
+    </Table>
+  )
 }
 
 StatisticsTab.propTypes = {
