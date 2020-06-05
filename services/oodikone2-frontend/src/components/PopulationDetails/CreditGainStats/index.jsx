@@ -6,6 +6,7 @@ import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
+import './creditGainStats.css'
 
 const CreditGainStats = ({ samples, selectedStudents, translate }) => {
   const { CreditStatistics } = infotooltips.PopulationStatistics
@@ -32,7 +33,7 @@ const CreditGainStats = ({ samples, selectedStudents, translate }) => {
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Credit statistics tab')
 
   return (
-    <>
+    <div id="credit-gain-stats">
       <Header>
         <InfoBox content={CreditStatistics.Infobox} />
       </Header>
@@ -42,17 +43,17 @@ const CreditGainStats = ({ samples, selectedStudents, translate }) => {
           menu={{ pointing: true }}
           panes={[
             {
-              menuItem: 'Credits gained',
+              menuItem: 'Credits Gained',
               render: renderCreditsGainTab
             },
             {
-              menuItem: 'Quarters',
+              menuItem: 'Statistics',
               render: renderQuartersTab
             }
           ]}
         />
       )}
-    </>
+    </div>
   )
 }
 
