@@ -1,74 +1,17 @@
-import React, { Component, useCallback } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { func, object, string, arrayOf, bool, shape, number } from 'prop-types'
-import { Header, Message, Tab, Accordion, Popup } from 'semantic-ui-react'
+import { Header, Message, Accordion, Popup } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import ReactMarkdown from 'react-markdown'
 
-import { useTabChangeAnalytics, useLocalStorage } from '../../common/hooks'
+import { useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import CourseQuarters from '../CourseQuarters'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
-import PopulationCreditGainTable from '../PopulationCreditGainTable'
 import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
-
-const CourseStatisticsSegment = ({ samples, selectedStudents, translate }) => {
-  const { CreditStatistics } = infoTooltips.PopulationStatistics
-  const renderCreditsGainTab = useCallback(() => {
-    return (
-      <Tab.Pane attached={false}>
-        <PopulationCreditGainTable
-          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
-          translate={translate}
-        />
-      </Tab.Pane>
-    )
-  }, [samples, selectedStudents, translate])
-
-  const renderQuartersTab = useCallback(() => {
-    return (
-      <Tab.Pane attached={false}>
-        <CourseQuarters
-          sample={samples.filter(s => selectedStudents.includes(s.studentNumber))}
-          translate={translate}
-        />
-      </Tab.Pane>
-    )
-  }, [samples, selectedStudents, translate])
-
-  const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Credit statistics tab')
-  return (
-    <>
-      <Header>
-        <InfoBox content={CreditStatistics.Infobox} />
-      </Header>
-      {samples && (
-        <Tab
-          onTabChange={handleTabChange}
-          menu={{ pointing: true }}
-          panes={[
-            {
-              menuItem: 'Credits gained',
-              render: renderCreditsGainTab
-            },
-            {
-              menuItem: 'Quarters',
-              render: renderQuartersTab
-            }
-          ]}
-        />
-      )}
-    </>
-  )
-}
-
-CourseStatisticsSegment.propTypes = {
-  samples: arrayOf(object).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  translate: func.isRequired
-}
+import CreditGainStats from './CreditGainStats'
 
 const withActiveIndex = Component => props => {
   const [activeIndex, setActiveIndex] = useLocalStorage('populationActiveIndex', [])
@@ -219,7 +162,7 @@ class PopulationDetails extends Component {
         content: {
           content: !query.years ? (
             <div ref={this.creditGainRef}>
-              <CourseStatisticsSegment samples={samples} selectedStudents={selectedStudents} translate={translate} />
+              <CreditGainStats samples={samples} selectedStudents={selectedStudents} translate={translate} />
             </div>
           ) : (
             <div>This table is omitted when searching population of multiple years</div>

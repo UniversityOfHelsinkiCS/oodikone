@@ -19,7 +19,7 @@ const FilterControlPanel = ({ open, setOpen, noFilters }) => (
 )
 
 FilterControlPanel.propTypes = {
-  open: PropTypes.func.isRequired,
+  open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,
   noFilters: PropTypes.number.isRequired
 }

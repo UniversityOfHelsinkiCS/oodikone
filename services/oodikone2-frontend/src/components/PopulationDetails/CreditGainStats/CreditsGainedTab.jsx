@@ -2,12 +2,11 @@ import React, { useCallback } from 'react'
 import { connect } from 'react-redux'
 import { func, arrayOf, object, number } from 'prop-types'
 import { Progress, Icon, Popup } from 'semantic-ui-react'
-import SearchResultTable from '../SearchResultTable'
-import { getStudentTotalCredits } from '../../common'
-import TSA from '../../common/tsa'
-
-import { creditsLessThan, creditsAtLeast } from '../../populationFilters'
-import { setPopulationFilter, removePopulationFilter } from '../../redux/populationFilters'
+import SearchResultTable from '../../SearchResultTable'
+import { getStudentTotalCredits } from '../../../common'
+import TSA from '../../../common/tsa'
+import { creditsLessThan, creditsAtLeast } from '../../../populationFilters'
+import { setPopulationFilter, removePopulationFilter } from '../../../redux/populationFilters'
 
 const getTotal = students => students.map(student => getStudentTotalCredits(student))
 
@@ -44,14 +43,7 @@ const filterStudents = (students, minCredits, maxCredits = Infinity) => {
   }
 }
 
-const PopulationCreditGainTable = ({
-  translate,
-  sample,
-  months,
-  filters,
-  setPopulationFilter,
-  removePopulationFilter
-}) => {
+const CreditsGainedTab = ({ translate, sample, months, filters, setPopulationFilter, removePopulationFilter }) => {
   const handleCreditBracketRowClicked = useCallback(
     (e, row) => {
       // clear filters & set credit filter for selected range
@@ -156,7 +148,7 @@ const mapStateToProps = state => ({
   filters: state.populationFilters.filters.filter(f => f.type === 'CreditsLessThan' || f.type === 'CreditsAtLeast')
 })
 
-PopulationCreditGainTable.propTypes = {
+CreditsGainedTab.propTypes = {
   translate: func.isRequired,
   sample: arrayOf(object).isRequired,
   months: number.isRequired,
@@ -168,4 +160,4 @@ PopulationCreditGainTable.propTypes = {
 export default connect(
   mapStateToProps,
   { setPopulationFilter, removePopulationFilter }
-)(PopulationCreditGainTable)
+)(CreditsGainedTab)

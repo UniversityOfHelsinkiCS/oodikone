@@ -2,18 +2,17 @@ import React from 'react'
 import { jStat } from 'jStat'
 import { sortBy } from 'lodash'
 import { func, arrayOf, object } from 'prop-types'
+import SearchResultTable from '../../SearchResultTable'
+import { getStudentTotalCredits } from '../../../common'
 
-import SearchResultTable from '../SearchResultTable'
-import { getStudentTotalCredits } from '../../common'
-
-const getStudentSampleInSplitQuarters = students => {
+const getStudentSampleInSplitQuartiles = students => {
   const sortedStudents = sortBy(students, student => getStudentTotalCredits(student))
-  const quarterSize = Math.floor(sortedStudents.length / 4)
+  const quartileSize = Math.floor(sortedStudents.length / 4)
   return [
-    sortedStudents.slice(0, quarterSize),
-    sortedStudents.slice(quarterSize, quarterSize * 2),
-    sortedStudents.slice(quarterSize * 2, quarterSize * 3),
-    sortedStudents.slice(quarterSize * 3, sortedStudents.length)
+    sortedStudents.slice(0, quartileSize),
+    sortedStudents.slice(quartileSize, quartileSize * 2),
+    sortedStudents.slice(quartileSize * 2, quartileSize * 3),
+    sortedStudents.slice(quartileSize * 3, sortedStudents.length)
   ]
 }
 
@@ -32,16 +31,14 @@ const getValues = students => {
   }
 }
 
-const getCreditStatsForTable = (students, studentsInQuarters) => [
+const getCreditStatsForTable = (students, studentsInQuartiles) => [
   getValues(students),
-  ...studentsInQuarters.map(s => getValues(s))
+  ...studentsInQuartiles.map(s => getValues(s))
 ]
 
-const CourseQuarters = props => {
-  const { translate, sample } = props
-
-  const quarters = getStudentSampleInSplitQuarters(sample)
-  const stats = getCreditStatsForTable(sample, quarters)
+const StatisticsTab = ({ translate, sample }) => {
+  const quartiles = getStudentSampleInSplitQuartiles(sample)
+  const stats = getCreditStatsForTable(sample, quartiles)
 
   const headers = [
     '',
@@ -64,9 +61,9 @@ const CourseQuarters = props => {
   return <SearchResultTable headers={headers} rows={rows} noResultText={translate('common.noResults')} definition />
 }
 
-CourseQuarters.propTypes = {
+StatisticsTab.propTypes = {
   translate: func.isRequired,
   sample: arrayOf(object).isRequired
 }
 
-export default CourseQuarters
+export default StatisticsTab
