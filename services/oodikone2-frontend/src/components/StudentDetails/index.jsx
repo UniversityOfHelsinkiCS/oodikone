@@ -26,6 +26,7 @@ class StudentDetails extends Component {
       degreename: '',
       studyrightid: null,
       chunky: false,
+      semester: false,
       chunksize: 5
     }
   }
@@ -476,6 +477,31 @@ class StudentDetails extends Component {
     return [firstChunk].concat(this.chunkifyArray(array.slice(size, array.length), size))
   }
 
+  semesterChunkify = (courses, semesterenrollments) => {
+    const { semesters, language } = this.props
+    const semesterChunks = semesterenrollments.reduce((acc, curr) => {
+      const currSemester = semesters.semesters[curr.semestercode]
+      const filteredcourses = courses.filter(
+        c => new Date(currSemester.startdate) < new Date(c.date) && new Date(c.date) < new Date(currSemester.enddate)
+      )
+      const grades = { data: filteredcourses, semester: currSemester, numOfCourses: filteredcourses.length }
+      acc.push(grades)
+      return acc
+    }, [])
+    const semesterMeans = semesterChunks.reduce((acc, curr) => {
+      const sum = curr.data.reduce((a, b) => a + b.grade, 0)
+      if (curr.numOfCourses > 0)
+        acc.push({
+          name: getTextIn(curr.semester.name, language),
+          y: sum / curr.numOfCourses,
+          x: new Date(curr.data[curr.numOfCourses - 1].date).getTime()
+        })
+      return acc
+    }, [])
+
+    return [{ name: 'Semester mean', data: semesterMeans, seriesThreshold: 150 }]
+  }
+
   // probably needs some fixing to be done
   gradeMeanSeries = student => {
     const { chunksize } = this.state
@@ -499,13 +525,15 @@ class StudentDetails extends Component {
     )
     const size = Number(chunksize) ? chunksize : 3
     const chunks = this.chunkifyArray(data.grades, size)
+    data.semesterMeans = this.semesterChunkify(data.grades, student.semesterenrollments)
     const chunkMeans = chunks.reduce((acc, curr) => {
       const sum = curr.reduce((a, b) => a + b.grade, 0)
-      acc.push({
-        name: `${curr.length} courses`,
-        y: sum / curr.length,
-        x: new Date(curr[curr.length - 1].date).getTime()
-      })
+      if (curr.length > 0)
+        acc.push({
+          name: `${curr.length} courses`,
+          y: sum / curr.length,
+          x: new Date(curr[curr.length - 1].date).getTime()
+        })
       return acc
     }, [])
     data.chunkMeans = [{ name: 'Group mean', data: chunkMeans, seriesThreshold: 150 }]
@@ -514,11 +542,10 @@ class StudentDetails extends Component {
 
   renderGradeGraph = student => {
     const series = this.gradeMeanSeries(student)
-    const { chunky, chunksize } = this.state
-    const { mean, chunkMeans } = series
-    const shownMean = chunky ? chunkMeans : [{ data: mean, name: 'Total mean', seriesThreshold: 150 }]
+    const { chunky, chunksize, semester } = this.state
+    const { mean, chunkMeans, semesterMeans } = series
 
-    const options = {
+    const defaultOptions = {
       chart: {
         type: 'spline'
       },
@@ -533,21 +560,47 @@ class StudentDetails extends Component {
       yAxis: {
         min: 1,
         max: 5
-      },
-      series: shownMean
+      }
+    }
+
+    const totalMeanOptions = {
+      ...defaultOptions,
+      series: [{ data: mean, name: 'Total mean', seriesThreshold: 150 }]
+    }
+    const chunkMeanOptions = {
+      ...defaultOptions,
+      series: chunkMeans
+    }
+    const semesterMeanOptions = {
+      ...defaultOptions,
+      series: semesterMeans
     }
     return (
       <div align="center">
-        <Message style={{ maxWidth: '400px' }}>
+        <Message style={{ maxWidth: '600px' }}>
           <Message.Header>Grade graph</Message.Header>
           <p>
             Plotting of grades. Total mean shows how the grade mean has developed during studies. Group mean splits
-            courses into chunks of selected size and takes the mean out of those grades.
+            courses into chunks of selected size and takes the mean out of those grades. Semester mean shows grade mean
+            of courses completed during that semester.
           </p>
         </Message>
         <Menu compact align="center">
-          <Menu.Item active={!chunky} name="Show total mean" onClick={() => this.setState({ chunky: false })} />
-          <Menu.Item active={chunky} name="Show group mean" onClick={() => this.setState({ chunky: true })} />
+          <Menu.Item
+            active={!chunky && !semester}
+            name="Show total mean"
+            onClick={() => this.setState({ chunky: false, semester: false })}
+          />
+          <Menu.Item
+            active={chunky && !semester}
+            name="Show group mean"
+            onClick={() => this.setState({ chunky: true, semester: false })}
+          />
+          <Menu.Item
+            active={!chunky && semester}
+            name="Show semester mean"
+            onClick={() => this.setState({ chunky: false, semester: true })}
+          />
         </Menu>
         {chunky && (
           <div>
@@ -558,7 +611,9 @@ class StudentDetails extends Component {
             />
           </div>
         )}
-        <ReactHighcharts highcharts={Highcharts} config={options} />
+        {!chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={totalMeanOptions} />}
+        {chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={chunkMeanOptions} />}
+        {!chunky && semester && <ReactHighcharts highcharts={Highcharts} config={semesterMeanOptions} />}
       </div>
     )
   }
