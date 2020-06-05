@@ -163,7 +163,7 @@ class PopulationDetails extends Component {
         content: {
           content: !query.years ? (
             <div ref={this.creditGainRef}>
-              <CreditGainStats samples={samples} selectedStudents={selectedStudents} translate={translate} />
+              <CreditGainStats filteredStudents={filteredStudents} translate={translate} />
             </div>
           ) : (
             <div>This table is omitted when searching population of multiple years</div>

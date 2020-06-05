@@ -293,5 +293,12 @@
     "searchTitle": [
       "Search for teachers"
     ]
+  },
+  "creditGainStats": {
+    "header": ["Statistics"],
+    "statsTableNameHeader": ["Statistic for n = ${n} Students"],
+    "statsTableCreditsHeader": ["Credits Earned"],
+    "statsTableAverage": ["Average"],
+    "statsTableStdDev": ["Standard Deviation"]
   }
 }
