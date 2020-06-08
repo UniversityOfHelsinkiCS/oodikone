@@ -289,7 +289,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
     cy.contains("Courses of population").click({ force: true })
-    cy.contains("Lineaarialgebra").siblings().within(() => { cy.get('.level').click() })
+    cy.contains("Lineaarialgebra").siblings().within(() => { cy.get('.level').click({ force: true }) })
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click({ force: true })
   })
 
