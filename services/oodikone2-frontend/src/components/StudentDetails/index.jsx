@@ -15,6 +15,7 @@ import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import { byDateDesc, reformatDate, getTextIn } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
+import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import SortableTable from '../SortableTable'
 import StudentCourseTable from '../StudentCourseTable'
 
@@ -32,6 +33,7 @@ class StudentDetails extends Component {
   }
 
   componentDidMount() {
+    this.props.getDegreesAndProgrammes()
     this.props.getSemesters()
     this.unlistenHistory = this.props.history.listen(() => {
       this.props.resetStudent()
@@ -329,8 +331,10 @@ class StudentDetails extends Component {
   }
 
   renderStudyRights = () => {
-    const { student, language } = this.props
+    const { student, language, degreesAndProgrammes } = this.props
     const { studyrightid } = this.state
+    const { programmes } = degreesAndProgrammes
+    const programmeCodes = Object.keys(programmes)
     const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
     const studyRightRows = student.studyrights.map(studyright => {
       const degree = sortBy(studyright.studyright_elements, 'enddate').find(e => e.element_detail.type === 10)
@@ -420,9 +424,11 @@ class StudentDetails extends Component {
                                 programme.enddate,
                                 'DD.MM.YYYY'
                               )})`}
-                              <Item as={Link} to={this.showPopulationStatistics(programme.code, programme.startdate)}>
-                                <Icon name="level up alternate" />
-                              </Item>{' '}
+                              {programmeCodes.includes(programme.code) && (
+                                <Item as={Link} to={this.showPopulationStatistics(programme.code, programme.startdate)}>
+                                  <Icon name="level up alternate" />
+                                </Item>
+                              )}{' '}
                               <br />
                             </p>
                           ))}
@@ -685,6 +691,8 @@ StudentDetails.propTypes = {
   error: bool.isRequired,
   fetching: bool.isRequired,
   getSemesters: func.isRequired,
+  degreesAndProgrammes: shape({}).isRequired,
+  getDegreesAndProgrammes: func.isRequired,
   semesters: shape({
     semesters: shape({}),
     years: shape({})
@@ -696,13 +704,14 @@ StudentDetails.defaultProps = {
   studentNumber: ''
 }
 
-const mapStateToProps = ({ students, localize, semesters }) => ({
+const mapStateToProps = ({ students, localize, semesters, populationDegreesAndProgrammes }) => ({
   language: getActiveLanguage(localize).code,
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
   semesters: semesters.data,
-  fetching: students.fetching
+  fetching: students.fetching,
+  degreesAndProgrammes: populationDegreesAndProgrammes.data || {}
 })
 
 const mapDispatchToProps = {
@@ -710,7 +719,8 @@ const mapDispatchToProps = {
   clearCourseStats,
   resetStudent,
   getStudent,
-  getSemesters
+  getSemesters,
+  getDegreesAndProgrammes
 }
 
 export default withRouter(
