@@ -4,7 +4,6 @@ import { func, object, string, arrayOf, bool, shape, number } from 'prop-types'
 import { Header, Message, Accordion, Popup } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import ReactMarkdown from 'react-markdown'
-
 import { useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -27,9 +26,12 @@ class PopulationDetails extends Component {
     isLoading: bool.isRequired,
     selectedStudentsByYear: shape({}).isRequired,
     query: shape({}).isRequired,
+    allStudents: arrayOf(object).isRequired,
     activeIndex: arrayOf(number).isRequired,
     setActiveIndex: func.isRequired,
-    mandatoryToggle: bool.isRequired
+    mandatoryToggle: bool.isRequired,
+    filterFeatToggle: bool.isRequired,
+    filteredStudents: arrayOf(object).isRequired
   }
 
   constructor() {
@@ -93,7 +95,14 @@ class PopulationDetails extends Component {
       return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
     }
 
-    const { query, selectedStudents, selectedStudentsByYear } = this.props
+    const {
+      query,
+      selectedStudents,
+      selectedStudentsByYear,
+      allStudents,
+      filteredStudents,
+      filterFeatToggle
+    } = this.props
     const { Students, CreditStatistics, CoursesOf, CreditAccumulationGraph } = infoTooltips.PopulationStatistics
 
     const panels = [
@@ -163,7 +172,9 @@ class PopulationDetails extends Component {
           content: !query.years ? (
             <div ref={this.creditGainRef}>
               <CreditGainStats
-                filteredStudents={samples.filter(s => selectedStudents.includes(s.studentNumber))}
+                filteredStudents={
+                  filterFeatToggle ? filteredStudents : samples.filter(s => selectedStudents.includes(s.studentNumber))
+                }
                 translate={translate}
               />
             </div>
@@ -208,6 +219,8 @@ class PopulationDetails extends Component {
                 selectedStudents={selectedStudents}
                 selectedStudentsByYear={selectedStudentsByYear}
                 query={query}
+                allStudents={allStudents}
+                filteredStudents={filteredStudents}
               />
             </div>
           )
@@ -244,7 +257,15 @@ class PopulationDetails extends Component {
         content: {
           content: (
             <div ref={this.studentTableRef}>
-              <PopulationStudents accordionView mandatoryToggle={this.props.mandatoryToggle} />
+              <PopulationStudents
+                accordionView
+                mandatoryToggle={this.props.mandatoryToggle}
+                filteredStudents={
+                  filterFeatToggle
+                    ? filteredStudents
+                    : allStudents.filter(s => selectedStudents.includes(s.studentNumber))
+                }
+              />
             </div>
           )
         }
