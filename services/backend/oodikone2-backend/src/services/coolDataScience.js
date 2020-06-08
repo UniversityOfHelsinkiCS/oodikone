@@ -391,11 +391,13 @@ const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)
 }
 
-const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum') => {
+const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'sum2') => {
   return sequelize.query(
     `
     SELECT SUM(cr.credits) AS ` +
     alias + // HAX, alias doesn't come from user so no sql injection
+      `,COUNT(DISTINCT(cr.student_studentnumber)) AS ` +
+      alias2 +
       `, cp.providercode, co.code, co.name FROM credit cr
       INNER JOIN course co ON cr.course_code = co.code
       INNER JOIN course_providers cp ON cp.coursecode = co.code
@@ -425,13 +427,13 @@ const mergele = (a, b) => {
   return _.mergeWith(a, b, sumMerge)
 }
 
-const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum') => {
+const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', alias2 = 'sum2') => {
   return years.map(
     year =>
       new Promise(async res => {
         const diff = currentYear - year
         const { from, to } = getRange(diff)
-        const creditsByCourse = await getTotalCreditsOfCoursesBetween(from, to, alias)
+        const creditsByCourse = await getTotalCreditsOfCoursesBetween(from, to, alias, alias2)
         res(
           creditsByCourse.map(c => {
             c['year'] = year
@@ -458,7 +460,8 @@ const getStatusStatistics = _.memoize(
         from: new Date(startTime - diff * Y_TO_MS),
         to: new Date(unixMillis - diff * Y_TO_MS)
       }),
-      'acc'
+      'acc',
+      'students'
     )
 
     const yearlyTotalCreditsPromises = makeYearlyCreditsPromises(
@@ -468,7 +471,8 @@ const getStatusStatistics = _.memoize(
         from: new Date(startTime - diff * Y_TO_MS),
         to: new Date(startTime - (diff - 1) * Y_TO_MS)
       }),
-      'total'
+      'total',
+      'students'
     )
 
     /* Gather all required data */
@@ -518,12 +522,16 @@ const getStatusStatistics = _.memoize(
             if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
             if (instance.acc !== undefined) {
               acc[courseCode]['yearly'][instance.year]['acc'] = instance.acc
+              acc[courseCode]['yearly'][instance.year]['accStudents'] = Number(instance.students)
             } else {
               acc[courseCode]['yearly'][instance.year]['total'] = instance.total
+              acc[courseCode]['yearly'][instance.year]['totalStudents'] = Number(instance.students)
             }
           })
           acc[courseCode]['current'] = _.get(acc, [courseCode, 'yearly', startYear, 'acc']) || 0
           acc[courseCode]['previous'] = _.get(acc, [courseCode, 'yearly', startYear - 1, 'acc']) || 0
+          acc[courseCode]['currentStudents'] = _.get(acc, [courseCode, 'yearly', startYear, 'accStudents']) || 0
+          acc[courseCode]['previousStudents'] = _.get(acc, [courseCode, 'yearly', startYear - 1, 'accStudents']) || 0
           return acc
         },
         {}
@@ -536,7 +544,6 @@ const getStatusStatistics = _.memoize(
       const programme = providerToProgramme[providerCode]
       const courseValues = Object.values(courses)
       const yearlyValues = courseValues.map(c => c.yearly)
-
       if (programme && programme.code) {
         acc[programme.code] = {
           name: programme.name,
