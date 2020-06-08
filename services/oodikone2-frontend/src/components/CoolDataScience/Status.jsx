@@ -117,14 +117,14 @@ const StatusContainer = ({
                     {total ? (
                       <span>
                         {' '}
-                        <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>/</span>{' '}
+                        {acc && <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>/</span>}{' '}
                         {Math.round(total).toLocaleString('fi')}
                       </span>
                     ) : (
                       <span>
                         {' '}
                         <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>
-                          {!!totalStudents && '/'}
+                          {!!totalStudents && !!accStudents && '/'}
                         </span>{' '}
                         {totalStudents && `${totalStudents} students`}
                       </span>
