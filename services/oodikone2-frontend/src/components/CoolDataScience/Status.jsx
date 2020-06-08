@@ -98,26 +98,36 @@ const StatusContainer = ({
       </div>
       {showYearlyValues && (
         <div style={{ marginTop: '10px', textAlign: 'start' }}>
-          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, { acc, total }]) => {
-            return (
-              <div style={{ margin: '5px 0' }} key={`${title}-${year}`}>
-                <span>
-                  <b>
-                    {year}
-                    {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
-                  </b>{' '}
-                  {acc ? Math.round(acc).toLocaleString('fi') : 0}
-                  {!!total && (
-                    <span>
-                      {' '}
-                      <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>/</span>{' '}
-                      {Math.round(total).toLocaleString('fi')}
-                    </span>
-                  )}
-                </span>
-              </div>
-            )
-          })}
+          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(
+            ([year, { acc, total, accStudents, totalStudents }]) => {
+              return (
+                <div style={{ margin: '5px 0' }} key={`${title}-${year}`}>
+                  <span>
+                    <b>
+                      {year}
+                      {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
+                    </b>{' '}
+                    {acc ? Math.round(acc).toLocaleString('fi') : accStudents}
+                    {total ? (
+                      <span>
+                        {' '}
+                        <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>/</span>{' '}
+                        {Math.round(total).toLocaleString('fi')}
+                      </span>
+                    ) : (
+                      <span>
+                        {' '}
+                        <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>
+                          {!!totalStudents && '/'}
+                        </span>{' '}
+                        {totalStudents}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              )
+            }
+          )}
         </div>
       )}
     </Segment>
@@ -282,18 +292,26 @@ const Status = () => {
           gridGap: '20px'
         }}
       >
-        {_.orderBy(Object.entries(_.last(drillStack) || data), ([, { current, previous }]) => getP(current, previous), [
-          'desc'
-        ]).map(([code, stats]) => {
+        {_.orderBy(
+          Object.entries(_.last(drillStack) || data),
+          ([, { current, previous, currentStudents, previousStudents }]) =>
+            getP(current || currentStudents, previous || previousStudents), // oh god
+          ['desc']
+        ).map(([code, stats]) => {
           const handleClick = () => pushToDrillStack(stats.drill)
+          // check if the course has credits or not (if credits is zero but there are students who have completed it)
+          const current =
+            !stats.drill && stats.current === 0 && stats.currentStudents > 1 ? stats.currentStudents : stats.current
+          const previous =
+            !stats.drill && stats.previous === 0 && stats.previousStudents > 1 ? stats.previousStudents : stats.previous
           return (
             <StatusContainer
               key={code}
               clickable={!!stats.drill}
               handleClick={handleClick}
               title={getTextIn(stats.name)}
-              current={stats.current}
-              previous={stats.previous}
+              current={current}
+              previous={previous}
               showYearlyValues={showYearlyValues}
               min1={-medianDiff * 2}
               max1={medianDiff * 2}
