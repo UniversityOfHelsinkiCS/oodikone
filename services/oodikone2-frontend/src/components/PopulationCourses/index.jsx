@@ -4,7 +4,7 @@ import { func, shape, arrayOf, string, bool } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
-
+import { useStore } from 'react-hookstore'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
@@ -22,15 +22,33 @@ const PopulationCourses = ({
   getPopulationSelectedStudentCourses: gpc,
   selectedStudentsByYear,
   query,
-  accordionView
+  accordionView,
+  filteredStudents
 }) => {
+  const [filterFeatToggle] = useStore('filterFeatToggle')
+
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
     : populationCourses
 
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = selectedPopulationCourses
+
   const reloadCourses = () => {
+    if (filterFeatToggle) {
+      // eslint-disable-next-line
+      selectedStudentsByYear = {}
+
+      if (filteredStudents && filteredStudents.length > 0) {
+        filteredStudents.forEach(student => {
+          if (!selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()]) {
+            selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()] = []
+          }
+          selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
+        })
+      }
+    }
+
     dispatchRefreshFilters()
     gpc({
       ...selectedPopulationCourses.query,
@@ -43,11 +61,17 @@ const PopulationCourses = ({
     })
   }
 
+  // Refresh hook for old filters.
   useEffect(() => {
     if (refreshNeeded) {
       reloadCourses()
     }
   }, [refreshNeeded])
+
+  // ...and for new ones.
+  useEffect(() => {
+    reloadCourses()
+  }, [filteredStudents])
 
   if (accordionView)
     return (
@@ -102,7 +126,8 @@ PopulationCourses.propTypes = {
   dispatchRefreshFilters: func.isRequired,
   selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
-  accordionView: bool.isRequired
+  accordionView: bool.isRequired,
+  filteredStudents: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize, populationFilters }) => ({
