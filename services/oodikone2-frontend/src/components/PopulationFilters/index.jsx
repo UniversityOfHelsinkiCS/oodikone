@@ -366,7 +366,7 @@ class PopulationFilters extends Component {
     }
 
     return (
-      <>
+      <div data-cy="active-filters-list">
         <Header>
           Filters <InfoBox content={Filters} />
         </Header>
@@ -440,7 +440,7 @@ class PopulationFilters extends Component {
             </Modal.Actions>
           </Modal>
         ) : null}
-      </>
+      </div>
     )
   }
 

@@ -45,7 +45,7 @@ const StudentTableTabs = ({ panes, filterPanes }) => {
   // this megamillion line component :) /Joona
   const { handleTabChange } = useTabChangeAnalytics(ANALYTICS_CATEGORY, 'Change students table tab')
 
-  return <Tab onTabChange={handleTabChange} panes={filterPanes(panes)} />
+  return <Tab onTabChange={handleTabChange} panes={filterPanes(panes)} data-cy="student-table-tabs" />
 }
 
 StudentTableTabs.propTypes = {
