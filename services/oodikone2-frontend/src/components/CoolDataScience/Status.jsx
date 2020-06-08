@@ -107,7 +107,13 @@ const StatusContainer = ({
                       {year}
                       {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
                     </b>{' '}
-                    {acc ? Math.round(acc).toLocaleString('fi') : accStudents}
+                    {acc ? (
+                      Math.round(acc).toLocaleString('fi')
+                    ) : (
+                      <span>
+                        {accStudents} {!totalStudents ? 'students' : ''}
+                      </span>
+                    )}
                     {total ? (
                       <span>
                         {' '}
@@ -120,7 +126,7 @@ const StatusContainer = ({
                         <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>
                           {!!totalStudents && '/'}
                         </span>{' '}
-                        {totalStudents}
+                        {totalStudents && `${totalStudents} students`}
                       </span>
                     )}
                   </span>
