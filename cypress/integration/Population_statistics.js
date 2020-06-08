@@ -5,7 +5,7 @@ const setPopStatsUntil = (until, includeSettings = []) => {
   includeSettings.forEach(setting => {
     cy.contains("Advanced settings").parent().siblings().contains(setting).click()
   })
-  cy.contains("Statistics until").siblings().get('.rdt').get('input').eq(2).click().clear().type(until)
+  cy.get(".adv-stats-until > .form-control").click().clear().type(until)
   cy.contains("Fetch population with new settings").click()
   cy.contains("Advanced settings")
 }
@@ -40,7 +40,7 @@ describe('Population Statistics tests', () => {
   }
 
   const removeFilter = (text) => {
-    cy.contains("Filters").siblings().within(() => {
+    cy.get("[data-cy='active-filters-list']").within(() => {
       cy.contains(text).parent().within(() => {
         cy.get(".remove").click()
       })
@@ -157,9 +157,7 @@ describe('Population Statistics tests', () => {
       cy.contains("Show only students with credits at least").parentsUntil("form").contains("set filter").click()
 
     })
-    cy.contains("Filters").siblings().within(() => {
-      cy.contains("Credits at least 15")
-    })
+    cy.get("[data-cy='active-filters-list']").should("contain", "Credits at least 15")
     checkAmountOfStudents(23)
 
     cy.contains("Show only students with credits less than").parentsUntil("form").contains("set filter").should('be.disabled')
@@ -195,7 +193,7 @@ describe('Population Statistics tests', () => {
     cy.contains("This filter is saved").siblings().within(() => { cy.get("input").type(`Basic filters-${new Date().getTime()}`, { delay: 0 }) })
     cy.contains("Save current filters as preset").parentsUntil(".dimmer").within(() => { cy.get("button").contains("Save").click() })
 
-    cy.contains("Filters").siblings().within(() => {
+    cy.get("[data-cy='active-filters-list']").within(() => {
       cy.contains(`Basic filters`).parentsUntil("form").get(".remove").click()
     })
 
@@ -291,7 +289,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
     cy.contains("Courses of population").click({ force: true })
-    cy.contains("Lineaarialgebra").siblings().within(() => { cy.get('.level').click() })
+    cy.contains("Lineaarialgebra").siblings().within(() => { cy.get('.level').click({ force: true }) })
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click({ force: true })
   })
 
@@ -299,7 +297,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Select study programme").click().siblings().contains("Kielten kandiohjelma").click()
     cy.contains("See population").click()
     cy.contains("Students (5)").click()
-    cy.contains("Mandatory Courses").click()
+    cy.get("[data-cy=student-table-tabs]").contains("Mandatory Courses").click()
     cy.contains("No mandatory courses defined. You can define them here.").find("a").click()
     cy.contains("Kielten kandiohjelma")
     cy.contains("Add courses")
@@ -309,7 +307,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Select study programme").click().siblings().contains("Kielten kandiohjelma").click()
     cy.contains("See population").click()
     cy.contains("Students (5)").click()
-    cy.contains("Mandatory Courses").siblings().contains("Tags").click()
+    cy.get("[data-cy=student-table-tabs]").contains("Mandatory Courses").siblings().contains("Tags").click()
     cy.contains("No tags defined. You can define them here.").find("a").click()
     cy.contains("Kielten kandiohjelma")
     cy.contains("Create new tag")
@@ -318,7 +316,7 @@ describe('Population Statistics tests', () => {
   it("Advanced settings work", () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen kandiohjelma").click()
     cy.contains("See population").click()
-    cy.get('.field > .ui > label').click()
+    cy.get('[data-cy=advanced-toggle]').click()
     cy.contains('Statistics until')
     // only spring
     cy.contains('Semesters').siblings().contains('Fall').click()
