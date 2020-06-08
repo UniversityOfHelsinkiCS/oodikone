@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Header, Segment, Button, Icon, Popup, Tab, Grid, Ref, Item } from 'semantic-ui-react'
+import { Button, Icon, Popup, Tab, Grid, Ref, Item } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
@@ -31,7 +31,7 @@ import infotooltips from '../../common/InfoToolTips'
 import CheckStudentList from '../CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
-import PopulationCourseTable from './PopulationCourseTable'
+import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
 
 const ANALYTICS_CATEGORY = 'Population students'
@@ -497,6 +497,16 @@ class PopulationStudents extends Component {
       }))
     )
 
+    const mandatoryTitle = m => {
+      return (
+        <Fragment>
+          {getTextIn(m.name, this.props.language)}
+          <br />
+          {m.code}
+        </Fragment>
+      )
+    }
+
     const getTotalRowVal = (t, m) => t[m.code]
 
     const mandatoryCourseColumns = [
@@ -512,22 +522,17 @@ class PopulationStudents extends Component {
             'code'
           ]).map(m => ({
             key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
-            title: verticalTitle(
-              <Fragment>
-                {getTextIn(m.name, this.props.language)}
-                <br />
-                {m.code}
-              </Fragment>
-            ),
-            cellProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
-            headerProps: { title: `${getTextIn(m.name, this.props.language)}\n${m.code}` },
+            title: this.props.mandatoryToggle ? mandatoryTitle(m) : verticalTitle(mandatoryTitle(m)),
+            cellProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
+            headerProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
             getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
             getRowContent: s => {
               if (s.total) return getTotalRowVal(s, m)
               return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
             },
             child: true,
-            childOf: e.label
+            childOf: e.label,
+            code: m.code
           }))
         )
       )
@@ -573,7 +578,7 @@ class PopulationStudents extends Component {
                 {this.props.mandatoryCourses.length > 0 && (
                   <React.Fragment>
                     {this.props.mandatoryToggle ? (
-                      <PopulationCourseTable
+                      <FlippedCourseTable
                         getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
                         tableProps={{
                           celled: true,
@@ -762,42 +767,13 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const toggleLabel = this.props.showList ? 'Hide' : 'Show'
-
-    if (this.props.accordionView)
-      return (
-        <Ref innerRef={this.handleRef}>
-          <>
-            {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
-            <InfoBox content={Students.Infobox} />
-            {this.renderStudentTable()}
-          </>
-        </Ref>
-      )
     return (
       <Ref innerRef={this.handleRef}>
-        <Segment>
-          {!this.props.accordionView && (
-            <Header dividing>
-              <div>
-                {`Students (${this.props.selectedStudents.length}) `}
-                <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : Students.Infobox} />
-                <Button
-                  size="small"
-                  onClick={() => {
-                    this.props.toggleStudentListVisibility()
-                    sendAnalytics('Toggle Show students', this.props.showList ? 'Hide' : 'Show')
-                  }}
-                  data-cy="show-student-list-button"
-                >
-                  {toggleLabel}
-                </Button>
-                {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
-              </div>
-            </Header>
-          )}
+        <>
+          {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
+          <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : Students.Infobox} />
           {this.renderStudentTable()}
-        </Segment>
+        </>
       </Ref>
     )
   }
@@ -812,7 +788,6 @@ PopulationStudents.defaultProps = {
 PopulationStudents.propTypes = {
   allStudents: arrayOf(object).isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  toggleStudentListVisibility: func.isRequired,
   showNames: bool.isRequired,
   showList: bool.isRequired,
   language: string.isRequired,
