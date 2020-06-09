@@ -54,10 +54,6 @@ const NavigationBar = props => {
           return
         }
       }
-      /* TODO: filter rework */
-      if (key === 'populations' && userRoles.includes('admin') && allNavigationItems.populations.items.length === 2) {
-        allNavigationItems.populations.items.push({ path: '/populationsng', translateId: 'classNew' })
-      }
       const { reqRights } = allNavigationItems[key]
       if (!reqRights || reqRights.every(r => userRoles.includes(r))) {
         visibleNavigationItems[key] = allNavigationItems[key]
