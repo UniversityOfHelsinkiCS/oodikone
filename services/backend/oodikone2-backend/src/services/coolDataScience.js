@@ -764,6 +764,7 @@ const getProtoC = async (query, doRefresh = false) => {
   return protoC
 }
 
+// this doesn't seem to be used anywhere? consider removin
 const getProtoCProgramme = async (query, doRefresh = false) => {
   const protoCProgramme = await getRedisCDS(REDIS_KEY_PROTOC_PROGRAMME)
   if (!protoCProgramme || doRefresh) {
@@ -789,8 +790,7 @@ const getUber = async (query, doRefresh = false) => {
   const KEY = `${REDIS_KEY_UBER}_OLD_${query.include_old_attainments.toUpperCase()}_${new Date(
     query.start_date
   ).getFullYear()}`
-  console.log(query)
-  console.log(KEY)
+
   const uber = await getRedisCDS(KEY)
   if (!uber || doRefresh) {
     const data = await calculateUber(query)
@@ -818,9 +818,6 @@ const refreshUber = async query => {
   const KEY = `${REDIS_KEY_UBER}_OLD_${query.include_old_attainments.toUpperCase()}_${new Date(
     query.start_date
   ).getFullYear()}`
-  console.log(query)
-  console.log(KEY, 'refresh')
-
   const data = await calculateUber(query)
   await saveToRedis(data, KEY)
 }
