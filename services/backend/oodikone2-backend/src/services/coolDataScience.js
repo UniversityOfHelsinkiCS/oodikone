@@ -753,6 +753,8 @@ const saveToRedis = async (data, REDIS_KEY) => {
 
 const getProtoC = async (query, doRefresh = false) => {
   const { include_old_attainments, exclude_non_enrolled } = query
+
+  // redis keys for different queries
   const KEY = `${REDIS_KEY_PROTOC}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
 
   const protoC = await getRedisCDS(KEY)
@@ -776,7 +778,9 @@ const getProtoCProgramme = async (query, doRefresh = false) => {
 }
 
 const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
-  const KEY = `${REDIS_KEY_STATUS}_YEARLY_${showByYear.toUpperCase()}`
+  // redis keys for different queries. adds a new key for every queried day.
+  // might cause issues, might not but def not until I am out :D
+  const KEY = `${REDIS_KEY_STATUS}_DATE_${unixMillis}_YEARLY_${showByYear.toUpperCase()}`
   const status = await getRedisCDS(KEY)
   if (!status || doRefresh) {
     const data = await calculateStatusStatistics(unixMillis, showByYear)
@@ -787,6 +791,7 @@ const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
 }
 
 const getUber = async (query, doRefresh = false) => {
+  // redis keys for different queries
   const KEY = `${REDIS_KEY_UBER}_OLD_${query.include_old_attainments.toUpperCase()}_${new Date(
     query.start_date
   ).getFullYear()}`
