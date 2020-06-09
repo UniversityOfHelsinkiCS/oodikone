@@ -44,7 +44,6 @@ router.get(
   '/status',
   withErr(async (req, res) => {
     const { date: unixMillis, showByYear } = req.query
-    console.log(req.query)
     const date = new Date(Number(unixMillis))
     const endOfToday = new Date()
     endOfToday.setHours(23, 59, 59, 999)
