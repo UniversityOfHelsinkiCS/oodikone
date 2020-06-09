@@ -747,8 +747,11 @@ const getRedisCDS = async REDIS_KEY => {
   return raw && JSON.parse(raw)
 }
 
-const saveToRedis = async (data, REDIS_KEY) => {
+const saveToRedis = async (data, REDIS_KEY, expire = false) => {
   await redisClient.setAsync(REDIS_KEY, JSON.stringify(data))
+  if (expire) {
+    redisClient.expireat(REDIS_KEY, parseInt(new Date().valueOf() / 1000) + 86400)
+  }
 }
 
 const getProtoC = async (query, doRefresh = false) => {
@@ -784,7 +787,7 @@ const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
   const status = await getRedisCDS(KEY)
   if (!status || doRefresh) {
     const data = await calculateStatusStatistics(unixMillis, showByYear)
-    await saveToRedis(data, KEY)
+    await saveToRedis(data, KEY, true)
     return data
   }
   return status
@@ -816,7 +819,7 @@ const refreshProtoC = async query => {
 const refreshStatus = async (unixMillis, showByYear) => {
   const KEY = `${REDIS_KEY_STATUS}_DATE_${unixMillis}_YEARLY_${showByYear.toUpperCase()}`
   const data = await calculateStatusStatistics(unixMillis, showByYear)
-  await saveToRedis(data, KEY)
+  await saveToRedis(data, KEY, true)
 }
 
 const refreshUber = async query => {
