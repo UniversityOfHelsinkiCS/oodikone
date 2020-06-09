@@ -750,6 +750,7 @@ const getRedisCDS = async REDIS_KEY => {
 const saveToRedis = async (data, REDIS_KEY, expire = false) => {
   await redisClient.setAsync(REDIS_KEY, JSON.stringify(data))
   if (expire) {
+    // expire redis keys that are created daily after 24 hours
     redisClient.expireat(REDIS_KEY, parseInt(new Date().valueOf() / 1000) + 86400)
   }
 }
