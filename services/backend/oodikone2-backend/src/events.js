@@ -1,5 +1,7 @@
 const { CronJob } = require('cron')
+const moment = require('moment')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
+const { refreshProtoC, refreshStatus, refreshUber, getStartYears } = require('./services/coolDataScience')
 const { refreshAssociationsInRedis: refreshAssociationsInRedisV2 } = require('./servicesV2/studyrights')
 const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./services/studyrights')
 const {
@@ -239,6 +241,51 @@ const refreshNonGraduatedStudentsOfOldProgrammesV2 = async () => {
   }
 }
 
+const refreshProtoCtoRedis = async () => {
+  try {
+    const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false' }
+    const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false' }
+    const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true' }
+    const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true' }
+    console.log('Refreshing CDS ProtoC')
+    await refreshProtoC(defaultQuery)
+    await refreshProtoC(onlyOld)
+    await refreshProtoC(onlyEnr)
+    await refreshProtoC(bothToggles)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const refreshStatusToRedis = async () => {
+  try {
+    const unixMillis = moment().valueOf()
+    const showByYearOff = 'false'
+    const showByYear = 'true'
+    console.log('Refreshing CDS Status')
+    await refreshStatus(unixMillis, showByYearOff)
+    await refreshStatus(unixMillis, showByYear)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const refreshUberToRedis = async () => {
+  try {
+    const years = await getStartYears()
+    const mappedYears = years.map(({ studystartdate }) => studystartdate)
+    mappedYears.forEach(async year => {
+      console.log('Refreshing CDS Uber data for date', year)
+      const defaultQuery = { include_old_attainments: 'false', start_date: year }
+      const oldAttainmentsQuery = { include_old_attainments: 'true', start_date: year }
+      await refreshUber(defaultQuery)
+      await refreshUber(oldAttainmentsQuery)
+    })
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const refreshStatistics = async () => {
   await refreshFacultyYearlyStats()
   await refreshStudyrightAssociations()
@@ -254,10 +301,17 @@ const refreshStatisticsV2 = async () => {
   await refreshTeacherLeaderboardV2()
 }
 
+const refreshCDS = async () => {
+  await refreshProtoCtoRedis()
+  await refreshStatusToRedis()
+  await refreshUberToRedis()
+}
+
 const startCron = () => {
   if (process.env.NODE_ENV === 'production') {
     schedule('0 6 * * *', async () => {
       await refreshStatistics()
+      await refreshCDS()
     })
 
     if (process.env.TAG === 'staging') {
@@ -271,5 +325,6 @@ const startCron = () => {
 module.exports = {
   startCron,
   refreshStatistics,
-  refreshStatisticsV2
+  refreshStatisticsV2,
+  refreshCDS
 }
