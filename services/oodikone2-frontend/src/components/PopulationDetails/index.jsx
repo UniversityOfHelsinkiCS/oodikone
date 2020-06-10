@@ -105,7 +105,6 @@ class PopulationDetails extends Component {
       filterFeatToggle
     } = this.props
     const { Students, CreditStatistics, CoursesOf, CreditAccumulationGraph } = infoTooltips.PopulationStatistics
-    console.log(selectedStudents);
 
     const panels = [
       {
