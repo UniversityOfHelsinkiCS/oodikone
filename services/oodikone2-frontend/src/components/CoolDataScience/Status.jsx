@@ -108,6 +108,7 @@ const StatusContainer = ({
                       {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
                     </b>{' '}
                     {accStudents <= acc ? Math.round(acc).toLocaleString('fi') : accStudents}
+                    {acc <= accStudents && totalStudents < 1 && ' students'}
                     {(total > 0 || totalStudents > 0) &&
                       ` / ${
                         totalStudents <= total && total > 0
