@@ -107,28 +107,18 @@ const StatusContainer = ({
                       {year}
                       {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
                     </b>{' '}
-                    {acc ? (
-                      Math.round(acc).toLocaleString('fi')
-                    ) : (
-                      <span>
-                        {accStudents} {!totalStudents ? 'students' : ''}
-                      </span>
-                    )}
-                    {total ? (
-                      <span>
-                        {' '}
-                        {acc && <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>/</span>}{' '}
-                        {Math.round(total).toLocaleString('fi')}
-                      </span>
-                    ) : (
-                      <span>
-                        {' '}
-                        <span style={{ fontSize: '1.4em', verticalAlign: 'bottom' }}>
-                          {!!totalStudents && !!accStudents && '/'}
-                        </span>{' '}
-                        {totalStudents && `${totalStudents} students`}
-                      </span>
-                    )}
+                    {/* render num of students instead of credits if no credits are given from the course */}
+                    {accStudents <= acc ? Math.round(acc).toLocaleString('fi') : accStudents}
+                    {/* if no total students add students after accStudents */}
+                    {acc <= accStudents && totalStudents < 1 && ' students'}
+                    {/* render total if there are credits or students for either */}
+                    {(total > 0 || totalStudents > 0) &&
+                      ` / ${
+                        // same logic as before to check if render num of students or credits
+                        totalStudents <= total && total > 0
+                          ? Math.round(total).toLocaleString('fi')
+                          : `${totalStudents} students`
+                      }`}
                   </span>
                 </div>
               )
@@ -319,7 +309,7 @@ const Status = () => {
         {_.orderBy(
           Object.entries(_.last(drillStack) || data),
           ([, { current, previous, currentStudents, previousStudents }]) =>
-            getP(current || currentStudents, previous || previousStudents), // oh god
+            getP(current || currentStudents, previous || previousStudents), // oh god<r
           ['desc']
         ).map(([code, stats]) => {
           const handleClick = () => pushToDrillStack(stats.drill, code)
