@@ -138,7 +138,7 @@ const PopulationStatistics = memo(props => {
       </Header>
       <Segment className="contentSegment">
         {renderPopulationSearch()}
-        {students ? (
+        {location.search !== '' ? (
           <PopulationDetails
             translate={translate}
             selectedStudents={filterFeatToggle ? getStudentNumbers(filteredStudents) : selectedStudents}
