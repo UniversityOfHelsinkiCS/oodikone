@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import { useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
+import NewPopStudents from '../PopulationStudents/NewPopStudents'
 import PopulationCourses from '../PopulationCourses'
 import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
@@ -257,15 +258,21 @@ class PopulationDetails extends Component {
         content: {
           content: (
             <div ref={this.studentTableRef}>
-              <PopulationStudents
-                accordionView
-                mandatoryToggle={this.props.mandatoryToggle}
-                filteredStudents={
-                  filterFeatToggle
-                    ? filteredStudents
-                    : allStudents.filter(s => selectedStudents.includes(s.studentNumber))
-                }
-              />
+              {filterFeatToggle ? (
+                <NewPopStudents
+                  accordionView
+                  mandatoryToggle={this.props.mandatoryToggle}
+                  filteredStudents={filteredStudents}
+                  allStudents={allStudents}
+                  selectedStudents={selectedStudents}
+                />
+              ) : (
+                <PopulationStudents
+                  accordionView
+                  mandatoryToggle={this.props.mandatoryToggle}
+                  filteredStudents={allStudents.filter(s => selectedStudents.includes(s.studentNumber))}
+                />
+              )}
             </div>
           )
         }

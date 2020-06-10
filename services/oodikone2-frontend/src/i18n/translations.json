@@ -299,6 +299,9 @@
     "statsTableNameHeader": ["Statistic for n = ${n} Students"],
     "statsTableCreditsHeader": ["Credits Earned"],
     "statsTableAverage": ["Average"],
-    "statsTableStdDev": ["Standard Deviation"]
+    "statsTableStdDev": ["Standard Deviation"],
+    "firstQuartile": ["1st Quartile (25 %)"],
+    "secondQuartile": ["2nd Quartile (50 %)"],
+    "thirdQuartile": ["3rd Quartile (75 %)"]
   }
 }
