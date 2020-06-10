@@ -454,7 +454,6 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   const startDate = showByYear === 'true' ? getCurrentYearStartDate() : await getCurrentStudyYearStartDate(unixMillis)
   const startYear = startDate.getFullYear()
   const startTime = startDate.getTime()
-
   const yearRange = _.range(2017, startYear + 1)
   const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
     startYear,
@@ -521,8 +520,17 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     acc[providerCode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
       (acc, [courseCode, yearlyInstances]) => {
         acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
+        const array = [2020, 2019, 2018, 2017]
+        array.forEach(year => {
+          acc[courseCode]['yearly'][year] = {}
+          acc[courseCode]['yearly'][year]['acc'] = 0
+          acc[courseCode]['yearly'][year]['accStudents'] = 0
+          acc[courseCode]['yearly'][year]['total'] = 0
+          acc[courseCode]['yearly'][year]['totalStudents'] = 0
+        })
         yearlyInstances.forEach(instance => {
           if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
+
           if (instance.acc !== undefined) {
             acc[courseCode]['yearly'][instance.year]['acc'] = instance.acc
             acc[courseCode]['yearly'][instance.year]['accStudents'] = Number(instance.students)
