@@ -107,10 +107,14 @@ const StatusContainer = ({
                       {year}
                       {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
                     </b>{' '}
+                    {/* render num of students instead of credits if no credits are given from the course */}
                     {accStudents <= acc ? Math.round(acc).toLocaleString('fi') : accStudents}
+                    {/* if no total students add students after accStudents */}
                     {acc <= accStudents && totalStudents < 1 && ' students'}
+                    {/* render total if there are credits or students for either */}
                     {(total > 0 || totalStudents > 0) &&
                       ` / ${
+                        // same logic as before to check if render num of students or credits
                         totalStudents <= total && total > 0
                           ? Math.round(total).toLocaleString('fi')
                           : `${totalStudents} students`
