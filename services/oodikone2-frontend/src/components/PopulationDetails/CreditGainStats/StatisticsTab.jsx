@@ -34,21 +34,15 @@ const StatisticsTab = ({ translate, filteredStudents }) => {
           <Table.Cell data-cy="credit-stats-min">{formatNumber(jStat.min(credits), 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>
-            Q<sub>1</sub> (25%)
-          </Table.Cell>
+          <Table.Cell>{translate('creditGainStats.firstQuartile')}</Table.Cell>
           <Table.Cell data-cy="credit-stats-q1">{formatNumber(quartiles[0], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>
-            Q<sub>2</sub> (50%)
-          </Table.Cell>
+          <Table.Cell>{translate('creditGainStats.secondQuartile')}</Table.Cell>
           <Table.Cell data-cy="credit-stats-q2">{formatNumber(quartiles[1], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>
-            Q<sub>3</sub> (75%)
-          </Table.Cell>
+          <Table.Cell>{translate('creditGainStats.thirdQuartile')}</Table.Cell>
           <Table.Cell data-cy="credit-stats-q3">{formatNumber(quartiles[2], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
