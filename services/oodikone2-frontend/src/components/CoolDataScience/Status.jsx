@@ -164,6 +164,7 @@ const Status = () => {
   const [drillStack, setDrillStack] = useState([])
   const [showSettings, setShowSettings] = useState(true)
   const [selectedDate, setSelectedDate] = useState(moment())
+  const [codes, setCodes] = useState([])
   const { CoolDataScience } = InfoToolTips
 
   const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
@@ -177,6 +178,19 @@ const Status = () => {
           showByYear
         })
         setData(res.data)
+        // if showByYear changes drillstack needs to be updated
+        if (codes.length > 0) {
+          const updatedDrillStack = codes.reduce((acc, code) => {
+            const drilled = data[code]
+            // check if the code is on first level of drilldown
+            if (drilled) acc.push(drilled.drill)
+            // if not on first level then use the previous object in array
+            // this might be source of bugs but its the best I could come up with
+            else if (acc.length > 0 && acc[0][code]) acc.push(acc[0][code].drill)
+            return acc
+          }, [])
+          setDrillStack(updatedDrillStack)
+        }
         setLoading(false)
       }
 
@@ -196,14 +210,18 @@ const Status = () => {
     sendAnalytics(`S Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
   }
 
-  const pushToDrillStack = values => {
+  const pushToDrillStack = (values, code) => {
+    const updatedCodes = [...codes].concat(code)
     const updatedDrillStack = [...drillStack].concat(values)
+    setCodes(updatedCodes)
     setDrillStack(updatedDrillStack)
     sendAnalytics('S Drilldown clicked', 'Status')
   }
 
   const popFromDrillStack = () => {
     const updatedDrillStack = _.dropRight([...drillStack], 1)
+    const updatedCodes = _.dropRight([...codes], 1)
+    setCodes(updatedCodes)
     setDrillStack(updatedDrillStack)
     sendAnalytics('S Drillup clicked', 'Status')
   }
@@ -304,7 +322,7 @@ const Status = () => {
             getP(current || currentStudents, previous || previousStudents), // oh god
           ['desc']
         ).map(([code, stats]) => {
-          const handleClick = () => pushToDrillStack(stats.drill)
+          const handleClick = () => pushToDrillStack(stats.drill, code)
           // check if the course has credits or not (if credits is zero but there are students who have completed it)
           const current =
             !stats.drill && stats.current === 0 && stats.currentStudents > 1 ? stats.currentStudents : stats.current
