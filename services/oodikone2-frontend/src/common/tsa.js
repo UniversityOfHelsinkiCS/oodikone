@@ -1,3 +1,4 @@
+// Toska Surveillance Agency
 import * as Sentry from '@sentry/browser'
 import { callApi } from '../apiConnection'
 
