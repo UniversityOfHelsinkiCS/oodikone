@@ -1,7 +1,13 @@
 const { CronJob } = require('cron')
 const moment = require('moment')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
-const { refreshProtoC, refreshStatus, refreshUber, getStartYears } = require('./services/coolDataScience')
+const {
+  refreshProtoC,
+  refreshStatus,
+  refreshUber,
+  refreshProtoCProgramme,
+  getStartYears
+} = require('./services/coolDataScience')
 const { refreshAssociationsInRedis: refreshAssociationsInRedisV2 } = require('./servicesV2/studyrights')
 const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./services/studyrights')
 const {
@@ -286,6 +292,25 @@ const refreshUberToRedis = async () => {
   }
 }
 
+const refreshProtoCProgrammeToRedis = async () => {
+  try {
+    const codes = (await getAllProgrammesV2()).map(p => p.code).filter(code => code.includes('KH'))
+    codes.forEach(async code => {
+      const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false', code }
+      const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false', code }
+      const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true', code }
+      const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true', code }
+      console.log('Refreshing CDS ProtoCProgramme for code ', code)
+      await refreshProtoCProgramme(defaultQuery)
+      await refreshProtoCProgramme(onlyOld)
+      await refreshProtoCProgramme(onlyEnr)
+      await refreshProtoCProgramme(bothToggles)
+    })
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const refreshStatistics = async () => {
   await refreshFacultyYearlyStats()
   await refreshStudyrightAssociations()
@@ -305,6 +330,7 @@ const refreshCDS = async () => {
   await refreshProtoCtoRedis()
   await refreshStatusToRedis()
   await refreshUberToRedis()
+  await refreshProtoCProgrammeToRedis()
 }
 
 const startCron = () => {

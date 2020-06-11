@@ -8,9 +8,6 @@ const {
   getStartYears
 } = require('../services/coolDataScience')
 
-// const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
-// const CURRENT_DATE = new Date()
-
 router.get('/start-years', async (req, res) => {
   const years = await getStartYears()
   res.json(years.map(({ studystartdate }) => studystartdate))
