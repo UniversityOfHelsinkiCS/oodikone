@@ -1,27 +1,41 @@
 import React, { useState } from 'react'
 import { Item, Icon, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { flatten } from 'lodash';
+import { flatten } from 'lodash'
+import { connect } from 'react-redux'
 import SortableTable from '../../SortableTable'
-import { getStudentTotalCredits, getTextIn, getNewestProgramme, reformatDate, copyToClipboard } from '../../../common'
+import {
+  getStudentTotalCredits,
+  getTextIn,
+  getNewestProgramme,
+  reformatDate,
+  copyToClipboard,
+  getUserIsAdmin
+} from '../../../common'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
+import sendEvent from '../../../common/sendEvent'
+import { getActiveLanguage } from 'react-localize-redux'
 
 const GeneralTab = ({
   data,
   showNames,
-  sendAnalytics,
   coursePopulation,
   customPopulation,
   populationStatistics,
   language,
-  containsStudyTracks,
   queryStudyrights,
-  admin,
+  isAdmin,
   studentToTargetCourseDateMap,
   selectedStudents,
   students
 }) => {
   const [popupStates, setPopupStates] = useState({})
+  const sendAnalytics = sendEvent.populationStudents
+
+  // TODO: This fixes crashing upon using back button. Find the root cause and fix it.
+  if (!populationStatistics.elementdetails) {
+    return null
+  }
 
   const popupTimeoutLength = 1000
   let timeout = null
@@ -40,10 +54,6 @@ const GeneralTab = ({
   }
 
   const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, language)
-
-
-
-
 
   const studyrightCodes = (studyrights, value) => {
     return studyrights
@@ -130,6 +140,21 @@ const GeneralTab = ({
     sendAnalytics('Copy all student emails to clipboard', 'Copy all student emails to clipboard')
   }
 
+  const containsStudyTracks = () => {
+    const allStudyrights = selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
+    return allStudyrights
+      .map(
+        studyrights =>
+          studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
+            elemArr
+              .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
+              .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name, language)))
+            return acc
+          }, []).length > 0
+      )
+      .some(el => el === true)
+  }
+
   // TODO: asd
 
   const columns = []
@@ -191,7 +216,7 @@ const GeneralTab = ({
       getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
     })
   }
-  if (containsStudyTracks && !(coursePopulation || customPopulation)) {
+  if (containsStudyTracks() && !(coursePopulation || customPopulation)) {
     columns.push({
       key: 'studytrack',
       title: 'Study Track',
@@ -199,7 +224,7 @@ const GeneralTab = ({
     })
   }
 
-  if (admin && !(coursePopulation || customPopulation)) {
+  if (isAdmin && !(coursePopulation || customPopulation)) {
     columns.push(
       {
         key: 'priority',
@@ -243,7 +268,7 @@ const GeneralTab = ({
     )
   }
 
-  if (admin) {
+  if (isAdmin) {
     columns.push({
       key: 'updatedAt',
       title: 'Last Updated At',
@@ -319,4 +344,20 @@ const GeneralTab = ({
   )
 }
 
-export default GeneralTab
+const mapStateToProps = state => {
+  const {
+    localize,
+    populations,
+    auth: {
+      token: { roles }
+    }
+  } = state
+
+  return {
+    isAdmin: getUserIsAdmin(roles),
+    language: getActiveLanguage(localize).code,
+    populationStatistics: populations.data
+  }
+}
+
+export default connect(mapStateToProps)(GeneralTab)
