@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { shape, bool, func } from 'prop-types'
+import { connect } from 'react-redux'
 import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
@@ -9,8 +10,8 @@ import Datetime from 'react-datetime'
 import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
-import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
+import { getStatus } from '../../redux/coolDataScience'
 import './status.css'
 
 const ANALYTICS_CATEGORY = 'Trends'
@@ -145,12 +146,10 @@ StatusContainer.propTypes = {
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
 
-const Status = () => {
+const Status = ({ getStatusDispatch, data, loading }) => {
   const DATE_FORMAT = 'DD.MM.YYYY'
   const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
   const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
-  const [loading, setLoading] = useState(false)
-  const [data, setData] = useState(null)
   const [drillStack, setDrillStack] = useState([])
   const [showSettings, setShowSettings] = useState(true)
   const [selectedDate, setSelectedDate] = useState(moment())
@@ -161,32 +160,24 @@ const Status = () => {
 
   useEffect(() => {
     if (selectedDate && isValidDate(selectedDate)) {
-      const load = async () => {
-        setLoading(true)
-        const res = await callApi('/cool-data-science/status', 'get', null, {
-          date: selectedDate.valueOf(),
-          showByYear
-        })
-        setData(res.data)
-        // if showByYear changes drillstack needs to be updated
-        if (codes.length > 0) {
-          const updatedDrillStack = codes.reduce((acc, code) => {
-            const drilled = data[code]
-            // check if the code is on first level of drilldown
-            if (drilled) acc.push(drilled.drill)
-            // if not on first level then use the previous object in array
-            // this might be source of bugs but its the best I could come up with
-            else if (acc.length > 0 && acc[0][code]) acc.push(acc[0][code].drill)
-            return acc
-          }, [])
-          setDrillStack(updatedDrillStack)
-        }
-        setLoading(false)
-      }
-
-      load()
+      getStatusDispatch({ date: selectedDate.valueOf(), showByYear })
     }
   }, [selectedDate, showByYear])
+
+  useEffect(() => {
+    if (codes.length > 0) {
+      const updatedDrillStack = codes.reduce((acc, code) => {
+        const drilled = data[code]
+        // check if the code is on first level of drilldown
+        if (drilled) acc.push(drilled.drill)
+        // if not on first level then use the previous object in array
+        // this might be source of bugs but its the best I could come up with
+        else if (acc.length > 0 && acc[0][code]) acc.push(acc[0][code].drill)
+        return acc
+      }, [])
+      setDrillStack(updatedDrillStack)
+    }
+  }, [data])
 
   const handleShowYearlyValuesToggled = () => {
     const yearlyValues = showYearlyValues
@@ -343,4 +334,18 @@ const Status = () => {
   )
 }
 
-export default Status
+Status.propTypes = {
+  data: shape({}).isRequired,
+  loading: bool.isRequired,
+  getStatusDispatch: func.isRequired
+}
+
+const mapStateToProps = ({ coolDataScience }) => ({
+  data: coolDataScience.data.status,
+  loading: coolDataScience.pending.status
+})
+
+export default connect(
+  mapStateToProps,
+  { getStatusDispatch: getStatus }
+)(Status)
