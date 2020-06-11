@@ -2,20 +2,12 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Button, Icon, Popup, Tab, Grid, Ref, Item } from 'semantic-ui-react'
+import { Button, Icon, Tab, Grid, Ref, Item } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
 import scrollToComponent from 'react-scroll-to-component'
-import {
-  getStudentTotalCredits,
-  copyToClipboard,
-  reformatDate,
-  getTextIn,
-  getUserRoles,
-  getNewestProgramme
-} from '../../common'
-import TSA from '../../common/tsa'
+import { getStudentTotalCredits, reformatDate, getTextIn, getUserRoles } from '../../common'
 import { useTabChangeAnalytics } from '../../common/hooks'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
@@ -28,22 +20,26 @@ import '../PopulationCourseStats/populationCourseStats.css'
 import SortableTable from '../SortableTable'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
-import CheckStudentList from '../CheckStudentList'
+import CheckStudentList from './CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
 import selector from '../../selectors/populationDetails'
 import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
+import GeneralTab from './StudentTable/GeneralTab'
+import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
 
-const ANALYTICS_CATEGORY = 'Population students'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
+// TODO: Refactoring in process, contains lot of duplicate code.
 
-const popupTimeoutLength = 1000
+const sendAnalytics = sendEvent.populationStudents
 
 const StudentTableTabs = ({ panes, filterPanes }) => {
   // only its own component really because I needed to use hooks and didn't want to refactor
   // this megamillion line component :) /Joona
-  const { handleTabChange } = useTabChangeAnalytics(ANALYTICS_CATEGORY, 'Change students table tab')
+  const { handleTabChange } = useTabChangeAnalytics(
+    ANALYTICS_CATEGORIES.populationStudents,
+    'Change students table tab'
+  )
 
   return <Tab onTabChange={handleTabChange} panes={filterPanes(panes)} data-cy="student-table-tabs" />
 }
@@ -57,10 +53,7 @@ class PopulationStudents extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      containsStudyTracks: false,
-      students: []
-    }
+    this.state = {}
 
     this.studentsRef = React.createRef()
   }
@@ -72,34 +65,13 @@ class PopulationStudents extends Component {
       this.props.getTagsByStudytrack(queryStudyright)
       this.props.getStudentTagsStudyTrack(queryStudyright)
     }
-    this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
+    this.setState({ admin })
   }
 
   componentDidUpdate = prevProps => {
     if (!prevProps.showList && this.props.showList) {
       scrollToComponent(this.studentsRef.current, { align: 'bottom' })
     }
-  }
-
-  containsStudyTracks = () => {
-    const { language, populationStatistics } = this.props
-    const students = this.props.samples.reduce((obj, s) => {
-      obj[s.studentNumber] = s
-      return obj
-    }, {})
-    this.setState({ students: this.props.samples })
-    const allStudyrights = this.props.selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
-    return allStudyrights
-      .map(
-        studyrights =>
-          this.studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
-            elemArr
-              .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
-              .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name, language)))
-            return acc
-          }, []).length > 0
-      )
-      .some(el => el === true)
   }
 
   studyrightCodes = (studyrights, value) => {
@@ -112,19 +84,6 @@ class PopulationStudents extends Component {
       .map(a => a[value])
   }
 
-  handlePopupOpen = id => {
-    this.setState({ [id]: true })
-
-    this.timeout = setTimeout(() => {
-      this.setState({ [id]: false })
-    }, popupTimeoutLength)
-  }
-
-  handlePopupClose = id => {
-    this.setState({ [id]: false })
-    clearTimeout(this.timeout)
-  }
-
   handleRef = node => {
     this.studentsRef.current = node
   }
@@ -134,33 +93,11 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const { admin, containsStudyTracks } = this.state
     const { populationStatistics, customPopulation, coursePopulation } = this.props
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
     }, {})
-
-    const studentToStudyrightStartMap = !(customPopulation || coursePopulation)
-      ? this.props.selectedStudents.reduce((res, sn) => {
-          const targetStudyright = flatten(
-            students[sn].studyrights.reduce((acc, curr) => {
-              acc.push(curr.studyright_elements)
-              return acc
-            }, [])
-          ).filter(e => e.code === this.props.queryStudyrights[0])
-          res[sn] = targetStudyright[0] ? targetStudyright[0].startdate : null
-          return res
-        }, {})
-      : null
-
-    const copyToClipboardAll = () => {
-      const studentsInfo = this.props.selectedStudents.map(number => students[number])
-      const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
-      const clipboardString = emails.join('; ')
-      copyToClipboard(clipboardString)
-      sendAnalytics('Copy all student emails to clipboard', 'Copy all student emails to clipboard')
-    }
 
     const transferFrom = s =>
       getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, this.props.language)
@@ -178,19 +115,6 @@ class PopulationStudents extends Component {
     const tags = tags => {
       const studentTags = tags.map(t => t.tag.tagname)
       return studentTags.join(', ')
-    }
-
-    const mainProgramme = (studyrights, studentNumber) => {
-      const programme = getNewestProgramme(
-        studyrights,
-        studentNumber,
-        this.props.studentToTargetCourseDateMap,
-        populationStatistics.elementdetails.data
-      )
-      if (programme) {
-        return programme.name
-      }
-      return null
     }
 
     const studytrack = studyrights => {
@@ -219,176 +143,6 @@ class PopulationStudents extends Component {
         return acc
       }, [])
       return res
-    }
-
-    const columns = []
-    if (this.props.showNames) {
-      columns.push(
-        { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
-        { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames }
-      )
-    }
-    columns.push(
-      {
-        key: 'studentnumber',
-        title: 'Student Number',
-        getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
-        getRowContent: s => (
-          <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
-            {!s.obfuscated ? s.studentNumber : 'hidden'}
-          </span>
-        ),
-        headerProps: { colSpan: 2 }
-      },
-      {
-        key: 'icon',
-        getRowVal: s =>
-          !s.obfuscated && (
-            <Item
-              as={Link}
-              to={`/students/${s.studentNumber}`}
-              onClick={() => {
-                sendAnalytics('Student details button clicked', 'General tab')
-              }}
-            >
-              <Icon name="level up alternate" />
-            </Item>
-          ),
-        cellProps: { collapsing: true, className: 'iconCellNoPointer' }
-      }
-    )
-    if (!(coursePopulation || customPopulation)) {
-      columns.push({
-        key: 'credits since start',
-        title: 'credits since start of studyright',
-        getRowVal: s => {
-          const credits = getStudentTotalCredits(s)
-          return credits
-        }
-      })
-    }
-    columns.push({
-      key: 'all credits',
-      title: 'All Credits',
-      getRowVal: s => s.credits
-    })
-
-    if (!(coursePopulation || customPopulation)) {
-      columns.push({
-        key: 'transferred from',
-        title: 'Transferred From',
-        getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
-      })
-    }
-    if (containsStudyTracks && !(coursePopulation || customPopulation)) {
-      columns.push({
-        key: 'studytrack',
-        title: 'Study Track',
-        getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0]
-      })
-    }
-
-    if (admin && !(coursePopulation || customPopulation)) {
-      columns.push(
-        {
-          key: 'priority',
-          title: 'priority',
-          getRowVal: s => priorityText(s.studyrights)
-        },
-        {
-          key: 'extent',
-          title: 'extent',
-          getRowVal: s => extentCodes(s.studyrights)
-        }
-      )
-    }
-    columns.push({
-      key: 'tags',
-      title: 'Tags',
-      getRowVal: s => (!s.obfuscated ? tags(s.tags) : '')
-    })
-
-    if (!(coursePopulation || customPopulation)) {
-      columns.push({
-        key: 'studystartdate',
-        title: 'start of studyright',
-        getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
-        getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD')
-      })
-    }
-
-    if (coursePopulation || customPopulation) {
-      columns.push(
-        {
-          key: 'programme',
-          title: 'Study Programme',
-          getRowVal: s =>
-            getTextIn(mainProgramme(s.studyrights, s.studentNumber), this.props.language) || 'No programme'
-        },
-        {
-          key: 'startyear',
-          title: 'Start Year at Uni',
-          getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : '')
-        }
-      )
-    }
-
-    if (admin) {
-      columns.push({
-        key: 'updatedAt',
-        title: 'Last Updated At',
-        getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
-      })
-    }
-    if (this.props.showNames) {
-      columns.push(
-        {
-          key: 'email',
-          title: (
-            <Fragment>
-              email
-              <Popup
-                trigger={<Icon link name="copy" onClick={copyToClipboardAll} style={{ float: 'right' }} />}
-                content="Copied email list!"
-                on="click"
-                open={this.state['0']}
-                onClose={() => this.handlePopupClose('0')}
-                onOpen={() => this.handlePopupOpen('0')}
-                position="top right"
-              />
-            </Fragment>
-          ),
-          getRowVal: s => s.email,
-          headerProps: { colSpan: 2 }
-        },
-        {
-          key: 'copy email',
-          getRowVal: s =>
-            s.email && !s.obfuscated ? (
-              <Popup
-                trigger={
-                  <Icon
-                    link
-                    name="copy outline"
-                    onClick={() => {
-                      copyToClipboard(s.email)
-                      sendAnalytics("Copy student's email to clipboard", "Copy student's email to clipboard")
-                    }}
-                    style={{ float: 'right' }}
-                  />
-                }
-                content="Email copied!"
-                on="click"
-                open={this.state[s.studentNumber]}
-                onClose={() => this.handlePopupClose(s.studentNumber)}
-                onOpen={() => this.handlePopupOpen(s.studentNumber)}
-                position="top right"
-              />
-            ) : null,
-          headerProps: { onClick: null, sorted: null },
-          cellProps: { collapsing: true, className: 'iconCellNoPointer' }
-        }
-      )
     }
 
     const verticalTitle = title => <div className="verticalTitle">{title}</div>
@@ -547,25 +301,20 @@ class PopulationStudents extends Component {
     }, this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true }))
     const mandatoryCourseData = [totals, ...selectedStudentsData]
 
+    // FIXME: here only for refactorment
+    const { showNames, studentToTargetCourseDateMap } = this.props
+
     const panes = [
       {
         menuItem: 'General',
         render: () => (
           <Tab.Pane>
-            <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-              <SortableTable
-                getRowKey={s => s.studentNumber}
-                tableProps={{
-                  collapsing: true,
-                  basic: true,
-                  compact: 'very',
-                  padded: false,
-                  celled: true
-                }}
-                columns={columns}
-                data={this.props.selectedStudents.map(sn => students[sn])}
-              />
-            </div>
+            <GeneralTab
+              showNames={showNames}
+              coursePopulation={coursePopulation}
+              customPopulation={customPopulation}
+              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            />
           </Tab.Pane>
         )
       },
