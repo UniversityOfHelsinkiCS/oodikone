@@ -780,7 +780,6 @@ const getProtoC = async (query, doRefresh = false) => {
 // used for studytrack view
 const getProtoCProgramme = async (query, doRefresh = false) => {
   const { include_old_attainments, exclude_non_enrolled, code } = query
-
   const KEY = `${REDIS_KEY_PROTOC_PROGRAMME}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
   const protoCProgramme = await getRedisCDS(KEY)
 
