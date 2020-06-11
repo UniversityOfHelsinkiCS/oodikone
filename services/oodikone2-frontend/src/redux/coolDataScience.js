@@ -21,10 +21,23 @@ export const getStatus = ({ date, showByYear }) => {
   return callController(route, prefix, [], 'get', null, params)
 }
 
+export const getUber = ({ startDate, includeOldAttainments }) => {
+  const route = '/cool-data-science/uber-data'
+  const prefix = 'GET_UBER_'
+  const params = { start_date: startDate, include_old_attainments: includeOldAttainments }
+  return callController(route, prefix, [], 'get', null, params)
+}
+
+export const getYears = () => {
+  const route = '/cool-data-science/start-years'
+  const prefix = 'GET_YEARS_'
+  return callController(route, prefix)
+}
+
 const reducer = (
   state = {
-    data: { protoC: {}, protoCProgramme: {}, status: {}, uber: {} },
-    pending: { protoC: false, protoCProgramme: false, status: false, uber: false }
+    data: { protoC: {}, protoCProgramme: {}, status: {}, uber: [], years: [] },
+    pending: { protoC: false, protoCProgramme: false, status: false, uber: false, years: false }
   },
   action
 ) => {
@@ -135,6 +148,78 @@ const reducer = (
         pending: {
           ...state.pending,
           status: false
+        }
+      }
+    case 'GET_UBER_ATTEMPT':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          uber: []
+        },
+        pending: {
+          ...state.pending,
+          uber: true
+        }
+      }
+    case 'GET_UBER_FAILED':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          uber: []
+        },
+        pending: {
+          ...state.pending,
+          uber: false
+        }
+      }
+    case 'GET_UBER_SUCCESS':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          uber: action.response || []
+        },
+        pending: {
+          ...state.pending,
+          uber: false
+        }
+      }
+    case 'GET_YEARS_ATTEMPT':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          years: []
+        },
+        pending: {
+          ...state.pending,
+          years: true
+        }
+      }
+    case 'GET_YEARS_FAILED':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          years: []
+        },
+        pending: {
+          ...state.pending,
+          years: false
+        }
+      }
+    case 'GET_YEARS_SUCCESS':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          years: action.response || []
+        },
+        pending: {
+          ...state.pending,
+          years: false
         }
       }
     default:
