@@ -15,7 +15,6 @@ import {
   getUserRoles,
   getNewestProgramme
 } from '../../common'
-import TSA from '../../common/tsa'
 import { useTabChangeAnalytics } from '../../common/hooks'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
@@ -35,15 +34,17 @@ import selector from '../../selectors/populationDetails'
 import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
+import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
 
-const ANALYTICS_CATEGORY = 'Population students'
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
-
+const sendAnalytics = sendEvent.populationStudents
 
 const StudentTableTabs = ({ panes, filterPanes }) => {
   // only its own component really because I needed to use hooks and didn't want to refactor
   // this megamillion line component :) /Joona
-  const { handleTabChange } = useTabChangeAnalytics(ANALYTICS_CATEGORY, 'Change students table tab')
+  const { handleTabChange } = useTabChangeAnalytics(
+    ANALYTICS_CATEGORIES.populationStudents,
+    'Change students table tab'
+  )
 
   return <Tab onTabChange={handleTabChange} panes={filterPanes(panes)} data-cy="student-table-tabs" />
 }
@@ -58,8 +59,6 @@ class PopulationStudents extends Component {
     super(props)
 
     this.state = {
-      containsStudyTracks: false,
-      students: []
     }
 
     this.studentsRef = React.createRef()
@@ -72,34 +71,13 @@ class PopulationStudents extends Component {
       this.props.getTagsByStudytrack(queryStudyright)
       this.props.getStudentTagsStudyTrack(queryStudyright)
     }
-    this.setState({ admin, containsStudyTracks: this.containsStudyTracks() })
+    this.setState({ admin })
   }
 
   componentDidUpdate = prevProps => {
     if (!prevProps.showList && this.props.showList) {
       scrollToComponent(this.studentsRef.current, { align: 'bottom' })
     }
-  }
-
-  containsStudyTracks = () => {
-    const { language, populationStatistics } = this.props
-    const students = this.props.samples.reduce((obj, s) => {
-      obj[s.studentNumber] = s
-      return obj
-    }, {})
-    this.setState({ students: this.props.samples })
-    const allStudyrights = this.props.selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
-    return allStudyrights
-      .map(
-        studyrights =>
-          this.studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
-            elemArr
-              .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
-              .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name, language)))
-            return acc
-          }, []).length > 0
-      )
-      .some(el => el === true)
   }
 
   studyrightCodes = (studyrights, value) => {
@@ -121,7 +99,6 @@ class PopulationStudents extends Component {
       return null
     }
 
-    const { admin, containsStudyTracks } = this.state
     const { populationStatistics, customPopulation, coursePopulation } = this.props
     const students = this.props.samples.reduce((obj, s) => {
       obj[s.studentNumber] = s
@@ -344,7 +321,7 @@ class PopulationStudents extends Component {
     const mandatoryCourseData = [totals, ...selectedStudentsData]
 
     // FIXME: here only for refactorment
-    const { showNames, language, queryStudyrights, studentToTargetCourseDateMap, selectedStudents } = this.props
+    const { showNames, queryStudyrights, studentToTargetCourseDateMap, selectedStudents } = this.props
 
     const panes = [
       {
@@ -354,14 +331,9 @@ class PopulationStudents extends Component {
             <GeneralTab
               showNames={showNames}
               data={this.props.selectedStudents.map(sn => students[sn])}
-              sendAnalytics={sendAnalytics}
               coursePopulation={coursePopulation}
               customPopulation={customPopulation}
-              populationStatistics={populationStatistics}
-              language={language}
-              containsStudyTracks={containsStudyTracks}
               queryStudyrights={queryStudyrights}
-              admin={admin}
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
               selectedStudents={selectedStudents}
               students={students}
