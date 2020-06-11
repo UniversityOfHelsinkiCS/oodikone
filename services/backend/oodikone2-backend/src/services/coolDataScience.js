@@ -781,7 +781,7 @@ const getProtoC = async (query, doRefresh = false) => {
 const getProtoCProgramme = async (query, doRefresh = false) => {
   const { include_old_attainments, exclude_non_enrolled, code } = query
 
-  const KEY = `${REDIS_KEY_PROTOC}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
+  const KEY = `${REDIS_KEY_PROTOC_PROGRAMME}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
   const protoCProgramme = await getRedisCDS(KEY)
 
   if (!protoCProgramme || doRefresh) {
@@ -823,7 +823,7 @@ const getUber = async (query, doRefresh = false) => {
 const refreshProtoCProgramme = async query => {
   const { include_old_attainments, exclude_non_enrolled, code } = query
 
-  const KEY = `${REDIS_KEY_PROTOC}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
+  const KEY = `${REDIS_KEY_PROTOC_PROGRAMME}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
 
   const data = await calculateProtoCProgramme(query)
   await saveToRedis(data, KEY)
