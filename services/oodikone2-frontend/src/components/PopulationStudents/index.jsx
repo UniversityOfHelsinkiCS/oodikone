@@ -2,12 +2,19 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Button, Icon, Tab, Grid, Ref, Item } from 'semantic-ui-react'
+import { Button, Icon, Popup, Tab, Grid, Ref, Item } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import XLSX from 'xlsx'
 import scrollToComponent from 'react-scroll-to-component'
-import { getStudentTotalCredits, reformatDate, getTextIn, getUserRoles } from '../../common'
+import {
+  getStudentTotalCredits,
+  copyToClipboard,
+  reformatDate,
+  getTextIn,
+  getUserRoles,
+  getNewestProgramme
+} from '../../common'
 import { useTabChangeAnalytics } from '../../common/hooks'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 
@@ -28,8 +35,6 @@ import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
-
-// TODO: Refactoring in process, contains lot of duplicate code.
 
 const sendAnalytics = sendEvent.populationStudents
 
@@ -53,7 +58,8 @@ class PopulationStudents extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {}
+    this.state = {
+    }
 
     this.studentsRef = React.createRef()
   }
@@ -115,6 +121,19 @@ class PopulationStudents extends Component {
     const tags = tags => {
       const studentTags = tags.map(t => t.tag.tagname)
       return studentTags.join(', ')
+    }
+
+    const mainProgramme = (studyrights, studentNumber) => {
+      const programme = getNewestProgramme(
+        studyrights,
+        studentNumber,
+        this.props.studentToTargetCourseDateMap,
+        populationStatistics.elementdetails.data
+      )
+      if (programme) {
+        return programme.name
+      }
+      return null
     }
 
     const studytrack = studyrights => {
@@ -302,7 +321,7 @@ class PopulationStudents extends Component {
     const mandatoryCourseData = [totals, ...selectedStudentsData]
 
     // FIXME: here only for refactorment
-    const { showNames, studentToTargetCourseDateMap } = this.props
+    const { showNames, queryStudyrights, studentToTargetCourseDateMap, selectedStudents } = this.props
 
     const panes = [
       {
@@ -311,9 +330,13 @@ class PopulationStudents extends Component {
           <Tab.Pane>
             <GeneralTab
               showNames={showNames}
+              data={this.props.selectedStudents.map(sn => students[sn])}
               coursePopulation={coursePopulation}
               customPopulation={customPopulation}
+              queryStudyrights={queryStudyrights}
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+              selectedStudents={selectedStudents}
+              students={students}
             />
           </Tab.Pane>
         )
