@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect, useCallback } from 'react'
+import { connect } from 'react-redux'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Table, Form, Dropdown, Icon, Checkbox, Message } from 'semantic-ui-react'
@@ -7,8 +8,8 @@ import _ from 'lodash'
 import ReactMarkdown from 'react-markdown'
 
 import TSA from '../../common/tsa'
-import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
+import { getUber, getYears } from '../../redux/coolDataScience'
 import './protoG.css'
 
 const ANALYTICS_CATEGORY = 'Trends'
@@ -158,35 +159,26 @@ const getSnapshotsStartYears = _.memoize(snapshots =>
   _.uniq(snapshots.map(s => new Date(s.date).getFullYear())).map(year => new Date(year, 8, 1))
 )
 
-const ProtoG = () => {
+const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, getYearsDispatch }) => {
   const [startOptions, setStartOptions] = useState([])
   const [startDate, setStartDate] = useState(null)
-  const [uberdata, setUberdata] = useState(null)
-  const [isLoading, setLoading] = useState(true)
   const [expandedOrgs, setExpandedOrgs] = useState({})
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
 
   useEffect(() => {
-    async function load() {
-      setLoading(true)
-      const res = await callApi('/cool-data-science/start-years')
-      setLoading(false)
-      setStartOptions(res.data.map((date, i) => ({ key: i, text: new Date(date).getFullYear(), value: date })))
-      setStartDate(res.data[0])
-    }
-
-    load()
+    getYearsDispatch()
   }, [])
 
   useEffect(() => {
+    if (years.length > 0) {
+      setStartOptions(years.map((date, i) => ({ key: i, text: new Date(date).getFullYear(), value: date })))
+      setStartDate(years[0])
+    }
+  }, [years])
+
+  useEffect(() => {
     async function load() {
-      setLoading(true)
-      const res = await callApi('/cool-data-science/uber-data', 'get', null, {
-        start_date: startDate,
-        include_old_attainments: includeOldAttainments.toString()
-      })
-      setUberdata(res.data)
-      setLoading(false)
+      getUberDispatch({ startDate, includeOldAttainments: includeOldAttainments.toString() })
     }
 
     if (startDate) {
@@ -238,9 +230,9 @@ const ProtoG = () => {
         </Form.Group>
       </Form>
 
-      <Segment placeholder={isLoading} vertical>
-        <Dimmer inverted active={isLoading} />
-        <Loader active={isLoading} />
+      <Segment placeholder={isLoading || loadingYears} vertical>
+        <Dimmer inverted active={isLoading || loadingYears} />
+        <Loader active={isLoading || loadingYears} />
 
         {uberdata && (
           <Table compact striped className="proto-g-table">
@@ -298,4 +290,14 @@ const ProtoG = () => {
   )
 }
 
-export default ProtoG
+const mapStateToProps = ({ coolDataScience }) => ({
+  uberdata: coolDataScience.data.uber || [],
+  isLoading: coolDataScience.pending.uber,
+  years: coolDataScience.data.years,
+  loadingYears: coolDataScience.pending.years
+})
+
+export default connect(
+  mapStateToProps,
+  { getUberDispatch: getUber, getYearsDispatch: getYears }
+)(ProtoG)
