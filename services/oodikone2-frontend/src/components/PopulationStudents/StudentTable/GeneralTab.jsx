@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
+import { shape, bool, string, arrayOf, object } from 'prop-types'
 import { Item, Icon, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { flatten } from 'lodash'
 import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import SortableTable from '../../SortableTable'
 import {
   getStudentTotalCredits,
@@ -14,10 +16,11 @@ import {
 } from '../../../common'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
-import { getActiveLanguage } from 'react-localize-redux'
+import selector from '../../../selectors/populationDetails'
+
+// TODO: Refactoring in process, contains lot of duplicate code.
 
 const GeneralTab = ({
-  data,
   showNames,
   coursePopulation,
   customPopulation,
@@ -27,7 +30,7 @@ const GeneralTab = ({
   isAdmin,
   studentToTargetCourseDateMap,
   selectedStudents,
-  students
+  samples
 }) => {
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
@@ -36,6 +39,11 @@ const GeneralTab = ({
   if (!populationStatistics.elementdetails) {
     return null
   }
+
+  const students = samples.reduce((obj, s) => {
+    obj[s.studentNumber] = s
+    return obj
+  }, {})
 
   const popupTimeoutLength = 1000
   let timeout = null
@@ -338,10 +346,29 @@ const GeneralTab = ({
           celled: true
         }}
         columns={columns}
-        data={data}
+        data={selectedStudents.map(sn => students[sn])}
       />
     </div>
   )
+}
+
+GeneralTab.defaultProps = {
+  studentToTargetCourseDateMap: null,
+  customPopulation: false,
+  coursePopulation: false
+}
+
+GeneralTab.propTypes = {
+  showNames: bool.isRequired,
+  coursePopulation: bool,
+  customPopulation: bool,
+  populationStatistics: shape({}).isRequired,
+  language: string.isRequired,
+  queryStudyrights: arrayOf(string).isRequired,
+  isAdmin: bool.isRequired,
+  studentToTargetCourseDateMap: shape({}),
+  selectedStudents: arrayOf(string).isRequired,
+  samples: arrayOf(object).isRequired
 }
 
 const mapStateToProps = state => {
@@ -353,10 +380,15 @@ const mapStateToProps = state => {
     }
   } = state
 
+  const { selectedStudents, samples } = selector.makePopulationsToData(state)
+
   return {
     isAdmin: getUserIsAdmin(roles),
     language: getActiveLanguage(localize).code,
-    populationStatistics: populations.data
+    populationStatistics: populations.data,
+    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
+    selectedStudents,
+    samples
   }
 }
 
