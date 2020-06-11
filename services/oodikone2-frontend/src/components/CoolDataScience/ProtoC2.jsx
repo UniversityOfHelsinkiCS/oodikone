@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { func, bool, shape } from 'prop-types'
+import { connect } from 'react-redux'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-react'
@@ -7,8 +8,8 @@ import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import TSA from '../../common/tsa'
-import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
+import { getProtoC } from '../../redux/coolDataScience'
 
 HighchartsCustomEvents(Highcharts)
 
@@ -402,9 +403,7 @@ OrgChart.propTypes = {
   isSideways: PropTypes.bool
 }
 
-const ProtoC = () => {
-  const [data, setData] = useState(null)
-  const [isLoading, setLoading] = useState(true)
+const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
 
@@ -412,17 +411,10 @@ const ProtoC = () => {
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true)
-      const res = await callApi('/cool-data-science/proto-c-data', 'get', null, {
-        include_old_attainments: includeOldAttainments.toString(),
-        exclude_non_enrolled: excludeNonEnrolled.toString()
-      })
-      setData(res.data)
-      setLoading(false)
-    }
-
-    load()
+    getProtoCDispatch({
+      includeOldAttainments: includeOldAttainments.toString(),
+      excludeNonEnrolled: excludeNonEnrolled.toString()
+    })
   }, [includeOldAttainments, excludeNonEnrolled])
 
   const handleOldAttainmentToggled = useCallback(() => {
@@ -510,4 +502,18 @@ const ProtoC = () => {
   )
 }
 
-export default ProtoC
+ProtoC.propTypes = {
+  isLoading: bool.isRequired,
+  data: shape({}).isRequired,
+  getProtoCDispatch: func.isRequired
+}
+
+const mapStateToProps = ({ coolDataScience }) => ({
+  data: coolDataScience.data.protoC,
+  isLoading: coolDataScience.pending.protoC
+})
+
+export default connect(
+  mapStateToProps,
+  { getProtoCDispatch: getProtoC }
+)(ProtoC)
