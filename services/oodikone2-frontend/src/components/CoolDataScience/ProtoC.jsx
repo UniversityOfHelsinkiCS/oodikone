@@ -9,7 +9,6 @@ import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import TSA from '../../common/tsa'
-import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
 import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
 

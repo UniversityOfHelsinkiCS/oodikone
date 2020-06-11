@@ -3,15 +3,22 @@ import { callController } from '../apiConnection'
 export const getProtoC = ({ includeOldAttainments, excludeNonEnrolled }) => {
   const route = '/cool-data-science/proto-c-data'
   const prefix = 'GET_PROTOC_'
-  const query = { include_old_attainments: includeOldAttainments, exclude_non_enrolled: excludeNonEnrolled }
-  return callController(route, prefix, [], 'get', query)
+  const params = { include_old_attainments: includeOldAttainments, exclude_non_enrolled: excludeNonEnrolled }
+  return callController(route, prefix, [], 'get', null, params)
 }
 
 export const getProtoCProgramme = ({ includeOldAttainments, excludeNonEnrolled, code }) => {
   const route = '/cool-data-science/proto-c-data-programme'
   const prefix = 'GET_PROTOC_PROGRAMME_'
-  const query = { include_old_attainments: includeOldAttainments, exclude_non_enrolled: excludeNonEnrolled, code }
-  return callController(route, prefix, [], 'get', query)
+  const params = { include_old_attainments: includeOldAttainments, exclude_non_enrolled: excludeNonEnrolled, code }
+  return callController(route, prefix, [], 'get', null, params)
+}
+
+export const getStatus = ({ date, showByYear }) => {
+  const route = '/cool-data-science/status'
+  const prefix = 'GET_STATUS_'
+  const params = { date, showByYear }
+  return callController(route, prefix, [], 'get', null, params)
 }
 
 const reducer = (
@@ -92,6 +99,42 @@ const reducer = (
         pending: {
           ...state.pending,
           protoCProgramme: false
+        }
+      }
+    case 'GET_STATUS_ATTEMPT':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          status: {}
+        },
+        pending: {
+          ...state.pending,
+          status: true
+        }
+      }
+    case 'GET_STATUS_FAILED':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          status: {}
+        },
+        pending: {
+          ...state.pending,
+          status: false
+        }
+      }
+    case 'GET_STATUS_SUCCESS':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          status: action.response || {}
+        },
+        pending: {
+          ...state.pending,
+          status: false
         }
       }
     default:
