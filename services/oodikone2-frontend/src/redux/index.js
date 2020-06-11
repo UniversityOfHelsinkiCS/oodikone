@@ -44,6 +44,7 @@ import singleCourseStats from './singleCourseStats'
 import userAccessEmail from './userAccessEmail'
 import customPopulationSearch from './customPopulationSearch'
 import presentStudents from './presentStudents'
+import coolDataScience from './coolDataScience'
 
 export default combineReducers({
   localize,
@@ -90,5 +91,6 @@ export default combineReducers({
   singleCourseStats,
   userAccessEmail,
   customPopulationSearch,
-  presentStudents
+  presentStudents,
+  coolDataScience
 })
