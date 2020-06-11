@@ -125,7 +125,7 @@ export const handleRequest = store => next => async action => {
   if (requestSettings) {
     const { route, method, data, prefix, query, params, onProgress } = requestSettings
     try {
-      const res = await callApi(route, method, data, params, 0, onProgress)
+      const res = await callApi(route, method, data, query, params, 0, onProgress)
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
       // handle stale Shibboleth session by reloading frontend

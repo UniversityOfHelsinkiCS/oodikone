@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { connect } from 'react-redux'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Checkbox, Button, Message, Icon } from 'semantic-ui-react'
@@ -10,6 +11,7 @@ import HighchartsCustomEvents from 'highcharts-custom-events'
 import TSA from '../../common/tsa'
 import { callApi } from '../../apiConnection'
 import InfoToolTips from '../../common/InfoToolTips'
+import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
 
 HighchartsCustomEvents(Highcharts)
 
@@ -493,9 +495,15 @@ const StudytrackDrilldown = ({ programme, sorter, sortDir }) => {
   return <StudytrackChart programme={programmeSortedStudytracks} />
 }
 
-const ProtoC = ({ programme }) => {
-  const [data, setData] = useState(null)
-  const [isLoading, setLoading] = useState(true)
+const ProtoC = ({
+  programme,
+  getProtoCDispatch,
+  getProtoCProgrammeDispatch,
+  protoC,
+  protoCProgramme,
+  loadingProtoC,
+  loadingProtoCProgramme
+}) => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrg, setDrilldownOrg] = useState(null)
@@ -507,27 +515,26 @@ const ProtoC = ({ programme }) => {
   useEffect(() => {
     const load = async () => {
       if (!!programme) {
-        setLoading(true)
-        const res = await callApi('/cool-data-science/proto-c-data-programme', 'get', null, {
-          include_old_attainments: includeOldAttainments.toString(),
-          exclude_non_enrolled: excludeNonEnrolled.toString(),
+        getProtoCProgrammeDispatch({
+          includeOldAttainments: includeOldAttainments.toString(),
+          excludeNonEnrolled: excludeNonEnrolled.toString(),
           code: programme
         })
-        setDrilldownProgramme(res.data)
-        setLoading(false)
       } else {
-        setLoading(true)
-        const res = await callApi('/cool-data-science/proto-c-data', 'get', null, {
-          include_old_attainments: includeOldAttainments.toString(),
-          exclude_non_enrolled: excludeNonEnrolled.toString(),
-          code: programme
+        getProtoCDispatch({
+          includeOldAttainments: includeOldAttainments.toString(),
+          excludeNonEnrolled: excludeNonEnrolled.toString()
         })
-        setData(res.data)
-        setLoading(false)
       }
     }
     load()
   }, [includeOldAttainments, excludeNonEnrolled])
+
+  useEffect(() => {
+    if (!!programme) {
+      setDrilldownProgramme(protoCProgramme)
+    }
+  }, [protoCProgramme])
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
@@ -551,8 +558,8 @@ const ProtoC = ({ programme }) => {
   }, [])
 
   const sortedOrgs = useMemo(() => {
-    return Object.values(data || {}).sort((a, b) => sorters[sorter](a, b) * sortDir)
-  }, [data, sorter, sortDir])
+    return Object.values(protoC || {}).sort((a, b) => sorters[sorter](a, b) * sortDir)
+  }, [protoC, sorter, sortDir])
 
   const handleClick = sorterName => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
@@ -626,7 +633,11 @@ const ProtoC = ({ programme }) => {
     return (
       <Segment>
         <SorterButtons />
-        <StudytrackDrilldown programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
+        <Segment placeholder={loadingProtoC || loadingProtoCProgramme} vertical>
+          <Dimmer inverted active={loadingProtoC || loadingProtoCProgramme} />
+          <Loader active={loadingProtoC || loadingProtoCProgramme} />
+          <StudytrackDrilldown programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
+        </Segment>
         <RenderBelowGraph />
       </Segment>
     )
@@ -638,11 +649,13 @@ const ProtoC = ({ programme }) => {
         <h2>Prototyyppi: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
       <SorterButtons />
-      <Segment placeholder={isLoading} vertical>
-        <Dimmer inverted active={isLoading} />
-        <Loader active={isLoading} />
-        {!isLoading && data && <OrgChart orgs={sortedOrgs} onOrgClicked={handleOrgClicked} />}
-        {!isLoading && data && drilldownOrg && (
+      <Segment placeholder={loadingProtoC || loadingProtoCProgramme} vertical>
+        <Dimmer inverted active={loadingProtoC || loadingProtoCProgramme} />
+        <Loader active={loadingProtoC || loadingProtoCProgramme} />
+        {!(loadingProtoC || loadingProtoCProgramme) && protoC && (
+          <OrgChart orgs={sortedOrgs} onOrgClicked={handleOrgClicked} />
+        )}
+        {!(loadingProtoC || loadingProtoCProgramme) && protoC && drilldownOrg && (
           <ProgrammeDrilldown
             org={drilldownOrg}
             sorter={sorter}
@@ -650,7 +663,7 @@ const ProtoC = ({ programme }) => {
             onProgrammeClicked={handleProgrammeClicked}
           />
         )}
-        {!isLoading && data && drilldownProgramme && (
+        {!(loadingProtoC || loadingProtoCProgramme) && protoC && drilldownProgramme && (
           <StudytrackDrilldown programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
         )}
       </Segment>
@@ -659,4 +672,14 @@ const ProtoC = ({ programme }) => {
   )
 }
 
-export default ProtoC
+const mapStateToProps = ({ coolDataScience }) => ({
+  protoC: coolDataScience.data.protoC || {},
+  protoCProgramme: coolDataScience.data.protoCProgramme || {},
+  loadingProtoC: coolDataScience.pending.protoC,
+  loadingProtoCProgramme: coolDataScience.pending.protoCProgramme
+})
+
+export default connect(
+  mapStateToProps,
+  { getProtoCDispatch: getProtoC, getProtoCProgrammeDispatch: getProtoCProgramme }
+)(ProtoC)

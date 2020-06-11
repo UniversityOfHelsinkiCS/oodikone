@@ -454,7 +454,6 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   const startDate = showByYear === 'true' ? getCurrentYearStartDate() : await getCurrentStudyYearStartDate(unixMillis)
   const startYear = startDate.getFullYear()
   const startTime = startDate.getTime()
-
   const yearRange = _.range(2017, startYear + 1)
   const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
     startYear,
@@ -521,8 +520,17 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     acc[providerCode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
       (acc, [courseCode, yearlyInstances]) => {
         acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
+        const array = [2020, 2019, 2018, 2017]
+        array.forEach(year => {
+          acc[courseCode]['yearly'][year] = {}
+          acc[courseCode]['yearly'][year]['acc'] = 0
+          acc[courseCode]['yearly'][year]['accStudents'] = 0
+          acc[courseCode]['yearly'][year]['total'] = 0
+          acc[courseCode]['yearly'][year]['totalStudents'] = 0
+        })
         yearlyInstances.forEach(instance => {
           if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
+
           if (instance.acc !== undefined) {
             acc[courseCode]['yearly'][instance.year]['acc'] = instance.acc
             acc[courseCode]['yearly'][instance.year]['accStudents'] = Number(instance.students)
@@ -760,7 +768,6 @@ const getProtoC = async (query, doRefresh = false) => {
 
   // redis keys for different queries
   const KEY = `${REDIS_KEY_PROTOC}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
-
   const protoC = await getRedisCDS(KEY)
   if (!protoC || doRefresh) {
     const data = await calculateProtoC(query)
@@ -770,12 +777,15 @@ const getProtoC = async (query, doRefresh = false) => {
   return protoC
 }
 
-// this doesn't seem to be used anywhere? consider removin
+// used for studytrack view
 const getProtoCProgramme = async (query, doRefresh = false) => {
-  const protoCProgramme = await getRedisCDS(REDIS_KEY_PROTOC_PROGRAMME)
+  const { include_old_attainments, exclude_non_enrolled, code } = query
+  const KEY = `${REDIS_KEY_PROTOC_PROGRAMME}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
+  const protoCProgramme = await getRedisCDS(KEY)
+
   if (!protoCProgramme || doRefresh) {
     const data = await calculateProtoCProgramme(query)
-    await saveToRedis(data, REDIS_KEY_PROTOC_PROGRAMME)
+    await saveToRedis(data, KEY)
     return data
   }
   return protoCProgramme
@@ -807,6 +817,15 @@ const getUber = async (query, doRefresh = false) => {
     return data
   }
   return uber
+}
+
+const refreshProtoCProgramme = async query => {
+  const { include_old_attainments, exclude_non_enrolled, code } = query
+
+  const KEY = `${REDIS_KEY_PROTOC_PROGRAMME}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
+
+  const data = await calculateProtoCProgramme(query)
+  await saveToRedis(data, KEY)
 }
 
 const refreshProtoC = async query => {
@@ -924,5 +943,6 @@ module.exports = {
   refreshProtoC,
   refreshStatus,
   refreshUber,
+  refreshProtoCProgramme,
   getStartYears
 }
