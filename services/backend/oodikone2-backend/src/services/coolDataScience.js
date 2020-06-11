@@ -768,7 +768,6 @@ const getProtoC = async (query, doRefresh = false) => {
 
   // redis keys for different queries
   const KEY = `${REDIS_KEY_PROTOC}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
-  console.log('lol2')
   const protoC = await getRedisCDS(KEY)
   if (!protoC || doRefresh) {
     const data = await calculateProtoC(query)
@@ -782,7 +781,8 @@ const getProtoC = async (query, doRefresh = false) => {
 const getProtoCProgramme = async (query, doRefresh = false) => {
   const { include_old_attainments, exclude_non_enrolled, code } = query
 
-  const KEY = `${REDIS_KEY_PROTOC}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`  const protoCProgramme = await getRedisCDS(KEY)
+  const KEY = `${REDIS_KEY_PROTOC}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
+  const protoCProgramme = await getRedisCDS(KEY)
 
   if (!protoCProgramme || doRefresh) {
     const data = await calculateProtoCProgramme(query)
