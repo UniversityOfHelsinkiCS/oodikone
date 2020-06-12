@@ -271,7 +271,8 @@ const Status = ({ getStatusDispatch, data, loading }) => {
   const DrilldownMessage = () => (
     <Message
       color="blue"
-      content="Klikkaamalla tiedekuntaa pystyt porautumaan koulutusohjelma tasolle ja ohjelmaa klikkaamalla pystyt porautumaan kurssitasolle."
+      content="Klikkaamalla tiedekuntaa pystyt porautumaan koulutusohjelma tasolle ja ohjelmaa klikkaamalla pystyt porautumaan kurssitasolle.
+      Vasemmassa yläkulmassa olevaa nuolta klikkaamalla pääset edelliseen näkymään."
     />
   )
 
@@ -290,19 +291,20 @@ const Status = ({ getStatusDispatch, data, loading }) => {
   )
   const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
   return (
-    <div>
+    <Segment>
+      <DrilldownMessage />
       <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px' }}>
         {drillStack.length > 0 && (
           <Icon onClick={popFromDrillStack} style={{ fontSize: '40px', cursor: 'pointer' }} name="arrow left" />
         )}
       </div>
-      <DrilldownMessage />
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, 240px)',
           gridTemplateRows: 'repeat(auto-fill) 20px',
-          gridGap: '20px'
+          gridGap: '20px',
+          justifyContent: 'center'
         }}
       >
         {_.orderBy(
@@ -338,7 +340,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
       <Message>
         <ReactMarkdown source={CoolDataScience.status} escapeHtml={false} />
       </Message>
-    </div>
+    </Segment>
   )
 }
 
