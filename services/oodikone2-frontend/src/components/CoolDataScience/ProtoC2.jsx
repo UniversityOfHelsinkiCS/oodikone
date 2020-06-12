@@ -441,6 +441,14 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
     sendAnalytics('C2 Sorter clicked', 'ProtoC2')
   }
 
+  const DrilldownMessage = () => (
+    <Message
+      color="blue"
+      content=" Graafissa pystyy palkkeja klikkaamalla porautumaan kunkin tiedekunnan ohjelmatasolle. 
+      Painamalla ohjelmatasolla jotakin palkkia uudelleen pääsee takaisin tiedekuntatasolle. "
+    />
+  )
+
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)
     .sort((a, b) => {
@@ -454,6 +462,7 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
       <div align="center">
         <h2>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
+      <DrilldownMessage />
       <div align="center" style={{ marginTop: '10px' }}>
         <Button.Group>
           <Button style={{ cursor: 'default' }} active color="black">
