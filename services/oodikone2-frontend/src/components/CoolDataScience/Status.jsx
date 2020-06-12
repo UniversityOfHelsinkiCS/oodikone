@@ -268,6 +268,13 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     )
   }
 
+  const DrilldownMessage = () => (
+    <Message
+      color="blue"
+      content="Klikkaamalla tiedekuntaa pystyt porautumaan koulutusohjelma tasolle ja ohjelmaa klikkaamalla pystyt porautumaan kurssitasolle."
+    />
+  )
+
   if (!data || loading)
     return (
       <Segment style={{ padding: '40px' }} textAlign="center">
@@ -289,6 +296,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
           <Icon onClick={popFromDrillStack} style={{ fontSize: '40px', cursor: 'pointer' }} name="arrow left" />
         )}
       </div>
+      <DrilldownMessage />
       <div
         style={{
           display: 'grid',
