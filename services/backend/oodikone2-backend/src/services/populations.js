@@ -362,7 +362,6 @@ const studentnumbersWithAllStudyrightElements = async (
 
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
-
   const filteredExtents = []
   let studyrightWhere = {
     extentcode: {

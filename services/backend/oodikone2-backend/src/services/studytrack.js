@@ -277,7 +277,7 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
   const endDate = `${moment(new Date(), 'YYYY')
     .add(1, 'years')
     .format('YYYY')}-${semesterEnd['SPRING']}`
-  const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
+  const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, true)
   const promises = [
     graduatedStatsForStudytrack(studytrack, since),
     productivityStatsForProvider(providercode, since),
@@ -526,8 +526,8 @@ const statsForClass = async (studentnumbers, startDate, studyprogramme, endDate)
     tranferredToStudyprogram(studentnumbers, startDate, studyprogramme, endDate),
     nationalitiesFromClass(studentnumbers),
     transferredFromStudyprogram(studentnumbers, startDate, studyprogramme, new Date()),
-    cancelledStudyright(studentnumbers, startDate, studyprogramme, endDate),
-    startedStudyright(studentnumbers, startDate, studyprogramme, endDate)
+    cancelledStudyright(studentnumbers, startDate, studyprogramme, new Date()),
+    startedStudyright(studentnumbers, startDate, studyprogramme, new Date())
   ])
 }
 
@@ -597,7 +597,7 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
           startDate,
           endDate,
           false,
-          false
+          true
         )
         const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
           studyprogramme,
@@ -704,7 +704,7 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
         startDate,
         endDate,
         false,
-        false
+        true
       )
       const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
         studyprogramme,
@@ -723,6 +723,7 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
         started
       ] = await statsForClass(studentnumbers, startDate, studyprogramme, endDate)
       // theres so much shit in the data that transefferFrom doesnt rly mean anything
+
       delete genders[null]
       const creditValues = credits.reduce(
         (acc, curr) => {
