@@ -203,6 +203,13 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
       sendAnalytics('G Toggled expanded orgs', 'ProtoG')
     }
   }
+
+  const DrilldownMessage = () => (
+    <Message color='blue'
+      content="Klikkaamalla tiedekuntaa pystyt tarkastelemaan koulutusohjelma kohtaista dataa."
+    />
+  )
+
   const { CoolDataScience } = InfoToolTips
   return (
     <Segment>
@@ -215,6 +222,7 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
           checked={includeOldAttainments}
         />
       </div>
+      <DrilldownMessage />
       <Form onSubmit={preventDefault}>
         <Form.Group inline>
           <Form.Field>
