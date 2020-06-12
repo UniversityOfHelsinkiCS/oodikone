@@ -628,6 +628,13 @@ const ProtoC = ({
     </>
   )
 
+  const DrilldownMessage = () => (
+    <Message color='blue'
+      content="Graafissa pystyy pisteitä klikkaamalla porautumaan ensin ohjelmatasolle ja edelleen opintosuuntatasolle. 
+      Uusi graafi avautuu nykyisen alle."
+    />
+  )
+
   if (!!programme && drilldownProgramme) {
     return (
       <Segment>
@@ -647,6 +654,7 @@ const ProtoC = ({
       <div align="center">
         <h2>Prototyyppi: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
+      <DrilldownMessage />
       <SorterButtons />
       <Segment placeholder={loadingProtoC || loadingProtoCProgramme} vertical>
         <Dimmer inverted active={loadingProtoC || loadingProtoCProgramme} />
