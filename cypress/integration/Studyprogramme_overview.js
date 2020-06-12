@@ -59,10 +59,10 @@ describe('Studyprogramme overview', () => {
     cy.get('table').should('have.length', 2)
     cy.contains('Population progress')
     cy.contains('Yearly productivity')
-    cy.contains("2017-2018").siblings().contains('219').siblings().contains('171')
+    cy.contains("2017-2018").siblings().contains('228').siblings().contains('178')
 
-    cy.get('table').eq(1).contains('2018').siblings().contains('3023.00').siblings().contains('2616.00')
-    cy.get('table').eq(1).contains('2017').siblings().contains('3159.00').siblings().contains("2889.00")
+    cy.get('table').eq(1).contains('2018').siblings().contains('3023.00').siblings().contains('2631.00')
+    cy.get('table').eq(1).contains('2017').siblings().contains('3159.00').siblings().contains("2914.00")
   })
 
   it('can add and delete mandatory courses and labels', () => {
