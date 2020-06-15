@@ -74,7 +74,7 @@ describe('Studyprogramme overview', () => {
     cy.wait('@searchResponse')
     cy.contains('Searched courses')
     cy.get('table').eq(0).contains('Code Generation').click()
-    cy.get('table').eq(1).contains('tr', 'Code Generation').contains('select label')
+    cy.contains('select label')
 
     cy.contains('Group labels').click()
     const label = 'cypress test label'

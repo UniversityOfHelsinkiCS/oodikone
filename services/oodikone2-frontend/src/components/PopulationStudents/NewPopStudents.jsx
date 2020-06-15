@@ -135,6 +135,10 @@ class PopulationStudents extends Component {
 
     const { admin, containsStudyTracks } = this.state
     const { populationStatistics, customPopulation, coursePopulation } = this.props
+
+    if (!populationStatistics.elementdetails) {
+      return null
+    }
     const students = this.props.allStudents.reduce((obj, s) => {
       obj[s.studentNumber] = s
       return obj
