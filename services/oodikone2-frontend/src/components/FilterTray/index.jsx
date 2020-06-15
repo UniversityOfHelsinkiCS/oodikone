@@ -7,7 +7,6 @@ import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
-import FilterControlPanel from './FilterControlPanel'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [open, setOpen] = useState(false)
@@ -48,11 +47,20 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
             <Gender filterControl={filterControl} />
             <StartYearAtUni filterControl={filterControl} />
           </Card.Group>
+          <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
+            <Button secondary onClick={() => setOpen(false)}>
+              <Icon name="angle double up" />
+              <div>
+                Close Filters
+                {noFilters > 0 ? <span className="no-filters">{` (${noFilters} active)`}</span> : null}
+              </div>
+              <Icon name="angle double up" />
+            </Button>
+          </div>
         </Sidebar.Pusher>
         <Sidebar.Pushable>{children}</Sidebar.Pushable>
       </Sidebar>
-      <FilterControlPanel open={open} setOpen={setOpen} noFilters={noFilters} />
-      <div id="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
+      <div className="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
         <Button secondary onClick={() => setOpen(true)}>
           <Icon name="angle double down" />
           <div>
