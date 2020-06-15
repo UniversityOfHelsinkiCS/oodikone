@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Form, Dropdown } from 'semantic-ui-react'
+import { Form, Dropdown } from 'semantic-ui-react'
 import ClearFilterButton from '../ClearFilterButton'
+import FilterCard from '../FilterCard'
 
 const StartYearAtUni = ({ filterControl }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
@@ -31,29 +32,24 @@ const StartYearAtUni = ({ filterControl }) => {
   }))
 
   return (
-    <Card>
-      <Card.Content>
-        <Card.Header>Starting Year at University</Card.Header>
-        <Card.Description>
-          <Form>
-            <Dropdown
-              multiple
-              selection
-              fluid
-              options={options}
-              button
-              className="mini"
-              placeholder="No Filter"
-              onChange={(_, { value: inputValue }) => setValue(inputValue)}
-              value={value}
-            />
-          </Form>
-        </Card.Description>
-      </Card.Content>
-      <Card.Content extra>
-        <ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} />
-      </Card.Content>
-    </Card>
+    <FilterCard
+      title="Starting Year at University"
+      footer={<ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} />}
+    >
+      <Form>
+        <Dropdown
+          multiple
+          selection
+          fluid
+          options={options}
+          button
+          className="mini"
+          placeholder="No Filter"
+          onChange={(_, { value: inputValue }) => setValue(inputValue)}
+          value={value}
+        />
+      </Form>
+    </FilterCard>
   )
 }
 

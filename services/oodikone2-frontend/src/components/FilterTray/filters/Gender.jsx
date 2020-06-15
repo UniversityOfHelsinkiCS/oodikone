@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Form, Radio } from 'semantic-ui-react'
+import { Form, Radio } from 'semantic-ui-react'
 import ClearFilterButton from '../ClearFilterButton'
+import FilterCard from '../FilterCard'
 
 const Gender = ({ filterControl }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
@@ -31,28 +32,20 @@ const Gender = ({ filterControl }) => {
   ]
 
   return (
-    <Card>
-      <Card.Content>
-        <Card.Header>Gender</Card.Header>
-        <Card.Description>
-          <Form>
-            {options.map(opt => (
-              <Form.Field key={opt.key}>
-                <Radio
-                  label={opt.text}
-                  value={opt.value}
-                  checked={value === opt.value}
-                  onChange={(_, { value: inputValue }) => setValue(inputValue)}
-                />
-              </Form.Field>
-            ))}
-          </Form>
-        </Card.Description>
-      </Card.Content>
-      <Card.Content extra>
-        <ClearFilterButton disabled={!value} onClick={() => setValue(null)} />
-      </Card.Content>
-    </Card>
+    <FilterCard title="Gender" footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} />}>
+      <Form>
+        {options.map(opt => (
+          <Form.Field key={opt.key}>
+            <Radio
+              label={opt.text}
+              value={opt.value}
+              checked={value === opt.value}
+              onChange={(_, { value: inputValue }) => setValue(inputValue)}
+            />
+          </Form.Field>
+        ))}
+      </Form>
+    </FilterCard>
   )
 }
 
