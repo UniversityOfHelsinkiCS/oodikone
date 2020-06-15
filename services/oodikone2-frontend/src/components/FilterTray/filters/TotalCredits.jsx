@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Form, Input } from 'semantic-ui-react'
+import { Form, Input } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
+import FilterCard from '../FilterCard'
 
 const TotalCredits = ({ filterControl }) => {
   const [value, setValue] = useState({ min: '', max: '' })
@@ -26,21 +27,16 @@ const TotalCredits = ({ filterControl }) => {
   const onChange = key => (_, { value: inputValue }) => setValue(prev => ({ ...prev, [key]: inputValue }))
 
   return (
-    <Card>
-      <Card.Content>
-        <Card.Header>Total Credits</Card.Header>
-        <Card.Description>
-          <Form>
-            <Form.Field>
-              <Input label="Min" size="mini" onChange={onChange('min')} value={value.min} />
-            </Form.Field>
-            <Form.Field>
-              <Input label="Max" size="mini" onChange={onChange('max')} value={value.max} />
-            </Form.Field>
-          </Form>
-        </Card.Description>
-      </Card.Content>
-    </Card>
+    <FilterCard title="Total Credits">
+      <Form>
+        <Form.Field>
+          <Input label="Min" size="mini" onChange={onChange('min')} value={value.min} />
+        </Form.Field>
+        <Form.Field>
+          <Input label="Max" size="mini" onChange={onChange('max')} value={value.max} />
+        </Form.Field>
+      </Form>
+    </FilterCard>
   )
 }
 
