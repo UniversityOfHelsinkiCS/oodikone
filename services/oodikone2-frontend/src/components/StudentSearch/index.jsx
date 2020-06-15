@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react'
-import { withRouter, Link } from 'react-router-dom'
+import { withRouter, Link, useLocation } from 'react-router-dom'
 import { func, string, arrayOf, object, bool } from 'prop-types'
 import { connect } from 'react-redux'
 
@@ -28,12 +28,17 @@ const StudentSearch = ({
   const [loading, setLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [searchStr, setSearchStr] = useState('')
+  const location = useLocation()
 
   const resetComponent = () => {
     setLoading(false)
     setShowResults(false)
     setSearchStr('')
   }
+
+  useEffect(() => {
+    resetComponent()
+  }, [location])
 
   useEffect(() => {
     if (studentNumber && containsOnlyNumbers(studentNumber)) {
