@@ -65,7 +65,7 @@ describe('Studyprogramme overview', () => {
     cy.get('table').eq(1).contains('2017').siblings().contains('3159.00').siblings().contains("2914.00")
   })
 
-  it.only('can add and delete mandatory courses and labels', () => {
+  it('can add and delete mandatory courses and labels', () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click()
     cy.contains('Mandatory Courses').click()
     cy.get('button').contains('Add Courses').click()
