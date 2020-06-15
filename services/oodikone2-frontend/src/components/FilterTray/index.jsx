@@ -39,9 +39,11 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
       <Sidebar open={open}>
         <Sidebar.Pusher>
           <Card.Group id="filter-tray">
-            <Header size="large">
-              <Icon name="filter" />
+            <Header size="medium">
               <Header.Content>Filters</Header.Content>
+              <div>
+                <Icon name="bars" size="large" />
+              </div>
             </Header>
             <TotalCredits filterControl={filterControl} />
             <Gender filterControl={filterControl} />
