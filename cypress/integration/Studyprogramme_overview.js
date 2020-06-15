@@ -65,7 +65,7 @@ describe('Studyprogramme overview', () => {
     cy.get('table').eq(1).contains('2017').siblings().contains('3159.00').siblings().contains("2914.00")
   })
 
-  it('can add and delete mandatory courses and labels', () => {
+  it.only('can add and delete mandatory courses and labels', () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click()
     cy.contains('Mandatory Courses').click()
     cy.get('button').contains('Add Courses').click()
@@ -74,7 +74,7 @@ describe('Studyprogramme overview', () => {
     cy.wait('@searchResponse')
     cy.contains('Searched courses')
     cy.get('table').eq(0).contains('Code Generation').click()
-    cy.get('table').eq(1).contains('tr', 'Code Generation').contains('select label')
+    cy.contains('select label')
 
     cy.contains('Group labels').click()
     const label = 'cypress test label'
