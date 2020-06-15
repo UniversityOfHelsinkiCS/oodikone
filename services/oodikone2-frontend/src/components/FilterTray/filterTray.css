@@ -1,7 +1,7 @@
 /** #filter-tray is used repeatedly as a selector to achieve higher specificity
     over semantic-ui without using !important everywhere. */
 
-#filter-tray-toggle {
+.filter-tray-toggle {
   transform: rotate(-90deg);
   position: fixed;
   left: 0;
@@ -9,7 +9,7 @@
   transform-origin: top left;
 }
 
-#filter-tray-toggle .button {
+.filter-tray-toggle .button {
   width: 100vh;
   border-radius: 0;
   font-size: 1.2rem;
@@ -19,7 +19,7 @@
   justify-content: space-between;
 }
 
-#filter-tray-toggle .button .no-filters {
+.filter-tray-toggle .button .no-filters {
   font-size: 1rem;
   font-weight: normal;
   font-style: italic;
@@ -29,6 +29,10 @@
   vertical-align: top;
 }
 
+.filter-tray-toggle.inline-toggle button {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
 #filter-tray {
   background-color: #1b1c1d;
   height: 100vh;
@@ -36,7 +40,6 @@
   justify-content: center;
   padding-top: 2rem;
   margin: 0;
-  width: 100%;
 }
 
 #filter-tray .segmentContainer {
