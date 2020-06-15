@@ -120,18 +120,20 @@ class PopulationStudents extends Component {
     const studytrack = studyrights => {
       const { queryStudyrights } = this.props
       let startdate = '1900-01-01'
+      let enddate = '2020-04-20'
       const res = this.studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
         elemArr
           .filter(el => populationStatistics.elementdetails.data[el.code].type === 20)
           .forEach(el => {
             if (queryStudyrights.includes(el.code)) {
               startdate = el.startdate // eslint-disable-line
+              enddate = el.enddate // eslint-disable-line
             }
           })
         elemArr
           .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
           .forEach(el => {
-            if (el.enddate > startdate) {
+            if (el.enddate > startdate && el.startdate <= enddate) {
               acc.push({
                 name: populationStatistics.elementdetails.data[el.code].name.fi,
                 startdate: el.startdate,
