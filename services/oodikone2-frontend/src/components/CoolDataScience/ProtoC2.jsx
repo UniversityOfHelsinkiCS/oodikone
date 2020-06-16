@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import PropTypes, { func, bool, shape } from 'prop-types'
+import PropTypes, { func, bool, shape, string } from 'prop-types'
 import { connect } from 'react-redux'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
@@ -9,7 +9,7 @@ import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import TSA from '../../common/tsa'
 import InfoToolTips from '../../common/InfoToolTips'
-import { getProtoC } from '../../redux/coolDataScience'
+import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
 
 HighchartsCustomEvents(Highcharts)
 
@@ -322,7 +322,15 @@ ClickableChart.propTypes = {
   isSideways: PropTypes.bool
 }
 
-const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
+const ProtoC = ({
+  getProtoCDispatch,
+  getProtoCProgrammeDispatch,
+  data,
+  isLoading,
+  programme = 'KH50_005',
+  protoCProgrammeData,
+  protoCProgrammeLoading
+}) => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
   const [drilldownOrg, setDrilldownOrg] = useState(null)
@@ -332,11 +340,25 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
 
   useEffect(() => {
-    getProtoCDispatch({
-      includeOldAttainments: includeOldAttainments.toString(),
-      excludeNonEnrolled: excludeNonEnrolled.toString()
-    })
+    if (programme) {
+      getProtoCProgrammeDispatch({
+        includeOldAttainments: includeOldAttainments.toString(),
+        excludeNonEnrolled: excludeNonEnrolled.toString(),
+        code: programme
+      })
+    } else {
+      getProtoCDispatch({
+        includeOldAttainments: includeOldAttainments.toString(),
+        excludeNonEnrolled: excludeNonEnrolled.toString()
+      })
+    }
   }, [includeOldAttainments, excludeNonEnrolled])
+
+  useEffect(() => {
+    if (programme) {
+      setDrilldownProgramme(protoCProgrammeData.studytracks)
+    }
+  }, [protoCProgrammeData])
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
@@ -355,11 +377,11 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
   }, [data, currentSorter])
 
   const sortedProgrammes = useMemo(() => {
-    return Object.values(drilldownOrg || {}).sort(currentSorter)
+    return (drilldownOrg || []).sort(currentSorter)
   }, [drilldownOrg, currentSorter])
 
   const sortedStudytracks = useMemo(() => {
-    return Object.values(drilldownProgramme || {}).sort(currentSorter)
+    return (drilldownProgramme || []).sort(currentSorter)
   }, [drilldownProgramme, currentSorter])
 
   const drilldownOrgClick = useCallback(org => {
@@ -393,6 +415,60 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
       if (a === 'nimi') return -1
       return a > b ? 1 : -1
     })
+
+  if (programme && drilldownProgramme) {
+    return (
+      <Segment>
+        <div align="center">
+          <h2>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
+        </div>
+        <div align="center" style={{ marginTop: '10px' }}>
+          <Button.Group>
+            <Button style={{ cursor: 'default' }} active color="black">
+              Sort by:
+            </Button>
+            {sorterNames.map(sorterName => (
+              <Button
+                basic={sorter !== sorterName}
+                color={sorter === sorterName ? 'blue' : 'black'}
+                key={sorterName}
+                active={sorter === sorterName}
+                onClick={() => handleClick(sorterName)}
+                style={{ borderRadius: '1px' }}
+                icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
+                content={sorterName}
+              />
+            ))}
+          </Button.Group>
+        </div>
+        <Segment placeholder={isLoading} vertical>
+          <Dimmer inverted active={isLoading} />
+          <Loader active={isLoading} />
+          {!protoCProgrammeLoading && protoCProgrammeData && (
+            <>
+              <NonClickableChart data={drilldownProgramme} sorter={currentSorter} isSideways />
+            </>
+          )}
+          <div align="center">
+            <Checkbox
+              label="Include only at least once enrolled students"
+              onChange={handleExcludeNonEnrolledToggled}
+              checked={excludeNonEnrolled}
+            />
+            <Checkbox
+              style={{ marginLeft: '10px' }}
+              label="Include old attainments"
+              onChange={handleOldAttainmentToggled}
+              checked={includeOldAttainments}
+            />
+          </div>
+          <Message>
+            <ReactMarkdown source={CoolDataScience.protoC2} escapeHtml={false} />
+          </Message>
+        </Segment>
+      </Segment>
+    )
+  }
 
   return (
     <Segment>
@@ -457,18 +533,28 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
   )
 }
 
+ProtoC.defaultProps = {
+  programme: ''
+}
+
 ProtoC.propTypes = {
   isLoading: bool.isRequired,
   data: shape({}).isRequired,
-  getProtoCDispatch: func.isRequired
+  getProtoCDispatch: func.isRequired,
+  getProtoCProgrammeDispatch: func.isRequired,
+  protoCProgrammeLoading: bool.isRequired,
+  protoCProgrammeData: shape({}).isRequired,
+  programme: string
 }
 
 const mapStateToProps = ({ coolDataScience }) => ({
   data: coolDataScience.data.protoC,
-  isLoading: coolDataScience.pending.protoC
+  protoCProgrammeData: coolDataScience.data.protoCProgramme,
+  isLoading: coolDataScience.pending.protoC,
+  protoCProgrammeLoading: coolDataScience.pending.protoCProgramme
 })
 
 export default connect(
   mapStateToProps,
-  { getProtoCDispatch: getProtoC }
+  { getProtoCDispatch: getProtoC, getProtoCProgrammeDispatch: getProtoCProgramme }
 )(ProtoC)
