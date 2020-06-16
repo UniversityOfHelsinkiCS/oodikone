@@ -122,7 +122,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
       name: 'ei tahdissa',
       data: data.map(entry => ({
         custom: {
-          orgCode: entry.code
+          code: entry.code
         },
         y: entry.totalStudents - entry.students3y - entry.students4y - entry.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
@@ -145,7 +145,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
       name: '3v tahdissa',
       data: data.map(entry => ({
         custom: {
-          orgCode: entry.code
+          code: entry.code
         },
         y: entry.students3y,
         z: entry.students3y / entry.totalStudents
@@ -241,10 +241,11 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
           events: {
             click(e) {
               const { point } = e
-              if (point.custom && point.custom.orgCode) {
+              if (point.custom && point.custom.code) {
                 // clicked on top-level, drill down
                 sendAnalytics('Org drilldown clicked', 'ProtoC2')
                 const datapoint = data.find(entry => entry.code === point.custom.code)
+                console.log(point.custom)
                 clickHandler(datapoint.programmes || datapoint.studytracks)
               }
             }
