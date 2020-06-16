@@ -26,12 +26,24 @@
   letter-spacing: 0.06rem;
 }
 
+.filter-tray-toggle .button .button-label .icon {
+  margin-right: .6em;
+}
+
+.filter-tray-toggle .button .button-label > .label {
+  padding: .5em .7em .3em .7em;
+}
+
 .filter-tray-toggle .button .label {
   margin-left: 1rem;
 }
 
 .filter-tray-toggle.inline-toggle button {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: #2d2e2e !important;
+}
+
+.filter-tray-toggle.inline-toggle button:hover {
+  background-color: #202121 !important;
 }
 
 #filter-tray {
@@ -46,6 +58,7 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+  min-height: 64px;
   padding: 1.1rem 1rem 1rem 1.7rem;
   border-bottom: 1px solid #a0a0a0;
   align-items: center;
@@ -59,7 +72,8 @@
 }
 
 #filter-tray > .header > .content > .label {
-  margin-left: 1rem;
+  margin-left: 1.5rem;
+  padding-top: .7em;
 }
 
 #filter-tray .segmentContainer {
