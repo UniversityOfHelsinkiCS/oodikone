@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import lodash from 'lodash'
-import { Button, Card, Header, Icon } from 'semantic-ui-react'
+import { Button, Card, Header, Icon, Label } from 'semantic-ui-react'
 import './filterTray.css'
 import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
@@ -9,7 +9,7 @@ import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
 
   const [activeFilters, setActiveFilters] = useState({})
 
@@ -40,7 +40,15 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
         <Sidebar.Pusher>
           <Card.Group id="filter-tray">
             <Header size="medium">
-              <Header.Content>Filters</Header.Content>
+              <Header.Content>
+                Filters{' '}
+                {noFilters > 0 && (
+                  <Label color="teal" size="small">
+                    <Icon name="filter" />
+                    {noFilters}
+                  </Label>
+                )}
+              </Header.Content>
               <div>
                 <Icon name="bars" size="large" />
               </div>
