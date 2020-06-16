@@ -13,22 +13,21 @@
   width: 100vh;
   border-radius: 0;
   font-size: 1.2rem;
-  letter-spacing: 0.05rem;
-  text-transform: capitalize;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding-left: 5rem;
   padding-right: 5rem;
 }
 
-.filter-tray-toggle .button .no-filters {
-  font-size: 1rem;
-  font-weight: normal;
-  font-style: italic;
-  margin-left: 0.4rem;
-  letter-spacing: normal;
-  text-transform: none;
-  vertical-align: top;
+.filter-tray-toggle .button .button-label {
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.06rem;
+}
+
+.filter-tray-toggle .button .label {
+  margin-left: 1rem;
 }
 
 .filter-tray-toggle.inline-toggle button {
