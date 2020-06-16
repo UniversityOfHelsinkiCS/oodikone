@@ -76,21 +76,7 @@ const defaultConfig = () => {
   }
 }
 
-const changeSeries = (chart, categories, series) => {
-  chart.showLoading()
-
-  chart.xAxis[0].setCategories(categories)
-  while (chart.series.length > 0) {
-    chart.series[0].remove(false)
-  }
-
-  series.forEach(serie => chart.addSeries(serie, false))
-
-  chart.redraw()
-  chart.hideLoading()
-}
-
-const makeConfig = (organisations, sorter, type = 'column') => {
+const makeConfig = (data, sorter, type = 'column', clickHandler) => {
   const addMouseOverHandler = serie => {
     serie.point = {
       events: {
@@ -125,111 +111,64 @@ const makeConfig = (organisations, sorter, type = 'column') => {
     {
       color: '#7f8c8d',
       name: 'tällä hetkellä peruutettu',
-      data: organisations.map(org => ({
-        y: org.currentlyCancelled,
+      data: data.map(entry => ({
+        y: entry.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
-        z: org.currentlyCancelled / org.totalStudents
+        z: entry.currentlyCancelled / entry.totalStudents
       }))
     },
     {
       color: '#ff7979',
       name: 'ei tahdissa',
-      data: organisations.map(org => ({
+      data: data.map(entry => ({
         custom: {
-          orgCode: org.code
+          orgCode: entry.code
         },
-        y: org.totalStudents - org.students3y - org.students4y - org.currentlyCancelled,
+        y: entry.totalStudents - entry.students3y - entry.students4y - entry.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
-        z: (org.totalStudents - org.students3y - org.students4y - org.currentlyCancelled) / org.totalStudents
+        z: (entry.totalStudents - entry.students3y - entry.students4y - entry.currentlyCancelled) / entry.totalStudents
       }))
     },
     {
       color: '#f9ca24',
       name: '4v tahdissa',
-      data: organisations.map(org => ({
+      data: data.map(entry => ({
         custom: {
-          orgCode: org.code
+          code: entry.code
         },
-        y: org.students4y,
-        z: org.students4y / org.totalStudents
+        y: entry.students4y,
+        z: entry.students4y / entry.totalStudents
       }))
     },
     {
       color: '#6ab04c',
       name: '3v tahdissa',
-      data: organisations.map(org => ({
+      data: data.map(entry => ({
         custom: {
-          orgCode: org.code
+          orgCode: entry.code
         },
-        y: org.students3y,
-        z: org.students3y / org.totalStudents
+        y: entry.students3y,
+        z: entry.students3y / entry.totalStudents
       }))
     }
   ].map(addMouseOverHandler)
 
-  const orgCategories = organisations.map(org => org.name)
+  const categories = data.map(entry => entry.name)
 
   return Highcharts.merge(defaultConfig(), {
     chart: {
       type
     },
     xAxis: {
-      categories: orgCategories,
+      categories,
       labels: {
         events: {
           click() {
             const { chart } = this
             chart.myLabel.destroy()
-            const clickedLabel = organisations.find(data => data.name === this.value)
-            if (clickedLabel) {
-              // clicked on top-level, drill down
-              sendAnalytics('Org drilldown clicked', 'ProtoC2')
-              const programmes = [...clickedLabel.programmes].sort(sorter)
-              changeSeries(
-                chart,
-                programmes.map(p => p.name),
-                [
-                  {
-                    color: '#7f8c8d',
-                    name: 'tällä hetkellä peruutettu',
-                    data: programmes.map(p => ({
-                      y: p.currentlyCancelled,
-                      // pass % of total as z so we can display it in the tooltip
-                      z: p.currentlyCancelled / p.totalStudents
-                    }))
-                  },
-                  {
-                    color: '#ff7979',
-                    name: 'ei tahdissa',
-                    data: programmes.map(p => ({
-                      y: p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled,
-                      // pass % of total as z so we can display it in the tooltip
-                      z: (p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled) / p.totalStudents
-                    }))
-                  },
-                  {
-                    color: '#f9ca24',
-                    name: '4v tahdissa',
-                    data: programmes.map(p => ({
-                      y: p.students4y,
-                      z: p.students4y / p.totalStudents
-                    }))
-                  },
-                  {
-                    color: '#6ab04c',
-                    name: '3v tahdissa',
-                    data: programmes.map(p => ({
-                      y: p.students3y,
-                      z: p.students3y / p.totalStudents
-                    }))
-                  }
-                ].map(addMouseOverHandler)
-              )
-            } else {
-              // drill up
-              sendAnalytics('Org drillup clicked', 'ProtoC2')
-              changeSeries(chart, orgCategories, orgSeries)
-            }
+            const clickedLabel = data.find(entry => entry.name === this.value)
+            if (clickedLabel) clickHandler(clickedLabel.programmes || clickedLabel.studytracks)
+            sendAnalytics('Drilldown clicked', 'ProtoC2')
           },
           mouseover() {
             const findLabel = (x, ticks) => {
@@ -302,57 +241,11 @@ const makeConfig = (organisations, sorter, type = 'column') => {
           events: {
             click(e) {
               const { point } = e
-              const { chart } = this.series
-
               if (point.custom && point.custom.orgCode) {
                 // clicked on top-level, drill down
                 sendAnalytics('Org drilldown clicked', 'ProtoC2')
-                const org = organisations.find(org => org.code === point.custom.orgCode)
-                const programmes = [...org.programmes].sort(sorter)
-                changeSeries(
-                  chart,
-                  programmes.map(p => p.name),
-                  [
-                    {
-                      color: '#7f8c8d',
-                      name: 'tällä hetkellä peruutettu',
-                      data: programmes.map(p => ({
-                        y: p.currentlyCancelled,
-                        // pass % of total as z so we can display it in the tooltip
-                        z: p.currentlyCancelled / p.totalStudents
-                      }))
-                    },
-                    {
-                      color: '#ff7979',
-                      name: 'ei tahdissa',
-                      data: programmes.map(p => ({
-                        y: p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled,
-                        // pass % of total as z so we can display it in the tooltip
-                        z: (p.totalStudents - p.students3y - p.students4y - p.currentlyCancelled) / p.totalStudents
-                      }))
-                    },
-                    {
-                      color: '#f9ca24',
-                      name: '4v tahdissa',
-                      data: programmes.map(p => ({
-                        y: p.students4y,
-                        z: p.students4y / p.totalStudents
-                      }))
-                    },
-                    {
-                      color: '#6ab04c',
-                      name: '3v tahdissa',
-                      data: programmes.map(p => ({
-                        y: p.students3y,
-                        z: p.students3y / p.totalStudents
-                      }))
-                    }
-                  ].map(addMouseOverHandler)
-                )
-              } else {
-                // drill up
-                sendAnalytics('Org drillup clicked', 'ProtoC2')
-                changeSeries(chart, orgCategories, orgSeries)
+                const datapoint = data.find(entry => entry.code === point.custom.code)
+                clickHandler(datapoint.programmes || datapoint.studytracks)
               }
             }
           }
@@ -362,7 +255,7 @@ const makeConfig = (organisations, sorter, type = 'column') => {
   })
 }
 
-const countNotInTarget = org => org.totalStudents - org.students4y - org.students3y - org.currentlyCancelled
+const countNotInTarget = entry => entry.totalStudents - entry.students4y - entry.students3y - entry.currentlyCancelled
 const sorters = {
   nimi: (a, b) => a.name.localeCompare(b.name),
   '4v tahti': (a, b) => a.students4y - b.students4y,
@@ -371,41 +264,69 @@ const sorters = {
   peruutettu: (a, b) => a.currentlyCancelled - b.currentlyCancelled
 }
 
-const OrgChart = React.memo(({ orgs, sorter, isSideways }) => {
-  return <ReactHighcharts highcharts={Highcharts} config={makeConfig(orgs, sorter, isSideways ? 'bar' : 'column')} />
+const ClickableChart = React.memo(({ data, sorter, isSideways, clickHandler }) => {
+  return (
+    <ReactHighcharts
+      highcharts={Highcharts}
+      config={makeConfig(data, sorter, isSideways ? 'bar' : 'column', clickHandler)}
+    />
+  )
 })
 
-OrgChart.defaultProps = {
+const NonClickableChart = React.memo(({ data, sorter, isSideways }) => {
+  if (data.length < 1)
+    return (
+      <Segment>
+        <h3 align="center">no studytrack data available for selected programme</h3>
+      </Segment>
+    )
+  return <ReactHighcharts highcharts={Highcharts} config={makeConfig(data, sorter, isSideways ? 'bar' : 'column')} />
+})
+
+NonClickableChart.defaultProps = {
   isSideways: false
 }
 
-OrgChart.propTypes = {
-  orgs: PropTypes.arrayOf(
+NonClickableChart.propTypes = {
+  data: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string,
       code: PropTypes.string,
       students3y: PropTypes.number,
       students4y: PropTypes.number,
       totalStudents: PropTypes.number,
-      currentlyCancelled: PropTypes.number,
-      programmes: PropTypes.arrayOf(
-        PropTypes.shape({
-          name: PropTypes.string,
-          students3y: PropTypes.number,
-          students4y: PropTypes.number,
-          totalStudents: PropTypes.number,
-          currentlyCancelled: PropTypes.number
-        })
-      ).isRequired
+      currentlyCancelled: PropTypes.number
     })
   ).isRequired,
   sorter: PropTypes.func.isRequired,
   isSideways: PropTypes.bool
 }
 
+ClickableChart.defaultProps = {
+  isSideways: false
+}
+
+ClickableChart.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string,
+      code: PropTypes.string,
+      students3y: PropTypes.number,
+      students4y: PropTypes.number,
+      totalStudents: PropTypes.number,
+      currentlyCancelled: PropTypes.number
+    })
+  ).isRequired,
+  sorter: PropTypes.func.isRequired,
+  clickHandler: func.isRequired,
+  isSideways: PropTypes.bool
+}
+
 const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
+  const [drilldownOrg, setDrilldownOrg] = useState(null)
+  const [drilldownProgramme, setDrilldownProgramme] = useState(null)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
@@ -433,6 +354,22 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
     return Object.values(data || {}).sort(currentSorter)
   }, [data, currentSorter])
 
+  const sortedProgrammes = useMemo(() => {
+    return Object.values(drilldownOrg || {}).sort(currentSorter)
+  }, [drilldownOrg, currentSorter])
+
+  const sortedStudytracks = useMemo(() => {
+    return Object.values(drilldownProgramme || {}).sort(currentSorter)
+  }, [drilldownProgramme, currentSorter])
+
+  const drilldownOrgClick = useCallback(org => {
+    setDrilldownOrg(org)
+  })
+
+  const drilldownProgrammeClick = useCallback(programme => {
+    setDrilldownProgramme(programme)
+  })
+
   const { CoolDataScience } = InfoToolTips
 
   const handleClick = sorterName => {
@@ -444,8 +381,8 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
   const DrilldownMessage = () => (
     <Message
       color="blue"
-      content=" Graafissa pystyy palkkeja klikkaamalla porautumaan kunkin tiedekunnan ohjelmatasolle. 
-      Painamalla ohjelmatasolla jotakin palkkia uudelleen pääsee takaisin tiedekuntatasolle. "
+      content=" Graafissa pystyy palkkeja klikkaamalla porautumaan kunkin tiedekunnan ohjelmatasolle.
+      Ohjelmatasolla jotakin palkkia klikkaamalla pystyy porautumaan opintosuuntaus tasolle."
     />
   )
 
@@ -487,7 +424,16 @@ const ProtoC = ({ getProtoCDispatch, data, isLoading }) => {
         <Loader active={isLoading} />
         {!isLoading && data && (
           <>
-            <OrgChart orgs={sortedOrgs} sorter={currentSorter} isSideways />
+            <ClickableChart data={sortedOrgs} sorter={currentSorter} isSideways clickHandler={drilldownOrgClick} />
+            {drilldownOrg && (
+              <ClickableChart
+                data={sortedProgrammes}
+                sorter={currentSorter}
+                isSideways
+                clickHandler={drilldownProgrammeClick}
+              />
+            )}
+            {drilldownProgramme && <NonClickableChart data={sortedStudytracks} sorter={currentSorter} isSideways />}
           </>
         )}
         <div align="center">
