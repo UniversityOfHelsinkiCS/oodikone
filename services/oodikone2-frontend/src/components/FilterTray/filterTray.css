@@ -17,6 +17,8 @@
   text-transform: capitalize;
   display: flex;
   justify-content: space-between;
+  padding-left: 5rem;
+  padding-right: 5rem;
 }
 
 .filter-tray-toggle .button .no-filters {
@@ -48,6 +50,17 @@
   padding: 1.1rem 1rem 1rem 1.7rem;
   border-bottom: 1px solid #a0a0a0;
   align-items: center;
+  margin-bottom: 1.5rem !important;
+  color: white;
+}
+
+#filter-tray > .header > .content {
+  display: flex;
+  align-items: center;
+}
+
+#filter-tray > .header > .content > .label {
+  margin-left: 1rem;
 }
 
 #filter-tray .segmentContainer {
@@ -59,14 +72,23 @@
   background-color: rgba(255, 255, 255, 0.08);
   border: none;
   box-shadow: none;
+  margin-bottom: 0;
 }
 
-#filter-tray.cards .header {
+#filter-tray > .card > .content > .header {
   color: white;
+  margin: 0;
+  padding: 0.8rem;
+  cursor: pointer;
 }
 
-#filter-tray.cards > .header {
-  margin-bottom: 1.5rem;
+#filter-tray.cards .content {
+  padding: 0;
+}
+
+#filter-tray.cards .description,
+#filter-tray.cards .extra {
+  padding: 0.8rem;
 }
 
 #filter-tray .card .extra {
@@ -115,25 +137,6 @@
 
 #filter-control-panel label::before {
   background-color: #2d2e2f;
-}
-
-#filter-status {
-  background: none;
-  border: none;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-
-#filter-status .description {
-  color: #818186;
-  font-size: 1rem;
-  font-style: italic;
-  display: flex;
-  justify-content: center;
-}
-
-#filter-status .filters-are-active {
-  color: #fff;
 }
 
 #filter-close-button {
