@@ -9,7 +9,7 @@ import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   const [activeFilters, setActiveFilters] = useState({})
 
@@ -41,9 +41,9 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <Card.Group id="filter-tray">
             <Header size="medium">
               <Header.Content>
-                Filters{' '}
+                Filters
                 {noFilters > 0 && (
-                  <Label color="teal" size="small">
+                  <Label color="blue" size="small">
                     <Icon name="filter" />
                     {noFilters}
                   </Label>
@@ -60,7 +60,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)}>
               <Icon name="angle double up" />
-              <div>Close Filters</div>
+              <div className="button-label">Close Filters</div>
               <Icon name="angle double up" />
             </Button>
           </div>
@@ -70,9 +70,14 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
       <div className="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
         <Button secondary onClick={() => setOpen(true)}>
           <Icon name="angle double down" />
-          <div>
+          <div className="button-label">
             Filters
-            {noFilters > 0 ? <span className="no-filters">{` (${noFilters} active)`}</span> : null}
+            {noFilters > 0 && (
+              <Label color="blue" size="small">
+                <Icon name="filter" />
+                {noFilters}
+              </Label>
+            )}
           </div>
           <Icon name="angle double down" />
         </Button>
