@@ -245,7 +245,6 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
                 // clicked on top-level, drill down
                 sendAnalytics('Org drilldown clicked', 'ProtoC2')
                 const datapoint = data.find(entry => entry.code === point.custom.code)
-                console.log(point.custom)
                 clickHandler(datapoint.programmes || datapoint.studytracks)
               }
             }
