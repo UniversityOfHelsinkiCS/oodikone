@@ -52,10 +52,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)}>
               <Icon name="angle double up" />
-              <div>
-                Close Filters
-                {noFilters > 0 ? <span className="no-filters">{` (${noFilters} active)`}</span> : null}
-              </div>
+              <div>Close Filters</div>
               <Icon name="angle double up" />
             </Button>
           </div>
