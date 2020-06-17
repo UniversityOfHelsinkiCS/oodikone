@@ -73,7 +73,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <div className="button-label">
             Filters
             {noFilters > 0 && (
-              <Label color="blue" size="small">
+              <Label color="grey" size="small">
                 <Icon name="filter" />
                 {noFilters}
               </Label>
