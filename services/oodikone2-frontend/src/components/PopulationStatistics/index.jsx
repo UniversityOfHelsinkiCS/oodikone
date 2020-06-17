@@ -19,6 +19,7 @@ import FilterTray from '../FilterTray'
 
 createStore('mandatoryToggle', window.localStorage.getItem('oodikoneMandatoryToggle') === 'true')
 createStore('filterFeatToggle', window.localStorage.getItem('oodikoneFilterFeatToggle') === 'true')
+createStore('clickSaver', window.localStorage.getItem('oodikoneClickSaver') === 'true')
 
 const PopulationStatistics = memo(props => {
   const {
@@ -39,6 +40,7 @@ const PopulationStatistics = memo(props => {
   const [filteredStudents, setFilteredStudents] = useState(students)
   const [mandatoryToggle, setMandatoryToggle] = useStore('mandatoryToggle')
   const [filterFeatToggle, setFilterFeatToggle] = useStore('filterFeatToggle')
+  const [clickSaver, setClickSaver] = useStore('clickSaver')
   const [excluded, setExcluded] = useState([])
 
   const { onProgress, progress } = useProgress(loading)
@@ -114,6 +116,18 @@ const PopulationStatistics = memo(props => {
                     }}
                     label="Toggle New Filters"
                   />
+                  {filterFeatToggle && (
+                    <Form.Radio
+                      checked={clickSaver}
+                      toggle
+                      onChange={() => {
+                        const newVal = !clickSaver
+                        setClickSaver(newVal)
+                        localStorage.setItem('oodikoneClickSaver', newVal)
+                      }}
+                      label="Save Precious Clicks"
+                    />
+                  )}
                 </Form.Group>
               </Form>
             ) : null}
