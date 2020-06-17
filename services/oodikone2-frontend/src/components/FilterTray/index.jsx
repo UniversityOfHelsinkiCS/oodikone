@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import lodash from 'lodash'
-import { Button, Card, Header, Icon, Label } from 'semantic-ui-react'
+import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
+import { useStore } from 'react-hookstore'
 import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
-  const [open, setOpen] = useState(false)
+  const [clickSaver] = useStore('clickSaver')
+  const [open, setOpen] = useState(clickSaver)
 
   const [activeFilters, setActiveFilters] = useState({})
 
@@ -43,10 +45,19 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
               <Header.Content>
                 Filters
                 {noFilters > 0 && (
-                  <Label color="blue" size="small">
-                    <Icon name="filter" />
-                    {noFilters}
-                  </Label>
+                  <Popup
+                    content="Number of active filters."
+                    position="bottom center"
+                    pinned
+                    size="mini"
+                    on="hover"
+                    trigger={
+                      <Label color="blue" size="small">
+                        <Icon name="filter" />
+                        {noFilters}
+                      </Label>
+                    }
+                  />
                 )}
               </Header.Content>
               <div>
@@ -73,10 +84,19 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <div className="button-label">
             Filters
             {noFilters > 0 && (
-              <Label color="grey" size="small">
-                <Icon name="filter" />
-                {noFilters}
-              </Label>
+              <Popup
+                content="Number of active filters."
+                position="right center"
+                pinned
+                size="mini"
+                on="hover"
+                trigger={
+                  <Label color="grey" size="small">
+                    <Icon name="filter" />
+                    {noFilters}
+                  </Label>
+                }
+              />
             )}
           </div>
           <Icon name="angle double down" />

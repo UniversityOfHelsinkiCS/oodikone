@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
+import { useStore } from 'react-hookstore'
 
 const FilterCard = ({ title, children, footer }) => {
-  const [open, setOpen] = useState(false)
+  const [clickSaver] = useStore('clickSaver')
+  const [open, setOpen] = useState(clickSaver)
 
   return (
     <Card>
