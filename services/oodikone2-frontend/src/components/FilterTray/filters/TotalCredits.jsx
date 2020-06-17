@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Form, Input } from 'semantic-ui-react'
+import { Form, Input, Button, Label } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
 import FilterCard from '../FilterCard'
 
@@ -30,7 +30,16 @@ const TotalCredits = ({ filterControl }) => {
     <FilterCard title="Total Credits">
       <Form>
         <Form.Field>
-          <Input label="Min" size="mini" onChange={onChange('min')} value={value.min} />
+          <Input labelPosition="left" size="mini" onChange={onChange('min')} value={value.min} action>
+            <Label>Min</Label>
+            <input />
+            <Button type="submit" size="mini">
+              Moi
+            </Button>
+            <Button type="submit" size="mini">
+              No hei
+            </Button>
+          </Input>
         </Form.Field>
         <Form.Field>
           <Input label="Max" size="mini" onChange={onChange('max')} value={value.max} />
