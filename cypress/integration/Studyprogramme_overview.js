@@ -124,6 +124,7 @@ describe('Studyprogramme overview', () => {
     cy.get('i.level.up.alternate.icon').eq(0).click()
     cy.contains('Credit accumulation (for 29 students)')
   })
+
   it('can create and delete tags for population', () => {
     const name = `tag-${new Date().getTime()}`
     cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
@@ -135,6 +136,7 @@ describe('Studyprogramme overview', () => {
     cy.contains('2018')
     deleteTag(name)
   })
+
   it('can create personal tags', () => {
     const name = `tag-${new Date().getTime()}`
     cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
@@ -147,7 +149,8 @@ describe('Studyprogramme overview', () => {
     cy.contains(name)
     deleteTag(name)
   })
-  it('can add tags to students', () => {
+
+  it.only('can add tags to students', () => {
     const name = `tag-${new Date().getTime()}`
 
     cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
@@ -160,7 +163,7 @@ describe('Studyprogramme overview', () => {
     cy.contains('Add tags to students').click()
     cy.get('.form > .field > .dropdown').click().get('.ui > .search').type(name).click()
     
-    cy.get('.form > .field > .dropdown').contains(name).click()
+    cy.get('.form > .field > .dropdown > .visible').contains(name).click()
 
     cy.get('textarea').type('010623419')
     cy.get('.positive').click()

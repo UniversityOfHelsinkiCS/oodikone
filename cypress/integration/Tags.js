@@ -39,7 +39,7 @@ describe('Tag tests', () => {
     cy.contains('Add tags to students').click()
     cy.get('.form > .field > .dropdown').click().get('.ui > .search').type(name).click()
 
-    cy.get('.form > .field > .dropdown').contains(name).click()
+    cy.get('.form > .field > .dropdown > .visible').contains(name).click()
 
     cy.get('textarea').type('014022579\n011122249')
     cy.get('.positive').click()
