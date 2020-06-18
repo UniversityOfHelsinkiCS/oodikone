@@ -44,9 +44,12 @@ const TotalCredits = ({ filterControl }) => {
     setUpdatedAt(prev => ({ ...prev, [key]: now() }))
   }
 
-  const onSubmit = key => () => {
-    setUpdatedAt(prev => ({ ...prev, [key]: null }))
-    updateFilters(key)
+  const onKeyDown = key => event => {
+    if (event.keyCode === 13) {
+      event.preventDefault()
+      setUpdatedAt(prev => ({ ...prev, [key]: null }))
+      updateFilters(key)
+    }
   }
 
   const onClear = key => () => {
@@ -61,28 +64,16 @@ const TotalCredits = ({ filterControl }) => {
     <FilterCard title="Total Credits">
       <Form>
         <Form.Field>
-          <Input labelPosition="left" size="mini" onChange={onChange('min')} value={value.min} action>
+          <Input
+            labelPosition="left"
+            size="mini"
+            onChange={onChange('min')}
+            value={value.min}
+            action
+            onKeyDown={onKeyDown('min')}
+          >
             <Label>Min</Label>
             <input />
-            <Popup
-              content="Apply filter."
-              position="bottom center"
-              pinned
-              size="mini"
-              on="hover"
-              trigger={
-                <Button
-                  type="submit"
-                  size="mini"
-                  color="green"
-                  icon
-                  onClick={onSubmit('min')}
-                  disabled={!updatedAt.min}
-                >
-                  <Icon name="check" />
-                </Button>
-              }
-            />
             <Popup
               content="Clear filter."
               position="bottom center"
