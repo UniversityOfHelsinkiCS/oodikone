@@ -4,6 +4,7 @@ const { refreshAssociationsInRedis } = require('./services/studyrights')
 const {
   refreshProtoC,
   refreshStatus,
+  refreshStatusGraduated,
   refreshUber,
   refreshProtoCProgramme,
   getStartYears
@@ -271,6 +272,10 @@ const refreshStatusToRedis = async () => {
     console.log('Refreshing CDS Status')
     await refreshStatus(unixMillis, showByYearOff)
     await refreshStatus(unixMillis, showByYear)
+
+    console.log('Refreshing CDS Graduated')
+    await refreshStatusGraduated(unixMillis, showByYearOff)
+    await refreshStatusGraduated(unixMillis, showByYear)
   } catch (e) {
     console.log(e)
   }

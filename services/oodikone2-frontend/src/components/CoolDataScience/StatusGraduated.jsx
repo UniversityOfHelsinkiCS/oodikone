@@ -168,13 +168,13 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const handleShowYearlyValuesToggled = () => {
     const yearlyValues = showYearlyValues
     setShowYearlyValues(!showYearlyValues)
-    sendAnalytics(`S Show yearly values toggle ${!yearlyValues ? 'on' : 'off'}`, 'Status')
+    sendAnalytics(`SG Show yearly values toggle ${!yearlyValues ? 'on' : 'off'}`, 'Status graduated')
   }
 
   const handleShowByYearToggled = () => {
     const byYear = showByYear
     setShowByYear(!showByYear)
-    sendAnalytics(`S Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
+    sendAnalytics(`SG Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status graduated')
   }
 
   const pushToDrillStack = (values, code) => {
@@ -182,7 +182,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
     const updatedDrillStack = [...drillStack].concat(values)
     setCodes(updatedCodes)
     setDrillStack(updatedDrillStack)
-    sendAnalytics('S Drilldown clicked', 'Status')
+    sendAnalytics('SG Drilldown clicked', 'Status graduated')
   }
 
   const popFromDrillStack = () => {
@@ -190,7 +190,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
     const updatedCodes = _.dropRight([...codes], 1)
     setCodes(updatedCodes)
     setDrillStack(updatedDrillStack)
-    sendAnalytics('S Drillup clicked', 'Status')
+    sendAnalytics('SG Drillup clicked', 'Status graduated')
   }
 
   const renderSettings = () => {
