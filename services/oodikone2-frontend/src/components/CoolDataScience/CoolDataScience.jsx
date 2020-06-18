@@ -7,6 +7,7 @@ import ProtoC from './ProtoC'
 import ProtoC2 from './ProtoC2'
 import ProtoG from './ProtoG'
 import Status from './Status'
+import Graduated from './StatusGraduated'
 import relativeGraphImg from '../../assets/graph-relative.png'
 import absoluteGraphImg from '../../assets/graph-absolute.png'
 import timelineGraphImg from '../../assets/graph-timeline.png'
@@ -56,6 +57,7 @@ const CoolDataScience = () => {
           <NavTile to={`${baseURI}/absolute`} title="Compare numerical trends" imageSrc={absoluteGraphImg} />
           <NavTile to={`${baseURI}/timeline`} title="Compare trends over time" imageSrc={timelineGraphImg} />
           <NavTile to={`${baseURI}/status`} title="See current status" imageSrc={statusImg} />
+          <NavTile to={`${baseURI}/lol`} title="See currentsss status" imageSrc={statusImg} />
         </NavTiles>
       </div>
       <div style={{ margin: '0 auto', marginBottom: '300px', maxWidth: '75vw' }}>
@@ -64,6 +66,7 @@ const CoolDataScience = () => {
           <Route exact path={`${baseURI}/absolute`} component={ProtoC2} />
           <Route exact path={`${baseURI}/timeline`} component={ProtoG} />
           <Route exact path={`${baseURI}/status`} component={Status} />
+          <Route exact path={`${baseURI}/lol`} component={Graduated} />
         </Switch>
       </div>
 
