@@ -136,7 +136,7 @@ const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|
 const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const DATE_FORMAT = 'DD.MM.YYYY'
   const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
-  const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
+  const [showByYear, setShowByYear] = useLocalStorage('showByYear', true)
   const [drillStack, setDrillStack] = useState([])
   const [showSettings, setShowSettings] = useState(true)
   const [selectedDate, setSelectedDate] = useState(moment())
