@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Form, Dropdown } from 'semantic-ui-react'
-import ClearFilterButton from '../ClearFilterButton'
-import FilterCard from '../FilterCard'
+import ClearFilterButton from './common/ClearFilterButton'
+import FilterCard from './common/FilterCard'
 
 const StartYearAtUni = ({ filterControl }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
