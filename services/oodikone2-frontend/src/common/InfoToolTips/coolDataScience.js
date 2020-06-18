@@ -48,5 +48,16 @@ export default {
   eikä lukuvuoden alusta. Kohdasta **Näytä päivänä** voi valita tarkastelupäivän, joka on oletusarvoisesti tämänhetkinen päivä.
   <br> <br>
   Avoimen yliopiston suorituksia ei vielä lasketa mukaan.
+  `,
+  statusGraduated: `
+  **Tilannekuva** näyttää "reaaliaikaisesti" eri tiedekuntien ja ohjelmien valmistumiset nykyisen lukuvuoden aikana 
+  verrattuna edelliseen lukuvuoteen. **Nuoli** kuvaa muutosta, paljonko valmistuneita on kertynyt tämänhetkisen lukuvuoden alusta tarkastelupäivään mennessä 
+  suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna.
+  <br> <br>
+  Tilannekuvassa voi **porautua** kortteja klikkaamalla ohjelmatasolle. **Asetukset**-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. Valinta **Näytä edelliset vuodet** näyttää
+  vuosittaisen valmistumis-kertymän tähän päivään mennessä vuonna X sekä koko lukuvuoden X valmistuneet muodossa "\`kerääntymä vuonna X / koko lukuvuoden X valmistuneet\`". Valinta **Näytä vuositasolla** 
+  laskee kertymän kalenterivuoden alusta,
+  eikä lukuvuoden alusta. Kohdasta **Näytä päivänä** voi valita tarkastelupäivän, joka on oletusarvoisesti tämänhetkinen päivä.
+  <br> <br>
   `
 }

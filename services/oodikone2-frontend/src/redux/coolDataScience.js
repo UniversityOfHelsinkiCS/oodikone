@@ -28,6 +28,13 @@ export const getUber = ({ startDate, includeOldAttainments }) => {
   return callController(route, prefix, [], 'get', null, params)
 }
 
+export const getStatusGraduated = ({ date, showByYear }) => {
+  const route = '/cool-data-science/status-graduated'
+  const prefix = 'GET_GRADUATED_'
+  const params = { date, showByYear }
+  return callController(route, prefix, [], 'get', null, params)
+}
+
 export const getYears = () => {
   const route = '/cool-data-science/start-years'
   const prefix = 'GET_YEARS_'
@@ -36,8 +43,8 @@ export const getYears = () => {
 
 const reducer = (
   state = {
-    data: { protoC: {}, protoCProgramme: {}, status: {}, uber: [], years: [] },
-    pending: { protoC: false, protoCProgramme: false, status: false, uber: false, years: false }
+    data: { protoC: {}, protoCProgramme: {}, status: {}, uber: [], years: [], graduated: {} },
+    pending: { protoC: false, protoCProgramme: false, status: false, uber: false, years: false, graduated: false }
   },
   action
 ) => {
@@ -220,6 +227,42 @@ const reducer = (
         pending: {
           ...state.pending,
           years: false
+        }
+      }
+    case 'GET_GRADUATED_ATTEMPT':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          graduated: {}
+        },
+        pending: {
+          ...state.pending,
+          graduated: true
+        }
+      }
+    case 'GET_GRADUATED_FAILED':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          graduated: {}
+        },
+        pending: {
+          ...state.pending,
+          graduated: false
+        }
+      }
+    case 'GET_GRADUATED_SUCCESS':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          graduated: action.response || {}
+        },
+        pending: {
+          ...state.pending,
+          graduated: false
         }
       }
     default:

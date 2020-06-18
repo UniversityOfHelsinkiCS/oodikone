@@ -32,7 +32,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
    */
   const withoutFilter = name => applyFilters(lodash.omit(activeFilters, name))
 
-  const filterControl = { addFilter, removeFilter, withoutFilter, allStudents, filteredStudents }
+  const filterControl = { addFilter, removeFilter, withoutFilter, activeFilters, allStudents, filteredStudents }
 
   const noFilters = Object.keys(activeFilters).length
 
