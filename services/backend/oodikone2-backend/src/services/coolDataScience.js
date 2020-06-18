@@ -856,15 +856,14 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
       }
       // if no year in programme yearly add year
       if (!mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year])
-        mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year] = { total: Number(curr.sum), acc: 0 }
-      else mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year]['total'] = Number(curr.sum)
-
+        mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year] = { total: 0, acc: 0 }
       // if no year in yearly total for faculty
       if (!mankeled[curr.faculty_code]['yearly'][data.year])
         mankeled[curr.faculty_code]['yearly'][data.year] = { total: 0, acc: 0 }
       // do not add anything to total if current year. might fuck up in fall :D
       if (data.year !== startYear) {
         mankeled[curr.faculty_code]['yearly'][data.year].total += Number(curr.sum)
+        mankeled[curr.faculty_code]['drill'][curr.code]['yearly'][data.year].total = Number(curr.sum)
       }
     })
   })
@@ -975,6 +974,12 @@ const refreshStatus = async (unixMillis, showByYear) => {
   await saveToRedis(data, KEY, true)
 }
 
+const refreshStatusGraduated = async (unixMillis, showByYear) => {
+  const KEY = `${REDIS_KEY_GRADUATED}_DATE_${unixMillis}_YEARLY_${showByYear.toUpperCase()}`
+  const data = await calculateStatusGraduated(unixMillis, showByYear)
+  await saveToRedis(data, KEY, true)
+}
+
 const refreshUber = async query => {
   const KEY = `${REDIS_KEY_UBER}_OLD_${query.include_old_attainments.toUpperCase()}_${new Date(
     query.start_date
@@ -1077,6 +1082,7 @@ module.exports = {
   refreshStatus,
   refreshUber,
   refreshProtoCProgramme,
+  refreshStatusGraduated,
   getStartYears,
   getGraduatedStatus
 }
