@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Form, Input, Button, Label, Icon, Popup } from 'semantic-ui-react'
+import { Form } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
-import FilterCard from '../FilterCard'
+import FilterCard from './common/FilterCard'
+import NumericInput from './common/NumericInput'
 
 const TotalCredits = ({ filterControl }) => {
   const [value, setValue] = useState({ min: '', max: '' })
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
+  const labels = { min: 'Min', max: 'Max' }
 
   const now = () => new Date().getTime()
 
@@ -44,9 +46,12 @@ const TotalCredits = ({ filterControl }) => {
     setUpdatedAt(prev => ({ ...prev, [key]: now() }))
   }
 
-  const onSubmit = key => () => {
-    setUpdatedAt(prev => ({ ...prev, [key]: null }))
-    updateFilters(key)
+  const onKeyDown = key => event => {
+    if (event.keyCode === 13) {
+      event.preventDefault()
+      setUpdatedAt(prev => ({ ...prev, [key]: null }))
+      updateFilters(key)
+    }
   }
 
   const onClear = key => () => {
@@ -60,46 +65,18 @@ const TotalCredits = ({ filterControl }) => {
   return (
     <FilterCard title="Total Credits">
       <Form>
-        <Form.Field>
-          <Input labelPosition="left" size="mini" onChange={onChange('min')} value={value.min} action>
-            <Label>Min</Label>
-            <input />
-            <Popup
-              content="Apply filter."
-              position="bottom center"
-              pinned
-              size="mini"
-              on="hover"
-              trigger={
-                <Button
-                  type="submit"
-                  size="mini"
-                  color="green"
-                  icon
-                  onClick={onSubmit('min')}
-                  disabled={!updatedAt.min}
-                >
-                  <Icon name="check" />
-                </Button>
-              }
+        {Object.keys(value).map(key => (
+          <Form.Field key={`total-credits-filter-${key}`}>
+            <NumericInput
+              onChange={onChange(key)}
+              onKeyDown={onKeyDown(key)}
+              onClear={onClear(key)}
+              value={value[key]}
+              label={labels[key]}
+              clearButtonDisabled={clearButtonDisabled(key)}
             />
-            <Popup
-              content="Clear filter."
-              position="bottom center"
-              pinned
-              size="mini"
-              on="hover"
-              trigger={
-                <Button size="mini" color="red" icon onClick={onClear('min')} disabled={clearButtonDisabled('min')}>
-                  <Icon name="close" />
-                </Button>
-              }
-            />
-          </Input>
-        </Form.Field>
-        <Form.Field>
-          <Input label="Max" size="mini" onChange={onChange('max')} value={value.max} />
-        </Form.Field>
+          </Form.Field>
+        ))}
       </Form>
     </FilterCard>
   )

@@ -109,11 +109,6 @@
   padding-top: 0.2rem;
 }
 
-#filter-tray .card .action > input {
-  flex-shrink: 1;
-  width: inherit;
-}
-
 #filter-tray .checkbox {
   margin-left: 0.8rem;
 }
