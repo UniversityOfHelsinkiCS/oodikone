@@ -7,7 +7,7 @@ import { useTitle } from '../../common/hooks'
 import ProtoC from '../CoolDataScience/ProtoC'
 import ProtoC2 from '../CoolDataScience/ProtoC2'
 import ProtoG from '../CoolDataScience/ProtoG'
-import Status from '../CoolDataScience/Status'
+import StatusPanel from '../CoolDataScience/StatusPanel'
 import relativeGraphImg from '../../assets/graph-relative.png'
 import absoluteGraphImg from '../../assets/graph-absolute.png'
 import timelineGraphImg from '../../assets/graph-timeline.png'
@@ -68,7 +68,7 @@ const Trends = () => {
       </div>
       <div style={{ margin: '0 auto', marginBottom: '300px', maxWidth: '75vw' }}>
         <Switch>
-          <Route exact path={`${baseURI}/status`} component={Status} />
+          <Route exact path={`${baseURI}/status`} component={StatusPanel} />
           <Route exact path={`${baseURI}/relative`} component={ProtoC} />
           <Route exact path={`${baseURI}/absolute`} component={ProtoC2} />
           <Route exact path={`${baseURI}/timeline`} component={ProtoG} />

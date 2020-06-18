@@ -11,7 +11,7 @@ import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
 import InfoToolTips from '../../common/InfoToolTips'
-import { getStatus } from '../../redux/coolDataScience'
+import { getStatusGraduated } from '../../redux/coolDataScience'
 import './status.css'
 
 const ANALYTICS_CATEGORY = 'Trends'
@@ -99,32 +99,19 @@ const StatusContainer = ({
       </div>
       {showYearlyValues && (
         <div style={{ marginTop: '10px', textAlign: 'start' }}>
-          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(
-            ([year, { acc, total, accStudents, totalStudents }]) => {
-              return (
-                <div style={{ margin: '5px 0' }} key={`${title}-${year}`}>
-                  <span>
-                    <b>
-                      {year}
-                      {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
-                    </b>{' '}
-                    {/* render num of students instead of credits if no credits are given from the course */}
-                    {accStudents <= acc ? Math.round(acc).toLocaleString('fi') : accStudents}
-                    {/* if no total students add students after accStudents */}
-                    {acc <= accStudents && totalStudents < 1 && ' students'}
-                    {/* render total if there are credits or students for either */}
-                    {(total > 0 || totalStudents > 0) &&
-                      ` / ${
-                        // same logic as before to check if render num of students or credits
-                        totalStudents <= total && total > 0
-                          ? Math.round(total).toLocaleString('fi')
-                          : `${totalStudents} students`
-                      }`}
-                  </span>
-                </div>
-              )
-            }
-          )}
+          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(([year, { acc, total }]) => {
+            return (
+              <div style={{ margin: '5px 0' }} key={`${title}-${year}`}>
+                <span>
+                  <b>
+                    {year}
+                    {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
+                  </b>{' '}
+                  {acc} {total > 0 ? `/ ${total}` : ''}
+                </span>
+              </div>
+            )
+          })}
         </div>
       )}
     </Segment>
@@ -146,7 +133,7 @@ StatusContainer.propTypes = {
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
 
-const Status = ({ getStatusDispatch, data, loading }) => {
+const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const DATE_FORMAT = 'DD.MM.YYYY'
   const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
   const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
@@ -155,12 +142,11 @@ const Status = ({ getStatusDispatch, data, loading }) => {
   const [selectedDate, setSelectedDate] = useState(moment())
   const [codes, setCodes] = useState([])
   const { CoolDataScience } = InfoToolTips
-
   const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
 
   useEffect(() => {
     if (selectedDate && isValidDate(selectedDate)) {
-      getStatusDispatch({ date: selectedDate.valueOf(), showByYear })
+      getStatusGraduatedDispatch({ date: selectedDate.valueOf(), showByYear })
     }
   }, [selectedDate, showByYear])
 
@@ -271,7 +257,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
   const DrilldownMessage = () => (
     <Message
       color="blue"
-      content="Klikkaamalla tiedekuntaa pystyt porautumaan koulutusohjelma tasolle ja ohjelmaa klikkaamalla pystyt porautumaan kurssitasolle.
+      content="Klikkaamalla tiedekuntaa pystyt porautumaan koulutusohjelma tasolle.
       Vasemmassa yläkulmassa olevaa nuolta klikkaamalla pääset edelliseen näkymään."
     />
   )
@@ -309,24 +295,19 @@ const Status = ({ getStatusDispatch, data, loading }) => {
       >
         {_.orderBy(
           Object.entries(_.last(drillStack) || data),
-          ([, { current, previous, currentStudents, previousStudents }]) =>
-            getP(current || currentStudents, previous || previousStudents), // oh god<r
+          ([, { current, previous }]) => getP(current, previous), // oh god<r
           ['desc']
         ).map(([code, stats]) => {
           const handleClick = () => pushToDrillStack(stats.drill, code)
-          // check if the course has credits or not (if credits is zero but there are students who have completed it)
-          const current =
-            !stats.drill && stats.current === 0 && stats.currentStudents > 1 ? stats.currentStudents : stats.current
-          const previous =
-            !stats.drill && stats.previous === 0 && stats.previousStudents > 1 ? stats.previousStudents : stats.previous
+
           return (
             <StatusContainer
               key={code}
               clickable={!!stats.drill}
               handleClick={handleClick}
               title={getTextIn(stats.name)}
-              current={current}
-              previous={previous}
+              current={stats.current}
+              previous={stats.previous}
               showYearlyValues={showYearlyValues}
               min1={-medianDiff * 2}
               max1={medianDiff * 2}
@@ -338,7 +319,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
       </div>
       {renderSettings()}
       <Message>
-        <ReactMarkdown source={CoolDataScience.status} escapeHtml={false} />
+        <ReactMarkdown source={CoolDataScience.statusGraduated} escapeHtml={false} />
       </Message>
     </>
   )
@@ -347,15 +328,15 @@ const Status = ({ getStatusDispatch, data, loading }) => {
 Status.propTypes = {
   data: shape({}).isRequired,
   loading: bool.isRequired,
-  getStatusDispatch: func.isRequired
+  getStatusGraduatedDispatch: func.isRequired
 }
 
 const mapStateToProps = ({ coolDataScience }) => ({
-  data: coolDataScience.data.status,
-  loading: coolDataScience.pending.status
+  data: coolDataScience.data.graduated,
+  loading: coolDataScience.pending.graduated
 })
 
 export default connect(
   mapStateToProps,
-  { getStatusDispatch: getStatus }
+  { getStatusGraduatedDispatch: getStatusGraduated }
 )(Status)
