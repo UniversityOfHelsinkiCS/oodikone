@@ -10,13 +10,15 @@ const TotalCredits = ({ filterControl }) => {
 
   const now = () => new Date().getTime()
 
+  const names = Object.fromEntries(Object.keys(value).map(key => [key, `totalCredits${key}`]))
+
   const filterFunctions = {
     min: student => getStudentTotalCredits(student) >= Number(value.min),
     max: student => getStudentTotalCredits(student) <= Number(value.max)
   }
 
   const updateFilters = key => {
-    const name = `totalCredits${key}`
+    const name = names[key]
 
     if (value[key] !== '') {
       filterControl.addFilter(name, filterFunctions[key])
@@ -47,6 +49,14 @@ const TotalCredits = ({ filterControl }) => {
     updateFilters(key)
   }
 
+  const onClear = key => () => {
+    setValue(prev => ({ ...prev, [key]: '' }))
+    setUpdatedAt(prev => ({ ...prev, [key]: null }))
+    filterControl.removeFilter(names[key])
+  }
+
+  const clearButtonDisabled = key => !Object.keys(filterControl.activeFilters).includes(names[key])
+
   return (
     <FilterCard title="Total Credits">
       <Form>
@@ -54,10 +64,10 @@ const TotalCredits = ({ filterControl }) => {
           <Input labelPosition="left" size="mini" onChange={onChange('min')} value={value.min} action>
             <Label>Min</Label>
             <input />
-            <Button type="submit" size="mini" color="green" icon onClick={onSubmit('min')}>
+            <Button type="submit" size="mini" color="green" icon onClick={onSubmit('min')} disabled={!updatedAt.min}>
               <Icon name="check" />
             </Button>
-            <Button type="submit" size="mini" color="red" icon disabled={!value.min}>
+            <Button size="mini" color="red" icon onClick={onClear('min')} disabled={clearButtonDisabled('min')}>
               <Icon name="close" />
             </Button>
           </Input>
@@ -74,7 +84,8 @@ TotalCredits.propTypes = {
   filterControl: PropTypes.shape({
     addFilter: PropTypes.func.isRequired,
     removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired
+    withoutFilter: PropTypes.func.isRequired,
+    activeFilters: PropTypes.object.isRequired
   }).isRequired
 }
 
