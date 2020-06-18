@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Form, Input, Button, Label, Icon } from 'semantic-ui-react'
+import { Form, Input, Button, Label, Icon, Popup } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
 import FilterCard from '../FilterCard'
 
@@ -64,12 +64,37 @@ const TotalCredits = ({ filterControl }) => {
           <Input labelPosition="left" size="mini" onChange={onChange('min')} value={value.min} action>
             <Label>Min</Label>
             <input />
-            <Button type="submit" size="mini" color="green" icon onClick={onSubmit('min')} disabled={!updatedAt.min}>
-              <Icon name="check" />
-            </Button>
-            <Button size="mini" color="red" icon onClick={onClear('min')} disabled={clearButtonDisabled('min')}>
-              <Icon name="close" />
-            </Button>
+            <Popup
+              content="Apply filter."
+              position="bottom center"
+              pinned
+              size="mini"
+              on="hover"
+              trigger={
+                <Button
+                  type="submit"
+                  size="mini"
+                  color="green"
+                  icon
+                  onClick={onSubmit('min')}
+                  disabled={!updatedAt.min}
+                >
+                  <Icon name="check" />
+                </Button>
+              }
+            />
+            <Popup
+              content="Clear filter."
+              position="bottom center"
+              pinned
+              size="mini"
+              on="hover"
+              trigger={
+                <Button size="mini" color="red" icon onClick={onClear('min')} disabled={clearButtonDisabled('min')}>
+                  <Icon name="close" />
+                </Button>
+              }
+            />
           </Input>
         </Form.Field>
         <Form.Field>
