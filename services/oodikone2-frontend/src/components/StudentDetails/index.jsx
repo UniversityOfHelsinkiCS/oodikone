@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Fragment, useEffect, useState } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
@@ -18,52 +18,51 @@ import { clearCourseStats } from '../../redux/coursestats'
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import SortableTable from '../SortableTable'
 import StudentCourseTable from '../StudentCourseTable'
+import TSA from '../../common/tsa'
 
-class StudentDetails extends Component {
-  constructor() {
-    super()
-    this.state = {
-      graphYearStart: null,
-      degreename: '',
-      studyrightid: null,
-      chunky: false,
-      semester: false,
-      chunksize: 5
+const ANALYTICS_CATEGORY = 'Student stats'
+const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
+
+const StudentDetails = ({
+  student,
+  language,
+  degreesAndProgrammes,
+  studentNumber,
+  getStudent,
+  semesters,
+  student: { semesterenrollments },
+  resetStudent,
+  removeStudentSelection,
+  translate,
+  getDegreesAndProgrammes,
+  getSemesters,
+  pending,
+  error,
+  fetching,
+  clearCourseStats
+}) => {
+  const [graphYearStart, setGraphYear] = useState(null)
+  const [degreename, setDegreename] = useState('')
+  const [studyrightid, setStudyrightid] = useState(null)
+  const [chunky, setChunky] = useState(false)
+  const [semester, setSemester] = useState(false)
+  const [chunksize, setChunkSize] = useState(5)
+
+  useEffect(() => {
+    getDegreesAndProgrammes()
+    getSemesters()
+  }, [])
+
+  useEffect(() => {
+    setGraphYear(null)
+    if (studentNumber.length > 0) getStudent(studentNumber)
+    else {
+      resetStudent()
+      removeStudentSelection()
     }
-  }
+  }, [studentNumber])
 
-  componentDidMount() {
-    this.props.getDegreesAndProgrammes()
-    this.props.getSemesters()
-    this.unlistenHistory = this.props.history.listen(() => {
-      this.props.resetStudent()
-      this.props.removeStudentSelection()
-    })
-  }
-
-  componentDidUpdate() {
-    if (isEmpty(this.props.student) && this.props.studentNumber && !this.props.error) {
-      this.props.getStudent(this.props.studentNumber)
-    }
-  }
-
-  componentWillUnmount() {
-    this.unlistenHistory()
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const changedStudent = nextProps.studentNumber !== this.props.studentNumber
-
-    if (changedStudent) {
-      this.setState({ graphYearStart: null })
-    }
-  }
-
-  getAbsentYears = () => {
-    const {
-      semesters,
-      student: { semesterenrollments }
-    } = this.props
+  const getAbsentYears = () => {
     semesterenrollments.sort((a, b) => a.semestercode - b.semestercode)
     const mappedSemesters = Object.values(semesters.semesters).reduce(
       (acc, { semestercode, startdate, enddate }) => ({ ...acc, [semestercode]: { startdate, enddate } }),
@@ -126,7 +125,7 @@ class StudentDetails extends Component {
     )
   }
 
-  showPopulationStatistics = (studyprogramme, date) => {
+  const showPopulationStatistics = (studyprogramme, date) => {
     const year = moment(date).isBefore(moment(`${date.slice(0, 4)}-08-01`)) ? date.slice(0, 4) - 1 : date.slice(0, 4)
     const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
     return (
@@ -135,15 +134,11 @@ class StudentDetails extends Component {
     )
   }
 
-  handleStartDateChange = (elements, id) => {
-    const { degreename, graphYearStart, studyrightid } = this.state
-
+  const handleStartDateChange = (elements, id) => {
     if (id === studyrightid) {
-      this.setState({
-        graphYearStart: null,
-        degreename: '',
-        studyrightid: ''
-      })
+      setGraphYear(null)
+      setDegreename('')
+      setStudyrightid('')
       return
     }
 
@@ -152,16 +147,12 @@ class StudentDetails extends Component {
       sortBy(elements.programmes, 'startdate', ['desc'])[0] || { startdate: graphYearStart, name: degreename }
 
     const { startdate, name } = getTarget()
-    this.setState({
-      graphYearStart: startdate,
-      degreename: name,
-      studyrightid: id
-    })
+    setGraphYear(startdate)
+    setDegreename(name)
+    setStudyrightid(id)
   }
 
-  renderCreditsGraph = () => {
-    const { translate, student } = this.props
-    const { graphYearStart } = this.state
+  const renderCreditsGraph = () => {
     const selectedStart = graphYearStart || student.started
     const filteredCourses = student.courses.filter(c => new Date(c.date) > new Date(selectedStart))
     const newStudent = cloneDeep(student)
@@ -184,14 +175,12 @@ class StudentDetails extends Component {
         title={translate('studentStatistics.chartTitle')}
         translate={translate}
         maxCredits={sample.maxCredits}
-        absences={this.getAbsentYears()}
+        absences={getAbsentYears()}
       />
     )
   }
 
-  renderCourseParticipation = () => {
-    const { translate, student, language } = this.props
-
+  const renderCourseParticipation = () => {
     const courseHeaders = [
       translate('common.date'),
       translate('common.course'),
@@ -237,7 +226,7 @@ class StudentDetails extends Component {
             as={Link}
             to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
           >
-            <Icon name="level up alternate" onClick={() => this.props.clearCourseStats()} />
+            <Icon name="level up alternate" onClick={() => clearCourseStats()} />
           </Item>
         ])
       } else {
@@ -257,7 +246,7 @@ class StudentDetails extends Component {
             as={Link}
             to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
           >
-            <Icon name="level up alternate" onClick={() => this.props.clearCourseStats()} />
+            <Icon name="level up alternate" onClick={() => clearCourseStats()} />
           </Item>
         ])
       }
@@ -286,8 +275,7 @@ class StudentDetails extends Component {
     )
   }
 
-  renderTags = () => {
-    const { student, language } = this.props
+  const renderTags = () => {
     const data = Object.values(
       student.tags.reduce((acc, t) => {
         if (!acc[t.programme.code]) acc[t.programme.code] = { programme: t.programme, tags: [] }
@@ -330,9 +318,7 @@ class StudentDetails extends Component {
     )
   }
 
-  renderStudyRights = () => {
-    const { student, language, degreesAndProgrammes } = this.props
-    const { studyrightid } = this.state
+  const renderStudyRights = () => {
     const { programmes } = degreesAndProgrammes
     const programmeCodes = Object.keys(programmes)
     const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
@@ -403,7 +389,7 @@ class StudentDetails extends Component {
                     <Table.Row
                       active={c.studyrightid === studyrightid}
                       key={c.studyrightid}
-                      onClick={() => this.handleStartDateChange(c.elements, c.studyrightid)}
+                      onClick={() => handleStartDateChange(c.elements, c.studyrightid)}
                     >
                       <Table.Cell verticalAlign="middle">
                         {c.elements.degree && (
@@ -425,7 +411,7 @@ class StudentDetails extends Component {
                                 'DD.MM.YYYY'
                               )})`}
                               {programmeCodes.includes(programme.code) && (
-                                <Item as={Link} to={this.showPopulationStatistics(programme.code, programme.startdate)}>
+                                <Item as={Link} to={showPopulationStatistics(programme.code, programme.startdate)}>
                                   <Icon name="level up alternate" />
                                 </Item>
                               )}{' '}
@@ -474,17 +460,16 @@ class StudentDetails extends Component {
     )
   }
 
-  chunkifyArray = (array, size = 1) => {
+  const chunkifyArray = (array, size = 1) => {
     if (!array) return []
     const firstChunk = array.slice(0, size) // create the first chunk of the given array
     if (!firstChunk.length) {
       return array // this is the base case to terminal the recursive
     }
-    return [firstChunk].concat(this.chunkifyArray(array.slice(size, array.length), size))
+    return [firstChunk].concat(chunkifyArray(array.slice(size, array.length), size))
   }
 
-  semesterChunkify = (courses, semesterenrollments) => {
-    const { semesters, language } = this.props
+  const semesterChunkify = (courses, semesterenrollments) => {
     const semesterChunks = semesterenrollments.reduce((acc, curr) => {
       const currSemester = semesters.semesters[curr.semestercode]
       const filteredcourses = courses.filter(
@@ -509,8 +494,7 @@ class StudentDetails extends Component {
   }
 
   // probably needs some fixing to be done
-  gradeMeanSeries = student => {
-    const { chunksize } = this.state
+  const gradeMeanSeries = student => {
     const sortedCourses = student.courses.sort(byDateDesc).reverse()
     const filterCourses = sortedCourses.filter(c => Number(c.grade) && !c.isStudyModuleCredit && c.passed)
     const data = filterCourses.reduce(
@@ -530,8 +514,8 @@ class StudentDetails extends Component {
       { grades: [], dates: [], mean: [], minDate: null, maxDate: null }
     )
     const size = Number(chunksize) ? chunksize : 3
-    const chunks = this.chunkifyArray(data.grades, size)
-    data.semesterMeans = this.semesterChunkify(data.grades, student.semesterenrollments)
+    const chunks = chunkifyArray(data.grades, size)
+    data.semesterMeans = semesterChunkify(data.grades, student.semesterenrollments)
     const chunkMeans = chunks.reduce((acc, curr) => {
       const sum = curr.reduce((a, b) => a + b.grade, 0)
       if (curr.length > 0)
@@ -546,9 +530,9 @@ class StudentDetails extends Component {
     return data
   }
 
-  renderGradeGraph = student => {
-    const series = this.gradeMeanSeries(student)
-    const { chunky, chunksize, semester } = this.state
+  const renderGradeGraph = student => {
+    sendAnalytics('Clicked grade graph', 'Student')
+    const series = gradeMeanSeries(student)
     const { mean, chunkMeans, semesterMeans } = series
 
     const defaultOptions = {
@@ -586,35 +570,42 @@ class StudentDetails extends Component {
         <Message style={{ maxWidth: '600px' }}>
           <Message.Header>Grade graph</Message.Header>
           <p>
-            Plotting of grades. Total mean shows how the grade mean has developed during studies. Group mean splits
-            courses into chunks of selected size and takes the mean out of those grades. Semester mean shows grade mean
-            of courses completed during that semester.
+            Total mean näyttää kuinka keskiarvo on kehittynyt koko opintojen ajan. Group mean ottaa ryhmittää kurssit
+            valitun koon mukaan ja ottaa niiden keskiarvot. Semester mean laskee jokaisen lukukauden keskiarvon.
           </p>
         </Message>
         <Menu compact align="center">
           <Menu.Item
             active={!chunky && !semester}
             name="Show total mean"
-            onClick={() => this.setState({ chunky: false, semester: false })}
+            onClick={() => {
+              setChunky(false)
+              setSemester(false)
+              sendAnalytics('Clicked total mean', 'Student')
+            }}
           />
           <Menu.Item
             active={chunky && !semester}
             name="Show group mean"
-            onClick={() => this.setState({ chunky: true, semester: false })}
+            onClick={() => {
+              setChunky(true)
+              setSemester(false)
+              sendAnalytics('Clicked group mean', 'Student')
+            }}
           />
           <Menu.Item
             active={!chunky && semester}
             name="Show semester mean"
-            onClick={() => this.setState({ chunky: false, semester: true })}
+            onClick={() => {
+              setChunky(false)
+              setSemester(true)
+              sendAnalytics('Clicked semester mean', 'Student')
+            }}
           />
         </Menu>
         {chunky && (
           <div>
-            <Input
-              label="Group size"
-              defaultValue={chunksize}
-              onChange={e => this.setState({ chunksize: Number(e.target.value) })}
-            />
+            <Input label="Group size" defaultValue={chunksize} onChange={e => setChunkSize(Number(e.target.value))} />
           </div>
         )}
         {!chunky && !semester && <ReactHighcharts highcharts={Highcharts} config={totalMeanOptions} />}
@@ -624,44 +615,41 @@ class StudentDetails extends Component {
     )
   }
 
-  render() {
-    const { translate, student, studentNumber, pending, error, semesters, fetching } = this.props
-    if (fetching) return <Loader active={fetching} />
-    if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return null
-    if (error) {
-      return (
-        <Segment textAlign="center">
-          <p>Student not found or no sufficient permissions</p>
-        </Segment>
-      )
-    }
-
-    const panes = [
-      { menuItem: 'Credit graph', render: () => <Tab.Pane>{this.renderCreditsGraph()}</Tab.Pane> },
-      { menuItem: 'Grade graph', render: () => <Tab.Pane>{this.renderGradeGraph(student)}</Tab.Pane> }
-    ]
-
+  if (fetching) return <Loader active={fetching} />
+  if ((pending || !studentNumber || isEmpty(student) || !semesters) && !error) return null
+  if (error) {
     return (
-      <Segment className="contentSegment">
-        <StudentInfoCard student={student} translate={translate} />
-        <Tab panes={panes} />
-        {this.renderTags()}
-        {this.renderStudyRights()}
-        {this.renderCourseParticipation()}
+      <Segment textAlign="center">
+        <p>Student not found or no sufficient permissions</p>
       </Segment>
     )
   }
+
+  const panes = [
+    { menuItem: 'Credit graph', render: () => <Tab.Pane>{renderCreditsGraph()}</Tab.Pane> },
+    { menuItem: 'Grade graph', render: () => <Tab.Pane>{renderGradeGraph(student)}</Tab.Pane> }
+  ]
+
+  return (
+    <Segment className="contentSegment">
+      <StudentInfoCard student={student} translate={translate} />
+      <Tab panes={panes} />
+      {renderTags()}
+      {renderStudyRights()}
+      {renderCourseParticipation()}
+    </Segment>
+  )
 }
 
 StudentDetails.propTypes = {
   language: string.isRequired,
   getStudent: func.isRequired,
-  history: shape({}).isRequired,
   resetStudent: func.isRequired,
+  clearCourseStats: func.isRequired,
+  degreesAndProgrammes: shape({}).isRequired,
   removeStudentSelection: func.isRequired,
   studentNumber: string,
   translate: func.isRequired,
-  clearCourseStats: func.isRequired,
   student: shape({
     courses: arrayOf(
       shape({
@@ -691,7 +679,6 @@ StudentDetails.propTypes = {
   error: bool.isRequired,
   fetching: bool.isRequired,
   getSemesters: func.isRequired,
-  degreesAndProgrammes: shape({}).isRequired,
   getDegreesAndProgrammes: func.isRequired,
   semesters: shape({
     semesters: shape({}),
