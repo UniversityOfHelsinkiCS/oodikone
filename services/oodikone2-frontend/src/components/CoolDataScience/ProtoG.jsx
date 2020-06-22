@@ -214,7 +214,7 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
   return (
     <Segment>
       <div style={{ display: 'flex' }}>
-        <h3>Prototyyppi: Suhteellisen tavoiteaikaerittelyn kehitys</h3>
+        <h2>Kandiohjelmat: Suhteellisen tavoiteaikaerittelyn kehitys</h2>
         <Checkbox
           style={{ marginLeft: 'auto' }}
           label="Include old attainments"
