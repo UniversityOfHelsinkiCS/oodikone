@@ -473,7 +473,7 @@ const ProtoC = ({
   return (
     <Segment>
       <div align="center">
-        <h2>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
+        <h2>Kandiohjelmat: Tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
       <DrilldownMessage />
       <div align="center" style={{ marginTop: '10px' }}>
