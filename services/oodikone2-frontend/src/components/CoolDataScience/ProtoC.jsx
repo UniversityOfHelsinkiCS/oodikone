@@ -652,7 +652,7 @@ const ProtoC = ({
   return (
     <Segment>
       <div align="center">
-        <h2>Prototyyppi: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
+        <h2>Kandiohjelmat: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
       </div>
       <DrilldownMessage />
       <SorterButtons />

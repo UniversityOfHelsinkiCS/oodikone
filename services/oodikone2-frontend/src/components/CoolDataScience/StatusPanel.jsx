@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tab, Segment } from 'semantic-ui-react'
+import { Tab } from 'semantic-ui-react'
 import Status from './Status'
 import Graduated from './StatusGraduated'
 
@@ -8,11 +8,7 @@ const StatusPanel = () => {
     { menuItem: 'Attainments', render: () => <Status /> },
     { menuItem: 'Graduations', render: () => <Graduated /> }
   ]
-  return (
-    <Segment>
-      <Tab panes={panes} />
-    </Segment>
-  )
+  return <Tab panes={panes} />
 }
 
 export default StatusPanel
