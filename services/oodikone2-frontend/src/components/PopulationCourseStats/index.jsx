@@ -17,6 +17,8 @@ import { PopulationCourseContext } from './PopulationCourseContext'
 import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
+import Students from './Students'
+import { getUserIsAdmin } from '../../common'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
@@ -60,6 +62,7 @@ class PopulationCourseStats extends Component {
     clearCourseStats: func.isRequired,
     pending: bool.isRequired,
     selectedStudents: arrayOf(string).isRequired,
+    isAdmin: bool.isRequired,
     years: shape({}) // eslint-disable-line
   }
 
@@ -225,7 +228,7 @@ class PopulationCourseStats extends Component {
   }
 
   render() {
-    const { courses, translate, pending } = this.props
+    const { courses, translate, pending, isAdmin } = this.props
     const { studentAmountLimit, courseStatistics, sortCriteria, reversed } = this.state
     const contextValue = {
       courseStatistics,
@@ -271,6 +274,17 @@ class PopulationCourseStats extends Component {
         )
       }
     ]
+
+    if (isAdmin) {
+      panes.push({
+        menuItem: 'students',
+        render: () => (
+          <div className="menuTab" style={{ marginTop: '0.5em' }}>
+            <Students />
+          </div>
+        )
+      })
+    }
     if (!courses) {
       return null
     }
@@ -297,12 +311,14 @@ const mapStateToProps = state => {
   const { years } = state.semesters.data
   const courseFilters = state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')
   const selectedCourses = courseFilters.map(f => f.params.course.course)
+  const isAdmin = getUserIsAdmin(state.auth.token.roles)
   return {
     language: getActiveLanguage(state.localize).code,
     translate: getTranslate(state.localize),
     years,
     selectedCourses,
-    populationCourses: state.populationCourses
+    populationCourses: state.populationCourses,
+    isAdmin
   }
 }
 
