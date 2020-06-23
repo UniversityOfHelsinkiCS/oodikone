@@ -7,7 +7,7 @@ import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
-import NewTab from './NewCreditsGainedTab'
+import NewCreditsGainedTab from './NewCreditsGainedTab'
 import './creditGainStats.css'
 
 const CreditGainStats = ({ filteredStudents, translate }) => {
@@ -18,7 +18,7 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
     return (
       <Tab.Pane attached={false}>
         {filterFeatToggle ? (
-          <NewTab filteredStudents={filteredStudents} />
+          <NewCreditsGainedTab filteredStudents={filteredStudents} />
         ) : (
           <CreditsGainedTab sample={filteredStudents} translate={translate} />
         )}

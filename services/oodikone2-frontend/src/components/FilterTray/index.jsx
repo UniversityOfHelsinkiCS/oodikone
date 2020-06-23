@@ -20,7 +20,6 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
 
   useEffect(() => {
     setFilteredStudents(applyFilters(activeFilters))
-    console.log(activeFilters);
   }, [activeFilters, allStudents])
 
   const addFilter = (name, filterFn) => setActiveFilters(prev => ({ ...prev, [name]: filterFn }))
