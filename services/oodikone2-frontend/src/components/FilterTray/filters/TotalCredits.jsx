@@ -48,7 +48,6 @@ const TotalCredits = ({ filterControl }) => {
 
   // Listen to hook-store for external filtering requests.
   useEffect(() => {
-    console.log('totalCreditsExternal', totalCreditsExternal)
     Object.keys(value).forEach(key => {
       const newValue =
         totalCreditsExternal[key] === null || totalCreditsExternal[key] === undefined ? '' : totalCreditsExternal[key]
@@ -62,10 +61,6 @@ const TotalCredits = ({ filterControl }) => {
       }
     })
   }, [totalCreditsExternal])
-
-  useEffect(() => {
-    console.log(filterControl.activeFilters);
-  }, filterControl.activeFilters)
 
   const onChange = key => (_, { value: inputValue }) => {
     setValue(prev => ({ ...prev, [key]: inputValue }))

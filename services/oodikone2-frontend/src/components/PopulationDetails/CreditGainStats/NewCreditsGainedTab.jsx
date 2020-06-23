@@ -1,13 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useLocation } from 'react-router-dom'
-import { Table, Progress, Button } from 'semantic-ui-react'
+import { Table, Progress, Button, Icon, Popup } from 'semantic-ui-react'
 import { useStore } from 'react-hookstore'
 import { getMonths } from '../../../common/query'
 import { getStudentTotalCredits } from '../../../common'
 
 const CreditsGainedTab = ({ filteredStudents }) => {
-  console.log(filteredStudents);
   const [, setTotalCreditsExternal] = useStore('totalCreditsExternal')
   const months = getMonths(useLocation())
   const creditList = filteredStudents.map(student => getStudentTotalCredits(student))
@@ -18,22 +17,23 @@ const CreditsGainedTab = ({ filteredStudents }) => {
       : creditList.filter(credits => credits < max && credits >= min).length
 
   const limits = [
-    [Math.ceil(months * (55 / 12))],
+    [Math.ceil(months * (55 / 12)), null],
     [Math.ceil(months * (50 / 12)), Math.ceil(months * (55 / 12))],
     [Math.ceil(months * (40 / 12)), Math.ceil(months * (50 / 12))],
     [Math.ceil(months * (30 / 12)), Math.ceil(months * (40 / 12))],
     [Math.ceil(months * (20 / 12)), Math.ceil(months * (30 / 12))],
     [Math.ceil(months * (10 / 12)), Math.ceil(months * (20 / 12))],
     [1, Math.ceil(months * (10 / 12))],
-    [0, 0]
+    [null, 0]
   ]
 
-  const updateFilters = (min, max) => setTotalCreditsExternal(max === 0 ? { max: 0 } : { min, max: max - 1 })
+  const updateFilters = (min, max) => setTotalCreditsExternal({ min, max: Math.max(0, max - 1) || null })
 
   return (
     <Table celled>
       <Table.Header>
         <Table.Row>
+          <Table.HeaderCell collapsing></Table.HeaderCell>
           <Table.HeaderCell>Credits Gained During First {months} Months</Table.HeaderCell>
           <Table.HeaderCell>
             Number of Students
@@ -47,8 +47,18 @@ const CreditsGainedTab = ({ filteredStudents }) => {
       <Table.Body>
         {limits.map(([min, max]) => (
           <Table.Row key={`table-row-${min}-${max}`}>
+            <Table.Cell collapsing>
+              <Popup
+                content={`Rajaa opiskelijat ensimmäisen ${months} kuukauden aikana saatujen opintopisteiden perusteella`}
+                size="mini"
+                trigger={
+                  <Button onClick={() => updateFilters(min, max)} size="mini" icon basic>
+                    <Icon name="filter" />
+                  </Button>
+                }
+              />
+            </Table.Cell>
             <Table.Cell>
-              <Button onClick={() => updateFilters(min, max)}>FFF</Button>
               {max === 0 ? 0 : `${min} ≤ credits`}
               {max > 0 && ` < ${max}`}
             </Table.Cell>
