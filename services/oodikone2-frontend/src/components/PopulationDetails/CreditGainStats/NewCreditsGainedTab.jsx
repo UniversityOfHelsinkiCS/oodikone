@@ -1,11 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useLocation } from 'react-router-dom'
-import { Table, Progress } from 'semantic-ui-react'
+import { Table, Progress, Button } from 'semantic-ui-react'
+import { useStore } from 'react-hookstore'
 import { getMonths } from '../../../common/query'
 import { getStudentTotalCredits } from '../../../common'
 
 const CreditsGainedTab = ({ filteredStudents }) => {
+  console.log(filteredStudents);
+  const [, setTotalCreditsExternal] = useStore('totalCreditsExternal')
   const months = getMonths(useLocation())
   const creditList = filteredStudents.map(student => getStudentTotalCredits(student))
 
@@ -25,6 +28,8 @@ const CreditsGainedTab = ({ filteredStudents }) => {
     [0, 0]
   ]
 
+  const updateFilters = (min, max) => setTotalCreditsExternal(max === 0 ? { max: 0 } : { min, max: max - 1 })
+
   return (
     <Table celled>
       <Table.Header>
@@ -43,6 +48,7 @@ const CreditsGainedTab = ({ filteredStudents }) => {
         {limits.map(([min, max]) => (
           <Table.Row key={`table-row-${min}-${max}`}>
             <Table.Cell>
+              <Button onClick={() => updateFilters(min, max)}>FFF</Button>
               {max === 0 ? 0 : `${min} ≤ credits`}
               {max > 0 && ` < ${max}`}
             </Table.Cell>
