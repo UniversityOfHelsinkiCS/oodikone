@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Form } from 'semantic-ui-react'
+import { createStore, useStore } from 'react-hookstore'
 import { getStudentTotalCredits } from '../../../common'
 import FilterCard from './common/FilterCard'
 import NumericInput from './common/NumericInput'
 
+createStore('totalCreditsExternal', { min: null, max: null })
+
 const TotalCredits = ({ filterControl }) => {
+  const [totalCreditsExternal] = useStore('totalCreditsExternal')
   const [value, setValue] = useState({ min: '', max: '' })
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
   const labels = { min: 'Min', max: 'Max' }
@@ -14,21 +18,22 @@ const TotalCredits = ({ filterControl }) => {
 
   const names = Object.fromEntries(Object.keys(value).map(key => [key, `totalCredits${key}`]))
 
-  const filterFunctions = {
-    min: student => getStudentTotalCredits(student) >= Number(value.min),
-    max: student => getStudentTotalCredits(student) <= Number(value.max)
-  }
+  const filterFunctions = limit => ({
+    min: student => getStudentTotalCredits(student) >= Number(limit),
+    max: student => getStudentTotalCredits(student) <= Number(limit)
+  })
 
   const updateFilters = key => {
     const name = names[key]
 
     if (value[key] !== '') {
-      filterControl.addFilter(name, filterFunctions[key])
+      filterControl.addFilter(name, filterFunctions(value[key])[key])
     } else {
       filterControl.removeFilter(name)
     }
   }
 
+  // Update filters automatically 2 sec after value change.
   useEffect(() => {
     const timer = setTimeout(() => {
       Object.keys(updatedAt).forEach(key => {
@@ -40,6 +45,22 @@ const TotalCredits = ({ filterControl }) => {
     }, 2000)
     return () => clearTimeout(timer)
   }, [updatedAt])
+
+  // Listen to hook-store for external filtering requests.
+  useEffect(() => {
+    Object.keys(value).forEach(key => {
+      const newValue =
+        totalCreditsExternal[key] === null || totalCreditsExternal[key] === undefined ? '' : totalCreditsExternal[key]
+      const name = names[key]
+      setValue(prev => ({ ...prev, [key]: String(newValue) }))
+
+      if (newValue === '') {
+        filterControl.removeFilter(name)
+      } else {
+        filterControl.addFilter(name, filterFunctions(newValue)[key])
+      }
+    })
+  }, [totalCreditsExternal])
 
   const onChange = key => (_, { value: inputValue }) => {
     setValue(prev => ({ ...prev, [key]: inputValue }))

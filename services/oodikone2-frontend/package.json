@@ -80,6 +80,7 @@
     "path-to-regexp": "^2.4.0",
     "piwik-react-router": "^0.12.1",
     "prop-types": "^15.7.2",
+    "qs": "^6.9.4",
     "query-string": "^6.8.1",
     "react": "^16.8.6",
     "react-datetime": "^2.16.3",
