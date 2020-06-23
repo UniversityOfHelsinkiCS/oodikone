@@ -16,6 +16,7 @@ const StudyrightElement = require('./studyrightElement')
 const Transfer = require('./transfer')
 const ProgrammeModule = require('./programmeModule')
 const ProgrammeModuleChild = require('./programmeModuleChild')
+const ExcludedCourse = require('./excludedCourse')
 
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
@@ -113,5 +114,6 @@ module.exports = {
   StudyrightElement,
   Transfer,
   ProgrammeModule,
-  ProgrammeModuleChild
+  ProgrammeModuleChild,
+  ExcludedCourse
 }

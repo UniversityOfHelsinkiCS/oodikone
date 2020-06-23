@@ -1,121 +1,155 @@
-import React, { useState, useEffect } from 'react'
-import { Table } from 'semantic-ui-react'
-import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
-import { sortBy } from 'lodash'
+import React, { useState, useMemo, useEffect } from 'react'
+import { Table, Icon, Popup, Item } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { UsePopulationCourseContext } from '../PopulationCourseContext'
+import FilterToggleIcon from '../../FilterToggleIcon'
+import { getTextIn } from '../../../common'
 
 const verticalTitle = title => {
   // https://stackoverflow.com/a/41396815
   return <div className="tableVerticalTitle">{title}</div>
 }
 
-const DIRECTIONS = {
-  ASC: 'ascending',
-  DESC: 'descending'
-}
+const Students = () => {
+  const {
+    courseStatistics,
+    filterInput,
+    isActiveCourse,
+    onCourseNameCellClick,
+    onGoToCourseStatisticsClick
+  } = UsePopulationCourseContext()
+  const { language } = useSelector(({ settings }) => settings)
+  const [page, setPage] = useState(0)
+  const [sortedRows, setSortedRows] = useState(courseStatistics.map(c => ({ ...c.course, passed: c.stats.passed })))
 
-const Students = ({ defaultdescending, defaultsortkey, columns, data, tableProps, getRowKey }) => {
-  const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
-  const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
-  const [sortedRows, setSortedRows] = useState(data)
+  useEffect(() => {
+    setSortedRows(courseStatistics.map(c => ({ ...c.course, passed: c.stats.passed })))
+  }, [courseStatistics])
 
-  const handleSort = column => {
-    if (selected === column) {
-      setDirection(direction === DIRECTIONS.ASC ? DIRECTIONS.DESC : DIRECTIONS.ASC)
+  const hasCompleted = (courseCode, student) => {
+    const course = courseStatistics.find(c => c.course.code === courseCode)
+    if (!course) return false
+
+    return Boolean(course.students.passed[student])
+  }
+
+  const students = useMemo(() => {
+    const studentSet = new Set()
+    courseStatistics.forEach(course => {
+      const allStudents = Object.keys(course.students.all)
+      allStudents.forEach(student => studentSet.add(student))
+    })
+
+    const allStudents = Array.from(studentSet)
+    return allStudents.map(student => {
+      let passed = 0
+      courseStatistics.forEach(course => {
+        if (course.students.passed[student]) {
+          passed++
+        }
+      })
+
+      return { studentnumber: student, passed }
+    })
+  }, [courseStatistics])
+
+  const maxPages = Math.floor(students.length / 10)
+
+  const changePage = direction => {
+    const newPage = page + direction
+    if (newPage > maxPages) {
+      setPage(0)
+    } else if (newPage < 0) {
+      setPage(maxPages)
     } else {
-      setSelected(column)
-      setDirection(DIRECTIONS.DESC)
+      setPage(newPage)
     }
   }
 
-  useEffect(() => {
-    const column = columns.find(c => c.key === selected)
-    if (!column) {
-      setSortedRows(data)
-      return
-    }
-    const { getRowVal } = column
-    const sorted = sortBy(data, [getRowVal])
-    setSortedRows(direction === DIRECTIONS.ASC ? sorted : sorted.reverse())
-  }, [selected])
-
   return (
-    <Table sortable {...tableProps} className="fixed-header" striped>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell key="general" content={<b>Students:</b>} colSpan="2" style={{ textAlign: 'right' }} />
-          {sortedRows
-            .filter(row => row.studentNumber)
-            .map(row => (
+    <div>
+      <button type="button" onClick={() => changePage(-1)}>
+        page-
+      </button>
+      <button type="button" onClick={() => changePage(1)}>
+        page+
+      </button>
+      <span>
+        {page + 1} / {maxPages + 1}
+      </span>
+      <Table sortable className="fixed-header" striped celled>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell key="general" content={<b>Students:</b>} colSpan="5" style={{ textAlign: 'right' }} />
+            {students.slice(page * 10, page * 10 + 10).map(student => (
               <Table.HeaderCell
                 className="rotatedTableHeader"
-                key={getRowKey(row)}
-                content={verticalTitle(row.studentNumber)}
+                key={student.studentnumber}
+                content={verticalTitle(student.studentnumber)}
               />
             ))}
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        <Table.Row>
-          <Table.Cell>Course</Table.Cell>
-          <Table.Cell>Total</Table.Cell>
-          {sortedRows
-            .filter(row => row.studentNumber)
-            .map(row => (
-              <Table.Cell key={getRowKey(row)} content={columns[2].getRowVal(row)} />
+          </Table.Row>
+          <Table.Row>
+            {filterInput('nameFilter', 'populationCourses.name', '3')}
+            {filterInput('codeFilter', 'populationCourses.code')}
+            <Table.HeaderCell>Total</Table.HeaderCell>
+            {students.slice(page * 10, page * 10 + 10).map(student => (
+              <Table.HeaderCell key={student.studentnumber} content={student.passed} />
             ))}
-        </Table.Row>
-        {columns
-          .filter(col => col.cellProps)
-          .filter(col => data[0][col.code] && data[0][col.code] > 0)
-          .map(col => (
-            <Table.Row key={col.key}>
-              <Table.Cell key="name" content={col.title} onClick={() => handleSort(col.key)} />
-              <Table.Cell key="totals" content={data[0][col.code]} />
-              {sortedRows
-                .filter(row => row.studentNumber)
-                .map(row => (
-                  <Table.Cell key={getRowKey(row)} content={col.getRowContent(row)} />
-                ))}
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {sortedRows.map(col => (
+            <Table.Row key={col.code}>
+              <Popup
+                trigger={
+                  <Table.Cell className="filterCell clickableCell">
+                    <FilterToggleIcon isActive={isActiveCourse(col)} onClick={() => onCourseNameCellClick(col.code)} />
+                  </Table.Cell>
+                }
+                content={
+                  isActiveCourse(col) ? (
+                    <span>
+                      Poista rajaus kurssin <b>{getTextIn(col.name, language)}</b> perusteella
+                    </span>
+                  ) : (
+                    <span>
+                      Rajaa opiskelijat kurssin <b>{getTextIn(col.name, language)}</b> perusteella
+                    </span>
+                  )
+                }
+                position="top right"
+              />
+              <Table.Cell className="nameCell" key="name" content={col.name.fi} />
+              <Table.Cell className="iconCell clickableCell">
+                <p>
+                  <Item
+                    as={Link}
+                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                      col.code
+                    )}"]&separate=false&unifyOpenUniCourses=false`}
+                  >
+                    <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(col.code)} />
+                  </Item>
+                </p>
+              </Table.Cell>
+              <Table.Cell key="code" content={col.code} />
+              <Table.Cell key="totals" content={col.passed} />
+              {students.slice(page * 10, page * 10 + 10).map(student => (
+                <Table.Cell
+                  key={student.studentnumber}
+                  content={
+                    hasCompleted(col.code, student.studentnumber) ? <Icon fitted name="check" color="green" /> : null
+                  }
+                />
+              ))}
             </Table.Row>
           ))}
-      </Table.Body>
-    </Table>
+        </Table.Body>
+      </Table>
+    </div>
   )
-}
-
-Students.propTypes = {
-  tableProps: shape({}),
-  getRowKey: func.isRequired,
-  getRowProps: func,
-  columns: arrayOf(
-    shape({
-      key: string.isRequired,
-      title: oneOfType([element, string]),
-      headerProps: shape({}),
-      getRowVal: func,
-      getRowContent: func,
-      getCellProps: func,
-      cellProps: shape({}),
-      group: bool,
-      children: arrayOf()
-    })
-  ).isRequired,
-  data: arrayOf(shape({})).isRequired,
-  defaultdescending: bool,
-  defaultsortkey: string,
-  collapsingHeaders: bool,
-  showNames: bool,
-  chunkifyBy: string
-}
-
-Students.defaultProps = {
-  tableProps: undefined,
-  getRowProps: undefined,
-  defaultdescending: false,
-  defaultsortkey: null,
-  collapsingHeaders: false,
-  showNames: undefined,
-  chunkifyBy: undefined
 }
 
 export default Students

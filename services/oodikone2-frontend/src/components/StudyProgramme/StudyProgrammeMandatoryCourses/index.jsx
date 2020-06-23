@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { func, shape, string } from 'prop-types'
+import { func, shape, string, bool } from 'prop-types'
 import { Message, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import {
@@ -11,9 +11,11 @@ import {
   setMandatoryCourseLabel as setMandatoryCourseLabelAction
 } from '../../../redux/populationMandatoryCourses'
 import MandatoryCourseTable from '../MandatoryCourseTable'
+import NewMandatoryCourseTable from '../NewMandatoryCourses'
 import AddMandatoryCourses from '../AddMandatoryCourses'
 import MandatoryCourseLabels from '../MandatoryCourseLabels'
 import { useTabs } from '../../../common/hooks'
+import { getUserIsAdmin } from '../../../common'
 
 const StudyProgrammeMandatoryCourses = props => {
   const {
@@ -24,15 +26,21 @@ const StudyProgrammeMandatoryCourses = props => {
     studyProgramme,
     mandatoryCourses,
     language,
-    history
+    history,
+    isAdmin
   } = props
   const [tab, setTab] = useTabs('p_m_tab', 0, history)
-
   useEffect(() => {
     if (studyProgramme) {
       getMandatoryCourses(studyProgramme)
     }
   }, [studyProgramme])
+
+  useEffect(() => {
+    if (tab === 2) {
+      getMandatoryCourses(studyProgramme, true)
+    }
+  }, [tab])
 
   if (!studyProgramme) return null
 
@@ -62,6 +70,18 @@ const StudyProgrammeMandatoryCourses = props => {
     }
   ]
 
+  if (isAdmin)
+    panes.push({
+      menuItem: 'New Mand. Courses',
+      render: () => (
+        <NewMandatoryCourseTable
+          mandatoryCourses={mandatoryCourses.data}
+          studyProgramme={studyProgramme}
+          language={language}
+        />
+      )
+    })
+
   return (
     <React.Fragment>
       <Message
@@ -82,8 +102,21 @@ StudyProgrammeMandatoryCourses.propTypes = {
   studyProgramme: string.isRequired,
   mandatoryCourses: shape({}).isRequired,
   language: string.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
+  isAdmin: bool.isRequired
 }
+
+const mapStateToProps = ({
+  populationMandatoryCourses,
+  localize,
+  auth: {
+    token: { roles }
+  }
+}) => ({
+  isAdmin: getUserIsAdmin(roles),
+  mandatoryCourses: populationMandatoryCourses,
+  language: getActiveLanguage(localize).code
+})
 
 const mapDispatchToProps = {
   getMandatoryCourses: getMandatoryCoursesAction,
@@ -93,9 +126,6 @@ const mapDispatchToProps = {
 }
 
 export default connect(
-  ({ populationMandatoryCourses, localize }) => ({
-    mandatoryCourses: populationMandatoryCourses,
-    language: getActiveLanguage(localize).code
-  }),
+  mapStateToProps,
   mapDispatchToProps
 )(withRouter(StudyProgrammeMandatoryCourses))
