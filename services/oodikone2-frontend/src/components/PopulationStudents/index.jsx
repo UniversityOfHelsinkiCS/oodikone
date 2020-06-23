@@ -305,7 +305,6 @@ class PopulationStudents extends Component {
 
     // FIXME: here only for refactorment
     const { showNames, studentToTargetCourseDateMap } = this.props
-
     const panes = [
       {
         menuItem: 'General',
@@ -582,7 +581,7 @@ const mapStateToProps = state => {
   } = state
 
   const { selectedStudents, samples } = selector.makePopulationsToData(state)
-  const mandatoryCodes = populationMandatoryCourses.data.map(c => c.code)
+  const mandatoryCodes = populationMandatoryCourses.data.filter(course => course.visible.visibility).map(c => c.code)
 
   let mandatoryPassed = {}
 
