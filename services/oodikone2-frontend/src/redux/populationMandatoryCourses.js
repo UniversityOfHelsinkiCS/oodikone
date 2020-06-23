@@ -6,6 +6,22 @@ export const getMandatoryCourses = (id, toggle = false) => {
   return callController(route, prefix)
 }
 
+export const setCourseExclusion = (programmecode, coursecode) => {
+  const prefix = 'SET_COURSE_EXCLUSION_'
+  const route = `/v3/programme_modules/${programmecode}/${coursecode}`
+  const method = 'post'
+  const data = { programmecode, coursecode }
+  return callController(route, prefix, data, method)
+}
+
+export const removeCourseExclusion = (programmecode, coursecode, id) => {
+  const prefix = 'REMOVE_COURSE_EXCLUSION_'
+  const route = `/v3/programme_modules/`
+  const method = 'delete'
+  const data = { programmecode, coursecode, id }
+  return callController(route, prefix, data, method)
+}
+
 export const addMandatoryCourse = (id, course) => {
   const prefix = 'ADD_MANDATORY_COURSE_'
   const route = `/mandatory_courses/${id}`
@@ -101,6 +117,42 @@ const reducer = (state = { data: [] }, action) => {
         pending: false,
         error: false,
         data: state.data.filter(course => course.code !== action.response)
+      }
+    case 'SET_COURSE_EXCLUSION_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'SET_COURSE_EXCLUSION_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        error: true,
+        data: action.response
+      }
+    case 'SET_COURSE_EXCLUSION_SUCCESS':
+      return {
+        pending: false,
+        error: false,
+        data: action.response
+      }
+    case 'REMOVE_COURSE_EXCLUSION_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'REMOVE_COURSE_EXCLUSION_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        error: true,
+        data: action.response
+      }
+    case 'REMOVE_COURSE_EXCLUSION_SUCCESS':
+      return {
+        pending: false,
+        error: false,
+        data: action.response
       }
     default:
       return state
