@@ -21,6 +21,32 @@ const CourseGroup = sequelizeKone.define('course_groups', {
   }
 })
 
+const ExcludedCourse = sequelizeKone.define(
+  'excluded_courses',
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.INTEGER,
+      autoIncrement: true
+    },
+    programme_code: {
+      type: Sequelize.STRING
+    },
+    course_code: {
+      type: Sequelize.STRING
+    },
+    created_at: {
+      type: Sequelize.DATE
+    },
+    updated_at: {
+      type: Sequelize.DATE
+    }
+  },
+  {
+    underscored: true
+  }
+)
+
 const TeacherCourseGroup = sequelizeKone.define('teacher_course_groups', {
   course_group_id: {
     type: Sequelize.BIGINT
@@ -248,5 +274,6 @@ module.exports = {
   MandatoryCourseLabels,
   MigrationKone,
   CustomPopulationSearch,
-  sequelizeKone
+  sequelizeKone,
+  ExcludedCourse
 }
