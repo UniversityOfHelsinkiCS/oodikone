@@ -1,6 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import { Table, Icon } from 'semantic-ui-react'
+import { Table, Icon, Popup, Item } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
+import FilterToggleIcon from '../../FilterToggleIcon'
+import { getTextIn } from '../../../common'
 
 const verticalTitle = title => {
   // https://stackoverflow.com/a/41396815
@@ -8,7 +12,14 @@ const verticalTitle = title => {
 }
 
 const Students = () => {
-  const { courseStatistics, filterInput } = UsePopulationCourseContext()
+  const {
+    courseStatistics,
+    filterInput,
+    isActiveCourse,
+    onCourseNameCellClick,
+    onGoToCourseStatisticsClick
+  } = UsePopulationCourseContext()
+  const { language } = useSelector(({ settings }) => settings)
   const [page, setPage] = useState(0)
   const [sortedRows, setSortedRows] = useState(courseStatistics.map(c => ({ ...c.course, passed: c.stats.passed })))
 
@@ -43,19 +54,34 @@ const Students = () => {
     })
   }, [courseStatistics])
 
+  const maxPages = Math.floor(students.length / 10)
+
+  const changePage = direction => {
+    const newPage = page + direction
+    if (newPage > maxPages) {
+      setPage(0)
+    } else if (newPage < 0) {
+      setPage(maxPages)
+    } else {
+      setPage(newPage)
+    }
+  }
+
   return (
     <div>
-      <button type="button" onClick={() => setPage(page - 1)}>
+      <button type="button" onClick={() => changePage(-1)}>
         page-
       </button>
-      <button type="button" onClick={() => setPage(page + 1)}>
+      <button type="button" onClick={() => changePage(1)}>
         page+
       </button>
-      <input type="text" value={page} onChange={e => setPage(Number(e.target.value))} />
+      <span>
+        {page + 1} / {maxPages + 1}
+      </span>
       <Table sortable className="fixed-header" striped celled>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell key="general" content={<b>Students:</b>} colSpan="2" style={{ textAlign: 'right' }} />
+            <Table.HeaderCell key="general" content={<b>Students:</b>} colSpan="5" style={{ textAlign: 'right' }} />
             {students.slice(page * 10, page * 10 + 10).map(student => (
               <Table.HeaderCell
                 className="rotatedTableHeader"
@@ -64,19 +90,50 @@ const Students = () => {
               />
             ))}
           </Table.Row>
-        </Table.Header>
-        <Table.Body>
           <Table.Row>
-            {filterInput('nameFilter', 'populationCourses.name')}
+            {filterInput('nameFilter', 'populationCourses.name', '3')}
             {filterInput('codeFilter', 'populationCourses.code')}
-            <Table.Cell>Total</Table.Cell>
+            <Table.HeaderCell>Total</Table.HeaderCell>
             {students.slice(page * 10, page * 10 + 10).map(student => (
-              <Table.Cell key={student.studentnumber} content={student.passed} />
+              <Table.HeaderCell key={student.studentnumber} content={student.passed} />
             ))}
           </Table.Row>
+        </Table.Header>
+        <Table.Body>
           {sortedRows.map(col => (
             <Table.Row key={col.code}>
-              <Table.Cell key="name" content={col.name.fi} />
+              <Popup
+                trigger={
+                  <Table.Cell className="filterCell clickableCell">
+                    <FilterToggleIcon isActive={isActiveCourse(col)} onClick={() => onCourseNameCellClick(col.code)} />
+                  </Table.Cell>
+                }
+                content={
+                  isActiveCourse(col) ? (
+                    <span>
+                      Poista rajaus kurssin <b>{getTextIn(col.name, language)}</b> perusteella
+                    </span>
+                  ) : (
+                    <span>
+                      Rajaa opiskelijat kurssin <b>{getTextIn(col.name, language)}</b> perusteella
+                    </span>
+                  )
+                }
+                position="top right"
+              />
+              <Table.Cell className="nameCell" key="name" content={col.name.fi} />
+              <Table.Cell className="iconCell clickableCell">
+                <p>
+                  <Item
+                    as={Link}
+                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                      col.code
+                    )}"]&separate=false&unifyOpenUniCourses=false`}
+                  >
+                    <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(col.code)} />
+                  </Item>
+                </p>
+              </Table.Cell>
               <Table.Cell key="code" content={col.code} />
               <Table.Cell key="totals" content={col.passed} />
               {students.slice(page * 10, page * 10 + 10).map(student => (
