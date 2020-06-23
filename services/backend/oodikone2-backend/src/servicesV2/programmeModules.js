@@ -6,7 +6,7 @@ const { dbConnections: sisConnections } = require('../databaseV2/connection')
 const { sequelizeKone } = require('../database/connection')
 
 const byProgrammeCode = async code => {
-  const connection = !sisConnections.established ? sisConnections.sequelize : sequelizeKone
+  const connection = sisConnections.established ? sisConnections.sequelize : sequelizeKone
   const [result] = await connection.query(
     `
     WITH RECURSIVE children as (
