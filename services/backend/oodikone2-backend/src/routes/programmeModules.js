@@ -13,7 +13,6 @@ router.delete('/v3/programme_modules', async (req, res) => {
     await removeExcludedCourse(id)
     const result = await byProgrammeCode(programmecode)
     res.json(result)
-    res.json(result)
   } catch (e) {
     console.log(e)
     res.json(500).json(e)
