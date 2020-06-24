@@ -22,3 +22,7 @@
 #credit-gain-stats .collapsing {
   padding-right: 0;
 }
+
+#credit-gain-stats .ui.primary.button:focus {
+  background-color: #2185d0;
+}
