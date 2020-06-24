@@ -6,10 +6,11 @@ import { getStudentTotalCredits } from '../../../common'
 import FilterCard from './common/FilterCard'
 import NumericInput from './common/NumericInput'
 
-createStore('totalCreditsExternal', { min: null, max: null })
+export const storeName = 'totalCreditsFilterExternal'
+createStore(storeName, { min: null, max: null })
 
 const TotalCredits = ({ filterControl }) => {
-  const [totalCreditsExternal] = useStore('totalCreditsExternal')
+  const [externalValue] = useStore(storeName)
   const [value, setValue] = useState({ min: '', max: '' })
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
   const labels = { min: 'Min', max: 'Max' }
@@ -20,7 +21,7 @@ const TotalCredits = ({ filterControl }) => {
 
   const filterFunctions = limit => ({
     min: student => getStudentTotalCredits(student) >= Number(limit),
-    max: student => getStudentTotalCredits(student) <= Number(limit)
+    max: student => getStudentTotalCredits(student) < Number(limit)
   })
 
   const updateFilters = key => {
@@ -49,8 +50,7 @@ const TotalCredits = ({ filterControl }) => {
   // Listen to hook-store for external filtering requests.
   useEffect(() => {
     Object.keys(value).forEach(key => {
-      const newValue =
-        totalCreditsExternal[key] === null || totalCreditsExternal[key] === undefined ? '' : totalCreditsExternal[key]
+      const newValue = externalValue[key] === null ? '' : externalValue[key]
       const name = names[key]
       setValue(prev => ({ ...prev, [key]: String(newValue) }))
 
@@ -60,7 +60,7 @@ const TotalCredits = ({ filterControl }) => {
         filterControl.addFilter(name, filterFunctions(newValue)[key])
       }
     })
-  }, [totalCreditsExternal])
+  }, [externalValue])
 
   const onChange = key => (_, { value: inputValue }) => {
     setValue(prev => ({ ...prev, [key]: inputValue }))
