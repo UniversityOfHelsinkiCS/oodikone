@@ -7,7 +7,6 @@ import { getStudentTotalCredits } from '../../../common'
 import ExternalCreditFilterToggle from './ExternalCreditFilterToggle'
 
 const CreditsGainedTab = ({ filteredStudents }) => {
-  console.log('credits gained rendered');
   const months = getMonths(useLocation())
   const creditList = filteredStudents.map(student => getStudentTotalCredits(student))
 
