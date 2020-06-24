@@ -99,7 +99,7 @@ const PopulationStatistics = memo(props => {
                     id="accordion-toggle"
                     checked={mandatoryToggle}
                     toggle
-                    onChange={() => {
+                    onClick={() => {
                       const newVal = !mandatoryToggle
                       setMandatoryToggle(newVal)
                       localStorage.setItem('oodikoneMandatoryToggle', newVal)
@@ -109,7 +109,7 @@ const PopulationStatistics = memo(props => {
                   <Form.Radio
                     checked={filterFeatToggle}
                     toggle
-                    onChange={() => {
+                    onClick={() => {
                       const newVal = !filterFeatToggle
                       setFilterFeatToggle(newVal)
                       localStorage.setItem('oodikoneFilterFeatToggle', newVal)
@@ -120,7 +120,7 @@ const PopulationStatistics = memo(props => {
                     <Form.Radio
                       checked={clickSaver}
                       toggle
-                      onChange={() => {
+                      onClick={() => {
                         const newVal = !clickSaver
                         setClickSaver(newVal)
                         localStorage.setItem('oodikoneClickSaver', newVal)
