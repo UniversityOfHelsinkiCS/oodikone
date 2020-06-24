@@ -6,12 +6,17 @@ import { getStudentTotalCredits } from '../../../common'
 import FilterCard from './common/FilterCard'
 import NumericInput from './common/NumericInput'
 
-export const storeName = 'totalCreditsFilterExternal'
-createStore(storeName, { min: null, max: null })
+// Store for external filtering requests.
+export const requestStoreName = 'totalCreditsFilterExternal'
+createStore(requestStoreName, { min: null, max: null })
+
+// Store for sharing current filter value.
+export const valueStoreName = 'totalCreditsFilterValue'
+createStore(valueStoreName, { min: '', max: '' })
 
 const TotalCredits = ({ filterControl }) => {
-  const [externalValue] = useStore(storeName)
-  const [value, setValue] = useState({ min: '', max: '' })
+  const [externalValue] = useStore(requestStoreName)
+  const [value, setValue] = useStore(valueStoreName)
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
   const labels = { min: 'Min', max: 'Max' }
 
