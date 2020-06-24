@@ -8,7 +8,7 @@ const FilterCard = ({ title, children, footer, active }) => {
   const [open, setOpen] = useState(clickSaver)
 
   return (
-    <Card>
+    <Card className={active ? 'active-filter' : null}>
       <Card.Content>
         <Card.Header onClick={() => setOpen(prev => !prev)}>
           <Icon name={open ? 'caret down' : 'caret right'} />

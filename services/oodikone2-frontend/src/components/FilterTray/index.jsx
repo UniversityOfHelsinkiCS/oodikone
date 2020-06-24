@@ -8,6 +8,7 @@ import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
+import Courses from './filters/Courses'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [clickSaver] = useStore('clickSaver')
@@ -67,6 +68,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
             <TotalCredits filterControl={filterControl} />
             <Gender filterControl={filterControl} />
             <StartYearAtUni filterControl={filterControl} />
+            <Courses filterControl={filterControl} />
           </Card.Group>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)}>
