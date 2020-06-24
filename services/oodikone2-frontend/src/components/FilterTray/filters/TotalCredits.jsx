@@ -6,13 +6,19 @@ import { getStudentTotalCredits } from '../../../common'
 import FilterCard from './common/FilterCard'
 import NumericInput from './common/NumericInput'
 
-createStore('totalCreditsExternal', { min: null, max: null })
+// Store for external filtering requests.
+export const requestStoreName = 'totalCreditsFilterExternal'
+createStore(requestStoreName, { min: null, max: null })
+
+// Store for sharing current filter value.
+export const valueStoreName = 'totalCreditsFilterValue'
+createStore(valueStoreName, { min: '', max: '' })
 
 const TotalCredits = ({ filterControl }) => {
-  const [totalCreditsExternal] = useStore('totalCreditsExternal')
-  const [value, setValue] = useState({ min: '', max: '' })
+  const [externalValue] = useStore(requestStoreName)
+  const [value, setValue] = useStore(valueStoreName)
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
-  const labels = { min: 'Min', max: 'Max' }
+  const labels = { min: 'At Least', max: 'Less Than' }
 
   const now = () => new Date().getTime()
 
@@ -20,7 +26,7 @@ const TotalCredits = ({ filterControl }) => {
 
   const filterFunctions = limit => ({
     min: student => getStudentTotalCredits(student) >= Number(limit),
-    max: student => getStudentTotalCredits(student) <= Number(limit)
+    max: student => getStudentTotalCredits(student) < Number(limit)
   })
 
   const updateFilters = key => {
@@ -49,8 +55,7 @@ const TotalCredits = ({ filterControl }) => {
   // Listen to hook-store for external filtering requests.
   useEffect(() => {
     Object.keys(value).forEach(key => {
-      const newValue =
-        totalCreditsExternal[key] === null || totalCreditsExternal[key] === undefined ? '' : totalCreditsExternal[key]
+      const newValue = externalValue[key] === null ? '' : externalValue[key]
       const name = names[key]
       setValue(prev => ({ ...prev, [key]: String(newValue) }))
 
@@ -60,7 +65,7 @@ const TotalCredits = ({ filterControl }) => {
         filterControl.addFilter(name, filterFunctions(newValue)[key])
       }
     })
-  }, [totalCreditsExternal])
+  }, [externalValue])
 
   const onChange = key => (_, { value: inputValue }) => {
     setValue(prev => ({ ...prev, [key]: inputValue }))
@@ -83,8 +88,10 @@ const TotalCredits = ({ filterControl }) => {
 
   const clearButtonDisabled = key => !Object.keys(filterControl.activeFilters).includes(names[key])
 
+  const active = Object.values(names).some(name => Object.keys(filterControl.activeFilters).includes(name))
+
   return (
-    <FilterCard title="Total Credits">
+    <FilterCard title="Total Credits" active={active}>
       <Form>
         {Object.keys(value).map(key => (
           <Form.Field key={`total-credits-filter-${key}`}>

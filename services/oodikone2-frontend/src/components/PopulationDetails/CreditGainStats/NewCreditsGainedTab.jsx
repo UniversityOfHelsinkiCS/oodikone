@@ -1,13 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { useLocation } from 'react-router-dom'
-import { Table, Progress, Button, Icon, Popup } from 'semantic-ui-react'
-import { useStore } from 'react-hookstore'
+import { Table, Progress } from 'semantic-ui-react'
 import { getMonths } from '../../../common/query'
 import { getStudentTotalCredits } from '../../../common'
+import ExternalCreditFilterToggle from './ExternalCreditFilterToggle'
 
 const CreditsGainedTab = ({ filteredStudents }) => {
-  const [, setTotalCreditsExternal] = useStore('totalCreditsExternal')
   const months = getMonths(useLocation())
   const creditList = filteredStudents.map(student => getStudentTotalCredits(student))
 
@@ -26,8 +25,6 @@ const CreditsGainedTab = ({ filteredStudents }) => {
     [1, Math.ceil(months * (10 / 12))],
     [null, 0]
   ]
-
-  const updateFilters = (min, max) => setTotalCreditsExternal({ min, max: Math.max(0, max - 1) || null })
 
   return (
     <Table celled>
@@ -48,15 +45,7 @@ const CreditsGainedTab = ({ filteredStudents }) => {
         {limits.map(([min, max]) => (
           <Table.Row key={`table-row-${min}-${max}`}>
             <Table.Cell collapsing>
-              <Popup
-                content={`Rajaa opiskelijat ensimmäisen ${months} kuukauden aikana saatujen opintopisteiden perusteella`}
-                size="mini"
-                trigger={
-                  <Button onClick={() => updateFilters(min, max)} size="mini" icon basic>
-                    <Icon name="filter" />
-                  </Button>
-                }
-              />
+              <ExternalCreditFilterToggle min={min} max={max} />
             </Table.Cell>
             <Table.Cell>
               {max === 0 ? 0 : `${min} ≤ credits`}
