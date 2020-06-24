@@ -5,9 +5,10 @@ import { Table, Progress, Button, Icon, Popup } from 'semantic-ui-react'
 import { useStore } from 'react-hookstore'
 import { getMonths } from '../../../common/query'
 import { getStudentTotalCredits } from '../../../common'
+import { storeName } from '../../FilterTray/filters/TotalCredits'
 
 const CreditsGainedTab = ({ filteredStudents }) => {
-  const [, setTotalCreditsExternal] = useStore('totalCreditsExternal')
+  const [, setTotalCreditsExternal] = useStore(storeName)
   const months = getMonths(useLocation())
   const creditList = filteredStudents.map(student => getStudentTotalCredits(student))
 
@@ -27,7 +28,7 @@ const CreditsGainedTab = ({ filteredStudents }) => {
     [null, 0]
   ]
 
-  const updateFilters = (min, max) => setTotalCreditsExternal({ min, max: Math.max(0, max - 1) || null })
+  const updateFilters = (min, max) => setTotalCreditsExternal({ min, max: Math.max(1, max) || null })
 
   return (
     <Table celled>
