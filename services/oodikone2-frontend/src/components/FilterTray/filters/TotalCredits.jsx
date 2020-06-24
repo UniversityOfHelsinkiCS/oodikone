@@ -18,7 +18,7 @@ const TotalCredits = ({ filterControl }) => {
   const [externalValue] = useStore(requestStoreName)
   const [value, setValue] = useStore(valueStoreName)
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
-  const labels = { min: 'Min', max: 'Max' }
+  const labels = { min: 'At Least', max: 'Less Than' }
 
   const now = () => new Date().getTime()
 
