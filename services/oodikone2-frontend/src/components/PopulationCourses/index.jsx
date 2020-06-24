@@ -11,6 +11,7 @@ import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { refreshFilters } from '../../redux/populationFilters'
+import { dataStoreName } from '../FilterTray/filters/Courses'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
@@ -26,6 +27,7 @@ const PopulationCourses = ({
   filteredStudents
 }) => {
   const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [, setCourseFilterData] = useStore(dataStoreName)
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -72,6 +74,14 @@ const PopulationCourses = ({
   useEffect(() => {
     reloadCourses()
   }, [filteredStudents])
+
+  // TODO: Temporary hack to pass course data to new filters, improve.
+  useEffect(() => {
+    const { pending, error, data } = selectedPopulationCourses
+    if (filterFeatToggle && !pending && !error) {
+      setCourseFilterData(data.coursestatistics)
+    }
+  }, [selectedPopulationCourses.data])
 
   if (accordionView)
     return (
