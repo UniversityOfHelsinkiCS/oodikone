@@ -24,7 +24,6 @@
   display: flex;
   align-items: center;
   letter-spacing: 0.06rem;
-  min-height: 23px;
 }
 
 .filter-tray-toggle .button .button-label .icon {
@@ -37,6 +36,8 @@
 
 .filter-tray-toggle .button .button-label > .label {
   padding: 0.5em 0.7em 0.3em 0.7em;
+  margin-top: -2px;
+  margin-bottom: -2px;
 }
 
 .filter-tray-toggle.inline-toggle button {
