@@ -90,11 +90,16 @@
   margin-bottom: 0;
 }
 
+#filter-tray .card .card-header-text {
+  flex-grow: 1;
+}
+
 #filter-tray > .card > .content > .header {
   color: white;
   margin: 0;
   padding: 0.8rem;
   cursor: pointer;
+  display: flex;
 }
 
 #filter-tray.cards .content {

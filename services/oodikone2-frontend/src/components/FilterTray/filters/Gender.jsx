@@ -5,7 +5,7 @@ import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
 
 const Gender = ({ filterControl }) => {
-  const { addFilter, removeFilter, withoutFilter } = filterControl
+  const { addFilter, removeFilter, withoutFilter, activeFilters } = filterControl
   const [value, setValue] = useState(null)
   const name = 'gender'
 
@@ -32,7 +32,11 @@ const Gender = ({ filterControl }) => {
   ]
 
   return (
-    <FilterCard title="Gender" footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} />}>
+    <FilterCard
+      title="Gender"
+      footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} />}
+      active={Object.keys(activeFilters).includes(name)}
+    >
       <Form>
         {options.map(opt => (
           <Form.Field key={opt.key}>
@@ -53,7 +57,8 @@ Gender.propTypes = {
   filterControl: PropTypes.shape({
     addFilter: PropTypes.func.isRequired,
     removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired
+    withoutFilter: PropTypes.func.isRequired,
+    activeFilters: PropTypes.object.isRequired
   }).isRequired
 }
 
