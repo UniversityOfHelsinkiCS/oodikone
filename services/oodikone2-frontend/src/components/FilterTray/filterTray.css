@@ -118,6 +118,12 @@
   font-size: 0.9rem;
 }
 
+#filter-tray .card .labeled.input .label {
+  min-width: 76px;
+  display: flex;
+  align-items: center;
+}
+
 #filter-control-panel {
   width: 20vw;
   position: fixed;
