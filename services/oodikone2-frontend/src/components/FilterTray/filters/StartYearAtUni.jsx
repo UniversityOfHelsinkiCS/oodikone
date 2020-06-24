@@ -5,7 +5,7 @@ import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
 
 const StartYearAtUni = ({ filterControl }) => {
-  const { addFilter, removeFilter, withoutFilter } = filterControl
+  const { addFilter, removeFilter, withoutFilter, activeFilters } = filterControl
 
   const [value, setValue] = useState([])
   const name = 'startYearAtUni'
@@ -35,6 +35,7 @@ const StartYearAtUni = ({ filterControl }) => {
     <FilterCard
       title="Starting Year at University"
       footer={<ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} />}
+      active={Object.keys(activeFilters).includes(name)}
     >
       <Form>
         <Dropdown
@@ -57,7 +58,8 @@ StartYearAtUni.propTypes = {
   filterControl: PropTypes.shape({
     addFilter: PropTypes.func.isRequired,
     removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired
+    withoutFilter: PropTypes.func.isRequired,
+    activeFilters: PropTypes.object.isRequired
   }).isRequired
 }
 

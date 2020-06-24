@@ -88,8 +88,10 @@ const TotalCredits = ({ filterControl }) => {
 
   const clearButtonDisabled = key => !Object.keys(filterControl.activeFilters).includes(names[key])
 
+  const active = Object.values(names).some(name => Object.keys(filterControl.activeFilters).includes(name))
+
   return (
-    <FilterCard title="Total Credits">
+    <FilterCard title="Total Credits" active={active}>
       <Form>
         {Object.keys(value).map(key => (
           <Form.Field key={`total-credits-filter-${key}`}>
