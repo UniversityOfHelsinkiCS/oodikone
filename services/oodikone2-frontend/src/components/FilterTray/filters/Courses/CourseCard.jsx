@@ -1,22 +1,63 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, Dropdown } from 'semantic-ui-react'
 
-const CourseCard = ({ course }) => {
-  const options = [
-    { key: '1', text: 'All', value: 1 },
-    { key: '2', text: 'Passed', value: 2 },
-    { key: '3', text: 'Passed After Failure', value: 3 },
-    { key: '4', text: 'Failed', value: 4 },
-    { key: '5', text: 'Failed Many Times', value: 5 },
-    { key: '6', text: 'Not Participated', value: 6 },
-    { key: '7', text: 'Not Participated or Failed', value: 7 }
+const CourseCard = ({ courseStats, filterContol }) => {
+  const { course, students } = courseStats
+  const [selectedOption, setSelectedOption] = useState(0)
+  const name = `courseFilter-${course.code}`
+
+  const subFilters = [
+    {
+      label: 'All',
+      func: ({ studentNumber }) => Object.keys(students.all).includes(studentNumber)
+    },
+    {
+      label: 'Passed',
+      func: ({ studentNumber }) => Object.keys(students.passed).includes(studentNumber)
+    },
+    {
+      label: 'Passed After Failure',
+      func: ({ studentNumber }) => Object.keys(students.retryPassed).includes(studentNumber)
+    },
+    {
+      label: 'Failed',
+      func: ({ studentNumber }) => Object.keys(students.failed).includes(studentNumber)
+    },
+    {
+      label: 'Failed Many Times',
+      func: ({ studentNumber }) => Object.keys(students.failedMany).includes(studentNumber)
+    },
+    {
+      label: 'Not Participated',
+      func: ({ studentNumber }) => !Object.keys(students.all).includes(studentNumber)
+    },
+    {
+      label: 'Not Participated or Failed',
+      func: ({ studentNumber }) =>
+        !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber)
+    }
   ]
+
+  const options = subFilters.map((filter, i) => ({ key: i, text: filter.label, value: i }))
+
+  const onChange = (_, { value }) => {
+    setSelectedOption(value)
+    filterContol.addFilter(name, subFilters[value].func)
+  }
 
   return (
     <Card>
       <Card.Header>{course.name.fi}</Card.Header>
       <Card.Content>
-        <Dropdown options={options} value={1} selection fluid className="mini" button />
+        <Dropdown
+          options={options}
+          value={selectedOption}
+          onChange={onChange}
+          selection
+          fluid
+          className="mini"
+          button
+        />
       </Card.Content>
     </Card>
   )
