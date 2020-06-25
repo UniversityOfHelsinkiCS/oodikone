@@ -54,6 +54,9 @@
   align-content: flex-start;
   justify-content: center;
   margin: 0 0 0 3rem;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-bottom: 2rem;
 }
 
 #filter-tray > .header {
