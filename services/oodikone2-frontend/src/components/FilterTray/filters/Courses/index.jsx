@@ -31,7 +31,11 @@ const Courses = ({ filterControl }) => {
       <Form>
         <Card.Group>
           {selectedCourses.map(course => (
-            <CourseCard course={course.course} key={`course-filter-selected-course-${course.course.code}`} />
+            <CourseCard
+              courseStats={course}
+              filterContol={filterControl}
+              key={`course-filter-selected-course-${course.course.code}`}
+            />
           ))}
         </Card.Group>
         <Dropdown
