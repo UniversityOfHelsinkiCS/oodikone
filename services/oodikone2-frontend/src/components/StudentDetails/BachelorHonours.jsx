@@ -93,7 +93,7 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
   }, [mandatoryModules])
 
   const moduleRows = studentsModules.map(mod => (
-    <Table.Row>
+    <Table.Row key={mod.course_code}>
       <Table.Cell>{reformatDate(mod.date, 'DD.MM.YYYY')}</Table.Cell>
       <Table.Cell>
         {mod.course.name.fi} ({mod.course_code})
@@ -103,7 +103,7 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
   ))
 
   const otherModuleRows = otherModules.map(mod => (
-    <Table.Row>
+    <Table.Row key={mod.course_code}>
       <Table.Cell>{reformatDate(mod.date, 'DD.MM.YYYY')}</Table.Cell>
       <Table.Cell>
         {mod.course.name.fi} ({mod.course_code})
