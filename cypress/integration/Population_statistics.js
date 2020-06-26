@@ -92,7 +92,7 @@ describe('Population Statistics tests', () => {
     cy.go("back")
     cy.contains("Ohjelmoinnin perusteet")
     cy.contains("Courses of population").click().parent().within(() => {
-      cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "15")
+      cy.contains("Ohjelmoinnin perusteet").siblings().eq(4).should("have.text", "15")
     })
 
     cy.contains("add").click()
@@ -114,7 +114,7 @@ describe('Population Statistics tests', () => {
     })
     cy.contains("Courses of population").click({ force: true })
     cy.contains("Courses of population").parent().within(() => {
-      cy.contains("Ohjelmoinnin perusteet").siblings().eq(3).should("have.text", "1")
+      cy.contains("Ohjelmoinnin perusteet").siblings().eq(5).should("have.text", "1")
     })
 
     cy.contains("Students (1)").click()
