@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { connect, useSelector, useDispatch } from 'react-redux'
 import { string, func } from 'prop-types'
-import { Button, Label, Table } from 'semantic-ui-react'
+import { Button, Label, Table, Icon } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import { GetMandatoryCourseLabels } from '../../../redux/mandatoryCourseLabels'
 import {
@@ -13,8 +13,12 @@ import {
 const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeExclusion }) => {
   const dispatch = useDispatch()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-  const [collapsed, setCollapsed] = useState({})
+  const [visible, setVisible] = useState({})
   const [modules, setModules] = useState([])
+
+  useEffect(() => {
+    dispatch(getMandatoryCourses(studyProgramme, true))
+  }, [])
 
   useEffect(() => {
     if (!mandatoryCourses) return
@@ -58,9 +62,9 @@ const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeEx
   const showAllButton = module => <Button onClick={() => deleteAll(module)}>Set visible</Button>
   const hideAllButton = module => <Button onClick={() => excludeAll(module)}>Set hidden</Button>
 
-  const toggleCollapse = code => {
-    const newState = !collapsed[code]
-    setCollapsed({ ...collapsed, [code]: newState })
+  const toggleVisible = code => {
+    const newState = !visible[code]
+    setVisible({ ...visible, [code]: newState })
   }
 
   const calculateModuleVisibility = code => {
@@ -85,10 +89,6 @@ const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeEx
     }
   }
 
-  if (collapsed === null) {
-    return null
-  }
-
   return (
     <Table>
       <Table.Header>
@@ -100,7 +100,8 @@ const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeEx
         {modules.map(({ module, courses }) => (
           <>
             <Table.Row key={module}>
-              <Table.Cell onClick={() => toggleCollapse(module)}>
+              <Table.Cell style={{ cursor: 'pointer' }} onClick={() => toggleVisible(module)}>
+                <Icon name={visible[module] ? 'angle down' : 'angle right'} />
                 <b>{courses[0].label_name ? courses[0].label_name.fi : module}</b>
               </Table.Cell>
               <Table.Cell>
@@ -113,9 +114,9 @@ const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeEx
                 {calculateModuleVisibility(module) === 'hidden' ? showAllButton(module) : hideAllButton(module)}
               </Table.Cell>
             </Table.Row>
-            {!collapsed[module] &&
+            {visible[module] &&
               courses.map(course => (
-                <Table.Row key={course.code}>
+                <Table.Row key={`${module}/${course.code}`}>
                   <Table.Cell>{getTextIn(course.name, language)}</Table.Cell>
                   <Table.Cell>
                     <Label
