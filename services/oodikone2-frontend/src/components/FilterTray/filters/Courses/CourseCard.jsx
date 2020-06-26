@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Dropdown } from 'semantic-ui-react'
+import { Card, Dropdown, Button, Icon } from 'semantic-ui-react'
 import { getActiveLanguage } from 'react-localize-redux'
 import { connect } from 'react-redux'
 import { getTextIn } from '../../../../common'
 
-const CourseCard = ({ courseStats, filterContol, language }) => {
+const CourseCard = ({ courseStats, filterContol, language, removeCourse }) => {
   const { course, students } = courseStats
   const [selectedOption, setSelectedOption] = useState(0)
   const name = `courseFilter-${course.code}`
@@ -51,9 +51,19 @@ const CourseCard = ({ courseStats, filterContol, language }) => {
 
   const onChange = (_, { value }) => setSelectedOption(value)
 
+  const removeFilter = () => {
+    filterContol.removeFilter(name)
+    removeCourse()
+  }
+
   return (
     <Card>
-      <Card.Header>{getTextIn(course.name, language)}</Card.Header>
+      <Card.Header>
+        {getTextIn(course.name, language)}
+        <Button compact color="red" size="tiny" onClick={removeFilter} icon>
+          <Icon name="close" />
+        </Button>
+      </Card.Header>
       <Card.Content>
         <Dropdown
           options={options}
@@ -78,7 +88,8 @@ CourseCard.propTypes = {
     addFilter: PropTypes.func,
     removeFilter: PropTypes.func
   }).isRequired,
-  language: PropTypes.string.isRequired
+  language: PropTypes.string.isRequired,
+  removeCourse: PropTypes.func.isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({
