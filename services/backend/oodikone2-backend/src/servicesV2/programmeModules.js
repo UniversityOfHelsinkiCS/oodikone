@@ -53,6 +53,26 @@ const addExcludedCourses = async (programmecode, coursecodes) => {
   // })
   return ExcludedCourse.bulkCreate(coursecodes.map(c => ({ programme_code: programmecode, course_code: c })))
 }
+// just copy pasted from above since almost same query
+const modulesByProgrammeCode = async code => {
+  const connection = sisConnections.established ? sisConnections.sequelize : sequelizeKone
+  const [result] = await connection.query(
+    `
+    WITH RECURSIVE children as (
+      SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS label_name, NULL AS label_code FROM programme_modules pm
+      WHERE pm.code = ?
+      UNION ALL
+      SELECT pm.*, c.order AS module_order, c.name AS label_name, c.code AS label_code
+      FROM children c, programme_modules pm, programme_module_children pmc
+      WHERE c.id = pmc.parent_id AND pm.id = pmc.child_id
+      GROUP BY pm.id, c.name, c.code, c.order
+    ) SELECT * FROM children WHERE type = 'module'
+  `,
+    { replacements: [code] }
+  )
+
+  return result
+}
 
 const removeExcludedCourses = async ids => {
   return ExcludedCourse.destroy({
@@ -64,4 +84,4 @@ const removeExcludedCourses = async ids => {
   })
 }
 
-module.exports = { byProgrammeCode, addExcludedCourses, removeExcludedCourses }
+module.exports = { byProgrammeCode, addExcludedCourses, removeExcludedCourses, modulesByProgrammeCode }
