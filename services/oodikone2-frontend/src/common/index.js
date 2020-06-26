@@ -174,6 +174,7 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
     const facultyCode = sr.faculty_code
     const studyrightElements = sr.studyright_elements.filter(
       srE =>
+        elementDetails[srE.code] &&
         elementDetails[srE.code].type === 20 &&
         (studentToTargetCourseDateMap && studentNumber
           ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(moment(srE.startdate), moment(srE.enddate))

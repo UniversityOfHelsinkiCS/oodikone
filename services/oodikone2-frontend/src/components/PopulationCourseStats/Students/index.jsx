@@ -20,18 +20,44 @@ const Students = () => {
     onGoToCourseStatisticsClick
   } = UsePopulationCourseContext()
   const { language } = useSelector(({ settings }) => settings)
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [page, setPage] = useState(0)
-  const [sortedRows, setSortedRows] = useState(courseStatistics.map(c => ({ ...c.course, passed: c.stats.passed })))
+  const [collapsed, setCollapsed] = useState({})
+  const [modules, setModules] = useState([])
 
   useEffect(() => {
-    setSortedRows(courseStatistics.map(c => ({ ...c.course, passed: c.stats.passed })))
-  }, [courseStatistics])
+    const modules = {}
+    mandatoryCourses.forEach(course => {
+      const code = course.label_code
+      if (!modules[code]) {
+        modules[code] = []
+      }
+      modules[code].push(course)
+    })
+    const collapsed = {}
+    Object.keys(modules).forEach(m => {
+      collapsed[m] = true
+    })
+    setCollapsed(collapsed)
+    setModules(Object.entries(modules).sort((a, b) => a[1][0].module_order - b[1][0].module_order))
+  }, [mandatoryCourses])
 
   const hasCompleted = (courseCode, student) => {
     const course = courseStatistics.find(c => c.course.code === courseCode)
     if (!course) return false
 
     return Boolean(course.students.passed[student])
+  }
+
+  const countCompleted = (courses, student) => {
+    let completed = 0
+    courses.forEach(course => {
+      if (hasCompleted(course.code, student)) {
+        completed++
+      }
+    })
+
+    return completed
   }
 
   const students = useMemo(() => {
@@ -67,6 +93,15 @@ const Students = () => {
     }
   }
 
+  const toggleCollapse = code => {
+    const newState = !collapsed[code]
+    setCollapsed({ ...collapsed, [code]: newState })
+  }
+
+  const pagedStudents = students.slice(page * 10, page * 10 + 10)
+
+  console.log(modules)
+
   return (
     <div>
       <button type="button" onClick={() => changePage(-1)}>
@@ -81,8 +116,9 @@ const Students = () => {
       <Table sortable className="fixed-header" striped celled>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell key="general" content={<b>Students:</b>} colSpan="5" style={{ textAlign: 'right' }} />
-            {students.slice(page * 10, page * 10 + 10).map(student => (
+            {filterInput('nameFilter', 'populationCourses.name', '3')}
+            {filterInput('codeFilter', 'populationCourses.code')}
+            {pagedStudents.map(student => (
               <Table.HeaderCell
                 className="rotatedTableHeader"
                 key={student.studentnumber}
@@ -90,61 +126,75 @@ const Students = () => {
               />
             ))}
           </Table.Row>
-          <Table.Row>
-            {filterInput('nameFilter', 'populationCourses.name', '3')}
-            {filterInput('codeFilter', 'populationCourses.code')}
-            <Table.HeaderCell>Total</Table.HeaderCell>
-            {students.slice(page * 10, page * 10 + 10).map(student => (
-              <Table.HeaderCell key={student.studentnumber} content={student.passed} />
-            ))}
-          </Table.Row>
         </Table.Header>
         <Table.Body>
-          {sortedRows.map(col => (
-            <Table.Row key={col.code}>
-              <Popup
-                trigger={
-                  <Table.Cell className="filterCell clickableCell">
-                    <FilterToggleIcon isActive={isActiveCourse(col)} onClick={() => onCourseNameCellClick(col.code)} />
-                  </Table.Cell>
-                }
-                content={
-                  isActiveCourse(col) ? (
-                    <span>
-                      Poista rajaus kurssin <b>{getTextIn(col.name, language)}</b> perusteella
-                    </span>
-                  ) : (
-                    <span>
-                      Rajaa opiskelijat kurssin <b>{getTextIn(col.name, language)}</b> perusteella
-                    </span>
-                  )
-                }
-                position="top right"
-              />
-              <Table.Cell className="nameCell" key="name" content={col.name.fi} />
-              <Table.Cell className="iconCell clickableCell">
-                <p>
-                  <Item
-                    as={Link}
-                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-                      col.code
-                    )}"]&separate=false&unifyOpenUniCourses=false`}
-                  >
-                    <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(col.code)} />
-                  </Item>
-                </p>
-              </Table.Cell>
-              <Table.Cell key="code" content={col.code} />
-              <Table.Cell key="totals" content={col.passed} />
-              {students.slice(page * 10, page * 10 + 10).map(student => (
-                <Table.Cell
-                  key={student.studentnumber}
-                  content={
-                    hasCompleted(col.code, student.studentnumber) ? <Icon fitted name="check" color="green" /> : null
-                  }
-                />
-              ))}
-            </Table.Row>
+          {modules.map(([module, courses]) => (
+            <>
+              <Table.Row>
+                <Table.Cell colSpan="3" onClick={() => toggleCollapse(module)}>
+                  <b>{courses[0].label_name.fi}</b>
+                </Table.Cell>
+                <Table.Cell>
+                  <b>{module}</b>
+                </Table.Cell>
+                {pagedStudents.map(student => (
+                  <Table.Cell>{countCompleted(courses, student.studentnumber)}</Table.Cell>
+                ))}
+              </Table.Row>
+              {!collapsed[module] &&
+                courses
+                  .filter(c => c.visible.visibility)
+                  .map(col => (
+                    <Table.Row key={col.code}>
+                      <Popup
+                        trigger={
+                          <Table.Cell className="filterCell clickableCell">
+                            <FilterToggleIcon
+                              isActive={isActiveCourse(col)}
+                              onClick={() => onCourseNameCellClick(col.code)}
+                            />
+                          </Table.Cell>
+                        }
+                        content={
+                          isActiveCourse(col) ? (
+                            <span>
+                              Poista rajaus kurssin <b>{getTextIn(col.name, language)}</b> perusteella
+                            </span>
+                          ) : (
+                            <span>
+                              Rajaa opiskelijat kurssin <b>{getTextIn(col.name, language)}</b> perusteella
+                            </span>
+                          )
+                        }
+                        position="top right"
+                      />
+                      <Table.Cell className="nameCell" key="name" content={col.name.fi} />
+                      <Table.Cell className="iconCell clickableCell">
+                        <p>
+                          <Item
+                            as={Link}
+                            to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                              col.code
+                            )}"]&separate=false&unifyOpenUniCourses=false`}
+                          >
+                            <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(col.code)} />
+                          </Item>
+                        </p>
+                      </Table.Cell>
+                      <Table.Cell key="code" content={col.code} />
+                      {pagedStudents.map(student => (
+                        <Table.Cell
+                          key={student.studentnumber}
+                          content={
+                            hasCompleted(col.code, student.studentnumber) ? (
+                              <Icon fitted name="check" color="green" />
+                            ) : null
+                          }
+                        />
+                      ))}
+                    </Table.Row>
+                  ))}
+            </>
           ))}
         </Table.Body>
       </Table>
