@@ -1,20 +1,24 @@
-// TODO: Remove hardcoded language-specific keys.
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Form, Dropdown, Card } from 'semantic-ui-react'
 import { createStore, useStore } from 'react-hookstore'
+import { connect } from 'react-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
+import { getTextIn } from '../../../../common'
 
 export const dataStoreName = 'courseFilterDataStore'
 createStore(dataStoreName, [])
 
-const Courses = ({ filterControl }) => {
+const Courses = ({ filterControl, language }) => {
   const [courseStats] = useStore(dataStoreName)
   const [selectedCourses, setSelectedCourses] = useState([])
 
   const onChange = (_, { value }) =>
     setSelectedCourses(prev => prev.concat(courseStats.find(course => course.course.code === value[0])))
+
+  const removeCourse = course => () => setSelectedCourses(prev => prev.filter(c => c !== course))
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
   const options = courseStats
@@ -22,7 +26,7 @@ const Courses = ({ filterControl }) => {
     .filter(course => !selectedCourses.includes(course))
     .map(course => ({
       key: `course-filter-option-${course.course.code}`,
-      text: course.course.name.fi,
+      text: getTextIn(course.course.name, language),
       value: course.course.code
     }))
 
@@ -35,12 +39,13 @@ const Courses = ({ filterControl }) => {
               courseStats={course}
               filterContol={filterControl}
               key={`course-filter-selected-course-${course.course.code}`}
+              removeCourse={removeCourse(course)}
             />
           ))}
         </Card.Group>
         <Dropdown
           options={options}
-          placeholder="Add Course to Filter By"
+          placeholder="Select Course to Filter By"
           selection
           className="mini"
           fluid
@@ -59,7 +64,12 @@ const Courses = ({ filterControl }) => {
 Courses.propTypes = {
   filterControl: PropTypes.shape({
     filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
-  }).isRequired
+  }).isRequired,
+  language: PropTypes.string.isRequired
 }
 
-export default Courses
+const mapStateToProps = ({ localize }) => ({
+  language: getActiveLanguage(localize).code
+})
+
+export default connect(mapStateToProps)(Courses)
