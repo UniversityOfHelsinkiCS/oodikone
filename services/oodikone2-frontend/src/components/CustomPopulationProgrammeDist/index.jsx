@@ -24,6 +24,7 @@ const CustomPopulationProgrammeDist = ({
     if (Object.keys(populationStatistics).length > 0) {
       const allProgrammes = {}
       const filteredSamples = samples.filter(student => selectedStudents.includes(student.studentNumber))
+
       filteredSamples.forEach(student => {
         const programme = getNewestProgramme(
           student.studyrights,

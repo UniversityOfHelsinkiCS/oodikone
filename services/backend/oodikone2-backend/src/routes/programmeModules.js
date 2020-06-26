@@ -1,10 +1,21 @@
 const router = require('express').Router()
-const { byProgrammeCode, addExcludedCourse, removeExcludedCourse } = require('../servicesV2/programmeModules')
+const {
+  byProgrammeCode,
+  addExcludedCourse,
+  removeExcludedCourse,
+  modulesByProgrammeCode
+} = require('../servicesV2/programmeModules')
 
 router.get('/v3/programme_modules/:code', async (req, res) => {
   const { code } = req.params
   const module = await byProgrammeCode(code)
   res.json(module)
+})
+
+router.get('/v3/programme_modules/:code/modules', async (req, res) => {
+  const { code } = req.params
+  const result = await modulesByProgrammeCode(code)
+  res.json(result)
 })
 
 router.delete('/v3/programme_modules', async (req, res) => {
