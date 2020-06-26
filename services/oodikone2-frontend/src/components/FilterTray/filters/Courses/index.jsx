@@ -18,6 +18,8 @@ const Courses = ({ filterControl, language }) => {
   const onChange = (_, { value }) =>
     setSelectedCourses(prev => prev.concat(courseStats.find(course => course.course.code === value[0])))
 
+  const removeCourse = course => () => setSelectedCourses(prev => prev.filter(c => c !== course))
+
   // Wrestle course stats into something semantic-ui eats without throwing up.
   const options = courseStats
     .filter(course => course.stats.students > Math.round(filterControl.filteredStudents.length * 0.3))
@@ -37,12 +39,13 @@ const Courses = ({ filterControl, language }) => {
               courseStats={course}
               filterContol={filterControl}
               key={`course-filter-selected-course-${course.course.code}`}
+              removeCourse={removeCourse(course)}
             />
           ))}
         </Card.Group>
         <Dropdown
           options={options}
-          placeholder="Add Course to Filter By"
+          placeholder="Select Course to Filter By"
           selection
           className="mini"
           fluid
