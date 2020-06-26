@@ -12,19 +12,19 @@ export const getMandatoryCourseModules = id => {
   return callController(route, prefix)
 }
 
-export const setCourseExclusion = (programmecode, coursecode) => {
+export const setCourseExclusion = (programmecode, coursecodes) => {
   const prefix = 'SET_COURSE_EXCLUSION_'
-  const route = `/v3/programme_modules/${programmecode}/${coursecode}`
+  const route = `/v3/programme_modules/${programmecode}`
   const method = 'post'
-  const data = { programmecode, coursecode }
+  const data = { programmecode, coursecodes }
   return callController(route, prefix, data, method)
 }
 
-export const removeCourseExclusion = (programmecode, coursecode, id) => {
+export const removeCourseExclusion = (programmecode, ids) => {
   const prefix = 'REMOVE_COURSE_EXCLUSION_'
   const route = `/v3/programme_modules/`
   const method = 'delete'
-  const data = { programmecode, coursecode, id }
+  const data = { programmecode, ids }
   return callController(route, prefix, data, method)
 }
 

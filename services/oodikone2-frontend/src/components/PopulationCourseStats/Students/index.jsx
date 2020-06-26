@@ -32,10 +32,13 @@ const Students = () => {
       if (!modules[code]) {
         modules[code] = []
       }
-      modules[code].push(course)
+      if (course.visible.visibility) modules[code].push(course)
     })
     const collapsed = {}
     Object.keys(modules).forEach(m => {
+      if (modules[m].length === 0) {
+        delete modules[m]
+      }
       collapsed[m] = true
     })
     setCollapsed(collapsed)
@@ -100,8 +103,6 @@ const Students = () => {
 
   const pagedStudents = students.slice(page * 10, page * 10 + 10)
 
-  console.log(modules)
-
   return (
     <div>
       <button type="button" onClick={() => changePage(-1)}>
@@ -131,7 +132,8 @@ const Students = () => {
           {modules.map(([module, courses]) => (
             <>
               <Table.Row>
-                <Table.Cell colSpan="3" onClick={() => toggleCollapse(module)}>
+                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleCollapse(module)}>
+                  <Icon name={collapsed[module] ? 'angle right' : 'angle down'} />
                   <b>{courses[0].label_name.fi}</b>
                 </Table.Cell>
                 <Table.Cell>

@@ -36,12 +36,6 @@ const StudyProgrammeMandatoryCourses = props => {
     }
   }, [studyProgramme])
 
-  useEffect(() => {
-    if (tab === 2) {
-      getMandatoryCourses(studyProgramme, true)
-    }
-  }, [tab])
-
   if (!studyProgramme) return null
 
   const panes = [
@@ -73,13 +67,7 @@ const StudyProgrammeMandatoryCourses = props => {
   if (isAdmin)
     panes.push({
       menuItem: 'New Mand. Courses',
-      render: () => (
-        <NewMandatoryCourseTable
-          mandatoryCourses={mandatoryCourses.data}
-          studyProgramme={studyProgramme}
-          language={language}
-        />
-      )
+      render: () => <NewMandatoryCourseTable studyProgramme={studyProgramme} language={language} />
     })
 
   return (
