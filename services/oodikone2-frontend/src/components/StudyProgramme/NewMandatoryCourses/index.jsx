@@ -1,82 +1,145 @@
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
-import { arrayOf, string, shape, func } from 'prop-types'
-import { Button, Label } from 'semantic-ui-react'
-import SortableTable from '../../SortableTable'
+import React, { useEffect, useState } from 'react'
+import { connect, useSelector, useDispatch } from 'react-redux'
+import { string, func } from 'prop-types'
+import { Button, Label, Table } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import { GetMandatoryCourseLabels } from '../../../redux/mandatoryCourseLabels'
-import { setCourseExclusion, removeCourseExclusion } from '../../../redux/populationMandatoryCourses'
+import {
+  setCourseExclusion,
+  removeCourseExclusion,
+  getMandatoryCourses
+} from '../../../redux/populationMandatoryCourses'
 
-const MandatoryCourseTable = ({
-  studyProgramme,
-  mandatoryCourses,
-  language,
-  labels,
-  getLabels,
-  setExclusion,
-  removeExclusion
-}) => {
+const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeExclusion }) => {
+  const dispatch = useDispatch()
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+  const [collapsed, setCollapsed] = useState({})
+  const [modules, setModules] = useState([])
+
   useEffect(() => {
-    getLabels(studyProgramme)
-  }, [])
-
-  const setExclusionButton = code => <Button onClick={() => setExclusion(studyProgramme, code)}>Set hidden</Button>
-  const deleteButton = (coursecode, id) => (
-    <Button onClick={() => removeExclusion(studyProgramme, coursecode, id)}>Set visible</Button>
-  )
-
-  const idtolabel = labels.reduce((acc, e) => {
-    acc[e.id] = e
-    return acc
-  }, {})
-
-  // remove duplicates for now until we figure out how to present modules
-
-  const filteredCourses = mandatoryCourses.filter(course => {
-    let counter = 0
-    mandatoryCourses.forEach(course2 => {
-      if (course2.code === course.code) counter += 1
+    if (!mandatoryCourses) return
+    const modules = {}
+    mandatoryCourses.forEach(course => {
+      const code = course.label_code
+      if (!modules[code]) {
+        modules[code] = []
+      }
+      modules[code].push(course)
     })
-    return counter === 1
-  })
 
-  const columns = [
-    {
-      key: 'name',
-      title: 'Name',
-      getRowVal: course => getTextIn(course.name, language)
-    },
-    { key: 'code', title: 'Code', getRowVal: course => course.code },
-    {
-      key: 'label',
-      title: 'Label',
-      getRowVal: course => course.label && idtolabel[course.label.id] && idtolabel[course.label.id].label,
-      getRowContent: course => (
-        <Label
-          content={course.visible.visibility ? 'visible' : 'hidden'}
-          color={course.visible.visibility ? 'green' : 'red'}
-        />
-      )
-    },
-    {
-      key: 'visibility',
-      title: 'Set visibility',
-      getRowVal: course =>
-        course.visible.visibility ? setExclusionButton(course.code) : deleteButton(course.code, course.visible.id)
+    setModules(
+      Object.entries(modules)
+        .map(([module, courses]) => ({ module, courses, module_order: courses[0].module_order }))
+        .sort((a, b) => a.module_order - b.module_order)
+    )
+  }, [mandatoryCourses])
+
+  // WARNING STUPIDNESS AHEAD
+  useEffect(() => {
+    if (!modules[0]) return
+    if (modules[0].module === 'undefined') {
+      dispatch(getMandatoryCourses(studyProgramme, true))
     }
-  ]
+  }, [modules])
 
-  return <SortableTable columns={columns} data={filteredCourses} getRowKey={row => row.code} />
+  const setExclusionButton = code => <Button onClick={() => setExclusion(studyProgramme, [code])}>Set hidden</Button>
+  const deleteButton = id => <Button onClick={() => removeExclusion(studyProgramme, [id])}>Set visible</Button>
+
+  const excludeAll = code => {
+    const module = modules.find(({ module }) => module === code)
+    setExclusion(studyProgramme, module.courses.filter(c => c.visible.visibility).map(c => c.code))
+  }
+
+  const deleteAll = code => {
+    const module = modules.find(({ module }) => module === code)
+    removeExclusion(studyProgramme, module.courses.map(c => c.visible.id))
+  }
+
+  const showAllButton = module => <Button onClick={() => deleteAll(module)}>Set visible</Button>
+  const hideAllButton = module => <Button onClick={() => excludeAll(module)}>Set hidden</Button>
+
+  const toggleCollapse = code => {
+    const newState = !collapsed[code]
+    setCollapsed({ ...collapsed, [code]: newState })
+  }
+
+  const calculateModuleVisibility = code => {
+    const module = modules.find(({ module }) => module === code)
+    if (module.courses.every(course => course.visible.visibility)) {
+      return 'visible'
+    }
+    if (module.courses.every(course => !course.visible.visibility)) {
+      return 'hidden'
+    }
+    return 'partial'
+  }
+
+  const moduleVisibilityColor = visibility => {
+    switch (visibility) {
+      case 'visible':
+        return 'green'
+      case 'hidden':
+        return 'red'
+      default:
+        return 'yellow'
+    }
+  }
+
+  if (collapsed === null) {
+    return null
+  }
+
+  return (
+    <Table>
+      <Table.Header>
+        <Table.HeaderCell>Name</Table.HeaderCell>
+        <Table.HeaderCell>Label</Table.HeaderCell>
+        <Table.HeaderCell>Set visibility</Table.HeaderCell>
+      </Table.Header>
+      <Table.Body>
+        {modules.map(({ module, courses }) => (
+          <>
+            <Table.Row key={module}>
+              <Table.Cell onClick={() => toggleCollapse(module)}>
+                <b>{courses[0].label_name ? courses[0].label_name.fi : module}</b>
+              </Table.Cell>
+              <Table.Cell>
+                <Label
+                  content={calculateModuleVisibility(module)}
+                  color={moduleVisibilityColor(calculateModuleVisibility(module))}
+                />
+              </Table.Cell>
+              <Table.Cell>
+                {calculateModuleVisibility(module) === 'hidden' ? showAllButton(module) : hideAllButton(module)}
+              </Table.Cell>
+            </Table.Row>
+            {!collapsed[module] &&
+              courses.map(course => (
+                <Table.Row key={course.code}>
+                  <Table.Cell>{getTextIn(course.name, language)}</Table.Cell>
+                  <Table.Cell>
+                    <Label
+                      content={course.visible.visibility ? 'visible' : 'hidden'}
+                      color={course.visible.visibility ? 'green' : 'red'}
+                    />
+                  </Table.Cell>
+                  <Table.Cell>
+                    {course.visible.visibility ? setExclusionButton(course.code) : deleteButton(course.visible.id)}
+                  </Table.Cell>
+                </Table.Row>
+              ))}
+          </>
+        ))}
+      </Table.Body>
+    </Table>
+  )
 }
 
 MandatoryCourseTable.propTypes = {
-  mandatoryCourses: arrayOf(shape({})).isRequired,
   studyProgramme: string.isRequired,
   removeExclusion: func.isRequired,
   setExclusion: func.isRequired,
-  language: string.isRequired,
-  labels: arrayOf(shape({ code: string, label: string, name: shape({}) })).isRequired,
-  getLabels: func.isRequired
+  language: string.isRequired
 }
 
 const mapStateToProps = ({ mandatoryCourseLabels }) => ({

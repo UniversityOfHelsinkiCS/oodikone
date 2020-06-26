@@ -32,10 +32,13 @@ const Students = () => {
       if (!modules[code]) {
         modules[code] = []
       }
-      modules[code].push(course)
+      if (course.visible.visibility) modules[code].push(course)
     })
     const collapsed = {}
     Object.keys(modules).forEach(m => {
+      if (modules[m].length === 0) {
+        delete modules[m]
+      }
       collapsed[m] = true
     })
     setCollapsed(collapsed)
@@ -99,8 +102,6 @@ const Students = () => {
   }
 
   const pagedStudents = students.slice(page * 10, page * 10 + 10)
-
-  console.log(modules)
 
   return (
     <div>
