@@ -13,11 +13,12 @@ import { getStudent, removeStudentSelection, resetStudent } from '../../redux/st
 import { getSemesters } from '../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import { byDateDesc, reformatDate, getTextIn } from '../../common'
+import { byDateDesc, reformatDate, getTextIn, getUserIsAdmin } from '../../common'
 import { clearCourseStats } from '../../redux/coursestats'
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import SortableTable from '../SortableTable'
 import StudentCourseTable from '../StudentCourseTable'
+import BachelorHonours from './BachelorHonours'
 import TSA from '../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Student stats'
@@ -39,7 +40,8 @@ const StudentDetails = ({
   pending,
   error,
   fetching,
-  clearCourseStats
+  clearCourseStats,
+  isAdmin
 }) => {
   const [graphYearStart, setGraphYear] = useState(null)
   const [degreename, setDegreename] = useState('')
@@ -636,6 +638,13 @@ const StudentDetails = ({
       <Tab panes={panes} />
       {renderTags()}
       {renderStudyRights()}
+      {isAdmin && (
+        <BachelorHonours
+          student={student}
+          programmes={degreesAndProgrammes.programmes}
+          absentYears={getAbsentYears()}
+        />
+      )}
       {renderCourseParticipation()}
     </Segment>
   )
@@ -679,6 +688,7 @@ StudentDetails.propTypes = {
   error: bool.isRequired,
   fetching: bool.isRequired,
   getSemesters: func.isRequired,
+  isAdmin: bool.isRequired,
   getDegreesAndProgrammes: func.isRequired,
   semesters: shape({
     semesters: shape({}),
@@ -691,13 +701,22 @@ StudentDetails.defaultProps = {
   studentNumber: ''
 }
 
-const mapStateToProps = ({ students, localize, semesters, populationDegreesAndProgrammes }) => ({
+const mapStateToProps = ({
+  students,
+  localize,
+  semesters,
+  populationDegreesAndProgrammes,
+  auth: {
+    token: { roles }
+  }
+}) => ({
   language: getActiveLanguage(localize).code,
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
   semesters: semesters.data,
   fetching: students.fetching,
+  isAdmin: getUserIsAdmin(roles),
   degreesAndProgrammes: populationDegreesAndProgrammes.data || {}
 })
 
