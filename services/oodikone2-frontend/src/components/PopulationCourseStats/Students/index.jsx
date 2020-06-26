@@ -132,7 +132,8 @@ const Students = () => {
           {modules.map(([module, courses]) => (
             <>
               <Table.Row>
-                <Table.Cell colSpan="3" onClick={() => toggleCollapse(module)}>
+                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleCollapse(module)}>
+                  <Icon name={collapsed[module] ? 'angle right' : 'angle down'} />
                   <b>{courses[0].label_name.fi}</b>
                 </Table.Cell>
                 <Table.Cell>
