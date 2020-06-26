@@ -111,7 +111,7 @@ function PopulationCourseStats(props) {
         studentAmountLimit,
         selectedStudentsLength: props.selectedStudents.length
       })
-      // setCourseStatistics(updateCourseStatisticsCriteria(props, state))
+      setCourseStatistics(updateCourseStatisticsCriteria(props, state))
     }
   }, [props.courses, props.selectedStudents])
 
