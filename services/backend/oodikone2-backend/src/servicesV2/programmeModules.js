@@ -46,21 +46,22 @@ const byProgrammeCode = async code => {
   return labeled
 }
 
-const addExcludedCourse = async (programmecode, coursecode) => {
-  return ExcludedCourse.create({
-    programme_code: programmecode,
-    course_code: coursecode
-  })
+const addExcludedCourses = async (programmecode, coursecodes) => {
+  // return ExcludedCourse.create({
+  //   programme_code: programmecode,
+  //   course_code: coursecode
+  // })
+  return ExcludedCourse.bulkCreate(coursecodes.map(c => ({ programme_code: programmecode, course_code: c })))
 }
 
-const removeExcludedCourse = async id => {
+const removeExcludedCourses = async ids => {
   return ExcludedCourse.destroy({
     where: {
       id: {
-        [Op.eq]: id
+        [Op.or]: ids
       }
     }
   })
 }
 
-module.exports = { byProgrammeCode, addExcludedCourse, removeExcludedCourse }
+module.exports = { byProgrammeCode, addExcludedCourses, removeExcludedCourses }

@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { byProgrammeCode, addExcludedCourse, removeExcludedCourse } = require('../servicesV2/programmeModules')
+const { byProgrammeCode, addExcludedCourses, removeExcludedCourses } = require('../servicesV2/programmeModules')
 
 router.get('/v3/programme_modules/:code', async (req, res) => {
   const { code } = req.params
@@ -8,9 +8,9 @@ router.get('/v3/programme_modules/:code', async (req, res) => {
 })
 
 router.delete('/v3/programme_modules', async (req, res) => {
-  const { programmecode, id } = req.body
+  const { programmecode, ids } = req.body
   try {
-    await removeExcludedCourse(id)
+    await removeExcludedCourses(ids)
     const result = await byProgrammeCode(programmecode)
     res.json(result)
   } catch (e) {
@@ -19,10 +19,10 @@ router.delete('/v3/programme_modules', async (req, res) => {
   }
 })
 
-router.post('/v3/programme_modules/:programmecode/:coursecode', async (req, res) => {
-  const { programmecode, coursecode } = req.body
+router.post('/v3/programme_modules/:programmecode/', async (req, res) => {
+  const { programmecode, coursecodes } = req.body
   try {
-    await addExcludedCourse(programmecode, coursecode)
+    await addExcludedCourses(programmecode, coursecodes)
     const result = await byProgrammeCode(programmecode)
     res.json(result)
   } catch (e) {
