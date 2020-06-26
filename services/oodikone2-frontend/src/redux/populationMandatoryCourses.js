@@ -6,6 +6,12 @@ export const getMandatoryCourses = (id, toggle = false) => {
   return callController(route, prefix)
 }
 
+export const getMandatoryCourseModules = id => {
+  const prefix = 'GET_MANDATORY_MODULES_'
+  const route = `/v3/programme_modules/${id}/modules`
+  return callController(route, prefix)
+}
+
 export const setCourseExclusion = (programmecode, coursecodes) => {
   const prefix = 'SET_COURSE_EXCLUSION_'
   const route = `/v3/programme_modules/${programmecode}`
@@ -149,6 +155,24 @@ const reducer = (state = { data: [] }, action) => {
         data: action.response
       }
     case 'REMOVE_COURSE_EXCLUSION_SUCCESS':
+      return {
+        pending: false,
+        error: false,
+        data: action.response
+      }
+    case 'GET_MANDATORY_MODULES_ATTEMPT':
+      return {
+        ...state,
+        pending: true
+      }
+    case 'GET_MANDATORY_MODULES_FAILURE':
+      return {
+        ...state,
+        pending: false,
+        error: true,
+        data: action.response
+      }
+    case 'GET_MANDATORY_MODULES_SUCCESS':
       return {
         pending: false,
         error: false,
