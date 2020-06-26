@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Dropdown } from 'semantic-ui-react'
 
@@ -39,12 +39,14 @@ const CourseCard = ({ courseStats, filterContol }) => {
     }
   ]
 
+  // Apply filter when mounting.
+  useEffect(() => {
+    filterContol.addFilter(name, subFilters[selectedOption].func)
+  }, [selectedOption])
+
   const options = subFilters.map((filter, i) => ({ key: i, text: filter.label, value: i }))
 
-  const onChange = (_, { value }) => {
-    setSelectedOption(value)
-    filterContol.addFilter(name, subFilters[value].func)
-  }
+  const onChange = (_, { value }) => setSelectedOption(value)
 
   return (
     <Card>
