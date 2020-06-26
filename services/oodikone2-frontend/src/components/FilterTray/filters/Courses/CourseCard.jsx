@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Dropdown } from 'semantic-ui-react'
+import { getActiveLanguage } from 'react-localize-redux'
+import { connect } from 'react-redux'
+import { getTextIn } from '../../../../common'
 
-const CourseCard = ({ courseStats, filterContol }) => {
+const CourseCard = ({ courseStats, filterContol, language }) => {
   const { course, students } = courseStats
   const [selectedOption, setSelectedOption] = useState(0)
   const name = `courseFilter-${course.code}`
@@ -50,7 +53,7 @@ const CourseCard = ({ courseStats, filterContol }) => {
 
   return (
     <Card>
-      <Card.Header>{course.name.fi}</Card.Header>
+      <Card.Header>{getTextIn(course.name, language)}</Card.Header>
       <Card.Content>
         <Dropdown
           options={options}
@@ -74,7 +77,12 @@ CourseCard.propTypes = {
   filterContol: PropTypes.shape({
     addFilter: PropTypes.func,
     removeFilter: PropTypes.func
-  }).isRequired
+  }).isRequired,
+  language: PropTypes.string.isRequired
 }
 
-export default CourseCard
+const mapStateToProps = ({ localize }) => ({
+  language: getActiveLanguage(localize).code
+})
+
+export default connect(mapStateToProps)(CourseCard)
