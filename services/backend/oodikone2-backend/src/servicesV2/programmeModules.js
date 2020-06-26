@@ -46,6 +46,13 @@ const byProgrammeCode = async code => {
   return labeled
 }
 
+const addExcludedCourses = async (programmecode, coursecodes) => {
+  // return ExcludedCourse.create({
+  //   programme_code: programmecode,
+  //   course_code: coursecode
+  // })
+  return ExcludedCourse.bulkCreate(coursecodes.map(c => ({ programme_code: programmecode, course_code: c })))
+}
 // just copy pasted from above since almost same query
 const modulesByProgrammeCode = async code => {
   const connection = sisConnections.established ? sisConnections.sequelize : sequelizeKone
@@ -67,21 +74,14 @@ const modulesByProgrammeCode = async code => {
   return result
 }
 
-const addExcludedCourse = async (programmecode, coursecode) => {
-  return ExcludedCourse.create({
-    programme_code: programmecode,
-    course_code: coursecode
-  })
-}
-
-const removeExcludedCourse = async id => {
+const removeExcludedCourses = async ids => {
   return ExcludedCourse.destroy({
     where: {
       id: {
-        [Op.eq]: id
+        [Op.or]: ids
       }
     }
   })
 }
 
-module.exports = { byProgrammeCode, addExcludedCourse, removeExcludedCourse, modulesByProgrammeCode }
+module.exports = { byProgrammeCode, addExcludedCourses, removeExcludedCourses, modulesByProgrammeCode }

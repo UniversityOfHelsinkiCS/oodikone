@@ -114,7 +114,7 @@ describe('Population Statistics tests', () => {
     })
     cy.contains("Courses of population").click({ force: true })
     cy.contains("Courses of population").parent().within(() => {
-      cy.contains("Ohjelmoinnin perusteet").siblings().eq(5).should("have.text", "1")
+      cy.contains("Ohjelmoinnin perusteet").siblings().eq(5).should("have.text", "0")
     })
 
     cy.contains("Students (1)").click()
