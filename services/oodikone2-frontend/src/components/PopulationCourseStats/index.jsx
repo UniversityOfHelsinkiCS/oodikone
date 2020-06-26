@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Table, Form, Input, Tab } from 'semantic-ui-react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
@@ -45,52 +45,82 @@ const lodashSortOrderTypes = {
   DESC: 'desc'
 }
 
-class PopulationCourseStats extends Component {
-  static propTypes = {
-    courses: shape({
-      coursestatistics: arrayOf(object),
-      coursetypes: shape({}),
-      disciplines: shape({})
-    }).isRequired,
-    translate: func.isRequired,
-    setPopulationFilter: func.isRequired,
-    populationCourses: shape({
-      data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
-    }).isRequired,
-    selectedCourses: arrayOf(object).isRequired,
-    removePopulationFilterOfCourse: func.isRequired,
-    clearCourseStats: func.isRequired,
-    pending: bool.isRequired,
-    selectedStudents: arrayOf(string).isRequired,
-    isAdmin: bool.isRequired,
-    years: shape({}) // eslint-disable-line
+function updateCourseStatisticsCriteria(props, state) {
+  const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
+  const {
+    courses: { coursestatistics },
+    language
+  } = props
+
+  const studentAmountFilter = ({ stats }) => {
+    const { students } = stats
+    return studentAmountLimit === 0 || students >= studentAmountLimit
+  }
+  const courseCodeFilter = ({ course }) => {
+    const { code } = course
+    return code.toLowerCase().includes(codeFilter.toLowerCase())
+  }
+  const courseNameFilter = ({ course }) => {
+    const { name } = course
+    return name[language].toLowerCase().includes(nameFilter.toLowerCase())
   }
 
-  static getDerivedStateFromProps(props, state) {
+  const filteredCourses =
+    coursestatistics &&
+    coursestatistics
+      .filter(studentAmountFilter)
+      .filter(c => !codeFilter || courseCodeFilter(c))
+      .filter(c => !nameFilter || courseNameFilter(c))
+
+  const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
+
+  const courseStatistics = orderBy(
+    filteredCourses,
+    [course => course.stats[sortCriteria], course => course.course.code],
+    [lodashSortOrder, lodashSortOrderTypes.ASC]
+  )
+
+  return courseStatistics
+}
+
+const initialState = props => ({
+  sortCriteria: tableColumnNames.STUDENTS,
+  reversed: true,
+  studentAmountLimit: Math.round(props.selectedStudents.length * 0.3),
+  codeFilter: '',
+  nameFilter: '',
+  activeView: null,
+  selectedStudentsLength: props.selectedStudentsLength || 0
+})
+
+function PopulationCourseStats(props) {
+  const [state, setState] = useState(initialState(props))
+  const [courseStatistics, setCourseStatistics] = useState(updateCourseStatisticsCriteria(props, initialState(props)))
+  const [timer, setTimer] = useState(null)
+
+  useEffect(() => {
     if (state && props.courses) {
       const studentAmountLimit =
         state.selectedStudentsLength !== props.selectedStudents.length
           ? Math.round(props.selectedStudents.length * 0.3)
           : state.studentAmountLimit
-      return {
+
+      setState({
         ...state,
-        courseStatistics: PopulationCourseStats.updateCourseStatisticsCriteria(props, state),
         initialSortReady: true,
         studentAmountLimit,
         selectedStudentsLength: props.selectedStudents.length
-      }
+      })
+      // setCourseStatistics(updateCourseStatisticsCriteria(props, state))
     }
+  }, [props.courses, props.selectedStudents])
 
-    return null
-  }
-
-  static updateCourseStatisticsCriteria(props, state) {
-    const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
+  useEffect(() => {
+    const { studentAmountLimit, codeFilter, nameFilter, reversed, sortCriteria } = state
     const {
       courses: { coursestatistics },
       language
     } = props
-
     const studentAmountFilter = ({ stats }) => {
       const { students } = stats
       return studentAmountLimit === 0 || students >= studentAmountLimit
@@ -113,106 +143,112 @@ class PopulationCourseStats extends Component {
 
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 
-    const courseStatistics = orderBy(
+    const sortedStatistics = orderBy(
       filteredCourses,
       [course => course.stats[sortCriteria], course => course.course.code],
       [lodashSortOrder, lodashSortOrderTypes.ASC]
     )
 
-    return courseStatistics
-  }
+    setCourseStatistics(sortedStatistics)
+  }, [state.studentAmountLimit, state.codeFilter, state.nameFilter])
 
-  state = {
-    sortCriteria: tableColumnNames.STUDENTS,
-    reversed: true,
-    studentAmountLimit: Math.round(this.props.selectedStudents.length * 0.3),
-    codeFilter: '',
-    nameFilter: '',
-    activeView: null,
-    selectedStudentsLength: 0
-  }
-
-  onFilterChange = (e, field) => {
+  const onFilterChange = (e, field) => {
     const {
       target: { value }
     } = e
-    clearTimeout(this.timer)
-    this.timer = setTimeout(() => {
-      this.setState({ [field]: value })
-    }, 1000)
+    clearTimeout(timer)
+    setTimer(
+      setTimeout(() => {
+        setState({ ...state, [field]: value })
+      }, 1000)
+    )
   }
 
-  onSetFilterKeyPress = e => {
+  const handleCourseStatisticsCriteriaChange = () => {
+    // eslint-disable-next-line react/no-access-state-in-setstate
+    const courseStatistics = updateCourseStatisticsCriteria(props, state)
+    setCourseStatistics(courseStatistics)
+  }
+
+  // useEffect(() => {
+  //   handleCourseStatisticsCriteriaChange()
+  // }, [state.studentAmountLimit, state.sortCriteria, state.reversed])
+
+  const onSetFilterKeyPress = e => {
     const { key } = e
     const enterKey = 'Enter'
     const isEnterKeyPress = key === enterKey
     if (isEnterKeyPress) {
-      this.handleCourseStatisticsCriteriaChange()
+      handleCourseStatisticsCriteriaChange()
     }
   }
 
-  onStudentAmountLimitChange = e => {
+  const onStudentAmountLimitChange = e => {
     const {
       target: { value }
     } = e
-    clearTimeout(this.timer)
-    this.timer = setTimeout(() => {
-      sendAnalytics(
-        'Courses of Population student count filter change',
-        'Courses of Population student count filter change',
-        value
-      )
-      this.setState({ studentAmountLimit: value }, () => this.handleCourseStatisticsCriteriaChange())
-    }, 1000)
-  }
-
-  onSortableColumnHeaderClick = criteria => {
-    const { reversed, sortCriteria } = this.state
-    const isActiveSortCriteria = sortCriteria === criteria
-    const isReversed = isActiveSortCriteria ? !reversed : reversed
-
-    this.setState(
-      {
-        sortCriteria: criteria,
-        reversed: isReversed
-      },
-      () => this.handleCourseStatisticsCriteriaChange()
+    clearTimeout(timer)
+    setTimer(
+      setTimeout(() => {
+        sendAnalytics(
+          'Courses of Population student count filter change',
+          'Courses of Population student count filter change',
+          value
+        )
+        setState({ ...state, studentAmountLimit: value }) // , () => this.handleCourseStatisticsCriteriaChange())
+      }, 1000)
     )
   }
 
-  onGoToCourseStatisticsClick = courseCode => {
-    const { clearCourseStats: clearCourseStatsfn } = this.props
+  const onSortableColumnHeaderClick = criteria => {
+    const { reversed, sortCriteria } = state
+    const isActiveSortCriteria = sortCriteria === criteria
+    const isReversed = isActiveSortCriteria ? !reversed : reversed
+
+    const lodashSortOrder = isReversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
+
+    const sortedStatistics = orderBy(
+      courseStatistics,
+      [course => course.stats[sortCriteria], course => course.course.code],
+      [lodashSortOrder, lodashSortOrderTypes.ASC]
+    )
+
+    setState({
+      ...state,
+      sortCriteria: criteria,
+      reversed: isReversed
+    })
+
+    setCourseStatistics(sortedStatistics)
+  }
+
+  const onGoToCourseStatisticsClick = courseCode => {
+    const { clearCourseStats: clearCourseStatsfn } = props
     sendAnalytics('Courses of Population course stats button clicked', courseCode)
     clearCourseStatsfn()
   }
 
-  onCourseNameCellClick = code => {
-    const courseStatistic = this.props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
+  const isActiveCourse = course => {
+    const { selectedCourses } = props
+    return selectedCourses.length > 0 && selectedCourses.find(c => course.code === c.code) !== undefined
+  }
+
+  const onCourseNameCellClick = code => {
+    const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
     if (courseStatistic) {
-      if (!this.isActiveCourse(courseStatistic.course)) {
+      if (!isActiveCourse(courseStatistic.course)) {
         const params = { course: courseStatistic, field: 'all' }
-        this.props.setPopulationFilter(courseParticipation(params))
+        props.setPopulationFilter(courseParticipation(params))
         sendAnalytics('Courses of Population course selected for filter', code)
       } else {
-        this.props.removePopulationFilterOfCourse(courseStatistic.course)
+        props.removePopulationFilterOfCourse(courseStatistic.course)
         sendAnalytics('Courses of Population course unselected for filter', code)
       }
     }
   }
 
-  handleCourseStatisticsCriteriaChange = () => {
-    // eslint-disable-next-line react/no-access-state-in-setstate
-    const courseStatistics = PopulationCourseStats.updateCourseStatisticsCriteria(this.props, this.state)
-    this.setState({ courseStatistics })
-  }
-
-  isActiveCourse = course => {
-    const { selectedCourses } = this.props
-    return selectedCourses.length > 0 && selectedCourses.find(c => course.code === c.code) !== undefined
-  }
-
-  renderFilterInputHeaderCell = (field, name, colSpan = '') => {
-    const { translate } = this.props
+  const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
+    const { translate } = props
     return (
       <Table.HeaderCell colSpan={colSpan}>
         {translate(name)}
@@ -220,91 +256,115 @@ class PopulationCourseStats extends Component {
           className="courseCodeInput"
           transparent
           placeholder="(filter here)"
-          onChange={e => this.onFilterChange(e, field)}
-          onKeyPress={this.onSetFilterKeyPress}
+          onChange={e => onFilterChange(e, field)}
+          onKeyPress={onSetFilterKeyPress}
         />
       </Table.HeaderCell>
     )
   }
 
-  render() {
-    const { courses, translate, pending, isAdmin } = this.props
-    const { studentAmountLimit, courseStatistics, sortCriteria, reversed } = this.state
-    const contextValue = {
-      courseStatistics,
-      filterInput: this.renderFilterInputHeaderCell,
-      isActiveCourse: this.isActiveCourse,
-      onCourseNameCellClick: this.onCourseNameCellClick,
-      onGoToCourseStatisticsClick: this.onGoToCourseStatisticsClick,
-      onSortableColumnHeaderClick: this.onSortableColumnHeaderClick,
-      tableColumnNames,
-      translate,
-      sortCriteria,
-      reversed
-    }
-
-    const panes = [
-      {
-        menuItem: 'pass/fail',
-        render: () => (
-          <div className="menuTab">
-            <PassFail />
-          </div>
-        )
-      },
-      {
-        menuItem: 'grades',
-        render: () => (
-          <div className="menuTab">
-            <GradeDistribution />
-          </div>
-        )
-      },
-      {
-        menuItem: 'when passed',
-        render: () => (
-          <div className="menuTab" style={{ marginTop: '0.5em' }}>
-            <PassingSemesters
-              filterInput={this.renderFilterInputHeaderCell}
-              courseStatistics={courseStatistics}
-              onCourseNameClickFn={this.onCourseNameCellClick}
-              isActiveCourseFn={this.isActiveCourse}
-            />
-          </div>
-        )
-      }
-    ]
-
-    if (isAdmin) {
-      panes.push({
-        menuItem: 'students',
-        render: () => (
-          <div className="menuTab" style={{ marginTop: '0.5em' }}>
-            <Students />
-          </div>
-        )
-      })
-    }
-    if (!courses) {
-      return null
-    }
-    if (pending) {
-      return null
-    }
-    return (
-      <div>
-        <Form>
-          <Form.Field inline>
-            <label>{translate('populationCourses.limit')}</label>
-            <Input defaultValue={studentAmountLimit} onChange={this.onStudentAmountLimitChange} />
-          </Form.Field>
-        </Form>
-        <PopulationCourseContext.Provider value={contextValue}>
-          <Tab panes={panes} />
-        </PopulationCourseContext.Provider>
-      </div>
-    )
+  const { courses, translate, pending, isAdmin } = props
+  const { sortCriteria, reversed } = state
+  const contextValue = {
+    courseStatistics,
+    filterInput: renderFilterInputHeaderCell,
+    isActiveCourse,
+    onCourseNameCellClick,
+    onGoToCourseStatisticsClick,
+    onSortableColumnHeaderClick,
+    tableColumnNames,
+    translate,
+    sortCriteria,
+    reversed
   }
+
+  const panes = [
+    {
+      menuItem: 'pass/fail',
+      render: () => (
+        <div className="menuTab">
+          <PassFail />
+        </div>
+      )
+    },
+    {
+      menuItem: 'grades',
+      render: () => (
+        <div className="menuTab">
+          <GradeDistribution />
+        </div>
+      )
+    },
+    {
+      menuItem: 'when passed',
+      render: () => (
+        <div className="menuTab" style={{ marginTop: '0.5em' }}>
+          <PassingSemesters
+            filterInput={renderFilterInputHeaderCell}
+            courseStatistics={courseStatistics}
+            onCourseNameClickFn={onCourseNameCellClick}
+            isActiveCourseFn={isActiveCourse}
+          />
+        </div>
+      )
+    }
+  ]
+
+  if (isAdmin) {
+    panes.push({
+      menuItem: 'students',
+      render: () => (
+        <div className="menuTab" style={{ marginTop: '0.5em' }}>
+          <Students />
+        </div>
+      )
+    })
+  }
+
+  if (!courses) {
+    return null
+  }
+
+  if (!courseStatistics) {
+    return null
+  }
+
+  if (pending) {
+    return null
+  }
+  return (
+    <div>
+      <Form>
+        <Form.Field inline>
+          <label>{translate('populationCourses.limit')}</label>
+          <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
+        </Form.Field>
+      </Form>
+      <PopulationCourseContext.Provider value={contextValue}>
+        <Tab panes={panes} />
+      </PopulationCourseContext.Provider>
+    </div>
+  )
+}
+
+PopulationCourseStats.propTypes = {
+  courses: shape({
+    coursestatistics: arrayOf(object),
+    coursetypes: shape({}),
+    disciplines: shape({})
+  }).isRequired,
+  translate: func.isRequired,
+  setPopulationFilter: func.isRequired,
+  populationCourses: shape({
+    data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
+  }).isRequired,
+  selectedCourses: arrayOf(object).isRequired,
+  removePopulationFilterOfCourse: func.isRequired,
+  clearCourseStats: func.isRequired,
+  pending: bool.isRequired,
+  selectedStudents: arrayOf(string).isRequired,
+  isAdmin: bool.isRequired,
+  years: shape({}) // eslint-disable-line
 }
 
 const mapStateToProps = state => {
