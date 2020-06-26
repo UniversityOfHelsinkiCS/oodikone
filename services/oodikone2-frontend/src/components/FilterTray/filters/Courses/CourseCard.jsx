@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 import { Card, Dropdown } from 'semantic-ui-react'
 
 const CourseCard = ({ courseStats, filterContol }) => {
@@ -61,6 +62,17 @@ const CourseCard = ({ courseStats, filterContol }) => {
       </Card.Content>
     </Card>
   )
+}
+
+CourseCard.propTypes = {
+  courseStats: PropTypes.shape({
+    course: PropTypes.object,
+    students: PropTypes.object
+  }).isRequired,
+  filterContol: PropTypes.shape({
+    addFilter: PropTypes.func,
+    removeFilter: PropTypes.func
+  }).isRequired
 }
 
 export default CourseCard
