@@ -5,13 +5,11 @@ import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { orderBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-
+import { useStore } from 'react-hookstore'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { clearCourseStats } from '../../redux/coursestats'
-
 import { courseParticipation } from '../../populationFilters'
 import PassingSemesters from './PassingSemesters'
-
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
 import TSA from '../../common/tsa'
@@ -19,6 +17,7 @@ import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
 import Students from './Students'
 import { getUserIsAdmin } from '../../common'
+import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
@@ -97,6 +96,8 @@ function PopulationCourseStats(props) {
   const [state, setState] = useState(initialState(props))
   const [courseStatistics, setCourseStatistics] = useState(updateCourseStatisticsCriteria(props, initialState(props)))
   const [timer, setTimer] = useState(null)
+  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const { toggleCourseSelection } = useCourseFilter()
 
   useEffect(() => {
     if (state && props.courses) {
@@ -236,7 +237,10 @@ function PopulationCourseStats(props) {
   const onCourseNameCellClick = code => {
     const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
     if (courseStatistic) {
-      if (!isActiveCourse(courseStatistic.course)) {
+      if (filterFeatToggle) {
+        // Toggle new filters
+        toggleCourseSelection(code)
+      } else if (!isActiveCourse(courseStatistic.course)) {
         const params = { course: courseStatistic, field: 'all' }
         props.setPopulationFilter(courseParticipation(params))
         sendAnalytics('Courses of Population course selected for filter', code)

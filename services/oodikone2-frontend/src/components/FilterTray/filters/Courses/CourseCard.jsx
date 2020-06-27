@@ -4,9 +4,11 @@ import { Card, Dropdown, Button, Icon } from 'semantic-ui-react'
 import { getActiveLanguage } from 'react-localize-redux'
 import { connect } from 'react-redux'
 import { getTextIn } from '../../../../common'
+import useCourseFilter from './useCourseFilter'
 
-const CourseCard = ({ courseStats, filterContol, language, removeCourse }) => {
+const CourseCard = ({ courseStats, filterContol, language }) => {
   const { course, students } = courseStats
+  const { toggleCourseSelection } = useCourseFilter()
   const [selectedOption, setSelectedOption] = useState(0)
   const name = `courseFilter-${course.code}`
 
@@ -42,25 +44,25 @@ const CourseCard = ({ courseStats, filterContol, language, removeCourse }) => {
     }
   ]
 
-  // Apply filter when mounting.
+  // Apply filter on mount or selection change.
   useEffect(() => {
     filterContol.addFilter(name, subFilters[selectedOption].func)
   }, [selectedOption])
+
+  // Remove filter on unmount.
+  useEffect(() => {
+    return () => filterContol.removeFilter(name)
+  }, [])
 
   const options = subFilters.map((filter, i) => ({ key: i, text: filter.label, value: i }))
 
   const onChange = (_, { value }) => setSelectedOption(value)
 
-  const removeFilter = () => {
-    filterContol.removeFilter(name)
-    removeCourse()
-  }
-
   return (
     <Card>
       <Card.Header>
         {getTextIn(course.name, language)}
-        <Button compact color="red" size="tiny" onClick={removeFilter} icon>
+        <Button compact color="red" size="tiny" onClick={() => toggleCourseSelection(course.code)} icon>
           <Icon name="close" />
         </Button>
       </Card.Header>
@@ -88,8 +90,7 @@ CourseCard.propTypes = {
     addFilter: PropTypes.func,
     removeFilter: PropTypes.func
   }).isRequired,
-  language: PropTypes.string.isRequired,
-  removeCourse: PropTypes.func.isRequired
+  language: PropTypes.string.isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({

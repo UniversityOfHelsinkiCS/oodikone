@@ -11,7 +11,7 @@ import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { refreshFilters } from '../../redux/populationFilters'
-import { dataStoreName } from '../FilterTray/filters/Courses'
+import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
@@ -27,7 +27,7 @@ const PopulationCourses = ({
   filteredStudents
 }) => {
   const [filterFeatToggle] = useStore('filterFeatToggle')
-  const [, setCourseFilterData] = useStore(dataStoreName)
+  const { setCourses: setCourseFilterData } = useCourseFilter()
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
