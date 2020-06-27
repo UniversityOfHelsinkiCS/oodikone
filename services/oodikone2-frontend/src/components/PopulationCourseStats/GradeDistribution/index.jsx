@@ -25,7 +25,7 @@ const formatGradeDistribution = grades =>
 const CourseRow = ({ courseStatistics }) => {
   const { language } = useSelector(({ settings }) => settings)
 
-  const { isActiveCourse, onCourseNameClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+  const { isActiveCourse, onCourseNameCellClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
   const { course, grades } = courseStatistics
   const { name, code } = course
@@ -49,7 +49,7 @@ const CourseRow = ({ courseStatistics }) => {
       <Popup
         trigger={
           <Table.Cell className="filterCell clickableCell">
-            <FilterToggleIcon isActive={isActive} onClick={() => onCourseNameClick(code)} />
+            <FilterToggleIcon isActive={isActive} onClick={() => onCourseNameCellClick(code)} />
           </Table.Cell>
         }
         content={

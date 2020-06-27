@@ -31,7 +31,7 @@ export default () => {
       return {
         ...prev,
         selectedCourses: isSelected
-          ? prev.selectedCourses.filter(c => c.course.code !== course.course.code)
+          ? prev.selectedCourses.filter(c => c.course.code !== courseCode)
           : prev.selectedCourses.concat(course)
       }
     })
