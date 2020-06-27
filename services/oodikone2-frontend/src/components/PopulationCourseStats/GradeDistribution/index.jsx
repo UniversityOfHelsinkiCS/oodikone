@@ -4,10 +4,12 @@ import { replace, sortBy, omit } from 'lodash'
 import { Link } from 'react-router-dom'
 import { shape, string } from 'prop-types'
 import { useSelector } from 'react-redux'
+import { useStore } from 'react-hookstore'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
+import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
 const gradeTypes = [1, 2, 3, 4, 5]
 
@@ -24,13 +26,15 @@ const formatGradeDistribution = grades =>
 
 const CourseRow = ({ courseStatistics }) => {
   const { language } = useSelector(({ settings }) => settings)
+  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const { courseIsSelected } = useCourseFilter()
 
-  const { isActiveCourse, onCourseNameClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+  const { isActiveCourse, onCourseNameCellClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
   const { course, grades } = courseStatistics
   const { name, code } = course
 
-  const isActive = isActiveCourse(course)
+  const isActive = filterFeatToggle ? courseIsSelected(course.code) : isActiveCourse(course)
   let attempts = 0
   let failedGrades = 0
   let otherPassed = 0
@@ -49,7 +53,7 @@ const CourseRow = ({ courseStatistics }) => {
       <Popup
         trigger={
           <Table.Cell className="filterCell clickableCell">
-            <FilterToggleIcon isActive={isActive} onClick={() => onCourseNameClick(code)} />
+            <FilterToggleIcon isActive={isActive} onClick={() => onCourseNameCellClick(code)} />
           </Table.Cell>
         }
         content={
