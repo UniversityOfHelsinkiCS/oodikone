@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Form, Dropdown, Card } from 'semantic-ui-react'
 import { connect } from 'react-redux'
@@ -9,13 +9,7 @@ import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 
 const Courses = ({ filterControl, language }) => {
-  const { courses: courseStats } = useCourseFilter()
-  const [selectedCourses, setSelectedCourses] = useState([])
-
-  const onChange = (_, { value }) =>
-    setSelectedCourses(prev => prev.concat(courseStats.find(course => course.course.code === value[0])))
-
-  const removeCourse = course => () => setSelectedCourses(prev => prev.filter(c => c !== course))
+  const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
   const options = courseStats
@@ -36,7 +30,6 @@ const Courses = ({ filterControl, language }) => {
               courseStats={course}
               filterContol={filterControl}
               key={`course-filter-selected-course-${course.course.code}`}
-              removeCourse={removeCourse(course)}
             />
           ))}
         </Card.Group>
@@ -48,7 +41,7 @@ const Courses = ({ filterControl, language }) => {
           fluid
           button
           value={[]}
-          onChange={onChange}
+          onChange={(_, { value }) => toggleCourseSelection(value[0])}
           multiple
           closeOnChange
           style={{ marginTop: '3rem' }}
