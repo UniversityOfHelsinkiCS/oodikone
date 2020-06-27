@@ -1,19 +1,16 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Form, Dropdown, Card } from 'semantic-ui-react'
-import { createStore, useStore } from 'react-hookstore'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
-import { CourseFilterContext, CourseFilterProvider } from './CourseFilterContext'
 import useCourseFilter from './useCourseFilter'
 
 const Courses = ({ filterControl, language }) => {
   const { courses: courseStats } = useCourseFilter()
   const [selectedCourses, setSelectedCourses] = useState([])
-  console.log(courseStats)
 
   const onChange = (_, { value }) =>
     setSelectedCourses(prev => prev.concat(courseStats.find(course => course.course.code === value[0])))

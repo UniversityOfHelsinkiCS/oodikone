@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, arrayOf, string, bool } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
@@ -11,7 +11,6 @@ import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { refreshFilters } from '../../redux/populationFilters'
-import { CourseFilterContext } from '../FilterTray/filters/Courses/CourseFilterContext'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 
 const PopulationCourses = ({
