@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, arrayOf, string, bool } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
@@ -11,7 +11,7 @@ import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { refreshFilters } from '../../redux/populationFilters'
-import { dataStoreName } from '../FilterTray/filters/Courses'
+import { CourseFilterContext } from '../FilterTray/filters/Courses/CourseFilterContext'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
@@ -27,7 +27,7 @@ const PopulationCourses = ({
   filteredStudents
 }) => {
   const [filterFeatToggle] = useStore('filterFeatToggle')
-  const [, setCourseFilterData] = useStore(dataStoreName)
+  const [, setCourseFilterData] = useContext(CourseFilterContext)
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses

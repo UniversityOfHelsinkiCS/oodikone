@@ -9,6 +9,7 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
+import { CourseFilterProvider } from './filters/Courses/CourseFilterContext'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [clickSaver] = useStore('clickSaver')
@@ -38,7 +39,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
   const noFilters = Object.keys(activeFilters).length
 
   return (
-    <>
+    <CourseFilterProvider>
       <Sidebar open={open}>
         <Sidebar.Pusher>
           <Card.Group id="filter-tray">
@@ -104,7 +105,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <Icon name="angle double down" />
         </Button>
       </div>
-    </>
+    </CourseFilterProvider>
   )
 }
 
