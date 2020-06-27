@@ -36,5 +36,7 @@ export default () => {
       }
     })
 
-  return { courses, selectedCourses, setCourses, toggleCourseSelection }
+  const courseIsSelected = courseCode => selectedCourses.some(course => course.course.code === courseCode)
+
+  return { courses, selectedCourses, setCourses, toggleCourseSelection, courseIsSelected }
 }

@@ -2,9 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Table, Icon, Popup, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useStore } from 'react-hookstore'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
+import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
 const verticalTitle = title => {
   // https://stackoverflow.com/a/41396815
@@ -24,6 +26,8 @@ const Students = () => {
   const [page, setPage] = useState(0)
   const [collapsed, setCollapsed] = useState({})
   const [modules, setModules] = useState([])
+  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const { courseIsSelected } = useCourseFilter()
 
   useEffect(() => {
     const modules = {}
@@ -152,13 +156,19 @@ const Students = () => {
                         trigger={
                           <Table.Cell className="filterCell clickableCell">
                             <FilterToggleIcon
-                              isActive={isActiveCourse(col)}
+                              isActive={filterFeatToggle ? courseIsSelected(col.code) : isActiveCourse(col)}
                               onClick={() => onCourseNameCellClick(col.code)}
                             />
                           </Table.Cell>
                         }
                         content={
-                          isActiveCourse(col) ? (
+                          // This is the best ternary I've ever written :mintu:
+                          /* eslint-disable-next-line no-nested-ternary */
+                          (filterFeatToggle ? (
+                            courseIsSelected(col.code)
+                          ) : (
+                            isActiveCourse(col)
+                          )) ? (
                             <span>
                               Poista rajaus kurssin <b>{getTextIn(col.name, language)}</b> perusteella
                             </span>

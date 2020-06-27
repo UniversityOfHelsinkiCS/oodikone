@@ -5,13 +5,11 @@ import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { orderBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-
+import { useStore } from 'react-hookstore'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { clearCourseStats } from '../../redux/coursestats'
-
 import { courseParticipation } from '../../populationFilters'
 import PassingSemesters from './PassingSemesters'
-
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
 import TSA from '../../common/tsa'
@@ -19,7 +17,6 @@ import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
 import Students from './Students'
 import { getUserIsAdmin } from '../../common'
-import { useStore } from 'react-hookstore'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
