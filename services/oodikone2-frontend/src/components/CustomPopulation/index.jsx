@@ -6,7 +6,7 @@ import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { intersection, difference } from 'lodash'
 import ReactMarkdown from 'react-markdown'
 import scrollToComponent from 'react-scroll-to-component'
-
+import { createStore } from 'react-hookstore'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulation } from '../../redux/populations'
@@ -27,6 +27,9 @@ import CustomPopulationCourses from '../CustomPopulationCourses'
 import CustomPopulationProgrammeDist from '../CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import InfoBox from '../InfoBox'
+
+// Copy-pasted from population stats to make new filters not break custom population.
+createStore('filterFeatToggle', window.localStorage.getItem('oodikoneFilterFeatToggle') === 'true')
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
