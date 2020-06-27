@@ -9,7 +9,7 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
-import { CourseFilterProvider } from './filters/Courses/CourseFilterContext'
+import { CourseFilterProvider } from './filters/Courses/useCourseFilter'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [clickSaver] = useStore('clickSaver')
