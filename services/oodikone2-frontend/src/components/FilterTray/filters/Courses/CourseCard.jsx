@@ -4,9 +4,11 @@ import { Card, Dropdown, Button, Icon } from 'semantic-ui-react'
 import { getActiveLanguage } from 'react-localize-redux'
 import { connect } from 'react-redux'
 import { getTextIn } from '../../../../common'
+import useCourseFilter from './useCourseFilter'
 
-const CourseCard = ({ courseStats, filterContol, language, removeCourse }) => {
+const CourseCard = ({ courseStats, filterContol, language }) => {
   const { course, students } = courseStats
+  const { toggleCourseSelection } = useCourseFilter()
   const [selectedOption, setSelectedOption] = useState(0)
   const name = `courseFilter-${course.code}`
 
@@ -53,7 +55,7 @@ const CourseCard = ({ courseStats, filterContol, language, removeCourse }) => {
 
   const removeFilter = () => {
     filterContol.removeFilter(name)
-    removeCourse()
+    toggleCourseSelection(course.code)
   }
 
   return (
@@ -88,8 +90,7 @@ CourseCard.propTypes = {
     addFilter: PropTypes.func,
     removeFilter: PropTypes.func
   }).isRequired,
-  language: PropTypes.string.isRequired,
-  removeCourse: PropTypes.func.isRequired
+  language: PropTypes.string.isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({
