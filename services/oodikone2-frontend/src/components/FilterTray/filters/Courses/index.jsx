@@ -8,9 +8,10 @@ import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
 import { CourseFilterContext, CourseFilterProvider } from './CourseFilterContext'
+import useCourseFilter from './useCourseFilter'
 
 const Courses = ({ filterControl, language }) => {
-  const [courseStats] = useContext(CourseFilterContext)
+  const { courses: courseStats } = useCourseFilter()
   const [selectedCourses, setSelectedCourses] = useState([])
   console.log(courseStats)
 
