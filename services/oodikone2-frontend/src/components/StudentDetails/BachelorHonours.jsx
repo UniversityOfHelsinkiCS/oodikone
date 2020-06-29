@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import { shape, arrayOf, func } from 'prop-types'
 import { connect } from 'react-redux'
-import { Segment, Table, Label, Header } from 'semantic-ui-react'
+import { Divider, Table, Label, Header } from 'semantic-ui-react'
 
 import { getNewestProgramme, reformatDate } from '../../common'
 import { getMandatoryCourseModules } from '../../redux/populationMandatoryCourses'
@@ -52,10 +52,12 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       const graduationDate = moment(degree.date)
       const yearsForGraduation = moment.duration(graduationDate.diff(studyStartDate)).asYears()
 
+      // calculate time student has been absent during bachelors degree
       const timeAbsent = absentYears.reduce((acc, curr) => {
         const start = moment(curr.startdate)
         const end = moment(curr.enddate)
 
+        // if absent years are not in the degree start and end range return acc
         if (start < studyStartDate || start > graduationDate) return acc
         const diff = moment.duration(end.diff(start)).asYears()
         return acc + diff
@@ -92,71 +94,63 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
     }
   }, [mandatoryModules])
 
-  const moduleRows = studentsModules.map(mod => (
-    <Table.Row key={mod.course_code}>
-      <Table.Cell>{reformatDate(mod.date, 'DD.MM.YYYY')}</Table.Cell>
-      <Table.Cell>
-        {mod.course.name.fi} ({mod.course_code})
-      </Table.Cell>
-      <Table.Cell>{mod.grade}</Table.Cell>
-    </Table.Row>
-  ))
+  const dataRows = modules =>
+    modules.map(mod => (
+      <Table.Row key={mod.course_code}>
+        <Table.Cell>{reformatDate(mod.date, 'DD.MM.YYYY')}</Table.Cell>
+        <Table.Cell>
+          {mod.course.name.fi} ({mod.course_code})
+        </Table.Cell>
+        <Table.Cell>{mod.grade}</Table.Cell>
+      </Table.Row>
+    ))
 
-  const otherModuleRows = otherModules.map(mod => (
-    <Table.Row key={mod.course_code}>
-      <Table.Cell>{reformatDate(mod.date, 'DD.MM.YYYY')}</Table.Cell>
-      <Table.Cell>
-        {mod.course.name.fi} ({mod.course_code})
-      </Table.Cell>
-      <Table.Cell>{mod.grade}</Table.Cell>
-    </Table.Row>
-  ))
+  const dataTable = data => (
+    <Table>
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell>Date</Table.HeaderCell>
+          <Table.HeaderCell>Course</Table.HeaderCell>
+          <Table.HeaderCell>Grade</Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>{dataRows(data)}</Table.Body>
+    </Table>
+  )
 
   if (!render) return null
 
   return (
-    <Segment>
-      <Header>Bachelor Honours</Header>
-      <Label tag content={honors ? 'Honours' : 'Not honours'} color={honors ? 'green' : 'red'} />
+    <>
+      <Divider horizontal style={{ padding: '20px' }}>
+        <Header as="h4">Bachelor Honours</Header>
+      </Divider>
+      <Header as="h5">Applicable</Header>
+      <Label
+        tag
+        content={honors ? 'Applicable for Honours' : 'Not Applicable for Honours'}
+        color={honors ? 'green' : 'red'}
+      />
       {otherModules.length > 0 ? <Label tag content="Might need further inspection" color="blue" /> : null}
       {studentsModules.length > 0 ? (
         <>
           <Header as="h4">Main modules</Header>
-          <Table>
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell>Date</Table.HeaderCell>
-                <Table.HeaderCell>Course</Table.HeaderCell>
-                <Table.HeaderCell>Grade</Table.HeaderCell>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>{moduleRows}</Table.Body>
-          </Table>
+          {dataTable(studentsModules)}
         </>
       ) : null}
       {otherModules.length > 0 ? (
         <>
           <Header as="h4">Other modules</Header>
-          <Table>
-            <Table.Header>
-              <Table.Row></Table.Row>
-              <Table.Row>
-                <Table.HeaderCell>Date</Table.HeaderCell>
-                <Table.HeaderCell>Course</Table.HeaderCell>
-                <Table.HeaderCell>Grade</Table.HeaderCell>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>{otherModuleRows}</Table.Body>
-          </Table>
+          {dataTable(otherModules)}
         </>
       ) : null}
-    </Segment>
+    </>
   )
 }
 
 BachelorHonours.propTypes = {
   student: shape({}).isRequired,
-  programmes: arrayOf(shape({})).isRequired,
+  programmes: shape({}).isRequired,
   mandatoryModules: arrayOf(shape({})).isRequired,
   absentYears: arrayOf(shape({})).isRequired,
   getMandatoryCourseModulesDispatch: func.isRequired
@@ -164,7 +158,7 @@ BachelorHonours.propTypes = {
 
 const mapStateToProps = ({ populationMandatoryCourses }) => {
   return {
-    mandatoryModules: populationMandatoryCourses.data || {}
+    mandatoryModules: populationMandatoryCourses.data || []
   }
 }
 
