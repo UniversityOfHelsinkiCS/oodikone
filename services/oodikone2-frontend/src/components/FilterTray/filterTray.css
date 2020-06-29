@@ -91,7 +91,7 @@
   background-color: rgba(255, 255, 255, 0.08);
   border: none;
   box-shadow: none;
-  margin-bottom: 0;
+  margin-top: 0;
 }
 
 #filter-tray .card .card-header-text {
@@ -137,40 +137,6 @@
   min-width: 76px;
   display: flex;
   align-items: center;
-}
-
-#filter-control-panel {
-  width: 20vw;
-  position: fixed;
-  bottom: 0;
-  left: -20vw;
-  background-color: #0e0f0f;
-  -webkit-transition: all 0.5s;
-  transition: all 0.5s;
-  z-index: 10;
-  padding-top: 1rem;
-}
-
-#filter-control-panel.sidebar-open {
-  left: 0;
-}
-
-#filter-control-panel button {
-  padding: 1rem 1.5rem 1rem 12px;
-  width: 100%;
-  border-radius: 0;
-}
-
-#filter-control-panel > .checkbox {
-  padding: 1rem;
-}
-
-#filter-control-panel label {
-  color: #fff !important;
-}
-
-#filter-control-panel label::before {
-  background-color: #2d2e2f;
 }
 
 #filter-close-button {
