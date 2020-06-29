@@ -72,6 +72,16 @@
   order: -2;
 }
 
+#filter-tray .comparator-input > .label {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+#filter-tray .comparator-input > .label > .dropdown {
+  text-align: center;
+  font-size: 1.1rem;
+}
+
 #filter-tray > .header > .content {
   display: flex;
   align-items: center;
@@ -141,4 +151,11 @@
 
 #filter-close-button {
   background: #1b1c1d;
+}
+
+#filter-tray .description-text {
+  color: #9e9e9e;
+  margin-top: -0.5rem;
+  padding-bottom: 1rem;
+  font-style: italic;
 }
