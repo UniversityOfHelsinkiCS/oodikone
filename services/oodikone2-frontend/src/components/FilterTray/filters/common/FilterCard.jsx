@@ -24,7 +24,7 @@ const FilterCard = ({ title, children, footer, active }) => {
 
 FilterCard.propTypes = {
   title: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.element.isRequired,
   footer: PropTypes.element,
   active: PropTypes.bool
 }
