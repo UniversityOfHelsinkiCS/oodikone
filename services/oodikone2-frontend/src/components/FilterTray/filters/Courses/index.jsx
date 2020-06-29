@@ -1,12 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Form, Dropdown, Card } from 'semantic-ui-react'
+import { Dropdown, Card } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
+import './courseFilter.css'
 
 const Courses = ({ filterControl, language }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
@@ -23,30 +24,27 @@ const Courses = ({ filterControl, language }) => {
 
   return (
     <FilterCard title="Courses">
-      <Form>
-        <Card.Group>
-          {selectedCourses.map(course => (
-            <CourseCard
-              courseStats={course}
-              filterContol={filterControl}
-              key={`course-filter-selected-course-${course.course.code}`}
-            />
-          ))}
-        </Card.Group>
-        <Dropdown
-          options={options}
-          placeholder="Select Course to Filter By"
-          selection
-          className="mini"
-          fluid
-          button
-          value={[]}
-          onChange={(_, { value }) => toggleCourseSelection(value[0])}
-          multiple
-          closeOnChange
-          style={{ marginTop: '3rem' }}
-        />
-      </Form>
+      <Dropdown
+        options={options}
+        placeholder="Select Course to Filter By"
+        selection
+        className="mini course-filter-selection"
+        fluid
+        button
+        value={[]}
+        onChange={(_, { value }) => toggleCourseSelection(value[0])}
+        multiple
+        closeOnChange
+      />
+      <Card.Group>
+        {selectedCourses.map(course => (
+          <CourseCard
+            courseStats={course}
+            filterContol={filterControl}
+            key={`course-filter-selected-course-${course.course.code}`}
+          />
+        ))}
+      </Card.Group>
     </FilterCard>
   )
 }
