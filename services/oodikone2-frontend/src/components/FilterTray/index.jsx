@@ -9,8 +9,7 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
-import { CourseFilterProvider } from './filters/Courses/useCourseFilter'
-import { CreditFilterProvider } from './filters/TotalCredits/useCreditFilter'
+import FilterContextProvider from './FilterContextProvider'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [clickSaver] = useStore('clickSaver')
@@ -40,75 +39,73 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
   const noFilters = Object.keys(activeFilters).length
 
   return (
-    <CourseFilterProvider>
-      <CreditFilterProvider>
-        <Sidebar open={open}>
-          <Sidebar.Pusher>
-            <Card.Group id="filter-tray">
-              <Header size="medium">
-                <Header.Content>
-                  Filters
-                  {noFilters > 0 && (
-                    <Popup
-                      content="Number of active filters."
-                      position="bottom center"
-                      pinned
-                      size="mini"
-                      on="hover"
-                      trigger={
-                        <Label color="blue" size="small">
-                          <Icon name="filter" />
-                          {noFilters}
-                        </Label>
-                      }
-                    />
-                  )}
-                </Header.Content>
-                <div>
-                  <Icon name="bars" size="large" />
-                </div>
-              </Header>
-              <TotalCredits filterControl={filterControl} />
-              <Gender filterControl={filterControl} />
-              <StartYearAtUni filterControl={filterControl} />
-              <Courses filterControl={filterControl} />
-            </Card.Group>
-            <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
-              <Button secondary onClick={() => setOpen(false)}>
-                <Icon name="angle double up" />
-                <div className="button-label">Close Filters</div>
-                <Icon name="angle double up" />
-              </Button>
-            </div>
-          </Sidebar.Pusher>
-          <Sidebar.Pushable>{children}</Sidebar.Pushable>
-        </Sidebar>
-        <div className="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
-          <Button secondary onClick={() => setOpen(true)}>
-            <Icon name="angle double down" />
-            <div className="button-label">
-              Filters
-              {noFilters > 0 && (
-                <Popup
-                  content="Number of active filters."
-                  position="right center"
-                  pinned
-                  size="mini"
-                  on="hover"
-                  trigger={
-                    <Label color="grey" size="small">
-                      <Icon name="filter" />
-                      {noFilters}
-                    </Label>
-                  }
-                />
-              )}
-            </div>
-            <Icon name="angle double down" />
-          </Button>
-        </div>
-      </CreditFilterProvider>
-    </CourseFilterProvider>
+    <FilterContextProvider>
+      <Sidebar open={open}>
+        <Sidebar.Pusher>
+          <Card.Group id="filter-tray">
+            <Header size="medium">
+              <Header.Content>
+                Filters
+                {noFilters > 0 && (
+                  <Popup
+                    content="Number of active filters."
+                    position="bottom center"
+                    pinned
+                    size="mini"
+                    on="hover"
+                    trigger={
+                      <Label color="blue" size="small">
+                        <Icon name="filter" />
+                        {noFilters}
+                      </Label>
+                    }
+                  />
+                )}
+              </Header.Content>
+              <div>
+                <Icon name="bars" size="large" />
+              </div>
+            </Header>
+            <TotalCredits filterControl={filterControl} />
+            <Gender filterControl={filterControl} />
+            <StartYearAtUni filterControl={filterControl} />
+            <Courses filterControl={filterControl} />
+          </Card.Group>
+          <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
+            <Button secondary onClick={() => setOpen(false)}>
+              <Icon name="angle double up" />
+              <div className="button-label">Close Filters</div>
+              <Icon name="angle double up" />
+            </Button>
+          </div>
+        </Sidebar.Pusher>
+        <Sidebar.Pushable>{children}</Sidebar.Pushable>
+      </Sidebar>
+      <div className="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
+        <Button secondary onClick={() => setOpen(true)}>
+          <Icon name="angle double down" />
+          <div className="button-label">
+            Filters
+            {noFilters > 0 && (
+              <Popup
+                content="Number of active filters."
+                position="right center"
+                pinned
+                size="mini"
+                on="hover"
+                trigger={
+                  <Label color="grey" size="small">
+                    <Icon name="filter" />
+                    {noFilters}
+                  </Label>
+                }
+              />
+            )}
+          </div>
+          <Icon name="angle double down" />
+        </Button>
+      </div>
+    </FilterContextProvider>
   )
 }
 
