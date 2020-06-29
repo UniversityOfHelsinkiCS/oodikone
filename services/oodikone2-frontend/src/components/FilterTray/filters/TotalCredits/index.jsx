@@ -58,8 +58,8 @@ const TotalCredits = ({ filterControl }) => {
     })
   }, [requestedValue])
 
-  const onChange = key => (_, { value: inputValue }) => {
-    setCurrentValue({ [key]: inputValue })
+  const onChange = key => (_, { value }) => {
+    setCurrentValue({ [key]: value })
     setUpdatedAt(prev => ({ ...prev, [key]: now() }))
   }
 
