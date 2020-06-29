@@ -7,6 +7,7 @@ import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
+import './courseFilter.css'
 
 const Courses = ({ filterControl, language }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
