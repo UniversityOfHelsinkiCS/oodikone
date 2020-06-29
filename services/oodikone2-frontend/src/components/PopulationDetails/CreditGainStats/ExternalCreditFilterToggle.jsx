@@ -2,13 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Popup, Button, Icon } from 'semantic-ui-react'
 import { useLocation } from 'react-router-dom'
-import { useStore } from 'react-hookstore'
 import { getMonths } from '../../../common/query'
-import { requestStoreName, valueStoreName } from '../../FilterTray/filters/TotalCredits'
+import useCreditFilter from '../../FilterTray/filters/TotalCredits/useCreditFilter'
 
 const ExternalCreditFilterToggle = ({ min, max }) => {
-  const [, setTotalCreditsExternal] = useStore(requestStoreName)
-  const [currentFilterValue] = useStore(valueStoreName)
+  const { currentValue: currentFilterValue, setRequestedValue } = useCreditFilter()
   const months = getMonths(useLocation())
   const limitedMax = max === 0 ? 1 : max
 
@@ -17,7 +15,7 @@ const ExternalCreditFilterToggle = ({ min, max }) => {
   const active = currentMin === min && currentMax === limitedMax
 
   const updateFilters = () =>
-    active ? setTotalCreditsExternal({ min: null, max: null }) : setTotalCreditsExternal({ min, max: limitedMax })
+    active ? setRequestedValue({ min: null, max: null }) : setRequestedValue({ min, max: limitedMax })
 
   return (
     <Popup
