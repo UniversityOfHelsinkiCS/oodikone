@@ -23,7 +23,7 @@ const Courses = ({ filterControl, language }) => {
     }))
 
   return (
-    <FilterCard title="Courses">
+    <FilterCard title="Courses" active={!!selectedCourses.length}>
       <Dropdown
         options={options}
         placeholder="Select Course to Filter By"
