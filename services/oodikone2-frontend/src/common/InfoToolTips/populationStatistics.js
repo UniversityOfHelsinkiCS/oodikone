@@ -103,10 +103,8 @@ export default {
     täsmää puolivuosi-lukumäärien summan kanssa, johtuen tuplakirjauksista Oodissa.`
   },
   Students: {
-    AccordionTitle: `**Students** Taulukko näyttää oletusarvoisesti vain 
-    opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.`,
-    Infobox: `**Students:** harmaata "show" painiketta klikkaamalla saa listan kaikista populaation opiskelijoista
-    (huom. suodattimet vaikuttavat tähän listaan!). Taulukko näyttää oletusarvoisesti vain 
+    AccordionTitle: `**Students** Taulukko joka näyttää informaatiota opiskelijoista.`,
+    Infobox: `**Students:** Taulukko näyttää oletusarvoisesti vain 
     opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
     <br> <br>
     **GENERAL:**
