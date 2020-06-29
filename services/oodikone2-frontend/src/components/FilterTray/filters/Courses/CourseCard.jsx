@@ -59,26 +59,23 @@ const CourseCard = ({ courseStats, filterContol, language }) => {
   const onChange = (_, { value }) => setSelectedOption(value)
 
   return (
-    <Card className="course-card">
+    <Card>
+      <Card.Header>
+        {getTextIn(course.name, language)}
+        <Button compact color="red" size="tiny" onClick={() => toggleCourseSelection(course.code)} icon>
+          <Icon name="close" />
+        </Button>
+      </Card.Header>
       <Card.Content>
-        <Card.Header>
-          <div>{getTextIn(course.name, language)}</div>
-          <Button compact color="red" size="tiny" onClick={() => toggleCourseSelection(course.code)} icon>
-            <Icon name="close" />
-          </Button>
-        </Card.Header>
-        <Card.Description>
-          <div>Show:</div>
-          <Dropdown
-            options={options}
-            value={selectedOption}
-            onChange={onChange}
-            selection
-            fluid
-            className="mini"
-            button
-          />
-        </Card.Description>
+        <Dropdown
+          options={options}
+          value={selectedOption}
+          onChange={onChange}
+          selection
+          fluid
+          className="mini"
+          button
+        />
       </Card.Content>
     </Card>
   )
