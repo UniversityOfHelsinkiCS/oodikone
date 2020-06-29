@@ -2,7 +2,20 @@ import React, { Fragment, useEffect, useState } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
-import { Segment, Table, Icon, Label, Header, Loader, Item, Menu, Tab, Input, Message } from 'semantic-ui-react'
+import {
+  Divider,
+  Segment,
+  Table,
+  Icon,
+  Label,
+  Header,
+  Loader,
+  Item,
+  Menu,
+  Tab,
+  Input,
+  Message
+} from 'semantic-ui-react'
 import { isEmpty, sortBy, flattenDeep, cloneDeep } from 'lodash'
 import moment from 'moment'
 import Highcharts from 'highcharts/highstock'
@@ -271,7 +284,9 @@ const StudentDetails = ({
 
     return (
       <Fragment>
-        <Header content="Courses" />
+        <Divider horizontal style={{ padding: '20px' }}>
+          <Header as="h4">Courses</Header>
+        </Divider>
         {courseTables}
       </Fragment>
     )
@@ -373,7 +388,9 @@ const StudentDetails = ({
 
     return (
       <Fragment>
-        <Header content="Studyrights" />
+        <Divider horizontal style={{ padding: '20px' }}>
+          <Header as="h4">Studyrights</Header>
+        </Divider>
         <Table className="fixed-header">
           <Table.Header>
             <Table.Row>
