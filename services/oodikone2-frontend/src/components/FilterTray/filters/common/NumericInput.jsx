@@ -2,13 +2,21 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Input, Label, Popup, Button, Icon } from 'semantic-ui-react'
 
-const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonDisabled }) => (
-  <Input labelPosition="left" size="mini" onChange={onChange} value={value} action onKeyDown={onKeyDown}>
+const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonDisabled, className }) => (
+  <Input
+    labelPosition="left"
+    size="mini"
+    onChange={onChange}
+    value={value}
+    action
+    onKeyDown={onKeyDown}
+    className={className}
+  >
     <Label>{label}</Label>
     <input />
     <Popup
       content="Clear filter."
-      position="bottom center"
+      position="top right"
       pinned
       size="mini"
       on="hover"
@@ -23,11 +31,17 @@ const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonD
 
 NumericInput.propTypes = {
   onChange: PropTypes.func.isRequired,
-  onKeyDown: PropTypes.func.isRequired,
+  onKeyDown: PropTypes.func,
   onClear: PropTypes.func.isRequired,
   value: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
-  clearButtonDisabled: PropTypes.bool.isRequired
+  label: PropTypes.node.isRequired,
+  clearButtonDisabled: PropTypes.bool.isRequired,
+  className: PropTypes.string
+}
+
+NumericInput.defaultProps = {
+  onKeyDown: () => {},
+  className: null
 }
 
 export default NumericInput

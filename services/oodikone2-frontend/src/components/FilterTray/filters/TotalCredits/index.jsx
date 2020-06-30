@@ -1,28 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Form } from 'semantic-ui-react'
-import { createStore, useStore } from 'react-hookstore'
-import { getStudentTotalCredits } from '../../../common'
-import FilterCard from './common/FilterCard'
-import NumericInput from './common/NumericInput'
-
-// Store for external filtering requests.
-export const requestStoreName = 'totalCreditsFilterExternal'
-createStore(requestStoreName, { min: null, max: null })
-
-// Store for sharing current filter value.
-export const valueStoreName = 'totalCreditsFilterValue'
-createStore(valueStoreName, { min: '', max: '' })
+import { getStudentTotalCredits } from '../../../../common'
+import FilterCard from '../common/FilterCard'
+import NumericInput from '../common/NumericInput'
+import useCreditFilter from './useCreditFilter'
 
 const TotalCredits = ({ filterControl }) => {
-  const [externalValue] = useStore(requestStoreName)
-  const [value, setValue] = useStore(valueStoreName)
+  const { currentValue, requestedValue, setCurrentValue } = useCreditFilter()
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
   const labels = { min: 'At Least', max: 'Less Than' }
 
   const now = () => new Date().getTime()
 
-  const names = Object.fromEntries(Object.keys(value).map(key => [key, `totalCredits${key}`]))
+  const names = Object.fromEntries(Object.keys(currentValue).map(key => [key, `totalCredits${key}`]))
 
   const filterFunctions = limit => ({
     min: student => getStudentTotalCredits(student) >= Number(limit),
@@ -32,8 +23,8 @@ const TotalCredits = ({ filterControl }) => {
   const updateFilters = key => {
     const name = names[key]
 
-    if (value[key] !== '') {
-      filterControl.addFilter(name, filterFunctions(value[key])[key])
+    if (currentValue[key] !== '') {
+      filterControl.addFilter(name, filterFunctions(currentValue[key])[key])
     } else {
       filterControl.removeFilter(name)
     }
@@ -52,12 +43,12 @@ const TotalCredits = ({ filterControl }) => {
     return () => clearTimeout(timer)
   }, [updatedAt])
 
-  // Listen to hook-store for external filtering requests.
+  // Listen for external filtering requests (from credit stats table rows).
   useEffect(() => {
-    Object.keys(value).forEach(key => {
-      const newValue = externalValue[key] === null ? '' : externalValue[key]
+    Object.keys(currentValue).forEach(key => {
+      const newValue = requestedValue[key] === null ? '' : requestedValue[key]
       const name = names[key]
-      setValue(prev => ({ ...prev, [key]: String(newValue) }))
+      setCurrentValue({ [key]: String(newValue) })
 
       if (newValue === '') {
         filterControl.removeFilter(name)
@@ -65,10 +56,10 @@ const TotalCredits = ({ filterControl }) => {
         filterControl.addFilter(name, filterFunctions(newValue)[key])
       }
     })
-  }, [externalValue])
+  }, [requestedValue])
 
-  const onChange = key => (_, { value: inputValue }) => {
-    setValue(prev => ({ ...prev, [key]: inputValue }))
+  const onChange = key => (_, { value }) => {
+    setCurrentValue({ [key]: value })
     setUpdatedAt(prev => ({ ...prev, [key]: now() }))
   }
 
@@ -81,7 +72,7 @@ const TotalCredits = ({ filterControl }) => {
   }
 
   const onClear = key => () => {
-    setValue(prev => ({ ...prev, [key]: '' }))
+    setCurrentValue({ [key]: '' })
     setUpdatedAt(prev => ({ ...prev, [key]: null }))
     filterControl.removeFilter(names[key])
   }
@@ -93,13 +84,13 @@ const TotalCredits = ({ filterControl }) => {
   return (
     <FilterCard title="Total Credits" active={active}>
       <Form>
-        {Object.keys(value).map(key => (
+        {Object.keys(currentValue).map(key => (
           <Form.Field key={`total-credits-filter-${key}`}>
             <NumericInput
               onChange={onChange(key)}
               onKeyDown={onKeyDown(key)}
               onClear={onClear(key)}
-              value={value[key]}
+              value={currentValue[key]}
               label={labels[key]}
               clearButtonDisabled={clearButtonDisabled(key)}
             />
