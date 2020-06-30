@@ -9,7 +9,9 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
-import { CourseFilterProvider } from './filters/Courses/useCourseFilter'
+import FilterContextProvider from './FilterContextProvider'
+import GradeMean from './filters/GradeMean'
+import StartingSemester from './filters/StartingSemester'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [clickSaver] = useStore('clickSaver')
@@ -39,7 +41,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
   const noFilters = Object.keys(activeFilters).length
 
   return (
-    <CourseFilterProvider>
+    <FilterContextProvider>
       <Sidebar open={open}>
         <Sidebar.Pusher>
           <Card.Group id="filter-tray">
@@ -70,6 +72,8 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
             <Gender filterControl={filterControl} />
             <StartYearAtUni filterControl={filterControl} />
             <Courses filterControl={filterControl} />
+            <GradeMean filterControl={filterControl} />
+            <StartingSemester filterControl={filterControl} />
           </Card.Group>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)}>
@@ -105,7 +109,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <Icon name="angle double down" />
         </Button>
       </div>
-    </CourseFilterProvider>
+    </FilterContextProvider>
   )
 }
 

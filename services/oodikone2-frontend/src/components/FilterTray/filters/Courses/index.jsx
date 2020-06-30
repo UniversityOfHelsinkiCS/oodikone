@@ -15,7 +15,7 @@ const Courses = ({ filterControl, language }) => {
   // Wrestle course stats into something semantic-ui eats without throwing up.
   const options = courseStats
     .filter(course => course.stats.students > Math.round(filterControl.filteredStudents.length * 0.3))
-    .filter(course => !selectedCourses.includes(course))
+    .filter(course => !selectedCourses.some(c => c.course.code === course.course.code))
     .map(course => ({
       key: `course-filter-option-${course.course.code}`,
       text: getTextIn(course.course.name, language),
@@ -23,7 +23,7 @@ const Courses = ({ filterControl, language }) => {
     }))
 
   return (
-    <FilterCard title="Courses">
+    <FilterCard title="Courses" active={!!selectedCourses.length}>
       <Dropdown
         options={options}
         placeholder="Select Course to Filter By"
