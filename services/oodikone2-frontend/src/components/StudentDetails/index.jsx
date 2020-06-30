@@ -53,8 +53,7 @@ const StudentDetails = ({
   pending,
   error,
   fetching,
-  clearCourseStats,
-  isAdmin
+  clearCourseStats
 }) => {
   const [graphYearStart, setGraphYear] = useState(null)
   const [degreename, setDegreename] = useState('')
@@ -655,13 +654,7 @@ const StudentDetails = ({
       <Tab panes={panes} />
       {renderTags()}
       {renderStudyRights()}
-      {isAdmin && (
-        <BachelorHonours
-          student={student}
-          programmes={degreesAndProgrammes.programmes}
-          absentYears={getAbsentYears()}
-        />
-      )}
+      <BachelorHonours student={student} programmes={degreesAndProgrammes.programmes} absentYears={getAbsentYears()} />
       {renderCourseParticipation()}
     </Segment>
   )
@@ -705,7 +698,6 @@ StudentDetails.propTypes = {
   error: bool.isRequired,
   fetching: bool.isRequired,
   getSemesters: func.isRequired,
-  isAdmin: bool.isRequired,
   getDegreesAndProgrammes: func.isRequired,
   semesters: shape({
     semesters: shape({}),
