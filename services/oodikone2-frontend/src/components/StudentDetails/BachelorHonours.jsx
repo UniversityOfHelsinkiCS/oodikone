@@ -125,10 +125,10 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       <Divider horizontal style={{ padding: '20px' }}>
         <Header as="h4">Bachelor Honours</Header>
       </Divider>
-      <Header as="h5">Applicable</Header>
+      <Header as="h5">Qualified</Header>
       <Label
         tag
-        content={honors ? 'Applicable for Honours' : 'Not Applicable for Honours'}
+        content={honors ? 'Qualified for Honours' : 'Not qualified for Honours'}
         color={honors ? 'green' : 'red'}
       />
       {otherModules.length > 0 ? <Label tag content="Might need further inspection" color="blue" /> : null}
