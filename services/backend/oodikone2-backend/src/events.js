@@ -267,15 +267,18 @@ const refreshProtoCtoRedis = async () => {
 const refreshStatusToRedis = async () => {
   try {
     const unixMillis = moment().valueOf()
+    const date = new Date(Number(unixMillis))
+
+    date.setHours(23, 59, 59, 999)
     const showByYearOff = 'false'
     const showByYear = 'true'
     console.log('Refreshing CDS Status')
-    await refreshStatus(unixMillis, showByYearOff)
-    await refreshStatus(unixMillis, showByYear)
+    await refreshStatus(date.getTime(), showByYearOff)
+    await refreshStatus(date.getTime(), showByYear)
 
     console.log('Refreshing CDS Graduated')
-    await refreshStatusGraduated(unixMillis, showByYearOff)
-    await refreshStatusGraduated(unixMillis, showByYear)
+    await refreshStatusGraduated(date.getTime(), showByYearOff)
+    await refreshStatusGraduated(date.getTime(), showByYear)
   } catch (e) {
     console.log(e)
   }
