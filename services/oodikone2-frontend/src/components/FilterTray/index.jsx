@@ -10,7 +10,6 @@ import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
 import FilterContextProvider from './FilterContextProvider'
-import GradeMean from './filters/GradeMean'
 import StartingSemester from './filters/StartingSemester'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
@@ -72,7 +71,6 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
             <Gender filterControl={filterControl} />
             <StartYearAtUni filterControl={filterControl} />
             <Courses filterControl={filterControl} />
-            <GradeMean filterControl={filterControl} />
             <StartingSemester filterControl={filterControl} />
           </Card.Group>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
