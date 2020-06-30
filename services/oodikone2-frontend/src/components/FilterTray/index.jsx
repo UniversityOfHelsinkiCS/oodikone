@@ -71,7 +71,6 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
             <Gender filterControl={filterControl} />
             <StartYearAtUni filterControl={filterControl} />
             <Courses filterControl={filterControl} />
-            <StartingSemester filterControl={filterControl} />
           </Card.Group>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)}>
