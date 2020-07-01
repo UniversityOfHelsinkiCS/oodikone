@@ -2,11 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Table, Icon, Popup, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { useStore } from 'react-hookstore'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
+import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const verticalTitle = title => {
   // https://stackoverflow.com/a/41396815
@@ -26,7 +26,7 @@ const Students = () => {
   const [page, setPage] = useState(0)
   const [visible, setVisible] = useState({})
   const [modules, setModules] = useState([])
-  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
 
   useEffect(() => {

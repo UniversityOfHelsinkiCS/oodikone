@@ -4,7 +4,6 @@ import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { func, bool, shape, arrayOf, string, any } from 'prop-types'
 import { Header, Segment, Divider, Form } from 'semantic-ui-react'
 import { intersection, flattenDeep } from 'lodash'
-import { createStore, useStore } from 'react-hookstore'
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails'
@@ -16,10 +15,7 @@ import { getUserIsAdmin, flattenStudyrights, getTotalCreditsFromCourses } from '
 import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
-
-createStore('mandatoryToggle', window.localStorage.getItem('oodikoneMandatoryToggle') === 'true')
-createStore('filterFeatToggle', window.localStorage.getItem('oodikoneFilterFeatToggle') === 'true')
-createStore('clickSaver', window.localStorage.getItem('oodikoneClickSaver') === 'true')
+import useFeatureToggle from '../../common/useFeatureToggle'
 
 const PopulationStatistics = memo(props => {
   const {
@@ -38,9 +34,9 @@ const PopulationStatistics = memo(props => {
     students
   } = props
   const [filteredStudents, setFilteredStudents] = useState(students)
-  const [mandatoryToggle, setMandatoryToggle] = useStore('mandatoryToggle')
-  const [filterFeatToggle, setFilterFeatToggle] = useStore('filterFeatToggle')
-  const [clickSaver, setClickSaver] = useStore('clickSaver')
+  const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
+  const [filterFeatToggle, , toggleFilterFeature] = useFeatureToggle('filterFeatToggle')
+  const [clickSaver, , toggleClickSaver] = useFeatureToggle('clickSaver')
   const [excluded, setExcluded] = useState([])
 
   const { onProgress, progress } = useProgress(loading)
@@ -99,34 +95,17 @@ const PopulationStatistics = memo(props => {
                     id="accordion-toggle"
                     checked={mandatoryToggle}
                     toggle
-                    onClick={() => {
-                      const newVal = !mandatoryToggle
-                      setMandatoryToggle(newVal)
-                      localStorage.setItem('oodikoneMandatoryToggle', newVal)
-                    }}
+                    onClick={toggleMandatoryToggle}
                     label="Toggle Mandatory Courses"
                   />
                   <Form.Radio
                     checked={filterFeatToggle}
                     toggle
-                    onClick={() => {
-                      const newVal = !filterFeatToggle
-                      setFilterFeatToggle(newVal)
-                      localStorage.setItem('oodikoneFilterFeatToggle', newVal)
-                    }}
+                    onClick={toggleFilterFeature}
                     label="Toggle New Filters"
                   />
                   {filterFeatToggle && (
-                    <Form.Radio
-                      checked={clickSaver}
-                      toggle
-                      onClick={() => {
-                        const newVal = !clickSaver
-                        setClickSaver(newVal)
-                        localStorage.setItem('oodikoneClickSaver', newVal)
-                      }}
-                      label="Save Precious Clicks"
-                    />
+                    <Form.Radio checked={clickSaver} toggle onClick={toggleClickSaver} label="Save Precious Clicks" />
                   )}
                 </Form.Group>
               </Form>

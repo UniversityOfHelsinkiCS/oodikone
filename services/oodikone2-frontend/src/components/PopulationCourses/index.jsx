@@ -4,7 +4,6 @@ import { func, shape, arrayOf, string, bool } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
-import { useStore } from 'react-hookstore'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
@@ -12,6 +11,7 @@ import infotooltips from '../../common/InfoToolTips'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { refreshFilters } from '../../redux/populationFilters'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
+import useFeatureToggle from '../../common/useFeatureToggle'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
@@ -26,7 +26,7 @@ const PopulationCourses = ({
   accordionView,
   filteredStudents
 }) => {
-  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { setCourses: setCourseFilterData } = useCourseFilter()
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data

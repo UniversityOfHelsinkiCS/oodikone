@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
-import { useStore } from 'react-hookstore'
+import useFeatureToggle from '../../../../common/useFeatureToggle'
 
 const FilterCard = ({ title, children, footer, active, className }) => {
-  const [clickSaver] = useStore('clickSaver')
+  const [clickSaver] = useFeatureToggle('clickSaver')
   const [open, setOpen] = useState(clickSaver)
 
   return (
