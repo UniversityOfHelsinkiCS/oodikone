@@ -1,3 +1,8 @@
+/**
+ * This filter clones the functionality of the old StartingThisSemester filter. However,
+ * the new "Starting Year at University" filter offers essentially the same functionality
+ * and more. Thus, this component is :deprekoitu: but left here for possible future use.
+ */
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Form, Radio } from 'semantic-ui-react'
@@ -20,8 +25,8 @@ const StartingSemester = ({ filterControl }) => {
   const count = starting => withoutFilter(name).filter(student => student.starting === starting).length
 
   const options = [
-    { key: 'during-this-semester', text: `During This Semester (${count(true)})`, value: 1 },
-    { key: 'before-this-semester', text: `Before This Semester (${count(false)})`, value: 2 }
+    { key: 'during-this-semester', text: `During (${count(true)})`, value: 1 },
+    { key: 'before-this-semester', text: `Before (${count(false)})`, value: 2 }
   ]
 
   return (
@@ -31,7 +36,7 @@ const StartingSemester = ({ filterControl }) => {
       active={Object.keys(activeFilters).includes(name)}
     >
       <Form>
-        <div className="description-text">Show students who started:</div>
+        <div className="description-text">Show students who started...</div>
         {options.map(opt => (
           <Form.Field key={opt.key}>
             <Radio
@@ -42,6 +47,7 @@ const StartingSemester = ({ filterControl }) => {
             />
           </Form.Field>
         ))}
+        <div className="description-text">...selected semester.</div>
       </Form>
     </FilterCard>
   )
