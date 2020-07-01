@@ -30,6 +30,7 @@ import InfoBox from '../InfoBox'
 
 // Copy-pasted from population stats to make new filters not break custom population.
 createStore('filterFeatToggle', window.localStorage.getItem('oodikoneFilterFeatToggle') === 'true')
+createStore('mandatoryToggle', window.localStorage.getItem('oodikoneMandatoryToggle') === 'true')
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
