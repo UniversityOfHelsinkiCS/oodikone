@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Form, Radio } from 'semantic-ui-react'
+import { Form, Dropdown } from 'semantic-ui-react'
 import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
 
@@ -8,6 +8,13 @@ const Gender = ({ filterControl }) => {
   const { addFilter, removeFilter, withoutFilter, activeFilters } = filterControl
   const [value, setValue] = useState(null)
   const name = 'gender'
+
+  const genderCodes = {
+    female: { label: 'Female', value: 2 },
+    male: { label: 'Male', value: 1 },
+    other: { label: 'Other', value: 9 },
+    unknown: { label: 'Unknown', value: 0 }
+  }
 
   useEffect(() => {
     if (!value) {
@@ -23,13 +30,13 @@ const Gender = ({ filterControl }) => {
     countsByGender[gc] = countsByGender[gc] ? countsByGender[gc] + 1 : 1
   })
 
-  // Using this prevents showing undefined.
-  const formatCount = count => (count ? `(${count})` : '')
+  const count = genderCode => withoutFilter(name).filter(student => student.gender_code === genderCode).length
 
-  const options = [
-    { key: 'female', text: `Female ${formatCount(countsByGender[2])}`, value: 2 },
-    { key: 'male', text: `Male ${formatCount(countsByGender[1])}`, value: 1 }
-  ]
+  const options = Object.entries(genderCodes).map(([key, gender]) => ({
+    key,
+    text: `${gender.label} (${count(gender.value)})`,
+    value: gender.value
+  }))
 
   return (
     <FilterCard
@@ -38,16 +45,16 @@ const Gender = ({ filterControl }) => {
       active={Object.keys(activeFilters).includes(name)}
     >
       <Form>
-        {options.map(opt => (
-          <Form.Field key={opt.key}>
-            <Radio
-              label={opt.text}
-              value={opt.value}
-              checked={value === opt.value}
-              onChange={(_, { value: inputValue }) => setValue(inputValue)}
-            />
-          </Form.Field>
-        ))}
+        <Dropdown
+          options={options}
+          value={value}
+          onChange={(_, { value: inputValue }) => setValue(inputValue)}
+          placeholder="Choose Gender"
+          className="mini"
+          selection
+          fluid
+          button
+        />
       </Form>
     </FilterCard>
   )
