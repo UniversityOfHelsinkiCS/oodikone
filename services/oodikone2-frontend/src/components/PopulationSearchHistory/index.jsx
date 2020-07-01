@@ -245,6 +245,15 @@ class PopulationSearchHistory extends Component {
             checked={studentStatuses.includes('NONDEGREE')}
             onChange={this.handleStudentStatusSelection}
           />
+          <Form.Checkbox
+            className="populationStatisticsRadio"
+            key="TRANSFERRED"
+            label="Transferred from students"
+            value="TRANSFERRED"
+            name="studentStatusGroup"
+            checked={studentStatuses.includes('TRANSFERRED')}
+            onChange={this.handleStudentStatusSelection}
+          />
         </Form.Field>
         <Button onClick={this.pushQueryToUrl}>Fetch population with new settings</Button>
       </Form.Group>
