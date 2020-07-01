@@ -159,3 +159,12 @@
   padding-bottom: 1rem;
   font-style: italic;
 }
+
+#filter-tray .total-credits-filter .description {
+  margin-left: -4px;
+}
+
+#filter-tray .total-credits-filter .form {
+  position: relative;
+  left: 3px;
+}
