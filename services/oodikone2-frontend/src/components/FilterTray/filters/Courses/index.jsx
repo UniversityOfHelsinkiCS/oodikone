@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Dropdown, Card } from 'semantic-ui-react'
+import { Card } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import FilterCard from '../common/FilterCard'
@@ -8,6 +8,7 @@ import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 import './courseFilter.css'
+import DropdownWithUnfuckedPlaceholder from './DropdownWithUnfuckedPlaceholder'
 
 const Courses = ({ filterControl, language }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
@@ -23,18 +24,12 @@ const Courses = ({ filterControl, language }) => {
     }))
 
   return (
-    <FilterCard title="Courses" active={!!selectedCourses.length}>
-      <Dropdown
+    <FilterCard title="Courses" active={!!selectedCourses.length} className="courses-filter">
+      <DropdownWithUnfuckedPlaceholder
         options={options}
         placeholder="Select Course to Filter By"
-        selection
-        className="mini course-filter-selection"
-        fluid
-        button
-        value={[]}
+        className="course-filter-selection"
         onChange={(_, { value }) => toggleCourseSelection(value[0])}
-        multiple
-        closeOnChange
       />
       <Card.Group>
         {selectedCourses.map(course => (
