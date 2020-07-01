@@ -4,12 +4,12 @@ import { replace, sortBy, omit } from 'lodash'
 import { Link } from 'react-router-dom'
 import { shape, string } from 'prop-types'
 import { useSelector } from 'react-redux'
-import { useStore } from 'react-hookstore'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
+import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const gradeTypes = [1, 2, 3, 4, 5]
 
@@ -26,7 +26,7 @@ const formatGradeDistribution = grades =>
 
 const CourseRow = ({ courseStatistics }) => {
   const { language } = useSelector(({ settings }) => settings)
-  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
 
   const { isActiveCourse, onCourseNameCellClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
