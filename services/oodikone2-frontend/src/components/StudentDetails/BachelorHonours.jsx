@@ -17,9 +17,12 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
   useEffect(() => {
     const bachelorStudyrights = student.studyrights.filter(sr => sr.extentcode === 1)
     const newestBachelorProgramme = getNewestProgramme(bachelorStudyrights, student.studentNumber, null, programmes)
+    const studyrightWithNewestProgramme = bachelorStudyrights.find(sr =>
+      sr.studyright_elements.map(srE => srE.code).includes(newestBachelorProgramme.code)
+    )
+    setStartDate(moment(studyrightWithNewestProgramme.startdate))
 
     // currently only for matlu
-    setStartDate(moment(newestBachelorProgramme.startdate))
     const shouldRender = [
       'KH50_001',
       'KH50_002',
@@ -62,8 +65,9 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
         const diff = moment.duration(end.diff(start)).asYears()
         return acc + diff
       }, 0)
-
-      inTime = yearsForGraduation <= 3 + timeAbsent.toFixed(1)
+      // round because absent count too accurate i.e. if a person has been absent a whole year
+      // timeAbsent = 0.99... or something similar < 1 so in the name of fairness round a bit.
+      inTime = yearsForGraduation <= 3 + Math.round(timeAbsent * 10) / 10
     }
 
     if (attainedModules.length > 3) {
