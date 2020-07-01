@@ -65,8 +65,9 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
         const diff = moment.duration(end.diff(start)).asYears()
         return acc + diff
       }, 0)
-
-      inTime = yearsForGraduation <= (3 + timeAbsent).toFixed(1)
+      // round because absent count too accurate i.e. if a person has been absent a whole year
+      // timeAbsent = 0.99... or something similar < 1 so in the name of fairness round a bit.
+      inTime = yearsForGraduation <= 3 + Math.round(timeAbsent * 10) / 10
     }
 
     if (attainedModules.length > 3) {
