@@ -149,7 +149,6 @@ const CoursePopulation = ({
                   </span>
                 }
                 position="top center"
-                offset="0, 50px"
                 wide="very"
               >
                 <Popup.Content>
@@ -195,7 +194,6 @@ const CoursePopulation = ({
                   </span>
                 }
                 position="top center"
-                offset="0, 50px"
                 wide="very"
               >
                 <Popup.Content>
@@ -239,7 +237,6 @@ const CoursePopulation = ({
                   </span>
                 }
                 position="top center"
-                offset="0, 50px"
                 wide="very"
               >
                 <Popup.Content>
@@ -285,7 +282,6 @@ const CoursePopulation = ({
                   </span>
                 }
                 position="top center"
-                offset="0, 50px"
                 wide="very"
               >
                 <Popup.Content>
