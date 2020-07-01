@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { Table, Form, Input, Tab } from 'semantic-ui-react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
@@ -44,7 +44,7 @@ const lodashSortOrderTypes = {
   DESC: 'desc'
 }
 
-function updateCourseStatisticsCriteria(props, state) {
+function updateCourseStatisticsCriteria(props, state, mandatoryCourses, mandatoryToggle) {
   const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
   const {
     courses: { coursestatistics },
@@ -64,10 +64,16 @@ function updateCourseStatisticsCriteria(props, state) {
     return name[language].toLowerCase().includes(nameFilter.toLowerCase())
   }
 
+  const mandatoryFilter = ({ course }) => {
+    return mandatoryCourses.some(c => c.code === course.code)
+  }
+
+  const puimuri = mandatoryToggle ? mandatoryFilter : studentAmountFilter
+
   const filteredCourses =
     coursestatistics &&
     coursestatistics
-      .filter(studentAmountFilter)
+      .filter(puimuri)
       .filter(c => !codeFilter || courseCodeFilter(c))
       .filter(c => !nameFilter || courseNameFilter(c))
 
@@ -94,9 +100,12 @@ const initialState = props => ({
 
 function PopulationCourseStats(props) {
   const [state, setState] = useState(initialState(props))
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+
   const [courseStatistics, setCourseStatistics] = useState(updateCourseStatisticsCriteria(props, initialState(props)))
   const [timer, setTimer] = useState(null)
   const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [mandatoryToggle] = useStore('mandatoryToggle')
   const { toggleCourseSelection } = useCourseFilter()
 
   useEffect(() => {
@@ -112,7 +121,7 @@ function PopulationCourseStats(props) {
         studentAmountLimit,
         selectedStudentsLength: props.selectedStudents.length
       })
-      setCourseStatistics(updateCourseStatisticsCriteria(props, state))
+      setCourseStatistics(updateCourseStatisticsCriteria(props, state, mandatoryCourses, mandatoryToggle))
     }
   }, [props.courses, props.selectedStudents])
 
@@ -135,12 +144,22 @@ function PopulationCourseStats(props) {
       return name[language].toLowerCase().includes(nameFilter.toLowerCase())
     }
 
+    const mandatoryFilter = ({ course }) => {
+      return mandatoryCourses.some(c => c.code === course.code && c.visible.visibility)
+    }
+
+    const puimuri = mandatoryToggle ? mandatoryFilter : studentAmountFilter
+
     const filteredCourses =
       coursestatistics &&
       coursestatistics
-        .filter(studentAmountFilter)
+        .filter(puimuri)
         .filter(c => !codeFilter || courseCodeFilter(c))
         .filter(c => !nameFilter || courseNameFilter(c))
+        .map(c => {
+          const course = mandatoryCourses.find(mc => mc.code === c.course.code)
+          return { ...c, ...course }
+        })
 
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
 
@@ -151,7 +170,7 @@ function PopulationCourseStats(props) {
     )
 
     setCourseStatistics(sortedStatistics)
-  }, [state.studentAmountLimit, state.codeFilter, state.nameFilter])
+  }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, mandatoryCourses])
 
   const onFilterChange = (e, field) => {
     const {
@@ -314,7 +333,7 @@ function PopulationCourseStats(props) {
     }
   ]
 
-  if (isAdmin) {
+  if (isAdmin && mandatoryToggle) {
     panes.push({
       menuItem: 'students',
       render: () => (
@@ -338,12 +357,14 @@ function PopulationCourseStats(props) {
   }
   return (
     <div>
-      <Form>
-        <Form.Field inline>
-          <label>{translate('populationCourses.limit')}</label>
-          <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
-        </Form.Field>
-      </Form>
+      {!mandatoryToggle && (
+        <Form>
+          <Form.Field inline>
+            <label>{translate('populationCourses.limit')}</label>
+            <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
+          </Form.Field>
+        </Form>
+      )}
       <PopulationCourseContext.Provider value={contextValue}>
         <Tab panes={panes} />
       </PopulationCourseContext.Provider>

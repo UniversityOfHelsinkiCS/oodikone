@@ -31,12 +31,13 @@ const Students = () => {
 
   useEffect(() => {
     const modules = {}
-    mandatoryCourses.forEach(course => {
+
+    courseStatistics.forEach(course => {
       const code = course.label_code
       if (!modules[code]) {
         modules[code] = []
       }
-      if (course.visible.visibility) modules[code].push(course)
+      modules[code].push(course)
     })
     const collapsed = {}
     Object.keys(modules).forEach(m => {
@@ -51,7 +52,7 @@ const Students = () => {
         .map(([module, courses]) => ({ module, courses, module_order: courses[0].module_order }))
         .sort((a, b) => a.module_order - b.module_order)
     )
-  }, [mandatoryCourses])
+  }, [mandatoryCourses, courseStatistics])
 
   const hasCompleted = (courseCode, student) => {
     const course = courseStatistics.find(c => c.course.code === courseCode)
