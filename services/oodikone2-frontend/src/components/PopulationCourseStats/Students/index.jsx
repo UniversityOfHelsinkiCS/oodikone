@@ -46,7 +46,11 @@ const Students = () => {
       collapsed[m] = true
     })
     setCollapsed(collapsed)
-    setModules(Object.entries(modules).sort((a, b) => a[1][0].module_order - b[1][0].module_order))
+    setModules(
+      Object.entries(modules)
+        .map(([module, courses]) => ({ module, courses, module_order: courses[0].module_order }))
+        .sort((a, b) => a.module_order - b.module_order)
+    )
   }, [mandatoryCourses])
 
   const hasCompleted = (courseCode, student) => {
@@ -133,7 +137,7 @@ const Students = () => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {modules.map(([module, courses]) => (
+          {modules.map(({ module, courses }) => (
             <>
               <Table.Row>
                 <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleCollapse(module)}>
