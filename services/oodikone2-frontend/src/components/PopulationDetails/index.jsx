@@ -124,7 +124,6 @@ class PopulationDetails extends Component {
                     </span>
                   }
                   position="top center"
-                  offset="0, 50px"
                   wide="very"
                 >
                   <Popup.Content>
@@ -156,7 +155,6 @@ class PopulationDetails extends Component {
                     </span>
                   }
                   position="top center"
-                  offset="0, 50px"
                   wide="very"
                 >
                   <Popup.Content>
@@ -199,7 +197,6 @@ class PopulationDetails extends Component {
                     </span>
                   }
                   position="top center"
-                  offset="0, 50px"
                   wide="very"
                 >
                   <Popup.Content>
@@ -242,7 +239,6 @@ class PopulationDetails extends Component {
                     </span>
                   }
                   position="top center"
-                  offset="0, 50px"
                   wide="very"
                 >
                   <Popup.Content>

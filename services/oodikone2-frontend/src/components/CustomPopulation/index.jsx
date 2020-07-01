@@ -221,7 +221,6 @@ const CustomPopulation = ({
                   </span>
                 }
                 position="top center"
-                offset="0, 50px"
                 wide="very"
               >
                 <Popup.Content>
@@ -265,7 +264,6 @@ const CustomPopulation = ({
                   </span>
                 }
                 position="top center"
-                offset="0, 50px"
                 wide="very"
               >
                 <Popup.Content>
@@ -305,7 +303,6 @@ const CustomPopulation = ({
                   </span>
                 }
                 position="top center"
-                offset="0, 50px"
                 wide="very"
               >
                 <Popup.Content>
@@ -344,7 +341,6 @@ const CustomPopulation = ({
                   </span>
                 }
                 position="top center"
-                offset="0, 50px"
                 wide="very"
               >
                 <Popup.Content>
