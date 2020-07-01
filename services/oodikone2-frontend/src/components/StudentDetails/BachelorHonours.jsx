@@ -17,9 +17,12 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
   useEffect(() => {
     const bachelorStudyrights = student.studyrights.filter(sr => sr.extentcode === 1)
     const newestBachelorProgramme = getNewestProgramme(bachelorStudyrights, student.studentNumber, null, programmes)
+    const studyrightWithNewestProgramme = bachelorStudyrights.find(sr =>
+      sr.studyright_elements.map(srE => srE.code).includes(newestBachelorProgramme.code)
+    )
+    setStartDate(moment(studyrightWithNewestProgramme.startdate))
 
     // currently only for matlu
-    setStartDate(moment(newestBachelorProgramme.startdate))
     const shouldRender = [
       'KH50_001',
       'KH50_002',
@@ -63,7 +66,7 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
         return acc + diff
       }, 0)
 
-      inTime = yearsForGraduation <= 3 + timeAbsent.toFixed(1)
+      inTime = yearsForGraduation <= (3 + timeAbsent).toFixed(1)
     }
 
     if (attainedModules.length > 3) {
