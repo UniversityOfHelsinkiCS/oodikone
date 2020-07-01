@@ -10,7 +10,6 @@ import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
 import FilterContextProvider from './FilterContextProvider'
-import StartingSemester from './filters/StartingSemester'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [clickSaver] = useStore('clickSaver')
