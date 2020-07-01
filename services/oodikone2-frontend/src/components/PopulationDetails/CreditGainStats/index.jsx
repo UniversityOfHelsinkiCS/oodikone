@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { Tab, Header } from 'semantic-ui-react'
-import { useStore } from 'react-hookstore'
 import infotooltips from '../../../common/InfoToolTips'
 import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
@@ -9,9 +8,10 @@ import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
 import NewCreditsGainedTab from './NewCreditsGainedTab'
 import './creditGainStats.css'
+import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const CreditGainStats = ({ filteredStudents, translate }) => {
-  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { CreditStatistics } = infotooltips.PopulationStatistics
 
   const renderCreditsGainTab = useCallback(() => {

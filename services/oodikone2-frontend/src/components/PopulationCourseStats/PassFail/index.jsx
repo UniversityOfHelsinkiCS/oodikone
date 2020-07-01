@@ -2,16 +2,16 @@ import React from 'react'
 import { Table, Icon, Popup, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { useStore } from 'react-hookstore'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
+import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const PassFail = () => {
   const { language } = useSelector(({ settings }) => settings)
-  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
   const {
     courseStatistics,

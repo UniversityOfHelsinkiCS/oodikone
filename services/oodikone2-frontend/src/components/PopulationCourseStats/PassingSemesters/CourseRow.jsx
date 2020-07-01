@@ -3,11 +3,11 @@ import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
 import { Table, Popup } from 'semantic-ui-react'
 import { number, shape, string, func, bool } from 'prop-types'
-import { useStore } from 'react-hookstore'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import '../populationCourseStats.css'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
+import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
 const getCumulativeYearCount = (year, passingSemesters) => {
@@ -65,7 +65,7 @@ const renderCumulativeStatistics = passingSemesters => (
 )
 
 const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn, activeLanguage }) => {
-  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
   const { stats, course } = statistics
   const passingSemesters = cumulative ? stats.passingSemestersCumulative : stats.passingSemesters

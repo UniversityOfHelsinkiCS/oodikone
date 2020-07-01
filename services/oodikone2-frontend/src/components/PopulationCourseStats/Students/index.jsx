@@ -2,11 +2,11 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Table, Icon, Popup, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { useStore } from 'react-hookstore'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
+import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const verticalTitle = title => {
   // https://stackoverflow.com/a/41396815
@@ -24,34 +24,34 @@ const Students = () => {
   const { language } = useSelector(({ settings }) => settings)
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [page, setPage] = useState(0)
-  const [collapsed, setCollapsed] = useState({})
+  const [visible, setVisible] = useState({})
   const [modules, setModules] = useState([])
-  const [filterFeatToggle] = useStore('filterFeatToggle')
+  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
 
   useEffect(() => {
     const modules = {}
-    mandatoryCourses.forEach(course => {
+
+    courseStatistics.forEach(course => {
       const code = course.label_code
       if (!modules[code]) {
         modules[code] = []
       }
-      if (course.visible.visibility) modules[code].push(course)
+      modules[code].push(course)
     })
-    const collapsed = {}
+
     Object.keys(modules).forEach(m => {
       if (modules[m].length === 0) {
         delete modules[m]
       }
-      collapsed[m] = true
     })
-    setCollapsed(collapsed)
+
     setModules(
       Object.entries(modules)
         .map(([module, courses]) => ({ module, courses, module_order: courses[0].module_order }))
         .sort((a, b) => a.module_order - b.module_order)
     )
-  }, [mandatoryCourses])
+  }, [mandatoryCourses, courseStatistics])
 
   const hasCompleted = (courseCode, student) => {
     const course = courseStatistics.find(c => c.course.code === courseCode)
@@ -104,9 +104,9 @@ const Students = () => {
     }
   }
 
-  const toggleCollapse = code => {
-    const newState = !collapsed[code]
-    setCollapsed({ ...collapsed, [code]: newState })
+  const toggleVisible = code => {
+    const newState = !visible[code]
+    setVisible({ ...visible, [code]: newState })
   }
 
   const pagedStudents = students.slice(page * 10, page * 10 + 10)
@@ -140,8 +140,8 @@ const Students = () => {
           {modules.map(({ module, courses }) => (
             <>
               <Table.Row>
-                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleCollapse(module)}>
-                  <Icon name={collapsed[module] ? 'angle right' : 'angle down'} />
+                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module)}>
+                  <Icon name={visible[module] ? 'angle down' : 'angle right'} />
                   <b>{courses[0].label_name.fi}</b>
                 </Table.Cell>
                 <Table.Cell>
@@ -151,7 +151,7 @@ const Students = () => {
                   <Table.Cell>{countCompleted(courses, student.studentnumber)}</Table.Cell>
                 ))}
               </Table.Row>
-              {!collapsed[module] &&
+              {visible[module] &&
                 courses
                   .filter(c => c.visible.visibility)
                   .map(col => (

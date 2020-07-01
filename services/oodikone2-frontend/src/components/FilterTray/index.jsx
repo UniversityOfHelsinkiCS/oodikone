@@ -3,16 +3,16 @@ import PropTypes from 'prop-types'
 import lodash from 'lodash'
 import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
-import { useStore } from 'react-hookstore'
 import TotalCredits from './filters/TotalCredits'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
 import FilterContextProvider from './FilterContextProvider'
+import useFeatureToggle from '../../common/useFeatureToggle'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
-  const [clickSaver] = useStore('clickSaver')
+  const [clickSaver] = useFeatureToggle('clickSaver')
   const [open, setOpen] = useState(clickSaver)
 
   const [activeFilters, setActiveFilters] = useState({})
