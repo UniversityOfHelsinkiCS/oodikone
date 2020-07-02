@@ -12,7 +12,7 @@ import { BASE_PATH } from './constants'
 import store from './store'
 import ErrorBoundary from './components/ErrorBoundary'
 import Main from './components/Main'
-import { FeatureToggleProvider } from './common/useFeatureToggle'
+import CommonContext from './CommonContext';
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 
@@ -30,11 +30,11 @@ try {
 
 ReactDOM.render(
   <Provider store={store}>
-    <FeatureToggleProvider>
+    <CommonContext>
       <ErrorBoundary>
         <Main />
       </ErrorBoundary>
-    </FeatureToggleProvider>
+    </CommonContext>
   </Provider>,
   document.getElementById('root')
 )

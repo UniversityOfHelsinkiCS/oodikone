@@ -41,6 +41,7 @@ const Gender = ({ filterControl }) => {
   return (
     <FilterCard
       title="Gender"
+      contextKey="genderFilter"
       footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} />}
       active={Object.keys(activeFilters).includes(name)}
     >

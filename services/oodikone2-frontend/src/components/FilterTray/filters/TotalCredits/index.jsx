@@ -6,6 +6,8 @@ import FilterCard from '../common/FilterCard'
 import NumericInput from '../common/NumericInput'
 import useCreditFilter from './useCreditFilter'
 
+export const contextKey = 'creditFilter'
+
 const TotalCredits = ({ filterControl }) => {
   const { currentValue, requestedValue, setCurrentValue } = useCreditFilter()
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
@@ -82,7 +84,7 @@ const TotalCredits = ({ filterControl }) => {
   const active = Object.values(names).some(name => Object.keys(filterControl.activeFilters).includes(name))
 
   return (
-    <FilterCard title="Total Credits" active={active} className="total-credits-filter">
+    <FilterCard title="Total Credits" active={active} className="total-credits-filter" contextKey={contextKey}>
       <Form>
         {Object.keys(currentValue).map(key => (
           <Form.Field key={`total-credits-filter-${key}`}>
