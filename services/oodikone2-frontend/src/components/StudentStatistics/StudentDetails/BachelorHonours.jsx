@@ -15,28 +15,31 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
   const [render, setRender] = useState(false)
 
   useEffect(() => {
-    const bachelorStudyrights = student.studyrights.filter(sr => sr.extentcode === 1)
-    const newestBachelorProgramme = getNewestProgramme(bachelorStudyrights, student.studentNumber, null, programmes)
-    const studyrightWithNewestProgramme = bachelorStudyrights.find(sr =>
-      sr.studyright_elements.map(srE => srE.code).includes(newestBachelorProgramme.code)
-    )
-    setStartDate(moment(studyrightWithNewestProgramme.startdate))
+    if (programmes) {
+      const bachelorStudyrights = student.studyrights.filter(sr => sr.extentcode === 1)
+      const newestBachelorProgramme = getNewestProgramme(bachelorStudyrights, student.studentNumber, null, programmes)
+      const studyrightWithNewestProgramme = bachelorStudyrights.find(sr =>
+        sr.studyright_elements.map(srE => srE.code).includes(newestBachelorProgramme.code)
+      )
 
-    // currently only for matlu
-    const shouldRender = [
-      'KH50_001',
-      'KH50_002',
-      'KH50_003',
-      'KH50_004',
-      'KH50_005',
-      'KH50_006',
-      'KH50_007',
-      'KH50_008'
-    ].includes(newestBachelorProgramme.code)
+      if (studyrightWithNewestProgramme) setStartDate(moment(studyrightWithNewestProgramme.startdate))
 
-    if (shouldRender) getMandatoryCourseModulesDispatch(newestBachelorProgramme.code)
+      // currently only for matlu
+      const shouldRender = [
+        'KH50_001',
+        'KH50_002',
+        'KH50_003',
+        'KH50_004',
+        'KH50_005',
+        'KH50_006',
+        'KH50_007',
+        'KH50_008'
+      ].includes(newestBachelorProgramme.code)
 
-    setRender(shouldRender)
+      if (shouldRender) getMandatoryCourseModulesDispatch(newestBachelorProgramme.code)
+
+      setRender(shouldRender)
+    }
   }, [])
 
   useEffect(() => {
