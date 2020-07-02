@@ -7,8 +7,8 @@ import { Card, Tab, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import CoursesTab from './CoursesTab'
-import { getTextIn } from '../../common'
-import '../PopulationQueryCard/populationQueryCard.css'
+import { getTextIn } from '../../../common'
+import '../../PopulationQueryCard/populationQueryCard.css'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,

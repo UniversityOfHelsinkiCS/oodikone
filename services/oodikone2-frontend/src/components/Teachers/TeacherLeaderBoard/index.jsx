@@ -4,11 +4,11 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { func, arrayOf, bool, shape, any, string } from 'prop-types'
 import moment from 'moment'
-import { getTopTeachersCategories } from '../../redux/teachersTopCategories'
-import { getTopTeachers } from '../../redux/teachersTop'
+import { getTopTeachersCategories } from '../../../redux/teachersTopCategories'
+import { getTopTeachers } from '../../../redux/teachersTop'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import LeaderForm from './LeaderForm'
-import { callApi } from '../../apiConnection'
+import { callApi } from '../../../apiConnection'
 
 class TeacherLeaderBoard extends Component {
   state = {
