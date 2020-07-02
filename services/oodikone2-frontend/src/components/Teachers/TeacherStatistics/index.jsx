@@ -5,11 +5,11 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
-import { getProviders } from '../../redux/providers'
-import { getSemesters } from '../../redux/semesters'
-import { getTeacherStatistics } from '../../redux/teacherStatistics'
+import { getProviders } from '../../../redux/providers'
+import { getSemesters } from '../../../redux/semesters'
+import { getTeacherStatistics } from '../../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { getTextIn, getUserIsAdmin } from '../../common'
+import { getTextIn, getUserIsAdmin } from '../../../common'
 
 const initial = {
   semesterStart: null,

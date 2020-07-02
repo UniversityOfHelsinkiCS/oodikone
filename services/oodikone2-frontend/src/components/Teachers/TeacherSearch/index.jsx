@@ -4,10 +4,10 @@ import { func, arrayOf, object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import './teacherSearch.css'
-import { validateInputLength, splitByEmptySpace } from '../../common/index'
-import Timeout from '../Timeout'
-import { findTeachers } from '../../redux/teachers'
-import SortableTable from '../SortableTable'
+import { validateInputLength, splitByEmptySpace } from '../../../common/index'
+import Timeout from '../../Timeout'
+import { findTeachers } from '../../../redux/teachers'
+import SortableTable from '../../SortableTable'
 
 const DEFAULT_STATE = {
   searchterm: '',
