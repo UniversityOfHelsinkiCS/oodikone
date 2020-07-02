@@ -8,12 +8,18 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
-import FilterContextProvider from './FilterContextProvider'
 import useFeatureToggle from '../../common/useFeatureToggle'
+import useFilterTray from './useFilterTray'
+
+export const contextKey = 'filterTray'
 
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [clickSaver] = useFeatureToggle('clickSaver')
-  const [open, setOpen] = useState(clickSaver)
+  const [open, setOpen] = useFilterTray(contextKey)
+
+  useEffect(() => {
+    setOpen(clickSaver)
+  }, [])
 
   const [activeFilters, setActiveFilters] = useState({})
 
@@ -39,7 +45,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
   const noFilters = Object.keys(activeFilters).length
 
   return (
-    <FilterContextProvider>
+    <>
       <Sidebar open={open}>
         <Sidebar.Pusher>
           <Card.Group id="filter-tray">
@@ -105,7 +111,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <Icon name="angle double down" />
         </Button>
       </div>
-    </FilterContextProvider>
+    </>
   )
 }
 

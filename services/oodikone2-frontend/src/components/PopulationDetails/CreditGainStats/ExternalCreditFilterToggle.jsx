@@ -4,9 +4,14 @@ import { Popup, Button, Icon } from 'semantic-ui-react'
 import { useLocation } from 'react-router-dom'
 import { getMonths } from '../../../common/query'
 import useCreditFilter from '../../FilterTray/filters/TotalCredits/useCreditFilter'
+import { contextKey as filterTrayContextKey } from '../../FilterTray'
+import { contextKey as creditFilterContextKey } from '../../FilterTray/filters/TotalCredits'
+import useFilterTray from '../../FilterTray/useFilterTray'
 
 const ExternalCreditFilterToggle = ({ min, max }) => {
   const { currentValue: currentFilterValue, setRequestedValue } = useCreditFilter()
+  const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
+  const [, setCreditFilterOpen] = useFilterTray(creditFilterContextKey)
   const months = getMonths(useLocation())
   const limitedMax = max === 0 ? 1 : max
 
@@ -14,8 +19,15 @@ const ExternalCreditFilterToggle = ({ min, max }) => {
   const currentMax = currentFilterValue.max === '' ? null : Number(currentFilterValue.max)
   const active = currentMin === min && currentMax === limitedMax
 
-  const updateFilters = () =>
-    active ? setRequestedValue({ min: null, max: null }) : setRequestedValue({ min, max: limitedMax })
+  const updateFilters = () => {
+    if (active) {
+      setRequestedValue({ min: null, max: null })
+    } else {
+      setRequestedValue({ min, max: limitedMax })
+      setFilterTrayOpen(true)
+      setCreditFilterOpen(true)
+    }
+  }
 
   return (
     <Popup
