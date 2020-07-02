@@ -48,6 +48,10 @@ const PopulationQueryCard = ({ translate, population, query, removeSampleFn, uni
             {studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes '}
             students with non-degree study right
           </div>
+          <div>
+            {studentStatuses.includes('TRANSFERRED') ? 'Includes ' : 'Excludes '}
+            students who have transferred out of this programme
+          </div>
         </Card.Meta>
       </Card>
     )

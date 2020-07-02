@@ -6,13 +6,13 @@ import { connect } from 'react-redux'
 import { Search, Segment, Container } from 'semantic-ui-react'
 import moment from 'moment'
 
-import { findStudents, getStudent } from '../../redux/students'
-import SegmentDimmer from '../SegmentDimmer'
-import SortableTable from '../SortableTable'
-import Timeout from '../Timeout'
-import { makeFormatStudentRows } from '../../selectors/students'
+import { findStudents, getStudent } from '../../../redux/students'
+import SegmentDimmer from '../../SegmentDimmer'
+import SortableTable from '../../SortableTable'
+import Timeout from '../../Timeout'
+import { makeFormatStudentRows } from '../../../selectors/students'
 
-import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '../../common'
+import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '../../../common'
 
 const StudentSearch = ({
   getStudent,

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Segment, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, string, any, number } from 'prop-types'
-import { getTopTeachers } from '../../redux/teachersTop'
+import { getTopTeachers } from '../../../redux/teachersTop'
 
 class LeaderForm extends Component {
   componentDidMount() {
