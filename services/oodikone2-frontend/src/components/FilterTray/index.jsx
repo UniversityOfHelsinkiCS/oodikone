@@ -11,9 +11,11 @@ import Courses from './filters/Courses'
 import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from './useFilterTray'
 
+export const contextKey = 'filterTray'
+
 const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
   const [clickSaver] = useFeatureToggle('clickSaver')
-  const [open, setOpen] = useFilterTray('filterTray')
+  const [open, setOpen] = useFilterTray(contextKey)
 
   useEffect(() => {
     setOpen(clickSaver)

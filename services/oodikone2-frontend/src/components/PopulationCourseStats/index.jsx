@@ -18,6 +18,9 @@ import Students from './Students'
 import { getUserIsAdmin } from '../../common'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 import useFeatureToggle from '../../common/useFeatureToggle'
+import useFilterTray from '../FilterTray/useFilterTray'
+import { contextKey as filterTrayContextKey } from '../FilterTray'
+import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Courses'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
@@ -101,7 +104,8 @@ const initialState = props => ({
 function PopulationCourseStats(props) {
   const [state, setState] = useState(initialState(props))
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-
+  const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
+  const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
   const [courseStatistics, setCourseStatistics] = useState(updateCourseStatisticsCriteria(props, initialState(props)))
   const [timer, setTimer] = useState(null)
   const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
@@ -259,6 +263,8 @@ function PopulationCourseStats(props) {
       if (filterFeatToggle) {
         // Toggle new filters
         toggleCourseSelection(code)
+        setFilterTrayOpen(true)
+        setCourseFilterOpen(true)
       } else if (!isActiveCourse(courseStatistic.course)) {
         const params = { course: courseStatistic, field: 'all' }
         props.setPopulationFilter(courseParticipation(params))
