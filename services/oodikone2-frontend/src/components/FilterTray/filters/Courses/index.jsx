@@ -10,6 +10,8 @@ import useCourseFilter from './useCourseFilter'
 import './courseFilter.css'
 import DropdownWithUnfuckedPlaceholder from './DropdownWithUnfuckedPlaceholder'
 
+export const contextKey = 'coursesFilter'
+
 const Courses = ({ filterControl, language }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
 
@@ -24,7 +26,7 @@ const Courses = ({ filterControl, language }) => {
     }))
 
   return (
-    <FilterCard title="Courses" active={!!selectedCourses.length} className="courses-filter">
+    <FilterCard title="Courses" active={!!selectedCourses.length} className="courses-filter" contextKey={contextKey}>
       <DropdownWithUnfuckedPlaceholder
         options={options}
         placeholder="Select Course to Filter By"
