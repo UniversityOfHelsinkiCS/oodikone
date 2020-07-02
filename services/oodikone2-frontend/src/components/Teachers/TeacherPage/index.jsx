@@ -3,7 +3,7 @@ import { Redirect } from 'react-router-dom'
 import { shape, string, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
-import { getTeacher } from '../../redux/teachers'
+import { getTeacher } from '../../../redux/teachers'
 import TeacherDetails from '../TeacherDetails'
 
 class TeacherPage extends Component {

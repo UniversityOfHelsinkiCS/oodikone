@@ -4,14 +4,14 @@ import { Card, Icon, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import { reformatDate } from '../../common'
-import { studentDetailsType } from '../../constants/types'
-import { DISPLAY_DATE_FORMAT } from '../../constants'
+import { reformatDate } from '../../../common'
+import { studentDetailsType } from '../../../constants/types'
+import { DISPLAY_DATE_FORMAT } from '../../../constants'
 
 import './studentInfoCard.css'
 
-import { removeStudentSelection, resetStudent } from '../../redux/students'
-import { updatePopulationStudents } from '../../redux/populations'
+import { removeStudentSelection, resetStudent } from '../../../redux/students'
+import { updatePopulationStudents } from '../../../redux/populations'
 
 const StudentInfoCard = props => {
   const { student, translate, showName, updating } = props

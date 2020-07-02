@@ -22,17 +22,17 @@ import Highcharts from 'highcharts/highstock'
 import ReactHighcharts from 'react-highcharts'
 import { withRouter, Link } from 'react-router-dom'
 
-import { getStudent, removeStudentSelection, resetStudent } from '../../redux/students'
-import { getSemesters } from '../../redux/semesters'
+import { getStudent, removeStudentSelection, resetStudent } from '../../../redux/students'
+import { getSemesters } from '../../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
-import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import { byDateDesc, reformatDate, getTextIn, getUserIsAdmin } from '../../common'
-import { clearCourseStats } from '../../redux/coursestats'
-import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
-import SortableTable from '../SortableTable'
+import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
+import { byDateDesc, reformatDate, getTextIn, getUserIsAdmin } from '../../../common'
+import { clearCourseStats } from '../../../redux/coursestats'
+import { getDegreesAndProgrammes } from '../../../redux/populationDegreesAndProgrammes'
+import SortableTable from '../../SortableTable'
 import StudentCourseTable from '../StudentCourseTable'
 import BachelorHonours from './BachelorHonours'
-import TSA from '../../common/tsa'
+import TSA from '../../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Student stats'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
@@ -78,7 +78,11 @@ const StudentDetails = ({
 
   const getAbsentYears = () => {
     semesterenrollments.sort((a, b) => a.semestercode - b.semestercode)
-    const mappedSemesters = Object.values(semesters.semesters).reduce(
+    const acualSemesters = semesters.semesters
+
+    if (!acualSemesters) return []
+
+    const mappedSemesters = Object.values(acualSemesters).reduce(
       (acc, { semestercode, startdate, enddate }) => ({ ...acc, [semestercode]: { startdate, enddate } }),
       {}
     )
@@ -336,7 +340,7 @@ const StudentDetails = ({
 
   const renderStudyRights = () => {
     const { programmes } = degreesAndProgrammes
-    const programmeCodes = Object.keys(programmes)
+    const programmeCodes = programmes ? Object.keys(programmes) : []
     const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
     const studyRightRows = student.studyrights.map(studyright => {
       const degree = sortBy(studyright.studyright_elements, 'enddate').find(e => e.element_detail.type === 10)
@@ -654,7 +658,11 @@ const StudentDetails = ({
       <Tab panes={panes} />
       {renderTags()}
       {renderStudyRights()}
-      <BachelorHonours student={student} programmes={degreesAndProgrammes.programmes} absentYears={getAbsentYears()} />
+      <BachelorHonours
+        student={student}
+        programmes={degreesAndProgrammes.programmes || {}}
+        absentYears={getAbsentYears()}
+      />
       {renderCourseParticipation()}
     </Segment>
   )

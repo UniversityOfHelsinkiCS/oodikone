@@ -4,7 +4,7 @@ import { getActiveLanguage } from 'react-localize-redux'
 import { Tab, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, func, number, oneOfType } from 'prop-types'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { getTextIn } from '../../common'
+import { getTextIn } from '../../../common'
 
 const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
   <div>
