@@ -34,6 +34,7 @@ const StartYearAtUni = ({ filterControl }) => {
   return (
     <FilterCard
       title="Starting Year at University"
+      contextKey="startYearFilter"
       footer={<ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} />}
       active={Object.keys(activeFilters).includes(name)}
     >
