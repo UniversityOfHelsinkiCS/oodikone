@@ -4,8 +4,8 @@ import { shape, arrayOf, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { Divider, Table, Label, Header } from 'semantic-ui-react'
 
-import { getNewestProgramme, reformatDate } from '../../common'
-import { getMandatoryCourseModules } from '../../redux/populationMandatoryCourses'
+import { getNewestProgramme, reformatDate } from '../../../common'
+import { getMandatoryCourseModules } from '../../../redux/populationMandatoryCourses'
 
 const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatch, mandatoryModules, absentYears }) => {
   const [studentsModules, setModules] = useState([])
