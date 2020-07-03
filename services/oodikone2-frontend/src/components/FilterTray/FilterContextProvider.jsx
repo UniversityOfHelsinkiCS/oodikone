@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { CourseFilterProvider } from './filters/Courses/useCourseFilter'
-import { CreditFilterProvider } from './filters/TotalCredits/useCreditFilter'
+import { CreditFilterProvider } from './filters/CreditsEarned/useCreditFilter'
 import { FilterTrayProvider } from './useFilterTray'
 
 const FilterContextProvider = ({ children }) => (
