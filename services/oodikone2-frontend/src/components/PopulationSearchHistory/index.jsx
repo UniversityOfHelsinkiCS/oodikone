@@ -149,18 +149,19 @@ class PopulationSearchHistory extends Component {
   }
 
   pushQueryToUrl = () => {
-    const { studyRights, tag } = this.props.populations.query
+    const { studyRights, tag, years } = this.props.populations.query
     const { studentStatuses, semesters, months, year } = this.state.query
+
     const queryObject = {
       tag,
       year,
       months,
       studentStatuses,
       semesters,
-      studyRights: JSON.stringify(studyRights)
+      studyRights: JSON.stringify(studyRights),
+      years
     }
     const searchString = qs.stringify(queryObject)
-
     this.props.history.push({ search: searchString })
   }
 
