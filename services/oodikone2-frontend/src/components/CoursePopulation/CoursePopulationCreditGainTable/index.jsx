@@ -5,9 +5,9 @@ import { Table, Tab } from 'semantic-ui-react'
 import { maxBy } from 'lodash'
 import { getActiveLanguage } from 'react-localize-redux'
 
-import InfoBox from '../InfoBox'
-import infotooltips from '../../common/InfoToolTips'
-import { getNewestProgramme, getTextIn } from '../../common'
+import InfoBox from '../../InfoBox'
+import infotooltips from '../../../common/InfoToolTips'
+import { getNewestProgramme, getTextIn } from '../../../common'
 
 const CreditGainTableRow = ({ statistics, code, language }) => {
   return (
