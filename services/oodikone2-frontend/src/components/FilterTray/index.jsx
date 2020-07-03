@@ -10,6 +10,7 @@ import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
 import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from './useFilterTray'
+import EnrollmentStatus from './filters/EnrollmentStatus'
 
 export const contextKey = 'filterTray'
 
@@ -72,6 +73,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
                 <Icon name="bars" size="large" />
               </div>
             </Header>
+            <EnrollmentStatus filterControl={filterControl} />
             <CreditsEarned filterControl={filterControl} />
             <Gender filterControl={filterControl} />
             <StartYearAtUni filterControl={filterControl} />
