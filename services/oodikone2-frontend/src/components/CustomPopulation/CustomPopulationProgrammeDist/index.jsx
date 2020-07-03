@@ -4,10 +4,10 @@ import { Progress } from 'semantic-ui-react'
 import { func, arrayOf, string, shape } from 'prop-types'
 import { getActiveLanguage } from 'react-localize-redux'
 
-import SearchResultTable from '../SearchResultTable'
-import { programmeFilter } from '../../populationFilters'
-import { setPopulationFilter, removePopulationFilter } from '../../redux/populationFilters'
-import { getNewestProgramme, getTextIn } from '../../common'
+import SearchResultTable from '../../SearchResultTable'
+import { programmeFilter } from '../../../populationFilters'
+import { setPopulationFilter, removePopulationFilter } from '../../../redux/populationFilters'
+import { getNewestProgramme, getTextIn } from '../../../common'
 
 const CustomPopulationProgrammeDist = ({
   samples,

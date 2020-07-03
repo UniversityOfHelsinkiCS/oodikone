@@ -3,9 +3,9 @@ import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, string, arrayOf, number } from 'prop-types'
 
-import infoTooltips from '../../common/InfoToolTips'
-import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
-import { gradeFilter } from '../../populationFilters'
+import infoTooltips from '../../../common/InfoToolTips'
+import { removePopulationFilter, setPopulationFilter } from '../../../redux/populationFilters'
+import { gradeFilter } from '../../../populationFilters'
 
 const GradeFilter = ({
   coursecodes,

@@ -4,10 +4,10 @@ import { Progress } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
 import { shape, func, bool, arrayOf, string, number } from 'prop-types'
 
-import SearchResultTable from '../SearchResultTable'
-import { gradeFilter } from '../../populationFilters'
-import { setPopulationFilter, removePopulationFilter } from '../../redux/populationFilters'
-import { getHighestGradeOfCourseBetweenRange } from '../../common'
+import SearchResultTable from '../../SearchResultTable'
+import { gradeFilter } from '../../../populationFilters'
+import { setPopulationFilter, removePopulationFilter } from '../../../redux/populationFilters'
+import { getHighestGradeOfCourseBetweenRange } from '../../../common'
 
 const CoursePopulationCreditDist = ({
   singleCourseStats,
