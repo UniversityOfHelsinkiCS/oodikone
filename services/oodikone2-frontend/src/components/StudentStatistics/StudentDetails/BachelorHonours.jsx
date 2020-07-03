@@ -13,6 +13,8 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
   const [studyStartDate, setStartDate] = useState('')
   const [honors, setHonors] = useState(false)
   const [render, setRender] = useState(false)
+  const [graduated, setGraduated] = useState(false)
+  const [inspection, setInspection] = useState(false)
 
   useEffect(() => {
     if (programmes) {
@@ -22,8 +24,10 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
         sr.studyright_elements.map(srE => srE.code).includes(newestBachelorProgramme.code)
       )
 
-      if (studyrightWithNewestProgramme) setStartDate(moment(studyrightWithNewestProgramme.startdate))
-
+      if (studyrightWithNewestProgramme) {
+        setStartDate(moment(studyrightWithNewestProgramme.startdate))
+        setGraduated(!!studyrightWithNewestProgramme.graduated)
+      }
       // currently only for matlu
       const shouldRender = [
         'KH50_001',
@@ -93,11 +97,13 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       setHonors(filterGrades.length > 1 && inTime)
       setModules(pairedModules)
       setOther(leftOutModules)
+      setInspection(leftOutModules.length > 0 || (graduated && pairedModules.length < 3))
     } else {
       const filterGrades = attainedModules.filter(mod => mod.course_code !== '00345' && Number(mod.grade) > 3)
 
       setHonors(filterGrades.length > 1 && inTime)
       setModules(attainedModules)
+      setInspection(graduated && attainedModules.length < 3)
     }
   }, [mandatoryModules])
 
@@ -138,7 +144,7 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
         content={honors ? 'Qualified for Honours' : 'Not qualified for Honours'}
         color={honors ? 'green' : 'red'}
       />
-      {otherModules.length > 0 ? <Label tag content="Might need further inspection" color="blue" /> : null}
+      {inspection ? <Label tag content="Might need further inspection" color="blue" /> : null}
       {studentsModules.length > 0 ? (
         <>
           <Header as="h4">Main modules</Header>
