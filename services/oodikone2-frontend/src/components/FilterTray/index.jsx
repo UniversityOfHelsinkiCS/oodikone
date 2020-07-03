@@ -3,13 +3,15 @@ import PropTypes from 'prop-types'
 import lodash from 'lodash'
 import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
-import TotalCredits from './filters/TotalCredits'
+import CreditsEarned from './filters/CreditsEarned'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
 import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from './useFilterTray'
+import EnrollmentStatus from './filters/EnrollmentStatus'
+import TransferredToProgramme from './filters/TransferredToProgramme'
 
 export const contextKey = 'filterTray'
 
@@ -72,7 +74,9 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
                 <Icon name="bars" size="large" />
               </div>
             </Header>
-            <TotalCredits filterControl={filterControl} />
+            <EnrollmentStatus filterControl={filterControl} />
+            <TransferredToProgramme filterControl={filterControl} />
+            <CreditsEarned filterControl={filterControl} />
             <Gender filterControl={filterControl} />
             <StartYearAtUni filterControl={filterControl} />
             <Courses filterControl={filterControl} />
