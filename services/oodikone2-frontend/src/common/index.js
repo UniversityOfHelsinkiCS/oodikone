@@ -128,7 +128,7 @@ export const cancelablePromise = promise => {
       if (hasCanceled) res(false)
       res(true)
     } catch (e) {
-      console.log('e', e)
+      console.log('e', e) // eslint-disable-line no-console
       rej(e)
     }
   })
