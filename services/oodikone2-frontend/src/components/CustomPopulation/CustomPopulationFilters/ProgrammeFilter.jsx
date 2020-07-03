@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Icon, Button, Form, Dropdown, Popup } from 'semantic-ui-react'
 import { func, shape, string, arrayOf } from 'prop-types'
-import { programmeFilter } from '../../populationFilters'
-import { textAndDescriptionSearch, getNewestProgramme, getTextIn } from '../../common'
-import infoTooltips from '../../common/InfoToolTips'
-import { removePopulationFilter, setPopulationFilter } from '../../redux/populationFilters'
+import { programmeFilter } from '../../../populationFilters'
+import { textAndDescriptionSearch, getNewestProgramme, getTextIn } from '../../../common'
+import infoTooltips from '../../../common/InfoToolTips'
+import { removePopulationFilter, setPopulationFilter } from '../../../redux/populationFilters'
 
 const ProgrammeFilter = ({
   removePopulationFilterAction,
