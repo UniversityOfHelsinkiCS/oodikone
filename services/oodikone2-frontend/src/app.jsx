@@ -25,7 +25,7 @@ try {
     })
   }
 } catch (e) {
-  console.log(e) // eslint-disable-line
+  console.log(e) // eslint-disable-line no-console
 }
 
 ReactDOM.render(
