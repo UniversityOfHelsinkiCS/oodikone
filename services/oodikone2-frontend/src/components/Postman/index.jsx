@@ -42,8 +42,7 @@ class Postman extends Component {
   }
 
   dataToConsole = () => {
-    // eslint-disable-next-line no-console
-    console.log(this.state.data)
+    console.log(this.state.data) // eslint-disable-line no-console
   }
 
   downloadJSON = () => {
