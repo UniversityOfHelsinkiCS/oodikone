@@ -8,7 +8,7 @@ import useCreditFilter from './useCreditFilter'
 
 export const contextKey = 'creditFilter'
 
-const TotalCredits = ({ filterControl }) => {
+const CreditsEarned = ({ filterControl }) => {
   const { currentValue, requestedValue, setCurrentValue } = useCreditFilter()
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
   const labels = { min: 'At Least', max: 'Less Than' }
@@ -84,8 +84,11 @@ const TotalCredits = ({ filterControl }) => {
   const active = Object.values(names).some(name => Object.keys(filterControl.activeFilters).includes(name))
 
   return (
-    <FilterCard title="Total Credits" active={active} className="total-credits-filter" contextKey={contextKey}>
+    <FilterCard title="Credits Earned" active={active} className="total-credits-filter" contextKey={contextKey}>
       <Form>
+        <div className="description-text">
+          Filter students by the amount of credits earned during the selected period.
+        </div>
         {Object.keys(currentValue).map(key => (
           <Form.Field key={`total-credits-filter-${key}`}>
             <NumericInput
@@ -103,7 +106,7 @@ const TotalCredits = ({ filterControl }) => {
   )
 }
 
-TotalCredits.propTypes = {
+CreditsEarned.propTypes = {
   filterControl: PropTypes.shape({
     addFilter: PropTypes.func.isRequired,
     removeFilter: PropTypes.func.isRequired,
@@ -112,4 +115,4 @@ TotalCredits.propTypes = {
   }).isRequired
 }
 
-export default TotalCredits
+export default CreditsEarned
