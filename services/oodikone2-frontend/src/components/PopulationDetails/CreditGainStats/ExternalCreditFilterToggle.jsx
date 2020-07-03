@@ -3,9 +3,9 @@ import PropTypes from 'prop-types'
 import { Popup, Button, Icon } from 'semantic-ui-react'
 import { useLocation } from 'react-router-dom'
 import { getMonths } from '../../../common/query'
-import useCreditFilter from '../../FilterTray/filters/TotalCredits/useCreditFilter'
+import useCreditFilter from '../../FilterTray/filters/CreditsEarned/useCreditFilter'
 import { contextKey as filterTrayContextKey } from '../../FilterTray'
-import { contextKey as creditFilterContextKey } from '../../FilterTray/filters/TotalCredits'
+import { contextKey as creditFilterContextKey } from '../../FilterTray/filters/CreditsEarned'
 import useFilterTray from '../../FilterTray/useFilterTray'
 
 const ExternalCreditFilterToggle = ({ min, max }) => {
