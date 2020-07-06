@@ -127,6 +127,7 @@
 #filter-tray.cards .description,
 #filter-tray.cards .extra {
   padding: 0.8rem;
+  margin: 0;
 }
 
 #filter-tray .card .extra {
@@ -155,9 +156,8 @@
 
 #filter-tray .description-text {
   color: #9e9e9e;
-  margin-top: -0.5rem;
-  padding-bottom: 1rem;
   font-style: italic;
+  margin: 0 0.2rem 1.2rem 0.2rem;
 }
 
 #filter-tray .total-credits-filter .description {
@@ -167,4 +167,19 @@
 #filter-tray .total-credits-filter .form {
   position: relative;
   left: 3px;
+}
+
+#filter-tray .button.toggle.active {
+  background-color: #2085d0 !important;
+}
+
+#filter-tray .flex-centered {
+  display: flex;
+  justify-content: center;
+}
+
+#filter-tray .or::before {
+  color: #fff;
+  background-color: #2e2e2f;
+  font-size: 0.8rem;
 }
