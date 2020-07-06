@@ -74,8 +74,8 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
                 <Icon name="bars" size="large" />
               </div>
             </Header>
-            <EnrollmentStatus filterControl={filterControl} />
             <TransferredToProgramme filterControl={filterControl} />
+            <EnrollmentStatus filterControl={filterControl} />
             <CreditsEarned filterControl={filterControl} />
             <Gender filterControl={filterControl} />
             <StartYearAtUni filterControl={filterControl} />
