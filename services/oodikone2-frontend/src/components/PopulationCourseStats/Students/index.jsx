@@ -19,42 +19,14 @@ const Students = () => {
     filterInput,
     isActiveCourse,
     onCourseNameCellClick,
-    onGoToCourseStatisticsClick
+    onGoToCourseStatisticsClick,
+    modules
   } = UsePopulationCourseContext()
   const { language } = useSelector(({ settings }) => settings)
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [page, setPage] = useState(0)
   const [visible, setVisible] = useState({})
-  const [modules, setModules] = useState([])
   const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
-
-  useEffect(() => {
-    const modules = {}
-
-    courseStatistics.forEach(course => {
-      const code = course.label_code
-      if (!modules[code]) {
-        modules[code] = []
-      }
-      modules[code].push(course)
-    })
-
-    Object.keys(modules).forEach(m => {
-      if (modules[m].length === 0) {
-        delete modules[m]
-      }
-    })
-
-    setModules(
-      Object.entries(modules)
-        .map(([module, courses]) => ({
-          module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
-          courses
-        }))
-        .sort((a, b) => a.module.order - b.module.order)
-    )
-  }, [mandatoryCourses, courseStatistics])
 
   const hasCompleted = (courseCode, student) => {
     const course = courseStatistics.find(c => c.course.code === courseCode)
