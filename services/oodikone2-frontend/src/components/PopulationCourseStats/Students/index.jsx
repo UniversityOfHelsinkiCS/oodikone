@@ -48,8 +48,11 @@ const Students = () => {
 
     setModules(
       Object.entries(modules)
-        .map(([module, courses]) => ({ module, courses, module_order: courses[0].module_order }))
-        .sort((a, b) => a.module_order - b.module_order)
+        .map(([module, courses]) => ({
+          module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
+          courses
+        }))
+        .sort((a, b) => a.module.order - b.module.order)
     )
   }, [mandatoryCourses, courseStatistics])
 
@@ -138,20 +141,22 @@ const Students = () => {
         </Table.Header>
         <Table.Body>
           {modules.map(({ module, courses }) => (
-            <>
+            <React.Fragment key={module.code}>
               <Table.Row>
-                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module)}>
-                  <Icon name={visible[module] ? 'angle down' : 'angle right'} />
-                  <b>{courses[0].label_name.fi}</b>
+                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module.code)}>
+                  <Icon name={visible[module.code] ? 'angle down' : 'angle right'} />
+                  <b>{getTextIn(module.name, language)}</b>
                 </Table.Cell>
                 <Table.Cell>
-                  <b>{module}</b>
+                  <b>{module.code}</b>
                 </Table.Cell>
                 {pagedStudents.map(student => (
-                  <Table.Cell>{countCompleted(courses, student.studentnumber)}</Table.Cell>
+                  <Table.Cell key={`${module.code}-${student.studentnumber}`}>
+                    {countCompleted(courses, student.studentnumber)}
+                  </Table.Cell>
                 ))}
               </Table.Row>
-              {visible[module] &&
+              {visible[module.code] &&
                 courses
                   .filter(c => c.visible.visibility)
                   .map(col => (
@@ -210,7 +215,7 @@ const Students = () => {
                       ))}
                     </Table.Row>
                   ))}
-            </>
+            </React.Fragment>
           ))}
         </Table.Body>
       </Table>
