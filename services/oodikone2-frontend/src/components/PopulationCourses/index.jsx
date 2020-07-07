@@ -23,7 +23,6 @@ const PopulationCourses = ({
   getPopulationSelectedStudentCourses: gpc,
   selectedStudentsByYear,
   query,
-  accordionView,
   filteredStudents
 }) => {
   const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
@@ -83,42 +82,20 @@ const PopulationCourses = ({
     }
   }, [selectedPopulationCourses.data])
 
-  if (accordionView)
-    return (
-      <Segment basic>
-        <Header>
-          <InfoBox content={CoursesOf.Infobox} />
-        </Header>
-        <SegmentDimmer translate={translate} isLoading={pending} />
-        <PopulationCourseStats
-          key={selectedPopulationCourses.query.uuid}
-          courses={selectedPopulationCourses.data}
-          query={selectedPopulationCourses.query}
-          pending={pending}
-          selectedStudents={selectedStudents}
-        />
-      </Segment>
-    )
-
   return (
-    <React.Fragment>
-      <Segment>
-        {!accordionView && (
-          <Header size="medium" dividing>
-            {translate('populationCourses.header')}
-            <InfoBox content={CoursesOf.Infobox} />
-          </Header>
-        )}
-        <SegmentDimmer translate={translate} isLoading={pending} />
-        <PopulationCourseStats
-          key={selectedPopulationCourses.query.uuid}
-          courses={selectedPopulationCourses.data}
-          query={selectedPopulationCourses.query}
-          pending={pending}
-          selectedStudents={selectedStudents}
-        />
-      </Segment>
-    </React.Fragment>
+    <Segment basic>
+      <Header>
+        <InfoBox content={CoursesOf.Infobox} />
+      </Header>
+      <SegmentDimmer translate={translate} isLoading={pending} />
+      <PopulationCourseStats
+        key={selectedPopulationCourses.query.uuid}
+        courses={selectedPopulationCourses.data}
+        query={selectedPopulationCourses.query}
+        pending={pending}
+        selectedStudents={selectedStudents}
+      />
+    </Segment>
   )
 }
 
@@ -136,7 +113,6 @@ PopulationCourses.propTypes = {
   dispatchRefreshFilters: func.isRequired,
   selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
-  accordionView: bool.isRequired,
   filteredStudents: arrayOf(shape({})).isRequired
 }
 

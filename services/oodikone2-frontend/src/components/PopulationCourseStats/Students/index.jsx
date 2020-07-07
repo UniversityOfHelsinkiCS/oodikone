@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Table, Icon, Popup, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -19,39 +19,14 @@ const Students = () => {
     filterInput,
     isActiveCourse,
     onCourseNameCellClick,
-    onGoToCourseStatisticsClick
+    onGoToCourseStatisticsClick,
+    modules
   } = UsePopulationCourseContext()
   const { language } = useSelector(({ settings }) => settings)
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [page, setPage] = useState(0)
   const [visible, setVisible] = useState({})
-  const [modules, setModules] = useState([])
   const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
-
-  useEffect(() => {
-    const modules = {}
-
-    courseStatistics.forEach(course => {
-      const code = course.label_code
-      if (!modules[code]) {
-        modules[code] = []
-      }
-      modules[code].push(course)
-    })
-
-    Object.keys(modules).forEach(m => {
-      if (modules[m].length === 0) {
-        delete modules[m]
-      }
-    })
-
-    setModules(
-      Object.entries(modules)
-        .map(([module, courses]) => ({ module, courses, module_order: courses[0].module_order }))
-        .sort((a, b) => a.module_order - b.module_order)
-    )
-  }, [mandatoryCourses, courseStatistics])
 
   const hasCompleted = (courseCode, student) => {
     const course = courseStatistics.find(c => c.course.code === courseCode)
@@ -138,20 +113,22 @@ const Students = () => {
         </Table.Header>
         <Table.Body>
           {modules.map(({ module, courses }) => (
-            <>
+            <React.Fragment key={module.code}>
               <Table.Row>
-                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module)}>
-                  <Icon name={visible[module] ? 'angle down' : 'angle right'} />
-                  <b>{courses[0].label_name.fi}</b>
+                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module.code)}>
+                  <Icon name={visible[module.code] ? 'angle down' : 'angle right'} />
+                  <b>{getTextIn(module.name, language)}</b>
                 </Table.Cell>
                 <Table.Cell>
-                  <b>{module}</b>
+                  <b>{module.code}</b>
                 </Table.Cell>
                 {pagedStudents.map(student => (
-                  <Table.Cell>{countCompleted(courses, student.studentnumber)}</Table.Cell>
+                  <Table.Cell key={`${module.code}-${student.studentnumber}`}>
+                    {countCompleted(courses, student.studentnumber)}
+                  </Table.Cell>
                 ))}
               </Table.Row>
-              {visible[module] &&
+              {visible[module.code] &&
                 courses
                   .filter(c => c.visible.visibility)
                   .map(col => (
@@ -210,7 +187,7 @@ const Students = () => {
                       ))}
                     </Table.Row>
                   ))}
-            </>
+            </React.Fragment>
           ))}
         </Table.Body>
       </Table>

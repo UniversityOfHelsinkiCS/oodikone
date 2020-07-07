@@ -2,7 +2,7 @@ import React from 'react'
 import { string, arrayOf } from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
-import { graphDataType } from '../../constants/types'
+import { graphDataType } from '../../../constants/types'
 import './multicolorBarChart.css'
 
 const MulticolorBarChart = props => {
