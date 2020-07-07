@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Form, Button } from 'semantic-ui-react'
+import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 
-const TransferredToProgramme = ({ filterControl }) => {
+const GraduatedFromProgramme = ({ filterControl, code }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
   const [value, setValue] = useState(null)
-  const name = 'transferredToProgrammeFilter'
+  const name = 'graduatedFromProgrammeFilter'
   const active = value !== null
 
-  const filterFn = wanted => student => student.transferredStudyright === wanted
+  const filterFn = wanted => student => {
+    const studyright = student.studyrights.find(sr => sr.studyright_elements.map(sre => sre.code).includes(code))
+    return studyright && !!studyright.graduated === !!wanted
+  }
 
   useEffect(() => {
     if (active) {
@@ -26,7 +30,7 @@ const TransferredToProgramme = ({ filterControl }) => {
 
   return (
     <FilterCard
-      title="Transfer Status"
+      title="Graduated Students"
       contextKey={name}
       active={active}
       footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} />}
@@ -44,18 +48,23 @@ const TransferredToProgramme = ({ filterControl }) => {
             </Button>
           </Button.Group>
         </Form.Field>
-        <div className="description-text">...transferred to this study programme.</div>
+        <div className="description-text">...graduated from this study programme.</div>
       </Form>
     </FilterCard>
   )
 }
 
-TransferredToProgramme.propTypes = {
+GraduatedFromProgramme.propTypes = {
   filterControl: PropTypes.shape({
     addFilter: PropTypes.func.isRequired,
     removeFilter: PropTypes.func.isRequired,
     withoutFilter: PropTypes.func.isRequired
-  }).isRequired
+  }).isRequired,
+  code: PropTypes.string.isRequired
 }
 
-export default TransferredToProgramme
+const mapStateToProps = ({ populations }) => ({
+  code: populations.query ? populations.query.studyRights.programme : ''
+})
+
+export default connect(mapStateToProps)(GraduatedFromProgramme)
