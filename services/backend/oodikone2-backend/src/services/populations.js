@@ -57,6 +57,7 @@ const formatStudentForPopulationStatistics = (
   },
   credits,
   startDate,
+  endDate,
   startDateMoment,
   endDateMoment
 ) => {
