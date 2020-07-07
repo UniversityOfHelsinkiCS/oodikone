@@ -213,7 +213,6 @@ class PopulationDetails extends Component {
           content: (
             <div ref={this.courseTableRef}>
               <PopulationCourses
-                accordionView
                 selectedStudents={selectedStudents}
                 selectedStudentsByYear={selectedStudentsByYear}
                 query={query}
@@ -256,7 +255,6 @@ class PopulationDetails extends Component {
             <div ref={this.studentTableRef}>
               {filterFeatToggle ? (
                 <NewPopStudents
-                  accordionView
                   mandatoryToggle={this.props.mandatoryToggle}
                   filteredStudents={filteredStudents}
                   allStudents={allStudents}
@@ -264,7 +262,6 @@ class PopulationDetails extends Component {
                 />
               ) : (
                 <PopulationStudents
-                  accordionView
                   mandatoryToggle={this.props.mandatoryToggle}
                   filteredStudents={allStudents.filter(s => selectedStudents.includes(s.studentNumber))}
                 />
