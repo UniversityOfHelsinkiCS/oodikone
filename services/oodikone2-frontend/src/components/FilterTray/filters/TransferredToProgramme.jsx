@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Form, Radio } from 'semantic-ui-react'
+import { Form, Button } from 'semantic-ui-react'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 
@@ -22,10 +22,7 @@ const TransferredToProgramme = ({ filterControl }) => {
 
   const count = wanted => withoutFilter(name).filter(filterFn(wanted)).length
 
-  const options = [
-    { key: 'transfer-true', text: `Have (${count(true)})`, value: 1 },
-    { key: 'transfer-false', text: `Have Not (${count(false)})`, value: 0 }
-  ]
+  const toggle = buttonValue => () => setValue(prev => (prev === buttonValue ? null : buttonValue))
 
   return (
     <FilterCard
@@ -36,16 +33,17 @@ const TransferredToProgramme = ({ filterControl }) => {
     >
       <Form>
         <div className="description-text">Show students who...</div>
-        {options.map(opt => (
-          <Form.Field key={opt.key}>
-            <Radio
-              label={opt.text}
-              value={opt.value}
-              checked={value === opt.value}
-              onChange={(_, { value: inputValue }) => setValue(inputValue)}
-            />
-          </Form.Field>
-        ))}
+        <Form.Field className="flex-centered">
+          <Button.Group size="small">
+            <Button toggle active={value === 1} onClick={toggle(1)}>
+              {`Have (${count(true)})`}
+            </Button>
+            <Button.Or text="OR" />
+            <Button toggle negative={value === 0} active={value === 0} onClick={toggle(0)}>
+              {`Have Not (${count(false)})`}
+            </Button>
+          </Button.Group>
+        </Form.Field>
         <div className="description-text">...transferred to this study programme.</div>
       </Form>
     </FilterCard>

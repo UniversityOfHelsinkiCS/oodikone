@@ -103,6 +103,7 @@ const initialState = props => ({
 
 function PopulationCourseStats(props) {
   const [state, setState] = useState(initialState(props))
+  const [modules, setModules] = useState()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
   const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
@@ -175,6 +176,34 @@ function PopulationCourseStats(props) {
 
     setCourseStatistics(sortedStatistics)
   }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, mandatoryCourses])
+
+  useEffect(() => {
+    if (!courseStatistics || !mandatoryCourses) return
+    const modules = {}
+
+    courseStatistics.forEach(course => {
+      const code = course.label_code
+      if (!modules[code]) {
+        modules[code] = []
+      }
+      modules[code].push(course)
+    })
+
+    Object.keys(modules).forEach(m => {
+      if (modules[m].length === 0) {
+        delete modules[m]
+      }
+    })
+
+    setModules(
+      Object.entries(modules)
+        .map(([module, courses]) => ({
+          module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
+          courses
+        }))
+        .sort((a, b) => a.module.order - b.module.order)
+    )
+  }, [mandatoryCourses, courseStatistics])
 
   const onFilterChange = (e, field) => {
     const {
@@ -296,6 +325,7 @@ function PopulationCourseStats(props) {
   const { sortCriteria, reversed } = state
   const contextValue = {
     courseStatistics,
+    modules,
     filterInput: renderFilterInputHeaderCell,
     isActiveCourse,
     onCourseNameCellClick,

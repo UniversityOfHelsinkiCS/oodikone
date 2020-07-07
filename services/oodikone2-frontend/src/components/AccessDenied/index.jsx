@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import { random } from 'lodash'
 import { logout as logoutAction } from '../../redux/auth'
 import { images } from '../../common'
-import MulticolorBarChart from '../MulticolorBarChart'
+import MulticolorBarChart from './MulticolorBarChart'
 
 const names = [
   'mluukkai',
