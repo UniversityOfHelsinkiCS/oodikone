@@ -1,17 +1,19 @@
 import React from 'react'
 import { Table, Icon, Popup, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import useFeatureToggle from '../../../common/useFeatureToggle'
+import CollapsibleModuleTable from '../CollapsibleModuleTable'
+import { useLanguage } from '../../../common/hooks'
 
 const PassFail = () => {
-  const { language } = useSelector(({ settings }) => settings)
+  const language = useLanguage()
   const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
+  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { courseIsSelected } = useCourseFilter()
   const {
     courseStatistics,
@@ -23,7 +25,8 @@ const PassFail = () => {
     onCourseNameCellClick,
     sortCriteria,
     reversed,
-    translate
+    translate,
+    modules
   } = UsePopulationCourseContext()
   const getSortableHeaderCell = (label, columnName, rowSpan = 1) => (
     <SortableHeaderCell
@@ -129,7 +132,13 @@ const PassFail = () => {
   return (
     <Table className="fixed-header" celled sortable>
       {getTableHeader()}
-      <Table.Body>{courseStatistics.map(getCourseRow)}</Table.Body>
+      <Table.Body>
+        {mandatoryToggle ? (
+          <CollapsibleModuleTable modules={modules}>{courses => courses.map(getCourseRow)}</CollapsibleModuleTable>
+        ) : (
+          courseStatistics.map(getCourseRow)
+        )}
+      </Table.Body>
     </Table>
   )
 }
