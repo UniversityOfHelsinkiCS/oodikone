@@ -10,6 +10,7 @@ import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import useFeatureToggle from '../../../common/useFeatureToggle'
+import { useLanguage } from '../../../common/hooks'
 
 const gradeTypes = [1, 2, 3, 4, 5]
 
@@ -25,7 +26,7 @@ const formatGradeDistribution = grades =>
   )
 
 const CourseRow = ({ courseStatistics }) => {
-  const { language } = useSelector(({ settings }) => settings)
+  const language = useLanguage()
   const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
 
