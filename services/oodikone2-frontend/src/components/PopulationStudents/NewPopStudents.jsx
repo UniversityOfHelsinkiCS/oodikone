@@ -129,10 +129,6 @@ class PopulationStudents extends Component {
   }
 
   renderStudentTable() {
-    if (!this.props.showList && !this.props.accordionView) {
-      return null
-    }
-
     const { admin, containsStudyTracks } = this.state
     const { populationStatistics, customPopulation, coursePopulation } = this.props
 
@@ -816,7 +812,6 @@ PopulationStudents.propTypes = {
   getStudentTagsStudyTrack: func.isRequired,
   userRoles: arrayOf(string).isRequired,
   studentToTargetCourseDateMap: shape({}),
-  accordionView: bool.isRequired,
   coursePopulation: bool,
   customPopulation: bool,
   mandatoryToggle: bool.isRequired

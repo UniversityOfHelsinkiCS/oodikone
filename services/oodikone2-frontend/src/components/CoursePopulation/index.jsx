@@ -305,7 +305,6 @@ const CoursePopulation = ({
               samples={studentData.students}
               selectedStudents={selectedStudents}
               coursePopulation
-              accordionView
             />
           </div>
         )

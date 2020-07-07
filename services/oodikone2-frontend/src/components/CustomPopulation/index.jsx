@@ -355,12 +355,7 @@ const CustomPopulation = ({
       content: {
         content: (
           <div ref={studentRef}>
-            <PopulationStudents
-              samples={custompop}
-              selectedStudents={selectedStudents}
-              customPopulation
-              accordionView
-            />
+            <PopulationStudents samples={custompop} selectedStudents={selectedStudents} customPopulation />
           </div>
         )
       }
