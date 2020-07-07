@@ -9,6 +9,7 @@ import { logout as logoutAction } from '../../redux/auth'
 import { images } from '../../common'
 import MulticolorBarChart from './MulticolorBarChart'
 
+// add github handles of oodikone devs here
 const names = [
   'mluukkai',
   'jakousa',
