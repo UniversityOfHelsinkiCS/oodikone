@@ -12,6 +12,7 @@ import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from './useFilterTray'
 import EnrollmentStatus from './filters/EnrollmentStatus'
 import TransferredToProgramme from './filters/TransferredToProgramme'
+import GraduatedFromProgramme from './filters/GraduatedFromProgramme'
 
 export const contextKey = 'filterTray'
 
@@ -74,6 +75,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
                 <Icon name="bars" size="large" />
               </div>
             </Header>
+            <GraduatedFromProgramme filterControl={filterControl} />
             <TransferredToProgramme filterControl={filterControl} />
             <EnrollmentStatus filterControl={filterControl} />
             <CreditsEarned filterControl={filterControl} />
