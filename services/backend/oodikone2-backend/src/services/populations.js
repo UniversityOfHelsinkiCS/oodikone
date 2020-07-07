@@ -462,6 +462,7 @@ const studentnumbersWithAllStudyrightElements = async (
   })
 
   const studentnumberlist = filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
+  // fetch students that have transferred out of the programme and filter out these studentnumbers
   if (!transferredStudents) {
     const transferredOutStudents = await Transfers.findAll({
       attributes: ['studentnumber'],

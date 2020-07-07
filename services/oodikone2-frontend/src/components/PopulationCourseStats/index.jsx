@@ -103,7 +103,7 @@ const initialState = props => ({
 
 function PopulationCourseStats(props) {
   const [state, setState] = useState(initialState(props))
-  const [modules, setModules] = useState()
+  const [modules, setModules] = useState([])
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
   const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
@@ -162,7 +162,7 @@ function PopulationCourseStats(props) {
         .filter(c => !codeFilter || courseCodeFilter(c))
         .filter(c => !nameFilter || courseNameFilter(c))
         .map(c => {
-          const course = mandatoryCourses.find(mc => mc.code === c.course.code)
+          const course = mandatoryToggle ? mandatoryCourses.find(mc => mc.code === c.course.code) : {}
           return { ...c, ...course }
         })
 
@@ -173,37 +173,38 @@ function PopulationCourseStats(props) {
       [course => course.stats[sortCriteria], course => course.course.code],
       [lodashSortOrder, lodashSortOrderTypes.ASC]
     )
+    if (mandatoryToggle) {
+      const modules = {}
+
+      sortedStatistics.forEach(course => {
+        const code = course.label_code
+        if (!code) {
+          return
+        }
+        if (!modules[code]) {
+          modules[code] = []
+        }
+        modules[code].push(course)
+      })
+
+      Object.keys(modules).forEach(m => {
+        if (modules[m].length === 0) {
+          delete modules[m]
+        }
+      })
+
+      setModules(
+        Object.entries(modules)
+          .map(([module, courses]) => ({
+            module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
+            courses
+          }))
+          .sort((a, b) => a.module.order - b.module.order)
+      )
+    }
 
     setCourseStatistics(sortedStatistics)
   }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, mandatoryCourses])
-
-  useEffect(() => {
-    if (!courseStatistics || !mandatoryCourses) return
-    const modules = {}
-
-    courseStatistics.forEach(course => {
-      const code = course.label_code
-      if (!modules[code]) {
-        modules[code] = []
-      }
-      modules[code].push(course)
-    })
-
-    Object.keys(modules).forEach(m => {
-      if (modules[m].length === 0) {
-        delete modules[m]
-      }
-    })
-
-    setModules(
-      Object.entries(modules)
-        .map(([module, courses]) => ({
-          module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
-          courses
-        }))
-        .sort((a, b) => a.module.order - b.module.order)
-    )
-  }, [mandatoryCourses, courseStatistics])
 
   const onFilterChange = (e, field) => {
     const {
