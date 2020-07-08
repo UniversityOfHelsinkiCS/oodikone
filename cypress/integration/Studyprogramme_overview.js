@@ -150,7 +150,7 @@ describe('Studyprogramme overview', () => {
     deleteTag(name)
   })
 
-  it.only('can add tags to students', () => {
+  it('can add tags to students', () => {
     const name = `tag-${new Date().getTime()}`
 
     cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
