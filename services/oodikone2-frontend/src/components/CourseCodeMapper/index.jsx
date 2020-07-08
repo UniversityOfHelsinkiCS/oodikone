@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { orderBy } from 'lodash'
 import { connect } from 'react-redux'
@@ -13,24 +13,28 @@ import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 
 const { func, shape, string, objectOf, arrayOf, bool } = PropTypes
 
-class CourseCodeMapper extends Component {
-  constructor(props) {
-    super(props)
-    props.getDuplicates(props.studyprogramme)
-    props.getMandatoryCourses(props.studyprogramme)
-  }
+const CourseCodeMapper = ({
+  studyprogramme,
+  addDuplicate,
+  removeDuplicate,
+  getDuplicates,
+  getMandatoryCourses,
+  language,
+  courseCodeDuplicates,
+  mandatoryCourses,
+  findCoursesDispatch
+}) => {
+  const [codes, setCodes] = useState({})
+  useEffect(() => {
+    getDuplicates(studyprogramme)
+    getMandatoryCourses(studyprogramme)
+  }, [])
 
-  state = {
-    codes: {}
-  }
-
-  getName = name => {
-    const { language } = this.props
+  const getName = name => {
     return getTextIn(name, language)
   }
 
-  getTableRows = () => {
-    const { courseCodeDuplicates, mandatoryCourses, findCoursesDispatch } = this.props
+  const getTableRows = () => {
     const { data } = courseCodeDuplicates
     const find = (query, language) => findCoursesDispatch(query, language)
     const rows = mandatoryCourses.data.map(course => {
@@ -38,18 +42,18 @@ class CourseCodeMapper extends Component {
       const duplicates = maincode ? orderBy(data[maincode].filter(e => e.code !== course.code), ['code'], ['ASC']) : []
       return (
         <Table.Row key={course.code}>
-          <Table.Cell>{`${course.code} ${this.getName(course.name)}`}</Table.Cell>
+          <Table.Cell>{`${course.code} ${getName(course.name)}`}</Table.Cell>
           <Table.Cell>
             <Label.Group>
               {duplicates.map(e => (
                 <Label key={e.code}>
-                  {`${e.code} ${this.getName(e.name)}`}
+                  {`${e.code} ${getName(e.name)}`}
                   <Icon
                     style={{ margin: '0 0 0 5px' }}
                     color="red"
                     name="remove circle"
                     title="Remove from group"
-                    onClick={this.removeDuplicate(e.code)}
+                    onClick={() => removeDuplicate(e.code)}
                   />
                 </Label>
               ))}
@@ -59,14 +63,12 @@ class CourseCodeMapper extends Component {
             <Grid style={{ minWidth: '350px' }}>
               <Grid.Column width={11}>
                 <CourseSearch
-                  handleResultSelect={(e, { result }) =>
-                    this.setState(old => ({ codes: { ...old.codes, [course.code]: result.code } }))
-                  }
+                  handleResultSelect={(e, { result }) => setCodes({ ...codes, [course.code]: result.code })}
                   findFunction={find}
                 />
               </Grid.Column>
               <Grid.Column width={5}>
-                <Button fluid content="Add" onClick={this.addDuplicate(course.code, this.state.codes[course.code])} />
+                <Button fluid content="Add" onClick={() => addDuplicate(course.code, codes[course.code])} />
               </Grid.Column>
             </Grid>
           </Table.Cell>
@@ -76,41 +78,31 @@ class CourseCodeMapper extends Component {
     return rows
   }
 
-  addDuplicate = (code1, code2) => () => {
-    this.props.addDuplicate(code1, code2)
-  }
-
-  removeDuplicate = code => () => {
-    this.props.removeDuplicate(code)
-  }
-
-  render() {
-    const pending = this.props.courseCodeDuplicates.pending || this.props.mandatoryCourses.pending
-    const { data } = this.props.mandatoryCourses
-    return (
-      <div className="segmentContainer">
-        <Segment className="contentSegment">
-          <Message
-            header="Map mandatory courses to alternative courses"
-            content="By default courses with different codes are considered as separate courses.
+  const pending = courseCodeDuplicates.pending || mandatoryCourses.pending
+  const { data } = mandatoryCourses
+  return (
+    <div className="segmentContainer">
+      <Segment className="contentSegment">
+        <Message
+          header="Map mandatory courses to alternative courses"
+          content="By default courses with different codes are considered as separate courses.
               If this is not the case use this to combine old and new course codes to each other."
-          />
-          <Loader active={pending} />
-          <Table striped celled className="fixed-header">
-            <Table.Header>
-              <Table.Row>
-                <Table.HeaderCell>Mandatory course</Table.HeaderCell>
-                <Table.HeaderCell>Alternative courses</Table.HeaderCell>
-                <Table.HeaderCell>Add alternative</Table.HeaderCell>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>{this.getTableRows()}</Table.Body>
-          </Table>
-          {data.length === 0 && <Message info>You need to define mandatory courses first</Message>}
-        </Segment>
-      </div>
-    )
-  }
+        />
+        <Loader active={pending} />
+        <Table striped celled className="fixed-header">
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Mandatory course</Table.HeaderCell>
+              <Table.HeaderCell>Alternative courses</Table.HeaderCell>
+              <Table.HeaderCell>Add alternative</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>{getTableRows()}</Table.Body>
+        </Table>
+        {data.length === 0 && <Message info>You need to define mandatory courses first</Message>}
+      </Segment>
+    </div>
+  )
 }
 
 CourseCodeMapper.propTypes = {
