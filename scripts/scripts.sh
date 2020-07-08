@@ -36,8 +36,10 @@ echo_path () {
 }
 
 get_oodikone_server_backup() {
-    scp -r -o ProxyCommand="ssh -W %h:%p melkinpaasi.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
-    scp -r -o ProxyCommand="ssh -W %h:%p melkinpaasi.cs.helsinki.fi" svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
+    echo "Enter your Uni Helsinki username:"
+    read username
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
 }
 
 get_anon_oodikone() {
