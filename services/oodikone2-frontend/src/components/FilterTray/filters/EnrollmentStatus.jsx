@@ -4,10 +4,11 @@ import lodash from 'lodash'
 import { Form, Dropdown } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { getTranslate } from 'react-localize-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 
-const EnrollmentStatus = ({ filterControl, allSemesters, language }) => {
+const EnrollmentStatus = ({ filterControl, allSemesters, language, translate }) => {
   const [status, setStatus] = useState(null)
   const [semesters, setSemesters] = useState([])
   const { allStudents, addFilter, removeFilter } = filterControl
@@ -51,7 +52,7 @@ const EnrollmentStatus = ({ filterControl, allSemesters, language }) => {
 
   return (
     <FilterCard
-      title="Enrollment Status"
+      title={translate('enrlFilter.title')}
       contextKey="enrollmentStatus"
       active={active}
       footer={<ClearFilterButton disabled={!status && !semesters.length} onClick={clear} />}
@@ -62,7 +63,7 @@ const EnrollmentStatus = ({ filterControl, allSemesters, language }) => {
             options={statusOptions}
             value={status}
             onChange={(_, { value }) => setStatus(value)}
-            placeholder="Choose Enrollment Status"
+            placeholder={translate('enrlFilter.statusLabel')}
             className="mini"
             selection
             fluid
@@ -78,7 +79,7 @@ const EnrollmentStatus = ({ filterControl, allSemesters, language }) => {
             options={semesterOptions}
             button
             className="mini"
-            placeholder="Choose Semesters"
+            placeholder={translate('enrlFilter.semesterLabel')}
             onChange={(_, { value }) => setSemesters(value)}
             value={semesters}
           />
@@ -95,16 +96,18 @@ EnrollmentStatus.propTypes = {
     allStudents: PropTypes.arrayOf(PropTypes.object).isRequired
   }).isRequired,
   allSemesters: PropTypes.shape({}),
-  language: PropTypes.string.isRequired
+  language: PropTypes.string.isRequired,
+  translate: PropTypes.func.isRequired
 }
 
 EnrollmentStatus.defaultProps = {
   allSemesters: {}
 }
 
-const mapStateToProps = ({ semesters, settings }) => ({
+const mapStateToProps = ({ semesters, settings, localize }) => ({
   allSemesters: semesters.data.semesters,
-  language: settings.language
+  language: settings.language,
+  translate: getTranslate(localize)
 })
 
 export default withRouter(connect(mapStateToProps)(EnrollmentStatus))
