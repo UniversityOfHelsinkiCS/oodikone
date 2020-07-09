@@ -311,5 +311,16 @@
     "filterCountTooltip": ["Number of active filters."],
     "clearButtonLabel": ["Clear"],
     "numericFilterClearTooltip": ["Clear filter."]
+  },
+  "courseFilter": {
+    "courseSelectorLabel": ["Select Course to Filter By"],
+    "subFilterAll": ["All"],
+    "subFilterPassed": ["Passed"],
+    "subFilterPassAfterFail": ["Passed After Failure"],
+    "subFilterFailed": ["Failed"],
+    "subFilterFailedMany": ["Failed Many Times"],
+    "subFilterNot": ["Not Participated"],
+    "subFilterNotOrFail": ["Not Participated or Failed"],
+    "subFilterDropdownLabel": ["Show:"]
   }
 }
