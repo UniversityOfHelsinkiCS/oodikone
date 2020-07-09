@@ -1,61 +1,60 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Form, Button, Divider, Message } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 import { getAccessGroups } from '../../redux/accessGroups'
 import { modifyAccessGroups } from '../../redux/users'
 
-class AccessGroups extends Component {
-  state = {
-    selected: this.props.userGroups
-  }
+const AccessGroups = ({
+  savePending,
+  userGroups,
+  user,
+  groups,
+  modifyAccessGroups,
+  pending,
+  saveError,
+  getAccessGroups
+}) => {
+  const [selected, setSelected] = useState(userGroups)
 
-  componentDidMount() {
-    if (this.props.groups.length === 0) this.props.getAccessGroups()
-  }
+  useEffect(() => {
+    if (groups.length === 0) getAccessGroups()
+  }, [])
 
-  componentDidUpdate(prevState) {
-    const { savePending, userGroups } = this.props
-    const finishedRequest = !savePending && prevState.savePending
-    if (finishedRequest) {
-      this.setState({ selected: userGroups }) // eslint-disable-line
-    }
-  }
+  useEffect(() => {
+    const finishedRequest = !savePending
+    if (finishedRequest) setSelected(userGroups)
+  }, [savePending])
 
-  submit = () => {
-    const { user, groups } = this.props
-    const { selected } = this.state
+  const submit = () => {
     const rights = groups.reduce((acc, { value }) => ({ ...acc, [value]: false }), {})
     selected.forEach(value => {
       rights[value] = true
     })
-    this.props.modifyAccessGroups(user.id, rights)
+    modifyAccessGroups(user.id, rights)
   }
 
-  render() {
-    const { pending, groups, savePending, saveError } = this.props
-    return (
-      <Form loading={savePending} error={!!saveError}>
-        <Message error content="Modifying access rights failed." />
-        <Form.Dropdown
-          loading={pending}
-          name="groups"
-          label="Access Groups"
-          placeholder="Select access groups"
-          fluid
-          multiple
-          options={groups}
-          value={this.state.selected}
-          onChange={(_, { value }) => this.setState({ selected: value })}
-          clearable
-          selectOnBlur={false}
-          selectOnNavigation={false}
-        />
-        <Divider />
-        <Button basic fluid positive content="Save" onClick={this.submit} />
-      </Form>
-    )
-  }
+  return (
+    <Form loading={savePending} error={!!saveError}>
+      <Message error content="Modifying access rights failed." />
+      <Form.Dropdown
+        loading={pending}
+        name="groups"
+        label="Access Groups"
+        placeholder="Select access groups"
+        fluid
+        multiple
+        options={groups}
+        value={selected}
+        onChange={(_, { value }) => setSelected(value)}
+        clearable
+        selectOnBlur={false}
+        selectOnNavigation={false}
+      />
+      <Divider />
+      <Button basic fluid positive content="Save" onClick={submit} />
+    </Form>
+  )
 }
 
 AccessGroups.propTypes = {
