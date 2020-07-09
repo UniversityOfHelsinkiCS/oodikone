@@ -324,6 +324,7 @@
     "subFilterDropdownLabel": ["Show:"]
   },
   "creditFilter": {
+    "title": ["Credit Filter"],
     "description": ["Filter students by the amount of credits earned during the selected period."],
     "labelMax": ["Less Than"],
     "labelMin": ["At Least"]
