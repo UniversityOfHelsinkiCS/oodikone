@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { Search, Segment, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
@@ -9,19 +9,16 @@ import Timeout from '../../Timeout'
 import { findTeachers } from '../../../redux/teachers'
 import SortableTable from '../../SortableTable'
 
-const DEFAULT_STATE = {
-  searchterm: '',
-  displayResults: false
-}
+const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, findTeachers }) => {
+  const [searchterm, setSearchterm] = useState('')
+  const [displayResults, setDisplayResults] = useState(false)
 
-class TeacherSearch extends Component {
-  state = DEFAULT_STATE
-
-  resetComponent = () => {
-    this.setState(DEFAULT_STATE)
+  const resetComponent = () => {
+    setSearchterm('')
+    setDisplayResults(false)
   }
 
-  fetchTeachers = searchterm => {
+  const fetchTeachers = searchterm => {
     const trimmedSearchterm = searchterm.trim()
     if (
       !splitByEmptySpace(trimmedSearchterm).find(t => validateInputLength(t, 4)) ||
@@ -29,73 +26,73 @@ class TeacherSearch extends Component {
     ) {
       return
     }
-    this.props.setTimeout('fetch', () => {}, 250)
-    this.props.findTeachers(trimmedSearchterm).then(() => {
-      this.setState({ displayResults: true })
-      this.props.clearTimeout('fetch')
+    // eslint-disable-next-line no-implied-eval
+    setTimeout('fetch', () => {}, 250)
+    findTeachers(trimmedSearchterm).then(() => {
+      setDisplayResults(true)
+      clearTimeout('fetch')
     })
   }
 
-  handleSearchChange = (e, { value }) => {
-    this.props.clearTimeout('search')
+  const handleSearchChange = (e, { value }) => {
+    clearTimeout('search')
     if (value.length > 0) {
-      this.setState({ searchterm: value })
-      this.props.setTimeout(
+      setSearchterm(value)
+      // eslint-disable-next-line no-implied-eval
+      setTimeout(
         'search',
         () => {
-          this.fetchTeachers(value)
+          fetchTeachers(value)
         },
         250
       )
     } else {
-      this.resetComponent()
+      resetComponent()
     }
   }
 
-  render() {
-    const columns = [
-      { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
-      {
-        key: 'icon',
-        getRowContent: () => <Icon name={this.props.icon} />,
-        cellProps: { collapsing: true },
-        headerProps: { onClick: null, sorted: null }
-      }
-    ]
+  const columns = [
+    { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
+    {
+      key: 'icon',
+      getRowContent: () => <Icon name={icon} />,
+      cellProps: { collapsing: true },
+      headerProps: { onClick: null, sorted: null }
+    }
+  ]
 
-    return (
-      <div>
-        <div className="searchContainer">
-          <Search
-            className="searchInput"
-            input={{ fluid: true }}
-            placeholder="Search by entering a username, id or name"
-            value={this.state.searchterm}
-            onSearchChange={this.handleSearchChange}
-            showNoResults={false}
-          />
-          {this.state.displayResults && (
-            <Segment className="contentSegment">
-              {this.props.teachers.length <= 0 ? (
-                <div>No teachers matched your search</div>
-              ) : (
-                <SortableTable
-                  getRowKey={s => s.id}
-                  getRowProps={teacher => ({
-                    className: 'clickable',
-                    onClick: () => this.props.onClick(teacher)
-                  })}
-                  tableProps={{ celled: false, sortable: false }}
-                  columns={columns}
-                  data={this.props.teachers}
-                />
-              )}
-            </Segment>
-          )}
-        </div>
+  return (
+    <div>
+      <div className="searchContainer">
+        <Search
+          className="searchInput"
+          input={{ fluid: true }}
+          placeholder="Search by entering a username, id or name"
+          value={searchterm}
+          onSearchChange={handleSearchChange}
+          showNoResults={false}
+        />
+        {displayResults && (
+          <Segment className="contentSegment">
+            {teachers.length <= 0 ? (
+              <div>No teachers matched your search</div>
+            ) : (
+              <SortableTable
+                getRowKey={s => s.id}
+                getRowProps={teacher => ({
+                  className: 'clickable',
+                  onClick: () => onClick(teacher)
+                })}
+                tableProps={{ celled: false, sortable: false }}
+                columns={columns}
+                data={teachers}
+              />
+            )}
+          </Segment>
+        )}
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 TeacherSearch.propTypes = {
