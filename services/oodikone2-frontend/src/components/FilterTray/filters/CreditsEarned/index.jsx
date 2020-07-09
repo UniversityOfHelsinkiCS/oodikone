@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Form } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+import { getTranslate } from 'react-localize-redux'
 import { getStudentTotalCredits } from '../../../../common'
 import FilterCard from '../common/FilterCard'
 import NumericInput from '../common/NumericInput'
@@ -8,10 +10,10 @@ import useCreditFilter from './useCreditFilter'
 
 export const contextKey = 'creditFilter'
 
-const CreditsEarned = ({ filterControl }) => {
+const CreditsEarned = ({ filterControl, translate }) => {
   const { currentValue, requestedValue, setCurrentValue } = useCreditFilter()
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
-  const labels = { min: 'At Least', max: 'Less Than' }
+  const labels = { min: translate('creditFilter.labelMin'), max: translate('creditFilter.labelMax') }
 
   const now = () => new Date().getTime()
 
@@ -86,9 +88,7 @@ const CreditsEarned = ({ filterControl }) => {
   return (
     <FilterCard title="Credits Earned" active={active} className="total-credits-filter" contextKey={contextKey}>
       <Form>
-        <div className="description-text">
-          Filter students by the amount of credits earned during the selected period.
-        </div>
+        <div className="description-text">{translate('creditFilter.description')}</div>
         {Object.keys(currentValue).map(key => (
           <Form.Field key={`total-credits-filter-${key}`}>
             <NumericInput
@@ -112,7 +112,10 @@ CreditsEarned.propTypes = {
     removeFilter: PropTypes.func.isRequired,
     withoutFilter: PropTypes.func.isRequired,
     activeFilters: PropTypes.object.isRequired
-  }).isRequired
+  }).isRequired,
+  translate: PropTypes.func.isRequired
 }
 
-export default CreditsEarned
+const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
+
+export default connect(mapStateToProps)(CreditsEarned)
