@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
+import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
@@ -12,7 +12,7 @@ import DropdownWithUnfuckedPlaceholder from './DropdownWithUnfuckedPlaceholder'
 
 export const contextKey = 'coursesFilter'
 
-const Courses = ({ filterControl, language }) => {
+const Courses = ({ filterControl, language, translate }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
@@ -29,7 +29,7 @@ const Courses = ({ filterControl, language }) => {
     <FilterCard title="Courses" active={!!selectedCourses.length} className="courses-filter" contextKey={contextKey}>
       <DropdownWithUnfuckedPlaceholder
         options={options}
-        placeholder="Select Course to Filter By"
+        placeholder={translate('courseFilter.courseSelectorLabel')}
         className="course-filter-selection"
         onChange={(_, { value }) => toggleCourseSelection(value[0])}
       />
@@ -50,11 +50,13 @@ Courses.propTypes = {
   filterControl: PropTypes.shape({
     filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
   }).isRequired,
-  language: PropTypes.string.isRequired
+  language: PropTypes.string.isRequired,
+  translate: PropTypes.func.isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({
-  language: getActiveLanguage(localize).code
+  language: getActiveLanguage(localize).code,
+  translate: getTranslate(localize)
 })
 
 export default connect(mapStateToProps)(Courses)

@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Form, Dropdown } from 'semantic-ui-react'
 import { connect } from 'react-redux'
+import { getTranslate } from 'react-localize-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 
-const GraduatedFromProgramme = ({ filterControl, code }) => {
+const GraduatedFromProgramme = ({ filterControl, code, translate }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
   const [value, setValue] = useState(null)
   const name = 'graduatedFromProgrammeFilter'
@@ -38,35 +39,37 @@ const GraduatedFromProgramme = ({ filterControl, code }) => {
 
   const count = wanted => withoutFilter(name).filter(filterFn(wanted)).length
 
-  const options = [{ key: 'graduated-false', text: `Not Graduated (${count(0)})`, value: 0 }].concat(
+  const options = [
+    { key: 'graduated-false', text: `${translate('gradFromProgFilter.optNot')} (${count(0)})`, value: 0 }
+  ].concat(
     combinedExtent
       ? [
-          { key: 'graduated-bachelor', text: `Graduated with Bachelor's (${count(1)})`, value: 1 },
-          { key: 'graduated-master', text: `Graduated with Master's (${count(2)})`, value: 2 }
+          { key: 'graduated-bachelor', text: `${translate('gradFromProgFilter.optBachelor')} (${count(1)})`, value: 1 },
+          { key: 'graduated-master', text: `${translate('gradFromProgFilter.optMaster')} (${count(2)})`, value: 2 }
         ]
-      : [{ key: 'graduated-true', text: `Graduated  (${count(1)})`, value: 1 }]
+      : [{ key: 'graduated-true', text: `${translate('gradFromProgFilter.optGrad')}  (${count(1)})`, value: 1 }]
   )
 
   return (
     <FilterCard
-      title="Graduated Students"
+      title={translate('gradFromProgFilter.title')}
       contextKey={name}
       active={active}
       footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} />}
     >
       <Form>
-        <div className="description-text">Show students who have...</div>
+        <div className="description-text">{translate('gradFromProgFilter.descriptionUpper')}</div>
         <Dropdown
           options={options}
           value={value}
           onChange={(_, { value: inputValue }) => setValue(inputValue)}
-          placeholder="Choose Option"
+          placeholder={translate('gradFromProgFilter.dropdownLabel')}
           className="mini"
           selection
           fluid
           button
         />
-        <div className="description-text">...from this study programme.</div>
+        <div className="description-text">{translate('gradFromProgFilter.descriptionLower')}</div>
       </Form>
     </FilterCard>
   )
@@ -78,11 +81,13 @@ GraduatedFromProgramme.propTypes = {
     removeFilter: PropTypes.func.isRequired,
     withoutFilter: PropTypes.func.isRequired
   }).isRequired,
-  code: PropTypes.string.isRequired
+  code: PropTypes.string.isRequired,
+  translate: PropTypes.func.isRequired
 }
 
-const mapStateToProps = ({ populations }) => ({
-  code: populations.query ? populations.query.studyRights.programme : ''
+const mapStateToProps = ({ populations, localize }) => ({
+  code: populations.query ? populations.query.studyRights.programme : '',
+  translate: getTranslate(localize)
 })
 
 export default connect(mapStateToProps)(GraduatedFromProgramme)
