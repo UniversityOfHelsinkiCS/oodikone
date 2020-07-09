@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
@@ -11,28 +11,33 @@ import { getTeacherStatistics } from '../../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import { getTextIn, getUserIsAdmin } from '../../../common'
 
-const initial = {
-  semesterStart: null,
-  semesterEnd: null,
-  providers: [],
-  display: false
-}
+const TeacherStatistics = ({
+  getProviders,
+  getSemesters,
+  getTeacherStatistics,
+  semesters,
+  providers,
+  statistics,
+  pending,
+  isAdmin,
+  rights,
+  history
+}) => {
+  const [semesterStart, setSemesterStart] = useState(null)
+  const [semesterEnd, setSemesterEnd] = useState(null)
+  const [display, setDisplay] = useState(false)
+  // awful variable name but for some reason we need providers for props and state :kuolemakiitos:
+  const [provs, setProviders] = useState([])
 
-class TeacherStatistics extends Component {
-  state = initial
+  useEffect(() => {
+    getProviders()
+    getSemesters()
+  }, [])
 
-  componentDidMount() {
-    this.props.getProviders()
-    this.props.getSemesters()
-  }
-
-  setStartSemester = (_, { value }) => {
-    const { semesterEnd } = this.state
-    this.setState({ semesterStart: value })
+  const setStartSemester = (_, { value }) => {
+    setSemesterStart(value)
     if (semesterEnd <= value) {
-      this.setState({
-        semesterEnd: value
-      })
+      setSemesterEnd(value)
     }
   }
 
@@ -50,7 +55,7 @@ class TeacherStatistics extends Component {
     --------
     etcetc...
     */
-  mapToProviders = rights =>
+  const mapToProviders = rights =>
     rights.map(r => {
       if (r.includes('_')) {
         let newPrefix = ''
@@ -64,95 +69,91 @@ class TeacherStatistics extends Component {
       return r
     })
 
-  handleChange = (_, { name, value }) => {
-    this.setState({ [name]: value })
+  const setEndSemester = (_, { value }) => {
+    setSemesterEnd(value)
   }
 
-  handleSubmit = async () => {
-    const { semesterStart, semesterEnd, providers } = this.state
-    await this.props.getTeacherStatistics(semesterStart, semesterEnd, providers)
-    this.setState({ display: true })
+  const changeProviders = (_, { value }) => {
+    setProviders(value)
   }
 
-  render() {
-    const { semesters, providers, statistics, pending, isAdmin } = this.props
-    const { display, semesterStart, semesterEnd } = this.state
-    const userProviders = this.mapToProviders(this.props.rights)
-    const invalidQueryParams = this.state.providers.length === 0 || !semesterStart
-    const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
-    const filteredOptions = semesters.filter(sem => {
-      const options =
-        moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
-          ? Number(sem.text.replace(/[^0-9]/g, '')) <= new Date().getFullYear()
-          : Number(sem.text.replace(/[^0-9]/g, '')) < new Date().getFullYear() ||
-            (Number(sem.text.replace(/[^0-9]/g, '')) === new Date().getFullYear() && sem.text.includes('Spring')) // so that current spring is included
-      return options
-    })
-    return (
-      <div>
-        <Message
-          header="Teacher statistics by course providers"
-          content="Statistics for teachers that admitted credits during
+  const handleSubmit = async () => {
+    await getTeacherStatistics(semesterStart, semesterEnd, provs)
+    setDisplay(true)
+  }
+
+  const userProviders = mapToProviders(rights)
+  const invalidQueryParams = provs.length === 0 || !semesterStart
+  const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
+  const filteredOptions = semesters.filter(sem => {
+    const options =
+      moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
+        ? Number(sem.text.replace(/[^0-9]/g, '')) <= new Date().getFullYear()
+        : Number(sem.text.replace(/[^0-9]/g, '')) < new Date().getFullYear() ||
+          (Number(sem.text.replace(/[^0-9]/g, '')) === new Date().getFullYear() && sem.text.includes('Spring')) // so that current spring is included
+    return options
+  })
+  return (
+    <div>
+      <Message
+        header="Teacher statistics by course providers"
+        content="Statistics for teachers that admitted credits during
               and between the given semesters for one of the given course providers."
-        />
-        <Segment>
-          <Form loading={pending}>
-            <Form.Group widths="equal">
-              <Form.Dropdown
-                name="semesterStart"
-                placeholder="Semester"
-                label="Start semester"
-                selection
-                search
-                options={filteredOptions}
-                value={semesterStart}
-                onChange={this.setStartSemester}
-                selectOnBlur={false}
-                selectOnNavigation={false}
-              />
-              <Form.Dropdown
-                name="semesterEnd"
-                placeholder="Semester"
-                label="End semester"
-                selection
-                search
-                options={filteredOptions.filter(semester => semester.value >= semesterStart)}
-                disabled={!semesterStart}
-                value={semesterEnd}
-                onChange={this.handleChange}
-                selectOnBlur={false}
-                selectOnNavigation={false}
-              />
-            </Form.Group>
-            <Form.Field>
-              <label>Course providers</label>
-              <Dropdown
-                name="providers"
-                placeholder="Providers"
-                multiple
-                selection
-                search
-                options={providerOptions}
-                value={this.state.providers}
-                onChange={this.handleChange}
-                selectOnBlur={false}
-                selectOnNavigation={false}
-              />
-            </Form.Field>
-            <Button fluid content="Search" onClick={this.handleSubmit} disabled={invalidQueryParams} />
-          </Form>
-        </Segment>
-        {display && !pending && (
-          <Segment>
-            <TeacherStatisticsTable
-              statistics={statistics}
-              onClickFn={id => this.props.history.push(`/teachers/${id}`)}
+      />
+      <Segment>
+        <Form loading={pending}>
+          <Form.Group widths="equal">
+            <Form.Dropdown
+              name="semesterStart"
+              placeholder="Semester"
+              label="Start semester"
+              selection
+              search
+              options={filteredOptions}
+              value={semesterStart}
+              onChange={setStartSemester}
+              selectOnBlur={false}
+              selectOnNavigation={false}
             />
-          </Segment>
-        )}
-      </div>
-    )
-  }
+            <Form.Dropdown
+              name="semesterEnd"
+              placeholder="Semester"
+              label="End semester"
+              selection
+              search
+              options={filteredOptions.filter(semester => semester.value >= semesterStart)}
+              disabled={!semesterStart}
+              value={semesterEnd}
+              onChange={setEndSemester}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+            />
+          </Form.Group>
+          <Form.Field>
+            <label>Course providers</label>
+            <Dropdown
+              name="providers"
+              placeholder="Providers"
+              multiple
+              selection
+              search
+              options={providerOptions}
+              value={provs}
+              onChange={changeProviders}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+            />
+          </Form.Field>
+          <Button fluid content="Search" onClick={handleSubmit} disabled={invalidQueryParams} />
+        </Form>
+      </Segment>
+      {display && !pending && (
+        <Segment>
+          <TeacherStatisticsTable statistics={statistics} onClickFn={id => history.push(`/teachers/${id}`)} />
+        </Segment>
+      )}
+    </div>
+  )
 }
 
 TeacherStatistics.propTypes = {

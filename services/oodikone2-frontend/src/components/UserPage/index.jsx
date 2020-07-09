@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useEffect } from 'react'
 import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getActiveLanguage } from 'react-localize-redux'
@@ -15,83 +15,43 @@ import AccessGroups from './AccessGroups'
 import EmailNotification from './EmailNotification'
 import { getElementDetails } from '../../redux/elementdetails'
 
-const formatToDropdown = (elements, language) => {
-  const options = Object.values(elements).map(e => ({
-    key: e.code,
-    value: e.code,
-    description: e.code,
-    text: getTextIn(e.name, language)
-  }))
-  return sortBy(options, 'text')
-}
-
-class UserPage extends Component {
-  state = {
-    degree: undefined,
-    programme: undefined
-  }
-
-  componentDidMount() {
-    const { associations, pending, getElementDetails, elementdetails, accessGroups, faculties } = this.props
+const UserPage = ({
+  user,
+  language,
+  elementdetails,
+  accessGroups,
+  isAdmin,
+  faculties,
+  setFaculties,
+  goBack,
+  history,
+  associations,
+  pending,
+  getElementDetails,
+  removeUserUnits,
+  getAccessGroups,
+  getFaculties,
+  getDegreesAndProgrammesUnfiltered
+}) => {
+  useEffect(() => {
     if (elementdetails.length === 0) getElementDetails()
-    if (accessGroups.data.length === 0) this.props.getAccessGroups()
-    if (faculties.length === 0) this.props.getFaculties()
+    if (accessGroups.data.length === 0) getAccessGroups()
+    if (faculties.length === 0) getFaculties()
     if (Object.keys(associations).length === 0 && !pending) {
-      this.props.getDegreesAndProgrammesUnfiltered()
+      getDegreesAndProgrammesUnfiltered()
     }
-  }
+  }, [])
 
-  getDisabledUnits = (units, enabled) => {
-    const enabledIds = new Set(enabled.map(element => element.code))
-    return units.filter(u => !enabledIds.has(u.id))
-  }
+  const removeAccess = (uid, unit) => () => removeUserUnits(uid, [unit])
 
-  removeAccess = (uid, unit) => () => this.props.removeUserUnits(uid, [unit])
-
-  degreeOptions = () => {
-    const { degrees } = this.props.associations
-    const degreeOptions = !degrees ? [] : formatToDropdown(degrees, this.props.language)
-    return degreeOptions
-  }
-
-  programmeOptions = () => {
-    const { degrees, programmes } = this.props.associations
-    const { degree: degreeCode } = this.state
-    if (!programmes) return []
-    if (degrees && degreeCode) {
-      const degree = degrees[degreeCode]
-      return formatToDropdown(degree.programmes, this.props.language)
-    }
-    return formatToDropdown(programmes, this.props.language)
-  }
-
-  specializationOptions = () => {
-    const { studyTracks } = this.props.associations
-    const { programme: programmeCode } = this.state
-    if (!studyTracks) return []
-    if (programmeCode) {
-      const filteredStudyTracks = Object.values(studyTracks)
-        .filter(s => s.programmes[programmeCode])
-        .reduce((acc, e) => {
-          acc[e.code] = e
-          return acc
-        }, {})
-      return formatToDropdown(filteredStudyTracks, this.props.language)
-    }
-    return formatToDropdown(studyTracks, this.props.language)
-  }
-
-  allSpecializationIds = () => this.specializationOptions().map(sp => sp.key)
-
-  showAs = uid => {
+  const showAs = uid => {
     setMocking(uid)
-    this.props.history.push('/')
+    history.push('/')
     window.location.reload()
   }
 
-  renderUnitList = (elementdetailcodes, elementdetails, user) => {
+  const renderUnitList = (elementdetailcodes, elementdetails, user) => {
     if (!elementdetailcodes) return null
-    const { language } = this.props
     const nameInLanguage = element => getTextIn(element.name, language)
     elementdetailcodes.sort()
     return (
@@ -106,7 +66,7 @@ class UserPage extends Component {
                     basic
                     negative
                     floated="right"
-                    onClick={this.removeAccess(user.id, code)}
+                    onClick={removeAccess(user.id, code)}
                     content="Remove"
                     size="tiny"
                   />
@@ -121,114 +81,111 @@ class UserPage extends Component {
     )
   }
 
-  render() {
-    const { user, language, elementdetails, accessGroups, isAdmin, faculties, setFaculties, goBack } = this.props
-
-    if (!accessGroups) {
-      return null
-    }
-
-    return (
-      <div>
-        <Button icon="arrow circle left" content="Back" onClick={goBack} />
+  const renderUserInfoCard = () => (
+    <Card fluid>
+      <Card.Content>
+        <Card.Header>
+          {isAdmin && user.is_enabled && (
+            <Popup
+              content="Show Oodikone as this user"
+              trigger={
+                <Button floated="right" circular size="tiny" basic icon="spy" onClick={() => showAs(user.username)} />
+              }
+            />
+          )}
+          {user.full_name}
+        </Card.Header>
         <Divider />
-        <Card.Group>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header>
-                {isAdmin && user.is_enabled && (
-                  <Popup
-                    content="Show Oodikone as this user"
-                    trigger={
-                      <Button
-                        floated="right"
-                        circular
-                        size="tiny"
-                        basic
-                        icon="spy"
-                        onClick={() => this.showAs(user.username)}
-                      />
-                    }
-                  />
-                )}
-                {user.full_name}
-              </Card.Header>
-              <Divider />
-              <Card.Meta content={user.username} />
-              <Card.Meta content={user.email} />
-              <Card.Description>
-                {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`} <br />
-              </Card.Description>
-            </Card.Content>
-          </Card>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Add study programme access rights" />
-              <Divider />
-              <AccessRights uid={user.id} rights={user.elementdetails} />
-            </Card.Content>
-          </Card>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Add access group rights" />
-              <Divider />
-              <AccessGroups user={user} />
-            </Card.Content>
-          </Card>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Access rights" />
-              <Card.Description>
-                {user.accessgroup.map(ag => ag.group_code).includes('admin') ? (
-                  <p
-                    style={{
-                      fontSize: '34px',
-                      fontFamily: 'Comic Sans',
-                      color: 'darkred',
-                      border: '1px'
-                    }}
-                  >
-                    Admin access!
-                  </p>
-                ) : null}
-                {this.renderUnitList(user.programme, elementdetails, user)}
-                <Header content="Faculties" />
-                <Dropdown
-                  placeholder="Select faculties"
-                  fluid
-                  selection
-                  multiple
-                  value={user.faculty.map(f => f.faculty_code)}
-                  options={sortBy(
-                    faculties.map(f => ({
-                      key: f.code,
-                      text: getTextIn(f.name, language),
-                      description: f.code,
-                      value: f.code
-                    })),
-                    ['text']
-                  )}
-                  onChange={(__, { value: facultycodes }) => setFaculties(user.id, facultycodes)}
-                  search={textAndDescriptionSearch}
-                  selectOnBlur={false}
-                  selectOnNavigation={false}
-                />
-              </Card.Description>
-            </Card.Content>
-          </Card>
-          <Card fluid>
-            <Card.Content>
-              <Card.Header content="Send email about receiving access to oodikone" />
-              <Card.Description>
-                <Divider />
-                <EmailNotification userEmail={user.email} />
-              </Card.Description>
-            </Card.Content>
-          </Card>
-        </Card.Group>
-      </div>
-    )
+        <Card.Meta content={user.username} />
+        <Card.Meta content={user.email} />
+        <Card.Description>
+          {`Access to oodikone: ${user.is_enabled ? 'En' : 'Dis'}abled`} <br />
+        </Card.Description>
+      </Card.Content>
+    </Card>
+  )
+
+  const renderAccessRights = () => (
+    <Card fluid>
+      <Card.Content>
+        <Card.Header content="Access rights" />
+        <Card.Description>
+          {user.accessgroup.map(ag => ag.group_code).includes('admin') ? (
+            <p
+              style={{
+                fontSize: '34px',
+                fontFamily: 'Comic Sans',
+                color: 'darkred',
+                border: '1px'
+              }}
+            >
+              Admin access!
+            </p>
+          ) : null}
+          {renderUnitList(user.programme, elementdetails, user)}
+          <Header content="Faculties" />
+          <Dropdown
+            placeholder="Select faculties"
+            fluid
+            selection
+            multiple
+            value={user.faculty.map(f => f.faculty_code)}
+            options={sortBy(
+              faculties.map(f => ({
+                key: f.code,
+                text: getTextIn(f.name, language),
+                description: f.code,
+                value: f.code
+              })),
+              ['text']
+            )}
+            onChange={(__, { value: facultycodes }) => setFaculties(user.id, facultycodes)}
+            search={textAndDescriptionSearch}
+            selectOnBlur={false}
+            selectOnNavigation={false}
+          />
+        </Card.Description>
+      </Card.Content>
+    </Card>
+  )
+
+  if (!accessGroups) {
+    return null
   }
+
+  return (
+    <div>
+      <Button icon="arrow circle left" content="Back" onClick={goBack} />
+      <Divider />
+      <Card.Group>
+        {renderUserInfoCard()}
+        <Card fluid>
+          <Card.Content>
+            <Card.Header content="Add study programme access rights" />
+            <Divider />
+            <AccessRights uid={user.id} rights={user.elementdetails} />
+          </Card.Content>
+        </Card>
+        <Card fluid>
+          <Card.Content>
+            <Card.Header content="Add access group rights" />
+            <Divider />
+            <AccessGroups user={user} />
+          </Card.Content>
+        </Card>
+        {renderAccessRights()}
+        <Card fluid>
+          <Card.Content>
+            <Card.Header content="Send email about receiving access to oodikone" />
+            <Card.Description>
+              <Divider />
+              <EmailNotification userEmail={user.email} />
+            </Card.Description>
+          </Card.Content>
+        </Card>
+      </Card.Group>
+    </div>
+  )
 }
 
 UserPage.propTypes = {
