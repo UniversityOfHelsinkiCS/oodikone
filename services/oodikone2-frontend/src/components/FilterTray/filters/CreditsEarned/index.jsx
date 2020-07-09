@@ -86,7 +86,12 @@ const CreditsEarned = ({ filterControl, translate }) => {
   const active = Object.values(names).some(name => Object.keys(filterControl.activeFilters).includes(name))
 
   return (
-    <FilterCard title="Credits Earned" active={active} className="total-credits-filter" contextKey={contextKey}>
+    <FilterCard
+      title={translate('creditFilter.title')}
+      active={active}
+      className="total-credits-filter"
+      contextKey={contextKey}
+    >
       <Form>
         <div className="description-text">{translate('creditFilter.description')}</div>
         {Object.keys(currentValue).map(key => (
