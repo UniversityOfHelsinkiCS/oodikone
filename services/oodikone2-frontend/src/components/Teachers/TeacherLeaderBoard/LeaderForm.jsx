@@ -7,7 +7,8 @@ import { getTopTeachers } from '../../../redux/teachersTop'
 const LeaderForm = ({
   selectedyear,
   selectedcategory,
-  handleChange,
+  handleCategoryChange,
+  handleYearChange,
   yearoptions,
   categoryoptions,
   updateAndSubmitForm
@@ -41,7 +42,7 @@ const LeaderForm = ({
             selection
             search
             value={selectedyear}
-            onChange={handleChange}
+            onChange={handleYearChange}
             selectOnBlur={false}
             selectOnNavigation={false}
           />
@@ -53,7 +54,7 @@ const LeaderForm = ({
             selection
             search
             value={selectedcategory}
-            onChange={handleChange}
+            onChange={handleCategoryChange}
             selectOnBlur={false}
             selectOnNavigation={false}
           />
@@ -67,7 +68,8 @@ LeaderForm.propTypes = {
   yearoptions: arrayOf(shape({})).isRequired,
   categoryoptions: arrayOf(shape({ key: any, value: any, text: string })).isRequired,
   updateAndSubmitForm: func.isRequired,
-  handleChange: func.isRequired,
+  handleCategoryChange: func.isRequired,
+  handleYearChange: func.isRequired,
   selectedcategory: string, // eslint-disable-line
   selectedyear: number // eslint-disable-line
 }
