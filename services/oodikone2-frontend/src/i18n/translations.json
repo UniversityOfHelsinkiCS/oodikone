@@ -308,6 +308,8 @@
     "trayTitle": ["Filters"],
     "trayOpen": ["Filters"],
     "trayClose": ["Close Filters"],
-    "filterCountTooltip": ["Number of active filters."]
+    "filterCountTooltip": ["Number of active filters."],
+    "clearButtonLabel": ["Clear"],
+    "numericFilterClearTooltip": ["Clear filter."]
   }
 }
