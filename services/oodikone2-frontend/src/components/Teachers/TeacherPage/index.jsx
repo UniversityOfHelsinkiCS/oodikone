@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Redirect } from 'react-router-dom'
 import { shape, string, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
@@ -7,16 +7,14 @@ import { getTeacher } from '../../../redux/teachers'
 import TeacherDetails from '../TeacherDetails'
 
 const TeacherPage = ({ teacher, teacherid, isLoading, getTeacher }) => {
-  const [initialized, setInitialized] = useState(false)
-  useEffect(async () => {
-    if (!teacher) await getTeacher(teacherid)
-    setInitialized(true)
+  useEffect(() => {
+    if (!teacher) getTeacher(teacherid)
   }, [])
 
-  if (!initialized || isLoading) {
+  if (isLoading || !teacher) {
     return <Segment basic loading={isLoading} />
   }
-  if (!teacher) {
+  if (!teacher && !isLoading) {
     return <Redirect to="/teachers" />
   }
   return <TeacherDetails teacher={teacher} />
