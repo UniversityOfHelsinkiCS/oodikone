@@ -303,5 +303,68 @@
     "firstQuartile": ["1st Quartile (25 %)"],
     "secondQuartile": ["2nd Quartile (50 %)"],
     "thirdQuartile": ["3rd Quartile (75 %)"]
+  },
+  "filters": {
+    "trayTitle": ["Filters"],
+    "trayOpen": ["Filters"],
+    "trayClose": ["Close Filters"],
+    "filterCountTooltip": ["Number of active filters."],
+    "clearButtonLabel": ["Clear"],
+    "numericFilterClearTooltip": ["Clear filter."]
+  },
+  "courseFilter": {
+    "courseSelectorLabel": ["Select Course to Filter By"],
+    "subFilterAll": ["All"],
+    "subFilterPassed": ["Passed"],
+    "subFilterPassAfterFail": ["Passed After Failure"],
+    "subFilterFailed": ["Failed"],
+    "subFilterFailedMany": ["Failed Many Times"],
+    "subFilterNot": ["Not Participated"],
+    "subFilterNotOrFail": ["Not Participated or Failed"],
+    "subFilterDropdownLabel": ["Show:"]
+  },
+  "creditFilter": {
+    "title": ["Credit Filter"],
+    "description": ["Filter students by the amount of credits earned during the selected period."],
+    "labelMax": ["Less Than"],
+    "labelMin": ["At Least"]
+  },
+  "enrlFilter": {
+    "title": ["Enrollment Status"],
+    "statusLabel": ["Choose Enrollment Status"],
+    "semesterLabel": ["Choose Semesters"]
+  },
+  "genderFilter": {
+    "title": ["Gender"],
+    "dropdownLabel": ["Choose Gender"],
+    "female": ["Female"],
+    "male": ["Male"],
+    "other": ["Other"],
+    "unknown": ["Unknown"]
+  },
+  "gradeMeanFilter": {
+    "title": ["Grade Mean"],
+    "comparatorTooltip": ["Select comparator."]
+  },
+  "gradFromProgFilter": {
+    "title": ["Graduated Students"],
+    "dropdownLabel": ["Choose Option"],
+    "descriptionUpper": ["Show students who have..."],
+    "descriptionLower": ["...from this study programme."],
+    "optNot": ["Not Graduated"],
+    "optGrad": ["Graduated"],
+    "optBachelor": ["Graduated with Bachelor's"],
+    "optMaster": ["Graduated with Master's"]
+  },
+  "startYearFilter": {
+    "title": ["Starting Year at University"],
+    "dropdownLabel": ["Choose Years to Include"]
+  },
+  "transferFilter": {
+    "title": ["Transfer Status"],
+    "descriptionUpper": ["Show students who..."],
+    "descriptionLower": ["...transferred to this study programme."],
+    "have": ["Have"],
+    "haveNot": ["Have Not"]
   }
 }
