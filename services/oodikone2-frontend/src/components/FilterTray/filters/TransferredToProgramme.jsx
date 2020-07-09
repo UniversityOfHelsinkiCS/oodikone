@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Form, Button } from 'semantic-ui-react'
+import { getTranslate } from 'react-localize-redux'
+import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 
-const TransferredToProgramme = ({ filterControl }) => {
+const TransferredToProgramme = ({ filterControl, translate }) => {
   const { addFilter, removeFilter, withoutFilter } = filterControl
   const [value, setValue] = useState(null)
   const name = 'transferredToProgrammeFilter'
@@ -26,25 +28,25 @@ const TransferredToProgramme = ({ filterControl }) => {
 
   return (
     <FilterCard
-      title="Transfer Status"
+      title={translate('transferFilter.title')}
       contextKey={name}
       active={active}
       footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} />}
     >
       <Form>
-        <div className="description-text">Show students who...</div>
+        <div className="description-text">{translate('transferFilter.descriptionUpper')}</div>
         <Form.Field className="flex-centered">
           <Button.Group size="small">
             <Button toggle active={value === 1} onClick={toggle(1)}>
-              {`Have (${count(true)})`}
+              {`${translate('transferFilter.have')} (${count(true)})`}
             </Button>
             <Button.Or text="OR" />
             <Button toggle active={value === 0} onClick={toggle(0)}>
-              {`Have Not (${count(false)})`}
+              {`${translate('transferFilter.haveNot')} (${count(false)})`}
             </Button>
           </Button.Group>
         </Form.Field>
-        <div className="description-text">...transferred to this study programme.</div>
+        <div className="description-text">{translate('transferFilter.descriptionLower')}</div>
       </Form>
     </FilterCard>
   )
@@ -55,7 +57,10 @@ TransferredToProgramme.propTypes = {
     addFilter: PropTypes.func.isRequired,
     removeFilter: PropTypes.func.isRequired,
     withoutFilter: PropTypes.func.isRequired
-  }).isRequired
+  }).isRequired,
+  translate: PropTypes.func.isRequired
 }
 
-export default TransferredToProgramme
+const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
+
+export default connect(mapStateToProps)(TransferredToProgramme)

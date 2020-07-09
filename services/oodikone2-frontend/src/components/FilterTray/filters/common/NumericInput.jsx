@@ -1,8 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Input, Label, Popup, Button, Icon } from 'semantic-ui-react'
+import { connect } from 'react-redux'
+import { getTranslate } from 'react-localize-redux'
 
-const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonDisabled, className }) => (
+const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonDisabled, className, translate }) => (
   <Input
     labelPosition="left"
     size="mini"
@@ -15,7 +17,7 @@ const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonD
     <Label>{label}</Label>
     <input />
     <Popup
-      content="Clear filter."
+      content={translate('filters.numericFilterClearTooltip')}
       position="top right"
       pinned
       size="mini"
@@ -36,7 +38,8 @@ NumericInput.propTypes = {
   value: PropTypes.string.isRequired,
   label: PropTypes.node.isRequired,
   clearButtonDisabled: PropTypes.bool.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
+  translate: PropTypes.func.isRequired
 }
 
 NumericInput.defaultProps = {
@@ -44,4 +47,6 @@ NumericInput.defaultProps = {
   className: null
 }
 
-export default NumericInput
+const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
+
+export default connect(mapStateToProps)(NumericInput)

@@ -2,11 +2,13 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Dropdown, Popup } from 'semantic-ui-react'
+import { getTranslate } from 'react-localize-redux'
+import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import NumericInput from './common/NumericInput'
 import { getStudentGradeMean } from '../../../common'
 
-const GradeMean = ({ filterControl }) => {
+const GradeMean = ({ filterControl, translate }) => {
   const [comparator, setComparator] = useState('<')
   const [value, setValue] = useState('')
   const name = 'gradeMeanFilter'
@@ -29,7 +31,7 @@ const GradeMean = ({ filterControl }) => {
   }, [comparator, value])
 
   return (
-    <FilterCard title="Grade Mean">
+    <FilterCard title={translate('gradeMeanFilter.title')}>
       <NumericInput
         onChange={(_, { value: inputValue }) => setValue(inputValue)}
         onClear={() => setValue('')}
@@ -38,7 +40,7 @@ const GradeMean = ({ filterControl }) => {
         className="comparator-input"
         label={
           <Popup
-            content="Select comparator."
+            content={translate('gradeMeanFilter.comparatorTooltip')}
             position="top left"
             pinned
             size="mini"
@@ -62,7 +64,10 @@ GradeMean.propTypes = {
   filterControl: PropTypes.shape({
     addFilter: PropTypes.func.isRequired,
     removeFilter: PropTypes.func.isRequired
-  }).isRequired
+  }).isRequired,
+  translate: PropTypes.func.isRequired
 }
 
-export default GradeMean
+const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
+
+export default connect(mapStateToProps)(GradeMean)
