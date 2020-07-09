@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import lodash from 'lodash'
 import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
+import { getTranslate } from 'react-localize-redux'
+import { connect } from 'react-redux'
 import CreditsEarned from './filters/CreditsEarned'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
@@ -16,7 +18,7 @@ import GraduatedFromProgramme from './filters/GraduatedFromProgramme'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children }) => {
+const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children, translate }) => {
   const [clickSaver] = useFeatureToggle('clickSaver')
   const [open, setOpen] = useFilterTray(contextKey)
 
@@ -54,10 +56,10 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <Card.Group id="filter-tray">
             <Header size="medium">
               <Header.Content>
-                Filters
+                {translate('filters.trayTitle')}
                 {noFilters > 0 && (
                   <Popup
-                    content="Number of active filters."
+                    content={translate('filters.filterCountTooltip')}
                     position="bottom center"
                     pinned
                     size="mini"
@@ -86,7 +88,7 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)}>
               <Icon name="angle double up" />
-              <div className="button-label">Close Filters</div>
+              <div className="button-label">{translate('filters.trayClose')}</div>
               <Icon name="angle double up" />
             </Button>
           </div>
@@ -97,10 +99,10 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
         <Button secondary onClick={() => setOpen(true)}>
           <Icon name="angle double down" />
           <div className="button-label">
-            Filters
+            {translate('filters.trayOpen')}
             {noFilters > 0 && (
               <Popup
-                content="Number of active filters."
+                content={translate('filters.filterCountTooltip')}
                 position="right center"
                 pinned
                 size="mini"
@@ -125,7 +127,8 @@ FilterTray.propTypes = {
   setFilteredStudents: PropTypes.func.isRequired,
   allStudents: PropTypes.arrayOf(PropTypes.shape({})),
   filteredStudents: PropTypes.arrayOf(PropTypes.shape({})),
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  translate: PropTypes.func.isRequired
 }
 
 FilterTray.defaultProps = {
@@ -133,4 +136,6 @@ FilterTray.defaultProps = {
   filteredStudents: []
 }
 
-export default FilterTray
+const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
+
+export default connect(mapStateToProps)(FilterTray)
