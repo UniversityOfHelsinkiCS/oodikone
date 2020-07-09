@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Redirect } from 'react-router-dom'
 import { shape, string, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
@@ -6,29 +6,20 @@ import { Segment } from 'semantic-ui-react'
 import { getTeacher } from '../../../redux/teachers'
 import TeacherDetails from '../TeacherDetails'
 
-class TeacherPage extends Component {
-  state = {
-    initialized: false
-  }
+const TeacherPage = ({ teacher, teacherid, isLoading, getTeacher }) => {
+  const [initialized, setInitialized] = useState(false)
+  useEffect(async () => {
+    if (!teacher) await getTeacher(teacherid)
+    setInitialized(true)
+  }, [])
 
-  async componentDidMount() {
-    const { teacher, teacherid } = this.props
-    if (!teacher) {
-      await this.props.getTeacher(teacherid)
-    }
-    this.setState({ initialized: true })
+  if (!initialized || isLoading) {
+    return <Segment basic loading={isLoading} />
   }
-
-  render() {
-    const { teacher, isLoading } = this.props
-    if (!this.state.initialized || isLoading) {
-      return <Segment basic loading={isLoading} />
-    }
-    if (!teacher) {
-      return <Redirect to="/teachers" />
-    }
-    return <TeacherDetails teacher={teacher} />
+  if (!teacher) {
+    return <Redirect to="/teachers" />
   }
+  return <TeacherDetails teacher={teacher} />
 }
 
 TeacherPage.propTypes = {

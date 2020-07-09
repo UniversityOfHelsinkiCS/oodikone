@@ -1,67 +1,66 @@
-import React, { Component } from 'react'
+import React, { useEffect } from 'react'
 import { Segment, Form } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, arrayOf, shape, string, any, number } from 'prop-types'
 import { getTopTeachers } from '../../../redux/teachersTop'
 
-class LeaderForm extends Component {
-  componentDidMount() {
-    const { year, category } = this.defaultValues()
-    if (year && category) {
-      this.props.updateAndSubmitForm({
-        selectedyear: year,
-        selectedcategory: category
-      })
-    }
-  }
-
-  defaultValues = () => {
-    const { yearoptions, categoryoptions } = this.props
+const LeaderForm = ({
+  selectedyear,
+  selectedcategory,
+  handleChange,
+  yearoptions,
+  categoryoptions,
+  updateAndSubmitForm
+}) => {
+  useEffect(() => {
     const [defaultyear = {}] = [
       yearoptions.find(year => Number(year.text.slice(0, 4)) === new Date().getFullYear() - 1)
     ]
     const [defaultcategory = {}] = categoryoptions
-    return {
-      year: defaultyear.value,
-      category: defaultcategory.value
-    }
-  }
 
-  render() {
-    const { yearoptions, categoryoptions } = this.props
-    return (
-      <Segment>
-        <Form>
-          <Form.Group widths="equal">
-            <Form.Dropdown
-              name="selectedyear"
-              label="Academic year"
-              placeholder="Academic year"
-              options={yearoptions}
-              selection
-              search
-              value={this.props.selectedyear}
-              onChange={this.props.handleChange}
-              selectOnBlur={false}
-              selectOnNavigation={false}
-            />
-            <Form.Dropdown
-              name="selectedcategory"
-              label="Category"
-              placeholder="Category"
-              options={categoryoptions}
-              selection
-              search
-              value={this.props.selectedcategory}
-              onChange={this.props.handleChange}
-              selectOnBlur={false}
-              selectOnNavigation={false}
-            />
-          </Form.Group>
-        </Form>
-      </Segment>
-    )
-  }
+    const year = defaultyear.value
+    const category = defaultcategory.value
+
+    if (year && category) {
+      updateAndSubmitForm({
+        selectedyear: year,
+        selectedcategory: category
+      })
+    }
+  }, [])
+
+  return (
+    <Segment>
+      <Form>
+        <Form.Group widths="equal">
+          <Form.Dropdown
+            name="selectedyear"
+            label="Academic year"
+            placeholder="Academic year"
+            options={yearoptions}
+            selection
+            search
+            value={selectedyear}
+            onChange={handleChange}
+            selectOnBlur={false}
+            selectOnNavigation={false}
+          />
+          <Form.Dropdown
+            name="selectedcategory"
+            label="Category"
+            placeholder="Category"
+            options={categoryoptions}
+            selection
+            search
+            value={selectedcategory}
+            onChange={handleChange}
+            selectOnBlur={false}
+            selectOnNavigation={false}
+          />
+        </Form.Group>
+      </Form>
+    </Segment>
+  )
 }
 
 LeaderForm.propTypes = {
