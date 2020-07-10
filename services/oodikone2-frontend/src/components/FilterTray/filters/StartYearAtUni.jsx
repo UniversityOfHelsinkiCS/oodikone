@@ -5,9 +5,10 @@ import { getTranslate } from 'react-localize-redux'
 import { connect } from 'react-redux'
 import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
+import useFilters from '../useFilters'
 
-const StartYearAtUni = ({ filterControl, translate }) => {
-  const { addFilter, removeFilter, withoutFilter, activeFilters } = filterControl
+const StartYearAtUni = ({ translate }) => {
+  const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
 
   const [value, setValue] = useState([])
   const name = 'startYearAtUni'
@@ -58,12 +59,6 @@ const StartYearAtUni = ({ filterControl, translate }) => {
 }
 
 StartYearAtUni.propTypes = {
-  filterControl: PropTypes.shape({
-    addFilter: PropTypes.func.isRequired,
-    removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired,
-    activeFilters: PropTypes.object.isRequired
-  }).isRequired,
   translate: PropTypes.func.isRequired
 }
 

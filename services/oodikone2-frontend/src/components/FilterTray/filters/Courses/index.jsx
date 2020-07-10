@@ -9,15 +9,17 @@ import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 import './courseFilter.css'
 import DropdownWithUnfuckedPlaceholder from './DropdownWithUnfuckedPlaceholder'
+import useFilters from '../../useFilters'
 
 export const contextKey = 'coursesFilter'
 
-const Courses = ({ filterControl, language, translate }) => {
+const Courses = ({ language, translate }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
+  const { filteredStudents } = useFilters()
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
   const options = courseStats
-    .filter(course => course.stats.students > Math.round(filterControl.filteredStudents.length * 0.3))
+    .filter(course => course.stats.students > Math.round(filteredStudents.length * 0.3))
     .filter(course => !selectedCourses.some(c => c.course.code === course.course.code))
     .map(course => ({
       key: `course-filter-option-${course.course.code}`,
@@ -35,11 +37,7 @@ const Courses = ({ filterControl, language, translate }) => {
       />
       <Card.Group>
         {selectedCourses.map(course => (
-          <CourseCard
-            courseStats={course}
-            filterContol={filterControl}
-            key={`course-filter-selected-course-${course.course.code}`}
-          />
+          <CourseCard courseStats={course} key={`course-filter-selected-course-${course.course.code}`} />
         ))}
       </Card.Group>
     </FilterCard>
@@ -47,9 +45,6 @@ const Courses = ({ filterControl, language, translate }) => {
 }
 
 Courses.propTypes = {
-  filterControl: PropTypes.shape({
-    filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
-  }).isRequired,
   language: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired
 }

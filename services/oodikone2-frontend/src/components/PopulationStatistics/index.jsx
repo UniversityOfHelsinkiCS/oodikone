@@ -16,6 +16,7 @@ import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
 import useFeatureToggle from '../../common/useFeatureToggle'
+import useFilters from '../FilterTray/useFilters'
 
 const PopulationStatistics = memo(props => {
   const {
@@ -33,14 +34,15 @@ const PopulationStatistics = memo(props => {
     isLoading,
     students
   } = props
-  const [filteredStudents, setFilteredStudents] = useState(students)
   const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const [filterFeatToggle, , toggleFilterFeature] = useFeatureToggle('filterFeatToggle')
   const [clickSaver, , toggleClickSaver] = useFeatureToggle('clickSaver')
   const [excluded, setExcluded] = useState([])
+  const { setAllStudents, filteredStudents } = useFilters()
 
   const { onProgress, progress } = useProgress(loading)
   useTitle('Population statistics')
+
   useEffect(() => {
     if (props.queryIsSet) {
       const { query, tagstudent, selectedStudents, samples, studytracks } = props
@@ -61,6 +63,11 @@ const PopulationStatistics = memo(props => {
       setExcluded(excludedFilters)
     }
   }, [props.selectedStudents])
+
+  // Pass students to filter context.
+  useEffect(() => {
+    setAllStudents(students)
+  }, [students])
 
   const getStudentNumbers = students => {
     if (!students) {
@@ -150,13 +157,7 @@ const PopulationStatistics = memo(props => {
     </div>
   )
 
-  return filterFeatToggle ? (
-    <FilterTray setFilteredStudents={setFilteredStudents} filteredStudents={filteredStudents} allStudents={students}>
-      {renderAcualComponent()}
-    </FilterTray>
-  ) : (
-    renderAcualComponent()
-  )
+  return filterFeatToggle ? <FilterTray>{renderAcualComponent()}</FilterTray> : renderAcualComponent()
 })
 
 PopulationStatistics.propTypes = {
