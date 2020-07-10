@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
@@ -9,7 +9,6 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
-import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from './useFilterTray'
 import EnrollmentStatus from './filters/EnrollmentStatus'
 import TransferredToProgramme from './filters/TransferredToProgramme'
@@ -19,13 +18,8 @@ import useFilters from './useFilters'
 export const contextKey = 'filterTray'
 
 const FilterTray = ({ children, translate }) => {
-  const [clickSaver] = useFeatureToggle('clickSaver')
   const [open, setOpen] = useFilterTray(contextKey)
   const { allStudents, activeFilters } = useFilters()
-
-  useEffect(() => {
-    setOpen(clickSaver)
-  }, [])
 
   const noFilters = Object.keys(activeFilters).length
 
