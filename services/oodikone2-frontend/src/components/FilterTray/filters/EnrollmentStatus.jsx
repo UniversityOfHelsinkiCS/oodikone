@@ -7,11 +7,12 @@ import { connect } from 'react-redux'
 import { getTranslate } from 'react-localize-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
+import useFilters from '../useFilters'
 
-const EnrollmentStatus = ({ filterControl, allSemesters, language, translate }) => {
+const EnrollmentStatus = ({ allSemesters, language, translate }) => {
   const [status, setStatus] = useState(null)
   const [semesters, setSemesters] = useState([])
-  const { allStudents, addFilter, removeFilter } = filterControl
+  const { allStudents, addFilter, removeFilter } = useFilters()
   const name = 'enrollmentStatusFilter'
   const active = !!status && !!semesters.length
 
@@ -90,11 +91,6 @@ const EnrollmentStatus = ({ filterControl, allSemesters, language, translate }) 
 }
 
 EnrollmentStatus.propTypes = {
-  filterControl: PropTypes.shape({
-    addFilter: PropTypes.func.isRequired,
-    removeFilter: PropTypes.func.isRequired,
-    allStudents: PropTypes.arrayOf(PropTypes.object).isRequired
-  }).isRequired,
   allSemesters: PropTypes.shape({}),
   language: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired
