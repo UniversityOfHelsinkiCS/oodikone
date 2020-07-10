@@ -36,7 +36,6 @@ const PopulationStatistics = memo(props => {
   } = props
   const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const [filterFeatToggle, , toggleFilterFeature] = useFeatureToggle('filterFeatToggle')
-  const [clickSaver, , toggleClickSaver] = useFeatureToggle('clickSaver')
   const [excluded, setExcluded] = useState([])
   const { setAllStudents, filteredStudents } = useFilters()
 
@@ -111,9 +110,6 @@ const PopulationStatistics = memo(props => {
                     onClick={toggleFilterFeature}
                     label="Toggle New Filters"
                   />
-                  {filterFeatToggle && (
-                    <Form.Radio checked={clickSaver} toggle onClick={toggleClickSaver} label="Save Precious Clicks" />
-                  )}
                 </Form.Group>
               </Form>
             ) : null}
