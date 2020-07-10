@@ -15,12 +15,14 @@ import useFilterTray from './useFilterTray'
 import EnrollmentStatus from './filters/EnrollmentStatus'
 import TransferredToProgramme from './filters/TransferredToProgramme'
 import GraduatedFromProgramme from './filters/GraduatedFromProgramme'
+import useFilters from './useFilters'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children, translate }) => {
+const FilterTray = ({ children, translate }) => {
   const [clickSaver] = useFeatureToggle('clickSaver')
   const [open, setOpen] = useFilterTray(contextKey)
+  const { allStudents, filteredStudents, setFilteredStudents } = useFilters()
 
   useEffect(() => {
     setOpen(clickSaver)
@@ -124,16 +126,8 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
 }
 
 FilterTray.propTypes = {
-  setFilteredStudents: PropTypes.func.isRequired,
-  allStudents: PropTypes.arrayOf(PropTypes.shape({})),
-  filteredStudents: PropTypes.arrayOf(PropTypes.shape({})),
   children: PropTypes.node.isRequired,
   translate: PropTypes.func.isRequired
-}
-
-FilterTray.defaultProps = {
-  allStudents: [],
-  filteredStudents: []
 }
 
 const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
