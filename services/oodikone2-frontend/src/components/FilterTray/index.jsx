@@ -22,32 +22,12 @@ export const contextKey = 'filterTray'
 const FilterTray = ({ children, translate }) => {
   const [clickSaver] = useFeatureToggle('clickSaver')
   const [open, setOpen] = useFilterTray(contextKey)
-  const { allStudents, filteredStudents, setFilteredStudents } = useFilters()
+  const filterControl = useFilters()
+  const { allStudents, activeFilters } = filterControl
 
   useEffect(() => {
     setOpen(clickSaver)
   }, [])
-
-  const [activeFilters, setActiveFilters] = useState({})
-
-  const applyFilters = filters =>
-    Object.values(filters).reduce((students, nextFilter) => students.filter(nextFilter), allStudents)
-
-  useEffect(() => {
-    setFilteredStudents(applyFilters(activeFilters))
-  }, [activeFilters, allStudents])
-
-  const addFilter = (name, filterFn) => setActiveFilters(prev => ({ ...prev, [name]: filterFn }))
-  const removeFilter = name => setActiveFilters(prev => lodash.omit(prev, name))
-
-  /**
-   * Apply all active filters except for the one named as the argument.
-   * This provides a way for a filter to count objects without itself affecting the sample.
-   * @param {string} name Name of the filter to skip.
-   */
-  const withoutFilter = name => applyFilters(lodash.omit(activeFilters, name))
-
-  const filterControl = { addFilter, removeFilter, withoutFilter, activeFilters, allStudents, filteredStudents }
 
   const noFilters = Object.keys(activeFilters).length
 
