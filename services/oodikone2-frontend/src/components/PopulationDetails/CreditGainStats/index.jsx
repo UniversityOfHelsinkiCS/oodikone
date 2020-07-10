@@ -5,23 +5,16 @@ import infotooltips from '../../../common/InfoToolTips'
 import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
-import CreditsGainedTab from './CreditsGainedTab'
 import NewCreditsGainedTab from './NewCreditsGainedTab'
 import './creditGainStats.css'
-import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const CreditGainStats = ({ filteredStudents, translate }) => {
-  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { CreditStatistics } = infotooltips.PopulationStatistics
 
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        {filterFeatToggle ? (
-          <NewCreditsGainedTab filteredStudents={filteredStudents} />
-        ) : (
-          <CreditsGainedTab sample={filteredStudents} translate={translate} />
-        )}
+        <NewCreditsGainedTab filteredStudents={filteredStudents} />
       </Tab.Pane>
     )
   }, [filteredStudents, translate])

@@ -11,21 +11,17 @@ import infotooltips from '../../common/InfoToolTips'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { refreshFilters } from '../../redux/populationFilters'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../common/useFeatureToggle'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
   populationCourses,
-  refreshNeeded,
   dispatchRefreshFilters,
   selectedStudents,
   translate,
   getPopulationSelectedStudentCourses: gpc,
-  selectedStudentsByYear,
   query,
   filteredStudents
 }) => {
-  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { setCourses: setCourseFilterData } = useCourseFilter()
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
@@ -36,18 +32,15 @@ const PopulationCourses = ({
   const { pending } = selectedPopulationCourses
 
   const reloadCourses = () => {
-    if (filterFeatToggle) {
-      // eslint-disable-next-line
-      selectedStudentsByYear = {}
+    const selectedStudentsByYear = {}
 
-      if (filteredStudents && filteredStudents.length > 0) {
-        filteredStudents.forEach(student => {
-          if (!selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()]) {
-            selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()] = []
-          }
-          selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
-        })
-      }
+    if (filteredStudents && filteredStudents.length > 0) {
+      filteredStudents.forEach(student => {
+        if (!selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()]) {
+          selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()] = []
+        }
+        selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
+      })
     }
 
     dispatchRefreshFilters()
@@ -62,14 +55,6 @@ const PopulationCourses = ({
     })
   }
 
-  // Refresh hook for old filters.
-  useEffect(() => {
-    if (refreshNeeded) {
-      reloadCourses()
-    }
-  }, [refreshNeeded])
-
-  // ...and for new ones.
   useEffect(() => {
     reloadCourses()
   }, [filteredStudents])
@@ -77,7 +62,7 @@ const PopulationCourses = ({
   // TODO: Temporary hack to pass course data to new filters, improve.
   useEffect(() => {
     const { pending, error, data } = selectedPopulationCourses
-    if (filterFeatToggle && !pending && !error) {
+    if (!pending && !error) {
       setCourseFilterData(data.coursestatistics)
     }
   }, [selectedPopulationCourses.data])
@@ -106,20 +91,17 @@ PopulationCourses.defaultPropTypes = {
 PopulationCourses.propTypes = {
   populationSelectedStudentCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
   populationCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
-  refreshNeeded: bool.isRequired,
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   getPopulationSelectedStudentCourses: func.isRequired,
   dispatchRefreshFilters: func.isRequired,
-  selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
   filteredStudents: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize, populationFilters }) => ({
+const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize }) => ({
   populationCourses,
   populationSelectedStudentCourses,
-  refreshNeeded: populationFilters.refreshNeeded,
   translate: getTranslate(localize)
 })
 
