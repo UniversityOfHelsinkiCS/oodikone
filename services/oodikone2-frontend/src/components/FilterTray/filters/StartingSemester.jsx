@@ -4,13 +4,13 @@
  * and more. Thus, this component is :deprekoitu: but left here for possible future use.
  */
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { Form, Radio } from 'semantic-ui-react'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
+import useFilters from '../useFilters'
 
-const StartingSemester = ({ filterControl }) => {
-  const { addFilter, removeFilter, withoutFilter, activeFilters } = filterControl
+const StartingSemester = () => {
+  const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
   const [value, setValue] = useState(null)
   const name = 'startingSemesterFilter'
 
@@ -51,15 +51,6 @@ const StartingSemester = ({ filterControl }) => {
       </Form>
     </FilterCard>
   )
-}
-
-StartingSemester.propTypes = {
-  filterControl: PropTypes.shape({
-    addFilter: PropTypes.func.isRequired,
-    removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired,
-    activeFilters: PropTypes.object.isRequired
-  }).isRequired
 }
 
 export default StartingSemester

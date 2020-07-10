@@ -7,8 +7,10 @@ import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import NumericInput from './common/NumericInput'
 import { getStudentGradeMean } from '../../../common'
+import useFilters from '../useFilters'
 
-const GradeMean = ({ filterControl, translate }) => {
+const GradeMean = ({ translate }) => {
+  const { addFilter, removeFilter } = useFilters()
   const [comparator, setComparator] = useState('<')
   const [value, setValue] = useState('')
   const name = 'gradeMeanFilter'
@@ -24,9 +26,9 @@ const GradeMean = ({ filterControl, translate }) => {
 
   useEffect(() => {
     if (value === '') {
-      filterControl.removeFilter(name)
+      removeFilter(name)
     } else {
-      filterControl.addFilter(name, filters(value)[comparator])
+      addFilter(name, filters(value)[comparator])
     }
   }, [comparator, value])
 
@@ -61,10 +63,6 @@ const GradeMean = ({ filterControl, translate }) => {
 }
 
 GradeMean.propTypes = {
-  filterControl: PropTypes.shape({
-    addFilter: PropTypes.func.isRequired,
-    removeFilter: PropTypes.func.isRequired
-  }).isRequired,
   translate: PropTypes.func.isRequired
 }
 

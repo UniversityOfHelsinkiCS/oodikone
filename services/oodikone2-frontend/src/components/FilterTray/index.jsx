@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import PropTypes from 'prop-types'
-import lodash from 'lodash'
 import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
 import { getTranslate } from 'react-localize-redux'
@@ -22,8 +21,7 @@ export const contextKey = 'filterTray'
 const FilterTray = ({ children, translate }) => {
   const [clickSaver] = useFeatureToggle('clickSaver')
   const [open, setOpen] = useFilterTray(contextKey)
-  const filterControl = useFilters()
-  const { allStudents, activeFilters } = filterControl
+  const { allStudents, activeFilters } = useFilters()
 
   useEffect(() => {
     setOpen(clickSaver)
@@ -59,13 +57,13 @@ const FilterTray = ({ children, translate }) => {
                 <Icon name="bars" size="large" />
               </div>
             </Header>
-            <GraduatedFromProgramme filterControl={filterControl} />
-            <TransferredToProgramme filterControl={filterControl} />
-            <EnrollmentStatus filterControl={filterControl} />
-            <CreditsEarned filterControl={filterControl} />
-            <Gender filterControl={filterControl} />
-            <StartYearAtUni filterControl={filterControl} />
-            <Courses filterControl={filterControl} />
+            <GraduatedFromProgramme />
+            <TransferredToProgramme />
+            <EnrollmentStatus />
+            <CreditsEarned />
+            <Gender />
+            <StartYearAtUni />
+            <Courses />
           </Card.Group>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)}>
