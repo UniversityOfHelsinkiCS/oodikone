@@ -290,7 +290,7 @@ class PopulationStudents extends Component {
       )
     ]
 
-    const selectedStudentsData = this.props.selectedStudents.map(sn => students[sn])
+    const selectedStudentsData = this.props.filteredStudents
     const totals = selectedStudentsData.reduce((acc, s) => {
       this.props.mandatoryCourses.forEach(m => {
         if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
@@ -426,13 +426,10 @@ class PopulationStudents extends Component {
                 <React.Fragment>
                   <TagPopulation
                     tags={this.props.tags}
-                    selectedStudents={this.props.selectedStudents}
+                    selectedStudents={this.props.filteredStudents.map(stu => stu.studentNumber)}
                     studytrack={this.props.queryStudyrights[0]}
                   />
-                  <TagList
-                    studytrack={this.props.queryStudyrights[0]}
-                    selectedStudents={this.props.selectedStudents.map(sn => students[sn])}
-                  />
+                  <TagList studytrack={this.props.queryStudyrights[0]} selectedStudents={this.props.filteredStudents} />
                 </React.Fragment>
               )}
             </div>
@@ -442,7 +439,7 @@ class PopulationStudents extends Component {
     ]
 
     const generateWorkbook = () => {
-      const data = this.props.selectedStudents.map(sn => students[sn])
+      const data = this.props.filteredStudents
       const sortedMandatory = sortBy(this.props.mandatoryCourses, [
         m => {
           const res = m.code.match(/\d+/)
@@ -516,7 +513,9 @@ class PopulationStudents extends Component {
     return (
       <Ref innerRef={this.handleRef}>
         <>
-          {this.state.admin ? <CheckStudentList students={this.props.selectedStudents} /> : null}
+          {this.state.admin ? (
+            <CheckStudentList students={this.props.filteredStudents.map(stu => stu.studentNumber)} />
+          ) : null}
           <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : Students.Infobox} />
           {this.renderStudentTable()}
         </>

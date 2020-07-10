@@ -12,7 +12,6 @@ import { useLanguage } from '../../../common/hooks'
 
 const PassFail = () => {
   const language = useLanguage()
-  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { courseIsSelected } = useCourseFilter()
   const {
@@ -20,7 +19,6 @@ const PassFail = () => {
     onSortableColumnHeaderClick,
     filterInput,
     tableColumnNames,
-    isActiveCourse,
     onGoToCourseStatisticsClick,
     onCourseNameCellClick,
     sortCriteria,
@@ -79,7 +77,7 @@ const PassFail = () => {
       passedOfPopulation,
       triedOfPopulation
     } = stats
-    const isActive = filterFeatToggle ? courseIsSelected(course.code) : isActiveCourse(course)
+    const isActive = courseIsSelected(course.code)
     return (
       <Table.Row key={code} active={isActive}>
         <Popup

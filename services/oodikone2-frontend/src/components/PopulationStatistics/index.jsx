@@ -1,17 +1,16 @@
-import React, { memo, useState, useEffect } from 'react'
+import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { func, bool, shape, arrayOf, string, any } from 'prop-types'
 import { Header, Segment, Divider, Form } from 'semantic-ui-react'
-import { intersection, flattenDeep } from 'lodash'
+import { flattenDeep } from 'lodash'
 import PopulationSearchForm from '../PopulationSearchForm'
 import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails'
-import PopulationFilters from '../PopulationFilters'
 import InfoBox from '../InfoBox'
 import ProgressBar from '../ProgressBar'
 import infoTooltips from '../../common/InfoToolTips'
-import { getUserIsAdmin, flattenStudyrights, getTotalCreditsFromCourses } from '../../common'
+import { getUserIsAdmin, getTotalCreditsFromCourses } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
@@ -21,7 +20,6 @@ import useFilters from '../FilterTray/useFilters'
 const PopulationStatistics = memo(props => {
   const {
     translate,
-    selectedStudents,
     queryIsSet,
     selectedStudentsByYear,
     query,
@@ -35,46 +33,15 @@ const PopulationStatistics = memo(props => {
     students
   } = props
   const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
-  const [filterFeatToggle, , toggleFilterFeature] = useFeatureToggle('filterFeatToggle')
-  const [excluded, setExcluded] = useState([])
-  const { setAllStudents, filteredStudents } = useFilters()
+  const { setAllStudents } = useFilters()
 
   const { onProgress, progress } = useProgress(loading)
   useTitle('Population statistics')
-
-  useEffect(() => {
-    if (props.queryIsSet) {
-      const { query, tagstudent, selectedStudents, samples, studytracks } = props
-      const studyrights = samples.flatMap(student =>
-        flattenStudyrights(student.studyrights, query.studyRights.programme)
-      )
-      const studytracksInPopulation = intersection(Object.keys(studytracks), studyrights)
-
-      const excludedFilters = []
-
-      if (!query.studentStatuses.includes('CANCELLED')) excludedFilters.push('CanceledStudyright')
-
-      const taggedStudentNumbers = tagstudent.map(tag => tag.studentnumber)
-
-      if (intersection(taggedStudentNumbers, selectedStudents) < 1) excludedFilters.push('TagFilter')
-
-      if (studytracksInPopulation.length < 1) excludedFilters.push('StudytrackFilter')
-      setExcluded(excludedFilters)
-    }
-  }, [props.selectedStudents])
 
   // Pass students to filter context.
   useEffect(() => {
     setAllStudents(students)
   }, [students])
-
-  const getStudentNumbers = students => {
-    if (!students) {
-      return []
-    }
-
-    return students.map(s => s.studentNumber)
-  }
 
   const renderPopulationSearch = () => {
     const { Main } = infoTooltips.PopulationStatistics
@@ -104,22 +71,10 @@ const PopulationStatistics = memo(props => {
                     onClick={toggleMandatoryToggle}
                     label="Toggle Mandatory Courses"
                   />
-                  <Form.Radio
-                    checked={filterFeatToggle}
-                    toggle
-                    onClick={toggleFilterFeature}
-                    label="Toggle New Filters"
-                  />
                 </Form.Group>
               </Form>
             ) : null}
             <PopulationSearchHistory history={history} />
-            {!props.isLoading && props.queryIsSet && !filterFeatToggle && (
-              <>
-                <Divider />
-                <PopulationFilters samples={props.samples} exclude={excluded} />
-              </>
-            )}
           </>
         ) : null}
         <ProgressBar fixed progress={progress} />
@@ -127,33 +82,29 @@ const PopulationStatistics = memo(props => {
     )
   }
 
-  const renderAcualComponent = () => (
-    <div className="segmentContainer">
-      <Header className="segmentTitle" size="large">
-        {translate('populationStatistics.header')}
-      </Header>
-      <Segment className="contentSegment">
-        {renderPopulationSearch()}
-        {location.search !== '' ? (
-          <PopulationDetails
-            translate={translate}
-            selectedStudents={filterFeatToggle ? getStudentNumbers(filteredStudents) : selectedStudents}
-            filteredStudents={filteredStudents}
-            allStudents={students}
-            queryIsSet={queryIsSet}
-            selectedStudentsByYear={selectedStudentsByYear}
-            query={query}
-            samples={samples}
-            isLoading={isLoading}
-            mandatoryToggle={mandatoryToggle}
-            filterFeatToggle={filterFeatToggle}
-          />
-        ) : null}
-      </Segment>
-    </div>
+  return (
+    <FilterTray>
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">
+          {translate('populationStatistics.header')}
+        </Header>
+        <Segment className="contentSegment">
+          {renderPopulationSearch()}
+          {location.search !== '' ? (
+            <PopulationDetails
+              translate={translate}
+              queryIsSet={queryIsSet}
+              selectedStudentsByYear={selectedStudentsByYear}
+              query={query}
+              samples={samples}
+              isLoading={isLoading}
+              mandatoryToggle={mandatoryToggle}
+            />
+          ) : null}
+        </Segment>
+      </div>
+    </FilterTray>
   )
-
-  return filterFeatToggle ? <FilterTray>{renderAcualComponent()}</FilterTray> : renderAcualComponent()
 })
 
 PopulationStatistics.propTypes = {
@@ -165,7 +116,6 @@ PopulationStatistics.propTypes = {
   isAdmin: bool.isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   samples: arrayOf(shape({})).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
   queryIsSet: bool.isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   isLoading: bool.isRequired,
@@ -182,7 +132,7 @@ PopulationStatistics.propTypes = {
 
 const mapStateToProps = state => {
   // haha copied from other place :mintu:
-  const { samples, selectedStudents, selectedStudentsByYear } = selectors.makePopulationsToData(state)
+  const { samples, selectedStudentsByYear } = selectors.makePopulationsToData(state)
   // REFACTOR YES, IF YOU SEE THIS COMMENT YOU ARE OBLIGATED TO FIX IT
   if (samples.length > 0) {
     const creditsAndDates = samples.map(s => {
@@ -218,7 +168,6 @@ const mapStateToProps = state => {
     populationFound: populations.data.students !== undefined,
     query: populations.query ? populations.query : {},
     isAdmin: getUserIsAdmin(roles),
-    selectedStudents,
     queryIsSet: !!populations.query,
     selectedStudentsByYear,
     tagstudent: state.tagstudent.data || {},

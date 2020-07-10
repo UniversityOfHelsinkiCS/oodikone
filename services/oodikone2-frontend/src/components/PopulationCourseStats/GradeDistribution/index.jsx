@@ -27,7 +27,6 @@ const formatGradeDistribution = grades =>
 
 const CourseRow = ({ courseStatistics }) => {
   const language = useLanguage()
-  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
 
   const { isActiveCourse, onCourseNameCellClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
@@ -35,7 +34,7 @@ const CourseRow = ({ courseStatistics }) => {
   const { course, grades } = courseStatistics
   const { name, code } = course
 
-  const isActive = filterFeatToggle ? courseIsSelected(course.code) : isActiveCourse(course)
+  const isActive = courseIsSelected(course.code)
   let attempts = 0
   let failedGrades = 0
   let otherPassed = 0

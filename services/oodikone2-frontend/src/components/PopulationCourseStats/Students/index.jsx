@@ -6,7 +6,6 @@ import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const verticalTitle = title => {
   // https://stackoverflow.com/a/41396815
@@ -17,7 +16,6 @@ const Students = () => {
   const {
     courseStatistics,
     filterInput,
-    isActiveCourse,
     onCourseNameCellClick,
     onGoToCourseStatisticsClick,
     modules
@@ -25,7 +23,6 @@ const Students = () => {
   const { language } = useSelector(({ settings }) => settings)
   const [page, setPage] = useState(0)
   const [visible, setVisible] = useState({})
-  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const { courseIsSelected } = useCourseFilter()
 
   const hasCompleted = (courseCode, student) => {
@@ -137,19 +134,13 @@ const Students = () => {
                         trigger={
                           <Table.Cell className="filterCell clickableCell">
                             <FilterToggleIcon
-                              isActive={filterFeatToggle ? courseIsSelected(col.code) : isActiveCourse(col)}
+                              isActive={courseIsSelected(col.code)}
                               onClick={() => onCourseNameCellClick(col.code)}
                             />
                           </Table.Cell>
                         }
                         content={
-                          // This is the best ternary I've ever written :mintu:
-                          /* eslint-disable-next-line no-nested-ternary */
-                          (filterFeatToggle ? (
-                            courseIsSelected(col.code)
-                          ) : (
-                            isActiveCourse(col)
-                          )) ? (
+                          courseIsSelected(col.code) ? (
                             <span>
                               Poista rajaus kurssin <b>{getTextIn(col.name, language)}</b> perusteella
                             </span>
