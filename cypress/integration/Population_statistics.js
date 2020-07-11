@@ -159,6 +159,7 @@ describe('Population Statistics tests', () => {
     cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click({ force: true })
     cy.contains('Fetch population').click()
 
+    // FIXME: This fails randomly both locally and on CI.
     cy.contains('Credit accumulation (for 206 students)')
 
     // spring + fall and include cancelled

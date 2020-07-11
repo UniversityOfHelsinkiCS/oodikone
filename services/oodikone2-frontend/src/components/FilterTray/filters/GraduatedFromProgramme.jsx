@@ -56,7 +56,8 @@ const GraduatedFromProgramme = ({ code, translate }) => {
       title={translate('gradFromProgFilter.title')}
       contextKey={name}
       active={active}
-      footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} />}
+      footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} name={name} />}
+      name={name}
     >
       <Form>
         <div className="description-text">{translate('gradFromProgFilter.descriptionUpper')}</div>
@@ -69,6 +70,7 @@ const GraduatedFromProgramme = ({ code, translate }) => {
           selection
           fluid
           button
+          data-cy={`${name}-dropdown`}
         />
         <div className="description-text">{translate('gradFromProgFilter.descriptionLower')}</div>
       </Form>

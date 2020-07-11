@@ -3,13 +3,13 @@ import PropTypes from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
 import useFilterTray from '../../useFilterTray'
 
-const FilterCard = ({ title, children, footer, active, className, contextKey }) => {
+const FilterCard = ({ title, children, footer, active, className, contextKey, name }) => {
   const [open, , toggleOpen] = useFilterTray(contextKey)
 
   return (
     <Card className={`${className} ${active ? 'active-filter' : ''}`}>
       <Card.Content>
-        <Card.Header onClick={toggleOpen}>
+        <Card.Header onClick={toggleOpen} data-cy={`${name}-header`}>
           <Icon name={open ? 'caret down' : 'caret right'} />
           <div className="card-header-text">{title}</div>
           {active && <Icon name="check" color="green" className="filter-status-icon" />}
@@ -27,7 +27,8 @@ FilterCard.propTypes = {
   footer: PropTypes.element,
   active: PropTypes.bool,
   className: PropTypes.string,
-  contextKey: PropTypes.string.isRequired
+  contextKey: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired
 }
 
 FilterCard.defaultProps = {

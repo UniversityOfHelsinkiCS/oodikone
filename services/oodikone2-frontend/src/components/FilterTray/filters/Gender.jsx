@@ -47,6 +47,7 @@ const Gender = ({ translate }) => {
       contextKey="genderFilter"
       footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} />}
       active={Object.keys(activeFilters).includes(name)}
+      name={name}
     >
       <Form>
         <Dropdown
