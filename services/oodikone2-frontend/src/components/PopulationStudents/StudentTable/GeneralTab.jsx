@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { shape, bool, string, arrayOf, object } from 'prop-types'
+import { shape, bool, string, arrayOf } from 'prop-types'
 import { Item, Icon, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { flatten } from 'lodash'

@@ -65,7 +65,6 @@ const CustomPopulation = ({
   // Pass students to filter context.
   useEffect(() => {
     setAllStudents(custompop || [])
-    console.log(custompop)
   }, [custompop])
 
   useEffect(() => {

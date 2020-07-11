@@ -404,12 +404,10 @@ PopulationCourseStats.propTypes = {
     disciplines: shape({})
   }).isRequired,
   translate: func.isRequired,
-  setPopulationFilter: func.isRequired,
   populationCourses: shape({
     data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
   }).isRequired,
   selectedCourses: arrayOf(object).isRequired,
-  removePopulationFilterOfCourse: func.isRequired,
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
