@@ -39,15 +39,6 @@ describe('Population Statistics tests', () => {
     })
   }
 
-  const removeFilter = (text) => {
-    cy.get("[data-cy='active-filters-list']").within(() => {
-      cy.contains(text).parent().within(() => {
-        cy.get(".remove").click()
-      })
-    })
-  }
-
-
   it('Population statistics search form is usable', () => {
     cy.contains("See population").should('be.disabled')
     cy.url().should('include', '/populations')
@@ -59,8 +50,8 @@ describe('Population Statistics tests', () => {
     cy.get("@enrollmentSelect").its(`${[0]}.value`).then((beforeVal) => {
       cy.get("@enrollmentSelect").click()
       // go back to 2010-2019
-      cy.get(".yearSelectInput .rdtPrev").click()
-      cy.get(".yearSelectInput table").contains("2014-2015").click()
+      cy.get(".yearSelectInput .rdtPrev").click({ force: true })
+      cy.get(".yearSelectInput table").contains("2014-2015").click({ force: true })
       cy.get("@enrollmentSelect").should('not.have.value', beforeVal)
     })
 
@@ -95,17 +86,12 @@ describe('Population Statistics tests', () => {
       cy.contains("Ohjelmoinnin perusteet").siblings().eq(4).should("have.text", "15")
     })
 
-    cy.contains("add").click()
-    cy.contains("Add filters").siblings().within(() => {
-      cy.get(".form").should('have.length', 9)
-    })
-
     checkAmountOfStudents(29)
 
     let filteredStudents = 1328493
     cy.contains("Credit statistics").click()
-    cy.contains("Credits gained during first").parentsUntil(".tab").get("table").within(() => {
-      cy.get("tr").eq(2).find("td").eq(1).invoke("text").then(text => filteredStudents = Number(text))
+    cy.contains("Credits Gained During First").parentsUntil(".tab").get("table").within(() => {
+      cy.get("tr").eq(2).find("td").eq(2).invoke("text").then(text => filteredStudents = Number(text))
       cy.route('POST', '/api/v2/populationstatistics/courses**').as('courseData')
       cy.get("tr").eq(2).find('.filter').click()
       cy.wait('@courseData')
@@ -146,150 +132,11 @@ describe('Population Statistics tests', () => {
     })
   })
 
-  it('All filters working', () => {
-    cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.contains("See population").click()
-
-    cy.contains("add").click()
-    cy.contains("Add filters").siblings().within(() => {
-      cy.contains("Show only students with credits at least").parentsUntil("form").contains("set filter").should('be.disabled')
-        .parentsUntil("form").find("input").type("15")
-      cy.contains("Show only students with credits at least").parentsUntil("form").contains("set filter").click()
-
-    })
-    cy.get("[data-cy='active-filters-list']").should("contain", "Credits at least 15")
-    checkAmountOfStudents(23)
-
-    cy.contains("Show only students with credits less than").parentsUntil("form").contains("set filter").should('be.disabled')
-      .parentsUntil("form").find("input").type("100")
-    cy.contains("Show only students with credits less than").parentsUntil("form").contains("set filter").click()
-
-    checkAmountOfStudents(22)
-
-    cy.contains("chosen semester").parentsUntil("form").contains("set filter").click()
-
-    checkAmountOfStudents(11)
-
-    cy.contains("select status").click().siblings().contains("present").click()
-    cy.contains("select semesters").click().siblings().contains("Fall 2018").click()
-    cy.contains("Spring 2018").click()
-    cy.contains("Spring 2018").parentsUntil("form").contains("set filter").click()
-    cy.contains("Students that were present").should('have.text', "Students that were present during Fall 2018, Spring 2018")
-    cy.get(':nth-child(6) > .form > .inline > :nth-child(2) > .ui > .default').click().siblings().contains('have not').click()
-
-    checkAmountOfStudents(11)
-
-    cy.contains('transferred to').parentsUntil("form").contains("set filter").click()
-
-    checkAmountOfStudents(11)
-
-    cy.contains("Students that").parentsUntil("form").contains("set filter").click()
-    cy.contains('Showing students that have not graduated from Tietojenkäsittelytieteen maisteriohjelma')
-    checkAmountOfStudents(11)
-
-    cy.contains("Advanced filters").click()
-
-    cy.contains("Save filters as preset").click()
-    cy.contains("This filter is saved").siblings().within(() => { cy.get("input").type(`Basic filters-${new Date().getTime()}`, { delay: 0 }) })
-    cy.contains("Save current filters as preset").parentsUntil(".dimmer").within(() => { cy.get("button").contains("Save").click() })
-
-    cy.get("[data-cy='active-filters-list']").within(() => {
-      cy.contains(`Basic filters`).parentsUntil("form").get(".remove").click()
-    })
-
-    cy.contains("course type").click().siblings().contains("Aineopinnot").click()
-    cy.contains("discipline").click().siblings().contains("Tietojenkäsittelytiede").click()
-    cy.contains("and at least").parentsUntil("form").contains("set filter").click()
-
-    checkAmountOfStudents(0)
-
-    cy.get('.filter-segment').its('length')
-      .then(originalLength => {
-        cy.contains('.filter-segment', 'Laskennan mallit').should('exist')
-        removeFilter('Laskennan mallit')
-        cy.get('.filter-segment').should('have.length', originalLength - 1)
-      })
-
-    cy.contains("select source").click().siblings().contains("Anywhere").click()
-    cy.contains("select target").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.contains("Students that transferred from").parentsUntil("form").contains("set filter").click()
-    cy.contains("Showing students that transferred").should('have.text', 'Showing students that transferred to Tietojenkäsittelytieteen maisteriohjelma')
-
-    cy.contains('are/not').click().siblings().contains('not').click()
-    cy.contains('select graduation').click().siblings().contains('graduated').click()
-    cy.contains('select extent').click().siblings().contains('Ylempi korkeakoulututkinto').click()
-    cy.contains('Alempi korkeakoulututkinto').parentsUntil("form").contains("set filter").click()
-
-    cy.contains('Excluded students that graduated')
-
-    cy.contains("Students that has").parentsUntil("form").within(() => {
-      cy.contains("degree").click().siblings().contains("any degree").click()
-      cy.contains("programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma")
-      cy.contains("priority").click().siblings().contains("primary studies").click()
-      cy.contains("set filter").click()
-    })
-
-    checkAmountOfStudents(0)
-
-    cy.contains("Basic filters").parentsUntil("form").contains("set filter").click()
-
-    cy.contains("Save filters as preset").click()
-    cy.contains("This filter is saved").siblings().within(() => { cy.get("input").type(`Advanced filters-${new Date().getTime()}`, { delay: 0 }) })
-    cy.contains("Save current filters as preset").parentsUntil(".dimmer").within(() => { cy.get("button").contains("Save").click() })
-
-    cy.visit("/populations")
-    cy.contains("Select study programme", { timeout: 50000 }).click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.contains("See population").click()
-
-    cy.contains("add").click()
-    cy.contains("Advanced filters").click()
-
-    cy.get('label:contains(Basic filters)').each(($f) => {
-      cy.wrap($f).parentsUntil("form").contains("set filter").click()
-    })
-    cy.get("label:contains(Advanced filters-)").each(($f) => {
-      cy.wrap($f).parentsUntil("form").contains("set filter").click()
-    })
-
-    cy.get("label:contains(Basic filters)").each(($f) => {
-      cy.wrap($f).parentsUntil(".segment").within(() => {
-        cy.get(".trash").click()
-      })
-      cy.root().get("button").contains("Delete for good").click({ force: true })
-    })
-
-    cy.get("label:contains(Advanced filters-)").each(($f) => {
-      cy.wrap($f).parentsUntil(".segment").within(() => {
-        cy.get(".trash").click()
-      })
-      cy.root().get("button").contains("Delete for good").click({ force: true })
-    })
-  })
-
-  it("'Has enrolled' filter is shown only if non-enrolled students are included in the advanced settings", () => {
-    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.contains("See population").click()
-    setPopStatsUntil("September 2019", ["present nor absent"])
-
-    cy.wait(500)
-    cy.contains("Add filters").parent().contains("button", "add").should('not.have.class', 'disabled')
-    cy.contains("Add filters").parent().contains("button", "add").click()
-    cy.contains("Add filters").siblings().within(() => {
-      cy.get(".form").should('have.length', 10)
-    })
-
-    checkAmountOfStudents(32)
-    cy.contains("have/haven't").click().siblings().contains("have").click()
-    cy.contains("enrolled present (n)or absent").parentsUntil("form").contains("set filter").click()
-    cy.contains("Excluded students who").should("have.text", "Excluded students who haven't enrolled present nor absent")
-    checkAmountOfStudents(29)
-  })
-
   it('Population statistics wont crash course population', () => {
     cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
     cy.contains("See population").click()
     cy.contains("Courses of population").click({ force: true })
-    cy.contains("Lineaarialgebra").siblings().within(() => { cy.get('.level').click({ force: true }) })
+    cy.get(':nth-child(3) > .iconCell > p > .item > .level').click({ force: true })
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click({ force: true })
   })
 
@@ -319,21 +166,21 @@ describe('Population Statistics tests', () => {
     cy.get('[data-cy=advanced-toggle]').click()
     cy.contains('Statistics until')
     // only spring
-    cy.contains('Semesters').siblings().contains('Fall').click()
+    cy.get(':nth-child(2) > :nth-child(2) > .ui > label').click({ force: true })
     cy.contains('Fetch population').click()
 
     cy.contains('Credit accumulation (for 13 students)')
 
     // only fall
-    cy.contains('Semesters').siblings().contains('Fall').click()
-    cy.contains('Semesters').siblings().contains('Spring').click()
+    cy.get(':nth-child(2) > :nth-child(2) > .ui > label').click({ force: true })
+    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click({ force: true })
     cy.contains('Fetch population').click()
 
     cy.contains('Credit accumulation (for 206 students)')
 
     // spring + fall and include cancelled
-    cy.contains('Semesters').siblings().contains('Spring').click()
-    cy.contains('Include').siblings().contains('present nor absent').click()
+    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click({ force: true })
+    cy.get(':nth-child(3) > :nth-child(3) > .ui > label').click({ force: true })
     cy.contains('Fetch population').click()
 
     cy.contains('Credit accumulation (for 228 students)')

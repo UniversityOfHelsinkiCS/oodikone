@@ -44,6 +44,7 @@ const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) =>
         fluid
         selectOnBlur={false}
         selectOnNavigation={false}
+        data-cy="history-search"
       />
     </Segment>
   )
