@@ -445,6 +445,7 @@ const PopulationSearchForm = props => {
         fluid
         selectOnBlur={false}
         selectOnNavigation={false}
+        data-cy="select-study-programme"
       />
     </Form.Field>
   )

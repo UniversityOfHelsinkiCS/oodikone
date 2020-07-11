@@ -1,5 +1,8 @@
 /// <reference types="Cypress" />
 
+/**
+ * Initialize headers and load the base URL or optional path.
+ */
 Cypress.Commands.add("init", (path = '') => {
   cy.server({
     onAnyRequest: function (route, proxy) {
@@ -12,4 +15,11 @@ Cypress.Commands.add("init", (path = '') => {
     }
   })
   cy.visit(Cypress.config().baseUrl.concat(path))
+})
+
+/**
+ * Shorthand for using "Cypress Selectors" (CS), i.e., `data-cy` attributes.
+ */
+Cypress.Commands.add("cs", (name) => {
+  return cy.get(`[data-cy='${name}']`)
 })
