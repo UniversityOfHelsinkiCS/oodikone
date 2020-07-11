@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-types'
 import { connect } from 'react-redux'
@@ -31,90 +31,77 @@ const countFilteredStudents = (stat, filter) =>
     }
   }, {})
 
-class SingleCourseStats extends Component {
-  constructor(props) {
-    super(props)
+const SingleCourseStats = ({
+  stats,
+  setSelectedCourse,
+  activeLanguage,
+  history,
+  location,
+  stats: { coursecode },
+  getSemesters,
+  years,
+  semesters,
+  programmes,
+  maxYearsToCreatePopulationFrom,
+  getMaxYearsToCreatePopulationFrom
+}) => {
+  const [primary, setPrimary] = useState([ALL.value])
+  const [comparison, setComparison] = useState([])
+  const [fromYear, setFromYear] = useState(0)
+  const [toYear, setToYear] = useState(0)
+  const [separate, setSeparate] = useState(null)
 
-    const yearcodes = props.stats.statistics.map(s => s.yearcode)
-    const fromYear = min(yearcodes)
-    const toYear = max(yearcodes)
-
-    this.state = {
-      primary: [ALL.value],
-      comparison: [],
-      fromYear,
-      toYear,
-      separate: null
+  const parseQueryFromUrl = () => {
+    const { separate } = qs.parse(location.search)
+    return {
+      separate: JSON.parse(separate)
     }
   }
 
-  componentWillMount = () => {
-    const {
-      setSelectedCourse,
-      location,
-      stats: { coursecode },
-      getSemesters,
-      years,
-      semesters
-    } = this.props
+  useEffect(() => {
     if (years.length === 0 || semesters.length === 0) getSemesters()
     if (location.search) {
-      const params = this.parseQueryFromUrl()
-      this.setState(params)
+      const { separate } = parseQueryFromUrl()
+      setSeparate(separate)
     }
-    setSelectedCourse(coursecode)
-  }
-
-  componentDidUpdate = prevProps => {
-    const { primary } = this.state
-    if (this.props.programmes.length !== prevProps.programmes.length) {
-      if (primary.every(c => !this.props.programmes.map(p => p.key).includes(c))) {
-        // eslint-disable-next-line react/no-did-update-set-state
-        this.setState({
-          primary: [ALL.value]
-        })
-      }
-    }
-  }
-
-  componentWillUnmount = () => {
-    const { clearSelectedCourse } = this.props
-    clearSelectedCourse()
-  }
-
-  componentDidMount = () => {
-    this.props.getMaxYearsToCreatePopulationFrom({
-      courseCodes: JSON.stringify(this.props.stats.alternatives)
+    getMaxYearsToCreatePopulationFrom({
+      courseCodes: JSON.stringify(stats.alternatives)
     })
-  }
+    setSelectedCourse(coursecode)
 
-  getProgrammeName = progcode => {
+    const yearcodes = stats.statistics.map(s => s.yearcode)
+    const initFromYear = min(yearcodes)
+    const initToYear = max(yearcodes)
+    setFromYear(initFromYear)
+    setToYear(initToYear)
+  }, [])
+
+  useEffect(() => {
+    if (primary.every(c => !programmes.map(p => p.key).includes(c))) {
+      setPrimary([ALL.value])
+    }
+  }, [programmes])
+
+  const getProgrammeName = progcode => {
     if (progcode === ALL.value) {
       return 'All'
     }
     if (progcode === 'EXCLUDED') {
       return 'Excluded'
     }
-    const { activeLanguage } = this.props
-    const { name } = this.props.stats.programmes[progcode]
+    const { name } = stats.programmes[progcode]
     return getTextIn(name, activeLanguage)
   }
 
-  setExcludedToComparison = () =>
-    this.setState({
-      // eslint-disable-next-line react/no-access-state-in-setstate
-      comparison: this.state.primary.includes(ALL.value) ? [] : ['EXCLUDED']
-    })
+  const setExcludedToComparison = () => setComparison(primary.includes(ALL.value) ? [] : ['EXCLUDED'])
 
-  getExcluded = () =>
-    this.state.primary.includes(ALL.value)
-      ? []
-      : difference(this.props.programmes.map(p => p.value).filter(v => v !== ALL.value), this.state.primary)
+  const getExcluded = () =>
+    primary.includes(ALL.value) ? [] : difference(programmes.map(p => p.value).filter(v => v !== ALL.value), primary)
 
-  belongsToAtLeastOneProgramme = codes => {
+  const belongsToAtLeastOneProgramme = codes => {
     if (codes.includes(ALL.value)) return () => true
 
-    const { programmes } = this.props.stats
+    const { programmes } = stats
     const studentNumbers = []
     codes.forEach(code => {
       if (programmes[code]) {
@@ -126,13 +113,12 @@ class SingleCourseStats extends Component {
     return studentnumber => numberset.has(studentnumber)
   }
 
-  validProgCode = code => {
-    const { programmes } = this.props.stats
+  const validProgCode = code => {
+    const { programmes } = stats
     return programmes[code] || (code === ALL.value || code === 'EXCLUDED')
   }
 
-  filteredYearsAndSemesters = () => {
-    const { years, semesters, stats } = this.props
+  const filteredYearsAndSemesters = () => {
     const yearcodes = stats.statistics.map(s => s.yearcode)
     const from = min(yearcodes)
     const to = max(yearcodes)
@@ -149,9 +135,7 @@ class SingleCourseStats extends Component {
     }
   }
 
-  isStatInYearRange = ({ name }) => {
-    const { separate, fromYear, toYear } = this.state
-    const { years, semesters } = this.props
+  const isStatInYearRange = ({ name }) => {
     const timeFilter = ({ value }) => value >= fromYear && value <= toYear
     const filteredSemesters = semesters.filter(timeFilter)
     const filteredYears = years.filter(timeFilter)
@@ -160,11 +144,11 @@ class SingleCourseStats extends Component {
       : filteredYears.find(year => year.text === name)
   }
 
-  statsForProgrammes = (progCodes, name) => {
-    const { statistics } = this.props.stats
-    const filter = this.belongsToAtLeastOneProgramme(progCodes)
+  const statsForProgrammes = (progCodes, name) => {
+    const { statistics } = stats
+    const filter = belongsToAtLeastOneProgramme(progCodes)
     const progStats = statistics
-      .filter(this.isStatInYearRange)
+      .filter(isStatInYearRange)
       .map(({ code, name, students: allstudents, attempts, coursecode }) => {
         const cumulative = {
           grades: countFilteredStudents(attempts.grades, filter),
@@ -237,64 +221,53 @@ class SingleCourseStats extends Component {
     }
   }
 
-  handleSelect = (e, { name, value }) => {
+  const handleSelect = (e, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
-
     if (name === 'primary') {
-      this.setState({
-        // eslint-disable-next-line react/no-access-state-in-setstate
-        comparison: this.state.comparison.filter(p => p !== 'EXCLUDED')
-      })
+      setComparison(comparison.filter(p => p !== 'EXCLUDED'))
     }
 
-    if (
-      (!this.state[name].includes(ALL.value) && value.includes(ALL.value)) ||
-      (name === 'primary' && value.length === 0)
-    ) {
+    if ((!primary.includes(ALL.value) && value.includes(ALL.value)) || (name === 'primary' && value.length === 0)) {
       selected = [ALL.value]
     }
-    if (name === 'primary')
-      if (this.state.primary.length > selected.length) sendAnalytics('Primary group removed', 'Course stats')
+    if (name === 'primary') {
+      if (primary.length > selected.length) sendAnalytics('Primary group removed', 'Course stats')
       else sendAnalytics('Primary group set', 'Course stats')
+      setPrimary(selected)
+    }
 
-    if (name === 'comparison')
-      if (this.state.comparison.length > selected.length) sendAnalytics('Comparison group removed', 'Course stats')
+    if (name === 'comparison') {
+      if (comparison.length > selected.length) sendAnalytics('Comparison group removed', 'Course stats')
       else sendAnalytics('Comparison group set', 'Course stats')
-
-    this.setState({ [name]: selected })
+      setComparison(selected)
+    }
   }
 
-  handleChange = (e, { name, value }) => {
-    this.setState({ [name]: value })
-  }
-
-  handleYearChange = (e, { name, value }) => {
-    const { fromYear, toYear } = this.state
-    if (name === 'fromYear' && value <= toYear) this.setState({ fromYear: value })
-    else if (name === 'toYear' && value >= fromYear) this.setState({ toYear: value })
+  const handleYearChange = (e, { name, value }) => {
+    if (name === 'fromYear' && value <= toYear) setFromYear(value)
+    else if (name === 'toYear' && value >= fromYear) setToYear(value)
     sendAnalytics('Changed time frame', 'Course stats')
   }
 
-  filteredProgrammeStatistics = () => {
-    const { primary, comparison } = this.state
-    const filter = p => this.validProgCode(p)
+  const filteredProgrammeStatistics = () => {
+    const filter = p => validProgCode(p)
 
-    const excludedProgrammes = this.getExcluded()
+    const excludedProgrammes = getExcluded()
 
     const primaryProgrammes = primary
     const comparisonProgrammes = comparison.filter(filter)
     if (comparison.includes('EXCLUDED')) comparisonProgrammes.push(...excludedProgrammes)
 
     const pstats = primaryProgrammes.length
-      ? this.statsForProgrammes(
+      ? statsForProgrammes(
           primaryProgrammes,
-          primaryProgrammes.length === 1 ? this.getProgrammeName(primaryProgrammes[0]) : 'Primary'
+          primaryProgrammes.length === 1 ? getProgrammeName(primaryProgrammes[0]) : 'Primary'
         )
       : undefined
     const cstats = comparisonProgrammes.length
-      ? this.statsForProgrammes(
+      ? statsForProgrammes(
           comparisonProgrammes,
-          comparisonProgrammes.length === 1 ? this.getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
+          comparisonProgrammes.length === 1 ? getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
         )
       : undefined
     return {
@@ -303,20 +276,11 @@ class SingleCourseStats extends Component {
     }
   }
 
-  parseQueryFromUrl = () => {
-    const { location } = this.props
-    const { separate } = qs.parse(location.search)
-    return {
-      separate: JSON.parse(separate)
-    }
-  }
+  const clearComparison = () => setComparison([])
 
-  clearComparison = () => this.setState({ comparison: [] })
-
-  comparisonProgrammes = programmes => {
-    const { primary, comparison } = this.state
+  const comparisonProgrammes = programmes => {
     const result = programmes.filter(({ key }) => key !== 'EXCLUDED')
-    const excludedProgrammes = this.getExcluded()
+    const excludedProgrammes = getExcluded()
 
     if (!primary.includes(ALL.value)) {
       const excludedStudents = result
@@ -335,106 +299,93 @@ class SingleCourseStats extends Component {
     return result.filter(({ key }) => !comparison.includes('EXCLUDED') || !excludedProgrammes.includes(key))
   }
 
-  showPopulation = () => {
-    const { fromYear: from, toYear: to } = this.state
-    const {
-      stats: { alternatives },
-      history,
-      years: yearCodes
-    } = this.props
-    const years = `${yearCodes.find(s => s.value === from).text.split('-')[0]}-${
-      yearCodes.find(s => s.value === to).text.split('-')[1]
+  const showPopulation = () => {
+    const from = fromYear
+    const to = toYear
+    const years2 = `${years.find(s => s.value === from).text.split('-')[0]}-${
+      years.find(s => s.value === to).text.split('-')[1]
     }`
-    const queryObject = { from, to, coursecodes: JSON.stringify(alternatives), years, separate: false }
+    const queryObject = { from, to, coursecodes: JSON.stringify(stats), years2, separate: false }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
 
-  renderShowPopulation(disabled = false) {
-    return <Button disabled={disabled} onClick={this.showPopulation} content="Show population" />
+  const renderShowPopulation = (disabled = false) => {
+    return <Button disabled={disabled} onClick={showPopulation} content="Show population" />
   }
 
-  render() {
-    const { programmes, maxYearsToCreatePopulationFrom, stats } = this.props
-    const { primary, comparison, fromYear, toYear } = this.state
-    const statistics = this.filteredProgrammeStatistics()
-    const { filteredYears } = this.filteredYearsAndSemesters()
+  const statistics = filteredProgrammeStatistics()
+  const { filteredYears } = filteredYearsAndSemesters()
 
-    const timeFilter = (_, value) => value >= fromYear && value <= toYear
-    const filteredProgrammes = programmes
-      .map(e => {
-        const students = new Set(flatten(Object.values(pickBy(e.students, timeFilter))))
-        return { ...e, students: [...students], size: students.size }
-      })
-      .filter(e => e.size > 0)
-    if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
+  const timeFilter = (_, value) => value >= fromYear && value <= toYear
+  const filteredProgrammes = programmes
+    .map(e => {
+      const students = new Set(flatten(Object.values(pickBy(e.students, timeFilter))))
+      return { ...e, students: [...students], size: students.size }
+    })
+    .filter(e => e.size > 0)
+  if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
-    return (
-      <div>
-        <Segment>
-          <Form>
-            <Header content="Statistics by time range" as="h4" />
-            <YearFilter
-              years={filteredYears}
-              fromYear={fromYear}
-              toYear={toYear}
-              handleChange={this.handleYearChange}
+  return (
+    <div>
+      <Segment>
+        <Form>
+          <Header content="Statistics by time range" as="h4" />
+          <YearFilter years={filteredYears} fromYear={fromYear} toYear={toYear} handleChange={handleYearChange} />
+          {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
+            <Popup
+              content={`Max years to create a population from for this course is ${Math.max(
+                0,
+                maxYearsToCreatePopulationFrom
+              )}`}
+              trigger={<span>{renderShowPopulation(true)}</span>}
             />
-            {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
-              <Popup
-                content={`Max years to create a population from for this course is ${Math.max(
-                  0,
-                  maxYearsToCreatePopulationFrom
-                )}`}
-                trigger={<span>{this.renderShowPopulation(true)}</span>}
+          ) : (
+            renderShowPopulation()
+          )}
+        </Form>
+      </Segment>
+      <Segment>
+        <Form>
+          <Header content="Filter statistics by study programmes" as="h4" />
+          <Grid>
+            <Grid.Column width={8}>
+              <ProgrammeDropdown
+                name="primary"
+                options={filteredProgrammes}
+                label="Primary group"
+                placeholder="Select study programmes"
+                value={primary}
+                onChange={handleSelect}
               />
-            ) : (
-              this.renderShowPopulation()
-            )}
-          </Form>
-        </Segment>
-        <Segment>
-          <Form>
-            <Header content="Filter statistics by study programmes" as="h4" />
-            <Grid>
-              <Grid.Column width={8}>
-                <ProgrammeDropdown
-                  name="primary"
-                  options={filteredProgrammes}
-                  label="Primary group"
-                  placeholder="Select study programmes"
-                  value={primary}
-                  onChange={this.handleSelect}
+            </Grid.Column>
+            <Grid.Column width={8}>
+              <ProgrammeDropdown
+                name="comparison"
+                options={comparisonProgrammes(filteredProgrammes)}
+                label="Comparison group"
+                placeholder="Optional"
+                value={comparison}
+                onChange={handleSelect}
+              />
+            </Grid.Column>
+            <Grid.Column width={8} />
+            <Grid.Column width={8}>
+              <Form.Group>
+                <Form.Button
+                  content="Select excluded study programmes"
+                  onClick={setExcludedToComparison}
+                  disabled={primary.length === 1 && primary[0] === ALL.value}
                 />
-              </Grid.Column>
-              <Grid.Column width={8}>
-                <ProgrammeDropdown
-                  name="comparison"
-                  options={this.comparisonProgrammes(filteredProgrammes)}
-                  label="Comparison group"
-                  placeholder="Optional"
-                  value={comparison}
-                  onChange={this.handleSelect}
-                />
-              </Grid.Column>
-              <Grid.Column width={8} />
-              <Grid.Column width={8}>
-                <Form.Group>
-                  <Form.Button
-                    content="Select excluded study programmes"
-                    onClick={this.setExcludedToComparison}
-                    disabled={primary.length === 1 && primary[0] === ALL.value}
-                  />
-                  <Form.Button content="Clear" onClick={this.clearComparison} />
-                </Form.Group>
-              </Grid.Column>
-            </Grid>
-          </Form>
-        </Segment>
-        <ResultTabs separate={this.state.separate} primary={statistics.primary} comparison={statistics.comparison} />
-      </div>
-    )
-  }
+                <Form.Button content="Clear" onClick={clearComparison} />
+              </Form.Group>
+            </Grid.Column>
+          </Grid>
+        </Form>
+      </Segment>
+      <ResultTabs separate={separate} primary={statistics.primary} comparison={statistics.comparison} />
+    </div>
+  )
 }
 
 SingleCourseStats.propTypes = {
@@ -467,7 +418,6 @@ SingleCourseStats.propTypes = {
   location: shape({}).isRequired,
   activeLanguage: string.isRequired,
   setSelectedCourse: func.isRequired,
-  clearSelectedCourse: func.isRequired,
   getSemesters: func.isRequired,
   history: shape({
     push: func

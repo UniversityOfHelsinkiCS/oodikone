@@ -73,7 +73,7 @@ describe('Studyprogramme overview', () => {
     cy.get('input').eq(0).type('Code Generation')
     cy.wait('@searchResponse')
     cy.contains('Searched courses')
-    cy.get('table').eq(0).contains('Code Generation').click()
+    cy.get(':nth-child(1) > .ten').click()
     cy.contains('select label')
 
     cy.contains('Group labels').click()

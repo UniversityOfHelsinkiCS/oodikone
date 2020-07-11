@@ -57,13 +57,13 @@ describe('Teachers page tests', () => {
   })
 
   it("Check leaderboad works", () => {
-    cy.get('.borderless > :nth-child(2)').click()
-    cy.get(':nth-child(1) > .ui > .search').click()
-    cy.contains('2017-18').click()
-    cy.contains("Recalculate this year").click()
+    cy.get('.borderless > :nth-child(2)').click({ force: true })
+    cy.get(':nth-child(1) > .ui > .search').click({ force: true })
+    cy.contains('2017-18').click({ force: true })
+    cy.contains("Recalculate this year").click({ force: true })
     cy.wait(5000)
     cy.reload()
-    cy.get(':nth-child(1) > .ui > .search').click()
+    cy.get(':nth-child(1) > .ui > .search').click({ force: true })
     cy.contains('2017-18').click()
     cy.contains("Passed")
     cy.contains("Antero")

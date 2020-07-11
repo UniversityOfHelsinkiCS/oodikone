@@ -5,8 +5,10 @@ import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { connect } from 'react-redux'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
+import useFilters from '../../useFilters'
 
-const CourseCard = ({ courseStats, filterContol, language, translate }) => {
+const CourseCard = ({ courseStats, language, translate }) => {
+  const { addFilter, removeFilter } = useFilters()
   const { course, students } = courseStats
   const { toggleCourseSelection } = useCourseFilter()
   const [selectedOption, setSelectedOption] = useState(0)
@@ -46,12 +48,12 @@ const CourseCard = ({ courseStats, filterContol, language, translate }) => {
 
   // Apply filter on mount or selection change.
   useEffect(() => {
-    filterContol.addFilter(name, subFilters[selectedOption].func)
+    addFilter(name, subFilters[selectedOption].func)
   }, [selectedOption])
 
   // Remove filter on unmount.
   useEffect(() => {
-    return () => filterContol.removeFilter(name)
+    return () => removeFilter(name)
   }, [])
 
   const options = subFilters.map((filter, i) => ({ key: i, text: filter.label, value: i }))
@@ -88,10 +90,6 @@ CourseCard.propTypes = {
   courseStats: PropTypes.shape({
     course: PropTypes.object,
     students: PropTypes.object
-  }).isRequired,
-  filterContol: PropTypes.shape({
-    addFilter: PropTypes.func,
-    removeFilter: PropTypes.func
   }).isRequired,
   language: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired

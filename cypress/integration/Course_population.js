@@ -32,41 +32,9 @@ describe('Course population tests', () => {
     cy.contains('Population of course Käyttöjärjestelmät 2017-18')
     cy.contains('TKT20003, 582219, 582640, 582497')
     cy.contains('Students (all=39)')
-    cy.contains('add').click()
-    cy.contains('Select students that have grade')
 
     cy.contains('Students (39)').click()
     cy.contains('013614218')
     cy.contains('014022579')
-  })
-
-  it('Filters are working', ()=> {
-    cy.url().should('include', '/coursestatistics')
-    cy.contains("Search for courses")
-    cy.get("input[placeholder='Search by entering a course code']").type('TKT10004')
-    cy.get(':nth-child(2) > .ten > :nth-child(1)').click()
-    cy.contains("Fetch statistics").should('be.enabled').click()
-
-    cy.get(':nth-child(2) > :nth-child(1) > div > .item > .level').click()
-    cy.contains('Population of course Tietokantojen perusteet 2017-18')
-    cy.contains('add').click()
-    
-    // sex filter
-    cy.get('.inline > :nth-child(2) > :nth-child(1) > label').click()
-    cy.get(':nth-child(8) > .form > .inline > :nth-child(3) > .ui').click()
-
-    cy.contains('Students (all=100)')
-    cy.contains('Grade distribution').click()
-    cy.contains("Grades").parentsUntil(".tab").get("table").within(() => {
-      cy.get("tr").eq(2).click()
-    })
-    // cy.get(':nth-child(4) > .segment > .selectable > tbody > :nth-child(2) > :nth-child(2)').click()
-    cy.contains('Students (all=17)')
-    cy.contains('Programme distribution').click()
-    cy.contains("Programmes").parentsUntil(".tab").get("table").eq(1).within(() => {
-      cy.get("tr").eq(2).click()
-    })
-    cy.contains('Tietojenkäsittelytieteen kandiohjelma, KH50_005').should('not.exist')
-    cy.contains('Students (all=1)')
   })
 })

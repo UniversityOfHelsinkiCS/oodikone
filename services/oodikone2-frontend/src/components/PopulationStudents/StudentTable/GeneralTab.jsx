@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { shape, bool, string, arrayOf, object } from 'prop-types'
+import { shape, bool, string, arrayOf } from 'prop-types'
 import { Item, Icon, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { flatten } from 'lodash'
@@ -16,7 +16,7 @@ import {
 } from '../../../common'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
-import selector from '../../../selectors/populationDetails'
+import useFilters from '../../FilterTray/useFilters'
 
 // TODO: Refactoring in process, contains lot of duplicate code.
 
@@ -28,22 +28,21 @@ const GeneralTab = ({
   language,
   queryStudyrights,
   isAdmin,
-  studentToTargetCourseDateMap,
-  selectedStudents,
-  samples
+  studentToTargetCourseDateMap
 }) => {
+  const { filteredStudents } = useFilters()
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
+
+  // TODO: Refactor this away:
+  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
   // TODO: This fixes crashing upon using back button. Find the root cause and fix it.
   if (!populationStatistics.elementdetails) {
     return null
   }
 
-  const students = samples.reduce((obj, s) => {
-    obj[s.studentNumber] = s
-    return obj
-  }, {})
+  const students = Object.fromEntries(filteredStudents.map(stu => [stu.studentNumber, stu]))
 
   const popupTimeoutLength = 1000
   let timeout = null
@@ -368,9 +367,7 @@ GeneralTab.propTypes = {
   language: string.isRequired,
   queryStudyrights: arrayOf(string).isRequired,
   isAdmin: bool.isRequired,
-  studentToTargetCourseDateMap: shape({}),
-  selectedStudents: arrayOf(string).isRequired,
-  samples: arrayOf(object).isRequired
+  studentToTargetCourseDateMap: shape({})
 }
 
 const mapStateToProps = state => {
@@ -382,15 +379,11 @@ const mapStateToProps = state => {
     }
   } = state
 
-  const { selectedStudents, samples } = selector.makePopulationsToData(state)
-
   return {
     isAdmin: getUserIsAdmin(roles),
     language: getActiveLanguage(localize).code,
     populationStatistics: populations.data,
-    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
-    selectedStudents,
-    samples
+    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : []
   }
 }
 

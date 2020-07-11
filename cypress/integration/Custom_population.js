@@ -22,19 +22,11 @@ const save = () => {
 };
 
 const selectSavedPopulation = name => {
-  cy.contains("Saved populations")
-    .siblings()
-    .get("input[class=search]")
-    .click()
-    .type(name)
-    .type("{enter}");
+   cy.get('[data-cy="history-search"]').children().eq(0).type(name).type("{enter}");
 };
 
 const deleteAllSearches = () => {
-  cy.contains("Saved populations")
-    .siblings()
-    .get("input[class=search]")
-    .click();
+  cy.get('[data-cy="history-search"]').children().eq(0).click();
   cy.contains("Saved populations")
     .parent()
     .parent()
@@ -45,12 +37,7 @@ const deleteAllSearches = () => {
       const searchItems = d.find("div[role=option] > span[class=text]");
       for (let i = 0; i < searchItems.length; i++) {
         if (searchItems[i].textContent.includes("TEST-")) {
-          cy.contains("Saved populations")
-            .siblings()
-            .get("input[class=search]")
-            .click()
-            .type(searchItems[i].textContent)
-            .type("{enter}");
+          cy.get('[data-cy="history-search"]').children().eq(0).type(searchItems[i].textContent).type("{enter}");
           cy.get("button")
             .contains("Delete")
             .click();
@@ -79,7 +66,6 @@ const searchFor = studentnumbers => {
 };
 
 const hasLanded = () => {
-  cy.contains("Add filters");
   cy.contains("Credit accumulation");
   cy.contains("Programme distribution");
   cy.contains("Courses of Population");
@@ -163,11 +149,9 @@ describe("Custom population tests", () => {
     it("Doesn't find empty custom population", () => {
       const testStudentNumbers = ["1", "2", "3"];
       searchFor(testStudentNumbers);
-      cy.contains("Add filters").should("not.exist");
       cy.contains("Credit accumulation").should("not.exist");
       cy.contains("Programme distribution").should("not.exist");
       cy.contains("Courses of Population").should("not.exist");
-      cy.contains("Students").should("not.exist");
       cy.get("button").contains("Custom population");
     });
 
@@ -177,11 +161,9 @@ describe("Custom population tests", () => {
       loginAs("Normaalikäyttäjä");
 
       searchFor(kasvatusStudents);
-      cy.contains("Add filters").should("not.exist");
       cy.contains("Credit accumulation").should("not.exist");
       cy.contains("Programme distribution").should("not.exist");
       cy.contains("Courses of Population").should("not.exist");
-      cy.contains("Students").should("not.exist");
 
       searchFor(kapistelyStudents.concat(kasvatusStudents));
       hasLanded();

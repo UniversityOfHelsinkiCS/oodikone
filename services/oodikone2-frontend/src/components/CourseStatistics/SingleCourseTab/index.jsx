@@ -1,57 +1,42 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
 import { shape, arrayOf, oneOfType, number, string } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
 import selectors from '../../../selectors/courseStats'
 
-class SingleCourseTab extends Component {
-  state = {
-    selected: this.props.selected
-  }
+const SingleCourseTab = ({ selected, stats, courses }) => {
+  const [selection, setSelection] = useState(selected)
 
-  getStats = () => {
-    const { stats } = this.props
-    const { selected } = this.state
-    return {
-      selected,
-      selectedStatistic: stats[selected]
-    }
-  }
-
-  render() {
-    const { selected, selectedStatistic } = this.getStats()
-    const { courses } = this.props
-    if (!selectedStatistic) return null
-    return (
-      <div>
-        <Segment>
-          <Form>
-            {courses ? (
-              courses.text
-            ) : (
-              <Form.Dropdown
-                name="selected"
-                options={courses}
-                onChange={(e, { value }) => this.setState({ selected: value })}
-                value={selected || courses.value}
-                selectOnBlur={false}
-                selectOnNavigation={false}
-              />
-            )}
-            <Divider />
-            <Label.Group>
-              <Label
-                key={selectedStatistic.coursecode}
-                content={`${selectedStatistic.alternatives.map(code => ` ${code}`)} ${selectedStatistic.name} `}
-              />
-            </Label.Group>
-          </Form>
-        </Segment>
-        {selected && <SingleCourseStats stats={selectedStatistic} />}
-      </div>
-    )
-  }
+  if (!stats[selection]) return null
+  return (
+    <div>
+      <Segment>
+        <Form>
+          {courses ? (
+            courses.text
+          ) : (
+            <Form.Dropdown
+              name="selected"
+              options={courses}
+              onChange={(e, { value }) => setSelection(value)}
+              value={selection || courses.value}
+              selectOnBlur={false}
+              selectOnNavigation={false}
+            />
+          )}
+          <Divider />
+          <Label.Group>
+            <Label
+              key={stats[selection].coursecode}
+              content={`${stats[selection].alternatives.map(code => ` ${code}`)} ${stats[selection].name} `}
+            />
+          </Label.Group>
+        </Form>
+      </Segment>
+      {selection && <SingleCourseStats stats={stats[selection]} />}
+    </div>
+  )
 }
 
 SingleCourseTab.propTypes = {

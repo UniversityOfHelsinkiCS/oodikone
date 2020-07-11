@@ -5,9 +5,10 @@ import { getTranslate } from 'react-localize-redux'
 import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
+import useFilters from '../useFilters'
 
-const TransferredToProgramme = ({ filterControl, translate }) => {
-  const { addFilter, removeFilter, withoutFilter } = filterControl
+const TransferredToProgramme = ({ translate }) => {
+  const { addFilter, removeFilter, withoutFilter } = useFilters()
   const [value, setValue] = useState(null)
   const name = 'transferredToProgrammeFilter'
   const active = value !== null
@@ -53,11 +54,6 @@ const TransferredToProgramme = ({ filterControl, translate }) => {
 }
 
 TransferredToProgramme.propTypes = {
-  filterControl: PropTypes.shape({
-    addFilter: PropTypes.func.isRequired,
-    removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired
-  }).isRequired,
   translate: PropTypes.func.isRequired
 }
 

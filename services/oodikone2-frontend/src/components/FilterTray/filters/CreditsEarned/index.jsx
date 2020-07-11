@@ -7,11 +7,13 @@ import { getStudentTotalCredits } from '../../../../common'
 import FilterCard from '../common/FilterCard'
 import NumericInput from '../common/NumericInput'
 import useCreditFilter from './useCreditFilter'
+import useFilters from '../../useFilters'
 
 export const contextKey = 'creditFilter'
 
-const CreditsEarned = ({ filterControl, translate }) => {
+const CreditsEarned = ({ translate }) => {
   const { currentValue, requestedValue, setCurrentValue } = useCreditFilter()
+  const { addFilter, removeFilter, activeFilters } = useFilters()
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
   const labels = { min: translate('creditFilter.labelMin'), max: translate('creditFilter.labelMax') }
 
@@ -28,9 +30,9 @@ const CreditsEarned = ({ filterControl, translate }) => {
     const name = names[key]
 
     if (currentValue[key] !== '') {
-      filterControl.addFilter(name, filterFunctions(currentValue[key])[key])
+      addFilter(name, filterFunctions(currentValue[key])[key])
     } else {
-      filterControl.removeFilter(name)
+      removeFilter(name)
     }
   }
 
@@ -55,9 +57,9 @@ const CreditsEarned = ({ filterControl, translate }) => {
       setCurrentValue({ [key]: String(newValue) })
 
       if (newValue === '') {
-        filterControl.removeFilter(name)
+        removeFilter(name)
       } else {
-        filterControl.addFilter(name, filterFunctions(newValue)[key])
+        addFilter(name, filterFunctions(newValue)[key])
       }
     })
   }, [requestedValue])
@@ -78,12 +80,12 @@ const CreditsEarned = ({ filterControl, translate }) => {
   const onClear = key => () => {
     setCurrentValue({ [key]: '' })
     setUpdatedAt(prev => ({ ...prev, [key]: null }))
-    filterControl.removeFilter(names[key])
+    removeFilter(names[key])
   }
 
-  const clearButtonDisabled = key => !Object.keys(filterControl.activeFilters).includes(names[key])
+  const clearButtonDisabled = key => !Object.keys(activeFilters).includes(names[key])
 
-  const active = Object.values(names).some(name => Object.keys(filterControl.activeFilters).includes(name))
+  const active = Object.values(names).some(name => Object.keys(activeFilters).includes(name))
 
   return (
     <FilterCard
@@ -112,12 +114,6 @@ const CreditsEarned = ({ filterControl, translate }) => {
 }
 
 CreditsEarned.propTypes = {
-  filterControl: PropTypes.shape({
-    addFilter: PropTypes.func.isRequired,
-    removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired,
-    activeFilters: PropTypes.object.isRequired
-  }).isRequired,
   translate: PropTypes.func.isRequired
 }
 

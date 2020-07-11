@@ -1,16 +1,10 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
-import useFeatureToggle from '../../../../common/useFeatureToggle'
 import useFilterTray from '../../useFilterTray'
 
 const FilterCard = ({ title, children, footer, active, className, contextKey }) => {
-  const [clickSaver] = useFeatureToggle('clickSaver')
-  const [open, setOpen, toggleOpen] = useFilterTray(contextKey)
-
-  useEffect(() => {
-    setOpen(clickSaver)
-  }, [])
+  const [open, , toggleOpen] = useFilterTray(contextKey)
 
   return (
     <Card className={`${className} ${active ? 'active-filter' : ''}`}>
