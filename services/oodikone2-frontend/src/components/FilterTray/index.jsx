@@ -47,7 +47,7 @@ const FilterTray = ({ children, translate, filterSet }) => {
             {filterSet}
           </Card.Group>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
-            <Button secondary onClick={() => setOpen(false)}>
+            <Button secondary onClick={() => setOpen(false)} data-cy="filter-toggle-close">
               <Icon name="angle double up" />
               <div className="button-label">{translate('filters.trayClose')}</div>
               <Icon name="angle double up" />
@@ -57,7 +57,7 @@ const FilterTray = ({ children, translate, filterSet }) => {
         <Sidebar.Pushable>{children}</Sidebar.Pushable>
       </Sidebar>
       <div className="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
-        <Button secondary onClick={() => setOpen(true)}>
+        <Button secondary onClick={() => setOpen(true)} data-cy="filter-toggle-open">
           <Icon name="angle double down" />
           <div className="button-label">
             {translate('filters.trayOpen')}
