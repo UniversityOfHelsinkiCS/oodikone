@@ -21,6 +21,7 @@ import infotooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
+import { CoursePopulationFilters } from '../FilterTray/FilterSets'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -315,7 +316,7 @@ const CoursePopulation = ({
   ]
 
   return (
-    <FilterTray>
+    <FilterTray filterSet={<CoursePopulationFilters />}>
       <div className="segmentContainer">
         <Segment className="contentSegment">
           <Header className="segmentTitle" size="large" textAlign="center">

@@ -40,6 +40,7 @@ const StartYearAtUni = ({ translate }) => {
       contextKey="startYearFilter"
       footer={<ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} />}
       active={Object.keys(activeFilters).includes(name)}
+      name={name}
     >
       <Form>
         <Dropdown

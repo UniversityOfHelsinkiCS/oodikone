@@ -28,7 +28,13 @@ const Courses = ({ language, translate }) => {
     }))
 
   return (
-    <FilterCard title="Courses" active={!!selectedCourses.length} className="courses-filter" contextKey={contextKey}>
+    <FilterCard
+      title="Courses"
+      active={!!selectedCourses.length}
+      className="courses-filter"
+      contextKey={contextKey}
+      name="courseFilter"
+    >
       <DropdownWithUnfuckedPlaceholder
         options={options}
         placeholder={translate('courseFilter.courseSelectorLabel')}

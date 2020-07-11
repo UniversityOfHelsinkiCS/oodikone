@@ -34,6 +34,7 @@ const StartingSemester = () => {
       title="Starting Semester"
       footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} />}
       active={Object.keys(activeFilters).includes(name)}
+      name={name}
     >
       <Form>
         <div className="description-text">Show students who started...</div>

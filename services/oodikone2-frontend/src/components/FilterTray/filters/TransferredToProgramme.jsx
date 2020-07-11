@@ -33,6 +33,7 @@ const TransferredToProgramme = ({ translate }) => {
       contextKey={name}
       active={active}
       footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} />}
+      name={name}
     >
       <Form>
         <div className="description-text">{translate('transferFilter.descriptionUpper')}</div>
