@@ -5,9 +5,10 @@ import { getTranslate } from 'react-localize-redux'
 import { connect } from 'react-redux'
 import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
+import useFilters from '../useFilters'
 
-const Gender = ({ filterControl, translate }) => {
-  const { addFilter, removeFilter, withoutFilter, activeFilters } = filterControl
+const Gender = ({ translate }) => {
+  const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
   const [value, setValue] = useState(null)
   const name = 'gender'
 
@@ -64,12 +65,6 @@ const Gender = ({ filterControl, translate }) => {
 }
 
 Gender.propTypes = {
-  filterControl: PropTypes.shape({
-    addFilter: PropTypes.func.isRequired,
-    removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired,
-    activeFilters: PropTypes.object.isRequired
-  }).isRequired,
   translate: PropTypes.func.isRequired
 }
 

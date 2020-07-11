@@ -7,7 +7,6 @@ import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import '../populationCourseStats.css'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../../common/useFeatureToggle'
 
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
 const getCumulativeYearCount = (year, passingSemesters) => {
@@ -64,12 +63,11 @@ const renderCumulativeStatistics = passingSemesters => (
   </Fragment>
 )
 
-const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, isActiveCourseFn, activeLanguage }) => {
-  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
+const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, activeLanguage }) => {
   const { courseIsSelected } = useCourseFilter()
   const { stats, course } = statistics
   const passingSemesters = cumulative ? stats.passingSemestersCumulative : stats.passingSemesters
-  const isActive = filterFeatToggle ? courseIsSelected(course.code) : isActiveCourseFn(course)
+  const isActive = courseIsSelected(course.code)
 
   return (
     <Table.Row key={course.code} active={isActive}>
@@ -114,7 +112,6 @@ CourseRow.propTypes = {
   }).isRequired,
   cumulative: bool.isRequired,
   onCourseNameClickFn: func.isRequired,
-  isActiveCourseFn: func.isRequired,
   activeLanguage: string.isRequired
 }
 

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Form, Label, Segment, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
@@ -8,58 +8,55 @@ import { fields, setValue } from '../../../redux/coursesSummaryForm'
 import CumulativeTable from '../CumulativeTable'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 
-class SummaryTab extends Component {
-  handleChange = (e, { name, value }) => {
+const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClickCourse }) => {
+  const handleChange = (e, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
-    if ((!this.props.form[fields.programmes].includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
+    if ((!form[fields.programmes].includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
       selected = [ALL.value]
     }
-    this.props.setValue(name, selected)
+    setValue(name, selected)
   }
 
-  render() {
-    const { statistics, programmes, queryInfo } = this.props
-    const data = statistics.map(stat => {
-      const { coursecode, name, realisations, summary } = stat
-      const { passed, failed, passrate } = summary
-      return {
-        id: coursecode,
-        category: name,
-        passed,
-        failed,
-        passrate,
-        realisations
-      }
-    })
+  const data = statistics.map(stat => {
+    const { coursecode, name, realisations, summary } = stat
+    const { passed, failed, passrate } = summary
+    return {
+      id: coursecode,
+      category: name,
+      passed,
+      failed,
+      passrate,
+      realisations
+    }
+  })
 
-    return (
-      <div>
-        <Segment>
-          <Form>
-            <Header content="Filter statistics by study programmes" as="h4" />
-            <ProgrammeDropdown
-              options={programmes
-                .map(e => ({ ...e, size: new Set(flatten(Object.values(e.students))).size }))
-                .filter(e => e.size > 0)}
-              label="Study programmes:"
-              name={fields.programmes}
-              onChange={this.handleChange}
-              value={this.props.form[fields.programmes]}
-            />
-            <Form.Field>
-              <label>Timeframe:</label>
-              <Label.Group>
-                {queryInfo.timeframe.map(({ code, name }) => (
-                  <Label key={code} content={name} />
-                ))}
-              </Label.Group>
-            </Form.Field>
-          </Form>
-        </Segment>
-        {<CumulativeTable categoryName="Course" onClickCourse={this.props.onClickCourse} data={data} />}
-      </div>
-    )
-  }
+  return (
+    <div>
+      <Segment>
+        <Form>
+          <Header content="Filter statistics by study programmes" as="h4" />
+          <ProgrammeDropdown
+            options={programmes
+              .map(e => ({ ...e, size: new Set(flatten(Object.values(e.students))).size }))
+              .filter(e => e.size > 0)}
+            label="Study programmes:"
+            name={fields.programmes}
+            onChange={handleChange}
+            value={form[fields.programmes]}
+          />
+          <Form.Field>
+            <label>Timeframe:</label>
+            <Label.Group>
+              {queryInfo.timeframe.map(({ code, name }) => (
+                <Label key={code} content={name} />
+              ))}
+            </Label.Group>
+          </Form.Field>
+        </Form>
+      </Segment>
+      {<CumulativeTable categoryName="Course" onClickCourse={onClickCourse} data={data} />}
+    </div>
+  )
 }
 
 SummaryTab.propTypes = {

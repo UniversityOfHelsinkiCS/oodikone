@@ -1,21 +1,16 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { shape, func, bool, arrayOf, string } from 'prop-types'
+import { shape, func, bool } from 'prop-types'
 import { Segment, Header, Accordion, Popup } from 'semantic-ui-react'
 import qs from 'query-string'
-import { intersection, difference } from 'lodash'
 import ReactMarkdown from 'react-markdown'
 import scrollToComponent from 'react-scroll-to-component'
-
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
-import { clearPopulationFilters } from '../../redux/populationFilters'
 import { getFaculties } from '../../redux/faculties'
 import { getSemesters } from '../../redux/semesters'
 import PopulationStudents from '../PopulationStudents'
-
-import CustomPopulationFilters from '../CustomPopulation/CustomPopulationFilters'
 import CoursePopulationGradeDist from './CoursePopulationGradeDist'
 import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
@@ -24,6 +19,8 @@ import { getStudentToTargetCourseDateMap, getUserIsAdmin } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
+import FilterTray from '../FilterTray'
+import useFilters from '../FilterTray/useFilters'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -32,12 +29,13 @@ const CoursePopulation = ({
   pending,
   history,
   courseData,
-  selectedStudents,
   getSemestersDispatch,
-  clearPopulationFiltersDispatch,
   semesters,
   getFacultiesDispatch
 }) => {
+  const { setAllStudents, filteredStudents } = useFilters()
+  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
+
   const parseQueryFromUrl = () => {
     const { location } = history
     const query = qs.parse(location.search)
@@ -62,6 +60,11 @@ const CoursePopulation = ({
     () => getStudentToTargetCourseDateMap(studentData.students ? studentData.students : [], codes),
     [studentData.students, codes]
   )
+
+  // Pass students to filter context.
+  useEffect(() => {
+    setAllStudents(studentData.students || [])
+  }, [studentData.students])
 
   useEffect(() => {
     getSemestersDispatch()
@@ -89,7 +92,6 @@ const CoursePopulation = ({
     if (semesters.years && semesters.semesters) {
       const { coursecodes, from, to, years, separate } = parseQueryFromUrl()
       const parsedCourseCodes = JSON.parse(coursecodes)
-      clearPopulationFiltersDispatch()
       getCoursePopulationDispatch({ coursecodes, from, to, onProgress, separate })
       getSingleCourseStatsDispatch({
         fromYear: from,
@@ -302,8 +304,8 @@ const CoursePopulation = ({
           <div ref={studentRef}>
             <PopulationStudents
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              samples={studentData.students}
-              selectedStudents={selectedStudents}
+              filteredStudents={studentData.students.filter(stu => selectedStudents.includes(stu.studentNumber))}
+              mandatoryToggle={false}
               coursePopulation
             />
           </div>
@@ -313,25 +315,19 @@ const CoursePopulation = ({
   ]
 
   return (
-    <div className="segmentContainer">
-      <Segment className="contentSegment">
-        <Header className="segmentTitle" size="large" textAlign="center">
-          Population of course {header}
-        </Header>
-        <Header className="segmentTitle" size="medium" textAlign="center">
-          {subHeader}
-        </Header>
-        <CustomPopulationFilters
-          studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-          samples={studentData.students}
-          coursecodes={codes}
-          from={dateFrom}
-          to={dateTo}
-          coursePopulation
-        />
-        <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
-      </Segment>
-    </div>
+    <FilterTray>
+      <div className="segmentContainer">
+        <Segment className="contentSegment">
+          <Header className="segmentTitle" size="large" textAlign="center">
+            Population of course {header}
+          </Header>
+          <Header className="segmentTitle" size="medium" textAlign="center">
+            {subHeader}
+          </Header>
+          <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+        </Segment>
+      </div>
+    </FilterTray>
   )
 }
 
@@ -339,12 +335,10 @@ CoursePopulation.propTypes = {
   getCoursePopulationDispatch: func.isRequired,
   getSingleCourseStatsDispatch: func.isRequired,
   getSemestersDispatch: func.isRequired,
-  clearPopulationFiltersDispatch: func.isRequired,
   pending: bool.isRequired,
   studentData: shape({}).isRequired,
   history: shape({}).isRequired,
   courseData: shape({}).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
   semesters: shape({
     semesters: shape({}),
     years: shape({})
@@ -354,35 +348,17 @@ CoursePopulation.propTypes = {
 
 const mapStateToProps = ({
   singleCourseStats,
-  populationFilters,
   populations,
   semesters,
   auth: {
     token: { roles }
   }
 }) => {
-  const samples = populations.data.students ? populations.data.students : []
-  let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
-  const { complemented } = populationFilters
-
-  if (samples.length > 0 && populationFilters.filters.length > 0) {
-    const studentsForFilter = f => {
-      return samples.filter(f.filter).map(s => s.studentNumber)
-    }
-
-    const matchingStudents = populationFilters.filters.map(studentsForFilter)
-    selectedStudents = intersection(...matchingStudents)
-
-    if (complemented) {
-      selectedStudents = difference(samples.map(s => s.studentNumber), selectedStudents)
-    }
-  }
   return {
     studentData: populations.data,
     pending: populations.pending,
     query: populations.query,
     courseData: singleCourseStats.stats || {},
-    selectedStudents,
     semesters: semesters.data,
     isAdmin: getUserIsAdmin(roles)
   }
@@ -395,7 +371,6 @@ export default withRouter(
       getCoursePopulationDispatch: getCoursePopulation,
       getSingleCourseStatsDispatch: getSingleCourseStats,
       getSemestersDispatch: getSemesters,
-      clearPopulationFiltersDispatch: clearPopulationFilters,
       getFacultiesDispatch: getFaculties
     }
   )(CoursePopulation)

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import lodash from 'lodash'
 import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
 import { getTranslate } from 'react-localize-redux'
@@ -10,42 +9,17 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Sidebar from '../Sidebar'
 import Courses from './filters/Courses'
-import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from './useFilterTray'
 import EnrollmentStatus from './filters/EnrollmentStatus'
 import TransferredToProgramme from './filters/TransferredToProgramme'
 import GraduatedFromProgramme from './filters/GraduatedFromProgramme'
+import useFilters from './useFilters'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, children, translate }) => {
-  const [clickSaver] = useFeatureToggle('clickSaver')
+const FilterTray = ({ children, translate }) => {
   const [open, setOpen] = useFilterTray(contextKey)
-
-  useEffect(() => {
-    setOpen(clickSaver)
-  }, [])
-
-  const [activeFilters, setActiveFilters] = useState({})
-
-  const applyFilters = filters =>
-    Object.values(filters).reduce((students, nextFilter) => students.filter(nextFilter), allStudents)
-
-  useEffect(() => {
-    setFilteredStudents(applyFilters(activeFilters))
-  }, [activeFilters, allStudents])
-
-  const addFilter = (name, filterFn) => setActiveFilters(prev => ({ ...prev, [name]: filterFn }))
-  const removeFilter = name => setActiveFilters(prev => lodash.omit(prev, name))
-
-  /**
-   * Apply all active filters except for the one named as the argument.
-   * This provides a way for a filter to count objects without itself affecting the sample.
-   * @param {string} name Name of the filter to skip.
-   */
-  const withoutFilter = name => applyFilters(lodash.omit(activeFilters, name))
-
-  const filterControl = { addFilter, removeFilter, withoutFilter, activeFilters, allStudents, filteredStudents }
+  const { allStudents, activeFilters } = useFilters()
 
   const noFilters = Object.keys(activeFilters).length
 
@@ -77,13 +51,13 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
                 <Icon name="bars" size="large" />
               </div>
             </Header>
-            <GraduatedFromProgramme filterControl={filterControl} />
-            <TransferredToProgramme filterControl={filterControl} />
-            <EnrollmentStatus filterControl={filterControl} />
-            <CreditsEarned filterControl={filterControl} />
-            <Gender filterControl={filterControl} />
-            <StartYearAtUni filterControl={filterControl} />
-            <Courses filterControl={filterControl} />
+            <GraduatedFromProgramme />
+            <TransferredToProgramme />
+            <EnrollmentStatus />
+            <CreditsEarned />
+            <Gender />
+            <StartYearAtUni />
+            <Courses />
           </Card.Group>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)}>
@@ -124,16 +98,8 @@ const FilterTray = ({ setFilteredStudents, allStudents, filteredStudents, childr
 }
 
 FilterTray.propTypes = {
-  setFilteredStudents: PropTypes.func.isRequired,
-  allStudents: PropTypes.arrayOf(PropTypes.shape({})),
-  filteredStudents: PropTypes.arrayOf(PropTypes.shape({})),
   children: PropTypes.node.isRequired,
   translate: PropTypes.func.isRequired
-}
-
-FilterTray.defaultProps = {
-  allStudents: [],
-  filteredStudents: []
 }
 
 const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })

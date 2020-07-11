@@ -7,7 +7,6 @@ import { orderBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { clearCourseStats } from '../../redux/coursestats'
-import { courseParticipation } from '../../populationFilters'
 import PassingSemesters from './PassingSemesters'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
@@ -109,7 +108,6 @@ function PopulationCourseStats(props) {
   const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
   const [courseStatistics, setCourseStatistics] = useState(updateCourseStatisticsCriteria(props, initialState(props)))
   const [timer, setTimer] = useState(null)
-  const [filterFeatToggle] = useFeatureToggle('filterFeatToggle')
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { toggleCourseSelection } = useCourseFilter()
 
@@ -290,19 +288,9 @@ function PopulationCourseStats(props) {
   const onCourseNameCellClick = code => {
     const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
     if (courseStatistic) {
-      if (filterFeatToggle) {
-        // Toggle new filters
-        toggleCourseSelection(code)
-        setFilterTrayOpen(true)
-        setCourseFilterOpen(true)
-      } else if (!isActiveCourse(courseStatistic.course)) {
-        const params = { course: courseStatistic, field: 'all' }
-        props.setPopulationFilter(courseParticipation(params))
-        sendAnalytics('Courses of Population course selected for filter', code)
-      } else {
-        props.removePopulationFilterOfCourse(courseStatistic.course)
-        sendAnalytics('Courses of Population course unselected for filter', code)
-      }
+      toggleCourseSelection(code)
+      setFilterTrayOpen(true)
+      setCourseFilterOpen(true)
     }
   }
 
@@ -416,12 +404,10 @@ PopulationCourseStats.propTypes = {
     disciplines: shape({})
   }).isRequired,
   translate: func.isRequired,
-  setPopulationFilter: func.isRequired,
   populationCourses: shape({
     data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
   }).isRequired,
   selectedCourses: arrayOf(object).isRequired,
-  removePopulationFilterOfCourse: func.isRequired,
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,

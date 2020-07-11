@@ -5,9 +5,10 @@ import { connect } from 'react-redux'
 import { getTranslate } from 'react-localize-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
+import useFilters from '../useFilters'
 
-const GraduatedFromProgramme = ({ filterControl, code, translate }) => {
-  const { addFilter, removeFilter, withoutFilter } = filterControl
+const GraduatedFromProgramme = ({ code, translate }) => {
+  const { addFilter, removeFilter, withoutFilter } = useFilters()
   const [value, setValue] = useState(null)
   const name = 'graduatedFromProgrammeFilter'
   const active = value !== null
@@ -76,11 +77,6 @@ const GraduatedFromProgramme = ({ filterControl, code, translate }) => {
 }
 
 GraduatedFromProgramme.propTypes = {
-  filterControl: PropTypes.shape({
-    addFilter: PropTypes.func.isRequired,
-    removeFilter: PropTypes.func.isRequired,
-    withoutFilter: PropTypes.func.isRequired
-  }).isRequired,
   code: PropTypes.string.isRequired,
   translate: PropTypes.func.isRequired
 }
