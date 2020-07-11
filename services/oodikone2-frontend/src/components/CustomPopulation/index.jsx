@@ -25,6 +25,7 @@ import ProgressBar from '../ProgressBar'
 import InfoBox from '../InfoBox'
 import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
+import { CustomPopulationFilters } from '../FilterTray/FilterSets'
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
@@ -379,7 +380,7 @@ const CustomPopulation = ({
   )
 
   return (
-    <FilterTray>
+    <FilterTray filterSet={<CustomPopulationFilters />}>
       <div className="segmentContainer">
         <Message style={{ maxWidth: '800px' }}>
           <Message.Header>Custom population</Message.Header>
