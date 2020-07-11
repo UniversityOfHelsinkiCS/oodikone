@@ -61,6 +61,7 @@ const EnrollmentStatus = ({ allSemesters, language, translate }) => {
       contextKey="enrollmentStatus"
       active={active}
       footer={<ClearFilterButton disabled={!status && !semesters.length} onClick={clear} />}
+      name={name}
     >
       <Form>
         <Form.Field>

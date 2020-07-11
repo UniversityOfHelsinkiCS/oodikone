@@ -4,8 +4,8 @@ import { Button, Icon } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { connect } from 'react-redux'
 
-const ClearFilterButton = ({ disabled, onClick, translate }) => (
-  <Button compact color="red" size="tiny" disabled={disabled} onClick={onClick}>
+const ClearFilterButton = ({ disabled, onClick, translate, name }) => (
+  <Button compact color="red" size="tiny" disabled={disabled} onClick={onClick} data-cy={`${name}-clear`}>
     <Icon name="close" />
     {translate('filters.clearButtonLabel')}
   </Button>
@@ -14,7 +14,8 @@ const ClearFilterButton = ({ disabled, onClick, translate }) => (
 ClearFilterButton.propTypes = {
   disabled: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
-  translate: PropTypes.func.isRequired
+  translate: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })

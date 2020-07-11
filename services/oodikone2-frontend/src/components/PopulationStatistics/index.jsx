@@ -16,6 +16,7 @@ import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
 import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilters from '../FilterTray/useFilters'
+import { PopulationStatisticsFilters } from '../FilterTray/FilterSets'
 
 const PopulationStatistics = memo(props => {
   const {
@@ -83,7 +84,7 @@ const PopulationStatistics = memo(props => {
   }
 
   return (
-    <FilterTray>
+    <FilterTray filterSet={<PopulationStatisticsFilters />}>
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
           {translate('populationStatistics.header')}

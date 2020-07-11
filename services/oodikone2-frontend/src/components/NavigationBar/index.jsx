@@ -91,17 +91,24 @@ const NavigationBar = props => {
           key={`menu-item-drop-${translateId}`}
           tabIndex="-1"
           text={t(`navigationBar.${translateId}`)}
+          data-cy={`navbar-${translateId}`}
         >
           <Dropdown.Menu>
             {items.map(i => (
-              <Dropdown.Item as={NavLink} key={`menu-item-${i.path}`} to={i.path} tabIndex="-1">
+              <Dropdown.Item
+                as={NavLink}
+                key={`menu-item-${i.path}`}
+                to={i.path}
+                tabIndex="-1"
+                data-cy={`navbar-${i.translateId}`}
+              >
                 {t(`navigationBar.${i.translateId}`)}
               </Dropdown.Item>
             ))}
           </Dropdown.Menu>
         </Menu.Item>
       ) : (
-        <Menu.Item as={NavLink} key={`menu-item-${path}`} to={path} tabIndex="-1">
+        <Menu.Item as={NavLink} key={`menu-item-${path}`} to={path} tabIndex="-1" data-cy={`navbar-${translateId}`}>
           {t(`navigationBar.${translateId}`)}
           {tag && (
             <div style={{ position: 'absolute', top: 0, right: 17 }}>

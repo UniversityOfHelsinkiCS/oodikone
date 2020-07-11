@@ -12,20 +12,7 @@ const setPopStatsUntil = (until, includeSettings = []) => {
 
 describe('Population Statistics tests', () => {
   beforeEach(() => {
-    cy.server({
-      onAnyRequest: function (route, proxy) {
-        if (Cypress.config().baseUrl.includes("http://nginx/")) {
-          proxy.xhr.setRequestHeader('uid', 'tktl')
-          proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
-          proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
-          proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
-        }
-      }
-    })
-    console.log(Cypress.config().baseUrl)
-    cy.visit(Cypress.config().baseUrl)
-    cy.contains("Study programme").click().siblings().contains("Search by class").click()
-    cy.contains("Select study programme")
+    cy.init()
   })
 
   const checkAmountOfStudents = (assertion) => {
@@ -40,6 +27,8 @@ describe('Population Statistics tests', () => {
   }
 
   it('Population statistics search form is usable', () => {
+    cy.cs("navbar-studyProgramme").click()
+    cy.cs("navbar-class").click()
     cy.contains("See population").should('be.disabled')
     cy.url().should('include', '/populations')
     cy.contains("Search for population")
@@ -60,8 +49,7 @@ describe('Population Statistics tests', () => {
   })
 
   it('Population statistics is usable on general level', () => {
-    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.contains("See population").click()
+    cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma")
     setPopStatsUntil('September 2019')
 
     cy.get(".card").within(() => {
@@ -113,8 +101,7 @@ describe('Population Statistics tests', () => {
   })
 
   it('Student list checking works as intended', () => {
-    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.contains("See population").click()
+    cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma")
     cy.contains("Students (29)").click()
     cy.contains("010111264")
     cy.contains("666666666").should('not.exist')
@@ -133,16 +120,14 @@ describe('Population Statistics tests', () => {
   })
 
   it('Population statistics wont crash course population', () => {
-    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen maisteriohjelma").click()
-    cy.contains("See population").click()
+    cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma")
     cy.contains("Courses of population").click({ force: true })
     cy.get(':nth-child(3) > .iconCell > p > .item > .level').click({ force: true })
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click({ force: true })
   })
 
   it("Empty 'mandatory courses' tab has a link to the page where mandatory courses can be added", () => {
-    cy.contains("Select study programme").click().siblings().contains("Kielten kandiohjelma").click()
-    cy.contains("See population").click()
+    cy.selectStudyProgramme("Kielten kandiohjelma")
     cy.contains("Students (5)").click()
     cy.get("[data-cy=student-table-tabs]").contains("Mandatory Courses").click()
     cy.contains("No mandatory courses defined. You can define them here.").find("a").click()
@@ -151,8 +136,7 @@ describe('Population Statistics tests', () => {
   })
 
   it("Empty 'tags' tab has a link to the page where tags can be created", () => {
-    cy.contains("Select study programme").click().siblings().contains("Kielten kandiohjelma").click()
-    cy.contains("See population").click()
+    cy.selectStudyProgramme("Kielten kandiohjelma")
     cy.contains("Students (5)").click()
     cy.get("[data-cy=student-table-tabs]").contains("Mandatory Courses").siblings().contains("Tags").click()
     cy.contains("No tags defined. You can define them here.").find("a").click()
@@ -161,8 +145,7 @@ describe('Population Statistics tests', () => {
   })
   
   it("Advanced settings work", () => {
-    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen kandiohjelma").click()
-    cy.contains("See population").click()
+    cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma")
     cy.get('[data-cy=advanced-toggle]').click()
     cy.contains('Statistics until')
     // only spring
@@ -176,6 +159,7 @@ describe('Population Statistics tests', () => {
     cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click({ force: true })
     cy.contains('Fetch population').click()
 
+    // FIXME: This fails randomly both locally and on CI.
     cy.contains('Credit accumulation (for 206 students)')
 
     // spring + fall and include cancelled
@@ -187,8 +171,7 @@ describe('Population Statistics tests', () => {
   })
   
   it("Credit Statistics, Statistics pane works", () => {
-    cy.contains("Select study programme").click().siblings().contains("Tietojenkäsittelytieteen kandiohjelma").click()
-    cy.contains("See population").click()
+    cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma")
     cy.contains("Credit statistics").click()
     cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
 

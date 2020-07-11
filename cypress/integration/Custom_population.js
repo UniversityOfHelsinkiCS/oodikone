@@ -96,18 +96,7 @@ const loginAs = username => {
 
 describe("Custom population tests", () => {
   beforeEach(() => {
-    cy.server({
-      onAnyRequest: function(route, proxy) {
-        if (Cypress.config().baseUrl.includes("http://nginx/")) {
-          proxy.xhr.setRequestHeader("uid", "tktl");
-          proxy.xhr.setRequestHeader("shib-session-id", "mock-shibboleth");
-          proxy.xhr.setRequestHeader("hygroupcn", "grp-oodikone-users");
-          proxy.xhr.setRequestHeader("edupersonaffiliation", "asdasd");
-        }
-      }
-    });
-    console.log(Cypress.config().baseUrl);
-    cy.visit(`${Cypress.config().baseUrl}custompopulation`);
+    cy.init('custompopulation')
     cy.url().should("include", "/custompopulation");
     cy.contains("Custom population");
   });
