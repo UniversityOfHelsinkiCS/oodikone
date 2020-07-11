@@ -32,7 +32,7 @@ const FilterTray = ({ children, translate, filterSet }) => {
                     size="mini"
                     on="hover"
                     trigger={
-                      <Label color="blue" size="small">
+                      <Label color="blue" size="small" data-cy="active-filter-count">
                         <Icon name="filter" />
                         {noFilters}
                       </Label>

@@ -93,6 +93,7 @@ const CreditsEarned = ({ translate }) => {
       active={active}
       className="total-credits-filter"
       contextKey={contextKey}
+      name="credit-filter"
     >
       <Form>
         <div className="description-text">{translate('creditFilter.description')}</div>
