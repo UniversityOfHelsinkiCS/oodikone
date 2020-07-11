@@ -10,18 +10,7 @@ const deleteTag = (name) => {
 
 describe('Tag tests', () => {
   beforeEach(() => {
-    cy.server({
-      onAnyRequest: function (route, proxy) {
-        if (Cypress.config().baseUrl.includes("http://nginx/")) {
-          proxy.xhr.setRequestHeader('uid', 'admink')
-          proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
-          proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
-          proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
-        }
-      }
-    })
-    cy.visit(Cypress.config().baseUrl)
-    cy.reload()
+    cy.init()
     cy.contains("Study programme").click()
     cy.contains("Overview").click()
     cy.contains("Datatieteen maisteriohjelma").click()
