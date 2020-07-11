@@ -1,7 +1,7 @@
 import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
-import { func, bool, shape, arrayOf, string, any } from 'prop-types'
+import { func, bool, shape, arrayOf, any } from 'prop-types'
 import { Header, Segment, Divider, Form } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
 import PopulationSearchForm from '../PopulationSearchForm'

@@ -90,10 +90,6 @@ class PopulationStudents extends Component {
 
   renderStudentTable() {
     const { populationStatistics, customPopulation, coursePopulation } = this.props
-    const students = this.props.samples.reduce((obj, s) => {
-      obj[s.studentNumber] = s
-      return obj
-    }, {})
 
     const transferFrom = s =>
       getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, this.props.language)
@@ -532,7 +528,6 @@ PopulationStudents.defaultProps = {
 
 PopulationStudents.propTypes = {
   samples: arrayOf(object).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
   showNames: bool.isRequired,
   showList: bool.isRequired,
   language: string.isRequired,
@@ -557,7 +552,8 @@ PopulationStudents.propTypes = {
   studentToTargetCourseDateMap: shape({}),
   coursePopulation: bool,
   customPopulation: bool,
-  mandatoryToggle: bool.isRequired
+  mandatoryToggle: bool.isRequired,
+  filteredStudents: arrayOf(shape({})).isRequired
 }
 
 const mapStateToProps = state => {
