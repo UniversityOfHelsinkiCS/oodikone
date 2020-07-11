@@ -26,12 +26,6 @@ const EnrollmentStatus = ({ allSemesters, language, translate }) => {
     .uniq()
     .value()
 
-  const semesterOptions = semesterCodes.map(code => ({
-    key: `semester-option-${code}`,
-    text: allSemesters[code].name[language],
-    value: code
-  }))
-
   useEffect(() => {
     if (active) {
       addFilter(name, student =>
@@ -45,6 +39,16 @@ const EnrollmentStatus = ({ allSemesters, language, translate }) => {
       removeFilter(name)
     }
   }, [status, semesters])
+
+  if (!Object.keys(allSemesters).length) {
+    return null
+  }
+
+  const semesterOptions = semesterCodes.map(code => ({
+    key: `semester-option-${code}`,
+    text: allSemesters[code].name[language],
+    value: code
+  }))
 
   const clear = () => {
     setStatus(null)

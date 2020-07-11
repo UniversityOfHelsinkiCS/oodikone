@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea, Segment, Header, Accordion, Popup, Message } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
-import { intersection, difference } from 'lodash'
 import ReactMarkdown from 'react-markdown'
 import scrollToComponent from 'react-scroll-to-component'
 import { useProgress, useTitle } from '../../common/hooks'
@@ -17,15 +16,15 @@ import {
   deleteCustomPopulationSearch
 } from '../../redux/customPopulationSearch'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
-import { clearPopulationFilters } from '../../redux/populationFilters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import SearchHistory from '../SearchHistory'
 import PopulationStudents from '../PopulationStudents'
-import CustomPopulationFilters from './CustomPopulationFilters'
 import CustomPopulationCourses from './CustomPopulationCourses'
 import CustomPopulationProgrammeDist from './CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import InfoBox from '../InfoBox'
+import FilterTray from '../FilterTray'
+import useFilters from '../FilterTray/useFilters'
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
@@ -38,8 +37,6 @@ const CustomPopulation = ({
   custompop,
   customPopulationFlag,
   translate,
-  selectedStudents,
-  clearPopulationFiltersDispatch,
   loading,
   customPopulationSearches,
   latestCreatedCustomPopulationSearchId,
@@ -52,6 +49,8 @@ const CustomPopulation = ({
   const [activeIndex, setIndex] = useState([])
   const [selectedSearchId, setSelectedSearchId] = useState('')
   const [newestIndex, setNewest] = useState(null)
+  const { setAllStudents, filteredStudents } = useFilters()
+  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
   const { onProgress, progress } = useProgress(loading)
 
@@ -62,6 +61,12 @@ const CustomPopulation = ({
   const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
 
   useTitle('Custom population')
+
+  // Pass students to filter context.
+  useEffect(() => {
+    setAllStudents(custompop || [])
+    console.log(custompop)
+  }, [custompop])
 
   useEffect(() => {
     getCustomPopulationSearchesDispatch()
@@ -130,7 +135,6 @@ const CustomPopulation = ({
     const studentnumbers = input.match(/[0-9]+/g)
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
-    clearPopulationFiltersDispatch()
     selectCustomPopulationSearchDispatch(selectedSearchId || null)
     handleClose()
   }
@@ -355,7 +359,7 @@ const CustomPopulation = ({
       content: {
         content: (
           <div ref={studentRef}>
-            <PopulationStudents samples={custompop} selectedStudents={selectedStudents} customPopulation />
+            <PopulationStudents mandatoryToggle={false} filteredStudents={filteredStudents} customPopulation />
           </div>
         )
       }
@@ -371,32 +375,33 @@ const CustomPopulation = ({
             : ''}
         </Header>
       )}
-      <CustomPopulationFilters samples={custompop} />
       <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
     </div>
   )
 
   return (
-    <div className="segmentContainer">
-      <Message style={{ maxWidth: '800px' }}>
-        <Message.Header>Custom population</Message.Header>
-        <p>
-          Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
-          button will open a modal where you can enter a list of studentnumbers. You can also save a custom population
-          by giving it a name and clicking the save button in the modal. It will then appear in the saved populations
-          list. These populations are personal meaning that they will only show to you. You can only search
-          studentnumbers you have access rights to i.e. you have rights to the programme they are in.
-        </p>
-      </Message>
-      {renderCustomPopulationSearch()}
-      {custompop.length > 0 && customPopulationFlag ? (
-        <Segment className="contentSegment">{renderCustomPopulation()}</Segment>
-      ) : (
-        <Segment className="contentSegment">
-          <ProgressBar progress={progress} />
-        </Segment>
-      )}
-    </div>
+    <FilterTray>
+      <div className="segmentContainer">
+        <Message style={{ maxWidth: '800px' }}>
+          <Message.Header>Custom population</Message.Header>
+          <p>
+            Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
+            button will open a modal where you can enter a list of studentnumbers. You can also save a custom population
+            by giving it a name and clicking the save button in the modal. It will then appear in the saved populations
+            list. These populations are personal meaning that they will only show to you. You can only search
+            studentnumbers you have access rights to i.e. you have rights to the programme they are in.
+          </p>
+        </Message>
+        {renderCustomPopulationSearch()}
+        {custompop.length > 0 && customPopulationFlag ? (
+          <Segment className="contentSegment">{renderCustomPopulation()}</Segment>
+        ) : (
+          <Segment className="contentSegment">
+            <ProgressBar progress={progress} />
+          </Segment>
+        )}
+      </div>
+    </FilterTray>
   )
 }
 
@@ -411,8 +416,6 @@ CustomPopulation.propTypes = {
   customPopulationFlag: bool.isRequired,
   getCustomPopulationDispatch: func.isRequired,
   getCustomPopulationCoursesByStudentnumbers: func.isRequired,
-  clearPopulationFiltersDispatch: func.isRequired,
-  selectedStudents: arrayOf(string).isRequired,
   loading: bool.isRequired,
   customPopulationSearches: arrayOf(shape({})).isRequired,
   customPopulationSearchSaving: bool.isRequired,
@@ -425,45 +428,24 @@ CustomPopulation.propTypes = {
   deleteCustomPopulationSearchDispatch: func.isRequired
 }
 
-const mapStateToProps = ({ populationFilters, populations, localize, populationCourses, customPopulationSearch }) => {
-  const samples = populations.data.students ? populations.data.students : []
-  let selectedStudents = samples.length > 0 ? samples.map(s => s.studentNumber) : []
-  const { complemented } = populationFilters
-  const { customPopulationFlag } = populations
-  if (samples.length > 0 && populationFilters.filters.length > 0) {
-    const studentsForFilter = f => {
-      return samples.filter(f.filter).map(s => s.studentNumber)
-    }
-
-    const matchingStudents = populationFilters.filters.map(studentsForFilter)
-    selectedStudents = intersection(...matchingStudents)
-
-    if (complemented) {
-      selectedStudents = difference(samples.map(s => s.studentNumber), selectedStudents)
-    }
-  }
-
-  return {
-    translate: getTranslate(localize),
-    loading: populations.pending,
-    custompop: populations.data.students || [],
-    courses: populationCourses.data,
-    pending: populationCourses.pending,
-    selectedStudents,
-    customPopulationFlag,
-    customPopulationSearches: customPopulationSearch.customPopulationSearches,
-    customPopulationSearchSaving: customPopulationSearch.saving,
-    latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
-    searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId
-  }
-}
+const mapStateToProps = ({ populations, localize, populationCourses, customPopulationSearch }) => ({
+  translate: getTranslate(localize),
+  loading: populations.pending,
+  custompop: populations.data.students || [],
+  courses: populationCourses.data,
+  pending: populationCourses.pending,
+  customPopulationFlag: populations.customPopulationFlag,
+  customPopulationSearches: customPopulationSearch.customPopulationSearches,
+  customPopulationSearchSaving: customPopulationSearch.saving,
+  latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
+  searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId
+})
 
 export default connect(
   mapStateToProps,
   {
     getCustomPopulationDispatch: getCustomPopulation,
     getCustomPopulationCoursesByStudentnumbers,
-    clearPopulationFiltersDispatch: clearPopulationFilters,
     saveCustomPopulationSearchDispatch: saveCustomPopulationSearch,
     getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
     updateCustomPopulationSearchDispatch: updateCustomPopulationSearch,
