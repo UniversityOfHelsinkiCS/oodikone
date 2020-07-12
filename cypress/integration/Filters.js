@@ -84,22 +84,19 @@ describe("Population Statistics", () => {
     checkFilteringResult(219, true)
   })
 
-  // FIXME: Dropdown items are in random order lol.
-  /*
-  it.only("Courses filter works", () => {
+  it("Courses filter works", () => {
     cy.cs("courseFilter-header").click()
-    cy.selectFromDropdown("courseFilter-course-dropdown", 0)
+    cy.cs("courseFilter-course-dropdown").click().contains("MAT11002").click()
     checkFilteringResult(82)
     cy.selectFromDropdown("courseFilter-MAT11002-dropdown", 1)
     checkFilteringResult(75)
-    cy.selectFromDropdown("courseFilter-course-dropdown", 0)
-    checkFilteringResult(31)
-    cy.selectFromDropdown("courseFilter-TKT20003-dropdown", 6)
-    checkFilteringResult(31)
+    cy.cs("courseFilter-course-dropdown").click().contains("TKT20001").click()
+    checkFilteringResult(62)
+    cy.selectFromDropdown("courseFilter-TKT20001-dropdown", 6)
+    checkFilteringResult(24)
     cy.cs("courseFilter-MAT11002-clear").click()
-    checkFilteringResult(192)
-    cy.cs("courseFilter-TKT20003-clear").click()
+    checkFilteringResult(166)
+    cy.cs("courseFilter-TKT20001-clear").click()
     checkFilteringResult(219, true)
   })
-  */
 })
