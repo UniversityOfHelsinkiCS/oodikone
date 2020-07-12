@@ -10,7 +10,7 @@ import useFilters from '../useFilters'
 const Gender = ({ translate }) => {
   const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
   const [value, setValue] = useState(null)
-  const name = 'gender'
+  const name = 'genderFilter'
 
   const genderCodes = {
     female: { label: translate('genderFilter.female'), value: 2 },
@@ -45,7 +45,7 @@ const Gender = ({ translate }) => {
     <FilterCard
       title={translate('genderFilter.title')}
       contextKey="genderFilter"
-      footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} />}
+      footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} name={name} />}
       active={Object.keys(activeFilters).includes(name)}
       name={name}
     >
@@ -59,6 +59,7 @@ const Gender = ({ translate }) => {
           selection
           fluid
           button
+          data-cy={`${name}-dropdown`}
         />
       </Form>
     </FilterCard>

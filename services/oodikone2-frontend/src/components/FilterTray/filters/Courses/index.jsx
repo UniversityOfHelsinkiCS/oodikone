@@ -16,6 +16,7 @@ export const contextKey = 'coursesFilter'
 const Courses = ({ language, translate }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
   const { filteredStudents } = useFilters()
+  const name = 'courseFilter'
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
   const options = courseStats
@@ -33,13 +34,14 @@ const Courses = ({ language, translate }) => {
       active={!!selectedCourses.length}
       className="courses-filter"
       contextKey={contextKey}
-      name="courseFilter"
+      name={name}
     >
       <DropdownWithUnfuckedPlaceholder
         options={options}
         placeholder={translate('courseFilter.courseSelectorLabel')}
         className="course-filter-selection"
         onChange={(_, { value }) => toggleCourseSelection(value[0])}
+        name={name}
       />
       <Card.Group>
         {selectedCourses.map(course => (
