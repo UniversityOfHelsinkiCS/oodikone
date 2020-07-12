@@ -38,7 +38,7 @@ const StartYearAtUni = ({ translate }) => {
     <FilterCard
       title={translate('startYearFilter.title')}
       contextKey="startYearFilter"
-      footer={<ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} />}
+      footer={<ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} name={name} />}
       active={Object.keys(activeFilters).includes(name)}
       name={name}
     >
@@ -53,6 +53,7 @@ const StartYearAtUni = ({ translate }) => {
           placeholder={translate('startYearFilter.dropdownLabel')}
           onChange={(_, { value: inputValue }) => setValue(inputValue)}
           value={value}
+          data-cy={`${name}-dropdown`}
         />
       </Form>
     </FilterCard>

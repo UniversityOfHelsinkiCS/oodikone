@@ -51,4 +51,55 @@ describe("Population Statistics", () => {
     cy.cs("enrollmentStatusFilter-clear").click()
     checkFilteringResult(219, true)
   })
+
+  it("Credit filter works", () => {
+    cy.cs("credit-filter-header").click()
+    cy.cs("credit-filter-min").click().type("50{enter}")
+    checkFilteringResult(98)
+    cy.cs("credit-filter-max").click().type("100{enter}")
+    checkFilteringResult(88)
+    cy.cs("credit-filter-min-clear").click()
+    checkFilteringResult(209)
+    cy.cs("credit-filter-max-clear").click()
+    checkFilteringResult(219, true)
+  })
+
+  it("Gender filter works", () => {
+    cy.cs("genderFilter-header").click()
+    cy.selectFromDropdown("genderFilter-dropdown", 0)
+    checkFilteringResult(48)
+    cy.selectFromDropdown("genderFilter-dropdown", 1)
+    checkFilteringResult(171)
+    cy.selectFromDropdown("genderFilter-dropdown", 2)
+    checkFilteringResult(0)
+    cy.cs("genderFilter-clear").click()
+    checkFilteringResult(219, true)
+  })
+
+  it("Starting year filter works", () => {
+    cy.cs("startYearAtUni-header").click()
+    cy.selectFromDropdown("startYearAtUni-dropdown", [18])
+    checkFilteringResult(155)
+    cy.cs("startYearAtUni-clear").click()
+    checkFilteringResult(219, true)
+  })
+
+  // FIXME: Dropdown items are in random order lol.
+  /*
+  it.only("Courses filter works", () => {
+    cy.cs("courseFilter-header").click()
+    cy.selectFromDropdown("courseFilter-course-dropdown", 0)
+    checkFilteringResult(82)
+    cy.selectFromDropdown("courseFilter-MAT11002-dropdown", 1)
+    checkFilteringResult(75)
+    cy.selectFromDropdown("courseFilter-course-dropdown", 0)
+    checkFilteringResult(31)
+    cy.selectFromDropdown("courseFilter-TKT20003-dropdown", 6)
+    checkFilteringResult(31)
+    cy.cs("courseFilter-MAT11002-clear").click()
+    checkFilteringResult(192)
+    cy.cs("courseFilter-TKT20003-clear").click()
+    checkFilteringResult(219, true)
+  })
+  */
 })
