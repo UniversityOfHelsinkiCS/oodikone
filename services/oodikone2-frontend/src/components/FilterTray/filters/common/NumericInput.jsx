@@ -13,7 +13,7 @@ const NumericInput = ({
   clearButtonDisabled,
   className,
   translate,
-  name,
+  name
 }) => (
   <Input
     labelPosition="left"

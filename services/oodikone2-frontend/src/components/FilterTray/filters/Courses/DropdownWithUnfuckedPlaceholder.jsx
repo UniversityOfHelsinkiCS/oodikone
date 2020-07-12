@@ -38,7 +38,8 @@ DropdownWithUnfuckedPlaceholder.propTypes = {
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   placeholder: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
+  name: PropTypes.string.isRequired
 }
 
 DropdownWithUnfuckedPlaceholder.defaultProps = {
