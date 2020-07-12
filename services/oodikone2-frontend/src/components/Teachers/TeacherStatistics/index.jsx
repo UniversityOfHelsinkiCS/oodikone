@@ -142,6 +142,7 @@ const TeacherStatistics = ({
               onChange={changeProviders}
               selectOnBlur={false}
               selectOnNavigation={false}
+              data-cy="course-providers"
             />
           </Form.Field>
           <Button fluid content="Search" onClick={handleSubmit} disabled={invalidQueryParams} />
