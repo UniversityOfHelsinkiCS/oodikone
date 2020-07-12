@@ -10,8 +10,9 @@ describe('Teachers page tests', () => {
   it("Check Statistics", () => {
     cy.get(':nth-child(1) > .ui > .search').click()
     cy.contains('Autumn 2017').click()
-    cy.get('.form > :nth-child(2) > .ui').click()
+    cy.cs('course-providers').click()
     cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+    cy.cs('course-providers').children('.icon').click()
     cy.get('.form > .fluid').click()
     cy.contains('Name')
     cy.contains('Wu')
