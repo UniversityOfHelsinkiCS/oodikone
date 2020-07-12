@@ -60,7 +60,7 @@ const EnrollmentStatus = ({ allSemesters, language, translate }) => {
       title={translate('enrlFilter.title')}
       contextKey="enrollmentStatus"
       active={active}
-      footer={<ClearFilterButton disabled={!status && !semesters.length} onClick={clear} />}
+      footer={<ClearFilterButton disabled={!status && !semesters.length} onClick={clear} name={name} />}
       name={name}
     >
       <Form>
@@ -75,6 +75,7 @@ const EnrollmentStatus = ({ allSemesters, language, translate }) => {
             fluid
             button
             clearable
+            data-cy={`${name}-status`}
           />
         </Form.Field>
         <Form.Field>
@@ -88,6 +89,7 @@ const EnrollmentStatus = ({ allSemesters, language, translate }) => {
             placeholder={translate('enrlFilter.semesterLabel')}
             onChange={(_, { value }) => setSemesters(value)}
             value={semesters}
+            data-cy={`${name}-semesters`}
           />
         </Form.Field>
       </Form>

@@ -32,18 +32,18 @@ const TransferredToProgramme = ({ translate }) => {
       title={translate('transferFilter.title')}
       contextKey={name}
       active={active}
-      footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} />}
+      footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} name={name} />}
       name={name}
     >
       <Form>
         <div className="description-text">{translate('transferFilter.descriptionUpper')}</div>
         <Form.Field className="flex-centered">
           <Button.Group size="small">
-            <Button toggle active={value === 1} onClick={toggle(1)}>
+            <Button toggle active={value === 1} onClick={toggle(1)} data-cy={`${name}-have`}>
               {`${translate('transferFilter.have')} (${count(true)})`}
             </Button>
             <Button.Or text="OR" />
-            <Button toggle active={value === 0} onClick={toggle(0)}>
+            <Button toggle active={value === 0} onClick={toggle(0)} data-cy={`${name}-havenot`}>
               {`${translate('transferFilter.haveNot')} (${count(false)})`}
             </Button>
           </Button.Group>
