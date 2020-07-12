@@ -32,11 +32,11 @@ Cypress.Commands.add("selectFromDropdown", (name, index) => {
   const indexes = Array.isArray(index) ? index : [index]
 
   indexes.forEach((i) => {
-    cy.cs(name).click().children(".menu").children().eq(i).click()
+    cy.cs(name).click().children(".menu").children().eq(i).click({ force: true })
   })
 
   // Close multiple selection so it does not block elements underneath it.
   if (Array.isArray(index)) {
-    cy.cs(name).children(".icon").click()
+    cy.cs(name).children(".icon").click({ force: true })
   }
 })
