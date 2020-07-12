@@ -9,6 +9,7 @@ describe("Population Statistics", () => {
   before(() => {
     // Tests run considerably faster if we don't init() before each case.
     // Drawback is that cases then rely on the tray being toggled open.
+    // TODO: Make smarter (if one test fails all subsequent tests fail, too)?
     cy.init()
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma")
     cy.cs("filter-toggle-open").click()
