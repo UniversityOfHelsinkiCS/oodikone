@@ -76,9 +76,10 @@ describe("Population Statistics", () => {
     checkFilteringResult(219, true)
   })
 
-  it("Starting year filter works", () => {
+  it.only("Starting year filter works", () => {
     cy.viewport(1920, 1080)
     cy.cs("startYearAtUni-header").click()
+    cy.screenshot('debug0')
     cy.selectFromDropdown("startYearAtUni-dropdown", [18])
     cy.screenshot('debug1')
     checkFilteringResult(155)
