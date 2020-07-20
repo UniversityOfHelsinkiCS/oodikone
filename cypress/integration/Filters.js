@@ -77,17 +77,23 @@ describe("Population Statistics", () => {
   })
 
   it("Starting year filter works", () => {
+    cy.viewport(1920, 1080)
     cy.cs("startYearAtUni-header").click()
     cy.selectFromDropdown("startYearAtUni-dropdown", [18])
+    cy.screenshot('debug1')
     checkFilteringResult(155)
+    cy.screenshot('debug2')
     cy.cs("startYearAtUni-clear").click()
     checkFilteringResult(219, true)
   })
 
   it("Courses filter works", () => {
+    cy.viewport(1920, 1080)
     cy.cs("courseFilter-header").click()
     cy.cs("courseFilter-course-dropdown").click().contains("MAT11002").click()
+    cy.screenshot('debug3')
     checkFilteringResult(82)
+    cy.screenshot('debug4')
     cy.selectFromDropdown("courseFilter-MAT11002-dropdown", 1)
     checkFilteringResult(75)
     cy.cs("courseFilter-course-dropdown").click().contains("TKT20001").click()
