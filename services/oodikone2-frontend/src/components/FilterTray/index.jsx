@@ -4,17 +4,22 @@ import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
 import { getTranslate } from 'react-localize-redux'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import Sidebar from '../Sidebar'
 import useFilterTray from './useFilterTray'
 import useFilters from './useFilters'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ children, translate, filterSet }) => {
+const FilterTray = ({ children, translate, filterSet, location }) => {
   const [open, setOpen] = useFilterTray(contextKey)
   const { allStudents, activeFilters } = useFilters()
 
   const noFilters = Object.keys(activeFilters).length
+
+  if (!location.search) {
+    return children
+  }
 
   return (
     <>
@@ -87,9 +92,12 @@ const FilterTray = ({ children, translate, filterSet }) => {
 FilterTray.propTypes = {
   children: PropTypes.node.isRequired,
   translate: PropTypes.func.isRequired,
-  filterSet: PropTypes.node.isRequired
+  filterSet: PropTypes.node.isRequired,
+  location: PropTypes.shape({
+    search: PropTypes.string.isRequired
+  }).isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
 
-export default connect(mapStateToProps)(FilterTray)
+export default connect(mapStateToProps)(withRouter(FilterTray))
