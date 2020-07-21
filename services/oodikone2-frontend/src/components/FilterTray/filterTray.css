@@ -56,10 +56,10 @@
   margin: 0 0 0 3rem;
   overflow-y: scroll;
   overflow-x: hidden;
-  padding-bottom: 2rem;
+  padding: 1.5rem 0 2rem 0;
 }
 
-#filter-tray > .header {
+#filter-tray-container > .header {
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -67,7 +67,10 @@
   padding: 1.1rem 1rem 1rem 1.7rem;
   border-bottom: 1px solid #a0a0a0;
   align-items: center;
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 0 !important;
+  margin-top: 63px;
+  margin-left: 3rem;
+  width: auto;
   color: white;
   order: -2;
 }

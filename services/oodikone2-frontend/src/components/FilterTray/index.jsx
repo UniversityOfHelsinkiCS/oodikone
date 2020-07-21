@@ -25,7 +25,7 @@ const FilterTray = ({ children, translate, filterSet, location }) => {
     <>
       <Sidebar open={open}>
         <Sidebar.Pusher>
-          <Card.Group id="filter-tray">
+          <div id="filter-tray-container">
             <Header size="medium">
               <Header.Content>
                 {translate('filters.trayTitle')}
@@ -49,8 +49,8 @@ const FilterTray = ({ children, translate, filterSet, location }) => {
                 <Icon name="bars" size="large" />
               </div>
             </Header>
-            {filterSet}
-          </Card.Group>
+            <Card.Group id="filter-tray">{filterSet}</Card.Group>
+          </div>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={() => setOpen(false)} data-cy="filter-toggle-close">
               <Icon name="angle double up" />
