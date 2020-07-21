@@ -62,7 +62,6 @@
 #filter-tray-container > .header {
   display: flex;
   justify-content: space-between;
-  width: 100%;
   min-height: 64px;
   padding: 1.1rem 1rem 1rem 1.7rem;
   border-bottom: 1px solid #a0a0a0;
