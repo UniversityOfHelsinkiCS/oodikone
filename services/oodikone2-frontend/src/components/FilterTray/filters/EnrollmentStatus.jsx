@@ -63,36 +63,38 @@ const EnrollmentStatus = ({ allSemesters, language, translate }) => {
       footer={<ClearFilterButton disabled={!status && !semesters.length} onClick={clear} name={name} />}
       name={name}
     >
-      <Form>
-        <Form.Field>
-          <Dropdown
-            options={statusOptions}
-            value={status}
-            onChange={(_, { value }) => setStatus(value)}
-            placeholder={translate('enrlFilter.statusLabel')}
-            className="mini"
-            selection
-            fluid
-            button
-            clearable
-            data-cy={`${name}-status`}
-          />
-        </Form.Field>
-        <Form.Field>
-          <Dropdown
-            multiple
-            selection
-            fluid
-            options={semesterOptions}
-            button
-            className="mini"
-            placeholder={translate('enrlFilter.semesterLabel')}
-            onChange={(_, { value }) => setSemesters(value)}
-            value={semesters}
-            data-cy={`${name}-semesters`}
-          />
-        </Form.Field>
-      </Form>
+      <div className="card-content">
+        <Form>
+          <Form.Field>
+            <Dropdown
+              options={statusOptions}
+              value={status}
+              onChange={(_, { value }) => setStatus(value)}
+              placeholder={translate('enrlFilter.statusLabel')}
+              className="mini"
+              selection
+              fluid
+              button
+              clearable
+              data-cy={`${name}-status`}
+            />
+          </Form.Field>
+          <Form.Field>
+            <Dropdown
+              multiple
+              selection
+              fluid
+              options={semesterOptions}
+              button
+              className="mini"
+              placeholder={translate('enrlFilter.semesterLabel')}
+              onChange={(_, { value }) => setSemesters(value)}
+              value={semesters}
+              data-cy={`${name}-semesters`}
+            />
+          </Form.Field>
+        </Form>
+      </div>
     </FilterCard>
   )
 }
