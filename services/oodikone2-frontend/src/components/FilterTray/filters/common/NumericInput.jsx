@@ -4,7 +4,17 @@ import { Input, Label, Popup, Button, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getTranslate } from 'react-localize-redux'
 
-const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonDisabled, className, translate }) => (
+const NumericInput = ({
+  onChange,
+  onKeyDown,
+  onClear,
+  value,
+  label,
+  clearButtonDisabled,
+  className,
+  translate,
+  name
+}) => (
   <Input
     labelPosition="left"
     size="mini"
@@ -13,6 +23,7 @@ const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonD
     action
     onKeyDown={onKeyDown}
     className={className}
+    data-cy={name}
   >
     <Label>{label}</Label>
     <input />
@@ -23,7 +34,7 @@ const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonD
       size="mini"
       on="hover"
       trigger={
-        <Button size="mini" color="red" icon onClick={onClear} disabled={clearButtonDisabled}>
+        <Button size="mini" color="red" icon onClick={onClear} disabled={clearButtonDisabled} data-cy={`${name}-clear`}>
           <Icon name="close" />
         </Button>
       }
@@ -39,7 +50,8 @@ NumericInput.propTypes = {
   label: PropTypes.node.isRequired,
   clearButtonDisabled: PropTypes.bool.isRequired,
   className: PropTypes.string,
-  translate: PropTypes.func.isRequired
+  translate: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired
 }
 
 NumericInput.defaultProps = {

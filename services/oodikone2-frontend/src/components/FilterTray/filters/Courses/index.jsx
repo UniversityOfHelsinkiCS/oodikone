@@ -16,15 +16,18 @@ export const contextKey = 'coursesFilter'
 const Courses = ({ language, translate }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
   const { filteredStudents } = useFilters()
+  const name = 'courseFilter'
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
+  const makeLabel = cs => `${cs.course.code} - ${getTextIn(cs.course.name, language)}`
   const options = courseStats
-    .filter(course => course.stats.students > Math.round(filteredStudents.length * 0.3))
-    .filter(course => !selectedCourses.some(c => c.course.code === course.course.code))
-    .map(course => ({
-      key: `course-filter-option-${course.course.code}`,
-      text: getTextIn(course.course.name, language),
-      value: course.course.code
+    .filter(cs => cs.stats.students > Math.round(filteredStudents.length * 0.3))
+    .filter(cs => !selectedCourses.some(c => c.course.code === cs.course.code))
+    .sort((a, b) => makeLabel(a).localeCompare(makeLabel(b)))
+    .map(cs => ({
+      key: `course-filter-option-${cs.course.code}`,
+      text: makeLabel(cs),
+      value: cs.course.code
     }))
 
   return (
@@ -33,13 +36,14 @@ const Courses = ({ language, translate }) => {
       active={!!selectedCourses.length}
       className="courses-filter"
       contextKey={contextKey}
-      name="courseFilter"
+      name={name}
     >
       <DropdownWithUnfuckedPlaceholder
         options={options}
         placeholder={translate('courseFilter.courseSelectorLabel')}
         className="course-filter-selection"
         onChange={(_, { value }) => toggleCourseSelection(value[0])}
+        name={name}
       />
       <Card.Group>
         {selectedCourses.map(course => (

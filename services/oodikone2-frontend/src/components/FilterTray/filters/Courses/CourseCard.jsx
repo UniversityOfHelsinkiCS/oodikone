@@ -65,7 +65,14 @@ const CourseCard = ({ courseStats, language, translate }) => {
       <Card.Content>
         <Card.Header>
           <div>{getTextIn(course.name, language)}</div>
-          <Button compact color="red" size="tiny" onClick={() => toggleCourseSelection(course.code)} icon>
+          <Button
+            compact
+            color="red"
+            size="tiny"
+            onClick={() => toggleCourseSelection(course.code)}
+            icon
+            data-cy={`${name}-clear`}
+          >
             <Icon name="close" />
           </Button>
         </Card.Header>
@@ -79,6 +86,7 @@ const CourseCard = ({ courseStats, language, translate }) => {
             fluid
             className="mini"
             button
+            data-cy={`${name}-dropdown`}
           />
         </Card.Description>
       </Card.Content>

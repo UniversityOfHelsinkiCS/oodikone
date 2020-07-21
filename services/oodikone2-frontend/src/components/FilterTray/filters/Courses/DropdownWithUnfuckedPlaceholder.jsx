@@ -6,7 +6,7 @@ import { Dropdown } from 'semantic-ui-react'
  * I am not proud of this but the makers of semantic-ui-react should be even less so.
  * And yes, the <input> is fucking required to make their mess of a component work.
  */
-const DropdownWithUnfuckedPlaceholder = ({ options, placeholder: defaultPlaceholder, onChange, className }) => {
+const DropdownWithUnfuckedPlaceholder = ({ options, placeholder: defaultPlaceholder, onChange, className, name }) => {
   const [placeholder, setPlaceholder] = useState(defaultPlaceholder)
   const ref = createRef()
 
@@ -28,6 +28,7 @@ const DropdownWithUnfuckedPlaceholder = ({ options, placeholder: defaultPlacehol
         multiple
         closeOnChange
         search
+        data-cy={`${name}-course-dropdown`}
       />
     </>
   )
@@ -37,7 +38,8 @@ DropdownWithUnfuckedPlaceholder.propTypes = {
   options: PropTypes.arrayOf(PropTypes.object).isRequired,
   placeholder: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  className: PropTypes.string
+  className: PropTypes.string,
+  name: PropTypes.string.isRequired
 }
 
 DropdownWithUnfuckedPlaceholder.defaultProps = {
