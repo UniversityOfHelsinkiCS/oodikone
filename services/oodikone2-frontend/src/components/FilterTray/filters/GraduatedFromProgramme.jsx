@@ -61,17 +61,19 @@ const GraduatedFromProgramme = ({ code, translate }) => {
     >
       <Form>
         <div className="description-text">{translate('gradFromProgFilter.descriptionUpper')}</div>
-        <Dropdown
-          options={options}
-          value={value}
-          onChange={(_, { value: inputValue }) => setValue(inputValue)}
-          placeholder={translate('gradFromProgFilter.dropdownLabel')}
-          className="mini"
-          selection
-          fluid
-          button
-          data-cy={`${name}-dropdown`}
-        />
+        <div className="card-content">
+          <Dropdown
+            options={options}
+            value={value}
+            onChange={(_, { value: inputValue }) => setValue(inputValue)}
+            placeholder={translate('gradFromProgFilter.dropdownLabel')}
+            className="mini"
+            selection
+            fluid
+            button
+            data-cy={`${name}-dropdown`}
+          />
+        </div>
         <div className="description-text">{translate('gradFromProgFilter.descriptionLower')}</div>
       </Form>
     </FilterCard>

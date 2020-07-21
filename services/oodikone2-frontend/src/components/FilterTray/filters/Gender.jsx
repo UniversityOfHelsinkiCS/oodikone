@@ -49,19 +49,21 @@ const Gender = ({ translate }) => {
       active={Object.keys(activeFilters).includes(name)}
       name={name}
     >
-      <Form>
-        <Dropdown
-          options={options}
-          value={value}
-          onChange={(_, { value: inputValue }) => setValue(inputValue)}
-          placeholder={translate('genderFilter.dropdownLabel')}
-          className="mini"
-          selection
-          fluid
-          button
-          data-cy={`${name}-dropdown`}
-        />
-      </Form>
+      <div className="card-content">
+        <Form>
+          <Dropdown
+            options={options}
+            value={value}
+            onChange={(_, { value: inputValue }) => setValue(inputValue)}
+            placeholder={translate('genderFilter.dropdownLabel')}
+            className="mini"
+            selection
+            fluid
+            button
+            data-cy={`${name}-dropdown`}
+          />
+        </Form>
+      </div>
     </FilterCard>
   )
 }
