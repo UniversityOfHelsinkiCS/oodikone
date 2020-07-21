@@ -106,6 +106,7 @@ const CreditsEarned = ({ translate }) => {
               value={currentValue[key]}
               label={labels[key]}
               clearButtonDisabled={clearButtonDisabled(key)}
+              name={`credit-filter-${key}`}
             />
           </Form.Field>
         ))}

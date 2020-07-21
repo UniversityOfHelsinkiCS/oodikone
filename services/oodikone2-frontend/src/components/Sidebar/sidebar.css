@@ -5,7 +5,7 @@
 }
 
 #oodi-sidebar .pusher {
-  width: 25vw;
+  width: 350px;
   position: sticky;
   top: 0;
   height: 100vh !important;
@@ -15,7 +15,7 @@
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-end;
-  margin-left: -25vw;
+  margin-left: -350px;
   -webkit-transition: all 0.5s;
   transition: all 0.5s;
   z-index: 5;
@@ -32,5 +32,5 @@
 }
 
 #oodi-sidebar.sidebar-open .pushable {
-  width: 79vw;
+  width: calc(100% - 350px);
 }
