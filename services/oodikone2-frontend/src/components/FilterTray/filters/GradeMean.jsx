@@ -8,9 +8,11 @@ import FilterCard from './common/FilterCard'
 import NumericInput from './common/NumericInput'
 import { getStudentGradeMean } from '../../../common'
 import useFilters from '../useFilters'
+import useAnalytics from '../useAnalytics'
 
 const GradeMean = ({ translate }) => {
   const { addFilter, removeFilter } = useFilters()
+  const analytics = useAnalytics()
   const [comparator, setComparator] = useState('<')
   const [value, setValue] = useState('')
   const name = 'gradeMeanFilter'
@@ -27,8 +29,10 @@ const GradeMean = ({ translate }) => {
   useEffect(() => {
     if (value === '') {
       removeFilter(name)
+      analytics.clearFilter(name)
     } else {
       addFilter(name, filters(value)[comparator])
+      analytics.setFilter(name, comparator.concat(value))
     }
   }, [comparator, value])
 
