@@ -6,11 +6,13 @@ import { connect } from 'react-redux'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 import useFilters from '../../useFilters'
+import useAnalytics from '../../useAnalytics'
 
 const CourseCard = ({ courseStats, language, translate }) => {
   const { addFilter, removeFilter } = useFilters()
   const { course, students } = courseStats
   const { toggleCourseSelection } = useCourseFilter()
+  const analytics = useAnalytics()
   const [selectedOption, setSelectedOption] = useState(0)
   const name = `courseFilter-${course.code}`
 
@@ -60,19 +62,17 @@ const CourseCard = ({ courseStats, language, translate }) => {
 
   const onChange = (_, { value }) => setSelectedOption(value)
 
+  const clear = () => {
+    toggleCourseSelection(course.code)
+    analytics.clearFilter(course.code)
+  }
+
   return (
     <Card className="course-card">
       <Card.Content>
         <Card.Header>
           <div>{getTextIn(course.name, language)}</div>
-          <Button
-            compact
-            color="red"
-            size="tiny"
-            onClick={() => toggleCourseSelection(course.code)}
-            icon
-            data-cy={`${name}-clear`}
-          >
+          <Button compact color="red" size="tiny" onClick={clear} icon data-cy={`${name}-clear`}>
             <Icon name="close" />
           </Button>
         </Card.Header>

@@ -8,12 +8,14 @@ import FilterCard from '../common/FilterCard'
 import NumericInput from '../common/NumericInput'
 import useCreditFilter from './useCreditFilter'
 import useFilters from '../../useFilters'
+import useAnalytics from '../../useAnalytics'
 
 export const contextKey = 'creditFilter'
 
 const CreditsEarned = ({ translate }) => {
   const { currentValue, requestedValue, setCurrentValue } = useCreditFilter()
   const { addFilter, removeFilter, activeFilters } = useFilters()
+  const analytics = useAnalytics()
   const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
   const labels = { min: translate('creditFilter.labelMin'), max: translate('creditFilter.labelMax') }
 
@@ -31,8 +33,10 @@ const CreditsEarned = ({ translate }) => {
 
     if (currentValue[key] !== '') {
       addFilter(name, filterFunctions(currentValue[key])[key])
+      analytics.setFilter(name, currentValue[key])
     } else {
       removeFilter(name)
+      analytics.clearFilter(name)
     }
   }
 

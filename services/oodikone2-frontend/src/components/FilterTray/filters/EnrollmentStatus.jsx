@@ -8,11 +8,13 @@ import { getTranslate } from 'react-localize-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
+import useAnalytics from '../useAnalytics'
 
 const EnrollmentStatus = ({ allSemesters, language, translate }) => {
   const [status, setStatus] = useState(null)
   const [semesters, setSemesters] = useState([])
   const { allStudents, addFilter, removeFilter } = useFilters()
+  const analytics = useAnalytics()
   const name = 'enrollmentStatusFilter'
   const active = !!status && !!semesters.length
 
@@ -35,8 +37,10 @@ const EnrollmentStatus = ({ allSemesters, language, translate }) => {
           return enrollment ? enrollment.enrollmenttype === status : false
         })
       )
+      analytics.setFilter(name, `${statusOptions[status]} (${semesters.map(sem => allSemesters[sem].en).join(', ')})`)
     } else {
       removeFilter(name)
+      analytics.clearFilter(name)
     }
   }, [status, semesters])
 

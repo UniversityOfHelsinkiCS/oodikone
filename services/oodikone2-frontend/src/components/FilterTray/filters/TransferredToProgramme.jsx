@@ -6,9 +6,11 @@ import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
+import useAnalytics from '../useAnalytics'
 
 const TransferredToProgramme = ({ translate }) => {
   const { addFilter, removeFilter, withoutFilter } = useFilters()
+  const analytics = useAnalytics()
   const [value, setValue] = useState(null)
   const name = 'transferredToProgrammeFilter'
   const active = value !== null
@@ -18,8 +20,10 @@ const TransferredToProgramme = ({ translate }) => {
   useEffect(() => {
     if (active) {
       addFilter(name, filterFn(!!value))
+      analytics.setFilter(name, value)
     } else {
       removeFilter(name)
+      analytics.clearFilter(name)
     }
   }, [value])
 

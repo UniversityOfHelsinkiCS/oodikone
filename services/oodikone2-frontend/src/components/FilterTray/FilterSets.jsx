@@ -28,19 +28,35 @@ export const PopulationStatisticsFilters = () => {
   )
 }
 
-export const CoursePopulationFilters = () => (
-  <>
-    <EnrollmentStatus />
-    <Gender />
-    <StartYearAtUni />
-  </>
-)
+export const CoursePopulationFilters = () => {
+  const analytics = useAnalytics()
 
-export const CustomPopulationFilters = () => (
-  <>
-    <EnrollmentStatus />
-    <Gender />
-    <StartYearAtUni />
-    <Courses />
-  </>
-)
+  useEffect(() => {
+    analytics.setTarget('Course Population')
+  })
+
+  return (
+    <>
+      <EnrollmentStatus />
+      <Gender />
+      <StartYearAtUni />
+    </>
+  )
+}
+
+export const CustomPopulationFilters = () => {
+  const analytics = useAnalytics()
+
+  useEffect(() => {
+    analytics.setTarget('Custom Population')
+  })
+
+  return (
+    <>
+      <EnrollmentStatus />
+      <Gender />
+      <StartYearAtUni />
+      <Courses />
+    </>
+  )
+}

@@ -6,9 +6,11 @@ import { connect } from 'react-redux'
 import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
 import useFilters from '../useFilters'
+import useAnalytics from '../useAnalytics'
 
 const StartYearAtUni = ({ translate }) => {
   const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
+  const analytics = useAnalytics()
 
   const [value, setValue] = useState([])
   const name = 'startYearAtUni'
@@ -17,8 +19,10 @@ const StartYearAtUni = ({ translate }) => {
   useEffect(() => {
     if (!isActive()) {
       removeFilter(name)
+      analytics.clearFilter(name)
     } else {
       addFilter(name, student => value.some(year => year === new Date(student.started).getFullYear()))
+      analytics.setFilter(name, value.join(', '))
     }
   }, [value])
 
