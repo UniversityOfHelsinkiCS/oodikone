@@ -15,18 +15,21 @@ FilterAnalyticsProvider.propTypes = {
 
 export default () => {
   const [state, setState] = useContext(FilterAnalyticsContext)
+  const category = `Filters (${state})`
 
   const setTarget = name => setState(name)
   const unsetTarget = () => setState(null)
-
-  const setFilter = (name, value) => state && TSA.Matomo.sendEvent(`Filters (${state})`, 'Set Filter', name, value)
-
-  const clearFilter = name => state && TSA.Matomo.sendEvent(`Filters (${state})`, 'Clear Filter', name)
+  const setFilter = (name, value) => state && TSA.Matomo.sendEvent(category, 'Set Filter', name, value)
+  const clearFilter = name => state && TSA.Matomo.sendEvent(category, 'Clear Filter', name)
+  const openTray = () => state && TSA.Matomo.sendEvent(category, 'Toggle Filter Tray', 'Open')
+  const closeTray = () => state && TSA.Matomo.sendEvent(category, 'Toggle Filter Tray', 'Close')
 
   return {
     setTarget,
     unsetTarget,
     setFilter,
-    clearFilter
+    clearFilter,
+    openTray,
+    closeTray
   }
 }

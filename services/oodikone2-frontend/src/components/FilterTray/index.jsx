@@ -8,17 +8,29 @@ import { withRouter } from 'react-router-dom'
 import Sidebar from '../Sidebar'
 import useFilterTray from './useFilterTray'
 import useFilters from './useFilters'
+import useAnalytics from './useAnalytics'
 
 export const contextKey = 'filterTray'
 
 const FilterTray = ({ children, translate, filterSet, location }) => {
   const [open, setOpen] = useFilterTray(contextKey)
   const { allStudents, activeFilters } = useFilters()
-
-  const noFilters = Object.keys(activeFilters).length
+  const analytics = useAnalytics()
 
   if (!location.search) {
     return children
+  }
+
+  const noFilters = Object.keys(activeFilters).length
+
+  const openTray = () => {
+    setOpen(true)
+    analytics.openTray()
+  }
+
+  const closeTray = () => {
+    setOpen(false)
+    analytics.closeTray()
   }
 
   return (
@@ -52,7 +64,7 @@ const FilterTray = ({ children, translate, filterSet, location }) => {
             <Card.Group id="filter-tray">{filterSet}</Card.Group>
           </div>
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
-            <Button secondary onClick={() => setOpen(false)} data-cy="filter-toggle-close">
+            <Button secondary onClick={closeTray} data-cy="filter-toggle-close">
               <Icon name="angle double up" />
               <div className="button-label">{translate('filters.trayClose')}</div>
               <Icon name="angle double up" />
@@ -62,7 +74,7 @@ const FilterTray = ({ children, translate, filterSet, location }) => {
         <Sidebar.Pushable>{children}</Sidebar.Pushable>
       </Sidebar>
       <div className="filter-tray-toggle" style={{ visibility: allStudents.length > 0 ? 'visible' : 'hidden' }}>
-        <Button secondary onClick={() => setOpen(true)} data-cy="filter-toggle-open">
+        <Button secondary onClick={openTray} data-cy="filter-toggle-open">
           <Icon name="angle double down" />
           <div className="button-label">
             {translate('filters.trayOpen')}

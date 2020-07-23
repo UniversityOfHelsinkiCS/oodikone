@@ -6,9 +6,11 @@ import { connect } from 'react-redux'
 import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
 import useFilters from '../useFilters'
+import useAnalytics from '../useAnalytics'
 
 const Gender = ({ translate }) => {
   const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
+  const analytics = useAnalytics()
   const [value, setValue] = useState(null)
   const name = 'genderFilter'
 
@@ -22,8 +24,10 @@ const Gender = ({ translate }) => {
   useEffect(() => {
     if (!value) {
       removeFilter(name)
+      analytics.clearFilter(name)
     } else {
       addFilter(name, student => value === student.gender_code)
+      analytics.setFilter(name, value)
     }
   }, [value])
 
