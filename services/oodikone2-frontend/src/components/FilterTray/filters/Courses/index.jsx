@@ -10,12 +10,14 @@ import useCourseFilter from './useCourseFilter'
 import './courseFilter.css'
 import DropdownWithUnfuckedPlaceholder from './DropdownWithUnfuckedPlaceholder'
 import useFilters from '../../useFilters'
+import useAnalytics from '../../useAnalytics'
 
 export const contextKey = 'coursesFilter'
 
 const Courses = ({ language, translate }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
   const { filteredStudents } = useFilters()
+  const analytics = useAnalytics()
   const name = 'courseFilter'
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
@@ -30,6 +32,12 @@ const Courses = ({ language, translate }) => {
       value: cs.course.code
     }))
 
+  const onChange = (_, { value }) => {
+    const courseCode = value[0]
+    toggleCourseSelection(courseCode)
+    analytics.setFilter(name, courseCode)
+  }
+
   return (
     <FilterCard
       title="Courses"
@@ -42,7 +50,7 @@ const Courses = ({ language, translate }) => {
         options={options}
         placeholder={translate('courseFilter.courseSelectorLabel')}
         className="course-filter-selection"
-        onChange={(_, { value }) => toggleCourseSelection(value[0])}
+        onChange={onChange}
         name={name}
       />
       <Card.Group>
