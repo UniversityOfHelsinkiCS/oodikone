@@ -4,15 +4,18 @@ import { CourseFilterProvider } from './filters/Courses/useCourseFilter'
 import { CreditFilterProvider } from './filters/CreditsEarned/useCreditFilter'
 import { FilterTrayProvider } from './useFilterTray'
 import { FilterProvider } from './useFilters'
+import { FilterAnalyticsProvider } from './useAnalytics'
 
 const FilterContextProvider = ({ children }) => (
-  <FilterTrayProvider>
-    <FilterProvider>
-      <CourseFilterProvider>
-        <CreditFilterProvider>{children}</CreditFilterProvider>
-      </CourseFilterProvider>
-    </FilterProvider>
-  </FilterTrayProvider>
+  <FilterAnalyticsProvider>
+    <FilterTrayProvider>
+      <FilterProvider>
+        <CourseFilterProvider>
+          <CreditFilterProvider>{children}</CreditFilterProvider>
+        </CourseFilterProvider>
+      </FilterProvider>
+    </FilterTrayProvider>
+  </FilterAnalyticsProvider>
 )
 
 FilterContextProvider.propTypes = {

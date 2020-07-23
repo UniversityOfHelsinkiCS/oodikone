@@ -56,18 +56,20 @@
   margin: 0 0 0 3rem;
   overflow-y: scroll;
   overflow-x: hidden;
-  padding-bottom: 2rem;
+  padding: 1.5rem 0 2rem 0;
 }
 
-#filter-tray > .header {
+#filter-tray-container > .header {
   display: flex;
   justify-content: space-between;
-  width: 100%;
   min-height: 64px;
   padding: 1.1rem 1rem 1rem 1.7rem;
   border-bottom: 1px solid #a0a0a0;
   align-items: center;
-  margin-bottom: 1.5rem !important;
+  margin-bottom: 0 !important;
+  margin-top: 63px;
+  margin-left: 3rem;
+  width: auto;
   color: white;
   order: -2;
 }
@@ -126,13 +128,13 @@
 
 #filter-tray.cards .description,
 #filter-tray.cards .extra {
-  padding: 0.8rem;
+  padding: 0 0.8rem 0.8rem 0.8rem;
   margin: 0;
 }
 
 #filter-tray .card .extra {
   margin: 0 0 0 auto;
-  padding-top: 0.2rem;
+  padding-top: 0.8rem;
 }
 
 #filter-tray .checkbox {
@@ -157,7 +159,11 @@
 #filter-tray .description-text {
   color: #9e9e9e;
   font-style: italic;
-  margin: 0 0.2rem 1.2rem 0.2rem;
+  margin: 1rem 0.2rem 0 0.2rem;
+}
+
+#filter-tray .card-content {
+  margin-top: 0.8rem;
 }
 
 #filter-tray .total-credits-filter .description {
