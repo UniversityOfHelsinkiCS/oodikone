@@ -97,19 +97,21 @@ const CreditsEarned = ({ translate }) => {
     >
       <Form>
         <div className="description-text">{translate('creditFilter.description')}</div>
-        {Object.keys(currentValue).map(key => (
-          <Form.Field key={`total-credits-filter-${key}`}>
-            <NumericInput
-              onChange={onChange(key)}
-              onKeyDown={onKeyDown(key)}
-              onClear={onClear(key)}
-              value={currentValue[key]}
-              label={labels[key]}
-              clearButtonDisabled={clearButtonDisabled(key)}
-              name={`credit-filter-${key}`}
-            />
-          </Form.Field>
-        ))}
+        <div className="card-content">
+          {Object.keys(currentValue).map(key => (
+            <Form.Field key={`total-credits-filter-${key}`}>
+              <NumericInput
+                onChange={onChange(key)}
+                onKeyDown={onKeyDown(key)}
+                onClear={onClear(key)}
+                value={currentValue[key]}
+                label={labels[key]}
+                clearButtonDisabled={clearButtonDisabled(key)}
+                name={`credit-filter-${key}`}
+              />
+            </Form.Field>
+          ))}
+        </div>
       </Form>
     </FilterCard>
   )

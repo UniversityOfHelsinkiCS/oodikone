@@ -42,20 +42,22 @@ const StartYearAtUni = ({ translate }) => {
       active={Object.keys(activeFilters).includes(name)}
       name={name}
     >
-      <Form>
-        <Dropdown
-          multiple
-          selection
-          fluid
-          options={options}
-          button
-          className="mini"
-          placeholder={translate('startYearFilter.dropdownLabel')}
-          onChange={(_, { value: inputValue }) => setValue(inputValue)}
-          value={value}
-          data-cy={`${name}-dropdown`}
-        />
-      </Form>
+      <div className="card-content">
+        <Form>
+          <Dropdown
+            multiple
+            selection
+            fluid
+            options={options}
+            button
+            className="mini"
+            placeholder={translate('startYearFilter.dropdownLabel')}
+            onChange={(_, { value: inputValue }) => setValue(inputValue)}
+            value={value}
+            data-cy={`${name}-dropdown`}
+          />
+        </Form>
+      </div>
     </FilterCard>
   )
 }

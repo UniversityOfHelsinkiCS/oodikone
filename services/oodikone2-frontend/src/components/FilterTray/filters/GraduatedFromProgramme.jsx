@@ -6,9 +6,11 @@ import { getTranslate } from 'react-localize-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
+import useAnalytics from '../useAnalytics'
 
 const GraduatedFromProgramme = ({ code, translate }) => {
   const { addFilter, removeFilter, withoutFilter } = useFilters()
+  const analytics = useAnalytics()
   const [value, setValue] = useState(null)
   const name = 'graduatedFromProgrammeFilter'
   const active = value !== null
@@ -33,8 +35,10 @@ const GraduatedFromProgramme = ({ code, translate }) => {
   useEffect(() => {
     if (active) {
       addFilter(name, filterFn(value))
+      analytics.setFilter(name, value)
     } else {
       removeFilter(name)
+      analytics.clearFilter(name)
     }
   }, [value])
 
@@ -61,17 +65,19 @@ const GraduatedFromProgramme = ({ code, translate }) => {
     >
       <Form>
         <div className="description-text">{translate('gradFromProgFilter.descriptionUpper')}</div>
-        <Dropdown
-          options={options}
-          value={value}
-          onChange={(_, { value: inputValue }) => setValue(inputValue)}
-          placeholder={translate('gradFromProgFilter.dropdownLabel')}
-          className="mini"
-          selection
-          fluid
-          button
-          data-cy={`${name}-dropdown`}
-        />
+        <div className="card-content">
+          <Dropdown
+            options={options}
+            value={value}
+            onChange={(_, { value: inputValue }) => setValue(inputValue)}
+            placeholder={translate('gradFromProgFilter.dropdownLabel')}
+            className="mini"
+            selection
+            fluid
+            button
+            data-cy={`${name}-dropdown`}
+          />
+        </div>
         <div className="description-text">{translate('gradFromProgFilter.descriptionLower')}</div>
       </Form>
     </FilterCard>
