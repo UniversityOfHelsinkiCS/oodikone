@@ -147,7 +147,6 @@ const NavigationBar = props => {
               }}
             />
           ))}
-          <Dropdown.Item icon="heartbeat" text="Destroy oodikone with SIS" onClick={setFlagSIS} />
           <Dropdown.Item icon="log out" text={t('navigationBar.logout')} onClick={logout} />
         </Dropdown.Menu>
       </Menu.Item>
