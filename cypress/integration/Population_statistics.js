@@ -149,22 +149,23 @@ describe('Population Statistics tests', () => {
     cy.get('[data-cy=advanced-toggle]').click()
     cy.contains('Statistics until')
     // only spring
-    cy.get(':nth-child(2) > :nth-child(2) > .ui > label').click({ force: true })
+    cy.cs('toggle-fall').click()
     cy.contains('Fetch population').click()
 
     cy.contains('Credit accumulation (for 13 students)')
 
     // only fall
-    cy.get(':nth-child(2) > :nth-child(2) > .ui > label').click({ force: true })
-    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click({ force: true })
+    cy.cs('toggle-fall').click()
+    cy.cs('toggle-spring').click()
+
     cy.contains('Fetch population').click()
 
     // FIXME: This fails randomly both locally and on CI.
     cy.contains('Credit accumulation (for 206 students)')
 
     // spring + fall and include cancelled
-    cy.get(':nth-child(2) > :nth-child(3) > .ui > label').click({ force: true })
-    cy.get(':nth-child(3) > :nth-child(3) > .ui > label').click({ force: true })
+    cy.cs('toggle-spring').click()
+    cy.cs('toggle-cancelled').click()
     cy.contains('Fetch population').click()
 
     cy.contains('Credit accumulation (for 228 students)')

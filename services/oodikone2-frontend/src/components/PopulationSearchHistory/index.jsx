@@ -205,6 +205,7 @@ class PopulationSearchHistory extends Component {
               name="semesterGroup"
               checked={semesters.includes('FALL')}
               onChange={this.handleSemesterSelection}
+              data-cy="toggle-fall"
             />
             <Form.Checkbox
               className="populationStatisticsRadio"
@@ -214,6 +215,7 @@ class PopulationSearchHistory extends Component {
               name="semesterGroup"
               checked={semesters.includes('SPRING')}
               onChange={this.handleSemesterSelection}
+              data-cy="toggle-spring"
             />
           </Form.Field>
         ) : null}
@@ -236,6 +238,7 @@ class PopulationSearchHistory extends Component {
             name="studentStatusGroup"
             checked={studentStatuses.includes('CANCELLED')}
             onChange={this.handleStudentStatusSelection}
+            data-cy="toggle-cancelled"
           />
           <Form.Checkbox
             className="populationStatisticsRadio"
