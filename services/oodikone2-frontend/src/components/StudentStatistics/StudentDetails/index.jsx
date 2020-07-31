@@ -69,7 +69,7 @@ const StudentDetails = ({
 
     // If a student has been absent for a long period, then the enrollments aren't marked in oodi...
     // Therefore we need to manually patch empty enrollment ranges with absences
-    const now = new Date().getTime()
+    const now = new Date().setHours(0, 0, 0, 0) // needs to be done due to semester table being a mess
     const latestSemester = parseInt(
       Object.entries(mappedSemesters).find(
         ([, { startdate, enddate }]) => now <= new Date(enddate).getTime() && now >= new Date(startdate).getTime()
