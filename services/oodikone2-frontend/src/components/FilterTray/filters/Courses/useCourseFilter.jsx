@@ -6,24 +6,18 @@ import { getPopulationSelectedStudentCourses } from '../../../../redux/populatio
 const defaultState = {
   courses: [],
   selectedCourses: [],
-  courseQueryData: {},
-  courseQueryOptions: {},
   dispatchCourseQuery: null
 }
 
 const CourseFilterContext = createContext([[], () => {}])
 
-const CourseFilterProvider = ({ children, getPopulationSelectedStudentCourses, populationSelectedStudentCourses }) => {
+const CourseFilterProvider = ({ children, getPopulationSelectedStudentCourses }) => {
   const [state, setState] = useState(defaultState)
 
   // On load, extract the course query dispatch function from redux for further use.
   useEffect(() => {
     setState(prev => ({ ...prev, dispatchCourseQuery: getPopulationSelectedStudentCourses }))
   }, [])
-
-  useEffect(() => {
-    console.log(populationSelectedStudentCourses)
-  }, [populationSelectedStudentCourses])
 
   return <CourseFilterContext.Provider value={[state, setState]}>{children}</CourseFilterContext.Provider>
 }
@@ -34,7 +28,7 @@ CourseFilterProvider.propTypes = {
 }
 
 const ConnectedProvider = connect(
-  ({ populationSelectedStudentCourses }) => ({ populationSelectedStudentCourses }),
+  null,
   { getPopulationSelectedStudentCourses }
 )(CourseFilterProvider)
 
@@ -43,7 +37,7 @@ export { ConnectedProvider as CourseFilterProvider }
 // Acual hook functions.
 export default () => {
   const [state, setState] = useContext(CourseFilterContext)
-  const { courses, selectedCourses, courseQueryOptions, dispatchCourseQuery } = state
+  const { courses, selectedCourses, dispatchCourseQuery } = state
 
   const setCourses = courses => setState(prev => ({ ...prev, courses }))
 
@@ -62,8 +56,6 @@ export default () => {
 
   const courseIsSelected = courseCode => selectedCourses.some(course => course.course.code === courseCode)
 
-  const setCourseQueryOpts = courseQueryOptions => setState(prev => ({ ...prev, courseQueryOptions }))
-
   const runCourseQuery = opts => {
     dispatchCourseQuery(opts)
   }
@@ -74,7 +66,6 @@ export default () => {
     setCourses,
     toggleCourseSelection,
     courseIsSelected,
-    setCourseQueryOpts,
     runCourseQuery
   }
 }
