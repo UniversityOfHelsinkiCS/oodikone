@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, arrayOf, string, bool } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
@@ -11,6 +11,7 @@ import infotooltips from '../../common/InfoToolTips'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import { refreshFilters } from '../../redux/populationFilters'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
+import useFilters from '../FilterTray/useFilters'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
@@ -22,7 +23,8 @@ const PopulationCourses = ({
   query,
   filteredStudents
 }) => {
-  const { setCourses: setCourseFilterData } = useCourseFilter()
+  const { setCourses: setCourseFilterData, setCourseQueryOpts, runCourseQuery } = useCourseFilter()
+  const { activeFilters } = useFilters()
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -31,6 +33,8 @@ const PopulationCourses = ({
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = selectedPopulationCourses
 
+  /*
+  ORIGINAL:
   const reloadCourses = () => {
     const selectedStudentsByYear = {}
 
@@ -54,16 +58,62 @@ const PopulationCourses = ({
       years: query.years
     })
   }
+  */
 
+  // FIXME: Temporary hack to pass course data to new filters, improve.
+  /**
+   * Basically, there exists a race condition between applying filters in client and fetching
+   * an updated course stats payload from backend. The best remedy would be to handle the stats
+   * fetching in useCourseFilter hook instead of redux. As is, the client uses the full set of
+   * stats for filtering (hook) that is fetched only once and never updated, and another set
+   * for courses of population table (redux) that gets updated as usual.
+   */
+  /*
   useEffect(() => {
     reloadCourses()
-  }, [filteredStudents])
+  }, [activeFilters])
+  */
 
-  // TODO: Temporary hack to pass course data to new filters, improve.
+  const makeCourseQueryOpts = () => {
+    const selectedStudentsByYear = {}
+
+    if (filteredStudents && filteredStudents.length > 0) {
+      filteredStudents.forEach(student => {
+        if (!selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()]) {
+          selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()] = []
+        }
+        selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
+      })
+    }
+
+    return {
+      ...selectedPopulationCourses.query,
+      uuid: uuidv4(),
+      studyRights: [query.studyRights.programme],
+      selectedStudents,
+      selectedStudentsByYear,
+      year: query.year,
+      years: query.years
+    }
+  }
+
+  useEffect(() => {
+    // Probably wanna do this in course filter card, eh?
+    if (filteredStudents.length) {
+      const opts = makeCourseQueryOpts()
+      // console.log(opts)
+      //setCourseQueryOpts(opts)
+      dispatchRefreshFilters()
+      runCourseQuery(opts)
+    }
+  }, [filteredStudents]) // should probably be [activeFilters]
+
+  const [once, setOnce] = useState(true)
   useEffect(() => {
     const { pending, error, data } = selectedPopulationCourses
-    if (!pending && !error) {
+    if (!pending && !error && once) {
       setCourseFilterData(data.coursestatistics)
+      setOnce(false)
     }
   }, [selectedPopulationCourses.data])
 
