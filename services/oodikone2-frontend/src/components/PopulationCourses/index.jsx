@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, arrayOf, string, bool } from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
@@ -8,21 +8,17 @@ import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
-import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
-import { refreshFilters } from '../../redux/populationFilters'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
   populationCourses,
-  dispatchRefreshFilters,
   selectedStudents,
   translate,
-  getPopulationSelectedStudentCourses: gpc,
   query,
   filteredStudents
 }) => {
-  const { setCourses: setCourseFilterData } = useCourseFilter()
+  const { setCourses: setCourseFilterData, runCourseQuery } = useCourseFilter()
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -31,7 +27,7 @@ const PopulationCourses = ({
   const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = selectedPopulationCourses
 
-  const reloadCourses = () => {
+  const makeCourseQueryOpts = () => {
     const selectedStudentsByYear = {}
 
     if (filteredStudents && filteredStudents.length > 0) {
@@ -43,8 +39,7 @@ const PopulationCourses = ({
       })
     }
 
-    dispatchRefreshFilters()
-    gpc({
+    return {
       ...selectedPopulationCourses.query,
       uuid: uuidv4(),
       studyRights: [query.studyRights.programme],
@@ -52,18 +47,22 @@ const PopulationCourses = ({
       selectedStudentsByYear,
       year: query.year,
       years: query.years
-    })
+    }
   }
 
   useEffect(() => {
-    reloadCourses()
+    if (filteredStudents.length) {
+      runCourseQuery(makeCourseQueryOpts())
+    }
   }, [filteredStudents])
 
-  // TODO: Temporary hack to pass course data to new filters, improve.
+  // FIXME: Move this to useCourseFilter.jsx
+  const [once, setOnce] = useState(true)
   useEffect(() => {
     const { pending, error, data } = selectedPopulationCourses
-    if (!pending && !error) {
+    if (!pending && !error && once) {
       setCourseFilterData(data.coursestatistics)
+      setOnce(false)
     }
   }, [selectedPopulationCourses.data])
 
@@ -93,8 +92,6 @@ PopulationCourses.propTypes = {
   populationCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  getPopulationSelectedStudentCourses: func.isRequired,
-  dispatchRefreshFilters: func.isRequired,
   query: shape({}).isRequired,
   filteredStudents: arrayOf(shape({})).isRequired
 }
@@ -105,10 +102,4 @@ const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, 
   translate: getTranslate(localize)
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    getPopulationSelectedStudentCourses,
-    dispatchRefreshFilters: refreshFilters
-  }
-)(PopulationCourses)
+export default connect(mapStateToProps)(PopulationCourses)

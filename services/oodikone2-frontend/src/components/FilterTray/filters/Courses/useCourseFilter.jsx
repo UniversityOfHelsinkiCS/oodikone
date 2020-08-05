@@ -1,25 +1,43 @@
-import React, { createContext, useState, useContext } from 'react'
+import React, { createContext, useState, useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { getPopulationSelectedStudentCourses } from '../../../../redux/populationSelectedStudentCourses'
 
 const defaultState = {
   courses: [],
-  selectedCourses: []
+  selectedCourses: [],
+  dispatchCourseQuery: null
 }
 
 const CourseFilterContext = createContext([[], () => {}])
 
-export const CourseFilterProvider = ({ children }) => {
+const CourseFilterProvider = ({ children, getPopulationSelectedStudentCourses }) => {
   const [state, setState] = useState(defaultState)
+
+  // On load, extract the course query dispatch function from redux for further use.
+  useEffect(() => {
+    setState(prev => ({ ...prev, dispatchCourseQuery: getPopulationSelectedStudentCourses }))
+  }, [])
+
   return <CourseFilterContext.Provider value={[state, setState]}>{children}</CourseFilterContext.Provider>
 }
 
 CourseFilterProvider.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  getPopulationSelectedStudentCourses: PropTypes.func.isRequired
 }
 
+const ConnectedProvider = connect(
+  null,
+  { getPopulationSelectedStudentCourses }
+)(CourseFilterProvider)
+
+export { ConnectedProvider as CourseFilterProvider }
+
+// Acual hook functions.
 export default () => {
   const [state, setState] = useContext(CourseFilterContext)
-  const { courses, selectedCourses } = state
+  const { courses, selectedCourses, dispatchCourseQuery } = state
 
   const setCourses = courses => setState(prev => ({ ...prev, courses }))
 
@@ -38,5 +56,16 @@ export default () => {
 
   const courseIsSelected = courseCode => selectedCourses.some(course => course.course.code === courseCode)
 
-  return { courses, selectedCourses, setCourses, toggleCourseSelection, courseIsSelected }
+  const runCourseQuery = opts => {
+    dispatchCourseQuery(opts)
+  }
+
+  return {
+    courses,
+    selectedCourses,
+    setCourses,
+    toggleCourseSelection,
+    courseIsSelected,
+    runCourseQuery
+  }
 }
