@@ -1,163 +1,75 @@
-import React, { useCallback } from 'react'
-import { connect } from 'react-redux'
-import { func, arrayOf, object, number } from 'prop-types'
-import { Progress, Icon, Popup } from 'semantic-ui-react'
-import SearchResultTable from '../../SearchResultTable'
+import React from 'react'
+import PropTypes from 'prop-types'
+import { useLocation } from 'react-router-dom'
+import { Table, Progress } from 'semantic-ui-react'
+import { getMonths } from '../../../common/query'
 import { getStudentTotalCredits } from '../../../common'
-import TSA from '../../../common/tsa'
-import { creditsLessThan, creditsAtLeast } from '../../../populationFilters'
-import { setPopulationFilter, removePopulationFilter } from '../../../redux/populationFilters'
+import ExternalCreditFilterToggle from './ExternalCreditFilterToggle'
 
-const getTotal = students => students.map(student => getStudentTotalCredits(student))
+const CreditsGainedTab = ({ filteredStudents }) => {
+  const months = getMonths(useLocation())
+  const creditList = filteredStudents.map(student => getStudentTotalCredits(student))
 
-const expectedAmountOfCredits = months => [
-  [Math.ceil(months * (55 / 12))],
-  [Math.ceil(months * (50 / 12)), Math.ceil(months * (55 / 12))],
-  [Math.ceil(months * (40 / 12)), Math.ceil(months * (50 / 12))],
-  [Math.ceil(months * (30 / 12)), Math.ceil(months * (40 / 12))],
-  [Math.ceil(months * (20 / 12)), Math.ceil(months * (30 / 12))],
-  [Math.ceil(months * (10 / 12)), Math.ceil(months * (20 / 12))],
-  [1, Math.ceil(months * (10 / 12))],
-  [0, 0]
-]
+  const studentCount = (min, max = Infinity) =>
+    max === 0
+      ? creditList.filter(credits => credits === 0).length
+      : creditList.filter(credits => credits < max && credits >= min).length
 
-const filterStudents = (students, minCredits, maxCredits = Infinity) => {
-  if (minCredits === 0) {
-    return {
-      minCredits: '',
-      maxCredits,
-      amount: students.filter(s => s === minCredits).length
-    }
-  }
-  if (maxCredits === Infinity) {
-    return {
-      minCredits,
-      maxCredits: '',
-      amount: students.filter(s => s >= minCredits).length
-    }
-  }
-  return {
-    minCredits,
-    maxCredits,
-    amount: students.filter(s => s >= minCredits && s < maxCredits).length
-  }
-}
-
-const CreditsGainedTab = ({ translate, sample, months, filters, setPopulationFilter, removePopulationFilter }) => {
-  const handleCreditBracketRowClicked = useCallback(
-    (e, row) => {
-      // clear filters & set credit filter for selected range
-      TSA.Matomo.sendEvent('Population statistics', '"Credits gained during" row selected', row[0])
-      filters.forEach(filter => removePopulationFilter(filter.id))
-
-      const credits = row[0].split(/(\d+)/).map(count => Number(count))
-      if (credits[1]) {
-        setPopulationFilter(creditsAtLeast({ credit: credits[1] }))
-        if (credits[3]) {
-          setPopulationFilter(creditsLessThan({ credit: credits[3] }))
-        }
-      } else {
-        setPopulationFilter(creditsLessThan({ credit: 1 }))
-      }
-    },
-    [filters, removePopulationFilter, setPopulationFilter]
-  )
-
-  const stats = getTotal(sample)
-  const limits = expectedAmountOfCredits(months)
-  const arr = limits.map(l => filterStudents(stats, ...l))
-
-  const rows = arr.map(a => {
-    if (a.maxCredits === 0) {
-      return [
-        `${a.maxCredits}`,
-        a.amount,
-        <Progress
-          style={{ margin: '0px' }}
-          percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)}
-          progress
-        />
-      ]
-    }
-    if (a.maxCredits) {
-      return [
-        `${a.minCredits} ≤ credits < ${a.maxCredits}`,
-        a.amount,
-        <Progress
-          style={{ margin: '0px' }}
-          percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)}
-          progress
-        />
-      ]
-    }
-    return [
-      `${a.minCredits} ≤ credits`,
-      a.amount,
-      <Progress
-        style={{ margin: '0px' }}
-        percent={stats.length === 0 ? 0 : Math.round((a.amount / stats.length) * 100)}
-        progress
-      />
-    ]
-  })
-
-  const headers = [
-    `Credits gained during first ${months} months`,
-    `Students (all=${stats.length})`,
-    'Percentage of population'
+  const limits = [
+    [Math.ceil(months * (55 / 12)), null],
+    [Math.ceil(months * (50 / 12)), Math.ceil(months * (55 / 12))],
+    [Math.ceil(months * (40 / 12)), Math.ceil(months * (50 / 12))],
+    [Math.ceil(months * (30 / 12)), Math.ceil(months * (40 / 12))],
+    [Math.ceil(months * (20 / 12)), Math.ceil(months * (30 / 12))],
+    [Math.ceil(months * (10 / 12)), Math.ceil(months * (20 / 12))],
+    [1, Math.ceil(months * (10 / 12))],
+    [null, 0]
   ]
+
   return (
-    <SearchResultTable
-      headers={headers}
-      rows={rows}
-      actionTrigger={row => {
-        return (
-          <Popup
-            content={
-              <span>
-                Rajaa opiskelijat ensimmäisen <b>{months}</b> kuukauden aikana saatujen opintopisteiden perusteella:{' '}
-                <b>({row[0]})</b>
-              </span>
-            }
-            trigger={
-              <>
-                <Icon
-                  onClick={() => handleCreditBracketRowClicked(null, row)}
-                  style={{ marginLeft: '10px', cursor: 'pointer' }}
-                  name="filter"
+    <Table celled>
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell collapsing></Table.HeaderCell>
+          <Table.HeaderCell>Credits Gained During First {months} Months</Table.HeaderCell>
+          <Table.HeaderCell>
+            Number of Students
+            <br />
+            <span style={{ fontWeight: 100 }}>(n={filteredStudents.length})</span>
+          </Table.HeaderCell>
+          <Table.HeaderCell>Percentage of Population</Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+
+      <Table.Body>
+        {limits.map(([min, max]) => (
+          <Table.Row key={`table-row-${min}-${max}`}>
+            <Table.Cell collapsing>
+              <ExternalCreditFilterToggle min={min} max={max} />
+            </Table.Cell>
+            <Table.Cell>
+              {max === 0 ? 0 : `${min} ≤ credits`}
+              {max > 0 && ` < ${max}`}
+            </Table.Cell>
+            <Table.Cell>{studentCount(min, max)}</Table.Cell>
+            <Table.Cell>
+              {filteredStudents.length && (
+                <Progress
+                  percent={Math.round((studentCount(min, max) / filteredStudents.length) * 100)}
+                  progress
+                  className="credit-stats-progress-bar"
                 />
-                <Icon
-                  onClick={() => handleCreditBracketRowClicked(null, row)}
-                  name="add"
-                  size="tiny"
-                  style={{ marginLeft: '-9px', marginRight: '25px', cursor: 'pointer' }}
-                />
-              </>
-            }
-            position="top left"
-          />
-        )
-      }}
-      noResultText={translate('common.noResults')}
-    />
+              )}
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
   )
 }
-
-const mapStateToProps = state => ({
-  months: state.populations.query.months,
-  filters: state.populationFilters.filters.filter(f => f.type === 'CreditsLessThan' || f.type === 'CreditsAtLeast')
-})
 
 CreditsGainedTab.propTypes = {
-  translate: func.isRequired,
-  sample: arrayOf(object).isRequired,
-  months: number.isRequired,
-  setPopulationFilter: func.isRequired,
-  removePopulationFilter: func.isRequired,
-  filters: arrayOf(object).isRequired
+  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
-export default connect(
-  mapStateToProps,
-  { setPopulationFilter, removePopulationFilter }
-)(CreditsGainedTab)
+export default CreditsGainedTab
