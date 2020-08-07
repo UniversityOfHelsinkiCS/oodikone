@@ -1,35 +1,12 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { func, shape, arrayOf, string, bool } from 'prop-types'
 import { Segment, Header, Popup } from 'semantic-ui-react'
 import { getTranslate } from 'react-localize-redux'
-
 import SegmentDimmer from '../../SegmentDimmer'
 import PopulationCourseStats from '../../PopulationCourseStats'
-import { refreshFilters } from '../../../redux/populationFilters'
-import { getCustomPopulationCoursesByStudentnumbers } from '../../../redux/populationCourses'
 
-const CustomPopulationCourses = ({
-  refreshNeeded,
-  dispatchRefreshFilters,
-  translate,
-  courses,
-  pending,
-  selectedStudents,
-  getCustomPopulationCoursesByStudentnumbersDispatch,
-  query
-}) => {
-  const reloadCourses = () => {
-    dispatchRefreshFilters()
-    getCustomPopulationCoursesByStudentnumbersDispatch({ studentnumberlist: selectedStudents })
-  }
-
-  useEffect(() => {
-    if (refreshNeeded) {
-      reloadCourses()
-    }
-  }, [refreshNeeded])
-
+const CustomPopulationCourses = ({ translate, courses, pending, selectedStudents, query }) => {
   return (
     <Segment>
       <Header size="medium" dividing>
@@ -57,24 +34,14 @@ CustomPopulationCourses.propTypes = {
   courses: shape([]).isRequired,
   translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  refreshNeeded: bool.isRequired,
-  getCustomPopulationCoursesByStudentnumbersDispatch: func.isRequired,
-  dispatchRefreshFilters: func.isRequired,
   query: shape({}).isRequired
 }
 
-const mapStateToProps = ({ localize, populationFilters, populationCourses }) => ({
+const mapStateToProps = ({ localize, populationCourses }) => ({
   courses: populationCourses.data,
   pending: populationCourses.pending,
   translate: getTranslate(localize),
-  query: populationCourses.query,
-  refreshNeeded: populationFilters.refreshNeeded
+  query: populationCourses.query
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    dispatchRefreshFilters: refreshFilters,
-    getCustomPopulationCoursesByStudentnumbersDispatch: getCustomPopulationCoursesByStudentnumbers
-  }
-)(CustomPopulationCourses)
+export default connect(mapStateToProps)(CustomPopulationCourses)

@@ -1,20 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
-import { func, arrayOf, string, shape } from 'prop-types'
+import { arrayOf, string, shape } from 'prop-types'
 import { getActiveLanguage } from 'react-localize-redux'
-
 import SearchResultTable from '../../SearchResultTable'
-import { programmeFilter } from '../../../populationFilters'
-import { setPopulationFilter, removePopulationFilter } from '../../../redux/populationFilters'
 import { getNewestProgramme, getTextIn } from '../../../common'
 
 const CustomPopulationProgrammeDist = ({
   samples,
   selectedStudents,
-  setPopulationFilterDispatch,
-  removePopulationFilterDispatch,
-  filters,
   studentToTargetCourseDateMap,
   language,
   populationStatistics
@@ -60,28 +54,9 @@ const CustomPopulationProgrammeDist = ({
     }
   }, [selectedStudents])
 
-  const setFilter = row => {
-    const splitRow = row[0].split(', ')
-    filters.map(filter => removePopulationFilterDispatch(filter.id))
-    setPopulationFilterDispatch(
-      programmeFilter(
-        { programme: splitRow.slice(-1)[0], programmeName: splitRow[0], studentToTargetCourseDateMap },
-        populationStatistics.elementdetails.data
-      )
-    )
-  }
-
   const headers = ['Programmes', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
-  return (
-    <SearchResultTable
-      headers={headers}
-      rows={tableRows}
-      selectable
-      rowClickFn={(e, row) => setFilter(row)}
-      noResultText="placeholder"
-    />
-  )
+  return <SearchResultTable headers={headers} rows={tableRows} selectable noResultText="placeholder" />
 }
 
 CustomPopulationProgrammeDist.defaultProps = {
@@ -91,26 +66,16 @@ CustomPopulationProgrammeDist.defaultProps = {
 CustomPopulationProgrammeDist.propTypes = {
   samples: arrayOf(shape({})).isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  setPopulationFilterDispatch: func.isRequired,
-  removePopulationFilterDispatch: func.isRequired,
-  filters: arrayOf(shape({})).isRequired,
   studentToTargetCourseDateMap: shape({}),
   language: string.isRequired,
   populationStatistics: shape({}).isRequired
 }
 
-const mapStateToProps = ({ populationFilters, localize, populations }) => {
+const mapStateToProps = ({ localize, populations }) => {
   return {
-    filters: populationFilters.filters.filter(f => f.type === 'ProgrammeFilter'),
     language: getActiveLanguage(localize).code,
     populationStatistics: populations.data
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    setPopulationFilterDispatch: setPopulationFilter,
-    removePopulationFilterDispatch: removePopulationFilter
-  }
-)(CustomPopulationProgrammeDist)
+export default connect(mapStateToProps)(CustomPopulationProgrammeDist)

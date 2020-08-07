@@ -2,25 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
-import { shape, func, bool, arrayOf, string, number } from 'prop-types'
-
+import { shape, bool, arrayOf, string, number } from 'prop-types'
 import SearchResultTable from '../../SearchResultTable'
-import { gradeFilter } from '../../../populationFilters'
-import { setPopulationFilter, removePopulationFilter } from '../../../redux/populationFilters'
 import { getHighestGradeOfCourseBetweenRange } from '../../../common'
 
-const CoursePopulationCreditDist = ({
-  singleCourseStats,
-  pending,
-  selectedStudents,
-  setPopulationFilterDispatch,
-  removePopulationFilterDispatch,
-  samples,
-  filters,
-  codes,
-  from,
-  to
-}) => {
+const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStudents, samples, codes, from, to }) => {
   const [courseGrades, setGrades] = useState([])
   useEffect(() => {
     if (samples && singleCourseStats.alternatives) {
@@ -44,19 +30,6 @@ const CoursePopulationCreditDist = ({
       setGrades(filteredGradeArray)
     }
   }, [pending, selectedStudents])
-  const setFilter = row => {
-    filters.map(filter => removePopulationFilterDispatch(filter.id))
-
-    setPopulationFilterDispatch(
-      gradeFilter({
-        grade: row[0],
-        coursecodes: codes,
-        coursename: singleCourseStats.name,
-        from,
-        to
-      })
-    )
-  }
 
   const totalAmount = courseGrades.reduce((acc, curr) => acc + curr.amount, 0)
 
@@ -77,40 +50,22 @@ const CoursePopulationCreditDist = ({
   ])
   const headers = ['Grades', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
-  return (
-    <SearchResultTable
-      headers={headers}
-      rows={rows}
-      selectable
-      rowClickFn={(e, row) => setFilter(row)}
-      noResultText="no data available"
-    />
-  )
+  return <SearchResultTable headers={headers} rows={rows} selectable noResultText="no data available" />
 }
 
 CoursePopulationCreditDist.propTypes = {
   singleCourseStats: shape({}).isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  setPopulationFilterDispatch: func.isRequired,
-  removePopulationFilterDispatch: func.isRequired,
   samples: arrayOf(shape({})).isRequired,
-  filters: arrayOf(shape({})).isRequired,
   codes: arrayOf(string).isRequired,
   from: number.isRequired,
   to: number.isRequired
 }
 
-const mapStateToProps = ({ singleCourseStats, populationFilters }) => ({
+const mapStateToProps = ({ singleCourseStats }) => ({
   singleCourseStats: singleCourseStats.stats,
-  pending: singleCourseStats.pending,
-  filters: populationFilters.filters.filter(f => f.type === 'GradeFilter')
+  pending: singleCourseStats.pending
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    setPopulationFilterDispatch: setPopulationFilter,
-    removePopulationFilterDispatch: removePopulationFilter
-  }
-)(CoursePopulationCreditDist)
+export default connect(mapStateToProps)(CoursePopulationCreditDist)

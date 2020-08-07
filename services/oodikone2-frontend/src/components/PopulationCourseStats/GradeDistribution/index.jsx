@@ -29,7 +29,7 @@ const CourseRow = ({ courseStatistics }) => {
   const language = useLanguage()
   const { courseIsSelected } = useCourseFilter()
 
-  const { isActiveCourse, onCourseNameCellClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+  const { onCourseNameCellClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
   const { course, grades } = courseStatistics
   const { name, code } = course
@@ -49,7 +49,7 @@ const CourseRow = ({ courseStatistics }) => {
       .reduce(countSumReducer, 0)
   }
   return (
-    <Table.Row active={isActiveCourse(course)}>
+    <Table.Row active={isActive}>
       <Popup
         trigger={
           <Table.Cell className="filterCell clickableCell">

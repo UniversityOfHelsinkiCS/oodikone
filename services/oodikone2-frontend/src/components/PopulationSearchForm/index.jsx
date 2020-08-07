@@ -13,10 +13,8 @@ import moment from 'moment'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
-import { getPopulationFilters, setPopulationFilter, resetPopulationFilters } from '../../redux/populationFilters'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getSemesters } from '../../redux/semesters'
-import { transferTo } from '../../populationFilters'
 
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 import { getTagsByStudytrackAction } from '../../redux/tags'
@@ -109,21 +107,17 @@ const PopulationSearchForm = props => {
     setState({ isLoading: true })
     props.setLoading()
     props.clearSelected()
-    props.resetPopulationFilters()
     fetchPopulationPromises.current = cancelablePromise(
       Promise.all([
         props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
         props.getPopulationCourses(request),
-        props.getPopulationFilters(request),
+        [],
         props.getMandatoryCourses(formattedQueryParams.studyRights.programme, props.mandatoryToggle),
         props.getTagsByStudytrackAction(query.studyRights.programme)
       ])
     )
     const success = await fetchPopulationPromises.current.promise
     if (success) {
-      if (query.studyRights.programme === 'KH50_001') {
-        props.setPopulationFilter(transferTo(false))
-      }
       setState({
         isLoading: false
       })
@@ -164,7 +158,6 @@ const PopulationSearchForm = props => {
     setDidMount(true)
     return () => {
       if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
-      props.resetPopulationFilters()
     }
   }, [location.search])
 
@@ -633,9 +626,6 @@ PopulationSearchForm.propTypes = {
   getPopulationStatistics: func.isRequired,
   getPopulationCourses: func.isRequired,
   getMandatoryCourses: func.isRequired,
-  getPopulationFilters: func.isRequired,
-  setPopulationFilter: func.isRequired,
-  resetPopulationFilters: func.isRequired,
   queries: shape({}).isRequired,
   studyProgrammes: shape({}), //eslint-disable-line
   degrees: arrayOf(dropdownType), //eslint-disable-line
@@ -675,10 +665,7 @@ export default withRouter(
       getPopulationStatistics,
       getPopulationCourses,
       getPopulationSelectedStudentCourses,
-      getPopulationFilters,
       getMandatoryCourses,
-      setPopulationFilter,
-      resetPopulationFilters,
       getDegreesAndProgrammes,
       setLoading,
       getSemesters,
