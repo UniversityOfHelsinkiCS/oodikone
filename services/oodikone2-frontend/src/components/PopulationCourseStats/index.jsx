@@ -5,7 +5,6 @@ import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { orderBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import { setPopulationFilter, removePopulationFilterOfCourse } from '../../redux/populationFilters'
 import { clearCourseStats } from '../../redux/coursestats'
 import PassingSemesters from './PassingSemesters'
 import './populationCourseStats.css'
@@ -280,11 +279,6 @@ function PopulationCourseStats(props) {
     clearCourseStatsfn()
   }
 
-  const isActiveCourse = course => {
-    const { selectedCourses } = props
-    return selectedCourses.length > 0 && selectedCourses.find(c => course.code === c.code) !== undefined
-  }
-
   const onCourseNameCellClick = code => {
     const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
     if (courseStatistic) {
@@ -316,7 +310,6 @@ function PopulationCourseStats(props) {
     courseStatistics,
     modules,
     filterInput: renderFilterInputHeaderCell,
-    isActiveCourse,
     onCourseNameCellClick,
     onGoToCourseStatisticsClick,
     onSortableColumnHeaderClick,
@@ -351,7 +344,6 @@ function PopulationCourseStats(props) {
             filterInput={renderFilterInputHeaderCell}
             courseStatistics={courseStatistics}
             onCourseNameClickFn={onCourseNameCellClick}
-            isActiveCourseFn={isActiveCourse}
           />
         </div>
       )
@@ -407,7 +399,6 @@ PopulationCourseStats.propTypes = {
   populationCourses: shape({
     data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
   }).isRequired,
-  selectedCourses: arrayOf(object).isRequired,
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
@@ -417,14 +408,12 @@ PopulationCourseStats.propTypes = {
 
 const mapStateToProps = state => {
   const { years } = state.semesters.data
-  const courseFilters = state.populationFilters.filters.filter(f => f.type === 'CourseParticipation')
-  const selectedCourses = courseFilters.map(f => f.params.course.course)
   const isAdmin = getUserIsAdmin(state.auth.token.roles)
+
   return {
     language: getActiveLanguage(state.localize).code,
     translate: getTranslate(state.localize),
     years,
-    selectedCourses,
     populationCourses: state.populationCourses,
     isAdmin
   }
@@ -433,8 +422,6 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   {
-    setPopulationFilter,
-    removePopulationFilterOfCourse,
     clearCourseStats
   }
 )(withRouter(PopulationCourseStats))

@@ -5,7 +5,7 @@ import infotooltips from '../../../common/InfoToolTips'
 import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
-import NewCreditsGainedTab from './NewCreditsGainedTab'
+import CreditsGainedTab from './CreditsGainedTab'
 import './creditGainStats.css'
 
 const CreditGainStats = ({ filteredStudents, translate }) => {
@@ -14,7 +14,7 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <NewCreditsGainedTab filteredStudents={filteredStudents} />
+        <CreditsGainedTab filteredStudents={filteredStudents} />
       </Tab.Pane>
     )
   }, [filteredStudents, translate])

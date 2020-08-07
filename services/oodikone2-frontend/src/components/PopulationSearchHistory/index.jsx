@@ -10,7 +10,6 @@ import { get as lodashGet } from 'lodash'
 
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation, updatePopulationStudents } from '../../redux/populations'
-import { clearPopulationFilters } from '../../redux/populationFilters'
 import TSA from '../../common/tsa'
 
 import './populationSearchHistory.css'
@@ -331,7 +330,6 @@ const mapStateToProps = ({ populations, populationDegreesAndProgrammes, localize
 const mapDispatchToProps = dispatch => ({
   removePopulation: uuid => {
     dispatch(removePopulation(uuid))
-    dispatch(clearPopulationFilters())
   },
   updatePopulationStudents: students => dispatch(updatePopulationStudents(students))
 })
