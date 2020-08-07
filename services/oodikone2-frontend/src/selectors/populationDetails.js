@@ -1,19 +1,16 @@
 import { createSelector } from 'reselect'
-import { intersection, difference } from 'lodash'
 
 const getPopulations = state => state.populations
 
-const getFilters = state => state.populationFilters
-
 const makePopulationsToData = createSelector(
-  [getPopulations, getFilters],
-  (populations, populationFilters) => {
+  [getPopulations],
+  populations => {
     const { pending, data, query } = populations
     const { programme } = query ? query.studyRights : ''
 
     const samples = pending || !data.students ? [] : data.students
-    const { complemented } = populationFilters
-    let selectedStudents = samples.length > 0 ? samples.map(({ studentNumber }) => studentNumber) : []
+    const complemented = false
+    const selectedStudents = samples.length > 0 ? samples.map(({ studentNumber }) => studentNumber) : []
     const years = []
     const selectedStudentsByYear = {}
 
@@ -27,31 +24,6 @@ const makePopulationsToData = createSelector(
       })
     }
 
-    if (samples.length > 0 && populationFilters.filters.length > 0) {
-      const studentsForFilter = f => {
-        return samples.filter(f.filter).map(s => s.studentNumber)
-      }
-
-      const matchingStudents = populationFilters.filters.map(studentsForFilter)
-      selectedStudents = intersection(...matchingStudents)
-
-      if (complemented) {
-        selectedStudents = difference(samples.map(s => s.studentNumber), selectedStudents)
-      }
-      years.forEach(year => {
-        selectedStudentsByYear[year] = intersection(...matchingStudents, selectedStudentsByYear[year])
-      })
-      if (complemented) {
-        years.forEach(year => {
-          selectedStudentsByYear[year] = difference(
-            samples
-              .filter(student => new Date(student.studyrightStart).getFullYear() === year)
-              .map(student => student.studentNumber),
-            selectedStudentsByYear[year]
-          )
-        })
-      }
-    }
     return { samples, selectedStudents, complemented, programme, selectedStudentsByYear }
   }
 )
