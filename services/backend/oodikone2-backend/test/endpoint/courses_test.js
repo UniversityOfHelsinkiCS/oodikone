@@ -3,7 +3,6 @@ process.env.DB_SCHEMA = schema
 
 const test = require('ava')
 const supertest = require('supertest')
-const jwt = require('jsonwebtoken')
 
 const { Course, CourseInstance, CourseTeacher, Credit, Teacher, Student, sequelize } = require('../../src/models')
 const {
@@ -15,16 +14,9 @@ const {
   generateCourseTeachers
 } = require('../utils')
 const app = require('../../src/app')
-const conf = require('../../src/conf-backend')
 const api = supertest(app)
 
-const uid = 'tktl',
-  fullname = ''
-const payload = { userId: uid, name: fullname }
-
-const token = jwt.sign(payload, conf.TOKEN_SECRET, {
-  expiresIn: '24h'
-})
+const uid = 'tktl'
 
 const INSTANCE_COUNT = 4
 
@@ -52,7 +44,8 @@ test.skip.after.always(async () => {
   await sequelize.dropSchema(schema)
 })
 
-test.skip('should pong when pinged', async t => {
+test('should pong when pinged', async t => {
+  t.is(false, true)
   const res = await api.get('/ping')
 
   t.is(res.status, 200)
@@ -64,7 +57,6 @@ test.skip('courses can be searched by a searchterm', async t => {
   const res = await api
     .get('/api/courses')
     .query({ name: selectedCourse.name })
-    .set('x-access-token', token)
     .set('uid', uid)
   t.is(res.status, 200)
   t.truthy(res.body.length > 0, 'res body was empty')
