@@ -76,7 +76,7 @@
     "jStat": "^1.8.5",
     "jwt-decode": "^2.2.0",
     "localforage": "^1.7.4",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.24.0",
     "path-to-regexp": "^2.4.0",
     "piwik-react-router": "^0.12.1",
