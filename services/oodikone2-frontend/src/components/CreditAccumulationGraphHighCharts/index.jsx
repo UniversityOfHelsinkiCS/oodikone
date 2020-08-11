@@ -66,6 +66,18 @@ class CreditAccumulationGraphHighCharts extends Component {
         )
       }
     }
+
+    /**
+     * Trigger updating the chart after filter tray transition has finished.
+     * This hack remedies the problem that highcharts will not dynamically adapt to container width
+     * if a CSS transition is used. The resize must fire only after the transition has completed to
+     * ensure correct size.
+     */
+    if (this.props.trayOpen !== nextProps.trayOpen) {
+      setTimeout(() => {
+        this.props.setChartHeight(this.props.currentGraphSize - 1)
+      }, 700)
+    }
   }
 
   componentDidUpdate() {
@@ -329,7 +341,8 @@ CreditAccumulationGraphHighCharts.propTypes = {
   language: string.isRequired,
   translate: func.isRequired,
   absences: arrayOf(shape({})),
-  render: bool
+  render: bool,
+  trayOpen: bool.isRequired
 }
 
 const mapStateToProps = state => ({
