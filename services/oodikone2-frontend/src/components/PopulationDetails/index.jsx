@@ -12,6 +12,7 @@ import InfoBox from '../InfoBox'
 import infoTooltips from '../../common/InfoToolTips'
 import CreditGainStats from './CreditGainStats'
 import useFilters from '../FilterTray/useFilters'
+import useFilterTray from '../FilterTray/useFilterTray'
 
 const PopulationDetails = ({
   samples,
@@ -23,6 +24,7 @@ const PopulationDetails = ({
   mandatoryToggle
 }) => {
   const { allStudents, filteredStudents } = useFilters()
+  const [trayOpen] = useFilterTray('filterTray')
   // TODO: Refactor this away from children:
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
@@ -60,6 +62,7 @@ const PopulationDetails = ({
         label={samples.label}
         maxCredits={samples.maxCredits}
         selectedStudents={selectedStudents}
+        trayOpen={trayOpen}
       />
     )
     return (
