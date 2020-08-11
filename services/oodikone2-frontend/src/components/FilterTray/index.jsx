@@ -86,7 +86,7 @@ const FilterTray = ({ children, translate, filterSet, location }) => {
                 size="mini"
                 on="hover"
                 trigger={
-                  <Label color="grey" size="small">
+                  <Label color="blue" size="small">
                     <Icon name="filter" />
                     {noFilters}
                   </Label>
