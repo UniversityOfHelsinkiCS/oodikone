@@ -40,6 +40,15 @@
   margin-bottom: -2px;
 }
 
+#filter-ribbon {
+  transform: rotate(90deg);
+  position: relative;
+  top: 9px;
+  left: -25px;
+  font-size: 10px;
+  padding-right: 18px;
+}
+
 .filter-tray-toggle.inline-toggle button {
   background-color: #2d2e2e !important;
 }
