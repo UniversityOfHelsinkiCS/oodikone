@@ -7,11 +7,14 @@ import useCreditFilter from '../../FilterTray/filters/CreditsEarned/useCreditFil
 import { contextKey as filterTrayContextKey } from '../../FilterTray'
 import { contextKey as creditFilterContextKey } from '../../FilterTray/filters/CreditsEarned'
 import useFilterTray from '../../FilterTray/useFilterTray'
+import useAnalytics from '../../FilterTray/useAnalytics'
 
 const ExternalCreditFilterToggle = ({ min, max }) => {
   const { currentValue: currentFilterValue, setRequestedValue } = useCreditFilter()
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
   const [, setCreditFilterOpen] = useFilterTray(creditFilterContextKey)
+  const filterAnalytics = useAnalytics()
+
   const months = getMonths(useLocation())
   const limitedMax = max === 0 ? 1 : max
 
@@ -22,10 +25,12 @@ const ExternalCreditFilterToggle = ({ min, max }) => {
   const updateFilters = () => {
     if (active) {
       setRequestedValue({ min: null, max: null })
+      filterAnalytics.clearCreditFilterViaTable()
     } else {
       setRequestedValue({ min, max: limitedMax })
       setFilterTrayOpen(true)
       setCreditFilterOpen(true)
+      filterAnalytics.setCreditFilterViaTable()
     }
   }
 
