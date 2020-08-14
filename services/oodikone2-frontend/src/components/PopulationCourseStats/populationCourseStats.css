@@ -25,6 +25,20 @@
   cursor: pointer;
 }
 
+.studentVerticalTitle {
+  writing-mode: vertical-rl;
+  min-width: 64px;
+  max-width: 200%;
+  max-height: 200px;
+  white-space: initial;
+  padding: 1px;
+
+  /* transform:
+    translate(-25px, 80px)
+    rotate(270deg);
+  background-color: transparent !important; */
+}
+
 .menuTab {
   overflow-y: auto;
   max-height: 80vh;
