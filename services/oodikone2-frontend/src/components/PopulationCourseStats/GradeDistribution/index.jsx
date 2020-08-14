@@ -165,11 +165,7 @@ const GradeDistribution = () => {
                   <Table.Cell>
                     <b>{module.code}</b>
                   </Table.Cell>
-                  {/* {pagedStudents.map(student => (
-                    <Table.Cell key={`${module.code}-${student.studentnumber}`}>
-                      {countCompleted(courses, student.studentnumber)}
-                    </Table.Cell>
-                  ))} */}
+                  <Table.Cell colSpan="8" />
                 </Table.Row>
                 {visible[module.code] &&
                   courses.map(course => <CoursePopUpRow key={course.course.code} courseStatistics={course} />)}

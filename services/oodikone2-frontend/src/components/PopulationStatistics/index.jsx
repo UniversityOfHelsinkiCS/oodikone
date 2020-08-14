@@ -78,7 +78,7 @@ const PopulationStatistics = memo(props => {
             <PopulationSearchHistory history={history} />
           </>
         ) : null}
-        <ProgressBar fixed progress={progress} />
+        <ProgressBar progress={progress} />
       </Segment>
     )
   }
