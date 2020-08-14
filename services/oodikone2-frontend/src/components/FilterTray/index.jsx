@@ -57,9 +57,11 @@ const FilterTray = ({ children, translate, filterSet, location }) => {
                   />
                 )}
               </Header.Content>
+              {/*
               <div>
                 <Icon name="bars" size="large" />
               </div>
+              */}
             </Header>
             <Card.Group id="filter-tray">{filterSet}</Card.Group>
           </div>
