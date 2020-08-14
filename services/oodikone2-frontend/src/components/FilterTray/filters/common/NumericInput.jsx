@@ -29,7 +29,7 @@ const NumericInput = ({
     <input />
     <Popup
       content={translate('filters.numericFilterClearTooltip')}
-      position="top right"
+      position="left center"
       pinned
       size="mini"
       on="hover"
