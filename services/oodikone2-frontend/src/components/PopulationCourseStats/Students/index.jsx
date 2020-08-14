@@ -6,10 +6,17 @@ import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
+import useFilters from '../../FilterTray/useFilters'
 
-const verticalTitle = title => {
+const verticalTitle = (...params) => {
   // https://stackoverflow.com/a/41396815
-  return <div className="tableVerticalTitle">{title}</div>
+  return (
+    <div className="studentVerticalTitle">
+      {params.map(p => (
+        <div key={p}>{p}</div>
+      ))}
+    </div>
+  )
 }
 
 const Students = () => {
@@ -24,6 +31,7 @@ const Students = () => {
   const [page, setPage] = useState(0)
   const [visible, setVisible] = useState({})
   const { courseIsSelected } = useCourseFilter()
+  const { filteredStudents } = useFilters()
 
   const hasCompleted = (courseCode, student) => {
     const course = courseStatistics.find(c => c.course.code === courseCode)
@@ -59,7 +67,9 @@ const Students = () => {
         }
       })
 
-      return { studentnumber: student, passed }
+      const { firstnames, lastname } = filteredStudents.find(s => s.studentNumber === student)
+
+      return { studentnumber: student, name: `${lastname} ${firstnames}`, passed }
     })
   }, [courseStatistics])
 
@@ -103,7 +113,7 @@ const Students = () => {
               <Table.HeaderCell
                 className="rotatedTableHeader"
                 key={student.studentnumber}
-                content={verticalTitle(student.studentnumber)}
+                content={<div>{verticalTitle(student.studentnumber, student.name)}</div>}
               />
             ))}
           </Table.Row>

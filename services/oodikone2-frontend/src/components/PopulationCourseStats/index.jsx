@@ -19,6 +19,7 @@ import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from '../FilterTray/useFilterTray'
 import { contextKey as filterTrayContextKey } from '../FilterTray'
 import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Courses'
+import useAnalytics from '../FilterTray/useAnalytics'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
@@ -108,7 +109,8 @@ function PopulationCourseStats(props) {
   const [courseStatistics, setCourseStatistics] = useState(updateCourseStatisticsCriteria(props, initialState(props)))
   const [timer, setTimer] = useState(null)
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
-  const { toggleCourseSelection } = useCourseFilter()
+  const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
+  const filterAnalytics = useAnalytics()
 
   useEffect(() => {
     if (state && props.courses) {
@@ -282,6 +284,14 @@ function PopulationCourseStats(props) {
   const onCourseNameCellClick = code => {
     const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
     if (courseStatistic) {
+      const isSelected = courseIsSelected(code)
+
+      if (isSelected) {
+        filterAnalytics.clearCourseFilterViaTable()
+      } else {
+        filterAnalytics.setCourseFilterViaTable()
+      }
+
       toggleCourseSelection(code)
       setFilterTrayOpen(true)
       setCourseFilterOpen(true)
