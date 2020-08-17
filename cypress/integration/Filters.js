@@ -75,23 +75,16 @@ describe("Population Statistics", () => {
     cy.cs("genderFilter-clear").click()
     checkFilteringResult(219, true)
   })
-  
-  // FIXME: This test fails in CI and with cypress:run but not with cypress:open.
-/*
+
   it("Starting year filter works", () => {
-    cy.viewport(1920, 1080)
     cy.cs("startYearAtUni-header").click()
-    cy.screenshot('debug0')
-    cy.selectFromDropdown("startYearAtUni-dropdown", [18])
-    cy.screenshot('debug1')
-    checkFilteringResult(155)   // 153 in ci
-    cy.screenshot('debug2')
+    cy.selectFromDropdown("startYearAtUni-dropdown", [16])
+    checkFilteringResult(13)
     cy.cs("startYearAtUni-clear").click()
     checkFilteringResult(219, true)
   })
-*/
+
   it("Courses filter works", () => {
-    cy.viewport(1920, 1080)
     cy.cs("courseFilter-header").click()
     cy.cs("courseFilter-course-dropdown").click().contains("MAT11002").click()
     checkFilteringResult(82)
