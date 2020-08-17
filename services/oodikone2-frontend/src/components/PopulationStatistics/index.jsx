@@ -2,21 +2,17 @@ import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { getActiveLanguage, getTranslate } from 'react-localize-redux'
 import { func, bool, shape, arrayOf, any } from 'prop-types'
-import { Header, Segment, Divider, Form } from 'semantic-ui-react'
+import { Header, Segment } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
-import PopulationSearchForm from '../PopulationSearchForm'
-import PopulationSearchHistory from '../PopulationSearchHistory'
 import PopulationDetails from '../PopulationDetails'
-import InfoBox from '../InfoBox'
-import ProgressBar from '../ProgressBar'
-import infoTooltips from '../../common/InfoToolTips'
-import { getUserIsAdmin, getTotalCreditsFromCourses } from '../../common'
-import { useProgress, useTitle } from '../../common/hooks'
+import { getTotalCreditsFromCourses } from '../../common'
+import { useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
 import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilters from '../FilterTray/useFilters'
 import { PopulationStatisticsFilters } from '../FilterTray/FilterSets'
+import PopulationSearch from '../PopulationSearch'
 
 const PopulationStatistics = memo(props => {
   const {
@@ -25,63 +21,19 @@ const PopulationStatistics = memo(props => {
     selectedStudentsByYear,
     query,
     samples,
-    populationFound,
-    loading,
     location,
     history,
-    isAdmin,
     isLoading,
     students
   } = props
-  const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
+  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { setAllStudents } = useFilters()
-
-  const { onProgress, progress } = useProgress(loading)
   useTitle('Population statistics')
 
   // Pass students to filter context.
   useEffect(() => {
     setAllStudents(students)
   }, [students])
-
-  const renderPopulationSearch = () => {
-    const { Main } = infoTooltips.PopulationStatistics
-
-    const title =
-      populationFound && history.location.search
-        ? translate('populationStatistics.foundTitle')
-        : translate('populationStatistics.searchTitle')
-
-    return (
-      <Segment>
-        <Header size="medium">
-          {title}
-          {(!populationFound || !history.location.search) && <InfoBox content={Main} />}
-        </Header>
-        <PopulationSearchForm onProgress={onProgress} mandatoryToggle={mandatoryToggle} />
-        <Divider />
-        {location.search !== '' ? (
-          <>
-            {isAdmin ? (
-              <Form>
-                <Form.Group inline>
-                  <Form.Radio
-                    id="accordion-toggle"
-                    checked={mandatoryToggle}
-                    toggle
-                    onClick={toggleMandatoryToggle}
-                    label="Toggle Mandatory Courses"
-                  />
-                </Form.Group>
-              </Form>
-            ) : null}
-            <PopulationSearchHistory history={history} />
-          </>
-        ) : null}
-        <ProgressBar progress={progress} />
-      </Segment>
-    )
-  }
 
   return (
     <FilterTray filterSet={<PopulationStatisticsFilters />}>
@@ -90,7 +42,7 @@ const PopulationStatistics = memo(props => {
           {translate('populationStatistics.header')}
         </Header>
         <Segment className="contentSegment">
-          {renderPopulationSearch()}
+          <PopulationSearch history={history} location={location} />
           {location.search !== '' ? (
             <PopulationDetails
               translate={translate}
@@ -110,24 +62,13 @@ const PopulationStatistics = memo(props => {
 
 PopulationStatistics.propTypes = {
   translate: func.isRequired,
-  populationFound: bool.isRequired,
-  loading: bool.isRequired,
   location: shape({}).isRequired,
   history: shape({}).isRequired,
-  isAdmin: bool.isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
   samples: arrayOf(shape({})).isRequired,
   queryIsSet: bool.isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
   isLoading: bool.isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
   selectedStudentsByYear: shape({}).isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
   query: shape({}).isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
-  tagstudent: arrayOf(shape({})).isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
-  studytracks: shape({}).isRequired,
   students: arrayOf(any).isRequired
 }
 
@@ -154,26 +95,15 @@ const mapStateToProps = state => {
     samples.minDateWithCredits = Math.min(...datesWithCredits)
   }
 
-  const {
-    localize,
-    populations,
-    auth: {
-      token: { roles }
-    }
-  } = state
+  const { localize, populations } = state
 
   return {
     translate: getTranslate(localize),
     currentLanguage: getActiveLanguage(localize).value,
-    loading: populations.pending,
-    populationFound: populations.data.students !== undefined,
     query: populations.query ? populations.query : {},
-    isAdmin: getUserIsAdmin(roles),
     queryIsSet: !!populations.query,
     selectedStudentsByYear,
-    tagstudent: state.tagstudent.data || {},
     samples,
-    studytracks: state.populationDegreesAndProgrammes.data.studyTracks || {},
     isLoading: populations.pending === true,
     students: populations.data.students || []
   }

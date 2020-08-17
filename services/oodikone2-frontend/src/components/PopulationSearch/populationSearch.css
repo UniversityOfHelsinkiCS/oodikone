@@ -28,3 +28,8 @@
 .yearControlButton {
   font-size: 8px !important;
 }
+
+.historyContainer {
+  display: flex !important;
+  width: 100% !important;
+}
