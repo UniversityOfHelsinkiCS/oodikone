@@ -21,7 +21,7 @@ import { getTagsByStudytrackAction } from '../../redux/tags'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, cancelablePromise } from '../../common'
 import { useSearchHistory } from '../../common/hooks'
 import { setLoading } from '../../redux/graphSpinner'
-import './populationSearchForm.css'
+import './populationSearch.css'
 import { dropdownType } from '../../constants/types'
 import SearchHistory from '../SearchHistory'
 
