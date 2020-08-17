@@ -1,8 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Segment, Header, Divider, Form } from 'semantic-ui-react'
+import { Segment, Header, Divider, Form, Button, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getTranslate } from 'react-localize-redux'
+import { Link } from 'react-router-dom'
 import PopulationSearchForm from './PopulationSearchForm'
 import PopulationSearchHistory from './PopulationSearchHistory'
 import ProgressBar from '../ProgressBar'
@@ -31,10 +32,18 @@ const PopulationSearch = ({ populationFound, history, location, isAdmin, loading
       <PopulationSearchForm onProgress={onProgress} mandatoryToggle={mandatoryToggle} />
       <Divider />
       {location.search !== '' ? (
-        <>
-          {isAdmin ? (
-            <Form>
-              <Form.Group inline>
+        <Form>
+          <Form.Group inline>
+            <Form.Field>
+              <Link to="/populations">
+                <Button icon labelPosition="left" color="blue">
+                  <Icon name="left arrow" />
+                  New Population Search
+                </Button>
+              </Link>
+            </Form.Field>
+            {isAdmin ? (
+              <Form.Field>
                 <Form.Radio
                   id="accordion-toggle"
                   checked={mandatoryToggle}
@@ -42,11 +51,11 @@ const PopulationSearch = ({ populationFound, history, location, isAdmin, loading
                   onClick={toggleMandatoryToggle}
                   label="Toggle Mandatory Courses"
                 />
-              </Form.Group>
-            </Form>
-          ) : null}
+              </Form.Field>
+            ) : null}
+          </Form.Group>
           <PopulationSearchHistory history={history} />
-        </>
+        </Form>
       ) : null}
       <ProgressBar progress={progress} />
     </Segment>
