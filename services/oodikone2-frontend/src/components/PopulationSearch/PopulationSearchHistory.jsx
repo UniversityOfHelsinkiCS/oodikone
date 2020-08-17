@@ -12,7 +12,7 @@ import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation, updatePopulationStudents } from '../../redux/populations'
 import TSA from '../../common/tsa'
 
-import './populationSearchHistory.css'
+import './populationSearch.css'
 import infotooltips from '../../common/InfoToolTips'
 import { getTextIn } from '../../common'
 import InfoBox from '../InfoBox'
