@@ -1,7 +1,7 @@
 /// <reference types="Cypress" />
 
 const checkFilteringResult = (studentCount, noFiltering = false) => {
-  cy.get(".accordion > :nth-child(1)").should("contain", `for ${studentCount} students`)
+  cy.contains(`Students (${studentCount})`)
   cy.cs("active-filter-count").should(noFiltering ? "not.exist" : "exist")
 }
 
@@ -98,5 +98,54 @@ describe("Population Statistics", () => {
     checkFilteringResult(125)
     cy.cs("courseFilter-TKT20001-clear").click()
     checkFilteringResult(219, true)
+  })
+})
+
+describe("Course Statistics", () => {
+  before(() => {
+    cy.init()
+    cy.cs("navbar-courseStatistics").click()
+    cy.cs("course-code-input").click().type("TKT20002")
+    cy.get(":nth-child(2) > .ten").click()
+    cy.cs("fetch-stats-button").click()
+    cy.get(":nth-child(2) > :nth-child(1) > div > .item > .level").click()
+    cy.cs("filter-toggle-open").click()
+  })
+
+  it("Filter tray opens and closes", () => {
+    cy.cs("filter-toggle-close").click().should("not.be.visible")
+    cy.cs("filter-toggle-open").click().should("not.be.visible")
+  })
+
+  it("Enrollment filter works", () => {
+    cy.cs("enrollmentStatusFilter-header").click()
+    cy.selectFromDropdown("enrollmentStatusFilter-status", 0)
+    checkFilteringResult(93, true)
+    cy.selectFromDropdown("enrollmentStatusFilter-semesters", [0, 0])
+    checkFilteringResult(92)
+    cy.selectFromDropdown("enrollmentStatusFilter-status", 1)
+    checkFilteringResult(0)
+    cy.cs("enrollmentStatusFilter-clear").click()
+    checkFilteringResult(93, true)
+  })
+
+  it("Gender filter works", () => {
+    cy.cs("genderFilter-header").click()
+    cy.selectFromDropdown("genderFilter-dropdown", 0)
+    checkFilteringResult(19)
+    cy.selectFromDropdown("genderFilter-dropdown", 1)
+    checkFilteringResult(74)
+    cy.selectFromDropdown("genderFilter-dropdown", 2)
+    checkFilteringResult(0)
+    cy.cs("genderFilter-clear").click()
+    checkFilteringResult(93, true)
+  })
+
+  it("Starting year filter works", () => {
+    cy.cs("startYearAtUni-header").click()
+    cy.selectFromDropdown("startYearAtUni-dropdown", [9])
+    checkFilteringResult(79)
+    cy.cs("startYearAtUni-clear").click()
+    checkFilteringResult(93, true)
   })
 })

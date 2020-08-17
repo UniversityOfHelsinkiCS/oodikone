@@ -205,6 +205,7 @@ const SearchForm = props => {
                   onChange={cc => setState({ ...state, courseCode: cc })}
                   loading={props.coursesLoading}
                   minSearchLength={0}
+                  data-cy="course-code-input"
                 />
               </Form.Field>
               <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
@@ -243,6 +244,7 @@ const SearchForm = props => {
                   positive
                   content="Fetch statistics"
                   onClick={onSubmitFormClick}
+                  data-cy="fetch-stats-button"
                 />
               </Fragment>
             )}
