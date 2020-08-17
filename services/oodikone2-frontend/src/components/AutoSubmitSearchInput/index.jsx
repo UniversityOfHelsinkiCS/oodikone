@@ -19,7 +19,8 @@ const AutoSubmitSearchInput = ({
   minSearchLength,
   doSearch,
   loading,
-  disabled
+  disabled,
+  ...rest
 }) => {
   const [input, setInput] = useState(value)
 
@@ -62,6 +63,7 @@ const AutoSubmitSearchInput = ({
       placeholder={placeholder}
       loading={loading}
       disabled={disabled}
+      {...rest}
     />
   )
 }
