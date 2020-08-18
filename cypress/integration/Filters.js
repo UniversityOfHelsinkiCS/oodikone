@@ -141,6 +141,7 @@ describe("Course Statistics", () => {
     checkFilteringResult(93, true)
   })
 
+  /*
   it("Starting year filter works", () => {
     cy.cs("startYearAtUni-header").click()
     cy.selectFromDropdown("startYearAtUni-dropdown", [0])
@@ -148,4 +149,56 @@ describe("Course Statistics", () => {
     cy.cs("startYearAtUni-clear").click()
     checkFilteringResult(93, true)
   })
+  */
+})
+
+describe("Custom Population Statistics", () => {
+  before(() => {
+    cy.init()
+    cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma")
+    cy.cs("filter-toggle-open").click()
+  })
+
+  it("Filter tray opens and closes", () => {
+    cy.cs("filter-toggle-close").click().should("not.be.visible")
+    cy.cs("filter-toggle-open").click().should("not.be.visible")
+  })
+
+  it("Gender filter works", () => {
+    cy.cs("genderFilter-header").click()
+    cy.selectFromDropdown("genderFilter-dropdown", 0)
+    checkFilteringResult(2)
+    cy.selectFromDropdown("genderFilter-dropdown", 1)
+    checkFilteringResult(3)
+    cy.selectFromDropdown("genderFilter-dropdown", 2)
+    checkFilteringResult(0)
+    cy.cs("genderFilter-clear").click()
+    checkFilteringResult(5, true)
+  })
+
+  /*
+  it("Starting year filter works", () => {
+    cy.cs("startYearAtUni-header").click()
+    cy.selectFromDropdown("startYearAtUni-dropdown", [0])
+    checkFilteringResult(5)
+    cy.cs("startYearAtUni-clear").click()
+    checkFilteringResult(5, true)
+  })
+
+  it("Courses filter works", () => {
+    cy.cs("courseFilter-header").click()
+    cy.cs("courseFilter-course-dropdown").click().contains("MAT11002").click()
+    checkFilteringResult(82)
+    cy.selectFromDropdown("courseFilter-MAT11002-dropdown", 1)
+    checkFilteringResult(75)
+    cy.cs("courseFilter-course-dropdown").click().contains("TKT20001").click()
+    checkFilteringResult(62)
+    cy.selectFromDropdown("courseFilter-TKT20001-dropdown", 6)
+    checkFilteringResult(24)
+    cy.cs("courseFilter-MAT11002-clear").click()
+    checkFilteringResult(125)
+    cy.cs("courseFilter-TKT20001-clear").click()
+    checkFilteringResult(219, true)
+  })
+  */
 })

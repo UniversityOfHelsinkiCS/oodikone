@@ -26,6 +26,7 @@ import InfoBox from '../InfoBox'
 import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
 import { CustomPopulationFilters } from '../FilterTray/FilterSets'
+import useFilterTray from '../FilterTray/useFilterTray'
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
@@ -51,6 +52,7 @@ const CustomPopulation = ({
   const [selectedSearchId, setSelectedSearchId] = useState('')
   const [newestIndex, setNewest] = useState(null)
   const { setAllStudents, filteredStudents } = useFilters()
+  const [trayOpen] = useFilterTray()
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
   const { onProgress, progress } = useProgress(loading)
@@ -244,6 +246,7 @@ const CustomPopulation = ({
               selectedStudents={selectedStudents}
               translate={translate}
               render={false}
+              trayOpen={trayOpen}
             />
           </div>
         )
