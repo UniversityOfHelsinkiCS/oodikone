@@ -96,9 +96,11 @@ const FilterTray = ({ children, translate, filterSet }) => {
             )}
           </div>
           <Icon name="angle double down" />
-          <Label color="red" ribbon="right" id="filter-ribbon">
-            NEW!
-          </Label>
+          <div id="filter-ribbon-container">
+            <Label color="red" ribbon="right" id="filter-ribbon">
+              NEW!
+            </Label>
+          </div>
         </Button>
       </div>
     </>
