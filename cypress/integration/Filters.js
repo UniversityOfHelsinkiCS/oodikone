@@ -154,7 +154,7 @@ describe("Course Statistics", () => {
 
 describe("Custom Population Statistics", () => {
   before(() => {
-    cy.visit("/custompopulation")
+    cy.init("custompopulation")
     cy.cs("custom-pop-search-button").click()
     cy.cs("student-no-input").click().type(`
       010182086
