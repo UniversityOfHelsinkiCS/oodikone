@@ -143,8 +143,8 @@ describe("Course Statistics", () => {
 
   it("Starting year filter works", () => {
     cy.cs("startYearAtUni-header").click()
-    cy.selectFromDropdown("startYearAtUni-dropdown", [9])
-    checkFilteringResult(79)
+    cy.selectFromDropdown("startYearAtUni-dropdown", [0])
+    checkFilteringResult(0)
     cy.cs("startYearAtUni-clear").click()
     checkFilteringResult(93, true)
   })
