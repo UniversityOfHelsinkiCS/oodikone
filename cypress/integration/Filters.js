@@ -154,8 +154,16 @@ describe("Course Statistics", () => {
 
 describe("Custom Population Statistics", () => {
   before(() => {
-    cy.init()
-    cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma")
+    cy.visit("/custompopulation")
+    cy.cs("custom-pop-search-button").click()
+    cy.cs("student-no-input").click().type(`
+      010182086
+      010211504
+      010275964
+      010328785
+      010331154
+    `)
+    cy.cs("search-button").click()
     cy.cs("filter-toggle-open").click()
   })
 
@@ -176,7 +184,6 @@ describe("Custom Population Statistics", () => {
     checkFilteringResult(5, true)
   })
 
-  /*
   it("Starting year filter works", () => {
     cy.cs("startYearAtUni-header").click()
     cy.selectFromDropdown("startYearAtUni-dropdown", [0])
@@ -185,6 +192,7 @@ describe("Custom Population Statistics", () => {
     checkFilteringResult(5, true)
   })
 
+  /*
   it("Courses filter works", () => {
     cy.cs("courseFilter-header").click()
     cy.cs("courseFilter-course-dropdown").click().contains("MAT11002").click()

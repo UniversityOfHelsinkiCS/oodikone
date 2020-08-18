@@ -143,7 +143,7 @@ const CustomPopulation = ({
   const renderCustomPopulationSearch = () => (
     <Modal
       trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)}>
+        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="custom-pop-search-button">
           Custom population
         </Button>
       }
@@ -160,7 +160,12 @@ const CustomPopulation = ({
           </Form.Field>
           <Form.Field>
             <em> Insert studentnumbers you wish to use for population here </em>
-            <TextArea value={input} placeholder="011111111" onChange={e => setInput(e.target.value)} />
+            <TextArea
+              value={input}
+              placeholder="011111111"
+              onChange={e => setInput(e.target.value)}
+              data-cy="student-no-input"
+            />
           </Form.Field>
         </Form>
         <SearchHistory
@@ -186,7 +191,7 @@ const CustomPopulation = ({
         />
         <Button disabled={!selectedSearchId} negative floated="left" icon="trash" onClick={onDelete} content="Delete" />
         <Button onClick={handleClose}>Cancel</Button>
-        <Button positive onClick={e => onClicker(e)}>
+        <Button positive onClick={e => onClicker(e)} data-cy="search-button">
           Search population
         </Button>
       </Modal.Actions>
