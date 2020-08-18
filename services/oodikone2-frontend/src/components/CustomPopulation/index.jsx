@@ -26,6 +26,7 @@ import InfoBox from '../InfoBox'
 import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
 import { CustomPopulationFilters } from '../FilterTray/FilterSets'
+import useFilterTray from '../FilterTray/useFilterTray'
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
@@ -51,6 +52,7 @@ const CustomPopulation = ({
   const [selectedSearchId, setSelectedSearchId] = useState('')
   const [newestIndex, setNewest] = useState(null)
   const { setAllStudents, filteredStudents } = useFilters()
+  const [trayOpen] = useFilterTray()
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
   const { onProgress, progress } = useProgress(loading)
@@ -141,7 +143,7 @@ const CustomPopulation = ({
   const renderCustomPopulationSearch = () => (
     <Modal
       trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)}>
+        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="custom-pop-search-button">
           Custom population
         </Button>
       }
@@ -158,7 +160,12 @@ const CustomPopulation = ({
           </Form.Field>
           <Form.Field>
             <em> Insert studentnumbers you wish to use for population here </em>
-            <TextArea value={input} placeholder="011111111" onChange={e => setInput(e.target.value)} />
+            <TextArea
+              value={input}
+              placeholder="011111111"
+              onChange={e => setInput(e.target.value)}
+              data-cy="student-no-input"
+            />
           </Form.Field>
         </Form>
         <SearchHistory
@@ -184,7 +191,7 @@ const CustomPopulation = ({
         />
         <Button disabled={!selectedSearchId} negative floated="left" icon="trash" onClick={onDelete} content="Delete" />
         <Button onClick={handleClose}>Cancel</Button>
-        <Button positive onClick={e => onClicker(e)}>
+        <Button positive onClick={e => onClicker(e)} data-cy="search-button">
           Search population
         </Button>
       </Modal.Actions>
@@ -244,6 +251,7 @@ const CustomPopulation = ({
               selectedStudents={selectedStudents}
               translate={translate}
               render={false}
+              trayOpen={trayOpen}
             />
           </div>
         )

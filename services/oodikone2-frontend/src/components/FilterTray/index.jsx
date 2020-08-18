@@ -4,7 +4,6 @@ import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
 import { getTranslate } from 'react-localize-redux'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import Sidebar from '../Sidebar'
 import useFilterTray from './useFilterTray'
 import useFilters from './useFilters'
@@ -12,12 +11,12 @@ import useAnalytics from './useAnalytics'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ children, translate, filterSet, location }) => {
+const FilterTray = ({ children, translate, filterSet }) => {
   const [open, setOpen] = useFilterTray(contextKey)
   const { allStudents, activeFilters } = useFilters()
   const analytics = useAnalytics()
 
-  if (!location.search) {
+  if (!allStudents) {
     return children
   }
 
@@ -97,9 +96,11 @@ const FilterTray = ({ children, translate, filterSet, location }) => {
             )}
           </div>
           <Icon name="angle double down" />
-          <Label color="red" ribbon="right" id="filter-ribbon">
-            NEW!
-          </Label>
+          <div id="filter-ribbon-container">
+            <Label color="red" ribbon="right" id="filter-ribbon">
+              NEW!
+            </Label>
+          </div>
         </Button>
       </div>
     </>
@@ -109,12 +110,9 @@ const FilterTray = ({ children, translate, filterSet, location }) => {
 FilterTray.propTypes = {
   children: PropTypes.node.isRequired,
   translate: PropTypes.func.isRequired,
-  filterSet: PropTypes.node.isRequired,
-  location: PropTypes.shape({
-    search: PropTypes.string.isRequired
-  }).isRequired
+  filterSet: PropTypes.node.isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
 
-export default connect(mapStateToProps)(withRouter(FilterTray))
+export default connect(mapStateToProps)(FilterTray)

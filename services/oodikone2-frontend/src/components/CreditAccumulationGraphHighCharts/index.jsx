@@ -329,7 +329,8 @@ class CreditAccumulationGraphHighCharts extends Component {
 CreditAccumulationGraphHighCharts.defaultProps = {
   absences: [],
   singleStudent: false,
-  render: true
+  render: true,
+  trayOpen: false
 }
 
 CreditAccumulationGraphHighCharts.propTypes = {
@@ -342,7 +343,7 @@ CreditAccumulationGraphHighCharts.propTypes = {
   translate: func.isRequired,
   absences: arrayOf(shape({})),
   render: bool,
-  trayOpen: bool.isRequired
+  trayOpen: bool
 }
 
 const mapStateToProps = state => ({

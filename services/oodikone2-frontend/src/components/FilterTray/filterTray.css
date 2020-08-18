@@ -40,11 +40,14 @@
   margin-bottom: -2px;
 }
 
+#filter-ribbon-container {
+  position: fixed;
+  top: 19px;
+  right: 253px;
+}
+
 #filter-ribbon {
   transform: rotate(90deg);
-  position: relative;
-  top: 9px;
-  left: -25px;
   font-size: 10px;
   padding-right: 18px;
 }
