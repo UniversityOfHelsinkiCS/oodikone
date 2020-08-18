@@ -13,6 +13,7 @@ import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilters from '../FilterTray/useFilters'
 import { PopulationStatisticsFilters } from '../FilterTray/FilterSets'
 import PopulationSearch from '../PopulationSearch'
+import { clearPopulations } from '../../redux/populations'
 
 const PopulationStatistics = memo(props => {
   const {
@@ -24,11 +25,17 @@ const PopulationStatistics = memo(props => {
     location,
     history,
     isLoading,
-    students
+    students,
+    clearPopulations
   } = props
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { setAllStudents } = useFilters()
   useTitle('Population statistics')
+
+  // Clear data when navigating back to population search view.
+  useEffect(() => {
+    clearPopulations()
+  }, [history.location.search])
 
   // Pass students to filter context.
   useEffect(() => {
@@ -69,7 +76,8 @@ PopulationStatistics.propTypes = {
   isLoading: bool.isRequired,
   selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
-  students: arrayOf(any).isRequired
+  students: arrayOf(any).isRequired,
+  clearPopulations: func.isRequired
 }
 
 const mapStateToProps = state => {
@@ -109,4 +117,7 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(PopulationStatistics)
+export default connect(
+  mapStateToProps,
+  { clearPopulations }
+)(PopulationStatistics)
