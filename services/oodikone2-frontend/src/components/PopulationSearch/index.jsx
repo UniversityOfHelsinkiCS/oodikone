@@ -31,7 +31,7 @@ const PopulationSearch = ({ populationFound, history, location, isAdmin, loading
       </Header>
       <PopulationSearchForm onProgress={onProgress} mandatoryToggle={mandatoryToggle} />
       <Divider />
-      {location.search !== '' ? (
+      {location.search !== '' && !loading && (
         <Form>
           <Form.Group inline>
             <Form.Field>
@@ -56,7 +56,7 @@ const PopulationSearch = ({ populationFound, history, location, isAdmin, loading
           </Form.Group>
           <PopulationSearchHistory history={history} />
         </Form>
-      ) : null}
+      )}
       <ProgressBar progress={progress} />
     </Segment>
   )
