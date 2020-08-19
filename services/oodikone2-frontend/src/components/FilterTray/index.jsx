@@ -11,12 +11,12 @@ import useAnalytics from './useAnalytics'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ children, translate, filterSet }) => {
+const FilterTray = ({ children, translate, filterSet, visible }) => {
   const [open, setOpen] = useFilterTray(contextKey)
   const { allStudents, activeFilters } = useFilters()
   const analytics = useAnalytics()
 
-  if (!allStudents) {
+  if (!visible) {
     return children
   }
 
@@ -110,7 +110,12 @@ const FilterTray = ({ children, translate, filterSet }) => {
 FilterTray.propTypes = {
   children: PropTypes.node.isRequired,
   translate: PropTypes.func.isRequired,
-  filterSet: PropTypes.node.isRequired
+  filterSet: PropTypes.node.isRequired,
+  visible: PropTypes.bool
+}
+
+FilterTray.defaultProps = {
+  visible: true
 }
 
 const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })

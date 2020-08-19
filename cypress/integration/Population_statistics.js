@@ -141,7 +141,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Create new tag")
   })
   
-  it("Advanced settings work", () => {
+  it.only("Advanced settings work", () => {
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma")
     cy.get('[data-cy=advanced-toggle]').click()
     cy.contains('Statistics until')
@@ -152,6 +152,7 @@ describe('Population Statistics tests', () => {
     cy.contains('Credit accumulation (for 13 students)')
 
     // only fall
+    cy.get('[data-cy=advanced-toggle]').click()
     cy.cs('toggle-fall').click()
     cy.cs('toggle-spring').click()
 
@@ -161,6 +162,7 @@ describe('Population Statistics tests', () => {
     cy.contains('Credit accumulation (for 206 students)')
 
     // spring + fall and include cancelled
+    cy.get('[data-cy=advanced-toggle]').click()
     cy.cs('toggle-spring').click()
     cy.cs('toggle-cancelled').click()
     cy.contains('Fetch population').click()
