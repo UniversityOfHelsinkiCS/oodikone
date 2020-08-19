@@ -36,7 +36,7 @@ const PopulationStatistics = memo(props => {
   }, [students])
 
   return (
-    <FilterTray filterSet={<PopulationStatisticsFilters />}>
+    <FilterTray filterSet={<PopulationStatisticsFilters />} visible={location.search !== ''}>
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
           {translate('populationStatistics.header')}

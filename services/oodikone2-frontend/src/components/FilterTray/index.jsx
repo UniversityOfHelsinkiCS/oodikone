@@ -4,7 +4,6 @@ import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
 import { getTranslate } from 'react-localize-redux'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import Sidebar from '../Sidebar'
 import useFilterTray from './useFilterTray'
 import useFilters from './useFilters'
@@ -12,13 +11,12 @@ import useAnalytics from './useAnalytics'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ children, translate, filterSet, location }) => {
+const FilterTray = ({ children, translate, filterSet, visible }) => {
   const [open, setOpen] = useFilterTray(contextKey)
   const { allStudents, activeFilters } = useFilters()
   const analytics = useAnalytics()
 
-  // Don't show filters in population search view.
-  if (!location.search) {
+  if (!visible) {
     return children
   }
 
@@ -113,11 +111,13 @@ FilterTray.propTypes = {
   children: PropTypes.node.isRequired,
   translate: PropTypes.func.isRequired,
   filterSet: PropTypes.node.isRequired,
-  location: PropTypes.shape({
-    search: PropTypes.string.isRequired
-  }).isRequired
+  visible: PropTypes.bool
+}
+
+FilterTray.defaultProps = {
+  visible: true
 }
 
 const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
 
-export default connect(mapStateToProps)(withRouter(FilterTray))
+export default connect(mapStateToProps)(FilterTray)
