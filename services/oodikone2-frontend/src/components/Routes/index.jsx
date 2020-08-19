@@ -25,7 +25,7 @@ const retry = async (fn, retriesLeft = 3, interval = 500) =>
       })
   })
 
-const WelcomePage = React.lazy(() => retry(() => import('../WelcomePage')))
+const FrontPage = React.lazy(() => retry(() => import('../FrontPage')))
 const Populations = React.lazy(() => retry(() => import('../PopulationStatistics')))
 const StudentStatistics = React.lazy(() => retry(() => import('../StudentStatistics')))
 const CourseStatistics = React.lazy(() => retry(() => import('../CourseStatistics')))
@@ -57,7 +57,7 @@ const routes = {
 const Routes = () => (
   <Suspense fallback={<Loader active inline="centered" />}>
     <Switch>
-      <Route exact path="/" component={WelcomePage} />
+      <Route exact path="/" component={FrontPage} />
       <Route exact path="/populations" component={Populations} />
       <Route exact path="/study-programme/:studyProgrammeId?" component={StudyProgramme} />
       <Route exact path="/study-programme/:studyProgrammeId/course-group/:courseGroupId" component={StudyProgramme} />
