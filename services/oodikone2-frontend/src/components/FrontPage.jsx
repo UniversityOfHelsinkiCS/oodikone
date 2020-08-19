@@ -1,10 +1,10 @@
 import React from 'react'
 import { Container, Header, Image, Divider, List } from 'semantic-ui-react'
 import moment from 'moment'
-import { images } from '../../common'
-import { useTitle } from '../../common/hooks'
+import { images } from '../common'
+import { useTitle } from '../common/hooks'
 
-const WelcomePage = () => {
+export default () => {
   useTitle()
   return (
     <div>
@@ -65,4 +65,3 @@ const WelcomePage = () => {
     </div>
   )
 }
-export default WelcomePage
