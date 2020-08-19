@@ -8,7 +8,7 @@ export default () => {
   useTitle()
   return (
     <div>
-      <Container text style={{ paddingTop: 50 }}>
+      <Container text style={{ paddingTop: 50 }} textAlign="justified">
         <Header as="h1" textAlign="center">
           Oodikone
         </Header>
