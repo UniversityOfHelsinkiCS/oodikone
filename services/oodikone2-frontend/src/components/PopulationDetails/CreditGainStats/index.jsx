@@ -7,8 +7,11 @@ import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
 import './creditGainStats.css'
+import useFeatureToggle from '../../../common/useFeatureToggle'
+import NewInfoBox from '../../InfoBox/NewInfoBox'
 
 const CreditGainStats = ({ filteredStudents, translate }) => {
+  const [infoBoxToggle] = useFeatureToggle('infoBoxToggle')
   const { CreditStatistics } = infotooltips.PopulationStatistics
 
   const renderCreditsGainTab = useCallback(() => {
@@ -31,9 +34,13 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
 
   return (
     <div id="credit-gain-stats">
-      <Header>
-        <InfoBox content={CreditStatistics.Infobox} />
-      </Header>
+      {infoBoxToggle ? (
+        <NewInfoBox content={CreditStatistics.Infobox} />
+      ) : (
+        <Header>
+          <InfoBox content={CreditStatistics.Infobox} />
+        </Header>
+      )}
       {filteredStudents && (
         <Tab
           onTabChange={handleTabChange}
