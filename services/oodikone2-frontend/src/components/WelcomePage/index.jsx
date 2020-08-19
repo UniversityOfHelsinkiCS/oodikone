@@ -1,5 +1,5 @@
 import React from 'react'
-import { Container, Header, Image, Divider } from 'semantic-ui-react'
+import { Container, Header, Image, Divider, List } from 'semantic-ui-react'
 import moment from 'moment'
 import { images } from '../../common'
 import { useTitle } from '../../common/hooks'
@@ -10,31 +10,52 @@ const WelcomePage = () => {
     <div>
       <Container text style={{ paddingTop: 50 }}>
         <Header as="h1" textAlign="center">
-          oodikone
+          Oodikone
         </Header>
-        <h3 style={{ textAlign: 'center' }}>a tool for explorative research on student data</h3>
+        <Header as="h3" style={{ textAlign: 'center' }}>
+          Exploratory Research on Study Data
+        </Header>
+
         <Divider section />
-        <h4>Study programme</h4>
+
+        <Header as="h4">Study Programme</Header>
+        <List bulleted>
+          <List.Item>
+            <i>Search by Class:</i> Query a student population specified by a starting year and a study right. Oodikone
+            will show you interactive statistics and visualizations for the population to be explored.
+          </List.Item>
+          <List.Item>
+            <i>Overview:</i> View student progress and annual productivity for a given study programme.
+          </List.Item>
+        </List>
+
+        <Divider section />
+
+        <Header as="h4">Student Statistics</Header>
+        <p>View detailed information for a given student.</p>
+
+        <Divider section />
+
+        <Header as="h4">Course Statistics</Header>
+        <p>View statistics by course and year.</p>
+
+        <Divider section />
+
+        <Header as="h4">Trends</Header>
+        <p>View many kinds visualizations of study progress and study programme status.</p>
+
+        <Divider section />
+
+        <Header as="h4">Feedback</Header>
         <p>
-          Query a student population specified by starting year and studyright. Oodikone will give you study statistics
-          and visualizations of the population, which you can interactively filter and explore.
+          For questions and suggestions, use either the feedback form or shoot an e-mail to{' '}
+          <a href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</a>.
         </p>
-        <p>View overview of a studyprogramme with statistics of population progress and yearly productivity.</p>
+
         <Divider section />
 
-        <h4>Student Statistics</h4>
-        <p>Shows detailed information and visualizations of a queried student.</p>
-        <Divider section />
-
-        <h4>Course Statistics</h4>
-        <p>Shows student results of a course over specified years.</p>
-        <Divider section />
-
-        <h4>Trouble? Questions? Suggestions? Need access rights?</h4>
-        <p>Contact team Oodikone by email: grp-toska@helsinki.fi</p>
-        <Divider section />
         <p>
-          Site updated at:{' '}
+          Oodikone was last updated on:{' '}
           {moment(process.env.BUILT_AT)
             .toDate()
             .toLocaleString()}
