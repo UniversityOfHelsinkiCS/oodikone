@@ -5,13 +5,16 @@ import { CreditFilterProvider } from './filters/CreditsEarned/useCreditFilter'
 import { FilterTrayProvider } from './useFilterTray'
 import { FilterProvider } from './useFilters'
 import { FilterAnalyticsProvider } from './useAnalytics'
+import { GradeFilterProvider } from './filters/Grade/useGradeFilter'
 
 const FilterContextProvider = ({ children }) => (
   <FilterAnalyticsProvider>
     <FilterTrayProvider>
       <FilterProvider>
         <CourseFilterProvider>
-          <CreditFilterProvider>{children}</CreditFilterProvider>
+          <CreditFilterProvider>
+            <GradeFilterProvider>{children}</GradeFilterProvider>
+          </CreditFilterProvider>
         </CourseFilterProvider>
       </FilterProvider>
     </FilterTrayProvider>
