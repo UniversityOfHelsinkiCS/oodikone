@@ -1,10 +1,25 @@
 .ok-infobox.ok-infobox.ok-infobox {
   display: flex;
-  width: fit-content;
+  flex-direction: column;
+  padding: 0;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.ok-infobox.ok-infobox.ok-infobox .content-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 1.5em;
 }
 
 .ok-infobox.ok-infobox.ok-infobox .content {
-  padding-bottom: 3em;
+  color: black;
+  margin: 0 0 0 1.5em;
+  padding: 0;
+}
+
+.ok-infobox.ok-infobox.ok-infobox .content .header {
+  padding-bottom: 0.4em;
 }
 
 .ok-infobox-collapsed.ok-infobox-collapsed.ok-infobox-collapsed {
@@ -16,13 +31,9 @@
 }
 
 .ok-infobox-close.ok-infobox-close.ok-infobox-close.ok-infobox-close {
-  position: absolute;
-  bottom: 0;
-  left: 0;
   width: 100%;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
-  background-color: #89e093 !important;
-  color: #fff !important;
-  font-size: 1.1rem;
+  border: 1px solid #1ebc30;
+  margin: 0;
 }

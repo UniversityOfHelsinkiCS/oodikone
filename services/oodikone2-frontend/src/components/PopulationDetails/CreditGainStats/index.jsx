@@ -35,7 +35,7 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
   return (
     <div id="credit-gain-stats">
       {infoBoxToggle ? (
-        <NewInfoBox content={CreditStatistics.Infobox} />
+        <NewInfoBox title="Informatiivinen otsikko" content={CreditStatistics.Infobox} />
       ) : (
         <Header>
           <InfoBox content={CreditStatistics.Infobox} />
