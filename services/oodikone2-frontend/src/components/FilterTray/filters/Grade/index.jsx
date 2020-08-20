@@ -9,6 +9,7 @@ import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
 import FilterCard from '../common/FilterCard'
 import ClearFilterButton from '../common/ClearFilterButton'
+import useGradeFilter from './useGradeFilter'
 
 /**
  * Grade filter.
@@ -16,28 +17,35 @@ import ClearFilterButton from '../common/ClearFilterButton'
  */
 const Grade = ({ translate }) => {
   const { addFilter, removeFilter, withoutFilter, activeFilters, allStudents } = useFilters()
+  const { value, setValue, grades } = useGradeFilter()
   const analytics = useAnalytics()
-  const [value, setValue] = useState(null)
   const name = 'gradeFilter'
-
-  /*
-  const filterFn = student => 
 
   // Filter function update hook.
   useEffect(() => {
     if (value.length) {
-      addFilter(name, )
+      const studentNumbers = value.reduce((a, b) => a.concat(grades[b]), [])
+      addFilter(name, student => studentNumbers.includes(student.studentNumber))
     } else {
-      
+      removeFilter(name)
     }
-  })
-  */
+  }, [value])
+
+  const checked = grade => value.includes(grade)
+
+  const onChange = grade => () => {
+    if (checked(grade)) {
+      setValue(value.filter(val => val !== grade))
+    } else {
+      setValue(value.concat(grade))
+    }
+  }
 
   return (
     <FilterCard
       title={translate('gradeFilter.title')}
       contextKey="gradeFilter"
-      footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} name={name} />}
+      footer={<ClearFilterButton disabled={!value.length} onClick={() => setValue([])} name={name} />}
       active={Object.keys(activeFilters).includes(name)}
       name={name}
     >
@@ -45,7 +53,7 @@ const Grade = ({ translate }) => {
         <Form>
           {[5, 4, 3, 2, 1, 0].map(grade => (
             <Form.Field>
-              <Checkbox label={grade} />
+              <Checkbox label={grade} checked={checked(grade)} onChange={onChange(grade)} />
             </Form.Field>
           ))}
         </Form>
