@@ -201,3 +201,10 @@
   background-color: #2e2e2f;
   font-size: 0.8rem;
 }
+
+#filter-tray .filter-option-count {
+  color: #ababab;
+  margin-left: 0.6rem;
+  font-size: 0.8rem;
+  font-style: italic;
+}

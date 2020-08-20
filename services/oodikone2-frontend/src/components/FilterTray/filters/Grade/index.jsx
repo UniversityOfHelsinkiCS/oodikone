@@ -16,7 +16,7 @@ import useGradeFilter from './useGradeFilter'
  * Only applicable to a single course.
  */
 const Grade = ({ translate }) => {
-  const { addFilter, removeFilter, withoutFilter, activeFilters, allStudents } = useFilters()
+  const { addFilter, removeFilter, activeFilters } = useFilters()
   const { value, setValue, grades } = useGradeFilter()
   const analytics = useAnalytics()
   const name = 'gradeFilter'
@@ -53,7 +53,16 @@ const Grade = ({ translate }) => {
         <Form>
           {[5, 4, 3, 2, 1, 0].map(grade => (
             <Form.Field>
-              <Checkbox label={grade} checked={checked(grade)} onChange={onChange(grade)} />
+              <Checkbox
+                label={
+                  <label>
+                    {grade}
+                    <span className="filter-option-count">{`(${grades[grade].length} students)`}</span>
+                  </label>
+                }
+                checked={checked(grade)}
+                onChange={onChange(grade)}
+              />
             </Form.Field>
           ))}
         </Form>
