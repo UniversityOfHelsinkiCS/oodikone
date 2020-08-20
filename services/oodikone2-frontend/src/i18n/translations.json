@@ -366,5 +366,8 @@
     "descriptionLower": ["...transferred to this study programme."],
     "have": ["Have"],
     "haveNot": ["Have Not"]
+  },
+  "gradeFilter": {
+    "title": ["Grade"]
   }
 }
