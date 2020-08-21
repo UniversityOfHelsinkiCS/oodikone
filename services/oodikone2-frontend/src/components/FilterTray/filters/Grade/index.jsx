@@ -20,6 +20,7 @@ const Grade = ({ translate }) => {
   const { value, setValue, grades } = useGradeFilter()
   const analytics = useAnalytics()
   const name = 'gradeFilter'
+  const options = Object.keys(grades).sort((a, b) => b - a)
 
   // Filter function update hook.
   useEffect(() => {
@@ -51,8 +52,8 @@ const Grade = ({ translate }) => {
     >
       <div className="card-content">
         <Form>
-          {[5, 4, 3, 2, 1, 0].map(grade => (
-            <Form.Field>
+          {options.map(grade => (
+            <Form.Field key={`grade-filter-option-${grade}`}>
               <Checkbox
                 label={
                   <label>
