@@ -7,6 +7,7 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Courses from './filters/Courses'
 import useAnalytics from './useAnalytics'
+import Grade from './filters/Grade'
 
 export const PopulationStatisticsFilters = () => {
   const analytics = useAnalytics()
@@ -37,6 +38,7 @@ export const CoursePopulationFilters = () => {
 
   return (
     <>
+      <Grade />
       <EnrollmentStatus />
       <Gender />
       <StartYearAtUni />
