@@ -5,17 +5,21 @@ import { intersection, orderBy } from 'lodash'
 import { shape, bool, arrayOf, string, number } from 'prop-types'
 import SearchResultTable from '../../SearchResultTable'
 import { getHighestGradeOfCourseBetweenRange } from '../../../common'
+import useGradeFilter from '../../FilterTray/filters/Grade/useGradeFilter'
 
 const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStudents, samples, codes, from, to }) => {
-  const [courseGrades, setGrades] = useState([])
+  const [courseGrades, setCourseGrades] = useState([])
+  const { setGrades } = useGradeFilter()
+
   useEffect(() => {
     if (samples && singleCourseStats.alternatives) {
       const filteredGradeArray = []
-
       const grades = {}
+
       samples.forEach(student => {
         const courses = student.courses.filter(c => codes.includes(c.course_code))
         const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
+
         if (highestGrade) {
           if (!grades[highestGrade.grade]) {
             grades[highestGrade.grade] = []
@@ -23,11 +27,14 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
           grades[highestGrade.grade].push(student.studentNumber)
         }
       })
+
       Object.keys(grades).forEach(grade => {
         const filteredGrades = intersection(selectedStudents, grades[grade])
         filteredGradeArray.push({ grade, amount: filteredGrades.length })
       })
-      setGrades(filteredGradeArray)
+
+      setCourseGrades(filteredGradeArray)
+      setGrades(grades)
     }
   }, [pending, selectedStudents])
 
