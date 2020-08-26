@@ -285,11 +285,12 @@ function PopulationCourseStats(props) {
     const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
     if (courseStatistic) {
       const isSelected = courseIsSelected(code)
+      const name = 'Course Filtername'
 
       if (isSelected) {
-        filterAnalytics.clearCourseFilterViaTable()
+        filterAnalytics.clearFilterViaTable(name)
       } else {
-        filterAnalytics.setCourseFilterViaTable()
+        filterAnalytics.setFilterViaTable(name)
       }
 
       toggleCourseSelection(code)
