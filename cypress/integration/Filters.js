@@ -150,6 +150,16 @@ describe("Course Statistics", () => {
     checkFilteringResult(93, true)
   })
   */
+
+  it("Grade filter works", () => {
+    cy.cs("gradeFilter-header").click()
+    cy.cs("grade-option-5").click()
+    checkFilteringResult(24)
+    cy.cs("grade-option-Hyl.").click()
+    checkFilteringResult(40)
+    cy.cs("gradeFilter-clear").click()
+    checkFilteringResult(93, true)
+  })
 })
 
 describe("Custom Population Statistics", () => {
