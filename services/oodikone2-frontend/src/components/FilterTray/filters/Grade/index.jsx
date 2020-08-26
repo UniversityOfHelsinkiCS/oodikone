@@ -56,7 +56,7 @@ const Grade = ({ translate }) => {
             <Form.Field key={`grade-filter-option-${grade}`}>
               <Checkbox
                 label={
-                  <label>
+                  <label data-cy={`grade-option-${grade}`}>
                     {grade}
                     <span className="filter-option-count">{`(${grades[grade].length} students)`}</span>
                   </label>
