@@ -5,6 +5,7 @@ import { intersection, orderBy } from 'lodash'
 import { shape, bool, arrayOf, string, number } from 'prop-types'
 import { getHighestGradeOfCourseBetweenRange } from '../../../common'
 import useGradeFilter from '../../FilterTray/filters/Grade/useGradeFilter'
+import ExternalGradeFilterToggle from './ExternalGradeFilterToggle'
 
 const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStudents, samples, codes, from, to }) => {
   const [courseGrades, setCourseGrades] = useState([])
@@ -52,6 +53,7 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
     <Table celled>
       <Table.Header>
         <Table.Row>
+          <Table.HeaderCell collapsing></Table.HeaderCell>
           <Table.HeaderCell>Grades</Table.HeaderCell>
           <Table.HeaderCell>
             Number of Students
@@ -64,7 +66,10 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
 
       <Table.Body>
         {sortedCourseGrades.map(grade => (
-          <Table.Row key={`table-row-${grade}`}>
+          <Table.Row key={`grade-table-row-${grade.grade}`}>
+            <Table.Cell collapsing>
+              <ExternalGradeFilterToggle grade={grade.grade} />
+            </Table.Cell>
             <Table.Cell>{grade.grade}</Table.Cell>
             <Table.Cell>{grade.amount}</Table.Cell>
             <Table.Cell>
@@ -72,7 +77,7 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
                 <Progress
                   percent={Math.round((grade.amount / selectedStudents.length) * 100)}
                   progress
-                  className="credit-stats-progress-bar"
+                  style={{ margin: 0 }}
                 />
               )}
             </Table.Cell>
