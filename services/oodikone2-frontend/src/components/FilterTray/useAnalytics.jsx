@@ -25,10 +25,8 @@ export default () => {
   const clearFilter = name => sendEvent('Clear Filter', name)
   const openTray = () => sendEvent('Toggle Filter Tray', 'Open')
   const closeTray = () => sendEvent('Toggle Filter Tray', 'Close')
-  const setCreditFilterViaTable = () => sendEvent('Set Filter Via Table', 'Credit Filter')
-  const clearCreditFilterViaTable = () => sendEvent('Clear Filter Via Table', 'Credit Filter')
-  const setCourseFilterViaTable = () => sendEvent('Set Filter Via Table', 'Course Filter')
-  const clearCourseFilterViaTable = () => sendEvent('Clear Filter Via Table', 'Course Filter')
+  const setFilterViaTable = (name, value) => sendEvent('Set Filter Via Table', name, value)
+  const clearFilterViaTable = (name, value) => sendEvent('Clear Filter Via Table', name, value)
 
   return {
     setTarget,
@@ -37,9 +35,7 @@ export default () => {
     clearFilter,
     openTray,
     closeTray,
-    setCreditFilterViaTable,
-    clearCreditFilterViaTable,
-    setCourseFilterViaTable,
-    clearCourseFilterViaTable
+    setFilterViaTable,
+    clearFilterViaTable
   }
 }

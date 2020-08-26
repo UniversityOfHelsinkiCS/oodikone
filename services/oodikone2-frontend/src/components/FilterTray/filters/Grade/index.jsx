@@ -11,6 +11,8 @@ import FilterCard from '../common/FilterCard'
 import ClearFilterButton from '../common/ClearFilterButton'
 import useGradeFilter from './useGradeFilter'
 
+export const contextKey = 'gradeFilter'
+
 /**
  * Grade filter.
  * Only applicable to a single course.
@@ -45,7 +47,7 @@ const Grade = ({ translate }) => {
   return (
     <FilterCard
       title={translate('gradeFilter.title')}
-      contextKey="gradeFilter"
+      contextKey={contextKey}
       footer={<ClearFilterButton disabled={!value.length} onClick={() => setValue([])} name={name} />}
       active={Object.keys(activeFilters).includes(name)}
       name={name}
@@ -56,7 +58,7 @@ const Grade = ({ translate }) => {
             <Form.Field key={`grade-filter-option-${grade}`}>
               <Checkbox
                 label={
-                  <label>
+                  <label data-cy={`grade-option-${grade}`}>
                     {grade}
                     <span className="filter-option-count">{`(${grades[grade].length} students)`}</span>
                   </label>
