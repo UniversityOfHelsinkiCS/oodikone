@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Progress } from 'semantic-ui-react'
+import { Progress, Table } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
 import { shape, bool, arrayOf, string, number } from 'prop-types'
-import SearchResultTable from '../../SearchResultTable'
 import { getHighestGradeOfCourseBetweenRange } from '../../../common'
 import useGradeFilter from '../../FilterTray/filters/Grade/useGradeFilter'
 
@@ -38,8 +37,6 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
     }
   }, [pending, selectedStudents])
 
-  const totalAmount = courseGrades.reduce((acc, curr) => acc + curr.amount, 0)
-
   const sortedCourseGrades = orderBy(
     courseGrades,
     e => {
@@ -50,14 +47,40 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
     },
     ['desc']
   )
-  const rows = sortedCourseGrades.map(g => [
-    `${g.grade}`,
-    g.amount,
-    <Progress style={{ margin: '0px' }} percent={Math.round((g.amount / totalAmount) * 100)} progress />
-  ])
-  const headers = ['Grades', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
-  return <SearchResultTable headers={headers} rows={rows} selectable noResultText="no data available" />
+  return (
+    <Table celled>
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell>Grades</Table.HeaderCell>
+          <Table.HeaderCell>
+            Number of Students
+            <br />
+            <span style={{ fontWeight: 100 }}>(n={selectedStudents.length})</span>
+          </Table.HeaderCell>
+          <Table.HeaderCell>Percentage of Population</Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+
+      <Table.Body>
+        {sortedCourseGrades.map(grade => (
+          <Table.Row key={`table-row-${grade}`}>
+            <Table.Cell>{grade.grade}</Table.Cell>
+            <Table.Cell>{grade.amount}</Table.Cell>
+            <Table.Cell>
+              {selectedStudents.length && (
+                <Progress
+                  percent={Math.round((grade.amount / selectedStudents.length) * 100)}
+                  progress
+                  className="credit-stats-progress-bar"
+                />
+              )}
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
+  )
 }
 
 CoursePopulationCreditDist.propTypes = {
