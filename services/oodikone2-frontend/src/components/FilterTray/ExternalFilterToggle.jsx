@@ -32,13 +32,25 @@ const ExternalFilterToggle = ({
     }
   }
 
-  const Toggle = () => (
+  /**
+   * For some reason, isolating the <Button> into its own component does not work -> ugly copy-paste.
+   * https://stackoverflow.com/questions/63611315/semantics-popup-does-not-show-up-when-passing-a-custom-component-as-trigger
+   */
+  return popupContent ? (
+    <Popup
+      content={popupContent}
+      size="mini"
+      trigger={
+        <Button onClick={updateFilters} size="mini" icon basic={!active} primary={active}>
+          <Icon name="filter" />
+        </Button>
+      }
+    />
+  ) : (
     <Button onClick={updateFilters} size="mini" icon basic={!active} primary={active}>
       <Icon name="filter" />
     </Button>
   )
-
-  return popupContent ? <Popup content={popupContent} size="mini" trigger={<Toggle />} /> : <Toggle />
 }
 
 ExternalFilterToggle.propTypes = {
