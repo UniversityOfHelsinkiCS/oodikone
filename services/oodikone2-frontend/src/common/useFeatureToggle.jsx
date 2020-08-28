@@ -5,6 +5,7 @@ import localforage from 'localforage'
 const storageName = 'oodikoneFeatureToggle'
 
 const FeatureToggleContext = createContext([[], () => {}])
+FeatureToggleContext.displayName = 'Feature Toggle'
 
 export const FeatureToggleProvider = ({ children }) => {
   const [state, setState] = useState({})

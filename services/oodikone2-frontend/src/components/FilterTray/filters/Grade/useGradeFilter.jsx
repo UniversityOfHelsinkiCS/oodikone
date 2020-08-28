@@ -7,6 +7,7 @@ const defaultState = {
 }
 
 const GradeFilterContext = createContext([[], () => {}])
+GradeFilterContext.displayName = 'Grade Filter'
 
 export const GradeFilterProvider = ({ children }) => {
   const [state, setState] = useState(defaultState)
