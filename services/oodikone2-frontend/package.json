@@ -84,6 +84,7 @@
     "qs": "^6.9.4",
     "query-string": "^6.8.1",
     "react": "^16.8.6",
+    "react-context-devtool": "^2.0.0",
     "react-datetime": "^2.16.3",
     "react-dom": "^16.8.6",
     "react-highcharts": "^16.0.2",
