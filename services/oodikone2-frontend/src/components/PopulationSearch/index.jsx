@@ -15,7 +15,6 @@ import { useProgress } from '../../common/hooks'
 
 const PopulationSearch = ({ populationFound, history, location, isAdmin, loading, translate }) => {
   const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
-  const [infoBoxToggle, , toggleInfoBox] = useFeatureToggle('infoBoxToggle')
   const { onProgress, progress } = useProgress(loading)
   const { Main } = infotooltips.PopulationStatistics
 
@@ -52,15 +51,6 @@ const PopulationSearch = ({ populationFound, history, location, isAdmin, loading
                     toggle
                     onClick={toggleMandatoryToggle}
                     label="Toggle Mandatory Courses"
-                  />
-                </Form.Field>
-                <Form.Field>
-                  <Form.Radio
-                    id="infobox-toggle"
-                    checked={infoBoxToggle}
-                    toggle
-                    onClick={toggleInfoBox}
-                    label="Toggle Great-Made Infobox"
                   />
                 </Form.Field>
               </>
