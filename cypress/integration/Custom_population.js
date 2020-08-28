@@ -68,7 +68,7 @@ const searchFor = studentnumbers => {
 const hasLanded = () => {
   cy.contains("Credit accumulation");
   cy.contains("Programme distribution");
-  cy.contains("Courses of Population");
+  cy.contains("Courses of population");
   cy.contains("Students");
 };
 
@@ -140,7 +140,7 @@ describe("Custom population tests", () => {
       searchFor(testStudentNumbers);
       cy.contains("Credit accumulation").should("not.exist");
       cy.contains("Programme distribution").should("not.exist");
-      cy.contains("Courses of Population").should("not.exist");
+      cy.contains("Courses of population").should("not.exist");
       cy.get("button").contains("Custom population");
     });
 
@@ -152,7 +152,7 @@ describe("Custom population tests", () => {
       searchFor(kasvatusStudents);
       cy.contains("Credit accumulation").should("not.exist");
       cy.contains("Programme distribution").should("not.exist");
-      cy.contains("Courses of Population").should("not.exist");
+      cy.contains("Courses of population").should("not.exist");
 
       searchFor(kapistelyStudents.concat(kasvatusStudents));
       hasLanded();
