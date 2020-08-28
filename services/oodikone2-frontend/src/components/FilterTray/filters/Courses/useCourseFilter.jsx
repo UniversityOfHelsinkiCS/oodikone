@@ -10,6 +10,7 @@ const defaultState = {
 }
 
 const CourseFilterContext = createContext([[], () => {}])
+CourseFilterContext.displayName = 'Course Filter'
 
 const CourseFilterProvider = ({ children, getPopulationSelectedStudentCourses }) => {
   const [state, setState] = useState(defaultState)

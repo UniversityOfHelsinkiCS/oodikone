@@ -32,24 +32,26 @@ const ExternalFilterToggle = ({
     }
   }
 
-  /**
-   * For some reason, isolating the <Button> into its own component does not work -> ugly copy-paste.
-   * https://stackoverflow.com/questions/63611315/semantics-popup-does-not-show-up-when-passing-a-custom-component-as-trigger
-   */
+  const Toggle = () => (
+    <Button onClick={updateFilters} size="mini" icon basic={!active} primary={active}>
+      <Icon name="filter" />
+    </Button>
+  )
+
+  // Trigger must be wrapped in <div> for the tooltip to work.
+  // See https://stackoverflow.com/questions/63611315/semantics-popup-does-not-show-up-when-passing-a-custom-component-as-trigger
   return popupContent ? (
     <Popup
       content={popupContent}
       size="mini"
       trigger={
-        <Button onClick={updateFilters} size="mini" icon basic={!active} primary={active}>
-          <Icon name="filter" />
-        </Button>
+        <div>
+          <Toggle />
+        </div>
       }
     />
   ) : (
-    <Button onClick={updateFilters} size="mini" icon basic={!active} primary={active}>
-      <Icon name="filter" />
-    </Button>
+    <Toggle />
   )
 }
 

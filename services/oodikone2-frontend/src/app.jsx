@@ -1,14 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-
 import * as Sentry from '@sentry/browser'
 import 'semantic-ui-css/semantic.min.css'
 import 'react-datetime/css/react-datetime.css'
 import './styles/custom.css'
-
+import { debugContextDevtool } from 'react-context-devtool'
 import { BASE_PATH } from './constants'
-
 import store from './store'
 import ErrorBoundary from './components/ErrorBoundary'
 import Main from './components/Main'
@@ -28,6 +26,8 @@ try {
   console.log(e) // eslint-disable-line no-console
 }
 
+const container = document.getElementById('root')
+
 ReactDOM.render(
   <Provider store={store}>
     <CommonContext>
@@ -36,8 +36,11 @@ ReactDOM.render(
       </ErrorBoundary>
     </CommonContext>
   </Provider>,
-  document.getElementById('root')
+  container
 )
+
+// Best not to use this in production as the performance impact appears to be quite high.
+debugContextDevtool(container, { disable: IS_PRODUCTION })
 
 if (module.hot) {
   module.hot.accept()

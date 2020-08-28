@@ -5,6 +5,7 @@ import React, { createContext, useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 
 const FilterTrayContext = createContext([[], () => {}])
+FilterTrayContext.displayName = 'Filter Tray'
 
 export const FilterTrayProvider = ({ children }) => {
   const [state, setState] = useState({})
