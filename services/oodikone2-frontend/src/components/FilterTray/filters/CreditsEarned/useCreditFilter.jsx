@@ -7,6 +7,7 @@ const defaultState = {
 }
 
 const CreditFilterContext = createContext([[], () => {}])
+CreditFilterContext.displayName = 'Credit Filter'
 
 export const CreditFilterProvider = ({ children }) => {
   const [state, setState] = useState(defaultState)

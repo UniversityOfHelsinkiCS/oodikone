@@ -15,6 +15,7 @@ const applyFilters = (filters, allStudents) =>
   Object.values(filters).reduce((students, nextFilter) => students.filter(nextFilter), allStudents)
 
 const FilterContext = createContext([[], () => {}])
+FilterContext.displayName = 'Filters'
 
 export const FilterProvider = ({ children }) => {
   const [state, setState] = useState(defaultState)
