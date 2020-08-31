@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 import { func, object, arrayOf, bool, shape } from 'prop-types'
-import { Header, Message, Accordion, Popup } from 'semantic-ui-react'
+import { Message, Accordion, Popup } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import ReactMarkdown from 'react-markdown'
 import { useLocalStorage } from '../../common/hooks'
@@ -13,6 +13,7 @@ import infoTooltips from '../../common/InfoToolTips'
 import CreditGainStats from './CreditGainStats'
 import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
+import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 
 const PopulationDetails = ({
   samples,
@@ -52,8 +53,6 @@ const PopulationDetails = ({
   }
 
   const renderCreditGainGraphs = () => {
-    const { CreditAccumulationGraph } = infoTooltips.PopulationStatistics
-
     const graphs = (
       <CreditAccumulationGraphHighCharts
         students={samples}
@@ -67,9 +66,7 @@ const PopulationDetails = ({
     )
     return (
       <>
-        <Header>
-          <InfoBox content={CreditAccumulationGraph.Infobox} />
-        </Header>
+        <InfoBox content={info} />
         {samples.length > 0 && graphs}
       </>
     )

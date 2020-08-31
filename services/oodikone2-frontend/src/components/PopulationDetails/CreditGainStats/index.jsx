@@ -1,19 +1,14 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-import { Tab, Header } from 'semantic-ui-react'
-import infotooltips from '../../../common/InfoToolTips'
+import { Tab } from 'semantic-ui-react'
 import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
+import info from '../../../common/markdown/populationStatistics/creditStatistics.info.md'
 import './creditGainStats.css'
-import useFeatureToggle from '../../../common/useFeatureToggle'
-import NewInfoBox from '../../InfoBox/NewInfoBox'
 
 const CreditGainStats = ({ filteredStudents, translate }) => {
-  const [infoBoxToggle] = useFeatureToggle('infoBoxToggle')
-  const { CreditStatistics } = infotooltips.PopulationStatistics
-
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
@@ -34,13 +29,7 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
 
   return (
     <div id="credit-gain-stats">
-      {infoBoxToggle ? (
-        <NewInfoBox title="Informatiivinen otsikko" content={CreditStatistics.Infobox} />
-      ) : (
-        <Header>
-          <InfoBox content={CreditStatistics.Infobox} />
-        </Header>
-      )}
+      <InfoBox content={info} />
       {filteredStudents && (
         <Tab
           onTabChange={handleTabChange}
