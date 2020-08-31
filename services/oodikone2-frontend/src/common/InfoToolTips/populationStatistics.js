@@ -152,14 +152,7 @@ export default {
     `
   },
   CreditStatistics: {
-    AccordionTitle: `**Credit Statistics** Opintopistekertymä-kategoria skaalautuvat valitun tarkastelujakson mukaan. `,
-    Infobox: `Opintopistekertymä-kategoria skaalautuvat valitun tarkastelujakson mukaan. 
-    Jos tarkastelujaksoksi valitsee 12 kuukautta, ylin kategoria on 55 opintopistettä tai yli, 
-    eli opiskelija etenee tavoiteajassa. Taulukosta näkee silmäyksellä tavoiteajassa etenevät (ylin kategoria) 
-    ja myös esim. nollasuorittajat. Huom.! nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, 
-    ellei heitä ole erikseen suodattanut populaatiosta pois. Kategorioita voi myös itsessään käyttää suodattimina, 
-    eli klikkaamalla haluamaansa kategoriaa saa näkyviin vain sen kategorian opiskelijat. 
-    Tämä suodatin löytyy ”Filters” otsikon alta ja sen voi poistaa klikkaamalla mustaa rastia.`
+    AccordionTitle: `**Credit Statistics** Opintopistekertymä-kategoria skaalautuvat valitun tarkastelujakson mukaan. `
   },
   ProgrammeDistributionCustomPopulation: `Näyttää opiskelijan viimeisimmän koulutusohjelman`,
   ProgrammeDistributionCoursePopulation: `Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin`,
