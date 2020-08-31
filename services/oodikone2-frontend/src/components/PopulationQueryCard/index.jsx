@@ -9,7 +9,7 @@ import './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 import { reformatDate, getTextIn } from '../../common'
 import InfoBox from '../InfoBox'
-import infotooltips from '../../common/InfoToolTips'
+import info from '../../common/markdown/populationStatistics/queryCard.info.md'
 
 const PopulationQueryCard = ({ translate, population, query, removeSampleFn, units, language, tags }) => {
   const { uuid, year, semesters, months, studentStatuses, tag, years } = query
@@ -18,42 +18,43 @@ const PopulationQueryCard = ({ translate, population, query, removeSampleFn, uni
   const highestYear = query.years ? Math.max(...query.years.map(year => Number(year))) : null
   const { students } = population
   const header = units.map(u => getTextIn(u.name, language)).join(', ')
-  const { QueryCard } = infotooltips.PopulationStatistics
 
   if (students.length > 0) {
     return (
-      <Card className="cardContainer">
-        <Card.Header className="cardHeader">
-          <div>{header}</div>
-          <InfoBox content={QueryCard} style={{ margin: 'auto' }} />
-        </Card.Header>
-        <Card.Meta>
-          <div className="dateItem">
-            <Icon name="calendar" size="small" />
-            {!years
-              ? `${semesters.map(s => translate(`populationStatistics.${s}`))}/
+      <>
+        <Card className="cardContainer">
+          <Card.Header className="cardHeader">
+            <div>{header}</div>
+          </Card.Header>
+          <Card.Meta>
+            <div className="dateItem">
+              <Icon name="calendar" size="small" />
+              {!years
+                ? `${semesters.map(s => translate(`populationStatistics.${s}`))}/
                 ${year}-${Number(year) + 1}, showing ${months} months.`
-              : `${semesters.map(s => translate(`populationStatistics.${s}`))}/
+                : `${semesters.map(s => translate(`populationStatistics.${s}`))}/
                 started during ${lowestYear}-${highestYear}`}
-          </div>
-          {tag ? <div>{`Tagged with: ${tagname}`}</div> : null}
-          <div>{`${translate('populationStatistics.sampleSize', { amount: students.length })} `}</div>
-          <div>{`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}</div>
-          <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
-          <div>
-            {studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes '}
-            {"students who haven't enrolled present nor absent"}
-          </div>
-          <div>
-            {studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes '}
-            students with non-degree study right
-          </div>
-          <div>
-            {studentStatuses.includes('TRANSFERRED') ? 'Includes ' : 'Excludes '}
-            students who have transferred out of this programme
-          </div>
-        </Card.Meta>
-      </Card>
+            </div>
+            {tag ? <div>{`Tagged with: ${tagname}`}</div> : null}
+            <div>{`${translate('populationStatistics.sampleSize', { amount: students.length })} `}</div>
+            <div>{`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}</div>
+            <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
+            <div>
+              {studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes '}
+              {"students who haven't enrolled present nor absent"}
+            </div>
+            <div>
+              {studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes '}
+              students with non-degree study right
+            </div>
+            <div>
+              {studentStatuses.includes('TRANSFERRED') ? 'Includes ' : 'Excludes '}
+              students who have transferred out of this programme
+            </div>
+          </Card.Meta>
+        </Card>
+        <InfoBox content={info} />
+      </>
     )
   }
   return (
