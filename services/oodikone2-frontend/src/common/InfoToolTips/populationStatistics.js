@@ -1,14 +1,4 @@
 export default {
-  Main: `Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita
-  sisäänotto-lukuvuoden mukaisesti, vuosikurssi kerrallaan. Uudet koulutusohjelmat
-  ovat pääsääntöisesti alkaneet 1.8.2017 joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
-  <br>
-  <br>
-  **Class of:** lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen. <br>
-  **Study programme:** haluttu koulutusohjelma.<br>
-  **Select tag (Optional):** itsetehty tai valmis tägi.<br>
-  **Study track (Optional):** opintosuunta.<br>
-  **Degree (optional):** tutkintotaso.`,
   Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella ilmoittautuneita, haluttu ajanjakso valitaan tästä.
 
   **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat, tutkinnonsuoritusoikeudesta luopuneet ja erillisopinto-oikeudella opiskelevat. Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.`,
