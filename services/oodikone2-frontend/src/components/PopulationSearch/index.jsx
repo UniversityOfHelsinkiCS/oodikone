@@ -8,15 +8,14 @@ import PopulationSearchForm from './PopulationSearchForm'
 import PopulationSearchHistory from './PopulationSearchHistory'
 import ProgressBar from '../ProgressBar'
 import InfoBox from '../InfoBox'
-import infotooltips from '../../common/InfoToolTips'
 import { getUserIsAdmin } from '../../common'
 import useFeatureToggle from '../../common/useFeatureToggle'
 import { useProgress } from '../../common/hooks'
+import info from '../../common/markdown/populationStatistics/search.info.md'
 
 const PopulationSearch = ({ populationFound, history, location, isAdmin, loading, translate }) => {
   const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { onProgress, progress } = useProgress(loading)
-  const { Main } = infotooltips.PopulationStatistics
 
   const title =
     populationFound && history.location.search
@@ -25,10 +24,8 @@ const PopulationSearch = ({ populationFound, history, location, isAdmin, loading
 
   return (
     <Segment>
-      <Header size="medium">
-        {title}
-        {(!populationFound || !history.location.search) && <InfoBox content={Main} />}
-      </Header>
+      <Header size="medium">{title}</Header>
+      {(!populationFound || !history.location.search) && <InfoBox content={info} />}
       <PopulationSearchForm onProgress={onProgress} mandatoryToggle={mandatoryToggle} />
       <Divider />
       {location.search !== '' && !loading && (
