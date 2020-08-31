@@ -77,35 +77,7 @@ export default {
     Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.`
   },
   Students: {
-    AccordionTitle: `**Students** Taulukko joka näyttää informaatiota opiskelijoista.`,
-    Infobox: `**Students:** Taulukko näyttää oletusarvoisesti vain 
-    opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
-    <br> <br>
-    **GENERAL:**
-    Klikkaamalla opiskelijanumeron vieressä olevaa sinistä nuolta, siirtyy "student statistic" näkymään valitun opiskelijan osalta.
-    <br> <br>
-    **credits since start of studyright**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson / populaation ajalta.
-    <br> <br>
-    **all credits:** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, 
-      eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
-    <br> <br>    
-    **transferred from:** opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
-    <br> <br>
-    **studytracks:** opintosuunta
-    <br> <br>
-    **MANDATORY COURSES:**
-    Tällä välilehdellä näkyy, mitä pakollisiksi määriteltyjä kursseja opiskelija on suorittanut. 
-    Kurssit voi määrittää kohdassa "Study program" > "Overview" > haluttu koulutusohjelma. 
-    Scrollatessa kurssitaulukkoa alaspäin, kurssin nimen saa näkyviin viemällä kursorin halutun 
-    solun kohdalle.
-    <br> <br>
-    **Tags:**
-    <br>
-    Opiskelijoille voi luoda tag:eja ryhmittelyä varten kohdassa "Study Program" > "Overview" > haluttu koulutusohjelma.
-    <br> <br>
-    **Download**:  klikkaamalla tätä harmaata kuvaketta, saa ladattua .xlsx tiedoston, 
-    joka sisältää kaikki "General" ja "Mandatory Courses" välilehtien tiedot.
-    `
+    AccordionTitle: `**Students** Taulukko joka näyttää informaatiota opiskelijoista.`
   },
   CoursePopulationStudents: {
     Infobox: `**Students:** harmaata _Show_-painiketta klikkaamalla saa listan kaikista populaation opiskelijoista.

@@ -8,7 +8,7 @@ import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
-import info from '../../common/markdown/populationStatistics/coursesOfPopulation.md'
+import info from '../../common/markdown/populationStatistics/coursesOfPopulation.info.md'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
