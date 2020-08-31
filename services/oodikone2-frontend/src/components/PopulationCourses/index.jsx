@@ -7,8 +7,8 @@ import uuidv4 from 'uuid/v4'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
-import infotooltips from '../../common/InfoToolTips'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
+import info from '../../common/markdown/populationStatistics/coursesOfPopulation.md'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
@@ -24,7 +24,6 @@ const PopulationCourses = ({
     ? populationSelectedStudentCourses
     : populationCourses
 
-  const { CoursesOf } = infotooltips.PopulationStatistics
   const { pending } = selectedPopulationCourses
 
   const makeCourseQueryOpts = () => {
@@ -68,9 +67,7 @@ const PopulationCourses = ({
 
   return (
     <Segment basic>
-      <Header>
-        <InfoBox content={CoursesOf.Infobox} />
-      </Header>
+      <InfoBox content={info} />
       <SegmentDimmer translate={translate} isLoading={pending} />
       <PopulationCourseStats
         key={selectedPopulationCourses.query.uuid}
