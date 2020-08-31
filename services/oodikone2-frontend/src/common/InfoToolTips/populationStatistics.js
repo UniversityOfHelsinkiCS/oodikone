@@ -74,33 +74,7 @@ export default {
   },
   CoursesOf: {
     AccordionTitle: `**Courses of population**
-    Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.`,
-    Infobox: `Courses of population
-    <br> <br>
-    Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.
-    <br> <br>
-    Kurssin nimiää voi käyttää suodattimina, eli klikkaamalla haluamiansa nimiä saa vain näkyviin kyseisten kurssien opiskelijat. Nämä suodatimet löytyvät ”Filters” otsikon alta ja ne voi poistaa klikkaamalla mustaa rastia.
-    <br> <br>
-    Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta siirtyy ”course statistics” 
-    näkymään valitun kurssin osalta.
-    <br> <br>
-    Taulukon tietoja voi suodattaa kohdassa ”limit to courses where student number at least” 
-    kirjoittamalla haluamansa opiskelijalukumäärän kenttään sekä kohdassa ”code (filter here)” 
-    kirjoittamalla haluamansa kurssikoodin alun kenttään ja näkyviin jää esimerkiksi vain 
-    ”MAT”-alkuiset kurssit. Huom.! Nämä suodattimet ovat ”taulukon sisäisiä” suodattimia, 
-    eivätkä siis ilmesty ”Filters” otsikon alle. Suodattimet saa pois tyhjentämällä kentän 
-    kirjoittamistaan merkeistä ja painamalla ENTER.
-    <br> <br>
-    Taulukossa on kolme eri näkymää ”pass/fail”, ”grades” ja ”when passed”.
-    <br> <br>
-    **pass/fail** oletusnäkymä, joka sisältää kurssisuoritukset, hylätyt sekä yritykset. 
-    Taulukon tietoja voi järjestää eri sarakkeita (n, after retry, percentage, many times, 
-    per student, passed ja attempted) klikkaamalla.
-    <br> <br>
-    **grades** arvosanajakauma
-    <br> <br>
-    **when passed** kurssisuorituksen ajankohdan. Huom.! ”passed” sarakkeen kokonaissumma ei välttämättä 
-    täsmää puolivuosi-lukumäärien summan kanssa, johtuen tuplakirjauksista Oodissa.`
+    Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.`
   },
   Students: {
     AccordionTitle: `**Students** Taulukko joka näyttää informaatiota opiskelijoista.`,
