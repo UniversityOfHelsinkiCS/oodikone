@@ -13,7 +13,7 @@ import infoTooltips from '../../common/InfoToolTips'
 import CreditGainStats from './CreditGainStats'
 import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
-import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md';
+import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 
 const PopulationDetails = ({
   samples,
@@ -53,7 +53,6 @@ const PopulationDetails = ({
   }
 
   const renderCreditGainGraphs = () => {
-
     const graphs = (
       <CreditAccumulationGraphHighCharts
         students={samples}
