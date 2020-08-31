@@ -62,15 +62,7 @@ export default {
   },
   CreditAccumulationGraph: {
     AccordionTitle: ` **Credit accumulation graph**
-    Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.`,
-    Infobox: `Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina. Kun
-    hiiren vie kuvaajien päälle, saa näkyviin jokaista kuvaajaa vastaavan opiskelijanumeron. Opiskelijanumeron
-    yhteydessä olevaa ympyrää klikkaamalla siirtyy ”student statistics” puolelle ja näkee valitun opiskelijan
-    opintotiedot.
-    <br>
-    X-akselin skaalaa voi säätää harmaista painikkeista ”1m”, ”3m”, ”6m”, ”YTD”, ”1y” ja ”ALL” tai kuvaajan alla
-    olevan sinisen näkymän harmaita ”kahvoja” siirtämällä. Y-akselin skaalaa voi säätää harmaista painikkeista
-    ”small” ”medium” ja "large”`
+    Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.`
   },
   CoursesOf: {
     AccordionTitle: `**Courses of population**
