@@ -1,17 +1,14 @@
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { Tab } from 'semantic-ui-react'
-import infotooltips from '../../../common/InfoToolTips'
 import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
-import info from '../../../common/markdown/populationStatistics/creditStatistics.info.md';
+import info from '../../../common/markdown/populationStatistics/creditStatistics.info.md'
 import './creditGainStats.css'
 
 const CreditGainStats = ({ filteredStudents, translate }) => {
-  const { CreditStatistics } = infotooltips.PopulationStatistics
-
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
