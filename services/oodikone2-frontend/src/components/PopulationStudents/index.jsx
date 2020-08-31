@@ -28,6 +28,7 @@ import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
+import info from '../../common/markdown/populationStatistics/students.info.md'
 
 // TODO: Refactoring in process, contains lot of duplicate code.
 
@@ -512,7 +513,7 @@ class PopulationStudents extends Component {
           {this.state.admin ? (
             <CheckStudentList students={this.props.filteredStudents.map(stu => stu.studentNumber)} />
           ) : null}
-          <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : Students.Infobox} />
+          <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : info} />
           {this.renderStudentTable()}
         </>
       </Ref>
