@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Message, Icon, Button } from 'semantic-ui-react'
+import ReactMarkdown from 'react-markdown'
 import './infoBox.css'
 
-const InfoBox = ({ content, title }) => {
+const InfoBox = ({ content }) => {
   const [open, setOpen] = useState(false)
   const toggleOpen = () => setOpen(prev => !prev)
 
@@ -12,8 +13,7 @@ const InfoBox = ({ content, title }) => {
       <div className="content-container">
         <Icon name="info circle" size="huge" />
         <Message.Content>
-          {title && <Message.Header>{title}</Message.Header>}
-          {content}
+          <ReactMarkdown source={content} escapeHtml={false} />
         </Message.Content>
       </div>
       <Button onClick={toggleOpen} className="ok-infobox-close">
@@ -29,12 +29,7 @@ const InfoBox = ({ content, title }) => {
 }
 
 InfoBox.propTypes = {
-  content: PropTypes.node.isRequired,
-  title: PropTypes.string
-}
-
-InfoBox.defaultProps = {
-  title: null
+  content: PropTypes.node.isRequired
 }
 
 export default InfoBox
