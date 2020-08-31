@@ -19,7 +19,6 @@ import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import '../PopulationCourseStats/populationCourseStats.css'
 import SortableTable from '../SortableTable'
 import InfoBox from '../InfoBox'
-import infotooltips from '../../common/InfoToolTips'
 import CheckStudentList from './CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
@@ -29,6 +28,7 @@ import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
 import info from '../../common/markdown/populationStatistics/students.info.md'
+import infoForCoursePop from '../../common/markdown/coursePopulation/students.info.md'
 
 // TODO: Refactoring in process, contains lot of duplicate code.
 
@@ -502,7 +502,6 @@ class PopulationStudents extends Component {
   }
 
   render() {
-    const { Students, CoursePopulationStudents } = infotooltips.PopulationStatistics
     if (this.props.samples.length === 0) {
       return null
     }
@@ -513,7 +512,7 @@ class PopulationStudents extends Component {
           {this.state.admin ? (
             <CheckStudentList students={this.props.filteredStudents.map(stu => stu.studentNumber)} />
           ) : null}
-          <InfoBox content={this.props.coursePopulation ? CoursePopulationStudents.Infobox : info} />
+          <InfoBox content={this.props.coursePopulation ? infoForCoursePop : info} />
           {this.renderStudentTable()}
         </>
       </Ref>
