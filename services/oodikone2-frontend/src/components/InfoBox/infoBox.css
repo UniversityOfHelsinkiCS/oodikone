@@ -37,3 +37,21 @@
   border: 1px solid #1ebc30;
   margin: 0;
 }
+
+.ok-infobox.ok-infobox.ok-infobox h1,
+.ok-infobox.ok-infobox.ok-infobox h2,
+.ok-infobox.ok-infobox.ok-infobox h3,
+.ok-infobox.ok-infobox.ok-infobox h4,
+.ok-infobox.ok-infobox.ok-infobox h5,
+.ok-infobox.ok-infobox.ok-infobox h6 {
+  color: #1ebc30;
+}
+
+.ok-infobox.ok-infobox.ok-infobox h1 {
+  font-size: 1.6rem;
+  padding-bottom: 0.4em;
+}
+
+.ok-infobox.ok-infobox.ok-infobox h2 {
+  font-size: 1.3rem;
+}
