@@ -47,7 +47,13 @@ const CumulativeTable = ({ stats, name, alternatives, separate }) => {
               ),
             cellProps: { width: 4 }
           },
-          { key: 'PASSED', title: 'Passed', getRowVal: s => s.cumulative.categories.passed, cellProps: { width: 4 } },
+          {
+            key: 'PASSED',
+            title: 'Passed',
+            // Backend returns duplicates in `s.cumulative` -> use `s.students`.
+            getRowVal: s => Object.values(s.students.grades).reduce((a, b) => a + b, 0),
+            cellProps: { width: 4 }
+          },
           { key: 'FAILED', title: 'Failed', getRowVal: s => s.cumulative.categories.failed, cellProps: { width: 4 } },
           {
             key: 'PASSRATE',
