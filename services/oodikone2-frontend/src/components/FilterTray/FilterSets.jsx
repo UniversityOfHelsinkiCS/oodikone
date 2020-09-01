@@ -39,7 +39,6 @@ export const CoursePopulationFilters = () => {
   return (
     <>
       <Grade />
-      <EnrollmentStatus />
       <Gender />
       <StartYearAtUni />
     </>
