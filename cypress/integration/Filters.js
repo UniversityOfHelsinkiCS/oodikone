@@ -84,7 +84,7 @@ describe("Population Statistics", () => {
     checkFilteringResult(219, true)
   })
 
-  it("Courses filter works", () => {
+  it.only("Courses filter works", () => {
     cy.cs("courseFilter-header").click()
     cy.cs("courseFilter-course-dropdown").click().contains("MAT11002").click()
     checkFilteringResult(82)
