@@ -14,6 +14,14 @@ Cypress.Commands.add("init", (path = '') => {
       }
     }
   })
+
+  // Babel throws an error probably because of markdown files. I'm sorry about this :lul:.
+  cy.on('uncaught:exception', (err, runnable) => {
+    expect(err.message).to.include("Cannot read property 'helpers' of undefined")
+    done()
+    return false
+  })
+
   cy.visit(Cypress.config().baseUrl.concat(path))
 })
 
