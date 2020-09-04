@@ -42,6 +42,14 @@ export default () => {
 
   const setCourses = courses => setState(prev => ({ ...prev, courses }))
 
+  const setCoursesOnce = courses => {
+    if (!state.courses.length) {
+      setState(prev => ({ ...prev, courses }))
+    }
+  }
+
+  const resetCourses = () => setState(prev => ({ ...prev, courses: [] }))
+
   const toggleCourseSelection = courseCode =>
     setState(prev => {
       const course = courses.find(course => course.course.code === courseCode)
@@ -65,6 +73,8 @@ export default () => {
     courses,
     selectedCourses,
     setCourses,
+    setCoursesOnce,
+    resetCourses,
     toggleCourseSelection,
     courseIsSelected,
     runCourseQuery

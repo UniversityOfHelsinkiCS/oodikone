@@ -18,7 +18,7 @@ const PopulationCourses = ({
   query,
   filteredStudents
 }) => {
-  const { setCourses: setCourseFilterData, runCourseQuery } = useCourseFilter()
+  const { setCoursesOnce, resetCourses, runCourseQuery } = useCourseFilter()
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -49,21 +49,27 @@ const PopulationCourses = ({
     }
   }
 
+  /**
+   * These three hooks are required to make navigation work properly (context must be emptied
+   * when unmounting this view.)
+   */
   useEffect(() => {
     if (filteredStudents.length) {
       runCourseQuery(makeCourseQueryOpts())
     }
   }, [filteredStudents])
 
-  // FIXME: Move this to useCourseFilter.jsx
-  const [once, setOnce] = useState(true)
   useEffect(() => {
     const { pending, error, data } = selectedPopulationCourses
-    if (!pending && !error && once) {
-      setCourseFilterData(data.coursestatistics)
-      setOnce(false)
+    if (!pending && !error) {
+      setCoursesOnce(data.coursestatistics)
     }
   }, [selectedPopulationCourses.data])
+
+  // Clear course filter data on unmount.
+  useEffect(() => {
+    return resetCourses
+  }, [])
 
   return (
     <Segment basic>
