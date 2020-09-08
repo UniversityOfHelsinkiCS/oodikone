@@ -305,7 +305,8 @@ const SingleCourseStats = ({
     const years2 = `${years.find(s => s.value === from).text.split('-')[0]}-${
       years.find(s => s.value === to).text.split('-')[1]
     }`
-    const queryObject = { from, to, coursecodes: JSON.stringify(stats), years2, separate: false }
+    const { alternatives } = stats
+    const queryObject = { from, to, coursecodes: JSON.stringify(alternatives), years2, separate: false }
     const searchString = qs.stringify(queryObject)
     history.push(`/coursepopulation?${searchString}`)
   }
