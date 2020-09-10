@@ -37,7 +37,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run test:smoke"
+      "pre-push": "npm run lint"
     }
   },
   "repository": {
