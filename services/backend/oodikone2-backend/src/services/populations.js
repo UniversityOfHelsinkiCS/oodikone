@@ -396,10 +396,10 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   const students = await Studyright.findAll({
-    attributes: ['student_studentnumber'],
+    attributes: ['student_studentnumber', 'studystartdate'],
     include: {
       model: StudyrightElement,
-      attributes: [],
+      attributes: ['startdate'],
       required: true,
       where: {
         code: {
@@ -411,7 +411,7 @@ const studentnumbersWithAllStudyrightElements = async (
         attributes: []
       }
     },
-    group: [sequelize.col('studyright.studyrightid')],
+    group: [sequelize.col('studyright.studyrightid'), sequelize.col('studyright_elements.startdate')],
     where: {
       [Op.or]: [
         {
@@ -420,9 +420,18 @@ const studentnumbersWithAllStudyrightElements = async (
           }
         },
         {
-          ['$studyright_elements.startdate$']: {
-            [Op.between]: [formattedStartDate, endDate]
-          }
+          [Op.or]: [
+            {
+              ['$studyright_elements.startdate$']: {
+                [Op.between]: [formattedStartDate, endDate]
+              }
+            },
+            {
+              ['studystartdate']: {
+                [Op.between]: [formattedStartDate, endDate]
+              }
+            }
+          ]
         }
       ],
       ...studyrightWhere
@@ -431,7 +440,14 @@ const studentnumbersWithAllStudyrightElements = async (
     having: count('studyright_elements.code', studyRights.length, true),
     raw: true
   })
-  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+
+  const filteredStudents = students.filter(s => {
+    const maxDate = Math.max(new Date(s.studystartdate), new Date(s['studyright_elements.startdate']))
+
+    return maxDate > new Date(formattedStartDate) && maxDate < new Date(endDate)
+  })
+
+  const studentnumbers = [...new Set(filteredStudents.map(s => s.student_studentnumber))]
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const allStudytracksForStudents = await StudyrightElement.findAll({
@@ -841,6 +857,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
   bottlenecks.allStudents = allstudentslength
   return bottlenecks
 }
+
+// const optionStatistics = programme => {
+
+// }
 
 module.exports = {
   studentnumbersWithAllStudyrightElements,
