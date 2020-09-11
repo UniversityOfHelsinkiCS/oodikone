@@ -396,10 +396,10 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   const students = await Studyright.findAll({
-    attributes: ['student_studentnumber', 'studystartdate'],
+    attributes: ['student_studentnumber'],
     include: {
       model: StudyrightElement,
-      attributes: ['startdate'],
+      attributes: [],
       required: true,
       where: {
         code: {
@@ -411,7 +411,7 @@ const studentnumbersWithAllStudyrightElements = async (
         attributes: []
       }
     },
-    group: [sequelize.col('studyright.studyrightid'), sequelize.col('studyright_elements.startdate')],
+    group: [sequelize.col('studyright.studyrightid')],
     where: {
       [Op.or]: [
         {
@@ -419,20 +419,16 @@ const studentnumbersWithAllStudyrightElements = async (
             [Op.ne]: 20
           }
         },
-        {
-          [Op.or]: [
-            {
-              ['$studyright_elements.startdate$']: {
-                [Op.between]: [formattedStartDate, endDate]
-              }
-            },
-            {
-              ['studystartdate']: {
-                [Op.between]: [formattedStartDate, endDate]
-              }
-            }
-          ]
-        }
+        sequelize.where(
+          sequelize.fn(
+            'GREATEST',
+            sequelize.col('studyright_elements.startdate'),
+            sequelize.col('studyright.studystartdate')
+          ),
+          {
+            [Op.between]: [formattedStartDate, endDate]
+          }
+        )
       ],
       ...studyrightWhere
     },
@@ -441,13 +437,7 @@ const studentnumbersWithAllStudyrightElements = async (
     raw: true
   })
 
-  const filteredStudents = students.filter(s => {
-    const maxDate = Math.max(new Date(s.studystartdate), new Date(s['studyright_elements.startdate']))
-
-    return maxDate > new Date(formattedStartDate) && maxDate < new Date(endDate)
-  })
-
-  const studentnumbers = [...new Set(filteredStudents.map(s => s.student_studentnumber))]
+  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const allStudytracksForStudents = await StudyrightElement.findAll({
