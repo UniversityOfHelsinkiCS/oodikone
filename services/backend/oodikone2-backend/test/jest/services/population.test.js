@@ -98,6 +98,7 @@ describe('optimizedStatisticsOf tests', () => {
 
   const studyright = {
     studyrightid: 1,
+    studystartdate: new Date('2011-07-31 21:00:00+00'),
     student_studentnumber: student.studentnumber,
     extentcode: studyrightextents.bachelors.extentcode
   }
