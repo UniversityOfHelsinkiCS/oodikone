@@ -2,30 +2,23 @@
 
 [![CircleCI](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master.svg?style=svg)](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master)
 
-An application for analyzing university data. The entire development environment runs inside of a Docker network that's defined in the docker-compose.yml file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
+An application for analyzing university data. The entire development environment runs in a Docker network that's defined in the `docker-compose.yml` file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
 
-## Prerequisites
+## Requirements
 
-Install Docker CE on your machine:
+To run Oodikone locally, you will need the following:
 
-- [Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-- [macOS](https://docs.docker.com/docker-for-mac/install/)
-- [Windows](https://docs.docker.com/docker-for-windows/install/)
-
-Install Docker Compose:
-
-- https://docs.docker.com/compose/install/
+1. [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) running on your system.
+2. Membership of [Toska's Github organisation](https://github.com/UniversityOfHelsinkiCS).
+3. Local clone of this repository.
+4. Run the CLI (see [Installation](#Installation))
 
 ## Installation
 
-Launch the CLI with the command below and follow the instructions.
+Launch the CLI and follow the instructions:
 
-Before running cli [make yourself a deployment key](https://developer.github.com/v3/guides/managing-deploy-keys/#setup-2) for Anonyymioodi private repository and put it in your root folder as private.key. This allows you to download the anonymized dumps from the repository.
-
-Install by running
-
-```
-bash ./scripts/run.sh
+```bash
+./scripts/run.sh
 ```
 
 For local development with anonymized data use `2) Anon setup` (you can run e2e tests with this).
@@ -64,31 +57,31 @@ The mapping of ports and environment variables are also defined in the docker-co
 
 #### With anonymized data:
 
-```
+```bash
 npm start
 ```
 
 #### With real data:
 
-```
+```bash
 npm run start:real
 ```
 
 OR
 
-```
+```bash
 docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml -f ./docker/docker-compose.dev.real.yml up -d
 ```
 
 ### Stop the development environment
 
-```
+```bash
 npm run docker:down
 ```
 
 ### Restart container(s)
 
-```
+```bash
 npm run docker:restart          # all
 
 npm run docker:restart:backend  # just backend
@@ -96,13 +89,13 @@ npm run docker:restart:backend  # just backend
 
 ### View the containers in the running environment
 
-```
+```bash
 docker-compose ps
 ```
 
 ### View logs
 
-```
+```bash
 npm run docker:logs          # all
 
 npm run docker:logs:backend  # just backend
@@ -110,7 +103,7 @@ npm run docker:logs:backend  # just backend
 
 ### Attach a terminal shell to a container
 
-```
+```bash
 docker exec -it backend bash
 
 docker exec -it <container> <command>
@@ -118,7 +111,7 @@ docker exec -it <container> <command>
 
 ### Use `psql` or other database CLI tools
 
-```
+```bash
 docker exec -it -u postgres oodi_db psql -d tkt_oodi
 
 docker exec -it -u <username> <container> psql -d <db name>
@@ -132,7 +125,7 @@ This is how the setup script fetches the database dump from production servers. 
 
 #### Command
 
-```
+```bash
 scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* ./backups/
 
 -r : recursively copy files
@@ -145,18 +138,18 @@ scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki
 >
 > The command below will copy files from a remotePath on server2 directly > into your machine at localPath. Internally the scp request is proxied via > server1.
 >
-> ```
+> ```bash
 > scp -i user2-cert.pem -o ProxyCommand="ssh -i user1-cert.pem -W %h:%p > user1@server1" user2@server2:/<remotePath> <localpath>
 > ```
 >
 > If you use password authentication instead, try with:
 >
-> ```
+> ```bash
 > scp -o ProxyCommand="ssh -W %h:%p user1@server1" > user2@server2:/<remotePath> <localpath>
 > ```
 >
 > If you use the same user credentials in both servers:
 >
-> ```
+> ```bash
 > scp -o ProxyCommand="ssh -W %h:%p commonuser@server1" > commonuser@server2:/<remotePath> <localpath>
 > ```

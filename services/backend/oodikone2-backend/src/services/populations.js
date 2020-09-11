@@ -419,11 +419,16 @@ const studentnumbersWithAllStudyrightElements = async (
             [Op.ne]: 20
           }
         },
-        {
-          ['$studyright_elements.startdate$']: {
+        sequelize.where(
+          sequelize.fn(
+            'GREATEST',
+            sequelize.col('studyright_elements.startdate'),
+            sequelize.col('studyright.studystartdate')
+          ),
+          {
             [Op.between]: [formattedStartDate, endDate]
           }
-        }
+        )
       ],
       ...studyrightWhere
     },
@@ -431,6 +436,7 @@ const studentnumbersWithAllStudyrightElements = async (
     having: count('studyright_elements.code', studyRights.length, true),
     raw: true
   })
+
   const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
@@ -841,6 +847,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
   bottlenecks.allStudents = allstudentslength
   return bottlenecks
 }
+
+// const optionStatistics = programme => {
+
+// }
 
 module.exports = {
   studentnumbersWithAllStudyrightElements,
