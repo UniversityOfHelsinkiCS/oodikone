@@ -21,6 +21,7 @@ const { Tag, TagStudent } = require('../models/models_kone')
 const { getCodeToMainCourseMap, unifyOpenUniversity } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
+const { getAllProgrammes } = require('./studyrights')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -469,6 +470,7 @@ const studentnumbersWithAllStudyrightElements = async (
   })
 
   const studentnumberlist = filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
+
   // fetch students that have transferred out of the programme and filter out these studentnumbers
   if (!transferredStudents) {
     const transferredOutStudents = await Transfers.findAll({
@@ -523,6 +525,40 @@ const parseQueryParams = query => {
     endDate,
     tag
   }
+}
+
+const getBachelorsForStudents = async (students, code) => {
+  const programmes = await getAllProgrammes()
+  const [bachelors] = await sequelize.query(
+    `
+  WITH master AS (
+    SELECT *
+    FROM "studyright" JOIN "studyright_elements" ON studyright.studyrightid = studyright_elements.studyrightid
+    WHERE student_studentnumber IN(:studentnumbers) AND code IN (:codes))
+  SELECT student_studentnumber, code FROM "studyright" JOIN "studyright_elements" ON studyright.studyrightid = studyright_elements.studyrightid
+  WHERE extentcode = 1 AND code IN (:allprogrammes) AND givendate IN (SELECT givendate FROM master) AND student_studentnumber IN (SELECT student_studentnumber FROM master)
+  GROUP BY student_studentnumber, studyright_elements.code
+  `,
+    {
+      replacements: {
+        studentnumbers: students,
+        codes: [code],
+        allprogrammes: programmes.map(p => p.code)
+      }
+    }
+  )
+
+  const concBach = {}
+
+  bachelors.forEach(({ student_studentnumber, code }) => {
+    if (!concBach[student_studentnumber]) {
+      concBach[student_studentnumber] = []
+    }
+
+    concBach[student_studentnumber].push(code)
+  })
+
+  return bachelors
 }
 
 const formatStudentsForApi = async (
@@ -657,6 +693,9 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         nondegreeStudents,
         transferredStudents
       )
+
+  const bachelors = await getBachelorsForStudents(studentnumbers, studyRights[0])
+  console.log(bachelors)
   const { students, credits, extents, semesters, elementdetails, courses } = await getStudentsIncludeCoursesBetween(
     studentnumbers,
     startDate,
