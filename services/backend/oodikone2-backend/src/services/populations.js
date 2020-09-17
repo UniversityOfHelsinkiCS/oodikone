@@ -530,6 +530,7 @@ const parseQueryParams = query => {
 }
 
 const getBachelorsForStudents = async (students, code) => {
+  if (!code || !students.length) return {}
   const programmes = await getAllProgrammes()
 
   const masters = await Studyright.findAll({
