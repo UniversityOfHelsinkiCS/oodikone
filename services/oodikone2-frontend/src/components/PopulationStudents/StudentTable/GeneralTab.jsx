@@ -285,7 +285,7 @@ const GeneralTab = ({
     })
   }
 
-  if (isAdmin)
+  if (queryStudyrights.some(code => code.startsWith('MH')))
     columns.push({
       key: 'bachelorProgramme',
       title: 'Bachelor',
