@@ -54,7 +54,8 @@ const formatStudentForPopulationStatistics = (
     gender_fi,
     gender_sv,
     gender_en,
-    tags
+    tags,
+    bachelor
   },
   credits,
   startDate,
@@ -101,7 +102,8 @@ const formatStudentForPopulationStatistics = (
     updatedAt: updatedAt || createdAt,
     tags: tags || [],
     studyrightStart: startDate,
-    starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]')
+    starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]'),
+    bachelor
   }
 }
 
@@ -529,43 +531,79 @@ const parseQueryParams = query => {
 
 const getBachelorsForStudents = async (students, code) => {
   const programmes = await getAllProgrammes()
-  const [bachelors] = await sequelize.query(
-    `
-  WITH master AS (
-    SELECT *
-    FROM "studyright" JOIN "studyright_elements" ON studyright.studyrightid = studyright_elements.studyrightid
-    WHERE student_studentnumber IN(:studentnumbers) AND code IN (:codes))
-  SELECT student_studentnumber, code FROM "studyright" JOIN "studyright_elements" ON studyright.studyrightid = studyright_elements.studyrightid
-  WHERE extentcode = 1 AND code IN (:allprogrammes) AND givendate IN (SELECT givendate FROM master) AND student_studentnumber IN (SELECT student_studentnumber FROM master)
-  GROUP BY student_studentnumber, studyright_elements.code
-  `,
-    {
-      replacements: {
-        studentnumbers: students,
-        codes: [code],
-        allprogrammes: programmes.map(p => p.code)
+
+  const masters = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          studentnumber: {
+            [Op.in]: students
+          },
+          code: code
+        }
       }
-    }
-  )
-
-  const concBach = {}
-
-  bachelors.forEach(({ student_studentnumber, code }) => {
-    if (!concBach[student_studentnumber]) {
-      concBach[student_studentnumber] = []
-    }
-
-    concBach[student_studentnumber].push(code)
+    ],
+    where: {
+      extentcode: 2,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    attributes: ['student_studentnumber', 'givendate']
   })
+  const mastersMap = masters.reduce((obj, studyright) => {
+    obj[studyright.student_studentnumber] = studyright.givendate
+    return obj
+  }, {})
 
+  const bachelors = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          studentnumber: {
+            [Op.in]: students
+          },
+          code: {
+            [Op.in]: programmes.map(p => p.code)
+          }
+        },
+        include: [
+          {
+            model: ElementDetails,
+            attributes: ['name']
+          }
+        ],
+        attributes: ['code', 'startdate']
+      }
+    ],
+    where: {
+      extentcode: 1,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    order: [[StudyrightElement, 'startdate', 'DESC']],
+    attributes: ['student_studentnumber', 'givendate']
+  })
   return bachelors
+    .filter(b => b.givendate.getTime() === mastersMap[b.student_studentnumber].getTime())
+    .reduce((obj, element) => {
+      obj[element.student_studentnumber] = {
+        code: element.studyright_elements[0].code,
+        name: element.studyright_elements[0].element_detail.name
+      }
+      return obj
+    }, {})
 }
 
 const formatStudentsForApi = async (
   { students, credits, extents, semesters, elementdetails, courses },
   startDate,
   endDate,
-  { studyRights }
+  { studyRights },
+  bachelors
 ) => {
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
@@ -593,6 +631,8 @@ const formatStudentsForApi = async (
         stats.transfers.targets[transfer.targetcode] = target
         stats.transfers.sources[transfer.sourcecode] = source
       })
+      if (student.studentnumber in bachelors) student.bachelor = bachelors[student.studentnumber]
+      else student.bachelor = null
       stats.students.push(
         formatStudentForPopulationStatistics(student, credits, startDate, endDate, startDateMoment, endDateMoment)
       )
@@ -695,7 +735,6 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
       )
 
   const bachelors = await getBachelorsForStudents(studentnumbers, studyRights[0])
-  console.log(bachelors)
   const { students, credits, extents, semesters, elementdetails, courses } = await getStudentsIncludeCoursesBetween(
     studentnumbers,
     startDate,
@@ -708,7 +747,8 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     { students, credits, extents, semesters, elementdetails, courses },
     startDate,
     endDate,
-    formattedQueryParams
+    formattedQueryParams,
+    bachelors
   )
   return formattedStudents
 }
