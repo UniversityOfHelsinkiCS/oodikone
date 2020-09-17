@@ -588,6 +588,7 @@ const getBachelorsForStudents = async (students, code) => {
     attributes: ['student_studentnumber', 'givendate']
   })
   return bachelors
+    .filter(b => b.student_studentnumber in mastersMap)
     .filter(b => b.givendate.getTime() === mastersMap[b.student_studentnumber].getTime())
     .reduce((obj, element) => {
       obj[element.student_studentnumber] = {
