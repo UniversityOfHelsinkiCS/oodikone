@@ -22,6 +22,8 @@ Launch the CLI and follow the instructions:
 ./scripts/run.sh
 ```
 
+*Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary* 😊
+
 For local development with anonymized data use `2) Anon setup` (you can run e2e tests with this).
 
 To get also the full real dataset use `3) Full setup`
@@ -30,19 +32,20 @@ To get also the full real dataset use `3) Full setup`
 
 Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visual browser.
 
-The acual oodikone starts to http://localhost:8081/
+The acual oodikone can be accessed at [http://localhost:8081/](http://localhost:8081/).
 
-On a fresh install, some features do not work because redis is empty.  
-To populate redis, navigate to http://localhost:8081/updater, and press the 'refresh statistics' -button.
+### Populate Redis on Fresh Install
 
-## What the CLI does
+On a fresh install some features do not work because the redis store is empty. To populate redis, navigate to [http://localhost:8081/updater](http://localhost:8081/updater), and click *Refresh Statistics*.
 
-- Builds and runs the Dockerized development environment
-- Gets a database dump from production servers
-- Creates the database schema and populates it with the dump
-- Adds git-hooks
+### What the CLI does
 
-## Docker commands
+- Builds and runs the Dockerized development environment.
+- Downloads a database dump from the production servers.
+- Creates the database schema and populates it with the downloaded dump.
+- Adds git-hooks to run linting on push. (Use `git push --no-verify` to circumvent this behavior.)
+
+## Development Environment
 
 The development environment is entirely configured in the docker-compose.yml file located in this repository. The file defines the containers/environments for:
 
@@ -54,24 +57,20 @@ The development environment is entirely configured in the docker-compose.yml fil
 
 The mapping of ports and environment variables are also defined in the docker-compose file. You can start, stop and manage the development environment by running the following commands from a terminal shell in this directory.
 
+## Usage
+
 ### Start the development environment
 
-#### With anonymized data:
+With anonymized data:
 
 ```bash
 npm start
 ```
 
-#### With real data:
+With real data:
 
 ```bash
 npm run start:real
-```
-
-OR
-
-```bash
-docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml -f ./docker/docker-compose.dev.real.yml up -d
 ```
 
 ### Stop the development environment
@@ -82,10 +81,22 @@ npm run docker:down
 
 ### Restart container(s)
 
-```bash
-npm run docker:restart          # all
+All:
 
-npm run docker:restart:backend  # just backend
+```bash
+npm run docker:restart
+```
+
+Only backend:
+
+```bash
+npm run docker:restart:backend
+```
+
+Only frontend:
+
+```bash
+npm run docker:restart:frontend
 ```
 
 ### View the containers in the running environment
@@ -96,33 +107,79 @@ docker-compose ps
 
 ### View logs
 
-```bash
-npm run docker:logs          # all
+All:
 
-npm run docker:logs:backend  # just backend
+```bash
+npm run docker:logs
+```
+
+Only backend:
+
+```bash
+npm run docker:logs:backend
+```
+
+Only frontend:
+
+```bash
+npm run docker:logs:frontend
 ```
 
 ### Attach a terminal shell to a container
 
 ```bash
-docker exec -it backend bash
-
 docker exec -it <container> <command>
+```
+
+For example:
+
+```bash
+docker exec -it backend bash
 ```
 
 ### Use `psql` or other database CLI tools
 
 ```bash
-docker exec -it -u postgres oodi_db psql -d tkt_oodi
-
 docker exec -it -u <username> <container> psql -d <db name>
+```
+
+For example:
+
+```bash
+docker exec -it -u postgres oodi_db psql -d tkt_oodi
+```
+
+## Testing
+
+Testing is implemented as a combination of unit tests (jest) and end-to-end tests (Cypress). Oodikone must be using the anonymous dataset when running tests (see [Installation](#Installation)).
+
+The test suite is run in CI on every push to `trunk`. Take advantage of this as running the tests can take upwards of 15 minutes.
+
+**Note:** All containers must be up and ready before running tests. (Use `npm start`).
+
+### Run All Tests
+
+```bash
+npm test
+```
+
+### Run End-to-End Tests
+
+```bash
+npm run cypress:run
+```
+
+## Open Cypress GUI
+
+```bash
+npm run cypress:open
 ```
 
 ## Other commands
 
 ### How to `scp` backup files from oodikone via melkki-proxy
 
-This is how the setup script fetches the database dump from production servers. It will require you to have access to both melkki.cs.helsinki.fi as well as oodikone.cs.helsinki.fi. The command uses `scp` to transfer all backup files recursively from a known location on the production server by using the melkki server as a proxy, allowing you to get the dump even when you're not connected to the university network.
+This is how the setup script fetches the database dump from production servers. It will require you to have access to both melkki.cs.helsinki.fi as well as oodikone.cs.helsinki.fi. The command uses `scp` to transfer all backup files recursively from a known location on the production server by using the melkki server as a proxy, allowing you to get the dump even if you are not in the university network.
 
 #### Command
 
