@@ -6,64 +6,60 @@ PS3='Please enter your choice: '
 
 mopo () {
     if [ $(tput cols) -gt "100" ]; then
-        cat assets/mopo2.txt
+        cat scripts/assets/mopo2.txt
     fi
 }
 
 logo () {
-    if [ $(tput cols) -gt "100" ]; then
-        cat assets/logo.txt
+    if [ $(tput cols) -gt "76" ]; then
+        cat scripts/assets/logo.txt
     fi
 }
 
 logo
+cat scripts/assets/welcome.txt
 
 options=(
-    "e2e setup"
-    "Anon setup"
-    "Full setup"
-    "Reset anon db"
-    "Reset real db"
-    "Download latest anon db"
-    "Download latest real db"
-    "Setup SIS data"
-    "Quit"
+    "Set up with anonymous data."
+    "Set up with real data."
+    "Reset anonymous database."
+    "Reset real data database."
+    "Download latest anonynmous data."
+    "Download latest real data."
+    "Setup SIS data."
+    "Quit."
 )
 
 while true; do
     select opt in "${options[@]}"; do
         case $opt in
-            "e2e setup")
-                mopo
-                run_e2e_setup ./docker/docker-compose.lateste2e.yml staging
-                ;;
-            "Anon setup")
+            "Set up with anonymous data.")
                 mopo
                 run_anon_full_setup
                 ;;
-            "Full setup")
+            "Set up with real data.")
                 mopo
                 run_full_setup
                 ;;
-            "Reset anon db")
+            "Reset anonymous database.")
                 reset_db
                 ;;
-            "Reset real db")
+            "Reset real data database.")
                 reset_real_db
                 ;;
-            "Download latest anon db")
+            "Download latest anonynmous data.")
                 get_anon_oodikone
                 ;;
-            "Download latest real db")
+            "Download latest real data.")
                 get_oodikone_server_backup
                 ;;
-            "Setup SIS data")
+            "Setup SIS data.")
                 ./scripts/populate-db.sh
                 ;;
-            "Quit")
+            "Quit.")
                 break 2
                 ;;
-            *) echo "invalid option $REPLY";;
+            *) echo "Invalid option $REPLY";;
         esac
         break
     done
