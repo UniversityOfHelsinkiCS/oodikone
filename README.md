@@ -19,20 +19,12 @@ To run Oodikone locally, you will need the following:
 Launch the CLI and follow the instructions:
 
 ```bash
-./scripts/run.sh
+./oodikone.sh
 ```
 
 *Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary* 😊
 
-For local development with anonymized data use `2) Anon setup` (you can run e2e tests with this).
-
-To get also the full real dataset use `3) Full setup`
-
-> `1) e2e setup` is designed for use in CircleCI. But you can still try it locally if you want to.
-
-Run E2E tests in with `npm run cypress:run` or `npm run cypress:open` with visual browser.
-
-The acual oodikone can be accessed at [http://localhost:8081/](http://localhost:8081/).
+The acual oodikone can be accessed at [http://localhost:8081/](http://localhost:8081/) and Adminer at [http://localhost:5050/](http://localhost:5050/?pgsql=db&username=postgres).
 
 ### Populate Redis on Fresh Install
 
@@ -44,6 +36,14 @@ On a fresh install some features do not work because the redis store is empty. T
 - Downloads a database dump from the production servers.
 - Creates the database schema and populates it with the downloaded dump.
 - Adds git-hooks to run linting on push. (Use `git push --no-verify` to circumvent this behavior.)
+
+### Daily Refresh
+
+It is recommended to run the "morning script" daily when starting work. It prunes Docker, refreshes the repository and rebuilds the containers before starting Oodikone again.
+
+```bash
+./oodikone.sh -m
+```
 
 ## Development Environment
 
