@@ -129,7 +129,7 @@ install_cli_npm_packages () {
 }
 
 show_instructions () {
-    cat ./assets/instructions.txt
+    cat ./scripts/assets/instructions.txt
 }
 
 run_full_setup () {
