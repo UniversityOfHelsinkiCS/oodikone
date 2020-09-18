@@ -26,4 +26,3 @@ services/updater_api/debug.log
 services/backend/updater_writer/dumps
 debug.log
 programme_module_dump.sql
-morning.sh

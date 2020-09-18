@@ -129,7 +129,7 @@ install_cli_npm_packages () {
 }
 
 show_instructions () {
-    cat ./assets/instructions.txt
+    cat ./scripts/assets/instructions.txt
 }
 
 run_full_setup () {
@@ -174,20 +174,4 @@ run_anon_full_setup () {
     if [[ ! -z anon_data_error ]] ; then
         tput setaf 1; echo "$anon_data_error"; tput sgr0
     fi
-}
-
-run_e2e_setup () {
-    echo "Setup npm packages"
-    install_cli_npm_packages
-    echo "Init dirs"
-    init_dirs
-    echo "Getting anon backups from the private repository. "
-    get_anon_oodikone
-    echo "Building images"
-    TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 build
-    echo "Setup oodikone db from dump."
-    TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 up -d db user_db db_kone analytics_db
-    db_anon_setup_full
-    echo "Starting services."
-    TAG=$2 SENTRY_RELEASE_VERSION=$3 docker-compose -f docker-compose.yml -f $1 up -d
 }
