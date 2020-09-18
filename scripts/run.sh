@@ -20,7 +20,6 @@ logo
 cat scripts/assets/welcome.txt
 
 options=(
-    "e2e setup"
     "Anon setup"
     "Full setup"
     "Reset anon DB"
@@ -34,10 +33,6 @@ options=(
 while true; do
     select opt in "${options[@]}"; do
         case $opt in
-            "e2e setup")
-                mopo
-                run_e2e_setup ./docker/docker-compose.lateste2e.yml staging
-                ;;
             "Anon setup")
                 mopo
                 run_anon_full_setup
