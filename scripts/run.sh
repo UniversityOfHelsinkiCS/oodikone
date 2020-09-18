@@ -6,26 +6,27 @@ PS3='Please enter your choice: '
 
 mopo () {
     if [ $(tput cols) -gt "100" ]; then
-        cat assets/mopo2.txt
+        cat scripts/assets/mopo2.txt
     fi
 }
 
 logo () {
-    if [ $(tput cols) -gt "100" ]; then
-        cat assets/logo.txt
+    if [ $(tput cols) -gt "76" ]; then
+        cat scripts/assets/logo.txt
     fi
 }
 
 logo
+cat scripts/assets/welcome.txt
 
 options=(
     "e2e setup"
     "Anon setup"
     "Full setup"
-    "Reset anon db"
-    "Reset real db"
-    "Download latest anon db"
-    "Download latest real db"
+    "Reset anon DB"
+    "Reset real DB"
+    "Download latest anon DB"
+    "Download latest real DB"
     "Setup SIS data"
     "Quit"
 )
@@ -45,16 +46,16 @@ while true; do
                 mopo
                 run_full_setup
                 ;;
-            "Reset anon db")
+            "Reset anon DB")
                 reset_db
                 ;;
-            "Reset real db")
+            "Reset real DB")
                 reset_real_db
                 ;;
-            "Download latest anon db")
+            "Download latest anon DB")
                 get_anon_oodikone
                 ;;
-            "Download latest real db")
+            "Download latest real DB")
                 get_oodikone_server_backup
                 ;;
             "Setup SIS data")
@@ -63,7 +64,7 @@ while true; do
             "Quit")
                 break 2
                 ;;
-            *) echo "invalid option $REPLY";;
+            *) echo "Invalid option $REPLY";;
         esac
         break
     done
