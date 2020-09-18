@@ -9,9 +9,10 @@ An application for analyzing university data. The entire development environment
 To run Oodikone locally, you will need the following:
 
 1. [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) running on your system.
-2. Membership of [Toska's Github organisation](https://github.com/UniversityOfHelsinkiCS).
-3. Local clone of this repository.
-4. Run the CLI (see [Installation](#Installation))
+2. Membership of [Toska's GitHub organisation](https://github.com/UniversityOfHelsinkiCS).
+3. SSH key set up for GitHub (see [docs](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh)).
+4. Local clone of this repository.
+5. Run the CLI (see [Installation](#Installation))
 
 ## Installation
 

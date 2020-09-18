@@ -284,6 +284,14 @@ const GeneralTab = ({
       getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
     })
   }
+
+  if (queryStudyrights.some(code => code.startsWith('MH')))
+    columns.push({
+      key: 'bachelorProgramme',
+      title: 'Bachelor',
+      getRowVal: s => (s.bachelor ? getTextIn(s.bachelor.name, language) : '')
+    })
+
   if (showNames) {
     columns.push(
       {
