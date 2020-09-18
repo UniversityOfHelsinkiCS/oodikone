@@ -43,16 +43,8 @@ get_oodikone_server_backup() {
 }
 
 get_anon_oodikone() {
-    file=./private.key
-    if [ -e "$file" ]; then
-      echo "Private key exists"
-    else
-      echo "No private key, echoing from environment variable OODI_KEY"
-      echo "$OODI_KEY" | awk  '{gsub("\\\\n","\n")};1' > private.key
-      chmod 400 private.key
-    fi
     rm -rf anonyymioodi
-    GIT_SSH_COMMAND='ssh -i private.key' git clone --depth=1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
+    git clone --depth=1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
 }
 
 restore_psql_from_backup () {
