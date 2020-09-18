@@ -20,43 +20,43 @@ logo
 cat scripts/assets/welcome.txt
 
 options=(
-    "Anon setup"
-    "Full setup"
-    "Reset anon DB"
-    "Reset real DB"
-    "Download latest anon DB"
-    "Download latest real DB"
-    "Setup SIS data"
-    "Quit"
+    "Set up with anonymous data."
+    "Set up with real data."
+    "Reset anonymous database."
+    "Reset real data database."
+    "Download latest anonynmous data."
+    "Download latest real data."
+    "Setup SIS data."
+    "Quit."
 )
 
 while true; do
     select opt in "${options[@]}"; do
         case $opt in
-            "Anon setup")
+            "Set up with anonymous data.")
                 mopo
                 run_anon_full_setup
                 ;;
-            "Full setup")
+            "Set up with real data.")
                 mopo
                 run_full_setup
                 ;;
-            "Reset anon DB")
+            "Reset anonymous database.")
                 reset_db
                 ;;
-            "Reset real DB")
+            "Reset real data database.")
                 reset_real_db
                 ;;
-            "Download latest anon DB")
+            "Download latest anonynmous data.")
                 get_anon_oodikone
                 ;;
-            "Download latest real DB")
+            "Download latest real data.")
                 get_oodikone_server_backup
                 ;;
-            "Setup SIS data")
+            "Setup SIS data.")
                 ./scripts/populate-db.sh
                 ;;
-            "Quit")
+            "Quit.")
                 break 2
                 ;;
             *) echo "Invalid option $REPLY";;

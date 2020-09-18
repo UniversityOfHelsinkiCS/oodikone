@@ -1,8 +1,8 @@
   Welcome to Oodikone CLI!
 
 This tool helps you in managing the project configuration. If you are new to
-Oodikone development, you should probably run "Anon setup" which will take care
-of setting up and starting Oodikone for you.
+Oodikone development, you should probably run "Set up with anonymous data"
+which will take care of setting up and starting Oodikone for you.
 
 Please use the anonymous data whenever possible!
 
