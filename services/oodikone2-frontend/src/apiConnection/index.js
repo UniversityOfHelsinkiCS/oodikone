@@ -125,8 +125,47 @@ export const handleRequest = store => next => async action => {
   if (requestSettings) {
     const { route, method, data, prefix, query, params, onProgress } = requestSettings
     try {
-      const res = await callApi(route, method, data, params, 0, onProgress)
-      store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
+      if (prefix === 'GET_STUDYPROGRAMME_BACHELORS_') {
+        store.dispatch({
+          type: `${prefix}SUCCESS`,
+          response: {
+            MH50_009: {
+              data: [
+                {
+                  year: 2017,
+                  bachelors: [
+                    {
+                      name: 'Matematiikan koulutusohjelma',
+                      amount: 34
+                    },
+                    {
+                      name: 'Maantieteen koulutusohjelma',
+                      amount: 3
+                    }
+                  ]
+                },
+                {
+                  year: 2018,
+                  bachelors: [
+                    {
+                      name: 'Matematiikan koulutusohjelma',
+                      amount: 41
+                    },
+                    {
+                      name: 'Maantieteen koulutusohjelma',
+                      amount: 5
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          query
+        })
+      } else {
+        const res = await callApi(route, method, data, params, 0, onProgress)
+        store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
+      }
     } catch (e) {
       // handle stale Shibboleth session by reloading frontend
       if (e.message.toLowerCase() === 'network error') {

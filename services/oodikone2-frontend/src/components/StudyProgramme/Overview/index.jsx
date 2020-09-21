@@ -3,16 +3,28 @@ import { string, func, shape, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import ProductivityTable from '../ProductivityTable'
 import ThroughputTable from '../ThroughputTable'
+import BachelorsTable from '../BachelorsTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
+import { getBachelors } from '../../../redux/studyProgrammeBachelors'
 import { isNewHYStudyProgramme } from '../../../common'
 
 const Overview = props => {
-  const { productivity, throughput, studyprogramme, dispatchGetProductivity, dispatchGetThroughput, history } = props
+  const {
+    productivity,
+    throughput,
+    bachelors,
+    studyprogramme,
+    dispatchGetProductivity,
+    dispatchGetThroughput,
+    dispatchGetBachelors,
+    history
+  } = props
 
   useEffect(() => {
     dispatchGetProductivity(studyprogramme)
     dispatchGetThroughput(studyprogramme)
+    dispatchGetBachelors(studyprogramme)
   }, [])
   return (
     <React.Fragment>
@@ -33,6 +45,7 @@ const Overview = props => {
         showCredits={isNewHYStudyProgramme(studyprogramme)}
         newProgramme={isNewHYStudyProgramme(studyprogramme)}
       />
+      <BachelorsTable bachelors={bachelors.data[studyprogramme]} loading={throughput.pending} />
     </React.Fragment>
   )
 }
@@ -41,6 +54,7 @@ Overview.propTypes = {
   studyprogramme: string.isRequired,
   dispatchGetProductivity: func.isRequired,
   dispatchGetThroughput: func.isRequired,
+  dispatchGetBachelors: func.isRequired,
   history: shape({}).isRequired,
   productivity: shape({
     error: bool,
@@ -51,18 +65,25 @@ Overview.propTypes = {
     error: bool,
     pending: bool,
     data: shape({})
+  }).isRequired, // eslint-disable-line
+  bachelors: shape({
+    error: bool,
+    pending: bool,
+    data: shape({})
   }).isRequired // eslint-disable-line
 }
 
-const mapStateToProps = ({ studyProgrammeProductivity, studyProgrammeThroughput }) => ({
+const mapStateToProps = ({ studyProgrammeProductivity, studyProgrammeThroughput, studyProgrammeBachelors }) => ({
   productivity: studyProgrammeProductivity,
-  throughput: studyProgrammeThroughput
+  throughput: studyProgrammeThroughput,
+  bachelors: studyProgrammeBachelors
 })
 
 export default connect(
   mapStateToProps,
   {
     dispatchGetProductivity: getProductivity,
-    dispatchGetThroughput: getThroughput
+    dispatchGetThroughput: getThroughput,
+    dispatchGetBachelors: getBachelors
   }
 )(Overview)
