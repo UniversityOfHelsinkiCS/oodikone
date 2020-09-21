@@ -285,11 +285,11 @@ const GeneralTab = ({
     })
   }
 
-  if (queryStudyrights.some(code => code.startsWith('MH')))
+  if (queryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH')))
     columns.push({
-      key: 'bachelorProgramme',
-      title: 'Bachelor',
-      getRowVal: s => (s.bachelor ? getTextIn(s.bachelor.name, language) : '')
+      key: 'option',
+      title: queryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
+      getRowVal: s => (s.option ? getTextIn(s.option.name, language) : '')
     })
 
   if (showNames) {
