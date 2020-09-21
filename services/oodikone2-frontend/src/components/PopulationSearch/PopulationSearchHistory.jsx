@@ -7,15 +7,14 @@ import moment from 'moment'
 import qs from 'query-string'
 import Datetime from 'react-datetime'
 import { get as lodashGet } from 'lodash'
-
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation, updatePopulationStudents } from '../../redux/populations'
 import TSA from '../../common/tsa'
-
 import './populationSearch.css'
 import infotooltips from '../../common/InfoToolTips'
 import { getTextIn } from '../../common'
 import InfoBox from '../InfoBox'
+import info from '../../common/markdown/populationStatistics/queryCard.info.md'
 
 const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
   // hack: I wanna use useEffect because it's handy but PopulationSearchHistory is not a function component
@@ -272,17 +271,18 @@ class PopulationSearchHistory extends Component {
     }
     const studentNumberList = populations.data.students.map(s => s.studentNumber)
     const { programme: programmeCode, degree: degreeCode, studyTrack: studyTrackCode } = populations.query.studyRights
+
+    // I'm sorry about the awful layout fix but we are going to rework this whole area from ground up, so no point in wasting more time now.
     return (
-      <React.Fragment>
-        <PopulationsQueryTSA programmeCode={programmeCode} unitData={units.data} />
-        <Form.Group inline style={{ marginRight: '100px' }}>
+      <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+        <div>
+          <PopulationsQueryTSA programmeCode={programmeCode} unitData={units.data} />
           <PopulationQueryCard
             key={`population-${populations.query.uuid}`}
             translate={translate}
             population={populations.data}
             query={populations.query}
             queryId={0}
-            unit={units.data.programmes[programmeCode]} // Possibly deprecated
             units={[
               units.data.programmes[programmeCode],
               units.data.degrees[degreeCode],
@@ -293,25 +293,28 @@ class PopulationSearchHistory extends Component {
             updating={populations.updating}
             tags={tags}
           />
-        </Form.Group>
-        <Form.Group>
-          <Form.Field style={{ margin: 'auto' }}>
-            <b>
-              Advanced settings
-              {showAdvancedSettings ? <InfoBox content={Advanced} /> : null}
-            </b>
-            <Form.Radio
-              data-cy="advanced-toggle"
-              toggle
-              checked={showAdvancedSettings}
-              onClick={() => {
-                this.setState({ showAdvancedSettings: !showAdvancedSettings })
-              }}
-            />
-          </Form.Field>
-          {this.renderAdvancedSettingsSelector()}
-        </Form.Group>
-      </React.Fragment>
+          <div style={{ marginLeft: '5px', marginTop: '15px' }}>
+            <InfoBox content={info} />
+          </div>
+        </div>
+        <div style={{ marginLeft: '100px' }}>
+          <Form.Group>
+            <Form.Field>
+              <Form.Radio
+                data-cy="advanced-toggle"
+                toggle
+                checked={showAdvancedSettings}
+                onClick={() => {
+                  this.setState({ showAdvancedSettings: !showAdvancedSettings })
+                }}
+                label="Advanced settings"
+              />
+            </Form.Field>
+          </Form.Group>
+          <div>{this.renderAdvancedSettingsSelector()}</div>
+          <div>{showAdvancedSettings && <InfoBox content={Advanced} />}</div>
+        </div>
+      </div>
     )
   }
 

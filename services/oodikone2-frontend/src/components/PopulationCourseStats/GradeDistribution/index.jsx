@@ -135,8 +135,8 @@ const GradeDistribution = () => {
     <Table celled sortable className="fixed-header">
       <Table.Header>
         <Table.Row>
-          {filterInput('nameFilter', 'populationCourses.name', '3')}
-          {filterInput('codeFilter', 'populationCourses.code')}
+          {filterInput('nameFilter', 'Name', '3')}
+          {filterInput('codeFilter', 'Code')}
 
           <SortableHeaderCell
             content="Attempts"
