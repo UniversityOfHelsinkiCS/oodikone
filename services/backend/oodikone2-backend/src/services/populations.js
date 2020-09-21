@@ -808,7 +808,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         transferredStudents
       )
   // wtf
-  const code = studyRights[0]
+  const code = studyRights[0] || ''
   let optionData = {}
   if (code.includes('MH')) {
     optionData = await getBachelorsForStudents(studentnumbers, code)
