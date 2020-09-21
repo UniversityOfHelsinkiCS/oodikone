@@ -9,6 +9,8 @@ const ping = async () => {
 }
 
 const getProductivity = async id => {
+  console.log(ANALYTICS_URL)
+
   const response = await client.get(`/productivity/${id}`)
   return response.data
 }

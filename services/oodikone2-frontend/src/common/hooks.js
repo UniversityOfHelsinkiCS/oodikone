@@ -281,3 +281,9 @@ export const useLanguage = () => {
   const { language } = useSelector(({ settings }) => settings)
   return language
 }
+
+export const useIsAdmin = () => {
+  const { roles } = useSelector(({ auth }) => auth.token)
+  if (!roles) return false
+  return roles.some(role => role.group_code === 'admin')
+}

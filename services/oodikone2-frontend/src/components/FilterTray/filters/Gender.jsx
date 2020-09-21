@@ -1,24 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { Form, Dropdown } from 'semantic-ui-react'
-import { getTranslate } from 'react-localize-redux'
-import { connect } from 'react-redux'
 import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 
-const Gender = ({ translate }) => {
+export default () => {
   const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
   const analytics = useAnalytics()
   const [value, setValue] = useState(null)
   const name = 'genderFilter'
 
   const genderCodes = {
-    female: { label: translate('genderFilter.female'), value: 2 },
-    male: { label: translate('genderFilter.male'), value: 1 },
-    other: { label: translate('genderFilter.other'), value: 9 },
-    unknown: { label: translate('genderFilter.unknown'), value: 0 }
+    female: { label: 'Female', value: 2 },
+    male: { label: 'Male', value: 1 },
+    other: { label: 'Other', value: 9 },
+    unknown: { label: 'Unknown', value: 0 }
   }
 
   useEffect(() => {
@@ -47,7 +44,7 @@ const Gender = ({ translate }) => {
 
   return (
     <FilterCard
-      title={translate('genderFilter.title')}
+      title="Gender"
       contextKey="genderFilter"
       footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} name={name} />}
       active={Object.keys(activeFilters).includes(name)}
@@ -59,7 +56,7 @@ const Gender = ({ translate }) => {
             options={options}
             value={value}
             onChange={(_, { value: inputValue }) => setValue(inputValue)}
-            placeholder={translate('genderFilter.dropdownLabel')}
+            placeholder="Choose Gender"
             className="mini"
             selection
             fluid
@@ -71,11 +68,3 @@ const Gender = ({ translate }) => {
     </FilterCard>
   )
 }
-
-Gender.propTypes = {
-  translate: PropTypes.func.isRequired
-}
-
-const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
-
-export default connect(mapStateToProps)(Gender)

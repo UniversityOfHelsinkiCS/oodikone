@@ -2,8 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Card, Header, Icon, Label, Popup } from 'semantic-ui-react'
 import './filterTray.css'
-import { getTranslate } from 'react-localize-redux'
-import { connect } from 'react-redux'
 import Sidebar from '../Sidebar'
 import useFilterTray from './useFilterTray'
 import useFilters from './useFilters'
@@ -11,7 +9,7 @@ import useAnalytics from './useAnalytics'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ children, translate, filterSet, visible }) => {
+const FilterTray = ({ children, filterSet, visible }) => {
   const [open, setOpen] = useFilterTray(contextKey)
   const { allStudents, activeFilters } = useFilters()
   const analytics = useAnalytics()
@@ -39,10 +37,10 @@ const FilterTray = ({ children, translate, filterSet, visible }) => {
           <div id="filter-tray-container">
             <Header size="medium">
               <Header.Content>
-                {translate('filters.trayTitle')}
+                Filters
                 {noFilters > 0 && (
                   <Popup
-                    content={translate('filters.filterCountTooltip')}
+                    content="Number of active filters."
                     position="bottom center"
                     pinned
                     size="mini"
@@ -67,7 +65,7 @@ const FilterTray = ({ children, translate, filterSet, visible }) => {
           <div className="filter-tray-toggle inline-toggle" style={{ visibility: open ? 'visible' : 'hidden' }}>
             <Button secondary onClick={closeTray} data-cy="filter-toggle-close">
               <Icon name="angle double up" />
-              <div className="button-label">{translate('filters.trayClose')}</div>
+              <div className="button-label">Close Filters</div>
               <Icon name="angle double up" />
             </Button>
           </div>
@@ -78,10 +76,10 @@ const FilterTray = ({ children, translate, filterSet, visible }) => {
         <Button secondary onClick={openTray} data-cy="filter-toggle-open">
           <Icon name="angle double down" />
           <div className="button-label">
-            {translate('filters.trayOpen')}
+            Filters
             {noFilters > 0 && (
               <Popup
-                content={translate('filters.filterCountTooltip')}
+                content="Number of active filters."
                 position="right center"
                 pinned
                 size="mini"
@@ -109,7 +107,6 @@ const FilterTray = ({ children, translate, filterSet, visible }) => {
 
 FilterTray.propTypes = {
   children: PropTypes.node.isRequired,
-  translate: PropTypes.func.isRequired,
   filterSet: PropTypes.node.isRequired,
   visible: PropTypes.bool
 }
@@ -118,6 +115,4 @@ FilterTray.defaultProps = {
   visible: true
 }
 
-const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
-
-export default connect(mapStateToProps)(FilterTray)
+export default FilterTray

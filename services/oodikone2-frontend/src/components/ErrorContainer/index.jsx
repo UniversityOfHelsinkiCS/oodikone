@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { arrayOf, func, object } from 'prop-types'
-import { getTranslate } from 'react-localize-redux'
+import { arrayOf, object } from 'prop-types'
 
 import ErrorMessage from '../ErrorMessage'
 
@@ -15,15 +14,13 @@ const ErrorContainer = props => {
       message={error.error}
       url={error.url}
       uuid={error.uuid}
-      translate={props.translate}
     />
   ))
   return <div className="segmentContainer">{errors}</div>
 }
 
-const mapStateToProps = ({ errors, localize }) => ({
-  errors: errors.length ? errors : [],
-  translate: getTranslate(localize)
+const mapStateToProps = ({ errors }) => ({
+  errors: errors.length ? errors : []
 })
 
 ErrorContainer.defaultProps = {
@@ -31,8 +28,7 @@ ErrorContainer.defaultProps = {
 }
 
 ErrorContainer.propTypes = {
-  errors: arrayOf(object),
-  translate: func.isRequired
+  errors: arrayOf(object)
 }
 
 export default connect(mapStateToProps)(ErrorContainer)
