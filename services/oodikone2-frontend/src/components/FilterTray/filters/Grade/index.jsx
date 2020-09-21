@@ -1,10 +1,7 @@
 // FIXME: Remove when feature is ready.
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { Form, Checkbox } from 'semantic-ui-react'
-import { connect } from 'react-redux'
-import { getTranslate } from 'react-localize-redux'
 import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
 import FilterCard from '../common/FilterCard'
@@ -17,7 +14,7 @@ export const contextKey = 'gradeFilter'
  * Grade filter.
  * Only applicable to a single course.
  */
-const Grade = ({ translate }) => {
+export default () => {
   const { addFilter, removeFilter, activeFilters } = useFilters()
   const { value, setValue, grades } = useGradeFilter()
   const analytics = useAnalytics()
@@ -46,7 +43,7 @@ const Grade = ({ translate }) => {
 
   return (
     <FilterCard
-      title={translate('gradeFilter.title')}
+      title="Grade"
       contextKey={contextKey}
       footer={<ClearFilterButton disabled={!value.length} onClick={() => setValue([])} name={name} />}
       active={Object.keys(activeFilters).includes(name)}
@@ -73,11 +70,3 @@ const Grade = ({ translate }) => {
     </FilterCard>
   )
 }
-
-Grade.propTypes = {
-  translate: PropTypes.func.isRequired
-}
-
-const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
-
-export default connect(mapStateToProps)(Grade)

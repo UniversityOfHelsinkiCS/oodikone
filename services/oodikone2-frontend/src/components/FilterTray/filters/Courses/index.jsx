@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { getActiveLanguage, getTranslate } from 'react-localize-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
@@ -14,7 +14,7 @@ import useAnalytics from '../../useAnalytics'
 
 export const contextKey = 'coursesFilter'
 
-const Courses = ({ language, translate }) => {
+const Courses = ({ language }) => {
   const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
   const { filteredStudents } = useFilters()
   const analytics = useAnalytics()
@@ -48,7 +48,7 @@ const Courses = ({ language, translate }) => {
     >
       <DropdownWithUnfuckedPlaceholder
         options={options}
-        placeholder={translate('courseFilter.courseSelectorLabel')}
+        placeholder="Select Course to Filter By"
         className="course-filter-selection"
         onChange={onChange}
         name={name}
@@ -63,13 +63,11 @@ const Courses = ({ language, translate }) => {
 }
 
 Courses.propTypes = {
-  language: PropTypes.string.isRequired,
-  translate: PropTypes.func.isRequired
+  language: PropTypes.string.isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({
-  language: getActiveLanguage(localize).code,
-  translate: getTranslate(localize)
+  language: getActiveLanguage(localize).code
 })
 
 export default connect(mapStateToProps)(Courses)
