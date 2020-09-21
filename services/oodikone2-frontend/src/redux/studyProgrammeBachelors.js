@@ -4,7 +4,7 @@ import listreducer from './common/listreducer'
 const prefix = 'GET_STUDYPROGRAMME_BACHELORS_'
 
 export const getBachelors = studyprogrammeId => {
-  const route = `v2/studyprogrammes/${studyprogrammeId}/bachelors`
+  const route = `v2/studyprogrammes/${studyprogrammeId}/optiondata`
   return callController(route, prefix, [], 'get')
 }
 

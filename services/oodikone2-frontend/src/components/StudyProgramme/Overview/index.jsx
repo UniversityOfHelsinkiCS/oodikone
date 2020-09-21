@@ -8,6 +8,7 @@ import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
 import { getBachelors } from '../../../redux/studyProgrammeBachelors'
 import { isNewHYStudyProgramme } from '../../../common'
+import { useIsAdmin } from '../../../common/hooks'
 
 const Overview = props => {
   const {
@@ -21,10 +22,12 @@ const Overview = props => {
     history
   } = props
 
+  const isAdmin = useIsAdmin()
+
   useEffect(() => {
     dispatchGetProductivity(studyprogramme)
     dispatchGetThroughput(studyprogramme)
-    dispatchGetBachelors(studyprogramme)
+    if (isAdmin) dispatchGetBachelors(studyprogramme)
   }, [])
   return (
     <React.Fragment>
@@ -45,7 +48,7 @@ const Overview = props => {
         showCredits={isNewHYStudyProgramme(studyprogramme)}
         newProgramme={isNewHYStudyProgramme(studyprogramme)}
       />
-      <BachelorsTable bachelors={bachelors.data[studyprogramme]} loading={throughput.pending} />
+      {isAdmin && <BachelorsTable bachelors={bachelors.data} loading={throughput.pending} />}
     </React.Fragment>
   )
 }

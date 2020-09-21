@@ -12,7 +12,7 @@ const {
   ElementDetails,
   Transfers
 } = require('../models')
-const { getAssociations } = require('./studyrights')
+const { getAssociations, getAllProgrammes } = require('./studyrights')
 const { ThesisCourse, ThesisTypeEnums } = require('../models/models_kone')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
@@ -517,6 +517,89 @@ const startedStudyright = async (studentnumbers, startDate, studytrack, endDate)
   })
 }
 
+const bachelorData = async (startDate, endDate, code) => {
+  const programmes = await getAllProgrammes()
+
+  const masters = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          code: code
+        }
+      }
+    ],
+    where: {
+      extentcode: 2,
+      studystartdate: {
+        [Op.between]: [startDate, endDate]
+      }
+    },
+    attributes: ['student_studentnumber', 'givendate', 'studystartdate']
+  })
+  const mastersMap = masters.reduce((obj, studyright) => {
+    obj[studyright.student_studentnumber] = { givendate: studyright.givendate, startdate: studyright.studystartdate }
+    return obj
+  }, {})
+
+  const students = masters.map(m => m.student_studentnumber)
+
+  const bachelors = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          studentnumber: {
+            [Op.in]: students
+          },
+          code: {
+            [Op.in]: programmes.map(p => p.code)
+          }
+        },
+        include: [
+          {
+            model: ElementDetails,
+            attributes: ['name']
+          }
+        ],
+        attributes: ['code']
+      }
+    ],
+    where: {
+      extentcode: 1,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    attributes: ['student_studentnumber', 'startdate', 'givendate']
+  })
+
+  const data = {}
+  const years = new Set()
+
+  bachelors
+    .filter(b => b.student_studentnumber in mastersMap)
+    .filter(b => b.givendate.getTime() === mastersMap[b.student_studentnumber].givendate.getTime())
+    .forEach(b => {
+      const date = mastersMap[b.student_studentnumber].startdate
+      const year = date.getMonth() > 8 ? date.getFullYear() - 1 : date.getFullYear()
+      years.add(year)
+      const code = b.studyright_elements[0].code
+      if (!data[code]) {
+        data[code] = {}
+        data[code].name = b.studyright_elements[0].element_detail.name
+        data[code].total = 0
+      }
+      if (!data[code][year]) {
+        data[code][year] = 0
+      }
+      data[code][year] += 1
+      data[code].total += 1
+    })
+
+  return { data, years: Array.from(years).sort() }
+}
+
 const statsForClass = async (studentnumbers, startDate, studyprogramme, endDate) => {
   return Promise.all([
     creditsAfter(studentnumbers, startDate),
@@ -796,5 +879,6 @@ module.exports = {
   throughputStatsForStudytrack,
   findProgrammeThesisCredits,
   thesisProductivityFromCredits,
-  thesisProductivityForStudytrack
+  thesisProductivityForStudytrack,
+  bachelorData
 }

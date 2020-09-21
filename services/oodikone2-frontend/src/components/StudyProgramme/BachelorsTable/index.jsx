@@ -16,27 +16,33 @@ const BachelorsTable = ({ bachelors, loading }) => (
     </Header>
     <div>Statistics from n+1 years</div>
     <Segment basic loading={loading} style={{ overflowX: 'auto' }}>
-      <Table selectable>
-        {bachelors && bachelors.data
-          ? bachelors.data.map(item => (
-              <>
-                <Table.Header>
-                  <Table.Row>
-                    <Table.HeaderCell>{item.year}</Table.HeaderCell>
-                    <Table.HeaderCell>Lukumäärä</Table.HeaderCell>
-                  </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                  {item.bachelors.map(bachelor => (
-                    <Table.Row>
-                      <Table.Cell>{bachelor.name}</Table.Cell>
-                      <Table.Cell>{bachelor.amount}</Table.Cell>
-                    </Table.Row>
+      <Table selectable sortable>
+        {bachelors && bachelors.data ? (
+          <>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Name</Table.HeaderCell>
+                <Table.HeaderCell>Code</Table.HeaderCell>
+                {bachelors.years.map(year => (
+                  <Table.HeaderCell key={year}>{year}</Table.HeaderCell>
+                ))}
+                <Table.HeaderCell>Total</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {Object.keys(bachelors.data).map(code => (
+                <Table.Row key={code}>
+                  <Table.Cell>{bachelors.data[code].name.fi}</Table.Cell>
+                  <Table.Cell>{code}</Table.Cell>
+                  {bachelors.years.map(year => (
+                    <Table.Cell key={year}>{bachelors.data[code][year]}</Table.Cell>
                   ))}
-                </Table.Body>
-              </>
-            ))
-          : null}
+                  <Table.Cell>{bachelors.data[code].total}</Table.Cell>
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </>
+        ) : null}
       </Table>
     </Segment>
   </>
@@ -44,7 +50,8 @@ const BachelorsTable = ({ bachelors, loading }) => (
 
 BachelorsTable.propTypes = {
   bachelors: shape({
-    data: arrayOf(any)
+    data: shape({}),
+    years: arrayOf(any)
   }),
   loading: bool.isRequired
 }
