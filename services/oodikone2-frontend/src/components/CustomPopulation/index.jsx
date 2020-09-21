@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Button, Modal, Form, TextArea, Segment, Header, Accordion, Popup, Message } from 'semantic-ui-react'
-import { getTranslate } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import ReactMarkdown from 'react-markdown'
 import scrollToComponent from 'react-scroll-to-component'
@@ -38,7 +37,6 @@ const CustomPopulation = ({
   deleteCustomPopulationSearchDispatch,
   custompop,
   customPopulationFlag,
-  translate,
   loading,
   customPopulationSearches,
   latestCreatedCustomPopulationSearchId,
@@ -217,14 +215,12 @@ const CustomPopulation = ({
         content: (
           <>
             {activeIndex.includes(0) ? (
-              <>
-                {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
-              </>
+              <>Credit accumulation (for {selectedStudents.length} students)</>
             ) : (
               <Popup
                 trigger={
                   <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    {translate('populationStatistics.graphSegmentHeader')} (for {selectedStudents.length} students)
+                    Credit accumulation (for {selectedStudents.length} students)
                   </span>
                 }
                 position="top center"
@@ -249,7 +245,6 @@ const CustomPopulation = ({
             <CreditAccumulationGraphHighCharts
               students={custompop}
               selectedStudents={selectedStudents}
-              translate={translate}
               render={false}
               trayOpen={trayOpen}
             />
@@ -419,7 +414,6 @@ CustomPopulation.defaultProps = {
 }
 
 CustomPopulation.propTypes = {
-  translate: func.isRequired,
   custompop: arrayOf(shape({})).isRequired,
   customPopulationFlag: bool.isRequired,
   getCustomPopulationDispatch: func.isRequired,
@@ -436,8 +430,7 @@ CustomPopulation.propTypes = {
   deleteCustomPopulationSearchDispatch: func.isRequired
 }
 
-const mapStateToProps = ({ populations, localize, populationCourses, customPopulationSearch }) => ({
-  translate: getTranslate(localize),
+const mapStateToProps = ({ populations, populationCourses, customPopulationSearch }) => ({
   loading: populations.pending,
   custompop: populations.data.students || [],
   courses: populationCourses.data,

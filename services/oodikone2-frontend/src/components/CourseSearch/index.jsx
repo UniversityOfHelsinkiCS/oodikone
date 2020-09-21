@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Search } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { getActiveLanguage, getTranslate } from 'react-localize-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import Timeout from '../Timeout'
 
 import { makeSortCourses } from '../../selectors/courses'
@@ -73,7 +73,6 @@ const sortCourses = makeSortCourses()
 
 const mapStateToProps = ({ localize, courses }) => ({
   courseList: sortCourses(courses),
-  translate: getTranslate(localize),
   activeLanguage: getActiveLanguage(localize).code
 })
 
