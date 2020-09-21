@@ -11,7 +11,6 @@ class ErrorMessage extends Component {
     message: string,
     url: string,
     uuid: string.isRequired,
-    translate: func.isRequired,
     removeError: func.isRequired
   }
 
@@ -26,13 +25,11 @@ class ErrorMessage extends Component {
   }
 
   render() {
-    const { code, message, url, translate } = this.props
+    const { code, message, url } = this.props
     return (
       <Message error onDismiss={this.handleDismiss}>
-        <Message.Header>{translate('error.connectionError')}</Message.Header>
-        <p>
-          {translate('error.errorInResponseTo')}: {url}
-        </p>
+        <Message.Header>Connection error</Message.Header>
+        <p>Error for API call: {url}</p>
         <code>
           {code} – {message}
         </code>
