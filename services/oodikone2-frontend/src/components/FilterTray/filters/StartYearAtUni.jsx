@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { Form, Dropdown } from 'semantic-ui-react'
-import { getTranslate } from 'react-localize-redux'
-import { connect } from 'react-redux'
 import ClearFilterButton from './common/ClearFilterButton'
 import FilterCard from './common/FilterCard'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 
-const StartYearAtUni = ({ translate }) => {
+export default () => {
   const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
   const analytics = useAnalytics()
 
@@ -40,7 +37,7 @@ const StartYearAtUni = ({ translate }) => {
 
   return (
     <FilterCard
-      title={translate('startYearFilter.title')}
+      title="Starting Year at University"
       contextKey="startYearFilter"
       footer={<ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} name={name} />}
       active={Object.keys(activeFilters).includes(name)}
@@ -55,7 +52,7 @@ const StartYearAtUni = ({ translate }) => {
             options={options}
             button
             className="mini"
-            placeholder={translate('startYearFilter.dropdownLabel')}
+            placeholder="Choose Years to Include"
             onChange={(_, { value: inputValue }) => setValue(inputValue)}
             value={value}
             data-cy={`${name}-dropdown`}
@@ -65,11 +62,3 @@ const StartYearAtUni = ({ translate }) => {
     </FilterCard>
   )
 }
-
-StartYearAtUni.propTypes = {
-  translate: PropTypes.func.isRequired
-}
-
-const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
-
-export default connect(mapStateToProps)(StartYearAtUni)
