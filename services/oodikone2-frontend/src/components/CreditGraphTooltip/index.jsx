@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card, Icon } from 'semantic-ui-react'
-import { func, bool, arrayOf, object } from 'prop-types'
+import { bool, arrayOf, object } from 'prop-types'
 
 import './creditGraphTooltip.css'
 
@@ -27,18 +27,18 @@ const getCardMeta = (name, date) => (
   </Card.Meta>
 )
 
-const getCardDescription = (translate, credits, grade, passed, isStudyModuleCredit) => (
+const getCardDescription = (credits, grade, passed, isStudyModuleCredit) => (
   <Card.Description className="tooltipBody">
     <div className="tooltipBodyItem">
-      <div className="tooltipBodyTitle">{translate('common.credits')}</div>
+      <div className="tooltipBodyTitle">Credits</div>
       <div className="tooltipBodyValue">{credits}</div>
     </div>
     <div className="tooltipBodyItem">
-      <div className="tooltipBodyTitle">{translate('common.grade')}</div>
+      <div className="tooltipBodyTitle">Grade</div>
       <div className="tooltipBodyValue">{grade}</div>
     </div>
     <div className="tooltipBodyItem">
-      <div className="tooltipBodyTitle">{isStudyModuleCredit ? 'module' : translate('common.passed')}</div>
+      <div className="tooltipBodyTitle">{isStudyModuleCredit ? 'module' : 'Passed'}</div>
       <div className="tooltipBodyValue">
         {isStudyModuleCredit ? ( // eslint-disable-line
           <Icon name="certificate" color="purple" />
@@ -53,7 +53,7 @@ const getCardDescription = (translate, credits, grade, passed, isStudyModuleCred
 )
 
 const CreditGraphTooltip = props => {
-  const { active, translate } = props
+  const { active } = props
   if (active && props.payload && props.payload.length > 0) {
     const { payload } = props
     const { name } = payload[0]
@@ -63,7 +63,7 @@ const CreditGraphTooltip = props => {
         <Card.Content>
           {getCardHeader(title, isStudyModuleCredit)}
           {getCardMeta(name, date)}
-          {getCardDescription(translate, credits, grade, passed, isStudyModuleCredit)}
+          {getCardDescription(credits, grade, passed, isStudyModuleCredit)}
         </Card.Content>
       </Card>
     )
@@ -77,7 +77,6 @@ CreditGraphTooltip.defaultProps = {
 }
 
 CreditGraphTooltip.propTypes = {
-  translate: func.isRequired,
   active: bool,
   payload: arrayOf(object)
 }
