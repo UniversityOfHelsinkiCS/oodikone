@@ -519,6 +519,7 @@ const startedStudyright = async (studentnumbers, startDate, studytrack, endDate)
 
 const bachelorData = async (startDate, endDate, code) => {
   const programmes = await getAllProgrammes()
+  const students = await studentnumbersWithAllStudyrightElements([code], startDate, endDate, false, true)
 
   const masters = await Studyright.findAll({
     include: [
@@ -526,23 +527,26 @@ const bachelorData = async (startDate, endDate, code) => {
         model: StudyrightElement,
         where: {
           code: code
-        }
+        },
+        attributes: ['startdate']
       }
     ],
     where: {
       extentcode: 2,
-      studystartdate: {
-        [Op.between]: [startDate, endDate]
+      student_studentnumber: {
+        [Op.in]: students
       }
     },
     attributes: ['student_studentnumber', 'givendate', 'studystartdate']
   })
-  const mastersMap = masters.reduce((obj, studyright) => {
-    obj[studyright.student_studentnumber] = { givendate: studyright.givendate, startdate: studyright.studystartdate }
-    return obj
-  }, {})
 
-  const students = masters.map(m => m.student_studentnumber)
+  const mastersMap = masters
+    .filter(m => m.studystartdate)
+    .reduce((obj, studyright) => {
+      const acualDate = new Date(Math.max(+studyright.studystartdate, +studyright.studyright_elements[0].startdate))
+      obj[studyright.student_studentnumber] = { givendate: studyright.givendate, startdate: acualDate }
+      return obj
+    }, {})
 
   const bachelors = await Studyright.findAll({
     include: [
@@ -571,6 +575,7 @@ const bachelorData = async (startDate, endDate, code) => {
         [Op.in]: students
       }
     },
+    order: [[StudyrightElement, 'startdate', 'DESC']],
     attributes: ['student_studentnumber', 'startdate', 'givendate']
   })
 
@@ -582,9 +587,13 @@ const bachelorData = async (startDate, endDate, code) => {
     .filter(b => b.givendate.getTime() === mastersMap[b.student_studentnumber].givendate.getTime())
     .forEach(b => {
       const date = mastersMap[b.student_studentnumber].startdate
-      const year = date.getMonth() > 8 ? date.getFullYear() - 1 : date.getFullYear()
+      const year =
+        date.getMonth() > 6 || (date.getMonth() === 6 && date.getDate() == 31)
+          ? date.getFullYear()
+          : date.getFullYear() - 1
       years.add(year)
       const code = b.studyright_elements[0].code
+
       if (!data[code]) {
         data[code] = {}
         data[code].name = b.studyright_elements[0].element_detail.name
