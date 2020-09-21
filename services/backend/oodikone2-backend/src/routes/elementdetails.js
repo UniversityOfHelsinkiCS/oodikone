@@ -2,7 +2,7 @@ const router = require('express').Router()
 const { getStudentsUserCanAccess } = require('../services/userService')
 const { getAllDegreesAndProgrammes, getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 const MandatoryCourses = require('../services/mandatoryCourses')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('../services/studytrack')
+const { productivityStatsForStudytrack, throughputStatsForStudytrack, bachelorData } = require('../services/studytrack')
 const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
 const {
   getProductivity,
@@ -80,6 +80,16 @@ router.get('/v2/studyprogrammes/ping', async (req, res) => {
     res.json(result)
   } catch (e) {
     res.status(500).end()
+  }
+})
+
+router.get('/v2/studyprogrammes/:id/optiondata', async (req, res) => {
+  const code = req.params.id
+  if (code) {
+    const data = await bachelorData(new Date('2017-07-31'), new Date(), code)
+    return res.json(data)
+  } else {
+    res.status(422).end()
   }
 })
 
