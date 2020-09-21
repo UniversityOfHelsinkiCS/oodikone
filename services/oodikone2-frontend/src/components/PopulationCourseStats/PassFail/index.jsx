@@ -23,7 +23,6 @@ const PassFail = () => {
     onCourseNameCellClick,
     sortCriteria,
     reversed,
-    translate,
     modules
   } = UsePopulationCourseContext()
   const getSortableHeaderCell = (label, columnName, rowSpan = 1) => (
@@ -40,25 +39,25 @@ const PassFail = () => {
   const getTableHeader = () => (
     <Table.Header>
       <Table.Row>
-        <Table.HeaderCell colSpan="4" content={translate('populationCourses.course')} />
-        {getSortableHeaderCell(translate('populationCourses.students'), tableColumnNames.STUDENTS, 2)}
-        <Table.HeaderCell colSpan="3" content={translate('populationCourses.passed')} />
-        <Table.HeaderCell colSpan="2" content={translate('populationCourses.failed')} />
-        <Table.HeaderCell colSpan="2" content={translate('populationCourses.attempts')} />
-        <Table.HeaderCell colSpan="2" content={translate('populationCourses.percentageOfPopulation')} />
+        <Table.HeaderCell colSpan="4" content="Course" />
+        {getSortableHeaderCell('Students', tableColumnNames.STUDENTS, 2)}
+        <Table.HeaderCell colSpan="3" content="Passed" />
+        <Table.HeaderCell colSpan="2" content="Failed" />
+        <Table.HeaderCell colSpan="2" content="Attempts" />
+        <Table.HeaderCell colSpan="2" content="percentage of population" />
       </Table.Row>
       <Table.Row>
-        {filterInput('nameFilter', 'populationCourses.name', '3')}
-        {filterInput('codeFilter', 'populationCourses.code')}
-        {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.PASSED)}
-        {getSortableHeaderCell(translate('populationCourses.passedAfterRetry'), tableColumnNames.RETRY_PASSED)}
-        {getSortableHeaderCell(translate('populationCourses.percentage'), tableColumnNames.PERCENTAGE)}
-        {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.FAILED)}
-        {getSortableHeaderCell(translate('populationCourses.failedManyTimes'), tableColumnNames.FAILED_MANY)}
-        {getSortableHeaderCell(translate('populationCourses.number'), tableColumnNames.ATTEMPTS)}
-        {getSortableHeaderCell(translate('populationCourses.perStudent'), tableColumnNames.PER_STUDENT)}
-        {getSortableHeaderCell(translate('populationCourses.passed'), tableColumnNames.PASSED_OF_POPULATION)}
-        {getSortableHeaderCell(translate('populationCourses.attempted'), tableColumnNames.TRIED_OF_POPULATION)}
+        {filterInput('nameFilter', 'Name', '3')}
+        {filterInput('codeFilter', 'Code')}
+        {getSortableHeaderCell('n', tableColumnNames.PASSED)}
+        {getSortableHeaderCell('after retry', tableColumnNames.RETRY_PASSED)}
+        {getSortableHeaderCell('percentage', tableColumnNames.PERCENTAGE)}
+        {getSortableHeaderCell('n', tableColumnNames.FAILED)}
+        {getSortableHeaderCell('many times', tableColumnNames.FAILED_MANY)}
+        {getSortableHeaderCell('n', tableColumnNames.ATTEMPTS)}
+        {getSortableHeaderCell('per student', tableColumnNames.PER_STUDENT)}
+        {getSortableHeaderCell('Passed', tableColumnNames.PASSED_OF_POPULATION)}
+        {getSortableHeaderCell('attempted', tableColumnNames.TRIED_OF_POPULATION)}
       </Table.Row>
     </Table.Header>
   )

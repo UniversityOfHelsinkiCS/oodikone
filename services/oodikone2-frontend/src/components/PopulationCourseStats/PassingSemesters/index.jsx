@@ -27,8 +27,8 @@ const PassingSemesters = () => {
       <Table celled className="fixed-header">
         <Table.Header>
           <Table.Row>
-            {filterInput('nameFilter', 'populationCourses.name', '2')}
-            {filterInput('codeFilter', 'populationCourses.code')}
+            {filterInput('nameFilter', 'Name', '2')}
+            {filterInput('codeFilter', 'Code')}
 
             <Table.HeaderCell>Students</Table.HeaderCell>
             <Table.HeaderCell>Passed</Table.HeaderCell>
