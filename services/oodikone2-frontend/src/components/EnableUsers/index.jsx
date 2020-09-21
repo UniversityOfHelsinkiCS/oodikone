@@ -3,7 +3,7 @@ import { withRouter, Link } from 'react-router-dom'
 import { Button, Radio, Icon, Header, Segment, Loader, Label, Popup } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf, number } from 'prop-types'
-import { getTranslate, getActiveLanguage } from 'react-localize-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { getUsers } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
@@ -224,7 +224,6 @@ const sortUsers = makeSortUsers()
 
 const mapStateToProps = ({ localize, users, units, elementdetails }) => ({
   language: getActiveLanguage(localize).code,
-  translate: getTranslate(localize),
   units: units.data,
   elementdetails: elementdetails.data,
   enabledOnly: users.enabledOnly,

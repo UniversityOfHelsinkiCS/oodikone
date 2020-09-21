@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Dropdown, Button, Icon } from 'semantic-ui-react'
-import { getActiveLanguage, getTranslate } from 'react-localize-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { connect } from 'react-redux'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
 
-const CourseCard = ({ courseStats, language, translate }) => {
+const CourseCard = ({ courseStats, language }) => {
   const { addFilter, removeFilter } = useFilters()
   const { course, students } = courseStats
   const { toggleCourseSelection } = useCourseFilter()
@@ -18,31 +18,31 @@ const CourseCard = ({ courseStats, language, translate }) => {
 
   const subFilters = [
     {
-      label: translate('courseFilter.subFilterAll'),
+      label: 'All',
       func: ({ studentNumber }) => Object.keys(students.all).includes(studentNumber)
     },
     {
-      label: translate('courseFilter.subFilterPassed'),
+      label: 'Passed',
       func: ({ studentNumber }) => Object.keys(students.passed).includes(studentNumber)
     },
     {
-      label: translate('courseFilter.subFilterPassAfterFail'),
+      label: 'Passed After Failure',
       func: ({ studentNumber }) => Object.keys(students.retryPassed).includes(studentNumber)
     },
     {
-      label: translate('courseFilter.subFilterFailed'),
+      label: 'Failed',
       func: ({ studentNumber }) => Object.keys(students.failed).includes(studentNumber)
     },
     {
-      label: translate('courseFilter.subFilterFailedMany'),
+      label: 'Failed Many Times',
       func: ({ studentNumber }) => Object.keys(students.failedMany).includes(studentNumber)
     },
     {
-      label: translate('courseFilter.subFilterNot'),
+      label: 'Not Participated',
       func: ({ studentNumber }) => !Object.keys(students.all).includes(studentNumber)
     },
     {
-      label: translate('courseFilter.subFilterNotOrFail'),
+      label: 'Not Participated or Failed',
       func: ({ studentNumber }) =>
         !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber)
     }
@@ -77,7 +77,7 @@ const CourseCard = ({ courseStats, language, translate }) => {
           </Button>
         </Card.Header>
         <Card.Description>
-          <div>{translate('courseFilter.subFilterDropdownLabel')}</div>
+          <div>Show:</div>
           <Dropdown
             options={options}
             value={selectedOption}
@@ -99,13 +99,11 @@ CourseCard.propTypes = {
     course: PropTypes.object,
     students: PropTypes.object
   }).isRequired,
-  language: PropTypes.string.isRequired,
-  translate: PropTypes.func.isRequired
+  language: PropTypes.string.isRequired
 }
 
 const mapStateToProps = ({ localize }) => ({
-  language: getActiveLanguage(localize).code,
-  translate: getTranslate(localize)
+  language: getActiveLanguage(localize).code
 })
 
 export default connect(mapStateToProps)(CourseCard)

@@ -110,7 +110,7 @@ class CreditAccumulationGraphHighCharts extends Component {
   filterCoursesByDate = (courses, date) => courses.filter(c => moment(c.date).isSameOrAfter(moment(date)))
 
   createTooltip = point => {
-    const { students, language, translate } = this.props
+    const { students, language } = this.props
 
     if (point.series.name === SINGLE_GRAPH_GOAL_SERIES_NAME) {
       return null
@@ -131,7 +131,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         }
       }
     ]
-    return renderToString(<CreditGraphTooltip payload={payload} active translate={translate} />)
+    return renderToString(<CreditGraphTooltip payload={payload} />)
   }
 
   createGraphOptions = (students, selectedStudents, graphSize, render) => {
@@ -340,7 +340,6 @@ CreditAccumulationGraphHighCharts.propTypes = {
   setChartHeight: func.isRequired,
   currentGraphSize: number.isRequired,
   language: string.isRequired,
-  translate: func.isRequired,
   absences: arrayOf(shape({})),
   render: bool,
   trayOpen: bool

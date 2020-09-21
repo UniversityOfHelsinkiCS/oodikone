@@ -1,16 +1,13 @@
 // Not in use currently, but code left here for possible future use.
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { Dropdown, Popup } from 'semantic-ui-react'
-import { getTranslate } from 'react-localize-redux'
-import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import NumericInput from './common/NumericInput'
 import { getStudentGradeMean } from '../../../common'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 
-const GradeMean = ({ translate }) => {
+export default () => {
   const { addFilter, removeFilter } = useFilters()
   const analytics = useAnalytics()
   const [comparator, setComparator] = useState('<')
@@ -37,7 +34,7 @@ const GradeMean = ({ translate }) => {
   }, [comparator, value])
 
   return (
-    <FilterCard title={translate('gradeMeanFilter.title')}>
+    <FilterCard title="Grade Mean">
       <NumericInput
         onChange={(_, { value: inputValue }) => setValue(inputValue)}
         onClear={() => setValue('')}
@@ -46,7 +43,7 @@ const GradeMean = ({ translate }) => {
         className="comparator-input"
         label={
           <Popup
-            content={translate('gradeMeanFilter.comparatorTooltip')}
+            content="Select comparator."
             position="top left"
             pinned
             size="mini"
@@ -65,11 +62,3 @@ const GradeMean = ({ translate }) => {
     </FilterCard>
   )
 }
-
-GradeMean.propTypes = {
-  translate: PropTypes.func.isRequired
-}
-
-const mapStateToProps = ({ localize }) => ({ translate: getTranslate(localize) })
-
-export default connect(mapStateToProps)(GradeMean)
