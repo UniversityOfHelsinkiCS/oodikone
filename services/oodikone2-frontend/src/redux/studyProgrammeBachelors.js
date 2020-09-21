@@ -1,0 +1,13 @@
+import { callController } from '../apiConnection/index'
+import listreducer from './common/listreducer'
+
+const prefix = 'GET_STUDYPROGRAMME_BACHELORS_'
+
+export const getBachelors = studyprogrammeId => {
+  const route = `v2/studyprogrammes/${studyprogrammeId}/bachelors`
+  return callController(route, prefix, [], 'get')
+}
+
+const reducer = listreducer(prefix, null, false)
+
+export default reducer
