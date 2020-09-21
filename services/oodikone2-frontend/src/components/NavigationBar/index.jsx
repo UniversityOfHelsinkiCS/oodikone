@@ -29,22 +29,26 @@ const adminerUrls = [
 
 const allNavigationItems = {
   populations: {
-    translateId: 'studyProgramme',
-    items: [{ path: '/populations', translateId: 'class' }, { path: '/study-programme', translateId: 'overview' }]
+    key: 'studyProgramme',
+    label: 'Study programme',
+    items: [
+      { path: '/populations', key: 'class', label: 'Search by class' },
+      { path: '/study-programme', key: 'overview', label: 'Overview' }
+    ]
   },
-  students: { path: '/students', translateId: 'students' },
-  courseStatistics: { path: '/coursestatistics', translateId: 'courseStatistics' },
-  teachers: { path: '/teachers', translateId: 'teachers', reqRights: ['teachers'] },
-  users: { path: '/users', translateId: 'users', reqRights: ['users'] },
-  trends: { path: '/trends', translateId: 'trends', tag: 'New!' },
-  faculty: { path: '/faculties', translateId: 'faculty', reqRights: ['faculties'] },
-  updater: { path: '/updater', translateId: 'updater', reqRights: ['dev', 'admin'] },
-  sandbox: { path: '/sandbox', translateId: 'sandbox', reqRights: ['dev'] },
-  feedback: { path: '/feedback', translateId: 'feedback' }
+  students: { path: '/students', key: 'students', label: 'Student statistics' },
+  courseStatistics: { path: '/coursestatistics', key: 'courseStatistics', label: 'Course statistics' },
+  teachers: { path: '/teachers', key: 'teachers', label: 'Teachers', reqRights: ['teachers'] },
+  users: { path: '/users', key: 'users', label: 'Users', reqRights: ['users'] },
+  trends: { path: '/trends', key: 'trends', label: 'Trends', tag: 'New!' },
+  faculty: { path: '/faculties', key: 'faculty', label: 'Faculty', reqRights: ['faculties'] },
+  updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['dev', 'admin'] },
+  sandbox: { path: '/sandbox', key: 'sandbox', label: 'Sandbox', reqRights: ['dev'] },
+  feedback: { path: '/feedback', key: 'feedback', label: 'Need help?' }
 }
 
 const NavigationBar = props => {
-  const { logout, translate: t, userRoles, rights, mockedBy, userId } = props
+  const { logout, userRoles, rights, mockedBy, userId } = props
 
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
@@ -84,15 +88,9 @@ const NavigationBar = props => {
   )
 
   const renderNavigationRoutes = () =>
-    Object.values(visibleNavigationItems).map(({ items, path, translateId, tag }) =>
+    Object.values(visibleNavigationItems).map(({ items, path, key, label, tag }) =>
       items ? (
-        <Menu.Item
-          as={Dropdown}
-          key={`menu-item-drop-${translateId}`}
-          tabIndex="-1"
-          text={t(`navigationBar.${translateId}`)}
-          data-cy={`navbar-${translateId}`}
-        >
+        <Menu.Item as={Dropdown} key={`menu-item-drop-${key}`} tabIndex="-1" text={label} data-cy={`navbar-${key}`}>
           <Dropdown.Menu>
             {items.map(i => (
               <Dropdown.Item
@@ -100,16 +98,16 @@ const NavigationBar = props => {
                 key={`menu-item-${i.path}`}
                 to={i.path}
                 tabIndex="-1"
-                data-cy={`navbar-${i.translateId}`}
+                data-cy={`navbar-${i.key}`}
               >
-                {t(`navigationBar.${i.translateId}`)}
+                {i.label}
               </Dropdown.Item>
             ))}
           </Dropdown.Menu>
         </Menu.Item>
       ) : (
-        <Menu.Item as={NavLink} key={`menu-item-${path}`} to={path} tabIndex="-1" data-cy={`navbar-${translateId}`}>
-          {t(`navigationBar.${translateId}`)}
+        <Menu.Item as={NavLink} key={`menu-item-${path}`} to={path} tabIndex="-1" data-cy={`navbar-${key}`}>
+          {label}
           {tag && (
             <div style={{ position: 'absolute', top: 0, right: 17 }}>
               <Label style={{ fontSize: '8px' }} color="red" ribbon="right">
@@ -147,12 +145,12 @@ const NavigationBar = props => {
               }}
             />
           ))}
-          <Dropdown.Item icon="log out" text={t('navigationBar.logout')} onClick={logout} />
+          <Dropdown.Item icon="log out" text="Logout" onClick={logout} />
         </Dropdown.Menu>
       </Menu.Item>
     ) : (
       <Menu.Item link onClick={logout} icon="log out" tabIndex="-1">
-        {t('navigationBar.logout')}
+        Logout
       </Menu.Item>
     )
 
@@ -203,7 +201,6 @@ const NavigationBar = props => {
 }
 
 NavigationBar.propTypes = {
-  translate: func.isRequired,
   logout: func.isRequired,
   userRoles: arrayOf(string),
   rights: arrayOf(string),
