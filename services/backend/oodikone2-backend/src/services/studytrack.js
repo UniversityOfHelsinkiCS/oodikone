@@ -605,8 +605,13 @@ const bachelorData = async (startDate, endDate, code) => {
       data[code][year] += 1
       data[code].total += 1
     })
-
-  return { data, years: Array.from(years).sort() }
+  const dataAsArray = Object.keys(data).map(code => {
+    const { name } = data[code]
+    const output = { code, name }
+    years.forEach(y => (output[y] = data[code][y] || 0))
+    return output
+  })
+  return { data: dataAsArray, years: Array.from(years).sort() }
 }
 
 const statsForClass = async (studentnumbers, startDate, studyprogramme, endDate) => {
