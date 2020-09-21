@@ -46,7 +46,7 @@ describe('Studyprogramme overview', () => {
 
     cy.wait(1000)
     cy.get('.attached > :nth-child(1)').click()
-    cy.get('table').should('have.length', 2)
+    cy.get('table').should('have.length', 3)
     cy.contains('Population progress')
     cy.contains('Yearly productivity')
     cy.contains("2017-2018").siblings().contains('228').siblings().contains('178')
