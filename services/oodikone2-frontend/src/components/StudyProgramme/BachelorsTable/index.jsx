@@ -7,18 +7,25 @@ const DIRECTIONS = {
   DESC: 'descending' // false
 }
 
+function sortBy(column, data) {
+  const sortByString = column === 'name' || column === 'code'
+  return data.concat().sort((a, b) => {
+    const keyA = column === 'name' ? a[column].fi : a[column]
+    const keyB = column === 'name' ? b[column].fi : b[column]
+    return sortByString ? keyB.localeCompare(keyA) : keyB - keyA
+  })
+}
+
 const BachelorsTable = ({ bachelors, loading }) => {
   const [bachelorsData, setBachelorsData] = useState([])
-  const [sortColumn, setSortColumn] = useState('name')
+  const [sortColumn, setSortColumn] = useState(null)
   const [direction, setDirection] = useState(false)
 
   useEffect(() => setBachelorsData(bachelors), [bachelors])
 
   useEffect(() => {
     if (!bachelorsData || !bachelorsData.data) return
-    const data = bachelorsData.data
-      .concat()
-      .sort((a, b) => (sortColumn === 'name' ? b[sortColumn].fi - a[sortColumn].fi : b[sortColumn] - a[sortColumn]))
+    const data = sortBy(sortColumn, bachelorsData.data)
     if (direction) data.reverse()
     setBachelorsData({ ...bachelorsData, data })
   }, [direction, sortColumn])
