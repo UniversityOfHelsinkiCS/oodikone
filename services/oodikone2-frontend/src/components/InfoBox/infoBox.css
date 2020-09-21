@@ -24,6 +24,7 @@
 
 .ok-infobox-collapsed.ok-infobox-collapsed.ok-infobox-collapsed {
   margin-bottom: 1em;
+  white-space: nowrap;
 }
 
 .ok-infobox-collapsed i.icon {
