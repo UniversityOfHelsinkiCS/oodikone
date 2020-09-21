@@ -17,7 +17,7 @@ function sortBy(column, data) {
 }
 
 const BachelorsTable = ({ bachelors, loading }) => {
-  const [bachelorsData, setBachelorsData] = useState([])
+  const [bachelorsData, setBachelorsData] = useState({})
   const [sortColumn, setSortColumn] = useState(null)
   const [direction, setDirection] = useState(false)
 
@@ -43,6 +43,7 @@ const BachelorsTable = ({ bachelors, loading }) => {
     }
   }
 
+  if (!loading && (!bachelorsData.data || !bachelorsData.data.length)) return null
   return (
     <>
       <Header>
