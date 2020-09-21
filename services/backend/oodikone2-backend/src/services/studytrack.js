@@ -606,8 +606,8 @@ const bachelorData = async (startDate, endDate, code) => {
       data[code].total += 1
     })
   const dataAsArray = Object.keys(data).map(code => {
-    const { name } = data[code]
-    const output = { code, name }
+    const { name, total } = data[code]
+    const output = { code, name, total }
     years.forEach(y => (output[y] = data[code][y] || 0))
     return output
   })

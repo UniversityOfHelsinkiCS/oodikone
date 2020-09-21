@@ -66,7 +66,9 @@ const BachelorsTable = ({ bachelors, loading }) => {
                       {year}
                     </Table.HeaderCell>
                   ))}
-                  <Table.HeaderCell>Total</Table.HeaderCell>
+                  <Table.HeaderCell sorted={getSorted('total')} onClick={() => setSorted('total')}>
+                    Total
+                  </Table.HeaderCell>
                 </Table.Row>
               </Table.Header>
               <Table.Body>
