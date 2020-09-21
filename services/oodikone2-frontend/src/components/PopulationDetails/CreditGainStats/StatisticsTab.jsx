@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { Table } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
 
-const StatisticsTab = ({ translate, filteredStudents }) => {
+const StatisticsTab = ({ filteredStudents }) => {
   const credits = filteredStudents.map(student => getStudentTotalCredits(student))
   const formatNumber = (x, decimals) => (Number.isNaN(x) ? 0 : x).toFixed(decimals)
   const quartiles = jStat.quartiles(credits)
@@ -14,19 +14,19 @@ const StatisticsTab = ({ translate, filteredStudents }) => {
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell data-cy="credit-stats-table-name-header">
-            {translate('creditGainStats.statsTableNameHeader', { n: credits.length })}
+            {`Statistic for n = ${credits.length} Students`}
           </Table.HeaderCell>
-          <Table.HeaderCell>{translate('creditGainStats.statsTableCreditsHeader')}</Table.HeaderCell>
+          <Table.HeaderCell>Credits Earned</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
 
       <Table.Body>
         <Table.Row>
-          <Table.Cell>{translate('creditGainStats.statsTableAverage')}</Table.Cell>
+          <Table.Cell>Average</Table.Cell>
           <Table.Cell data-cy="credit-stats-mean">{formatNumber(jStat.mean(credits), 2)}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>{translate('creditGainStats.statsTableStdDev')}</Table.Cell>
+          <Table.Cell>Standard Deviation</Table.Cell>
           <Table.Cell data-cy="credit-stats-stdev">{formatNumber(jStat.stdev(credits), 2)}</Table.Cell>
         </Table.Row>
         <Table.Row>
@@ -34,15 +34,15 @@ const StatisticsTab = ({ translate, filteredStudents }) => {
           <Table.Cell data-cy="credit-stats-min">{formatNumber(jStat.min(credits), 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>{translate('creditGainStats.firstQuartile')}</Table.Cell>
+          <Table.Cell>1st Quartile (25 %)</Table.Cell>
           <Table.Cell data-cy="credit-stats-q1">{formatNumber(quartiles[0], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>{translate('creditGainStats.secondQuartile')}</Table.Cell>
+          <Table.Cell>2nd Quartile (50 %)</Table.Cell>
           <Table.Cell data-cy="credit-stats-q2">{formatNumber(quartiles[1], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
-          <Table.Cell>{translate('creditGainStats.thirdQuartile')}</Table.Cell>
+          <Table.Cell>3rd Quartile (75 %)</Table.Cell>
           <Table.Cell data-cy="credit-stats-q3">{formatNumber(quartiles[2], 0)}</Table.Cell>
         </Table.Row>
         <Table.Row>
@@ -55,7 +55,6 @@ const StatisticsTab = ({ translate, filteredStudents }) => {
 }
 
 StatisticsTab.propTypes = {
-  translate: PropTypes.func.isRequired,
   filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 

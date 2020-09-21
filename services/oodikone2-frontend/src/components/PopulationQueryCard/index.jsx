@@ -8,8 +8,6 @@ import { minBy } from 'lodash'
 import './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 import { reformatDate, getTextIn } from '../../common'
-import InfoBox from '../InfoBox'
-import info from '../../common/markdown/populationStatistics/queryCard.info.md'
 
 const PopulationQueryCard = ({ translate, population, query, removeSampleFn, units, language, tags }) => {
   const { uuid, year, semesters, months, studentStatuses, tag, years } = query
@@ -53,7 +51,6 @@ const PopulationQueryCard = ({ translate, population, query, removeSampleFn, uni
             </div>
           </Card.Meta>
         </Card>
-        <InfoBox content={info} />
       </>
     )
   }
@@ -87,7 +84,6 @@ PopulationQueryCard.propTypes = {
   }).isRequired,
   removeSampleFn: func.isRequired,
   units: arrayOf(object).isRequired,
-  unit: object, // eslint-disable-line
   tags: arrayOf(shape({})).isRequired
 }
 

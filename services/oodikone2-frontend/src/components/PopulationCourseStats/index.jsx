@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { connect, useSelector } from 'react-redux'
 import { Table, Form, Input, Tab } from 'semantic-ui-react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
-import { getActiveLanguage, getTranslate } from 'react-localize-redux'
+import { getActiveLanguage } from 'react-localize-redux'
 import { orderBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
@@ -300,10 +300,9 @@ function PopulationCourseStats(props) {
   }
 
   const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
-    const { translate } = props
     return (
       <Table.HeaderCell colSpan={colSpan}>
-        {translate(name)}
+        {name}
         <Input
           className="courseCodeInput"
           transparent
@@ -315,7 +314,7 @@ function PopulationCourseStats(props) {
     )
   }
 
-  const { courses, translate, pending, isAdmin } = props
+  const { courses, pending, isAdmin } = props
   const { sortCriteria, reversed } = state
   const contextValue = {
     courseStatistics,
@@ -325,7 +324,6 @@ function PopulationCourseStats(props) {
     onGoToCourseStatisticsClick,
     onSortableColumnHeaderClick,
     tableColumnNames,
-    translate,
     sortCriteria,
     reversed
   }
@@ -388,7 +386,7 @@ function PopulationCourseStats(props) {
       {!mandatoryToggle && (
         <Form>
           <Form.Field inline>
-            <label>{translate('populationCourses.limit')}</label>
+            <label>Limit to courses where student number at least</label>
             <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
           </Form.Field>
         </Form>
@@ -406,7 +404,6 @@ PopulationCourseStats.propTypes = {
     coursetypes: shape({}),
     disciplines: shape({})
   }).isRequired,
-  translate: func.isRequired,
   populationCourses: shape({
     data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
   }).isRequired,
@@ -423,7 +420,6 @@ const mapStateToProps = state => {
 
   return {
     language: getActiveLanguage(state.localize).code,
-    translate: getTranslate(state.localize),
     years,
     populationCourses: state.populationCourses,
     isAdmin
