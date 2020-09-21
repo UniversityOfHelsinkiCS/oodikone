@@ -517,6 +517,104 @@ const startedStudyright = async (studentnumbers, startDate, studytrack, endDate)
   })
 }
 
+const masterData = async (startDate, endDate, code) => {
+  const programmes = await getAllProgrammes()
+  const students = await studentnumbersWithAllStudyrightElements([code], startDate, endDate, false, true)
+
+  const bachelors = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          code: code
+        },
+        attributes: ['startdate']
+      }
+    ],
+    where: {
+      graduated: 1,
+      extentcode: 1,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    attributes: ['student_studentnumber', 'givendate', 'studystartdate']
+  })
+
+  const bachelorsMap = bachelors
+    .filter(b => b.studystartdate)
+    .reduce((obj, studyright) => {
+      const acualDate = new Date(Math.max(+studyright.studystartdate, +studyright.studyright_elements[0].startdate))
+      obj[studyright.student_studentnumber] = { givendate: studyright.givendate, startdate: acualDate }
+      return obj
+    }, {})
+
+  const masters = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          studentnumber: {
+            [Op.in]: students
+          },
+          code: {
+            [Op.in]: programmes.map(p => p.code)
+          }
+        },
+        include: [
+          {
+            model: ElementDetails,
+            attributes: ['name']
+          }
+        ],
+        attributes: ['code']
+      }
+    ],
+    where: {
+      extentcode: 2,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    order: [[StudyrightElement, 'startdate', 'DESC']],
+    attributes: ['student_studentnumber', 'startdate', 'givendate']
+  })
+
+  const data = {}
+  const years = new Set()
+
+  masters
+    .filter(m => m.student_studentnumber in bachelorsMap)
+    .filter(m => m.givendate.getTime() === bachelorsMap[m.student_studentnumber].givendate.getTime())
+    .forEach(b => {
+      const date = bachelorsMap[b.student_studentnumber].startdate
+      const year =
+        date.getMonth() > 6 || (date.getMonth() === 6 && date.getDate() == 31)
+          ? date.getFullYear()
+          : date.getFullYear() - 1
+      years.add(year)
+      const code = b.studyright_elements[0].code
+
+      if (!data[code]) {
+        data[code] = {}
+        data[code].name = b.studyright_elements[0].element_detail.name
+        data[code].total = 0
+      }
+      if (!data[code][year]) {
+        data[code][year] = 0
+      }
+      data[code][year] += 1
+      data[code].total += 1
+    })
+  const dataAsArray = Object.keys(data).map(code => {
+    const { name, total } = data[code]
+    const output = { code, name, total }
+    years.forEach(y => (output[y] = data[code][y] || 0))
+    return output
+  })
+  return { data: dataAsArray, years: Array.from(years).sort() }
+}
+
 const bachelorData = async (startDate, endDate, code) => {
   const programmes = await getAllProgrammes()
   const students = await studentnumbersWithAllStudyrightElements([code], startDate, endDate, false, true)
@@ -894,5 +992,6 @@ module.exports = {
   findProgrammeThesisCredits,
   thesisProductivityFromCredits,
   thesisProductivityForStudytrack,
-  bachelorData
+  bachelorData,
+  masterData
 }
