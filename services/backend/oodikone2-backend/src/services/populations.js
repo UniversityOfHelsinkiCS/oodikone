@@ -447,6 +447,9 @@ const studentnumbersWithAllStudyrightElements = async (
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
+      },
+      code: {
+        [Op.in]: studyRights
       }
     },
     include: {
