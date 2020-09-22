@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
-import { func, object, arrayOf, bool, shape } from 'prop-types'
+import { object, arrayOf, bool, shape } from 'prop-types'
 import { Message, Accordion, Popup } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import ReactMarkdown from 'react-markdown'
@@ -15,15 +15,7 @@ import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 
-const PopulationDetails = ({
-  samples,
-  translate,
-  queryIsSet,
-  isLoading,
-  query,
-  selectedStudentsByYear,
-  mandatoryToggle
-}) => {
+const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStudentsByYear, mandatoryToggle }) => {
   const { allStudents, filteredStudents } = useFilters()
   const [trayOpen] = useFilterTray('filterTray')
   // TODO: Refactor this away from children:
@@ -56,8 +48,7 @@ const PopulationDetails = ({
     const graphs = (
       <CreditAccumulationGraphHighCharts
         students={samples}
-        title={`${translate('populationStatistics.sampleId')}`}
-        translate={translate}
+        title="Id"
         label={samples.label}
         maxCredits={samples.maxCredits}
         selectedStudents={selectedStudents}
@@ -77,7 +68,7 @@ const PopulationDetails = ({
   }
 
   if (samples.length === 0) {
-    return <Message negative content={`${translate('populationStatistics.emptyQueryResult')}`} />
+    return <Message negative content="No statistics found for the given query." />
   }
 
   const { Students, CreditStatistics, CoursesOf, CreditAccumulationGraph } = infoTooltips.PopulationStatistics
@@ -89,14 +80,12 @@ const PopulationDetails = ({
         content: (
           <>
             {activeIndex.includes(0) ? (
-              <>
-                {translate('populationStatistics.graphSegmentHeader')} (for {filteredStudents.length} students)
-              </>
+              <>Credit accumulation (for {filteredStudents.length} students)</>
             ) : (
               <Popup
                 trigger={
                   <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    {translate('populationStatistics.graphSegmentHeader')} (for {filteredStudents.length} students)
+                    Credit accumulation (for {filteredStudents.length} students)
                   </span>
                 }
                 position="top center"
@@ -146,7 +135,7 @@ const PopulationDetails = ({
       content: {
         content: !query.years ? (
           <div ref={creditGainRef}>
-            <CreditGainStats filteredStudents={filteredStudents} translate={translate} />
+            <CreditGainStats filteredStudents={filteredStudents} />
           </div>
         ) : (
           <div>This table is omitted when searching population of multiple years</div>
@@ -239,7 +228,6 @@ const PopulationDetails = ({
 }
 
 PopulationDetails.propTypes = {
-  translate: func.isRequired,
   samples: arrayOf(object).isRequired,
   queryIsSet: bool.isRequired,
   isLoading: bool.isRequired,
