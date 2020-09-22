@@ -176,7 +176,7 @@ class PopulationSearchHistory extends Component {
     const { semesters, studentStatuses } = query
 
     return (
-      <Form.Group>
+      <Form.Group style={{ flexDirection: 'column' }}>
         <Form.Field error={query.months < 0}>
           <b>Statistics until</b>
           <Datetime
@@ -193,7 +193,7 @@ class PopulationSearchHistory extends Component {
         </Form.Field>
 
         {!populations.query.tag ? (
-          <Form.Field>
+          <Form.Field style={{ marginTop: '15px' }}>
             <b>Semesters</b>
             <Form.Checkbox
               className="populationStatisticsRadio"
@@ -217,7 +217,7 @@ class PopulationSearchHistory extends Component {
             />
           </Form.Field>
         ) : null}
-        <Form.Field>
+        <Form.Field style={{ marginTop: '15px' }}>
           <b>Include</b>
           <Form.Checkbox
             className="populationStatisticsRadio"
@@ -257,7 +257,9 @@ class PopulationSearchHistory extends Component {
             onChange={this.handleStudentStatusSelection}
           />
         </Form.Field>
-        <Button onClick={this.pushQueryToUrl}>Fetch population with new settings</Button>
+        <Form.Field style={{ marginTop: '15px' }}>
+          <Button onClick={this.pushQueryToUrl}>Fetch population with new settings</Button>
+        </Form.Field>
       </Form.Group>
     )
   }
