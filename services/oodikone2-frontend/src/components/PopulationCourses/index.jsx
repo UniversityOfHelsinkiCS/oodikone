@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { func, shape, arrayOf, string, bool } from 'prop-types'
+import { shape, arrayOf, string, bool } from 'prop-types'
 import { Segment } from 'semantic-ui-react'
-import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
@@ -14,7 +13,6 @@ const PopulationCourses = ({
   populationSelectedStudentCourses,
   populationCourses,
   selectedStudents,
-  translate,
   query,
   filteredStudents
 }) => {
@@ -74,7 +72,7 @@ const PopulationCourses = ({
   return (
     <Segment basic>
       <InfoBox content={info} />
-      <SegmentDimmer translate={translate} isLoading={pending} />
+      <SegmentDimmer isLoading={pending} />
       <PopulationCourseStats
         key={selectedPopulationCourses.query.uuid}
         courses={selectedPopulationCourses.data}
@@ -93,16 +91,14 @@ PopulationCourses.defaultPropTypes = {
 PopulationCourses.propTypes = {
   populationSelectedStudentCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
   populationCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
-  translate: func.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   query: shape({}).isRequired,
   filteredStudents: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses, localize }) => ({
+const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses }) => ({
   populationCourses,
-  populationSelectedStudentCourses,
-  translate: getTranslate(localize)
+  populationSelectedStudentCourses
 })
 
 export default connect(mapStateToProps)(PopulationCourses)

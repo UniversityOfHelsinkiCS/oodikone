@@ -107,8 +107,8 @@ const Students = () => {
       <Table sortable className="fixed-header" striped celled>
         <Table.Header>
           <Table.Row>
-            {filterInput('nameFilter', 'populationCourses.name', '3')}
-            {filterInput('codeFilter', 'populationCourses.code')}
+            {filterInput('nameFilter', 'Name', '3')}
+            {filterInput('codeFilter', 'Code')}
             {pagedStudents.map(student => (
               <Table.HeaderCell
                 className="rotatedTableHeader"

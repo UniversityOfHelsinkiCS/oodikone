@@ -1,15 +1,14 @@
 import React from 'react'
-import { func, bool } from 'prop-types'
+import { bool } from 'prop-types'
 import { Dimmer, Loader } from 'semantic-ui-react'
 
-const SegmentDimmer = ({ translate, isLoading = false }) => (
+const SegmentDimmer = ({ isLoading = false }) => (
   <Dimmer active={isLoading} inverted>
-    <Loader>{translate('common.loading')}</Loader>
+    <Loader>Loading</Loader>
   </Dimmer>
 )
 
 SegmentDimmer.propTypes = {
-  translate: func.isRequired,
   isLoading: bool.isRequired
 }
 

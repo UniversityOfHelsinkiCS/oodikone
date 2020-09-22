@@ -8,22 +8,22 @@ import CreditsGainedTab from './CreditsGainedTab'
 import info from '../../../common/markdown/populationStatistics/creditStatistics.info.md'
 import './creditGainStats.css'
 
-const CreditGainStats = ({ filteredStudents, translate }) => {
+const CreditGainStats = ({ filteredStudents }) => {
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
         <CreditsGainedTab filteredStudents={filteredStudents} />
       </Tab.Pane>
     )
-  }, [filteredStudents, translate])
+  }, [filteredStudents])
 
   const renderQuartersTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <StatisticsTab filteredStudents={filteredStudents} translate={translate} />
+        <StatisticsTab filteredStudents={filteredStudents} />
       </Tab.Pane>
     )
-  }, [filteredStudents, translate])
+  }, [filteredStudents])
 
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Credit statistics tab')
 
@@ -40,7 +40,7 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
               render: renderCreditsGainTab
             },
             {
-              menuItem: translate('creditGainStats.header'),
+              menuItem: 'Statistics',
               render: renderQuartersTab
             }
           ]}
@@ -52,8 +52,7 @@ const CreditGainStats = ({ filteredStudents, translate }) => {
 }
 
 CreditGainStats.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
-  translate: PropTypes.func.isRequired
+  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
 }
 
 export default CreditGainStats
