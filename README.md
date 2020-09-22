@@ -1,6 +1,6 @@
 # oodikone
 
-[![CircleCI](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master.svg?style=svg)](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master)
+[![CircleCI](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master.svg?style=svg)](https://app.circleci.com/pipelines/github/UniversityOfHelsinkiCS/oodikone)
 
 An application for analyzing university data. The entire development environment runs in a Docker network that's defined in the `docker-compose.yml` file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
 
