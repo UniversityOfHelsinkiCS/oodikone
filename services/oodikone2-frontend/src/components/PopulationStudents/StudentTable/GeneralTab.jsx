@@ -277,14 +277,6 @@ const GeneralTab = ({
     )
   }
 
-  if (isAdmin) {
-    columns.push({
-      key: 'updatedAt',
-      title: 'Last Updated At',
-      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
-    })
-  }
-
   if (queryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH')))
     columns.push({
       key: 'option',
@@ -341,6 +333,14 @@ const GeneralTab = ({
         cellProps: { collapsing: true, className: 'iconCellNoPointer' }
       }
     )
+  }
+
+  if (isAdmin) {
+    columns.push({
+      key: 'updatedAt',
+      title: 'Last Updated At',
+      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
+    })
   }
 
   return (
