@@ -447,9 +447,6 @@ const studentnumbersWithAllStudyrightElements = async (
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
-      },
-      code: {
-        [Op.in]: studyRights
       }
     },
     include: {
@@ -835,7 +832,6 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     optionData
   )
 
-  //console.log(formattedStudents[0])
   return formattedStudents
 }
 
