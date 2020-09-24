@@ -62,6 +62,25 @@ describe('Course Statistics tests', () => {
     cy.contains("Search for courses")
   })
 
+  it('Consecutive searches should not crash', () => {
+    cy.url().should('include', '/coursestatistics')
+    cy.contains("Search for courses")
+    cy.get("input[placeholder='Search by entering a course code']").type('TKT20003')
+    cy.contains("td", "TKT20003").click()
+    cy.contains("Fetch statistics").should('be.enabled').click()
+    cy.contains("Show population")
+    cy.contains("TKT20003")
+
+    cy.contains("Course statistics").click()
+    cy.contains("Search for courses")
+    //cy.wait(500)
+    cy.get("input[placeholder='Search by entering a course code']").type('TKT10001')
+    cy.contains("td", "TKT10001").click()
+    cy.contains("Fetch statistics").should('be.enabled').click()
+    cy.contains("Show population")
+    cy.contains("TKT10001")
+  })
+
   describe('When searching unified course stats', () => {
     beforeEach(() => {
       cy.url().should('include', '/coursestatistics')

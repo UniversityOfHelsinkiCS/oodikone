@@ -155,8 +155,8 @@ const StudyrightsTable = ({
                     key={c.studyrightid}
                     onClick={() => handleStartDateChange(c.elements, c.studyrightid)}
                   >
-                    <Table.Cell verticalAlign="middle">{renderDegrees(c)}</Table.Cell>
-                    <Table.Cell>{c.elements.degree && renderProgrammes(c)}</Table.Cell>
+                    <Table.Cell verticalAlign="middle">{c.elements.degree && renderDegrees(c)}</Table.Cell>
+                    <Table.Cell>{c.elements.programmes.length > 0 && renderProgrammes(c)}</Table.Cell>
                     <Table.Cell>{renderStudytracks(c)}</Table.Cell>
                     <Table.Cell>{renderGraduated(c)}</Table.Cell>
                   </Table.Row>
