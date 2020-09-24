@@ -34,6 +34,7 @@ const countFilteredStudents = (stat, filter) =>
 const SingleCourseStats = ({
   stats,
   setSelectedCourse,
+  clearSelectedCourse,
   activeLanguage,
   history,
   location,
@@ -74,6 +75,8 @@ const SingleCourseStats = ({
     const initToYear = max(yearcodes)
     setFromYear(initFromYear)
     setToYear(initToYear)
+
+    return () => clearSelectedCourse()
   }, [])
 
   useEffect(() => {
@@ -419,6 +422,7 @@ SingleCourseStats.propTypes = {
   location: shape({}).isRequired,
   activeLanguage: string.isRequired,
   setSelectedCourse: func.isRequired,
+  clearSelectedCourse: func.isRequired,
   getSemesters: func.isRequired,
   history: shape({
     push: func
