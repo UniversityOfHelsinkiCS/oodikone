@@ -71,12 +71,12 @@ const formatStudentForPopulationStatistics = (
             .add(1, 'day')
             .toISOString()
         : attainment_date
-
+    const passed = Credit.passed({ credittypecode })
     return {
       course_code,
       date: attainment_date_normailized,
-      passed: Credit.passed({ credittypecode }),
-      grade,
+      passed,
+      grade: passed ? grade : 'Hyl.',
       credits,
       isStudyModuleCredit: isStudyModule
     }
