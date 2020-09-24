@@ -443,10 +443,31 @@ const studentnumbersWithAllStudyrightElements = async (
   const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
+  const rights = await Studyright.findAll({
+    attributes: ['studyrightid'],
+    where: {
+      student_studentnumber: {
+        [Op.in]: studentnumbers
+      }
+    },
+    include: {
+      attributes: [],
+      model: StudyrightElement,
+      where: {
+        code: {
+          [Op.in]: studyRights
+        }
+      }
+    },
+    group: ['studyright.studyrightid'],
+    having: count('studyright_elements.id', studyRights.length, true),
+    raw: true
+  })
+
   const allStudytracksForStudents = await StudyrightElement.findAll({
     where: {
-      studentnumber: {
-        [Op.in]: studentnumbers
+      studyrightid: {
+        [Op.in]: rights.map(r => r.studyrightid)
       }
     },
     include: {
@@ -466,7 +487,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }, {})
 
   const filteredStudentnumbers = studentnumbers.filter(studentnumber => {
-    const newestStudytrack = sortBy(formattedStudytracks[studentnumber], 'startdate').reverse()[0]
+    const newestStudytrack = sortBy(formattedStudytracks[studentnumber], ['enddate', 'startdate']).reverse()[0]
     if (!newestStudytrack) return false
     return studyRights.includes(newestStudytrack.code)
   })

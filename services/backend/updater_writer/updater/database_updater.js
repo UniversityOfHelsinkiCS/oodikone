@@ -102,10 +102,7 @@ const updateStudyRights = async (studyRights, studentnumber, transaction) => {
     { where: { student_studentnumber: studentnumber, studyrightid: { [notIn]: studyrightids } } },
     { transaction }
   )
-  await StudyrightElement.destroy(
-    { where: { studentnumber, studyrightid: { [notIn]: studyrightids } } },
-    { transaction }
-  )
+  await StudyrightElement.destroy({ where: { studentnumber } }, { transaction })
 
   await Promise.all([
     StudyrightExtent.bulkCreate(studyRightExtents, {
