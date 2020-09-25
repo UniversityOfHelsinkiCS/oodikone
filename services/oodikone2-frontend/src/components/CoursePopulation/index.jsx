@@ -22,6 +22,7 @@ import InfoBox from '../InfoBox'
 import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
 import { CoursePopulationFilters } from '../FilterTray/FilterSets'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -34,6 +35,7 @@ const CoursePopulation = ({
   semesters,
   getFacultiesDispatch
 }) => {
+  const { language } = useLanguage()
   const { setAllStudents, filteredStudents } = useFilters()
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
@@ -308,6 +310,7 @@ const CoursePopulation = ({
               filteredStudents={studentData.students.filter(stu => selectedStudents.includes(stu.studentNumber))}
               mandatoryToggle={false}
               coursePopulation
+              language={language}
             />
           </div>
         )

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { shape, string, arrayOf, func, bool } from 'prop-types'
 import { Header, Segment, Tab, Button } from 'semantic-ui-react'
 import { isEqual, uniqBy } from 'lodash'
@@ -25,8 +24,10 @@ import { getPresentStudents, clearPresentStudents } from '../../redux/presentStu
 import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
 
 import { callApi } from '../../apiConnection'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const StudyProgramme = props => {
+  const { language } = useLanguage()
   const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
   useTitle('Study programmes')
 
@@ -132,7 +133,7 @@ const StudyProgramme = props => {
     [props.history]
   )
 
-  const { match, programmes, language } = props
+  const { match, programmes } = props
   const { studyProgrammeId } = match.params
   const programmeName = programmes[studyProgrammeId] && getTextIn(programmes[studyProgrammeId].name, language)
   const panes = getPanes()
@@ -191,7 +192,6 @@ StudyProgramme.propTypes = {
     })
   }),
   programmes: shape({}),
-  language: string.isRequired,
   history: shape({}).isRequired,
   rights: arrayOf(string).isRequired,
   userRoles: arrayOf(string).isRequired,
@@ -212,7 +212,6 @@ StudyProgramme.defaultProps = {
 
 const mapStateToProps = ({
   populationDegreesAndProgrammes,
-  localize,
   auth: {
     token: { rights, roles }
   }
@@ -220,7 +219,6 @@ const mapStateToProps = ({
   const programmes = populationDegreesAndProgrammes.data ? populationDegreesAndProgrammes.data.programmes : {}
   return {
     programmes,
-    language: getActiveLanguage(localize).code,
     rights,
     userRoles: getUserRoles(roles),
     isAdmin: getUserIsAdmin(roles)

@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { getActiveLanguage } from 'react-localize-redux'
 import { Header, Segment, Form } from 'semantic-ui-react'
 import { uniq } from 'lodash'
-import { string, arrayOf, shape, func, bool } from 'prop-types'
+import { arrayOf, shape, func, bool } from 'prop-types'
 import { getTextIn } from '../../common'
 import { useTitle } from '../../common/hooks'
 import { getUserFaculties, getFacultiesYearlyStats, getFacultyProgrammes } from '../../redux/faculties'
 import YearFilter from '../CourseStatistics/SearchForm/YearFilter'
 import FacultySelector from './FacultySelector'
 import FacultyStats from './FacultyStats'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const Faculty = ({
   getUserFaculties,
@@ -21,9 +21,9 @@ const Faculty = ({
   error,
   facultyYearlyStats,
   history,
-  match,
-  language
+  match
 }) => {
+  const { language } = useLanguage()
   const [selectedFaculty, setSelectedFaculty] = useState(null)
   const [fromYear, setFromYear] = useState(-1)
   const [toYear, setToYear] = useState(-1)
@@ -149,15 +149,13 @@ Faculty.propTypes = {
   facultyYearlyStats: arrayOf(shape({})).isRequired,
   history: shape({}).isRequired,
   match: shape({}).isRequired,
-  language: string.isRequired,
   pending: bool.isRequired,
   error: bool.isRequired
 }
 
-const mapStateToProps = ({ faculties, localize }) => ({
+const mapStateToProps = ({ faculties }) => ({
   faculties: faculties.data,
   facultyYearlyStats: faculties.yearlyStats,
-  language: getActiveLanguage(localize).code,
   pending: faculties.userFacultiesPending,
   error: faculties.userFacultiesError
 })

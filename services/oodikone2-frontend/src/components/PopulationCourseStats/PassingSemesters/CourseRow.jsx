@@ -1,12 +1,11 @@
 import React, { Fragment } from 'react'
-import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { Table, Popup } from 'semantic-ui-react'
 import { number, shape, string, func, bool } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import '../populationCourseStats.css'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
 const getCumulativeYearCount = (year, passingSemesters) => {
@@ -63,7 +62,8 @@ const renderCumulativeStatistics = passingSemesters => (
   </Fragment>
 )
 
-const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, activeLanguage }) => {
+const CourseRow = ({ statistics, cumulative, onCourseNameClickFn }) => {
+  const { language } = useLanguage()
   const { courseIsSelected } = useCourseFilter()
   const { stats, course } = statistics
   const passingSemesters = cumulative ? stats.passingSemestersCumulative : stats.passingSemesters
@@ -80,17 +80,17 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn, activeLanguage
         content={
           isActive ? (
             <span>
-              Poista rajaus kurssin <b>{getTextIn(course.name, activeLanguage)}</b> perusteella
+              Poista rajaus kurssin <b>{getTextIn(course.name, language)}</b> perusteella
             </span>
           ) : (
             <span>
-              Rajaa opiskelijat kurssin <b>{getTextIn(course.name, activeLanguage)}</b> perusteella
+              Rajaa opiskelijat kurssin <b>{getTextIn(course.name, language)}</b> perusteella
             </span>
           )
         }
         position="top right"
       />
-      <Table.Cell className="nameCell">{getTextIn(course.name, activeLanguage)}</Table.Cell>
+      <Table.Cell className="nameCell">{getTextIn(course.name, language)}</Table.Cell>
       <Table.Cell>{course.code}</Table.Cell>
       <Table.Cell>{stats.students}</Table.Cell>
       <Table.Cell>{stats.passed}</Table.Cell>
@@ -111,12 +111,7 @@ CourseRow.propTypes = {
     })
   }).isRequired,
   cumulative: bool.isRequired,
-  onCourseNameClickFn: func.isRequired,
-  activeLanguage: string.isRequired
+  onCourseNameClickFn: func.isRequired
 }
 
-const mapStateToProps = ({ localize }) => ({
-  activeLanguage: getActiveLanguage(localize).code
-})
-
-export default connect(mapStateToProps)(CourseRow)
+export default CourseRow

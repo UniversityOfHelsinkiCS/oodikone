@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { orderBy } from 'lodash'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { Button, Message, Table, Segment, Icon, Loader, Label, Grid } from 'semantic-ui-react'
 import { getDuplicates, addDuplicate, removeDuplicate } from '../../redux/coursecodeduplicates'
-
 import CourseSearch from '../CourseSearch'
 import { getTextIn } from '../../common'
 import { findCourses } from '../../redux/courses'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const { func, shape, string, objectOf, arrayOf, bool } = PropTypes
 
@@ -19,11 +18,11 @@ const CourseCodeMapper = ({
   removeDuplicate,
   getDuplicates,
   getMandatoryCourses,
-  language,
   courseCodeDuplicates,
   mandatoryCourses,
   findCoursesDispatch
 }) => {
+  const { language } = useLanguage()
   const [codes, setCodes] = useState({})
   useEffect(() => {
     getDuplicates(studyprogramme)
@@ -106,7 +105,6 @@ const CourseCodeMapper = ({
 }
 
 CourseCodeMapper.propTypes = {
-  language: string.isRequired,
   studyprogramme: string.isRequired,
   findCoursesDispatch: func.isRequired,
   getDuplicates: func.isRequired,
@@ -128,10 +126,9 @@ CourseCodeMapper.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = ({ courseCodeDuplicates, populationMandatoryCourses, localize }) => ({
+const mapStateToProps = ({ courseCodeDuplicates, populationMandatoryCourses }) => ({
   mandatoryCourses: populationMandatoryCourses,
-  courseCodeDuplicates,
-  language: getActiveLanguage(localize).code
+  courseCodeDuplicates
 })
 
 const mapDispatchToProps = dispatch => ({

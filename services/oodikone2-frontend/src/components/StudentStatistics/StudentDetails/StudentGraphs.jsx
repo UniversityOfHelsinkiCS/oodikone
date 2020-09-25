@@ -4,15 +4,16 @@ import { Menu, Tab, Input, Message } from 'semantic-ui-react'
 import { flattenDeep, cloneDeep } from 'lodash'
 import Highcharts from 'highcharts/highstock'
 import ReactHighcharts from 'react-highcharts'
-
 import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
 import { byDateDesc, reformatDate, getTextIn } from '../../../common'
 import TSA from '../../../common/tsa'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const ANALYTICS_CATEGORY = 'Student stats'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const CreditsGraph = ({ graphYearStart, student, absences }) => {
+  const { language } = useLanguage()
   const selectedStart = graphYearStart || student.started
   const filteredCourses = student.courses.filter(c => new Date(c.date) > new Date(selectedStart))
   const newStudent = cloneDeep(student)
@@ -35,6 +36,7 @@ const CreditsGraph = ({ graphYearStart, student, absences }) => {
       title="Credit Accumulation"
       maxCredits={sample.maxCredits}
       absences={absences}
+      language={language}
     />
   )
 }

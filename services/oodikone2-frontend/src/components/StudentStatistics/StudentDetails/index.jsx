@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Loader } from 'semantic-ui-react'
 import { isEmpty, sortBy } from 'lodash'
 import moment from 'moment'
@@ -19,10 +18,10 @@ import StudyrightsTable from './StudyrightsTable'
 import TagsTable from './TagsTable'
 import CourseParticipationTable from './CourseParticipationTable'
 import StudentGraphs from './StudentGraphs'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const StudentDetails = ({
   student,
-  language,
   degreesAndProgrammes,
   studentNumber,
   getStudent,
@@ -37,6 +36,7 @@ const StudentDetails = ({
   fetching,
   clearCourseStats
 }) => {
+  const { language } = useLanguage()
   const [graphYearStart, setGraphYear] = useState('')
   const [degreename, setDegreename] = useState('')
   const [studyrightid, setStudyrightid] = useState('')
@@ -189,7 +189,6 @@ const StudentDetails = ({
 }
 
 StudentDetails.propTypes = {
-  language: string.isRequired,
   getStudent: func.isRequired,
   resetStudent: func.isRequired,
   clearCourseStats: func.isRequired,
@@ -239,14 +238,12 @@ StudentDetails.defaultProps = {
 
 const mapStateToProps = ({
   students,
-  localize,
   semesters,
   populationDegreesAndProgrammes,
   auth: {
     token: { roles }
   }
 }) => ({
-  language: getActiveLanguage(localize).code,
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,

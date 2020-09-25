@@ -3,13 +3,14 @@ import { connect } from 'react-redux'
 import { shape, arrayOf, string, number } from 'prop-types'
 import { Table, Tab } from 'semantic-ui-react'
 import { maxBy } from 'lodash'
-import { getActiveLanguage } from 'react-localize-redux'
-
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 import { getNewestProgramme, getTextIn } from '../../../common'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
-const CreditGainTableRow = ({ statistics, code, language }) => {
+const CreditGainTableRow = ({ statistics, code }) => {
+  const { language } = useLanguage()
+
   return (
     <Table.Row key={code} value={statistics.students.length}>
       <Table.Cell>
@@ -164,8 +165,7 @@ CoursePopulationCreditGainTable.defaultProps = {
 
 CreditGainTableRow.propTypes = {
   statistics: shape({}).isRequired,
-  code: string.isRequired,
-  language: string.isRequired
+  code: string.isRequired
 }
 
 CreditGainTable.propTypes = {
@@ -188,11 +188,10 @@ CoursePopulationCreditGainTable.propTypes = {
   faculties: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = ({ populations, localize, faculties }) => {
+const mapStateToProps = ({ populations, faculties }) => {
   return {
     faculties: faculties.data,
-    populationStatistics: populations.data,
-    language: getActiveLanguage(localize).code
+    populationStatistics: populations.data
   }
 }
 

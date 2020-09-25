@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { string, arrayOf, object, func, bool, shape } from 'prop-types'
 import { Button, Icon, Tab, Grid, Ref, Item } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
@@ -558,7 +557,6 @@ PopulationStudents.propTypes = {
 
 const mapStateToProps = state => {
   const {
-    localize,
     settings,
     populations,
     populationCourses,
@@ -589,7 +587,6 @@ const mapStateToProps = state => {
   return {
     showNames: settings.namesVisible,
     showList: settings.studentlistVisible,
-    language: getActiveLanguage(localize).code,
     queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
     populationStatistics: populations.data,
     mandatoryCourses: populationMandatoryCourses.data,

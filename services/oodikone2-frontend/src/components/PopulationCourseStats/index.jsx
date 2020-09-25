@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { connect, useSelector } from 'react-redux'
 import { Table, Form, Input, Tab } from 'semantic-ui-react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
-import { getActiveLanguage } from 'react-localize-redux'
 import { orderBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
@@ -20,6 +19,7 @@ import useFilterTray from '../FilterTray/useFilterTray'
 import { contextKey as filterTrayContextKey } from '../FilterTray'
 import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Courses'
 import useAnalytics from '../FilterTray/useAnalytics'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
 
@@ -46,11 +46,10 @@ const lodashSortOrderTypes = {
   DESC: 'desc'
 }
 
-function updateCourseStatisticsCriteria(props, state, mandatoryCourses, mandatoryToggle) {
+function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses, mandatoryToggle) {
   const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
   const {
-    courses: { coursestatistics },
-    language
+    courses: { coursestatistics }
   } = props
 
   const studentAmountFilter = ({ stats }) => {
@@ -101,12 +100,15 @@ const initialState = props => ({
 })
 
 function PopulationCourseStats(props) {
+  const { language } = useLanguage()
   const [state, setState] = useState(initialState(props))
   const [modules, setModules] = useState([])
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
   const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
-  const [courseStatistics, setCourseStatistics] = useState(updateCourseStatisticsCriteria(props, initialState(props)))
+  const [courseStatistics, setCourseStatistics] = useState(
+    updateCourseStatisticsCriteria(props, language, initialState(props))
+  )
   const [timer, setTimer] = useState(null)
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
@@ -125,7 +127,7 @@ function PopulationCourseStats(props) {
         studentAmountLimit,
         selectedStudentsLength: props.selectedStudents.length
       })
-      setCourseStatistics(updateCourseStatisticsCriteria(props, state, mandatoryCourses, mandatoryToggle))
+      setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses, mandatoryToggle))
     }
   }, [props.courses, props.selectedStudents])
 
@@ -219,7 +221,7 @@ function PopulationCourseStats(props) {
 
   const handleCourseStatisticsCriteriaChange = () => {
     // eslint-disable-next-line react/no-access-state-in-setstate
-    const courseStatistics = updateCourseStatisticsCriteria(props, state)
+    const courseStatistics = updateCourseStatisticsCriteria(props, language, state)
     setCourseStatistics(courseStatistics)
   }
 
@@ -419,7 +421,6 @@ const mapStateToProps = state => {
   const isAdmin = getUserIsAdmin(state.auth.token.roles)
 
   return {
-    language: getActiveLanguage(state.localize).code,
     years,
     populationCourses: state.populationCourses,
     isAdmin
