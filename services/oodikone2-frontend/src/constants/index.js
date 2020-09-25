@@ -209,3 +209,5 @@ export const ERROR_STATUSES_NOT_TO_CAPTURE = []
 // Increment this if search history code changes
 // so it will be reseted for all users.
 export const SEARCH_HISTORY_VERSION = '1.0'
+
+export const LANGUAGE_CODES = ['fi', 'en', 'sv']
