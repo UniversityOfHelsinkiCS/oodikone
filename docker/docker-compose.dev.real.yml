@@ -21,6 +21,10 @@ services:
   updater_writer:
     environment:
       DB_URL: postgres://postgres@db:5432/tkt_oodi_real
+  updater_api:
+    environment:
+      - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
+      - TOKEN
 
   redis:
     volumes:
