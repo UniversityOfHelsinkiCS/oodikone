@@ -1,7 +1,7 @@
 import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { getActiveLanguage, getTranslate } from 'react-localize-redux'
-import { func, bool, shape, arrayOf, any } from 'prop-types'
+import { getActiveLanguage } from 'react-localize-redux'
+import { bool, shape, arrayOf, any } from 'prop-types'
 import { Header, Segment } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
 import PopulationDetails from '../PopulationDetails'
@@ -15,17 +15,7 @@ import { PopulationStatisticsFilters } from '../FilterTray/FilterSets'
 import PopulationSearch from '../PopulationSearch'
 
 const PopulationStatistics = memo(props => {
-  const {
-    translate,
-    queryIsSet,
-    selectedStudentsByYear,
-    query,
-    samples,
-    location,
-    history,
-    isLoading,
-    students
-  } = props
+  const { queryIsSet, selectedStudentsByYear, query, samples, location, history, isLoading, students } = props
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { setAllStudents } = useFilters()
   useTitle('Population statistics')
@@ -39,13 +29,12 @@ const PopulationStatistics = memo(props => {
     <FilterTray filterSet={<PopulationStatisticsFilters />} visible={location.search !== ''}>
       <div className="segmentContainer">
         <Header className="segmentTitle" size="large">
-          {translate('populationStatistics.header')}
+          Population statistics
         </Header>
         <Segment className="contentSegment">
           <PopulationSearch history={history} location={location} />
           {location.search !== '' ? (
             <PopulationDetails
-              translate={translate}
               queryIsSet={queryIsSet}
               selectedStudentsByYear={selectedStudentsByYear}
               query={query}
@@ -61,7 +50,6 @@ const PopulationStatistics = memo(props => {
 })
 
 PopulationStatistics.propTypes = {
-  translate: func.isRequired,
   location: shape({}).isRequired,
   history: shape({}).isRequired,
   samples: arrayOf(shape({})).isRequired,
@@ -98,7 +86,6 @@ const mapStateToProps = state => {
   const { localize, populations } = state
 
   return {
-    translate: getTranslate(localize),
     currentLanguage: getActiveLanguage(localize).value,
     query: populations.query ? populations.query : {},
     queryIsSet: !!populations.query,

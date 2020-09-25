@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { func, shape, string, arrayOf } from 'prop-types'
-import { getTranslate, getActiveLanguage } from 'react-localize-redux'
+import { shape, string, arrayOf } from 'prop-types'
+import { getActiveLanguage } from 'react-localize-redux'
 import { Segment, Header, Message } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 
@@ -15,7 +15,7 @@ import { getUserRoles, checkUserAccess } from '../../common'
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
 const StudentStatistics = props => {
-  const { translate, match, userRoles, rights } = props
+  const { match, userRoles, rights } = props
   const { studentNumber } = match.params
 
   useTitle('Student statistics')
@@ -35,19 +35,18 @@ const StudentStatistics = props => {
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
-        {translate('studentStatistics.header')}
+        Student statistics
       </Header>
       <StudentNameVisibilityToggle />
       <Segment className="contentSegment">
-        <StudentSearch translate={translate} studentNumber={studentNumber} />
-        <StudentDetails translate={translate} studentNumber={studentNumber} />
+        <StudentSearch studentNumber={studentNumber} />
+        <StudentDetails studentNumber={studentNumber} />
       </Segment>
     </div>
   )
 }
 
 StudentStatistics.propTypes = {
-  translate: func.isRequired,
   match: shape({
     params: shape({
       studentNumber: string
@@ -72,7 +71,6 @@ const mapStateToProps = ({
 }) => ({
   userRoles: getUserRoles(roles),
   rights,
-  translate: getTranslate(localize),
   currentLanguage: getActiveLanguage(localize).value,
   student: students.data.find(student => student.studentNumber === students.selected)
 })
