@@ -74,7 +74,7 @@ PopulationSearch.propTypes = {
 const mapStateToProps = ({ populations, auth }) => ({
   populationFound: populations.data.students !== undefined,
   isAdmin: getUserIsAdmin(auth.token.roles),
-  loading: !!populations.pending,
+  loading: !!populations.pending
 })
 
 export default connect(mapStateToProps)(PopulationSearch)

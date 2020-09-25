@@ -642,7 +642,7 @@ PopulationSearchForm.propTypes = {
   mandatoryToggle: bool.isRequired
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, localize, tags }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, tags }) => {
   const { language } = settings
   const { pending } = populationDegreesAndProgrammes
   return {
