@@ -4,7 +4,6 @@ import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
 import { func, arrayOf, shape, bool, string, object, oneOfType } from 'prop-types'
 import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
-import { getTranslate } from 'react-localize-redux'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
 import { sortBy, isEqual } from 'lodash'
@@ -56,7 +55,7 @@ const PopulationSearchForm = props => {
 
   const { query, isLoading, momentYear } = totalState
 
-  const { studyProgrammes, location, semesters, queries, history, tags, language, translate, onProgress } = props
+  const { studyProgrammes, location, semesters, queries, history, tags, language, onProgress } = props
 
   const parseQueryFromUrl = () => {
     const initial = initialQuery()
@@ -580,22 +579,22 @@ const PopulationSearchForm = props => {
   if (!shouldRenderSearchForm() && location.search !== '') {
     return null
   }
-  let errorText = translate('populationStatistics.alreadyFetched')
+  let errorText = 'Selected population already in analysis.'
   let isQueryInvalid = false
 
   if (!validYearCheck(momentYear)) {
     isQueryInvalid = true
-    errorText = translate('populationStatistics.selectValidYear')
+    errorText = 'Select a valid year.'
   }
 
   if (query.semesters.length === 0) {
     isQueryInvalid = true
-    errorText = 'Select at least one semester'
+    errorText = 'Select at least one semester.'
   }
 
   if (!query.studyRights.programme) {
     isQueryInvalid = true
-    errorText = translate('populationStatistics.selectStudyRights')
+    errorText = 'Select study rights.'
   }
 
   return (
@@ -611,7 +610,7 @@ const PopulationSearchForm = props => {
         </Grid>
         <Message error color="blue" header={errorText} />
         <Form.Button onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
-          {translate('populationStatistics.addPopulation')}
+          See population
         </Form.Button>
         <SearchHistory items={searchHistory} updateItem={updateItemInSearchHistory} handleSearch={pushQueryToUrl} />
       </Form>
@@ -621,7 +620,6 @@ const PopulationSearchForm = props => {
 
 PopulationSearchForm.propTypes = {
   language: string.isRequired,
-  translate: func.isRequired,
   getDegreesAndProgrammes: func.isRequired,
   getPopulationStatistics: func.isRequired,
   getPopulationCourses: func.isRequired,
@@ -651,7 +649,6 @@ const mapStateToProps = ({ semesters, settings, populations, populationDegreesAn
     semesters: semesters.data,
     language,
     queries: populations.query || {},
-    translate: getTranslate(localize),
     studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
     tags: tags.data
