@@ -30,7 +30,6 @@ const StudentDetails = ({
   student: { semesterenrollments },
   resetStudent,
   removeStudentSelection,
-  translate,
   getDegreesAndProgrammes,
   getSemesters,
   pending,
@@ -162,11 +161,10 @@ const StudentDetails = ({
 
   return (
     <Segment className="contentSegment">
-      <StudentInfoCard student={student} translate={translate} />
+      <StudentInfoCard student={student} />
       <StudentGraphs
         student={student}
         absences={getAbsentYears()}
-        translate={translate}
         graphYearStart={graphYearStart}
         semesters={semesters}
         language={language}
@@ -185,12 +183,7 @@ const StudentDetails = ({
         programmes={degreesAndProgrammes.programmes || {}}
         absentYears={getAbsentYears()}
       />
-      <CourseParticipationTable
-        student={student}
-        language={language}
-        translate={translate}
-        clearCourseStats={clearCourseStats}
-      />
+      <CourseParticipationTable student={student} language={language} clearCourseStats={clearCourseStats} />
     </Segment>
   )
 }
@@ -203,7 +196,6 @@ StudentDetails.propTypes = {
   degreesAndProgrammes: shape({}).isRequired,
   removeStudentSelection: func.isRequired,
   studentNumber: string,
-  translate: func.isRequired,
   student: shape({
     courses: arrayOf(
       shape({
