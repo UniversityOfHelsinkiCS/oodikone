@@ -15,7 +15,7 @@ const {
   getAllProgrammes: getAllProgrammesV2,
   nonGraduatedStudentsOfElementDetail: nonGraduatedStudentsOfElementDetailV2
 } = require('./servicesV2/studyrights')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studytrack')
+const { productivityStatsForCode, throughputStatsForCode } = require('./services/studyprogramme')
 
 const {
   productivityStatsForStudytrack: productivityStatsForStudytrackV2,
@@ -88,7 +88,7 @@ const refreshOverview = async () => {
       }
       try {
         await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-        const data = await throughputStatsForStudytrack(code, programmeStatsSince.getFullYear())
+        const data = await throughputStatsForCode(code, programmeStatsSince.getFullYear())
         await setThroughput(data)
       } catch (e) {
         try {
@@ -101,7 +101,7 @@ const refreshOverview = async () => {
       }
       try {
         await patchProductivity({ [code]: { status: 'RECALCULATING' } })
-        const data = await productivityStatsForStudytrack(code, programmeStatsSince)
+        const data = await productivityStatsForCode(code, programmeStatsSince)
         await setProductivity(data)
       } catch (e) {
         try {

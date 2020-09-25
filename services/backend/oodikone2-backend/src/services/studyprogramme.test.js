@@ -5,11 +5,11 @@ const {
   findGraduated,
   graduatedStatsFromStudyrights,
   combineStatistics,
-  productivityStatsForStudytrack,
+  productivityStatsForCode,
   findProgrammeThesisCredits,
   thesisProductivityFromCredits,
   thesisProductivityForStudytrack
-} = require('./studytrack')
+} = require('./studyprogramme')
 const { sequelize } = require('../models')
 const { ThesisTypeEnums, ThesisCourse } = require('../models/models_kone')
 const { readFileSync } = require('fs')
@@ -21,14 +21,14 @@ const provider = '500-M010'
 const studytrack = 'MH50_010'
 
 const thesisCourse = {
-  // from studytrack.test.sql
+  // from studyprogramme.test.sql
   programmeCode: 'MH50_010',
   courseCode: 'THESIS_01',
   thesisType: MASTER
 }
 
 beforeAll(async () => {
-  const query = readFileSync('./src/services/studytrack.test.sql', 'utf8')
+  const query = readFileSync('./src/services/studyprogramme.test.sql', 'utf8')
   await sequelize.query(query)
   await ThesisCourse.create(thesisCourse)
 })
@@ -188,8 +188,8 @@ test('combineStatistics returns correctly formatted array', () => {
   })
 })
 
-test('productivityStatsForStudytrack integrates', async () => {
-  const stats = await productivityStatsForStudytrack(studytrack, '2001-01-01')
+test('productivityStatsForCode integrates', async () => {
+  const stats = await productivityStatsForCode(studytrack, '2001-01-01')
   expect(stats.data).toContainEqual({
     year: 2015,
     graduated: 0,
