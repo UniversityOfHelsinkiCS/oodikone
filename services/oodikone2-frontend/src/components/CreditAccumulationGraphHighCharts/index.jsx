@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { renderToString } from 'react-dom/server'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import moment from 'moment'
 import { arrayOf, bool, object, string, func, number, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
@@ -346,7 +345,6 @@ CreditAccumulationGraphHighCharts.propTypes = {
 }
 
 const mapStateToProps = state => ({
-  language: getActiveLanguage(state.localize).code,
   spinner: state.graphSpinner,
   currentGraphSize: state.settings.chartHeight
 })

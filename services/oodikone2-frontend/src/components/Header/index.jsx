@@ -1,11 +1,7 @@
 import React from 'react'
-import { connect } from 'react-redux'
 import { shape, string } from 'prop-types'
-import { getActiveLanguage } from 'react-localize-redux'
 import { withRouter } from 'react-router-dom'
-
 import NavigationBar from '../NavigationBar'
-
 import './header.css'
 
 const Header = props => (
@@ -20,8 +16,4 @@ Header.propTypes = {
   }).isRequired
 }
 
-const mapStateToProps = ({ localize }) => ({
-  currentLanguage: getActiveLanguage(localize).code
-})
-
-export default withRouter(connect(mapStateToProps)(Header))
+export default withRouter(Header)

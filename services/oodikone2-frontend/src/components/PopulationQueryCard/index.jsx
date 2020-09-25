@@ -1,6 +1,4 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { withRouter } from 'react-router-dom'
 import { func, arrayOf, object, shape, string, oneOfType, number } from 'prop-types'
 import { Card, Icon } from 'semantic-ui-react'
@@ -8,8 +6,10 @@ import { minBy } from 'lodash'
 import './populationQueryCard.css'
 import { DISPLAY_DATE_FORMAT } from '../../constants'
 import { reformatDate, getTextIn } from '../../common'
+import useLanguage from '../LanguagePicker/useLanguage'
 
-const PopulationQueryCard = ({ population, query, removeSampleFn, units, language, tags }) => {
+const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags }) => {
+  const { language } = useLanguage()
   const { uuid, year, semesters, months, studentStatuses, tag, years } = query
   const tagname = tag && tags.length > 0 ? tags.find(t => t.tag_id === tag).tagname : ''
   const lowestYear = query.years ? Math.min(...query.years.map(year => Number(year))) : null
@@ -74,7 +74,6 @@ const PopulationQueryCard = ({ population, query, removeSampleFn, units, languag
 }
 
 PopulationQueryCard.propTypes = {
-  language: string.isRequired,
   population: shape({ students: arrayOf(object), extents: arrayOf(object) }).isRequired,
   query: shape({
     year: oneOfType([string, number]),
@@ -87,11 +86,4 @@ PopulationQueryCard.propTypes = {
   tags: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = ({ localize }) => ({ language: getActiveLanguage(localize).code })
-
-export default withRouter(
-  connect(
-    mapStateToProps,
-    null
-  )(PopulationQueryCard)
-)
+export default withRouter(PopulationQueryCard)

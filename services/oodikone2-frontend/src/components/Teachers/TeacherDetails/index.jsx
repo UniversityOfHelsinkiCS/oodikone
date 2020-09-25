@@ -1,7 +1,5 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
-import { shape, string } from 'prop-types'
+import { shape } from 'prop-types'
 import { isString } from 'lodash'
 import { Card, Tab, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
@@ -9,6 +7,7 @@ import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import CoursesTab from './CoursesTab'
 import { getTextIn } from '../../../common'
 import '../../PopulationQueryCard/populationQueryCard.css'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,
@@ -26,7 +25,8 @@ const formatStatisticsForTable = (statistics, language) => {
   }))
 }
 
-const TeacherDetails = ({ teacher, language, history }) => {
+const TeacherDetails = ({ teacher, history }) => {
+  const { language } = useLanguage()
   const { courses, years, semesters } = teacher.statistics
 
   const panes = [
@@ -57,12 +57,7 @@ const TeacherDetails = ({ teacher, language, history }) => {
 
 TeacherDetails.propTypes = {
   teacher: shape({}).isRequired,
-  history: shape({}).isRequired,
-  language: string.isRequired
+  history: shape({}).isRequired
 }
 
-const mapStateToProps = ({ localize }) => ({
-  language: getActiveLanguage(localize).code
-})
-
-export default connect(mapStateToProps)(withRouter(TeacherDetails))
+export default withRouter(TeacherDetails)

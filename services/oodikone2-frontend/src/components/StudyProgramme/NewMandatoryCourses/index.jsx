@@ -9,8 +9,10 @@ import {
   removeCourseExclusion,
   getMandatoryCourses
 } from '../../../redux/populationMandatoryCourses'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
-const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeExclusion }) => {
+const MandatoryCourseTable = ({ studyProgramme, setExclusion, removeExclusion }) => {
+  const { language } = useLanguage()
   const dispatch = useDispatch()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [visible, setVisible] = useState({})
@@ -139,8 +141,7 @@ const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeEx
 MandatoryCourseTable.propTypes = {
   studyProgramme: string.isRequired,
   removeExclusion: func.isRequired,
-  setExclusion: func.isRequired,
-  language: string.isRequired
+  setExclusion: func.isRequired
 }
 
 const mapStateToProps = ({ mandatoryCourseLabels }) => ({

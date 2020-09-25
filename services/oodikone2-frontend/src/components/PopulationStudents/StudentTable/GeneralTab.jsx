@@ -4,7 +4,6 @@ import { Item, Icon, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { flatten } from 'lodash'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import SortableTable from '../../SortableTable'
 import {
   getStudentTotalCredits,
@@ -17,6 +16,7 @@ import {
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
 import useFilters from '../../FilterTray/useFilters'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 // TODO: Refactoring in process, contains lot of duplicate code.
 
@@ -25,11 +25,11 @@ const GeneralTab = ({
   coursePopulation,
   customPopulation,
   populationStatistics,
-  language,
   queryStudyrights,
   isAdmin,
   studentToTargetCourseDateMap
 }) => {
+  const { language } = useLanguage()
   const { filteredStudents } = useFilters()
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
@@ -372,7 +372,6 @@ GeneralTab.propTypes = {
   coursePopulation: bool,
   customPopulation: bool,
   populationStatistics: shape({}).isRequired,
-  language: string.isRequired,
   queryStudyrights: arrayOf(string).isRequired,
   isAdmin: bool.isRequired,
   studentToTargetCourseDateMap: shape({})
@@ -380,7 +379,6 @@ GeneralTab.propTypes = {
 
 const mapStateToProps = state => {
   const {
-    localize,
     populations,
     auth: {
       token: { roles }
@@ -389,7 +387,6 @@ const mapStateToProps = state => {
 
   return {
     isAdmin: getUserIsAdmin(roles),
-    language: getActiveLanguage(localize).code,
     populationStatistics: populations.data,
     queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : []
   }

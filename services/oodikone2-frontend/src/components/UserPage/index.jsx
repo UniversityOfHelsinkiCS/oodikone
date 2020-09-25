@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { string, number, shape, bool, arrayOf, func } from 'prop-types'
@@ -14,10 +13,10 @@ import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
 import EmailNotification from './EmailNotification'
 import { getElementDetails } from '../../redux/elementdetails'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const UserPage = ({
   user,
-  language,
   elementdetails,
   accessGroups,
   isAdmin,
@@ -33,6 +32,8 @@ const UserPage = ({
   getFaculties,
   getDegreesAndProgrammesUnfiltered
 }) => {
+  const { language } = useLanguage()
+
   useEffect(() => {
     if (elementdetails.length === 0) getElementDetails()
     if (accessGroups.data.length === 0) getAccessGroups()
@@ -216,7 +217,6 @@ UserPage.propTypes = {
   }).isRequired,
   removeUserUnits: func.isRequired,
   setFaculties: func.isRequired,
-  language: string.isRequired,
   goBack: func.isRequired,
   getDegreesAndProgrammesUnfiltered: func.isRequired,
   associations: shape({}).isRequired,
@@ -233,7 +233,6 @@ UserPage.propTypes = {
   isAdmin: bool.isRequired
 }
 const mapStateToProps = state => ({
-  language: getActiveLanguage(state.localize).code,
   units: state.units.data,
   faculties: state.faculties.data,
   associations: state.populationDegreesAndProgrammesUnfiltered.data,

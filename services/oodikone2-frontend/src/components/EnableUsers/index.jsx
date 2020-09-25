@@ -3,7 +3,6 @@ import { withRouter, Link } from 'react-router-dom'
 import { Button, Radio, Icon, Header, Segment, Loader, Label, Popup } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf, number } from 'prop-types'
-import { getActiveLanguage } from 'react-localize-redux'
 import { getUsers } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
@@ -11,6 +10,7 @@ import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard, getTextIn } from '../../common'
 import UserPageNew from '../UserPage'
 import SortableTable from '../SortableTable'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 class EnableUsers extends Component {
   state = {
@@ -54,6 +54,7 @@ class EnableUsers extends Component {
   }
 
   renderUserSearchList = () => {
+    const { language } = useLanguage()
     const { enabledOnly } = this.state
     const { users, error, elementdetails } = this.props
     let usersToRender
@@ -104,7 +105,7 @@ class EnableUsers extends Component {
                 const nameInLanguage = code => {
                   const elem = elementdetails.find(e => e.code === code)
                   if (!elem) return null
-                  return getTextIn(elem.name, this.props.language)
+                  return getTextIn(elem.name, language)
                 }
 
                 if (!user.elementdetails || user.elementdetails.length === 0) return null
@@ -194,7 +195,6 @@ EnableUsers.propTypes = {
       studentNumber: string
     })
   }).isRequired,
-  language: string.isRequired,
   getUsers: func.isRequired,
   pending: bool.isRequired,
   getUnits: func.isRequired,
@@ -222,8 +222,7 @@ EnableUsers.propTypes = {
 
 const sortUsers = makeSortUsers()
 
-const mapStateToProps = ({ localize, users, units, elementdetails }) => ({
-  language: getActiveLanguage(localize).code,
+const mapStateToProps = ({ users, units, elementdetails }) => ({
   units: units.data,
   elementdetails: elementdetails.data,
   enabledOnly: users.enabledOnly,

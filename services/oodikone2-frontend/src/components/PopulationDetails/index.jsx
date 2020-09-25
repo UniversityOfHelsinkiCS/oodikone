@@ -14,10 +14,12 @@ import CreditGainStats from './CreditGainStats'
 import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStudentsByYear, mandatoryToggle }) => {
   const { allStudents, filteredStudents } = useFilters()
   const [trayOpen] = useFilterTray('filterTray')
+  const { language } = useLanguage()
   // TODO: Refactor this away from children:
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
@@ -53,6 +55,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
         maxCredits={samples.maxCredits}
         selectedStudents={selectedStudents}
         trayOpen={trayOpen}
+        language={language}
       />
     )
     return (
@@ -213,7 +216,11 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       content: {
         content: (
           <div ref={studentTableRef}>
-            <PopulationStudents mandatoryToggle={mandatoryToggle} filteredStudents={filteredStudents} />
+            <PopulationStudents
+              language={language}
+              mandatoryToggle={mandatoryToggle}
+              filteredStudents={filteredStudents}
+            />
           </div>
         )
       }

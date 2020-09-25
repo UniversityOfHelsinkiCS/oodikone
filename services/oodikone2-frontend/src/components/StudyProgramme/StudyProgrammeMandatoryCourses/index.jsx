@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { func, shape, string, bool } from 'prop-types'
 import { Message, Tab } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
@@ -25,7 +24,6 @@ const StudyProgrammeMandatoryCourses = props => {
     setMandatoryCourseLabel,
     studyProgramme,
     mandatoryCourses,
-    language,
     history,
     isAdmin
   } = props
@@ -49,7 +47,6 @@ const StudyProgrammeMandatoryCourses = props => {
             studyProgramme={studyProgramme}
             deleteMandatoryCourse={deleteMandatoryCourse}
             setMandatoryCourseLabel={setMandatoryCourseLabel}
-            language={language}
           />
         </Tab.Pane>
       )
@@ -67,7 +64,7 @@ const StudyProgrammeMandatoryCourses = props => {
   if (isAdmin)
     panes.push({
       menuItem: 'New Mand. Courses',
-      render: () => <NewMandatoryCourseTable studyProgramme={studyProgramme} language={language} />
+      render: () => <NewMandatoryCourseTable studyProgramme={studyProgramme} />
     })
 
   return (
@@ -89,21 +86,18 @@ StudyProgrammeMandatoryCourses.propTypes = {
   setMandatoryCourseLabel: func.isRequired,
   studyProgramme: string.isRequired,
   mandatoryCourses: shape({}).isRequired,
-  language: string.isRequired,
   history: shape({}).isRequired,
   isAdmin: bool.isRequired
 }
 
 const mapStateToProps = ({
   populationMandatoryCourses,
-  localize,
   auth: {
     token: { roles }
   }
 }) => ({
   isAdmin: getUserIsAdmin(roles),
-  mandatoryCourses: populationMandatoryCourses,
-  language: getActiveLanguage(localize).code
+  mandatoryCourses: populationMandatoryCourses
 })
 
 const mapDispatchToProps = {
