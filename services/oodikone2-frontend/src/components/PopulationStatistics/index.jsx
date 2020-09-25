@@ -1,6 +1,5 @@
 import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { bool, shape, arrayOf, any } from 'prop-types'
 import { Header, Segment } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
@@ -83,10 +82,9 @@ const mapStateToProps = state => {
     samples.minDateWithCredits = Math.min(...datesWithCredits)
   }
 
-  const { localize, populations } = state
+  const { populations } = state
 
   return {
-    currentLanguage: getActiveLanguage(localize).value,
     query: populations.query ? populations.query : {},
     queryIsSet: !!populations.query,
     selectedStudentsByYear,
