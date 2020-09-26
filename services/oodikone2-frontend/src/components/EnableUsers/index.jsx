@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
-import { withRouter, Link } from 'react-router-dom'
-import { Button, Radio, Icon, Header, Segment, Loader, Label, Popup } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom'
+import { Radio, Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { func, shape, string, bool, arrayOf, number } from 'prop-types'
 import { getUsers } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
 import { makeSortUsers } from '../../selectors/users'
-import { copyToClipboard, getTextIn } from '../../common'
+import { copyToClipboard } from '../../common'
 import UserPageNew from '../UserPage'
-import SortableTable from '../SortableTable'
-import useLanguage from '../LanguagePicker/useLanguage'
+import UserSearchList from './UserSearchList'
 
 class EnableUsers extends Component {
   state = {
@@ -53,101 +52,6 @@ class EnableUsers extends Component {
     return !user ? <Loader active /> : <UserPageNew userid={userid} user={user} goBack={this.openUsersPage} />
   }
 
-  renderUserSearchList = () => {
-    const { language } = useLanguage()
-    const { enabledOnly } = this.state
-    const { users, error, elementdetails } = this.props
-    let usersToRender
-    if (enabledOnly) {
-      usersToRender = users.filter(u => u.is_enabled)
-    } else {
-      usersToRender = users
-    }
-    return error ? null : (
-      <div>
-        <SortableTable
-          getRowKey={user => user.id}
-          tableProps={{ celled: true, structured: true }}
-          columns={[
-            {
-              key: 'NAME',
-              title: 'Name',
-              getRowVal: user => {
-                const nameparts = user.full_name.split(' ')
-                return nameparts[nameparts.length - 1]
-              },
-              getRowContent: user => user.full_name
-            },
-            {
-              key: 'USERNAME',
-              title: 'Username',
-              getRowVal: user => user.username
-            },
-            {
-              key: 'ROLE',
-              title: 'Role',
-              getRowContent: user => (
-                <Label.Group>
-                  {user.accessgroup
-                    .map(ag => ag.group_code)
-                    .sort()
-                    .map(code => (
-                      <Label key={code} content={code} />
-                    ))}
-                </Label.Group>
-              ),
-              getRowVal: user => user.accessgroup.map(ag => ag.group_code).sort()
-            },
-            {
-              key: 'PROGRAMMES',
-              title: 'Programmes',
-              getRowVal: user => {
-                const nameInLanguage = code => {
-                  const elem = elementdetails.find(e => e.code === code)
-                  if (!elem) return null
-                  return getTextIn(elem.name, language)
-                }
-
-                if (!user.elementdetails || user.elementdetails.length === 0) return null
-                const name = nameInLanguage(user.elementdetails[0])
-                if (!name) return `${user.elementdetails.length} programmes`
-                if (user.elementdetails.length >= 2) {
-                  return `${nameInLanguage(user.elementdetails[0])} +${user.elementdetails.length - 1} others`
-                }
-                return name
-              }
-            },
-            {
-              key: 'OODIACCESS',
-              title: 'Has access',
-              getRowVal: user => user.is_enabled,
-              getRowContent: user => (
-                <Icon
-                  style={{ margin: 'auto' }}
-                  color={user.is_enabled ? 'green' : 'red'}
-                  name={user.is_enabled ? 'check' : 'remove'}
-                />
-              )
-            },
-            {
-              key: 'EDIT',
-              title: '',
-              getRowVal: user => (
-                <Button.Group compact widths={2}>
-                  <Button basic size="mini" as={Link} to={`users/${user.id}`}>
-                    Edit
-                  </Button>
-                </Button.Group>
-              ),
-              headerProps: { onClick: null, sorted: null }
-            }
-          ]}
-          data={usersToRender}
-        />
-      </div>
-    )
-  }
-
   handlePopupOpen = () => {
     this.setState({ popupOpen: true })
     this.popupTimeout = setTimeout(() => {
@@ -160,7 +64,7 @@ class EnableUsers extends Component {
   }
 
   render() {
-    const { match, pending } = this.props
+    const { match, pending, users, error, elementdetails } = this.props
     const { enabledOnly } = this.state
     const { userid } = match.params
     return (
@@ -174,7 +78,11 @@ class EnableUsers extends Component {
           onClick={() => this.toggleEnabledOnly()}
         />
         <Segment loading={pending} className="contentSegment">
-          {!userid ? this.renderUserSearchList() : this.renderUserPage(userid)}
+          {!userid ? (
+            <UserSearchList enabledOnly={enabledOnly} users={users} error={error} elementdetails={elementdetails} />
+          ) : (
+            this.renderUserPage(userid)
+          )}
         </Segment>
         <Popup
           trigger={<Icon link name="envelope" onClick={this.copyEmailsToClippoard} style={{ float: 'right' }} />}

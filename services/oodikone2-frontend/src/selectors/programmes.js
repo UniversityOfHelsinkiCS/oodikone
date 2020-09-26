@@ -1,25 +1,21 @@
 import { createSelector } from 'reselect'
-import { getActiveLanguage } from 'react-localize-redux'
-import { getTextIn } from '../common'
 
-const languageSelector = state => getActiveLanguage(state.localize).code
 const associationsSelector = state => state.populationDegreesAndProgrammesUnfiltered.data
 
-const toOptions = (elements, language) =>
+const toOptions = elements =>
   !elements
     ? []
     : Object.values(elements).map(element => ({
         code: element.code,
-        name: getTextIn(element.name, language)
+        name: element.name
       }))
 
 const userRightsPropSelector = (_, props) => props.rights
 
 const dropdownProgrammeSelector = createSelector(
-  languageSelector,
   associationsSelector,
-  (language, assocs) => {
-    const programmes = toOptions(assocs.programmes, language)
+  assocs => {
+    const programmes = toOptions(assocs.programmes)
     return programmes
   }
 )
