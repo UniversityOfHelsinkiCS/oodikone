@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux'
-import { localeReducer as localize } from 'react-localize-redux'
 import actionHistory from './actionHistory'
 import users from './users'
 import populations from './populations'
@@ -47,7 +46,6 @@ import presentStudents from './presentStudents'
 import coolDataScience from './coolDataScience'
 
 export default combineReducers({
-  localize,
   actionHistory,
   users,
   mandatoryCourseLabels,

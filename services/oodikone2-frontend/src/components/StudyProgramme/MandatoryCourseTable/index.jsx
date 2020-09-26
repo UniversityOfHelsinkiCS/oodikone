@@ -63,7 +63,6 @@ const MandatoryCourseTable = ({
       getRowVal: course => deleteButton(course.code)
     }
   ]
-
   return <SortableTable columns={columns} data={mandatoryCourses} getRowKey={row => row.code} />
 }
 

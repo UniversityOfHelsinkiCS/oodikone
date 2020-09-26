@@ -22,10 +22,10 @@ const CreditGainTableRow = ({ statistics, code }) => {
   )
 }
 
-const CreditGainTable = ({ data, selectedStudents, totalCredits, language, headerText }) => {
+const CreditGainTable = ({ data, selectedStudents, totalCredits, headerText }) => {
   const tableRows = Object.keys(data)
     .sort()
-    .map(code => <CreditGainTableRow key={code} statistics={data[code]} code={code} language={language} />)
+    .map(code => <CreditGainTableRow key={code} statistics={data[code]} code={code} />)
   return (
     <Table>
       <Table.Header style={{ backgroundColor: 'whitesmoke' }}>
@@ -55,8 +55,7 @@ const CoursePopulationCreditGainTable = ({
   to,
   studentToTargetCourseDateMap,
   populationStatistics,
-  faculties,
-  language
+  faculties
 }) => {
   const [programmeCreditsStatistics, setStatistics] = useState({})
   const [facultyCreditsStatistics, setFacStatistics] = useState({})
@@ -130,7 +129,6 @@ const CoursePopulationCreditGainTable = ({
             selectedStudents={selectedStudents}
             totalCredits={totalCredits}
             headerText="Faculty"
-            language={language}
           />
         </Tab.Pane>
       )
@@ -144,7 +142,6 @@ const CoursePopulationCreditGainTable = ({
             selectedStudents={selectedStudents}
             totalCredits={totalCredits}
             headerText="Programme"
-            language={language}
           />
         </Tab.Pane>
       )
@@ -172,7 +169,6 @@ CreditGainTable.propTypes = {
   data: shape({}).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   totalCredits: number.isRequired,
-  language: string.isRequired,
   headerText: string.isRequired
 }
 
@@ -182,7 +178,6 @@ CoursePopulationCreditGainTable.propTypes = {
   codes: arrayOf(string).isRequired,
   from: number.isRequired,
   to: number.isRequired,
-  language: string.isRequired,
   studentToTargetCourseDateMap: shape({}),
   populationStatistics: shape({}).isRequired,
   faculties: arrayOf(shape({})).isRequired

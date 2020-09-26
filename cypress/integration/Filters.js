@@ -106,7 +106,7 @@ describe("Course Statistics", () => {
     cy.init()
     cy.cs("navbar-courseStatistics").click()
     cy.cs("course-code-input").click().type("TKT20002")
-    cy.get(":nth-child(2) > .ten").click()
+    cy.get(":nth-child(1) > .ten").click()
     cy.cs("fetch-stats-button").click()
     cy.get(":nth-child(2) > :nth-child(1) > div > .item > .level").click()
     cy.cs("filter-toggle-open").click()
