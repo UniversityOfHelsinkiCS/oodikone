@@ -9,7 +9,7 @@ import './courseTable.css'
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false }) => {
   const { language } = useLanguage()
   const noContent = courses.length === 0
-  const sortCourses = courses => sortBy(courses, course => course.name)
+  const sortCourses = courses => sortBy(courses, course => course.name[language])
 
   const getEmptyListRow = () => (
     <Table.Row>
