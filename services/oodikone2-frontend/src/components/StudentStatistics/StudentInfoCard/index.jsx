@@ -3,18 +3,15 @@ import { func, bool, shape } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-
 import { reformatDate } from '../../../common'
 import { studentDetailsType } from '../../../constants/types'
 import { DISPLAY_DATE_FORMAT } from '../../../constants'
-
 import './studentInfoCard.css'
-
 import { removeStudentSelection, resetStudent } from '../../../redux/students'
 import { updatePopulationStudents } from '../../../redux/populations'
 
 const StudentInfoCard = props => {
-  const { student, translate, showName, updating } = props
+  const { student, showName, updating } = props
   const name = showName ? `${student.name}, ` : ''
   const email = showName && student.email ? `${student.email}` : ''
   const onRemove = () => {
@@ -34,13 +31,11 @@ const StudentInfoCard = props => {
           <Icon name="remove" className="controlIcon" onClick={onRemove} />
         </Card.Header>
         <Card.Meta>
-          <div className="startDate">
-            {`${translate('common.started')}: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}
-          </div>
+          <div className="startDate">{`Started: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}</div>
           <div className="startDate">{email}</div>
         </Card.Meta>
         <Card.Description>
-          {`${translate('common.credits')}: ${student.credits || 0}`}
+          {`Credits: ${student.credits || 0}`}
           <p style={{ fontSize: 14 }}>{`Updated at ${reformatDate(student.updatedAt, DISPLAY_DATE_FORMAT)}`}</p>
         </Card.Description>
         <div style={{ paddingTop: '4px' }}>
@@ -62,7 +57,6 @@ const StudentInfoCard = props => {
 
 StudentInfoCard.propTypes = {
   student: studentDetailsType.isRequired,
-  translate: func.isRequired,
   showName: bool.isRequired,
   removeStudentSelection: func.isRequired,
   resetStudent: func.isRequired,

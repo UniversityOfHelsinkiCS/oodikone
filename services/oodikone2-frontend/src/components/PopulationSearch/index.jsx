@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Segment, Header, Divider, Form, Button, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { getTranslate } from 'react-localize-redux'
 import { Link } from 'react-router-dom'
 import PopulationSearchForm from './PopulationSearchForm'
 import PopulationSearchHistory from './PopulationSearchHistory'
@@ -13,14 +12,11 @@ import useFeatureToggle from '../../common/useFeatureToggle'
 import { useProgress } from '../../common/hooks'
 import info from '../../common/markdown/populationStatistics/search.info.md'
 
-const PopulationSearch = ({ populationFound, history, location, isAdmin, loading, translate }) => {
+const PopulationSearch = ({ populationFound, history, location, isAdmin, loading }) => {
   const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { onProgress, progress } = useProgress(loading)
 
-  const title =
-    populationFound && history.location.search
-      ? translate('populationStatistics.foundTitle')
-      : translate('populationStatistics.searchTitle')
+  const title = populationFound && history.location.search ? 'Population' : 'Search for population'
 
   return (
     <Segment>
@@ -72,15 +68,13 @@ PopulationSearch.propTypes = {
   }).isRequired,
   populationFound: PropTypes.bool.isRequired,
   isAdmin: PropTypes.bool.isRequired,
-  loading: PropTypes.bool.isRequired,
-  translate: PropTypes.func.isRequired
+  loading: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = ({ populations, auth, localize }) => ({
+const mapStateToProps = ({ populations, auth }) => ({
   populationFound: populations.data.students !== undefined,
   isAdmin: getUserIsAdmin(auth.token.roles),
-  loading: !!populations.pending,
-  translate: getTranslate(localize)
+  loading: !!populations.pending
 })
 
 export default connect(mapStateToProps)(PopulationSearch)

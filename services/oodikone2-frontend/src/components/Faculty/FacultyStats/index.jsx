@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { Link } from 'react-router-dom'
 import { string, arrayOf, shape, number } from 'prop-types'
 import { Segment, Icon, Header, Item } from 'semantic-ui-react'
@@ -8,6 +7,7 @@ import { getTextIn } from '../../../common'
 import { calculateStatsForProgramme, calculateTotalPassedCourses, calculateTotalFailedCourses } from '../facultyUtils'
 import SortableTable from '../../SortableTable'
 import FacultyStatsGraph from '../FacultyStatsGraph'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const ShowProgrammeOverView = ({ code }) => {
   return (
@@ -21,7 +21,8 @@ ShowProgrammeOverView.propTypes = {
   code: string.isRequired
 }
 
-const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, language, fromYear, toYear }) => {
+const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, fromYear, toYear }) => {
+  const { language } = useLanguage()
   const totalStats = useMemo(
     () =>
       Object.entries(selectedFacultyProgrammesStats).reduce((res, [code, stats]) => {
@@ -107,14 +108,12 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, langu
 FacultyStats.propTypes = {
   facultyProgrammes: arrayOf(shape({})).isRequired,
   selectedFacultyProgrammesStats: shape({}).isRequired,
-  language: string.isRequired,
   fromYear: number.isRequired,
   toYear: number.isRequired
 }
 
-const mapStateToProps = ({ faculties, localize }) => ({
-  facultyProgrammes: faculties.facultyProgrammes,
-  language: getActiveLanguage(localize).code
+const mapStateToProps = ({ faculties }) => ({
+  facultyProgrammes: faculties.facultyProgrammes
 })
 
 export default connect(mapStateToProps)(FacultyStats)

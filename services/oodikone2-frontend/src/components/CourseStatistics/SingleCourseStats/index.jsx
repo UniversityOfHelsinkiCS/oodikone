@@ -3,7 +3,6 @@ import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { getActiveLanguage } from 'react-localize-redux'
 import { difference, min, max, flatten, pickBy, uniq } from 'lodash'
 import qs from 'query-string'
 import ResultTabs from '../ResultTabs'
@@ -18,6 +17,7 @@ import YearFilter from '../SearchForm/YearFilter'
 import { getTextIn } from '../../../common'
 import { getSemesters } from '../../../redux/semesters'
 import TSA from '../../../common/tsa'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const ANALYTICS_CATEGORY = 'Course Statistics'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
@@ -35,7 +35,6 @@ const SingleCourseStats = ({
   stats,
   setSelectedCourse,
   clearSelectedCourse,
-  activeLanguage,
   history,
   location,
   stats: { coursecode },
@@ -46,6 +45,7 @@ const SingleCourseStats = ({
   maxYearsToCreatePopulationFrom,
   getMaxYearsToCreatePopulationFrom
 }) => {
+  const { language } = useLanguage()
   const [primary, setPrimary] = useState([ALL.value])
   const [comparison, setComparison] = useState([])
   const [fromYear, setFromYear] = useState(0)
@@ -93,7 +93,7 @@ const SingleCourseStats = ({
       return 'Excluded'
     }
     const { name } = stats.programmes[progcode]
-    return getTextIn(name, activeLanguage)
+    return getTextIn(name, language)
   }
 
   const setExcludedToComparison = () => setComparison(primary.includes(ALL.value) ? [] : ['EXCLUDED'])
@@ -330,6 +330,10 @@ const SingleCourseStats = ({
     .filter(e => e.size > 0)
   if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
+  const options = filteredProgrammes
+    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : text[language], ...rest }))
+    .map(prog => ({ ...prog, name: prog.text }))
+
   return (
     <div>
       <Segment>
@@ -356,7 +360,7 @@ const SingleCourseStats = ({
             <Grid.Column width={8}>
               <ProgrammeDropdown
                 name="primary"
-                options={filteredProgrammes}
+                options={options}
                 label="Primary group"
                 placeholder="Select study programmes"
                 value={primary}
@@ -366,7 +370,7 @@ const SingleCourseStats = ({
             <Grid.Column width={8}>
               <ProgrammeDropdown
                 name="comparison"
-                options={comparisonProgrammes(filteredProgrammes)}
+                options={comparisonProgrammes(options)}
                 label="Comparison group"
                 placeholder="Optional"
                 value={comparison}
@@ -420,7 +424,6 @@ SingleCourseStats.propTypes = {
   years: arrayOf(shape({})).isRequired,
   semesters: arrayOf(shape({})).isRequired,
   location: shape({}).isRequired,
-  activeLanguage: string.isRequired,
   setSelectedCourse: func.isRequired,
   clearSelectedCourse: func.isRequired,
   getSemesters: func.isRequired,
@@ -449,7 +452,6 @@ const mapStateToProps = state => {
         value: yearcode
       }))
       .reverse(),
-    activeLanguage: getActiveLanguage(state.localize).code,
     maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom
   }
 }

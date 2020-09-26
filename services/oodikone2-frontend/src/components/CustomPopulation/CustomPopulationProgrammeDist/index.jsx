@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Progress } from 'semantic-ui-react'
 import { arrayOf, string, shape } from 'prop-types'
-import { getActiveLanguage } from 'react-localize-redux'
 import SearchResultTable from '../../SearchResultTable'
 import { getNewestProgramme, getTextIn } from '../../../common'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const CustomPopulationProgrammeDist = ({
   samples,
   selectedStudents,
   studentToTargetCourseDateMap,
-  language,
   populationStatistics
 }) => {
+  const { language } = useLanguage()
   const [tableRows, setRows] = useState([])
   useEffect(() => {
     if (Object.keys(populationStatistics).length > 0) {
@@ -67,13 +67,11 @@ CustomPopulationProgrammeDist.propTypes = {
   samples: arrayOf(shape({})).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   studentToTargetCourseDateMap: shape({}),
-  language: string.isRequired,
   populationStatistics: shape({}).isRequired
 }
 
-const mapStateToProps = ({ localize, populations }) => {
+const mapStateToProps = ({ populations }) => {
   return {
-    language: getActiveLanguage(localize).code,
     populationStatistics: populations.data
   }
 }

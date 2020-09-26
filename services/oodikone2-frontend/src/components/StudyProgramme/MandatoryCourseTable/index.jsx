@@ -6,16 +6,18 @@ import { Button, Dropdown } from 'semantic-ui-react'
 import SortableTable from '../../SortableTable'
 import { getTextIn } from '../../../common'
 import { GetMandatoryCourseLabels } from '../../../redux/mandatoryCourseLabels'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const MandatoryCourseTable = ({
   studyProgramme,
   mandatoryCourses,
-  language,
   deleteMandatoryCourse,
   setMandatoryCourseLabel,
   labels,
   getLabels
 }) => {
+  const { language } = useLanguage()
+
   useEffect(() => {
     getLabels(studyProgramme)
   }, [])
@@ -61,7 +63,6 @@ const MandatoryCourseTable = ({
       getRowVal: course => deleteButton(course.code)
     }
   ]
-
   return <SortableTable columns={columns} data={mandatoryCourses} getRowKey={row => row.code} />
 }
 
@@ -70,7 +71,6 @@ MandatoryCourseTable.propTypes = {
   studyProgramme: string.isRequired,
   deleteMandatoryCourse: func.isRequired,
   setMandatoryCourseLabel: func.isRequired,
-  language: string.isRequired,
   labels: arrayOf(shape({ code: string, label: string, name: shape({}) })).isRequired,
   getLabels: func.isRequired
 }

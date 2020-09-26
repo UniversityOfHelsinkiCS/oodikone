@@ -3,12 +3,13 @@ import { sortBy } from 'lodash'
 import { Segment, Table } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getActiveYears } from '../courseStatisticsUtils'
-
+import useLanguage from '../../LanguagePicker/useLanguage'
 import './courseTable.css'
 
 const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false }) => {
+  const { language } = useLanguage()
   const noContent = courses.length === 0
-  const sortCourses = courses => sortBy(courses, course => course.name)
+  const sortCourses = courses => sortBy(courses, course => course.name[language])
 
   const getEmptyListRow = () => (
     <Table.Row>
@@ -23,7 +24,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
       onClick={() => (course.min_attainment_date || mandatory ? onSelectCourse(course) : null)}
     >
       <Table.Cell width={10}>
-        <div>{course.name}</div>
+        <div>{course.name[language]}</div>
         <div>{getActiveYears(course)}</div>
       </Table.Cell>
       <Table.Cell content={!course.alternatives ? course.code : course.alternatives.map(a => a.code).join(', ')} />
@@ -48,7 +49,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
 }
 
 CourseTable.propTypes = {
-  courses: arrayOf(shape({ code: string, name: string, seleted: bool })).isRequired,
+  courses: arrayOf(shape({ code: string, name: shape({}), seleted: bool })).isRequired,
   onSelectCourse: func.isRequired,
   hidden: bool.isRequired,
   title: string.isRequired,

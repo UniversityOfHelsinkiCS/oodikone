@@ -21,7 +21,6 @@ const StudentSearch = ({
   students,
   studentNumber,
   findStudents,
-  translate,
   showNames,
   pending
 }) => {
@@ -93,7 +92,7 @@ const StudentSearch = ({
       return <div style={{ margin: 100 }} />
     }
     if (students.length <= 0) {
-      return <div>{translate('common.noResults')}</div>
+      return <div>No search results or search term is not accurate enough</div>
     }
 
     const columns = [
@@ -123,7 +122,7 @@ const StudentSearch = ({
       },
       {
         key: 'started',
-        title: translate('common.started'),
+        title: 'Started',
         getRowVal: s => (s.started === 'Unavailable' ? -Infinity : moment(s.started, 'DD.MM.YYYY').unix()),
         getRowContent: s => (
           <Link
@@ -246,18 +245,17 @@ const StudentSearch = ({
           onSearchChange={handleSearchChange}
           showNoResults={false}
           value={searchStr}
-          placeholder={translate('studentStatistics.searchPlaceholder')}
+          placeholder="Search with a student number or name (surname firstname)"
         />
       </Container>
       <Segment basic>
-        <SegmentDimmer translate={translate} isLoading={loading} />
+        <SegmentDimmer isLoading={loading} />
         {renderSearchResults()}
       </Segment>
     </Fragment>
   )
 }
 StudentSearch.propTypes = {
-  translate: func.isRequired,
   findStudents: func.isRequired,
   getStudent: func.isRequired,
   studentNumber: string,

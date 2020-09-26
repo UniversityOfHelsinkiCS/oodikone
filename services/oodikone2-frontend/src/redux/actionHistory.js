@@ -1,8 +1,6 @@
 const reducer = (state = [], action) => {
   switch (action.type) {
     case '@@INIT':
-    case '@@localize/INITIALIZE':
-    case '@@localize/ADD_TRANSLATION':
       return state
     default: {
       const newAction = { ...action, time: new Date().toISOString() }

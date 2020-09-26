@@ -6,8 +6,8 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import { getUserRoles, setMocking, setTestUser, setTestUserSIS, getTestUserSIS } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
-import LanguageChooser from '../LanguageChooser'
 import './navigationBar.css'
+import LanguagePicker from '../LanguagePicker'
 
 const {
   USER_ADMINER_URL,
@@ -163,9 +163,9 @@ const NavigationBar = props => {
     </Menu.Item>
   )
 
-  const renderLanguageChooser = () => (
+  const renderLanguagePicker = () => (
     <Menu.Item>
-      <LanguageChooser />
+      <LanguagePicker />
     </Menu.Item>
   )
 
@@ -192,7 +192,7 @@ const NavigationBar = props => {
       {renderHome()}
       {renderNavigationRoutes()}
       {renderUserMenu()}
-      {renderLanguageChooser()}
+      {renderLanguagePicker()}
       {showSISSwitch && renderSISSwitch(!!getTestUserSIS())}
       {mockedBy && renderStopMockingButton()}
       {getTestUserSIS() && renderSISWarning()}
