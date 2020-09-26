@@ -1,6 +1,5 @@
 import { createSelector } from 'reselect'
-import { getActiveLanguage } from 'react-localize-redux'
-import { byDateDesc, reformatDate, getTextIn } from '../common'
+import { byDateDesc, reformatDate } from '../common'
 
 const getData = obj => obj
 
@@ -43,15 +42,12 @@ export const makeSortCourses = () =>
 export const getCourseSearchResults = state =>
   state.courseSearch.data.courses
     ? {
-        courses: state.courseSearch.data.courses.map(({ name, ...rest }) => ({
-          ...rest,
-          name: getTextIn(name, getActiveLanguage(state.localize).code)
-        })),
+        courses: state.courseSearch.data.courses,
         groups: state.courseSearch.data.groups,
         groupMeta: Object.entries(state.courseSearch.data.groupMeta).reduce((res, [groupId, { name, ...rest }]) => {
           res[groupId] = {
             ...rest,
-            name: getTextIn(name, getActiveLanguage(state.localize).code)
+            name
           }
           return res
         }, {})

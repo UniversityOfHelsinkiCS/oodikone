@@ -16,7 +16,7 @@ const ThesisCourses = ({ studyprogramme, createThesis, getTheses }) => {
   }
   return (
     <React.Fragment>
-      <Message content="The set of courses used for calculating theses productivity statistics" />
+      <Message content="The set of courses used for calculating thesis productivity statistics" />
       <Expandable fluid title="Add thesis course">
         <CourseSearchForm />
         <SearchResult
