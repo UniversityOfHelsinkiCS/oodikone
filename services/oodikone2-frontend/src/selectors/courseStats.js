@@ -1,33 +1,18 @@
-/* eslint-disable react/jsx-filename-extension */
 import { createSelector } from 'reselect'
-import { getActiveLanguage } from 'react-localize-redux'
 import { sortBy, flatten } from 'lodash'
-import { getTextIn } from '../common'
-
-const nameAsString = (data, language) => {
-  if (typeof data === 'string') {
-    return data
-  }
-  return getTextIn(data, language)
-}
 
 const courseStatsSelector = state => state.courseStats.data
 
-const languageSelector = state => getActiveLanguage(state.localize).code
-
 const getCourseStats = createSelector(
-  [courseStatsSelector, languageSelector],
-  (courseStats, lang) => {
+  [courseStatsSelector],
+  courseStats => {
     const stats = {}
     Object.entries(courseStats).forEach(entry => {
       const [coursecode, data] = entry
       const { statistics } = data
       stats[coursecode] = {
         ...data,
-        statistics: statistics.map(stat => ({
-          ...stat,
-          name: nameAsString(stat.name, lang)
-        }))
+        statistics
       }
     })
     return stats
@@ -77,8 +62,8 @@ const mergeStudents = (students1, students2) => {
 }
 
 const getAllStudyProgrammes = createSelector(
-  [getCourseStats, languageSelector, selectedCourseSelector],
-  (courseStats, language, selectedCourseCode) => {
+  [getCourseStats, selectedCourseSelector],
+  (courseStats, selectedCourseCode) => {
     const studentsIncluded = new Set(
       selectedCourseCode
         ? courseStats[selectedCourseCode].statistics.reduce(
@@ -109,7 +94,7 @@ const getAllStudyProgrammes = createSelector(
             key: code,
             value: code,
             description: code === 'OTHER' ? 'Students with no associated programme' : '',
-            text: getTextIn(name, language),
+            text: name,
             students: filteredStudents
           }
         } else {

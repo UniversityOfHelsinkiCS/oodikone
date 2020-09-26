@@ -330,6 +330,10 @@ const SingleCourseStats = ({
     .filter(e => e.size > 0)
   if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
+  const options = filteredProgrammes
+    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : text[language], ...rest }))
+    .map(prog => ({ ...prog, name: prog.text }))
+
   return (
     <div>
       <Segment>
@@ -356,7 +360,7 @@ const SingleCourseStats = ({
             <Grid.Column width={8}>
               <ProgrammeDropdown
                 name="primary"
-                options={filteredProgrammes}
+                options={options}
                 label="Primary group"
                 placeholder="Select study programmes"
                 value={primary}
@@ -366,7 +370,7 @@ const SingleCourseStats = ({
             <Grid.Column width={8}>
               <ProgrammeDropdown
                 name="comparison"
-                options={comparisonProgrammes(filteredProgrammes)}
+                options={comparisonProgrammes(options)}
                 label="Comparison group"
                 placeholder="Optional"
                 value={comparison}

@@ -7,8 +7,10 @@ import selectors, { ALL } from '../../../selectors/courseStats'
 import { fields, setValue } from '../../../redux/coursesSummaryForm'
 import CumulativeTable from '../CumulativeTable'
 import ProgrammeDropdown from '../ProgrammeDropdown'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClickCourse }) => {
+  const { language } = useLanguage()
   const handleChange = (e, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
     if ((!form[fields.programmes].includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
@@ -30,15 +32,19 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
     }
   })
 
+  const options = programmes
+    .map(e => ({ ...e, size: new Set(flatten(Object.values(e.students))).size }))
+    .filter(e => e.size > 0)
+    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : text[language], ...rest }))
+    .map(prog => ({ ...prog, name: prog.text }))
+
   return (
     <div>
       <Segment>
         <Form>
           <Header content="Filter statistics by study programmes" as="h4" />
           <ProgrammeDropdown
-            options={programmes
-              .map(e => ({ ...e, size: new Set(flatten(Object.values(e.students))).size }))
-              .filter(e => e.size > 0)}
+            options={options}
             label="Study programmes:"
             name={fields.programmes}
             onChange={handleChange}
