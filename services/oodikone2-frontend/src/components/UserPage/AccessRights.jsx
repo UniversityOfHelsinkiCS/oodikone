@@ -6,13 +6,7 @@ import { isEqual } from 'lodash'
 import { textAndDescriptionSearch } from '../../common'
 import selectors from '../../selectors/programmes'
 import { addUserUnits } from '../../redux/users'
-
-const formatToOptions = ({ code, name }) => ({
-  key: code,
-  value: code,
-  text: name,
-  description: code
-})
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const initialState = {
   programme: undefined,
@@ -20,20 +14,32 @@ const initialState = {
 }
 
 const AccessRights = ({ uid, programmes, pending, ...props }) => {
+  const { language } = useLanguage()
   const [state, setState] = useState({ ...initialState })
   const { programme } = state
+
   const handleClick = () => {
     const codes = [programme].filter(e => !!e)
     props.addUserUnits(uid, codes)
     setState({ ...state, ...initialState })
   }
+
+  const options = programmes
+    .map(({ code, name }) => ({
+      key: code,
+      value: code,
+      text: name[language],
+      description: code
+    }))
+    .sort((p1, p2) => p1.text.localeCompare(p2.text))
+
   return (
     <Form loading={pending}>
       <Form.Dropdown
         name="programme"
         label="Study programme"
         placeholder="Select unit"
-        options={programmes}
+        options={options}
         value={programme}
         onChange={(_, { value }) =>
           setState({
@@ -63,14 +69,10 @@ AccessRights.propTypes = {
   pending: PropTypes.bool.isRequired
 }
 
-const mapStateToProps = (state, props) => {
-  const options = selectors.filteredDropdownProgrammeSelector(state, props)
-  const programmes = options.map(formatToOptions).sort((p1, p2) => p1.text.localeCompare(p2.text))
-  return {
-    programmes,
-    pending: Boolean(state.users.userunitpending)
-  }
-}
+const mapStateToProps = (state, props) => ({
+  programmes: selectors.filteredDropdownProgrammeSelector(state, props),
+  pending: Boolean(state.users.userunitpending)
+})
 
 export default connect(
   mapStateToProps,

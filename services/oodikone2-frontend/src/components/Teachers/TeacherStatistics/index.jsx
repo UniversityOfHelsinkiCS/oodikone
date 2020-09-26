@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
@@ -9,7 +8,8 @@ import { getProviders } from '../../../redux/providers'
 import { getSemesters } from '../../../redux/semesters'
 import { getTeacherStatistics } from '../../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { getTextIn, getUserIsAdmin } from '../../../common'
+import { getUserIsAdmin } from '../../../common'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const TeacherStatistics = ({
   getProviders,
@@ -23,6 +23,7 @@ const TeacherStatistics = ({
   rights,
   history
 }) => {
+  const { language } = useLanguage()
   const [semesterStart, setSemesterStart] = useState(null)
   const [semesterEnd, setSemesterEnd] = useState(null)
   const [display, setDisplay] = useState(false)
@@ -85,6 +86,7 @@ const TeacherStatistics = ({
   const userProviders = mapToProviders(rights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
   const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
+  const localizedProviderOptions = providerOptions.map(({ name, ...rest }) => ({ ...rest, text: name[language] }))
   const filteredOptions = semesters.filter(sem => {
     const options =
       moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0
@@ -137,7 +139,7 @@ const TeacherStatistics = ({
               multiple
               selection
               search
-              options={providerOptions}
+              options={localizedProviderOptions}
               value={provs}
               onChange={changeProviders}
               selectOnBlur={false}
@@ -182,7 +184,7 @@ const mapStateToProps = state => {
   const providerOptions = providers.data.map(p => ({
     key: p.providercode,
     value: p.providercode,
-    text: getTextIn(p.name, getActiveLanguage(state.localize).code)
+    name: p.name
   }))
   const semesterOptions = !semesters
     ? []

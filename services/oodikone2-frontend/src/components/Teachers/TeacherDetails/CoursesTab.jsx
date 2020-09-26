@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import { Tab, Form } from 'semantic-ui-react'
 import { shape, string, arrayOf, func, number, oneOfType } from 'prop-types'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import { getTextIn } from '../../../common'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
   <div>
@@ -35,7 +34,8 @@ CourseStatsTab.defaultProps = {
   selected: null
 }
 
-const CoursesTab = ({ courses, language, semesters }) => {
+const CoursesTab = ({ courses, semesters }) => {
+  const { language } = useLanguage()
   const [selectedSemester, setSelectedSemester] = useState(null)
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [semesterOptions, setSemesterOptions] = useState([])
@@ -135,12 +135,7 @@ const CoursesTab = ({ courses, language, semesters }) => {
 
 CoursesTab.propTypes = {
   courses: shape({}).isRequired,
-  semesters: shape({}).isRequired,
-  language: string.isRequired
+  semesters: shape({}).isRequired
 }
 
-const mapStateToProps = ({ localize }) => ({
-  language: getActiveLanguage(localize).code
-})
-
-export default connect(mapStateToProps)(CoursesTab)
+export default CoursesTab

@@ -9,8 +9,10 @@ import {
   removeCourseExclusion,
   getMandatoryCourses
 } from '../../../redux/populationMandatoryCourses'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
-const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeExclusion }) => {
+const MandatoryCourseTable = ({ studyProgramme, setExclusion, removeExclusion }) => {
+  const { language } = useLanguage()
   const dispatch = useDispatch()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [visible, setVisible] = useState({})
@@ -102,7 +104,7 @@ const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeEx
             <Table.Row key={module}>
               <Table.Cell style={{ cursor: 'pointer' }} onClick={() => toggleVisible(module)}>
                 <Icon name={visible[module] ? 'angle down' : 'angle right'} />
-                <b>{courses[0].label_name ? courses[0].label_name.fi : module}</b>
+                <b>{courses[0].label_name ? courses[0].label_name[language] : module}</b>
               </Table.Cell>
               <Table.Cell>
                 <Label
@@ -139,8 +141,7 @@ const MandatoryCourseTable = ({ studyProgramme, language, setExclusion, removeEx
 MandatoryCourseTable.propTypes = {
   studyProgramme: string.isRequired,
   removeExclusion: func.isRequired,
-  setExclusion: func.isRequired,
-  language: string.isRequired
+  setExclusion: func.isRequired
 }
 
 const mapStateToProps = ({ mandatoryCourseLabels }) => ({

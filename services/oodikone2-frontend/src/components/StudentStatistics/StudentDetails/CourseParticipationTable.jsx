@@ -6,16 +6,10 @@ import { Link } from 'react-router-dom'
 import { byDateDesc, reformatDate, getTextIn } from '../../../common'
 import StudentCourseTable from '../StudentCourseTable'
 
-const CourseParticipationTable = ({ translate, student, language, clearCourseStats }) => {
+const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
   if (!student) return null
 
-  const courseHeaders = [
-    translate('common.date'),
-    translate('common.course'),
-    translate('common.grade'),
-    translate('common.credits'),
-    ''
-  ]
+  const courseHeaders = ['Date', 'Course', 'Grade', 'Credits', '']
 
   const courseRowsByAcademicYear = {}
 
@@ -104,7 +98,6 @@ const CourseParticipationTable = ({ translate, student, language, clearCourseSta
 CourseParticipationTable.propTypes = {
   student: shape({}).isRequired,
   language: string.isRequired,
-  translate: func.isRequired,
   clearCourseStats: func.isRequired
 }
 

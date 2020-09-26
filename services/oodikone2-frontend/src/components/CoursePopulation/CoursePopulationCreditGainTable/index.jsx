@@ -3,13 +3,14 @@ import { connect } from 'react-redux'
 import { shape, arrayOf, string, number } from 'prop-types'
 import { Table, Tab } from 'semantic-ui-react'
 import { maxBy } from 'lodash'
-import { getActiveLanguage } from 'react-localize-redux'
-
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 import { getNewestProgramme, getTextIn } from '../../../common'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
-const CreditGainTableRow = ({ statistics, code, language }) => {
+const CreditGainTableRow = ({ statistics, code }) => {
+  const { language } = useLanguage()
+
   return (
     <Table.Row key={code} value={statistics.students.length}>
       <Table.Cell>
@@ -21,10 +22,10 @@ const CreditGainTableRow = ({ statistics, code, language }) => {
   )
 }
 
-const CreditGainTable = ({ data, selectedStudents, totalCredits, language, headerText }) => {
+const CreditGainTable = ({ data, selectedStudents, totalCredits, headerText }) => {
   const tableRows = Object.keys(data)
     .sort()
-    .map(code => <CreditGainTableRow key={code} statistics={data[code]} code={code} language={language} />)
+    .map(code => <CreditGainTableRow key={code} statistics={data[code]} code={code} />)
   return (
     <Table>
       <Table.Header style={{ backgroundColor: 'whitesmoke' }}>
@@ -54,8 +55,7 @@ const CoursePopulationCreditGainTable = ({
   to,
   studentToTargetCourseDateMap,
   populationStatistics,
-  faculties,
-  language
+  faculties
 }) => {
   const [programmeCreditsStatistics, setStatistics] = useState({})
   const [facultyCreditsStatistics, setFacStatistics] = useState({})
@@ -129,7 +129,6 @@ const CoursePopulationCreditGainTable = ({
             selectedStudents={selectedStudents}
             totalCredits={totalCredits}
             headerText="Faculty"
-            language={language}
           />
         </Tab.Pane>
       )
@@ -143,7 +142,6 @@ const CoursePopulationCreditGainTable = ({
             selectedStudents={selectedStudents}
             totalCredits={totalCredits}
             headerText="Programme"
-            language={language}
           />
         </Tab.Pane>
       )
@@ -164,15 +162,13 @@ CoursePopulationCreditGainTable.defaultProps = {
 
 CreditGainTableRow.propTypes = {
   statistics: shape({}).isRequired,
-  code: string.isRequired,
-  language: string.isRequired
+  code: string.isRequired
 }
 
 CreditGainTable.propTypes = {
   data: shape({}).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   totalCredits: number.isRequired,
-  language: string.isRequired,
   headerText: string.isRequired
 }
 
@@ -182,17 +178,15 @@ CoursePopulationCreditGainTable.propTypes = {
   codes: arrayOf(string).isRequired,
   from: number.isRequired,
   to: number.isRequired,
-  language: string.isRequired,
   studentToTargetCourseDateMap: shape({}),
   populationStatistics: shape({}).isRequired,
   faculties: arrayOf(shape({})).isRequired
 }
 
-const mapStateToProps = ({ populations, localize, faculties }) => {
+const mapStateToProps = ({ populations, faculties }) => {
   return {
     faculties: faculties.data,
-    populationStatistics: populations.data,
-    language: getActiveLanguage(localize).code
+    populationStatistics: populations.data
   }
 }
 

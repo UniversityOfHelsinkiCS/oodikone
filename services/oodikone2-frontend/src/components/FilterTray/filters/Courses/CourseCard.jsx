@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Dropdown, Button, Icon } from 'semantic-ui-react'
-import { getActiveLanguage } from 'react-localize-redux'
-import { connect } from 'react-redux'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
+import useLanguage from '../../../LanguagePicker/useLanguage'
 
-const CourseCard = ({ courseStats, language }) => {
+const CourseCard = ({ courseStats }) => {
+  const { language } = useLanguage()
   const { addFilter, removeFilter } = useFilters()
   const { course, students } = courseStats
   const { toggleCourseSelection } = useCourseFilter()
@@ -98,12 +98,6 @@ CourseCard.propTypes = {
   courseStats: PropTypes.shape({
     course: PropTypes.object,
     students: PropTypes.object
-  }).isRequired,
-  language: PropTypes.string.isRequired
+  }).isRequired
 }
-
-const mapStateToProps = ({ localize }) => ({
-  language: getActiveLanguage(localize).code
-})
-
-export default connect(mapStateToProps)(CourseCard)
+export default CourseCard

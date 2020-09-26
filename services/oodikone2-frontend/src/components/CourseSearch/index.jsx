@@ -2,24 +2,22 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Search } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
 import Timeout from '../Timeout'
-
 import { makeSortCourses } from '../../selectors/courses'
-
 import './courseSearch.css'
+import useLanguage from '../LanguagePicker/useLanguage'
 
-const { func, string, arrayOf, object } = PropTypes
+const { func, arrayOf, object } = PropTypes
 
 const CourseSearch = props => {
   const [isLoading, setIsLoading] = useState(false)
   const [searchStr, setSearchStr] = useState('')
+  const { language } = useLanguage()
 
   const fetchCoursesList = str => {
-    const { activeLanguage } = props
     if (str.length >= 3) {
       setIsLoading(true)
-      props.findFunction(str, activeLanguage).then(() => setIsLoading(false))
+      props.findFunction(str, language).then(() => setIsLoading(false))
     } else {
       props.findFunction('')
     }
@@ -65,15 +63,13 @@ CourseSearch.propTypes = {
   courseList: arrayOf(object).isRequired,
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
-  handleResultSelect: func.isRequired,
-  activeLanguage: string.isRequired
+  handleResultSelect: func.isRequired
 }
 
 const sortCourses = makeSortCourses()
 
-const mapStateToProps = ({ localize, courses }) => ({
-  courseList: sortCourses(courses),
-  activeLanguage: getActiveLanguage(localize).code
+const mapStateToProps = ({ courses }) => ({
+  courseList: sortCourses(courses)
 })
 
 export default connect(mapStateToProps)(Timeout(CourseSearch))

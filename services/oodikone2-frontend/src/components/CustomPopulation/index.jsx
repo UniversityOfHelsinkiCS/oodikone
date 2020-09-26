@@ -26,6 +26,7 @@ import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
 import { CustomPopulationFilters } from '../FilterTray/FilterSets'
 import useFilterTray from '../FilterTray/useFilterTray'
+import useLanguage from '../LanguagePicker/useLanguage'
 
 const CustomPopulation = ({
   getCustomPopulationDispatch,
@@ -43,6 +44,7 @@ const CustomPopulation = ({
   customPopulationSearchSaving,
   searchedCustomPopulationSearchId
 }) => {
+  const { language } = useLanguage()
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [name, setName] = useState('')
@@ -247,6 +249,7 @@ const CustomPopulation = ({
               selectedStudents={selectedStudents}
               render={false}
               trayOpen={trayOpen}
+              language={language}
             />
           </div>
         )
@@ -362,7 +365,12 @@ const CustomPopulation = ({
       content: {
         content: (
           <div ref={studentRef}>
-            <PopulationStudents mandatoryToggle={false} filteredStudents={filteredStudents} customPopulation />
+            <PopulationStudents
+              language={language}
+              mandatoryToggle={false}
+              filteredStudents={filteredStudents}
+              customPopulation
+            />
           </div>
         )
       }

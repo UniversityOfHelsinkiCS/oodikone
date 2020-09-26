@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react'
-import { connect } from 'react-redux'
-import { getActiveLanguage } from 'react-localize-redux'
-import { string, arrayOf, shape, number, func } from 'prop-types'
+import { arrayOf, shape, number, func } from 'prop-types'
 import { calculateTotalPassedCourses, calculateTotalFailedCourses } from '../facultyUtils'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 import FacultyStatsGraph from '../FacultyStatsGraph'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
-const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, toYear, handleSelect }) => {
+const FacultySelector = ({ faculties, facultyYearlyStats, fromYear, toYear, handleSelect }) => {
+  const { language } = useLanguage()
   const calculateYearlyStatsForFaculty = facultyCode => {
     const res = {}
     const yearData = {
@@ -118,7 +118,6 @@ const FacultySelector = ({ language, faculties, facultyYearlyStats, fromYear, to
 }
 
 FacultySelector.propTypes = {
-  language: string.isRequired,
   faculties: arrayOf(shape({})).isRequired,
   facultyYearlyStats: arrayOf(shape({})).isRequired,
   fromYear: number.isRequired,
@@ -126,8 +125,4 @@ FacultySelector.propTypes = {
   handleSelect: func.isRequired
 }
 
-const mapStateToProps = ({ localize }) => ({
-  language: getActiveLanguage(localize).code
-})
-
-export default connect(mapStateToProps)(FacultySelector)
+export default FacultySelector

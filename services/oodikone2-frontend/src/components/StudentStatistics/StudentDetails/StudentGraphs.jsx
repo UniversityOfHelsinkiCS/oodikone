@@ -1,18 +1,19 @@
 import React, { useState } from 'react'
-import { func, shape, string, arrayOf } from 'prop-types'
+import { shape, string, arrayOf } from 'prop-types'
 import { Menu, Tab, Input, Message } from 'semantic-ui-react'
 import { flattenDeep, cloneDeep } from 'lodash'
 import Highcharts from 'highcharts/highstock'
 import ReactHighcharts from 'react-highcharts'
-
 import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
 import { byDateDesc, reformatDate, getTextIn } from '../../../common'
 import TSA from '../../../common/tsa'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const ANALYTICS_CATEGORY = 'Student stats'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
-const CreditsGraph = ({ graphYearStart, student, translate, absences }) => {
+const CreditsGraph = ({ graphYearStart, student, absences }) => {
+  const { language } = useLanguage()
   const selectedStart = graphYearStart || student.started
   const filteredCourses = student.courses.filter(c => new Date(c.date) > new Date(selectedStart))
   const newStudent = cloneDeep(student)
@@ -32,10 +33,10 @@ const CreditsGraph = ({ graphYearStart, student, translate, absences }) => {
       singleStudent
       students={sample}
       selectedStudents={[student.studentNumber]}
-      title={translate('studentStatistics.chartTitle')}
-      translate={translate}
+      title="Credit Accumulation"
       maxCredits={sample.maxCredits}
       absences={absences}
+      language={language}
     />
   )
 }
@@ -43,7 +44,6 @@ const CreditsGraph = ({ graphYearStart, student, translate, absences }) => {
 CreditsGraph.propTypes = {
   student: shape({}).isRequired,
   absences: arrayOf(shape({})).isRequired,
-  translate: func.isRequired,
   graphYearStart: string.isRequired
 }
 
@@ -211,13 +211,13 @@ GradeGraph.propTypes = {
   language: string.isRequired
 }
 
-const StudentGraphs = ({ student, absences, translate, graphYearStart, semesters, language }) => {
+const StudentGraphs = ({ student, absences, graphYearStart, semesters, language }) => {
   const panes = [
     {
       menuItem: 'Credit graph',
       render: () => (
         <Tab.Pane>
-          <CreditsGraph absences={absences} translate={translate} student={student} graphYearStart={graphYearStart} />
+          <CreditsGraph absences={absences} student={student} graphYearStart={graphYearStart} />
         </Tab.Pane>
       )
     },
@@ -236,7 +236,6 @@ const StudentGraphs = ({ student, absences, translate, graphYearStart, semesters
 StudentGraphs.propTypes = {
   student: shape({}).isRequired,
   absences: arrayOf(shape({})).isRequired,
-  translate: func.isRequired,
   graphYearStart: string.isRequired,
   semesters: shape({}).isRequired,
   language: string.isRequired

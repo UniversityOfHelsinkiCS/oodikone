@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux'
 import { Table, Header, Dropdown } from 'semantic-ui-react'
 import { flatten, uniq } from 'lodash'
 import { shape, string, number } from 'prop-types'
-import { getActiveLanguage } from 'react-localize-redux'
 import { getTextIn } from '../../../common'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
   return (
@@ -62,9 +62,10 @@ const CourseTable = ({ course, courseInstance, language }) => {
 }
 
 const FacultyLevelStatistics = () => {
-  const { courseStats, language } = useSelector(({ courseStats, localize }) => ({
+  const { language: activeLanguage } = useLanguage()
+  const { courseStats, language } = useSelector(({ courseStats }) => ({
     courseStats: courseStats.data,
-    language: getActiveLanguage(localize).code
+    language: activeLanguage
   }))
   const yearcodes = uniq(flatten(Object.values(courseStats).map(c => Object.keys(c.facultyStats))))
     .sort()

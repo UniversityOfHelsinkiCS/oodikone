@@ -1,21 +1,18 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { func, shape, string, arrayOf } from 'prop-types'
-import { getTranslate, getActiveLanguage } from 'react-localize-redux'
+import { shape, string, arrayOf } from 'prop-types'
 import { Segment, Header, Message } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
-
 import { findStudents, getStudent, selectStudent } from '../../redux/students'
 import StudentSearch from './StudentSearch'
 import StudentDetails from './StudentDetails'
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import { useTitle } from '../../common/hooks'
 import { getUserRoles, checkUserAccess } from '../../common'
-
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
 const StudentStatistics = props => {
-  const { translate, match, userRoles, rights } = props
+  const { match, userRoles, rights } = props
   const { studentNumber } = match.params
 
   useTitle('Student statistics')
@@ -35,19 +32,18 @@ const StudentStatistics = props => {
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
-        {translate('studentStatistics.header')}
+        Student statistics
       </Header>
       <StudentNameVisibilityToggle />
       <Segment className="contentSegment">
-        <StudentSearch translate={translate} studentNumber={studentNumber} />
-        <StudentDetails translate={translate} studentNumber={studentNumber} />
+        <StudentSearch studentNumber={studentNumber} />
+        <StudentDetails studentNumber={studentNumber} />
       </Segment>
     </div>
   )
 }
 
 StudentStatistics.propTypes = {
-  translate: func.isRequired,
   match: shape({
     params: shape({
       studentNumber: string
@@ -64,7 +60,6 @@ StudentStatistics.defaultProps = {
 }
 
 const mapStateToProps = ({
-  localize,
   students,
   auth: {
     token: { roles, rights }
@@ -72,8 +67,6 @@ const mapStateToProps = ({
 }) => ({
   userRoles: getUserRoles(roles),
   rights,
-  translate: getTranslate(localize),
-  currentLanguage: getActiveLanguage(localize).value,
   student: students.data.find(student => student.studentNumber === students.selected)
 })
 const mapDispatchToProps = dispatch => ({

@@ -5,7 +5,6 @@ import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
 import { sortBy } from 'lodash'
 import { func, arrayOf, shape, bool } from 'prop-types'
-
 import { clearCourses, findCoursesV2, toggleUnifyOpenUniCourses } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
@@ -16,6 +15,7 @@ import { mergeCourses } from '../courseStatisticsUtils'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import SearchHistory from '../../SearchHistory'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Course statistics search', action, name, value)
 
@@ -47,6 +47,7 @@ const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchin
 }
 
 const SearchForm = props => {
+  const { language } = useLanguage()
   const [state, setState] = useState({
     ...INITIAL
   })
@@ -137,7 +138,7 @@ const SearchForm = props => {
       separate,
       unifyOpenUniCourses: props.unifyOpenUniCourses
     }
-    const searchHistoryText = codes.map(code => `${selectedCourses[code].name} ${code}`)
+    const searchHistoryText = codes.map(code => `${selectedCourses[code].name[language]} ${code}`)
     addItemToSearchHistory({
       text: searchHistoryText.join(', '),
       params

@@ -1,7 +1,6 @@
 import React, { Component, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, object, bool, arrayOf } from 'prop-types'
-import { getTranslate } from 'react-localize-redux'
 import { Form, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
@@ -44,7 +43,6 @@ const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
 
 class PopulationSearchHistory extends Component {
   static propTypes = {
-    translate: func.isRequired,
     removePopulation: func.isRequired,
     populations: shape({
       pending: bool,
@@ -172,7 +170,7 @@ class PopulationSearchHistory extends Component {
       return null
     }
     const { query } = this.state
-    const { translate, populations } = this.props
+    const { populations } = this.props
     const { semesters, studentStatuses } = query
 
     return (
@@ -198,7 +196,7 @@ class PopulationSearchHistory extends Component {
             <Form.Checkbox
               className="populationStatisticsRadio"
               key="FALL"
-              label={translate(`populationStatistics.${'FALL'}`)}
+              label="Fall"
               value="FALL"
               name="semesterGroup"
               checked={semesters.includes('FALL')}
@@ -208,7 +206,7 @@ class PopulationSearchHistory extends Component {
             <Form.Checkbox
               className="populationStatisticsRadio"
               key="SPRING"
-              label={translate(`populationStatistics.${'SPRING'}`)}
+              label="Spring"
               value="SPRING"
               name="semesterGroup"
               checked={semesters.includes('SPRING')}
@@ -265,7 +263,7 @@ class PopulationSearchHistory extends Component {
   }
 
   renderQueryCards = () => {
-    const { populations, translate, units, tags } = this.props
+    const { populations, units, tags } = this.props
     const { showAdvancedSettings } = this.state
     const { Advanced } = infotooltips.PopulationStatistics
     if (!units.data.programmes || !populations.query || !populations.data.students) {
@@ -281,7 +279,6 @@ class PopulationSearchHistory extends Component {
           <PopulationsQueryTSA programmeCode={programmeCode} unitData={units.data} />
           <PopulationQueryCard
             key={`population-${populations.query.uuid}`}
-            translate={translate}
             population={populations.data}
             query={populations.query}
             queryId={0}
@@ -325,10 +322,9 @@ class PopulationSearchHistory extends Component {
   }
 }
 
-const mapStateToProps = ({ populations, populationDegreesAndProgrammes, localize, tags }) => ({
+const mapStateToProps = ({ populations, populationDegreesAndProgrammes, tags }) => ({
   populations,
   units: populationDegreesAndProgrammes,
-  translate: getTranslate(localize),
   tags: tags.data
 })
 
