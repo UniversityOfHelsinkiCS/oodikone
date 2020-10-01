@@ -1,11 +1,14 @@
 import React, { useState } from 'react'
-import { Table, Segment } from 'semantic-ui-react'
-import { shape, arrayOf, any, string, number, func } from 'prop-types'
+import { Link } from 'react-router-dom'
+import { Table, Segment, Icon, Item } from 'semantic-ui-react'
+import { shape, arrayOf, any, string, number, func, bool } from 'prop-types'
 import { sortBy } from 'lodash'
+import { connect } from 'react-redux'
+import { getCourseStats } from '../../../redux/coursestats'
 
 const calculatePassrate = (pass, fail) => (100 * pass) / (pass + fail)
 
-const TeacherStatisticsTable = ({ statistics, onClickFn }) => {
+const TeacherStatisticsTable = ({ statistics, onClickFn, getCourseStats, unifyOpenUniCourses, renderLink }) => {
   const [selected, setSelected] = useState('credits')
   const [direction, setDirection] = useState('descending')
 
@@ -36,6 +39,18 @@ const TeacherStatisticsTable = ({ statistics, onClickFn }) => {
 
   const sortDirection = name => (selected === name ? direction : null)
 
+  const fetchCourseStats = id => getCourseStats({ courseCodes: [id], separate: false, unifyOpenUniCourses }, null)
+
+  const renderCourseStatsLink = id => {
+    if (!renderLink) return null
+    const query = `courseCodes=["${id}"]&separate=false&unifyOpenUniCourses=${unifyOpenUniCourses}`
+    return (
+      <Item as={Link} to={`/coursestatistics?${query}`} onClick={() => fetchCourseStats(id)}>
+        <Icon name="level up alternate" />
+      </Item>
+    )
+  }
+
   return statistics.length === 0 ? (
     <Segment basic content="No statistics found for the given query." />
   ) : (
@@ -60,7 +75,10 @@ const TeacherStatisticsTable = ({ statistics, onClickFn }) => {
       <Table.Body>
         {roundStatisticCredits(sortStatistics(statistics)).map(({ id, name, credits, passrate, transferred }) => (
           <Table.Row key={id} onClick={() => onClickFn(id)} style={{ cursor: 'pointer' }}>
-            <Table.Cell content={name} textAlign="left" />
+            <Table.Cell textAlign="left">
+              {name}
+              {renderCourseStatsLink(id)}
+            </Table.Cell>
             <Table.Cell content={credits} width={2} />
             <Table.Cell content={transferred} width={2} />
             <Table.Cell content={`${parseFloat(passrate).toFixed(2)} %`} width={2} />
@@ -82,7 +100,18 @@ TeacherStatisticsTable.propTypes = {
       passed: number
     })
   ).isRequired,
-  onClickFn: func.isRequired
+  onClickFn: func.isRequired,
+  getCourseStats: func.isRequired,
+  unifyOpenUniCourses: bool.isRequired,
+  renderLink: bool.isRequired
 }
 
-export default TeacherStatisticsTable
+const mapStateToProps = state => {
+  const { unifyOpenUniCourses } = state.courseSearch
+  return { unifyOpenUniCourses }
+}
+
+export default connect(
+  mapStateToProps,
+  { getCourseStats }
+)(TeacherStatisticsTable)
