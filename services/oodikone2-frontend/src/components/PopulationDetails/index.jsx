@@ -2,7 +2,6 @@ import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 import { object, arrayOf, bool, shape } from 'prop-types'
 import { Message, Accordion } from 'semantic-ui-react'
-import scrollToComponent from 'react-scroll-to-component'
 import { useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -34,14 +33,12 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
     } else {
       indexes.push(index)
     }
-    setActiveIndex(prev => {
-      if (prev.length < indexes.length) {
-        const foundIndex = indexes.find(index => !prev.includes(index))
-        const refs = [creditGraphRef, creditGainRef, courseTableRef, studentTableRef]
-        scrollToComponent(refs[foundIndex].current, { align: 'bottom' })
-      }
-      return indexes
-    })
+    setActiveIndex(indexes)
+    /**
+     * Here used to be a :tunkki: that scrolled to the component that was opened. However,
+     * it does not work with the way this view is now rendered. This is left here just as a
+     * reminder in case we want to reimplement auto-scrolling once this component is refactored.
+     */
   }
 
   const renderCreditGainGraphs = () => {
