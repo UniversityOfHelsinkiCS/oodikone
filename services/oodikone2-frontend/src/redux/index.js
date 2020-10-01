@@ -31,7 +31,6 @@ import courseDisciplines from './coursedisciplines'
 import courseSearch from './coursesearch'
 import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
-import ping from './ping'
 import thesisCourses from './thesisCourses'
 import accessGroups from './accessGroups'
 import feedback from './feedback'
@@ -78,7 +77,6 @@ export default combineReducers({
   courseSearch,
   courseStats,
   courseSummaryForm,
-  ping,
   thesisCourses,
   accessGroups,
   elementdetails,
