@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
-import { Button, Modal, Form, TextArea, Segment, Header, Accordion, Popup, Message } from 'semantic-ui-react'
+import { Button, Modal, Form, TextArea, Segment, Header, Accordion, Message } from 'semantic-ui-react'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
-import ReactMarkdown from 'react-markdown'
 import scrollToComponent from 'react-scroll-to-component'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
@@ -215,29 +214,9 @@ const CustomPopulation = ({
       key: 0,
       title: {
         content: (
-          <>
-            {activeIndex.includes(0) ? (
-              <>Credit accumulation (for {selectedStudents.length} students)</>
-            ) : (
-              <Popup
-                trigger={
-                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    Credit accumulation (for {selectedStudents.length} students)
-                  </span>
-                }
-                position="top center"
-                wide="very"
-              >
-                <Popup.Content>
-                  {' '}
-                  <ReactMarkdown
-                    source={infotooltips.PopulationStatistics.CreditAccumulationGraph.AccordionTitle}
-                    escapeHtml={false}
-                  />
-                </Popup.Content>
-              </Popup>
-            )}
-          </>
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Credit accumulation (for {selectedStudents.length} students)
+          </span>
         )
       },
       onTitleClick: () => handleClick(0),
@@ -259,29 +238,9 @@ const CustomPopulation = ({
       key: 1,
       title: {
         content: (
-          <>
-            {activeIndex.includes(1) ? (
-              <>Programme distribution</>
-            ) : (
-              <Popup
-                trigger={
-                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    Programme distribution
-                  </span>
-                }
-                position="top center"
-                wide="very"
-              >
-                <Popup.Content>
-                  {' '}
-                  <ReactMarkdown
-                    source={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation}
-                    escapeHtml={false}
-                  />
-                </Popup.Content>
-              </Popup>
-            )}
-          </>
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Programme distribution
+          </span>
         )
       },
       onTitleClick: () => handleClick(1),
@@ -298,29 +257,9 @@ const CustomPopulation = ({
       key: 2,
       title: {
         content: (
-          <>
-            {activeIndex.includes(2) ? (
-              <>Courses of population</>
-            ) : (
-              <Popup
-                trigger={
-                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    Courses of population
-                  </span>
-                }
-                position="top center"
-                wide="very"
-              >
-                <Popup.Content>
-                  {' '}
-                  <ReactMarkdown
-                    source={infotooltips.PopulationStatistics.CreditDistributionCoursePopulation}
-                    escapeHtml={false}
-                  />
-                </Popup.Content>
-              </Popup>
-            )}
-          </>
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Courses of population
+          </span>
         )
       },
       onTitleClick: () => handleClick(2),
@@ -336,29 +275,9 @@ const CustomPopulation = ({
       key: 3,
       title: {
         content: (
-          <>
-            {activeIndex.includes(3) ? (
-              <>Students ({selectedStudents.length})</>
-            ) : (
-              <Popup
-                trigger={
-                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    Students ({selectedStudents.length})
-                  </span>
-                }
-                position="top center"
-                wide="very"
-              >
-                <Popup.Content>
-                  {' '}
-                  <ReactMarkdown
-                    source={infotooltips.PopulationStatistics.Students.AccordionTitle}
-                    escapeHtml={false}
-                  />
-                </Popup.Content>
-              </Popup>
-            )}
-          </>
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Students ({selectedStudents.length})
+          </span>
         )
       },
       onTitleClick: () => handleClick(3),
