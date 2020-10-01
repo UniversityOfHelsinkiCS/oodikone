@@ -1,15 +1,13 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 import { object, arrayOf, bool, shape } from 'prop-types'
-import { Message, Accordion, Popup } from 'semantic-ui-react'
+import { Message, Accordion } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
-import ReactMarkdown from 'react-markdown'
 import { useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
 import InfoBox from '../InfoBox'
-import infoTooltips from '../../common/InfoToolTips'
 import CreditGainStats from './CreditGainStats'
 import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
@@ -74,33 +72,14 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
     return <Message negative content="No statistics found for the given query." />
   }
 
-  const { Students, CreditStatistics, CoursesOf, CreditAccumulationGraph } = infoTooltips.PopulationStatistics
-
   const panels = [
     {
       key: 0,
       title: {
         content: (
-          <>
-            {activeIndex.includes(0) ? (
-              <>Credit accumulation (for {filteredStudents.length} students)</>
-            ) : (
-              <Popup
-                trigger={
-                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    Credit accumulation (for {filteredStudents.length} students)
-                  </span>
-                }
-                position="top center"
-                wide="very"
-              >
-                <Popup.Content>
-                  {' '}
-                  <ReactMarkdown source={CreditAccumulationGraph.AccordionTitle} escapeHtml={false} />
-                </Popup.Content>
-              </Popup>
-            )}
-          </>
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Credit accumulation (for {filteredStudents.length} students)
+          </span>
         )
       },
       onTitleClick: () => handleClick(0),
@@ -112,26 +91,9 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       key: 1,
       title: {
         content: (
-          <>
-            {activeIndex.includes(1) ? (
-              <>Credit statistics</>
-            ) : (
-              <Popup
-                trigger={
-                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    Credit statistics
-                  </span>
-                }
-                position="top center"
-                wide="very"
-              >
-                <Popup.Content>
-                  {' '}
-                  <ReactMarkdown source={CreditStatistics.AccordionTitle} escapeHtml={false} />
-                </Popup.Content>
-              </Popup>
-            )}
-          </>
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Credit statistics
+          </span>
         )
       },
       onTitleClick: () => handleClick(1),
@@ -149,26 +111,9 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       key: 2,
       title: {
         content: (
-          <>
-            {activeIndex.includes(2) ? (
-              <>Courses of population</>
-            ) : (
-              <Popup
-                trigger={
-                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    Courses of population
-                  </span>
-                }
-                position="top center"
-                wide="very"
-              >
-                <Popup.Content>
-                  {' '}
-                  <ReactMarkdown source={CoursesOf.AccordionTitle} escapeHtml={false} />
-                </Popup.Content>
-              </Popup>
-            )}
-          </>
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Courses of population
+          </span>
         )
       },
       onTitleClick: () => handleClick(2),
@@ -190,26 +135,9 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       key: 3,
       title: {
         content: (
-          <>
-            {activeIndex.includes(3) ? (
-              <>Students ({filteredStudents.length})</>
-            ) : (
-              <Popup
-                trigger={
-                  <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-                    Students ({filteredStudents.length})
-                  </span>
-                }
-                position="top center"
-                wide="very"
-              >
-                <Popup.Content>
-                  {' '}
-                  <ReactMarkdown source={Students.AccordionTitle} escapeHtml={false} />
-                </Popup.Content>
-              </Popup>
-            )}
-          </>
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Students ({filteredStudents.length})
+          </span>
         )
       },
       onTitleClick: () => handleClick(3),
