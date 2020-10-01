@@ -78,7 +78,7 @@ const PassFail = () => {
     } = stats
     const isActive = courseIsSelected(course.code)
     return (
-      <Table.Row key={code} active={isActive}>
+      <Table.Row key={code} active={isActive} data-cy={name.fi}>
         <Popup
           trigger={
             <Table.Cell className="filterCell clickableCell">
