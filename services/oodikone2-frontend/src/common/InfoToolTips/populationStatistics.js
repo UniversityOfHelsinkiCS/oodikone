@@ -37,20 +37,6 @@ export default {
     CreditsBeforeStudyright: `Suodattaa pois opiskelijat joilla vähemmän opintopisteitä ennen kyseisessä ohjelmassa aloittamista`,
     StudytrackFilter: `Palauttaa opiskelijat joilla on valittu kyseinen suuntautumisvaihtoehto`
   },
-  CreditAccumulationGraph: {
-    AccordionTitle: ` **Credit accumulation graph**
-    Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.`
-  },
-  CoursesOf: {
-    AccordionTitle: `**Courses of population**
-    Tämä taulukko sisältää kaikkien populaatioon liittyvien opiskelijoiden kaikki kurssisuoritukset.`
-  },
-  Students: {
-    AccordionTitle: `**Students** Taulukko joka näyttää informaatiota opiskelijoista.`
-  },
-  CreditStatistics: {
-    AccordionTitle: `**Credit Statistics** Opintopistekertymä-kategoria skaalautuvat valitun tarkastelujakson mukaan. `
-  },
   ProgrammeDistributionCustomPopulation: `Näyttää opiskelijan viimeisimmän koulutusohjelman`,
   ProgrammeDistributionCoursePopulation: `Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin`,
   GradeDistributionCoursePopulation: `Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.`,
