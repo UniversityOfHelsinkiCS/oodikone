@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { Tab, Form } from 'semantic-ui-react'
-import { shape, string, arrayOf, func, number, oneOfType } from 'prop-types'
+import { shape, string, arrayOf, func, number, oneOfType, bool } from 'prop-types'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import { getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
+const CourseStatsTab = ({ statistics, options, doSelect, selected, renderCourseLink }) => (
   <div>
     <Form>
       <Form.Dropdown
@@ -19,7 +19,7 @@ const CourseStatsTab = ({ statistics, options, doSelect, selected }) => (
         selectOnNavigation={false}
       />
     </Form>
-    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />}
+    {selected && <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} renderLink={renderCourseLink} />}
   </div>
 )
 
@@ -27,11 +27,13 @@ CourseStatsTab.propTypes = {
   options: arrayOf(shape({})).isRequired,
   statistics: arrayOf(shape({})).isRequired,
   doSelect: func.isRequired,
-  selected: oneOfType([string, number])
+  selected: oneOfType([string, number]),
+  renderCourseLink: bool
 }
 
 CourseStatsTab.defaultProps = {
-  selected: null
+  selected: null,
+  renderCourseLink: false
 }
 
 const CoursesTab = ({ courses, semesters }) => {
@@ -114,6 +116,7 @@ const CoursesTab = ({ courses, semesters }) => {
               doSelect={setSemester}
               selected={selectedSemester}
               statistics={getSemesterStats(selectedSemester)}
+              renderCourseLink
             />
           )
         },

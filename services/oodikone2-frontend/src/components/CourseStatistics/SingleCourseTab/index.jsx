@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
 import { shape, arrayOf, oneOfType, number, string } from 'prop-types'
@@ -7,6 +7,10 @@ import selectors from '../../../selectors/courseStats'
 
 const SingleCourseTab = ({ selected, stats, courses }) => {
   const [selection, setSelection] = useState(selected)
+
+  useEffect(() => {
+    setSelection(selected)
+  }, [selected])
 
   if (!stats[selection]) return null
   return (

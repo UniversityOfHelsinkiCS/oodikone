@@ -42,6 +42,10 @@ const CourseStatistics = props => {
   useTitle('Course statistics')
 
   useEffect(() => {
+    setSelected(initCourseCode)
+  }, [initCourseCode])
+
+  useEffect(() => {
     if (statsIsEmpty) {
       setSelected(initCourseCode)
       setActiveIndex(0)
