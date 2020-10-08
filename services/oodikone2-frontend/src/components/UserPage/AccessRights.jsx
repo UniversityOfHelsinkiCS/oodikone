@@ -28,7 +28,7 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
     .map(({ code, name }) => ({
       key: code,
       value: code,
-      text: name[language],
+      text: name[language] || name.fi,
       description: code
     }))
     .sort((p1, p2) => p1.text.localeCompare(p2.text))
