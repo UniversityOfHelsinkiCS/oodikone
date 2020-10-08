@@ -55,13 +55,15 @@ const publishAll = async (tasks, priority = false) => {
 const scheduleActiveStudents = async () => {
   const tasks = [...(await Schedule.find({ type: 'student', active: true }).sort({ updatedAt: 1 }))]
   console.log(tasks.length, 'tasks to schedule')
-  await publishAll(tasks)
+  publishAll(tasks)
+  return tasks.length
 }
 
 const scheduleAllStudents = async () => {
   const tasks = [...(await Schedule.find({ type: 'student' }).sort({ updatedAt: 1 }))]
   console.log(tasks.length, 'tasks to schedule')
-  await publishAll(tasks)
+  publishAll(tasks)
+  return tasks.length
 }
 
 const scheduleMeta = async () => {
@@ -84,13 +86,15 @@ const scheduleAttainmentUpdate = async () => {
 const scheduleStudentCheck = async () => {
   const tasks = [...(await Schedule.find({ type: 'student', status: 'NO_STUDENT' }).sort({ updatedAt: 1 }))]
   console.log(tasks.length, 'tasks to schedule')
-  await publishAll(tasks)
+  publishAll(tasks)
+  return tasks.length
 }
 
 const scheduleStudentsByArray = async studentNumbers => {
   try {
     const tasks = await Schedule.find({ type: 'student', task: { $in: studentNumbers } })
-    await publishAll(tasks, true)
+    publishAll(tasks, true)
+    return tasks.length
   } catch (e) {
     console.log(e)
   }
@@ -103,7 +107,8 @@ const scheduleOldestNStudents = async amount => {
         .sort({ updatedAt: 1 })
         .limit(Number(amount)))
     ]
-    await publishAll(tasks)
+    publishAll(tasks)
+    return tasks.length
   } catch (e) {
     console.log(e)
   }
@@ -112,19 +117,22 @@ const scheduleOldestNStudents = async amount => {
 const rescheduleCreated = async () => {
   const tasks = [...(await Schedule.find({ type: 'student', status: 'CREATED' }).sort({ updatedAt: 1 }))]
   console.log(tasks.length, 'tasks to schedule')
-  await publishAll(tasks)
+  publishAll(tasks)
+  return tasks.length
 }
 
 const rescheduleScheduled = async () => {
   const tasks = [...(await Schedule.find({ type: 'student', status: 'SCHEDULED' }).sort({ updatedAt: 1 }))]
   console.log(tasks.length, 'tasks to schedule')
-  await publishAll(tasks)
+  publishAll(tasks)
+  return tasks.length
 }
 
 const rescheduleFetched = async () => {
   const tasks = [...(await Schedule.find({ type: 'student', status: 'FETCHED' }).sort({ updatedAt: 1 }))]
   console.log(tasks.length, 'tasks to schedule')
-  await publishAll(tasks)
+  publishAll(tasks)
+  return tasks.length
 }
 
 const scheduleDaily = async () => {
@@ -154,7 +162,8 @@ const scheduleDaily = async () => {
 
   const tasks = [...new Set(studentnumbers)].map(sn => ({ task: sn }))
   console.log(tasks.length, 'tasks to schedule')
-  await publishAll(tasks)
+  publishAll(tasks)
+  return tasks.length
 }
 
 module.exports = {

@@ -24,64 +24,64 @@ app.get('/ping', (req, res) => res.json({ message: 'pong ' }))
 
 app.post('/update', async (req, res) => {
   await createTasks(req.body)
-  await scheduleStudentsByArray(req.body)
-  res.json({ message: 'scheduled' })
+  const scheduled = await scheduleStudentsByArray(req.body)
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.post('/update/oldest', async (req, res) => {
   const { amount } = req.body
-  scheduleOldestNStudents(amount)
-  res.json({ message: 'scheduled' })
+  const scheduled = await scheduleOldestNStudents(amount)
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.post('/update/all', async (req, res) => {
-  scheduleAllStudents()
-  res.json({ message: 'scheduled' })
+  const scheduled = await scheduleAllStudents()
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.post('/update/active', async (req, res) => {
-  scheduleActiveStudents()
-  res.json({ message: 'scheduled' })
+  const scheduled = await scheduleActiveStudents()
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.post('/update/attainment', async (req, res) => {
   scheduleAttainmentUpdate()
-  res.json({ message: 'scheduled' })
+  res.json({ message: `scheduled attainments` })
 })
 
 app.post('/update/meta', async (req, res) => {
   scheduleMeta()
-  res.json({ message: 'scheduled' })
+  res.json({ message: 'scheduled meta' })
 })
 
 app.post('/update/no_student', async (req, res) => {
-  scheduleStudentCheck()
-  res.json({ message: 'scheduled' })
+  const scheduled = await scheduleStudentCheck()
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.post('/update/studentlist', async (req, res) => {
   createTasks()
-  res.json({ message: 'scheduled' })
+  res.json({ message: `tasks created` })
 })
 
 app.post('/update/daily', async (req, res) => {
-  scheduleDaily()
-  res.json({ message: 'scheduled' })
+  const scheduled = await scheduleDaily()
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.post('/reschedule/created', async (req, res) => {
-  rescheduleCreated()
-  res.json({ message: 'scheduled' })
+  const scheduled = await rescheduleCreated()
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.post('/reschedule/scheduled', async (req, res) => {
-  rescheduleScheduled()
-  res.json({ message: 'scheduled' })
+  const scheduled = await rescheduleScheduled()
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.post('/reschedule/fetched', async (req, res) => {
-  rescheduleFetched()
-  res.json({ message: 'scheduled' })
+  const scheduled = await rescheduleFetched()
+  res.json({ message: `scheduled ${scheduled} updates` })
 })
 
 app.get('/statuses', async (req, res) => {
