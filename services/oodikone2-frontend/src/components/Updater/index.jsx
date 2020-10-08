@@ -7,26 +7,36 @@ import { useTitle } from '../../common/hooks'
 
 const Updater = () => {
   const [amount, setAmount] = useState('')
+  const [messages, setMessages] = useState([])
   const [statuses, setStatuses] = useState(null)
   const [nums, setNums] = useState('')
   useTitle('Updater')
 
-  const updateOldestStudents = amount => amount !== 0 && callApi('/updater/update/oldest', 'post', { amount })
-  const updateAllStudents = () => callApi('/updater/update/all', 'post')
-  const updateActiveStudents = () => callApi('/updater/update/active', 'post')
-  const updateNoStudents = () => callApi('/updater/update/no_student', 'post')
-  const updateAttainmentDates = () => callApi('/updater/update/attainment', 'post')
-  const updateMetadata = () => callApi('/updater/update/meta', 'post')
-  const updateDaily = () => callApi('/updater/update/daily', 'post')
-  const createTasks = () => callApi('/updater/update/studentlist', 'post')
-  const rescheduleScheduled = () => callApi('/updater/reschedule/scheduled', 'post')
-  const rescheduleFetched = () => callApi('/updater/reschedule/fetched', 'post')
-  const updatePopulationStudents = () => callApi('/updatedatabase', 'post', nums.split('\n'))
-  const refreshStatistics = () => callApi('/updater/refresh_statistics', 'post')
-  const updateSISMeta = () => callApi('/updater/update/v2/meta', 'get')
-  const updateSISStudents = () => callApi('/updater/update/v2/students', 'get')
-  const updateSISProgrammes = () => callApi('/updater/update/v2/programmes')
-  const refreshStatisticsV2 = () => callApi('/updater/refresh_statistic_v2', 'post')
+  const apiCall = async (url, method, data) => {
+    try {
+      const response = await callApi(url, method, data)
+      setMessages(messages.concat(<div style={{ color: 'green' }}>{response.data.message}</div>))
+    } catch {
+      setMessages(messages.concat(<div style={{ color: 'red' }}>updater api error</div>))
+    }
+  }
+
+  const updateOldestStudents = amount => amount !== 0 && apiCall('/updater/update/oldest', 'post', { amount })
+  const updateAllStudents = () => apiCall('/updater/update/all', 'post')
+  const updateActiveStudents = () => apiCall('/updater/update/active', 'post')
+  const updateNoStudents = () => apiCall('/updater/update/no_student', 'post')
+  const updateAttainmentDates = () => apiCall('/updater/update/attainment', 'post')
+  const updateMetadata = () => apiCall('/updater/update/meta', 'post')
+  const updateDaily = () => apiCall('/updater/update/daily', 'post')
+  const createTasks = () => apiCall('/updater/update/studentlist', 'post')
+  const rescheduleScheduled = () => apiCall('/updater/reschedule/scheduled', 'post')
+  const rescheduleFetched = () => apiCall('/updater/reschedule/fetched', 'post')
+  const updatePopulationStudents = () => apiCall('/updatedatabase', 'post', nums.trim().split('\n'))
+  const refreshStatistics = () => apiCall('/updater/refresh_statistics', 'post')
+  const updateSISMeta = () => apiCall('/updater/update/v2/meta', 'get')
+  const updateSISStudents = () => apiCall('/updater/update/v2/students', 'get')
+  const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
+  const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
 
   const statusRef = useRef()
   useEffect(() => {
@@ -83,6 +93,8 @@ const Updater = () => {
         <Button content="Update SIS Programmes" onClick={() => updateSISProgrammes()} />
         <Button content="Refresh statistics V2" icon="refresh" onClick={() => refreshStatisticsV2()} />
       </Segment>
+      <Button content="Clear messages" onClick={() => setMessages([])} />
+      <Header>{messages}</Header>
       <Header>Status:</Header>
       <Segment loading={!statuses} basic>
         <Table striped>
