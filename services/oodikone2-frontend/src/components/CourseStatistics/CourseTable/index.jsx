@@ -65,7 +65,7 @@ function areEqual(prevProps, nextProps) {
   if (prevProps.courses.length !== nextProps.courses.length) {
     return false
   }
-  return true
+  return prevProps.courses.every(c1 => nextProps.courses.some(c2 => c1.code === c2.code))
 }
 
 export default React.memo(CourseTable, areEqual)
