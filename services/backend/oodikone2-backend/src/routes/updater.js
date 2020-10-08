@@ -24,7 +24,7 @@ router.post('/update/oldest', async (req, res) => {
   try {
     const response = await updateOldestStudents(amount)
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -35,7 +35,7 @@ router.post('/update/all', async (req, res) => {
   try {
     const response = await updateAllStudents()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -46,7 +46,7 @@ router.post('/update/active', async (req, res) => {
   try {
     const response = await updateActiveStudents()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -57,7 +57,7 @@ router.post('/update/no_student', async (req, res) => {
   try {
     const response = await updateNoStudents()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -68,7 +68,7 @@ router.post('/update/attainment', async (req, res) => {
   try {
     const response = await updateAttainments()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -79,7 +79,7 @@ router.post('/update/meta', async (req, res) => {
   try {
     const response = await updateMetadata()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -90,7 +90,7 @@ router.post('/update/studentlist', async (req, res) => {
   try {
     const response = await updateStudentlist()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -111,7 +111,7 @@ router.post('/reschedule/scheduled', async (req, res) => {
   try {
     const response = await rescheduleScheduled()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -122,7 +122,7 @@ router.post('/reschedule/fetched', async (req, res) => {
   try {
     const response = await rescheduleFetched()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
@@ -133,7 +133,7 @@ router.post('/update/daily', async (req, res) => {
   try {
     const response = await updateDaily()
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)
