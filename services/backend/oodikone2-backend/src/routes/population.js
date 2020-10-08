@@ -495,7 +495,7 @@ router.post('/updatedatabase', async (req, res) => {
   try {
     const response = await updateStudents(studentnumbers)
     if (response) {
-      res.status(200).json('Scheduled')
+      res.status(200).json({ ...response })
     }
   } catch (err) {
     res.status(500).json(err)

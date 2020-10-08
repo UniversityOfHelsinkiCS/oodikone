@@ -62,7 +62,7 @@ describe('Course Statistics tests', () => {
     cy.contains("Search for courses")
   })
 
-  it('Consecutive searches should not crash', () => {
+  it.only('On consecutive searches should not crash and search should work', () => {
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
     cy.get("input[placeholder='Search by entering a course code']").type('TKT20003')
@@ -74,11 +74,11 @@ describe('Course Statistics tests', () => {
     cy.contains("Course statistics").click()
     cy.contains("Search for courses")
     //cy.wait(500)
-    cy.get("input[placeholder='Search by entering a course code']").type('TKT10001')
-    cy.contains("td", "TKT10001").click()
+    cy.get("input[placeholder='Search by entering a course code']").type('TKT20001')
+    cy.contains("td", "TKT20001").click()
     cy.contains("Fetch statistics").should('be.enabled').click()
     cy.contains("Show population")
-    cy.contains("TKT10001")
+    cy.contains("TKT20001")
   })
 
   describe('When searching unified course stats', () => {
