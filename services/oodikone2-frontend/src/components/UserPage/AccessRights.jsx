@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Form, Divider } from 'semantic-ui-react'
 import PropTypes from 'prop-types'
 import { isEqual } from 'lodash'
-import { textAndDescriptionSearch } from '../../common'
+import { textAndDescriptionSearch, getTextIn } from '../../common'
 import selectors from '../../selectors/programmes'
 import { addUserUnits } from '../../redux/users'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -28,7 +28,7 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
     .map(({ code, name }) => ({
       key: code,
       value: code,
-      text: name[language] || name.fi,
+      text: getTextIn(name, language),
       description: code
     }))
     .sort((p1, p2) => p1.text.localeCompare(p2.text))

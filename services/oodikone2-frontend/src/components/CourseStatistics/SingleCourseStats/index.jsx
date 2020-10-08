@@ -331,7 +331,7 @@ const SingleCourseStats = ({
   if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
   const options = filteredProgrammes
-    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : text[language], ...rest }))
+    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text, language), ...rest }))
     .map(prog => ({ ...prog, name: prog.text }))
 
   return (
