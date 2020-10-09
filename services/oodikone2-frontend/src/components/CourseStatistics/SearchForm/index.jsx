@@ -9,7 +9,7 @@ import { clearCourses, findCoursesV2, toggleUnifyOpenUniCourses } from '../../..
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory, usePrevious } from '../../../common/hooks'
-import { validateInputLength } from '../../../common'
+import { validateInputLength, getTextIn } from '../../../common'
 import TSA from '../../../common/tsa'
 import { mergeCourses } from '../courseStatisticsUtils'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
@@ -138,7 +138,7 @@ const SearchForm = props => {
       separate,
       unifyOpenUniCourses: props.unifyOpenUniCourses
     }
-    const searchHistoryText = codes.map(code => `${selectedCourses[code].name[language]} ${code}`)
+    const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name, language)} ${code}`)
     addItemToSearchHistory({
       text: searchHistoryText.join(', '),
       params

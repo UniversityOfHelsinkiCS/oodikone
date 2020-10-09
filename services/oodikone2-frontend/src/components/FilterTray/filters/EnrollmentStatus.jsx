@@ -8,6 +8,7 @@ import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
+import { getTextIn } from '../../../common'
 
 const EnrollmentStatus = ({ allSemesters, language }) => {
   const [status, setStatus] = useState(null)
@@ -49,7 +50,7 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
 
   const semesterOptions = semesterCodes.map(code => ({
     key: `semester-option-${code}`,
-    text: allSemesters[code].name[language],
+    text: getTextIn(allSemesters[code].name, language),
     value: code
   }))
 

@@ -8,7 +8,7 @@ import { getProviders } from '../../../redux/providers'
 import { getSemesters } from '../../../redux/semesters'
 import { getTeacherStatistics } from '../../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { getUserIsAdmin } from '../../../common'
+import { getUserIsAdmin, getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const TeacherStatistics = ({
@@ -86,7 +86,10 @@ const TeacherStatistics = ({
   const userProviders = mapToProviders(rights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
   const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
-  const localizedProviderOptions = providerOptions.map(({ name, ...rest }) => ({ ...rest, text: name[language] }))
+  const localizedProviderOptions = providerOptions.map(({ name, ...rest }) => ({
+    ...rest,
+    text: getTextIn(name, language)
+  }))
   const filteredOptions = semesters.filter(sem => {
     const options =
       moment(new Date()).diff(new Date(`${new Date().getFullYear()}-8-1`), 'days') > 0

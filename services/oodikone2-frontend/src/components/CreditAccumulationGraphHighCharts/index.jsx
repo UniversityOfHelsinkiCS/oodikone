@@ -13,7 +13,7 @@ import './creditAccumulationGraphHC.css'
 import CreditGraphTooltip from '../CreditGraphTooltip'
 import { clearLoading } from '../../redux/graphSpinner'
 import { setChartHeight } from '../../redux/settings'
-import { reformatDate } from '../../common'
+import { reformatDate, getTextIn } from '../../common'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 
 // boost canvas needed because tests break with large population
@@ -126,7 +126,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         payload: {
           ...targetCourse,
           date: reformatDate(targetCourse.date, DISPLAY_DATE_FORMAT),
-          title: targetCourse.course.name[language]
+          title: getTextIn(targetCourse.course.name, language)
         }
       }
     ]
