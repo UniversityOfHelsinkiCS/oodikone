@@ -1,4 +1,5 @@
 .courseCodeInput {
+  width: 100% !important;
   margin-left: 0.25em !important;
   width: 6em;
   text-decoration: underline;
@@ -43,4 +44,9 @@
   overflow-y: auto;
   max-height: 80vh;
   padding: 0;
+}
+
+.flex-cell {
+  display: flex;
+  justify-content: space-around;
 }

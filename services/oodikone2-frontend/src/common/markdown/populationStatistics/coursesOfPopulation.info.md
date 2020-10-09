@@ -6,7 +6,7 @@ Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssir
 
 Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin *Course Statistics* -näkymään.
 
-Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Limit to courses where student number at least*. Lisäksi kurssin nimi- ja koodisarakkeissa on hakukentät *("filter here")* suodattamista varten. Suodattimet saa pois tyhjentämällä kentän ja painamalla ENTER. *Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.*
+Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Limit to courses where student number at least*. Lisäksi kurssin nimi- ja koodisarakkeissa on hakukentät *("filter here")* suodattamista varten. Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia. *Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.*
 
 ## Taulukot:
 
