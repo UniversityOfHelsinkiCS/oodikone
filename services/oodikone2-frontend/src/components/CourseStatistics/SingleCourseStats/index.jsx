@@ -161,7 +161,8 @@ const SingleCourseStats = ({
           grades: countFilteredStudents(allstudents.grades, filter),
           categories: countFilteredStudents(allstudents.classes, filter)
         }
-        return { code, name: getTextIn(name, language), cumulative, students, coursecode }
+        const parsedName = separate ? getTextIn(name, language) : name
+        return { code, name: parsedName, cumulative, students, coursecode }
       })
 
     const totals = progStats.reduce(
