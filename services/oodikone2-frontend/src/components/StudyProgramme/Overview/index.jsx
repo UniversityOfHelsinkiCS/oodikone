@@ -48,7 +48,7 @@ const Overview = props => {
         showCredits={isNewHYStudyProgramme(studyprogramme)}
         newProgramme={isNewHYStudyProgramme(studyprogramme)}
       />
-      {isAdmin && <BachelorsTable bachelors={bachelors.data} loading={throughput.pending} />}
+      <BachelorsTable bachelors={bachelors.data} loading={throughput.pending} />
     </React.Fragment>
   )
 }
