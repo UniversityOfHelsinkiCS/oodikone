@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { connect, useSelector } from 'react-redux'
-import { Table, Form, Input, Tab } from 'semantic-ui-react'
+import { Table, Form, Input, Tab, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { orderBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
@@ -305,17 +305,28 @@ function PopulationCourseStats(props) {
     }
   }
 
+  const onFilterReset = field => {
+    clearTimeout(timer)
+    setState({ ...state, [field]: '' })
+  }
+
+  const getFilterValue = field => (field in state ? state[field] || '' : '')
+
   const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
     return (
       <Table.HeaderCell colSpan={colSpan}>
-        {name}
-        <Input
-          className="courseCodeInput"
-          transparent
-          placeholder="(filter here)"
-          onChange={e => onFilterChange(e, field)}
-          onKeyPress={onSetFilterKeyPress}
-        />
+        <div className="flex-cell">
+          {name}
+          <Input
+            className="courseCodeInput"
+            transparent
+            placeholder="(filter here)"
+            onChange={e => onFilterChange(e, field)}
+            onKeyPress={onSetFilterKeyPress}
+            value={getFilterValue(field)}
+            icon={<Icon name="delete" link onClick={() => onFilterReset(field)} />}
+          />
+        </div>
       </Table.HeaderCell>
     )
   }
