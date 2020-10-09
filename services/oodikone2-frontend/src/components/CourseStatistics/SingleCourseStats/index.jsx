@@ -143,7 +143,7 @@ const SingleCourseStats = ({
     const filteredSemesters = semesters.filter(timeFilter)
     const filteredYears = years.filter(timeFilter)
     return separate
-      ? filteredSemesters.find(year => year.texts.includes(name))
+      ? filteredSemesters.find(year => year.texts.includes(getTextIn(name, language)))
       : filteredYears.find(year => year.text === name)
   }
 
@@ -161,8 +161,9 @@ const SingleCourseStats = ({
           grades: countFilteredStudents(allstudents.grades, filter),
           categories: countFilteredStudents(allstudents.classes, filter)
         }
-        return { code, name, cumulative, students, coursecode }
+        return { code, name: getTextIn(name, language), cumulative, students, coursecode }
       })
+
     const totals = progStats.reduce(
       (acc, curr) => {
         const passed = acc.cumulative.categories.passed + curr.cumulative.categories.passed

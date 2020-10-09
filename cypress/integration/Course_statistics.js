@@ -62,7 +62,7 @@ describe('Course Statistics tests', () => {
     cy.contains("Search for courses")
   })
 
-  it.only('On consecutive searches should not crash and search should work', () => {
+  it('On consecutive searches should not crash and search should work', () => {
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
     cy.get("input[placeholder='Search by entering a course code']").type('TKT20003')
@@ -79,6 +79,20 @@ describe('Course Statistics tests', () => {
     cy.contains("Fetch statistics").should('be.enabled').click()
     cy.contains("Show population")
     cy.contains("TKT20001")
+  })
+
+  it('Shows statistics when separating by semester', () => {
+    const courseCode = 'DATA11002'
+    cy.url().should('include', '/coursestatistics')
+    cy.contains("Search for courses")
+    cy.get("input[placeholder='Search by entering a course code']").type(courseCode)
+    cy.contains("td", courseCode).click()
+    cy.contains("Separate statistics for Spring and Fall semesters").click()
+    cy.contains("Fetch statistics").should('be.enabled').click()
+    cy.contains("Kevät 2018")
+    cy.contains("Syksy 2017")
+    cy.get("tbody").contains("19")
+    cy.contains(courseCode)
   })
 
   describe('When searching unified course stats', () => {
