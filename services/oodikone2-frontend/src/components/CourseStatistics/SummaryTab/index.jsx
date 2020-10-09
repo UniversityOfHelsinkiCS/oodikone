@@ -8,6 +8,7 @@ import { fields, setValue } from '../../../redux/coursesSummaryForm'
 import CumulativeTable from '../CumulativeTable'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import useLanguage from '../../LanguagePicker/useLanguage'
+import { getTextIn } from '../../../common'
 
 const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClickCourse }) => {
   const { language } = useLanguage()
@@ -35,7 +36,7 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
   const options = programmes
     .map(e => ({ ...e, size: new Set(flatten(Object.values(e.students))).size }))
     .filter(e => e.size > 0)
-    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : text[language], ...rest }))
+    .map(({ text, ...rest }) => ({ text: typeof text === 'string' ? text : getTextIn(text, language), ...rest }))
     .map(prog => ({ ...prog, name: prog.text }))
 
   return (

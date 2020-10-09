@@ -6,7 +6,7 @@ import { Dropdown, Tab, Message, Button } from 'semantic-ui-react'
 import ThroughputTable from '../ThroughputTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
-import { isNewHYStudyProgramme, textAndDescriptionSearch } from '../../../common'
+import { isNewHYStudyProgramme, textAndDescriptionSearch, getTextIn } from '../../../common'
 import ProtoC from '../../CoolDataScience/ProtoC'
 
 const Overview = ({
@@ -48,7 +48,7 @@ const Overview = ({
 
       const dropdownOptions = filteredStudytracks.map(st => ({
         key: st.code,
-        text: st.name[language],
+        text: getTextIn(st.name, language),
         description: st.code,
         value: st.code
       }))
@@ -98,7 +98,7 @@ const Overview = ({
               ...selectedYearData.studytrackdata[curr],
               // oh pls no, pls fix asap
               // need to fix logic in throughputtable component so that we can name this better
-              year: `${studytrack.name[language]}, ${curr}`
+              year: `${getTextIn(studytrack.name, language)}, ${curr}`
             }
             acc.push(newStudyTrackObject)
           }

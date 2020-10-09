@@ -12,7 +12,7 @@ import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
 import Students from './Students'
-import { getUserIsAdmin } from '../../common'
+import { getUserIsAdmin, getTextIn } from '../../common'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from '../FilterTray/useFilterTray'
@@ -62,7 +62,9 @@ function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses
   }
   const courseNameFilter = ({ course }) => {
     const { name } = course
-    return name[language].toLowerCase().includes(nameFilter.toLowerCase())
+    return getTextIn(name, language)
+      .toLowerCase()
+      .includes(nameFilter.toLowerCase())
   }
 
   const mandatoryFilter = ({ course }) => {
@@ -147,7 +149,9 @@ function PopulationCourseStats(props) {
     }
     const courseNameFilter = ({ course }) => {
       const { name } = course
-      return name[language].toLowerCase().includes(nameFilter.toLowerCase())
+      return getTextIn(name, language)
+        .toLowerCase()
+        .includes(nameFilter.toLowerCase())
     }
 
     const mandatoryFilter = ({ course }) => {
