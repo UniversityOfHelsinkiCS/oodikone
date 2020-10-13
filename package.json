@@ -37,6 +37,7 @@
   },
   "husky": {
     "hooks": {
+      "pre-commit": "scripts/grep_only.sh",
       "pre-push": "npm run lint"
     }
   },
