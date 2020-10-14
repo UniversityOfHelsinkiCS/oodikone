@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Header, Grid, Segment } from 'semantic-ui-react'
-import { shape, any, arrayOf, bool } from 'prop-types'
+import { shape, any, arrayOf, bool, oneOfType, array } from 'prop-types'
 
 const DIRECTIONS = {
   ASC: 'ascending', // true
@@ -97,10 +97,13 @@ const BachelorsTable = ({ bachelors, loading }) => {
 }
 
 BachelorsTable.propTypes = {
-  bachelors: shape({
-    data: arrayOf(any),
-    years: arrayOf(any)
-  }),
+  bachelors: oneOfType([
+    shape({
+      data: arrayOf(any),
+      years: arrayOf(any)
+    }),
+    array
+  ]),
   loading: bool.isRequired
 }
 
