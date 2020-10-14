@@ -7,7 +7,7 @@ import { getProductivity } from '../../../redux/productivity'
 import './productivityTable.css'
 
 const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, newProgramme }) => {
-  const [selectedYear, setYear] = useState(null)
+  const [selectedYear, setYear] = useState(newProgramme ? 2017 : null)
 
   const years = productivity
     ? productivity.data
@@ -16,9 +16,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, 
     : []
 
   useEffect(() => {
-    if (newProgramme && years.length > 1) {
-      setYear('2017')
-    } else if (!selectedYear && years.length > 5) {
+    if (!selectedYear && years.length > 5) {
       setYear(years[5].value)
     } else if (!selectedYear && years.length > 1) {
       setYear(years[years.length - 1].value)
@@ -83,7 +81,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, 
         </Grid>
       </Header>
       <div>Statistics from selected year onwards</div>
-      <Dropdown options={years} onChange={handleChange} selection value={selectedYear} />
+      {years.length > 4 ? <Dropdown options={years} onChange={handleChange} selection value={selectedYear} /> : null}
       <Segment basic loading={loading} style={{ overflowX: 'auto' }}>
         <Table structured celled compact striped selectable className="fixed-header">
           <Table.Header>

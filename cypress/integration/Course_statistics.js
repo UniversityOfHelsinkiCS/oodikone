@@ -10,7 +10,7 @@ describe('Course Statistics tests', () => {
   it('Searching single course having duplicate mappings shows course statistics', () => {
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
-    cy.get("input[placeholder='Search by entering a course code']").type('TKT20003')
+    cy.get("input[placeholder='Search by a course code']").type('TKT20003')
     cy.contains("tr", "TKT20003").click()
     cy.contains("Fetch statistics").should('be.enabled').click()
     cy.contains("Search for courses").should('not.exist')
@@ -40,7 +40,7 @@ describe('Course Statistics tests', () => {
   it('Searching multiple courses having duplicate mappings shows course statistics', () => {
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
-    cy.get("input[placeholder='Search by entering a course code']").type('TKT')
+    cy.get("input[placeholder='Search by a course code']").type('TKT')
     cy.contains("td", "TKT20003").click()
     cy.contains("td", /^TKT10002/).click()
     cy.contains("Fetch statistics").should('be.enabled').click()
@@ -65,7 +65,7 @@ describe('Course Statistics tests', () => {
   it('On consecutive searches should not crash and search should work', () => {
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
-    cy.get("input[placeholder='Search by entering a course code']").type('TKT20003')
+    cy.get("input[placeholder='Search by a course code']").type('TKT20003')
     cy.contains("td", "TKT20003").click()
     cy.contains("Fetch statistics").should('be.enabled').click()
     cy.contains("Show population")
@@ -74,7 +74,7 @@ describe('Course Statistics tests', () => {
     cy.contains("Course statistics").click()
     cy.contains("Search for courses")
     //cy.wait(500)
-    cy.get("input[placeholder='Search by entering a course code']").type('TKT20001')
+    cy.get("input[placeholder='Search by a course code']").type('TKT20001')
     cy.contains("td", "TKT20001").click()
     cy.contains("Fetch statistics").should('be.enabled').click()
     cy.contains("Show population")
@@ -85,7 +85,7 @@ describe('Course Statistics tests', () => {
     const courseCode = 'DATA11002'
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
-    cy.get("input[placeholder='Search by entering a course code']").type(courseCode)
+    cy.get("input[placeholder='Search by a course code']").type(courseCode)
     cy.contains("td", courseCode).click()
     cy.contains("Separate statistics for Spring and Fall semesters").click()
     cy.contains("Fetch statistics").should('be.enabled').click()
@@ -100,7 +100,7 @@ describe('Course Statistics tests', () => {
       cy.url().should('include', '/coursestatistics')
       cy.contains("Search for courses")
       cy.get("input[name='unifyOpenUniCourses']").parent().click()
-      cy.get("input[placeholder='Search by entering a course code']").type('TKT10002')
+      cy.get("input[placeholder='Search by a course code']").type('TKT10002')
       cy.contains("td", "TKT10002, AYTKT10002").click()
       cy.contains("Fetch statistics").should('be.enabled').click()
       cy.contains("Search for courses").should('not.exist')

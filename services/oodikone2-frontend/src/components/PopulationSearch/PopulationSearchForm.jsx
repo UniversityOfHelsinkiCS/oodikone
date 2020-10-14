@@ -389,6 +389,7 @@ const PopulationSearchForm = props => {
 
   const renderEnrollmentDateSelector = () => {
     const { year } = query
+    const currentYear = moment().year()
     return (
       <Form.Group key="year" className="enrollmentSelectorGroup">
         <Form.Field error={!validYearCheck(momentYear)} className="yearSelect">
@@ -398,12 +399,14 @@ const PopulationSearchForm = props => {
             control={Datetime}
             dateFormat={YEAR_DATE_FORMAT}
             timeFormat={false}
-            renderYear={(p, selectableYear) => (
-              <td {...p}>
-                {`${selectableYear}`}-<br />
-                {`${selectableYear + 1}`}
-              </td>
-            )}
+            renderYear={(p, selectableYear) =>
+              selectableYear <= currentYear && selectableYear >= 1900 ? (
+                <td {...p}>
+                  {`${selectableYear}`}-<br />
+                  {`${selectableYear + 1}`}
+                </td>
+              ) : null
+            }
             closeOnSelect
             value={`${year}-${moment()
               .year(year)

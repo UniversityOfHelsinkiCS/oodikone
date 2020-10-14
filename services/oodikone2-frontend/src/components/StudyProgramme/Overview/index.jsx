@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { string, func, shape, bool } from 'prop-types'
+import { string, func, shape, bool, oneOfType, array } from 'prop-types'
 import { connect } from 'react-redux'
 import ProductivityTable from '../ProductivityTable'
 import ThroughputTable from '../ThroughputTable'
@@ -48,7 +48,7 @@ const Overview = props => {
         showCredits={isNewHYStudyProgramme(studyprogramme)}
         newProgramme={isNewHYStudyProgramme(studyprogramme)}
       />
-      {isAdmin && <BachelorsTable bachelors={bachelors.data} loading={throughput.pending} />}
+      <BachelorsTable bachelors={bachelors.data} loading={throughput.pending} />
     </React.Fragment>
   )
 }
@@ -72,7 +72,7 @@ Overview.propTypes = {
   bachelors: shape({
     error: bool,
     pending: bool,
-    data: shape({})
+    data: oneOfType([shape({}), array])
   }).isRequired // eslint-disable-line
 }
 
