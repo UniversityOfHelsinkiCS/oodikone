@@ -185,8 +185,8 @@ const SearchForm = props => {
         <Form>
           <Header content="Search for courses" />
           <div style={{ marginBottom: '15px' }}>
-            <Form.Group widths="equal">
-              <Form.Field>
+            <Form.Group>
+              <Form.Field width={8}>
                 <label>Name:</label>
                 <AutoSubmitSearchInput
                   doSearch={fetchCourses}
@@ -197,11 +197,11 @@ const SearchForm = props => {
                   minSearchLength={0}
                 />
               </Form.Field>
-              <Form.Field>
+              <Form.Field width={3}>
                 <label>Code:</label>
                 <AutoSubmitSearchInput
                   doSearch={fetchCourses}
-                  placeholder="Search by entering a course code"
+                  placeholder="Search by a course code"
                   value={courseCode}
                   onChange={cc => setState({ ...state, courseCode: cc })}
                   loading={props.coursesLoading}
@@ -209,7 +209,7 @@ const SearchForm = props => {
                   data-cy="course-code-input"
                 />
               </Form.Field>
-              <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
+              <Form.Field width={4} style={{ display: 'flex', flexDirection: 'column' }}>
                 <label>Unify open university courses:</label>
                 <span style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
                   <Form.Checkbox

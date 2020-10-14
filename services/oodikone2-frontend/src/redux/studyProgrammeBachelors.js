@@ -8,6 +8,6 @@ export const getBachelors = studyprogrammeId => {
   return callController(route, prefix, [], 'get')
 }
 
-const reducer = listreducer(prefix, null, false)
+const reducer = listreducer(prefix, null, true)
 
 export default reducer

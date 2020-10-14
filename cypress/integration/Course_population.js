@@ -10,7 +10,7 @@ describe('Course population tests', () => {
   it('Can find course population', () => {
     cy.url().should('include', '/coursestatistics')
     cy.contains("Search for courses")
-    cy.get("input[placeholder='Search by entering a course code']").type('TKT20003')
+    cy.get("input[placeholder='Search by a course code']").type('TKT20003')
     cy.contains("tr", "TKT20003").click()
     cy.contains("Fetch statistics").should('be.enabled').click()
 

@@ -45,7 +45,7 @@ describe('Population Statistics tests', () => {
     cy.contains("Select degree").click().siblings().contains("Luonnontieteiden kandidaatti")
   })
 
-  it.only('Population statistics is usable on general level', () => {
+  it('Population statistics is usable on general level', () => {
     cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma")
     setPopStatsUntil('September 2019')
 
