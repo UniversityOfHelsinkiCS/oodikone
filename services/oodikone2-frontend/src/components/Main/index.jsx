@@ -13,7 +13,7 @@ const history = TSA.Matomo.connectToHistory(createBrowserHistory())
 
 export default () => {
   useEffect(() => {
-    initShibbolethPinger()
+    initShibbolethPinger(60000, window.location.origin)
   }, [])
 
   return (
