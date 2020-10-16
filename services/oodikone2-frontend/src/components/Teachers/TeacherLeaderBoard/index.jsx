@@ -52,6 +52,12 @@ const TeacherLeaderBoard = ({
     getTopTeachers(year, category)
   }
 
+  const initLeaderboard = (year, category) => {
+    setSelectedyear(year)
+    setSelectedcategory(category)
+    updateAndSubmitForm({ selectedyear: year, selectedcategory: category })
+  }
+
   const handleYearChange = (e, { value }) => {
     setSelectedyear(value)
     updateAndSubmitForm({ selectedyear: value })
@@ -84,7 +90,7 @@ const TeacherLeaderBoard = ({
             categoryoptions={categoryoptions}
             handleYearChange={handleYearChange}
             handleCategoryChange={handleCategoryChange}
-            updateAndSubmitForm={updateAndSubmitForm}
+            initLeaderboard={initLeaderboard}
             selectedcategory={selectedcategory}
             selectedyear={selectedyear}
           />
