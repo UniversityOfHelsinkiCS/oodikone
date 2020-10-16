@@ -4,6 +4,13 @@ import { connect } from 'react-redux'
 import { func, arrayOf, shape, string, any, number } from 'prop-types'
 import { getTopTeachers } from '../../../redux/teachersTop'
 
+const currentYear = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+
+  return now.getMonth() > 7 ? year : year - 1
+}
+
 const LeaderForm = ({
   selectedyear,
   selectedcategory,
@@ -11,22 +18,17 @@ const LeaderForm = ({
   handleYearChange,
   yearoptions,
   categoryoptions,
-  updateAndSubmitForm
+  initLeaderboard
 }) => {
   useEffect(() => {
-    const [defaultyear = {}] = [
-      yearoptions.find(year => Number(year.text.slice(0, 4)) === new Date().getFullYear() - 1)
-    ]
+    const [defaultyear = {}] = [yearoptions.find(year => Number(year.text.slice(0, 4)) === currentYear())]
     const [defaultcategory = {}] = categoryoptions
 
     const year = defaultyear.value
     const category = defaultcategory.value
 
     if (year && category) {
-      updateAndSubmitForm({
-        selectedyear: year,
-        selectedcategory: category
-      })
+      initLeaderboard(year, category)
     }
   }, [])
 
@@ -67,7 +69,7 @@ const LeaderForm = ({
 LeaderForm.propTypes = {
   yearoptions: arrayOf(shape({})).isRequired,
   categoryoptions: arrayOf(shape({ key: any, value: any, text: string })).isRequired,
-  updateAndSubmitForm: func.isRequired,
+  initLeaderboard: func.isRequired,
   handleCategoryChange: func.isRequired,
   handleYearChange: func.isRequired,
   selectedcategory: string, // eslint-disable-line
