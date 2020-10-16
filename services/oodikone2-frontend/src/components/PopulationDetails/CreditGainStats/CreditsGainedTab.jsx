@@ -16,13 +16,11 @@ const CreditsGainedTab = ({ filteredStudents }) => {
       : creditList.filter(credits => credits < max && credits >= min).length
 
   const limits = [
-    [Math.ceil(months * (55 / 12)), null],
-    [Math.ceil(months * (50 / 12)), Math.ceil(months * (55 / 12))],
-    [Math.ceil(months * (40 / 12)), Math.ceil(months * (50 / 12))],
-    [Math.ceil(months * (30 / 12)), Math.ceil(months * (40 / 12))],
-    [Math.ceil(months * (20 / 12)), Math.ceil(months * (30 / 12))],
-    [Math.ceil(months * (10 / 12)), Math.ceil(months * (20 / 12))],
-    [1, Math.ceil(months * (10 / 12))],
+    [Math.ceil(months * (60 / 12)), undefined],
+    [Math.ceil(months * (45 / 12)), Math.ceil(months * (60 / 12))],
+    [Math.ceil(months * (30 / 12)), Math.ceil(months * (45 / 12))],
+    [Math.ceil(months * (15 / 12)), Math.ceil(months * (30 / 12))],
+    [1, Math.ceil(months * (15 / 12))],
     [null, 0]
   ]
 
