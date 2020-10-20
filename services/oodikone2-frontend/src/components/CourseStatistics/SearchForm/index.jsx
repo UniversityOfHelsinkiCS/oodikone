@@ -179,6 +179,25 @@ const SearchForm = props => {
   const selected = Object.values(selectedCourses).map(course => ({ ...course, selected: true }))
   const noSelectedCourses = selected.length === 0
 
+  const addAllCourses = () => {
+    courses.forEach(course => {
+      course.selected = true
+    })
+
+    const newSelectedCourses = courses.reduce((newSelected, course) => {
+      newSelected[course.code] = { ...course }
+      return newSelected
+    }, {})
+
+    setState({
+      ...state,
+      selectedCourses: {
+        ...selectedCourses,
+        ...newSelectedCourses
+      }
+    })
+  }
+
   return (
     <React.Fragment>
       <Segment loading={isLoading}>
@@ -225,7 +244,7 @@ const SearchForm = props => {
               hidden={noSelectedCourses}
               courses={selected}
               onSelectCourse={onSelectCourse}
-              controlIcon="remove"
+              controlIcon="trash alternate outline"
             />
             {!noSelectedCourses && (
               <Fragment>
@@ -254,8 +273,19 @@ const SearchForm = props => {
               courses={courses}
               title="Searched courses"
               onSelectCourse={onSelectCourse}
-              controlIcon="plus"
             />
+            {courses.length ? (
+              <div className="select-all-container">
+                <Form.Button
+                  type="button"
+                  size="large"
+                  content="Select all search results"
+                  basic
+                  color="green"
+                  onClick={addAllCourses}
+                />
+              </div>
+            ) : null}
           </div>
         </Form>
       </Segment>
