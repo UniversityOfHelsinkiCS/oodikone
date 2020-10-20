@@ -71,14 +71,15 @@ router.get('/v2/courseyearlystats', async (req, res) => {
 router.get('/v3/courseyearlystats', async (req, res) => {
   try {
     const { rights, roles } = req
-    const admin = roles && roles.includes('admin')
-    if (!admin) {
-      // If user has rights to see at least one programme, then they are allowed
-      // to see all of them
-      if (rights.length <= 0) {
-        return res.status(403).json({ error: 'No programmes so no access to course stats' })
-      }
+
+    const allowedByRoles = roles && ['admin', 'courseStatistics'].some(role => roles.includes(role))
+
+    // If user has rights to see at least one programme, then they are allowed
+    // to see all of them
+    if (!allowedByRoles && rights.length < 1) {
+      return res.status(403).json({ error: 'No programmes so no access to course stats' })
     }
+
     const { codes, separate: sep, unifyOpenUniCourses: unify } = req.query
 
     const separate = !sep ? false : JSON.parse(sep)
