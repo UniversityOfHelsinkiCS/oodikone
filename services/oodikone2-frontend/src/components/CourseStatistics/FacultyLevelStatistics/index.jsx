@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Table, Header, Dropdown } from 'semantic-ui-react'
+import { Table, Header, Dropdown, Message } from 'semantic-ui-react'
 import { flatten, uniq } from 'lodash'
 import { shape, string, number } from 'prop-types'
 import { getTextIn } from '../../../common'
@@ -9,11 +9,11 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
   return (
     <Table.Row>
-      <Table.Cell>
+      <Table.Cell width={13}>
         {facultyCode}, {facultyName}
       </Table.Cell>
-      <Table.Cell>{students}</Table.Cell>
-      <Table.Cell>{credits}</Table.Cell>
+      <Table.Cell width={2}>{students}</Table.Cell>
+      <Table.Cell width={1}>{credits}</Table.Cell>
     </Table.Row>
   )
 }
@@ -43,17 +43,23 @@ const CourseTable = ({ course, courseInstance, language }) => {
       <Table compact>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Faculty</Table.HeaderCell>
-            <Table.HeaderCell>Students</Table.HeaderCell>
-            <Table.HeaderCell>Credits</Table.HeaderCell>
+            <Table.HeaderCell width={13}>Faculty</Table.HeaderCell>
+            <Table.HeaderCell width={2}>Students</Table.HeaderCell>
+            <Table.HeaderCell width={1}>Credits</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>{rows}</Table.Body>
         <Table.Footer>
           <Table.Row>
-            <Table.HeaderCell style={{ fontWeight: '700' }}>Total</Table.HeaderCell>
-            <Table.HeaderCell style={{ fontWeight: '700' }}>{courseInstance.allStudents.length}</Table.HeaderCell>
-            <Table.HeaderCell style={{ fontWeight: '700' }}>{courseInstance.allCredits}</Table.HeaderCell>
+            <Table.HeaderCell width={13} style={{ fontWeight: '700' }}>
+              Total
+            </Table.HeaderCell>
+            <Table.HeaderCell width={2} style={{ fontWeight: '700' }}>
+              {courseInstance.allStudents.length}
+            </Table.HeaderCell>
+            <Table.HeaderCell width={1} style={{ fontWeight: '700' }}>
+              {courseInstance.allCredits}
+            </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>
       </Table>
@@ -89,6 +95,15 @@ const FacultyLevelStatistics = () => {
     <CourseTable course={course} courseInstance={courseInstance} language={language} key={course.coursecode} />
   ))
 
+  const renderMessage = () =>
+    yearsCourseStats.length !== Object.keys(courseStats).length ? (
+      <Message info>
+        <p>
+          Displaying {yearsCourseStats.length} courses of {Object.keys(courseStats).length} searched courses
+        </p>
+      </Message>
+    ) : null
+
   return (
     <div>
       Select year
@@ -101,6 +116,7 @@ const FacultyLevelStatistics = () => {
           setSelectedYear(data.value)
         }}
       />
+      {renderMessage()}
       {courseTables}
     </div>
   )
