@@ -4,7 +4,7 @@ import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
-import { getUserRoles, setMocking, setTestUser, setTestUserSIS, getTestUserSIS } from '../../common'
+import { getUserRoles, setMocking, setTestUser, setTestUserSIS, getTestUserSIS, checkUserAccess } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
@@ -53,10 +53,12 @@ const NavigationBar = props => {
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
     Object.keys(allNavigationItems).forEach(key => {
-      if (key === 'courseStatistics' || key === 'populations' || key === 'students') {
+      if (key === 'populations' || key === 'students') {
         if (!userRoles.includes('admin') && rights.length === 0) {
           return
         }
+      } else if (key === 'courseStatistics') {
+        if (!checkUserAccess(['courseStatistics', 'admin'], userRoles) && rights.length < 1) return
       }
       const { reqRights } = allNavigationItems[key]
       if (!reqRights || reqRights.every(r => userRoles.includes(r))) {
