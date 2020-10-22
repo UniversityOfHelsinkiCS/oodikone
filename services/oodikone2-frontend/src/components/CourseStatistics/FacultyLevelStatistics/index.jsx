@@ -9,33 +9,41 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
   return (
     <Table.Row>
-      <Table.Cell>
+      <Table.Cell width={13}>
         {facultyCode}, {facultyName}
       </Table.Cell>
-      <Table.Cell>{students}</Table.Cell>
-      <Table.Cell>{credits}</Table.Cell>
+      <Table.Cell width={2}>{students}</Table.Cell>
+      <Table.Cell width={1}>{credits}</Table.Cell>
     </Table.Row>
   )
 }
 
-const CourseTable = ({ course, courseInstance, language }) => {
+const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
   const { coursecode, name } = course
 
-  const rows = Object.entries(courseInstance.faculties)
-    .sort(([facultyCodeA], [facultyCodeB]) => facultyCodeA.localeCompare(facultyCodeB))
-    .map(([facultyCode, instanceFaculty]) => (
-      <CourseTableRow
-        key={`${coursecode}-${facultyCode}`}
-        facultyCode={facultyCode}
-        facultyName={getTextIn(instanceFaculty.name, language)}
-        students={instanceFaculty.students.length}
-        credits={instanceFaculty.credits}
-      />
-    ))
+  const rows = courseInstance ? (
+    Object.entries(courseInstance.faculties)
+      .sort(([facultyCodeA], [facultyCodeB]) => facultyCodeA.localeCompare(facultyCodeB))
+      .map(([facultyCode, instanceFaculty]) => (
+        <CourseTableRow
+          key={`${coursecode}-${facultyCode}`}
+          facultyCode={facultyCode}
+          facultyName={getTextIn(instanceFaculty.name, language)}
+          students={instanceFaculty.students.length}
+          credits={instanceFaculty.credits}
+        />
+      ))
+  ) : (
+    <Table.Row>
+      <Table.Cell width={13}>No data for selected year</Table.Cell>
+    </Table.Row>
+  )
+
   return (
     <>
       <Header>
-        {courseInstance.year} {coursecode}
+        {courseInstance ? courseInstance.year : `${1949 + Number(selectedYear)}-${1950 + Number(selectedYear)}`}{' '}
+        {coursecode}
       </Header>
       <Header size="small">
         {name} ({coursecode})
@@ -43,19 +51,27 @@ const CourseTable = ({ course, courseInstance, language }) => {
       <Table compact>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>Faculty</Table.HeaderCell>
-            <Table.HeaderCell>Students</Table.HeaderCell>
-            <Table.HeaderCell>Credits</Table.HeaderCell>
+            <Table.HeaderCell width={13}>Faculty</Table.HeaderCell>
+            <Table.HeaderCell width={2}>Students</Table.HeaderCell>
+            <Table.HeaderCell width={1}>Credits</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
         <Table.Body>{rows}</Table.Body>
-        <Table.Footer>
-          <Table.Row>
-            <Table.HeaderCell style={{ fontWeight: '700' }}>Total</Table.HeaderCell>
-            <Table.HeaderCell style={{ fontWeight: '700' }}>{courseInstance.allStudents.length}</Table.HeaderCell>
-            <Table.HeaderCell style={{ fontWeight: '700' }}>{courseInstance.allCredits}</Table.HeaderCell>
-          </Table.Row>
-        </Table.Footer>
+        {courseInstance ? (
+          <Table.Footer>
+            <Table.Row>
+              <Table.HeaderCell width={13} style={{ fontWeight: '700' }}>
+                Total
+              </Table.HeaderCell>
+              <Table.HeaderCell width={2} style={{ fontWeight: '700' }}>
+                {courseInstance ? courseInstance.allStudents.length : 0}
+              </Table.HeaderCell>
+              <Table.HeaderCell width={1} style={{ fontWeight: '700' }}>
+                {courseInstance ? courseInstance.allCredits : 0}
+              </Table.HeaderCell>
+            </Table.Row>
+          </Table.Footer>
+        ) : null}
       </Table>
     </>
   )
@@ -80,13 +96,20 @@ const FacultyLevelStatistics = () => {
   }))
 
   const yearsCourseStats = Object.values(courseStats)
-    .filter(course => !!course.facultyStats[selectedYear])
     .map(course => ({
       course,
       courseInstance: course.facultyStats[selectedYear]
     }))
+    .sort((a, b) => (a.courseInstance === undefined) - (b.courseInstance === undefined))
+
   const courseTables = yearsCourseStats.map(({ course, courseInstance }) => (
-    <CourseTable course={course} courseInstance={courseInstance} language={language} key={course.coursecode} />
+    <CourseTable
+      course={course}
+      courseInstance={courseInstance}
+      language={language}
+      key={course.coursecode}
+      selectedYear={selectedYear}
+    />
   ))
 
   return (
@@ -116,7 +139,8 @@ CourseTableRow.propTypes = {
 CourseTable.propTypes = {
   course: shape({}).isRequired,
   courseInstance: shape({}).isRequired,
-  language: string.isRequired
+  language: string.isRequired,
+  selectedYear: string.isRequired
 }
 
 export default FacultyLevelStatistics

@@ -7,7 +7,7 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 import './courseTable.css'
 import { getTextIn } from '../../../common'
 
-const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false }) => {
+const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false, controlIcon }) => {
   const { language } = useLanguage()
   const noContent = courses.length === 0
   const sortCourses = courses => sortBy(courses, course => getTextIn(course.name, language))
@@ -29,6 +29,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
         <div>{getActiveYears(course)}</div>
       </Table.Cell>
       <Table.Cell content={!course.alternatives ? course.code : course.alternatives.map(a => a.code).join(', ')} />
+      {controlIcon ? <Table.Cell icon={controlIcon} /> : null}
     </Table.Row>
   )
 
@@ -40,6 +41,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
             <Table.Row>
               <Table.HeaderCell content={title} />
               <Table.HeaderCell content="Code" />
+              {controlIcon ? <Table.HeaderCell /> : null}
             </Table.Row>
           </Table.Header>
           <Table.Body>{noContent ? getEmptyListRow() : sortCourses(courses).map(toCourseRow)}</Table.Body>
@@ -55,11 +57,12 @@ CourseTable.propTypes = {
   hidden: bool.isRequired,
   title: string.isRequired,
   emptyListText: string,
-  controlIcon: string.isRequired
+  controlIcon: string
 }
 
 CourseTable.defaultProps = {
-  emptyListText: 'No results.'
+  emptyListText: 'No results.',
+  controlIcon: null
 }
 
 function areEqual(prevProps, nextProps) {

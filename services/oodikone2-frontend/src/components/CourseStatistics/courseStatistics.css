@@ -31,3 +31,9 @@
 .yearControlButton {
   font-size: 8px !important;
 }
+
+.select-all-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+}
