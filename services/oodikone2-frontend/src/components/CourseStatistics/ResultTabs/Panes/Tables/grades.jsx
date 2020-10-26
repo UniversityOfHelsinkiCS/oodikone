@@ -36,18 +36,24 @@ const getTableData = (stats, isGradeSeries, isRelative) =>
     }
   })
 
-const getGradeColumns = isGradeSeries =>
-  isGradeSeries
-    ? [
-        getSortableColumn('0', '0', s => s['0']),
-        getSortableColumn('1', '1', s => s['1']),
-        getSortableColumn('2', '2', s => s['2']),
-        getSortableColumn('3', '3', s => s['3']),
-        getSortableColumn('4', '4', s => s['4']),
-        getSortableColumn('5', '5', s => s['5']),
-        getSortableColumn('OTHER_PASSED', 'Other passed', s => s['Hyv.'])
-      ]
-    : THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
+const includesHTOrTT = stats =>
+  stats.some(({ cumulative }) => ['HT', 'TT'].some(grade => Object.keys(cumulative.grades).includes(grade)))
+
+const getGradeColumns = (isGradeSeries, addHTAndTT) => {
+  if (!isGradeSeries) return THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
+  const columns = [
+    getSortableColumn('0', '0', s => s['0']),
+    getSortableColumn('1', '1', s => s['1']),
+    getSortableColumn('2', '2', s => s['2']),
+    getSortableColumn('3', '3', s => s['3']),
+    getSortableColumn('4', '4', s => s['4']),
+    getSortableColumn('5', '5', s => s['5']),
+    getSortableColumn('OTHER_PASSED', 'Other passed', s => s['Hyv.'])
+  ]
+  if (addHTAndTT)
+    columns.splice(6, 0, getSortableColumn('HT', 'HT', s => s.HT), getSortableColumn('TT', 'TT', s => s.TT))
+  return columns
+}
 
 const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
   const {
@@ -84,7 +90,7 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
       )
     ),
     getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
-    ...getGradeColumns(isGradeSeries)
+    ...getGradeColumns(isGradeSeries, includesHTOrTT(stats))
   ]
 
   const data = getTableData(stats, isGradeSeries, isRelative)
