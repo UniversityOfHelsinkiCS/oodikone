@@ -22,8 +22,8 @@ const CreditsGainedTab = ({ filteredStudents }) => {
     [Math.ceil(months * (45 / 12)), Math.ceil(months * (60 / 12))],
     [Math.ceil(months * (30 / 12)), Math.ceil(months * (45 / 12))],
     [Math.ceil(months * (15 / 12)), Math.ceil(months * (30 / 12))],
-    [0, Math.ceil(months * (15 / 12))]
-    // [null, 0]
+    [1, Math.ceil(months * (15 / 12))],
+    [null, 0]
   ]
 
   const [limits, setLimits] = useState(initialLimits)
@@ -37,7 +37,8 @@ const CreditsGainedTab = ({ filteredStudents }) => {
       newLimits.push(limit)
       if (collapsed.includes(max)) {
         ;[0, 1, 2].forEach(n => {
-          newLimits.push([Math.ceil(max - n * factor - factor), Math.ceil(max - n * factor), true])
+          const min = Math.ceil(max - n * factor - factor)
+          newLimits.push([min === 0 ? 1 : min, Math.ceil(max - n * factor), true])
         })
       }
     })
