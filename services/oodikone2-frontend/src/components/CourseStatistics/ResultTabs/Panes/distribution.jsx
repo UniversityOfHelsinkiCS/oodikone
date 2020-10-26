@@ -33,7 +33,9 @@ const getGradeSeries = series => {
           getDataObject('3', newSeries[3], 'd'),
           getDataObject('4', newSeries[4], 'e'),
           getDataObject('5', newSeries[5], 'f'),
-          getDataObject('Hyv.', newSeries['Hyv.'], 'g')
+          getDataObject('HT', newSeries.HT, 'g'),
+          getDataObject('TT', newSeries.TT, 'h'),
+          getDataObject('Hyv.', newSeries['Hyv.'], 'i')
         ],
         relative: [
           getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
@@ -42,7 +44,9 @@ const getGradeSeries = series => {
           getDataObject('3', newSeries[3].map(absoluteToRelative(sumAll)), 'd'),
           getDataObject('4', newSeries[4].map(absoluteToRelative(sumAll)), 'e'),
           getDataObject('5', newSeries[5].map(absoluteToRelative(sumAll)), 'f'),
-          getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'g')
+          getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'g'),
+          getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'h'),
+          getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'i')
         ]
       }
     : {
