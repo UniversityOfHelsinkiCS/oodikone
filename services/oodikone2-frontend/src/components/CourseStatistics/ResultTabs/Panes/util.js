@@ -82,6 +82,8 @@ export const getGradeSpread = (series, isRelative) => {
     3: [],
     4: [],
     5: [],
+    HT: [],
+    TT: [],
     'Hyv.': []
   }
   const newSeries = series.reduce(
