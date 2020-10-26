@@ -1,28 +1,61 @@
-import React from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { useLocation } from 'react-router-dom'
 import { Table, Progress } from 'semantic-ui-react'
 import { getMonths } from '../../../common/query'
 import { getStudentTotalCredits } from '../../../common'
 import ExternalCreditFilterToggle from './ExternalCreditFilterToggle'
+import { useIsAdmin } from '../../../common/hooks'
 
 const CreditsGainedTab = ({ filteredStudents }) => {
+  const isAdmin = useIsAdmin()
   const months = getMonths(useLocation())
-  const creditList = filteredStudents.map(student => getStudentTotalCredits(student))
+  const creditList = useMemo(() => filteredStudents.map(student => getStudentTotalCredits(student)), [filteredStudents])
 
   const studentCount = (min, max = Infinity) =>
     max === 0
       ? creditList.filter(credits => credits === 0).length
       : creditList.filter(credits => credits < max && credits >= min).length
 
-  const limits = [
-    [Math.ceil(months * (60 / 12)), undefined],
+  const initialLimits = [
+    [Math.ceil(months * (60 / 12))],
     [Math.ceil(months * (45 / 12)), Math.ceil(months * (60 / 12))],
     [Math.ceil(months * (30 / 12)), Math.ceil(months * (45 / 12))],
     [Math.ceil(months * (15 / 12)), Math.ceil(months * (30 / 12))],
     [1, Math.ceil(months * (15 / 12))],
     [null, 0]
   ]
+
+  const [limits, setLimits] = useState(initialLimits)
+  const [collapsed, setCollapsed] = useState([])
+
+  useEffect(() => {
+    const factor = months * (5 / 12)
+    const newLimits = []
+    initialLimits.forEach(limit => {
+      const max = limit[1]
+      newLimits.push(limit)
+      if (collapsed.includes(max)) {
+        ;[0, 1, 2].forEach(n => {
+          const min = Math.ceil(max - n * factor - factor)
+          newLimits.push([min === 0 ? 1 : min, Math.ceil(max - n * factor), true])
+        })
+      }
+    })
+
+    setLimits(newLimits)
+  }, [collapsed])
+
+  const collapse = (min, max) => {
+    if (!isAdmin) return
+    if (min == null || max == null) return
+
+    if (collapsed.includes(max)) {
+      setCollapsed(collapsed.filter(c => c !== max))
+    } else {
+      setCollapsed(collapsed.concat(max))
+    }
+  }
 
   return (
     <Table celled>
@@ -40,8 +73,12 @@ const CreditsGainedTab = ({ filteredStudents }) => {
       </Table.Header>
 
       <Table.Body>
-        {limits.map(([min, max]) => (
-          <Table.Row key={`table-row-${min}-${max}`}>
+        {limits.map(([min, max, sub]) => (
+          <Table.Row
+            style={{ backgroundColor: sub && 'lightgray' }}
+            onClick={() => collapse(min, max)}
+            key={`table-row-${min}-${max}`}
+          >
             <Table.Cell collapsing>
               <ExternalCreditFilterToggle min={min} max={max} />
             </Table.Cell>

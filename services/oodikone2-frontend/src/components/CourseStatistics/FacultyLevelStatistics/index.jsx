@@ -138,9 +138,13 @@ CourseTableRow.propTypes = {
 
 CourseTable.propTypes = {
   course: shape({}).isRequired,
-  courseInstance: shape({}).isRequired,
+  courseInstance: shape({}),
   language: string.isRequired,
   selectedYear: string.isRequired
+}
+
+CourseTable.defaultProps = {
+  courseInstance: null
 }
 
 export default FacultyLevelStatistics
