@@ -92,7 +92,7 @@ const CoursePopulation = ({
 
   useEffect(() => {
     if (semesters.years && semesters.semesters) {
-      const { coursecodes, from, to, years, separate } = parseQueryFromUrl()
+      const { coursecodes, from, to, years, years2, separate } = parseQueryFromUrl()
       const parsedCourseCodes = JSON.parse(coursecodes)
       getCoursePopulationDispatch({ coursecodes, from, to, onProgress, separate })
       getSingleCourseStatsDispatch({
@@ -102,7 +102,11 @@ const CoursePopulation = ({
         separate
       })
       setCodes(parsedCourseCodes)
-      setYears(years)
+      if (years) {
+        setYears(years)
+      } else {
+        setYears(years2)
+      }
       getFromToDates(from, to, separate)
       getFacultiesDispatch()
 
