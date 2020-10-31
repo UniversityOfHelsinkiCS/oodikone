@@ -15,7 +15,7 @@ USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
 
 docker-compose-dev () {
-    docker-compose -f docker-compose.yml -f ./docker/docker-compose.dev.yml "$@"
+    npm run docker:oodikone:dev -- "$@"
 }
 
 retry () {

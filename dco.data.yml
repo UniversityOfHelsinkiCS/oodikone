@@ -1,0 +1,52 @@
+version: "3.2"
+
+services:
+  nats:
+    image: nats-streaming:0.15.1
+    command: -cid updaterNATS --file_slice_max_bytes 0 --file_slice_max_age 100h -store file -dir datastore
+    expose:
+      - "4222"
+    ports:
+      - "8222:8222"
+      - "4222:4222"
+    container_name: nats
+    volumes:
+      - datastore:/datastore
+
+  db:
+    image: postgres:10-alpine
+    ports:
+      - "5421:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: oodi_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+  db_sis:
+    image: postgres:9.6.3
+    ports:
+      - "5426:5432"
+    volumes:
+      - pgdata_sis:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: db_sis
+    environment:
+      - POSTGRES_USER=postgres
+
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    container_name: redis
+
+volumes:
+  datastore:
+  pgdata:
+  pgdata_sis:
+  redis-data:
