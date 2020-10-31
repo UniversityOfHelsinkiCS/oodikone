@@ -5,8 +5,9 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['npm', 'run', 'dev']
     volumes:
+      - updater-api-nodemod:/usr/src/app/node_modules
       - ./updater/updater_api/:/usr/src/app
     restart: unless-stopped
 
@@ -14,8 +15,9 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['npm', 'run', 'dev']
     volumes:
+      - updater-writer-nodemod:/usr/src/app/node_modules
       - ./services/backend/updater_writer/:/usr/src/app
       - ./services/backend/shared/models:/usr/src/app/models
       - ./services/backend/shared/migrations:/usr/src/app/database/migrations
@@ -28,8 +30,9 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['npm', 'run', 'dev']
     volumes:
+      - updater-scheduler-nodemod:/usr/src/app/node_modules
       - ./updater/updater_scheduler/:/usr/src/app
     restart: unless-stopped
 
@@ -37,8 +40,9 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['npm', 'run', 'dev']
     volumes:
+      - sis-updater-scheduler-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-scheduler/:/usr/src/app
     restart: unless-stopped
 
@@ -46,7 +50,15 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: 'npm run dev'
+    command: ['npm', 'run', 'dev']
     volumes:
+      - sis-updater-worker-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-worker/:/usr/src/app
     restart: unless-stopped
+
+volumes:
+  sis-updater-scheduler-nodemod:
+  sis-updater-worker-nodemod:
+  updater-api-nodemod:
+  updater-scheduler-nodemod:
+  updater-writer-nodemod:
