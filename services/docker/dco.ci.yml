@@ -5,17 +5,9 @@ services:
     environment:
       - POSTGRES_DB=user_db
 
-  db:
-    environment:
-      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test
-
   analytics_db:
     environment:
       - POSTGRES_MULTIPLE_DATABASES=analytics_db
-
-  db_sis:
-    environment:
-      - POSTGRES_MULTIPLE_DATABASES=db_sis
 
   backend:
     image: toska/oodikone2-backend:${TAG}
@@ -54,30 +46,6 @@ services:
         - toska/oodikone2-userservice:staging
         - toska/oodikone2-userservice:latest
 
-  updater_api:
-    image: toska/updater_api:${TAG}
-    build:
-      cache_from:
-        - toska/updater_api:trunk
-        - toska/updater_api:staging
-        - toska/updater_api:latest
-
-  updater_writer:
-    image: toska/updater_writer:${TAG}
-    build:
-      cache_from:
-        - toska/updater_writer:trunk
-        - toska/updater_writer:staging
-        - toska/updater_writer:latest
-
-  updater_scheduler:
-    image: toska/updater_scheduler:${TAG}
-    build:
-      cache_from:
-        - toska/updater_scheduler:trunk
-        - toska/updater_scheduler:staging
-        - toska/updater_scheduler:latest
-
   analytics:
     image: toska/oodikone2-analytics:${TAG}
     build:
@@ -85,27 +53,6 @@ services:
         - toska/oodikone2-analytics:trunk
         - toska/oodikone2-analytics:staging
         - toska/oodikone2-analytics:latest
-
-  sis-updater-scheduler:
-    image: toska/sis-updater-scheduler:${TAG}
-    environment:
-      CI: 1
-    build:
-      cache_from:
-        - toska/sis-updater-scheduler:trunk
-        - toska/sis-updater-scheduler:staging
-        - toska/sis-updater-scheduler:latest
-
-  sis-updater-worker:
-    image: toska/sis-updater-worker:${TAG}
-    environment:
-      CI: 1
-    build:
-      cache_from:
-        - toska/sis-updater-worker:trunk
-        - toska/sis-updater-worker:staging
-        - toska/sis-updater-worker:latest
-    container_name: oodikone_sis-updater-worker_1
 
   nginx:
     image: nginx:latest

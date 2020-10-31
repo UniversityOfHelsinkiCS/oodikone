@@ -43,13 +43,8 @@ else
   services=(
     backend
     frontend
-    updater_writer
-    updater_api
-    updater_scheduler
     analytics
     userservice
-    sis-updater-scheduler
-    oodikone_sis-updater-worker_1
   )
 fi
 
