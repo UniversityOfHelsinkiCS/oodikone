@@ -16,10 +16,11 @@ services:
       args:
         NODE_ENV: 'development'
         TAG: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['npm', 'run', 'dev']
     environment:
       FRONT_URL: http://localhost:8000
     volumes:
+      - backend-nodemod:/usr/src/app/node_modules
       - ./services/backend/oodikone2-backend/:/usr/src/app
       - ./services/backend/shared/models:/usr/src/app/src/models
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
@@ -31,7 +32,7 @@ services:
       args:
         NODE_ENV: 'development'
         TAG: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run docker']
+    command: ['npm', 'run', 'docker']
     ports:
       - "8081:8081"
       - "7777:7777"
@@ -41,6 +42,7 @@ services:
       KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
       SIS_ADMINER_URL: http://localhost:5050/?pgsql=db_sis&username=postgres
     volumes:
+      - frontend-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-frontend/:/usr/src/app
     restart: unless-stopped
 
@@ -48,8 +50,9 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['npm', 'run', 'dev']
     volumes:
+      - userservice-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-userservice/:/usr/src/app
     restart: unless-stopped
 
@@ -57,7 +60,14 @@ services:
     build:
       args:
         NODE_ENV: 'development'
-    command: ['sh', '-c', 'cp -r /usr/src/cache/node_modules/. /usr/src/app/node_modules/ && npm run dev']
+    command: ['npm', 'run', 'dev']
     volumes:
+      - analytics-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-analytics/:/usr/src/app
     restart: unless-stopped
+
+volumes:
+  backend-nodemod:
+  analytics-nodemod:
+  frontend-nodemod:
+  userservice-nodemod:
