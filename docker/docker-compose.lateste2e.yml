@@ -54,14 +54,6 @@ services:
         - toska/oodikone2-userservice:staging
         - toska/oodikone2-userservice:latest
 
-  usageservice:
-    image: toska/oodikone2-usageservice:${TAG}
-    build:
-      cache_from:
-        - toska/oodikone2-usageservice:trunk
-        - toska/oodikone2-usageservice:staging
-        - toska/oodikone2-usageservice:latest
-
   updater_api:
     image: toska/updater_api:${TAG}
     build:

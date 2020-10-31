@@ -34,17 +34,6 @@ services:
     environment:
       - POSTGRES_USER=postgres
 
-  usage_db:
-    image: postgres:9.6.3
-    ports:
-      - "5424:5432"
-    volumes:
-      - usage_pgdata:/var/lib/postgresql/data
-    container_name: oodi_usage_db
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=usage_db
-
   db:
     image: postgres:10-alpine
     ports:
@@ -110,9 +99,7 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
       SECRET_TOKEN: dev
       USERSERVICE_URL: http://userservice:4567
-      USAGESERVICE_URL: http://usageservice:545
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      USAGESERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       ANALYTICS_URL: http://analytics:4568
       NATS_URI: nats://nats:4222
       UPDATER_URL: http://updater_scheduler:3678
@@ -151,19 +138,6 @@ services:
     depends_on:
       - user_db
     container_name: userservice
-
-  usageservice:
-    build:
-      context: services/oodikone2-usageservice
-    ports:
-      - 545:545
-    environment:
-      PORT: "545"
-      DB_URL: postgres://postgres@usage_db:5432/usage_db
-      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-    depends_on:
-      - usage_db
-    container_name: usageservice
 
   updater_api:
     build:
@@ -275,7 +249,6 @@ volumes:
   datastore:
   analytics_pgdata:
   user_pgdata:
-  usage_pgdata:
   pgdata:
   pgdata_kone:
   pgdata_sis:
