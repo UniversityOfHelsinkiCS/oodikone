@@ -27,7 +27,7 @@
     "docker:both:dev": "npm run docker:both:base -- -f ./docker/dco.data.dev.yml -f ./updater/docker/dco.dev.yml -f ./services/docker/dco.dev.yml",
     "docker:both:real": "npm run docker:both:dev -- -f ./docker/dco.data.dev.real.yml  -f ./updater/docker/dco.dev.real.yml -f ./services/docker/dco.dev.real.yml",
     "docker:cypress": "npm run docker:oodikone:dev -- -f ./docker/dco.cypress.yml run --rm cypress",
-    "docker:ci": "npm run docker:both:base -- -f ./docker/dco.data.ci.yml -f ./services/docker/dco.ci.yml -f ./updater/dco.ci.yml",
+    "docker:ci": "npm run docker:both:base -- -f ./docker/dco.data.ci.yml -f ./services/docker/dco.ci.yml -f ./updater/docker/dco.ci.yml",
     "docker:ci:cypress": "npm run docker:ci -- -f ./docker/dco.cypress.yml run --rm cypress",
     "docker:build": "npm run docker:oodikone:dev -- build",
     "docker:mac:up": "npm run docker:oodikone:dev -- up -d backend && npm run docker:up",
