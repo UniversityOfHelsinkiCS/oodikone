@@ -9,13 +9,7 @@ import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
 
-const {
-  USER_ADMINER_URL,
-  ADMINER_URL,
-  ANALYTICS_ADMINER_URL,
-  KONE_ADMINER_URL,
-  SIS_ADMINER_URL
-} = process.env
+const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, KONE_ADMINER_URL, SIS_ADMINER_URL } = process.env
 
 const adminerUrls = [
   { url: ADMINER_URL, text: 'Database' },

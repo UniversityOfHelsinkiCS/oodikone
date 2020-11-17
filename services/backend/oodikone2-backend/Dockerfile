@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 EXPOSE 8080
 CMD npm start
 
-COPY package* ./
+COPY ./oodikone2-backend/package* ./
 
 RUN npm ci
 

@@ -6,7 +6,7 @@ EXPOSE 4567
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-COPY package* ./
+COPY ./package* ./
 
 RUN npm ci
 

@@ -34,7 +34,6 @@ module.exports = (app, url) => {
   app.use(url, ping)
   app.use(shibbolethHeadersFix(['hyGroupCn', 'SHIB_LOGOUT_URL', 'eduPersonAffiliation', 'uid', 'displayName', 'mail']))
   app.use(url, matomoInit)
-  app.use(url, log)
   app.use(url, login)
   app.use(`${url}/superlogin`, superlogin)
   app.use(auth.checkAuth, auth.checkRequiredGroup, auth.checkUserBlacklisting, accessLogger, sentryUserId)
