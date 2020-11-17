@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
-    "test": "npm run lint",
-    "lint": "npx eslint .",
+    "test": "npm ci && npm run lint",
+    "lint": "eslint .",
     "lintfix": "prettier --write **/*.{js,json} && eslint --fix ."
   },
   "repository": {
