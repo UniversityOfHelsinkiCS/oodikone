@@ -86,7 +86,6 @@ module.exports = (env, args) => {
           USER_ADMINER_URL: JSON.stringify(process.env.USER_ADMINER_URL),
           ADMINER_URL: JSON.stringify(process.env.ADMINER_URL),
           KONE_ADMINER_URL: JSON.stringify(process.env.KONE_ADMINER_URL),
-          USAGE_ADMINER_URL: JSON.stringify(process.env.USAGE_ADMINER_URL),
           SIS_ADMINER_URL: JSON.stringify(process.env.SIS_ADMINER_URL),
           SENTRY_RELEASE_VERSION: JSON.stringify(sentryreleaseversion),
           TAG: JSON.stringify(process.env.TAG),

@@ -183,5 +183,3 @@ export const handleAuth = store => next => async action => {
     }
   }
 }
-
-export const sendLog = async data => callApi('/log', 'post', data)
