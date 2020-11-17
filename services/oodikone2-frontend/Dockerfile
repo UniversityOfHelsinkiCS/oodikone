@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 EXPOSE 5000
 CMD serve -s -l 5000 dist
 
-COPY package* ./
+COPY ./package* ./
 
 RUN npm ci
 

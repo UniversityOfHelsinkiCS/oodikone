@@ -5,7 +5,7 @@ CMD npm start
 
 RUN apk add postgresql-client
 
-COPY package* ./
+COPY ./updater_writer/package* ./
 
 RUN npm ci
 
@@ -16,4 +16,3 @@ COPY ./updater_writer /usr/src/app
 COPY ./shared/models /usr/src/app/models
 COPY ./shared/migrations /usr/src/app/database/migrations
 COPY ./shared/migrations_kone /usr/src/app/database/migrations_kone
-
