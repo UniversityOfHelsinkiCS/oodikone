@@ -1,5 +1,4 @@
 const morgan = require('morgan')
-const usageService = require('../services/usageService')
 const logger = require('../util/logger')
 
 // So this appears to be a hack to get neatly formatted stats like response-time etc. from morgan
@@ -26,8 +25,10 @@ const accessLogger = morgan((tokens, req, res) => {
     'ms'
   ].join(' ')
 
-  usageService.log(message, meta).catch(e => {
-    logger.error('Failed to save usage stats!', e)
+  logger.info(message, {
+    ...meta,
+    // pass this as a custom field so we can filter by it in graylog
+    isUsageStats: true
   })
 })
 
