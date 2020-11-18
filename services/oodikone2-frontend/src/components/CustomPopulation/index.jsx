@@ -1,21 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
-import { Button, Modal, Form, TextArea, Segment, Header, Accordion, Message } from 'semantic-ui-react'
+import { Segment, Header, Accordion, Message } from 'semantic-ui-react'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import scrollToComponent from 'react-scroll-to-component'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
-import { getCustomPopulation } from '../../redux/populations'
-import {
-  getCustomPopulationSearches,
-  saveCustomPopulationSearch,
-  updateCustomPopulationSearch,
-  selectCustomPopulationSearch,
-  deleteCustomPopulationSearch
-} from '../../redux/customPopulationSearch'
+import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import SearchHistory from '../SearchHistory'
 import PopulationStudents from '../PopulationStudents'
 import CustomPopulationCourses from './CustomPopulationCourses'
 import CustomPopulationProgrammeDist from './CustomPopulationProgrammeDist'
@@ -26,35 +18,26 @@ import useFilters from '../FilterTray/useFilters'
 import { CustomPopulationFilters } from '../FilterTray/FilterSets'
 import useFilterTray from '../FilterTray/useFilterTray'
 import useLanguage from '../LanguagePicker/useLanguage'
+import CustomPopulationSearch from './CustomPopulationSearch'
 
 const CustomPopulation = ({
-  getCustomPopulationDispatch,
-  getCustomPopulationCoursesByStudentnumbers,
   getCustomPopulationSearchesDispatch,
-  saveCustomPopulationSearchDispatch,
-  updateCustomPopulationSearchDispatch,
-  selectCustomPopulationSearchDispatch,
-  deleteCustomPopulationSearchDispatch,
   custompop,
   customPopulationFlag,
   loading,
   customPopulationSearches,
   latestCreatedCustomPopulationSearchId,
-  customPopulationSearchSaving,
   searchedCustomPopulationSearchId
 }) => {
   const { language } = useLanguage()
-  const [modal, setModal] = useState(false)
-  const [input, setInput] = useState('')
-  const [name, setName] = useState('')
   const [activeIndex, setIndex] = useState([])
-  const [selectedSearchId, setSelectedSearchId] = useState('')
+  const [, setSelectedSearchId] = useState('')
   const [newestIndex, setNewest] = useState(null)
   const { setAllStudents, filteredStudents } = useFilters()
   const [trayOpen] = useFilterTray()
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
-  const { onProgress, progress } = useProgress(loading)
+  const { progress } = useProgress(loading)
 
   const creditGainRef = useRef()
   const programmeRef = useRef()
@@ -84,118 +67,6 @@ const CustomPopulation = ({
       setSelectedSearchId(latestCreatedCustomPopulationSearchId)
     }
   }, [latestCreatedCustomPopulationSearchId])
-
-  const handleNameChange = e => {
-    setName(e.target.value)
-  }
-
-  const clearForm = () => {
-    setName('')
-    setInput('')
-    setSelectedSearchId('')
-  }
-
-  const handleClose = () => {
-    setModal(false)
-    clearForm()
-  }
-
-  const onSave = () => {
-    const studentnumberlist = input.match(/[0-9]+/g)
-    if (selectedSearchId) {
-      updateCustomPopulationSearchDispatch({ id: selectedSearchId, studentnumberlist })
-    } else {
-      saveCustomPopulationSearchDispatch({ name, studentnumberlist })
-    }
-  }
-
-  const onDelete = () => {
-    if (selectedSearchId) {
-      deleteCustomPopulationSearchDispatch({ id: selectedSearchId })
-      clearForm()
-    }
-  }
-
-  const onSelectSearch = selected => {
-    if (!selected) {
-      clearForm()
-      return
-    }
-
-    const { id: selectedSearchId } = selected
-    const selectedSearch = customPopulationSearches.find(({ id }) => id === selectedSearchId)
-    if (selectedSearch) {
-      setInput(selectedSearch.students.join('\n'))
-      setName(selectedSearch.name)
-      setSelectedSearchId(selectedSearch.id)
-    }
-  }
-
-  const onClicker = e => {
-    e.preventDefault()
-    const studentnumbers = input.match(/[0-9]+/g)
-    getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress })
-    getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
-    selectCustomPopulationSearchDispatch(selectedSearchId || null)
-    handleClose()
-  }
-  const renderCustomPopulationSearch = () => (
-    <Modal
-      trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="custom-pop-search-button">
-          Custom population
-        </Button>
-      }
-      open={modal}
-      onClose={handleClose}
-      size="small"
-    >
-      <Modal.Content>
-        <Form>
-          <h2> Custom population </h2>
-          <Form.Field>
-            <em> Insert name for this custom population if you wish to save it </em>
-            <Form.Input disabled={!!selectedSearchId} value={name} placeholder="name" onChange={handleNameChange} />
-          </Form.Field>
-          <Form.Field>
-            <em> Insert studentnumbers you wish to use for population here </em>
-            <TextArea
-              value={input}
-              placeholder="011111111"
-              onChange={e => setInput(e.target.value)}
-              data-cy="student-no-input"
-            />
-          </Form.Field>
-        </Form>
-        <SearchHistory
-          header="Saved populations"
-          items={customPopulationSearches.map(s => ({
-            ...s,
-            text: s.name,
-            timestamp: s.updatedAt,
-            params: { id: s.id }
-          }))}
-          updateItem={() => null}
-          handleSearch={onSelectSearch}
-        />
-      </Modal.Content>
-      <Modal.Actions>
-        <Button
-          disabled={!name || customPopulationSearchSaving}
-          loading={customPopulationSearchSaving}
-          floated="left"
-          icon="save"
-          onClick={onSave}
-          content="Save"
-        />
-        <Button disabled={!selectedSearchId} negative floated="left" icon="trash" onClick={onDelete} content="Delete" />
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button positive onClick={e => onClicker(e)} data-cy="search-button">
-          Search population
-        </Button>
-      </Modal.Actions>
-    </Modal>
-  )
 
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
@@ -322,7 +193,7 @@ const CustomPopulation = ({
             studentnumbers you have access rights to i.e. you have rights to the programme they are in.
           </p>
         </Message>
-        {renderCustomPopulationSearch()}
+        <CustomPopulationSearch />
         {custompop.length > 0 && customPopulationFlag ? (
           <Segment className="contentSegment">{renderCustomPopulation()}</Segment>
         ) : (
@@ -343,28 +214,19 @@ CustomPopulation.defaultProps = {
 CustomPopulation.propTypes = {
   custompop: arrayOf(shape({})).isRequired,
   customPopulationFlag: bool.isRequired,
-  getCustomPopulationDispatch: func.isRequired,
-  getCustomPopulationCoursesByStudentnumbers: func.isRequired,
   loading: bool.isRequired,
   customPopulationSearches: arrayOf(shape({})).isRequired,
-  customPopulationSearchSaving: bool.isRequired,
   latestCreatedCustomPopulationSearchId: string,
   searchedCustomPopulationSearchId: string,
-  saveCustomPopulationSearchDispatch: func.isRequired,
-  getCustomPopulationSearchesDispatch: func.isRequired,
-  updateCustomPopulationSearchDispatch: func.isRequired,
-  selectCustomPopulationSearchDispatch: func.isRequired,
-  deleteCustomPopulationSearchDispatch: func.isRequired
+  getCustomPopulationSearchesDispatch: func.isRequired
 }
 
 const mapStateToProps = ({ populations, populationCourses, customPopulationSearch }) => ({
   loading: populations.pending,
   custompop: populations.data.students || [],
   courses: populationCourses.data,
-  pending: populationCourses.pending,
   customPopulationFlag: populations.customPopulationFlag,
   customPopulationSearches: customPopulationSearch.customPopulationSearches,
-  customPopulationSearchSaving: customPopulationSearch.saving,
   latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
   searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId
 })
@@ -372,12 +234,7 @@ const mapStateToProps = ({ populations, populationCourses, customPopulationSearc
 export default connect(
   mapStateToProps,
   {
-    getCustomPopulationDispatch: getCustomPopulation,
     getCustomPopulationCoursesByStudentnumbers,
-    saveCustomPopulationSearchDispatch: saveCustomPopulationSearch,
-    getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
-    updateCustomPopulationSearchDispatch: updateCustomPopulationSearch,
-    selectCustomPopulationSearchDispatch: selectCustomPopulationSearch,
-    deleteCustomPopulationSearchDispatch: deleteCustomPopulationSearch
+    getCustomPopulationSearchesDispatch: getCustomPopulationSearches
   }
 )(CustomPopulation)
