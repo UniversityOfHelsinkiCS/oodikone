@@ -23,6 +23,7 @@ const { Tag, TagStudent } = require('../models/models_kone')
 const { getCodeToMainCourseMap, unifyOpenUniversity } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
+const { getAllProgrammes } = require('./studyrights')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -55,7 +56,8 @@ const formatStudentForPopulationStatistics = (
     gender_fi,
     gender_sv,
     gender_en,
-    tags
+    tags,
+    option
   },
   credits,
   startDate,
@@ -102,7 +104,8 @@ const formatStudentForPopulationStatistics = (
     updatedAt: updatedAt || createdAt,
     tags: tags || [],
     studyrightStart: startDate,
-    starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]')
+    starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]'),
+    option
   }
 }
 
@@ -496,11 +499,103 @@ const parseQueryParams = query => {
   }
 }
 
+const getOptionsForStudents = async (students, code, level) => {
+  if (!code || !students.length) return {}
+
+  let graduated
+  let currentExtent
+  let optionExtent
+
+  if (level === 'BSC') {
+    graduated = { graduated: 1 }
+    currentExtent = 1
+    optionExtent = 2
+  } else if (level === 'MSC') {
+    graduated = {}
+    currentExtent = 2
+    optionExtent = 1
+  } else {
+    throw new Error('Invalid study level ' + level)
+  }
+
+  const programmes = await getAllProgrammes()
+
+  const currentStudyrights = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          studentnumber: {
+            [Op.in]: students
+          },
+          code: code
+        }
+      }
+    ],
+    where: {
+      ...graduated,
+      extentcode: currentExtent,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    attributes: ['studentStudentnumber', 'givendate']
+  })
+
+  const currentStudyrightsMap = currentStudyrights.reduce((obj, studyright) => {
+    obj[studyright.studentStudentnumber] = studyright.givendate
+    return obj
+  }, {})
+
+  const options = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          studentnumber: {
+            [Op.in]: students
+          },
+          code: {
+            [Op.in]: programmes.map(p => p.code)
+          }
+        },
+        include: [
+          {
+            model: ElementDetail,
+            attributes: ['name']
+          }
+        ],
+        attributes: ['code', 'startdate']
+      }
+    ],
+    where: {
+      extentcode: optionExtent,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    order: [[StudyrightElement, 'startdate', 'DESC']],
+    attributes: ['studentStudentnumber', 'givendate']
+  })
+
+  return options
+    .filter(m => m.studentStudentnumber in currentStudyrightsMap)
+    .filter(m => m.givendate.getTime() === currentStudyrightsMap[m.studentStudentnumber].getTime())
+    .reduce((obj, element) => {
+      obj[element.studentStudentnumber] = {
+        code: element.studyright_elements[0].code,
+        name: element.studyright_elements[0].element_detail.name
+      }
+      return obj
+    }, {})
+}
+
 const formatStudentsForApi = async (
   { students, credits, extents, semesters, elementdetails, courses },
   startDate,
   endDate,
-  { studyRights }
+  { studyRights },
+  optionData
 ) => {
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
@@ -528,7 +623,8 @@ const formatStudentsForApi = async (
         stats.transfers.targets[transfer.targetcode] = target
         stats.transfers.sources[transfer.sourcecode] = source
       })
-
+      if (student.studentnumber in optionData) student.option = optionData[student.studentnumber]
+      else student.option = null
       stats.students.push(
         formatStudentForPopulationStatistics(student, credits, startDate, endDate, startDateMoment, endDateMoment)
       )
@@ -625,6 +721,15 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         cancelledStudents,
         nondegreeStudents
       )
+
+  const code = studyRights[0] || ''
+  let optionData = {}
+  if (code.includes('MH')) {
+    optionData = await getOptionsForStudents(studentnumbers, code, 'MSC')
+  } else if (code.includes('KH')) {
+    optionData = await getOptionsForStudents(studentnumbers, code, 'BSC')
+  }
+
   const { students, credits, extents, semesters, elementdetails, courses } = await getStudentsIncludeCoursesBetween(
     studentnumbers,
     startDate,
@@ -637,8 +742,10 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     { students, credits, extents, semesters, elementdetails, courses },
     startDate,
     endDate,
-    formattedQueryParams
+    formattedQueryParams,
+    optionData
   )
+
   return formattedStudents
 }
 
