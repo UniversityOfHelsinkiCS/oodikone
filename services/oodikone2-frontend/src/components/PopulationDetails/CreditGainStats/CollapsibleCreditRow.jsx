@@ -66,7 +66,8 @@ const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }
             </div>
           </Table.Cell>
           <Table.Cell>
-            <span style={{ color: 'lightgray' }}>AAA</span>
+            {/* TODO NO NO NO NO */}
+            <span style={{ color: 'lightgray', userSelect: 'none' }}>AAA</span>
             {imax === 0 ? 0 : `${imin} ≤ credits`}
             {imax > 0 && ` < ${imax}`}
           </Table.Cell>
