@@ -54,7 +54,7 @@ npm run docker:down --prefix $DIR_PATH
 npm run docker:up --prefix $DIR_PATH -- ${SERVICES[@]}
 
 echo "Populating DB_SIS and DB_ANON"
-echo $DB_SIS_ARGS $DB_ANON_ARGS | xargs -n 3 -P 2 sh -c 'drop_create_populate $1 $2 $3' sh
+echo $DB_SIS_ARGS $DB_ANON_ARGS | xargs -n 3 -P 2 bash -c 'drop_create_populate $1 $2 $3' bash
 
 echo "Cleaning up"
 npm run docker:down --prefix $DIR_PATH
