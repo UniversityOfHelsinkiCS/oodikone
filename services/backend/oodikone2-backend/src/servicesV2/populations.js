@@ -499,11 +499,28 @@ const parseQueryParams = query => {
   }
 }
 
-const getMastersForStudents = async (students, code) => {
+const getOptionsForStudents = async (students, code, level) => {
   if (!code || !students.length) return {}
+
+  let graduated
+  let currentExtent
+  let optionExtent
+
+  if (level === 'BSC') {
+    graduated = { graduated: 1 }
+    currentExtent = 1
+    optionExtent = 2
+  } else if (level === 'MSC') {
+    graduated = {}
+    currentExtent = 2
+    optionExtent = 1
+  } else {
+    throw new Error('Invalid study level ' + level)
+  }
+
   const programmes = await getAllProgrammes()
 
-  const bachelors = await Studyright.findAll({
+  const currentStudyrights = await Studyright.findAll({
     include: [
       {
         model: StudyrightElement,
@@ -516,20 +533,21 @@ const getMastersForStudents = async (students, code) => {
       }
     ],
     where: {
-      graduated: 1,
-      extentcode: 1,
+      ...graduated,
+      extentcode: currentExtent,
       student_studentnumber: {
         [Op.in]: students
       }
     },
-    attributes: ['student_studentnumber', 'givendate']
+    attributes: ['studentStudentnumber', 'givendate']
   })
-  const bachelorsMap = bachelors.reduce((obj, studyright) => {
-    obj[studyright.get('student_studentnumber')] = studyright.givendate
+
+  const currentStudyrightsMap = currentStudyrights.reduce((obj, studyright) => {
+    obj[studyright.studentStudentnumber] = studyright.givendate
     return obj
   }, {})
 
-  const masters = await Studyright.findAll({
+  const options = await Studyright.findAll({
     include: [
       {
         model: StudyrightElement,
@@ -551,94 +569,22 @@ const getMastersForStudents = async (students, code) => {
       }
     ],
     where: {
-      extentcode: 2,
+      extentcode: optionExtent,
       student_studentnumber: {
         [Op.in]: students
       }
     },
     order: [[StudyrightElement, 'startdate', 'DESC']],
-    attributes: ['student_studentnumber', 'givendate']
+    attributes: ['studentStudentnumber', 'givendate']
   })
-  return masters
-    .filter(m => m.get('student_studentnumber') in bachelorsMap)
-    .filter(m => m.get('givendate').getTime() === bachelorsMap[m.get('student_studentnumber')].getTime())
+
+  return options
+    .filter(m => m.studentStudentnumber in currentStudyrightsMap)
+    .filter(m => m.givendate.getTime() === currentStudyrightsMap[m.studentStudentnumber].getTime())
     .reduce((obj, element) => {
-      obj[element.get('student_studentnumber')] = {
-        code: element.get('studyright_elements')[0].code,
-        name: element.get('studyright_elements')[0].element_detail.name
-      }
-      return obj
-    }, {})
-}
-
-const getBachelorsForStudents = async (students, code) => {
-  if (!code || !students.length) return {}
-  const programmes = await getAllProgrammes()
-
-  const masters = await Studyright.findAll({
-    include: [
-      {
-        model: StudyrightElement,
-        where: {
-          studentnumber: {
-            [Op.in]: students
-          },
-          code: code
-        }
-      }
-    ],
-    where: {
-      extentcode: 2,
-      student_studentnumber: {
-        [Op.in]: students
-      }
-    },
-    attributes: ['student_studentnumber', 'givendate']
-  })
-
-  const mastersMap = masters.reduce((obj, studyright) => {
-    obj[studyright.get('student_studentnumber')] = studyright.givendate
-    return obj
-  }, {})
-
-  const bachelors = await Studyright.findAll({
-    include: [
-      {
-        model: StudyrightElement,
-        where: {
-          studentnumber: {
-            [Op.in]: students
-          },
-          code: {
-            [Op.in]: programmes.map(p => p.code)
-          }
-        },
-        include: [
-          {
-            model: ElementDetail,
-            attributes: ['name']
-          }
-        ],
-        attributes: ['code', 'startdate']
-      }
-    ],
-    where: {
-      extentcode: 1,
-      student_studentnumber: {
-        [Op.in]: students
-      }
-    },
-    order: [[StudyrightElement, 'startdate', 'DESC']],
-    attributes: ['student_studentnumber', 'givendate']
-  })
-
-  return bachelors
-    .filter(b => b.get('student_studentnumber') in mastersMap)
-    .filter(b => b.get('givendate').getTime() === mastersMap[b.get('student_studentnumber')].getTime())
-    .reduce((obj, element) => {
-      obj[element.get('student_studentnumber')] = {
-        code: element.get('studyright_elements')[0].code,
-        name: element.get('studyright_elements')[0].element_detail.name
+      obj[element.studentStudentnumber] = {
+        code: element.studyright_elements[0].code,
+        name: element.studyright_elements[0].element_detail.name
       }
       return obj
     }, {})
@@ -779,9 +725,9 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   const code = studyRights[0] || ''
   let optionData = {}
   if (code.includes('MH')) {
-    optionData = await getBachelorsForStudents(studentnumbers, code)
+    optionData = await getOptionsForStudents(studentnumbers, code, 'MSC')
   } else if (code.includes('KH')) {
-    optionData = await getMastersForStudents(studentnumbers, code)
+    optionData = await getOptionsForStudents(studentnumbers, code, 'BSC')
   }
 
   const { students, credits, extents, semesters, elementdetails, courses } = await getStudentsIncludeCoursesBetween(
