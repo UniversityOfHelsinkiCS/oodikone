@@ -61,9 +61,12 @@ const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }
       {limits.map(([imin, imax]) => (
         <Table.Row style={{ backgroundColor: 'lightgray' }} key={`table-row-${imin}-${imax}`}>
           <Table.Cell collapsing>
-            <ExternalCreditFilterToggle min={imin} max={imax} />
+            <div style={{ display: 'flex' }}>
+              <ExternalCreditFilterToggle min={imin} max={imax} />
+            </div>
           </Table.Cell>
           <Table.Cell>
+            <span style={{ color: 'lightgray' }}>AAA</span>
             {imax === 0 ? 0 : `${imin} ≤ credits`}
             {imax > 0 && ` < ${imax}`}
           </Table.Cell>
