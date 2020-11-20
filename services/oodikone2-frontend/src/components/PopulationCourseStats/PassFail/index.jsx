@@ -131,7 +131,7 @@ const PassFail = () => {
       {getTableHeader()}
       <Table.Body>
         {mandatoryToggle ? (
-          <CollapsibleModuleTable emptyColSpan={10} modules={modules}>
+          <CollapsibleModuleTable emptyColSpan={12} modules={modules}>
             {courses => courses.map(getCourseRow)}
           </CollapsibleModuleTable>
         ) : (
