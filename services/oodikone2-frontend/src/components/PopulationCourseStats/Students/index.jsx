@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Table, Icon, Popup, Item } from 'semantic-ui-react'
+import { Table, Icon, Popup, Item, Pagination } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
@@ -75,17 +75,6 @@ const Students = () => {
 
   const maxPages = Math.floor(students.length / 10)
 
-  const changePage = direction => {
-    const newPage = page + direction
-    if (newPage > maxPages) {
-      setPage(0)
-    } else if (newPage < 0) {
-      setPage(maxPages)
-    } else {
-      setPage(newPage)
-    }
-  }
-
   const toggleVisible = code => {
     const newState = !visible[code]
     setVisible({ ...visible, [code]: newState })
@@ -95,15 +84,15 @@ const Students = () => {
 
   return (
     <div>
-      <button type="button" onClick={() => changePage(-1)}>
-        page-
-      </button>
-      <button type="button" onClick={() => changePage(1)}>
-        page+
-      </button>
-      <span>
-        {page + 1} / {maxPages + 1}
-      </span>
+      <Pagination
+        secondary
+        activePage={page + 1}
+        totalPages={maxPages + 1}
+        onPageChange={(e, { activePage }) => setPage(activePage - 1)}
+        ellipsisItem={null}
+        firstItem={null}
+        lastItem={null}
+      />
       <Table sortable className="fixed-header" striped celled>
         <Table.Header>
           <Table.Row>
