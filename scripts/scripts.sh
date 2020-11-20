@@ -130,7 +130,7 @@ install_local_npm_packages () {
     # The rest is required for linting to work.
     cd services/oodikone2-frontend
     npm ci
-    cd services/oodikone2-analytics
+    cd ../oodikone2-analytics
     npm ci
     cd ../oodikone2-userservice
     npm ci
