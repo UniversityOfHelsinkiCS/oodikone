@@ -20,7 +20,7 @@ const { productivityStatsForCode, throughputStatsForCode } = require('./services
 const {
   productivityStatsForStudytrack: productivityStatsForStudytrackV2,
   throughputStatsForStudytrack: throughputStatsForStudytrackV2
-} = require('./servicesV2/studytrack')
+} = require('./servicesV2/studyprogramme')
 
 const { calculateFacultyYearlyStats } = require('./services/faculties')
 const topteachers = require('./services/topteachers')
