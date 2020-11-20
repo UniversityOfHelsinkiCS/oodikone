@@ -12,7 +12,7 @@ const {
   ElementDetail,
   Transfer
 } = require('../modelsV2')
-const { getAssociations } = require('./studyrights')
+const { getAssociations, getAllProgrammes } = require('./studyrights')
 const { ThesisCourse, ThesisTypeEnums } = require('../models/models_kone')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { semesterStart, semesterEnd } = require('../util/semester')
@@ -506,6 +506,121 @@ const startedStudyright = async (studentnumbers, startDate, studytrack, endDate)
   })
 }
 
+const optionData = async (startDate, endDate, code, level) => {
+  const programmes = await getAllProgrammes()
+  const students = await studentnumbersWithAllStudyrightElements([code], startDate, endDate, false, true)
+
+  let graduated
+  let currentExtent
+  let optionExtent
+
+  if (level === 'BSC') {
+    graduated = { graduated: 1 }
+    currentExtent = 1
+    optionExtent = 2
+  } else if (level === 'MSC') {
+    graduated = {}
+    currentExtent = 2
+    optionExtent = 1
+  } else {
+    throw new Error('Invalid study level ' + level)
+  }
+
+  const currentStudyrights = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          code: code
+        },
+        attributes: ['startdate']
+      }
+    ],
+    where: {
+      ...graduated,
+      extentcode: currentExtent,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    attributes: ['studentStudentnumber', 'givendate', 'studystartdate']
+  })
+
+  const currentStudyrightsMap = currentStudyrights
+    .filter(b => b.studystartdate)
+    .reduce((obj, studyright) => {
+      const acualDate = new Date(Math.max(+studyright.studystartdate, +studyright.studyright_elements[0].startdate))
+      obj[studyright.studentStudentnumber] = { givendate: studyright.givendate, startdate: acualDate }
+      return obj
+    }, {})
+
+  const options = await Studyright.findAll({
+    include: [
+      {
+        model: StudyrightElement,
+        where: {
+          studentnumber: {
+            [Op.in]: students
+          },
+          code: {
+            [Op.in]: programmes.map(p => p.code)
+          }
+        },
+        include: [
+          {
+            model: ElementDetail,
+            attributes: ['name']
+          }
+        ],
+        attributes: ['code']
+      }
+    ],
+    where: {
+      extentcode: optionExtent,
+      student_studentnumber: {
+        [Op.in]: students
+      }
+    },
+    order: [[StudyrightElement, 'startdate', 'DESC']],
+    attributes: ['studentStudentnumber', 'startdate', 'givendate']
+  })
+
+  const data = {}
+  const years = new Set()
+
+  options
+    .filter(m => m.studentStudentnumber in currentStudyrightsMap)
+    .filter(m => m.givendate.getTime() === currentStudyrightsMap[m.studentStudentnumber].givendate.getTime())
+    .forEach(b => {
+      const date = currentStudyrightsMap[b.studentStudentnumber].startdate
+      const year =
+        date.getMonth() > 6 || (date.getMonth() === 6 && date.getDate() == 31)
+          ? date.getFullYear()
+          : date.getFullYear() - 1
+      years.add(year)
+      const code = b.studyright_elements[0].code
+
+      if (!data[code]) {
+        data[code] = {}
+        data[code].name = b.studyright_elements[0].element_detail.name
+        data[code].total = 0
+      }
+      if (!data[code][year]) {
+        data[code][year] = 0
+      }
+      data[code][year] += 1
+      data[code].total += 1
+    })
+
+  const dataAsArray = Object.keys(data).map(code => {
+    const { name, total } = data[code]
+    const output = { code, name, total }
+    years.forEach(y => (output[y] = data[code][y] || 0))
+    return output
+  })
+  return { data: dataAsArray, years: Array.from(years).sort() }
+}
+
 const statsForClass = async (studentnumbers, startDate, studyprogramme, endDate) => {
   return Promise.all([
     creditsAfter(studentnumbers, startDate),
@@ -784,5 +899,6 @@ module.exports = {
   throughputStatsForStudytrack,
   findProgrammeThesisCredits,
   thesisProductivityFromCredits,
-  thesisProductivityForStudytrack
+  thesisProductivityForStudytrack,
+  optionData
 }
