@@ -22,7 +22,7 @@ import useFilterTray from '../FilterTray/useFilterTray'
 import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
 import sendEvent from '../../common/sendEvent'
-import { getStudentGradeMean } from '../../common'
+import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits } from '../../common'
 
 const sendAnalytics = sendEvent.populationStudents
 
@@ -90,7 +90,8 @@ const CustomPopulation = ({
     const getXlsx = () => {
       const data = filteredStudents.map(student => ({
         'Student Number': student.studentNumber,
-        'Grade Mean': getStudentGradeMean(student)
+        'Grade Mean': getStudentGradeMean(student),
+        'Grade Mean Weighted by ECTS': getStudentGradeMeanWeightedByCredits(student)
       }))
       console.log(data)
 
