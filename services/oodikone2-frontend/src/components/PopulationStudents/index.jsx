@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { string, arrayOf, object, func, bool, shape } from 'prop-types'
+import { string, arrayOf, object, func, bool, shape, node } from 'prop-types'
 import { Button, Icon, Tab, Grid, Ref, Item } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
@@ -493,6 +493,7 @@ class PopulationStudents extends Component {
               Download
               <Icon name="file excel" />
             </Button>
+            {this.props.dataExport}
           </Grid.Column>
         </Grid>
         <StudentTableTabs panes={panes} filterPanes={filteredPanes} />
@@ -522,7 +523,8 @@ class PopulationStudents extends Component {
 PopulationStudents.defaultProps = {
   studentToTargetCourseDateMap: null,
   customPopulation: false,
-  coursePopulation: false
+  coursePopulation: false,
+  dataExport: null
 }
 
 PopulationStudents.propTypes = {
@@ -552,7 +554,8 @@ PopulationStudents.propTypes = {
   coursePopulation: bool,
   customPopulation: bool,
   mandatoryToggle: bool.isRequired,
-  filteredStudents: arrayOf(shape({})).isRequired
+  filteredStudents: arrayOf(shape({})).isRequired,
+  dataExport: node
 }
 
 const mapStateToProps = state => {
