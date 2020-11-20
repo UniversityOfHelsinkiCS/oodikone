@@ -49,7 +49,7 @@ const PassingSemesters = () => {
         </Table.Header>
         <Table.Body>
           {mandatoryToggle ? (
-            <CollapsibleModuleTable modules={modules} emptyColSpan={13}>
+            <CollapsibleModuleTable modules={modules} emptyColSpan={15}>
               {courses =>
                 courses.map(stats => (
                   <CourseRow
