@@ -2,7 +2,11 @@ const router = require('express').Router()
 const { getStudentsUserCanAccess } = require('../servicesV2/userService')
 //const { getAllDegreesAndProgrammes, getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 const MandatoryCourses = require('../servicesV2/mandatoryCourses')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack, optionData } = require('../servicesV2/studytrack')
+const {
+  productivityStatsForStudytrack,
+  throughputStatsForStudytrack,
+  optionData
+} = require('../servicesV2/studyprogramme')
 const { findProgrammeTheses /* , createThesisCourse, deleteThesisCourse */ } = require('../services/thesis')
 
 const {
