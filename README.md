@@ -19,7 +19,7 @@ To run Oodikone locally, you will need the following:
 Launch the CLI and follow the instructions:
 
 ```bash
-./oodikone.sh
+npm run cli
 ```
 
 *Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary* 😊
