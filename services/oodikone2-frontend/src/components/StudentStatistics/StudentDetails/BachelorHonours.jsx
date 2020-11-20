@@ -15,6 +15,7 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
   const [render, setRender] = useState(false)
   const [graduated, setGraduated] = useState(false)
   const [inspection, setInspection] = useState(false)
+  const [reason, setReason] = useState(null)
 
   useEffect(() => {
     if (programmes) {
@@ -41,10 +42,9 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       ].includes(newestBachelorProgramme.code)
 
       if (shouldRender) getMandatoryCourseModulesDispatch(newestBachelorProgramme.code)
-
       setRender(shouldRender)
     }
-  }, [])
+  }, [programmes])
 
   useEffect(() => {
     // very naive perus- and aineopinto filtering
@@ -95,6 +95,13 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       const leftOutModules = attainedModules.filter(mod => !pairedModules.includes(mod))
 
       setHonors(filterGrades.length > 1 && inTime)
+
+      if (!inTime) {
+        setReason('Did not graduate in time')
+      } else if (filterGrades.length <= 1) {
+        setReason('Module grades too low')
+      }
+
       setModules(pairedModules)
       setOther(leftOutModules)
       setInspection(leftOutModules.length > 0 || (graduated && pairedModules.length < 3))
@@ -102,8 +109,15 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       const filterGrades = attainedModules.filter(mod => mod.course_code !== '00345' && Number(mod.grade) > 3)
 
       setHonors(filterGrades.length > 1 && inTime)
+
+      if (!inTime) {
+        setReason('Did not graduate in time')
+      } else if (filterGrades.length <= 1) {
+        setReason('Module grades too low')
+      }
+
       setModules(attainedModules)
-      setInspection(graduated && attainedModules.length < 3)
+      setInspection(inTime && graduated && attainedModules.length < 3)
     }
   }, [mandatoryModules])
 
@@ -144,7 +158,8 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
         content={honors ? 'Qualified for Honours' : 'Not qualified for Honours'}
         color={honors ? 'green' : 'red'}
       />
-      {inspection ? <Label tag content="Might need further inspection" color="blue" /> : null}
+      {!honors && reason && <Label tag content={reason} color="red" />}
+      {inspection && <Label tag content="Might need further inspection" color="blue" />}
       {studentsModules.length > 0 ? (
         <>
           <Header as="h4">Main modules</Header>
