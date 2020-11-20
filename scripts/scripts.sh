@@ -124,17 +124,31 @@ reset_db_for_cypress () {
     retry curl --silent --fail localhost:8080/ping
 }
 
-install_cli_npm_packages () {
+install_local_npm_packages () {
     npm ci
+
+    # The rest is required for linting to work.
+    cd services/oodikone2-frontend
+    npm ci
+    cd services/oodikone2-analytics
+    npm ci
+    cd ../oodikone2-userservice
+    npm ci
+    cd ../backend/oodikone2-backend
+    npm ci
+    cd ../updater_writer
+    npm ci
+
+    cd ../../../
 }
 
 show_instructions () {
-    cat ./scripts/assets/instructions.txt
+    cat scripts/assets/instructions.txt
 }
 
 run_full_setup () {
     echo "Setup npm packages"
-    install_cli_npm_packages
+    install_local_npm_packages
     echo "Init dirs"
     init_dirs
     echo "Getting backups from the Oodikone server, this will prompt you for your password. "
@@ -153,7 +167,7 @@ run_full_setup () {
 
 run_anon_full_setup () {
     echo "Setup npm packages"
-    install_cli_npm_packages
+    install_local_npm_packages
     echo "Init dirs"
     init_dirs
     echo "Getting anon backups from the private repository. "
