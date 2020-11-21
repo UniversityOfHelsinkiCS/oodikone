@@ -19,7 +19,6 @@ import InfoBox from '../InfoBox'
 import CheckStudentList from './CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
-import selector from '../../selectors/populationDetails'
 import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
@@ -235,14 +234,13 @@ class PopulationStudents extends Component {
       )
     ]
 
-    const selectedStudentsData = this.props.filteredStudents
-    const totals = selectedStudentsData.reduce((acc, s) => {
+    const totals = this.props.filteredStudents.reduce((acc, s) => {
       this.props.mandatoryCourses.forEach(m => {
         if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
       })
       return acc
     }, this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true }))
-    const mandatoryCourseData = [totals, ...selectedStudentsData]
+    const mandatoryCourseData = [totals, ...this.props.filteredStudents]
 
     // FIXME: here only for refactorment
     const { showNames, studentToTargetCourseDateMap } = this.props
@@ -404,7 +402,7 @@ class PopulationStudents extends Component {
   }
 
   render() {
-    if (this.props.samples.length === 0) {
+    if (this.props.filteredStudents.length === 0) {
       return null
     }
 
@@ -430,7 +428,6 @@ PopulationStudents.defaultProps = {
 }
 
 PopulationStudents.propTypes = {
-  samples: arrayOf(object).isRequired,
   showNames: bool.isRequired,
   showList: bool.isRequired,
   language: string.isRequired,
@@ -461,13 +458,11 @@ const mapStateToProps = state => {
     populationCourses,
     populationMandatoryCourses,
     tags,
-    tagstudent,
     auth: {
       token: { roles }
     }
   } = state
 
-  const { selectedStudents, samples } = selector.makePopulationsToData(state)
   const mandatoryCodes = populationMandatoryCourses.data
     .filter(course => course.visible && course.visible.visibility)
     .map(c => c.code)
@@ -487,14 +482,10 @@ const mapStateToProps = state => {
     showNames: settings.namesVisible,
     showList: settings.studentlistVisible,
     queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
-    populationStatistics: populations.data,
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,
     tags: tags.data,
-    userRoles: getUserRoles(roles),
-    tagstudent: tagstudent.data,
-    selectedStudents,
-    samples
+    userRoles: getUserRoles(roles)
   }
 }
 
