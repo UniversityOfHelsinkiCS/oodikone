@@ -72,13 +72,15 @@ const formatStudentForPopulationStatistics = (
             .toISOString()
         : attainment_date
     const passed = Credit.passed({ credittypecode })
+
     return {
       course_code,
       date: attainment_date_normailized,
       passed,
       grade: passed ? grade : 'Hyl.',
       credits,
-      isStudyModuleCredit: isStudyModule
+      isStudyModuleCredit: isStudyModule,
+      credittypecode
     }
   }
 
@@ -829,6 +831,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         transferredStudents
       )
   // wtf
+  // plz
   const code = studyRights[0] || ''
   let optionData = {}
   if (code.includes('MH')) {
