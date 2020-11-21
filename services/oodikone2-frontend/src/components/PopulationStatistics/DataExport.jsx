@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Button, Dropdown, Icon } from 'semantic-ui-react'
+import { Dropdown } from 'semantic-ui-react'
 import xlsx from 'xlsx'
 import { getStudentTotalCredits, getTextIn, reformatDate } from '../../common'
 import sendEvent from '../../common/sendEvent'
