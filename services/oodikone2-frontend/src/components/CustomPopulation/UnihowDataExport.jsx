@@ -15,10 +15,9 @@ export default () => {
   const getXlsx = () => {
     const data = filteredStudents.map(student => ({
       'Student Number': student.studentNumber,
-      'Grade Mean': getStudentGradeMean(student),
-      'Grade Mean Weighted by ECTS': getStudentGradeMeanWeightedByCredits(student)
+      'Grade Mean (no transferred credits)': getStudentGradeMean(student, false),
+      'Grade Mean Weighted by ECTS (no transferred credits)': getStudentGradeMeanWeightedByCredits(student, false)
     }))
-    console.log(data)
 
     const sheet = xlsx.utils.json_to_sheet(data)
 
@@ -35,9 +34,9 @@ export default () => {
       <Dropdown.Item
         onClick={() => {
           xlsx.writeFile(getXlsx(), filename)
-          sendAnalytics('Download excel button clicked', 'Download excel button clicked')
+          sendAnalytics('Download excel button clicked', 'Download excel button clicked (UniHow)')
         }}
-        text="Download (UniHow)"
+        text="Excel Workbook (UniHow)"
         icon="file excel"
       />
     </>
