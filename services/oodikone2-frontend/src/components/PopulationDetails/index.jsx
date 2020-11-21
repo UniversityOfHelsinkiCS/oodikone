@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
-import { object, arrayOf, bool, shape } from 'prop-types'
+import { object, arrayOf, bool, shape, node } from 'prop-types'
 import { Message, Accordion } from 'semantic-ui-react'
 import { useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
@@ -13,7 +13,15 @@ import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 import useLanguage from '../LanguagePicker/useLanguage'
 
-const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStudentsByYear, mandatoryToggle }) => {
+const PopulationDetails = ({
+  samples,
+  queryIsSet,
+  isLoading,
+  query,
+  selectedStudentsByYear,
+  mandatoryToggle,
+  dataExport
+}) => {
   const { allStudents, filteredStudents } = useFilters()
   const [trayOpen] = useFilterTray('filterTray')
   const { language } = useLanguage()
@@ -145,6 +153,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
               language={language}
               mandatoryToggle={mandatoryToggle}
               filteredStudents={filteredStudents}
+              dataExport={dataExport}
             />
           </div>
         )
@@ -165,7 +174,12 @@ PopulationDetails.propTypes = {
   isLoading: bool.isRequired,
   selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
-  mandatoryToggle: bool.isRequired
+  mandatoryToggle: bool.isRequired,
+  dataExport: node
+}
+
+PopulationDetails.defaultProps = {
+  dataExport: null
 }
 
 export default connect(null)(PopulationDetails)
