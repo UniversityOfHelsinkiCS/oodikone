@@ -1,7 +1,7 @@
 import { sortBy } from 'lodash'
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Button, Icon } from 'semantic-ui-react'
+import { Button, Dropdown, Icon } from 'semantic-ui-react'
 import xlsx from 'xlsx'
 import { getStudentTotalCredits, getTextIn, reformatDate } from '../../common'
 import sendEvent from '../../common/sendEvent'
@@ -137,16 +137,13 @@ export default () => {
   }
 
   return (
-    <Button
-      icon
-      labelPosition="right"
+    <Dropdown.Item
       onClick={() => {
         xlsx.writeFile(generateWorkbook(), 'students.xlsx')
         sendAnalytics('Download excel button clicked', 'Download excel button clicked')
       }}
-    >
-      Save as XLSX
-      <Icon name="file excel" />
-    </Button>
+      text="Excel Workbook"
+      icon="file excel"
+    />
   )
 }
