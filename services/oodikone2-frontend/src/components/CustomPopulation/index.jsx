@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Header, Accordion, Message, Button, Icon } from 'semantic-ui-react'
+import { Segment, Header, Accordion, Message } from 'semantic-ui-react'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
 import scrollToComponent from 'react-scroll-to-component'
-import xlsx from 'xlsx'
-import moment from 'moment'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
@@ -21,10 +19,7 @@ import { CustomPopulationFilters } from '../FilterTray/FilterSets'
 import useFilterTray from '../FilterTray/useFilterTray'
 import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
-import sendEvent from '../../common/sendEvent'
-import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits } from '../../common'
-
-const sendAnalytics = sendEvent.populationStudents
+import UnihowDataExport from './UnihowDataExport'
 
 const CustomPopulation = ({
   getCustomPopulationSearchesDispatch,
@@ -84,39 +79,6 @@ const CustomPopulation = ({
     if (activeIndex.length < indexes.length) setNewest(index)
     else setNewest(null)
     setIndex(indexes)
-  }
-
-  const DataExport = () => {
-    const getXlsx = () => {
-      const data = filteredStudents.map(student => ({
-        'Student Number': student.studentNumber,
-        'Grade Mean': getStudentGradeMean(student),
-        'Grade Mean Weighted by ECTS': getStudentGradeMeanWeightedByCredits(student)
-      }))
-      console.log(data)
-
-      const sheet = xlsx.utils.json_to_sheet(data)
-
-      const workbook = xlsx.utils.book_new()
-      xlsx.utils.book_append_sheet(workbook, sheet)
-      return workbook
-    }
-
-    const filename = `oodikone_export_${filteredStudents.length}_students_${moment().format('YYYYMMDD-hhmmss')}.xlsx`
-
-    return (
-      <Button
-        icon
-        labelPosition="right"
-        onClick={() => {
-          xlsx.writeFile(getXlsx(), filename)
-          sendAnalytics('Download excel button clicked', 'Download excel button clicked')
-        }}
-      >
-        Download (UniHow)
-        <Icon name="file excel" />
-      </Button>
-    )
   }
 
   const panels = [
@@ -198,7 +160,7 @@ const CustomPopulation = ({
               language={language}
               mandatoryToggle={false}
               filteredStudents={filteredStudents}
-              dataExport={<DataExport />}
+              dataExport={<UnihowDataExport />}
               customPopulation
             />
           </div>
