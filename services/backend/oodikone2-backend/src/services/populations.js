@@ -788,19 +788,15 @@ const formatQueryParamArrays = (query, params) => {
 const optimizedStatisticsOf = async (query, studentnumberlist) => {
   const formattedQueryParams = formatQueryParamArrays(query, ['semesters', 'studentStatuses'])
 
-  if (
-    !formattedQueryParams.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)
-  ) {
+  if (!formattedQueryParams.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
 
   if (
     formattedQueryParams.studentStatuses &&
-    !formattedQueryParams.studentStatuses
-      .map(
-        status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
-      )
-      .every(e => e === true)
+    !formattedQueryParams.studentStatuses.every(
+      status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+    )
   ) {
     return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE or TRANSFERRED' }
   }
