@@ -8,7 +8,9 @@ import lodash from 'lodash'
 const defaultState = {
   allStudents: [],
   filteredStudents: [],
-  activeFilters: {}
+  activeFilters: {},
+  // This is a special filter that operates on students' courses instead of the student's themselves.
+  creditDateFilter: null
 }
 
 const applyFilters = (filters, allStudents) =>
@@ -19,12 +21,18 @@ FilterContext.displayName = 'Filters'
 
 export const FilterProvider = ({ children }) => {
   const [state, setState] = useState(defaultState)
-  const { activeFilters, allStudents } = state
+  const { activeFilters, allStudents, creditDateFilter } = state
 
   // Apply filters as a side-effect.
   useEffect(() => {
-    setState(prev => ({ ...prev, filteredStudents: applyFilters(activeFilters, allStudents) }))
-  }, [activeFilters, allStudents])
+    const withRegularFilters = applyFilters(activeFilters, allStudents)
+    const filteredStudents = withRegularFilters.map(({ courses, ...rest }) => ({
+      ...rest,
+      courses: creditDateFilter ? courses.filter(creditDateFilter) : courses
+    }))
+
+    setState(prev => ({ ...prev, filteredStudents }))
+  }, [activeFilters, allStudents, creditDateFilter])
 
   return <FilterContext.Provider value={[state, setState]}>{children}</FilterContext.Provider>
 }
@@ -37,6 +45,7 @@ export default () => {
   const [state, setState] = useContext(FilterContext)
 
   const setAllStudents = allStudents => setState(prev => ({ ...prev, allStudents }))
+  const setCreditDateFilter = creditDateFilter => setState(prev => ({ ...prev, creditDateFilter }))
 
   const addFilter = (name, filterFn) =>
     setState(prev => ({ ...prev, activeFilters: { ...prev.activeFilters, [name]: filterFn } }))
@@ -57,6 +66,7 @@ export default () => {
     filteredStudents,
     activeFilters,
     setAllStudents,
+    setCreditDateFilter,
     addFilter,
     removeFilter,
     withoutFilter

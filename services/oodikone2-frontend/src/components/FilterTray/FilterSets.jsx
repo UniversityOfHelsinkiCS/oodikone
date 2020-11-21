@@ -8,6 +8,7 @@ import StartYearAtUni from './filters/StartYearAtUni'
 import Courses from './filters/Courses'
 import useAnalytics from './useAnalytics'
 import Grade from './filters/Grade'
+import Date from './filters/Date'
 
 export const PopulationStatisticsFilters = () => {
   const analytics = useAnalytics()
@@ -58,6 +59,7 @@ export const CustomPopulationFilters = () => {
       <Gender />
       <StartYearAtUni />
       <Courses />
+      <Date />
     </>
   )
 }
