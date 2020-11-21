@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { string, arrayOf, object, func, bool, shape, node } from 'prop-types'
-import { Icon, Tab, Grid, Ref, Item } from 'semantic-ui-react'
+import { Icon, Tab, Grid, Ref, Item, Dropdown } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
@@ -394,7 +394,13 @@ class PopulationStudents extends Component {
           <Grid.Column>
             <StudentNameVisibilityToggle />
           </Grid.Column>
-          <Grid.Column textAlign="right">{this.props.dataExport}</Grid.Column>
+          {this.props.dataExport && (
+            <Grid.Column textAlign="right">
+              <Dropdown text="Export Data" icon="save" button labeled className="icon" direction="left">
+                <Dropdown.Menu>{this.props.dataExport}</Dropdown.Menu>
+              </Dropdown>
+            </Grid.Column>
+          )}
         </Grid>
         <StudentTableTabs panes={panes} filterPanes={filteredPanes} />
       </Fragment>
