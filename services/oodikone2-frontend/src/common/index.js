@@ -83,16 +83,20 @@ export const getStudentTotalCredits = student => {
   return passedCourses.reduce((a, b) => a + b.credits, 0)
 }
 
-const getGradedCourses = student => student.courses.filter(c => Number(c.grade) && !c.isStudyModuleCredit)
+const getGradedCourses = (student, includeTransferredCredits = true) =>
+  includeTransferredCredits
+    ? student.courses.filter(c => Number(c.grade) && !c.isStudyModuleCredit)
+    : student.courses.filter(c => Number(c.grade) && !c.isStudyModuleCredit && c.credittypecode !== 9)
 
-export const getStudentGradeMean = student => {
-  const gradeTotal = getGradedCourses(student).reduce((a, b) => a + Number(b.grade), 0)
-  const mean = gradeTotal / getGradedCourses(student).length || 0
+export const getStudentGradeMean = (student, includeTransferredCredits = true) => {
+  const courses = getGradedCourses(student, includeTransferredCredits)
+  const gradeTotal = courses.reduce((a, b) => a + Number(b.grade), 0)
+  const mean = gradeTotal / courses.length || 0
   return mean
 }
 
-export const getStudentGradeMeanWeightedByCredits = student => {
-  const courses = getGradedCourses(student)
+export const getStudentGradeMeanWeightedByCredits = (student, includeTransferredCredits = true) => {
+  const courses = getGradedCourses(student, includeTransferredCredits)
   const gradeTotal = courses.reduce((a, b) => a + Number(b.grade) * Number(b.credits), 0)
   const sumWeights = courses.reduce((a, b) => a + Number(b.credits), 0)
   const mean = gradeTotal / sumWeights || 0
