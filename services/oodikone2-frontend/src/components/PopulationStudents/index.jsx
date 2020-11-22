@@ -1,14 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { string, arrayOf, object, func, bool, shape } from 'prop-types'
-import { Button, Icon, Tab, Grid, Ref, Item } from 'semantic-ui-react'
+import { string, arrayOf, object, func, bool, shape, node } from 'prop-types'
+import { Icon, Tab, Grid, Ref, Item, Dropdown } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
-import XLSX from 'xlsx'
 import scrollToComponent from 'react-scroll-to-component'
-import { getStudentTotalCredits, reformatDate, getTextIn, getUserRoles } from '../../common'
+import { getTextIn, getUserRoles } from '../../common'
 import { useTabChangeAnalytics } from '../../common/hooks'
-import { PRIORITYCODE_TEXTS } from '../../constants'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
 import { getTagsByStudytrackAction } from '../../redux/tags'
@@ -21,7 +19,6 @@ import InfoBox from '../InfoBox'
 import CheckStudentList from './CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
-import selector from '../../selectors/populationDetails'
 import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
@@ -89,56 +86,7 @@ class PopulationStudents extends Component {
   }
 
   renderStudentTable() {
-    const { populationStatistics, customPopulation, coursePopulation } = this.props
-
-    const transferFrom = s =>
-      getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, this.props.language)
-
-    const priorityText = studyRights => {
-      const codes = this.studyrightCodes(studyRights, 'prioritycode')
-      return codes.map(code => (PRIORITYCODE_TEXTS[code] ? PRIORITYCODE_TEXTS[code] : code)).join(', ')
-    }
-
-    const extentCodes = studyRights => {
-      const codes = this.studyrightCodes(studyRights, 'extentcode')
-      return codes.join(', ')
-    }
-
-    const tags = tags => {
-      const studentTags = tags.map(t => t.tag.tagname)
-      return studentTags.join(', ')
-    }
-
-    const studytrack = studyrights => {
-      const { queryStudyrights } = this.props
-      let startdate = '1900-01-01'
-      let enddate = '2020-04-20'
-      const res = this.studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
-        elemArr
-          .filter(el => populationStatistics.elementdetails.data[el.code].type === 20)
-          .forEach(el => {
-            if (queryStudyrights.includes(el.code)) {
-              startdate = el.startdate // eslint-disable-line
-              enddate = el.enddate // eslint-disable-line
-            }
-          })
-        elemArr
-          .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
-          .forEach(el => {
-            if (el.enddate > startdate && el.startdate <= enddate) {
-              acc.push({
-                name: populationStatistics.elementdetails.data[el.code].name.fi,
-                startdate: el.startdate,
-                enddate: el.enddate
-              })
-            }
-          })
-        acc.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))
-        return acc
-      }, [])
-      return res
-    }
-
+    const { customPopulation, coursePopulation } = this.props
     const verticalTitle = title => <div className="verticalTitle">{title}</div>
 
     const hasPassedMandatory = (studentNumber, code) =>
@@ -286,14 +234,13 @@ class PopulationStudents extends Component {
       )
     ]
 
-    const selectedStudentsData = this.props.filteredStudents
-    const totals = selectedStudentsData.reduce((acc, s) => {
+    const totals = this.props.filteredStudents.reduce((acc, s) => {
       this.props.mandatoryCourses.forEach(m => {
         if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
       })
       return acc
     }, this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true }))
-    const mandatoryCourseData = [totals, ...selectedStudentsData]
+    const mandatoryCourseData = [totals, ...this.props.filteredStudents]
 
     // FIXME: here only for refactorment
     const { showNames, studentToTargetCourseDateMap } = this.props
@@ -434,40 +381,6 @@ class PopulationStudents extends Component {
       }
     ]
 
-    const generateWorkbook = () => {
-      const data = this.props.filteredStudents
-      const sortedMandatory = sortBy(this.props.mandatoryCourses, [
-        m => {
-          const res = m.code.match(/\d+/)
-          return res ? Number(res[0]) : Number.MAX_VALUE
-        }
-      ])
-      const worksheet = XLSX.utils.json_to_sheet(
-        data.map(s => ({
-          'last name': s.lastname,
-          'given names': s.firstnames,
-          'student number': s.studentNumber,
-          'credits since start': getStudentTotalCredits(s),
-          'all credits': s.credits,
-          email: s.email,
-          'transferred from': s.transferredStudyright ? transferFrom(s) : '',
-          priority: priorityText(s.studyrights),
-          extent: extentCodes(s.studyrights),
-          studytrack: studytrack(s.studyrights).map(st => st.name)[0],
-          tags: tags(s.tags),
-          'start year at university': reformatDate(s.started, 'YYYY'),
-          'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
-          'mandatory total passed': totalMandatoryPassed(s.studentNumber),
-          ...sortedMandatory.reduce((acc, m) => {
-            acc[`${getTextIn(m.name, this.props.language)}\n${m.code}`] = hasPassedMandatory(s.studentNumber, m.code)
-            return acc
-          }, {})
-        }))
-      )
-      const workbook = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(workbook, worksheet)
-      return workbook
-    }
     const filteredPanes = panesToFilter => {
       if (coursePopulation || customPopulation) {
         return panesToFilter.slice(0, 1)
@@ -481,19 +394,13 @@ class PopulationStudents extends Component {
           <Grid.Column>
             <StudentNameVisibilityToggle />
           </Grid.Column>
-          <Grid.Column textAlign="right">
-            <Button
-              icon
-              labelPosition="right"
-              onClick={() => {
-                XLSX.writeFile(generateWorkbook(), 'students.xlsx')
-                sendAnalytics('Download excel button clicked', 'Download excel button clicked')
-              }}
-            >
-              Download
-              <Icon name="file excel" />
-            </Button>
-          </Grid.Column>
+          {this.props.dataExport && (
+            <Grid.Column textAlign="right">
+              <Dropdown text="Export Data" icon="save" button labeled className="icon" direction="left">
+                <Dropdown.Menu>{this.props.dataExport}</Dropdown.Menu>
+              </Dropdown>
+            </Grid.Column>
+          )}
         </Grid>
         <StudentTableTabs panes={panes} filterPanes={filteredPanes} />
       </Fragment>
@@ -501,7 +408,7 @@ class PopulationStudents extends Component {
   }
 
   render() {
-    if (this.props.samples.length === 0) {
+    if (this.props.filteredStudents.length === 0) {
       return null
     }
 
@@ -522,21 +429,15 @@ class PopulationStudents extends Component {
 PopulationStudents.defaultProps = {
   studentToTargetCourseDateMap: null,
   customPopulation: false,
-  coursePopulation: false
+  coursePopulation: false,
+  dataExport: null
 }
 
 PopulationStudents.propTypes = {
-  samples: arrayOf(object).isRequired,
   showNames: bool.isRequired,
   showList: bool.isRequired,
   language: string.isRequired,
   queryStudyrights: arrayOf(string).isRequired,
-  populationStatistics: shape({
-    courses: arrayOf(shape({})),
-    extents: arrayOf(shape({})),
-    semesters: arrayOf(shape({})),
-    students: arrayOf(shape({}))
-  }).isRequired,
   mandatoryCourses: arrayOf(
     shape({
       name: shape({}).isRequired,
@@ -552,7 +453,8 @@ PopulationStudents.propTypes = {
   coursePopulation: bool,
   customPopulation: bool,
   mandatoryToggle: bool.isRequired,
-  filteredStudents: arrayOf(shape({})).isRequired
+  filteredStudents: arrayOf(shape({})).isRequired,
+  dataExport: node
 }
 
 const mapStateToProps = state => {
@@ -562,13 +464,11 @@ const mapStateToProps = state => {
     populationCourses,
     populationMandatoryCourses,
     tags,
-    tagstudent,
     auth: {
       token: { roles }
     }
   } = state
 
-  const { selectedStudents, samples } = selector.makePopulationsToData(state)
   const mandatoryCodes = populationMandatoryCourses.data
     .filter(course => course.visible && course.visible.visibility)
     .map(c => c.code)
@@ -588,14 +488,10 @@ const mapStateToProps = state => {
     showNames: settings.namesVisible,
     showList: settings.studentlistVisible,
     queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
-    populationStatistics: populations.data,
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,
     tags: tags.data,
-    userRoles: getUserRoles(roles),
-    tagstudent: tagstudent.data,
-    selectedStudents,
-    samples
+    userRoles: getUserRoles(roles)
   }
 }
 

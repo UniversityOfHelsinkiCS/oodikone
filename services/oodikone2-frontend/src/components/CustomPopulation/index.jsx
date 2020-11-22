@@ -19,6 +19,7 @@ import { CustomPopulationFilters } from '../FilterTray/FilterSets'
 import useFilterTray from '../FilterTray/useFilterTray'
 import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
+import UnihowDataExport from './UnihowDataExport'
 
 const CustomPopulation = ({
   getCustomPopulationSearchesDispatch,
@@ -159,6 +160,7 @@ const CustomPopulation = ({
               language={language}
               mandatoryToggle={false}
               filteredStudents={filteredStudents}
+              dataExport={<UnihowDataExport />}
               customPopulation
             />
           </div>

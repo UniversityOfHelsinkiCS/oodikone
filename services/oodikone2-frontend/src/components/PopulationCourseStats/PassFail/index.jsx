@@ -106,6 +106,7 @@ const PassFail = () => {
               to={`/coursestatistics?courseCodes=["${encodeURIComponent(
                 code
               )}"]&separate=false&unifyOpenUniCourses=false`}
+              data-cy={`coursestats-link-${code}`}
             >
               <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(code)} />
             </Item>

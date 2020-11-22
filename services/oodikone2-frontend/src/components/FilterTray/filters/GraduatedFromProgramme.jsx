@@ -70,6 +70,7 @@ const GraduatedFromProgramme = ({ code }) => {
             placeholder="Choose Option"
             className="mini"
             selection
+            selectOnBlur={false}
             fluid
             button
             data-cy={`${name}-dropdown`}
