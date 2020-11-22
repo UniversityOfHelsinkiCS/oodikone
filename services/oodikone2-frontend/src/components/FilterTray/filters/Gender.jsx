@@ -59,6 +59,7 @@ export default () => {
             placeholder="Choose Gender"
             className="mini"
             selection
+            selectOnBlur={false}
             fluid
             button
             data-cy={`${name}-dropdown`}
