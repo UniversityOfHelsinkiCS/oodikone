@@ -72,13 +72,15 @@ const formatStudentForPopulationStatistics = (
             .toISOString()
         : attainment_date
     const passed = Credit.passed({ credittypecode })
+
     return {
       course_code,
       date: attainment_date_normailized,
       passed,
       grade: passed ? grade : 'Hyl.',
       credits,
-      isStudyModuleCredit: isStudyModule
+      isStudyModuleCredit: isStudyModule,
+      credittypecode
     }
   }
 
@@ -786,19 +788,15 @@ const formatQueryParamArrays = (query, params) => {
 const optimizedStatisticsOf = async (query, studentnumberlist) => {
   const formattedQueryParams = formatQueryParamArrays(query, ['semesters', 'studentStatuses'])
 
-  if (
-    !formattedQueryParams.semesters.map(semester => semester === 'FALL' || semester === 'SPRING').every(e => e === true)
-  ) {
+  if (!formattedQueryParams.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
     return { error: 'Semester should be either SPRING OR FALL' }
   }
 
   if (
     formattedQueryParams.studentStatuses &&
-    !formattedQueryParams.studentStatuses
-      .map(
-        status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
-      )
-      .every(e => e === true)
+    !formattedQueryParams.studentStatuses.every(
+      status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+    )
   ) {
     return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE or TRANSFERRED' }
   }
@@ -829,6 +827,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         transferredStudents
       )
   // wtf
+  // plz
   const code = studyRights[0] || ''
   let optionData = {}
   if (code.includes('MH')) {

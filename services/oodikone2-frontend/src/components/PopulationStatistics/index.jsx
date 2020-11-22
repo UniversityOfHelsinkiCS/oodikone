@@ -12,6 +12,7 @@ import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilters from '../FilterTray/useFilters'
 import { PopulationStatisticsFilters } from '../FilterTray/FilterSets'
 import PopulationSearch from '../PopulationSearch'
+import DataExport from './DataExport'
 
 const PopulationStatistics = memo(props => {
   const { queryIsSet, selectedStudentsByYear, query, samples, location, history, isLoading, students } = props
@@ -40,6 +41,7 @@ const PopulationStatistics = memo(props => {
               samples={samples}
               isLoading={isLoading}
               mandatoryToggle={mandatoryToggle}
+              dataExport={<DataExport />}
             />
           ) : null}
         </Segment>

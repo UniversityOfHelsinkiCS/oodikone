@@ -56,14 +56,11 @@ describe('Population Statistics tests', () => {
       cy.contains("Excludes students who haven't enrolled present nor absent")
     })
     cy.contains("Courses of population").click({ force: true })
-    cy.get(".sortable").within(() => {
-      cy.cs("Laskennan mallit").children().its('length').should('be.gte', 10)
-      cy.route('/api/v3/courseyearlystats**').as('coursePage')
-      cy.contains("Laskennan mallit")
-      cy.get(':nth-child(2) > .iconCell > p > .item > .level').click({ force: true })
-      cy.wait('@coursePage')
-      cy.url().should('include', '/coursestatistics')
-    })
+
+   cy.route('/api/v3/courseyearlystats**').as('coursePage')
+   cy.cs("coursestats-link-TKT20005").click()
+   cy.wait('@coursePage')
+   cy.url().should('include', '/coursestatistics')
     cy.contains("TKT20005")
     cy.go("back")
     cy.contains("Courses of population")
@@ -74,26 +71,6 @@ describe('Population Statistics tests', () => {
     })
 
     checkAmountOfStudents(29)
-
-    let filteredStudents = 1328493
-    cy.contains("Credit statistics").click()
-    cy.contains("Credits Gained During First").parentsUntil(".tab").get("table").within(() => {
-      cy.get("tr").eq(2).find("td").eq(2).invoke("text").then(text => filteredStudents = Number(text))
-      cy.route('POST', '/api/v2/populationstatistics/courses**').as('courseData')
-      cy.get("tr").eq(2).find('.filter').click()
-      cy.wait('@courseData')
-    }).then(() => {
-      checkAmountOfStudents(filteredStudents)
-    })
-    //cy.contains("Courses of population").click({ force: true })
-    cy.get(".sortable").parent().within(() => {
-      cy.contains("Ohjelmoinnin perusteet").siblings().eq(5).should("have.text", "0")
-    })
-
-    cy.contains("Students (1)").click()
-    cy.contains("Student names hidden").click()
-    cy.contains("Luoto").siblings().eq(2).click()
-    cy.contains("Luoto").invoke('text').then((text) => expect(text).to.equal('Luoto Veli-Matti, 014824094'))
   })
 
   it('Student list checking works as intended', () => {
