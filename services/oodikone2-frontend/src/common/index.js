@@ -78,8 +78,10 @@ export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|s
 
 export const studyrightTypes = { degree: '10', programme: '20', speciality: '30' } // speciality???
 
-export const getStudentTotalCredits = student => {
-  const passedCourses = student.courses.filter(c => c.passed && !c.isStudyModuleCredit)
+export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
+  const passedCourses = includeTransferredCredits
+    ? student.courses.filter(c => c.passed && !c.isStudyModuleCredit)
+    : student.courses.filter(c => c.passed && !c.isStudyModuleCredit && c.credittypecode !== 9)
   return passedCourses.reduce((a, b) => a + b.credits, 0)
 }
 
