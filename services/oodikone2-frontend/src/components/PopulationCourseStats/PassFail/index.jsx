@@ -1,6 +1,7 @@
 import React from 'react'
 import { Table, Icon, Popup, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import { func, instanceOf } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
@@ -139,6 +140,11 @@ const PassFail = ({ expandedGroups, toggleGroupExpansion }) => {
       </Table.Body>
     </Table>
   )
+}
+
+PassFail.propTypes = {
+  expandedGroups: instanceOf(Set).isRequired,
+  toggleGroupExpansion: func.isRequired
 }
 
 export default PassFail

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, number } from 'prop-types'
+import { func, arrayOf, object, number, instanceOf } from 'prop-types'
 import { useLanguage } from '../../common/hooks'
 import { getTextIn } from '../../common'
 
@@ -33,7 +33,9 @@ const CollapsibleModuleTable = ({ modules, emptyColSpan, children, expandedGroup
 CollapsibleModuleTable.propTypes = {
   modules: arrayOf(object).isRequired,
   children: func.isRequired,
-  emptyColSpan: number.isRequired
+  emptyColSpan: number.isRequired,
+  expandedGroups: instanceOf(Set).isRequired,
+  toggleGroupExpansion: func.isRequired
 }
 
 export default CollapsibleModuleTable
