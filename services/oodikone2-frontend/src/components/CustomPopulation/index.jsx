@@ -158,7 +158,6 @@ const CustomPopulation = ({
           <div ref={studentRef}>
             <PopulationStudents
               language={language}
-              mandatoryToggle={false}
               filteredStudents={filteredStudents}
               dataExport={<UnihowDataExport />}
               customPopulation
