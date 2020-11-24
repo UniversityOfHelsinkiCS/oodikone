@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { connect, useSelector } from 'react-redux'
-import { Table, Form, Input, Tab, Icon } from 'semantic-ui-react'
+import { Table, Input, Tab, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
@@ -12,7 +12,7 @@ import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
 import Students from './Students'
-import { getUserIsAdmin, getTextIn } from '../../common'
+import { getTextIn } from '../../common'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 import useFilterTray from '../FilterTray/useFilterTray'
 import { contextKey as filterTrayContextKey } from '../FilterTray'
@@ -95,6 +95,8 @@ const initialState = props => ({
 })
 
 function PopulationCourseStats(props) {
+  const { language } = useLanguage()
+
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
   const [courseStatistics, setCourseStatistics] = useState(
@@ -102,7 +104,6 @@ function PopulationCourseStats(props) {
   )
   const [expandedGroups, setExpandedGroups] = useState(new Set())
 
-  const { language } = useLanguage()
   const [state, setState] = useState(initialState(props))
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
@@ -285,7 +286,11 @@ function PopulationCourseStats(props) {
 
   const toggleGroupExpansion = code => {
     const newExpandedGroups = new Set(expandedGroups)
-    newExpandedGroups.has(code) ? newExpandedGroups.delete(code) : newExpandedGroups.add(code)
+    if (newExpandedGroups.has(code)) {
+      newExpandedGroups.delete(code)
+    } else {
+      newExpandedGroups.add(code)
+    }
     setExpandedGroups(newExpandedGroups)
   }
 
@@ -310,7 +315,7 @@ function PopulationCourseStats(props) {
     )
   }
 
-  const { courses, pending, isAdmin } = props
+  const { courses, pending } = props
   const { sortCriteria, reversed } = state
   const contextValue = {
     courseStatistics,
@@ -397,18 +402,15 @@ PopulationCourseStats.propTypes = {
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  isAdmin: bool.isRequired,
   years: shape({}) // eslint-disable-line
 }
 
 const mapStateToProps = state => {
   const { years } = state.semesters.data
-  const isAdmin = getUserIsAdmin(state.auth.token.roles)
 
   return {
     years,
-    populationCourses: state.populationCourses,
-    isAdmin
+    populationCourses: state.populationCourses
   }
 }
 

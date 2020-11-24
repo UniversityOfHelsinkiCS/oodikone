@@ -6,7 +6,7 @@ import CollapsibleModuleTable from '../CollapsibleModuleTable'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
 const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
-  const { modules, courseStatistics, onCourseNameCellClick, isActiveCourse, filterInput } = UsePopulationCourseContext()
+  const { modules, onCourseNameCellClick, isActiveCourse, filterInput } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
 
   const handleChange = () => {
