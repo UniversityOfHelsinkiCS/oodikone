@@ -8,7 +8,6 @@ import { getTotalCreditsFromCourses } from '../../common'
 import { useTitle } from '../../common/hooks'
 import selectors from '../../selectors/populationDetails'
 import FilterTray from '../FilterTray'
-import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilters from '../FilterTray/useFilters'
 import { PopulationStatisticsFilters } from '../FilterTray/FilterSets'
 import PopulationSearch from '../PopulationSearch'
@@ -16,7 +15,6 @@ import DataExport from './DataExport'
 
 const PopulationStatistics = memo(props => {
   const { queryIsSet, selectedStudentsByYear, query, samples, location, history, isLoading, students } = props
-  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { setAllStudents } = useFilters()
   useTitle('Population statistics')
 
@@ -40,7 +38,6 @@ const PopulationStatistics = memo(props => {
               query={query}
               samples={samples}
               isLoading={isLoading}
-              mandatoryToggle={mandatoryToggle}
               dataExport={<DataExport />}
             />
           ) : null}

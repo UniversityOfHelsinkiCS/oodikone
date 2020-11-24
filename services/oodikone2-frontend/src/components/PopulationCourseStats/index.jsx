@@ -14,7 +14,6 @@ import PassFail from './PassFail'
 import Students from './Students'
 import { getUserIsAdmin, getTextIn } from '../../common'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from '../FilterTray/useFilterTray'
 import { contextKey as filterTrayContextKey } from '../FilterTray'
 import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Courses'
@@ -46,16 +45,12 @@ const lodashSortOrderTypes = {
   DESC: 'desc'
 }
 
-function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses, mandatoryToggle) {
-  const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
+function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses) {
+  const { sortCriteria, codeFilter, nameFilter, reversed } = state
   const {
     courses: { coursestatistics }
   } = props
 
-  const studentAmountFilter = ({ stats }) => {
-    const { students } = stats
-    return studentAmountLimit === 0 || students >= studentAmountLimit
-  }
   const courseCodeFilter = ({ course }) => {
     const { code } = course
     return code.toLowerCase().includes(codeFilter.toLowerCase())
@@ -71,12 +66,11 @@ function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses
     return mandatoryCourses.some(c => c.code === course.code)
   }
 
-  const puimuri = mandatoryToggle ? mandatoryFilter : studentAmountFilter
-
   const filteredCourses =
     coursestatistics &&
+    mandatoryCourses &&
     coursestatistics
-      .filter(puimuri)
+      .filter(mandatoryFilter)
       .filter(c => !codeFilter || courseCodeFilter(c))
       .filter(c => !nameFilter || courseNameFilter(c))
 
@@ -94,7 +88,6 @@ function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses
 const initialState = props => ({
   sortCriteria: tableColumnNames.STUDENTS,
   reversed: true,
-  studentAmountLimit: Math.round(props.selectedStudents.length * 0.3),
   codeFilter: '',
   nameFilter: '',
   activeView: null,
@@ -107,7 +100,6 @@ function PopulationCourseStats(props) {
   const [courseStatistics, setCourseStatistics] = useState(
     updateCourseStatisticsCriteria(props, language, initialState(props))
   )
-  const [timer, setTimer] = useState(null)
   const [expandedGroups, setExpandedGroups] = useState(new Set())
 
   const { language } = useLanguage()
@@ -115,7 +107,6 @@ function PopulationCourseStats(props) {
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
   const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
-  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
   const filterAnalytics = useAnalytics()
 
@@ -132,20 +123,16 @@ function PopulationCourseStats(props) {
         studentAmountLimit,
         selectedStudentsLength: props.selectedStudents.length
       })
-      setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses, mandatoryToggle))
+      setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses))
     }
   }, [props.courses, props.selectedStudents])
 
   useEffect(() => {
-    const { studentAmountLimit, codeFilter, nameFilter, reversed, sortCriteria } = state
+    const { codeFilter, nameFilter, reversed, sortCriteria } = state
     const {
       courses: { coursestatistics },
       language
     } = props
-    const studentAmountFilter = ({ stats }) => {
-      const { students } = stats
-      return studentAmountLimit === 0 || students >= studentAmountLimit
-    }
     const courseCodeFilter = ({ course }) => {
       const { code } = course
       return code.toLowerCase().includes(codeFilter.toLowerCase())
@@ -161,16 +148,15 @@ function PopulationCourseStats(props) {
       return mandatoryCourses.some(c => c.code === course.code && c.visible.visibility)
     }
 
-    const puimuri = mandatoryToggle ? mandatoryFilter : studentAmountFilter
-
     const filteredCourses =
       coursestatistics &&
+      mandatoryCourses &&
       coursestatistics
-        .filter(puimuri)
+        .filter(mandatoryFilter)
         .filter(c => !codeFilter || courseCodeFilter(c))
         .filter(c => !nameFilter || courseNameFilter(c))
         .map(c => {
-          const course = mandatoryToggle ? mandatoryCourses.find(mc => mc.code === c.course.code) : {}
+          const course = mandatoryCourses.find(mc => mc.code === c.course.code)
           return { ...c, ...course }
         })
 
@@ -181,35 +167,34 @@ function PopulationCourseStats(props) {
       [course => course.stats[sortCriteria], course => course.course.code],
       [lodashSortOrder, lodashSortOrderTypes.ASC]
     )
-    if (mandatoryToggle) {
-      const modules = {}
 
-      sortedStatistics.forEach(course => {
-        const code = course.label_code
-        if (!code) {
-          return
-        }
-        if (!modules[code]) {
-          modules[code] = []
-        }
-        modules[code].push(course)
-      })
+    const modules = {}
 
-      Object.keys(modules).forEach(m => {
-        if (modules[m].length === 0) {
-          delete modules[m]
-        }
-      })
+    sortedStatistics.forEach(course => {
+      const code = course.label_code
+      if (!code) {
+        return
+      }
+      if (!modules[code]) {
+        modules[code] = []
+      }
+      modules[code].push(course)
+    })
 
-      setModules(
-        Object.entries(modules)
-          .map(([module, courses]) => ({
-            module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
-            courses
-          }))
-          .sort((a, b) => a.module.order - b.module.order)
-      )
-    }
+    Object.keys(modules).forEach(m => {
+      if (modules[m].length === 0) {
+        delete modules[m]
+      }
+    })
+
+    setModules(
+      Object.entries(modules)
+        .map(([module, courses]) => ({
+          module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
+          courses
+        }))
+        .sort((a, b) => a.module.order - b.module.order)
+    )
 
     setCourseStatistics(sortedStatistics)
   }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, mandatoryCourses])
@@ -246,23 +231,6 @@ function PopulationCourseStats(props) {
     if (isEnterKeyPress) {
       handleCourseStatisticsCriteriaChange()
     }
-  }
-
-  const onStudentAmountLimitChange = e => {
-    const {
-      target: { value }
-    } = e
-    clearTimeout(timer)
-    setTimer(
-      setTimeout(() => {
-        sendAnalytics(
-          'Courses of Population student count filter change',
-          'Courses of Population student count filter change',
-          value
-        )
-        setState({ ...state, studentAmountLimit: value }) // , () => this.handleCourseStatisticsCriteriaChange())
-      }, 1000)
-    )
   }
 
   const onSortableColumnHeaderClick = criteria => {
@@ -386,19 +354,16 @@ function PopulationCourseStats(props) {
           />
         </div>
       )
-    }
-  ]
-
-  if (isAdmin && mandatoryToggle) {
-    panes.push({
+    },
+    {
       menuItem: 'students',
       render: () => (
         <div className="menuTab" style={{ marginTop: '0.5em' }}>
           <Students expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
       )
-    })
-  }
+    }
+  ]
 
   if (!courses) {
     return null
@@ -413,14 +378,6 @@ function PopulationCourseStats(props) {
   }
   return (
     <div>
-      {!mandatoryToggle && (
-        <Form>
-          <Form.Field inline>
-            <label>Limit to courses where student number at least</label>
-            <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
-          </Form.Field>
-        </Form>
-      )}
       <PopulationCourseContext.Provider value={contextValue}>
         <Tab panes={panes} />
       </PopulationCourseContext.Provider>

@@ -9,7 +9,6 @@ import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../../common/useFeatureToggle'
 import { useLanguage } from '../../../common/hooks'
 
 const gradeTypes = [1, 2, 3, 4, 5]
@@ -123,8 +122,6 @@ const GradeDistribution = ({ expandedGroups, toggleGroupExpansion }) => {
 
   const { language } = useSelector(({ settings }) => settings)
 
-  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
-
   return (
     <Table celled sortable className="fixed-header">
       <Table.Header>
@@ -148,28 +145,22 @@ const GradeDistribution = ({ expandedGroups, toggleGroupExpansion }) => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {mandatoryToggle
-          ? modules.map(({ module, courses }) => (
-              <React.Fragment key={module.code}>
-                <Table.Row>
-                  <Table.Cell
-                    style={{ cursor: 'pointer' }}
-                    colSpan="3"
-                    onClick={() => toggleGroupExpansion(module.code)}
-                  >
-                    <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
-                    <b>{getTextIn(module.name, language)}</b>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <b>{module.code}</b>
-                  </Table.Cell>
-                  <Table.Cell colSpan="8" />
-                </Table.Row>
-                {expandedGroups.has(module.code) &&
-                  courses.map(course => <CoursePopUpRow key={course.course.code} courseStatistics={course} />)}
-              </React.Fragment>
-            ))
-          : courseStatistics.map(stats => <CoursePopUpRow key={stats.course.code} courseStatistics={stats} />)}
+        {modules.map(({ module, courses }) => (
+          <React.Fragment key={module.code}>
+            <Table.Row>
+              <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleGroupExpansion(module.code)}>
+                <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
+                <b>{getTextIn(module.name, language)}</b>
+              </Table.Cell>
+              <Table.Cell>
+                <b>{module.code}</b>
+              </Table.Cell>
+              <Table.Cell colSpan="8" />
+            </Table.Row>
+            {expandedGroups.has(module.code) &&
+              courses.map(course => <CoursePopUpRow key={course.course.code} courseStatistics={course} />)}
+          </React.Fragment>
+        ))}
       </Table.Body>
     </Table>
   )

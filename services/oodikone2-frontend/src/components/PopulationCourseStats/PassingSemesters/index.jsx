@@ -2,12 +2,10 @@ import React, { useState } from 'react'
 import { Table, Checkbox } from 'semantic-ui-react'
 import CourseRow from './CourseRow'
 import TSA from '../../../common/tsa'
-import useFeatureToggle from '../../../common/useFeatureToggle'
 import CollapsibleModuleTable from '../CollapsibleModuleTable'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
 const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
-  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { modules, courseStatistics, onCourseNameCellClick, isActiveCourse, filterInput } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
 
@@ -48,36 +46,24 @@ const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {mandatoryToggle ? (
-            <CollapsibleModuleTable
-              modules={modules}
-              emptyColSpan={15}
-              expandedGroups={expandedGroups}
-              toggleGroupExpansion={toggleGroupExpansion}
-            >
-              {courses =>
-                courses.map(stats => (
-                  <CourseRow
-                    key={stats.course.code}
-                    statistics={stats}
-                    isActiveCourseFn={isActiveCourse}
-                    onCourseNameClickFn={onCourseNameCellClick}
-                    cumulative={cumulativeStats}
-                  />
-                ))
-              }
-            </CollapsibleModuleTable>
-          ) : (
-            courseStatistics.map(stats => (
-              <CourseRow
-                key={stats.course.code}
-                statistics={stats}
-                isActiveCourseFn={isActiveCourse}
-                onCourseNameClickFn={onCourseNameCellClick}
-                cumulative={cumulativeStats}
-              />
-            ))
-          )}
+          <CollapsibleModuleTable
+            modules={modules}
+            emptyColSpan={15}
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
+          >
+            {courses =>
+              courses.map(stats => (
+                <CourseRow
+                  key={stats.course.code}
+                  statistics={stats}
+                  isActiveCourseFn={isActiveCourse}
+                  onCourseNameClickFn={onCourseNameCellClick}
+                  cumulative={cumulativeStats}
+                />
+              ))
+            }
+          </CollapsibleModuleTable>
         </Table.Body>
       </Table>
     </div>
