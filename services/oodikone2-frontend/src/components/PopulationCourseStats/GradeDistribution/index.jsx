@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Table, Popup, Item, Icon } from 'semantic-ui-react'
 import { replace, sortBy, omit } from 'lodash'
 import { Link } from 'react-router-dom'
@@ -111,7 +111,6 @@ const CoursePopUpRow = ({ courseStatistics }) => {
 
 const GradeDistribution = ({ expandedGroups, toggleGroupExpansion }) => {
   const {
-    courseStatistics,
     modules,
     onSortableColumnHeaderClick,
     filterInput,

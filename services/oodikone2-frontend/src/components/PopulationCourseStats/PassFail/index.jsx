@@ -13,7 +13,6 @@ const PassFail = ({ expandedGroups, toggleGroupExpansion }) => {
   const language = useLanguage()
   const { courseIsSelected } = useCourseFilter()
   const {
-    courseStatistics,
     onSortableColumnHeaderClick,
     filterInput,
     tableColumnNames,

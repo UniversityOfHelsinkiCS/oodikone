@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { connect } from 'react-redux'
-import { string, func, bool } from 'prop-types'
+import { func, bool } from 'prop-types'
 import { Radio } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 
