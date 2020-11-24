@@ -7,7 +7,7 @@ import { withRouter } from 'react-router-dom'
 import TSA from '../../common/tsa'
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
-const StudentNameVisibilityToggle = ({ showNames, toggleLabel, toggleStudentNameVisibility: toggle }) => {
+const StudentNameVisibilityToggle = ({ showNames, toggleStudentNameVisibility: toggle }) => {
   const handleChange = useCallback(() => {
     TSA.Matomo.sendEvent('Common', 'Toggle student name visibility', showNames ? 'hide' : 'show')
     toggle()
@@ -15,20 +15,18 @@ const StudentNameVisibilityToggle = ({ showNames, toggleLabel, toggleStudentName
 
   return (
     <div style={{ marginTop: 15, marginBottom: 10 }}>
-      <Radio toggle label={toggleLabel} checked={showNames} onChange={handleChange} />
+      <Radio toggle label="Show student names" checked={showNames} onChange={handleChange} />
     </div>
   )
 }
 
 StudentNameVisibilityToggle.propTypes = {
   showNames: bool.isRequired,
-  toggleLabel: string.isRequired,
   toggleStudentNameVisibility: func.isRequired
 }
 
 const mapStateToProps = state => ({
-  showNames: state.settings.namesVisible,
-  toggleLabel: state.settings.namesVisible ? 'Student names visible' : 'Student names hidden'
+  showNames: state.settings.namesVisible
 })
 
 export default connect(

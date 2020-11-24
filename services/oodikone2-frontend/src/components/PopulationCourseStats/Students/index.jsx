@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react'
 import { Table, Icon, Popup, Item, Pagination } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, connect } from 'react-redux'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import useFilters from '../../FilterTray/useFilters'
+import StudentNameVisibilityToggle from '../../StudentNameVisibilityToggle'
 
 const verticalTitle = (...params) => {
   // https://stackoverflow.com/a/41396815
@@ -19,7 +20,7 @@ const verticalTitle = (...params) => {
   )
 }
 
-const Students = ({ expandedGroups, toggleGroupExpansion }) => {
+const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
   const {
     courseStatistics,
     filterInput,
@@ -78,6 +79,9 @@ const Students = ({ expandedGroups, toggleGroupExpansion }) => {
 
   return (
     <div>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <StudentNameVisibilityToggle />
+      </div>
       <Pagination
         secondary
         activePage={page + 1}
@@ -96,7 +100,13 @@ const Students = ({ expandedGroups, toggleGroupExpansion }) => {
               <Table.HeaderCell
                 className="rotatedTableHeader"
                 key={student.studentnumber}
-                content={<div>{verticalTitle(student.studentnumber, student.name)}</div>}
+                content={
+                  <div>
+                    {showNames
+                      ? verticalTitle(student.studentnumber, student.name)
+                      : verticalTitle(student.studentnumber)}
+                  </div>
+                }
               />
             ))}
           </Table.Row>
@@ -179,4 +189,8 @@ const Students = ({ expandedGroups, toggleGroupExpansion }) => {
   )
 }
 
-export default Students
+const mapStateToProps = state => ({
+  showNames: state.settings.namesVisible
+})
+
+export default connect(mapStateToProps)(Students)
