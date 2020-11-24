@@ -231,7 +231,6 @@ const CoursePopulation = ({
             <PopulationStudents
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
               filteredStudents={studentData.students.filter(stu => selectedStudents.includes(stu.studentNumber))}
-              mandatoryToggle={false}
               coursePopulation
               language={language}
             />
