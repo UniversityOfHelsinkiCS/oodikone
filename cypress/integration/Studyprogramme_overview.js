@@ -22,13 +22,19 @@ describe("Studyprogramme overview", () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.contains("Code Mapper").click();
     cy.wait(150);
-    cy.contains("tr", "TKT20003 Käyttöjärjestelmät").within(($tr) => {
+    cy.contains("tr", "TKT20003 Käyttöjärjestelmät", {
+      timeout: 100000,
+    }).within(($tr) => {
       cy.get("input").type("582219");
     });
-    cy.contains("tr", "TKT20003 Käyttöjärjestelmät").within(($tr) => {
+    cy.contains("tr", "TKT20003 Käyttöjärjestelmät", {
+      timeout: 100000,
+    }).within(($tr) => {
       cy.get(".results").contains("Käyttöjärjestelmät (582219)");
     });
-    cy.contains("tr", "TKT20003 Käyttöjärjestelmät").within(($tr) => {
+    cy.contains("tr", "TKT20003 Käyttöjärjestelmät", {
+      timeout: 100000,
+    }).within(($tr) => {
       cy.contains("button", "Add");
     });
   });
