@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Table, Checkbox } from 'semantic-ui-react'
+import { func, instanceOf } from 'prop-types'
 import CourseRow from './CourseRow'
 import TSA from '../../../common/tsa'
 import CollapsibleModuleTable from '../CollapsibleModuleTable'
@@ -68,6 +69,11 @@ const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
       </Table>
     </div>
   )
+}
+
+PassingSemesters.propTypes = {
+  expandedGroups: instanceOf(Set).isRequired,
+  toggleGroupExpansion: func.isRequired
 }
 
 export default PassingSemesters

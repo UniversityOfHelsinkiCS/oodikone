@@ -2,7 +2,7 @@ import React from 'react'
 import { Table, Popup, Item, Icon } from 'semantic-ui-react'
 import { replace, sortBy, omit } from 'lodash'
 import { Link } from 'react-router-dom'
-import { shape, string } from 'prop-types'
+import { shape, string, instanceOf, func } from 'prop-types'
 import { useSelector } from 'react-redux'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
@@ -171,6 +171,11 @@ CourseRow.propTypes = {
 
 CoursePopUpRow.propTypes = {
   courseStatistics: shape({ course: shape({ code: string }) }).isRequired
+}
+
+GradeDistribution.propTypes = {
+  expandedGroups: instanceOf(Set).isRequired,
+  toggleGroupExpansion: func.isRequired
 }
 
 export default GradeDistribution

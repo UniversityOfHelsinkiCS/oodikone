@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { Table, Icon, Popup, Item, Pagination } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { useSelector, connect } from 'react-redux'
+import { bool, instanceOf, func } from 'prop-types'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
@@ -192,5 +193,11 @@ const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
 const mapStateToProps = state => ({
   showNames: state.settings.namesVisible
 })
+
+Students.propTypes = {
+  showNames: bool.isRequired,
+  expandedGroups: instanceOf(Set).isRequired,
+  toggleGroupExpansion: func.isRequired
+}
 
 export default connect(mapStateToProps)(Students)
