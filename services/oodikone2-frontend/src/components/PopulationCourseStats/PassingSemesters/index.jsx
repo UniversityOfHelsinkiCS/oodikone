@@ -27,7 +27,7 @@ const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
       <Table celled className="fixed-header">
         <Table.Header>
           <Table.Row>
-            {filterInput('nameFilter', 'Name', '2')}
+            {filterInput('nameFilter', 'Name', '3')}
             {filterInput('codeFilter', 'Code')}
 
             <Table.HeaderCell>Students</Table.HeaderCell>
