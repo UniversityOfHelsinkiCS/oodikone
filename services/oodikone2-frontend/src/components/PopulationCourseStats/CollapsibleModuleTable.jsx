@@ -14,7 +14,12 @@ const CollapsibleModuleTable = ({ modules, emptyColSpan, children, expandedGroup
       {modules.map(({ module, courses }) => (
         <React.Fragment key={module.code}>
           <Table.Row>
-            <Table.Cell colSpan="3" style={{ cursor: 'pointer' }} onClick={() => toggleGroupExpansion(module.code)}>
+            <Table.Cell
+              colSpan="3"
+              style={{ cursor: 'pointer' }}
+              onClick={() => toggleGroupExpansion(module.code)}
+              data-cy={`expand-${module.code}`}
+            >
               <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
               <b>{getTextIn(module.name, language)}</b>
             </Table.Cell>
