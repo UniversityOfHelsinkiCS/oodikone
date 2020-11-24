@@ -19,7 +19,7 @@ const verticalTitle = (...params) => {
   )
 }
 
-const Students = () => {
+const Students = ({ expandedGroups, toggleGroupExpansion }) => {
   const {
     courseStatistics,
     filterInput,
@@ -29,7 +29,6 @@ const Students = () => {
   } = UsePopulationCourseContext()
   const { language } = useSelector(({ settings }) => settings)
   const [page, setPage] = useState(0)
-  const [visible, setVisible] = useState({})
   const { courseIsSelected } = useCourseFilter()
   const { filteredStudents } = useFilters()
 
@@ -75,11 +74,6 @@ const Students = () => {
 
   const maxPages = Math.floor(students.length / 10)
 
-  const toggleVisible = code => {
-    const newState = !visible[code]
-    setVisible({ ...visible, [code]: newState })
-  }
-
   const pagedStudents = students.slice(page * 10, page * 10 + 10)
 
   return (
@@ -111,8 +105,8 @@ const Students = () => {
           {modules.map(({ module, courses }) => (
             <React.Fragment key={module.code}>
               <Table.Row>
-                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module.code)}>
-                  <Icon name={visible[module.code] ? 'angle down' : 'angle right'} />
+                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleGroupExpansion(module.code)}>
+                  <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
                   <b>{getTextIn(module.name, language)}</b>
                 </Table.Cell>
                 <Table.Cell>
@@ -124,7 +118,7 @@ const Students = () => {
                   </Table.Cell>
                 ))}
               </Table.Row>
-              {visible[module.code] &&
+              {expandedGroups.has(module.code) &&
                 courses
                   .filter(c => c.visible.visibility)
                   .map(col => (

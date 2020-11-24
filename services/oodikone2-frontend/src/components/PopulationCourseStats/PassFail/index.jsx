@@ -10,7 +10,7 @@ import useFeatureToggle from '../../../common/useFeatureToggle'
 import CollapsibleModuleTable from '../CollapsibleModuleTable'
 import { useLanguage } from '../../../common/hooks'
 
-const PassFail = () => {
+const PassFail = ({ expandedGroups, toggleGroupExpansion }) => {
   const language = useLanguage()
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { courseIsSelected } = useCourseFilter()
@@ -132,7 +132,12 @@ const PassFail = () => {
       {getTableHeader()}
       <Table.Body>
         {mandatoryToggle ? (
-          <CollapsibleModuleTable emptyColSpan={12} modules={modules}>
+          <CollapsibleModuleTable
+            emptyColSpan={12}
+            modules={modules}
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
+          >
             {courses => courses.map(getCourseRow)}
           </CollapsibleModuleTable>
         ) : (

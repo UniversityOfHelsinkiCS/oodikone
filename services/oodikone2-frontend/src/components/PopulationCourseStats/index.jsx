@@ -102,17 +102,19 @@ const initialState = props => ({
 })
 
 function PopulationCourseStats(props) {
-  const { language } = useLanguage()
-  const [state, setState] = useState(initialState(props))
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-  const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
-  const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
   const [courseStatistics, setCourseStatistics] = useState(
     updateCourseStatisticsCriteria(props, language, initialState(props))
   )
   const [timer, setTimer] = useState(null)
+  const [expandedGroups, setExpandedGroups] = useState(new Set())
+
+  const { language } = useLanguage()
+  const [state, setState] = useState(initialState(props))
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+  const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
+  const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
   const filterAnalytics = useAnalytics()
@@ -237,10 +239,6 @@ function PopulationCourseStats(props) {
     setCourseStatistics(courseStatistics)
   }
 
-  // useEffect(() => {
-  //   handleCourseStatisticsCriteriaChange()
-  // }, [state.studentAmountLimit, state.sortCriteria, state.reversed])
-
   const onSetFilterKeyPress = e => {
     const { key } = e
     const enterKey = 'Enter'
@@ -317,6 +315,12 @@ function PopulationCourseStats(props) {
     setFilterFields({ ...filterFields, [field]: '' })
   }
 
+  const toggleGroupExpansion = code => {
+    const newExpandedGroups = new Set(expandedGroups)
+    newExpandedGroups.has(code) ? newExpandedGroups.delete(code) : newExpandedGroups.add(code)
+    setExpandedGroups(newExpandedGroups)
+  }
+
   const getFilterValue = field => (field in filterFields ? filterFields[field] || '' : '')
 
   const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
@@ -357,7 +361,7 @@ function PopulationCourseStats(props) {
       menuItem: 'pass/fail',
       render: () => (
         <div className="menuTab">
-          <PassFail />
+          <PassFail expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
       )
     },
@@ -365,7 +369,7 @@ function PopulationCourseStats(props) {
       menuItem: 'grades',
       render: () => (
         <div className="menuTab">
-          <GradeDistribution />
+          <GradeDistribution expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
       )
     },
@@ -377,6 +381,8 @@ function PopulationCourseStats(props) {
             filterInput={renderFilterInputHeaderCell}
             courseStatistics={courseStatistics}
             onCourseNameClickFn={onCourseNameCellClick}
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
           />
         </div>
       )
@@ -388,7 +394,7 @@ function PopulationCourseStats(props) {
       menuItem: 'students',
       render: () => (
         <div className="menuTab" style={{ marginTop: '0.5em' }}>
-          <Students />
+          <Students expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
       )
     })

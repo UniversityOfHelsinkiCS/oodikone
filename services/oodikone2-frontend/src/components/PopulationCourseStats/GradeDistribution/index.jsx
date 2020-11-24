@@ -110,7 +110,7 @@ const CoursePopUpRow = ({ courseStatistics }) => {
   )
 }
 
-const GradeDistribution = () => {
+const GradeDistribution = ({ expandedGroups, toggleGroupExpansion }) => {
   const {
     courseStatistics,
     modules,
@@ -124,12 +124,6 @@ const GradeDistribution = () => {
   const { language } = useSelector(({ settings }) => settings)
 
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
-  const [visible, setVisible] = useState([])
-
-  const toggleVisible = code => {
-    const newState = !visible[code]
-    setVisible({ ...visible, [code]: newState })
-  }
 
   return (
     <Table celled sortable className="fixed-header">
@@ -158,8 +152,12 @@ const GradeDistribution = () => {
           ? modules.map(({ module, courses }) => (
               <React.Fragment key={module.code}>
                 <Table.Row>
-                  <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module.code)}>
-                    <Icon name={visible[module.code] ? 'angle down' : 'angle right'} />
+                  <Table.Cell
+                    style={{ cursor: 'pointer' }}
+                    colSpan="3"
+                    onClick={() => toggleGroupExpansion(module.code)}
+                  >
+                    <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
                     <b>{getTextIn(module.name, language)}</b>
                   </Table.Cell>
                   <Table.Cell>
@@ -167,7 +165,7 @@ const GradeDistribution = () => {
                   </Table.Cell>
                   <Table.Cell colSpan="8" />
                 </Table.Row>
-                {visible[module.code] &&
+                {expandedGroups.has(module.code) &&
                   courses.map(course => <CoursePopUpRow key={course.course.code} courseStatistics={course} />)}
               </React.Fragment>
             ))
