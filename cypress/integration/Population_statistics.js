@@ -81,7 +81,7 @@ describe("Population Statistics tests", () => {
     cy.contains("Courses of population").click({ force: true });
 
     cy.route("/api/v3/courseyearlystats**").as("coursePage");
-    cy.wait(150);
+    cy.wait(5000);
     cy.cs("expand-CSM10000").click();
     cy.cs("coursestats-link-CSM12101").click();
     cy.wait("@coursePage");
