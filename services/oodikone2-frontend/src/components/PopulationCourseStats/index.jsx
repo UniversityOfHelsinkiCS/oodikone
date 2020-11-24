@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { connect, useSelector } from 'react-redux'
 import { Table, Form, Input, Tab, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
-import { orderBy } from 'lodash'
+import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
 import PassingSemesters from './PassingSemesters'
@@ -104,6 +104,7 @@ const initialState = props => ({
 function PopulationCourseStats(props) {
   const { language } = useLanguage()
   const [state, setState] = useState(initialState(props))
+  const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
@@ -215,13 +216,20 @@ function PopulationCourseStats(props) {
     const {
       target: { value }
     } = e
-    clearTimeout(timer)
-    setTimer(
-      setTimeout(() => {
-        setState({ ...state, [field]: value })
-      }, 1000)
-    )
+
+    setFilterFields({ ...filterFields, [field]: value })
   }
+
+  const setFilters = useCallback(
+    debounce(({ codeFilter, nameFilter }) => {
+      setState({ ...state, codeFilter, nameFilter })
+    }, 500),
+    [state]
+  )
+
+  useEffect(() => {
+    setFilters(filterFields)
+  }, [filterFields])
 
   const handleCourseStatisticsCriteriaChange = () => {
     // eslint-disable-next-line react/no-access-state-in-setstate
@@ -306,11 +314,10 @@ function PopulationCourseStats(props) {
   }
 
   const onFilterReset = field => {
-    clearTimeout(timer)
-    setState({ ...state, [field]: '' })
+    setFilterFields({ ...filterFields, [field]: '' })
   }
 
-  const getFilterValue = field => (field in state ? state[field] || '' : '')
+  const getFilterValue = field => (field in filterFields ? filterFields[field] || '' : '')
 
   const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
     return (
