@@ -90,7 +90,9 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn }) => {
         }
         position="top right"
       />
-      <Table.Cell className="nameCell">{getTextIn(course.name, language)}</Table.Cell>
+      <Table.Cell colSpan="2" className="nameCell">
+        {getTextIn(course.name, language)}
+      </Table.Cell>
       <Table.Cell>{course.code}</Table.Cell>
       <Table.Cell>{stats.students}</Table.Cell>
       <Table.Cell>{stats.passed}</Table.Cell>
