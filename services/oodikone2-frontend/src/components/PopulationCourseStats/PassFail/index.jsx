@@ -6,13 +6,11 @@ import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../../common/useFeatureToggle'
 import CollapsibleModuleTable from '../CollapsibleModuleTable'
 import { useLanguage } from '../../../common/hooks'
 
 const PassFail = ({ expandedGroups, toggleGroupExpansion }) => {
   const language = useLanguage()
-  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { courseIsSelected } = useCourseFilter()
   const {
     courseStatistics,
@@ -131,18 +129,14 @@ const PassFail = ({ expandedGroups, toggleGroupExpansion }) => {
     <Table className="fixed-header" celled sortable>
       {getTableHeader()}
       <Table.Body>
-        {mandatoryToggle ? (
-          <CollapsibleModuleTable
-            emptyColSpan={12}
-            modules={modules}
-            expandedGroups={expandedGroups}
-            toggleGroupExpansion={toggleGroupExpansion}
-          >
-            {courses => courses.map(getCourseRow)}
-          </CollapsibleModuleTable>
-        ) : (
-          courseStatistics.map(getCourseRow)
-        )}
+        <CollapsibleModuleTable
+          emptyColSpan={12}
+          modules={modules}
+          expandedGroups={expandedGroups}
+          toggleGroupExpansion={toggleGroupExpansion}
+        >
+          {courses => courses.map(getCourseRow)}
+        </CollapsibleModuleTable>
       </Table.Body>
     </Table>
   )

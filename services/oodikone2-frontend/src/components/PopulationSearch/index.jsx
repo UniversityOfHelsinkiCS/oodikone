@@ -8,12 +8,10 @@ import PopulationSearchHistory from './PopulationSearchHistory'
 import ProgressBar from '../ProgressBar'
 import InfoBox from '../InfoBox'
 import { getUserIsAdmin } from '../../common'
-import useFeatureToggle from '../../common/useFeatureToggle'
 import { useProgress } from '../../common/hooks'
 import info from '../../common/markdown/populationStatistics/search.info.md'
 
 const PopulationSearch = ({ populationFound, history, location, isAdmin, loading }) => {
-  const [mandatoryToggle, , toggleMandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { onProgress, progress } = useProgress(loading)
 
   const title = populationFound && history.location.search ? 'Population' : 'Search for population'
@@ -22,7 +20,7 @@ const PopulationSearch = ({ populationFound, history, location, isAdmin, loading
     <Segment>
       <Header size="medium">{title}</Header>
       {(!populationFound || !history.location.search) && <InfoBox content={info} />}
-      <PopulationSearchForm onProgress={onProgress} mandatoryToggle={mandatoryToggle} />
+      <PopulationSearchForm onProgress={onProgress} />
       <Divider />
       {location.search !== '' && !loading && (
         <Form>
@@ -35,19 +33,6 @@ const PopulationSearch = ({ populationFound, history, location, isAdmin, loading
                 </Button>
               </Link>
             </Form.Field>
-            {isAdmin ? (
-              <>
-                <Form.Field>
-                  <Form.Radio
-                    id="accordion-toggle"
-                    checked={mandatoryToggle}
-                    toggle
-                    onClick={toggleMandatoryToggle}
-                    label="Toggle Mandatory Courses"
-                  />
-                </Form.Field>
-              </>
-            ) : null}
           </Form.Group>
           <PopulationSearchHistory history={history} />
         </Form>

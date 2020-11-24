@@ -111,7 +111,7 @@ const PopulationSearchForm = props => {
         props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
         props.getPopulationCourses(request),
         [],
-        props.getMandatoryCourses(formattedQueryParams.studyRights.programme, props.mandatoryToggle),
+        props.getMandatoryCourses(formattedQueryParams.studyRights.programme),
         props.getTagsByStudytrackAction(query.studyRights.programme)
       ])
     )
@@ -643,8 +643,7 @@ PopulationSearchForm.propTypes = {
   tags: oneOfType([arrayOf(shape({ tag_id: string, tagname: string })), object]).isRequired,
   onProgress: func.isRequired,
   clearSelected: func.isRequired,
-  clearPopulations: func.isRequired,
-  mandatoryToggle: bool.isRequired
+  clearPopulations: func.isRequired
 }
 
 const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, tags }) => {
