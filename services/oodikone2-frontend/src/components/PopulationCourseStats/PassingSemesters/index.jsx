@@ -6,7 +6,7 @@ import useFeatureToggle from '../../../common/useFeatureToggle'
 import CollapsibleModuleTable from '../CollapsibleModuleTable'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
-const PassingSemesters = () => {
+const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
   const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { modules, courseStatistics, onCourseNameCellClick, isActiveCourse, filterInput } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
@@ -49,7 +49,12 @@ const PassingSemesters = () => {
         </Table.Header>
         <Table.Body>
           {mandatoryToggle ? (
-            <CollapsibleModuleTable modules={modules} emptyColSpan={15}>
+            <CollapsibleModuleTable
+              modules={modules}
+              emptyColSpan={15}
+              expandedGroups={expandedGroups}
+              toggleGroupExpansion={toggleGroupExpansion}
+            >
               {courses =>
                 courses.map(stats => (
                   <CourseRow
