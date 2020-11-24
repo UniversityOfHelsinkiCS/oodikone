@@ -326,16 +326,16 @@ function PopulationCourseStats(props) {
   const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
     return (
       <Table.HeaderCell colSpan={colSpan}>
-        <div className="flex-cell">
-          {name}
+        <div>{name}</div>
+        <div>
           <Input
             className="courseCodeInput"
             transparent
-            placeholder="(filter here)"
+            placeholder="Filter..."
             onChange={e => onFilterChange(e, field)}
             onKeyPress={onSetFilterKeyPress}
             value={getFilterValue(field)}
-            icon={<Icon name="delete" link onClick={() => onFilterReset(field)} />}
+            icon={getFilterValue(field) ? <Icon name="delete" link onClick={() => onFilterReset(field)} /> : undefined}
           />
         </div>
       </Table.HeaderCell>
