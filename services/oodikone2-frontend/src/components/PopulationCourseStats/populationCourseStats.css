@@ -1,7 +1,7 @@
 .courseCodeInput {
-  width: 100% !important;
-  margin-left: 0.25em !important;
-  text-decoration: underline;
+  width: 6rem !important;
+  font-size: 0.85rem !important;
+  margin-top: 0.5rem;
 }
 
 .activeSortHeader {
@@ -27,25 +27,15 @@
 
 .studentVerticalTitle {
   writing-mode: vertical-rl;
-  min-width: 64px;
+  min-width: 24px;
   max-width: 200%;
   max-height: 200px;
   white-space: initial;
   padding: 1px;
-
-  /* transform:
-    translate(-25px, 80px)
-    rotate(270deg);
-  background-color: transparent !important; */
 }
 
 .menuTab {
   overflow-y: auto;
   max-height: 80vh;
   padding: 0;
-}
-
-.flex-cell {
-  display: flex;
-  justify-content: space-around;
 }

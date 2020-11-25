@@ -1,21 +1,19 @@
 import React from 'react'
 import { Table, Icon, Popup, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import { func, instanceOf } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../../common/useFeatureToggle'
 import CollapsibleModuleTable from '../CollapsibleModuleTable'
 import { useLanguage } from '../../../common/hooks'
 
-const PassFail = () => {
+const PassFail = ({ expandedGroups, toggleGroupExpansion }) => {
   const language = useLanguage()
-  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
   const { courseIsSelected } = useCourseFilter()
   const {
-    courseStatistics,
     onSortableColumnHeaderClick,
     filterInput,
     tableColumnNames,
@@ -131,16 +129,22 @@ const PassFail = () => {
     <Table className="fixed-header" celled sortable>
       {getTableHeader()}
       <Table.Body>
-        {mandatoryToggle ? (
-          <CollapsibleModuleTable emptyColSpan={12} modules={modules}>
-            {courses => courses.map(getCourseRow)}
-          </CollapsibleModuleTable>
-        ) : (
-          courseStatistics.map(getCourseRow)
-        )}
+        <CollapsibleModuleTable
+          emptyColSpan={12}
+          modules={modules}
+          expandedGroups={expandedGroups}
+          toggleGroupExpansion={toggleGroupExpansion}
+        >
+          {courses => courses.map(getCourseRow)}
+        </CollapsibleModuleTable>
       </Table.Body>
     </Table>
   )
+}
+
+PassFail.propTypes = {
+  expandedGroups: instanceOf(Set).isRequired,
+  toggleGroupExpansion: func.isRequired
 }
 
 export default PassFail

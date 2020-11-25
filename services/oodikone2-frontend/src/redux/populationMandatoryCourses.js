@@ -1,8 +1,8 @@
 import { callController } from '../apiConnection/index'
 
-export const getMandatoryCourses = (id, toggle = false) => {
+export const getMandatoryCourses = id => {
   const prefix = 'GET_MANDATORY_COURSES_'
-  const route = toggle ? `/v3/programme_modules/${id}` : `/v2/studyprogrammes/${id}/mandatory_courses`
+  const route = `/v3/programme_modules/${id}`
   return callController(route, prefix)
 }
 
