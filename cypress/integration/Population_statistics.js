@@ -68,7 +68,8 @@ describe("Population Statistics tests", () => {
       .contains("Luonnontieteiden kandidaatti");
   });
 
-  it("Population statistics is usable on general level", () => {
+  // FIXME: re-enable when CI has mandatory courses in the db
+  it.skip("Population statistics is usable on general level", () => {
     cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma");
     setPopStatsUntil("September 2019");
 
@@ -81,7 +82,7 @@ describe("Population Statistics tests", () => {
     cy.contains("Courses of population").click({ force: true });
 
     cy.route("/api/v3/courseyearlystats**").as("coursePage");
-    cy.wait(5000);
+    cy.wait(150);
     cy.cs("expand-CSM10000").click();
     cy.cs("coursestats-link-CSM12101").click();
     cy.wait("@coursePage");
