@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react'
 import { Table, Icon, Popup, Item, Pagination } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, connect } from 'react-redux'
+import { bool, instanceOf, func } from 'prop-types'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import useFilters from '../../FilterTray/useFilters'
+import StudentNameVisibilityToggle from '../../StudentNameVisibilityToggle'
 
 const verticalTitle = (...params) => {
   // https://stackoverflow.com/a/41396815
@@ -19,7 +21,7 @@ const verticalTitle = (...params) => {
   )
 }
 
-const Students = () => {
+const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
   const {
     courseStatistics,
     filterInput,
@@ -29,7 +31,6 @@ const Students = () => {
   } = UsePopulationCourseContext()
   const { language } = useSelector(({ settings }) => settings)
   const [page, setPage] = useState(0)
-  const [visible, setVisible] = useState({})
   const { courseIsSelected } = useCourseFilter()
   const { filteredStudents } = useFilters()
 
@@ -75,15 +76,13 @@ const Students = () => {
 
   const maxPages = Math.floor(students.length / 10)
 
-  const toggleVisible = code => {
-    const newState = !visible[code]
-    setVisible({ ...visible, [code]: newState })
-  }
-
   const pagedStudents = students.slice(page * 10, page * 10 + 10)
 
   return (
     <div>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <StudentNameVisibilityToggle />
+      </div>
       <Pagination
         secondary
         activePage={page + 1}
@@ -102,7 +101,13 @@ const Students = () => {
               <Table.HeaderCell
                 className="rotatedTableHeader"
                 key={student.studentnumber}
-                content={<div>{verticalTitle(student.studentnumber, student.name)}</div>}
+                content={
+                  <div>
+                    {showNames
+                      ? verticalTitle(student.studentnumber, student.name)
+                      : verticalTitle(student.studentnumber)}
+                  </div>
+                }
               />
             ))}
           </Table.Row>
@@ -111,8 +116,8 @@ const Students = () => {
           {modules.map(({ module, courses }) => (
             <React.Fragment key={module.code}>
               <Table.Row>
-                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module.code)}>
-                  <Icon name={visible[module.code] ? 'angle down' : 'angle right'} />
+                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleGroupExpansion(module.code)}>
+                  <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
                   <b>{getTextIn(module.name, language)}</b>
                 </Table.Cell>
                 <Table.Cell>
@@ -124,7 +129,7 @@ const Students = () => {
                   </Table.Cell>
                 ))}
               </Table.Row>
-              {visible[module.code] &&
+              {expandedGroups.has(module.code) &&
                 courses
                   .filter(c => c.visible.visibility)
                   .map(col => (
@@ -185,4 +190,14 @@ const Students = () => {
   )
 }
 
-export default Students
+const mapStateToProps = state => ({
+  showNames: state.settings.namesVisible
+})
+
+Students.propTypes = {
+  showNames: bool.isRequired,
+  expandedGroups: instanceOf(Set).isRequired,
+  toggleGroupExpansion: func.isRequired
+}
+
+export default connect(mapStateToProps)(Students)

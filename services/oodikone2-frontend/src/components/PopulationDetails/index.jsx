@@ -13,15 +13,7 @@ import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 import useLanguage from '../LanguagePicker/useLanguage'
 
-const PopulationDetails = ({
-  samples,
-  queryIsSet,
-  isLoading,
-  query,
-  selectedStudentsByYear,
-  mandatoryToggle,
-  dataExport
-}) => {
+const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStudentsByYear, dataExport }) => {
   const { allStudents, filteredStudents } = useFilters()
   const [trayOpen] = useFilterTray('filterTray')
   const { language } = useLanguage()
@@ -149,12 +141,7 @@ const PopulationDetails = ({
       content: {
         content: (
           <div ref={studentTableRef}>
-            <PopulationStudents
-              language={language}
-              mandatoryToggle={mandatoryToggle}
-              filteredStudents={filteredStudents}
-              dataExport={dataExport}
-            />
+            <PopulationStudents language={language} filteredStudents={filteredStudents} dataExport={dataExport} />
           </div>
         )
       }
@@ -174,7 +161,6 @@ PopulationDetails.propTypes = {
   isLoading: bool.isRequired,
   selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
-  mandatoryToggle: bool.isRequired,
   dataExport: node
 }
 

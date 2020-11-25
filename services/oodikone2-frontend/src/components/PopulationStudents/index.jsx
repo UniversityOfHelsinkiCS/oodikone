@@ -19,7 +19,6 @@ import InfoBox from '../InfoBox'
 import CheckStudentList from './CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
-import FlippedCourseTable from './FlippedCourseTable'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
@@ -218,7 +217,7 @@ class PopulationStudents extends Component {
             'code'
           ]).map(m => ({
             key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
-            title: this.props.mandatoryToggle ? mandatoryTitle(m) : verticalTitle(mandatoryTitle(m)),
+            title: verticalTitle(mandatoryTitle(m)),
             cellProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
             headerProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
             getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
@@ -259,51 +258,29 @@ class PopulationStudents extends Component {
         )
       },
       {
-        menuItem: this.props.mandatoryToggle ? 'Courses' : 'Mandatory Courses',
+        menuItem: 'Courses',
         render: () => (
           <Tab.Pane>
             <div style={{ display: 'flex' }}>
               <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
                 {this.props.mandatoryCourses.length > 0 && (
-                  <React.Fragment>
-                    {this.props.mandatoryToggle ? (
-                      <FlippedCourseTable
-                        getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
-                        tableProps={{
-                          celled: true,
-                          compact: 'very',
-                          padded: false,
-                          collapsing: true,
-                          basic: true,
-                          striped: true,
-                          singleLine: true,
-                          textAlign: 'center'
-                        }}
-                        collapsingHeaders
-                        showNames={this.props.showNames}
-                        columns={mandatoryCourseColumns}
-                        data={mandatoryCourseData}
-                      />
-                    ) : (
-                      <SortableTable
-                        getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
-                        tableProps={{
-                          celled: true,
-                          compact: 'very',
-                          padded: false,
-                          collapsing: true,
-                          basic: true,
-                          striped: true,
-                          singleLine: true,
-                          textAlign: 'center'
-                        }}
-                        collapsingHeaders
-                        showNames={this.props.showNames}
-                        columns={mandatoryCourseColumns}
-                        data={mandatoryCourseData}
-                      />
-                    )}
-                  </React.Fragment>
+                  <SortableTable
+                    getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
+                    tableProps={{
+                      celled: true,
+                      compact: 'very',
+                      padded: false,
+                      collapsing: true,
+                      basic: true,
+                      striped: true,
+                      singleLine: true,
+                      textAlign: 'center'
+                    }}
+                    collapsingHeaders
+                    showNames={this.props.showNames}
+                    columns={mandatoryCourseColumns}
+                    data={mandatoryCourseData}
+                  />
                 )}
               </div>
               {this.props.mandatoryCourses.length === 0 && (
@@ -452,7 +429,6 @@ PopulationStudents.propTypes = {
   studentToTargetCourseDateMap: shape({}),
   coursePopulation: bool,
   customPopulation: bool,
-  mandatoryToggle: bool.isRequired,
   filteredStudents: arrayOf(shape({})).isRequired,
   dataExport: node
 }

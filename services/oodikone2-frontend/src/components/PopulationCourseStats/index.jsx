@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { connect, useSelector } from 'react-redux'
-import { Table, Form, Input, Tab, Icon } from 'semantic-ui-react'
+import { Table, Input, Tab, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, shape, string, bool } from 'prop-types'
-import { orderBy } from 'lodash'
+import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
 import PassingSemesters from './PassingSemesters'
@@ -12,9 +12,8 @@ import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
 import Students from './Students'
-import { getUserIsAdmin, getTextIn } from '../../common'
+import { getTextIn } from '../../common'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../common/useFeatureToggle'
 import useFilterTray from '../FilterTray/useFilterTray'
 import { contextKey as filterTrayContextKey } from '../FilterTray'
 import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Courses'
@@ -46,16 +45,12 @@ const lodashSortOrderTypes = {
   DESC: 'desc'
 }
 
-function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses, mandatoryToggle) {
-  const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
+function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses) {
+  const { sortCriteria, codeFilter, nameFilter, reversed } = state
   const {
     courses: { coursestatistics }
   } = props
 
-  const studentAmountFilter = ({ stats }) => {
-    const { students } = stats
-    return studentAmountLimit === 0 || students >= studentAmountLimit
-  }
   const courseCodeFilter = ({ course }) => {
     const { code } = course
     return code.toLowerCase().includes(codeFilter.toLowerCase())
@@ -71,12 +66,11 @@ function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses
     return mandatoryCourses.some(c => c.code === course.code)
   }
 
-  const puimuri = mandatoryToggle ? mandatoryFilter : studentAmountFilter
-
   const filteredCourses =
     coursestatistics &&
+    mandatoryCourses &&
     coursestatistics
-      .filter(puimuri)
+      .filter(mandatoryFilter)
       .filter(c => !codeFilter || courseCodeFilter(c))
       .filter(c => !nameFilter || courseNameFilter(c))
 
@@ -94,7 +88,6 @@ function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses
 const initialState = props => ({
   sortCriteria: tableColumnNames.STUDENTS,
   reversed: true,
-  studentAmountLimit: Math.round(props.selectedStudents.length * 0.3),
   codeFilter: '',
   nameFilter: '',
   activeView: null,
@@ -103,16 +96,18 @@ const initialState = props => ({
 
 function PopulationCourseStats(props) {
   const { language } = useLanguage()
-  const [state, setState] = useState(initialState(props))
+
+  const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-  const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
-  const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
   const [courseStatistics, setCourseStatistics] = useState(
     updateCourseStatisticsCriteria(props, language, initialState(props))
   )
-  const [timer, setTimer] = useState(null)
-  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
+  const [expandedGroups, setExpandedGroups] = useState(new Set())
+
+  const [state, setState] = useState(initialState(props))
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+  const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
+  const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
   const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
   const filterAnalytics = useAnalytics()
 
@@ -129,20 +124,16 @@ function PopulationCourseStats(props) {
         studentAmountLimit,
         selectedStudentsLength: props.selectedStudents.length
       })
-      setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses, mandatoryToggle))
+      setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses))
     }
   }, [props.courses, props.selectedStudents])
 
   useEffect(() => {
-    const { studentAmountLimit, codeFilter, nameFilter, reversed, sortCriteria } = state
+    const { codeFilter, nameFilter, reversed, sortCriteria } = state
     const {
       courses: { coursestatistics },
       language
     } = props
-    const studentAmountFilter = ({ stats }) => {
-      const { students } = stats
-      return studentAmountLimit === 0 || students >= studentAmountLimit
-    }
     const courseCodeFilter = ({ course }) => {
       const { code } = course
       return code.toLowerCase().includes(codeFilter.toLowerCase())
@@ -158,16 +149,15 @@ function PopulationCourseStats(props) {
       return mandatoryCourses.some(c => c.code === course.code && c.visible.visibility)
     }
 
-    const puimuri = mandatoryToggle ? mandatoryFilter : studentAmountFilter
-
     const filteredCourses =
       coursestatistics &&
+      mandatoryCourses &&
       coursestatistics
-        .filter(puimuri)
+        .filter(mandatoryFilter)
         .filter(c => !codeFilter || courseCodeFilter(c))
         .filter(c => !nameFilter || courseNameFilter(c))
         .map(c => {
-          const course = mandatoryToggle ? mandatoryCourses.find(mc => mc.code === c.course.code) : {}
+          const course = mandatoryCourses.find(mc => mc.code === c.course.code)
           return { ...c, ...course }
         })
 
@@ -178,35 +168,34 @@ function PopulationCourseStats(props) {
       [course => course.stats[sortCriteria], course => course.course.code],
       [lodashSortOrder, lodashSortOrderTypes.ASC]
     )
-    if (mandatoryToggle) {
-      const modules = {}
 
-      sortedStatistics.forEach(course => {
-        const code = course.label_code
-        if (!code) {
-          return
-        }
-        if (!modules[code]) {
-          modules[code] = []
-        }
-        modules[code].push(course)
-      })
+    const modules = {}
 
-      Object.keys(modules).forEach(m => {
-        if (modules[m].length === 0) {
-          delete modules[m]
-        }
-      })
+    sortedStatistics.forEach(course => {
+      const code = course.label_code
+      if (!code) {
+        return
+      }
+      if (!modules[code]) {
+        modules[code] = []
+      }
+      modules[code].push(course)
+    })
 
-      setModules(
-        Object.entries(modules)
-          .map(([module, courses]) => ({
-            module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
-            courses
-          }))
-          .sort((a, b) => a.module.order - b.module.order)
-      )
-    }
+    Object.keys(modules).forEach(m => {
+      if (modules[m].length === 0) {
+        delete modules[m]
+      }
+    })
+
+    setModules(
+      Object.entries(modules)
+        .map(([module, courses]) => ({
+          module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
+          courses
+        }))
+        .sort((a, b) => a.module.order - b.module.order)
+    )
 
     setCourseStatistics(sortedStatistics)
   }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, mandatoryCourses])
@@ -215,23 +204,26 @@ function PopulationCourseStats(props) {
     const {
       target: { value }
     } = e
-    clearTimeout(timer)
-    setTimer(
-      setTimeout(() => {
-        setState({ ...state, [field]: value })
-      }, 1000)
-    )
+
+    setFilterFields({ ...filterFields, [field]: value })
   }
+
+  const setFilters = useCallback(
+    debounce(({ codeFilter, nameFilter }) => {
+      setState({ ...state, codeFilter, nameFilter })
+    }, 500),
+    [state]
+  )
+
+  useEffect(() => {
+    setFilters(filterFields)
+  }, [filterFields])
 
   const handleCourseStatisticsCriteriaChange = () => {
     // eslint-disable-next-line react/no-access-state-in-setstate
     const courseStatistics = updateCourseStatisticsCriteria(props, language, state)
     setCourseStatistics(courseStatistics)
   }
-
-  // useEffect(() => {
-  //   handleCourseStatisticsCriteriaChange()
-  // }, [state.studentAmountLimit, state.sortCriteria, state.reversed])
 
   const onSetFilterKeyPress = e => {
     const { key } = e
@@ -240,23 +232,6 @@ function PopulationCourseStats(props) {
     if (isEnterKeyPress) {
       handleCourseStatisticsCriteriaChange()
     }
-  }
-
-  const onStudentAmountLimitChange = e => {
-    const {
-      target: { value }
-    } = e
-    clearTimeout(timer)
-    setTimer(
-      setTimeout(() => {
-        sendAnalytics(
-          'Courses of Population student count filter change',
-          'Courses of Population student count filter change',
-          value
-        )
-        setState({ ...state, studentAmountLimit: value }) // , () => this.handleCourseStatisticsCriteriaChange())
-      }, 1000)
-    )
   }
 
   const onSortableColumnHeaderClick = criteria => {
@@ -306,32 +281,41 @@ function PopulationCourseStats(props) {
   }
 
   const onFilterReset = field => {
-    clearTimeout(timer)
-    setState({ ...state, [field]: '' })
+    setFilterFields({ ...filterFields, [field]: '' })
   }
 
-  const getFilterValue = field => (field in state ? state[field] || '' : '')
+  const toggleGroupExpansion = code => {
+    const newExpandedGroups = new Set(expandedGroups)
+    if (newExpandedGroups.has(code)) {
+      newExpandedGroups.delete(code)
+    } else {
+      newExpandedGroups.add(code)
+    }
+    setExpandedGroups(newExpandedGroups)
+  }
+
+  const getFilterValue = field => (field in filterFields ? filterFields[field] || '' : '')
 
   const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
     return (
       <Table.HeaderCell colSpan={colSpan}>
-        <div className="flex-cell">
-          {name}
+        <div>{name}</div>
+        <div>
           <Input
             className="courseCodeInput"
             transparent
-            placeholder="(filter here)"
+            placeholder="Filter..."
             onChange={e => onFilterChange(e, field)}
             onKeyPress={onSetFilterKeyPress}
             value={getFilterValue(field)}
-            icon={<Icon name="delete" link onClick={() => onFilterReset(field)} />}
+            icon={getFilterValue(field) ? <Icon name="delete" link onClick={() => onFilterReset(field)} /> : undefined}
           />
         </div>
       </Table.HeaderCell>
     )
   }
 
-  const { courses, pending, isAdmin } = props
+  const { courses, pending } = props
   const { sortCriteria, reversed } = state
   const contextValue = {
     courseStatistics,
@@ -350,7 +334,7 @@ function PopulationCourseStats(props) {
       menuItem: 'pass/fail',
       render: () => (
         <div className="menuTab">
-          <PassFail />
+          <PassFail expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
       )
     },
@@ -358,7 +342,7 @@ function PopulationCourseStats(props) {
       menuItem: 'grades',
       render: () => (
         <div className="menuTab">
-          <GradeDistribution />
+          <GradeDistribution expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
       )
     },
@@ -370,22 +354,21 @@ function PopulationCourseStats(props) {
             filterInput={renderFilterInputHeaderCell}
             courseStatistics={courseStatistics}
             onCourseNameClickFn={onCourseNameCellClick}
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
           />
+        </div>
+      )
+    },
+    {
+      menuItem: 'students',
+      render: () => (
+        <div className="menuTab" style={{ marginTop: '0.5em' }}>
+          <Students expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
       )
     }
   ]
-
-  if (isAdmin && mandatoryToggle) {
-    panes.push({
-      menuItem: 'students',
-      render: () => (
-        <div className="menuTab" style={{ marginTop: '0.5em' }}>
-          <Students />
-        </div>
-      )
-    })
-  }
 
   if (!courses) {
     return null
@@ -400,14 +383,6 @@ function PopulationCourseStats(props) {
   }
   return (
     <div>
-      {!mandatoryToggle && (
-        <Form>
-          <Form.Field inline>
-            <label>Limit to courses where student number at least</label>
-            <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
-          </Form.Field>
-        </Form>
-      )}
       <PopulationCourseContext.Provider value={contextValue}>
         <Tab panes={panes} />
       </PopulationCourseContext.Provider>
@@ -427,18 +402,15 @@ PopulationCourseStats.propTypes = {
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  isAdmin: bool.isRequired,
   years: shape({}) // eslint-disable-line
 }
 
 const mapStateToProps = state => {
   const { years } = state.semesters.data
-  const isAdmin = getUserIsAdmin(state.auth.token.roles)
 
   return {
     years,
-    populationCourses: state.populationCourses,
-    isAdmin
+    populationCourses: state.populationCourses
   }
 }
 

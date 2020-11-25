@@ -1,15 +1,14 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Table, Popup, Item, Icon } from 'semantic-ui-react'
 import { replace, sortBy, omit } from 'lodash'
 import { Link } from 'react-router-dom'
-import { shape, string } from 'prop-types'
+import { shape, string, instanceOf, func } from 'prop-types'
 import { useSelector } from 'react-redux'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
-import useFeatureToggle from '../../../common/useFeatureToggle'
 import { useLanguage } from '../../../common/hooks'
 
 const gradeTypes = [1, 2, 3, 4, 5]
@@ -110,9 +109,8 @@ const CoursePopUpRow = ({ courseStatistics }) => {
   )
 }
 
-const GradeDistribution = () => {
+const GradeDistribution = ({ expandedGroups, toggleGroupExpansion }) => {
   const {
-    courseStatistics,
     modules,
     onSortableColumnHeaderClick,
     filterInput,
@@ -122,14 +120,6 @@ const GradeDistribution = () => {
   } = UsePopulationCourseContext()
 
   const { language } = useSelector(({ settings }) => settings)
-
-  const [mandatoryToggle] = useFeatureToggle('mandatoryToggle')
-  const [visible, setVisible] = useState([])
-
-  const toggleVisible = code => {
-    const newState = !visible[code]
-    setVisible({ ...visible, [code]: newState })
-  }
 
   return (
     <Table celled sortable className="fixed-header">
@@ -154,24 +144,22 @@ const GradeDistribution = () => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {mandatoryToggle
-          ? modules.map(({ module, courses }) => (
-              <React.Fragment key={module.code}>
-                <Table.Row>
-                  <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleVisible(module.code)}>
-                    <Icon name={visible[module.code] ? 'angle down' : 'angle right'} />
-                    <b>{getTextIn(module.name, language)}</b>
-                  </Table.Cell>
-                  <Table.Cell>
-                    <b>{module.code}</b>
-                  </Table.Cell>
-                  <Table.Cell colSpan="8" />
-                </Table.Row>
-                {visible[module.code] &&
-                  courses.map(course => <CoursePopUpRow key={course.course.code} courseStatistics={course} />)}
-              </React.Fragment>
-            ))
-          : courseStatistics.map(stats => <CoursePopUpRow key={stats.course.code} courseStatistics={stats} />)}
+        {modules.map(({ module, courses }) => (
+          <React.Fragment key={module.code}>
+            <Table.Row>
+              <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleGroupExpansion(module.code)}>
+                <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
+                <b>{getTextIn(module.name, language)}</b>
+              </Table.Cell>
+              <Table.Cell>
+                <b>{module.code}</b>
+              </Table.Cell>
+              <Table.Cell colSpan="8" />
+            </Table.Row>
+            {expandedGroups.has(module.code) &&
+              courses.map(course => <CoursePopUpRow key={course.course.code} courseStatistics={course} />)}
+          </React.Fragment>
+        ))}
       </Table.Body>
     </Table>
   )
@@ -183,6 +171,11 @@ CourseRow.propTypes = {
 
 CoursePopUpRow.propTypes = {
   courseStatistics: shape({ course: shape({ code: string }) }).isRequired
+}
+
+GradeDistribution.propTypes = {
+  expandedGroups: instanceOf(Set).isRequired,
+  toggleGroupExpansion: func.isRequired
 }
 
 export default GradeDistribution
