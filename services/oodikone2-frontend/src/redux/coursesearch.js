@@ -7,9 +7,9 @@ const storeActions = actions(prefix)
 
 export const clearCourses = storeActions.clear
 
-export const findCourses = ({ name, type, discipline }, language = 'fi') => {
+export const findCourses = ({ name, type }, language = 'fi') => {
   const route = '/coursesmulti'
-  const params = { name, type, discipline, language }
+  const params = { name, type, language }
   return callController(route, prefix, [], 'get', params, params)
 }
 
