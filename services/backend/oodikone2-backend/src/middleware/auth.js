@@ -10,13 +10,24 @@ const TOKEN_VERSION = 1 // When token structure changes, increment in userservic
 const checkAuth = async (req, res, next) => {
   const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
   const uid = req.headers['uid']
-  if (!token) return res.status(403).json({ error: 'No token in headers' })
+
+  if (!token) {
+    return res.status(403).json({ error: 'No token in headers' })
+  }
+
   jwt.verify(token, conf.TOKEN_SECRET, async (err, decoded) => {
-    if (err) return res.status(403).json(err)
-    if (decoded.version !== TOKEN_VERSION)
+    if (err) {
+      return res.status(403).json(err)
+    }
+
+    if (decoded.version !== TOKEN_VERSION) {
       return res.status(401).json({ error: 'Token needs to be refreshed - invalid version' })
-    if (decoded.mockedBy ? decoded.mockedBy !== uid : decoded.userId !== uid)
+    }
+
+    if (decoded.mockedBy ? decoded.mockedBy !== uid : decoded.userId !== uid) {
       return res.status(403).json({ error: 'User shibboleth id and token id did not match' })
+    }
+
     const userData = await getUserDataFor(decoded.userId)
     req.decodedToken = decoded
     Object.assign(req, userData)
@@ -27,12 +38,12 @@ const checkAuth = async (req, res, next) => {
 const roles = requiredRoles => async (req, res, next) => {
   if (req.decodedToken) {
     const { roles } = req
+
     if (requiredRoles.every(r => roles.indexOf(r) >= 0) || roles.includes('admin')) {
-      next()
-      return
+      return next()
     }
   }
-  console.log(`Missing required roles ${requiredRoles}`)
+
   res.status(403).json({ error: 'missing required roles' })
 }
 
@@ -40,25 +51,28 @@ const checkRequiredGroup = async (req, res, next) => {
   const hyGroups = parseHyGroups(req.headers['hygroupcn'])
   const enabled = hasRequiredGroup(hyGroups)
   const tokenOutdated = req.decodedToken.enabled !== enabled
+
   if (tokenOutdated) {
-    res.status(401).json({
-      error: 'Token needs to be refreshed - enabled doesnt match hy-group requirement'
+    return res.status(401).json({
+      error: 'Token needs to be refreshed - enabled does not match hy-group requirement'
     })
-  } else if (!enabled) {
-    res.status(403).json({ error: 'User is not enabled' })
-  } else {
-    next()
   }
+
+  if (!enabled) {
+    return res.status(403).json({ error: 'User is not enabled' })
+  }
+  next()
 }
 
 const checkUserBlacklisting = async (req, res, next) => {
   const { userId, createdAt } = req.decodedToken
   const isBlacklisted = await blacklist.isUserBlacklisted(userId, createdAt)
+
   if (isBlacklisted) {
-    res.status(401).json({ error: 'Token needs to be refreshed - blacklisted' })
-  } else {
-    next()
+    return res.status(401).json({ error: 'Token needs to be refreshed - blacklisted' })
   }
+
+  next()
 }
 
 module.exports = {
