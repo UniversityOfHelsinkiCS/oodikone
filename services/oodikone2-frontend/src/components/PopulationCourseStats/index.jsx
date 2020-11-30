@@ -393,26 +393,19 @@ function PopulationCourseStats(props) {
 PopulationCourseStats.propTypes = {
   courses: shape({
     coursestatistics: arrayOf(object),
-    coursetypes: shape({}),
-    disciplines: shape({})
+    coursetypes: shape({})
   }).isRequired,
   populationCourses: shape({
     data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
   }).isRequired,
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  years: shape({}) // eslint-disable-line
+  selectedStudents: arrayOf(string).isRequired
 }
 
-const mapStateToProps = state => {
-  const { years } = state.semesters.data
-
-  return {
-    years,
-    populationCourses: state.populationCourses
-  }
-}
+const mapStateToProps = ({ populationCourses }) => ({
+  populationCourses
+})
 
 export default connect(
   mapStateToProps,

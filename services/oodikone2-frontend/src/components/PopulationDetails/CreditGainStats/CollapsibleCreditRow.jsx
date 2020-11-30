@@ -2,22 +2,11 @@ import React, { useState } from 'react'
 import { Table, Progress, Icon } from 'semantic-ui-react'
 import { number, func } from 'prop-types'
 import ExternalCreditFilterToggle from './ExternalCreditFilterToggle'
-import { useIsAdmin } from '../../../common/hooks'
 
 const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }) => {
   const [limits, setLimits] = useState([])
-  const isAdmin = useIsAdmin()
-
-  // const [isCollapsed, setIsCollapsed] = useState(false)
-  // const []
-
-  // useEffect(() => {
-
-  // }, [isCollapsed])
 
   const collapse = () => {
-    if (!isAdmin || !max) return
-
     if (limits.length > 0) {
       setLimits([])
       return

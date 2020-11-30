@@ -162,6 +162,7 @@ run_full_setup () {
     db_setup_full
     db_anon_setup_full
     docker-compose-dev down
+    npm run docker:up:real
     show_instructions
 }
 
@@ -184,6 +185,7 @@ run_anon_full_setup () {
     docker-compose-dev up -d db user_db db_kone analytics_db
     db_anon_setup_full
     docker-compose-dev down
+    npm run docker:up
     show_instructions
     if [[ ! -z anon_data_error ]] ; then
         tput setaf 1; echo "$anon_data_error"; tput sgr0
