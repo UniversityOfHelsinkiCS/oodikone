@@ -128,12 +128,6 @@ export const handleRequest = store => next => async action => {
       const res = await callApi(route, method, data, params, 0, onProgress)
       store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
     } catch (e) {
-      // handle stale Shibboleth session by reloading frontend
-      if (e.message.toLowerCase() === 'network error') {
-        window.location.reload(true)
-        return
-      }
-
       store.dispatch({ type: `${prefix}FAILURE`, response: e, query })
       handleError(e, store.getState().actionHistory)
     }
@@ -160,12 +154,6 @@ export const handleAuth = store => next => async action => {
       }
       store.dispatch({ type: 'LOGIN_SUCCESS', token })
     } catch (err) {
-      // handle stale Shibboleth session by reloading frontend
-      if (err.message.toLowerCase() === 'network error') {
-        window.location.reload(true)
-        return
-      }
-
       store.dispatch({ type: 'LOGIN_FAILURE' })
       handleError(err, store.getState().actionHistory)
     }
@@ -174,10 +162,6 @@ export const handleAuth = store => next => async action => {
       await logout()
       store.dispatch({ type: 'LOGOUT_SUCCESSFUL' })
     } catch (err) {
-      if (err.message.toLowerCase() === 'network error') {
-        window.location.reload(true)
-        return
-      }
       store.dispatch({ type: 'LOGOUT_FAILURE' })
       handleError(err, store.getState().actionHistory)
     }
