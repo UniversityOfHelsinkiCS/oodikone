@@ -457,7 +457,7 @@ const ProtoC = ({
             />
             <Checkbox
               style={{ marginLeft: '10px' }}
-              label="Include old attainments"
+              label="Include attainments attained before the studyright start"
               onChange={handleOldAttainmentToggled}
               checked={includeOldAttainments}
             />
@@ -520,7 +520,7 @@ const ProtoC = ({
           />
           <Checkbox
             style={{ marginLeft: '10px' }}
-            label="Include old attainments"
+            label="Include attainments attained before the studyright start"
             onChange={handleOldAttainmentToggled}
             checked={includeOldAttainments}
           />
