@@ -100,7 +100,11 @@ const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
             {pagedStudents.map(student => (
               <Table.HeaderCell
                 key={student.studentnumber}
-                content={<div>{showNames ? verticalTitle(student.name) : verticalTitle(student.studentnumber)}</div>}
+                content={
+                  <Link style={{ color: 'black' }} to={`/students/${student.studentnumber}`}>
+                    {showNames ? verticalTitle(student.name) : verticalTitle(student.studentnumber)}
+                  </Link>
+                }
               />
             ))}
           </Table.Row>
