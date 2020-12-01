@@ -42,7 +42,7 @@ const CourseCard = ({ courseStats }) => {
       func: ({ studentNumber }) => !Object.keys(students.all).includes(studentNumber)
     },
     {
-      label: 'Not Participated or Failed',
+      label: 'Failed or Not Participated',
       func: ({ studentNumber }) =>
         !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber)
     }
