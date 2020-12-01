@@ -298,7 +298,7 @@ function PopulationCourseStats(props) {
 
   const renderFilterInputHeaderCell = (field, name, colSpan = '') => {
     return (
-      <Table.HeaderCell colSpan={colSpan}>
+      <Table.HeaderCell width="6" colSpan={colSpan}>
         <div>{name}</div>
         <div>
           <Input
