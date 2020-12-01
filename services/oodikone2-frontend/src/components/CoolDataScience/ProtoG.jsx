@@ -217,7 +217,7 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
         <h2>Kandiohjelmat: Suhteellisen tavoiteaikaerittelyn kehitys</h2>
         <Checkbox
           style={{ marginLeft: 'auto' }}
-          label="Include old attainments"
+          label="Include attainments attained before the studyright start"
           onChange={handleOldAttainmentToggled}
           checked={includeOldAttainments}
         />
