@@ -18,22 +18,4 @@
   max-height: 200px;
   white-space: initial;
   padding: 1px;
-
-  /* transform:
-    translate(-25px, 80px)
-    rotate(270deg);
-  background-color: transparent !important; */
 }
-
-/* .rotatedTableHeader {
-  transform: 
-    rotate(315deg)   
-    translate(25px, -15px);
-  max-width: 120px;
-  border: none !important;
-  background-color: black !important;
-}
-
-.tableCell {
-  max-width: 120px !important;
-} */
