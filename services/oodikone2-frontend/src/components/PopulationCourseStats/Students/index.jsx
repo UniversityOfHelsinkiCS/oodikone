@@ -99,14 +99,11 @@ const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
             {filterInput('codeFilter', 'Code')}
             {pagedStudents.map(student => (
               <Table.HeaderCell
-                className="rotatedTableHeader"
                 key={student.studentnumber}
                 content={
-                  <div>
-                    {showNames
-                      ? verticalTitle(student.studentnumber, student.name)
-                      : verticalTitle(student.studentnumber)}
-                  </div>
+                  <Link style={{ color: 'black' }} to={`/students/${student.studentnumber}`}>
+                    {showNames ? verticalTitle(student.name) : verticalTitle(student.studentnumber)}
+                  </Link>
                 }
               />
             ))}

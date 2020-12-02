@@ -57,11 +57,7 @@ const FlippedCourseTable = ({
           {sortedRows
             .filter(row => row.studentNumber)
             .map(row => (
-              <Table.HeaderCell
-                className="rotatedTableHeader"
-                key={getRowKey(row)}
-                content={verticalTitle(row.studentNumber)}
-              />
+              <Table.HeaderCell key={getRowKey(row)} content={verticalTitle(row.studentNumber)} />
             ))}
         </Table.Row>
       </Table.Header>

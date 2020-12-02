@@ -103,7 +103,6 @@ const PopulationCourseTable = ({
               .filter(c => !c.child && !(c.title == null))
               .map(c => (
                 <Table.HeaderCell
-                  className="rotatedTableHeader"
                   key={c.key}
                   content={c.title}
                   onClick={
