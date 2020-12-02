@@ -3,7 +3,6 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { shape, func, bool } from 'prop-types'
 import { Segment, Header, Accordion } from 'semantic-ui-react'
-import qs from 'query-string'
 import scrollToComponent from 'react-scroll-to-component'
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
@@ -22,6 +21,7 @@ import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
 import { CoursePopulationFilters } from '../FilterTray/FilterSets'
 import useLanguage from '../LanguagePicker/useLanguage'
+import { queryParamsFromUrl } from '../../common/query'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -38,11 +38,6 @@ const CoursePopulation = ({
   const { setAllStudents, filteredStudents } = useFilters()
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
-  const parseQueryFromUrl = () => {
-    const { location } = history
-    const query = qs.parse(location.search)
-    return query
-  }
   const [codes, setCodes] = useState([])
   const [headerYears, setYears] = useState('')
   const [dateFrom, setDateFrom] = useState(null)
@@ -92,7 +87,7 @@ const CoursePopulation = ({
 
   useEffect(() => {
     if (semesters.years && semesters.semesters) {
-      const { coursecodes, from, to, years, years2, separate } = parseQueryFromUrl()
+      const { coursecodes, from, to, years, years2, separate } = queryParamsFromUrl(history.location)
       const parsedCourseCodes = JSON.parse(coursecodes)
       getCoursePopulationDispatch({ coursecodes, from, to, onProgress, separate })
       getSingleCourseStatsDispatch({
@@ -283,7 +278,6 @@ const mapStateToProps = ({
   return {
     studentData: populations.data,
     pending: populations.pending,
-    query: populations.query,
     courseData: singleCourseStats.stats || {},
     semesters: semesters.data,
     isAdmin: getUserIsAdmin(roles)
