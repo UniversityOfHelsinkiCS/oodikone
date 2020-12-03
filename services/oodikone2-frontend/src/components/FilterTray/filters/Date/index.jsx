@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Form } from 'semantic-ui-react'
-import Datetime from 'react-datetime'
 import 'moment/locale/fi'
-import ClearFilterButton from './common/ClearFilterButton'
-import FilterCard from './common/FilterCard'
-import useFilters from '../useFilters'
+import ClearFilterButton from '../common/ClearFilterButton'
+import FilterCard from '../common/FilterCard'
+import useFilters from '../../useFilters'
+import DateTime from './DateTime'
 
 /**
  * Filter courses according to the date when credits were earned.
@@ -16,7 +16,7 @@ export default () => {
   const label = 'Select Date'
   const [startDate, setStartDate] = useState(label)
   const [endDate, setEndDate] = useState(label)
-  const name = 'dateFilter'
+  const name = 'creditDateFilter'
 
   useEffect(() => {
     const filterFn = course => {
@@ -50,29 +50,17 @@ export default () => {
       name={name}
     >
       <div className="description-text">
-        Include courses from the selected date range only. Does not filter out students.
+        Include course credits from the selected date range only. Does not filter out students.
       </div>
       <div className="card-content">
         <Form>
           <Form.Field>
             <label>Start Date:</label>
-            <Datetime
-              value={startDate}
-              onChange={date => setStartDate(date)}
-              timeFormat={false}
-              locale="fi"
-              closeOnSelect
-            />
+            <DateTime value={startDate} onChange={date => setStartDate(date)} />
           </Form.Field>
           <Form.Field>
             <label>End Date:</label>
-            <Datetime
-              value={endDate}
-              onChange={date => setEndDate(date)}
-              timeFormat={false}
-              locale="fi"
-              closeOnSelect
-            />
+            <DateTime value={endDate} onChange={date => setEndDate(date)} />
           </Form.Field>
         </Form>
       </div>
