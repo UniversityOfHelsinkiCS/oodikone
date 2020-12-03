@@ -76,7 +76,7 @@ export const byCodeDesc = (a, b) => b.code.localeCompare(a.code)
 
 export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|specialist.*/)
 
-export const studyrightTypes = { degree: '10', programme: '20', speciality: '30' } // speciality???
+export const studyrightElementTypes = { degree: 10, programme: 20, speciality: 30 }
 
 export const getStudentTotalCredits = (student, includeTransferredCredits = true) => {
   const passedCourses = includeTransferredCredits

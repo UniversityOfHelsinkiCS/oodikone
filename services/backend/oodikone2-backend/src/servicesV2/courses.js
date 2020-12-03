@@ -734,7 +734,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
     ...statistics,
     coursecode,
     alternatives: uniqueCodes,
-    name: course.name.fi
+    name: course.name
   }
 }
 

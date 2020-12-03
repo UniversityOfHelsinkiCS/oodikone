@@ -25,7 +25,7 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
     const { passed, failed, passrate } = summary
     return {
       id: coursecode,
-      category: name,
+      category: getTextIn(name, language),
       passed,
       failed,
       passrate,
@@ -70,7 +70,11 @@ SummaryTab.propTypes = {
   statistics: arrayOf(
     shape({
       coursecode: oneOfType([number, string]),
-      name: string,
+      name: shape({
+        fi: string,
+        en: string,
+        sv: string
+      }),
       summary: shape({
         failed: number,
         passed: number,
