@@ -25,7 +25,7 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
     const { passed, failed, passrate } = summary
     return {
       id: coursecode,
-      category: name,
+      category: getTextIn(name, language),
       passed,
       failed,
       passrate,
