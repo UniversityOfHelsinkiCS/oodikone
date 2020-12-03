@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { shape, string, arrayOf, func, bool } from 'prop-types'
 import { Header, Segment, Tab, Button } from 'semantic-ui-react'
 import { isEqual, uniqBy } from 'lodash'
-import StudyProgrammeMandatoryCourses from './StudyProgrammeMandatoryCourses'
+import DegreeCoursesTable from './DegreeCourses'
 import CourseCodeMapper from '../CourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
@@ -86,8 +86,8 @@ const StudyProgramme = props => {
     }
     panes.push(
       {
-        menuItem: 'Mandatory Courses',
-        render: () => <StudyProgrammeMandatoryCourses studyProgramme={studyProgrammeId} />
+        menuItem: 'Degree Courses',
+        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />
       },
       { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> }
     )
