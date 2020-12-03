@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, string, bool } from 'prop-types'
-import { Segment } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { Segment, Button, Icon, Modal } from 'semantic-ui-react'
 import uuidv4 from 'uuid/v4'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
+import DegreeCoursesTable from '../StudyProgramme/DegreeCourses'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 import info from '../../common/markdown/populationStatistics/coursesOfPopulation.info.md'
 
@@ -72,11 +72,9 @@ const PopulationCourses = ({
 
   return (
     <Segment basic>
+      <FilterDegreeCoursesModal />
       <InfoBox content={info} />
       <SegmentDimmer isLoading={pending} />
-      <div style={{ marginBottom: '1rem' }}>
-        <Link to={`/study-programme/${query.studyRights.programme}?p_m_tab=2&p_tab=1`}>Filter courses shown</Link>
-      </div>
       <PopulationCourseStats
         key={selectedPopulationCourses.query.uuid}
         courses={selectedPopulationCourses.data}
@@ -86,6 +84,35 @@ const PopulationCourses = ({
       />
     </Segment>
   )
+
+  function FilterDegreeCoursesModal() {
+    const [open, setOpen] = useState(false)
+
+    return (
+      <Modal
+        size="large"
+        closeIcon
+        onClose={() => setOpen(false)}
+        onOpen={() => setOpen(true)}
+        open={open}
+        trigger={
+          <span style={{ marginRight: '1rem' }}>
+            <Button basic icon labelPosition="left">
+              <Icon name="eye" />
+              Hide Courses
+            </Button>
+          </span>
+        }
+      >
+        <Modal.Header>Hide degree courses</Modal.Header>
+        <Modal.Content image>
+          <Modal.Description>
+            <DegreeCoursesTable studyProgramme={query.studyRights.programme} />
+          </Modal.Description>
+        </Modal.Content>
+      </Modal>
+    )
+  }
 }
 
 PopulationCourses.defaultPropTypes = {
