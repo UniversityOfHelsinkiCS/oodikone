@@ -734,7 +734,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
     ...statistics,
     coursecode,
     alternatives: uniqueCodes,
-    name: course.name.fi
+    name: course.name
   }
 }
 
@@ -845,6 +845,7 @@ const byNameAndOrCodeLike = async (name, code) => {
       ...codeLikeTerm(code)
     }
   })
+  console.log(courses)
 
   const groups = {}
   const groupMeta = {}

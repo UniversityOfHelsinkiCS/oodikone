@@ -3,10 +3,13 @@ import { connect } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
 import { shape, arrayOf, oneOfType, number, string } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
+import useLanguage from '../../LanguagePicker/useLanguage'
 import selectors from '../../../selectors/courseStats'
+import { getTextIn } from '../../../common'
 
 const SingleCourseTab = ({ selected, stats, courses }) => {
   const [selection, setSelection] = useState(selected)
+  const { language } = useLanguage()
 
   useEffect(() => {
     setSelection(selected)
@@ -33,7 +36,10 @@ const SingleCourseTab = ({ selected, stats, courses }) => {
           <Label.Group>
             <Label
               key={stats[selection].coursecode}
-              content={`${stats[selection].alternatives.map(code => ` ${code}`)} ${stats[selection].name} `}
+              content={`${stats[selection].alternatives.map(code => ` ${code}`)} ${getTextIn(
+                stats[selection].name,
+                language
+              )} `}
             />
           </Label.Group>
         </Form>
