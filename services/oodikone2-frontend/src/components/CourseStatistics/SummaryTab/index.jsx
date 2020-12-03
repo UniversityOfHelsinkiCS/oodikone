@@ -70,7 +70,11 @@ SummaryTab.propTypes = {
   statistics: arrayOf(
     shape({
       coursecode: oneOfType([number, string]),
-      name: string,
+      name: shape({
+        fi: string,
+        en: string,
+        sv: string
+      }),
       summary: shape({
         failed: number,
         passed: number,
