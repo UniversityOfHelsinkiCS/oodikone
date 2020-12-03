@@ -13,7 +13,7 @@ import CoursePopulationGradeDist from './CoursePopulationGradeDist'
 import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
-import { getStudentToTargetCourseDateMap, getUserIsAdmin } from '../../common'
+import { getStudentToTargetCourseDateMap, getUserIsAdmin, getTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
@@ -111,7 +111,7 @@ const CoursePopulation = ({
     }
   }, [semesters])
 
-  const header = courseData ? `${courseData.name} ${headerYears}` : null
+  const header = courseData ? `${getTextIn(courseData.name, language)} ${headerYears}` : null
   const subHeader = codes.join(', ')
 
   if (!dateFrom || !dateTo) return null
