@@ -845,7 +845,6 @@ const byNameAndOrCodeLike = async (name, code) => {
       ...codeLikeTerm(code)
     }
   })
-  console.log(courses)
 
   const groups = {}
   const groupMeta = {}
