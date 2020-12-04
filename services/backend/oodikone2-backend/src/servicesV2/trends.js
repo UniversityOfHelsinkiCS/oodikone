@@ -153,8 +153,9 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
                     ON credit.student_studentnumber = studyright.student_studentnumber
             WHERE
                 studyright.extentcode = 1 -- Bachelor's
+                AND org.code NOT IN ('01', 'H02955')
                 AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
-                AND studyright.studystartdate IN ('2017-07-31 21:00:00+00', '2018-07-31 21:00:00+00', '2019-07-31 21:00:00+00')
+                -- AND studyright.studystartdate IN ('2017-07-31 21:00:00+00', '2018-07-31 21:00:00+00', '2019-07-31 21:00:00+00')
                 AND element_details.type IN (20,30) -- programme
                 ${!!codes && codes.length > 0 ? 'AND element_details.code IN (:codes)' : ''}
                 AND transfers.studyrightid IS NULL -- Not transferred within faculty
@@ -528,7 +529,6 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   }, {})
 
   const providerToProgramme = elementDetails.reduce((res, curr) => {
-    console.log(curr)
     const [p] = mapToProviders([curr.code])
     res[p] = {
       code: curr.code,
@@ -536,8 +536,6 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     }
     return res
   }, {})
-
-  //console.log(providerToProgramme)
 
   /* Calculate course level stats and group by providers */
   const coursesGroupedByProvider = Object.entries(
@@ -575,13 +573,10 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     )
     return acc
   }, {})
-  //console.log(coursesGroupedByProvider)
 
   /* Map providers into proper programmes and calculate programme level stats */
   const groupedByProgramme = Object.entries(coursesGroupedByProvider).reduce((acc, [organizationcode, courses]) => {
-    //console.log(organizationcode)
     const programme = providerToProgramme[organizationcode]
-    // console.log(programme)
     const courseValues = Object.values(courses)
     const yearlyValues = courseValues.map(c => c.yearly)
     if (programme && programme.code) {
@@ -595,8 +590,6 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     }
     return acc
   }, {})
-
-  // console.log(groupedByProgramme)
 
   /* Group programmes into faculties and calculate faculty level stats */
   const groupedByFaculty = Object.entries(groupedByProgramme).reduce((acc, [programmeCode, programmeStats]) => {
@@ -620,7 +613,6 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     })
     return acc
   }, {})
-  // console.log(groupedByFaculty)
 
   return groupedByFaculty
 }
