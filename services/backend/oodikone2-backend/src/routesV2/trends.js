@@ -7,9 +7,7 @@ const {
   getUber,
   getStartYears,
   getGraduatedStatus
-} = require('../services/coolDataScience')
-const useSisRouter = require('../util/useSisRouter')
-const trendsV2 = require('../routesV2/trends')
+} = require('../servicesV2/trends')
 
 router.get('/start-years', async (req, res) => {
   const years = await getStartYears()
@@ -78,4 +76,4 @@ router.get(
   })
 )
 
-module.exports = useSisRouter(trendsV2, router)
+module.exports = router
