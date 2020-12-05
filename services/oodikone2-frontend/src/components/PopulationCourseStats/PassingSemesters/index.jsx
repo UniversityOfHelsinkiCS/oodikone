@@ -1,51 +1,21 @@
 import React, { useState } from 'react'
-import { Table, Checkbox } from 'semantic-ui-react'
+import { Table } from 'semantic-ui-react'
 import { func, instanceOf } from 'prop-types'
-import CourseRow from './CourseRow'
-import TSA from '../../../common/tsa'
+import PassingSemesterRow from './PassingSemesterRow'
 import CollapsibleModuleTable from '../CollapsibleModuleTable'
+import PassingSemestersHeader from './PassingSemestersHeader'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
+import CumulativeCheckbox from './CumulativeCheckbox'
 
 const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
-  const { modules, onCourseNameCellClick, isActiveCourse, filterInput } = UsePopulationCourseContext()
+  const { modules, onCourseNameCellClick, isActiveCourse } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
-
-  const handleChange = () => {
-    TSA.Matomo.sendEvent(
-      'Population statistics',
-      'Courses of Population toggle cumulative when passed stats',
-      cumulativeStats ? 'false' : 'true'
-    )
-    // eslint-disable-next-line react/no-access-state-in-setstate
-    setCumulativeStats(!cumulativeStats)
-  }
 
   return (
     <div>
-      <Checkbox toggle checked={cumulativeStats} onChange={handleChange} label="Show cumulative stats" />
+      <CumulativeCheckbox cumulativeStats={cumulativeStats} setCumulativeStats={setCumulativeStats} />
       <Table celled className="fixed-header">
-        <Table.Header>
-          <Table.Row>
-            {filterInput('nameFilter', 'Name', '3')}
-            {filterInput('codeFilter', 'Code')}
-
-            <Table.HeaderCell>Students</Table.HeaderCell>
-            <Table.HeaderCell>Passed</Table.HeaderCell>
-
-            <Table.HeaderCell>Before 1st year</Table.HeaderCell>
-            <Table.HeaderCell>1st fall</Table.HeaderCell>
-            <Table.HeaderCell>1st spring</Table.HeaderCell>
-            <Table.HeaderCell>2nd fall</Table.HeaderCell>
-            <Table.HeaderCell>2nd spring</Table.HeaderCell>
-            <Table.HeaderCell>3rd fall</Table.HeaderCell>
-            <Table.HeaderCell>3rd spring</Table.HeaderCell>
-            <Table.HeaderCell>4th fall</Table.HeaderCell>
-            <Table.HeaderCell>4th spring</Table.HeaderCell>
-            <Table.HeaderCell>5th year</Table.HeaderCell>
-            <Table.HeaderCell>6th year</Table.HeaderCell>
-            <Table.HeaderCell>Later</Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
+        <PassingSemestersHeader />
         <Table.Body>
           <CollapsibleModuleTable
             modules={modules}
@@ -55,7 +25,7 @@ const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
           >
             {courses =>
               courses.map(stats => (
-                <CourseRow
+                <PassingSemesterRow
                   key={stats.course.code}
                   statistics={stats}
                   isActiveCourseFn={isActiveCourse}
