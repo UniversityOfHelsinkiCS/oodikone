@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, string, bool } from 'prop-types'
-import PopulationCourseStats from '../../PopulationCourseStats'
+import PopulationCourseStatsFlat from '../../PopulationCourseStats/PopulationCourseStatsFlat'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
 const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, error }) => {
@@ -19,7 +19,7 @@ const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, er
   }, [])
 
   return (
-    <PopulationCourseStats
+    <PopulationCourseStatsFlat
       courses={courses}
       query={query}
       pending={pending}

@@ -62,7 +62,7 @@ const renderCumulativeStatistics = passingSemesters => (
   </Fragment>
 )
 
-const CourseRow = ({ statistics, cumulative, onCourseNameClickFn }) => {
+const PassingSemesterRow = ({ statistics, cumulative, onCourseNameClickFn }) => {
   const { language } = useLanguage()
   const { courseIsSelected } = useCourseFilter()
   const { stats, course } = statistics
@@ -102,7 +102,7 @@ const CourseRow = ({ statistics, cumulative, onCourseNameClickFn }) => {
   )
 }
 
-CourseRow.propTypes = {
+PassingSemesterRow.propTypes = {
   statistics: shape({
     course: shape({ code: string, name: shape({}) }),
     stats: shape({
@@ -116,4 +116,4 @@ CourseRow.propTypes = {
   onCourseNameClickFn: func.isRequired
 }
 
-export default CourseRow
+export default PassingSemesterRow
