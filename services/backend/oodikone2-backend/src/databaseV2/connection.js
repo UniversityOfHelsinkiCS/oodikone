@@ -31,6 +31,7 @@ class DbConnection extends EventEmitter {
         return
       }
       console.log(`Sis database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
+      console.log(e)
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }
