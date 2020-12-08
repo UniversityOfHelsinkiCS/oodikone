@@ -8,6 +8,7 @@ import { getUserRoles, setMocking, setTestUser, setTestUserSIS, getTestUserSIS, 
 import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
+import { useIsAdmin } from '../../common/hooks'
 
 const { USER_ADMINER_URL, ADMINER_URL, ANALYTICS_ADMINER_URL, KONE_ADMINER_URL, SIS_ADMINER_URL } = process.env
 
@@ -41,6 +42,7 @@ const allNavigationItems = {
 
 const NavigationBar = props => {
   const { logout, userRoles, rights, mockedBy, userId } = props
+  const isAdmin = useIsAdmin()
 
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
@@ -179,7 +181,6 @@ const NavigationBar = props => {
       AT YOUR OWN RISK
     </Menu.Item>
   )
-  const showSISSwitch = process.env.TAG === 'staging' || process.env.NODE_ENV === 'development'
 
   return (
     <Menu stackable fluid className="navBar">
@@ -187,7 +188,7 @@ const NavigationBar = props => {
       {renderNavigationRoutes()}
       {renderUserMenu()}
       {renderLanguagePicker()}
-      {showSISSwitch && renderSISSwitch(!!getTestUserSIS())}
+      {isAdmin && renderSISSwitch(!!getTestUserSIS())}
       {mockedBy && renderStopMockingButton()}
       {getTestUserSIS() && renderSISWarning()}
     </Menu>
