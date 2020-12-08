@@ -179,7 +179,6 @@ const NavigationBar = props => {
       AT YOUR OWN RISK
     </Menu.Item>
   )
-  const showSISSwitch = process.env.TAG === 'staging' || process.env.NODE_ENV === 'development'
 
   return (
     <Menu stackable fluid className="navBar">
@@ -187,7 +186,7 @@ const NavigationBar = props => {
       {renderNavigationRoutes()}
       {renderUserMenu()}
       {renderLanguagePicker()}
-      {showSISSwitch && renderSISSwitch(!!getTestUserSIS())}
+      {renderSISSwitch(!!getTestUserSIS())}
       {mockedBy && renderStopMockingButton()}
       {getTestUserSIS() && renderSISWarning()}
     </Menu>
