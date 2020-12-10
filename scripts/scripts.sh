@@ -13,6 +13,7 @@ PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
 KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
+SIS_REAL_DB_BACKUP="$BACKUP_DIR/latest-sis.sqz"
 
 docker-compose-dev () {
     npm run docker:oodikone:dev -- "$@"
@@ -75,8 +76,8 @@ db_setup_full () {
     restore_psql_from_backup $USER_REAL_DB_BACKUP oodi_user_db user_db_real
     ping_psql "oodi_analytics_db" "analytics_db_real"
     restore_psql_from_backup $ANALYTICS_REAL_DB_BACKUP oodi_analytics_db analytics_db_real
-    # echo "Restoring MongoDB from backup"
-    # retry restore_mongodb_from_backup
+    ping_psql "db_sis" "db_sis_real"
+    restore_psql_from_backup $SIS_REAL_DB_BACKUP db_sis db_sis_real
     echo "Database setup finished"
 }
 
@@ -102,7 +103,7 @@ db_anon_setup_full () {
 
 reset_real_db () {
     docker-compose-dev down
-    docker-compose-dev up -d db user_db db_kone analytics_db
+    docker-compose-dev up -d db user_db db_kone analytics_db db_sis
     db_setup_full
     docker-compose-dev down
 }
@@ -158,7 +159,7 @@ run_full_setup () {
     echo "Building images"
     docker-compose-dev build
     echo "Setup oodikone db from dump."
-    docker-compose-dev up -d db user_db db_kone analytics_db
+    docker-compose-dev up -d db user_db db_kone analytics_db db_sis
     db_setup_full
     db_anon_setup_full
     docker-compose-dev down

@@ -175,6 +175,12 @@ npm run cypress:open
 
 ## Other commands
 
+### Start updater
+
+```bash
+npm run docker:updater:dev up
+```
+
 ### How to `scp` backup files from oodikone via melkki-proxy
 
 This is how the setup script fetches the database dump from production servers. It will require you to have access to both melkki.cs.helsinki.fi as well as oodikone.cs.helsinki.fi. The command uses `scp` to transfer all backup files recursively from a known location on the production server by using the melkki server as a proxy, allowing you to get the dump even if you are not in the university network.
