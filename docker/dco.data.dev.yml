@@ -13,7 +13,7 @@ services:
       - "-c"
       - "max_wal_size=8GB"
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=db_sis
+      - POSTGRES_MULTIPLE_DATABASES=db_sis,db_sis_real
     restart: unless-stopped
 
   adminer:
