@@ -1,6 +1,6 @@
 const express = require('express')
 require('express-async-errors')
-const { scheduleMeta, scheduleStudents, scheduleProgrammes } = require('./scheduler')
+const { scheduleMeta, scheduleStudents, scheduleProgrammes, scheduleByStudentNumbers } = require('./scheduler')
 const { getStructure } = require('./explorer')
 const { getCourses } = require('./courseParser')
 const { SECRET_TOKEN } = require('./config')
@@ -45,6 +45,11 @@ app.get('/v1/students', async (_, res) => {
 app.get('/v1/programmes', async (_, res) => {
   await scheduleProgrammes()
   res.locals.msg('Scheduled programmes')
+})
+
+app.post('/v1/students', async (req, res) => {
+  await scheduleByStudentNumbers(req.body.studentnumbers)
+  res.locals.msg('Scheduled studentnumbers')
 })
 
 app.get('/v1/structure/:code', async (req, res) => {
