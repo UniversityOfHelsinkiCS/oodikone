@@ -95,6 +95,7 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
     <Table>
       <Table.Header>
         <Table.HeaderCell>Name</Table.HeaderCell>
+        <Table.HeaderCell>Code</Table.HeaderCell>
         <Table.HeaderCell>Label</Table.HeaderCell>
         <Table.HeaderCell>Set visibility</Table.HeaderCell>
       </Table.Header>
@@ -106,6 +107,7 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
                 <Icon name={visible[module] ? 'angle down' : 'angle right'} />
                 <b>{courses[0].label_name ? getTextIn(courses[0].label_name, language) : module}</b>
               </Table.Cell>
+              <Table.Cell>{module}</Table.Cell>
               <Table.Cell>
                 <Label
                   content={calculateModuleVisibility(module)}
@@ -117,20 +119,23 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
               </Table.Cell>
             </Table.Row>
             {visible[module] &&
-              courses.map(course => (
-                <Table.Row key={`${module}/${course.code}`}>
-                  <Table.Cell>{getTextIn(course.name, language)}</Table.Cell>
-                  <Table.Cell>
-                    <Label
-                      content={course.visible.visibility ? 'visible' : 'hidden'}
-                      color={course.visible.visibility ? 'green' : 'red'}
-                    />
-                  </Table.Cell>
-                  <Table.Cell>
-                    {course.visible.visibility ? setExclusionButton(course.code) : deleteButton(course.visible.id)}
-                  </Table.Cell>
-                </Table.Row>
-              ))}
+              courses
+                .sort((a, b) => a.code.localeCompare(b.code))
+                .map(course => (
+                  <Table.Row key={`${module}/${course.code}`}>
+                    <Table.Cell>{getTextIn(course.name, language)}</Table.Cell>
+                    <Table.Cell>{course.code}</Table.Cell>
+                    <Table.Cell>
+                      <Label
+                        content={course.visible.visibility ? 'visible' : 'hidden'}
+                        color={course.visible.visibility ? 'green' : 'red'}
+                      />
+                    </Table.Cell>
+                    <Table.Cell>
+                      {course.visible.visibility ? setExclusionButton(course.code) : deleteButton(course.visible.id)}
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
           </>
         ))}
       </Table.Body>
