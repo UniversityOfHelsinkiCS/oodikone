@@ -91,15 +91,13 @@ const PopulationCourses = ({
     return (
       <Modal
         size="large"
-        closeIcon
-        onClose={() => setOpen(false)}
         onOpen={() => setOpen(true)}
         open={open}
         trigger={
           <span style={{ marginRight: '1rem' }}>
             <Button basic icon labelPosition="left">
               <Icon name="eye" />
-              Hide Courses
+              Manage Courses Shown
             </Button>
           </span>
         }
@@ -108,6 +106,10 @@ const PopulationCourses = ({
         <Modal.Content image>
           <Modal.Description>
             <DegreeCoursesTable studyProgramme={query.studyRights.programme} />
+            <Button onClick={() => setOpen(false)} icon labelPosition="left">
+              <Icon name="save" />
+              Save & Close
+            </Button>
           </Modal.Description>
         </Modal.Content>
       </Modal>
