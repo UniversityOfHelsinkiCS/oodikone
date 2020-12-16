@@ -21,6 +21,7 @@ import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
+import FilterDegreeCoursesModal from '../PopulationCourses/FilterDegreeCoursesModal'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
 import info from '../../common/markdown/populationStatistics/students.info.md'
 import infoForCoursePop from '../../common/markdown/coursePopulation/students.info.md'
@@ -383,10 +384,13 @@ class PopulationStudents extends Component {
     return (
       <Ref innerRef={this.handleRef}>
         <>
+          <span style={{ marginRight: '0.5rem' }}>
+            <InfoBox content={this.props.coursePopulation ? infoForCoursePop : info} />
+          </span>
           {this.state.admin ? (
             <CheckStudentList students={this.props.filteredStudents.map(stu => stu.studentNumber)} />
           ) : null}
-          <InfoBox content={this.props.coursePopulation ? infoForCoursePop : info} />
+          <FilterDegreeCoursesModal studyProgramme={this.props.queryStudyrights[0]} />
           {this.renderStudentTable()}
         </>
       </Ref>
