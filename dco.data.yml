@@ -59,8 +59,15 @@ services:
       TEST_DB_SCHEMA: updater_test
     container_name: updater_writer
 
+  sis-importer-db:
+    image: postgres:9.6.3
+    volumes:
+      - sis-importer-pgdata:/var/lib/postgresql/data
+    container_name: sis-importer-db
+
 volumes:
   datastore:
   pgdata:
   pgdata_sis:
   redis-data:
+  sis-importer-pgdata:
