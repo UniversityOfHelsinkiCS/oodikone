@@ -14,8 +14,16 @@ const {
   REDIS_LATEST_MESSAGE_RECEIVED
 } = require('./config')
 
+let cancelled = false
+let i = 0
+
 const handleMessage = messageHandler => async msg => {
   try {
+    if (cancelled) {
+      console.log('vroom vroom', i++)
+      msg.ack()
+      return
+    } 
     await messageHandler(JSON.parse(msg.getData()))
   } catch (e) {
     logger.error({ message: 'Failed handling message', meta: e.stack })
@@ -26,6 +34,17 @@ const handleMessage = messageHandler => async msg => {
     } catch (e) {
       logger.error({ message: 'Failed acking message', meta: e.stack })
     }
+  }
+}
+
+const handleInfoMessage = async msg => {
+  if (msg.getData() === 'ABORT') {
+    console.log('aborting')
+    cancelled = true
+    setTimeout(() => {
+      cancelled = false
+    }, 20000)
+    msg.ack()
   }
 }
 
@@ -84,4 +103,7 @@ dbConnections.on('connect', async () => {
   purgeChannel.on('error', e => {
     logger.error({ message: 'Purge channel error', meta: e.stack })
   })
+
+  const infoChannel = stan.subscribe('SIS_INFO_CHANNEL', NATS_GROUP, opts)
+  infoChannel.on('message', handleInfoMessage)
 })
