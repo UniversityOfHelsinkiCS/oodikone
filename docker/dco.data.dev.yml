@@ -26,6 +26,3 @@ services:
       - 5050:8080
     container_name: adminer
     restart: unless-stopped
-
-networks:
-  default:
