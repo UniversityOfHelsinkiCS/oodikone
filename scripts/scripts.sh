@@ -49,7 +49,11 @@ get_anon_oodikone() {
 }
 
 restore_psql_from_backup () {
+    echo ""
+    echo "Restoring database from backup ($1/$2):"
+    echo "  1. Copying dump..."
     docker cp $1 $2:/asd.sqz
+    echo "  2. Writing database..."
     docker exec $2 pg_restore -U postgres --no-owner -F c --dbname=$3 -j4 /asd.sqz
 }
 
@@ -57,13 +61,15 @@ ping_psql () {
     drop_psql $1 $2
     echo "Creating psql in container $1 with db name $2"
     retry docker exec -u postgres $1 pg_isready --dbname=$2
-    docker exec -u postgres $1 psql -c "CREATE DATABASE $2" || echo "container $1 DB $2 already exists"
+    #docker exec -u postgres $1 psql -c "CREATE DATABASE $2" || echo "container $1 DB $2 already exists"
+    docker exec -u postgres $1 createdb $2 || echo "container $1 DB $2 already exists"
 }
 
 drop_psql () {
     echo "Dropping psql in container $1 with db name $2"
     retry docker exec -u postgres $1 pg_isready --dbname=$2
-    docker exec -u postgres $1 psql -c "DROP DATABASE $2" || echo "container $1 DB $2 doesn't exists"
+    #docker exec -u postgres $1 psql -c "DROP DATABASE $2" || echo "container $1 DB $2 doesn't exists"
+    docker exec -u postgres $1 dropdb $2 || echo "container $1 DB $2 does not exist"
 }
 
 db_setup_full () {
@@ -81,8 +87,20 @@ db_setup_full () {
     echo "Database setup finished"
 }
 
+run_importer_setup () {
+    echo "Setting up importer database."
+    echo "Enter your Uni Helsinki username:"
+    read username
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@importer:/home/importer_user/importer-db/backup/importer-db.sqz "$BACKUP_DIR/"
+    docker-compose -f dco.data.yml up -d sis-importer-db
+    ping_psql "sis-importer-db" "importer-db"
+    restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
+    docker-compose -f dco.data.yml down
+}
+
 db_anon_setup_full () {
     echo "Restoring PostgreSQL from backup"
+    
     ping_psql "oodi_db" "tkt_oodi"
     ping_psql "oodi_db" "tkt_oodi_test"
     restore_psql_from_backup $PSQL_DB_BACKUP oodi_db tkt_oodi
@@ -96,8 +114,7 @@ db_anon_setup_full () {
 
     ping_psql "oodi_analytics_db" "analytics_db"
     restore_psql_from_backup $ANALYTICS_DB_BACKUP oodi_analytics_db analytics_db
-    # echo "Restoring MongoDB from backup"
-    # retry restore_mongodb_from_backup
+
     echo "Database setup finished"
 }
 
@@ -110,7 +127,7 @@ reset_real_db () {
 
 reset_db () {
     docker-compose-dev down
-    docker-compose-dev up -d db user_db db_kone analytics_db
+    docker-compose-dev up -d db user_db db_kone analytics_db db_sis
     db_anon_setup_full
     docker-compose-dev down
 }
