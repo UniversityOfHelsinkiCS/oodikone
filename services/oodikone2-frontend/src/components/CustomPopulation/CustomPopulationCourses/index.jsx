@@ -4,11 +4,11 @@ import { shape, arrayOf, string, bool } from 'prop-types'
 import PopulationCourseStatsFlat from '../../PopulationCourseStats/PopulationCourseStatsFlat'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
-const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, error }) => {
+const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, error, showFilter }) => {
   const { setCoursesOnce, resetCourses } = useCourseFilter()
 
   useEffect(() => {
-    if (!pending && !error) {
+    if (!pending && !error && courses.coursestatistics) {
       setCoursesOnce(courses.coursestatistics)
     }
   }, [courses])
@@ -25,6 +25,7 @@ const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, er
       pending={pending}
       selectedStudents={selectedStudents}
       customPopulation
+      showFilter={showFilter}
     />
   )
 }
@@ -34,7 +35,8 @@ CustomPopulationCourses.propTypes = {
   courses: shape([]).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   query: shape({}).isRequired,
-  error: bool.isRequired
+  error: bool.isRequired,
+  showFilter: bool
 }
 
 const mapStateToProps = ({ populationCourses }) => ({
