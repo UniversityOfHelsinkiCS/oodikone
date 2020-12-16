@@ -42,7 +42,9 @@
     "docker:obliterate": "docker stop $(docker ps -aq) ; docker rmi -f $(docker images -a -q) ; docker system prune -a",
     "start": "npm run docker:up && npm run docker:logs",
     "start:real": "npm run docker:oodikone:real -- up -d && npm run docker:oodikone:real -- logs -f",
-    "start:updater": "npm run docker:up -- --scale sis-updater-worker=4 sis-updater-scheduler sis-updater-worker db_sis sis-updater-nats db adminer redis && npm run docker:logs -- --tail=\"1000\""
+    "start:updater": "npm run docker:up -- --scale sis-updater-worker=4 sis-updater-scheduler sis-updater-worker db_sis sis-updater-nats db adminer redis && npm run docker:logs -- --tail=\"1000\"",
+    "updater:dev:up": "npm run docker:updater:real -- up",
+    "updater:dev:down": "npm run docker:updater:real -- down --remove-orphans"
   },
   "husky": {
     "hooks": {
