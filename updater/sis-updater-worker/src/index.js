@@ -1,3 +1,4 @@
+const { debounce } = require('lodash')
 const { stan, opts } = require('./utils/stan')
 const { dbConnections } = require('./db/connection')
 const { update, purge } = require('./updater')
@@ -14,14 +15,19 @@ const {
   REDIS_LATEST_MESSAGE_RECEIVED
 } = require('./config')
 
-let cancelled = false
-let i = 0
+let abortingMessages = false
+
+const resetAbortTimer = debounce(() => {
+  abortingMessages = false
+  logger.info({ message: 'Scheduled messages are enabled again' })
+}, 5000)
 
 const handleMessage = messageHandler => async msg => {
   try {
-    if (cancelled) {
-      console.log('vroom vroom', i++)
+    if (abortingMessages) {
+      logger.info({ message: 'Aborting scheduled message' })
       msg.ack()
+      resetAbortTimer()
       return
     } 
     await messageHandler(JSON.parse(msg.getData()))
@@ -39,11 +45,8 @@ const handleMessage = messageHandler => async msg => {
 
 const handleInfoMessage = async msg => {
   if (msg.getData() === 'ABORT') {
-    console.log('aborting')
-    cancelled = true
-    setTimeout(() => {
-      cancelled = false
-    }, 20000)
+    logger.info({ message: 'Starting to abort scheduled messages' })
+    abortingMessages = true
     msg.ack()
   }
 }
