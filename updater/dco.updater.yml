@@ -75,8 +75,6 @@ services:
     depends_on:
       - redis
       - sis-updater-nats
-    networks:
-      - importer
 
   sis-updater-worker:
     build:
@@ -96,15 +94,7 @@ services:
     depends_on:
       - redis
       - sis-updater-nats
-    networks:
-      - importer
 
 volumes:
   mongodata:
   sis-updater-datastore:
-
-
-networks:
-  importer:
-    external: 
-      name: importer_network
