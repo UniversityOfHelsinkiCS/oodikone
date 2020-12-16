@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import DegreeCoursesTable from '../StudyProgramme/DegreeCourses'
-import { Button, Icon, Modal } from 'semantic-ui-react'
 import { string } from 'prop-types'
+import { Button, Icon, Modal } from 'semantic-ui-react'
+import DegreeCoursesTable from '../StudyProgramme/DegreeCourses'
 
 const FilterDegreeCoursesModal = ({ studyProgramme }) => {
   const [open, setOpen] = useState(false)

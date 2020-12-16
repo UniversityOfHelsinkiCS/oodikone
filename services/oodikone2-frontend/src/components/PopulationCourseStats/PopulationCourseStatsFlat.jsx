@@ -376,6 +376,10 @@ PopulationCourseStats.propTypes = {
   showFilter: bool
 }
 
+PopulationCourseStats.defaultProps = {
+  showFilter: false
+}
+
 const mapStateToProps = state => {
   const { years } = state.semesters.data
   const isAdmin = getUserIsAdmin(state.auth.token.roles)

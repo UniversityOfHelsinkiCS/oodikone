@@ -291,7 +291,8 @@ CoursePopulation.propTypes = {
     semesters: shape({}),
     years: shape({})
   }).isRequired,
-  getFacultiesDispatch: func.isRequired
+  getFacultiesDispatch: func.isRequired,
+  getCustomPopulationCoursesByStudentnumbers: func.isRequired
 }
 
 const mapStateToProps = ({

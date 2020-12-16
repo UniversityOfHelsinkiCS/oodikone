@@ -39,6 +39,10 @@ CustomPopulationCourses.propTypes = {
   showFilter: bool
 }
 
+CustomPopulationCourses.defaultProps = {
+  showFilter: false
+}
+
 const mapStateToProps = ({ populationCourses }) => ({
   courses: populationCourses.data,
   pending: populationCourses.pending,
