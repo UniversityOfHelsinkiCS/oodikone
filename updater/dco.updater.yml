@@ -60,9 +60,9 @@ services:
       REDIS_URI: //redis:6379
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
       SIS_NATS_TOKEN: dev
-      SIS_IMPORTER_HOST: importer-db
-      SIS_IMPORTER_USER: dev
-      SIS_IMPORTER_PASSWORD: dev
+      SIS_IMPORTER_HOST: sis-importer-db
+      SIS_IMPORTER_USER: postgres
+      SIS_IMPORTER_PASSWORD: postgres
       SIS_IMPORTER_DATABASE: importer-db
       SECRET_TOKEN: dev
       # LOG_HOST: host.docker.internal
@@ -84,9 +84,9 @@ services:
       DB_URL: postgres://postgres@db_sis:5432/db_sis
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
       SIS_NATS_TOKEN: dev
-      SIS_IMPORTER_HOST: importer-db
-      SIS_IMPORTER_USER: dev
-      SIS_IMPORTER_PASSWORD: dev
+      SIS_IMPORTER_HOST: sis-importer-db
+      SIS_IMPORTER_USER: postgres
+      SIS_IMPORTER_PASSWORD: postgres
       SIS_IMPORTER_DATABASE: importer-db
       # LOG_HOST: host.docker.internal
       # LOG_HOSTNAME: sis-updater-worker

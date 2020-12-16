@@ -340,14 +340,19 @@ function PopulationCourseStats(props) {
   if (pending) {
     return null
   }
+
+  const { showFilter = true } = props
+
   return (
     <div>
-      <Form>
-        <Form.Field inline>
-          <label>Limit to courses where student number at least</label>
-          <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
-        </Form.Field>
-      </Form>
+      {showFilter && (
+        <Form>
+          <Form.Field inline>
+            <label>Limit to courses where student number at least</label>
+            <Input defaultValue={state.studentAmountLimit} onChange={onStudentAmountLimitChange} />
+          </Form.Field>
+        </Form>
+      )}
       <PopulationCourseContext.Provider value={contextValue}>
         <Tab panes={panes} />
       </PopulationCourseContext.Provider>
@@ -367,7 +372,12 @@ PopulationCourseStats.propTypes = {
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  years: shape({}) // eslint-disable-line
+  years: shape({}), // eslint-disable-line
+  showFilter: bool
+}
+
+PopulationCourseStats.defaultProps = {
+  showFilter: false
 }
 
 const mapStateToProps = state => {
