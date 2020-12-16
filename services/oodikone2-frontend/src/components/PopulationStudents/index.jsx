@@ -21,6 +21,7 @@ import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
+import FilterDegreeCoursesModal from '../PopulationCourses/FilterDegreeCoursesModal'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
 import info from '../../common/markdown/populationStatistics/students.info.md'
 import infoForCoursePop from '../../common/markdown/coursePopulation/students.info.md'
@@ -166,32 +167,12 @@ class PopulationStudents extends Component {
       const label = e.label ? e.label.label : ''
       acc[label] = acc[label] || []
       acc[label].push(e)
-      if (e.label) mandatoryCourseLabels.push(e.label)
-      else mandatoryCourseLabels.push({ id: 'null', label: '' })
+      if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.label_code })
+      else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
       return acc
     }, {})
 
     const sortedlabels = orderBy(uniqBy(mandatoryCourseLabels, l => l.label), [e => e.orderNumber], ['asc'])
-
-    const labelColumns = []
-    labelColumns.push(
-      {
-        key: 'general',
-        title: <b>Labels:</b>,
-        parent: true,
-        headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
-      },
-      ...sortedlabels.map(e => ({
-        key: e.id,
-        title: (
-          <div style={{ overflowX: 'hidden' }}>
-            <div style={{ width: 0 }}>{e.label}</div>
-          </div>
-        ),
-        parent: true,
-        headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber }
-      }))
-    )
 
     const mandatoryTitle = m => {
       return (
@@ -202,6 +183,40 @@ class PopulationStudents extends Component {
         </Fragment>
       )
     }
+
+    const { visibleLabels, visibleCourseCodes } = this.props.mandatoryCourses.reduce(
+      (acc, cur) => {
+        if (cur.visible.visibility) {
+          acc.visibleLabels.add(cur.label_code)
+          acc.visibleCourseCodes.add(cur.code)
+        }
+
+        return acc
+      },
+      { visibleLabels: new Set(), visibleCourseCodes: new Set() }
+    )
+
+    const labelColumns = []
+    labelColumns.push(
+      {
+        key: 'general',
+        title: <b>Labels:</b>,
+        parent: true,
+        headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
+      },
+      ...sortedlabels
+        .filter(({ code }) => visibleLabels.has(code))
+        .map(e => ({
+          key: e.id,
+          title: (
+            <div style={{ overflowX: 'hidden' }}>
+              <div style={{ width: 0 }}>{e.label}</div>
+            </div>
+          ),
+          parent: true,
+          headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber }
+        }))
+    )
 
     const getTotalRowVal = (t, m) => t[m.code]
     const mandatoryCourseColumns = [
@@ -215,20 +230,22 @@ class PopulationStudents extends Component {
               return res ? Number(res[0]) : Number.MAX_VALUE
             },
             'code'
-          ]).map(m => ({
-            key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
-            title: verticalTitle(mandatoryTitle(m)),
-            cellProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
-            headerProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
-            getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
-            getRowContent: s => {
-              if (s.total) return getTotalRowVal(s, m)
-              return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
-            },
-            child: true,
-            childOf: e.label,
-            code: m.code
-          }))
+          ])
+            .filter(course => visibleCourseCodes.has(course.code))
+            .map(m => ({
+              key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
+              title: verticalTitle(mandatoryTitle(m)),
+              cellProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
+              headerProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
+              getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
+              getRowContent: s => {
+                if (s.total) return getTotalRowVal(s, m)
+                return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
+              },
+              child: true,
+              childOf: e.label,
+              code: m.code
+            }))
         )
       )
     ]
@@ -283,31 +300,6 @@ class PopulationStudents extends Component {
                   />
                 )}
               </div>
-              {this.props.mandatoryCourses.length === 0 && (
-                <div
-                  style={{
-                    paddingLeft: '10px',
-                    minHeight: '300px',
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                >
-                  <h3>
-                    No mandatory courses defined. You can define them{' '}
-                    <Link
-                      to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=2`}
-                      onClick={() => {
-                        sendAnalytics('No mandatory courses defined button clicked', 'Mandatory courses tab')
-                      }}
-                    >
-                      here
-                    </Link>
-                    .
-                  </h3>
-                </div>
-              )}
             </div>
           </Tab.Pane>
         )
@@ -392,10 +384,13 @@ class PopulationStudents extends Component {
     return (
       <Ref innerRef={this.handleRef}>
         <>
+          <span style={{ marginRight: '0.5rem' }}>
+            <InfoBox content={this.props.coursePopulation ? infoForCoursePop : info} />
+          </span>
           {this.state.admin ? (
             <CheckStudentList students={this.props.filteredStudents.map(stu => stu.studentNumber)} />
           ) : null}
-          <InfoBox content={this.props.coursePopulation ? infoForCoursePop : info} />
+          <FilterDegreeCoursesModal studyProgramme={this.props.queryStudyrights[0]} />
           {this.renderStudentTable()}
         </>
       </Ref>

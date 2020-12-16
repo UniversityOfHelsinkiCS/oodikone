@@ -24,9 +24,9 @@ options=(
     "Set up with real data."
     "Reset anonymous database."
     "Reset real data database."
-    "Download latest anonynmous data."
+    "Download latest anonymous data."
     "Download latest real data."
-    "Setup SIS data."
+    "Set up importer-db."
     "Quit."
 )
 
@@ -36,6 +36,7 @@ while true; do
             "Set up with anonymous data.")
                 mopo
                 run_anon_full_setup
+                ./scripts/populate-db.sh
                 ;;
             "Set up with real data.")
                 mopo
@@ -43,18 +44,19 @@ while true; do
                 ;;
             "Reset anonymous database.")
                 reset_db
+                #./scripts/populate-db.sh
                 ;;
             "Reset real data database.")
                 reset_real_db
                 ;;
-            "Download latest anonynmous data.")
+            "Download latest anonymous data.")
                 get_anon_oodikone
                 ;;
             "Download latest real data.")
                 get_oodikone_server_backup
                 ;;
-            "Setup SIS data.")
-                ./scripts/populate-db.sh
+            "Set up importer-db.")
+                run_importer_setup
                 ;;
             "Quit.")
                 break 2

@@ -1,6 +1,7 @@
 const express = require('express')
 require('express-async-errors')
-const { scheduleMeta, scheduleStudents, scheduleProgrammes } = require('./scheduler')
+const { stan } = require('./utils/stan')
+const { scheduleMeta, scheduleStudents, scheduleProgrammes, scheduleByStudentNumbers } = require('./scheduler')
 const { getStructure } = require('./explorer')
 const { getCourses } = require('./courseParser')
 const { SECRET_TOKEN } = require('./config')
@@ -45,6 +46,21 @@ app.get('/v1/students', async (_, res) => {
 app.get('/v1/programmes', async (_, res) => {
   await scheduleProgrammes()
   res.locals.msg('Scheduled programmes')
+})
+
+app.post('/v1/students', async (req, res) => {
+  await scheduleByStudentNumbers(req.body.studentnumbers)
+  res.locals.msg('Scheduled studentnumbers')
+})
+
+app.get('/v1/abort', async (req, res) => {
+  stan.publish('SIS_INFO_CHANNEL', 'ABORT', err => {
+    if (err) {
+      return res.locals.msg('Error sending abort msg?')
+    }
+
+    res.locals.msg('Abort message sent')
+  })
 })
 
 app.get('/v1/structure/:code', async (req, res) => {

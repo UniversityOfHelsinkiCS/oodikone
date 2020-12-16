@@ -6,12 +6,14 @@ import { Segment, Header, Accordion } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
+import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import { getFaculties } from '../../redux/faculties'
 import { getSemesters } from '../../redux/semesters'
 import PopulationStudents from '../PopulationStudents'
 import CoursePopulationGradeDist from './CoursePopulationGradeDist'
 import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
+import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import ProgressBar from '../ProgressBar'
 import { getStudentToTargetCourseDateMap, getUserIsAdmin, getTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
@@ -32,7 +34,8 @@ const CoursePopulation = ({
   courseData,
   getSemestersDispatch,
   semesters,
-  getFacultiesDispatch
+  getFacultiesDispatch,
+  getCustomPopulationCoursesByStudentnumbers
 }) => {
   const { language } = useLanguage()
   const { setAllStudents, filteredStudents } = useFilters()
@@ -61,6 +64,12 @@ const CoursePopulation = ({
   // Pass students to filter context.
   useEffect(() => {
     setAllStudents(studentData.students || [])
+
+    // Data fetching for courses of population tab
+    if (!studentData.students) return
+    getCustomPopulationCoursesByStudentnumbers({
+      studentnumberlist: studentData.students.map(student => student.studentNumber)
+    })
   }, [studentData.students])
 
   useEffect(() => {
@@ -190,11 +199,29 @@ const CoursePopulation = ({
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Credit gains
+            Courses of population
           </span>
         )
       },
       onTitleClick: () => handleClick(2),
+      content: {
+        content: (
+          <div ref={programmeRef}>
+            <CustomPopulationCourses selectedStudents={selectedStudents} showFilter={false} />
+          </div>
+        )
+      }
+    },
+    {
+      key: 3,
+      title: {
+        content: (
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Credit gains
+          </span>
+        )
+      },
+      onTitleClick: () => handleClick(3),
       content: {
         content: (
           <div ref={creditGainRef}>
@@ -211,7 +238,7 @@ const CoursePopulation = ({
       }
     },
     {
-      key: 3,
+      key: 4,
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -219,7 +246,7 @@ const CoursePopulation = ({
           </span>
         )
       },
-      onTitleClick: () => handleClick(3),
+      onTitleClick: () => handleClick(4),
       content: {
         content: (
           <div ref={studentRef}>
@@ -264,7 +291,8 @@ CoursePopulation.propTypes = {
     semesters: shape({}),
     years: shape({})
   }).isRequired,
-  getFacultiesDispatch: func.isRequired
+  getFacultiesDispatch: func.isRequired,
+  getCustomPopulationCoursesByStudentnumbers: func.isRequired
 }
 
 const mapStateToProps = ({
@@ -291,7 +319,8 @@ export default withRouter(
       getCoursePopulationDispatch: getCoursePopulation,
       getSingleCourseStatsDispatch: getSingleCourseStats,
       getSemestersDispatch: getSemesters,
-      getFacultiesDispatch: getFaculties
+      getFacultiesDispatch: getFaculties,
+      getCustomPopulationCoursesByStudentnumbers
     }
   )(CoursePopulation)
 )
