@@ -111,12 +111,12 @@ const scheduleMeta = async (clean = true) => {
     totalOrganisations +
     totalStudyLevels +
     totalEducationTypes +
-    totalStudyYears +
     creditTypes.length +
     totalCourseUnits +
     totalStudyModules
 
   await redisSet(REDIS_TOTAL_META_KEY, totalMeta)
+  console.log('meta running')
 }
 
 const scheduleStudents = async () => {
@@ -131,6 +131,7 @@ const scheduleStudents = async () => {
   })
 
   await redisSet(REDIS_TOTAL_STUDENTS_KEY, totalStudents)
+  console.log('students running')
 }
 
 const getHourlyPersonsToUpdate = async () => {
@@ -224,6 +225,8 @@ const scheduleProgrammes = async () => {
   createJobs(entityIds, 'programme_modules')
     .then(() => console.log('scheduling programmes', entityIds))
     .catch(e => console.log('Failed upadting modules', e))
+
+  console.log('programmes running')
 }
 
 const scheduleWeekly = async () => {
