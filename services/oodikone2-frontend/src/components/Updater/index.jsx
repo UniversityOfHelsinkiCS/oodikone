@@ -39,6 +39,7 @@ const Updater = () => {
   const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
   const updateSISPopulationStudents = () => apiCall('/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
+  const abortSisUpdater = () => apiCall('/v1/abort?token=dev', 'get')
 
   const statusRef = useRef()
   useEffect(() => {
@@ -90,10 +91,17 @@ const Updater = () => {
       <Form.Button content="Refresh statistics" icon="refresh" onClick={() => refreshStatistics()} />
       <Segment>
         <Header>SIS STUFF WATCHOUT</Header>
-        <Button content="Update SIS Meta" onClick={() => updateSISMeta()} />
-        <Button content="Update SIS Students" onClick={() => updateSISStudents()} />
-        <Button content="Update SIS Programmes" onClick={() => updateSISProgrammes()} />
-        <Button content="Refresh statistics V2" icon="refresh" onClick={() => refreshStatisticsV2()} />
+        <Form>
+          <Form.Group>
+            <Form.Button content="Update SIS Meta" onClick={() => updateSISMeta()} />
+            <Form.Button content="Update SIS Students" onClick={() => updateSISStudents()} />
+            <Form.Button content="Update SIS Programmes" onClick={() => updateSISProgrammes()} />
+            <Form.Button content="Refresh statistics V2" icon="refresh" onClick={() => refreshStatisticsV2()} />
+          </Form.Group>
+          <Form.Group>
+            <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
+          </Form.Group>
+        </Form>
         <Form.Group>
           <TextArea onChange={(_, { value }) => setSISNums(value)} />
           <Form.Button
