@@ -1,4 +1,4 @@
-const startYear = 1900
+const startYear = 1950
 const endYear = 2050
 
 const org = 'hy-university-root-id'

@@ -86,13 +86,6 @@ const scheduleMeta = async (clean = true) => {
     clean
   })
 
-  const totalStudyYears = await scheduleFromDb({
-    table: IMPORTER_TABLES.studyYears,
-    distinct: 'org',
-    pluck: 'org',
-    clean
-  })
-
   const creditTypes = [4, 7, 9, 10]
   await createJobs(creditTypes, 'credit_types')
 
@@ -253,7 +246,6 @@ const schedulePurge = async () => {
     'element_details',
     'organization',
     'semester_enrollments',
-    'semesters',
     'student',
     'studyright',
     'studyright_elements',
