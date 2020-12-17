@@ -18,7 +18,7 @@ for (let year = startYear; year <= endYear; year++) {
       sv: `Hösten ${year}`
     },
     startdate: `${year}-08-01`,
-    enddate: `${year}-01-01`,
+    enddate: `${year+1}-01-01`,
     yearcode,
     org,
     yearname: `${year}-${year+1}`,
