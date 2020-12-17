@@ -10,6 +10,7 @@ const Updater = () => {
   const [messages, setMessages] = useState([])
   const [statuses, setStatuses] = useState(null)
   const [nums, setNums] = useState('')
+  const [SISNums, setSISNums] = useState('')
   useTitle('Updater')
 
   const apiCall = async (url, method, data) => {
@@ -36,6 +37,7 @@ const Updater = () => {
   const updateSISMeta = () => apiCall('/updater/update/v2/meta', 'get')
   const updateSISStudents = () => apiCall('/updater/update/v2/students', 'get')
   const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
+  const updateSISPopulationStudents = () => apiCall('/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
 
   const statusRef = useRef()
@@ -92,6 +94,14 @@ const Updater = () => {
         <Button content="Update SIS Students" onClick={() => updateSISStudents()} />
         <Button content="Update SIS Programmes" onClick={() => updateSISProgrammes()} />
         <Button content="Refresh statistics V2" icon="refresh" onClick={() => refreshStatisticsV2()} />
+        <Form.Group>
+          <TextArea onChange={(_, { value }) => setSISNums(value)} />
+          <Form.Button
+            onClick={updateSISPopulationStudents}
+            content="Update students by student number"
+            icon="refresh"
+          />
+        </Form.Group>
       </Segment>
       <Button content="Clear messages" onClick={() => setMessages([])} />
       <Header>{messages}</Header>
