@@ -15,14 +15,15 @@ const updateOrganisations = async organisations => {
 }
 
 const updateStudyModules = async studyModules => {
+  const hyStudyModules = studyModules.filter(s => !s.university_org_ids.includes('aalto-university-root-id'))
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
-    studyModules.map(s => s.id),
+    hyStudyModules.map(s => s.id),
     'module_id',
     'attainment_date'
   )
   const courseIdToAttainments = groupBy(attainments, 'module_id')
-  const groupIdToCourse = groupBy(studyModules, 'group_id')
+  const groupIdToCourse = groupBy(hyStudyModules, 'group_id')
 
   await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
