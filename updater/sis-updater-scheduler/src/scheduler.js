@@ -86,13 +86,6 @@ const scheduleMeta = async (clean = true) => {
     clean
   })
 
-  const totalStudyYears = await scheduleFromDb({
-    table: IMPORTER_TABLES.studyYears,
-    distinct: 'org',
-    pluck: 'org',
-    clean
-  })
-
   const creditTypes = [4, 7, 9, 10]
   await createJobs(creditTypes, 'credit_types')
 
@@ -118,7 +111,6 @@ const scheduleMeta = async (clean = true) => {
     totalOrganisations +
     totalStudyLevels +
     totalEducationTypes +
-    totalStudyYears +
     creditTypes.length +
     totalCourseUnits +
     totalStudyModules
@@ -231,6 +223,7 @@ const scheduleProgrammes = async () => {
   createJobs(entityIds, 'programme_modules')
     .then(() => console.log('scheduling programmes', entityIds))
     .catch(e => console.log('Failed upadting modules', e))
+
 }
 
 const scheduleWeekly = async () => {
@@ -253,7 +246,6 @@ const schedulePurge = async () => {
     'element_details',
     'organization',
     'semester_enrollments',
-    'semesters',
     'student',
     'studyright',
     'studyright_elements',

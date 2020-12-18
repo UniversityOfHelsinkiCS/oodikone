@@ -4,7 +4,6 @@ const {
   Course,
   CourseType,
   CourseProvider,
-  Semester,
   CreditType,
   StudyrightExtent
 } = require('../db/models')
@@ -16,14 +15,15 @@ const updateOrganisations = async organisations => {
 }
 
 const updateStudyModules = async studyModules => {
+  const hyStudyModules = studyModules.filter(s => !s.university_org_ids.includes('aalto-university-root-id'))
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
-    studyModules.map(s => s.id),
+    hyStudyModules.map(s => s.id),
     'module_id',
     'attainment_date'
   )
   const courseIdToAttainments = groupBy(attainments, 'module_id')
-  const groupIdToCourse = groupBy(studyModules, 'group_id')
+  const groupIdToCourse = groupBy(hyStudyModules, 'group_id')
 
   await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
@@ -71,59 +71,6 @@ const updateCourseTypes = async studyLevels => {
   await bulkCreate(CourseType, studyLevels.map(mapCourseType))
 }
 
-const updateSemesters = async studyYears => {
-  // TIME TO HACK
-  const startYear = 1950
-  const endYear = 2025
-
-  const org = 'hy-university-root-id'
-
-  const semesters = []
-
-  let semestercode = 1
-  let yearcode = 1
-
-  for (let year = startYear; year <= endYear; year++) {
-    semesters.push({
-      composite: `${org}-${semestercode}`,
-      semestercode: semestercode++,
-      name: {
-        en: `Autumn ${year}`,
-        fi: `Syksy ${year}`,
-        sv: `Hösten ${year}`
-      },
-      startdate: `${year}-08-01`,
-      enddate: `${year}-01-01`,
-      yearcode,
-      org,
-      yearname: `${year}-${year+1}`,
-      term_index: 0,
-      start_year: year
-    })
-
-    semesters.push({
-      composite: `${org}-${semestercode}`,
-      semestercode: semestercode++,
-      name: {
-        en: `Spring ${year+1}`,
-        fi: `Kevät ${year+1}`,
-        sv: `Våren ${year+1}`
-      },
-      startdate: `${year+1}-01-01`,
-      enddate: `${year+1}-08-01`,
-      yearcode,
-      org,
-      yearname: `${year}-${year+1}`,
-      term_index: 1,
-      start_year: year
-    })
-    yearcode++;
-  }
-
-  //const semesters = flattenDeep(Object.entries(groupBy(studyYears, 'org')).map(mapSemester))
-  await bulkCreate(Semester, semesters)
-}
-
 const updateCreditTypes = async creditTypes => {
   await bulkCreate(CreditType, creditTypes)
 }
@@ -138,7 +85,6 @@ module.exports = {
   updateStudyModules,
   updateCourseUnits,
   updateCourseTypes,
-  updateSemesters,
   updateCreditTypes,
   updateStudyrightExtents
 }
