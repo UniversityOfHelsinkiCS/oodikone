@@ -5,6 +5,7 @@ import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
+import { useTabChangeAnalytics } from '../../common/hooks'
 import PassingSemesters from './PassingSemesters'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
@@ -110,6 +111,7 @@ function PopulationCourseStats(props) {
   const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
   const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
   const filterAnalytics = useAnalytics()
+  const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Change Courses of population tab')
 
   useEffect(() => {
     if (state && props.courses) {
@@ -288,8 +290,10 @@ function PopulationCourseStats(props) {
     const newExpandedGroups = new Set(expandedGroups)
     if (newExpandedGroups.has(code)) {
       newExpandedGroups.delete(code)
+      sendAnalytics('Collapsed group', code)
     } else {
       newExpandedGroups.add(code)
+      sendAnalytics('Expanded group', code)
     }
     setExpandedGroups(newExpandedGroups)
   }
@@ -384,7 +388,7 @@ function PopulationCourseStats(props) {
   return (
     <div>
       <PopulationCourseContext.Provider value={contextValue}>
-        <Tab panes={panes} />
+        <Tab panes={panes} onTabChange={handleTabChange} />
       </PopulationCourseContext.Provider>
     </div>
   )
