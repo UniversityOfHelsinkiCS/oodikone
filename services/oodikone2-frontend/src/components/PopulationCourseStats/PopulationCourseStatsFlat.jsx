@@ -5,7 +5,6 @@ import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
-import PassingSemesters from './PassingSemesters/PassingSemesterFlat'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
 import TSA from '../../common/tsa'
@@ -312,18 +311,6 @@ function PopulationCourseStats(props) {
       render: () => (
         <div className="menuTab">
           <GradeDistribution />
-        </div>
-      )
-    },
-    {
-      menuItem: 'when passed',
-      render: () => (
-        <div className="menuTab" style={{ marginTop: '0.5em' }}>
-          <PassingSemesters
-            filterInput={renderFilterInputHeaderCell}
-            courseStatistics={courseStatistics}
-            onCourseNameClickFn={onCourseNameCellClick}
-          />
         </div>
       )
     }
