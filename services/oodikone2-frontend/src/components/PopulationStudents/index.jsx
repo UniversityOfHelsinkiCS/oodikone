@@ -390,7 +390,9 @@ class PopulationStudents extends Component {
           {this.state.admin ? (
             <CheckStudentList students={this.props.filteredStudents.map(stu => stu.studentNumber)} />
           ) : null}
-          <FilterDegreeCoursesModal studyProgramme={this.props.queryStudyrights[0]} />
+          {this.props.queryStudyrights[0] && (
+            <FilterDegreeCoursesModal studyProgramme={this.props.queryStudyrights[0]} />
+          )}
           {this.renderStudentTable()}
         </>
       </Ref>
