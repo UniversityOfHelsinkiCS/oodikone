@@ -73,7 +73,7 @@ const PopulationCourses = ({
   return (
     <Segment basic>
       <InfoBox content={info} />
-      <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />
+      {query.studyRights.programme && <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />}
       <SegmentDimmer isLoading={pending} />
       <PopulationCourseStats
         key={selectedPopulationCourses.query.uuid}
