@@ -77,7 +77,7 @@ const CoursePopulation = ({
   }, [])
 
   useEffect(() => {
-    if (newestIndex) {
+    if (newestIndex && refs[newestIndex]) {
       scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
     }
   }, [activeIndex])
