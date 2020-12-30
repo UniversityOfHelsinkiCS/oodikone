@@ -97,7 +97,7 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       setHonors(filterGrades.length > 1 && inTime)
 
       if (!inTime) {
-        setReason('Did not graduate in time')
+        setReason(degree ? 'Did not graduate in time' : 'Has not graduated')
       } else if (filterGrades.length <= 1) {
         setReason('Module grades too low')
       }
@@ -111,7 +111,7 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       setHonors(filterGrades.length > 1 && inTime)
 
       if (!inTime) {
-        setReason('Did not graduate in time')
+        setReason(degree ? 'Did not graduate in time' : 'Has not graduated')
       } else if (filterGrades.length <= 1) {
         setReason('Module grades too low')
       }
