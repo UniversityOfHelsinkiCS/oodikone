@@ -2,14 +2,22 @@ import React, { useState } from 'react'
 import { string } from 'prop-types'
 import { Button, Icon, Modal } from 'semantic-ui-react'
 import DegreeCoursesTable from '../StudyProgramme/DegreeCourses'
+import sendEvent from '../../common/sendEvent'
+
+const sendAnalytics = sendEvent.common
 
 const FilterDegreeCoursesModal = ({ studyProgramme }) => {
   const [open, setOpen] = useState(false)
 
+  const setModalOpenState = state => {
+    setOpen(state)
+    sendAnalytics('FilterDegreeCoursesModal visibility toggled', state)
+  }
+
   return (
     <Modal
       size="large"
-      onOpen={() => setOpen(true)}
+      onOpen={() => setModalOpenState(true)}
       open={open}
       trigger={
         <span style={{ margin: '0 0.5rem' }}>
@@ -24,7 +32,7 @@ const FilterDegreeCoursesModal = ({ studyProgramme }) => {
       <Modal.Content image>
         <Modal.Description>
           <DegreeCoursesTable studyProgramme={studyProgramme} />
-          <Button onClick={() => setOpen(false)} icon labelPosition="left">
+          <Button onClick={() => setModalOpenState(false)} icon labelPosition="left">
             <Icon name="save" />
             Save & Close
           </Button>
