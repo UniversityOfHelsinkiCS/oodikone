@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Dropdown, Button, Icon } from 'semantic-ui-react'
+import { Card, Dropdown, Button, Icon, Popup } from 'semantic-ui-react'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 import useFilters from '../../useFilters'
@@ -27,7 +27,8 @@ const CourseCard = ({ courseStats }) => {
     },
     {
       label: 'Passed After Failure',
-      func: ({ studentNumber }) => Object.keys(students.retryPassed).includes(studentNumber)
+      func: ({ studentNumber }) => Object.keys(students.retryPassed).includes(studentNumber),
+      info: 'Student passed the course after failing it at least once.'
     },
     {
       label: 'Failed',
@@ -58,9 +59,7 @@ const CourseCard = ({ courseStats }) => {
     return () => removeFilter(name)
   }, [])
 
-  const options = subFilters.map((filter, i) => ({ key: i, text: filter.label, value: i }))
-
-  const onChange = (_, { value }) => setSelectedOption(value)
+  const onClick = (_, { value }) => setSelectedOption(value)
 
   const clear = () => {
     toggleCourseSelection(course.code)
@@ -79,15 +78,29 @@ const CourseCard = ({ courseStats }) => {
         <Card.Description>
           <div>Show:</div>
           <Dropdown
-            options={options}
+            text={subFilters[selectedOption].label}
             value={selectedOption}
-            onChange={onChange}
-            selection
             fluid
             className="mini"
             button
             data-cy={`${name}-dropdown`}
-          />
+          >
+            <Dropdown.Menu>
+              {subFilters.map((option, i) => {
+                if (option.info) {
+                  return (
+                    <Popup
+                      key={option.label}
+                      basic
+                      trigger={<Dropdown.Item text={option.label} value={i} onClick={onClick} />}
+                      content={option.info}
+                    />
+                  )
+                }
+                return <Dropdown.Item key={option.label} text={option.label} value={i} onClick={onClick} />
+              })}
+            </Dropdown.Menu>
+          </Dropdown>
         </Card.Description>
       </Card.Content>
     </Card>
