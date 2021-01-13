@@ -185,7 +185,7 @@ class PopulationStudents extends Component {
 
     const { visibleLabels, visibleCourseCodes } = this.props.mandatoryCourses.reduce(
       (acc, cur) => {
-        if (cur.visible.visibility) {
+        if (cur.visible && cur.visible.visibility) {
           acc.visibleLabels.add(cur.label_code)
           acc.visibleCourseCodes.add(cur.code)
         }
