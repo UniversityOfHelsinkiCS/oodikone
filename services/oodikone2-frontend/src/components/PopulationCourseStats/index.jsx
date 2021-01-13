@@ -147,7 +147,7 @@ function PopulationCourseStats(props) {
     }
 
     const mandatoryFilter = ({ course }) => {
-      return mandatoryCourses.some(c => c.code === course.code && c.visible.visibility)
+      return mandatoryCourses.some(c => c.code === course.code && c.visible && c.visible.visibility)
     }
 
     const filteredCourses =
