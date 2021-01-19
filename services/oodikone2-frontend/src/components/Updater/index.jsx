@@ -39,7 +39,7 @@ const Updater = () => {
   const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
   const updateSISPopulationStudents = () => apiCall('/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
-  const abortSisUpdater = () => apiCall('/v1/abort?token=dev', 'get')
+  const abortSisUpdater = () => apiCall('/updater/abort', 'get')
 
   const statusRef = useRef()
   useEffect(() => {

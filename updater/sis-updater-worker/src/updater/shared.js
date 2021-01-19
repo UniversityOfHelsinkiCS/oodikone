@@ -6,6 +6,7 @@ const { getObject: redisGet, setObject: redisSet, lock: redisLock, expire: redis
 const TIME_LIMIT_BETWEEN_RELOADS = 1000 * 60 * 30
 const REDIS_INITIALIZED = 'INITIALIZED'
 const SHARED_LOCK = 'SHARED_LOCK'
+const FIRST_SEMESTER_START_YEAR = 1950
 
 let loadedAt = null
 
@@ -161,7 +162,14 @@ const initOrgToStartYearToSemesters = async () =>
     localMapToRedisKey.orgToStartYearToSemesters,
     (await Semester.findAll()).reduce((res, curr) => {
       if (!res[curr.org]) res[curr.org] = {}
-      if (!res[curr.org][curr.startYear]) res[curr.org][curr.startYear] = {}
+      if (!res[curr.org][curr.startYear]) {
+        res[curr.org][curr.startYear] = {}
+        if (curr.startYear === FIRST_SEMESTER_START_YEAR) {
+          for (let i = 1900; i < FIRST_SEMESTER_START_YEAR; i++) {
+            res[curr.org][i] = { 0: curr, 1: curr }
+          }
+        }
+      }
       res[curr.org][curr.startYear][curr.termIndex] = curr
       return res
     }, {})

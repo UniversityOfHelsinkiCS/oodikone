@@ -69,6 +69,11 @@ const rescheduleFetched = async () => {
   return response.data
 }
 
+const abort = async () => {
+  const response = await client.get('/abort')
+  return response.data
+}
+
 module.exports = {
   ping,
   updateStudents,
@@ -82,5 +87,6 @@ module.exports = {
   rescheduleScheduled,
   rescheduleFetched,
   updateNoStudents,
-  updateDaily
+  updateDaily,
+  abort
 }
