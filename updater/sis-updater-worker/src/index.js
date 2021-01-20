@@ -1,3 +1,4 @@
+const { debounce } = require('lodash')
 const { stan, opts } = require('./utils/stan')
 const { dbConnections } = require('./db/connection')
 const { update, purge } = require('./updater')
@@ -14,8 +15,21 @@ const {
   REDIS_LATEST_MESSAGE_RECEIVED
 } = require('./config')
 
+let abortingMessages = false
+
+const resetAbortTimer = debounce(() => {
+  abortingMessages = false
+  logger.info({ message: 'Scheduled messages are enabled again' })
+}, 5000)
+
 const handleMessage = messageHandler => async msg => {
   try {
+    if (abortingMessages) {
+      logger.info({ message: 'Aborting scheduled message' })
+      msg.ack()
+      resetAbortTimer()
+      return
+    } 
     await messageHandler(JSON.parse(msg.getData()))
   } catch (e) {
     logger.error({ message: 'Failed handling message', meta: e.stack })
@@ -26,6 +40,14 @@ const handleMessage = messageHandler => async msg => {
     } catch (e) {
       logger.error({ message: 'Failed acking message', meta: e.stack })
     }
+  }
+}
+
+const handleInfoMessage = async msg => {
+  if (msg.getData() === 'ABORT') {
+    logger.info({ message: 'Starting to abort scheduled messages' })
+    abortingMessages = true
+    msg.ack()
   }
 }
 
@@ -84,4 +106,7 @@ dbConnections.on('connect', async () => {
   purgeChannel.on('error', e => {
     logger.error({ message: 'Purge channel error', meta: e.stack })
   })
+
+  const infoChannel = stan.subscribe('SIS_INFO_CHANNEL', NATS_GROUP, opts)
+  infoChannel.on('message', handleInfoMessage)
 })
