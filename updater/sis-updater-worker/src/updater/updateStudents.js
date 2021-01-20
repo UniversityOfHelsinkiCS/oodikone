@@ -419,9 +419,11 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
   const mapSemesterEnrollment = semesterEnrollmentMapper(personIdToStudentNumber, studyrightToUniOrgId)
   const semesterEnrollments = uniqBy(
     flatten(
-      termRegistrations.map(({ student_id, term_registrations, study_right_id }) =>
-        term_registrations.map(mapSemesterEnrollment(student_id, study_right_id))
-      )
+      termRegistrations
+        .filter(t => studyRights.some(r => r.id === t.study_right_id))
+        .map(({ student_id, term_registrations, study_right_id }) =>
+          term_registrations.map(mapSemesterEnrollment(student_id, study_right_id))
+        )
     ),
     sE => `${sE.studentnumber}${sE.semestercomposite}`
   )
