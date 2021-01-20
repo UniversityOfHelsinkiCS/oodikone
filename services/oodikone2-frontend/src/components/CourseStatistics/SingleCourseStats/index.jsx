@@ -419,7 +419,7 @@ SingleCourseStats.propTypes = {
         )
       })
     ),
-    name: string,
+    name: shape({ fi: string, en: string, sv: string }),
     coursecode: string
   }).isRequired,
   programmes: arrayOf(shape({})).isRequired,
