@@ -5,10 +5,11 @@ import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
+import { useTabChangeAnalytics } from '../../common/hooks'
 import PassingSemesters from './PassingSemesters'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
-import TSA from '../../common/tsa'
+import sendEvent from '../../common/sendEvent'
 import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
 import Students from './Students'
@@ -20,8 +21,7 @@ import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Cou
 import useAnalytics from '../FilterTray/useAnalytics'
 import useLanguage from '../LanguagePicker/useLanguage'
 
-const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
-
+const sendAnalytics = sendEvent.populationStatistics
 export const tableColumnNames = {
   STUDENTS: 'students',
   PASSED: 'passed',
@@ -110,6 +110,7 @@ function PopulationCourseStats(props) {
   const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
   const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
   const filterAnalytics = useAnalytics()
+  const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Courses of Population tab changed')
 
   useEffect(() => {
     if (state && props.courses) {
@@ -146,7 +147,7 @@ function PopulationCourseStats(props) {
     }
 
     const mandatoryFilter = ({ course }) => {
-      return mandatoryCourses.some(c => c.code === course.code && c.visible.visibility)
+      return mandatoryCourses.some(c => c.code === course.code && c.visible && c.visible.visibility)
     }
 
     const filteredCourses =
@@ -206,6 +207,7 @@ function PopulationCourseStats(props) {
     } = e
 
     setFilterFields({ ...filterFields, [field]: value })
+    sendAnalytics('Courses of Population filter changed', field, value)
   }
 
   const setFilters = useCallback(
@@ -288,8 +290,10 @@ function PopulationCourseStats(props) {
     const newExpandedGroups = new Set(expandedGroups)
     if (newExpandedGroups.has(code)) {
       newExpandedGroups.delete(code)
+      sendAnalytics('Courses of Population collapsed group', code)
     } else {
       newExpandedGroups.add(code)
+      sendAnalytics('Courses of Population expanded group', code)
     }
     setExpandedGroups(newExpandedGroups)
   }
@@ -384,7 +388,7 @@ function PopulationCourseStats(props) {
   return (
     <div>
       <PopulationCourseContext.Provider value={contextValue}>
-        <Tab panes={panes} />
+        <Tab panes={panes} onTabChange={handleTabChange} />
       </PopulationCourseContext.Provider>
     </div>
   )

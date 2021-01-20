@@ -33,6 +33,7 @@ const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
       .groupBy('id')
   )
     .map(({ data }) => getLatestSnapshot(data))
+    .filter(s => !!s)
     .filter(isActive)
 
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))

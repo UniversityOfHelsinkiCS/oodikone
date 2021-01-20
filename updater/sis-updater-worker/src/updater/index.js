@@ -26,7 +26,6 @@ const {
   updateStudyModules,
   updateCourseUnits,
   updateCourseTypes,
-  updateSemesters,
   updateCreditTypes,
   updateStudyrightExtents
 } = require('./updateMeta')
@@ -40,7 +39,6 @@ const idToHandler = {
   study_modules: updateStudyModules,
   course_units: updateCourseUnits,
   study_levels: updateCourseTypes,
-  study_years: updateSemesters,
   credit_types: updateCreditTypes,
   education_types: updateStudyrightExtents,
   programme_modules: updateProgrammeModules
@@ -57,8 +55,6 @@ const update = async ({ entityIds, type }) => {
       return await updateHandler(await selectFromSnapshotsByIds(type, entityIds))
     case 'course_units':
       return await updateHandler(await selectFromByIds(type, entityIds, 'group_id'))
-    case 'study_years':
-      return await updateHandler(await selectFromByIds(type, entityIds, 'org'))
     case 'study_modules':
       return await updateHandler(await selectFromByIds('modules', entityIds, 'group_id'))
     case 'education_types':

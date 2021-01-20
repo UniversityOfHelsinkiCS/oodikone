@@ -173,13 +173,29 @@ npm run cypress:run
 npm run cypress:open
 ```
 
-## Other commands
+## How to Updater
 
-### Start updater
+Before running updater you must run `importer-db` setup via the CLI (see [Installation](#Installation)).
+
+If you want to use the control panel UI, first start Oodikone in real data mode:
 
 ```bash
-npm run docker:updater:dev up
+npm run docker:up:real
 ```
+
+Followed by acual updater:
+
+```bash
+npm run updater:dev:up
+```
+
+When you are done, close hanging containers with:
+
+```bash
+npm run updater:dev:down
+```
+
+## Other commands
 
 ### How to `scp` backup files from oodikone via melkki-proxy
 

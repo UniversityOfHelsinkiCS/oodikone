@@ -19,7 +19,8 @@ const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
 }
 
 const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
-  const { coursecode, name } = course
+  const { coursecode } = course
+  const name = getTextIn(course.name, language)
 
   const rows = courseInstance ? (
     Object.entries(courseInstance.faculties)
