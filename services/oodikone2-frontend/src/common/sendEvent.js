@@ -4,12 +4,24 @@ import TSA from './tsa'
 const { sendEvent } = TSA.Matomo
 
 export const ANALYTICS_CATEGORIES = {
-  populationStudents: 'Population students'
+  populationStudents: 'Population students',
+  populationStatistics: 'Population statistics',
+  degreeCourses: 'Degree courses',
+  common: 'Common'
 }
 
-export default Object.fromEntries(
-  Object.entries(ANALYTICS_CATEGORIES).map(([catKey, catName]) => [
-    catKey,
-    (action, name, value) => sendEvent(catName, action, name, value)
-  ])
-)
+// This export could be created with Object.fromEntries, but then autocomplete wont work.
+export default {
+  populationStudents: (action, name, value) => {
+    sendEvent(ANALYTICS_CATEGORIES.populationStudents, action, name, value)
+  },
+  populationStatistics: (action, name, value) => {
+    sendEvent(ANALYTICS_CATEGORIES.populationStatistics, action, name, value)
+  },
+  degreeCourses: (action, name, value) => {
+    sendEvent(ANALYTICS_CATEGORIES.degreeCourses, action, name, value)
+  },
+  common: (action, name, value) => {
+    sendEvent(ANALYTICS_CATEGORIES.common, action, name, value)
+  }
+}

@@ -4,7 +4,6 @@ const {
   Course,
   CourseType,
   CourseProvider,
-  Semester,
   CreditType,
   StudyrightExtent
 } = require('../db/models')
@@ -16,14 +15,15 @@ const updateOrganisations = async organisations => {
 }
 
 const updateStudyModules = async studyModules => {
+  const hyStudyModules = studyModules.filter(s => !s.university_org_ids.includes('aalto-university-root-id'))
   const attainments = await selectFromByIdsOrderBy(
     'attainments',
-    studyModules.map(s => s.id),
+    hyStudyModules.map(s => s.id),
     'module_id',
     'attainment_date'
   )
   const courseIdToAttainments = groupBy(attainments, 'module_id')
-  const groupIdToCourse = groupBy(studyModules, 'group_id')
+  const groupIdToCourse = groupBy(hyStudyModules, 'group_id')
 
   await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
@@ -71,11 +71,6 @@ const updateCourseTypes = async studyLevels => {
   await bulkCreate(CourseType, studyLevels.map(mapCourseType))
 }
 
-const updateSemesters = async studyYears => {
-  const semesters = flattenDeep(Object.entries(groupBy(studyYears, 'org')).map(mapSemester))
-  await bulkCreate(Semester, semesters)
-}
-
 const updateCreditTypes = async creditTypes => {
   await bulkCreate(CreditType, creditTypes)
 }
@@ -90,7 +85,6 @@ module.exports = {
   updateStudyModules,
   updateCourseUnits,
   updateCourseTypes,
-  updateSemesters,
   updateCreditTypes,
   updateStudyrightExtents
 }
