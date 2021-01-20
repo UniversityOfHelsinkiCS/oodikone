@@ -10,7 +10,8 @@ const {
   rescheduleScheduled,
   rescheduleFetched,
   updateNoStudents,
-  updateDaily
+  updateDaily,
+  abort
 } = require('../services/updaterService')
 const { updateSISMetadata, updateSISStudents, updateSISProgrammes } = require('../services/sisUpdaterService')
 const { refreshStatistics, refreshStatisticsV2 } = require('../events')
@@ -201,6 +202,16 @@ router.post('/refresh_statistic_v2', async (req, res) => {
     res.status(200).json('Refreshing sis statistics')
   } catch (err) {
     console.error(err)
+    res.status(500).json({ error: 'error' })
+  }
+})
+
+router.get('/abort', async (req, res) => {
+  try {
+    await abort()
+    res.status(200)
+  } catch (err) {
+    console.log(err)
     res.status(500).json({ error: 'error' })
   }
 })
