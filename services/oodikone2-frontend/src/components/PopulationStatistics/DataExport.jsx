@@ -136,14 +136,26 @@ export default () => {
     return workbook
   }
 
+  const copyStudentNumbers = students => {
+    const studentNumbers = students.map(student => student.studentNumber).join('\n')
+    navigator.clipboard.writeText(studentNumbers)
+  }
+
   return (
-    <Dropdown.Item
-      onClick={() => {
-        xlsx.writeFile(generateWorkbook(), 'students.xlsx')
-        sendAnalytics('Download excel button clicked', 'Download excel button clicked')
-      }}
-      text="Excel Workbook"
-      icon="file excel"
-    />
+    <>
+      <Dropdown.Item
+        onClick={() => {
+          xlsx.writeFile(generateWorkbook(), 'students.xlsx')
+          sendAnalytics('Download excel button clicked', 'Download excel button clicked')
+        }}
+        text="Excel Workbook"
+        icon="file excel"
+      />
+      <Dropdown.Item
+        onClick={() => copyStudentNumbers(filteredStudents)}
+        text="Copy Student Numbers"
+        icon="copy outline"
+      />
+    </>
   )
 }
