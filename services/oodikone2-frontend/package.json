@@ -67,7 +67,7 @@
     "@babel/preset-react": "^7.0.0",
     "@sentry/browser": "^5.9.1",
     "@sentry/cli": "^1.47.1",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "babel-polyfill": "^6.26.0",
     "dotenv": "^6.2.0",
     "highcharts": "^7.2.2",
