@@ -461,7 +461,10 @@ const studentnumbersWithAllStudyrightElements = async (
         studentnumber: {
           [Op.in]: studentnumbers
         },
-        semestercode
+        semestercode,
+        enrollment_date: {
+          [Op.not]: null
+        }
       }
     })
 
