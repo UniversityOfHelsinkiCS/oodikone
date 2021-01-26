@@ -286,7 +286,7 @@ const GeneralTab = ({
     // potentially will replace the 'start of studyright' column - both present for validation
     columns.push({
       key: 'studystartdateactual',
-      title: 'start of studyright (actual)',
+      title: 'started in studyright',
       getRowVal: s => new Date(getActualStartDate(s.studentNumber)).getTime(),
       getRowContent: s => reformatDate(getActualStartDate(s.studentNumber), 'YYYY-MM-DD')
     })
