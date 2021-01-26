@@ -8,6 +8,7 @@ import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
 import InfoBox from '../InfoBox'
 import CreditGainStats from './CreditGainStats'
+import AgeStats from './AgeStats'
 import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
@@ -109,11 +110,25 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Courses of population
+            Age distribution
           </span>
         )
       },
       onTitleClick: () => handleClick(2),
+      content: {
+        content: <AgeStats filteredStudents={filteredStudents} />
+      }
+    },
+    {
+      key: 3,
+      title: {
+        content: (
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Courses of population
+          </span>
+        )
+      },
+      onTitleClick: () => handleClick(3),
       content: {
         content: (
           <div ref={courseTableRef}>
@@ -129,7 +144,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       }
     },
     {
-      key: 3,
+      key: 4,
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -137,7 +152,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
           </span>
         )
       },
-      onTitleClick: () => handleClick(3),
+      onTitleClick: () => handleClick(4),
       content: {
         content: (
           <div ref={studentTableRef}>
