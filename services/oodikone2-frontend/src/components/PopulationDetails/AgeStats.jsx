@@ -31,19 +31,19 @@ const groupedAgesReducer = (acc, age) => {
 const AgeStats = ({ filteredStudents }) => {
   const [isGrouped, setIsGrouped] = useState(false)
 
-  let ages = Object.entries(
+  const ages = Object.entries(
     filteredStudents
       .map(student => getAge(student.birthdate))
       .reduce(isGrouped ? groupedAgesReducer : separateAgesReducer, {})
   )
-    .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
+    .sort((a, b) => Number(b[0]) - Number(a[0]))
     .map(([key, value]) => [key, value])
 
   const getAgeCellContent = age => {
     if (!isGrouped) return age
     if (age === '15') return '<20'
 
-    return `${age} - ${parseInt(age) + 4}`
+    return `${age} - ${Number(age) + 4}`
   }
 
   return (
