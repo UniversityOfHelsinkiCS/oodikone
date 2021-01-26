@@ -60,7 +60,9 @@ services:
     container_name: updater_writer
 
   sis-importer-db:
-    image: postgres:9.6.3
+    image: postgres:13.1
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - sis-importer-pgdata:/var/lib/postgresql/data
     container_name: sis-importer-db
