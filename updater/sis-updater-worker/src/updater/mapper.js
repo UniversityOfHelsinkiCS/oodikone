@@ -210,7 +210,7 @@ const courseMapper = courseIdToAttainments => ([groupId, courses]) => {
 
       if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
         min_attainment_date = courseAttainments[0].attainment_date
-      if (!max_attainment_date || timify(max_attainment_date) < timify(courseAttainments[curr.length - 1]))
+      if (!max_attainment_date || timify(max_attainment_date) < timify(courseAttainments[courseAttainments.length - 1].attainment_date))
         max_attainment_date = courseAttainments[courseAttainments.length - 1].attainment_date
 
       return { min_attainment_date, max_attainment_date }
