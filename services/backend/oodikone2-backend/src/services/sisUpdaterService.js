@@ -8,6 +8,13 @@ const updateSISStudents = async () => {
   return response.data
 }
 
+const updateStudentsByStudentNumber = async studentnumbers => {
+  const data = { studentnumbers: ['013867366'] }
+  const response = await client.post('/v1/students', data, { params: { token: SECRET_TOKEN } })
+  //console.log('response', response)
+  return response.data
+}
+
 const updateSISMetadata = async () => {
   const response = await client.get('/v1/meta', { params: { token: SECRET_TOKEN } })
   return response.data
@@ -18,8 +25,15 @@ const updateSISProgrammes = async () => {
   return response.data
 }
 
+const abort = async () => {
+  const response = await client.get('/v1/abort', { params: { token: SECRET_TOKEN } })
+  return response.data
+}
+
 module.exports = {
   updateSISMetadata,
   updateSISStudents,
-  updateSISProgrammes
+  updateSISProgrammes,
+  updateStudentsByStudentNumber,
+  abort
 }
