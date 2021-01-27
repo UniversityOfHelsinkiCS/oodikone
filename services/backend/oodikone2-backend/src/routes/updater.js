@@ -196,7 +196,7 @@ router.post('/update/v2/students', async (req, res) => {
       res.status(200).json('Update SIS students scheduled')
     }
   } catch (err) {
-    //console.log(err)
+    console.log(err)
     res.status(500).json({ error: 'error' })
   }
 })
