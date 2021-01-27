@@ -1,6 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { sortBy } = require('lodash')
+const { getCurrentSemester } = require('./semesters')
 
 const {
   Student,
@@ -57,7 +58,8 @@ const formatStudentForPopulationStatistics = (
     gender_sv,
     gender_en,
     tags,
-    option
+    option,
+    birthdate
   },
   credits,
   startDate,
@@ -107,7 +109,8 @@ const formatStudentForPopulationStatistics = (
     tags: tags || [],
     studyrightStart: startDate,
     starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]'),
-    option
+    option,
+    birthdate
   }
 }
 
@@ -203,7 +206,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'abbreviatedname',
         'email',
         'updatedAt',
-        'gender_code'
+        'gender_code',
+        'birthdate'
         /* 'gender_fi',
         'gender_sv',
         'gender_en' */
@@ -224,7 +228,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'graduated',
             'canceldate',
             'prioritycode',
-            'faculty_code'
+            'faculty_code',
+            'studystartdate'
           ],
           separate: true,
           include: [
@@ -385,6 +390,7 @@ const studentnumbersWithAllStudyrightElements = async (
   if (!nondegreeStudents) {
     filteredExtents.push(33, 99, 14, 13)
   }
+  // this does not work in SIS, that is why we have a kludge below
   if (!cancelledStudents) {
     studyrightWhere.canceldate = null
   }
@@ -446,7 +452,28 @@ const studentnumbersWithAllStudyrightElements = async (
     raw: true
   })
 
-  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+  let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+
+  // study right cancel does not work in SIS, but the below kludge should do the trick
+  // since canceldate != null   === student does not have any enrolment
+  if (!cancelledStudents) {
+    const { semestercode } = await getCurrentSemester()
+
+    const enrolments = await SemesterEnrollment.findAll({
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers
+        },
+        semestercode,
+        enrollment_date: {
+          [Op.not]: null
+        }
+      }
+    })
+
+    const enrolledStudentnumbers = enrolments.map(e => e.studentnumber)
+    studentnumbers = enrolledStudentnumbers
+  }
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({

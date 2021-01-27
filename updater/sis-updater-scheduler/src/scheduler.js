@@ -178,6 +178,17 @@ const scheduleByStudentNumbers = async studentNumbers => {
   await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
 }
 
+const scheduleByCourseCodes = async courseCodes => {
+  const { knex } = knexConnection
+  const coursesToUpdate = await knex(IMPORTER_TABLES.courseUnits)
+    .whereIn('code', courseCodes)
+    .distinct('group_id')
+    .pluck('group_id')
+  await redisSet(REDIS_TOTAL_META_DONE_KEY, 0)
+  await redisSet(REDIS_TOTAL_META_KEY, coursesToUpdate.length)
+  await eachLimit(chunk(coursesToUpdate, CHUNK_SIZE), 10, async c => await createJobs(c, IMPORTER_TABLES.courseUnits))
+}
+
 const isUpdaterActive = async () => {
   const latestUpdaterHandledMessage = await redisGet(REDIS_LATEST_MESSAGE_RECEIVED)
   return (
@@ -285,6 +296,7 @@ module.exports = {
   scheduleWeekly,
   schedulePurge,
   scheduleByStudentNumbers,
+  scheduleByCourseCodes,
   isUpdaterActive,
   hasWeeklyBeenScheduled
 }

@@ -1,7 +1,7 @@
 const express = require('express')
 require('express-async-errors')
 const { stan } = require('./utils/stan')
-const { scheduleMeta, scheduleStudents, scheduleProgrammes, scheduleByStudentNumbers } = require('./scheduler')
+const { scheduleMeta, scheduleStudents, scheduleProgrammes, scheduleByStudentNumbers, scheduleByCourseCodes } = require('./scheduler')
 const { getStructure } = require('./explorer')
 const { getCourses } = require('./courseParser')
 const { SECRET_TOKEN } = require('./config')
@@ -81,6 +81,11 @@ app.get('/v1/courses/:code', async (req, res) => {
     console.log(e)
     res.json({ error: e })
   }
+})
+
+app.post('/v1/courses', async (req, res) => {
+  await scheduleByCourseCodes(req.body.courseCodes)
+  res.locals.msg('Scheduled courses')
 })
 
 app.use(errorBoundary)
