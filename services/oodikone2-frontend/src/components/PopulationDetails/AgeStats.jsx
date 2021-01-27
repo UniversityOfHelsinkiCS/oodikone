@@ -29,7 +29,7 @@ const groupedAgesReducer = (acc, age) => {
 }
 
 const AgeStats = ({ filteredStudents }) => {
-  const [isGrouped, setIsGrouped] = useState(false)
+  const [isGrouped, setIsGrouped] = useState(true)
 
   const ages = Object.entries(
     filteredStudents
