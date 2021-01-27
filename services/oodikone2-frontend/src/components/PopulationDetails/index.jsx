@@ -13,6 +13,7 @@ import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 import useLanguage from '../LanguagePicker/useLanguage'
+import sisDestructionStyle from '../../common/sisDestructionStyle'
 
 const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStudentsByYear, dataExport }) => {
   const { allStudents, filteredStudents } = useFilters()
@@ -165,7 +166,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
 
   return (
     <>
-      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} style={sisDestructionStyle} />
     </>
   )
 }

@@ -8,7 +8,7 @@ const {
   getGrade,
   getUniOrgId,
   getSemester,
-  getCountry
+  getCountry,
 } = require('./shared')
 
 const genderMankeli = gender => {
@@ -54,7 +54,7 @@ const studentMapper = (attainments, studyRights) => student => {
     country_en: country ? country.name.en : null,
     home_country_fi: home_country ? home_country.name.fi : null,
     home_country_sv: home_country ? home_country.name.sv : null,
-    home_country_en: home_country ? home_country.name.en : null
+    home_country_en: home_country ? home_country.name.en : null,
   }
 }
 
@@ -66,7 +66,7 @@ const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) 
     canceldate: studyright.study_right_cancellation ? studyright.study_right_cancellation.cancellationDate : null,
     studentStudentnumber: personIdToStudentNumber[studyright.person_id],
     prioritycode: 2,
-    educationType: 99
+    educationType: 99,
   }
 
   return {
@@ -77,7 +77,7 @@ const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) 
       : studyright.valid.endDate,
     graduated: studyright.study_right_graduation ? 1 : 0,
     studystartdate: studyright.study_start_date,
-    ...overrideProps
+    ...overrideProps,
   }
 }
 
@@ -86,26 +86,26 @@ const mapStudyrightElements = (studyrightid, ordinal, startdate, enddate, studen
     studyrightid,
     startdate,
     enddate,
-    studentnumber
+    studentnumber,
   }
 
   return [
     {
       ...defaultProps,
       id: `${defaultProps.studyrightid}-${ordinal}-1`,
-      code
+      code,
     },
     {
       ...defaultProps,
       id: `${defaultProps.studyrightid}-${ordinal}-2`,
-      code: childCode
-    }
+      code: childCode,
+    },
   ]
 }
 
 const mapTeacher = person => ({
   id: person.employee_number,
-  name: `${person.last_name} ${person.first_names}`.trim()
+  name: `${person.last_name} ${person.first_names}`.trim(),
 })
 
 const moduleTypes = new Set(['ModuleAttainment', 'DegreeProgrammeAttainment'])
@@ -128,7 +128,7 @@ const creditMapper = (
     attainment_date,
     type,
     course_unit_id,
-    module_group_id
+    module_group_id,
   } = attainment
   const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
   const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
@@ -151,7 +151,18 @@ const creditMapper = (
     semestercode: targetSemester.semestercode,
     semester_composite: targetSemester.composite,
     isStudyModule: isModule(type),
-    org: attainmentUniOrg
+    org: attainmentUniOrg,
+  }
+}
+
+const termRegistrationTypeToEnrollmenttype = termRegistrationType => {
+  switch (termRegistrationType) {
+    case 'ATTENDING':
+      return 1
+    case 'NONATTENDING':
+      return 2
+    default:
+      return 3
   }
 }
 
@@ -163,10 +174,10 @@ const semesterEnrollmentMapper = (personIdToStudentNumber, studyrightToUniOrgId)
     studyTerm: { termIndex, studyYearStartYear },
     registrationDate,
     termRegistrationType,
-    statutoryAbsence
+    statutoryAbsence,
   } = termRegistration
 
-  const enrollmenttype = termRegistrationType === 'ATTENDING' ? 1 : 2
+  const enrollmenttype = termRegistrationTypeToEnrollmenttype(termRegistrationType)
   const studentnumber = personIdToStudentNumber[studentId]
   const { semestercode } = getSemester(studyrightToUniOrgId[studyRightId], studyYearStartYear, termIndex)
   const enrollment_date = registrationDate
@@ -179,14 +190,14 @@ const semesterEnrollmentMapper = (personIdToStudentNumber, studyrightToUniOrgId)
     enrollment_date,
     org,
     semestercomposite: `${org}-${semestercode}`,
-    statutory_absence: statutoryAbsence
+    statutory_absence: statutoryAbsence,
   }
 }
 
 const courseProviderMapper = courseGroupId => ({ organisationId }) => ({
   composite: `${courseGroupId}-${organisationId}`,
   coursecode: courseGroupId,
-  organizationcode: organisationId
+  organizationcode: organisationId,
 })
 
 const timify = t => new Date(t).getTime()
@@ -210,7 +221,10 @@ const courseMapper = courseIdToAttainments => ([groupId, courses]) => {
 
       if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
         min_attainment_date = courseAttainments[0].attainment_date
-      if (!max_attainment_date || timify(max_attainment_date) < timify(courseAttainments[courseAttainments.length - 1].attainment_date))
+      if (
+        !max_attainment_date ||
+        timify(max_attainment_date) < timify(courseAttainments[courseAttainments.length - 1].attainment_date)
+      )
         max_attainment_date = courseAttainments[courseAttainments.length - 1].attainment_date
 
       return { min_attainment_date, max_attainment_date }
@@ -228,13 +242,13 @@ const courseMapper = courseIdToAttainments => ([groupId, courses]) => {
     latest_instance_date: max_attainment_date,
     startdate,
     enddate,
-    is_study_module: false // VALIDATE THIS PLS
+    is_study_module: false, // VALIDATE THIS PLS
   }
 }
 
 const mapCourseType = studyLevel => ({
   coursetypecode: studyLevel.id,
-  name: studyLevel.name
+  name: studyLevel.name,
 })
 
 const mapSemester = ([org, orgStudyYears]) => {
@@ -254,7 +268,7 @@ const mapSemester = ([org, orgStudyYears]) => {
         semestercode: semestercode++,
         org,
         termIndex: i,
-        startYear: orgStudyYear.start_year
+        startYear: orgStudyYear.start_year,
       }
     })
   })
@@ -262,7 +276,7 @@ const mapSemester = ([org, orgStudyYears]) => {
 
 const mapStudyrightExtent = educationType => ({
   extentcode: educationTypeToExtentcode[educationType.id],
-  name: educationType.name
+  name: educationType.name,
 })
 
 module.exports = {
@@ -276,5 +290,5 @@ module.exports = {
   courseMapper,
   mapCourseType,
   mapSemester,
-  mapStudyrightExtent
+  mapStudyrightExtent,
 }

@@ -10,10 +10,15 @@ const {
   rescheduleScheduled,
   rescheduleFetched,
   updateNoStudents,
-  updateDaily,
-  abort
+  updateDaily
 } = require('../services/updaterService')
-const { updateSISMetadata, updateSISStudents, updateSISProgrammes } = require('../services/sisUpdaterService')
+const {
+  updateSISMetadata,
+  updateSISStudents,
+  updateSISProgrammes,
+  updateStudentsByStudentNumber,
+  abort
+} = require('../services/sisUpdaterService')
 const { refreshStatistics, refreshStatisticsV2 } = require('../events')
 
 router.post('/update/oldest', async (req, res) => {
@@ -171,7 +176,22 @@ router.get('/update/v2/students', async (req, res) => {
   if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
 
   try {
-    const response = await updateSISStudents(req)
+    const response = await updateSISStudents()
+    if (response) {
+      res.status(200).json('Update SIS students scheduled')
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: 'error' })
+  }
+})
+
+router.post('/update/v2/students', async (req, res) => {
+  const { roles } = req
+  if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
+
+  try {
+    const response = await updateStudentsByStudentNumber(req.body)
     if (response) {
       res.status(200).json('Update SIS students scheduled')
     }
@@ -209,7 +229,7 @@ router.post('/refresh_statistic_v2', async (req, res) => {
 router.get('/abort', async (req, res) => {
   try {
     await abort()
-    res.status(200)
+    res.status(200).json()
   } catch (err) {
     console.log(err)
     res.status(500).json({ error: 'error' })
