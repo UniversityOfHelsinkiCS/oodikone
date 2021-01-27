@@ -9,9 +9,8 @@ const updateSISStudents = async () => {
 }
 
 const updateStudentsByStudentNumber = async studentnumbers => {
-  const data = { studentnumbers: ['013867366'] }
+  const data = { studentnumbers }
   const response = await client.post('/v1/students', data, { params: { token: SECRET_TOKEN } })
-  //console.log('response', response)
   return response.data
 }
 
