@@ -55,7 +55,8 @@ const formatStudentForPopulationStatistics = (
     gender_sv,
     gender_en,
     tags,
-    option
+    option,
+    birthdate
   },
   credits,
   startDate,
@@ -105,7 +106,8 @@ const formatStudentForPopulationStatistics = (
     tags: tags || [],
     studyrightStart: startDate,
     starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]'),
-    option
+    option,
+    birthdate
   }
 }
 
@@ -204,7 +206,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'gender_code',
         'gender_fi',
         'gender_sv',
-        'gender_en'
+        'gender_en',
+        'birthdate'
       ],
       include: [
         {
@@ -222,7 +225,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'graduated',
             'canceldate',
             'prioritycode',
-            'faculty_code'
+            'faculty_code',
+            'studystartdate'
           ],
           separate: true,
           include: [

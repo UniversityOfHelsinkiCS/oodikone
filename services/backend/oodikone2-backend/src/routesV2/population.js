@@ -214,6 +214,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 router.get('/v3/populationstatistics', async (req, res) => {
   const { year, semesters, studyRights: studyRightsJSON } = req.query
   const { decodedToken } = req
+
   try {
     if (!year || !semesters || !studyRightsJSON) {
       res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })

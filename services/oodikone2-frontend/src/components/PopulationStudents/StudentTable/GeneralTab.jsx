@@ -141,6 +141,28 @@ const GeneralTab = ({
       }, {})
     : null
 
+  const studentToStudyrightActualStartMap = !(customPopulation || coursePopulation)
+    ? selectedStudents.reduce((res, sn) => {
+        const targetStudyright = students[sn].studyrights.find(studyright =>
+          studyright.studyright_elements.some(e => e.code === queryStudyrights[0])
+        )
+        res[sn] = targetStudyright ? targetStudyright.studystartdate : null
+        return res
+      }, {})
+    : null
+
+  const getActualStartDate = studentNumber => {
+    const studyRightStart = studentToStudyrightStartMap[studentNumber]
+    const studyRightStartActual = studentToStudyrightActualStartMap[studentNumber]
+
+    if (!studyRightStart) return studyRightStartActual
+    if (!studyRightStartActual) return studyRightStart
+
+    return new Date(studyRightStart).getTime() > new Date(studyRightStartActual).getTime()
+      ? studyRightStart
+      : studyRightStartActual
+  }
+
   const copyToClipboardAll = () => {
     const studentsInfo = selectedStudents.map(number => students[number])
     const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
@@ -259,6 +281,14 @@ const GeneralTab = ({
       title: 'start of studyright',
       getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
       getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD')
+    })
+
+    // potentially will replace the 'start of studyright' column - both present for validation
+    columns.push({
+      key: 'studystartdateactual',
+      title: 'started in studyright',
+      getRowVal: s => new Date(getActualStartDate(s.studentNumber)).getTime(),
+      getRowContent: s => reformatDate(getActualStartDate(s.studentNumber), 'YYYY-MM-DD')
     })
   }
 
