@@ -18,7 +18,7 @@ try {
   if (IS_PRODUCTION && BASE_PATH === '/' && ['staging', 'latest'].includes(process.env.TAG)) {
     Sentry.init({
       environment: process.env.TAG,
-      dsn: 'https://02d07bd40f404cc0965f38f06183d9fb@sentry.toska.cs.helsinki.fi/3',
+      dsn: 'https://c55e6d020db640e889948cc25ced1c19@sentry.toska.cs.helsinki.fi/2',
       release: process.env.SENTRY_RELEASE_VERSION
     })
   }
