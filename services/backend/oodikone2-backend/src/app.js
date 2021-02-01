@@ -24,7 +24,7 @@ initializeDatabaseConnection()
     const app = express()
 
     Sentry.init({
-      dsn: process.env.SENTRY_ADDR,
+      dsn: 'https://c55e6d020db640e889948cc25ced1c19@sentry.toska.cs.helsinki.fi/2',
       environment: process.env.TAG
     })
     app.use(Sentry.Handlers.requestHandler())
