@@ -369,7 +369,7 @@ const GeneralTab = ({
     columns.push({
       key: 'updatedAt',
       title: 'Last Updated At',
-      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
+      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  HH:mm:ss')
     })
   }
 
