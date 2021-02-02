@@ -34,12 +34,6 @@ knexConnection.on('connect', async () => {
   console.log('Knex database connection established successfully')
   startServer()
 
-  if (isDev) {
-    await scheduleMeta()
-    await scheduleStudents()
-    await scheduleProgrammes()
-  }
-
   // Monday-Friday at every minute 30
   scheduleCron('30 * * * 1-5', async () => {
     // If updater is currently running, then return
