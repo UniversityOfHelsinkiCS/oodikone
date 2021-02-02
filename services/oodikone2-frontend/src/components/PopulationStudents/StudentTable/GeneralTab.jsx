@@ -276,12 +276,14 @@ const GeneralTab = ({
   })
 
   if (!(coursePopulation || customPopulation)) {
-    columns.push({
-      key: 'studystartdate',
-      title: 'start of studyright',
-      getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
-      getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD')
-    })
+    if (isAdmin) {
+      columns.push({
+        key: 'studystartdate',
+        title: 'start of studyright',
+        getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
+        getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD')
+      })
+    }
 
     // potentially will replace the 'start of studyright' column - both present for validation
     columns.push({
@@ -369,7 +371,7 @@ const GeneralTab = ({
     columns.push({
       key: 'updatedAt',
       title: 'Last Updated At',
-      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss')
+      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  HH:mm:ss')
     })
   }
 
