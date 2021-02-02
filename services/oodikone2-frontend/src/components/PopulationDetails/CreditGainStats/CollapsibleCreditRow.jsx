@@ -27,7 +27,7 @@ const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }
 
   return (
     <>
-      <Table.Row style={{ cursor: isCollapsible && 'pointer' }} onClick={() => collapse()}>
+      <Table.Row style={{ cursor: isCollapsible && 'pointer' }} onClick={isCollapsible ? () => collapse() : undefined}>
         <Table.Cell collapsing>
           <ExternalCreditFilterToggle min={min} max={max} />
         </Table.Cell>
