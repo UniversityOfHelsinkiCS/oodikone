@@ -1,6 +1,9 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Table, Progress, Radio, Icon } from 'semantic-ui-react'
+import sendEvent from '../../common/sendEvent'
+
+const sendAnalytics = sendEvent.populationStatistics
 
 // https://stackoverflow.com/a/7091965
 const getAge = dateString => {
@@ -60,6 +63,15 @@ const AgeStats = ({ filteredStudents }) => {
     return `${age} - ${Number(age) + 4}`
   }
 
+  const handleGroupExpand = index => {
+    if (expandedGroups.includes(index)) {
+      setExpandedGroups(expandedGroups.filter(val => val !== index))
+    } else {
+      setExpandedGroups(expandedGroups.concat(index))
+      sendAnalytics('Age group expanded')
+    }
+  }
+
   return (
     <div>
       <div style={{ marginTop: 15, marginBottom: 10 }}>
@@ -93,14 +105,7 @@ const AgeStats = ({ filteredStudents }) => {
         <Table.Body>
           {ages.map(([age, count], i) => (
             <React.Fragment key={age}>
-              <Table.Row
-                onClick={() =>
-                  setExpandedGroups(
-                    expandedGroups.includes(i) ? expandedGroups.filter(val => val !== i) : expandedGroups.concat(i)
-                  )
-                }
-                style={{ cursor: isGrouped ? 'pointer' : undefined }}
-              >
+              <Table.Row onClick={() => handleGroupExpand(i)} style={{ cursor: isGrouped ? 'pointer' : undefined }}>
                 <Table.Cell>
                   {getAgeCellContent(age)}{' '}
                   {isGrouped && <Icon name={expandedGroups.includes(i) ? 'caret down' : 'caret right'} color="grey" />}
