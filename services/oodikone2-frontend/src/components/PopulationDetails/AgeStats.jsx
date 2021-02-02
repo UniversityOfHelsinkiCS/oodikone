@@ -14,6 +14,21 @@ const getAge = dateString => {
   return age
 }
 
+// https://stackoverflow.com/a/45309555
+function getMedian(values) {
+  if (values.length === 0) return 0
+
+  values.sort(function(a, b) {
+    return a - b
+  })
+
+  const half = Math.floor(values.length / 2)
+
+  if (values.length % 2) return values[half]
+
+  return (values[half - 1] + values[half]) / 2.0
+}
+
 const getAgeGroup = age => Math.floor(age / 5) * 5
 
 const separateAgesReducer = (acc, age) => {
@@ -50,6 +65,18 @@ const AgeStats = ({ filteredStudents }) => {
     <div>
       <div style={{ marginTop: 15, marginBottom: 10 }}>
         <Radio toggle label="Group ages" checked={isGrouped} onChange={() => setIsGrouped(!isGrouped)} />
+      </div>
+      <div>
+        Median:{' '}
+        {getMedian(
+          ages.reduce((acc, [age, count]) => {
+            for (let i = 0; i < count; i++) {
+              acc.push(Number(age))
+            }
+
+            return acc
+          }, [])
+        )}
       </div>
       <Table celled compact="very">
         <Table.Header>
