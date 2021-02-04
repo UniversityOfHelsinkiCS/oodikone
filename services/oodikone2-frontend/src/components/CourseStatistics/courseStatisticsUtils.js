@@ -80,6 +80,11 @@ const mergeCourses = (groupsArgs, courses, groupMeta, unifyOpenUniCourses = fals
       const groupId =
         isAvoin(course.code) && !notAvoin.has(course.code) && !unifyOpenUniCourses ? course.code : groups[course.code]
 
+      // Don't show courses without attainments
+      if (!(course.max_attainment_date && course.min_attainment_date)) {
+        return
+      }
+
       if (!mergedCourses[groupId]) {
         mergedCourses[groupId] = {
           ...course,
