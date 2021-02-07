@@ -11,11 +11,11 @@ import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory, usePrevious } from '../../../common/hooks'
 import { validateInputLength, getTextIn } from '../../../common'
 import TSA from '../../../common/tsa'
-import { mergeCourses } from '../courseStatisticsUtils'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import SearchHistory from '../../SearchHistory'
 import useLanguage from '../../LanguagePicker/useLanguage'
+import { mergeCourses } from './searchFormUtils'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Course statistics search', action, name, value)
 
