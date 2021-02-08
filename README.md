@@ -195,6 +195,30 @@ When you are done, close hanging containers with:
 npm run updater:dev:down
 ```
 
+### updater scheduler
+
+Stop with HTTP GET
+
+```bash
+http://localhost:8082/v1/abort?token=dev
+```
+
+Schedule students with HTTP POST
+
+```bash
+http://localhost:8082/v1/students?token=dev
+```
+
+body
+
+```bash
+{ 
+    "studentnumbers": [
+        "014598456"
+    ] 
+}
+```
+
 ## Other commands
 
 ### How to `scp` backup files from oodikone via melkki-proxy
