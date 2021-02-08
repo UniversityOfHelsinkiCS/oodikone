@@ -15,7 +15,7 @@ import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import SearchHistory from '../../SearchHistory'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import { mergeCourses } from './searchFormUtils'
+import filterCourseSearchResults from './searchFormUtils'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Course statistics search', action, name, value)
 
@@ -324,7 +324,7 @@ const mapStateToProps = state => {
   const { unifyOpenUniCourses } = state.courseSearch
 
   return {
-    matchingCourses: mergeCourses(groups, courses, groupMeta, unifyOpenUniCourses),
+    matchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending,
     unifyOpenUniCourses
