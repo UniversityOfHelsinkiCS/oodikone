@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment from 'moment'
 
 const MIN_YEAR = 1899
 const MAX_YEAR = 2112
@@ -32,4 +32,4 @@ const getActiveYears = course => {
   return `${startYearText} — ${endYearText}`
 }
 
-export { getActiveYears, getYearText}
+export { getActiveYears, getYearText }
