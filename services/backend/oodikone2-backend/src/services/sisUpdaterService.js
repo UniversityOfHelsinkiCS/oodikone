@@ -10,11 +10,7 @@ const updateSISStudents = async () => {
 
 const updateStudentsByStudentNumber = async studentnumbers => {
   const data = { studentnumbers }
-  const acual_data = data.map(n => (n[0] === '0' ? n : `+${n}`))
-
-  console.log(acual_data)
-
-  const response = await client.post('/v1/students', acual_data, { params: { token: SECRET_TOKEN } })
+  const response = await client.post('/v1/students', data, { params: { token: SECRET_TOKEN } })
   return response.data
 }
 
