@@ -49,7 +49,11 @@ app.get('/v1/programmes', async (_, res) => {
 })
 
 app.post('/v1/students', async (req, res) => {
-  await scheduleByStudentNumbers(req.body.studentnumbers)
+  const studentnumbers = req.body.studentnumbers.map(n => n[0] === '0' ? n : `0${n}`)
+
+  console.log(studentnumbers)
+
+  await scheduleByStudentNumbers(studentnumbers)
   res.locals.msg('Scheduled studentnumbers')
 })
 
