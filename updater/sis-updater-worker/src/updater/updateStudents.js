@@ -84,6 +84,8 @@ const updateStudents = async personIds => {
 
     return res
   }, {})
+
+  this is deprecated by the following function call
   */
 
   // grouping in function that sets first_snapshot_date_time

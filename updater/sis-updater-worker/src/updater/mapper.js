@@ -76,7 +76,9 @@ const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) 
       ? studyright.study_right_graduation.phase1GraduationDate
       : studyright.valid.endDate,
     graduated: studyright.study_right_graduation ? 1 : 0,
-    studystartdate: studyright.study_start_date,
+    // studystartdate: studyright.study_start_date, '
+    // accoriding to Eija the right date is the following
+    studystartdate: studyright.valid.startDate, 
     ...overrideProps,
   }
 }
