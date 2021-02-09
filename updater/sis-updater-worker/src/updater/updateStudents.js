@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { flatten, uniqBy, sortBy, sortedUniqBy, groupBy, isEqual, orderBy, has, get } = require('lodash')
+const { flatten, uniqBy, sortBy, sortedUniqBy, groupBy, isEqual, orderBy, has, get, conformsTo } = require('lodash')
 const {
   Course,
   Student,
@@ -24,6 +24,40 @@ const {
 } = require('./mapper')
 const { isBaMa } = require('../utils')
 
+const groupStudyrightSnapshots = (studyRightSnapshots) => {
+  const snapshotsBystudyright = Object.entries(
+    groupBy(
+      studyRightSnapshots.filter(sR => sR.document_state === 'ACTIVE'),
+      'id'
+    )
+  )    
+
+  return snapshotsBystudyright.reduce((res, [id, snapshots]) => {
+    const byPhases = s => {
+      const phase1 = s.accepted_selection_path.educationPhase1GroupId
+      const phase2 = s.accepted_selection_path.educationPhase2GroupId ? s.accepted_selection_path.educationPhase2GroupId : 'none'
+      return `${phase1}-${phase2}`
+    }
+
+    const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'desc')
+
+    const groupedByPhases = groupBy(orderedSnapshots, byPhases)
+    
+    const snapshotsWithRightDate = Object.keys(groupedByPhases).map(key => {
+      const snapshots = groupedByPhases[key]
+      const most_recent = snapshots[0]
+      const the_first = snapshots[snapshots.length-1]
+      most_recent.first_snapshot_date_time = the_first.snapshot_date_time
+
+      return most_recent
+    })
+
+    res[id] = snapshotsWithRightDate
+
+    return res
+  }, {})
+}
+
 const updateStudents = async personIds => {
   await loadMapsIfNeeded()
 
@@ -35,6 +69,7 @@ const updateStudents = async personIds => {
     selectFromByIds('study_right_primalities', personIds, 'student_id')
   ])
 
+  /*
   const groupedStudyRightSnapshots = Object.entries(
     groupBy(
       studyRightSnapshots.filter(sR => sR.document_state === 'ACTIVE'),
@@ -46,8 +81,15 @@ const updateStudents = async personIds => {
       if (i === 0) return true
       return !isEqual(currentSnapshot.accepted_selection_path, orderedSnapshots[i - 1].accepted_selection_path)
     })
+
     return res
   }, {})
+
+  this is deprecated by the following function call
+  */
+
+  // grouping in function that sets first_snapshot_date_time
+  const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
 
   const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
     acc.push(curr[0])
@@ -204,7 +246,9 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
-        const startDate = snapshot.valid.startDate
+        // const startDate = snapshot.valid.startDate
+        // according to Eija Airio this is the right way to get the date... at least when studyright has changed
+        const startDate = snapshot.first_snapshot_date_time
         const endDate =
           snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
             ? snapshot.study_right_graduation.phase1GraduationDate
