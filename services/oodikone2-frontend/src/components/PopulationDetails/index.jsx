@@ -117,7 +117,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       },
       onTitleClick: () => handleClick(2),
       content: {
-        content: <AgeStats filteredStudents={filteredStudents} />
+        content: <AgeStats filteredStudents={filteredStudents} query={query} />
       }
     },
     {

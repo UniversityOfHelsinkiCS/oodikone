@@ -6,9 +6,9 @@ import sendEvent from '../../common/sendEvent'
 const sendAnalytics = sendEvent.populationStatistics
 
 // https://stackoverflow.com/a/7091965
-const getAge = dateString => {
+const getAge = toDate => {
   const today = new Date()
-  const birthDate = new Date(dateString)
+  const birthDate = new Date(toDate)
   let age = today.getFullYear() - birthDate.getFullYear()
   const m = today.getMonth() - birthDate.getMonth()
   if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
@@ -46,7 +46,7 @@ const groupedAgesReducer = (acc, age) => {
   return acc
 }
 
-const AgeStats = ({ filteredStudents }) => {
+const AgeStats = ({ filteredStudents, query }) => {
   const [isGrouped, setIsGrouped] = useState(true)
   const [expandedGroups, setExpandedGroups] = useState([])
 
@@ -72,6 +72,27 @@ const AgeStats = ({ filteredStudents }) => {
     }
   }
 
+  const getActualStartDate = student => {
+    const studyright = student.studyrights.find(studyright =>
+      studyright.studyright_elements.some(e => e.code === query.studyRights.programme)
+    )
+    return new Date(studyright.studystartdate || studyright.startdate)
+  }
+
+  const getMedianAtStudiesStart = () => {
+    return getMedian(
+      filteredStudents.reduce((acc, student) => {
+        const timeSinceStudiesStart = new Date().getTime() - getActualStartDate(student).getTime()
+        // let's adjust student birthdate by adding time they have been studying
+        // so we can get their age when they started their studies
+        const ageAtStudiestStart = getAge(new Date(student.birthdate).getTime() + timeSinceStudiesStart)
+        acc.push(Number(ageAtStudiestStart))
+
+        return acc
+      }, [])
+    )
+  }
+
   return (
     <div>
       <div style={{ marginTop: 15, marginBottom: 10 }}>
@@ -89,6 +110,7 @@ const AgeStats = ({ filteredStudents }) => {
           }, [])
         )}
       </div>
+      <div>Median at studies start: {getMedianAtStudiesStart()}</div>
       <Table celled compact="very">
         <Table.Header>
           <Table.Row>
