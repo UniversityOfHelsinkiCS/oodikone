@@ -14,6 +14,9 @@ import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 import useLanguage from '../LanguagePicker/useLanguage'
 import sisDestructionStyle from '../../common/sisDestructionStyle'
+import sendEvent from '../../common/sendEvent'
+
+const sendAnalytics = sendEvent.populationStatistics
 
 const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStudentsByYear, dataExport }) => {
   const { allStudents, filteredStudents } = useFilters()
@@ -36,6 +39,10 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       indexes.push(index)
     }
     setActiveIndex(indexes)
+    sendAnalytics(
+      'Population statistics tab clicked',
+      ['Credit accumulation', 'Credit statistics', 'Age distribution', 'Courses of population', 'Students'][index]
+    )
     /**
      * Here used to be a :tunkki: that scrolled to the component that was opened. However,
      * it does not work with the way this view is now rendered. This is left here just as a
