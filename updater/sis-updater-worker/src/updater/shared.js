@@ -106,7 +106,7 @@ const initModuleGroupIdToDegree = async () => {
     selectColumnsFrom('modules', ['group_id', 'degree_title_urns'])
   )
   const degreeTitlesByUrns = (await selectAllFrom('degree_titles')).reduce((acc, curr) => {
-    acc[curr.id] = curr.name
+    acc[curr.id] = curr
     return acc
   }, {})
   const moduleGroupIdToDegree = moduleGroupIdsAndDegreeUrns.reduce((acc, curr) => {
