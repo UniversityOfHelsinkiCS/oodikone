@@ -1,6 +1,6 @@
 const { each } = require('async')
 const { Semester, Organization } = require('../db/models')
-const { selectAllFrom, selectAllFromSnapshots } = require('../db')
+const { selectAllFrom, selectAllFromSnapshots, selectColumnsFromWithoutNull } = require('../db')
 const { getObject: redisGet, setObject: redisSet, lock: redisLock, expire: redisExpire } = require('../utils/redis')
 
 const TIME_LIMIT_BETWEEN_RELOADS = 1000 * 60 * 30
