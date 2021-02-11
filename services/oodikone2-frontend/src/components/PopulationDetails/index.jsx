@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 import { object, arrayOf, bool, shape, node } from 'prop-types'
-import { Message, Accordion } from 'semantic-ui-react'
+import { Message, Accordion, Label } from 'semantic-ui-react'
 import { useLocalStorage } from '../../common/hooks'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -14,6 +14,9 @@ import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 import useLanguage from '../LanguagePicker/useLanguage'
 import sisDestructionStyle from '../../common/sisDestructionStyle'
+import sendEvent from '../../common/sendEvent'
+
+const sendAnalytics = sendEvent.populationStatistics
 
 const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStudentsByYear, dataExport }) => {
   const { allStudents, filteredStudents } = useFilters()
@@ -36,6 +39,10 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       indexes.push(index)
     }
     setActiveIndex(indexes)
+    sendAnalytics(
+      'Population statistics tab clicked',
+      ['Credit accumulation', 'Credit statistics', 'Age distribution', 'Courses of population', 'Students'][index]
+    )
     /**
      * Here used to be a :tunkki: that scrolled to the component that was opened. However,
      * it does not work with the way this view is now rendered. This is left here just as a
@@ -112,12 +119,15 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Age distribution
+            <Label style={{ marginLeft: '1rem', marginBottom: '0.5rem' }} color="red">
+              NEW!
+            </Label>
           </span>
         )
       },
       onTitleClick: () => handleClick(2),
       content: {
-        content: <AgeStats filteredStudents={filteredStudents} />
+        content: <AgeStats filteredStudents={filteredStudents} query={query} />
       }
     },
     {
