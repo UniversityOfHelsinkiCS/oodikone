@@ -12,7 +12,7 @@ const {
   StudyrightElement,
   Transfer
 } = require('../db/models')
-const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
+const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../db')
 const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, loadMapsIfNeeded } = require('./shared')
 const {
   studentMapper,
@@ -399,16 +399,61 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     return res
   }, {})
 
+  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment', 'CustomCourseUnitAttainment'])
+  const creditTeachers = []
+
+  // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
+  const fixCustomCourseUnitAttainments = async (att) => {
+    if (att.type !== 'CustomCourseUnitAttainment') {
+      return att
+    }
+
+    if (!att.code) {
+      return null
+    }
+
+    const codeParts = att.code.split(/\-\d+$/)
+    if (!codeParts.length) {
+      return null
+    }
+
+    const parsedCourseCode = codeParts[0]
+    const courseUnits = await getCourseUnitsByCode(parsedCourseCode)
+
+    const courseUnit = courseUnits.find(cu => {
+      const { startDate, endDate } = cu.validity_period
+      const attainment_date = new Date(att.attainment_date)
+
+      const isAfterStart = new Date(startDate) <= attainment_date
+      const isBeforeEnd = !endDate || new Date(endDate) > attainment_date
+
+      return isAfterStart && isBeforeEnd
+    })
+
+    if (!courseUnit) {
+      return null
+    }
+
+    // Add the course to the mapping objects for creditMapper to work properly.
+    courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
+    courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
+
+    const { group_id } = courseUnit
+    return { ...att, course_unit_id: courseUnit.id }
+  }
+
+  const fixAttainments = async () => Promise.all(attainments.map(fixCustomCourseUnitAttainments))
+  const fixedAttainments = await fixAttainments()
+
   const mapCredit = creditMapper(
     personIdToStudentNumber,
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode
   )
-  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment'])
-  const creditTeachers = []
 
-  const credits = attainments
+  const credits = fixedAttainments
+    .filter(a => a !== null)
     .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration)
     .map(a => {
       a.acceptor_persons
