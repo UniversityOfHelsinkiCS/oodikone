@@ -94,11 +94,6 @@ const FilterTray = ({ children, filterSet, visible }) => {
             )}
           </div>
           <Icon name="angle double down" />
-          <div id="filter-ribbon-container">
-            <Label color="red" ribbon="right" id="filter-ribbon">
-              NEW!
-            </Label>
-          </div>
         </Button>
       </div>
     </>
