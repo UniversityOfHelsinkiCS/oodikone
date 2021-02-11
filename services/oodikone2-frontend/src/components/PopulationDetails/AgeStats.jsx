@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import PropTypes, { shape } from 'prop-types'
 import { Table, Progress, Radio, Icon } from 'semantic-ui-react'
 import sendEvent from '../../common/sendEvent'
 
@@ -21,7 +21,7 @@ const getAge = toDate => {
 function getMedian(values) {
   if (values.length === 0) return 0
 
-  values.sort(function(a, b) {
+  values.sort((a, b) => {
     return a - b
   })
 
@@ -175,7 +175,8 @@ const AgeStats = ({ filteredStudents, query }) => {
 }
 
 AgeStats.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
+  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
+  query: shape({}).isRequired
 }
 
 export default AgeStats
