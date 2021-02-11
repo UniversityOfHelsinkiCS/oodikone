@@ -246,9 +246,10 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
-        // const startDate = snapshot.valid.startDate
+        const startDate = snapshot.valid.startDate
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
-        const startDate = snapshot.first_snapshot_date_time
+        // const startDate = snapshot.first_snapshot_date_time
+
         const endDate =
           snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
             ? snapshot.study_right_graduation.phase1GraduationDate
@@ -268,7 +269,8 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           const [maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
             ordinal,
-            snapshot.study_right_graduation ? snapshot.study_right_graduation.phase1GraduationDate : null,
+            //snapshot.study_right_graduation ? snapshot.study_right_graduation.phase1GraduationDate : null,
+            startDate,
             snapshot.study_right_graduation && snapshot.study_right_graduation.phase2GraduationDate
               ? snapshot.study_right_graduation.phase2GraduationDate
               : snapshot.valid.endDate,
