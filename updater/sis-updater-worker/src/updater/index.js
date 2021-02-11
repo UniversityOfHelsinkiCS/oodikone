@@ -102,7 +102,14 @@ const purge = async ({ table, before }) => {
   unlock()
 }
 
+const purgeByStudentNumber = async (studentNumbers) => {
+  await Student.destroy({
+    where: { studentnumber: studentNumbers }
+  })
+}
+
 module.exports = {
   update,
-  purge
+  purge,
+  purgeByStudentNumber,
 }
