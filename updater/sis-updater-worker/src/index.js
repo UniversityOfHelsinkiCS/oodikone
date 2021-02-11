@@ -1,12 +1,13 @@
 const { debounce } = require('lodash')
 const { stan, opts } = require('./utils/stan')
 const { dbConnections } = require('./db/connection')
-const { update, purge } = require('./updater')
+const { update, purge, purgeByStudentNumber } = require('./updater')
 const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
 const { logger } = require('./utils/logger')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
   SIS_PURGE_SCHEDULE_CHANNEL,
+  SIS_MISC_SCHEDULE_CHANNEL,
   NATS_GROUP,
   REDIS_TOTAL_META_KEY,
   REDIS_TOTAL_STUDENTS_KEY,
@@ -77,6 +78,14 @@ const purgeMsgHandler = async purgeMsg => {
   await purge(purgeMsg)
 }
 
+const miscMsgHandler = async miscMessage => {
+  const studentNumbers = miscMessage.entityIds.map(s => s.student_number)
+  const msgInUpdateFormat = { ...miscMessage, entityIds: miscMessage.entityIds.map(s => s.id)}
+
+  await purgeByStudentNumber(studentNumbers)
+  await updateMsgHandler(msgInUpdateFormat)
+}
+
 stan.on('error', e => {
   console.log('NATS connection failed', e)
   if (!process.env.CI) process.exit(1)
@@ -109,4 +118,10 @@ dbConnections.on('connect', async () => {
 
   const infoChannel = stan.subscribe('SIS_INFO_CHANNEL', NATS_GROUP, opts)
   infoChannel.on('message', handleInfoMessage)
+
+  const miscChannel = stan.subscribe(SIS_MISC_SCHEDULE_CHANNEL, NATS_GROUP, opts)
+  miscChannel.on('message', handleMessage(miscMsgHandler))
+  miscChannel.on('error', e => {
+    logger.error({ message: 'Misc channel error', meta: e.stack })
+  })
 })
