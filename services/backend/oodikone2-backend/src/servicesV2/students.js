@@ -139,7 +139,17 @@ const formatStudent = ({
   tags
 }) => {
   const toCourse = ({ grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
-    course = course.get()
+    try {
+      course = course.get()
+    } catch (e) {
+      // TODO: this should not be here 1.6.2021
+      course = {
+        code: '99999 - MISSING FORM SIS',
+        name: 'missing',
+        coursetypecode: 'missing'
+      }
+    }
+
     return {
       course: {
         code: course.code,
