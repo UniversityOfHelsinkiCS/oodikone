@@ -411,7 +411,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   const students = await Studyright.findAll({
-    attributes: ['student_studentnumber'],
+    attributes: ['student_studentnumber', 'graduated'],
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -455,7 +455,7 @@ const studentnumbersWithAllStudyrightElements = async (
   let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
 
   // study right cancel does not work in SIS, but the below kludge should do the trick
-  // since canceldate != null   === student does not have any enrolment
+  // since canceldate != null  === student does not have any enrolment
   if (!cancelledStudents) {
     const { semestercode } = await getCurrentSemester()
 
@@ -472,7 +472,8 @@ const studentnumbersWithAllStudyrightElements = async (
     })
 
     const enrolledStudentnumbers = enrolments.map(e => e.studentnumber)
-    studentnumbers = enrolledStudentnumbers
+    const graduated = [...new Set(students.filter(s => s.graduated).map(s => s.student_studentnumber))]
+    studentnumbers = [...new Set(graduated.concat(enrolledStudentnumbers))]
   }
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
@@ -546,6 +547,7 @@ const studentnumbersWithAllStudyrightElements = async (
     }).map(s => s.studentnumber)
 
     const notTransferredStudents = studentnumberlist.filter(sn => !transferredOutStudents.includes(sn))
+
     return notTransferredStudents
   }
 
