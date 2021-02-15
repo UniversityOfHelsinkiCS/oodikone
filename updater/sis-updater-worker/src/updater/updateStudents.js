@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { flatten, uniqBy, sortBy, sortedUniqBy, groupBy, isEqual, orderBy, has, get, conformsTo } = require('lodash')
+const { flatten, uniqBy, sortBy, sortedUniqBy, groupBy, orderBy, has, get, uniq } = require('lodash')
 const {
   Course,
   Student,
@@ -249,8 +249,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         //const startDate = snapshot.valid.startDate
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
         const startDate = snapshot.first_snapshot_date_time
-
-        console.log(snapshot.valid.startDate, snapshot.first_snapshot_date_time)
 
         const endDate =
           snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
@@ -510,16 +508,35 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
   }, {})
 
   const mapSemesterEnrollment = semesterEnrollmentMapper(personIdToStudentNumber, studyrightToUniOrgId)
-  const semesterEnrollments = uniqBy(
-    flatten(
-      termRegistrations
-        .filter(t => studyRights.some(r => r.id === t.study_right_id))
-        .map(({ student_id, term_registrations, study_right_id }) =>
-          term_registrations.map(mapSemesterEnrollment(student_id, study_right_id))
-        )
-    ),
-    sE => `${sE.studentnumber}${sE.semestercomposite}`
+
+  const allSementerEnrollments = flatten(
+    termRegistrations
+      .filter(t => studyRights.some(r => r.id === t.study_right_id))
+      .map(({ student_id, term_registrations, study_right_id }) =>
+        term_registrations.map(mapSemesterEnrollment(student_id, study_right_id))
+      )
   )
+
+  const semesters = uniq(allSementerEnrollments.map(s => s.semestercode))
+
+  // each studyright has own set of semester enrolments and those are not always in sync
+  const semesterEnrollments = semesters.map(semester => {
+    const enrolmentsForSemster = allSementerEnrollments.filter(se => se.semestercode === semester)
+
+    const present = enrolmentsForSemster.find(se => se.enrollmenttype === 1)
+    if ( present ) {
+      return present
+    }
+    const absent = enrolmentsForSemster.find(se => se.enrollmenttype === 2)
+    if ( absent ) {
+      return absent
+    }
+    
+    return enrolmentsForSemster[0]
+  })
+
+
+  console.log(JSON.stringify(semesterEnrollments, null, 2))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }
