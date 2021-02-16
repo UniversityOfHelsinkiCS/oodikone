@@ -24,6 +24,11 @@ const updateSISProgrammes = async () => {
   return response.data
 }
 
+const updateSISRedisCache = async () => {
+  const response = await client.get('/v1/rediscache', { params: { token: SECRET_TOKEN } })
+  return response.data
+}
+
 const abort = async () => {
   const response = await client.get('/v1/abort', { params: { token: SECRET_TOKEN } })
   return response.data
@@ -34,5 +39,6 @@ module.exports = {
   updateSISStudents,
   updateSISProgrammes,
   updateStudentsByStudentNumber,
+  updateSISRedisCache,
   abort
 }

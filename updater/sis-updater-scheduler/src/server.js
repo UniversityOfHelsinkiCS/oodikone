@@ -57,6 +57,10 @@ app.post('/v1/students', async (req, res) => {
   res.locals.msg('Scheduled studentnumbers')
 })
 
+app.get('/v1/rediscache', async (req, res) => {
+  res.locals.msg('Scheduled rediscache')
+})
+
 app.get('/v1/abort', async (req, res) => {
   stan.publish('SIS_INFO_CHANNEL', 'ABORT', err => {
     if (err) {
