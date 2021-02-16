@@ -59,7 +59,8 @@ const calculateMapsToRedis = async () =>
     initGradeScaleIdToGradeIdsToGrades(),
     initOrgToUniOrgId(),
     initOrgToStartYearToSemesters(),
-    initCountries()
+    initCountries(),
+    initModuleGroupIdToDegree()
   ])
 
 const loadMapsFromRedis = async () =>
