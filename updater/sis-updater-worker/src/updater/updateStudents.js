@@ -233,8 +233,6 @@ const updateElementDetails = async studyRights => {
   const mappedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type: 30 }))
 
   // Sort to avoid deadlocks
-  console.log("mapped degrees", mappedDegrees)
-  console.log("mapped programmes", mappedProgrammes)
   await bulkCreate(
     ElementDetail,
     sortedUniqBy(sortBy([...mappedDegrees, ...mappedProgrammes, ...mappedStudytracks], ['code']), e => e.code),
@@ -283,7 +281,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         id: `${mainStudyRight.id}-degree-2`,
         code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)[0].short_name.en
       }
-      console.log("mainStudyRight", mainStudyRight)
       snapshotStudyRightElements.push(baDegreeStudyRightElement, maDegreeStudyRightElement)
 
       orderedSnapshots.forEach(snapshot => {
@@ -344,7 +341,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
     }, [])
     .filter(sE => !!sE.code)
 
-  console.log("study rights elements after mapping", studyRightElements)
   await bulkCreate(StudyrightElement, studyRightElements)
 }
 
@@ -580,8 +576,6 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
     return enrolmentsForSemster[0]
   })
 
-
-  console.log(JSON.stringify(semesterEnrollments, null, 2))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }
