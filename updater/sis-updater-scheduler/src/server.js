@@ -58,7 +58,13 @@ app.post('/v1/students', async (req, res) => {
 })
 
 app.get('/v1/rediscache', async (req, res) => {
-  res.locals.msg('Scheduled rediscache')
+  stan.publish('SIS_INFO_CHANNEL', 'RELOAD_REDIS', err => {
+    if (err) {
+      return res.locals.msg('Error sending reloading msg?')
+    }
+
+    res.locals.msg('Scheduled redis cache reloading')
+  })
 })
 
 app.get('/v1/abort', async (req, res) => {

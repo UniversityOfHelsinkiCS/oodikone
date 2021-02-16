@@ -51,7 +51,7 @@ const handleInfoMessage = async msg => {
     abortingMessages = true
     msg.ack()
   }
-  if (msg.getData() === 'RELOADREDIS') {
+  if (msg.getData() === 'RELOAD_REDIS') {
     logger.info({ message: 'Starting to reload redis cache' })
     await loadMapsOnDemand()
     msg.ack()
