@@ -1,6 +1,7 @@
 const { debounce } = require('lodash')
 const { stan, opts } = require('./utils/stan')
 const { dbConnections } = require('./db/connection')
+const { loadMapsOnDemand } = require('./updater/shared')
 const { update, purge, purgeByStudentNumber } = require('./updater')
 const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
 const { logger } = require('./utils/logger')
@@ -48,6 +49,11 @@ const handleInfoMessage = async msg => {
   if (msg.getData() === 'ABORT') {
     logger.info({ message: 'Starting to abort scheduled messages' })
     abortingMessages = true
+    msg.ack()
+  }
+  if (msg.getData() === 'RELOADREDIS') {
+    logger.info({ message: 'Starting to reload redis cache' })
+    await loadMapsOnDemand()
     msg.ack()
   }
 }
