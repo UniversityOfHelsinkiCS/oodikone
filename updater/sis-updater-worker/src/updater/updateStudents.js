@@ -13,7 +13,7 @@ const {
   Transfer
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../db')
-const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, loadMapsIfNeeded } = require('./shared')
+const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, getDegrees, loadMapsIfNeeded } = require('./shared')
 const {
   studentMapper,
   studyrightMapper,
@@ -194,7 +194,18 @@ const updateElementDetails = async studyRights => {
           educationPhase2ChildGroupId
         }
       } = curr
-
+      if (educationPhase1GroupId && educationPhase2GroupId) {
+        [educationPhase1GroupId, educationPhase2GroupId].forEach(group_id => {
+          const degrees = getDegrees(group_id)
+          if (!degrees || degrees.length !== 1) return
+          const degree = degrees[0]
+          acc[10].add({
+            group_id: `${group_id}-degree`,
+            code: degree.short_name.en,
+            name: degree.name
+          })
+        })
+      }
       acc[20].add(educationPhase1GroupId)
       acc[20].add(educationPhase2GroupId)
       acc[30].add(educationPhase1ChildGroupId)
@@ -202,7 +213,7 @@ const updateElementDetails = async studyRights => {
 
       return acc
     },
-    { 20: new Set(), 30: new Set() }
+    { 10: new Set(), 20: new Set(), 30: new Set() }
   )
 
   const programmes = await selectFromByIds(
@@ -216,18 +227,19 @@ const updateElementDetails = async studyRights => {
     'group_id'
   )
 
+  const mappedDegrees = [...groupedEducationPhases[10]].map(degree => ({...degree, type: 10}))
   const mappedProgrammes = programmes.map(programme => ({ ...programme, type: 20 }))
   const mappedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type: 30 }))
 
   // Sort to avoid deadlocks
   await bulkCreate(
     ElementDetail,
-    sortedUniqBy(sortBy([...mappedProgrammes, ...mappedStudytracks], ['code']), e => e.code),
+    sortedUniqBy(sortBy([...mappedDegrees, ...mappedProgrammes, ...mappedStudytracks], ['code']), e => e.code),
     null,
     ['code']
   )
 
-  return [...mappedProgrammes, ...mappedStudytracks].reduce((acc, curr) => {
+  return [...mappedDegrees, ...mappedProgrammes, ...mappedStudytracks].reduce((acc, curr) => {
     acc[curr.group_id] = curr.code
     return acc
   }, {})
@@ -242,6 +254,34 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
 
       const snapshotStudyRightElements = []
       const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
+
+      const baDegreeStudyRightElement = {
+        studyrightid: `${mainStudyRight.id}-1`,
+        startdate: mainStudyRight.valid
+            ? mainStudyRight.valid.startDate
+            : mainStudyRight.study_start_date,
+        enddate: mainStudyRight.study_right_graduation
+            ? mainStudyRight.study_right_graduation.phase1GraduationDate
+            : mainStudyRight.valid.endDate,
+        studentnumber: personIdToStudentNumber[mainStudyRight.person_id],
+        id: `${mainStudyRight.id}-degree-1`,
+        code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)[0].short_name.en
+      }
+
+      const maDegreeStudyRightElement = {
+        studyrightid: `${mainStudyRight.id}-2`,
+        startdate: mainStudyRight.valid
+            ? mainStudyRight.valid.startDate
+            : mainStudyRight.study_start_date,
+        enddate: mainStudyRight.study_right_graduation
+            ? mainStudyRight.study_right_graduation.phase2GraduationDate
+            : mainStudyRight.valid.endDate,
+        studentnumber: personIdToStudentNumber[mainStudyRight.person_id],
+        id: `${mainStudyRight.id}-degree-2`,
+        code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)[0].short_name.en
+      }
+      snapshotStudyRightElements.push(baDegreeStudyRightElement, maDegreeStudyRightElement)
+
       orderedSnapshots.forEach(snapshot => {
         const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
@@ -535,8 +575,6 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
     return enrolmentsForSemster[0]
   })
 
-
-  console.log(JSON.stringify(semesterEnrollments, null, 2))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }

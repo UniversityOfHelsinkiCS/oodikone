@@ -32,7 +32,8 @@ const IMPORTER_TABLES = {
   persons: 'persons',
   studyrights: 'studyrights',
   termRegistrations: 'term_registrations',
-  studyRightPrimalities: 'study_right_primalities'
+  studyRightPrimalities: 'study_right_primalities',
+  degreeTitles: 'degree_titles'
 }
 
 const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) =>
