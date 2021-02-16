@@ -40,6 +40,7 @@ const Updater = () => {
   const updateSISPopulationStudents = () => apiCall('/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
   const abortSisUpdater = () => apiCall('/updater/abort', 'get')
+  const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache', 'get')
 
   const statusRef = useRef()
   useEffect(() => {
@@ -96,6 +97,7 @@ const Updater = () => {
             <Form.Button content="Update SIS Meta" onClick={() => updateSISMeta()} />
             <Form.Button content="Update SIS Students" onClick={() => updateSISStudents()} />
             <Form.Button content="Update SIS Programmes" onClick={() => updateSISProgrammes()} />
+            <Form.Button content="Refresh SIS Redis cache" onClick={() => refreshSISRedisCache()} />
             <Form.Button content="Refresh statistics V2" icon="refresh" onClick={() => refreshStatisticsV2()} />
           </Form.Group>
           <Form.Group>
