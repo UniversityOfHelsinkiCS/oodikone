@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { flatten, uniqBy, sortBy, sortedUniqBy, groupBy, isEqual, orderBy, has, get, conformsTo } = require('lodash')
+const { flatten, uniqBy, sortBy, sortedUniqBy, groupBy, orderBy, has, get, uniq } = require('lodash')
 const {
   Course,
   Student,
@@ -13,6 +13,7 @@ const {
   Transfer
 } = require('../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
+const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../db')
 const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, getDegrees, loadMapsIfNeeded } = require('./shared')
 const {
   studentMapper,
@@ -289,9 +290,10 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
-        // const startDate = snapshot.valid.startDate
+        //const startDate = snapshot.valid.startDate
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
         const startDate = snapshot.first_snapshot_date_time
+
         const endDate =
           snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
             ? snapshot.study_right_graduation.phase1GraduationDate
@@ -311,7 +313,8 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           const [maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
             ordinal,
-            snapshot.study_right_graduation ? snapshot.study_right_graduation.phase1GraduationDate : null,
+            //snapshot.study_right_graduation ? snapshot.study_right_graduation.phase1GraduationDate : null,
+            startDate,
             snapshot.study_right_graduation && snapshot.study_right_graduation.phase2GraduationDate
               ? snapshot.study_right_graduation.phase2GraduationDate
               : snapshot.valid.endDate,
@@ -441,16 +444,61 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     return res
   }, {})
 
+  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment', 'CustomCourseUnitAttainment'])
+  const creditTeachers = []
+
+  // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
+  const fixCustomCourseUnitAttainments = async (att) => {
+    if (att.type !== 'CustomCourseUnitAttainment') {
+      return att
+    }
+
+    if (!att.code) {
+      return null
+    }
+
+    const codeParts = att.code.split(/\-\d+$/)
+    if (!codeParts.length) {
+      return null
+    }
+
+    const parsedCourseCode = codeParts[0]
+    const courseUnits = await getCourseUnitsByCode(parsedCourseCode)
+
+    const courseUnit = courseUnits.find(cu => {
+      const { startDate, endDate } = cu.validity_period
+      const attainment_date = new Date(att.attainment_date)
+
+      const isAfterStart = new Date(startDate) <= attainment_date
+      const isBeforeEnd = !endDate || new Date(endDate) > attainment_date
+
+      return isAfterStart && isBeforeEnd
+    })
+
+    if (!courseUnit) {
+      return null
+    }
+
+    // Add the course to the mapping objects for creditMapper to work properly.
+    courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
+    courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
+
+    const { group_id } = courseUnit
+    return { ...att, course_unit_id: courseUnit.id }
+  }
+
+  const fixAttainments = async () => Promise.all(attainments.map(fixCustomCourseUnitAttainments))
+  const fixedAttainments = await fixAttainments()
+
   const mapCredit = creditMapper(
     personIdToStudentNumber,
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode
   )
-  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment'])
-  const creditTeachers = []
 
-  const credits = attainments
+  const credits = fixedAttainments
+    .filter(a => a !== null)
     .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration)
     .map(a => {
       a.acceptor_persons
@@ -505,16 +553,35 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
   }, {})
 
   const mapSemesterEnrollment = semesterEnrollmentMapper(personIdToStudentNumber, studyrightToUniOrgId)
-  const semesterEnrollments = uniqBy(
-    flatten(
-      termRegistrations
-        .filter(t => studyRights.some(r => r.id === t.study_right_id))
-        .map(({ student_id, term_registrations, study_right_id }) =>
-          term_registrations.map(mapSemesterEnrollment(student_id, study_right_id))
-        )
-    ),
-    sE => `${sE.studentnumber}${sE.semestercomposite}`
+
+  const allSementerEnrollments = flatten(
+    termRegistrations
+      .filter(t => studyRights.some(r => r.id === t.study_right_id))
+      .map(({ student_id, term_registrations, study_right_id }) =>
+        term_registrations.map(mapSemesterEnrollment(student_id, study_right_id))
+      )
   )
+
+  const semesters = uniq(allSementerEnrollments.map(s => s.semestercode))
+
+  // each studyright has own set of semester enrolments and those are not always in sync
+  const semesterEnrollments = semesters.map(semester => {
+    const enrolmentsForSemster = allSementerEnrollments.filter(se => se.semestercode === semester)
+
+    const present = enrolmentsForSemster.find(se => se.enrollmenttype === 1)
+    if ( present ) {
+      return present
+    }
+    const absent = enrolmentsForSemster.find(se => se.enrollmenttype === 2)
+    if ( absent ) {
+      return absent
+    }
+    
+    return enrolmentsForSemster[0]
+  })
+
+
+  console.log(JSON.stringify(semesterEnrollments, null, 2))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }
