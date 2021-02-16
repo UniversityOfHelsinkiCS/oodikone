@@ -50,6 +50,17 @@ const loadMapsIfNeeded = async () => {
   }
 }
 
+const loadMapsOnDemand = async () => {
+  // TODO: hotfix for frontend, refactor this to more logical place
+  const unlock = await redisLock(SHARED_LOCK, 1000 * 60 * 3)
+  await calculateMapsToRedis()
+  await redisSet(REDIS_INITIALIZED, true)
+  await redisExpire(REDIS_INITIALIZED, 1800)
+  unlock()
+  await loadMapsFromRedis()
+  loadedAt = new Date().getTime()
+}
+
 const calculateMapsToRedis = async () =>
   Promise.all([
     initDaysToSemesters(),
@@ -279,5 +290,6 @@ module.exports = {
   getSemester,
   getCountry,
   getDegrees,
-  loadMapsIfNeeded
+  loadMapsIfNeeded,
+  loadMapsOnDemand
 }

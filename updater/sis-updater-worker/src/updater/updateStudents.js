@@ -255,32 +255,40 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       const snapshotStudyRightElements = []
       const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
 
-      const baDegreeStudyRightElement = {
-        studyrightid: `${mainStudyRight.id}-1`,
-        startdate: mainStudyRight.valid
-            ? mainStudyRight.valid.startDate
-            : mainStudyRight.study_start_date,
-        enddate: mainStudyRight.study_right_graduation
+      if (mainStudyRight.accepted_selection_path.educationPhase1GroupId) {
+        const baDegreeStudyRightElement = {
+          studyrightid: `${mainStudyRight.id}-1`,
+          enddate:
+            mainStudyRight.study_right_graduation && mainStudyRight.study_right_graduation.phase1GraduationDate
+              ? mainStudyRight.study_right_graduation.phase1GraduationDate
+              : mainStudyRight.valid.endDate,
+          graduated: mainStudyRight.study_right_graduation && mainStudyRight.study_right_graduation.phase1GraduationDate ? 1 : 0,
+          startdate: mainStudyRight.study_right_graduation
             ? mainStudyRight.study_right_graduation.phase1GraduationDate
-            : mainStudyRight.valid.endDate,
-        studentnumber: personIdToStudentNumber[mainStudyRight.person_id],
-        id: `${mainStudyRight.id}-degree-1`,
-        code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)[0].short_name.en
+            : null,
+          studentnumber: personIdToStudentNumber[mainStudyRight.person_id],
+          id: `${mainStudyRight.id}-degree-1`,
+          code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)[0].short_name.en
+        }
+        snapshotStudyRightElements.push(baDegreeStudyRightElement)
       }
-
-      const maDegreeStudyRightElement = {
-        studyrightid: `${mainStudyRight.id}-2`,
-        startdate: mainStudyRight.valid
-            ? mainStudyRight.valid.startDate
-            : mainStudyRight.study_start_date,
-        enddate: mainStudyRight.study_right_graduation
+      if (mainStudyRight.accepted_selection_path.educationPhase2GroupId) {
+        const maDegreeStudyRightElement = {
+          studyrightid: `${mainStudyRight.id}-2`,
+          enddate:
+            mainStudyRight.study_right_graduation && mainStudyRight.study_right_graduation.phase2GraduationDate
+              ? mainStudyRight.study_right_graduation.phase2GraduationDate
+              : mainStudyRight.valid.endDate,
+          graduated: mainStudyRight.study_right_graduation && mainStudyRight.study_right_graduation.phase2GraduationDate ? 1 : 0,
+          startdate: mainStudyRight.study_right_graduation
             ? mainStudyRight.study_right_graduation.phase2GraduationDate
-            : mainStudyRight.valid.endDate,
-        studentnumber: personIdToStudentNumber[mainStudyRight.person_id],
-        id: `${mainStudyRight.id}-degree-2`,
-        code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)[0].short_name.en
+            : null,
+          studentnumber: personIdToStudentNumber[mainStudyRight.person_id],
+          id: `${mainStudyRight.id}-degree-2`,
+          code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)[0].short_name.en
+        }
+        snapshotStudyRightElements.push(maDegreeStudyRightElement)
       }
-      snapshotStudyRightElements.push(baDegreeStudyRightElement, maDegreeStudyRightElement)
 
       orderedSnapshots.forEach(snapshot => {
         const ordinal = snapshot.modification_ordinal
