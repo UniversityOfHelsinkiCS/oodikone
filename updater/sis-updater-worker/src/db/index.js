@@ -63,6 +63,12 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
   }
 }
 
+const getCourseUnitsByCode = (code) =>
+  dbConnections
+    .knex('course_units')
+    .where({ code })
+    .select('*')
+
 module.exports = {
   selectFromByIds,
   selectFromByIdsOrderBy,
@@ -72,4 +78,5 @@ module.exports = {
   selectAllFromSnapshots,
   selectColumnsFrom,
   selectWithoutNull
+  getCourseUnitsByCode
 }

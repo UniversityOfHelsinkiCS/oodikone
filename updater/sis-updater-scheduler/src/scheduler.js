@@ -6,6 +6,7 @@ const { set: redisSet, get: redisGet } = require('./utils/redis')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
   SIS_PURGE_SCHEDULE_CHANNEL,
+  SIS_MISC_SCHEDULE_CHANNEL,
   CHUNK_SIZE,
   isDev,
   DEV_SCHEDULE_COUNT,
@@ -35,9 +36,9 @@ const IMPORTER_TABLES = {
   degreeTitles: 'degree_titles'
 }
 
-const createJobs = async (entityIds, type) =>
+const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) =>
   new Promise((res, rej) => {
-    stan.publish(SIS_UPDATER_SCHEDULE_CHANNEL, JSON.stringify({ entityIds, type }), err => {
+    stan.publish(channel, JSON.stringify({ entityIds, type }), err => {
       if (err) return rej(err)
       res()
     })
@@ -172,11 +173,11 @@ const getHourlyPersonsToUpdate = async () => {
 const scheduleByStudentNumbers = async studentNumbers => {
   const { knex } = knexConnection
   const personsToUpdate = await knex('persons')
+    .column('id', 'student_number')
     .whereIn('student_number', studentNumbers)
-    .pluck('id')
   await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
   await redisSet(REDIS_TOTAL_STUDENTS_KEY, personsToUpdate.length)
-  await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
+  await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students', SIS_MISC_SCHEDULE_CHANNEL))
 }
 
 const scheduleByCourseCodes = async courseCodes => {
