@@ -77,6 +77,6 @@ module.exports = {
   selectAllFrom,
   selectAllFromSnapshots,
   selectColumnsFrom,
-  selectWithoutNull
+  selectWithoutNull,
   getCourseUnitsByCode
 }
