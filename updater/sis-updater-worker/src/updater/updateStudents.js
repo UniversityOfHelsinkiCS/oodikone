@@ -538,6 +538,27 @@ const updateTeachers = async attainments => {
   return personIdToEmployeeNumber
 }
 
+// why we are using two terms for the same thing: term registration and semester enrollment
+const semesterEnrolmentsOfStudent = (allSementerEnrollments) => {
+  const semesters = uniq(allSementerEnrollments.map(s => s.semestercode))
+  const semesterEnrollments = semesters.map(semester => {
+    const enrolmentsForSemster = allSementerEnrollments.filter(se => se.semestercode === semester)
+
+    const present = enrolmentsForSemster.find(se => se.enrollmenttype === 1)
+    if ( present ) {
+      return present
+    }
+    const absent = enrolmentsForSemster.find(se => se.enrollmenttype === 2)
+    if ( absent ) {
+      return absent
+    }
+
+    return enrolmentsForSemster[0]
+  })
+
+  return semesterEnrollments
+}
+
 const updateTermRegistrations = async (termRegistrations, personIdToStudentNumber) => {
   const studyRightIds = termRegistrations.map(({ study_right_id }) => study_right_id)
   const studyRights = await selectFromSnapshotsByIds('studyrights', studyRightIds)
@@ -557,24 +578,8 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
       )
   )
 
-  const semesters = uniq(allSementerEnrollments.map(s => s.semestercode))
-
-  // each studyright has own set of semester enrolments and those are not always in sync
-  const semesterEnrollments = semesters.map(semester => {
-    const enrolmentsForSemster = allSementerEnrollments.filter(se => se.semestercode === semester)
-
-    const present = enrolmentsForSemster.find(se => se.enrollmenttype === 1)
-    if ( present ) {
-      return present
-    }
-    const absent = enrolmentsForSemster.find(se => se.enrollmenttype === 2)
-    if ( absent ) {
-      return absent
-    }
-    
-    return enrolmentsForSemster[0]
-  })
-
+  const enrolmentsByStudents = groupBy(allSementerEnrollments, (e) => e.studentnumber)
+  const semesterEnrollments = flatten(Object.values(enrolmentsByStudents).map(semesterEnrolmentsOfStudent))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }
