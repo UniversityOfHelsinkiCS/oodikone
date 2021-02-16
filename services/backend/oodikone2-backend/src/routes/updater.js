@@ -217,14 +217,14 @@ router.get('/update/v2/programmes', async (req, res) => {
   }
 })
 
-router.get('/update/v2/rediscache', async (req, res) => {
+router.get('/refresh_redis_cache', async (req, res) => {
   const { roles } = req
   if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
 
   try {
     const response = await updateSISRedisCache()
     if (response) {
-      res.status(200).json('Update SIS redis cache scheduled')
+      res.status(200).json('Refreshing SIS redis cache scheduled')
     }
   } catch (err) {
     console.log(err)
