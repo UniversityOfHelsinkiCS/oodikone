@@ -71,7 +71,7 @@ class CourseYearlyStatsCounter {
       // disgusting
       faculty_code &&
       !this.facultyStats[yearcode].faculties[faculty_code] &&
-      !this.facultyStats[yearcode].allStudents.includes(studentnumber)
+      !this.facultyStats[yearcode].allPassed.includes(studentnumber)
     ) {
       this.initFaculty(yearcode, faculty_code, organization)
     }
