@@ -12,7 +12,6 @@ const {
   StudyrightElement,
   Transfer
 } = require('../db/models')
-const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate } = require('../db')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../db')
 const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, getDegrees, loadMapsIfNeeded } = require('./shared')
 const {
