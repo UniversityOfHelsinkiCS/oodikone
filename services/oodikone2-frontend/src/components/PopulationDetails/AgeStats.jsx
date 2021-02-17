@@ -64,10 +64,19 @@ const AgeStats = ({ filteredStudents, query }) => {
   }
 
   const getActualStartDate = student => {
-    const studyright = student.studyrights.find(studyright =>
-      studyright.studyright_elements.some(e => e.code === query.studyRights.programme)
-    )
-    return new Date(studyright.studystartdate || studyright.startdate)
+    const actualStudyStartDate = student.studyrights.reduce((startdate, studyright) => {
+      if (startdate) return startdate
+
+      const studyright_element = studyright.studyright_elements.find(e => e.code === query.studyRights.programme)
+      if (!studyright_element) return startdate
+
+      // matching behavior with backend, studystartdate is used if it exists and is bigger of the two
+      return new Date(studyright_element.startdate).getTime() > new Date(studyright.studystartdate).getTime()
+        ? studyright_element.startdate
+        : studyright.studystartdate
+    }, null)
+
+    return new Date(actualStudyStartDate)
   }
 
   const getAverageAtStudiesStart = () => {
