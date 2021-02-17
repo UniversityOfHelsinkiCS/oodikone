@@ -36,6 +36,7 @@ const StudyrightsTable = ({
       .map(programme => ({
         code: programme.code,
         startdate: programme.startdate,
+        studystartdate: studyright.studystartdate,
         enddate: programme.enddate,
         name: getTextIn(programme.element_detail.name, language)
       }))
@@ -100,12 +101,15 @@ const StudyrightsTable = ({
     </p>
   )
 
+  const getActualStartDate = c =>
+    new Date(c.startdate).getTime() > new Date(c.studystartdate).getTime() ? c.startdate : c.studystartdate
+
   const renderProgrammes = c =>
     sortBy(c.elements.programmes.filter(filterDuplicates), 'startdate')
       .reverse()
       .map(programme => (
         <p key={`${programme.name}-${programme.startdate}`}>
-          {`${programme.name} (${reformatDate(programme.startdate, 'DD.MM.YYYY')} - ${reformatDate(
+          {`${programme.name} (${reformatDate(getActualStartDate(programme), 'DD.MM.YYYY')} - ${reformatDate(
             programme.enddate,
             'DD.MM.YYYY'
           )})`}
