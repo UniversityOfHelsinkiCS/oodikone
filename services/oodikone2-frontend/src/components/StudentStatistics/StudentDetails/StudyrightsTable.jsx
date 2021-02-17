@@ -26,7 +26,6 @@ const StudyrightsTable = ({
     const degree = sortBy(studyright.studyright_elements, 'enddate').find(e => e.element_detail.type === 10)
     const formattedDegree = degree && {
       startdate: degree.startdate,
-      studystartdate: studyright.studystartdate,
       enddate: degree.enddate,
       name: getTextIn(degree.element_detail.name, language),
       graduateionDate: degree.graduation_date,
@@ -94,11 +93,9 @@ const StudyrightsTable = ({
 
   const renderDegrees = c => (
     <p key={c.elements.degree.name}>
-      {/* Sometimes studystartdate contains the right date while startdate is off so we do this. */}
-      {/* Same on population statistics page so attempting to keep consistency.*/}
       {`${c.elements.degree.name}
-      (${reformatDate(c.elements.degree.studystartdate || c.elements.degree.startdate, 'DD.MM.YYYY')} -
-      ${reformatDate(c.elements.degree.studystartdate || c.elements.degree.enddate, 'DD.MM.YYYY')})`}
+      (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} -
+      ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
       <br />
     </p>
   )
