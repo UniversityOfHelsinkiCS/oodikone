@@ -7,6 +7,7 @@ import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import FacultyLevelStatistics from './FacultyLevelStatistics'
+import CourseDiff from './CourseDiff'
 import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
@@ -33,11 +34,13 @@ const CourseStatistics = props => {
     loading,
     initCourseCode,
     userRoles,
-    rights
+    rights,
+    diffIsEmpty
   } = props
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [selected, setSelected] = useState(initCourseCode)
+  const [showDiff, setShowDiff] = useState(false)
   const { onProgress, progress } = useProgress(loading)
   useTitle('Course statistics')
 
@@ -106,22 +109,30 @@ const CourseStatistics = props => {
     )
 
   const panes = getPanes()
+
+  const getContent = () => {
+    if ((statsIsEmpty && diffIsEmpty) || history.location.search === '') {
+      return <SearchForm onProgress={onProgress} showDiff={showDiff} setShowDiff={setShowDiff} />
+    }
+    if (showDiff) {
+      return <CourseDiff />
+    }
+    return (
+      <Tab
+        menu={{ attached: false, borderless: false }}
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={handleTabChange}
+      />
+    )
+  }
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
         Course Statistics
       </Header>
       <Segment className="contentSegment">
-        {statsIsEmpty || history.location.search === '' ? (
-          <SearchForm onProgress={onProgress} />
-        ) : (
-          <Tab
-            menu={{ attached: false, borderless: false }}
-            panes={panes}
-            activeIndex={activeIndex}
-            onTabChange={handleTabChange}
-          />
-        )}
+        {getContent()}
         <ProgressBar fixed progress={progress} />
       </Segment>
     </div>
@@ -136,11 +147,13 @@ CourseStatistics.propTypes = {
   loading: bool.isRequired,
   initCourseCode: string.isRequired,
   userRoles: arrayOf(string).isRequired,
-  rights: arrayOf(string).isRequired
+  rights: arrayOf(string).isRequired,
+  diffIsEmpty: bool.isRequired
 }
 
 const mapStateToProps = ({
   courseStats,
+  oodiSisDiff,
   auth: {
     token: { roles, rights }
   }
@@ -149,12 +162,13 @@ const mapStateToProps = ({
   return {
     userRoles: getUserRoles(roles),
     rights,
-    pending: courseStats.pending,
+    pending: courseStats.pending || oodiSisDiff.pending,
     error: courseStats.error,
     statsIsEmpty: courses.length === 0,
     singleCourseStats: courses.length === 1,
-    loading: courseStats.pending,
-    initCourseCode: courses[0] || ''
+    loading: courseStats.pending || oodiSisDiff.pending,
+    initCourseCode: courses[0] || '',
+    diffIsEmpty: Object.keys(oodiSisDiff.data).length === 0
   }
 }
 
