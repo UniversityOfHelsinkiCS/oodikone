@@ -17,19 +17,10 @@ const getAge = toDate => {
   return age
 }
 
-// https://stackoverflow.com/a/45309555
-function getMedian(values) {
+function getAverage(values) {
   if (values.length === 0) return 0
 
-  values.sort((a, b) => {
-    return a - b
-  })
-
-  const half = Math.floor(values.length / 2)
-
-  if (values.length % 2) return values[half]
-
-  return (values[half - 1] + values[half]) / 2.0
+  return (values.reduce((acc, cur) => acc + cur, 0) / values.length).toFixed(1)
 }
 
 const getAgeGroup = age => Math.floor(age / 5) * 5
@@ -79,8 +70,8 @@ const AgeStats = ({ filteredStudents, query }) => {
     return new Date(studyright.studystartdate || studyright.startdate)
   }
 
-  const getMedianAtStudiesStart = () => {
-    return getMedian(
+  const getAverageAtStudiesStart = () => {
+    return getAverage(
       filteredStudents.reduce((acc, student) => {
         const timeSinceStudiesStart = new Date().getTime() - getActualStartDate(student).getTime()
         // let's adjust student birthdate by adding time they have been studying
@@ -99,8 +90,8 @@ const AgeStats = ({ filteredStudents, query }) => {
         <Radio toggle label="Group ages" checked={isGrouped} onChange={() => setIsGrouped(!isGrouped)} />
       </div>
       <div>
-        Median:{' '}
-        {getMedian(
+        Average:{' '}
+        {getAverage(
           ages.reduce((acc, [age, count]) => {
             for (let i = 0; i < count; i++) {
               acc.push(Number(age))
@@ -110,7 +101,7 @@ const AgeStats = ({ filteredStudents, query }) => {
           }, [])
         )}
       </div>
-      <div>Median at studies start: {getMedianAtStudiesStart()}</div>
+      <div>Average at studies start: {getAverageAtStudiesStart()}</div>
       <Table celled compact="very">
         <Table.Header>
           <Table.Row>
