@@ -93,7 +93,7 @@ jobs:
           path: cypress/screenshots
       - deploy:
           command: |
-            if [ "${DEPLOY}" == "true" ]; then
+            if [ "${DEPLOY}" == "not_acually_true" ]; then
               docker exec --env SENTRY_URL --env SENTRY_AUTH_TOKEN --env SENTRY_ORG=sentry --env SENTRY_PROJECT=oodikone frontend \
                 sh +e -c 'npm run sentry-cli -- releases info "$(cat /SENTRY_RELEASE_VERSION)" && \
                 npm run sentry-cli -- releases delete "$(cat /SENTRY_RELEASE_VERSION)" || true'
