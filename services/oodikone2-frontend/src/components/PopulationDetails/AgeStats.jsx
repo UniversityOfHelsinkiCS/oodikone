@@ -67,12 +67,12 @@ const AgeStats = ({ filteredStudents, query }) => {
     const actualStudyStartDate = student.studyrights.reduce((startdate, studyright) => {
       if (startdate) return startdate
 
-      const studyright_element = studyright.studyright_elements.find(e => e.code === query.studyRights.programme)
-      if (!studyright_element) return startdate
+      const studyrightElement = studyright.studyright_elements.find(e => e.code === query.studyRights.programme)
+      if (!studyrightElement) return startdate
 
       // matching behavior with backend, studystartdate is used if it exists and is bigger of the two
-      return new Date(studyright_element.startdate).getTime() > new Date(studyright.studystartdate).getTime()
-        ? studyright_element.startdate
+      return new Date(studyrightElement.startdate).getTime() > new Date(studyright.studystartdate).getTime()
+        ? studyrightElement.startdate
         : studyright.studystartdate
     }, null)
 
