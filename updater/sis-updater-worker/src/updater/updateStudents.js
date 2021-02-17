@@ -183,6 +183,18 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   await bulkCreate(Studyright, formattedStudyRights, null, ['studyrightid'])
 }
 
+const createDegreeFromGroupId = groupdId => {
+  // Create degree object to be added to db as element detail
+  const degrees = getDegrees(groupdId)
+  if (!degrees) return
+  const degree = degrees[0]
+  return {
+    group_id: `${groupdId}-degree`,
+    code: degree.short_name.en,
+    name: degree.name
+  }
+}
+
 const updateElementDetails = async studyRights => {
   const groupedEducationPhases = studyRights.reduce(
     (acc, curr) => {
@@ -194,23 +206,16 @@ const updateElementDetails = async studyRights => {
           educationPhase2ChildGroupId
         }
       } = curr
-      if (educationPhase1GroupId && educationPhase2GroupId) {
-        [educationPhase1GroupId, educationPhase2GroupId].forEach(group_id => {
-          const degrees = getDegrees(group_id)
-          if (!degrees || degrees.length !== 1) return
-          const degree = degrees[0]
-          acc[10].add({
-            group_id: `${group_id}-degree`,
-            code: degree.short_name.en,
-            name: degree.name
-          })
-        })
+      if (educationPhase1GroupId) {
+        acc[10].add(createDegreeFromGroupId(educationPhase1GroupId))
+      }
+      if (educationPhase2GroupId) {
+        acc[10].add(createDegreeFromGroupId(educationPhase2GroupId))
       }
       acc[20].add(educationPhase1GroupId)
       acc[20].add(educationPhase2GroupId)
       acc[30].add(educationPhase1ChildGroupId)
       acc[30].add(educationPhase2ChildGroupId)
-
       return acc
     },
     { 10: new Set(), 20: new Set(), 30: new Set() }
@@ -227,9 +232,10 @@ const updateElementDetails = async studyRights => {
     'group_id'
   )
 
-  const mappedDegrees = [...groupedEducationPhases[10]].map(degree => ({...degree, type: 10}))
+  const mappedDegrees = [...groupedEducationPhases[10]].filter(degree => degree).map(degree => ({...degree, type: 10}))
   const mappedProgrammes = programmes.map(programme => ({ ...programme, type: 20 }))
   const mappedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type: 30 }))
+
 
   // Sort to avoid deadlocks
   await bulkCreate(
@@ -254,41 +260,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
 
       const snapshotStudyRightElements = []
       const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
-
-      if (mainStudyRight.accepted_selection_path.educationPhase1GroupId) {
-        const baDegreeStudyRightElement = {
-          studyrightid: `${mainStudyRight.id}-1`,
-          enddate:
-            mainStudyRight.study_right_graduation && mainStudyRight.study_right_graduation.phase1GraduationDate
-              ? mainStudyRight.study_right_graduation.phase1GraduationDate
-              : mainStudyRight.valid.endDate,
-          graduated: mainStudyRight.study_right_graduation && mainStudyRight.study_right_graduation.phase1GraduationDate ? 1 : 0,
-          startdate: mainStudyRight.study_right_graduation
-            ? mainStudyRight.study_right_graduation.phase1GraduationDate
-            : null,
-          studentnumber: personIdToStudentNumber[mainStudyRight.person_id],
-          id: `${mainStudyRight.id}-degree-1`,
-          code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)[0].short_name.en
-        }
-        snapshotStudyRightElements.push(baDegreeStudyRightElement)
-      }
-      if (mainStudyRight.accepted_selection_path.educationPhase2GroupId) {
-        const maDegreeStudyRightElement = {
-          studyrightid: `${mainStudyRight.id}-2`,
-          enddate:
-            mainStudyRight.study_right_graduation && mainStudyRight.study_right_graduation.phase2GraduationDate
-              ? mainStudyRight.study_right_graduation.phase2GraduationDate
-              : mainStudyRight.valid.endDate,
-          graduated: mainStudyRight.study_right_graduation && mainStudyRight.study_right_graduation.phase2GraduationDate ? 1 : 0,
-          startdate: mainStudyRight.study_right_graduation
-            ? mainStudyRight.study_right_graduation.phase2GraduationDate
-            : null,
-          studentnumber: personIdToStudentNumber[mainStudyRight.person_id],
-          id: `${mainStudyRight.id}-degree-2`,
-          code: getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)[0].short_name.en
-        }
-        snapshotStudyRightElements.push(maDegreeStudyRightElement)
-      }
 
       orderedSnapshots.forEach(snapshot => {
         const ordinal = snapshot.modification_ordinal
