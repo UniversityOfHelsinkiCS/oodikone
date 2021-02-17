@@ -157,9 +157,12 @@ function PopulationCourseStats(props) {
         .filter(mandatoryFilter)
         .filter(c => !codeFilter || courseCodeFilter(c))
         .filter(c => !nameFilter || courseNameFilter(c))
-        .map(c => {
-          const course = mandatoryCourses.find(mc => mc.code === c.course.code)
-          return { ...c, ...course }
+        // it needs to be with flatMap and filter and not map and find
+        // because there can be many mandatoryCourses with the same course code
+        // as they can belong to many categories
+        .flatMap(c => {
+          const courses = mandatoryCourses.filter(mc => mc.code === c.course.code)
+          return courses.map(course => ({ ...c, ...course }))
         })
 
     const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
