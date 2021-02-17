@@ -304,17 +304,20 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             : snapshot.valid.endDate
 
         if (isBaMa(mainStudyRightEducation)) {
-          const [baProgramme, baStudytrack] = mapStudyrightElements(
+          const possibleBaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
+          const [baDegree, baProgramme, baStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`,
             ordinal,
             startDate,
             endDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId]
+            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
+            possibleBaDegrees ? possibleBaDegrees[0].short_name.en : null
           )
 
-          const [maProgramme, maStudytrack] = mapStudyrightElements(
+          const possibleMaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)
+          const [maDegree, maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
             ordinal,
             //snapshot.study_right_graduation ? snapshot.study_right_graduation.phase1GraduationDate : null,
@@ -324,22 +327,25 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
               : snapshot.valid.endDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId]
+            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId],
+            possibleMaDegrees ? possibleMaDegrees[0].short_name.en : null
           )
 
-          snapshotStudyRightElements.push(baProgramme, baStudytrack, maProgramme, maStudytrack)
+          snapshotStudyRightElements.push(baDegree, baProgramme, baStudytrack, maDegree, maProgramme, maStudytrack)
         } else {
-          const [programme, studytrack] = mapStudyrightElements(
+          const possibleDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
+          const [degree, programme, studytrack] = mapStudyrightElements(
             mainStudyRight.id,
             ordinal,
             startDate,
             endDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId]
+            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
+            possibleDegrees ? possibleDegrees[0].short_name.en : null
           )
 
-          snapshotStudyRightElements.push(programme, studytrack)
+          snapshotStudyRightElements.push(degree, programme, studytrack)
         }
       })
 
