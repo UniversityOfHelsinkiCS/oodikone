@@ -69,25 +69,6 @@ const updateStudents = async personIds => {
     selectFromByIds('study_right_primalities', personIds, 'student_id')
   ])
 
-  /*
-  const groupedStudyRightSnapshots = Object.entries(
-    groupBy(
-      studyRightSnapshots.filter(sR => sR.document_state === 'ACTIVE'),
-      'id'
-    )
-  ).reduce((res, [id, snapshots]) => {
-    const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'desc')
-    res[id] = orderedSnapshots.filter((currentSnapshot, i) => {
-      if (i === 0) return true
-      return !isEqual(currentSnapshot.accepted_selection_path, orderedSnapshots[i - 1].accepted_selection_path)
-    })
-
-    return res
-  }, {})
-
-  this is deprecated by the following function call
-  */
-
   // grouping in function that sets first_snapshot_date_time
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
 
