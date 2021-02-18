@@ -94,11 +94,11 @@ jobs:
       - deploy:
           command: |
             if [ "${DEPLOY}" == "true" ]; then
-              docker exec --env SENTRY_URL --env SENTRY_AUTH_TOKEN --env SENTRY_ORG=sentry --env SENTRY_PROJECT=oodikone frontend \
+              docker exec --env SENTRY_URL --env SENTRY_AUTH_TOKEN --env SENTRY_ORG=toska --env SENTRY_PROJECT=oodikone frontend \
                 sh +e -c 'npm run sentry-cli -- releases info "$(cat /SENTRY_RELEASE_VERSION)" && \
                 npm run sentry-cli -- releases delete "$(cat /SENTRY_RELEASE_VERSION)" || true'
 
-              docker exec --env SENTRY_URL --env SENTRY_AUTH_TOKEN --env SENTRY_ORG=sentry --env SENTRY_PROJECT=oodikone frontend \
+              docker exec --env SENTRY_URL --env SENTRY_AUTH_TOKEN --env SENTRY_ORG=toska --env SENTRY_PROJECT=oodikone frontend \
                 sh -c 'npm run sentry-cli -- releases new --finalize "$(cat /SENTRY_RELEASE_VERSION)" && \
                 npm run sentry-cli -- releases files "$(cat /SENTRY_RELEASE_VERSION)" upload-sourcemaps --rewrite dist'
             fi
