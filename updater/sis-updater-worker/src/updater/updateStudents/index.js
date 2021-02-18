@@ -164,19 +164,6 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   await bulkCreate(Studyright, formattedStudyRights, null, ['studyrightid'])
 }
 
-const createDegreeFromGroupId = groupdId => {
-  // Create degree object to be added to db as element detail
-  const degrees = getDegrees(groupdId)
-  if (!degrees) return
-  const degree = degrees[0]
-  return {
-    group_id: `${groupdId}-degree`,
-    code: degree.short_name.en,
-    name: degree.name
-  }
-}
-
-
 const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
   const studyRightElements = Object.values(groupedStudyRightSnapshots)
     .reduce((res, snapshots) => {
