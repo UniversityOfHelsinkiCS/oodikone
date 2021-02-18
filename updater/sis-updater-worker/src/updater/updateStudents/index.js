@@ -7,22 +7,18 @@ const {
   Teacher,
   Credit,
   CreditTeacher,
-  Studyright,
-  StudyrightElement,
   Transfer
 } = require('../../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../../db')
-const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, getDegrees, loadMapsIfNeeded } = require('../shared')
+const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
 const {
   studentMapper,
-  studyrightMapper,
-  mapStudyrightElements,
   mapTeacher,
   creditMapper,
   semesterEnrollmentMapper
 } = require('../mapper')
 const { isBaMa } = require('../../utils')
-const { updateElementDetails } = require('./studyRightUpdaters')
+const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 
 const groupStudyrightSnapshots = (studyRightSnapshots) => {
   const snapshotsBystudyright = Object.entries(
@@ -104,142 +100,6 @@ const updateStudents = async personIds => {
   ])
 }
 
-const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
-  const mapStudyright = studyrightMapper(personIdToStudentNumber)
-
-  const formattedStudyRights = studyRights.reduce((acc, studyright) => {
-    const studyRightEducation = getEducation(studyright.education_id)
-    const primality = get(personIdToStudyRightIdToPrimality, `${studyright.person_id}.${studyright.id}`)
-    const primalityEndDate = get(primality, 'end_date')
-    const isPrimality = primality && !primalityEndDate
-    if (!studyRightEducation) return acc
-
-    if (isBaMa(studyRightEducation)) {
-      const studyRightBach = mapStudyright(studyright, {
-        extentcode: 1,
-        studyrightid: `${studyright.id}-1`,
-        prioritycode: get(studyright, 'study_right_graduation.phase1GraduationDate')
-          ? 30
-          : studyright.state === 'RESCINDED'
-          ? 5
-          : isPrimality
-          ? 1
-          : 2
-      })
-
-      const studyRightMast = mapStudyright(studyright, {
-        extentcode: 2,
-        studyrightid: `${studyright.id}-2`,
-        enddate:
-          studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
-            ? studyright.study_right_graduation.phase2GraduationDate
-            : studyright.valid.endDate,
-        graduated: studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate ? 1 : 0,
-        studystartdate: studyright.study_right_graduation
-          ? studyright.study_right_graduation.phase1GraduationDate
-          : null,
-        prioritycode: get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
-          ? 30
-          : studyright.state === 'RESCINDED'
-          ? 5
-          : isPrimality
-          ? get(studyright, 'study_right_graduation.phase1GraduationDate')
-            ? 1
-            : 6
-          : 2
-      })
-
-      acc.push(studyRightMast, studyRightBach)
-    } else {
-      const educationType = getEducationType(studyRightEducation.education_type)
-      const mappedStudyright = mapStudyright(studyright, {
-        extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
-        prioritycode: studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
-      })
-      acc.push(mappedStudyright)
-    }
-    return acc
-  }, [])
-
-  await bulkCreate(Studyright, formattedStudyRights, null, ['studyrightid'])
-}
-
-const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
-  const studyRightElements = Object.values(groupedStudyRightSnapshots)
-    .reduce((res, snapshots) => {
-      const mainStudyRight = snapshots[0]
-      const mainStudyRightEducation = getEducation(mainStudyRight.education_id)
-      if (!mainStudyRightEducation) return res
-
-      const snapshotStudyRightElements = []
-      const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
-
-      orderedSnapshots.forEach(snapshot => {
-        const ordinal = snapshot.modification_ordinal
-        const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
-
-        //const startDate = snapshot.valid.startDate
-        // according to Eija Airio this is the right way to get the date... at least when studyright has changed
-        const startDate = snapshot.first_snapshot_date_time
-
-        const endDate =
-          snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
-            ? snapshot.study_right_graduation.phase1GraduationDate
-            : snapshot.valid.endDate
-
-        if (isBaMa(mainStudyRightEducation)) {
-          const possibleBaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
-          const [baDegree, baProgramme, baStudytrack] = mapStudyrightElements(
-            `${mainStudyRight.id}-1`,
-            ordinal,
-            startDate,
-            endDate,
-            studentnumber,
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            possibleBaDegrees ? possibleBaDegrees[0].short_name.en : null
-          )
-
-          const possibleMaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)
-          const [maDegree, maProgramme, maStudytrack] = mapStudyrightElements(
-            `${mainStudyRight.id}-2`,
-            ordinal,
-            //snapshot.study_right_graduation ? snapshot.study_right_graduation.phase1GraduationDate : null,
-            startDate,
-            snapshot.study_right_graduation && snapshot.study_right_graduation.phase2GraduationDate
-              ? snapshot.study_right_graduation.phase2GraduationDate
-              : snapshot.valid.endDate,
-            studentnumber,
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId],
-            possibleMaDegrees ? possibleMaDegrees[0].short_name.en : null
-          )
-
-          snapshotStudyRightElements.push(baDegree, baProgramme, baStudytrack, maDegree, maProgramme, maStudytrack)
-        } else {
-          const possibleDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
-          const [degree, programme, studytrack] = mapStudyrightElements(
-            mainStudyRight.id,
-            ordinal,
-            startDate,
-            endDate,
-            studentnumber,
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
-            moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            possibleDegrees ? possibleDegrees[0].short_name.en : null
-          )
-
-          snapshotStudyRightElements.push(degree, programme, studytrack)
-        }
-      })
-
-      res.push(...uniqBy(snapshotStudyRightElements, 'code'))
-      return res
-    }, [])
-    .filter(sE => !!sE.code)
-
-  await bulkCreate(StudyrightElement, studyRightElements)
-}
 
 const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
   const getTransfersFrom = (orderedSnapshots, studyrightid, educationId) => {
