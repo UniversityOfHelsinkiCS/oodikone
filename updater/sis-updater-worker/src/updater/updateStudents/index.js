@@ -11,9 +11,9 @@ const {
   Studyright,
   StudyrightElement,
   Transfer
-} = require('../db/models')
-const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../db')
-const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, getDegrees, loadMapsIfNeeded } = require('./shared')
+} = require('../../db/models')
+const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../../db')
+const { educationTypeToExtentcode, getEducationType, getEducation, getUniOrgId, getDegrees, loadMapsIfNeeded } = require('../shared')
 const {
   studentMapper,
   studyrightMapper,
@@ -21,8 +21,8 @@ const {
   mapTeacher,
   creditMapper,
   semesterEnrollmentMapper
-} = require('./mapper')
-const { isBaMa } = require('../utils')
+} = require('../mapper')
+const { isBaMa } = require('../../utils')
 
 const groupStudyrightSnapshots = (studyRightSnapshots) => {
   const snapshotsBystudyright = Object.entries(
@@ -264,6 +264,8 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       orderedSnapshots.forEach(snapshot => {
         const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
+
+        console.log("Snapshot", snapshot)
 
         //const startDate = snapshot.valid.startDate
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
