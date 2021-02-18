@@ -64,6 +64,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       })
       acc.push(mappedStudyright)
     }
+
     return acc
   }, [])
 
@@ -71,6 +72,11 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
 }
 
 const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
+  const possibleBscFirst = (s1, s2) => {
+    if ( !s1.accepted_selection_path.educationPhase2GroupId ) return -1
+    return 1
+  }
+
   const studyRightElements = Object.values(groupedStudyRightSnapshots)
     .reduce((res, snapshots) => {
       const mainStudyRight = snapshots[0]
@@ -80,7 +86,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       const snapshotStudyRightElements = []
       const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
 
-      orderedSnapshots.forEach(snapshot => {
+      orderedSnapshots.sort(possibleBscFirst).forEach(snapshot => {
         const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
@@ -121,7 +127,12 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             possibleMaDegrees ? possibleMaDegrees[0].short_name.en : null
           )
 
-          snapshotStudyRightElements.push(baDegree, baProgramme, baStudytrack, maDegree, maProgramme, maStudytrack)
+          const possibleBScDuplicate = snapshotStudyRightElements.find( element => element.code === baProgramme.code )
+          if (possibleBScDuplicate) {
+            snapshotStudyRightElements.push(maDegree, maProgramme, maStudytrack)
+          } else {
+            snapshotStudyRightElements.push(baDegree, baProgramme, baStudytrack, maDegree, maProgramme, maStudytrack)
+          }
         } else {
           const possibleDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
           const [degree, programme, studytrack] = mapStudyrightElements(
