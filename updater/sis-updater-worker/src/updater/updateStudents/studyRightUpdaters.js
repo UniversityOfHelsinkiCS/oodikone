@@ -58,6 +58,9 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       acc.push(studyRightMast, studyRightBach)
     } else {
       const educationType = getEducationType(studyRightEducation.education_type)
+      if (educationType.parent_id === 'urn:code:education-type:non-degree-education') {
+        return acc
+      }
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
         prioritycode: studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
@@ -81,7 +84,13 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
     .reduce((res, snapshots) => {
       const mainStudyRight = snapshots[0]
       const mainStudyRightEducation = getEducation(mainStudyRight.education_id)
-      if (!mainStudyRightEducation) return res
+      if (!mainStudyRightEducation) {
+        return res
+      }
+      const educationType = getEducationType(mainStudyRightEducation.education_type)
+      if (educationType.parent_id === 'urn:code:education-type:non-degree-education') {
+        return res
+      }
 
       const snapshotStudyRightElements = []
       const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
