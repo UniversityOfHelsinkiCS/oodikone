@@ -10,6 +10,7 @@ const {
   getSemester,
   getCountry,
 } = require('./shared')
+const { CREDIT_TYPE_CODES } = require('./shared')
 
 const genderMankeli = gender => {
   if (gender === 'male') return 1
@@ -17,12 +18,6 @@ const genderMankeli = gender => {
   return 3
 }
 
-const CREDIT_TYPE_CODES = {
-  PASSED: 4,
-  FAILED: 10,
-  IMPROVED: 7,
-  APPROVED: 9
-}
 
 const studentMapper = (attainments, studyRights) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
