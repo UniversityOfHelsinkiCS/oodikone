@@ -17,6 +17,13 @@ const genderMankeli = gender => {
   return 3
 }
 
+const CREDIT_TYPE_CODES = {
+  PASSED: 4,
+  FAILED: 10,
+  IMPROVED: 7,
+  APPROVED: 9
+}
+
 const studentMapper = (attainments, studyRights) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
 
@@ -33,8 +40,12 @@ const studentMapper = (attainments, studyRights) => student => {
 
   const attainmentsOfStudent = attainments.filter(attainment => attainment.person_id === id) // current db doesn't have studentnumbers in attainment table so have to use person_id for now
   const creditcount = attainmentsOfStudent.reduce((acc, curr) => {
-    if (curr.type === 'ModuleAttainment' || curr.state === 'FAILED' || curr.misregistration) return acc // bit hacky solution for now
-    return acc + Number(curr.credits)
+    if (curr.type === 'ModuleAttainment' || curr.misregistration) return acc // bit hacky solution for now
+    const credittypecode = getCreditTypeCodeFromAttainment(curr, getGrade(curr.grade_scale_id, curr.grade_id).passed)
+    if (credittypecode === CREDIT_TYPE_CODES.APPROVED || credittypecode === CREDIT_TYPE_CODES.PASSED) {
+      return acc + Number(curr.credits)
+    }
+    return acc
   }, 0)
 
   return {
