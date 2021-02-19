@@ -7,6 +7,12 @@ const TIME_LIMIT_BETWEEN_RELOADS = 1000 * 60 * 30
 const REDIS_INITIALIZED = 'INITIALIZED'
 const SHARED_LOCK = 'SHARED_LOCK'
 const FIRST_SEMESTER_START_YEAR = 1950
+const CREDIT_TYPE_CODES = {
+  PASSED: 4,
+  FAILED: 10,
+  IMPROVED: 7,
+  APPROVED: 9
+}
 
 let loadedAt = null
 
@@ -224,10 +230,10 @@ const getCountry = countryId => localMaps.countries[countryId]
 
 const getCreditTypeCodeFromAttainment = (attainment, passed) => {
   const { primary, state } = attainment
-  if (!passed || state === 'FAILED') return 10
-  if (!primary) return 7
-  if (state === 'ATTAINED') return 4
-  return 9
+  if (!passed || state === 'FAILED') return CREDIT_TYPE_CODES.FAILED
+  if (!primary) return CREDIT_TYPE_CODES.IMPROVED
+  if (state === 'ATTAINED') return CREDIT_TYPE_CODES.PASSED
+  return CREDIT_TYPE_CODES.APPROVED
 }
 
 const educationTypeToExtentcode = {
@@ -258,19 +264,19 @@ const educationTypeToExtentcode = {
 
 const creditTypeIdToCreditType = {
   4: {
-    credittypecode: 4,
+    credittypecode: CREDIT_TYPE_CODES.PASSED,
     name: { en: 'Completed', fi: 'Suoritettu', sv: 'Genomförd' }
   },
   7: {
-    credittypecode: 7,
+    credittypecode: CREDIT_TYPE_CODES.IMPROVED
     name: { en: 'Improved (grade)', fi: 'Korotettu', sv: 'Höjd' }
   },
   9: {
-    credittypecode: 9,
+    credittypecode: CREDIT_TYPE_CODES.APPROVED
     name: { en: 'Transferred', fi: 'Hyväksiluettu', sv: 'Tillgodoräknad' }
   },
   10: {
-    credittypecode: 10,
+    credittypecode: CREDIT_TYPE_CODES.FAILED,
     name: { en: 'Failed', fi: 'Hylätty', sv: 'Underkänd' }
   }
 }
@@ -291,5 +297,6 @@ module.exports = {
   getCountry,
   getDegrees,
   loadMapsIfNeeded,
-  loadMapsOnDemand
+  loadMapsOnDemand,
+  CREDIT_TYPE_CODES
 }
