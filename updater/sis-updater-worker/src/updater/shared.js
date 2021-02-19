@@ -228,14 +228,6 @@ const initCountries = async () =>
 
 const getCountry = countryId => localMaps.countries[countryId]
 
-const getCreditTypeCodeFromAttainment = (attainment, passed) => {
-  const { primary, state } = attainment
-  if (!passed || state === 'FAILED') return CREDIT_TYPE_CODES.FAILED
-  if (!primary) return CREDIT_TYPE_CODES.IMPROVED
-  if (state === 'ATTAINED') return CREDIT_TYPE_CODES.PASSED
-  return CREDIT_TYPE_CODES.APPROVED
-}
-
 const educationTypeToExtentcode = {
   'urn:code:education-type:degree-education:bachelors-degree': 1,
   'urn:code:education-type:degree-education:masters-degree': 2,
@@ -262,17 +254,25 @@ const educationTypeToExtentcode = {
   'urn:code:education-type:non-degree-education:separate-studies:adult-educator-pedagogical-studies': null // Parent is 99
 }
 
+const getCreditTypeCodeFromAttainment = (attainment, passed) => {
+  const { primary, state } = attainment
+  if (!passed || state === 'FAILED') return CREDIT_TYPE_CODES.FAILED
+  if (!primary) return CREDIT_TYPE_CODES.IMPROVED
+  if (state === 'ATTAINED') return CREDIT_TYPE_CODES.PASSED
+  return CREDIT_TYPE_CODES.APPROVED
+}
+
 const creditTypeIdToCreditType = {
   4: {
     credittypecode: CREDIT_TYPE_CODES.PASSED,
     name: { en: 'Completed', fi: 'Suoritettu', sv: 'Genomförd' }
   },
   7: {
-    credittypecode: CREDIT_TYPE_CODES.IMPROVED
+    credittypecode: CREDIT_TYPE_CODES.IMPROVED,
     name: { en: 'Improved (grade)', fi: 'Korotettu', sv: 'Höjd' }
   },
   9: {
-    credittypecode: CREDIT_TYPE_CODES.APPROVED
+    credittypecode: CREDIT_TYPE_CODES.APPROVED,
     name: { en: 'Transferred', fi: 'Hyväksiluettu', sv: 'Tillgodoräknad' }
   },
   10: {
