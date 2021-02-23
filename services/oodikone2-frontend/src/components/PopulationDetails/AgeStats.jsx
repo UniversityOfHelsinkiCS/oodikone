@@ -70,7 +70,7 @@ const AgeStats = ({ filteredStudents, query }) => {
 
       // matching behavior with backend, studystartdate is used if it exists and is bigger of the two
       return new Date(studyright.startdate).getTime() > new Date(studyright.studystartdate).getTime()
-        ? studyrightElement.startdate
+        ? studyright.startdate
         : studyright.studystartdate
     }, null)
 
