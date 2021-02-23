@@ -5,9 +5,6 @@ const { stan } = require('./utils/stan')
 const { isDev, REDIS_LAST_WEEKLY_SCHEDULE, REDIS_LAST_HOURLY_SCHEDULE } = require('./config')
 const { startServer } = require('./server')
 const {
-  scheduleMeta,
-  scheduleStudents,
-  scheduleProgrammes,
   scheduleHourly,
   scheduleWeekly,
   schedulePurge,
@@ -37,13 +34,14 @@ knexConnection.on('connect', async () => {
   // Monday-Friday at every minute 30
   scheduleCron('30 * * * 1-5', async () => {
     // If updater is currently running, then return
-    if (await isUpdaterActive()) return
+    if ((await isUpdaterActive()) || isDev) return
     await scheduleHourly()
     await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
   })
 
   // Saturday at 4 AM
   scheduleCron('0 4 * * 6', async () => {
+    if (isDev) return
     await scheduleWeekly()
     await redisSet(REDIS_LAST_WEEKLY_SCHEDULE, new Date())
   })
@@ -52,7 +50,7 @@ knexConnection.on('connect', async () => {
   scheduleCron('0 4 * * SUN', async () => {
     // If updater is currently running or weekly update
     // hasn't been scheduled properly, then return
-    if ((await isUpdaterActive()) || !(await hasWeeklyBeenScheduled())) return
+    if ((await isUpdaterActive()) || !(await hasWeeklyBeenScheduled()) || isDev) return
     await schedulePurge()
   })
 })
