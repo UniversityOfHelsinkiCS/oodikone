@@ -1,7 +1,7 @@
 import React, { Component, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, object, bool, arrayOf } from 'prop-types'
-import { Form, Button } from 'semantic-ui-react'
+import { Form, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
 import Datetime from 'react-datetime'
@@ -311,7 +311,17 @@ class PopulationSearchHistory extends Component {
             </Form.Field>
           </Form.Group>
           <div>{this.renderAdvancedSettingsSelector()}</div>
-          <div>{showAdvancedSettings && <InfoBox content={Advanced} />}</div>
+          <div>
+            {showAdvancedSettings ? (
+              <InfoBox content={Advanced} />
+            ) : (
+              <Message style={{ marginTop: '2.25rem' }}>
+                <Message.Header>Note:</Message.Header>
+                By default only students who have not transferred to this study programme are shown. You can change
+                filters on the left.
+              </Message>
+            )}
+          </div>
         </div>
       </div>
     )

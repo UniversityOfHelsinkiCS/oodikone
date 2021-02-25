@@ -8,7 +8,7 @@ import useAnalytics from '../useAnalytics'
 export default () => {
   const { addFilter, removeFilter, withoutFilter } = useFilters()
   const analytics = useAnalytics()
-  const [value, setValue] = useState(null)
+  const [value, setValue] = useState(0)
   const name = 'transferredToProgrammeFilter'
   const active = value !== null
 

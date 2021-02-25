@@ -151,6 +151,16 @@ const GeneralTab = ({
       }, {})
     : null
 
+  const studentToStudyrightEndMap = !(customPopulation || coursePopulation)
+    ? selectedStudents.reduce((res, sn) => {
+        const targetStudyright = students[sn].studyrights.find(studyright =>
+          studyright.studyright_elements.some(e => e.code === queryStudyrights[0])
+        )
+        res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
+        return res
+      }, {})
+    : null
+
   const getActualStartDate = studentNumber => {
     const studyRightStart = studentToStudyrightStartMap[studentNumber]
     const studyRightStartActual = studentToStudyrightActualStartMap[studentNumber]
@@ -185,8 +195,6 @@ const GeneralTab = ({
       )
       .some(el => el === true)
   }
-
-  // TODO: asd
 
   const columns = []
   if (showNames) {
@@ -291,6 +299,16 @@ const GeneralTab = ({
       title: 'started in studyright',
       getRowVal: s => new Date(getActualStartDate(s.studentNumber)).getTime(),
       getRowContent: s => reformatDate(getActualStartDate(s.studentNumber), 'YYYY-MM-DD')
+    })
+
+    columns.push({
+      key: 'enddate',
+      title: 'graduation date',
+      getRowVal: s => new Date(studentToStudyrightEndMap[s.studentNumber]).getTime(),
+      getRowContent: s =>
+        studentToStudyrightEndMap[s.studentNumber]
+          ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
+          : ''
     })
   }
 
