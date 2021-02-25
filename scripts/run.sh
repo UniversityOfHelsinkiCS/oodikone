@@ -27,6 +27,7 @@ options=(
     "Download latest anonymous data."
     "Download latest real data."
     "Set up importer-db."
+    "Download & reset all real data"
     "Quit."
 )
 
@@ -57,6 +58,9 @@ while true; do
                 ;;
             "Set up importer-db.")
                 run_importer_setup
+                ;;
+            "Download & reset all real data")
+                run_full_real_data_reset
                 ;;
             "Quit.")
                 break 2
