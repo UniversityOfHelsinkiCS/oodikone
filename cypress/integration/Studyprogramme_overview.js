@@ -93,7 +93,7 @@ describe("Studyprogramme overview", () => {
   it("can move to Population statistics page by clickin", () => {
     cy.contains("Tietojenkäsittelytieteen maisteriohjelma").click();
     cy.get("i.level.up.alternate.icon").eq(0).click();
-    cy.contains("Credit accumulation (for 29 students)");
+    cy.contains("Credit accumulation (for 16 students)");
   });
 
   it("can create and delete tags for population", () => {
