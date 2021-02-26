@@ -92,16 +92,16 @@ describe("Population Statistics tests", () => {
 
   it("Student list checking works as intended", () => {
     cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma");
-    cy.contains("Students (29)").click();
-    cy.contains("010111264");
+    cy.contains("Students (16)").click();
+    cy.contains("010429464");
     cy.contains("666666666").should("not.exist");
     cy.contains("button", "Check studentnumbers").click();
     cy.contains("Check for studentnumbers");
-    cy.get("textarea").type("010111264").type("{enter}").type("666666666");
+    cy.get("textarea").type("010429464").type("{enter}").type("666666666");
     cy.contains("button", "check students").click();
     cy.contains("#checkstudentsresults", "Results").within((e) => {
       cy.contains("Student numbers in list and in oodi").click();
-      cy.contains("#found", "010111264");
+      cy.contains("#found", "010429464");
       cy.contains("Student numbers in list but not in oodi").click();
       cy.contains("#notfound", "666666666");
       cy.contains("Student numbers in oodi but not in list").click();
@@ -126,7 +126,7 @@ describe("Population Statistics tests", () => {
     cy.cs("toggle-fall").click();
     cy.contains("Fetch population").click();
 
-    cy.contains("Credit accumulation (for 13 students)");
+    cy.contains("Credit accumulation (for 0 students)");
 
     // only fall
     cy.get("[data-cy=advanced-toggle]").click();
@@ -136,7 +136,7 @@ describe("Population Statistics tests", () => {
     cy.contains("Fetch population").click();
 
     // FIXME: This fails randomly both locally and on CI.
-    cy.contains("Credit accumulation (for 206 students)");
+    cy.contains("Credit accumulation (for 194 students)");
 
     // spring + fall and include cancelled
     cy.get("[data-cy=advanced-toggle]").click();
@@ -144,7 +144,7 @@ describe("Population Statistics tests", () => {
     cy.cs("toggle-cancelled").click();
     cy.contains("Fetch population").click();
 
-    cy.contains("Credit accumulation (for 228 students)");
+    cy.contains("Credit accumulation (for 202 students)");
   });
 
   it("Credit Statistics, Statistics pane works", () => {
@@ -154,13 +154,13 @@ describe("Population Statistics tests", () => {
 
     cy.get("[data-cy='credit-stats-table-name-header']").should(
       "contain",
-      "Statistic for n = 219 Students"
+      "Statistic for n = 194 Students"
     );
-    cy.get("[data-cy='credit-stats-mean']").should("contain", "44.36");
-    cy.get("[data-cy='credit-stats-stdev']").should("contain", "30.77");
+    cy.get("[data-cy='credit-stats-mean']").should("contain", "45.10");
+    cy.get("[data-cy='credit-stats-stdev']").should("contain", "30.61");
     cy.get("[data-cy='credit-stats-min']").should("contain", "0");
-    cy.get("[data-cy='credit-stats-q1']").should("contain", "17");
-    cy.get("[data-cy='credit-stats-q2']").should("contain", "46");
+    cy.get("[data-cy='credit-stats-q1']").should("contain", "19");
+    cy.get("[data-cy='credit-stats-q2']").should("contain", "47");
     cy.get("[data-cy='credit-stats-q3']").should("contain", "66");
     cy.get("[data-cy='credit-stats-max']").should("contain", "137");
   });
