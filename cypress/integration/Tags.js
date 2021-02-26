@@ -34,10 +34,9 @@ describe('Tag tests', () => {
     cy.get('.positive').click()
     cy.contains(name).find('.level').click()
 
-    cy.contains('Credit accumulation (for 2 students)')
-    cy.contains("Students (2)").click()
+    cy.contains('Credit accumulation (for 1 students)')
+    cy.contains("Students (1)").click()
     cy.contains('014022579')
-    cy.contains('011122249')
 
     cy.go('back')
     deleteTag(name)
