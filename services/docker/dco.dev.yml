@@ -41,6 +41,7 @@ services:
       ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
       KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
       SIS_ADMINER_URL: http://localhost:5050/?pgsql=db_sis&username=postgres
+      SIS_IMPORTER_ADMINER_URL: http://localhost:5050/?pgsql=sis-importer-db&username=postgres
     volumes:
       - frontend-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-frontend/:/usr/src/app
