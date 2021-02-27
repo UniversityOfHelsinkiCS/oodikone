@@ -31,7 +31,7 @@ const studentMapper = (attainments, studyRights) => student => {
   const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
 
   const dateofuniversityenrollment =
-    studyRightsOfStudent.length > 0 ? sortBy(studyRightsOfStudent.map(sr => sr.study_start_date))[0] : null
+    studyRightsOfStudent.length > 0 ? sortBy(studyRightsOfStudent.map(sr => sr.valid.startDate))[0] : null
 
   const attainmentsOfStudent = attainments.filter(attainment => attainment.person_id === id) // current db doesn't have studentnumbers in attainment table so have to use person_id for now
   const creditcount = attainmentsOfStudent.reduce((acc, curr) => {
