@@ -24,7 +24,7 @@ npm run cli
 
 *Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary* 😊
 
-The acual oodikone can be accessed at [http://localhost:8081/](http://localhost:8081/) and Adminer at [http://localhost:5050/](http://localhost:5050/?pgsql=db&username=postgres).
+The acual oodikone can be accessed at [http://localhost:8081/](http://localhost:8081/) and Adminer at [http://localhost:5050/](http://localhost:5050/?pgsql=db&username=postgres). Adminer requires you to login with username `postgres` and password `postgres`.
 
 ### Populate Redis on Fresh Install
 
