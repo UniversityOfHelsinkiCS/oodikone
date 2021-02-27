@@ -17,7 +17,7 @@ services:
     restart: unless-stopped
 
   adminer:
-    image: adminer:4.6.2
+    image: adminer:4.8.0
     environment:
       - ADMINER_DESIGN=pepa-linha
     volumes:
