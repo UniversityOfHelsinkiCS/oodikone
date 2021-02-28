@@ -8,6 +8,8 @@ const {
 } = require('../models')
 const { Op } = require('sequelize')
 
+let verbose = false
+
 const populationDiff = async (programme, year) => {
   const months = Number((2020-Number(year))*12 + 7)
 
@@ -29,16 +31,18 @@ const populationDiff = async (programme, year) => {
   if (oodiOnly.length === 0 && sisOnly.length === 0 ) {
   } else {
     if (oodiOnly.length > 0) {
-      console.log('  ',year, '   oodi only ', oodiOnly.length, 'both', both.length)
+      console.log('  ',year, '   oodi only', oodiOnly.length, 'both', both.length)
     }
     if (sisOnly.length > 0) {     
       const wronglyMarked = (await cancelledButGraduated(programme)).map(s => s.student_studentnumber)
       const remaining = _.difference(wronglyMarked, sisOnly)     
       if (remaining.length==0 ) {
-        console.log('  ', year,'   sis only  ', sisOnly.length, 'wrongly set cancel date in oodi', 'both', both.length) 
+        if (verbose) {
+          console.log('  ', year,'   sis only' , sisOnly.length, 'wrongly set cancel date in oodi', 'both', both.length) 
+        }
       } else {
-        console.log('  ', year, '   sis only  ', sisOnly.length, 'both', both.length) 
-        console.log(sisOnly.join(', '))
+        console.log('******************************************')
+        console.log('  ', year, '   sis only', sisOnly.length, 'both', both.length, sisOnly.join(', ')) 
       }
     }
   }
@@ -96,7 +100,7 @@ const bscCodes = async () => {
   })).map(s => s.code)
 }
 
-const master = async () => { 
+const msc = async () => { 
   const programmes = await masterCodes()
   for (let programme of programmes) {
     await programmeDiff(programme)
@@ -111,9 +115,22 @@ const bsc = async () => {
   }
 }
 
-const main = async () => { 
+const main = async () => {
+  // print moar/less
+  verbose = false
   await bsc()
+  await msc()
   process.exit()
 }
 
 main()
+
+/* 
+  how to run:
+    docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js
+
+  or:
+    docker exec -it backend sh
+    cd src/sisoodi_diff/
+    node populations.js
+*/
