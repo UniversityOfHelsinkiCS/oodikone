@@ -2,6 +2,11 @@
 const _ = require('lodash')
 const populationsSis = require('../servicesV2/populations')
 const populationsOodi = require('../services/populations')
+const {
+  Studyright,
+  StudyrightElement
+} = require('../models')
+const { Op } = require('sequelize')
 
 const populationDiff = async (programme, year) => {
   const months = Number((2020-Number(year))*12 + 7)
@@ -22,17 +27,19 @@ const populationDiff = async (programme, year) => {
   const both = _.intersection(studentsOodi, studentsSis)
 
   if (oodiOnly.length === 0 && sisOnly.length === 0 ) {
-    //console.log(' ', year,'both', both.length)
   } else {
-    console.log('  ',year)
-    console.log('   both      ', both.length)
     if (oodiOnly.length > 0) {
-      console.log('   oodi only ', oodiOnly.length)
-      console.log(oodiOnly)
+      console.log('  ',year, '   oodi only ', oodiOnly.length, 'both', both.length)
     }
-    if (sisOnly.length > 0) {
-      console.log('   sis only  ', sisOnly.length)
-      console.log(sisOnly)
+    if (sisOnly.length > 0) {     
+      const wronglyMarked = (await cancelledButGraduated(programme)).map(s => s.student_studentnumber)
+      const remaining = _.difference(wronglyMarked, sisOnly)     
+      if (remaining.length==0 ) {
+        console.log('  ', year,'   sis only  ', sisOnly.length, 'wrongly set cancel date in oodi', 'both', both.length) 
+      } else {
+        console.log('  ', year, '   sis only  ', sisOnly.length, 'both', both.length) 
+        console.log(sisOnly.join(', '))
+      }
     }
   }
 }
@@ -45,19 +52,68 @@ const programmeDiff = async (programme) => {
   await populationDiff(programme, '2020' )
 }
 
-const main = async () => { 
+const cancelledButGraduated = async (code) => {
+  const wrong = await Studyright.findAll({
+    where: {
+      graduated: 1,
+      canceldate: {
+        [Op.ne]: null
+      },
+    },
+    include: {
+      model: StudyrightElement,
+      required: true,
+      where: { code }
+    }
+  })
 
-  const programmes = [
-    'KH50_001',
-    'MH50_001', 'MH50_002', 'MH50_003','MH50_004', 'MH50_005', 'MH50_006', 'MH50_007', 'MH50_009', 'MH50_010', 'MH50_011', 'MH50_012','MH50_013' 
-  ]
-  
+  return wrong
+}
+
+const masterCodes = async () => {
+  return  (await StudyrightElement.findAll({
+    attributes: ['code'],
+    where: {
+      code: {
+        [Op.like]: 'MH%'
+      }   
+    },
+    group: ['code'],
+    order:  ['code']
+  })).map(s => s.code)
+}
+
+const bscCodes = async () => {
+  return  (await StudyrightElement.findAll({
+    attributes: ['code'],
+    where: {
+      code: {
+        [Op.like]: 'KH%'
+      }   
+    },
+    group: ['code'],
+    order:  ['code']
+  })).map(s => s.code)
+}
+
+const master = async () => { 
+  const programmes = await masterCodes()
   for (let programme of programmes) {
     await programmeDiff(programme)
   }
 
-  process.exit()
+}
 
+const bsc = async () => { 
+  const programmes = await bscCodes()
+  for (let programme of programmes) {
+    await programmeDiff(programme)
+  }
+}
+
+const main = async () => { 
+  await bsc()
+  process.exit()
 }
 
 main()
