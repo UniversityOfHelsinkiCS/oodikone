@@ -22,9 +22,9 @@ const { updateStudyRights, updateStudyRightElements, updateElementDetails } = re
 
 const studyRightHasDegreeEducation = (studyRight) => {
   const education = getEducation(studyRight.education_id)
-  if (!education) return false
+  if (!education) return true
   const educationType = getEducationType(education.education_type)
-  if (!educationType) return false
+  if (!educationType) return true
   return educationType.parent_id !== 'urn:code:education-type:non-degree-education'
 }
 
