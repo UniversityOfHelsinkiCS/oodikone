@@ -28,12 +28,15 @@ const CreditDiffTable = ({ title, color, students }) => (
       </Table.Row>
     </Table.Header>
     <Table.Body>
-      {students.map(missing => (
-        <Table.Row key={`${missing.studentnumber}-${missing.year}`}>
-          <Table.Cell>{missing.studentnumber}</Table.Cell>
-          <Table.Cell>{missing.year}</Table.Cell>
-        </Table.Row>
-      ))}
+      {students
+        .sort()
+        .reverse()
+        .map(missing => (
+          <Table.Row key={`${missing.studentnumber}-${missing.year}`}>
+            <Table.Cell>{missing.studentnumber}</Table.Cell>
+            <Table.Cell>{missing.year}</Table.Cell>
+          </Table.Row>
+        ))}
     </Table.Body>
   </Table>
 )
