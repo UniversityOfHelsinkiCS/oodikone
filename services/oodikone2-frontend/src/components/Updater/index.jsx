@@ -106,7 +106,7 @@ const Updater = () => {
             <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
           </Form.Group>
         </Form>
-        <div style={{ display: 'flex', justifyContent: 'space-between'}}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Form.Group>
             <TextArea onChange={(_, { value }) => setSISNums(value)} />
             <Form.Button
