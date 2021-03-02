@@ -25,13 +25,16 @@ const populationDiff = async (programme, year) => {
   const studentsOodi  = resultOodi.students.map(s => s.studentNumber)
 
   const sisOnly = _.difference(studentsSis, studentsOodi)
-  const oodiOnly = _.difference(studentsOodi. studentsSis)
+  const oodiOnly = _.difference(studentsOodi, studentsSis)
   const both = _.intersection(studentsOodi, studentsSis)
 
   if (oodiOnly.length === 0 && sisOnly.length === 0 ) {
   } else {
     if (oodiOnly.length > 0) {
       console.log('  ',year, '   oodi only', oodiOnly.length, 'both', both.length)
+      oodiOnly.forEach(s => {
+        console.log('  ', s)
+      })
     }
     if (sisOnly.length > 0) {     
       const wronglyMarked = (await cancelledButGraduated(programme)).map(s => s.student_studentnumber)
@@ -117,13 +120,12 @@ const bsc = async () => {
 
 const main = async () => {
   // print moar/less
-  verbose = false
-  await bsc()
-  await msc()
+  verbose = true
+  //await bsc()
+  //await msc()
+  await programmeDiff('KH50_005')
   process.exit()
 }
-
-main()
 
 /* 
   how to run:
