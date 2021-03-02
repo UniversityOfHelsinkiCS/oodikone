@@ -27,6 +27,7 @@ services:
 
   db_sis:
     image: postgres:13.2
+    shm_size: 1g
     ports:
       - "5426:5432"
     volumes:
