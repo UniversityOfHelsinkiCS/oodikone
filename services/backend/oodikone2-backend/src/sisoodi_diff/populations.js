@@ -123,9 +123,12 @@ const main = async () => {
   verbose = true
   //await bsc()
   //await msc()
+  console.log("starting")
   await programmeDiff('KH50_005')
   process.exit()
 }
+
+main()
 
 /* 
   how to run:
@@ -136,3 +139,4 @@ const main = async () => {
     cd src/sisoodi_diff/
     node populations.js
 */
+
