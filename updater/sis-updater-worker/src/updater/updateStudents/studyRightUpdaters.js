@@ -75,7 +75,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
         prioritycode: studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2,
-        canceldate: studyright.state === 'PASSIVE' ? studyright.snapshot_date_time : null
+        canceldate: cancelDate(studyright)
       })
       acc.push(mappedStudyright)
     }
