@@ -14,6 +14,11 @@ const updateStudentsByStudentNumber = async studentnumbers => {
   return response.data
 }
 
+const updateSISStudentsByProgramme = async details => {
+  const response = await client.post('/v1/students_by_programme', details, { params: { token: SECRET_TOKEN } })
+  return response.data
+}
+
 const updateSISMetadata = async () => {
   const response = await client.get('/v1/meta', { params: { token: SECRET_TOKEN } })
   return response.data
@@ -37,6 +42,7 @@ const abort = async () => {
 module.exports = {
   updateSISMetadata,
   updateSISStudents,
+  updateSISStudentsByProgramme,
   updateSISProgrammes,
   updateStudentsByStudentNumber,
   updateSISRedisCache,
