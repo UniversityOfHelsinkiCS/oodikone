@@ -1,4 +1,5 @@
 const axios = require('axios')
+const { optimizedStatisticsOf } = require('../servicesV2/populations')
 const { SIS_UPDATER_URL, SECRET_TOKEN } = require('../conf-backend')
 
 const client = axios.create({ baseURL: SIS_UPDATER_URL })
@@ -15,8 +16,16 @@ const updateStudentsByStudentNumber = async studentnumbers => {
 }
 
 const updateSISStudentsByProgramme = async details => {
-  const response = await client.post('/v1/students_by_programme', details, { params: { token: SECRET_TOKEN } })
-  return response.data
+  const { year, programme } = details
+  const query = {
+    semesters: ['FALL', 'SPRING'],
+    studyRights: { programme },
+    year: Number(year),
+    studentStatuses: ['CANCELLED', 'EXCHANGE', 'NONDEGREE', 'TRANSFERRED']
+  }
+  const result = await optimizedStatisticsOf(query)
+  const studentnumbers = result.students.map(s => s.studentNumber)
+  return await updateStudentsByStudentNumber(studentnumbers)
 }
 
 const updateSISMetadata = async () => {
