@@ -13,6 +13,7 @@ const Updater = () => {
   const [SISNums, setSISNums] = useState('')
   const [SISProgrammeName, setSISProgrammeName] = useState('')
   const [SISProgrammeYear, setSISProgrammeYear] = useState('')
+  const [SISCourses, setSISCourses] = useState('')
   useTitle('Updater')
 
   const apiCall = async (url, method, data) => {
@@ -48,6 +49,7 @@ const Updater = () => {
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
   const abortSisUpdater = () => apiCall('/updater/abort', 'get')
   const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache', 'get')
+  const updateSISCourses = () => apiCall('/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
 
   const statusRef = useRef()
   useEffect(() => {
@@ -138,6 +140,20 @@ const Updater = () => {
             icon="refresh"
           />
         </Form.Group>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Form.Group>
+            <TextArea onChange={(_, { value }) => setSISNums(value)} />
+            <Form.Button
+              onClick={updateSISPopulationStudents}
+              content="Update students by student number"
+              icon="refresh"
+            />
+          </Form.Group>
+          <Form.Group>
+            <TextArea onChange={(_, { value }) => setSISCourses(value)} />
+            <Form.Button onClick={updateSISCourses} content="Update courses by course code" icon="refresh" />
+          </Form.Group>
+        </div>
       </Segment>
       <Button content="Clear messages" onClick={() => setMessages([])} />
       <Header>{messages}</Header>
