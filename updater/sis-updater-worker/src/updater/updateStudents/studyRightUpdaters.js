@@ -13,6 +13,12 @@ const { getDegrees, getEducation, getEducationType } = require('../shared') // n
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
+  const cancelDate = studyright => {
+    if (studyright.state === 'RESCINDED') return studyright.study_right_cancellation.cancellationDate
+    if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
+    return null
+  }
+
   const formattedStudyRights = studyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
     const primality = get(personIdToStudyRightIdToPrimality, `${studyright.person_id}.${studyright.id}`)
@@ -21,6 +27,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     if (!studyRightEducation) return acc
 
     if (isBaMa(studyRightEducation)) {
+      const canceldate = cancelDate(studyright)
+
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
         studyrightid: `${studyright.id}-1`,
@@ -31,7 +39,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
             : isPrimality
               ? 1
               : 2,
-        canceldate: studyright.state === 'PASSIVE' ? studyright.snapshot_date_time : null
+        canceldate
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -54,7 +62,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
                 ? 1
                 : 6
               : 2,
-        canceldate: studyright.state === 'PASSIVE' ? studyright.snapshot_date_time : null
+        canceldate
       })
 
 
