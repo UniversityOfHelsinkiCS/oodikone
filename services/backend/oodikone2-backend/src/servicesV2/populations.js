@@ -390,7 +390,6 @@ const studentnumbersWithAllStudyrightElements = async (
   if (!nondegreeStudents) {
     filteredExtents.push(33, 99, 14, 13)
   }
-  // this does not work in SIS, that is why we have a kludge below
   if (!cancelledStudents) {
     studyrightWhere.canceldate = null
   }
@@ -452,29 +451,7 @@ const studentnumbersWithAllStudyrightElements = async (
     raw: true
   })
 
-  let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
-
-  // study right cancel does not work in SIS, but the below kludge should do the trick
-  // since canceldate != null  === student does not have any enrolment
-  if (!cancelledStudents) {
-    const { semestercode } = await getCurrentSemester()
-
-    const enrolments = await SemesterEnrollment.findAll({
-      where: {
-        studentnumber: {
-          [Op.in]: studentnumbers
-        },
-        semestercode,
-        enrollment_date: {
-          [Op.not]: null
-        }
-      }
-    })
-
-    const enrolledStudentnumbers = enrolments.map(e => e.studentnumber)
-    const graduated = [...new Set(students.filter(s => s.graduated).map(s => s.student_studentnumber))]
-    studentnumbers = [...new Set(graduated.concat(enrolledStudentnumbers))]
-  }
+  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
@@ -547,7 +524,6 @@ const studentnumbersWithAllStudyrightElements = async (
     }).map(s => s.studentnumber)
 
     const notTransferredStudents = studentnumberlist.filter(sn => !transferredOutStudents.includes(sn))
-
     return notTransferredStudents
   }
 
