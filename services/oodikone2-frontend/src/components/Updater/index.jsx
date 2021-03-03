@@ -113,39 +113,31 @@ const Updater = () => {
             <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
           </Form.Group>
         </Form>
-        <Form.Group>
-          <TextArea onChange={(_, { value }) => setSISNums(value)} />
-          <Form.Button
-            onClick={updateSISPopulationStudents}
-            content="Update students by student number"
-            icon="refresh"
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Input
-            placeholder="programme"
-            name="programme"
-            value={SISProgrammeName}
-            onChange={(_, { value }) => setSISProgrammeName(value)}
-          />
-          <Form.Input
-            placeholder="year"
-            name="year"
-            value={SISProgrammeYear}
-            onChange={(_, { value }) => setSISProgrammeYear(value)}
-          />
-          <Form.Button
-            onClick={updateSISPopulationStudentsByProgramme}
-            content="Update all students by programme & year"
-            icon="refresh"
-          />
-        </Form.Group>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Form.Group>
             <TextArea onChange={(_, { value }) => setSISNums(value)} />
             <Form.Button
               onClick={updateSISPopulationStudents}
               content="Update students by student number"
+              icon="refresh"
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Input
+              placeholder="programme"
+              name="programme"
+              value={SISProgrammeName}
+              onChange={(_, { value }) => setSISProgrammeName(value)}
+            />
+            <Form.Input
+              placeholder="year"
+              name="year"
+              value={SISProgrammeYear}
+              onChange={(_, { value }) => setSISProgrammeYear(value)}
+            />
+            <Form.Button
+              onClick={updateSISPopulationStudentsByProgramme}
+              content="Update all students by programme & year"
               icon="refresh"
             />
           </Form.Group>
