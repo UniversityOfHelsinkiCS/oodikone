@@ -1,5 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
+const { getCurrentSemester } = require('../services/semesters')
 const { sortBy } = require('lodash')
 
 const {
@@ -446,7 +447,28 @@ const studentnumbersWithAllStudyrightElements = async (
     raw: true
   })
 
-  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+  let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+
+  // Oodi canceldates don't match SIS studyright statuses, so filter out all students who haven't enrolled for semester
+  if (!cancelledStudents) {
+    const { semestercode } = await getCurrentSemester()
+
+    const enrolments = await SemesterEnrollment.findAll({
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers
+        },
+        semestercode,
+        enrollment_date: {
+          [Op.not]: null
+        }
+      }
+    })
+
+    const enrolledStudentnumbers = enrolments.map(e => e.studentnumber)
+    const graduated = [...new Set(students.filter(s => s.graduated).map(s => s.student_studentnumber))]
+    studentnumbers = [...new Set(graduated.concat(enrolledStudentnumbers))]
+  }
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
