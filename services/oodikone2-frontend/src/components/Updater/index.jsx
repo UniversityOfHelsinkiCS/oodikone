@@ -11,6 +11,8 @@ const Updater = () => {
   const [statuses, setStatuses] = useState(null)
   const [nums, setNums] = useState('')
   const [SISNums, setSISNums] = useState('')
+  const [SISProgrammeName, setSISProgrammeName] = useState('')
+  const [SISProgrammeYear, setSISProgrammeYear] = useState('')
   useTitle('Updater')
 
   const apiCall = async (url, method, data) => {
@@ -38,6 +40,11 @@ const Updater = () => {
   const updateSISStudents = () => apiCall('/updater/update/v2/students', 'get')
   const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
   const updateSISPopulationStudents = () => apiCall('/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
+  const updateSISPopulationStudentsByProgramme = () =>
+    apiCall('/updater/update/v2/students_by_programme', 'post', {
+      programme: SISProgrammeName.trim(),
+      year: Number(SISProgrammeYear.trim())
+    })
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
   const abortSisUpdater = () => apiCall('/updater/abort', 'get')
   const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache', 'get')
@@ -109,6 +116,25 @@ const Updater = () => {
           <Form.Button
             onClick={updateSISPopulationStudents}
             content="Update students by student number"
+            icon="refresh"
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Input
+            placeholder="programme"
+            name="programme"
+            value={SISProgrammeName}
+            onChange={(_, { value }) => setSISProgrammeName(value)}
+          />
+          <Form.Input
+            placeholder="year"
+            name="year"
+            value={SISProgrammeYear}
+            onChange={(_, { value }) => setSISProgrammeYear(value)}
+          />
+          <Form.Button
+            onClick={updateSISPopulationStudentsByProgramme}
+            content="Update all students by programme & year"
             icon="refresh"
           />
         </Form.Group>
