@@ -98,7 +98,7 @@ app.get('/v1/courses/:code', async (req, res) => {
 })
 
 app.post('/v1/courses', async (req, res) => {
-  await scheduleByCourseCodes(req.body.courseCodes)
+  await scheduleByCourseCodes(req.body.coursecodes)
   res.locals.msg('Scheduled courses')
 })
 
