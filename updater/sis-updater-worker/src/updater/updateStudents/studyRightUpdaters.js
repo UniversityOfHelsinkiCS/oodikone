@@ -13,14 +13,14 @@ const { getDegrees, getEducation, getEducationType } = require('../shared') // n
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
-  const cancelDate = (studyright, phase_number = 1, isBaMa = false) => {
+  const parseCancelDate = (studyright, phase_number = 1, isBaMa = false) => {
     if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
     if (studyright.state === 'RESCINDED') return studyright.study_right_cancellation.cancellationDate
     if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
     return null
   }
 
-  const priorityCode = (studyright, phase_number = 1, isBaMa = false) => {
+  const parsePriorityCode = (studyright, phase_number = 1, isBaMa = false) => {
     const primality = get(personIdToStudyRightIdToPrimality, `${studyright.person_id}.${studyright.id}`)
     const primalityEndDate = get(primality, 'end_date')
     const isPrimality = primality && !primalityEndDate
@@ -55,8 +55,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
         studyrightid: `${studyright.id}-1`,
-        prioritycode: priorityCode(studyright, 1, true),
-        canceldate: cancelDate(studyright, 1, true)
+        prioritycode: parsePriorityCode(studyright, 1, true),
+        canceldate: parseCancelDate(studyright, 1, true)
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -70,8 +70,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         studystartdate: studyright.study_right_graduation
           ? studyright.study_right_graduation.phase1GraduationDate
           : null,
-        prioritycode: priorityCode(studyright, 2, true),
-        canceldate: cancelDate(studyright, 2, true)
+        prioritycode: parsePriorityCode(studyright, 2, true),
+        canceldate: parseCancelDate(studyright, 2, true)
       })
 
 
@@ -83,8 +83,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       }
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
-        prioritycode: priorityCode(studyright),
-        canceldate: cancelDate(studyright)
+        prioritycode: parsePriorityCode(studyright),
+        canceldate: parseCancelDate(studyright)
       })
       acc.push(mappedStudyright)
     }
