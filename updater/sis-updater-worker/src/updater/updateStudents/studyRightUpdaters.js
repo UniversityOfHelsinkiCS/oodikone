@@ -13,7 +13,8 @@ const { getDegrees, getEducation, getEducationType } = require('../shared') // n
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
-  const cancelDate = studyright => {
+  const cancelDate = (studyright, phase_number = 1, isBaMa = false) => {
+    if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
     if (studyright.state === 'RESCINDED') return studyright.study_right_cancellation.cancellationDate
     if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
     return null
@@ -27,8 +28,6 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     if (!studyRightEducation) return acc
 
     if (isBaMa(studyRightEducation)) {
-      const canceldate = cancelDate(studyright)
-
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
         studyrightid: `${studyright.id}-1`,
@@ -39,7 +38,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
             : isPrimality
               ? 1
               : 2,
-        canceldate
+        canceldate: cancelDate(studyright, 1, true)
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -62,7 +61,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
                 ? 1
                 : 6
               : 2,
-        canceldate
+        canceldate: cancelDate(studyright, 2, true)
       })
 
 
