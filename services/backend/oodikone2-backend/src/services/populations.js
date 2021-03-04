@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const { getCurrentSemester } = require('../services/semesters')
+// const { getCurrentSemester } = require('../services/semesters')
 const { sortBy } = require('lodash')
 
 const {
