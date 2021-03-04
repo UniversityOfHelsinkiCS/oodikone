@@ -6,9 +6,12 @@ const {
   Studyright,
   Credit,
   StudyrightExtent,
-  Semester
+  Semester,
+  SemesterEnrollment
 } = require('../../../src/models/index')
 const { optimizedStatisticsOf } = require('../../../src/services/populations')
+jest.mock('../../../src/services/semesters')
+const semesterService = require('../../../src/services/semesters')
 jest.setTimeout(10000)
 
 const langify = name => ({
@@ -60,6 +63,15 @@ const semesters = {
     enddate: new Date('2012-07-30'),
     yearcode: 62,
     yearname: '2011-12'
+  },
+  // used for mocking current
+  current: {
+    semestercode: 125,
+    name: { en: 'Autumn 2012', fi: 'Syksy 2012', sv: 'Hösten 2012' },
+    startdate: new Date('2012-08-01'),
+    enddate: new Date('2012-12-31'),
+    yearcode: 63,
+    yearname: '2012-13'
   }
 }
 
@@ -119,6 +131,27 @@ describe('optimizedStatisticsOf tests', () => {
     semestercode: 124
   }
 
+  const semesterEnrollments = {
+    fall: {
+      enrollmenttype: 1,
+      studentnumber: student.studentnumber,
+      semestercode: semesters.fall.semestercode,
+      enrollment_date: semesters.fall.startdate
+    },
+    spring: {
+      enrollmenttype: 1,
+      studentnumber: student.studentnumber,
+      semestercode: semesters.spring.semestercode,
+      enrollment_date: semesters.spring.startdate
+    },
+    current: {
+      enrollmenttype: 1,
+      studentnumber: student.studentnumber,
+      semestercode: semesters.current.semestercode,
+      enrollment_date: semesters.current.startdate
+    }
+  }
+
   const studyrightelements = {
     bsc: {
       startdate: new Date('2011-07-31 21:00:00+00'),
@@ -143,7 +176,7 @@ describe('optimizedStatisticsOf tests', () => {
     - Two credits in 2011-09-31 and 2012-02-31.
     `, () => {
     beforeAll(async () => {
-      await Semester.bulkCreate([semesters.fall, semesters.spring])
+      await Semester.bulkCreate([semesters.fall, semesters.spring, semesters.current])
       await Student.create(student)
       await Course.create(courses.elements_of_ai)
       await Credit.bulkCreate([creditFall, creditSpring])
@@ -151,6 +184,20 @@ describe('optimizedStatisticsOf tests', () => {
       await StudyrightExtent.create(studyrightextents.bachelors)
       await Studyright.create(studyright)
       await StudyrightElement.bulkCreate([studyrightelements.bsc, studyrightelements.maths])
+      await SemesterEnrollment.bulkCreate([
+        semesterEnrollments.fall,
+        semesterEnrollments.spring,
+        semesterEnrollments.current
+      ])
+      // Mock current semester implementation
+      semesterService.getCurrentSemester.mockImplementation(async () => {
+        const currentSemester = await Semester.findOne({
+          where: {
+            semestercode: semesters.current.semestercode
+          }
+        })
+        return currentSemester
+      })
     })
 
     test('Query result for BSc, Fall 2011 for 12 months should contain the student.', async () => {
