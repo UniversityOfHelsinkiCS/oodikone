@@ -20,24 +20,42 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     return null
   }
 
-  const formattedStudyRights = studyRights.reduce((acc, studyright) => {
-    const studyRightEducation = getEducation(studyright.education_id)
+  const priorityCode = (studyright, phase_number = 1, isBaMa = false) => {
     const primality = get(personIdToStudyRightIdToPrimality, `${studyright.person_id}.${studyright.id}`)
     const primalityEndDate = get(primality, 'end_date')
     const isPrimality = primality && !primalityEndDate
+    if (!isBaMa) {
+      return studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
+    }
+    if (phase_number === 1) {
+      return get(studyright, 'study_right_graduation.phase1GraduationDate')
+        ? 30
+        : studyright.state === 'RESCINDED'
+        ? 5
+        : isPrimality
+          ? 1
+          : 2
+    }
+    return get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
+      ? 30
+      : studyright.state === 'RESCINDED'
+        ? 5
+        : isPrimality
+          ? get(studyright, 'study_right_graduation.phase1GraduationDate')
+            ? 1
+            : 6
+          : 2
+  }
+
+  const formattedStudyRights = studyRights.reduce((acc, studyright) => {
+    const studyRightEducation = getEducation(studyright.education_id)
     if (!studyRightEducation) return acc
 
     if (isBaMa(studyRightEducation)) {
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
         studyrightid: `${studyright.id}-1`,
-        prioritycode: get(studyright, 'study_right_graduation.phase1GraduationDate')
-          ? 30
-          : studyright.state === 'RESCINDED'
-            ? 5
-            : isPrimality
-              ? 1
-              : 2,
+        prioritycode: priorityCode(studyright, 1, true),
         canceldate: cancelDate(studyright, 1, true)
       })
 
@@ -52,15 +70,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         studystartdate: studyright.study_right_graduation
           ? studyright.study_right_graduation.phase1GraduationDate
           : null,
-        prioritycode: get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
-          ? 30
-          : studyright.state === 'RESCINDED'
-            ? 5
-            : isPrimality
-              ? get(studyright, 'study_right_graduation.phase1GraduationDate')
-                ? 1
-                : 6
-              : 2,
+        prioritycode: priorityCode(studyright, 2, true),
         canceldate: cancelDate(studyright, 2, true)
       })
 
@@ -73,7 +83,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       }
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
-        prioritycode: studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2,
+        prioritycode: priorityCode(studyright),
         canceldate: cancelDate(studyright)
       })
       acc.push(mappedStudyright)
