@@ -45,7 +45,8 @@
     "start:updater": "npm run docker:up -- --scale sis-updater-worker=4 sis-updater-scheduler sis-updater-worker db_sis sis-updater-nats db adminer redis && npm run docker:logs -- --tail=\"1000\"",
     "updater:dev:up": "npm run docker:updater:real -- up",
     "updater:dev:down": "npm run docker:updater:real -- down --remove-orphans",
-    "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js"
+    "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
+    "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js"
   },
   "husky": {
     "hooks": {
