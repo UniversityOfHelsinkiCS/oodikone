@@ -1,6 +1,6 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-// const { getCurrentSemester } = require('../services/semesters')
+const { getCurrentSemester } = require('../services/semesters')
 const { sortBy } = require('lodash')
 
 const {
@@ -406,7 +406,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   const students = await Studyright.findAll({
-    attributes: ['student_studentnumber', 'graduated'],
+    attributes: ['student_studentnumber', 'graduated', 'enddate'],
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -449,27 +449,35 @@ const studentnumbersWithAllStudyrightElements = async (
 
   let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
 
-  // Oodi canceldates don't match SIS studyright statuses, so filter out all students who haven't enrolled for semester
-  // temp uncomment following fix
-  //if (!cancelledStudents) {
-  //  const { semestercode } = await getCurrentSemester()
+  // Oodi canceldates don't match SIS studyright statuses, so
+  // - filter out all students who haven't enrolled for semester
+  // - filter out all students who have enrolled for both semesters but whose studyright has ended
+  // - don't use above filtering to graduated students
+  if (!cancelledStudents) {
+    const { semestercode } = await getCurrentSemester()
 
-  //  const enrolments = await SemesterEnrollment.findAll({
-  //    where: {
-  //      studentnumber: {
-  //        [Op.in]: studentnumbers
-  //      },
-  //      semestercode,
-  //      enrollment_date: {
-  //        [Op.not]: null
-  //      }
-  //    }
-  //  })
-
-  //  const enrolledStudentnumbers = enrolments.map(e => e.studentnumber)
-  //  const graduated = [...new Set(students.filter(s => s.graduated).map(s => s.student_studentnumber))]
-  //  studentnumbers = [...new Set(graduated.concat(enrolledStudentnumbers))]
-  //}
+    const enrolments = await SemesterEnrollment.findAll({
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers
+        },
+        semestercode,
+        enrollment_date: {
+          [Op.not]: null
+        }
+      }
+    })
+    const studentsByStudentnumber = students.reduce((res, curr) => {
+      res[curr.student_studentnumber] = curr
+      return res
+    }, {})
+    const today = new Date()
+    const graduated = [...new Set(students.filter(s => s.graduated).map(s => s.student_studentnumber))]
+    const enrolledStudentnumbers = enrolments
+      .map(e => e.studentnumber)
+      .filter(s => new Date(studentsByStudentnumber[s].enddate) >= today)
+    studentnumbers = [...new Set(graduated.concat(enrolledStudentnumbers))]
+  }
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
