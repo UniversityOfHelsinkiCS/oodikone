@@ -1,30 +1,14 @@
 // Run with `npm run diff:students`
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
-const { objectDiff } = require('../utils')
-
-// Fields that are not to be compared.
-const ignoredFields = ['updatedAt']
-
-const compareLength = (oodi, sis) => {
-  if (!oodi.length) {
-    return 'Length: N/A'
-  }
-
-  return `Length (oodi/sis): ${oodi.length} / ${sis.length}`
-}
+const { compareStarted } = require('./compareMisc')
 
 const getStudentDiff = async studentNumber => {
-  const msg = []
+  let msg = []
   const oodi = await studentServiceOodi.withId(studentNumber)
   const sis = await studentServiceSis.withId(studentNumber)
 
-  const diff = objectDiff(oodi, sis, ignoredFields)
-
-  diff.forEach(field => {
-    msg.push(`${field} diff:`)
-    msg.push(`  ${compareLength(oodi[field], sis[field])}`)
-  })
+  msg = compareStarted(oodi.started, sis.started, msg)
 
   return msg
 }
@@ -41,7 +25,7 @@ const main = async () => {
     if (msg.length) {
       console.log(`${studentNumber}:`)
       msg.forEach(s => {
-        console.log(`  ${s}`)
+        console.log(s)
       })
     }
 
