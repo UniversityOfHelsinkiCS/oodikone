@@ -2,6 +2,7 @@
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
 const { compareStarted } = require('./compareMisc')
+const getStudentNumbers = require('./getStudentNumbers')
 
 const getStudentDiff = async studentNumber => {
   let msg = []
@@ -14,7 +15,7 @@ const getStudentDiff = async studentNumber => {
 }
 
 const main = async () => {
-  const studentNumbers = ['010690785', '011610159']
+  const studentNumbers = getStudentNumbers()
 
   console.log(`Comparing ${studentNumbers.length} students between Oodi and SIS databases.`)
   console.log('Only differing students and fields are printed.\n\n')
