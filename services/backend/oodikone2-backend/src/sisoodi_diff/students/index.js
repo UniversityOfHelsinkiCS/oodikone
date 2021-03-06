@@ -15,7 +15,7 @@ const getStudentDiff = async studentNumber => {
 }
 
 const main = async () => {
-  const studentNumbers = getStudentNumbers()
+  const studentNumbers = await getStudentNumbers()
 
   console.log(`Comparing ${studentNumbers.length} students between Oodi and SIS databases.`)
   console.log('Only differing students and fields are printed.\n\n')
