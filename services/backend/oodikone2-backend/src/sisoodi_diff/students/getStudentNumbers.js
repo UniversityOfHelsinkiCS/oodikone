@@ -13,33 +13,41 @@ const getStudentNumbersFromFile = (n = 10) => {
   }
 }
 
-const getStudentNumbersFromProgramme = async studyProgrammeCode => {
-  try {
-    const studentNumbers = await StudyrightElement.findAll({
-      attributes: ['studentnumber'],
-      where: {
+const getStudentNumbersFromProgramme = async (studyProgrammeCode, year = null) => {
+  const whereConditions = year
+    ? {
         code: {
           [Op.eq]: studyProgrammeCode
         },
-        [Op.and]: where(fn('DATE_PART', 'year', col('startdate')), 2018)
-      },
+        [Op.and]: where(fn('DATE_PART', 'year', col('startdate')), year)
+      }
+    : {
+        code: {
+          [Op.eq]: studyProgrammeCode
+        }
+      }
+
+  try {
+    const studentNumbers = await StudyrightElement.findAll({
+      attributes: ['studentnumber'],
+      where: whereConditions,
       raw: true
     }).map(sn => sn.studentnumber)
-
-    console.log('n', studentNumbers.length)
-    return studentNumbers.slice(0, 5)
+    return studentNumbers
   } catch (error) {
     console.log(error)
+    throw new Error()
   }
 }
 
 const getStudentNumbers = async () => {
   const firstArg = process.argv[2]
   const secondArg = process.argv[3]
+  const thirdArg = process.argv[4]
 
   switch (firstArg) {
     case 'p':
-      return await getStudentNumbersFromProgramme(secondArg)
+      return await getStudentNumbersFromProgramme(secondArg, thirdArg)
     case 'n':
       return getStudentNumbersFromFile(secondArg)
     case undefined:

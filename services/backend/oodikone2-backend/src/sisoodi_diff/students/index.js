@@ -1,4 +1,19 @@
-// Run with `npm run diff:students`
+/**
+ * Usage:
+ *
+ * Compare 10 first students in students.csv:
+ * npm run diff:students
+ *
+ * Compare `n` students in students.csv (max 1000):
+ * npm run diff:students n 900
+ *
+ * Compare students filtering by study programme `code`:
+ * npm run diff:students p <code>
+ *
+ * Compare students filtering by study programme `code` and starting `year`:
+ * npm run diff:students p <code> <year>
+ * E.g.: npm run diff:students KH50_005 2018
+ */
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
 const { compareStarted } = require('./compareMisc')
