@@ -16,7 +16,7 @@
  */
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
-const { compareStarted } = require('./compareMisc')
+const { compareCredits } = require('./compareMisc')
 const getStudentNumbers = require('./getStudentNumbers')
 
 const getStudentDiff = async studentNumber => {
@@ -24,7 +24,8 @@ const getStudentDiff = async studentNumber => {
   const oodi = await studentServiceOodi.withId(studentNumber)
   const sis = await studentServiceSis.withId(studentNumber)
 
-  msg = compareStarted(oodi.started, sis.started, msg)
+  //msg = compareStarted(oodi.started, sis.started, msg)
+  msg = compareCredits(oodi.credits, sis.credits, msg)
 
   return msg
 }
@@ -38,14 +39,9 @@ const main = async () => {
   for (const studentNumber of studentNumbers) {
     const msg = await getStudentDiff(studentNumber)
 
-    if (msg.length) {
-      console.log(`${studentNumber}:`)
-      msg.forEach(s => {
-        console.log(s)
-      })
-    }
-
-    console.log('\n')
+    console.log(`${studentNumber}: ${msg.length === 0 ? 'OK' : ''}`)
+    msg.forEach(s => console.log(s))
+    console.log('')
   }
 
   console.log('DONED.')
