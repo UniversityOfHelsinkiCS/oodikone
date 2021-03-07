@@ -1,36 +1,37 @@
-// Run with `npm run diff:students`
+/**
+ * Usage:
+ *
+ * Compare 10 first students in students.csv:
+ * npm run diff:students
+ *
+ * Compare `n` students in students.csv (max 1000):
+ * npm run diff:students n 900
+ *
+ * Compare students filtering by study programme `code`:
+ * npm run diff:students p <code>
+ *
+ * Compare students filtering by study programme `code` and starting `year`:
+ * npm run diff:students p <code> <year>
+ * E.g.: npm run diff:students KH50_005 2018
+ */
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
-const { objectDiff } = require('../utils')
-
-// Fields that are not to be compared.
-const ignoredFields = ['updatedAt']
-
-const compareLength = (oodi, sis) => {
-  if (!oodi.length) {
-    return 'Length: N/A'
-  }
-
-  return `Length (oodi/sis): ${oodi.length} / ${sis.length}`
-}
+const { compareCredits } = require('./compareMisc')
+const getStudentNumbers = require('./getStudentNumbers')
 
 const getStudentDiff = async studentNumber => {
-  const msg = []
+  let msg = []
   const oodi = await studentServiceOodi.withId(studentNumber)
   const sis = await studentServiceSis.withId(studentNumber)
 
-  const diff = objectDiff(oodi, sis, ignoredFields)
-
-  diff.forEach(field => {
-    msg.push(`${field} diff:`)
-    msg.push(`  ${compareLength(oodi[field], sis[field])}`)
-  })
+  //msg = compareStarted(oodi.started, sis.started, msg)
+  msg = compareCredits(oodi.credits, sis.credits, msg)
 
   return msg
 }
 
 const main = async () => {
-  const studentNumbers = ['010690785', '011610159']
+  const studentNumbers = await getStudentNumbers()
 
   console.log(`Comparing ${studentNumbers.length} students between Oodi and SIS databases.`)
   console.log('Only differing students and fields are printed.\n\n')
@@ -38,14 +39,9 @@ const main = async () => {
   for (const studentNumber of studentNumbers) {
     const msg = await getStudentDiff(studentNumber)
 
-    if (msg.length) {
-      console.log(`${studentNumber}:`)
-      msg.forEach(s => {
-        console.log(`  ${s}`)
-      })
-    }
-
-    console.log('\n')
+    console.log(`${studentNumber}: ${msg.length === 0 ? 'OK' : ''}`)
+    msg.forEach(s => console.log(s))
+    console.log('')
   }
 
   console.log('DONED.')
