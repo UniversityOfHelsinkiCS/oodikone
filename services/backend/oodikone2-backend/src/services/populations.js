@@ -374,7 +374,7 @@ const studentnumbersWithAllStudyrightElements = async (
 
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
-  const filteredExtents = []
+  const filteredExtents = [10] // always filter out secondary subject students
   let studyrightWhere = {
     extentcode: {
       [Op.notIn]: filteredExtents
