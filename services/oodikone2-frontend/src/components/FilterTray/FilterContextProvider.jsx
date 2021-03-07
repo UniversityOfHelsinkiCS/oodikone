@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { CourseFilterProvider } from './filters/Courses/useCourseFilter'
 import { CreditFilterProvider } from './filters/CreditsEarned/useCreditFilter'
+import { AgeFilterProvider } from './filters/Age/useAgeFilter'
 import { FilterTrayProvider } from './useFilterTray'
 import { FilterProvider } from './useFilters'
 import { FilterAnalyticsProvider } from './useAnalytics'
@@ -13,7 +14,9 @@ const FilterContextProvider = ({ children }) => (
       <FilterProvider>
         <CourseFilterProvider>
           <CreditFilterProvider>
-            <GradeFilterProvider>{children}</GradeFilterProvider>
+            <AgeFilterProvider>
+              <GradeFilterProvider>{children}</GradeFilterProvider>
+            </AgeFilterProvider>
           </CreditFilterProvider>
         </CourseFilterProvider>
       </FilterProvider>
