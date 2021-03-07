@@ -315,7 +315,7 @@ class PopulationSearchHistory extends Component {
             {showAdvancedSettings ? (
               <InfoBox content={Advanced} />
             ) : (
-              <Message style={{ marginTop: '2.25rem' }}>
+              <Message color="blue" style={{ marginTop: '2.25rem' }}>
                 <Message.Header>Note:</Message.Header>
                 By default only students who have not transferred to this study programme are shown. You can change
                 filters on the left.
