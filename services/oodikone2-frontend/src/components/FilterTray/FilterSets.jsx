@@ -9,6 +9,7 @@ import Courses from './filters/Courses'
 import useAnalytics from './useAnalytics'
 import Grade from './filters/Grade'
 import Date from './filters/Date'
+import Age from './filters/Age'
 
 export const PopulationStatisticsFilters = () => {
   const analytics = useAnalytics()
@@ -23,6 +24,7 @@ export const PopulationStatisticsFilters = () => {
       <TransferredToProgramme />
       <EnrollmentStatus />
       <CreditsEarned />
+      <Age />
       <Gender />
       <StartYearAtUni />
       <Courses />
@@ -40,6 +42,7 @@ export const CoursePopulationFilters = () => {
   return (
     <>
       <Grade />
+      <Age />
       <Gender />
       <StartYearAtUni />
     </>
@@ -56,6 +59,7 @@ export const CustomPopulationFilters = () => {
   return (
     <>
       <EnrollmentStatus />
+      <Age />
       <Gender />
       <StartYearAtUni />
       <Courses />
