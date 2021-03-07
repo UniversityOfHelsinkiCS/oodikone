@@ -10,6 +10,22 @@ import ProgrammeDropdown from '../ProgrammeDropdown'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import { getTextIn } from '../../../common'
 
+// Certified JavaScript moment but basically this was crashing
+// since sometimes object like {en: ..., fi: ...., sv: ....}
+// was being passed to React which is not legal but then again
+// it works sometimes? so doing this to make sure while fixing
+// the crash the realisations that worked will keep working
+const unObjectifyProperty = ({ obj, property }) => {
+  const suspectField = obj[property]
+  if (typeof suspectField === 'object' && suspectField !== null) {
+    if (suspectField.en) return { ...obj, [property]: suspectField.en }
+
+    throw Error(`Invalid object being tried to pass to React: ${JSON.stringify(suspectField)}`)
+  }
+
+  return { ...obj, [property]: suspectField }
+}
+
 const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClickCourse }) => {
   const { language } = useLanguage()
   const handleChange = (e, { name, value }) => {
@@ -29,7 +45,9 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
       passed,
       failed,
       passrate,
-      realisations
+      realisations: realisations.map(obj => {
+        return unObjectifyProperty({ obj, property: 'realisation' })
+      })
     }
   })
 
@@ -54,9 +72,11 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
           <Form.Field>
             <label>Timeframe:</label>
             <Label.Group>
-              {queryInfo.timeframe.map(({ code, name }) => (
-                <Label key={code} content={name} />
-              ))}
+              {queryInfo.timeframe.map(objBeforeUbObjectifying => {
+                const obj = unObjectifyProperty({ obj: objBeforeUbObjectifying, property: 'name' })
+                const { code, name } = obj
+                return <Label key={code} content={name} />
+              })}
             </Label.Group>
           </Form.Field>
         </Form>
