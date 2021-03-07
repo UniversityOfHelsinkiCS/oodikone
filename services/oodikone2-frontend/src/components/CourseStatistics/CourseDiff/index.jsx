@@ -28,12 +28,15 @@ const CreditDiffTable = ({ title, color, students }) => (
       </Table.Row>
     </Table.Header>
     <Table.Body>
-      {students.map(missing => (
-        <Table.Row key={`${missing.studentnumber}-${missing.year}`}>
-          <Table.Cell>{missing.studentnumber}</Table.Cell>
-          <Table.Cell>{missing.year}</Table.Cell>
-        </Table.Row>
-      ))}
+      {students
+        .sort()
+        .reverse()
+        .map(missing => (
+          <Table.Row key={`${missing.studentnumber}-${missing.year}`}>
+            <Table.Cell>{missing.studentnumber}</Table.Cell>
+            <Table.Cell>{missing.year}</Table.Cell>
+          </Table.Row>
+        ))}
     </Table.Body>
   </Table>
 )
@@ -49,33 +52,35 @@ const CourseDiffTable = ({ data }) => (
     </Table.Header>
     <Accordion
       as={Table.Body}
-      panels={data.map(({ coursecode, missingStudents, extraStudents }) => {
-        return {
-          key: coursecode,
-          class: 'tr',
-          title: {
-            as: Table.Row,
+      panels={data
+        .sort((a, b) => b.missingStudents.length - a.missingStudents.length)
+        .map(({ coursecode, missingStudents, extraStudents }) => {
+          return {
             key: coursecode,
-            children: [
-              <>
-                <Table.Cell>
-                  <b>{coursecode}</b>
-                </Table.Cell>
-                <Table.Cell collapsing>{missingStudents.length}</Table.Cell>
-                <Table.Cell collapsing>{extraStudents.length}</Table.Cell>
-              </>
-            ]
-          },
-          content: {
-            children: (
-              <>
-                <CreditDiffTable title="Missing credits" color="red" students={missingStudents} />
-                <CreditDiffTable title="Extra credits" color="green" students={extraStudents} />
-              </>
-            )
+            class: 'tr',
+            title: {
+              as: Table.Row,
+              key: coursecode,
+              children: [
+                <>
+                  <Table.Cell>
+                    <b>{coursecode}</b>
+                  </Table.Cell>
+                  <Table.Cell collapsing>{missingStudents.length}</Table.Cell>
+                  <Table.Cell collapsing>{extraStudents.length}</Table.Cell>
+                </>
+              ]
+            },
+            content: {
+              children: (
+                <>
+                  <CreditDiffTable title="Missing credits" color="red" students={missingStudents} />
+                  <CreditDiffTable title="Extra credits" color="green" students={extraStudents} />
+                </>
+              )
+            }
           }
-        }
-      })}
+        })}
     />
   </Table>
 )

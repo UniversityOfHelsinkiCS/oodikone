@@ -11,6 +11,9 @@ const Updater = () => {
   const [statuses, setStatuses] = useState(null)
   const [nums, setNums] = useState('')
   const [SISNums, setSISNums] = useState('')
+  const [SISProgrammeName, setSISProgrammeName] = useState('')
+  const [SISProgrammeYear, setSISProgrammeYear] = useState('')
+  const [SISCourses, setSISCourses] = useState('')
   useTitle('Updater')
 
   const apiCall = async (url, method, data) => {
@@ -38,9 +41,15 @@ const Updater = () => {
   const updateSISStudents = () => apiCall('/updater/update/v2/students', 'get')
   const updateSISProgrammes = () => apiCall('/updater/update/v2/programmes')
   const updateSISPopulationStudents = () => apiCall('/updater/update/v2/students', 'post', SISNums.trim().split('\n'))
+  const updateSISPopulationStudentsByProgramme = () =>
+    apiCall('/updater/update/v2/students_by_programme', 'post', {
+      programme: SISProgrammeName.trim(),
+      year: Number(SISProgrammeYear.trim())
+    })
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
   const abortSisUpdater = () => apiCall('/updater/abort', 'get')
   const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache', 'get')
+  const updateSISCourses = () => apiCall('/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
 
   const statusRef = useRef()
   useEffect(() => {
@@ -104,14 +113,39 @@ const Updater = () => {
             <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
           </Form.Group>
         </Form>
-        <Form.Group>
-          <TextArea onChange={(_, { value }) => setSISNums(value)} />
-          <Form.Button
-            onClick={updateSISPopulationStudents}
-            content="Update students by student number"
-            icon="refresh"
-          />
-        </Form.Group>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Form.Group>
+            <TextArea onChange={(_, { value }) => setSISNums(value)} />
+            <Form.Button
+              onClick={updateSISPopulationStudents}
+              content="Update students by student number"
+              icon="refresh"
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Input
+              placeholder="programme"
+              name="programme"
+              value={SISProgrammeName}
+              onChange={(_, { value }) => setSISProgrammeName(value)}
+            />
+            <Form.Input
+              placeholder="year"
+              name="year"
+              value={SISProgrammeYear}
+              onChange={(_, { value }) => setSISProgrammeYear(value)}
+            />
+            <Form.Button
+              onClick={updateSISPopulationStudentsByProgramme}
+              content="Update all students by programme & year"
+              icon="refresh"
+            />
+          </Form.Group>
+          <Form.Group>
+            <TextArea onChange={(_, { value }) => setSISCourses(value)} />
+            <Form.Button onClick={updateSISCourses} content="Update courses by course code" icon="refresh" />
+          </Form.Group>
+        </div>
       </Segment>
       <Button content="Clear messages" onClick={() => setMessages([])} />
       <Header>{messages}</Header>

@@ -85,9 +85,8 @@ const StudyrightsTable = ({
         </div>
       )
     return (
-      <div>
+      <div style={{ padding: '.5em 0' }}>
         <Icon name="circle outline" color="red" />
-        <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
       </div>
     )
   }

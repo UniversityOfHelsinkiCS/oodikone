@@ -201,23 +201,27 @@ const removeEmptySpaces = str => str.replace(/\s\s+/g, ' ')
 
 const splitByEmptySpace = str => removeEmptySpaces(str).split(' ')
 
-const likefy = term => `%${term}%`
-
-const columnLike = (column, term) => ({
-  [column]: {
-    [Op.iLike]: likefy(term)
-  }
-})
-
 const nameLike = terms => {
   const [first, second] = terms
   if (!second) {
-    return columnLike('abbreviatedname', first)
+    return {
+      ['abbreviatedname']: {
+        [Op.iLike]: `%${first}%`
+      }
+    }
   } else {
     return {
       [Op.or]: [
-        columnLike('abbreviatedname', `%${first}%${second}%`),
-        columnLike('abbreviatedname', `%${second}%${first}%`)
+        {
+          ['abbreviatedname']: {
+            [Op.iLike]: `%%${first}%${second}%%`
+          }
+        },
+        {
+          ['abbreviatedname']: {
+            [Op.iLike]: `%%${second}%${first}%%`
+          }
+        }
       ]
     }
   }
@@ -229,7 +233,7 @@ const studentnumberLike = terms => {
   }
   return {
     studentnumber: {
-      [Op.iLike]: likefy(terms[0])
+      [Op.iLike]: `%${terms[0]}%`
     }
   }
 }

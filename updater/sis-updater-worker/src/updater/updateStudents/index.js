@@ -10,7 +10,7 @@ const {
   Transfer
 } = require('../../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../../db')
-const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
+const { getEducation, getUniOrgId, loadMapsIfNeeded, getEducationType } = require('../shared')
 const {
   studentMapper,
   mapTeacher,
@@ -19,6 +19,18 @@ const {
 } = require('../mapper')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
+
+const studyRightHasDegreeEducation = (studyRight) => {
+  const education = getEducation(studyRight.education_id)
+  if (!education) return true
+  const educationType = getEducationType(education.education_type)
+  if (!educationType) return true
+  return educationType.parent_id !== 'urn:code:education-type:non-degree-education'
+}
+
+const takeDegreeStudyRightSnapshots = (studyRightSnapshots) => {
+  return studyRightSnapshots.filter(studyRight => studyRightHasDegreeEducation(studyRight))
+}
 
 const groupStudyrightSnapshots = (studyRightSnapshots) => {
   const snapshotsBystudyright = Object.entries(
@@ -54,6 +66,7 @@ const groupStudyrightSnapshots = (studyRightSnapshots) => {
   }, {})
 }
 
+
 const updateStudents = async personIds => {
   await loadMapsIfNeeded()
 
@@ -65,8 +78,10 @@ const updateStudents = async personIds => {
     selectFromByIds('study_right_primalities', personIds, 'student_id')
   ])
 
+  const degreeStudyRightSnapshots = takeDegreeStudyRightSnapshots(studyRightSnapshots)
+
   // grouping in function that sets first_snapshot_date_time
-  const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
+  const groupedStudyRightSnapshots = groupStudyrightSnapshots(degreeStudyRightSnapshots)
 
   const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
     acc.push(curr[0])
@@ -84,7 +99,7 @@ const updateStudents = async personIds => {
     return res
   }, {})
 
-  const mappedStudents = students.map(studentMapper(attainments, studyRightSnapshots))
+  const mappedStudents = students.map(studentMapper(attainments, degreeStudyRightSnapshots))
   await bulkCreate(Student, mappedStudents)
 
   const [moduleGroupIdToCode] = await Promise.all([

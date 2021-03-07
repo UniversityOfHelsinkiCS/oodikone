@@ -5,13 +5,19 @@ const { isBaMa } = require('../../utils') // Only used here, move
 const { studyrightMapper } = require('../mapper') // also only used here
 const { get, sortBy, sortedUniqBy, orderBy, uniqBy } = require('lodash')
 const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
-const { selectFromByIds, bulkCreate }  = require('../../db')
+const { selectFromByIds, bulkCreate } = require('../../db')
 const { getDegrees, getEducation, getEducationType } = require('../shared') // not all of these are really shared,
 // e.g. getDegrees, getEducationType is only used here, refactor?
 
 
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
+
+  const cancelDate = studyright => {
+    if (studyright.state === 'RESCINDED') return studyright.study_right_cancellation.cancellationDate
+    if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
+    return null
+  }
 
   const formattedStudyRights = studyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
@@ -21,6 +27,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     if (!studyRightEducation) return acc
 
     if (isBaMa(studyRightEducation)) {
+      const canceldate = cancelDate(studyright)
+
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
         studyrightid: `${studyright.id}-1`,
@@ -30,7 +38,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
             ? 5
             : isPrimality
               ? 1
-              : 2
+              : 2,
+        canceldate
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -52,8 +61,10 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
               ? get(studyright, 'study_right_graduation.phase1GraduationDate')
                 ? 1
                 : 6
-              : 2
+              : 2,
+        canceldate
       })
+
 
       acc.push(studyRightMast, studyRightBach)
     } else {
@@ -63,7 +74,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       }
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
-        prioritycode: studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
+        prioritycode: studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2,
+        canceldate: cancelDate(studyright)
       })
       acc.push(mappedStudyright)
     }
@@ -76,7 +88,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
 
 const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
   const possibleBscFirst = (s1, s2) => {
-    if ( !s1.accepted_selection_path.educationPhase2GroupId ) return -1
+    if (!s1.accepted_selection_path.educationPhase2GroupId) return -1
     return 1
   }
 
@@ -136,7 +148,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             possibleMaDegrees ? possibleMaDegrees[0].short_name.en : null
           )
 
-          const possibleBScDuplicate = snapshotStudyRightElements.find( element => element.code === baProgramme.code )
+          const possibleBScDuplicate = snapshotStudyRightElements.find(element => element.code === baProgramme.code)
           if (possibleBScDuplicate) {
             snapshotStudyRightElements.push(maDegree, maProgramme, maStudytrack)
           } else {
@@ -163,6 +175,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       return res
     }, [])
     .filter(sE => !!sE.code)
+
 
   await bulkCreate(StudyrightElement, studyRightElements)
 }
@@ -219,7 +232,10 @@ const updateElementDetails = async studyRights => {
     'group_id'
   )
 
-  const mappedDegrees = [...groupedEducationPhases[10]].filter(degree => degree).map(degree => ({...degree, type: 10}))
+  const mappedDegrees = [...groupedEducationPhases[10]].filter(degree => degree).map(degree => ({
+    ...degree,
+    type: 10
+  }))
   const mappedProgrammes = programmes.map(programme => ({ ...programme, type: 20 }))
   const mappedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type: 30 }))
 
@@ -240,5 +256,5 @@ const updateElementDetails = async studyRights => {
 module.exports = {
   updateStudyRights,
   updateStudyRightElements,
-  updateElementDetails,
+  updateElementDetails
 }
