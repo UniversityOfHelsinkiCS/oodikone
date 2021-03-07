@@ -50,6 +50,7 @@ const handleInfoMessage = async msg => {
     logger.info({ message: 'Starting to abort scheduled messages' })
     abortingMessages = true
     msg.ack()
+    resetAbortTimer()
   }
   if (msg.getData() === 'RELOAD_REDIS') {
     logger.info({ message: 'Starting to reload redis cache' })

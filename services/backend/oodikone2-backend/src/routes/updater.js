@@ -15,10 +15,12 @@ const {
 const {
   updateSISMetadata,
   updateSISStudents,
+  updateSISStudentsByProgramme,
   updateSISProgrammes,
   updateSISRedisCache,
   updateStudentsByStudentNumber,
-  abort
+  abort,
+  updateCoursesByCourseCode
 } = require('../services/sisUpdaterService')
 const { refreshStatistics, refreshStatisticsV2 } = require('../events')
 
@@ -202,6 +204,21 @@ router.post('/update/v2/students', async (req, res) => {
   }
 })
 
+router.post('/update/v2/courses', async (req, res) => {
+  const { roles } = req
+  if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
+
+  try {
+    const response = await updateCoursesByCourseCode(req.body)
+    if (response) {
+      res.status(200).json('Update SIS courses scheduled')
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: 'error' })
+  }
+})
+
 router.get('/update/v2/programmes', async (req, res) => {
   const { roles } = req
   if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
@@ -210,6 +227,21 @@ router.get('/update/v2/programmes', async (req, res) => {
     const response = await updateSISProgrammes()
     if (response) {
       res.status(200).json('Update SIS programmes scheduled')
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ error: 'error' })
+  }
+})
+
+router.post('/update/v2/students_by_programme', async (req, res) => {
+  const { roles } = req
+  if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
+  try {
+    const response = await updateSISStudentsByProgramme(req.body)
+    if (response) {
+      const { year, programme } = req.body
+      res.status(200).json(`Update for ${programme} ${year} scheduled`)
     }
   } catch (err) {
     console.log(err)

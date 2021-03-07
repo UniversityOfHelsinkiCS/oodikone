@@ -26,7 +26,8 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
 
   db_sis:
-    image: postgres:9.6.3
+    image: postgres:13.2
+    shm_size: 1g
     ports:
       - "5426:5432"
     volumes:
@@ -35,6 +36,7 @@ services:
     container_name: db_sis
     environment:
       - POSTGRES_USER=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
 
   redis:
     image: redis
