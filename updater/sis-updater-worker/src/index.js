@@ -2,12 +2,13 @@ const { debounce } = require('lodash')
 const { stan, opts } = require('./utils/stan')
 const { dbConnections } = require('./db/connection')
 const { loadMapsOnDemand } = require('./updater/shared')
-const { update, purge, purgeByStudentNumber } = require('./updater')
+const { update } = require('./updater')
+const { purge, prePurge, purgeByStudentNumber } = require('./updater/purge')
 const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
 const { logger } = require('./utils/logger')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
-  SIS_PURGE_SCHEDULE_CHANNEL,
+  SIS_PURGE_CHANNEL,
   SIS_MISC_SCHEDULE_CHANNEL,
   NATS_GROUP,
   REDIS_TOTAL_META_KEY,
@@ -82,7 +83,8 @@ const updateMsgHandler = async updateMsg => {
 }
 
 const purgeMsgHandler = async purgeMsg => {
-  await purge(purgeMsg)
+  if (purgeMsg.action === 'PURGE') await purge(purgeMsg)
+  if (purgeMsg.action === 'PREPURGE') await prePurge(purgeMsg)
 }
 
 const miscMsgHandler = async miscMessage => {
@@ -117,7 +119,7 @@ dbConnections.on('connect', async () => {
     logger.error({ message: 'Updater channel error', meta: e.stack })
   })
 
-  const purgeChannel = stan.subscribe(SIS_PURGE_SCHEDULE_CHANNEL, NATS_GROUP, opts)
+  const purgeChannel = stan.subscribe(SIS_PURGE_CHANNEL, NATS_GROUP, opts)
   purgeChannel.on('message', handleMessage(purgeMsgHandler))
   purgeChannel.on('error', e => {
     logger.error({ message: 'Purge channel error', meta: e.stack })

@@ -1,11 +1,10 @@
 const { chunk } = require('lodash')
-const { each, eachLimit } = require('async')
+const { eachLimit } = require('async')
 const { knexConnection } = require('./db/connection')
 const { stan } = require('./utils/stan')
 const { set: redisSet, get: redisGet } = require('./utils/redis')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
-  SIS_PURGE_SCHEDULE_CHANNEL,
   SIS_MISC_SCHEDULE_CHANNEL,
   CHUNK_SIZE,
   isDev,
@@ -16,9 +15,9 @@ const {
   REDIS_TOTAL_STUDENTS_DONE_KEY,
   REDIS_LAST_HOURLY_SCHEDULE,
   REDIS_LATEST_MESSAGE_RECEIVED,
-  LATEST_MESSAGE_RECEIVED_THRESHOLD,
-  REDIS_LAST_WEEKLY_SCHEDULE
+  LATEST_MESSAGE_RECEIVED_THRESHOLD
 } = require('./config')
+const { startPrePurge, startPurge } = require('./purge')
 const { logger } = require('./utils/logger')
 
 const IMPORTER_TABLES = {
@@ -199,17 +198,6 @@ const isUpdaterActive = async () => {
   )
 }
 
-const hasWeeklyBeenScheduled = async () => {
-  const lastWeeklySchedule = await redisGet(REDIS_LAST_WEEKLY_SCHEDULE)
-  const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
-
-  return (
-    lastWeeklySchedule &&
-    lastHourlySchedule &&
-    new Date(lastWeeklySchedule).getTime() > new Date(lastHourlySchedule).getTime()
-  )
-}
-
 const scheduleHourly = async () => {
   try {
     // Update meta that have changed between now and the last update
@@ -248,44 +236,19 @@ const scheduleWeekly = async () => {
   }
 }
 
-const schedulePurge = async () => {
-  const TABLES_TO_PURGE = [
-    'course',
-    'course_providers',
-    'course_types',
-    'credit',
-    'credit_teachers',
-    'credit_types',
-    'element_details',
-    'organization',
-    'semester_enrollments',
-    'studyright',
-    'studyright_elements',
-    'studyright_extents',
-    'teacher'
-  ]
+const schedulePrePurge = async () => {
   try {
-    const lastHourlySchedule = await redisGet(REDIS_LAST_HOURLY_SCHEDULE)
-    console.log('PURGE_REDIS_LAST_HOURLY', lastHourlySchedule)
-
-    if (!lastHourlySchedule || Number.isNaN(new Date(lastHourlySchedule).getTime())) {
-      throw new Error('Invalid date from hourly schedule')
-    }
-    each(
-      Object.values(TABLES_TO_PURGE),
-      async table =>
-        new Promise((res, rej) => {
-          stan.publish(SIS_PURGE_SCHEDULE_CHANNEL, JSON.stringify({ table, before: lastHourlySchedule }), err => {
-            if (err) {
-              console.log('failed publishing', err)
-              rej()
-            }
-            res()
-          })
-        })
-    )
+    await startPrePurge()
   } catch (e) {
-    logger.error({ message: 'Purge scheduling failed', meta: e.stack })
+    logger.error({ message: 'Purge failed', meta: e.stack })
+  }
+}
+
+const schedulePurge = async () => {
+  try {
+    await startPurge()
+  } catch (e) {
+    logger.error({ message: 'Purge failed', meta: e.stack })
   }
 }
 
@@ -295,9 +258,9 @@ module.exports = {
   scheduleProgrammes,
   scheduleHourly,
   scheduleWeekly,
+  schedulePrePurge,
   schedulePurge,
   scheduleByStudentNumbers,
   scheduleByCourseCodes,
-  isUpdaterActive,
-  hasWeeklyBeenScheduled
+  isUpdaterActive
 }
