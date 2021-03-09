@@ -259,7 +259,6 @@ const schedulePurge = async () => {
     'element_details',
     'organization',
     'semester_enrollments',
-    'student',
     'studyright',
     'studyright_elements',
     'studyright_extents',
