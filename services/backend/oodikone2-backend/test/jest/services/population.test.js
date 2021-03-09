@@ -200,28 +200,10 @@ describe('optimizedStatisticsOf tests', () => {
       })
     })
 
-    test('Query result for BSc, Fall 2011 for 12 months should contain the student.', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code], 12)
-      const { students } = await optimizedStatisticsOf(query)
-      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
-    })
-
-    test('Query result for BSc, Fall 2012 for 12 months should contain the student.', async () => {
-      const query = createQueryObject('2012', SEMESTER.FALL, [elementdetails.bsc.code], 12)
-      const { students } = await optimizedStatisticsOf(query)
-      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
-    })
-
     test('Query result for Mathematics, Fall 2010 for 12 months should not contain the student.', async () => {
       const query = createQueryObject('2010', SEMESTER.FALL, [elementdetails.maths.code], 12)
       const { students } = await optimizedStatisticsOf(query)
       expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(false)
-    })
-
-    test('Query result for Mathematics, Fall 2011 for 12 months should contain the student.', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.maths.code], 12)
-      const { students } = await optimizedStatisticsOf(query)
-      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
     })
 
     test('Query result for Mathematics, Fall 2012 for 12 months should not contain the student.', async () => {
@@ -236,43 +218,10 @@ describe('optimizedStatisticsOf tests', () => {
       expect(students.some(s => s.studentNumber === student.student_studentnumber)).toBe(false)
     })
 
-    test('Query result for BSc and Mathematics, Fall 2011 for 12 months should contain the student.', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code, elementdetails.maths.code], 12)
-      const { students } = await optimizedStatisticsOf(query)
-      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
-    })
-
-    test('Query result for BSc, Spring 2012 for 12 months should contain the student', async () => {
-      const query = createQueryObject('2012', SEMESTER.SPRING, [elementdetails.bsc.code], 12)
-      const { students } = await optimizedStatisticsOf(query)
-      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
-    })
-
     test('Query result for Mathematics, Spring 2012 for 12 months should not contain the student', async () => {
       const query = createQueryObject('2012', SEMESTER.SPRING, [elementdetails.maths.code], 12)
       const { students } = await optimizedStatisticsOf(query)
       expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(false)
-    })
-
-    test('Query result for BSc, Fall 2011 for 4 months should only return the FALL course instance for student. ', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code], 4)
-      const { students } = await optimizedStatisticsOf(query)
-      const result = students.find(s => s.studentNumber === student.studentnumber)
-      const courseinstances = result.courses
-      expect(courseinstances.length).toBe(1)
-      expect(
-        courseinstances.some(
-          instance =>
-            instance.date.getTime() === courseinstanceFall.coursedate.getTime() &&
-            instance.course_code === courseinstanceFall.course_code
-        )
-      ).toBe(true)
-    })
-
-    test('Query result for BSc, Fall 2011 for 1 month should return student even though do not have any credits yet. ', async () => {
-      const query = createQueryObject('2011', SEMESTER.FALL, [elementdetails.bsc.code], 1)
-      const { students } = await optimizedStatisticsOf(query)
-      expect(students.some(s => s.studentNumber === student.studentnumber)).toBe(true)
     })
   })
 })
