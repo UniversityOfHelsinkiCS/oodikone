@@ -151,7 +151,10 @@ const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, 
           ]
         ]
 
-      if (!sourcecode || !targetcode) return curr
+      if (!sourcecode || !targetcode || sourcecode === targetcode) return curr
+      // source === targetcode isn't really a change between programmes, but we should still update transferdate to
+      // newer snapshot date time
+      // but: updating requires some changes to this reducers logic, so this fix can be here for now
 
       curr.push({
         id: `${mappedId}-${snapshot.modification_ordinal}-${sourcecode}-${targetcode}`,

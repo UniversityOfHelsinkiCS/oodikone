@@ -13,33 +13,50 @@ const { getDegrees, getEducation, getEducationType } = require('../shared') // n
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
-  const cancelDate = studyright => {
+  const parseCancelDate = (studyright, phase_number = 1, isBaMa = false) => {
+    if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
     if (studyright.state === 'RESCINDED') return studyright.study_right_cancellation.cancellationDate
     if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
     return null
   }
 
-  const formattedStudyRights = studyRights.reduce((acc, studyright) => {
-    const studyRightEducation = getEducation(studyright.education_id)
+  const parsePriorityCode = (studyright, phase_number = 1, isBaMa = false) => {
     const primality = get(personIdToStudyRightIdToPrimality, `${studyright.person_id}.${studyright.id}`)
     const primalityEndDate = get(primality, 'end_date')
     const isPrimality = primality && !primalityEndDate
+    if (!isBaMa) {
+      return studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
+    }
+    if (phase_number === 1) {
+      return get(studyright, 'study_right_graduation.phase1GraduationDate')
+        ? 30
+        : studyright.state === 'RESCINDED'
+        ? 5
+        : isPrimality
+          ? 1
+          : 2
+    }
+    return get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
+      ? 30
+      : studyright.state === 'RESCINDED'
+        ? 5
+        : isPrimality
+          ? get(studyright, 'study_right_graduation.phase1GraduationDate')
+            ? 1
+            : 6
+          : 2
+  }
+
+  const formattedStudyRights = studyRights.reduce((acc, studyright) => {
+    const studyRightEducation = getEducation(studyright.education_id)
     if (!studyRightEducation) return acc
 
     if (isBaMa(studyRightEducation)) {
-      const canceldate = cancelDate(studyright)
-
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
         studyrightid: `${studyright.id}-1`,
-        prioritycode: get(studyright, 'study_right_graduation.phase1GraduationDate')
-          ? 30
-          : studyright.state === 'RESCINDED'
-            ? 5
-            : isPrimality
-              ? 1
-              : 2,
-        canceldate
+        prioritycode: parsePriorityCode(studyright, 1, true),
+        canceldate: parseCancelDate(studyright, 1, true)
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -53,16 +70,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         studystartdate: studyright.study_right_graduation
           ? studyright.study_right_graduation.phase1GraduationDate
           : null,
-        prioritycode: get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
-          ? 30
-          : studyright.state === 'RESCINDED'
-            ? 5
-            : isPrimality
-              ? get(studyright, 'study_right_graduation.phase1GraduationDate')
-                ? 1
-                : 6
-              : 2,
-        canceldate
+        prioritycode: parsePriorityCode(studyright, 2, true),
+        canceldate: parseCancelDate(studyright, 2, true)
       })
 
 
@@ -74,8 +83,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       }
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
-        prioritycode: studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2,
-        canceldate: cancelDate(studyright)
+        prioritycode: parsePriorityCode(studyright),
+        canceldate: parseCancelDate(studyright)
       })
       acc.push(mappedStudyright)
     }

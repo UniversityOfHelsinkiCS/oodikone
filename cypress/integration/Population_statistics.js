@@ -90,7 +90,7 @@ describe("Population Statistics tests", () => {
     cy.contains("CSM12101");
   });
 
-  it("Student list checking works as intended", () => {
+  it.skip("Student list checking works as intended", () => {
     cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma");
     cy.contains("Students (16)").click();
     cy.contains("010429464");
@@ -109,7 +109,7 @@ describe("Population Statistics tests", () => {
     });
   });
 
-  it("Empty 'tags' tab has a link to the page where tags can be created", () => {
+  it.skip("Empty 'tags' tab has a link to the page where tags can be created", () => {
     cy.selectStudyProgramme("Kielten kandiohjelma");
     cy.contains("Students (5)").click();
     cy.get("[data-cy=student-table-tabs]").contains("Tags").click();
@@ -118,7 +118,7 @@ describe("Population Statistics tests", () => {
     cy.contains("Create new tag");
   });
 
-  it("Advanced settings work", () => {
+  it.skip("Advanced settings work", () => {
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma");
     cy.get("[data-cy=advanced-toggle]").click();
     cy.contains("Statistics until");
@@ -147,7 +147,7 @@ describe("Population Statistics tests", () => {
     cy.contains("Credit accumulation (for 202 students)");
   });
 
-  it("Credit Statistics, Statistics pane works", () => {
+  it.skip("Credit Statistics, Statistics pane works", () => {
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma");
     cy.contains("Credit statistics").click();
     cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click();
