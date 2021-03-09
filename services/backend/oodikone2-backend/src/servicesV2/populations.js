@@ -808,7 +808,6 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     formattedQueryParams,
     optionData
   )
-
   return formattedStudents
 }
 
