@@ -219,19 +219,14 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
   const creditTeachers = []
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
-  const fixCustomCourseUnitAttainments = async (att) => {
-    if (att.type !== 'CustomCourseUnitAttainment') {
-      return att
-    }
+  const fixCustomCourseUnitAttainments = async (acc, att) => {
+    const attainments = await acc
+    if (att.type !== 'CustomCourseUnitAttainment') return attainments.concat(att)
 
-    if (!att.code) {
-      return null
-    }
+    if (!att.code) return attainments
 
     const codeParts = att.code.split(/\-\d+$/)
-    if (!codeParts.length) {
-      return null
-    }
+    if (!codeParts.length) return attainments
 
     const parsedCourseCode = codeParts[0]
     const courseUnits = await getCourseUnitsByCode(parsedCourseCode)
@@ -246,20 +241,16 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
       return isAfterStart && isBeforeEnd
     })
 
-    if (!courseUnit) {
-      return null
-    }
+    if (!courseUnit) return attainments
 
     // Add the course to the mapping objects for creditMapper to work properly.
     courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
     courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
 
-    const { group_id } = courseUnit
-    return { ...att, course_unit_id: courseUnit.id }
+    return attainments.concat({ ...att, course_unit_id: courseUnit.id })
   }
 
-  const fixAttainments = async () => Promise.all(attainments.map(fixCustomCourseUnitAttainments))
-  const fixedAttainments = await fixAttainments()
+  const fixedAttainments = await attainments.reduce(fixCustomCourseUnitAttainments, [])
 
   const mapCredit = creditMapper(
     personIdToStudentNumber,
