@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { flatten, uniqBy, sortBy, groupBy, orderBy, has, get, uniq } = require('lodash')
+const { flatten, uniqBy, sortBy, groupBy, orderBy, has, get, uniq, isEqual } = require('lodash')
 const {
   Course,
   Student,
@@ -9,7 +9,7 @@ const {
   CreditTeacher,
   Transfer
 } = require('../../db/models')
-const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCode } = require('../../db')
+const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
 const { getEducation, getUniOrgId, loadMapsIfNeeded, getEducationType } = require('../shared')
 const {
   studentMapper,
@@ -216,38 +216,63 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
   const creditTeachers = []
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
-  const fixCustomCourseUnitAttainments = async (acc, att) => {
-    const attainments = await acc
-    if (att.type !== 'CustomCourseUnitAttainment') return attainments.concat(att)
+  const fixCustomCourseUnitAttainments = async (attainments) => {
+    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => (att) => {
+      if (att.type !== 'CustomCourseUnitAttainment') return att
+  
+      const courseUnits = courses.filter(c => c.code === attIdToCourseCode[att.id])
+  
+      let courseUnit = courseUnits.find(cu => {
+        const { startDate, endDate } = cu.validity_period
+        const attainment_date = new Date(att.attainment_date)
+  
+        const isAfterStart = new Date(startDate) <= attainment_date
+        const isBeforeEnd = !endDate || new Date(endDate) > attainment_date
+  
+        return isAfterStart && isBeforeEnd
+      })
+  
+      if (!courseUnit) {
+        /**
+         * Sometimes registrations are fakd, see attainment hy-opinto-141561630. The attainmentdate is outside of all courses, yet should be mapped.
+         */
+        courseUnit = courseUnits.find(cu => {
+          const { startDate, endDate } = cu.validity_period
+          const date = new Date(att.registration_date)
+    
+          const isAfterStart = new Date(startDate) <= date
+          const isBeforeEnd = !endDate || new Date(endDate) > date
+    
+          return isAfterStart && isBeforeEnd
+        })
+        if (!courseUnit) return att
+      }
+  
+      // Add the course to the mapping objects for creditMapper to work properly.
+      courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
+      courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
+  
+      return { ...att, course_unit_id: courseUnit.id }
+    }
+  
+    const findMissingCourseCodes = (attainmentIdCodeMap, att) => {
+      if (att.type !== 'CustomCourseUnitAttainment') return attainmentIdCodeMap
+      if (!att.code) return attainmentIdCodeMap
+  
+      const codeParts = att.code.split(/\-\d+$/)
+      if (!codeParts.length) return attainmentIdCodeMap
+  
+      const parsedCourseCode = codeParts[0]
+      return { ...attainmentIdCodeMap, [att.id]: parsedCourseCode }
+    }
 
-    if (!att.code) return attainments
-
-    const codeParts = att.code.split(/\-\d+$/)
-    if (!codeParts.length) return attainments
-
-    const parsedCourseCode = codeParts[0]
-    const courseUnits = await getCourseUnitsByCode(parsedCourseCode)
-
-    const courseUnit = courseUnits.find(cu => {
-      const { startDate, endDate } = cu.validity_period
-      const attainment_date = new Date(att.attainment_date)
-
-      const isAfterStart = new Date(startDate) <= attainment_date
-      const isBeforeEnd = !endDate || new Date(endDate) > attainment_date
-
-      return isAfterStart && isBeforeEnd
-    })
-
-    if (!courseUnit) return attainments
-
-    // Add the course to the mapping objects for creditMapper to work properly.
-    courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
-    courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
-
-    return attainments.concat({ ...att, course_unit_id: courseUnit.id })
+    const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
+    const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
+    const courses = await getCourseUnitsByCodes(missingCodes)
+    return attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments))
   }
 
-  const fixedAttainments = await attainments.reduce(fixCustomCourseUnitAttainments, [])
+  const fixedAttainments = await fixCustomCourseUnitAttainments(attainments) 
 
   const mapCredit = creditMapper(
     personIdToStudentNumber,
