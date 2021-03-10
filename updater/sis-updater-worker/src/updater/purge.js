@@ -60,7 +60,7 @@ const prePurge = async ({ table, before }) => {
     }
   })
 
-  sendToNats(SIS_PURGE_CHANNEL, { success: true, table, count, before })
+  sendToNats(SIS_PURGE_CHANNEL, { action: 'PREPURGE_STATUS', table, count, before })
 }
 
 const purge = async ({ table, before }) => {

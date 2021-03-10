@@ -1,14 +1,12 @@
+const axios = require('axios').default;
 const { NATS_GROUP, SIS_PURGE_CHANNEL, REDIS_LAST_PREPURGE_INFO } = require('./config')
 const { logger } = require('./utils/logger')
 const { stan, opts } = require('./utils/stan')
 const { set: redisSet, get: redisGet } = require('./utils/redis')
 
-const MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE = 5
-
-const sendToSlack = (message) => {
-  logger.info(message)
-  console.log(sendToSlack)
-}
+const PURGE_ROWS_OLDER_THAN_DAYS = 30
+const MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE = 4
+const PREPURGE_ROWS_OLDER_THAN_DAYS = PURGE_ROWS_OLDER_THAN_DAYS - MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE
 
 const TABLES_TO_PURGE = [
   'course',
@@ -26,17 +24,19 @@ const TABLES_TO_PURGE = [
   'teacher'
 ]
 
-let collectedPrePurgeTableData = {}
-let stanChannel
+let collectedPrePurgeTableData = {} // Collect data from nats, since synchronous (ack) should be ok.
+let stanChannel // Channel is initialized once for purge
 
-const getPrePurgeInfo = async () => {
-  const infoString = await redisGet(REDIS_LAST_PREPURGE_INFO)
-  return JSON.parse(infoString)
-}
+const sendToSlack = async (text) => {
+  const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
+  logger.info("Sending to slack", { text })
+  if (!SLACK_WEBHOOK) return logger.info('SLACK_WEBHOOK environment variable must be set')
 
-const setPrePurgeInfo = async (prePurgeDate, prePurgeTargetDate) => {
-  const info = { prePurgeDate, prePurgeTargetDate }
-  await redisSet(REDIS_LAST_PREPURGE_INFO, JSON.stringify(info))
+  try {
+    axios.post(SLACK_WEBHOOK, { text })
+  } catch (err) {
+    logger.info('Failed to send to slack', { err: err.meta })
+  }
 }
 
 const sendToNats = (channel, data) => new Promise((res, rej) => {
@@ -49,79 +49,107 @@ const sendToNats = (channel, data) => new Promise((res, rej) => {
   })
 })
 
+const prePurgeGetImportantDatesFromNow = () => {
+  const rowsOlderThanWillBeDeleted = new Date()
+  rowsOlderThanWillBeDeleted.setDate(rowsOlderThanWillBeDeleted.getDate() - PREPURGE_ROWS_OLDER_THAN_DAYS)
+
+  const dateAfterWhichPurgeCanBeRun = new Date()
+  dateAfterWhichPurgeCanBeRun.setDate(dateAfterWhichPurgeCanBeRun.getDate() + MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE)
+
+  return {
+    rowsOlderThanWillBeDeleted,
+    dateAfterWhichPurgeCanBeRun
+  }
+}
+
+// Set so that purge can ever delete 30 days old data
+
+const getPrePurgeInfo = async () => {
+  const infoString = await redisGet(REDIS_LAST_PREPURGE_INFO)
+  const info = JSON.parse(infoString)
+  return info || {}
+}
+
+const setPurgeInfo = async (purgeTargetDate) => {
+  const purgeAfterDate = prePurgeGetImportantDatesFromNow().dateAfterWhichPurgeCanBeRun
+  const info = { purgeAfterDate, purgeTargetDate }
+  await redisSet(REDIS_LAST_PREPURGE_INFO, JSON.stringify(info))
+}
+
 const collectResponses = (table, count) => {
   collectedPrePurgeTableData = { ...collectedPrePurgeTableData, [table]: count }
 }
 
 const setupPurge = (before) => {
-  const now = new Date()
+  const counts = Object.keys(collectedPrePurgeTableData).map(table => {
+    if (collectedPrePurgeTableData[table] === 0) return
 
-  const status = Object.keys(collectedPrePurgeTableData).map(table =>
-    `From table ${table}, ${collectedPrePurgeTableData[table]} records will be deleted`).join(',\n')
+    return `${collectedPrePurgeTableData[table]} rows from ${table}`
+  }).filter(s => s).join(',\n')
 
-  sendToSlack(`Prepurge has been run now, next purge after ${MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE} will delete the data.\n${status}`)
+  const status = counts ? `${counts}\n + CASCADEs for all tables` : "No data will be deleted."
 
-  setPrePurgeInfo(now, before)
+  const string = `Next purge after ${MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE}+ days will attempt to delete data older than ${before}. According to prepurge count:\n${status}`
+
+  sendToSlack(string)
+
+  setPurgeInfo(before)
+}
+
+const handleStatusUpdate = (table, count, before) => {
+  collectResponses(table, count)
+  if (TABLES_TO_PURGE.every(t => Object.keys(collectedPrePurgeTableData).includes(t))) {
+    setupPurge(before)
+    collectedPrePurgeTableData = {}
+  }
 }
 
 const setUpResponseChannel = () => {
   if (stanChannel) return
   stanChannel = stan.subscribe(SIS_PURGE_CHANNEL, NATS_GROUP, opts)
   stanChannel.on('message', msg => {
-    const data = msg.getData()
-
-    if (data.success) collectResponses(data.table, data.count)
-
-    if (TABLES_TO_PURGE.every(table => Object.keys(collectedPrePurgeTableData).includes(table))) {
-      collectedPrePurgeTableData = {}
-      setupPurge(data.before)
-    }
-
+    const { action, table, count, before } = JSON.parse(msg.getData())
+    if (action !== 'PREPURGE_STATUS') return msg.ack()
+    handleStatusUpdate(table, count, before)
     msg.ack()
   })
-
-}
-
-/**
- * purge happens the on sunday
- * prePurge happens the previous monday (- 6 days)
- */
-const getPrePurgeBefore = () => {
-  const PURGE_LIMIT = 31
-  const EXPECTED_PREPURGE_PURGE_DIFF = 6
-  const prePurgeBefore = new Date()
-  prePurgeBefore.setDate(prePurgeBefore.getDate() - (PURGE_LIMIT - EXPECTED_PREPURGE_PURGE_DIFF))
-  return prePurgeBefore
 }
 
 const startPrePurge = async () => {
-  const before = getPrePurgeBefore()
+  const before = prePurgeGetImportantDatesFromNow().rowsOlderThanWillBeDeleted
   setUpResponseChannel()
+
   await TABLES_TO_PURGE.reduce(async (prom, table) => {
     await prom
-    return sendToNats(SIS_PURGE_CHANNEL, { action: 'PREPURGE', table, before })
-  })
-
-  return false
-}
-
-const allowedToPurge = async () => {
-  const now = new Date()
-  const { prePurgeDate } = await getPrePurgeInfo()
-  const msDiff = now.getTime() - prePurgeDate.getTime()
-  const dayDiff = msDiff / (1000 * 60 * 60 * 24)
-  if (dayDiff > MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE) return true
+    return sendToNats(SIS_PURGE_CHANNEL, { action: 'PREPURGE_START', table, before })
+  }, Promise.resolve())
 
   return false
 }
 
 const startPurge = async () => {
-  if (!(await allowedToPurge())) return
-  const { prePurgeTargetDate } = await getPrePurgeInfo()
+  const allowedToPurge = (purgeAfterDate) => {
+    if (!purgeAfterDate) {
+      logger.info(`Purge was scheduled, but there was no date to purge after. Purge was not executed.`)
+
+      return false
+    }
+    const runPurgeAfterDate = new Date(purgeAfterDate)
+    const now = new Date()
+  
+    if (now.getTime() < runPurgeAfterDate.getTime()) {
+      logger.info(`Purge was scheduled, but ${runPurgeAfterDate} is after ${now}. Purge was not executed.`)
+      return false
+    }
+    return true
+  }
+
+  const { purgeAfterDate, purgeTargetDate } = await getPrePurgeInfo()
+  if (!allowedToPurge(purgeAfterDate)) return
   return TABLES_TO_PURGE.reduce(async (prom, table) => {
     await prom
-    return sendToNats(SIS_PURGE_CHANNEL, { action: 'PURGE', table, before: prePurgeTargetDate })
-  })
+    return sendToNats(SIS_PURGE_CHANNEL, { action: 'PURGE_START', table, before: purgeTargetDate })
+  }, Promise.resolve())
 }
 
 module.exports = {
