@@ -83,8 +83,8 @@ const updateMsgHandler = async updateMsg => {
 }
 
 const purgeMsgHandler = async purgeMsg => {
-  if (purgeMsg.action === 'PURGE') await purge(purgeMsg)
-  if (purgeMsg.action === 'PREPURGE') await prePurge(purgeMsg)
+  if (purgeMsg.action === 'PURGE_START') await purge(purgeMsg)
+  if (purgeMsg.action === 'PREPURGE_START') await prePurge(purgeMsg)
 }
 
 const miscMsgHandler = async miscMessage => {

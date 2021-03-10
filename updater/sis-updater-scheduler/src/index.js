@@ -51,6 +51,7 @@ knexConnection.on('connect', async () => {
     await redisSet(REDIS_LAST_WEEKLY_SCHEDULE, new Date())
   })
 
+  // Monday at 12 AM
   scheduleCron('0 12 * * MON', async () => {
     if (isDev) return
     logger.info('Starting prepurge')
