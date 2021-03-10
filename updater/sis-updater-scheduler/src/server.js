@@ -1,5 +1,6 @@
 const express = require('express')
 require('express-async-errors')
+const { logger } = require('./utils/logger')
 const { stan } = require('./utils/stan')
 const { scheduleMeta, scheduleStudents, scheduleProgrammes, scheduleByStudentNumbers, scheduleByCourseCodes } = require('./scheduler')
 const { getStructure } = require('./explorer')
@@ -23,7 +24,7 @@ const auth = (req, res, next) => {
 }
 
 const errorBoundary = (err, _, res, next) => {
-  console.error(err.stack)
+  logger.error(err.stack)
   res.locals.msg('Internal server error', 500)
   next(err)
 }
@@ -51,7 +52,7 @@ app.get('/v1/programmes', async (_, res) => {
 app.post('/v1/students', async (req, res) => {
   const studentnumbers = req.body.studentnumbers.map(n => n[0] === '0' ? n : `0${n}`)
 
-  console.log(studentnumbers)
+  logger.info(JSON.stringify(studentnumbers))
 
   await scheduleByStudentNumbers(studentnumbers)
   res.locals.msg('Scheduled studentnumbers')
