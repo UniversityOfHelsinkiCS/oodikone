@@ -45,6 +45,10 @@ const getStudentNumbers = async () => {
   const secondArg = process.argv[3]
   const thirdArg = process.argv[4]
 
+  if (/\d/.test(firstArg)) {
+    return [firstArg]
+  }
+
   switch (firstArg) {
     case 'p':
       return await getStudentNumbersFromProgramme(secondArg, thirdArg)

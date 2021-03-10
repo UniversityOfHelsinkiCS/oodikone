@@ -13,10 +13,13 @@
  * Compare students filtering by study programme `code` and starting `year`:
  * npm run diff:students p <code> <year>
  * E.g.: npm run diff:students KH50_005 2018
+ *
+ * Compare single student by student number:
+ * npm run diff:students 123456789
  */
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
-const { compareCredits } = require('./compareMisc')
+const { compareCourses } = require('./compareCourses')
 const getStudentNumbers = require('./getStudentNumbers')
 
 const getStudentDiff = async studentNumber => {
@@ -25,7 +28,8 @@ const getStudentDiff = async studentNumber => {
   const sis = await studentServiceSis.withId(studentNumber)
 
   //msg = compareStarted(oodi.started, sis.started, msg)
-  msg = compareCredits(oodi.credits, sis.credits, msg)
+  //msg = compareCredits(oodi.credits, sis.credits, msg)
+  msg = compareCourses(oodi.courses, sis.courses, msg)
 
   return msg
 }

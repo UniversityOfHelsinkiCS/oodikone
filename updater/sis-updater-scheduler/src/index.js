@@ -1,4 +1,5 @@
 const { knexConnection } = require('./db/connection')
+const { logger } = require('./utils/logger')
 const { set: redisSet } = require('./utils/redis')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { stan } = require('./utils/stan')
@@ -7,9 +8,9 @@ const { startServer } = require('./server')
 const {
   scheduleHourly,
   scheduleWeekly,
+  schedulePrePurge,
   schedulePurge,
   isUpdaterActive,
-  hasWeeklyBeenScheduled
 } = require('./scheduler')
 
 stan.on('error', e => {
@@ -35,6 +36,8 @@ knexConnection.on('connect', async () => {
   scheduleCron('30 * * * 1-5', async () => {
     // If updater is currently running, then return
     if ((await isUpdaterActive()) || isDev) return
+    logger.info('Starting hourly')
+
     await scheduleHourly()
     await redisSet(REDIS_LAST_HOURLY_SCHEDULE, new Date())
   })
@@ -42,15 +45,24 @@ knexConnection.on('connect', async () => {
   // Saturday at 4 AM
   scheduleCron('0 4 * * 6', async () => {
     if (isDev) return
+    logger.info('Starting weekly')
+
     await scheduleWeekly()
     await redisSet(REDIS_LAST_WEEKLY_SCHEDULE, new Date())
   })
 
+  // Monday at 12 AM
+  scheduleCron('0 12 * * MON', async () => {
+    if (isDev) return
+    logger.info('Starting prepurge')
+    await schedulePrePurge()
+  })
+
   // Sunday at 4 AM
   scheduleCron('0 4 * * SUN', async () => {
-    // If updater is currently running or weekly update
-    // hasn't been scheduled properly, then return
-    if ((await isUpdaterActive()) || !(await hasWeeklyBeenScheduled()) || isDev) return
+    // If updater is currently running, then return
+    if ((await isUpdaterActive()) || isDev) return
+    logger.info('Starting purge')
     await schedulePurge()
   })
 })
