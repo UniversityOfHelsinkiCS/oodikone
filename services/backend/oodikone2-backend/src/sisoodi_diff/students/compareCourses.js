@@ -1,4 +1,5 @@
 const { sum } = require('lodash')
+const compareCoursesPairwise = require('./compareCoursesPairwise')
 const ignoredCourses = require('./ignoredCourses')
 
 const excludeIgnoredCourses = courses =>
@@ -35,6 +36,7 @@ const compareCourses = (oodi, sis, msg) => {
 
   msg = compareTotalCredits(oodi, sis, msg)
   msg = compareLength(oodi, sis, msg)
+  msg = compareCoursesPairwise(oodi, sis, msg)
   return msg
 }
 
