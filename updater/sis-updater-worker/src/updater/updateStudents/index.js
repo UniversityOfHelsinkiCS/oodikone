@@ -38,7 +38,7 @@ const groupStudyrightSnapshots = (studyRightSnapshots) => {
       studyRightSnapshots.filter(sR => sR.document_state === 'ACTIVE'),
       'id'
     )
-  )    
+  )
 
   return snapshotsBystudyright.reduce((res, [id, snapshots]) => {
     const byPhases = s => {
@@ -47,7 +47,7 @@ const groupStudyrightSnapshots = (studyRightSnapshots) => {
       return `${phase1}-${phase2}`
     }
 
-    const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'desc')
+    const orderedSnapshots = orderBy(snapshots, [s => new Date(s.snapshot_date_time), s =>  Number(s.modification_ordinal)], ['desc', 'desc'] )
 
     const groupedByPhases = groupBy(orderedSnapshots, byPhases)
     

@@ -67,9 +67,9 @@ const populationDiff = async (programme, year) => {
 
 const programmeDiff = async programme => {
   console.log(programme)
-  // await populationDiff(programme, '2017')
-  // await populationDiff(programme, '2018')
-  // await populationDiff(programme, '2019')
+  await populationDiff(programme, '2017')
+  await populationDiff(programme, '2018')
+  await populationDiff(programme, '2019')
   await populationDiff(programme, '2020')
 }
 
@@ -137,7 +137,7 @@ const main = async () => {
   console.log('starting')
   //await bsc()
   //await msc()
-  await programmeDiff('KH50_005')
+  await programmeDiff('KH20_001')
   process.exit()
 }
 
