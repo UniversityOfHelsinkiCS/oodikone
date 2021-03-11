@@ -24,6 +24,7 @@ import useFilters from '../FilterTray/useFilters'
 import { CoursePopulationFilters } from '../FilterTray/FilterSets'
 import useLanguage from '../LanguagePicker/useLanguage'
 import { queryParamsFromUrl } from '../../common/query'
+import sisDestructionStyle from '../../common/sisDestructionStyle'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
@@ -272,7 +273,14 @@ const CoursePopulation = ({
           <Header className="segmentTitle" size="medium" textAlign="center">
             {subHeader}
           </Header>
-          <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+          <Accordion
+            activeIndex={activeIndex}
+            exclusive={false}
+            styled
+            fluid
+            panels={panels}
+            style={sisDestructionStyle}
+          />
         </Segment>
       </div>
     </FilterTray>
