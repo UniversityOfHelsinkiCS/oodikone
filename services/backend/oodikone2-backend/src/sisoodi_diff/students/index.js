@@ -26,10 +26,11 @@ const getStudentDiff = async studentNumber => {
   let msg = []
   const oodi = await studentServiceOodi.withId(studentNumber)
   const sis = await studentServiceSis.withId(studentNumber)
+  const courses = { oodi: oodi.courses, sis: sis.courses }
 
   //msg = compareStarted(oodi.started, sis.started, msg)
   //msg = compareCredits(oodi.credits, sis.credits, msg)
-  msg = compareCourses(oodi.courses, sis.courses, msg)
+  msg = await compareCourses({ studentNumber, courses }, msg)
 
   return msg
 }
