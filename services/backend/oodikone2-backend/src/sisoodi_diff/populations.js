@@ -136,11 +136,8 @@ const main = async () => {
   verbose = true
 
   const what = process.argv.slice(2)
-  console.log(what)
 
-  console.log('starting')
-
-  if (process.argv.length === 1) {
+  if (process.argv.length === 2) {
     await programmeDiff('KH20_001')
     process.exit()
   }
