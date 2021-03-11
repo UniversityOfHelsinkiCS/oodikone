@@ -138,19 +138,20 @@ const formatStudent = ({
   createdAt,
   tags
 }) => {
-  const toCourse = ({ grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
+  const toCourse = ({ id, grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
     try {
       course = course.get()
     } catch (e) {
       // TODO: this should not be here 1.6.2021
       course = {
-        code: '99999 - MISSING FORM SIS',
+        code: '99999 - MISSING FROM SIS',
         name: 'missing',
         coursetypecode: 'missing'
       }
     }
 
     return {
+      id,
       course: {
         code: course.code,
         name: course.name,
