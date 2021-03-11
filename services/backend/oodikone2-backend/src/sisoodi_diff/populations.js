@@ -137,7 +137,7 @@ const main = async () => {
   console.log('starting')
   //await bsc()
   //await msc()
-  await programmeDiff('KH57_002')
+  await programmeDiff('KH20_001')
   process.exit()
 }
 
