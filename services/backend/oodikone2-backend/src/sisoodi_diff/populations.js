@@ -169,4 +169,11 @@ main()
   or:
     npm run diff:populations KH10_001 KH20_001 KH50_005
     npm run diff:populations msc bsc
+
+  in production:
+    docker exec -it backend sh
+
+    and then:
+
+    npm run diff:populations KH10_001 KH20_001 KH50_005
 */
