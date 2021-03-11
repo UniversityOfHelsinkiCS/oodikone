@@ -134,10 +134,32 @@ const bsc = async () => {
 const main = async () => {
   // print moar/less
   verbose = true
+
+  const what = process.argv.slice(2)
+  console.log(what)
+
   console.log('starting')
-  //await bsc()
-  //await msc()
-  await programmeDiff('KH20_001')
+
+  if (process.argv.length === 1) {
+    await programmeDiff('KH20_001')
+    process.exit()
+  }
+
+  if (what.includes('msc')) {
+    await msc()
+  }
+
+  if (what.includes('bsc')) {
+    await bsc()
+  }
+
+  for ( let i=0; i < what.length; i++ ) {
+    const programme = what[i]
+    if ( programme.startsWith('KH') || programme.startsWith('MH') ) {
+      await programmeDiff(programme)
+    } 
+  }
+
   process.exit()
 }
 
@@ -148,7 +170,6 @@ main()
     docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js
 
   or:
-    docker exec -it backend sh
-    cd src/sisoodi_diff/
-    node populations.js
+    npm run diff:populations KH10_001 KH20_001 KH50_005
+    npm run diff:populations msc bsc
 */
