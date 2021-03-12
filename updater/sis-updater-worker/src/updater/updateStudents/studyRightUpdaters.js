@@ -15,7 +15,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
 
   const parseCancelDate = (studyright, phase_number = 1, isBaMa = false) => {
     if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
-    if (studyright.state === 'RESCINDED') return studyright.study_right_cancellation.cancellationDate
+
+    if (['RESCINDED','CANCELLED_BY_ADMINISTRATION'].includes(studyright.state)) return studyright.study_right_cancellation.cancellationDate
     if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
     return null
   }
@@ -74,7 +75,6 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         canceldate: parseCancelDate(studyright, 2, true)
       })
 
-
       acc.push(studyRightMast, studyRightBach)
     } else {
       const educationType = getEducationType(studyRightEducation.education_type)
@@ -86,6 +86,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         prioritycode: parsePriorityCode(studyright),
         canceldate: parseCancelDate(studyright)
       })
+
       acc.push(mappedStudyright)
     }
 
@@ -114,13 +115,12 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       }
 
       const snapshotStudyRightElements = []
-      const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
+      const orderedSnapshots = orderBy(snapshots, [s => new Date(s.snapshot_date_time), s =>  Number(s.modification_ordinal)], ['desc', 'desc'] )
 
       orderedSnapshots.sort(possibleBscFirst).forEach(snapshot => {
         const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
-        //const startDate = snapshot.valid.startDate
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
         const startDate = snapshot.first_snapshot_date_time
 
