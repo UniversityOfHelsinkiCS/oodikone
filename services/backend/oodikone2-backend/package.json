@@ -32,7 +32,10 @@
     "update_attainment_dates": "node scripts/update_max_attainment_dates.js",
     "create_defa_report": "node scripts/create_defa_report.js",
     "create_fmsei_report": "node scripts/create_fmsei_report.js",
-    "seed_course_groups": "node scripts/create_course_groups_kayttis.js"
+    "seed_course_groups": "node scripts/create_course_groups_kayttis.js",
+    "diff:students": "node /usr/src/app/src/sisoodi_diff/students/index.js",
+    "diff:populations": "node /usr/src/app/src/sisoodi_diff/populations.js",
+    "diff:courses": "node /usr/src/app/src/sisoodi_diff/courses.js"
   },
   "author": "Matti Luukkainen",
   "license": "MIT",

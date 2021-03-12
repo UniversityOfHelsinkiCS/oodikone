@@ -1,12 +1,6 @@
 const { sum } = require('lodash')
 const compareCoursesPairwise = require('./compareCoursesPairwise')
-const ignoredCourses = require('./ignoredCourses')
-
-const excludeIgnoredCourses = courses =>
-  courses.filter(({ course }) => {
-    const { code } = course
-    return !ignoredCourses.includes(code)
-  })
+const excludeIgnoredCourses = require('./excludeIgnoredCourses')
 
 const compareTotalCredits = (oodi, sis, msg) => {
   const sumOodi = sum(oodi.map(course => course.credits))
@@ -30,9 +24,9 @@ const compareLength = (oodi, sis, msg) => {
   return msg.concat(`  course.length diff:\t\t\t${missing}`)
 }
 
-const compareCourses = (oodi, sis, msg) => {
-  oodi = excludeIgnoredCourses(oodi)
-  sis = excludeIgnoredCourses(sis)
+const compareCourses = async (data, msg) => {
+  const { oodi, sis } = data.courses
+  await excludeIgnoredCourses(data)
 
   msg = compareTotalCredits(oodi, sis, msg)
   msg = compareLength(oodi, sis, msg)

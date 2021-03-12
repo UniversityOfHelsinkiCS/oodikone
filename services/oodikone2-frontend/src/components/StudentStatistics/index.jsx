@@ -10,6 +10,7 @@ import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import { useTitle } from '../../common/hooks'
 import { getUserRoles, checkUserAccess } from '../../common'
 import { toggleStudentNameVisibility } from '../../redux/settings'
+import sisDestructionStyle from '../../common/sisDestructionStyle'
 
 const StudentStatistics = props => {
   const { match, userRoles, rights } = props
@@ -30,12 +31,12 @@ const StudentStatistics = props => {
     )
 
   return (
-    <div className="segmentContainer">
+    <div className="segmentContainer" style={sisDestructionStyle}>
       <Header className="segmentTitle" size="large">
         Student statistics
       </Header>
       <StudentNameVisibilityToggle />
-      <Segment className="contentSegment">
+      <Segment className="contentSegment" style={sisDestructionStyle}>
         <StudentSearch studentNumber={studentNumber} />
         <StudentDetails studentNumber={studentNumber} />
       </Segment>
