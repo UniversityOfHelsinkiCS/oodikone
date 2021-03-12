@@ -9,13 +9,13 @@ const {
 } = require('./config')
 
 
-const logStatus = async (type, count, done, scheduled, startTime) => {
+const logStatus = async (type, count, done, scheduled, startTime, humanType) => {
   logger.info({
-    message: 'Update',
+    message: `Update ${count} ${humanType}: ${done}/${scheduled}`,
     type,
     count,
     done,
-    scheduled,
+    acual_scheduled: scheduled,
     timems: new Date() - startTime
   })
 }
@@ -34,7 +34,7 @@ const postUpdate = async (updateMsg, currentChunkStartTime) => {
   const totalScheduled = Number(await redisGet(totalKey))
   const totalDone = Number(await redisIncrementBy(doneKey, count))
 
-  logStatus(type, count, totalDone, totalScheduled, currentChunkStartTime)
+  logStatus(type, count, totalDone, totalScheduled, currentChunkStartTime, updateMsg.type)
 
   const updateReady = totalDone >= totalScheduled
   if (updateReady) {
