@@ -59,7 +59,7 @@ app.post('/v1/students', async (req, res) => {
 })
 
 app.get('/v1/rediscache', async (req, res) => {
-  stan.publish('SIS_INFO_CHANNEL', 'RELOAD_REDIS', err => {
+  stan.publish('SIS_INFO_CHANNEL', JSON.stringify({ message: 'RELOAD_REDIS' }), err => {
     if (err) {
       return res.locals.msg('Error sending reloading msg?')
     }
@@ -69,7 +69,7 @@ app.get('/v1/rediscache', async (req, res) => {
 })
 
 app.get('/v1/abort', async (req, res) => {
-  stan.publish('SIS_INFO_CHANNEL', 'ABORT', err => {
+  stan.publish('SIS_INFO_CHANNEL', JSON.stringify({ message: 'ABORT' }), err => {
     if (err) {
       return res.locals.msg('Error sending abort msg?')
     }
