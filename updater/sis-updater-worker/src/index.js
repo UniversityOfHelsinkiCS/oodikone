@@ -1,10 +1,10 @@
-const { debounce } = require('lodash')
 const { stan, opts } = require('./utils/stan')
 const { dbConnections } = require('./db/connection')
 const { loadMapsOnDemand } = require('./updater/shared')
 const { update } = require('./updater')
+const { postUpdate } = require('./postUpdate')
 const { purge, prePurge, purgeByStudentNumber } = require('./updater/purge')
-const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
+const { get: redisGet, set: redisSet } = require('./utils/redis')
 const { logger } = require('./utils/logger')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
@@ -18,21 +18,8 @@ const {
   REDIS_LATEST_MESSAGE_RECEIVED
 } = require('./config')
 
-let abortingMessages = false
-
-const resetAbortTimer = debounce(() => {
-  abortingMessages = false
-  logger.info({ message: 'Scheduled messages are enabled again' })
-}, 5000)
-
 const handleMessage = messageHandler => async msg => {
   try {
-    if (abortingMessages) {
-      logger.info({ message: 'Aborting scheduled message' })
-      msg.ack()
-      resetAbortTimer()
-      return
-    } 
     await messageHandler(JSON.parse(msg.getData()))
   } catch (e) {
     logger.error({ message: 'Failed handling message', meta: e.stack })
@@ -46,40 +33,43 @@ const handleMessage = messageHandler => async msg => {
   }
 }
 
-const handleInfoMessage = async msg => {
-  if (msg.getData() === 'ABORT') {
-    logger.info({ message: 'Starting to abort scheduled messages' })
-    abortingMessages = true
-    msg.ack()
-    resetAbortTimer()
-  }
-  if (msg.getData() === 'RELOAD_REDIS') {
-    logger.info({ message: 'Starting to reload redis cache' })
-    await loadMapsOnDemand()
-    msg.ack()
+const resetStatusToZero = async (...redisKeys) => {
+  for (const key of redisKeys) {
+    await redisSet(key, 0)
   }
 }
 
-const logProgress = async (updateMsg, startTime) => {
-  const totalScheduled = await redisGet(updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY)
-  const totalDone = await redisIncrementBy(
-    updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY,
-    updateMsg.entityIds.length
-  )
-  logger.info({
-    message: 'Update',
-    type: updateMsg.type === 'students' ? 'STUDENTS' : 'META',
-    count: updateMsg.entityIds.length,
-    done: totalDone,
-    scheduled: totalScheduled,
-    timems: new Date() - startTime
-  })
+const handleInfoMessage = async infoMsg => {
+  if (infoMsg.message === 'ABORT') {
+    logger.info({ message: 'Starting to abort scheduled messages' })
+    await resetStatusToZero(REDIS_TOTAL_META_KEY, REDIS_TOTAL_META_DONE_KEY, REDIS_TOTAL_STUDENTS_KEY, REDIS_TOTAL_STUDENTS_DONE_KEY)
+  }
+  if (infoMsg.message === 'RELOAD_REDIS') {
+    logger.info({ message: 'Starting to reload redis cache' })
+    await loadMapsOnDemand()
+  }
+}
+
+const isAllowedToUpdateMsg = async (updateMsg) => {
+  const doneKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY
+  const totalKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
+
+  const done = Number(await redisGet(doneKey))
+  const totalScheduled = Number(await redisGet(totalKey))
+
+  if (totalScheduled > done) return true
+  await resetStatusToZero(doneKey, totalKey)
+
+  return false
 }
 
 const updateMsgHandler = async updateMsg => {
+  const allowedToUpdate = await isAllowedToUpdateMsg(updateMsg)
+  if (!allowedToUpdate) return
+
   const startTime = new Date()
   await update(updateMsg)
-  await logProgress(updateMsg, startTime)
+  await postUpdate(updateMsg, startTime)
 }
 
 const purgeMsgHandler = async purgeMsg => {
@@ -126,7 +116,7 @@ dbConnections.on('connect', async () => {
   })
 
   const infoChannel = stan.subscribe('SIS_INFO_CHANNEL', NATS_GROUP, opts)
-  infoChannel.on('message', handleInfoMessage)
+  infoChannel.on('message', handleMessage(handleInfoMessage))
 
   const miscChannel = stan.subscribe(SIS_MISC_SCHEDULE_CHANNEL, NATS_GROUP, opts)
   miscChannel.on('message', handleMessage(miscMsgHandler))
