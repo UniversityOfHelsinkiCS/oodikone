@@ -19,6 +19,7 @@ const updateStudentsByStudentNumber = async studentnumbers => {
 
 const updateSISStudentsByProgramme = async details => {
   const { programme } = details
+  if (!programme) return
   const getStudentsForOneYear = async year => {
     const query = {
       semesters: ['FALL', 'SPRING'],
