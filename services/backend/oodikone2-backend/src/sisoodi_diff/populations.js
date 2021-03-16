@@ -10,9 +10,6 @@ let verbose = false
 
 const populationDiff = async (programme, year) => {
   const months = Number((2020 - Number(year)) * 12 + 7)
-  if (verbose) {
-    console.log('amount of months to fetch', months)
-  }
 
   const query = {
     semesters: ['FALL', 'SPRING'],

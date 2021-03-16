@@ -136,17 +136,21 @@ function PopulationCourseStats(props) {
       language
     } = props
     const courseCodeFilter = ({ course }) => {
+      if (!codeFilter) return true
+
       const { code } = course
       return code.toLowerCase().includes(codeFilter.toLowerCase())
     }
     const courseNameFilter = ({ course }) => {
+      if (!nameFilter) return true
+
       const { name } = course
       return getTextIn(name, language)
         .toLowerCase()
         .includes(nameFilter.toLowerCase())
     }
 
-    const mandatoryFilter = ({ course }) => {
+    const visibleCoursesFilter = ({ course }) => {
       return mandatoryCourses.some(c => c.code === course.code && c.visible && c.visible.visibility)
     }
 
@@ -154,9 +158,9 @@ function PopulationCourseStats(props) {
       coursestatistics &&
       mandatoryCourses &&
       coursestatistics
-        .filter(mandatoryFilter)
-        .filter(c => !codeFilter || courseCodeFilter(c))
-        .filter(c => !nameFilter || courseNameFilter(c))
+        .filter(visibleCoursesFilter)
+        .filter(courseCodeFilter)
+        .filter(courseNameFilter)
         // it needs to be with flatMap and filter and not map and find
         // because there can be many mandatoryCourses with the same course code
         // as they can belong to many categories

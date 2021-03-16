@@ -123,8 +123,6 @@ const startPrePurge = async () => {
     await prom
     return sendToNats(SIS_PURGE_CHANNEL, { action: 'PREPURGE_START', table, before })
   }, Promise.resolve())
-
-  return false
 }
 
 const startPurge = async () => {

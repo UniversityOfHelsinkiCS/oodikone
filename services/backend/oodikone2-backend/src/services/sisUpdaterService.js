@@ -1,6 +1,8 @@
 const axios = require('axios')
-const { optimizedStatisticsOf } = require('../servicesV2/populations')
+const { optimizedStatisticsOf: sisOptimized } = require('../servicesV2/populations')
+const { optimizedStatisticsOf: oodiOptimized } = require('../services/populations')
 const { SIS_UPDATER_URL, SECRET_TOKEN } = require('../conf-backend')
+const { flatten } = require('lodash')
 
 const client = axios.create({ baseURL: SIS_UPDATER_URL })
 
@@ -16,15 +18,25 @@ const updateStudentsByStudentNumber = async studentnumbers => {
 }
 
 const updateSISStudentsByProgramme = async details => {
-  const { year, programme } = details
-  const query = {
-    semesters: ['FALL', 'SPRING'],
-    studyRights: { programme },
-    year: Number(year),
-    studentStatuses: ['CANCELLED', 'EXCHANGE', 'NONDEGREE', 'TRANSFERRED']
+  const { programme } = details
+  if (!programme) return
+  const getStudentsForOneYear = async year => {
+    const query = {
+      semesters: ['FALL', 'SPRING'],
+      studyRights: { programme },
+      year: Number(year),
+      studentStatuses: ['CANCELLED', 'EXCHANGE', 'NONDEGREE', 'TRANSFERRED']
+    }
+    const sisResult = await sisOptimized(query)
+    const oodiResult = await oodiOptimized(query)
+    const sisStudentnumbers = sisResult.students.map(s => s.studentNumber)
+    const oodiStudentnumbers = oodiResult.students.map(s => s.studentNumber)
+    return [...new Set([...sisStudentnumbers, ...oodiStudentnumbers])]
   }
-  const result = await optimizedStatisticsOf(query)
-  const studentnumbers = result.students.map(s => s.studentNumber)
+  const years = [2017, 2018, 2019, 2020]
+  const studentnumbers = details.year
+    ? await getStudentsForOneYear(details.year)
+    : flatten(await Promise.all(years.map(async year => await getStudentsForOneYear(year))))
   return await updateStudentsByStudentNumber(studentnumbers)
 }
 
