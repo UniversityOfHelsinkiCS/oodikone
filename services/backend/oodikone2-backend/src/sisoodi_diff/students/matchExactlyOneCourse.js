@@ -33,8 +33,7 @@ const matchExactlyOneCourse = (courseToPair, courses) => {
   const dateMatches = filterByDate(date, codeMatches)
 
   if (dateMatches.length === 0) {
-    console.log('ERROR! Could not match courses.')
-    throw new Error()
+    throw new Error('ERROR! Could not match courses (date).')
   }
 
   if (dateMatches.length === 1 && coursesMatch(courseToPair, dateMatches[0])) {
@@ -45,8 +44,7 @@ const matchExactlyOneCourse = (courseToPair, courses) => {
   const creditsMatches = filterByCredits(credits, dateMatches)
 
   if (creditsMatches.length !== 1) {
-    console.log('ERROR! Could not match courses.')
-    throw new Error()
+    throw new Error('ERROR! Could not match courses (credits).')
   }
 
   return creditsMatches[0]
