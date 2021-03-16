@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Button } from 'semantic-ui-react'
+import { Form, Button, Radio } from 'semantic-ui-react'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
@@ -39,16 +39,25 @@ export default () => {
       <Form>
         <div className="description-text">Show students who...</div>
         <div className="card-content">
-          <Form.Field className="flex-centered">
-            <Button.Group size="small">
-              <Button toggle active={value === 1} onClick={toggle(1)} data-cy={`${name}-have`}>
-                {`Have (${count(true)})`}
-              </Button>
-              <Button.Or text="OR" />
-              <Button toggle active={value === 0} onClick={toggle(0)} data-cy={`${name}-havenot`}>
-                {`Have Not (${count(false)})`}
-              </Button>
-            </Button.Group>
+          <Form.Field>
+            <Radio
+              label={`Have (${count(true)})`}
+              name="radioGroup"
+              value="this"
+              checked={value === 1}
+              onChange={toggle(1)}
+              data-cy={`${name}-have`}
+            />
+          </Form.Field>
+          <Form.Field>
+            <Radio
+              label={`Have Not (${count(false)})`}
+              name="radioGroup"
+              value="that"
+              checked={value === 0}
+              onChange={toggle(0)}
+              data-cy={`${name}-havenot`}
+            />
           </Form.Field>
         </div>
         <div className="description-text">...transferred to this study programme.</div>
