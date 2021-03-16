@@ -1,6 +1,7 @@
-const SisCourse = require('../servicesV2/courses')
-const OodiCourse = require('../services/courses')
-const diff = require('../services/diff')
+const SisCourse = require('../../servicesV2/courses')
+const OodiCourse = require('../../services/courses')
+const diff = require('../../services/diff')
+const { filterCourseDiff } = require('./filters')
 
 const CYAN = '\x1b[36m%s\x1b[0m'
 const RED = '\x1b[41m%s\x1b[0m'
@@ -21,22 +22,26 @@ const calculateTotals = diff =>
     (totals, course) => {
       return {
         totalMissingInSis: totals.totalMissingInSis + course.missingStudents.length,
-        totalExtraInSis: totals.totalExtraInSis + course.extraStudents.length
+        totalExtraInSis: totals.totalExtraInSis + course.extraStudents.length,
+        totalIgnored: totals.totalIgnored + course.ignoredStudentsCount
       }
     },
-    { totalMissingInSis: 0, totalExtraInSis: 0 }
+    { totalMissingInSis: 0, totalExtraInSis: 0, totalIgnored: 0 }
   )
 
 const printTotals = diff => {
-  const { totalMissingInSis, totalExtraInSis } = calculateTotals(diff)
-  console.log(CYAN, `Total missing from SIS: ${totalMissingInSis}, total extra in SIS: ${totalExtraInSis}`)
+  const { totalMissingInSis, totalExtraInSis, totalIgnored } = calculateTotals(diff)
+  console.log(
+    CYAN,
+    `Total missing from SIS: ${totalMissingInSis}, total extra in SIS: ${totalExtraInSis}. (${totalIgnored} ignored)`
+  )
 }
 
 const printCourseSpecificTotals = diff => {
   diff.forEach(course =>
     console.log(
       CYAN,
-      `${course.coursecode}: ${course.missingStudents.length} missing, ${course.extraStudents.length} extra`
+      `${course.coursecode}: ${course.missingStudents.length} missing, ${course.extraStudents.length} extra, ${course.ignoredStudentsCount} ignored`
     )
   )
 }
@@ -57,7 +62,8 @@ const printDetails = diff => {
 }
 
 const main = async () => {
-  const diff = await getDiff()
+  let diff = await getDiff()
+  diff = filterCourseDiff(diff)
 
   printDetails(diff)
   printCourseSpecificTotals(diff)
