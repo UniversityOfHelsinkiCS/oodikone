@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import useFilters from '../../components/FilterTray/useFilters'
 import { Button, Message } from 'semantic-ui-react'
+import useFilters from '../FilterTray/useFilters'
 
 const FilterActiveNote = () => {
   const { removeFilter } = useFilters()

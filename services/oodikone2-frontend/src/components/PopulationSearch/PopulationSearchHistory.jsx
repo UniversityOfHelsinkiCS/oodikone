@@ -1,7 +1,7 @@
 import React, { Component, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, object, bool, arrayOf } from 'prop-types'
-import { Form, Button, Message } from 'semantic-ui-react'
+import { Form, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
 import Datetime from 'react-datetime'
