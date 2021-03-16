@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Button, Radio } from 'semantic-ui-react'
+import { Form, Radio } from 'semantic-ui-react'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
+import { usePrevious } from '../../../common/hooks'
 
 export default () => {
-  const { addFilter, removeFilter, withoutFilter } = useFilters()
+  const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
   const analytics = useAnalytics()
   const [value, setValue] = useState(0)
   const name = 'transferredToProgrammeFilter'
   const active = value !== null
+
+  const filterIsActive = name in activeFilters
+  const prevValue = usePrevious(filterIsActive)
 
   const filterFn = wanted => student => student.transferredStudyright === wanted
 
@@ -23,6 +27,14 @@ export default () => {
       analytics.clearFilter(name)
     }
   }, [value])
+
+  useEffect(() => {
+    // bit of a hack but basically to keep visual of the filter
+    // up to date with the actual state of the filter when controlled
+    // from outside. Better solution would be to treat context as one
+    // source of truth for filters.
+    if (prevValue && !filterIsActive) setValue(null)
+  }, [filterIsActive])
 
   const count = wanted => withoutFilter(name).filter(filterFn(wanted)).length
 
