@@ -14,6 +14,7 @@ import infotooltips from '../../common/InfoToolTips'
 import { getTextIn } from '../../common'
 import InfoBox from '../InfoBox'
 import info from '../../common/markdown/populationStatistics/queryCard.info.md'
+import FilterActiveNote from './FilterActiveNote'
 
 const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
   // hack: I wanna use useEffect because it's handy but PopulationSearchHistory is not a function component
@@ -311,17 +312,7 @@ class PopulationSearchHistory extends Component {
             </Form.Field>
           </Form.Group>
           <div>{this.renderAdvancedSettingsSelector()}</div>
-          <div>
-            {showAdvancedSettings ? (
-              <InfoBox content={Advanced} />
-            ) : (
-              <Message color="blue" style={{ marginTop: '2.25rem' }}>
-                <Message.Header>Note:</Message.Header>
-                By default only students who have not transferred to this study programme are shown. You can change
-                filters on the left.
-              </Message>
-            )}
-          </div>
+          <div>{showAdvancedSettings ? <InfoBox content={Advanced} /> : <FilterActiveNote />}</div>
         </div>
       </div>
     )
