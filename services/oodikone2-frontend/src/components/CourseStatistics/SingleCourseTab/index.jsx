@@ -60,7 +60,7 @@ const mapStateToProps = state => ({
   courses: selectors.getCourses(state).map(({ code, name }) => ({
     key: code,
     value: code,
-    text: <Header content={name} />,
+    text: <Header content={<>{name}</>}/>,
     content: name
   }))
 })
