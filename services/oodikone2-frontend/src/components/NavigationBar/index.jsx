@@ -127,9 +127,9 @@ const NavigationBar = props => {
     process.env.NODE_ENV === 'development' ? (
       <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
         <Dropdown.Menu>
-          {adminerUrls.map(({ url, text }) => (
+          {adminerUrls.map(({ url, text }, index) => (
             <Dropdown.Item
-              key={url}
+              key={`${index}-${url}`}
               onClick={() => {
                 const win = window.open(url, '_blank')
                 win.focus()
