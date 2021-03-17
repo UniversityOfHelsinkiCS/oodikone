@@ -21,6 +21,7 @@ const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
 const { compareCourses } = require('./compareCourses')
 const getStudentNumbers = require('./getStudentNumbers')
+const { output, printCodes } = require('./output')
 
 const getStudentDiff = async studentNumber => {
   let msg = []
@@ -38,18 +39,20 @@ const getStudentDiff = async studentNumber => {
 const main = async () => {
   const studentNumbers = await getStudentNumbers()
 
-  console.log(`Comparing ${studentNumbers.length} students between Oodi and SIS databases.`)
-  console.log('Only differing students and fields are printed.\n\n')
+  output(`Comparing ${studentNumbers.length} students between Oodi and SIS databases.`)
+  output('Only differing students and fields are printed.\n\n')
 
   for (const studentNumber of studentNumbers) {
     const msg = await getStudentDiff(studentNumber)
 
-    console.log(`${studentNumber}: ${msg.length === 0 ? 'OK' : ''}`)
-    msg.forEach(s => console.log(s))
-    console.log('')
+    output(`${studentNumber}: ${msg.length === 0 ? 'OK' : ''}`)
+    msg.forEach(s => output(s))
+    output('')
   }
 
-  console.log('DONED.')
+  printCodes()
+
+  output('DONED.')
 }
 
 main()
