@@ -39,9 +39,9 @@ echo_path () {
 get_oodikone_server_backup() {
     echo "Enter your Uni Helsinki username:"
     read username
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@svm-96.cs.helsinki.fi:/home/updater_user/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-96.cs.helsinki.fi:/home/updater_user/backups/* "$BACKUP_DIR/"
 }
 
 get_anon_oodikone() {
@@ -92,7 +92,7 @@ run_importer_setup () {
     echo "Setting up importer database."
     echo "Enter your Uni Helsinki username:"
     read username
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@importer:/home/importer_user/importer-db/backup/importer-db.sqz "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@importer:/home/importer_user/importer-db/backup/importer-db.sqz "$BACKUP_DIR/"
     docker-compose -f dco.data.yml up -d sis-importer-db
     ping_psql "sis-importer-db" "importer-db"
     restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
@@ -104,16 +104,16 @@ run_full_real_data_reset () {
     read username
 
     echo "Downloading oodikone database dumps"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
 
     echo "Downloading oodi-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
 
     echo "Downloading sis-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@svm-96.cs.helsinki.fi:/home/updater_user/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-96.cs.helsinki.fi:/home/updater_user/backups/* "$BACKUP_DIR/"
 
     echo "Downloading importer-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@importer:/home/importer_user/importer-db/backup/importer-db.sqz "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@importer:/home/importer_user/importer-db/backup/importer-db.sqz "$BACKUP_DIR/"
 
     docker-compose-dev down
     docker-compose-dev up -d db user_db db_kone analytics_db db_sis sis-importer-db
