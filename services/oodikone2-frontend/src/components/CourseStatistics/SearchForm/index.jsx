@@ -209,7 +209,7 @@ const SearchForm = props => {
     <React.Fragment>
       <Segment loading={isLoading}>
         <Form>
-          <Header content="Search for courses" />
+          <Header>Search for courses</Header>
           <div style={{ marginBottom: '15px' }}>
             <Form.Group>
               <Form.Field width={8}>

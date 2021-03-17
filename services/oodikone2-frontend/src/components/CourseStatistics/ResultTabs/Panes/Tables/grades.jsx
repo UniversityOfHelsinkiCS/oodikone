@@ -97,7 +97,7 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
 
   return (
     <div>
-      <Header as="h3" content={name} textAlign="center" />
+      <Header as="h3" textAlign="center">{name}</Header>
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}

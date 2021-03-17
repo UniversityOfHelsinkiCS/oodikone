@@ -6,7 +6,7 @@ import { courseDataWithRealisationsType } from '../../../constants/types'
 import FoldableRow from './foldableRow'
 
 const getHeader = categoryName => {
-  const getHeaderCell = content => <Table.HeaderCell key={content} content={content} />
+  const getHeaderCell = content => <Table.HeaderCell key={content}>{content}</Table.HeaderCell>
   const headerLabels = [categoryName, 'Passed', 'Failed', 'Pass rate']
   return (
     <Table.Header>
