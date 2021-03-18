@@ -44,7 +44,7 @@ const makeCsv = () => {
     })
     .join('\n')
 
-  const filename = `student_diff_${moment().format('YYYYMMDDhhmmss')}.csv`
+  const filename = `student_diff_${moment().format('YYYYMMDDHHmmss')}.csv`
   writeFileSync(filename, content)
   console.log(`CREATED services/backend/oodikone2-backend/${filename}`)
 }
