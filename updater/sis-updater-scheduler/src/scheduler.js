@@ -33,10 +33,9 @@ const IMPORTER_TABLES = {
   degreeTitles: 'degree_titles'
 }
 
-const createJobs = async (entityIds, type) => {
+const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
   const redisKey = type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
   await redisIncrementBy(redisKey, entityIds.length)
-  const channel = SIS_UPDATER_SCHEDULE_CHANNEL
 
   return new Promise((res, rej) => {
     stan.publish(channel, JSON.stringify({ entityIds, type }), err => {
