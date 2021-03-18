@@ -8,8 +8,76 @@ const { Op } = require('sequelize')
 
 let verbose = false
 
+   /* 
+  if a number under 'sis' it is found in sis-oodikone but missing form
+  oodi-oodikone due to a oodi-oodikone fukap
+*/
+
+const ignores = {
+  'KH40_001': {
+    '2020': {
+      'oodi': ['014290314'] // studyright enddate wrong in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
+  },
+  'KH40_002': {
+    '2020': {
+      'sis': ['011368870'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
+  },
+  'KH40_003': {
+    '2020': {
+      'sis': ['015340182'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
+  },
+  'KH40_004': {
+    '2017': {
+      'oodi': ['011531500'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
+  },
+  'KH40_005': {
+    '2018': {
+      'sis': ['014650093'] // graduated but mistakenlu luop in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
+  },
+  'KH50_004': {
+    '2020': {
+      'oodi': ['013881465'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
+  },
+  'KH74_001': {
+    '2019': {
+      'sis': ['014480768'] // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    }
+  },
+  'KH57_002': {
+    '2017': {
+      'oodi': ['014818220'] // UPDATER FUKAP graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    }
+  },
+  'KH90_001': {
+    '2020': {
+      'sis': ['014261181'] // UPDATER FUKAP many things wrong... https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2707
+    }
+  },
+  'KH55_001': {
+    '2019': {
+      'sis': ['015160142'] // UPDATER FUKAP duplicate studyrigth https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2709
+    }
+  },
+  'KH57_001': {
+    '2018': {
+      'sis': ['013296128'] // leagally missing... do not remember why
+    }
+  }
+}
+
+
+
 const populationDiff = async (programme, year) => {
   const months = Number((2020 - Number(year)) * 12 + 7)
+  if (verbose) {
+    //console.log('amount of months to fetch', months)
+  }
 
   const query = {
     semesters: ['FALL', 'SPRING'],
@@ -24,8 +92,22 @@ const populationDiff = async (programme, year) => {
   const studentsSis = resultSis.students.map(s => s.studentNumber)
   const studentsOodi = resultOodi.students.map(s => s.studentNumber)
 
-  const sisOnly = _.difference(studentsSis, studentsOodi)
-  const oodiOnly = _.difference(studentsOodi, studentsSis)
+  let sisOnly = _.difference(studentsSis, studentsOodi)
+  let oodiOnly = _.difference(studentsOodi, studentsSis)
+
+  if (ignores[programme] && ignores[programme][year] ) {
+    
+    const legallyInSisButNotInOodi = ignores[programme][year]['sis']
+    if ( legallyInSisButNotInOodi ) {
+      sisOnly = _.difference(sisOnly, legallyInSisButNotInOodi)
+    }
+
+    const inOodiNotInSis = ignores[programme][year]['oodi']
+    if ( inOodiNotInSis ) {
+      oodiOnly = _.difference(oodiOnly, inOodiNotInSis)
+    }
+  }
+
   const both = _.intersection(studentsOodi, studentsSis)
 
   if (oodiOnly.length === 0 && sisOnly.length === 0) {
@@ -114,6 +196,7 @@ const bscCodes = async () => {
   })).map(s => s.code)
 }
 
+
 const msc = async () => {
   const programmes = await masterCodes()
   for (let programme of programmes) {
@@ -127,6 +210,15 @@ const bsc = async () => {
     await programmeDiff(programme)
   }
 }
+
+const bscnok = async () => {
+  let programmes = await bscCodes()
+  for (let programme of _.difference(programmes, ['KH60_001'])) {
+    await programmeDiff(programme)
+  }
+}
+
+
 
 const main = async () => {
   // print moar/less
@@ -145,6 +237,10 @@ const main = async () => {
 
   if (what.includes('bsc')) {
     await bsc()
+  }
+
+  if (what.includes('bscnok')) {
+    await bscnok()
   }
 
   for ( let i=0; i < what.length; i++ ) {

@@ -1,5 +1,6 @@
 const axios = require('axios')
 const { mayhemifiedDatesMatch } = require('../utils')
+const getPartialAttainments = require('./getPartialAttainments')
 const { matchExactlyOneCourse } = require('./matchExactlyOneCourse')
 
 const getMissingAttainments = async studentNumber => {
@@ -15,23 +16,29 @@ const matchFuckedCourses = (search, courses) => {
   return matches
 }
 
+const filterOutPartialAttainments = async ({ sis, oodi }) => {
+  const partialAttainments = await getPartialAttainments()
+  //console.log(partialAttainments.includes('20013A'));
+  sis = sis.filter(({ course }) => !partialAttainments.includes(course.code))
+  oodi = oodi.filter(({ course }) => !partialAttainments.includes(course.code))
+  return { sis, oodi }
+}
+
 const excludeIgnoredCourses = async ({ courses, studentNumber }) => {
+  let { sis, oodi } = await filterOutPartialAttainments(courses)
   const missingAttainmentIds = (await getMissingAttainments(studentNumber)).map(att => att.id)
 
   // Remember what SIS courses were filtered out because of missing attainments in order
   // to remove corresponding courses from Oodi data with good confidence.
   const removedFromSis = []
-  const sis = courses.sis.filter(course => {
+  sis = sis.filter(course => {
     const missing = missingAttainmentIds.includes(course.id)
     if (missing) {
       removedFromSis.push(course)
     }
     return !missing
   })
-  //console.log(removedFromSis)
 
-  //const oodiCoursesToRemove = removedFromSis.map(course => matchExactlyOneCourse(course, courses.oodi))
-  let { oodi } = courses
   const notRemovedFromOodi = []
 
   for (const c of removedFromSis) {
