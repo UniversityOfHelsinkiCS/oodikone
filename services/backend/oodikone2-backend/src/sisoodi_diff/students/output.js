@@ -36,8 +36,10 @@ const makeCsv = () => {
     return
   }
 
-  const content = Object.entries(data)
-    .map(([code, { name, n, studentNumbers }]) => {
+  const content = Object.keys(data)
+    .sort()
+    .map(code => {
+      const { name, n, studentNumbers } = data[code]
       return `${code};${n};${name};${Array.from(studentNumbers).join(',')}`
     })
     .join('\n')
