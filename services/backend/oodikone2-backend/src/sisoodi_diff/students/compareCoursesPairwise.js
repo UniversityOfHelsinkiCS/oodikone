@@ -46,8 +46,8 @@ const compareOodiToSis = (data, msg) => {
   return msg
 }
 
-const compareCoursesPairwise = (oodiCourses, sisCourses, msg) => {
-  msg = compareOodiToSis(oodiCourses, sisCourses, msg)
+const compareCoursesPairwise = (data, msg) => {
+  msg = compareOodiToSis(data, msg)
   return msg
 }
 

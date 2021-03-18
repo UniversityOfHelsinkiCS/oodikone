@@ -18,7 +18,7 @@
  * npm run diff:students 123456789
  *
  * Options:
- *   --csv    Output to a file.
+ *   csv    Output to a file.
  */
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
