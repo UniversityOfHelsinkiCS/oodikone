@@ -30,7 +30,7 @@ const compareCourses = async (data, msg) => {
 
   msg = compareTotalCredits(oodi, sis, msg)
   msg = compareLength(oodi, sis, msg)
-  msg = compareCoursesPairwise(oodi, sis, msg)
+  msg = compareCoursesPairwise(data, msg)
   return msg
 }
 

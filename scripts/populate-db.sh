@@ -50,7 +50,7 @@ mkdir -p backups
 echo "Enter your Uni Helsinki username:"
 read username
 echo "Fetching latest staging SIS data & OODI demo data"
-scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkinpaasi.cs.helsinki.fi" $username@oodikone-staging:/home/tkt_oodi/backups/\{sis-updater-staging.sqz,demo-anon-staging.sqz\} $BACKUPS
+scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@oodikone-staging:/home/tkt_oodi/backups/\{sis-updater-staging.sqz,demo-anon-staging.sqz\} $BACKUPS
 
 echo "Setting up services: ${SERVICES[@]}"
 npm run docker:down --prefix $DIR_PATH

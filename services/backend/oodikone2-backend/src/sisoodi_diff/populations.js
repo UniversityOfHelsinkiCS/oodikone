@@ -44,29 +44,29 @@ const ignores = {
       'oodi': ['013881465'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
     }
   },
-  'KH57_002': {
-    '2017': {
-      'oodi': ['014818220'] // graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
-    }
-  },
   'KH74_001': {
     '2019': {
       'sis': ['014480768'] // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
     }
   },
+  'KH57_002': {
+    '2017': {
+      'oodi': ['014818220'] // UPDATER FUKAP graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    }
+  },
   'KH90_001': {
     '2020': {
-      'sis': ['014261181'] // many things wrong... https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2707
+      'sis': ['014261181'] // UPDATER FUKAP many things wrong... https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2707
     }
   },
   'KH55_001': {
     '2019': {
-      'sis': ['015160142'] // duplicate studyrigth https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2709
+      'sis': ['015160142'] // UPDATER FUKAP duplicate studyrigth https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2709
     }
   },
   'KH57_001': {
     '2018': {
-      'sis': ['013296128']
+      'sis': ['013296128'] // leagally missing... do not remember why
     }
   }
 }

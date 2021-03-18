@@ -1,45 +1,53 @@
 const moment = require('moment')
+const { matchExactlyOneCourse } = require('./matchExactlyOneCourse')
+const { output } = require('./output')
 
-const matchByDate = (date, courses) => {
-  const dst = moment(date).hour() === 21
-  const tzFix = dst ? 3 : 2
-  const oodiDate = moment(date).add(tzFix, 'hours')
-  const matches = courses.filter(course => oodiDate.isSame(course.date))
-  return matches
-}
+// FIXME: ei samaan ämpäriin!
+const coursesToIgnore = ['DIGI-100A', 'TKT50003', 'AYTKT50003']
 
-const findPairFromSis = (oodiCourse, sisCourses) => {
-  const { code } = oodiCourse.course
-  const codeMatches = sisCourses.filter(({ course }) => course.code === code)
-  let courseMatch = null
+const compareOodiToSis = (data, msg) => {
+  const { studentNumber, courses } = data
+  const oodiCourses = courses.oodi
+  const sisCourses = courses.sis
 
-  if (codeMatches.length > 1) {
-    const dateMatches = matchByDate(oodiCourse.date, codeMatches)
+  let missing = []
 
-    if (dateMatches.length > 1) {
-      console.log('WARNING! Found two courses in SIS with matching code and date.')
-      console.log(oodiCourse)
-      console.log(dateMatches)
-      throw new Error()
+  for (const oodiCourse of oodiCourses) {
+    const courseCode = oodiCourse.course.code
+
+    try {
+      matchExactlyOneCourse(oodiCourse, sisCourses)
+    } catch (error) {
+      if (coursesToIgnore.includes(courseCode)) {
+        continue
+      }
+
+      missing = missing.concat(oodiCourse)
+      const name = oodiCourse.course.name.fi
+      output(
+        {
+          code: courseCode,
+          name,
+          studentNumber: studentNumber
+        },
+        'code'
+      )
+
+      const date = moment(oodiCourse.date).format('YYYY-MM-DD')
+      const { credits } = oodiCourse
+      msg = msg.concat(`    ${oodiCourse.course.code} missing from SIS.\t\t${date}\t\t${credits}\t\t[${name}]`)
     }
-
-    // TODO: Add matching by credits after matching by date (lääkis breaks everything as it stands).
-
-    courseMatch = dateMatches[0] || null
   }
 
-  return courseMatch
+  if (missing.length > 0) {
+    msg = msg.concat(`  Total missing from SIS: ${missing.length}`)
+  }
+
+  return msg
 }
 
 const compareCoursesPairwise = (oodiCourses, sisCourses, msg) => {
-  for (const oodiCourse of oodiCourses) {
-    const sisCourse = findPairFromSis(oodiCourse, sisCourses)
-
-    if (!sisCourse) {
-      msg = msg.concat(`    ${oodiCourse.course.code} not found in SIS.`)
-    }
-  }
-
+  msg = compareOodiToSis(oodiCourses, sisCourses, msg)
   return msg
 }
 

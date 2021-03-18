@@ -2,7 +2,7 @@ const { chunk } = require('lodash')
 const { eachLimit } = require('async')
 const { knexConnection } = require('./db/connection')
 const { stan } = require('./utils/stan')
-const { set: redisSet, get: redisGet } = require('./utils/redis')
+const { incrby: redisIncrementBy, get: redisGet } = require('./utils/redis')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
   SIS_MISC_SCHEDULE_CHANNEL,
@@ -11,8 +11,6 @@ const {
   DEV_SCHEDULE_COUNT,
   REDIS_TOTAL_META_KEY,
   REDIS_TOTAL_STUDENTS_KEY,
-  REDIS_TOTAL_META_DONE_KEY,
-  REDIS_TOTAL_STUDENTS_DONE_KEY,
   REDIS_LAST_HOURLY_SCHEDULE,
   REDIS_LATEST_MESSAGE_RECEIVED,
   LATEST_MESSAGE_RECEIVED_THRESHOLD
@@ -35,13 +33,17 @@ const IMPORTER_TABLES = {
   degreeTitles: 'degree_titles'
 }
 
-const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) =>
-  new Promise((res, rej) => {
+const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
+  const redisKey = type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
+  await redisIncrementBy(redisKey, entityIds.length)
+
+  return new Promise((res, rej) => {
     stan.publish(channel, JSON.stringify({ entityIds, type }), err => {
       if (err) return rej(err)
       res()
     })
   })
+}
 
 const scheduleFromDb = async ({
   table,
@@ -70,19 +72,17 @@ const scheduleFromDb = async ({
 }
 
 const scheduleMeta = async (clean = true) => {
-  await redisSet(REDIS_TOTAL_META_DONE_KEY, 0)
-  await redisSet(REDIS_TOTAL_META_KEY, 'SCHEDULING...')
-  const totalOrganisations = await scheduleFromDb({
+  await scheduleFromDb({
     table: IMPORTER_TABLES.organisations,
     clean
   })
 
-  const totalStudyLevels = await scheduleFromDb({
+  await scheduleFromDb({
     table: IMPORTER_TABLES.studyLevels,
     clean
   })
 
-  const totalEducationTypes = await scheduleFromDb({
+  await scheduleFromDb({
     table: IMPORTER_TABLES.educationTypes,
     clean
   })
@@ -90,7 +90,7 @@ const scheduleMeta = async (clean = true) => {
   const creditTypes = [4, 7, 9, 10]
   await createJobs(creditTypes, 'credit_types')
 
-  const totalCourseUnits = await scheduleFromDb({
+  await scheduleFromDb({
     table: IMPORTER_TABLES.courseUnits,
     distinct: 'group_id',
     pluck: 'group_id',
@@ -98,7 +98,7 @@ const scheduleMeta = async (clean = true) => {
     clean
   })
 
-  const totalStudyModules = await scheduleFromDb({
+  await scheduleFromDb({
     scheduleId: 'study_modules',
     table: IMPORTER_TABLES.modules,
     whereIn: ['type', ['StudyModule', 'DegreeProgramme']],
@@ -107,30 +107,16 @@ const scheduleMeta = async (clean = true) => {
     limit: isDev ? DEV_SCHEDULE_COUNT : null,
     clean
   })
-
-  const totalMeta =
-    totalOrganisations +
-    totalStudyLevels +
-    totalEducationTypes +
-    creditTypes.length +
-    totalCourseUnits +
-    totalStudyModules
-
-  await redisSet(REDIS_TOTAL_META_KEY, totalMeta)
 }
 
 const scheduleStudents = async () => {
-  await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
-  await redisSet(REDIS_TOTAL_STUDENTS_KEY, 'SCHEDULING...')
-  const totalStudents = await scheduleFromDb({
+  await scheduleFromDb({
     scheduleId: 'students',
     table: IMPORTER_TABLES.persons,
     whereNotNull: 'student_number',
     pluck: 'id',
     limit: isDev ? DEV_SCHEDULE_COUNT : null
   })
-
-  await redisSet(REDIS_TOTAL_STUDENTS_KEY, totalStudents)
 }
 
 const getHourlyPersonsToUpdate = async () => {
@@ -174,8 +160,7 @@ const scheduleByStudentNumbers = async studentNumbers => {
   const personsToUpdate = await knex('persons')
     .column('id', 'student_number')
     .whereIn('student_number', studentNumbers)
-  await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
-  await redisSet(REDIS_TOTAL_STUDENTS_KEY, personsToUpdate.length)
+
   await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students', SIS_MISC_SCHEDULE_CHANNEL))
 }
 
@@ -185,8 +170,7 @@ const scheduleByCourseCodes = async courseCodes => {
     .whereIn('code', courseCodes)
     .distinct('group_id')
     .pluck('group_id')
-  await redisSet(REDIS_TOTAL_META_DONE_KEY, 0)
-  await redisSet(REDIS_TOTAL_META_KEY, coursesToUpdate.length)
+
   await eachLimit(chunk(coursesToUpdate, CHUNK_SIZE), 10, async c => await createJobs(c, IMPORTER_TABLES.courseUnits))
 }
 
@@ -206,8 +190,7 @@ const scheduleHourly = async () => {
     // Update persons whose attainments, studyrights etc. have changed
     // between now and the last update
     const personsToUpdate = await getHourlyPersonsToUpdate()
-    await redisSet(REDIS_TOTAL_STUDENTS_DONE_KEY, 0)
-    await redisSet(REDIS_TOTAL_STUDENTS_KEY, personsToUpdate.length)
+
     await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
   } catch (e) {
     logger.error({ message: 'Hourly scheduling failed', meta: e.stack })
