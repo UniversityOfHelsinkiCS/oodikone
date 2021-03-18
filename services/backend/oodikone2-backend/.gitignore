@@ -16,3 +16,5 @@ src/anonymized_API
 
 models
 migrations
+
+/student_diff_*

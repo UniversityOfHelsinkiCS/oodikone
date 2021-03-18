@@ -16,12 +16,15 @@
  *
  * Compare single student by student number:
  * npm run diff:students 123456789
+ *
+ * Options:
+ *   --csv    Output to a file.
  */
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
 const { compareCourses } = require('./compareCourses')
 const getStudentNumbers = require('./getStudentNumbers')
-const { output, printCodes } = require('./output')
+const { output, makeCsv } = require('./output')
 
 const getStudentDiff = async studentNumber => {
   let msg = []
@@ -50,7 +53,7 @@ const main = async () => {
     output('')
   }
 
-  printCodes()
+  makeCsv()
 
   output('DONED.')
 }
