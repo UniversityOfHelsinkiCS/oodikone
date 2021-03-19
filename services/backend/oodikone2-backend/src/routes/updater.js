@@ -240,8 +240,7 @@ router.post('/update/v2/students_by_programme', async (req, res) => {
   try {
     const response = await updateSISStudentsByProgramme(req.body)
     if (response) {
-      const { year, programme } = req.body
-      res.status(200).json(`Update for ${programme} ${year} scheduled`)
+      res.status(200).json(`Update for ${req.body.programme} scheduled`)
     }
   } catch (err) {
     console.log(err)
