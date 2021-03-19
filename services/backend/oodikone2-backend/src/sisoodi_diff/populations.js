@@ -115,11 +115,11 @@ const populationDiff = async (programme, year) => {
   } else {
     if (oodiOnly.length > 0) {
       const wronglyMarkedAllDetails = await cancelledInSIS(oodiOnly, resultOodi, programme)
-      console.log("len ", wronglyMarkedAllDetails.length)
-      if (wronglyMarkedAllDetails.length > 1) {
-        console.log('marked as cancelled in sis, but in oodi studyright ends 2021-07-31')
+      if (wronglyMarkedAllDetails.length > 0) {
+        console.log("year", year)
+        console.log('\t marked as cancelled in sis, but in oodi studyright ends 2021-07-31:')
         wronglyMarkedAllDetails.forEach(s => {
-          console.log(s.studentStudentnumber, ", canceldate ", s.canceldate, ", enddate ", s.enddate)
+          console.log("\t", s.studentStudentnumber, ", canceldate ", s.canceldate, ", enddate ", s.enddate)
         })
         oodiOnly = _.difference(wronglyMarkedAllDetails.map(sn => sn.studentStudentnumber), oodiOnly)
       }
@@ -133,7 +133,7 @@ const populationDiff = async (programme, year) => {
       }
     }
     if (sisOnly.length > 0) {
-      const wronglyMarked = (await cancelledButGraduated(programme))
+      const wronglyMarked = (await cancelledButGraduated(programme)).map(sn => sn.studentStudentnumber)
       if (verbose) {
 
       }
