@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const _ = require('lodash')
 const populationsSis = require('../servicesV2/populations')
 const populationsOodi = require('../services/populations')
