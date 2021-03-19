@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const populationsSis = require('../servicesV2/populations')
 const populationsOodi = require('../services/populations')
-const { Studyright, StudyrightElement } = require('../models')
+const { Studyright, StudyrightElement, Transfers } = require('../models')
 const { Studyright: SISStudyright, StudyrightElement: SISStudyrightElement  } = require('../modelsV2')
 const { Op } = require('sequelize')
 
@@ -124,15 +124,19 @@ const populationDiff = async (programme, year) => {
       }
     }
 
+    if (weirds.transferredInPakkoSiirto.length > 0) {
+      console.log(`${weirds.transferredInPakkoSiirto.length} not at all in sis programme and were transferred in pakkosiirto 2020-12-17`)
+      if (verbose) weirds.transferredInPakkoSiirto.forEach(s => { console.log(s) })
+    }
+
     if (weirds.notInProgramme.length > 0) {
-      console.log(`${weirds.notInProgramme.length} not at all in sis programme`)
+      console.log(`${weirds.notInProgramme.length} not at all in sis programme for some reason`)
       if (verbose) weirds.notInProgramme.forEach(s => { console.log(s) })
     }
 
-    const oodiNoWeirds = _.difference(
+    const oodiNoWeirds = _.difference(oodiOnly,
       [...weirds.cancelledstudents.map(sn => sn.studentStudentnumber), 
-       ...weirds.notInProgramme 
-      ], oodiOnly
+       ...weirds.notInProgramme, ...weirds.transferredInPakkoSiirto]
     )
 
     if (oodiNoWeirds.length > 0) {
@@ -187,16 +191,18 @@ const cancelledButGraduated = async code => {
 }
 
 const weirdInSIS = async (oodiOnly, resultOodi, code) => {
-  const findCorrectStudyRight = (studyrights) => (
+
+  const findCorrectOodiStudyRight = (studyrights) => (
     studyrights.filter(sr => 
       sr.studyright_elements.some(elem => elem.code === code)
     )[0]
   )
+
   const oodiRights = resultOodi.students
                       .filter(s => oodiOnly.includes(s.studentNumber))
                       .reduce((acc, curr) => (
                         {...acc,
-                          [curr.studentNumber]: findCorrectStudyRight(curr.studyrights)
+                          [curr.studentNumber]: findCorrectOodiStudyRight(curr.studyrights)
                         }
                       ), {})
 
@@ -224,9 +230,25 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
   ).map(sn => ( sisRights[sn] ))
 
   const notInProgramme = oodiOnly.filter(sn => !sisRights[sn])
+
+  const transferredInPakkoSiirto = await Transfers.findAll({
+    attributes: ['studentnumber'],
+    where: {
+      targetcode: code,
+      transferdate: {
+        [Op.eq]: new Date('2020-12-17T22:00:00.000Z')
+      },
+      studentnumber: {
+        [Op.in]: notInProgramme
+      }
+    },
+      raw: true
+    }).map(s => s.studentnumber)
+
   return {
     cancelledstudents,
-    notInProgramme
+    notInProgramme: _.difference(notInProgramme, transferredInPakkoSiirto),
+    transferredInPakkoSiirto
   }
 }
 
