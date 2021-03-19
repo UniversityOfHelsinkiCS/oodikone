@@ -110,61 +110,62 @@ const populationDiff = async (programme, year) => {
   console.log('=== Year ', year, ', total both: ', both.length, ' ===')
 
   if (oodiOnly.length > 0) {
-    console.log('Only in oodi, amount: ', oodiOnly.length, '\n')
+    console.log(`${oodiOnly.length} only in oodi, of which...`)
 
     const weirds = await weirdInSIS(oodiOnly, resultOodi, programme)
 
     if (weirds.cancelledstudents.length > 0) {
-      console.log('REASON: marked as cancelled in sis, but in oodi studyright ends 2021-07-31, amount: ', 
-                  weirds.cancelledstudents.length)
+      console.log(`${weirds.cancelledstudents.length} marked as cancelled in sis, but oodi enddate is 2021-07-31`)
       if (verbose) {
-        console.log('Student / SIS canceldate / SIS enddate:')
         weirds.cancelledstudents.forEach(s => {
-          console.log(s.studentStudentnumber, " / ", s.canceldate, " / ", s.enddate)
+          console.log(s.studentStudentnumber, " / cancelled: ", s.canceldate, 
+                      " / enddate: ", s.enddate)
         })
       }
     }
 
-    if (weirds.notInProgramme > 0) {
-      console.log('REASON: not at all in sis programme, amount: ', weirds.notInProgramme.length)
+    if (weirds.notInProgramme.length > 0) {
+      console.log(`${weirds.notInProgramme.length} not at all in sis programme`)
       if (verbose) weirds.notInProgramme.forEach(s => { console.log(s) })
     }
 
     const oodiNoWeirds = _.difference(
-      [...weirds.cancelledstudents, ...weirds.notInProgramme ], oodiOnly
+      [...weirds.cancelledstudents.map(sn => sn.studentStudentnumber), 
+       ...weirds.notInProgramme 
+      ], oodiOnly
     )
 
     if (oodiNoWeirds.length > 0) {
-      console.log('REASON: other reason, amount: ', oodiNoWeirds.length)
+      console.log(`${oodiNoWeirds.length} missing from sis for other reasons`)
       if (verbose) oodiNoWeirds.forEach(s => { console.log(s) })
     }
   }
 
   if (sisOnly.length > 0) {
-    console.log('Only in sis, amount: ', sisOnly.length, '\n')
+    console.log(`${sisOnly.length} only in sis, of which...`)
     const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.studentStudentnumber)
 
     if (wronglySetCancel.length > 0) {
-      console.log('REASON: wrongly set cancel date in oodi, amount: ', wronglySetCancel.length)
+      console.log(`${wronglySetCancel.length} marked with wrong cancel date in oodi`)
       if (verbose) wronglySetCancel.forEach(s => { console.log(s) })
     }
 
     const remaining = _.difference(wronglySetCancel, sisOnly)
 
     if (remaining.length > 0) {
-      console.log('REASON: other reason, amount: ', remaining.length)
+      console.log(`${remaining.length} missing from oodi for other reasons`)
       if (verbose) remaining.forEach(s => { console.log(s) })
-
     }
   }
 }
 
 const programmeDiff = async programme => {
   console.log('====== ', programme, ' ======')
-  await populationDiff(programme, '2017')
-  await populationDiff(programme, '2018')
-  await populationDiff(programme, '2019')
-  await populationDiff(programme, '2020')
+  const years = ['2017', '2018', '2019', '2020']
+  for (const year of years ) {
+    await populationDiff(programme, year)
+    console.log('')
+  }
 }
 
 const cancelledButGraduated = async code => {
