@@ -113,62 +113,45 @@ const populationDiff = async (programme, year) => {
     console.log(`${oodiOnly.length} only in oodi, of which...`)
 
     const weirds = await weirdInSIS(oodiOnly, resultOodi, programme)
-
-    if (weirds.cancelledstudents.length > 0) {
-      console.log(`${weirds.cancelledstudents.length} marked as cancelled in sis, but oodi enddate is after sis canceldate. Also not transferred to this program.`)
-      if (verbose) weirds.cancelledstudents.forEach(s => console.log(s))
-    }
-
-    if (weirds.transferredInPakkoSiirto.length > 0) {
-      console.log(`${weirds.transferredInPakkoSiirto.length} not at all in sis programme,  transferred in pakkosiirto 2020-12-17`)
-      if (verbose) weirds.transferredInPakkoSiirto.forEach(s => { console.log(s) })
-    }
-
-    if (weirds.transferredAtSomeOtherDate.length > 0) {
-      console.log(`${weirds.transferredAtSomeOtherDate.length} not at all in sis programme, transferred at some date, not in pakkosiirto`)
-      if (verbose) weirds.transferredAtSomeOtherDate.forEach(s => { console.log(s) })
-    }
-
-    if (weirds.notInProgramme.length > 0) {
-      console.log(`${weirds.notInProgramme.length} not at all in sis programme for some reason`)
-      if (verbose) weirds.notInProgramme.forEach(s => { console.log(s) })
-    }
-
-    const oodiNoWeirds = _.difference(oodiOnly,
-      [...weirds.cancelledstudents,
-       ...weirds.notInProgramme, ...weirds.transferredInPakkoSiirto,
-       ...weirds.transferredAtSomeOtherDate]
-    )
-
+    const oodiNoWeirds = _.difference(oodiOnly, _.flatten(Object.values(weirds)))
     const weirdosTotalLength = Object.values(weirds).reduce((acc, curr) => acc + curr.length, 0)
-    
     if (oodiOnly.length !== weirdosTotalLength + oodiNoWeirds.length) {
       console.log(
         `!!! oodiOnly length ${oodiOnly.length} doesn't match weirds (${weirdosTotalLength}) + no-weirds (${oodiNoWeirds.length}), check for bugs !!!`
       )
     }
 
-    if (oodiNoWeirds.length > 0) {
-      console.log(`${oodiNoWeirds.length} missing from sis for other reasons`)
-      if (verbose) oodiNoWeirds.forEach(s => { console.log(s) })
-    }
+    printWithReason(
+      weirds.cancelledstudents, 
+      "marked as cancelled in sis, but oodi enddate is after sis canceldate. Also not transferred to this program."
+    )
+    printWithReason(
+      weirds.transferredInPakkoSiirto, 
+      "not at all in sis programme,  transferred in pakkosiirto 2020-12-17"
+    )
+    printWithReason(
+      weirds.transferredAtSomeOtherDate, 
+      "not at all in sis programme, transferred at some date, not in pakkosiirto"
+    )
+    printWithReason(weirds.notInProgramme, "not at all in sis programme for some reason")
+    printWithReason(oodiNoWeirds, "missing from sis for other reasons")
   }
 
   if (sisOnly.length > 0) {
     console.log(`${sisOnly.length} only in sis, of which...`)
     const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.studentStudentnumber)
+    const remaining = _.difference(sisOnly, wronglySetCancel)
 
-    if (wronglySetCancel.length > 0) {
-      console.log(`${wronglySetCancel.length} marked with wrong cancel date in oodi`)
-      if (verbose) wronglySetCancel.forEach(s => { console.log(s) })
-    }
+    printWithReason(wronglySetCancel, "marked with wrong cancel date in oodi")
+    printWithReason(remaining, "missing from sis for other reasons")
+  }
+  console.log('') // adding newline before next programme / year
+}
 
-    const remaining = _.difference(wronglySetCancel, sisOnly)
-
-    if (remaining.length > 0) {
-      console.log(`${remaining.length} missing from oodi for other reasons`)
-      if (verbose) remaining.forEach(s => { console.log(s) })
-    }
+const printWithReason = (studentnumbers, reason) => {
+  if (studentnumbers.length > 0) {
+    console.log(`- ${studentnumbers.length} ${reason}`)
+    if (verbose) studentnumbers.forEach(s => { console.log(s) })
   }
 }
 
@@ -177,7 +160,6 @@ const programmeDiff = async programme => {
   const years = ['2017', '2018', '2019', '2020']
   for (const year of years ) {
     await populationDiff(programme, year)
-    console.log('')
   }
 }
 
