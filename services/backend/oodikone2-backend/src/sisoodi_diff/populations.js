@@ -376,6 +376,8 @@ main()
 
     npm run diff:populations KH10_001 KH20_001 KH50_005
 
-  if you want just a list of all studentnumbers, e.g. to be run against updater, do:
-    npm run diff:populations printall
+  if you want just a list of all studentnumbers, e.g. to be run against updater, include
+  'printall' in arguments. So:
+    npm run diff:populations msc printall, or 
+    npm run diff:populations KH10_001 KH20_001 KH50_005 printall
 */
