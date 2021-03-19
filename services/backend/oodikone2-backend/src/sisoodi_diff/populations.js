@@ -4,7 +4,7 @@ const _ = require('lodash')
 const populationsSis = require('../servicesV2/populations')
 const populationsOodi = require('../services/populations')
 const { Studyright, StudyrightElement, Transfers } = require('../models')
-const { Studyright: SISStudyright, StudyrightElement: SISStudyrightElement  } = require('../modelsV2')
+const { Studyright: SISStudyright, StudyrightElement: SISStudyrightElement } = require('../modelsV2')
 const { Op } = require('sequelize')
 
 let verbose = false
@@ -15,61 +15,61 @@ let verbose = false
 */
 
 const ignores = {
-  'KH40_001': {
-    '2020': {
-      'oodi': ['014290314'] // studyright enddate wrong in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
+  KH40_001: {
+    2020: {
+      oodi: ['014290314'], // studyright enddate wrong in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    },
   },
-  'KH40_002': {
-    '2020': {
-      'sis': ['011368870'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
+  KH40_002: {
+    2020: {
+      sis: ['011368870'], // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    },
   },
-  'KH40_003': {
-    '2020': {
-      'sis': ['015340182'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
+  KH40_003: {
+    2020: {
+      sis: ['015340182'], // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    },
   },
-  'KH40_004': {
-    '2017': {
-      'oodi': ['011531500'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
+  KH40_004: {
+    2017: {
+      oodi: ['011531500'], // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    },
   },
-  'KH40_005': {
-    '2018': {
-      'sis': ['014650093'] // graduated but mistakenlu luop in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
+  KH40_005: {
+    2018: {
+      sis: ['014650093'], // graduated but mistakenlu luop in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    },
   },
-  'KH50_004': {
-    '2020': {
-      'oodi': ['013881465'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
+  KH50_004: {
+    2020: {
+      oodi: ['013881465'], // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    },
   },
-  'KH74_001': {
-    '2019': {
-      'sis': ['014480768'] // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
-    }
+  KH74_001: {
+    2019: {
+      sis: ['014480768'], // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    },
   },
-  'KH57_002': {
-    '2017': {
-      'oodi': ['014818220'] // UPDATER FUKAP graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
-    }
+  KH57_002: {
+    2017: {
+      oodi: ['014818220'], // UPDATER FUKAP graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    },
   },
-  'KH90_001': {
-    '2020': {
-      'sis': ['014261181'] // UPDATER FUKAP many things wrong... https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2707
-    }
+  KH90_001: {
+    2020: {
+      sis: ['014261181'], // UPDATER FUKAP many things wrong... https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2707
+    },
   },
-  'KH55_001': {
-    '2019': {
-      'sis': ['015160142'] // UPDATER FUKAP duplicate studyrigth https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2709
-    }
+  KH55_001: {
+    2019: {
+      sis: ['015160142'], // UPDATER FUKAP duplicate studyrigth https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2709
+    },
   },
-  'KH57_001': {
-    '2018': {
-      'sis': ['013296128'] // leagally missing... do not remember why
-    }
-  }
+  KH57_001: {
+    2018: {
+      sis: ['013296128'], // leagally missing... do not remember why
+    },
+  },
 }
 
 const populationDiff = async (programme, year) => {
@@ -79,7 +79,7 @@ const populationDiff = async (programme, year) => {
     semesters: ['FALL', 'SPRING'],
     months,
     studyRights: { programme },
-    year
+    year,
   }
 
   const resultSis = await populationsSis.optimizedStatisticsOf(query)
@@ -91,15 +91,14 @@ const populationDiff = async (programme, year) => {
   let sisOnly = _.difference(studentsSis, studentsOodi)
   let oodiOnly = _.difference(studentsOodi, studentsSis)
 
-  if (ignores[programme] && ignores[programme][year] ) {
-    
+  if (ignores[programme] && ignores[programme][year]) {
     const legallyInSisButNotInOodi = ignores[programme][year]['sis']
-    if ( legallyInSisButNotInOodi ) {
+    if (legallyInSisButNotInOodi) {
       sisOnly = _.difference(sisOnly, legallyInSisButNotInOodi)
     }
 
     const inOodiNotInSis = ignores[programme][year]['oodi']
-    if ( inOodiNotInSis ) {
+    if (inOodiNotInSis) {
       oodiOnly = _.difference(oodiOnly, inOodiNotInSis)
     }
   }
@@ -124,19 +123,19 @@ const populationDiff = async (programme, year) => {
     }
 
     printWithReason(
-      weirds.cancelledstudents, 
-      "marked as cancelled in sis, but oodi enddate is after sis canceldate. Also not transferred to this program."
+      weirds.cancelledstudents,
+      'marked as cancelled in sis, but oodi enddate is after sis canceldate. Also not transferred to this program.'
     )
     printWithReason(
-      weirds.transferredInPakkoSiirto, 
-      "not at all in sis programme,  transferred in pakkosiirto 2020-12-17"
+      weirds.transferredInPakkoSiirto,
+      'not at all in sis programme,  transferred in pakkosiirto 2020-12-17'
     )
     printWithReason(
-      weirds.transferredAtSomeOtherDate, 
-      "not at all in sis programme, transferred at some date, not in pakkosiirto"
+      weirds.transferredAtSomeOtherDate,
+      'not at all in sis programme, transferred at some date, not in pakkosiirto'
     )
-    printWithReason(weirds.notInProgramme, "not at all in sis programme for some reason")
-    printWithReason(oodiNoWeirds, "missing from sis for other reasons")
+    printWithReason(weirds.notInProgramme, 'not at all in sis programme for some reason')
+    printWithReason(oodiNoWeirds, 'missing from sis for other reasons')
   }
 
   if (sisOnly.length > 0) {
@@ -144,8 +143,8 @@ const populationDiff = async (programme, year) => {
     const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.studentStudentnumber)
     const remaining = _.difference(sisOnly, wronglySetCancel)
 
-    printWithReason(wronglySetCancel, "marked with wrong cancel date in oodi")
-    printWithReason(remaining, "missing from sis for other reasons")
+    printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
+    printWithReason(remaining, 'missing from sis for other reasons')
   }
   console.log('') // adding newline before next programme / year
 }
@@ -153,14 +152,17 @@ const populationDiff = async (programme, year) => {
 const printWithReason = (studentnumbers, reason) => {
   if (studentnumbers.length > 0) {
     console.log(`- ${studentnumbers.length} ${reason}`)
-    if (verbose) studentnumbers.forEach(s => { console.log(s) })
+    if (verbose)
+      studentnumbers.forEach(s => {
+        console.log(s)
+      })
   }
 }
 
 const programmeDiff = async programme => {
   console.log('====== ', programme, ' ======')
   const years = ['2017', '2018', '2019', '2020']
-  for (const year of years ) {
+  for (const year of years) {
     await populationDiff(programme, year)
   }
 }
@@ -170,51 +172,39 @@ const cancelledButGraduated = async code => {
     where: {
       graduated: 1,
       canceldate: {
-        [Op.ne]: null
-      }
+        [Op.ne]: null,
+      },
     },
     include: {
       model: StudyrightElement,
       required: true,
-      where: { code }
-    }
+      where: { code },
+    },
   })
 
   return wrong
 }
 
 const weirdInSIS = async (oodiOnly, resultOodi, code) => {
-
-  const findCorrectOodiStudyRight = (studyrights) => (
-    studyrights.filter(sr => 
-      sr.studyright_elements.some(elem => elem.code === code)
-    )[0]
-  )
+  const findCorrectOodiStudyRight = studyrights =>
+    studyrights.filter(sr => sr.studyright_elements.some(elem => elem.code === code))[0]
 
   const oodiRights = resultOodi.students
-                      .filter(s => oodiOnly.includes(s.studentNumber))
-                      .reduce((acc, curr) => (
-                        {...acc,
-                          [curr.studentNumber]: findCorrectOodiStudyRight(curr.studyrights)
-                        }
-                      ), {})
+    .filter(s => oodiOnly.includes(s.studentNumber))
+    .reduce((acc, curr) => ({ ...acc, [curr.studentNumber]: findCorrectOodiStudyRight(curr.studyrights) }), {})
 
   const sisRights = await SISStudyright.findAll({
     where: {
       student_studentnumber: {
-        [Op.in]: oodiOnly
-      }
+        [Op.in]: oodiOnly,
+      },
     },
     include: {
       model: SISStudyrightElement,
       required: true,
-      where: { code }
-    }
-  }).reduce((acc, curr) => (
-      {...acc,
-        [curr.studentStudentnumber]: curr
-      }
-    ), {})
+      where: { code },
+    },
+  }).reduce((acc, curr) => ({ ...acc, [curr.studentStudentnumber]: curr }), {})
 
   const notInSisProgramme = oodiOnly.filter(sn => !sisRights[sn])
 
@@ -223,76 +213,76 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
     where: {
       targetcode: code,
       studentnumber: {
-        [Op.in]: notInSisProgramme
-      }
+        [Op.in]: notInSisProgramme,
+      },
     },
-      raw: true
-    })
+    raw: true,
+  })
 
-  let studentNumbersTransferredToThisProgramme = transferredToThisProgramme.map(
-    s => s.studentnumber
-  )
+  let studentNumbersTransferredToThisProgramme = transferredToThisProgramme.map(s => s.studentnumber)
 
   const uniqStudentNumbersTransferredToThisProgramme = new Set(studentNumbersTransferredToThisProgramme)
 
-  if (studentNumbersTransferredToThisProgramme.length !== uniqStudentNumbersTransferredToThisProgramme.size && verbose) {
-    console.log("(note: Duplicates in oodi transfers, filtering for correct comparison results)")
+  if (
+    studentNumbersTransferredToThisProgramme.length !== uniqStudentNumbersTransferredToThisProgramme.size &&
+    verbose
+  ) {
+    console.log('(note: Duplicates in oodi transfers, filtering for correct comparison results)')
     studentNumbersTransferredToThisProgramme = [...uniqStudentNumbersTransferredToThisProgramme]
   }
 
   const pakkoSiirtoDate = new Date('2020-12-17 22:00')
-  const transferredInPakkoSiirto = transferredToThisProgramme.filter(
-    t => new Date(t.transferdate).getTime() == pakkoSiirtoDate.getTime()
-  ).map(s => s.studentnumber)
+  const transferredInPakkoSiirto = transferredToThisProgramme
+    .filter(t => new Date(t.transferdate).getTime() == pakkoSiirtoDate.getTime())
+    .map(s => s.studentnumber)
 
-  const transferredAtSomeOtherDate = _.difference(
-    studentNumbersTransferredToThisProgramme,
-    transferredInPakkoSiirto
-  )
+  const transferredAtSomeOtherDate = _.difference(studentNumbersTransferredToThisProgramme, transferredInPakkoSiirto)
 
-  const cancelledstudents = oodiOnly.filter(sn =>
-    sisRights[sn] && sisRights[sn].canceldate && 
-    new Date(oodiRights[sn].enddate).getTime() > new Date(sisRights[sn].enddate).getTime() &&
-    !uniqStudentNumbersTransferredToThisProgramme.has(sn)
+  const cancelledstudents = oodiOnly.filter(
+    sn =>
+      sisRights[sn] &&
+      sisRights[sn].canceldate &&
+      new Date(oodiRights[sn].enddate).getTime() > new Date(sisRights[sn].enddate).getTime() &&
+      !uniqStudentNumbersTransferredToThisProgramme.has(sn)
   )
 
   return {
     cancelledstudents,
     transferredInPakkoSiirto,
     transferredAtSomeOtherDate,
-    notInProgramme: _.difference(notInSisProgramme, 
-      studentNumbersTransferredToThisProgramme
-    )
+    notInProgramme: _.difference(notInSisProgramme, studentNumbersTransferredToThisProgramme),
   }
 }
 
-
 const masterCodes = async () => {
-  return (await StudyrightElement.findAll({
-    attributes: ['code'],
-    where: {
-      code: {
-        [Op.like]: 'MH%'
-      }
-    },
-    group: ['code'],
-    order: ['code']
-  })).map(s => s.code)
+  return (
+    await StudyrightElement.findAll({
+      attributes: ['code'],
+      where: {
+        code: {
+          [Op.like]: 'MH%',
+        },
+      },
+      group: ['code'],
+      order: ['code'],
+    })
+  ).map(s => s.code)
 }
 
 const bscCodes = async () => {
-  return (await StudyrightElement.findAll({
-    attributes: ['code'],
-    where: {
-      code: {
-        [Op.like]: 'KH%'
-      }
-    },
-    group: ['code'],
-    order: ['code']
-  })).map(s => s.code)
+  return (
+    await StudyrightElement.findAll({
+      attributes: ['code'],
+      where: {
+        code: {
+          [Op.like]: 'KH%',
+        },
+      },
+      group: ['code'],
+      order: ['code'],
+    })
+  ).map(s => s.code)
 }
-
 
 const msc = async () => {
   const programmes = await masterCodes()
@@ -314,8 +304,6 @@ const bscnok = async () => {
     await programmeDiff(programme)
   }
 }
-
-
 
 const main = async () => {
   // print moar/less
@@ -340,11 +328,11 @@ const main = async () => {
     await bscnok()
   }
 
-  for ( let i=0; i < what.length; i++ ) {
+  for (let i = 0; i < what.length; i++) {
     const programme = what[i]
-    if ( programme.startsWith('KH') || programme.startsWith('MH') ) {
+    if (programme.startsWith('KH') || programme.startsWith('MH')) {
       await programmeDiff(programme)
-    } 
+    }
   }
 
   process.exit()
