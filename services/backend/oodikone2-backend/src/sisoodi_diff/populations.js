@@ -8,6 +8,8 @@ const { Studyright: SISStudyright, StudyrightElement: SISStudyrightElement } = r
 const { Op } = require('sequelize')
 
 let verbose = false
+let printAll = false
+let allfakd = []
 
 /* 
   if a number under 'sis' it is found in sis-oodikone but missing form
@@ -106,6 +108,12 @@ const populationDiff = async (programme, year) => {
   const both = _.intersection(studentsOodi, studentsSis)
 
   if (oodiOnly.length === 0 && sisOnly.length === 0) return
+
+  if (printAll) {
+    allfakd = [...allfakd, both]
+    return
+  }
+
 
   // Report results and possible causes
   console.log('=== Year ', year, ', total both: ', both.length, ' ===')
@@ -316,6 +324,10 @@ const main = async () => {
     process.exit()
   }
 
+  if (what.includes('printall')) {
+    printAll = true
+  }
+
   if (what.includes('msc')) {
     await msc()
   }
@@ -333,6 +345,10 @@ const main = async () => {
     if (programme.startsWith('KH') || programme.startsWith('MH')) {
       await programmeDiff(programme)
     }
+  }
+  if (printAll) {
+    console.log("total amount: ", allfakd.length)
+    allfakd.forEach(student => { console.log(student) })
   }
 
   process.exit()
@@ -354,4 +370,7 @@ main()
     and then:
 
     npm run diff:populations KH10_001 KH20_001 KH50_005
+
+  if you want just a list of all studentnumbers, e.g. to be run against updater, do:
+    npm run diff:populations printall
 */
