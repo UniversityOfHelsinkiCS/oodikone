@@ -110,10 +110,9 @@ const populationDiff = async (programme, year) => {
   if (oodiOnly.length === 0 && sisOnly.length === 0) return
 
   if (printAll) {
-    allfakd = [...allfakd, both]
+    allfakd = [...allfakd, ...oodiOnly, ...sisOnly]
     return
   }
-
 
   // Report results and possible causes
   console.log('=== Year ', year, ', total both: ', both.length, ' ===')
@@ -168,7 +167,9 @@ const printWithReason = (studentnumbers, reason) => {
 }
 
 const programmeDiff = async programme => {
-  console.log('====== ', programme, ' ======')
+  if (!printAll) {
+    console.log('====== ', programme, ' ======')
+  }
   const years = ['2017', '2018', '2019', '2020']
   for (const year of years) {
     await populationDiff(programme, year)
@@ -326,6 +327,7 @@ const main = async () => {
 
   if (what.includes('printall')) {
     printAll = true
+    console.log('Getting information for all asked students first, then printing studentnumbers. Might take a while')
   }
 
   if (what.includes('msc')) {
@@ -342,13 +344,16 @@ const main = async () => {
 
   for (let i = 0; i < what.length; i++) {
     const programme = what[i]
+    if (programme.startsWith('printall')) continue
     if (programme.startsWith('KH') || programme.startsWith('MH')) {
       await programmeDiff(programme)
     }
   }
   if (printAll) {
-    console.log("total amount: ", allfakd.length)
-    allfakd.forEach(student => { console.log(student) })
+    console.log('total amount: ', allfakd.length)
+    allfakd.forEach(student => {
+      console.log(student)
+    })
   }
 
   process.exit()
