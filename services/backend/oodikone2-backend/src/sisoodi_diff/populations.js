@@ -1,9 +1,11 @@
-/* eslint-disable */
+/* eslint-disablrray, function(dateObj) {
+  return new Date */
 
 const _ = require('lodash')
 const populationsSis = require('../servicesV2/populations')
 const populationsOodi = require('../services/populations')
 const { Studyright, StudyrightElement } = require('../models')
+const { Studyright: SISStudyright, StudyrightElement: SISStudyrightElement  } = require('../modelsV2')
 const { Op } = require('sequelize')
 
 let verbose = false
@@ -71,8 +73,6 @@ const ignores = {
   }
 }
 
-
-
 const populationDiff = async (programme, year) => {
   const months = Number((2020 - Number(year)) * 12 + 7)
   if (verbose) {
@@ -95,6 +95,7 @@ const populationDiff = async (programme, year) => {
   let sisOnly = _.difference(studentsSis, studentsOodi)
   let oodiOnly = _.difference(studentsOodi, studentsSis)
 
+
   if (ignores[programme] && ignores[programme][year] ) {
     
     const legallyInSisButNotInOodi = ignores[programme][year]['sis']
@@ -113,15 +114,29 @@ const populationDiff = async (programme, year) => {
   if (oodiOnly.length === 0 && sisOnly.length === 0) {
   } else {
     if (oodiOnly.length > 0) {
-      console.log('  ', year, '   oodi only', oodiOnly.length, 'both', both.length)
-      if (verbose) {
-        oodiOnly.forEach(s => {
-          console.log('  ', s)
+      const wronglyMarkedAllDetails = await cancelledInSIS(oodiOnly, resultOodi, programme)
+      console.log("len ", wronglyMarkedAllDetails.length)
+      if (wronglyMarkedAllDetails.length > 1) {
+        console.log('marked as cancelled in sis, but in oodi studyright ends 2021-07-31')
+        wronglyMarkedAllDetails.forEach(s => {
+          console.log(s.studentStudentnumber, ", canceldate ", s.canceldate, ", enddate ", s.enddate)
         })
+        oodiOnly = _.difference(wronglyMarkedAllDetails.map(sn => sn.studentStudentnumber), oodiOnly)
+      }
+      if (oodiOnly.length > 0) {
+        console.log('  ', year, '   oodi only', oodiOnly.length, 'both', both.length)
+        if (verbose) {
+          oodiOnly.forEach(s => {
+            console.log('  ', s)
+          })
+        }
       }
     }
     if (sisOnly.length > 0) {
-      const wronglyMarked = (await cancelledButGraduated(programme)).map(s => s.student_studentnumber)
+      const wronglyMarked = (await cancelledButGraduated(programme))
+      if (verbose) {
+
+      }
       const remaining = _.difference(wronglyMarked, sisOnly)
       if (verbose) {
         console.log('wrongly marked', wronglyMarked)
@@ -169,6 +184,46 @@ const cancelledButGraduated = async code => {
 
   return wrong
 }
+
+const cancelledInSIS = async (oodiOnly, resultOodi, code) => {
+  const findCorrectStudyRight = (studyrights) => (
+    studyrights.filter(sr => 
+      sr.studyright_elements.some(elem => elem.code === code)
+    )[0]
+  )
+  const oodiRights = resultOodi.students
+                      .filter(s => oodiOnly.includes(s.studentNumber))
+                      .reduce((acc, curr) => (
+                        {...acc,
+                          [curr.studentNumber]: findCorrectStudyRight(curr.studyrights)
+                        }
+                      ), {})
+
+  const sisRights = await SISStudyright.findAll({
+    where: {
+      student_studentnumber: {
+        [Op.in]: oodiOnly
+      }
+    },
+    include: {
+      model: SISStudyrightElement,
+      required: true,
+      where: { code }
+    }
+  }).reduce((acc, curr) => (
+      {...acc,
+        [curr.studentStudentnumber]: curr
+      }
+    ), {})
+
+  const oodiEndDate = new Date('2021-07-30T21:00:00.000Z')
+  const cancelledstudents = oodiOnly.filter(sn =>
+      new Date(oodiRights[sn].enddate).getTime() === oodiEndDate.getTime() &&
+      sisRights[sn].canceldate
+  ).map(sn => ( sisRights[sn] ))
+  return cancelledstudents
+}
+
 
 const masterCodes = async () => {
   return (await StudyrightElement.findAll({
