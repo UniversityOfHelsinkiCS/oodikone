@@ -115,18 +115,18 @@ const populationDiff = async (programme, year) => {
     const weirds = await weirdInSIS(oodiOnly, resultOodi, programme)
 
     if (weirds.cancelledstudents.length > 0) {
-      console.log(`${weirds.cancelledstudents.length} marked as cancelled in sis, but oodi enddate is 2021-07-31`)
-      if (verbose) {
-        weirds.cancelledstudents.forEach(s => {
-          console.log(s.studentStudentnumber, " / cancelled: ", s.canceldate, 
-                      " / enddate: ", s.enddate)
-        })
-      }
+      console.log(`${weirds.cancelledstudents.length} marked as cancelled in sis, but oodi enddate is after sis canceldate. Also not transferred to this program.`)
+      if (verbose) weirds.cancelledstudents.forEach(s => console.log(s))
     }
 
     if (weirds.transferredInPakkoSiirto.length > 0) {
-      console.log(`${weirds.transferredInPakkoSiirto.length} not at all in sis programme and were transferred in pakkosiirto 2020-12-17`)
+      console.log(`${weirds.transferredInPakkoSiirto.length} not at all in sis programme,  transferred in pakkosiirto 2020-12-17`)
       if (verbose) weirds.transferredInPakkoSiirto.forEach(s => { console.log(s) })
+    }
+
+    if (weirds.transferredAtSomeOtherDate.length > 0) {
+      console.log(`${weirds.transferredAtSomeOtherDate.length} not at all in sis programme, transferred at some date, not in pakkosiirto`)
+      if (verbose) weirds.transferredAtSomeOtherDate.forEach(s => { console.log(s) })
     }
 
     if (weirds.notInProgramme.length > 0) {
@@ -135,9 +135,18 @@ const populationDiff = async (programme, year) => {
     }
 
     const oodiNoWeirds = _.difference(oodiOnly,
-      [...weirds.cancelledstudents.map(sn => sn.studentStudentnumber), 
-       ...weirds.notInProgramme, ...weirds.transferredInPakkoSiirto]
+      [...weirds.cancelledstudents,
+       ...weirds.notInProgramme, ...weirds.transferredInPakkoSiirto,
+       ...weirds.transferredAtSomeOtherDate]
     )
+
+    const weirdosTotalLength = Object.values(weirds).reduce((acc, curr) => acc + curr.length, 0)
+    
+    if (oodiOnly.length !== weirdosTotalLength + oodiNoWeirds.length) {
+      console.log(
+        `!!! oodiOnly length ${oodiOnly.length} doesn't match weirds (${weirdosTotalLength}) + no-weirds (${oodiNoWeirds.length}), check for bugs !!!`
+      )
+    }
 
     if (oodiNoWeirds.length > 0) {
       console.log(`${oodiNoWeirds.length} missing from sis for other reasons`)
@@ -223,32 +232,53 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
       }
     ), {})
 
-  const oodiEndDate = new Date('2021-07-30T21:00:00.000Z')
-  const cancelledstudents = oodiOnly.filter(sn =>
-      new Date(oodiRights[sn].enddate).getTime() === oodiEndDate.getTime() &&
-      sisRights[sn] && sisRights[sn].canceldate
-  ).map(sn => ( sisRights[sn] ))
+  const notInSisProgramme = oodiOnly.filter(sn => !sisRights[sn])
 
-  const notInProgramme = oodiOnly.filter(sn => !sisRights[sn])
-
-  const transferredInPakkoSiirto = await Transfers.findAll({
-    attributes: ['studentnumber'],
+  const transferredToThisProgramme = await Transfers.findAll({
+    attributes: ['studentnumber', 'transferdate'],
     where: {
       targetcode: code,
-      transferdate: {
-        [Op.eq]: new Date('2020-12-17T22:00:00.000Z')
-      },
       studentnumber: {
-        [Op.in]: notInProgramme
+        [Op.in]: notInSisProgramme
       }
     },
       raw: true
-    }).map(s => s.studentnumber)
+    })
+
+  let studentNumbersTransferredToThisProgramme = transferredToThisProgramme.map(
+    s => s.studentnumber
+  )
+
+  const uniqStudentNumbersTransferredToThisProgramme = new Set(studentNumbersTransferredToThisProgramme)
+
+  if (studentNumbersTransferredToThisProgramme.length !== uniqStudentNumbersTransferredToThisProgramme.size && verbose) {
+    console.log("(note: Duplicates in oodi transfers, filtering for correct comparison results)")
+    studentNumbersTransferredToThisProgramme = [...uniqStudentNumbersTransferredToThisProgramme]
+  }
+
+  const pakkoSiirtoDate = new Date('2020-12-17 22:00')
+  const transferredInPakkoSiirto = transferredToThisProgramme.filter(
+    t => new Date(t.transferdate).getTime() == pakkoSiirtoDate.getTime()
+  ).map(s => s.studentnumber)
+
+  const transferredAtSomeOtherDate = _.difference(
+    studentNumbersTransferredToThisProgramme,
+    transferredInPakkoSiirto
+  )
+
+  const cancelledstudents = oodiOnly.filter(sn =>
+    sisRights[sn] && sisRights[sn].canceldate && 
+    new Date(oodiRights[sn].enddate).getTime() > new Date(sisRights[sn].enddate).getTime() &&
+    !uniqStudentNumbersTransferredToThisProgramme.has(sn)
+  )
 
   return {
     cancelledstudents,
-    notInProgramme: _.difference(notInProgramme, transferredInPakkoSiirto),
-    transferredInPakkoSiirto
+    transferredInPakkoSiirto,
+    transferredAtSomeOtherDate,
+    notInProgramme: _.difference(notInSisProgramme, 
+      studentNumbersTransferredToThisProgramme
+    )
   }
 }
 
