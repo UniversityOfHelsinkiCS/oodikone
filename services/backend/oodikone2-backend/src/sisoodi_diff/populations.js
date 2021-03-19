@@ -219,7 +219,7 @@ const cancelledInSIS = async (oodiOnly, resultOodi, code) => {
   const oodiEndDate = new Date('2021-07-30T21:00:00.000Z')
   const cancelledstudents = oodiOnly.filter(sn =>
       new Date(oodiRights[sn].enddate).getTime() === oodiEndDate.getTime() &&
-      sisRights[sn].canceldate
+      sisRights[sn] && sisRights[sn].canceldate
   ).map(sn => ( sisRights[sn] ))
   return cancelledstudents
 }
