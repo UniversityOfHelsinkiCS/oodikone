@@ -61,7 +61,7 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
     <div>
       <Segment>
         <Form>
-          <Header content="Filter statistics by study programmes" as="h4" />
+          <Header as="h4">Filter statistics by study programmes</Header>
           <ProgrammeDropdown
             options={options}
             label="Study programmes:"

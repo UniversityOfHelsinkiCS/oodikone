@@ -129,7 +129,7 @@ const NavigationBar = props => {
         <Dropdown.Menu>
           {adminerUrls.map(({ url, text }) => (
             <Dropdown.Item
-              key={url}
+              key={`${url}-${text}`}
               onClick={() => {
                 const win = window.open(url, '_blank')
                 win.focus()
