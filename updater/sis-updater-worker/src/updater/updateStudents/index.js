@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { flatten, uniqBy, sortBy, groupBy, orderBy, has, get, uniq, isEqual } = require('lodash')
+const { flatten, uniqBy, sortBy, groupBy, orderBy, has, get, uniq } = require('lodash')
 const {
   Course,
   Student,

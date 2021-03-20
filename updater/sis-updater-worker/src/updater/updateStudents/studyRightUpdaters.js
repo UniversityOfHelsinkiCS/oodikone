@@ -175,7 +175,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
             possibleDegrees ? possibleDegrees[0].short_name.en : null
           )
-
           snapshotStudyRightElements.push(degree, programme, studytrack)
         }
       })
@@ -185,6 +184,26 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
     }, [])
     .filter(sE => !!sE.code)
 
+  // Uncomment this and execute updater to check if student has graduated from 
+  // bach, but master path is missing. 
+  const bselems = studyRightElements.filter(sr => sr.code.startsWith('KH'))
+  console.log("graduated bsc, no selected master path")
+  bselems.forEach(elem => {
+    const mainstudyRightId = elem.studyrightid.slice(0,-2)
+    if (!groupedStudyRightSnapshots[mainstudyRightId]) {
+      console.log('what')
+      console.log(elem)
+      console.log(mainstudyRightId)
+      return
+    }
+    const mainStudyRight = groupedStudyRightSnapshots[mainstudyRightId][0]
+    const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
+    if (mainStudyRight.study_right_graduation && 
+        mainStudyRight.study_right_graduation.phase1GraduationDate && 
+        !mainStudyRight.accepted_selection_path.educationPhase2GroupId) {
+        console.log(studentnumber)
+      }
+  })
 
   await bulkCreate(StudyrightElement, studyRightElements)
 }
