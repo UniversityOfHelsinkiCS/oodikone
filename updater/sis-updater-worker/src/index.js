@@ -15,7 +15,7 @@ const {
   REDIS_TOTAL_STUDENTS_KEY,
   REDIS_TOTAL_META_DONE_KEY,
   REDIS_TOTAL_STUDENTS_DONE_KEY,
-  REDIS_LATEST_MESSAGE_RECEIVED
+  REDIS_LATEST_MESSAGE_RECEIVED,
 } = require('./config')
 
 const handleMessage = messageHandler => async msg => {
@@ -42,7 +42,12 @@ const resetStatusToZero = async (...redisKeys) => {
 const handleInfoMessage = async infoMsg => {
   if (infoMsg.message === 'ABORT') {
     logger.info({ message: 'Starting to abort scheduled messages' })
-    await resetStatusToZero(REDIS_TOTAL_META_KEY, REDIS_TOTAL_META_DONE_KEY, REDIS_TOTAL_STUDENTS_KEY, REDIS_TOTAL_STUDENTS_DONE_KEY)
+    await resetStatusToZero(
+      REDIS_TOTAL_META_KEY,
+      REDIS_TOTAL_META_DONE_KEY,
+      REDIS_TOTAL_STUDENTS_KEY,
+      REDIS_TOTAL_STUDENTS_DONE_KEY
+    )
   }
   if (infoMsg.message === 'RELOAD_REDIS') {
     logger.info({ message: 'Starting to reload redis cache' })
@@ -50,7 +55,7 @@ const handleInfoMessage = async infoMsg => {
   }
 }
 
-const isAllowedToUpdateMsg = async (updateMsg) => {
+const isAllowedToUpdateMsg = async updateMsg => {
   const doneKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY
   const totalKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
 
@@ -79,7 +84,7 @@ const purgeMsgHandler = async purgeMsg => {
 
 const miscMsgHandler = async miscMessage => {
   const studentNumbers = miscMessage.entityIds.map(s => s.student_number)
-  const msgInUpdateFormat = { ...miscMessage, entityIds: miscMessage.entityIds.map(s => s.id)}
+  const msgInUpdateFormat = { ...miscMessage, entityIds: miscMessage.entityIds.map(s => s.id) }
 
   await purgeByStudentNumber(studentNumbers)
   await updateMsgHandler(msgInUpdateFormat)
