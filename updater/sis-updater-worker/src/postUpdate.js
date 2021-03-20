@@ -8,7 +8,6 @@ const {
   REDIS_TOTAL_STUDENTS_DONE_KEY,
 } = require('./config')
 
-
 const logStatus = async (type, count, done, scheduled, startTime, humanType) => {
   logger.info({
     message: `Update ${count} ${humanType}: ${done}/${scheduled}`,
@@ -16,7 +15,7 @@ const logStatus = async (type, count, done, scheduled, startTime, humanType) => 
     count,
     done,
     acual_scheduled: scheduled,
-    timems: new Date() - startTime
+    timems: new Date() - startTime,
   })
 }
 
@@ -42,9 +41,8 @@ const postUpdate = async (updateMsg, currentChunkStartTime) => {
     logger.info('Updating ended')
     return
   }
-
 }
 
 module.exports = {
-  postUpdate
+  postUpdate,
 }
