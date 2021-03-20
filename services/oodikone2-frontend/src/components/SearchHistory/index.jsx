@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import moment from 'moment'
 import { sortBy } from 'lodash'
-import { Segment, Form, Header } from 'semantic-ui-react'
+import { Segment, Form, Header, Icon } from 'semantic-ui-react'
 import { arrayOf, date, func, shape, string, bool } from 'prop-types'
 
 const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) => {
@@ -24,7 +24,12 @@ const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) =>
 
   return (
     <Segment>
-      <Header disabled={disabled} content={header} icon="clock outline" />
+      <Header disabled={disabled}>
+        <>
+          <Icon name="clock outline" />
+          {header}
+        </>
+      </Header>
       <Form.Dropdown
         disabled={disabled}
         placeholder="Select a previous search"
