@@ -39,8 +39,8 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
         <Table selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell content={title} />
-              <Table.HeaderCell content="Code" />
+              <Table.HeaderCell>{title}</Table.HeaderCell>
+              <Table.HeaderCell>Code</Table.HeaderCell>
               {controlIcon ? <Table.HeaderCell /> : null}
             </Table.Row>
           </Table.Header>
