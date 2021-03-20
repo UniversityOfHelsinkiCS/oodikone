@@ -25,7 +25,10 @@ const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) =>
   return (
     <Segment>
       <Header disabled={disabled}>
-        <><Icon name="clock outline"/>{header}</>
+        <>
+          <Icon name="clock outline" />
+          {header}
+        </>
       </Header>
       <Form.Dropdown
         disabled={disabled}

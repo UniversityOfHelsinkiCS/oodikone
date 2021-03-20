@@ -19,59 +19,59 @@ let allfakd = []
 const ignores = {
   KH40_001: {
     2020: {
-      oodi: ['014290314'], // studyright enddate wrong in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    },
+      oodi: ['014290314'] // studyright enddate wrong in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
   },
   KH40_002: {
     2020: {
-      sis: ['011368870'], // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    },
+      sis: ['011368870'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
   },
   KH40_003: {
     2020: {
-      sis: ['015340182'], // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    },
+      sis: ['015340182'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
   },
   KH40_004: {
     2017: {
-      oodi: ['011531500'], // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    },
+      oodi: ['011531500'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
   },
   KH40_005: {
     2018: {
-      sis: ['014650093'], // graduated but mistakenlu luop in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    },
+      sis: ['014650093'] // graduated but mistakenlu luop in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
   },
   KH50_004: {
     2020: {
-      oodi: ['013881465'], // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    },
+      oodi: ['013881465'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+    }
   },
   KH74_001: {
     2019: {
-      sis: ['014480768'], // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
-    },
+      sis: ['014480768'] // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    }
   },
   KH57_002: {
     2017: {
-      oodi: ['014818220'], // UPDATER FUKAP graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
-    },
+      oodi: ['014818220'] // UPDATER FUKAP graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    }
   },
   KH90_001: {
     2020: {
-      sis: ['014261181'], // UPDATER FUKAP many things wrong... https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2707
-    },
+      sis: ['014261181'] // UPDATER FUKAP many things wrong... https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2707
+    }
   },
   KH55_001: {
     2019: {
-      sis: ['015160142'], // UPDATER FUKAP duplicate studyrigth https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2709
-    },
+      sis: ['015160142'] // UPDATER FUKAP duplicate studyrigth https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2709
+    }
   },
   KH57_001: {
     2018: {
-      sis: ['013296128'], // leagally missing... do not remember why
-    },
-  },
+      sis: ['013296128'] // leagally missing... do not remember why
+    }
+  }
 }
 
 const populationDiff = async (programme, year) => {
@@ -81,7 +81,7 @@ const populationDiff = async (programme, year) => {
     semesters: ['FALL', 'SPRING'],
     months,
     studyRights: { programme },
-    year,
+    year
   }
 
   const resultSis = await populationsSis.optimizedStatisticsOf(query)
@@ -181,14 +181,14 @@ const cancelledButGraduated = async code => {
     where: {
       graduated: 1,
       canceldate: {
-        [Op.ne]: null,
-      },
+        [Op.ne]: null
+      }
     },
     include: {
       model: StudyrightElement,
       required: true,
-      where: { code },
-    },
+      where: { code }
+    }
   })
 
   return wrong
@@ -205,14 +205,14 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
   const sisRights = await SISStudyright.findAll({
     where: {
       student_studentnumber: {
-        [Op.in]: oodiOnly,
-      },
+        [Op.in]: oodiOnly
+      }
     },
     include: {
       model: SISStudyrightElement,
       required: true,
-      where: { code },
-    },
+      where: { code }
+    }
   }).reduce((acc, curr) => ({ ...acc, [curr.studentStudentnumber]: curr }), {})
 
   const notInSisProgramme = oodiOnly.filter(sn => !sisRights[sn])
@@ -222,10 +222,10 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
     where: {
       targetcode: code,
       studentnumber: {
-        [Op.in]: notInSisProgramme,
-      },
+        [Op.in]: notInSisProgramme
+      }
     },
-    raw: true,
+    raw: true
   })
 
   let studentNumbersTransferredToThisProgramme = transferredToThisProgramme.map(s => s.studentnumber)
@@ -259,38 +259,34 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
     cancelledstudents,
     transferredInPakkoSiirto,
     transferredAtSomeOtherDate,
-    notInProgramme: _.difference(notInSisProgramme, studentNumbersTransferredToThisProgramme),
+    notInProgramme: _.difference(notInSisProgramme, studentNumbersTransferredToThisProgramme)
   }
 }
 
 const masterCodes = async () => {
-  return (
-    await StudyrightElement.findAll({
-      attributes: ['code'],
-      where: {
-        code: {
-          [Op.like]: 'MH%',
-        },
-      },
-      group: ['code'],
-      order: ['code'],
-    })
-  ).map(s => s.code)
+  return (await StudyrightElement.findAll({
+    attributes: ['code'],
+    where: {
+      code: {
+        [Op.like]: 'MH%'
+      }
+    },
+    group: ['code'],
+    order: ['code']
+  })).map(s => s.code)
 }
 
 const bscCodes = async () => {
-  return (
-    await StudyrightElement.findAll({
-      attributes: ['code'],
-      where: {
-        code: {
-          [Op.like]: 'KH%',
-        },
-      },
-      group: ['code'],
-      order: ['code'],
-    })
-  ).map(s => s.code)
+  return (await StudyrightElement.findAll({
+    attributes: ['code'],
+    where: {
+      code: {
+        [Op.like]: 'KH%'
+      }
+    },
+    group: ['code'],
+    order: ['code']
+  })).map(s => s.code)
 }
 
 const msc = async () => {
