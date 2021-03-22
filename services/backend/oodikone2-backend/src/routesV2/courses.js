@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const crypto = require('crypto')
 const Course = require('../servicesV2/courses')
 const { validateParamLength } = require('../util')
 const logger = require('../util/logger')
@@ -47,36 +48,18 @@ router.get('/v2/coursesmulti', async (req, res) => {
   res.json(courseDisciplines)
 }) */
 
-/* router.get('/v2/courseyearlystats', async (req, res) => {
-  let results = []
-  const { rights, roles } = req
-  const admin = roles.includes('admin')
-  if (!admin) {
-    if (rights.length <= 0) {
-      return res.status(403).json({ error: 'No programmes so no access to course stats' })
-    }
-  }
-  if (req.query.start && req.query.codes && req.query.end) {
-    const { codes } = req.query
-    const years = { start: req.query.start, end: req.query.end }
-    results = await Promise.all(
-      JSON.parse(codes).map(code => Course.yearlyStatsOf(code, years, req.query.separate, req.query.language))
-    )
-  }
-  res.json(results)
-}) */
-
 router.get('/v3/courseyearlystats', async (req, res) => {
   try {
     const { rights, roles } = req
-    const admin = roles && roles.includes('admin')
-    if (!admin) {
-      // If user has rights to see at least one programme, then they are allowed
-      // to see all of them
-      if (rights.length <= 0) {
-        return res.status(403).json({ error: 'No programmes so no access to course stats' })
-      }
+
+    const allowedRoles = roles && ['admin', 'courseStatistics'].find(role => roles.includes(role))
+
+    // If user has rights to see at least one programme, then they are allowed
+    // to see all of them
+    if (!allowedRoles && rights.length < 1) {
+      return res.status(403).json({ error: 'No programmes so no access to course stats' })
     }
+
     const { codes, separate: sep, unifyOpenUniCourses: unify } = req.query
 
     const separate = !sep ? false : JSON.parse(sep)
@@ -84,7 +67,11 @@ router.get('/v3/courseyearlystats', async (req, res) => {
     if (!codes) {
       res.status(422).send('Missing required query parameters')
     } else {
-      const results = await Course.courseYearlyStats(codes, separate, unifyOpenUniCourses)
+      // Studentnumbers should be obfuscated to all other users except admins
+      // and users with rights to any specific study programmes
+      const anonymize = allowedRoles !== 'admin' && rights.length < 1
+      const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
+      const results = await Course.courseYearlyStats(codes, separate, unifyOpenUniCourses, anonymizationSalt)
       res.json(results)
     }
   } catch (e) {
