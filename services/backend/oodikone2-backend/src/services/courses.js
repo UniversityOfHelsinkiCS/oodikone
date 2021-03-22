@@ -681,7 +681,6 @@ module.exports = {
   getMainCourseToCourseMap,
   getAllCourseTypes,
   getAllDisciplines,
-  yearlyStatsOfNew,
   courseYearlyStats,
   byNameAndOrCodeLike,
   byCodes,
