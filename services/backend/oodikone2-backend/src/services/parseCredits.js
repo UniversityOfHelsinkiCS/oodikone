@@ -45,7 +45,6 @@ const parseCredit = (credit, anonymizationSalt) => {
     }
   }
 
-  
   return {
     student,
     yearcode,

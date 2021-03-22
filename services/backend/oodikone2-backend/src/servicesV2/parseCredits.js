@@ -9,11 +9,11 @@ const formatStudyrightElement = ({ code, element_detail, startdate, studyright: 
     startdate,
     faculty_code: studyright.faculty_code || null,
     organization: studyright.organization
-    ? {
-        name: studyright.organization.name,
-        code: studyright.organization.code
-      }
-    : null
+      ? {
+          name: studyright.organization.name,
+          code: studyright.organization.code
+        }
+      : null
   }
 }
 
