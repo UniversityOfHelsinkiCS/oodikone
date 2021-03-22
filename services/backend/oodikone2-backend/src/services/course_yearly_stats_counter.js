@@ -156,7 +156,7 @@ class CourseYearlyStatsCounter {
     }
   }
 
-  formatStudentStatistics(students) {
+  parseStudentStatistics(students) {
     const grades = {}
     const classes = {}
     const studentnumbers = new Set()
@@ -169,18 +169,86 @@ class CourseYearlyStatsCounter {
     return { grades, classes, studentnumbers: [...studentnumbers] }
   }
 
-  formatGroupStatistics() {
-    return Object.values(this.groups).map(({ students, ...rest }) => ({
-      ...rest,
-      students: this.formatStudentStatistics(students)
-    }))
+  parseProgrammeStatistics(anonymizationSalt) {
+    if (anonymizationSalt) {
+      this.programmes = Object.values(this.programmes).map(({ students, passed, credits, name }) => {
+        let obfuscatedStudents = {}
+        let obfuscatedPassed = {}
+        let obfuscatedCredits = {}
+        for (const [yearcode, studentsOfTheYear] of Object.entries(students)) {
+          if (studentsOfTheYear.length < 6) {
+            obfuscatedStudents[yearcode] = -1
+            obfuscatedPassed[yearcode] = -1
+            obfuscatedCredits[yearcode] = -1
+          } else {
+            obfuscatedStudents[yearcode] = studentsOfTheYear
+            obfuscatedPassed[yearcode] = passed[yearcode]
+            obfuscatedCredits[yearcode] = credits[yearcode]
+          }
+        }
+        return {
+          name,
+          credits: obfuscatedCredits,
+          passed: obfuscatedPassed,
+          students: obfuscatedStudents
+        }
+      })
+    }
+
+    return this.programmes
   }
 
-  getFinalStatistics() {
+  parseGroupStatistics(anonymizationSalt) {
+    const groupStatistics = Object.values(this.groups).map(({ students, ...rest }) => {
+      const normalStats = {
+        ...rest,
+        students: this.parseStudentStatistics(students)
+      }
+      if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
+        const obfuscatedStats = {
+          code: rest.code,
+          name: rest.name,
+          coursecode: rest.coursecode,
+          attempts: -1,
+          yearcode: rest.yearcode,
+          students: -1
+        }
+        return obfuscatedStats
+      }
+      return normalStats
+    })
+
+    return groupStatistics
+  }
+
+  parseFacultyStatistics(anonymizationSalt) {
+    if (anonymizationSalt) {
+      this.facultyStats = Object.values(this.facultyStats).map(({ allStudents, ...rest }) => {
+        const normalStats = {
+          ...rest,
+          allStudents
+        }
+        if (allStudents.length < 6) {
+          const obfuscatedStats = {
+            year: rest.year,
+            allCredits: -1,
+            allPassed: -1,
+            allStudents: -1,
+            faculties: -1
+          }
+          return obfuscatedStats
+        }
+        return normalStats
+      })
+    }
+    return this.facultyStats
+  }
+
+  getFinalStatistics(anonymizationSalt) {
     return {
-      programmes: this.programmes,
-      statistics: this.formatGroupStatistics(),
-      facultyStats: this.facultyStats
+      programmes: this.parseProgrammeStatistics(anonymizationSalt),
+      statistics: this.parseGroupStatistics(anonymizationSalt),
+      facultyStats: this.parseFacultyStatistics(anonymizationSalt)
     }
   }
 }
