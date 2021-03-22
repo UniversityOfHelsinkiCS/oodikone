@@ -16,6 +16,7 @@ const {
   dbConnections: { sequelize }
 } = require('../databaseV2/connection')
 const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
+const { parseCredit } = require('./parseCredits')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../servicesV2/course_yearly_stats_counter')
 const _ = require('lodash')
@@ -109,8 +110,8 @@ const byName = (name, language) =>
 
 const byCode = code => Course.findByPk(code)
 
-const creditsForCourses = async codes =>
-  Credit.findAll({
+const creditsForCourses = async (codes, anonymizationSalt) => {
+  const credits = Credit.findAll({
     include: [
       {
         model: Student,
@@ -158,6 +159,9 @@ const creditsForCourses = async codes =>
     },
     order: [['attainment_date', 'ASC']]
   })
+  const parsedCredits = credits.map(credit => parseCredit(credit, anonymizationSalt))
+  return parsedCredits
+}
 
 const bySearchTerm = async (term, language) => {
   const formatCourse = course => ({
@@ -625,37 +629,7 @@ const getGroupId = async code => {
   return duplicates ? duplicates.groupid : code
 }
 
-const formatStudyrightElement = ({ code, element_detail, startdate, studyright: sr }) => {
-  const studyright = sr.get({ plain: true })
-  return {
-    code,
-    name: element_detail.name,
-    startdate,
-    faculty_code: studyright.faculty_code || null,
-    organization: studyright.organization || null
-  }
-}
-
-const parseCredit = credit => {
-  const { student, semester, grade, course_code, credits } = credit
-  const { studentnumber, studyright_elements: elements } = student
-  const { yearcode, yearname, semestercode, name: semestername } = semester
-  return {
-    student,
-    yearcode,
-    yearname,
-    semestercode,
-    semestername,
-    coursecode: course_code,
-    grade,
-    passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
-    studentnumber,
-    programmes: elements.map(formatStudyrightElement),
-    credits
-  }
-}
-
-const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
+const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anonymizationSalt) => {
   const codes = await alternativeCodes(coursecode)
 
   if (unifyOpenUniCourses) {
@@ -678,7 +652,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
 
   const uniqueCodes = _.uniq(codes)
   const [credits, course] = await Promise.all([
-    creditsForCourses(uniqueCodes),
+    creditsForCourses(uniqueCodes, anonymizationSalt),
     Course.findOne({
       where: {
         code: coursecode
@@ -698,7 +672,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses) => {
       programmes,
       coursecode,
       credits
-    } = parseCredit(credit)
+    } = credit
     const groupcode = separate ? semestercode : yearcode
     const groupname = separate ? semestername : yearname
     const unknownProgramme = [
@@ -785,8 +759,10 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
   return maxYearsToCreatePopulationFrom
 }
 
-const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses) => {
-  const stats = await Promise.all(coursecodes.map(code => yearlyStatsOfNew(code, separate, unifyOpenUniCourses)))
+const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses, anonymizationSalt) => {
+  const stats = await Promise.all(
+    coursecodes.map(code => yearlyStatsOfNew(code, separate, unifyOpenUniCourses, anonymizationSalt))
+  )
   return stats
 }
 
