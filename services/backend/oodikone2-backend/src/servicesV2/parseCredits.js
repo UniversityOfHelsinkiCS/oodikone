@@ -8,7 +8,12 @@ const formatStudyrightElement = ({ code, element_detail, startdate, studyright: 
     name: element_detail.name,
     startdate,
     faculty_code: studyright.faculty_code || null,
-    organization: studyright.organization || null
+    organization: studyright.organization
+    ? {
+        name: studyright.organization.name,
+        code: studyright.organization.code
+      }
+    : null
   }
 }
 
@@ -24,11 +29,11 @@ const parseCredit = (credit, anonymizationSalt) => {
       .digest('hex')
 
     const anonymizedStudent = {
-      studyright_elements,
       studentnumber: anonymizedStudentNumber
     }
 
     return {
+      obfuscated: true,
       student: anonymizedStudent,
       yearcode,
       yearname,
