@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const crypto = require('crypto')
 const Course = require('../servicesV2/courses')
 const { validateParamLength } = require('../util')
 const logger = require('../util/logger')
