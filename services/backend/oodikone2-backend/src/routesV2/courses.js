@@ -47,25 +47,6 @@ router.get('/v2/coursesmulti', async (req, res) => {
   res.json(courseDisciplines)
 }) */
 
-/* router.get('/v2/courseyearlystats', async (req, res) => {
-  let results = []
-  const { rights, roles } = req
-  const admin = roles.includes('admin')
-  if (!admin) {
-    if (rights.length <= 0) {
-      return res.status(403).json({ error: 'No programmes so no access to course stats' })
-    }
-  }
-  if (req.query.start && req.query.codes && req.query.end) {
-    const { codes } = req.query
-    const years = { start: req.query.start, end: req.query.end }
-    results = await Promise.all(
-      JSON.parse(codes).map(code => Course.yearlyStatsOf(code, years, req.query.separate, req.query.language))
-    )
-  }
-  res.json(results)
-}) */
-
 router.get('/v3/courseyearlystats', async (req, res) => {
   try {
     const { rights, roles } = req
