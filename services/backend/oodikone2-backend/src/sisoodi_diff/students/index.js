@@ -45,17 +45,32 @@ const main = async () => {
   output(`Comparing ${studentNumbers.length} students between Oodi and SIS databases.`)
   output('Only differing students and fields are printed.\n\n')
 
+  let okCount = 0
+
   for (const studentNumber of studentNumbers) {
     const msg = await getStudentDiff(studentNumber)
 
     output(`${studentNumber}: ${msg.length === 0 ? 'OK' : ''}`)
     msg.forEach(s => output(s))
     output('')
+
+    if (msg.length === 0) {
+      okCount++
+    }
   }
 
   makeCsv()
 
-  output('DONED.')
+  const total = studentNumbers.length
+  const failed = studentNumbers.length - okCount
+  const okPercent = ((okCount / total) * 100).toFixed(0)
+  const failedPercent = ((failed / total) * 100).toFixed(0)
+
+  output('Done.')
+  output('\n--------------\nRUN STATISTICS\n--------------\n')
+  output(`Total:\t\t${total} students`)
+  output(`OK:\t\t${okCount} students\t(${okPercent} %)`)
+  output(`Failed:\t\t${failed} students\t(${failedPercent} %)`)
 }
 
 main()
