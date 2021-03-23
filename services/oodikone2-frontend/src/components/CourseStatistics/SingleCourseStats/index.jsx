@@ -340,7 +340,7 @@ const SingleCourseStats = ({
     <div>
       <Segment>
         <Form>
-          <Header content="Statistics by time range" as="h4" />
+          <Header as="h4">Statistics by time range</Header>
           <YearFilter years={filteredYears} fromYear={fromYear} toYear={toYear} handleChange={handleYearChange} />
           {maxYearsToCreatePopulationFrom < toYear - fromYear + 1 ? (
             <Popup
@@ -357,7 +357,7 @@ const SingleCourseStats = ({
       </Segment>
       <Segment>
         <Form>
-          <Header content="Filter statistics by study programmes" as="h4" />
+          <Header as="h4">Filter statistics by study programmes</Header>
           <Grid>
             <Grid.Column width={8}>
               <ProgrammeDropdown
