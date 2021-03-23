@@ -10,6 +10,7 @@ class CourseYearlyStatsCounter {
     this.groups = {}
     this.programmes = {}
     this.facultyStats = {}
+    this.obfuscated = false
     this.history = {
       passed: new Set(),
       failed: new Set(),
@@ -205,6 +206,9 @@ class CourseYearlyStatsCounter {
         students: this.parseStudentStatistics(students)
       }
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
+        // indicate to the front that some of the data has been obfuscated and therefore 
+        // totals cannot be calculated
+        this.obfuscated = true
         const obfuscatedStats = {
           code: rest.code,
           name: rest.name,
@@ -248,7 +252,8 @@ class CourseYearlyStatsCounter {
     return {
       programmes: this.parseProgrammeStatistics(anonymizationSalt),
       statistics: this.parseGroupStatistics(anonymizationSalt),
-      facultyStats: this.parseFacultyStatistics(anonymizationSalt)
+      facultyStats: this.parseFacultyStatistics(anonymizationSalt),
+      obfuscated: this.obfuscated
     }
   }
 }
