@@ -2,9 +2,6 @@ const moment = require('moment')
 const { matchExactlyOneCourse } = require('./matchExactlyOneCourse')
 const { output } = require('./output')
 
-// FIXME: ei samaan ämpäriin!
-const coursesToIgnore = ['DIGI-100A', 'TKT50003', 'AYTKT50003']
-
 const compareOodiToSis = (data, msg) => {
   const { studentNumber, courses } = data
   const oodiCourses = courses.oodi
@@ -18,10 +15,6 @@ const compareOodiToSis = (data, msg) => {
     try {
       matchExactlyOneCourse(oodiCourse, sisCourses)
     } catch (error) {
-      if (coursesToIgnore.includes(courseCode)) {
-        continue
-      }
-
       missing = missing.concat(oodiCourse)
       const name = oodiCourse.course.name.fi
       output(
