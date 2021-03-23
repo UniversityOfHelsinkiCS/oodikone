@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { excludeStudyModulesFromCourses } = require('../utils')
 const { matchExactlyOneCourse } = require('./matchExactlyOneCourse')
 const { output } = require('./output')
 
@@ -47,7 +48,10 @@ const compareOodiToSis = (data, msg) => {
 }
 
 const compareCoursesPairwise = (data, msg) => {
-  msg = compareOodiToSis(data, msg)
+  const { courses } = data
+  const sis = excludeStudyModulesFromCourses(courses.sis)
+  const oodi = excludeStudyModulesFromCourses(courses.oodi)
+  msg = compareOodiToSis({ ...data, courses: { sis, oodi } }, msg)
   return msg
 }
 

@@ -19,6 +19,11 @@ const mayhemifiedDatesMatch = (a, b) => {
   return oodiDate.isSame(sis)
 }
 
+const excludeStudyModulesFromCourses = course => course.filter(course => course.isStudyModuleCredit === false)
+const onlyStudyModulesFromCourses = course => course.filter(course => course.isStudyModuleCredit === true)
+
 module.exports = {
-  mayhemifiedDatesMatch
+  mayhemifiedDatesMatch,
+  excludeStudyModulesFromCourses,
+  onlyStudyModulesFromCourses
 }
