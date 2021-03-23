@@ -19,7 +19,7 @@ let allfakd = []
 const ignores = {
   KH40_001: {
     2020: {
-      oodi: ['014290314'] // studyright enddate wrong in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+      oodi: ['014290314'] // Oodissa on virhe opintoajan pituuden laskussa. Tämä on tullut äskettäin ilmi. Sisussa on siis oikeat tiedot.
     }
   },
   KH40_002: {
@@ -39,7 +39,7 @@ const ignores = {
   },
   KH40_005: {
     2018: {
-      sis: ['014650093'] // graduated but mistakenlu luop in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+      sis: ['014650093'] // on tosiaan vähän ristiriitaiset tiedot Oodissa. Sisussa näkyy kuitenkin ok, niin että annetaan olla
     }
   },
   KH50_004: {
@@ -53,8 +53,8 @@ const ignores = {
     }
   },
   KH57_002: {
-    2017: {
-      oodi: ['014818220'] // UPDATER FUKAP graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    '2017': {
+      'oodi': ['014818220'] // graduation missing in sis-oodikone due to sis prblm https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
     }
   },
   KH90_001: {
