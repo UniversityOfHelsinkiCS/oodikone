@@ -24,7 +24,9 @@ const names = [
   'cxcorp',
   'ajhaa',
   'joonashak',
-  'vaahtokarkki'
+  'vaahtokarkki',
+  'otahontas',
+  'saarasat'
 ]
 
 const dummyData = names.map(name => ({
