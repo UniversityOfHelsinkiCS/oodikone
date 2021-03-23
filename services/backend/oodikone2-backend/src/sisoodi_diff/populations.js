@@ -51,7 +51,7 @@ const ignores = {
   },
   'KH57_002': {
     '2017': {
-      'oodi': ['014818220'] // UPDATER FUKAP graduation missing in sis-oodikone https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+      'oodi': ['014818220'] // graduation missing in sis-oodikone due to sis prblm https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
     }
   },
   'KH90_001': {
