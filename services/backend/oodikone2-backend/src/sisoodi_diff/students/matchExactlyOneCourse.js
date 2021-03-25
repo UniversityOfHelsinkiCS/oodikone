@@ -6,11 +6,25 @@ const filterByCode = (code, courses) => courses.filter(({ course }) => course.co
 
 const filterByCredits = (credits, courses) => courses.filter(course => course.credits === credits)
 
-const coursesMatch = (a, b) =>
-  a.course.code === b.course.code && a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
+const filterByName = (name, courses) =>
+  courses.filter(({ course }) => {
+    return course.name.fi === name
+  })
+
+const coursesMatch = (a, b, matchByName = false, matchByCode = true) => {
+  if (matchByName) {
+    return a.course.name.fi === b.course.name.fi && a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
+  }
+
+  if (matchByCode) {
+    return a.course.code === b.course.code && a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
+  }
+
+  return a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
+}
 
 // Idea here is to find exactly one matching course or fail otherwise.
-const matchExactlyOneCourse = (courseToPair, courses) => {
+const matchExactlyOneCourse = (courseToPair, courses, matchByName = false, matchByCode = true) => {
   const { code } = courseToPair.course
   const exactCodeMatches = filterByCode(code, courses)
 
@@ -20,7 +34,7 @@ const matchExactlyOneCourse = (courseToPair, courses) => {
 
   const codeMatches = exactCodeMatches.length > 0 ? exactCodeMatches : specialCodeMatches
 
-  if (codeMatches.length === 0) {
+  if (codeMatches.length === 0 && matchByCode) {
     throw new Error('ERROR! Could not match course (code).')
   }
 
@@ -28,9 +42,21 @@ const matchExactlyOneCourse = (courseToPair, courses) => {
     return codeMatches[0]
   }
 
+  const nameMatches = filterByName(courseToPair.course.name.fi, courses)
+
+  if (nameMatches.length === 0 && matchByName) {
+    throw new Error('ERROR! Could not match course (name).')
+  }
+
+  if (nameMatches.length === 1 && coursesMatch(courseToPair, nameMatches[0])) {
+    return nameMatches[0]
+  }
+
   // Need to filter by date.
+  const toBeSeacrhedByDate =
+    matchByCode && !matchByName ? codeMatches : !matchByCode && matchByName ? nameMatches : courses
   const { date, credits } = courseToPair
-  const dateMatches = filterByDate(date, codeMatches)
+  const dateMatches = filterByDate(date, toBeSeacrhedByDate)
 
   if (dateMatches.length === 0) {
     throw new Error('ERROR! Could not match courses (date).')
