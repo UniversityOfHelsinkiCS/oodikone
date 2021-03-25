@@ -3,6 +3,8 @@ const { matchExactlyOneCourse } = require('./matchExactlyOneCourse')
 const moment = require('moment')
 const { output } = require('./output')
 
+const coursesToIgnore = ['TKT20009', 'AYTKT20009', 'DIGI-100', 'CSM13204']
+
 const matchOnlyByCreditsAndDateIfNecessary = (courseToPair, courses) => {
   try {
     matchExactlyOneCourse(courseToPair, courses)
@@ -24,11 +26,9 @@ const matchStudyModulesAsCourses = (data, msg) => {
     try {
       matchOnlyByCreditsAndDateIfNecessary(oodiCourse, sisCourses)
     } catch (error) {
-      /*
       if (coursesToIgnore.includes(courseCode)) {
         continue
       }
-      */
 
       missing = missing.concat(oodiCourse)
       const name = oodiCourse.course.name.fi
