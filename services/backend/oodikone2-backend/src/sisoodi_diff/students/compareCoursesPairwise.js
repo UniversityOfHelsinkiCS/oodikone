@@ -41,7 +41,7 @@ const compareOodiToSis = (data, msg) => {
   }
 
   if (missing.length > 0) {
-    msg = msg.concat(`  Total missing from SIS: ${missing.length}`)
+    msg = msg.concat(`  Total courses missing from SIS: ${missing.length}`)
   }
 
   return msg

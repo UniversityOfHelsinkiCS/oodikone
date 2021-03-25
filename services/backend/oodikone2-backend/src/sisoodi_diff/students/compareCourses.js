@@ -1,4 +1,5 @@
 const compareCoursesPairwise = require('./compareCoursesPairwise')
+const compareStudyModules = require('./compareStudyModules')
 const excludeIgnoredCourses = require('./excludeIgnoredCourses')
 
 const compareCourses = async (data, msg) => {
@@ -7,6 +8,7 @@ const compareCourses = async (data, msg) => {
   //msg = compareTotalCredits(oodi, sis, msg)
   //msg = compareLength(oodi, sis, msg)
   msg = compareCoursesPairwise(data, msg)
+  msg = compareStudyModules(data, msg)
   return msg
 }
 
