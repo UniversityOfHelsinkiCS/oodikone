@@ -21,18 +21,37 @@ const getTableData = (stats, isGradeSeries, isRelative) =>
       name,
       code,
       cumulative: { grades },
-      coursecode
+      coursecode,
+      obfuscated
     } = stat
 
-    const spread = isGradeSeries ? getGradeSpread([grades], isRelative) : getThesisGradeSpread([grades], isRelative)
+    if (obfuscated) {
+      return {
+        name,
+        code,
+        coursecode,
+        attempts: '5 or less students',
+        0: ['NA'],
+        1: ['NA'],
+        2: ['NA'],
+        3: ['NA'],
+        4: ['NA'],
+        5: ['NA'],
+        HT: ['NA'],
+        TT: ['NA'],
+        'Hyv.': ['NA']
+      }
+    }
 
     const attempts = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
+    const gradeSpread = isGradeSeries ? getGradeSpread([grades], isRelative) : getThesisGradeSpread([grades], isRelative)
+
     return {
       name,
       code,
       coursecode,
       attempts,
-      ...spread
+      ...gradeSpread
     }
   })
 
