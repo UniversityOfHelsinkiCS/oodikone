@@ -102,6 +102,7 @@ router.get('/v2/studyprogrammes/:id/optiondata', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   const code = req.params.id
+
   if (code) {
     let data = null
     try {
@@ -109,6 +110,7 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     } catch (e) {
       console.error(e)
     }
+
     if (!data) {
       try {
         const stats = await productivityStatsForCode(code, programmeStatsSince)
@@ -117,6 +119,7 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
         console.error(e)
       }
     }
+
     return res.json(data)
   } else {
     res.status(422).end()

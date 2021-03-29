@@ -122,7 +122,11 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
-        const startDate = snapshot.first_snapshot_date_time
+        let startDate = snapshot.first_snapshot_date_time
+        // fix for varhaiskasvatus, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
+        if ( snapshot.accepted_selection_path && snapshot.accepted_selection_path.educationPhase1GroupId ==='hy-DP-114256570') {
+          startDate = snapshot.valid.startDate
+        }
 
         const endDate =
           snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
