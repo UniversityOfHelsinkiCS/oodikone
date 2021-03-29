@@ -153,7 +153,7 @@ const SingleCourseStats = ({
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const progStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allstudents, attempts, coursecode }) => {
+      .map(({ code, name, students: allstudents, attempts, coursecode, obfuscated }) => {
         const cumulative = {
           grades: countFilteredStudents(attempts.grades, filter),
           categories: countFilteredStudents(attempts.classes, filter)
@@ -162,8 +162,9 @@ const SingleCourseStats = ({
           grades: countFilteredStudents(allstudents.grades, filter),
           categories: countFilteredStudents(allstudents.classes, filter)
         }
+
         const parsedName = separate ? getTextIn(name, language) : name
-        return { code, name: parsedName, cumulative, students, coursecode }
+        return { code, name: parsedName, cumulative, students, coursecode, obfuscated }
       })
 
     const totals = progStats.reduce(

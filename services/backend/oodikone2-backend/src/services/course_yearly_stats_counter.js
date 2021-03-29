@@ -196,6 +196,7 @@ class CourseYearlyStatsCounter {
         // totals cannot be calculated
         this.obfuscated = true
         const obfuscatedStats = {
+          obfuscated: true,
           code: rest.code,
           name: rest.name,
           coursecode: rest.coursecode,
