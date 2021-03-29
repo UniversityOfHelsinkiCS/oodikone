@@ -43,7 +43,8 @@ const SingleCourseStats = ({
   semesters,
   programmes,
   maxYearsToCreatePopulationFrom,
-  getMaxYearsToCreatePopulationFrom
+  getMaxYearsToCreatePopulationFrom,
+  userHasAccessToAllStats
 }) => {
   const { language } = useLanguage()
   const [primary, setPrimary] = useState([ALL.value])
@@ -355,44 +356,46 @@ const SingleCourseStats = ({
           )}
         </Form>
       </Segment>
-      <Segment>
-        <Form>
-          <Header as="h4">Filter statistics by study programmes</Header>
-          <Grid>
-            <Grid.Column width={8}>
-              <ProgrammeDropdown
-                name="primary"
-                options={options}
-                label="Primary group"
-                placeholder="Select study programmes"
-                value={primary}
-                onChange={handleSelect}
-              />
-            </Grid.Column>
-            <Grid.Column width={8}>
-              <ProgrammeDropdown
-                name="comparison"
-                options={comparisonProgrammes(options)}
-                label="Comparison group"
-                placeholder="Optional"
-                value={comparison}
-                onChange={handleSelect}
-              />
-            </Grid.Column>
-            <Grid.Column width={8} />
-            <Grid.Column width={8}>
-              <Form.Group>
-                <Form.Button
-                  content="Select excluded study programmes"
-                  onClick={setExcludedToComparison}
-                  disabled={primary.length === 1 && primary[0] === ALL.value}
+      {userHasAccessToAllStats &&
+        <Segment>
+          <Form>
+            <Header as="h4">Filter statistics by study programmes</Header>
+            <Grid>
+              <Grid.Column width={8}>
+                <ProgrammeDropdown
+                  name="primary"
+                  options={options}
+                  label="Primary group"
+                  placeholder="Select study programmes"
+                  value={primary}
+                  onChange={handleSelect}
                 />
-                <Form.Button content="Clear" onClick={clearComparison} />
-              </Form.Group>
-            </Grid.Column>
-          </Grid>
-        </Form>
-      </Segment>
+              </Grid.Column>
+              <Grid.Column width={8}>
+                <ProgrammeDropdown
+                  name="comparison"
+                  options={comparisonProgrammes(options)}
+                  label="Comparison group"
+                  placeholder="Optional"
+                  value={comparison}
+                  onChange={handleSelect}
+                />
+              </Grid.Column>
+              <Grid.Column width={8} />
+              <Grid.Column width={8}>
+                <Form.Group>
+                  <Form.Button
+                    content="Select excluded study programmes"
+                    onClick={setExcludedToComparison}
+                    disabled={primary.length === 1 && primary[0] === ALL.value}
+                  />
+                  <Form.Button content="Clear" onClick={clearComparison} />
+                </Form.Group>
+              </Grid.Column>
+            </Grid>
+          </Form>
+        </Segment>
+      }
       <ResultTabs separate={separate} primary={statistics.primary} comparison={statistics.comparison} />
     </div>
   )
