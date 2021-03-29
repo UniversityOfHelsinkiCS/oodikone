@@ -7,7 +7,7 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 import selectors from '../../../selectors/courseStats'
 import { getTextIn } from '../../../common'
 
-const SingleCourseTab = ({ selected, stats, courses }) => {
+const SingleCourseTab = ({ selected, stats, courses, userHasAccessToAllStats }) => {
   const [selection, setSelection] = useState(selected)
   const { language } = useLanguage()
 
@@ -44,7 +44,7 @@ const SingleCourseTab = ({ selected, stats, courses }) => {
           </Label.Group>
         </Form>
       </Segment>
-      {selection && <SingleCourseStats stats={stats[selection]} />}
+      {selection && <SingleCourseStats stats={stats[selection]} userHasAccessToAllStats={userHasAccessToAllStats}/>}
     </div>
   )
 }

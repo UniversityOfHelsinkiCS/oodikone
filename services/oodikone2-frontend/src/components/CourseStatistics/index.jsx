@@ -61,6 +61,8 @@ const CourseStatistics = props => {
     setSelected(coursecode)
   }
 
+  const userHasAccessToAllStats = userHasAccessToAllCourseStats(userRoles, rights)
+
   const getPanes = () => {
     let panes = [
       {
@@ -69,11 +71,11 @@ const CourseStatistics = props => {
       },
       {
         menuItem: MENU.COURSE,
-        render: () => <SingleCourseTab selected={selected || initCourseCode} />
+        render: () => <SingleCourseTab selected={selected || initCourseCode} userHasAccessToAllStats={userHasAccessToAllStats} />
       },
     ]
 
-    if (userHasAccessToAllCourseStats(userRoles, rights)) {
+    if (userHasAccessToAllStats) {
       panes = [...panes,
         {
           menuItem: MENU.FACULTY,
@@ -122,7 +124,13 @@ const CourseStatistics = props => {
 
   const getContent = () => {
     if ((statsIsEmpty && diffIsEmpty) || history.location.search === '') {
-      return <SearchForm onProgress={onProgress} showDiff={showDiff} setShowDiff={setShowDiff} />
+      return (
+        <SearchForm
+          onProgress={onProgress}
+          showDiff={showDiff}
+          setShowDiff={setShowDiff}
+        />
+      )
     }
     if (showDiff) {
       return <CourseDiff />
