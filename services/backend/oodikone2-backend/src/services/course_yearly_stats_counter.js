@@ -172,28 +172,14 @@ class CourseYearlyStatsCounter {
 
   parseProgrammeStatistics(anonymizationSalt) {
     if (anonymizationSalt) {
-      this.programmes = Object.values(this.programmes).map(({ students, passed, credits, name }) => {
-        let obfuscatedStudents = {}
-        let obfuscatedPassed = {}
-        let obfuscatedCredits = {}
-        for (const [yearcode, studentsOfTheYear] of Object.entries(students)) {
-          if (studentsOfTheYear.length < 6) {
-            obfuscatedStudents[yearcode] = -1
-            obfuscatedPassed[yearcode] = -1
-            obfuscatedCredits[yearcode] = -1
-          } else {
-            obfuscatedStudents[yearcode] = studentsOfTheYear
-            obfuscatedPassed[yearcode] = passed[yearcode]
-            obfuscatedCredits[yearcode] = credits[yearcode]
-          }
+      this.programmes = {
+        '000000': {
+          name: { en: '', fi: '', sv: ''},
+          credits: {},
+          passed: {},
+          students: {}
         }
-        return {
-          name,
-          credits: obfuscatedCredits,
-          passed: obfuscatedPassed,
-          students: obfuscatedStudents
-        }
-      })
+      }
     }
 
     return this.programmes
@@ -213,9 +199,19 @@ class CourseYearlyStatsCounter {
           code: rest.code,
           name: rest.name,
           coursecode: rest.coursecode,
-          attempts: -1,
+          attempts: {
+            classes: {
+              failed: [],
+              passed: []
+            },
+            grades: {},
+          },
           yearcode: rest.yearcode,
-          students: -1
+          students: {
+            classes: {},
+            grades: {},
+            studentnumbers: []
+          }
         }
         return obfuscatedStats
       }
@@ -227,23 +223,15 @@ class CourseYearlyStatsCounter {
 
   parseFacultyStatistics(anonymizationSalt) {
     if (anonymizationSalt) {
-      this.facultyStats = Object.values(this.facultyStats).map(({ allStudents, ...rest }) => {
-        const normalStats = {
-          ...rest,
-          allStudents
+      this.facultyStats = [
+        {
+          year: 'NA',
+          allCredits: 0,
+          allPassed: [],
+          allStudents: [],
+          faculties: {}
         }
-        if (allStudents.length < 6) {
-          const obfuscatedStats = {
-            year: rest.year,
-            allCredits: -1,
-            allPassed: -1,
-            allStudents: -1,
-            faculties: -1
-          }
-          return obfuscatedStats
-        }
-        return normalStats
-      })
+      ]
     }
     return this.facultyStats
   }
