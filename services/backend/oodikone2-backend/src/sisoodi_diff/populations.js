@@ -207,7 +207,7 @@ const populationDiff = async (programme, year) => {
     const remaining = _.difference(sisOnly, wronglySetCancel)
 
     printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
-    printWithReason(remaining, 'missing from sis for other reasons')
+    printWithReason(remaining, 'missing from oodi for other reasons')
   }
   console.log('') // adding newline before next programme / year
 }
