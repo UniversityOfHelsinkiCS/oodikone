@@ -12,8 +12,6 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
     switch (viewMode) {
       case viewModeNames.CUMULATIVE:
         return <CumulativeTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
-      case viewModeNames.STUDENT:
-        return <StudentTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
       case viewModeNames.GRADES:
         return (
           <GradesTable
@@ -24,6 +22,8 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
             isRelative={isRelative}
           />
         )
+      case viewModeNames.STUDENT:
+        return <StudentTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
       default:
         return null
     }
