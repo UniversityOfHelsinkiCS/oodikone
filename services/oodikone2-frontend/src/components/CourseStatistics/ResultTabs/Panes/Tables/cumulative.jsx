@@ -56,17 +56,17 @@ const CumulativeTable = ({ stats, name, alternatives, separate }) => {
             getRowVal: s => Object.values(s.students.grades).reduce((a, b) => a + b, 0),
             cellProps: { width: 4 }
           },
-          { key: 'FAILED', title: 'Failed', getRowVal: s => s.cumulative.categories.failed, cellProps: { width: 4 } },
+          {
+            key: 'FAILED',
+            title: 'Failed',
+            getRowVal: s => s.cumulative.categories.failed,
+            cellProps: { width: 4 }
+          },
           {
             key: 'PASSRATE',
             title: 'Pass rate',
-            getRowVal: s =>
-              s.cumulative.categories.passed / (s.cumulative.categories.failed + s.cumulative.categories.passed),
-            getRowContent: stat =>
-              `${Number(
-                (100 * stat.cumulative.categories.passed) /
-                  (stat.cumulative.categories.failed + stat.cumulative.categories.passed) || 0
-              ).toFixed(2)} %`,
+            getRowVal: s => s.cumulative.categories.passRate,
+            getRowContent: s => `${Number(s.cumulative.categories.passRate || 0).toFixed(2)} %`,
             cellProps: { width: 4 }
           }
         ]}
