@@ -154,7 +154,7 @@ const SingleCourseStats = ({
     const progStats = statistics
       .filter(isStatInYearRange)
       .map(({ code, name, students: allstudents, attempts, coursecode, obfuscated }) => {
-        const cumulative = {
+        let cumulative = {
           grades: countFilteredStudents(attempts.grades, filter),
           categories: countFilteredStudents(attempts.classes, filter)
         }
@@ -162,12 +162,14 @@ const SingleCourseStats = ({
           grades: countFilteredStudents(allstudents.grades, filter),
           categories: countFilteredStudents(allstudents.classes, filter)
         }
+        const { failed, passed } = cumulative.categories
+        cumulative.categories.passRate = (100 * passed) / (passed + failed)
 
         const parsedName = separate ? getTextIn(name, language) : name
         return { code, name: parsedName, cumulative, students, coursecode, obfuscated }
       })
 
-    const totals = progStats.reduce(
+    let totals = progStats.reduce(
       (acc, curr) => {
         const passed = acc.cumulative.categories.passed + curr.cumulative.categories.passed
         const failed = acc.cumulative.categories.failed + curr.cumulative.categories.failed
@@ -207,7 +209,8 @@ const SingleCourseStats = ({
         cumulative: {
           categories: {
             passed: 0,
-            failed: 0
+            failed: 0,
+            passrate: 0,
           },
           grades: {}
         },
@@ -220,6 +223,10 @@ const SingleCourseStats = ({
         }
       }
     )
+
+    const { failed, passed } = totals.cumulative.categories
+    totals.cumulative.categories.passRate = (100 * passed) / (passed + failed)
+
     return {
       codes: progCodes.concat,
       name,
