@@ -23,7 +23,7 @@ const appendData = msg => {
 }
 
 const output = (msg, type = 'message') => {
-  if (type === 'code' && fileOutputMode) {
+  if (type === 'code') {
     appendData(msg)
     return
   }
