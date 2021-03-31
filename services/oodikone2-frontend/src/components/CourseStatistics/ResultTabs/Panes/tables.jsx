@@ -9,9 +9,18 @@ import GradesTable from './Tables/grades'
 
 const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelative }) => {
   const getViewMode = (name, stats) => {
+    const populationsShouldBeVisible = stats[0].userHasAccessToAllData
     switch (viewMode) {
       case viewModeNames.CUMULATIVE:
-        return <CumulativeTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
+        return (
+          <CumulativeTable
+            separate={separate}
+            name={name}
+            stats={stats}
+            alternatives={alternatives}
+            populationsShouldBeVisible={populationsShouldBeVisible}
+          />
+        ) 
       case viewModeNames.GRADES:
         return (
           <GradesTable
@@ -20,10 +29,20 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
             stats={stats}
             alternatives={alternatives}
             isRelative={isRelative}
+            populationsShouldBeVisible={populationsShouldBeVisible}
+
           />
         )
       case viewModeNames.STUDENT:
-        return <StudentTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
+        return (
+          <StudentTable
+            separate={separate}
+            name={name}
+            stats={stats}
+            alternatives={alternatives}
+            populationsShouldBeVisible={populationsShouldBeVisible}
+          />
+        )
       default:
         return null
     }

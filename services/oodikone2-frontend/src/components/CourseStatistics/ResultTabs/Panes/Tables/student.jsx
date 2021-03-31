@@ -10,7 +10,7 @@ import { defineCellColor } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, alternatives, separate }) => {
+const StudentTable = ({ stats, name, alternatives, separate, populationsShouldBeVisible }) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -40,7 +40,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
             getRowContent: s => (
               <div>
                 {s.name}
-                {s.name !== 'Total' ? (
+                {(s.name !== 'Total' && populationsShouldBeVisible) ? (
                   <Item as={Link} to={showPopulation(s.code, s.name, s)}>
                     <Icon name="level up alternate" />
                   </Item>
@@ -53,7 +53,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
           {
             key: 'TOTAL',
             title: 'Students',
-            getRowVal: s => s.obfuscated ? '5 or less students' : s.students.total,
+            getRowVal: s => s.rowObfuscated ? '5 or less students' : s.students.total,
             getCellProps: s => defineCellColor(s),
             headerProps: { rowSpan: 2, width: 3 }
           },
@@ -66,7 +66,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
           {
             key: 'PASS_FIRST',
             title: 'first try',
-            getRowVal: s => s.obfuscated ? 'NA' : s.students.categories.passedFirst || 0,
+            getRowVal: s => s.rowObfuscated ? 'NA' : s.students.categories.passedFirst || 0,
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
@@ -74,7 +74,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
           {
             key: 'PASS_RETRY',
             title: 'after retry',
-            getRowVal: s => s.obfuscated ? 'NA' : s.students.categories.passedRetry || 0,
+            getRowVal: s => s.rowObfuscated ? 'NA' : s.students.categories.passedRetry || 0,
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
@@ -82,8 +82,8 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
           {
             key: 'PASS_RATE',
             title: 'percentage',
-            getRowVal: s => s.obfuscated ? 'NA' : s.students.passRate,
-            getRowContent: s => s.obfuscated ? 'NA' : formatPercentage(s.students.passRate),
+            getRowVal: s => s.rowObfuscated ? 'NA' : s.students.passRate,
+            getRowContent: s => s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
             child: true
@@ -97,7 +97,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
           {
             key: 'FAIL_FIRST',
             title: 'first try',
-            getRowVal: s => s.obfuscated ? 'NA' : s.students.categories.failedFirst || 0,
+            getRowVal: s => s.rowObfuscated ? 'NA' : s.students.categories.failedFirst || 0,
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
@@ -105,7 +105,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
           {
             key: 'FAIL_RETRY',
             title: 'after retry',
-            getRowVal: s => s.obfuscated ? 'NA' : s.students.categories.failedRetry || 0,
+            getRowVal: s => s.rowObfuscated ? 'NA' : s.students.categories.failedRetry || 0,
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
@@ -113,8 +113,8 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
           {
             key: 'FAIL_RATE',
             title: 'percentage',
-            getRowVal: s => s.obfuscated ? 'NA': s.students.failRate,
-            getRowContent: s => s.obfuscated ? 'NA' : formatPercentage(s.students.failRate),
+            getRowVal: s => s.rowObfuscated ? 'NA': s.students.failRate,
+            getRowContent: s => s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
             child: true
@@ -130,7 +130,8 @@ StudentTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
   alternatives: arrayOf(string).isRequired,
-  separate: bool
+  separate: bool,
+  populationsShouldBeVisible: bool,
 }
 
 StudentTable.defaultProps = {
