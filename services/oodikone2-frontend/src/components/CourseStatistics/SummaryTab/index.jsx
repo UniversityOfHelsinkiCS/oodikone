@@ -27,7 +27,7 @@ const unObjectifyProperty = ({ obj, property }) => {
   return { ...obj, [property]: suspectField }
 }
 
-const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClickCourse }) => {
+const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClickCourse, userHasAccessToAllStats }) => {
   const { language } = useLanguage()
   const handleChange = (e, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
@@ -62,14 +62,18 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
     <div>
       <Segment>
         <Form>
-          <Header as="h4">Filter statistics by study programmes</Header>
-          <ProgrammeDropdown
-            options={options}
-            label="Study programmes:"
-            name={fields.programmes}
-            onChange={handleChange}
-            value={form[fields.programmes]}
-          />
+          {userHasAccessToAllStats &&
+            <>
+              <Header as="h4">Filter statistics by study programmes</Header>
+              <ProgrammeDropdown
+                options={options}
+                label="Study programmes:"
+                name={fields.programmes}
+                onChange={handleChange}
+                value={form[fields.programmes]}
+              />
+            </>
+          }
           <Form.Field>
             <label>Timeframe:</label>
             <Label.Group>
