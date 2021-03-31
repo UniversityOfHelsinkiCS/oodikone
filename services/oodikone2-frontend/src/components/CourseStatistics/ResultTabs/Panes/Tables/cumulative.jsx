@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { uniq } from 'lodash'
 import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
+import { defineCellColor } from '../util'
 
 const CumulativeTable = ({ stats, name, alternatives, separate }) => {
   const showPopulation = (yearcode, years) => {
@@ -47,7 +48,7 @@ const CumulativeTable = ({ stats, name, alternatives, separate }) => {
               ) : (
                 <div>{s.name}</div>
               ),
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },
           {
@@ -55,14 +56,14 @@ const CumulativeTable = ({ stats, name, alternatives, separate }) => {
             title: 'Passed',
             // Backend returns duplicates in `s.cumulative` -> use `s.students`.
             getRowVal: s => s.obfuscated ? '5 or less students' : Object.values(s.students.grades).reduce((a, b) => a + b, 0),
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },
           {
             key: 'FAILED',
             title: 'Failed',
             getRowVal: s => s.obfuscated ? '5 or less students': s.cumulative.categories.failed,
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },
           {
@@ -70,7 +71,7 @@ const CumulativeTable = ({ stats, name, alternatives, separate }) => {
             title: 'Pass rate',
             getRowVal: s => s.obfuscated ? 'NA' : s.cumulative.passRate,
             getRowContent: s => s.obfuscated ? 'NA' : `${Number(s.cumulative.passRate || 0).toFixed(2)} %`,
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           }
         ]}

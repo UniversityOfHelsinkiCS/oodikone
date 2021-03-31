@@ -6,14 +6,20 @@ import { connect } from 'react-redux'
 import { Header, Icon, Item } from 'semantic-ui-react'
 import { uniq } from 'lodash'
 import SortableTable from '../../../../SortableTable'
-import { getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
+import {
+  defineCellColor,
+  getGradeSpread,
+  getThesisGradeSpread,
+  isThesisGrades,
+  THESIS_GRADE_KEYS
+} from '../util'
 
 const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
   key,
   title,
   getRowVal,
   getRowContent,
-  getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+  getCellProps: s => defineCellColor(s),
 })
 
 const getTableData = (stats, notThesisGrades, isRelative) =>

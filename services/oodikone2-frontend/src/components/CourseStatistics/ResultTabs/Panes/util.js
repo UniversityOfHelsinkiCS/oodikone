@@ -120,3 +120,7 @@ export const getGradeSpread = (series, isRelative) => {
 
   return isRelative ? relative : newSeries
 }
+
+export const defineCellColor = (s) => {
+  return s.obfuscated && { style: { color: 'gray' } }
+}
