@@ -67,7 +67,7 @@ const CourseStatistics = props => {
     let panes = [
       {
         menuItem: MENU.SUM,
-        render: () => <SummaryTab onClickCourse={switchToCourse} />
+        render: () => <SummaryTab onClickCourse={switchToCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
       },
       {
         menuItem: MENU.COURSE,
