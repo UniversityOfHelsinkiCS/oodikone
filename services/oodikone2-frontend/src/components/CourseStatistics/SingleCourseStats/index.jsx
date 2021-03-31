@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
-import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-types'
+import { shape, string, arrayOf, objectOf, oneOfType, number, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { difference, min, max, flatten, pickBy, uniq } from 'lodash'
@@ -190,19 +190,27 @@ const SingleCourseStats = ({
       .filter(isStatInYearRange)
       .map(({ code, name, students: allstudents, attempts, coursecode, obfuscated }) => {
 
-        const cumulative = countCumulativeStats(attempts, filter, obfuscated)
-        const students = countStudentStats(allstudents, filter, obfuscated)
+        const cumulative = countCumulativeStats(attempts, filter)
+        const students = countStudentStats(allstudents, filter)
 
         const parsedName = separate ? getTextIn(name, language) : name
-        return { code, name: parsedName, cumulative, students, coursecode, obfuscated }
+        return {
+          code,
+          name: parsedName,
+          cumulative,
+          students,
+          coursecode,
+          rowObfuscated: obfuscated,
+          userHasAccessToAllStats
+        }
       })
 
     let totals = progStats.reduce(
       (acc, curr) => {
-        if (curr.obfuscated) {
+        if (curr.rowObfuscated) {
           return acc
         } 
-        const passed = acc.cumulative.categories.passed + Object.values(curr.students.grades).reduce((a, b) => a + b, 0)
+        const passed = acc.cumulative.categories.passed + curr.cumulative.categories.passed
         const failed = acc.cumulative.categories.failed + curr.cumulative.categories.failed
         const cgrades = acc.cumulative.grades
 
@@ -272,6 +280,7 @@ const SingleCourseStats = ({
       codes: progCodes.concat,
       name,
       stats: progStats.concat(totals),
+      userHasAccessToAllStats,
       totals
     }
   }
@@ -485,7 +494,8 @@ SingleCourseStats.propTypes = {
     push: func
   }).isRequired,
   getMaxYearsToCreatePopulationFrom: func.isRequired,
-  maxYearsToCreatePopulationFrom: number.isRequired
+  maxYearsToCreatePopulationFrom: number.isRequired,
+  userHasAccessToAllStats: bool,
 }
 
 const mapStateToProps = state => {

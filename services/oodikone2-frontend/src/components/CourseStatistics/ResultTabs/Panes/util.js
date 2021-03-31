@@ -122,5 +122,5 @@ export const getGradeSpread = (series, isRelative) => {
 }
 
 export const defineCellColor = (s) => {
-  return s.obfuscated && { style: { color: 'gray' } }
+  return s.rowObfuscated && { style: { color: 'gray' } }
 }
