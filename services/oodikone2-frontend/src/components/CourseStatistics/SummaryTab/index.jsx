@@ -9,6 +9,7 @@ import CumulativeTable from '../CumulativeTable'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import { getTextIn } from '../../../common'
+import { userHasAccessToAllCourseStats } from '../courseStatisticsUtils'
 
 // Certified JavaScript moment but basically this was crashing
 // since sometimes object like {en: ..., fi: ...., sv: ....}
@@ -113,11 +114,14 @@ SummaryTab.propTypes = {
 }
 
 const mapStateToProps = state => {
+  const roles = state.auth.token.roles
+  const rights = state.auth.token.rights
+  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, rights)
   const programmes = selectors.getAllStudyProgrammes(state)
   const programmeCodes = state.courseSummaryForm[fields.programmes]
   return {
     form: state.courseSummaryForm,
-    statistics: selectors.summaryStatistics(state, { programmes, programmeCodes }),
+    statistics: selectors.summaryStatistics(state, { programmes, programmeCodes }, userHasAccessToAllStats),
     queryInfo: selectors.getQueryInfo(state),
     programmes
   }
