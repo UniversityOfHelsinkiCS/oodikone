@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { uniq } from 'lodash'
 import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
+import { defineCellColor } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
@@ -46,14 +47,14 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
                 ) : null}
               </div>
             ),
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             headerProps: { rowSpan: 2, width: 3 }
           },
           {
             key: 'TOTAL',
             title: 'Students',
             getRowVal: s => s.obfuscated ? '5 or less students' : s.students.total,
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             headerProps: { rowSpan: 2, width: 3 }
           },
           {
@@ -66,7 +67,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
             key: 'PASS_FIRST',
             title: 'first try',
             getRowVal: s => s.obfuscated ? 'NA' : s.students.categories.passedFirst || 0,
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
           },
@@ -74,7 +75,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
             key: 'PASS_RETRY',
             title: 'after retry',
             getRowVal: s => s.obfuscated ? 'NA' : s.students.categories.passedRetry || 0,
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
           },
@@ -83,7 +84,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
             title: 'percentage',
             getRowVal: s => s.obfuscated ? 'NA' : s.students.passRate,
             getRowContent: s => s.obfuscated ? 'NA' : formatPercentage(s.students.passRate),
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
             child: true
           },
@@ -97,7 +98,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
             key: 'FAIL_FIRST',
             title: 'first try',
             getRowVal: s => s.obfuscated ? 'NA' : s.students.categories.failedFirst || 0,
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
           },
@@ -105,7 +106,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
             key: 'FAIL_RETRY',
             title: 'after retry',
             getRowVal: s => s.obfuscated ? 'NA' : s.students.categories.failedRetry || 0,
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
           },
@@ -114,7 +115,7 @@ const StudentTable = ({ stats, name, alternatives, separate }) => {
             title: 'percentage',
             getRowVal: s => s.obfuscated ? 'NA': s.students.failRate,
             getRowContent: s => s.obfuscated ? 'NA' : formatPercentage(s.students.failRate),
-            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
+            getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
             child: true
           }
