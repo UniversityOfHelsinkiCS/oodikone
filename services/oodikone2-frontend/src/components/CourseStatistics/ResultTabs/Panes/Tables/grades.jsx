@@ -12,10 +12,11 @@ const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
   key,
   title,
   getRowVal,
-  getRowContent
+  getRowContent,
+  getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
 })
 
-const getTableData = (stats, isGradeSeries, isRelative) =>
+const getTableData = (stats, notThesisGrades, isRelative) =>
   stats.map(stat => {
     const {
       name,
@@ -25,32 +26,15 @@ const getTableData = (stats, isGradeSeries, isRelative) =>
       obfuscated
     } = stat
 
-    if (obfuscated) {
-      return {
-        name,
-        code,
-        coursecode,
-        attempts: '5 or less students',
-        0: ['NA'],
-        1: ['NA'],
-        2: ['NA'],
-        3: ['NA'],
-        4: ['NA'],
-        5: ['NA'],
-        HT: ['NA'],
-        TT: ['NA'],
-        'Hyv.': ['NA']
-      }
-    }
-
     const attempts = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
-    const gradeSpread = isGradeSeries ? getGradeSpread([grades], isRelative) : getThesisGradeSpread([grades], isRelative)
+    const gradeSpread = notThesisGrades ? getGradeSpread([grades], isRelative) : getThesisGradeSpread([grades], isRelative)
 
     return {
       name,
       code,
       coursecode,
       attempts,
+      obfuscated,
       ...gradeSpread
     }
   })
@@ -58,19 +42,19 @@ const getTableData = (stats, isGradeSeries, isRelative) =>
 const includesHTOrTT = stats =>
   stats.some(({ cumulative }) => ['HT', 'TT'].some(grade => Object.keys(cumulative.grades).includes(grade)))
 
-const getGradeColumns = (isGradeSeries, addHTAndTT) => {
-  if (!isGradeSeries) return THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
+const getGradeColumns = (notThesisGrades, addHTAndTT) => {
+  if (!notThesisGrades) return THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s.obfuscated ? 'NA' : s[k]))
   const columns = [
-    getSortableColumn('0', '0', s => s['0']),
-    getSortableColumn('1', '1', s => s['1']),
-    getSortableColumn('2', '2', s => s['2']),
-    getSortableColumn('3', '3', s => s['3']),
-    getSortableColumn('4', '4', s => s['4']),
-    getSortableColumn('5', '5', s => s['5']),
-    getSortableColumn('OTHER_PASSED', 'Other passed', s => s['Hyv.'])
+    getSortableColumn('0', '0', s => s.obfuscated ? 'NA' : s['0']),
+    getSortableColumn('1', '1', s => s.obfuscated ? 'NA' : s['1']),
+    getSortableColumn('2', '2', s => s.obfuscated ? 'NA' : s['2']),
+    getSortableColumn('3', '3', s => s.obfuscated ? 'NA' : s['3']),
+    getSortableColumn('4', '4', s => s.obfuscated ? 'NA' : s['4']),
+    getSortableColumn('5', '5', s => s.obfuscated ? 'NA' : s['5']),
+    getSortableColumn('OTHER_PASSED', 'Other passed', s => s.obfuscated ? 'NA' : s['Hyv.'])
   ]
   if (addHTAndTT)
-    columns.splice(6, 0, getSortableColumn('HT', 'HT', s => s.HT), getSortableColumn('TT', 'TT', s => s.TT))
+    columns.splice(6, 0, getSortableColumn('HT', 'HT', s => s.obfuscated ? 'NA' : s.HT), getSortableColumn('TT', 'TT', s => s.obfuscated ? 'NA' : s.TT))
   return columns
 }
 
@@ -78,7 +62,7 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
   const {
     cumulative: { grades }
   } = stats[0]
-  const isGradeSeries = !isThesisGrades(grades)
+  const notThesisGrades = !isThesisGrades(grades)
 
   const showPopulation = (yearcode, years) => {
     const queryObject = {
@@ -108,11 +92,11 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
         </div>
       )
     ),
-    getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
-    ...getGradeColumns(isGradeSeries, includesHTOrTT(stats))
+    getSortableColumn('ATTEMPTS', 'Attempts', s => s.obfuscated ? '5 or less students' : s.attempts),
+    ...getGradeColumns(notThesisGrades, includesHTOrTT(stats))
   ]
 
-  const data = getTableData(stats, isGradeSeries, isRelative)
+  const data = getTableData(stats, notThesisGrades, isRelative)
 
   return (
     <div>
