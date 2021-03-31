@@ -131,7 +131,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           }
         }
 
-
         const endDate =
           snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
             ? snapshot.study_right_graduation.phase1GraduationDate

@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { reformatDate } from '../../../common'
 import { studentDetailsType } from '../../../constants/types'
-import { DISPLAY_DATE_FORMAT } from '../../../constants'
+import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants'
 import './studentInfoCard.css'
 import { removeStudentSelection, resetStudent } from '../../../redux/students'
 import { updatePopulationStudents } from '../../../redux/populations'
@@ -19,6 +19,11 @@ const StudentInfoCard = props => {
     props.resetStudent()
     props.removeStudentSelection()
   }
+
+  const formattedTimestamp = reformatDate(
+    student.updatedAt,
+    props.has_dev_role ? DISPLAY_DATE_FORMAT_DEV : DISPLAY_DATE_FORMAT
+  )
 
   return (
     <Card fluid>
@@ -36,7 +41,7 @@ const StudentInfoCard = props => {
         </Card.Meta>
         <Card.Description>
           {`Credits: ${student.credits || 0}`}
-          <p style={{ fontSize: 14 }}>{`Updated at ${reformatDate(student.updatedAt, DISPLAY_DATE_FORMAT)}`}</p>
+          <p style={{ fontSize: 14 }}>{`Updated at ${formattedTimestamp}`}</p>
         </Card.Description>
         <div style={{ paddingTop: '4px' }}>
           <Button
@@ -62,12 +67,14 @@ StudentInfoCard.propTypes = {
   resetStudent: func.isRequired,
   history: shape({}).isRequired,
   updating: bool.isRequired,
-  updatePopulationStudents: func.isRequired
+  updatePopulationStudents: func.isRequired,
+  has_dev_role: bool.isRequired
 }
 
 const mapStateToProps = state => ({
   showName: state.settings.namesVisible,
-  updating: state.populations.updating
+  updating: state.populations.updating,
+  has_dev_role: state.auth.token.roles.find(r => r.group_code === 'dev') !== undefined
 })
 
 export default withRouter(

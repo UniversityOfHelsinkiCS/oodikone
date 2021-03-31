@@ -32,11 +32,6 @@ const ignores = {
       sis: ['015340182'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
     }
   },
-  KH40_004: {
-    2017: {
-      oodi: ['011531500'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
-  },
   KH40_005: {
     2018: {
       sis: ['014650093'] // on tosiaan vähän ristiriitaiset tiedot Oodissa. Sisussa näkyy kuitenkin ok, niin että annetaan olla
@@ -53,8 +48,8 @@ const ignores = {
     }
   },
   KH57_002: {
-    '2017': {
-      'oodi': ['014818220'] // graduation missing in sis-oodikone due to sis prblm https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    2017: {
+      oodi: ['014818220'] // graduation missing in sis-oodikone due to sis prblm https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
     }
   },
   KH90_001: {
@@ -70,6 +65,46 @@ const ignores = {
   KH57_001: {
     2018: {
       sis: ['013296128'] // leagally missing... do not remember why
+    }
+  },
+  KH60_001: {
+    2017: {
+      oodi: [ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+        '013299358',
+        '014720169',
+        '014711262',
+        '014721825',
+        '014528934',
+        '014659133'
+      ]
+    },
+    2018:{ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+      oodi: [
+        '014726105',
+        '014708699',
+        '014732623',
+        '014728983',
+        '014323074',
+        '014624977',
+      ]
+    },
+    2019:{ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+      oodi: [
+        '014366086',
+        '014731909',
+        '014734511',
+      ]
+    },
+    2020:{ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+      oodi: [
+        '013466013',
+        '014590027',
+        '014340963',
+        '014179998',
+        '013743299',
+        '013758239',
+        '014590807',
+      ]
     }
   },
   // there are many inconsistencies in masters, so they're grouped by the reason, not

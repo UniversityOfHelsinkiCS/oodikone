@@ -59,6 +59,7 @@ export const AVAILABLE_LANGUAGES = [{ name: 'fi', code: 'fi' }, { name: 'en', co
 export const DEFAULT_LANG = 'fi'
 
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
+export const DISPLAY_DATE_FORMAT_DEV = 'DD.MM.YYYY HH:mm:ss'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
 export const passRateCumGraphOptions = (categories, max, title, skipFirstColor) => ({
