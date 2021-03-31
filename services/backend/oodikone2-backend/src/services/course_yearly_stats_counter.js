@@ -174,7 +174,7 @@ class CourseYearlyStatsCounter {
     if (anonymizationSalt) {
       this.programmes = {
         '000000': {
-          name: { en: '', fi: '', sv: ''},
+          name: { en: '', fi: '', sv: '' },
           credits: {},
           passed: {},
           students: {}
@@ -195,6 +195,11 @@ class CourseYearlyStatsCounter {
         // indicate to the front that some of the data has been obfuscated and therefore 
         // totals cannot be calculated
         this.obfuscated = true
+        let gradeSpread = {}
+        for (const grade in normalStats.students.grades) {
+          gradeSpread[grade] = []
+        }
+
         const obfuscatedStats = {
           obfuscated: true,
           code: rest.code,
@@ -205,12 +210,17 @@ class CourseYearlyStatsCounter {
               failed: [],
               passed: []
             },
-            grades: {},
+            grades: gradeSpread,
           },
           yearcode: rest.yearcode,
           students: {
-            classes: {},
-            grades: {},
+            classes: {
+              failedFirst: [],
+              failedRetry: [],
+              passedFirst: [],
+              passedRetry: []
+            },
+            grades: gradeSpread,
             studentnumbers: []
           }
         }

@@ -47,26 +47,30 @@ const CumulativeTable = ({ stats, name, alternatives, separate }) => {
               ) : (
                 <div>{s.name}</div>
               ),
+            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
             cellProps: { width: 4 }
           },
           {
             key: 'PASSED',
             title: 'Passed',
             // Backend returns duplicates in `s.cumulative` -> use `s.students`.
-            getRowVal: s => Object.values(s.students.grades).reduce((a, b) => a + b, 0),
+            getRowVal: s => s.obfuscated ? '5 or less students' : Object.values(s.students.grades).reduce((a, b) => a + b, 0),
+            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
             cellProps: { width: 4 }
           },
           {
             key: 'FAILED',
             title: 'Failed',
-            getRowVal: s => s.cumulative.categories.failed,
+            getRowVal: s => s.obfuscated ? '5 or less students': s.cumulative.categories.failed,
+            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
             cellProps: { width: 4 }
           },
           {
             key: 'PASSRATE',
             title: 'Pass rate',
-            getRowVal: s => s.cumulative.categories.passRate,
-            getRowContent: s => `${Number(s.cumulative.categories.passRate || 0).toFixed(2)} %`,
+            getRowVal: s => s.obfuscated ? 'NA' : s.cumulative.passRate,
+            getRowContent: s => s.obfuscated ? 'NA' : `${Number(s.cumulative.passRate || 0).toFixed(2)} %`,
+            getCellProps: s => s.obfuscated && { style: { color: 'gray' } },
             cellProps: { width: 4 }
           }
         ]}

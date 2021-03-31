@@ -22,7 +22,7 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 const ANALYTICS_CATEGORY = 'Course Statistics'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
-const countFilteredStudents = (stat, filter) =>
+const countFilteredStudents = (stat, filter) => (
   Object.entries(stat).reduce((acc, entry) => {
     const [category, students] = entry
     return {
@@ -30,6 +30,7 @@ const countFilteredStudents = (stat, filter) =>
       [category]: students.filter(filter).length
     }
   }, {})
+)
 
 const SingleCourseStats = ({
   stats,
@@ -148,22 +149,49 @@ const SingleCourseStats = ({
       : filteredYears.find(year => year.text === name)
   }
 
+  const countCumulativeStats = (attempts, filter) => {
+    // Count the stats for the Cumulative- and Grades-tab
+    // Also used in Pass rate chart and Grade distirbution chart
+    const grades = countFilteredStudents(attempts.grades, filter)
+    const categories = countFilteredStudents(attempts.classes, filter)
+
+    const { failed, passed } = categories
+    const passRate = (100 * passed) / (passed + failed)
+
+    return {
+      grades,
+      categories,
+      passRate
+    }
+  }
+
+  const countStudentStats = (allstudents, filter) => {
+    const grades = countFilteredStudents(allstudents.grades, filter)
+    const categories = countFilteredStudents(allstudents.classes, filter)
+  
+    const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = categories
+    const total = passedFirst + passedRetry + failedFirst + failedRetry
+    const passRate = (passedFirst + passedRetry) / total
+    const failRate = (failedFirst + failedRetry) / total
+
+    return {
+      grades,
+      categories,
+      passRate,
+      failRate,
+      total
+    }
+  } 
+
   const statsForProgrammes = (progCodes, name) => {
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const progStats = statistics
       .filter(isStatInYearRange)
       .map(({ code, name, students: allstudents, attempts, coursecode, obfuscated }) => {
-        let cumulative = {
-          grades: countFilteredStudents(attempts.grades, filter),
-          categories: countFilteredStudents(attempts.classes, filter)
-        }
-        const students = {
-          grades: countFilteredStudents(allstudents.grades, filter),
-          categories: countFilteredStudents(allstudents.classes, filter)
-        }
-        const { failed, passed } = cumulative.categories
-        cumulative.categories.passRate = (100 * passed) / (passed + failed)
+
+        const cumulative = countCumulativeStats(attempts, filter, obfuscated)
+        const students = countStudentStats(allstudents, filter, obfuscated)
 
         const parsedName = separate ? getTextIn(name, language) : name
         return { code, name: parsedName, cumulative, students, coursecode, obfuscated }
@@ -171,7 +199,10 @@ const SingleCourseStats = ({
 
     let totals = progStats.reduce(
       (acc, curr) => {
-        const passed = acc.cumulative.categories.passed + curr.cumulative.categories.passed
+        if (curr.obfuscated) {
+          return acc
+        } 
+        const passed = acc.cumulative.categories.passed + Object.values(curr.students.grades).reduce((a, b) => a + b, 0)
         const failed = acc.cumulative.categories.failed + curr.cumulative.categories.failed
         const cgrades = acc.cumulative.grades
 
@@ -210,22 +241,32 @@ const SingleCourseStats = ({
           categories: {
             passed: 0,
             failed: 0,
-            passrate: 0,
           },
-          grades: {}
+          passRate: 0,
+          grades: {},
         },
         students: {
           categories: {
             passedFirst: 0,
             failedFirst: 0
           },
-          grades: {}
+          grades: {},
+          total: 0,
+          passRate: 0,
+          failRate: 0
         }
       }
     )
 
+    // Count pass- and failrates also for "Total"-lines
+    const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = totals.students.categories
+    const total = passedFirst + passedRetry + failedFirst + failedRetry
+    totals.students.total = total
+    totals.students.passRate = (passedFirst + passedRetry) / total
+    totals.students.failRate = (failedFirst + failedRetry) / total
+
     const { failed, passed } = totals.cumulative.categories
-    totals.cumulative.categories.passRate = (100 * passed) / (passed + failed)
+    totals.cumulative.passRate = (100 * passed) / (passed + failed)
 
     return {
       codes: progCodes.concat,
