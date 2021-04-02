@@ -9,7 +9,7 @@ import GradesTable from './Tables/grades'
 
 const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelative }) => {
   const getViewMode = (name, stats) => {
-    const populationsShouldBeVisible = stats[0].userHasAccessToAllData
+    const populationsShouldBeVisible = stats[0].userHasAccessToAllStats
     switch (viewMode) {
       case viewModeNames.CUMULATIVE:
         return (

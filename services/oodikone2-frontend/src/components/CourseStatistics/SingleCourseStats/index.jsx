@@ -243,6 +243,7 @@ const SingleCourseStats = ({
         code: 9999,
         name: 'Total',
         coursecode: '000',
+        userHasAccessToAllStats,
         cumulative: {
           categories: {
             passed: 0,
