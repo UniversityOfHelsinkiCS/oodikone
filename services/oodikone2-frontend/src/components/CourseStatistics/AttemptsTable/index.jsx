@@ -18,7 +18,7 @@ const getHeader = categoryName => {
   )
 }
 
-const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
+const AttemptsTable = ({ categoryName, data, onClickCourse }) => (
   <Table style={{ cursor: 'pointer' }} selectable className="fixed-header">
     {getHeader(categoryName)}
     <Table.Body>
@@ -29,10 +29,10 @@ const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
   </Table>
 )
 
-CumulativeTable.propTypes = {
+AttemptsTable.propTypes = {
   categoryName: string.isRequired,
   data: arrayOf(courseDataWithRealisationsType).isRequired,
   onClickCourse: func.isRequired
 }
 
-export default CumulativeTable
+export default AttemptsTable

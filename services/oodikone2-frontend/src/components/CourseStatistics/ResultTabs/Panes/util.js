@@ -1,7 +1,7 @@
 import { arrayOf, number, oneOfType, shape, string, oneOf } from 'prop-types'
 
 export const viewModeNames = {
-  CUMULATIVE: 'Cumulative',
+  ATTEMPTS: 'Attempts',
   GRADES: 'Grades',
   STUDENT: 'Student'
 }

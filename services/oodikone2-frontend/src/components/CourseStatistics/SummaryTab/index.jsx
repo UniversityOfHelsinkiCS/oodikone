@@ -5,7 +5,7 @@ import { shape, arrayOf, func, oneOfType, number, string, bool } from 'prop-type
 import { flatten } from 'lodash'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import { fields, setValue } from '../../../redux/coursesSummaryForm'
-import CumulativeTable from '../CumulativeTable'
+import AttemptsTable from '../AttemptsTable'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import { getTextIn } from '../../../common'
@@ -86,7 +86,7 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
           </Form.Field>
         </Form>
       </Segment>
-      {<CumulativeTable categoryName="Course" onClickCourse={onClickCourse} data={data} />}
+      {<AttemptsTable categoryName="Course" onClickCourse={onClickCourse} data={data} />}
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 import { defineCellColor } from '../util'
 
-const CumulativeTable = ({ stats, name, alternatives, separate, populationsShouldBeVisible }) => {
+const AttemptsTable = ({ stats, name, alternatives, separate, populationsShouldBeVisible }) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -54,7 +54,7 @@ const CumulativeTable = ({ stats, name, alternatives, separate, populationsShoul
           {
             key: 'PASSED',
             title: 'Passed',
-            // Backend returns duplicates in `s.cumulative` -> use `s.students`.
+            // Backend returns duplicates in `s.attempts` -> use `s.students`.
             getRowVal: s =>
               s.rowObfuscated ? '5 or less students' : Object.values(s.students.grades).reduce((a, b) => a + b, 0),
             getCellProps: s => defineCellColor(s),
@@ -63,15 +63,15 @@ const CumulativeTable = ({ stats, name, alternatives, separate, populationsShoul
           {
             key: 'FAILED',
             title: 'Failed',
-            getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.cumulative.categories.failed),
+            getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts.categories.failed),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },
           {
             key: 'PASSRATE',
             title: 'Pass rate',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.cumulative.passRate),
-            getRowContent: s => (s.rowObfuscated ? 'NA' : `${Number(s.cumulative.passRate || 0).toFixed(2)} %`),
+            getRowVal: s => (s.rowObfuscated ? 'NA' : s.attempts.passRate),
+            getRowContent: s => (s.rowObfuscated ? 'NA' : `${Number(s.attempts.passRate || 0).toFixed(2)} %`),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           }
@@ -82,7 +82,7 @@ const CumulativeTable = ({ stats, name, alternatives, separate, populationsShoul
   )
 }
 
-CumulativeTable.propTypes = {
+AttemptsTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
   alternatives: arrayOf(string).isRequired,
@@ -90,8 +90,8 @@ CumulativeTable.propTypes = {
   populationsShouldBeVisible: bool.isRequired
 }
 
-CumulativeTable.defaultProps = {
+AttemptsTable.defaultProps = {
   separate: false
 }
 
-export default connect(null)(CumulativeTable)
+export default connect(null)(AttemptsTable)

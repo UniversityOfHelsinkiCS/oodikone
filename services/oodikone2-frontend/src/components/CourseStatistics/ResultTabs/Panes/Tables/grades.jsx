@@ -21,7 +21,7 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
     const {
       name,
       code,
-      cumulative: { grades },
+      attempts: { grades },
       coursecode,
       rowObfuscated
     } = stat
@@ -42,7 +42,7 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
   })
 
 const includesHTOrTT = stats =>
-  stats.some(({ cumulative }) => ['HT', 'TT'].some(grade => Object.keys(cumulative.grades).includes(grade)))
+  stats.some(({ attempts }) => ['HT', 'TT'].some(grade => Object.keys(attempts.grades).includes(grade)))
 
 const getGradeColumns = (notThesisGrades, addHTAndTT) => {
   if (!notThesisGrades) return THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => (s.rowObfuscated ? 'NA' : s[k])))
@@ -67,7 +67,7 @@ const getGradeColumns = (notThesisGrades, addHTAndTT) => {
 
 const GradesTable = ({ stats, name, alternatives, separate, isRelative, populationsShouldBeVisible }) => {
   const {
-    cumulative: { grades }
+    attempts: { grades }
   } = stats[0]
   const notThesisGrades = !isThesisGrades(grades)
 
