@@ -39,21 +39,25 @@ const ResultTabs = props => {
     setViewMode(newViewMode)
   }
 
+  const getRelativeButton = () => (
+    <div className="toggleContainer">
+      <label className="toggleLabel">Absolute</label>
+      <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
+      <label className="toggleLabel">Relative</label>
+    </div>
+  )
+
   const renderViewModeSelector = () => {
     const isTogglePane = tab !== 0
     const getButtonMenu = () => (
-      <Menu secondary>
-        {Object.values(viewModeNames).map(name => (
-          <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
-        ))}
-        {viewMode === 'Grades' && (
-          <Menu.Item
-            name={isRelative ? 'Set absolute' : 'Set relative'}
-            active={isRelative}
-            onClick={() => setIsRelative(!isRelative)}
-          />
-        )}
-      </Menu>
+      <>
+        <Menu secondary>
+          {Object.values(viewModeNames).map(name => (
+            <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
+          ))}
+        </Menu>
+        {viewMode === 'Grades' && getRelativeButton()}
+      </>
     )
 
     const getToggle = () => {
@@ -71,13 +75,7 @@ const ResultTabs = props => {
               {viewModeNames.STUDENT}
             </label>
           </div>
-          {(tab === 2 || props.comparison) && (
-            <div className="toggleContainer">
-              <label className="toggleLabel">Absolute</label>
-              <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
-              <label className="toggleLabel">Relative</label>
-            </div>
-          )}
+          {(tab === 2 || props.comparison) && getRelativeButton()}
         </div>
       )
     }

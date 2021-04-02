@@ -23,10 +23,12 @@ class FoldableRow extends Component {
     const hasRealisations = realisations.length && realisations.length > 0
     const showCourseRealisations = hasRealisations && isUnfolded
 
-    const getCell = content => <Table.Cell content={content} />
+    const getCell = (content, obfuscated) => (
+      <Table.Cell style={{ color: obfuscated && 'gray' }} content={obfuscated ? '5 or less students' : content} />
+    )
 
     const getRow = (rowId, rowData, isMainRow = true) => {
-      const { passed, failed, passrate, realisation } = rowData
+      const { passed, failed, passrate, realisation, obfuscated } = rowData
       const showFoldIcon = isMainRow && hasRealisations
       return (
         <Table.Row key={rowId} className={!isMainRow ? 'subRow' : ''}>
@@ -46,12 +48,13 @@ class FoldableRow extends Component {
                 realisation
               )
             }
+            style={{ color: obfuscated && 'gray' }}
             className={isMainRow ? 'courseNameCell' : 'courseRealisationCell'}
             onClick={() => onClickFn(id)}
           />
-          {getCell(passed)}
-          {getCell(failed)}
-          {getCell(`${passrate || 0} %`)}
+          {getCell(passed, obfuscated)}
+          {getCell(failed, obfuscated)}
+          {getCell(`${passrate || 0} %`, obfuscated)}
         </Table.Row>
       )
     }
