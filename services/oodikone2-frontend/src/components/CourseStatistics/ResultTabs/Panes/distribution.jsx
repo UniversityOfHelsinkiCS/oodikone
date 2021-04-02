@@ -73,8 +73,8 @@ const getGradeSeries = series => {
       }
 }
 
-const getGradeCumSeriesFromStats = stats => {
-  const series = stats.flatMap(s => s.cumulative.grades)
+const getGradeAttemptSeriesFromStats = stats => {
+  const series = stats.flatMap(s => s.attempts.grades)
   return getGradeSeries(series)
 }
 
@@ -84,12 +84,12 @@ const getGradeStudSeriesFromStats = stats => {
 }
 
 const Distribution = ({ primary, comparison, viewMode, isRelative }) => {
-  const isCumulativeMode = viewMode === viewModeNames.CUMULATIVE
+  const isAttemptsMode = viewMode === viewModeNames.ATTEMPTS
   const primaryStats = primary.stats.filter(stat => stat.name !== 'Total' || isRelative)
   const statYears = primaryStats.map(year => year.name)
   const comparisonStats = comparison ? comparison.stats : []
 
-  const gradeGraphSerieFn = isCumulativeMode ? getGradeCumSeriesFromStats : getGradeStudSeriesFromStats
+  const gradeGraphSerieFn = isAttemptsMode ? getGradeAttemptSeriesFromStats : getGradeStudSeriesFromStats
 
   const gradeGraphSerie = gradeGraphSerieFn(primaryStats)
   const comparisonGraphSerie = gradeGraphSerieFn(comparisonStats)

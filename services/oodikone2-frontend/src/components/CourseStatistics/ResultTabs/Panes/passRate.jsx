@@ -3,7 +3,7 @@ import React from 'react'
 import { Grid } from 'semantic-ui-react'
 import { bool } from 'prop-types'
 import StackedBarChart from '../../../StackedBarChart'
-import { passRateCumGraphOptions, passRateStudGraphOptions } from '../../../../constants'
+import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../constants'
 import {
   viewModeNames,
   getDataObject,
@@ -13,13 +13,13 @@ import {
   absoluteToRelative
 } from './util'
 
-const getPassRateCumSeriesFromStats = stats => {
+const getPassRateAttemptSeriesFromStats = stats => {
   const all = []
   const passed = []
   const failed = []
 
   stats.forEach(year => {
-    const { passed: p, failed: f } = year.cumulative.categories
+    const { passed: p, failed: f } = year.attempts.categories
     all.push(p + f)
     passed.push(p)
     failed.push(f)
@@ -75,18 +75,18 @@ const getPassRateStudSeriesFromStats = stats => {
 }
 
 const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
-  const isCumulativeMode = viewMode === viewModeNames.CUMULATIVE
+  const isAttemptsMode = viewMode === viewModeNames.ATTEMPTS
 
   const primaryStats = primary.stats.filter(stat => stat.name !== 'Total')
   const statYears = primaryStats.map(year => year.name)
   const comparisonStats = comparison ? comparison.stats : []
-  const passGraphSerieFn = isCumulativeMode ? getPassRateCumSeriesFromStats : getPassRateStudSeriesFromStats
+  const passGraphSerieFn = isAttemptsMode ? getPassRateAttemptSeriesFromStats : getPassRateStudSeriesFromStats
 
   const passGraphSerie = passGraphSerieFn(primaryStats)
   const comparisonGraphSerie = passGraphSerieFn(comparisonStats)
 
   const maxPassRateVal = isRelative ? 1 : getMaxValueOfSeries(passGraphSerie.absolute)
-  const graphOptionsFn = isCumulativeMode ? passRateCumGraphOptions : passRateStudGraphOptions
+  const graphOptionsFn = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudGraphOptions
   const primaryGraphOptions = comparison
     ? graphOptionsFn(statYears, maxPassRateVal, 'Primary pass rate chart', isRelative)
     : graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart', isRelative)

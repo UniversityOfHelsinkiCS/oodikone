@@ -22,7 +22,7 @@ const paneViewIndex = {
 
 const ResultTabs = props => {
   const [tab, setTab] = useTabs('cs_tab', 0, props.history)
-  const [viewMode, setViewMode] = useState(viewModeNames.CUMULATIVE)
+  const [viewMode, setViewMode] = useState(viewModeNames.ATTEMPTS)
   const [isRelative, setIsRelative] = useState(false)
 
   const handleTabChange = (...params) => {
@@ -31,7 +31,7 @@ const ResultTabs = props => {
     const currentTab = params[1].panes[activeIndex]
     sendAnalytics(`Current tab '${currentTab.menuItem.content}'`, 'Course statistics')
     setTab(...params)
-    setViewMode(resetViewMode ? viewModeNames.CUMULATIVE : viewMode)
+    setViewMode(resetViewMode ? viewModeNames.ATTEMPTS : viewMode)
   }
 
   const handleModeChange = newViewMode => {
@@ -62,13 +62,13 @@ const ResultTabs = props => {
 
     const getToggle = () => {
       const isToggleChecked = viewMode === viewModeNames.STUDENT
-      const newMode = isToggleChecked ? viewModeNames.CUMULATIVE : viewModeNames.STUDENT
+      const newMode = isToggleChecked ? viewModeNames.ATTEMPTS : viewModeNames.STUDENT
       const toggleId = 'viewModeToggle'
       return (
         <div style={{ display: 'flex' }}>
           <div className="toggleContainer">
             <label className="toggleLabel" htmlFor={toggleId}>
-              {viewModeNames.CUMULATIVE}
+              {viewModeNames.ATTEMPTS}
             </label>
             <Radio id={toggleId} checked={isToggleChecked} toggle onChange={() => handleModeChange(newMode)} />
             <label className="toggleLabel" htmlFor={toggleId}>

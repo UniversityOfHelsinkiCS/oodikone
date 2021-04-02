@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Grid } from 'semantic-ui-react'
 import { string, arrayOf, bool } from 'prop-types'
 import { dataSeriesType, viewModeNames, viewModeType } from './util'
-import CumulativeTable from './Tables/cumulative'
+import AttemptsTable from './Tables/attempts'
 import StudentTable from './Tables/student'
 import GradesTable from './Tables/grades'
 
@@ -11,9 +11,9 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
   const getViewMode = (name, stats) => {
     const populationsShouldBeVisible = stats[0].userHasAccessToAllStats
     switch (viewMode) {
-      case viewModeNames.CUMULATIVE:
+      case viewModeNames.ATTEMPTS:
         return (
-          <CumulativeTable
+          <AttemptsTable
             separate={separate}
             name={name}
             stats={stats}

@@ -62,7 +62,7 @@ export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const DISPLAY_DATE_FORMAT_DEV = 'DD.MM.YYYY HH:mm:ss'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
-export const passRateCumGraphOptions = (categories, max, title, skipFirstColor) => ({
+export const passRateAttemptGraphOptions = (categories, max, title, skipFirstColor) => ({
   chart: {
     type: 'column'
   },
