@@ -512,7 +512,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
     counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
     counter.markCreditToHistory(studentnumber, passed)
   }
-  const statistics = counter.getFinalStatistics()
+  const statistics = counter.getFinalStatistics(anonymizationSalt)
   return {
     ...statistics,
     coursecode,

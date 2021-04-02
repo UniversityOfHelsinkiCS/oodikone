@@ -13,6 +13,7 @@ import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
 import { clearCourseStats } from '../../redux/coursestats'
 import { getUserRoles, checkUserAccess } from '../../common'
+import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
 import TSA from '../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Course Statistics'
@@ -60,20 +61,34 @@ const CourseStatistics = props => {
     setSelected(coursecode)
   }
 
+  const userHasAccessToAllStats = userHasAccessToAllCourseStats(userRoles, rights)
+
   const getPanes = () => {
-    const panes = [
+    let panes = [
       {
         menuItem: MENU.SUM,
-        render: () => <SummaryTab onClickCourse={switchToCourse} />
+        render: () => <SummaryTab onClickCourse={switchToCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
       },
       {
         menuItem: MENU.COURSE,
-        render: () => <SingleCourseTab selected={selected || initCourseCode} />
-      },
-      {
-        menuItem: MENU.FACULTY,
-        render: () => <FacultyLevelStatistics />
-      },
+        render: () => (
+          <SingleCourseTab selected={selected || initCourseCode} userHasAccessToAllStats={userHasAccessToAllStats} />
+        )
+      }
+    ]
+
+    if (userHasAccessToAllStats) {
+      panes = [
+        ...panes,
+        {
+          menuItem: MENU.FACULTY,
+          render: () => <FacultyLevelStatistics />
+        }
+      ]
+    }
+
+    panes = [
+      ...panes,
       {
         menuItem: {
           key: 'query',
@@ -89,6 +104,7 @@ const CourseStatistics = props => {
         render: () => null
       }
     ]
+
     return !singleCourseStats ? panes : panes.filter(p => p.menuItem !== MENU.SUM)
   }
 
