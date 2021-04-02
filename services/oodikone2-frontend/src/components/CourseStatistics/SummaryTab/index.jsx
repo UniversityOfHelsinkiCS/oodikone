@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Label, Segment, Header } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { shape, arrayOf, func, oneOfType, number, string } from 'prop-types'
+import { shape, arrayOf, func, oneOfType, number, string, bool } from 'prop-types'
 import { flatten } from 'lodash'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import { fields, setValue } from '../../../redux/coursesSummaryForm'
@@ -62,7 +62,7 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
     <div>
       <Segment>
         <Form>
-          {userHasAccessToAllStats &&
+          {userHasAccessToAllStats && (
             <>
               <Header as="h4">Filter statistics by study programmes</Header>
               <ProgrammeDropdown
@@ -73,7 +73,7 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
                 value={form[fields.programmes]}
               />
             </>
-          }
+          )}
           <Form.Field>
             <label>Timeframe:</label>
             <Label.Group>
@@ -114,12 +114,13 @@ SummaryTab.propTypes = {
     courses: arrayOf(shape({})),
     timeframe: arrayOf(shape({}))
   }).isRequired,
-  onClickCourse: func.isRequired
+  onClickCourse: func.isRequired,
+  userHasAccessToAllStats: bool.isRequired
 }
 
 const mapStateToProps = state => {
-  const roles = state.auth.token.roles
-  const rights = state.auth.token.rights
+  const { roles } = state.auth.token
+  const { rights } = state.auth.token
   const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, rights)
   const programmes = selectors.getAllStudyProgrammes(state)
   const programmeCodes = state.courseSummaryForm[fields.programmes]

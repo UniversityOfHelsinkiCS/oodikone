@@ -20,7 +20,7 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
             alternatives={alternatives}
             populationsShouldBeVisible={populationsShouldBeVisible}
           />
-        ) 
+        )
       case viewModeNames.GRADES:
         return (
           <GradesTable
@@ -30,7 +30,6 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
             alternatives={alternatives}
             isRelative={isRelative}
             populationsShouldBeVisible={populationsShouldBeVisible}
-
           />
         )
       case viewModeNames.STUDENT:

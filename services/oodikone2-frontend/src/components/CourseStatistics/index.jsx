@@ -71,12 +71,15 @@ const CourseStatistics = props => {
       },
       {
         menuItem: MENU.COURSE,
-        render: () => <SingleCourseTab selected={selected || initCourseCode} userHasAccessToAllStats={userHasAccessToAllStats} />
-      },
+        render: () => (
+          <SingleCourseTab selected={selected || initCourseCode} userHasAccessToAllStats={userHasAccessToAllStats} />
+        )
+      }
     ]
 
     if (userHasAccessToAllStats) {
-      panes = [...panes,
+      panes = [
+        ...panes,
         {
           menuItem: MENU.FACULTY,
           render: () => <FacultyLevelStatistics />
@@ -84,7 +87,8 @@ const CourseStatistics = props => {
       ]
     }
 
-    panes = [...panes,
+    panes = [
+      ...panes,
       {
         menuItem: {
           key: 'query',
@@ -124,13 +128,7 @@ const CourseStatistics = props => {
 
   const getContent = () => {
     if ((statsIsEmpty && diffIsEmpty) || history.location.search === '') {
-      return (
-        <SearchForm
-          onProgress={onProgress}
-          showDiff={showDiff}
-          setShowDiff={setShowDiff}
-        />
-      )
+      return <SearchForm onProgress={onProgress} showDiff={showDiff} setShowDiff={setShowDiff} />
     }
     if (showDiff) {
       return <CourseDiff />
