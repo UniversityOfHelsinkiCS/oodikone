@@ -375,7 +375,10 @@ const SingleCourseStats = ({
   }
 
   const renderShowPopulation = (disabled = false) => {
-    return <Button disabled={disabled} onClick={showPopulation} content="Show population" />
+    if (userHasAccessToAllStats) {
+      return <Button disabled={disabled} onClick={showPopulation} content="Show population" />
+    }
+    return null
   }
 
   const statistics = filteredProgrammeStatistics()
