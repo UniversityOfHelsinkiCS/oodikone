@@ -32,4 +32,8 @@ const getActiveYears = course => {
   return `${startYearText} — ${endYearText}`
 }
 
-export { getActiveYears, getYearText }
+const userHasAccessToAllCourseStats = (roles, rights) => {
+  return (roles && ['admin'].some(role => roles.includes(role))) || rights.length > 0
+}
+
+export { getActiveYears, getYearText, userHasAccessToAllCourseStats }
