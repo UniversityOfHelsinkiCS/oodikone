@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
-import { shape, arrayOf, oneOfType, number, string } from 'prop-types'
+import { shape, arrayOf, oneOfType, number, string, bool } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import selectors from '../../../selectors/courseStats'
@@ -44,7 +44,7 @@ const SingleCourseTab = ({ selected, stats, courses, userHasAccessToAllStats }) 
           </Label.Group>
         </Form>
       </Segment>
-      {selection && <SingleCourseStats stats={stats[selection]} userHasAccessToAllStats={userHasAccessToAllStats}/>}
+      {selection && <SingleCourseStats stats={stats[selection]} userHasAccessToAllStats={userHasAccessToAllStats} />}
     </div>
   )
 }
@@ -52,7 +52,8 @@ const SingleCourseTab = ({ selected, stats, courses, userHasAccessToAllStats }) 
 SingleCourseTab.propTypes = {
   stats: shape({}).isRequired,
   courses: arrayOf(shape({})).isRequired,
-  selected: oneOfType([number, string]).isRequired
+  selected: oneOfType([number, string]).isRequired,
+  userHasAccessToAllStats: bool.isRequired
 }
 
 const mapStateToProps = state => ({

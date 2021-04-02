@@ -192,7 +192,7 @@ class CourseYearlyStatsCounter {
         students: this.parseStudentStatistics(students)
       }
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
-        // indicate to the front that some of the data has been obfuscated and therefore 
+        // indicate to the front that some of the data has been obfuscated and therefore
         // totals cannot be calculated
         this.obfuscated = true
         let gradeSpread = {}
@@ -210,7 +210,7 @@ class CourseYearlyStatsCounter {
               failed: [],
               passed: []
             },
-            grades: gradeSpread,
+            grades: gradeSpread
           },
           yearcode: rest.yearcode,
           students: {

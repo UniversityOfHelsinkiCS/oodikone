@@ -165,8 +165,10 @@ const summaryStatistics = createSelector(
       const { statistics, name } = data
 
       // No filters based on programmes can be applied, if the programme and student number-data
-      // has been obfuscated 
-      const realisations = statistics.map(realisation => getRealisationStats(realisation, filterStudentFn, userHasAccessToAllStats))
+      // has been obfuscated
+      const realisations = statistics.map(realisation =>
+        getRealisationStats(realisation, filterStudentFn, userHasAccessToAllStats)
+      )
       const summary = getSummaryStats(statistics, filterStudentFn, userHasAccessToAllStats)
 
       return {

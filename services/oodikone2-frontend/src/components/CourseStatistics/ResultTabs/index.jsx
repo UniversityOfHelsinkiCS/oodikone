@@ -42,7 +42,7 @@ const ResultTabs = props => {
   const getRelativeButton = () => (
     <div className="toggleContainer">
       <label className="toggleLabel">Absolute</label>
-        <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
+      <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
       <label className="toggleLabel">Relative</label>
     </div>
   )

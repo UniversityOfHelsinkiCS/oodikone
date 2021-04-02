@@ -24,10 +24,7 @@ class FoldableRow extends Component {
     const showCourseRealisations = hasRealisations && isUnfolded
 
     const getCell = (content, obfuscated) => (
-      <Table.Cell
-        style={{ color: obfuscated && 'gray' }}
-        content={obfuscated ? '5 or less students' : content}
-      />
+      <Table.Cell style={{ color: obfuscated && 'gray' }} content={obfuscated ? '5 or less students' : content} />
     )
 
     const getRow = (rowId, rowData, isMainRow = true) => {

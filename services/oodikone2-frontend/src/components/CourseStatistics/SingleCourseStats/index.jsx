@@ -22,7 +22,7 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 const ANALYTICS_CATEGORY = 'Course Statistics'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
-const countFilteredStudents = (stat, filter) => (
+const countFilteredStudents = (stat, filter) =>
   Object.entries(stat).reduce((acc, entry) => {
     const [category, students] = entry
     return {
@@ -30,7 +30,6 @@ const countFilteredStudents = (stat, filter) => (
       [category]: students.filter(filter).length
     }
   }, {})
-)
 
 const SingleCourseStats = ({
   stats,
@@ -168,7 +167,7 @@ const SingleCourseStats = ({
   const countStudentStats = (allstudents, filter) => {
     const grades = countFilteredStudents(allstudents.grades, filter)
     const categories = countFilteredStudents(allstudents.classes, filter)
-  
+
     const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = categories
     const total = passedFirst + passedRetry + failedFirst + failedRetry
     const passRate = (passedFirst + passedRetry) / total
@@ -181,7 +180,7 @@ const SingleCourseStats = ({
       failRate,
       total
     }
-  } 
+  }
 
   const statsForProgrammes = (progCodes, name) => {
     const { statistics } = stats
@@ -189,7 +188,6 @@ const SingleCourseStats = ({
     const progStats = statistics
       .filter(isStatInYearRange)
       .map(({ code, name, students: allstudents, attempts, coursecode, obfuscated }) => {
-
         const cumulative = countCumulativeStats(attempts, filter)
         const students = countStudentStats(allstudents, filter)
 
@@ -205,11 +203,11 @@ const SingleCourseStats = ({
         }
       })
 
-    let totals = progStats.reduce(
+    const totals = progStats.reduce(
       (acc, curr) => {
         if (curr.rowObfuscated) {
           return acc
-        } 
+        }
         const passed = acc.cumulative.categories.passed + curr.cumulative.categories.passed
         const failed = acc.cumulative.categories.failed + curr.cumulative.categories.failed
         const cgrades = acc.cumulative.grades
@@ -248,10 +246,10 @@ const SingleCourseStats = ({
         cumulative: {
           categories: {
             passed: 0,
-            failed: 0,
+            failed: 0
           },
           passRate: 0,
-          grades: {},
+          grades: {}
         },
         students: {
           categories: {
@@ -414,7 +412,7 @@ const SingleCourseStats = ({
           )}
         </Form>
       </Segment>
-      {userHasAccessToAllStats &&
+      {userHasAccessToAllStats && (
         <Segment>
           <Form>
             <Header as="h4">Filter statistics by study programmes</Header>
@@ -453,7 +451,7 @@ const SingleCourseStats = ({
             </Grid>
           </Form>
         </Segment>
-      }
+      )}
       <ResultTabs separate={separate} primary={statistics.primary} comparison={statistics.comparison} />
     </div>
   )
@@ -495,7 +493,7 @@ SingleCourseStats.propTypes = {
   }).isRequired,
   getMaxYearsToCreatePopulationFrom: func.isRequired,
   maxYearsToCreatePopulationFrom: number.isRequired,
-  userHasAccessToAllStats: bool,
+  userHasAccessToAllStats: bool.isRequired
 }
 
 const mapStateToProps = state => {
