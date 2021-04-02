@@ -10,6 +10,7 @@ class CourseYearlyStatsCounter {
     this.groups = {}
     this.programmes = {}
     this.facultyStats = {}
+    this.obfuscated = false
     this.history = {
       passed: new Set(),
       failed: new Set(),
@@ -156,7 +157,7 @@ class CourseYearlyStatsCounter {
     }
   }
 
-  formatStudentStatistics(students) {
+  parseStudentStatistics(students) {
     const grades = {}
     const classes = {}
     const studentnumbers = new Set()
@@ -169,18 +170,89 @@ class CourseYearlyStatsCounter {
     return { grades, classes, studentnumbers: [...studentnumbers] }
   }
 
-  formatGroupStatistics() {
-    return Object.values(this.groups).map(({ students, ...rest }) => ({
-      ...rest,
-      students: this.formatStudentStatistics(students)
-    }))
+  parseProgrammeStatistics(anonymizationSalt) {
+    if (anonymizationSalt) {
+      this.programmes = {
+        '000000': {
+          name: { en: '', fi: '', sv: '' },
+          credits: {},
+          passed: {},
+          students: {}
+        }
+      }
+    }
+
+    return this.programmes
   }
 
-  getFinalStatistics() {
+  parseGroupStatistics(anonymizationSalt) {
+    const groupStatistics = Object.values(this.groups).map(({ students, ...rest }) => {
+      const normalStats = {
+        ...rest,
+        students: this.parseStudentStatistics(students)
+      }
+      if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
+        // indicate to the front that some of the data has been obfuscated and therefore
+        // totals cannot be calculated
+        this.obfuscated = true
+        let gradeSpread = {}
+        for (const grade in normalStats.students.grades) {
+          gradeSpread[grade] = []
+        }
+
+        const obfuscatedStats = {
+          obfuscated: true,
+          code: rest.code,
+          name: rest.name,
+          coursecode: rest.coursecode,
+          attempts: {
+            classes: {
+              failed: [],
+              passed: []
+            },
+            grades: gradeSpread
+          },
+          yearcode: rest.yearcode,
+          students: {
+            classes: {
+              failedFirst: [],
+              failedRetry: [],
+              passedFirst: [],
+              passedRetry: []
+            },
+            grades: gradeSpread,
+            studentnumbers: []
+          }
+        }
+        return obfuscatedStats
+      }
+      return normalStats
+    })
+
+    return groupStatistics
+  }
+
+  parseFacultyStatistics(anonymizationSalt) {
+    if (anonymizationSalt) {
+      this.facultyStats = [
+        {
+          year: 'NA',
+          allCredits: 0,
+          allPassed: [],
+          allStudents: [],
+          faculties: {}
+        }
+      ]
+    }
+    return this.facultyStats
+  }
+
+  getFinalStatistics(anonymizationSalt) {
     return {
-      programmes: this.programmes,
-      statistics: this.formatGroupStatistics(),
-      facultyStats: this.facultyStats
+      programmes: this.parseProgrammeStatistics(anonymizationSalt),
+      statistics: this.parseGroupStatistics(anonymizationSalt),
+      facultyStats: this.parseFacultyStatistics(anonymizationSalt),
+      obfuscated: this.obfuscated
     }
   }
 }
