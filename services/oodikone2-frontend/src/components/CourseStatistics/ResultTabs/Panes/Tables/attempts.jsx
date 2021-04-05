@@ -8,7 +8,7 @@ import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 import { defineCellColor } from '../util'
 
-const CumulativeTable = ({ stats, name, alternatives, separate, populationsShouldBeVisible }) => {
+const AttemptsTable = ({ stats, name, alternatives, separate, headerVisible = false, userHasAccessToAllStats }) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -23,9 +23,11 @@ const CumulativeTable = ({ stats, name, alternatives, separate, populationsShoul
 
   return (
     <div>
-      <Header as="h3" textAlign="center">
-        {name}
-      </Header>
+      {headerVisible && (
+        <Header as="h3" textAlign="center">
+          {name}
+        </Header>
+      )}
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}
@@ -35,26 +37,24 @@ const CumulativeTable = ({ stats, name, alternatives, separate, populationsShoul
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s =>
-              s.code !== 9999 ? (
-                <div>
-                  {s.name}
-                  {s.name !== 'Total' && populationsShouldBeVisible ? (
-                    <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-                      <Icon name="level up alternate" />
-                    </Item>
-                  ) : null}
-                </div>
-              ) : (
-                <div>{s.name}</div>
-              ),
+            getRowContent: s => (
+              <div>
+                {s.name}
+                {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+                {s.name !== 'Total' && userHasAccessToAllStats && (
+                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                    <Icon name="level up alternate" />
+                  </Item>
+                )}
+              </div>
+            ),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },
           {
             key: 'PASSED',
             title: 'Passed',
-            // Backend returns duplicates in `s.cumulative` -> use `s.students`.
+            // Backend returns duplicates in `s.attempts` -> use `s.students`.
             getRowVal: s =>
               s.rowObfuscated ? '5 or less students' : Object.values(s.students.grades).reduce((a, b) => a + b, 0),
             getCellProps: s => defineCellColor(s),
@@ -63,35 +63,39 @@ const CumulativeTable = ({ stats, name, alternatives, separate, populationsShoul
           {
             key: 'FAILED',
             title: 'Failed',
-            getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.cumulative.categories.failed),
+            getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts.categories.failed),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },
           {
             key: 'PASSRATE',
             title: 'Pass rate',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.cumulative.passRate),
-            getRowContent: s => (s.rowObfuscated ? 'NA' : `${Number(s.cumulative.passRate || 0).toFixed(2)} %`),
+            getRowVal: s => (s.rowObfuscated ? 'NA' : s.attempts.passRate),
+            getRowContent: s => (s.rowObfuscated ? 'NA' : `${Number(s.attempts.passRate || 0).toFixed(2)} %`),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           }
         ]}
         data={stats}
       />
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+      )}
     </div>
   )
 }
 
-CumulativeTable.propTypes = {
+AttemptsTable.propTypes = {
   stats: arrayOf(shape({})).isRequired,
   name: oneOfType([number, string]).isRequired,
   alternatives: arrayOf(string).isRequired,
   separate: bool,
-  populationsShouldBeVisible: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
+  headerVisible: bool.isRequired
 }
 
-CumulativeTable.defaultProps = {
+AttemptsTable.defaultProps = {
   separate: false
 }
 
-export default connect(null)(CumulativeTable)
+export default connect(null)(AttemptsTable)

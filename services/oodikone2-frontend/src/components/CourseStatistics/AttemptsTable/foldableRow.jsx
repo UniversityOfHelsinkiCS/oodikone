@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import { func } from 'prop-types'
+import { bool, func } from 'prop-types'
 import { Table, Icon } from 'semantic-ui-react'
 
 import { courseDataWithRealisationsType } from '../../../constants/types'
@@ -8,7 +8,8 @@ import './foldableRow.css'
 class FoldableRow extends Component {
   static propTypes = {
     courseData: courseDataWithRealisationsType.isRequired,
-    onClickFn: func.isRequired
+    onClickFn: func.isRequired,
+    userHasAccessToAllStats: bool.isRequired
   }
 
   state = {
@@ -16,7 +17,7 @@ class FoldableRow extends Component {
   }
 
   render() {
-    const { courseData, onClickFn } = this.props
+    const { courseData, onClickFn, userHasAccessToAllStats } = this.props
     const { isUnfolded } = this.state
     const { id, category, realisations } = courseData
 
@@ -42,7 +43,8 @@ class FoldableRow extends Component {
             content={
               isMainRow ? (
                 <Fragment>
-                  {category} <span>{id}</span>
+                  {category}
+                  {!userHasAccessToAllStats && <strong>*</strong>} <span>{id}</span>
                 </Fragment>
               ) : (
                 realisation
