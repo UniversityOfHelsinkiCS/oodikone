@@ -86,7 +86,17 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
           </Form.Field>
         </Form>
       </Segment>
-      {<AttemptsTable categoryName="Course" onClickCourse={onClickCourse} data={data} />}
+      {
+        <AttemptsTable
+          categoryName="Course"
+          onClickCourse={onClickCourse}
+          data={data}
+          userHasAccessToAllStats={userHasAccessToAllStats}
+        />
+      }
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+      )}
     </div>
   )
 }

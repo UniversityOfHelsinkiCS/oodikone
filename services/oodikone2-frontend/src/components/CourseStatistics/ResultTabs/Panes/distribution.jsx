@@ -83,7 +83,7 @@ const getGradeStudSeriesFromStats = stats => {
   return getGradeSeries(series)
 }
 
-const Distribution = ({ primary, comparison, viewMode, isRelative }) => {
+const Distribution = ({ primary, comparison, viewMode, isRelative, userHasAccessToAllStats }) => {
   const isAttemptsMode = viewMode === viewModeNames.ATTEMPTS
   const primaryStats = primary.stats.filter(stat => stat.name !== 'Total' || isRelative)
   const statYears = primaryStats.map(year => year.name)
@@ -121,6 +121,9 @@ const Distribution = ({ primary, comparison, viewMode, isRelative }) => {
           </Grid.Column>
         </Grid.Row>
       )}
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
+      )}
     </>
   )
 }
@@ -129,7 +132,8 @@ Distribution.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
   viewMode: viewModeType.isRequired,
-  isRelative: bool
+  isRelative: bool,
+  userHasAccessToAllStats: bool.isRequired
 }
 
 Distribution.defaultProps = {
