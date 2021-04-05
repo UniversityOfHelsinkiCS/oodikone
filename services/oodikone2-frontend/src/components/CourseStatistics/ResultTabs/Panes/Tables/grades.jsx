@@ -21,7 +21,7 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
     const {
       name,
       code,
-      cumulative: { grades },
+      attempts: { grades },
       coursecode,
       rowObfuscated
     } = stat
@@ -42,7 +42,7 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
   })
 
 const includesHTOrTT = stats =>
-  stats.some(({ cumulative }) => ['HT', 'TT'].some(grade => Object.keys(cumulative.grades).includes(grade)))
+  stats.some(({ attempts }) => ['HT', 'TT'].some(grade => Object.keys(attempts.grades).includes(grade)))
 
 const getGradeColumns = (notThesisGrades, addHTAndTT) => {
   if (!notThesisGrades) return THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => (s.rowObfuscated ? 'NA' : s[k])))
@@ -65,9 +65,17 @@ const getGradeColumns = (notThesisGrades, addHTAndTT) => {
   return columns
 }
 
-const GradesTable = ({ stats, name, alternatives, separate, isRelative, populationsShouldBeVisible }) => {
+const GradesTable = ({
+  stats,
+  name,
+  alternatives,
+  separate,
+  isRelative,
+  userHasAccessToAllStats,
+  headerVisible = false
+}) => {
   const {
-    cumulative: { grades }
+    attempts: { grades }
   } = stats[0]
   const notThesisGrades = !isThesisGrades(grades)
 
@@ -91,11 +99,12 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative, populati
       s => (
         <div>
           {s.name}
-          {s.name !== 'Total' && populationsShouldBeVisible ? (
+          {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+          {s.name !== 'Total' && userHasAccessToAllStats && (
             <Item as={Link} to={showPopulation(s.code, s.name, s)}>
               <Icon name="level up alternate" />
             </Item>
-          ) : null}
+          )}
         </div>
       )
     ),
@@ -112,9 +121,11 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative, populati
 
   return (
     <div>
-      <Header as="h3" textAlign="center">
-        {name}
-      </Header>
+      {headerVisible && (
+        <Header as="h3" textAlign="center">
+          {name}
+        </Header>
+      )}
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}
@@ -122,6 +133,9 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative, populati
         columns={columns}
         data={data}
       />
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+      )}
     </div>
   )
 }
@@ -132,7 +146,8 @@ GradesTable.propTypes = {
   alternatives: arrayOf(string).isRequired,
   separate: bool,
   isRelative: bool.isRequired,
-  populationsShouldBeVisible: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
+  headerVisible: bool.isRequired
 }
 
 GradesTable.defaultProps = {

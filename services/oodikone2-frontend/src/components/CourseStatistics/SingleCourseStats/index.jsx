@@ -148,8 +148,8 @@ const SingleCourseStats = ({
       : filteredYears.find(year => year.text === name)
   }
 
-  const countCumulativeStats = (attempts, filter) => {
-    // Count the stats for the Cumulative- and Grades-tab
+  const countAttemptStats = (attempts, filter) => {
+    // Count the stats for the Attempts- and Grades-tab
     // Also used in Pass rate chart and Grade distirbution chart
     const grades = countFilteredStudents(attempts.grades, filter)
     const categories = countFilteredStudents(attempts.classes, filter)
@@ -187,15 +187,15 @@ const SingleCourseStats = ({
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const progStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allstudents, attempts, coursecode, obfuscated }) => {
-        const cumulative = countCumulativeStats(attempts, filter)
+      .map(({ code, name, students: allstudents, attempts: allAttempts, coursecode, obfuscated }) => {
+        const attempts = countAttemptStats(allAttempts, filter)
         const students = countStudentStats(allstudents, filter)
 
         const parsedName = separate ? getTextIn(name, language) : name
         return {
           code,
           name: parsedName,
-          cumulative,
+          attempts,
           students,
           coursecode,
           rowObfuscated: obfuscated,
@@ -208,13 +208,13 @@ const SingleCourseStats = ({
         if (curr.rowObfuscated) {
           return acc
         }
-        const passed = acc.cumulative.categories.passed + curr.cumulative.categories.passed
-        const failed = acc.cumulative.categories.failed + curr.cumulative.categories.failed
-        const cgrades = acc.cumulative.grades
+        const passed = acc.attempts.categories.passed + curr.attempts.categories.passed
+        const failed = acc.attempts.categories.failed + curr.attempts.categories.failed
+        const cgrades = acc.attempts.grades
 
-        Object.keys(curr.cumulative.grades).forEach(grade => {
+        Object.keys(curr.attempts.grades).forEach(grade => {
           if (!cgrades[grade]) cgrades[grade] = 0
-          cgrades[grade] += curr.cumulative.grades[grade]
+          cgrades[grade] += curr.attempts.grades[grade]
         })
         const { passedFirst, failedFirst } = curr.students.categories
 
@@ -235,7 +235,7 @@ const SingleCourseStats = ({
         return {
           ...acc,
           coursecode: curr.coursecode,
-          cumulative: { categories: { passed, failed }, grades: cgrades },
+          attempts: { categories: { passed, failed }, grades: cgrades },
           students: { categories: { passedFirst: newPassedFirst, failedFirst: newFailedFirst }, grades: sgrades }
         }
       },
@@ -244,7 +244,7 @@ const SingleCourseStats = ({
         name: 'Total',
         coursecode: '000',
         userHasAccessToAllStats,
-        cumulative: {
+        attempts: {
           categories: {
             passed: 0,
             failed: 0
@@ -272,8 +272,8 @@ const SingleCourseStats = ({
     totals.students.passRate = (passedFirst + passedRetry) / total
     totals.students.failRate = (failedFirst + failedRetry) / total
 
-    const { failed, passed } = totals.cumulative.categories
-    totals.cumulative.passRate = (100 * passed) / (passed + failed)
+    const { failed, passed } = totals.attempts.categories
+    totals.attempts.passRate = (100 * passed) / (passed + failed)
 
     return {
       codes: progCodes.concat,
@@ -375,7 +375,10 @@ const SingleCourseStats = ({
   }
 
   const renderShowPopulation = (disabled = false) => {
-    return <Button disabled={disabled} onClick={showPopulation} content="Show population" />
+    if (userHasAccessToAllStats) {
+      return <Button disabled={disabled} onClick={showPopulation} content="Show population" />
+    }
+    return null
   }
 
   const statistics = filteredProgrammeStatistics()

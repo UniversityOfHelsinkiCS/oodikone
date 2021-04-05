@@ -10,7 +10,7 @@ import { defineCellColor } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, alternatives, separate, populationsShouldBeVisible }) => {
+const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllStats, headerVisible = false }) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -25,9 +25,11 @@ const StudentTable = ({ stats, name, alternatives, separate, populationsShouldBe
 
   return (
     <div>
-      <Header as="h3" textAlign="center">
-        {name}
-      </Header>
+      {headerVisible && (
+        <Header as="h3" textAlign="center">
+          {name}
+        </Header>
+      )}
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}
@@ -40,11 +42,12 @@ const StudentTable = ({ stats, name, alternatives, separate, populationsShouldBe
             getRowContent: s => (
               <div>
                 {s.name}
-                {s.name !== 'Total' && populationsShouldBeVisible ? (
+                {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+                {s.name !== 'Total' && userHasAccessToAllStats && (
                   <Item as={Link} to={showPopulation(s.code, s.name, s)}>
                     <Icon name="level up alternate" />
                   </Item>
-                ) : null}
+                )}
               </div>
             ),
             getCellProps: s => defineCellColor(s),
@@ -122,6 +125,9 @@ const StudentTable = ({ stats, name, alternatives, separate, populationsShouldBe
         ]}
         data={stats}
       />
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+      )}
     </div>
   )
 }
@@ -131,7 +137,8 @@ StudentTable.propTypes = {
   name: oneOfType([number, string]).isRequired,
   alternatives: arrayOf(string).isRequired,
   separate: bool,
-  populationsShouldBeVisible: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
+  headerVisible: bool.isRequired
 }
 
 StudentTable.defaultProps = {

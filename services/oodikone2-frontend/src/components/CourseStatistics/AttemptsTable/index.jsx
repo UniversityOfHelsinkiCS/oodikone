@@ -1,6 +1,6 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
-import { string, arrayOf, func } from 'prop-types'
+import { string, arrayOf, func, bool } from 'prop-types'
 
 import { courseDataWithRealisationsType } from '../../../constants/types'
 import FoldableRow from './foldableRow'
@@ -18,21 +18,27 @@ const getHeader = categoryName => {
   )
 }
 
-const CumulativeTable = ({ categoryName, data, onClickCourse }) => (
+const AttemptsTable = ({ categoryName, data, onClickCourse, userHasAccessToAllStats }) => (
   <Table style={{ cursor: 'pointer' }} selectable className="fixed-header">
     {getHeader(categoryName)}
     <Table.Body>
       {data.map(course => (
-        <FoldableRow key={course.id} courseData={course} onClickFn={onClickCourse} />
+        <FoldableRow
+          key={course.id}
+          courseData={course}
+          onClickFn={onClickCourse}
+          userHasAccessToAllStats={userHasAccessToAllStats}
+        />
       ))}
     </Table.Body>
   </Table>
 )
 
-CumulativeTable.propTypes = {
+AttemptsTable.propTypes = {
   categoryName: string.isRequired,
   data: arrayOf(courseDataWithRealisationsType).isRequired,
-  onClickCourse: func.isRequired
+  onClickCourse: func.isRequired,
+  userHasAccessToAllStats: bool.isRequired
 }
 
-export default CumulativeTable
+export default AttemptsTable
