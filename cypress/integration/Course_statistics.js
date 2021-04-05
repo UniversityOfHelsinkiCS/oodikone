@@ -201,7 +201,7 @@ describe('Course Statistics tests', () => {
       // Statistics
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Attempts").click()
-      cy.get("#CourseStatPanes h3+table>tbody").within(() => {
+      cy.get("#CourseStatPanes table>tbody").within(() => {
         attemptsTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
             values.forEach((value, tdIndex) => {
@@ -214,7 +214,7 @@ describe('Course Statistics tests', () => {
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Student").click()
-      cy.get("#CourseStatPanes h3+table>tbody").within(() => {
+      cy.get("#CourseStatPanes table>tbody").within(() => {
         studentTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
             values.forEach((value, tdIndex) => {
@@ -227,7 +227,7 @@ describe('Course Statistics tests', () => {
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Grades").click()
-      cy.get("#CourseStatPanes h3+table>tbody").within(() => {
+      cy.get("#CourseStatPanes table>tbody").within(() => {
         gradesTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
             values.forEach((value, tdIndex) => {
@@ -344,7 +344,7 @@ describe('Course Statistics tests', () => {
       }
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Attempts").click()
-      cy.get("#CourseStatPanes h3+table>tbody").within(() => {
+      cy.get("#CourseStatPanes table>tbody").within(() => {
         timeAttemptsTableContents.filter(timeRangeFilter(newYearRange)).forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
             values.forEach((value, tdIndex) => {
@@ -357,7 +357,7 @@ describe('Course Statistics tests', () => {
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Student").click()
-      cy.get("#CourseStatPanes h3+table>tbody").within(() => {
+      cy.get("#CourseStatPanes table>tbody").within(() => {
         timeStudentTableContents.filter(timeRangeFilter(newYearRange)).forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
             values.forEach((value, tdIndex) => {
@@ -370,7 +370,7 @@ describe('Course Statistics tests', () => {
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Grades").click()
-      cy.get("#CourseStatPanes h3+table>tbody").within(() => {
+      cy.get("#CourseStatPanes table>tbody").within(() => {
         timeGradesTableContents.filter(timeRangeFilter(newYearRange)).forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
             values.forEach((value, tdIndex) => {
@@ -448,7 +448,7 @@ describe('Course Statistics tests', () => {
       // Statistics
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Attempts").click()
-      cy.get("#PrimaryDataTable h3+table>tbody").within(() => {
+      cy.get("#PrimaryDataTable table>tbody").within(() => {
         const attemptsTableContents = [
           // [time, passed, failed, passrate]
           ["Total", 218, 12, "94.71 %"],
@@ -466,7 +466,7 @@ describe('Course Statistics tests', () => {
         })
         cy.get("tr").should('have.length', 14)
       })
-      cy.get("#ComparisonDataTable h3+table>tbody").within(() => {
+      cy.get("#ComparisonDataTable table>tbody").within(() => {
         const attemptsTableContents = [
           // [time, passed, failed, passrate]
           ["Total", 129, 30, "78.57 %"],
@@ -487,7 +487,7 @@ describe('Course Statistics tests', () => {
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Student").click()
-      cy.get("#PrimaryDataTable h3+table>tbody").within(() => {
+      cy.get("#PrimaryDataTable table>tbody").within(() => {
         const studentTableContents = [
           // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
           ["Total", 171, 165,	0, "96.49 %",	6, 0,	"3.51 %"],
@@ -505,7 +505,7 @@ describe('Course Statistics tests', () => {
         })
         cy.get("tr").should('have.length', 14)
       })
-      cy.get("#ComparisonDataTable h3+table>tbody").within(() => {
+      cy.get("#ComparisonDataTable table>tbody").within(() => {
         const studentTableContents = [
           // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
           ["Total", 115, 95, 0,	"82.61 %", 20, 0,	"17.39 %"],
@@ -526,7 +526,7 @@ describe('Course Statistics tests', () => {
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Grades").click()
-      cy.get("#PrimaryDataTable h3+table>tbody").within(() => {
+      cy.get("#PrimaryDataTable table>tbody").within(() => {
         const gradesTableContents = [
           // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
           ["Total", 227, 12, 4,	7, 11, 18, 161,	14],
@@ -545,7 +545,7 @@ describe('Course Statistics tests', () => {
         })
         cy.get("tr").should('have.length', 14)
       })
-      cy.get("#ComparisonDataTable h3+table>tbody").within(() => {
+      cy.get("#ComparisonDataTable table>tbody").within(() => {
         const gradesTableContents = [
           // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
           ["Total", 140, 30, 2,	5, 13, 20, 67, 3],
