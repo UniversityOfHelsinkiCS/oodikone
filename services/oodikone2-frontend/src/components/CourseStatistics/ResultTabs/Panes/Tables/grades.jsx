@@ -65,7 +65,15 @@ const getGradeColumns = (notThesisGrades, addHTAndTT) => {
   return columns
 }
 
-const GradesTable = ({ stats, name, alternatives, separate, isRelative, populationsShouldBeVisible }) => {
+const GradesTable = ({
+  stats,
+  name,
+  alternatives,
+  separate,
+  isRelative,
+  populationsShouldBeVisible,
+  headerVisible
+}) => {
   const {
     attempts: { grades }
   } = stats[0]
@@ -112,9 +120,11 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative, populati
 
   return (
     <div>
-      <Header as="h3" textAlign="center">
-        {name}
-      </Header>
+      {headerVisible && (
+        <Header as="h3" textAlign="center">
+          {name}
+        </Header>
+      )}
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}
@@ -132,7 +142,8 @@ GradesTable.propTypes = {
   alternatives: arrayOf(string).isRequired,
   separate: bool,
   isRelative: bool.isRequired,
-  populationsShouldBeVisible: bool.isRequired
+  populationsShouldBeVisible: bool.isRequired,
+  headerVisible: bool.isRequired
 }
 
 GradesTable.defaultProps = {

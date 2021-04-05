@@ -10,7 +10,7 @@ import { defineCellColor } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, alternatives, separate, populationsShouldBeVisible }) => {
+const StudentTable = ({ stats, name, alternatives, separate, populationsShouldBeVisible, headerVisible }) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -25,9 +25,11 @@ const StudentTable = ({ stats, name, alternatives, separate, populationsShouldBe
 
   return (
     <div>
-      <Header as="h3" textAlign="center">
-        {name}
-      </Header>
+      {headerVisible && (
+        <Header as="h3" textAlign="center">
+          {name}
+        </Header>
+      )}
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}
@@ -131,7 +133,8 @@ StudentTable.propTypes = {
   name: oneOfType([number, string]).isRequired,
   alternatives: arrayOf(string).isRequired,
   separate: bool,
-  populationsShouldBeVisible: bool.isRequired
+  populationsShouldBeVisible: bool.isRequired,
+  headerVisible: bool.isRequired
 }
 
 StudentTable.defaultProps = {

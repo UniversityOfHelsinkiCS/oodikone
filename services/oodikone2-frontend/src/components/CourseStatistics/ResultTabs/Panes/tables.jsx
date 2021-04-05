@@ -19,6 +19,7 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
             stats={stats}
             alternatives={alternatives}
             populationsShouldBeVisible={populationsShouldBeVisible}
+            headerVisible={comparison}
           />
         )
       case viewModeNames.GRADES:
@@ -30,6 +31,7 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
             alternatives={alternatives}
             isRelative={isRelative}
             populationsShouldBeVisible={populationsShouldBeVisible}
+            headerVisible={comparison}
           />
         )
       case viewModeNames.STUDENT:
@@ -40,6 +42,7 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
             stats={stats}
             alternatives={alternatives}
             populationsShouldBeVisible={populationsShouldBeVisible}
+            headerVisible={comparison}
           />
         )
       default:
