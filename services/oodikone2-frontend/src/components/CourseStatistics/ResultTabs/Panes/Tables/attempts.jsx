@@ -8,7 +8,7 @@ import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 import { defineCellColor } from '../util'
 
-const AttemptsTable = ({ stats, name, alternatives, separate, populationsShouldBeVisible, headerVisible }) => {
+const AttemptsTable = ({ stats, name, alternatives, separate, headerVisible = false, userHasAccessToAllStats }) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -37,19 +37,17 @@ const AttemptsTable = ({ stats, name, alternatives, separate, populationsShouldB
             key: 'TIME',
             title: 'Time',
             getRowVal: s => s.code,
-            getRowContent: s =>
-              s.code !== 9999 ? (
-                <div>
-                  {s.name}
-                  {s.name !== 'Total' && populationsShouldBeVisible ? (
-                    <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-                      <Icon name="level up alternate" />
-                    </Item>
-                  ) : null}
-                </div>
-              ) : (
-                <div>{s.name}</div>
-              ),
+            getRowContent: s => (
+              <div>
+                {s.name}
+                {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+                {s.name !== 'Total' && userHasAccessToAllStats && (
+                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                    <Icon name="level up alternate" />
+                  </Item>
+                )}
+              </div>
+            ),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },
@@ -80,6 +78,9 @@ const AttemptsTable = ({ stats, name, alternatives, separate, populationsShouldB
         ]}
         data={stats}
       />
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+      )}
     </div>
   )
 }
@@ -89,7 +90,7 @@ AttemptsTable.propTypes = {
   name: oneOfType([number, string]).isRequired,
   alternatives: arrayOf(string).isRequired,
   separate: bool,
-  populationsShouldBeVisible: bool.isRequired,
+  userHasAccessToAllStats: bool.isRequired,
   headerVisible: bool.isRequired
 }
 

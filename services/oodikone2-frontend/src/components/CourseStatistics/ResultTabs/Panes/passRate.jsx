@@ -74,7 +74,7 @@ const getPassRateStudSeriesFromStats = stats => {
   }
 }
 
-const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
+const PassRate = ({ primary, comparison, viewMode, isRelative = false, userHasAccessToAllStats }) => {
   const isAttemptsMode = viewMode === viewModeNames.ATTEMPTS
 
   const primaryStats = primary.stats.filter(stat => stat.name !== 'Total')
@@ -112,6 +112,9 @@ const PassRate = ({ primary, comparison, viewMode, isRelative = false }) => {
           </Grid.Column>
         </Grid.Row>
       )}
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
+      )}
     </>
   )
 }
@@ -120,7 +123,8 @@ PassRate.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
   viewMode: viewModeType.isRequired,
-  isRelative: bool
+  isRelative: bool,
+  userHasAccessToAllStats: bool.isRequired
 }
 
 PassRate.defaultProps = {

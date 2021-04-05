@@ -71,8 +71,8 @@ const GradesTable = ({
   alternatives,
   separate,
   isRelative,
-  populationsShouldBeVisible,
-  headerVisible
+  userHasAccessToAllStats,
+  headerVisible = false
 }) => {
   const {
     attempts: { grades }
@@ -99,11 +99,12 @@ const GradesTable = ({
       s => (
         <div>
           {s.name}
-          {s.name !== 'Total' && populationsShouldBeVisible ? (
+          {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+          {s.name !== 'Total' && userHasAccessToAllStats && (
             <Item as={Link} to={showPopulation(s.code, s.name, s)}>
               <Icon name="level up alternate" />
             </Item>
-          ) : null}
+          )}
         </div>
       )
     ),
@@ -132,6 +133,9 @@ const GradesTable = ({
         columns={columns}
         data={data}
       />
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+      )}
     </div>
   )
 }
@@ -142,7 +146,7 @@ GradesTable.propTypes = {
   alternatives: arrayOf(string).isRequired,
   separate: bool,
   isRelative: bool.isRequired,
-  populationsShouldBeVisible: bool.isRequired,
+  userHasAccessToAllStats: bool.isRequired,
   headerVisible: bool.isRequired
 }
 

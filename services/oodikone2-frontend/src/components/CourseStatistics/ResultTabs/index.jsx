@@ -91,6 +91,8 @@ const ResultTabs = props => {
 
   const getPanes = () => {
     const { primary, comparison, separate } = props
+    const { userHasAccessToAllStats } = primary
+
     const paneMenuItems = [
       {
         menuItem: { key: 'Table', icon: 'table', content: 'Table' },
@@ -101,6 +103,7 @@ const ResultTabs = props => {
             primary={primary}
             viewMode={viewMode}
             isRelative={isRelative}
+            userHasAccessToAllStats={userHasAccessToAllStats}
           />
         )
       },
@@ -112,13 +115,20 @@ const ResultTabs = props => {
             primary={primary}
             viewMode={viewMode}
             isRelative={isRelative && !!comparison}
+            userHasAccessToAllStats={userHasAccessToAllStats}
           />
         )
       },
       {
         menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
         renderFn: () => (
-          <Distribution comparison={comparison} primary={primary} viewMode={viewMode} isRelative={isRelative} />
+          <Distribution
+            comparison={comparison}
+            primary={primary}
+            viewMode={viewMode}
+            isRelative={isRelative}
+            userHasAccessToAllStats={userHasAccessToAllStats}
+          />
         )
       }
     ]
