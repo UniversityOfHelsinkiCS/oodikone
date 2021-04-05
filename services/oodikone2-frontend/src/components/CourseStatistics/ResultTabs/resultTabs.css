@@ -5,6 +5,12 @@
 
 .modeSelectorContainer {
   margin-left: 2em;
+  width: 100%;
+}
+
+.chartToggleContainer {
+  display: flex;
+  margin-bottom: 1.5em;
 }
 
 .toggleContainer {
