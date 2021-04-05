@@ -6,10 +6,12 @@ import { dataSeriesType, viewModeNames } from './Panes/util'
 import PassRate from './Panes/passRate'
 import Distribution from './Panes/distribution'
 import Tables from './Panes/tables'
+import InfoBox from '../../InfoBox'
 import { useTabs } from '../../../common/hooks'
 
 import './resultTabs.css'
 import TSA from '../../../common/tsa'
+import infotooltips from '../../../common/InfoToolTips'
 
 const ANALYTICS_CATEGORY = 'Course Statistics'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
@@ -50,14 +52,12 @@ const ResultTabs = props => {
   const renderViewModeSelector = () => {
     const isTogglePane = tab !== 0
     const getButtonMenu = () => (
-      <>
-        <Menu secondary>
-          {Object.values(viewModeNames).map(name => (
-            <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
-          ))}
-        </Menu>
+      <Menu secondary>
+        {Object.values(viewModeNames).map(name => (
+          <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
+        ))}
         {viewMode === 'Grades' && getRelativeButton()}
-      </>
+      </Menu>
     )
 
     const getToggle = () => {
@@ -65,7 +65,7 @@ const ResultTabs = props => {
       const newMode = isToggleChecked ? viewModeNames.ATTEMPTS : viewModeNames.STUDENT
       const toggleId = 'viewModeToggle'
       return (
-        <div style={{ display: 'flex' }}>
+        <div className="chartToggleContainer">
           <div className="toggleContainer">
             <label className="toggleLabel" htmlFor={toggleId}>
               {viewModeNames.ATTEMPTS}
@@ -80,7 +80,13 @@ const ResultTabs = props => {
       )
     }
 
-    return <div className="modeSelectorContainer">{isTogglePane ? getToggle() : getButtonMenu()}</div>
+    // Remove "false" and activate infoboxes when the texts for them are ready
+    return (
+      <div className="modeSelectorContainer">
+        {isTogglePane ? getToggle() : getButtonMenu()}
+        {false && <InfoBox content={infotooltips.CourseStatistics[tab][viewMode]} />}
+      </div>
+    )
   }
 
   const getPanes = () => {
