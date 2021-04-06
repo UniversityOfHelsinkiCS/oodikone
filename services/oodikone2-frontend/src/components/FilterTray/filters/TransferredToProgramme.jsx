@@ -49,21 +49,27 @@ export default () => {
       name={name}
     >
       <Form>
-        <div className="description-text">Show students who...</div>
         <div className="card-content">
           <Form.Field>
             <Radio
-              label={`Have (${count(true)})`}
+              label="All"
+              name="radioGroup"
+              value="all"
+              // checked={value === 1}
+              // onChange={toggle(1)}
+              // data-cy={`${name}-have`}
+            />
+            <Radio
+              label="Transferred"
               name="radioGroup"
               value="this"
               checked={value === 1}
               onChange={toggle(1)}
               data-cy={`${name}-have`}
+              style={{ margin: '0.5rem 0' }}
             />
-          </Form.Field>
-          <Form.Field>
             <Radio
-              label={`Have Not (${count(false)})`}
+              label="Not Transferred"
               name="radioGroup"
               value="that"
               checked={value === 0}
@@ -72,7 +78,6 @@ export default () => {
             />
           </Form.Field>
         </div>
-        <div className="description-text">...transferred to this study programme.</div>
       </Form>
     </FilterCard>
   )

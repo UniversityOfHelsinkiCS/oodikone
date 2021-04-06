@@ -90,7 +90,7 @@ export default () => {
 
   return (
     <FilterCard
-      title="Credit Filter"
+      title="Credits"
       active={active}
       className="total-credits-filter"
       contextKey={contextKey}
