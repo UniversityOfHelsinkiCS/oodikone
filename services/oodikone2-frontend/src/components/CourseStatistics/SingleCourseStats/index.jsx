@@ -18,6 +18,7 @@ import { getTextIn } from '../../../common'
 import { getSemesters } from '../../../redux/semesters'
 import TSA from '../../../common/tsa'
 import useLanguage from '../../LanguagePicker/useLanguage'
+import { countTotalStats } from './countStatistics'
 
 const ANALYTICS_CATEGORY = 'Course Statistics'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
@@ -150,7 +151,7 @@ const SingleCourseStats = ({
 
   const countAttemptStats = (attempts, filter) => {
     // Count the stats for the Attempts- and Grades-tab
-    // Also used in Pass rate chart and Grade distirbution chart
+    // Also used in Pass rate chart and Grade distribution chart
     const grades = countFilteredStudents(attempts.grades, filter)
     const categories = countFilteredStudents(attempts.classes, filter)
 
@@ -185,7 +186,7 @@ const SingleCourseStats = ({
   const statsForProgrammes = (progCodes, name) => {
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(progCodes)
-    const progStats = statistics
+    const formattedStats = statistics
       .filter(isStatInYearRange)
       .map(({ code, name, students: allstudents, attempts: allAttempts, coursecode, obfuscated }) => {
         const attempts = countAttemptStats(allAttempts, filter)
@@ -203,82 +204,12 @@ const SingleCourseStats = ({
         }
       })
 
-    const totals = progStats.reduce(
-      (acc, curr) => {
-        if (curr.rowObfuscated) {
-          return acc
-        }
-        const passed = acc.attempts.categories.passed + curr.attempts.categories.passed
-        const failed = acc.attempts.categories.failed + curr.attempts.categories.failed
-        const cgrades = acc.attempts.grades
-
-        Object.keys(curr.attempts.grades).forEach(grade => {
-          if (!cgrades[grade]) cgrades[grade] = 0
-          cgrades[grade] += curr.attempts.grades[grade]
-        })
-        const { passedFirst, failedFirst } = curr.students.categories
-
-        const newPassedFirst = passedFirst
-          ? acc.students.categories.passedFirst + passedFirst
-          : acc.students.categories.passedFirst
-        const newFailedFirst = failedFirst
-          ? acc.students.categories.failedFirst + failedFirst
-          : acc.students.categories.failedFirst
-
-        const sgrades = acc.students.grades
-
-        Object.keys(curr.students.grades).forEach(grade => {
-          if (!sgrades[grade]) sgrades[grade] = 0
-          sgrades[grade] += curr.students.grades[grade]
-        })
-
-        return {
-          ...acc,
-          coursecode: curr.coursecode,
-          attempts: { categories: { passed, failed }, grades: cgrades },
-          students: { categories: { passedFirst: newPassedFirst, failedFirst: newFailedFirst }, grades: sgrades }
-        }
-      },
-      {
-        code: 9999,
-        name: 'Total',
-        coursecode: '000',
-        userHasAccessToAllStats,
-        attempts: {
-          categories: {
-            passed: 0,
-            failed: 0
-          },
-          passRate: 0,
-          grades: {}
-        },
-        students: {
-          categories: {
-            passedFirst: 0,
-            failedFirst: 0
-          },
-          grades: {},
-          total: 0,
-          passRate: 0,
-          failRate: 0
-        }
-      }
-    )
-
-    // Count pass- and failrates also for "Total"-lines
-    const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = totals.students.categories
-    const total = passedFirst + passedRetry + failedFirst + failedRetry
-    totals.students.total = total
-    totals.students.passRate = (passedFirst + passedRetry) / total
-    totals.students.failRate = (failedFirst + failedRetry) / total
-
-    const { failed, passed } = totals.attempts.categories
-    totals.attempts.passRate = (100 * passed) / (passed + failed)
+    const totals = countTotalStats(formattedStats, userHasAccessToAllStats)
 
     return {
       codes: progCodes.concat,
       name,
-      stats: progStats.concat(totals),
+      stats: formattedStats.concat(totals),
       userHasAccessToAllStats,
       totals
     }
