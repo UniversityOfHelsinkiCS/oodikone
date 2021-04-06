@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Tab, Grid, Radio, Menu } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { shape, bool } from 'prop-types'
@@ -25,7 +25,13 @@ const paneViewIndex = {
 const ResultTabs = props => {
   const [tab, setTab] = useTabs('cs_tab', 0, props.history)
   const [viewMode, setViewMode] = useState(viewModeNames.ATTEMPTS)
+  const [selectedView, setSelectedView] = useState(false)
   const [isRelative, setIsRelative] = useState(false)
+
+  useEffect(() => {
+    const newViewMode = selectedView ? viewModeNames.ATTEMPTS : viewModeNames.STUDENT
+    handleModeChange(newViewMode)
+  }, [selectedView])
 
   const handleTabChange = (...params) => {
     const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE && viewMode === viewModeNames.GRADES
@@ -41,11 +47,15 @@ const ResultTabs = props => {
     setViewMode(newViewMode)
   }
 
-  const getRelativeButton = () => (
+  const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
     <div className="toggleContainer">
-      <label className="toggleLabel">Absolute</label>
-      <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
-      <label className="toggleLabel">Relative</label>
+      <label className="toggleLabel">{firstLabel}</label>
+        <Radio
+          toggle
+          checked={value}
+          onChange={() => setValue(!value)}
+        />
+      <label className="toggleLabel">{secondLabel}</label>
     </div>
   )
 
@@ -56,26 +66,15 @@ const ResultTabs = props => {
         {Object.values(viewModeNames).map(name => (
           <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
         ))}
-        {viewMode === 'Grades' && getRelativeButton()}
+        {viewMode === 'Grades' && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
       </Menu>
     )
 
     const getToggle = () => {
-      const isToggleChecked = viewMode === viewModeNames.STUDENT
-      const newMode = isToggleChecked ? viewModeNames.ATTEMPTS : viewModeNames.STUDENT
-      const toggleId = 'viewModeToggle'
       return (
         <div className="chartToggleContainer">
-          <div className="toggleContainer">
-            <label className="toggleLabel" htmlFor={toggleId}>
-              {viewModeNames.ATTEMPTS}
-            </label>
-            <Radio id={toggleId} checked={isToggleChecked} toggle onChange={() => handleModeChange(newMode)} />
-            <label className="toggleLabel" htmlFor={toggleId}>
-              {viewModeNames.STUDENT}
-            </label>
-          </div>
-          {(tab === 2 || props.comparison) && getRelativeButton()}
+          {getRadioButton('Attempts', 'Student', selectedView, setSelectedView)}
+          {(tab === 2 || props.comparison) && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
         </div>
       )
     }
