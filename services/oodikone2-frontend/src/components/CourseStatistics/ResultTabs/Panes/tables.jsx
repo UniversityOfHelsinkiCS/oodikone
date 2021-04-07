@@ -3,17 +3,25 @@ import { connect } from 'react-redux'
 import { Grid } from 'semantic-ui-react'
 import { string, arrayOf, bool } from 'prop-types'
 import { dataSeriesType, viewModeNames, viewModeType } from './util'
-import CumulativeTable from './Tables/cumulative'
+import AttemptsTable from './Tables/attempts'
 import StudentTable from './Tables/student'
 import GradesTable from './Tables/grades'
 
-const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelative }) => {
+const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelative, userHasAccessToAllStats }) => {
   const getViewMode = (name, stats) => {
+    const headerVisible = !!comparison
     switch (viewMode) {
-      case viewModeNames.CUMULATIVE:
-        return <CumulativeTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
-      case viewModeNames.STUDENT:
-        return <StudentTable separate={separate} name={name} stats={stats} alternatives={alternatives} />
+      case viewModeNames.ATTEMPTS:
+        return (
+          <AttemptsTable
+            separate={separate}
+            name={name}
+            stats={stats}
+            alternatives={alternatives}
+            userHasAccessToAllStats={userHasAccessToAllStats}
+            headerVisible={headerVisible}
+          />
+        )
       case viewModeNames.GRADES:
         return (
           <GradesTable
@@ -22,6 +30,19 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
             stats={stats}
             alternatives={alternatives}
             isRelative={isRelative}
+            userHasAccessToAllStats={userHasAccessToAllStats}
+            headerVisible={headerVisible}
+          />
+        )
+      case viewModeNames.STUDENT:
+        return (
+          <StudentTable
+            separate={separate}
+            name={name}
+            stats={stats}
+            alternatives={alternatives}
+            userHasAccessToAllStats={userHasAccessToAllStats}
+            headerVisible={headerVisible}
           />
         )
       default:
@@ -50,7 +71,8 @@ Tables.propTypes = {
   viewMode: viewModeType.isRequired,
   alternatives: arrayOf(string).isRequired,
   separate: bool,
-  isRelative: bool.isRequired
+  isRelative: bool.isRequired,
+  userHasAccessToAllStats: bool.isRequired
 }
 
 Tables.defaultProps = {

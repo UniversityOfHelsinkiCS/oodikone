@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
-import { shape, string, arrayOf, objectOf, oneOfType, number, func } from 'prop-types'
+import { shape, string, arrayOf, objectOf, oneOfType, number, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { difference, min, max, flatten, pickBy, uniq } from 'lodash'
@@ -43,7 +43,8 @@ const SingleCourseStats = ({
   semesters,
   programmes,
   maxYearsToCreatePopulationFrom,
-  getMaxYearsToCreatePopulationFrom
+  getMaxYearsToCreatePopulationFrom,
+  userHasAccessToAllStats
 }) => {
   const { language } = useLanguage()
   const [primary, setPrimary] = useState([ALL.value])
@@ -147,33 +148,73 @@ const SingleCourseStats = ({
       : filteredYears.find(year => year.text === name)
   }
 
+  const countAttemptStats = (attempts, filter) => {
+    // Count the stats for the Attempts- and Grades-tab
+    // Also used in Pass rate chart and Grade distirbution chart
+    const grades = countFilteredStudents(attempts.grades, filter)
+    const categories = countFilteredStudents(attempts.classes, filter)
+
+    const { failed, passed } = categories
+    const passRate = (100 * passed) / (passed + failed)
+
+    return {
+      grades,
+      categories,
+      passRate
+    }
+  }
+
+  const countStudentStats = (allstudents, filter) => {
+    const grades = countFilteredStudents(allstudents.grades, filter)
+    const categories = countFilteredStudents(allstudents.classes, filter)
+
+    const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = categories
+    const total = passedFirst + passedRetry + failedFirst + failedRetry
+    const passRate = (passedFirst + passedRetry) / total
+    const failRate = (failedFirst + failedRetry) / total
+
+    return {
+      grades,
+      categories,
+      passRate,
+      failRate,
+      total
+    }
+  }
+
   const statsForProgrammes = (progCodes, name) => {
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const progStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allstudents, attempts, coursecode }) => {
-        const cumulative = {
-          grades: countFilteredStudents(attempts.grades, filter),
-          categories: countFilteredStudents(attempts.classes, filter)
-        }
-        const students = {
-          grades: countFilteredStudents(allstudents.grades, filter),
-          categories: countFilteredStudents(allstudents.classes, filter)
-        }
+      .map(({ code, name, students: allstudents, attempts: allAttempts, coursecode, obfuscated }) => {
+        const attempts = countAttemptStats(allAttempts, filter)
+        const students = countStudentStats(allstudents, filter)
+
         const parsedName = separate ? getTextIn(name, language) : name
-        return { code, name: parsedName, cumulative, students, coursecode }
+        return {
+          code,
+          name: parsedName,
+          attempts,
+          students,
+          coursecode,
+          rowObfuscated: obfuscated,
+          userHasAccessToAllStats
+        }
       })
 
     const totals = progStats.reduce(
       (acc, curr) => {
-        const passed = acc.cumulative.categories.passed + curr.cumulative.categories.passed
-        const failed = acc.cumulative.categories.failed + curr.cumulative.categories.failed
-        const cgrades = acc.cumulative.grades
+        if (curr.rowObfuscated) {
+          return acc
+        }
+        const passed = acc.attempts.categories.passed + curr.attempts.categories.passed
+        const failed = acc.attempts.categories.failed + curr.attempts.categories.failed
+        const cgrades = acc.attempts.grades
 
-        Object.keys(curr.cumulative.grades).forEach(grade => {
+        Object.keys(curr.attempts.grades).forEach(grade => {
           if (!cgrades[grade]) cgrades[grade] = 0
-          cgrades[grade] += curr.cumulative.grades[grade]
+          cgrades[grade] += curr.attempts.grades[grade]
         })
         const { passedFirst, failedFirst } = curr.students.categories
 
@@ -194,7 +235,7 @@ const SingleCourseStats = ({
         return {
           ...acc,
           coursecode: curr.coursecode,
-          cumulative: { categories: { passed, failed }, grades: cgrades },
+          attempts: { categories: { passed, failed }, grades: cgrades },
           students: { categories: { passedFirst: newPassedFirst, failedFirst: newFailedFirst }, grades: sgrades }
         }
       },
@@ -202,11 +243,13 @@ const SingleCourseStats = ({
         code: 9999,
         name: 'Total',
         coursecode: '000',
-        cumulative: {
+        userHasAccessToAllStats,
+        attempts: {
           categories: {
             passed: 0,
             failed: 0
           },
+          passRate: 0,
           grades: {}
         },
         students: {
@@ -214,14 +257,29 @@ const SingleCourseStats = ({
             passedFirst: 0,
             failedFirst: 0
           },
-          grades: {}
+          grades: {},
+          total: 0,
+          passRate: 0,
+          failRate: 0
         }
       }
     )
+
+    // Count pass- and failrates also for "Total"-lines
+    const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = totals.students.categories
+    const total = passedFirst + passedRetry + failedFirst + failedRetry
+    totals.students.total = total
+    totals.students.passRate = (passedFirst + passedRetry) / total
+    totals.students.failRate = (failedFirst + failedRetry) / total
+
+    const { failed, passed } = totals.attempts.categories
+    totals.attempts.passRate = (100 * passed) / (passed + failed)
+
     return {
       codes: progCodes.concat,
       name,
       stats: progStats.concat(totals),
+      userHasAccessToAllStats,
       totals
     }
   }
@@ -317,7 +375,10 @@ const SingleCourseStats = ({
   }
 
   const renderShowPopulation = (disabled = false) => {
-    return <Button disabled={disabled} onClick={showPopulation} content="Show population" />
+    if (userHasAccessToAllStats) {
+      return <Button disabled={disabled} onClick={showPopulation} content="Show population" />
+    }
+    return null
   }
 
   const statistics = filteredProgrammeStatistics()
@@ -355,44 +416,46 @@ const SingleCourseStats = ({
           )}
         </Form>
       </Segment>
-      <Segment>
-        <Form>
-          <Header as="h4">Filter statistics by study programmes</Header>
-          <Grid>
-            <Grid.Column width={8}>
-              <ProgrammeDropdown
-                name="primary"
-                options={options}
-                label="Primary group"
-                placeholder="Select study programmes"
-                value={primary}
-                onChange={handleSelect}
-              />
-            </Grid.Column>
-            <Grid.Column width={8}>
-              <ProgrammeDropdown
-                name="comparison"
-                options={comparisonProgrammes(options)}
-                label="Comparison group"
-                placeholder="Optional"
-                value={comparison}
-                onChange={handleSelect}
-              />
-            </Grid.Column>
-            <Grid.Column width={8} />
-            <Grid.Column width={8}>
-              <Form.Group>
-                <Form.Button
-                  content="Select excluded study programmes"
-                  onClick={setExcludedToComparison}
-                  disabled={primary.length === 1 && primary[0] === ALL.value}
+      {userHasAccessToAllStats && (
+        <Segment>
+          <Form>
+            <Header as="h4">Filter statistics by study programmes</Header>
+            <Grid>
+              <Grid.Column width={8}>
+                <ProgrammeDropdown
+                  name="primary"
+                  options={options}
+                  label="Primary group"
+                  placeholder="Select study programmes"
+                  value={primary}
+                  onChange={handleSelect}
                 />
-                <Form.Button content="Clear" onClick={clearComparison} />
-              </Form.Group>
-            </Grid.Column>
-          </Grid>
-        </Form>
-      </Segment>
+              </Grid.Column>
+              <Grid.Column width={8}>
+                <ProgrammeDropdown
+                  name="comparison"
+                  options={comparisonProgrammes(options)}
+                  label="Comparison group"
+                  placeholder="Optional"
+                  value={comparison}
+                  onChange={handleSelect}
+                />
+              </Grid.Column>
+              <Grid.Column width={8} />
+              <Grid.Column width={8}>
+                <Form.Group>
+                  <Form.Button
+                    content="Select excluded study programmes"
+                    onClick={setExcludedToComparison}
+                    disabled={primary.length === 1 && primary[0] === ALL.value}
+                  />
+                  <Form.Button content="Clear" onClick={clearComparison} />
+                </Form.Group>
+              </Grid.Column>
+            </Grid>
+          </Form>
+        </Segment>
+      )}
       <ResultTabs separate={separate} primary={statistics.primary} comparison={statistics.comparison} />
     </div>
   )
@@ -433,7 +496,8 @@ SingleCourseStats.propTypes = {
     push: func
   }).isRequired,
   getMaxYearsToCreatePopulationFrom: func.isRequired,
-  maxYearsToCreatePopulationFrom: number.isRequired
+  maxYearsToCreatePopulationFrom: number.isRequired,
+  userHasAccessToAllStats: bool.isRequired
 }
 
 const mapStateToProps = state => {
