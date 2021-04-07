@@ -100,17 +100,17 @@ const mapStudyrightElements = (studyrightid, ordinal, startdate, enddate, studen
   return [
     {
     ...defaultProps,
-    id: `${defaultProps.studyrightid}-${ordinal}-degree`,
+    id: `${defaultProps.studyrightid}-${code}-degree`,
     code: degreeCode
     },
     {
       ...defaultProps,
-      id: `${defaultProps.studyrightid}-${ordinal}-1`,
+      id: `${defaultProps.studyrightid}-${code}-1`,
       code,
     },
     {
       ...defaultProps,
-      id: `${defaultProps.studyrightid}-${ordinal}-2`,
+      id: `${defaultProps.studyrightid}-${code}-2`,
       code: childCode,
     },
   ]
@@ -141,13 +141,24 @@ const creditMapper = (
     attainment_date,
     type,
     course_unit_id,
+    module_id,
     module_group_id,
+    state,
   } = attainment
   const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
   const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
   const targetSemester = getSemesterByDate(new Date(attainment_date))
 
   if (!targetSemester) return null
+
+  const course_code = !isModule(type)
+    ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
+    : moduleGroupIdToModuleCode[module_group_id]
+
+  // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
+  // See, e.g., TKT5
+  const isSubstitutedStudyModule = state === 'SUBSTITUTED' && module_id !== null
+  const isStudyModule = isModule(type) && !isSubstitutedStudyModule
 
   return {
     id: id,
@@ -158,12 +169,10 @@ const creditMapper = (
     credittypecode: getCreditTypeCodeFromAttainment(attainment, getGrade(grade_scale_id, grade_id).passed),
     attainment_date: attainment_date,
     course_id: !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id,
-    course_code: !isModule(type)
-      ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
-      : moduleGroupIdToModuleCode[module_group_id],
+    course_code,
     semestercode: targetSemester.semestercode,
     semester_composite: targetSemester.composite,
-    isStudyModule: isModule(type),
+    isStudyModule,
     org: attainmentUniOrg,
   }
 }
