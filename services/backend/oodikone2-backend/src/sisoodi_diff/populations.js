@@ -223,11 +223,15 @@ const populationDiff = async (programme, year) => {
 
   if (sisOnly.length > 0) {
     console.log(`${sisOnly.length} only in sis, of which...`)
-    const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.studentStudentnumber)
+    const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.student_studentnumber)
     const remaining = _.difference(sisOnly, wronglySetCancel)
 
-    printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
-    printWithReason(remaining, 'missing from oodi for other reasons')
+    if (wronglySetCancel.length > 0) {
+      printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
+    }
+    if (remaining.length > 0) {
+      printWithReason(remaining, 'missing from oodi for other reasons')
+    }
   }
   console.log('') // adding newline before next programme / year
 }
