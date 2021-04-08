@@ -191,27 +191,33 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
     }, [])
     .filter(sE => !!sE.code)
 
-  // Uncomment this and execute updater to check if student has graduated from 
-  // bach, but master path is missing. 
+  const findMasterStudyRightBugs = (studyRightElements) => {
+    const masterStudyRights = studyRightElements.filter(s => s.code.startsWith("MH"))
 
-  // const bselems = studyRightElements.filter(sr => sr.code.startsWith('KH'))
-  // console.log("graduated bsc, no selected master path")
-  // bselems.forEach(elem => {
-  //   const mainstudyRightId = elem.studyrightid.slice(0,-2)
-  //   if (!groupedStudyRightSnapshots[mainstudyRightId]) {
-  //     console.log('what, why is the bach missing?, details:')
-  //     console.log(elem)
-  //     console.log(mainstudyRightId)
-  //     return
-  //   }
-  //   const mainStudyRight = groupedStudyRightSnapshots[mainstudyRightId][0]
-  //   const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
-  //   if (mainStudyRight.study_right_graduation &&
-  //       mainStudyRight.study_right_graduation.phase1GraduationDate &&
-  //       !mainStudyRight.accepted_selection_path.educationPhase2GroupId) {
-  //       console.log(studentnumber)
-  //     }
-  // })
+    // Check if newest snapshot is passive, but there is an active snapshot with newer
+    // ordinal and later enddate
+    // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2748
+    const newestSnapShotHasAnomalie = (opinoikId) => {
+      const snapshots = groupedStudyRightSnapshots[opinoikId]
+      if (!snapshots || snapshots[0].state !== "PASSIVE") return false
+      return snapshots.some(ss =>
+          new Date(ss.valid.endDate) > new Date(snapshots[0].valid.endDate &&
+          ss.modification_ordinal > snapshots[0].modification_ordinal)
+      )
+    }
+
+    const studyrightsWithAnomalies = masterStudyRights.filter(sr =>
+      newestSnapShotHasAnomalie(sr.studyrightid.slice(0, -2))
+    )
+    if (studyrightsWithAnomalies.length > 0) {
+      console.log("Students whose correct enddate is skipped because of newer snapshot:")
+      studyrightsWithAnomalies.forEach(sr =>
+        console.log(sr.studentnumber, "- program:", sr.code)
+      )
+    }
+  }
+  // Uncomment following to find different types of msc studyright bugs
+  // findMasterStudyRightBugs(studyRightElements)
 
   await bulkCreate(StudyrightElement, studyRightElements)
 }
