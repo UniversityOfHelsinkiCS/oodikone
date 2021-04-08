@@ -20,21 +20,22 @@
  * Options:
  *   csv    Output to a file.
  */
-const studentServiceOodi = require('../../services/students')
+//const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
-const { compareCourses } = require('./compareCourses')
+//const { compareCourses } = require('./compareCourses')
+const { compareCredits } = require('./compareMisc')
 const getStudentNumbers = require('./getStudentNumbers')
 const { output, makeCsv } = require('./output')
 
 const getStudentDiff = async studentNumber => {
   let msg = []
-  const oodi = await studentServiceOodi.withId(studentNumber)
+  //const oodi = await studentServiceOodi.withId(studentNumber)
   const sis = await studentServiceSis.withId(studentNumber)
-  const courses = { oodi: oodi.courses, sis: sis.courses }
+  //const courses = { oodi: oodi.courses, sis: sis.courses }
 
   //msg = compareStarted(oodi.started, sis.started, msg)
-  //msg = compareCredits(oodi.credits, sis.credits, msg)
-  msg = await compareCourses({ studentNumber, courses }, msg)
+  msg = compareCredits(sis.credits, sis.courses, msg)
+  //msg = await compareCourses({ studentNumber, courses }, msg)
 
   return msg
 }
