@@ -126,6 +126,7 @@ const formatStudent = ({
   lastname,
   studentnumber,
   dateofuniversityenrollment,
+  creditcount,
   gender,
   credits,
   abbreviatedname,
@@ -179,18 +180,14 @@ const formatStudent = ({
   if (credits === undefined) {
     credits = []
   }
-
-  const courses = credits.sort(courseByDate).map(toCourse)
-  const totalCredits = courses.map(course => course.credits).reduce((total, courseCredits) => total + courseCredits, 0)
-
   return {
     firstnames,
     lastname,
     studyrights,
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
-    credits: totalCredits,
-    courses,
+    credits: creditcount || 0,
+    courses: credits.sort(courseByDate).map(toCourse),
     name: abbreviatedname,
     transfers: transfers || [],
     gender,
