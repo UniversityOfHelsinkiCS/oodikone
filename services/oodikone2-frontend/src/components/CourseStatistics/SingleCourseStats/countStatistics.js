@@ -12,15 +12,25 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         if (!cgrades[grade]) cgrades[grade] = 0
         cgrades[grade] += curr.attempts.grades[grade]
       })
-      const { passedFirst, failedFirst } = curr.students.categories
+      const { passedFirst, passedRetry, failedFirst, failedRetry } = curr.students.categories
 
       const newPassedFirst = passedFirst
         ? acc.students.categories.passedFirst + passedFirst
         : acc.students.categories.passedFirst
-      const newFailedFirst = failedFirst
+
+        const newPassedRetry = passedRetry
+        ? acc.students.categories.passedRetry + passedRetry
+        : acc.students.categories.passedRetry
+
+        const newFailedFirst = failedFirst
         ? acc.students.categories.failedFirst + failedFirst
         : acc.students.categories.failedFirst
 
+      const newFailedRetry = failedRetry
+        ? acc.students.categories.failedRetry + failedRetry
+        : acc.students.categories.failedRetry
+
+        
       const sgrades = acc.students.grades
 
       Object.keys(curr.students.grades).forEach(grade => {
@@ -32,7 +42,7 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         ...acc,
         coursecode: curr.coursecode,
         attempts: { categories: { passed, failed }, grades: cgrades },
-        students: { categories: { passedFirst: newPassedFirst, failedFirst: newFailedFirst }, grades: sgrades }
+        students: { categories: { passedFirst: newPassedFirst, passedRetry: newPassedRetry, failedFirst: newFailedFirst, failedRetry: newFailedRetry }, grades: sgrades }
       }
     },
     {
@@ -51,7 +61,9 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       students: {
         categories: {
           passedFirst: 0,
-          failedFirst: 0
+          passedRetry: 0,
+          failedFirst: 0,
+          failedRetry: 0
         },
         grades: {},
         total: 0,
@@ -60,6 +72,8 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       }
     }
   )
+
+  console.log("students", totals.students.categories)
 
   // Count pass- and failrates also for "Total"-lines
   const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = totals.students.categories
