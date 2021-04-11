@@ -4,14 +4,22 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       if (curr.rowObfuscated) {
         return acc
       }
-      const passed = acc.attempts.categories.passed + curr.attempts.categories.passed
-      const failed = acc.attempts.categories.failed + curr.attempts.categories.failed
+
+      let passed = acc.attempts.categories.passed
+      let failed = acc.attempts.categories.failed
       const cgrades = acc.attempts.grades
 
       Object.keys(curr.attempts.grades).forEach(grade => {
         if (!cgrades[grade]) cgrades[grade] = 0
         cgrades[grade] += curr.attempts.grades[grade]
+
+        if (['Eisa', 'Hyl.', '0', 'Luop'].includes(grade)) {
+          failed += curr.attempts.grades[grade]
+        } else {
+          passed += curr.attempts.grades[grade]
+        }
       })
+
       const { passedFirst, passedRetry, failedFirst, failedRetry } = curr.students.categories
 
       const newPassedFirst = passedFirst
@@ -29,7 +37,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       const newFailedRetry = failedRetry
         ? acc.students.categories.failedRetry + failedRetry
         : acc.students.categories.failedRetry
-
         
       const sgrades = acc.students.grades
 
@@ -72,8 +79,6 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       }
     }
   )
-
-  console.log("students", totals.students.categories)
 
   // Count pass- and failrates also for "Total"-lines
   const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = totals.students.categories
