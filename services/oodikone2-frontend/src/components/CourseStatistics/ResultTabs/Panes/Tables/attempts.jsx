@@ -54,7 +54,7 @@ const AttemptsTable = ({ stats, name, alternatives, separate, headerVisible = fa
           {
             key: 'PASSED',
             title: 'Passed',
-            getRowVal: s => s.rowObfuscated ? '5 or less students' : s.attempts.categories.passed,
+            getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts.categories.passed),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },

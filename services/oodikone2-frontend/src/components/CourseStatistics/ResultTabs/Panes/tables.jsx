@@ -8,7 +8,7 @@ import StudentTable from './Tables/student'
 import GradesTable from './Tables/grades'
 
 const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelative, userHasAccessToAllStats }) => {
-  const getViewMode = (statistics) => {
+  const getViewMode = statistics => {
     const { name, stats } = statistics
     const headerVisible = !!comparison
 
@@ -54,8 +54,8 @@ const Tables = ({ primary, comparison, viewMode, alternatives, separate, isRelat
 
   return (
     <Fragment>
-      <Grid.Column id='PrimaryDataTable'>{getViewMode(primary)}</Grid.Column>
-      {comparison && <Grid.Column id='ComparisonDataTable'>{getViewMode(comparison)}</Grid.Column>}
+      <Grid.Column id="PrimaryDataTable">{getViewMode(primary)}</Grid.Column>
+      {comparison && <Grid.Column id="ComparisonDataTable">{getViewMode(comparison)}</Grid.Column>}
     </Fragment>
   )
 }

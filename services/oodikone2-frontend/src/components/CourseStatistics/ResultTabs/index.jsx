@@ -28,6 +28,11 @@ const ResultTabs = props => {
   const [selectedView, setSelectedView] = useState(false)
   const [isRelative, setIsRelative] = useState(false)
 
+  const handleModeChange = newViewMode => {
+    sendAnalytics(`Current view mode '${newViewMode}'`, 'Course statistics')
+    setViewMode(newViewMode)
+  }
+
   useEffect(() => {
     const newViewMode = selectedView ? viewModeNames.ATTEMPTS : viewModeNames.STUDENT
     handleModeChange(newViewMode)
@@ -42,19 +47,10 @@ const ResultTabs = props => {
     setViewMode(resetViewMode ? viewModeNames.ATTEMPTS : viewMode)
   }
 
-  const handleModeChange = newViewMode => {
-    sendAnalytics(`Current view mode '${newViewMode}'`, 'Course statistics')
-    setViewMode(newViewMode)
-  }
-
   const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
     <div className="toggleContainer">
       <label className="toggleLabel">{firstLabel}</label>
-        <Radio
-          toggle
-          checked={value}
-          onChange={() => setValue(!value)}
-        />
+      <Radio toggle checked={value} onChange={() => setValue(!value)} />
       <label className="toggleLabel">{secondLabel}</label>
     </div>
   )
@@ -73,7 +69,7 @@ const ResultTabs = props => {
     const getToggle = () => {
       return (
         <div className="chartToggleContainer">
-          {getRadioButton('Student','Attempts', selectedView, setSelectedView)}
+          {getRadioButton('Student', 'Attempts', selectedView, setSelectedView)}
           {(tab === 2 || props.comparison) && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
         </div>
       )
