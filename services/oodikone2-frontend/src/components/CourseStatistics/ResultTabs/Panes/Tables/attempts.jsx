@@ -54,9 +54,7 @@ const AttemptsTable = ({ stats, name, alternatives, separate, headerVisible = fa
           {
             key: 'PASSED',
             title: 'Passed',
-            // Backend returns duplicates in `s.attempts` -> use `s.students`.
-            getRowVal: s =>
-              s.rowObfuscated ? '5 or less students' : Object.values(s.students.grades).reduce((a, b) => a + b, 0),
+            getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts.categories.passed),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 4 }
           },
