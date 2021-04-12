@@ -110,16 +110,16 @@ describe('Course Statistics tests', () => {
     const yearRange = { from: "2000-01", to: "2017-18" }
     const attemptsTableContents = [
       // [time, passed, failed, passrate]
-      ["Total", 335, 42, "88.14 %"],
-      ["2017-18", 195, 29, "85.78 %"],
-      ["2016-17", 67, 2, "97.06 %"],
+      ["Total", 312, 42, "88.14 %"],
+      ["2017-18", 175, 29, "85.78 %"],
+      ["2016-17", 66, 2, "97.06 %"],
       ["2015-16", 27, 2, "93.10 %"],
       ["2014-15", 16, 0, "100.00 %"],
-      ["2013-14", 5, 2, "75.00 %"],
+      ["2013-14", 6, 2, "75.00 %"],
     ]
     const studentTableContents = [
       // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
-      ["Total", 275, 249, 0, "90.55 %",	26,	0, "9.45 %"],
+      ["Total", 335, 249, 58,	"91.64 %", 26, 2, "8.36 %"],
       ["2017-18", 195, 131, 43, "89.23 %", 20, 1, "10.77 %"],
       ["2016-17", 67, 59, 6, "97.01 %", 2, 0, "2.99 %"],
       ["2015-16", 27, 24, 2, "96.30 %", 1, 0, "3.70 %"],
@@ -310,9 +310,9 @@ describe('Course Statistics tests', () => {
       
       const timeAttemptsTableContents = [
         // [time, passed, failed, passrate]
-        ["Total", 110, 4, "96.46 %"],
+        ["Total", 109, 4, "96.46 %"],
         ["2017-18", 175, 29, "85.78 %"],
-        ["2016-17", 67, 2, "97.06 %"],
+        ["2016-17", 66, 2, "97.06 %"],
         ["2015-16", 27, 2, "93.10 %"],
         ["2014-15", 16, 0, "100.00 %"],
         ["2013-14", 6, 2, "75.00 %"],
@@ -320,7 +320,7 @@ describe('Course Statistics tests', () => {
 
       const timeStudentTableContents = [
         // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
-        ["Total", 102, 99, 0,	"97.06 %", 3, 0, "2.94 %"],
+        ["Total", 110, 99, 8,	"97.27 %", 3, 0, "2.73 %"],
         ["2017-18", 195, 131, 43, "89.23 %", 20, 1, "10.77 %"],
         ["2016-17", 67, 59, 6, "97.01 %", 2, 0, "2.99 %"],
         ["2015-16", 27, 24, 2, "96.30 %", 1, 0, "3.70 %"],
@@ -451,10 +451,10 @@ describe('Course Statistics tests', () => {
       cy.get("#PrimaryDataTable table>tbody").within(() => {
         const attemptsTableContents = [
           // [time, passed, failed, passrate]
-          ["Total", 218, 12, "94.71 %"],
-          ["2017-18", 131, 10, "92.65 %"],
+          ["Total", 215, 12, "94.71 %"],
+          ["2017-18", 126, 10, "92.65 %"],
           ["2016-17", 56, 1, "98.25 %"],
-          ["2015-16", 19, 1, "95.24 %"],
+          ["2015-16", 20, 1, "95.24 %"],
           ["2014-15", 6, 0, "100.00 %"],
         ]
         attemptsTableContents.forEach((values, trIndex) => {
@@ -469,10 +469,10 @@ describe('Course Statistics tests', () => {
       cy.get("#ComparisonDataTable table>tbody").within(() => {
         const attemptsTableContents = [
           // [time, passed, failed, passrate]
-          ["Total", 129, 30, "78.57 %"],
-          ["2017-18", 67, 19, "73.24 %"],
+          ["Total", 110, 30, "78.57 %"],
+          ["2017-18", 52, 19, "73.24 %"],
           ["2016-17", 15, 1, "93.75 %"],
-          ["2015-16", 10, 1, "90.00 %"],
+          ["2015-16", 9, 1, "90.00 %"],
           ["2014-15", 11, 0, "100.00 %"],
         ]
         attemptsTableContents.forEach((values, trIndex) => {
@@ -490,7 +490,7 @@ describe('Course Statistics tests', () => {
       cy.get("#PrimaryDataTable table>tbody").within(() => {
         const studentTableContents = [
           // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
-          ["Total", 171, 165,	0, "96.49 %",	6, 0,	"3.51 %"],
+          ["Total", 218, 165,	47, "97.25 %",	6, 0,	"2.75 %"],
           ["2017-18", 131, 86, 40, "96.18 %", 5, 0, "3.82 %"],
           ["2016-17", 56, 51, 4, "98.21 %", 1, 0, "1.79 %"],
           ["2015-16", 19, 17, 2, "100.00 %", 0, 0, "0.00 %"],
@@ -508,7 +508,7 @@ describe('Course Statistics tests', () => {
       cy.get("#ComparisonDataTable table>tbody").within(() => {
         const studentTableContents = [
           // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
-          ["Total", 115, 95, 0,	"82.61 %", 20, 0,	"17.39 %"],
+          ["Total", 129, 95, 12,	"82.95 %", 20, 2,	"17.05 %"],
           ["2017-18", 67, 48, 3, "76.12 %", 15, 1, "23.88 %"],
           ["2016-17", 15, 11, 3, "93.33 %", 1, 0, "6.67 %"],
           ["2015-16", 10, 9, 0, "90.00 %", 1, 0, "10.00 %"],
