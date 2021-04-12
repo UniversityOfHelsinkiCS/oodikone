@@ -1,12 +1,12 @@
-export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
+const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
   const totals = formattedStats.reduce(
     (acc, curr) => {
       if (curr.rowObfuscated) {
         return acc
       }
 
-      let passed = acc.attempts.categories.passed
-      let failed = acc.attempts.categories.failed
+      let { passed } = acc.attempts.categories
+      let { failed } = acc.attempts.categories
       const cgrades = acc.attempts.grades
 
       Object.keys(curr.attempts.grades).forEach(grade => {
@@ -37,7 +37,7 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       const newFailedRetry = failedRetry
         ? acc.students.categories.failedRetry + failedRetry
         : acc.students.categories.failedRetry
-        
+
       const sgrades = acc.students.grades
 
       Object.keys(curr.students.grades).forEach(grade => {
@@ -49,7 +49,15 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         ...acc,
         coursecode: curr.coursecode,
         attempts: { categories: { passed, failed }, grades: cgrades },
-        students: { categories: { passedFirst: newPassedFirst, passedRetry: newPassedRetry, failedFirst: newFailedFirst, failedRetry: newFailedRetry }, grades: sgrades }
+        students: {
+          categories: {
+            passedFirst: newPassedFirst,
+            passedRetry: newPassedRetry,
+            failedFirst: newFailedFirst,
+            failedRetry: newFailedRetry
+          },
+          grades: sgrades
+        }
       }
     },
     {
@@ -92,3 +100,5 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
 
   return totals
 }
+
+export default countTotalStats

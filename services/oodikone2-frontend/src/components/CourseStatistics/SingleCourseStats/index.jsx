@@ -18,7 +18,7 @@ import { getTextIn } from '../../../common'
 import { getSemesters } from '../../../redux/semesters'
 import TSA from '../../../common/tsa'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import { countTotalStats } from './countStatistics'
+import countTotalStats from './countTotalStats'
 
 const ANALYTICS_CATEGORY = 'Course Statistics'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
