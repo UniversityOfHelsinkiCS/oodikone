@@ -73,7 +73,7 @@ const ResultTabs = props => {
     const getToggle = () => {
       return (
         <div className="chartToggleContainer">
-          {getRadioButton('Attempts', 'Student', selectedView, setSelectedView)}
+          {getRadioButton('Student','Attempts', selectedView, setSelectedView)}
           {(tab === 2 || props.comparison) && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
         </div>
       )
