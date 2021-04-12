@@ -26,11 +26,11 @@ export const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         ? acc.students.categories.passedFirst + passedFirst
         : acc.students.categories.passedFirst
 
-        const newPassedRetry = passedRetry
+      const newPassedRetry = passedRetry
         ? acc.students.categories.passedRetry + passedRetry
         : acc.students.categories.passedRetry
 
-        const newFailedFirst = failedFirst
+      const newFailedFirst = failedFirst
         ? acc.students.categories.failedFirst + failedFirst
         : acc.students.categories.failedFirst
 
