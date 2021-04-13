@@ -66,10 +66,10 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
-    "concurrently": "^6.0.0",
+    "concurrently": "^6.0.1",
     "cypress": "^6.8.0",
     "cypress-smokify": "0.0.3",
-    "husky": "^5.2.0"
+    "husky": "^6.0.0"
   },
   "dependencies": {}
 }

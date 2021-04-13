@@ -5,6 +5,12 @@
 
 .modeSelectorContainer {
   margin-left: 2em;
+  width: 100%;
+}
+
+.chartToggleContainer {
+  display: flex;
+  margin-bottom: 1.5em;
 }
 
 .toggleContainer {
@@ -16,4 +22,9 @@
   cursor: pointer;
   padding-left: 0.5em;
   padding-right: 0.5em;
+}
+
+.totalsDisclaimer {
+  font-style: italic;
+  color: gray;
 }

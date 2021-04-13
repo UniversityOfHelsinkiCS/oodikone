@@ -9,6 +9,7 @@ const TIMEOUTS = {
 }
 
 const AutoSubmitSearchInput = ({
+  clearAllTimeouts,
   clearTimeout,
   onChange,
   setTimeout,
@@ -69,6 +70,7 @@ const AutoSubmitSearchInput = ({
 }
 
 AutoSubmitSearchInput.propTypes = {
+  clearAllTimeouts: func.isRequired,
   clearTimeout: func.isRequired,
   setTimeout: func.isRequired,
   doSearch: func.isRequired,

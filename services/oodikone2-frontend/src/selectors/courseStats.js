@@ -119,20 +119,22 @@ const calculatePassRate = (passed, failed) => {
   return passRate ? passRate.toFixed(2) : null
 }
 
-const getRealisationStats = (realisation, filterStudentFn) => {
-  const { name, attempts } = realisation
+const getRealisationStats = (realisation, filterStudentFn, userHasAccessToAllStats) => {
+  const { name, attempts, obfuscated } = realisation
   const { passed, failed } = attempts.classes
-  const passedAmount = passed.filter(filterStudentFn).length
-  const failedAmount = failed.filter(filterStudentFn).length
+  const passedAmount = userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
+  const failedAmount = userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
+
   return {
     passed: passedAmount,
     failed: failedAmount,
     realisation: name,
-    passrate: calculatePassRate(passedAmount, failedAmount)
+    passrate: calculatePassRate(passedAmount, failedAmount),
+    obfuscated
   }
 }
 
-const getSummaryStats = (statistics, filterStudentFn) => {
+const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) => {
   const summaryAcc = {
     passed: 0,
     failed: 0
@@ -140,8 +142,8 @@ const getSummaryStats = (statistics, filterStudentFn) => {
 
   const summary = statistics.reduce((acc, cur) => {
     const { passed, failed } = cur.attempts.classes
-    acc.passed += passed.filter(filterStudentFn).length
-    acc.failed += failed.filter(filterStudentFn).length
+    acc.passed += userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
+    acc.failed += userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
     return acc
   }, summaryAcc)
 
@@ -153,7 +155,7 @@ const getSummaryStats = (statistics, filterStudentFn) => {
 const summaryStatistics = createSelector(
   getCourseStats,
   getProgrammesFromProps,
-  (courseStats, { programmeCodes, programmes }) => {
+  (courseStats, { programmeCodes, programmes }, userHasAccessToAllStats) => {
     const filteredProgrammes = programmes.filter(p => programmeCodes.includes(p.key))
     const students = new Set(filteredProgrammes.reduce((acc, p) => [...acc, ...flatten(Object.values(p.students))], []))
 
@@ -162,8 +164,12 @@ const summaryStatistics = createSelector(
       const [coursecode, data] = entry
       const { statistics, name } = data
 
-      const realisations = statistics.map(realisation => getRealisationStats(realisation, filterStudentFn))
-      const summary = getSummaryStats(statistics, filterStudentFn)
+      // No filters based on programmes can be applied, if the programme and student number-data
+      // has been obfuscated
+      const realisations = statistics.map(realisation =>
+        getRealisationStats(realisation, filterStudentFn, userHasAccessToAllStats)
+      )
+      const summary = getSummaryStats(statistics, filterStudentFn, userHasAccessToAllStats)
 
       return {
         coursecode,

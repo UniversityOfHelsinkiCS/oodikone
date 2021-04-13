@@ -6,60 +6,78 @@ import { connect } from 'react-redux'
 import { Header, Icon, Item } from 'semantic-ui-react'
 import { uniq } from 'lodash'
 import SortableTable from '../../../../SortableTable'
-import { getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
+import { defineCellColor, getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
 
 const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
   key,
   title,
   getRowVal,
-  getRowContent
+  getRowContent,
+  getCellProps: s => defineCellColor(s)
 })
 
-const getTableData = (stats, isGradeSeries, isRelative) =>
+const getTableData = (stats, notThesisGrades, isRelative) =>
   stats.map(stat => {
     const {
       name,
       code,
-      cumulative: { grades },
-      coursecode
+      attempts: { grades },
+      coursecode,
+      rowObfuscated
     } = stat
 
-    const spread = isGradeSeries ? getGradeSpread([grades], isRelative) : getThesisGradeSpread([grades], isRelative)
-
     const attempts = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
+    const gradeSpread = notThesisGrades
+      ? getGradeSpread([grades], isRelative)
+      : getThesisGradeSpread([grades], isRelative)
+
     return {
       name,
       code,
       coursecode,
       attempts,
-      ...spread
+      rowObfuscated,
+      ...gradeSpread
     }
   })
 
 const includesHTOrTT = stats =>
-  stats.some(({ cumulative }) => ['HT', 'TT'].some(grade => Object.keys(cumulative.grades).includes(grade)))
+  stats.some(({ attempts }) => ['HT', 'TT'].some(grade => Object.keys(attempts.grades).includes(grade)))
 
-const getGradeColumns = (isGradeSeries, addHTAndTT) => {
-  if (!isGradeSeries) return THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => s[k]))
+const getGradeColumns = (notThesisGrades, addHTAndTT) => {
+  if (!notThesisGrades) return THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => (s.rowObfuscated ? 'NA' : s[k])))
   const columns = [
-    getSortableColumn('0', '0', s => s['0']),
-    getSortableColumn('1', '1', s => s['1']),
-    getSortableColumn('2', '2', s => s['2']),
-    getSortableColumn('3', '3', s => s['3']),
-    getSortableColumn('4', '4', s => s['4']),
-    getSortableColumn('5', '5', s => s['5']),
-    getSortableColumn('OTHER_PASSED', 'Other passed', s => s['Hyv.'])
+    getSortableColumn('0', '0', s => (s.rowObfuscated ? 'NA' : s['0'])),
+    getSortableColumn('1', '1', s => (s.rowObfuscated ? 'NA' : s['1'])),
+    getSortableColumn('2', '2', s => (s.rowObfuscated ? 'NA' : s['2'])),
+    getSortableColumn('3', '3', s => (s.rowObfuscated ? 'NA' : s['3'])),
+    getSortableColumn('4', '4', s => (s.rowObfuscated ? 'NA' : s['4'])),
+    getSortableColumn('5', '5', s => (s.rowObfuscated ? 'NA' : s['5'])),
+    getSortableColumn('OTHER_PASSED', 'Other passed', s => (s.rowObfuscated ? 'NA' : s['Hyv.']))
   ]
   if (addHTAndTT)
-    columns.splice(6, 0, getSortableColumn('HT', 'HT', s => s.HT), getSortableColumn('TT', 'TT', s => s.TT))
+    columns.splice(
+      6,
+      0,
+      getSortableColumn('HT', 'HT', s => (s.rowObfuscated ? 'NA' : s.HT)),
+      getSortableColumn('TT', 'TT', s => (s.rowObfuscated ? 'NA' : s.TT))
+    )
   return columns
 }
 
-const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
+const GradesTable = ({
+  stats,
+  name,
+  alternatives,
+  separate,
+  isRelative,
+  userHasAccessToAllStats,
+  headerVisible = false
+}) => {
   const {
-    cumulative: { grades }
+    attempts: { grades }
   } = stats[0]
-  const isGradeSeries = !isThesisGrades(grades)
+  const notThesisGrades = !isThesisGrades(grades)
 
   const showPopulation = (yearcode, years) => {
     const queryObject = {
@@ -73,33 +91,41 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
     return `/coursepopulation?${searchString}`
   }
 
-  const columns = [
-    getSortableColumn(
+  const timeColumn = {
+    ...getSortableColumn(
       'TIME',
       'Time',
       s => s.code,
       s => (
         <div>
           {s.name}
-          {s.name !== 'Total' ? (
+          {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+          {s.name !== 'Total' && userHasAccessToAllStats && (
             <Item as={Link} to={showPopulation(s.code, s.name, s)}>
               <Icon name="level up alternate" />
             </Item>
-          ) : null}
+          )}
         </div>
       )
     ),
-    getSortableColumn('ATTEMPTS', 'Attempts', s => s.attempts),
-    ...getGradeColumns(isGradeSeries, includesHTOrTT(stats))
+    cellProps: { width: 3 }
+  }
+
+  const columns = [
+    timeColumn,
+    getSortableColumn('ATTEMPTS', 'Attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
+    ...getGradeColumns(notThesisGrades, includesHTOrTT(stats))
   ]
 
-  const data = getTableData(stats, isGradeSeries, isRelative)
+  const data = getTableData(stats, notThesisGrades, isRelative)
 
   return (
     <div>
-      <Header as="h3" textAlign="center">
-        {name}
-      </Header>
+      {headerVisible && (
+        <Header as="h3" textAlign="center">
+          {name}
+        </Header>
+      )}
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}
@@ -107,6 +133,9 @@ const GradesTable = ({ stats, name, alternatives, separate, isRelative }) => {
         columns={columns}
         data={data}
       />
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
+      )}
     </div>
   )
 }
@@ -116,7 +145,9 @@ GradesTable.propTypes = {
   name: oneOfType([number, string]).isRequired,
   alternatives: arrayOf(string).isRequired,
   separate: bool,
-  isRelative: bool.isRequired
+  isRelative: bool.isRequired,
+  userHasAccessToAllStats: bool.isRequired,
+  headerVisible: bool.isRequired
 }
 
 GradesTable.defaultProps = {
