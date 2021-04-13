@@ -9,7 +9,6 @@ const { selectFromByIds, bulkCreate } = require('../../db')
 const { getDegrees, getEducation, getEducationType } = require('../shared') // not all of these are really shared,
 // e.g. getDegrees, getEducationType is only used here, refactor?
 
-
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
