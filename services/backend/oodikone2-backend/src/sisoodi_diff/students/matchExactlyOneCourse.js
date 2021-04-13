@@ -11,6 +11,8 @@ const filterByName = (name, courses) =>
     return course.name.fi === name
   })
 
+const filterByGrade = (grade, courses) => courses.filter(course => course.grade === grade)
+
 const coursesMatch = (a, b, matchByName = false, matchByCode = true) => {
   if (matchByName) {
     return a.course.name.fi === b.course.name.fi && a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
@@ -69,7 +71,15 @@ const matchExactlyOneCourse = (courseToPair, courses, matchByName = false, match
   // Need to filter by credit.
   const creditsMatches = filterByCredits(credits, dateMatches)
 
-  if (creditsMatches.length !== 1) {
+  if (creditsMatches.length === 0) {
+    throw new Error('ERROR! Could not match courses (credits).')
+  }
+
+  // Need to filter by grade.
+  const { grade } = courseToPair
+  const gradeMatches = filterByGrade(grade, creditsMatches)
+
+  if (gradeMatches.length !== 1) {
     throw new Error('ERROR! Could not match courses (credits).')
   }
 
