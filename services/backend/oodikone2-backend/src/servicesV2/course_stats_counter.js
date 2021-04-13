@@ -148,21 +148,21 @@ class CourseStatsCounter {
 
   getPassingSemestersCumulative() {
     const passingSemesters = this.stats.passingSemesters
-    const cumulativeStats = {
+    const attemptStats = {
       BEFORE: passingSemesters['BEFORE']
     }
 
-    cumulativeStats['0-FALL'] = passingSemesters['BEFORE'] + passingSemesters['0-FALL']
-    cumulativeStats['0-SPRING'] = cumulativeStats['0-FALL'] + passingSemesters['0-SPRING']
+    attemptStats['0-FALL'] = passingSemesters['BEFORE'] + passingSemesters['0-FALL']
+    attemptStats['0-SPRING'] = attemptStats['0-FALL'] + passingSemesters['0-SPRING']
 
     for (let i = 1; i < 7; i++) {
-      cumulativeStats[fall[i]] = cumulativeStats[spring[i - 1]] + passingSemesters[fall[i]]
-      cumulativeStats[spring[i]] = cumulativeStats[fall[i]] + passingSemesters[spring[i]]
+      attemptStats[fall[i]] = attemptStats[spring[i - 1]] + passingSemesters[fall[i]]
+      attemptStats[spring[i]] = attemptStats[fall[i]] + passingSemesters[spring[i]]
     }
 
-    cumulativeStats['LATER'] = cumulativeStats['6-SPRING'] + passingSemesters['LATER']
+    attemptStats['LATER'] = attemptStats['6-SPRING'] + passingSemesters['LATER']
 
-    return cumulativeStats
+    return attemptStats
   }
 
   getFinalStats() {

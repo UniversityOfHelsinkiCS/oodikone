@@ -102,7 +102,8 @@ const ignores = {
   },
   KH60_001: {
     2017: {
-      oodi: [ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+      oodi: [
+        // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
         '013299358',
         '014720169',
         '014711262',
@@ -112,22 +113,13 @@ const ignores = {
         '014845154' // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
       ]
     },
-    2018:{ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
-      oodi: [
-        '014726105',
-        '014708699',
-        '014732623',
-        '014728983',
-        '014323074',
-        '014624977',
-      ]
+    2018: {
+      // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+      oodi: ['014726105', '014708699', '014732623', '014728983', '014323074', '014624977']
     },
-    2019:{ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
-      oodi: [
-        '014366086',
-        '014731909',
-        '014734511',
-      ]
+    2019: {
+      // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+      oodi: ['014366086', '014731909', '014734511']
     },
     2020:{ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
       oodi: [
@@ -150,7 +142,9 @@ const ignores = {
   },
   MH40_009: {
     2020: {
-      sis: ['010951408']
+      sis: ['010951408'],
+      // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+      oodi: ['013466013', '014590027', '014340963', '014179998', '013743299', '013758239', '014590807']
     }
   },
   // there are many inconsistencies in masters, so they're grouped by the reason, not
@@ -284,11 +278,15 @@ const populationDiff = async (programme, year) => {
 
   if (sisOnly.length > 0) {
     console.log(`${sisOnly.length} only in sis, of which...`)
-    const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.studentStudentnumber)
+    const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.student_studentnumber)
     const remaining = _.difference(sisOnly, wronglySetCancel)
 
-    printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
-    printWithReason(remaining, 'missing from sis for other reasons')
+    if (wronglySetCancel.length > 0) {
+      printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
+    }
+    if (remaining.length > 0) {
+      printWithReason(remaining, 'missing from oodi for other reasons')
+    }
   }
   console.log('') // adding newline before next programme / year
 }

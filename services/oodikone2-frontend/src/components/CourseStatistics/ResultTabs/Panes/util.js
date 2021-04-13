@@ -1,9 +1,9 @@
 import { arrayOf, number, oneOfType, shape, string, oneOf } from 'prop-types'
 
 export const viewModeNames = {
-  CUMULATIVE: 'Cumulative',
-  STUDENT: 'Student',
-  GRADES: 'Grades'
+  ATTEMPTS: 'Attempts',
+  GRADES: 'Grades',
+  STUDENT: 'Student'
 }
 
 export const getDataObject = (name, data, stack) => ({ name, data, stack })
@@ -119,4 +119,8 @@ export const getGradeSpread = (series, isRelative) => {
   }, {})
 
   return isRelative ? relative : newSeries
+}
+
+export const defineCellColor = s => {
+  return s.rowObfuscated && { style: { color: 'gray' } }
 }
