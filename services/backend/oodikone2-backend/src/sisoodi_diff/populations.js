@@ -8,7 +8,6 @@ const { Studyright: SISStudyright, StudyrightElement: SISStudyrightElement } = r
 const { Op } = require('sequelize')
 
 let verbose = false
-let collectAllGrouped = false
 /* 
   if a number under 'sis' it is found in sis-oodikone but missing form
   oodi-oodikone due to a oodi-oodikone fukap
@@ -97,7 +96,7 @@ const ignores = {
     sis: [
       // full-on oodikone fakap, no need to fix
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2745
-      '014581611',
+      '014581611'
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2771
       //'013012234',
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2772
@@ -120,7 +119,7 @@ const ignores = {
       '014015735',
       '014016572',
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2781
-      '013878737',
+      '013878737'
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2749
       //'014577749',
       //'014724767',
@@ -135,14 +134,13 @@ const ignores = {
 let allGrouped = {
   oodiOnly: {
     cancelledInSis: [],
-    other: []
+    unknown: []
   },
   sisOnly: {
     cancelledInOodi: [],
-    other: []
+    unknown: []
   }
 }
-
 
 const populationDiff = async (programme, year) => {
   const months = Number((2020 - Number(year)) * 12 + 7)
@@ -180,14 +178,9 @@ const populationDiff = async (programme, year) => {
   sisOnly = _.difference(sisOnly, ignores.MH_ALL.sis)
   oodiOnly = _.difference(oodiOnly, ignores.MH_ALL.oodi)
 
-  const both = _.intersection(studentsOodi, studentsSis)
-
   if (oodiOnly.length === 0 && sisOnly.length === 0) return
 
-  }
-
-  // Report results and possible causes
-  // console.log('=== Year ', year, ', total both: ', both.length, ' ===')
+  // Check for possible causes and group together
 
   if (oodiOnly.length > 0) {
     //console.log(`${oodiOnly.length} only in oodi, of which...`)
@@ -214,52 +207,38 @@ const populationDiff = async (programme, year) => {
     //   'not at all in sis programme, transferred at some date, not in pakkosiirto'
     // )
     // printWithReason(weirds.notInProgramme, 'not at all in sis programme for some reason')
-    allGrouped.oodi.other.push(...oodiOnly)
+    const cancelledInSis = await checkIfCancelledInSis(programme, oodiOnly)
+
+    const cancelledInSisNums = cancelledInSis.map(s => s.studentStudentnumber)
+    oodiOnly = _.difference(oodiOnly, cancelledInSisNums)
+    allGrouped.oodiOnly.cancelledInSis.push(...cancelledInSisNums)
+    allGrouped.oodiOnly.unknown.push(...oodiOnly)
   }
 
   if (sisOnly.length > 0) {
-    console.log(`${sisOnly.length} only in sis, of which...`)
+    const cancelledInOodi = await checkIfCancelledInOodi(programme, sisOnly)
+    let cancelledInOodiNums = cancelledInOodi.map(s => s.student_studentnumber)
 
-    const cancelledInOodiButPermanentStudyrightInSis = 
-      findCancelledInOodiButPermanentStudyrightInSis(programme, sisOnly)
+    const permanentStudyRight = cancelledInOodi.filter(s => s.enddate.includes("2112"))
+    let permanentStudyRightNums = permanentStudyRight.map(s => s.student_studentnumber)
 
-    sisOnly = _.difference(sisOnly, cancelledInOodiButPermanentStudyrightInSis)
-k
+    cancelledInOodiNums = _.difference(cancelledInOodiNums, permanentStudyRightNums)
+    sisOnly = _.difference(sisOnly, cancelledInOodiNums)
+    
     // const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.student_studentnumber)
     // const remaining = _.difference(sisOnly, wronglySetCancel)
 
     // if (wronglySetCancel.length > 0) {
     //   printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
     // }
-
-    printWithReason(cancelledInOodiButPermanentStudyrightInSis, 
-      'missing since has been cancelled in oodi but has permanent studyright in sis')
-    allGrouped.oodi.other.push(...sisOnly)
-  }
-  console.log('') // adding newline before next programme / year
-}
-
-const printWithReason = (studentnumbers, reason) => {
-  if (studentnumbers.length > 0) {
-    console.log(`- ${studentnumbers.length} ${reason}`)
-    if (verbose)
-      studentnumbers.forEach(s => {
-        console.log(s)
-      })
+    allGrouped.sisOnly.cancelledInOodi.push(...cancelledInOodiNums)
+    allGrouped.sisOnly.unknown.push(...sisOnly)
   }
 }
 
-const programmeDiff = async programme => {
-  if (!collectAllGrouped) {
-    console.log('====== ', programme, ' ======')
-  }
-  const years = ['2017', '2018', '2019', '2020']
-  for (const year of years) {
-    await populationDiff(programme, year)
-  }
-}
+// Function to check diff reasons
 
-const findCancelledInOodiButPermanentStudyrightInSis = async (code, sisOnly) => {
+const checkIfCancelledInOodi = async (code, sisOnly) => {
   const cancelledInOodi = await Studyright.findAll({
     where: {
       canceldate: {
@@ -277,7 +256,28 @@ const findCancelledInOodiButPermanentStudyrightInSis = async (code, sisOnly) => 
       where: { code }
     }
   })
-  return cancelledInOodi.map(s => s.student_studentnumber)
+  return cancelledInOodi
+}
+
+const checkIfCancelledInSis = async (code, oodiOnly) => {
+  const cancelledInSis = await SISStudyright.findAll({
+    where: {
+      canceldate: {
+        [Op.ne]: null
+      }
+    },
+    where: {
+      student_studentnumber: {
+        [Op.in]: oodiOnly
+      }
+    },
+    include: {
+      model: SISStudyrightElement,
+      required: true,
+      where: { code }
+    }
+  })
+  return cancelledInSis
 }
 
 const weirdInSIS = async (oodiOnly, resultOodi, code) => {
@@ -349,6 +349,20 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
   }
 }
 
+const printWithReason = (studentnumbers, reason) => {
+  if (studentnumbers.length > 0) {
+    console.log(`- ${reason}: ${studentnumbers.length} students`)
+    if (verbose) studentnumbers.forEach(s => console.log(s))
+  }
+}
+
+const programmeDiff = async programme => {
+  const years = ['2017', '2018', '2019', '2020']
+  for (const year of years) {
+    await populationDiff(programme, year)
+  }
+}
+
 const masterCodes = async () => {
   return (await StudyrightElement.findAll({
     attributes: ['code'],
@@ -407,11 +421,6 @@ const main = async () => {
     process.exit()
   }
 
-  if (what.includes('allgrouped')) {
-    collectAllGrouped = true
-    console.log('Getting information of all students first, then printing studentnumbers. Might take a while')
-  }
-
   if (what.includes('msc')) {
     await msc()
   }
@@ -431,14 +440,20 @@ const main = async () => {
       await programmeDiff(programme)
     }
   }
-  if (collectAllGrouped) {
-    console.log('=== only in sis ===')
-    console.log(JSON.stringify(allGrouped ))
-    printWithReason(allGrouped.sis.other, 'missing for unknown reasons')
-    console.log('=== only in oodi ===')
-    printWithReason(allGrouped.oodi.other, 'missing for unknown reasons')
-  }
 
+  // Print with reasons 
+  //
+  console.log('=== Only in sis ===')
+  console.log("missing for...")
+  printWithReason(allGrouped.sisOnly.cancelledInOodi, 'cancelled in oodi')
+  printWithReason(allGrouped.sisOnly.unknown, 'unknown reason')
+
+  console.log("")
+
+  console.log('=== Only in oodi ===')
+  console.log("missing for...")
+  printWithReason(allGrouped.oodiOnly.cancelledInSis, 'cancelled in sis')
+  printWithReason(allGrouped.oodiOnly.unknown, 'unknown reason')
   process.exit()
 }
 
@@ -459,8 +474,4 @@ main()
 
     npm run diff:populations KH10_001 KH20_001 KH50_005
 
-
-  if you want all students grouped by diff reason, include 'allgrouped' in arguments:
-    npm run diff:populations msc allgrouped, or 
-    npm run diff:populations KH10_001 KH20_001 KH50_005 allgrouped
 */
