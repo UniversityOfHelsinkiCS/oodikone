@@ -23,7 +23,7 @@
 const studentServiceOodi = require('../../services/students')
 const studentServiceSis = require('../../servicesV2/students')
 const { compareCourses } = require('./compareCourses')
-const { compareCredits } = require('./compareMisc')
+//const { compareCredits } = require('./compareMisc')
 const getStudentNumbers = require('./getStudentNumbers')
 const { output, makeCsv } = require('./output')
 
@@ -34,7 +34,7 @@ const getStudentDiff = async studentNumber => {
   const courses = { oodi: oodi.courses, sis: sis.courses }
 
   //msg = compareStarted(oodi.started, sis.started, msg)
-  msg = compareCredits(sis.credits, sis.courses, msg)
+  //msg = compareCredits(sis.credits, sis.courses, msg)
   msg = await compareCourses({ studentNumber, courses }, msg)
 
   return msg
