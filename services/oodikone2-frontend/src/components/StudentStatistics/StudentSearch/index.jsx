@@ -283,9 +283,4 @@ const mapDispatchToProps = dispatch => ({
   getStudent: studentNumber => dispatch(getStudent(studentNumber))
 })
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(Timeout(StudentSearch))
-)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch)))

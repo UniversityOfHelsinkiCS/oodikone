@@ -53,7 +53,7 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
     <Table celled>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell collapsing></Table.HeaderCell>
+          <Table.HeaderCell collapsing />
           <Table.HeaderCell>Grades</Table.HeaderCell>
           <Table.HeaderCell>
             Number of Students

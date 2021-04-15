@@ -82,11 +82,8 @@ const mapStateToProps = ({ studyProgrammeProductivity, studyProgrammeThroughput,
   bachelors: studyProgrammeBachelors
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    dispatchGetProductivity: getProductivity,
-    dispatchGetThroughput: getThroughput,
-    dispatchGetBachelors: getBachelors
-  }
-)(Overview)
+export default connect(mapStateToProps, {
+  dispatchGetProductivity: getProductivity,
+  dispatchGetThroughput: getThroughput,
+  dispatchGetBachelors: getBachelors
+})(Overview)

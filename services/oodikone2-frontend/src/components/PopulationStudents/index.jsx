@@ -171,7 +171,11 @@ class PopulationStudents extends Component {
       return acc
     }, {})
 
-    const sortedlabels = orderBy(uniqBy(mandatoryCourseLabels, l => l.label), [e => e.orderNumber], ['asc'])
+    const sortedlabels = orderBy(
+      uniqBy(mandatoryCourseLabels, l => l.label),
+      [e => e.orderNumber],
+      ['asc']
+    )
 
     const mandatoryTitle = m => {
       return (
@@ -249,12 +253,15 @@ class PopulationStudents extends Component {
       )
     ]
 
-    const totals = this.props.filteredStudents.reduce((acc, s) => {
-      this.props.mandatoryCourses.forEach(m => {
-        if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
-      })
-      return acc
-    }, this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true }))
+    const totals = this.props.filteredStudents.reduce(
+      (acc, s) => {
+        this.props.mandatoryCourses.forEach(m => {
+          if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
+        })
+        return acc
+      },
+      this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
+    )
     const mandatoryCourseData = [totals, ...this.props.filteredStudents]
 
     // FIXME: here only for refactorment
@@ -464,11 +471,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    toggleStudentListVisibility,
-    getTagsByStudytrack: getTagsByStudytrackAction,
-    getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
-  }
-)(withRouter(PopulationStudents))
+export default connect(mapStateToProps, {
+  toggleStudentListVisibility,
+  getTagsByStudytrack: getTagsByStudytrackAction,
+  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
+})(withRouter(PopulationStudents))

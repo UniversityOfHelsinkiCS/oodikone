@@ -111,9 +111,4 @@ const mapStateToProps = ({ teachers }) => {
   }
 }
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    { findTeachers }
-  )(Timeout(TeacherSearch))
-)
+export default withRouter(connect(mapStateToProps, { findTeachers })(Timeout(TeacherSearch)))

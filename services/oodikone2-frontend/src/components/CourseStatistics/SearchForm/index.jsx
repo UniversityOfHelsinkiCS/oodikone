@@ -351,16 +351,13 @@ const mapStateToProps = state => {
 }
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      getCourseStats,
-      clearCourses,
-      findCoursesV2,
-      clearCourseStats,
-      toggleUnifyOpenUniCourses,
-      getCourseStatsDiff,
-      clearOodiSisDiff
-    }
-  )(SearchForm)
+  connect(mapStateToProps, {
+    getCourseStats,
+    clearCourses,
+    findCoursesV2,
+    clearCourseStats,
+    toggleUnifyOpenUniCourses,
+    getCourseStatsDiff,
+    clearOodiSisDiff
+  })(SearchForm)
 )

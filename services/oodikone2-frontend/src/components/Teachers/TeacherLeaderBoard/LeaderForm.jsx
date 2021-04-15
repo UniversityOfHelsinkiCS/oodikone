@@ -76,7 +76,4 @@ LeaderForm.propTypes = {
   selectedyear: number // eslint-disable-line
 }
 
-export default connect(
-  null,
-  { getTopTeachers }
-)(LeaderForm)
+export default connect(null, { getTopTeachers })(LeaderForm)

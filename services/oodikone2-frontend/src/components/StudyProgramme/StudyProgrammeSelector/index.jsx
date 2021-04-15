@@ -157,7 +157,4 @@ const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  null
-)(StudyProgrammeSelector)
+export default connect(mapStateToProps, null)(StudyProgrammeSelector)

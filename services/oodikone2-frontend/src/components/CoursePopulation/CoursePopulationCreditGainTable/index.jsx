@@ -190,7 +190,4 @@ const mapStateToProps = ({ populations, faculties }) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  null
-)(CoursePopulationCreditGainTable)
+export default connect(mapStateToProps, null)(CoursePopulationCreditGainTable)

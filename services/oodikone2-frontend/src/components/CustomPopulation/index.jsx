@@ -72,7 +72,10 @@ const CustomPopulation = ({
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
     if (indexes.includes(index)) {
-      indexes.splice(indexes.findIndex(ind => ind === index), 1)
+      indexes.splice(
+        indexes.findIndex(ind => ind === index),
+        1
+      )
     } else {
       indexes.push(index)
     }
@@ -232,10 +235,7 @@ const mapStateToProps = ({ populations, populationCourses, customPopulationSearc
   searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    getCustomPopulationCoursesByStudentnumbers,
-    getCustomPopulationSearchesDispatch: getCustomPopulationSearches
-  }
-)(CustomPopulation)
+export default connect(mapStateToProps, {
+  getCustomPopulationCoursesByStudentnumbers,
+  getCustomPopulationSearchesDispatch: getCustomPopulationSearches
+})(CustomPopulation)
