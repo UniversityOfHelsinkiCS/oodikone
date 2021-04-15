@@ -166,7 +166,4 @@ const mapDispatchToProps = {
   getFacultyProgrammes
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(Faculty))
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Faculty))

@@ -85,7 +85,7 @@ const SortableTable = ({
 
   const columnsWithCollapsedHeaders = collapsingHeaders
     ? [
-        ...columns.filter(c => c.headerProps && (!collapsed[c.headerProps.title] && !c.collapsed)),
+        ...columns.filter(c => c.headerProps && !collapsed[c.headerProps.title] && !c.collapsed),
         ...Object.values(collapsed)
       ].sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
     : columns

@@ -378,9 +378,6 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    clearCourseStats
-  }
-)(withRouter(PopulationCourseStats))
+export default connect(mapStateToProps, {
+  clearCourseStats
+})(withRouter(PopulationCourseStats))

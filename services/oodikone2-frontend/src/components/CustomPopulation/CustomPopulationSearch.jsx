@@ -174,15 +174,12 @@ const mapStateToProps = ({ populations, populationCourses, customPopulationSearc
   customPopulationSearchSaving: customPopulationSearch.saving
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    getCustomPopulationDispatch: getCustomPopulation,
-    getCustomPopulationCoursesByStudentnumbers,
-    saveCustomPopulationSearchDispatch: saveCustomPopulationSearch,
-    getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
-    updateCustomPopulationSearchDispatch: updateCustomPopulationSearch,
-    selectCustomPopulationSearchDispatch: selectCustomPopulationSearch,
-    deleteCustomPopulationSearchDispatch: deleteCustomPopulationSearch
-  }
-)(CustomPopulationSearch)
+export default connect(mapStateToProps, {
+  getCustomPopulationDispatch: getCustomPopulation,
+  getCustomPopulationCoursesByStudentnumbers,
+  saveCustomPopulationSearchDispatch: saveCustomPopulationSearch,
+  getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
+  updateCustomPopulationSearchDispatch: updateCustomPopulationSearch,
+  selectCustomPopulationSearchDispatch: selectCustomPopulationSearch,
+  deleteCustomPopulationSearchDispatch: deleteCustomPopulationSearch
+})(CustomPopulationSearch)

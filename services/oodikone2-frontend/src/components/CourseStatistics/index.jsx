@@ -188,9 +188,4 @@ const mapStateToProps = ({
   }
 }
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    { clearCourseStats }
-  )(CourseStatistics)
-)
+export default withRouter(connect(mapStateToProps, { clearCourseStats })(CourseStatistics))

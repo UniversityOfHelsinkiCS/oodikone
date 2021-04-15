@@ -96,9 +96,4 @@ Feedback.propTypes = {
   error: PropTypes.bool.isRequired
 }
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    { sendFeedback: sendFeedbackAction }
-  )(Feedback)
-)
+export default withRouter(connect(mapStateToProps, { sendFeedback: sendFeedbackAction })(Feedback))

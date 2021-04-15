@@ -122,7 +122,4 @@ const mapDispatchToProps = {
   onClearErrors: clearErrors
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(EmailNotification)
+export default connect(mapStateToProps, mapDispatchToProps)(EmailNotification)

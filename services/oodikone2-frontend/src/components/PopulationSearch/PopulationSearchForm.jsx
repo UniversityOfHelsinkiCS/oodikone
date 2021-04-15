@@ -660,19 +660,16 @@ const mapStateToProps = ({ semesters, settings, populations, populationDegreesAn
 }
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      getPopulationStatistics,
-      getPopulationCourses,
-      getPopulationSelectedStudentCourses,
-      getMandatoryCourses,
-      getDegreesAndProgrammes,
-      setLoading,
-      getSemesters,
-      getTagsByStudytrackAction,
-      clearSelected,
-      clearPopulations
-    }
-  )(PopulationSearchForm)
+  connect(mapStateToProps, {
+    getPopulationStatistics,
+    getPopulationCourses,
+    getPopulationSelectedStudentCourses,
+    getMandatoryCourses,
+    getDegreesAndProgrammes,
+    setLoading,
+    getSemesters,
+    getTagsByStudytrackAction,
+    clearSelected,
+    clearPopulations
+  })(PopulationSearchForm)
 )

@@ -171,7 +171,4 @@ Updater.propTypes = {}
 
 Updater.defaultProps = {}
 
-export default connect(
-  null,
-  null
-)(Updater)
+export default connect(null, null)(Updater)

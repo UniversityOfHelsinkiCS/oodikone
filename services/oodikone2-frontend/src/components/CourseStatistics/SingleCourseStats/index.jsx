@@ -101,7 +101,12 @@ const SingleCourseStats = ({
   const setExcludedToComparison = () => setComparison(primary.includes(ALL.value) ? [] : ['EXCLUDED'])
 
   const getExcluded = () =>
-    primary.includes(ALL.value) ? [] : difference(programmes.map(p => p.value).filter(v => v !== ALL.value), primary)
+    primary.includes(ALL.value)
+      ? []
+      : difference(
+          programmes.map(p => p.value).filter(v => v !== ALL.value),
+          primary
+        )
 
   const belongsToAtLeastOneProgramme = codes => {
     if (codes.includes(ALL.value)) return () => true
@@ -120,7 +125,7 @@ const SingleCourseStats = ({
 
   const validProgCode = code => {
     const { programmes } = stats
-    return programmes[code] || (code === ALL.value || code === 'EXCLUDED')
+    return programmes[code] || code === ALL.value || code === 'EXCLUDED'
   }
 
   const filteredYearsAndSemesters = () => {
@@ -460,9 +465,4 @@ const mapDispatchToProps = {
   getMaxYearsToCreatePopulationFrom
 }
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(SingleCourseStats)
-)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats))

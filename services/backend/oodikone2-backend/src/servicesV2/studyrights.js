@@ -63,7 +63,10 @@ const nonGraduatedStudentsOfElementDetail = async code => {
     }
   })
 
-  const studyrights = await getActiveStudyrightsFromIdsBeforeDate(studyrightElements.map(sE => sE.studyrightid), today)
+  const studyrights = await getActiveStudyrightsFromIdsBeforeDate(
+    studyrightElements.map(sE => sE.studyrightid),
+    today
+  )
 
   // Filter out students that are in new master's programmes,
   // see if student is currently enrolled and format the result

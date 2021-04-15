@@ -242,14 +242,11 @@ const mapStateToProps = state => ({
   isAdmin: getUserRoles(state.auth.token.roles).includes('admin')
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    removeUserUnits,
-    setFaculties,
-    getDegreesAndProgrammesUnfiltered,
-    getAccessGroups,
-    getFaculties,
-    getElementDetails
-  }
-)(withRouter(UserPage))
+export default connect(mapStateToProps, {
+  removeUserUnits,
+  setFaculties,
+  getDegreesAndProgrammesUnfiltered,
+  getAccessGroups,
+  getFaculties,
+  getElementDetails
+})(withRouter(UserPage))

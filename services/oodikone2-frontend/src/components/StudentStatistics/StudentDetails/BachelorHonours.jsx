@@ -190,7 +190,6 @@ const mapStateToProps = ({ populationMandatoryCourses }) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { getMandatoryCourseModulesDispatch: getMandatoryCourseModules }
-)(BachelorHonours)
+export default connect(mapStateToProps, { getMandatoryCourseModulesDispatch: getMandatoryCourseModules })(
+  BachelorHonours
+)

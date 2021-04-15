@@ -25,7 +25,8 @@ const ignores = {
   KH20_001: {
     2020: {
       sis: [
-        '014472190', '014709698' // mistakenly missing from oodi-oodikone
+        '014472190',
+        '014709698' // mistakenly missing from oodi-oodikone
       ]
     }
   },
@@ -61,7 +62,7 @@ const ignores = {
   },
   KH50_001: {
     2020: {
-      oodi:['013470384']  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+      oodi: ['013470384'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
   KH50_004: {
@@ -74,7 +75,7 @@ const ignores = {
       sis: ['014480768'] // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
     },
     2020: {
-      sis: ['014614071', '013497370' ] // missing from oodi-oodikone perhaps due to missing läsnäolo for suksy
+      sis: ['014614071', '013497370'] // missing from oodi-oodikone perhaps due to missing läsnäolo for suksy
     }
   },
   KH57_002: {
@@ -118,7 +119,8 @@ const ignores = {
       // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
       oodi: ['014366086', '014731909', '014734511']
     },
-    2020:{ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+    2020: {
+      // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
       oodi: [
         '013466013',
         '014590027',
@@ -274,12 +276,12 @@ const populationDiff = async (programme, year) => {
     const cancelledInOodi = await checkIfCancelledInOodi(programme, sisOnly)
     let cancelledInOodiNums = cancelledInOodi.map(s => s.student_studentnumber)
 
-    const permanentStudyRight = cancelledInOodi.filter(s => s.enddate.includes("2112"))
+    const permanentStudyRight = cancelledInOodi.filter(s => s.enddate.includes('2112'))
     let permanentStudyRightNums = permanentStudyRight.map(s => s.student_studentnumber)
 
     cancelledInOodiNums = _.difference(cancelledInOodiNums, permanentStudyRightNums)
     sisOnly = _.difference(sisOnly, cancelledInOodiNums)
-    
+
     // const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.student_studentnumber)
     // const remaining = _.difference(sisOnly, wronglySetCancel)
 
@@ -419,29 +421,33 @@ const programmeDiff = async programme => {
 }
 
 const masterCodes = async () => {
-  return (await StudyrightElement.findAll({
-    attributes: ['code'],
-    where: {
-      code: {
-        [Op.like]: 'MH%'
-      }
-    },
-    group: ['code'],
-    order: ['code']
-  })).map(s => s.code)
+  return (
+    await StudyrightElement.findAll({
+      attributes: ['code'],
+      where: {
+        code: {
+          [Op.like]: 'MH%'
+        }
+      },
+      group: ['code'],
+      order: ['code']
+    })
+  ).map(s => s.code)
 }
 
 const bscCodes = async () => {
-  return (await StudyrightElement.findAll({
-    attributes: ['code'],
-    where: {
-      code: {
-        [Op.like]: 'KH%'
-      }
-    },
-    group: ['code'],
-    order: ['code']
-  })).map(s => s.code)
+  return (
+    await StudyrightElement.findAll({
+      attributes: ['code'],
+      where: {
+        code: {
+          [Op.like]: 'KH%'
+        }
+      },
+      group: ['code'],
+      order: ['code']
+    })
+  ).map(s => s.code)
 }
 
 const msc = async () => {
@@ -496,17 +502,17 @@ const main = async () => {
     }
   }
 
-  // Print with reasons 
+  // Print with reasons
   //
   console.log('=== Only in sis ===')
-  console.log("missing for...")
+  console.log('missing for...')
   printWithReason(allGrouped.sisOnly.cancelledInOodi, 'cancelled in oodi')
   printWithReason(allGrouped.sisOnly.unknown, 'unknown reason')
 
-  console.log("")
+  console.log('')
 
   console.log('=== Only in oodi ===')
-  console.log("missing for...")
+  console.log('missing for...')
   printWithReason(allGrouped.oodiOnly.cancelledInSis, 'cancelled in sis')
   printWithReason(allGrouped.oodiOnly.unknown, 'unknown reason')
   process.exit()

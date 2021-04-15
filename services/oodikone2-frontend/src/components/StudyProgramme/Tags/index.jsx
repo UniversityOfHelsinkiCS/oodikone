@@ -187,12 +187,9 @@ Tags.propTypes = {
 }
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      createTag: createTagAction,
-      deleteTag: deleteTagAction,
-      getTagsByStudytrack: getTagsByStudytrackAction
-    }
-  )(Tags)
+  connect(mapStateToProps, {
+    createTag: createTagAction,
+    deleteTag: deleteTagAction,
+    getTagsByStudytrack: getTagsByStudytrackAction
+  })(Tags)
 )

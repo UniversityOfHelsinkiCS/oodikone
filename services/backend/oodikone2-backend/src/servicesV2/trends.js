@@ -383,15 +383,17 @@ const mankeliUberData = data =>
 const getCurrentStudyYearStartDate = _.memoize(
   async unixMillis =>
     new Date(
-      (await sequelize.query(
-        `
+      (
+        await sequelize.query(
+          `
     SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < :a ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
     `,
-        {
-          type: sequelize.QueryTypes.SELECT,
-          replacements: { a: new Date(unixMillis) }
-        }
-      ))[0].startdate
+          {
+            type: sequelize.QueryTypes.SELECT,
+            replacements: { a: new Date(unixMillis) }
+          }
+        )
+      )[0].startdate
     )
 )
 

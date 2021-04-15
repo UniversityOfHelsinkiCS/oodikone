@@ -78,12 +78,9 @@ const mapStateToProps = state => ({
 })
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      removeStudentSelection,
-      resetStudent,
-      updatePopulationStudents
-    }
-  )(StudentInfoCard)
+  connect(mapStateToProps, {
+    removeStudentSelection,
+    resetStudent,
+    updatePopulationStudents
+  })(StudentInfoCard)
 )

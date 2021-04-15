@@ -78,7 +78,4 @@ const mapStateToProps = ({ thesisCourses }) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { getThesisCourses, deleteThesisCourse }
-)(ThesisCourseList)
+export default connect(mapStateToProps, { getThesisCourses, deleteThesisCourse })(ThesisCourseList)

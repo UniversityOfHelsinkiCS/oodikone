@@ -156,10 +156,7 @@ const mapStateToProps = ({ teachersTop, teachersTopCategories }) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    getTopTeachersCategories,
-    getTopTeachers
-  }
-)(withRouter(TeacherLeaderBoard))
+export default connect(mapStateToProps, {
+  getTopTeachersCategories,
+  getTopTeachers
+})(withRouter(TeacherLeaderBoard))

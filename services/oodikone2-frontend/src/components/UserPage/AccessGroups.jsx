@@ -89,10 +89,7 @@ const mapStateToProps = ({ accessGroups, users }, { user }) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    getAccessGroups,
-    modifyAccessGroups
-  }
-)(AccessGroups)
+export default connect(mapStateToProps, {
+  getAccessGroups,
+  modifyAccessGroups
+})(AccessGroups)
