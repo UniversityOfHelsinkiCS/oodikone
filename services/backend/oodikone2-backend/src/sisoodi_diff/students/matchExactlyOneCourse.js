@@ -13,17 +13,8 @@ const filterByName = (name, courses) =>
 
 const filterByGrade = (grade, courses) => courses.filter(course => course.grade === grade)
 
-const coursesMatch = (a, b, matchByName = false, matchByCode = true) => {
-  if (matchByName) {
-    return a.course.name.fi === b.course.name.fi && a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
-  }
-
-  if (matchByCode) {
-    return a.course.code === b.course.code && a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
-  }
-
-  return a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
-}
+// FIXME: unnecessary code
+const coursesMatch = (a, b) => a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
 
 // Idea here is to find exactly one matching course or fail otherwise.
 const matchExactlyOneCourse = (courseToPair, courses, matchByName = false, matchByCode = true) => {
