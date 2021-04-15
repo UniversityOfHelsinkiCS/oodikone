@@ -14,6 +14,21 @@ let verbose = false
 */
 
 const ignores = {
+  KH10_001: {
+    2017: {
+      oodi: ['014816167'] // on tohtoriopiskelija, mutta kandioikeus jätetty oodissa voimaan
+    },
+    2020: {
+      oodi: ['011725361'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+    }
+  },
+  KH20_001: {
+    2020: {
+      sis: [
+        '014472190', '014709698' // mistakenly missing from oodi-oodikone
+      ]
+    }
+  },
   KH40_001: {
     2020: {
       oodi: ['014290314'] // Oodissa on virhe opintoajan pituuden laskussa. Tämä on tullut äskettäin ilmi. Sisussa on siis oikeat tiedot.
@@ -29,9 +44,24 @@ const ignores = {
       sis: ['015340182'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
     }
   },
+  KH40_004: {
+    2020: {
+      sis: ['011516143'] // ei läsnä syksyllä, puuttuu ehkä siksi oodista?
+    }
+  },
   KH40_005: {
     2018: {
       sis: ['014650093'] // on tosiaan vähän ristiriitaiset tiedot Oodissa. Sisussa näkyy kuitenkin ok, niin että annetaan olla
+    }
+  },
+  KH40_006: {
+    2020: {
+      oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+    }
+  },
+  KH50_001: {
+    2020: {
+      oodi:['013470384']  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
   KH50_004: {
@@ -42,6 +72,9 @@ const ignores = {
   KH74_001: {
     2019: {
       sis: ['014480768'] // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
+    },
+    2020: {
+      sis: ['014614071', '013497370' ] // missing from oodi-oodikone perhaps due to missing läsnäolo for suksy
     }
   },
   KH57_002: {
@@ -73,7 +106,8 @@ const ignores = {
         '014711262',
         '014721825',
         '014528934',
-        '014659133'
+        '014659133',
+        '014845154' // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
       ]
     },
     2018: {
@@ -84,7 +118,28 @@ const ignores = {
       // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
       oodi: ['014366086', '014731909', '014734511']
     },
+    2020:{ // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
+      oodi: [
+        '013466013',
+        '014590027',
+        '014340963',
+        '014179998',
+        '013743299',
+        '013758239',
+        '014590807',
+        '013495071' // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
+      ],
+      sis: ['014734511'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2790 also a varhaiskasvatus issue
+    }
+  },
+  MH10_001: {
     2020: {
+      sis: ['012334670']
+    }
+  },
+  MH40_009: {
+    2020: {
+      sis: ['010951408'],
       // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
       oodi: ['013466013', '014590027', '014340963', '014179998', '013743299', '013758239', '014590807']
     }
