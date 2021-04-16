@@ -24,8 +24,8 @@ const formatCredit = credit => {
   return { id, year, credits }
 }
 
-const getTransferredCredits = (provider, since) =>
-  Credit.findAll({
+const getTransferredCredits = async (provider, since) =>
+  await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'credittypecode'],
     include: {
       model: Course,
@@ -53,8 +53,8 @@ const getTransferredCredits = (provider, since) =>
     }
   })
 
-const getCreditsForMajors = (provider, since, studentnumbers) =>
-  Credit.findAll({
+const getCreditsForMajors = async (provider, since, studentnumbers) =>
+  await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
     include: {
       model: Course,
@@ -85,34 +85,36 @@ const getCreditsForMajors = (provider, since, studentnumbers) =>
     }
   })
 
-const getCreditsForProvider = (provider, since) =>
-  Credit.findAll({
-    attributes: ['id', 'course_code', 'credits', 'attainment_date'],
-    include: {
-      model: Course,
-      attributes: ['code'],
-      required: true,
-      where: {
-        is_study_module: false
-      },
+const getCreditsForProvider = async (provider, since) =>
+  (
+    await Credit.findAll({
+      attributes: ['id', 'course_code', 'credits', 'attainment_date'],
       include: {
-        model: Provider,
-        attributes: [],
+        model: Course,
+        attributes: ['code'],
         required: true,
         where: {
-          providercode: provider
+          is_study_module: false
+        },
+        include: {
+          model: Provider,
+          attributes: [],
+          required: true,
+          where: {
+            providercode: provider
+          }
+        }
+      },
+      where: {
+        credittypecode: {
+          [Op.notIn]: [10, 9]
+        },
+        attainment_date: {
+          [Op.gte]: since
         }
       }
-    },
-    where: {
-      credittypecode: {
-        [Op.notIn]: [10, 9]
-      },
-      attainment_date: {
-        [Op.gte]: since
-      }
-    }
-  }).map(formatCredit)
+    })
+  ).map(formatCredit)
 
 const productivityStatsFromCredits = credits => {
   const stats = {}
