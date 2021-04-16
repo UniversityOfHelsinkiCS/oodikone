@@ -30,7 +30,7 @@ const bySearchTerm = async rawTerm => {
     return []
   }
   const terms = splitByEmptySpace(searchTerm)
-  return Teacher.findAll({
+  return await Teacher.findAll({
     attributes: {
       exclude: ['createdAt', 'updatedAt']
     },
@@ -40,8 +40,8 @@ const bySearchTerm = async rawTerm => {
   })
 }
 
-const findTeacherCredits = teacherid =>
-  Teacher.findByPk(teacherid, {
+const findTeacherCredits = async teacherid =>
+  await Teacher.findByPk(teacherid, {
     attributes: ['name', 'code', 'id'],
     include: {
       model: Credit,
@@ -169,7 +169,7 @@ const teacherStats = async teacherid => {
 }
 
 const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => {
-  const teachers = Teacher.findAll({
+  const teachers = await Teacher.findAll({
     attributes: ['id'],
     include: {
       model: Credit,
@@ -207,8 +207,8 @@ const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => 
   return teachers.map(({ id }) => id)
 }
 
-const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) =>
-  Teacher.findAll({
+const getCredits = async (teacherIds, semestercodeStart, semestercodeEnd) =>
+  await Teacher.findAll({
     attributes: ['name', 'code', 'id'],
     include: {
       model: Credit,
