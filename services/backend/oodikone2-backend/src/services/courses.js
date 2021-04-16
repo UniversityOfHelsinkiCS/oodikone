@@ -455,15 +455,17 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
     const nonOpenUniCodes = _.uniq(codes.map(unifyOpenUniversity))
 
     const matchingOpenUniCourseCodes = nonOpenUniCodes.length
-      ? await Course.findAll({
-          where: {
-            code: {
-              [Op.regexp]: {
-                [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
+      ? (
+          await Course.findAll({
+            where: {
+              code: {
+                [Op.regexp]: {
+                  [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
+                }
               }
             }
-          }
-        }).map(course => course.code)
+          })
+        ).map(course => course.code)
       : []
 
     codes.push(...matchingOpenUniCourseCodes)
@@ -530,14 +532,16 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
 const maxYearsToCreatePopulationFrom = async coursecodes => {
   const maxAttainmentDate = new Date(
     Math.max(
-      ...(await Course.findAll({
-        where: {
-          code: {
-            [Op.in]: coursecodes
-          }
-        },
-        attributes: ['max_attainment_date']
-      }).map(c => new Date(c.max_attainment_date).getTime()))
+      ...(
+        await Course.findAll({
+          where: {
+            code: {
+              [Op.in]: coursecodes
+            }
+          },
+          attributes: ['max_attainment_date']
+        })
+      ).map(c => new Date(c.max_attainment_date).getTime())
     )
   )
   const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
