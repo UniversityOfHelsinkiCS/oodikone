@@ -3,7 +3,7 @@ const { ElementDetails, StudyrightElement } = require('../models')
 const Op = Sequelize.Op
 
 const hasStudent = async (code, studentnumber) =>
-  StudyrightElement.findOne({
+  await StudyrightElement.findOne({
     where: {
       studentnumber,
       code
