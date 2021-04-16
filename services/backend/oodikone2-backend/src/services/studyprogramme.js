@@ -135,28 +135,30 @@ const formatGraduatedStudyright = ({ studyrightid, enddate, studystartdate }) =>
   return { studyrightid, year, timeToGraduation }
 }
 
-const findGraduated = (studytrack, since) =>
-  Studyright.findAll({
-    include: {
-      model: StudyrightElement,
-      attributes: [],
-      required: true,
+const findGraduated = async (studytrack, since) =>
+  (
+    await Studyright.findAll({
       include: {
-        model: ElementDetails,
+        model: StudyrightElement,
         attributes: [],
         required: true,
-        where: {
-          code: studytrack
+        include: {
+          model: ElementDetails,
+          attributes: [],
+          required: true,
+          where: {
+            code: studytrack
+          }
+        }
+      },
+      where: {
+        graduated: 1,
+        enddate: {
+          [Op.gte]: since
         }
       }
-    },
-    where: {
-      graduated: 1,
-      enddate: {
-        [Op.gte]: since
-      }
-    }
-  }).map(formatGraduatedStudyright)
+    })
+  ).map(formatGraduatedStudyright)
 
 const graduatedStatsFromStudyrights = studyrights => {
   const stats = {}
@@ -195,15 +197,17 @@ const findProgrammeThesisCredits = async code => {
   // for old programme but they will show up in the new one since same course code)
   // get first studentnumbers that are actually in the new programme
 
-  const studentNumbers = await StudyrightElement.findAll({
-    attributes: ['studentnumber'],
-    where: {
-      code: {
-        [Op.eq]: code
-      }
-    },
-    raw: true
-  }).map(sn => sn.studentnumber)
+  const studentNumbers = (
+    await StudyrightElement.findAll({
+      attributes: ['studentnumber'],
+      where: {
+        code: {
+          [Op.eq]: code
+        }
+      },
+      raw: true
+    })
+  ).map(sn => sn.studentnumber)
 
   const credits = await Credit.findAll({
     include: {
@@ -361,8 +365,8 @@ const thesesFromClass = async (studentnumbers, startDate, code) => {
   return theses
 }
 
-const graduationsFromClass = async (studentnumbers, studytrack) => {
-  return Studyright.findAll({
+const graduationsFromClass = async (studentnumbers, studytrack) =>
+  await Studyright.findAll({
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -382,7 +386,6 @@ const graduationsFromClass = async (studentnumbers, studytrack) => {
       }
     }
   })
-}
 
 const gendersFromClass = async studentnumbers => {
   return Student.findAll({
@@ -416,8 +419,8 @@ const nationalitiesFromClass = async studentnumbers => {
   }, {})
 }
 
-const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Transfers.count({
+const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, endDate) =>
+  await Transfers.count({
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
@@ -430,10 +433,9 @@ const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, e
     distinct: true,
     col: 'studentnumber'
   })
-}
 
-const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Transfers.count({
+const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack, endDate) =>
+  await Transfers.count({
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
@@ -446,7 +448,6 @@ const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack
     distinct: true,
     col: 'studentnumber'
   })
-}
 
 const formatCreditsForProductivity = credits => {
   return credits.map(formatCredit).reduce(function(acc, curr) {
@@ -473,8 +474,8 @@ const transferredCreditsForProductivity = async (studytrack, since) => {
   return formattedCredits
 }
 
-const cancelledStudyright = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Studyright.count({
+const cancelledStudyright = async (studentnumbers, startDate, studytrack, endDate) =>
+  await Studyright.count({
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -494,10 +495,9 @@ const cancelledStudyright = async (studentnumbers, startDate, studytrack, endDat
       }
     }
   })
-}
 
-const startedStudyright = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Studyright.count({
+const startedStudyright = async (studentnumbers, startDate, studytrack, endDate) =>
+  await Studyright.count({
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -517,7 +517,6 @@ const startedStudyright = async (studentnumbers, startDate, studytrack, endDate)
       }
     }
   })
-}
 
 const optionData = async (startDate, endDate, code, level) => {
   const programmes = await getAllProgrammes()
