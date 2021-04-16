@@ -411,7 +411,8 @@ PopulationCourseStats.propTypes = {
   }).isRequired,
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired,
+  language: string.isRequired
 }
 
 const mapStateToProps = ({ populationCourses }) => ({

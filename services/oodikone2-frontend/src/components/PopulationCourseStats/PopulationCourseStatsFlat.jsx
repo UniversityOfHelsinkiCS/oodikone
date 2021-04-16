@@ -360,7 +360,8 @@ PopulationCourseStats.propTypes = {
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   years: shape({}), // eslint-disable-line
-  showFilter: bool
+  showFilter: bool,
+  language: string.isRequired
 }
 
 PopulationCourseStats.defaultProps = {
