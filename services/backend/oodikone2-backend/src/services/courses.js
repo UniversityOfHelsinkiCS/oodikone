@@ -486,10 +486,12 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
       semestername,
       yearcode,
       yearname,
+      attainment_date,
       programmes,
       coursecode,
       credits
     } = credit
+
     const groupcode = separate ? semestercode : yearcode
     const groupname = separate ? semestername : yearname
     const unknownProgramme = [
@@ -518,6 +520,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
       credits
     )
     counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
+    counter.markCreditToNewCategory(studentnumber, passed, attainment_date, groupcode)
     counter.markCreditToHistory(studentnumber, passed)
   }
   const statistics = counter.getFinalStatistics(anonymizationSalt)
