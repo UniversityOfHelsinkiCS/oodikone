@@ -27,6 +27,7 @@ const ResultTabs = props => {
   const [viewMode, setViewMode] = useState(viewModeNames.ATTEMPTS)
   const [selectedView, setSelectedView] = useState(false)
   const [isRelative, setIsRelative] = useState(false)
+  const [showGrades, setShowGrades] = useState(false)
 
   const handleModeChange = newViewMode => {
     sendAnalytics(`Current view mode '${newViewMode}'`, 'Course statistics')
@@ -39,7 +40,7 @@ const ResultTabs = props => {
   }, [selectedView])
 
   const handleTabChange = (...params) => {
-    const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE && viewMode === viewModeNames.GRADES
+    const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE && viewMode === viewModeNames.ATTEMPTS
     const { activeIndex } = params[1]
     const currentTab = params[1].panes[activeIndex]
     sendAnalytics(`Current tab '${currentTab.menuItem.content}'`, 'Course statistics')
@@ -62,7 +63,8 @@ const ResultTabs = props => {
         {Object.values(viewModeNames).map(name => (
           <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
         ))}
-        {viewMode === 'Grades' && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
+        {viewMode === 'Attempts' && getRadioButton('Totals', 'Grade distribution', showGrades, setShowGrades)}
+        {viewMode === 'Attempts' && showGrades && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
       </Menu>
     )
 
@@ -98,6 +100,7 @@ const ResultTabs = props => {
             primary={primary}
             viewMode={viewMode}
             isRelative={isRelative}
+            showGrades={showGrades}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
         )
