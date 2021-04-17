@@ -116,7 +116,7 @@ const AttemptsTable = ({
 
   let columns = [
     timeColumn,
-    getSortableColumn('ATTEMPTS', 'Attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
+    getSortableColumn('ATTEMPTS', 'Total attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
     getSortableColumn('PASSED', 'Passed', s => (s.rowObfuscated ? '5 or less students' : s.passed)),
     getSortableColumn('FAILED', 'Failed', s => (s.rowObfuscated ? '5 or less students' : s.failed)),
     getSortableColumn(
@@ -130,7 +130,7 @@ const AttemptsTable = ({
   if (showGrades) {
     columns = [
       timeColumn,
-      getSortableColumn('ATTEMPTS', 'Attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
+      getSortableColumn('ATTEMPTS', 'Total attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
       ...getGradeColumns(notThesisGrades, includesHTOrTT(stats))
     ]
   }
