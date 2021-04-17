@@ -171,16 +171,14 @@ const SingleCourseStats = ({
   }
 
   const countStudentStats = (allstudents, filter) => {
-    const grades = countFilteredStudents(allstudents.grades, filter)
-    const categories = countFilteredStudents(allstudents.classes, filter)
+    const categories = countFilteredStudents(allstudents.categories, filter)
 
-    const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = categories
-    const total = passedFirst + passedRetry + failedFirst + failedRetry
-    const passRate = (passedFirst + passedRetry) / total
-    const failRate = (failedFirst + failedRetry) / total
+    const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = categories
+    const total = passedFirst + passedEventually + neverPassed
+    const passRate = (passedFirst + passedEventually) / total
+    const failRate = neverPassed / total
 
     return {
-      grades,
       categories,
       passRate,
       failRate,
@@ -193,21 +191,30 @@ const SingleCourseStats = ({
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const formattedStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allstudents, attempts: allAttempts, coursecode, obfuscated }) => {
-        const attempts = countAttemptStats(allAttempts, filter)
-        const students = countStudentStats(allstudents, filter)
-
-        const parsedName = separate ? getTextIn(name, language) : name
-        return {
+      .map(
+        ({
           code,
-          name: parsedName,
-          attempts,
-          students,
+          name,
+          students: allstudents,
+          newStudents: allNewStudents,
+          attempts: allAttempts,
           coursecode,
-          rowObfuscated: obfuscated,
-          userHasAccessToAllStats
+          obfuscated
+        }) => {
+          const attempts = countAttemptStats(allAttempts, filter)
+          const newStudents = countStudentStats(allNewStudents, filter)
+          const parsedName = separate ? getTextIn(name, language) : name
+          return {
+            code,
+            name: parsedName,
+            attempts,
+            students: newStudents,
+            coursecode,
+            rowObfuscated: obfuscated,
+            userHasAccessToAllStats
+          }
         }
-      })
+      )
 
     const totals = countTotalStats(formattedStats, userHasAccessToAllStats)
 

@@ -16,6 +16,7 @@ class CourseYearlyStatsCounter {
       failed: new Set(),
       attempts: new Set()
     }
+    this.students = new Map()
   }
 
   initProgramme(code, name) {
@@ -48,6 +49,14 @@ class CourseYearlyStatsCounter {
           failed: []
         }
       },
+      newStudents: {
+        categories: {
+          passedFirst: [],
+          passedEventually: [],
+          neverPassed: []
+        }
+      },
+      studentnumbers: [],
       students: {},
       yearcode
     }
@@ -157,6 +166,49 @@ class CourseYearlyStatsCounter {
     }
   }
 
+  markCreditToNewCategory(studentnumber, passed, attainment_date, groupcode) {
+    if (!this.students.has(studentnumber)) {
+      if (passed) {
+        this.students.set(studentnumber, {
+          earliestAttainment: attainment_date,
+          category: 'passedFirst',
+          code: groupcode
+        })
+      } else {
+        this.students.set(studentnumber, {
+          earliestAttainment: attainment_date,
+          category: 'neverPassed',
+          code: groupcode
+        })
+      }
+    } else {
+      const student = this.students.get(studentnumber)
+      if (attainment_date < student.earliestAttainment) {
+        if (passed) {
+          this.students.set(studentnumber, {
+            earliestAttainment: attainment_date,
+            category: 'passedFirst',
+            code: groupcode
+          })
+        } else {
+          if (student.category == 'passedFirst') {
+            this.students.set(studentnumber, {
+              earliestAttainment: attainment_date,
+              category: 'passedEventually',
+              code: groupcode
+            })
+          }
+        }
+      } else {
+        if (student.category === 'neverPassed') {
+          if (passed) {
+            this.students.set(studentnumber, { ...student, category: 'passedEventually' })
+          }
+        }
+      }
+    }
+  }
+
   parseStudentStatistics(students) {
     const grades = {}
     const classes = {}
@@ -186,6 +238,13 @@ class CourseYearlyStatsCounter {
   }
 
   parseGroupStatistics(anonymizationSalt) {
+    if (!anonymizationSalt) {
+      for (const [studentnumber, data] of this.students) {
+        this.groups[data.code].newStudents.categories[data.category].push(studentnumber)
+        this.groups[data.code].studentnumbers.push(studentnumber)
+      }
+    }
+
     const groupStatistics = Object.values(this.groups).map(({ students, ...rest }) => {
       const normalStats = {
         ...rest,
