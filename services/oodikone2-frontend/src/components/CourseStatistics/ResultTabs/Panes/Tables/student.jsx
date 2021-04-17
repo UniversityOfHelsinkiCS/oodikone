@@ -55,7 +55,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
           },
           {
             key: 'TOTAL',
-            title: 'Students',
+            title: 'All students',
             getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.total),
             getCellProps: s => defineCellColor(s),
             headerProps: { rowSpan: 2, width: 3 }
