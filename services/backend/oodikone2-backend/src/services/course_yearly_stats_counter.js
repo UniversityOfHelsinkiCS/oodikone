@@ -1,21 +1,9 @@
-const CATEGORY = {
-  FAIL_FIRST: 'failedFirst',
-  PASS_FIRST: 'passedFirst',
-  FAIL_RETRY: 'failedRetry',
-  PASS_RETRY: 'passedRetry'
-}
-
 class CourseYearlyStatsCounter {
   constructor() {
     this.groups = {}
     this.programmes = {}
     this.facultyStats = {}
     this.obfuscated = false
-    this.history = {
-      passed: new Set(),
-      failed: new Set(),
-      attempts: new Set()
-    }
     this.students = new Map()
   }
 
@@ -61,13 +49,6 @@ class CourseYearlyStatsCounter {
     }
   }
 
-  studentHistory(studentnumber) {
-    const attempted = this.history.attempts.has(studentnumber)
-    const passed = this.history.passed.has(studentnumber)
-    const failed = this.history.failed.has(studentnumber)
-    return { attempted, passed, failed }
-  }
-
   markStudyProgramme(code, name, studentnumber, yearcode, passed, credit, faculty_code, organization) {
     if (!this.programmes[code]) {
       this.initProgramme(code, name)
@@ -111,44 +92,11 @@ class CourseYearlyStatsCounter {
     })
   }
 
-  markCreditToHistory(studentnumber, passed) {
-    const passedBefore = this.history.passed.has(studentnumber)
-    if (!passedBefore) {
-      this.history.attempts.add(studentnumber)
-      if (passed) {
-        this.history.passed.add(studentnumber)
-        this.history.failed.delete(studentnumber)
-      } else {
-        this.history.failed.add(studentnumber)
-      }
-    }
-  }
-
-  getCreditCategory(studentnumber, passed, attempted) {
-    if (!attempted) {
-      return passed ? CATEGORY.PASS_FIRST : CATEGORY.FAIL_FIRST
-    } else {
-      return passed ? CATEGORY.PASS_RETRY : CATEGORY.FAIL_RETRY
-    }
-  }
-
-  markCreditToStudents(studentnumber, passed, grade, groupcode) {
-    const { students } = this.groups[groupcode]
-    const { attempted } = this.studentHistory(studentnumber)
-    const category = this.getCreditCategory(studentnumber, passed, attempted)
-    const student = students[studentnumber]
-    if (!student || passed || student.failed) {
-      students[studentnumber] = { passed, category, grade }
-    }
-  }
-
   markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode) {
     if (!this.groups[groupcode]) {
       this.initGroup(groupcode, groupname, coursecode, yearcode)
     }
-    this.markCreditToStudents(studentnumber, passed, grade, groupcode)
     this.markCreditToAttempts(studentnumber, passed, grade, groupcode)
-    this.markCreditToHistory(studentnumber, passed)
   }
 
   markCreditToAttempts(studentnumber, passed, grade, groupcode) {
@@ -165,7 +113,7 @@ class CourseYearlyStatsCounter {
     }
   }
 
-  markCreditToNewCategory(studentnumber, passed, attainment_date, groupcode) {
+  markCreditToStudentCategories(studentnumber, passed, attainment_date, groupcode) {
     if (!this.students.has(studentnumber)) {
       if (passed) {
         this.students.set(studentnumber, {
@@ -208,15 +156,6 @@ class CourseYearlyStatsCounter {
     }
   }
 
-  parseStudentStatistics(students) {
-    const studentnumbers = new Set()
-    Object.entries(students).forEach(([studentnumber, stat]) => {
-      studentnumbers.add(studentnumber)
-    })
-    console.log([...studentnumbers].length)
-    return { studentnumbers: [...studentnumbers] }
-  }
-
   parseProgrammeStatistics(anonymizationSalt) {
     if (anonymizationSalt) {
       this.programmes = {
@@ -248,10 +187,6 @@ class CourseYearlyStatsCounter {
         // indicate to the front that some of the data has been obfuscated and therefore
         // totals cannot be calculated
         this.obfuscated = true
-        let gradeSpread = {}
-        for (const grade in normalStats.students.grades) {
-          gradeSpread[grade] = []
-        }
 
         const obfuscatedStats = {
           obfuscated: true,
@@ -267,13 +202,11 @@ class CourseYearlyStatsCounter {
           },
           yearcode: rest.yearcode,
           students: {
-            classes: {
-              failedFirst: [],
-              failedRetry: [],
+            categories: {
               passedFirst: [],
-              passedRetry: []
+              passedEventually: [],
+              neverPassed: [],
             },
-            grades: gradeSpread,
             studentnumbers: []
           }
         }
@@ -297,6 +230,7 @@ class CourseYearlyStatsCounter {
         }
       ]
     }
+    console.log(this.facultyStats)
     return this.facultyStats
   }
 
@@ -310,4 +244,4 @@ class CourseYearlyStatsCounter {
   }
 }
 
-module.exports = { CourseYearlyStatsCounter, CATEGORY }
+module.exports = { CourseYearlyStatsCounter }
