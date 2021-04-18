@@ -43,7 +43,7 @@ class CourseYearlyStatsCounter {
           passedEventually: [],
           neverPassed: []
         },
-        studentnumbers: [],
+        studentnumbers: []
       },
       yearcode
     }
@@ -69,7 +69,6 @@ class CourseYearlyStatsCounter {
       this.programmes[code].credits[yearcode] = 0
     }
 
-    console.log({ faculty_code })
     if (faculty_code && !this.facultyStats[yearcode].allStudents.includes(studentnumber)) {
       this.facultyStats[yearcode].allStudents.push(studentnumber)
       this.facultyStats[yearcode].faculties[faculty_code].students.push(studentnumber)
@@ -120,7 +119,7 @@ class CourseYearlyStatsCounter {
         this.students.set(studentnumber, {
           earliestAttainment: attainment_date,
           category: 'passedFirst',
-          code: groupcode,
+          code: groupcode
         })
       } else {
         this.students.set(studentnumber, {
@@ -173,21 +172,25 @@ class CourseYearlyStatsCounter {
   }
 
   parseGroupStatistics(anonymizationSalt) {
-    if (!anonymizationSalt) {
-      for (const [studentnumber, data] of this.students) {
-        this.groups[data.code].students.categories[data.category].push(studentnumber)
-        this.groups[data.code].students.studentnumbers.push(studentnumber)
-      }
+    for (const [studentnumber, data] of this.students) {
+      this.groups[data.code].students.categories[data.category].push(studentnumber)
+      this.groups[data.code].students.studentnumbers.push(studentnumber)
     }
 
     const groupStatistics = Object.values(this.groups).map(({ ...rest }) => {
       const normalStats = {
-        ...rest,
+        ...rest
       }
+      console.log({ normalStats})
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
         // indicate to the front that some of the data has been obfuscated and therefore
         // totals cannot be calculated
         this.obfuscated = true
+
+        let gradeSpread = {}
+        for (const grade in normalStats.attempts.grades) {
+          gradeSpread[grade] = []
+        }
 
         const obfuscatedStats = {
           obfuscated: true,
@@ -206,7 +209,7 @@ class CourseYearlyStatsCounter {
             categories: {
               passedFirst: [],
               passedEventually: [],
-              neverPassed: [],
+              neverPassed: []
             },
             studentnumbers: []
           }
