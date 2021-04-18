@@ -195,7 +195,6 @@ const SingleCourseStats = ({
         ({
           code,
           name,
-          students: allstudents,
           newStudents: allNewStudents,
           attempts: allAttempts,
           coursecode,
