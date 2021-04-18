@@ -158,7 +158,7 @@ const SingleCourseStats = ({
     // Count the stats for the Attempts- and Grades-tab
     // Also used in Pass rate chart and Grade distribution chart
     const grades = countFilteredStudents(attempts.grades, filter)
-    const categories = countFilteredStudents(attempts.classes, filter)
+    const categories = countFilteredStudents(attempts.categories, filter)
 
     const { failed, passed } = categories
     const passRate = (100 * passed) / (passed + failed)

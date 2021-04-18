@@ -45,6 +45,7 @@ const parseCredit = (credit, anonymizationSalt) => {
       credits
     }
   }
+  console.log(studyright_elements.studyright)
 
   return {
     student,

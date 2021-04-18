@@ -32,7 +32,7 @@ class CourseYearlyStatsCounter {
       coursecode,
       attempts: {
         grades: {},
-        classes: {
+        categories: {
           passed: [],
           failed: []
         }
@@ -69,6 +69,7 @@ class CourseYearlyStatsCounter {
       this.programmes[code].credits[yearcode] = 0
     }
 
+    console.log({ faculty_code })
     if (faculty_code && !this.facultyStats[yearcode].allStudents.includes(studentnumber)) {
       this.facultyStats[yearcode].allStudents.push(studentnumber)
       this.facultyStats[yearcode].faculties[faculty_code].students.push(studentnumber)
@@ -101,15 +102,15 @@ class CourseYearlyStatsCounter {
 
   markCreditToAttempts(studentnumber, passed, grade, groupcode) {
     const { attempts } = this.groups[groupcode]
-    const { grades, classes } = attempts
+    const { grades, categories } = attempts
     if (!grades[grade]) {
       grades[grade] = []
     }
     grades[grade].push(studentnumber)
     if (passed) {
-      classes.passed.push(studentnumber)
+      categories.passed.push(studentnumber)
     } else {
-      classes.failed.push(studentnumber)
+      categories.failed.push(studentnumber)
     }
   }
 
@@ -194,7 +195,7 @@ class CourseYearlyStatsCounter {
           name: rest.name,
           coursecode: rest.coursecode,
           attempts: {
-            classes: {
+            categories: {
               failed: [],
               passed: []
             },
@@ -230,7 +231,6 @@ class CourseYearlyStatsCounter {
         }
       ]
     }
-    console.log(this.facultyStats)
     return this.facultyStats
   }
 
