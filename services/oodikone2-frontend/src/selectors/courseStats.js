@@ -115,7 +115,7 @@ const calculatePassRate = (passed, failed) => {
 
 const getRealisationStats = (realisation, filterStudentFn, userHasAccessToAllStats) => {
   const { name, attempts, obfuscated } = realisation
-  const { passed, failed } = attempts.classes
+  const { passed, failed } = attempts.categories
   const passedAmount = userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
   const failedAmount = userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
 
@@ -135,7 +135,7 @@ const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) =
   }
 
   const summary = statistics.reduce((acc, cur) => {
-    const { passed, failed } = cur.attempts.classes
+    const { passed, failed } = cur.attempts.categories
     acc.passed += userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
     acc.failed += userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
     return acc
