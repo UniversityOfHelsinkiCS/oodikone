@@ -48,10 +48,10 @@ const ResultTabs = props => {
     setViewMode(resetViewMode ? viewModeNames.ATTEMPTS : viewMode)
   }
 
-  const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
+  const getRadioButton = (id, firstLabel, secondLabel, value, setValue) => (
     <div className="toggleContainer">
       <label className="toggleLabel">{firstLabel}</label>
-      <Radio toggle checked={value} onChange={() => setValue(!value)} />
+      <Radio id={id} toggle checked={value} onChange={() => setValue(!value)} />
       <label className="toggleLabel">{secondLabel}</label>
     </div>
   )
@@ -63,16 +63,16 @@ const ResultTabs = props => {
         {Object.values(viewModeNames).map(name => (
           <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
         ))}
-        {viewMode === 'Attempts' && getRadioButton('Totals', 'Grade distribution', showGrades, setShowGrades)}
-        {viewMode === 'Attempts' && showGrades && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
+        {viewMode === 'Attempts' && getRadioButton('gradeToggle', 'Totals', 'Grade distribution', showGrades, setShowGrades)}
+        {viewMode === 'Attempts' && showGrades && getRadioButton('relativeToggle', 'Absolute', 'Relative', isRelative, setIsRelative)}
       </Menu>
     )
 
     const getToggle = () => {
       return (
         <div className="chartToggleContainer">
-          {tab === 1 && getRadioButton('Student', 'Attempts', selectedView, setSelectedView)}
-          {(tab === 2 || props.comparison) && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
+          {tab === 1 && getRadioButton('studentToggle', 'Student', 'Attempts', selectedView, setSelectedView)}
+          {(tab === 2 || props.comparison) && getRadioButton('relativeToggle', 'Absolute', 'Relative', isRelative, setIsRelative)}
         </div>
       )
     }
