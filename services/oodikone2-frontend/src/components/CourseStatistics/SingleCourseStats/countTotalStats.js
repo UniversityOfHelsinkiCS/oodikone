@@ -34,13 +34,6 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         ? acc.students.categories.neverPassed + neverPassed
         : acc.students.categories.neverPassed
 
-      // const sgrades = acc.students.grades
-
-      // Object.keys(curr.students.grades).forEach(grade => {
-      //   if (!sgrades[grade]) sgrades[grade] = 0
-      //   sgrades[grade] += curr.students.grades[grade]
-      // })
-
       return {
         ...acc,
         coursecode: curr.coursecode,
@@ -50,8 +43,7 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
             passedFirst: newPassedFirst,
             passedEventually: newPassedEventually,
             neverPassed: newNeverPassed
-          },
-          grades: {}
+          }
         }
       }
     },
