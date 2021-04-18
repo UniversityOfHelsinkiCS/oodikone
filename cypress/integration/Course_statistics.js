@@ -211,7 +211,7 @@ describe('Course Statistics tests', () => {
         cy.get("tr").should('have.length', 14)
       })
 
-      cy.get("#gradeToggle", { force: true }).click({ force: true })
+      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true })
       cy.get("#CourseStatPanes table>tbody").within(() => {
         gradesTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
@@ -353,7 +353,7 @@ describe('Course Statistics tests', () => {
         cy.get("tr").should('have.length', 4)
       })
 
-      cy.get("#gradeToggle", { force: true }).click({ force: true })
+      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true })
       cy.get("#CourseStatPanes table>tbody").within(() => {
         timeGradesTableContents.filter(timeRangeFilter(newYearRange)).forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
@@ -525,7 +525,7 @@ describe('Course Statistics tests', () => {
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
       cy.contains("#CourseStatPanes a.item", "Attempts").click()
-      cy.get("#gradeToggle", { force: true }).click({ force: true })
+      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true })
 
       cy.get("#PrimaryDataTable table>tbody").within(() => {
         const gradesTableContents = [

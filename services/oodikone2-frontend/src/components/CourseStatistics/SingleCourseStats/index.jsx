@@ -191,29 +191,20 @@ const SingleCourseStats = ({
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const formattedStats = statistics
       .filter(isStatInYearRange)
-      .map(
-        ({
+      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated }) => {
+        const attempts = countAttemptStats(allAttempts, filter)
+        const students = countStudentStats(allStudents, filter)
+        const parsedName = separate ? getTextIn(name, language) : name
+        return {
           code,
-          name,
-          students: allStudents,
-          attempts: allAttempts,
+          name: parsedName,
+          attempts,
+          students,
           coursecode,
-          obfuscated
-        }) => {
-          const attempts = countAttemptStats(allAttempts, filter)
-          const students = countStudentStats(allStudents, filter)
-          const parsedName = separate ? getTextIn(name, language) : name
-          return {
-            code,
-            name: parsedName,
-            attempts,
-            students,
-            coursecode,
-            rowObfuscated: obfuscated,
-            userHasAccessToAllStats
-          }
+          rowObfuscated: obfuscated,
+          userHasAccessToAllStats
         }
-      )
+      })
 
     const totals = countTotalStats(formattedStats, userHasAccessToAllStats)
 
