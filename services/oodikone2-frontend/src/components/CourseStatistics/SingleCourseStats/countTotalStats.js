@@ -30,7 +30,7 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         ? acc.students.categories.passedEventually + passedEventually
         : acc.students.categories.passedEventually
 
-      const newNeverPassed = failedFirst
+      const newNeverPassed = neverPassed
         ? acc.students.categories.neverPassed + neverPassed
         : acc.students.categories.neverPassed
 
@@ -75,11 +75,11 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
   )
 
   // Count pass- and failrates also for "Total"-lines
-  const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = totals.students.categories
-  const total = passedFirst + passedRetry + failedFirst + failedRetry
+  const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = totals.students.categories
+  const total = passedFirst + passedEventually + neverPassed
   totals.students.total = total
-  totals.students.passRate = (passedFirst + passedRetry) / total
-  totals.students.failRate = (failedFirst + failedRetry) / total
+  totals.students.passRate = (passedFirst + passedEventually) / total
+  totals.students.failRate = neverPassed / total
 
   const { failed, passed } = totals.attempts.categories
   totals.attempts.passRate = (100 * passed) / (passed + failed)

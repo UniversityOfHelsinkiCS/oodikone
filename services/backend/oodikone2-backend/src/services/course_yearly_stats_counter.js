@@ -49,15 +49,14 @@ class CourseYearlyStatsCounter {
           failed: []
         }
       },
-      newStudents: {
+      students: {
         categories: {
           passedFirst: [],
           passedEventually: [],
           neverPassed: []
-        }
+        },
+        studentnumbers: [],
       },
-      studentnumbers: [],
-      students: {},
       yearcode
     }
   }
@@ -172,7 +171,7 @@ class CourseYearlyStatsCounter {
         this.students.set(studentnumber, {
           earliestAttainment: attainment_date,
           category: 'passedFirst',
-          code: groupcode
+          code: groupcode,
         })
       } else {
         this.students.set(studentnumber, {
@@ -210,16 +209,12 @@ class CourseYearlyStatsCounter {
   }
 
   parseStudentStatistics(students) {
-    const grades = {}
-    const classes = {}
     const studentnumbers = new Set()
     Object.entries(students).forEach(([studentnumber, stat]) => {
-      const { grade, category } = stat
-      grades[grade] = grades[grade] ? grades[grade].concat(studentnumber) : [studentnumber]
-      classes[category] = classes[category] ? classes[category].concat(studentnumber) : [studentnumber]
       studentnumbers.add(studentnumber)
     })
-    return { grades, classes, studentnumbers: [...studentnumbers] }
+    console.log([...studentnumbers].length)
+    return { studentnumbers: [...studentnumbers] }
   }
 
   parseProgrammeStatistics(anonymizationSalt) {
@@ -240,15 +235,14 @@ class CourseYearlyStatsCounter {
   parseGroupStatistics(anonymizationSalt) {
     if (!anonymizationSalt) {
       for (const [studentnumber, data] of this.students) {
-        this.groups[data.code].newStudents.categories[data.category].push(studentnumber)
-        this.groups[data.code].studentnumbers.push(studentnumber)
+        this.groups[data.code].students.categories[data.category].push(studentnumber)
+        this.groups[data.code].students.studentnumbers.push(studentnumber)
       }
     }
 
-    const groupStatistics = Object.values(this.groups).map(({ students, ...rest }) => {
+    const groupStatistics = Object.values(this.groups).map(({ ...rest }) => {
       const normalStats = {
         ...rest,
-        students: this.parseStudentStatistics(students)
       }
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
         // indicate to the front that some of the data has been obfuscated and therefore

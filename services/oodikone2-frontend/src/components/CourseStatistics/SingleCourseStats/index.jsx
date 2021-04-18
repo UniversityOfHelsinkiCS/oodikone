@@ -195,19 +195,19 @@ const SingleCourseStats = ({
         ({
           code,
           name,
-          newStudents: allNewStudents,
+          students: allStudents,
           attempts: allAttempts,
           coursecode,
           obfuscated
         }) => {
           const attempts = countAttemptStats(allAttempts, filter)
-          const newStudents = countStudentStats(allNewStudents, filter)
+          const students = countStudentStats(allStudents, filter)
           const parsedName = separate ? getTextIn(name, language) : name
           return {
             code,
             name: parsedName,
             attempts,
-            students: newStudents,
+            students,
             coursecode,
             rowObfuscated: obfuscated,
             userHasAccessToAllStats
