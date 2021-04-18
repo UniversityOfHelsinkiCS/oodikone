@@ -25,7 +25,7 @@ const paneViewIndex = {
 const ResultTabs = props => {
   const [tab, setTab] = useTabs('cs_tab', 0, props.history)
   const [viewMode, setViewMode] = useState(viewModeNames.ATTEMPTS)
-  const [selectedView, setSelectedView] = useState(false)
+  const [selectedView, setSelectedView] = useState(true)
   const [isRelative, setIsRelative] = useState(false)
   const [showGrades, setShowGrades] = useState(false)
 
