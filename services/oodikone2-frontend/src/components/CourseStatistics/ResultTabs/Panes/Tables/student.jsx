@@ -86,7 +86,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             key: 'PASS_RATE',
             title: 'percentage',
             getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.passRate),
-            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate)),
+            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate || 0)),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
             child: true
@@ -109,7 +109,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             key: 'FAIL_RATE',
             title: 'percentage',
             getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.failRate),
-            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate)),
+            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
             child: true
