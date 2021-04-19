@@ -40,8 +40,8 @@ const getCategoriesAndYears = async () => {
   }
 }
 
-const creditsWithTeachersForYear = async yearcode =>
-  await Credit.findAll({
+const creditsWithTeachersForYear = yearcode =>
+  Credit.findAll({
     attributes: ['id', 'credits', 'credittypecode', 'isStudyModule'],
     include: [
       {
