@@ -63,11 +63,8 @@ const ResultTabs = props => {
         {Object.values(viewModeNames).map(name => (
           <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
         ))}
-        {viewMode === 'Attempts' &&
-          getRadioButton('Totals', 'Grade distribution', showGrades, setShowGrades)}
-        {viewMode === 'Attempts' &&
-          showGrades &&
-          getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
+        {viewMode === 'Attempts' && getRadioButton('Totals', 'Grade distribution', showGrades, setShowGrades)}
+        {viewMode === 'Attempts' && showGrades && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
       </Menu>
     )
 
@@ -75,8 +72,7 @@ const ResultTabs = props => {
       return (
         <div className="chartToggleContainer">
           {tab === 1 && getRadioButton('Student', 'Attempts', selectedView, setSelectedView)}
-          {(tab === 2 || props.comparison) &&
-            getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
+          {(tab === 2 || props.comparison) && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
         </div>
       )
     }

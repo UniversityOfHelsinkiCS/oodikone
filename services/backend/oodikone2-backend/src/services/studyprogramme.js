@@ -388,30 +388,34 @@ const graduationsFromClass = (studentnumbers, studytrack) =>
   })
 
 const gendersFromClass = async studentnumbers => {
-  return (await Student.findAll({
-    attributes: [[sequelize.fn('count', sequelize.col('gender_en')), 'count'], 'gender_en'],
-    where: {
-      studentnumber: {
-        [Op.in]: studentnumbers
-      }
-    },
-    group: ['gender_en'],
-    raw: true
-  })).reduce((acc, curr) => {
+  return (
+    await Student.findAll({
+      attributes: [[sequelize.fn('count', sequelize.col('gender_en')), 'count'], 'gender_en'],
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers
+        }
+      },
+      group: ['gender_en'],
+      raw: true
+    })
+  ).reduce((acc, curr) => {
     acc[curr.gender_en] = curr.count
     return acc
   }, {})
 }
 
 const nationalitiesFromClass = async studentnumbers => {
-  return (await Student.findAll({
-    where: {
-      studentnumber: {
-        [Op.in]: studentnumbers
-      }
-    },
-    attributes: ['home_country_en']
-  })).reduce((acc, { home_country_en }) => {
+  return (
+    await Student.findAll({
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers
+        }
+      },
+      attributes: ['home_country_en']
+    })
+  ).reduce((acc, { home_country_en }) => {
     const country = home_country_en || 'Unknown'
     if (!acc[country]) acc[country] = 0
     acc[country] += 1

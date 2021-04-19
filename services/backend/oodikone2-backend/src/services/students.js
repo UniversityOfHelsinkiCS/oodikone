@@ -81,8 +81,8 @@ const byId = async id => {
 }
 
 const findByCourseAndSemesters = async (coursecodes, from, to, separate) =>
-  (await sequelize
-    .query(
+  (
+    await sequelize.query(
       `
   SELECT
     studentnumber
@@ -105,18 +105,20 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate) =>
         type: sequelize.QueryTypes.SELECT,
         raw: true
       }
-    ))
-    .map(st => st.studentnumber)
+    )
+  ).map(st => st.studentnumber)
 
 const findByTag = async tag => {
-  return (await TagStudent.findAll({
-    attributes: ['studentnumber'],
-    where: {
-      tag_id: {
-        [Op.eq]: tag
+  return (
+    await TagStudent.findAll({
+      attributes: ['studentnumber'],
+      where: {
+        tag_id: {
+          [Op.eq]: tag
+        }
       }
-    }
-  })).map(st => st.studentnumber)
+    })
+  ).map(st => st.studentnumber)
 }
 
 const formatStudent = ({
