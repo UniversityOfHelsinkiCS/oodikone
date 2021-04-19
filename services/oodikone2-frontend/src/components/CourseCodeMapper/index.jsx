@@ -38,7 +38,13 @@ const CourseCodeMapper = ({
     const find = (query, language) => findCoursesDispatch(query, language)
     const rows = mandatoryCourses.data.map(course => {
       const maincode = Object.keys(data).find(k => data[k].map(e => e.code).includes(course.code))
-      const duplicates = maincode ? orderBy(data[maincode].filter(e => e.code !== course.code), ['code'], ['ASC']) : []
+      const duplicates = maincode
+        ? orderBy(
+            data[maincode].filter(e => e.code !== course.code),
+            ['code'],
+            ['ASC']
+          )
+        : []
       return (
         <Table.Row key={course.code}>
           <Table.Cell>{`${course.code} ${getName(course.name)}`}</Table.Cell>
@@ -139,7 +145,4 @@ const mapDispatchToProps = dispatch => ({
   getMandatoryCourses: studyprogramme => dispatch(getMandatoryCourses(studyprogramme))
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CourseCodeMapper)
+export default connect(mapStateToProps, mapDispatchToProps)(CourseCodeMapper)

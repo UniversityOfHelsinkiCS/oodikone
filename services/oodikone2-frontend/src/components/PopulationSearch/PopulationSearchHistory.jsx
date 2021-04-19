@@ -336,7 +336,4 @@ const mapDispatchToProps = dispatch => ({
   updatePopulationStudents: students => dispatch(updatePopulationStudents(students))
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(PopulationSearchHistory)
+export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)

@@ -71,11 +71,8 @@ const mapStateToProps = ({ settings }) => ({
 })
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      createStudentTag: createStudentTagAction,
-      deleteStudentTag: deleteStudentTagAction
-    }
-  )(TagStudent)
+  connect(mapStateToProps, {
+    createStudentTag: createStudentTagAction,
+    deleteStudentTag: deleteStudentTagAction
+  })(TagStudent)
 )

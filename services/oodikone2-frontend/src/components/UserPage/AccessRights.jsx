@@ -74,11 +74,6 @@ const mapStateToProps = (state, props) => ({
   pending: Boolean(state.users.userunitpending)
 })
 
-export default connect(
-  mapStateToProps,
-  { addUserUnits },
-  null,
-  {
-    areStatePropsEqual: isEqual
-  }
-)(AccessRights)
+export default connect(mapStateToProps, { addUserUnits }, null, {
+  areStatePropsEqual: isEqual
+})(AccessRights)

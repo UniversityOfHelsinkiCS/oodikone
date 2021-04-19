@@ -85,7 +85,7 @@ const PopulationCourseTable = ({
     setColumnsWithCollapsedHeaders(
       collapsingHeaders
         ? columns
-            .filter(c => c.headerProps && (!collapsed[c.headerProps.title] && !c.collapsed))
+            .filter(c => c.headerProps && !collapsed[c.headerProps.title] && !c.collapsed)
             .sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber)
             .concat(Object.values(collapsed).sort((a, b) => a.headerProps.ordernumber - b.headerProps.ordernumber))
         : columns

@@ -55,7 +55,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
           },
           {
             key: 'TOTAL',
-            title: 'Students',
+            title: 'All students',
             getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.total),
             getCellProps: s => defineCellColor(s),
             headerProps: { rowSpan: 2, width: 3 }
@@ -75,9 +75,9 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             child: true
           },
           {
-            key: 'PASS_RETRY',
-            title: 'after retry',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedRetry || 0),
+            key: 'PASS_EVENTUALLY',
+            title: 'passed eventually',
+            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedEventually || 0),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
@@ -86,7 +86,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             key: 'PASS_RATE',
             title: 'percentage',
             getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.passRate),
-            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate)),
+            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate || 0)),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
             child: true
@@ -98,17 +98,9 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             headerProps: { colSpan: 3, width: 5 }
           },
           {
-            key: 'FAIL_FIRST',
-            title: 'first try',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.failedFirst || 0),
-            getCellProps: s => defineCellColor(s),
-            cellProps: { width: 2 },
-            child: true
-          },
-          {
-            key: 'FAIL_RETRY',
-            title: 'after retry',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.failedRetry || 0),
+            key: 'NEVER PASSED',
+            title: 'never passed',
+            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.neverPassed || 0),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
             child: true
@@ -117,7 +109,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             key: 'FAIL_RATE',
             title: 'percentage',
             getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.failRate),
-            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate)),
+            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
             child: true

@@ -28,7 +28,7 @@ const CreditsGainedTab = ({ filteredStudents }) => {
     <Table celled>
       <Table.Header>
         <Table.Row>
-          <Table.HeaderCell collapsing></Table.HeaderCell>
+          <Table.HeaderCell collapsing />
           <Table.HeaderCell>Credits Gained During First {months} Months</Table.HeaderCell>
           <Table.HeaderCell>
             Number of Students

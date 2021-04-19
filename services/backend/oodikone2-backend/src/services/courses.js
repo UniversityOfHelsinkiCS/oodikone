@@ -411,9 +411,15 @@ const setDuplicateCode = async (code1, code2) => {
             groupid = Math.max(0, ...Object.values(all).filter(e => e))
             groupid = groupid && !isNaN(groupid) ? groupid + 1 : 1
           }
-          await CourseDuplicates.bulkCreate([{ groupid, coursecode: code1 }, { groupid, coursecode: code2 }], {
-            ignoreDuplicates: true
-          })
+          await CourseDuplicates.bulkCreate(
+            [
+              { groupid, coursecode: code1 },
+              { groupid, coursecode: code2 }
+            ],
+            {
+              ignoreDuplicates: true
+            }
+          )
         } else {
           // both have a group, must merge groups
           await CourseDuplicates.update({ groupid: all[code1] }, { where: { groupid: all[code2] } })
@@ -449,15 +455,17 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
     const nonOpenUniCodes = _.uniq(codes.map(unifyOpenUniversity))
 
     const matchingOpenUniCourseCodes = nonOpenUniCodes.length
-      ? await Course.findAll({
-          where: {
-            code: {
-              [Op.regexp]: {
-                [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
+      ? (
+          await Course.findAll({
+            where: {
+              code: {
+                [Op.regexp]: {
+                  [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
+                }
               }
             }
-          }
-        }).map(course => course.code)
+          })
+        ).map(course => course.code)
       : []
 
     codes.push(...matchingOpenUniCourseCodes)
@@ -478,10 +486,12 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
       semestername,
       yearcode,
       yearname,
+      attainment_date,
       programmes,
       coursecode,
       credits
     } = credit
+
     const groupcode = separate ? semestercode : yearcode
     const groupname = separate ? semestername : yearname
     const unknownProgramme = [
@@ -510,7 +520,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
       credits
     )
     counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
-    counter.markCreditToHistory(studentnumber, passed)
+    counter.markCreditToStudentCategories(studentnumber, passed, attainment_date, groupcode)
   }
   const statistics = counter.getFinalStatistics(anonymizationSalt)
   return {
@@ -524,14 +534,16 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
 const maxYearsToCreatePopulationFrom = async coursecodes => {
   const maxAttainmentDate = new Date(
     Math.max(
-      ...(await Course.findAll({
-        where: {
-          code: {
-            [Op.in]: coursecodes
-          }
-        },
-        attributes: ['max_attainment_date']
-      }).map(c => new Date(c.max_attainment_date).getTime()))
+      ...(
+        await Course.findAll({
+          where: {
+            code: {
+              [Op.in]: coursecodes
+            }
+          },
+          attributes: ['max_attainment_date']
+        })
+      ).map(c => new Date(c.max_attainment_date).getTime())
     )
   )
   const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)

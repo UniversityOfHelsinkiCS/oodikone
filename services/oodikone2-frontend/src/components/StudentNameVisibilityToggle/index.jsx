@@ -29,7 +29,4 @@ const mapStateToProps = state => ({
   showNames: state.settings.namesVisible
 })
 
-export default connect(
-  mapStateToProps,
-  { toggleStudentNameVisibility }
-)(withRouter(StudentNameVisibilityToggle))
+export default connect(mapStateToProps, { toggleStudentNameVisibility })(withRouter(StudentNameVisibilityToggle))

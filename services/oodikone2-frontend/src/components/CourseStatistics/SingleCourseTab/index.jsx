@@ -66,7 +66,4 @@ const mapStateToProps = state => ({
   }))
 })
 
-export default connect(
-  mapStateToProps,
-  {}
-)(SingleCourseTab)
+export default connect(mapStateToProps, {})(SingleCourseTab)

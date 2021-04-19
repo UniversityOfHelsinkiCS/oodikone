@@ -22,8 +22,7 @@ describe('Course Statistics tests', () => {
     cy.contains(".tabular.menu a", "Table").click()
     cy.contains("All")
     cy.contains(".modeSelectorRow a", "Attempts").click()
-    cy.contains(".modeSelectorRow a", "Student").click()
-    cy.contains(".modeSelectorRow a", "Grades").click()
+    cy.contains(".modeSelectorRow a", "Students").click()
 
     cy.contains(".tabular.menu a", "Pass rate chart").click()
     cy.get("div.modeSelectorContainer").click()
@@ -110,21 +109,21 @@ describe('Course Statistics tests', () => {
     const yearRange = { from: "2000-01", to: "2017-18" }
     const attemptsTableContents = [
       // [time, passed, failed, passrate]
-      ["Total", 312, 42, "88.14 %"],
-      ["2017-18", 175, 29, "85.78 %"],
-      ["2016-17", 66, 2, "97.06 %"],
-      ["2015-16", 27, 2, "93.10 %"],
-      ["2014-15", 16, 0, "100.00 %"],
-      ["2013-14", 6, 2, "75.00 %"],
+      ["Total", 354, 312, 42, "88.14 %"],
+      ["2017-18", 204, 175, 29, "85.78 %"],
+      ["2016-17", 68, 66, 2, "97.06 %"],
+      ["2015-16", 29, 27, 2, "93.10 %"],
+      ["2014-15", 16, 16, 0, "100.00 %"],
+      ["2013-14", 8, 6, 2, "75.00 %"],
     ]
     const studentTableContents = [
-      // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
-      ["Total", 335, 249, 58,	"91.64 %", 26, 2, "8.36 %"],
-      ["2017-18", 195, 131, 43, "89.23 %", 20, 1, "10.77 %"],
-      ["2016-17", 67, 59, 6, "97.01 %", 2, 0, "2.99 %"],
-      ["2015-16", 27, 24, 2, "96.30 %", 1, 0, "3.70 %"],
-      ["2014-15", 16, 16, 0, "100.00 %", 0, 0, "0.00 %"],
-      ["2013-14", 5, 2, 3, "100.00 %", 0, 0, "0.00 %"],
+      // time, students, passedfirsttry, passedeventually, pass%, neverpassed, fail%]
+      ["Total", 289, 254, 13,	"92.39 %", 22, "7.61 %"],
+      ["2017-18", 157, 132, 5, "87.26 %", 20, "12.74 %"],
+      ["2016-17", 62, 60, 1, "98.39 %", 1, "1.61 %"],
+      ["2015-16", 27, 25, 2, "100.00 %", 0, "0.00 %"],
+      ["2014-15", 16, 16, 0, "100.00 %", 0, "0.00 %"],
+      ["2013-14", 5, 3, 2, "100.00 %", 0, "0.00 %"],
     ]
     const gradesTableContents = [
       // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
@@ -212,10 +211,9 @@ describe('Course Statistics tests', () => {
         cy.get("tr").should('have.length', 14)
       })
 
-      cy.contains("#CourseStatPanes a.item", "Table").click()
-      cy.contains("#CourseStatPanes a.item", "Student").click()
+      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true })
       cy.get("#CourseStatPanes table>tbody").within(() => {
-        studentTableContents.forEach((values, trIndex) => {
+        gradesTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
             values.forEach((value, tdIndex) => {
               cy.get("td").eq(tdIndex).contains(value)
@@ -226,9 +224,9 @@ describe('Course Statistics tests', () => {
       })
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
-      cy.contains("#CourseStatPanes a.item", "Grades").click()
+      cy.contains("#CourseStatPanes a.item", "Students").click()
       cy.get("#CourseStatPanes table>tbody").within(() => {
-        gradesTableContents.forEach((values, trIndex) => {
+        studentTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
             values.forEach((value, tdIndex) => {
               cy.get("td").eq(tdIndex).contains(value)
@@ -310,22 +308,22 @@ describe('Course Statistics tests', () => {
       
       const timeAttemptsTableContents = [
         // [time, passed, failed, passrate]
-        ["Total", 109, 4, "96.46 %"],
-        ["2017-18", 175, 29, "85.78 %"],
-        ["2016-17", 66, 2, "97.06 %"],
-        ["2015-16", 27, 2, "93.10 %"],
-        ["2014-15", 16, 0, "100.00 %"],
-        ["2013-14", 6, 2, "75.00 %"],
+        ["Total", 113, 109, 4, "96.46 %"],
+        ["2017-18", 204, 175, 29, "85.78 %"],
+        ["2016-17", 68, 66, 2, "97.06 %"],
+        ["2015-16", 29, 27, 2, "93.10 %"],
+        ["2014-15", 16, 16, 0, "100.00 %"],
+        ["2013-14", 8, 6, 2, "75.00 %"],
       ]
 
       const timeStudentTableContents = [
-        // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
-        ["Total", 110, 99, 8,	"97.27 %", 3, 0, "2.73 %"],
-        ["2017-18", 195, 131, 43, "89.23 %", 20, 1, "10.77 %"],
-        ["2016-17", 67, 59, 6, "97.01 %", 2, 0, "2.99 %"],
-        ["2015-16", 27, 24, 2, "96.30 %", 1, 0, "3.70 %"],
-        ["2014-15", 16, 16, 0, "100.00 %", 0, 0, "0.00 %"],
-        ["2013-14", 5, 2, 3, "100.00 %", 0, 0, "0.00 %"],
+        // time, students, passedfirsttry, passedeventually, pass%, neverpassed, fail%]
+        ["Total", 105, 101, 3,	"99.05 %", 1, "0.95 %"],
+        ["2017-18", 195, 131, 43, "89.23 %", 1, "10.77 %"],
+        ["2016-17", 62, 60, 1, "98.39 %", 1, "1.61 %"],
+        ["2015-16", 27, 25, 2, "100.00 %", 0, "0.00 %"],
+        ["2014-15", 16, 16, 0, "100.00 %", 0, "0.00 %"],
+        ["2013-14", 5, 2, 3, "100.00 %", 0, "0.00 %"],
       ]
 
       const timeGradesTableContents = [
@@ -355,8 +353,20 @@ describe('Course Statistics tests', () => {
         cy.get("tr").should('have.length', 4)
       })
 
+      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true })
+      cy.get("#CourseStatPanes table>tbody").within(() => {
+        timeGradesTableContents.filter(timeRangeFilter(newYearRange)).forEach((values, trIndex) => {
+          cy.get("tr").eq(trIndex).within(() => {
+            values.forEach((value, tdIndex) => {
+              cy.get("td").eq(tdIndex).contains(value)
+            })
+          })
+        })
+        cy.get("tr").should('have.length', 4)
+      })
+
       cy.contains("#CourseStatPanes a.item", "Table").click()
-      cy.contains("#CourseStatPanes a.item", "Student").click()
+      cy.contains("#CourseStatPanes a.item", "Students").click()
       cy.get("#CourseStatPanes table>tbody").within(() => {
         timeStudentTableContents.filter(timeRangeFilter(newYearRange)).forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
@@ -369,17 +379,6 @@ describe('Course Statistics tests', () => {
       })
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
-      cy.contains("#CourseStatPanes a.item", "Grades").click()
-      cy.get("#CourseStatPanes table>tbody").within(() => {
-        timeGradesTableContents.filter(timeRangeFilter(newYearRange)).forEach((values, trIndex) => {
-          cy.get("tr").eq(trIndex).within(() => {
-            values.forEach((value, tdIndex) => {
-              cy.get("td").eq(tdIndex).contains(value)
-            })
-          })
-        })
-        cy.get("tr").should('have.length', 4)
-      })
     })
 
     it('after changing filters shows different stats', () => {
@@ -451,11 +450,11 @@ describe('Course Statistics tests', () => {
       cy.get("#PrimaryDataTable table>tbody").within(() => {
         const attemptsTableContents = [
           // [time, passed, failed, passrate]
-          ["Total", 215, 12, "94.71 %"],
-          ["2017-18", 126, 10, "92.65 %"],
-          ["2016-17", 56, 1, "98.25 %"],
-          ["2015-16", 20, 1, "95.24 %"],
-          ["2014-15", 6, 0, "100.00 %"],
+          ["Total", 227, 215, 12, "94.71 %"],
+          ["2017-18", 136, 126, 10, "92.65 %"],
+          ["2016-17", 57, 56, 1, "98.25 %"],
+          ["2015-16", 21, 20, 1, "95.24 %"],
+          ["2014-15", 6, 6, 0, "100.00 %"],
         ]
         attemptsTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
@@ -469,11 +468,11 @@ describe('Course Statistics tests', () => {
       cy.get("#ComparisonDataTable table>tbody").within(() => {
         const attemptsTableContents = [
           // [time, passed, failed, passrate]
-          ["Total", 110, 30, "78.57 %"],
-          ["2017-18", 52, 19, "73.24 %"],
-          ["2016-17", 15, 1, "93.75 %"],
-          ["2015-16", 9, 1, "90.00 %"],
-          ["2014-15", 11, 0, "100.00 %"],
+          ["Total", 140, 110, 30, "78.57 %"],
+          ["2017-18", 71, 52, 19, "73.24 %"],
+          ["2016-17", 16, 15, 1, "93.75 %"],
+          ["2015-16", 10, 9, 1, "90.00 %"],
+          ["2014-15", 11, 11, 0, "100.00 %"],
         ]
         attemptsTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
@@ -486,15 +485,15 @@ describe('Course Statistics tests', () => {
       })
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
-      cy.contains("#CourseStatPanes a.item", "Student").click()
+      cy.contains("#CourseStatPanes a.item", "Students").click()
       cy.get("#PrimaryDataTable table>tbody").within(() => {
         const studentTableContents = [
-          // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
-          ["Total", 218, 165,	47, "97.25 %",	6, 0,	"2.75 %"],
-          ["2017-18", 131, 86, 40, "96.18 %", 5, 0, "3.82 %"],
-          ["2016-17", 56, 51, 4, "98.21 %", 1, 0, "1.79 %"],
-          ["2015-16", 19, 17, 2, "100.00 %", 0, 0, "0.00 %"],
-          ["2014-15", 6, 6, 0, "100.00 %", 0, 0, "0.00 %"],
+          // time, students, passedfirsttry, eventuallypassed, pass%, neverpassed, fail%]
+          ["Total", 179, 168,	6, "97.21 %",	5,	"2.79 %"],
+          ["2017-18", 95, 86, 4, "94.74 %", 5, "5.26 %"],
+          ["2016-17", 53, 52, 1, "100.00 %", 0, "0.00 %"],
+          ["2015-16", 19, 18, 1, "100.00 %", 0, "0.00 %"],
+          ["2014-15", 6, 6, 0, "100.00 %", 0, "0.00 %"],
         ]
         studentTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
@@ -507,12 +506,12 @@ describe('Course Statistics tests', () => {
       })
       cy.get("#ComparisonDataTable table>tbody").within(() => {
         const studentTableContents = [
-          // time, students, passedfirsttry, passedretry, pass%, failedfirsttry, failedretry, fail%]
-          ["Total", 129, 95, 12,	"82.95 %", 20, 2,	"17.05 %"],
-          ["2017-18", 67, 48, 3, "76.12 %", 15, 1, "23.88 %"],
-          ["2016-17", 15, 11, 3, "93.33 %", 1, 0, "6.67 %"],
-          ["2015-16", 10, 9, 0, "90.00 %", 1, 0, "10.00 %"],
-          ["2014-15", 11, 11, 0, "100.00 %", 0, 0, "0.00 %"],
+          // time, students, passedfirsttry, passedeventually, pass%, neverpassed, fail%]
+          ["Total", 122, 98, 7,	"86.07 %", 17, "13.93 %"],
+          ["2017-18", 65, 49, 1, "76.92 %", 15, "23.08 %"],
+          ["2016-17", 13, 12, 0, "92.31 %", 1, "7.69 %"],
+          ["2015-16", 10, 9, 1, "100.00 %", 0, "0.00 %"],
+          ["2014-15", 11, 11, 0, "100.00 %", 0, "0.00 %"],
         ]
         studentTableContents.forEach((values, trIndex) => {
           cy.get("tr").eq(trIndex).within(() => {
@@ -525,7 +524,9 @@ describe('Course Statistics tests', () => {
       })
 
       cy.contains("#CourseStatPanes a.item", "Table").click()
-      cy.contains("#CourseStatPanes a.item", "Grades").click()
+      cy.contains("#CourseStatPanes a.item", "Attempts").click()
+      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true })
+
       cy.get("#PrimaryDataTable table>tbody").within(() => {
         const gradesTableContents = [
           // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]

@@ -44,7 +44,4 @@ const mapDispatchToProps = dispatch => ({
   removeError: uuid => dispatch(removeError(uuid))
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ErrorMessage)
+export default connect(mapStateToProps, mapDispatchToProps)(ErrorMessage)

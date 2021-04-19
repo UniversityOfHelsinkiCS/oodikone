@@ -40,10 +40,7 @@ ThesisCourses.propTypes = {
   getTheses: func.isRequired
 }
 
-export default connect(
-  null,
-  {
-    createThesis: createNewThesisCourse,
-    getTheses: getThesisCourses
-  }
-)(ThesisCourses)
+export default connect(null, {
+  createThesis: createNewThesisCourse,
+  getTheses: getThesisCourses
+})(ThesisCourses)

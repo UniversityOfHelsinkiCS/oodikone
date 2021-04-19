@@ -109,10 +109,7 @@ const mapStateToProps = ({ tagstudent }) => ({
 })
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      createMultipleStudentTag: createMultipleStudentTagAction
-    }
-  )(TagModal)
+  connect(mapStateToProps, {
+    createMultipleStudentTag: createMultipleStudentTagAction
+  })(TagModal)
 )

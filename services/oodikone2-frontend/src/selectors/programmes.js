@@ -12,13 +12,10 @@ const toOptions = elements =>
 
 const userRightsPropSelector = (_, props) => props.rights
 
-const dropdownProgrammeSelector = createSelector(
-  associationsSelector,
-  assocs => {
-    const programmes = toOptions(assocs.programmes)
-    return programmes
-  }
-)
+const dropdownProgrammeSelector = createSelector(associationsSelector, assocs => {
+  const programmes = toOptions(assocs.programmes)
+  return programmes
+})
 
 const filteredDropdownProgrammeSelector = createSelector(
   dropdownProgrammeSelector,

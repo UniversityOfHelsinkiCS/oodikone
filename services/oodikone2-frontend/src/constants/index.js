@@ -55,7 +55,11 @@ const assumeBasename = () => {
 export const BASE_PATH = assumeBasename()
 
 export const API_BASE_PATH = `${assumeBasename()}api`
-export const AVAILABLE_LANGUAGES = [{ name: 'fi', code: 'fi' }, { name: 'en', code: 'en' }, { name: 'sv', code: 'sv' }]
+export const AVAILABLE_LANGUAGES = [
+  { name: 'fi', code: 'fi' },
+  { name: 'en', code: 'en' },
+  { name: 'sv', code: 'sv' }
+]
 export const DEFAULT_LANG = 'fi'
 
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'

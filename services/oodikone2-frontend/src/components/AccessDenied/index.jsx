@@ -122,7 +122,4 @@ const mapDispatchToProps = {
   logout: logoutAction
 }
 
-export default connect(
-  null,
-  mapDispatchToProps
-)(AccessDenied)
+export default connect(null, mapDispatchToProps)(AccessDenied)

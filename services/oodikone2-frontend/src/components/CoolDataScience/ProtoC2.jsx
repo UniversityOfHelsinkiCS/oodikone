@@ -182,7 +182,9 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
             const customToolTip = orgSeries.reduce((acc, curr) => {
               const percentage = (curr.data[tick.pos].z * 100).toFixed(1)
               // eslint-disable-next-line no-param-reassign
-              acc = `${acc} <span style="color:${curr.color}">●</span> ${curr.name}: <b>${curr.data[tick.pos].y}</b> (${percentage}%)<br/>`
+              acc = `${acc} <span style="color:${curr.color}">●</span> ${curr.name}: <b>${
+                curr.data[tick.pos].y
+              }</b> (${percentage}%)<br/>`
               return acc
             }, `${tick.label.textStr}<br/>`)
 
@@ -554,7 +556,7 @@ const mapStateToProps = ({ coolDataScience }) => ({
   protoCProgrammeLoading: coolDataScience.pending.protoCProgramme
 })
 
-export default connect(
-  mapStateToProps,
-  { getProtoCDispatch: getProtoC, getProtoCProgrammeDispatch: getProtoCProgramme }
-)(ProtoC)
+export default connect(mapStateToProps, {
+  getProtoCDispatch: getProtoC,
+  getProtoCProgrammeDispatch: getProtoCProgramme
+})(ProtoC)

@@ -9,8 +9,4 @@ export const formatStudents = students =>
     return { studentNumber, started: date, credits, lastname, firstnames }
   })
 
-export const makeFormatStudentRows = () =>
-  createSelector(
-    getStudents,
-    formatStudents
-  )
+export const makeFormatStudentRows = () => createSelector(getStudents, formatStudents)
