@@ -45,7 +45,7 @@ const ResultTabs = props => {
     const currentTab = params[1].panes[activeIndex]
     sendAnalytics(`Current tab '${currentTab.menuItem.content}'`, 'Course statistics')
     setTab(...params)
-    setViewMode(resetViewMode ? viewModeNames.ATTEMPTS : viewMode)
+    setViewMode(resetViewMode ? viewMode : viewModeNames.ATTEMPTS)
   }
 
   const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
