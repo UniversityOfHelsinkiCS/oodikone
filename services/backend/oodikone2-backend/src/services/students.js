@@ -81,7 +81,7 @@ const byId = async id => {
 }
 
 const findByCourseAndSemesters = async (coursecodes, from, to, separate) =>
-  sequelize
+  (await sequelize
     .query(
       `
   SELECT
@@ -105,7 +105,7 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate) =>
         type: sequelize.QueryTypes.SELECT,
         raw: true
       }
-    )
+    ))
     .map(st => st.studentnumber)
 
 const findByTag = tag => {
