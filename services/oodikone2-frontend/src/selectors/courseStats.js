@@ -3,44 +3,38 @@ import { sortBy, flatten } from 'lodash'
 
 const courseStatsSelector = state => state.courseStats.data
 
-const getCourseStats = createSelector(
-  [courseStatsSelector],
-  courseStats => {
-    const stats = {}
-    Object.entries(courseStats).forEach(entry => {
-      const [coursecode, data] = entry
-      const { statistics } = data
-      stats[coursecode] = {
-        ...data,
-        statistics
-      }
-    })
-    return stats
-  }
-)
+const getCourseStats = createSelector([courseStatsSelector], courseStats => {
+  const stats = {}
+  Object.entries(courseStats).forEach(entry => {
+    const [coursecode, data] = entry
+    const { statistics } = data
+    stats[coursecode] = {
+      ...data,
+      statistics
+    }
+  })
+  return stats
+})
 
 const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
 
-const getQueryInfo = createSelector(
-  [getCourseStats],
-  stats => {
-    const courseStats = Object.values(stats)
-    const semesters = {}
-    const courses = []
-    courseStats.forEach(c => {
-      courses.push({
-        code: c.coursecode,
-        name: c.name,
-        alternatives: c.alternatives
-      })
-      c.statistics.forEach(({ name, code }) => {
-        semesters[code] = { name, code }
-      })
+const getQueryInfo = createSelector([getCourseStats], stats => {
+  const courseStats = Object.values(stats)
+  const semesters = {}
+  const courses = []
+  courseStats.forEach(c => {
+    courses.push({
+      code: c.coursecode,
+      name: c.name,
+      alternatives: c.alternatives
     })
-    const timeframe = sortBy(Object.values(semesters), 'code')
-    return { courses, timeframe }
-  }
-)
+    c.statistics.forEach(({ name, code }) => {
+      semesters[code] = { name, code }
+    })
+  })
+  const timeframe = sortBy(Object.values(semesters), 'code')
+  return { courses, timeframe }
+})
 
 // export const newLocal = <Popup content="Students from all programmes" trigger="All" />
 export const ALL = {
@@ -121,7 +115,7 @@ const calculatePassRate = (passed, failed) => {
 
 const getRealisationStats = (realisation, filterStudentFn, userHasAccessToAllStats) => {
   const { name, attempts, obfuscated } = realisation
-  const { passed, failed } = attempts.classes
+  const { passed, failed } = attempts.categories
   const passedAmount = userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
   const failedAmount = userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
 
@@ -141,7 +135,7 @@ const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) =
   }
 
   const summary = statistics.reduce((acc, cur) => {
-    const { passed, failed } = cur.attempts.classes
+    const { passed, failed } = cur.attempts.categories
     acc.passed += userHasAccessToAllStats ? passed.filter(filterStudentFn).length : passed.length
     acc.failed += userHasAccessToAllStats ? failed.filter(filterStudentFn).length : failed.length
     return acc
@@ -181,13 +175,11 @@ const summaryStatistics = createSelector(
   }
 )
 
-const getCourses = createSelector(
-  getCourseStats,
-  stats =>
-    Object.values(stats).map(({ name, coursecode: code }) => ({
-      code,
-      name
-    }))
+const getCourses = createSelector(getCourseStats, stats =>
+  Object.values(stats).map(({ name, coursecode: code }) => ({
+    code,
+    name
+  }))
 )
 
 export default {

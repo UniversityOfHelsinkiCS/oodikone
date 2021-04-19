@@ -411,16 +411,14 @@ PopulationCourseStats.propTypes = {
   }).isRequired,
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired,
+  language: string.isRequired
 }
 
 const mapStateToProps = ({ populationCourses }) => ({
   populationCourses
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    clearCourseStats
-  }
-)(withRouter(PopulationCourseStats))
+export default connect(mapStateToProps, {
+  clearCourseStats
+})(withRouter(PopulationCourseStats))

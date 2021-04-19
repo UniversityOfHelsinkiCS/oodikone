@@ -103,10 +103,7 @@ TagList.propTypes = {
   namesVisible: bool.isRequired
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    getTagsByStudytrack: getTagsByStudytrackAction,
-    getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
-  }
-)(TagList)
+export default connect(mapStateToProps, {
+  getTagsByStudytrack: getTagsByStudytrackAction,
+  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
+})(TagList)

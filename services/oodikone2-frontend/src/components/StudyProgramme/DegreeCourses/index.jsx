@@ -74,12 +74,18 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
 
   const excludeAll = code => {
     const module = modules.find(({ module }) => module === code)
-    setExclusion(studyProgramme, module.courses.filter(c => c.visible.visibility).map(c => c.code))
+    setExclusion(
+      studyProgramme,
+      module.courses.filter(c => c.visible.visibility).map(c => c.code)
+    )
   }
 
   const deleteAll = code => {
     const module = modules.find(({ module }) => module === code)
-    removeExclusion(studyProgramme, module.courses.map(c => c.visible.id))
+    removeExclusion(
+      studyProgramme,
+      module.courses.map(c => c.visible.id)
+    )
   }
 
   const showAllButton = module => (
@@ -200,7 +206,4 @@ const mapDispatchToProps = dispatch => ({
   removeExclusion: (programmecode, coursecode, id) => dispatch(removeCourseExclusion(programmecode, coursecode, id))
 })
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DegreeCourses)
+export default connect(mapStateToProps, mapDispatchToProps)(DegreeCourses)

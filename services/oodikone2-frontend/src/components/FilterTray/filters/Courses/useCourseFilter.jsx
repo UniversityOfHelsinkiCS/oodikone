@@ -28,10 +28,7 @@ CourseFilterProvider.propTypes = {
   getPopulationSelectedStudentCourses: PropTypes.func.isRequired
 }
 
-const ConnectedProvider = connect(
-  null,
-  { getPopulationSelectedStudentCourses }
-)(CourseFilterProvider)
+const ConnectedProvider = connect(null, { getPopulationSelectedStudentCourses })(CourseFilterProvider)
 
 export { ConnectedProvider as CourseFilterProvider }
 

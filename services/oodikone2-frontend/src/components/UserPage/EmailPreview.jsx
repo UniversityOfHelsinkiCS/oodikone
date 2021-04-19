@@ -109,7 +109,4 @@ const mapDispatchToProps = {
   onPreviewRequested: getPreview
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(EmailPreview)
+export default connect(mapStateToProps, mapDispatchToProps)(EmailPreview)
