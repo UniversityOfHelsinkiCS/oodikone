@@ -158,7 +158,7 @@ const SingleCourseStats = ({
     // Count the stats for the Attempts- and Grades-tab
     // Also used in Pass rate chart and Grade distribution chart
     const grades = countFilteredStudents(attempts.grades, filter)
-    const categories = countFilteredStudents(attempts.classes, filter)
+    const categories = countFilteredStudents(attempts.categories, filter)
 
     const { failed, passed } = categories
     const passRate = (100 * passed) / (passed + failed)
@@ -171,16 +171,14 @@ const SingleCourseStats = ({
   }
 
   const countStudentStats = (allstudents, filter) => {
-    const grades = countFilteredStudents(allstudents.grades, filter)
-    const categories = countFilteredStudents(allstudents.classes, filter)
+    const categories = countFilteredStudents(allstudents.categories, filter)
 
-    const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = categories
-    const total = passedFirst + passedRetry + failedFirst + failedRetry
-    const passRate = (passedFirst + passedRetry) / total
-    const failRate = (failedFirst + failedRetry) / total
+    const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = categories
+    const total = passedFirst + passedEventually + neverPassed
+    const passRate = (passedFirst + passedEventually) / total
+    const failRate = neverPassed / total
 
     return {
-      grades,
       categories,
       passRate,
       failRate,
@@ -193,10 +191,9 @@ const SingleCourseStats = ({
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const formattedStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allstudents, attempts: allAttempts, coursecode, obfuscated }) => {
+      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated }) => {
         const attempts = countAttemptStats(allAttempts, filter)
-        const students = countStudentStats(allstudents, filter)
-
+        const students = countStudentStats(allStudents, filter)
         const parsedName = separate ? getTextIn(name, language) : name
         return {
           code,
