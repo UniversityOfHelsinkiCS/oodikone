@@ -99,9 +99,9 @@ describe("Studyprogramme overview", () => {
   it("can create and delete tags for population", () => {
     const name = `tag-${new Date().getTime()}`;
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
-    cy.get(".attached > :nth-child(6)").click();
-    cy.get(":nth-child(1) > .field > .ui > input").type(name);
-    cy.get(".form-control").type("2018");
+    cy.get(".attached").contains("Tags").click();
+    cy.get(".tagNameSelectInput > .ui > input").type(name);
+    cy.get(".yearSelectInput").type("2018");
     cy.contains("Create new tag").click();
     cy.contains(name);
     cy.contains("2018");
@@ -111,9 +111,10 @@ describe("Studyprogramme overview", () => {
   it("can create personal tags", () => {
     const name = `tag-${new Date().getTime()}`;
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
-    cy.get(".attached > :nth-child(6)").click();
-    cy.get(":nth-child(1) > .field > .ui > input").type(name);
-    cy.get(".form-control").type("2018");
+    cy.get(".attached").contains("Tags").click();
+    cy.get(".tagNameSelectInput > .ui > input").type(name);
+    cy.get(".yearSelectInput").type("2018");
+
     cy.get(".ui > label").click();
     cy.contains("Create new tag").click();
     cy.get(".purple");
@@ -125,9 +126,9 @@ describe("Studyprogramme overview", () => {
     const name = `tag-${new Date().getTime()}`;
 
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
-    cy.get(".attached > :nth-child(6)").click();
-    cy.get(":nth-child(1) > .field > .ui > input").type(name);
-    cy.get(".form-control").type("2018");
+    cy.get(".attached").contains("Tags").click();
+    cy.get(".tagNameSelectInput > .ui > input").type(name);
+    cy.get(".yearSelectInput").type("2018");
     cy.contains("Create new tag").click();
     cy.contains(name);
 
