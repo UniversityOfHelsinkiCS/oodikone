@@ -152,9 +152,6 @@ ProductivityTable.defaultProps = {
   thesis: undefined
 }
 
-export default connect(
-  null,
-  {
-    dispatchGetProductivity: getProductivity
-  }
-)(ProductivityTable)
+export default connect(null, {
+  dispatchGetProductivity: getProductivity
+})(ProductivityTable)

@@ -27,17 +27,9 @@ export const sortCourses = courseList =>
       selected: courseList.selected.some(c => course.code === c.code)
     }))
 
-export const makeSortCourseInstances = () =>
-  createSelector(
-    getInstanceData,
-    sortInstances
-  )
+export const makeSortCourseInstances = () => createSelector(getInstanceData, sortInstances)
 
-export const makeSortCourses = () =>
-  createSelector(
-    getData,
-    sortCourses
-  )
+export const makeSortCourses = () => createSelector(getData, sortCourses)
 
 export const getCourseSearchResults = state =>
   state.courseSearch.data.courses

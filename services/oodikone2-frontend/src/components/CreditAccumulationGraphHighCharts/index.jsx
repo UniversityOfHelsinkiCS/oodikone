@@ -349,7 +349,4 @@ const mapStateToProps = state => ({
   currentGraphSize: state.settings.chartHeight
 })
 
-export default connect(
-  mapStateToProps,
-  { clearLoading, setChartHeight }
-)(withRouter(CreditAccumulationGraphHighCharts))
+export default connect(mapStateToProps, { clearLoading, setChartHeight })(withRouter(CreditAccumulationGraphHighCharts))

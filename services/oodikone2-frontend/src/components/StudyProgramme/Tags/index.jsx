@@ -139,7 +139,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
           <Form.Group>
             <Form.Field>
               <label>Tag name</label>
-              <Form.Input onChange={handleChange} value={tagname} />
+              <Form.Input className="tagNameSelectInput" onChange={handleChange} value={tagname} />
             </Form.Field>
             <Form.Field>
               <label>Associated start year</label>
@@ -187,12 +187,9 @@ Tags.propTypes = {
 }
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      createTag: createTagAction,
-      deleteTag: deleteTagAction,
-      getTagsByStudytrack: getTagsByStudytrackAction
-    }
-  )(Tags)
+  connect(mapStateToProps, {
+    createTag: createTagAction,
+    deleteTag: deleteTagAction,
+    getTagsByStudytrack: getTagsByStudytrackAction
+  })(Tags)
 )

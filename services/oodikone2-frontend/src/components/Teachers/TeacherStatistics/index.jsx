@@ -217,11 +217,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    getProviders,
-    getSemesters,
-    getTeacherStatistics
-  }
-)(withRouter(TeacherStatistics))
+export default connect(mapStateToProps, {
+  getProviders,
+  getSemesters,
+  getTeacherStatistics
+})(withRouter(TeacherStatistics))

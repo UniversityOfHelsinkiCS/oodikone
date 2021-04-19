@@ -1,8 +1,11 @@
 // Returns an array containing all values that are in a but not in b taking account duplicates
 const difference = (a, b) => {
-  return a.filter(function(v) {
-    return !this.get(v) || !this.set(v, this.get(v) - 1)
-  }, b.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), new Map()))
+  return a.filter(
+    function(v) {
+      return !this.get(v) || !this.set(v, this.get(v) - 1)
+    },
+    b.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), new Map())
+  )
 }
 
 const mapStudentNumbers = (studentnumbers, yearcode, name) =>

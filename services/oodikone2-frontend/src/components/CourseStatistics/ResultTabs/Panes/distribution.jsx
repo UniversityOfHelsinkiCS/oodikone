@@ -4,11 +4,9 @@ import { Grid } from 'semantic-ui-react'
 import { bool } from 'prop-types'
 import { gradeGraphOptions } from '../../../../constants'
 import {
-  viewModeNames,
   getDataObject,
   getMaxValueOfSeries,
   dataSeriesType,
-  viewModeType,
   getGradeSpread,
   getThesisGradeSpread,
   isThesisSeries,
@@ -73,28 +71,18 @@ const getGradeSeries = series => {
       }
 }
 
-const getGradeAttemptSeriesFromStats = stats => {
-  const series = stats.flatMap(s => s.attempts.grades)
-  return getGradeSeries(series)
-}
-
-const getGradeStudSeriesFromStats = stats => {
-  const series = stats.flatMap(s => s.students.grades)
-  return getGradeSeries(series)
-}
-
-const Distribution = ({ primary, comparison, viewMode, isRelative, userHasAccessToAllStats }) => {
-  const isAttemptsMode = viewMode === viewModeNames.ATTEMPTS
+const Distribution = ({ primary, comparison, isRelative, userHasAccessToAllStats }) => {
   const primaryStats = primary.stats.filter(stat => stat.name !== 'Total' || isRelative)
   const statYears = primaryStats.map(year => year.name)
   const comparisonStats = comparison ? comparison.stats : []
 
-  const gradeGraphSerieFn = isAttemptsMode ? getGradeAttemptSeriesFromStats : getGradeStudSeriesFromStats
+  const primaryGrades = primaryStats.flatMap(s => s.attempts.grades)
+  const comparisonGrades = comparisonStats.flatMap(s => s.attempts.grades)
 
-  const gradeGraphSerie = gradeGraphSerieFn(primaryStats)
-  const comparisonGraphSerie = gradeGraphSerieFn(comparisonStats)
+  const gradeGraphSeries = getGradeSeries(primaryGrades)
+  const comparisonGraphSeries = getGradeSeries(comparisonGrades)
 
-  const maxGradeValue = isRelative ? 1 : getMaxValueOfSeries(gradeGraphSerie.absolute)
+  const maxGradeValue = isRelative ? 1 : getMaxValueOfSeries(gradeGraphSeries.absolute)
 
   const primaryDistributionOptions = comparison
     ? gradeGraphOptions(statYears, maxGradeValue, 'Primary Grades')
@@ -107,7 +95,7 @@ const Distribution = ({ primary, comparison, viewMode, isRelative, userHasAccess
         <Grid.Column>
           <StackedBarChart
             options={primaryDistributionOptions}
-            series={isRelative ? gradeGraphSerie.relative : gradeGraphSerie.absolute}
+            series={isRelative ? gradeGraphSeries.relative : gradeGraphSeries.absolute}
           />
         </Grid.Column>
       </Grid.Row>
@@ -116,7 +104,7 @@ const Distribution = ({ primary, comparison, viewMode, isRelative, userHasAccess
           <Grid.Column>
             <StackedBarChart
               options={comparisonDistributionOptions}
-              series={isRelative ? comparisonGraphSerie.relative : comparisonGraphSerie.absolute}
+              series={isRelative ? comparisonGraphSeries.relative : comparisonGraphSeries.absolute}
             />
           </Grid.Column>
         </Grid.Row>
@@ -131,7 +119,6 @@ const Distribution = ({ primary, comparison, viewMode, isRelative, userHasAccess
 Distribution.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
-  viewMode: viewModeType.isRequired,
   isRelative: bool,
   userHasAccessToAllStats: bool.isRequired
 }

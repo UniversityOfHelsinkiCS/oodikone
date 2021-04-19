@@ -356,7 +356,4 @@ const mapStateToProps = ({ coolDataScience }) => ({
   loading: coolDataScience.pending.status
 })
 
-export default connect(
-  mapStateToProps,
-  { getStatusDispatch: getStatus }
-)(Status)
+export default connect(mapStateToProps, { getStatusDispatch: getStatus })(Status)

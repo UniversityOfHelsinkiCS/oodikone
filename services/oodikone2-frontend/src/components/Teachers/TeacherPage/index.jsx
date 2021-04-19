@@ -40,7 +40,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { getTeacher }
-)(TeacherPage)
+export default connect(mapStateToProps, { getTeacher })(TeacherPage)
