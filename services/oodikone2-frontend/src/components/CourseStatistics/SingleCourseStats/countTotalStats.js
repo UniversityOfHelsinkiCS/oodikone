@@ -20,30 +20,19 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         }
       })
 
-      const { passedFirst, passedRetry, failedFirst, failedRetry } = curr.students.categories
+      const { passedFirst, passedEventually, neverPassed } = curr.students.categories
 
       const newPassedFirst = passedFirst
         ? acc.students.categories.passedFirst + passedFirst
         : acc.students.categories.passedFirst
 
-      const newPassedRetry = passedRetry
-        ? acc.students.categories.passedRetry + passedRetry
-        : acc.students.categories.passedRetry
+      const newPassedEventually = passedEventually
+        ? acc.students.categories.passedEventually + passedEventually
+        : acc.students.categories.passedEventually
 
-      const newFailedFirst = failedFirst
-        ? acc.students.categories.failedFirst + failedFirst
-        : acc.students.categories.failedFirst
-
-      const newFailedRetry = failedRetry
-        ? acc.students.categories.failedRetry + failedRetry
-        : acc.students.categories.failedRetry
-
-      const sgrades = acc.students.grades
-
-      Object.keys(curr.students.grades).forEach(grade => {
-        if (!sgrades[grade]) sgrades[grade] = 0
-        sgrades[grade] += curr.students.grades[grade]
-      })
+      const newNeverPassed = neverPassed
+        ? acc.students.categories.neverPassed + neverPassed
+        : acc.students.categories.neverPassed
 
       return {
         ...acc,
@@ -52,11 +41,9 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         students: {
           categories: {
             passedFirst: newPassedFirst,
-            passedRetry: newPassedRetry,
-            failedFirst: newFailedFirst,
-            failedRetry: newFailedRetry
-          },
-          grades: sgrades
+            passedEventually: newPassedEventually,
+            neverPassed: newNeverPassed
+          }
         }
       }
     },
@@ -76,24 +63,23 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       students: {
         categories: {
           passedFirst: 0,
-          passedRetry: 0,
-          failedFirst: 0,
-          failedRetry: 0
+          passedEventually: 0,
+          neverPassed: 0
         },
-        grades: {},
-        total: 0,
         passRate: 0,
-        failRate: 0
-      }
+        failRate: 0,
+        total: 0
+      },
+      studentnumbers: []
     }
   )
 
   // Count pass- and failrates also for "Total"-lines
-  const { passedFirst = 0, passedRetry = 0, failedFirst = 0, failedRetry = 0 } = totals.students.categories
-  const total = passedFirst + passedRetry + failedFirst + failedRetry
+  const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = totals.students.categories
+  const total = passedFirst + passedEventually + neverPassed
   totals.students.total = total
-  totals.students.passRate = (passedFirst + passedRetry) / total
-  totals.students.failRate = (failedFirst + failedRetry) / total
+  totals.students.passRate = (passedFirst + passedEventually) / total
+  totals.students.failRate = neverPassed / total
 
   const { failed, passed } = totals.attempts.categories
   totals.attempts.passRate = (100 * passed) / (passed + failed)

@@ -41,35 +41,31 @@ const getPassRateAttemptSeriesFromStats = stats => {
 
 const getPassRateStudSeriesFromStats = stats => {
   const all = []
-  const failedFirst = []
-  const failedRetry = []
   const passedFirst = []
-  const passedRetry = []
+  const passedEventually = []
+  const neverPassed = []
 
   stats.forEach(year => {
-    const { failedFirst: ff, failedRetry: fr, passedFirst: pf, passedRetry: pr } = year.students.categories
+    const { passedFirst: pf, passedEventually: pe, neverPassed: np } = year.students.categories
 
-    all.push((ff || 0) + (fr || 0) + (pf || 0) + (pr || 0))
-    failedFirst.push(ff || 0)
-    failedRetry.push(fr || 0)
+    all.push((pf || 0) + (pe || 0) + (np || 0))
     passedFirst.push(pf || 0)
-    passedRetry.push(pr || 0)
+    passedEventually.push(pe || 0)
+    neverPassed.push(np || 0)
   })
 
   return {
     absolute: [
       getDataObject(`all`, all, 'a'),
       getDataObject(` passed on first try`, passedFirst, 'b'),
-      getDataObject(`passed after retry`, passedRetry, 'b'),
-      getDataObject(`failed on first try`, failedFirst, 'c'),
-      getDataObject(`failed after retry`, failedRetry, 'c')
+      getDataObject(`passed eventually`, passedEventually, 'b'),
+      getDataObject(`never passed`, neverPassed, 'c')
     ],
     relative: [
       // eslint-disable-next-line no-unused-vars
       getDataObject(` passed on first try`, passedFirst.map(absoluteToRelative(all)), 'b'),
-      getDataObject(`passed after retry`, passedRetry.map(absoluteToRelative(all)), 'b'),
-      getDataObject(`failed on first try`, failedFirst.map(absoluteToRelative(all)), 'c'),
-      getDataObject(`failed after retry`, failedRetry.map(absoluteToRelative(all)), 'c')
+      getDataObject(`passed eventually`, passedEventually.map(absoluteToRelative(all)), 'b'),
+      getDataObject(`never passed`, neverPassed.map(absoluteToRelative(all)), 'c')
     ]
   }
 }
