@@ -69,8 +69,8 @@ CourseTable.propTypes = {
   emptyListText: string,
   controlIcon: string,
   mandatory: bool,
-  raised: bool,
-  strongBorder: bool
+  raised: bool.isRequired,
+  strongBorder: bool.isRequired
 }
 
 CourseTable.defaultProps = {
