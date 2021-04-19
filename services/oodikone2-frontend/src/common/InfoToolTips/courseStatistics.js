@@ -57,6 +57,6 @@ export default {
 
       Graafi näyttää suorituskertojen arvosanajakauman eri vuosille. Mahdollinen kategoria
       "Other passed" sisältää sekä arvosanan "Hyv." että kurssin hyväksiluvut.
-    `,
+    `
   }
 }
