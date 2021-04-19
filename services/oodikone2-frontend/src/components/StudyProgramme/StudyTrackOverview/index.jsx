@@ -255,10 +255,7 @@ const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgram
   language: settings.language
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    dispatchGetProductivity: getProductivity,
-    dispatchGetThroughput: getThroughput
-  }
-)(Overview)
+export default connect(mapStateToProps, {
+  dispatchGetProductivity: getProductivity,
+  dispatchGetThroughput: getThroughput
+})(Overview)

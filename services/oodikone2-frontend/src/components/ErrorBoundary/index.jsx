@@ -89,7 +89,4 @@ const mapStateToProps = ({ actionHistory, auth }) => ({
   actionHistory
 })
 
-export default connect(
-  mapStateToProps,
-  { login: loginAction }
-)(ErrorBoundary)
+export default connect(mapStateToProps, { login: loginAction })(ErrorBoundary)

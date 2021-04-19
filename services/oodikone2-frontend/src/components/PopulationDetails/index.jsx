@@ -34,7 +34,10 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
     if (indexes.includes(index)) {
-      indexes.splice(indexes.findIndex(ind => ind === index), 1)
+      indexes.splice(
+        indexes.findIndex(ind => ind === index),
+        1
+      )
     } else {
       indexes.push(index)
     }

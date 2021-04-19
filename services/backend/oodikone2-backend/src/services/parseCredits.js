@@ -15,7 +15,7 @@ const formatStudyrightElement = ({ code, element_detail, startdate, studyright }
 })
 
 const parseCredit = (credit, anonymizationSalt) => {
-  const { student, semester, grade, course_code, credits } = credit
+  const { student, semester, grade, course_code, credits, attainment_date } = credit
   const { studentnumber, studyright_elements } = student
   const { yearcode, yearname, semestercode, name: semestername } = semester
 
@@ -36,6 +36,7 @@ const parseCredit = (credit, anonymizationSalt) => {
       yearname,
       semestercode,
       semestername,
+      attainment_date,
       coursecode: course_code,
       grade,
       passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
@@ -51,6 +52,7 @@ const parseCredit = (credit, anonymizationSalt) => {
     yearname,
     semestercode,
     semestername,
+    attainment_date,
     coursecode: course_code,
     grade,
     passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),

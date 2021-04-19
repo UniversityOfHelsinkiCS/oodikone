@@ -68,10 +68,7 @@ const mapStateToProps = state => ({
   pending: state.courseSearch.pending
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    findCoursesV2,
-    clearCourses
-  }
-)(CourseSearchForm)
+export default connect(mapStateToProps, {
+  findCoursesV2,
+  clearCourses
+})(CourseSearchForm)

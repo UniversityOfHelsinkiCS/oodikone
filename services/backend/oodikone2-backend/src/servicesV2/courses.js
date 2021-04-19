@@ -397,9 +397,15 @@ const setDuplicateCode = async (code1, code2) => {
             groupid = Math.max(0, ...Object.values(all).filter(e => e))
             groupid = groupid && !isNaN(groupid) ? groupid + 1 : 1
           }
-          await CourseDuplicates.bulkCreate([{ groupid, coursecode: code1 }, { groupid, coursecode: code2 }], {
-            ignoreDuplicates: true
-          })
+          await CourseDuplicates.bulkCreate(
+            [
+              { groupid, coursecode: code1 },
+              { groupid, coursecode: code2 }
+            ],
+            {
+              ignoreDuplicates: true
+            }
+          )
         } else {
           // both have a group, must merge groups
           await CourseDuplicates.update({ groupid: all[code1] }, { where: { groupid: all[code2] } })

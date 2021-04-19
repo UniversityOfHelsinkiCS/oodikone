@@ -263,9 +263,4 @@ const mapDispatchToProps = {
   getDegreesAndProgrammes
 }
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(StudentDetails)
-)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentDetails))

@@ -140,12 +140,9 @@ const mapStateToProps = ({ users, units, elementdetails }) => ({
 })
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      getUsers,
-      getUnits,
-      getElementDetails
-    }
-  )(EnableUsers)
+  connect(mapStateToProps, {
+    getUsers,
+    getUnits,
+    getElementDetails
+  })(EnableUsers)
 )

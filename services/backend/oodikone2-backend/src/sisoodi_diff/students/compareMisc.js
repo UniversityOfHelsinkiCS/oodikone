@@ -8,14 +8,15 @@ const compareStarted = (oodi, sis, msg) => {
     SIS: ${sis}`)
 }
 
-const compareCredits = (oodi, sis, msg) => {
-  if (oodi === sis) {
+const compareCredits = (totalCredits, courses, msg) => {
+  const totalFromCourses = courses.map(c => c.credits).reduce((a, b) => a + Number(b), 0)
+
+  if (totalCredits === totalFromCourses) {
     return msg
   }
 
-  const d = Number(sis) - Number(oodi)
-
-  return msg.concat(`  credits diff:\t\t${d}\t(o: ${oodi} / s: ${sis})`)
+  const d = totalCredits - totalFromCourses
+  return msg.concat(`  credits diff:\t\t${d}\t(o: ${totalCredits} / s: ${totalFromCourses})`)
 }
 
 module.exports = {

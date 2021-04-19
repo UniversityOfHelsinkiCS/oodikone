@@ -2,8 +2,7 @@ import { arrayOf, number, oneOfType, shape, string, oneOf } from 'prop-types'
 
 export const viewModeNames = {
   ATTEMPTS: 'Attempts',
-  GRADES: 'Grades',
-  STUDENT: 'Student'
+  STUDENT: 'Students'
 }
 
 export const getDataObject = (name, data, stack) => ({ name, data, stack })

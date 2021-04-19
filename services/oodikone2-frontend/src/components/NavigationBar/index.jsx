@@ -233,11 +233,6 @@ const mapDispatchToProps = {
   logout: logoutAction
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-  null,
-  {
-    areStatePropsEqual: isEqual
-  }
-)(NavigationBar)
+export default connect(mapStateToProps, mapDispatchToProps, null, {
+  areStatePropsEqual: isEqual
+})(NavigationBar)

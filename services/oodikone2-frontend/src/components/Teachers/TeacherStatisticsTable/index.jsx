@@ -111,7 +111,4 @@ const mapStateToProps = state => {
   return { unifyOpenUniCourses }
 }
 
-export default connect(
-  mapStateToProps,
-  { getCourseStats }
-)(TeacherStatisticsTable)
+export default connect(mapStateToProps, { getCourseStats })(TeacherStatisticsTable)

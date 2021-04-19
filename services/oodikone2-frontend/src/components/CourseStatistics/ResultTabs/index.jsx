@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Tab, Grid, Radio, Menu } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { shape, bool } from 'prop-types'
@@ -25,10 +25,22 @@ const paneViewIndex = {
 const ResultTabs = props => {
   const [tab, setTab] = useTabs('cs_tab', 0, props.history)
   const [viewMode, setViewMode] = useState(viewModeNames.ATTEMPTS)
+  const [selectedView, setSelectedView] = useState(true)
   const [isRelative, setIsRelative] = useState(false)
+  const [showGrades, setShowGrades] = useState(false)
+
+  const handleModeChange = newViewMode => {
+    sendAnalytics(`Current view mode '${newViewMode}'`, 'Course statistics')
+    setViewMode(newViewMode)
+  }
+
+  useEffect(() => {
+    const newViewMode = selectedView ? viewModeNames.ATTEMPTS : viewModeNames.STUDENT
+    handleModeChange(newViewMode)
+  }, [selectedView])
 
   const handleTabChange = (...params) => {
-    const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE && viewMode === viewModeNames.GRADES
+    const resetViewMode = params[1].activeIndex === paneViewIndex.TABLE && viewMode === viewModeNames.ATTEMPTS
     const { activeIndex } = params[1]
     const currentTab = params[1].panes[activeIndex]
     sendAnalytics(`Current tab '${currentTab.menuItem.content}'`, 'Course statistics')
@@ -36,16 +48,11 @@ const ResultTabs = props => {
     setViewMode(resetViewMode ? viewModeNames.ATTEMPTS : viewMode)
   }
 
-  const handleModeChange = newViewMode => {
-    sendAnalytics(`Current view mode '${newViewMode}'`, 'Course statistics')
-    setViewMode(newViewMode)
-  }
-
-  const getRelativeButton = () => (
+  const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
     <div className="toggleContainer">
-      <label className="toggleLabel">Absolute</label>
-      <Radio toggle checked={isRelative} onChange={() => setIsRelative(!isRelative)} />
-      <label className="toggleLabel">Relative</label>
+      <label className="toggleLabel">{firstLabel}</label>
+      <Radio toggle data-cy="gradeToggle" checked={value} onChange={() => setValue(!value)} />
+      <label className="toggleLabel">{secondLabel}</label>
     </div>
   )
 
@@ -56,26 +63,16 @@ const ResultTabs = props => {
         {Object.values(viewModeNames).map(name => (
           <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
         ))}
-        {viewMode === 'Grades' && getRelativeButton()}
+        {viewMode === 'Attempts' && getRadioButton('Totals', 'Grade distribution', showGrades, setShowGrades)}
+        {viewMode === 'Attempts' && showGrades && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
       </Menu>
     )
 
     const getToggle = () => {
-      const isToggleChecked = viewMode === viewModeNames.STUDENT
-      const newMode = isToggleChecked ? viewModeNames.ATTEMPTS : viewModeNames.STUDENT
-      const toggleId = 'viewModeToggle'
       return (
         <div className="chartToggleContainer">
-          <div className="toggleContainer">
-            <label className="toggleLabel" htmlFor={toggleId}>
-              {viewModeNames.ATTEMPTS}
-            </label>
-            <Radio id={toggleId} checked={isToggleChecked} toggle onChange={() => handleModeChange(newMode)} />
-            <label className="toggleLabel" htmlFor={toggleId}>
-              {viewModeNames.STUDENT}
-            </label>
-          </div>
-          {(tab === 2 || props.comparison) && getRelativeButton()}
+          {tab === 1 && getRadioButton('Student', 'Attempts', selectedView, setSelectedView)}
+          {(tab === 2 || props.comparison) && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
         </div>
       )
     }
@@ -103,6 +100,7 @@ const ResultTabs = props => {
             primary={primary}
             viewMode={viewMode}
             isRelative={isRelative}
+            showGrades={showGrades}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
         )
@@ -125,7 +123,6 @@ const ResultTabs = props => {
           <Distribution
             comparison={comparison}
             primary={primary}
-            viewMode={viewMode}
             isRelative={isRelative}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />

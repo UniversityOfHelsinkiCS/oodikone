@@ -137,7 +137,10 @@ const CoursePopulation = ({
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
     if (indexes.includes(index)) {
-      indexes.splice(indexes.findIndex(ind => ind === index), 1)
+      indexes.splice(
+        indexes.findIndex(ind => ind === index),
+        1
+      )
     } else {
       indexes.push(index)
     }
@@ -321,14 +324,11 @@ const mapStateToProps = ({
 }
 
 export default withRouter(
-  connect(
-    mapStateToProps,
-    {
-      getCoursePopulationDispatch: getCoursePopulation,
-      getSingleCourseStatsDispatch: getSingleCourseStats,
-      getSemestersDispatch: getSemesters,
-      getFacultiesDispatch: getFaculties,
-      getCustomPopulationCoursesByStudentnumbers
-    }
-  )(CoursePopulation)
+  connect(mapStateToProps, {
+    getCoursePopulationDispatch: getCoursePopulation,
+    getSingleCourseStatsDispatch: getSingleCourseStats,
+    getSemestersDispatch: getSemesters,
+    getFacultiesDispatch: getFaculties,
+    getCustomPopulationCoursesByStudentnumbers
+  })(CoursePopulation)
 )

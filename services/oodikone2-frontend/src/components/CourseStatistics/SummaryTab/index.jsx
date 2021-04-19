@@ -142,7 +142,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { setValue }
-)(SummaryTab)
+export default connect(mapStateToProps, { setValue })(SummaryTab)

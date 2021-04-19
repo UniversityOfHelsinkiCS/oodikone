@@ -12,7 +12,10 @@ import { useLanguage } from '../../../common/hooks'
 const formatGradeDistribution = grades =>
   replace(
     JSON.stringify(
-      sortBy(Object.entries(grades).map(([key, value]) => ({ [key]: value.count })), o => -Object.keys(o)),
+      sortBy(
+        Object.entries(grades).map(([key, value]) => ({ [key]: value.count })),
+        o => -Object.keys(o)
+      ),
       null,
       1
     ),
