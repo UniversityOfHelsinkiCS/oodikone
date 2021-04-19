@@ -181,7 +181,7 @@ class CourseYearlyStatsCounter {
       const normalStats = {
         ...rest
       }
-      console.log({ normalStats})
+
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
         // indicate to the front that some of the data has been obfuscated and therefore
         // totals cannot be calculated
