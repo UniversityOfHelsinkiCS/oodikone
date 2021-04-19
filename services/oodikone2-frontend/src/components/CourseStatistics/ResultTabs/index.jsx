@@ -81,7 +81,7 @@ const ResultTabs = props => {
     return (
       <div className="modeSelectorContainer">
         {isTogglePane ? getToggle() : getButtonMenu()}
-        {false && <InfoBox content={infotooltips.CourseStatistics[tab][viewMode]} />}
+        <InfoBox content={infotooltips.CourseStatistics[tab][viewMode]} />
       </div>
     )
   }
