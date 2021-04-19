@@ -169,7 +169,7 @@ const teacherStats = async teacherid => {
 }
 
 const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => {
-  const teachers = Teacher.findAll({
+  const teachers = await Teacher.findAll({
     attributes: ['id'],
     include: {
       model: Credit,
