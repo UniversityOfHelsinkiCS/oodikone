@@ -139,7 +139,9 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
           <Form.Group>
             <Form.Field>
               <label>Tag name</label>
-              <Form.Input onChange={handleChange} value={tagname} />
+              <Form.Input 
+                className="tagNameSelectInput"
+                onChange={handleChange} value={tagname} />
             </Form.Field>
             <Form.Field>
               <label>Associated start year</label>
