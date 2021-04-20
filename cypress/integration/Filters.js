@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-const checkFilteringResult = (studentCount, noFiltering = false) => {
+const checkFilteringResult = (studentCount) => {
   cy.contains(`Students (${studentCount})`)
   // I don't know why this got fkd but we don't have time to fix it now. Works acually, though.
   // cy.cs("active-filter-count").should(noFiltering ? "not.exist" : "exist")
@@ -13,12 +13,6 @@ describe("Population Statistics", () => {
     // TODO: Make smarter (if one test fails all subsequent tests fail, too)?
     cy.init()
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma")
-    cy.cs("filter-toggle-open").click()
-  })
-
-  it("Filter tray opens and closes", () => {
-    cy.cs("filter-toggle-close").click().should("not.be.visible")
-    cy.cs("filter-toggle-open").click().should("not.be.visible")
   })
 
   // anon data doesn't work with current population statistic logic, so we need to skip
@@ -112,12 +106,6 @@ describe("Course Statistics", () => {
     cy.get(":nth-child(2) > .ten").click()
     cy.cs("fetch-stats-button").click()
     cy.get(":nth-child(2) > :nth-child(1) > div > .item > .level").click()
-    cy.cs("filter-toggle-open").click()
-  })
-
-  it("Filter tray opens and closes", () => {
-    cy.cs("filter-toggle-close").click().should("not.be.visible")
-    cy.cs("filter-toggle-open").click().should("not.be.visible")
   })
 
   /*
@@ -142,8 +130,6 @@ describe("Course Statistics", () => {
     checkFilteringResult(74)
     cy.selectFromDropdown("genderFilter-dropdown", 2)
     checkFilteringResult(0)
-    cy.cs("genderFilter-clear").click()
-    checkFilteringResult(93, true)
   })
 
   /*
@@ -162,8 +148,6 @@ describe("Course Statistics", () => {
     checkFilteringResult(24)
     cy.cs("grade-option-Hyl.").click()
     checkFilteringResult(40)
-    cy.cs("gradeFilter-clear").click()
-    checkFilteringResult(93, true)
   })
 })
 
@@ -179,12 +163,6 @@ describe("Custom Population Statistics", () => {
       010331154
     `)
     cy.cs("search-button").click()
-    cy.cs("filter-toggle-open").click()
-  })
-
-  it("Filter tray opens and closes", () => {
-    cy.cs("filter-toggle-close").click().should("not.be.visible")
-    cy.cs("filter-toggle-open").click().should("not.be.visible")
   })
 
   it("Gender filter works", () => {
@@ -195,16 +173,12 @@ describe("Custom Population Statistics", () => {
     checkFilteringResult(3)
     cy.selectFromDropdown("genderFilter-dropdown", 2)
     checkFilteringResult(0)
-    cy.cs("genderFilter-clear").click()
-    checkFilteringResult(5, true)
   })
 
   it("Starting year filter works", () => {
     cy.cs("startYearAtUni-header").click()
     cy.selectFromDropdown("startYearAtUni-dropdown", [0])
     checkFilteringResult(5)
-    cy.cs("startYearAtUni-clear").click()
-    checkFilteringResult(5, true)
   })
 
   it("Courses filter works", () => {
