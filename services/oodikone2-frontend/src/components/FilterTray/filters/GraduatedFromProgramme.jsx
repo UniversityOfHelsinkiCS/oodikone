@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Form, Dropdown } from 'semantic-ui-react'
+import { Form, Radio } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
@@ -8,7 +8,7 @@ import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 
 const GraduatedFromProgramme = ({ code }) => {
-  const { addFilter, removeFilter, withoutFilter } = useFilters()
+  const { addFilter, removeFilter } = useFilters()
   const analytics = useAnalytics()
   const [value, setValue] = useState(null)
   const name = 'graduatedFromProgrammeFilter'
@@ -41,29 +41,26 @@ const GraduatedFromProgramme = ({ code }) => {
     }
   }, [value])
 
-  const count = wanted => withoutFilter(name).filter(filterFn(wanted)).length
-
-  const options = [{ key: 'graduated-false', text: `Not Graduated (${count(0)})`, value: 0 }].concat(
+  const options = [{ key: 'graduated-false', text: `Not Graduated`, value: 0 }].concat(
     combinedExtent
       ? [
-          { key: 'graduated-bachelor', text: `Graduated with Bachelor's (${count(1)})`, value: 1 },
-          { key: 'graduated-master', text: `Graduated with Master's (${count(2)})`, value: 2 }
+          { key: 'graduated-bachelor', text: `Graduated with Bachelor's`, value: 1 },
+          { key: 'graduated-master', text: `Graduated with Master's`, value: 2 }
         ]
-      : [{ key: 'graduated-true', text: `Graduated  (${count(1)})`, value: 1 }]
+      : [{ key: 'graduated-true', text: `Graduated`, value: 1 }]
   )
 
   return (
     <FilterCard
-      title="Graduated Students"
+      title="Graduation Status"
       contextKey={name}
       active={active}
       footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} name={name} />}
       name={name}
     >
       <Form>
-        <div className="description-text">Show students who have...</div>
         <div className="card-content">
-          <Dropdown
+          {/* <Dropdown
             options={options}
             value={value}
             onChange={(_, { value: inputValue }) => setValue(inputValue)}
@@ -74,9 +71,51 @@ const GraduatedFromProgramme = ({ code }) => {
             fluid
             button
             data-cy={`${name}-dropdown`}
-          />
+          /> */}
+          <Form.Field>
+            <Radio
+              label="All"
+              checked={value === null}
+              onChange={() => setValue(null)}
+              style={{ marginBottom: '0.5rem' }}
+            />
+            {options.map(option => (
+              <Radio
+                label={option.text}
+                name="radioGroup"
+                style={{ marginBottom: '0.5rem' }}
+                checked={value === option.value}
+                onChange={() => setValue(option.value)}
+                // data-cy={`${name}-have`}
+              />
+            ))}
+            {/* <Radio
+              label="All"
+              name="radioGroup"
+              value="all"
+              // checked={value === 1}
+              // onChange={toggle(1)}
+              // data-cy={`${name}-have`}
+            />
+            <Radio
+              label="Transferred"
+              name="radioGroup"
+              value="this"
+              checked={value === 1}
+              onChange={toggle(1)}
+              data-cy={`${name}-have`}
+              style={{ margin: '0.5rem 0' }}
+            />
+            <Radio
+              label="Not Transferred"
+              name="radioGroup"
+              value="that"
+              checked={value === 0}
+              onChange={toggle(0)}
+              data-cy={`${name}-havenot`}
+            /> */}
+          </Form.Field>
         </div>
-        <div className="description-text">...from this study programme.</div>
       </Form>
     </FilterCard>
   )

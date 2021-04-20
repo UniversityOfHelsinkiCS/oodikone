@@ -7,7 +7,7 @@ import useAnalytics from '../useAnalytics'
 import { usePrevious } from '../../../common/hooks'
 
 export default () => {
-  const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
+  const { addFilter, removeFilter, activeFilters } = useFilters()
   const analytics = useAnalytics()
   const [value, setValue] = useState(0)
   const name = 'transferredToProgrammeFilter'
@@ -36,8 +36,6 @@ export default () => {
     if (prevValue && !filterIsActive) setValue(null)
   }, [filterIsActive])
 
-  const count = wanted => withoutFilter(name).filter(filterFn(wanted)).length
-
   const toggle = buttonValue => () => setValue(prev => (prev === buttonValue ? null : buttonValue))
 
   return (
@@ -49,30 +47,32 @@ export default () => {
       name={name}
     >
       <Form>
-        <div className="description-text">Show students who...</div>
         <div className="card-content">
           <Form.Field>
             <Radio
-              label={`Have (${count(true)})`}
+              label="All"
               name="radioGroup"
-              value="this"
+              checked={value === null}
+              onChange={toggle(null)}
+              // data-cy={`${name}-have`}
+            />
+            <Radio
+              label="Transferred"
+              name="radioGroup"
               checked={value === 1}
               onChange={toggle(1)}
               data-cy={`${name}-have`}
+              style={{ margin: '0.5rem 0' }}
             />
-          </Form.Field>
-          <Form.Field>
             <Radio
-              label={`Have Not (${count(false)})`}
+              label="Not Transferred"
               name="radioGroup"
-              value="that"
               checked={value === 0}
               onChange={toggle(0)}
               data-cy={`${name}-havenot`}
             />
           </Form.Field>
         </div>
-        <div className="description-text">...transferred to this study programme.</div>
       </Form>
     </FilterCard>
   )

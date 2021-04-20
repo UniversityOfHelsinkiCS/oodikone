@@ -37,7 +37,7 @@ export default () => {
 
   return (
     <FilterCard
-      title="Starting Year at University"
+      title="Starting Year"
       contextKey="startYearFilter"
       footer={<ClearFilterButton disabled={!isActive()} onClick={() => setValue([])} name={name} />}
       active={Object.keys(activeFilters).includes(name)}
