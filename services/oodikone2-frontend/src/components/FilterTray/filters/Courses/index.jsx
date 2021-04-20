@@ -1,11 +1,10 @@
 import React from 'react'
-import { Card } from 'semantic-ui-react'
+import { Dropdown } from 'semantic-ui-react'
 import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 import './courseFilter.css'
-import DropdownWithUnfuckedPlaceholder from './DropdownWithUnfuckedPlaceholder'
 import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
 import useLanguage from '../../../LanguagePicker/useLanguage'
@@ -45,18 +44,24 @@ const Courses = () => {
       contextKey={contextKey}
       name={name}
     >
-      <DropdownWithUnfuckedPlaceholder
+      <Dropdown
         options={options}
-        placeholder="Select Course to Filter By"
-        className="course-filter-selection"
+        placeholder="Select Course"
+        selection
+        className="mini course-filter-selection"
+        fluid
+        button
+        value={[]}
         onChange={onChange}
+        multiple
+        closeOnChange
+        search
         name={name}
+        data-cy={`${name}-course-dropdown`}
       />
-      <Card.Group>
-        {selectedCourses.map(course => (
-          <CourseCard courseStats={course} key={`course-filter-selected-course-${course.course.code}`} />
-        ))}
-      </Card.Group>
+      {selectedCourses.map(course => (
+        <CourseCard courseStats={course} key={`course-filter-selected-course-${course.course.code}`} />
+      ))}
     </FilterCard>
   )
 }

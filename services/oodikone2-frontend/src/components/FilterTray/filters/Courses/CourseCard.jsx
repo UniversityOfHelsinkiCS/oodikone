@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Dropdown, Button, Icon, Popup } from 'semantic-ui-react'
+import { Label, Dropdown, Button, Icon, Popup } from 'semantic-ui-react'
 import { getTextIn } from '../../../../common'
 import useCourseFilter from './useCourseFilter'
 import useFilters from '../../useFilters'
@@ -43,9 +43,10 @@ const CourseCard = ({ courseStats }) => {
       func: ({ studentNumber }) => !Object.keys(students.all).includes(studentNumber)
     },
     {
-      label: 'Failed or Not Participated',
+      label: "Didn't pass",
       func: ({ studentNumber }) =>
-        !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber)
+        !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
+      info: "Students that failed or didn't participate in the course"
     }
   ]
 
@@ -67,43 +68,41 @@ const CourseCard = ({ courseStats }) => {
   }
 
   return (
-    <Card className="course-card">
-      <Card.Content>
-        <Card.Header>
-          <div>{getTextIn(course.name, language)}</div>
-          <Button compact color="red" size="tiny" onClick={clear} icon data-cy={`${name}-clear`}>
-            <Icon name="close" />
-          </Button>
-        </Card.Header>
-        <Card.Description>
-          <div>Show:</div>
-          <Dropdown
-            text={subFilters[selectedOption].label}
-            value={selectedOption}
-            fluid
-            className="mini"
-            button
-            data-cy={`${name}-dropdown`}
-          >
-            <Dropdown.Menu>
-              {subFilters.map((option, i) => {
-                if (option.info) {
-                  return (
-                    <Popup
-                      key={option.label}
-                      basic
-                      trigger={<Dropdown.Item text={option.label} value={i} onClick={onClick} />}
-                      content={option.info}
-                    />
-                  )
-                }
-                return <Dropdown.Item key={option.label} text={option.label} value={i} onClick={onClick} />
-              })}
-            </Dropdown.Menu>
-          </Dropdown>
-        </Card.Description>
-      </Card.Content>
-    </Card>
+    <>
+      <Label style={{ marginTop: '0.5rem' }}>
+        {getTextIn(course.name, language)}
+
+        <Dropdown
+          text={subFilters[selectedOption].label}
+          value={selectedOption}
+          fluid
+          className="mini"
+          button
+          data-cy={`${name}-dropdown`}
+          style={{ marginTop: '0.5rem' }}
+        >
+          <Dropdown.Menu>
+            {subFilters.map((option, i) => {
+              if (option.info) {
+                return (
+                  <Popup
+                    key={option.label}
+                    basic
+                    trigger={<Dropdown.Item text={option.label} value={i} onClick={onClick} />}
+                    content={option.info}
+                  />
+                )
+              }
+              return <Dropdown.Item key={option.label} text={option.label} value={i} onClick={onClick} />
+            })}
+          </Dropdown.Menu>
+        </Dropdown>
+
+        <Button compact size="tiny" onClick={clear} icon data-cy={`${name}-clear`} style={{ marginTop: '0.5rem' }}>
+          <Icon name="close" />
+        </Button>
+      </Label>
+    </>
   )
 }
 
