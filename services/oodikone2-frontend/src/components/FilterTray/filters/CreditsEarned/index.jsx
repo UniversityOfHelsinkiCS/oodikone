@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Form } from 'semantic-ui-react'
+import { Form, Input, Label } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../../common'
 import FilterCard from '../common/FilterCard'
-import NumericInput from '../common/NumericInput'
 import useCreditFilter from './useCreditFilter'
 import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
@@ -78,14 +77,6 @@ export default () => {
     }
   }
 
-  const onClear = key => () => {
-    setCurrentValue({ [key]: '' })
-    setUpdatedAt(prev => ({ ...prev, [key]: null }))
-    removeFilter(names[key])
-  }
-
-  const clearButtonDisabled = key => !Object.keys(activeFilters).includes(names[key])
-
   const active = Object.values(names).some(name => Object.keys(activeFilters).includes(name))
 
   return (
@@ -97,20 +88,17 @@ export default () => {
       name="credit-filter"
     >
       <Form>
-        <div className="description-text">
-          Filter students by the amount of credits earned during the selected period.
-        </div>
         <div className="card-content">
           {Object.keys(currentValue).map(key => (
             <Form.Field key={`total-credits-filter-${key}`}>
-              <NumericInput
+              <Label style={{ marginBottom: '0.5rem' }}>{labels[key]}</Label>
+              <Input
+                size="mini"
                 onChange={onChange(key)}
-                onKeyDown={onKeyDown(key)}
-                onClear={onClear(key)}
                 value={currentValue[key]}
-                label={labels[key]}
-                clearButtonDisabled={clearButtonDisabled(key)}
-                name={`credit-filter-${key}`}
+                onKeyDown={onKeyDown(key)}
+                data-cy={`credit-filter-${key}`}
+                style={{ width: '100px' }}
               />
             </Form.Field>
           ))}

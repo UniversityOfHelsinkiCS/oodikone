@@ -8,7 +8,7 @@ import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 
 const GraduatedFromProgramme = ({ code }) => {
-  const { addFilter, removeFilter, withoutFilter } = useFilters()
+  const { addFilter, removeFilter } = useFilters()
   const analytics = useAnalytics()
   const [value, setValue] = useState(null)
   const name = 'graduatedFromProgrammeFilter'
@@ -41,8 +41,6 @@ const GraduatedFromProgramme = ({ code }) => {
     }
   }, [value])
 
-  const count = wanted => withoutFilter(name).filter(filterFn(wanted)).length
-
   const options = [{ key: 'graduated-false', text: `Not Graduated`, value: 0 }].concat(
     combinedExtent
       ? [
@@ -51,8 +49,6 @@ const GraduatedFromProgramme = ({ code }) => {
         ]
       : [{ key: 'graduated-true', text: `Graduated`, value: 1 }]
   )
-
-  console.log({ value })
 
   return (
     <FilterCard
