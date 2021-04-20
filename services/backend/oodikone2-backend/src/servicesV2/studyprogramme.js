@@ -85,8 +85,8 @@ const getCreditsForMajors = (provider, since, studentnumbers) =>
     }
   })
 
-const getCreditsForProvider = (provider, since) =>
-  Credit.findAll({
+const getCreditsForProvider = async (provider, since) =>
+  (await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date'],
     include: {
       model: Course,
@@ -112,7 +112,8 @@ const getCreditsForProvider = (provider, since) =>
         [Op.gte]: since
       }
     }
-  }).map(formatCredit)
+  })
+).map(formatCredit)
 
 const productivityStatsFromCredits = credits => {
   const stats = {}
@@ -133,8 +134,8 @@ const formatGraduatedStudyright = ({ studyrightid, enddate, studystartdate }) =>
   return { studyrightid, year, timeToGraduation }
 }
 
-const findGraduated = (studytrack, since) =>
-  Studyright.findAll({
+const findGraduated = async (studytrack, since) =>
+  (await Studyright.findAll({
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -154,7 +155,8 @@ const findGraduated = (studytrack, since) =>
         [Op.gte]: since
       }
     }
-  }).map(formatGraduatedStudyright)
+  })
+).map(formatGraduatedStudyright)
 
 const graduatedStatsFromStudyrights = studyrights => {
   const stats = {}
@@ -372,7 +374,7 @@ const genderCodeToValue = code => {
 }
 
 const gendersFromClass = async studentnumbers => {
-  return Student.findAll({
+  return (await Student.findAll({
     attributes: [[sequelize.fn('count', sequelize.col('gender_code')), 'count'], 'gender_code'],
     where: {
       studentnumber: {
@@ -381,21 +383,23 @@ const gendersFromClass = async studentnumbers => {
     },
     group: ['gender_code'],
     raw: true
-  }).reduce((acc, curr) => {
+  })
+  ).reduce((acc, curr) => {
     acc[genderCodeToValue(curr.gender_code)] = curr.count
     return acc
   }, {})
 }
 
 const nationalitiesFromClass = async studentnumbers => {
-  return Student.findAll({
+  return (await Student.findAll({
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
       }
     },
     attributes: ['home_country_en']
-  }).reduce((acc, { home_country_en }) => {
+  })
+  ).reduce((acc, { home_country_en }) => {
     const country = home_country_en || 'Unknown'
     if (!acc[country]) acc[country] = 0
     acc[country] += 1
