@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, Icon, Header } from 'semantic-ui-react'
+import { Icon, Header } from 'semantic-ui-react'
 import useFilterTray from '../../useFilterTray'
 
-const FilterCard = ({ title, children, footer, active, className, contextKey, name }) => {
+const FilterCard = ({ title, children, contextKey, name }) => {
   const [open, , toggleOpen] = useFilterTray(contextKey)
 
   return (
@@ -26,9 +26,6 @@ const FilterCard = ({ title, children, footer, active, className, contextKey, na
 FilterCard.propTypes = {
   title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-  footer: PropTypes.element,
-  active: PropTypes.bool,
-  className: PropTypes.string,
   contextKey: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired
 }

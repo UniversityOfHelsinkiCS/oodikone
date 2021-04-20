@@ -36,8 +36,6 @@ export default () => {
     if (prevValue && !filterIsActive) setValue(null)
   }, [filterIsActive])
 
-  const count = wanted => withoutFilter(name).filter(filterFn(wanted)).length
-
   const toggle = buttonValue => () => setValue(prev => (prev === buttonValue ? null : buttonValue))
 
   return (
