@@ -441,16 +441,17 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
     const nonOpenUniCodes = _.uniq(codes.map(unifyOpenUniversity))
 
     const matchingOpenUniCourseCodes = nonOpenUniCodes.length
-      ? (await Course.findAll({
-          where: {
-            code: {
-              [Op.regexp]: {
-                [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
+      ? (
+          await Course.findAll({
+            where: {
+              code: {
+                [Op.regexp]: {
+                  [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
+                }
               }
             }
-          }
-        })
-      ).map(course => course.code)
+          })
+        ).map(course => course.code)
       : []
 
     codes.push(...matchingOpenUniCourseCodes)
