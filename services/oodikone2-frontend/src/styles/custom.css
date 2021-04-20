@@ -15,7 +15,6 @@ html {
 
 .segmentContainer {
   align-content: center;
-  max-width: 1600px;
   display: flex;
   margin-left: auto;
   margin-right: auto;
