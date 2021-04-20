@@ -506,7 +506,7 @@ const studentnumbersWithAllStudyrightElements = async (
 
   // fetch students that have transferred out of the programme and filter out these studentnumbers
   if (!transferredStudents) {
-    const transferredOutStudents = await Transfer.findAll({
+    const transferredOutStudents = (await Transfer.findAll({
       attributes: ['studentnumber'],
       where: {
         sourcecode: {
@@ -520,7 +520,8 @@ const studentnumbersWithAllStudyrightElements = async (
         }
       },
       raw: true
-    }).map(s => s.studentnumber)
+    })
+    ).map(s => s.studentnumber)
 
     const notTransferredStudents = studentnumberlist.filter(sn => !transferredOutStudents.includes(sn))
     return notTransferredStudents
