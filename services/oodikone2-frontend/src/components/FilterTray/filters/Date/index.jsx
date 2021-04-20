@@ -52,7 +52,7 @@ export default () => {
       <div className="description-text">
         Include course credits from the selected date range only. Does not filter out students.
       </div>
-      <div className="card-content">
+      <div className="card-content" style={{ marginTop: '0.5rem' }}>
         <Form>
           <Form.Field>
             <label>Start Date:</label>
