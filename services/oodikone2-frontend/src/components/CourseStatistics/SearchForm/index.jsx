@@ -260,6 +260,8 @@ const SearchForm = props => {
               courses={selected}
               onSelectCourse={onSelectCourse}
               controlIcon="trash alternate outline"
+              raised
+              strongBorder
             />
             {!noSelectedCourses && (
               <Fragment>
