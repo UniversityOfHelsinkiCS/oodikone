@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Form } from 'semantic-ui-react'
+import { Form, Label, Input } from 'semantic-ui-react'
 import FilterCard from '../common/FilterCard'
-import NumericInput from '../common/NumericInput'
 import useAgeFilter from './useAgeFilter'
 import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
@@ -86,18 +85,17 @@ const AgeFilter = () => {
   return (
     <FilterCard title="Age" active={active} className="total-age-filter" contextKey={contextKey} name="age-filter">
       <Form>
-        <div className="description-text">Filter students by their age.</div>
         <div className="card-content">
           {Object.keys(currentValue).map(key => (
             <Form.Field key={`total-age-filter-${key}`}>
-              <NumericInput
+              <Label style={{ marginBottom: '0.5rem' }}>{labels[key]}</Label>
+              <Input
+                size="mini"
                 onChange={onChange(key)}
-                onKeyDown={onKeyDown(key)}
-                onClear={onClear(key)}
                 value={currentValue[key]}
-                label={labels[key]}
-                clearButtonDisabled={clearButtonDisabled(key)}
-                name={`age-filter-${key}`}
+                onKeyDown={onKeyDown(key)}
+                data-cy={`age-filter-${key}`}
+                style={{ width: '100px' }}
               />
             </Form.Field>
           ))}
