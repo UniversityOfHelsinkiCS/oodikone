@@ -110,7 +110,7 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate) =>
     )
 ).map(st => st.studentnumber)
 
-const findByTag = tag => {
+const findByTag = async tag => {
   return (await TagStudent.findAll({
     attributes: ['studentnumber'],
     where: {
