@@ -7,7 +7,17 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 import './courseTable.css'
 import { getTextIn } from '../../../common'
 
-const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false, controlIcon }) => {
+const CourseTable = ({
+  courses,
+  onSelectCourse,
+  hidden,
+  title,
+  emptyListText,
+  mandatory = false,
+  controlIcon,
+  raised = false,
+  strongBorder = false
+}) => {
   const { language } = useLanguage()
   const noContent = courses.length === 0
   const sortCourses = courses => sortBy(courses, course => getTextIn(course.name, language))
@@ -35,7 +45,7 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
 
   return (
     !hidden && (
-      <Segment basic style={{ padding: '0' }}>
+      <Segment raised={raised} style={{ padding: '0', border: strongBorder && '2px solid black' }}>
         <Table selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
@@ -58,7 +68,9 @@ CourseTable.propTypes = {
   title: string.isRequired,
   emptyListText: string,
   controlIcon: string,
-  mandatory: bool
+  mandatory: bool,
+  raised: bool.isRequired,
+  strongBorder: bool.isRequired
 }
 
 CourseTable.defaultProps = {
