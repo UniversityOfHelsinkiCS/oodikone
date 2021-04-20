@@ -441,7 +441,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
     const nonOpenUniCodes = _.uniq(codes.map(unifyOpenUniversity))
 
     const matchingOpenUniCourseCodes = nonOpenUniCodes.length
-      ? await Course.findAll({
+      ? (await Course.findAll({
           where: {
             code: {
               [Op.regexp]: {
@@ -449,7 +449,8 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
               }
             }
           }
-        }).map(course => course.code)
+        })
+      ).map(course => course.code)
       : []
 
     codes.push(...matchingOpenUniCourseCodes)
