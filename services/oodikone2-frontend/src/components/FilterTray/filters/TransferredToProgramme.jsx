@@ -7,7 +7,7 @@ import useAnalytics from '../useAnalytics'
 import { usePrevious } from '../../../common/hooks'
 
 export default () => {
-  const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
+  const { addFilter, removeFilter, activeFilters } = useFilters()
   const analytics = useAnalytics()
   const [value, setValue] = useState(0)
   const name = 'transferredToProgrammeFilter'

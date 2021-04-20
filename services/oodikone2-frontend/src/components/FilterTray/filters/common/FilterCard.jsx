@@ -30,10 +30,4 @@ FilterCard.propTypes = {
   name: PropTypes.string.isRequired
 }
 
-FilterCard.defaultProps = {
-  footer: null,
-  active: false,
-  className: ''
-}
-
 export default FilterCard
