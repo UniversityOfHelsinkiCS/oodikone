@@ -72,14 +72,6 @@ const AgeFilter = () => {
     }
   }
 
-  const onClear = key => () => {
-    setCurrentValue({ [key]: '' })
-    setUpdatedAt(prev => ({ ...prev, [key]: null }))
-    removeFilter(names[key])
-  }
-
-  const clearButtonDisabled = key => !Object.keys(activeFilters).includes(names[key])
-
   const active = Object.values(names).some(name => Object.keys(activeFilters).includes(name))
 
   return (

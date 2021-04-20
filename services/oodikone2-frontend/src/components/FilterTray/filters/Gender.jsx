@@ -62,6 +62,7 @@ export default () => {
             selectOnBlur={false}
             fluid
             button
+            clearable
             data-cy={`${name}-dropdown`}
           />
         </Form>
