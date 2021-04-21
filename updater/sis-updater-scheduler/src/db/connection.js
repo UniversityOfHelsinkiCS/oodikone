@@ -32,6 +32,7 @@ class KnexConnection extends EventEmitter {
         return
       }
       console.log(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
+      console.log("Error: ", e)
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }
