@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR_PATH=$(dirname "$0")
+USER_DATA_FILE_PATH="hyuserdata"
 ANONDB_DIR=anonyymioodi
 BACKUP_DIR=backups
 
@@ -90,8 +91,15 @@ db_setup_full () {
 
 run_importer_setup () {
     echo "Setting up importer database."
-    echo "Enter your Uni Helsinki username:"
-    read username
+    if [ ! -f "$USER_DATA_FILE_PATH" ]; then
+      echo ""
+      echo "!! No previous usename data found. Will ask for username !!"
+      echo "Enter your Uni Helsinki username:"
+      read username
+      echo $username > $USER_DATA_FILE_PATH
+    fi
+    username=$(cat $USER_DATA_FILE_PATH | head -n 1)
+    echo "Using your Uni Helsinki username: $username"
     scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@importer:/home/importer_user/importer-db/backup/importer-db.sqz "$BACKUP_DIR/"
     docker-compose -f dco.data.yml up -d sis-importer-db
     ping_psql "sis-importer-db" "importer-db"
