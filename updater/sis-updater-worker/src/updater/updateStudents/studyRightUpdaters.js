@@ -247,21 +247,20 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
   await bulkCreate(StudyrightElement, studyRightElements)
 }
 
-// Create degree object to be added to db as element detail
-const createDegreeFromGroupId = groupdId => {
-  const degrees = getDegrees(groupdId)
-  if (!degrees) return
-  const degree = degrees[0]
-  return {
-    group_id: `${groupdId}-degree`,
-    code: degree.short_name.en,
-    name: degree.name
-  }
-}
-
 // Parse possible values for degrees, programmes and studytracks based on phases the student has been accepted to.
 // If elements aren't updated, db doesn't have right elementdetail codes and adding studyrightelements to db fails.
 const updateElementDetails = async studyRights => {
+  // Create degree object to be added to db as element detail
+  const createDegreeFromGroupId = groupdId => {
+    const degrees = getDegrees(groupdId)
+    if (!degrees) return
+    const degree = degrees[0]
+    return {
+      group_id: `${groupdId}-degree`,
+      code: degree.short_name.en,
+      name: degree.name
+    }
+  }
   const groupedEducationPhases = studyRights.reduce(
     (acc, curr) => {
       const {
