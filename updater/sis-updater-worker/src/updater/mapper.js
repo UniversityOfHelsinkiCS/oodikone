@@ -64,29 +64,6 @@ const studentMapper = (attainments, studyRights) => student => {
   }
 }
 
-const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
-  const defaultProps = {
-    facultyCode: getOrganisationCode(studyright.organisation_id),
-    startdate: studyright.valid.startDate,
-    givendate: studyright.grant_date,
-    canceldate: studyright.study_right_cancellation ? studyright.study_right_cancellation.cancellationDate : null,
-    studentStudentnumber: personIdToStudentNumber[studyright.person_id],
-    prioritycode: 2,
-    educationType: 99,
-  }
-
-  return {
-    ...defaultProps,
-    studyrightid: studyright.id,
-    enddate: studyright.study_right_graduation
-      ? studyright.study_right_graduation.phase1GraduationDate
-      : studyright.valid.endDate,
-    graduated: studyright.study_right_graduation ? 1 : 0,
-    studystartdate: studyright.valid.startDate, 
-    ...overrideProps,
-  }
-}
-
 const mapTeacher = person => ({
   id: person.employee_number,
   name: `${person.last_name} ${person.first_names}`.trim(),
@@ -274,7 +251,6 @@ const mapStudyrightExtent = educationType => ({
 
 module.exports = {
   studentMapper,
-  studyrightMapper,
   mapTeacher,
   creditMapper,
   semesterEnrollmentMapper,
