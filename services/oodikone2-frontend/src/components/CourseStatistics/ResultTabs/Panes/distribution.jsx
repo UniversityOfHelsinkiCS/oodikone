@@ -73,9 +73,9 @@ const getGradeSeries = series => {
 
 const Distribution = ({ primary, comparison, isRelative, userHasAccessToAllStats }) => {
   const primaryStats = primary.stats.filter(stat => stat.name !== 'Total' || isRelative)
-  const statYears = primaryStats.map(year => year.name)
-  const comparisonStats = comparison ? comparison.stats : []
 
+  const statYears = primaryStats.map(year => year.name)
+  const comparisonStats = comparison ? comparison.stats.filter(stat => stat.name !== 'Total' || isRelative) : []
   const primaryGrades = primaryStats.flatMap(s => s.attempts.grades)
   const comparisonGrades = comparisonStats.flatMap(s => s.attempts.grades)
 
