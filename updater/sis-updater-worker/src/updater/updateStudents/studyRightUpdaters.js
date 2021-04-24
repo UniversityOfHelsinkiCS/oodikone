@@ -13,21 +13,18 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       givendate: studyright.grant_date,
       studentStudentnumber: personIdToStudentNumber[studyright.person_id],
       educationType: 99,
-    }
-  
-    return {
-      ...defaultProps,
       studyrightid: studyright.id,
       enddate: studyright.study_right_graduation
         ? studyright.study_right_graduation.phase1GraduationDate
         : studyright.valid.endDate,
       graduated: studyright.study_right_graduation ? 1 : 0,
       studystartdate: studyright.valid.startDate, 
+    }
+    return {
+      ...defaultProps,
       ...overrideProps,
     }
   }
-
-  const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
   const parseCancelDate = (studyright, phase_number = 1, isBaMa = false) => {
     if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
@@ -63,6 +60,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
             : 6
           : 2
   }
+
+  const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
   const formattedStudyRights = studyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
