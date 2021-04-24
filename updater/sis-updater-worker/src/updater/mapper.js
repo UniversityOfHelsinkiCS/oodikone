@@ -100,17 +100,17 @@ const mapStudyrightElements = (studyrightid, ordinal, startdate, enddate, studen
   return [
     {
     ...defaultProps,
-    id: `${defaultProps.studyrightid}-${code}-degree`,
+    id: `${defaultProps.studyrightid}-${degreeCode}`,
     code: degreeCode
     },
     {
       ...defaultProps,
-      id: `${defaultProps.studyrightid}-${code}-1`,
+      id: `${defaultProps.studyrightid}-${code}`,
       code,
     },
     {
       ...defaultProps,
-      id: `${defaultProps.studyrightid}-${code}-2`,
+      id: `${defaultProps.studyrightid}-${childCode}`,
       code: childCode,
     },
   ]
