@@ -200,7 +200,7 @@ let allGrouped = {
 }
 
 const populationDiff = async (programme, year) => {
-  const withProgramme = (students) => students.map(s => `${s}, ${programme}`) 
+  const withProgramme = students => students.map(s => `${s}, ${programme}`)
 
   const months = Number((2020 - Number(year)) * 12 + 7)
 
