@@ -87,33 +87,6 @@ const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) 
   }
 }
 
-const mapStudyrightElements = (studyrightid, ordinal, startdate, enddate, studentnumber, code, childCode, degreeCode) => {
-  const defaultProps = {
-    studyrightid,
-    startdate,
-    enddate,
-    studentnumber,
-  }
-
-  return [
-    {
-    ...defaultProps,
-    id: `${defaultProps.studyrightid}-${degreeCode}`,
-    code: degreeCode
-    },
-    {
-      ...defaultProps,
-      id: `${defaultProps.studyrightid}-${code}`,
-      code,
-    },
-    {
-      ...defaultProps,
-      id: `${defaultProps.studyrightid}-${childCode}`,
-      code: childCode,
-    },
-  ]
-}
-
 const mapTeacher = person => ({
   id: person.employee_number,
   name: `${person.last_name} ${person.first_names}`.trim(),
@@ -302,7 +275,6 @@ const mapStudyrightExtent = educationType => ({
 module.exports = {
   studentMapper,
   studyrightMapper,
-  mapStudyrightElements,
   mapTeacher,
   creditMapper,
   semesterEnrollmentMapper,
