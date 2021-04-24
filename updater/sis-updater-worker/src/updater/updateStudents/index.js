@@ -25,7 +25,8 @@ const studyRightHasDegreeEducation = (studyRight) => {
   if (!education) return true
   const educationType = getEducationType(education.education_type)
   if (!educationType) return true
-  return educationType.parent_id !== 'urn:code:education-type:non-degree-education'
+  const nonDegreeEducationType ='urn:code:education-type:non-degree-education';
+  return educationType.parent_id.indexOf(nonDegreeEducationType) === -1;
 }
 
 const takeDegreeStudyRightSnapshots = (studyRightSnapshots) => {
