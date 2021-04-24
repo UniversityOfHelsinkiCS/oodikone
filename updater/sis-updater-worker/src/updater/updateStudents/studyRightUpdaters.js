@@ -1,36 +1,32 @@
-// Module containing studyright-related updaters
 const { educationTypeToExtentcode } = require('../shared')
-const { isBaMa } = require('../../utils') // Only used here, move
+const { isBaMa } = require('../../utils')
 const { get, sortBy, sortedUniqBy, orderBy, uniqBy } = require('lodash')
 const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
 const { selectFromByIds, bulkCreate } = require('../../db')
-const { getDegrees, getEducation, getEducationType } = require('../shared') // not all of these are really shared,
-// e.g. getDegrees, getEducationType is only used here, refactor?
-
-const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
-  const defaultProps = {
-    facultyCode: getOrganisationCode(studyright.organisation_id),
-    startdate: studyright.valid.startDate,
-    givendate: studyright.grant_date,
-    canceldate: studyright.study_right_cancellation ? studyright.study_right_cancellation.cancellationDate : null,
-    studentStudentnumber: personIdToStudentNumber[studyright.person_id],
-    prioritycode: 2,
-    educationType: 99,
-  }
-
-  return {
-    ...defaultProps,
-    studyrightid: studyright.id,
-    enddate: studyright.study_right_graduation
-      ? studyright.study_right_graduation.phase1GraduationDate
-      : studyright.valid.endDate,
-    graduated: studyright.study_right_graduation ? 1 : 0,
-    studystartdate: studyright.valid.startDate, 
-    ...overrideProps,
-  }
-}
+const { getDegrees, getEducation, getEducationType, getOrganisationCode } = require('../shared')
 
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
+  const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
+    const defaultProps = {
+      facultyCode: getOrganisationCode(studyright.organisation_id),
+      startdate: studyright.valid.startDate,
+      givendate: studyright.grant_date,
+      studentStudentnumber: personIdToStudentNumber[studyright.person_id],
+      educationType: 99,
+    }
+  
+    return {
+      ...defaultProps,
+      studyrightid: studyright.id,
+      enddate: studyright.study_right_graduation
+        ? studyright.study_right_graduation.phase1GraduationDate
+        : studyright.valid.endDate,
+      graduated: studyright.study_right_graduation ? 1 : 0,
+      studystartdate: studyright.valid.startDate, 
+      ...overrideProps,
+    }
+  }
+
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
   const parseCancelDate = (studyright, phase_number = 1, isBaMa = false) => {
@@ -75,13 +71,15 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     if (isBaMa(studyRightEducation)) {
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
-        studyrightid: `${studyright.id}-1`,
         prioritycode: parsePriorityCode(studyright, 1, true),
-        canceldate: parseCancelDate(studyright, 1, true)
+        canceldate: parseCancelDate(studyright, 1, true),
+        studyrightid: `${studyright.id}-1`,
       })
 
       const studyRightMast = mapStudyright(studyright, {
         extentcode: 2,
+        prioritycode: parsePriorityCode(studyright, 2, true),
+        canceldate: parseCancelDate(studyright, 2, true),
         studyrightid: `${studyright.id}-2`,
         enddate:
           studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
@@ -91,8 +89,6 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         studystartdate: studyright.study_right_graduation
           ? studyright.study_right_graduation.phase1GraduationDate
           : null,
-        prioritycode: parsePriorityCode(studyright, 2, true),
-        canceldate: parseCancelDate(studyright, 2, true)
       })
 
       acc.push(studyRightMast, studyRightBach)
