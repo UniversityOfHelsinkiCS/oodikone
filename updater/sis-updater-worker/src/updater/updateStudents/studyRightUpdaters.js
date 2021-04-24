@@ -1,6 +1,5 @@
 // Module containing studyright-related updaters
 const { educationTypeToExtentcode } = require('../shared')
-const { mapStudyrightElements } = require('../mapper')
 const { isBaMa } = require('../../utils') // Only used here, move
 const { studyrightMapper } = require('../mapper') // also only used here
 const { get, sortBy, sortedUniqBy, orderBy, uniqBy } = require('lodash')
@@ -95,11 +94,39 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   await bulkCreate(Studyright, formattedStudyRights, null, ['studyrightid'])
 }
 
+const mapStudyrightElements = (studyrightid, ordinal, startdate, enddate, studentnumber, code, childCode, degreeCode) => {
+  const defaultProps = {
+    studyrightid,
+    startdate,
+    enddate,
+    studentnumber,
+  }
+
+  return [
+    {
+    ...defaultProps,
+    id: `${defaultProps.studyrightid}-${degreeCode}`,
+    code: degreeCode
+    },
+    {
+      ...defaultProps,
+      id: `${defaultProps.studyrightid}-${code}`,
+      code,
+    },
+    {
+      ...defaultProps,
+      id: `${defaultProps.studyrightid}-${childCode}`,
+      code: childCode,
+    },
+  ]
+}
+
 const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
   const possibleBscFirst = (s1, s2) => {
     if (!s1.accepted_selection_path.educationPhase2GroupId) return -1
     return 1
   }
+
 
   const studyRightElements = Object.values(groupedStudyRightSnapshots)
     .reduce((res, snapshots) => {
