@@ -145,7 +145,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            possibleBaDegrees ? possibleBaDegrees[0].short_name.en : null
+            possibleBaDegrees ? possibleBaDegrees[0].short_name.en : undefined
           )
 
           const possibleMaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)
@@ -160,7 +160,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId],
-            possibleMaDegrees ? possibleMaDegrees[0].short_name.en : null
+            possibleMaDegrees ? possibleMaDegrees[0].short_name.en : undefined 
           )
 
           const possibleBScDuplicate = snapshotStudyRightElements.find(element => element.code === baProgramme.code)
@@ -179,7 +179,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            possibleDegrees ? possibleDegrees[0].short_name.en : null
+            possibleDegrees ? possibleDegrees[0].short_name.en : undefined
           )
           snapshotStudyRightElements.push(degree, programme, studytrack)
         }
