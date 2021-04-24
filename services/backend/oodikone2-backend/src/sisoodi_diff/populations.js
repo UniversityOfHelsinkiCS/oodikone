@@ -200,6 +200,8 @@ let allGrouped = {
 }
 
 const populationDiff = async (programme, year) => {
+  const withProgramme = students => students.map(s => `${s}, ${programme}`)
+
   const months = Number((2020 - Number(year)) * 12 + 7)
 
   const query = {
@@ -268,15 +270,15 @@ const populationDiff = async (programme, year) => {
 
     const cancelledInSisNums = cancelledInSis.map(s => s.studentStudentnumber)
     oodiOnly = _.difference(oodiOnly, cancelledInSisNums)
-    allGrouped.oodiOnly.cancelledInSis.push(...cancelledInSisNums)
-    allGrouped.oodiOnly.unknown.push(...oodiOnly)
+    allGrouped.oodiOnly.cancelledInSis.push(...withProgramme(cancelledInSisNums))
+    allGrouped.oodiOnly.unknown.push(...withProgramme(oodiOnly))
   }
 
   if (sisOnly.length > 0) {
     const cancelledInOodi = await checkIfCancelledInOodi(programme, sisOnly)
     let cancelledInOodiNums = cancelledInOodi.map(s => s.student_studentnumber)
 
-    const permanentStudyRight = cancelledInOodi.filter(s => s.enddate.includes('2112'))
+    const permanentStudyRight = cancelledInOodi.filter(s => String(s.enddate).includes('2112'))
     let permanentStudyRightNums = permanentStudyRight.map(s => s.student_studentnumber)
 
     cancelledInOodiNums = _.difference(cancelledInOodiNums, permanentStudyRightNums)
@@ -288,8 +290,8 @@ const populationDiff = async (programme, year) => {
     // if (wronglySetCancel.length > 0) {
     //   printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
     // }
-    allGrouped.sisOnly.cancelledInOodi.push(...cancelledInOodiNums)
-    allGrouped.sisOnly.unknown.push(...sisOnly)
+    allGrouped.sisOnly.cancelledInOodi.push(...withProgramme(cancelledInOodiNums))
+    allGrouped.sisOnly.unknown.push(...withProgramme(sisOnly))
   }
 }
 

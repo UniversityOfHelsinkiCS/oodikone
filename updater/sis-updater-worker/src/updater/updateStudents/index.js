@@ -25,7 +25,8 @@ const studyRightHasDegreeEducation = (studyRight) => {
   if (!education) return true
   const educationType = getEducationType(education.education_type)
   if (!educationType) return true
-  return educationType.parent_id !== 'urn:code:education-type:non-degree-education'
+  const nonDegreeEducationType ='urn:code:education-type:non-degree-education';
+  return educationType.parent_id.indexOf(nonDegreeEducationType) === -1;
 }
 
 const takeDegreeStudyRightSnapshots = (studyRightSnapshots) => {
@@ -83,9 +84,9 @@ const updateStudents = async personIds => {
   // grouping in function that sets first_snapshot_date_time
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(degreeStudyRightSnapshots)
 
-  console.log('**')
-  console.log(JSON.stringify(groupedStudyRightSnapshots, null , 2))
-  console.log(groupedStudyRightSnapshots["hy-opinoik-96550693"].map(s => s.modification_ordinal))
+  // console.log('**')
+  // console.log(JSON.stringify(groupedStudyRightSnapshots, null , 2))
+  // console.log(groupedStudyRightSnapshots["hy-opinoik-96550693"].map(s => s.modification_ordinal))
 
   const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
     acc.push(curr[0])
