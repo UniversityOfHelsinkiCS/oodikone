@@ -18,6 +18,8 @@ const CourseTableRow = ({ facultyCode, students, credits, facultyName }) => {
   )
 }
 
+
+
 const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
   const { coursecode } = course
   const name = getTextIn(course.name, language)
@@ -40,10 +42,15 @@ const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
     </Table.Row>
   )
 
+  const getYearToShow = () => {
+    const alternativeYear = selectedYear ? `${1949 + Number(selectedYear)}-${1950 + Number(selectedYear)}` : ''
+    return courseInstance ? courseInstance.year : alternativeYear 
+  }
+
   return (
     <>
       <Header>
-        {courseInstance ? courseInstance.year : selectedYear ? `${1949 + Number(selectedYear)}-${1950 + Number(selectedYear)}` : ''}{' '}
+        {getYearToShow()}{' '}
         {coursecode}
       </Header>
       <Header size="small">
