@@ -152,7 +152,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           const [maDegree, maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
             ordinal,
-            //snapshot.study_right_graduation ? snapshot.study_right_graduation.phase1GraduationDate : null,
             startDate,
             snapshot.study_right_graduation && snapshot.study_right_graduation.phase2GraduationDate
               ? snapshot.study_right_graduation.phase2GraduationDate
