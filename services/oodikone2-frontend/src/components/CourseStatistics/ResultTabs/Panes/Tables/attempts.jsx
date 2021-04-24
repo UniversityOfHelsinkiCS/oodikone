@@ -117,8 +117,8 @@ const AttemptsTable = ({
   let columns = [
     timeColumn,
     getSortableColumn('ATTEMPTS', 'Total attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
-    getSortableColumn('PASSED', 'Passed', s => (s.rowObfuscated ? '5 or less students' : s.passed)),
-    getSortableColumn('FAILED', 'Failed', s => (s.rowObfuscated ? '5 or less students' : s.failed)),
+    getSortableColumn('PASSED', 'Passed', s => (s.rowObfuscated ? 'NA' : s.passed)),
+    getSortableColumn('FAILED', 'Failed', s => (s.rowObfuscated ? 'NA' : s.failed)),
     getSortableColumn(
       'PASSRATE',
       'Pass rate',

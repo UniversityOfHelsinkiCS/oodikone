@@ -40,11 +40,15 @@ const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
     </Table.Row>
   )
 
+  const getYearToShow = () => {
+    const alternativeYear = selectedYear ? `${1949 + Number(selectedYear)}-${1950 + Number(selectedYear)}` : ''
+    return courseInstance ? courseInstance.year : alternativeYear
+  }
+
   return (
     <>
       <Header>
-        {courseInstance ? courseInstance.year : `${1949 + Number(selectedYear)}-${1950 + Number(selectedYear)}`}{' '}
-        {coursecode}
+        {getYearToShow()} {coursecode}
       </Header>
       <Header size="small">
         {name} ({coursecode})

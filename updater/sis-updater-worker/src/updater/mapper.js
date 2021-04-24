@@ -4,7 +4,6 @@ const {
   educationTypeToExtentcode,
   getSemesterByDate,
   getCreditTypeCodeFromAttainment,
-  getOrganisationCode,
   getGrade,
   getUniOrgId,
   getSemester,
@@ -62,58 +61,6 @@ const studentMapper = (attainments, studyRights) => student => {
     home_country_sv: home_country ? home_country.name.sv : null,
     home_country_en: home_country ? home_country.name.en : null,
   }
-}
-
-const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
-  const defaultProps = {
-    facultyCode: getOrganisationCode(studyright.organisation_id),
-    startdate: studyright.valid.startDate,
-    givendate: studyright.grant_date,
-    canceldate: studyright.study_right_cancellation ? studyright.study_right_cancellation.cancellationDate : null,
-    studentStudentnumber: personIdToStudentNumber[studyright.person_id],
-    prioritycode: 2,
-    educationType: 99,
-  }
-
-  return {
-    ...defaultProps,
-    studyrightid: studyright.id,
-    enddate: studyright.study_right_graduation
-      ? studyright.study_right_graduation.phase1GraduationDate
-      : studyright.valid.endDate,
-    graduated: studyright.study_right_graduation ? 1 : 0,
-    // studystartdate: studyright.study_start_date, '
-    // accoriding to Eija the right date is the following
-    studystartdate: studyright.valid.startDate, 
-    ...overrideProps,
-  }
-}
-
-const mapStudyrightElements = (studyrightid, ordinal, startdate, enddate, studentnumber, code, childCode, degreeCode) => {
-  const defaultProps = {
-    studyrightid,
-    startdate,
-    enddate,
-    studentnumber,
-  }
-
-  return [
-    {
-    ...defaultProps,
-    id: `${defaultProps.studyrightid}-${code}-degree`,
-    code: degreeCode
-    },
-    {
-      ...defaultProps,
-      id: `${defaultProps.studyrightid}-${code}-1`,
-      code,
-    },
-    {
-      ...defaultProps,
-      id: `${defaultProps.studyrightid}-${code}-2`,
-      code: childCode,
-    },
-  ]
 }
 
 const mapTeacher = person => ({
@@ -303,8 +250,6 @@ const mapStudyrightExtent = educationType => ({
 
 module.exports = {
   studentMapper,
-  studyrightMapper,
-  mapStudyrightElements,
   mapTeacher,
   creditMapper,
   semesterEnrollmentMapper,

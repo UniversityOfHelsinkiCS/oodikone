@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR_PATH=$(dirname "$0")
+USER_DATA_FILE_PATH="hyuserdata"
 ANONDB_DIR=anonyymioodi
 BACKUP_DIR=backups
 
@@ -14,6 +15,28 @@ KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
 SIS_REAL_DB_BACKUP="$BACKUP_DIR/latest-sis.sqz"
+
+# Remember username during runtime
+username=""
+
+get_username_and_password() {
+  # Check if username has already been set
+  [ -z "$username" ]|| return 0
+
+  # Check if username is saved to data file and ask it if not
+  if [ ! -f "$USER_DATA_FILE_PATH" ]; then
+    echo ""
+    echo "!! No previous username data found. Will ask it now !!"
+    echo "Enter your Uni Helsinki username:"
+    read username
+    echo $username > $USER_DATA_FILE_PATH
+    echo "Succesfully saved username"
+    echo ""
+  fi
+
+  # Set username
+  username=$(cat $USER_DATA_FILE_PATH | head -n 1)
+}
 
 docker-compose-dev () {
     npm run docker:oodikone:dev -- "$@"
@@ -37,8 +60,8 @@ echo_path () {
 }
 
 get_oodikone_server_backup() {
-    echo "Enter your Uni Helsinki username:"
-    read username
+    get_username_and_password
+    echo "Using your Uni Helsinki username: $username"
     scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
     scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
     scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-96.cs.helsinki.fi:/home/updater_user/backups/* "$BACKUP_DIR/"
@@ -89,9 +112,8 @@ db_setup_full () {
 }
 
 run_importer_setup () {
-    echo "Setting up importer database."
-    echo "Enter your Uni Helsinki username:"
-    read username
+    get_username_and_password
+    echo "Using your Uni Helsinki username: $username"
     scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@importer:/home/importer_user/importer-db/backup/importer-db.sqz "$BACKUP_DIR/"
     docker-compose -f dco.data.yml up -d sis-importer-db
     ping_psql "sis-importer-db" "importer-db"
@@ -100,8 +122,8 @@ run_importer_setup () {
 }
 
 run_full_real_data_reset () {
-    echo "Enter your Uni Helsinki username:"
-    read username
+    get_username_and_password
+    echo "Using your Uni Helsinki username: $username"
 
     echo "Downloading oodikone database dumps"
     scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
