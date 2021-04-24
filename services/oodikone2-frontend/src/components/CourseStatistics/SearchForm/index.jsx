@@ -27,6 +27,13 @@ const INITIAL = {
   separate: false
 }
 
+const searchBoxStyle = {
+  border: '2px solid black',
+  borderRadius: '0.3em',
+  padding: '12px',
+  boxShadow: '0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%)'
+}
+
 const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchingCoursesLength) => {
   const prevCoursesLoading = usePrevious(coursesLoading)
 
@@ -254,37 +261,38 @@ const SearchForm = props => {
                 </Form.Field>
               )}
             </Form.Group>
-            <CourseTable
-              title="Selected courses"
-              hidden={noSelectedCourses}
-              courses={selected}
-              onSelectCourse={onSelectCourse}
-              controlIcon="trash alternate outline"
-              raised
-              strongBorder
-            />
-            {!noSelectedCourses && (
-              <Fragment>
-                <Form.Checkbox
-                  label="Separate statistics for Spring and Fall semesters"
-                  name="separate"
-                  onChange={onToggleSeparateStatistics}
-                  checked={separate}
-                />
-                <Form.Button
-                  type="button"
-                  disabled={disabled}
-                  fluid
-                  size="huge"
-                  primary
-                  basic
-                  positive
-                  content="Fetch statistics"
-                  onClick={onSubmitFormClick}
-                  data-cy="fetch-stats-button"
-                />
-              </Fragment>
-            )}
+            <div style={!noSelectedCourses ? searchBoxStyle : null}>
+              <CourseTable
+                title="Selected courses"
+                hidden={noSelectedCourses}
+                courses={selected}
+                onSelectCourse={onSelectCourse}
+                controlIcon="trash alternate outline"
+                selectedTable
+              />
+              {!noSelectedCourses && (
+                <Fragment>
+                  <Form.Checkbox
+                    label="Separate statistics for Spring and Fall semesters"
+                    name="separate"
+                    onChange={onToggleSeparateStatistics}
+                    checked={separate}
+                  />
+                  <Form.Button
+                    type="button"
+                    disabled={disabled}
+                    fluid
+                    size="huge"
+                    primary
+                    basic
+                    positive
+                    content="Fetch statistics"
+                    onClick={onSubmitFormClick}
+                    data-cy="fetch-stats-button"
+                  />
+                </Fragment>
+              )}
+            </div>
             <CourseTable
               hidden={isLoading}
               courses={courses}

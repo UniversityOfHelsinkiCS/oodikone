@@ -15,8 +15,7 @@ const CourseTable = ({
   emptyListText,
   mandatory = false,
   controlIcon,
-  raised = false,
-  strongBorder = false
+  selectedTable = false
 }) => {
   const { language } = useLanguage()
   const noContent = courses.length === 0
@@ -45,7 +44,7 @@ const CourseTable = ({
 
   return (
     !hidden && (
-      <Segment raised={raised} style={{ padding: '0', border: strongBorder && '2px solid black' }}>
+      <Segment id={selectedTable && 'selected-table'}>
         <Table selectable className="fixed-header">
           <Table.Header>
             <Table.Row>
@@ -69,8 +68,7 @@ CourseTable.propTypes = {
   emptyListText: string,
   controlIcon: string,
   mandatory: bool,
-  raised: bool.isRequired,
-  strongBorder: bool.isRequired
+  selectedTable: bool.isRequired
 }
 
 CourseTable.defaultProps = {
