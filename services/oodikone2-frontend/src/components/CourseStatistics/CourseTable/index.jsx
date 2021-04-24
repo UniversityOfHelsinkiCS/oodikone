@@ -44,7 +44,7 @@ const CourseTable = ({
 
   return (
     !hidden && (
-      <Segment id={selectedTable && 'selected-table'}>
+      <Segment id={selectedTable ? 'selected-table' : 'searched-table'}>
         <Table selectable className="fixed-header">
           <Table.Header>
             <Table.Row>

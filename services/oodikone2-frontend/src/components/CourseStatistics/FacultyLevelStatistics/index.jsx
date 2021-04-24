@@ -43,7 +43,7 @@ const CourseTable = ({ course, courseInstance, language, selectedYear }) => {
   return (
     <>
       <Header>
-        {courseInstance ? courseInstance.year : `${1949 + Number(selectedYear)}-${1950 + Number(selectedYear)}`}{' '}
+        {courseInstance ? courseInstance.year : selectedYear ? `${1949 + Number(selectedYear)}-${1950 + Number(selectedYear)}` : ''}{' '}
         {coursecode}
       </Header>
       <Header size="small">
