@@ -227,42 +227,17 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
             possibleDegrees ? possibleDegrees[0].short_name.en : undefined
           )
+          console.log("degree", degree)
           snapshotStudyRightElements.push(degree, programme, studytrack)
         }
       })
+
+      console.log("elements while looping", snapshotStudyRightElements)
 
       res.push(...uniqBy(snapshotStudyRightElements, 'code'))
       return res
     }, [])
     .filter(sE => !!sE.code)
-
-  const findMasterStudyRightBugs = (studyRightElements) => {
-    const masterStudyRights = studyRightElements.filter(s => s.code.startsWith("MH"))
-
-    // Check if newest snapshot is passive, but there is an active snapshot with newer
-    // ordinal and later enddate
-    // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2748
-    const newestSnapShotHasAnomalie = (opinoikId) => {
-      const snapshots = groupedStudyRightSnapshots[opinoikId]
-      if (!snapshots || snapshots[0].state !== "PASSIVE") return false
-      return snapshots.some(ss =>
-          new Date(ss.valid.endDate) > new Date(snapshots[0].valid.endDate &&
-          ss.modification_ordinal > snapshots[0].modification_ordinal)
-      )
-    }
-
-    const studyrightsWithAnomalies = masterStudyRights.filter(sr =>
-      newestSnapShotHasAnomalie(sr.studyrightid.slice(0, -2))
-    )
-    if (studyrightsWithAnomalies.length > 0) {
-      console.log("Students whose correct enddate is skipped because of newer snapshot:")
-      studyrightsWithAnomalies.forEach(sr =>
-        console.log(sr.studentnumber, "- program:", sr.code)
-      )
-    }
-  }
-  // Uncomment following to find different types of msc studyright bugs
-  // findMasterStudyRightBugs(studyRightElements)
 
   await bulkCreate(StudyrightElement, studyRightElements)
 }
