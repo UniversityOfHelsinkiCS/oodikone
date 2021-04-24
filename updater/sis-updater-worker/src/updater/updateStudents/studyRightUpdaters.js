@@ -5,18 +5,27 @@ const { ElementDetail, Studyright, StudyrightElement } = require('../../db/model
 const { selectFromByIds, bulkCreate } = require('../../db')
 const { getDegrees, getEducation, getEducationType, getOrganisationCode } = require('../shared')
 
+// Same end date is used in both studyright and studyrightelement updaters
+const parseEndDate = (studyright, phase_number = 1, isBaMa = false) => {
+  if (isBaMa && phase_number === 2) {
+    return studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
+            ? studyright.study_right_graduation.phase2GraduationDate
+            : studyright.valid.endDate
+  }
+  return studyright.study_right_graduation
+    ? studyright.study_right_graduation.phase1GraduationDate
+    : studyright.valid.endDate
+}
+
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
   const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
     const defaultProps = {
+      studyrightid: studyright.id,
       facultyCode: getOrganisationCode(studyright.organisation_id),
       startdate: studyright.valid.startDate,
       givendate: studyright.grant_date,
       studentStudentnumber: personIdToStudentNumber[studyright.person_id],
       educationType: 99,
-      studyrightid: studyright.id,
-      enddate: studyright.study_right_graduation
-        ? studyright.study_right_graduation.phase1GraduationDate
-        : studyright.valid.endDate,
       graduated: studyright.study_right_graduation ? 1 : 0,
       studystartdate: studyright.valid.startDate, 
     }
@@ -72,6 +81,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         extentcode: 1,
         prioritycode: parsePriorityCode(studyright, 1, true),
         canceldate: parseCancelDate(studyright, 1, true),
+        enddate: parseEndDate(studyright, 1, true),
         studyrightid: `${studyright.id}-1`,
       })
 
@@ -79,11 +89,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         extentcode: 2,
         prioritycode: parsePriorityCode(studyright, 2, true),
         canceldate: parseCancelDate(studyright, 2, true),
+        enddate: parseEndDate(studyright, 2, true),
         studyrightid: `${studyright.id}-2`,
-        enddate:
-          studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
-            ? studyright.study_right_graduation.phase2GraduationDate
-            : studyright.valid.endDate,
         graduated: studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate ? 1 : 0,
         studystartdate: studyright.study_right_graduation
           ? studyright.study_right_graduation.phase1GraduationDate
@@ -99,7 +106,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
         prioritycode: parsePriorityCode(studyright),
-        canceldate: parseCancelDate(studyright)
+        canceldate: parseCancelDate(studyright),
+        enddate: parseEndDate(studyright)
       })
 
       acc.push(mappedStudyright)
@@ -174,10 +182,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           }
         }
 
-        const endDate =
-          snapshot.study_right_graduation && snapshot.study_right_graduation.phase1GraduationDate
-            ? snapshot.study_right_graduation.phase1GraduationDate
-            : snapshot.valid.endDate
+        const endDate = parseEndDate(snapshot)
 
         if (isBaMa(mainStudyRightEducation)) {
           const possibleBaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
@@ -197,9 +202,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             `${mainStudyRight.id}-2`,
             ordinal,
             startDate,
-            snapshot.study_right_graduation && snapshot.study_right_graduation.phase2GraduationDate
-              ? snapshot.study_right_graduation.phase2GraduationDate
-              : snapshot.valid.endDate,
+            parseEndDate(snapshot, 2, isBaMa),
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId],
