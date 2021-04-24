@@ -4,7 +4,6 @@ const {
   educationTypeToExtentcode,
   getSemesterByDate,
   getCreditTypeCodeFromAttainment,
-  getOrganisationCode,
   getGrade,
   getUniOrgId,
   getSemester,
