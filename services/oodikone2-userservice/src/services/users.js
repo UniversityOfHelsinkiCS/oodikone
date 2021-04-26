@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
+const _ = require('lodash')
 const moment = require('moment')
 const { flatMap } = require('lodash')
 const {
@@ -15,7 +16,7 @@ const {
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
 const HyGroupService = require('./hygroups')
-const { requiredGroup } = require('../conf')
+const { requiredGroup, courseStatisticsGroup } = require('../conf')
 const Op = Sequelize.Op
 
 const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
@@ -82,6 +83,7 @@ const updateGroups = async (user, affiliations, hyGroups) => {
       hyGroupsToDelete = hyGroupsToDelete.concat(hyGroup)
     }
   })
+
   await user.addHy_group(await HyGroupService.byCodes(hyGroupsToAdd))
   await user.removeHy_group(await HyGroupService.byCodes(hyGroupsToDelete))
 }
@@ -107,6 +109,8 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
     user = await updateUser(user, { full_name, mail })
     await updateGroups(user, affiliations, hyGroups)
   }
+
+  await determineAccessToCourseStats(user, hyGroups)
 
   console.log('Generating token')
   const token = await generateToken(uid)
@@ -158,7 +162,8 @@ const getUserData = user => {
   if (user == null) return null
   const newuser = user.get()
   newuser.elementdetails = getUserProgrammes(newuser)
-  newuser.is_enabled = requiredGroup === null || newuser.hy_group.some(e => e.code === requiredGroup)
+  const hyGroups = newuser.hy_group.map(e => e.code)
+  newuser.is_enabled = requiredGroup === null || _.intersection(hyGroups, requiredGroup).length > 0
   newuser.hy_group = null
   return newuser
 }
@@ -301,6 +306,16 @@ const modifyRights = async (uid, rights) => {
 const getRoles = async user => {
   const foundUser = byUsername(user)
   return foundUser.accessgroup
+}
+
+const determineAccessToCourseStats = async (user, hyGroups) => {
+  const accessGroups = (user && user.accessgroup) || []
+  const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'courseStatistics')
+  if (hyGroups.includes(courseStatisticsGroup) && !alreadyAccess) {
+    await modifyRights(user.id, { courseStatistics: true })
+  } else if (!hyGroups.includes(courseStatisticsGroup) && alreadyAccess) {
+    await modifyRights(user.id, { courseStatistics: false })
+  }
 }
 
 module.exports = {
