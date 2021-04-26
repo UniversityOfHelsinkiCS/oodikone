@@ -41,6 +41,7 @@ const AccessGroups = ({
         loading={pending}
         name="groups"
         label="Access Groups"
+        data-cy="access-groups-form"
         placeholder="Select access groups"
         fluid
         multiple
@@ -52,7 +53,7 @@ const AccessGroups = ({
         selectOnNavigation={false}
       />
       <Divider />
-      <Button basic fluid positive content="Save" onClick={submit} />
+      <Button basic fluid positive content="Save" data-cy="access-groups-save" onClick={submit} />
     </Form>
   )
 }
