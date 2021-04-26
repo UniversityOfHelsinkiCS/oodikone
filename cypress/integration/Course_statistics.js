@@ -567,4 +567,63 @@ describe('Course Statistics tests', () => {
       })
     })
   })
+
+  it("Some features of Course Statistics are hidden for courseStatistics-users", () => {
+    cy.contains("Users").click()
+    cy.contains("Oodikone users")
+    cy.contains("mocking").should('not.exist')
+    cy.contains("tr", "User manager").within(($row) => {
+      cy.contains('.button', 'Edit').click()
+    })
+
+    cy.get("[data-cy=access-groups-form]").click().contains("courseStatistics").click()
+    cy.get("[data-cy=access-groups-save]").click()
+
+    cy.route('POST', '/api/superlogin/usermk').as('superlogin')
+    cy.get('i.spy').click()
+    cy.wait('@superlogin')
+    cy.contains("mocking as usermk")
+    cy.wait(1000)
+
+    cy.get("[data-cy=navbar-courseStatistics]").click()
+    cy.get("[data-cy=course-code-input]").type('TKT20003')
+    cy.contains("tr", "TKT20003").click()
+    cy.contains("Fetch statistics").should('be.enabled').click()
+    cy.contains("Filter statistics by study programmes").should('not.exist')
+    cy.contains("Faculty statistics").should('not.exist')
+    cy.contains("Show population").should('not.exist')
+
+    const attemptsTableContents = [
+      // [time, passed, failed, passrate]
+      ["Total*", 57, 48, 9, "84.21 %"],
+      ["2018-19", "5 or less students", "NA", "NA", "NA"],
+      ["2017-18", 39, 31, 8, "79.49 %"],
+    ]
+
+    cy.contains("#CourseStatPanes a.item", "Attempts").click()
+    cy.get("#CourseStatPanes table>tbody").within(() => {
+      attemptsTableContents.forEach((values, trIndex) => {
+        cy.get("tr").eq(trIndex).within(() => {
+          values.forEach((value, tdIndex) => {
+            cy.get("td").eq(tdIndex).contains(value)
+          })
+        })
+      })
+      cy.get("tr").should('have.length', 10)
+    })
+
+    cy.contains("Stop mocking").click()
+    cy.wait(1000)
+
+    cy.contains("Users").click()
+    cy.contains("Oodikone users")
+    cy.contains("tr", "User manager").within(($row) => {
+      cy.contains('.button', 'Edit').click()
+    })
+    cy.contains("Access Groups").siblings().within(($row) => {
+      cy.get("i[class='dropdown icon clear']").click()
+    })
+    cy.get("[data-cy=access-groups-save]").click()
+
+  })
 })

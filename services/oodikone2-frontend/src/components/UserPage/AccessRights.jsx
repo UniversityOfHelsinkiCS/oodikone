@@ -39,6 +39,7 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
         name="programme"
         label="Study programme"
         placeholder="Select unit"
+        data-cy="access-rights-form"
         options={options}
         value={programme}
         onChange={(_, { value }) =>
@@ -55,7 +56,15 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
         selectOnNavigation={false}
       />
       <Divider />
-      <Form.Button disabled={!programme} basic fluid positive content="Save" onClick={handleClick} />
+      <Form.Button
+        disabled={!programme}
+        basic
+        fluid
+        positive
+        content="Save"
+        onClick={handleClick}
+        data-cy="access-rights-save"
+      />
     </Form>
   )
 }
