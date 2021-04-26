@@ -17,6 +17,20 @@ const genderMankeli = gender => {
   return 3
 }
 
+const calculateTotalCreditsFromAttainments = (attainments) => {
+  const attainmentsToSum = attainments.filter(att => {
+    if (att.misregistration) {
+      return false
+    }
+
+    const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment']
+
+    return validTypes.includes(att.type)
+  })
+
+  const totalCredits = attainmentsToSum.reduce((sum, att) => sum + Number(att.credits), 0)
+  return totalCredits
+}
 
 const studentMapper = (attainments, studyRights) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
@@ -32,15 +46,8 @@ const studentMapper = (attainments, studyRights) => student => {
   const dateofuniversityenrollment =
     studyRightsOfStudent.length > 0 ? sortBy(studyRightsOfStudent.map(sr => sr.valid.startDate))[0] : null
 
-  const attainmentsOfStudent = attainments.filter(attainment => attainment.person_id === id) // current db doesn't have studentnumbers in attainment table so have to use person_id for now
-  const creditcount = attainmentsOfStudent.reduce((acc, curr) => {
-    if (curr.type === 'ModuleAttainment' || curr.misregistration) return acc // bit hacky solution for now
-    const credittypecode = getCreditTypeCodeFromAttainment(curr, getGrade(curr.grade_scale_id, curr.grade_id).passed)
-    if (credittypecode === CREDIT_TYPE_CODES.APPROVED || credittypecode === CREDIT_TYPE_CODES.PASSED) {
-      return acc + Number(curr.credits)
-    }
-    return acc
-  }, 0)
+  // Current db doesn't have studentnumbers in attainment table so have to use person_id for now.
+  const attainmentsOfStudent = attainments.filter(attainment => attainment.person_id === id)
 
   return {
     lastname: last_name,
@@ -52,7 +59,7 @@ const studentMapper = (attainments, studyRights) => student => {
     national_student_number: oppija_id,
     home_county_id: null, // wtf this is probably trash, current db has only null in this column
     birthdate: date_of_birth,
-    creditcount,
+    creditcount: calculateTotalCreditsFromAttainments(attainmentsOfStudent),
     dateofuniversityenrollment,
     country_fi: country ? country.name.fi : null,
     country_sv: country ? country.name.sv : null,
