@@ -14,7 +14,7 @@ const mapToProviders = elementDetails =>
   })
 
 const hasRequiredGroup = hyGroups => {
-  const hasGroup = requiredGroup === null || hyGroups.some(e => e === requiredGroup)
+  const hasGroup = requiredGroup === null || _.intersection(hyGroups, requiredGroup).length > 0
   return hasGroup
 }
 
