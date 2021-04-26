@@ -1,4 +1,5 @@
 const { requiredGroup } = require('../conf-backend')
+const _ = require('lodash')
 
 const mapToProviders = elementDetails =>
   elementDetails.map(r => {
