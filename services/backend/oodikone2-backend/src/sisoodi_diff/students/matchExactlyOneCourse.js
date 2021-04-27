@@ -6,21 +6,17 @@ const filterByCode = (code, courses) => courses.filter(({ course }) => course.co
 
 const filterByCredits = (credits, courses) => courses.filter(course => course.credits === credits)
 
-const filterByName = (name, courses) =>
-  courses.filter(({ course }) => {
-    return course.name.fi === name
-  })
-
 const filterByGrade = (grade, courses) => courses.filter(course => course.grade === grade)
 
 const coursesMatch = (a, b) => a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
 
 // Idea here is to find exactly one matching course or fail otherwise.
-const matchExactlyOneCourse = (courseToPair, courses, matchByName = false, matchByCode = true) => {
+const matchExactlyOneCourse = (courseToPair, courses, matchByCode = true) => {
   const { code } = courseToPair.course
   const exactCodeMatches = filterByCode(code, courses)
 
   // Try to fall back to the special 99999 code used for courses that are missing from SIS.
+  // This is done so that the script can try matching the courses by credits and date instead of just skipping 99999's.
   // TODO: Eventually diff should succeed with this bit removed!
   const specialCodeMatches = filterByCode('99999 - MISSING FROM SIS', courses)
 
@@ -34,19 +30,8 @@ const matchExactlyOneCourse = (courseToPair, courses, matchByName = false, match
     return codeMatches[0]
   }
 
-  const nameMatches = filterByName(courseToPair.course.name.fi, courses)
-
-  if (nameMatches.length === 0 && matchByName) {
-    throw new Error('ERROR! Could not match course (name).')
-  }
-
-  if (nameMatches.length === 1 && coursesMatch(courseToPair, nameMatches[0])) {
-    return nameMatches[0]
-  }
-
   // Need to filter by date.
-  const toBeSeacrhedByDate =
-    matchByCode && !matchByName ? codeMatches : !matchByCode && matchByName ? nameMatches : courses
+  const toBeSeacrhedByDate = matchByCode ? codeMatches : courses
   const { date, credits } = courseToPair
   const dateMatches = filterByDate(date, toBeSeacrhedByDate)
 
