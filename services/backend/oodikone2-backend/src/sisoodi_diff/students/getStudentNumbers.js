@@ -28,11 +28,12 @@ const getStudentNumbersFromProgramme = async (studyProgrammeCode, year = null) =
       }
 
   try {
-    const studentNumbers = await StudyrightElement.findAll({
+    const studentNumberObjects = await StudyrightElement.findAll({
       attributes: ['studentnumber'],
       where: whereConditions,
       raw: true
-    }).map(sn => sn.studentnumber)
+    })
+    const studentNumbers = studentNumberObjects.map(sn => sn.studentnumber)
     return studentNumbers
   } catch (error) {
     console.log(error)
