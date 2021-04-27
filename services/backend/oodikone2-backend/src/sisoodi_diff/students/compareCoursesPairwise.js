@@ -3,7 +3,6 @@ const { excludeStudyModulesFromCourses } = require('../utils')
 const { matchExactlyOneCourse } = require('./matchExactlyOneCourse')
 const { output } = require('./output')
 
-// FIXME: ei samaan ämpäriin!
 const coursesToIgnore = ['DIGI-100A', 'TKT50003', 'AYTKT50003']
 
 const compareOodiToSis = (data, msg) => {
