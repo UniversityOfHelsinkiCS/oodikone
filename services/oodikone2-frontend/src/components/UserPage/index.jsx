@@ -64,6 +64,7 @@ const UserPage = ({
               <List.Item key={code}>
                 <List.Content floated="right">
                   <Button
+                    data-cy="remove-access"
                     basic
                     negative
                     floated="right"
