@@ -9,7 +9,7 @@ const matchOnlyByCreditsAndDateIfNecessary = (courseToPair, courses) => {
   try {
     matchExactlyOneCourse(courseToPair, courses)
   } catch (error) {
-    matchExactlyOneCourse(courseToPair, courses, false, false)
+    matchExactlyOneCourse(courseToPair, courses, false)
   }
 }
 
