@@ -35,7 +35,6 @@ const getStudentDiff = async studentNumber => {
 
   //msg = compareStarted(oodi.started, sis.started, msg)
   //msg = compareCredits(sis.credits, sis.courses, msg)
-  console.log(oodi.courses.length, sis.courses.length)
   msg = await compareCourses({ studentNumber, courses }, msg)
 
   return msg

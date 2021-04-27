@@ -13,7 +13,6 @@ const filterByName = (name, courses) =>
 
 const filterByGrade = (grade, courses) => courses.filter(course => course.grade === grade)
 
-// FIXME: unnecessary code
 const coursesMatch = (a, b) => a.credits === b.credits && mayhemifiedDatesMatch(a.date, b.date)
 
 // Idea here is to find exactly one matching course or fail otherwise.
