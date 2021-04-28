@@ -10,20 +10,26 @@ const byProgrammeCode = async code => {
   const connection = sisConnections.established ? sisConnections.sequelize : sequelizeKone
 
   // recursively get a module and all of its children and all of the children of the children...
-  const [result] = await connection.query(
-    `
-    WITH RECURSIVE children as (
-      SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS label_name, NULL AS label_code FROM programme_modules pm
-      WHERE pm.code = ?
-      UNION ALL
-      SELECT pm.*, c.order AS module_order, c.name AS label_name, c.code AS label_code
-      FROM children c, programme_modules pm, programme_module_children pmc
-      WHERE c.id = pmc.parent_id AND pm.id = pmc.child_id
-      GROUP BY pm.id, c.name, c.code, c.order
-    ) SELECT * FROM children WHERE type = 'course'
-  `,
-    { replacements: [code] }
-  )
+  try {
+    const [result] = await connection.query(
+      `
+      WITH RECURSIVE children as (
+        SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS label_name, NULL AS label_code FROM programme_modules pm
+        WHERE pm.code = ?
+        UNION ALL
+        SELECT pm.*, c.order AS module_order, c.name AS label_name, c.code AS label_code
+        FROM children c, programme_modules pm, programme_module_children pmc
+        WHERE c.id = pmc.parent_id AND pm.id = pmc.child_id
+        GROUP BY pm.id, c.name, c.code, c.order
+      ) SELECT * FROM children WHERE type = 'course'
+    `,
+      { replacements: [code] }
+    )
+  } catch (e) {
+    console.error("Error when searching programme module with code: ", code)
+    console.error("Details: ", e)
+    return []
+  }
 
   const excluded = await ExcludedCourse.findAll({
     where: {
@@ -56,20 +62,26 @@ const addExcludedCourses = async (programmecode, coursecodes) => {
 // just copy pasted from above since almost same query
 const modulesByProgrammeCode = async code => {
   const connection = sisConnections.established ? sisConnections.sequelize : sequelizeKone
-  const [result] = await connection.query(
-    `
-    WITH RECURSIVE children as (
-      SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS label_name, NULL AS label_code FROM programme_modules pm
-      WHERE pm.code = ?
-      UNION ALL
-      SELECT pm.*, c.order AS module_order, c.name AS label_name, c.code AS label_code
-      FROM children c, programme_modules pm, programme_module_children pmc
-      WHERE c.id = pmc.parent_id AND pm.id = pmc.child_id
-      GROUP BY pm.id, c.name, c.code, c.order
-    ) SELECT * FROM children WHERE type = 'module'
-  `,
-    { replacements: [code] }
-  )
+  try {
+    const [result] = await connection.query(
+      `
+      WITH RECURSIVE children as (
+        SELECT DISTINCT pm.*, 0 AS module_order, NULL::jsonb AS label_name, NULL AS label_code FROM programme_modules pm
+        WHERE pm.code = ?
+        UNION ALL
+        SELECT pm.*, c.order AS module_order, c.name AS label_name, c.code AS label_code
+        FROM children c, programme_modules pm, programme_module_children pmc
+        WHERE c.id = pmc.parent_id AND pm.id = pmc.child_id
+        GROUP BY pm.id, c.name, c.code, c.order
+      ) SELECT * FROM children WHERE type = 'module'
+    `,
+      { replacements: [code] }
+    )
+  } catch (e) {
+    console.error("Error when searching programme module with code: ", code)
+    console.error("Details: ", e)
+    return []
+  }
 
   return result
 }
