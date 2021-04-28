@@ -35,6 +35,9 @@ const calculateTotalCreditsFromAttainments = (attainments) => {
 const studentMapper = (attainments, studyRights) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
 
+  // Test student
+  if (student_number === "012023965") return null
+
   const gender_urn_array = gender_urn ? gender_urn.split(':') : null
   const formattedGender = gender_urn_array ? gender_urn_array[gender_urn_array.length - 1] : null
   const gender_code = genderMankeli(formattedGender)

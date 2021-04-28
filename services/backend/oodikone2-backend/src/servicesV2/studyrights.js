@@ -320,7 +320,6 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
   const isValid = ({ type }) => types.has(type)
   const associations = { programmes: {}, degrees: {}, studyTracks: {} }
   while (offset <= total) {
-    console.log(`${offset}/${total}`)
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
     elementgroups.forEach(fullgroup => {
       const group = fullgroup.filter(isValid)
