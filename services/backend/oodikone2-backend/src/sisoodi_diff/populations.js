@@ -145,23 +145,23 @@ const ignores = {
   },
   MH80_001: {
     2020: {
-      oodi: ['014015735'] 
+      oodi: ['014015735']
     }
   },
   MH20_001: {
     2020: {
-      oodi: ['014582035']  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+      oodi: ['014582035'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
     }
   },
   MH20_002: {
     2018: {
-      oodi: ['014846467']  // väärin oodi-oodikoneessa
+      oodi: ['014846467'] // väärin oodi-oodikoneessa
     }
   },
   MH30_004: {
     2018: {
-      oodi: ['011513023']  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
-    }, 
+      oodi: ['011513023'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+    },
     2020: {
       oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
@@ -185,11 +185,11 @@ const ignores = {
   MH40_005: {
     2018: {
       oodi: ['014913549'], // not cancelled in oodi even if it should have been
-      sis: ['014939002']  // graduated but wrongly marked in oodi
+      sis: ['014939002'] // graduated but wrongly marked in oodi
     },
     2019: {
       oodi: ['015095686'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-    }, 
+    },
     2020: {
       oodi: ['014736823'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
     }
@@ -224,7 +224,7 @@ const ignores = {
   MH40_014: {
     2017: {
       sis: ['014445428'] // graduated but wrongly marked in oodi
-    }, 
+    },
     2020: {
       oodi: ['013349512'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
     }
@@ -469,10 +469,10 @@ const populationDiff = async (programme, year) => {
     allGrouped.oodiOnly.cancelledInSis.push(...withProgramme(cancelledInSisNums))
     allGrouped.oodiOnly.unknown.push(...withProgramme(oodiOnly))
     console.log('oodi-only')
-    if (cancelledInSisNums.length>0) {
+    if (cancelledInSisNums.length > 0) {
       console.log(cancelledInSisNums.join('\n'))
     }
-    if (oodiOnly.length>0) {
+    if (oodiOnly.length > 0) {
       console.log(oodiOnly.join('\n'))
     }
   }
@@ -496,10 +496,10 @@ const populationDiff = async (programme, year) => {
     allGrouped.sisOnly.cancelledInOodi.push(...withProgramme(cancelledInOodiNums))
     allGrouped.sisOnly.unknown.push(...withProgramme(sisOnly))
     console.log('sis-only')
-    if (cancelledInOodiNums.length>0) {
+    if (cancelledInOodiNums.length > 0) {
       console.log(cancelledInOodiNums.join('\n'))
     }
-    if (sisOnly.length>0) {
+    if (sisOnly.length > 0) {
       console.log(sisOnly.join('\n'))
     }
   }
@@ -627,7 +627,7 @@ const printWithReason = (studentnumbers, reason) => {
 
 const programmeDiff = async programme => {
   const years = ['2017', '2018', '2019', '2020']
-  console.log("\n"+programme)
+  console.log('\n' + programme)
   for (const year of years) {
     await populationDiff(programme, year)
   }
