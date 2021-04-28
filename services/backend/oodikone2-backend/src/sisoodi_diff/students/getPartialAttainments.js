@@ -8,6 +8,7 @@ const downloadPartialAttainments = async () => {
   console.log('INFO: Downloading new partial attainment data.\n')
   const token = process.env.IMPORTER_ARCHAEOLOGY_TOKEN
   const url = `https://importer.cs.helsinki.fi/archeology/assessmentItemsFromCoursesWithPartAttainments?token=${token}`
+  console.log(url)
   const res = await axios.get(url)
   return res.data
 }

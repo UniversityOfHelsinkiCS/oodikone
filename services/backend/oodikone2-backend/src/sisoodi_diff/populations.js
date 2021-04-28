@@ -146,19 +146,100 @@ const ignores = {
       oodi: ['013466013', '014590027', '014340963', '014179998', '013743299', '013758239', '014590807']
     }
   },
+  MH80_001: {
+    2020: {
+      oodi: ['014015735']
+    }
+  },
+  MH20_001: {
+    2020: {
+      oodi: ['014582035'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+    }
+  },
+  MH20_002: {
+    2018: {
+      oodi: ['014846467'] // väärin oodi-oodikoneessa
+    }
+  },
+  MH30_004: {
+    2018: {
+      oodi: ['011513023'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+    },
+    2020: {
+      oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+    }
+  },
+  MH40_001: {
+    2018: {
+      sis: ['014486995'] // unknown oodi-oodikonefakap
+    }
+  },
+  MH40_002: {
+    2019: {
+      oodi: ['014720114'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+    }
+  },
+  MH40_003: {
+    2019: {
+      sis: ['014444047'], // graduated but wrongly marked in oodi
+      oodi: ['015100050'] // not cancelled in oodi even if it should have been,
+    }
+  },
+  MH40_005: {
+    2018: {
+      oodi: ['014913549'], // not cancelled in oodi even if it should have been
+      sis: ['014939002'] // graduated but wrongly marked in oodi
+    },
+    2019: {
+      oodi: ['015095686'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+    },
+    2020: {
+      oodi: ['014736823'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+    }
+  },
+  MH40_006: {
+    2018: {
+      sis: ['014193880'] // graduated but wrongly marked in oodi
+    }
+  },
+  MH40_008: {
+    2020: {
+      oodi: ['011516143'] // oodi-oodikone has masters selection despite it clearly should not have one
+    }
+  },
+  MH40_010: {
+    2019: {
+      sis: ['014145812'] // graduated but wrongly marked in oodi
+    }
+  },
+  MH40_012: {
+    2018: {
+      oodi: ['014148547'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2830
+    }
+  },
+  MH40_014: {
+    2017: {
+      sis: ['014445428'] // graduated but wrongly marked in oodi
+    },
+    2020: {
+      oodi: ['013349512'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
+    }
+  },
+  MH40_015: {
+    2020: {
+      oodi: ['014143791'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
+    }
+  },
   // there are many inconsistencies in masters, so they're grouped by the reason, not
   // by program for now
   MH_ALL: {
     // in sis, but not in oodi
     sis: [
       // full-on oodikone fakap, no need to fix
-      // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2745
-      '014581611'
+      '014581611' // not in oodi-oodikone due to fukap
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2771
       //'013012234',
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2772
-      //'014444047',
-      //'014939002',
       //'014193880',
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2750
       //'012334670',
@@ -166,23 +247,14 @@ const ignores = {
     ],
     // in oodi, but not in sis
     oodi: [
-      // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2748
-      '014317611',
-      '013066769',
-      '014022508',
-      '014159358',
-      '013967091',
-      '013986535',
-      '014015735',
-      '014016572',
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2781
-      '013878737'
+      '013878737',
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2749
-      //'014577749',
       //'014724767',
-      //'014582035',
       //'010947593',
-      //'012616631',
+      // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+      '014577749',
+      '014724767'
     ]
   }
 }
@@ -241,6 +313,8 @@ const populationDiff = async (programme, year) => {
 
   // Check for possible causes and group together
 
+  console.log(year)
+
   if (oodiOnly.length > 0) {
     //console.log(`${oodiOnly.length} only in oodi, of which...`)
 
@@ -272,6 +346,13 @@ const populationDiff = async (programme, year) => {
     oodiOnly = _.difference(oodiOnly, cancelledInSisNums)
     allGrouped.oodiOnly.cancelledInSis.push(...withProgramme(cancelledInSisNums))
     allGrouped.oodiOnly.unknown.push(...withProgramme(oodiOnly))
+    console.log('oodi-only')
+    if (cancelledInSisNums.length > 0) {
+      console.log(cancelledInSisNums.join('\n'))
+    }
+    if (oodiOnly.length > 0) {
+      console.log(oodiOnly.join('\n'))
+    }
   }
 
   if (sisOnly.length > 0) {
@@ -292,6 +373,13 @@ const populationDiff = async (programme, year) => {
     // }
     allGrouped.sisOnly.cancelledInOodi.push(...withProgramme(cancelledInOodiNums))
     allGrouped.sisOnly.unknown.push(...withProgramme(sisOnly))
+    console.log('sis-only')
+    if (cancelledInOodiNums.length > 0) {
+      console.log(cancelledInOodiNums.join('\n'))
+    }
+    if (sisOnly.length > 0) {
+      console.log(sisOnly.join('\n'))
+    }
   }
 }
 
@@ -417,6 +505,7 @@ const printWithReason = (studentnumbers, reason) => {
 
 const programmeDiff = async programme => {
   const years = ['2017', '2018', '2019', '2020']
+  console.log('\n' + programme)
   for (const year of years) {
     await populationDiff(programme, year)
   }
