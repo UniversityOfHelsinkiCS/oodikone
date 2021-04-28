@@ -9,6 +9,8 @@ const { PORT } = conf
 const { initializeDatabaseConnection } = require('./database/connection')
 const { dbConnections } = require('./databaseV2/connection')
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production'
+
 initializeDatabaseConnection()
   .then(() => {
     dbConnections.connect()
@@ -23,11 +25,13 @@ initializeDatabaseConnection()
 
     const app = express()
 
-    Sentry.init({
-      dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
-      environment: process.env.TAG
-    })
-    app.use(Sentry.Handlers.requestHandler())
+    if (IS_PRODUCTION && ['staging', 'latest'].includes(process.env.TAG)) {
+      Sentry.init({
+        dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
+        environment: process.env.TAG
+      })
+      app.use(Sentry.Handlers.requestHandler())
+    }
 
     startCron()
 
