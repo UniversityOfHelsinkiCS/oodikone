@@ -1,0 +1,18 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "03:00"
+  open-pull-requests-limit: 10
+  target-branch: trunk
+  ignore:
+  - dependency-name: cypress
+    versions:
+    - 7.0.1
+  - dependency-name: husky
+    versions:
+    - 5.0.9
+    - 5.1.0
+    - 5.1.2
