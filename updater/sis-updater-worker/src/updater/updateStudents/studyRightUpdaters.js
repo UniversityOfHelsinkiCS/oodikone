@@ -227,12 +227,9 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
             possibleDegrees ? possibleDegrees[0].short_name.en : undefined
           )
-          console.log("degree", degree)
           snapshotStudyRightElements.push(degree, programme, studytrack)
         }
       })
-
-      console.log("elements while looping", snapshotStudyRightElements)
 
       res.push(...uniqBy(snapshotStudyRightElements, 'code'))
       return res
