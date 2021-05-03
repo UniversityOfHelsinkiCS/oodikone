@@ -47,6 +47,14 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     const primality = get(personIdToStudyRightIdToPrimality, `${studyright.person_id}.${studyright.id}`)
     const primalityEndDate = get(primality, 'end_date')
     const isPrimality = primality && !primalityEndDate
+
+    const PRIORITYCODES = {
+      MAIN: 1,
+      SECONDARY: 2,
+      RESCINDED: 5,
+      GRADUATED: 30,
+    }
+
     if (!isBaMa) {
       return studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
     }
@@ -66,7 +74,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         : isPrimality
           ? get(studyright, 'study_right_graduation.phase1GraduationDate')
             ? 1
-            : 6
+            : 6 // what is this
           : 2
   }
 
