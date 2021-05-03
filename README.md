@@ -255,3 +255,10 @@ scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki
 > ```bash
 > scp -o ProxyCommand="ssh -W %h:%p commonuser@server1" > commonuser@server2:/<remotePath> <localpath>
 > ```
+>
+
+## Known situations and ways to handle them
+
+- Problem: Oodikone doesn't start and database container (e.g. db_sis) logs include the line "can't open '/docker-entrypoint-initdb.d/'
+  - Possible reason: You probably have too restricting read rights in `scripts/docker-entrypoint-initdb.d` -folder. This could be for example caused by fairly strict `umask` setting, such as `077` in your OS.
+  - Possible solution: Either change the umask on whole OS (to `022` for example) or set the correct read rights for docker-entrypoint -folder by running `chmod 755 scripts/docker-entrypoint-initdb.d`
