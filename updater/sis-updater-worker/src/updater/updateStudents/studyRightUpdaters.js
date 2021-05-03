@@ -56,26 +56,26 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     }
 
     if (!isBaMa) {
-      return studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
+      return studyright.state === 'GRADUATED' ? PRIORITYCODES.GRADUATED : studyright.state === 'RESCINDED' ? PRIORITYCODES.RESCINDED : isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
     }
     if (phase_number === 1) {
       return get(studyright, 'study_right_graduation.phase1GraduationDate')
-        ? 30
+        ? PRIORITYCODES.GRADUATED
         : studyright.state === 'RESCINDED'
-        ? 5
+        ? PRIORITYCODES.RESCINDED
         : isPrimality
-          ? 1
-          : 2
+          ? PRIORITYCODES.MAIN
+          : PRIORITYCODES.SECONDARY
     }
     return get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
-      ? 30
+      ? PRIORITYCODES.GRADUATED
       : studyright.state === 'RESCINDED'
-        ? 5
+        ? PRIORITYCODES.RESCINDED
         : isPrimality
           ? get(studyright, 'study_right_graduation.phase1GraduationDate')
-            ? 1
+            ? PRIORITYCODES.MAIN
             : 6 // what is this
-          : 2
+          : PRIORITYCODES.SECONDARY
   }
 
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
