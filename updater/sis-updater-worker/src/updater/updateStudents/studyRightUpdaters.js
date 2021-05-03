@@ -54,7 +54,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       RESCINDED: 5,
       GRADUATED: 30,
     }
-
+  
+    // Logic still a bit repetitive, plz make this better!
     if (!isBaMa) {
       if (studyright.state === 'GRADUATED') return PRIORITYCODES.GRADUATED
       if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
