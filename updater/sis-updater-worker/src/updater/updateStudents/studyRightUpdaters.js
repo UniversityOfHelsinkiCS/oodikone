@@ -56,26 +56,29 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     }
 
     if (!isBaMa) {
-      return studyright.state === 'GRADUATED' ? PRIORITYCODES.GRADUATED : studyright.state === 'RESCINDED' ? PRIORITYCODES.RESCINDED : isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
+      if (studyright.state === 'GRADUATED') return PRIORITYCODES.GRADUATED
+      if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
+      return isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
     }
+
     if (phase_number === 1) {
-      return get(studyright, 'study_right_graduation.phase1GraduationDate')
-        ? PRIORITYCODES.GRADUATED
-        : studyright.state === 'RESCINDED'
-        ? PRIORITYCODES.RESCINDED
-        : isPrimality
-          ? PRIORITYCODES.MAIN
-          : PRIORITYCODES.SECONDARY
+      if (get(studyright, 'study_right_graduation.phase1GraduationDate')) return PRIORITYCODES.GRADUATED
+      if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
+      return isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
     }
-    return get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
-      ? PRIORITYCODES.GRADUATED
-      : studyright.state === 'RESCINDED'
-        ? PRIORITYCODES.RESCINDED
-        : isPrimality
-          ? get(studyright, 'study_right_graduation.phase1GraduationDate')
+
+    if (get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')) {
+      return PRIORITYCODES.GRADUATED
+    }
+
+    if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
+
+    if (isPrimality) {
+      return get(studyright, 'study_right_graduation.phase1GraduationDate')
             ? PRIORITYCODES.MAIN
-            : 6 // what is this
-          : PRIORITYCODES.SECONDARY
+            : 6 // hey, you, if you know this, add this to PRIORITYCODES
+    }
+    return PRIORITYCODES.SECONDARY
   }
 
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
