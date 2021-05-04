@@ -22,13 +22,18 @@ const calculateTotalCreditsFromAttainments = (attainments) => {
     if (att.misregistration) {
       return false
     }
-
     const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment']
 
     return validTypes.includes(att.type)
   })
 
-  const totalCredits = attainmentsToSum.reduce((sum, att) => sum + Number(att.credits), 0)
+  const totalCredits = attainmentsToSum.reduce((sum, att) => {
+    const credittypecode = getCreditTypeCodeFromAttainment(att, getGrade(att.grade_scale_id, att.grade_id).passed)
+  if (credittypecode === CREDIT_TYPE_CODES.APPROVED || credittypecode === CREDIT_TYPE_CODES.PASSED) {
+    return sum + Number(att.credits)
+  }
+  return sum
+  }, 0)
   return totalCredits
 }
 
