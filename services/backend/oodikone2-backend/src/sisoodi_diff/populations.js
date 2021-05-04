@@ -160,7 +160,7 @@ const ignores = {
   },
   MH30_004: {
     2018: {
-      oodi: ['011513023'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+      oodi: ['011513023'] //ei vielä maisteriopiskelija
     },
     2020: {
       oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
@@ -189,9 +189,6 @@ const ignores = {
     },
     2019: {
       oodi: ['015095686'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-    },
-    2020: {
-      oodi: ['014736823'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
     }
   },
   MH40_006: {
@@ -387,9 +384,6 @@ const ignores = {
         '013324281', '014289642', '014463565', '013940775', '014330287' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       ]
     }, 
-    2018: {
-      oodi: ['014335680'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2849
-    }, 
   },
   MH70_008: {
     2017: {
@@ -422,7 +416,98 @@ const ignores = {
       oodi: ['011309295'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
     }
   },
-
+  MH80_001: {
+    2019: {
+      oodi: ['014816950'], // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
+      sis: ['014341027'] // graduated but wrongly marked in oodi 
+    },
+    2020: {
+      oodi: [
+        '014343643', '014015735', '014016572', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+        '014816934'  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+      ]
+    }
+  },
+  MH80_002: {
+    2017: {
+      oodi: ['014855458'] // ilmottautuminen puuttuu, oodi-oodikoneessa prblm
+    },
+    2019: {
+      oodi: ['015186113'] // ilmottautuminen puuttuu, oodi-oodikoneessa prblm
+    }
+  },
+  MH80_003: {
+    2018: {
+      oodi: ['013451099'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+    },
+    2019: {
+      oodi: ['015087461']  // ilmottautuminen puuttuu, oodi-oodikoneessa prblm
+    },
+    2020: {
+      oodi: ['014923924'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
+    },
+  },
+  MH80_005: {
+    2020: {
+      oodi: ['010956351'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2859
+    }
+  },
+  MH80_006: {
+    2020: {
+      oodi: ['014586293'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+    }
+  },
+  MH80_007: {
+    2018: {
+      oodi: ['015009423'], // ilmottautuminen puuttuu, oodi-oodikoneessa prblm
+      sis: [
+        '014477179', '014018651' // ei näy tuntemattomasta syystä oodi-oodikoneessa
+      ]
+    },
+    2019: {
+      oodi: ['014713406'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827 
+    },
+    2020: {
+      oodi: [
+        '013214702', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827 
+        '014928806' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
+      ], 
+      sis: ['014591314'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2860
+    }
+  },
+  MH60_001: {
+    2017: {
+      oodi: ['014722206'], // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
+      sis: [ '014739590', '014849105', '014750427', '014848627', '014811706', '014830114', 
+        '014786132', '011488048', '012740617', '014451234' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+      ] 
+    },
+    2018: {
+      oodi: [
+        '011488048', '014750427', '014624977', '014659133', '014720169', '014721825', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '013143064', '014021813', '014470723', '014631821', '014643660', '014716102', '014716979', '014726082' // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
+      ]
+    },
+    2019: {
+      oodi: [
+        '012740617','014830114', '014811706', '014786132', '014451234', '014323074', '014366086', '014528934', '014708699', '014711262', '014726105','014728983', '014731909', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '014732623' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2866
+      ]
+    },
+    2020: {
+      sis: [
+        '014829031', '014818848', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2861
+        '014734511' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2862
+      ],
+      oodi: ['014954744', '014711864', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2865
+        '011856463', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+        '014739590', '014848627', '014849105', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '014819504', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
+        '014222324', // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa),
+        '014723645' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+       ] 
+    }
+  },
   // there are many inconsistencies in masters, so they're grouped by the reason, not
   // by program for now
   MH_ALL: {
@@ -479,6 +564,8 @@ const populationDiff = async (programme, year) => {
   const studentsSis = resultSis.students.map(s => s.studentNumber)
   const studentsOodi = resultOodi.students.map(s => s.studentNumber)
 
+  //console.log(year, studentsSis.length, studentsOodi.length)
+
   let sisOnly = _.difference(studentsSis, studentsOodi)
   let oodiOnly = _.difference(studentsOodi, studentsSis)
 
@@ -503,7 +590,7 @@ const populationDiff = async (programme, year) => {
 
   // Check for possible causes and group together
 
-  console.log(year)
+  console.log('\n'+year)
 
   if (oodiOnly.length > 0) {
     //console.log(`${oodiOnly.length} only in oodi, of which...`)
@@ -733,9 +820,9 @@ const bscCodes = async () => {
 
 const msc = async () => {
   const programmes = await masterCodes()
-  console.log(programmes.join('\n'))
+  //console.log(programmes.join('\n'))
   for (let programme of programmes) {
-    //await programmeDiff(programme)
+    await programmeDiff(programme)
   }
 }
 
@@ -817,16 +904,4 @@ main()
 
     npm run diff:populations KH10_001 KH20_001 KH50_005
 
-*/
-
-/*
-MH60_001
-
-MH80_001
-MH80_002
-MH80_003
-
-MH80_005
-MH80_006
-MH80_007
 */
