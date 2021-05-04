@@ -86,6 +86,7 @@ const miscMsgHandler = async miscMessage => {
   const studentNumbers = miscMessage.entityIds.map(s => s.student_number)
   const msgInUpdateFormat = { ...miscMessage, entityIds: miscMessage.entityIds.map(s => s.id) }
 
+  // TODO the single student purge
   await purgeByStudentNumber(studentNumbers)
   await updateMsgHandler(msgInUpdateFormat)
 }
