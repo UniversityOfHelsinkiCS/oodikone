@@ -17,22 +17,28 @@ const genderMankeli = gender => {
   return 3
 }
 
-const calculateTotalCreditsFromAttainments = (attainments) => {
+const calculateTotalCreditsFromAttainments = attainments => {
   const attainmentsToSum = attainments.filter(att => {
     if (att.misregistration) {
       return false
     }
+
+    // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
+    // See, e.g., TKT5
+    // Logic copyed from
+    const isSubstitutedOrIncludedStudyModule =
+      (att.state === 'SUBSTITUTED' || att.state === 'INCLUDED') && att.module_id !== null
     const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment']
 
-    return validTypes.includes(att.type)
+    return validTypes.includes(att.type) || isSubstitutedOrIncludedStudyModule
   })
 
   const totalCredits = attainmentsToSum.reduce((sum, att) => {
     const credittypecode = getCreditTypeCodeFromAttainment(att, getGrade(att.grade_scale_id, att.grade_id).passed)
-  if (credittypecode === CREDIT_TYPE_CODES.APPROVED || credittypecode === CREDIT_TYPE_CODES.PASSED) {
-    return sum + Number(att.credits)
-  }
-  return sum
+    if (credittypecode === CREDIT_TYPE_CODES.APPROVED || credittypecode === CREDIT_TYPE_CODES.PASSED) {
+      return sum + Number(att.credits)
+    }
+    return sum
   }, 0)
   return totalCredits
 }
