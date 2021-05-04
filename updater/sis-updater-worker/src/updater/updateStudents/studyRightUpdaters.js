@@ -94,7 +94,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         prioritycode: parsePriorityCode(studyright, 1, true),
         canceldate: parseCancelDate(studyright, 1, true),
         enddate: parseEndDate(studyright, 1, true),
-        studyrightid: `${studyright.id}-1`,
+        studyrightid: `${studyright.id}-1`, // duplikaattiifx
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -119,7 +119,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
         prioritycode: parsePriorityCode(studyright),
         canceldate: parseCancelDate(studyright),
-        enddate: parseEndDate(studyright)
+        enddate: parseEndDate(studyright),
+        studyrightid: `${studyright.id}-1`, // duplikaattiifx
       })
 
       acc.push(mappedStudyright)
@@ -227,10 +228,11 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           } else {
             snapshotStudyRightElements.push(baDegree, baProgramme, baStudytrack, maDegree, maProgramme, maStudytrack)
           }
+
         } else {
           const possibleDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
           const [degree, programme, studytrack] = mapStudyrightElements(
-            mainStudyRight.id,
+            `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattiifx
             ordinal,
             startDate,
             endDate,
