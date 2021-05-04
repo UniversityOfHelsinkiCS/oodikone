@@ -134,7 +134,7 @@ const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, 
         ? usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')
           ? `${studyrightid}-2`
           : `${studyrightid}-1`
-        : studyrightid
+        : `${studyrightid}-1` // studyrightid duplicatefix
 
       const sourcecode =
         moduleGroupIdToCode[
