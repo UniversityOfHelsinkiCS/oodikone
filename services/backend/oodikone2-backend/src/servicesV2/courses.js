@@ -110,7 +110,7 @@ const byName = (name, language) =>
 const byCode = code => Course.findByPk(code)
 
 const creditsForCourses = async (codes, anonymizationSalt) => {
-  const credits = Credit.findAll({
+  const credits = await Credit.findAll({
     include: [
       {
         model: Student,
@@ -524,14 +524,16 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
 const maxYearsToCreatePopulationFrom = async coursecodes => {
   const maxAttainmentDate = new Date(
     Math.max(
-      ...(await Course.findAll({
-        where: {
-          code: {
-            [Op.in]: coursecodes
-          }
-        },
-        attributes: ['max_attainment_date']
-      }).map(c => new Date(c.max_attainment_date).getTime()))
+      ...(
+        await Course.findAll({
+          where: {
+            code: {
+              [Op.in]: coursecodes
+            }
+          },
+          attributes: ['max_attainment_date']
+        })
+      ).map(c => new Date(c.max_attainment_date).getTime())
     )
   )
   const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
