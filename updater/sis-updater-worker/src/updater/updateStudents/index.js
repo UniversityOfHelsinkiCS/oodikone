@@ -291,8 +291,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
 
   const credits = fixedAttainments
     .filter(a => a !== null)
-    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration)
-    .filter(a => !attainmentsToBeExluced.has(a.id))
+    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id))
     .map(a => {
       a.acceptor_persons
         .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
