@@ -19,6 +19,7 @@ const {
 } = require('../mapper')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
+const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 
 const studyRightHasDegreeEducation = (studyRight) => {
   const education = getEducation(studyRight.education_id)
@@ -285,9 +286,12 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     courseGroupIdToCourseCode
   )
 
+  // These are partial attainments, that are already attached to a larger acual attainment
+  const attainmentsToBeExluced = await getAttainmentsToBeExcluded()
+
   const credits = fixedAttainments
     .filter(a => a !== null)
-    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration)
+    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id))
     .map(a => {
       a.acceptor_persons
         .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
