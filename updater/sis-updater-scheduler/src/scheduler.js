@@ -207,7 +207,6 @@ const scheduleProgrammes = async () => {
   createJobs(entityIds, 'programme_modules')
     .then(() => console.log('scheduling programmes', entityIds))
     .catch(e => console.log('Failed upadting modules', e))
-
 }
 
 const scheduleWeekly = async () => {
