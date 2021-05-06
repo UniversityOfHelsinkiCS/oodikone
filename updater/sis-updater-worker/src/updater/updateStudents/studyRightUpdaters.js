@@ -47,27 +47,39 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     const primality = get(personIdToStudyRightIdToPrimality, `${studyright.person_id}.${studyright.id}`)
     const primalityEndDate = get(primality, 'end_date')
     const isPrimality = primality && !primalityEndDate
+
+    const PRIORITYCODES = {
+      MAIN: 1,
+      SECONDARY: 2,
+      RESCINDED: 5,
+      GRADUATED: 30,
+    }
+  
+    // Logic still a bit repetitive, plz make this better!
     if (!isBaMa) {
-      return studyright.state === 'GRADUATED' ? 30 : studyright.state === 'RESCINDED' ? 5 : isPrimality ? 1 : 2
+      if (studyright.state === 'GRADUATED') return PRIORITYCODES.GRADUATED
+      if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
+      return isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
     }
+
     if (phase_number === 1) {
-      return get(studyright, 'study_right_graduation.phase1GraduationDate')
-        ? 30
-        : studyright.state === 'RESCINDED'
-        ? 5
-        : isPrimality
-          ? 1
-          : 2
+      if (get(studyright, 'study_right_graduation.phase1GraduationDate')) return PRIORITYCODES.GRADUATED
+      if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
+      return isPrimality ? PRIORITYCODES.MAIN : PRIORITYCODES.SECONDARY
     }
-    return get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')
-      ? 30
-      : studyright.state === 'RESCINDED'
-        ? 5
-        : isPrimality
-          ? get(studyright, 'study_right_graduation.phase1GraduationDate')
-            ? 1
-            : 6
-          : 2
+
+    if (get(studyright, 'studyright.study_right_graduation.phase2GraduationDate')) {
+      return PRIORITYCODES.GRADUATED
+    }
+
+    if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
+
+    if (isPrimality) {
+      return get(studyright, 'study_right_graduation.phase1GraduationDate')
+            ? PRIORITYCODES.MAIN
+            : 6 // hey, you, if you know this, add this to PRIORITYCODES
+    }
+    return PRIORITYCODES.SECONDARY
   }
 
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
@@ -82,7 +94,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         prioritycode: parsePriorityCode(studyright, 1, true),
         canceldate: parseCancelDate(studyright, 1, true),
         enddate: parseEndDate(studyright, 1, true),
-        studyrightid: `${studyright.id}-1`,
+        studyrightid: `${studyright.id}-1`, // duplikaattiifx
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -107,7 +119,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
         prioritycode: parsePriorityCode(studyright),
         canceldate: parseCancelDate(studyright),
-        enddate: parseEndDate(studyright)
+        enddate: parseEndDate(studyright),
+        studyrightid: `${studyright.id}-1`, // duplikaattiifx
       })
 
       acc.push(mappedStudyright)
@@ -215,10 +228,11 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           } else {
             snapshotStudyRightElements.push(baDegree, baProgramme, baStudytrack, maDegree, maProgramme, maStudytrack)
           }
+
         } else {
           const possibleDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
           const [degree, programme, studytrack] = mapStudyrightElements(
-            mainStudyRight.id,
+            `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattiifx
             ordinal,
             startDate,
             endDate,
@@ -227,12 +241,9 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
             possibleDegrees ? possibleDegrees[0].short_name.en : undefined
           )
-          console.log("degree", degree)
           snapshotStudyRightElements.push(degree, programme, studytrack)
         }
       })
-
-      console.log("elements while looping", snapshotStudyRightElements)
 
       res.push(...uniqBy(snapshotStudyRightElements, 'code'))
       return res

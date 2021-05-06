@@ -84,10 +84,6 @@ const updateStudents = async personIds => {
   // grouping in function that sets first_snapshot_date_time
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(degreeStudyRightSnapshots)
 
-  // console.log('**')
-  // console.log(JSON.stringify(groupedStudyRightSnapshots, null , 2))
-  // console.log(groupedStudyRightSnapshots["hy-opinoik-96550693"].map(s => s.modification_ordinal))
-
   const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
     acc.push(curr[0])
     return acc
@@ -138,7 +134,7 @@ const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, 
         ? usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')
           ? `${studyrightid}-2`
           : `${studyrightid}-1`
-        : studyrightid
+        : `${studyrightid}-1` // studyrightid duplicatefix
 
       const sourcecode =
         moduleGroupIdToCode[
