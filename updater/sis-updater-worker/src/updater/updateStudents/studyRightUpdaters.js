@@ -115,6 +115,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       if (educationType.parent_id === 'urn:code:education-type:non-degree-education') {
         return acc
       }
+
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
         prioritycode: parsePriorityCode(studyright),
