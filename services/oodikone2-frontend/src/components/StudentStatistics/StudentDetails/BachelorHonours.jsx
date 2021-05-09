@@ -7,6 +7,18 @@ import { Divider, Table, Label, Header } from 'semantic-ui-react'
 import { getNewestProgramme, reformatDate } from '../../../common'
 import { getMandatoryCourseModules } from '../../../redux/populationMandatoryCourses'
 
+const bachelorCodes = [
+  'KH50_001',
+  'KH50_002',
+  'KH50_003',
+  'KH50_004',
+  'KH50_005',
+  'KH50_006',
+  'KH50_007',
+  'KH50_008',
+  '00345'
+]
+
 const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatch, mandatoryModules, absentYears }) => {
   const [studentsModules, setModules] = useState([])
   const [otherModules, setOther] = useState([])
@@ -30,16 +42,7 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
         setGraduated(!!studyrightWithNewestProgramme.graduated)
       }
       // currently only for matlu
-      const shouldRender = [
-        'KH50_001',
-        'KH50_002',
-        'KH50_003',
-        'KH50_004',
-        'KH50_005',
-        'KH50_006',
-        'KH50_007',
-        'KH50_008'
-      ].includes(newestBachelorProgramme.code)
+      const shouldRender = bachelorCodes.includes(newestBachelorProgramme.code)
 
       if (shouldRender) getMandatoryCourseModulesDispatch(newestBachelorProgramme.code)
       setRender(shouldRender)
@@ -52,11 +55,11 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       .filter(mod => mod.name.fi.includes('perusopinnot') || mod.name.fi.includes('aineopinnot'))
       .map(mod => mod.code)
     const attainedModules = student.courses.filter(
-      course => basicAndIntermediateStudies.includes(course.course_code) || course.course_code === '00345'
+      course => basicAndIntermediateStudies.includes(course.course_code) || bachelorCodes.includes(course.course_code)
     )
 
     let inTime = false
-    const degree = attainedModules.find(mod => mod.course_code === '00345')
+    const degree = attainedModules.find(mod => bachelorCodes.includes(mod.course_code))
 
     if (degree) {
       const graduationDate = moment(degree.date)
@@ -87,10 +90,12 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
           mod2 => mod2.course_code.slice(4, mod.course_code.length) === mod.course_code.slice(4, mod.course_code.length)
         )
         if (filtered.length > 1) pairedModules.push(mod)
-        if (mod.course_code === '00345') pairedModules.push(mod)
+        if (bachelorCodes.includes(mod.course_code)) pairedModules.push(mod)
       })
 
-      const filterGrades = pairedModules.filter(mod => mod.course_code !== '00345' && Number(mod.grade) > 3)
+      const filterGrades = pairedModules.filter(
+        mod => !bachelorCodes.includes(mod.course_code) && Number(mod.grade) > 3
+      )
 
       const leftOutModules = attainedModules.filter(mod => !pairedModules.includes(mod))
 
@@ -106,7 +111,9 @@ const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatc
       setOther(leftOutModules)
       setInspection(leftOutModules.length > 0 || (graduated && pairedModules.length < 3))
     } else {
-      const filterGrades = attainedModules.filter(mod => mod.course_code !== '00345' && Number(mod.grade) > 3)
+      const filterGrades = attainedModules.filter(
+        mod => !bachelorCodes.includes(mod.course_code) && Number(mod.grade) > 3
+      )
 
       setHonors(filterGrades.length > 1 && inTime)
 
