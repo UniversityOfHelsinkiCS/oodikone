@@ -182,6 +182,12 @@ const formatStudent = ({
   if (credits === undefined) {
     credits = []
   }
+
+  const formattedCredits = credits
+    .sort(courseByDate)
+    .map(toCourse)
+    .filter(c => c.course.name !== 'missing')
+
   return {
     firstnames,
     lastname,
@@ -189,7 +195,7 @@ const formatStudent = ({
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
     credits: creditcount || 0,
-    courses: credits.sort(courseByDate).map(toCourse),
+    courses: formattedCredits,
     name: abbreviatedname,
     transfers: transfers || [],
     gender,
