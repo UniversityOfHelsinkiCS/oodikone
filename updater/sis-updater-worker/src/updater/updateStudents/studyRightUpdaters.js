@@ -53,6 +53,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       SECONDARY: 2,
       RESCINDED: 5,
       GRADUATED: 30,
+      OPTION: 6
     }
   
     // Logic still a bit repetitive, plz make this better!
@@ -77,7 +78,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     if (isPrimality) {
       return get(studyright, 'study_right_graduation.phase1GraduationDate')
             ? PRIORITYCODES.MAIN
-            : 6 // hey, you, if you know this, add this to PRIORITYCODES
+            : PRIORITYCODES.OPTION
     }
     return PRIORITYCODES.SECONDARY
   }
