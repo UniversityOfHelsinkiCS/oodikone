@@ -9,7 +9,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
 
   const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
     const defaultProps = {
-      studyrightid: studyright.id,
+      studyrightid: `${studyright.id}-1`, // duplikaattifix
       facultyCode: getOrganisationCode(studyright.organisation_id),
       startdate: studyright.valid.startDate,
       givendate: studyright.grant_date,
@@ -101,7 +101,6 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         prioritycode: parsePriorityCode(studyright, 1, true),
         canceldate: parseCancelDate(studyright, 1, true),
         enddate: parseEndDate(studyright, 1, true),
-        studyrightid: `${studyright.id}-1`, // duplikaattiifx
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -119,6 +118,8 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       acc.push(studyRightMast, studyRightBach)
     } else {
       const educationType = getEducationType(studyRightEducation.education_type)
+
+      // This can be removed after filtering is done in importer!
       if (educationType.parent_id === 'urn:code:education-type:non-degree-education') {
         return acc
       }
@@ -128,7 +129,6 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
         prioritycode: parsePriorityCode(studyright),
         canceldate: parseCancelDate(studyright),
         enddate: parseEndDate(studyright),
-        studyrightid: `${studyright.id}-1`, // duplikaattiifx
       })
 
       acc.push(mappedStudyright)
