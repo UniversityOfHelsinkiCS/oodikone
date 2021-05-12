@@ -39,7 +39,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     const isEternalStudyRight = studyright =>
       studyright.study_right_expiration_rules_urn.includes("urn:code:study-right-expiration-rules:eternal")
 
-    if (isEternalStudyRight(studyright)) return '2112-12-21'
+    if (isEternalStudyRight(studyright)) studyright.valid.endDate = '2112-12-21'
 
     if (isBaMa && phase_number === 2) {
       return studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
@@ -141,41 +141,130 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   }, [])
 
   await bulkCreate(Studyright, formattedStudyRights, null, ['studyrightid'])
+  return formattedStudyRights
 }
 
-const mapStudyrightElements = (studyrightid, ordinal, startdate, enddate, studentnumber, code, childCode, degreeCode) => {
+const mapStudyrightElements = (studyrightid, ordinal, startdate, studentnumber, code, childCode, degreeCode, transfersByStudyRightId, formattedStudyRightsById) => {
   const defaultProps = {
     studyrightid,
     startdate,
-    enddate,
     studentnumber,
   }
 
+  // be default, well use the enddate in studyright and given startdate 
+  // (might be horrible logic, check later)
+  let enddate = formattedStudyRightsById[studyrightid].enddate
+  let realStartDate = startdate
+
+  // except when studyright has been transferred, then override
+  if (transfersByStudyRightId[studyrightid]) {
+    const transfer = transfersByStudyRightId[studyrightid]
+    if (code === transfer.sourcecode) {
+      enddate = transfer.transferdate
+    } else if (code === transfer.targetcode) {
+      startdate = transfer.transferdate
+    }
+  }
+
+
+  // we should probably map degree in a different manner since degree can be per many
+  // programmes and studytracks. Now the correct one might be overwritten later.
   return [
     {
     ...defaultProps,
     id: `${defaultProps.studyrightid}-${degreeCode}`,
-    code: degreeCode
+    code: degreeCode,
+    enddate,
     },
     {
       ...defaultProps,
       id: `${defaultProps.studyrightid}-${code}`,
       code,
+      enddate,
+      startdate: realStartDate
     },
     {
       ...defaultProps,
       id: `${defaultProps.studyrightid}-${childCode}`,
       code: childCode,
+      enddate,
+      startdate: realStartDate
     },
   ]
 }
 
-const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
+const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights) => {
+
+  const formattedStudyRightsById = {}
+  Object.values(formattedStudyRights).forEach(studyright => {
+    formattedStudyRightsById[studyright.studyrightid] = studyright
+  })
+
   const possibleBscFirst = (s1, s2) => {
     if (!s1.accepted_selection_path.educationPhase2GroupId) return -1
     return 1
   }
 
+  const getTransfersFrom = (orderedSnapshots, studyrightid, educationId) => {
+    return orderedSnapshots.reduce((curr, snapshot, i) => {
+      if (i === 0) return curr
+
+      const studyRightEducation = getEducation(educationId)
+      if (!studyRightEducation) return curr
+
+      const usePhase2 =
+        isBaMa(studyRightEducation) && !!get(orderedSnapshots[i - 1], 'study_right_graduation.phase1GraduationDate')
+
+      if (usePhase2 && !get(orderedSnapshots[i - 1], 'accepted_selection_path.educationPhase2GroupId')) return curr
+
+      const mappedId = isBaMa(studyRightEducation)
+        ? usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')
+          ? `${studyrightid}-2`
+          : `${studyrightid}-1`
+        : `${studyrightid}-1` // studyrightid duplicatefix
+
+      const sourcecode =
+        moduleGroupIdToCode[
+          orderedSnapshots[i - 1].accepted_selection_path[
+            usePhase2 ? 'educationPhase2GroupId' : 'educationPhase1GroupId'
+          ]
+        ]
+
+      const targetcode =
+        moduleGroupIdToCode[
+          snapshot.accepted_selection_path[
+            usePhase2 && has(snapshot, 'accepted_selection_path.educationPhase2GroupId')
+              ? 'educationPhase2GroupId'
+              : 'educationPhase1GroupId'
+          ]
+        ]
+
+      if (!sourcecode || !targetcode || sourcecode === targetcode) return curr
+      // source === targetcode isn't really a change between programmes, but we should still update transferdate to
+      // newer snapshot date time
+      // but: updating requires some changes to this reducers logic, so this fix can be here for now
+
+      curr.push({
+        id: `${mappedId}-${snapshot.modification_ordinal}-${sourcecode}-${targetcode}`,
+        sourcecode,
+        targetcode,
+        transferdate: new Date(snapshot.snapshot_date_time),
+        studentnumber: personIdToStudentNumber[snapshot.person_id],
+        studyrightid: mappedId
+      })
+
+      return curr
+    }, [])
+  }
+
+  const transfersByStudyRightId = {}
+  Object.values(groupedStudyRightSnapshots).forEach(snapshots => {
+    const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
+    getTransfersFrom(orderedSnapshots, snapshots[0].id, snapshots[0].education_id).forEach(
+      transfer => {
+        transfersByStudyRightId[transfer.studyrightid] = transfer
+      })
+  })
 
   const studyRightElements = Object.values(groupedStudyRightSnapshots)
     .reduce((res, snapshots) => {
@@ -185,6 +274,8 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         return res
       }
       const educationType = getEducationType(mainStudyRightEducation.education_type)
+
+      // remove this
       if (educationType.parent_id === 'urn:code:education-type:non-degree-education') {
         return res
       }
@@ -232,16 +323,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             transfersByStudyRightId,
             formattedStudyRightsById
           )
-
-          if (maProgramme.code === "420053-ma" || maProgramme.code === "MH40_009") {
-            console.log(JSON.stringify(mainStudyRight, null, 2))
-            console.log("and original codes are:")
-            console.log("educationPhase2GroupId", snapshot.accepted_selection_path.educationPhase2GroupId)
-            console.log("educationPhase2ChildGroupId", snapshot.accepted_selection_path.educationPhase2ChildGroupId)
-            console.log("mapped to:")
-            console.log(maProgramme)
-            console.log(maStudytrack)
-          }
 
           const possibleBScDuplicate = snapshotStudyRightElements.find(element => element.code === baProgramme.code)
           if (possibleBScDuplicate) {
