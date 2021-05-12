@@ -122,11 +122,6 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     } else {
       const educationType = getEducationType(studyRightEducation.education_type)
 
-      // This can be removed after filtering is done in importer!
-      if (educationType.parent_id === 'urn:code:education-type:non-degree-education') {
-        return acc
-      }
-
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
         prioritycode: parsePriorityCode(studyright),
@@ -271,12 +266,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       const mainStudyRight = snapshots[0]
       const mainStudyRightEducation = getEducation(mainStudyRight.education_id)
       if (!mainStudyRightEducation) {
-        return res
-      }
-      const educationType = getEducationType(mainStudyRightEducation.education_type)
-
-      // remove this
-      if (educationType.parent_id === 'urn:code:education-type:non-degree-education') {
         return res
       }
 
