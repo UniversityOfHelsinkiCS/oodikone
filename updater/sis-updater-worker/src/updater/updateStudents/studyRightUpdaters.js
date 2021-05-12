@@ -139,7 +139,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   return formattedStudyRights
 }
 
-const mapStudyrightElements = (studyrightid, ordinal, startdate, studentnumber, code, childCode, degreeCode, transfersByStudyRightId, formattedStudyRightsById) => {
+const mapStudyrightElements = (studyrightid, startdate, studentnumber, code, childCode, degreeCode, transfersByStudyRightId, formattedStudyRightsById) => {
   const defaultProps = {
     studyrightid,
     startdate,
@@ -273,7 +273,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       const orderedSnapshots = orderBy(snapshots, [s => new Date(s.snapshot_date_time), s =>  Number(s.modification_ordinal)], ['desc', 'desc'] )
 
       orderedSnapshots.sort(possibleBscFirst).forEach(snapshot => {
-        const ordinal = snapshot.modification_ordinal
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
@@ -290,7 +289,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           const possibleBaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
           const [baDegree, baProgramme, baStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`,
-            ordinal,
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
@@ -303,7 +301,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           const possibleMaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)
           const [maDegree, maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
-            ordinal,
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
@@ -324,7 +321,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           const possibleDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
           const [degree, programme, studytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattiifx
-            ordinal,
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
