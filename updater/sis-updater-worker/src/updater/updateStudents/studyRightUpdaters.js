@@ -24,6 +24,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   }
 
   const parseCancelDate = (studyright, phase_number = 1, isBaMa = false) => {
+    // is this really needed?
     if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
 
     if (['RESCINDED','CANCELLED_BY_ADMINISTRATION'].includes(studyright.state)) return studyright.study_right_cancellation.cancellationDate
@@ -32,6 +33,14 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   }
 
   const parseEndDate = (studyright, phase_number = 1, isBaMa = false) => {
+
+    // Set eternal studyright enddate to match what we used to use in oodi-oodikone
+    // instead of showing it as "Unavailable" in frontend
+    const isEternalStudyRight = studyright =>
+      studyright.study_right_expiration_rules_urn.includes("urn:code:study-right-expiration-rules:eternal")
+
+    if (isEternalStudyRight(studyright)) return '2112-12-21'
+
     if (isBaMa && phase_number === 2) {
       return studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
               ? studyright.study_right_graduation.phase2GraduationDate
@@ -82,18 +91,12 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     return PRIORITYCODES.SECONDARY
   }
 
-  const isEternalStudyRight = studyright =>
-    studyright.study_right_expiration_rules_urn.includes("urn:code:study-right-expiration-rules:eternal")
-
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
   const formattedStudyRights = studyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
     if (!studyRightEducation) return acc
 
-    // Set eternal studyright enddate to match what we used to use in oodi-oodikone
-    // instead of showing it as "Unavailable" in frontend
-    if (isEternalStudyRight(studyright)) studyright.valid.endDate = '2112-12-21'
 
     if (isBaMa(studyRightEducation)) {
       const studyRightBach = mapStudyright(studyright, {
