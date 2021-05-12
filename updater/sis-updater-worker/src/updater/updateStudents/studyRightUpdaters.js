@@ -1,21 +1,9 @@
 const { educationTypeToExtentcode } = require('../shared')
 const { isBaMa } = require('../../utils')
-const { get, sortBy, sortedUniqBy, orderBy, uniqBy } = require('lodash')
+const { get, sortBy, sortedUniqBy, orderBy, uniqBy, has } = require('lodash')
 const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
 const { selectFromByIds, bulkCreate } = require('../../db')
 const { getDegrees, getEducation, getEducationType, getOrganisationCode } = require('../shared')
-
-// Same end date is used in both studyright and studyrightelement updaters
-const parseEndDate = (studyright, phase_number = 1, isBaMa = false) => {
-  if (isBaMa && phase_number === 2) {
-    return studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
-            ? studyright.study_right_graduation.phase2GraduationDate
-            : studyright.valid.endDate
-  }
-  return studyright.study_right_graduation
-    ? studyright.study_right_graduation.phase1GraduationDate
-    : studyright.valid.endDate
-}
 
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
 
@@ -41,6 +29,17 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     if (['RESCINDED','CANCELLED_BY_ADMINISTRATION'].includes(studyright.state)) return studyright.study_right_cancellation.cancellationDate
     if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
     return null
+  }
+
+  const parseEndDate = (studyright, phase_number = 1, isBaMa = false) => {
+    if (isBaMa && phase_number === 2) {
+      return studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
+              ? studyright.study_right_graduation.phase2GraduationDate
+              : studyright.valid.endDate
+    }
+    return studyright.study_right_graduation
+      ? studyright.study_right_graduation.phase1GraduationDate
+      : studyright.valid.endDate
   }
 
   const parsePriorityCode = (studyright, phase_number = 1, isBaMa = false) => {
