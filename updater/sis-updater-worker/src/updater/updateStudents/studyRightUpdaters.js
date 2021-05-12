@@ -26,7 +26,6 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
       startdate: studyright.valid.startDate,
       givendate: studyright.grant_date,
       studentStudentnumber: personIdToStudentNumber[studyright.person_id],
-      educationType: 99,
       graduated: studyright.study_right_graduation ? 1 : 0,
       studystartdate: studyright.valid.startDate, 
     }
