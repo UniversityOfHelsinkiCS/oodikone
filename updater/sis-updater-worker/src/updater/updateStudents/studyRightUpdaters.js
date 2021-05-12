@@ -206,19 +206,18 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           }
         }
 
-        const endDate = parseEndDate(snapshot)
-
         if (isBaMa(mainStudyRightEducation)) {
           const possibleBaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
           const [baDegree, baProgramme, baStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`,
             ordinal,
             startDate,
-            endDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            possibleBaDegrees ? possibleBaDegrees[0].short_name.en : undefined
+            possibleBaDegrees ? possibleBaDegrees[0].short_name.en : undefined,
+            transfersByStudyRightId,
+            formattedStudyRightsById
           )
 
           const possibleMaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)
@@ -226,12 +225,23 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             `${mainStudyRight.id}-2`,
             ordinal,
             startDate,
-            parseEndDate(snapshot, 2, isBaMa),
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId],
-            possibleMaDegrees ? possibleMaDegrees[0].short_name.en : undefined 
+            possibleMaDegrees ? possibleMaDegrees[0].short_name.en : undefined ,
+            transfersByStudyRightId,
+            formattedStudyRightsById
           )
+
+          if (maProgramme.code === "420053-ma" || maProgramme.code === "MH40_009") {
+            console.log(JSON.stringify(mainStudyRight, null, 2))
+            console.log("and original codes are:")
+            console.log("educationPhase2GroupId", snapshot.accepted_selection_path.educationPhase2GroupId)
+            console.log("educationPhase2ChildGroupId", snapshot.accepted_selection_path.educationPhase2ChildGroupId)
+            console.log("mapped to:")
+            console.log(maProgramme)
+            console.log(maStudytrack)
+          }
 
           const possibleBScDuplicate = snapshotStudyRightElements.find(element => element.code === baProgramme.code)
           if (possibleBScDuplicate) {
@@ -246,15 +256,17 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
             `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattiifx
             ordinal,
             startDate,
-            endDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            possibleDegrees ? possibleDegrees[0].short_name.en : undefined
+            possibleDegrees ? possibleDegrees[0].short_name.en : undefined,
+            transfersByStudyRightId,
+            formattedStudyRightsById
           )
           snapshotStudyRightElements.push(degree, programme, studytrack)
         }
       })
+
 
       res.push(...uniqBy(snapshotStudyRightElements, 'code'))
       return res

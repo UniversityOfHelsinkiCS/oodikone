@@ -104,13 +104,13 @@ const updateStudents = async personIds => {
   const mappedStudents = students.map(studentMapper(attainments, degreeStudyRightSnapshots))
   await bulkCreate(Student, mappedStudents)
 
-  const [moduleGroupIdToCode] = await Promise.all([
+  const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
     updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
     updateStudyRights(latestStudyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality)
   ])
 
   await Promise.all([
-    updateStudyRightElements(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber),
+    updateStudyRightElements(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights),
     updateTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber),
     updateAttainments(attainments, personIdToStudentNumber),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber)
