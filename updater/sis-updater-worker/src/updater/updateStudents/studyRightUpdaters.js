@@ -18,6 +18,7 @@ const parseEndDate = (studyright, phase_number = 1, isBaMa = false) => {
 }
 
 const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
+
   const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
     const defaultProps = {
       studyrightid: studyright.id,
@@ -83,11 +84,18 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
     return PRIORITYCODES.SECONDARY
   }
 
+  const isEternalStudyRight = studyright =>
+    studyright.study_right_expiration_rules_urn.includes("urn:code:study-right-expiration-rules:eternal")
+
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
   const formattedStudyRights = studyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
     if (!studyRightEducation) return acc
+
+    // Set eternal studyright enddate to match what we used to use in oodi-oodikone
+    // instead of showing it as "Unavailable" in frontend
+    if (isEternalStudyRight(studyright)) studyright.valid.endDate = '2112-12-21'
 
     if (isBaMa(studyRightEducation)) {
       const studyRightBach = mapStudyright(studyright, {
