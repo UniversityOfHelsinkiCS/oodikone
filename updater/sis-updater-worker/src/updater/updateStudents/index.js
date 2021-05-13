@@ -222,7 +222,8 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async (attainments) => {
-    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => (att) => {
+    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async (att) => {
+      if (att.state === "INCLUDED") return null
       if (att.type !== 'CustomCourseUnitAttainment') return att
   
       const courseUnits = courses.filter(c => c.code === attIdToCourseCode[att.id])
@@ -250,13 +251,37 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     
           return isAfterStart && isBeforeEnd
         })
-        if (!courseUnit) return att
+      
       }
   
+      if (!courseUnit) {
+        const codeParts = att.code.split(/\-\d+$/)
+        if (!codeParts.length) return att
+        const parsedCourseCode = codeParts[0]
+        try {
+          const [course, created] = await Course.findOrCreate({
+            where: {
+              code: parsedCourseCode
+            },
+            defaults: {
+              id: parsedCourseCode,
+              name: att.name,
+              code: parsedCourseCode,
+              coursetypecode: att.study_level_urn
+            }
+          })
+          courseUnit = course ? course : created
+          courseUnit.group_id = courseUnit.id
+        } catch (error) {
+          console.log(error)
+        }
+      }
+
+      if (!courseUnit) return att
       // Add the course to the mapping objects for creditMapper to work properly.
       courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
       courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
-  
+
       return { ...att, course_unit_id: courseUnit.id }
     }
   
@@ -264,9 +289,8 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
       if (att.type !== 'CustomCourseUnitAttainment') return attainmentIdCodeMap
       if (!att.code) return attainmentIdCodeMap
   
-      const codeParts = att.code.split(/\-\d+$/)
+      const codeParts = att.code.split("-")
       if (!codeParts.length) return attainmentIdCodeMap
-  
       const parsedCourseCode = codeParts[0]
       return { ...attainmentIdCodeMap, [att.id]: parsedCourseCode }
     }
@@ -274,7 +298,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
     const courses = await getCourseUnitsByCodes(missingCodes)
-    return attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments))
+    return Promise.all(attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)))
   }
 
   const fixedAttainments = await fixCustomCourseUnitAttainments(attainments) 
