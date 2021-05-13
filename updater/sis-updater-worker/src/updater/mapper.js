@@ -43,7 +43,7 @@ const calculateTotalCreditsFromAttainments = attainments => {
   return totalCredits
 }
 
-const studentMapper = (attainments, studyRights) => student => {
+const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
 
   // Test student
@@ -61,7 +61,7 @@ const studentMapper = (attainments, studyRights) => student => {
     studyRightsOfStudent.length > 0 ? sortBy(studyRightsOfStudent.map(sr => sr.valid.startDate))[0] : null
 
   // Current db doesn't have studentnumbers in attainment table so have to use person_id for now.
-  const attainmentsOfStudent = attainments.filter(attainment => attainment.person_id === id)
+  const attainmentsOfStudent = attainments.filter(attainment => (attainment.person_id === id && !attainmentsToBeExluced.has(attainment.id)))
 
   return {
     lastname: last_name,
