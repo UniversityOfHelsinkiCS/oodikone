@@ -199,39 +199,33 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   const code = req.query.code
 
   console.log('Throughput stats recalculation starting')
-  const codes = code ? [code] : (await getAllProgrammes()).map(p => p.code)
   try {
-    const data = codes.reduce((acc, id) => ({ ...acc, [id]: { status: 'RECALCULATING' } }), {})
-    await patchThroughput(data)
+    await patchThroughput({ [code]: { status: 'RECALCULATING' } })
     res.status(200).end()
   } catch (e) {
     console.error(e)
     return res.status(500).end()
   }
 
-  let ready = 0
-  for (const code of codes) {
-    try {
-      if (code.includes('MH') || code.includes('KH')) {
-        const data = await throughputStatsForStudytrack(code, 2017)
-        await setThroughput(data)
-      } else {
-        const data = await throughputStatsForStudytrack(code, 2000)
-        await setThroughput(data)
-      }
-    } catch (e) {
-      try {
-        await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
-      } catch (e) {
-        console.error(e)
-        return
-      }
-      console.error(e)
-      console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
+  try {
+    if (code.includes('MH') || code.includes('KH')) {
+      const data = await throughputStatsForStudytrack(code, 2017)
+      await setThroughput(data)
+    } else {
+      const data = await throughputStatsForStudytrack(code, 2000)
+      await setThroughput(data)
     }
-    ready += 1
-    console.log(`Throughput stats recalculation ${ready}/${codes.length} done`)
+  } catch (e) {
+    try {
+      await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
+    } catch (e) {
+      console.error(e)
+      return
+    }
+    console.error(e)
+    console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
   }
+  console.log(`Throughput stats recalculation for studyprogramme ${code} done`)
 })
 
 /* router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {
