@@ -345,6 +345,7 @@ const startCron = () => {
   if (process.env.NODE_ENV === 'production') {
     schedule('0 6 * * *', async () => {
       await refreshStatistics()
+      await refreshStatisticsV2()
       await refreshCDS()
     })
 
