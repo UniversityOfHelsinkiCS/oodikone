@@ -129,45 +129,35 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   const code = req.query.code
 
   console.log('Productivity stats recalculation starting')
-  const codes = code ? [code] : (await getAllProgrammes()).map(p => p.code)
   try {
-    await patchProductivity(
-      codes.reduce((acc, c) => {
-        acc[c] = { status: 'RECALCULATING' }
-        return acc
-      }, {})
-    )
+    await patchThroughput({ [code]: { status: 'RECALCULATING' } })
     res.status(200).end()
   } catch (e) {
     console.error(e)
     return res.status(500).end()
   }
 
-  let ready = 0
-  for (const code of codes) {
-    try {
-      if (code.includes('MH') || code.includes('KH')) {
-        const data = await productivityStatsForStudytrack(code, new Date('2017-07-31'))
-        await setProductivity(data)
-      } else {
-        const data = await productivityStatsForStudytrack(code, new Date('2000-07-31'))
-        await setProductivity(data)
-      }
-    } catch (e) {
-      try {
-        await patchProductivity({
-          [code]: { status: 'RECALCULATION ERRORED' }
-        })
-      } catch (e) {
-        console.error(e)
-        return
-      }
-      console.error(e)
-      console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
+  try {
+    if (code.includes('MH') || code.includes('KH')) {
+      const data = await productivityStatsForStudytrack(code, new Date('2017-07-31'))
+      await setProductivity(data)
+    } else {
+      const data = await productivityStatsForStudytrack(code, new Date('2000-07-31'))
+      await setProductivity(data)
     }
-    ready += 1
-    console.log(`Productivity stats recalculation ${ready}/${codes.length} done`)
+  } catch (e) {
+    try {
+      await patchProductivity({
+        [code]: { status: 'RECALCULATION ERRORED' }
+      })
+    } catch (e) {
+      console.error(e)
+      return
+    }
+    console.error(e)
+    console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
   }
+  console.log(`Productivity stats recalculation for studyprogramme ${code} done`)
 })
 
 router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
