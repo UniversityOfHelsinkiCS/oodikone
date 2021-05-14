@@ -155,7 +155,8 @@ const mapStudyrightElements = (studyrightid, startdate, studentnumber, code, chi
   if (transfersByStudyRightId[studyrightid]) {
     const transfer = transfersByStudyRightId[studyrightid]
     if (code === transfer.sourcecode) {
-      enddate = transfer.transferdate
+      enddate = new Date(transfer.transferdate)
+      enddate.setDate(enddate.getDate() - 1)
     } else if (code === transfer.targetcode) {
       startdate = transfer.transferdate
     }
