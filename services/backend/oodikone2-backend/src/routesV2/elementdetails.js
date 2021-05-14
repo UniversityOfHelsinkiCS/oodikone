@@ -14,8 +14,8 @@ const {
   setProductivity,
   getThroughput,
   setThroughput,
-  /* patchProductivity,
-  patchThroughput, */
+  patchProductivity,
+  patchThroughput,
   getNonGraduatedStudents
   //ping
 } = require('../servicesV2/analyticsService')
@@ -125,7 +125,7 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   }
 })
 
-/* router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
+router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   const code = req.query.code
 
   console.log('Productivity stats recalculation starting')
@@ -168,7 +168,7 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     ready += 1
     console.log(`Productivity stats recalculation ${ready}/${codes.length} done`)
   }
-}) */
+})
 
 router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
   const code = req.params.id
@@ -195,7 +195,7 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
   }
 })
 
-/* router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
+router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   const code = req.query.code
 
   console.log('Throughput stats recalculation starting')
@@ -232,7 +232,7 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
     ready += 1
     console.log(`Throughput stats recalculation ${ready}/${codes.length} done`)
   }
-}) */
+})
 
 /* router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {
   const { id } = req.params
