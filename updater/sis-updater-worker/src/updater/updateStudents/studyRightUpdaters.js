@@ -36,9 +36,10 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
 
     // Set eternal studyright enddate to match what we used to use in oodi-oodikone
     // instead of showing it as "Unavailable" in frontend
-    const isEternalStudyRight = studyright =>
-      studyright.study_right_expiration_rules_urn.includes("urn:code:study-right-expiration-rules:eternal")
-
+    const isEternalStudyRight = studyright => studyright
+        && studyright.study_right_expiration_rules_urn
+        && studyright.study_right_expiration_rules_urn.includes("urn:code:study-right-expiration-rules:eternal")
+  
     if (isEternalStudyRight(studyright)) studyright.valid.endDate = '2112-12-21'
 
     if (isBaMa && phase_number === 2) {
