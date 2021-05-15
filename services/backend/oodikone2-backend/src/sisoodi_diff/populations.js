@@ -16,15 +16,14 @@ let verbose = false
 const ignores = {
   KH40_006: {
     2020: {
-     oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+      oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
-  KH50_004: {
+  KH50_001: {
     2020: {
-      oodi: ['013881465'], // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+      oodi: ['013470384'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
-
   KH60_001: {
     2017: {
       oodi: [
@@ -53,17 +52,18 @@ const ignores = {
       oodi: ['014577749'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     },
     2020: {
-      oodi: [
-        '014925414' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
-      ], 
+      oodi: ['014925414'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
     }
   },
   MH20_001: {
     2020: {
-      oodi: [
-        '014509160', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
-      ] 
+      oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
     }
+  },
+  MH30_004: {
+    2020: {
+      oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+    } 
   },
   MH40_002: {
     2019: {
@@ -105,6 +105,7 @@ const ignores = {
       sis: ['014949160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     }
   },
+
   MH57_005: {
     2018: {
       sis: [
@@ -125,7 +126,6 @@ const ignores = {
       sis: ['014917639'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     },
   },
-
   MH70_004: {
     2018: {
       sis: ['014919873'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
@@ -146,28 +146,26 @@ const ignores = {
       oodi: ['014404139'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
     },
     2018: {
-      oodi: ['013175676'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2852
       sis: ['014370386'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     },
     2019: {
       sis: ['014863644'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     },
     2020: {
-      oodi: [
-        '014453520' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-      ], 
+      oodi: ['014453520'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
+
   MH80_001: {
     2020: {
       oodi: [
-        '014343643', '014015735', '014016572', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+       '014343643', '014015735', '014016572', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       ]
     }
   },
   MH80_006: {
     2020: {
-     oodi: ['014586293'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+      oodi: ['014586293'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
     }
   },
   MH80_007: {
@@ -182,7 +180,6 @@ const ignores = {
       sis: [ '014739590', '014849105', '014750427', '014848627', '014811706', '014830114', 
         '014786132', '011488048', '012740617', '014451234', '014741193', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
         '014829031', '014818848' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-        
       ] 
     },
     2018: {
