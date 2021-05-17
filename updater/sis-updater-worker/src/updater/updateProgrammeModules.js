@@ -187,7 +187,6 @@ const updateProgrammeModules = async (entityIds = []) => {
   }
 
   await bulkCreate(ProgrammeModule, Object.values(programmes))
-  // await bulkCreate(ProgrammeModuleChild, Object.values(joins), null, ['composite'])
   for (const join of Object.values(joins)) {
     await ProgrammeModuleChild.upsert(join)
   }
