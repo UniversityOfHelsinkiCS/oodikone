@@ -18,9 +18,19 @@ const genderMankeli = gender => {
 }
 
 const calculateTotalCreditsFromAttainments = attainments => {
+  const alreadyAddedIds = new Set()
   const attainmentsToSum = attainments.filter(att => {
     if (att.misregistration) {
       return false
+    }
+
+    const idParts = att.id.split("-")
+    if (idParts && idParts.length > 2) {
+      if (alreadyAddedIds.has(idParts[2])) {
+        return false
+      } else {
+        alreadyAddedIds.add(idParts[2])
+      }
     }
 
     // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
