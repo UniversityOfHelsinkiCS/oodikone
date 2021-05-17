@@ -26,11 +26,10 @@ const calculateTotalCreditsFromAttainments = attainments => {
     // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
     // See, e.g., TKT5
     // Logic copyed from
-    const isSubstitutedOrIncludedStudyModule =
-      (att.state === 'SUBSTITUTED' || att.state === 'INCLUDED') && att.module_id !== null
+    const isIncludedStudyModule = (att.state === 'INCLUDED') && att.module_id !== null
     const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment']
 
-    return validTypes.includes(att.type) || isSubstitutedOrIncludedStudyModule
+    return validTypes.includes(att.type) || isIncludedStudyModule
   })
 
   const totalCredits = attainmentsToSum.reduce((sum, att) => {
