@@ -140,57 +140,56 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   return formattedStudyRights
 }
 
-const mapStudyrightElements = (studyrightid, startdate, studentnumber, code, childCode, degreeCode, transfersByStudyRightId, formattedStudyRightsById) => {
-  const defaultProps = {
-    studyrightid,
-    startdate,
-    studentnumber,
-  }
-
-  // be default, well use the enddate in studyright and given startdate 
-  // (might be horrible logic, check later)
-  let enddate = formattedStudyRightsById[studyrightid].enddate
-  let realStartDate = startdate
-
-  // except when studyright has been transferred, then override
-  if (transfersByStudyRightId[studyrightid]) {
-    const transfer = transfersByStudyRightId[studyrightid]
-    if (code === transfer.sourcecode) {
-      enddate = new Date(transfer.transferdate)
-      enddate.setDate(enddate.getDate() - 1)
-    } else if (code === transfer.targetcode) {
-      startdate = transfer.transferdate
-    }
-  }
-
-
-  // we should probably map degree in a different manner since degree can be per many
-  // programmes and studytracks. Now the correct one might be overwritten later.
-  return [
-    {
-    ...defaultProps,
-    id: `${defaultProps.studyrightid}-${degreeCode}`,
-    code: degreeCode,
-    enddate,
-    },
-    {
-      ...defaultProps,
-      id: `${defaultProps.studyrightid}-${code}`,
-      code,
-      enddate,
-      startdate: realStartDate
-    },
-    {
-      ...defaultProps,
-      id: `${defaultProps.studyrightid}-${childCode}`,
-      code: childCode,
-      enddate,
-      startdate: realStartDate
-    },
-  ]
-}
-
 const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights) => {
+  const mapStudyrightElements = (studyrightid, startdate, studentnumber, code, childCode, degreeCode, transfersByStudyRightId, formattedStudyRightsById) => {
+    const defaultProps = {
+      studyrightid,
+      startdate,
+      studentnumber,
+    }
+  
+    // be default, well use the enddate in studyright and given startdate 
+    // (might be horrible logic, check later)
+    let enddate = formattedStudyRightsById[studyrightid].enddate
+    let realStartDate = startdate
+  
+    // except when studyright has been transferred, then override
+    if (transfersByStudyRightId[studyrightid]) {
+      const transfer = transfersByStudyRightId[studyrightid]
+      if (code === transfer.sourcecode) {
+        enddate = new Date(transfer.transferdate)
+        enddate.setDate(enddate.getDate() - 1)
+      } else if (code === transfer.targetcode) {
+        startdate = transfer.transferdate
+      }
+    }
+  
+  
+    // we should probably map degree in a different manner since degree can be per many
+    // programmes and studytracks. Now the correct one might be overwritten later.
+    return [
+      {
+      ...defaultProps,
+      id: `${defaultProps.studyrightid}-${degreeCode}`,
+      code: degreeCode,
+      enddate,
+      },
+      {
+        ...defaultProps,
+        id: `${defaultProps.studyrightid}-${code}`,
+        code,
+        enddate,
+        startdate: realStartDate
+      },
+      {
+        ...defaultProps,
+        id: `${defaultProps.studyrightid}-${childCode}`,
+        code: childCode,
+        enddate,
+        startdate: realStartDate
+      },
+    ]
+  }
 
   const formattedStudyRightsById = {}
   Object.values(formattedStudyRights).forEach(studyright => {
@@ -288,26 +287,24 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         }
 
         if (isBaMa(mainStudyRightEducation)) {
-          const possibleBaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
           const [baDegree, baProgramme, baStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`,
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            possibleBaDegrees ? possibleBaDegrees[0].short_name.en : undefined,
+            snapshot.phase1_education_classification_urn,
             transfersByStudyRightId,
             formattedStudyRightsById
           )
 
-          const possibleMaDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase2GroupId)
           const [maDegree, maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId],
-            possibleMaDegrees ? possibleMaDegrees[0].short_name.en : undefined ,
+            snapshot.phase2_education_classification_urn,
             transfersByStudyRightId,
             formattedStudyRightsById
           )
@@ -320,14 +317,13 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           }
 
         } else {
-          const possibleDegrees = getDegrees(mainStudyRight.accepted_selection_path.educationPhase1GroupId)
           const [degree, programme, studytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattiifx
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            possibleDegrees ? possibleDegrees[0].short_name.en : undefined,
+            snapshot.phase1_education_classification_urn,
             transfersByStudyRightId,
             formattedStudyRightsById
           )
