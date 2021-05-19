@@ -36,6 +36,7 @@ const update = async ({ entityIds, type }) => {
     case 'study_modules':
       return await updateHandler(await selectFromByIds('modules', entityIds, 'group_id'))
     case 'education_types':
+      return await updateHandler(await selectFromByIds(type, entityIds))
     case 'study_levels':
       return await updateHandler(await selectFromByIds(type, entityIds))
     case 'programme_modules':
