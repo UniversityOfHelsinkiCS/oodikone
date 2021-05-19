@@ -1,22 +1,26 @@
 /* eslint-disable */
 
 const _ = require('lodash')
-const { Transfer, StudyrightElement } = require('../models')
-const { Transfer: SISTranfer } = require('../modelsV2')
+const { Transfers, StudyrightElement } = require('../models')
+const { Transfer: SISTransfer } = require('../modelsV2')
+const { Op } = require('sequelize')
+
+let total = 0
 
 const populationDiff = async (programme) => {
 
-  const resultOodi = (await Transfer.findAll({
+  const resultOodi = (await Transfers.findAll({
     where: {
       sourcecode: programme
     }
   })).map(s => s.studentnumber)
 
-  const resultSis = (await SISTranfer.findAll({
+  const resultSis = (await SISTransfer.findAll({
     where: {
       sourcecode: programme
     }
   })).map(s => s.studentnumber)
+
 
   let sisOnly = _.difference(resultSis, resultOodi)
   let oodiOnly = _.difference(resultOodi, resultSis)
@@ -24,6 +28,7 @@ const populationDiff = async (programme) => {
   if (oodiOnly.length === 0 && sisOnly.length === 0) return
 
   const both = new Set([...resultSis, ...resultOodi])
+  total += both.size
 
   // Check for possible causes and group together
   console.log(`=== ${programme} ===`)
@@ -41,7 +46,8 @@ const populationDiff = async (programme) => {
 }
 
 const programmeDiff = async programme => {
-  await populationDiff(programme, year)
+  console.log('\n' + programme)
+  await populationDiff(programme)
   // const years = ['2017', '2018', '2019', '2020']
   // console.log('\n' + programme)
   // for (const year of years) {
@@ -119,6 +125,8 @@ const main = async () => {
       await programmeDiff(programme)
     }
   }
+
+  console.log("== TOTAL: ", total)
 }
 
 main()
