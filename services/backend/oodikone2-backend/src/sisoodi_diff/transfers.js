@@ -5,8 +5,22 @@ const { Transfers, StudyrightElement } = require('../models')
 const { Transfer: SISTransfer } = require('../modelsV2')
 const { Op } = require('sequelize')
 
-let totalFrom = 0
-let totalTo = 0
+
+// To check for duplicate transfers in oodi, use following sql in psql
+// SELECT
+//     transferdate, COUNT(transferdate),
+//     studentnumber, COUNT(studentnumber),
+//     sourcecode, COUNT(sourcecode),
+//     targetcode, COUNT(targetcode)
+// FROM
+//     transfers
+// GROUP BY
+//     transferdate, studentnumber, sourcecode, targetcode
+// HAVING
+//     (COUNT(transferdate) > 1) AND
+//     (COUNT(studentnumber) > 1) AND
+//     (COUNT(sourcecode) > 1) AND
+//     (COUNT(targetcode) > 1);
 
 const transferDiff = async (programme) => {
   [true, false].forEach(async fromProgramme => {
@@ -26,11 +40,6 @@ const transferDiff = async (programme) => {
     if (oodiOnly.length === 0 && sisOnly.length === 0) return
 
     const both = new Set([...resultSis, ...resultOodi])
-    if (fromProgramme) {
-      totalFrom += both.size
-    } else {
-      totalTo += both.size
-    }
 
     // Check for possible causes and group together 
     const direction = fromProgramme ? "Transferred from" : "Transferred to"
@@ -111,12 +120,9 @@ const main = async () => {
       }
     }
   }
-  console.log("== TOTAL FROM: ", totalFrom)
-  console.log("== TOTAL TO: ", totalTo)
 }
 
 main()
-
 /* 
   how to run:
     docker exec backend node /usr/src/app/src/sisoodi_diff/transfers.js
