@@ -47,7 +47,8 @@
     "updater:dev:down": "npm run docker:updater:real -- down --remove-orphans",
     "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
-    "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js"
+    "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",
+    "diff:transfers": "docker exec backend node /usr/src/app/src/sisoodi_diff/transfers.js"
   },
   "husky": {
     "hooks": {
