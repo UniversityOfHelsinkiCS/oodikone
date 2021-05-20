@@ -9,7 +9,6 @@ const {
   getSemester,
   getCountry,
 } = require('./shared')
-const { CREDIT_TYPE_CODES } = require('./shared')
 
 const genderMankeli = gender => {
   if (gender === 'male') return 1
@@ -25,14 +24,21 @@ const validStates = ['INCLUDED', 'SUBSTITUTED', 'ATTAINED']
 // Basically all types at the moment
 const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment', 'ModuleAttainment', 'DegreeAttainment']
 
+const now = new Date()
+
 const calculateTotalCreditsFromAttainments = attainments => {
   const attainmentsToSum = attainments.filter(att => {
-    // Miss-registrations are not counted to the total
+    // Misregistrations are not counted to the total
     if (att.misregistration) {
       return false
     }
 
     if (!att.primary) {
+      return false
+    }
+
+    // Expired attainments are not counted in the total
+    if (att.expiryDate < now) {
       return false
     }
 
