@@ -219,7 +219,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     return res
   }, {})
 
-  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment', 'CustomCourseUnitAttainment'])
+  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment'])
   const creditTeachers = []
 
   const coursesToBeCreated = new Map()
@@ -228,11 +228,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const fixCustomCourseUnitAttainments = async (attainments) => {
 
     const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async (att) => {
-      if (att.type !== 'CustomCourseUnitAttainment') return att
-
-      // const idPartsToCheck = att.id.split("-")
-      // if (idPartsToCheck && idPartsToCheck.length > 2 && alreadyAddedIds.has(idPartsToCheck[2])) return null
-
+      if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') return att
       const courseUnits = courses.filter(c => c.code === attIdToCourseCode[att.id])
       let courseUnit = courseUnits.find(cu => {
         const { startDate, endDate } = cu.validity_period
@@ -257,10 +253,9 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     
           return isAfterStart && isBeforeEnd
         })
-      
       }
   
-      if (!courseUnit) {
+      if (!courseUnit && att.type === 'CustomCourseUnitAttainment') {
         const parsedCourseCode = attIdToCourseCode[att.id]
         const course = await Course.findOne({
           where: {
@@ -288,9 +283,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     }
   
     const findMissingCourseCodes = (attainmentIdCodeMap, att) => {
-      if (att.type !== 'CustomCourseUnitAttainment') {
-        // const idPartsToCheck = att.id.split("-")
-        // if (idPartsToCheck && idPartsToCheck.length > 2) alreadyAddedIds.add(idPartsToCheck[2])
+      if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') {
         return attainmentIdCodeMap
       }
       if (!att.code) return attainmentIdCodeMap
@@ -310,8 +303,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       return { ...attainmentIdCodeMap, [att.id]: parsedCourseCode }
     }
 
-    // There are duplicate attainments of which only one should pass through
-    // const alreadyAddedIds = new Set()
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
     const courses = await getCourseUnitsByCodes(missingCodes)
