@@ -17,38 +17,35 @@ const genderMankeli = gender => {
   return 3
 }
 
+// "Included and substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc
+//  This rules out failed units and modules as well as improved ones
+// See, e.g., TKT5
+const validStates = ['INCLUDED', 'SUBSTITUTED', 'ATTAINED']
+
+// Basically all types at the moment
+const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment', 'ModuleAttainment', 'DegreeAttainment']
+
 const calculateTotalCreditsFromAttainments = attainments => {
-  const alreadyAddedIds = new Set()
   const attainmentsToSum = attainments.filter(att => {
+    // Miss-registrations are not counted to the total
     if (att.misregistration) {
       return false
     }
 
-    const idParts = att.id.split("-")
-    if (idParts && idParts.length > 2) {
-      if (alreadyAddedIds.has(idParts[2])) {
-        return false
-      } else {
-        alreadyAddedIds.add(idParts[2])
-      }
+    if (!att.primary) {
+      return false
     }
 
-    // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
-    // See, e.g., TKT5
-    // Logic copyed from
-    const isIncludedStudyModule = (att.state === 'INCLUDED') && att.module_id !== null
-    const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment']
+    // Does not have any attainments attached to it, so is not a study module whose attainments have already been counted
+    const leafLevelAttainment = !att.nodes || att.nodes.length === 0 
 
-    return validTypes.includes(att.type) || isIncludedStudyModule
+    return validTypes.includes(att.type) && validStates.includes(att.state) && leafLevelAttainment
   })
 
   const totalCredits = attainmentsToSum.reduce((sum, att) => {
-    const credittypecode = getCreditTypeCodeFromAttainment(att, getGrade(att.grade_scale_id, att.grade_id).passed)
-    if (credittypecode === CREDIT_TYPE_CODES.APPROVED || credittypecode === CREDIT_TYPE_CODES.PASSED) {
-      return sum + Number(att.credits)
-    }
-    return sum
+    return sum + Number(att.credits)
   }, 0)
+
   return totalCredits
 }
 
@@ -134,7 +131,7 @@ const creditMapper = (
 
   // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
   // See, e.g., TKT5
-  const isSubstitutedStudyModule = state === 'SUBSTITUTED' && module_id !== null
+  const isSubstitutedStudyModule = (state === 'SUBSTITUTED' || state === 'INCLUDED') && module_id !== null
   const isStudyModule = isModule(type) && !isSubstitutedStudyModule
 
   return {
