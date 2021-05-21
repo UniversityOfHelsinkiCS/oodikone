@@ -130,10 +130,9 @@ const findGraduatedFromBscAndTransferred = async transfers => {
       let source = transfer.sourcecode
 
       // with this you can test if student is transferred multiple times on msc and find
-      // the original.
+      // the original. put the studentnumber to test to potentials array
       const potentials = []
 
-      // if (sn === 'studennumberhere') {
       if (potentials.includes(sn)) {
         const tfs = allTransfersForTheseStudentsByStudentNumber[sn]
         const findOriginalSource = code => {
@@ -141,7 +140,6 @@ const findGraduatedFromBscAndTransferred = async transfers => {
           if (!transferThatHasThisAsTarget) return code
           return findOriginalSource(transferThatHasThisAsTarget.sourcecode)
         }
-        console.log('Found original source for', sn)
         source = findOriginalSource(transfer.sourcecode)
       }
 
