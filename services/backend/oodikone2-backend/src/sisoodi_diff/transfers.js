@@ -17,9 +17,15 @@ const knownFromPopulations = flatten(ignores)
 
 const knownTransferErrors = {
   oodi: [
-    '013879228' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2927
+    '013879228', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2927
+    '012602807', // just plain weird case: https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2930
+    '014271993', // same as previous
+    '014625659', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2931
   ],
-  sis: []
+  sis: [
+    '013164917', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2929
+    '013303888'  // same as previous
+  ]
 }
 
 // To check for duplicate transfers in oodi, use following sql in psql
