@@ -6,17 +6,17 @@ const { Transfer: SISTransfer } = require('../modelsV2')
 const { Op } = require('sequelize')
 const { ignores } = require('./populations')
 
-const flatten = function (obj) {
+const flatten = function(obj) {
   if (Array.isArray(obj)) {
     return obj
   }
   return Object.values(obj).reduce((acc, curr) => [...acc, ...flatten(curr)], [])
-};
+}
 
 const knownFromPopulations = flatten(ignores)
 
 const knownTransferErrors = {
-  oodi: [ 
+  oodi: [
     '013879228' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2927
   ],
   sis: []
@@ -39,63 +39,70 @@ const knownTransferErrors = {
 //     (COUNT(targetcode) > 1);
 //
 
-
-const findGraduatedFromBscAndTransferred = async (transfers) => {
-  const studyRightElementsByStudentNumber = (await StudyrightElement.findAll({
-    where: {
-      studentnumber: {
-        [Op.in]: transfers.map(s => s.studentnumber)
-      }
-    },
-    include: [
-      {
-      model: ElementDetails,
-      required: true,
+const findGraduatedFromBscAndTransferred = async transfers => {
+  const studyRightElementsByStudentNumber = (
+    await StudyrightElement.findAll({
+      where: {
+        studentnumber: {
+          [Op.in]: transfers.map(s => s.studentnumber)
+        }
       },
-      {
-      model: Studyright,
-      required: true,
-      }
-    ]
-  })).reduce((acc, curr) => {
+      include: [
+        {
+          model: ElementDetails,
+          required: true
+        },
+        {
+          model: Studyright,
+          required: true
+        }
+      ]
+    })
+  ).reduce((acc, curr) => {
     const sn = curr.studentnumber
-    return {...acc, [sn]: acc[sn] ? [...acc[sn], curr] : [curr]}
+    return { ...acc, [sn]: acc[sn] ? [...acc[sn], curr] : [curr] }
   })
 
   const comparableDate = date => new Date(date).toISOString()
 
-  return transfers.filter(transfer => {
-    const sn = transfer.studentnumber
-    const studyRightElementOfSource = studyRightElementsByStudentNumber[sn]
-                                      .find(e => e.code == transfer.sourcecode && e.studyrightid == transfer.studyrightid)
+  return transfers
+    .filter(transfer => {
+      const sn = transfer.studentnumber
+      const studyRightElementOfSource = studyRightElementsByStudentNumber[sn].find(
+        e => e.code == transfer.sourcecode && e.studyrightid == transfer.studyrightid
+      )
 
-    const studyRightElementOfSourcesBsc = studyRightElementsByStudentNumber[sn]
-                                .find(e => comparableDate(e.startdate) == comparableDate(studyRightElementOfSource.startdate) && e.id != studyRightElementOfSource.id && e.element_detail.type == '20')
+      const studyRightElementOfSourcesBsc = studyRightElementsByStudentNumber[sn].find(
+        e =>
+          comparableDate(e.startdate) == comparableDate(studyRightElementOfSource.startdate) &&
+          e.id != studyRightElementOfSource.id &&
+          e.element_detail.type == '20'
+      )
 
-    return studyRightElementOfSourcesBsc && studyRightElementOfSourcesBsc.studyright.graduated
-  }).map(s => s.studentnumber)
+      return studyRightElementOfSourcesBsc && studyRightElementOfSourcesBsc.studyright.graduated
+    })
+    .map(s => s.studentnumber)
 }
 
 // FromProgramme --> check sourcecode, otherwise to programm --> targetcode
-const transferDiff = async (programme) => {
-
-  const transfersOodi = (await Transfers.findAll({
-    where: {targetcode: programme}
-  }))
+const transferDiff = async programme => {
+  const transfersOodi = await Transfers.findAll({
+    where: { targetcode: programme }
+  })
   const transfersOodiStudennumbers = transfersOodi.map(s => s.studentnumber)
 
-  const transfersSis = (await SISTransfer.findAll({
-    where: {targetcode: programme}
-  }))
+  const transfersSis = await SISTransfer.findAll({
+    where: { targetcode: programme }
+  })
   const transfersSisStudentnumbers = transfersSis.map(s => s.studentnumber)
 
   let sisOnly = _.difference(transfersSisStudentnumbers, transfersOodiStudennumbers)
   let oodiOnly = _.difference(transfersOodiStudennumbers, transfersSisStudentnumbers)
 
   const oodiOnlySet = new Set(oodiOnly)
-  const oodiOnlyData= transfersOodi.filter(t => oodiOnlySet.has(t.studentnumber))
+  const oodiOnlyData = transfersOodi.filter(t => oodiOnlySet.has(t.studentnumber))
 
-  // Filter cases already known 
+  // Filter cases already known
   if (oodiOnly.length > 0) {
     oodiOnly = _.difference(oodiOnly, knownTransferErrors.oodi)
   }
@@ -112,7 +119,7 @@ const transferDiff = async (programme) => {
   }
 
   // Filter known good cases out
-  if (oodiOnly.length > 0 && programme.startsWith("MH")) {
+  if (oodiOnly.length > 0 && programme.startsWith('MH')) {
     const graduatedFromBscAndTransferred = await findGraduatedFromBscAndTransferred(oodiOnlyData)
     oodiOnly = _.difference(oodiOnly, graduatedFromBscAndTransferred)
   }
@@ -122,19 +129,20 @@ const transferDiff = async (programme) => {
   console.log(`=== Transferred to ${programme} ===`)
 
   if (oodiOnly.length > 0) {
-    console.log("in oodi: ")
+    console.log('in oodi: ')
     console.log(oodiOnly.join('\n'))
   }
 
   if (sisOnly.length > 0) {
-    console.log("in sis:")
+    console.log('in sis:')
     console.log(sisOnly.join('\n'))
   }
 
   return [oodiOnly.length, sisOnly.length]
 }
 
-const findProgrammes = async (programmetype) => (
+const findProgrammes = async programmetype =>
+  (
     await StudyrightElement.findAll({
       attributes: ['code'],
       where: {
@@ -147,7 +155,7 @@ const findProgrammes = async (programmetype) => (
     })
   ).map(s => s.code)
 
-const calculateDiffs = async (programmetype) => {
+const calculateDiffs = async programmetype => {
   let oodiOnly = 0
   let sisOnly = 0
   const programmes = await findProgrammes(programmetype)
@@ -157,16 +165,16 @@ const calculateDiffs = async (programmetype) => {
     sisOnly += result[1]
   }
 
-  console.log("\nTotals:")
-  console.log("oodiOnly total: ", oodiOnly)
-  console.log("sisOnly total:", sisOnly)
+  console.log('\nTotals:')
+  console.log('oodiOnly total: ', oodiOnly)
+  console.log('sisOnly total:', sisOnly)
 }
 
 const main = async () => {
-  console.log("=== BSC ===")
-  await calculateDiffs("KH")
-  console.log("=== MSC ===")
-  await calculateDiffs("MH")
+  console.log('=== BSC ===')
+  await calculateDiffs('KH')
+  console.log('=== MSC ===')
+  await calculateDiffs('MH')
 }
 
 main()
