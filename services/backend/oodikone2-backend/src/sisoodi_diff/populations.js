@@ -687,3 +687,7 @@ main()
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2852
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
 */
+
+module.exports = {
+  ignores
+}
