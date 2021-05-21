@@ -15,6 +15,13 @@ const flatten = function (obj) {
 
 const knownFromPopulations = flatten(ignores)
 
+const knownTransferErrors = {
+  oodi: [ 
+    '013879228' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2927
+  ],
+  sis: []
+}
+
 // To check for duplicate transfers in oodi, use following sql in psql
 // SELECT
 //     transferdate, COUNT(transferdate),
@@ -87,6 +94,14 @@ const transferDiff = async (programme) => {
 
   const oodiOnlySet = new Set(oodiOnly)
   const oodiOnlyData= transfersOodi.filter(t => oodiOnlySet.has(t.studentnumber))
+
+  // Filter cases already known 
+  if (oodiOnly.length > 0) {
+    oodiOnly = _.difference(oodiOnly, knownTransferErrors.oodi)
+  }
+  if (sisOnly.length > 0) {
+    sisOnly = _.difference(sisOnly, knownTransferErrors.sis)
+  }
 
   // Filter students found in populations script away
   if (oodiOnly.length > 0) {
