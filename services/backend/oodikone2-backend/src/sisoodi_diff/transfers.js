@@ -4,7 +4,16 @@ const _ = require('lodash')
 const { Transfers, ElementDetails, StudyrightElement, Studyright } = require('../models')
 const { Transfer: SISTransfer } = require('../modelsV2')
 const { Op } = require('sequelize')
+const { ignores } = require('./populations')
 
+const flatten = function (obj) {
+  if (Array.isArray(obj)) {
+    return obj
+  }
+  return Object.values(obj).reduce((acc, curr) => [...acc, ...flatten(curr)], [])
+};
+
+const knownFromPopulations = flatten(ignores)
 
 // To check for duplicate transfers in oodi, use following sql in psql
 // SELECT
@@ -22,6 +31,8 @@ const { Op } = require('sequelize')
 //     (COUNT(sourcecode) > 1) AND
 //     (COUNT(targetcode) > 1);
 //
+
+
 const findGraduatedFromBscAndTransferred = async (transfers) => {
   const studyRightElementsByStudentNumber = (await StudyrightElement.findAll({
     where: {
@@ -77,13 +88,21 @@ const transferDiff = async (programme) => {
   const oodiOnlySet = new Set(oodiOnly)
   const oodiOnlyData= transfersOodi.filter(t => oodiOnlySet.has(t.studentnumber))
 
+  // Filter students found in populations script away
+  if (oodiOnly.length > 0) {
+    oodiOnly = _.difference(oodiOnly, knownFromPopulations)
+  }
+  if (sisOnly.length > 0) {
+    sisOnly = _.difference(sisOnly, knownFromPopulations)
+  }
+
   // Filter known good cases out
   if (oodiOnly.length > 0 && programme.startsWith("MH")) {
     const graduatedFromBscAndTransferred = await findGraduatedFromBscAndTransferred(oodiOnlyData)
     oodiOnly = _.difference(oodiOnly, graduatedFromBscAndTransferred)
   }
 
-  if (oodiOnly.length === 0 && sisOnly.length === 0) return [[], []]
+  if (oodiOnly.length === 0 && sisOnly.length === 0) return [0, 0]
 
   console.log(`=== Transferred to ${programme} ===`)
 
@@ -97,7 +116,7 @@ const transferDiff = async (programme) => {
     console.log(sisOnly.join('\n'))
   }
 
-  return [sisOnly.length, oodiOnly.length]
+  return [oodiOnly.length, sisOnly.length]
 }
 
 const findProgrammes = async (programmetype) => (
@@ -122,9 +141,10 @@ const calculateDiffs = async (programmetype) => {
     oodiOnly += result[0]
     sisOnly += result[1]
   }
+
   console.log("\nTotals:")
-  console.log("oodiOnly other length", oodiOnly.length)
-  console.log("sisOnly other length", sisOnly.length)
+  console.log("oodiOnly total: ", oodiOnly)
+  console.log("sisOnly total:", sisOnly)
 }
 
 const main = async () => {
