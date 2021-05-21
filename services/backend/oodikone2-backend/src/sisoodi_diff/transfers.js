@@ -18,13 +18,27 @@ const knownFromPopulations = flatten(ignores)
 const knownTransferErrors = {
   oodi: [
     '013879228', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2927
+    // next few lines are same case, fetched from oodi with
+    // SELECT studentnumber FROM transfers t
+    // LEFT JOIN studyright s ON t.studyrightid = s.studyrightid
+    // WHERE s.extentcode NOT IN (1,2,3,4) AND t.targetcode LIKE 'MH%';
+    '015152451',
+    '015152817',
+    '014890109',
+    '015152888',
+    '013304191',
+    '015152914',
+    '015454926',
+    '013304191',
     '012602807', // just plain weird case: https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2930
     '014271993', // same as previous
     '014625659', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2931
+    '011048721', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2932
+    '012083633' // same as previous
   ],
   sis: [
     '013164917', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2929
-    '013303888'  // same as previous
+    '013303888' // same as previous
   ]
 }
 
@@ -74,17 +88,22 @@ const findGraduatedFromBscAndTransferred = async transfers => {
   return transfers
     .filter(transfer => {
       const sn = transfer.studentnumber
+
+      // find studyrightelement of old msc program student was transferred from
       const studyRightElementOfSource = studyRightElementsByStudentNumber[sn].find(
         e => e.code == transfer.sourcecode && e.studyrightid == transfer.studyrightid
       )
 
+      // find studyrightelement of old bsc program corresponding to old msc
       const studyRightElementOfSourcesBsc = studyRightElementsByStudentNumber[sn].find(
         e =>
           comparableDate(e.startdate) == comparableDate(studyRightElementOfSource.startdate) &&
           e.id != studyRightElementOfSource.id &&
-          e.element_detail.type == '20'
+          e.element_detail.type == '20' &&
+          e.studyright.extentcode == '1'
       )
 
+      // check if student has graduated from old bsc
       return studyRightElementOfSourcesBsc && studyRightElementOfSourcesBsc.studyright.graduated
     })
     .map(s => s.studentnumber)
@@ -185,18 +204,5 @@ const main = async () => {
 
 main()
 /* 
-  how to run:
-    docker exec backend node /usr/src/app/src/sisoodi_diff/transfers.js
-
-  or:
-    npm run diff:transfers KH10_001 KH20_001 KH50_005
-    npm run diff:transfers msc bsc
-
-  in production:
-    docker exec -it backend sh
-
-    and then:
-
-    npm run diff:transfers KH10_001 KH20_001 KH50_005
-
+  to run, run in project root: npm run diff:transfers 
 */

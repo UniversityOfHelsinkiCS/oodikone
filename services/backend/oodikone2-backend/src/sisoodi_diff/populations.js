@@ -651,7 +651,7 @@ const main = async () => {
   verbose = true
 
   // importing this module in transfers runs module without args, so we need to return here
-  if (process.argv.length === 2) return 
+  if (process.argv.length === 2) return
 
   const what = process.argv.slice(2)
 
