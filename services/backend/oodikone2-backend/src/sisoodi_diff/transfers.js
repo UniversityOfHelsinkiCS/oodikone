@@ -33,8 +33,37 @@ const knownTransferErrors = {
     '012602807', // just plain weird case: https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2930
     '014271993', // same as previous
     '014625659', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2931
-    '011048721', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2932
-    '012083633' // same as previous
+    '011048721', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2932,
+    // note: you can test if student falls into this category with if filter in
+    // graduatedFromBscAndTransferred
+    '014190443', // same as above
+    '014347584', // same as above
+    '014483299', // same as above
+    '014590195', // same as above
+    '014595750', // same as above
+    '014606908', // same as above
+    '014711961', // same as above
+    '014735905', // same as above
+    '014738449', // same as above
+    '012083633', // same as above
+    '012070633', // same as above
+    '011388834', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2933
+    '012859087', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2934
+    '012603026', // some weird cases, but transfer-related stuff seems to be ok: https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2935
+    '010670459', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2936
+    '014587153', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2937
+    '014610693', // same as above
+    '014727670', // same as above
+    '011499684', // same as above
+    '014739655', // same as above
+    '014712902', // same as above
+    '013873745', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2938
+    '014300107', // same as above
+    '014711398', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2939
+    '014723302', // same as above
+    '014719471', // same as above
+    '013869393', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2940
+    '012115585' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2941
   ],
   sis: [
     '013164917', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2929
@@ -60,13 +89,14 @@ const knownTransferErrors = {
 //
 
 const findGraduatedFromBscAndTransferred = async transfers => {
+  const where = {
+    studentnumber: {
+      [Op.in]: transfers.map(s => s.studentnumber)
+    }
+  }
   const studyRightElementsByStudentNumber = (
     await StudyrightElement.findAll({
-      where: {
-        studentnumber: {
-          [Op.in]: transfers.map(s => s.studentnumber)
-        }
-      },
+      where,
       include: [
         {
           model: ElementDetails,
@@ -81,17 +111,42 @@ const findGraduatedFromBscAndTransferred = async transfers => {
   ).reduce((acc, curr) => {
     const sn = curr.studentnumber
     return { ...acc, [sn]: acc[sn] ? [...acc[sn], curr] : [curr] }
-  })
+  }, {})
+
+  const allTransfersForTheseStudentsByStudentNumber = (
+    await Transfers.findAll({
+      where
+    })
+  ).reduce((acc, curr) => {
+    const sn = curr.studentnumber
+    return { ...acc, [sn]: acc[sn] ? [...acc[sn], curr] : [curr] }
+  }, {})
 
   const comparableDate = date => new Date(date).toISOString()
 
   return transfers
     .filter(transfer => {
       const sn = transfer.studentnumber
+      let source = transfer.sourcecode
 
-      // find studyrightelement of old msc program student was transferred from
+      // with this you can test if student is transferred multiple times on msc and find
+      // the original.
+      const potentials = []
+
+      // if (sn === 'studennumberhere') {
+      if (potentials.includes(sn)) {
+        const tfs = allTransfersForTheseStudentsByStudentNumber[sn]
+        const findOriginalSource = code => {
+          const transferThatHasThisAsTarget = tfs.find(t => t.targetcode == code)
+          if (!transferThatHasThisAsTarget) return code
+          return findOriginalSource(transferThatHasThisAsTarget.sourcecode)
+        }
+        console.log('Found original source for', sn)
+        source = findOriginalSource(transfer.sourcecode)
+      }
+
       const studyRightElementOfSource = studyRightElementsByStudentNumber[sn].find(
-        e => e.code == transfer.sourcecode && e.studyrightid == transfer.studyrightid
+        e => e.code == source && e.studyrightid == transfer.studyrightid
       )
 
       // find studyrightelement of old bsc program corresponding to old msc
@@ -124,9 +179,6 @@ const transferDiff = async programme => {
   let sisOnly = _.difference(transfersSisStudentnumbers, transfersOodiStudennumbers)
   let oodiOnly = _.difference(transfersOodiStudennumbers, transfersSisStudentnumbers)
 
-  const oodiOnlySet = new Set(oodiOnly)
-  const oodiOnlyData = transfersOodi.filter(t => oodiOnlySet.has(t.studentnumber))
-
   // Filter cases already known
   if (oodiOnly.length > 0) {
     oodiOnly = _.difference(oodiOnly, knownTransferErrors.oodi)
@@ -145,6 +197,8 @@ const transferDiff = async programme => {
 
   // Filter known good cases out
   if (oodiOnly.length > 0 && programme.startsWith('MH')) {
+    const oodiOnlySet = new Set(oodiOnly)
+    const oodiOnlyData = transfersOodi.filter(t => oodiOnlySet.has(t.studentnumber))
     const graduatedFromBscAndTransferred = await findGraduatedFromBscAndTransferred(oodiOnlyData)
     oodiOnly = _.difference(oodiOnly, graduatedFromBscAndTransferred)
   }
