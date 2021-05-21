@@ -650,12 +650,10 @@ const main = async () => {
   // print moar/less
   verbose = true
 
-  const what = process.argv.slice(2)
+  // importing this module in transfers runs module without args, so we need to return here
+  if (process.argv.length === 2) return 
 
-  if (process.argv.length === 2) {
-    await programmeDiff('KH20_001')
-    process.exit()
-  }
+  const what = process.argv.slice(2)
 
   if (what.includes('msc')) {
     await msc()
