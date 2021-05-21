@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 const _ = require('lodash')
-const { Transfers, StudyrightElement, Studyright } = require('../models')
+const { Transfers, ElementDetails, StudyrightElement, Studyright } = require('../models')
 const { Transfer: SISTransfer } = require('../modelsV2')
 const { Op } = require('sequelize')
 
@@ -22,109 +22,116 @@ const { Op } = require('sequelize')
 //     (COUNT(sourcecode) > 1) AND
 //     (COUNT(targetcode) > 1);
 //
-const findGraduatedAndTransferredOnSameDay = async (transfers) => {
-  const graduationDatesByStudentnumber = (await Studyright.findAll({
+const findGraduatedFromBscAndTransferred = async (transfers) => {
+  const studyRightElementsByStudentNumber = (await StudyrightElement.findAll({
     where: {
-      student_studentnumber: {
+      studentnumber: {
         [Op.in]: transfers.map(s => s.studentnumber)
       }
-    }
+    },
+    include: [
+      {
+      model: ElementDetails,
+      required: true,
+      },
+      {
+      model: Studyright,
+      required: true,
+      }
+    ]
   })).reduce((acc, curr) => {
-    if (curr.graduated) {
-      const sn = curr.student_studentnumber
-      return {...acc, [sn]: acc.sn ? [...acc.sn, new Date(curr.enddate).toString()] : [new Date(curr.enddate).toString()]}
-    }
-    return acc
-  }, {})
+    const sn = curr.studentnumber
+    return {...acc, [sn]: acc[sn] ? [...acc[sn], curr] : [curr]}
+  })
 
-  return transfers.filter(transfer => 
-    graduationDatesByStudentnumber[transfer.studentnumber] && 
-      graduationDatesByStudentnumber[transfer.studentnumber].includes(new Date(transfer.transferdate).toString())
-  ).map(s => s.studentnumber)
+  const comparableDate = date => new Date(date).toISOString()
+
+  return transfers.filter(transfer => {
+    const sn = transfer.studentnumber
+    const studyRightElementOfSource = studyRightElementsByStudentNumber[sn]
+                                      .find(e => e.code == transfer.sourcecode && e.studyrightid == transfer.studyrightid)
+
+    const studyRightElementOfSourcesBsc = studyRightElementsByStudentNumber[sn]
+                                .find(e => comparableDate(e.startdate) == comparableDate(studyRightElementOfSource.startdate) && e.id != studyRightElementOfSource.id && e.element_detail.type == '20')
+
+    return studyRightElementOfSourcesBsc && studyRightElementOfSourcesBsc.studyright.graduated
+  }).map(s => s.studentnumber)
 }
 
 // FromProgramme --> check sourcecode, otherwise to programm --> targetcode
-const transferDiff = async (programme, fromProgramme = true) => {
-  const where = fromProgramme ? {sourcecode: programme} : {targetcode: programme}
-
-  let totals = [0, 0, 0]
+const transferDiff = async (programme) => {
 
   const transfersOodi = (await Transfers.findAll({
-    where: where
+    where: {targetcode: programme}
   }))
-  const resultOodi = transfersOodi.map(s => s.studentnumber)
+  const transfersOodiStudennumbers = transfersOodi.map(s => s.studentnumber)
 
   const transfersSis = (await SISTransfer.findAll({
-    where: where
+    where: {targetcode: programme}
   }))
-  const resultSis = transfersSis.map(s => s.studentnumber)
+  const transfersSisStudentnumbers = transfersSis.map(s => s.studentnumber)
 
-  let sisOnly = _.difference(resultSis, resultOodi)
-  let oodiOnly = _.difference(resultOodi, resultSis)
+  let sisOnly = _.difference(transfersSisStudentnumbers, transfersOodiStudennumbers)
+  let oodiOnly = _.difference(transfersOodiStudennumbers, transfersSisStudentnumbers)
 
-  if (oodiOnly.length === 0 && sisOnly.length === 0) return totals
+  const oodiOnlySet = new Set(oodiOnly)
+  const oodiOnlyData= transfersOodi.filter(t => oodiOnlySet.has(t.studentnumber))
 
-  const direction = fromProgramme ? "Transferred from" : "Transferred to"
-  console.log(`=== ${direction} ${programme} ===`)
+  // Filter known good cases out
+  if (oodiOnly.length > 0 && programme.startsWith("MH")) {
+    const graduatedFromBscAndTransferred = await findGraduatedFromBscAndTransferred(oodiOnlyData)
+    oodiOnly = _.difference(oodiOnly, graduatedFromBscAndTransferred)
+  }
+
+  if (oodiOnly.length === 0 && sisOnly.length === 0) return [[], []]
+
+  console.log(`=== Transferred to ${programme} ===`)
 
   if (oodiOnly.length > 0) {
-    const graduatedAndTransferredOnSameDay = await findGraduatedAndTransferredOnSameDay(transfersOodi)
-    oodiOnly = _.difference(oodiOnly, graduatedAndTransferredOnSameDay)
-    console.log("in oodi:")
-    if (graduatedAndTransferredOnSameDay.length > 0) {
-      console.log("graduated (probably from bsc) and was transferred to new program on same day")
-      console.log(graduatedAndTransferredOnSameDay.join('\n'))
-      totals[0] = graduatedAndTransferredOnSameDay.length
-    }
-    if (oodiOnly.length > 0) {
-      console.log("other reason")
-      console.log(oodiOnly.join('\n'))
-      totals[1] = oodiOnly.length
-    }
+    console.log("in oodi: ")
+    console.log(oodiOnly.join('\n'))
   }
 
   if (sisOnly.length > 0) {
     console.log("in sis:")
     console.log(sisOnly.join('\n'))
-    totals[2] = oodiOnly.length
   }
 
-  return totals
+  return [sisOnly.length, oodiOnly.length]
 }
 
-const findProgrammes = async () => {
-  return (
+const findProgrammes = async (programmetype) => (
     await StudyrightElement.findAll({
       attributes: ['code'],
       where: {
         code: {
-          [Op.like]: { [Op.any]: ['MH%', 'KH%']}
+          [Op.like]: `${programmetype}%`
         }
       },
       group: ['code'],
       order: ['code']
     })
   ).map(s => s.code)
+
+const calculateDiffs = async (programmetype) => {
+  let oodiOnly = 0
+  let sisOnly = 0
+  const programmes = await findProgrammes(programmetype)
+  for (const programme of programmes) {
+    const result = await transferDiff(programme)
+    oodiOnly += result[0]
+    sisOnly += result[1]
+  }
+  console.log("\nTotals:")
+  console.log("oodiOnly other length", oodiOnly.length)
+  console.log("sisOnly other length", sisOnly.length)
 }
 
 const main = async () => {
-  let fromTotals = [0, 0, 0]
-  let toTotals = [0, 0, 0]
-  const programmes = await findProgrammes()
-  console.log(programmes)
-  for (const programme of programmes) {
-    fromTotals = _.unzipWith([fromTotals, await transferDiff(programme, fromProgramme = true)], _.add)
-    toTotals = _.unzipWith([toTotals, await transferDiff(programme, fromProgramme = false)], _.add)
-  }
-  console.log("1. Total diff transferred from")
-  console.log("oodi, graduated & transferred on the same day", fromTotals[0])
-  console.log("oodi, other", fromTotals[1])
-  console.log("sis, other", fromTotals[2])
-
-  console.log("2. Total diff transferred to")
-  console.log("oodi, graduated & transferred on the same day", toTotals[0])
-  console.log("oodi, other", toTotals[1])
-  console.log("sis, other", toTotals[2])
+  console.log("=== BSC ===")
+  await calculateDiffs("KH")
+  console.log("=== MSC ===")
+  await calculateDiffs("MH")
 }
 
 main()
