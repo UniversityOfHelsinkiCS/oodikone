@@ -255,7 +255,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
         })
       }
   
-      if (!courseUnit && att.type === 'CustomCourseUnitAttainment') {
+      if (!courseUnit) {
         const parsedCourseCode = attIdToCourseCode[att.id]
         const course = await Course.findOne({
           where: {
@@ -309,18 +309,38 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     return await Promise.all(attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)))
   }
 
-  const fixedAttainments = await fixCustomCourseUnitAttainments(attainments) 
+  const fixedAttainments = await fixCustomCourseUnitAttainments(attainments)
+
+  const customTypes = new Set(['CustomModuleAttainment', 'CustomCourseUnitAttainment'])
+
+  // If an attainment has been attached to two degrees, a duplicate custom attainment is made for it. This duplicate
+  // should not show in the students attainments 
+  const doubleAttachment = (att, attainments) => {
+    if (!customTypes.has(att.type) && att.state !== "INCLUDED") {
+      return false
+    }
+
+    let isDoubleAttachment = false
+    const idParts = att.id.split("-")
+    if (idParts && idParts.length > 3) {
+      const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
+      isDoubleAttachment = attainments.some((a) => originalId === a.id && String(a.attainment_date) === String(att.attainment_date))
+    }
+
+    return isDoubleAttachment
+  }
 
   const mapCredit = creditMapper(
     personIdToStudentNumber,
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
-    courseGroupIdToCourseCode
+    courseGroupIdToCourseCode,
+    fixedAttainments
   )
 
   const credits = fixedAttainments
     .filter(a => a !== null)
-    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id))
+    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id) && !doubleAttachment(a, fixedAttainments))
     .map(a => {
       a.acceptor_persons
         .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
