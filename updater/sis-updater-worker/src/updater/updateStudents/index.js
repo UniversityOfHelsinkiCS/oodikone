@@ -255,7 +255,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
         })
       }
   
-      if (!courseUnit && att.type === 'CustomCourseUnitAttainment') {
+      if (!courseUnit) {
         const parsedCourseCode = attIdToCourseCode[att.id]
         const course = await Course.findOne({
           where: {
