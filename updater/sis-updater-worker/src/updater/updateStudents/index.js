@@ -309,18 +309,34 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     return await Promise.all(attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)))
   }
 
-  const fixedAttainments = await fixCustomCourseUnitAttainments(attainments) 
+  const fixedAttainments = await fixCustomCourseUnitAttainments(attainments)
+
+  const customTypes = new Set(['CustomModuleAttainment', 'CustomCourseUnitAttainment'])
+
+  const doubleAttachment = (att, attainments) => {
+    if (!customTypes.has(att.type) && att.state !== "INCLUDED") {
+      return false
+    }
+    const idParts = att.id.split("-")
+    if (idParts && idParts.length > 3) {
+      const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
+      return attainments.some((a) => a.id === originalId)
+    }
+
+    return false
+  }
 
   const mapCredit = creditMapper(
     personIdToStudentNumber,
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
-    courseGroupIdToCourseCode
+    courseGroupIdToCourseCode,
+    fixedAttainments
   )
 
   const credits = fixedAttainments
     .filter(a => a !== null)
-    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id))
+    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id) && !doubleAttachment(a, fixedAttainments))
     .map(a => {
       a.acceptor_persons
         .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
