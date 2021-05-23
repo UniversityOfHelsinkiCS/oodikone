@@ -22,33 +22,49 @@ const genderMankeli = gender => {
 const validStates = ['INCLUDED', 'SUBSTITUTED', 'ATTAINED']
 
 // Basically all types at the moment
-const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment', 'ModuleAttainment', 'DegreeAttainment']
+const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment']
 
 const now = new Date()
 
 const calculateTotalCreditsFromAttainments = attainments => {
-  const attainmentsToSum = attainments.filter(att => {
+  const totalCredits = attainments.reduce((sum, att) => {
     // Misregistrations are not counted to the total
     if (att.misregistration) {
-      return false
+      return sum
     }
-
     if (!att.primary) {
-      return false
+      return sum
     }
-
     // Expired attainments are not counted in the total
     if (att.expiryDate < now) {
-      return false
+      return sum
     }
 
     // Does not have any attainments attached to it, so is not a study module whose attainments have already been counted
-    const leafLevelAttainment = !att.nodes || att.nodes.length === 0 
+    if (att.nodes && att.nodes.length > 1) {
+      return sum
+    }
 
-    return validTypes.includes(att.type) && validStates.includes(att.state) && leafLevelAttainment
-  })
+    // If the state is FAILED or IMPROVED it should not be counted to total
+    if (!validStates.includes(att.state)) {
+      return sum
+    }
 
-  const totalCredits = attainmentsToSum.reduce((sum, att) => {
+    if (!validTypes.includes(att.type)) {
+      return sum
+    }
+
+    // In case there is a real ModuleAttainment (with attainments attached to it) with same first part of ID, 
+    // also this one is then actually a module, that should not be counted in the total
+    if (att.type === 'CustomModuleAttainment') {
+      const idParts = att.id.split("-")
+      if (idParts && idParts.length > 3) {
+        const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
+        const originalIsARealModule = attainments.filter((a) => a.id === originalId && a.nodes && a.nodes.length > 1) 
+        if (originalIsARealModule) return sum
+      }
+    }
+
     return sum + Number(att.credits)
   }, 0)
 
@@ -57,9 +73,6 @@ const calculateTotalCreditsFromAttainments = attainments => {
 
 const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
-
-  // Test student
-  if (student_number === "012023965") return null
 
   const gender_urn_array = gender_urn ? gender_urn.split(':') : null
   const formattedGender = gender_urn_array ? gender_urn_array[gender_urn_array.length - 1] : null
@@ -74,6 +87,9 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
 
   // Current db doesn't have studentnumbers in attainment table so have to use person_id for now.
   const attainmentsOfStudent = attainments.filter(attainment => (attainment.person_id === id && !attainmentsToBeExluced.has(attainment.id)))
+
+  // Test student
+  if (student_number === "012023965") return null
 
   return {
     lastname: last_name,
