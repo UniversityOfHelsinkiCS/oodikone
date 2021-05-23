@@ -313,17 +313,21 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
 
   const customTypes = new Set(['CustomModuleAttainment', 'CustomCourseUnitAttainment'])
 
+  // If an attainment has been attached to two degrees, a duplicate custom attainment is made for it. This duplicate
+  // should not show in the students attainments 
   const doubleAttachment = (att, attainments) => {
     if (!customTypes.has(att.type) && att.state !== "INCLUDED") {
       return false
     }
+
+    let isDoubleAttachment = false
     const idParts = att.id.split("-")
     if (idParts && idParts.length > 3) {
       const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
-      return attainments.some((a) => a.id === originalId)
+      isDoubleAttachment = attainments.some((a) => originalId === a.id && String(a.attainment_date) === String(att.attainment_date))
     }
 
-    return false
+    return isDoubleAttachment
   }
 
   const mapCredit = creditMapper(
