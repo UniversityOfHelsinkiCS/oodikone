@@ -51,16 +51,12 @@ const ignores = {
       sis: ['014734511'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2790 also a varhaiskasvatus issue
     }
   },
-
   MH10_001: {
-    2019: {
-      oodi: ['014577749'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-    },
     2020: {
       oodi: ['014925414'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
     }
   },
-  MH20_001: {
+  MH20_00: {
     2020: {
       oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
     }
@@ -70,6 +66,7 @@ const ignores = {
       oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
+  
   MH40_002: {
     2019: {
       oodi: ['014720114'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
@@ -110,7 +107,6 @@ const ignores = {
       sis: ['014949160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     }
   },
-
   MH57_005: {
     2018: {
       sis: [
@@ -120,12 +116,12 @@ const ignores = {
     },
     2019: {
       sis: ['014454516'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-      oodi: ['014342961'] // https://jira.it.helsinki.fi/browse/DOO-4500
     },
     2020: {
       sis: ['014582844'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     }
   },
+
   MH70_002: {
     2018: {
       sis: ['014917639'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
@@ -139,6 +135,7 @@ const ignores = {
       sis: ['014411148'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     }
   },
+
   MH70_007: {
     2017: {
       oodi: [
@@ -162,7 +159,6 @@ const ignores = {
       oodi: ['014453520'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
-
   MH80_001: {
     2020: {
       oodi: [
@@ -172,11 +168,7 @@ const ignores = {
       ]
     }
   },
-  MH80_006: {
-    2020: {
-      oodi: ['014586293'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
-    }
-  },
+
   MH80_007: {
     2020: {
       oodi: ['013214702'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
