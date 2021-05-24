@@ -121,6 +121,20 @@ run_importer_setup () {
     docker-compose -f dco.data.yml down
 }
 
+run_importer_setup_with_duplicate () {
+    if [[ -f "$BACKUP_DIR/importer-db.sqz" ]];then  
+      echo "Moving previous importer db backup to safety"
+      mv "$BACKUP_DIR/importer-db.sqz" "$BACKUP_DIR/importer-db.sqz_old"
+    fi
+    get_username
+    echo "Using your Uni Helsinki username: $username"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@importer:/home/importer_user/importer-duplicate/importer-db-duplicate-dump.sqz "$BACKUP_DIR/importer-db.sqz"
+    docker-compose -f dco.data.yml up -d sis-importer-db
+    ping_psql "sis-importer-db" "importer-db"
+    restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
+    docker-compose -f dco.data.yml down
+}
+
 run_full_real_data_reset () {
     get_username
     echo "Using your Uni Helsinki username: $username"
