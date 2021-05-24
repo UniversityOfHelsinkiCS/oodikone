@@ -27,6 +27,7 @@ options=(
     "Download latest anonymous data."
     "Download latest real data."
     "Set up importer-db."
+    "Set up importer-db from importer-duplicate."
     "Download & reset all real data"
     "Quit."
 )
@@ -58,6 +59,9 @@ while true; do
                 ;;
             "Set up importer-db.")
                 run_importer_setup
+                ;;
+            "Set up importer-db from importer-duplicate.")
+                run_importer_setup_with_duplicate
                 ;;
             "Download & reset all real data")
                 run_full_real_data_reset
