@@ -5,7 +5,7 @@ const { ElementDetail, Studyright, StudyrightElement } = require('../../db/model
 const { selectFromByIds, bulkCreate } = require('../../db')
 const { getDegrees, getEducation, getEducationType, getOrganisationCode } = require('../shared')
 
-const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
+const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
 
   const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
     const defaultProps = {
@@ -94,7 +94,13 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
 
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
-  const formattedStudyRights = studyRights.reduce((acc, studyright) => {
+  // Take only the latest study rights
+  const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
+    acc.push(curr[0])
+    return acc
+  }, [])
+
+  const formattedStudyRights = latestStudyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
     if (!studyRightEducation) return acc
 
