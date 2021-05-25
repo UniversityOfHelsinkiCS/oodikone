@@ -21,19 +21,6 @@ const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 
-const studyRightHasDegreeEducation = (studyRight) => {
-  const education = getEducation(studyRight.education_id)
-  if (!education) return true
-  const educationType = getEducationType(education.education_type)
-  if (!educationType) return true
-  const nonDegreeEducationType ='urn:code:education-type:non-degree-education';
-  return educationType.parent_id.indexOf(nonDegreeEducationType) === -1;
-}
-
-const takeDegreeStudyRightSnapshots = (studyRightSnapshots) => {
-  return studyRightSnapshots.filter(studyRight => studyRightHasDegreeEducation(studyRight))
-}
-
 const groupStudyrightSnapshots = (studyRightSnapshots) => {
   const snapshotsBystudyright = Object.entries(
     groupBy(
@@ -80,10 +67,8 @@ const updateStudents = async personIds => {
     selectFromByIds('study_right_primalities', personIds, 'student_id')
   ])
 
-  const degreeStudyRightSnapshots = takeDegreeStudyRightSnapshots(studyRightSnapshots)
-
   // grouping in function that sets first_snapshot_date_time
-  const groupedStudyRightSnapshots = groupStudyrightSnapshots(degreeStudyRightSnapshots)
+  const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
 
   const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
     acc.push(curr[0])
@@ -103,7 +88,7 @@ const updateStudents = async personIds => {
 
   const attainmentsToBeExluced = await getAttainmentsToBeExcluded()
 
-  const mappedStudents = students.map(studentMapper(attainments, degreeStudyRightSnapshots, attainmentsToBeExluced))
+  const mappedStudents = students.map(studentMapper(attainments, studyRightSnapshots, attainmentsToBeExluced))
   await bulkCreate(Student, mappedStudents)
 
   const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
