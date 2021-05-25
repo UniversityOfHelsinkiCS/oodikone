@@ -67,7 +67,10 @@ const GeneralTab = ({
     return studyrights
       .filter(sr => {
         const { studyright_elements: studyrightElements } = sr
-        return studyrightElements.filter(sre => cleanedQueryStudyrights.includes(sre.code)).length >= cleanedQueryStudyrights.length
+        return (
+          studyrightElements.filter(sre => cleanedQueryStudyrights.includes(sre.code)).length >=
+          cleanedQueryStudyrights.length
+        )
       })
       .map(a => a[value])
   }

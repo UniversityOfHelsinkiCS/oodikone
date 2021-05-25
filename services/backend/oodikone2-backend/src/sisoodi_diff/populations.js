@@ -66,7 +66,7 @@ const ignores = {
       oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
-  
+
   MH40_002: {
     2019: {
       oodi: ['014720114'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
@@ -115,7 +115,7 @@ const ignores = {
       ]
     },
     2019: {
-      sis: ['014454516'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
+      sis: ['014454516'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     },
     2020: {
       sis: ['014582844'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
