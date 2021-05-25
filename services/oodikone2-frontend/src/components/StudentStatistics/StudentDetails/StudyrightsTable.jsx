@@ -20,17 +20,9 @@ const StudyrightsTable = ({
 
   const { programmes } = degreesAndProgrammes
   const programmeCodes = programmes ? Object.keys(programmes) : []
-  const studyRightHeaders = ['Degree', 'Programme', 'Study Track', 'Graduated']
+  const studyRightHeaders = ['Programme', 'Study Track', 'Graduated']
 
   const studyRightRows = student.studyrights.map(studyright => {
-    const degree = sortBy(studyright.studyright_elements, 'enddate').find(e => e.element_detail.type === 10)
-    const formattedDegree = degree && {
-      startdate: degree.startdate,
-      enddate: degree.enddate,
-      name: getTextIn(degree.element_detail.name, language),
-      graduateionDate: degree.graduation_date,
-      canceldate: degree.canceldate
-    }
     const programmes = sortBy(studyright.studyright_elements, 'enddate')
       .filter(e => e.element_detail.type === 20)
       .map(programme => ({
@@ -52,7 +44,7 @@ const StudyrightsTable = ({
       graduated: studyright.graduated,
       canceldate: studyright.canceldate,
       enddate: studyright.enddate,
-      elements: { degree: formattedDegree, programmes, studytracks }
+      elements: { programmes, studytracks }
     }
   })
 
@@ -90,15 +82,6 @@ const StudyrightsTable = ({
       </div>
     )
   }
-
-  const renderDegrees = c => (
-    <p key={c.elements.degree.name}>
-      {`${c.elements.degree.name}
-      (${reformatDate(c.elements.degree.startdate, 'DD.MM.YYYY')} -
-      ${reformatDate(c.elements.degree.enddate, 'DD.MM.YYYY')})`}
-      <br />
-    </p>
-  )
 
   const getActualStartDate = c =>
     new Date(c.startdate).getTime() > new Date(c.studystartdate).getTime() ? c.startdate : c.studystartdate
@@ -151,14 +134,13 @@ const StudyrightsTable = ({
           {sortBy(studyRightRows, c => Number(c.studyrightid))
             .reverse()
             .map(c => {
-              if (c.elements.programmes.length > 0 || c.elements.degree) {
+              if (c.elements.programmes.length > 0) {
                 return (
                   <Table.Row
                     active={c.studyrightid === studyrightid}
                     key={c.studyrightid}
                     onClick={() => handleStartDateChange(c.elements, c.studyrightid)}
                   >
-                    <Table.Cell verticalAlign="middle">{c.elements.degree && renderDegrees(c)}</Table.Cell>
                     <Table.Cell>{c.elements.programmes.length > 0 && renderProgrammes(c)}</Table.Cell>
                     <Table.Cell>{renderStudytracks(c)}</Table.Cell>
                     <Table.Cell>{renderGraduated(c)}</Table.Cell>
