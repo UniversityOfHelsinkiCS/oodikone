@@ -9,7 +9,6 @@ const {
   getSemester,
   getCountry,
 } = require('./shared')
-const { CREDIT_TYPE_CODES } = require('./shared')
 
 const genderMankeli = gender => {
   if (gender === 'male') return 1
@@ -17,37 +16,63 @@ const genderMankeli = gender => {
   return 3
 }
 
+// "Included and substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc
+//  This rules out failed units and modules as well as improved ones
+// See, e.g., TKT5
+const validStates = ['INCLUDED', 'SUBSTITUTED', 'ATTAINED']
+
+// Basically all types at the moment
+const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment']
+
+const now = new Date()
+
 const calculateTotalCreditsFromAttainments = attainments => {
-  const attainmentsToSum = attainments.filter(att => {
+  const totalCredits = attainments.reduce((sum, att) => {
+    // Misregistrations are not counted to the total
     if (att.misregistration) {
-      return false
+      return sum
+    }
+    if (!att.primary) {
+      return sum
+    }
+    // Expired attainments are not counted in the total
+    if (att.expiryDate < now) {
+      return sum
     }
 
-    // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
-    // See, e.g., TKT5
-    // Logic copyed from
-    const isSubstitutedOrIncludedStudyModule =
-      (att.state === 'SUBSTITUTED' || att.state === 'INCLUDED') && att.module_id !== null
-    const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment']
-
-    return validTypes.includes(att.type) || isSubstitutedOrIncludedStudyModule
-  })
-
-  const totalCredits = attainmentsToSum.reduce((sum, att) => {
-    const credittypecode = getCreditTypeCodeFromAttainment(att, getGrade(att.grade_scale_id, att.grade_id).passed)
-    if (credittypecode === CREDIT_TYPE_CODES.APPROVED || credittypecode === CREDIT_TYPE_CODES.PASSED) {
-      return sum + Number(att.credits)
+    // Does not have any attainments attached to it, so is not a study module whose attainments have already been counted
+    if (att.nodes && att.nodes.length > 1) {
+      return sum
     }
-    return sum
+
+    // If the state is FAILED or IMPROVED it should not be counted to total
+    if (!validStates.includes(att.state)) {
+      return sum
+    }
+
+    if (!validTypes.includes(att.type)) {
+      return sum
+    }
+
+    // In case there is a real ModuleAttainment (with attainments attached to it) with same first part of ID, 
+    // also this one is then actually a module, that should not be counted in the total
+    if (att.type === 'CustomModuleAttainment') {
+      const idParts = att.id.split("-")
+      if (idParts && idParts.length > 3) {
+        const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
+        const originalIsARealModule = attainments.filter((a) => a.id === originalId && a.nodes && a.nodes.length > 1) 
+        if (originalIsARealModule) return sum
+      }
+    }
+
+    return sum + Number(att.credits)
   }, 0)
+
   return totalCredits
 }
 
-const studentMapper = (attainments, studyRights) => student => {
+const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
-
-  // Test student
-  if (student_number === "012023965") return null
 
   const gender_urn_array = gender_urn ? gender_urn.split(':') : null
   const formattedGender = gender_urn_array ? gender_urn_array[gender_urn_array.length - 1] : null
@@ -61,7 +86,10 @@ const studentMapper = (attainments, studyRights) => student => {
     studyRightsOfStudent.length > 0 ? sortBy(studyRightsOfStudent.map(sr => sr.valid.startDate))[0] : null
 
   // Current db doesn't have studentnumbers in attainment table so have to use person_id for now.
-  const attainmentsOfStudent = attainments.filter(attainment => attainment.person_id === id)
+  const attainmentsOfStudent = attainments.filter(attainment => (attainment.person_id === id && !attainmentsToBeExluced.has(attainment.id)))
+
+  // Test student
+  if (student_number === "012023965") return null
 
   return {
     lastname: last_name,
@@ -125,7 +153,7 @@ const creditMapper = (
 
   // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
   // See, e.g., TKT5
-  const isSubstitutedStudyModule = state === 'SUBSTITUTED' && module_id !== null
+  const isSubstitutedStudyModule = (state === 'SUBSTITUTED' || state === 'INCLUDED') && module_id !== null
   const isStudyModule = isModule(type) && !isSubstitutedStudyModule
 
   return {
