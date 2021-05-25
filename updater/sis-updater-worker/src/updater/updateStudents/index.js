@@ -55,56 +55,7 @@ const groupStudyrightSnapshots = (studyRightSnapshots) => {
   }, {})
 }
 
-const updateStudents = async personIds => {
-  await loadMapsIfNeeded()
-
-  const [students, studyRightSnapshots, attainments, termRegistrations, studyRightPrimalities] = await Promise.all([
-    selectFromByIds('persons', personIds),
-    selectFromByIds('studyrights', personIds, 'person_id'),
-    selectFromByIds('attainments', personIds, 'person_id'),
-    selectFromByIds('term_registrations', personIds, 'student_id'),
-    selectFromByIds('study_right_primalities', personIds, 'student_id')
-  ])
-
-  // grouping in function that sets first_snapshot_date_time
-  const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
-
-  const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
-    acc.push(curr[0])
-    return acc
-  }, [])
-
-  const personIdToStudentNumber = students.reduce((res, curr) => {
-    res[curr.id] = curr.student_number
-    return res
-  }, {})
-
-  const personIdToStudyRightIdToPrimality = studyRightPrimalities.reduce((res, curr) => {
-    if (!res[curr.student_id]) res[curr.student_id] = {}
-    res[curr.student_id][curr.study_right_id] = curr
-    return res
-  }, {})
-
-  const attainmentsToBeExluced = getAttainmentsToBeExcluded()
-
-  const mappedStudents = students.map(studentMapper(attainments, studyRightSnapshots, attainmentsToBeExluced))
-  await bulkCreate(Student, mappedStudents)
-
-  const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
-    updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
-    updateStudyRights(latestStudyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality)
-  ])
-
-  await Promise.all([
-    updateStudyRightElements(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights),
-    updateTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber),
-    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
-    updateTermRegistrations(termRegistrations, personIdToStudentNumber)
-  ])
-}
-
-
-const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
+const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
   const getTransfersFrom = (orderedSnapshots, studyrightid, educationId) => {
     return orderedSnapshots.reduce((curr, snapshot, i) => {
       if (i === 0) return curr
@@ -162,9 +113,62 @@ const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, 
     const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
     transfers.push(...getTransfersFrom(orderedSnapshots, snapshots[0].id, snapshots[0].education_id))
   })
+  return transfers
 
-  await bulkCreate(Transfer, transfers)
 }
+
+
+const updateStudents = async personIds => {
+  await loadMapsIfNeeded()
+
+  const [students, studyRightSnapshots, attainments, termRegistrations, studyRightPrimalities] = await Promise.all([
+    selectFromByIds('persons', personIds),
+    selectFromByIds('studyrights', personIds, 'person_id'),
+    selectFromByIds('attainments', personIds, 'person_id'),
+    selectFromByIds('term_registrations', personIds, 'student_id'),
+    selectFromByIds('study_right_primalities', personIds, 'student_id')
+  ])
+
+  // grouping in function that sets first_snapshot_date_time
+  const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
+
+  const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
+    acc.push(curr[0])
+    return acc
+  }, [])
+
+  const personIdToStudentNumber = students.reduce((res, curr) => {
+    res[curr.id] = curr.student_number
+    return res
+  }, {})
+
+  const personIdToStudyRightIdToPrimality = studyRightPrimalities.reduce((res, curr) => {
+    if (!res[curr.student_id]) res[curr.student_id] = {}
+    res[curr.student_id][curr.study_right_id] = curr
+    return res
+  }, {})
+
+  const attainmentsToBeExluced = getAttainmentsToBeExcluded()
+
+  const mappedStudents = students.map(studentMapper(attainments, studyRightSnapshots, attainmentsToBeExluced))
+  await bulkCreate(Student, mappedStudents)
+
+  const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
+    updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
+    updateStudyRights(latestStudyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality)
+  ])
+
+  const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
+
+  await Promise.all([
+    updateStudyRightElements(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights, mappedTransfers),
+    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
+    updateTermRegistrations(termRegistrations, personIdToStudentNumber),
+    await bulkCreate(Transfer, mappedTransfers)
+  ])
+}
+
+
 
 const updateAttainments = async (attainments, personIdToStudentNumber, attainmentsToBeExluced) => {
   const personIdToEmployeeNumber = await updateTeachers(attainments)
