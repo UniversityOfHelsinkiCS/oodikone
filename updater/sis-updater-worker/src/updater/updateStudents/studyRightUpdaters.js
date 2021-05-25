@@ -5,7 +5,7 @@ const { ElementDetail, Studyright, StudyrightElement } = require('../../db/model
 const { selectFromByIds, bulkCreate } = require('../../db')
 const { getDegrees, getEducation, getEducationType, getOrganisationCode } = require('../shared')
 
-const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
+const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
 
   const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
     const defaultProps = {
@@ -94,10 +94,15 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
 
   const mapStudyright = studyrightMapper(personIdToStudentNumber)
 
-  const formattedStudyRights = studyRights.reduce((acc, studyright) => {
+  // Take only the latest study rights
+  const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
+    acc.push(curr[0])
+    return acc
+  }, [])
+
+  const formattedStudyRights = latestStudyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
     if (!studyRightEducation) return acc
-
 
     if (isBaMa(studyRightEducation)) {
       const studyRightBach = mapStudyright(studyright, {
@@ -140,7 +145,7 @@ const updateStudyRights = async (studyRights, personIdToStudentNumber, personIdT
   return formattedStudyRights
 }
 
-const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights) => {
+const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights, mappedTransfers) => {
   const mapStudyrightElements = (studyrightid, startdate, studentnumber, code, childCode, degreeCode, transfersByStudyRightId, formattedStudyRightsById) => {
     const defaultProps = {
       studyrightid,
@@ -163,7 +168,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         startdate = transfer.transferdate
       }
     }
-  
   
     // we should probably map degree in a different manner since degree can be per many
     // programmes and studytracks. Now the correct one might be overwritten later.
@@ -196,71 +200,15 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
     formattedStudyRightsById[studyright.studyrightid] = studyright
   })
 
+  const transfersByStudyRightId = mappedTransfers.reduce((res, curr) => {
+    res[curr.studyrightid] = curr
+    return res
+  }, {})
+
   const possibleBscFirst = (s1, s2) => {
     if (!s1.accepted_selection_path.educationPhase2GroupId) return -1
     return 1
   }
-
-  const getTransfersFrom = (orderedSnapshots, studyrightid, educationId) => {
-    return orderedSnapshots.reduce((curr, snapshot, i) => {
-      if (i === 0) return curr
-
-      const studyRightEducation = getEducation(educationId)
-      if (!studyRightEducation) return curr
-
-      const usePhase2 =
-        isBaMa(studyRightEducation) && !!get(orderedSnapshots[i - 1], 'study_right_graduation.phase1GraduationDate')
-
-      if (usePhase2 && !get(orderedSnapshots[i - 1], 'accepted_selection_path.educationPhase2GroupId')) return curr
-
-      const mappedId = isBaMa(studyRightEducation)
-        ? usePhase2 && !!get(snapshot, 'accepted_selection_path.educationPhase2GroupId')
-          ? `${studyrightid}-2`
-          : `${studyrightid}-1`
-        : `${studyrightid}-1` // studyrightid duplicatefix
-
-      const sourcecode =
-        moduleGroupIdToCode[
-          orderedSnapshots[i - 1].accepted_selection_path[
-            usePhase2 ? 'educationPhase2GroupId' : 'educationPhase1GroupId'
-          ]
-        ]
-
-      const targetcode =
-        moduleGroupIdToCode[
-          snapshot.accepted_selection_path[
-            usePhase2 && has(snapshot, 'accepted_selection_path.educationPhase2GroupId')
-              ? 'educationPhase2GroupId'
-              : 'educationPhase1GroupId'
-          ]
-        ]
-
-      if (!sourcecode || !targetcode || sourcecode === targetcode) return curr
-      // source === targetcode isn't really a change between programmes, but we should still update transferdate to
-      // newer snapshot date time
-      // but: updating requires some changes to this reducers logic, so this fix can be here for now
-
-      curr.push({
-        id: `${mappedId}-${snapshot.modification_ordinal}-${sourcecode}-${targetcode}`,
-        sourcecode,
-        targetcode,
-        transferdate: new Date(snapshot.snapshot_date_time),
-        studentnumber: personIdToStudentNumber[snapshot.person_id],
-        studyrightid: mappedId
-      })
-
-      return curr
-    }, [])
-  }
-
-  const transfersByStudyRightId = {}
-  Object.values(groupedStudyRightSnapshots).forEach(snapshots => {
-    const orderedSnapshots = orderBy(snapshots, s => new Date(s.snapshot_date_time), 'asc')
-    getTransfersFrom(orderedSnapshots, snapshots[0].id, snapshots[0].education_id).forEach(
-      transfer => {
-        transfersByStudyRightId[transfer.studyrightid] = transfer
-      })
-  })
 
   const studyRightElements = Object.values(groupedStudyRightSnapshots)
     .reduce((res, snapshots) => {
@@ -392,7 +340,7 @@ const updateElementDetails = async studyRights => {
     ['code']
   )
 
-  return [...mappedDegrees, ...mappedProgrammes, ...mappedStudytracks].reduce((acc, curr) => {
+  return [...mappedProgrammes, ...mappedStudytracks].reduce((acc, curr) => {
     acc[curr.group_id] = curr.code
     return acc
   }, {})
