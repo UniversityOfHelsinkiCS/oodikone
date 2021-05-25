@@ -48,7 +48,7 @@ const calculateTotalCreditsFromAttainments = attainments => {
     }
 
     // Does not have any attainments attached to it, so is not a study module whose attainments have already been counted
-    if (att.nodes && att.nodes.length > 1) {
+    if (att.nodes && att.nodes[0] !== undefined) {
       return sum
     }
 
@@ -63,14 +63,14 @@ const calculateTotalCreditsFromAttainments = attainments => {
 
     // In case there is a real ModuleAttainment (with attainments attached to it) with same first part of ID, 
     // also this one is then actually a module, that should not be counted in the total
-    if (att.type === 'CustomModuleAttainment') {
-      const idParts = att.id.split("-")
-      if (idParts && idParts.length > 3) {
-        const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
-        const originalIsARealModule = attainments.filter((a) => a.id === originalId && a.nodes && a.nodes.length > 1) 
-        if (originalIsARealModule) return sum
-      }
-    }
+    // if (att.type === 'CustomModuleAttainment') {
+    //   const idParts = att.id.split("-")
+    //   if (idParts && idParts.length > 3) {
+    //     const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
+    //     const originalIsARealModule = attainments.filter((a) => a.id === originalId && a.nodes && a.nodes.length > 1) 
+    //     if (originalIsARealModule) return sum
+    //   }
+    // }
 
     return sum + Number(att.credits)
   }, 0)
@@ -146,10 +146,10 @@ const creditMapper = (
     attainment_date,
     type,
     course_unit_id,
-    module_id,
     module_group_id,
-    state,
+    nodes
   } = attainment
+
   const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
   const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
   const targetSemester = getSemesterByDate(new Date(attainment_date))
@@ -161,9 +161,11 @@ const creditMapper = (
     : moduleGroupIdToModuleCode[module_group_id]
 
   // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
-  // See, e.g., TKT5
-  const isSubstitutedStudyModule = (state === 'SUBSTITUTED' || state === 'INCLUDED') && module_id !== null
-  const isStudyModule = isModule(type) && !isSubstitutedStudyModule
+  // // See, e.g., TKT5
+  // const isSubstitutedStudyModule = (state === 'SUBSTITUTED' || state === 'INCLUDED') && module_id !== null
+  // const isStudyModule = isModule(type) && !isSubstitutedStudyModule
+
+  const isStudyModule = nodes && nodes[0] !== undefined
 
   return {
     id: id,
