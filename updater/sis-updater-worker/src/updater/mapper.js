@@ -86,8 +86,11 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
 
   const gender_code = parseGender(gender_urn)
 
+  // Country logic should be fixed, see issue:
+  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2958
   const country = getCountry(student.country_urn)
-  const home_country = student.citizenships ? getCountry(student.citizenships[0]) : null // this is stupid logic PLS FIX WHEN REAL PROPER DATA
+  const home_country = student.citizenships ? getCountry(student.citizenships[0]) : null
+
   const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
 
   const dateofuniversityenrollment =
