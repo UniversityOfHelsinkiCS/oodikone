@@ -14,47 +14,6 @@ let verbose = false
 */
 
 const ignores = {
-  KH10_001: {
-    2017: {
-      oodi: ['014816167'] // on tohtoriopiskelija, mutta kandioikeus jätetty oodissa voimaan
-    },
-    2020: {
-      oodi: ['011725361'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-    }
-  },
-  KH20_001: {
-    2020: {
-      sis: [
-        '014472190',
-        '014709698' // mistakenly missing from oodi-oodikone
-      ]
-    }
-  },
-  KH40_001: {
-    2020: {
-      oodi: ['014290314'] // Oodissa on virhe opintoajan pituuden laskussa. Tämä on tullut äskettäin ilmi. Sisussa on siis oikeat tiedot.
-    }
-  },
-  KH40_002: {
-    2020: {
-      sis: ['011368870'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
-  },
-  KH40_003: {
-    2020: {
-      sis: ['015340182'] // studyright enddate missing in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
-  },
-  KH40_004: {
-    2020: {
-      sis: ['011516143'] // ei läsnä syksyllä, puuttuu ehkä siksi oodista?
-    }
-  },
-  KH40_005: {
-    2018: {
-      sis: ['014650093'] // on tosiaan vähän ristiriitaiset tiedot Oodissa. Sisussa näkyy kuitenkin ok, niin että annetaan olla
-    }
-  },
   KH40_006: {
     2020: {
       oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
@@ -63,39 +22,6 @@ const ignores = {
   KH50_001: {
     2020: {
       oodi: ['013470384'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-    }
-  },
-  KH50_004: {
-    2020: {
-      oodi: ['013881465'] // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
-    }
-  },
-  KH74_001: {
-    2019: {
-      sis: ['014480768'] // graduation missing in oodi https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
-    },
-    2020: {
-      sis: ['014614071', '013497370'] // missing from oodi-oodikone perhaps due to missing läsnäolo for suksy
-    }
-  },
-  KH57_002: {
-    2017: {
-      oodi: ['014818220'] // graduation missing in sis-oodikone due to sis prblm https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2705
-    }
-  },
-  KH90_001: {
-    2020: {
-      sis: ['014261181'] // UPDATER FUKAP many things wrong... https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2707
-    }
-  },
-  KH55_001: {
-    2019: {
-      sis: ['015160142'] // UPDATER FUKAP duplicate studyrigth https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2709
-    }
-  },
-  KH57_001: {
-    2018: {
-      sis: ['013296128'] // leagally missing... do not remember why
     }
   },
   KH60_001: {
@@ -121,107 +47,37 @@ const ignores = {
     },
     2020: {
       // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
-      oodi: [
-        '013466013',
-        '014590027',
-        '014340963',
-        '014179998',
-        '013743299',
-        '013758239',
-        '014590807',
-        '013495071' // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
-      ],
+      oodi: ['013466013', '014590027', '014340963', '014179998', '013743299', '013758239', '014590807'],
       sis: ['014734511'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2790 also a varhaiskasvatus issue
     }
   },
   MH10_001: {
-    2019: {
-      oodi: ['014577749']// https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-    },
     2020: {
-      oodi: ['014724767'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-      sis: ['012334670']  // lienee oodi-oodikoneongelma
+      oodi: ['014925414'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
     }
   },
-  MH80_001: {
+  MH20_00: {
     2020: {
-      oodi: ['014015735']
-    }
-  },
-  MH20_001: {
-    2020: {
-      oodi: ['014582035'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
-    }
-  },
-  MH20_002: {
-    2018: {
-      oodi: ['014846467'] // väärin oodi-oodikoneessa
+      oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
     }
   },
   MH30_004: {
-    2018: {
-      oodi: ['011513023'] //ei vielä maisteriopiskelija
-    },
     2020: {
-      oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+      oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
-  MH40_001: {
-    2018: {
-      sis: ['014486995'] // unknown oodi-oodikonefakap
-    }
-  },
+
   MH40_002: {
     2019: {
       oodi: ['014720114'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
-  MH40_003: {
-    2019: {
-      sis: ['014444047'], // graduated but wrongly marked in oodi
-      oodi: ['015100050'] // not cancelled in oodi even if it should have been,
-    }
-  },
   MH40_005: {
-    2018: {
-      oodi: ['014913549'], // not cancelled in oodi even if it should have been
-      sis: ['014939002'] // graduated but wrongly marked in oodi
-    },
     2019: {
       oodi: ['015095686'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
-  MH40_006: {
-    2018: {
-      sis: ['014193880'] // graduated but wrongly marked in oodi
-    }
-  },
-  MH40_008: {
-    2020: {
-      oodi: ['011516143'] // oodi-oodikone has masters selection despite it clearly should not have one
-    }
-  },
-  MH40_009: {
-    2020: {
-      sis: ['010951408'],
-      // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
-      oodi: ['013466013', '014590027', '014340963', '014179998', '013743299', '013758239', '014590807']
-    }
-  },
-  MH40_010: {
-    2019: {
-      sis: ['014145812'] // graduated but wrongly marked in oodi
-    }
-  },
-  MH40_012: {
-    2018: {
-      oodi: ['014148547'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2830
-    }
-  },
   MH40_014: {
-    2017: {
-      sis: ['014445428'] // graduated but wrongly marked in oodi
-    },
     2020: {
       oodi: ['013349512'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
     }
@@ -231,43 +87,9 @@ const ignores = {
       oodi: ['014143791'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
     }
   },
-  MH50_001: {
-    2017: {
-      oodi: ['012023965'] // test student, should be ignored
-    },
-    2019: {
-      oodi: ['015103044'] // not cancelled in oodi even if it should have been
-    }, 
-    2020: {
-      oodi: ['014868814'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
-    }
-  },
-  MH50_005: {
-    2018: {
-      sis: ['014578353'] // graduated but wrongly marked in oodi 
-    },
-    2020: {
-      oodi: ['014589795'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
-    }
-  },
-  MH50_006: {
-    2017: {
-      oodi: ['014840913', '014796368']  // not cancelled in oodi even if it should have been
-    }
-  },
   MH50_009: {
-    2018: {
-      oodi: ['014973194', '014903452']  // not cancelled in oodi even if it should have been
-    },
-    2019: {
-      oodi: ['015175124']  // not cancelled in oodi even if it should have been
-    },
     2020: {
-      oodi: [
-        '014021774', // not cancelled in oodi even if it should have been, should have been in 2019 in oodi-oodikone
-        '014726943' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2841
-      ],
-      sis: ['013400710'] // virheellisesti ei näy oodi-oodikoneessa
+      oodi: ['014021774'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
   MH50_011: {
@@ -276,236 +98,143 @@ const ignores = {
     }
   },
   MH55_001: {
-    2018: {
-      sis: ['013161732'] // puuttuu oodi-oodikoneesta
-    }, 
     2019: {
       oodi: ['014744501'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2844
-    }, 
-    2020: {
-      sis: [
-        '014820878', // ei näy oodi-oodikoneessa tuntemattomasta syystä
-        '014957356', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2845
-        '015138336', // oodi-oodikoneessa virheellisesti provisorin ohjelmassa
-      ]
-    }
-  },
-  MH57_001
-  : {
-    2019: {
-      oodi: ['015180070'] // not cancelled in oodi even if it should have been
     }
   },
   MH57_003: {
-    2017: {
-      oodi: ['014818220'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2846
-    },
     2018: {
-      oodi: ['014905308', '014935828'] // not cancelled in oodi even if it should have been
-    }, 
-    2019: {
-      sis: ['014183324'] // for some reason not showing up is oodi-oodikone despite graduated
+      sis: ['014949160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     }
-  },
-  MH57_004: {
-    2017: {
-      sis: ['014803662'] // graduated but wrongly marked in oodi 
-    },
-    2019: {
-      sis: ['014441105'] // graduated but wrongly marked in oodi 
-    },
   },
   MH57_005: {
-    2017: {
-      sis: ['014137189'] // graduated but wrongly marked in oodi 
-    },
     2018: {
-      sis: ['014471971'], // graduated but wrongly marked in oodi 
-      oodi: ['014937428'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2847
+      sis: [
+        '014937428', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
+        '014952681' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
+      ]
     },
     2019: {
-      sis: ['014454516'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2847
+      sis: ['014454516'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     },
     2020: {
-      sis: ['014952681','014582844'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2847
-      oodi: ['014467710'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2847
-    },
-  },
-  MH70_001: {
-    2017: {
-      sis: ['014698592'], // graduated but wrongly marked in oodi 
-    },
-    2019: {
-      sis: ['014393871'], // graduated but wrongly marked in oodi 
-    },
-    2020: {
-      sis: ['011297556'], // wrongly cancelled in oodi
+      sis: ['014582844'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     }
   },
+
   MH70_002: {
     2018: {
-      oodi: [
-        '014449343', // oodi-oodikoneessa virheellisesti maisteriopiskelija vaikka kandi suorittamatta
-        '014917493', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2848
-        '014920697', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2848
-      ], 
-    },
-  },
-  MH70_003: {
-    2017: {
-      oodi: ['014816374'], // should be cancelled in oodi-oodikone
-      sis: ['014851290', '014830347', '014615504'] // graduated but wrongly marked in oodi 
+      sis: ['014917639'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     }
   },
   MH70_004: {
     2018: {
-      oodi: [
-        '014640346', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2848
-        '014722264'  // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
-      ],
+      sis: ['014919873'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     },
-    2020: {
-      oodi: [
-        '014054453', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-        '014919585', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
-        '014931505', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
-        '014946914', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2848
-      ]
+    2019: {
+      sis: ['014411148'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     }
   },
-  MH70_006: {
-    2018: {
-      oodi: ['015000862'] // not cancelled in oodi even if it should have been
-    }, 
-  },
+
   MH70_007: {
     2017: {
       oodi: [
-        '013324281', '014289642', '014463565', '013940775', '014330287' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+        '013324281',
+        '014289642',
+        '014330287' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       ]
-    }, 
+    }
   },
   MH70_008: {
     2017: {
-      oodi: ['014404139'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
-      sis: ['014814156'] // graduated but wrongly marked in oodi 
+      oodi: ['014404139'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
     },
     2018: {
-      oodi: [
-        '013175676', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2852
-        '012451964',  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2853
-        '014727214', '014732694', // not acually a master student, oodi-oodikone fakap
-      ], 
+      sis: ['014370386'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     },
     2019: {
-      oodi: ['013033815'] // a clear fukap in oodi-oodikone
+      sis: ['014863644'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
     },
     2020: {
-      oodi: [
-        '013032023', '014170751', '014453520', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-        '012740358' // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
-      ], 
-      sis: ['014467710', ] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2854
-    }
-  },
-  MH70_009: {
-    2018: {
-      oodi: ['014716270'] // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
-    },
-    2020: {
-      oodi: ['011309295'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
+      oodi: ['014453520'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
   MH80_001: {
-    2019: {
-      oodi: ['014816950'], // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
-      sis: ['014341027'] // graduated but wrongly marked in oodi 
-    },
     2020: {
       oodi: [
-        '014343643', '014015735', '014016572', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-        '014816934'  // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+        '014343643',
+        '014015735',
+        '014016572' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       ]
     }
   },
-  MH80_002: {
-    2017: {
-      oodi: ['014855458'] // ilmottautuminen puuttuu, oodi-oodikoneessa prblm
-    },
-    2019: {
-      oodi: ['015186113'] // ilmottautuminen puuttuu, oodi-oodikoneessa prblm
-    }
-  },
-  MH80_003: {
-    2018: {
-      oodi: ['013451099'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-    },
-    2019: {
-      oodi: ['015087461']  // ilmottautuminen puuttuu, oodi-oodikoneessa prblm
-    },
-    2020: {
-      oodi: ['014923924'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
-    },
-  },
-  MH80_005: {
-    2020: {
-      oodi: ['010956351'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2859
-    }
-  },
-  MH80_006: {
-    2020: {
-      oodi: ['014586293'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
-    }
-  },
+
   MH80_007: {
-    2018: {
-      oodi: ['015009423'], // ilmottautuminen puuttuu, oodi-oodikoneessa prblm
-      sis: [
-        '014477179', '014018651' // ei näy tuntemattomasta syystä oodi-oodikoneessa
-      ]
-    },
-    2019: {
-      oodi: ['014713406'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827 
-    },
     2020: {
-      oodi: [
-        '013214702', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827 
-        '014928806' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
-      ], 
+      oodi: ['013214702'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       sis: ['014591314'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2860
     }
   },
+
   MH60_001: {
     2017: {
-      oodi: ['014722206'], // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
-      sis: [ '014739590', '014849105', '014750427', '014848627', '014811706', '014830114', 
-        '014786132', '011488048', '012740617', '014451234' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
-      ] 
+      sis: [
+        '014739590',
+        '014849105',
+        '014750427',
+        '014848627',
+        '014811706',
+        '014830114',
+        '014786132',
+        '011488048',
+        '012740617',
+        '014451234',
+        '014741193', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '014829031',
+        '014818848' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
+      ]
     },
     2018: {
       oodi: [
-        '011488048', '014750427', '014624977', '014659133', '014720169', '014721825', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
-        '013143064', '014021813', '014470723', '014631821', '014643660', '014716102', '014716979', '014726082' // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa)
+        '011488048',
+        '014750427',
+        '014624977',
+        '014659133',
+        '014720169',
+        '014721825' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
       ]
     },
     2019: {
       oodi: [
-        '012740617','014830114', '014811706', '014786132', '014451234', '014323074', '014366086', '014528934', '014708699', '014711262', '014726105','014728983', '014731909', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '012740617',
+        '014830114',
+        '014811706',
+        '014786132',
+        '014451234',
+        '014323074',
+        '014366086',
+        '014528934',
+        '014708699',
+        '014711262',
+        '014726105',
+        '014728983',
+        '014731909', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
         '014732623' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2866
       ]
     },
     2020: {
       sis: [
-        '014829031', '014818848', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2861
         '014734511' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2862
       ],
-      oodi: ['014954744', '014711864', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2865
+      oodi: [
         '011856463', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-        '014739590', '014848627', '014849105', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
-        '014819504', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2829
-        '014222324', // oodi-oodikoneessa virheelliseti maisterissa (ei alempaa tutkintoa),
-        '014723645' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
-       ] 
+        '014739590',
+        '014848627',
+        '014849105',
+        '014741193', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '014954744', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2865
+        '014711864' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+      ]
     }
   },
   // there are many inconsistencies in masters, so they're grouped by the reason, not
@@ -513,23 +242,92 @@ const ignores = {
   MH_ALL: {
     // in sis, but not in oodi
     sis: [
-      // full-on oodikone fakap, no need to fix
-      '014581611' // not in oodi-oodikone due to fukap
-      // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2771
-      //'013012234',
-      // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2772
-      //'014193880',
-      // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2750
-      //'012334670',
-      //'010951408'
+      '014581611', // not in oodi-oodikone due to fukap pre 8.5.2021
+      '014650093', // KH40_005 on tosiaan vähän ristiriitaiset tiedot Oodissa. Sisussa näkyy kuitenkin ok, niin että annetaan olla
+      '013617228', // KH55_001 sisussa opinto-oikeus jatkuu hieman kauemmin 1.8.2021 vs 21.3.2021 eli close enouhgh
+      '013296128', // KH57_001 puuttuu oodi-oodikoneesta
+      '014480768', // KH74_001 graduation missing in oodi
+      '014588039', // KH80_002 näyttää olevan oikein, ei tietoa miksi ei näy sisussa 8.5.
+      '012334670', // MH10_001 oodissa virheellisesti peruttuna (jäänyt ilmoittautumatta vaikka on acually)
+      '014444047', // MH40_003 graduated but wrongly marked in oodi
+      '014939002', // MH40_005 graduated but wrongly marked in oodi
+      '014193880', // MH40_006 graduated but wrongly marked in oodi
+      '010951408', // MH40_009 oodissa virheellisesti peruttuna (jäänyt ilmoittautumatta vaikka on acually)
+      '014145812', // MH40_010 graduated but wrongly marked in oodi
+      '014445428', // MH40_014 graduated but wrongly marked in oodi
+      '014578353', // MH50_005 graduated but wrongly marked in oodi
+      '013400710', // MH50_009 virheellisesti ei näy oodi-oodikoneessa
+      '013161732', // MH55_001 puuttuu oodi-oodikoneesta
+      '013295763', // MH55_001 puuttuu oodi-oodikoneesta
+      '014183324', // MH57_003 tuntemattomasta syystä puuttuu oodi-oodikoneen populaatiosta
+      '014803662', // MH57_004 graduated but wrongly marked in oodi
+      '014441105', // MH57_004 graduated but wrongly marked in oodi
+      '014137189', // MH57_005 graduated but wrongly marked in oodi
+      '014471971', // MH57_005 graduated but wrongly marked in oodi
+      '014698592', // MH70_001 graduated but wrongly marked in oodi
+      '014393871', // MH70_001 graduated but wrongly marked in oodi
+      '011297556', // MH70_001 wrongly canceled in oodi-oodikone, dunno why
+      '011199159', // MH70_002 wrongly canceled in oodi-oodikone, dunno why
+      '014615504', // MH70_003 graduated but wrongly marked in oodi
+      '014830347', // MH70_003 graduated but wrongly marked in oodi
+      '014851290', // MH70_003 graduated but wrongly marked in oodi
+      '014814156', // MH70_008 graduated but wrongly marked in oodi
+      '014341027', // MH80_001 graduated but wrongly marked in oodi
+      '014477179', // MH80_007 graduated but wrongly marked in oodi
+      '013043575', // KH40_004 poissaolevana, mutta oodikoneessa virheellisesti cancelled
+      '014957356', // KH55_001 for unknown reasons does not show in oodi-oodikone
+      '015160142', // KH55_001 according to eija is oikein in oodi
+      '012629851', // MH40_002 virheellisesti ei näy oodi-oodikoneessa
+      '013631550' // MH50_012 virheellisesti ei näy oodi-oodikoneessa
     ],
     // in oodi, but not in sis
     oodi: [
-      // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2781
-      '013878737',
-      // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2749
-      //'014724767',
-      //'010947593',
+      '014816167', // on tohtoriopiskelija, mutta kandioikeus jätetty oodissa voimaan KH10_001
+      '013878737', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2781
+      // 9.5 ->
+      '014938427', // MH20_001 väärin oodi-oodikoneessa, ei ole maisteriopiskelija
+      '014846467', // MH20_002 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '011513023', // MH30_004 ei vielä maisteriopiskelija
+      '015100050', // MH40_003 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014913549', // MH40_005 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '011516143', // MH40_008 ei vielä maisteriopiskelija
+      '012023965', // MH50_001 testiopiskelija
+      '015103044', // MH50_001 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014796368', // MH50_006 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014840913', // MH50_006 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014973194', // MH50_009 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014903452', // MH50_009 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '015175124', // MH50_009 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '015180070', // MH57_001 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014905308', // MH57_003 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014935828', // MH57_003 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014449343', // MH70_002 ei vielä maisteriopiskelija
+      '014816374', // MH70_003 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014946914', // MH70_004 oodissa maisteriohjelma väärin kahteen kertaan
+      '014722264', // MH70_004 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '015000862', // MH70_006 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014716270', // MH70_009 ei vielä maisteriopiskelija
+      '014727214', // MH70_008 ei vielä maisteriopiskelija
+      '014732694', // MH70_008 ei vielä maisteriopiskelija
+      '012740358', // MH70_008 ei vielä maisteriopiskelija
+      '013033815', // MH70_008 ei maisterioikeutta
+      '014816950', // MH80_001 ei vielä maisteriopiskelija
+      '014855458', // MH80_002 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '015186113', // MH80_002 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '015087461', // MH80_003 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014588039', // MH80_003 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '015009423', // MH80_007 väärin oodi-oodikoneessa, ei ole ilmottautunut ollenkaan
+      '014722206', // MH60_001 ei vielä maisteriopiskelija
+      '013143064', // MH60_001 ei vielä maisteriopiskelija
+      '014021813', // MH60_001 ei vielä maisteriopiskelija
+      '014470723', // MH60_001 ei vielä maisteriopiskelija
+      '014631821', // MH60_001 ei vielä maisteriopiskelija
+      '014643660', // MH60_001 ei vielä maisteriopiskelija
+      '014716102', // MH60_001 ei vielä maisteriopiskelija
+      '014716979', // MH60_001 ei vielä maisteriopiskelija
+      '014726082', // MH60_001 ei vielä maisteriopiskelija
+      '014222324', // MH60_001 ei vielä maisteriopiskelija
+      '014589766' // MH20_001 ei vielä maisteriopiskelija
     ]
   }
 }
@@ -590,7 +388,7 @@ const populationDiff = async (programme, year) => {
 
   // Check for possible causes and group together
 
-  console.log('\n'+year)
+  console.log('\n' + year)
 
   if (oodiOnly.length > 0) {
     //console.log(`${oodiOnly.length} only in oodi, of which...`)
@@ -820,7 +618,7 @@ const bscCodes = async () => {
 
 const msc = async () => {
   const programmes = await masterCodes()
-  //console.log(programmes.join('\n'))
+  console.log(programmes.join('\n'))
   for (let programme of programmes) {
     await programmeDiff(programme)
   }
@@ -844,12 +642,10 @@ const main = async () => {
   // print moar/less
   verbose = true
 
-  const what = process.argv.slice(2)
+  // importing this module in transfers runs module without args, so we need to return here
+  if (process.argv.length === 2) return
 
-  if (process.argv.length === 2) {
-    await programmeDiff('KH20_001')
-    process.exit()
-  }
+  const what = process.argv.slice(2)
 
   if (what.includes('msc')) {
     await msc()
@@ -904,4 +700,24 @@ main()
 
     npm run diff:populations KH10_001 KH20_001 KH50_005
 
+  REMAINING ISSUES
+
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2790
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2844
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
+
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2852
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
 */
+
+module.exports = {
+  ignores
+}

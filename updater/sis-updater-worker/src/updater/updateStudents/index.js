@@ -101,18 +101,20 @@ const updateStudents = async personIds => {
     return res
   }, {})
 
-  const mappedStudents = students.map(studentMapper(attainments, degreeStudyRightSnapshots))
+  const attainmentsToBeExluced = await getAttainmentsToBeExcluded()
+
+  const mappedStudents = students.map(studentMapper(attainments, degreeStudyRightSnapshots, attainmentsToBeExluced))
   await bulkCreate(Student, mappedStudents)
 
-  const [moduleGroupIdToCode] = await Promise.all([
+  const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
     updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
     updateStudyRights(latestStudyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality)
   ])
 
   await Promise.all([
-    updateStudyRightElements(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber),
+    updateStudyRightElements(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights),
     updateTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber),
-    updateAttainments(attainments, personIdToStudentNumber),
+    updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber)
   ])
 }
@@ -180,7 +182,7 @@ const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, 
   await bulkCreate(Transfer, transfers)
 }
 
-const updateAttainments = async (attainments, personIdToStudentNumber) => {
+const updateAttainments = async (attainments, personIdToStudentNumber, attainmentsToBeExluced) => {
   const personIdToEmployeeNumber = await updateTeachers(attainments)
   const [courseUnits, modules] = await Promise.all([
     selectFromByIds(
@@ -217,16 +219,17 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     return res
   }, {})
 
-  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment', 'CustomCourseUnitAttainment'])
+  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment'])
   const creditTeachers = []
+
+  const coursesToBeCreated = new Map()
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async (attainments) => {
-    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => (att) => {
-      if (att.type !== 'CustomCourseUnitAttainment') return att
-  
+
+    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async (att) => {
+      if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') return att
       const courseUnits = courses.filter(c => c.code === attIdToCourseCode[att.id])
-  
       let courseUnit = courseUnits.find(cu => {
         const { startDate, endDate } = cu.validity_period
         const attainment_date = new Date(att.attainment_date)
@@ -250,48 +253,94 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     
           return isAfterStart && isBeforeEnd
         })
-        if (!courseUnit) return att
       }
   
+      if (!courseUnit) {
+        const parsedCourseCode = attIdToCourseCode[att.id]
+        const course = await Course.findOne({
+          where: {
+            code: parsedCourseCode
+          },
+        })
+        if (!course) {
+          coursesToBeCreated.set(parsedCourseCode, {
+            id: parsedCourseCode,
+            name: att.name,
+            code: parsedCourseCode,
+            coursetypecode: att.study_level_urn  
+          })
+        }
+        courseUnit = course ? course : { id: parsedCourseCode, code: parsedCourseCode }
+        courseUnit.group_id = courseUnit.id
+      }
+
+      if (!courseUnit) return att
       // Add the course to the mapping objects for creditMapper to work properly.
       courseUnitIdToCourseGroupId[courseUnit.id] = courseUnit.group_id
       courseGroupIdToCourseCode[courseUnit.group_id] = courseUnit.code
-  
+
       return { ...att, course_unit_id: courseUnit.id }
     }
   
     const findMissingCourseCodes = (attainmentIdCodeMap, att) => {
-      if (att.type !== 'CustomCourseUnitAttainment') return attainmentIdCodeMap
+      if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') {
+        return attainmentIdCodeMap
+      }
       if (!att.code) return attainmentIdCodeMap
-  
-      const codeParts = att.code.split(/\-\d+$/)
+      
+      const codeParts = att.code.split("-")
       if (!codeParts.length) return attainmentIdCodeMap
-  
-      const parsedCourseCode = codeParts[0]
+
+      let parsedCourseCode = ""
+      if (codeParts.length === 1) parsedCourseCode = codeParts[0]
+      else {
+        if (codeParts[1].length < 7) {
+          parsedCourseCode = `${codeParts[0]}-${codeParts[1]}`
+        } else {
+          parsedCourseCode = codeParts[0]
+        }
+      }
       return { ...attainmentIdCodeMap, [att.id]: parsedCourseCode }
     }
 
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
     const courses = await getCourseUnitsByCodes(missingCodes)
-    return attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments))
+    return await Promise.all(attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)))
   }
 
-  const fixedAttainments = await fixCustomCourseUnitAttainments(attainments) 
+  const fixedAttainments = await fixCustomCourseUnitAttainments(attainments)
+
+  const customTypes = new Set(['CustomModuleAttainment', 'CustomCourseUnitAttainment'])
+
+  // If an attainment has been attached to two degrees, a duplicate custom attainment is made for it. This duplicate
+  // should not show in the students attainments 
+  const doubleAttachment = (att, attainments) => {
+    if (!customTypes.has(att.type) && att.state !== "INCLUDED") {
+      return false
+    }
+
+    let isDoubleAttachment = false
+    const idParts = att.id.split("-")
+    if (idParts && idParts.length > 3) {
+      const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
+      isDoubleAttachment = attainments.some((a) => originalId === a.id && String(a.attainment_date) === String(att.attainment_date))
+    }
+
+    return isDoubleAttachment
+  }
 
   const mapCredit = creditMapper(
     personIdToStudentNumber,
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
-    courseGroupIdToCourseCode
+    courseGroupIdToCourseCode,
+    fixedAttainments
   )
-
-  // These are partial attainments, that are already attached to a larger acual attainment
-  const attainmentsToBeExluced = await getAttainmentsToBeExcluded()
 
   const credits = fixedAttainments
     .filter(a => a !== null)
-    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id))
+    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id) && !doubleAttachment(a, fixedAttainments))
     .map(a => {
       a.acceptor_persons
         .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
@@ -304,6 +353,9 @@ const updateAttainments = async (attainments, personIdToStudentNumber) => {
     })
     .filter(c => !!c)
 
+  const courses = Array.from(coursesToBeCreated.values())  
+
+  await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
   await bulkCreate(
     CreditTeacher,
