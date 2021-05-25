@@ -139,6 +139,12 @@ const updateTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, 
           ]
         ]
 
+      // If source or target is unknown, we shouldn't create transfer
+      if (sourcecode === 'urn:code:education-classification:koulutus_999999' ||
+          targetcode === 'urn:code:education-classification:koulutus_999999') {
+          return curr
+      }
+
       if (!sourcecode || !targetcode || sourcecode === targetcode) return curr
       // source === targetcode isn't really a change between programmes, but we should still update transferdate to
       // newer snapshot date time
