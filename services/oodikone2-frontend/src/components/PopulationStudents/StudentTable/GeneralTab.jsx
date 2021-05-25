@@ -43,6 +43,7 @@ const GeneralTab = ({
   }
 
   const students = Object.fromEntries(filteredStudents.map(stu => [stu.studentNumber, stu]))
+  const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
 
   const popupTimeoutLength = 1000
   let timeout = null
@@ -66,7 +67,7 @@ const GeneralTab = ({
     return studyrights
       .filter(sr => {
         const { studyright_elements: studyrightElements } = sr
-        return studyrightElements.filter(sre => queryStudyrights.includes(sre.code)).length >= queryStudyrights.length
+        return studyrightElements.filter(sre => cleanedQueryStudyrights.includes(sre.code)).length >= cleanedQueryStudyrights.length
       })
       .map(a => a[value])
   }
@@ -78,7 +79,7 @@ const GeneralTab = ({
       elemArr
         .filter(el => populationStatistics.elementdetails.data[el.code].type === 20)
         .forEach(el => {
-          if (queryStudyrights.includes(el.code)) {
+          if (cleanedQueryStudyrights.includes(el.code)) {
             startdate = el.startdate // eslint-disable-line
             enddate = el.enddate // eslint-disable-line
           }
@@ -135,7 +136,7 @@ const GeneralTab = ({
             acc.push(curr.studyright_elements)
             return acc
           }, [])
-        ).filter(e => e.code === queryStudyrights[0])
+        ).filter(e => e.code === cleanedQueryStudyrights[0])
         res[sn] = targetStudyright[0] ? targetStudyright[0].startdate : null
         return res
       }, {})
@@ -144,7 +145,7 @@ const GeneralTab = ({
   const studentToStudyrightActualStartMap = !(customPopulation || coursePopulation)
     ? selectedStudents.reduce((res, sn) => {
         const targetStudyright = students[sn].studyrights.find(studyright =>
-          studyright.studyright_elements.some(e => e.code === queryStudyrights[0])
+          studyright.studyright_elements.some(e => e.code === cleanedQueryStudyrights[0])
         )
         res[sn] = targetStudyright ? targetStudyright.studystartdate : null
         return res
@@ -154,7 +155,7 @@ const GeneralTab = ({
   const studentToStudyrightEndMap = !(customPopulation || coursePopulation)
     ? selectedStudents.reduce((res, sn) => {
         const targetStudyright = students[sn].studyrights.find(studyright =>
-          studyright.studyright_elements.some(e => e.code === queryStudyrights[0])
+          studyright.studyright_elements.some(e => e.code === cleanedQueryStudyrights[0])
         )
         res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
         return res
@@ -327,10 +328,10 @@ const GeneralTab = ({
     )
   }
 
-  if (queryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH')))
+  if (cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH')))
     columns.push({
       key: 'option',
-      title: queryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
+      title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
       getRowVal: s => (s.option ? getTextIn(s.option.name, language) : '')
     })
 
