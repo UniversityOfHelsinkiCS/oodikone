@@ -21,10 +21,11 @@ const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 
-const groupStudyrightSnapshots = (studyRightSnapshots) => {
+// Group snapshots by studyright id and find out when studyrights have begun
+const groupStudyrightSnapshots = (studyrightSnapshots) => {
   const snapshotsBystudyright = Object.entries(
     groupBy(
-      studyRightSnapshots.filter(sR => sR.document_state === 'ACTIVE'),
+      studyrightSnapshots.filter(s => s.document_state === 'ACTIVE'),
       'id'
     )
   )
@@ -57,6 +58,7 @@ const groupStudyrightSnapshots = (studyRightSnapshots) => {
 
 const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
   const getTransfersFrom = (orderedSnapshots, studyrightid, educationId) => {
+
     return orderedSnapshots.reduce((curr, snapshot, i) => {
       if (i === 0) return curr
 
@@ -129,13 +131,7 @@ const updateStudents = async personIds => {
     selectFromByIds('study_right_primalities', personIds, 'student_id')
   ])
 
-  // grouping in function that sets first_snapshot_date_time
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
-
-  const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
-    acc.push(curr[0])
-    return acc
-  }, [])
 
   const personIdToStudentNumber = students.reduce((res, curr) => {
     res[curr.id] = curr.student_number
@@ -155,7 +151,7 @@ const updateStudents = async personIds => {
 
   const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
     updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
-    updateStudyRights(latestStudyRights, personIdToStudentNumber, personIdToStudyRightIdToPrimality)
+    updateStudyRights(groupedStudyRightSnapshots, personIdToStudentNumber, personIdToStudyRightIdToPrimality)
   ])
 
   const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
@@ -167,8 +163,6 @@ const updateStudents = async personIds => {
     await bulkCreate(Transfer, mappedTransfers)
   ])
 }
-
-
 
 const updateAttainments = async (attainments, personIdToStudentNumber, attainmentsToBeExluced) => {
   const personIdToEmployeeNumber = await updateTeachers(attainments)
