@@ -392,7 +392,7 @@ const updateElementDetails = async studyRights => {
     ['code']
   )
 
-  return [...mappedDegrees, ...mappedProgrammes, ...mappedStudytracks].reduce((acc, curr) => {
+  return [...mappedProgrammes, ...mappedStudytracks].reduce((acc, curr) => {
     acc[curr.group_id] = curr.code
     return acc
   }, {})
