@@ -10,9 +10,10 @@ const {
   getCountry,
 } = require('./shared')
 
-const genderMankeli = gender => {
-  if (gender === 'male') return 1
-  if (gender === 'female') return 2
+const parseGender = gender_urn => {
+  if (!gender_urn) return null;
+  if (gender_urn === 'urn:code:gender:male') return 1
+  if (gender_urn === 'urn:code:gender:female') return 2
   return 3
 }
 
@@ -74,9 +75,10 @@ const calculateTotalCreditsFromAttainments = attainments => {
 const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
 
-  const gender_urn_array = gender_urn ? gender_urn.split(':') : null
-  const formattedGender = gender_urn_array ? gender_urn_array[gender_urn_array.length - 1] : null
-  const gender_code = genderMankeli(formattedGender)
+  // Filter out test student from oodi data
+  if (student_number === "012023965") return null
+
+  const gender_code = parseGender(gender_urn)
 
   const country = getCountry(student.country_urn)
   const home_country = student.citizenships ? getCountry(student.citizenships[0]) : null // this is stupid logic PLS FIX WHEN REAL PROPER DATA
@@ -88,8 +90,6 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
   // Current db doesn't have studentnumbers in attainment table so have to use person_id for now.
   const attainmentsOfStudent = attainments.filter(attainment => (attainment.person_id === id && !attainmentsToBeExluced.has(attainment.id)))
 
-  // Test student
-  if (student_number === "012023965") return null
 
   return {
     lastname: last_name,
