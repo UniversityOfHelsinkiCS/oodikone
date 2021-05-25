@@ -10,8 +10,14 @@ const {
   getCountry,
 } = require('./shared')
 
+// Keeping previous oodi logic:
+// 0 = Not known	
+// 1 = Male
+// 2 = Female
+// 3 = Other
+// Oodi also had 9 = Määrittelemätön, but Sis doesn't have this data
 const parseGender = gender_urn => {
-  if (!gender_urn) return null;
+  if (!gender_urn) return 0;
   if (gender_urn === 'urn:code:gender:male') return 1
   if (gender_urn === 'urn:code:gender:female') return 2
   return 3
