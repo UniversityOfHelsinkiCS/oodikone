@@ -55,7 +55,6 @@ const groupStudyrightSnapshots = (studyRightSnapshots) => {
   }, {})
 }
 
-
 const updateStudents = async personIds => {
   await loadMapsIfNeeded()
 
@@ -86,7 +85,7 @@ const updateStudents = async personIds => {
     return res
   }, {})
 
-  const attainmentsToBeExluced = await getAttainmentsToBeExcluded()
+  const attainmentsToBeExluced = getAttainmentsToBeExcluded()
 
   const mappedStudents = students.map(studentMapper(attainments, studyRightSnapshots, attainmentsToBeExluced))
   await bulkCreate(Student, mappedStudents)
