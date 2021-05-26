@@ -45,7 +45,7 @@ const allNavigationItems = {
   faculty: { path: '/faculties', key: 'faculty', label: 'Faculty', reqRights: ['faculties'] },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['dev', 'admin'] },
   sandbox: { path: '/sandbox', key: 'sandbox', label: 'Sandbox', reqRights: ['dev'] },
-  feedback: { path: '/feedback', key: 'feedback', label: 'Need help?' }
+  feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' }
 }
 
 const NavigationBar = props => {
