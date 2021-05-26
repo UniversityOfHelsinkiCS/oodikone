@@ -475,7 +475,7 @@ const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', 
 }
 
 const calculateStatusStatistics = async (unixMillis, showByYear) => {
-  const Y_TO_MS = 31556952000
+  const YEAR_TO_MILLISECONDS = 31556952000
   /* Memoize parses booleans into strings... */
   const startDate = showByYear === 'true' ? getCurrentYearStartDate() : await getCurrentStudyYearStartDate(unixMillis)
   const startYear = startDate.getFullYear()
@@ -485,8 +485,8 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     startYear,
     yearRange,
     diff => ({
-      from: new Date(startTime - diff * Y_TO_MS),
-      to: new Date(unixMillis - diff * Y_TO_MS)
+      from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
+      to: new Date(unixMillis - diff * YEAR_TO_MILLISECONDS)
     }),
     'acc',
     'students'
@@ -496,8 +496,8 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     startYear,
     yearRange.slice(0, -1),
     diff => ({
-      from: new Date(startTime - diff * Y_TO_MS),
-      to: new Date(startTime - (diff - 1) * Y_TO_MS)
+      from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
+      to: new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS)
     }),
     'total',
     'students'
