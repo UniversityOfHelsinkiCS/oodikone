@@ -1,6 +1,6 @@
 import { getTestUserSIS } from '.'
 
-export default getTestUserSIS()
+export default !getTestUserSIS()
   ? {
       backgroundColor: '#ffe9f0'
     }

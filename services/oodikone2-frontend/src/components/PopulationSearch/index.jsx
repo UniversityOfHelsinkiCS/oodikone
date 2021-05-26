@@ -9,6 +9,7 @@ import ProgressBar from '../ProgressBar'
 import InfoBox from '../InfoBox'
 import { useProgress } from '../../common/hooks'
 import info from '../../common/markdown/populationStatistics/search.info.md'
+import sisDestructionStyle from '../../common/sisDestructionStyle'
 
 const PopulationSearch = ({ populationFound, history, location, loading }) => {
   const { onProgress, progress } = useProgress(loading)
@@ -16,7 +17,7 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
   const title = populationFound && history.location.search ? 'Population' : 'Search for population'
 
   return (
-    <Segment>
+    <Segment style={sisDestructionStyle} >
       <Header size="medium">{title}</Header>
       {(!populationFound || !history.location.search) && <InfoBox content={info} />}
       <PopulationSearchForm onProgress={onProgress} />
