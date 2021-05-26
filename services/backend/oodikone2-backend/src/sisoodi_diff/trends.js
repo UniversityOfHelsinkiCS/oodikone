@@ -4,22 +4,25 @@ const oodiTrends = require('../services/coolDataScience')
 const recursiveDiff = (oodi, sis) => {
   Object.keys(oodi).forEach(child => {
     if (oodi[child].drill) {
+      console.log('\n=== Drilling to ', child)
+      console.log('- amount of modules / courses in oodidata: ', Object.keys(oodi[child].drill).length)
+      console.log('- amount of modules / courses in sisdata: ', Object.keys(sis[child].drill).length, '\n')
       recursiveDiff(oodi[child].drill, sis[child].drill)
     } else {
       // Go through each years diff
-      Object.keys(oodi[child].yearly).forEach(year => {
-        if (!sis[child]) {
-          console.log("Doesn't exist in sis data: ", oodi[child].name.fi)
-        } else {
+      if (!sis[child]) {
+        console.log("Doesn't exist in sis data: ", oodi[child].name.fi)
+      } else {
+        Object.keys(oodi[child].yearly).forEach(year => {
           const oodiCredits = oodi[child].yearly[year].acc
           const sisCredits = sis[child].yearly[year].acc
           if (oodiCredits != sisCredits) {
-            console.log("=== Acc diffs for ", oodi[child].name.fi)
-            console.log("Oodi: ", oodiCredits)
-            console.log("Sis: ", oodiCredits)
+            console.log('=== Acc diffs for ', oodi[child].name.fi)
+            console.log('Oodi: ', oodiCredits)
+            console.log('Sis: ', sisCredits)
           }
-        }
-      })
+        })
+      }
     }
   })
 }
@@ -36,7 +39,6 @@ const main = async () => {
 
   // diff lääkis
   recursiveDiff(oodiData.H30.drill, sisData.H30.drill)
-
 }
 
 main()
