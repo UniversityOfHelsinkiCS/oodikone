@@ -17,7 +17,7 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
   const title = populationFound && history.location.search ? 'Population' : 'Search for population'
 
   return (
-    <Segment style={sisDestructionStyle} >
+    <Segment style={sisDestructionStyle}>
       <Header size="medium">{title}</Header>
       {(!populationFound || !history.location.search) && <InfoBox content={info} />}
       <PopulationSearchForm onProgress={onProgress} />

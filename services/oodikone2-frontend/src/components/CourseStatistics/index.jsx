@@ -148,7 +148,7 @@ const CourseStatistics = props => {
       <Header className="segmentTitle" size="large">
         Course Statistics
       </Header>
-      <Segment className="contentSegment" style={sisDestructionStyle} >
+      <Segment className="contentSegment" style={sisDestructionStyle}>
         {getContent()}
         <ProgressBar fixed progress={progress} />
       </Segment>
