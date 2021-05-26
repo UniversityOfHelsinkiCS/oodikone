@@ -20,6 +20,11 @@ export const setTestUserSIS = booleanFlag =>
   booleanFlag ? localStorage.setItem(SIS_DB_FLAG, booleanFlag) : localStorage.removeItem(SIS_DB_FLAG)
 export const getTestUserSIS = () => localStorage.getItem(SIS_DB_FLAG)
 
+export const SIS_WARNING_FLAG = 'SIS_WARNING_FLAG'
+export const setHideSisWarningFlag = booleanFlag =>
+  booleanFlag ? localStorage.setItem(SIS_WARNING_FLAG, booleanFlag) : localStorage.removeItem(SIS_WARNING_FLAG)
+export const getHideSisWarningFlag = () => localStorage.getItem(SIS_WARNING_FLAG)
+
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>
     option.text
