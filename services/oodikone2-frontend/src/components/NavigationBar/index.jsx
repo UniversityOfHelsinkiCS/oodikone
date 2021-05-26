@@ -158,11 +158,11 @@ const NavigationBar = props => {
       </Menu.Item>
     )
 
-  const renderSISSwitch = isSis => (
+  const renderOodiSwitch = isSis => (
     <Menu.Item>
       <Button className={isSis ? 'sis-danger-zone-button' : ''} onClick={setFlagSIS} basic={!isSis} color="red">
         <Icon className="heartbeat" />
-        {isSis ? 'Stop SIS destruction' : 'Destroy oodikone with SIS'}
+        {isSis ? 'Stop Oodi destruction' : 'Destroy oodikone with Oodi'}
       </Button>
     </Menu.Item>
   )
@@ -179,26 +179,14 @@ const NavigationBar = props => {
     </Menu.Item>
   )
 
-  const renderSISWarning = () => (
-    <Menu.Item>
-      <img
-        src="https://p7.hiclipart.com/preview/453/925/261/emergency-lighting-siren-emergency-vehicle-lighting-light.jpg"
-        className="sis-destruction-siren"
-        alt="SIS destruction active"
-      />
-      AT YOUR OWN RISK
-    </Menu.Item>
-  )
-
   return (
     <Menu stackable fluid className="navBar">
       {renderHome()}
       {renderNavigationRoutes()}
       {renderUserMenu()}
       {renderLanguagePicker()}
-      {isAdmin && renderSISSwitch(!!getTestUserSIS())}
+      {isAdmin && renderOodiSwitch(!getTestUserSIS())}
       {mockedBy && renderStopMockingButton()}
-      {getTestUserSIS() && renderSISWarning()}
     </Menu>
   )
 }
