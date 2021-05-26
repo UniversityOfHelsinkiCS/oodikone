@@ -52,25 +52,14 @@ const calculateTotalCreditsFromAttainments = attainments => {
       return sum
     }
 
-    // If the state is FAILED or IMPROVED it should not be counted to total
-    if (!validStates.includes(att.state)) {
-      return sum
-    }
-
     if (!validTypes.includes(att.type)) {
       return sum
     }
 
-    // In case there is a real ModuleAttainment (with attainments attached to it) with same first part of ID, 
-    // also this one is then actually a module, that should not be counted in the total
-    // if (att.type === 'CustomModuleAttainment') {
-    //   const idParts = att.id.split("-")
-    //   if (idParts && idParts.length > 3) {
-    //     const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
-    //     const originalIsARealModule = attainments.filter((a) => a.id === originalId && a.nodes && a.nodes.length > 1) 
-    //     if (originalIsARealModule) return sum
-    //   }
-    // }
+    // If the state is FAILED or IMPROVED it should not be counted to total
+    if (!validStates.includes(att.state)) {
+      return sum
+    }
 
     return sum + Number(att.credits)
   }, 0)
@@ -160,11 +149,8 @@ const creditMapper = (
     ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
     : moduleGroupIdToModuleCode[module_group_id]
 
-  // "Substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc.
-  // // See, e.g., TKT5
-  // const isSubstitutedStudyModule = (state === 'SUBSTITUTED' || state === 'INCLUDED') && module_id !== null
-  // const isStudyModule = isModule(type) && !isSubstitutedStudyModule
 
+  // These are leaf attainments that have no other attainments attached to them
   const isStudyModule = nodes && nodes[0] !== undefined
 
   return {
