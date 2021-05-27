@@ -1,4 +1,4 @@
-const { uniqBy, flattenDeep, groupBy } = require('lodash')
+const { sortBy, uniqBy, flattenDeep, groupBy } = require('lodash')
 const {
   Organization,
   Course,
@@ -47,7 +47,10 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 
   const courses = Object.entries(groupIdToCourse).map(groupedCourse => {
     const [groupId, courses] = groupedCourse
-    const { organisations } = courses[0]
+
+    // Take organisation for the newest course_unit of this groupid
+    const coursesSortedByStartDate = sortBy(courses, 'validity_period.startDate')
+    const { organisations } = coursesSortedByStartDate[coursesSortedByStartDate.length - 1]
     const mapCourseProvider = courseProviderMapper(groupId)
     courseProviders.push(
       ...(organisations || [])
