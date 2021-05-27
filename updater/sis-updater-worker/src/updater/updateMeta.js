@@ -42,12 +42,40 @@ const updateCourseUnits = async courseUnits => {
 }
 
 const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
+  //console.log("=== ATTAINMENTS ===")
+  //Object.keys(courseIdToAttainments).forEach(courseId => {
+  //  console.log("courseId", courseId)
+  //  courseIdToAttainments[courseId].forEach(attainment => {
+  //    const { id, organisations } = attainment
+  //    console.log("id: ", id)
+  //    console.log("org: ", organisations)
+  //  })
+  //})
+  //console.log("=== COURSE UNITS ===")
+  //Object.keys(groupIdToCourse).forEach(groupId => {
+  //  console.log("groupId ", groupId)
+  //  groupIdToCourse[groupId].forEach(course => {
+  //    const { id, organisations } = course
+  //    console.log("id: ", id)
+  //    console.log("org: ", organisations)
+  //  })
+  //})
+
   const courseProviders = []
   const mapCourse = courseMapper(courseIdToAttainments)
+  const containsValidOrganisation = organisations => 
+    !!organisations.find(o => o.organisationId !== 'hy-org-virhe')
 
   const courses = Object.entries(groupIdToCourse).map(groupedCourse => {
     const [groupId, courses] = groupedCourse
-    const { organisations } = courses[0]
+    const courseWithValidOrganisation = courses.find(c => 
+      containsValidOrganisation(c.organisations)
+    )
+    //console.log("valid orgs ", courseWithValidOrganisation)
+    const organisations = courseWithValidOrganisation 
+      ? courseWithValidOrganisation.organisations 
+      : courses[0].organisations
+    //console.log("organisations", organisations)
     const mapCourseProvider = courseProviderMapper(groupId)
     courseProviders.push(
       ...(organisations || [])
