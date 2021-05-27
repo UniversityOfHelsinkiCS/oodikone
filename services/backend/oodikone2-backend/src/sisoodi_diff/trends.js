@@ -1,18 +1,30 @@
 const sisTrends = require('../servicesV2/trends')
 const oodiTrends = require('../services/coolDataScience')
 
-const recursiveDiff = (oodi, sis) => {
-  Object.keys(oodi).forEach(child => {
+let printCourses = false
+
+const recursiveDiff = (oodi, sis, level = 1) => {
+  Object
+    .keys(oodi).forEach(child => {
     if (oodi[child].drill) {
-      console.log('\n=== Drilling to ', child)
+      if (level === 1) {
+        console.log('\n====== Drilling to tiedekunta ', child, ' ======')
+        console.log(oodi[child].name.fi)
+      } else {
+        console.log('\n=== Drilling to programme', child, '===')
+        console.log(oodi[child].name.fi)
+      }
       console.log('- amount of modules / courses in oodidata: ', Object.keys(oodi[child].drill).length)
       console.log('- amount of modules / courses in sisdata: ', Object.keys(sis[child].drill).length, '\n')
-      recursiveDiff(oodi[child].drill, sis[child].drill)
+      console.log("- points in oodidata: ", oodi[child].current)
+      console.log("- points in sisdata: ", sis[child].current)
+      console.log("Total diff here: ", oodi[child].current - sis[child].current)
+      recursiveDiff(oodi[child].drill, sis[child].drill, level + 1)
     } else {
       // Go through each years diff
       if (!sis[child]) {
-        console.log("Doesn't exist in sis data: ", oodi[child].name.fi)
-      } else {
+        console.log("Doesn't exist in sis data: ", oodi[child].name.fi, ", ", child)
+      } else if (printCourses) {
         Object.keys(oodi[child].yearly).forEach(year => {
           const oodiCredits = oodi[child].yearly[year].acc
           const sisCredits = sis[child].yearly[year].acc
@@ -37,8 +49,8 @@ const main = async () => {
   const oodiData = await oodiTrends.getStatus(date.getTime(), showByYear)
   const sisData = await sisTrends.getStatus(date.getTime(), showByYear)
 
-  // diff lääkis
-  recursiveDiff(oodiData.H30.drill, sisData.H30.drill)
+  // diff everything at module level
+  recursiveDiff(oodiData, sisData)
 }
 
 main()

@@ -475,7 +475,7 @@ const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', 
 }
 
 const calculateStatusStatistics = async (unixMillis, showByYear) => {
-  const Y_TO_MS = 31556952000
+  const YEAR_TO_MILLISECONDS = 31556952000
   /* Memoize parses booleans into strings... */
   const startDate = showByYear === 'true' ? getCurrentYearStartDate() : await getCurrentStudyYearStartDate(unixMillis)
   const startYear = startDate.getFullYear()
@@ -485,8 +485,8 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     startYear,
     yearRange,
     diff => ({
-      from: new Date(startTime - diff * Y_TO_MS),
-      to: new Date(unixMillis - diff * Y_TO_MS)
+      from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
+      to: new Date(unixMillis - diff * YEAR_TO_MILLISECONDS)
     }),
     'acc',
     'students'
@@ -496,8 +496,8 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     startYear,
     yearRange.slice(0, -1),
     diff => ({
-      from: new Date(startTime - diff * Y_TO_MS),
-      to: new Date(startTime - (diff - 1) * Y_TO_MS)
+      from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
+      to: new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS)
     }),
     'total',
     'students'
@@ -1018,61 +1018,6 @@ const getStartYears = async () => {
     }
   )
 }
-
-// no idea what the comment below is, consider throwing into :roskis:
-
-// mankel data from:
-/* 
-      [
-        {
-          checkpoint: "2017-11-30T13:00:00.000Z",
-          orgCode: "H10",
-          orgName: "Teologinen tiedekunta",
-          programmeCode: "KH10_001",
-          programmeName: "Teologian ja uskonnontutkimuksen kandiohjelma",
-          programmeTotalStudents: "120",
-          students3y: "9"
-          students4y: "10"
-        },
-        ...
-      ]
-    */
-// into:
-/*
-    {
-      H10: {
-        name: "Teologinen tiedekunta",
-        code: "H10",
-        // snapshots of faculty level total & target numbers
-        snapshots: [
-          {
-            date: '2017-11-30T13:00:00.000Z',
-            totalStudents: 340, // sum of programme total students at this checkpoint
-            students3y: 43, // ^^^ of programme 3y target students
-            students4y: 55
-          },
-          ...
-        ],
-        // snapshots of programme level total & target numbers, grouped by programme
-        programmes: [
-          {
-            code: 'KH10_001',
-            name: 'Teologian ja uskonnontutkimuksen kandiohjelma',
-            snapshots: [
-              {
-                date: '2017-11-30T13:00:00.000Z',
-                totalStudents: 120,
-                students3y: 9,
-                students4y: 10
-              },
-              ...
-          },
-          ...
-        ]
-      },
-      ...
-    }
-    */
 
 module.exports = {
   withErr,
