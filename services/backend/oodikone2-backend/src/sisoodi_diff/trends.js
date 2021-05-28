@@ -56,6 +56,12 @@ const main = async () => {
   // diff everything at module level
   recursiveDiff(oodiData, sisData)
 
+  // diff oikis
+  // recursiveDiff(oodiData.H20.drill, sisData.H20.drill)
+
+  // diff lääkis
+  //recursiveDiff(oodiData.H30.drill, sisData.H30.drill)
+
   // print list of courses missing from trends sis data
   if (printListOfMissing) console.log(missingFromSisu.join('\n'))
 }
