@@ -414,7 +414,7 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
       INNER JOIN organization o ON o.id = cp.organizationcode
     WHERE
       cr.attainment_date BETWEEN :a AND :b
-      AND cr."isStudyModule" = false
+      AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
       AND cr.credittypecode IN (4, 9)
     GROUP BY co.id, o.code
     -- HAVING SUM(cr.credits) > 0
