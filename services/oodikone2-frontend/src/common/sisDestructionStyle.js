@@ -1,6 +1,6 @@
-import { getTestUserSIS } from '.'
+import { getTestUserOodi } from '.'
 
-export default !getTestUserSIS()
+export default !!getTestUserOodi()
   ? {
       backgroundColor: '#ffe9f0'
     }

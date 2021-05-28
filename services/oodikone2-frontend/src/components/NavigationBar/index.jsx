@@ -4,7 +4,7 @@ import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
-import { getUserRoles, setMocking, setTestUser, setTestUserSIS, getTestUserSIS, checkUserAccess } from '../../common'
+import { getUserRoles, setMocking, setTestUser, setTestUserOodi, getTestUserOodi, checkUserAccess } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
@@ -73,8 +73,8 @@ const NavigationBar = props => {
   const visibleNavigationItems = refreshNavigationRoutes()
 
   const setFlagSIS = () => {
-    const flag = getTestUserSIS()
-    setTestUserSIS(!flag)
+    const flag = getTestUserOodi()
+    setTestUserOodi(!flag)
     window.location.reload()
   }
 
@@ -185,7 +185,7 @@ const NavigationBar = props => {
       {renderNavigationRoutes()}
       {renderUserMenu()}
       {renderLanguagePicker()}
-      {isAdmin && renderOodiSwitch(!getTestUserSIS())}
+      {isAdmin && renderOodiSwitch(!!getTestUserOodi())}
       {mockedBy && renderStopMockingButton()}
     </Menu>
   )
