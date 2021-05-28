@@ -2,7 +2,6 @@ import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { chunk, isEqual } from 'lodash'
 import qs from 'query-string'
 import { useSelector } from 'react-redux'
-import { SIS_DB_FLAG } from './index'
 
 import { SEARCH_HISTORY_VERSION } from '../constants'
 import TSA from './tsa'
@@ -238,16 +237,6 @@ export const useChunk = (data, chunkifyBy) => {
   }, [chunkTrigger.current])
 
   return chunkifyBy ? chunkedData : data
-}
-
-export const useSisFeatureToggle = () => {
-  const [isSisModeActive, setIsSisModeActive] = useState(!!localStorage.getItem(SIS_DB_FLAG))
-
-  useEffect(() => {
-    setIsSisModeActive(!!localStorage.getItem(SIS_DB_FLAG))
-  }, [localStorage])
-
-  return isSisModeActive
 }
 
 export const useLocalStorage = (key, initialValue) => {
