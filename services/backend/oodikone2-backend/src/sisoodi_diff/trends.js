@@ -1,7 +1,10 @@
 const sisTrends = require('../servicesV2/trends')
 const oodiTrends = require('../services/coolDataScience')
 
+// change these flags to print less/more
 let printCourses = false
+let printListOfMissing = true
+let missingFromSisu = []
 
 const recursiveDiff = (oodi, sis, level = 1) => {
   Object
@@ -24,6 +27,7 @@ const recursiveDiff = (oodi, sis, level = 1) => {
       // Go through each years diff
       if (!sis[child]) {
         console.log("Doesn't exist in sis data: ", oodi[child].name.fi, ", ", child)
+        if (printListOfMissing) missingFromSisu.push(child)
       } else if (printCourses) {
         Object.keys(oodi[child].yearly).forEach(year => {
           const oodiCredits = oodi[child].yearly[year].acc
@@ -51,6 +55,9 @@ const main = async () => {
 
   // diff everything at module level
   recursiveDiff(oodiData, sisData)
+
+  // print list of courses missing from trends sis data
+  if (printListOfMissing) console.log(missingFromSisu.join('\n'))
 }
 
 main()
