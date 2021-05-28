@@ -1,6 +1,6 @@
 import { getTestUserOodi } from '.'
 
-export default !!getTestUserOodi()
+export default getTestUserOodi()
   ? {
       backgroundColor: '#ffe9f0'
     }
