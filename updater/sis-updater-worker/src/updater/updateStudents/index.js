@@ -259,6 +259,17 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             code: parsedCourseCode,
             coursetypecode: att.study_level_urn  
           })
+        }
+
+        // see if course has provider
+        const courseProvider = await CourseProvider.findOne({
+          where: {
+            coursecode: course.id
+          },
+        })
+
+        // if there's no courseprovider, create it
+        if (!courseProvider) {
           const mapCourseProvider = courseProviderMapper(parsedCourseCode)
           courseProvidersToBeCreated.push(
           ...(att.organisations || [])
@@ -266,6 +277,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             .map(mapCourseProvider)
           )
         }
+
         courseUnit = course ? course : { id: parsedCourseCode, code: parsedCourseCode }
         courseUnit.group_id = courseUnit.id
       }
