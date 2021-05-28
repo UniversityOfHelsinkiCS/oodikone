@@ -7,7 +7,7 @@ import qs from 'query-string'
 import Datetime from 'react-datetime'
 import { get as lodashGet } from 'lodash'
 import PopulationQueryCard from '../PopulationQueryCard'
-import { removePopulation, updatePopulationStudents } from '../../redux/populations'
+import { removePopulation } from '../../redux/populations'
 import TSA from '../../common/tsa'
 import './populationSearch.css'
 import infotooltips from '../../common/InfoToolTips'
@@ -52,7 +52,6 @@ class PopulationSearchHistory extends Component {
       query: object
     }).isRequired,
     units: object, // eslint-disable-line
-    updatePopulationStudents: func.isRequired,
     tags: arrayOf(shape({})).isRequired,
     history: shape({}).isRequired
   }
@@ -270,7 +269,6 @@ class PopulationSearchHistory extends Component {
     if (!units.data.programmes || !populations.query || !populations.data.students) {
       return null
     }
-    const studentNumberList = populations.data.students.map(s => s.studentNumber)
     const { programme: programmeCode, degree: degreeCode, studyTrack: studyTrackCode } = populations.query.studyRights
 
     // I'm sorry about the awful layout fix but we are going to rework this whole area from ground up, so no point in wasting more time now.
@@ -289,7 +287,6 @@ class PopulationSearchHistory extends Component {
               units.data.studyTracks[studyTrackCode]
             ].filter(Boolean)}
             removeSampleFn={this.removePopulation}
-            updateStudentsFn={() => this.props.updatePopulationStudents(studentNumberList)}
             updating={populations.updating}
             tags={tags}
           />
@@ -332,8 +329,7 @@ const mapStateToProps = ({ populations, populationDegreesAndProgrammes, tags }) 
 const mapDispatchToProps = dispatch => ({
   removePopulation: uuid => {
     dispatch(removePopulation(uuid))
-  },
-  updatePopulationStudents: students => dispatch(updatePopulationStudents(students))
+  }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)
