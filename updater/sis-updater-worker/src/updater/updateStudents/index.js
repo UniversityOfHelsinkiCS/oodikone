@@ -7,7 +7,8 @@ const {
   Teacher,
   Credit,
   CreditTeacher,
-  Transfer
+  Transfer,
+  CourseProvider
 } = require('../../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
 const { getEducation, getUniOrgId, loadMapsIfNeeded, getEducationType } = require('../shared')
@@ -15,7 +16,8 @@ const {
   studentMapper,
   mapTeacher,
   creditMapper,
-  semesterEnrollmentMapper
+  semesterEnrollmentMapper,
+  courseProviderMapper
 } = require('../mapper')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
@@ -205,6 +207,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const creditTeachers = []
 
   const coursesToBeCreated = new Map()
+  const courseProvidersToBeCreated = []
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async (attainments) => {
@@ -244,6 +247,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             code: parsedCourseCode
           },
         })
+
         if (!course) {
           coursesToBeCreated.set(parsedCourseCode, {
             id: parsedCourseCode,
@@ -251,6 +255,12 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             code: parsedCourseCode,
             coursetypecode: att.study_level_urn  
           })
+          const mapCourseProvider = courseProviderMapper(parsedCourseCode)
+          courseProviders.push(
+          ...(att.organisations || [])
+            .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+            .map(mapCourseProvider)
+          )
         }
         courseUnit = course ? course : { id: parsedCourseCode, code: parsedCourseCode }
         courseUnit.group_id = courseUnit.id
@@ -342,6 +352,11 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   await bulkCreate(
     CreditTeacher,
     uniqBy(creditTeachers, cT => cT.composite),
+    null,
+    ['composite']
+  )
+  await bulkCreate(CourseProvider, 
+    uniqBy(courseProviders, cP => cP.composite),
     null,
     ['composite']
   )
