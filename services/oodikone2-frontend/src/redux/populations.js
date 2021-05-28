@@ -62,13 +62,6 @@ export const getCustomPopulation = ({ studentnumberlist, onProgress }) => {
   return callController(route, prefix, body, 'post', query, params, onProgress)
 }
 
-export const updatePopulationStudents = students => {
-  const route = '/updatedatabase'
-  const prefix = 'UPDATE_POPULATION_STUDENTS_'
-
-  return callController(route, prefix, students, 'post')
-}
-
 export const clearPopulations = () => ({
   type: 'CLEAR_POPULATIONS'
 })

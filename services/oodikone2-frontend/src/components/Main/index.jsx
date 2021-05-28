@@ -7,6 +7,7 @@ import { BASE_PATH } from '../../constants'
 import Header from '../Header'
 import ErrorContainer from '../ErrorContainer'
 import Routes from '../Routes'
+import SisChangeMessage from './SisChangeMessage'
 import './main.css'
 
 const history = TSA.Matomo.connectToHistory(createBrowserHistory())
@@ -23,6 +24,7 @@ export default () => {
       <Router basename={BASE_PATH} history={history}>
         <main className="routeViewContainer">
           <Header />
+          <SisChangeMessage />
           <ErrorContainer />
           <Routes />
         </main>
