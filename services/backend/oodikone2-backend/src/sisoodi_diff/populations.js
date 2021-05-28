@@ -28,12 +28,7 @@ const ignores = {
     2017: {
       oodi: [
         // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
-        '013299358',
-        '014720169',
-        '014711262',
-        '014721825',
-        '014528934',
-        '014659133',
+        '013299358', '014720169', '014711262', '014721825', '014528934', '014659133',
         '014845154' // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
       ]
     },
@@ -47,7 +42,7 @@ const ignores = {
     },
     2020: {
       // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
-      oodi: ['013466013', '014590027', '014340963', '014179998', '013743299', '013758239', '014590807'],
+      oodi: ['013466013', '014590027', '014340963', '014179998', '013743299', '014590807'],
       sis: ['014734511'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2790 also a varhaiskasvatus issue
     }
   },
@@ -56,9 +51,9 @@ const ignores = {
       oodi: ['014925414'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
     }
   },
-  MH20_00: {
+  MH20_001: {
     2020: {
-      oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
+      oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2972
     }
   },
   MH30_004: {
@@ -66,7 +61,6 @@ const ignores = {
       oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
-
   MH40_002: {
     2019: {
       oodi: ['014720114'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
@@ -87,55 +81,17 @@ const ignores = {
       oodi: ['014143791'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
     }
   },
-  MH50_009: {
-    2020: {
-      oodi: ['014021774'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-    }
-  },
   MH50_011: {
     2017: {
       oodi: ['013337304'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
+
   MH55_001: {
     2019: {
       oodi: ['014744501'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2844
     }
   },
-  MH57_003: {
-    2018: {
-      sis: ['014949160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-    }
-  },
-  MH57_005: {
-    2018: {
-      sis: [
-        '014937428', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-        '014952681' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-      ]
-    },
-    2019: {
-      sis: ['014454516'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-    },
-    2020: {
-      sis: ['014582844'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-    }
-  },
-
-  MH70_002: {
-    2018: {
-      sis: ['014917639'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-    }
-  },
-  MH70_004: {
-    2018: {
-      sis: ['014919873'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-    },
-    2019: {
-      sis: ['014411148'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-    }
-  },
-
   MH70_007: {
     2017: {
       oodi: [
@@ -150,10 +106,7 @@ const ignores = {
       oodi: ['014404139'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
     },
     2018: {
-      sis: ['014370386'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
-    },
-    2019: {
-      sis: ['014863644'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
+      oodi: ['013175676']  // https://jira.it.helsinki.fi/browse/DOO-4540
     },
     2020: {
       oodi: ['014453520'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
@@ -168,11 +121,9 @@ const ignores = {
       ]
     }
   },
-
   MH80_007: {
     2020: {
       oodi: ['013214702'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-      sis: ['014591314'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2860
     }
   },
 
@@ -190,8 +141,6 @@ const ignores = {
         '012740617',
         '014451234',
         '014741193', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
-        '014829031',
-        '014818848' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
       ]
     },
     2018: {
@@ -278,7 +227,9 @@ const ignores = {
       '014957356', // KH55_001 for unknown reasons does not show in oodi-oodikone
       '015160142', // KH55_001 according to eija is oikein in oodi
       '012629851', // MH40_002 virheellisesti ei näy oodi-oodikoneessa
-      '013631550' // MH50_012 virheellisesti ei näy oodi-oodikoneessa
+      '013631550', // MH50_012 virheellisesti ei näy oodi-oodikoneessa
+      '013023498', // KH57_002 has longer studyright length in sisu
+      '014940525', // MH20_001 graduated but wrongly marked in oodi-oodikone
     ],
     // in oodi, but not in sis
     oodi: [
@@ -327,7 +278,7 @@ const ignores = {
       '014716979', // MH60_001 ei vielä maisteriopiskelija
       '014726082', // MH60_001 ei vielä maisteriopiskelija
       '014222324', // MH60_001 ei vielä maisteriopiskelija
-      '014589766' // MH20_001 ei vielä maisteriopiskelija
+      '014589766', // MH20_001 ei vielä maisteriopiskelija
     ]
   }
 }
@@ -702,20 +653,17 @@ main()
 
   REMAINING ISSUES
 
-  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2701
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
-  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2790
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2828
+
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
-  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2882
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2844
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
-
-  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2852
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
+
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2972
 */
 
 module.exports = {
