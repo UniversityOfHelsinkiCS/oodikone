@@ -8,16 +8,12 @@ import Header from '../Header'
 import ErrorContainer from '../ErrorContainer'
 import Routes from '../Routes'
 import SisChangeMessage from './SisChangeMessage'
-import { getTestUserSIS, setTestUserSIS } from '../../common'
 import './main.css'
 
 const history = TSA.Matomo.connectToHistory(createBrowserHistory())
 
 export default () => {
   useEffect(() => {
-    if (!getTestUserSIS) {
-      setTestUserSIS(true)
-    }
     if (process.env.NODE_ENV !== 'development') {
       initShibbolethPinger(60000, window.location.origin)
     }
