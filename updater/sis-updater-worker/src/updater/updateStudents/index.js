@@ -7,7 +7,8 @@ const {
   Teacher,
   Credit,
   CreditTeacher,
-  Transfer
+  Transfer,
+  CourseProvider
 } = require('../../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
 const { getEducation, getUniOrgId, loadMapsIfNeeded, getEducationType } = require('../shared')
@@ -15,7 +16,8 @@ const {
   studentMapper,
   mapTeacher,
   creditMapper,
-  semesterEnrollmentMapper
+  semesterEnrollmentMapper,
+  courseProviderMapper
 } = require('../mapper')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
@@ -205,6 +207,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const creditTeachers = []
 
   const coursesToBeCreated = new Map()
+  const courseProvidersToBeCreated = []
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async (attainments) => {
@@ -222,10 +225,10 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
         return isAfterStart && isBeforeEnd
       })
   
+      // Sometimes registrations are fakd, see attainment hy-opinto-141561630. 
+      // The attainmentdate is outside of all courses, yet should be mapped. 
+      // Try to catch suitable courseUnit for this purpose
       if (!courseUnit) {
-        /**
-         * Sometimes registrations are fakd, see attainment hy-opinto-141561630. The attainmentdate is outside of all courses, yet should be mapped.
-         */
         courseUnit = courseUnits.find(cu => {
           const { startDate, endDate } = cu.validity_period
           const date = new Date(att.registration_date)
@@ -237,13 +240,18 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
         })
       }
   
+      // If there's no suitable courseunit, there isn't courseunit available at all.
+      // --> Course should be created, if it doesn't exist in sis db
       if (!courseUnit) {
         const parsedCourseCode = attIdToCourseCode[att.id]
+        // see if course exists
         const course = await Course.findOne({
           where: {
             code: parsedCourseCode
           },
         })
+
+        // If course doesn't exist, create it
         if (!course) {
           coursesToBeCreated.set(parsedCourseCode, {
             id: parsedCourseCode,
@@ -252,6 +260,24 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             coursetypecode: att.study_level_urn  
           })
         }
+
+        // see if course has provider
+        const courseProvider = await CourseProvider.findOne({
+          where: {
+            coursecode: course.id
+          },
+        })
+
+        // if there's no courseprovider, create it
+        if (!courseProvider) {
+          const mapCourseProvider = courseProviderMapper(parsedCourseCode)
+          courseProvidersToBeCreated.push(
+          ...(att.organisations || [])
+            .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+            .map(mapCourseProvider)
+          )
+        }
+
         courseUnit = course ? course : { id: parsedCourseCode, code: parsedCourseCode }
         courseUnit.group_id = courseUnit.id
       }
@@ -342,6 +368,11 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   await bulkCreate(
     CreditTeacher,
     uniqBy(creditTeachers, cT => cT.composite),
+    null,
+    ['composite']
+  )
+  await bulkCreate(CourseProvider, 
+    uniqBy(courseProvidersToBeCreated, cP => cP.composite),
     null,
     ['composite']
   )

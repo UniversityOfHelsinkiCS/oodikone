@@ -1,7 +1,7 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 import { API_BASE_PATH, BASE_PATH, ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
-import { getMocked, setMocking, setTestUser, getTestUser, getTestUserSIS } from '../common'
+import { getMocked, setMocking, setTestUser, getTestUser, getTestUserOodi } from '../common'
 
 const isTestEnv = BASE_PATH === '/testing/'
 const isDevEnv = process.env.NODE_ENV === 'development'
@@ -10,7 +10,7 @@ const devOptions = {
     uid: getTestUser() || 'tktl',
     displayName: 'Development Kayttaja',
     'shib-session-id': 'mock-session',
-    'X-sis': !!getTestUserSIS()
+    'X-sis': !getTestUserOodi()
   }
 }
 
@@ -31,7 +31,7 @@ const getDefaultConfig = () => {
   }
   return {
     headers: {
-      'X-sis': !!getTestUserSIS()
+      'X-sis': !getTestUserOodi()
     }
   }
 }
