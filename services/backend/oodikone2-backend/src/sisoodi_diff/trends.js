@@ -8,25 +8,24 @@ let printListOfMissing = true
 let missingFromSisu = []
 
 const recursiveDiff = (oodi, sis, level = 1) => {
-  Object
-    .keys(oodi).forEach(child => {
+  Object.keys(oodi).forEach(child => {
     if (oodi[child].drill) {
       if (level === 1) {
         console.log('\n====== Drilling to tiedekunta ', child, ' ======')
         console.log(oodi[child].name.fi)
         console.log('- amount of programmes in oodidata: ', Object.keys(oodi[child].drill).length)
         console.log('- amount of programmes in sisdata: ', Object.keys(sis[child].drill).length, '\n')
-        console.log("- points in oodidata: ", oodi[child].current)
-        console.log("- points in sisdata: ", sis[child].current)
-        console.log("Total diff here: ", oodi[child].current - sis[child].current)
-        } else if(printProgrammes) {
+        console.log('- points in oodidata: ', oodi[child].current)
+        console.log('- points in sisdata: ', sis[child].current)
+        console.log('Total diff here: ', oodi[child].current - sis[child].current)
+      } else if (printProgrammes) {
         console.log('\n=== Drilling to programme', child, '===')
         console.log(oodi[child].name.fi)
         console.log('- amount of courses in oodidata: ', Object.keys(oodi[child].drill).length)
         console.log('- amount of courses in sisdata: ', Object.keys(sis[child].drill).length, '\n')
-        console.log("- points in oodidata: ", oodi[child].current)
-        console.log("- points in sisdata: ", sis[child].current)
-        console.log("Total diff here: ", oodi[child].current - sis[child].current)
+        console.log('- points in oodidata: ', oodi[child].current)
+        console.log('- points in sisdata: ', sis[child].current)
+        console.log('Total diff here: ', oodi[child].current - sis[child].current)
       }
       recursiveDiff(oodi[child].drill, sis[child].drill, level + 1)
     } else {
@@ -35,7 +34,7 @@ const recursiveDiff = (oodi, sis, level = 1) => {
         if (printListOfMissing) {
           missingFromSisu.push(child)
         } else {
-          console.log("Doesn't exist in sis data: ", oodi[child].name.fi, ", ", child)
+          console.log("Doesn't exist in sis data: ", oodi[child].name.fi, ', ', child)
         }
       } else if (printCourses) {
         Object.keys(oodi[child].yearly).forEach(year => {
