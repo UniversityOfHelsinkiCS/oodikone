@@ -16,7 +16,7 @@ let verbose = false
 const ignores = {
   KH40_006: {
     2020: {
-      oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+     oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
   KH50_001: {
@@ -24,6 +24,13 @@ const ignores = {
       oodi: ['013470384'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
+
+  KH50_004: {
+    2020: {
+      oodi: ['013881465'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2984
+    }
+  },
+
   KH60_001: {
     2017: {
       oodi: [
@@ -81,6 +88,13 @@ const ignores = {
       oodi: ['014143791'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
     }
   },
+
+  MH50_009: {
+    2020: {
+      oodi: ['014021774'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2984
+    }
+  },
+
   MH50_011: {
     2017: {
       oodi: ['013337304'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
@@ -664,6 +678,7 @@ main()
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
 
   https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2972
+  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2984
 */
 
 module.exports = {
