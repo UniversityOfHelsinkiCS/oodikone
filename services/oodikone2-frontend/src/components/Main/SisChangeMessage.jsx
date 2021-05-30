@@ -20,7 +20,7 @@ const SisChangeMessage = props => {
 
   const reasons = [
     'Osalla opiskelijoista voi olla opintopisteiden kokonaismäärässä eroja. Tämä koskee erityisesti tiedekuntia, joissa on runsaasti osasuorituksia.',
-    "Populaatioiden 'Advanced settings' -valikossa vaihto-opiskelijoiden ja tutkintoon johtamattomien opinto-oikeuksien näyttäminen ei välttämättä toimi."
+    'Populaatioiden osalta vaihto-opiskelijoiden, tutkintoon johtamattomien opinto-oikeuksien ja ohjelmaan siirrettyjen opiskelijoiden näyttäminen ei kaikissa tapauksissa toimi oikein.'
   ]
 
   // Kasvatustiedehuomiot
@@ -30,14 +30,14 @@ const SisChangeMessage = props => {
     rights.includes('MH60_002') ||
     userRoles.includes('admin')
   ) {
-    reasons.push(
-      'Varhaiskasvatuksen opettaja -tutkintosuunnan on opiskelijoita, joiden opinto-oikeudet näyttävät virheellisiltä.'
-    )
+    reasons.push('Osalla Varhaiskasvatuksen opettaja -tutkintosuunnan opiskelijoista on virheellisiä opinto-oikeuksia.')
   }
 
   // Oikeustiedehuomiot
   if (rights.includes('KH20_001') || rights.includes('MH20_001') || userRoles.includes('admin')) {
-    reasons.push('Oikeustieteellisen tiedekunnan tuottamat opintopisteet näkyvät Trends-osiossa väärin.')
+    reasons.push(
+      'Oikeustieteellisen tiedekunnan tuottamien opintopisteiden kokonaismäärä on Trends-osiossa liian alhainen.'
+    )
   }
 
   return (
