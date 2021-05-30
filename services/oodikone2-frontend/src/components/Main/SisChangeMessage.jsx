@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+
 import React, { useState } from 'react'
 import { Message } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
