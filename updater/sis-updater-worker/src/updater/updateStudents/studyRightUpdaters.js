@@ -300,11 +300,7 @@ const updateElementDetails = async studyRights => {
           educationPhase2GroupId,
           educationPhase2ChildGroupId
         },
-        phase1_education_classification_urn,
-        phase2_education_classification_urn
       } = curr
-      acc[10].add(phase1_education_classification_urn)
-      acc[10].add(phase2_education_classification_urn)
       acc[20].add(educationPhase1GroupId)
       acc[20].add(educationPhase2GroupId)
       acc[30].add(educationPhase1ChildGroupId)
@@ -312,11 +308,6 @@ const updateElementDetails = async studyRights => {
       return acc
     },
     { 10: new Set(), 20: new Set(), 30: new Set() }
-  )
-
-  const degrees = await selectFromByIds('education_classifications',
-    [...groupedEducationPhases[10]].filter(a => !!a),
-    'id'
   )
   const programmes = await selectFromByIds(
     'modules',
@@ -328,14 +319,13 @@ const updateElementDetails = async studyRights => {
     [...groupedEducationPhases[30]].filter(a => !!a),
     'group_id'
   )
-  const mappedDegrees = degrees.map(degree => ({ code: degree.id, name: degree.short_name, type: 10 }))
   const mappedProgrammes = programmes.map(programme => ({ ...programme, type: 20 }))
   const mappedStudytracks = studytracks.map(studytrack => ({ ...studytrack, type: 30 }))
 
   // Sort to avoid deadlocks
   await bulkCreate(
     ElementDetail,
-    sortedUniqBy(sortBy([...mappedDegrees, ...mappedProgrammes, ...mappedStudytracks], ['code']), e => e.code),
+    sortedUniqBy(sortBy([...mappedProgrammes, ...mappedStudytracks], ['code']), e => e.code),
     null,
     ['code']
   )

@@ -1,29 +1,41 @@
 const sisTrends = require('../servicesV2/trends')
 const oodiTrends = require('../services/coolDataScience')
 
+// change these flags to print less/more
 let printCourses = false
+let printProgrammes = false
+let printListOfMissing = true
+let missingFromSisu = []
 
 const recursiveDiff = (oodi, sis, level = 1) => {
-  Object
-    .keys(oodi).forEach(child => {
+  Object.keys(oodi).forEach(child => {
     if (oodi[child].drill) {
       if (level === 1) {
         console.log('\n====== Drilling to tiedekunta ', child, ' ======')
         console.log(oodi[child].name.fi)
-      } else {
+        console.log('- amount of programmes in oodidata: ', Object.keys(oodi[child].drill).length)
+        console.log('- amount of programmes in sisdata: ', Object.keys(sis[child].drill).length, '\n')
+        console.log('- points in oodidata: ', oodi[child].current)
+        console.log('- points in sisdata: ', sis[child].current)
+        console.log('Total diff here: ', oodi[child].current - sis[child].current)
+      } else if (printProgrammes) {
         console.log('\n=== Drilling to programme', child, '===')
         console.log(oodi[child].name.fi)
+        console.log('- amount of courses in oodidata: ', Object.keys(oodi[child].drill).length)
+        console.log('- amount of courses in sisdata: ', Object.keys(sis[child].drill).length, '\n')
+        console.log('- points in oodidata: ', oodi[child].current)
+        console.log('- points in sisdata: ', sis[child].current)
+        console.log('Total diff here: ', oodi[child].current - sis[child].current)
       }
-      console.log('- amount of modules / courses in oodidata: ', Object.keys(oodi[child].drill).length)
-      console.log('- amount of modules / courses in sisdata: ', Object.keys(sis[child].drill).length, '\n')
-      console.log("- points in oodidata: ", oodi[child].current)
-      console.log("- points in sisdata: ", sis[child].current)
-      console.log("Total diff here: ", oodi[child].current - sis[child].current)
       recursiveDiff(oodi[child].drill, sis[child].drill, level + 1)
     } else {
       // Go through each years diff
       if (!sis[child]) {
-        console.log("Doesn't exist in sis data: ", oodi[child].name.fi, ", ", child)
+        if (printListOfMissing) {
+          missingFromSisu.push(child)
+        } else {
+          console.log("Doesn't exist in sis data: ", oodi[child].name.fi, ', ', child)
+        }
       } else if (printCourses) {
         Object.keys(oodi[child].yearly).forEach(year => {
           const oodiCredits = oodi[child].yearly[year].acc
@@ -51,6 +63,15 @@ const main = async () => {
 
   // diff everything at module level
   recursiveDiff(oodiData, sisData)
+
+  // diff oikis
+  // recursiveDiff(oodiData.H20.drill, sisData.H20.drill)
+
+  // diff lääkis
+  //recursiveDiff(oodiData.H30.drill, sisData.H30.drill)
+
+  // print list of courses missing from trends sis data
+  if (printListOfMissing) console.log(missingFromSisu.join('\n'))
 }
 
 main()

@@ -35,7 +35,12 @@ const ignores = {
     2017: {
       oodi: [
         // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
-        '013299358', '014720169', '014711262', '014721825', '014528934', '014659133',
+        '013299358',
+        '014720169',
+        '014711262',
+        '014721825',
+        '014528934',
+        '014659133',
         '014845154' // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
       ]
     },
@@ -120,7 +125,7 @@ const ignores = {
       oodi: ['014404139'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
     },
     2018: {
-      oodi: ['013175676']  // https://jira.it.helsinki.fi/browse/DOO-4540
+      oodi: ['013175676'] // https://jira.it.helsinki.fi/browse/DOO-4540
     },
     2020: {
       oodi: ['014453520'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
@@ -137,7 +142,7 @@ const ignores = {
   },
   MH80_007: {
     2020: {
-      oodi: ['013214702'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+      oodi: ['013214702'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
 
@@ -154,7 +159,7 @@ const ignores = {
         '011488048',
         '012740617',
         '014451234',
-        '014741193', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '014741193' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
       ]
     },
     2018: {
@@ -243,7 +248,7 @@ const ignores = {
       '012629851', // MH40_002 virheellisesti ei näy oodi-oodikoneessa
       '013631550', // MH50_012 virheellisesti ei näy oodi-oodikoneessa
       '013023498', // KH57_002 has longer studyright length in sisu
-      '014940525', // MH20_001 graduated but wrongly marked in oodi-oodikone
+      '014940525' // MH20_001 graduated but wrongly marked in oodi-oodikone
     ],
     // in oodi, but not in sis
     oodi: [
@@ -292,7 +297,7 @@ const ignores = {
       '014716979', // MH60_001 ei vielä maisteriopiskelija
       '014726082', // MH60_001 ei vielä maisteriopiskelija
       '014222324', // MH60_001 ei vielä maisteriopiskelija
-      '014589766', // MH20_001 ei vielä maisteriopiskelija
+      '014589766' // MH20_001 ei vielä maisteriopiskelija
     ]
   }
 }

@@ -37,7 +37,14 @@ module.exports = (app, url) => {
   app.use(url, matomoInit)
   app.use(url, login)
   app.use(`${url}/superlogin`, superlogin)
-  app.use(auth.checkAuth, auth.checkRequiredGroup, auth.checkUserBlacklisting, accessLogger, sentryUserId)
+  app.use(
+    auth.checkAuth,
+    auth.checkRequiredGroup,
+    auth.checkUserBlacklisting,
+    auth.checkIfNonAdminAskingOldOodiData,
+    accessLogger,
+    sentryUserId
+  )
   app.use(url, elementdetails)
   app.use(url, courses)
   app.use(url, students)
