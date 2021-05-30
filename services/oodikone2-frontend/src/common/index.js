@@ -15,10 +15,16 @@ const TEST_USERID = 'TEST_USERID'
 export const setTestUser = userid =>
   userid ? localStorage.setItem(TEST_USERID, userid) : localStorage.removeItem(TEST_USERID)
 export const getTestUser = () => localStorage.getItem(TEST_USERID)
-export const SIS_DB_FLAG = 'SIS_DB_FLAG'
-export const setTestUserSIS = booleanFlag =>
-  booleanFlag ? localStorage.setItem(SIS_DB_FLAG, booleanFlag) : localStorage.removeItem(SIS_DB_FLAG)
-export const getTestUserSIS = () => localStorage.getItem(SIS_DB_FLAG)
+
+export const OODI_DB_FLAG = 'OODI_DB_FLAG'
+export const setTestUserOodi = booleanFlag =>
+  booleanFlag ? localStorage.setItem(OODI_DB_FLAG, booleanFlag) : localStorage.removeItem(OODI_DB_FLAG)
+export const getTestUserOodi = () => localStorage.getItem(OODI_DB_FLAG)
+
+export const SIS_WARNING_FLAG = 'SIS_WARNING_FLAG'
+export const setHideSisWarningFlag = booleanFlag =>
+  booleanFlag ? localStorage.setItem(SIS_WARNING_FLAG, booleanFlag) : localStorage.removeItem(SIS_WARNING_FLAG)
+export const getHideSisWarningFlag = () => localStorage.getItem(SIS_WARNING_FLAG)
 
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>

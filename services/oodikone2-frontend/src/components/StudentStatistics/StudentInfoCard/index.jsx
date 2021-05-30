@@ -8,8 +8,6 @@ import { studentDetailsType } from '../../../constants/types'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants'
 import './studentInfoCard.css'
 import { removeStudentSelection, resetStudent } from '../../../redux/students'
-import { updatePopulationStudents } from '../../../redux/populations'
-import { useSisFeatureToggle } from '../../../common/hooks'
 import { callApi } from '../../../apiConnection'
 
 const StudentInfoCard = props => {
@@ -22,19 +20,13 @@ const StudentInfoCard = props => {
     props.removeStudentSelection()
   }
 
-  const sisActive = useSisFeatureToggle()
-
   const formattedTimestamp = reformatDate(
     student.updatedAt,
     props.has_dev_role ? DISPLAY_DATE_FORMAT_DEV : DISPLAY_DATE_FORMAT
   )
 
   const updateStudent = async () => {
-    if (sisActive) {
-      await callApi('/updater/update/v2/students', 'post', [student.studentNumber])
-    } else {
-      await props.updatePopulationStudents([student.studentNumber])
-    }
+    await callApi('/updater/update/v2/students', 'post', [student.studentNumber])
   }
 
   return (
@@ -73,7 +65,6 @@ StudentInfoCard.propTypes = {
   resetStudent: func.isRequired,
   history: shape({}).isRequired,
   updating: bool.isRequired,
-  updatePopulationStudents: func.isRequired,
   has_dev_role: bool.isRequired
 }
 
@@ -86,7 +77,6 @@ const mapStateToProps = state => ({
 export default withRouter(
   connect(mapStateToProps, {
     removeStudentSelection,
-    resetStudent,
-    updatePopulationStudents
+    resetStudent
   })(StudentInfoCard)
 )

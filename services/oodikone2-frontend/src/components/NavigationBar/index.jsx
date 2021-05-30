@@ -4,7 +4,7 @@ import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
-import { getUserRoles, setMocking, setTestUser, setTestUserSIS, getTestUserSIS, checkUserAccess } from '../../common'
+import { getUserRoles, setMocking, setTestUser, setTestUserOodi, getTestUserOodi, checkUserAccess } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
@@ -45,7 +45,7 @@ const allNavigationItems = {
   faculty: { path: '/faculties', key: 'faculty', label: 'Faculty', reqRights: ['faculties'] },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['dev', 'admin'] },
   sandbox: { path: '/sandbox', key: 'sandbox', label: 'Sandbox', reqRights: ['dev'] },
-  feedback: { path: '/feedback', key: 'feedback', label: 'Need help?' }
+  feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' }
 }
 
 const NavigationBar = props => {
@@ -73,8 +73,8 @@ const NavigationBar = props => {
   const visibleNavigationItems = refreshNavigationRoutes()
 
   const setFlagSIS = () => {
-    const flag = getTestUserSIS()
-    setTestUserSIS(!flag)
+    const flag = getTestUserOodi()
+    setTestUserOodi(!flag)
     window.location.reload()
   }
 
@@ -158,11 +158,11 @@ const NavigationBar = props => {
       </Menu.Item>
     )
 
-  const renderSISSwitch = isSis => (
+  const renderOodiSwitch = isSis => (
     <Menu.Item>
       <Button className={isSis ? 'sis-danger-zone-button' : ''} onClick={setFlagSIS} basic={!isSis} color="red">
         <Icon className="heartbeat" />
-        {isSis ? 'Stop SIS destruction' : 'Destroy oodikone with SIS'}
+        {isSis ? 'Stop Oodi destruction' : 'Destroy oodikone with Oodi'}
       </Button>
     </Menu.Item>
   )
@@ -179,26 +179,14 @@ const NavigationBar = props => {
     </Menu.Item>
   )
 
-  const renderSISWarning = () => (
-    <Menu.Item>
-      <img
-        src="https://p7.hiclipart.com/preview/453/925/261/emergency-lighting-siren-emergency-vehicle-lighting-light.jpg"
-        className="sis-destruction-siren"
-        alt="SIS destruction active"
-      />
-      AT YOUR OWN RISK
-    </Menu.Item>
-  )
-
   return (
     <Menu stackable fluid className="navBar">
       {renderHome()}
       {renderNavigationRoutes()}
       {renderUserMenu()}
       {renderLanguagePicker()}
-      {isAdmin && renderSISSwitch(!!getTestUserSIS())}
+      {isAdmin && renderOodiSwitch(!!getTestUserOodi())}
       {mockedBy && renderStopMockingButton()}
-      {getTestUserSIS() && renderSISWarning()}
     </Menu>
   )
 }
