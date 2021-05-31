@@ -20,14 +20,6 @@ logo
 cat scripts/assets/welcome.txt
 
 options=(
-    "Set up with anonymous data."
-    "Set up with real data."
-    "Reset anonymous database."
-    "Reset real data database."
-    "Download latest anonymous data."
-    "Download latest real data."
-    "Set up importer-db."
-    "Set up importer-db from importer-duplicate."
     "Download & reset all real data"
     "Quit."
 )

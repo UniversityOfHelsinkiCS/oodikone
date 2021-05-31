@@ -1,6 +1,5 @@
 #!/bin/bash
 
-DIR_PATH=$(dirname "$0")
 USER_DATA_FILE_PATH="hyuserdata"
 ANONDB_DIR=anonyymioodi
 BACKUP_DIR=backups
@@ -28,14 +27,14 @@ get_username() {
     echo ""
     echo "!! No previous username data found. Will ask it now !!"
     echo "Enter your Uni Helsinki username:"
-    read username
-    echo $username > $USER_DATA_FILE_PATH
+    read -r username
+    echo "$username" > "$USER_DATA_FILE_PATH"
     echo "Succesfully saved username"
     echo ""
   fi
 
   # Set username
-  username=$(cat $USER_DATA_FILE_PATH | head -n 1)
+  username=$(head -n 1 < $USER_DATA_FILE_PATH)
 }
 
 docker-compose-dev () {
@@ -45,7 +44,7 @@ docker-compose-dev () {
 retry () {
     for i in {1..60}
     do
-        $@ && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
+        "$@" && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
     done
 }
 
@@ -56,7 +55,7 @@ init_dirs () {
 }
 
 echo_path () {
-    echo $(pwd)
+  pwd
 }
 
 get_oodikone_server_backup() {
@@ -76,24 +75,23 @@ restore_psql_from_backup () {
     echo ""
     echo "Restoring database from backup ($1/$2):"
     echo "  1. Copying dump..."
-    docker cp $1 $2:/asd.sqz
+    docker cp "$1" "$2:/asd.sqz"
     echo "  2. Writing database..."
-    docker exec $2 pg_restore -U postgres --no-owner -F c --dbname=$3 -j4 /asd.sqz
+    docker exec "$2" pg_restore -U postgres --no-owner -F c --dbname="$3 -j4 /asd.sqz"
 }
 
 ping_psql () {
-    drop_psql $1 $2
+    drop_psql "$1" "$2"
     echo "Creating psql in container $1 with db name $2"
-    retry docker exec -u postgres $1 pg_isready --dbname=$2
-    #docker exec -u postgres $1 psql -c "CREATE DATABASE $2" || echo "container $1 DB $2 already exists"
-    docker exec -u postgres $1 createdb $2 || echo "container $1 DB $2 already exists"
+    retry docker exec -u postgres "$1" pg_isready --dbname="$2"
+    docker exec -u postgres "$1" createdb "$2" || echo "container $1 DB $2 already exists"
 }
 
 drop_psql () {
     echo "Dropping psql in container $1 with db name $2"
-    retry docker exec -u postgres $1 pg_isready --dbname=$2
+    retry docker exec -u postgres "$1" pg_isready --dbname="$2"
     #docker exec -u postgres $1 psql -c "DROP DATABASE $2" || echo "container $1 DB $2 doesn't exists"
-    docker exec -u postgres $1 dropdb $2 || echo "container $1 DB $2 does not exist"
+    docker exec -u postgres "$1" dropdb "$2" || echo "container $1 DB $2 does not exist"
 }
 
 db_setup_full () {
