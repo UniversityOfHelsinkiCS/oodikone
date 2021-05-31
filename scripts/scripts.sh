@@ -109,34 +109,34 @@ run_full_real_data_reset () {
 }
 
 install_local_npm_packages () {
-    npm ci
-
-    # The rest is required for linting to work.
+    # These are required for linting and only installed if not already there
+    [[ -d node_modules ]] || npm ci
     cd services/oodikone2-frontend || return
-    npm ci
+    [[ -d node_modules ]] || npm ci
     cd ../oodikone2-analytics || return
-    npm ci
+    [[ -d node_modules ]] || npm ci
     cd ../oodikone2-userservice || return
-    npm ci
+    [[ -d node_modules ]] || npm ci
     cd ../backend/oodikone2-backend || return
-    npm ci
+    [[ -d node_modules ]] || npm ci
     cd ../updater_writer || return
-    npm ci
+    [[ -d node_modules ]] || npm ci
 
     cd ../../../
 }
 
 # Set up oodikone with real data
 run_full_setup () {
-    echo "Setup npm packages"
+    echo "=== Setup npm packages ==="
     install_local_npm_packages
-    echo "Creating needed directories and ensuring directories have correct rights"
+    echo "=== Creating directories and ensuring rights are correct ==="
     mkdir -p $BACKUP_DIR
     chmod 755 scripts/docker-entrypoint-initdb.d
-    echo "Setting up needed databases"
+    echo "=== Setting up needed databases ==="
     run_full_real_data_reset
-    echo "Building images"
+    echo "=== Building images ==="
     docker-compose-dev build
+    echo "=== Starting oodikone ==="
     npm run docker:up:real
     cat scripts/assets/instructions.txt
 }
