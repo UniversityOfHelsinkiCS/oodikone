@@ -5,13 +5,13 @@ source ./scripts/scripts.sh
 PS3='Please enter your choice: '
 
 mopo () {
-    if [ $(tput cols) -gt "100" ]; then
+    if [ "$(tput cols)" -gt "100" ]; then
         cat scripts/assets/mopo2.txt
     fi
 }
 
 logo () {
-    if [ $(tput cols) -gt "76" ]; then
+    if [ "$(tput cols)" -gt "76" ]; then
         cat scripts/assets/logo.txt
     fi
 }
