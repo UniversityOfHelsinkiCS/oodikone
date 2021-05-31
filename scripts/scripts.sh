@@ -70,19 +70,7 @@ drop_psql () {
 
 ### === FUNCTIONS TO RUN CLI OPTIONS ===
 
-run_importer_setup () {
-    get_username
-    echo "Using your Uni Helsinki username: $username"
-
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-    "$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
-
-    docker-compose -f dco.data.yml up -d sis-importer-db
-    ping_psql "sis-importer-db" "importer-db"
-    restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
-    docker-compose -f dco.data.yml down
-}
-
+# Download & reset all real data
 run_full_real_data_reset () {
     get_username
     echo "Using your Uni Helsinki username: $username"
@@ -124,20 +112,21 @@ install_local_npm_packages () {
     npm ci
 
     # The rest is required for linting to work.
-    cd services/oodikone2-frontend
+    cd services/oodikone2-frontend || return
     npm ci
-    cd ../oodikone2-analytics
+    cd ../oodikone2-analytics || return
     npm ci
-    cd ../oodikone2-userservice
+    cd ../oodikone2-userservice || return
     npm ci
-    cd ../backend/oodikone2-backend
+    cd ../backend/oodikone2-backend || return
     npm ci
-    cd ../updater_writer
+    cd ../updater_writer || return
     npm ci
 
     cd ../../../
 }
 
+# Set up oodikone with real data
 run_full_setup () {
     echo "Setup npm packages"
     install_local_npm_packages
@@ -152,10 +141,38 @@ run_full_setup () {
     cat scripts/assets/instructions.txt
 }
 
-get_oodikone_server_backup() {
+# Download & reset sis importer data
+run_importer_data_reset() {
     get_username
     echo "Using your Uni Helsinki username: $username"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-96.cs.helsinki.fi:/home/updater_user/backups/* "$BACKUP_DIR/"
+
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+    "$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
+
+    docker-compose -f dco.data.yml up -d sis-importer-db
+    ping_psql "sis-importer-db" "importer-db"
+    restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
+    docker-compose -f dco.data.yml down
+}
+
+# Download & reset old oodi data
+run_oodi_data_reset () {
+    get_username
+    echo "Using your Uni Helsinki username: $username"
+
+    echo "Downloading oodi-db dump"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+    "$username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
+
+    docker-compose-dev down
+    docker-compose-dev up -d db
+
+    echo "Restoring PostgreSQL from backup. This might take a while."
+
+    ping_psql "oodi_db" "tkt_oodi_real"
+    restore_psql_from_backup $PSQL_REAL_DB_BACKUP oodi_db tkt_oodi_real
+
+    echo "Database setup finished"
+
+    docker-compose-dev down
 }
