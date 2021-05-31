@@ -68,7 +68,7 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
-    "concurrently": "^6.0.2",
+    "concurrently": "^6.2.0",
     "cypress": "^7.4.0",
     "cypress-smokify": "0.0.3",
     "husky": "^6.0.0"
