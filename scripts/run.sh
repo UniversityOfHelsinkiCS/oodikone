@@ -41,10 +41,10 @@ while true; do
                 run_full_real_data_reset
                 ;;
             "Download & reset sis importer data.")
-                run_importer_setup
+                run_importer_data_reset
                 ;;
             "Download & reset old oodi data.")
-                run_importer_setup
+                run_oodi_data_reset
                 ;;
             "Quit.")
                 break 2
