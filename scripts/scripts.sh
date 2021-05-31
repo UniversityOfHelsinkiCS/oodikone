@@ -139,24 +139,22 @@ run_full_real_data_reset () {
     get_username
     echo "Using your Uni Helsinki username: $username"
 
-    echo "Downloading oodikone database dumps"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
-
-    echo "Downloading oodi-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/* "$BACKUP_DIR/"
+    echo "Downloading user-db, analytics-db and kone-db dumps"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+    "$username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
 
     echo "Downloading sis-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@svm-96.cs.helsinki.fi:/home/updater_user/backups/* "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+    "$username@svm-96.cs.helsinki.fi:/home/updater_user/backups/*" "$BACKUP_DIR/"
 
     echo "Downloading importer-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" $username@importer:/home/importer_user/importer-db/backup/importer-db.sqz "$BACKUP_DIR/"
+    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+    "$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
 
     docker-compose-dev down
-    docker-compose-dev up -d db user_db db_kone analytics_db db_sis sis-importer-db
+    docker-compose-dev up -d user_db db_kone analytics_db db_sis sis-importer-db
     
     echo "Restoring PostgreSQL from backup. This might take a while."
-    ping_psql "oodi_db" "tkt_oodi_real"
-    restore_psql_from_backup $PSQL_REAL_DB_BACKUP oodi_db tkt_oodi_real
     ping_psql "db_kone" "db_kone_real"
     restore_psql_from_backup $KONE_REAL_DB_BACKUP db_kone db_kone_real
     ping_psql "oodi_user_db" "user_db_real"
