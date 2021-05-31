@@ -61,11 +61,11 @@ jobs:
             - ~/.cache
       - run: npm run docker:ci -- pull --ignore-pull-failures
       - run: npm run docker:ci -- build
-      - run: npm run docker:ci -- up -d db user_db db_kone analytics_db
+      - run: npm run docker:ci -- up -d user_db db_kone analytics_db
       - *check_exit_statuses
-      - run: git clone --depth 1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
+      # - run: git clone --depth 1 git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git
       # - run: source ./scripts/scripts.sh && init_dirs && db_anon_setup_full
-      - *check_exit_statuses
+      # - *check_exit_statuses
       - run: npm run docker:ci -- up -d --no-recreate
       - run:
           name: log_in_background
