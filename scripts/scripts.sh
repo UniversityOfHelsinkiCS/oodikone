@@ -125,13 +125,19 @@ install_local_npm_packages () {
     cd ../../../
 }
 
+init_dirs () {
+  mkdir -p $BACKUP_DIR nginx nginx/cache nginx/letsencrypt
+  touch nginx/error.log
+  touch nginx/log
+  chmod 755 scripts/docker-entrypoint-initdb.d
+}
+
 # Set up oodikone with real data
 run_full_setup () {
     echo "=== Setup npm packages ==="
     install_local_npm_packages
     echo "=== Creating directories and ensuring rights are correct ==="
-    mkdir -p $BACKUP_DIR
-    chmod 755 scripts/docker-entrypoint-initdb.d
+    init_dirs
     echo "=== Setting up needed databases ==="
     run_full_real_data_reset
     echo "=== Building images ==="
