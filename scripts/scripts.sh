@@ -138,14 +138,12 @@ install_local_npm_packages () {
     cd ../../../
 }
 
-init_dirs () {
-}
-
 run_full_setup () {
     echo "Setup npm packages"
     install_local_npm_packages
-    echo "Init dirs"
-    init_dirs
+    echo "Create needed directories and ensure directories have correct rights"
+    mkdir -p $BACKUP_DIR
+    chmod 755 scripts/docker-entrypoint-initdb.d
     echo "Setting up needed databases"
     run_full_real_data_reset
     echo "Building images"
