@@ -48,11 +48,11 @@ docker-compose-dev () {
 
 restore_psql_from_backup () {
     echo ""
-    echo "Restoring database from backup ($1/$2):"
+    echo "Restoring database from backup $1 to container $2:"
     echo "  1. Copying dump..."
     docker cp "$1" "$2:/asd.sqz"
     echo "  2. Writing database..."
-    docker exec "$2" pg_restore -U postgres --no-owner -F c --dbname="$3 -j4 /asd.sqz"
+    docker exec "$2" pg_restore -U postgres --no-owner -F c --dbname="$3" -j4 /asd.sqz
 }
 
 ping_psql () {
@@ -130,7 +130,7 @@ install_local_npm_packages () {
 run_full_setup () {
     echo "Setup npm packages"
     install_local_npm_packages
-    echo "Create needed directories and ensure directories have correct rights"
+    echo "Creating needed directories and ensuring directories have correct rights"
     mkdir -p $BACKUP_DIR
     chmod 755 scripts/docker-entrypoint-initdb.d
     echo "Setting up needed databases"
