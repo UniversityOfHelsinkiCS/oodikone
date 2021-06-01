@@ -13,6 +13,8 @@ const { getRedisCDS, saveToRedis, getTargetStudentCounts } = require('./shared')
 const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
 const CURRENT_DATE = new Date()
 
+const REDIS_KEY_GRADUATED = 'GRADUATED_DATA_V2'
+
 const REDIS_KEY_PROTOC_PROGRAMME = 'PROTOC_PROGRAMME_DATA_V2'
 
 const withErr = handler => (req, res, next) =>
@@ -62,6 +64,7 @@ const getGraduatedBetween = async (start, end) => {
 }
 
 const calculateProtoCProgramme = async query => {
+  console.log("PROTOCPROGRAMME")
   const associations = await getAssociations()
   const codes = associations.programmes[query.code]
     ? [...associations.programmes[query.code].studytracks, query.code]
