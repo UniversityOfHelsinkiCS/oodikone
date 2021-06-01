@@ -1,9 +1,9 @@
 const _ = require('lodash')
-const { ElementDetail, Organization } = require('../../modelsV2')
 const {
   dbConnections: { sequelize }
 } = require('../../databaseV2/connection')
 const { mapToProviders } = require('../../util/utils')
+const { ElementDetail, Organization } = require('../../modelsV2')
 const { getRedisCDS, saveToRedis, userServiceClient } = require('./shared')
 
 const REDIS_KEY_STATUS = 'STATUS_DATA_V2'
