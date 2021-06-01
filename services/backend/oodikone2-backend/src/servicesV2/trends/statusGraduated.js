@@ -125,6 +125,11 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
   // add totals to mankeled
   promisedTotalData.forEach(data => {
     data.yearlyData.forEach(curr => {
+      // if no accumulated init faculty
+      if (!mankeled[curr.faculty_code]) {
+        const org = orgs.find(o => o.code === curr.faculty_code)
+        mankeled[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
+      }
       // if no accumulated init programme
       if (!mankeled[curr.faculty_code]['drill'][curr.code]) {
         const element = elements.find(e => e.code === curr.code)
