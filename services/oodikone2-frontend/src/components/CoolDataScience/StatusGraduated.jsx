@@ -22,12 +22,6 @@ const getP = (a, b) => {
   return a / b
 }
 
-const mapValueToRange = (x, min1, max1, min2, max2) => {
-  if (x < min1) return min2
-  if (x > max1) return max2
-  return ((x - min1) * (max2 - min2)) / (max1 - min1) + min2
-}
-
 const StatusContainer = ({
   title,
   current,
@@ -40,9 +34,11 @@ const StatusContainer = ({
   yearlyValues,
   showByYear
 }) => {
-  const diff = Math.round(current - previous)
-  const p = getP(current, previous)
-  const change = Math.round((p - 1) * 1000) / 10
+  const mapValueToRange = (x, min1, max1, min2, max2) => {
+    if (x < min1) return min2
+    if (x > max1) return max2
+    return ((x - min1) * (max2 - min2)) / (max1 - min1) + min2
+  }
 
   const getColor = v => {
     if (v > 2.5) return '#6ab04c'
@@ -54,6 +50,16 @@ const StatusContainer = ({
     if (x > 0) return `+${x.toLocaleString('fi')}`
     return x.toLocaleString('fi')
   }
+
+  const getDiffAndChange = (current, previous) => {
+    if (!current && !previous) return [0, 0]
+    const diff = Math.round(current - previous)
+    const change = Math.round((getP(current, previous) - 1) * 1000) / 10
+    return [diff, change]
+  }
+
+  const noTitleDataToShow = !current && !previous
+  const [diff, change] = getDiffAndChange(current, previous)
 
   return (
     <Segment
@@ -91,11 +97,17 @@ const StatusContainer = ({
             name="arrow right"
           />
         </div>
-        <div>
-          <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(change) }}>{plussify(diff)}</span>
-          <br />
-          <span style={{ fontWeight: 'bold', color: getColor(change) }}>({plussify(change)}%)</span>
-        </div>
+        {noTitleDataToShow ? (
+          <div>
+            <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(0) }}>Ei dataa tältä lukuvuodelta.</span>
+          </div>
+        ) : (
+          <div>
+            <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(change) }}>{plussify(diff)}</span>
+            <br />
+            <span style={{ fontWeight: 'bold', color: getColor(change) }}>({plussify(change)}%)</span>)
+          </div>
+        )}
       </div>
       {showYearlyValues && (
         <div style={{ marginTop: '10px', textAlign: 'start' }}>
@@ -120,8 +132,8 @@ const StatusContainer = ({
 
 StatusContainer.propTypes = {
   title: PropTypes.string.isRequired,
-  current: PropTypes.number.isRequired,
-  previous: PropTypes.number.isRequired,
+  current: PropTypes.number,
+  previous: PropTypes.number,
   clickable: PropTypes.bool.isRequired,
   handleClick: PropTypes.func.isRequired,
   min1: PropTypes.number.isRequired,
@@ -129,6 +141,11 @@ StatusContainer.propTypes = {
   showYearlyValues: PropTypes.bool.isRequired,
   yearlyValues: PropTypes.shape({}).isRequired,
   showByYear: PropTypes.bool.isRequired
+}
+
+StatusContainer.defaultProps = {
+  current: null,
+  previous: null
 }
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
