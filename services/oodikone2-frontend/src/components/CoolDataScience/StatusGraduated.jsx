@@ -109,7 +109,7 @@ const StatusContainer = ({
         </div>
         {noTitleDataToShow ? (
           <div>
-            <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(0) }}>Ei dataa tältä lukuvuodelta.</span>
+            <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(0) }}>Ei vielä dataa tältä lukuvuodelta.</span>
           </div>
         ) : (
           <div>
