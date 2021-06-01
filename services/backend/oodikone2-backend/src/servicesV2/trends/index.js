@@ -5,9 +5,9 @@ const {
 } = require('../../databaseV2/connection')
 const { getAssociations } = require('../../services/studyrights')
 
-const { getStatus, refreshStatus } = require('./getStatus')
-const { getProtoC, refreshProtoC } = require('./getProtoC')
-const { getUber, refreshUber } = require('./uberData')
+const { getStatus, refreshStatus } = require('./status')
+const { getProtoC, refreshProtoC } = require('./protoC')
+const { getUber, refreshUber } = require('./uber')
 const { getRedisCDS, saveToRedis, getTargetStudentCounts } = require('./shared')
 
 const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
