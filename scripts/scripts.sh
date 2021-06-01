@@ -129,7 +129,7 @@ init_dirs () {
   mkdir -p $BACKUP_DIR nginx nginx/cache nginx/letsencrypt
   touch nginx/error.log
   touch nginx/log
-  chmod 755 scripts/docker-entrypoint-initdb.d
+  chmod -R 755 scripts/docker-entrypoint-initdb.d
 }
 
 # Set up oodikone with real data
