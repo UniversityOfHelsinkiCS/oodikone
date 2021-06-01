@@ -51,6 +51,8 @@ const StatusContainer = ({
     return x.toLocaleString('fi')
   }
 
+  // TODO: Maybe just fix this in backend and add default value 0 for everything?
+
   const getDiffAndChange = (current, previous, noTitleDataToShow, hasChangedButCantShowPercentage) => {
     if (noTitleDataToShow) return [0, 0]
     const diff = Math.round(current - previous)
@@ -63,7 +65,9 @@ const StatusContainer = ({
     return [diff, change]
   }
 
-  const noTitleDataToShow = current === null && previous === null
+  const noTitleDataToShow = current === null
+  if (!current) current = 0
+  if (!previous) previous = 0
   const hasChangedButCantShowPercentage = (previous === 0 || current === 0) && previous !== current
   const [diff, change] = getDiffAndChange(current, previous, noTitleDataToShow, hasChangedButCantShowPercentage)
 
@@ -154,8 +158,8 @@ StatusContainer.propTypes = {
 }
 
 StatusContainer.defaultProps = {
-  current: 0,
-  previous: 0
+  current: null,
+  previous: 0 
 }
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
