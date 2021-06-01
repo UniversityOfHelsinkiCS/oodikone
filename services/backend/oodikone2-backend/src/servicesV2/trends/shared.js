@@ -1,4 +1,11 @@
+const axios = require('axios')
 const { redisClient } = require('../redis')
+const { USERSERVICE_URL } = require('../../conf-backend')
+
+const userServiceClient = axios.create({
+  baseURL: USERSERVICE_URL,
+  headers: { secret: process.env.USERSERVICE_SECRET }
+})
 
 const getRedisCDS = async REDIS_KEY => {
   const raw = await redisClient.getAsync(REDIS_KEY)
@@ -15,5 +22,6 @@ const saveToRedis = async (data, REDIS_KEY, expire = false) => {
 
 module.exports = {
   getRedisCDS,
-  saveToRedis
+  saveToRedis,
+  userServiceClient
 }
