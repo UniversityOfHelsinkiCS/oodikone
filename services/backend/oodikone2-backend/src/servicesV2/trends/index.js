@@ -5,7 +5,8 @@ const {
 } = require('../../databaseV2/connection')
 const { getAssociations } = require('../../services/studyrights')
 
-const { getStatus, refreshStatus } = require('./status')
+// TODO: change getStatus -> getStatusAttainments
+const { getStatus, refreshStatus } = require('./statusAttainments')
 const { getProtoC, refreshProtoC } = require('./protoC')
 const { getUber, refreshUber } = require('./uber')
 const { getRedisCDS, saveToRedis, getTargetStudentCounts } = require('./shared')
@@ -14,7 +15,6 @@ const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
 const CURRENT_DATE = new Date()
 
 const REDIS_KEY_GRADUATED = 'GRADUATED_DATA_V2'
-
 const REDIS_KEY_PROTOC_PROGRAMME = 'PROTOC_PROGRAMME_DATA_V2'
 
 const withErr = handler => (req, res, next) =>
