@@ -178,5 +178,5 @@ module.exports = {
   getRedisCDS,
   saveToRedis,
   userServiceClient,
-  getTargetStudentCounts 
+  getTargetStudentCounts
 }

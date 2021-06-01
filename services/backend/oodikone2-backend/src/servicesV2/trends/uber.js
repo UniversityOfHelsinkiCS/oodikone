@@ -206,7 +206,6 @@ const mankeliUberData = data =>
     .sort((a, b) => a.name.localeCompare(b.name))
     .value()
 
-
 const calculateUber = async query => {
   const data = await getUberData({
     startDate: new Date(query.start_date),
