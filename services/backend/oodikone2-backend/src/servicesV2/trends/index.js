@@ -1,13 +1,14 @@
 const axios = require('axios')
 const _ = require('lodash')
-const { ElementDetail, Organization } = require('../modelsV2')
+const { ElementDetail, Organization } = require('../../modelsV2')
 const {
   dbConnections: { sequelize }
-} = require('../databaseV2/connection')
-const { mapToProviders } = require('../util/utils')
-const { USERSERVICE_URL } = require('../conf-backend')
-const { getAssociations } = require('../services/studyrights')
-const { redisClient } = require('./redis')
+} = require('../../databaseV2/connection')
+const { mapToProviders } = require('../../util/utils')
+const { USERSERVICE_URL } = require('../../conf-backend')
+const { getAssociations } = require('../../services/studyrights')
+const { redisClient } = require('../redis')
+const { getStatus } = require('./getStatus')
 const userServiceClient = axios.create({
   baseURL: USERSERVICE_URL,
   headers: { secret: process.env.USERSERVICE_SECRET }
@@ -927,20 +928,6 @@ const getProtoCProgramme = async (query, doRefresh = false) => {
     return data
   }
   return protoCProgramme
-}
-
-const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
-  // redis keys for different queries. adds a new key for every queried day.
-  // might cause issues, might not but def not until I am out :D
-
-  const KEY = `${REDIS_KEY_STATUS}_DATE_${unixMillis}_YEARLY_${showByYear.toUpperCase()}`
-  const status = await getRedisCDS(KEY)
-  if (!status || doRefresh) {
-    const data = await calculateStatusStatistics(unixMillis, showByYear)
-    await saveToRedis(data, KEY, true)
-    return data
-  }
-  return status
 }
 
 const getUber = async (query, doRefresh = false) => {
