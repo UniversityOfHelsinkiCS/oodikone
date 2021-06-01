@@ -1,6 +1,9 @@
 const axios = require('axios')
 const { redisClient } = require('../redis')
 const { USERSERVICE_URL } = require('../../conf-backend')
+const {
+  dbConnections: { sequelize }
+} = require('../../databaseV2/connection')
 
 const userServiceClient = axios.create({
   baseURL: USERSERVICE_URL,

@@ -1,5 +1,9 @@
-const REDIS_KEY_GRADUATED = 'GRADUATED_DATA_V2'
+const REDIS_KEY_UBER = 'UBER_DATA_V2'
 const { getRedisCDS, saveToRedis } = require('./shared')
+const {
+  dbConnections: { sequelize }
+} = require('../../databaseV2/connection')
+const _ = require('lodash')
 
 const isSameDateIgnoringYear = (a, b) =>
   a.getUTCMonth() === b.getUTCMonth() &&
