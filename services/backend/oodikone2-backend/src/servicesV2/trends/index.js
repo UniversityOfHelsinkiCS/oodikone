@@ -547,20 +547,16 @@ const getStartYears = async () => {
 }
 
 module.exports = {
-  withErr,
-  mankeliUberData,
-  getTargetStudentCounts,
-  getUberData,
-  calculateProtoCProgramme,
+  getGraduatedStatus,
+  getProtoC,
   getProtoCProgramme,
   getStatus,
-  getProtoC,
   getUber,
   refreshProtoC,
-  refreshStatus,
-  refreshUber,
   refreshProtoCProgramme,
+  refreshStatus,
   refreshStatusGraduated,
+  refreshUber,
+  withErr,
   getStartYears,
-  getGraduatedStatus
 }
