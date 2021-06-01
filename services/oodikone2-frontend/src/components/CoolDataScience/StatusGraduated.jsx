@@ -51,15 +51,21 @@ const StatusContainer = ({
     return x.toLocaleString('fi')
   }
 
-  const getDiffAndChange = (current, previous) => {
-    if (!current && !previous) return [0, 0]
+  const getDiffAndChange = (current, previous, noTitleDataToShow, hasChangedButCantShowPercentage) => {
+    if (noTitleDataToShow) return [0, 0]
     const diff = Math.round(current - previous)
-    const change = Math.round((getP(current, previous) - 1) * 1000) / 10
+    let change
+    if (hasChangedButCantShowPercentage) {
+      change = diff > 0 ? 100 : -100
+    } else {
+      change = Math.round((getP(current, previous) - 1) * 1000) / 10
+    }
     return [diff, change]
   }
 
-  const noTitleDataToShow = !current && !previous
-  const [diff, change] = getDiffAndChange(current, previous)
+  const noTitleDataToShow = current === null && previous === null
+  const hasChangedButCantShowPercentage = (previous === 0 || current === 0) && previous !== current
+  const [diff, change] = getDiffAndChange(current, previous, noTitleDataToShow, hasChangedButCantShowPercentage)
 
   return (
     <Segment
@@ -104,8 +110,12 @@ const StatusContainer = ({
         ) : (
           <div>
             <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(change) }}>{plussify(diff)}</span>
-            <br />
-            <span style={{ fontWeight: 'bold', color: getColor(change) }}>({plussify(change)}%)</span>)
+            {hasChangedButCantShowPercentage ? null : (
+              <div>
+                <br />
+                <span style={{ fontWeight: 'bold', color: getColor(change) }}>({plussify(change)}%)</span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -144,8 +154,8 @@ StatusContainer.propTypes = {
 }
 
 StatusContainer.defaultProps = {
-  current: null,
-  previous: null
+  current: 0,
+  previous: 0
 }
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
