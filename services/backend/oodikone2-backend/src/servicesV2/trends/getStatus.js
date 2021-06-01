@@ -242,6 +242,13 @@ const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
   return status
 }
 
+const refreshStatus = async (unixMillis, showByYear) => {
+  const KEY = `${REDIS_KEY_STATUS}_DATE_${unixMillis}_YEARLY_${showByYear.toUpperCase()}`
+  const data = await calculateStatusStatistics(unixMillis, showByYear)
+  await saveToRedis(data, KEY, true)
+}
+
 module.exports = {
   getStatus,
+  refreshStatus
 }
