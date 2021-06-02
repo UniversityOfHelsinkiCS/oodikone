@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const { getRedisCDS, saveToRedis, getTargetStudentCounts } = require('./shared')
-const { getAssociations } = require('../../services/studyrights')
+const { getAssociations } = require('../../servicesV2/studyrights')
 
 const REDIS_KEY_PROTOC = 'PROTOC_DATA_V2'
 const REDIS_KEY_PROTOC_PROGRAMME = 'PROTOC_PROGRAMME_DATA_V2'
