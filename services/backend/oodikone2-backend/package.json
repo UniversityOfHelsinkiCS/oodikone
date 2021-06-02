@@ -16,7 +16,7 @@
     "dev": "NODE_ENV=dev nodemon --max_old_space_size=4096 index.js",
     "debug": "NODE_ENV=dev nodemon --max_old_space_size=4096 inspect index.js",
     "anon": "NODE_ENV=test nodemon index.js",
-    "test": "npm run lint && npm run jest",
+    "test": "npm run lint",
     "jest": "NODE_ENV=test jest --runInBand --verbose",
     "test_docker": "docker exec -t backend /bin/bash -c 'npm test'",
     "init_redis": "node src/util/init_redis.js",

@@ -16,7 +16,7 @@ let verbose = false
 const ignores = {
   KH40_006: {
     2020: {
-     oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+      oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
   KH50_001: {
@@ -34,43 +34,42 @@ const ignores = {
   KH60_001: {
     2017: {
       oodi: [
-        // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
-        '013299358',
+        '014528934', // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014659133', // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014845154', // https://jira.it.helsinki.fi/browse/DOO-4547
+        '013299358', // https://jira.it.helsinki.fi/browse/DOO-4545
         '014720169',
         '014711262',
-        '014721825',
-        '014528934',
-        '014659133',
-        '014845154' // studyright enddate too early in sis https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2787
+        '014721825'
       ]
     },
     2018: {
-      // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
       oodi: [
-        '014726105', 
-        '014708699', 
-        '014732623', 
+        '014726105', // https://jira.it.helsinki.fi/browse/DOO-4545
+        '014708699',
+        '014732623',
         '014728983',
-        '014323074', 
-        '014624977']
+        '014323074',
+        '014624977'
+      ]
     },
     2019: {
-      // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
       oodi: [
-        '014366086', 
-        '014731909', 
-        '014734511']
+        '014366086', // https://jira.it.helsinki.fi/browse/DOO-4545
+        '014731909',
+        '014734511' // https://jira.it.helsinki.fi/browse/DOO-4546
+      ]
     },
     2020: {
-      // varhaiskasvatus https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2738
       oodi: [
-        '013466013', 
-        '014590027', 
-        '014340963', 
-        '014179998', 
-        '013743299', 
-        '014590807'],
-      sis: ['014734511'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2790 also a varhaiskasvatus issue
+        '013466013', // https://jira.it.helsinki.fi/browse/DOO-4545
+        '014590027',
+        '014340963',
+        '014179998',
+        '013743299',
+        '014590807'
+      ],
+      sis: ['014734511'] // https://jira.it.helsinki.fi/browse/DOO-4546
     }
   },
   MH10_001: {
@@ -164,39 +163,39 @@ const ignores = {
   MH60_001: {
     2017: {
       sis: [
-        '014741193' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '014741193' // https://jira.it.helsinki.fi/browse/DOO-4546
       ]
     },
     2018: {
       oodi: [
-        '014624977',
-        '014659133',
+        '014659133', // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014624977', // https://jira.it.helsinki.fi/browse/DOO-4545
         '014720169',
-        '014721825' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
+        '014721825'
       ]
     },
     2019: {
       oodi: [
-        '014323074',
+        '014528934', // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014323074', // https://jira.it.helsinki.fi/browse/DOO-4545
         '014366086',
-        '014528934',
         '014708699',
         '014711262',
         '014726105',
         '014728983',
-        '014731909', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
-        '014732623', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2866
+        '014731909',
+        '014732623'
       ]
     },
     2020: {
       sis: [
-        '014734511' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2862
+        '014734511' // https://jira.it.helsinki.fi/browse/DOO-4546
       ],
       oodi: [
         '011856463', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-        '014741193', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2864
-        '014954744', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2865
-        '014711864', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+        '014741193', // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014954744', // https://jira.it.helsinki.fi/browse/DOO-4548
+        '014711864' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       ]
     }
   },
@@ -356,30 +355,6 @@ const populationDiff = async (programme, year) => {
   console.log('\n' + year)
 
   if (oodiOnly.length > 0) {
-    //console.log(`${oodiOnly.length} only in oodi, of which...`)
-
-    // const weirds = await weirdInSIS(oodiOnly, resultOodi, programme)
-    // const oodiNoWeirds = _.difference(oodiOnly, _.flatten(Object.values(weirds)))
-    // const weirdosTotalLength = Object.values(weirds).reduce((acc, curr) => acc + curr.length, 0)
-    // if (oodiOnly.length !== weirdosTotalLength + oodiNoWeirds.length) {
-    //   console.log(
-    //     `!!! oodiOnly length ${oodiOnly.length} doesn't match weirds (${weirdosTotalLength}) + no-weirds (${oodiNoWeirds.length}), check for bugs !!!`
-    //   )
-    // }
-
-    // printWithReason(
-    //   weirds.cancelledstudents,
-    //   'marked as cancelled in sis, but oodi enddate is after sis canceldate. Also not transferred to this program.'
-    // )
-    // printWithReason(
-    //   weirds.transferredInPakkoSiirto,
-    //   'not at all in sis programme,  transferred in pakkosiirto 2020-12-17'
-    // )
-    // printWithReason(
-    //   weirds.transferredAtSomeOtherDate,
-    //   'not at all in sis programme, transferred at some date, not in pakkosiirto'
-    // )
-    // printWithReason(weirds.notInProgramme, 'not at all in sis programme for some reason')
     const cancelledInSis = await checkIfCancelledInSis(programme, oodiOnly)
 
     const cancelledInSisNums = cancelledInSis.map(s => s.studentStudentnumber)
@@ -405,12 +380,6 @@ const populationDiff = async (programme, year) => {
     cancelledInOodiNums = _.difference(cancelledInOodiNums, permanentStudyRightNums)
     sisOnly = _.difference(sisOnly, cancelledInOodiNums)
 
-    // const wronglySetCancel = (await cancelledButGraduated(programme)).map(sn => sn.student_studentnumber)
-    // const remaining = _.difference(sisOnly, wronglySetCancel)
-
-    // if (wronglySetCancel.length > 0) {
-    //   printWithReason(wronglySetCancel, 'marked with wrong cancel date in oodi')
-    // }
     allGrouped.sisOnly.cancelledInOodi.push(...withProgramme(cancelledInOodiNums))
     allGrouped.sisOnly.unknown.push(...withProgramme(sisOnly))
     console.log('sis-only')
