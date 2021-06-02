@@ -144,7 +144,7 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
                         credits
                     FROM credit
                     WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
-                        AND credit."isStudyModule" = false
+                        AND (credit."isStudyModule" = false OR credit."isStudyModule" IS NULL)
                         ${
                           includeOldAttainments
                             ? ''
