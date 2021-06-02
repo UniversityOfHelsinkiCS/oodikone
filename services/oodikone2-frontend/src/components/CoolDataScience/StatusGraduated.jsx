@@ -66,8 +66,6 @@ const StatusContainer = ({
   }
 
   const noTitleDataToShow = current === null
-  if (!current) current = 0
-  if (!previous) previous = 0
   const hasChangedButCantShowPercentage = (previous === 0 || current === 0) && previous !== current
   const [diff, change] = getDiffAndChange(current, previous, noTitleDataToShow, hasChangedButCantShowPercentage)
 
@@ -109,7 +107,9 @@ const StatusContainer = ({
         </div>
         {noTitleDataToShow ? (
           <div>
-            <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(0) }}>Ei vielä dataa tältä lukuvuodelta.</span>
+            <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(0) }}>
+              Ei vielä dataa tältä lukuvuodelta.
+            </span>
           </div>
         ) : (
           <div>
@@ -159,7 +159,7 @@ StatusContainer.propTypes = {
 
 StatusContainer.defaultProps = {
   current: null,
-  previous: 0 
+  previous: 0
 }
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
