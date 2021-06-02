@@ -20,7 +20,8 @@ const SisChangeMessage = props => {
 
   const reasons = [
     'Osalla opiskelijoista voi olla opintopisteiden kokonaismäärässä eroja. Tämä koskee erityisesti tiedekuntia, joissa on runsaasti osasuorituksia.',
-    'Populaatioiden osalta vaihto-opiskelijoiden, tutkintoon johtamattomien opinto-oikeuksien ja ohjelmaan siirrettyjen opiskelijoiden näyttäminen ei kaikissa tapauksissa toimi oikein.'
+    'Populaatioiden osalta vaihto-opiskelijoiden, tutkintoon johtamattomien opinto-oikeuksien ja ohjelmaan siirrettyjen opiskelijoiden näyttäminen ei kaikissa tapauksissa toimi oikein.',
+    'Trendien osalta ainoastaan "See current status" -sivu toimii, muut eivät näytä vuositahteja oikein.'
   ]
 
   // Kasvatustiedehuomiot
