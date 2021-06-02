@@ -126,7 +126,7 @@ const getUberData = async ({ startDate, includeOldAttainments }) => {
                           credits
                       FROM credit
                       WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
-                          AND credit."isStudyModule" = false
+                          AND (credit."isStudyModule" = false OR credit."isStudyModule" IS NULL)
                           ${includeOldAttainments ? '' : 'AND credit.attainment_date >= $2::TIMESTAMP WITH TIME ZONE'}
                           AND credit.attainment_date <= checkpoints.checkpoint
                   ) credit

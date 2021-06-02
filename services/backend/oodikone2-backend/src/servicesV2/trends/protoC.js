@@ -157,7 +157,6 @@ const getProtoC = async (query, doRefresh = false) => {
   const { include_old_attainments, exclude_non_enrolled } = query
 
   // redis keys for different queries
-  console.log('GETTING PROTOC')
   const KEY = `${REDIS_KEY_PROTOC}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
   const protoC = await getRedisCDS(KEY)
   if (!protoC || doRefresh) {
