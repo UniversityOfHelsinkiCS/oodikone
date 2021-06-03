@@ -389,12 +389,12 @@ const updateTeachers = async attainments => {
 
   const personIdToEmployeeNumber = {}
   const teachers = (await selectFromByIds('persons', acceptorPersonIds))
-    .filter(p => !!p.employee_number)
+    .filter(p => !!p.employee_number && p.date_of_birth && p.first_names)    
     .map(p => {
       personIdToEmployeeNumber[p.id] = p.employee_number
       return mapTeacher(p)
     })
-
+console.log(JSON.stringify(teachers, null, 2));
   // Sort to avoid deadlocks
   await bulkCreate(Teacher, sortBy(teachers, ['id']))
   return personIdToEmployeeNumber
