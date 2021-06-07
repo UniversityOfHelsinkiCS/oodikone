@@ -37,7 +37,7 @@ while true; do
                 mopo
                 run_full_setup
                 ;;
-            "Download & reset all real data")
+            "Download & reset all real data.")
                 run_full_real_data_reset
                 ;;
             "Download & reset sis importer data.")

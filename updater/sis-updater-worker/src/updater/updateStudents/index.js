@@ -19,6 +19,7 @@ const {
   semesterEnrollmentMapper,
   courseProviderMapper
 } = require('../mapper')
+const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
@@ -190,6 +191,13 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     return res
   }, {})
 
+  const idsOfFaculties = dbConnections.knex
+    .select('id').from('organisations').where('parent_id','hy-university-root-id')
+
+  const idsOfDegreeProgrammes = new Set(await dbConnections.knex
+    .select('id').from('organisations').whereIn('parent_id', idsOfFaculties)
+    .map(org => org.id))
+
   const courseGroupIdToCourseCode = (
     await Course.findAll({
       where: {
@@ -268,14 +276,18 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
           },
         })
 
-        // if there's no courseprovider, create it
+        // If there's no courseprovider, try to create course provider
         if (!courseProvider) {
           const mapCourseProvider = courseProviderMapper(parsedCourseCode)
-          courseProvidersToBeCreated.push(
-          ...(att.organisations || [])
-            .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
-            .map(mapCourseProvider)
+
+          // Only map provider if its responsible and its degree programme
+          const correctProvider = att.organisations.find(o =>
+            idsOfDegreeProgrammes.has(o.organisationId) &&
+            o.roleUrn == 'urn:code:organisation-role:responsible-organisation'
           )
+          if (correctProvider) {
+            courseProvidersToBeCreated.push(mapCourseProvider(correctProvider))
+          }
         }
 
         courseUnit = course ? course : { id: parsedCourseCode, code: parsedCourseCode }
@@ -389,12 +401,12 @@ const updateTeachers = async attainments => {
 
   const personIdToEmployeeNumber = {}
   const teachers = (await selectFromByIds('persons', acceptorPersonIds))
-    .filter(p => !!p.employee_number)
+    .filter(p => !!p.employee_number && p.date_of_birth && p.first_names)    
     .map(p => {
       personIdToEmployeeNumber[p.id] = p.employee_number
       return mapTeacher(p)
     })
-
+console.log(JSON.stringify(teachers, null, 2));
   // Sort to avoid deadlocks
   await bulkCreate(Teacher, sortBy(teachers, ['id']))
   return personIdToEmployeeNumber
