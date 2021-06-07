@@ -82,7 +82,7 @@ parse_services() {
 # Set docker-compose env overrides to use for each version (anon, real or ci)
 parse_env() {
   [[ "$version" == "anon" ]] && env=""
-  [[ "$version" == "real" ]] && env="-f docker-compose.yml -f docker-compose.override.yml -f docker-compose.real.yml"
+  [[ "$version" == "real" ]] && env="-f docker-compose.yml -f docker-compose.real.yml"
   [[ "$version" == "ci" ]] && env="-f docker-compose.yml -f docker-compose.ci.yml"
   return 0
 }
@@ -102,7 +102,7 @@ parse_env
 if [[ "$compose_command" == "" ]]; then
   final_command="docker-compose ${env} ${services}"
 else
-  final_command="docker-compose ${env} ${services}"
+  final_command="docker-compose ${env} ${compose_command} ${services}"
 fi
 msg "${BLUE}Running: ${final_command}${NOFORMAT}"
-# eval "$final_command"
+eval "$final_command"

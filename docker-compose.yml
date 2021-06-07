@@ -1,0 +1,283 @@
+version: '3.8'
+
+services:
+  sis-updater-nats:
+    image: nats-streaming:0.16.2
+    command: -cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore
+    container_name: sis-updater-nats
+
+  sis-updater-scheduler:
+    build:
+      context: updater/sis-updater-scheduler
+      args:
+        NODE_ENV: 'development'
+    command: ['npm', 'run', 'dev']
+    environment:
+      REDIS_URI: //redis:6379
+      SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+      SIS_NATS_TOKEN: dev
+      SIS_IMPORTER_HOST: sis-importer-db
+      SIS_IMPORTER_USER: postgres
+      SIS_IMPORTER_PASSWORD: postgres
+      SIS_IMPORTER_DATABASE: importer-db
+      SECRET_TOKEN: dev
+    ports:
+      - "8082:8082"
+    container_name: sis-updater-scheduler
+    volumes:
+      - sis-updater-scheduler-nodemod:/usr/src/app/node_modules
+      - ./updater/sis-updater-scheduler/:/usr/src/app
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - sis-updater-nats
+
+  sis-updater-worker:
+    build:
+      context: updater/sis-updater-worker
+      args:
+        NODE_ENV: 'development'
+    environment:
+      REDIS_URI: //redis:6379
+      DB_URL: postgres://postgres@db_sis:5432/db_sis
+      SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+      SIS_NATS_TOKEN: dev
+      SIS_IMPORTER_HOST: sis-importer-db
+      SIS_IMPORTER_USER: postgres
+      SIS_IMPORTER_PASSWORD: postgres
+      SIS_IMPORTER_DATABASE: importer-db
+    depends_on:
+      - redis
+      - sis-updater-nats
+    command: ['npm', 'run', 'dev']
+    volumes:
+      - sis-updater-worker-nodemod:/usr/src/app/node_modules
+      - ./updater/sis-updater-worker/:/usr/src/app
+    restart: unless-stopped
+
+  db:
+    image: postgres:10-alpine
+    ports:
+      - "5421:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: oodi_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
+    restart: unless-stopped
+    shm_size: '2gb'
+
+  db_sis:
+    image: postgres:13.2
+    ports:
+      - "5426:5432"
+    volumes:
+      - pgdata_sis:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: db_sis
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_MULTIPLE_DATABASES=db_sis,db_sis_real
+    restart: unless-stopped
+    shm_size: 1g
+
+  redis:
+    image: redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    container_name: redis
+
+  sis-importer-db:
+    image: postgres:13.1
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - sis-importer-pgdata:/var/lib/postgresql/data
+    container_name: sis-importer-db
+
+  frontend:
+    build:
+      context: services/oodikone2-frontend
+      args:
+        NODE_ENV: 'development'
+        TAG: 'development'
+    command: ['npm', 'run', 'docker']
+    environment:
+      BACKEND_ADDR: backend
+      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
+      USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+      KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
+      SIS_ADMINER_URL: http://localhost:5050/?pgsql=db_sis&username=postgres
+    container_name: frontend
+    ports:
+      - "8081:8081"
+      - "7777:7777"
+    volumes:
+      - frontend-nodemod:/usr/src/app/node_modules
+      - ./services/oodikone2-frontend/:/usr/src/app
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: services/backend
+      dockerfile: oodikone2-backend/Dockerfile
+      args:
+        NODE_ENV: 'development'
+        TAG: 'development'
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS: redis
+      DB_URL: postgres://postgres@db:5432/tkt_oodi
+      DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone
+      SIS_DB_URL: postgres://postgres@db_sis:5432/db_sis
+      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+      TEST_DB_KONE: postgres://postgres@db_kone:5432/db_kone_test
+      TOKEN_SECRET: IWannaBeTheVeryBest
+      SECRET_TOKEN: dev
+      USERSERVICE_URL: http://userservice:4567
+      USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      ANALYTICS_URL: http://analytics:4568
+      UPDATER_URL: http://updater_scheduler:3678
+      SIS_UPDATER_URL: http://sis-updater-scheduler:8082
+      FRONT_URL: http://localhost:8000
+    container_name: backend
+    depends_on:
+      - db
+      - redis
+    command: ['npm', 'run', 'dev']
+    volumes:
+      - backend-nodemod:/usr/src/app/node_modules
+      - ./services/backend/oodikone2-backend/:/usr/src/app
+      - ./services/backend/shared/models:/usr/src/app/src/models
+      - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
+      - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
+    restart: unless-stopped
+
+  db_kone:
+    image: postgres:9.6.3
+    ports:
+      - "5425:5432"
+    volumes:
+      - pgdata_kone:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: db_kone
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=db_kone
+      - POSTGRES_USER=postgres
+
+  userservice:
+    build:
+      context: services/oodikone2-userservice
+      args:
+        NODE_ENV: 'development'
+    ports:
+      - 4567:4567
+    environment:
+      DB_URL: postgres://postgres@user_db:5432/user_db
+      TEST_DB: postgres://postgres@user_db:5432/user_db_test
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      TOKEN_SECRET: IWannaBeTheVeryBest
+    depends_on:
+      - user_db
+    container_name: userservice
+    command: ['npm', 'run', 'dev']
+    volumes:
+      - userservice-nodemod:/usr/src/app/node_modules
+      - ./services/oodikone2-userservice/:/usr/src/app
+    restart: unless-stopped
+
+  user_db:
+    image: postgres:9.6.3
+    ports:
+      - "5422:5432"
+    volumes:
+      - user_pgdata:/var/lib/postgresql/data
+    container_name: oodi_user_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
+    restart: unless-stopped
+
+  analytics:
+    build:
+      context: services/oodikone2-analytics
+      args:
+        NODE_ENV: 'development'
+    ports:
+      - 4568:4568
+    environment:
+      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
+      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
+    depends_on:
+      - analytics_db
+    container_name: analytics
+    command: ['npm', 'run', 'dev']
+    volumes:
+      - analytics-nodemod:/usr/src/app/node_modules
+      - ./services/oodikone2-analytics/:/usr/src/app
+    restart: unless-stopped
+
+  analytics_db:
+    image: postgres:9.6.3
+    ports:
+      - "5423:5432"
+    volumes:
+      - analytics_pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+    container_name: oodi_analytics_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_MULTIPLE_DATABASES=analytics_db,analytics_db_real
+    restart: unless-stopped
+
+  adminer:
+    image: adminer:4.8.0
+    environment:
+      - ADMINER_DESIGN=pepa-linha
+    volumes:
+      - ./adminer-plugins:/var/www/html/plugins-enabled
+    ports:
+      - 5050:8080
+    container_name: adminer
+    restart: unless-stopped
+
+  # cypress:
+  #   image: "cypress/included:3.8.3"
+  #   environment:
+  #     - CYPRESS_baseUrl=${CYPRESS_baseUrl}
+  #     - CYPRESS_videoCompression=false
+  #   working_dir: /e2e
+  #   volumes:
+  #     - ./cypress:/e2e/cypress
+  #     - ./cypress.json:/e2e/cypress.json
+  #     - ./node_modules:/node_modules
+  #   container_name: cypress
+  #   command: cypress run --browser chrome --headless
+
+volumes:
+  analytics-nodemod:
+  analytics_pgdata:
+  backend-nodemod:
+  frontend-nodemod:
+  mongodata:
+  pgdata:
+  pgdata_kone:
+  pgdata_sis:
+  redis-data:
+  sis-importer-pgdata:
+  sis-updater-scheduler-nodemod:
+  sis-updater-worker-nodemod:
+  updater-api-nodemod:
+  updater-scheduler-nodemod:
+  updater-writer-nodemod:
+  user_pgdata:
+  userservice-nodemod:
