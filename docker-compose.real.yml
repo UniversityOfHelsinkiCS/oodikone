@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    environment:
+      DB_URL: postgres://postgres@db:5432/tkt_oodi_real
+      DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone_real
+      SIS_DB_URL: postgres://postgres@db_sis:5432/db_sis_real
+
+  userservice:
+    environment:
+      DB_URL: postgres://postgres@user_db:5432/user_db_real
+
+  analytics:
+    environment:
+      DB_URL: postgres://postgres@analytics_db:5432/analytics_db_real
+
+  # updater_writer:
+  #   environment:
+  #     DB_URL: postgres://postgres@db:5432/tkt_oodi_real
+
+  # updater_api:
+  #   environment:
+  #     - OODI_ADDR=https://oodikone.cs.helsinki.fi/oodi
+  #     - TOKEN
+
+  # scheduler_mongo:
+  #   volumes:
+  #     - mongodata-real:/data/db
+
+  sis-updater-worker:
+    environment:
+      DB_URL: postgres://postgres@db_sis:5432/db_sis_real
+
+
+  redis:
+    volumes:
+      - redis-data-real:/data
+
+volumes:
+  redis-data-real:
+  mongodata-real:
