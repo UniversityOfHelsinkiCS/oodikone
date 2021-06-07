@@ -14,7 +14,7 @@ const filterStudentTags = (student, userId) => {
 const creditTotalMismatch = (student) => {
   return {
     ...student,
-    mismatch: mismatchedStudents.has(student.studentnumber)
+    mismatch: mismatchedStudents.has(student.studentNumber)
   }
 }
 
