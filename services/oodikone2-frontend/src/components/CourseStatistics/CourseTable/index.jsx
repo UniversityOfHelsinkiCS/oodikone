@@ -1,22 +1,13 @@
 import React from 'react'
 import { sortBy } from 'lodash'
-import { Segment, Table } from 'semantic-ui-react'
+import { Table } from 'semantic-ui-react'
 import { func, arrayOf, shape, string, bool } from 'prop-types'
 import { getActiveYears } from '../courseStatisticsUtils'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import './courseTable.css'
 import { getTextIn } from '../../../common'
 
-const CourseTable = ({
-  courses,
-  onSelectCourse,
-  hidden,
-  title,
-  emptyListText,
-  mandatory = false,
-  controlIcon,
-  selectedTable = false
-}) => {
+const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, mandatory = false, controlIcon }) => {
   const { language } = useLanguage()
   const noContent = courses.length === 0
   const sortCourses = courses => sortBy(courses, course => getTextIn(course.name, language))
@@ -44,18 +35,16 @@ const CourseTable = ({
 
   return (
     !hidden && (
-      <Segment id={selectedTable ? 'selected-table' : 'searched-table'}>
-        <Table selectable className="fixed-header">
-          <Table.Header>
-            <Table.Row>
-              <Table.HeaderCell>{title}</Table.HeaderCell>
-              <Table.HeaderCell>Code</Table.HeaderCell>
-              {controlIcon ? <Table.HeaderCell /> : null}
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>{noContent ? getEmptyListRow() : sortCourses(courses).map(toCourseRow)}</Table.Body>
-        </Table>
-      </Segment>
+      <Table selectable className="fixed-header">
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>{title}</Table.HeaderCell>
+            <Table.HeaderCell>Code</Table.HeaderCell>
+            {controlIcon ? <Table.HeaderCell /> : null}
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>{noContent ? getEmptyListRow() : sortCourses(courses).map(toCourseRow)}</Table.Body>
+      </Table>
     )
   )
 }
@@ -67,8 +56,7 @@ CourseTable.propTypes = {
   title: string.isRequired,
   emptyListText: string,
   controlIcon: string,
-  mandatory: bool,
-  selectedTable: bool.isRequired
+  mandatory: bool
 }
 
 CourseTable.defaultProps = {
