@@ -2,11 +2,19 @@ const router = require('express').Router()
 const Student = require('../servicesV2/students')
 const userService = require('../servicesV2/userService')
 const Unit = require('../servicesV2/units')
+const { mismatchedStudents } = require('../servicesV2/student_credit_total_mismatches')
 
 const filterStudentTags = (student, userId) => {
   return {
     ...student,
     tags: student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
+  }
+}
+
+const creditTotalMismatch = (student) => {
+  return {
+    ...student,
+    mismatch: mismatchedStudents.has(student.studentnumber)
   }
 }
 
@@ -58,7 +66,7 @@ router.get('/students/:id', async (req, res) => {
           .end()
       : res
           .status(200)
-          .json(filterStudentTags(results, decodedToken.id))
+          .json(creditTotalMismatch(filterStudentTags(results, decodedToken.id)))
           .end()
   }
 
