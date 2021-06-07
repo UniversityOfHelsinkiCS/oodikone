@@ -1,41 +1,52 @@
-# === Default docker-compose for oodikone project ===
-# Defaults to anonymous data and development env variables when developing oodikone
-# locally.
-
 services:
-  # === Oodikone services ===
-
-  frontend:
-    build:
-      args:
-        NODE_ENV: 'development'
-        TAG: 'development'
-      context: services/oodikone2-frontend
-    command: ['npm', 'run', 'docker']
-    container_name: frontend
+  adminer:
+    container_name: adminer
     environment:
-      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
-      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
-      BACKEND_ADDR: backend
-      KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
-      SIS_ADMINER_URL: http://localhost:5050/?pgsql=db_sis&username=postgres
-      USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
+      ADMINER_DESIGN: pepa-linha
+    image: adminer:4.8.0
     ports:
-      - "8081:8081"
-      - "7777:7777"
+      - "5050:8080"
     restart: unless-stopped
     volumes:
-      - frontend-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-frontend/:/usr/src/app
-
+      - ./adminer-plugins:/var/www/html/plugins-enabled
+  analytics:
+    build:
+      args:
+        NODE_ENV: development
+      context: services/oodikone2-analytics
+    command: "npm run dev"
+    container_name: analytics
+    depends_on:
+      - analytics_db
+    environment:
+      DB_URL: postgres://postgres@analytics_db:5432/analytics_db
+      TEST_DB: postgres://postgres@analytics_db:5432/analytics_db_test
+    ports:
+      - "4568:4568"
+    restart: unless-stopped
+    volumes:
+      - analytics-nodemod:/usr/src/app/node_modules
+      - ./services/oodikone2-analytics/:/usr/src/app
+  analytics_db:
+    container_name: oodi_analytics_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_MULTIPLE_DATABASES: analytics_db,analytics_db_real
+    image: postgres:9.6.3
+    ports:
+      - "5423:5432"
+    restart: unless-stopped
+    volumes:
+      - analytics_pgdata:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   backend:
     build:
       args:
-        NODE_ENV: 'development'
-        TAG: 'development'
+        NODE_ENV: development
+        TAG: development
       context: services/backend
       dockerfile: oodikone2-backend/Dockerfile
-    command: ['npm', 'run', 'dev']
+    command: "npm run dev"
     container_name: backend
     depends_on:
       - db
@@ -65,72 +76,20 @@ services:
       - ./services/backend/shared/models:/usr/src/app/src/models
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
       - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
-
-  userservice:
-    build:
-      args:
-        NODE_ENV: 'development'
-      context: services/oodikone2-userservice
-    command: ['npm', 'run', 'dev']
-    container_name: userservice
-    depends_on:
-      - user_db
+  db:
+    container_name: oodi_db
     environment:
-      DB_URL: postgres://postgres@user_db:5432/user_db
-      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      TEST_DB: postgres://postgres@user_db:5432/user_db_test
-      TOKEN_SECRET: IWannaBeTheVeryBest
+      POSTGRES_USER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_MULTIPLE_DATABASES: tkt_oodi,tkt_oodi_test,tkt_oodi_real
+    image: postgres:10-alpine
     ports:
-      - "4567:4567"
+      - "5421:5432"
     restart: unless-stopped
+    shm_size: 2gb
     volumes:
-      - userservice-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-userservice/:/usr/src/app
-
-  user_db:
-    container_name: oodi_user_db
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_MULTIPLE_DATABASES=user_db,user_db_real
-    image: postgres:9.6.3
-    ports:
-      - "5422:5432"
-    restart: unless-stopped
-    volumes:
-      - user_pgdata:/var/lib/postgresql/data
-
-  analytics:
-    build:
-      args:
-        NODE_ENV: 'development'
-      context: services/oodikone2-analytics
-    command: ['npm', 'run', 'dev']
-    container_name: analytics
-    depends_on:
-      - analytics_db
-    environment:
-      - DB_URL=postgres://postgres@analytics_db:5432/analytics_db
-      - TEST_DB=postgres://postgres@analytics_db:5432/analytics_db_test
-    ports:
-      - "4568:4568"
-    restart: unless-stopped
-    volumes:
-      - analytics-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-analytics/:/usr/src/app
-
-  analytics_db:
-    container_name: oodi_analytics_db
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_MULTIPLE_DATABASES=analytics_db,analytics_db_real
-    image: postgres:9.6.3
-    ports:
-      - "5423:5432"
-    restart: unless-stopped
-    volumes:
-      - analytics_pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
-
   db_kone:
     container_name: db_kone
     environment:
@@ -142,30 +101,67 @@ services:
     volumes:
       - pgdata_kone:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
-
-  db:
-    container_name: oodi_db
+  db_sis:
+    container_name: db_sis
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_HOST_AUTH_METHOD=trust
-      - POSTGRES_MULTIPLE_DATABASES=tkt_oodi,tkt_oodi_test,tkt_oodi_real
-    image: postgres:10-alpine
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_MULTIPLE_DATABASES: db_sis,db_sis_real
+      POSTGRES_USER: postgres
+    image: postgres:13.2
     ports:
-      - "5421:5432"
+      - "5426:5432"
     restart: unless-stopped
-    shm_size: "2gb"
+    shm_size: 2gb
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata_sis:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
-
-  # === Updater services ===
-
+  frontend:
+    build:
+      args:
+        NODE_ENV: development
+        TAG: development
+      context: services/oodikone2-frontend
+    command: "npm run docker"
+    container_name: frontend
+    environment:
+      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
+      BACKEND_ADDR: backend
+      KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
+      SIS_ADMINER_URL: http://localhost:5050/?pgsql=db_sis&username=postgres
+      USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
+    ports:
+      - "8081:8081"
+      - "7777:7777"
+    restart: unless-stopped
+    volumes:
+      - frontend-nodemod:/usr/src/app/node_modules
+      - ./services/oodikone2-frontend/:/usr/src/app
+  redis:
+    command: "redis-server --appendonly yes"
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+  sis-importer-db:
+    container_name: sis-importer-db
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    image: postgres:13.1
+    volumes:
+      - sis-importer-pgdata:/var/lib/postgresql/data
+  sis-updater-nats:
+    command: "-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore"
+    container_name: sis-updater-nats
+    image: nats-streaming:0.16.2
   sis-updater-scheduler:
     build:
       args:
-        NODE_ENV: 'development'
+        NODE_ENV: development
       context: updater/sis-updater-scheduler
-    command: ['npm', 'run', 'dev']
+    command: "npm run dev"
     container_name: sis-updater-scheduler
     depends_on:
       - redis
@@ -185,13 +181,12 @@ services:
     volumes:
       - sis-updater-scheduler-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-scheduler/:/usr/src/app
-
   sis-updater-worker:
     build:
       args:
-        NODE_ENV: 'development'
+        NODE_ENV: development
       context: updater/sis-updater-worker
-    command: ['npm', 'run', 'dev']
+    command: "npm run dev"
     depends_on:
       - redis
       - sis-updater-nats
@@ -208,57 +203,40 @@ services:
     volumes:
       - sis-updater-worker-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-worker/:/usr/src/app
-
-  sis-updater-nats:
-    command: -cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore
-    container_name: sis-updater-nats
-    image: nats-streaming:0.16.2
-
-  sis-importer-db:
-    container_name: sis-importer-db
+  user_db:
+    container_name: oodi_user_db
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    image: postgres:13.1
-    volumes:
-      - sis-importer-pgdata:/var/lib/postgresql/data
-
-  # Services for both
-  adminer:
-    container_name: adminer
-    environment:
-      - ADMINER_DESIGN=pepa-linha
-    image: adminer:4.8.0
+      POSTGRES_USER: postgres
+      POSTGRES_MULTIPLE_DATABASES: user_db,user_db_real
+    image: postgres:9.6.3
     ports:
-      - "5050:8080"
+      - "5422:5432"
     restart: unless-stopped
     volumes:
-      - ./adminer-plugins:/var/www/html/plugins-enabled
-
-  redis:
-    container_name: redis
-    command: ["redis-server", "--appendonly", "yes"]
-    image: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-
-  db_sis:
-    container_name: db_sis
+      - user_pgdata:/var/lib/postgresql/data
+  userservice:
+    build:
+      args:
+        NODE_ENV: development
+      context: services/oodikone2-userservice
+    command: "npm run dev"
+    container_name: userservice
+    depends_on:
+      - user_db
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
-      - POSTGRES_MULTIPLE_DATABASES=db_sis,db_sis_real
-      - POSTGRES_USER=postgres
-    image: postgres:13.2
+      DB_URL: postgres://postgres@user_db:5432/user_db
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      TEST_DB: postgres://postgres@user_db:5432/user_db_test"
+      TOKEN_SECRET: IWannaBeTheVeryBest
     ports:
-      - "5426:5432"
+      - "4567:4567"
     restart: unless-stopped
-    shm_size: "2gb"
     volumes:
-      - pgdata_sis:/var/lib/postgresql/data
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+      - userservice-nodemod:/usr/src/app/node_modules
+      - ./services/oodikone2-userservice/:/usr/src/app
 
 volumes:
+  # TODO: unify naming of pgdata, just like nodemod
   analytics-nodemod:
   analytics_pgdata:
   backend-nodemod:
