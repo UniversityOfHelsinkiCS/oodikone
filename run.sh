@@ -38,7 +38,7 @@ msg() {
 die() {
   local msg=$1
   local code=${2-1} # default exit status 1
-  msg "$msg"
+  msg "${RED}${msg}${NOFORMAT}"
   exit "$code"
 }
 
@@ -67,7 +67,7 @@ parse_params() {
   if [[ ${#args[@]} -eq 2 ]]; then
     compose_command=""
   else 
-    compose_command=${args[@]:2}
+    compose_command=${args[*]:2}
   fi 
   return 0
 }
@@ -93,11 +93,16 @@ setup_colors
 parse_services
 parse_env
 
+
+## All things are not yet implemented, fail with error
+[[ "$version" == "anon" ]] && die "${RED}Anon option not yet implemented${NOFORMAT}"
+[[ "$version" == "ci" ]] && die "${RED}CI option not yet implemented${NOFORMAT}"
+
 # SCRIPT LOGIC
-if ["$compose_command" == ""]; then
+if [[ "$compose_command" == "" ]]; then
   final_command="docker-compose ${env} ${services}"
 else
   final_command="docker-compose ${env} ${services}"
 fi
 msg "${BLUE}Running: ${final_command}${NOFORMAT}"
-eval "$final_command"
+# eval "$final_command"
