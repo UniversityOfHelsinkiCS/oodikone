@@ -4,7 +4,7 @@
 # scripts in package.json. It passes all additional arguments to docker-compose as is.
 # Script is based on https://betterdev.blog/minimal-safe-bash-script-template/
 
-set -Eeuo pipefail
+set -Eeuo pipefail # Fail fast if script fails
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
@@ -53,16 +53,51 @@ parse_params() {
     shift
   done
 
+  # Set args to global variables
   args=("$@")
+  option=${args[0]}
+  version=${args[1]}
 
   # check required arguments
   [[ ${#args[@]} -lt 2 ]] && usage && die 
-  [[ $1 != "oodikone" && $1 != "updater" ]] && usage && die
-  [[ $2 != "anon" && $2 != "real" && $2 != "ci" ]] && usage && die
+  [[ "$option" != "oodikone" && "$option" != "updater" ]] && usage && die
+  [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
+
+  # Parse docker-compose command that will be passed
+  if [[ ${#args[@]} -eq 2 ]]; then
+    compose_command=""
+  else 
+    compose_command=${args[@]:2}
+  fi 
   return 0
 }
 
+# Set which services to launch based on option
+parse_services() {
+  [[ "$option" == "oodikone" ]] && services="db db_sis db_kone analytics analytics_db backend frontend user_db userservice adminer"
+  [[ "$option" == "updater" ]] && services="db-sis sis-updater-nats sis-updater-scheduler sis-updater-worker redis adminer"
+  return 0
+}
+
+# Set docker-compose env overrides to use for each version (anon, real or ci)
+parse_env() {
+  [[ "$version" == "anon" ]] && env=""
+  [[ "$version" == "real" ]] && env="-f docker-compose.yml -f docker-compose.override.yml -f docker-compose.real.yml"
+  [[ "$version" == "ci" ]] && env="-f docker-compose.yml -f docker-compose.ci.yml"
+  return 0
+}
+
+# Run helper functions
 parse_params "$@"
 setup_colors
+parse_services
+parse_env
 
 # SCRIPT LOGIC
+if ["$compose_command" == ""]; then
+  final_command="docker-compose ${env} ${services}"
+else
+  final_command="docker-compose ${env} ${services}"
+fi
+msg "${BLUE}Running: ${final_command}${NOFORMAT}"
+eval "$final_command"
