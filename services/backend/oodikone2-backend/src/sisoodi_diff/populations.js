@@ -34,16 +34,16 @@ const ignores = {
         '013299358', // https://jira.it.helsinki.fi/browse/DOO-4545
         '014720169',
         '014711262',
-        '014721825',
+        '014721825'
       ]
     },
     2018: {
       oodi: [
         '014726105', // https://jira.it.helsinki.fi/browse/DOO-4545
-        '014708699', 
+        '014708699',
         '014732623',
         '014728983',
-        '014323074', 
+        '014323074',
         '014624977'
       ]
     },
@@ -51,17 +51,18 @@ const ignores = {
       oodi: [
         '014366086', // https://jira.it.helsinki.fi/browse/DOO-4545
         '014731909',
-        '014734511', // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014734511' // https://jira.it.helsinki.fi/browse/DOO-4546
       ]
     },
     2020: {
       oodi: [
         '013466013', // https://jira.it.helsinki.fi/browse/DOO-4545
-        '014590027', 
-        '014340963', 
-        '014179998', 
-        '013743299', 
-        '014590807'],
+        '014590027',
+        '014340963',
+        '014179998',
+        '013743299',
+        '014590807'
+      ],
       sis: ['014734511'] // https://jira.it.helsinki.fi/browse/DOO-4546
     }
   },
@@ -158,7 +159,7 @@ const ignores = {
         '014659133', // https://jira.it.helsinki.fi/browse/DOO-4546
         '014624977', // https://jira.it.helsinki.fi/browse/DOO-4545
         '014720169',
-        '014721825',
+        '014721825'
       ]
     },
     2019: {
@@ -171,7 +172,7 @@ const ignores = {
         '014726105',
         '014728983',
         '014731909',
-        '014732623',
+        '014732623'
       ]
     },
     2020: {
@@ -182,7 +183,7 @@ const ignores = {
         '011856463', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
         '014741193', // https://jira.it.helsinki.fi/browse/DOO-4546
         '014954744', // https://jira.it.helsinki.fi/browse/DOO-4548
-        '014711864', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+        '014711864' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       ]
     }
   },

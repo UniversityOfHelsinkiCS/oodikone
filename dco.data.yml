@@ -47,19 +47,19 @@ services:
       - redis-data:/data
     container_name: redis
 
-  updater_writer:
-    build:
-      context: services/backend
-      dockerfile: updater_writer/Dockerfile
-    depends_on:
-      - nats
-      - db
-    environment:
-      NATS_URI: nats://nats:4222
-      DB_URL: postgres://postgres@db:5432/tkt_oodi
-      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
-      TEST_DB_SCHEMA: updater_test
-    container_name: updater_writer
+  # updater_writer:
+  #   build:
+  #     context: services/backend
+  #     dockerfile: updater_writer/Dockerfile
+  #   depends_on:
+  #     - nats
+  #     - db
+  #   environment:
+  #     NATS_URI: nats://nats:4222
+  #     DB_URL: postgres://postgres@db:5432/tkt_oodi
+  #     TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
+  #     TEST_DB_SCHEMA: updater_test
+  #   container_name: updater_writer
 
   sis-importer-db:
     image: postgres:13.1
