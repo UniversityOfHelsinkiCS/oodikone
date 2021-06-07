@@ -25,12 +25,6 @@ const ignores = {
     }
   },
 
-  KH50_004: {
-    2020: {
-      oodi: ['013881465'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2984
-    }
-  },
-
   KH60_001: {
     2017: {
       oodi: [
@@ -104,12 +98,6 @@ const ignores = {
   MH40_015: {
     2020: {
       oodi: ['014143791'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
-    }
-  },
-
-  MH50_009: {
-    2020: {
-      oodi: ['014021774'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2984
     }
   },
 
