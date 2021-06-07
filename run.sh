@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script is used to run oodikone with different setups and is mainly used by 
+# This script is used to run oodikone with different setups and is mainly used by
 # scripts in package.json. It passes all additional arguments to docker-compose as is.
 # Script is based on https://betterdev.blog/minimal-safe-bash-script-template/
 
@@ -57,23 +57,23 @@ parse_params() {
   # Parse arguments. If arguments are not correct, print usage and exit with error.
   args=("$@")
 
-  [[ ${#args[@]} -lt 3 ]] && usage && die 
+  [[ ${#args[@]} -lt 3 ]] && usage && die
   option=${args[0]}
   version=${args[1]}
   [[ "$option" != "oodikone" && "$option" != "updater" ]] && usage && die
   [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
 
-  # Parse all additional arguments that will be passed to docker-compose. 
-  compose_command=${args[*]:2} 
+  # Parse all additional arguments that will be passed to docker-compose.
+  compose_command=${args[*]:2}
   return 0
 }
 
 # Set which services to launch based on option
 parse_services() {
   [[ "$option" == "oodikone" ]] && services="db db_sis db_kone analytics analytics_db \
-    backend frontend user_db userservice adminer"
+backend frontend user_db userservice adminer"
   [[ "$option" == "updater" ]] && services="db_sis sis-updater-nats \
-    sis-updater-scheduler sis-updater-worker redis adminer sis-importer-db"
+sis-updater-scheduler sis-updater-worker redis adminer sis-importer-db"
   return 0
 }
 
