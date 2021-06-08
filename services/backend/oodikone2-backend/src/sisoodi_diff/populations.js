@@ -58,21 +58,13 @@ const ignores = {
       oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2972
     }
   },
-  MH30_004: {
-    2020: {
-      oodi: ['012616631'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-    }
-  },
-  MH40_002: {
-    2019: {
-      oodi: ['014720114'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-    }
-  },
+
   MH40_005: {
     2019: {
       oodi: ['015095686'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
+
   MH40_014: {
     2020: {
       oodi: ['013349512'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
@@ -83,50 +75,23 @@ const ignores = {
       oodi: ['014143791'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
     }
   },
-
-  MH50_011: {
-    2017: {
-      oodi: ['013337304'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-    }
-  },
-
   MH55_001: {
     2019: {
       oodi: ['014744501'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2844
     }
   },
-  MH70_007: {
-    2017: {
-      oodi: [
-        '013324281',
-        '014289642',
-        '014330287' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-      ]
-    }
-  },
+
   MH70_008: {
     2017: {
       oodi: ['014404139'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
     },
-    2018: {
-      oodi: ['013175676'] // https://jira.it.helsinki.fi/browse/DOO-4540
-    },
-    2020: {
-      oodi: ['014453520'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-    }
   },
   MH80_001: {
     2020: {
       oodi: [
         '014343643',
-        '014015735',
         '014016572' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       ]
-    }
-  },
-  MH80_007: {
-    2020: {
-      oodi: ['013214702'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
 
@@ -136,25 +101,10 @@ const ignores = {
         '014741193' // https://jira.it.helsinki.fi/browse/DOO-4546
       ]
     },
-    2018: {
-      oodi: [
-        '014659133', // https://jira.it.helsinki.fi/browse/DOO-4546
-        '014624977', // https://jira.it.helsinki.fi/browse/DOO-4545
-        '014720169',
-        '014721825'
-      ]
-    },
     2019: {
       oodi: [
-        '014528934', // https://jira.it.helsinki.fi/browse/DOO-4546
         '014323074', // https://jira.it.helsinki.fi/browse/DOO-4545
         '014366086',
-        '014708699',
-        '014711262',
-        '014726105',
-        '014728983',
-        '014731909',
-        '014732623'
       ]
     },
     2020: {
@@ -162,10 +112,8 @@ const ignores = {
         '014734511' // https://jira.it.helsinki.fi/browse/DOO-4546
       ],
       oodi: [
-        '011856463', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
         '014741193', // https://jira.it.helsinki.fi/browse/DOO-4546
         '014954744', // https://jira.it.helsinki.fi/browse/DOO-4548
-        '014711864' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
       ]
     }
   },
@@ -224,6 +172,11 @@ const ignores = {
       '012908381', // KH57_001 ilmo 11.3. (eri opinto-oikeuteen ilman HYY jäsenyyttä)
       '013869393', // KH70_001 ilmottautunut 31.5.
       '014641471', // KH60_001 ilmottautunut 2.6.
+      '014819533', // MH60_001 valmistunut 31.5.
+      '014921285', // MH60_001 valmistunut 31.5.
+      '013471451', // MH40_002 puuttui oodi-oodikoneesta tuntemattomasta syystä
+      '010760864', // MH40_002 ilmottautunut 7.6.
+      '014808573', // MH60_001 valmistunut 31.5.
     ],
     // in oodi, but not in sis
     oodi: [
