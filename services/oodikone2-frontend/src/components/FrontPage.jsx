@@ -3,7 +3,6 @@ import React from 'react'
 import { Container, Header, Image, Divider, List } from 'semantic-ui-react'
 import moment from 'moment'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import propTypes from 'prop-types'
 import { isEqual } from 'lodash'
 import { images, getUserRoles, checkUserAccess } from '../common'
@@ -15,6 +14,7 @@ const FrontPage = props => {
 
   const showItems = {
     populations: userRoles.includes('admin') || rights.length !== 0,
+    studyProgramme: userRoles.includes('admin') || rights.length !== 0,
     students: userRoles.includes('admin') || rights.length !== 0,
     courseStatistics: checkUserAccess(['courseStatistics', 'admin'], userRoles) || rights.length > 0,
     teachers: userRoles.includes('admin') || userRoles.includes('teachers'),
@@ -31,57 +31,46 @@ const FrontPage = props => {
         <Header as="h3" style={{ textAlign: 'center' }}>
           Exploratory Research on Study Data
         </Header>
-
         {showItems.populations && (
-          <Link to="/populations" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div>
-              <Divider section />
-              <Header as="h4">Study Programme</Header>
-              <List bulleted>
-                <List.Item>
-                  <i>Search by Class:</i> Query a student population specified by a starting year and a study right.
-                  Oodikone will show you interactive statistics and visualizations for the population to be explored.
-                </List.Item>
-                <List.Item>
-                  <i>Overview:</i> View student progress and annual productivity for a given study programme.
-                </List.Item>
-              </List>
-            </div>
-          </Link>
+          <>
+            <Divider section />
+            <Header as="h4">Study Programme</Header>
+            <List bulleted>
+              <List.Item>
+                <i>Search by Class:</i> Query a student population specified by a starting year and a study right.
+                Oodikone will show you interactive statistics and visualizations for the population to be explored.
+              </List.Item>
+              <List.Item>
+                <i>Overview:</i> View student progress and annual productivity for a given study programme.
+              </List.Item>
+            </List>
+          </>
         )}
         {showItems.students && (
-          <Link to="/students" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div>
-              <Divider section />
-              <Header as="h4">Student Statistics</Header>
-              <p>View detailed information for a given student.</p>
-            </div>
-          </Link>
+          <>
+            <Divider section />
+            <Header as="h4">Student Statistics</Header>
+            <p>View detailed information for a given student.</p>
+          </>
         )}
         {showItems.courseStatistics && (
-          <Link to="/courseStatistics" style={{ textDecoration: 'none', color: 'inherit' }}>
-            <div>
-              <Divider section />
-              <Header as="h4">Course Statistics</Header>
-              <p>View statistics by course and year.</p>
-            </div>
-          </Link>
-        )}
-        <Link to="/trends" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div>
+          <>
             <Divider section />
-            <Header as="h4">Trends</Header>
-            <p>View many kinds visualizations of study progress and study programme status.</p>
-          </div>
-        </Link>
-        <div>
-          <Divider section />
-          <Header as="h4">Feedback</Header>
-          <p>
-            For questions and suggestions, use either the feedback form or shoot an e-mail to{' '}
-            <a href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</a>.
-          </p>
-        </div>
+            <Header as="h4">Course Statistics</Header>
+            <p>View statistics by course and year.</p>
+          </>
+        )}
+        <Divider section />
+        <Header as="h4">Trends</Header>
+        <p>View many kinds visualizations of study progress and study programme status.</p>
+
+        <Divider section />
+        <Header as="h4">Feedback</Header>
+        <p>
+          For questions and suggestions, use either the feedback form or shoot an e-mail to{' '}
+          <a href="mailto:grp-toska@helsinki.fi">grp-toska@helsinki.fi</a>.
+        </p>
+
         <Divider section />
         <p>
           Oodikone was last updated on:{' '}
