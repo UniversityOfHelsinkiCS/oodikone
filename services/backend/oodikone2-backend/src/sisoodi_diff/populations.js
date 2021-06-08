@@ -177,6 +177,21 @@ const ignores = {
       '013471451', // MH40_002 puuttui oodi-oodikoneesta tuntemattomasta syystä
       '010760864', // MH40_002 ilmottautunut 7.6.
       '014808573', // MH60_001 valmistunut 31.5.
+      '014921230', // MH40_003 valmistunut 1.6.
+      '014645309', // MH40_003 valmistunut 1.6.
+      '014949416', // MH40_010 valmistunut 31.5.
+      '014838093', // MH50_001 valmistunut 14.5.
+      '014900235', // MH40_001 valmistunut 30.5.
+      '014950861', // MH40_001 valmistunut 1.6.
+      '012685824', // MH50_009 ilmottautunut 26.5.
+      '015128870', // MH57_003 valmistunut 14.5.
+      '014728640', // MH57_004 valmistunut 14.5.
+      '015109022', // MH70_002 valmistunut 14.5.
+      '014921764', // MH70_002 valmistunut 14.5.
+      '014928518', // MH70_004 valmistunut 14.5.
+      '014922899', // MH70_004 valmistunut 14.5.
+      '014919967', //  MH70_009 valmistunut 14.5.
+      '014725737', //  MH70_009 valmistunut 14.5.
     ],
     // in oodi, but not in sis
     oodi: [
@@ -230,6 +245,8 @@ const ignores = {
       '014596115', // KH40_005 luopunut 15.5.
       '015111191', // KH50_008 luopunut 2.6.
       '015326258', // KH80_002 luopunut 17.5.
+      '014457568', // MH10_001 luopunut 17.5.
+      '014575411', // MH40_007 luopunut 24.5.
     ]
   }
 }
