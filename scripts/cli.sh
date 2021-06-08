@@ -1,8 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# This script is used to setup oodikone or parts of oodikone. It provides interactive
+# cli.
+
+ # Fail fast if script fails
+set -Eeuo pipefail
 
 # Constant filenames and paths used in scripts
-USER_DATA_FILE_PATH="hyuserdata"
-BACKUP_DIR=backups
+PROJECT_ROOT=$(git rev-parse --show-toplevel)
+USER_DATA_FILE_PATH="$PROJECT_ROOT/hyuserdata"
+BACKUP_DIR="$PROJECT_ROOT/backups"
 
 PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
 KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
@@ -10,14 +17,9 @@ USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
 SIS_REAL_DB_BACKUP="$BACKUP_DIR/latest-sis.sqz"
 
-# Remember username during runtime
-username=""
-
-### === GENERIC HELPER FUNCTIONS ===
-
 get_username() {
-  # Check if username has already been set
-  [ -z "$username" ]|| return 0
+  # Check if username variable has already been set
+  [[ -z "$username" ]] || return 0
 
   # Check if username is saved to data file and ask it if not
   if [ ! -f "$USER_DATA_FILE_PATH" ]; then
@@ -30,21 +32,19 @@ get_username() {
     echo ""
   fi
 
-  # Set username
-  username=$(head -n 1 < $USER_DATA_FILE_PATH)
+  # Set username to variable from data file
+  username=$(head -n 1 < "$USER_DATA_FILE_PATH")
 }
 
-retry () {
+retry_to_connect () {
   for i in {1..60}; do
-    "$@" && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
+    "$@" && break || echo "Retry attempt $i failed, waiting for 10 seconds..." && sleep 10;
   done
 }
 
 docker-compose-dev () {
     npm run docker:oodikone:dev -- "$@"
 }
-
-### === PSQL HELPER FUNCTIONS ===
 
 restore_psql_from_backup () {
     echo ""
@@ -58,17 +58,15 @@ restore_psql_from_backup () {
 ping_psql () {
     drop_psql "$1" "$2"
     echo "Creating psql in container $1 with db name $2"
-    retry docker exec -u postgres "$1" pg_isready --dbname="$2"
+    retry_to_connect docker exec -u postgres "$1" pg_isready --dbname="$2"
     docker exec -u postgres "$1" createdb "$2" || echo "container $1 DB $2 already exists"
 }
 
 drop_psql () {
     echo "Dropping psql in container $1 with db name $2"
-    retry docker exec -u postgres "$1" pg_isready --dbname="$2"
+    retry_to_connect docker exec -u postgres "$1" pg_isready --dbname="$2"
     docker exec -u postgres "$1" dropdb "$2" || echo "container $1 DB $2 does not exist"
 }
-
-### === FUNCTIONS TO RUN CLI OPTIONS ===
 
 # Download & reset all real data
 run_full_real_data_reset () {
@@ -93,13 +91,13 @@ run_full_real_data_reset () {
     echo "Restoring PostgreSQL from backup. This might take a while."
 
     ping_psql "db_kone" "db_kone_real"
-    restore_psql_from_backup $KONE_REAL_DB_BACKUP db_kone db_kone_real
+    restore_psql_from_backup "$KONE_REAL_DB_BACKUP" db_kone db_kone_real
     ping_psql "oodi_user_db" "user_db_real"
-    restore_psql_from_backup $USER_REAL_DB_BACKUP oodi_user_db user_db_real
+    restore_psql_from_backup "$USER_REAL_DB_BACKUP" oodi_user_db user_db_real
     ping_psql "oodi_analytics_db" "analytics_db_real"
-    restore_psql_from_backup $ANALYTICS_REAL_DB_BACKUP oodi_analytics_db analytics_db_real
+    restore_psql_from_backup "$ANALYTICS_REAL_DB_BACKUP" oodi_analytics_db analytics_db_real
     ping_psql "db_sis" "db_sis_real"
-    restore_psql_from_backup $SIS_REAL_DB_BACKUP db_sis db_sis_real
+    restore_psql_from_backup "$SIS_REAL_DB_BACKUP" db_sis db_sis_real
     ping_psql "sis-importer-db" "importer-db"
     restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
 
@@ -126,10 +124,8 @@ install_local_npm_packages () {
 }
 
 init_dirs () {
-  mkdir -p $BACKUP_DIR nginx nginx/cache nginx/letsencrypt
-  touch nginx/error.log
-  touch nginx/log
-  chmod -R 755 scripts/docker-entrypoint-initdb.d
+  mkdir -p "$BACKUP_DIR"
+  chmod -R g+r scripts/docker-entrypoint-initdb.d
 }
 
 # Set up oodikone with real data
@@ -176,9 +172,61 @@ run_oodi_data_reset () {
     echo "Restoring PostgreSQL from backup. This might take a while."
 
     ping_psql "oodi_db" "tkt_oodi_real"
-    restore_psql_from_backup $PSQL_REAL_DB_BACKUP oodi_db tkt_oodi_real
+    restore_psql_from_backup "$PSQL_REAL_DB_BACKUP" oodi_db tkt_oodi_real
 
     echo "Database setup finished"
 
     docker-compose-dev down
 }
+
+# === Run cli ===
+
+PS3='Please enter your choice: '
+
+mopo () {
+    if [ "$(tput cols)" -gt "100" ]; then
+        cat scripts/assets/mopo2.txt
+    fi
+}
+
+logo () {
+    if [ "$(tput cols)" -gt "76" ]; then
+        cat scripts/assets/logo.txt
+    fi
+}
+
+logo
+cat scripts/assets/welcome.txt
+
+options=(
+    "Set up oodikone with real data."
+    "Download & reset all real data."
+    "Download & reset sis importer data."
+    "Download & reset old oodi data."
+    "Quit."
+)
+
+while true; do
+    select opt in "${options[@]}"; do
+        case $opt in
+            "Set up oodikone with real data.")
+                mopo
+                run_full_setup
+                ;;
+            "Download & reset all real data.")
+                run_full_real_data_reset
+                ;;
+            "Download & reset sis importer data.")
+                run_importer_data_reset
+                ;;
+            "Download & reset old oodi data.")
+                run_oodi_data_reset
+                ;;
+            "Quit.")
+                break 2
+                ;;
+            *) echo "Invalid option $REPLY";;
+        esac
+        break
+    done
+done
