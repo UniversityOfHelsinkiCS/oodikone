@@ -1,5 +1,8 @@
+const { intersection } = require('lodash')
 const { get: redisGet, incrby: redisIncrementBy, set: redisSet } = require('./utils/redis')
 const { logger } = require('./utils/logger')
+const { fixVarhaiskasvatusStudyRights, studentsThatNeedToBeFixed } = require('./updater/updateStudents/varhaiskasvatusFixer')
+
 
 const {
   REDIS_TOTAL_META_KEY,
@@ -25,6 +28,12 @@ const handleUpdateEnding = async (doneKey, totalKey) => {
 }
 
 const postUpdate = async (updateMsg, currentChunkStartTime) => {
+  const studentsToBeFixed = intersection(updateMsg.entityIds || [], studentsThatNeedToBeFixed.map(s => s.id))
+  console.log(updateMsg)
+  if (studentsToBeFixed.length>0){
+    await fixVarhaiskasvatusStudyRights(studentsToBeFixed)
+  }
+
   const type = updateMsg.type === 'students' ? 'STUDENTS' : 'META'
   const count = updateMsg.entityIds.length
   const totalKey = type === 'STUDENTS' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY

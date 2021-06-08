@@ -14,11 +14,6 @@ let verbose = false
 */
 
 const ignores = {
-  KH40_006: {
-    2020: {
-      oodi: ['013919638'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-    }
-  },
   KH50_001: {
     2020: {
       oodi: ['013470384'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
@@ -28,44 +23,31 @@ const ignores = {
   KH60_001: {
     2017: {
       oodi: [
-        '014528934', // https://jira.it.helsinki.fi/browse/DOO-4546
-        '014659133', // https://jira.it.helsinki.fi/browse/DOO-4546
-        '014845154', // https://jira.it.helsinki.fi/browse/DOO-4547
-        '013299358', // https://jira.it.helsinki.fi/browse/DOO-4545
-        '014720169',
-        '014711262',
-        '014721825'
+        '014845154', // https://jira.it.helsinki.fi/browse/DOO-4547 (differing end date)
+        '013299358', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
       ]
     },
     2018: {
       oodi: [
-        '014726105', // https://jira.it.helsinki.fi/browse/DOO-4545
-        '014708699',
-        '014732623',
-        '014728983',
-        '014323074',
-        '014624977'
+        '014323074', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
       ]
     },
     2019: {
       oodi: [
-        '014366086', // https://jira.it.helsinki.fi/browse/DOO-4545
-        '014731909',
-        '014734511' // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014366086', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
       ]
     },
     2020: {
       oodi: [
-        '013466013', // https://jira.it.helsinki.fi/browse/DOO-4545
+        '013466013', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
         '014590027',
         '014340963',
         '014179998',
         '013743299',
-        '014590807'
       ],
-      sis: ['014734511'] // https://jira.it.helsinki.fi/browse/DOO-4546
     }
   },
+  
   MH10_001: {
     2020: {
       oodi: ['014925414'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
@@ -230,7 +212,18 @@ const ignores = {
       '012629851', // MH40_002 virheellisesti ei näy oodi-oodikoneessa
       '013631550', // MH50_012 virheellisesti ei näy oodi-oodikoneessa
       '013023498', // KH57_002 has longer studyright length in sisu
-      '014940525' // MH20_001 graduated but wrongly marked in oodi-oodikone
+      '014940525', // MH20_001 graduated but wrongly marked in oodi-oodikone
+      // after master change
+      '015077963', // KH10_001 ilmottautunut 19.5.
+      '010862241', // KH30_001 oodissa ei siirretty uuteen koulutusohjelmaan
+      '013751935', // KH40_003 oodissa ei siirretty uuteen koulutusohjelmaan
+      '012846184', // KH50_001 ilmottautunut 24.5.
+      '013041959', // KH50_001 ilmo 20.4. (eri opinto-oikeuteen ilman HYY jäsenyyttä)
+      '015123859', // KH50_005 ilmottautunut 2.6.
+      '014598249', // KH50_005 ilmottautunut 25.5.
+      '012908381', // KH57_001 ilmo 11.3. (eri opinto-oikeuteen ilman HYY jäsenyyttä)
+      '013869393', // KH70_001 ilmottautunut 31.5.
+      '014641471', // KH60_001 ilmottautunut 2.6.
     ],
     // in oodi, but not in sis
     oodi: [
@@ -279,7 +272,11 @@ const ignores = {
       '014716979', // MH60_001 ei vielä maisteriopiskelija
       '014726082', // MH60_001 ei vielä maisteriopiskelija
       '014222324', // MH60_001 ei vielä maisteriopiskelija
-      '014589766' // MH20_001 ei vielä maisteriopiskelija
+      '014589766', // MH20_001 ei vielä maisteriopiskelija
+      // after master change
+      '014596115', // KH40_005 luopunut 15.5.
+      '015111191', // KH50_008 luopunut 2.6.
+      '015326258', // KH80_002 luopunut 17.5.
     ]
   }
 }
