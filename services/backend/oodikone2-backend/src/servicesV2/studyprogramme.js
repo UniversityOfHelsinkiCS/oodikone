@@ -74,7 +74,10 @@ const getCreditsForMajors = (provider, since, studentnumbers) =>
     },
     where: {
       credittypecode: {
-        [Op.notIn]: [10, 9]
+        [Op.notIn]: [10, 9, 7]
+      },
+      isStudyModule: {
+        [Op.not]: true
       },
       attainment_date: {
         [Op.gte]: since
@@ -107,7 +110,10 @@ const getCreditsForProvider = async (provider, since) =>
       },
       where: {
         credittypecode: {
-          [Op.notIn]: [10, 9]
+          [Op.notIn]: [10, 9, 7]
+        },
+        isStudyModule: {
+          [Op.not]: true
         },
         attainment_date: {
           [Op.gte]: since
