@@ -112,9 +112,6 @@ const getCreditsForProvider = async (provider, since) =>
         credittypecode: {
           [Op.notIn]: [10, 9, 7]
         },
-        isStudyModule: {
-          [Op.not]: true
-        },
         attainment_date: {
           [Op.gte]: since
         }
@@ -270,7 +267,7 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
   const endDate = `${moment(new Date(), 'YYYY')
     .add(1, 'years')
     .format('YYYY')}-${semesterEnd['SPRING']}`
-  const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, false)
+  const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, true)
   const promises = [
     graduatedStatsForStudytrack(studytrack, since),
     productivityStatsForProvider(providercode, since),
@@ -490,8 +487,11 @@ const cancelledStudyright = async (studentnumbers, startDate, studytrack, endDat
       student_studentnumber: {
         [Op.in]: studentnumbers
       },
-      canceldate: {
+      startdate: {
         [Op.between]: [startDate, endDate]
+      },
+      canceldate: {
+        [Op.not]: null
       }
     }
   })
@@ -715,7 +715,7 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
           startDate,
           endDate,
           false,
-          false
+          true
         )
         const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
           studyprogramme,
@@ -822,7 +822,7 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
         startDate,
         endDate,
         false,
-        false
+        true
       )
       const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
         studyprogramme,
