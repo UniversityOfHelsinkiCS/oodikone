@@ -9,7 +9,7 @@
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 
 # Source common config
-source "$script_dir/common_config.sh"
+source "$script_dir"/common_config.sh
 
 # Set up constants
 PROJECT_ROOT=$(git rev-parse --show-toplevel)
@@ -21,33 +21,20 @@ USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
 SIS_REAL_DB_BACKUP="$BACKUP_DIR/latest-sis.sqz"
 
-# If username is not set, get username from data file.
-# Ask user to provide username, if username was not found from data file.
-get_username() {
-  [[ -z "${username-}" ]] || return 0
-
-  if [ ! -f "$USER_DATA_FILE_PATH" ]; then
-    msg "${BLUE}No previous username data found, please enter your Uni Helsinki username:${NOFORMAT}"
-    read -r username
-    echo "$username" > "$USER_DATA_FILE_PATH"
-    msg "${GREEN}Succesfully saved username${NOFORMAT}"
-  fi
-
-  username=$(head -n 1 < "$USER_DATA_FILE_PATH")
+# Run docker-compose down on cleanup
+cleanup() {
+  trap - SIGINT SIGTERM ERR EXIT
+  msg "
+${ORANGE}Trying to run docker-compose down and remove orphans${NOFORMAT}
+"
+  docker-compose down --remove-orphans
 }
 
-# Retry given command
-retry () {
-  for i in {1..60}; do
-    "$@" && break || msg "${ORANGE}Retry attempt $i failed, waiting for 10 seconds...${NOFORMAT}" && sleep 10;
-  done
-}
+# === CLI options ===
 
+### REWRITE THESE TO USE MESSAGES
 
-### REWRITE BELOW
-
-restore_psql_from_backup () {
-    echo ""
+restore_psql_from_backup() {
     echo "Restoring database from backup $1 to container $2:"
     echo "  1. Copying dump..."
     docker cp "$1" "$2:/asd.sqz"
@@ -55,21 +42,51 @@ restore_psql_from_backup () {
     docker exec "$2" pg_restore -U postgres --no-owner -F c --dbname="$3" -j4 /asd.sqz
 }
 
-ping_psql () {
+ping_psql() {
     drop_psql "$1" "$2"
     echo "Creating psql in container $1 with db name $2"
     retry docker exec -u postgres "$1" pg_isready --dbname="$2"
     docker exec -u postgres "$1" createdb "$2" || echo "container $1 DB $2 already exists"
 }
 
-drop_psql () {
+drop_psql() {
     echo "Dropping psql in container $1 with db name $2"
     retry docker exec -u postgres "$1" pg_isready --dbname="$2"
     docker exec -u postgres "$1" dropdb "$2" || echo "container $1 DB $2 does not exist"
 }
 
+draw_mopo() {
+  if [ "$(tput cols)" -gt "100" ]; then
+    echo
+    cat "$script_dir"/assets/mopo.txt
+    echo
+  fi
+}
+
+# Option 1
+set_up_oodikone() {
+  draw_mopo
+  die "not yet implemented!"
+}
+
+reset_all_anonymous_data() {
+  die "not yet implemented!"
+}
+
+reset_all_real_data() {
+  die "not yet implemented!"
+}
+
+reset_sis_importer_data() {
+  die "not yet implemented!"
+}
+
+reset_old_oodi_data() {
+  die "not yet implemented!"
+}
+
 # Download & reset all real data
-run_full_real_data_reset () {
+run_full_real_data_reset() {
     get_username
     echo "Using your Uni Helsinki username: $username"
 
@@ -106,7 +123,7 @@ run_full_real_data_reset () {
     docker-compose-dev down
 }
 
-install_local_npm_packages () {
+install_local_npm_packages() {
     # These are required for linting and only installed if not already there
     [[ -d node_modules ]] || npm ci
     cd services/oodikone2-frontend || return
@@ -129,7 +146,7 @@ init_dirs () {
 }
 
 # Set up oodikone with real data
-run_full_setup () {
+run_full_setup() {
     echo "=== Setting up npm packages locally ==="
     install_local_npm_packages
     echo "=== Creating directories and ensuring rights are correct ==="
@@ -158,7 +175,7 @@ run_importer_data_reset() {
 }
 
 # Download & reset old oodi data
-run_oodi_data_reset () {
+run_oodi_data_reset() {
     get_username
 
     return 0
@@ -179,55 +196,69 @@ run_oodi_data_reset () {
     docker-compose-dev down
 }
 
-# === Run cli ===
+# === CLI ===
 
+# If username is not set, get username from data file.
+# Ask user to provide username, if username was not found from data file.
+get_username() {
+  [[ -z "${username-}" ]] || return 0
 
-mopo () {
-    if [ "$(tput cols)" -gt "100" ]; then
-        cat scripts/assets/mopo2.txt
-    fi
+  if [ ! -f "$USER_DATA_FILE_PATH" ]; then
+    msg "${ORANGE}No previous username data found, please enter your Uni Helsinki username:${NOFORMAT}"
+    read -r username
+    echo "$username" > "$USER_DATA_FILE_PATH"
+    msg "${GREEN}Succesfully saved username${NOFORMAT}"
+  fi
+
+  username=$(head -n 1 < "$USER_DATA_FILE_PATH")
 }
 
-logo () {
-    if [ "$(tput cols)" -gt "76" ]; then
-        cat scripts/assets/logo.txt
-    fi
+show_welcome() {
+  if [ "$(tput cols)" -gt "76" ]; then
+    cat "$script_dir"/assets/logo.txt
+  fi
+  msg "${BLUE}Welcome to Oodikone CLI!${NOFORMAT}
+
+This tool helps you in managing the project configuration. If you are new to
+Oodikone development, you should probably run \"Set up oodikone\" which will
+take care of setting up and starting Oodikone for you. See README for more
+details.
+"
 }
 
-PS3='Please enter your choice: '
-
-logo
-cat scripts/assets/welcome.txt
+# Define custom shell prompt for the interactive select loop
+PS3="Please enter your choice: "
 
 options=(
-    "Set up oodikone with real data."
-    "Download & reset all real data."
-    "Download & reset sis importer data."
-    "Download & reset old oodi data."
-    "Quit."
+  "Set up oodikone."
+  "Reset all anonymous data."
+  "Reset all real data."
+  "Reset sis-importer data."
+  "Reset old oodi data."
+  "Quit."
 )
 
+show_welcome
+
 while true; do
-    select opt in "${options[@]}"; do
-        case $opt in
-            "Set up oodikone with real data.")
-                mopo
-                run_full_setup
-                ;;
-            "Download & reset all real data.")
-                run_full_real_data_reset
-                ;;
-            "Download & reset sis importer data.")
-                run_importer_data_reset
-                ;;
-            "Download & reset old oodi data.")
-                run_oodi_data_reset
-                ;;
-            "Quit.")
-                break 2
-                ;;
-            *) echo "Invalid option $REPLY";;
-        esac
-        break
-    done
+  select opt in "${options[@]}"; do
+    case $opt in
+      "Set up oodikone.")
+        set_up_oodikone;;
+      "Reset all anonymous data.")
+        reset_all_anonymous_data;;
+      "Reset all real data.")
+        reset_all_real_data;;
+      "Reset sis-importer data.")
+        reset_sis_importer_data;;
+      "Reset old oodi data.")
+        reset_old_oodi_data;;
+      "Quit.")
+        break 2;;
+      *) msg "${RED}Invalid option:${NOFORMAT} $REPLY
+";;
+    esac
+    break
+  done
 done
+
