@@ -1,50 +1,50 @@
 #!/usr/bin/env bash
 
-# This script is used to setup oodikone or parts of oodikone. It provides interactive
-# cli.
+# This script is used to setup oodikone with interactive cli. Base for script:
+# https://betterdev.blog/minimal-safe-bash-script-template/
 
- # Fail fast if script fails
-set -Eeuo pipefail
+# === Config ===
 
-# Constant filenames and paths used in scripts
+# Try to define the script’s location directory
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+# Source common config
+source "$script_dir/common_config.sh"
+
+# Set up constants
 PROJECT_ROOT=$(git rev-parse --show-toplevel)
 USER_DATA_FILE_PATH="$PROJECT_ROOT/hyuserdata"
 BACKUP_DIR="$PROJECT_ROOT/backups"
-
 PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
 KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
 SIS_REAL_DB_BACKUP="$BACKUP_DIR/latest-sis.sqz"
 
+# If username is not set, get username from data file.
+# Ask user to provide username, if username was not found from data file.
 get_username() {
-  # Check if username variable has already been set
-  [[ -z "$username" ]] || return 0
+  [[ -z "${username-}" ]] || return 0
 
-  # Check if username is saved to data file and ask it if not
   if [ ! -f "$USER_DATA_FILE_PATH" ]; then
-    echo ""
-    echo "!! No previous username data found. Will ask it now !!"
-    echo "Enter your Uni Helsinki username:"
+    msg "${BLUE}No previous username data found, please enter your Uni Helsinki username:${NOFORMAT}"
     read -r username
     echo "$username" > "$USER_DATA_FILE_PATH"
-    echo "Succesfully saved username"
-    echo ""
+    msg "${GREEN}Succesfully saved username${NOFORMAT}"
   fi
 
-  # Set username to variable from data file
   username=$(head -n 1 < "$USER_DATA_FILE_PATH")
 }
 
-retry_to_connect () {
+# Retry given command
+retry () {
   for i in {1..60}; do
-    "$@" && break || echo "Retry attempt $i failed, waiting for 10 seconds..." && sleep 10;
+    "$@" && break || msg "${ORANGE}Retry attempt $i failed, waiting for 10 seconds...${NOFORMAT}" && sleep 10;
   done
 }
 
-docker-compose-dev () {
-    npm run docker:oodikone:dev -- "$@"
-}
+
+### REWRITE BELOW
 
 restore_psql_from_backup () {
     echo ""
@@ -58,13 +58,13 @@ restore_psql_from_backup () {
 ping_psql () {
     drop_psql "$1" "$2"
     echo "Creating psql in container $1 with db name $2"
-    retry_to_connect docker exec -u postgres "$1" pg_isready --dbname="$2"
+    retry docker exec -u postgres "$1" pg_isready --dbname="$2"
     docker exec -u postgres "$1" createdb "$2" || echo "container $1 DB $2 already exists"
 }
 
 drop_psql () {
     echo "Dropping psql in container $1 with db name $2"
-    retry_to_connect docker exec -u postgres "$1" pg_isready --dbname="$2"
+    retry docker exec -u postgres "$1" pg_isready --dbname="$2"
     docker exec -u postgres "$1" dropdb "$2" || echo "container $1 DB $2 does not exist"
 }
 
@@ -130,7 +130,7 @@ init_dirs () {
 
 # Set up oodikone with real data
 run_full_setup () {
-    echo "=== Setup npm packages ==="
+    echo "=== Setting up npm packages locally ==="
     install_local_npm_packages
     echo "=== Creating directories and ensuring rights are correct ==="
     init_dirs
@@ -160,8 +160,8 @@ run_importer_data_reset() {
 # Download & reset old oodi data
 run_oodi_data_reset () {
     get_username
-    echo "Using your Uni Helsinki username: $username"
 
+    return 0
     echo "Downloading oodi-db dump"
     scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
     "$username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
@@ -181,7 +181,6 @@ run_oodi_data_reset () {
 
 # === Run cli ===
 
-PS3='Please enter your choice: '
 
 mopo () {
     if [ "$(tput cols)" -gt "100" ]; then
@@ -194,6 +193,8 @@ logo () {
         cat scripts/assets/logo.txt
     fi
 }
+
+PS3='Please enter your choice: '
 
 logo
 cat scripts/assets/welcome.txt
