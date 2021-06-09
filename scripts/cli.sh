@@ -198,21 +198,6 @@ run_oodi_data_reset() {
 
 # === CLI ===
 
-# If username is not set, get username from data file.
-# Ask user to provide username, if username was not found from data file.
-get_username() {
-  [[ -z "${username-}" ]] || return 0
-
-  if [ ! -f "$USER_DATA_FILE_PATH" ]; then
-    msg "${ORANGE}No previous username data found, please enter your Uni Helsinki username:${NOFORMAT}"
-    read -r username
-    echo "$username" > "$USER_DATA_FILE_PATH"
-    msg "${GREEN}Succesfully saved username${NOFORMAT}"
-  fi
-
-  username=$(head -n 1 < "$USER_DATA_FILE_PATH")
-}
-
 show_welcome() {
   if [ "$(tput cols)" -gt "76" ]; then
     cat "$script_dir"/assets/logo.txt
@@ -225,6 +210,23 @@ take care of setting up and starting Oodikone for you. See README for more
 details.
 "
 }
+
+# If username is not set, get username from data file.
+# Ask user to provide username, if username was not found from data file.
+get_username() {
+  if [ ! -f "$USER_DATA_FILE_PATH" ]; then
+    msg "${ORANGE}University username is needed to get database dumps from toska servers, please enter it now:${NOFORMAT}"
+    read -r username
+    echo "$username" > "$USER_DATA_FILE_PATH"
+    msg "${GREEN}Succesfully saved username for later usage.${NOFORMAT}"
+  fi
+  username=$(head -n 1 < "$USER_DATA_FILE_PATH")
+
+  msg "${BLUE}Using your university username ${PURPLE}${username}${BLUE} for \
+getting database dumps.${NOFORMAT}
+"
+}
+
 
 # Define custom shell prompt for the interactive select loop
 PS3="Please enter your choice: "
@@ -239,6 +241,7 @@ options=(
 )
 
 show_welcome
+get_username
 
 while true; do
   select opt in "${options[@]}"; do
