@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
 # This script is used to run oodikone with different setups and is mainly used by
-# scripts in package.json. It passes all additional arguments to docker-compose as is.
-# Base for script: https://betterdev.blog/minimal-safe-bash-script-template/
+# scripts in package.json. Script passes all additional arguments to docker-compose as
+# is. Base for script: https://betterdev.blog/minimal-safe-bash-script-template/
 
- # Fail fast if script fails
-set -Eeuo pipefail
+
+
+
+# === Config ===
 
 usage() {
   cat <<EOF
@@ -20,25 +22,6 @@ Following flags can be used:
 --no-color: colors not used
 EOF
   exit
-}
-
-setup_colors() {
-  if [[ -t 2 ]] && [[ -z "${NO_COLOR-}" ]] && [[ "${TERM-}" != "dumb" ]]; then
-    NOFORMAT='\033[0m' RED='\033[0;31m' BLUE='\033[0;34m'
-  else
-    NOFORMAT='' RED='' BLUE=''
-  fi
-}
-
-msg() {
-    echo >&2 -e "${1-}"
-}
-
-die() {
-  local msg=$1
-  local code=${2-1} # default exit status 1
-  msg "${RED}${msg}${NOFORMAT}"
-  exit "$code"
 }
 
 parse_params() {

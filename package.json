@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "An application for analyzing university data.",
   "scripts": {
-    "cli": "./scripts/run.sh",
+    "cli": "./scripts/cli.sh",
     "concurrently": "concurrently",
     "services": "./scripts/exec_command_for_services.sh",
     "lint": "./scripts/exec_parallel_npm_in_services.sh -c lint",
@@ -17,7 +17,7 @@
     "diff:transfers": "docker exec backend node /usr/src/app/src/sisoodi_diff/transfers.js",
     "diff:trends": "docker exec backend node /usr/src/app/src/sisoodi_diff/trends.js",
     "start": "./run.sh oodikone anon up --detach && ./run.sh oodikone anon logs --follow",
-    "start:real": "./run.sh oodikone real up --detach && ./run.sh oodikone real logs --follow",
+    "start:real": "./scripts/run.sh oodikone real up --detach && ./run.sh oodikone real logs --follow",
     "stop": "./run.sh oodikone real rm --stop --volumes",
     "updater:up": "./run.sh updater anon up --detach && ./run.sh updater anon logs --follow",
     "updater:up:real": "./run.sh updater real up --detach && ./run.sh updater real logs --follow",
