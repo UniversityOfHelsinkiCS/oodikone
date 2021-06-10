@@ -19,7 +19,9 @@ PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
 KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
 USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
 ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
-SIS_REAL_DB_BACKUP="$BACKUP_DIR/latest-sis.sqz"
+SIS_REAL_DB_BACKUP="$BACKUP_DIR/latest-sis-pg.sqz"
+ANONYYMIOODI_URL="git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git"
+ANONYYMIOODI_FOLDER="$PROJECT_ROOT/anonyymioodi"
 
 # Run docker-compose down on cleanup
 cleanup() {
@@ -33,6 +35,12 @@ ${ORANGE}Trying to run docker-compose down and remove orphans${NOFORMAT}
 # === CLI options ===
 
 ### REWRITE THESE TO USE MESSAGES
+
+retry () {
+  for i in {1..60}; do
+    "$@" && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
+  done
+}
 
 restore_psql_from_backup() {
     echo "Restoring database from backup $1 to container $2:"
@@ -63,7 +71,91 @@ draw_mopo() {
   fi
 }
 
-# Option 1
+reset_all_anonymous_data() {
+  msg "${BLUE}Downloading anonymous dumps${NOFORMAT}"
+  rm -rf "$ANONYYMIOODI_FOLDER" && git clone "$ANONYYMIOODI_URL" "$ANONYYMIOODI_FOLDER" \
+  && cd "$ANONYYMIOODI_FOLDER" || return 1
+
+  msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
+  docker-compose down
+  docker-compose up -d user_db db_kone analytics_db db_sis sis-importer-db
+
+  ping_psql "db_kone" "db_kone"
+  restore_psql_from_backup db_kone.sqz db_kone db_kone
+  ping_psql "oodi_user_db" "user_db"
+  restore_psql_from_backup user_db.sqz oodi_user_db user_db
+  ping_psql "oodi_analytics_db" "analytics_db"
+  restore_psql_from_backup analytics_db.sqz oodi_analytics_db analytics_db
+  ping_psql "db_sis" "db_sis"
+  restore_psql_from_backup db_sis.sqz db_sis db_sis
+  ping_psql "sis-importer-db" "importer-db"
+  restore_psql_from_backup importer-db.sqz sis-importer-db importer-db
+
+  msg "${GREEN}Database setup finished.${NOFORMAT}"
+}
+
+reset_all_real_data() {
+  msg "${BLUE}Downloading user-db, analytics-db and kone-db dumps${NOFORMAT}"
+  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+"$username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
+
+  msg "${BLUE}Downloading sis-db dump${NOFORMAT}"
+  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+"$username@svm-96.cs.helsinki.fi:/home/updater_user/backups/*" "$BACKUP_DIR/"
+
+  msg "${BLUE}Downloading importer-db dump${NOFORMAT}"
+  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+"$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
+
+  msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
+
+  docker-compose down
+  docker-compose up -d user_db db_kone analytics_db db_sis sis-importer-db
+  ping_psql "db_kone" "db_kone_real"
+  restore_psql_from_backup "$KONE_REAL_DB_BACKUP" db_kone db_kone_real
+  ping_psql "oodi_user_db" "user_db_real"
+  restore_psql_from_backup "$USER_REAL_DB_BACKUP" oodi_user_db user_db_real
+  ping_psql "oodi_analytics_db" "analytics_db_real"
+  restore_psql_from_backup "$ANALYTICS_REAL_DB_BACKUP" oodi_analytics_db analytics_db_real
+  ping_psql "db_sis" "db_sis_real"
+  restore_psql_from_backup "$SIS_REAL_DB_BACKUP" db_sis db_sis_real
+  ping_psql "sis-importer-db" "importer-db"
+  restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
+
+  msg "${GREEN}Database setup finished.${NOFORMAT}"
+}
+
+reset_sis_importer_data() {
+  msg "${BLUE}Downloading importer-db dump${NOFORMAT}"
+  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+"$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
+
+  msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
+
+  docker-compose down
+  docker-compose up -d sis-importer-db
+  ping_psql "sis-importer-db" "importer-db"
+  restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
+
+  msg "${GREEN}Database setup finished.${NOFORMAT}"
+}
+
+reset_old_oodi_data() {
+  echo "Downloading old oodi-db dump"
+  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
+"$username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
+
+  docker-compose down
+  docker-compose up -d db
+
+  msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
+
+  ping_psql "oodi_db" "tkt_oodi_real"
+  restore_psql_from_backup "$PSQL_REAL_DB_BACKUP" oodi_db tkt_oodi_real
+
+  msg "${GREEN}Database setup finished.${NOFORMAT}"
+}
+
 set_up_oodikone() {
   draw_mopo
 
@@ -83,118 +175,22 @@ set_up_oodikone() {
   done
   cd "$PROJECT_ROOT" || return 1
 
-  die "rest not yet implemented!"
-}
+  msg "${BLUE}Initializing needed directories and correct rights${NOFORMAT}
+  "
 
-reset_all_anonymous_data() {
-  die "not yet implemented!"
-}
-
-reset_all_real_data() {
-  die "not yet implemented!"
-}
-
-reset_sis_importer_data() {
-  die "not yet implemented!"
-}
-
-reset_old_oodi_data() {
-  die "not yet implemented!"
-}
-
-# Download & reset all real data
-run_full_real_data_reset() {
-    get_username
-    echo "Using your Uni Helsinki username: $username"
-
-    echo "Downloading user-db, analytics-db and kone-db dumps"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-    "$username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
-
-    echo "Downloading sis-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-    "$username@svm-96.cs.helsinki.fi:/home/updater_user/backups/*" "$BACKUP_DIR/"
-
-    echo "Downloading importer-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-    "$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
-
-    docker-compose-dev down
-    docker-compose-dev up -d user_db db_kone analytics_db db_sis sis-importer-db
-
-    echo "Restoring PostgreSQL from backup. This might take a while."
-
-    ping_psql "db_kone" "db_kone_real"
-    restore_psql_from_backup "$KONE_REAL_DB_BACKUP" db_kone db_kone_real
-    ping_psql "oodi_user_db" "user_db_real"
-    restore_psql_from_backup "$USER_REAL_DB_BACKUP" oodi_user_db user_db_real
-    ping_psql "oodi_analytics_db" "analytics_db_real"
-    restore_psql_from_backup "$ANALYTICS_REAL_DB_BACKUP" oodi_analytics_db analytics_db_real
-    ping_psql "db_sis" "db_sis_real"
-    restore_psql_from_backup "$SIS_REAL_DB_BACKUP" db_sis db_sis_real
-    ping_psql "sis-importer-db" "importer-db"
-    restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
-
-    echo "Database setup finished"
-
-    docker-compose-dev down
-}
-
-
-init_dirs () {
   mkdir -p "$BACKUP_DIR"
   chmod -R g+r scripts/docker-entrypoint-initdb.d
-}
 
-# Set up oodikone with real data
-run_full_setup() {
-    echo "=== Setting up npm packages locally ==="
-    install_local_npm_packages
-    echo "=== Creating directories and ensuring rights are correct ==="
-    init_dirs
-    echo "=== Setting up needed databases ==="
-    run_full_real_data_reset
-    echo "=== Building images ==="
-    docker-compose-dev build
-    echo "=== Starting oodikone ==="
-    npm run docker:up:real
-    cat scripts/assets/instructions.txt
-}
+  msg "${BLUE}Setting up databases with anonymous data.${NOFORMAT}
+  "
+  reset_all_anonymous_data
 
-# Download & reset sis importer data
-run_importer_data_reset() {
-    get_username
-    echo "Using your Uni Helsinki username: $username"
+  msg "${BLUE}Building images.${NOFORMAT}
+  "
+  docker-compose build
 
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-    "$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
-
-    docker-compose -f dco.data.yml up -d sis-importer-db
-    ping_psql "sis-importer-db" "importer-db"
-    restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
-    docker-compose -f dco.data.yml down
-}
-
-# Download & reset old oodi data
-run_oodi_data_reset() {
-    get_username
-
-    return 0
-    echo "Downloading oodi-db dump"
-    scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-    "$username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
-
-    docker-compose-dev down
-    docker-compose-dev up -d db
-
-    echo "Restoring PostgreSQL from backup. This might take a while."
-
-    ping_psql "oodi_db" "tkt_oodi_real"
-    restore_psql_from_backup "$PSQL_REAL_DB_BACKUP" oodi_db tkt_oodi_real
-
-    echo "Database setup finished"
-
-    docker-compose-dev down
+  msg "${GREEN}Setup ready, oodikone can be started! See README for more info.${NOFORMAT}
+  "
 }
 
 # === CLI ===
@@ -227,7 +223,6 @@ get_username() {
 getting database dumps.${NOFORMAT}
 "
 }
-
 
 # Define custom shell prompt for the interactive select loop
 PS3="Please enter your choice: "
