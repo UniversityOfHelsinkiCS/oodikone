@@ -1,25 +1,29 @@
 #!/usr/bin/env bash
 
 # This script is used to run oodikone with different setups and is mainly used by
-# scripts in package.json. Script passes all additional arguments to docker-compose as
-# is. Base for script: https://betterdev.blog/minimal-safe-bash-script-template/
-
-
-
+# scripts in package.json. Script parses some given parameters and passes rest to
+# docker-compose.
+# Base for script: https://betterdev.blog/minimal-safe-bash-script-template/
 
 # === Config ===
+
+# Try to define the script’s location directory
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+
+# Source common config
+source "$script_dir"/common_config.sh
 
 usage() {
   cat <<EOF
 Usage: $(basename "${BASH_SOURCE[0]}") option version command --flag
 
-Option: oodikone/updater
-Version: anon/real/ci
-Command: will be passed to docker-compose. Can't be empty
+Parameters:
+* Option: oodikone/updater
+* Version: anon/real/ci
+* Command: will be passed to docker-compose. Can't be empty
 
-Following flags can be used:
+Flags:
 -v or --verbose: for verbose mode (prints stack trace)
---no-color: colors not used
 EOF
   exit
 }
@@ -28,13 +32,11 @@ parse_params() {
   while :; do
     case "${1-}" in
     -v | --verbose) set -x ;;
-    --no-color) NO_COLOR=1 ;;
     -?*) die "Unknown option: $1" ;;
     *) break ;;
     esac
     shift
   done
-  setup_colors
 
   # Parse arguments. If arguments are not correct, print usage and exit with error.
   args=("$@")
@@ -73,7 +75,6 @@ parse_services
 parse_env
 
 ## All things are not yet implemented, fail with error
-[[ "$version" == "anon" ]] && die "${RED}Anon option not yet implemented${NOFORMAT}"
 [[ "$version" == "ci" ]] && die "${RED}CI option not yet implemented${NOFORMAT}"
 
 # Create command that will be run. Empty command (e.g. just ./run oodikone real) and
