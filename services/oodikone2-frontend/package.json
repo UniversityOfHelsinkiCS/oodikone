@@ -8,19 +8,16 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --mode=development --hot --inline",
-    "docker": "webpack-dev-server --mode=development --hot --inline --host 0.0.0.0",
-    "dist": "webpack --mode=production",
-    "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
     "lint:css": "stylelint 'src/**/*.css'",
     "lint:js": "eslint --ext .jsx,.js ./",
+    "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
     "lintfix": "eslint --ext .jsx,.js --fix ./ && stylelint --fix 'src/**/*.css'",
+    "docker": "webpack-dev-server --mode=development --hot --inline --host 0.0.0.0",
+    "dist": "webpack --mode=production",
     "sentry-cli": "sentry-cli",
     "stats": "webpack --json --mode=production --profile --progress > stats.json",
-    "test": "npm run lint",
-    "test_docker": "docker exec -t frontend /bin/bash -c 'npm test'",
     "notest": "echo",
-    "storybook": "start-storybook -h 0.0.0.0 -p 7777 --ci",
-    "eslint-check": "eslint --print-config src/app.jsx | eslint-config-prettier-check"
+    "storybook": "start-storybook -h 0.0.0.0 -p 7777 --ci"
   },
   "licence": "",
   "main": "src/app.jsx",
