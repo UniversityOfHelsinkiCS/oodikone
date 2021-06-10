@@ -4,31 +4,19 @@
   "description": "An application for analyzing university data.",
   "scripts": {
     "cli": "./scripts/cli.sh",
-    "concurrently": "concurrently",
-    "services": "./scripts/exec_command_for_services.sh",
-    "lint": "./scripts/exec_parallel_npm_in_services.sh -c lint",
-    "lintfix": "npm run services -- -c lintfix",
-    "test_services": "npm run services -- -e -c test",
-    "test": "./scripts/test.sh",
-    "test:smoke": "./scripts/test.sh -s",
+    "runner": "./scripts.runner.sh",
+    "start": "runner oodikone anon up --detach && runner oodikone anon logs --follow",
+    "start:real": "runner oodikone real up --detach && runner oodikone real logs --follow",
+    "stop": "runner oodikone real rm --stop --volumes",
+    "updater:up": "runner updater anon up --detach && runner updater anon logs --follow",
+    "updater:up:real": "runner updater real up --detach && runner updater real logs --follow",
+    "updater:down": "runner updater real rm --stop --volumes",
+    "docker:down": "docker-compose down --remove-orphans",
     "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
     "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",
     "diff:transfers": "docker exec backend node /usr/src/app/src/sisoodi_diff/transfers.js",
-    "diff:trends": "docker exec backend node /usr/src/app/src/sisoodi_diff/trends.js",
-    "start": "./run.sh oodikone anon up --detach && ./run.sh oodikone anon logs --follow",
-    "start:real": "./scripts/run.sh oodikone real up --detach && ./run.sh oodikone real logs --follow",
-    "stop": "./run.sh oodikone real rm --stop --volumes",
-    "updater:up": "./run.sh updater anon up --detach && ./run.sh updater anon logs --follow",
-    "updater:up:real": "./run.sh updater real up --detach && ./run.sh updater real logs --follow",
-    "updater:down": "./run.sh updater real rm --stop --volumes",
-    "docker:down": "docker-compose down --remove-orphans"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "scripts/grep_only.sh",
-      "pre-push": "npm run lint"
-    }
+    "diff:trends": "docker exec backend node /usr/src/app/src/sisoodi_diff/trends.js"
   },
   "repository": {
     "type": "git",
@@ -41,10 +29,7 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
-    "concurrently": "^6.2.0",
     "cypress": "^7.4.0",
-    "cypress-smokify": "0.0.3",
-    "husky": "^6.0.0"
-  },
-  "dependencies": {}
+    "cypress-smokify": "0.0.3"
+  }
 }
