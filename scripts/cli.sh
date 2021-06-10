@@ -66,7 +66,24 @@ draw_mopo() {
 # Option 1
 set_up_oodikone() {
   draw_mopo
-  die "not yet implemented!"
+
+  msg "${BLUE}Installing npm packages locally to enable linting${NOFORMAT}
+  "
+  folders_to_set_up=(
+    "$PROJECT_ROOT"
+    "$PROJECT_ROOT/services/oodikone2-analytics"
+    "$PROJECT_ROOT/services/oodikone2-frontend"
+    "$PROJECT_ROOT/services/oodikone2-userservice"
+    "$PROJECT_ROOT/services/backend/oodikone2-backend"
+  )
+
+  for folder in "${folders_to_set_up[@]}"; do
+    cd "$folder" || return 1
+    ([[ -d node_modules ]] && msg "${GREEN}Packages already installed in $folder${NOFORMAT}") || npm ci
+  done
+  cd "$PROJECT_ROOT" || return 1
+
+  die "rest not yet implemented!"
 }
 
 reset_all_anonymous_data() {
@@ -123,22 +140,6 @@ run_full_real_data_reset() {
     docker-compose-dev down
 }
 
-install_local_npm_packages() {
-    # These are required for linting and only installed if not already there
-    [[ -d node_modules ]] || npm ci
-    cd services/oodikone2-frontend || return
-    [[ -d node_modules ]] || npm ci
-    cd ../oodikone2-analytics || return
-    [[ -d node_modules ]] || npm ci
-    cd ../oodikone2-userservice || return
-    [[ -d node_modules ]] || npm ci
-    cd ../backend/oodikone2-backend || return
-    [[ -d node_modules ]] || npm ci
-    cd ../updater_writer || return
-    [[ -d node_modules ]] || npm ci
-
-    cd ../../../
-}
 
 init_dirs () {
   mkdir -p "$BACKUP_DIR"
