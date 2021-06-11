@@ -12,6 +12,16 @@
     "updater:up:real": "runner updater real up --detach && runner updater real logs --follow",
     "updater:down": "runner updater real rm --stop --volumes",
     "docker:down": "docker-compose down --remove-orphans",
+    "lint:analytics": "npm run lint --prefix services/oodikone2-analytics",
+    "lint:backend": "npm run lint --prefix services/backend/oodikone2-backend",
+    "lint:frontend": "npm run lint --prefix services/oodikone2-frontend",
+    "lint:userservice": "npm run lint --prefix services/oodikone2-userservice",
+    "lint": "concurrently 'npm run lint:analytics' 'npm run lint:backend' 'npm run lint:frontend' 'npm run lint:userservice'",
+    "lintfix:analytics": "npm run lintfix --prefix services/oodikone2-analytics",
+    "lintfix:backend": "npm run lintfix --prefix services/backend/oodikone2-backend",
+    "lintfix:frontend": "npm run lintfix --prefix services/oodikone2-frontend",
+    "lintfix:userservice": "npm run lintfix --prefix services/oodikone2-userservice",
+    "lintfix": "concurrently 'npm run lintfix:analytics' 'npm run lintfix:backend' 'npm run lintfix:frontend' 'npm run lintfix:userservice'",
     "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
     "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",
@@ -31,5 +41,8 @@
   "devDependencies": {
     "cypress": "^7.4.0",
     "cypress-smokify": "0.0.3"
+  },
+  "dependencies": {
+    "concurrently": "^6.2.0"
   }
 }
