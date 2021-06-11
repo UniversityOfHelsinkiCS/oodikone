@@ -50,10 +50,14 @@ cleanup() {
 # === CLI options ===
 
 draw_mopo() {
+  # Some hacks to print mopo as green, since colours from common config don't work
+  # Please feel free to fix this. And tell otahontas how you did it!
+  local mopogreen=$(tput setaf 34)
+  local normal=$(tput sgr0)
   if [ "$(tput cols)" -gt "100" ]; then
-    echo
-    cat "$script_dir"/assets/mopo.txt
-    echo
+    while IFS="" read -r p || [ -n "$p" ]; do
+      printf '%40s\n' "${mopogreen}$p${normal}"
+    done < "$script_dir"/assets/mopo.txt
   fi
 }
 
@@ -168,7 +172,7 @@ set_up_oodikone() {
   cd "$PROJECT_ROOT" || return 1
 
   infomsg "Setting up databases with anonymous data"
-  #reset_all_anonymous_data
+  reset_all_anonymous_data
 
   infomsg "Building images."
   sh "$script_dir"/runner.sh oodikone anon build
