@@ -134,6 +134,7 @@ services:
     <<: *defaults
     container_name: sis-db
     environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_MULTIPLE_DATABASES: sis-db,sis-db-real
     image: postgres:13.2
     ports:
@@ -146,6 +147,7 @@ services:
     <<: *defaults
     container_name: sis-importer-db
     environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_MULTIPLE_DATABASES: sis-importer-db,sis-importer-db-real
     image: postgres:13.1
     volumes:
