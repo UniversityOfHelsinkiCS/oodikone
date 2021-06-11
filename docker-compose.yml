@@ -120,7 +120,8 @@ services:
     <<: *db_defaults
     container_name: oodi-db
     environment:
-      POSTGRES_MULTIPLE_DATABASES: oodi-db,oodidb-real
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_MULTIPLE_DATABASES: oodi-db,oodi-db-real
     image: postgres:10-alpine
     ports:
       - "5421:5432"
@@ -142,6 +143,7 @@ services:
     <<: *db_defaults
     container_name: sis-db
     environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_MULTIPLE_DATABASES: sis-db,sis-db-real
     image: postgres:13.2
     ports:
@@ -155,6 +157,7 @@ services:
     <<: *db_defaults
     container_name: sis-importer-db
     environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_MULTIPLE_DATABASES: sis-importer-db,sis-importer-db-real
     image: postgres:13.1
     volumes:
