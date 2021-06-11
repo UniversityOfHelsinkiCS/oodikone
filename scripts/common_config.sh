@@ -23,6 +23,24 @@ msg() {
     echo >&2 -e "${1-}"
 }
 
+# Some special types of messages with colours
+successmsg() {
+  msg "${GREEN}$1${NOFORMAT}
+  "
+}
+failuremsg() {
+  msg "${RED}$1${NOFORMAT}
+  "
+}
+infomsg() {
+  msg "${BLUE}$1${NOFORMAT}
+  "
+}
+warningmsg() {
+  msg "${ORANGE}$1${NOFORMAT}
+  "
+}
+
 # Quit and exit with given message and error code
 # By default uses exit code 1, message must be given.
 die() {
