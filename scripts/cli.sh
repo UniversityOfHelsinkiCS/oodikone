@@ -20,9 +20,6 @@ USER_DATA_FILE="$DUMP_DIR/hyuserdata"
 ANON_DUMP_DIR="$DUMP_DIR/anon"
 REAL_DUMP_DIR="$DUMP_DIR/real"
 
-## Urls and names script is going to give for dumps
-ANON_DUMPS_GIT_URL="git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git"
-
 ## Following the naming convention in docker-compose, these are names for services
 ## and for the anonymous database. Real databases have suffix "-real".
 ANALYTICS_DB_NAME="analytics-db"
@@ -30,48 +27,28 @@ KONE_DB_NAME="kone-db"
 SIS_DB_NAME="sis-db"
 SIS_IMPORTER_DB_NAME="sis-importer-db"
 USER_DB_NAME="user-db"
-OODI_DB_NAME="oodi-db"
 DATABASES=("$ANALYTICS_DB_NAME" "$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
+OODI_DB_NAME="oodi-db" # TODO: Remove when oodi is removed
+
+## Urls should be in same order as databases
+ANON_DUMPS_GIT_URL="git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git"
+ANALYTICS_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-analytics-pg.sqz"
+KONE_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-kone-pg.sqz"
+SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-sis.sqz"
+SIS_IMPORTER_DB_REAL_DUMP_URL="importer:/home/importer_user/importer-db/backup/importer-db.sqz"
+USER_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-user-pg.sqz"
+REAL_DUMP_URLS=("$ANALYTICS_DB_REAL_DUMP_URL" "$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL"
+      "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
+OODI_DB_REAL_DUMP_URL="svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/latest-pg.sqz" # TODO: Remove when oodi is removed
 
 # Run docker-compose down on cleanup
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
-  msg "
-${ORANGE}Trying to run docker-compose down and remove orphans${NOFORMAT}
-"
+  warningmsg "Trying to run docker-compose down and remove orphans"
   docker-compose down --remove-orphans
 }
 
 # === CLI options ===
-
-### REWRITE THESE TO USE MESSAGES
-
-retry () {
-  for i in {1..60}; do
-    "$@" && break || echo "Retry attempt $i failed, waiting..." && sleep 10;
-  done
-}
-
-restore_psql_from_backup() {
-    echo "Restoring database from backup $1 to container $2:"
-    echo "  1. Copying dump..."
-    docker cp "$1" "$2:/asd.sqz"
-    echo "  2. Writing database..."
-    docker exec "$2" pg_restore -U postgres --no-owner -F c --dbname="$3" -j4 /asd.sqz
-}
-
-ping_psql() {
-    drop_psql "$1" "$2"
-    echo "Creating psql in container $1 with db name $2"
-    retry docker exec -u postgres "$1" pg_isready --dbname="$2"
-    docker exec -u postgres "$1" createdb "$2" || echo "container $1 DB $2 already exists"
-}
-
-drop_psql() {
-    echo "Dropping psql in container $1 with db name $2"
-    retry docker exec -u postgres "$1" pg_isready --dbname="$2"
-    docker exec -u postgres "$1" dropdb "$2" || echo "container $1 DB $2 does not exist"
-}
 
 draw_mopo() {
   if [ "$(tput cols)" -gt "100" ]; then
@@ -81,84 +58,104 @@ draw_mopo() {
   fi
 }
 
-reset_all_anonymous_data() {
-  # msg "${BLUE}Downloading anonymous dumps${NOFORMAT}"
-  # rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR" \
-  # && cd "$ANON_DUMP_DIR" || return 1
-  cd "$ANON_DUMP_DIR" || return 1
+retry () {
+  for i in {1..60}; do
+    "$@" && break || warningmsg "Retry attempt $i failed, waiting..." && sleep 10;
+  done
+}
 
-  msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
+download_real_dump() {
+  local database=$1
+  local pannu_url=$2
+  local dump_destination="$REAL_DUMP_DIR/$database.sqz"
+  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" "$username@$pannu_url" "$dump_destination"
+}
+
+### REWRITE THESE TO USE MESSAGES
+
+restore_psql_from_backup() {
+  infomsg "Restoring database from backup $1 to container $2:"
+  infomsg "  1. Copying dump..."
+  docker cp "$1" "$2:/asd.sqz"
+  infomsg "  2. Writing database..."
+  docker exec "$2" pg_restore -U postgres --no-owner -F c --dbname="$3" -j4 /asd.sqz
+}
+
+ping_psql() {
+  drop_psql "$1" "$2"
+  infomsg "Creating psql in container $1 with db name $2"
+  retry docker exec -u postgres "$1" pg_isready --dbname="$2"
+  docker exec -u postgres "$1" createdb "$2" || warningmsg "container $1 DB $2 already exists"
+}
+
+drop_psql() {
+  infomsg "Dropping psql in container $1 with db name $2"
+  retry docker exec -u postgres "$1" pg_isready --dbname="$2"
+  docker exec -u postgres "$1" dropdb "$2" || warningmsg "container $1 DB $2 does not exist"
+}
+
+reset_all_anonymous_data() {
+  infomsg "Downloading anonymous dumps"
+  rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR" \
+  && cd "$ANON_DUMP_DIR" || return 1
+
+  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
   docker-compose down
   docker-compose up -d ${DATABASES[*]}
 
-  for db in "${DATABASES[@]}"; do
-    ping_psql "$db" "$db"
-    restore_psql_from_backup "$db.sqz" "$db" "$db"
+  for database in "${DATABASES[@]}"; do
+    ping_psql "$database" "$database"
+    restore_psql_from_backup "$database.sqz" "$database" "$database"
   done
 
-  msg "${GREEN}Database setup finished.${NOFORMAT}"
+  successmsg "Database setup finished"
 }
 
 reset_all_real_data() {
-  msg "${BLUE}Downloading user-db, analytics-db and kone-db dumps${NOFORMAT}"
-  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-"$username@oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
+  infomsg "Downloading real data dumps, asking for pannu password when needed"
+  for i in ${!DATABASES[*]}; do
+    download_real_dump ${DATABASES[$i]} ${REAL_DUMP_URLS[$i]}
+  done
 
-  msg "${BLUE}Downloading sis-db dump${NOFORMAT}"
-  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-"$username@svm-96.cs.helsinki.fi:/home/updater_user/backups/*" "$BACKUP_DIR/"
-
-  msg "${BLUE}Downloading importer-db dump${NOFORMAT}"
-  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-"$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
-
-  msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
+  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
 
   docker-compose down
-  docker-compose up -d user_db db_kone analytics_db db_sis sis-importer-db
-  ping_psql "db_kone" "db_kone_real"
-  restore_psql_from_backup "$KONE_REAL_DB_BACKUP" db_kone db_kone_real
-  ping_psql "oodi_user_db" "user_db_real"
-  restore_psql_from_backup "$USER_REAL_DB_BACKUP" oodi_user_db user_db_real
-  ping_psql "oodi_analytics_db" "analytics_db_real"
-  restore_psql_from_backup "$ANALYTICS_REAL_DB_BACKUP" oodi_analytics_db analytics_db_real
-  ping_psql "db_sis" "db_sis_real"
-  restore_psql_from_backup "$SIS_REAL_DB_BACKUP" db_sis db_sis_real
-  ping_psql "sis-importer-db" "importer-db"
-  restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
+  docker-compose up -d ${DATABASES[*]}
 
-  msg "${GREEN}Database setup finished.${NOFORMAT}"
+  for database in "${DATABASES[@]}"; do
+    ping_psql "$database" "$database"
+    restore_psql_from_backup "$database.sqz" "$database" "$database-real"
+  done
+
+  successmsg "Database setup finished"
 }
 
 reset_sis_importer_data() {
-  msg "${BLUE}Downloading importer-db dump${NOFORMAT}"
-  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-"$username@importer:/home/importer_user/importer-db/backup/importer-db.sqz" "$BACKUP_DIR/"
+  infomsg "Downloading sis-importer-db dump"
+  download_real_dump $SIS_IMPORTER_DB_NAME $SIS_IMPORTER_DB_REAL_DUMP_URL
+  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
 
-  msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
-
+  local database=$SIS_IMPORTER_DB_NAME
   docker-compose down
-  docker-compose up -d sis-importer-db
-  ping_psql "sis-importer-db" "importer-db"
-  restore_psql_from_backup "$BACKUP_DIR/importer-db.sqz" sis-importer-db importer-db
+  docker-compose up -d $database
 
-  msg "${GREEN}Database setup finished.${NOFORMAT}"
+  ping_psql "$database" "$database"
+  restore_psql_from_backup "$database.sqz" "$database" "$database-real"
+  successmsg "Database setup finished"
 }
 
 reset_old_oodi_data() {
-  echo "Downloading old oodi-db dump"
-  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" \
-"$username@svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/*" "$BACKUP_DIR/"
+  infomsg "Downloading old oodi-db dump"
+  download_real_dump $OODI_DB_NAME $OODI_DB_REAL_DUMP_URL
+  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
 
+  local database=$OODI_DB_NAME
   docker-compose down
-  docker-compose up -d db
+  docker-compose up -d $database
 
-  msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
-
-  ping_psql "oodi_db" "tkt_oodi_real"
-  restore_psql_from_backup "$PSQL_REAL_DB_BACKUP" oodi_db tkt_oodi_real
-
-  msg "${GREEN}Database setup finished.${NOFORMAT}"
+  ping_psql "$database" "$database"
+  restore_psql_from_backup "$database.sqz" "$database" "$database-real"
+  successmsg "Database setup finished"
 }
 
 set_up_oodikone() {
@@ -211,10 +208,10 @@ details.
 }
 
 init_dirs() {
-  if [[ ! -d "$DUMP_DIR" ]]; then
+  if [[ ! -d "$DUMP_DIR/real" ]]; then
     msg "${BLUE}Creating directory for dumps and giving read rights for docker script${NOFORMAT}
     "
-    mkdir -p "$DUMP_DIR"
+    mkdir -p "$DUMP_DIR/real"
     chmod -R g+r scripts/docker-entrypoint-initdb.d
   fi
 }
