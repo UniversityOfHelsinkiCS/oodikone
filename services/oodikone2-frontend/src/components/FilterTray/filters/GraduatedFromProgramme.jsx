@@ -81,6 +81,7 @@ const GraduatedFromProgramme = ({ code }) => {
             />
             {options.map(option => (
               <Radio
+                key={option.key}
                 label={option.text}
                 name="radioGroup"
                 style={{ marginBottom: '0.5rem' }}
