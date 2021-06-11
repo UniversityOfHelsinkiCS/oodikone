@@ -406,7 +406,7 @@ const updateTeachers = async attainments => {
       personIdToEmployeeNumber[p.id] = p.employee_number
       return mapTeacher(p)
     })
-console.log(JSON.stringify(teachers, null, 2));
+
   // Sort to avoid deadlocks
   await bulkCreate(Teacher, sortBy(teachers, ['id']))
   return personIdToEmployeeNumber

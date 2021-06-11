@@ -158,6 +158,7 @@ class PopulationSearchHistory extends Component {
       years
     }
     const searchString = qs.stringify(queryObject)
+
     this.props.history.push({ search: searchString })
   }
 
@@ -256,7 +257,9 @@ class PopulationSearchHistory extends Component {
           />
         </Form.Field>
         <Form.Field style={{ marginTop: '15px' }}>
-          <Button onClick={this.pushQueryToUrl}>Fetch population with new settings</Button>
+          <Button type="button" onClick={this.pushQueryToUrl}>
+            Fetch population with new settings
+          </Button>
         </Form.Field>
       </Form.Group>
     )
