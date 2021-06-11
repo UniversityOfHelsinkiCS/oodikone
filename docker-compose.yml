@@ -9,6 +9,10 @@ x-build_defaults: &build_defaults
       TAG: development
   command: "npm run dev"
 
+x-db_defaults: &db_defaults
+  environment:
+    POSTGRES_HOST_AUTH_METHOD: trust
+
 services:
   adminer:
     <<: *defaults
@@ -37,6 +41,7 @@ services:
       - ./services/oodikone2-analytics/:/usr/src/app
   analytics-db:
     <<: *defaults
+    <<: *db_defaults
     container_name: analytics-db
     environment:
       POSTGRES_MULTIPLE_DATABASES: analytics-db,analytics-db-real
@@ -100,6 +105,7 @@ services:
       - ./services/oodikone2-frontend/:/usr/src/app
   kone-db:
     <<: *defaults
+    <<: *db_defaults
     container_name: kone-db
     environment:
       - POSTGRES_MULTIPLE_DATABASES=kone-db,kone-db-real
@@ -111,6 +117,7 @@ services:
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   oodi-db: # TODO: Remove when oodi stuff has been removed from oodikone
     <<: *defaults
+    <<: *db_defaults
     container_name: oodi-db
     environment:
       POSTGRES_MULTIPLE_DATABASES: oodi-db,oodidb-real
@@ -132,9 +139,9 @@ services:
       - redis-data:/data
   sis-db:
     <<: *defaults
+    <<: *db_defaults
     container_name: sis-db
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_MULTIPLE_DATABASES: sis-db,sis-db-real
     image: postgres:13.2
     ports:
@@ -145,9 +152,9 @@ services:
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   sis-importer-db:
     <<: *defaults
+    <<: *db_defaults
     container_name: sis-importer-db
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_MULTIPLE_DATABASES: sis-importer-db,sis-importer-db-real
     image: postgres:13.1
     volumes:
@@ -202,6 +209,7 @@ services:
       - ./updater/sis-updater-worker/:/usr/src/app
   user-db:
     <<: *defaults
+    <<: *db_defaults
     container_name: user-db
     environment:
       POSTGRES_MULTIPLE_DATABASES: user-db,user-db-real
