@@ -32,12 +32,64 @@ jobs:
             linter-workflow:
               - '.github/workflows/lint.yaml'
   lint_analytics:
+    name: "Lint analytics"
     needs: changes
     if: ${{ needs.changes.outputs.analytics == 'true' || needs.changes.outputs.linter-workflow == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: services/oodikone2-analytics
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+  lint_backend:
+    name: "Lint backend"
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.linter-workflow == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/backend/oodikone2-backend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+  lint_frontend:
+    name: "Lint frontend"
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.linter-workflow == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/oodikone2-frontend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+  lint_userservice:
+    name: "Lint userservice"
+    needs: changes
+    if: ${{ needs.changes.outputs.userservice == 'true' || needs.changes.outputs.linter-workflow == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/oodikone2-userservice
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
