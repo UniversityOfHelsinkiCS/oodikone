@@ -1,20 +1,30 @@
+x-defaults: &defaults
+  restart: unless-stopped
+
+x-build_defaults: &build_defaults
+  restart: unless-stopped
+  build:
+    args:
+      NODE_ENV: development
+      TAG: development
+  command: "npm run dev"
+
 services:
   adminer:
+    <<: *defaults
     container_name: adminer
     environment:
       ADMINER_DESIGN: pepa-linha
     image: adminer:4.8.0
     ports:
       - "5050:8080"
-    restart: unless-stopped
     volumes:
       - ./adminer-plugins:/var/www/html/plugins-enabled
   analytics:
+    <<: *defaults
+    <<: *build_defaults
     build:
-      args:
-        NODE_ENV: development
       context: services/oodikone2-analytics
-    command: "npm run dev"
     container_name: analytics
     depends_on:
       - analytics_db
@@ -23,11 +33,11 @@ services:
       TEST_DB: postgres://postgres@analytics_db:5432/analytics_db_test
     ports:
       - "4568:4568"
-    restart: unless-stopped
     volumes:
       - analytics-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-analytics/:/usr/src/app
   analytics_db:
+    <<: *defaults
     container_name: oodi_analytics_db
     environment:
       POSTGRES_USER: postgres
@@ -35,18 +45,15 @@ services:
     image: postgres:9.6.3
     ports:
       - "5423:5432"
-    restart: unless-stopped
     volumes:
       - analytics_pgdata:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   backend:
+    <<: *defaults
+    <<: *build_defaults
     build:
-      args:
-        NODE_ENV: development
-        TAG: development
       context: services/backend
       dockerfile: oodikone2-backend/Dockerfile
-    command: "npm run dev"
     container_name: backend
     depends_on:
       - db
@@ -69,7 +76,6 @@ services:
       USERSERVICE_URL: http://userservice:4567
     ports:
       - "8080:8080"
-    restart: unless-stopped
     volumes:
       - backend-nodemod:/usr/src/app/node_modules
       - ./services/backend/oodikone2-backend/:/usr/src/app
@@ -77,6 +83,7 @@ services:
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
       - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
   db:
+    <<: *defaults
     container_name: oodi_db
     environment:
       POSTGRES_USER: postgres
@@ -85,12 +92,12 @@ services:
     image: postgres:10-alpine
     ports:
       - "5421:5432"
-    restart: unless-stopped
     shm_size: 2gb
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   db_kone:
+    <<: *defaults
     container_name: db_kone
     environment:
       - POSTGRES_MULTIPLE_DATABASES=db_kone
@@ -102,6 +109,7 @@ services:
       - pgdata_kone:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   db_sis:
+    <<: *defaults
     container_name: db_sis
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -110,16 +118,14 @@ services:
     image: postgres:13.2
     ports:
       - "5426:5432"
-    restart: unless-stopped
     shm_size: 2gb
     volumes:
       - pgdata_sis:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   frontend:
+    <<: *defaults
+    <<: *build_defaults
     build:
-      args:
-        NODE_ENV: development
-        TAG: development
       context: services/oodikone2-frontend
     command: "npm run docker"
     container_name: frontend
@@ -133,11 +139,11 @@ services:
     ports:
       - "8081:8081"
       - "7777:7777"
-    restart: unless-stopped
     volumes:
       - frontend-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-frontend/:/usr/src/app
   redis:
+    <<: *defaults
     command: "redis-server --appendonly yes"
     container_name: redis
     image: redis
@@ -146,6 +152,7 @@ services:
     volumes:
       - redis-data:/data
   sis-importer-db:
+    <<: *defaults
     container_name: sis-importer-db
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
@@ -153,15 +160,15 @@ services:
     volumes:
       - sis-importer-pgdata:/var/lib/postgresql/data
   sis-updater-nats:
+    <<: *defaults
     command: "-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore"
     container_name: sis-updater-nats
     image: nats-streaming:0.16.2
   sis-updater-scheduler:
+    <<: *defaults
+    <<: *build_defaults
     build:
-      args:
-        NODE_ENV: development
       context: updater/sis-updater-scheduler
-    command: "npm run dev"
     container_name: sis-updater-scheduler
     depends_on:
       - redis
@@ -177,16 +184,14 @@ services:
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
     ports:
       - "8082:8082"
-    restart: unless-stopped
     volumes:
       - sis-updater-scheduler-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-scheduler/:/usr/src/app
   sis-updater-worker:
+    <<: *defaults
+    <<: *build_defaults
     build:
-      args:
-        NODE_ENV: development
       context: updater/sis-updater-worker
-    command: "npm run dev"
     depends_on:
       - redis
       - sis-updater-nats
@@ -199,11 +204,11 @@ services:
       SIS_IMPORTER_USER: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
-    restart: unless-stopped
     volumes:
       - sis-updater-worker-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-worker/:/usr/src/app
   user_db:
+    <<: *defaults
     container_name: oodi_user_db
     environment:
       POSTGRES_USER: postgres
@@ -211,15 +216,13 @@ services:
     image: postgres:9.6.3
     ports:
       - "5422:5432"
-    restart: unless-stopped
     volumes:
       - user_pgdata:/var/lib/postgresql/data
   userservice:
+    <<: *defaults
+    <<: *build_defaults
     build:
-      args:
-        NODE_ENV: development
       context: services/oodikone2-userservice
-    command: "npm run dev"
     container_name: userservice
     depends_on:
       - user_db
@@ -230,7 +233,6 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
     ports:
       - "4567:4567"
-    restart: unless-stopped
     volumes:
       - userservice-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-userservice/:/usr/src/app
