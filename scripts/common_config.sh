@@ -28,7 +28,7 @@ successmsg() {
   msg "${GREEN}$1${NOFORMAT}
   "
 }
-failuremsg() {
+errormsg() {
   msg "${RED}$1${NOFORMAT}
   "
 }

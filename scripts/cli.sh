@@ -37,8 +37,7 @@ KONE_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-kon
 SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-sis.sqz"
 SIS_IMPORTER_DB_REAL_DUMP_URL="importer:/home/importer_user/importer-db/backup/importer-db.sqz"
 USER_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-user-pg.sqz"
-REAL_DUMP_URLS=("$ANALYTICS_DB_REAL_DUMP_URL" "$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL"
-      "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
+REAL_DUMP_URLS=("$ANALYTICS_DB_REAL_DUMP_URL" "$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
 OODI_DB_REAL_DUMP_URL="svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/latest-pg.sqz" # TODO: Remove when oodi is removed
 
 # Run docker-compose down on cleanup
@@ -59,8 +58,9 @@ draw_mopo() {
 }
 
 retry () {
+  sleep 5
   for i in {1..60}; do
-    "$@" && break || warningmsg "Retry attempt $i failed, waiting..." && sleep 10;
+    "$@" && break || warningmsg "Retry attempt $i failed, waiting..." && sleep 5;
   done
 }
 
@@ -71,98 +71,88 @@ download_real_dump() {
   scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" "$username@$pannu_url" "$dump_destination"
 }
 
-### REWRITE THESE TO USE MESSAGES
-
-restore_psql_from_backup() {
-  infomsg "Restoring database from backup $1 to container $2:"
-  infomsg "  1. Copying dump..."
-  docker cp "$1" "$2:/asd.sqz"
-  infomsg "  2. Writing database..."
-  docker exec "$2" pg_restore -U postgres --no-owner -F c --dbname="$3" -j4 /asd.sqz
+check_if_postgres_is_ready() {
+  local container=$1
+  local database=$2
+  retry docker exec -u postgres "$container" pg_isready --dbname="$database"
 }
 
-ping_psql() {
-  drop_psql "$1" "$2"
-  infomsg "Creating psql in container $1 with db name $2"
-  retry docker exec -u postgres "$1" pg_isready --dbname="$2"
-  docker exec -u postgres "$1" createdb "$2" || warningmsg "container $1 DB $2 already exists"
-}
+reset_databases() {
+  local args=("$@")
+  local mode=${args[0]}
+  local databases=${args[*]:1}
 
-drop_psql() {
-  infomsg "Dropping psql in container $1 with db name $2"
-  retry docker exec -u postgres "$1" pg_isready --dbname="$2"
-  docker exec -u postgres "$1" dropdb "$2" || warningmsg "container $1 DB $2 does not exist"
+  local database_name_suffix=""
+  local database_dump_dir=$ANON_DUMP_DIR
+  if [[ $mode == "real" ]]; then
+    database_name_suffix="-real"
+    database_dump_dir=$REAL_DUMP_DIR
+  fi
+
+  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
+
+  docker-compose down
+  docker-compose up -d ${databases[*]}
+
+  for database in ${databases[@]}; do
+    local database_dump="$database_dump_dir/$database.sqz"
+    local database_container="$database"
+    local database_name="$database$database_name_suffix"
+
+    infomsg "Attempting to create database $database_name from dump $database_dump inside container $database_container"
+
+    infomsg "Trying to remove possibly existing previous version of database"
+    check_if_postgres_is_ready "$database_container" "$database_name"
+    docker exec -u postgres "$database_container" dropdb "$database_name" || warningmsg "This is okay, continuing"
+
+    infomsg "Trying to create new database"
+    check_if_postgres_is_ready "$database_container" "$database_name"
+    docker exec -u postgres "$database_container" createdb "$database_name" || warningmsg "This is okay, continuing"
+
+    infomsg "Restoring database from dump database"
+    msg "1. Copying dump..."
+    docker cp "$database_dump" "$database_container:/asd.sqz"
+    msg "2. Writing database..."
+    docker exec "$database_container" pg_restore -U postgres --no-owner -F c --dbname="$database_name" -j4 /asd.sqz
+    msg ""
+  done
+
+  successmsg "Database setup finished"
 }
 
 reset_all_anonymous_data() {
   infomsg "Downloading anonymous dumps"
-  rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR" \
-  && cd "$ANON_DUMP_DIR" || return 1
-
-  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
-  docker-compose down
-  docker-compose up -d ${DATABASES[*]}
-
-  for database in "${DATABASES[@]}"; do
-    ping_psql "$database" "$database"
-    restore_psql_from_backup "$database.sqz" "$database" "$database"
-  done
-
-  successmsg "Database setup finished"
+  # rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR"
+  reset_databases "anon" ${DATABASES[*]}
 }
 
 reset_all_real_data() {
   infomsg "Downloading real data dumps, asking for pannu password when needed"
   for i in ${!DATABASES[*]}; do
-    download_real_dump ${DATABASES[$i]} ${REAL_DUMP_URLS[$i]}
+    download_real_dump "${DATABASES[$i]}" "${REAL_DUMP_URLS[$i]}"
   done
-
-  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
-
-  docker-compose down
-  docker-compose up -d ${DATABASES[*]}
-
-  for database in "${DATABASES[@]}"; do
-    ping_psql "$database" "$database"
-    restore_psql_from_backup "$database.sqz" "$database" "$database-real"
-  done
-
-  successmsg "Database setup finished"
+  reset_databases "real" ${DATABASES[*]}
 }
 
 reset_sis_importer_data() {
   infomsg "Downloading sis-importer-db dump"
-  download_real_dump $SIS_IMPORTER_DB_NAME $SIS_IMPORTER_DB_REAL_DUMP_URL
-  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
-
   local database=$SIS_IMPORTER_DB_NAME
-  docker-compose down
-  docker-compose up -d $database
-
-  ping_psql "$database" "$database"
-  restore_psql_from_backup "$database.sqz" "$database" "$database-real"
-  successmsg "Database setup finished"
+  download_real_dump $database $SIS_IMPORTER_DB_REAL_DUMP_URL
+  reset_databases "real" $database
 }
 
 reset_old_oodi_data() {
   infomsg "Downloading old oodi-db dump"
-  download_real_dump $OODI_DB_NAME $OODI_DB_REAL_DUMP_URL
-  infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
-
   local database=$OODI_DB_NAME
-  docker-compose down
-  docker-compose up -d $database
-
-  ping_psql "$database" "$database"
-  restore_psql_from_backup "$database.sqz" "$database" "$database-real"
-  successmsg "Database setup finished"
+  # download_real_dump $database $OODI_DB_REAL_DUMP_URL
+  reset_databases "real" $database
 }
 
 set_up_oodikone() {
   draw_mopo
 
-  msg "${BLUE}Installing npm packages locally to enable linting${NOFORMAT}
-  "
+  infomsg "Installing npm packages locally to enable linting"
+
   folders_to_set_up=(
     "$PROJECT_ROOT"
     "$PROJECT_ROOT/services/oodikone2-analytics"
@@ -173,23 +163,17 @@ set_up_oodikone() {
 
   for folder in "${folders_to_set_up[@]}"; do
     cd "$folder" || return 1
-    ([[ -d node_modules ]] && msg "${GREEN}Packages already installed in $folder${NOFORMAT}") || npm ci
+    ([[ -d node_modules ]] && warningmsg "Packages already installed in $folder") || npm ci
   done
   cd "$PROJECT_ROOT" || return 1
 
-  msg "${BLUE}Initializing needed directories and correct rights${NOFORMAT}
-  "
+  infomsg "Setting up databases with anonymous data"
+  #reset_all_anonymous_data
 
-  msg "${BLUE}Setting up databases with anonymous data.${NOFORMAT}
-  "
-  reset_all_anonymous_data
+  infomsg "Building images."
+  sh "$script_dir"/runner.sh oodikone anon build
 
-  msg "${BLUE}Building images.${NOFORMAT}
-  "
-  docker-compose build
-
-  msg "${GREEN}Setup ready, oodikone can be started! See README for more info.${NOFORMAT}
-  "
+  successmsg "Setup ready, oodikone can be started! See README for more info."
 }
 
 # === CLI ===
@@ -198,19 +182,17 @@ show_welcome() {
   if [ "$(tput cols)" -gt "76" ]; then
     cat "$script_dir"/assets/logo.txt
   fi
-  msg "${BLUE}Welcome to Oodikone CLI!${NOFORMAT}
-
-This tool helps you in managing the project configuration. If you are new to
+  infomsg "Welcome to Oodikone CLI!"
+  msg "This tool helps you in managing the project configuration. If you are new to
 Oodikone development, you should probably run \"Set up oodikone\" which will
 take care of setting up and starting Oodikone for you. See README for more
-details.
-"
+details."
+  msg ""
 }
 
 init_dirs() {
   if [[ ! -d "$DUMP_DIR/real" ]]; then
-    msg "${BLUE}Creating directory for dumps and giving read rights for docker script${NOFORMAT}
-    "
+    infomsg "Creating directory for dumps and giving read rights for docker script"
     mkdir -p "$DUMP_DIR/real"
     chmod -R g+r scripts/docker-entrypoint-initdb.d
   fi
@@ -220,16 +202,14 @@ init_dirs() {
 # Ask user to provide username, if username was not found from data file.
 get_username() {
   if [ ! -f "$USER_DATA_FILE" ]; then
-    msg "${ORANGE}University username is needed to get database dumps from toska servers, please enter it now:${NOFORMAT}"
+    warningmsg "University username is needed to get database dumps from toska servers, please enter it now:"
     read -r username
     echo "$username" > "$USER_DATA_FILE"
-    msg "${GREEN}Succesfully saved username for later usage.${NOFORMAT}"
+    successmsg "Succesfully saved username for later usage."
   fi
   username=$(head -n 1 < "$USER_DATA_FILE")
 
-  msg "${BLUE}Using your university username ${PURPLE}${username}${BLUE} for \
-getting database dumps.${NOFORMAT}
-"
+  infomsg "Using your university username - $username - for getting database dumps"
 }
 
 # Define custom shell prompt for the interactive select loop
@@ -244,6 +224,7 @@ options=(
   "Quit."
 )
 
+# Run scripts before showing interactive prompt
 show_welcome
 init_dirs
 get_username
