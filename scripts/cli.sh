@@ -12,16 +12,26 @@ script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 source "$script_dir"/common_config.sh
 
 # Set up constants
-PROJECT_ROOT=$(git rev-parse --show-toplevel)
-USER_DATA_FILE_PATH="$PROJECT_ROOT/hyuserdata"
-BACKUP_DIR="$PROJECT_ROOT/backups"
-PSQL_REAL_DB_BACKUP="$BACKUP_DIR/latest-pg.sqz"
-KONE_REAL_DB_BACKUP="$BACKUP_DIR/latest-kone-pg.sqz"
-USER_REAL_DB_BACKUP="$BACKUP_DIR/latest-user-pg.sqz"
-ANALYTICS_REAL_DB_BACKUP="$BACKUP_DIR/latest-analytics-pg.sqz"
-SIS_REAL_DB_BACKUP="$BACKUP_DIR/latest-sis-pg.sqz"
-ANONYYMIOODI_URL="git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git"
-ANONYYMIOODI_FOLDER="$PROJECT_ROOT/anonyymioodi"
+
+## Folders
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+DUMP_DIR="$PROJECT_ROOT/.databasedumps"
+USER_DATA_FILE="$DUMP_DIR/hyuserdata"
+ANON_DUMP_DIR="$DUMP_DIR/anon"
+REAL_DUMP_DIR="$DUMP_DIR/real"
+
+## Urls and names script is going to give for dumps
+ANON_DUMPS_GIT_URL="git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git"
+
+## Following the naming convention in docker-compose, these are names for services
+## and for the anonymous database. Real databases have suffix "-real".
+ANALYTICS_DB_NAME="analytics-db"
+KONE_DB_NAME="kone-db"
+SIS_DB_NAME="sis-db"
+SIS_IMPORTER_DB_NAME="sis-importer-db"
+USER_DB_NAME="user-db"
+OODI_DB_NAME="oodi-db"
+DATABASES=("$ANALYTICS_DB_NAME" "$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
 
 # Run docker-compose down on cleanup
 cleanup() {
@@ -72,24 +82,19 @@ draw_mopo() {
 }
 
 reset_all_anonymous_data() {
-  msg "${BLUE}Downloading anonymous dumps${NOFORMAT}"
-  rm -rf "$ANONYYMIOODI_FOLDER" && git clone "$ANONYYMIOODI_URL" "$ANONYYMIOODI_FOLDER" \
-  && cd "$ANONYYMIOODI_FOLDER" || return 1
+  # msg "${BLUE}Downloading anonymous dumps${NOFORMAT}"
+  # rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR" \
+  # && cd "$ANON_DUMP_DIR" || return 1
+  cd "$ANON_DUMP_DIR" || return 1
 
   msg "${BLUE}Restoring PostgreSQL dumps from backups. This might take a while.${NOFORMAT}"
   docker-compose down
-  docker-compose up -d user_db db_kone analytics_db db_sis sis-importer-db
+  docker-compose up -d ${DATABASES[*]}
 
-  ping_psql "db_kone" "db_kone"
-  restore_psql_from_backup db_kone.sqz db_kone db_kone
-  ping_psql "oodi_user_db" "user_db"
-  restore_psql_from_backup user_db.sqz oodi_user_db user_db
-  ping_psql "oodi_analytics_db" "analytics_db"
-  restore_psql_from_backup analytics_db.sqz oodi_analytics_db analytics_db
-  ping_psql "db_sis" "db_sis"
-  restore_psql_from_backup db_sis.sqz db_sis db_sis
-  ping_psql "sis-importer-db" "importer-db"
-  restore_psql_from_backup importer-db.sqz sis-importer-db importer-db
+  for db in "${DATABASES[@]}"; do
+    ping_psql "$db" "$db"
+    restore_psql_from_backup "$db.sqz" "$db" "$db"
+  done
 
   msg "${GREEN}Database setup finished.${NOFORMAT}"
 }
@@ -178,9 +183,6 @@ set_up_oodikone() {
   msg "${BLUE}Initializing needed directories and correct rights${NOFORMAT}
   "
 
-  mkdir -p "$BACKUP_DIR"
-  chmod -R g+r scripts/docker-entrypoint-initdb.d
-
   msg "${BLUE}Setting up databases with anonymous data.${NOFORMAT}
   "
   reset_all_anonymous_data
@@ -208,16 +210,25 @@ details.
 "
 }
 
+init_dirs() {
+  if [[ ! -d "$DUMP_DIR" ]]; then
+    msg "${BLUE}Creating directory for dumps and giving read rights for docker script${NOFORMAT}
+    "
+    mkdir -p "$DUMP_DIR"
+    chmod -R g+r scripts/docker-entrypoint-initdb.d
+  fi
+}
+
 # If username is not set, get username from data file.
 # Ask user to provide username, if username was not found from data file.
 get_username() {
-  if [ ! -f "$USER_DATA_FILE_PATH" ]; then
+  if [ ! -f "$USER_DATA_FILE" ]; then
     msg "${ORANGE}University username is needed to get database dumps from toska servers, please enter it now:${NOFORMAT}"
     read -r username
-    echo "$username" > "$USER_DATA_FILE_PATH"
+    echo "$username" > "$USER_DATA_FILE"
     msg "${GREEN}Succesfully saved username for later usage.${NOFORMAT}"
   fi
-  username=$(head -n 1 < "$USER_DATA_FILE_PATH")
+  username=$(head -n 1 < "$USER_DATA_FILE")
 
   msg "${BLUE}Using your university username ${PURPLE}${username}${BLUE} for \
 getting database dumps.${NOFORMAT}
@@ -237,6 +248,7 @@ options=(
 )
 
 show_welcome
+init_dirs
 get_username
 
 while true; do
