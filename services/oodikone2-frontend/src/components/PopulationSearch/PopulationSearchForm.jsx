@@ -71,14 +71,15 @@ const PopulationSearchForm = props => {
 
   const checkPreviousQuery = (query, previousQuery) => {
     if (!previousQuery.studyRights) return false
-
     const sameMonths = query.months === previousQuery.months
     const sameYear = query.Year === previousQuery.Year
     const sameSemesters = previousQuery.semesters
       ? isEqual(previousQuery.semesters, query.semesters)
       : !(query.semesters.length > 0)
+    const studentStatusesArray =
+      typeof query.studentStatuses === 'string' ? [query.studentStatuses] : query.studentStatuses
     const sameStudentStatuses = previousQuery.studentStatuses
-      ? isEqual(query.studentStatuses, previousQuery.studentStatuses)
+      ? isEqual(studentStatusesArray, previousQuery.studentStatuses)
       : !(query.studentStatuses.length > 0)
     const sameTag = previousQuery.tag ? previousQuery.tag === query.tag : !query.tag
     const sameYears = previousQuery.years ? isEqual(previousQuery.years, query.years) : !query.years
@@ -126,7 +127,6 @@ const PopulationSearchForm = props => {
   const fetchPopulationFromUrlParams = () => {
     const previousQuery = queries
     const query = parseQueryFromUrl()
-
     if (!checkPreviousQuery(query, previousQuery)) {
       setState({ query })
       fetchPopulation(query)
