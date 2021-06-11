@@ -27,26 +27,24 @@ services:
       context: services/oodikone2-analytics
     container_name: analytics
     depends_on:
-      - analytics_db
+      - analytics-db
     environment:
-      DB_URL: postgres://postgres@analytics_db:5432/analytics_db
-      TEST_DB: postgres://postgres@analytics_db:5432/analytics_db_test
+      DB_URL: postgres://postgres@analytics-db:5432/analytics-db
     ports:
       - "4568:4568"
     volumes:
       - analytics-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-analytics/:/usr/src/app
-  analytics_db:
+  analytics-db:
     <<: *defaults
-    container_name: oodi_analytics_db
+    container_name: analytics-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_MULTIPLE_DATABASES: analytics_db,analytics_db_real
+      POSTGRES_MULTIPLE_DATABASES: analytics-db,analytics-db-real
     image: postgres:9.6.3
     ports:
       - "5423:5432"
     volumes:
-      - analytics_pgdata:/var/lib/postgresql/data
+      - analytics-db-data:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   backend:
     <<: *defaults
@@ -56,21 +54,19 @@ services:
       dockerfile: oodikone2-backend/Dockerfile
     container_name: backend
     depends_on:
-      - db
-      - db_sis
-      - db_kone
+      - kone-db
+      - oodi-db
       - redis
+      - sis-db
     environment:
       ANALYTICS_URL: http://analytics:4568
-      DB_URL: postgres://postgres@db:5432/tkt_oodi
-      DB_URL_KONE: postgres://postgres@db_kone:5432/db_kone
+      DB_URL: postgres://postgres@oodi-db:5432/oodi-db
+      DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:8000
       REDIS: redis
       SECRET_TOKEN: dev
-      SIS_DB_URL: postgres://postgres@db_sis:5432/db_sis
+      SIS_DB_URL: postgres://postgres@db_sis:5432/sis-db
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
-      TEST_DB: postgres://postgres@db:5432/tkt_oodi_test
-      TEST_DB_KONE: postgres://postgres@db_kone:5432/db_kone_test
       TOKEN_SECRET: IWannaBeTheVeryBest
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       USERSERVICE_URL: http://userservice:4567
@@ -82,13 +78,42 @@ services:
       - ./services/backend/shared/models:/usr/src/app/src/models
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
       - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
-  db:
+  frontend:
     <<: *defaults
-    container_name: oodi_db
+    <<: *build_defaults
+    build:
+      context: services/oodikone2-frontend
+    container_name: frontend
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_MULTIPLE_DATABASES: tkt_oodi,tkt_oodi_test,tkt_oodi_real
+      ADMINER_URL: http://localhost:5050/?pgsql=oodi-db&username=postgres
+      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics-db&username=postgres
+      BACKEND_ADDR: backend
+      KONE_ADMINER_URL: http://localhost:5050/?pgsql=kone-db&username=postgres
+      SIS_ADMINER_URL: http://localhost:5050/?pgsql=sis-db&username=postgres
+      SIS_IMPORTER_ADMINER_URL: http://localhost:5050/?pgsql=sis-importer-db&username=postgres
+      USER_ADMINER_URL: http://localhost:5050/?pgsql=user-db&username=postgres
+    ports:
+      - "8081:8081"
+      - "7777:7777"
+    volumes:
+      - frontend-nodemod:/usr/src/app/node_modules
+      - ./services/oodikone2-frontend/:/usr/src/app
+  kone-db:
+    <<: *defaults
+    container_name: kone-db
+    environment:
+      - POSTGRES_MULTIPLE_DATABASES=kone-db,kone-db-real
+    image: postgres:9.6.3
+    ports:
+      - "5425:5432"
+    volumes:
+      - kone-db-data:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+  oodi-db: # TODO: Remove when oodi stuff has been removed from oodikone
+    <<: *defaults
+    container_name: oodi-db
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: oodi-db,oodidb-real
     image: postgres:10-alpine
     ports:
       - "5421:5432"
@@ -96,52 +121,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
-  db_kone:
-    <<: *defaults
-    container_name: db_kone
-    environment:
-      - POSTGRES_MULTIPLE_DATABASES=db_kone
-      - POSTGRES_USER=postgres
-    image: postgres:9.6.3
-    ports:
-      - "5425:5432"
-    volumes:
-      - pgdata_kone:/var/lib/postgresql/data
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
-  db_sis:
-    <<: *defaults
-    container_name: db_sis
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_MULTIPLE_DATABASES: db_sis,db_sis_real
-      POSTGRES_USER: postgres
-    image: postgres:13.2
-    ports:
-      - "5426:5432"
-    shm_size: 2gb
-    volumes:
-      - pgdata_sis:/var/lib/postgresql/data
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
-  frontend:
-    <<: *defaults
-    <<: *build_defaults
-    build:
-      context: services/oodikone2-frontend
-    command: "npm run docker"
-    container_name: frontend
-    environment:
-      ADMINER_URL: http://localhost:5050/?pgsql=db&username=postgres
-      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics_db&username=postgres
-      BACKEND_ADDR: backend
-      KONE_ADMINER_URL: http://localhost:5050/?pgsql=db_kone&username=postgres
-      SIS_ADMINER_URL: http://localhost:5050/?pgsql=db_sis&username=postgres
-      USER_ADMINER_URL: http://localhost:5050/?pgsql=user_db&username=postgres
-    ports:
-      - "8081:8081"
-      - "7777:7777"
-    volumes:
-      - frontend-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-frontend/:/usr/src/app
   redis:
     <<: *defaults
     command: "redis-server --appendonly yes"
@@ -151,14 +130,26 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+  sis-db:
+    <<: *defaults
+    container_name: sis-db
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: sis-db,sis-db-real
+    image: postgres:13.2
+    ports:
+      - "5426:5432"
+    shm_size: 2gb
+    volumes:
+      - sis-db-data:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   sis-importer-db:
     <<: *defaults
     container_name: sis-importer-db
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_MULTIPLE_DATABASES: sis-importer-db,sis-importer-db-real
     image: postgres:13.1
     volumes:
-      - sis-importer-pgdata:/var/lib/postgresql/data
+      - sis-importer-db-data:/var/lib/postgresql/data
   sis-updater-nats:
     <<: *defaults
     command: "-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore"
@@ -176,7 +167,7 @@ services:
     environment:
       REDIS_URI: //redis:6379
       SECRET_TOKEN: dev
-      SIS_IMPORTER_DATABASE: importer-db
+      SIS_IMPORTER_DATABASE: sis-importer-db
       SIS_IMPORTER_HOST: sis-importer-db
       SIS_IMPORTER_PASSWORD: postgres
       SIS_IMPORTER_USER: postgres
@@ -196,9 +187,9 @@ services:
       - redis
       - sis-updater-nats
     environment:
-      DB_URL: postgres://postgres@db_sis:5432/db_sis
+      DB_URL: postgres://postgres@sis-db:5432/sis-db
       REDIS_URI: //redis:6379
-      SIS_IMPORTER_DATABASE: importer-db
+      SIS_IMPORTER_DATABASE: sis-importer-db
       SIS_IMPORTER_HOST: sis-importer-db
       SIS_IMPORTER_PASSWORD: postgres
       SIS_IMPORTER_USER: postgres
@@ -207,17 +198,16 @@ services:
     volumes:
       - sis-updater-worker-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-worker/:/usr/src/app
-  user_db:
+  user-db:
     <<: *defaults
-    container_name: oodi_user_db
+    container_name: user-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_MULTIPLE_DATABASES: user_db,user_db_real
+      POSTGRES_MULTIPLE_DATABASES: user-db,user-db-real
     image: postgres:9.6.3
     ports:
       - "5422:5432"
     volumes:
-      - user_pgdata:/var/lib/postgresql/data
+      - user-db-data:/var/lib/postgresql/data
   userservice:
     <<: *defaults
     <<: *build_defaults
@@ -225,11 +215,10 @@ services:
       context: services/oodikone2-userservice
     container_name: userservice
     depends_on:
-      - user_db
+      - user-db
     environment:
-      DB_URL: postgres://postgres@user_db:5432/user_db
+      DB_URL: postgres://postgres@user-db:5432/user-db
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      TEST_DB: postgres://postgres@user_db:5432/user_db_test"
       TOKEN_SECRET: IWannaBeTheVeryBest
     ports:
       - "4567:4567"
@@ -238,21 +227,16 @@ services:
       - ./services/oodikone2-userservice/:/usr/src/app
 
 volumes:
-  # TODO: unify naming of pgdata, just like nodemod
+  analytics-db-data:
   analytics-nodemod:
-  analytics_pgdata:
   backend-nodemod:
   frontend-nodemod:
-  mongodata:
-  pgdata:
-  pgdata_kone:
-  pgdata_sis:
+  kone-db-data:
+  oodi-db-data: # TODO: Remove when oodi stuff has been removed from oodikone
   redis-data:
-  sis-importer-pgdata:
+  sis-db-data:
+  sis-importer-db-data:
   sis-updater-scheduler-nodemod:
   sis-updater-worker-nodemod:
-  updater-api-nodemod:
-  updater-scheduler-nodemod:
-  updater-writer-nodemod:
-  user_pgdata:
+  user-db-data:
   userservice-nodemod:
