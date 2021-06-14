@@ -126,8 +126,8 @@ reset_databases() {
 
 reset_all_anonymous_data() {
   infomsg "Downloading anonymous dumps"
-  # rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR"
-  reset_databases "anon" ${DATABASES[*]}
+  rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR"
+  reset_databases "anon" ${DATABASES[*]} "$OODI_DB_NAME" #Remove oodi anon setup when oodi-db is deprecated
 }
 
 reset_all_real_data() {
@@ -148,7 +148,7 @@ reset_sis_importer_data() {
 reset_old_oodi_data() {
   infomsg "Downloading old oodi-db dump"
   local database=$OODI_DB_NAME
-  # download_real_dump $database $OODI_DB_REAL_DUMP_URL
+  download_real_dump $database $OODI_DB_REAL_DUMP_URL
   reset_databases "real" $database
 }
 
@@ -183,8 +183,12 @@ set_up_oodikone() {
 # === CLI ===
 
 show_welcome() {
+  local cashmoneyyellow=$(tput setaf 221)
+  local normal=$(tput sgr0)
   if [ "$(tput cols)" -gt "76" ]; then
-    cat "$script_dir"/assets/logo.txt
+    while IFS="" read -r p || [ -n "$p" ]; do
+      printf '%40s\n' "${cashmoneyyellow}$p${normal}"
+    done < "$script_dir"/assets/logo.txt
   fi
   infomsg "Welcome to Oodikone CLI!"
   msg "This tool helps you in managing the project configuration. If you are new to
