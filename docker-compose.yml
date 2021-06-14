@@ -70,7 +70,7 @@ services:
       FRONT_URL: http://localhost:8000
       REDIS: redis
       SECRET_TOKEN: dev
-      SIS_DB_URL: postgres://postgres@db_sis:5432/sis-db
+      SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
       TOKEN_SECRET: IWannaBeTheVeryBest
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019

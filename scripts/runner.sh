@@ -55,9 +55,9 @@ parse_params() {
 # Set which services to launch based on option
 parse_services() {
   [[ "$option" == "oodikone" ]] && services="adminer analytics analytics-db backend \
-frontend kone-db redis sis-db user-db userservice"
-  [[ "$option" == "updater" ]] && services="db_sis sis-updater-nats \
-sis-updater-scheduler sis-updater-worker redis adminer sis-importer-db"
+frontend kone-db oodi-db redis sis-db user-db userservice"
+  [[ "$option" == "updater" ]] && services="adminer redis sis-db sis-importer-db \
+sis-updater-nats sis-updater-scheduler sis-updater-worker"
   return 0
 }
 
