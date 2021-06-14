@@ -13,11 +13,7 @@
     "lint:js": "eslint --ext .jsx,.js ./",
     "lint": "concurrently 'npm run lint:js' 'npm run lint:css'",
     "lintfix": "eslint --ext .jsx,.js --fix ./ && stylelint --fix 'src/**/*.css'",
-    "dist": "webpack --mode=production",
-    "sentry-cli": "sentry-cli",
-    "stats": "webpack --json --mode=production --profile --progress > stats.json",
-    "notest": "echo",
-    "storybook": "start-storybook -h 0.0.0.0 -p 7777 --ci"
+    "dist": "webpack --mode=production"
   },
   "licence": "",
   "main": "src/app.jsx",

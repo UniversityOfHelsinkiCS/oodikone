@@ -7,10 +7,7 @@
     "start": "node index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
     "lint": "eslint .",
-    "lintfix": "prettier --write '**/*.{js,json}' && eslint --fix .",
-    "test": "npm run jest",
-    "jest": "NODE_ENV=test jest --runInBand --verbose --detectOpenHandles",
-    "test_docker": "docker exec -t userservice /bin/bash -c 'npm test'"
+    "lintfix": "prettier --write '**/*.{js,json}' && eslint --fix ."
   },
   "repository": {
     "type": "git",
