@@ -116,7 +116,7 @@ reset_databases() {
 
 reset_all_anonymous_data() {
   infomsg "Downloading anonymous dumps"
-  rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_HTTPS_URL" "$ANON_DUMP_DIR"
+  rm -rf "$ANON_DUMP_DIR" && git clone "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR"
   reset_databases "anon" ${DATABASES[*]} "$OODI_DB_NAME" #Remove oodi anon setup when oodi-db is deprecated
 }
 
