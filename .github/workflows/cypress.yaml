@@ -24,9 +24,7 @@ jobs:
       # - name: Build images
       #   run: ./run.sh oodikone ci build
       - name: Setup databases from anonyymioodi repo
-        env:
-          TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/" && source ./scripts/functions_for_setup.sh && init_dirs && reset_all_anonymous_data
+        run: git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/" && source ./scripts/functions_for_setup.sh && init_dirs && reset_all_anonymous_data
       # - name: Run oodikone
       #   run: ./run.sh oodikone ci up -d --no-recreate
       # - uses: cypress-io/github-action@v2
