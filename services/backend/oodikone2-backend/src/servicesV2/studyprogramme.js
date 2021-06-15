@@ -284,7 +284,6 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
 }
 
 const creditsAfter = (studentnumbers, startDate) => {
-  const failed = ['0', 'Hyl.', 'Luop', 'Eisa']
   return Promise.all(
     studentnumbers.map(student =>
       Credit.sum('credits', {
