@@ -31,6 +31,8 @@ services:
       DB_URL: postgres://postgres@analytics-db:5432/analytics-db
     ports:
       - "4568:4568"
+    profiles:
+      - oodikone
     volumes:
       - analytics-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-analytics/:/usr/src/app
@@ -71,6 +73,8 @@ services:
       USERSERVICE_URL: http://userservice:4567
     ports:
       - "8080:8080"
+    profiles:
+      - oodikone
     volumes:
       - backend-nodemod:/usr/src/app/node_modules
       - ./services/backend/oodikone2-backend/:/usr/src/app
@@ -94,6 +98,8 @@ services:
     ports:
       - "8081:8081"
       - "7777:7777"
+    profiles:
+      - oodikone
     volumes:
       - frontend-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-frontend/:/usr/src/app
@@ -165,6 +171,7 @@ services:
     container_name: sis-updater-scheduler
     depends_on:
       - redis
+      - sis-importer-db
       - sis-updater-nats
     environment:
       REDIS_URI: //redis:6379
@@ -177,6 +184,8 @@ services:
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
     ports:
       - "8082:8082"
+    profiles:
+      - updater
     volumes:
       - sis-updater-scheduler-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-scheduler/:/usr/src/app
@@ -187,6 +196,8 @@ services:
       context: updater/sis-updater-worker
     depends_on:
       - redis
+      - sis-db
+      - sis-importer-db
       - sis-updater-nats
     environment:
       DB_URL: postgres://postgres@sis-db:5432/sis-db
@@ -197,6 +208,8 @@ services:
       SIS_IMPORTER_USER: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+    profiles:
+      - updater
     volumes:
       - sis-updater-worker-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-worker/:/usr/src/app
@@ -225,6 +238,8 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
     ports:
       - "4567:4567"
+    profiles:
+      - oodikone
     volumes:
       - userservice-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-userservice/:/usr/src/app
