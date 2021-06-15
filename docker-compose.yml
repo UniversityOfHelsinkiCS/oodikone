@@ -220,6 +220,7 @@ services:
       - "5422:5432"
     volumes:
       - user-db-data:/var/lib/postgresql/data
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
   userservice:
     <<: *defaults
     <<: *build_defaults
