@@ -10,24 +10,29 @@ on:
       - package*.json
 
 jobs:
-  build:
-    name: "Build used services"
+  build-services:
+    name: "Build services"
     runs-on: ubuntu-latest
     env:
       TAG: trunk
-      DEPLOY: false
       CACHE_TAG: trunk
     steps:
       - uses: actions/checkout@v2
       - name: Pull needed images
-        run: ./run.sh oodikone ci pull --ignore-pull-failures
+        run: ./run.sh oodikone ci --profile buildable_services pull --ignore-pull-failures
       - name: Build images
-        run: ./run.sh oodikone ci build
+        run: ./run.sh oodikone ci --profile buildable_services build
+  build-databases:
+    name: "Build databases"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
       - name: Set git to use https with toska-grps github users access token instead of git.
         run: git config --global url."https://${{ secrets.GH_PRIVATE_REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
       - name: Setup databases from anonyymioodi repo
         run: source ./scripts/functions_for_setup.sh && init_dirs && reset_all_anonymous_data
-      - name: Run services
-        run: ./run.sh oodikone ci up -d --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
+
+      # - name: Run services
+      #   run: ./run.sh oodikone ci up -d --no-recreate
+      # - name: Run cypress
+      #   uses: cypress-io/github-action@v2
