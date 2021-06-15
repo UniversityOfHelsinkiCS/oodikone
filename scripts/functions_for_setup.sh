@@ -25,7 +25,6 @@ OODI_DB_NAME="oodi-db" # TODO: Remove when oodi is removed
 
 ## Urls should be in same order as databases
 ANON_DUMPS_GIT_URL="git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git"
-ANON_DUMPS_HTTPS_URL="https://github.com/UniversityOfHelsinkiCS/anonyymioodi.git"
 ANALYTICS_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-analytics-pg.sqz"
 KONE_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-kone-pg.sqz"
 SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-sis.sqz"
