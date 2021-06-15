@@ -51,39 +51,33 @@ parse_params() {
     compose_command=${args[*]:1}
   else
     version=${args[1]}
-    [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
+    [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && \
+usage && die "Wrong version"
     compose_command=${args[*]:2}
   fi
   return 0
 }
 
-# Set which services to launch based on option
-parse_services() {
-  [[ "$option" == "oodikone" ]] && services="adminer analytics analytics-db backend \
-frontend kone-db oodi-db redis sis-db user-db userservice"
-  [[ "$option" == "updater" ]] && services="adminer redis sis-db sis-importer-db \
-sis-updater-nats sis-updater-scheduler sis-updater-worker"
-  [[ "$option" == "both" ]] && services="adminer analytics analytics-db backend \
-frontend kone-db oodi-db redis sis-db sis-importer-db sis-updater-nats \
-sis-updater-scheduler sis-updater-worker user-db userservice"
+# Set which profile to use to launch correct services
+parse_profiles() {
+  if [[ "$option" == "both" ]]; then
+    profiles="--profile oodikone --profile updater"
+  else
+    profiles="--profile $option"
+  fi
   return 0
 }
 
-# Set docker-compose services to run based on given services
+# Set which docker-compose files to use based on version. In ci, profiles are also
+# emptied, since they're passed from github actions.
 parse_env() {
+  env=""
   if [[ "$version" == "real" ]]; then
     env="-f docker-compose.yml -f docker-compose.real.yml"
-    return 0
-  fi
-  if [[ "$version" == "ci" ]]; then
+  elif [[ "$version" == "ci" ]]; then
     env="-f docker-compose.ci.yml"
-    # Override services in ci
-    services="analytics analytics-db backend frontend kone-db oodi-db redis sis-db \
-user-db userservice"
-    return 0
+    profiles=""
   fi
-  # Otherwise use default env
-  env=""
   return 0
 }
 
@@ -91,7 +85,7 @@ user-db userservice"
 
 parse_params "$@"
 
-# Do morning cleanup
+# Do only morning cleanup for morning option
 if [[ "$option" == "morning" ]];then
   git checkout trunk
   git pull
@@ -99,17 +93,16 @@ if [[ "$option" == "morning" ]];then
   return 0
 fi
 
-parse_services
-parse_env
-
 # Create command that will be run. Empty command and "down" command will be handled
 # differently.
+parse_profiles
+parse_env
 if [[ "$compose_command" == "" ]]; then
   final_command="docker-compose ${env}"
 elif [[ "$compose_command" == *"down"* ]]; then
   final_command="docker-compose ${compose_command}"
 else
-  final_command="docker-compose ${env} ${compose_command} ${services}"
+  final_command="docker-compose ${env} ${profiles} ${compose_command}"
 fi
 
 msg "${BLUE}Running: ${final_command}${NOFORMAT}"
