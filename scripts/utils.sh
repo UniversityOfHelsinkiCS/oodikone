@@ -1,24 +1,9 @@
 #!/usr/bin/env bash
 
-# This script is includes common configs used in oodikone scripts.
-# Configs are based on https://betterdev.blog/minimal-safe-bash-script-template/
+# This file includes some utility functions that are used in oodikone scripts.
+# Functions are based on https://betterdev.blog/minimal-safe-bash-script-template/
 
-# Fail immediately if script fails, unbound variables are referenced
-# or command inside pipe fails. -E ensures cleanup trap fires in rare ERR cases.
-set -euoE pipefail
-
-# Try to run cleanup function after things fail.
-trap cleanup SIGINT SIGTERM ERR EXIT
-
-# By default cleanup doesn't do anything. To overwrite, copy this function to script
-# common was sourced from.
-cleanup() {
-  trap - SIGINT SIGTERM ERR EXIT
-  # script cleanup here
-}
-
-
-# Print messages and logs that are not script output
+# Print messages and logs that are not script output to stderr
 msg() {
     echo >&2 -e "${1-}"
 }
@@ -50,7 +35,7 @@ die() {
   exit "$code"
 }
 
-# Setup colors for logging if possible
+# Setup colors for messages if running interactive shell
 if [[ -t 2 ]] && [[ "${TERM-}" != "dumb" ]]; then
   NOFORMAT='\033[0m' RED='\033[0;31m' GREEN='\033[0;32m' ORANGE='\033[0;33m' BLUE='\033[0;34m' PURPLE='\033[0;35m' CYAN='\033[0;36m' YELLOW='\033[1;33m'
 else
