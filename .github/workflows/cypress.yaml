@@ -1,0 +1,30 @@
+name: Run end-to-end tests with Cypress
+
+on:
+  push:
+    paths:
+      - .github/workflows/cypress.yaml
+      - cypress.json
+      - cypress/**
+      - services/**
+      - package*.json
+
+jobs:
+  build:
+    name: "Build used services"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      DEPLOY: false
+      CACHE_TAG: trunk
+    steps:
+      - uses: actions/checkout@v2
+      - name: Pull needed images
+        run: ./run.sh oodikone ci pull --ignore-pull-failures
+      - name: Build images
+        run: ./run.sh oodikone ci build
+      - name: Setup databases
+        run: source ./scripts/functions_for_setup.sh && init_dirs && reset_all_anonymous_data
+      - name: Run oodikone
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - uses: cypress-io/github-action@v2
