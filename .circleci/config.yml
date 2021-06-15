@@ -117,5 +117,7 @@ workflows:
     jobs:
       - build:
           filters:
+            branches:
+              ignore: new_dev_options
             tags:
               only: /.*/
