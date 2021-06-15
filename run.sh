@@ -1,48 +1,39 @@
 #!/usr/bin/env bash
 
 # This script is used to run oodikone with different setups and is mainly used by
-# scripts in package.json. Script parses some given parameters and passes rest to
-# docker-compose.
+# scripts in package.json.
 # Base for script: https://betterdev.blog/minimal-safe-bash-script-template/
 
 # === Config ===
 
-# Try to define the script’s location directory
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+# Set up constants
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
 # Source common config
-source "$script_dir"/common_config.sh
+source "$PROJECT_ROOT"/scripts/common_config.sh
 
 usage() {
   cat <<EOF
-Usage: $(basename "${BASH_SOURCE[0]}") option version command --flag
+Usage: $(basename "${BASH_SOURCE[0]}") option [version] command --flag
 
 Parameters:
-* Option: oodikone/updater
-* Version: anon/real/ci
-* Command: will be passed to docker-compose. Can't be empty
-
-Flags:
--v or --verbose: for verbose mode (prints stack trace)
+* Option: oodikone/updater/both/morning
+* Version: anon/real/ci. Not necessary in all cases.
+* Command: will be passed to docker-compose.
 EOF
   exit
 }
 
+# Parse parameters. If arguments are not correct, print usage and exit with error.
 parse_params() {
-  while :; do
-    case "${1-}" in
-    -v | --verbose) set -x ;;
-    -?*) die "Unknown option: $1" ;;
-    *) break ;;
-    esac
-    shift
-  done
-
-  # Parse arguments. If arguments are not correct, print usage and exit with error.
   args=("$@")
 
   [[ ${#args[@]} -lt 3 ]] && usage && die
   option=${args[0]}
+
+  # If option is morning, other parameters aren't needed
+  [[ "$option" == "morning" ]] && return 0
+
   version=${args[1]}
   [[ "$option" != "oodikone" && "$option" != "updater" ]] && usage && die
   [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
@@ -69,8 +60,18 @@ parse_env() {
   return 0
 }
 
-# Run helper functions
+# === Run script ===
+
 parse_params "$@"
+
+if [[ "$option" == "morning" ]];then
+  git checkout trunk
+  git pull
+  docker-compose down --rmi all --remove-orphans
+  option=oodikone
+  anon build
+fi
+
 parse_services
 parse_env
 

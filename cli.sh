@@ -5,14 +5,7 @@
 
 # === Config ===
 
-# Try to define the script’s location directory
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
-
-# Source common config
-source "$script_dir"/common_config.sh
-
 # Set up constants
-
 ## Folders
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 DUMP_DIR="$PROJECT_ROOT/.databasedumps"
@@ -40,6 +33,9 @@ USER_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-use
 REAL_DUMP_URLS=("$ANALYTICS_DB_REAL_DUMP_URL" "$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
 OODI_DB_REAL_DUMP_URL="svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/latest-pg.sqz" # TODO: Remove when oodi is removed
 
+# Source common config
+source "$PROJECT_ROOT"/scripts/common_config.sh
+
 # Run docker-compose down on cleanup
 cleanup() {
   trap - SIGINT SIGTERM ERR EXIT
@@ -57,7 +53,7 @@ draw_mopo() {
   if [ "$(tput cols)" -gt "100" ]; then
     while IFS="" read -r p || [ -n "$p" ]; do
       printf '%40s\n' "${mopogreen}$p${normal}"
-    done < "$script_dir"/assets/mopo.txt
+    done < "$PROJECT_ROOT"/scripts/assets/mopo.txt
   fi
 }
 
@@ -175,7 +171,7 @@ set_up_oodikone() {
   reset_all_anonymous_data
 
   infomsg "Building images."
-  sh "$script_dir"/runner.sh oodikone anon build
+  sh "$PROJECT_ROOT"/run.sh oodikone anon build
 
   successmsg "Setup ready, oodikone can be started! See README for more info."
 }
@@ -188,7 +184,7 @@ show_welcome() {
   if [ "$(tput cols)" -gt "76" ]; then
     while IFS="" read -r p || [ -n "$p" ]; do
       printf '%40s\n' "${cashmoneyyellow}$p${normal}"
-    done < "$script_dir"/assets/logo.txt
+    done < "$PROJECT_ROOT"/scripts/assets/logo.txt
   fi
   infomsg "Welcome to Oodikone CLI!"
   msg "This tool helps you in managing the project configuration. If you are new to
@@ -202,7 +198,7 @@ init_dirs() {
   if [[ ! -d "$DUMP_DIR/real" ]]; then
     infomsg "Creating directory for dumps and giving read rights for docker script"
     mkdir -p "$DUMP_DIR/real"
-    chmod -R g+r scripts/docker-entrypoint-initdb.d
+    chmod -R g+r "$PROJECT_ROOT"/scripts/docker-entrypoint-initdb.d
   fi
 }
 
