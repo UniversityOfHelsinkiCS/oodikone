@@ -28,16 +28,19 @@ EOF
 parse_params() {
   args=("$@")
 
-  [[ ${#args[@]} -lt 3 ]] && usage && die
+  [[ ${#args[@]} -eq 0 ]] && usage && die "Wrong number of arguments"
   option=${args[0]}
 
   # If option is morning, other parameters aren't needed
   [[ "$option" == "morning" ]] && return 0
 
-  version=${args[1]}
-  [[ "$option" != "oodikone" && "$option" != "updater" ]] && usage && die
-  [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
+  # Else, parse arguments
+  [[ ("$option" != "oodikone" && "$option" != "updater" && "$option" != "both") ]] && \
+  usage && die "Wrong option"
 
+  [[ ${#args[@]} -eq 1 ]] && usage && die "Wrong number of arguments"
+  version=${args[1]}
+  [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
   # Parse all additional arguments that will be passed to docker-compose.
   compose_command=${args[*]:2}
   return 0
@@ -56,7 +59,8 @@ sis-updater-nats sis-updater-scheduler sis-updater-worker"
 parse_env() {
   [[ "$version" == "anon" ]] && env=""
   [[ "$version" == "real" ]] && env="-f docker-compose.yml -f docker-compose.real.yml"
-  [[ "$version" == "ci" ]] && env="-f docker-compose.ci.yml"
+  [[ "$version" == "ci" ]] && env="-f docker-compose.ci.yml" && services="analytics \
+analytics-db backend frontend kone-db oodi-db redis sis-db user-db userservice"
   return 0
 }
 
@@ -64,23 +68,19 @@ parse_env() {
 
 parse_params "$@"
 
+# Do morning cleanup
 if [[ "$option" == "morning" ]];then
   git checkout trunk
   git pull
   docker-compose down --rmi all --remove-orphans
-  option=oodikone
-  anon build
+  return 0
 fi
 
 parse_services
 parse_env
 
-## All things are not yet implemented, fail with error
-[[ "$version" == "ci" ]] && die "${RED}CI option not yet implemented${NOFORMAT}"
-
-# Create command that will be run. Empty command (e.g. just ./run oodikone real) and
-# "down" command will be handled differently, otherwise just pass all commands
-echo "comp command $compose_command"
+# Create command that will be run. Empty command and "down" command will be handled
+# differently.
 if [[ "$compose_command" == "" ]]; then
   final_command="docker-compose ${env}"
 elif [[ "$compose_command" == *"down"* ]]; then
