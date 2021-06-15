@@ -6,11 +6,15 @@
 
 # === Config ===
 
+# Fail immediately if script fails, unbound variables are referenced
+# or command inside pipe fails. -E ensures cleanup trap fires in rare ERR cases.
+set -euoE pipefail
+
 # Set up constants
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
-# Source common config
-source "$PROJECT_ROOT"/scripts/common_config.sh
+# Set up logging
+source "$PROJECT_ROOT"/scripts/utils.sh
 
 usage() {
   cat <<EOF

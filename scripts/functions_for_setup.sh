@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-# This file includes functions that are used to setup oodikone. File is sourced from
-# interactive cli and from Github actions CI configurations. Base for script:
-# https://betterdev.blog/minimal-safe-bash-script-template/
+# This file includes functions that are used to setup oodikone. File doesn't run anything
+# by itself and should be sourced from other script.
 
 # === Config ===
 
@@ -34,8 +33,8 @@ USER_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-use
 REAL_DUMP_URLS=("$ANALYTICS_DB_REAL_DUMP_URL" "$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
 OODI_DB_REAL_DUMP_URL="svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/latest-pg.sqz" # TODO: Remove when oodi is removed
 
-# Source common config
-source "$PROJECT_ROOT"/scripts/common_config.sh
+# Source utility functions
+source "$PROJECT_ROOT"/scripts/utils.sh
 
 # === Function ===
 

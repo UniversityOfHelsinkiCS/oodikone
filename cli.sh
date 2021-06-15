@@ -5,11 +5,18 @@
 
 # === Config ===
 
+# Fail immediately if script fails, unbound variables are referenced
+# or command inside pipe fails. -E ensures cleanup trap fires in rare ERR cases.
+set -euoE pipefail
+
 # Set up constants
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
 # Source functions for setup
 source "$PROJECT_ROOT"/scripts/functions_for_setup.sh
+
+# Try to run cleanup function if things fail.
+trap cleanup SIGINT SIGTERM ERR EXIT
 
 # Run docker-compose down on cleanup
 cleanup() {
