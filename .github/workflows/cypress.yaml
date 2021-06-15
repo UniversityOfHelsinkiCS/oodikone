@@ -19,15 +19,15 @@ jobs:
       CACHE_TAG: trunk
     steps:
       - uses: actions/checkout@v2
-      # - name: Pull needed images
-      #   run: ./run.sh oodikone ci pull --ignore-pull-failures
-      # - name: Build images
-      #   run: ./run.sh oodikone ci build
+      - name: Pull needed images
+        run: ./run.sh oodikone ci pull --ignore-pull-failures
+      - name: Build images
+        run: ./run.sh oodikone ci build
       - name: Set git to use https with toska-grps github users access token instead of git.
         run: git config --global url."https://${{ secrets.GH_PRIVATE_REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
       - name: Setup databases from anonyymioodi repo
         run: source ./scripts/functions_for_setup.sh && init_dirs && reset_all_anonymous_data
-      # - name: Run services
-      #   run: ./run.sh oodikone ci up -d --no-recreate
-      # - name: Run cypress
-      #   uses: cypress-io/github-action@v2
+      - name: Run services
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - name: Run cypress
+        uses: cypress-io/github-action@v2
