@@ -5,10 +5,12 @@ x-build_defaults: &build_defaults
   build:
     args:
       TAG: ${TAG}
+  profiles:
+    - buildable_services
 
 x-db_defaults: &db_defaults
-  environment:
-    POSTGRES_HOST_AUTH_METHOD: trust
+  profiles:
+    - database_services
 
 services:
   analytics:
