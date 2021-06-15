@@ -18,7 +18,7 @@ Usage: $(basename "${BASH_SOURCE[0]}") option [version] command --flag
 
 Parameters:
 * Option: oodikone/updater/both/morning
-* Version: anon/real/ci. Not necessary in all cases.
+* Version: anon/real/ci. Not necessary in all cases, such as when running down or logs.
 * Command: will be passed to docker-compose.
 EOF
   exit
@@ -39,10 +39,17 @@ parse_params() {
   usage && die "Wrong option"
 
   [[ ${#args[@]} -eq 1 ]] && usage && die "Wrong number of arguments"
-  version=${args[1]}
-  [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
-  # Parse all additional arguments that will be passed to docker-compose.
-  compose_command=${args[*]:2}
+
+  # Down or logs can be passed without version. Otherwise parse version and then pass
+  # rest to compose
+  if [[ "${args[1]}" == "down" || "${args[1]}" == "logs" ]]; then
+    version=""
+    compose_command=${args[*]:1}
+  else
+    version=${args[1]}
+    [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
+    compose_command=${args[*]:2}
+  fi
   return 0
 }
 
@@ -52,15 +59,27 @@ parse_services() {
 frontend kone-db oodi-db redis sis-db user-db userservice"
   [[ "$option" == "updater" ]] && services="adminer redis sis-db sis-importer-db \
 sis-updater-nats sis-updater-scheduler sis-updater-worker"
+  [[ "$option" == "both" ]] && services="adminer analytics analytics-db backend \
+frontend kone-db oodi-db redis sis-db sis-importer-db sis-updater-nats \
+sis-updater-scheduler sis-updater-worker user-db userservice"
   return 0
 }
 
-# Set docker-compose env overrides to use for each version (anon, real or ci)
+# Set docker-compose services to run based on given services
 parse_env() {
-  [[ "$version" == "anon" ]] && env=""
-  [[ "$version" == "real" ]] && env="-f docker-compose.yml -f docker-compose.real.yml"
-  [[ "$version" == "ci" ]] && env="-f docker-compose.ci.yml" && services="analytics \
-analytics-db backend frontend kone-db oodi-db redis sis-db user-db userservice"
+  if [[ "$version" == "real" ]]; then
+    env="-f docker-compose.yml -f docker-compose.real.yml"
+    return 0
+  fi
+  if [[ "$version" == "ci" ]]; then
+    env="-f docker-compose.ci.yml"
+    # Override services in ci
+    services="analytics analytics-db backend frontend kone-db oodi-db redis sis-db \
+user-db userservice"
+    return 0
+  fi
+  # Otherwise use default env
+  env=""
   return 0
 }
 
