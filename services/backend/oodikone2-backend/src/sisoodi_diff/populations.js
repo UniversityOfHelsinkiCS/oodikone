@@ -24,17 +24,17 @@ const ignores = {
     2017: {
       oodi: [
         '014845154', // https://jira.it.helsinki.fi/browse/DOO-4547 (differing end date)
-        '013299358', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
+        '013299358' // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
       ]
     },
     2018: {
       oodi: [
-        '014323074', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
+        '014323074' // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
       ]
     },
     2019: {
       oodi: [
-        '014366086', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
+        '014366086' // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
       ]
     },
     2020: {
@@ -43,11 +43,11 @@ const ignores = {
         '014590027',
         '014340963',
         '014179998',
-        '013743299',
-      ],
+        '013743299'
+      ]
     }
   },
-  
+
   MH10_001: {
     2020: {
       oodi: ['014925414'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
@@ -84,7 +84,7 @@ const ignores = {
   MH70_008: {
     2017: {
       oodi: ['014404139'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
-    },
+    }
   },
   MH80_001: {
     2020: {
@@ -104,7 +104,7 @@ const ignores = {
     2019: {
       oodi: [
         '014323074', // https://jira.it.helsinki.fi/browse/DOO-4545
-        '014366086',
+        '014366086'
       ]
     },
     2020: {
@@ -113,7 +113,7 @@ const ignores = {
       ],
       oodi: [
         '014741193', // https://jira.it.helsinki.fi/browse/DOO-4546
-        '014954744', // https://jira.it.helsinki.fi/browse/DOO-4548
+        '014954744' // https://jira.it.helsinki.fi/browse/DOO-4548
       ]
     }
   },
@@ -191,7 +191,7 @@ const ignores = {
       '014928518', // MH70_004 valmistunut 14.5.
       '014922899', // MH70_004 valmistunut 14.5.
       '014919967', //  MH70_009 valmistunut 14.5.
-      '014725737', //  MH70_009 valmistunut 14.5.
+      '014725737' //  MH70_009 valmistunut 14.5.
     ],
     // in oodi, but not in sis
     oodi: [
@@ -246,7 +246,7 @@ const ignores = {
       '015111191', // KH50_008 luopunut 2.6.
       '015326258', // KH80_002 luopunut 17.5.
       '014457568', // MH10_001 luopunut 17.5.
-      '014575411', // MH40_007 luopunut 24.5.
+      '014575411' // MH40_007 luopunut 24.5.
     ]
   }
 }
