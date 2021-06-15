@@ -24,7 +24,7 @@ jobs:
       # - name: Build images
       #   run: ./run.sh oodikone ci build
       - name: Set git to use https with toska-grps github users access token instead of git.
-        run: git config --global url."https://${{ secrets.GH_PRIVATE_REPO_ACCESS_TOKEN }}:x-oauth-basic@github".insteadOf git://github
+        run: git config --global url."https://${{ secrets.GH_PRIVATE_REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
       - name: Setup databases from anonyymioodi repo
         run: source ./scripts/functions_for_setup.sh && init_dirs && reset_all_anonymous_data
       # - name: Run services
