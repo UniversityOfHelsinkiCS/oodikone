@@ -112,6 +112,9 @@ const getCreditsForProvider = async (provider, since) =>
         credittypecode: {
           [Op.notIn]: [10, 9, 7]
         },
+        isStudyModule: {
+          [Op.not]: true
+        },
         attainment_date: {
           [Op.gte]: since
         }
