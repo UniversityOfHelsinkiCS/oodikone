@@ -45,7 +45,7 @@ jobs:
       - name: Build image
         run: docker-compose -f docker-compose.ci.yml build backend
       - name: Save built image
-        run: docker save toska/oodikone2-analytics:trunk -o /tmp/backend.tar
+        run: docker save toska/oodikone2-backend:trunk -o /tmp/backend.tar
       - name: Upload image for other jobs
         uses: actions/upload-artifact@v2
         with:
@@ -61,10 +61,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
         run: docker-compose -f docker-compose.ci.yml pull frontend
-      - name: Build images for services
+      - name: Build image
         run: docker-compose -f docker-compose.ci.yml build frontend
       - name: Save built image
-        run: docker save toska/oodikone2-analytics:trunk -o /tmp/frontend.tar
+        run: docker save toska/oodikone2-frontend:trunk -o /tmp/frontend.tar
       - name: Upload image for other jobs
         uses: actions/upload-artifact@v2
         with:
