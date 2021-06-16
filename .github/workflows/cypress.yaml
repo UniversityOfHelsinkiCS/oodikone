@@ -92,7 +92,11 @@ jobs:
   # === CYPRESS JOBS ===
 
   test:
-    needs: build_analytics,build_backend,build_frontend,build_userservice
+    needs:
+      - build_analytics
+      - build_backend
+      - build_frontend
+      - build_userservice
     name: "Run cypress tests"
     runs-on: ubuntu-latest
     env:
