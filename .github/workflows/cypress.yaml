@@ -10,8 +10,44 @@ on:
       - package*.json
 
 jobs:
-  build:
-    name: "Build images"
+
+  # === BUILD IMAGES ===
+  build_analytics:
+    name: "Build analytics"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Build  image
+        run: docker-compose -f docker-compose.ci.yml build analytics
+      - name: Save built image
+        run: docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
+      - name: Upload image for other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          path: /tmp/analytics.tar
+  build_backend:
+    name: "Build backend"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Build image
+        run: docker-compose -f docker-compose.ci.yml build backend
+      - name: Save built image
+        run: docker save toska/oodikone2-analytics:trunk -o /tmp/backend.tar
+      - name: Upload image for other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          path: /tmp/backend.tar
+  build_frontend:
+    name: "Build frontend"
     runs-on: ubuntu-latest
     env:
       TAG: trunk
@@ -20,21 +56,35 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Build images for services
-        run: docker-compose -f docker-compose.ci.yml build --parallel
-      - name: Save built images
-        run: |
-          docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
-          docker save toska/oodikone2-backend:trunk -o /tmp/backend.tar
-          docker save toska/oodikone2-frontend:trunk -o /tmp/frontend.tar
-          docker save toska/oodikone2-userservice:trunk -o /tmp/userservice.tar
-      - name: Upload images for next jobs
+        run: docker-compose -f docker-compose.ci.yml build frontend
+      - name: Save built image
+        run: docker save toska/oodikone2-analytics:trunk -o /tmp/frontend.tar
+      - name: Upload image for other jobs
         uses: actions/upload-artifact@v2
         with:
-          name: Docker images
-          path: /tmp/*.tar
+          path: /tmp/frontend.tar
+  build_userservice:
+    name: "Build userservice"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Build image
+        run: docker-compose -f docker-compose.ci.yml build userservice
+      - name: Save built image
+        run: docker save toska/oodikone2-userservice:trunk -o /tmp/userservice.tar
+      - name: Upload image for other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          path: /tmp/userservice.tar
+
+  # === CYPRESS JOBS ===
 
   test:
-    needs: build
+    needs: build_analytics,build_backend,build_frontend,build_userservice
     name: "Run cypress tests"
     runs-on: ubuntu-latest
     env:
@@ -43,26 +93,27 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-      - name: Login to toska docker registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Download built images
+        run: docker-compose -f docker-compose.ci.yml pull --ignore-pull-failures
+      - name: Download images
         uses: actions/download-artifact@v2
         with:
-          name: Docker images
           path: /tmp
+      - name: List tmp files
+        run: ls -la
+        working-directory: /tmp
       - name: Load built images
         run: |
           docker load --input /tmp/analytics.tar
           docker load --input /tmp/backend.tar
           docker load --input /tmp/frontend.tar
           docker load --input /tmp/userservice.tar
-      - name: Pull other needed images
-        run: docker-compose -f docker-compose.ci.yml pull --ignore-pull-failures
-      - name: Run services
+      - name: Login to toska docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: Run services, pull rest of the needed images
         run: docker-compose -f docker-compose.ci.yml up -d
       - name: Cypress run
         uses: cypress-io/github-action@v2
