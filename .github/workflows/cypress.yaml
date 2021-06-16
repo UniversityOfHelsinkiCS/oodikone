@@ -34,11 +34,11 @@ jobs:
         with:
           files: docker-compose.ci.yml
           targets: analytics
-          set: analytics.output.dest=/tmp/images/analytics.tar
+          set: analytics.output.dest=/tmp/analytics.tar
       - name: Upload built images for next jobs
         uses: actions/upload-artifact@v2
         with:
-          path: /tmp/images/
+          path: /tmp/*.tar
 
   test:
     needs: build
@@ -56,10 +56,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: Download built images
-          path: /tmp/images/
+          path: /tmp/*.tar
       - name: Load images
         run: |
-          docker load --input /tmp/images/*.tar
+          docker load --input /tmp/*.tar
           docker image ls -a
       # - name: Run services
       #   run: ./run.sh oodikone ci up -d --no-recreate
