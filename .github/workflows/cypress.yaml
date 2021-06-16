@@ -27,14 +27,18 @@ jobs:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Pull needed images
-        run: docker-compose -f docker-compose.ci.yml pull --ignore-pull-failures
+      # - name: Pull needed images
+      #   run: docker-compose -f docker-compose.ci.yml pull --ignore-pull-failures
       - name: Build analytics
         uses: docker/bake-action@v1.1.3
         with:
           files: docker-compose.ci.yml
-          targets: analytics
-          set: analytics.output.dest=/tmp/analytics.tar
+          targets: ["analytics", "frontend"]
+          set: |
+            analytics.output.dest=/tmp/analytics.tar
+            frontend.output.dest=/tmp/frontend.tar
+      - name: Chmod tmp dir for reading
+        run: chmod u+r /tmp/
       - name: Upload built images for next jobs
         uses: actions/upload-artifact@v2
         with:
