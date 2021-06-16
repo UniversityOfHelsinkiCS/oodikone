@@ -33,7 +33,7 @@ jobs:
         uses: docker/bake-action@v1.1.3
         with:
           files: docker-compose.ci.yml
-          targets: ["analytics", "frontend"]
+          targets: analytics,frontend
           set: |
             analytics.output.dest=/tmp/analytics.tar
             frontend.output.dest=/tmp/frontend.tar
