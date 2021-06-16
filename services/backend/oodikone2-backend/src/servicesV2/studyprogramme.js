@@ -556,14 +556,14 @@ const optionData = async (startDate, endDate, code, level) => {
         [Op.in]: students
       }
     },
-    attributes: ['student_studentnumber', 'givendate', 'studystartdate']
+    attributes: ['studentStudentnumber', 'givendate', 'studystartdate']
   })
 
   const currentStudyrightsMap = currentStudyrights
     .filter(b => b.studystartdate)
     .reduce((obj, studyright) => {
       const acualDate = new Date(Math.max(+studyright.studystartdate, +studyright.studyright_elements[0].startdate))
-      obj[studyright.student_studentnumber] = { givendate: studyright.givendate, startdate: acualDate }
+      obj[studyright.studentStudentnumber] = { givendate: studyright.givendate, startdate: acualDate }
       return obj
     }, {})
 
@@ -595,17 +595,17 @@ const optionData = async (startDate, endDate, code, level) => {
       }
     },
     order: [[StudyrightElement, 'startdate', 'DESC']],
-    attributes: ['student_studentnumber', 'startdate', 'givendate']
+    attributes: ['studentStudentnumber', 'startdate', 'givendate']
   })
 
   const data = {}
   const years = new Set()
 
   options
-    .filter(m => m.student_studentnumber in currentStudyrightsMap)
-    .filter(m => m.givendate.getTime() === currentStudyrightsMap[m.student_studentnumber].givendate.getTime())
+    .filter(m => m.studentStudentnumber in currentStudyrightsMap)
+    .filter(m => m.givendate.getTime() === currentStudyrightsMap[m.studentStudentnumber].givendate.getTime())
     .forEach(b => {
-      const date = currentStudyrightsMap[b.student_studentnumber].startdate
+      const date = currentStudyrightsMap[b.studentStudentnumber].startdate
       const year =
         date.getMonth() > 6 || (date.getMonth() === 6 && date.getDate() == 31)
           ? date.getFullYear()
