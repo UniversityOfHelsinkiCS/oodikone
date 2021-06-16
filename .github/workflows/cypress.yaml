@@ -10,27 +10,69 @@ on:
       - package*.json
 
 jobs:
-  test:
+  build:
+    name: "Build and pull images"
     runs-on: ubuntu-latest
-    container: cypress/browsers:node12.13.0-chrome78-ff70
     env:
       TAG: trunk
       CACHE_TAG: trunk
     steps:
-      - uses: actions/checkout@v2
-      - name: Pull needed images
-        run: ./run.sh oodikone ci --profile buildable_services pull --ignore-pull-failures
-      - name: Build images
-        run: ./run.sh oodikone ci --profile buildable_services build
-      - name: Set git to use https with toska-grps github users access token instead of git.
-        run: git config --global url."https://${{ secrets.GH_PRIVATE_REPO_ACCESS_TOKEN }}:x-oauth-basic@github.com/".insteadOf "git@github.com:"
-      - name: Setup databases from anonyymioodi repo
-        run: source ./scripts/functions_for_setup.sh && init_dirs && reset_all_anonymous_data
-      - name: Run services and databases
-        run: /run.sh oodikone ci --profile buildable_services --profile database_services up -d --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to toska docker registry
+        uses: docker/login-action@v1
         with:
-          browser: chrome
-        env:
-          CYPRESS_baseUrl: http://frontend
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: Pull needed images
+        run: docker-compose -f docker-compose.ci.yml pull --ignore-pull-failures
+      - name: Build images
+        uses: docker/bake-action@v1.1.3
+        with:
+          push: false
+          load: true
+          files: docker-compose.ci.yml
+          set: |
+            analytics.output.dest=/tmp/images/frontend.tar
+            backend.output.dest=/tmp/images/backend.tar
+            frontend.output.dest=/tmp/images/frontend.tar
+            userservice.output.dest=/tmp/images/userservice.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Upload built images for next job
+          path: /tmp/images/
+
+
+  test:
+    name: "Run cypress tests"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: Download built images
+          path: /tmp/images/
+      - name: Load images
+        run: |
+          docker load --input /tmp/images/*.tar
+          docker image ls -a
+      # - name: Run services
+      #   run: ./run.sh oodikone ci up -d --no-recreate
+      # - name: Run cypress
+      #   uses: cypress-io/github-action@v2
+      # uses: cypress-io/github-action@v2
+    #$  with:
+    # $    browser: chrome
+    # $  env:
+#  $    CYPRESS_baseUrl: http://frontend
