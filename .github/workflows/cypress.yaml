@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Build images for services
-        run: docker-compose -f docker-compose.ci.yml
+        run: docker-compose -f docker-compose.ci.yml build
       - name: Save built images
         run: |
           docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
