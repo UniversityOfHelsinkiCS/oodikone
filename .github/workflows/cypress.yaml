@@ -54,13 +54,12 @@ jobs:
         with:
           name: Docker images
           path: /tmp
-      - name: List some files
-        run: ls -R
-        working-directory: /tmp
-      - name: Load built images, list them
+      - name: Load built images
         run: |
-          docker load --input /tmp/*.tar
-          docker image ls -a
+          docker load --input /tmp/analytics.tar
+          docker load --input /tmp/backend.tar
+          docker load --input /tmp/frontend.tar
+          docker load --input /tmp/userservice.tar
       - name: Pull other needed images
         run: docker-compose -f docker-compose.ci.yml pull --ignore-pull-failures
       - name: Run services
