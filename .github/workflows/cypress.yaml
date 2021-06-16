@@ -20,7 +20,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Build images for services
-        run: docker-compose -f docker-compose.ci.yml build
+        run: docker-compose -f docker-compose.ci.yml build --parallel
       - name: Save built images
         run: |
           docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
@@ -53,8 +53,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: Docker images
-          path: /tmp/*.tar
-      - name: Load built images
+          path: /tmp
+      - name: List some files
+        run: ls -R
+        working-directory: /tmp
+      - name: Load built images, list them
         run: |
           docker load --input /tmp/*.tar
           docker image ls -a
