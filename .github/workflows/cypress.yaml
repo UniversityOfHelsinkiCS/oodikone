@@ -34,15 +34,11 @@ jobs:
         with:
           files: docker-compose.ci.yml
           targets: analytics
-          push: false
-          load: true
-          set: |
-            analytics.output.dest=/tmp/images/analytics.tar
+          set: analytics.output.dest=/tmp/images/analytics.tar
       - name: Upload built images for next jobs
         uses: actions/upload-artifact@v2
         with:
           path: /tmp/images/
-
 
   test:
     needs: build
