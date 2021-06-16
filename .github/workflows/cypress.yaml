@@ -35,14 +35,12 @@ jobs:
           files: docker-compose.ci.yml
           targets: analytics,userservice
           set: |
-            analytics.output.dest=/tmp/analytics.tar
-            userservice.output.dest=/tmp/frontend.tar
-      - name: Chmod tmp dir for reading and writing
-        run: chmod u+rw /tmp/
+            analytics.output.dest=tmp/analytics.tar
+            userservice.output.dest=tmp/userservice.tar
       - name: Upload built images for next jobs
         uses: actions/upload-artifact@v2
         with:
-          path: /tmp/*.tar
+          path: tmp/*.tar
 
   test:
     needs: build
@@ -60,10 +58,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: Download built images
-          path: /tmp/*.tar
+          path: tmp/*.tar
       - name: Load images
         run: |
-          docker load --input /tmp/*.tar
+          docker load --input tmp/*.tar
           docker image ls -a
       # - name: Run services
       #   run: ./run.sh oodikone ci up -d --no-recreate
