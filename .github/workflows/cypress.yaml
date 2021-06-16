@@ -11,7 +11,31 @@ on:
 
 jobs:
   build:
-    name: "Build and pull images"
+    name: "Build images"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Build images for services
+        run: docker-compose -f docker-compose.ci.yml
+      - name: Save built images
+        run: |
+          docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
+          docker save toska/oodikone2-backend:trunk -o /tmp/backend.tar
+          docker save toska/oodikone2-frontend:trunk -o /tmp/frontend.tar
+          docker save toska/oodikone2-userservice:trunk -o /tmp/userservice.tar
+      - name: Upload images for next jobs
+        uses: actions/upload-artifact@v2
+        with:
+          name: Docker images
+          path: /tmp/*.tar
+
+  test:
+    needs: build
+    name: "Run cypress tests"
     runs-on: ubuntu-latest
     env:
       TAG: trunk
@@ -25,43 +49,26 @@ jobs:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      # - name: Pull needed images
-      #   run: docker-compose -f docker-compose.ci.yml pull --ignore-pull-failures
-      - name: Build images for services
-        run: docker-compose -f docker-compose.ci.yml build analytics
-      - name: Save built images
-        run: |
-          docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
-      - name: Upload images for next jobs
-        uses: actions/upload-artifact@v2
-        with:
-          path: /tmp/*.tar
-
-  test:
-    needs: build
-    name: "Run cypress tests"
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download artifact
+      - name: Download built images
         uses: actions/download-artifact@v2
         with:
-          name: Download built images
+          name: Docker images
           path: /tmp/*.tar
-      - name: Load images
+      - name: Load built images
         run: |
           docker load --input /tmp/*.tar
           docker image ls -a
-      # - name: Run services
-      #   run: ./run.sh oodikone ci up -d --no-recreate
-      # - name: Run cypress
-      #   uses: cypress-io/github-action@v2
-      # uses: cypress-io/github-action@v2
-    #$  with:
-    # $    browser: chrome
-    # $  env:
-#  $    CYPRESS_baseUrl: http://frontend
+      - name: Pull other needed images
+        run: docker-compose -f docker-compose.ci.yml pull --ignore-pull-failures
+      - name: Run services
+        run: docker-compose -f docker-compose.ci.yml up -d
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+      - name: Upload video
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*

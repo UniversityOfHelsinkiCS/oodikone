@@ -21,7 +21,7 @@ Cypress.Commands.add("init", (path = '') => {
   //})
 
   //cy.visit(Cypress.config().baseUrl.concat(path))
-  cy.visit(Cypress.config().baseUrl)
+  cy.visit("localhost:8081")
 })
 
 /**
