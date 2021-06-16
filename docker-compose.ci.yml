@@ -5,12 +5,6 @@ x-build_defaults: &build_defaults
   build:
     args:
       TAG: ${TAG}
-  profiles:
-    - buildable_services
-
-x-db_defaults: &db_defaults
-  profiles:
-    - database_services
 
 services:
   analytics:
@@ -30,15 +24,14 @@ services:
       DB_URL: postgres://postgres@analytics-db:5432/analytics-db
     ports:
       - "4568:4568"
+
   analytics-db:
     <<: *defaults
-    <<: *db_defaults
     container_name: analytics-db
-    environment:
-      POSTGRES_MULTIPLE_DATABASES: analytics-db
-    image: postgres:9.6.3
+    image: registry.toska.cs.helsinki.fi/analytics-db
     ports:
       - "5423:5432"
+
   backend:
     <<: *defaults
     <<: *build_defaults
@@ -74,6 +67,7 @@ services:
       - ./services/backend/shared/models:/usr/src/app/src/models
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
       - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
+
   frontend:
     <<: *defaults
     <<: *build_defaults
@@ -90,30 +84,21 @@ services:
     ports:
       - "8081:8081"
       - "7777:7777"
+
   kone-db:
     <<: *defaults
-    <<: *db_defaults
     container_name: kone-db
-    environment:
-      - POSTGRES_MULTIPLE_DATABASES=kone-db
-    image: postgres:9.6.3
+    image: registry.toska.cs.helsinki.fi/kone-db
     ports:
       - "5425:5432"
-    volumes:
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   oodi-db: # TODO: Remove when oodi stuff has been removed from oodikone
     <<: *defaults
-    <<: *db_defaults
     container_name: oodi-db
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_MULTIPLE_DATABASES: oodi-db
-    image: postgres:10-alpine
+    image: registry.toska.cs.helsinki.fi/oodi-db
     ports:
       - "5421:5432"
-    shm_size: 2gb
-    volumes:
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   redis:
     <<: *defaults
     command: "redis-server --appendonly yes"
@@ -121,30 +106,21 @@ services:
     image: redis
     ports:
       - "6379:6379"
+
   sis-db:
     <<: *defaults
-    <<: *db_defaults
     container_name: sis-db
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_MULTIPLE_DATABASES: sis-db
-    image: postgres:13.2
+    image: registry.toska.cs.helsinki.fi/sis-db
     ports:
       - "5426:5432"
-    shm_size: 2gb
-    volumes:
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   user-db:
     <<: *defaults
-    <<: *db_defaults
     container_name: user-db
-    environment:
-      POSTGRES_MULTIPLE_DATABASES: user-db
-    image: postgres:9.6.3
+    image: registry.toska.cs.helsinki.fi/user-db
     ports:
       - "5422:5432"
-    volumes:
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   userservice:
     <<: *defaults
     <<: *build_defaults
