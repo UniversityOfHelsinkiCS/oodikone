@@ -48,7 +48,6 @@ PS3="Please enter your choice: "
 
 options=(
   "Set up oodikone."
-  "Reset all anonymous data."
   "Reset all real data."
   "Reset sis-importer data."
   "Reset old oodi data."
@@ -65,8 +64,6 @@ while true; do
     case $opt in
       "Set up oodikone.")
         set_up_oodikone;;
-      "Reset all anonymous data.")
-        reset_all_anonymous_data;;
       "Reset all real data.")
         reset_all_real_data;;
       "Reset sis-importer data.")

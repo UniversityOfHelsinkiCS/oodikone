@@ -10,7 +10,6 @@
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 DUMP_DIR="$PROJECT_ROOT/.databasedumps"
 USER_DATA_FILE="$DUMP_DIR/hyuserdata"
-ANON_DUMP_DIR="$DUMP_DIR/anon"
 REAL_DUMP_DIR="$DUMP_DIR/real"
 
 ## Following the naming convention in docker-compose, these are names for services
@@ -24,7 +23,6 @@ DATABASES=("$ANALYTICS_DB_NAME" "$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB
 OODI_DB_NAME="oodi-db" # TODO: Remove when oodi is removed
 
 ## Urls should be in same order as databases
-ANON_DUMPS_GIT_URL="git@github.com:UniversityOfHelsinkiCS/anonyymioodi.git"
 ANALYTICS_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-analytics-pg.sqz"
 KONE_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-kone-pg.sqz"
 SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-sis.sqz"
@@ -113,12 +111,6 @@ reset_databases() {
   successmsg "Database setup finished"
 }
 
-reset_all_anonymous_data() {
-  infomsg "Downloading anonymous dumps"
-  rm -rf "$ANON_DUMP_DIR" && git clone --verbose "$ANON_DUMPS_GIT_URL" "$ANON_DUMP_DIR"
-  reset_databases "anon" ${DATABASES[*]} "$OODI_DB_NAME" #Remove oodi anon setup when oodi-db is deprecated
-}
-
 reset_all_real_data() {
   infomsg "Downloading real data dumps, asking for pannu password when needed"
   for i in ${!DATABASES[*]}; do
@@ -160,10 +152,10 @@ set_up_oodikone() {
   done
   cd "$PROJECT_ROOT" || return 1
 
-  infomsg "Setting up databases with anonymous data"
-  reset_all_anonymous_data
+  infomsg "Pulling images"
+  sh "$PROJECT_ROOT"/run.sh oodikone anon build
 
-  infomsg "Building images."
+  infomsg "Building images"
   sh "$PROJECT_ROOT"/run.sh oodikone anon build
 
   successmsg "Setup ready, oodikone can be started! See README for more info."
