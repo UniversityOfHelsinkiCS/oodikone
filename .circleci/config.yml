@@ -9,18 +9,6 @@ executors:
     machine:
       image: ubuntu-1604:201903-01
 
-aliases:
-  - &check_exit_statuses
-    run:
-      name: check_exit_statuses
-      command: |
-        docker ps -a
-        if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
-          echo 'Some process had nonzero exit code';
-          npm run docker:ci -- logs
-          exit 1;
-        fi
-
 jobs:
   build:
     executor: my-executor
@@ -41,10 +29,7 @@ jobs:
               echo 'export CACHE_TAG=staging' >> $BASH_ENV;
               echo 'USING STAGING CONFIG';
             else
-              echo 'export TAG=trunk' >> $BASH_ENV;
-              echo 'export DEPLOY=false' >> $BASH_ENV;
-              echo 'export CACHE_TAG=trunk' >> $BASH_ENV;
-              echo 'USING TRUNK CONFIG';
+              echo "Circleci should run only on master push and tags!"
             fi
       - checkout
       - node/install:
@@ -59,22 +44,7 @@ jobs:
             - ~/.cache
       - run: npm run docker:ci -- pull --ignore-pull-failures
       - run: npm run docker:ci -- build
-      - run: npm run docker:ci -- up -d user_db db_kone analytics_db
-      - *check_exit_statuses
-      - run: npm run docker:ci -- up -d --no-recreate
-      - run:
-          name: log_in_background
-          background: true
-          command: |
-            docker ps -a && npm run docker:ci -- logs -f
-      - *check_exit_statuses
-      - run:
-          name: test services
-          command: |
-            if [ "${DEPLOY}" != "true" ]; then
-              npm run test_services
-            fi
-      - *check_exit_statuses
+      - run: npm run docker:ci -- up -d
       - deploy:
           command: |
             if [ "${DEPLOY}" == "true" ]; then
@@ -100,6 +70,6 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: new_dev_options
+              only: master
             tags:
               only: /.*/
