@@ -129,9 +129,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
-        run: docker-compose -f docker-compose.ci.yml pull analytics
+        run: .yml pull analytics
       - name: Build  image
-        run: docker-compose -f docker-compose.ci.yml build analytics
+        run: ./run.sh oodikone ci build analytics
       - name: Save built image
         run: docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
       - name: Upload image for other jobs
@@ -148,9 +148,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
-        run: docker-compose -f docker-compose.ci.yml pull backend
+        run: ./run.sh oodikone ci pull backend
       - name: Build image
-        run: docker-compose -f docker-compose.ci.yml build backend
+        run: ./run.sh oodikone ci build backend
       - name: Save built image
         run: docker save toska/oodikone2-backend:trunk -o /tmp/backend.tar
       - name: Upload image for other jobs
@@ -167,9 +167,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
-        run: docker-compose -f docker-compose.ci.yml pull frontend
+        run: ./run.sh oodikone ci pull frontend
       - name: Build image
-        run: docker-compose -f docker-compose.ci.yml build frontend
+        run: ./run.sh oodikone ci build frontend
       - name: Save built image
         run: docker save toska/oodikone2-frontend:trunk -o /tmp/frontend.tar
       - name: Upload image for other jobs
@@ -186,9 +186,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
-        run: docker-compose -f docker-compose.ci.yml pull userservice
+        run: ./run.sh oodikone ci pull userservice
       - name: Build image
-        run: docker-compose -f docker-compose.ci.yml build userservice
+        run: ./run.sh oodikone ci build userservice
       - name: Save built image
         run: docker save toska/oodikone2-userservice:trunk -o /tmp/userservice.tar
       - name: Upload image for other jobs
@@ -199,7 +199,7 @@ jobs:
   # === End-to-end tests ===
 
   test:
-    name: "Run cypress tests"
+    name: "Run end-to-end tests"
     needs:
       - build_analytics
       - build_backend
@@ -229,7 +229,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: docker-compose -f docker-compose.ci.yml up -d --no-recreate
+        run: ./run.sh oodikone ci up -d --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -274,4 +274,4 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: "Push to docker hub"
-        run: docker-compose -f docker-compose.ci.yml push
+        run: ./run.sh oodikone ci push
