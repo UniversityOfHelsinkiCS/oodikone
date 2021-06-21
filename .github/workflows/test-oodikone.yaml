@@ -188,12 +188,12 @@ jobs:
   # === End-to-end tests ===
 
   test:
+    name: "Run cypress tests"
     needs:
       - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
-    name: "Run cypress tests"
     runs-on: ubuntu-latest
     env:
       TAG: trunk
@@ -233,6 +233,7 @@ jobs:
           path: ./cypress/videos/*
 
   push_to_dockerhub:
+    name: "Push images to docker hub for caching"
     needs:
     - lint_analytics
     - lint_backend
@@ -240,7 +241,9 @@ jobs:
     - lint_userservice
     - test
     runs-on: ubuntu-latest
-    name: "Push images to docker hub for caching"
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
