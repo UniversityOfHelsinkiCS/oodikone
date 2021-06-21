@@ -4,24 +4,24 @@
  * Initialize headers and load the base URL or optional path.
  */
 Cypress.Commands.add("init", (path = '') => {
-  //cy.server({
-  //  onAnyRequest: function (route, proxy) {
-  //    proxy.xhr.setRequestHeader('uid', 'tktl')
-  //    proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
-  //    proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
-  //    proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
-  //  }
-  //})
+  cy.server({
+    onAnyRequest: function (route, proxy) {
+      proxy.xhr.setRequestHeader('uid', 'tktl')
+      proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
+      proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
+      proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
+    }
+  })
 
-  //// Babel throws an error probably because of markdown files. I'm sorry about this :lul:.
-  //cy.on('uncaught:exception', (err, runnable) => {
-  //  expect(err.message).to.include("Cannot read property 'helpers' of undefined")
-  //  done()
-  //  return false
-  //})
+  // Babel throws an error probably because of markdown files. I'm sorry about this :lul:.
+  cy.on('uncaught:exception', (err, runnable) => {
+    expect(err.message).to.include("Cannot read property 'helpers' of undefined")
+    done()
+    return false
+  })
 
-  //cy.visit(Cypress.config().baseUrl.concat(path))
-  cy.visit("localhost:8081")
+  const baseUrl = Cypress.config().baseUrl ? Cypress.config().baseUrl : "http://localhost:8081"
+  cy.visit(baseUrl.concat(path))
 })
 
 /**
