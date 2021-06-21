@@ -149,13 +149,13 @@ set_up_oodikone() {
   cd "$PROJECT_ROOT" || return 1
 
   infomsg "Cleaning up previous docker containers, volumes and networks"
-  sh "$PROJECT_ROOT"/run.sh both down --remove-orphans --volumes
+  "$PROJECT_ROOT"/run.sh both down --remove-orphans --volumes
 
   infomsg "Pulling images"
-  sh "$PROJECT_ROOT"/run.sh oodikone anon build
+  "$PROJECT_ROOT"/run.sh oodikone anon build
 
   infomsg "Building images"
-  sh "$PROJECT_ROOT"/run.sh oodikone anon build
+  ."$PROJECT_ROOT"/run.sh oodikone anon build
 
   successmsg "Setup ready, oodikone can be started! See README for more info."
 }
