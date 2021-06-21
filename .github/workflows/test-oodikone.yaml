@@ -3,7 +3,7 @@ name: Test oodikone
 on:
   push:
     paths:
-      - .github/workflows/cypress.yaml
+      - .github/workflows/test-oodikone.yaml
       - cypress.json
       - cypress/**
       - services/**
