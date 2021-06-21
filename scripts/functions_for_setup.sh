@@ -148,6 +148,9 @@ set_up_oodikone() {
   done
   cd "$PROJECT_ROOT" || return 1
 
+  infomsg "Cleaning up previous docker containers, volumes and networks"
+  sh "$PROJECT_ROOT"/run.sh both down --remove-orphans --volumes
+
   infomsg "Pulling images"
   sh "$PROJECT_ROOT"/run.sh oodikone anon build
 
