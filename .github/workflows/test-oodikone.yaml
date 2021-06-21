@@ -129,7 +129,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
-        run: .yml pull analytics
+        run: ./run.sh oodikone ci pull analytics
       - name: Build  image
         run: ./run.sh oodikone ci build analytics
       - name: Save built image

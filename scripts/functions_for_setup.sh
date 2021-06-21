@@ -10,7 +10,6 @@
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 DUMP_DIR="$PROJECT_ROOT/.databasedumps"
 USER_DATA_FILE="$DUMP_DIR/hyuserdata"
-REAL_DUMP_DIR="$DUMP_DIR/real"
 
 ## Following the naming convention in docker-compose, these are names for services
 ## and for the anonymous database. Real databases have suffix "-real".
@@ -58,7 +57,7 @@ retry () {
 download_real_dump() {
   local database=$1
   local pannu_url=$2
-  local dump_destination="$REAL_DUMP_DIR/$database.sqz"
+  local dump_destination="$DUMP_DIR/$database.sqz"
   scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" "$username@$pannu_url" "$dump_destination"
 }
 
@@ -69,16 +68,9 @@ check_if_postgres_is_ready() {
 }
 
 reset_databases() {
-  local args=("$@")
-  local mode=${args[0]}
-  local databases=${args[*]:1}
-
-  local database_name_suffix=""
-  local database_dump_dir=$ANON_DUMP_DIR
-  if [[ $mode == "real" ]]; then
-    database_name_suffix="-real"
-    database_dump_dir=$REAL_DUMP_DIR
-  fi
+  local databases=("$@")
+  local database_name_suffix="-real"
+  local database_dump_dir=$DUMP_DIR
 
   infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
 
@@ -114,23 +106,27 @@ reset_databases() {
 reset_all_real_data() {
   infomsg "Downloading real data dumps, asking for pannu password when needed"
   for i in ${!DATABASES[*]}; do
-    download_real_dump "${DATABASES[$i]}" "${REAL_DUMP_URLS[$i]}"
+    local database="${DATABASES[$i]}"
+    local url="${REAL_DUMP_URLS[$i]}"
+    download_real_dump "$database" "$url"
   done
-  reset_databases "real" ${DATABASES[*]}
+  reset_databases ${DATABASES[*]}
 }
 
 reset_sis_importer_data() {
   infomsg "Downloading sis-importer-db dump"
   local database=$SIS_IMPORTER_DB_NAME
-  download_real_dump $database $SIS_IMPORTER_DB_REAL_DUMP_URL
-  reset_databases "real" $database
+  local url=$SIS_IMPORTER_DB_REAL_DUMP_URL
+  download_real_dump $database $url
+  reset_databases $database
 }
 
 reset_old_oodi_data() {
   infomsg "Downloading old oodi-db dump"
   local database=$OODI_DB_NAME
-  download_real_dump $database $OODI_DB_REAL_DUMP_URL
-  reset_databases "real" $database
+  local url=$OODI_DB_REAL_DUMP_URL
+  download_real_dump $database $url
+  reset_databases $database
 }
 
 set_up_oodikone() {
@@ -162,10 +158,9 @@ set_up_oodikone() {
 }
 
 init_dirs() {
-  if [[ ! -d "$DUMP_DIR/real" ]]; then
-    infomsg "Creating directory for dumps and giving read rights for docker script"
-    mkdir -p "$DUMP_DIR/real"
-    chmod -R g+r "$PROJECT_ROOT"/scripts/docker-entrypoint-initdb.d
+  if [[ ! -d "$DUMP_DIR" ]]; then
+    infomsg "Creating directory for dumps"
+    mkdir "$DUMP_DIR"
   fi
 }
 
