@@ -48,6 +48,8 @@ services:
       - "5423:5432"
     profiles:
       - oodikone
+    volumes:
+      - analytics-db-data:/data
 
   backend:
     <<: *defaults
@@ -117,6 +119,8 @@ services:
       - "5425:5432"
     profiles:
       - oodikone
+    volumes:
+      - kone-db-data:/data
 
   oodi-db: # TODO: Remove when oodi stuff has been removed from oodikone
     <<: *defaults
@@ -126,6 +130,8 @@ services:
       - "5421:5432"
     profiles:
       - oodikone
+    volumes:
+      - oodi-db-data:/data
 
   redis:
     <<: *defaults
@@ -143,6 +149,8 @@ services:
     image: registry.toska.cs.helsinki.fi/sis-db
     ports:
       - "5426:5432"
+    volumes:
+      - sis-db-data:/data
 
   sis-importer-db:
     <<: *defaults
@@ -150,6 +158,8 @@ services:
     image: registry.toska.cs.helsinki.fi/sis-importer-db
     profiles:
       - updater
+    volumes:
+      - sis-importer-db-data:/data
 
   sis-updater-nats:
     <<: *defaults
@@ -221,6 +231,8 @@ services:
       - "5422:5432"
     profiles:
       - oodikone
+    volumes:
+      - user-db-data:/data
 
   userservice:
     <<: *defaults

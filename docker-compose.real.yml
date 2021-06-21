@@ -2,21 +2,26 @@ services:
   analytics:
     environment:
       DB_URL: postgres://postgres@analytics-db:5432/analytics-db-real
+
   backend:
     environment:
       DB_URL: postgres://postgres@oodi-db:5432/oodi-db-real
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db-real
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db-real
+
   redis:
     volumes:
       - redis-data-real:/data
+
   sis-updater-scheduler:
     environment:
       SIS_IMPORTER_DATABASE: sis-importer-db-real
+
   sis-updater-worker:
     environment:
       DB_URL: postgres://postgres@sis-db:5432/sis-db-real
       SIS_IMPORTER_DATABASE: sis-importer-db-real
+
   userservice:
     environment:
       DB_URL: postgres://postgres@user-db:5432/user-db-real
