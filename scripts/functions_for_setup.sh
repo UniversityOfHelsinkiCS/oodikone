@@ -155,7 +155,7 @@ set_up_oodikone() {
   "$PROJECT_ROOT"/run.sh oodikone anon build
 
   infomsg "Building images"
-  ."$PROJECT_ROOT"/run.sh oodikone anon build
+  "$PROJECT_ROOT"/run.sh oodikone anon build
 
   successmsg "Setup ready, oodikone can be started! See README for more info."
 }
