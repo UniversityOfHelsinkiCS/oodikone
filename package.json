@@ -21,7 +21,7 @@
     "lintfix:frontend": "npm run lintfix --prefix services/oodikone2-frontend",
     "lintfix:userservice": "npm run lintfix --prefix services/oodikone2-userservice",
     "lintfix": "concurrently 'npm run lintfix:*'",
-    "cypress:open": "cypress open --config baseUrl=http://localhost:8081/",
+    "cypress": "cypress",
     "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
     "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",

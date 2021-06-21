@@ -54,7 +54,7 @@ services:
       ANALYTICS_URL: http://analytics:4568
       DB_URL: postgres://postgres@oodi-db:5432/oodi-db
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
-      FRONT_URL: http://localhost:8000
+      FRONT_URL: http://localhost:1337
       REDIS: redis
       SECRET_TOKEN: dev
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
@@ -64,7 +64,7 @@ services:
       USERSERVICE_URL: http://userservice:4567
     image: toska/oodikone2-backend:${TAG}
     ports:
-      - "8080:8080"
+      - "9229:9229"
     volumes:
       - ./services/backend/shared/models:/usr/src/app/src/models
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
@@ -84,8 +84,7 @@ services:
       BACKEND_ADDR: backend
     image: toska/oodikone2-frontend:${TAG}
     ports:
-      - "8081:8081"
-      - "7777:7777"
+      - "5000:5000"
 
   kone-db:
     <<: *defaults
@@ -142,3 +141,16 @@ services:
     image: toska/oodikone2-userservice:${TAG}
     ports:
       - "4567:4567"
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    depends_on:
+      - frontend
+      - backend
+      - userservice
+      - analytics
+    ports:
+      -  1337:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf

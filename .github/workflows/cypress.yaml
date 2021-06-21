@@ -130,6 +130,8 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
       - name: Upload video
         uses: actions/upload-artifact@v2
         if: failure()
