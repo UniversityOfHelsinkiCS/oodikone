@@ -19,6 +19,7 @@ services:
       - "5050:8080"
     volumes:
       - ./adminer-plugins:/var/www/html/plugins-enabled
+
   analytics:
     <<: *defaults
     <<: *build_defaults
@@ -36,17 +37,14 @@ services:
     volumes:
       - analytics-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-analytics/:/usr/src/app
+
   analytics-db:
     <<: *defaults
     container_name: analytics-db
-    environment:
-      POSTGRES_MULTIPLE_DATABASES: analytics-db,analytics-db-real
-    image: postgres:9.6.3
+    image: registry.toska.cs.helsinki.fi/analytics-db
     ports:
       - "5423:5432"
-    volumes:
-      - analytics-db-data:/var/lib/postgresql/data
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   backend:
     <<: *defaults
     <<: *build_defaults
@@ -81,6 +79,7 @@ services:
       - ./services/backend/shared/models:/usr/src/app/src/models
       - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
       - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
+
   frontend:
     <<: *defaults
     <<: *build_defaults
@@ -103,30 +102,21 @@ services:
     volumes:
       - frontend-nodemod:/usr/src/app/node_modules
       - ./services/oodikone2-frontend/:/usr/src/app
+
   kone-db:
     <<: *defaults
     container_name: kone-db
-    environment:
-      - POSTGRES_MULTIPLE_DATABASES=kone-db,kone-db-real
-    image: postgres:9.6.3
+    image: registry.toska.cs.helsinki.fi/kone-db
     ports:
       - "5425:5432"
-    volumes:
-      - kone-db-data:/var/lib/postgresql/data
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   oodi-db: # TODO: Remove when oodi stuff has been removed from oodikone
     <<: *defaults
     container_name: oodi-db
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_MULTIPLE_DATABASES: oodi-db,oodi-db-real
-    image: postgres:10-alpine
+    image: registry.toska.cs.helsinki.fi/oodi-db
     ports:
       - "5421:5432"
-    shm_size: 2gb
-    volumes:
-      - oodi-db-data:/var/lib/postgresql/data
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   redis:
     <<: *defaults
     command: "redis-server --appendonly yes"
@@ -136,33 +126,25 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+
   sis-db:
     <<: *defaults
     container_name: sis-db
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_MULTIPLE_DATABASES: sis-db,sis-db-real
-    image: postgres:13.2
+    image: registry.toska.cs.helsinki.fi/sis-db
     ports:
       - "5426:5432"
-    shm_size: 2gb
-    volumes:
-      - sis-db-data:/var/lib/postgresql/data
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   sis-importer-db:
     <<: *defaults
     container_name: sis-importer-db
-    environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
-      POSTGRES_MULTIPLE_DATABASES: sis-importer-db,sis-importer-db-real
-    image: postgres:13.1
-    volumes:
-      - sis-importer-db-data:/var/lib/postgresql/data
+    image: registry.toska.cs.helsinki.fi/sis-importer-db
+
   sis-updater-nats:
     <<: *defaults
     command: "-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore"
     container_name: sis-updater-nats
     image: nats-streaming:0.16.2
+
   sis-updater-scheduler:
     <<: *defaults
     <<: *build_defaults
@@ -189,6 +171,7 @@ services:
     volumes:
       - sis-updater-scheduler-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-scheduler/:/usr/src/app
+
   sis-updater-worker:
     <<: *defaults
     <<: *build_defaults
@@ -213,17 +196,14 @@ services:
     volumes:
       - sis-updater-worker-nodemod:/usr/src/app/node_modules
       - ./updater/sis-updater-worker/:/usr/src/app
+
   user-db:
     <<: *defaults
     container_name: user-db
-    environment:
-      POSTGRES_MULTIPLE_DATABASES: user-db,user-db-real
-    image: postgres:9.6.3
+    image: registry.toska.cs.helsinki.fi/user-db
     ports:
       - "5422:5432"
-    volumes:
-      - user-db-data:/var/lib/postgresql/data
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+
   userservice:
     <<: *defaults
     <<: *build_defaults
