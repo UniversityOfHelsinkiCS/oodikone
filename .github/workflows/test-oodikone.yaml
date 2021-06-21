@@ -294,6 +294,7 @@ jobs:
     - lint_frontend
     - lint_userservice
     - test_end_to_end
+    - test_service_exit_statuses
     runs-on: ubuntu-latest
     env:
       TAG: trunk
