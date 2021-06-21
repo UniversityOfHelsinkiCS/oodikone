@@ -23,8 +23,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
         run: docker-compose -f docker-compose.ci.yml pull analytics
-      # - name: Build  image
-      #   run: docker-compose -f docker-compose.ci.yml build analytics
+      - name: Build  image
+        run: docker-compose -f docker-compose.ci.yml build analytics
       - name: Save built image
         run: docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
       - name: Upload image for other jobs
@@ -42,8 +42,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
         run: docker-compose -f docker-compose.ci.yml pull backend
-      # - name: Build image
-      #   run: docker-compose -f docker-compose.ci.yml build backend
+      - name: Build image
+        run: docker-compose -f docker-compose.ci.yml build backend
       - name: Save built image
         run: docker save toska/oodikone2-backend:trunk -o /tmp/backend.tar
       - name: Upload image for other jobs
@@ -61,8 +61,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
         run: docker-compose -f docker-compose.ci.yml pull frontend
-      # - name: Build image
-      #   run: docker-compose -f docker-compose.ci.yml build frontend
+      - name: Build image
+        run: docker-compose -f docker-compose.ci.yml build frontend
       - name: Save built image
         run: docker save toska/oodikone2-frontend:trunk -o /tmp/frontend.tar
       - name: Upload image for other jobs
@@ -80,8 +80,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Pull previous build from Docker hub
         run: docker-compose -f docker-compose.ci.yml pull userservice
-      # - name: Build image
-      #   run: docker-compose -f docker-compose.ci.yml build userservice
+      - name: Build image
+        run: docker-compose -f docker-compose.ci.yml build userservice
       - name: Save built image
         run: docker save toska/oodikone2-userservice:trunk -o /tmp/userservice.tar
       - name: Upload image for other jobs
@@ -90,7 +90,6 @@ jobs:
           path: /tmp/userservice.tar
 
   # === CYPRESS JOBS ===
-
   test:
     needs:
       - build_analytics
@@ -109,9 +108,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: /tmp/
-      - name: List tmp files
-        run: ls -la
-        working-directory: /tmp/artifact
       - name: Load built images
         run: |
           docker load --input /tmp/artifact/analytics.tar
@@ -138,3 +134,28 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
+
+  push_to_dockerhub:
+    needs:
+    - test
+    name: "Push images to docker hub for caching"
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "Push to docker hub"
+        run: docker-compose -f docker-compose.ci.yml push
