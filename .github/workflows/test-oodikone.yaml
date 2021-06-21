@@ -198,7 +198,7 @@ jobs:
 
   # === End-to-end tests ===
 
-  test:
+  test_end_to_end:
     name: "Run end-to-end tests"
     needs:
       - build_analytics
@@ -243,6 +243,43 @@ jobs:
           name: Cypress videos
           path: ./cypress/videos/*
 
+  # === Other tests ===
+
+  test_service_exit_statuses:
+    name: "Check services run correctly"
+    needs:
+      - build_analytics
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Run services, pull rest of the needed images
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - name: Check exit statuses
+        run: |
+          docker ps -a
+          if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
+            echo 'Some process had nonzero exit code';
+            ./run.sh oodikone ci logs;
+            exit 1;
+          fi
+
   push_to_dockerhub:
     name: "Push images to docker hub for caching"
     needs:
@@ -250,7 +287,7 @@ jobs:
     - lint_backend
     - lint_frontend
     - lint_userservice
-    - test
+    - test_end_to_end
     runs-on: ubuntu-latest
     env:
       TAG: trunk
