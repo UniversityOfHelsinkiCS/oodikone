@@ -1,5 +1,0 @@
-Welcome to Oodikone CLI!
-
-This tool helps you in managing the project configuration. If you are new to
-Oodikone development, you should probably run "Set up oodikone"
-which will take care of setting up and starting Oodikone for you. 

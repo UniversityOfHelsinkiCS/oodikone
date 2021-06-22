@@ -1,108 +1,109 @@
 #!/usr/bin/env bash
 
-# This script is used to run oodikone with different setups and is mainly used by 
-# scripts in package.json. It passes all additional arguments to docker-compose as is.
-# Script is based on https://betterdev.blog/minimal-safe-bash-script-template/
+# This script is used to run oodikone with different setups and is mainly used by
+# scripts in package.json.
+# Base for script: https://betterdev.blog/minimal-safe-bash-script-template/
 
-set -Eeuo pipefail # Fail fast if script fails
+# === Config ===
 
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
+# Fail immediately if script fails, unbound variables are referenced
+# or command inside pipe fails. -E ensures cleanup trap fires in rare ERR cases.
+set -euoE pipefail
+
+# Set up constants
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+
+# Set up logging
+source "$PROJECT_ROOT"/scripts/utils.sh
 
 usage() {
   cat <<EOF
-Usage: $(basename "${BASH_SOURCE[0]}") option version command --flag
+Usage: $(basename "${BASH_SOURCE[0]}") option [version] command --flag
 
-Option: oodikone/updater
-Version: anon/real/ci
-Command: will be passed to docker-compose
-
-Following flags can be used:
--v or --verbose: for verbose mode (prints stack trace)
---no-color: colors not used
+Parameters:
+* Option: oodikone/updater/both/morning
+* Version: anon/real/ci. Not necessary in all cases, such as when running down or logs.
+* Command: will be passed to docker-compose.
 EOF
   exit
 }
 
-setup_colors() {
-  if [[ -t 2 ]] && [[ -z "${NO_COLOR-}" ]] && [[ "${TERM-}" != "dumb" ]]; then
-    NOFORMAT='\033[0m' RED='\033[0;31m' GREEN='\033[0;32m' ORANGE='\033[0;33m' BLUE='\033[0;34m' PURPLE='\033[0;35m' CYAN='\033[0;36m' YELLOW='\033[1;33m'
-  else
-    NOFORMAT='' RED='' GREEN='' ORANGE='' BLUE='' PURPLE='' CYAN='' YELLOW=''
-  fi
-}
-
-msg() {
-    echo >&2 -e "${1-}"
-}
-
-die() {
-  local msg=$1
-  local code=${2-1} # default exit status 1
-  msg "${RED}${msg}${NOFORMAT}"
-  exit "$code"
-}
-
+# Parse parameters. If arguments are not correct, print usage and exit with error.
 parse_params() {
-  while :; do
-    case "${1-}" in
-    -v | --verbose) set -x ;;
-    --no-color) NO_COLOR=1 ;;
-    -?*) die "Unknown option: $1" ;;
-    *) break ;;
-    esac
-    shift
-  done
-
-  # Set args to global variables
   args=("$@")
+
+  [[ ${#args[@]} -eq 0 ]] && usage && die "Wrong number of arguments"
   option=${args[0]}
-  version=${args[1]}
 
-  # check required arguments
-  [[ ${#args[@]} -lt 2 ]] && usage && die 
-  [[ "$option" != "oodikone" && "$option" != "updater" ]] && usage && die
-  [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && usage && die
+  # If option is morning, other parameters aren't needed
+  [[ "$option" == "morning" ]] && return 0
 
-  # Parse docker-compose command that will be passed
-  if [[ ${#args[@]} -eq 2 ]]; then
-    compose_command=""
-  else 
+  # Else, parse arguments
+  [[ ("$option" != "oodikone" && "$option" != "updater" && "$option" != "both") ]] && \
+  usage && die "Wrong option"
+
+  [[ ${#args[@]} -eq 1 ]] && usage && die "Wrong number of arguments"
+
+  # Down or logs can be passed without version. Otherwise parse version and then pass
+  # rest to compose
+  if [[ "${args[1]}" == "down" || "${args[1]}" == "logs" ]]; then
+    version=""
+    compose_command=${args[*]:1}
+  else
+    version=${args[1]}
+    [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && \
+usage && die "Wrong version"
     compose_command=${args[*]:2}
-  fi 
+  fi
   return 0
 }
 
-# Set which services to launch based on option
-parse_services() {
-  [[ "$option" == "oodikone" ]] && services="db db_sis db_kone analytics analytics_db backend frontend user_db userservice adminer"
-  [[ "$option" == "updater" ]] && services="db-sis sis-updater-nats sis-updater-scheduler sis-updater-worker redis adminer"
+# Set which profile to use to launch correct services
+parse_profiles() {
+  if [[ "$option" == "both" ]]; then
+    profiles="--profile oodikone --profile updater"
+  else
+    profiles="--profile $option"
+  fi
   return 0
 }
 
-# Set docker-compose env overrides to use for each version (anon, real or ci)
+# Set which docker-compose files to use based on version. In ci, profiles are also
+# emptied, since they're passed from github actions.
 parse_env() {
-  [[ "$version" == "anon" ]] && env=""
-  [[ "$version" == "real" ]] && env="-f docker-compose.yml -f docker-compose.override.yml -f docker-compose.real.yml"
-  [[ "$version" == "ci" ]] && env="-f docker-compose.yml -f docker-compose.ci.yml"
+  env=""
+  if [[ "$version" == "real" ]]; then
+    env="-f docker-compose.yml -f docker-compose.real.yml"
+  elif [[ "$version" == "ci" ]]; then
+    env="-f docker-compose.ci.yml"
+    profiles=""
+  fi
   return 0
 }
 
-# Run helper functions
+# === Run script ===
+
 parse_params "$@"
-setup_colors
-parse_services
-parse_env
 
-
-## All things are not yet implemented, fail with error
-[[ "$version" == "anon" ]] && die "${RED}Anon option not yet implemented${NOFORMAT}"
-[[ "$version" == "ci" ]] && die "${RED}CI option not yet implemented${NOFORMAT}"
-
-# SCRIPT LOGIC
-if [[ "$compose_command" == "" ]]; then
-  final_command="docker-compose ${env} ${services}"
-else
-  final_command="docker-compose ${env} ${services}"
+# Do only morning cleanup for morning option
+if [[ "$option" == "morning" ]];then
+  git checkout trunk
+  git pull
+  docker-compose down --rmi all --remove-orphans
+  return 0
 fi
+
+# Create command that will be run. Empty command and "down" command will be handled
+# differently.
+parse_profiles
+parse_env
+if [[ "$compose_command" == "" ]]; then
+  final_command="docker-compose ${env}"
+elif [[ "$compose_command" == *"down"* ]]; then
+  final_command="docker-compose ${compose_command}"
+else
+  final_command="docker-compose ${env} ${profiles} ${compose_command}"
+fi
+
 msg "${BLUE}Running: ${final_command}${NOFORMAT}"
-# eval "$final_command"
+eval "$final_command"
