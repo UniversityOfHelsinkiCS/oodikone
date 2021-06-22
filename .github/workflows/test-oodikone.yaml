@@ -1,4 +1,4 @@
-name: Test oodikone
+name: "Test oodikone"
 
 on:
   push:
@@ -14,7 +14,7 @@ on:
       - run.sh
 
 jobs:
-  # === Detect changes ===
+  # === Detect changes for linting ===
 
   changes:
     name: "Detect if paths have changed"
@@ -288,6 +288,11 @@ jobs:
     - lint_userservice
     - test_end_to_end
     - test_service_exit_statuses
+    if: |
+      (needs.lint_analytics.status == 'success' || needs.lint_analytics.status == 'skipped') &&
+      (needs.lint_backend.status == 'success' || needs.lint_backend.status == 'skipped') &&
+      (needs.lint_frontend.status == 'success' || needs.lint_frontend.status == 'skipped') &&
+      (needs.lint_userservice.status == 'success' || needs.lint_userservice.status == 'skipped')
     runs-on: ubuntu-latest
     env:
       TAG: trunk
