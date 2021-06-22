@@ -1,0 +1,321 @@
+name: Test oodikone
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - .github/workflows/test-oodikone.yaml
+      - cypress.json
+      - cypress/**
+      - services/**
+      - package*.json
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/test-oodikone.yaml
+      - cypress.json
+      - cypress/**
+      - services/**
+      - package*.json
+
+jobs:
+  # === Detect changes ===
+
+  changes:
+    name: "Detect if paths have changed"
+    runs-on: ubuntu-latest
+    outputs:
+      analytics: ${{ steps.filter.outputs.analytics }}
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      userservice: ${{ steps.filter.outputs.userservice }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            analytics:
+              - 'services/oodikone2-analytics/**'
+            backend:
+              - 'services/backend/oodikone2-backend/**'
+            frontend:
+              - 'services/oodikone2-frontend/**'
+            userservice:
+              - 'services/oodikone2-userservice/**'
+
+  # === Static tests / linting ===
+
+  lint_analytics:
+    name: "Lint analytics"
+    needs: changes
+    if: ${{ needs.changes.outputs.analytics == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/oodikone2-analytics
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+  lint_backend:
+    name: "Lint backend"
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/backend/oodikone2-backend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+  lint_frontend:
+    name: "Lint frontend"
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/oodikone2-frontend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+  lint_userservice:
+    name: "Lint userservice"
+    needs: changes
+    if: ${{ needs.changes.outputs.userservice == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/oodikone2-userservice
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - name: Install dependencies
+        run: npm ci
+      - name: Run linter
+        run: npm run lint
+
+  # === Build images ===
+
+  build_analytics:
+    name: "Build analytics"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Pull previous build from Docker hub
+        run: ./run.sh oodikone ci pull analytics
+      - name: Build  image
+        run: ./run.sh oodikone ci build analytics
+      - name: Save built image
+        run: docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
+      - name: Upload image for other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          path: /tmp/analytics.tar
+  build_backend:
+    name: "Build backend"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Pull previous build from Docker hub
+        run: ./run.sh oodikone ci pull backend
+      - name: Build image
+        run: ./run.sh oodikone ci build backend
+      - name: Save built image
+        run: docker save toska/oodikone2-backend:trunk -o /tmp/backend.tar
+      - name: Upload image for other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          path: /tmp/backend.tar
+  build_frontend:
+    name: "Build frontend"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Pull previous build from Docker hub
+        run: ./run.sh oodikone ci pull frontend
+      - name: Build image
+        run: ./run.sh oodikone ci build frontend
+      - name: Save built image
+        run: docker save toska/oodikone2-frontend:trunk -o /tmp/frontend.tar
+      - name: Upload image for other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          path: /tmp/frontend.tar
+  build_userservice:
+    name: "Build userservice"
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Pull previous build from Docker hub
+        run: ./run.sh oodikone ci pull userservice
+      - name: Build image
+        run: ./run.sh oodikone ci build userservice
+      - name: Save built image
+        run: docker save toska/oodikone2-userservice:trunk -o /tmp/userservice.tar
+      - name: Upload image for other jobs
+        uses: actions/upload-artifact@v2
+        with:
+          path: /tmp/userservice.tar
+
+  # === End-to-end tests ===
+
+  test_end_to_end:
+    name: "Run end-to-end tests"
+    needs:
+      - build_analytics
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Login to toska docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: Run services, pull rest of the needed images
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - name: Run cypress
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: Upload video
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  # === Other tests ===
+
+  test_service_exit_statuses:
+    name: "Check services run correctly"
+    needs:
+      - build_analytics
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Login to toska docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: Run services, pull rest of the needed images
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - name: Check that exit statuses are not errors
+        run: |
+          docker ps -a
+          if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
+            echo 'Some process had nonzero exit code';
+            ./run.sh oodikone ci logs;
+            exit 1;
+          fi
+
+  push_to_dockerhub:
+    name: "Push images to docker hub for caching"
+    needs:
+    - lint_analytics
+    - lint_backend
+    - lint_frontend
+    - lint_userservice
+    - test_end_to_end
+    - test_service_exit_statuses
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "Push to docker hub"
+        run: ./run.sh oodikone ci push

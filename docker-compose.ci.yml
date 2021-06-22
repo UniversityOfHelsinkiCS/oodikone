@@ -1,0 +1,156 @@
+version: "3.9"
+
+x-defaults: &defaults
+  restart: unless-stopped
+
+x-build_defaults: &build_defaults
+  build:
+    args:
+      TAG: ${TAG}
+
+services:
+  analytics:
+    <<: *defaults
+    <<: *build_defaults
+    build:
+      cache_from:
+      - toska/oodikone2-userservice:trunk
+      - toska/oodikone2-userservice:staging
+      - toska/oodikone2-userservice:latest
+      context: services/oodikone2-analytics
+    container_name: analytics
+    depends_on:
+      - analytics-db
+    image: toska/oodikone2-analytics:${TAG}
+    environment:
+      DB_URL: postgres://postgres@analytics-db:5432/analytics-db
+    ports:
+      - "4568:4568"
+
+  analytics-db:
+    <<: *defaults
+    container_name: analytics-db
+    image: registry.toska.cs.helsinki.fi/analytics-db
+    ports:
+      - "5423:5432"
+
+  backend:
+    <<: *defaults
+    <<: *build_defaults
+    build:
+      cache_from:
+        - toska/oodikone2-backend:trunk
+        - toska/oodikone2-backend:staging
+        - toska/oodikone2-backend:latest
+      context: services/backend
+      dockerfile: oodikone2-backend/Dockerfile
+    container_name: backen
+    depends_on:
+      - kone-db
+      - oodi-db
+      - redis
+      - sis-db
+    environment:
+      ANALYTICS_URL: http://analytics:4568
+      DB_URL: postgres://postgres@oodi-db:5432/oodi-db
+      DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
+      FRONT_URL: http://localhost:1337
+      REDIS: redis
+      SECRET_TOKEN: dev
+      SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
+      SIS_UPDATER_URL: http://sis-updater-scheduler:8082
+      TOKEN_SECRET: IWannaBeTheVeryBest
+      USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      USERSERVICE_URL: http://userservice:4567
+    image: toska/oodikone2-backend:${TAG}
+    ports:
+      - "9229:9229"
+    volumes:
+      - ./services/backend/shared/models:/usr/src/app/src/models
+      - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
+      - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
+
+  frontend:
+    <<: *defaults
+    <<: *build_defaults
+    build:
+      cache_from:
+        - toska/oodikone2-frontend:trunk
+        - toska/oodikone2-frontend:staging
+        - toska/oodikone2-frontend:latest
+      context: services/oodikone2-frontend
+    container_name: frontend
+    environment:
+      BACKEND_ADDR: backend
+    image: toska/oodikone2-frontend:${TAG}
+    ports:
+      - "5000:5000"
+
+  kone-db:
+    <<: *defaults
+    container_name: kone-db
+    image: registry.toska.cs.helsinki.fi/kone-db
+    ports:
+      - "5425:5432"
+
+  oodi-db: # TODO: Remove when oodi stuff has been removed from oodikone
+    <<: *defaults
+    container_name: oodi-db
+    image: registry.toska.cs.helsinki.fi/oodi-db
+    ports:
+      - "5421:5432"
+
+  redis:
+    <<: *defaults
+    command: "redis-server --appendonly yes"
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+
+  sis-db:
+    <<: *defaults
+    container_name: sis-db
+    image: registry.toska.cs.helsinki.fi/sis-db
+    ports:
+      - "5426:5432"
+
+  user-db:
+    <<: *defaults
+    container_name: user-db
+    image: registry.toska.cs.helsinki.fi/user-db
+    ports:
+      - "5422:5432"
+
+  userservice:
+    <<: *defaults
+    <<: *build_defaults
+    build:
+      cache_from:
+        - toska/oodikone2-userservice:trunk
+        - toska/oodikone2-userservice:staging
+        - toska/oodikone2-userservice:latest
+      context: services/oodikone2-userservice
+    container_name: userservice
+    depends_on:
+      - user-db
+    environment:
+      DB_URL: postgres://postgres@user-db:5432/user-db
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      TOKEN_SECRET: IWannaBeTheVeryBest
+    image: toska/oodikone2-userservice:${TAG}
+    ports:
+      - "4567:4567"
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    depends_on:
+      - frontend
+      - backend
+      - userservice
+      - analytics
+    ports:
+      -  1337:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
