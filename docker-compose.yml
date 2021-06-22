@@ -83,9 +83,6 @@ services:
     volumes:
       - backend-nodemod:/usr/src/app/node_modules
       - ./services/backend/oodikone2-backend/:/usr/src/app
-      - ./services/backend/shared/models:/usr/src/app/src/models
-      - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
-      - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
 
   frontend:
     <<: *defaults
