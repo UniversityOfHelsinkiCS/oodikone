@@ -2,23 +2,15 @@ name: Test oodikone
 
 on:
   push:
-    branches-ignore:
-      - master
     paths:
       - .github/workflows/test-oodikone.yaml
-      - cypress.json
       - cypress/**
-      - services/**
-      - package*.json
-  pull_request:
-    branches:
-      - master
-    paths:
-      - .github/workflows/test-oodikone.yaml
       - cypress.json
-      - cypress/**
       - services/**
+      - docker-compose.ci.yml
+      - nginx.conf
       - package*.json
+      - run.sh
 
 jobs:
   # === Detect changes ===
