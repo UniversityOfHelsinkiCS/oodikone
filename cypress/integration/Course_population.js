@@ -18,12 +18,12 @@ describe('Course population tests', () => {
     cy.contains("TKT20003")
 
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
-    cy.contains('Population of course Käyttöjärjestelmät 2017-18')
-    cy.contains('TKT20003, 582219, 582640, 582497')
-    cy.contains('Students (all=39)')
+    cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
+    cy.contains('TKT20003')
+    cy.contains('Students (all=24)')
 
-    cy.contains('Students (39)').click()
-    cy.contains('013614218')
-    cy.contains('014022579')
+    cy.contains('Students (24)').click()
+    cy.contains('010135486')
+    cy.contains('010431753')
   })
 })
