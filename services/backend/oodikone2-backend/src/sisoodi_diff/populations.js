@@ -14,33 +14,16 @@ let verbose = false
 */
 
 const ignores = {
-  KH50_001: {
-    2020: {
-      oodi: ['013470384'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-    }
-  },
 
   KH60_001: {
-    2017: {
-      oodi: [
-        '014845154', // https://jira.it.helsinki.fi/browse/DOO-4547 (differing end date)
-        '013299358' // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
-      ]
-    },
     2018: {
       oodi: [
         '014323074' // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
       ]
     },
-    2019: {
-      oodi: [
-        '014366086' // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
-      ]
-    },
     2020: {
       oodi: [
         '013466013', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
-        '014590027',
         '014340963',
         '014179998',
         '013743299'
@@ -58,13 +41,11 @@ const ignores = {
       oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2972
     }
   },
-
   MH40_005: {
     2019: {
       oodi: ['015095686'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
     }
   },
-
   MH40_014: {
     2020: {
       oodi: ['013349512'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
@@ -80,7 +61,6 @@ const ignores = {
       oodi: ['014744501'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2844
     }
   },
-
   MH70_008: {
     2017: {
       oodi: ['014404139'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
@@ -88,10 +68,7 @@ const ignores = {
   },
   MH80_001: {
     2020: {
-      oodi: [
-        '014343643',
-        '014016572' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-      ]
+      oodi: ['014343643'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
 
@@ -102,10 +79,7 @@ const ignores = {
       ]
     },
     2019: {
-      oodi: [
-        '014323074', // https://jira.it.helsinki.fi/browse/DOO-4545
-        '014366086'
-      ]
+      oodi: [ '014323074' ]
     },
     2020: {
       sis: [
@@ -190,8 +164,117 @@ const ignores = {
       '014921764', // MH70_002 valmistunut 14.5.
       '014928518', // MH70_004 valmistunut 14.5.
       '014922899', // MH70_004 valmistunut 14.5.
-      '014919967', //  MH70_009 valmistunut 14.5.
-      '014725737' //  MH70_009 valmistunut 14.5.
+      '014919967', // MH70_009 valmistunut 14.5.
+      '014725737', // MH70_009 valmistunut 14.5.
+      '010854437', // KH40_004 ilmo kesäkuussa
+      '012629709', // KH80_001 ilmo kesäkuussa
+      '014366086', // KH60_001 ilmo kesäkuussa
+      '012104952', // KH60_001 ilmo kesäkuussa
+      '013867625', // KH60_001 ei oodissa siirretty uuteen koulutusohjelmaan
+      '014923694', // MH10_001 valmistunut
+      '014849642', // MH10_001 valmistunut
+      '014939057', // MH10_001 valmistunut
+      '014810642', // MH10_001 valmistunut
+      '014951909', // MH10_001 valmistunut
+      '014717020', // MH10_001 valmistunut
+      '014925715', // MH10_001 valmistunut
+      '014690859', // MH20_002 ilmo kesällä
+      '014938333', // MH90_001 valmistunut
+      '013596158', // MH90_001 valmistunut  
+      '014814774', // MH30_004 valmistunut
+      '014811405', // MH30_004 valmistunut
+      '014837997', // MH40_001 valmistunut
+      '014809909', // MH40_003 valmistunut
+      '014622568', // MH40_003 valmistunut
+      '014593079', // MH40_007 valmistunut
+      '014811230', // MH40_007 valmistunut
+      '014808269', // MH40_007 valmistunut
+      '014897241', // MH40_012 valmistunut
+      '013964447', // MH40_012 valmistunut
+      '014842940', // MH40_010 valmistunut
+      '014821819', // MH40_009 valmistunut
+      '014622241', // MH40_015 ...
+      '014731747', // MH40_015
+      '014515332', // MH40_015
+      '014788758', // MH40_015
+      '014937680', // MH40_015
+      '014940415', // MH40_015
+      '014622429', // MH40_014
+      '014710807', // MH40_014
+      '014972687', // MH50_001
+      '014838501', // MH50_003
+      '014785065', // MH50_007
+      '014725999', // MH50_006
+      '014852655', // MH50_006
+      '014052840', // MH50_011
+      '014929151', // MH50_011
+      '014926264', // MH50_010
+      '012776380', // MH50_009
+      '014597965', // MH50_009
+      '014819038', // MH57_002
+      '014347500', // MH57_005
+      '014917189', // MH57_005
+      '014682553', // MH57_005
+      '014811861', // MH57_003
+      '014607240', // MH57_003
+      '011091888', // MH70_002
+      '014824191', // MH70_002
+      '014869554', // MH70_002
+      '014917325', // MH70_002
+      '014919019', // MH70_002
+      '014657562', // MH70_002
+      '014918900', // MH70_002
+      '014917396', // MH70_002
+      '014917503', // MH70_002
+      '014919556', // MH70_002
+      '014732694', // MH70_002
+      '014741588', // MH70_002
+      '014917370', // MH70_002
+      '014952513', // MH70_004
+      '014917574', // MH70_004
+      '014696691', // MH70_004
+      '014875946', // MH70_004
+      '014491883', // MH70_004
+      '014943580', // MH70_004
+      '010907009', // MH70_008
+      '014151398', // MH70_008
+      '014740071', // MH70_008
+      '014755972', // MH70_008
+      '014789809', // MH70_008
+      '014810341', // MH70_008
+      '014848711', // MH70_008
+      '014864559', // MH70_008
+      '014919653', // MH70_008
+      '014940211', // MH70_007
+      '011522496', // MH70_007
+      '014755765', // MH70_009
+      '014830279', // MH80_001
+      '014955125', // MH80_001
+      '014928301', // MH80_001
+      '014951336', // MH80_002
+      '014329706', // MH80_004
+      '014810493', // MH80_004
+      '014722329', // MH80_007
+      '014807969', // MH80_007
+      '014710179', // MH80_006
+      '014806957', // MH80_006
+      '014745597', // MH80_006
+      '013757133', // MH80_005
+      '014936306', // MH80_005
+      '014821974', // MH60_001 alotusv väärin oodissa
+      '014396506', // MH60_001 valmistunut
+      '014728747', // MH60_001
+      '014811191', // MH60_001
+      '014812747', // MH60_001
+      '014812763', // MH60_001
+      '014818408', // MH60_001
+      '014819481', // MH60_001
+      '014823561', // MH60_001
+      '014858316', // MH60_001
+      '014863767', // MH60_001
+      '014920231', // MH60_001
+      '014936487', // MH60_001
+      '015159111', // MH60_001
     ],
     // in oodi, but not in sis
     oodi: [
@@ -246,7 +329,14 @@ const ignores = {
       '015111191', // KH50_008 luopunut 2.6.
       '015326258', // KH80_002 luopunut 17.5.
       '014457568', // MH10_001 luopunut 17.5.
-      '014575411' // MH40_007 luopunut 24.5.
+      '014575411', // MH40_007 luopunut 24.5.
+      '014152643', // KH10_001 luopunut
+      '013470384', // KH50_001 ei ilmoa
+      '014418303', // KH50_001 luopunut
+      '010664397', // KH50_005 opintoaika loppunut/luopunut
+      '014769816', // KH55_001 luopunut
+      '014845154', // KH60_001 oodissa väärä loppumispvm
+      '014821974', // MH60_001 alotusv väärin oodissa
     ]
   }
 }
@@ -463,7 +553,10 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
 const printWithReason = (studentnumbers, reason) => {
   if (studentnumbers.length > 0) {
     console.log(`- ${reason}: ${studentnumbers.length} students`)
-    if (verbose) studentnumbers.forEach(s => console.log(s))
+    if (verbose) studentnumbers.forEach(s => {
+      const p = s.split(', ')
+      console.log(`'${p[0]}', // ${p[1]}`)
+    })
   }
 }
 
@@ -509,12 +602,13 @@ const msc = async () => {
   const programmes = await masterCodes()
   console.log(programmes.join('\n'))
   for (let programme of programmes) {
-    await programmeDiff(programme)
+    //await programmeDiff(programme)
   }
 }
 
 const bsc = async () => {
   const programmes = await bscCodes()
+  console.log(programmes.join('\n'))
   for (let programme of programmes) {
     await programmeDiff(programme)
   }

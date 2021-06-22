@@ -7,11 +7,11 @@ $driver = "pgsql";
 */
 return new AdminerLoginServers(
     $servers = array(
-        "db" => array("server" => "db", "driver" => $driver),
-        "db_kone" => array("server" => "db_kone", "driver" => $driver),
-        "user_db" => array("server" => "user_db", "driver" => $driver),
-        "analytics_db" => array("server" => "analytics_db", "driver" => $driver),
-        "db_sis" => array("server" => "db_sis", "driver" => $driver),
-        "sis-importer-db" => array("server" => "sis-importer-db", "driver" => $driver)
+        "analytics-db" => array("server" => "analytics-db", "driver" => $driver),
+        "kone-db" => array("server" => "kone-db", "driver" => $driver),
+        "oodi-db" => array("server" => "oodi-db", "driver" => $driver),
+        "sis-db" => array("server" => "sis-db", "driver" => $driver),
+        "sis-importer-db" => array("server" => "sis-importer-db", "driver" => $driver),
+        "user-db" => array("server" => "user-db", "driver" => $driver)
     )
 );
