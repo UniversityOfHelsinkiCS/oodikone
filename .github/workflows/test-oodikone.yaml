@@ -2,6 +2,7 @@ name: Test oodikone
 
 on:
   push:
+    branches-ignore: master
     paths:
       - .github/workflows/test-oodikone.yaml
       - cypress/**
