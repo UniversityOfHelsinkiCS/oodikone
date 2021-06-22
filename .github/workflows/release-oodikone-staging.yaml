@@ -1,0 +1,29 @@
+name: Release oodikone to staging
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_and_release:
+    name: "Build images and release"
+    runs-on: ubuntu-latest
+    env:
+      TAG: staging
+      CACHE_TAG: staging
+    steps:
+      - name: "Checkout repo"
+        uses: actions/checkout@v2
+      - name: "Login to DockerHub"
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "Build  images"
+        run: ./run.sh oodikone ci build analytics backend frontend userservice
+      - name: "Push to docker hub"
+        run: ./run.sh oodikone ci push analytics backend frontend userservice
+      - name: "Notify"
+        run: |
+          curl --silent -X POST -H 'Content-type: application/json' --data "{\"text\":\"master started auto deployment!\"}" ${secrets.SLACKBOT_URL}
