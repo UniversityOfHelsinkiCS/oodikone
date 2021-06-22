@@ -23,13 +23,8 @@ jobs:
               echo 'export DEPLOY=true' >> $BASH_ENV;
               echo 'export CACHE_TAG=latest' >> $BASH_ENV;
               echo 'USING RELEASE CONFIG';
-            elif [[ "$CIRCLE_BRANCH" = "master" && -z "$CIRCLE_PULL_REQUEST" ]]; then
-              echo 'export TAG=staging' >> $BASH_ENV;
-              echo 'export DEPLOY=true' >> $BASH_ENV;
-              echo 'export CACHE_TAG=staging' >> $BASH_ENV;
-              echo 'USING STAGING CONFIG';
             else
-              echo "Circleci should run only on master push and tags!"
+              echo "Circleci should run only on tags!"
             fi
       - checkout
       - node/install:
@@ -70,6 +65,6 @@ workflows:
       - build:
           filters:
             branches:
-              only: master
+              only: dontrun # HAX, please don't use this branch
             tags:
               only: /.*/

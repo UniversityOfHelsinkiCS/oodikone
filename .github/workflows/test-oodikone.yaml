@@ -3,7 +3,7 @@ name: Test oodikone
 on:
   push:
     branches-ignore:
-      - main
+      - master
     paths:
       - .github/workflows/test-oodikone.yaml
       - cypress.json
@@ -12,7 +12,7 @@ on:
       - package*.json
   pull_request:
     branches:
-      - main
+      - master
     paths:
       - .github/workflows/test-oodikone.yaml
       - cypress.json
