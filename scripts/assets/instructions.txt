@@ -1,6 +1,0 @@
-Oodikone2 should now be running on your machine. Note that bringing up the containers may take upwards of 5 minutes on macOS. Have patience, young padawan.
-
-View Oodikone @ http://localhost:8081
-SQL viewer and editor @ http://localhost:5050/
-
-Happy developing!

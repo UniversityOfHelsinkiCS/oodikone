@@ -1,20 +1,11 @@
 **/node_modules
-data
-pgdata
-pgdata_kone
-user_pgdata
-analytics_pgdata
-usage_pgdata
-analytics-redis-data
-redis-data
-mongodata
-backups
+.databasedumps
+
+
+# These really needed?
 private.key
 private.key.pub
-anonyymioodi
-nginx
 kafka
-node_modules
 services/updater_writer/updater/test_assets/testi.bak
 services/updater_writer/updater/test_assets/011120775.json
 services/updater_writer/updater/test_assets/014272112.json
@@ -27,4 +18,3 @@ services/updater_api/debug.log
 services/backend/updater_writer/dumps
 debug.log
 programme_module_dump.sql
-hyuserdata

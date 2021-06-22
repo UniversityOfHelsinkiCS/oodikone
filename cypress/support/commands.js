@@ -6,12 +6,10 @@
 Cypress.Commands.add("init", (path = '') => {
   cy.server({
     onAnyRequest: function (route, proxy) {
-      if (Cypress.config().baseUrl.includes("http://nginx/")) {
-        proxy.xhr.setRequestHeader('uid', 'tktl')
-        proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
-        proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
-        proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
-      }
+      proxy.xhr.setRequestHeader('uid', 'tktl')
+      proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
+      proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
+      proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
     }
   })
 
@@ -22,7 +20,8 @@ Cypress.Commands.add("init", (path = '') => {
     return false
   })
 
-  cy.visit(Cypress.config().baseUrl.concat(path))
+  const baseUrl = Cypress.config().baseUrl ? Cypress.config().baseUrl : "http://localhost:8081"
+  cy.visit(baseUrl.concat(path))
 })
 
 /**
