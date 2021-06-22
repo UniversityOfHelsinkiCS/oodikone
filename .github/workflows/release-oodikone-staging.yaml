@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '.github/workflows/release-oodikone-staging.yaml'
+      - 'services/**'
+      - 'docker-compose.ci.yml'
 
 jobs:
   build_and_release:
