@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
-    "test": "npm install --dev && npm run lint",
     "lint": "eslint .",
     "lintfix": "prettier --write **/*.{js,json} && eslint --fix ."
   },
@@ -34,7 +33,7 @@
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-prettier": "^3.1.1",
-    "nodemon": "^1.19.1",
+    "nodemon": "^2.0.7",
     "prettier": "^1.18.2",
     "prettier-eslint": "^9.0.0"
   }

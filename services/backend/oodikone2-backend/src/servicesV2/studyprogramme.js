@@ -24,8 +24,8 @@ const formatCredit = credit => {
   return { id, year, credits }
 }
 
-const getTransferredCredits = (provider, since) =>
-  Credit.findAll({
+const getTransferredCredits = async (provider, since) =>
+  await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'credittypecode'],
     include: {
       model: Course,
@@ -53,8 +53,8 @@ const getTransferredCredits = (provider, since) =>
     }
   })
 
-const getCreditsForMajors = (provider, since, studentnumbers) =>
-  Credit.findAll({
+const getCreditsForMajors = async (provider, since, studentnumbers) =>
+  await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
     include: {
       model: Course,
@@ -111,6 +111,9 @@ const getCreditsForProvider = async (provider, since) =>
       where: {
         credittypecode: {
           [Op.notIn]: [10, 9, 7]
+        },
+        isStudyModule: {
+          [Op.not]: true
         },
         attainment_date: {
           [Op.gte]: since
@@ -284,7 +287,6 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
 }
 
 const creditsAfter = (studentnumbers, startDate) => {
-  const failed = ['0', 'Hyl.', 'Luop', 'Eisa']
   return Promise.all(
     studentnumbers.map(student =>
       Credit.sum('credits', {
@@ -296,10 +298,10 @@ const creditsAfter = (studentnumbers, startDate) => {
             [Op.gte]: startDate
           },
           isStudyModule: {
-            [Op.eq]: false
+            [Op.not]: true
           },
-          grade: {
-            [Op.notIn]: failed
+          credittypecode: {
+            [Op.notIn]: [10, 9, 7]
           }
         }
       })
@@ -350,7 +352,7 @@ const thesesFromClass = async (studentnumbers, startDate, code) => {
 }
 
 const graduationsFromClass = async (studentnumbers, studytrack) => {
-  return Studyright.findAll({
+  return await Studyright.findAll({
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -415,7 +417,7 @@ const nationalitiesFromClass = async studentnumbers => {
 }
 
 const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Transfer.count({
+  return await Transfer.count({
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
@@ -431,7 +433,7 @@ const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, e
 }
 
 const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Transfer.count({
+  return await Transfer.count({
     where: {
       studentnumber: {
         [Op.in]: studentnumbers
@@ -472,7 +474,7 @@ const transferredCreditsForProductivity = async (studytrack, since) => {
 }
 
 const cancelledStudyright = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Studyright.count({
+  return await Studyright.count({
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -498,7 +500,7 @@ const cancelledStudyright = async (studentnumbers, startDate, studytrack, endDat
 }
 
 const startedStudyright = async (studentnumbers, startDate, studytrack, endDate) => {
-  return Studyright.count({
+  return await Studyright.count({
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -733,6 +735,7 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
           cancelled,
           started
         ] = await statsForClass(studentnumbers, startDate, studyprogramme, endDate)
+
         delete genders[null]
         const creditValues = credits.reduce(
           (acc, curr) => {

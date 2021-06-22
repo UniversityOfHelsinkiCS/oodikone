@@ -6,11 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "NODE_ENV=dev nodemon index.js",
-    "test": "npm install --dev && npm run lint && npm run jest",
     "lint": "eslint .",
-    "lintfix": "prettier --write '**/*.{js,json}' && eslint --fix .",
-    "jest": "NODE_ENV=test jest --runInBand --verbose --detectOpenHandles",
-    "test_docker": "docker exec -t userservice /bin/bash -c 'npm test'"
+    "lintfix": "prettier --write '**/*.{js,json}' && eslint --fix ."
   },
   "repository": {
     "type": "git",
@@ -27,7 +24,6 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
-    "nodemon": "^1.19.1",
     "pg": "^8.6.0",
     "sequelize": "^6.6.2",
     "umzug": "^2.2.0"
@@ -38,6 +34,7 @@
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-prettier": "^3.1.0",
     "jest": "^24.8.0",
+    "nodemon": "^2.0.7",
     "prettier": "^1.18.2",
     "prettier-eslint": "^9.0.0"
   }
