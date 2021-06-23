@@ -258,6 +258,7 @@ const courseMapper = courseIdToAttainments => ([groupId, courses]) => {
     startdate,
     enddate,
     is_study_module: false, // VALIDATE THIS PLS
+    substitutions
   }
 }
 
