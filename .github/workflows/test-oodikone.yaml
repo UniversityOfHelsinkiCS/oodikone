@@ -280,3 +280,31 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: "Push to docker hub"
         run: ./run.sh oodikone ci push
+
+  report_failure:
+    runs-on: ubuntu-latest
+    name: Report test failure to oodikone notifications
+    needs:
+    - lint_analytics
+    - lint_backend
+    - lint_frontend
+    - lint_userservice
+    - test_end_to_end
+    - test_service_exit_statuses
+    - push_to_dockerhub
+    if: always()
+    steps:
+      - name:
+         if:
+          needs.lint_analytics.result == 'failure' ||
+          needs.lint_backend.result == 'failure' ||
+          needs.lint_frontend.result == 'failure' ||
+          needs.lint_userservice.result == 'failure' ||
+          needs.test_end_to_end.result == 'failure' ||
+          needs.test_service_exit_statuses.result == 'failure' ||
+          needs.push_to_dockerhub.result == 'failure'
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.0.1
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          header: ":rocket_down: Test run failed on ${GITHUB_REF##*/}"
+          body: "Oh no, <https://github.com/UniversityOfHelsinkiCS/oodikone/actions/runs/${GITHUB_RUN_ID}|workflow> run by *$GITHUB_ACTOR* has failed on branch ${GITHUB_REF##*/}"
