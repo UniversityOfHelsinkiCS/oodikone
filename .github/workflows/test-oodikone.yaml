@@ -1,4 +1,4 @@
-name: Test oodikone
+name: "Test oodikone"
 
 on:
   push:
@@ -6,52 +6,19 @@ on:
       - master
     paths:
       - .github/workflows/test-oodikone.yaml
-      - cypress.json
       - cypress/**
-      - services/**
-      - package*.json
-  pull_request:
-    branches:
-      - master
-    paths:
-      - .github/workflows/test-oodikone.yaml
       - cypress.json
-      - cypress/**
       - services/**
+      - docker-compose.ci.yml
+      - nginx.conf
       - package*.json
+      - run.sh
 
 jobs:
-  # === Detect changes ===
-
-  changes:
-    name: "Detect if paths have changed"
-    runs-on: ubuntu-latest
-    outputs:
-      analytics: ${{ steps.filter.outputs.analytics }}
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-      userservice: ${{ steps.filter.outputs.userservice }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            analytics:
-              - 'services/oodikone2-analytics/**'
-            backend:
-              - 'services/backend/oodikone2-backend/**'
-            frontend:
-              - 'services/oodikone2-frontend/**'
-            userservice:
-              - 'services/oodikone2-userservice/**'
-
   # === Static tests / linting ===
 
   lint_analytics:
     name: "Lint analytics"
-    needs: changes
-    if: ${{ needs.changes.outputs.analytics == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -67,8 +34,6 @@ jobs:
         run: npm run lint
   lint_backend:
     name: "Lint backend"
-    needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -84,8 +49,6 @@ jobs:
         run: npm run lint
   lint_frontend:
     name: "Lint frontend"
-    needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -101,8 +64,6 @@ jobs:
         run: npm run lint
   lint_userservice:
     name: "Lint userservice"
-    needs: changes
-    if: ${{ needs.changes.outputs.userservice == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:

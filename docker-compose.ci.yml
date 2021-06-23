@@ -65,10 +65,6 @@ services:
     image: toska/oodikone2-backend:${TAG}
     ports:
       - "9229:9229"
-    volumes:
-      - ./services/backend/shared/models:/usr/src/app/src/models
-      - ./services/backend/shared/migrations:/usr/src/app/src/database/migrations
-      - ./services/backend/shared/migrations_kone:/usr/src/app/src/database/migrations_kone
 
   frontend:
     <<: *defaults
