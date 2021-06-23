@@ -28,6 +28,9 @@ jobs:
         run: ./run.sh oodikone ci build analytics backend frontend userservice
       - name: "Push to docker hub"
         run: ./run.sh oodikone ci push analytics backend frontend userservice
-      - name: "Notify"
-        run: |
-          curl --silent -X POST -H 'Content-type: application/json' --data "{\"text\":\"master started auto deployment!\"}" ${secrets.SLACKBOT_URL}
+      - name: "Send notification to slack"
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.0.1
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          header: Master started auto deployment to staging
+          body: "Commit: <https://github.com/UniversityOfHelsinkiCS/oodikone/commit/$GITHUB_SHA>"
