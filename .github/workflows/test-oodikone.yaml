@@ -14,37 +14,11 @@ on:
       - run.sh
 
 jobs:
-  # === Detect changes for linting ===
-
-  changes:
-    name: "Detect if paths have changed"
-    runs-on: ubuntu-latest
-    outputs:
-      analytics: ${{ steps.filter.outputs.analytics }}
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-      userservice: ${{ steps.filter.outputs.userservice }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            analytics:
-              - 'services/oodikone2-analytics/**'
-            backend:
-              - 'services/backend/oodikone2-backend/**'
-            frontend:
-              - 'services/oodikone2-frontend/**'
-            userservice:
-              - 'services/oodikone2-userservice/**'
-
   # === Static tests / linting ===
 
   lint_analytics:
     name: "Lint analytics"
     needs: changes
-    if: ${{ needs.changes.outputs.analytics == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -61,7 +35,6 @@ jobs:
   lint_backend:
     name: "Lint backend"
     needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -78,7 +51,6 @@ jobs:
   lint_frontend:
     name: "Lint frontend"
     needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -95,7 +67,6 @@ jobs:
   lint_userservice:
     name: "Lint userservice"
     needs: changes
-    if: ${{ needs.changes.outputs.userservice == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -288,7 +259,6 @@ jobs:
     - lint_userservice
     - test_end_to_end
     - test_service_exit_statuses
-    if: always() && (needs.lint_analytics.result == 'success' || needs.lint_analytics.result == 'skipped') && (needs.lint_backend.result == 'success' && needs.lint_backend.result == 'skipped') && (needs.lint_frontend.result == 'success' && needs.lint_frontend.result == 'skipped') && (needs.lint_userservice.result == 'success' && needs.lint_userservice.result == 'skipped') && needs.test_end_to_end.result == 'success' && needs.test_service_exit_statuses.result == 'success'
     runs-on: ubuntu-latest
     env:
       TAG: trunk
