@@ -295,7 +295,7 @@ jobs:
     if: always()
     steps:
       - name:
-         if:
+         if: |
           needs.lint_analytics.result == 'failure' ||
           needs.lint_backend.result == 'failure' ||
           needs.lint_frontend.result == 'failure' ||

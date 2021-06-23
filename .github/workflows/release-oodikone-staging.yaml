@@ -33,4 +33,4 @@ jobs:
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           header: Master started auto deployment to staging
-          body: "Commit: <https://github.com/UniversityOfHelsinkiCS/oodikone/commit/$GITHUB_SHA>"
+          body: "Commit: <https://github.com/UniversityOfHelsinkiCS/oodikone/commit/${GITHUB_SHA}|${GITHUB_SHA:6}>"
