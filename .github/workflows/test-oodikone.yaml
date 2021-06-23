@@ -288,7 +288,14 @@ jobs:
     - lint_userservice
     - test_end_to_end
     - test_service_exit_statuses
-    if: ${{ (needs.lint_analytics.result == 'success' || needs.lint_analytics.result == 'skipped') && (needs.lint_backend.result == 'success' || needs.lint_backend.result == 'skipped') && (needs.lint_frontend.result == 'success' || needs.lint_frontend.result == 'skipped') && (needs.lint_userservice.result == 'success' || needs.lint_userservice.result == 'skipped') }}
+    if: |
+      always() &&
+      (needs.lint_analytics.result == 'success' || needs.lint_analytics.result == 'skipped') &&
+      (needs.lint_backend.result == 'success' && needs.lint_backend.result == 'skipped') &&
+      (needs.lint_frontend.result == 'success' && needs.lint_frontend.result == 'skipped') &&
+      (needs.lint_userservice.result == 'success' && needs.lint_userservice.result == 'skipped') &&
+      needs.test_end_to_end.result == 'success' &&
+      needs.test_service_exit_statuses.result == 'success'
     runs-on: ubuntu-latest
     env:
       TAG: trunk
