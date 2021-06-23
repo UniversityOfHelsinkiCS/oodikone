@@ -18,7 +18,10 @@ services/updater_api/debug.log
 services/backend/updater_writer/dumps
 debug.log
 programme_module_dump.sql
+<<<<<<< HEAD
 hyuserdata
 backups/
 nginx/
 
+=======
+>>>>>>> fb4cb5544253ea14af1e744b09cf2b07bb307733
