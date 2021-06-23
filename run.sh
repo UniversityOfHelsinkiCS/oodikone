@@ -25,7 +25,6 @@ Parameters:
 * Version: anon/real/ci. Not necessary in all cases, such as when running down or logs.
 * Command: will be passed to docker-compose.
 EOF
-  exit
 }
 
 # Parse parameters. If arguments are not correct, print usage and exit with error.
@@ -40,7 +39,7 @@ parse_params() {
 
   # Else, parse arguments
   [[ ("$option" != "oodikone" && "$option" != "updater" && "$option" != "both") ]] && \
-  usage && die "Wrong option"
+  usage && die "Wrong option: $option"
 
   [[ ${#args[@]} -eq 1 ]] && usage && die "Wrong number of arguments"
 
@@ -52,7 +51,7 @@ parse_params() {
   else
     version=${args[1]}
     [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && \
-usage && die "Wrong version"
+usage && die "Wrong version $version"
     compose_command=${args[*]:2}
   fi
   return 0
