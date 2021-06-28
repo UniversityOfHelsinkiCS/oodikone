@@ -31,7 +31,7 @@ const AgeFilter = () => {
 
   const filterFunctions = limit => ({
     min: student => getAge(student.birthdate) >= Number(limit),
-    max: student => getAge(student.birthdate) < Number(limit)
+    max: student => getAge(student.birthdate) < Number(limit),
   })
 
   const updateFilters = key => {
@@ -59,10 +59,12 @@ const AgeFilter = () => {
     return () => clearTimeout(timer)
   }, [updatedAt])
 
-  const onChange = key => (_, { value }) => {
-    setCurrentValue({ [key]: value })
-    setUpdatedAt(prev => ({ ...prev, [key]: now() }))
-  }
+  const onChange =
+    key =>
+    (_, { value }) => {
+      setCurrentValue({ [key]: value })
+      setUpdatedAt(prev => ({ ...prev, [key]: now() }))
+    }
 
   const onKeyDown = key => event => {
     if (event.keyCode === 13) {
@@ -75,7 +77,7 @@ const AgeFilter = () => {
   const active = Object.values(names).some(name => Object.keys(activeFilters).includes(name))
 
   return (
-    <FilterCard title="Age" active={active} className="total-age-filter" contextKey={contextKey} name="age-filter">
+    <FilterCard title="Age" active={active} className="total-age-filter" contextKey={contextKey} name="ageFilter">
       <Form>
         <div className="card-content">
           {Object.keys(currentValue).map(key => (
@@ -86,7 +88,7 @@ const AgeFilter = () => {
                 onChange={onChange(key)}
                 value={currentValue[key]}
                 onKeyDown={onKeyDown(key)}
-                data-cy={`age-filter-${key}`}
+                data-cy={`ageFilter-${key}`}
                 style={{ width: '100px' }}
               />
             </Form.Field>
