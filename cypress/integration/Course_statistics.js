@@ -101,7 +101,6 @@ describe("Course Statistics tests", () => {
     cy.contains(courseCode);
   });
 
-
   describe("When searching unified course stats", () => {
     beforeEach(() => {
       cy.url().should("include", "/coursestatistics");
@@ -112,7 +111,7 @@ describe("Course Statistics tests", () => {
       cy.contains("Fetch statistics").should("be.enabled").click();
       cy.contains("Search for courses").should("not.exist");
       cy.contains(
-          "TKT10002, 581325, AYTKT10002, A581325 Ohjelmoinnin perusteet"
+        "TKT10002, 581325, AYTKT10002, A581325 Ohjelmoinnin perusteet"
       );
     });
 
