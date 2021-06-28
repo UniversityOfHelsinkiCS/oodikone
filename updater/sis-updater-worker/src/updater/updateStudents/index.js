@@ -8,24 +8,19 @@ const {
   Credit,
   CreditTeacher,
   Transfer,
-  CourseProvider
+  CourseProvider,
 } = require('../../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
 const { getEducation, getUniOrgId, loadMapsIfNeeded, getEducationType } = require('../shared')
-const {
-  studentMapper,
-  mapTeacher,
-  creditMapper,
-  semesterEnrollmentMapper,
-  courseProviderMapper
-} = require('../mapper')
+const { studentMapper, mapTeacher, creditMapper, semesterEnrollmentMapper, courseProviderMapper } = require('../mapper')
+
 const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 
 // Group snapshots by studyright id and find out when studyrights have begun
-const groupStudyrightSnapshots = (studyrightSnapshots) => {
+const groupStudyrightSnapshots = studyrightSnapshots => {
   const snapshotsBystudyright = Object.entries(
     groupBy(
       studyrightSnapshots.filter(s => s.document_state === 'ACTIVE'),
@@ -36,18 +31,24 @@ const groupStudyrightSnapshots = (studyrightSnapshots) => {
   return snapshotsBystudyright.reduce((res, [id, snapshots]) => {
     const byPhases = s => {
       const phase1 = s.accepted_selection_path.educationPhase1GroupId
-      const phase2 = s.accepted_selection_path.educationPhase2GroupId ? s.accepted_selection_path.educationPhase2GroupId : 'none'
+      const phase2 = s.accepted_selection_path.educationPhase2GroupId
+        ? s.accepted_selection_path.educationPhase2GroupId
+        : 'none'
       return `${phase1}-${phase2}`
     }
 
-    const orderedSnapshots = orderBy(snapshots, [s => new Date(s.snapshot_date_time), s =>  Number(s.modification_ordinal)], ['desc', 'desc'] )
+    const orderedSnapshots = orderBy(
+      snapshots,
+      [s => new Date(s.snapshot_date_time), s => Number(s.modification_ordinal)],
+      ['desc', 'desc']
+    )
 
     const groupedByPhases = groupBy(orderedSnapshots, byPhases)
-    
+
     const snapshotsWithRightDate = Object.keys(groupedByPhases).map(key => {
       const snapshots = groupedByPhases[key]
       const most_recent = snapshots[0]
-      const the_first = snapshots[snapshots.length-1]
+      const the_first = snapshots[snapshots.length - 1]
       most_recent.first_snapshot_date_time = the_first.snapshot_date_time
 
       return most_recent
@@ -61,7 +62,6 @@ const groupStudyrightSnapshots = (studyrightSnapshots) => {
 
 const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber) => {
   const getTransfersFrom = (orderedSnapshots, studyrightid, educationId) => {
-
     return orderedSnapshots.reduce((curr, snapshot, i) => {
       if (i === 0) return curr
 
@@ -106,7 +106,7 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
         targetcode,
         transferdate: new Date(snapshot.snapshot_date_time),
         studentnumber: personIdToStudentNumber[snapshot.person_id],
-        studyrightid: mappedId
+        studyrightid: mappedId,
       })
 
       return curr
@@ -119,9 +119,7 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
     transfers.push(...getTransfersFrom(orderedSnapshots, snapshots[0].id, snapshots[0].education_id))
   })
   return transfers
-
 }
-
 
 const updateStudents = async personIds => {
   await loadMapsIfNeeded()
@@ -131,7 +129,7 @@ const updateStudents = async personIds => {
     selectFromByIds('studyrights', personIds, 'person_id'),
     selectFromByIds('attainments', personIds, 'person_id'),
     selectFromByIds('term_registrations', personIds, 'student_id'),
-    selectFromByIds('study_right_primalities', personIds, 'student_id')
+    selectFromByIds('study_right_primalities', personIds, 'student_id'),
   ])
 
   const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
@@ -154,16 +152,22 @@ const updateStudents = async personIds => {
 
   const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
     updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
-    updateStudyRights(groupedStudyRightSnapshots, personIdToStudentNumber, personIdToStudyRightIdToPrimality)
+    updateStudyRights(groupedStudyRightSnapshots, personIdToStudentNumber, personIdToStudyRightIdToPrimality),
   ])
 
   const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)
 
   await Promise.all([
-    updateStudyRightElements(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights, mappedTransfers),
+    updateStudyRightElements(
+      groupedStudyRightSnapshots,
+      moduleGroupIdToCode,
+      personIdToStudentNumber,
+      formattedStudyRights,
+      mappedTransfers
+    ),
     updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber),
-    await bulkCreate(Transfer, mappedTransfers)
+    await bulkCreate(Transfer, mappedTransfers),
   ])
 }
 
@@ -178,7 +182,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       'modules',
       attainments.map(a => a.module_group_id).filter(id => !!id),
       'group_id'
-    )
+    ),
   ])
 
   const courseUnitIdToCourseGroupId = courseUnits.reduce((res, curr) => {
@@ -192,62 +196,73 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   }, {})
 
   const idsOfFaculties = dbConnections.knex
-    .select('id').from('organisations').where('parent_id','hy-university-root-id')
+    .select('id')
+    .from('organisations')
+    .where('parent_id', 'hy-university-root-id')
 
-  const idsOfDegreeProgrammes = new Set(await dbConnections.knex
-    .select('id').from('organisations').whereIn('parent_id', idsOfFaculties)
-    .map(org => org.id))
+  const idsOfDegreeProgrammes = new Set(
+    await dbConnections.knex
+      .select('id')
+      .from('organisations')
+      .whereIn('parent_id', idsOfFaculties)
+      .map(org => org.id)
+  )
 
   const courseGroupIdToCourseCode = (
     await Course.findAll({
       where: {
         id: {
-          [Op.in]: Object.values(courseUnitIdToCourseGroupId)
-        }
-      }
+          [Op.in]: Object.values(courseUnitIdToCourseGroupId),
+        },
+      },
     })
   ).reduce((res, curr) => {
     res[curr.id] = curr.code
     return res
   }, {})
 
-  const properAttainmentTypes = new Set(['CourseUnitAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment'])
+  const properAttainmentTypes = new Set([
+    'CourseUnitAttainment',
+    'ModuleAttainment',
+    'DegreeProgrammeAttainment',
+    'CustomCourseUnitAttainment',
+    'CustomModuleAttainment',
+  ])
   const creditTeachers = []
 
   const coursesToBeCreated = new Map()
   const courseProvidersToBeCreated = []
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
-  const fixCustomCourseUnitAttainments = async (attainments) => {
-
-    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async (att) => {
+  const fixCustomCourseUnitAttainments = async attainments => {
+    const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
       if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') return att
       const courseUnits = courses.filter(c => c.code === attIdToCourseCode[att.id])
       let courseUnit = courseUnits.find(cu => {
         const { startDate, endDate } = cu.validity_period
         const attainment_date = new Date(att.attainment_date)
-  
+
         const isAfterStart = new Date(startDate) <= attainment_date
         const isBeforeEnd = !endDate || new Date(endDate) > attainment_date
-  
+
         return isAfterStart && isBeforeEnd
       })
-  
-      // Sometimes registrations are fakd, see attainment hy-opinto-141561630. 
-      // The attainmentdate is outside of all courses, yet should be mapped. 
+
+      // Sometimes registrations are fakd, see attainment hy-opinto-141561630.
+      // The attainmentdate is outside of all courses, yet should be mapped.
       // Try to catch suitable courseUnit for this purpose
       if (!courseUnit) {
         courseUnit = courseUnits.find(cu => {
           const { startDate, endDate } = cu.validity_period
           const date = new Date(att.registration_date)
-    
+
           const isAfterStart = new Date(startDate) <= date
           const isBeforeEnd = !endDate || new Date(endDate) > date
-    
+
           return isAfterStart && isBeforeEnd
         })
       }
-  
+
       // If there's no suitable courseunit, there isn't courseunit available at all.
       // --> Course should be created, if it doesn't exist in sis db
       if (!courseUnit) {
@@ -255,7 +270,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
         // see if course exists
         const course = await Course.findOne({
           where: {
-            code: parsedCourseCode
+            code: parsedCourseCode,
           },
         })
 
@@ -265,14 +280,14 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             id: parsedCourseCode,
             name: att.name,
             code: parsedCourseCode,
-            coursetypecode: att.study_level_urn  
+            coursetypecode: att.study_level_urn,
           })
         }
 
         // see if course has provider
         const courseProvider = await CourseProvider.findOne({
           where: {
-            coursecode: course.id
+            coursecode: course.id,
           },
         })
 
@@ -281,9 +296,10 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
           const mapCourseProvider = courseProviderMapper(parsedCourseCode)
 
           // Only map provider if its responsible and its degree programme
-          const correctProvider = att.organisations.find(o =>
-            idsOfDegreeProgrammes.has(o.organisationId) &&
-            o.roleUrn == 'urn:code:organisation-role:responsible-organisation'
+          const correctProvider = att.organisations.find(
+            o =>
+              idsOfDegreeProgrammes.has(o.organisationId) &&
+              o.roleUrn == 'urn:code:organisation-role:responsible-organisation'
           )
           if (correctProvider) {
             courseProvidersToBeCreated.push(mapCourseProvider(correctProvider))
@@ -301,17 +317,17 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
 
       return { ...att, course_unit_id: courseUnit.id }
     }
-  
+
     const findMissingCourseCodes = (attainmentIdCodeMap, att) => {
       if (att.type !== 'CustomCourseUnitAttainment' && att.type !== 'CustomModuleAttainment') {
         return attainmentIdCodeMap
       }
       if (!att.code) return attainmentIdCodeMap
-      
-      const codeParts = att.code.split("-")
+
+      const codeParts = att.code.split('-')
       if (!codeParts.length) return attainmentIdCodeMap
 
-      let parsedCourseCode = ""
+      let parsedCourseCode = ''
       if (codeParts.length === 1) parsedCourseCode = codeParts[0]
       else {
         if (codeParts[1].length < 7) {
@@ -326,7 +342,11 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     const attainmentIdCourseCodeMapForCustomCourseUnitAttainments = attainments.reduce(findMissingCourseCodes, {})
     const missingCodes = Object.values(attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
     const courses = await getCourseUnitsByCodes(missingCodes)
-    return await Promise.all(attainments.map(addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)))
+    return await Promise.all(
+      attainments.map(
+        addCourseUnitToCustomCourseUnitAttainments(courses, attainmentIdCourseCodeMapForCustomCourseUnitAttainments)
+      )
+    )
   }
 
   const fixedAttainments = await fixCustomCourseUnitAttainments(attainments)
@@ -334,17 +354,19 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const customTypes = new Set(['CustomModuleAttainment', 'CustomCourseUnitAttainment'])
 
   // If an attainment has been attached to two degrees, a duplicate custom attainment is made for it. This duplicate
-  // should not show in the students attainments 
+  // should not show in the students attainments
   const doubleAttachment = (att, attainments) => {
-    if (!customTypes.has(att.type) && att.state !== "INCLUDED") {
+    if (!customTypes.has(att.type) && att.state !== 'INCLUDED') {
       return false
     }
 
     let isDoubleAttachment = false
-    const idParts = att.id.split("-")
+    const idParts = att.id.split('-')
     if (idParts && idParts.length > 3) {
       const originalId = `${idParts[0]}-${idParts[1]}-${idParts[2]}`
-      isDoubleAttachment = attainments.some((a) => originalId === a.id && String(a.attainment_date) === String(att.attainment_date))
+      isDoubleAttachment = attainments.some(
+        a => originalId === a.id && String(a.attainment_date) === String(att.attainment_date)
+      )
     }
 
     return isDoubleAttachment
@@ -360,7 +382,13 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
 
   const credits = fixedAttainments
     .filter(a => a !== null)
-    .filter(a => properAttainmentTypes.has(a.type) && !a.misregistration && !attainmentsToBeExluced.has(a.id) && !doubleAttachment(a, fixedAttainments))
+    .filter(
+      a =>
+        properAttainmentTypes.has(a.type) &&
+        !a.misregistration &&
+        !attainmentsToBeExluced.has(a.id) &&
+        !doubleAttachment(a, fixedAttainments)
+    )
     .map(a => {
       a.acceptor_persons
         .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
@@ -373,7 +401,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     })
     .filter(c => !!c)
 
-  const courses = Array.from(coursesToBeCreated.values())  
+  const courses = Array.from(coursesToBeCreated.values())
 
   await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
@@ -383,7 +411,8 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     null,
     ['composite']
   )
-  await bulkCreate(CourseProvider, 
+  await bulkCreate(
+    CourseProvider,
     uniqBy(courseProvidersToBeCreated, cP => cP.composite),
     null,
     ['composite']
@@ -401,7 +430,7 @@ const updateTeachers = async attainments => {
 
   const personIdToEmployeeNumber = {}
   const teachers = (await selectFromByIds('persons', acceptorPersonIds))
-    .filter(p => !!p.employee_number && p.date_of_birth && p.first_names)    
+    .filter(p => !!p.employee_number && p.date_of_birth && p.first_names)
     .map(p => {
       personIdToEmployeeNumber[p.id] = p.employee_number
       return mapTeacher(p)
@@ -413,17 +442,17 @@ const updateTeachers = async attainments => {
 }
 
 // why we are using two terms for the same thing: term registration and semester enrollment
-const semesterEnrolmentsOfStudent = (allSementerEnrollments) => {
+const semesterEnrolmentsOfStudent = allSementerEnrollments => {
   const semesters = uniq(allSementerEnrollments.map(s => s.semestercode))
   const semesterEnrollments = semesters.map(semester => {
     const enrolmentsForSemster = allSementerEnrollments.filter(se => se.semestercode === semester)
 
     const present = enrolmentsForSemster.find(se => se.enrollmenttype === 1)
-    if ( present ) {
+    if (present) {
       return present
     }
     const absent = enrolmentsForSemster.find(se => se.enrollmenttype === 2)
-    if ( absent ) {
+    if (absent) {
       return absent
     }
 
@@ -452,12 +481,12 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
       )
   )
 
-  const enrolmentsByStudents = groupBy(allSementerEnrollments, (e) => e.studentnumber)
+  const enrolmentsByStudents = groupBy(allSementerEnrollments, e => e.studentnumber)
   const semesterEnrollments = flatten(Object.values(enrolmentsByStudents).map(semesterEnrolmentsOfStudent))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }
 
 module.exports = {
-  updateStudents
+  updateStudents,
 }
