@@ -13,5 +13,5 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-import './commands'
-import './populationStatistics'
+import "./commands";
+import "./populationStatistics";
