@@ -40,6 +40,6 @@
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
     "concurrently": "^6.2.0",
-    "cypress": "^7.5.0"
+    "cypress": "^7.6.0"
   }
 }
