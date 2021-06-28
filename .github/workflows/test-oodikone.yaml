@@ -431,7 +431,10 @@ jobs:
     - lint_backend
     - lint_frontend
     - lint_userservice
-    - test_end_to_end
+    - test_course_population
+    - test_course_statistics
+    - test_custom_population
+    - test_filters
     - test_service_exit_statuses
     - push_to_dockerhub
     if: failure()
