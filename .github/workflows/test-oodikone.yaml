@@ -159,8 +159,8 @@ jobs:
 
   # === End-to-end tests ===
 
-  test_end_to_end:
-    name: "Run end-to-end tests"
+  test_course_population:
+    name: "Test course population"
     needs:
       - build_analytics
       - build_backend
@@ -195,6 +195,145 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
+          spec: cypress/integration/Course_population.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: Upload video
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_course_statistics:
+    name: "Test course statistics"
+    needs:
+      - build_analytics
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Login to toska docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: Run services, pull rest of the needed images
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - name: Run cypress
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Course_statistics.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: Upload video
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_custom_population:
+    name: "Test custom population"
+    needs:
+      - build_analytics
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Login to toska docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: Run services, pull rest of the needed images
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - name: Run cypress
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Custom_population.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: Upload video
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_filters:
+    name: "Test filters"
+    needs:
+      - build_analytics
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Login to toska docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: Run services, pull rest of the needed images
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - name: Run cypress
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Filters.js
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: Upload video
@@ -254,7 +393,10 @@ jobs:
     - lint_backend
     - lint_frontend
     - lint_userservice
-    - test_end_to_end
+    - test_course_population
+    - test_course_statistics
+    - test_custom_population
+    - test_filters
     - test_service_exit_statuses
     runs-on: ubuntu-latest
     env:
