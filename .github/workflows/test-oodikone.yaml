@@ -1,4 +1,4 @@
-name: Test oodikone
+name: "Test oodikone"
 
 on:
   push:
@@ -6,52 +6,19 @@ on:
       - master
     paths:
       - .github/workflows/test-oodikone.yaml
-      - cypress.json
       - cypress/**
-      - services/**
-      - package*.json
-  pull_request:
-    branches:
-      - master
-    paths:
-      - .github/workflows/test-oodikone.yaml
       - cypress.json
-      - cypress/**
       - services/**
+      - docker-compose.ci.yml
+      - nginx.conf
       - package*.json
+      - run.sh
 
 jobs:
-  # === Detect changes ===
-
-  changes:
-    name: "Detect if paths have changed"
-    runs-on: ubuntu-latest
-    outputs:
-      analytics: ${{ steps.filter.outputs.analytics }}
-      backend: ${{ steps.filter.outputs.backend }}
-      frontend: ${{ steps.filter.outputs.frontend }}
-      userservice: ${{ steps.filter.outputs.userservice }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-          filters: |
-            analytics:
-              - 'services/oodikone2-analytics/**'
-            backend:
-              - 'services/backend/oodikone2-backend/**'
-            frontend:
-              - 'services/oodikone2-frontend/**'
-            userservice:
-              - 'services/oodikone2-userservice/**'
-
   # === Static tests / linting ===
 
   lint_analytics:
     name: "Lint analytics"
-    needs: changes
-    if: ${{ needs.changes.outputs.analytics == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -67,8 +34,6 @@ jobs:
         run: npm run lint
   lint_backend:
     name: "Lint backend"
-    needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -84,8 +49,6 @@ jobs:
         run: npm run lint
   lint_frontend:
     name: "Lint frontend"
-    needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -101,8 +64,6 @@ jobs:
         run: npm run lint
   lint_userservice:
     name: "Lint userservice"
-    needs: changes
-    if: ${{ needs.changes.outputs.userservice == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -319,3 +280,27 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: "Push to docker hub"
         run: ./run.sh oodikone ci push
+
+  report_failure:
+    runs-on: ubuntu-latest
+    name: Report test failure to oodikone notifications
+    needs:
+    - lint_analytics
+    - lint_backend
+    - lint_frontend
+    - lint_userservice
+    - test_end_to_end
+    - test_service_exit_statuses
+    - push_to_dockerhub
+    if: failure()
+    steps:
+      - name: "Extract branch name"
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: extract_branch
+      - name: "Send notification to slack"
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.0.1
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          header: ":rocket_down: Tests failed on ${{ steps.extract_branch.outputs.branch }}"
+          body: "Oh no, <https://github.com/UniversityOfHelsinkiCS/oodikone/actions/runs/${{ github.run_id }}/workflow> run by ${{ github.actor }} has failed on branch ${{ steps.extract_branch.outputs.branch }}"
