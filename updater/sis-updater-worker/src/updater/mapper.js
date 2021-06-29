@@ -217,8 +217,9 @@ const courseProviderMapper = courseGroupId => ({ organisationId }) => ({
 
 const timify = t => new Date(t).getTime()
 
-const courseMapper = courseIdToAttainments => ([groupId, courses]) => {
-  const { code, name, study_level: coursetypecode, substitutions } = courses[0]
+const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => {
+  const [groupId, courses] = groupedCourse
+  const { code, name, study_level: coursetypecode } = courses[0]
 
   const { min: startdate, max: enddate } = getMinMaxDate(
     courses,

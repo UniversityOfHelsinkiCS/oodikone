@@ -31,11 +31,13 @@ export const makeSortCourseInstances = () => createSelector(getInstanceData, sor
 
 export const makeSortCourses = () => createSelector(getData, sortCourses)
 
-export const getCourseSearchResults = state =>
-  state.courseSearch.data.courses
+export const getCourseSearchResults = state => {
+  // console.log('state: ', state)
+  return state.courseSearch.data.courses
     ? {
         courses: state.courseSearch.data.courses,
         groups: state.courseSearch.data.groups,
+        newMeta: state.courseSearch.data.newMeta,
         groupMeta: Object.entries(state.courseSearch.data.groupMeta).reduce((res, [groupId, { name, ...rest }]) => {
           res[groupId] = {
             ...rest,
@@ -47,5 +49,7 @@ export const getCourseSearchResults = state =>
     : {
         courses: [],
         groups: {},
-        groupMeta: {}
+        groupMeta: {},
+        newMeta: {}
       }
+}
