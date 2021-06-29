@@ -61,18 +61,27 @@ describe("Population Statistics", () => {
     });
   });
 
-  it.skip("Credit filter works", () => {
-    cy.cs("credit-filter-header").click();
-    cy.cs("credit-filter-min").click().type("50{enter}");
-    checkFilteringResult(98);
-    cy.cs("credit-filter-max").click().type("100{enter}");
-    checkFilteringResult(88);
-    cy.cs("credit-filter-min-clear").click();
-    checkFilteringResult(209);
-    cy.cs("credit-filter-max-clear").click();
-    checkFilteringResult(219, true);
+  it("Credit filter works", () => {
+    runTestStepWithPreAndPostParts("credit-filter-header", () => {
+        cy.cs("credit-filter-min").type("50");
+        cy.cs("credit-filter-max").type("150");
+        checkFilteringResult(26);
+        cy.cs("credit-filter-min").find("input").clear();
+        cy.cs("credit-filter-max").find("input").clear();
+    });
   });
 
+  it("Age filter works", () => {
+    runTestStepWithPreAndPostParts("ageFilter-header", () => {
+      cy.cs("ageFilter-min").type("20");
+      cy.cs("ageFilter-max").type("40");
+      checkFilteringResult(13);
+      cy.cs("ageFilter-min").find("input").clear();
+      cy.cs("ageFilter-max").find("input").clear();
+    })
+  });
+
+  // Can't be tested yet, since anon data doesn't provide enough information for this, fix
   it.skip("Gender filter works", () => {
     cy.cs("genderFilter-header").click();
     cy.selectFromDropdown("genderFilter-dropdown", 0);
@@ -85,28 +94,27 @@ describe("Population Statistics", () => {
     checkFilteringResult(219, true);
   });
 
-  it.skip("Starting year filter works", () => {
-    cy.cs("startYearAtUni-header").click();
-    cy.selectFromDropdown("startYearAtUni-dropdown", [16]);
-    checkFilteringResult(13);
-    cy.cs("startYearAtUni-clear").click();
-    checkFilteringResult(219, true);
+  it("Starting year filter works", () => {
+    runTestStepWithPreAndPostParts("startYearAtUni-header", () => {
+      cy.selectFromDropdown("startYearAtUni-dropdown", [0]);
+      checkFilteringResult(1);
+      clearSemanticUIMultipleDropDownSelection("startYearAtUni-dropdown")
+    })
   });
 
-  it.skip("Courses filter works", () => {
-    cy.cs("courseFilter-header").click();
-    cy.cs("courseFilter-course-dropdown").click().contains("MAT11002").click();
-    checkFilteringResult(82);
-    cy.selectFromDropdown("courseFilter-MAT11002-dropdown", 1);
-    checkFilteringResult(75);
-    cy.cs("courseFilter-course-dropdown").click().contains("TKT20001").click();
-    checkFilteringResult(62);
-    cy.selectFromDropdown("courseFilter-TKT20001-dropdown", 6);
-    checkFilteringResult(24);
-    cy.cs("courseFilter-MAT11002-clear").click();
-    checkFilteringResult(125);
-    cy.cs("courseFilter-TKT20001-clear").click();
-    checkFilteringResult(219, true);
+  it("Courses filter works", () => {
+    runTestStepWithPreAndPostParts("courseFilter-header", () => {
+      const courses = ["DATA15001", "MAT11003"]
+      cy.cs("courseFilter-course-dropdown").click().contains(courses[0]).click();
+      checkFilteringResult(15);
+      cy.selectFromDropdown(`courseFilter-${courses[0]}-dropdown`, 1);
+      checkFilteringResult(13);
+      cy.cs("courseFilter-course-dropdown").click().contains(courses[1]).click();
+      checkFilteringResult(9);
+      cy.selectFromDropdown(`courseFilter-${courses[1]}-dropdown`, 3);
+      checkFilteringResult(1);
+      courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
+    })
   });
 });
 
@@ -157,7 +165,7 @@ describe("Course Statistics", () => {
     runTestStepWithPreAndPostParts("startYearAtUni-header", () => {
       cy.selectFromDropdown("startYearAtUni-dropdown", [0]);
       checkFilteringResult(1);
-      cy.cs("startYearAtUni-dropdown").get("i.delete").click();
+      clearSemanticUIMultipleDropDownSelection("startYearAtUni-dropdown")
     })
   });
 
