@@ -16,7 +16,7 @@ import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import SearchHistory from '../../SearchHistory'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import filterCourseSearchResults from './searchFormUtils'
+import filterCourseSearchResults, { newFilterSearchResults } from './searchFormUtils'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Course statistics search', action, name, value)
 
@@ -55,6 +55,7 @@ const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchin
 }
 
 const SearchForm = props => {
+  console.log('matchingCourses: ', props.matchingCourses)
   const { language } = useLanguage()
   const [state, setState] = useState({
     ...INITIAL
@@ -348,12 +349,13 @@ SearchForm.propTypes = {
 }
 
 const mapStateToProps = state => {
-  const { groups, courses, groupMeta } = getCourseSearchResults(state)
+  const { groups, courses, groupMeta, newMeta } = getCourseSearchResults(state)
   const { pending: courseStatsPending } = state.courseStats
   const { unifyOpenUniCourses } = state.courseSearch
 
   return {
-    matchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses),
+    matchingCourses: newFilterSearchResults(newMeta, groups, unifyOpenUniCourses),
+    newMatchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses, newMeta),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending,
     unifyOpenUniCourses
