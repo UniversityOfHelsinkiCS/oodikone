@@ -2,28 +2,30 @@
 
 const checkFilteringResult = (studentCount) => {
   cy.contains(`Students (${studentCount})`);
-  // I don't know why this got fkd but we don't have time to fix it now. Works acually, though.
-  // cy.cs("active-filter-count").should(noFiltering ? "not.exist" : "exist")
 };
 
 describe("Population Statistics", () => {
+
+  const amountWithoutFiltering = 40
+  const checkFilteringResultIsAmountWithoutFiltering = () => checkFilteringResult(amountWithoutFiltering)
+
   before(() => {
     cy.init();
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma");
+    checkFilteringResultIsAmountWithoutFiltering()
   });
 
-  // anon data doesn't work with current population statistic logic, so we need to skip
-  // these
-  it.skip("Graduation filter works", () => {
+  it("Graduation filter works", () => {
     cy.cs("graduatedFromProgrammeFilter-header").click();
-    cy.selectFromDropdown("graduatedFromProgrammeFilter-dropdown", 0);
-    checkFilteringResult(193);
-    cy.selectFromDropdown("graduatedFromProgrammeFilter-dropdown", 1);
-    checkFilteringResult(1);
-    cy.cs("graduatedFromProgrammeFilter-clear").click();
-    checkFilteringResult(194, true);
+    cy.cs("graduatedFromProgrammeFilter-graduated-true").click()
+    checkFilteringResult(10);
+    cy.cs("graduatedFromProgrammeFilter-graduated-false").click()
+    checkFilteringResult(30);
+    cy.cs("graduatedFromProgrammeFilter-all").click()
+    checkFilteringResultIsAmountWithoutFiltering()
   });
 
+  // Can't be tested yet, since anon data doesn't provide enough information for this, fix
   it.skip("Transfer filter works", () => {
     cy.cs("transferredToProgrammeFilter-header").click();
     cy.cs("transferredToProgrammeFilter-have").click();
@@ -34,16 +36,13 @@ describe("Population Statistics", () => {
     checkFilteringResult(219, true);
   });
 
-  it.skip("Enrollment filter works", () => {
+  it("Enrollment filter works", () => {
     cy.cs("enrollmentStatusFilter-header").click();
     cy.selectFromDropdown("enrollmentStatusFilter-status", 0);
-    checkFilteringResult(219, true);
-    cy.selectFromDropdown("enrollmentStatusFilter-semesters", [0, 0]);
-    checkFilteringResult(202);
-    cy.selectFromDropdown("enrollmentStatusFilter-status", 1);
-    checkFilteringResult(13);
-    cy.cs("enrollmentStatusFilter-clear").click();
-    checkFilteringResult(219, true);
+    cy.selectFromDropdown("enrollmentStatusFilter-semesters", [0]);
+    checkFilteringResult(36);
+    cy.cs("enrollmentStatusFilter-semesters").get("i.delete").click();
+    checkFilteringResult(40);
   });
 
   it.skip("Credit filter works", () => {
