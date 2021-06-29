@@ -4,25 +4,41 @@ const checkFilteringResult = (studentCount) => {
   cy.contains(`Students (${studentCount})`);
 };
 
+// Semantic UI doesn't allow injection of data-cy:s for single multiple dropdown selection.
+// This function tries to click "x" on all selections inside dropdown matching given attribute
+const clearSemanticUIMultipleDropDownSelection = dataCyAttribute => {
+  cy.cs(dataCyAttribute).find("i.delete").click();
+}
+
+// Helper tool to create pre and post steps for each filter step. Created to avoid copypasting clicking and checking
+// to every it-function. Reason behind using test function wrapper is that Cypresses internal beforeEach / afterEach
+// functions don't take any parameters and using global object for matching test step name seemed overcomplicated.
+const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
+  return (dataCyAttributeOfHeaderToClick, testStepFunctionToRun) => {
+    cy.cs(dataCyAttributeOfHeaderToClick).click();
+    checkFilteringResult(amountWithoutFiltering);
+    testStepFunctionToRun();
+    checkFilteringResult(amountWithoutFiltering);
+    cy.cs(dataCyAttributeOfHeaderToClick).click();
+  }
+}
+
 describe("Population Statistics", () => {
 
-  const amountWithoutFiltering = 40
-  const checkFilteringResultIsAmountWithoutFiltering = () => checkFilteringResult(amountWithoutFiltering)
-
+  const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(40)
   before(() => {
     cy.init();
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma");
-    checkFilteringResultIsAmountWithoutFiltering()
   });
 
   it("Graduation filter works", () => {
-    cy.cs("graduatedFromProgrammeFilter-header").click();
-    cy.cs("graduatedFromProgrammeFilter-graduated-true").click()
-    checkFilteringResult(10);
-    cy.cs("graduatedFromProgrammeFilter-graduated-false").click()
-    checkFilteringResult(30);
-    cy.cs("graduatedFromProgrammeFilter-all").click()
-    checkFilteringResultIsAmountWithoutFiltering()
+    runTestStepWithPreAndPostParts("graduatedFromProgrammeFilter-header", () => {
+      cy.cs("graduatedFromProgrammeFilter-graduated-true").click()
+      checkFilteringResult(10);
+      cy.cs("graduatedFromProgrammeFilter-graduated-false").click()
+      checkFilteringResult(30);
+      cy.cs("graduatedFromProgrammeFilter-all").click()
+    })
   });
 
   // Can't be tested yet, since anon data doesn't provide enough information for this, fix
@@ -37,12 +53,12 @@ describe("Population Statistics", () => {
   });
 
   it("Enrollment filter works", () => {
-    cy.cs("enrollmentStatusFilter-header").click();
-    cy.selectFromDropdown("enrollmentStatusFilter-status", 0);
-    cy.selectFromDropdown("enrollmentStatusFilter-semesters", [0]);
-    checkFilteringResult(36);
-    cy.cs("enrollmentStatusFilter-semesters").get("i.delete").click();
-    checkFilteringResult(40);
+    runTestStepWithPreAndPostParts("enrollmentStatusFilter-header", () => {
+      cy.selectFromDropdown("enrollmentStatusFilter-status", 0);
+      cy.selectFromDropdown("enrollmentStatusFilter-semesters", [0]);
+      checkFilteringResult(36);
+      clearSemanticUIMultipleDropDownSelection("enrollmentStatusFilter-semesters")
+    });
   });
 
   it.skip("Credit filter works", () => {
@@ -95,6 +111,8 @@ describe("Population Statistics", () => {
 });
 
 describe("Course Statistics", () => {
+
+  const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(27)
   before(() => {
     cy.init();
     cy.cs("navbar-courseStatistics").click();
@@ -103,78 +121,58 @@ describe("Course Statistics", () => {
     cy.contains("td", /^TKT20001/).click();
     cy.contains("Fetch statistics").should("be.enabled").click();
     cy.get(":nth-child(2) > :nth-child(1) > div > .item > .level").click();
-    // check start situation
-    checkFilteringResult(27);
   });
 
   it("Grade filter works", () => {
-    cy.cs("gradeFilter-header").click();
-
-    cy.cs("gradeFilter-5").click();
-    checkFilteringResult(4);
-    cy.cs("gradeFilter-5").click();
-    checkFilteringResult(27);
-
-    cy.cs("gradeFilter-Hyl.").click();
-    checkFilteringResult(4);
-    cy.cs("gradeFilter-Hyl.").click();
-    checkFilteringResult(27);
-
-    cy.cs("gradeFilter-header").click();
+    runTestStepWithPreAndPostParts("gradeFilter-header", () => {
+      cy.cs("gradeFilter-5").click();
+      checkFilteringResult(4);
+      cy.cs("gradeFilter-5").click();
+    });
   });
 
   it("Age filter works", () => {
-    cy.cs("ageFilter-header").click();
-
-    cy.cs("ageFilter-min").type("20");
-    cy.cs("ageFilter-max").type("40");
-    checkFilteringResult(10);
-    cy.cs("ageFilter-min").clear();
-    cy.cs("ageFilter-max").clear();
-    checkFilteringResult(27);
-
-    cy.cs("ageFilter-header").click();
+    runTestStepWithPreAndPostParts("ageFilter-header", () => {
+      cy.cs("ageFilter-min").type("20");
+      cy.cs("ageFilter-max").type("40");
+      checkFilteringResult(10);
+      cy.cs("ageFilter-min").find("input").clear();
+      cy.cs("ageFilter-max").find("input").clear();
+    })
   });
 
   // Doesn't work since anon db genders are missing, fix
   it.skip("Gender filter works", () => {
     cy.cs("genderFilter-header").click();
-
     cy.selectFromDropdown("genderFilter-dropdown", 0);
     checkFilteringResult(19);
     cy.selectFromDropdown("genderFilter-dropdown", 1);
     checkFilteringResult(74);
     cy.selectFromDropdown("genderFilter-dropdown", 2);
     checkFilteringResult(0);
-
     cy.cs("genderFilter-header").click();
   });
 
   it("Starting year filter works", () => {
-    cy.cs("startYearAtUni-header").click();
-
-    cy.selectFromDropdown("startYearAtUni-dropdown", [0]);
-    checkFilteringResult(1);
-    cy.cs("startYearAtUni-dropdown").get("i.delete").click();
-    checkFilteringResult(27);
-
-    cy.cs("startYearAtUni-header").click();
+    runTestStepWithPreAndPostParts("startYearAtUni-header", () => {
+      cy.selectFromDropdown("startYearAtUni-dropdown", [0]);
+      checkFilteringResult(1);
+      cy.cs("startYearAtUni-dropdown").get("i.delete").click();
+    })
   });
 
   it("Filter combinations work", () => {
-    cy.cs("gradeFilter-header").click();
-    cy.cs("gradeFilter-3").click();
-    cy.cs("ageFilter-header").click();
-    cy.cs("ageFilter-min").type("20");
-    cy.cs("ageFilter-max").type("30");
-    checkFilteringResult(1);
-    cy.cs("gradeFilter-3").click();
-    cy.cs("genderFilter-header").click();
-    cy.cs("ageFilter-min").clear();
-    cy.cs("ageFilter-max").clear();
-    cy.cs("ageFilter-header").click();
-
-    checkFilteringResult(27);
+    runTestStepWithPreAndPostParts("gradeFilter-header", () => {
+      runTestStepWithPreAndPostParts("ageFilter-header", () => {
+        cy.cs("gradeFilter-3").click();
+        cy.cs("ageFilter-min").type("20");
+        cy.cs("ageFilter-max").type("30");
+        checkFilteringResult(1);
+        cy.cs("ageFilter-min").find("input").clear();
+        cy.cs("ageFilter-max").find("input").clear();
+        cy.cs("gradeFilter-3").click();
+      });
+    });
   });
 });
 
