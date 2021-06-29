@@ -1,4 +1,5 @@
 {
+  "baseUrl": "http://localhost:8081",
   "projectId": "c3jsph",
   "defaultCommandTimeout": 60000,
   "execTimeout": 60000,

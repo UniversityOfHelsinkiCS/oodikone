@@ -23,8 +23,6 @@ Cypress.Commands.add("init", (path = "") => {
   });
 
   const baseUrl = Cypress.config().baseUrl
-    ? Cypress.config().baseUrl
-    : "http://localhost:8081";
   cy.visit(baseUrl.concat(path));
 });
 
