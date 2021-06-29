@@ -92,6 +92,8 @@ const loginAs = (username) => {
 };
 
 describe("Custom population tests", () => {
+
+  const nonExistentStudentNumbers = ["123", "X", "-", " "];
   beforeEach(() => {
     cy.init("/custompopulation");
     cy.url().should("include", "/custompopulation");
@@ -106,28 +108,28 @@ describe("Custom population tests", () => {
     deleteAllSearches();
   });
 
-  const testStudentNumbers = ["010450938", "010589388", "010614509"];
-  const testStudentNumbers2 = ["010262566", "010307146"];
-  const nonExistentStudentNumbers = ["123", "X", "-", " "];
-
   describe("Custom population searching", () => {
     it("Finds a proper population", () => {
-      // Selected from dataset with creditcount +50
-      searchFor(testStudentNumbers);
-      hasLanded();
-      containsAmountOfStudents(testStudentNumbers.length);
-      containsSpecificStudents(testStudentNumbers);
+      cy.fixture('customPopulations').then(({studentNumbersForCSStudentsSet1}) => {
+        const students = studentNumbersForCSStudentsSet1
+        searchFor(students);
+        hasLanded();
+        containsAmountOfStudents(students.length);
+        containsSpecificStudents(students);
+      })
     });
 
     it("Doesn't return non-existing students", () => {
-      const testStudentNumbersWithSomeNonExistentStudents = [
-        ...testStudentNumbers,
-        ...nonExistentStudentNumbers,
-      ];
-      searchFor(testStudentNumbersWithSomeNonExistentStudents);
-      hasLanded();
-      containsAmountOfStudents(testStudentNumbers.length);
-      containsSpecificStudents(testStudentNumbers);
+      cy.fixture('customPopulations').then(({studentNumbersForCSStudentsSet1}) => {
+        const students = [
+          ...studentNumbersForCSStudentsSet1,
+          ...nonExistentStudentNumbers,
+        ];
+        searchFor(students);
+        hasLanded();
+        containsAmountOfStudents(studentNumbersForCSStudentsSet1.length);
+        containsSpecificStudents(studentNumbersForCSStudentsSet1);
+      });
     });
 
     it("Doesn't find empty custom population", () => {
@@ -158,58 +160,65 @@ describe("Custom population tests", () => {
 
   describe("Custom population search saving", () => {
     it("Saves a custom population search", () => {
-      openCustomPopupForm();
-      const name = fillName();
-      fillForm(testStudentNumbers);
-      save();
+      cy.fixture('customPopulations').then(({studentNumbersForCSStudentsSet1}) => {
+        const students = studentNumbersForCSStudentsSet1
+        openCustomPopupForm();
+        const name = fillName();
+        fillForm(students);
+        save();
 
-      // Round 1
-      selectSavedPopulation(name);
-      search();
-      cy.contains(`Custom population "${name}"`);
-      containsAmountOfStudents(testStudentNumbers.length);
-      containsSpecificStudents(testStudentNumbers);
+        // Round 1
+        selectSavedPopulation(name);
+        search();
+        cy.contains(`Custom population "${name}"`);
+        containsAmountOfStudents(students.length);
+        containsSpecificStudents(students);
 
-      // Round 2
-      cy.visit(`${Cypress.config().baseUrl}/custompopulation`);
-      cy.url().should("include", "/custompopulation");
-      cy.contains("Custom population");
-      cy.get("button").contains("Custom population").click();
-      selectSavedPopulation(name);
-      search();
-      cy.contains(`Custom population "${name}"`);
-      containsAmountOfStudents(testStudentNumbers.length);
-      containsSpecificStudents(testStudentNumbers);
+        // Round 2
+        cy.visit(`${Cypress.config().baseUrl}/custompopulation`);
+        cy.url().should("include", "/custompopulation");
+        cy.contains("Custom population");
+        cy.get("button").contains("Custom population").click();
+        selectSavedPopulation(name);
+        search();
+        cy.contains(`Custom population "${name}"`);
+        containsAmountOfStudents(students.length);
+        containsSpecificStudents(students);
+      });
     });
 
     it("Updates a custom population search", () => {
-      openCustomPopupForm();
-      const name = fillName();
-      fillForm(testStudentNumbers);
-      save();
+      cy.fixture('customPopulations').then(({studentNumbersForCSStudentsSet1, studentNumbersForCSStudentsSet2}) => {
+        const students1 = studentNumbersForCSStudentsSet1
+        const students2 = studentNumbersForCSStudentsSet2
+        openCustomPopupForm();
+        const name = fillName();
+        fillForm(students1);
+        save();
 
-      selectSavedPopulation(name);
-      search();
-      cy.contains(`Custom population "${name}"`);
-      containsAmountOfStudents(testStudentNumbers.length);
-      containsSpecificStudents(testStudentNumbers);
-      cy.contains("Custom population");
-      cy.get("button").contains("Custom population").click();
-      selectSavedPopulation(name);
-      fillForm([...testStudentNumbers, ...testStudentNumbers2]);
-      save();
+        selectSavedPopulation(name);
+        search();
+        cy.contains(`Custom population "${name}"`);
+        containsAmountOfStudents(students1.length);
+        containsSpecificStudents(students1);
+        cy.contains("Custom population");
+        cy.get("button").contains("Custom population").click();
+        selectSavedPopulation(name);
+        fillForm([...students1, ...students2]);
+        save();
 
-      cy.visit(`${Cypress.config().baseUrl}/custompopulation`);
-      cy.url().should("include", "/custompopulation");
-      cy.contains("Custom population");
-      cy.get("button").contains("Custom population").click();
-      selectSavedPopulation(name);
-      search();
-      cy.contains(`Custom population "${name}"`);
-      containsAmountOfStudents(
-        testStudentNumbers.length + testStudentNumbers2.length
-      );
-      containsSpecificStudents([...testStudentNumbers, ...testStudentNumbers2]);
+        cy.visit(`${Cypress.config().baseUrl}/custompopulation`);
+        cy.url().should("include", "/custompopulation");
+        cy.contains("Custom population");
+        cy.get("button").contains("Custom population").click();
+        selectSavedPopulation(name);
+        search();
+        cy.contains(`Custom population "${name}"`);
+        containsAmountOfStudents(
+            students1.length + students2.length
+        );
+        containsSpecificStudents([...students1, ...students2]);
+      });
     });
   });
 });
