@@ -14,4 +14,3 @@
 // ***********************************************************
 
 import "./commands";
-import "./populationStatistics";
