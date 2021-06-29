@@ -31,14 +31,9 @@ const ignores = {
     }
   },
 
-  MH10_001: {
+  MH40_002: {
     2020: {
-      oodi: ['014925414'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
-    }
-  },
-  MH20_001: {
-    2020: {
-      oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2972
+      sis: ['014840890'] // https://jira.it.helsinki.fi/browse/DOO-4572
     }
   },
   MH40_005: {
@@ -66,28 +61,36 @@ const ignores = {
       oodi: ['014404139'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
     }
   },
+  MH70_007: {
+    2020: {
+      sis: ['014918968', '014934081', '014954922', '014887918'] // https://jira.it.helsinki.fi/browse/DOO-4572
+    } 
+  },
   MH80_001: {
     2020: {
       oodi: ['014343643'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
     }
   },
-
   MH60_001: {
     2017: {
       sis: [
-        '014741193' // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014741193' // https://jira.it.helsinki.fi/browse/DOO-4570
       ]
     },
     2019: {
-      oodi: [ '014323074' ]
+      oodi: [ '014323074' ] // https://jira.it.helsinki.fi/browse/DOO-4570
     },
     2020: {
       sis: [
-        '014734511' // https://jira.it.helsinki.fi/browse/DOO-4546
+        '014632846', // https://jira.it.helsinki.fi/browse/DOO-4569
+        '014590027', // https://jira.it.helsinki.fi/browse/DOO-4571
+        '014590807', // https://jira.it.helsinki.fi/browse/DOO-4571
+        '014734511', // https://jira.it.helsinki.fi/browse/DOO-4571
+        '013299358', // https://jira.it.helsinki.fi/browse/DOO-4571
       ],
       oodi: [
-        '014741193', // https://jira.it.helsinki.fi/browse/DOO-4546
-        '014954744' // https://jira.it.helsinki.fi/browse/DOO-4548
+        '014741193', // https://jira.it.helsinki.fi/browse/DOO-4570
+        '014954744', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3046
       ]
     }
   },
