@@ -31,16 +31,6 @@ const ignores = {
     }
   },
 
-  MH10_001: {
-    2020: {
-      oodi: ['014925414'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2900
-    }
-  },
-  MH20_001: {
-    2020: {
-      oodi: ['014509160'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2972
-    }
-  },
   MH40_002: {
     2020: {
       sis: ['014840890'] // https://jira.it.helsinki.fi/browse/DOO-4572
