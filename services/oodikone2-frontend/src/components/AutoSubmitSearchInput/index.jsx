@@ -88,7 +88,7 @@ AutoSubmitSearchInput.defaultProps = {
   placeholder: 'Search...',
   icon: 'search',
   latency: 250,
-  minSearchLength: 4,
+  minSearchLength: 0,
   loading: false,
   disabled: false
 }

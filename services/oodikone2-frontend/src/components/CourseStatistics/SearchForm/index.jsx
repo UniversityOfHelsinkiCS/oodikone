@@ -16,7 +16,7 @@ import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import SearchHistory from '../../SearchHistory'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import filterCourseSearchResults, { newFilterSearchResults } from './searchFormUtils'
+import filterCourseSearchResults from './searchFormUtils'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Course statistics search', action, name, value)
 
@@ -55,7 +55,7 @@ const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchin
 }
 
 const SearchForm = props => {
-  console.log('matchingCourses: ', props.matchingCourses)
+  // console.log('matchingCourses: ', props.matchingCourses)
   const { language } = useLanguage()
   const [state, setState] = useState({
     ...INITIAL
@@ -168,7 +168,7 @@ const SearchForm = props => {
     if (isValidName || isValidCode) {
       return props.findCoursesV2({ name: courseName, code: courseCode })
     }
-    if (courseName.length === 0 && courseCode.length === 0) {
+    if (courseName.length < 5 && courseCode.length < 2) {
       props.clearCourses()
     }
     return Promise.resolve()
@@ -349,13 +349,12 @@ SearchForm.propTypes = {
 }
 
 const mapStateToProps = state => {
-  const { groups, courses, groupMeta, newMeta } = getCourseSearchResults(state)
+  const { courses } = getCourseSearchResults(state)
   const { pending: courseStatsPending } = state.courseStats
   const { unifyOpenUniCourses } = state.courseSearch
-
   return {
-    matchingCourses: newFilterSearchResults(newMeta, groups, unifyOpenUniCourses),
-    newMatchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses, newMeta),
+    matchingCourses: filterCourseSearchResults(courses, unifyOpenUniCourses),
+    // newMatchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses, newMeta),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending,
     unifyOpenUniCourses
