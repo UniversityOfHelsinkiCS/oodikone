@@ -52,10 +52,10 @@ export default () => {
       <div className="card-content">
         <Form>
           {options.map(grade => (
-            <Form.Field key={`grade-filter-option-${grade}`}>
+            <Form.Field key={`${name}-${grade}`}>
               <Checkbox
                 label={
-                  <label data-cy={`grade-option-${grade}`}>
+                  <label data-cy={`${name}-${grade}`}>
                     {grade}
                     <span className="filter-option-count">{`(${grades[grade].length} students)`}</span>
                   </label>
