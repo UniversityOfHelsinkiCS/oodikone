@@ -7,7 +7,7 @@
     "oodikone": "./run.sh oodikone anon up --detach && ./run.sh oodikone logs --follow --tail 100",
     "oodikone:real": "./run.sh oodikone real up --detach && ./run.sh oodikone logs --follow --tail 100",
     "updater": "./run.sh updater anon up --detach && ./run.sh updater logs --follow --tail 100",
-    "updater:real": "./run.sh update real up --detach && ./run.sh updater logs --follow --tail 100",
+    "updater:real": "./run.sh updater real up --detach && ./run.sh updater logs --follow --tail 100",
     "both": "./run.sh both anon up --detach && ./run.sh both logs --follow --tail 100",
     "both:real": "./run.sh both real up --detach && ./run.sh both logs --follow --tail 100",
     "docker:down": "./run.sh both down --remove-orphans",
@@ -40,6 +40,6 @@
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
     "concurrently": "^6.2.0",
-    "cypress": "^7.5.0"
+    "cypress": "^7.6.0"
   }
 }
