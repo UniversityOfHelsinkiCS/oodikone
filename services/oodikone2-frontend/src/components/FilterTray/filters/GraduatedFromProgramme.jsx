@@ -60,24 +60,13 @@ const GraduatedFromProgramme = ({ code }) => {
     >
       <Form>
         <div className="card-content">
-          {/* <Dropdown
-            options={options}
-            value={value}
-            onChange={(_, { value: inputValue }) => setValue(inputValue)}
-            placeholder="Choose Option"
-            className="mini"
-            selection
-            selectOnBlur={false}
-            fluid
-            button
-            data-cy={`${name}-dropdown`}
-          /> */}
           <Form.Field>
             <Radio
               label="All"
               checked={value === null}
               onChange={() => setValue(null)}
               style={{ marginBottom: '0.5rem' }}
+              data-cy={`${name}-all`}
             />
             {options.map(option => (
               <Radio
@@ -87,34 +76,9 @@ const GraduatedFromProgramme = ({ code }) => {
                 style={{ marginBottom: '0.5rem' }}
                 checked={value === option.value}
                 onChange={() => setValue(option.value)}
-                // data-cy={`${name}-have`}
+                data-cy={`${name}-${option.key}`}
               />
             ))}
-            {/* <Radio
-              label="All"
-              name="radioGroup"
-              value="all"
-              // checked={value === 1}
-              // onChange={toggle(1)}
-              // data-cy={`${name}-have`}
-            />
-            <Radio
-              label="Transferred"
-              name="radioGroup"
-              value="this"
-              checked={value === 1}
-              onChange={toggle(1)}
-              data-cy={`${name}-have`}
-              style={{ margin: '0.5rem 0' }}
-            />
-            <Radio
-              label="Not Transferred"
-              name="radioGroup"
-              value="that"
-              checked={value === 0}
-              onChange={toggle(0)}
-              data-cy={`${name}-havenot`}
-            /> */}
           </Form.Field>
         </div>
       </Form>
