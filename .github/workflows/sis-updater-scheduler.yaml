@@ -26,3 +26,10 @@ jobs:
         context: updater/sis-updater-scheduler/
         push: true
         tags: toska/sis-updater-scheduler:latest
+
+    - name: "Send notification to slack"
+      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.0.1
+      with:
+        webhook-url: ${{ secrets.WEBHOOK_URL }}
+        header: Trunk deployed sis-updater-scheduler to production
+        body: "Commit: <https://github.com/UniversityOfHelsinkiCS/oodikone/commit/${{ github.sha }}>"
