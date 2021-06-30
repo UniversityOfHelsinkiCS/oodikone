@@ -1,11 +1,12 @@
-import { actions } from './common/itemreducer'
+// import { actions } from './common/itemreducer'
 import { callController } from '../apiConnection/index'
 
 const prefix = 'GET_COURSE_SEARCH_RESULT_'
 
-const storeActions = actions(prefix)
+// const storeActions = actions(prefix)
 
-export const clearCourses = storeActions.clear
+// export const clearCourses = storeActions.clear
+export const clearCourses = () => ({ type: 'CLEAR COURSES' })
 
 export const findCourses = ({ name, type }, language = 'fi') => {
   const route = '/coursesmulti'
@@ -51,6 +52,11 @@ const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false 
       return {
         ...state,
         unifyOpenUniCourses: !state.unifyOpenUniCourses
+      }
+    case 'CLEAR COURSES':
+      return {
+        ...state,
+        data: {}
       }
     default:
       return state

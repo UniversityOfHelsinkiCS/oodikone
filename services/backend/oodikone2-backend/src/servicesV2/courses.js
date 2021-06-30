@@ -425,7 +425,7 @@ const alternativeCodes = async code => {
   return alternatives ? alternatives : [code]
 }
 
-const getGroupId = async code => {
+/* const getGroupId = async code => {
   const duplicates = await CourseDuplicates.findOne({
     where: {
       coursecode: code
@@ -435,7 +435,7 @@ const getGroupId = async code => {
   const temp = duplicates ? duplicates.groupid : code
   // console.log('temp: ', temp)
   return temp
-}
+} */
 
 const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anonymizationSalt) => {
   const codes = await alternativeCodes(coursecode)
@@ -602,6 +602,16 @@ const nameLikeTerm = name => {
   }
 }
 
+const byCodes = codes => {
+  return Course.findAll({
+    where: {
+      code: {
+        [Op.in]: codes
+      }
+    }
+  })
+}
+
 const codeLikeTerm = code =>
   !code
     ? undefined
@@ -628,7 +638,7 @@ const byNameAndOrCodeLike = async (name, code) => {
       'id',
       'name',
       'code',
-      ['latest_instance_date', 'date'],
+      'latest_instance_date',
       'startdate',
       'enddate',
       'max_attainment_date',
@@ -641,82 +651,33 @@ const byNameAndOrCodeLike = async (name, code) => {
     }
   })
 
-  let groups = {}
-  let groupMeta = {}
-
-  // const codeToMainCourseMap = await getCodeToMainCourseMap()
-  // console.log('codeTomainCourseMap: ', codeToMainCourseMap)
-  /*
-  await Promise.all(
-    // courses.map(
-      course =>
-        new Promise(async res => {
-          const formattedCode = unifyOpenUniversity(course.code)
-          const groupid = await getGroupId(formattedCode)
-          groups[course.code] = groupid
-          if (!groupMeta[groupid]) {
-            const mainCourse = codeToMainCourseMap[formattedCode]
-            if ((mainCourse && !isOpenUniCourseCode(course.code)) || !isOpenUniCourseCode(course.code)) {
-              groupMeta[groupid] = {
-                name: mainCourse ? mainCourse.name : course.name,
-                code: mainCourse ? mainCourse.code : course.code
-              }
-            }
-          }
-          res()
-        })
-    )
-  */
-
-  // cosnt newCoursesToSubstitutionsGroups = {}
-  const newCourses = courses.map(data => data.get())
- 
+  courses = courses.map(data => data.get())
+  console.log('courses: ', courses)
   let substitutionGroupIndex = 0
   const subsGroups = {}
   const visited = []
   const dfs = courseId => {
     if (visited.includes(courseId)) return
     visited.push(courseId)
-    const course = newCourses.find(course => course.id === courseId)
+    const course = courses.find(course => course.id === courseId)
+
     if (!course) return
-    console.log('rekursio: course: ', course)
+
     subsGroups[course.code] = substitutionGroupIndex
     course.subsId = substitutionGroupIndex
-    if (!subGroupMeta[substitutionGroupIndex]) {
-      subGroupMeta[substitutionGroupIndex] = []
-      subGroupMeta[substitutionGroupIndex].push(course)
-    } else {
-      subGroupMeta[substitutionGroupIndex].push(course)
-    }
     for (const courseId of course.substitutions) {
       dfs(courseId)
     }
   }
 
-  const subGroupMeta = {}
-
-  for (const course of newCourses) {
+  for (const course of courses) {
     if (!visited.includes(course.id)) {
       substitutionGroupIndex++
       dfs(course.id)
     }
   }
 
-  groups = newGroups
-  courses = newCourses
-  const newMeta = subGroupMeta
-
-  return { courses, groups, groupMeta, newMeta }
-}
-
-const byCodes = codes => {
-  return Course.findAll({
-    where: {
-      code: {
-        [Op.in]: codes
-      }
-    }
-  })
+  return { courses }
 }
 
 module.exports = {
