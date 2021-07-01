@@ -28,8 +28,23 @@ jobs:
         tags: toska/sis-updater-scheduler:latest
 
     - name: "Send notification to slack"
-      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.3.1
+      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
       with:
         webhook-url: ${{ secrets.WEBHOOK_URL }}
         message-type: deployment
         softa-url: https://oodikone.cs.helsinki.fi
+        deployment-target: production
+
+  report_failure:
+    runs-on: ubuntu-latest
+    name: Report deployment failure to oodikone notifications
+    needs:
+    - build_and_release
+    if: failure()
+    steps:
+      - name: "Send notification to slack"
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment-failure
+          deployment-target: production
