@@ -5,11 +5,11 @@ on:
     branches:
       - trunk
     paths:
-      - '.github/workflows/sis-updater-scheduler.yaml'
+      - '.github/workflows/release-sis-updater-scheduler.yaml'
       - 'updater/sis-updater-scheduler/**'
 
 jobs:
-  build:
+  build_and_release:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
