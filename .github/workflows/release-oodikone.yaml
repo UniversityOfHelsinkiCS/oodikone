@@ -25,10 +25,10 @@ jobs:
         run: ./run.sh oodikone ci up -d frontend
       - name: "Add frontend to sentry"
         run: |
-          docker exec --env SENTRY_URL --env SENTRY_AUTH_TOKEN --env SENTRY_ORG=toska --env SENTRY_PROJECT=oodikone frontend \
+          docker exec --env SENTRY_URL=${{ secrets.SENTRY_URL }} --env SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} --env SENTRY_ORG=toska --env SENTRY_PROJECT=oodikone frontend \
             sh +e -c 'npm install sentry-cli && npm run sentry-cli -- releases info "$(cat /SENTRY_RELEASE_VERSION)" && \
             npm run sentry-cli -- releases delete "$(cat /SENTRY_RELEASE_VERSION)" || true'
-          docker exec --env SENTRY_URL --env SENTRY_AUTH_TOKEN --env SENTRY_ORG=toska --env SENTRY_PROJECT=oodikone frontend \
+          docker exec --env SENTRY_URL=${{ secrets.SENTRY_URL }} --env SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} --env SENTRY_ORG=toska --env SENTRY_PROJECT=oodikone frontend \
             sh -c 'npm run sentry-cli -- releases new --finalize "$(cat /SENTRY_RELEASE_VERSION)" && \
             npm run sentry-cli -- releases files "$(cat /SENTRY_RELEASE_VERSION)" upload-sourcemaps --rewrite dist'
       - name: "Push to docker hub"
