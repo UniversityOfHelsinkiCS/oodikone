@@ -1,0 +1,50 @@
+name: Release sis-updater-worker
+
+on:
+  push:
+    branches:
+      - trunk
+    paths:
+      - '.github/workflows/release-sis-updater-worker.yaml'
+      - 'updater/sis-updater-worker/**'
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: updater/sis-updater-worker/
+        push: true
+        tags: toska/sis-updater-worker:latest
+
+    - name: "Send notification to slack"
+      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
+      with:
+        webhook-url: ${{ secrets.WEBHOOK_URL }}
+        message-type: deployment
+        softa-url: https://oodikone.cs.helsinki.fi
+        deployment-target: production
+
+  report_failure:
+    runs-on: ubuntu-latest
+    name: Report deployment failure to oodikone notifications
+    needs:
+    - build_and_release
+    if: failure()
+    steps:
+      - name: "Send notification to slack"
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment-failure
+          deployment-target: production

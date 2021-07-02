@@ -489,13 +489,8 @@ jobs:
     - push_to_dockerhub
     if: failure()
     steps:
-      - name: "Extract branch name"
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
-        id: extract_branch
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.0.1
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
-          header: ":rocket_down: Tests failed on ${{ steps.extract_branch.outputs.branch }}"
-          body: "Oh no, <https://github.com/UniversityOfHelsinkiCS/oodikone/actions/runs/${{ github.run_id }}/workflow> run by ${{ github.actor }} has failed on branch ${{ steps.extract_branch.outputs.branch }}"
+          message-type: test-failure
