@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const { NODE_ENV, DB_URL } = process.env
 
 const isDev = NODE_ENV === 'development'
