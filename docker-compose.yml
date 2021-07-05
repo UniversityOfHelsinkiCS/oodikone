@@ -8,6 +8,7 @@ x-build_defaults: &build_defaults
   args:
     NODE_ENV: development
     TAG: development
+  target: development
 
 services:
   adminer:
