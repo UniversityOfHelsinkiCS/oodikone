@@ -147,6 +147,7 @@ const SearchForm = props => {
   }
 
   const onSubmitFormClick = () => {
+    console.log('on submit form click')
     const codes = sortBy(Object.keys(selectedCourses))
     const params = {
       courseCodes: codes,
