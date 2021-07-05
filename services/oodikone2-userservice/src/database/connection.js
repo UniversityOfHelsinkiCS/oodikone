@@ -3,7 +3,6 @@ const Umzug = require('umzug')
 const conf = require('../conf')
 
 const sequelize = new Sequelize(conf.DB_URL, {
-  schema: conf.DB_SCHEMA,
   logging: false
 })
 const initializeDatabaseConnection = async () => {
@@ -22,7 +21,6 @@ const initializeDatabaseConnection = async () => {
       await sleep(1000)
     }
   }
-  if (process.env.NODE_ENV != 'test') {
     try {
       const migrator = new Umzug({
         storage: 'sequelize',
@@ -44,7 +42,6 @@ const initializeDatabaseConnection = async () => {
       console.log('Migration error')
       throw e
     }
-  }
 }
 
 const forceSyncDatabase = async () => {
