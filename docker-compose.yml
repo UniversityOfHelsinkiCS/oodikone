@@ -242,6 +242,7 @@ services:
       - user-db
     environment:
       DB_URL: postgres://postgres@user-db:5432/user-db
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       TOKEN_SECRET: IWannaBeTheVeryBest
     ports:
       - "4567:4567"
