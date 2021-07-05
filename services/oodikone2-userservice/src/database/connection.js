@@ -21,27 +21,27 @@ const initializeDatabaseConnection = async () => {
       await sleep(1000)
     }
   }
-    try {
-      const migrator = new Umzug({
-        storage: 'sequelize',
-        storageOptions: {
-          sequelize: sequelize,
-          tableName: 'migrations'
-        },
-        logging: console.log,
-        migrations: {
-          params: [sequelize.getQueryInterface(), Sequelize],
-          path: `${process.cwd()}/src/database/migrations`,
-          pattern: /\.js$/
-        }
-      })
-      const migrations = await migrator.up()
+  try {
+    const migrator = new Umzug({
+      storage: 'sequelize',
+      storageOptions: {
+        sequelize: sequelize,
+        tableName: 'migrations'
+      },
+      logging: console.log,
+      migrations: {
+        params: [sequelize.getQueryInterface(), Sequelize],
+        path: `${process.cwd()}/src/database/migrations`,
+        pattern: /\.js$/
+      }
+    })
+    const migrations = await migrator.up()
 
-      console.log('Migrations up to date', migrations)
-    } catch (e) {
-      console.log('Migration error')
-      throw e
-    }
+    console.log('Migrations up to date', migrations)
+  } catch (e) {
+    console.log('Migration error')
+    throw e
+  }
 }
 
 const forceSyncDatabase = async () => {
