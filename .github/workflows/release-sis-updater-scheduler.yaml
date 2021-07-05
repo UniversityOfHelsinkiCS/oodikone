@@ -5,11 +5,11 @@ on:
     branches:
       - trunk
     paths:
-      - '.github/workflows/sis-updater-scheduler.yaml'
+      - '.github/workflows/release-sis-updater-scheduler.yaml'
       - 'updater/sis-updater-scheduler/**'
 
 jobs:
-  build:
+  build_and_release:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -28,8 +28,23 @@ jobs:
         tags: toska/sis-updater-scheduler:latest
 
     - name: "Send notification to slack"
-      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.0.1
+      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
       with:
         webhook-url: ${{ secrets.WEBHOOK_URL }}
-        header: Trunk deployed sis-updater-scheduler to production
-        body: "Commit: <https://github.com/UniversityOfHelsinkiCS/oodikone/commit/${{ github.sha }}>"
+        message-type: deployment
+        softa-url: https://oodikone.cs.helsinki.fi
+        deployment-target: production
+
+  report_failure:
+    runs-on: ubuntu-latest
+    name: Report deployment failure to oodikone notifications
+    needs:
+    - build_and_release
+    if: failure()
+    steps:
+      - name: "Send notification to slack"
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment-failure
+          deployment-target: production
