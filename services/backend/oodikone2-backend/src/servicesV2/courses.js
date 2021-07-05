@@ -3,18 +3,20 @@ const {
   Student,
   Credit,
   Course,
-  CourseType,
-  // Discipline,
+  // CourseType,
   ElementDetail,
   StudyrightElement,
   Studyright,
   Semester,
   Organization
 } = require('../modelsV2')
+
+/*
 const {
   dbConnections: { sequelize }
 } = require('../databaseV2/connection')
-const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
+*/
+// const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
 const { parseCredit } = require('./parseCredits')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../servicesV2/course_yearly_stats_counter')
@@ -52,60 +54,6 @@ const byName = (name, language) =>
     order: [['latest_instance_date', 'DESC']],
     limit: 1
   })
-
-/* const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) => {
-  const includeDiscipline = discipline
-    ? {
-        include: {
-          model: Discipline,
-          where: {
-            discipline_id: {
-              [Op.eq]: discipline
-            }
-          }
-        }
-      }
-    : null
-
-  const whereNameOrCode = searchTerm
-    ? {
-        [Op.or]: [
-          {
-            name: {
-              [language]: {
-                [Op.iLike]: `%${searchTerm}%`
-              }
-            }
-          },
-          {
-            code: {
-              [Op.iLike]: `%${searchTerm}%`
-            }
-          }
-        ]
-      }
-    : null
-
-  const whereType = type
-    ? {
-        [Op.and]: [
-          {
-            coursetypecode: {
-              [Op.eq]: type
-            }
-          }
-        ]
-      }
-    : null
-
-  return Course.findAll({
-    ...includeDiscipline,
-    where: {
-      ...whereNameOrCode,
-      ...whereType
-    }
-  })
-} */
 
 const byCode = code => Course.findByPk(code)
 
@@ -179,38 +127,6 @@ const bySearchTerm = async (term, language) => {
   }
 }
 
-/* const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) => {
-  const formatCourse = course => ({
-    name: course.name[language],
-    code: course.code,
-    date: course.latest_instance_date
-  })
-  const removeDuplicates = courses => {
-    let newList = []
-    courses.map(course => {
-      const nameDuplicates = courses.filter(c => course.name === c.name)
-      if (nameDuplicates.length === 1 || !newList.find(c => c.name === course.name)) {
-        newList.push(course)
-      }
-      newList = newList.map(cor => {
-        if (cor.name === course.name) {
-          return cor.date > course.date ? cor : course
-        }
-        return cor
-      })
-    })
-    return newList
-  }
-  try {
-    const result = await byNameOrCodeTypeAndDiscipline(term, type, discipline, language)
-    return removeDuplicates(result.map(formatCourse))
-  } catch (e) {
-    return {
-      error: e
-    }
-  }
-} */
-
 const createCourse = async (code, name, latest_instance_date) =>
   Course.create({
     code,
@@ -218,246 +134,46 @@ const createCourse = async (code, name, latest_instance_date) =>
     latest_instance_date
   })
 
-const findDuplicates = async (oldPrefixes, newPrefixes) => {
-  let oldPrefixQuery = ''
-  let newPrefixQuery = ''
-  oldPrefixes.forEach(prefix => {
-    oldPrefixQuery += `ou.code like '${prefix}%' OR\n`
-  })
-  oldPrefixQuery = oldPrefixQuery.slice(0, -4)
-
-  newPrefixes.forEach(prefix => {
-    newPrefixQuery += `inr.code like '${prefix}%' OR\n`
-  })
-
-  newPrefixQuery = newPrefixQuery.slice(0, -4)
-
-  return sequelize.query(`select ou.code as code1,  inr.code as code2, ou.name from course ou
-  inner join course inr on
-  (
-    select count(*) from course inr
-  where inr.name = ou.name) > 1
-   AND inr.name = ou.name
-   where(
-    (${oldPrefixQuery})
-    AND (${newPrefixQuery})
-    AND ou.name->>'fi' not like 'Kandidaatin%'
-    AND ou.name->>'fi' not like 'Muualla suoritetut%'
-    AND ou.name->>'fi' not like 'Tutkimusharjoittelu%'
-    AND ou.name->>'fi' not like 'Väitöskirja%'
-    AND ou.name->>'fi' not like '%erusopinnot%'
-    AND ou.name->>'fi' not like '%ineopinnot%'
-    AND ou.name->>'fi' not like '%Pro gradu -tutkielma%'
-  )
-  order by name`)
-}
-
-const getMainCodes = () => {
-  return CourseDuplicates.findAll()
-}
-
-const deleteDuplicateCode = async code => {
-  try {
-    await CourseDuplicates.destroy({
-      where: {
-        coursecode: code
-      }
-    })
-    await sequelizeKone.query(
-      `DELETE FROM course_duplicates
-      WHERE groupid in ( SELECT groupid FROM course_duplicates
-      group by groupid
-      having count(*) = 1)`,
-      { type: sequelize.QueryTypes.BULKDELETE }
-    )
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-const getDuplicateCodesWithCourses = async () => {
-  const courseDuplicates = await CourseDuplicates.findAll()
-  const courses = await Course.findAll({
+const alternativeCodes = async code => {
+  console.log('code: ', code)
+  let course = await Course.findAll({
+    raw: true,
+    attributes: ['id', 'code', 'substitutions'],
     where: {
-      code: {
-        [Op.in]: courseDuplicates.map(e => e.coursecode)
-      }
+      ...codeLikeTerm(code)
     }
   })
-  const codeToCourse = courses.reduce((acc, c) => {
-    acc[c.code] = c
-    return acc
-  }, {})
-  return courseDuplicates.map(cd => ({ ...cd.get(), course: codeToCourse[cd.coursecode] }))
-}
 
-const getDuplicatesToIdMap = () => {
-  return getMainCodes().then(res =>
-    res.reduce((acc, e) => {
-      acc[e.coursecode] = e.groupid
-      return acc
-    }, {})
-  )
-}
+  console.log('course: ', course)
 
-const getIdToDuplicatesMapWithCourse = () => {
-  return getDuplicateCodesWithCourses().then(res =>
-    res.reduce((acc, e) => {
-      if (!e.course) return acc
-      acc[e.groupid] = acc[e.groupid] || []
-      acc[e.groupid].push(e.course)
-      return acc
-    }, {})
-  )
-}
+  const allSubstitutions = _.flatten(course.map(c => c.substitutions))
+  console.log('all substitutions: ', allSubstitutions)
 
-const getMainCodeToDuplicates = async () => {
-  const all = await getIdToDuplicatesMapWithCourse()
-  const maincodeToDuplicates = Object.values(all).reduce((acc, courses) => {
-    const main = _.orderBy(
-      courses,
-      [
-        c => {
-          if (c.code.match(/^A/)) return 4 // open university codes come last
-          if (c.code.match(/^\d/)) return 2 // old numeric codes come second
-          if (c.code.match(/^[A-Za-z]/)) return 1 // new letter based codes come first
-          return 3 // unknown, comes before open uni?
-        },
-        c => c.latest_instance_date || new Date(),
-        'code'
-      ],
-      ['asc', 'desc', 'desc']
-    )[0]
-    acc[main.code] = {
-      maincourse: { code: main.code, name: main.name },
-      duplicates: courses.map(c => ({ code: c.code, name: c.name }))
-    }
-    return acc
-  }, {})
-  return maincodeToDuplicates
-}
-
-const getCodeToMainCourseMap = async () => {
-  try {
-    const maincodeToDuplicates = await getMainCodeToDuplicates()
-    const codeToMainCode = Object.values(maincodeToDuplicates).reduce((acc, d) => {
-      d.duplicates.forEach(c => {
-        acc[c.code] = d.maincourse
-      })
-      return acc
-    }, {})
-    return codeToMainCode
-  } catch (e) {
-    console.error(e)
-  }
-  return {}
-}
-
-const getMainCodeToDuplicatesAndCodeToMainCode = async () => {
-  return [await getMainCodeToDuplicates(), await getCodeToMainCourseMap()]
-}
-
-const getMainCourseToCourseMap = async (/*programme*/) => {
-  try {
-    const codeToMainCodeMap = await getCodeToMainCourseMap()
-    const courses = await byCodes(Object.keys(codeToMainCodeMap))
-    const mainCodeToCoursesMap = courses.reduce((acc, course) => {
-      const maincourse = codeToMainCodeMap[course.code]
-      const duplicates = acc[maincourse.code] || []
-      duplicates.push(course)
-      acc[maincourse.code] = duplicates
-      return acc
-    }, {})
-    return mainCodeToCoursesMap
-  } catch (e) {
-    console.error(e)
-  }
-  return {}
-}
-
-const getDuplicateCodes = async code => {
-  const [mainCodeToDuplicates, codeToMainCourseMap] = await getMainCodeToDuplicatesAndCodeToMainCode()
-  const maincourse = codeToMainCourseMap[code]
-  if (!maincourse) return null
-  return mainCodeToDuplicates[maincourse.code].duplicates.map(e => e.code)
-}
-
-const setDuplicateCode = async (code1, code2) => {
-  if (code1 !== code2) {
-    try {
-      const course1 = await byCode(code1)
-      const course2 = await byCode(code2)
-      if (course1 && course2) {
-        const all = await getDuplicatesToIdMap()
-        // make sure both dont have a group
-        if ([all[code1], all[code2]].filter(e => e).length <= 1) {
-          let groupid = all[code1] || all[code2]
-          if (!groupid) {
-            // neither has a group, make one
-            groupid = Math.max(0, ...Object.values(all).filter(e => e))
-            groupid = groupid && !isNaN(groupid) ? groupid + 1 : 1
-          }
-          await CourseDuplicates.bulkCreate(
-            [
-              { groupid, coursecode: code1 },
-              { groupid, coursecode: code2 }
-            ],
-            {
-              ignoreDuplicates: true
-            }
-          )
-        } else {
-          // both have a group, must merge groups
-          await CourseDuplicates.update({ groupid: all[code1] }, { where: { groupid: all[code2] } })
+  let subCodes = []
+  if (allSubstitutions) {
+    subCodes = await Course.findAll({
+      raw: true,
+      attributes: ['code'],
+      where: {
+        id: {
+          [Op.in]: allSubstitutions
         }
       }
-    } catch (e) {
-      console.error(e)
-    }
+    })
   }
+  console.log('subCodes: ', subCodes)
+  const temp = subCodes.map(c => c.code)
+  console.log('temp: ', temp)
+  const doubleTemp = [...temp, code]
+  return allSubstitutions ? doubleTemp : [code]
 }
-
-const getAllCourseTypes = () => CourseType.findAll()
-// const getAllDisciplines = () => Discipline.findAll()
-
-const alternativeCodes = async code => {
-  const alternatives = await getDuplicateCodes(code)
-  return alternatives ? alternatives : [code]
-}
-
-/* const getGroupId = async code => {
-  const duplicates = await CourseDuplicates.findOne({
-    where: {
-      coursecode: code
-    }
-  })
-  // console.log('dublicates: ', duplicates)
-  const temp = duplicates ? duplicates.groupid : code
-  // console.log('temp: ', temp)
-  return temp
-} */
 
 const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anonymizationSalt) => {
-  const codes = await alternativeCodes(coursecode)
-
-  if (unifyOpenUniCourses) {
-    const nonOpenUniCodes = _.uniq(codes.map(unifyOpenUniversity))
-
-    const matchingOpenUniCourseCodes = nonOpenUniCodes.length
-      ? (
-          await Course.findAll({
-            where: {
-              code: {
-                [Op.regexp]: {
-                  [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
-                }
-              }
-            }
-          })
-        ).map(course => course.code)
-      : []
-
-    codes.push(...matchingOpenUniCourseCodes)
+  let codes = await alternativeCodes(coursecode)
+  console.log('unifyopenunicourses: ', unifyOpenUniCourses)
+  console.log('codes: ', codes)
+  if (!unifyOpenUniCourses) {
+    codes = codes.filter(c => !c.match(/^[A][0-9]|^AY/))
   }
 
   const uniqueCodes = _.uniq(codes)
@@ -469,6 +185,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
       }
     })
   ])
+
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
     const {
@@ -628,12 +345,12 @@ const unifyOpenUniversity = code => {
   console.log('code: ', code)
   if (!regexresult) return code
 
-  console.log('regex result: ', regexresult)
   return regexresult[1]
 }
 
 const byNameAndOrCodeLike = async (name, code) => {
   let courses = await Course.findAll({
+    raw: true,
     attributes: [
       'id',
       'name',
@@ -651,12 +368,10 @@ const byNameAndOrCodeLike = async (name, code) => {
     }
   })
 
-  courses = courses.map(data => data.get())
-  console.log('courses: ', courses)
   let substitutionGroupIndex = 0
   const subsGroups = {}
   const visited = []
-  const dfs = courseId => {
+  const dfs = async courseId => {
     if (visited.includes(courseId)) return
     visited.push(courseId)
     const course = courses.find(course => course.id === courseId)
@@ -665,6 +380,7 @@ const byNameAndOrCodeLike = async (name, code) => {
 
     subsGroups[course.code] = substitutionGroupIndex
     course.subsId = substitutionGroupIndex
+
     for (const courseId of course.substitutions) {
       dfs(courseId)
     }
@@ -686,17 +402,17 @@ module.exports = {
   bySearchTerm,
   //bySearchTermTypeAndDiscipline,
   createCourse,
-  findDuplicates,
-  setDuplicateCode,
-  deleteDuplicateCode,
-  getCodeToMainCourseMap,
-  getMainCourseToCourseMap,
-  getAllCourseTypes,
-  //getAllDisciplines,
+  // findDuplicates,
+  // setDuplicateCode,
+  // deleteDuplicateCode,
+  // getCodeToMainCourseMap,
+  // getMainCourseToCourseMap,
+  // getAllCourseTypes,
+  // getAllDisciplines,
   courseYearlyStats,
   byNameAndOrCodeLike,
   byCodes,
-  getMainCodeToDuplicatesAndCodeToMainCode,
+  // getMainCodeToDuplicatesAndCodeToMainCode,
   maxYearsToCreatePopulationFrom,
   unifyOpenUniversity
 }

@@ -1,7 +1,7 @@
 import { orderBy } from 'lodash'
 
 // handle special case where the course's actual code starts with "A" so it is mistakenly taken as Open Uni course
-const isAvoin = code => !!code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+const isAvoin = code => !!code.match(/^[A][0-9]|^AY/)
 
 const sortAlternatives = alternatives =>
   orderBy(
