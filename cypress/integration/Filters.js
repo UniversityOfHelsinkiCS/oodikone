@@ -186,6 +186,7 @@ describe("Course Statistics", () => {
 
 describe("Custom Population Statistics", () => {
   let runTestStepWithPreAndPostParts;
+
   before(() => {
     cy.init("/custompopulation");
     cy.cs("custom-pop-search-button").click();
@@ -230,7 +231,7 @@ describe("Custom Population Statistics", () => {
   });
 
   // Can't be tested yet, since feature doesn't work correctly
-  it.only("Courses filter works", () => {
+  it.skip("Courses filter works", () => {
     runTestStepWithPreAndPostParts("courseFilter-header", () => {
       const courses = ["MAT11001", "TKT20004"]
       cy.cs("courseFilter-course-dropdown").click().contains(courses[0]).click();

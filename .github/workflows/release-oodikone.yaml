@@ -1,21 +1,16 @@
-name: Release oodikone to staging
+name: Release oodikone to production
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - '.github/workflows/release-oodikone-staging.yaml'
-      - 'services/**'
-      - 'docker-compose.ci.yml'
+  release:
+    types: [published]
 
 jobs:
   build_and_release:
     name: "Build images and release"
     runs-on: ubuntu-latest
     env:
-      TAG: staging
-      CACHE_TAG: staging
+      TAG: latest
+      CACHE_TAG: latest
     steps:
       - name: "Checkout repo"
         uses: actions/checkout@v2
@@ -43,8 +38,8 @@ jobs:
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment
-          softa-url: https://oodikone-staging.cs.helsinki.fi/
-          deployment-target: staging
+          softa-url: https://oodikone.cs.helsinki.fi/
+          deployment-target: production
 
   report_failure:
     runs-on: ubuntu-latest
@@ -58,4 +53,4 @@ jobs:
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment-failure
-          deployment-target: staging
+          deployment-target: production
