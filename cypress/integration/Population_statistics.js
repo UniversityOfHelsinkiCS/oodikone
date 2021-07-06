@@ -49,10 +49,9 @@ describe("Population Statistics tests", () => {
       .its(`${[0]}.value`)
       .then((beforeVal) => {
         cy.get("@enrollmentSelect").click();
-        // go back to 2010-2019
         cy.get(".yearSelectInput .rdtPrev").click({ force: true });
         cy.get(".yearSelectInput table")
-          .contains("2014-2015")
+          .contains("2018-2019")
           .click({ force: true });
         cy.get("@enrollmentSelect").should("not.have.value", beforeVal);
       });
@@ -60,61 +59,83 @@ describe("Population Statistics tests", () => {
     cy.contains("Select study programme")
       .click()
       .siblings()
-      .contains("Tietojenkäsittelytieteen koulutusohjelma")
+      .contains("Tietojenkäsittelytieteen maisteriohjelma")
       .click();
-    cy.contains("Select degree")
-      .click()
-      .siblings()
-      .contains("Luonnontieteiden kandidaatti");
   });
 
-  // FIXME: re-enable when CI has mandatory courses in the db
-  it.skip("Population statistics is usable on general level", () => {
-    cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma");
-    setPopStatsUntil("September 2019");
+  it("Population statistics is usable on general level", () => {
+    cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma");
+    setPopStatsUntil("toukokuu 2020");
 
     cy.get(".card").within(() => {
-      cy.contains("Tietojenkäsittelytieteen maisteriohjelma");
-      cy.contains("Sample size: 29 students");
+      cy.contains("Tietojenkäsittelytieteen kandiohjelma");
+      cy.contains("Sample size: 40 students");
       cy.contains("Excludes exchange students");
       cy.contains("Excludes students who haven't enrolled present nor absent");
+      cy.contains("Excludes students with non-degree study right");
+      cy.contains("Excludes students who have transferred out of this programme");
+
     });
     cy.contains("Courses of population").click({ force: true });
 
     cy.route("/api/v3/courseyearlystats**").as("coursePage");
-    cy.wait(150);
-    cy.cs("expand-CSM10000").click();
-    cy.cs("coursestats-link-CSM12101").click();
+    cy.wait(1500); // a bit hacky way, wait until ui is ready
+    cy.cs("expand-TKT1").click();
+    cy.cs("coursestats-link-TKT10002").click();
     cy.wait("@coursePage");
     cy.url().should("include", "/coursestatistics");
-    cy.contains("CSM12101");
+    cy.contains("TKT10002, 581325 Ohjelmoinnin perusteet");
   });
 
-  it.skip("Student list checking works as intended", () => {
-    cy.selectStudyProgramme("Tietojenkäsittelytieteen maisteriohjelma");
-    cy.contains("Students (16)").click();
-    cy.contains("010429464");
-    cy.contains("666666666").should("not.exist");
+  it("Student list checking works as intended", () => {
+    const existing = "010113437"
+    const nonExisting = "66666666"
+    cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma");
+    cy.contains("Students (40)").click();
+    cy.contains(existing);
+    cy.contains(nonExisting).should("not.exist");
     cy.contains("button", "Check studentnumbers").click();
     cy.contains("Check for studentnumbers");
-    cy.get("textarea").type("010429464").type("{enter}").type("666666666");
+    cy.get("textarea").type(existing).type("{enter}").type(nonExisting);
     cy.contains("button", "check students").click();
     cy.contains("#checkstudentsresults", "Results").within((e) => {
       cy.contains("Student numbers in list and in oodi").click();
-      cy.contains("#found", "010429464");
+      cy.contains("#found", existing);
       cy.contains("Student numbers in list but not in oodi").click();
-      cy.contains("#notfound", "666666666");
+      cy.contains("#notfound", nonExisting);
       cy.contains("Student numbers in oodi but not in list").click();
-      cy.contains("#notsearched", "010533091");
+      cy.contains("#notsearched", "010614509");
     });
   });
 
-  it.skip("Empty 'tags' tab has a link to the page where tags can be created", () => {
-    cy.selectStudyProgramme("Kielten kandiohjelma");
+  it("Empty 'tags' tab has a link to the page where tags can be created", () => {
+    cy.cs("navbar-studyProgramme").click();
+    cy.cs("navbar-class").click();
+    cy.contains("See population").should("be.disabled");
+    cy.url().should("include", "/populations");
+    cy.contains("Search for population");
+    cy.contains("Class of")
+      .parent()
+      .within(() => {
+        cy.get(".form-control").as("enrollmentSelect");
+      });
+
+    cy.get("@enrollmentSelect")
+      .its(`${[0]}.value`)
+      .then((beforeVal) => {
+        cy.get("@enrollmentSelect").click();
+        cy.get(".yearSelectInput .rdtPrev").click({ force: true });
+        cy.get(".yearSelectInput table")
+          .contains("2019-2020")
+          .click({ force: true });
+        cy.get("@enrollmentSelect").should("not.have.value", beforeVal);
+      });
+    cy.selectStudyProgramme("Datatieteen maisteriohjelma");
     cy.contains("Students (5)").click();
     cy.get("[data-cy=student-table-tabs]").contains("Tags").click();
     cy.contains("No tags defined. You can define them here.").find("a").click();
-    cy.contains("Kielten kandiohjelma");
+    cy.contains("Tags").click();
+    cy.contains("Datatieteen maisteriohjelma");
     cy.contains("Create new tag");
   });
 
@@ -147,21 +168,21 @@ describe("Population Statistics tests", () => {
     cy.contains("Credit accumulation (for 202 students)");
   });
 
-  it.skip("Credit Statistics, Statistics pane works", () => {
+  it("Credit Statistics, Statistics pane works", () => {
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma");
     cy.contains("Credit statistics").click();
     cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click();
 
     cy.get("[data-cy='credit-stats-table-name-header']").should(
       "contain",
-      "Statistic for n = 194 Students"
+      "Statistic for n = 40 Students"
     );
-    cy.get("[data-cy='credit-stats-mean']").should("contain", "45.10");
-    cy.get("[data-cy='credit-stats-stdev']").should("contain", "30.61");
-    cy.get("[data-cy='credit-stats-min']").should("contain", "0");
-    cy.get("[data-cy='credit-stats-q1']").should("contain", "19");
-    cy.get("[data-cy='credit-stats-q2']").should("contain", "47");
-    cy.get("[data-cy='credit-stats-q3']").should("contain", "66");
-    cy.get("[data-cy='credit-stats-max']").should("contain", "137");
+    cy.get("[data-cy='credit-stats-mean']").should("contain", "123.11");
+    cy.get("[data-cy='credit-stats-stdev']").should("contain", "57.16");
+    cy.get("[data-cy='credit-stats-min']").should("contain", "23");
+    cy.get("[data-cy='credit-stats-q1']").should("contain", "81");
+    cy.get("[data-cy='credit-stats-q2']").should("contain", "129");
+    cy.get("[data-cy='credit-stats-q3']").should("contain", "151");
+    cy.get("[data-cy='credit-stats-max']").should("contain", "314");
   });
 });
