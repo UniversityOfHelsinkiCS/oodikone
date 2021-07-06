@@ -127,6 +127,7 @@ services:
         - toska/oodikone2-userservice:staging
         - toska/oodikone2-userservice:latest
       context: services/oodikone2-userservice
+      target: production
     container_name: userservice
     depends_on:
       - user-db
