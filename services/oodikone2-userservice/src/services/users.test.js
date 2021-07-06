@@ -9,48 +9,48 @@ const default_users = [
     full_name: 'Saus Maekinen',
     username: 'sasumaki',
     email: 'vittuilu.email@gmail.com',
-    language: 'finnish',
+    language: 'finnish'
   },
   {
     id: 42,
     full_name: 'Pekka Pouta',
     username: 'poutaukko',
     email: 'pekka.pouta@ilmatieteenlaitos.fi',
-    language: 'finnish',
+    language: 'finnish'
   },
   {
     id: 666,
     full_name: 'Sylvester Stallone',
     username: 'rambo666',
     email: 'sylvester@rambo.com',
-    language: 'americano',
+    language: 'americano'
   },
   {
     id: 665,
     full_name: 'Morgan Freeman',
     username: 'freeman',
     email: 'morgan@freeman.com',
-    language: 'americano',
-  },
+    language: 'americano'
+  }
 ]
 
 const default_accessgroups = [
   {
     id: 1,
     group_code: 'teachers',
-    group_info: 'liirum laarum',
+    group_info: 'liirum laarum'
   },
   {
     id: 2,
     group_code: 'admin',
-    group_info: 'big boss',
-  },
+    group_info: 'big boss'
+  }
 ]
 const default_hygroups = [
   {
     id: 1,
-    code: 'test-group',
-  },
+    code: 'test-group'
+  }
 ]
 
 beforeAll(async () => {
@@ -66,7 +66,7 @@ beforeAll(async () => {
   const normal_user = await User.findOne({ where: { id: 665 } })
   await UserElementDetails.upsert({
     userId: normal_user.id,
-    elementDetailCode: 'ELEMENT_CS',
+    elementDetailCode: 'ELEMENT_CS'
   })
   await normal_user.addHy_group(hygroup)
 })
