@@ -157,6 +157,16 @@ jobs:
         with:
           path: /tmp/userservice.tar
 
+  # === Integration tests ===
+  run_userservice_integration_tests:
+    name: "Run userservice integration tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Run tests included in docker build
+        run: docker-compose -f docker-compose.test.yml up --build userservice-test 
+
   # === End-to-end tests ===
 
   test_course_population:
@@ -441,6 +451,7 @@ jobs:
     - lint_backend
     - lint_frontend
     - lint_userservice
+    - run_userservice_integration_tests
     - test_course_population
     - test_course_statistics
     - test_custom_population
@@ -480,6 +491,7 @@ jobs:
     - lint_backend
     - lint_frontend
     - lint_userservice
+    - run_userservice_integration_tests
     - test_course_population
     - test_course_statistics
     - test_custom_population
