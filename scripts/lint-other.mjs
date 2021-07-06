@@ -1,5 +1,7 @@
 #!/usr/bin/env zx
 
+// Still at beta level. Note: you need to install actionlint, hadolint and shellcheck to run this. Or maybe create Dockerfile to run this?
+
 // Lint github action files
 await $`actionlint`
 
