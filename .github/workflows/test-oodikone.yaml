@@ -307,6 +307,52 @@ jobs:
           name: Cypress videos
           path: ./cypress/videos/*
 
+  test_population_statistics:
+    name: "Test population statistics"
+    needs:
+      - build_analytics
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    env:
+      TAG: trunk
+      CACHE_TAG: trunk
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Download images
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: Load built images
+        run: |
+          docker load --input /tmp/artifact/analytics.tar
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: Login to toska docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: Run services, pull rest of the needed images
+        run: ./run.sh oodikone ci up -d --no-recreate
+      - name: Run cypress
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Population_statistics.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: Upload video
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
   test_filters:
     name: "Test filters"
     needs:
@@ -401,6 +447,7 @@ jobs:
           name: Cypress videos
           path: ./cypress/videos/*
 
+
   # === Other tests ===
 
   test_service_exit_statuses:
@@ -456,6 +503,7 @@ jobs:
     - test_course_statistics
     - test_custom_population
     - test_filters
+    - test_population_statistics
     - test_teachers_and_users
     - test_service_exit_statuses
     runs-on: ubuntu-latest
@@ -496,6 +544,7 @@ jobs:
     - test_course_statistics
     - test_custom_population
     - test_filters
+    - test_population_statistics
     - test_teachers_and_users
     - test_service_exit_statuses
     - push_to_dockerhub
