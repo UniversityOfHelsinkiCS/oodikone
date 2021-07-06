@@ -13,7 +13,7 @@ describe("Student Statistics tests", () => {
     studentnumber: "010654019"
   }
 
-  it("Student statistics search form is usable", () => {
+  it.only("Student statistics search form is usable", () => {
     cy.contains("Show student names");
     cy.url().should("include", "/students");
     cy.get(".prompt").type(student.lastname);
@@ -22,10 +22,10 @@ describe("Student Statistics tests", () => {
     cy.contains("Credits");
     cy.contains(student.firstnames).should("not.exist");
 
-    cy.get("label").click(); // show student names
+    cy.cs("toggleStudentNames").click()
     cy.contains(student.firstnames);
 
-    cy.get("label").click() // hide student names
+    cy.cs("toggleStudentNames").click()
     cy.contains(student.firstnames).should("not.exist");
   });
 
@@ -43,11 +43,11 @@ describe("Student Statistics tests", () => {
     cy.contains(student.lastname).should("not.exist");
     cy.contains(student.firstnames).should("not.exist");
 
-    cy.get("label").click(); // show student names
+    cy.cs("toggleStudentNames").click()
     cy.contains(student.lastname);
     cy.contains(student.firstnames);
 
-    cy.get("label").click(); // hide
+    cy.cs("toggleStudentNames").click()
     cy.contains(student.lastname).should("not.exist");
     cy.contains(student.firstnames).should("not.exist");
   });
