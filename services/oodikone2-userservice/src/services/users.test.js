@@ -1,8 +1,7 @@
 const { sequelize, forceSyncDatabase } = require('../database/connection')
 const { User, AccessGroup, HyGroup, UserElementDetails } = require('../models/index')
-const userService = require('../services/users')
-const AccessService = require('../services/accessgroups')
-const { DB_SCHEMA } = require('../conf')
+const userService = require('./users')
+const AccessService = require('./accessgroups')
 
 const default_users = [
   {
@@ -10,60 +9,51 @@ const default_users = [
     full_name: 'Saus Maekinen',
     username: 'sasumaki',
     email: 'vittuilu.email@gmail.com',
-    language: 'finnish'
+    language: 'finnish',
   },
   {
     id: 42,
     full_name: 'Pekka Pouta',
     username: 'poutaukko',
     email: 'pekka.pouta@ilmatieteenlaitos.fi',
-    language: 'finnish'
+    language: 'finnish',
   },
   {
     id: 666,
     full_name: 'Sylvester Stallone',
     username: 'rambo666',
     email: 'sylvester@rambo.com',
-    language: 'americano'
+    language: 'americano',
   },
   {
     id: 665,
     full_name: 'Morgan Freeman',
     username: 'freeman',
     email: 'morgan@freeman.com',
-    language: 'americano'
-  }
+    language: 'americano',
+  },
 ]
 
 const default_accessgroups = [
   {
     id: 1,
     group_code: 'teachers',
-    group_info: 'liirum laarum'
+    group_info: 'liirum laarum',
   },
   {
     id: 2,
     group_code: 'admin',
-    group_info: 'big boss'
-  }
+    group_info: 'big boss',
+  },
 ]
 const default_hygroups = [
   {
     id: 1,
-    code: 'test-group'
-  }
+    code: 'test-group',
+  },
 ]
 
-const dropSchemaIfExists = async schema => {
-  const schemas = await sequelize.showAllSchemas()
-  if (schemas.some(name => name === schema)) {
-    await sequelize.dropSchema(schema)
-  }
-}
-
 beforeAll(async () => {
-  await dropSchemaIfExists(DB_SCHEMA)
-  await sequelize.createSchema(DB_SCHEMA)
   await forceSyncDatabase()
   await User.bulkCreate(default_users)
   await AccessGroup.bulkCreate(default_accessgroups)
@@ -76,22 +66,21 @@ beforeAll(async () => {
   const normal_user = await User.findOne({ where: { id: 665 } })
   await UserElementDetails.upsert({
     userId: normal_user.id,
-    elementDetailCode: 'ELEMENT_CS'
+    elementDetailCode: 'ELEMENT_CS',
   })
   await normal_user.addHy_group(hygroup)
 })
 afterAll(async () => {
+  await forceSyncDatabase()
   await sequelize.close()
 })
 
 describe('basic tests', () => {
   test('tests start', async () => {
-    console.log('mayhem begins')
     expect(process.env.NODE_ENV).toBe('test')
   })
 
   test('database is connected', async () => {
-    expect(DB_SCHEMA).toBe('test')
     try {
       await sequelize.authenticate()
     } catch (e) {
