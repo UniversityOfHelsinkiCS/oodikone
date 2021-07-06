@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "An application for analyzing university data.",
   "scripts": {
+    "cypress": "cypress",
+    "zx": "zx",
     "cli": "./cli.sh",
     "oodikone": "./run.sh oodikone anon up --detach && ./run.sh oodikone logs --follow --tail 100",
     "oodikone:real": "./run.sh oodikone real up --detach && ./run.sh oodikone logs --follow --tail 100",
@@ -15,13 +17,13 @@
     "lint:backend": "npm run lint --prefix services/backend/oodikone2-backend",
     "lint:frontend": "npm run lint --prefix services/oodikone2-frontend",
     "lint:userservice": "npm run lint --prefix services/oodikone2-userservice",
+    "linttest:other": "zx ./scripts/lint-other.mjs",
     "lint": "concurrently 'npm run lint:*'",
     "lintfix:analytics": "npm run lintfix --prefix services/oodikone2-analytics",
     "lintfix:backend": "npm run lintfix --prefix services/backend/oodikone2-backend",
     "lintfix:frontend": "npm run lintfix --prefix services/oodikone2-frontend",
     "lintfix:userservice": "npm run lintfix --prefix services/oodikone2-userservice",
     "lintfix": "concurrently 'npm run lintfix:*'",
-    "cypress": "cypress",
     "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
     "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",
@@ -40,6 +42,7 @@
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
     "concurrently": "^6.2.0",
-    "cypress": "^7.6.0"
+    "cypress": "^7.6.0",
+    "zx": "^2.0.0"
   }
 }
