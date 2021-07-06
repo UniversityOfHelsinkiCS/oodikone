@@ -5,12 +5,12 @@ const facultyProgrammeService = require('./facultyprogrammes')
 const facultyprogrammes = [
   {
     faculty_code: 'H10',
-    programme_code: 'MH10_001',
+    programme_code: 'MH10_001'
   },
   {
     faculty_code: 'H50',
-    programme_code: 'MH50_003',
-  },
+    programme_code: 'MH50_003'
+  }
 ]
 
 beforeAll(async () => {
@@ -34,5 +34,4 @@ describe('after running migrations the faculties faculty table', () => {
     expect(faculties.some(f => f.faculty_code === 'KH4000')).toBe(false)
     expect(faculties.some(f => f.programme_code === 'SWAGLITTINEN')).toBe(false)
   })
-
 })
