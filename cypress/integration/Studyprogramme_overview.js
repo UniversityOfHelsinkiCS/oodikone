@@ -36,13 +36,13 @@ describe("Studyprogramme overview", () => {
   });
 
 
-  it.only("progress should not be recalculating when opened for the first time", () => {
+  it("progress should not be recalculating when opened for the first time", () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.wait(1000)
     cy.contains("Recalculating").should("not.exist")
   })
 
-  it("renders progress and productivity tables", () => {
+  it("renders progress and productivity tables with calculated status", () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.contains("Admin").click();
     cy.contains("productivity").click();
@@ -54,32 +54,29 @@ describe("Studyprogramme overview", () => {
     cy.contains("Population progress");
     cy.contains("Yearly productivity");
 
-    const shouldContain = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "0", "0", 
+    const populationprogress2017 = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "10", "33 months", "0", "0", 
     "38", "34", "26", "22", "10"]
     cy.contains("2017-2018")
       .siblings()
-      .forEach((sibling, index) => {
-
-
+      .each((elem, index) => {
+        cy.wrap(elem).contains(populationprogress2017[index])
       })
-      .contains("228")
-      .siblings()
-      .contains("178");
 
     cy.get("table")
       .eq(1)
       .contains("2018")
       .siblings()
-      .contains("3023.00")
+      .contains("1378.00")
       .siblings()
-      .contains("2631.00");
+      .contains("55.00");
+
     cy.get("table")
       .eq(1)
       .contains("2017")
       .siblings()
-      .contains("3159.00")
+      .contains("555.00")
       .siblings()
-      .contains("2914.00");
+      .contains("9.00");
   });
 
   it("can open Thesis page", () => {
@@ -92,7 +89,7 @@ describe("Studyprogramme overview", () => {
   it("can move to Population statistics page by clickin", () => {
     cy.contains("Tietojenkäsittelytieteen maisteriohjelma").click();
     cy.get("i.level.up.alternate.icon").eq(0).click();
-    // cy.contains("Credit accumulation (for 16 students)");
+    cy.contains("Students (4)");
   });
 
   it("can create and delete tags for population", () => {
@@ -124,6 +121,8 @@ describe("Studyprogramme overview", () => {
   it("can add tags to students", () => {
     const name = `tag-${new Date().getTime()}`;
 
+    const student = "010113437"
+
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.get(".attached").contains("Tags").click();
     cy.get(".tagNameSelectInput > .ui > input").type(name);
@@ -140,12 +139,12 @@ describe("Studyprogramme overview", () => {
 
     cy.get(".form > .field > .dropdown > .visible").contains(name).click();
 
-    cy.get("textarea").type("010623419");
+    cy.get("textarea").type("010113437");
     cy.get(".positive").click();
 
     cy.contains("Student statistics").click();
-    cy.get(".prompt").type("010623419");
-    cy.contains("10").click();
+    cy.get(".prompt").type(student);
+    cy.contains(student).click();
     cy.contains(name);
 
     cy.go("back");
@@ -154,8 +153,8 @@ describe("Studyprogramme overview", () => {
     deleteTag(name);
 
     cy.contains("Student statistics").click();
-    cy.get(".prompt").type("010623419");
-    cy.contains("10").click();
+    cy.get(".prompt").type(student);
+    cy.contains(student).click();
     cy.contains(name).should("not.exist");
   });
 });
