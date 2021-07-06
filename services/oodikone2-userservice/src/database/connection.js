@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize')
 const Umzug = require('umzug')
-const conf = require('../conf')
+const { DB_URL }= require('../conf')
 
-const sequelize = new Sequelize(conf.DB_URL, {
+const sequelize = new Sequelize(DB_URL, {
   logging: false
 })
 const initializeDatabaseConnection = async () => {
