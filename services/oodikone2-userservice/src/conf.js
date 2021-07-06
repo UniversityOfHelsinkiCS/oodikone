@@ -1,4 +1,4 @@
-const { NODE_ENV, DB_URL } = process.env
+const { NODE_ENV, DB_URL, SECRET, TOKEN_SECRET} = process.env
 
 const isDev = NODE_ENV === 'development'
 const isStaging = NODE_ENV === 'staging'
@@ -15,6 +15,8 @@ if (isDev) {
 
 module.exports = {
   DB_URL,
+  SECRET,
+  TOKEN_SECRET,
   requiredGroup,
-  courseStatisticsGroup
+  courseStatisticsGroup,
 }
