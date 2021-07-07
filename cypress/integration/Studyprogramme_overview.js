@@ -17,7 +17,6 @@ describe("Studyprogramme overview", () => {
       .click();
     cy.contains("Study Programme", { timeout: 100000 });
   });
-
   // Return this when anon data has some kasvatustieteiden kandi
   it.skip("can view course groups", () => {
     cy.contains("Kasvatustieteiden kandiohjelma").click();
@@ -42,7 +41,12 @@ describe("Studyprogramme overview", () => {
     cy.contains("Recalculating").should("not.exist")
   })
 
-  it("renders progress and productivity tables with calculated status", () => {
+  // Taken from https://docs.cypress.io/api/commands/should#Compare-text-values-of-two-elements
+  const normalizeText = (s) => s.replace(/\s/g, '').toLowerCase()
+  let originalProgressCalculatedText;
+  let originalProductivityCalculatedText;
+
+  it.only("renders progress and productivity tables with calculated status", () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.contains("Admin").click();
     cy.contains("productivity").click();
@@ -77,6 +81,21 @@ describe("Studyprogramme overview", () => {
       .contains("555.00")
       .siblings()
       .contains("9.00");
+
+    // Wait to "recalculating" to disappear
+    cy.wait(1000);
+    // Grab update dates to be compared later
+    cy.cs("throughputUpdateStatus").invoke("text").then((text) => {
+      originalProgressCalculatedText =  normalizeText(text)
+      expect(originalProgressCalculatedText).not.to.contain("recalculating")
+      expect(originalProgressCalculatedText).not.to.contain("refresh")
+    })
+
+    cy.cs("productivityUpdateStatus").invoke("text").then((text) => {
+      originalProductivityCalculatedText = normalizeText(text)
+      expect(originalProductivityCalculatedText).not.to.contain("recalculating")
+      expect(originalProgressCalculatedText).not.to.contain("refresh")
+    })
   });
 
   it("can open Thesis page", () => {
@@ -156,5 +175,62 @@ describe("Studyprogramme overview", () => {
     cy.get(".prompt").type(student);
     cy.contains(student).click();
     cy.contains(name).should("not.exist");
+  });
+
+  it.only("renders progress and productivity tables with calculated status after recalculating stats again", () => {
+    cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
+    cy.contains("Admin").click();
+    cy.contains("productivity").click();
+    cy.contains("throughput").click();
+
+    cy.wait(1000);
+    cy.get(".attached > :nth-child(1)").click();
+    cy.get("table").should("have.length", 3);
+    cy.contains("Population progress");
+    cy.contains("Yearly productivity");
+
+    const populationprogress2017 = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "10", "33 months", "0", "0", 
+    "38", "34", "26", "22", "10"]
+    cy.contains("2017-2018")
+      .siblings()
+      .each((elem, index) => {
+        cy.wrap(elem).contains(populationprogress2017[index])
+      })
+
+    cy.get("table")
+      .eq(1)
+      .contains("2018")
+      .siblings()
+      .contains("1378.00")
+      .siblings()
+      .contains("55.00");
+
+    cy.get("table")
+      .eq(1)
+      .contains("2017")
+      .siblings()
+      .contains("555.00")
+      .siblings()
+      .contains("9.00");
+
+    // Wait to "recalculating" to disappear
+    cy.wait(1000);
+    // Check new calculation statuses are reported
+    const newProgressCalculatedTextElement = cy.cs("throughputUpdateStatus").invoke("text")
+    const newProductivityCalculatedTextElement = cy.cs("productivityUpdateStatus").invoke("text")
+
+    newProgressCalculatedTextElement.should((text) => {
+      const newProgressCalculatedText = normalizeText(text)
+      expect(newProgressCalculatedText).not.to.contain("recalculating")
+      expect(newProgressCalculatedText).not.to.contain("refresh")
+      expect(newProgressCalculatedText).not.to.contain(originalProgressCalculatedText)
+    })
+
+    newProductivityCalculatedTextElement.should((text) => {
+      const newProductivityCalculatedText = normalizeText(text)
+      expect(newProductivityCalculatedText).not.to.contain("recalculating")
+      expect(newProductivityCalculatedText).not.to.contain("refresh")
+      expect(newProductivityCalculatedText).not.to.contain(originalProgressCalculatedText)
+    })
   });
 });
