@@ -647,7 +647,7 @@ jobs:
     if: failure()
     steps:
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: test-failure
