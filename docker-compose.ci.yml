@@ -4,15 +4,14 @@ x-defaults: &defaults
   restart: unless-stopped
 
 x-build_defaults: &build_defaults
-  build:
-    args:
-      TAG: ${TAG}
+  args:
+    TAG: ${TAG}
 
 services:
   analytics:
     <<: *defaults
-    <<: *build_defaults
     build:
+      <<: *build_defaults
       cache_from:
       - toska/oodikone2-userservice:trunk
       - toska/oodikone2-userservice:staging
@@ -39,8 +38,8 @@ services:
 
   backend:
     <<: *defaults
-    <<: *build_defaults
     build:
+      <<: *build_defaults
       cache_from:
         - toska/oodikone2-backend:trunk
         - toska/oodikone2-backend:staging
@@ -71,8 +70,8 @@ services:
 
   frontend:
     <<: *defaults
-    <<: *build_defaults
     build:
+      <<: *build_defaults
       cache_from:
         - toska/oodikone2-frontend:trunk
         - toska/oodikone2-frontend:staging
@@ -123,8 +122,8 @@ services:
 
   userservice:
     <<: *defaults
-    <<: *build_defaults
     build:
+      <<: *build_defaults
       cache_from:
         - toska/oodikone2-userservice:trunk
         - toska/oodikone2-userservice:staging
