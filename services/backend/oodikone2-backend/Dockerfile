@@ -2,7 +2,7 @@ FROM node:14-alpine
 
 WORKDIR /usr/src/app
 EXPOSE 8080
-CMD npm start
+CMD ["npm", "start"]
 
 COPY ./oodikone2-backend/package* ./
 

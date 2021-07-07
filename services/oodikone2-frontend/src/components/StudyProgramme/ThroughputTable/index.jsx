@@ -213,7 +213,7 @@ const ThroughputTable = ({
             <Grid.Column>
               {studytrack ? `Population progress for selected studytrack` : 'Population progress'}
               {throughput && (
-                <Header.Subheader>
+                <Header.Subheader data-cy="throughputUpdateStatus">
                   {`Last updated ${
                     throughput.lastUpdated ? moment(throughput.lastUpdated).format('HH:mm:ss MM-DD-YYYY') : 'unknown'
                   }`}

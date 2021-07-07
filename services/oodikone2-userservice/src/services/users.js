@@ -16,7 +16,7 @@ const {
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
 const HyGroupService = require('./hygroups')
-const { requiredGroup, courseStatisticsGroup } = require('../conf')
+const { requiredGroup, courseStatisticsGroup, TOKEN_SECRET } = require('../conf')
 const Op = Sequelize.Op
 
 const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
@@ -36,7 +36,7 @@ const generateToken = async (uid, mockedBy = null) => {
     createdAt: moment().toISOString(),
     version: TOKEN_VERSION
   }
-  const token = jwt.sign(payload, process.env.TOKEN_SECRET)
+  const token = jwt.sign(payload, TOKEN_SECRET)
 
   // return the information including token as JSON
   return token

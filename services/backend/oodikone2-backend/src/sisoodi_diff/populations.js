@@ -14,7 +14,6 @@ let verbose = false
 */
 
 const ignores = {
-
   KH60_001: {
     2018: {
       oodi: [
@@ -64,7 +63,7 @@ const ignores = {
   MH70_007: {
     2020: {
       sis: ['014918968', '014934081', '014954922', '014887918'] // https://jira.it.helsinki.fi/browse/DOO-4572
-    } 
+    }
   },
   MH80_001: {
     2020: {
@@ -78,7 +77,7 @@ const ignores = {
       ]
     },
     2019: {
-      oodi: [ '014323074' ] // https://jira.it.helsinki.fi/browse/DOO-4570
+      oodi: ['014323074'] // https://jira.it.helsinki.fi/browse/DOO-4570
     },
     2020: {
       sis: [
@@ -86,11 +85,11 @@ const ignores = {
         '014590027', // https://jira.it.helsinki.fi/browse/DOO-4571
         '014590807', // https://jira.it.helsinki.fi/browse/DOO-4571
         '014734511', // https://jira.it.helsinki.fi/browse/DOO-4571
-        '013299358', // https://jira.it.helsinki.fi/browse/DOO-4571
+        '013299358' // https://jira.it.helsinki.fi/browse/DOO-4571
       ],
       oodi: [
         '014741193', // https://jira.it.helsinki.fi/browse/DOO-4570
-        '014954744', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3046
+        '014954744' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3046
       ]
     }
   },
@@ -183,7 +182,7 @@ const ignores = {
       '014925715', // MH10_001 valmistunut
       '014690859', // MH20_002 ilmo kesällä
       '014938333', // MH90_001 valmistunut
-      '013596158', // MH90_001 valmistunut  
+      '013596158', // MH90_001 valmistunut
       '014814774', // MH30_004 valmistunut
       '014811405', // MH30_004 valmistunut
       '014837997', // MH40_001 valmistunut
@@ -277,7 +276,7 @@ const ignores = {
       '014863767', // MH60_001
       '014920231', // MH60_001
       '014936487', // MH60_001
-      '015159111', // MH60_001
+      '015159111' // MH60_001
     ],
     // in oodi, but not in sis
     oodi: [
@@ -339,7 +338,7 @@ const ignores = {
       '010664397', // KH50_005 opintoaika loppunut/luopunut
       '014769816', // KH55_001 luopunut
       '014845154', // KH60_001 oodissa väärä loppumispvm
-      '014821974', // MH60_001 alotusv väärin oodissa
+      '014821974' // MH60_001 alotusv väärin oodissa
     ]
   }
 }
@@ -556,10 +555,11 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
 const printWithReason = (studentnumbers, reason) => {
   if (studentnumbers.length > 0) {
     console.log(`- ${reason}: ${studentnumbers.length} students`)
-    if (verbose) studentnumbers.forEach(s => {
-      const p = s.split(', ')
-      console.log(`'${p[0]}', // ${p[1]}`)
-    })
+    if (verbose)
+      studentnumbers.forEach(s => {
+        const p = s.split(', ')
+        console.log(`'${p[0]}', // ${p[1]}`)
+      })
   }
 }
 

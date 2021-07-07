@@ -17,24 +17,8 @@ describe("Studyprogramme overview", () => {
       .click();
     cy.contains("Study Programme", { timeout: 100000 });
   });
-
-  // FIXME: re-enable when CI has mandatory courses in the db
-  it.skip("can search for course mappings", () => {
-    cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
-    cy.contains("Code Mapper").click();
-    cy.wait(150);
-    cy.contains("tr", "TKT20003 Käyttöjärjestelmät").within(($tr) => {
-      cy.get("input").type("582219");
-    });
-    cy.contains("tr", "TKT20003 Käyttöjärjestelmät").within(($tr) => {
-      cy.get(".results").contains("Käyttöjärjestelmät (582219)");
-    });
-    cy.contains("tr", "TKT20003 Käyttöjärjestelmät").within(($tr) => {
-      cy.contains("button", "Add");
-    });
-  });
-
-  it("can view course groups", () => {
+  // Return this when anon data has some kasvatustieteiden kandi
+  it.skip("can view course groups", () => {
     cy.contains("Kasvatustieteiden kandiohjelma").click();
     cy.contains("Course Groups").click();
 
@@ -50,7 +34,20 @@ describe("Studyprogramme overview", () => {
     cy.get("i.reply.icon").click();
   });
 
-  it("renders progress and productivity tables", () => {
+
+  it("progress should not be recalculating when opened for the first time", () => {
+    cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
+    cy.wait(1000)
+    cy.contains("Recalculating").should("not.exist")
+  })
+
+  // Taken from https://docs.cypress.io/api/commands/should#Compare-text-values-of-two-elements
+  const normalizeText = (s) => s.replace(/\s/g, '').toLowerCase()
+  let originalProgressCalculatedText;
+  let originalProductivityCalculatedText;
+
+  // Used by two tests
+  const testProgressAndProductivity = () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.contains("Admin").click();
     cy.contains("productivity").click();
@@ -61,26 +58,50 @@ describe("Studyprogramme overview", () => {
     cy.get("table").should("have.length", 3);
     cy.contains("Population progress");
     cy.contains("Yearly productivity");
+
+    // These are the values if user has dev rights, since graduation feature is shown for only for devs
+    //const populationprogress2017IfUserHasDev = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "10", "33 months", "0", "0", 
+    // "38", "34", "26", "22", "10"]
+    const populationprogress2017 = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "0", "0", "38", "34", "26", "22", "10"]
     cy.contains("2017-2018")
       .siblings()
-      .contains("228")
-      .siblings()
-      .contains("178");
+      .each((elem, index) => {
+        cy.wrap(elem).contains(populationprogress2017[index])
+      })
 
     cy.get("table")
       .eq(1)
       .contains("2018")
       .siblings()
-      .contains("3023.00")
+      .contains("1378.00")
       .siblings()
-      .contains("2631.00");
+      .contains("55.00");
+
     cy.get("table")
       .eq(1)
       .contains("2017")
       .siblings()
-      .contains("3159.00")
+      .contains("555.00")
       .siblings()
-      .contains("2914.00");
+      .contains("9.00");
+  }
+
+  it("renders progress and productivity tables with calculated status", () => {
+    testProgressAndProductivity()
+    // Wait to "recalculating" to disappear
+    cy.wait(1000);
+    // Grab update dates to be compared later
+    cy.cs("throughputUpdateStatus").invoke("text").then((text) => {
+      originalProgressCalculatedText =  normalizeText(text)
+      expect(originalProgressCalculatedText).not.to.contain("recalculating")
+      expect(originalProgressCalculatedText).not.to.contain("refresh")
+    })
+
+    cy.cs("productivityUpdateStatus").invoke("text").then((text) => {
+      originalProductivityCalculatedText = normalizeText(text)
+      expect(originalProductivityCalculatedText).not.to.contain("recalculating")
+      expect(originalProgressCalculatedText).not.to.contain("refresh")
+    })
   });
 
   it("can open Thesis page", () => {
@@ -93,7 +114,7 @@ describe("Studyprogramme overview", () => {
   it("can move to Population statistics page by clickin", () => {
     cy.contains("Tietojenkäsittelytieteen maisteriohjelma").click();
     cy.get("i.level.up.alternate.icon").eq(0).click();
-    // cy.contains("Credit accumulation (for 16 students)");
+    cy.contains("Students (4)");
   });
 
   it("can create and delete tags for population", () => {
@@ -125,6 +146,8 @@ describe("Studyprogramme overview", () => {
   it("can add tags to students", () => {
     const name = `tag-${new Date().getTime()}`;
 
+    const student = "010113437"
+
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.get(".attached").contains("Tags").click();
     cy.get(".tagNameSelectInput > .ui > input").type(name);
@@ -141,12 +164,12 @@ describe("Studyprogramme overview", () => {
 
     cy.get(".form > .field > .dropdown > .visible").contains(name).click();
 
-    cy.get("textarea").type("010623419");
+    cy.get("textarea").type("010113437");
     cy.get(".positive").click();
 
     cy.contains("Student statistics").click();
-    cy.get(".prompt").type("010623419");
-    cy.contains("10").click();
+    cy.get(".prompt").type(student);
+    cy.contains(student).click();
     cy.contains(name);
 
     cy.go("back");
@@ -155,8 +178,32 @@ describe("Studyprogramme overview", () => {
     deleteTag(name);
 
     cy.contains("Student statistics").click();
-    cy.get(".prompt").type("010623419");
-    cy.contains("10").click();
+    cy.get(".prompt").type(student);
+    cy.contains(student).click();
     cy.contains(name).should("not.exist");
+  });
+
+  it("renders progress and productivity tables with calculated status after recalculating stats again", () => {
+    testProgressAndProductivity()
+
+    // Wait to "recalculating" to disappear
+    cy.wait(1000);
+    // Check new calculation statuses are reported
+    const newProgressCalculatedTextElement = cy.cs("throughputUpdateStatus").invoke("text")
+    const newProductivityCalculatedTextElement = cy.cs("productivityUpdateStatus").invoke("text")
+
+    newProgressCalculatedTextElement.should((text) => {
+      const newProgressCalculatedText = normalizeText(text)
+      expect(newProgressCalculatedText).not.to.contain("recalculating")
+      expect(newProgressCalculatedText).not.to.contain("refresh")
+      expect(newProgressCalculatedText).not.to.contain(originalProgressCalculatedText)
+    })
+
+    newProductivityCalculatedTextElement.should((text) => {
+      const newProductivityCalculatedText = normalizeText(text)
+      expect(newProductivityCalculatedText).not.to.contain("recalculating")
+      expect(newProductivityCalculatedText).not.to.contain("refresh")
+      expect(newProductivityCalculatedText).not.to.contain(originalProgressCalculatedText)
+    })
   });
 });
