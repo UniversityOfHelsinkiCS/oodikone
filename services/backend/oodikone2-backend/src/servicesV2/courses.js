@@ -11,12 +11,6 @@ const {
   Organization
 } = require('../modelsV2')
 
-/*
-const {
-  dbConnections: { sequelize }
-} = require('../databaseV2/connection')
-*/
-// const { sequelizeKone, CourseDuplicates } = require('../models/models_kone')
 const { parseCredit } = require('./parseCredits')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../servicesV2/course_yearly_stats_counter')
@@ -134,24 +128,29 @@ const createCourse = async (code, name, latest_instance_date) =>
     latest_instance_date
   })
 
-const alternativeCodes = async code => {
-  console.log('code: ', code)
+const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+
+const unifyOpenUniversity = code => {
+  const regexresult = isOpenUniCourseCode(code)
+  if (!regexresult) return code
+  return regexresult[1]
+}
+
+const allCodeAltenatives = async code => {
   let course = await Course.findAll({
     raw: true,
     attributes: ['id', 'code', 'substitutions'],
     where: {
-      ...codeLikeTerm(code)
+      code: code
     }
   })
-
-  console.log('course: ', course)
 
   const allSubstitutions = _.flatten(course.map(c => c.substitutions))
   console.log('all substitutions: ', allSubstitutions)
 
-  let subCodes = []
+  let subcodes = []
   if (allSubstitutions) {
-    subCodes = await Course.findAll({
+    subcodes = await Course.findAll({
       raw: true,
       attributes: ['code'],
       where: {
@@ -161,24 +160,35 @@ const alternativeCodes = async code => {
       }
     })
   }
-  console.log('subCodes: ', subCodes)
-  const temp = subCodes.map(c => c.code)
-  console.log('temp: ', temp)
-  const doubleTemp = [...temp, code]
-  return allSubstitutions ? doubleTemp : [code]
+
+  const courses = [...course, ...subcodes]
+  const temp = courses
+    .map(c => c.code)
+    .map(c => {
+      if (c.match(/^A/)) return [c, 4] // open university codes come last
+      if (c.match(/^\d/)) return [c, 2] // old numeric codes come second
+      if (c.match(/^[A-Za-z]/)) return [c, 1] // new letter based codes come first
+      return [c, 3] // unknown, comes before open uni?
+    })
+    .sort((a, b) => a[1] - b[1])
+    .map(c => c[0])
+
+  return allSubstitutions ? _.uniq(temp) : [code]
 }
 
 const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anonymizationSalt) => {
-  let codes = await alternativeCodes(coursecode)
-  console.log('unifyopenunicourses: ', unifyOpenUniCourses)
-  console.log('codes: ', codes)
-  if (!unifyOpenUniCourses) {
-    codes = codes.filter(c => !c.match(/^[A][0-9]|^AY/))
+  let codes = await allCodeAltenatives(coursecode)
+
+  if (isOpenUniCourseCode(coursecode) && !unifyOpenUniCourses) {
+    codes = [coursecode]
   }
 
-  const uniqueCodes = _.uniq(codes)
+  if (!isOpenUniCourseCode(coursecode) && !unifyOpenUniCourses) {
+    codes = codes.filter(code => !code.match(/^[A][0-9]|^AY/))
+  }
+
   const [credits, course] = await Promise.all([
-    creditsForCourses(uniqueCodes, anonymizationSalt),
+    creditsForCourses(codes, anonymizationSalt),
     Course.findOne({
       where: {
         code: coursecode
@@ -236,12 +246,13 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
   return {
     ...statistics,
     coursecode,
-    alternatives: uniqueCodes,
+    alternatives: codes,
     name: course.name
   }
 }
 
 const maxYearsToCreatePopulationFrom = async coursecodes => {
+  console.log('max year course codes: ', coursecodes)
   const maxAttainmentDate = new Date(
     Math.max(
       ...(
@@ -338,16 +349,6 @@ const codeLikeTerm = code =>
         }
       }
 
-const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
-
-const unifyOpenUniversity = code => {
-  const regexresult = isOpenUniCourseCode(code)
-  console.log('code: ', code)
-  if (!regexresult) return code
-
-  return regexresult[1]
-}
-
 const byNameAndOrCodeLike = async (name, code) => {
   let courses = await Course.findAll({
     raw: true,
@@ -400,19 +401,10 @@ module.exports = {
   byCode,
   byName,
   bySearchTerm,
-  //bySearchTermTypeAndDiscipline,
   createCourse,
-  // findDuplicates,
-  // setDuplicateCode,
-  // deleteDuplicateCode,
-  // getCodeToMainCourseMap,
-  // getMainCourseToCourseMap,
-  // getAllCourseTypes,
-  // getAllDisciplines,
   courseYearlyStats,
   byNameAndOrCodeLike,
   byCodes,
-  // getMainCodeToDuplicatesAndCodeToMainCode,
   maxYearsToCreatePopulationFrom,
   unifyOpenUniversity
 }

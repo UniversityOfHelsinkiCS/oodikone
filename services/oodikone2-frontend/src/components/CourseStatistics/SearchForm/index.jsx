@@ -55,7 +55,6 @@ const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchin
 }
 
 const SearchForm = props => {
-  // console.log('matchingCourses: ', props.matchingCourses)
   const { language } = useLanguage()
   const [state, setState] = useState({
     ...INITIAL
@@ -147,7 +146,6 @@ const SearchForm = props => {
   }
 
   const onSubmitFormClick = () => {
-    console.log('on submit form click')
     const codes = sortBy(Object.keys(selectedCourses))
     const params = {
       courseCodes: codes,

@@ -6,7 +6,7 @@ const prefix = 'GET_COURSE_SEARCH_RESULT_'
 // const storeActions = actions(prefix)
 
 // export const clearCourses = storeActions.clear
-export const clearCourses = () => ({ type: 'CLEAR COURSES' })
+export const clearCourses = () => ({ type: 'CLEAR_SEARCH_RESULTS' })
 
 export const findCourses = ({ name, type }, language = 'fi') => {
   const route = '/coursesmulti'
@@ -53,7 +53,7 @@ const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false 
         ...state,
         unifyOpenUniCourses: !state.unifyOpenUniCourses
       }
-    case 'CLEAR COURSES':
+    case 'CLEAR_SEARCH_RESULTS':
       return {
         ...state,
         data: {}
