@@ -30,7 +30,10 @@ services:
   analytics-db:
     <<: *defaults
     container_name: analytics-db
-    image: registry.toska.cs.helsinki.fi/analytics-db
+    environment:
+      POSTGRES_DB: analytics-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    image: postgres:9.6.3
     ports:
       - "5423:5432"
 
