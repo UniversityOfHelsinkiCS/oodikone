@@ -86,7 +86,7 @@ describe("Studyprogramme overview", () => {
       .contains("9.00");
   }
 
-  it.only("renders progress and productivity tables with calculated status", () => {
+  it("renders progress and productivity tables with calculated status", () => {
     testProgressAndProductivity()
     // Wait to "recalculating" to disappear
     cy.wait(1000);
@@ -183,7 +183,7 @@ describe("Studyprogramme overview", () => {
     cy.contains(name).should("not.exist");
   });
 
-  it.only("renders progress and productivity tables with calculated status after recalculating stats again", () => {
+  it("renders progress and productivity tables with calculated status after recalculating stats again", () => {
     testProgressAndProductivity()
 
     // Wait to "recalculating" to disappear
