@@ -579,7 +579,6 @@ jobs:
           docker ps -a
           if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
             echo 'Some process had nonzero exit code';
-            ./run.sh oodikone ci logs;
             exit 1;
           fi
 
@@ -651,3 +650,5 @@ jobs:
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: test-failure
+      - name: "Print logs on failure"
+        run: ./run.sh oodikone ci logs
