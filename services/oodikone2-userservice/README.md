@@ -1,1 +1,0 @@
-# oodikone2-userservice
