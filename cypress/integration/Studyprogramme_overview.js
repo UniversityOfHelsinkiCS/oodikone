@@ -46,7 +46,8 @@ describe("Studyprogramme overview", () => {
   let originalProgressCalculatedText;
   let originalProductivityCalculatedText;
 
-  it.only("renders progress and productivity tables with calculated status", () => {
+  // Used by two tests
+  const testProgressAndProductivity = () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.contains("Admin").click();
     cy.contains("productivity").click();
@@ -58,8 +59,10 @@ describe("Studyprogramme overview", () => {
     cy.contains("Population progress");
     cy.contains("Yearly productivity");
 
-    const populationprogress2017 = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "10", "33 months", "0", "0", 
-    "38", "34", "26", "22", "10"]
+    // These are the values if user has dev rights, since graduation feature is shown for only for devs
+    //const populationprogress2017IfUserHasDev = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "10", "33 months", "0", "0", 
+    // "38", "34", "26", "22", "10"]
+    const populationprogress2017 = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "0", "0", "38", "34", "26", "22", "10"]
     cy.contains("2017-2018")
       .siblings()
       .each((elem, index) => {
@@ -81,7 +84,10 @@ describe("Studyprogramme overview", () => {
       .contains("555.00")
       .siblings()
       .contains("9.00");
+  }
 
+  it.only("renders progress and productivity tables with calculated status", () => {
+    testProgressAndProductivity()
     // Wait to "recalculating" to disappear
     cy.wait(1000);
     // Grab update dates to be compared later
@@ -178,40 +184,7 @@ describe("Studyprogramme overview", () => {
   });
 
   it.only("renders progress and productivity tables with calculated status after recalculating stats again", () => {
-    cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
-    cy.contains("Admin").click();
-    cy.contains("productivity").click();
-    cy.contains("throughput").click();
-
-    cy.wait(1000);
-    cy.get(".attached > :nth-child(1)").click();
-    cy.get("table").should("have.length", 3);
-    cy.contains("Population progress");
-    cy.contains("Yearly productivity");
-
-    const populationprogress2017 = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "10", "33 months", "0", "0", 
-    "38", "34", "26", "22", "10"]
-    cy.contains("2017-2018")
-      .siblings()
-      .each((elem, index) => {
-        cy.wrap(elem).contains(populationprogress2017[index])
-      })
-
-    cy.get("table")
-      .eq(1)
-      .contains("2018")
-      .siblings()
-      .contains("1378.00")
-      .siblings()
-      .contains("55.00");
-
-    cy.get("table")
-      .eq(1)
-      .contains("2017")
-      .siblings()
-      .contains("555.00")
-      .siblings()
-      .contains("9.00");
+    testProgressAndProductivity()
 
     // Wait to "recalculating" to disappear
     cy.wait(1000);
