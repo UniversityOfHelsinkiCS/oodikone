@@ -1,12 +1,8 @@
 const axios = require('axios')
+const { redisClient } = require('./redis')
 const { ANALYTICS_URL } = require('../conf-backend')
 
 const client = axios.create({ baseURL: ANALYTICS_URL })
-
-const ping = async () => {
-  const response = await client.get('/ping')
-  return response.data
-}
 
 const getProductivity = async id => {
   const response = await client.get(`/v2/productivity/${id}`)
@@ -14,6 +10,7 @@ const getProductivity = async id => {
 }
 
 const setProductivity = async data => {
+  console.log("data", data)
   const response = await client.post('/v2/productivity', { data })
   return response.data
 }
@@ -59,7 +56,6 @@ const getNonGraduatedStudents = async id => {
 }
 
 module.exports = {
-  ping,
   getProductivity,
   setProductivity,
   patchProductivity,
