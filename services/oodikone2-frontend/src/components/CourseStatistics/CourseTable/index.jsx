@@ -11,7 +11,6 @@ const CourseTable = ({ courses, onSelectCourse, hidden, title, emptyListText, ma
   const { language } = useLanguage()
   const noContent = courses.length === 0
   const sortCourses = courses => sortBy(courses, course => getTextIn(course.name, language))
-  console.log('course table courses: ', courses)
 
   const getEmptyListRow = () => (
     <Table.Row>
