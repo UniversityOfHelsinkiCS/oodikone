@@ -28,7 +28,7 @@ jobs:
         tags: toska/sis-updater-worker:latest
 
     - name: "Send notification to slack"
-      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
+      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
       with:
         webhook-url: ${{ secrets.WEBHOOK_URL }}
         message-type: deployment
@@ -43,7 +43,7 @@ jobs:
     if: failure()
     steps:
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment-failure

@@ -36,66 +36,61 @@ const Updater = () => {
 
   return (
     <Segment>
+      <Form>
+        <Form.Group>
+          <Form.Button content="Update meta" onClick={() => updateSISMeta()} />
+          <Form.Button content="Update students" onClick={() => updateSISStudents()} />
+          <Form.Button content="Update programmes" onClick={() => updateSISProgrammes()} />
+          <Form.Button content="Refresh updater redis cache" onClick={() => refreshSISRedisCache()} />
+          <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
+        </Form.Group>
+        <Form.Group>
+          <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
+        </Form.Group>
+      </Form>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Form.Group>
+          <TextArea fluid onChange={(_, { value }) => setSISNums(value)} style={{ width: '98%' }} />
+          <Form.Button
+            onClick={updateSISPopulationStudents}
+            content="Update students by student number"
+            icon="refresh"
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Input
+            placeholder="programme"
+            fluid
+            name="programme"
+            value={SISProgrammeName}
+            onChange={(_, { value }) => setSISProgrammeName(value)}
+            style={{ marginBottom: 10 }}
+          />
+          <Form.Input
+            fluid
+            placeholder="year"
+            name="year"
+            value={SISProgrammeYear}
+            onChange={(_, { value }) => setSISProgrammeYear(value)}
+            style={{ marginBottom: 10 }}
+          />
+          <Form.Button
+            onClick={updateSISPopulationStudentsByProgramme}
+            content="Update all students by programme & year"
+            icon="refresh"
+          />
+        </Form.Group>
+        <Form.Group>
+          <TextArea fluid onChange={(_, { value }) => setSISCourses(value)} style={{ width: '98%' }} />
+          <Form.Button onClick={updateSISCourses} content="Update courses by course code" icon="refresh" />
+        </Form.Group>
+      </div>
       <Segment>
-        <Header style={{ marginTop: '-.14285714em' }}>SIS STUFF WATCHOUT</Header>
-        <Form>
-          <Form.Group>
-            <Form.Button content="Update SIS Meta" onClick={() => updateSISMeta()} />
-            <Form.Button content="Update SIS Students" onClick={() => updateSISStudents()} />
-            <Form.Button content="Update SIS Programmes" onClick={() => updateSISProgrammes()} />
-            <Form.Button content="Refresh SIS Redis cache" onClick={() => refreshSISRedisCache()} />
-            <Form.Button content="Refresh statistics V2" icon="refresh" onClick={() => refreshStatisticsV2()} />
-          </Form.Group>
-          <Form.Group>
-            <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />
-          </Form.Group>
-        </Form>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Form.Group>
-            <TextArea fluid onChange={(_, { value }) => setSISNums(value)} style={{ width: '98%' }} />
-            <Form.Button
-              onClick={updateSISPopulationStudents}
-              content="Update students by student number"
-              icon="refresh"
-            />
-          </Form.Group>
-          <Form.Group>
-            <Form.Input
-              placeholder="programme"
-              fluid
-              name="programme"
-              value={SISProgrammeName}
-              onChange={(_, { value }) => setSISProgrammeName(value)}
-              style={{ marginBottom: 10 }}
-            />
-            <Form.Input
-              fluid
-              placeholder="year"
-              name="year"
-              value={SISProgrammeYear}
-              onChange={(_, { value }) => setSISProgrammeYear(value)}
-              style={{ marginBottom: 10 }}
-            />
-            <Form.Button
-              onClick={updateSISPopulationStudentsByProgramme}
-              content="Update all students by programme & year"
-              icon="refresh"
-            />
-          </Form.Group>
-          <Form.Group>
-            <TextArea fluid onChange={(_, { value }) => setSISCourses(value)} style={{ width: '98%' }} />
-            <Form.Button onClick={updateSISCourses} content="Update courses by course code" icon="refresh" />
-          </Form.Group>
-        </div>
+        <Button content="Clear messages" onClick={() => setMessages([])} />
+        <Header>{messages}</Header>
       </Segment>
-      <Button content="Clear messages" onClick={() => setMessages([])} />
-      <Header>{messages}</Header>
     </Segment>
   )
 }
 
 export default Updater
-
-/*
- 
-*/
