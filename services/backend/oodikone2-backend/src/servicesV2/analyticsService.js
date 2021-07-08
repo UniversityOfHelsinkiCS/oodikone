@@ -6,11 +6,14 @@ const moment = require('moment')
 const client = axios.create({ baseURL: ANALYTICS_URL })
 
 const createRedisKeyForProductivity = id => `PRODUCTIVITY_${id}`
+const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
 
 const getProductivity = async id => {
   const redisKey = createRedisKeyForProductivity(id)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
   return {
-    [id]: JSON.parse(await redisClient.getAsync(redisKey))
+    [id]: JSON.parse(dataFromRedis)
   }
 }
 
@@ -22,7 +25,8 @@ const setProductivity = async data => {
     status: 'DONE',
     lastUpdated: moment().format()
   }
-  await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
   return {
     [id]: dataToRedis
   }
@@ -30,32 +34,61 @@ const setProductivity = async data => {
 
 const patchProductivity = async data => {
   const { id } = data
-  const redisKey = createRedisKeyForProductivity(data.id)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
+  const redisKey = createRedisKeyForProductivity(id)
+  const dataFromRedis = JSON.parse(await redisClient.getAsync(redisKey))
   const patchedData = {
     ...dataFromRedis,
     ...data,
     lastUpdated: moment().format()
   }
-  await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
+  if (setOperationStatus !== 'OK') return null
   return {
     [id]: patchedData
   }
 }
 
 const getThroughput = async id => {
-  const response = await client.get(`/v2/throughput/${id}`)
-  return response.data
+  const redisKey = createRedisKeyForThroughput(id)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return {
+    [id]: JSON.parse(dataFromRedis)
+  }
 }
 
 const setThroughput = async data => {
-  const response = await client.post('/v2/throughput', { data })
-  return response.data
+  const { id, data: dataToSet } = data
+  const redisKey = createRedisKeyForThroughput(id)
+  const dataToRedis = {
+    data: dataToSet.years,
+    totals: dataToSet.totals,
+    stTotals: dataToSet.stTotals,
+    status: 'DONE',
+    lastUpdated: moment().format()
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
+  return {
+    [id]: dataToRedis
+  }
 }
 
 const patchThroughput = async data => {
-  const response = await client.patch('/v2/throughput', { data })
-  return response.data
+  const [id, dataToPatch] = Object.entries(data)[0]
+  const redisKey = createRedisKeyForThroughput(id)
+  const { status } = dataToPatch
+  const dataFromRedis = JSON.parse(await redisClient.getAsync(redisKey))
+  const patchedData = {
+    ...dataFromRedis,
+    status,
+    lastUpdated: moment().format()
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
+  if (setOperationStatus !== 'OK') return null
+  return {
+    [id]: patchedData
+  }
 }
 
 const patchFacultyYearlyStats = async data => {
