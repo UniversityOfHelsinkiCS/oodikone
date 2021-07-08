@@ -1,27 +1,22 @@
-require('dotenv').config()
+const { NODE_ENV, DB_URL, SECRET, TOKEN_SECRET } = process.env
 
-const { NODE_ENV } = process.env
-
-const isTest = NODE_ENV === 'test'
-const isDev = NODE_ENV === 'dev'
+const isDev = NODE_ENV === 'development'
 const isStaging = NODE_ENV === 'staging'
 
-const DB_SCHEMA = isTest ? 'test' : process.env.DB_SCHEMA || 'public'
-const DB_URL = process.env.DB_URL
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 
 let requiredGroup = ['grp-oodikone-users', 'grp-oodikone-basic-users']
 if (isStaging) {
   requiredGroup = ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
 }
-if (isDev || isTest) {
+if (isDev) {
   requiredGroup = null
 }
 
 module.exports = {
   DB_URL,
-  DB_SCHEMA,
+  SECRET,
+  TOKEN_SECRET,
   requiredGroup,
-  courseStatisticsGroup,
-  isTest
+  courseStatisticsGroup
 }

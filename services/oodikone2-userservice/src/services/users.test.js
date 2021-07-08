@@ -1,8 +1,7 @@
 const { sequelize, forceSyncDatabase } = require('../database/connection')
 const { User, AccessGroup, HyGroup, UserElementDetails } = require('../models/index')
-const userService = require('../services/users')
-const AccessService = require('../services/accessgroups')
-const { DB_SCHEMA } = require('../conf')
+const userService = require('./users')
+const AccessService = require('./accessgroups')
 
 const default_users = [
   {
@@ -54,16 +53,7 @@ const default_hygroups = [
   }
 ]
 
-const dropSchemaIfExists = async schema => {
-  const schemas = await sequelize.showAllSchemas()
-  if (schemas.some(name => name === schema)) {
-    await sequelize.dropSchema(schema)
-  }
-}
-
 beforeAll(async () => {
-  await dropSchemaIfExists(DB_SCHEMA)
-  await sequelize.createSchema(DB_SCHEMA)
   await forceSyncDatabase()
   await User.bulkCreate(default_users)
   await AccessGroup.bulkCreate(default_accessgroups)
@@ -81,17 +71,16 @@ beforeAll(async () => {
   await normal_user.addHy_group(hygroup)
 })
 afterAll(async () => {
+  await forceSyncDatabase()
   await sequelize.close()
 })
 
 describe('basic tests', () => {
   test('tests start', async () => {
-    console.log('mayhem begins')
     expect(process.env.NODE_ENV).toBe('test')
   })
 
   test('database is connected', async () => {
-    expect(DB_SCHEMA).toBe('test')
     try {
       await sequelize.authenticate()
     } catch (e) {
