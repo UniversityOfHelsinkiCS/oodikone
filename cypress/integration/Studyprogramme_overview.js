@@ -62,7 +62,7 @@ describe("Studyprogramme overview", () => {
     // These are the values if user has dev rights, since graduation feature is shown for only for devs
     //const populationprogress2017IfUserHasDev = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "10", "33 months", "0", "0", 
     // "38", "34", "26", "22", "10"]
-    const populationprogress2017 = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "0", "0", "38", "34", "26", "22", "10"]
+    const populationprogress2017 = ["43", "11 (25%)", "32 (74%)", "42 (97%)", "43", "3", "10", "0", "0", "38", "34", "26", "22", "10"]
     cy.contains("2017-2018")
       .siblings()
       .each((elem, index) => {
