@@ -1,6 +1,5 @@
 const { CronJob } = require('cron')
 const moment = require('moment')
-const { refreshAssociationsInRedis } = require('./services/studyrights')
 const {
   refreshProtoC,
   refreshStatus,
@@ -10,12 +9,10 @@ const {
   getStartYears
 } = require('./services/coolDataScience')
 const { refreshAssociationsInRedis: refreshAssociationsInRedisV2 } = require('./servicesV2/studyrights')
-const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./services/studyrights')
 const {
   getAllProgrammes: getAllProgrammesV2,
   nonGraduatedStudentsOfElementDetail: nonGraduatedStudentsOfElementDetailV2
 } = require('./servicesV2/studyrights')
-const { productivityStatsForCode, throughputStatsForCode } = require('./services/studyprogramme')
 
 const {
   productivityStatsForStudytrack: productivityStatsForStudytrackV2,
@@ -23,18 +20,10 @@ const {
 } = require('./servicesV2/studyprogramme')
 
 const { calculateFacultyYearlyStats } = require('./services/faculties')
-const topteachers = require('./services/topteachers')
 const topteachersV2 = require('./servicesV2/topteachers')
 const { isNewHYStudyProgramme } = require('./util')
 
-const {
-  setProductivity,
-  setThroughput,
-  patchProductivity,
-  patchThroughput,
-  patchFacultyYearlyStats,
-  patchNonGraduatedStudents
-} = require('./services/analyticsService')
+const { patchFacultyYearlyStats } = require('./services/analyticsService')
 
 const {
   setProductivity: setProductivityV2,
@@ -56,15 +45,6 @@ const refreshFacultyYearlyStats = async () => {
   }
 }
 
-const refreshStudyrightAssociations = async () => {
-  try {
-    console.log('Refreshing studyright associations...')
-    await refreshAssociationsInRedis()
-  } catch (e) {
-    console.error(e)
-  }
-}
-
 const refreshStudyrightAssociationsV2 = async () => {
   try {
     console.log('Refreshing studyright associations...')
@@ -74,57 +54,9 @@ const refreshStudyrightAssociationsV2 = async () => {
   }
 }
 
-const refreshOverview = async () => {
-  try {
-    console.log('Refreshing overview...')
-    const codes = (await getAllProgrammes()).map(p => p.code)
-    let ready = 0
-    for (const code of codes) {
-      let programmeStatsSince = new Date('2017-07-31')
-      if (code.includes('MH') || code.includes('KH')) {
-        programmeStatsSince = new Date('2017-07-31')
-      } else {
-        programmeStatsSince = new Date('2000-07-31')
-      }
-      try {
-        await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-        const data = await throughputStatsForCode(code, programmeStatsSince.getFullYear())
-        await setThroughput(data)
-      } catch (e) {
-        try {
-          await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
-        } catch (e) {
-          console.error(e)
-        }
-        console.error(e)
-        console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
-      }
-      try {
-        await patchProductivity({ [code]: { status: 'RECALCULATING' } })
-        const data = await productivityStatsForCode(code, programmeStatsSince)
-        await setProductivity(data)
-      } catch (e) {
-        try {
-          await patchProductivity({
-            [code]: { status: 'RECALCULATION ERRORED' }
-          })
-        } catch (e) {
-          console.error(e)
-        }
-        console.error(e)
-        console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
-      }
-      ready += 1
-      console.log(`RefreshOverview ${ready}/${codes.length} done`)
-    }
-  } catch (e) {
-    console.error(e)
-  }
-}
-
 const refreshOverviewV2 = async () => {
   try {
-    console.log('Refreshing overview...')
+    console.log('Refreshing throughput and productivity for programmes...')
     const codes = (await getAllProgrammesV2()).map(p => p.code)
     let ready = 0
     for (const code of codes) {
@@ -135,14 +67,11 @@ const refreshOverviewV2 = async () => {
         programmeStatsSince = new Date('2000-07-31')
       }
       try {
-        // HERE
         await patchThroughputV2({ [code]: { status: 'RECALCULATING' } })
         const data = await throughputStatsForStudytrackV2(code, programmeStatsSince.getFullYear())
-        // HERE
         await setThroughputV2(data)
       } catch (e) {
         try {
-          // HERE
           await patchThroughputV2({ [code]: { status: 'RECALCULATION ERRORED' } })
         } catch (e) {
           console.error(e)
@@ -151,14 +80,11 @@ const refreshOverviewV2 = async () => {
         console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
       }
       try {
-        // HERE
         await patchProductivityV2({ [code]: { status: 'RECALCULATING' } })
         const data = await productivityStatsForStudytrackV2(code, programmeStatsSince)
-        // HERE
         await setProductivityV2(data)
       } catch (e) {
         try {
-          // HERE
           await patchProductivityV2({
             [code]: { status: 'RECALCULATION ERRORED' }
           })
@@ -169,21 +95,10 @@ const refreshOverviewV2 = async () => {
         console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
       }
       ready += 1
-      console.log(`RefreshOverview ${ready}/${codes.length} done`)
+      console.log(`${ready}/${codes.length} programmes done`)
     }
   } catch (e) {
     console.error(e)
-  }
-}
-
-const refreshTeacherLeaderboard = async () => {
-  try {
-    const startyearcode = new Date().getFullYear() - 1950
-    const endyearcode = startyearcode + 1
-    console.log('Refreshing teacher leaderboard...')
-    await topteachers.findAndSaveTeachers(startyearcode, endyearcode)
-  } catch (e) {
-    console.log(e)
   }
 }
 
@@ -193,31 +108,6 @@ const refreshTeacherLeaderboardV2 = async () => {
     const endyearcode = startyearcode + 1
     console.log('Refreshing teacher leaderboard...')
     await topteachersV2.findAndSaveTeachers(startyearcode, endyearcode)
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-const refreshNonGraduatedStudentsOfOldProgrammes = async () => {
-  try {
-    const oldProgrammeCodes = (await getAllProgrammes()).map(p => p.code).filter(c => !isNewHYStudyProgramme(c))
-    let i = 0
-    console.log('Refreshing non-graduated students of old programmes...')
-    await Promise.all(
-      oldProgrammeCodes.map(
-        c =>
-          new Promise(async res => {
-            try {
-              const [nonGraduatedStudents, studentnumbers] = await nonGraduatedStudentsOfElementDetail(c)
-              await patchNonGraduatedStudents({ [c]: { formattedData: nonGraduatedStudents, studentnumbers } })
-              console.log(`${++i}/${oldProgrammeCodes.length}`)
-            } catch (e) {
-              console.log(`Failed refreshing non-graduated students of programme ${c}!`)
-            }
-            res()
-          })
-      )
-    )
   } catch (e) {
     console.log(e)
   }
@@ -319,14 +209,6 @@ const refreshProtoCProgrammeToRedis = async () => {
   }
 }
 
-const refreshStatistics = async () => {
-  await refreshFacultyYearlyStats()
-  await refreshStudyrightAssociations()
-  await refreshOverview()
-  await refreshTeacherLeaderboard()
-  await refreshNonGraduatedStudentsOfOldProgrammes()
-}
-
 const refreshStatisticsV2 = async () => {
   await refreshStudyrightAssociationsV2()
   await refreshOverviewV2()
@@ -334,27 +216,23 @@ const refreshStatisticsV2 = async () => {
   await refreshTeacherLeaderboardV2()
 }
 
+const startCron = () => {
+  if (process.env.NODE_ENV === 'production') {
+    schedule('0 6 * * *', async () => {
+      await refreshStatisticsV2()
+    })
+  }
+}
+
+// OLD, add these to cron after fixing to work with SIS data
+const refreshStatistics = async () => {
+  await refreshFacultyYearlyStats()
+}
 const refreshCDS = async () => {
   await refreshProtoCtoRedis()
   await refreshStatusToRedis()
   await refreshUberToRedis()
   await refreshProtoCProgrammeToRedis()
-}
-
-const startCron = () => {
-  if (process.env.NODE_ENV === 'production') {
-    schedule('0 6 * * *', async () => {
-      await refreshStatistics()
-      await refreshStatisticsV2()
-      await refreshCDS()
-    })
-
-    if (process.env.TAG === 'staging') {
-      schedule('0 7 * * *', async () => {
-        await refreshStatisticsV2()
-      })
-    }
-  }
 }
 
 module.exports = {
