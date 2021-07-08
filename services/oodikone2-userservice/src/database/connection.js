@@ -1,9 +1,8 @@
 const Sequelize = require('sequelize')
 const Umzug = require('umzug')
-const conf = require('../conf')
+const { DB_URL } = require('../conf')
 
-const sequelize = new Sequelize(conf.DB_URL, {
-  schema: conf.DB_SCHEMA,
+const sequelize = new Sequelize(DB_URL, {
   logging: false
 })
 const initializeDatabaseConnection = async () => {
@@ -22,28 +21,26 @@ const initializeDatabaseConnection = async () => {
       await sleep(1000)
     }
   }
-  if (process.env.NODE_ENV != 'test') {
-    try {
-      const migrator = new Umzug({
-        storage: 'sequelize',
-        storageOptions: {
-          sequelize: sequelize,
-          tableName: 'migrations'
-        },
-        logging: console.log,
-        migrations: {
-          params: [sequelize.getQueryInterface(), Sequelize],
-          path: `${process.cwd()}/src/database/migrations`,
-          pattern: /\.js$/
-        }
-      })
-      const migrations = await migrator.up()
+  try {
+    const migrator = new Umzug({
+      storage: 'sequelize',
+      storageOptions: {
+        sequelize: sequelize,
+        tableName: 'migrations'
+      },
+      logging: console.log,
+      migrations: {
+        params: [sequelize.getQueryInterface(), Sequelize],
+        path: `${process.cwd()}/src/database/migrations`,
+        pattern: /\.js$/
+      }
+    })
+    const migrations = await migrator.up()
 
-      console.log('Migrations up to date', migrations)
-    } catch (e) {
-      console.log('Migration error')
-      throw e
-    }
+    console.log('Migrations up to date', migrations)
+  } catch (e) {
+    console.log('Migration error')
+    throw e
   }
 }
 

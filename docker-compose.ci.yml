@@ -4,15 +4,14 @@ x-defaults: &defaults
   restart: unless-stopped
 
 x-build_defaults: &build_defaults
-  build:
-    args:
-      TAG: ${TAG}
+  args:
+    TAG: ${TAG}
 
 services:
   analytics:
     <<: *defaults
-    <<: *build_defaults
     build:
+      <<: *build_defaults
       cache_from:
       - toska/oodikone2-userservice:trunk
       - toska/oodikone2-userservice:staging
@@ -30,21 +29,24 @@ services:
   analytics-db:
     <<: *defaults
     container_name: analytics-db
-    image: registry.toska.cs.helsinki.fi/analytics-db
+    environment:
+      POSTGRES_DB: analytics-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    image: postgres:9.6.3
     ports:
       - "5423:5432"
 
   backend:
     <<: *defaults
-    <<: *build_defaults
     build:
+      <<: *build_defaults
       cache_from:
         - toska/oodikone2-backend:trunk
         - toska/oodikone2-backend:staging
         - toska/oodikone2-backend:latest
       context: services/backend
       dockerfile: oodikone2-backend/Dockerfile
-    container_name: backen
+    container_name: backend
     depends_on:
       - kone-db
       - oodi-db
@@ -68,8 +70,8 @@ services:
 
   frontend:
     <<: *defaults
-    <<: *build_defaults
     build:
+      <<: *build_defaults
       cache_from:
         - toska/oodikone2-frontend:trunk
         - toska/oodikone2-frontend:staging
@@ -120,13 +122,14 @@ services:
 
   userservice:
     <<: *defaults
-    <<: *build_defaults
     build:
+      <<: *build_defaults
       cache_from:
         - toska/oodikone2-userservice:trunk
         - toska/oodikone2-userservice:staging
         - toska/oodikone2-userservice:latest
       context: services/oodikone2-userservice
+      target: production
     container_name: userservice
     depends_on:
       - user-db

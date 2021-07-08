@@ -65,7 +65,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, 
             <Grid.Column>
               Yearly productivity
               {productivity && (
-                <Header.Subheader>
+                <Header.Subheader data-cy="productivityUpdateStatus">
                   {`Last updated ${
                     productivity.lastUpdated
                       ? moment(productivity.lastUpdated).format('HH:mm:ss MM-DD-YYYY')

@@ -1,0 +1,12 @@
+services:
+
+  userservice-test:
+    build:
+      args:
+        NODE_ENV: test
+      target: test
+      context: services/oodikone2-userservice
+    container_name: userservice-test
+    environment:
+      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
+      TOKEN_SECRET: IWannaBeTheVeryBest
