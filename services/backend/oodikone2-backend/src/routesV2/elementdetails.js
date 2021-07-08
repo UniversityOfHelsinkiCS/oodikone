@@ -17,7 +17,6 @@ const {
   patchProductivity,
   patchThroughput,
   getNonGraduatedStudents
-  //ping
 } = require('../servicesV2/analyticsService')
 
 const programmeStatsSince = new Date('2017-07-31')

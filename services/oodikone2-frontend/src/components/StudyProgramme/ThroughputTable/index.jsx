@@ -265,7 +265,7 @@ const ThroughputTable = ({
 
             <Table.Row>
               {renderGenders || renderRatioOfFinns ? <Table.HeaderCell content="Total" /> : null}
-              {genders.map(gender => (
+              {[...genders].sort().map(gender => (
                 <Table.HeaderCell key={gender} content={gender} />
               ))}
               {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}

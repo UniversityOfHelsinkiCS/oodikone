@@ -46,7 +46,7 @@ services:
         - toska/oodikone2-backend:latest
       context: services/backend
       dockerfile: oodikone2-backend/Dockerfile
-    container_name: backen
+    container_name: backend
     depends_on:
       - kone-db
       - oodi-db
