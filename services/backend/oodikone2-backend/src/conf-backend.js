@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const { NODE_ENV } = process.env
 const isTest = process.env.NODE_ENV === 'test'
 let DB_URL = process.env.DB_URL
