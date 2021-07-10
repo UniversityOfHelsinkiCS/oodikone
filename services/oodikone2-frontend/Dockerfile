@@ -14,6 +14,8 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 ARG TAG=local
 ENV TAG=${TAG}
+ARG SENTRY_RELEASE
+ENV REACT_APP_SENTRY_RELEASE=$SENTRY_RELEASE
 
 COPY . /usr/src/app
 RUN if [ "${NODE_ENV}" != "development" ]; then \

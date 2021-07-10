@@ -1,13 +1,13 @@
 const isProduction = process.env.NODE_ENV === 'production'
 const isDev = process.env.NODE_ENV === 'development'
 
-const GIT_SHA = process.env.REACT_APP_GIT_SHA || ''
+const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE || ''
 
 const TAG = process.env.TAG || ''
 
 module.exports = {
   isProduction,
   isDev,
-  GIT_SHA,
+  SENTRY_RELEASE,
   TAG
 }
