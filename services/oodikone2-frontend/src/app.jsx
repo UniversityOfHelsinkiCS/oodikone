@@ -10,8 +10,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import Main from './components/Main'
 import CommonContext from './CommonContext'
 import initializeSentry from './util/sentry'
-
-const IS_PRODUCTION = process.env.NODE_ENV === 'production'
+import { isProduction } from './conf'
 
 initializeSentry()
 
@@ -29,7 +28,7 @@ ReactDOM.render(
 )
 
 // Best not to use this in production as the performance impact appears to be quite high.
-debugContextDevtool(container, { disable: IS_PRODUCTION })
+debugContextDevtool(container, { disable: isProduction })
 
 if (module.hot) {
   module.hot.accept()
