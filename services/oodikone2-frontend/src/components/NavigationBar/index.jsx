@@ -9,6 +9,7 @@ import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
 import { useIsAdmin } from '../../common/hooks'
+import { isDev } from '../../conf'
 
 const {
   USER_ADMINER_URL,
@@ -124,7 +125,7 @@ const NavigationBar = props => {
     )
   const testUsers = ['tktl', 'mluukkai']
   const renderUserMenu = () =>
-    process.env.NODE_ENV === 'development' ? (
+    isDev ? (
       <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
         <Dropdown.Menu>
           {adminerUrls.map(({ url, text }) => (

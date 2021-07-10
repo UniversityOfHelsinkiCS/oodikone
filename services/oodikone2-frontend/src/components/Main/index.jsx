@@ -9,12 +9,13 @@ import ErrorContainer from '../ErrorContainer'
 import Routes from '../Routes'
 import SisChangeMessage from './SisChangeMessage'
 import './main.css'
+import { isDev } from '../../conf'
 
 const history = TSA.Matomo.connectToHistory(createBrowserHistory())
 
 export default () => {
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') {
+    if (!isDev) {
       initShibbolethPinger(60000, window.location.origin)
     }
   }, [])
