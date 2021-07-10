@@ -2,9 +2,9 @@ import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 import { API_BASE_PATH, BASE_PATH, ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
 import { getMocked, setMocking, setTestUser, getTestUser, getTestUserOodi } from '../common'
+import { isDev } from '../conf'
 
 const isTestEnv = BASE_PATH === '/testing/'
-const isDevEnv = process.env.NODE_ENV === 'development'
 const devOptions = {
   headers: {
     uid: getTestUser() || 'tktl',
@@ -26,7 +26,7 @@ const getDefaultConfig = () => {
   if (isTestEnv) {
     return { ...testOptions }
   }
-  if (isDevEnv) {
+  if (isDev) {
     return { ...devOptions }
   }
   return {
@@ -66,7 +66,7 @@ export const logout = async () => {
 
 export const callApi = async (url, method = 'get', data, params, timeout = 0, progressCallback = null) => {
   let options = { headers: {}, timeout }
-  if (isDevEnv) {
+  if (isDev) {
     options = devOptions
   }
   if (isTestEnv) {
