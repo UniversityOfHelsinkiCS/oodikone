@@ -1,30 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import * as Sentry from '@sentry/browser'
 import 'semantic-ui-css/semantic.min.css'
 import 'react-datetime/css/react-datetime.css'
 import './styles/custom.css'
 import { debugContextDevtool } from 'react-context-devtool'
-import { BASE_PATH } from './constants'
 import store from './store'
 import ErrorBoundary from './components/ErrorBoundary'
 import Main from './components/Main'
 import CommonContext from './CommonContext'
+import initializeSentry from './util/sentry'
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 
-try {
-  if (IS_PRODUCTION && BASE_PATH === '/' && ['staging', 'latest'].includes(process.env.TAG)) {
-    Sentry.init({
-      environment: process.env.TAG,
-      dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
-      release: process.env.SENTRY_RELEASE_VERSION
-    })
-  }
-} catch (e) {
-  console.log(e) // eslint-disable-line no-console
-}
+initializeSentry()
 
 const container = document.getElementById('root')
 
