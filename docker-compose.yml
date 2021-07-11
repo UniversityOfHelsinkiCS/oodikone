@@ -8,7 +8,6 @@ x-build_defaults: &build_defaults
   args:
     NODE_ENV: development
     TAG: development
-  target: development
 
 services:
   adminer:
@@ -241,6 +240,7 @@ services:
     build:
       <<: *build_defaults
       context: services/oodikone2-userservice
+      target: development
     container_name: userservice
     depends_on:
       - user-db
