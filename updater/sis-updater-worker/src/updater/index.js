@@ -23,6 +23,7 @@ const idToHandler = {
 }
 
 const update = async ({ entityIds, type }) => {
+  console.log('entity id: ', entityIds)
   const updateHandler = idToHandler[type]
   switch (type) {
     case 'students':
