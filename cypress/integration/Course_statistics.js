@@ -150,7 +150,7 @@ describe("Course Statistics tests", () => {
     const yearRange = { from: "2000-2001", to: "2020-2021" };
     const attemptsTableContents = [
       // [time, passed, failed, passrate]
-      ["Total", 102, 99, 3],
+      ["Total", 511, 486, 25]
     ];
     const studentTableContents = [
       // time, students, passedfirsttry, passedeventually, pass%, neverpassed, fail%]
@@ -163,15 +163,14 @@ describe("Course Statistics tests", () => {
     ];
     const gradesTableContents = [
       // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
-      ["Total", 102, 3, 0, 3, 6, 13, 72, 5],
-      ["2020-2021", 2, 0, 0, 0, 0, 0, 2, 0],
-      ["2019-2020", 6, 0, 0, 0, 0, 1, 5, 0],
-      ["2018-2019", 34, 2, 0, 1, 0, 5, 26, 0],
-      ["2017-2018", 35, 0, 0, 0, 3, 3, 27, 2],
-      ["2016-2017", 17, 0, 0, 2, 3, 4, 8, 0],
-      ["2015-2016", 6, 1, 0, 0, 0, 0, 2, 3],
-      ["2011-2012", 1, 0, 0, 0, 0, 0, 1, 0],
-      ["2000-2001", 1, 0, 0, 0, 0, 0, 1, 0],
+      ["Total", 511, 25, 11, 17, 21, 59, 365, 13],
+      ["2020-2021", 1, 0, 0, 0, 0, 0, 1, 0],
+      ["2019-2020", 54, 4, 3, 1, 3, 4, 39, 0],
+      ["2018-2019", 154, 7, 2, 6, 5, 15, 119, 0],
+      ["2017-2018", 186, 9, 3, 5, 6, 16, 139, 8],
+      ["2016-2017", 71, 2, 1, 2, 5, 13, 48, 0],
+      ["2015-2016", 21, 1, 1, 1, 0, 7, 8, 3],
+      
     ];
 
     it("shows stats", () => {
@@ -194,7 +193,8 @@ describe("Course Statistics tests", () => {
         cy.get("div[role='option']").last().should("have.text", yearRange.from);
         cy.get("div[role='option']").should("have.length", 21);
       });
-      cy.contains("Show population").should("be.enabled");
+      cy.contains("Show population").should("not.be.enabled");
+      
 
       const timeRangeFilter =
         (timeRange) =>
@@ -216,7 +216,7 @@ describe("Course Statistics tests", () => {
               });
             });
         });
-        cy.get("tr").should("have.length", 9);
+        cy.get("tr").should("have.length", 17);
       });
       cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true });
       cy.get("#CourseStatPanes table>tbody").within(() => {
@@ -229,7 +229,7 @@ describe("Course Statistics tests", () => {
               });
             });
         });
-        cy.get("tr").should("have.length", 9);
+        cy.get("tr").should("have.length", 17);
       });
     });
 
@@ -684,11 +684,11 @@ describe("Course Statistics tests", () => {
 
       const attemptsTableContents = [
         // [time, passed, failed, passrate]
-        ["Total*", 58, 45, 13, "77.59 %"],
+        ["Total*", 288, 213, 75, "73.96 %"],
         ["2020-2021", "5 or less students", "NA", "NA", "NA"],
-        ["2019-2020", 33, 22, 11, "66.67 %"],
-        ["2018-2019", 14, 12, 2, "85.71 %"],
-        ["2017-2018", 11, 11, 0, "100.00 %"],
+        ["2019-2020", 164, 121, 43, "73.78 %"],
+        ["2018-2019", 85, 60, 25, "70.59 %"],
+        ["2017-2018", 39, 32, 7, "82.05 %"],
       ];
 
       cy.contains("#CourseStatPanes a.item", "Attempts").click();
@@ -702,7 +702,7 @@ describe("Course Statistics tests", () => {
               });
             });
         });
-        cy.get("tr").should("have.length", 5);
+        cy.get("tr").should("have.length", 7);
       });
 
       cy.contains("Stop mocking").click();
