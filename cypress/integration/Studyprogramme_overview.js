@@ -17,23 +17,6 @@ describe("Studyprogramme overview", () => {
       .click();
     cy.contains("Study Programme", { timeout: 100000 });
   });
-  // Return this when anon data has some kasvatustieteiden kandi
-  it.skip("can view course groups", () => {
-    cy.contains("Kasvatustieteiden kandiohjelma").click();
-    cy.contains("Course Groups").click();
-
-    cy.contains("tr", "Test course group").get("i.edit").click();
-    cy.contains("Edit group");
-    cy.get(".prompt").type("Professori Pekka");
-    cy.contains("Add teacher").parent().contains("000960").click();
-    cy.contains("Teachers in group").parent().contains("000960");
-
-    cy.get("i.reply.link.icon").click();
-    cy.contains("tr a", "Test course group").click();
-    cy.contains("Total teachers");
-    cy.get("i.reply.icon").click();
-  });
-
 
   it("progress should not be recalculating when opened for the first time", () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
