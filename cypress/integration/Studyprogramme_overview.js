@@ -18,18 +18,12 @@ describe("Studyprogramme overview", () => {
     cy.contains("Study Programme", { timeout: 100000 });
   });
 
-  it("progress should not be recalculating when opened for the first time", () => {
-    cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
-    cy.wait(1000)
-    cy.contains("Recalculating").should("not.exist")
-  })
-
   // Taken from https://docs.cypress.io/api/commands/should#Compare-text-values-of-two-elements
   const normalizeText = (s) => s.replace(/\s/g, '').toLowerCase()
   let originalProgressCalculatedText;
   let originalProductivityCalculatedText;
 
-  // Used by two tests
+  // Following function used by two tests
   const testProgressAndProductivity = () => {
     cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
     cy.contains("Admin").click();
@@ -42,32 +36,28 @@ describe("Studyprogramme overview", () => {
     cy.contains("Population progress");
     cy.contains("Yearly productivity");
 
-    // These are the values if user has dev rights, since graduation feature is shown for only for devs
-    //const populationprogress2017IfUserHasDev = ["43", "32 (74%)", "11 (25%)", "42 (97%)", "43", "3", "10", "10", "33 months", "0", "0", 
-    // "38", "34", "26", "22", "10"]
-    const populationprogress2017 = ["43", "11 (25%)", "32 (74%)", "42 (97%)", "43", "3", "10", "0", "0", "38", "34", "26", "22", "10"]
-    cy.contains("2017-2018")
+    // Graduation feature is shown for only for devs, these are the values for normal user
+    const populationprogress2018 = ["160", "42 (26%)", "118 (73%)", "159 (99%)", "159", "11", "11", "1", "0", "150", "123", "76", "41", "16"]
+    cy.contains("2018-2019")
       .siblings()
       .each((elem, index) => {
-        cy.wrap(elem).contains(populationprogress2017[index])
+        cy.wrap(elem).contains(populationprogress2018[index])
       })
-
+    const populationproductivity2019 = ["7388.0", "17", "7329.00", "59.00", "349.00"]
     cy.get("table")
       .eq(1)
-      .contains("2018")
+      .contains("2019")
       .siblings()
-      .contains("1378.00")
-      .siblings()
-      .contains("55.00");
-
-    cy.get("table")
-      .eq(1)
-      .contains("2017")
-      .siblings()
-      .contains("555.00")
-      .siblings()
-      .contains("9.00");
+      .each((elem, index) => {
+        cy.wrap(elem).contains(populationproductivity2019[index])
+      })
   }
+
+  it("progress should not be recalculating when opened for the first time", () => {
+    cy.contains("Tietojenkäsittelytieteen kandiohjelma").click();
+    cy.wait(1000)
+    cy.contains("Recalculating").should("not.exist")
+  })
 
   it("renders progress and productivity tables with calculated status", () => {
     testProgressAndProductivity()
@@ -95,9 +85,9 @@ describe("Studyprogramme overview", () => {
   });
 
   it("can move to Population statistics page by clickin", () => {
-    cy.contains("Tietojenkäsittelytieteen maisteriohjelma").click();
+    cy.contains("Lääketieteen koulutusohjelma").click();
     cy.get("i.level.up.alternate.icon").eq(0).click();
-    cy.contains("Students (4)");
+    cy.contains("Students (121)");
   });
 
   it("can create and delete tags for population", () => {
