@@ -27,7 +27,7 @@ const logger = require('../util/logger')
 }) */
 
 router.get('/v2/coursesmulti', async (req, res) => {
-  let results = { courses: [], groups: {}, groupMeta: {} }
+  let results = { courses: [] } // , groups: {}, groupMeta: {}
   const { name, code } = req.query
 
   if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
@@ -49,6 +49,7 @@ router.get('/v2/coursesmulti', async (req, res) => {
 }) */
 
 router.get('/v3/courseyearlystats', async (req, res) => {
+  console.log('routerissa')
   try {
     const { rights, roles } = req
 

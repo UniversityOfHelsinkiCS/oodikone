@@ -7,7 +7,7 @@ describe("Course Statistics tests", () => {
     cy.contains("Search for courses");
   });
 
-  it("Searching single course having duplicate mappings shows course statistics", () => {
+  it("Searching single course having substitution mappings shows course statistics", () => {
     cy.url().should("include", "/coursestatistics");
     cy.contains("Search for courses");
     cy.get("input[placeholder='Search by a course code']").type("TKT20001");
@@ -37,7 +37,7 @@ describe("Course Statistics tests", () => {
     cy.contains("Search for courses");
   });
 
-  it("Searching multiple courses having duplicate mappings shows course statistics", () => {
+  it("Searching multiple courses having substitution mappings shows course statistics", () => {
     cy.url().should("include", "/coursestatistics");
     cy.contains("Search for courses");
     cy.get("input[placeholder='Search by a course code']").type("TKT");
@@ -101,6 +101,37 @@ describe("Course Statistics tests", () => {
     cy.contains(courseCode);
   });
 
+  it("Searching course by name displays right courses", () => {
+    cy.url().should("include", "/coursestatistics");
+    cy.contains("Search for courses");
+    cy.get("input[placeholder='Search by entering a course name']").type(
+      "tietokantojen perusteet"
+    );
+
+    cy.contains("Tietokantojen perusteet");
+    cy.contains("Avoin yo: Tietokantojen perusteet");
+    cy.contains("A581328");
+    cy.contains("AYTKT10004");
+    cy.contains("TKT10004, 581328");
+    cy.contains("td", /^TKT10004/).click();
+
+    cy.contains("Fetch statistics").should("be.enabled").click();
+    cy.contains("Search for courses").should("not.exist");
+
+    cy.contains("TKT10004, 581328 Tietokantojen perusteet");
+    cy.get(".right").click();
+    cy.contains("No results");
+
+    cy.get("input[placeholder='Search by entering a course name']").type(
+      "tietokantojen perusteet"
+    );
+    cy.contains("td", /^AYTKT10004/).click();
+
+    cy.contains("Fetch statistics").should("be.enabled").click();
+    cy.contains("Search for courses").should("not.exist");
+    cy.contains("AYTKT10004 Avoin yo: Tietokantojen perusteet");
+  });
+
   describe("When searching unified course stats", () => {
     beforeEach(() => {
       cy.url().should("include", "/coursestatistics");
@@ -115,12 +146,11 @@ describe("Course Statistics tests", () => {
       );
     });
 
-    /*
-
+    // Statistics
     const yearRange = { from: "2000-2001", to: "2020-2021" };
     const attemptsTableContents = [
       // [time, passed, failed, passrate]
-      [ "Total*", 58, 45, 12
+      ["Total", 102, 99, 3],
     ];
     const studentTableContents = [
       // time, students, passedfirsttry, passedeventually, pass%, neverpassed, fail%]
@@ -133,12 +163,15 @@ describe("Course Statistics tests", () => {
     ];
     const gradesTableContents = [
       // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
-      ["Total", 354, 42, 6, 12, 24, 35, 218, 17],
-      ["2017-18", 204, 29, 5, 8, 10, 16, 127, 9],
-      ["2016-17", 68, 2, 0, 1, 6, 10, 49, 0],
-      ["2015-16", 29, 2, 1, 1, 0, 5, 16, 4],
-      ["2014-15", 16, 0, 0, 0, 1, 0, 11, 4],
-      ["2013-14", 8, 2, 0, 0, 2, 0, 4, 0],
+      ["Total", 102, 3, 0, 3, 6, 13, 72, 5],
+      ["2020-2021", 2, 0, 0, 0, 0, 0, 2, 0],
+      ["2019-2020", 6, 0, 0, 0, 0, 1, 5, 0],
+      ["2018-2019", 34, 2, 0, 1, 0, 5, 26, 0],
+      ["2017-2018", 35, 0, 0, 0, 3, 3, 27, 2],
+      ["2016-2017", 17, 0, 0, 2, 3, 4, 8, 0],
+      ["2015-2016", 6, 1, 0, 0, 0, 0, 2, 3],
+      ["2011-2012", 1, 0, 0, 0, 0, 0, 1, 0],
+      ["2000-2001", 1, 0, 0, 0, 0, 0, 1, 0],
     ];
 
     it("shows stats", () => {
@@ -163,6 +196,82 @@ describe("Course Statistics tests", () => {
       });
       cy.contains("Show population").should("be.enabled");
 
+      const timeRangeFilter =
+        (timeRange) =>
+        ([time]) => {
+          return (
+            (timeRange.from <= time && time <= timeRange.to) || time === "Total"
+          );
+        };
+
+      cy.contains("#CourseStatPanes a.item", "Table").click();
+      cy.contains("#CourseStatPanes a.item", "Attempts").click();
+      cy.get("#CourseStatPanes table>tbody").within(() => {
+        attemptsTableContents.forEach((values, trIndex) => {
+          cy.get("tr")
+            .eq(trIndex)
+            .within(() => {
+              values.forEach((value, tdIndex) => {
+                cy.get("td").eq(tdIndex).contains(value);
+              });
+            });
+        });
+        cy.get("tr").should("have.length", 9);
+      });
+      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true });
+      cy.get("#CourseStatPanes table>tbody").within(() => {
+        gradesTableContents.forEach((values, trIndex) => {
+          cy.get("tr")
+            .eq(trIndex)
+            .within(() => {
+              values.forEach((value, tdIndex) => {
+                cy.get("td").eq(tdIndex).contains(value);
+              });
+            });
+        });
+        cy.get("tr").should("have.length", 9);
+      });
+    });
+
+    it("after changing time range shows same stats", () => {
+      const newYearRange = { from: "2016-2017", to: "2019-2020" };
+      cy.get("div[name='fromYear']")
+        .click()
+        .within(() => {
+          cy.contains(newYearRange.from).click();
+        });
+      cy.get("div[name='toYear']")
+        .click()
+        .within(() => {
+          cy.contains(newYearRange.to).click();
+        });
+
+      // Time range
+      cy.get("div[name='fromYear']").within(() => {
+        cy.get("div[role='option']")
+          .first()
+          .should("have.text", newYearRange.to);
+        cy.contains("div[role='option']", newYearRange.from).should(
+          "have.class",
+          "selected"
+        );
+        cy.get("div[role='option']").last().should("have.text", "2000-2001");
+        cy.get("div[role='option']").should("have.length", 20);
+      });
+      cy.get("div[name='toYear']").within(() => {
+        cy.get("div[role='option']").first().should("have.text", "2020-2021");
+        cy.contains("div[role='option']", newYearRange.to).should(
+          "have.class",
+          "selected"
+        );
+        cy.get("div[role='option']")
+          .last()
+          .should("have.text", newYearRange.from);
+        cy.get("div[role='option']").should("have.length", 5);
+      });
+      cy.contains("Show population").should("be.enabled");
+    });
+    /*
       // Filters
       // Data currently has only "Muu" so we can't test these yet! See
       // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3058
@@ -222,89 +331,7 @@ describe("Course Statistics tests", () => {
       // });
       // cy.contains("Select excluded study programmes").should("be.disabled");
 
-      // Statistics
-      cy.contains("#CourseStatPanes a.item", "Table").click();
-      cy.contains("#CourseStatPanes a.item", "Attempts").click();
-      cy.get("#CourseStatPanes table>tbody").within(() => {
-        attemptsTableContents.forEach((values, trIndex) => {
-          cy.get("tr")
-            .eq(trIndex)
-            .within(() => {
-              values.forEach((value, tdIndex) => {
-                cy.get("td").eq(tdIndex).contains(value);
-              });
-            });
-        });
-        cy.get("tr").should("have.length", 14);
-      });
-
-      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true });
-      cy.get("#CourseStatPanes table>tbody").within(() => {
-        gradesTableContents.forEach((values, trIndex) => {
-          cy.get("tr")
-            .eq(trIndex)
-            .within(() => {
-              values.forEach((value, tdIndex) => {
-                cy.get("td").eq(tdIndex).contains(value);
-              });
-            });
-        });
-        cy.get("tr").should("have.length", 14);
-      });
-
-      cy.contains("#CourseStatPanes a.item", "Table").click();
-      cy.contains("#CourseStatPanes a.item", "Students").click();
-      cy.get("#CourseStatPanes table>tbody").within(() => {
-        studentTableContents.forEach((values, trIndex) => {
-          cy.get("tr")
-            .eq(trIndex)
-            .within(() => {
-              values.forEach((value, tdIndex) => {
-                cy.get("td").eq(tdIndex).contains(value);
-              });
-            });
-        });
-        cy.get("tr").should("have.length", 14);
-      });
-    });
-
-    it("after changing time range shows same stats", () => {
-      const newYearRange = { from: "2016-2017", to: "2019-2020" };
-      cy.get("div[name='fromYear']")
-        .click()
-        .within(() => {
-          cy.contains(newYearRange.from).click();
-        });
-      cy.get("div[name='toYear']")
-        .click()
-        .within(() => {
-          cy.contains(newYearRange.to).click();
-        });
-
-      // Time range
-      cy.get("div[name='fromYear']").within(() => {
-        cy.get("div[role='option']")
-          .first()
-          .should("have.text", newYearRange.to);
-        cy.contains("div[role='option']", newYearRange.from).should(
-          "have.class",
-          "selected"
-        );
-        cy.get("div[role='option']").last().should("have.text", "2000-2001");
-        cy.get("div[role='option']").should("have.length", 17);
-      });
-      cy.get("div[name='toYear']").within(() => {
-        cy.get("div[role='option']").first().should("have.text", "2020-2021");
-        cy.contains("div[role='option']", newYearRange.to).should(
-          "have.class",
-          "selected"
-        );
-        cy.get("div[role='option']")
-          .last()
-          .should("have.text", newYearRange.from);
-        cy.get("div[role='option']").should("have.length", 4);
-      });
-      cy.contains("Show population").should("be.enabled");
+        
 
       // Filters
       // Data currently has only "Muu" so we can't test these yet! See
@@ -397,66 +424,7 @@ describe("Course Statistics tests", () => {
         ["2013-14", 8, 2, 0, 0, 2, 0, 4, 0],
       ];
 
-      // Statistics
-      const timeRangeFilter =
-        (timeRange) =>
-        ([time]) => {
-          return (
-            (timeRange.from <= time && time <= timeRange.to) || time === "Total"
-          );
-        };
-      cy.contains("#CourseStatPanes a.item", "Table").click();
-      cy.contains("#CourseStatPanes a.item", "Attempts").click();
-      cy.get("#CourseStatPanes table>tbody").within(() => {
-        timeAttemptsTableContents
-          .filter(timeRangeFilter(newYearRange))
-          .forEach((values, trIndex) => {
-            cy.get("tr")
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  cy.get("td").eq(tdIndex).contains(value);
-                });
-              });
-          });
-        cy.get("tr").should("have.length", 4);
-      });
-
-      cy.get("[data-cy=gradeToggle]", { force: true }).click({ force: true });
-      cy.get("#CourseStatPanes table>tbody").within(() => {
-        timeGradesTableContents
-          .filter(timeRangeFilter(newYearRange))
-          .forEach((values, trIndex) => {
-            cy.get("tr")
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  cy.get("td").eq(tdIndex).contains(value);
-                });
-              });
-          });
-        cy.get("tr").should("have.length", 4);
-      });
-
-      cy.contains("#CourseStatPanes a.item", "Table").click();
-      cy.contains("#CourseStatPanes a.item", "Students").click();
-      cy.get("#CourseStatPanes table>tbody").within(() => {
-        timeStudentTableContents
-          .filter(timeRangeFilter(newYearRange))
-          .forEach((values, trIndex) => {
-            cy.get("tr")
-              .eq(trIndex)
-              .within(() => {
-                values.forEach((value, tdIndex) => {
-                  cy.get("td").eq(tdIndex).contains(value);
-                });
-              });
-          });
-        cy.get("tr").should("have.length", 4);
-      });
-
-      cy.contains("#CourseStatPanes a.item", "Table").click();
-    });
+    
 
     // Not working since only "Muu" students
     it("after changing filters shows different stats", () => {
@@ -684,74 +652,73 @@ describe("Course Statistics tests", () => {
       });
     });
   });
+*/
 
-     */
-  });
+    it("Some features of Course Statistics are hidden for courseStatistics-users", () => {
+      cy.contains("Users").click();
+      cy.contains("Oodikone users");
+      cy.contains("mocking").should("not.exist");
+      cy.contains("tr", "User manager").within(($row) => {
+        cy.contains(".button", "Edit").click();
+      });
 
-  it("Some features of Course Statistics are hidden for courseStatistics-users", () => {
-    cy.contains("Users").click();
-    cy.contains("Oodikone users");
-    cy.contains("mocking").should("not.exist");
-    cy.contains("tr", "User manager").within(($row) => {
-      cy.contains(".button", "Edit").click();
-    });
+      cy.get("[data-cy=access-groups-form]")
+        .click()
+        .contains("courseStatistics")
+        .click();
+      cy.get("[data-cy=access-groups-save]").click();
 
-    cy.get("[data-cy=access-groups-form]")
-      .click()
-      .contains("courseStatistics")
-      .click();
-    cy.get("[data-cy=access-groups-save]").click();
+      cy.route("POST", "/api/superlogin/usermk").as("superlogin");
+      cy.get("i.spy").click();
+      cy.wait("@superlogin");
+      cy.contains("mocking as usermk");
+      cy.wait(1000);
 
-    cy.route("POST", "/api/superlogin/usermk").as("superlogin");
-    cy.get("i.spy").click();
-    cy.wait("@superlogin");
-    cy.contains("mocking as usermk");
-    cy.wait(1000);
+      cy.get("[data-cy=navbar-courseStatistics]").click();
+      cy.get("[data-cy=course-code-input]").type("TKT20003");
+      cy.contains("tr", "TKT20003").click();
+      cy.contains("Fetch statistics").should("be.enabled").click();
+      cy.contains("Filter statistics by study programmes").should("not.exist");
+      cy.contains("Faculty statistics").should("not.exist");
+      cy.contains("Show population").should("not.exist");
 
-    cy.get("[data-cy=navbar-courseStatistics]").click();
-    cy.get("[data-cy=course-code-input]").type("TKT20003");
-    cy.contains("tr", "TKT20003").click();
-    cy.contains("Fetch statistics").should("be.enabled").click();
-    cy.contains("Filter statistics by study programmes").should("not.exist");
-    cy.contains("Faculty statistics").should("not.exist");
-    cy.contains("Show population").should("not.exist");
+      const attemptsTableContents = [
+        // [time, passed, failed, passrate]
+        ["Total*", 58, 45, 13, "77.59 %"],
+        ["2020-2021", "5 or less students", "NA", "NA", "NA"],
+        ["2019-2020", 33, 22, 11, "66.67 %"],
+        ["2018-2019", 14, 12, 2, "85.71 %"],
+        ["2017-2018", 11, 11, 0, "100.00 %"],
+      ];
 
-    const attemptsTableContents = [
-      // [time, passed, failed, passrate]
-      ["Total*", 58, 45, 13, "77.59 %"],
-      ["2020-2021", "5 or less students", "NA", "NA", "NA"],
-      ["2019-2020", 33, 22, 11, "66.67 %"],
-      ["2018-2019", 14, 12, 2, "85.71 %"],
-      ["2017-2018", 11, 11, 0, "100.00 %"],
-    ];
-
-    cy.contains("#CourseStatPanes a.item", "Attempts").click();
-    cy.get("#CourseStatPanes table>tbody").within(() => {
-      attemptsTableContents.forEach((values, trIndex) => {
-        cy.get("tr")
-          .eq(trIndex)
-          .within(() => {
-            values.forEach((value, tdIndex) => {
-              cy.get("td").eq(tdIndex).contains(value);
+      cy.contains("#CourseStatPanes a.item", "Attempts").click();
+      cy.get("#CourseStatPanes table>tbody").within(() => {
+        attemptsTableContents.forEach((values, trIndex) => {
+          cy.get("tr")
+            .eq(trIndex)
+            .within(() => {
+              values.forEach((value, tdIndex) => {
+                cy.get("td").eq(tdIndex).contains(value);
+              });
             });
-          });
+        });
+        cy.get("tr").should("have.length", 5);
       });
-      cy.get("tr").should("have.length", 5);
-    });
 
-    cy.contains("Stop mocking").click();
-    cy.wait(1000);
+      cy.contains("Stop mocking").click();
+      cy.wait(1000);
 
-    cy.contains("Users").click();
-    cy.contains("Oodikone users");
-    cy.contains("tr", "User manager").within(($row) => {
-      cy.contains(".button", "Edit").click();
-    });
-    cy.contains("Access Groups")
-      .siblings()
-      .within(($row) => {
-        cy.get("i[class='dropdown icon clear']").click();
+      cy.contains("Users").click();
+      cy.contains("Oodikone users");
+      cy.contains("tr", "User manager").within(($row) => {
+        cy.contains(".button", "Edit").click();
       });
-    cy.get("[data-cy=access-groups-save]").click();
+      cy.contains("Access Groups")
+        .siblings()
+        .within(($row) => {
+          cy.get("i[class='dropdown icon clear']").click();
+        });
+      cy.get("[data-cy=access-groups-save]").click();
+    });
   });
 });
