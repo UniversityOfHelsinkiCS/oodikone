@@ -40,6 +40,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     }
 
     if (req.body.years) {
+      console.log('years väylä')
       const upperYearBound = new Date().getFullYear() + 1
       const multicoursestatPromises = Promise.all(
         req.body.years.map(year => {
@@ -54,6 +55,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       )
       const multicoursestats = await multicoursestatPromises
       const result = StatMergeService.populationCourseStatsMerger(multicoursestats)
+      console.log('result: ', result)
       if (result.error) {
         res.status(400).json(result)
         return
@@ -61,6 +63,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
       res.json(result)
     } else {
+      console.log('bottleneck väylä')
       const result = await Population.bottlenecksOf(req.body)
 
       if (result.error) {
