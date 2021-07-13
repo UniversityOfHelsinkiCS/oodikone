@@ -91,7 +91,7 @@ describe("Population Statistics", () => {
     })
   });
 
-  it("Gender filter works", () => {
+  it.skip("Gender filter works", () => {
     runTestStepWithPreAndPostParts("genderFilter-header", () => {
       cy.selectFromDropdown("genderFilter-dropdown", 0);
       checkFilteringResult(666);
@@ -202,7 +202,7 @@ describe("Course Statistics", () => {
     })
   });
 
-  it.only("Filter combinations work", () => {
+  it("Filter combinations work", () => {
     runTestStepWithPreAndPostParts("gradeFilter-header", () => {
       runTestStepWithPreAndPostParts("ageFilter-header", () => {
         cy.cs("gradeFilter-3").click();
