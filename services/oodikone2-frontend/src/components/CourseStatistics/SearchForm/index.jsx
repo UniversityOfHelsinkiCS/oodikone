@@ -7,9 +7,8 @@ import { sortBy } from 'lodash'
 import { func, arrayOf, shape, bool } from 'prop-types'
 import { clearCourses, findCoursesV2, toggleUnifyOpenUniCourses } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
-import { getCourseStatsDiff, clearOodiSisDiff } from '../../../redux/oodiSisDiff'
 import { getCourseSearchResults } from '../../../selectors/courses'
-import { useSearchHistory, usePrevious, useIsAdmin } from '../../../common/hooks'
+import { useSearchHistory, usePrevious } from '../../../common/hooks'
 import { validateInputLength, getTextIn } from '../../../common'
 import TSA from '../../../common/tsa'
 import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
@@ -60,10 +59,9 @@ const SearchForm = props => {
     ...INITIAL
   })
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
-  const isAdmin = useIsAdmin()
 
   const { courseName, courseCode, selectedCourses, separate } = state
-  const { coursesLoading, isLoading, matchingCourses, unifyOpenUniCourses, showDiff, setShowDiff } = props
+  const { coursesLoading, isLoading, matchingCourses, unifyOpenUniCourses } = props
 
   const parseQueryFromUrl = () => {
     const { location } = props
@@ -81,11 +79,7 @@ const SearchForm = props => {
   const fetchStatisticsFromUrlParams = () => {
     const query = parseQueryFromUrl()
     setState({ ...state, ...query })
-    if (showDiff) {
-      props.getCourseStatsDiff(query, props.onProgress)
-    } else {
-      props.getCourseStats(query, props.onProgress)
-    }
+    props.getCourseStats(query, props.onProgress)
   }
 
   useEffect(() => {
@@ -93,7 +87,6 @@ const SearchForm = props => {
     if (!location.search) {
       props.clearCourses()
       props.clearCourseStats()
-      props.clearOodiSisDiff()
     }
   }, [])
 
@@ -252,14 +245,6 @@ const SearchForm = props => {
                   />
                 </span>
               </Form.Field>
-              {isAdmin && (
-                <Form.Field width={4} style={{ display: 'flex', flexDirection: 'column' }}>
-                  <label>Show Oodi/SIS diff</label>
-                  <span style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                    <Form.Checkbox onChange={() => setShowDiff(!showDiff)} checked={showDiff} />
-                  </span>
-                </Form.Field>
-              )}
             </Form.Group>
             <div style={!noSelectedCourses ? searchBoxStyle : null}>
               <CourseTable
@@ -340,11 +325,7 @@ SearchForm.propTypes = {
   location: shape({}).isRequired,
   unifyOpenUniCourses: bool.isRequired,
   toggleUnifyOpenUniCourses: func.isRequired,
-  onProgress: func,
-  clearOodiSisDiff: func.isRequired,
-  getCourseStatsDiff: func.isRequired,
-  showDiff: bool.isRequired,
-  setShowDiff: func.isRequired
+  onProgress: func
 }
 
 const mapStateToProps = state => {
@@ -353,7 +334,6 @@ const mapStateToProps = state => {
   const { unifyOpenUniCourses } = state.courseSearch
   return {
     matchingCourses: filterCourseSearchResults(courses, unifyOpenUniCourses),
-    // newMatchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses, newMeta),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending,
     unifyOpenUniCourses
@@ -366,8 +346,6 @@ export default withRouter(
     clearCourses,
     findCoursesV2,
     clearCourseStats,
-    toggleUnifyOpenUniCourses,
-    getCourseStatsDiff,
-    clearOodiSisDiff
+    toggleUnifyOpenUniCourses
   })(SearchForm)
 )
