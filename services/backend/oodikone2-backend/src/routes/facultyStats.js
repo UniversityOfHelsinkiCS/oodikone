@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { all } = require('../services/organisations')
 const { byType: getElementDetailsByType } = require('../services/elementdetails')
-const { getFacultyYearlyStats } = require('../services/analyticsService')
+const { getFacultyYearlyStats } = require('../servicesV2/analyticsService')
 
 router.get('/faculties', async (req, res) => {
   const { roles, faculties } = req
