@@ -5,7 +5,7 @@
     "jest": true
   },
   "parser": "babel-eslint",
-  "extends": ["eslint:recommended", "plugin:prettier/recommended", "prettier/babel"],
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
   "rules": {
     "no-console": 0,
     "prettier/prettier": "error"

@@ -13,14 +13,14 @@
     "both": "./run.sh both anon up --detach && ./run.sh both logs --follow --tail 100",
     "both:real": "./run.sh both real up --detach && ./run.sh both logs --follow --tail 100",
     "docker:down": "./run.sh both down --remove-orphans",
-    "lint:backend": "npm run lint --prefix services/backend/oodikone2-backend",
-    "lint:frontend": "npm run lint --prefix services/oodikone2-frontend",
-    "lint:userservice": "npm run lint --prefix services/oodikone2-userservice",
+    "lint:backend": "eslint services/backend",
+    "linttest:frontend": "npm run lint --prefix services/oodikone2-frontend",
+    "lint:userservice": "eslint services/userservice",
     "linttest:other": "zx ./scripts/lint-other.mjs",
     "lint": "concurrently 'npm run lint:*'",
     "lintfix:backend": "npm run lintfix --prefix services/backend/oodikone2-backend",
-    "lintfix:frontend": "npm run lintfix --prefix services/oodikone2-frontend",
-    "lintfix:userservice": "npm run lintfix --prefix services/oodikone2-userservice",
+    "lintfixtest:frontend": "npm run lintfix --prefix services/oodikone2-frontend",
+    "lintfix:userservice": "prettier --write services/userservice/**/*.{js,json} && eslint --fix services/userservice",
     "lintfix": "concurrently 'npm run lintfix:*'",
     "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
@@ -39,8 +39,13 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "concurrently": "^6.2.0",
     "cypress": "^7.7.0",
+    "eslint": "^7.30.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "prettier": "^2.3.2",
     "zx": "^2.0.0"
   }
 }
