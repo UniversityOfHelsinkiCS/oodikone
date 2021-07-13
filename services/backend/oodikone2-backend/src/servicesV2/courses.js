@@ -51,6 +51,15 @@ const byName = (name, language) =>
 
 const byCode = code => Course.findByPk(code)
 
+const findOneByCode = code => {
+  return Course.findOne({
+    attributes: ['id', 'code', 'name'],
+    where: {
+      code: code
+    }
+  })
+}
+
 const creditsForCourses = async (codes, anonymizationSalt) => {
   const credits = await Credit.findAll({
     include: [
@@ -406,5 +415,7 @@ module.exports = {
   byNameAndOrCodeLike,
   byCodes,
   maxYearsToCreatePopulationFrom,
-  unifyOpenUniversity
+  unifyOpenUniversity,
+  allCodeAltenatives,
+  findOneByCode
 }
