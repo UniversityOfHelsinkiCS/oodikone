@@ -12,8 +12,6 @@
   "scripts": {
     "start": "node --max_old_space_size=4096 index.js",
     "dev": "NODE_ENV=dev nodemon --max_old_space_size=4096 index.js",
-    "lint": "eslint .",
-    "lintfix": "prettier --write '**/*.{js,json}' && eslint --fix .",
     "diff:students": "node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "node /usr/src/app/src/sisoodi_diff/populations.js",
     "diff:courses": "node /usr/src/app/src/sisoodi_diff/courses/index.js",
@@ -53,18 +51,12 @@
   },
   "devDependencies": {
     "ava": "^2.4.0",
-    "babel-eslint": "^8.2.6",
-    "eslint": "^5.16.0",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-prettier": "^3.4.0",
     "faker": "^4.1.0",
     "jest": "^24.9.0",
     "nock": "^10.0.6",
     "node-status": "^1.0.0",
     "nodemon": "^1.19.4",
     "nyc": "^13.3.0",
-    "prettier": "^1.19.1",
-    "prettier-eslint": "^9.0.2",
     "supertest": "^3.4.2"
   },
   "ava": {
