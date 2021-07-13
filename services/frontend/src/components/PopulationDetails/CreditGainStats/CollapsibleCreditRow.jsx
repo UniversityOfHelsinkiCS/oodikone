@@ -81,12 +81,12 @@ CollapsibleCreditRow.propTypes = {
   max: number,
   studentCount: func.isRequired,
   filteredLength: number.isRequired,
-  months: number.isRequired
+  months: number.isRequired,
 }
 
 CollapsibleCreditRow.defaultProps = {
   min: undefined,
-  max: undefined
+  max: undefined,
 }
 
 export default CollapsibleCreditRow

@@ -9,9 +9,9 @@ const Expandable = ({ children, title, ...props }) => (
         key: 'key',
         title,
         content: {
-          content: children
-        }
-      }
+          content: children,
+        },
+      },
     ]}
     {...props}
   />
@@ -19,7 +19,7 @@ const Expandable = ({ children, title, ...props }) => (
 
 Expandable.propTypes = {
   title: PropTypes.string.isRequired,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
 }
 
 export default Expandable

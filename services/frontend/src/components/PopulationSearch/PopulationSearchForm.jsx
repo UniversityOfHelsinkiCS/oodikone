@@ -37,14 +37,14 @@ const initialQuery = () => ({
   studentStatuses: [],
   studyRights: {},
   months: months('2017', 'FALL'),
-  tag: null
+  tag: null,
 })
 
 const PopulationSearchForm = props => {
   const [totalState, setTotalState] = useState({
     query: initialQuery(),
     isLoading: false,
-    momentYear: Datetime.moment('2017-01-01')
+    momentYear: Datetime.moment('2017-01-01'),
   })
   const [didMount, setDidMount] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
@@ -64,7 +64,7 @@ const PopulationSearchForm = props => {
       ...initial,
       ...rest,
       studyRights: JSON.parse(studyRights),
-      months: JSON.parse(months)
+      months: JSON.parse(months),
     }
     return query
   }
@@ -113,13 +113,13 @@ const PopulationSearchForm = props => {
         props.getPopulationCourses(request),
         [],
         props.getMandatoryCourses(formattedQueryParams.studyRights.programme),
-        props.getTagsByStudytrackAction(query.studyRights.programme)
+        props.getTagsByStudytrackAction(query.studyRights.programme),
       ])
     )
     const success = await fetchPopulationPromises.current.promise
     if (success) {
       setState({
-        isLoading: false
+        isLoading: false,
       })
     }
   }
@@ -150,8 +150,8 @@ const PopulationSearchForm = props => {
           ...query,
           studentStatuses: [],
           semesters: ['FALL', 'SPRING'],
-          tag: null
-        }
+          tag: null,
+        },
       })
     }
     setDidMount(true)
@@ -166,9 +166,9 @@ const PopulationSearchForm = props => {
         ...query,
         studyRights: {
           ...query.studyRights,
-          [type]: undefined
-        }
-      }
+          [type]: undefined,
+        },
+      },
     })
   }
 
@@ -183,9 +183,9 @@ const PopulationSearchForm = props => {
       query: {
         ...query,
         studyRights: {
-          programme
-        }
-      }
+          programme,
+        },
+      },
     })
   }
 
@@ -224,7 +224,7 @@ const PopulationSearchForm = props => {
   const handleSubmit = () => {
     addItemToSearchHistory({
       text: getSearchHistoryTextFromQuery(),
-      params: query
+      params: query,
     })
     pushQueryToUrl(query)
   }
@@ -238,9 +238,9 @@ const PopulationSearchForm = props => {
           studyRights: {
             ...query.studyRights,
             studyTrack: null,
-            degree: null
-          }
-        }
+            degree: null,
+          },
+        },
       })
       return
     }
@@ -281,9 +281,9 @@ const PopulationSearchForm = props => {
         studyRights: {
           ...query.studyRights,
           studyTrack,
-          degree
-        }
-      }
+          degree,
+        },
+      },
     })
   }
 
@@ -319,9 +319,9 @@ const PopulationSearchForm = props => {
         ...query,
         studyRights: {
           ...query.studyRights,
-          degree
-        }
-      }
+          degree,
+        },
+      },
     })
   }
 
@@ -336,9 +336,9 @@ const PopulationSearchForm = props => {
         ...query,
         studyRights: {
           ...query.studyRights,
-          studyTrack
-        }
-      }
+          studyTrack,
+        },
+      },
     })
   }
 
@@ -359,8 +359,8 @@ const PopulationSearchForm = props => {
         query: {
           ...query,
           tag: null,
-          months: query.months
-        }
+          months: query.months,
+        },
       })
     } else {
       const months = tag.year
@@ -371,8 +371,8 @@ const PopulationSearchForm = props => {
           ...query,
           tag: tag.tag_id,
           year: tag.year || query.year,
-          months
-        }
+          months,
+        },
       })
     }
   }
@@ -408,10 +408,7 @@ const PopulationSearchForm = props => {
               ) : null
             }
             closeOnSelect
-            value={`${year}-${moment()
-              .year(year)
-              .add(1, 'years')
-              .format('YYYY')}`}
+            value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`}
             isValidDate={validYearCheck}
             onChange={handleYearSelection}
           />
@@ -471,7 +468,7 @@ const PopulationSearchForm = props => {
     chosenTag
   ) => {
     const renderableDegrees = () => (
-      <React.Fragment>
+      <>
         <label>Degree (Optional)</label>
         <Form.Dropdown
           placeholder="Select degree"
@@ -487,10 +484,10 @@ const PopulationSearchForm = props => {
           selectOnBlur={false}
           selectOnNavigation={false}
         />
-      </React.Fragment>
+      </>
     )
     const renderableTracks = () => (
-      <React.Fragment>
+      <>
         <label>Study Track (Optional)</label>
         <Form.Dropdown
           placeholder="Select study track"
@@ -506,7 +503,7 @@ const PopulationSearchForm = props => {
           selectOnBlur={false}
           selectOnNavigation={false}
         />
-      </React.Fragment>
+      </>
     )
     if (studyRights.programme) {
       return (
@@ -643,7 +640,7 @@ PopulationSearchForm.propTypes = {
   tags: oneOfType([arrayOf(shape({ tag_id: string, tagname: string })), object]).isRequired,
   onProgress: func.isRequired,
   clearSelected: func.isRequired,
-  clearPopulations: func.isRequired
+  clearPopulations: func.isRequired,
 }
 
 const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, tags }) => {
@@ -655,7 +652,7 @@ const mapStateToProps = ({ semesters, settings, populations, populationDegreesAn
     queries: populations.query || {},
     studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
     pending,
-    tags: tags.data
+    tags: tags.data,
   }
 }
 
@@ -670,6 +667,6 @@ export default withRouter(
     getSemesters,
     getTagsByStudytrackAction,
     clearSelected,
-    clearPopulations
+    clearPopulations,
   })(PopulationSearchForm)
 )

@@ -9,7 +9,7 @@ const SegmentDimmer = ({ isLoading = false }) => (
 )
 
 SegmentDimmer.propTypes = {
-  isLoading: bool.isRequired
+  isLoading: bool.isRequired,
 }
 
 export default SegmentDimmer

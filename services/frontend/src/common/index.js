@@ -29,10 +29,7 @@ export const getHideSisWarningFlag = () => localStorage.getItem(SIS_WARNING_FLAG
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>
     option.text
-      ? option.text
-          .toLowerCase()
-          .concat(option.description.toLowerCase())
-          .includes(param.toLowerCase())
+      ? option.text.toLowerCase().concat(option.description.toLowerCase()).includes(param.toLowerCase())
       : null
   )
 
@@ -46,7 +43,7 @@ export const decodeToken = token => {
 
 export const images = {
   toskaLogo,
-  irtomikko
+  irtomikko,
 }
 
 export const getUserRoles = roles => (roles ? roles.map(r => r.group_code) : [])
@@ -60,12 +57,7 @@ export const containsOnlyNumbers = str => str.match('^\\d+$')
 
 export const momentFromFormat = (date, format) => moment(date, format)
 
-export const reformatDate = (date, outputFormat) =>
-  !date
-    ? 'Unavailable'
-    : moment(date)
-        .local()
-        .format(outputFormat)
+export const reformatDate = (date, outputFormat) => (!date ? 'Unavailable' : moment(date).local().format(outputFormat))
 
 export const isInDateFormat = (date, format) => moment(date, format, true).isValid()
 export const isValidYear = year =>
@@ -158,7 +150,7 @@ export const cancelablePromise = promise => {
     promise: wrappedPromise,
     cancel: () => {
       hasCanceled = true
-    }
+    },
   }
 }
 
@@ -209,7 +201,7 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
         name: elementDetails[newestStudyrightElement.code].name,
         startdate: newestStudyrightElement.startdate,
         code: newestStudyrightElement.code,
-        facultyCode
+        facultyCode,
       })
     }
   })

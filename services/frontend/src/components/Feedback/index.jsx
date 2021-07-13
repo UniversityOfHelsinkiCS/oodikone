@@ -73,8 +73,8 @@ const Feedback = ({ sendFeedback, success, pending, error }) => {
                 content: 'Send',
                 positive: true,
                 disabled: pending,
-                onClick: event => handleSubmit(event)
-              }
+                onClick: event => handleSubmit(event),
+              },
             ]}
           />
         </div>
@@ -86,14 +86,14 @@ const Feedback = ({ sendFeedback, success, pending, error }) => {
 const mapStateToProps = ({ feedback }) => ({
   success: feedback.success,
   pending: feedback.pending,
-  error: feedback.error
+  error: feedback.error,
 })
 
 Feedback.propTypes = {
   sendFeedback: PropTypes.func.isRequired,
   success: PropTypes.bool.isRequired,
   pending: PropTypes.bool.isRequired,
-  error: PropTypes.bool.isRequired
+  error: PropTypes.bool.isRequired,
 }
 
 export default withRouter(connect(mapStateToProps, { sendFeedback: sendFeedbackAction })(Feedback))

@@ -11,19 +11,19 @@ const reducer = (state = { data: [] }, action) => {
     case 'GET_UNITS_ATTEMPT':
       return {
         pending: true,
-        data: state.data
+        data: state.data,
       }
     case 'GET_UNITS_FAILURE':
       return {
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
       }
     case 'GET_UNITS_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     default:
       return state

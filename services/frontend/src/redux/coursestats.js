@@ -12,7 +12,7 @@ export const getCourseStats = ({ courseCodes, separate, unifyOpenUniCourses }, o
   const params = {
     codes: courseCodes,
     separate,
-    unifyOpenUniCourses
+    unifyOpenUniCourses,
   }
   return callController(route, prefix, [], 'get', params, params, onProgress)
 }

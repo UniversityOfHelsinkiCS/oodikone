@@ -5,7 +5,7 @@ import Timeout from '../Timeout'
 
 const TIMEOUTS = {
   FETCH: 'fetch',
-  SEARCH: 'search'
+  SEARCH: 'search',
 }
 
 const AutoSubmitSearchInput = ({
@@ -81,7 +81,7 @@ AutoSubmitSearchInput.propTypes = {
   value: string.isRequired,
   onChange: func.isRequired,
   loading: bool,
-  disabled: bool
+  disabled: bool,
 }
 
 AutoSubmitSearchInput.defaultProps = {
@@ -90,7 +90,7 @@ AutoSubmitSearchInput.defaultProps = {
   latency: 250,
   minSearchLength: 0,
   loading: false,
-  disabled: false
+  disabled: false,
 }
 
 export default Timeout(AutoSubmitSearchInput)

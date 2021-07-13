@@ -41,75 +41,75 @@ const reducer = (state = { data: [], enabledOnly: true }, action) => {
       return {
         ...state,
         enabledOnly: false,
-        pending: true
+        pending: true,
       }
     case 'GET_USERS_FAILURE':
       return {
         ...state,
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
       }
     case 'GET_USERS_SUCCESS':
       return {
         ...state,
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'EDIT_USER_UNIT_ATTEMPT':
       return {
         ...state,
         userunitpending: true,
-        useruniterror: false
+        useruniterror: false,
       }
     case 'EDIT_USER_UNIT_FAILURE':
       return {
         ...state,
         userunitpending: false,
-        useruniterror: true
+        useruniterror: true,
       }
     case 'EDIT_USER_UNIT_SUCCESS':
       return {
         ...state,
         userunitpending: false,
         useruniterror: false,
-        data: state.data.filter(user => user.id !== action.response.id).concat(action.response)
+        data: state.data.filter(user => user.id !== action.response.id).concat(action.response),
       }
     case 'MODIFY_ACCESSGROUPS_ATTEMPT':
       return {
         ...state,
         accessgroupPending: true,
-        accessgroupError: false
+        accessgroupError: false,
       }
     case 'MODIFY_ACCESSGROUPS_FAILURE':
       return {
         ...state,
         accessgroupPending: false,
-        accessgroupError: true
+        accessgroupError: true,
       }
     case 'MODIFY_ACCESSGROUPS_SUCCESS':
       return {
         ...state,
         accessgroupPending: false,
         accessgroupError: false,
-        data: state.data.filter(user => user.id !== action.response.id).concat(action.response)
+        data: state.data.filter(user => user.id !== action.response.id).concat(action.response),
       }
     case 'SET_USER_FACULTIES_ATTEMPT':
       return {
         ...state,
-        setfacultypending: true
+        setfacultypending: true,
       }
     case 'SET_USER_FACULTIES_FAILURE':
       return {
         ...state,
-        setfacultypending: false
+        setfacultypending: false,
       }
     case 'SET_USER_FACULTIES_SUCCESS':
       return {
         ...state,
         setfacultypending: false,
-        data: state.data.filter(user => user.id !== action.response.id).concat(action.response)
+        data: state.data.filter(user => user.id !== action.response.id).concat(action.response),
       }
     default:
       return state

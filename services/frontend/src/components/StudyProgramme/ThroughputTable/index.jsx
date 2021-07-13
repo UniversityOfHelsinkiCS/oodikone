@@ -59,11 +59,11 @@ PopulationStatisticsLink.propTypes = {
   studytrack: string.isRequired,
   studyprogramme: string.isRequired,
   year: string.isRequired,
-  children: node.isRequired
+  children: node.isRequired,
 }
 
 TotalPopulationLink.defaultProps = {
-  confirm: false
+  confirm: false,
 }
 
 TotalPopulationLink.propTypes = {
@@ -71,7 +71,7 @@ TotalPopulationLink.propTypes = {
   years: arrayOf(shape({})).isRequired,
   children: node.isRequired,
   confirm: bool,
-  studytrack: string.isRequired
+  studytrack: string.isRequired,
 }
 
 const ThroughputTable = ({
@@ -84,7 +84,7 @@ const ThroughputTable = ({
   userRoles,
   history,
   newProgramme,
-  isStudytrackView
+  isStudytrackView,
 }) => {
   const [lowerYear, setLower] = useState(null)
   const [upperYear, setUpper] = useState(null)
@@ -98,7 +98,7 @@ const ThroughputTable = ({
           .map(stats => ({
             key: stats.year.substring(0, 4),
             text: stats.year,
-            value: stats.year.substring(0, 4)
+            value: stats.year.substring(0, 4),
           }))
           .sort((year1, year2) => Number(year2.value) - Number(year1.value))
       : []
@@ -206,7 +206,7 @@ const ThroughputTable = ({
     )
   }
   return (
-    <React.Fragment>
+    <>
       <Header>
         <Grid columns={2}>
           <Grid.Row>
@@ -271,10 +271,10 @@ const ThroughputTable = ({
               {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}
               <Table.HeaderCell>Graduated overall</Table.HeaderCell>
               {GRADUATED_FEATURE_TOGGLED_ON && (
-                <Fragment>
+                <>
                   <Table.HeaderCell>Graduated in time</Table.HeaderCell>
                   <Table.HeaderCell>Graduation median time</Table.HeaderCell>
-                </Fragment>
+                </>
               )}
               <Table.HeaderCell content="to" />
               {TRANSFERRED_FROM_FEATURE_TOGGLED_ON && <Table.HeaderCell content="from" />}
@@ -308,9 +308,9 @@ const ThroughputTable = ({
                   <Table.Cell>{year.credits.length}</Table.Cell>
                   {genders.map(gender => (
                     <Table.Cell key={`${year.year} gender:${gender}`}>
-                      {`${year.genders[gender] || 0} (${Math.floor(
-                        (year.genders[gender] / year.credits.length) * 100
-                      ) || 0}%)`}
+                      {`${year.genders[gender] || 0} (${
+                        Math.floor((year.genders[gender] / year.credits.length) * 100) || 0
+                      }%)`}
                     </Table.Cell>
                   ))}
                   {renderRatioOfFinns && ratioOfFinnsIn(year)}
@@ -318,10 +318,10 @@ const ThroughputTable = ({
                   {CANCELLED_FEATURE_TOGGLED_ON && <Table.Cell>{year.cancelled}</Table.Cell>}
                   <Table.Cell>{year.graduated}</Table.Cell>
                   {GRADUATED_FEATURE_TOGGLED_ON && (
-                    <Fragment>
+                    <>
                       <Table.Cell>{year.inTargetTime}</Table.Cell>
                       <Table.Cell>{year.medianGraduationTime ? `${year.medianGraduationTime} months` : '∞'}</Table.Cell>
-                    </Fragment>
+                    </>
                   )}
 
                   <Table.Cell>{year.transferred}</Table.Cell>
@@ -355,23 +355,23 @@ const ThroughputTable = ({
                 ))}
                 {renderRatioOfFinns ? (
                   <Table.HeaderCell>
-                    {`${throughput.totals.nationalities.Finland || 0} (${Math.floor(
-                      (throughput.totals.nationalities.Finland / calculateTotalNationalities()) * 100
-                    ) || 0}%)`}
+                    {`${throughput.totals.nationalities.Finland || 0} (${
+                      Math.floor((throughput.totals.nationalities.Finland / calculateTotalNationalities()) * 100) || 0
+                    }%)`}
                   </Table.HeaderCell>
                 ) : null}
                 <Table.HeaderCell>{throughput.totals.started}</Table.HeaderCell>
                 {CANCELLED_FEATURE_TOGGLED_ON && <Table.HeaderCell>{throughput.totals.cancelled}</Table.HeaderCell>}
                 <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
                 {GRADUATED_FEATURE_TOGGLED_ON && (
-                  <Fragment>
+                  <>
                     <Table.HeaderCell>{throughput.totals.inTargetTime}</Table.HeaderCell>
                     <Table.HeaderCell>
                       {throughput.totals.medianGraduationTime
                         ? `${throughput.totals.medianGraduationTime} months`
                         : '∞'}
                     </Table.HeaderCell>
-                  </Fragment>
+                  </>
                 )}
 
                 <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
@@ -407,13 +407,13 @@ const ThroughputTable = ({
                 key: 'fetch',
                 content: 'Show population',
                 positive: true,
-                onClick: event => pushQueryToUrl(event)
-              }
+                onClick: event => pushQueryToUrl(event),
+              },
             ]}
           />
         </>
       ) : null}
-    </React.Fragment>
+    </>
   )
 }
 
@@ -427,9 +427,9 @@ ThroughputTable.propTypes = {
         credits: arrayOf(number),
         thesisM: number,
         thesisB: number,
-        graduated: number
+        graduated: number,
       })
-    )
+    ),
   }),
   thesis: arrayOf(
     shape({
@@ -437,7 +437,7 @@ ThroughputTable.propTypes = {
       courseCode: string,
       thesisType: string,
       createdAt: string,
-      updatedAt: string
+      updatedAt: string,
     })
   ),
   studyprogramme: string.isRequired,
@@ -447,20 +447,20 @@ ThroughputTable.propTypes = {
   userRoles: arrayOf(string).isRequired,
   history: shape({}).isRequired,
   newProgramme: bool.isRequired,
-  isStudytrackView: bool
+  isStudytrackView: bool,
 }
 
 ThroughputTable.defaultProps = {
   throughput: null,
   thesis: undefined,
   studytrack: '',
-  isStudytrackView: false
+  isStudytrackView: false,
 }
 
 const mapStateToProps = ({
   auth: {
-    token: { roles }
-  }
+    token: { roles },
+  },
 }) => ({ userRoles: getUserRoles(roles) })
 
 export default connect(mapStateToProps)(ThroughputTable)

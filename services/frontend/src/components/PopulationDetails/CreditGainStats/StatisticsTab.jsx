@@ -55,7 +55,7 @@ const StatisticsTab = ({ filteredStudents }) => {
 }
 
 StatisticsTab.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
+  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default StatisticsTab

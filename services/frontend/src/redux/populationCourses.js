@@ -10,7 +10,7 @@ export const getPopulationCourses = ({
   selectedStudentsByYear,
   year,
   years,
-  tag
+  tag,
 }) => {
   const route = !tag ? '/v2/populationstatistics/courses' : '/v2/populationstatistics/coursesbytag'
   const prefix = 'GET_POPULATION_COURSES_'
@@ -24,7 +24,7 @@ export const getPopulationCourses = ({
     year,
     years,
     tag,
-    selectedStudentsByYear
+    selectedStudentsByYear,
   }
 
   const body = {
@@ -34,7 +34,7 @@ export const getPopulationCourses = ({
     tag,
     year,
     selectedStudentsByYear,
-    years
+    years,
   }
   return callController(route, prefix, body, 'post', query)
 }
@@ -67,7 +67,7 @@ const reducer = (state = defaultState, action) => {
         ...state,
         pending: true,
         error: false,
-        query: action.requestSettings.query
+        query: action.requestSettings.query,
       }
     case 'GET_POPULATION_COURSES_FAILURE':
       return {
@@ -75,7 +75,7 @@ const reducer = (state = defaultState, action) => {
         pending: false,
         error: true,
         data: {},
-        query: action.query
+        query: action.query,
       }
     case 'GET_POPULATION_COURSES_SUCCESS':
       return {
@@ -83,14 +83,14 @@ const reducer = (state = defaultState, action) => {
         pending: false,
         error: false,
         data: action.response || {},
-        query: action.query
+        query: action.query,
       }
     case 'GET_COURSES_OF_COURSE_POP_ATTEMPT':
       return {
         ...state,
         pending: true,
         error: false,
-        query: action.requestSettings.query
+        query: action.requestSettings.query,
       }
     case 'GET_COURSES_OF_COURSE_POP_FAILURE':
       return {
@@ -98,7 +98,7 @@ const reducer = (state = defaultState, action) => {
         pending: false,
         error: true,
         data: {},
-        query: action.query
+        query: action.query,
       }
     case 'GET_COURSES_OF_COURSE_POP_SUCCESS':
       return {
@@ -106,14 +106,14 @@ const reducer = (state = defaultState, action) => {
         pending: false,
         error: false,
         data: action.response || {},
-        query: action.query
+        query: action.query,
       }
     case 'GET_COURSES_OF_CUSTOM_POP_BY_SN_ATTEMPT':
       return {
         ...state,
         pending: true,
         error: false,
-        query: action.requestSettings.query
+        query: action.requestSettings.query,
       }
     case 'GET_COURSES_OF_CUSTOM_POP_BY_SN_FAILURE':
       return {
@@ -121,7 +121,7 @@ const reducer = (state = defaultState, action) => {
         pending: false,
         error: true,
         data: {},
-        query: action.query
+        query: action.query,
       }
     case 'GET_COURSES_OF_CUSTOM_POP_BY_SN_SUCCESS':
       return {
@@ -129,7 +129,7 @@ const reducer = (state = defaultState, action) => {
         pending: false,
         error: false,
         data: action.response || {},
-        query: action.query
+        query: action.query,
       }
     default:
       return state

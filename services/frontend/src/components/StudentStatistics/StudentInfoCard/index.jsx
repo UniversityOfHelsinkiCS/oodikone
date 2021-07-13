@@ -71,18 +71,18 @@ StudentInfoCard.propTypes = {
   resetStudent: func.isRequired,
   history: shape({}).isRequired,
   updating: bool.isRequired,
-  has_dev_role: bool.isRequired
+  has_dev_role: bool.isRequired,
 }
 
 const mapStateToProps = state => ({
   showName: state.settings.namesVisible,
   updating: state.populations.updating,
-  has_dev_role: state.auth.token.roles.find(r => r.group_code === 'dev') !== undefined
+  has_dev_role: state.auth.token.roles.find(r => r.group_code === 'dev') !== undefined,
 })
 
 export default withRouter(
   connect(mapStateToProps, {
     removeStudentSelection,
-    resetStudent
+    resetStudent,
   })(StudentInfoCard)
 )

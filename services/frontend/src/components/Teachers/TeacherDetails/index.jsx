@@ -11,7 +11,7 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 
 const statisticsTableTab = (title, statistics) => ({
   menuItem: title,
-  render: () => <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />
+  render: () => <TeacherStatisticsTable statistics={statistics} onClickFn={() => {}} />,
 })
 
 const formatStatisticsForTable = (statistics, language) => {
@@ -21,7 +21,7 @@ const formatStatisticsForTable = (statistics, language) => {
   return Object.values(statistics).map(({ name, stats, ...rest }) => ({
     ...rest,
     ...stats,
-    name: isString(name) ? name : getTextIn(name, language)
+    name: isString(name) ? name : getTextIn(name, language),
   }))
 }
 
@@ -32,10 +32,10 @@ const TeacherDetails = ({ teacher, history }) => {
   const panes = [
     {
       menuItem: 'Courses',
-      render: () => <CoursesTab courses={courses} semesters={semesters} />
+      render: () => <CoursesTab courses={courses} semesters={semesters} />,
     },
     statisticsTableTab('Semesters', formatStatisticsForTable(semesters, language)),
-    statisticsTableTab('Years', formatStatisticsForTable(years, language))
+    statisticsTableTab('Years', formatStatisticsForTable(years, language)),
   ]
 
   return (
@@ -57,7 +57,7 @@ const TeacherDetails = ({ teacher, history }) => {
 
 TeacherDetails.propTypes = {
   teacher: shape({}).isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
 }
 
 export default withRouter(TeacherDetails)

@@ -30,7 +30,7 @@ const UserPage = ({
   removeUserUnits,
   getAccessGroups,
   getFaculties,
-  getDegreesAndProgrammesUnfiltered
+  getDegreesAndProgrammesUnfiltered,
 }) => {
   const { language } = useLanguage()
 
@@ -118,7 +118,7 @@ const UserPage = ({
                 fontSize: '34px',
                 fontFamily: 'Comic Sans',
                 color: 'darkred',
-                border: '1px'
+                border: '1px',
               }}
             >
               Admin access!
@@ -137,7 +137,7 @@ const UserPage = ({
                 key: f.code,
                 text: getTextIn(f.name, language),
                 description: f.code,
-                value: f.code
+                value: f.code,
               })),
               ['text']
             )}
@@ -200,7 +200,7 @@ UserPage.propTypes = {
       shape({
         code: string,
         name: shape({}),
-        type: number
+        type: number,
       })
     ),
     faculty: arrayOf(
@@ -210,11 +210,11 @@ UserPage.propTypes = {
           shape({
             code: string,
             name: shape({}),
-            type: number
+            type: number,
           })
-        )
+        ),
       })
-    )
+    ),
   }).isRequired,
   removeUserUnits: func.isRequired,
   setFaculties: func.isRequired,
@@ -223,7 +223,7 @@ UserPage.propTypes = {
   associations: shape({}).isRequired,
   pending: bool.isRequired,
   history: shape({
-    push: func.isRequired
+    push: func.isRequired,
   }).isRequired,
   getAccessGroups: func.isRequired,
   getFaculties: func.isRequired,
@@ -231,7 +231,7 @@ UserPage.propTypes = {
   elementdetails: arrayOf(shape({ type: number, code: string, name: shape({}) })).isRequired,
   faculties: arrayOf(shape({ code: string, name: shape({}) })).isRequired,
   accessGroups: shape({}).isRequired,
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
 }
 const mapStateToProps = state => ({
   units: state.units.data,
@@ -240,7 +240,7 @@ const mapStateToProps = state => ({
   pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
   elementdetails: state.elementdetails.data,
   accessGroups: state.accessGroups,
-  isAdmin: getUserRoles(state.auth.token.roles).includes('admin')
+  isAdmin: getUserRoles(state.auth.token.roles).includes('admin'),
 })
 
 export default connect(mapStateToProps, {
@@ -249,5 +249,5 @@ export default connect(mapStateToProps, {
   getDegreesAndProgrammesUnfiltered,
   getAccessGroups,
   getFaculties,
-  getElementDetails
+  getElementDetails,
 })(withRouter(UserPage))

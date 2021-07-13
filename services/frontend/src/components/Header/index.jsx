@@ -12,8 +12,8 @@ const Header = props => (
 
 Header.propTypes = {
   location: shape({
-    pathname: string.isRequired
-  }).isRequired
+    pathname: string.isRequired,
+  }).isRequired,
 }
 
 export default withRouter(Header)

@@ -28,12 +28,12 @@ CourseStatsTab.propTypes = {
   statistics: arrayOf(shape({})).isRequired,
   doSelect: func.isRequired,
   selected: oneOfType([string, number]),
-  renderCourseLink: bool
+  renderCourseLink: bool,
 }
 
 CourseStatsTab.defaultProps = {
   selected: null,
-  renderCourseLink: false
+  renderCourseLink: false,
 }
 
 const CoursesTab = ({ courses, semesters }) => {
@@ -48,7 +48,7 @@ const CoursesTab = ({ courses, semesters }) => {
       .map(({ name, id }) => ({
         key: id,
         value: id,
-        text: getTextIn(name, language)
+        text: getTextIn(name, language),
       }))
       .sort((s1, s2) => s2.value - s1.value)
   }
@@ -59,7 +59,7 @@ const CoursesTab = ({ courses, semesters }) => {
       key: id,
       value: id,
       description: id,
-      text: getTextIn(name, language)
+      text: getTextIn(name, language),
     }))
   }
   useEffect(() => {
@@ -87,7 +87,7 @@ const CoursesTab = ({ courses, semesters }) => {
     return Object.entries(course.semesters).map(([semesterid, stats]) => ({
       id: semesterid,
       name: getTextIn(semesters[semesterid].name, language),
-      ...stats
+      ...stats,
     }))
   }
 
@@ -100,7 +100,7 @@ const CoursesTab = ({ courses, semesters }) => {
       .map(({ id, name, semesters }) => ({
         id,
         name: getTextIn(name, language),
-        ...semesters[semesterid]
+        ...semesters[semesterid],
       }))
   }
 
@@ -118,7 +118,7 @@ const CoursesTab = ({ courses, semesters }) => {
               statistics={getSemesterStats(selectedSemester)}
               renderCourseLink
             />
-          )
+          ),
         },
         {
           menuItem: 'Course',
@@ -129,8 +129,8 @@ const CoursesTab = ({ courses, semesters }) => {
               doSelect={setCourse}
               selected={selectedCourse}
             />
-          )
-        }
+          ),
+        },
       ]}
     />
   )
@@ -138,7 +138,7 @@ const CoursesTab = ({ courses, semesters }) => {
 
 CoursesTab.propTypes = {
   courses: shape({}).isRequired,
-  semesters: shape({}).isRequired
+  semesters: shape({}).isRequired,
 }
 
 export default CoursesTab

@@ -10,7 +10,7 @@ const getCourseStats = createSelector([courseStatsSelector], courseStats => {
     const { statistics } = data
     stats[coursecode] = {
       ...data,
-      statistics
+      statistics,
     }
   })
   return stats
@@ -26,7 +26,7 @@ const getQueryInfo = createSelector([getCourseStats], stats => {
     courses.push({
       code: c.coursecode,
       name: c.name,
-      alternatives: c.alternatives
+      alternatives: c.alternatives,
     })
     c.statistics.forEach(({ name, code }) => {
       semesters[code] = { name, code }
@@ -41,7 +41,7 @@ export const ALL = {
   key: 'ALL',
   value: 'ALL',
   text: 'All',
-  description: 'All students combined'
+  description: 'All students combined',
 }
 
 const mergeStudents = (students1, students2) => {
@@ -89,7 +89,7 @@ const getAllStudyProgrammes = createSelector(
             value: code,
             description: code === 'OTHER' ? 'Students with no associated programme' : '',
             text: name,
-            students: filteredStudents
+            students: filteredStudents,
           }
         } else {
           all[code].students = mergeStudents(all[code].students, filteredStudents)
@@ -124,14 +124,14 @@ const getRealisationStats = (realisation, filterStudentFn, userHasAccessToAllSta
     failed: failedAmount,
     realisation: name,
     passrate: calculatePassRate(passedAmount, failedAmount),
-    obfuscated
+    obfuscated,
   }
 }
 
 const getSummaryStats = (statistics, filterStudentFn, userHasAccessToAllStats) => {
   const summaryAcc = {
     passed: 0,
-    failed: 0
+    failed: 0,
   }
 
   const summary = statistics.reduce((acc, cur) => {
@@ -169,7 +169,7 @@ const summaryStatistics = createSelector(
         coursecode,
         name,
         summary,
-        realisations
+        realisations,
       }
     })
   }
@@ -178,7 +178,7 @@ const summaryStatistics = createSelector(
 const getCourses = createSelector(getCourseStats, stats =>
   Object.values(stats).map(({ name, coursecode: code }) => ({
     code,
-    name
+    name,
   }))
 )
 
@@ -188,5 +188,5 @@ export default {
   getAllStudyProgrammes,
   summaryStatistics,
   ALL,
-  getQueryInfo
+  getQueryInfo,
 }

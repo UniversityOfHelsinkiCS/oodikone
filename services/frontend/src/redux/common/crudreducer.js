@@ -1,7 +1,7 @@
 import { actionTypes } from '../../apiConnection'
 
 const additionalTypes = prefix => ({
-  reset: `${prefix}_CLEAR`
+  reset: `${prefix}_CLEAR`,
 })
 
 const createReducer = (
@@ -10,7 +10,7 @@ const createReducer = (
     reduceGET = (_, action) => action.response,
     reducePOST = (data, action) => data.concat(action.response),
     reduceDELETE = (data, action) => data.filter(d => d.id === action.query.id),
-    defaults = undefined
+    defaults = undefined,
   }
 ) => {
   const prefixGET = `${prefix}GET_`
@@ -24,7 +24,7 @@ const createReducer = (
     pending: false,
     error: false,
     data: [],
-    ...defaults
+    ...defaults,
   }
   const reducer = (state = initialState, action) => {
     switch (action.type) {
@@ -34,7 +34,7 @@ const createReducer = (
         return {
           ...state,
           error: false,
-          pending: true
+          pending: true,
         }
       case destroy.failure:
       case create.failure:
@@ -42,32 +42,32 @@ const createReducer = (
         return {
           ...state,
           error: true,
-          pending: false
+          pending: false,
         }
       case read.success:
         return {
           ...state,
           data: reduceGET(state.data, action),
           error: false,
-          pending: false
+          pending: false,
         }
       case create.success:
         return {
           ...state,
           data: reducePOST(state.data, action),
           error: false,
-          pending: false
+          pending: false,
         }
       case destroy.success:
         return {
           ...state,
           data: reduceDELETE(state.data, action),
           error: false,
-          pending: false
+          pending: false,
         }
       case other.reset: {
         return {
-          ...initialState
+          ...initialState,
         }
       }
       default:
@@ -78,7 +78,7 @@ const createReducer = (
     reducer,
     prefixGET,
     prefixPOST,
-    prefixDELETE
+    prefixDELETE,
   }
 }
 

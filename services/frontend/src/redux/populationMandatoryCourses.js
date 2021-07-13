@@ -57,126 +57,126 @@ const reducer = (state = { data: [] }, action) => {
     case 'GET_MANDATORY_COURSES_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'GET_MANDATORY_COURSES_FAILURE':
       return {
         ...state,
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
       }
     case 'GET_MANDATORY_COURSES_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'ADD_MANDATORY_COURSE_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'ADD_MANDATORY_COURSE_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'ADD_MANDATORY_COURSE_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: [...state.data, action.response]
+        data: [...state.data, action.response],
       }
     case 'SET_MANDATORY_COURSE_LABEL_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'SET_MANDATORY_COURSE_LABEL_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'SET_MANDATORY_COURSE_LABEL_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: state.data.map(e => (e.code === action.response.code ? action.response : e))
+        data: state.data.map(e => (e.code === action.response.code ? action.response : e)),
       }
     case 'DELETE_MANDATORY_COURSES_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'DELETE_MANDATORY_COURSE_FAILURE':
       return {
         ...state,
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
       }
     case 'DELETE_MANDATORY_COURSE_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: state.data.filter(course => course.code !== action.response)
+        data: state.data.filter(course => course.code !== action.response),
       }
     case 'SET_COURSE_EXCLUSION_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'SET_COURSE_EXCLUSION_FAILURE':
       return {
         ...state,
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
       }
     case 'SET_COURSE_EXCLUSION_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'REMOVE_COURSE_EXCLUSION_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'REMOVE_COURSE_EXCLUSION_FAILURE':
       return {
         ...state,
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
       }
     case 'REMOVE_COURSE_EXCLUSION_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'GET_MANDATORY_MODULES_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'GET_MANDATORY_MODULES_FAILURE':
       return {
         ...state,
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
       }
     case 'GET_MANDATORY_MODULES_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     default:
       return state

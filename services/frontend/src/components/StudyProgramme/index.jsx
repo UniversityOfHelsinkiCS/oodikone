@@ -37,7 +37,7 @@ const StudyProgramme = props => {
 
   const refreshProductivity = () => {
     callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {
-      code: props.match.params.studyProgrammeId
+      code: props.match.params.studyProgrammeId,
     })
       .then(() => {
         props.getProductivityDispatch(props.match.params.studyProgrammeId)
@@ -50,7 +50,7 @@ const StudyProgramme = props => {
   }
   const refreshThroughput = () => {
     callApi('/v2/studyprogrammes/throughput/recalculate', 'get', null, {
-      code: props.match.params.studyProgrammeId
+      code: props.match.params.studyProgrammeId,
     })
       .then(() => {
         props.getThroughputDispatch(props.match.params.studyProgrammeId)
@@ -74,20 +74,20 @@ const StudyProgramme = props => {
     const panes = []
     panes.push({
       menuItem: 'Overview',
-      render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />
+      render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />,
     })
     if (filteredStudytracks.length > 0) {
       panes.push({
         menuItem: 'Studytrack overview',
         render: () => (
           <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} admin={props.isAdmin} />
-        )
+        ),
       })
     }
     panes.push(
       {
         menuItem: 'Degree Courses',
-        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />
+        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
       },
       { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> }
     )
@@ -95,21 +95,21 @@ const StudyProgramme = props => {
     if ((userRoles.includes('coursegroups') && rights.includes(studyProgrammeId)) || userRoles.includes('admin')) {
       panes.push({
         menuItem: 'Course Groups',
-        render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />
+        render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />,
       })
     }
     panes.push({
       menuItem: 'Thesis Courses',
-      render: () => <ThesisCourses studyprogramme={studyProgrammeId} />
+      render: () => <ThesisCourses studyprogramme={studyProgrammeId} />,
     })
     panes.push({
       menuItem: 'Tags',
-      render: () => <Tags studyprogramme={studyProgrammeId} />
+      render: () => <Tags studyprogramme={studyProgrammeId} />,
     })
     if (!isNewHYStudyProgramme(studyProgrammeId)) {
       panes.push({
         menuItem: 'Present students',
-        render: () => <PresentStudents />
+        render: () => <PresentStudents />,
       })
     }
     if (props.isAdmin) {
@@ -120,7 +120,7 @@ const StudyProgramme = props => {
             <Button onClick={() => refreshThroughput()}>recalculate throughput</Button>
             <Button onClick={() => refreshProductivity()}>recalculate productivity</Button>
           </>
-        )
+        ),
       })
     }
     return panes
@@ -155,7 +155,7 @@ const StudyProgramme = props => {
       group: 'Programme Usage',
       name: 'study programme overview',
       label: programmeName,
-      value: 1
+      value: 1,
     })
   }, [programmeName])
 
@@ -188,8 +188,8 @@ StudyProgramme.propTypes = {
   match: shape({
     params: shape({
       studyProgrammeId: string,
-      courseGroupId: string
-    })
+      courseGroupId: string,
+    }),
   }),
   programmes: shape({}),
   history: shape({}).isRequired,
@@ -200,28 +200,28 @@ StudyProgramme.propTypes = {
   isAdmin: bool.isRequired,
   getPresentStudentsDispatch: func.isRequired,
   clearPresentStudentsDispatch: func.isRequired,
-  getDegreesAndProgrammesDispatch: func.isRequired
+  getDegreesAndProgrammesDispatch: func.isRequired,
 }
 
 StudyProgramme.defaultProps = {
   match: {
-    params: { studyProgrammeId: undefined }
+    params: { studyProgrammeId: undefined },
   },
-  programmes: {}
+  programmes: {},
 }
 
 const mapStateToProps = ({
   populationDegreesAndProgrammes,
   auth: {
-    token: { rights, roles }
-  }
+    token: { rights, roles },
+  },
 }) => {
   const programmes = populationDegreesAndProgrammes.data ? populationDegreesAndProgrammes.data.programmes : {}
   return {
     programmes,
     rights,
     userRoles: getUserRoles(roles),
-    isAdmin: getUserIsAdmin(roles)
+    isAdmin: getUserIsAdmin(roles),
   }
 }
 
@@ -232,10 +232,10 @@ export default connect(
     getProductivityDispatch: getProductivity,
     getPresentStudentsDispatch: getPresentStudents,
     clearPresentStudentsDispatch: clearPresentStudents,
-    getDegreesAndProgrammesDispatch: getDegreesAndProgrammes
+    getDegreesAndProgrammesDispatch: getDegreesAndProgrammes,
   },
   null,
   {
-    areStatePropsEqual: isEqual
+    areStatePropsEqual: isEqual,
   }
 )(withRouter(StudyProgramme))

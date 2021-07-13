@@ -18,7 +18,7 @@ const LeaderForm = ({
   handleYearChange,
   yearoptions,
   categoryoptions,
-  initLeaderboard
+  initLeaderboard,
 }) => {
   useEffect(() => {
     const [defaultyear = {}] = [yearoptions.find(year => Number(year.text.slice(0, 4)) === currentYear())]

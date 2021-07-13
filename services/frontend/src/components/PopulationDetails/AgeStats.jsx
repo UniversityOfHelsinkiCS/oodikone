@@ -174,7 +174,7 @@ const AgeStats = ({ filteredStudents, query }) => {
 
 AgeStats.propTypes = {
   filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
-  query: shape({}).isRequired
+  query: shape({}).isRequired,
 }
 
 export default AgeStats

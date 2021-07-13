@@ -19,7 +19,7 @@ const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CA
 const paneViewIndex = {
   TABLE: 0,
   PASS_RAGE: 1,
-  GRADE_DISTRIBUTION: 2
+  GRADE_DISTRIBUTION: 2,
 }
 
 const ResultTabs = props => {
@@ -103,7 +103,7 @@ const ResultTabs = props => {
             showGrades={showGrades}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
-        )
+        ),
       },
       {
         menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
@@ -115,7 +115,7 @@ const ResultTabs = props => {
             isRelative={isRelative && !!comparison}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
-        )
+        ),
       },
       {
         menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
@@ -126,8 +126,8 @@ const ResultTabs = props => {
             isRelative={isRelative}
             userHasAccessToAllStats={userHasAccessToAllStats}
           />
-        )
-      }
+        ),
+      },
     ]
 
     return paneMenuItems.map(p => {
@@ -139,7 +139,7 @@ const ResultTabs = props => {
             <Grid.Row className="modeSelectorRow">{renderViewModeSelector()}</Grid.Row>
             {renderFn()}
           </Grid>
-        )
+        ),
       }
     })
   }
@@ -155,12 +155,12 @@ ResultTabs.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
   history: shape({}).isRequired,
-  separate: bool
+  separate: bool,
 }
 
 ResultTabs.defaultProps = {
   comparison: undefined,
-  separate: false
+  separate: false,
 }
 
 export default withRouter(ResultTabs)

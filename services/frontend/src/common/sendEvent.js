@@ -7,7 +7,7 @@ export const ANALYTICS_CATEGORIES = {
   populationStudents: 'Population students',
   populationStatistics: 'Population statistics',
   degreeCourses: 'Degree courses',
-  common: 'Common'
+  common: 'Common',
 }
 
 // This export could be created with Object.fromEntries, but then autocomplete wont work.
@@ -23,5 +23,5 @@ export default {
   },
   common: (action, name, value) => {
     sendEvent(ANALYTICS_CATEGORIES.common, action, name, value)
-  }
+  },
 }

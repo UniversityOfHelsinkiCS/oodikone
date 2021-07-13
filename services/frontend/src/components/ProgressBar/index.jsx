@@ -43,12 +43,12 @@ const ProgressBar = ({ progress, fixed }) => {
 }
 
 ProgressBar.defaultProps = {
-  fixed: false
+  fixed: false,
 }
 
 ProgressBar.propTypes = {
   progress: number.isRequired,
-  fixed: bool
+  fixed: bool,
 }
 
 export default ProgressBar

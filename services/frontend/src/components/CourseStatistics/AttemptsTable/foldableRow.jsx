@@ -9,11 +9,11 @@ class FoldableRow extends Component {
   static propTypes = {
     courseData: courseDataWithRealisationsType.isRequired,
     onClickFn: func.isRequired,
-    userHasAccessToAllStats: bool.isRequired
+    userHasAccessToAllStats: bool.isRequired,
   }
 
   state = {
-    isUnfolded: true
+    isUnfolded: true,
   }
 
   render() {
@@ -42,10 +42,10 @@ class FoldableRow extends Component {
           <Table.Cell
             content={
               isMainRow ? (
-                <Fragment>
+                <>
                   {category}
                   {!userHasAccessToAllStats && <strong>*</strong>} <span>{id}</span>
-                </Fragment>
+                </>
               ) : (
                 realisation
               )
@@ -62,7 +62,7 @@ class FoldableRow extends Component {
     }
 
     return (
-      <Fragment>
+      <>
         {getRow(id, courseData)}
         {showCourseRealisations
           ? realisations.map(r => {
@@ -71,7 +71,7 @@ class FoldableRow extends Component {
               return getRow(realisationId, r, false)
             })
           : null}
-      </Fragment>
+      </>
     )
   }
 }

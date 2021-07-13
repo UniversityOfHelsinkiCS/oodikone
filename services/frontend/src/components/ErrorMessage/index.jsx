@@ -11,12 +11,12 @@ class ErrorMessage extends Component {
     message: string,
     url: string,
     uuid: string.isRequired,
-    removeError: func.isRequired
+    removeError: func.isRequired,
   }
 
   static defaultProps = {
     url: '',
-    message: ''
+    message: '',
   }
 
   handleDismiss = () => {
@@ -41,7 +41,7 @@ class ErrorMessage extends Component {
 const mapStateToProps = () => ({})
 
 const mapDispatchToProps = dispatch => ({
-  removeError: uuid => dispatch(removeError(uuid))
+  removeError: uuid => dispatch(removeError(uuid)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ErrorMessage)

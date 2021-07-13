@@ -13,14 +13,14 @@ import CourseGroup from '../CourseGroup'
 const getCourseGroupPath = (courseGroupId, studyProgrammeId) =>
   getCompiledPath('/study-programme/:studyProgrammeId/course-group/:courseGroupId', {
     courseGroupId,
-    studyProgrammeId
+    studyProgrammeId,
   })
 
 class AggregateView extends Component {
   state = {
     isLoading: true,
     editedCourseGroup: null,
-    courseGroups: []
+    courseGroups: [],
   }
 
   componentDidMount() {
@@ -28,7 +28,7 @@ class AggregateView extends Component {
       .then(res => {
         this.setState({
           courseGroups: res.data,
-          isLoading: false
+          isLoading: false,
         })
       })
       .catch(e => {
@@ -46,7 +46,7 @@ class AggregateView extends Component {
       .then(res => {
         this.setState({
           courseGroups: res.data,
-          isLoading: false
+          isLoading: false,
         })
       })
       .catch(e => {
@@ -73,15 +73,15 @@ class AggregateView extends Component {
         title: 'Course group',
         getRowVal: cg => cg.name,
         getRowContent: courseGroup => (
-          <Fragment>
+          <>
             <a
               href={getCourseGroupPath(courseGroup.id, programmeId)}
               onClick={e => this.handleNavigationCourseGroup(e, courseGroup.id, programmeId)}
             >
               {courseGroup.name}
             </a>
-          </Fragment>
-        )
+          </>
+        ),
       },
       { key: 'Credits', title: 'Credits', getRowVal: cg => cg.credits },
       { key: 'Students', title: 'Students', getRowVal: cg => cg.students },
@@ -90,28 +90,28 @@ class AggregateView extends Component {
         title: '',
         getRowVal: cg => <Icon name="edit" onClick={() => this.setState({ editedCourseGroup: cg.id })} link />,
         headerProps: { onClick: null, sorted: null },
-        cellProps: { collapsing: true }
-      }
+        cellProps: { collapsing: true },
+      },
     ]
 
     const renderViewCourseGroup = () => (
-      <Fragment>
+      <>
         <CourseGroup groupId={courseGroupId} studyProgrammeId={programmeId} />
-      </Fragment>
+      </>
     )
 
     const renderEditCourseGroup = () => (
-      <Fragment>
+      <>
         <Header size="medium">
           Edit group
           <Icon name="reply" onClick={() => this.setState({ editedCourseGroup: null })} link />
         </Header>
         <CourseGroupAddTeacher groupId={editedCourseGroup} />
-      </Fragment>
+      </>
     )
 
     const renderCourseGroups = () => (
-      <Fragment>
+      <>
         <Header size="medium">
           Group statistics
           <Button
@@ -129,7 +129,7 @@ class AggregateView extends Component {
         ) : (
           <SortableTable getRowKey={gc => gc.id} tableProps={{ celled: false }} columns={columns} data={courseGroups} />
         )}
-      </Fragment>
+      </>
     )
 
     return (
@@ -144,14 +144,14 @@ class AggregateView extends Component {
 
 AggregateView.propTypes = {
   history: shape({
-    push: func.isRequired
+    push: func.isRequired,
   }).isRequired,
   programmeId: string.isRequired,
-  courseGroupId: string
+  courseGroupId: string,
 }
 
 AggregateView.defaultProps = {
-  courseGroupId: null
+  courseGroupId: null,
 }
 
 export default withRouter(AggregateView)

@@ -18,7 +18,7 @@ const ShowProgrammeOverView = ({ code }) => {
 }
 
 ShowProgrammeOverView.propTypes = {
-  code: string.isRequired
+  code: string.isRequired,
 }
 
 const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, fromYear, toYear }) => {
@@ -58,35 +58,35 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, fromY
           {' '}
           {getNameOfProgramme(code)} <ShowProgrammeOverView code={code} />
         </div>
-      )
+      ),
     },
     {
       key: 'code',
       title: 'code',
-      getRowVal: ({ code }) => code
+      getRowVal: ({ code }) => code,
     },
     {
       key: 'studentCredits',
       title: 'Student credits',
-      getRowVal: ({ code }) => Math.round(totalStats[code].totalStudentCredits)
+      getRowVal: ({ code }) => Math.round(totalStats[code].totalStudentCredits),
     },
     {
       key: 'coursesPassed',
       title: 'Courses passed',
       getRowVal: ({ code }) => calculateTotalPassedCourses(totalStats[code]),
-      getRowContent: ({ code }) => `${calculateTotalPassedCourses(totalStats[code]).toFixed(2)}%`
+      getRowContent: ({ code }) => `${calculateTotalPassedCourses(totalStats[code]).toFixed(2)}%`,
     },
     {
       key: 'coursesFailed',
       title: 'Courses failed',
       getRowVal: ({ code }) => calculateTotalFailedCourses(totalStats[code]),
-      getRowContent: ({ code }) => `${calculateTotalFailedCourses(totalStats[code]).toFixed(2)}%`
+      getRowContent: ({ code }) => `${calculateTotalFailedCourses(totalStats[code]).toFixed(2)}%`,
     },
     {
       key: 'students',
       title: 'Students',
-      getRowVal: ({ code }) => totalStats[code].totalStudents.length
-    }
+      getRowVal: ({ code }) => totalStats[code].totalStudents.length,
+    },
   ]
   /* eslint-enable react/prop-types */
 
@@ -95,13 +95,13 @@ const FacultyStats = ({ facultyProgrammes, selectedFacultyProgrammesStats, fromY
   const masters = data.filter(programme => programme.code.includes('MH'))
 
   return (
-    <React.Fragment>
+    <>
       <Header>Bachelor degrees</Header>
       <SortableTable columns={headers} getRowKey={({ code }) => code} data={bachelors} />
       <Header>Masters degrees</Header>
       <SortableTable columns={headers} getRowKey={({ code }) => code} data={masters} />
       <FacultyStatsGraph data={graphData} />
-    </React.Fragment>
+    </>
   )
 }
 
@@ -109,11 +109,11 @@ FacultyStats.propTypes = {
   facultyProgrammes: arrayOf(shape({})).isRequired,
   selectedFacultyProgrammesStats: shape({}).isRequired,
   fromYear: number.isRequired,
-  toYear: number.isRequired
+  toYear: number.isRequired,
 }
 
 const mapStateToProps = ({ faculties }) => ({
-  facultyProgrammes: faculties.facultyProgrammes
+  facultyProgrammes: faculties.facultyProgrammes,
 })
 
 export default connect(mapStateToProps)(FacultyStats)

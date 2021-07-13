@@ -11,7 +11,7 @@ export const FilterAnalyticsProvider = ({ children }) => {
 }
 
 FilterAnalyticsProvider.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 }
 
 export default () => {
@@ -37,6 +37,6 @@ export default () => {
     openTray,
     closeTray,
     setFilterViaTable,
-    clearFilterViaTable
+    clearFilterViaTable,
   }
 }

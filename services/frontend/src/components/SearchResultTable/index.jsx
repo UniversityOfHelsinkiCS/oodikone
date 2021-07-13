@@ -53,7 +53,7 @@ SearchResultTable.defaultProps = {
   rowClickFn: () => null,
   selectable: false,
   definition: false,
-  actionTrigger: null
+  actionTrigger: null,
 }
 
 SearchResultTable.propTypes = {
@@ -63,7 +63,7 @@ SearchResultTable.propTypes = {
   noResultText: string.isRequired,
   selectable: bool,
   definition: bool,
-  actionTrigger: func
+  actionTrigger: func,
 }
 
 export default SearchResultTable

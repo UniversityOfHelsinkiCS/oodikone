@@ -5,13 +5,8 @@ import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import SortableHeaderCell from '../SortableHeaderCell'
 
 const GradeDistributionHeader = ({ gradeTypes }) => {
-  const {
-    onSortableColumnHeaderClick,
-    filterInput,
-    reversed,
-    sortCriteria,
-    tableColumnNames
-  } = UsePopulationCourseContext()
+  const { onSortableColumnHeaderClick, filterInput, reversed, sortCriteria, tableColumnNames } =
+    UsePopulationCourseContext()
 
   return (
     <Table.Header>
@@ -38,7 +33,7 @@ const GradeDistributionHeader = ({ gradeTypes }) => {
 }
 
 GradeDistributionHeader.propTypes = {
-  gradeTypes: arrayOf(number).isRequired
+  gradeTypes: arrayOf(number).isRequired,
 }
 
 export default GradeDistributionHeader

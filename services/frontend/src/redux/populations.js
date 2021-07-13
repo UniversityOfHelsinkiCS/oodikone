@@ -6,7 +6,7 @@ const initialState = {
   data: {},
   query: undefined,
   updating: false,
-  customPopulationFlag: false
+  customPopulationFlag: false,
 }
 
 export const getPopulationStatistics = ({
@@ -18,7 +18,7 @@ export const getPopulationStatistics = ({
   tag,
   year,
   years,
-  onProgress
+  onProgress,
 }) => {
   const route = !tag ? '/v3/populationstatistics/' : '/v3/populationstatisticsbytag'
   const prefix = 'GET_POPULATION_STATISTICS_'
@@ -30,7 +30,7 @@ export const getPopulationStatistics = ({
     months,
     tag,
     year,
-    years
+    years,
   }
   const params = {
     semesters,
@@ -39,7 +39,7 @@ export const getPopulationStatistics = ({
     studyRights,
     tag,
     year,
-    years
+    years,
   }
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
@@ -63,12 +63,12 @@ export const getCustomPopulation = ({ studentnumberlist, onProgress }) => {
 }
 
 export const clearPopulations = () => ({
-  type: 'CLEAR_POPULATIONS'
+  type: 'CLEAR_POPULATIONS',
 })
 
 export const removePopulation = uuid => ({
   type: 'REMOVE_POPULATION',
-  uuid
+  uuid,
 })
 
 const reducer = (state = initialState, action) => {
@@ -81,7 +81,7 @@ const reducer = (state = initialState, action) => {
         data: {},
         query: action.requestSettings.query,
         updating: false,
-        customPopulationFlag: false
+        customPopulationFlag: false,
       }
     case 'GET_POPULATION_STATISTICS_FAILURE':
       return {
@@ -91,7 +91,7 @@ const reducer = (state = initialState, action) => {
         data: action.response,
         query: action.query,
         updating: false,
-        customPopulationFlag: false
+        customPopulationFlag: false,
       }
     case 'GET_POPULATION_STATISTICS_SUCCESS':
       return {
@@ -101,7 +101,7 @@ const reducer = (state = initialState, action) => {
         data: action.response,
         query: action.query,
         updating: false,
-        customPopulationFlag: false
+        customPopulationFlag: false,
       }
     case 'GET_STUDENTS_OF_COURSE_ATTEMPT':
       return {
@@ -111,7 +111,7 @@ const reducer = (state = initialState, action) => {
         query: null,
         data: {},
         updating: false,
-        customPopulationFlag: false
+        customPopulationFlag: false,
       }
     case 'GET_STUDENTS_OF_COURSE_FAILURE':
       return {
@@ -120,7 +120,7 @@ const reducer = (state = initialState, action) => {
         error: true,
         data: action.response,
         updating: false,
-        customPopulationFlag: false
+        customPopulationFlag: false,
       }
     case 'GET_STUDENTS_OF_COURSE_SUCCESS':
       return {
@@ -129,7 +129,7 @@ const reducer = (state = initialState, action) => {
         error: false,
         data: action.response,
         updating: false,
-        customPopulationFlag: false
+        customPopulationFlag: false,
       }
     case 'GET_CUSTOM_POP_ATTEMPT':
       return {
@@ -139,7 +139,7 @@ const reducer = (state = initialState, action) => {
         query: null,
         data: {},
         updating: false,
-        customPopulationFlag: true
+        customPopulationFlag: true,
       }
     case 'GET_CUSTOM_POP_FAILURE':
       return {
@@ -148,7 +148,7 @@ const reducer = (state = initialState, action) => {
         error: true,
         data: action.response,
         updating: false,
-        customPopulationFlag: true
+        customPopulationFlag: true,
       }
     case 'GET_CUSTOM_POP_SUCCESS':
       return {
@@ -157,22 +157,22 @@ const reducer = (state = initialState, action) => {
         error: false,
         data: action.response,
         updating: false,
-        customPopulationFlag: true
+        customPopulationFlag: true,
       }
     case 'UPDATE_POPULATION_STUDENTS_ATTEMPT':
       return {
         ...state,
-        updating: true
+        updating: true,
       }
     case 'UPDATE_POPULATION_STUDENTS_FAILURE':
       return {
         ...state,
-        updating: false
+        updating: false,
       }
     case 'UPDATE_POPULATION_STUDENTS_SUCCESS':
       return {
         ...state,
-        updating: false
+        updating: false,
       }
     case 'REMOVE_POPULATION':
       return initialState

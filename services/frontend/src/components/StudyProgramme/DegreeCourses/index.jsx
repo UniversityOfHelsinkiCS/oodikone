@@ -7,7 +7,7 @@ import { GetMandatoryCourseLabels } from '../../../redux/mandatoryCourseLabels'
 import {
   setCourseExclusion,
   removeCourseExclusion,
-  getMandatoryCourses
+  getMandatoryCourses,
 } from '../../../redux/populationMandatoryCourses'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import sendEvent from '../../../common/sendEvent'
@@ -193,17 +193,17 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
 DegreeCourses.propTypes = {
   studyProgramme: string.isRequired,
   removeExclusion: func.isRequired,
-  setExclusion: func.isRequired
+  setExclusion: func.isRequired,
 }
 
 const mapStateToProps = ({ mandatoryCourseLabels }) => ({
-  labels: mandatoryCourseLabels.data
+  labels: mandatoryCourseLabels.data,
 })
 
 const mapDispatchToProps = dispatch => ({
   getLabels: studyProgramme => dispatch(GetMandatoryCourseLabels(studyProgramme)),
   setExclusion: (programmecode, coursecode) => dispatch(setCourseExclusion(programmecode, coursecode)),
-  removeExclusion: (programmecode, coursecode, id) => dispatch(removeCourseExclusion(programmecode, coursecode, id))
+  removeExclusion: (programmecode, coursecode, id) => dispatch(removeCourseExclusion(programmecode, coursecode, id)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(DegreeCourses)

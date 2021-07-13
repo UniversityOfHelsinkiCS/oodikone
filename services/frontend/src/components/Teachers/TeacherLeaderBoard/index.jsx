@@ -18,7 +18,7 @@ const TeacherLeaderBoard = ({
   updated,
   isLoading,
   yearoptions,
-  categoryoptions
+  categoryoptions,
 }) => {
   const [selectedyear, setSelectedyear] = useState(null)
   const [selectedcategory, setSelectedcategory] = useState(null)
@@ -129,7 +129,7 @@ TeacherLeaderBoard.propTypes = {
   updated: string.isRequired,
   getTopTeachers: func.isRequired,
   getTopTeachersCategories: func.isRequired,
-  categoryoptions: arrayOf(shape({ key: any, text: string, value: any })).isRequired
+  categoryoptions: arrayOf(shape({ key: any, text: string, value: any })).isRequired,
 }
 
 const mapStateToProps = ({ teachersTop, teachersTopCategories }) => {
@@ -145,18 +145,18 @@ const mapStateToProps = ({ teachersTop, teachersTopCategories }) => {
       .map(({ yearcode, yearname }) => ({
         key: yearcode,
         value: yearcode,
-        text: yearname
+        text: yearname,
       }))
       .sort((y1, y2) => y2.value - y1.value),
     categoryoptions: Object.values(categories).map(({ id, name }) => ({
       key: id,
       value: id,
-      text: name
-    }))
+      text: name,
+    })),
   }
 }
 
 export default connect(mapStateToProps, {
   getTopTeachersCategories,
-  getTopTeachers
+  getTopTeachers,
 })(withRouter(TeacherLeaderBoard))

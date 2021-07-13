@@ -18,8 +18,8 @@ const FacultyStatsGraph = ({ data }) => {
             ['coursesPassed', 'coursesFailed'].includes(mode)
               ? (stats[mode] / (stats.coursesPassed + stats.coursesFailed)) * 100
               : stats[mode].length || stats[mode]
-          )
-        }))
+          ),
+        })),
       })),
     [data, mode]
   )
@@ -45,8 +45,8 @@ const FacultyStatsGraph = ({ data }) => {
     xAxis: {
       min: Math.max(min, defaultStartTimestamp),
       max,
-      ordinal: false
-    }
+      ordinal: false,
+    },
   }
 
   const handleClick = (_, { name }) => setMode(name)
@@ -78,11 +78,11 @@ FacultyStatsGraph.propTypes = {
         year: shape({
           studentCredits: number,
           coursesPassed: number,
-          coursesFailed: number
-        })
-      })
+          coursesFailed: number,
+        }),
+      }),
     })
-  ).isRequired
+  ).isRequired,
 }
 
 export default FacultyStatsGraph

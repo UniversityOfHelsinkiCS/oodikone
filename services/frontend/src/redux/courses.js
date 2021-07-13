@@ -14,12 +14,12 @@ export const findMultipleCourses = ({ searchStr, type }, language = 'fi') => {
 }
 
 export const emptyCourseSearch = () => ({
-  type: 'CLEAR_COURSE_SEARCH'
+  type: 'CLEAR_COURSE_SEARCH',
 })
 
 export const toggleCourseSelect = code => ({
   type: 'TOGGLE_COURSE_SELECT',
-  code
+  code,
 })
 
 const reducer = (state = { data: [], selected: [] }, action) => {
@@ -27,51 +27,51 @@ const reducer = (state = { data: [], selected: [] }, action) => {
     case 'FIND_COURSES_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'FIND_COURSES_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'FIND_COURSES_SUCCESS':
       return {
         ...state,
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'FIND_COURSES_MULTI_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'FIND_COURSES_MULTI_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'FIND_COURSES_MULTI_SUCCESS':
       return {
         ...state,
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'CLEAR_COURSE_SEARCH':
       return {
         pending: false,
         data: [],
-        selected: []
+        selected: [],
       }
     case 'TOGGLE_COURSE_SELECT':
       return {
         ...state,
         selected: state.selected.find(course => course.code === action.code)
           ? state.selected.filter(cr => cr.code !== action.code)
-          : [...state.selected, state.data.find(course => course.code === action.code)]
+          : [...state.selected, state.data.find(course => course.code === action.code)],
       }
     default:
       return state

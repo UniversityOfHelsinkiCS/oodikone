@@ -89,12 +89,12 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Credit accumulation (for {filteredStudents.length} students)
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(0),
       content: {
-        content: <div ref={creditGraphRef}>{renderCreditGainGraphs()}</div>
-      }
+        content: <div ref={creditGraphRef}>{renderCreditGainGraphs()}</div>,
+      },
     },
     {
       key: 1,
@@ -103,7 +103,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Credit statistics
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(1),
       content: {
@@ -113,8 +113,8 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
           </div>
         ) : (
           <div>This table is omitted when searching population of multiple years</div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 2,
@@ -126,12 +126,12 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
               NEW!
             </Label>
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(2),
       content: {
-        content: <AgeStats filteredStudents={filteredStudents} query={query} />
-      }
+        content: <AgeStats filteredStudents={filteredStudents} query={query} />,
+      },
     },
     {
       key: 3,
@@ -140,7 +140,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Courses of population
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(3),
       content: {
@@ -154,8 +154,8 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
               filteredStudents={filteredStudents}
             />
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 4,
@@ -164,7 +164,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Students ({filteredStudents.length})
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(4),
       content: {
@@ -172,9 +172,9 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
           <div ref={studentTableRef}>
             <PopulationStudents language={language} filteredStudents={filteredStudents} dataExport={dataExport} />
           </div>
-        )
-      }
-    }
+        ),
+      },
+    },
   ]
 
   return (
@@ -190,11 +190,11 @@ PopulationDetails.propTypes = {
   isLoading: bool.isRequired,
   selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
-  dataExport: node
+  dataExport: node,
 }
 
 PopulationDetails.defaultProps = {
-  dataExport: null
+  dataExport: null,
 }
 
 export default connect(null)(PopulationDetails)

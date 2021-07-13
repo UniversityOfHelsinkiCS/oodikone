@@ -38,7 +38,7 @@ const UpdateTopTeachers = () => {
   }
 
   return (
-    <React.Fragment>
+    <>
       {error && <Message error content={error} />}
       <Button.Group fluid widths="8">
         <Button content="Update Top Teachers" icon="refresh" onClick={doUpdate} disabled={computing} />
@@ -46,7 +46,7 @@ const UpdateTopTeachers = () => {
       </Button.Group>
       {status && <KeyValueTable data={status} />}
       {!!computing && <Progress autoSuccess active={computing} percent={progress} />}
-    </React.Fragment>
+    </>
   )
 }
 

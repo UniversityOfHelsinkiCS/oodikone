@@ -30,12 +30,12 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
               const nameparts = user.full_name.split(' ')
               return nameparts[nameparts.length - 1]
             },
-            getRowContent: user => user.full_name
+            getRowContent: user => user.full_name,
           },
           {
             key: 'USERNAME',
             title: 'Username',
-            getRowVal: user => user.username
+            getRowVal: user => user.username,
           },
           {
             key: 'ROLE',
@@ -50,7 +50,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
                   ))}
               </Label.Group>
             ),
-            getRowVal: user => user.accessgroup.map(ag => ag.group_code).sort()
+            getRowVal: user => user.accessgroup.map(ag => ag.group_code).sort(),
           },
           {
             key: 'PROGRAMMES',
@@ -69,7 +69,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
                 return `${nameInLanguage(user.elementdetails[0])} +${user.elementdetails.length - 1} others`
               }
               return name
-            }
+            },
           },
           {
             key: 'OODIACCESS',
@@ -81,7 +81,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
                 color={user.is_enabled ? 'green' : 'red'}
                 name={user.is_enabled ? 'check' : 'remove'}
               />
-            )
+            ),
           },
           {
             key: 'EDIT',
@@ -93,8 +93,8 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
                 </Button>
               </Button.Group>
             ),
-            headerProps: { onClick: null, sorted: null }
-          }
+            headerProps: { onClick: null, sorted: null },
+          },
         ]}
         data={usersToRender}
       />
@@ -106,7 +106,7 @@ UserSearchList.propTypes = {
   enabledOnly: PropTypes.bool.isRequired,
   users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   error: PropTypes.bool.isRequired,
-  elementdetails: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+  elementdetails: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 }
 
 export default UserSearchList

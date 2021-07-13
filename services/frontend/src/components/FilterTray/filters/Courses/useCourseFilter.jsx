@@ -6,7 +6,7 @@ import { getPopulationSelectedStudentCourses } from '../../../../redux/populatio
 const defaultState = {
   courses: [],
   selectedCourses: [],
-  dispatchCourseQuery: null
+  dispatchCourseQuery: null,
 }
 
 const CourseFilterContext = createContext([[], () => {}])
@@ -25,7 +25,7 @@ const CourseFilterProvider = ({ children, getPopulationSelectedStudentCourses })
 
 CourseFilterProvider.propTypes = {
   children: PropTypes.node.isRequired,
-  getPopulationSelectedStudentCourses: PropTypes.func.isRequired
+  getPopulationSelectedStudentCourses: PropTypes.func.isRequired,
 }
 
 const ConnectedProvider = connect(null, { getPopulationSelectedStudentCourses })(CourseFilterProvider)
@@ -56,7 +56,7 @@ export default () => {
         ...prev,
         selectedCourses: isSelected
           ? prev.selectedCourses.filter(c => c.course.code !== courseCode)
-          : prev.selectedCourses.concat(course)
+          : prev.selectedCourses.concat(course),
       }
     })
 
@@ -74,6 +74,6 @@ export default () => {
     resetCourses,
     toggleCourseSelection,
     courseIsSelected,
-    runCourseQuery
+    runCourseQuery,
   }
 }

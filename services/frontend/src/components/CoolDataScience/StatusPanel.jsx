@@ -6,7 +6,7 @@ import Graduated from './StatusGraduated'
 const StatusPanel = () => {
   const panes = [
     { menuItem: 'Attainments', render: () => <Status /> },
-    { menuItem: 'Graduations', render: () => <Graduated /> }
+    { menuItem: 'Graduations', render: () => <Graduated /> },
   ]
   return <Tab panes={panes} />
 }

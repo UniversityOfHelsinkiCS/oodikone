@@ -10,7 +10,7 @@ const defaultState = {
   filteredStudents: [],
   activeFilters: {},
   // This is a special filter that operates on students' courses instead of the student's themselves.
-  creditDateFilter: null
+  creditDateFilter: null,
 }
 
 const applyFilters = (filters, allStudents) =>
@@ -28,7 +28,7 @@ export const FilterProvider = ({ children }) => {
     const withRegularFilters = applyFilters(activeFilters, allStudents)
     const filteredStudents = withRegularFilters.map(({ courses, ...rest }) => ({
       ...rest,
-      courses: creditDateFilter ? courses.filter(creditDateFilter) : courses
+      courses: creditDateFilter ? courses.filter(creditDateFilter) : courses,
     }))
 
     setState(prev => ({ ...prev, filteredStudents }))
@@ -38,7 +38,7 @@ export const FilterProvider = ({ children }) => {
 }
 
 FilterProvider.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 }
 
 export default () => {
@@ -69,6 +69,6 @@ export default () => {
     setCreditDateFilter,
     addFilter,
     removeFilter,
-    withoutFilter
+    withoutFilter,
   }
 }

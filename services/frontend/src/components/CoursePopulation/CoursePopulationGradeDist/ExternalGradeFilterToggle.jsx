@@ -20,7 +20,7 @@ const ExternalGradeFilterToggle = ({ grade }) => {
 }
 
 ExternalGradeFilterToggle.propTypes = {
-  grade: PropTypes.string.isRequired
+  grade: PropTypes.string.isRequired,
 }
 
 export default ExternalGradeFilterToggle

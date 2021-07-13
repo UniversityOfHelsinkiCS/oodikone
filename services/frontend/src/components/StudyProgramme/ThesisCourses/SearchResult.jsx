@@ -17,20 +17,20 @@ const SearchResult = ({ courses, getCourseActions }) =>
           key: 'code',
           title: 'Code',
           getRowVal: c => c.code,
-          headerProps: { width: 2, textAlign: 'center' }
+          headerProps: { width: 2, textAlign: 'center' },
         },
         {
           key: 'name',
           title: 'Name',
           getRowVal: c => c.name,
-          headerProps: { width: 12, textAlign: 'left' }
+          headerProps: { width: 12, textAlign: 'left' },
         },
         {
           key: 'actions',
           title: 'Action',
           getRowContent: getCourseActions,
-          headerProps: { width: 2, textAlign: 'center' }
-        }
+          headerProps: { width: 2, textAlign: 'center' },
+        },
       ]}
       data={courses}
     />
@@ -40,14 +40,14 @@ SearchResult.propTypes = {
   courses: arrayOf(
     shape({
       code: string,
-      name: string
+      name: string,
     })
   ),
-  getCourseActions: func.isRequired
+  getCourseActions: func.isRequired,
 }
 
 SearchResult.defaultProps = {
-  courses: []
+  courses: [],
 }
 
 const mapStateToProps = state => {
@@ -57,7 +57,7 @@ const mapStateToProps = state => {
   const searchResults = getCourseSearchResults(state).courses
   const filteredResults = searchResults.filter(c => !thesisCourseCodes.includes(c.code))
   return {
-    courses: filteredResults
+    courses: filteredResults,
   }
 }
 export default connect(mapStateToProps)(SearchResult)

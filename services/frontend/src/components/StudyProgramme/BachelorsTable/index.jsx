@@ -4,7 +4,7 @@ import { shape, any, arrayOf, bool, oneOfType, array } from 'prop-types'
 
 const DIRECTIONS = {
   ASC: 'ascending', // true
-  DESC: 'descending' // false
+  DESC: 'descending', // false
 }
 
 function sortBy(column, data) {
@@ -100,15 +100,15 @@ BachelorsTable.propTypes = {
   bachelors: oneOfType([
     shape({
       data: arrayOf(any),
-      years: arrayOf(any)
+      years: arrayOf(any),
     }),
-    array
+    array,
   ]),
-  loading: bool.isRequired
+  loading: bool.isRequired,
 }
 
 BachelorsTable.defaultProps = {
-  bachelors: null
+  bachelors: null,
 }
 
 export default BachelorsTable

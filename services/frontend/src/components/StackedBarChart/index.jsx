@@ -5,7 +5,7 @@ import { shape, arrayOf, object } from 'prop-types'
 
 class StackedBarChart extends Component {
   state = {
-    graphOptions: {}
+    graphOptions: {},
   }
 
   componentDidMount() {
@@ -30,7 +30,7 @@ class StackedBarChart extends Component {
 }
 StackedBarChart.propTypes = {
   options: shape({}).isRequired,
-  series: arrayOf(object).isRequired
+  series: arrayOf(object).isRequired,
 }
 
 export default StackedBarChart

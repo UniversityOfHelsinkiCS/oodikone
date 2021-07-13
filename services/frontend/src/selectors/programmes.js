@@ -7,7 +7,7 @@ const toOptions = elements =>
     ? []
     : Object.values(elements).map(element => ({
         code: element.code,
-        name: element.name
+        name: element.name,
       }))
 
 const userRightsPropSelector = (_, props) => props.rights
@@ -28,5 +28,5 @@ const filteredDropdownProgrammeSelector = createSelector(
 )
 
 export default {
-  filteredDropdownProgrammeSelector
+  filteredDropdownProgrammeSelector,
 }

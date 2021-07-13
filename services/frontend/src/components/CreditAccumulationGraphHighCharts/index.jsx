@@ -29,7 +29,7 @@ class CreditAccumulationGraphHighCharts extends Component {
     this.state = {
       studentCreditLines: [],
       options: [],
-      updateGraph: false
+      updateGraph: false,
     }
   }
 
@@ -126,9 +126,9 @@ class CreditAccumulationGraphHighCharts extends Component {
         payload: {
           ...targetCourse,
           date: reformatDate(targetCourse.date, DISPLAY_DATE_FORMAT),
-          title: getTextIn(targetCourse.course.name, language)
-        }
-      }
+          title: getTextIn(targetCourse.course.name, language),
+        },
+      },
     ]
     return renderToString(<CreditGraphTooltip payload={payload} />)
   }
@@ -165,15 +165,15 @@ class CreditAccumulationGraphHighCharts extends Component {
       dataOfSelected.push({
         name: SINGLE_GRAPH_GOAL_SERIES_NAME,
         data: [
-          ...[[students.minDate, 0], ...absencePoints, [students.maxDate, lastCredits]].sort((a, b) => a[0] - b[0])
+          ...[[students.minDate, 0], ...absencePoints, [students.maxDate, lastCredits]].sort((a, b) => a[0] - b[0]),
         ],
         seriesThreshold: 150,
         color: '#96d7c3',
         marker: {
-          enabled: false
+          enabled: false,
         },
         zones,
-        zoneAxis: 'x'
+        zoneAxis: 'x',
       })
     }
     const self = this
@@ -187,13 +187,13 @@ class CreditAccumulationGraphHighCharts extends Component {
           useHTML: true,
           style: {
             all: 'unset',
-            display: 'none'
+            display: 'none',
           },
-          split: false
+          split: false,
         }
       : {
           shared: false,
-          split: false
+          split: false,
         }
 
     const options = {
@@ -211,7 +211,7 @@ class CreditAccumulationGraphHighCharts extends Component {
                 if (this.series.halo) {
                   this.series.halo
                     .attr({
-                      class: 'highcharts-tracker'
+                      class: 'highcharts-tracker',
                     })
                     .toFront()
                 }
@@ -222,31 +222,31 @@ class CreditAccumulationGraphHighCharts extends Component {
                   attributes: {
                     fill: Highcharts.getOptions().colors[2],
                     'stroke-width': 2,
-                    stroke: Highcharts.getOptions().colors[1]
-                  }
-                }
-              }
+                    stroke: Highcharts.getOptions().colors[1],
+                  },
+                },
+              },
             },
-            cursor: 'pointer'
-          }
-        }
+            cursor: 'pointer',
+          },
+        },
       },
       yAxis: {
         max: lastCredits && lastCredits > students.maxCredits ? lastCredits : students.maxCredits,
-        title: { text: 'Credits' }
+        title: { text: 'Credits' },
       },
       xAxis: {
         max: students.maxDate,
         min: students.minDateWithCredits || students.minDate,
-        ordinal: false
+        ordinal: false,
       },
       series: dataOfSelected,
       chart: {
-        height: graphSize
+        height: graphSize,
       },
       tooltip: {
-        ...tooltipOptions
-      }
+        ...tooltipOptions,
+      },
     }
     this.setState({ options, updateGraph: false })
   }
@@ -267,7 +267,7 @@ class CreditAccumulationGraphHighCharts extends Component {
         return {
           ...defaultPointOptions,
           x: new Date(course.date).getTime(),
-          y: credits
+          y: credits,
         }
       })
       if (points.length < 2) {
@@ -279,8 +279,8 @@ class CreditAccumulationGraphHighCharts extends Component {
         seriesThreshold: 150,
         marker: {
           enabled: this.isSingleStudentGraph(),
-          radius: 4
-        }
+          radius: 4,
+        },
       }
     })
 
@@ -329,7 +329,7 @@ CreditAccumulationGraphHighCharts.defaultProps = {
   absences: [],
   singleStudent: false,
   render: true,
-  trayOpen: false
+  trayOpen: false,
 }
 
 CreditAccumulationGraphHighCharts.propTypes = {
@@ -341,12 +341,12 @@ CreditAccumulationGraphHighCharts.propTypes = {
   language: string.isRequired,
   absences: arrayOf(shape({})),
   render: bool,
-  trayOpen: bool
+  trayOpen: bool,
 }
 
 const mapStateToProps = state => ({
   spinner: state.graphSpinner,
-  currentGraphSize: state.settings.chartHeight
+  currentGraphSize: state.settings.chartHeight,
 })
 
 export default connect(mapStateToProps, { clearLoading, setChartHeight })(withRouter(CreditAccumulationGraphHighCharts))

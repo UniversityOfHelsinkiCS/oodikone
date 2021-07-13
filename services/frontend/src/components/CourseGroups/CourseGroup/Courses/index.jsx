@@ -11,7 +11,7 @@ const courseColumnTypes = {
   CODE: 'coursecode',
   NAME: 'coursenames',
   CREDITS: 'credits',
-  STUDENTS: 'students'
+  STUDENTS: 'students',
 }
 
 const CourseItem = ({ course }) => {
@@ -35,8 +35,8 @@ CourseItem.propTypes = {
     teachername: string,
     credits: number,
     students: number,
-    coursenames: shape({})
-  }).isRequired
+    coursenames: shape({}),
+  }).isRequired,
 }
 
 class Index extends Component {
@@ -44,7 +44,7 @@ class Index extends Component {
     isLoading: true,
     courses: [],
     sortColumn: courseColumnTypes.TEACHER,
-    sortReverse: false
+    sortReverse: false,
   }
 
   componentDidMount() {
@@ -66,7 +66,7 @@ class Index extends Component {
 
     this.setState({
       sortColumn: columnName,
-      sortReverse: isSortColumn ? !sortReverse : sortReverse
+      sortReverse: isSortColumn ? !sortReverse : sortReverse,
     })
   }
 
@@ -135,7 +135,7 @@ class Index extends Component {
     }
 
     return (
-      <Fragment>
+      <>
         <Header size="medium" content="Courses" />
         <Loader active={isLoading} inline="centered" />
         {isLoading ? (
@@ -148,14 +148,14 @@ class Index extends Component {
             ))}
           </List>
         )}
-      </Fragment>
+      </>
     )
   }
 }
 
 Index.propTypes = {
   teacherIds: arrayOf(string).isRequired,
-  semesterCode: number.isRequired
+  semesterCode: number.isRequired,
 }
 
 export default Index

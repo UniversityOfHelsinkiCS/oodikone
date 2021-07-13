@@ -20,7 +20,7 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
 
   const statusOptions = [
     { key: 'enrl-status-present', text: 'Present', value: 1 },
-    { key: 'enrl-status-absent', text: 'Absent', value: 2 }
+    { key: 'enrl-status-absent', text: 'Absent', value: 2 },
   ]
 
   const semesterCodes = lodash(allStudents.map(student => student.semesterenrollments.map(enrl => enrl.semestercode)))
@@ -51,7 +51,7 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
   const semesterOptions = semesterCodes.map(code => ({
     key: `semester-option-${code}`,
     text: getTextIn(allSemesters[code].name, language),
-    value: code
+    value: code,
   }))
 
   const clear = () => {
@@ -105,16 +105,16 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
 
 EnrollmentStatus.propTypes = {
   allSemesters: PropTypes.shape({}),
-  language: PropTypes.string.isRequired
+  language: PropTypes.string.isRequired,
 }
 
 EnrollmentStatus.defaultProps = {
-  allSemesters: {}
+  allSemesters: {},
 }
 
 const mapStateToProps = ({ semesters, settings }) => ({
   allSemesters: semesters.data.semesters,
-  language: settings.language
+  language: settings.language,
 })
 
 export default withRouter(connect(mapStateToProps)(EnrollmentStatus))

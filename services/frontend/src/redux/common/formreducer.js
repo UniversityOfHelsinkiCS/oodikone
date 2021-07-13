@@ -3,7 +3,7 @@ const formreducer = (prefix, initvals = {}) => {
 
   const actions = {
     CLEAR: `${prefix}_CLEAR`,
-    SET: `${prefix}_SET_VALUE`
+    SET: `${prefix}_SET_VALUE`,
   }
 
   const reducer = (state = { ...initial }, action) => {
@@ -11,7 +11,7 @@ const formreducer = (prefix, initvals = {}) => {
       case actions.SET:
         return {
           ...state,
-          [action.name]: action.value
+          [action.name]: action.value,
         }
       case actions.CLEAR:
         return { ...initial }
@@ -25,7 +25,7 @@ const formreducer = (prefix, initvals = {}) => {
   return {
     reducer,
     setValue,
-    clear
+    clear,
   }
 }
 

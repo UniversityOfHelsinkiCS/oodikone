@@ -14,7 +14,7 @@ const Tables = ({
   separate,
   isRelative,
   showGrades,
-  userHasAccessToAllStats
+  userHasAccessToAllStats,
 }) => {
   const getViewMode = statistics => {
     const { name, stats } = statistics
@@ -51,10 +51,10 @@ const Tables = ({
   }
 
   return (
-    <Fragment>
+    <>
       <Grid.Column id="PrimaryDataTable">{getViewMode(primary)}</Grid.Column>
       {comparison && <Grid.Column id="ComparisonDataTable">{getViewMode(comparison)}</Grid.Column>}
-    </Fragment>
+    </>
   )
 }
 
@@ -66,19 +66,19 @@ Tables.propTypes = {
   separate: bool,
   isRelative: bool.isRequired,
   showGrades: bool.isRequired,
-  userHasAccessToAllStats: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
 }
 
 Tables.defaultProps = {
   comparison: null,
-  separate: false
+  separate: false,
 }
 
 const mapStateToProps = state => {
   const { selectedCourse } = state.singleCourseStats
 
   return {
-    alternatives: state.courseStats.data[selectedCourse].alternatives
+    alternatives: state.courseStats.data[selectedCourse].alternatives,
   }
 }
 

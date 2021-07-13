@@ -11,7 +11,7 @@ const ExternalFilterToggle = ({
   clearFilter,
   filterName,
   active,
-  popupContent
+  popupContent,
 }) => {
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
   const [, setCreditFilterOpen] = useFilterTray(filterPanelContextKey)
@@ -67,12 +67,12 @@ ExternalFilterToggle.propTypes = {
   /** Toggle state. Must be controlled in the parent. */
   active: PropTypes.bool.isRequired,
   /** Content to show in the tooltip, if given. Tooltip is not shown if omitted. */
-  popupContent: PropTypes.node
+  popupContent: PropTypes.node,
 }
 
 ExternalFilterToggle.defaultProps = {
   filterPanelContextKey: undefined,
-  popupContent: undefined
+  popupContent: undefined,
 }
 
 export default ExternalFilterToggle

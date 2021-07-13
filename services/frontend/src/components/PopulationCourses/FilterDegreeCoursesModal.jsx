@@ -43,7 +43,7 @@ const FilterDegreeCoursesModal = ({ studyProgramme }) => {
 }
 
 FilterDegreeCoursesModal.propTypes = {
-  studyProgramme: string.isRequired
+  studyProgramme: string.isRequired,
 }
 
 export default FilterDegreeCoursesModal

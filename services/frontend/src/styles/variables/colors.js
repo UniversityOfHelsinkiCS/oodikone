@@ -61,5 +61,5 @@ module.exports = {
   chartdarkg: '#367a1c',
   chartlgreen: '#80e061',
   chartdarkred: '#a03530',
-  chartlred: '#e2726d'
+  chartlred: '#e2726d',
 }

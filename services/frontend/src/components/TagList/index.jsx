@@ -26,7 +26,7 @@ Row.propTypes = {
   sn: string.isRequired,
   studytrack: string.isRequired,
   tagOptions: arrayOf(shape({})).isRequired,
-  name: string.isRequired
+  name: string.isRequired,
 }
 
 const TagList = ({
@@ -36,7 +36,7 @@ const TagList = ({
   studytrack,
   getStudentTagsStudyTrack,
   getTagsByStudytrack,
-  namesVisible
+  namesVisible,
 }) => {
   useEffect(() => {
     getTagsByStudytrack(studytrack)
@@ -51,7 +51,7 @@ const TagList = ({
       .map(tag => ({
         key: tag.tag_id,
         text: tag.tagname,
-        value: tag.tag_id
+        value: tag.tag_id,
       }))
     return (
       <Row
@@ -89,7 +89,7 @@ const mapStateToProps = state => {
     tagstudent: tagstudent.data,
     tags: tags.data,
     studytrack: programme,
-    namesVisible: settings.namesVisible
+    namesVisible: settings.namesVisible,
   }
 }
 
@@ -100,10 +100,10 @@ TagList.propTypes = {
   tags: arrayOf(shape({})).isRequired,
   studytrack: string.isRequired,
   tagstudent: arrayOf(shape({})).isRequired,
-  namesVisible: bool.isRequired
+  namesVisible: bool.isRequired,
 }
 
 export default connect(mapStateToProps, {
   getTagsByStudytrack: getTagsByStudytrackAction,
-  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
+  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction,
 })(TagList)

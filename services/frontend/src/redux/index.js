@@ -88,5 +88,5 @@ export default combineReducers({
   customPopulationSearch,
   presentStudents,
   coolDataScience,
-  oodiSisDiff
+  oodiSisDiff,
 })

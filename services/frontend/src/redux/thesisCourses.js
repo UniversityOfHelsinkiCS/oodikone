@@ -5,7 +5,7 @@ const prefix = 'PROGRAMME_THESIS_'
 
 const options = {
   defaults: { data: [] },
-  reduceDELETE: (data, action) => data.filter(c => c.courseCode !== action.query.course)
+  reduceDELETE: (data, action) => data.filter(c => c.courseCode !== action.query.course),
 }
 
 const { reducer, prefixGET, prefixPOST, prefixDELETE } = createReducer(prefix, options)

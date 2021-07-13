@@ -10,7 +10,7 @@ export const getPopulationSelectedStudentCourses = ({
   year,
   years,
   tag,
-  selectedStudentsByYear
+  selectedStudentsByYear,
 }) => {
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_SELECTEDSTUDENTS_COURSES_'
@@ -24,7 +24,7 @@ export const getPopulationSelectedStudentCourses = ({
     year,
     years,
     tag,
-    selectedStudentsByYear
+    selectedStudentsByYear,
   }
   const body = {
     semesters,
@@ -35,13 +35,13 @@ export const getPopulationSelectedStudentCourses = ({
     year,
     tag,
     selectedStudentsByYear,
-    years
+    years,
   }
   return callController(route, prefix, body, 'post', query)
 }
 
 export const clearSelected = () => ({
-  type: 'CLEAR_SELECTED'
+  type: 'CLEAR_SELECTED',
 })
 
 const defaultState = { pending: false, error: false, data: null, query: {} }
@@ -52,7 +52,7 @@ const reducer = (state = defaultState, action) => {
         ...state,
         pending: true,
         error: false,
-        query: action.requestSettings.query
+        query: action.requestSettings.query,
       }
     case 'GET_POPULATION_SELECTEDSTUDENTS_COURSES_FAILURE':
       return {
@@ -60,7 +60,7 @@ const reducer = (state = defaultState, action) => {
         pending: false,
         error: true,
         data: {},
-        query: action.query
+        query: action.query,
       }
     case 'GET_POPULATION_SELECTEDSTUDENTS_COURSES_SUCCESS':
       return {
@@ -68,7 +68,7 @@ const reducer = (state = defaultState, action) => {
         pending: false,
         error: false,
         data: action.response,
-        query: action.query
+        query: action.query,
       }
     case 'CLEAR_SELECTED':
       return defaultState

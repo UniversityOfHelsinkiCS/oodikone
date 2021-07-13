@@ -4,13 +4,13 @@ export const sendError = (message = 'Something went wrong') => ({
   type: 'ADD_ERROR',
   error: {
     message,
-    uuid: uuidv4()
-  }
+    uuid: uuidv4(),
+  },
 })
 
 export const removeError = uuid => ({
   type: 'REMOVE_ERROR',
-  uuid
+  uuid,
 })
 
 const reducer = (state = [], action) => {

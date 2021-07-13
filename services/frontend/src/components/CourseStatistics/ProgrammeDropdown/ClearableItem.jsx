@@ -7,14 +7,14 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%'
+    width: '100%',
   },
   text: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   clear: {
-    flexGrow: 0
-  }
+    flexGrow: 0,
+  },
 }
 
 const handler = onClick => e => {
@@ -36,11 +36,11 @@ const ClearableItem = ({ name, onClear, icon, ...props }) => (
 ClearableItem.propTypes = {
   name: string.isRequired,
   onClear: func.isRequired,
-  icon: string
+  icon: string,
 }
 
 ClearableItem.defaultProps = {
-  icon: 'cancel'
+  icon: 'cancel',
 }
 
 export default ClearableItem

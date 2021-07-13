@@ -59,5 +59,5 @@ export default {
   laskee kertymän kalenterivuoden alusta,
   eikä lukuvuoden alusta. Kohdasta **Näytä päivänä** voi valita tarkastelupäivän, joka on oletusarvoisesti tämänhetkinen päivä.
   <br> <br>
-  `
+  `,
 }

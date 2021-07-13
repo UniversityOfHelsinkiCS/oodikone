@@ -14,13 +14,13 @@ const TagStudent = ({
   studytrack,
   tagOptions,
   studentname,
-  namesVisible
+  namesVisible,
 }) => {
   const handleChange = (event, { value }) => {
     event.preventDefault()
     const tag = {
       tag_id: value,
-      studentnumber
+      studentnumber,
     }
     createStudentTag(tag, studytrack)
   }
@@ -63,16 +63,16 @@ TagStudent.propTypes = {
   studentstags: arrayOf(shape({ tag: shape({ tagname: string, tag_id: string }), id: string })).isRequired,
   studytrack: string.isRequired,
   tagOptions: arrayOf(shape({})).isRequired,
-  namesVisible: bool.isRequired
+  namesVisible: bool.isRequired,
 }
 
 const mapStateToProps = ({ settings }) => ({
-  namesVisible: settings.namesVisible
+  namesVisible: settings.namesVisible,
 })
 
 export default withRouter(
   connect(mapStateToProps, {
     createStudentTag: createStudentTagAction,
-    deleteStudentTag: deleteStudentTagAction
+    deleteStudentTag: deleteStudentTagAction,
   })(TagStudent)
 )

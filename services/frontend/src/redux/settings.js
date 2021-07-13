@@ -5,7 +5,7 @@ const initial = () => ({
   language: DEFAULT_LANG,
   namesVisible: false,
   studentlistVisible: false,
-  chartHeight: 600
+  chartHeight: 600,
 })
 
 export const switchLanguage = (username, language) => {
@@ -21,37 +21,37 @@ const reducer = (state = initial(), action) => {
     case 'INIT_LANGUAGE':
       return {
         ...state,
-        language: action.language
+        language: action.language,
       }
     case 'SWITCH_LANGUAGE_SUCCESS':
       return {
         ...state,
-        language: action.response.language
+        language: action.response.language,
       }
     case 'HIDE_STUDENT_NAMES':
       return {
         ...state,
-        namesVisible: false
+        namesVisible: false,
       }
     case 'SHOW_STUDENT_NAMES':
       return {
         ...state,
-        namesVisible: true
+        namesVisible: true,
       }
     case 'TOGGLE_STUDENT_NAME_VISIBILITY':
       return {
         ...state,
-        namesVisible: !state.namesVisible
+        namesVisible: !state.namesVisible,
       }
     case 'TOGGLE_STUDENT_LIST_VISIBILITY':
       return {
         ...state,
-        studentlistVisible: !state.studentlistVisible
+        studentlistVisible: !state.studentlistVisible,
       }
     case 'SET_CHART_HEIGHT':
       return {
         ...state,
-        chartHeight: action.size
+        chartHeight: action.size,
       }
     default:
       return state
@@ -60,28 +60,28 @@ const reducer = (state = initial(), action) => {
 
 export const initLanguage = language => ({
   type: 'INIT_LANGUAGE',
-  language
+  language,
 })
 
 export const hideStudentNames = () => ({
-  type: 'HIDE_STUDENT_NAMES'
+  type: 'HIDE_STUDENT_NAMES',
 })
 
 export const showStudentNames = () => ({
-  type: 'SHOW_STUDENT_NAMES'
+  type: 'SHOW_STUDENT_NAMES',
 })
 
 export const setChartHeight = size => ({
   type: 'SET_CHART_HEIGHT',
-  size
+  size,
 })
 
 export const toggleStudentNameVisibility = () => ({
-  type: 'TOGGLE_STUDENT_NAME_VISIBILITY'
+  type: 'TOGGLE_STUDENT_NAME_VISIBILITY',
 })
 
 export const toggleStudentListVisibility = () => ({
-  type: 'TOGGLE_STUDENT_LIST_VISIBILITY'
+  type: 'TOGGLE_STUDENT_LIST_VISIBILITY',
 })
 
 export default reducer

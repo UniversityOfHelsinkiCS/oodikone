@@ -13,7 +13,7 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
   const academicYearSelectOptions = academicYears.map(ac => ({
     key: ac.semestercode,
     value: ac.semestercode,
-    text: ac.yearname
+    text: ac.yearname,
   }))
 
   const semesterCodeDifference = 2
@@ -23,7 +23,7 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
   const isMinSemesterCode = semesterCode === Math.min(...semesterCodes)
 
   return (
-    <Fragment>
+    <>
       <div className="academicYearFilterContainer">
         <Button
           type="button"
@@ -51,7 +51,7 @@ const AcademicYearFilter = ({ academicYears, semesterCode, handleSemesterCodeCha
           onClick={e => handleSemesterCodeChangeFn(e, { value: semesterCode + semesterCodeDifference })}
         />
       </div>
-    </Fragment>
+    </>
   )
 }
 
@@ -60,10 +60,10 @@ export default AcademicYearFilter
 AcademicYearFilter.propTypes = {
   semesterCode: number,
   academicYears: arrayOf(academicYearType),
-  handleSemesterCodeChangeFn: func.isRequired
+  handleSemesterCodeChangeFn: func.isRequired,
 }
 
 AcademicYearFilter.defaultProps = {
   semesterCode: undefined,
-  academicYears: undefined
+  academicYears: undefined,
 }

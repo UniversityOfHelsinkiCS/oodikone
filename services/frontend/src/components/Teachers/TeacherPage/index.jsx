@@ -24,11 +24,11 @@ TeacherPage.propTypes = {
   teacher: shape({}),
   teacherid: string.isRequired,
   getTeacher: func.isRequired,
-  isLoading: bool.isRequired
+  isLoading: bool.isRequired,
 }
 
 TeacherPage.defaultProps = {
-  teacher: undefined
+  teacher: undefined,
 }
 
 const mapStateToProps = (state, props) => {
@@ -36,7 +36,7 @@ const mapStateToProps = (state, props) => {
   const { items, pending } = state.teachers
   return {
     teacher: items[teacherid],
-    isLoading: pending
+    isLoading: pending,
   }
 }
 

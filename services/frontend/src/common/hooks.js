@@ -39,7 +39,7 @@ export const useTabs = (id, initialTab, { location, replace }) => {
   const pushToUrl = newTab => {
     replace({
       pathname: location.pathname,
-      search: qs.stringify({ ...qs.parse(location.search), [id]: newTab })
+      search: qs.stringify({ ...qs.parse(location.search), [id]: newTab }),
     })
   }
 
@@ -58,7 +58,7 @@ export const useTabs = (id, initialTab, { location, replace }) => {
     tab,
     (e, { activeIndex }) => {
       setTab(activeIndex)
-    }
+    },
   ]
 }
 
@@ -180,7 +180,7 @@ export const useProgress = loading => {
 
   return {
     progress,
-    onProgress
+    onProgress,
   }
 }
 

@@ -73,12 +73,12 @@ const CreditGraphTooltip = props => {
 
 CreditGraphTooltip.defaultProps = {
   active: false,
-  payload: []
+  payload: [],
 }
 
 CreditGraphTooltip.propTypes = {
   active: bool,
-  payload: arrayOf(object)
+  payload: arrayOf(object),
 }
 
 export default CreditGraphTooltip

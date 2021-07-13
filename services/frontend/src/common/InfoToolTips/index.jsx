@@ -7,7 +7,7 @@ const infotooltips = {
   PopulationStatistics,
   PopulationOverview,
   CoolDataScience,
-  CourseStatistics
+  CourseStatistics,
 }
 
 export default infotooltips

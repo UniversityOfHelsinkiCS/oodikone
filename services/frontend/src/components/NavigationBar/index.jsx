@@ -18,7 +18,7 @@ const adminerUrls = [
   { url: USER_ADMINER_URL, text: 'User database' },
   { url: KONE_ADMINER_URL, text: 'Kone database' },
   { url: SIS_ADMINER_URL, text: 'Sis database' },
-  { url: SIS_IMPORTER_ADMINER_URL, text: 'Sis importer database' }
+  { url: SIS_IMPORTER_ADMINER_URL, text: 'Sis importer database' },
 ]
 
 const allNavigationItems = {
@@ -27,8 +27,8 @@ const allNavigationItems = {
     label: 'Study programme',
     items: [
       { path: '/populations', key: 'class', label: 'Search by class' },
-      { path: '/study-programme', key: 'overview', label: 'Overview' }
-    ]
+      { path: '/study-programme', key: 'overview', label: 'Overview' },
+    ],
   },
   students: { path: '/students', key: 'students', label: 'Student statistics' },
   courseStatistics: { path: '/coursestatistics', key: 'courseStatistics', label: 'Course statistics' },
@@ -38,7 +38,7 @@ const allNavigationItems = {
   faculty: { path: '/faculties', key: 'faculty', label: 'Faculty', reqRights: ['faculties'] },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['dev', 'admin'] },
   sandbox: { path: '/sandbox', key: 'sandbox', label: 'Sandbox', reqRights: ['dev'] },
-  feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' }
+  feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
 }
 
 const NavigationBar = props => {
@@ -189,31 +189,31 @@ NavigationBar.propTypes = {
   userRoles: arrayOf(string),
   rights: arrayOf(string),
   mockedBy: string,
-  userId: string
+  userId: string,
 }
 
 NavigationBar.defaultProps = {
   mockedBy: null,
   userId: 'unknown',
   userRoles: [],
-  rights: []
+  rights: [],
 }
 
 const mapStateToProps = ({
   auth: {
-    token: { roles, rights, mockedBy, userId }
-  }
+    token: { roles, rights, mockedBy, userId },
+  },
 }) => ({
   userRoles: getUserRoles(roles),
   rights,
   mockedBy,
-  userId
+  userId,
 })
 
 const mapDispatchToProps = {
-  logout: logoutAction
+  logout: logoutAction,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps, null, {
-  areStatePropsEqual: isEqual
+  areStatePropsEqual: isEqual,
 })(NavigationBar)

@@ -10,7 +10,7 @@ import {
   getGradeSpread,
   getThesisGradeSpread,
   isThesisSeries,
-  absoluteToRelative
+  absoluteToRelative,
 } from './util'
 import StackedBarChart from '../../../StackedBarChart'
 
@@ -33,7 +33,7 @@ const getGradeSeries = series => {
           getDataObject('5', newSeries[5], 'f'),
           getDataObject('HT', newSeries.HT, 'g'),
           getDataObject('TT', newSeries.TT, 'h'),
-          getDataObject('Hyv.', newSeries['Hyv.'], 'i')
+          getDataObject('Hyv.', newSeries['Hyv.'], 'i'),
         ],
         relative: [
           getDataObject('0', newSeries[0].map(absoluteToRelative(sumAll)), 'a'),
@@ -44,8 +44,8 @@ const getGradeSeries = series => {
           getDataObject('5', newSeries[5].map(absoluteToRelative(sumAll)), 'f'),
           getDataObject('HT', newSeries.HT.map(absoluteToRelative(sumAll)), 'g'),
           getDataObject('TT', newSeries.TT.map(absoluteToRelative(sumAll)), 'h'),
-          getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'i')
-        ]
+          getDataObject('Hyv.', newSeries['Hyv.'].map(absoluteToRelative(sumAll)), 'i'),
+        ],
       }
     : {
         absolute: [
@@ -56,7 +56,7 @@ const getGradeSeries = series => {
           getDataObject('CL', newSeries.CL, 'e'),
           getDataObject('MCLA', newSeries.MCLA, 'f'),
           getDataObject('ECLA', newSeries.ECLA, 'g'),
-          getDataObject('L', newSeries.L, 'h')
+          getDataObject('L', newSeries.L, 'h'),
         ],
         relative: [
           getDataObject(' I', newSeries.I.map(absoluteToRelative(sumAll)), 'a'),
@@ -66,8 +66,8 @@ const getGradeSeries = series => {
           getDataObject('CL', newSeries.CL.map(absoluteToRelative(sumAll)), 'e'),
           getDataObject('MCLA', newSeries.MCLA.map(absoluteToRelative(sumAll)), 'f'),
           getDataObject('ECLA', newSeries.ECLA.map(absoluteToRelative(sumAll)), 'g'),
-          getDataObject('L', newSeries.L.map(absoluteToRelative(sumAll)), 'h')
-        ]
+          getDataObject('L', newSeries.L.map(absoluteToRelative(sumAll)), 'h'),
+        ],
       }
 }
 
@@ -120,12 +120,12 @@ Distribution.propTypes = {
   primary: dataSeriesType.isRequired,
   comparison: dataSeriesType,
   isRelative: bool,
-  userHasAccessToAllStats: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
 }
 
 Distribution.defaultProps = {
   comparison: undefined,
-  isRelative: false
+  isRelative: false,
 }
 
 export default Distribution

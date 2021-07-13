@@ -23,7 +23,7 @@ const PassFailRow = ({ courseStats }) => {
     percentage,
     perStudent,
     passedOfPopulation,
-    triedOfPopulation
+    triedOfPopulation,
   } = stats
   const isActive = courseIsSelected(course.code)
   return (
@@ -77,7 +77,7 @@ const PassFailRow = ({ courseStats }) => {
 }
 
 PassFailRow.propTypes = {
-  courseStats: shape({ course: shape({ code: string }) }).isRequired
+  courseStats: shape({ course: shape({ code: string }) }).isRequired,
 }
 
 export default PassFailRow

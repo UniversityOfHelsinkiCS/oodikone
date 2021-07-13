@@ -32,23 +32,23 @@ export const tableColumnNames = {
   ATTEMPTS: 'attempts',
   PER_STUDENT: 'perStudent',
   PASSED_OF_POPULATION: 'passedOfPopulation',
-  TRIED_OF_POPULATION: 'triedOfPopulation'
+  TRIED_OF_POPULATION: 'triedOfPopulation',
 }
 
 export const sortOrderTypes = {
   ASC: 'ascending',
-  DESC: 'descending'
+  DESC: 'descending',
 }
 
 const lodashSortOrderTypes = {
   ASC: 'asc',
-  DESC: 'desc'
+  DESC: 'desc',
 }
 
 function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses) {
   const { sortCriteria, codeFilter, nameFilter, reversed } = state
   const {
-    courses: { coursestatistics }
+    courses: { coursestatistics },
   } = props
 
   const courseCodeFilter = ({ course }) => {
@@ -57,9 +57,7 @@ function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses
   }
   const courseNameFilter = ({ course }) => {
     const { name } = course
-    return getTextIn(name, language)
-      .toLowerCase()
-      .includes(nameFilter.toLowerCase())
+    return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
   }
 
   const mandatoryFilter = ({ course }) => {
@@ -91,7 +89,7 @@ const initialState = props => ({
   codeFilter: '',
   nameFilter: '',
   activeView: null,
-  selectedStudentsLength: props.selectedStudentsLength || 0
+  selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
 function PopulationCourseStats(props) {
@@ -123,7 +121,7 @@ function PopulationCourseStats(props) {
         ...state,
         initialSortReady: true,
         studentAmountLimit,
-        selectedStudentsLength: props.selectedStudents.length
+        selectedStudentsLength: props.selectedStudents.length,
       })
       setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses))
     }
@@ -133,7 +131,7 @@ function PopulationCourseStats(props) {
     const { codeFilter, nameFilter, reversed, sortCriteria } = state
     const {
       courses: { coursestatistics },
-      language
+      language,
     } = props
     const courseCodeFilter = ({ course }) => {
       if (!codeFilter) return true
@@ -145,9 +143,7 @@ function PopulationCourseStats(props) {
       if (!nameFilter) return true
 
       const { name } = course
-      return getTextIn(name, language)
-        .toLowerCase()
-        .includes(nameFilter.toLowerCase())
+      return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
     }
 
     const visibleCoursesFilter = ({ course }) => {
@@ -200,7 +196,7 @@ function PopulationCourseStats(props) {
       Object.entries(modules)
         .map(([module, courses]) => ({
           module: { code: module, name: courses[0].label_name, order: courses[0].module_order },
-          courses
+          courses,
         }))
         .sort((a, b) => a.module.order - b.module.order)
     )
@@ -210,7 +206,7 @@ function PopulationCourseStats(props) {
 
   const onFilterChange = (e, field) => {
     const {
-      target: { value }
+      target: { value },
     } = e
 
     setFilterFields({ ...filterFields, [field]: value })
@@ -259,7 +255,7 @@ function PopulationCourseStats(props) {
     setState({
       ...state,
       sortCriteria: criteria,
-      reversed: isReversed
+      reversed: isReversed,
     })
 
     setCourseStatistics(sortedStatistics)
@@ -337,7 +333,7 @@ function PopulationCourseStats(props) {
     onSortableColumnHeaderClick,
     tableColumnNames,
     sortCriteria,
-    reversed
+    reversed,
   }
 
   const panes = [
@@ -347,7 +343,7 @@ function PopulationCourseStats(props) {
         <div className="menuTab">
           <PassFail expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
-      )
+      ),
     },
     {
       menuItem: 'grades',
@@ -355,7 +351,7 @@ function PopulationCourseStats(props) {
         <div className="menuTab">
           <GradeDistribution expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
-      )
+      ),
     },
     {
       menuItem: 'when passed',
@@ -369,7 +365,7 @@ function PopulationCourseStats(props) {
             toggleGroupExpansion={toggleGroupExpansion}
           />
         </div>
-      )
+      ),
     },
     {
       menuItem: 'students',
@@ -377,8 +373,8 @@ function PopulationCourseStats(props) {
         <div className="menuTab" style={{ marginTop: '0.5em' }}>
           <Students expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
         </div>
-      )
-    }
+      ),
+    },
   ]
 
   if (!courses) {
@@ -404,21 +400,21 @@ function PopulationCourseStats(props) {
 PopulationCourseStats.propTypes = {
   courses: shape({
     coursestatistics: arrayOf(object),
-    coursetypes: shape({})
+    coursetypes: shape({}),
   }).isRequired,
   populationCourses: shape({
-    data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
+    data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) }),
   }).isRequired,
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
-  language: string.isRequired
+  language: string.isRequired,
 }
 
 const mapStateToProps = ({ populationCourses }) => ({
-  populationCourses
+  populationCourses,
 })
 
 export default connect(mapStateToProps, {
-  clearCourseStats
+  clearCourseStats,
 })(withRouter(PopulationCourseStats))

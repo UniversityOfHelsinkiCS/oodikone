@@ -6,7 +6,7 @@ const preStyle = {
   overflow: 'auto',
   maxHeight: '25em',
   wordBreak: 'break-all',
-  whiteSpace: 'pre-wrap'
+  whiteSpace: 'pre-wrap',
 }
 
 const KeyValueTable = ({ data }) => (
@@ -31,7 +31,7 @@ const KeyValueTable = ({ data }) => (
 )
 
 KeyValueTable.propTypes = {
-  data: shape({}).isRequired
+  data: shape({}).isRequired,
 }
 
 export default KeyValueTable

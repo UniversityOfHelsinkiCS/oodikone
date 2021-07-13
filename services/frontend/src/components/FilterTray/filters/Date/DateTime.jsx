@@ -12,7 +12,7 @@ const DateTime = ({ value, onChange }) => {
 
 DateTime.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]).isRequired,
-  onChange: PropTypes.func.isRequired
+  onChange: PropTypes.func.isRequired,
 }
 
 export default DateTime

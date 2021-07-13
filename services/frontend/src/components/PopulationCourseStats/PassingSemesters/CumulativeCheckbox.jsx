@@ -19,7 +19,7 @@ const CumulativeCheckbox = ({ cumulativeStats, setCumulativeStats }) => {
 
 CumulativeCheckbox.propTypes = {
   cumulativeStats: bool.isRequired,
-  setCumulativeStats: func.isRequired
+  setCumulativeStats: func.isRequired,
 }
 
 export default CumulativeCheckbox

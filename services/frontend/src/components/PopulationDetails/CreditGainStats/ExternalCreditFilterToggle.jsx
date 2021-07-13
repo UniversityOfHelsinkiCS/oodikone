@@ -30,12 +30,12 @@ const ExternalCreditFilterToggle = ({ min, max }) => {
 
 ExternalCreditFilterToggle.propTypes = {
   min: PropTypes.number,
-  max: PropTypes.number
+  max: PropTypes.number,
 }
 
 ExternalCreditFilterToggle.defaultProps = {
   min: null,
-  max: null
+  max: null,
 }
 
 export default ExternalCreditFilterToggle

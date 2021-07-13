@@ -21,7 +21,7 @@ const CreditsGainedTab = ({ filteredStudents }) => {
     [Math.ceil(months * (30 / 12)), Math.ceil(months * (45 / 12))],
     [Math.ceil(months * (15 / 12)), Math.ceil(months * (30 / 12))],
     [1, Math.ceil(months * (15 / 12))],
-    [null, 0]
+    [null, 0],
   ]
 
   return (
@@ -56,7 +56,7 @@ const CreditsGainedTab = ({ filteredStudents }) => {
 }
 
 CreditsGainedTab.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
+  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default CreditsGainedTab

@@ -33,67 +33,67 @@ const reducer = (state = { data: [] }, action) => {
     case 'GET_TAGS_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'GET_TAGS_SUCCESS':
       return {
         ...state,
         pending: false,
-        data: action.response || {}
+        data: action.response || {},
       }
     case 'GET_TAGS_BY_ST_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'GET_TAGS_BY_ST_SUCCESS':
       return {
         ...state,
         pending: false,
-        data: action.response || {}
+        data: action.response || {},
       }
     case 'GET_TAGS_BY_ST_FAILURE':
       return {
         ...state,
         pending: false,
-        data: action.response || {}
+        data: action.response || {},
       }
     case 'GET_TAGS_FAILURE':
       return {
         ...state,
-        pending: false
+        pending: false,
       }
     case 'CREATE_TAG_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'CREATE_TAG_FAILURE':
       return {
         ...state,
-        pending: false
+        pending: false,
       }
     case 'CREATE_TAG_SUCCESS':
       return {
         ...state,
         pending: false,
-        data: action.response
+        data: action.response,
       }
     case 'DELETE_TAG_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'DELETE_TAG_FAILURE':
       return {
         ...state,
-        pending: false
+        pending: false,
       }
     case 'DELETE_TAG_SUCCESS':
       return {
         ...state,
         pending: false,
-        data: action.response
+        data: action.response,
       }
     default:
       return state

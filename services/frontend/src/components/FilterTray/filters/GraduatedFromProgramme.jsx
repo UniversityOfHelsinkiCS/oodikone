@@ -45,7 +45,7 @@ const GraduatedFromProgramme = ({ code }) => {
     combinedExtent
       ? [
           { key: 'graduated-bachelor', text: `Graduated with Bachelor's`, value: 1 },
-          { key: 'graduated-master', text: `Graduated with Master's`, value: 2 }
+          { key: 'graduated-master', text: `Graduated with Master's`, value: 2 },
         ]
       : [{ key: 'graduated-true', text: `Graduated`, value: 1 }]
   )
@@ -87,11 +87,11 @@ const GraduatedFromProgramme = ({ code }) => {
 }
 
 GraduatedFromProgramme.propTypes = {
-  code: PropTypes.string.isRequired
+  code: PropTypes.string.isRequired,
 }
 
 const mapStateToProps = ({ populations }) => ({
-  code: populations.query ? populations.query.studyRights.programme : ''
+  code: populations.query ? populations.query.studyRights.programme : '',
 })
 
 export default connect(mapStateToProps)(GraduatedFromProgramme)

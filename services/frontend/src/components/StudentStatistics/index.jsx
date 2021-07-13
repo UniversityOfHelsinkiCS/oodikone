@@ -47,34 +47,34 @@ const StudentStatistics = props => {
 StudentStatistics.propTypes = {
   match: shape({
     params: shape({
-      studentNumber: string
-    })
+      studentNumber: string,
+    }),
   }),
   userRoles: arrayOf(string).isRequired,
-  rights: arrayOf(string).isRequired
+  rights: arrayOf(string).isRequired,
 }
 
 StudentStatistics.defaultProps = {
   match: {
-    params: { studentNumber: undefined }
-  }
+    params: { studentNumber: undefined },
+  },
 }
 
 const mapStateToProps = ({
   students,
   auth: {
-    token: { roles, rights }
-  }
+    token: { roles, rights },
+  },
 }) => ({
   userRoles: getUserRoles(roles),
   rights,
-  student: students.data.find(student => student.studentNumber === students.selected)
+  student: students.data.find(student => student.studentNumber === students.selected),
 })
 const mapDispatchToProps = dispatch => ({
   toggleStudentNameVisibility,
   findStudents: searchStr => dispatch(findStudents(searchStr)),
   getStudent: studentNumber => dispatch(getStudent(studentNumber)),
-  selectStudent: studentNumber => dispatch(selectStudent(studentNumber))
+  selectStudent: studentNumber => dispatch(selectStudent(studentNumber)),
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentStatistics))

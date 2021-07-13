@@ -9,7 +9,7 @@ export const getPresentStudents = studyprogrammeId => {
 }
 
 export const clearPresentStudents = () => ({
-  type: `${prefix}_CLEAR`
+  type: `${prefix}_CLEAR`,
 })
 
 const reducer = listreducer(prefix, null, false)

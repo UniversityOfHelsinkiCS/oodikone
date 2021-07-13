@@ -32,7 +32,7 @@ const reducer = (
     pending: false,
     error: false,
     userFacultiesPending: false,
-    userFacultiesError: false
+    userFacultiesError: false,
   },
   action
 ) => {
@@ -41,71 +41,71 @@ const reducer = (
       return {
         ...state,
         pending: true,
-        error: false
+        error: false,
       }
     case 'GET_FACULTIES_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'GET_FACULTIES_SUCCESS':
       return {
         ...state,
         data: action.response,
         pending: false,
-        error: true
+        error: true,
       }
     case 'GET_USER_FACULTIES_ATTEMPT':
       return {
         ...state,
         userFacultiesPending: true,
-        userFacultiesError: false
+        userFacultiesError: false,
       }
     case 'GET_USER_FACULTIES_FAILURE':
       return {
         ...state,
         userFacultiesPending: false,
-        userFacultiesError: true
+        userFacultiesError: true,
       }
     case 'GET_USER_FACULTIES_SUCCESS':
       return {
         ...state,
         data: action.response,
         userFacultiesPending: false,
-        userFacultiesError: false
+        userFacultiesError: false,
       }
     case 'GET_FACULTIES_YEARLY_STATS_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'GET_FACULTIES_YEARLY_STATS_SUCCESS':
       return {
         ...state,
         yearlyStats: action.response,
         pending: false,
-        error: true
+        error: true,
       }
     case 'GET_FACULTY_PROGRAMMES_ATTEMPT':
       return {
         ...state,
         pending: true,
-        error: false
+        error: false,
       }
     case 'GET_FACULTY_PROGRAMMES_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'GET_FACULTY_PROGRAMMES_SUCCESS':
       return {
         ...state,
         facultyProgrammes: action.response,
         pending: false,
-        error: false
+        error: false,
       }
     default:
       return state

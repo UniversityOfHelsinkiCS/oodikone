@@ -22,7 +22,7 @@ export const getPreview = () => {
 }
 
 export const clearErrors = () => ({
-  type: CLEAR_USER_ACCESS_ERRORS
+  type: CLEAR_USER_ACCESS_ERRORS,
 })
 
 const extractAxiosError = response => response.data && (response.data.error || response.data)
@@ -92,16 +92,16 @@ const previewError = (state = null, action) => {
 
 const sending = combineReducers({
   pending: sendingPending,
-  error: sendingError
+  error: sendingError,
 })
 
 const preview = combineReducers({
   pending: previewPending,
   error: previewError,
-  data: previewData
+  data: previewData,
 })
 
 export default combineReducers({
   sending,
-  preview
+  preview,
 })

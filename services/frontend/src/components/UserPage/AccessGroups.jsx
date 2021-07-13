@@ -13,7 +13,7 @@ const AccessGroups = ({
   modifyAccessGroups,
   pending,
   saveError,
-  getAccessGroups
+  getAccessGroups,
 }) => {
   const [selected, setSelected] = useState(userGroups)
 
@@ -60,7 +60,7 @@ const AccessGroups = ({
 
 AccessGroups.propTypes = {
   user: PropTypes.shape({
-    id: PropTypes.string
+    id: PropTypes.string,
   }).isRequired,
   getAccessGroups: PropTypes.func.isRequired,
   modifyAccessGroups: PropTypes.func.isRequired,
@@ -68,7 +68,7 @@ AccessGroups.propTypes = {
   userGroups: PropTypes.arrayOf(PropTypes.string).isRequired,
   saveError: PropTypes.bool.isRequired,
   savePending: PropTypes.bool.isRequired,
-  pending: PropTypes.bool.isRequired
+  pending: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = ({ accessGroups, users }, { user }) => {
@@ -78,7 +78,7 @@ const mapStateToProps = ({ accessGroups, users }, { user }) => {
     key: group.id,
     text: group.group_code,
     value: group.group_code,
-    description: group.group_info
+    description: group.group_info,
   }))
   const userGroups = user.accessgroup.map(({ group_code: code }) => code)
   return {
@@ -86,11 +86,11 @@ const mapStateToProps = ({ accessGroups, users }, { user }) => {
     userGroups,
     pending: !!pending,
     saveError: !!saveError,
-    savePending: !!savePending
+    savePending: !!savePending,
   }
 }
 
 export default connect(mapStateToProps, {
   getAccessGroups,
-  modifyAccessGroups
+  modifyAccessGroups,
 })(AccessGroups)

@@ -21,7 +21,7 @@ export const findCoursesV2 = ({ name, code }) => {
 }
 
 export const toggleUnifyOpenUniCourses = () => ({
-  type: 'TOGGLE_UNIFY_OPEN_UNI_COURSES'
+  type: 'TOGGLE_UNIFY_OPEN_UNI_COURSES',
 })
 
 const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false }, action) => {
@@ -30,13 +30,13 @@ const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false 
       return {
         ...state,
         pending: true,
-        lastSearch: action.requestSettings.query
+        lastSearch: action.requestSettings.query,
       }
     case 'GET_COURSE_SEARCH_RESULT_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'GET_COURSE_SEARCH_RESULT_SUCCESS':
       return {
@@ -46,17 +46,17 @@ const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false 
         data:
           action.query.code === state.lastSearch.code && action.query.name === state.lastSearch.name
             ? action.response
-            : state.data
+            : state.data,
       }
     case 'TOGGLE_UNIFY_OPEN_UNI_COURSES':
       return {
         ...state,
-        unifyOpenUniCourses: !state.unifyOpenUniCourses
+        unifyOpenUniCourses: !state.unifyOpenUniCourses,
       }
     case 'CLEAR_SEARCH_RESULTS':
       return {
         ...state,
-        data: {}
+        data: {},
       }
     default:
       return state

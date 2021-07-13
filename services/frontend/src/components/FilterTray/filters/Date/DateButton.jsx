@@ -10,7 +10,7 @@ const DateButton = ({ value }, openCalendar) => {
 }
 
 DateButton.propTypes = {
-  value: PropTypes.string.isRequired
+  value: PropTypes.string.isRequired,
 }
 
 export default DateButton

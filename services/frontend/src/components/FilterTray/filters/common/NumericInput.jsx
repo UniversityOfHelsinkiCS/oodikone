@@ -38,12 +38,12 @@ NumericInput.propTypes = {
   label: PropTypes.node.isRequired,
   clearButtonDisabled: PropTypes.bool.isRequired,
   className: PropTypes.string,
-  name: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
 }
 
 NumericInput.defaultProps = {
   onKeyDown: () => {},
-  className: null
+  className: null,
 }
 
 export default NumericInput

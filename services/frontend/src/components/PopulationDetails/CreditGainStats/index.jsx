@@ -37,12 +37,12 @@ const CreditGainStats = ({ filteredStudents }) => {
           panes={[
             {
               menuItem: 'Credits Gained',
-              render: renderCreditsGainTab
+              render: renderCreditsGainTab,
             },
             {
               menuItem: 'Statistics',
-              render: renderQuartersTab
-            }
+              render: renderQuartersTab,
+            },
           ]}
           data-cy="credit-stats-tab"
         />
@@ -52,7 +52,7 @@ const CreditGainStats = ({ filteredStudents }) => {
 }
 
 CreditGainStats.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired
+  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default CreditGainStats

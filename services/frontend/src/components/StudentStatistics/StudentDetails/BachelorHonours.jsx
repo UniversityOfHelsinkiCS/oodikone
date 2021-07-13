@@ -16,7 +16,7 @@ const bachelorCodes = [
   'KH50_006',
   'KH50_007',
   'KH50_008',
-  '00345'
+  '00345',
 ]
 
 const BachelorHonours = ({ student, programmes, getMandatoryCourseModulesDispatch, mandatoryModules, absentYears }) => {
@@ -188,12 +188,12 @@ BachelorHonours.propTypes = {
   programmes: shape({}).isRequired,
   mandatoryModules: arrayOf(shape({})).isRequired,
   absentYears: arrayOf(shape({})).isRequired,
-  getMandatoryCourseModulesDispatch: func.isRequired
+  getMandatoryCourseModulesDispatch: func.isRequired,
 }
 
 const mapStateToProps = ({ populationMandatoryCourses }) => {
   return {
-    mandatoryModules: populationMandatoryCourses.data || []
+    mandatoryModules: populationMandatoryCourses.data || [],
   }
 }
 

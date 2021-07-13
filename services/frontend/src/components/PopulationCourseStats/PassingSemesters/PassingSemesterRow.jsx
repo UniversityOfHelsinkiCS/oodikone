@@ -18,26 +18,26 @@ const getCumulativeYearCount = (year, passingSemesters) => {
 }
 
 const renderYear = (year, passingSemesters) => (
-  <Fragment>
+  <>
     <Table.Cell>{passingSemesters[`${year}-FALL`] || ''}</Table.Cell>
     <Table.Cell>{passingSemesters[`${year}-SPRING`] || ''}</Table.Cell>
-  </Fragment>
+  </>
 )
 
 const renderCompactYear = (year, passingSemesters) => (
-  <Fragment>
+  <>
     <Table.Cell>{getYearCount(year, passingSemesters) || ''}</Table.Cell>
-  </Fragment>
+  </>
 )
 
 const renderCompactCumulativeYear = (year, passingSemesters) => (
-  <Fragment>
+  <>
     <Table.Cell>{getCumulativeYearCount(year, passingSemesters) || ''}</Table.Cell>
-  </Fragment>
+  </>
 )
 
 const renderStatistics = passingSemesters => (
-  <Fragment>
+  <>
     <Table.Cell>{passingSemesters.BEFORE || ''}</Table.Cell>
     {renderYear(0, passingSemesters)}
     {renderYear(1, passingSemesters)}
@@ -46,11 +46,11 @@ const renderStatistics = passingSemesters => (
     {renderCompactYear(4, passingSemesters)}
     {renderCompactYear(5, passingSemesters)}
     <Table.Cell>{passingSemesters.LATER || ''}</Table.Cell>
-  </Fragment>
+  </>
 )
 
 const renderCumulativeStatistics = passingSemesters => (
-  <Fragment>
+  <>
     <Table.Cell>{passingSemesters.BEFORE || ''}</Table.Cell>
     {renderYear(0, passingSemesters)}
     {renderYear(1, passingSemesters)}
@@ -59,7 +59,7 @@ const renderCumulativeStatistics = passingSemesters => (
     {renderCompactCumulativeYear(4, passingSemesters)}
     {renderCompactCumulativeYear(5, passingSemesters)}
     <Table.Cell>{passingSemesters.LATER || ''}</Table.Cell>
-  </Fragment>
+  </>
 )
 
 const PassingSemesterRow = ({ statistics, cumulative, onCourseNameClickFn }) => {
@@ -109,11 +109,11 @@ PassingSemesterRow.propTypes = {
       students: number,
       passed: number,
       passingSemesters: shape({}),
-      passingSemestersCumulative: shape({})
-    })
+      passingSemestersCumulative: shape({}),
+    }),
   }).isRequired,
   cumulative: bool.isRequired,
-  onCourseNameClickFn: func.isRequired
+  onCourseNameClickFn: func.isRequired,
 }
 
 export default PassingSemesterRow

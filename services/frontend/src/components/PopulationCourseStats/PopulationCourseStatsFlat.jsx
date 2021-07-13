@@ -30,23 +30,23 @@ export const tableColumnNames = {
   ATTEMPTS: 'attempts',
   PER_STUDENT: 'perStudent',
   PASSED_OF_POPULATION: 'passedOfPopulation',
-  TRIED_OF_POPULATION: 'triedOfPopulation'
+  TRIED_OF_POPULATION: 'triedOfPopulation',
 }
 
 export const sortOrderTypes = {
   ASC: 'ascending',
-  DESC: 'descending'
+  DESC: 'descending',
 }
 
 const lodashSortOrderTypes = {
   ASC: 'asc',
-  DESC: 'desc'
+  DESC: 'desc',
 }
 
 function updateCourseStatisticsCriteria(props, language, state) {
   const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
   const {
-    courses: { coursestatistics }
+    courses: { coursestatistics },
   } = props
 
   const studentAmountFilter = ({ stats }) => {
@@ -59,9 +59,7 @@ function updateCourseStatisticsCriteria(props, language, state) {
   }
   const courseNameFilter = ({ course }) => {
     const { name } = course
-    return getTextIn(name, language)
-      .toLowerCase()
-      .includes(nameFilter.toLowerCase())
+    return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
   }
 
   const filteredCourses =
@@ -89,7 +87,7 @@ const initialState = props => ({
   codeFilter: '',
   nameFilter: '',
   activeView: null,
-  selectedStudentsLength: props.selectedStudentsLength || 0
+  selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
 function PopulationCourseStats(props) {
@@ -117,7 +115,7 @@ function PopulationCourseStats(props) {
         ...state,
         initialSortReady: true,
         studentAmountLimit,
-        selectedStudentsLength: props.selectedStudents.length
+        selectedStudentsLength: props.selectedStudents.length,
       })
       setCourseStatistics(updateCourseStatisticsCriteria(props, language, state))
     }
@@ -127,7 +125,7 @@ function PopulationCourseStats(props) {
     const { studentAmountLimit, codeFilter, nameFilter, reversed, sortCriteria } = state
     const {
       courses: { coursestatistics },
-      language
+      language,
     } = props
     const studentAmountFilter = ({ stats }) => {
       const { students } = stats
@@ -139,9 +137,7 @@ function PopulationCourseStats(props) {
     }
     const courseNameFilter = ({ course }) => {
       const { name } = course
-      return getTextIn(name, language)
-        .toLowerCase()
-        .includes(nameFilter.toLowerCase())
+      return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
     }
 
     const filteredCourses =
@@ -164,7 +160,7 @@ function PopulationCourseStats(props) {
 
   const onFilterChange = (e, field) => {
     const {
-      target: { value }
+      target: { value },
     } = e
 
     setFilterFields({ ...filterFields, [field]: value })
@@ -198,7 +194,7 @@ function PopulationCourseStats(props) {
 
   const onStudentAmountLimitChange = e => {
     const {
-      target: { value }
+      target: { value },
     } = e
     clearTimeout(timer)
     setTimer(
@@ -229,7 +225,7 @@ function PopulationCourseStats(props) {
     setState({
       ...state,
       sortCriteria: criteria,
-      reversed: isReversed
+      reversed: isReversed,
     })
 
     setCourseStatistics(sortedStatistics)
@@ -294,7 +290,7 @@ function PopulationCourseStats(props) {
     onSortableColumnHeaderClick,
     tableColumnNames,
     sortCriteria,
-    reversed
+    reversed,
   }
 
   const panes = [
@@ -304,7 +300,7 @@ function PopulationCourseStats(props) {
         <div className="menuTab">
           <PassFail />
         </div>
-      )
+      ),
     },
     {
       menuItem: 'grades',
@@ -312,8 +308,8 @@ function PopulationCourseStats(props) {
         <div className="menuTab">
           <GradeDistribution />
         </div>
-      )
-    }
+      ),
+    },
   ]
 
   if (!courses) {
@@ -351,21 +347,21 @@ PopulationCourseStats.propTypes = {
   courses: shape({
     coursestatistics: arrayOf(object),
     coursetypes: shape({}),
-    disciplines: shape({})
+    disciplines: shape({}),
   }).isRequired,
   populationCourses: shape({
-    data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) })
+    data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) }),
   }).isRequired,
   clearCourseStats: func.isRequired,
   pending: bool.isRequired,
   selectedStudents: arrayOf(string).isRequired,
   years: shape({}), // eslint-disable-line
   showFilter: bool,
-  language: string.isRequired
+  language: string.isRequired,
 }
 
 PopulationCourseStats.defaultProps = {
-  showFilter: false
+  showFilter: false,
 }
 
 const mapStateToProps = state => {
@@ -375,10 +371,10 @@ const mapStateToProps = state => {
   return {
     years,
     populationCourses: state.populationCourses,
-    isAdmin
+    isAdmin,
   }
 }
 
 export default connect(mapStateToProps, {
-  clearCourseStats
+  clearCourseStats,
 })(withRouter(PopulationCourseStats))

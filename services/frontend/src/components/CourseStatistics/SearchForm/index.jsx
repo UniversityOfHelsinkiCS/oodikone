@@ -24,14 +24,14 @@ const INITIAL = {
   courseName: '',
   courseCode: '',
   selectedCourses: {},
-  separate: false
+  separate: false,
 }
 
 const searchBoxStyle = {
   border: '2px solid black',
   borderRadius: '0.3em',
   padding: '12px',
-  boxShadow: '0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%)'
+  boxShadow: '0 2px 4px 0 rgb(34 36 38 / 12%), 0 2px 10px 0 rgb(34 36 38 / 15%)',
 }
 
 const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchingCoursesLength) => {
@@ -57,7 +57,7 @@ const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchin
 const SearchForm = props => {
   const { language } = useLanguage()
   const [state, setState] = useState({
-    ...INITIAL
+    ...INITIAL,
   })
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
   const isAdmin = useIsAdmin()
@@ -73,7 +73,7 @@ const SearchForm = props => {
       ...rest,
       courseCodes: JSON.parse(courseCodes),
       separate: JSON.parse(separate),
-      unifyOpenUniCourses: JSON.parse(unifyOpenUniCourses || false)
+      unifyOpenUniCourses: JSON.parse(unifyOpenUniCourses || false),
     }
     return query
   }
@@ -115,7 +115,7 @@ const SearchForm = props => {
       sendAnalytics('Unselected course', course.name)
       setState({
         ...state,
-        selectedCourses: rest
+        selectedCourses: rest,
       })
     } else {
       sendAnalytics('Selected course', course.name)
@@ -123,8 +123,8 @@ const SearchForm = props => {
         ...state,
         selectedCourses: {
           ...selectedCourses,
-          [course.code]: { ...course, selected: true }
-        }
+          [course.code]: { ...course, selected: true },
+        },
       })
     }
   }
@@ -150,12 +150,12 @@ const SearchForm = props => {
     const params = {
       courseCodes: codes,
       separate,
-      unifyOpenUniCourses: props.unifyOpenUniCourses
+      unifyOpenUniCourses: props.unifyOpenUniCourses,
     }
     const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name, language)} ${code}`)
     addItemToSearchHistory({
       text: searchHistoryText.join(', '),
-      params
+      params,
     })
     pushQueryToUrl(params)
   }
@@ -207,13 +207,13 @@ const SearchForm = props => {
       ...state,
       selectedCourses: {
         ...selectedCourses,
-        ...newSelectedCourses
-      }
+        ...newSelectedCourses,
+      },
     })
   }
 
   return (
-    <React.Fragment>
+    <>
       <Segment loading={isLoading}>
         <Form>
           <Header>Search for courses</Header>
@@ -271,7 +271,7 @@ const SearchForm = props => {
                 selectedTable
               />
               {!noSelectedCourses && (
-                <Fragment>
+                <>
                   <Form.Checkbox
                     label="Separate statistics for Spring and Fall semesters"
                     name="separate"
@@ -290,7 +290,7 @@ const SearchForm = props => {
                     onClick={onSubmitFormClick}
                     data-cy="fetch-stats-button"
                   />
-                </Fragment>
+                </>
               )}
             </div>
             <CourseTable
@@ -320,12 +320,12 @@ const SearchForm = props => {
         items={searchHistory}
         updateItem={updateItemInSearchHistory}
       />
-    </React.Fragment>
+    </>
   )
 }
 
 SearchForm.defaultProps = {
-  onProgress: null
+  onProgress: null,
 }
 
 SearchForm.propTypes = {
@@ -344,7 +344,7 @@ SearchForm.propTypes = {
   clearOodiSisDiff: func.isRequired,
   getCourseStatsDiff: func.isRequired,
   showDiff: bool.isRequired,
-  setShowDiff: func.isRequired
+  setShowDiff: func.isRequired,
 }
 
 const mapStateToProps = state => {
@@ -356,7 +356,7 @@ const mapStateToProps = state => {
     // newMatchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses, newMeta),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending,
-    unifyOpenUniCourses
+    unifyOpenUniCourses,
   }
 }
 
@@ -368,6 +368,6 @@ export default withRouter(
     clearCourseStats,
     toggleUnifyOpenUniCourses,
     getCourseStatsDiff,
-    clearOodiSisDiff
+    clearOodiSisDiff,
   })(SearchForm)
 )

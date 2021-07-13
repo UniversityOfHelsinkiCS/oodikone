@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const defaultState = {
   value: [],
-  grades: {}
+  grades: {},
 }
 
 const GradeFilterContext = createContext([[], () => {}])
@@ -15,7 +15,7 @@ export const GradeFilterProvider = ({ children }) => {
 }
 
 GradeFilterProvider.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 }
 
 export default () => {
@@ -25,6 +25,6 @@ export default () => {
     value: state.value,
     setValue: value => setState(prev => ({ ...prev, value })),
     grades: state.grades,
-    setGrades: grades => setState(prev => ({ ...prev, grades }))
+    setGrades: grades => setState(prev => ({ ...prev, grades })),
   }
 }

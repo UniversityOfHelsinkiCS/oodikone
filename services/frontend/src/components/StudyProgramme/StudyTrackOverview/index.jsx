@@ -16,7 +16,7 @@ const Overview = ({
   dispatchGetProductivity,
   dispatchGetThroughput,
   history,
-  studyprogrammes
+  studyprogrammes,
 }) => {
   const [selectedTrack, setTrack] = useState('')
   const [selectedYear, setYear] = useState('')
@@ -43,14 +43,14 @@ const Overview = ({
       const yearDropdownOptions = years.map(year => ({
         key: year,
         text: year,
-        value: year
+        value: year,
       }))
 
       const dropdownOptions = filteredStudytracks.map(st => ({
         key: st.code,
         text: getTextIn(st.name, language),
         description: st.code,
-        value: st.code
+        value: st.code,
       }))
       if (yearDropdownOptions.length > 0) {
         setYear(yearDropdownOptions[0].value)
@@ -72,7 +72,7 @@ const Overview = ({
           data: selectedData,
           lastUpdated: throughput.data[studyprogramme].lastUpdated,
           status: throughput.data[studyprogramme].status,
-          totals: throughput.data[studyprogramme].stTotals[selectedTrack]
+          totals: throughput.data[studyprogramme].stTotals[selectedTrack],
         }
         setData(newData)
       }
@@ -98,7 +98,7 @@ const Overview = ({
               ...selectedYearData.studytrackdata[curr],
               // oh pls no, pls fix asap
               // need to fix logic in throughputtable component so that we can name this better
-              year: `${getTextIn(studytrack.name, language)}, ${curr}`
+              year: `${getTextIn(studytrack.name, language)}, ${curr}`,
             }
             acc.push(newStudyTrackObject)
           }
@@ -113,10 +113,10 @@ const Overview = ({
             credits: selectedYearData.creditValues,
             genders: {
               Male: Number(selectedYearData.genders.Male),
-              Female: Number(selectedYearData.genders.Female)
+              Female: Number(selectedYearData.genders.Female),
             },
-            students: Number(selectedYearData.genders.Male) + Number(selectedYearData.genders.Female)
-          }
+            students: Number(selectedYearData.genders.Male) + Number(selectedYearData.genders.Female),
+          },
         }
         setData(newData)
       }
@@ -179,7 +179,7 @@ const Overview = ({
       )
     }
     return (
-      <React.Fragment>
+      <>
         {renderSelection(year)}
         <ThroughputTable
           throughput={throughputData}
@@ -192,7 +192,7 @@ const Overview = ({
           newProgramme={isNewHYStudyProgramme(studyprogramme)}
           isStudytrackView={year}
         />
-      </React.Fragment>
+      </>
     )
   }
   const handleTabChange = (event, { activeIndex }) => {
@@ -210,18 +210,18 @@ const Overview = ({
   const panes = [
     {
       menuItem: 'Year specific',
-      render: () => renderTable(true)
+      render: () => renderTable(true),
     },
     {
       menuItem: 'Studytrack specific',
-      render: () => renderTable(false)
-    }
+      render: () => renderTable(false),
+    },
   ]
 
   if (studyprogramme.includes('KH'))
     panes.push({
       menuItem: 'Studytrack Graph',
-      render: () => <ProtoC programme={studyprogramme} />
+      render: () => <ProtoC programme={studyprogramme} />,
     })
 
   return (
@@ -245,17 +245,17 @@ Overview.propTypes = {
   throughput: shape({
     error: bool,
     pending: bool,
-    data: shape({})
+    data: shape({}),
   }).isRequired // eslint-disable-line
 }
 
 const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgrammes, settings }) => ({
   throughput: studyProgrammeThroughput,
   studyprogrammes: populationDegreesAndProgrammes.data.programmes || {},
-  language: settings.language
+  language: settings.language,
 })
 
 export default connect(mapStateToProps, {
   dispatchGetProductivity: getProductivity,
-  dispatchGetThroughput: getThroughput
+  dispatchGetThroughput: getThroughput,
 })(Overview)

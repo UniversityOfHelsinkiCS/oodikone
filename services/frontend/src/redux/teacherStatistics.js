@@ -8,7 +8,7 @@ export const getTeacherStatistics = (semesterStart, semesterEnd, providers) => {
   const params = {
     providers,
     semesterStart,
-    semesterEnd
+    semesterEnd,
   }
   return callController(route, prefix, [], 'get', params, params)
 }

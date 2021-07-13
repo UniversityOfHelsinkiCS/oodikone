@@ -14,7 +14,7 @@ const StudyrightsTable = ({
   language,
   handleStartDateChange,
   showPopulationStatistics,
-  studyrightid
+  studyrightid,
 }) => {
   if (!student) return null
 
@@ -30,21 +30,21 @@ const StudyrightsTable = ({
         startdate: programme.startdate,
         studystartdate: studyright.studystartdate,
         enddate: programme.enddate,
-        name: getTextIn(programme.element_detail.name, language)
+        name: getTextIn(programme.element_detail.name, language),
       }))
     const studytracks = sortBy(studyright.studyright_elements, 'enddate')
       .filter(e => e.element_detail.type === 30)
       .map(studytrack => ({
         startdate: studytrack.startdate,
         enddate: studytrack.enddate,
-        name: getTextIn(studytrack.element_detail.name, language)
+        name: getTextIn(studytrack.element_detail.name, language),
       }))
     return {
       studyrightid: studyright.studyrightid,
       graduated: studyright.graduated,
       canceldate: studyright.canceldate,
       enddate: studyright.enddate,
-      elements: { programmes, studytracks }
+      elements: { programmes, studytracks },
     }
   })
 
@@ -118,7 +118,7 @@ const StudyrightsTable = ({
       ))
 
   return (
-    <Fragment>
+    <>
       <Divider horizontal style={{ padding: '20px' }}>
         <Header as="h4">Studyrights</Header>
       </Divider>
@@ -151,12 +151,12 @@ const StudyrightsTable = ({
             })}
         </Table.Body>
       </Table>
-    </Fragment>
+    </>
   )
 }
 
 StudyrightsTable.defaultProps = {
-  studyrightid: ''
+  studyrightid: '',
 }
 
 StudyrightsTable.propTypes = {
@@ -165,7 +165,7 @@ StudyrightsTable.propTypes = {
   language: string.isRequired,
   handleStartDateChange: func.isRequired,
   showPopulationStatistics: func.isRequired,
-  studyrightid: string
+  studyrightid: string,
 }
 
 export default StudyrightsTable

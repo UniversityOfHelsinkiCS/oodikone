@@ -12,7 +12,7 @@ const FilterToggleIcon = ({ onClick, isActive }) => (
 
 FilterToggleIcon.propTypes = {
   onClick: PropTypes.func.isRequired,
-  isActive: PropTypes.bool.isRequired
+  isActive: PropTypes.bool.isRequired,
 }
 
 export default FilterToggleIcon

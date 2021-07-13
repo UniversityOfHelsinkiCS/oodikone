@@ -26,12 +26,12 @@ const LanguageProvider = ({ children, token }) => {
 LanguageProvider.propTypes = {
   children: PropTypes.node.isRequired,
   token: PropTypes.shape({
-    language: PropTypes.string
-  })
+    language: PropTypes.string,
+  }),
 }
 
 LanguageProvider.defaultProps = {
-  token: null
+  token: null,
 }
 
 const mapStateToProps = ({ auth }) => ({ token: auth.token })

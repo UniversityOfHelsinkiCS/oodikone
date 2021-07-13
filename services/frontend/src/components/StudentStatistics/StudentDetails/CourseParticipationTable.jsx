@@ -47,7 +47,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
           to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
         >
           <Icon name="level up alternate" onClick={() => clearCourseStats()} />
-        </Item>
+        </Item>,
       ])
     } else {
       courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`].push([
@@ -65,7 +65,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
           to={`/coursestatistics?courseCodes=["${course.code}"]&separate=false&unifyOpenUniCourses=false`}
         >
           <Icon name="level up alternate" onClick={() => clearCourseStats()} />
-        </Item>
+        </Item>,
       ])
     }
   })
@@ -98,7 +98,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
 CourseParticipationTable.propTypes = {
   student: shape({}).isRequired,
   language: string.isRequired,
-  clearCourseStats: func.isRequired
+  clearCourseStats: func.isRequired,
 }
 
 export default CourseParticipationTable

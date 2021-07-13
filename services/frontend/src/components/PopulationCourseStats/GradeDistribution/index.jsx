@@ -43,7 +43,7 @@ const GradeDistribution = ({ expandedGroups, toggleGroupExpansion }) => {
 
 GradeDistribution.propTypes = {
   expandedGroups: instanceOf(Set).isRequired,
-  toggleGroupExpansion: func.isRequired
+  toggleGroupExpansion: func.isRequired,
 }
 
 export default GradeDistribution

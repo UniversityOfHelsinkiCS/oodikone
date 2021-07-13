@@ -44,7 +44,7 @@ const CreditsGraph = ({ graphYearStart, student, absences }) => {
 CreditsGraph.propTypes = {
   student: shape({}).isRequired,
   absences: arrayOf(shape({})).isRequired,
-  graphYearStart: string.isRequired
+  graphYearStart: string.isRequired,
 }
 
 const chunkifyArray = (array, size = 1) => {
@@ -72,7 +72,7 @@ const semesterChunkify = (courses, semesterenrollments, semesters, language) => 
       acc.push({
         name: getTextIn(curr.semester.name, language),
         y: sum / curr.numOfCourses,
-        x: new Date(curr.data[curr.numOfCourses - 1].date).getTime()
+        x: new Date(curr.data[curr.numOfCourses - 1].date).getTime(),
       })
     return acc
   }, [])
@@ -109,7 +109,7 @@ const gradeMeanSeries = (student, chunksize, semesters, language) => {
       acc.push({
         name: `${curr.length} courses`,
         y: sum / curr.length,
-        x: new Date(curr[curr.length - 1].date).getTime()
+        x: new Date(curr[curr.length - 1].date).getTime(),
       })
     return acc
   }, [])
@@ -127,33 +127,33 @@ const GradeGraph = ({ student, semesters, language }) => {
 
   const defaultOptions = {
     chart: {
-      type: 'spline'
+      type: 'spline',
     },
     title: {
-      text: 'Grade plot'
+      text: 'Grade plot',
     },
     xAxis: {
       type: 'datetime',
       min: new Date(series.minDate).getTime(),
-      max: new Date(series.maxDate).getTime()
+      max: new Date(series.maxDate).getTime(),
     },
     yAxis: {
       min: 1,
-      max: 5
-    }
+      max: 5,
+    },
   }
 
   const totalMeanOptions = {
     ...defaultOptions,
-    series: [{ data: mean, name: 'Total mean', seriesThreshold: 150 }]
+    series: [{ data: mean, name: 'Total mean', seriesThreshold: 150 }],
   }
   const chunkMeanOptions = {
     ...defaultOptions,
-    series: chunkMeans
+    series: chunkMeans,
   }
   const semesterMeanOptions = {
     ...defaultOptions,
-    series: semesterMeans
+    series: semesterMeans,
   }
   return (
     <div align="center">
@@ -208,7 +208,7 @@ const GradeGraph = ({ student, semesters, language }) => {
 GradeGraph.propTypes = {
   student: shape({}).isRequired,
   semesters: shape({}).isRequired,
-  language: string.isRequired
+  language: string.isRequired,
 }
 
 const StudentGraphs = ({ student, absences, graphYearStart, semesters, language }) => {
@@ -219,7 +219,7 @@ const StudentGraphs = ({ student, absences, graphYearStart, semesters, language 
         <Tab.Pane>
           <CreditsGraph absences={absences} student={student} graphYearStart={graphYearStart} />
         </Tab.Pane>
-      )
+      ),
     },
     {
       menuItem: 'Grade graph',
@@ -227,8 +227,8 @@ const StudentGraphs = ({ student, absences, graphYearStart, semesters, language 
         <Tab.Pane>
           <GradeGraph student={student} semesters={semesters} language={language} />
         </Tab.Pane>
-      )
-    }
+      ),
+    },
   ]
   return <Tab panes={panes} />
 }
@@ -238,7 +238,7 @@ StudentGraphs.propTypes = {
   absences: arrayOf(shape({})).isRequired,
   graphYearStart: string.isRequired,
   semesters: shape({}).isRequired,
-  language: string.isRequired
+  language: string.isRequired,
 }
 
 export default StudentGraphs

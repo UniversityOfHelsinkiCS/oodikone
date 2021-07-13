@@ -19,7 +19,7 @@ const Overview = props => {
     dispatchGetProductivity,
     dispatchGetThroughput,
     dispatchGetBachelors,
-    history
+    history,
   } = props
 
   const isAdmin = useIsAdmin()
@@ -30,7 +30,7 @@ const Overview = props => {
     if (isAdmin) dispatchGetBachelors(studyprogramme)
   }, [])
   return (
-    <React.Fragment>
+    <>
       <ThroughputTable
         throughput={throughput.data[studyprogramme]}
         thesis={throughput.data.thesis}
@@ -49,7 +49,7 @@ const Overview = props => {
         newProgramme={isNewHYStudyProgramme(studyprogramme)}
       />
       <BachelorsTable bachelors={bachelors.data} loading={throughput.pending} />
-    </React.Fragment>
+    </>
   )
 }
 
@@ -62,28 +62,28 @@ Overview.propTypes = {
   productivity: shape({
     error: bool,
     pending: bool,
-    data: shape({})
+    data: shape({}),
   }).isRequired, // eslint-disable-line
   throughput: shape({
     error: bool,
     pending: bool,
-    data: shape({})
+    data: shape({}),
   }).isRequired, // eslint-disable-line
   bachelors: shape({
     error: bool,
     pending: bool,
-    data: oneOfType([shape({}), array])
+    data: oneOfType([shape({}), array]),
   }).isRequired // eslint-disable-line
 }
 
 const mapStateToProps = ({ studyProgrammeProductivity, studyProgrammeThroughput, studyProgrammeBachelors }) => ({
   productivity: studyProgrammeProductivity,
   throughput: studyProgrammeThroughput,
-  bachelors: studyProgrammeBachelors
+  bachelors: studyProgrammeBachelors,
 })
 
 export default connect(mapStateToProps, {
   dispatchGetProductivity: getProductivity,
   dispatchGetThroughput: getThroughput,
-  dispatchGetBachelors: getBachelors
+  dispatchGetBachelors: getBachelors,
 })(Overview)

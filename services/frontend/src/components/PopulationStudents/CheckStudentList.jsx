@@ -24,23 +24,23 @@ const CheckStudentList = ({ students }) => {
       key: 'found',
       title: 'Student numbers in list and in oodi',
       content: {
-        content: foundStudents.length === 0 ? 'no numbers in list and oodi' : <List id="found" items={foundStudents} />
-      }
+        content: foundStudents.length === 0 ? 'no numbers in list and oodi' : <List id="found" items={foundStudents} />,
+      },
     },
     {
       key: 'not found',
       title: 'Student numbers in list but not in oodi',
       content: {
-        content: notInOodiRows.length === 0 ? 'all numbers in oodi' : <List id="notfound" items={notInOodiRows} />
-      }
+        content: notInOodiRows.length === 0 ? 'all numbers in oodi' : <List id="notfound" items={notInOodiRows} />,
+      },
     },
     {
       key: 'not searched',
       title: 'Student numbers in oodi but not in list',
       content: {
-        content: notInListRows.length === 0 ? 'all numbers in list' : <List id="notsearched" items={notInListRows} />
-      }
-    }
+        content: notInListRows.length === 0 ? 'all numbers in list' : <List id="notsearched" items={notInListRows} />,
+      },
+    },
   ]
 
   const renderResults = () => (
@@ -94,7 +94,7 @@ const CheckStudentList = ({ students }) => {
 }
 
 CheckStudentList.propTypes = {
-  students: arrayOf(string).isRequired
+  students: arrayOf(string).isRequired,
 }
 
 export default CheckStudentList

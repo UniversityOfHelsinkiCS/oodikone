@@ -11,7 +11,7 @@ const ProgrammeDropdown = ({ options, label, name, onChange, onClear, value, ...
       key,
       content: <DropdownItem name={text} code={key} size={size} description={description} />,
       text: !onClear ? text : <ClearableItem name={text} onClear={onClear} />,
-      value: v
+      value: v,
     }))}
     selection
     multiple
@@ -39,14 +39,14 @@ ProgrammeDropdown.propTypes = {
       count: oneOfType([string, number]),
       value: oneOfType([string, number]),
       text: oneOfType([string, number]),
-      size: oneOfType([string, number])
+      size: oneOfType([string, number]),
     })
-  ).isRequired
+  ).isRequired,
 }
 
 ProgrammeDropdown.defaultProps = {
   value: [],
-  onClear: undefined
+  onClear: undefined,
 }
 
 export default ProgrammeDropdown

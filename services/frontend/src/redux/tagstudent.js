@@ -57,34 +57,34 @@ const reducer = (state = { data: [], success: false, created: false, pending: fa
       return {
         ...state,
         pending: true,
-        error: null
+        error: null,
       }
     case 'GET_STUDENT_TAGS_SUCCESS':
       return {
         ...state,
         pending: false,
         data: action.response || {},
-        error: null
+        error: null,
       }
     case 'GET_STUDENT_TAGS_FAILURE':
       return {
         ...state,
         pending: false,
-        error: null
+        error: null,
       }
     case 'GET_STUDENT_TAGS_BY_ST_ATTEMPT':
       return {
         ...state,
         pending: true,
         success: false,
-        error: null
+        error: null,
       }
     case 'GET_STUDENT_TAGS_BY_ST_FAILURE':
       return {
         ...state,
         pending: false,
         success: false,
-        error: null
+        error: null,
       }
     case 'GET_STUDENT_TAGS_BY_ST_SUCCESS':
       return {
@@ -92,40 +92,40 @@ const reducer = (state = { data: [], success: false, created: false, pending: fa
         pending: false,
         data: action.response || [],
         success: true,
-        error: null
+        error: null,
       }
     case 'GET_STUDENT_TAG_BY_SN_ATTEMPT':
       return {
         ...state,
         pending: true,
-        error: null
+        error: null,
       }
     case 'GET_STUDENT_TAG_BY_SN_FAILURE':
       return {
         ...state,
         pending: false,
-        error: null
+        error: null,
       }
     case 'GET_STUDENT_TAG_BY_SN_SUCCESS':
       return {
         ...state,
         pending: false,
         data: action.response || [],
-        error: null
+        error: null,
       }
     case 'CREATE_STUDENT_TAG_ATTEMPT':
       return {
         ...state,
         pending: true,
         success: false,
-        error: null
+        error: null,
       }
     case 'CREATE_STUDENT_TAG_FAILURE':
       return {
         ...state,
         pending: false,
         success: false,
-        error: null
+        error: null,
       }
     case 'CREATE_STUDENT_TAG_SUCCESS':
       return {
@@ -133,21 +133,21 @@ const reducer = (state = { data: [], success: false, created: false, pending: fa
         pending: false,
         success: true,
         data: action.response,
-        error: null
+        error: null,
       }
     case 'DELETE_STUDENT_TAG_ATTEMPT':
       return {
         ...state,
         success: false,
         pending: true,
-        error: null
+        error: null,
       }
     case 'DELETE_STUDENT_TAG_FAILURE':
       return {
         ...state,
         success: false,
         pending: false,
-        error: null
+        error: null,
       }
     case 'DELETE_STUDENT_TAG_SUCCESS':
       return {
@@ -155,21 +155,21 @@ const reducer = (state = { data: [], success: false, created: false, pending: fa
         pending: false,
         success: true,
         data: action.response,
-        error: null
+        error: null,
       }
     case 'DELETE_MULTIPLE_TAGS_ATTEMPT':
       return {
         ...state,
         pending: true,
         success: false,
-        error: null
+        error: null,
       }
     case 'DELETE_MULTIPLE_TAGS_FAILURE':
       return {
         ...state,
         pending: false,
         success: false,
-        error: action.response.response.data.error
+        error: action.response.response.data.error,
       }
     case 'DELETE_MULTIPLE_TAGS_SUCCESS':
       return {
@@ -177,21 +177,21 @@ const reducer = (state = { data: [], success: false, created: false, pending: fa
         pending: false,
         success: true,
         error: null,
-        data: action.response
+        data: action.response,
       }
     case 'CREATE_MULTIPLE_TAGS_ATTEMPT':
       return {
         ...state,
         pending: true,
         success: false,
-        error: null
+        error: null,
       }
     case 'CREATE_MULTIPLE_TAGS_FAILURE':
       return {
         ...state,
         pending: false,
         success: false,
-        error: action.response.response.data.error
+        error: action.response.response.data.error,
       }
     case 'CREATE_MULTIPLE_TAGS_SUCCESS':
       return {
@@ -199,7 +199,7 @@ const reducer = (state = { data: [], success: false, created: false, pending: fa
         pending: false,
         success: true,
         data: action.response,
-        error: null
+        error: null,
       }
     default:
       return state

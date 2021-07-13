@@ -23,11 +23,11 @@ SortableHeaderCell.propTypes = {
   activeSortColumn: string.isRequired,
   reversed: bool.isRequired,
   onClickFn: func.isRequired,
-  rowSpan: number
+  rowSpan: number,
 }
 
 SortableHeaderCell.defaultProps = {
-  rowSpan: 1
+  rowSpan: 1,
 }
 
 export default SortableHeaderCell

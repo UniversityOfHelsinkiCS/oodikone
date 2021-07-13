@@ -12,7 +12,7 @@ const verticalTitle = title => {
 
 const DIRECTIONS = {
   ASC: 'ascending',
-  DESC: 'descending'
+  DESC: 'descending',
 }
 
 const FlippedCourseTable = ({
@@ -22,7 +22,7 @@ const FlippedCourseTable = ({
   data,
   tableProps,
   getRowKey,
-  chunkifyBy
+  chunkifyBy,
 }) => {
   const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
   const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
@@ -104,7 +104,7 @@ FlippedCourseTable.propTypes = {
       getCellProps: func,
       cellProps: shape({}),
       group: bool,
-      children: arrayOf()
+      children: arrayOf(),
     })
   ).isRequired,
   data: arrayOf(shape({})).isRequired,
@@ -112,7 +112,7 @@ FlippedCourseTable.propTypes = {
   defaultsortkey: string,
   collapsingHeaders: bool,
   showNames: bool,
-  chunkifyBy: string
+  chunkifyBy: string,
 }
 
 FlippedCourseTable.defaultProps = {
@@ -122,7 +122,7 @@ FlippedCourseTable.defaultProps = {
   defaultsortkey: null,
   collapsingHeaders: false,
   showNames: undefined,
-  chunkifyBy: undefined
+  chunkifyBy: undefined,
 }
 
 export default FlippedCourseTable

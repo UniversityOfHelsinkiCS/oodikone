@@ -16,21 +16,21 @@ const reducer = (state = { data: [], enabledOnly: true, success: false, pending:
         ...state,
         success: false,
         pending: true,
-        error: false
+        error: false,
       }
     case 'SEND_FEEDBACK_SUCCESS':
       return {
         ...state,
         success: true,
         pending: false,
-        error: false
+        error: false,
       }
     case 'SEND_FEEDBACK_FAILURE':
       return {
         ...state,
         success: false,
         pending: false,
-        error: true
+        error: true,
       }
     default:
       return state

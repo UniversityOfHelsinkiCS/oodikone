@@ -41,7 +41,7 @@ const PresentStudents = () => {
     const mergeData = year => {
       mergedData[minYear !== maxYear ? `${minYear}-${maxYear}` : `${maxYear}`] = {
         endYear: year,
-        students: flatten([...studentAccumulator])
+        students: flatten([...studentAccumulator]),
       }
       resetVariablesTo(year)
     }
@@ -66,7 +66,7 @@ const PresentStudents = () => {
       mergedData.Total = {
         endYear: -Infinity,
         students: entries.reduce((acc, [, students]) => acc.concat(...students), []),
-        bold: true
+        bold: true,
       }
     }
 

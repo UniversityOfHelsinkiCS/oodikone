@@ -35,7 +35,7 @@ const NavTile = ({ to, title, imageSrc }) => {
 NavTile.propTypes = {
   to: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  imageSrc: PropTypes.string.isRequired
+  imageSrc: PropTypes.string.isRequired,
 }
 
 const NavTiles = ({ children }) => {
@@ -43,7 +43,7 @@ const NavTiles = ({ children }) => {
 }
 
 NavTiles.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 }
 
 const baseURI = '/trends'

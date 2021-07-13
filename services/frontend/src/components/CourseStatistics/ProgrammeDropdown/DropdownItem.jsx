@@ -6,14 +6,14 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   text: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   students: {
-    flexGrow: 0
-  }
+    flexGrow: 0,
+  },
 }
 
 const DropdownItem = ({ name, code, size, description }) =>
@@ -46,13 +46,13 @@ const DropdownItem = ({ name, code, size, description }) =>
   )
 
 DropdownItem.defaultProps = {
-  description: ''
+  description: '',
 }
 DropdownItem.propTypes = {
   name: string.isRequired,
   code: string.isRequired,
   size: oneOfType([number, string]).isRequired,
-  description: string
+  description: string,
 }
 
 export default DropdownItem

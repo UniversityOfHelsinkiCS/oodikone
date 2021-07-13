@@ -25,7 +25,7 @@ const TeacherStatisticsTable = ({ statistics, onClickFn, getCourseStats, unifyOp
   const sortStatistics = statistics => {
     const formatted = statistics.map(stat => ({
       ...stat,
-      passrate: calculatePassrate(stat.passed, stat.failed)
+      passrate: calculatePassrate(stat.passed, stat.failed),
     }))
     const sorted = sortBy(formatted, selected)
     return direction === 'ascending' ? sorted : sorted.reverse()
@@ -34,7 +34,7 @@ const TeacherStatisticsTable = ({ statistics, onClickFn, getCourseStats, unifyOp
   const roundStatisticCredits = statistics =>
     statistics.map(s => ({
       ...s,
-      credits: s.credits.toFixed(2)
+      credits: s.credits.toFixed(2),
     }))
 
   const sortDirection = name => (selected === name ? direction : null)
@@ -97,13 +97,13 @@ TeacherStatisticsTable.propTypes = {
       transferred: number,
       credits: any,
       failed: number,
-      passed: number
+      passed: number,
     })
   ).isRequired,
   onClickFn: func.isRequired,
   getCourseStats: func.isRequired,
   unifyOpenUniCourses: bool.isRequired,
-  renderLink: bool.isRequired
+  renderLink: bool.isRequired,
 }
 
 const mapStateToProps = state => {

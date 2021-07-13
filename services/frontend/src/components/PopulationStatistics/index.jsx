@@ -55,7 +55,7 @@ PopulationStatistics.propTypes = {
   isLoading: bool.isRequired,
   selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
-  students: arrayOf(any).isRequired
+  students: arrayOf(any).isRequired,
 }
 
 const mapStateToProps = state => {
@@ -89,7 +89,7 @@ const mapStateToProps = state => {
     selectedStudentsByYear,
     samples,
     isLoading: populations.pending === true,
-    students: populations.data.students || []
+    students: populations.data.students || [],
   }
 }
 
