@@ -82,7 +82,6 @@ module.exports = (env, args) => {
         },
         'process.env': {
           NODE_ENV: JSON.stringify(mode),
-          ANALYTICS_ADMINER_URL: JSON.stringify(process.env.ANALYTICS_ADMINER_URL),
           USER_ADMINER_URL: JSON.stringify(process.env.USER_ADMINER_URL),
           ADMINER_URL: JSON.stringify(process.env.ADMINER_URL),
           KONE_ADMINER_URL: JSON.stringify(process.env.KONE_ADMINER_URL),
