@@ -1,25 +1,13 @@
 {
-  "name": "oodikone2-userservice",
-  "version": "1.0.0",
-  "description": "",
+  "name": "userservice",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
     "lint": "eslint .",
     "lintfix": "prettier --write '**/*.{js,json}' && eslint --fix .",
-    "test": "jest"
+    "test": "jest --verbose --runInBand --silent=false"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice.git"
-  },
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice/issues"
-  },
-  "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone2-userservice#readme",
   "dependencies": {
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
