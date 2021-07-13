@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const { NODE_ENV } = process.env
 const isTest = process.env.NODE_ENV === 'test'
 let DB_URL = process.env.DB_URL
@@ -32,7 +30,6 @@ const KEY_PATH = process.env.KEY_PATH // production/staging only
 const USERSERVICE_URL = process.env.USERSERVICE_URL
 const UPDATER_URL = process.env.UPDATER_URL
 const SIS_UPDATER_URL = process.env.SIS_UPDATER_URL
-const ANALYTICS_URL = process.env.ANALYTICS_URL
 const PORT = isTest ? 8079 : 8080
 const OODI_SECRET = process.env.OODI_SECRET
 const ANALYTICS_INFLUXDB_URL = process.env.ANALYTICS_INFLUXDB_URL
@@ -98,7 +95,6 @@ module.exports = {
   USERSERVICE_URL: formatURL(USERSERVICE_URL),
   ACCESS_TOKEN_HEADER_KEY,
   PORT,
-  ANALYTICS_URL: formatURL(ANALYTICS_URL),
   requiredGroup,
   OODI_SECRET,
   OODI_SECRET_HEADER_KEY,

@@ -54,7 +54,7 @@ export default () => {
               name="radioGroup"
               checked={value === null}
               onChange={toggle(null)}
-              // data-cy={`${name}-have`}
+              data-cy={`${name}-all`}
             />
             <Radio
               label="Transferred"

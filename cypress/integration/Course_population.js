@@ -20,9 +20,9 @@ describe("Course population tests", () => {
     cy.get(":nth-child(3) > :nth-child(1) > div > .item > .level").click();
     cy.contains("Population of course Käyttöjärjestelmät 2019-2020");
     cy.contains("TKT20003");
-    cy.contains("Students (all=24)");
+    // cy.contains("Students (all=24)");
 
-    cy.contains("Students (24)").click();
+    cy.contains("Students (127)").click();
     cy.contains("010135486");
     cy.contains("010431753");
   });

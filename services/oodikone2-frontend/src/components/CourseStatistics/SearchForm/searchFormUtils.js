@@ -1,26 +1,10 @@
 import { orderBy } from 'lodash'
 
-const fixGroups = groupsArgs => {
-  const notAvoin = new Set()
-  const groups = {}
+// handle special case where the course's actual code starts with "A" so it is mistakenly taken as Open Uni course
+const isAvoin = code => !!code.match(/^[A][0-9]|^AY/)
 
-  Object.entries(groupsArgs).forEach(([code, parentCode]) => {
-    groups[code] = parentCode
-
-    // handle special case where the course's actual code starts with "A" so it is mistakenly taken as Open Uni course
-    if (groupsArgs[`AY${code}`] && code.startsWith('A')) {
-      groups[code] = code
-      notAvoin.add(code)
-    }
-  })
-
-  return { groups, notAvoin }
-}
-
-const isAvoin = code => !!code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
-
-const sortAlternatives = alternatives =>
-  orderBy(
+const sortAlternatives = alternatives => {
+  const result = orderBy(
     alternatives,
     [
       a => {
@@ -35,57 +19,51 @@ const sortAlternatives = alternatives =>
     ['asc', 'desc', 'desc']
   )
 
+  return result
+}
+
 // If special case of Open Uni course that starts with A let's just sort them length, that
 // should be good enough in this case.
-const getAlternatives = (course, notAvoin) =>
-  course.alternatives.some(c => notAvoin.has(c.code))
-    ? course.alternatives.sort((a, b) => a.code.length - b.code.length)
-    : sortAlternatives(course.alternatives)
+const getAlternatives = course => sortAlternatives(course.alternatives)
 
-const filterCourseSearchResults = (groupsArgs, courses, groupMeta, unifyOpenUniCourses = false) => {
+const filterCourseSearchResults = (courses, unifyOpenUniCourses) => {
   const mergedCourses = {}
+  const sortedCourses = sortAlternatives(courses)
+  sortedCourses.forEach(course => {
+    const groupId = isAvoin(course.code) && !unifyOpenUniCourses ? course.code : course.subsId
 
-  const { groups, notAvoin } = fixGroups(groupsArgs)
+    if (!(course.max_attainment_date && course.min_attainment_date)) {
+      return
+    }
 
-  courses
-    // Sort the codes so that we know non-Open Uni courses come up first
-    .sort((a, b) => a.code.length - b.code.length)
-    .forEach(course => {
-      const groupId =
-        isAvoin(course.code) && !notAvoin.has(course.code) && !unifyOpenUniCourses ? course.code : groups[course.code]
-
-      // Don't show courses without attainments
-      if (!(course.max_attainment_date && course.min_attainment_date)) {
-        return
+    if (!mergedCourses[groupId]) {
+      mergedCourses[groupId] = {
+        ...course,
+        alternatives: [{ code: course.code, latestInstanceDate: new Date(course.latest_instance_date) }],
+        min_attainment_date: new Date(course.min_attainment_date),
+        max_attainment_date: new Date(course.max_attainment_date)
       }
+    } else {
+      const mergedCourse = mergedCourses[groupId]
+      mergedCourse.min_attainment_date = new Date(
+        Math.min(mergedCourse.min_attainment_date, new Date(course.min_attainment_date))
+      )
+      mergedCourse.max_attainment_date = new Date(
+        Math.max(mergedCourse.max_attainment_date, new Date(course.max_attainment_date))
+      )
+      mergedCourse.alternatives.push({
+        code: course.code,
+        latestInstanceDate: new Date(course.latest_instance_date)
+      })
+    }
+  })
 
-      if (!mergedCourses[groupId]) {
-        mergedCourses[groupId] = {
-          ...course,
-          code: (groupMeta[groupId] && groupMeta[groupId].code) || course.code,
-          name: (groupMeta[groupId] && groupMeta[groupId].name) || course.name,
-          alternatives: [{ code: course.code, latestInstanceDate: new Date(course.latest_instance_date) }],
-          min_attainment_date: new Date(course.min_attainment_date),
-          max_attainment_date: new Date(course.max_attainment_date)
-        }
-      } else {
-        const mergedCourse = mergedCourses[groupId]
-        mergedCourse.min_attainment_date = new Date(
-          Math.min(mergedCourse.min_attainment_date, new Date(course.min_attainment_date))
-        )
-        mergedCourse.max_attainment_date = new Date(
-          Math.max(mergedCourse.max_attainment_date, new Date(course.max_attainment_date))
-        )
-        mergedCourse.alternatives.push({
-          code: course.code,
-          latestInstanceDate: new Date(course.latest_instance_date)
-        })
-      }
-    })
-
-  return Object.values(mergedCourses).map(course => ({
+  const result = Object.values(mergedCourses).map(course => ({
     ...course,
-    alternatives: getAlternatives(course, notAvoin)
+    alternatives: getAlternatives(course)
   }))
+
+  return result
 }
+
 export default filterCourseSearchResults

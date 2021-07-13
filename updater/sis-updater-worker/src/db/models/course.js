@@ -43,7 +43,10 @@ Course.init(
     updatedAt: {
       field: 'updated_at',
       type: DATE
-    }
+    },
+    substitutions: {
+      type: JSONB
+    },
   },
   {
     underscored: false,

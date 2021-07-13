@@ -17,21 +17,6 @@ on:
 jobs:
   # === Static tests / linting ===
 
-  lint_analytics:
-    name: "Lint analytics"
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/oodikone2-analytics
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14
-      - name: Install dependencies
-        run: npm ci
-      - name: Run linter
-        run: npm run lint
   lint_backend:
     name: "Lint backend"
     runs-on: ubuntu-latest
@@ -80,25 +65,6 @@ jobs:
 
   # === Build images ===
 
-  build_analytics:
-    name: "Build analytics"
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Pull previous build from Docker hub
-        run: ./run.sh oodikone ci pull analytics
-      - name: Build  image
-        run: ./run.sh oodikone ci build analytics
-      - name: Save built image
-        run: docker save toska/oodikone2-analytics:trunk -o /tmp/analytics.tar
-      - name: Upload image for other jobs
-        uses: actions/upload-artifact@v2
-        with:
-          path: /tmp/analytics.tar
   build_backend:
     name: "Build backend"
     runs-on: ubuntu-latest
@@ -172,7 +138,6 @@ jobs:
   test_course_population:
     name: "Test course population"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -189,7 +154,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -218,7 +182,6 @@ jobs:
   test_course_statistics:
     name: "Test course statistics"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -235,7 +198,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -264,7 +226,6 @@ jobs:
   test_custom_population:
     name: "Test custom population"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -281,7 +242,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -310,7 +270,6 @@ jobs:
   test_population_statistics:
     name: "Test population statistics"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -327,7 +286,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -356,7 +314,6 @@ jobs:
   test_filters:
     name: "Test filters"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -373,7 +330,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -402,7 +358,6 @@ jobs:
   test_student_statistics:
     name: "Test student statistics"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -419,7 +374,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -448,7 +402,6 @@ jobs:
   test_studyprogramme_overview:
     name: "Test studyprogramme overview"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -465,7 +418,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -494,7 +446,6 @@ jobs:
   test_teachers_and_users:
     name: "Test teachers and users"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -511,7 +462,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -545,7 +495,6 @@ jobs:
   test_service_exit_statuses:
     name: "Check services run correctly"
     needs:
-      - build_analytics
       - build_backend
       - build_frontend
       - build_userservice
@@ -562,7 +511,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -585,7 +533,6 @@ jobs:
   push_to_dockerhub:
     name: "Push images to docker hub for caching"
     needs:
-    - lint_analytics
     - lint_backend
     - lint_frontend
     - lint_userservice
@@ -612,7 +559,6 @@ jobs:
           path: /tmp/
       - name: Load built images
         run: |
-          docker load --input /tmp/artifact/analytics.tar
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
@@ -628,7 +574,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Report test failure to oodikone notifications
     needs:
-    - lint_analytics
     - lint_backend
     - lint_frontend
     - lint_userservice

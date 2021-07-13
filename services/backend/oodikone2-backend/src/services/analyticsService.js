@@ -1,7 +1,6 @@
 const axios = require('axios')
-const { ANALYTICS_URL } = require('../conf-backend')
 
-const client = axios.create({ baseURL: ANALYTICS_URL })
+const client = axios.create({ baseURL: '' }) // NOT USED ANYMORE MUAHAHAHA, delete when deleting other oodi-related functions and modules
 
 const ping = async () => {
   const response = await client.get('/ping')
