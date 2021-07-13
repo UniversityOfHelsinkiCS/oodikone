@@ -5,12 +5,12 @@ const facultyProgrammeService = require('./facultyprogrammes')
 const facultyprogrammes = [
   {
     faculty_code: 'H10',
-    programme_code: 'MH10_001'
+    programme_code: 'MH10_001',
   },
   {
     faculty_code: 'H50',
-    programme_code: 'MH50_003'
-  }
+    programme_code: 'MH50_003',
+  },
 ]
 
 beforeAll(async () => {

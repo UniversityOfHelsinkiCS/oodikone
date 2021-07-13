@@ -6,15 +6,15 @@ const UserElementDetails = sequelize.define(
   {
     userId: {
       primaryKey: true,
-      type: Sequelize.BIGINT
+      type: Sequelize.BIGINT,
     },
     elementDetailCode: {
       primaryKey: true,
-      type: Sequelize.STRING
-    }
+      type: Sequelize.STRING,
+    },
   },
   {
-    tablename: 'user_elementdetails'
+    tablename: 'user_elementdetails',
   }
 )
 
@@ -22,21 +22,21 @@ const AccessGroup = sequelize.define('access_group', {
   id: {
     primaryKey: true,
     type: Sequelize.BIGINT,
-    autoIncrement: true
+    autoIncrement: true,
   },
   group_code: {
     type: Sequelize.STRING,
-    unique: true
+    unique: true,
   },
   group_info: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   createdAt: {
-    type: Sequelize.DATE
+    type: Sequelize.DATE,
   },
   updatedAt: {
-    type: Sequelize.DATE
-  }
+    type: Sequelize.DATE,
+  },
 })
 
 const UserFaculties = sequelize.define('user_faculties', {
@@ -45,35 +45,35 @@ const UserFaculties = sequelize.define('user_faculties', {
     type: Sequelize.BIGINT,
     references: {
       model: 'users',
-      key: 'id'
-    }
+      key: 'id',
+    },
   },
   faculty_code: {
     primaryKey: true,
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   createdAt: {
-    type: Sequelize.DATE
+    type: Sequelize.DATE,
   },
   updatedAt: {
-    type: Sequelize.DATE
-  }
+    type: Sequelize.DATE,
+  },
 })
 const FacultyProgrammes = sequelize.define('faculty_programmes', {
   faculty_code: {
     primaryKey: true,
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   programme_code: {
     primaryKey: true,
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   createdAt: {
-    type: Sequelize.DATE
+    type: Sequelize.DATE,
   },
   updatedAt: {
-    type: Sequelize.DATE
-  }
+    type: Sequelize.DATE,
+  },
 })
 
 const User = sequelize.define(
@@ -82,55 +82,55 @@ const User = sequelize.define(
     id: {
       primaryKey: true,
       type: Sequelize.BIGINT,
-      autoIncrement: true
+      autoIncrement: true,
     },
     full_name: { type: Sequelize.STRING },
     username: {
       type: Sequelize.STRING,
-      unique: true
+      unique: true,
     },
     email: { type: Sequelize.STRING },
-    language: { type: Sequelize.STRING }
+    language: { type: Sequelize.STRING },
   },
   {
     tableName: 'users',
-    timestamps: false
+    timestamps: false,
   }
 )
 const HyGroup = sequelize.define('hy_group', {
   id: {
     primaryKey: true,
     type: Sequelize.BIGINT,
-    autoIncrement: true
+    autoIncrement: true,
   },
 
   code: { type: Sequelize.STRING },
 
   createdAt: {
-    type: Sequelize.DATE
+    type: Sequelize.DATE,
   },
 
   updatedAt: {
-    type: Sequelize.DATE
-  }
+    type: Sequelize.DATE,
+  },
 })
 
 const Affiliation = sequelize.define('affiliations', {
   id: {
     primaryKey: true,
     type: Sequelize.BIGINT,
-    autoIncrement: true
+    autoIncrement: true,
   },
 
   code: { type: Sequelize.STRING },
 
   createdAt: {
-    type: Sequelize.DATE
+    type: Sequelize.DATE,
   },
 
   updatedAt: {
-    type: Sequelize.DATE
-  }
+    type: Sequelize.DATE,
+  },
 })
 
 const Migration = sequelize.define(
@@ -138,12 +138,12 @@ const Migration = sequelize.define(
   {
     name: {
       type: Sequelize.STRING,
-      primaryKey: true
-    }
+      primaryKey: true,
+    },
   },
   {
     tablename: 'migrations',
-    timestamps: false
+    timestamps: false,
   }
 )
 
@@ -152,7 +152,7 @@ UserElementDetails.belongsTo(User)
 
 User.belongsToMany(AccessGroup, {
   through: 'user_accessgroup',
-  as: 'accessgroup'
+  as: 'accessgroup',
 })
 AccessGroup.belongsToMany(User, { through: 'user_accessgroup' })
 
@@ -161,7 +161,7 @@ HyGroup.belongsToMany(User, { through: 'user_hy_group' })
 
 User.belongsToMany(Affiliation, {
   through: 'user_affiliation',
-  as: 'affiliation'
+  as: 'affiliation',
 })
 Affiliation.belongsToMany(User, { through: 'user_affiliation' })
 
@@ -169,7 +169,7 @@ User.hasMany(UserFaculties, { as: 'faculty', foreignKey: 'userId' })
 UserFaculties.hasMany(FacultyProgrammes, {
   as: 'programme',
   foreignKey: 'faculty_code',
-  sourceKey: 'faculty_code'
+  sourceKey: 'faculty_code',
 })
 
 module.exports = {
@@ -181,5 +181,5 @@ module.exports = {
   Affiliation,
   UserFaculties,
   FacultyProgrammes,
-  sequelize
+  sequelize,
 }

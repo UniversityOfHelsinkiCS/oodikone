@@ -240,5 +240,5 @@ SELECT pg_catalog.setval('users_id_seq', 331, true);
 --
 `
     ),
-  down: async () => {}
+  down: async () => {},
 }

@@ -9,9 +9,9 @@ const byCodes = codes =>
   Affiliation.findAll({
     where: {
       code: {
-        [Op.in]: codes
-      }
-    }
+        [Op.in]: codes,
+      },
+    },
   })
 
 const create = code => Affiliation.create({ code })

@@ -3,9 +3,9 @@ module.exports = {
     return queryInterface.bulkInsert('access_groups', [
       {
         group_code: 'cooldata',
-        group_info: 'grants access to cool data'
-      }
+        group_info: 'grants access to cool data',
+      },
     ])
   },
-  down: async () => {}
+  down: async () => {},
 }
