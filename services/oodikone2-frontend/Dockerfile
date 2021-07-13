@@ -19,9 +19,5 @@ ENV REACT_APP_SENTRY_RELEASE=$SENTRY_RELEASE
 
 COPY . /usr/src/app
 RUN if [ "${NODE_ENV}" != "development" ]; then \
-      export CHECKSUM="$(find . ! -path */node_modules/* -type f -exec md5sum {} \; | sort -k 2 | printf "$(cat - )\\nBASE_PATH ${BASE_PATH}" | md5sum | awk '{ print $1 }')" && \
-      export SENTRY_RELEASE_VERSION="${NODE_ENV}-${CHECKSUM}" && \
-      echo "${SENTRY_RELEASE_VERSION}" > /SENTRY_RELEASE_VERSION && \
-      SENTRY_RELEASE_VERSION="${SENTRY_RELEASE_VERSION}" npm run dist && \
-      npm install -g serve; \
+      npm run dist && npm install -g serve; \
     fi
