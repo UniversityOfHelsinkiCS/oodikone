@@ -3,7 +3,6 @@ const {
   Student,
   Credit,
   Course,
-  // CourseType,
   ElementDetail,
   StudyrightElement,
   Studyright,
@@ -155,7 +154,6 @@ const allCodeAltenatives = async code => {
   })
 
   const allSubstitutions = _.flatten(course.map(c => c.substitutions))
-  console.log('all substitutions: ', allSubstitutions)
 
   let subcodes = []
   if (allSubstitutions) {
@@ -261,7 +259,6 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
 }
 
 const maxYearsToCreatePopulationFrom = async coursecodes => {
-  console.log('max year course codes: ', coursecodes)
   const maxAttainmentDate = new Date(
     Math.max(
       ...(
