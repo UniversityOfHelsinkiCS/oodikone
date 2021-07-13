@@ -39,7 +39,6 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
     "concurrently": "^6.2.0",
     "cypress": "^7.7.0",
     "eslint": "^7.30.0",
@@ -47,5 +46,8 @@
     "eslint-plugin-prettier": "^3.4.0",
     "prettier": "^2.3.2",
     "zx": "^2.0.0"
+  },
+  "dependencies": {
+    "@babel/eslint-parser": "^7.14.7"
   }
 }
