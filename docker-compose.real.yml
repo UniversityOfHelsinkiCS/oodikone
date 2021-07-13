@@ -1,7 +1,4 @@
 services:
-  analytics:
-    environment:
-      DB_URL: postgres://postgres@analytics-db:5432/analytics-db-real
 
   backend:
     environment:

@@ -8,33 +8,6 @@ x-build_defaults: &build_defaults
     TAG: ${TAG}
 
 services:
-  analytics:
-    <<: *defaults
-    build:
-      <<: *build_defaults
-      cache_from:
-      - toska/oodikone2-userservice:trunk
-      - toska/oodikone2-userservice:staging
-      - toska/oodikone2-userservice:latest
-      context: services/oodikone2-analytics
-    container_name: analytics
-    depends_on:
-      - analytics-db
-    image: toska/oodikone2-analytics:${TAG}
-    environment:
-      DB_URL: postgres://postgres@analytics-db:5432/analytics-db
-    ports:
-      - "4568:4568"
-
-  analytics-db:
-    <<: *defaults
-    container_name: analytics-db
-    environment:
-      POSTGRES_DB: analytics-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:9.6.3
-    ports:
-      - "5423:5432"
 
   backend:
     <<: *defaults
