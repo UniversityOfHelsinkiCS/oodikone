@@ -14,14 +14,14 @@
     "both:real": "./run.sh both real up --detach && ./run.sh both logs --follow --tail 100",
     "docker:down": "./run.sh both down --remove-orphans",
     "lint:backend": "eslint services/backend",
-    "linttest:frontend": "npm run lint --prefix services/oodikone2-frontend",
+    "lint:frontend": "concurrently 'eslint --ext .jsx,.js services/frontend' 'npm run stylelint --prefix services/frontend'",
     "lint:userservice": "eslint services/userservice",
-    "linttest:other": "zx ./scripts/lint-other.mjs",
     "lint": "concurrently 'npm run lint:*'",
     "lintfix:backend": "prettier --write services/backend/**/*.{js,json} && eslint --fix services/backend",
-    "lintfixtest:frontend": "npm run lintfix --prefix services/oodikone2-frontend",
+    "lintfix:frontend": "eslint --ext .jsx,.js --fix services/frontend && npm run stylelint:fix --prefix services/frontend",
     "lintfix:userservice": "prettier --write services/userservice/**/*.{js,json} && eslint --fix services/userservice",
     "lintfix": "concurrently 'npm run lintfix:*'",
+    "linttest:other": "zx ./scripts/lint-other.mjs",
     "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
     "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",
@@ -39,15 +39,20 @@
   },
   "homepage": "https://github.com/UniversityOfHelsinkiCS/oodikone#readme",
   "devDependencies": {
+    "@babel/eslint-parser": "^7.14.7",
+    "@babel/plugin-syntax-jsx": "^7.14.5",
     "concurrently": "^6.2.0",
     "cypress": "^7.7.0",
     "eslint": "^7.30.0",
+    "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-prefer-object-spread": "^1.2.1",
     "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "prettier": "^2.3.2",
     "zx": "^2.0.0"
-  },
-  "dependencies": {
-    "@babel/eslint-parser": "^7.14.7"
   }
 }
