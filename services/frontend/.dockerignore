@@ -1,3 +1,5 @@
 .dockerignore
+.gitignore
 Dockerfile
+build/
 node_modules/
