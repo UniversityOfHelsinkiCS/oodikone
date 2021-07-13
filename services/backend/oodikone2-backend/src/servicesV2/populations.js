@@ -20,7 +20,7 @@ const {
   dbConnections: { sequelize }
 } = require('../databaseV2/connection')
 const { Tag, TagStudent } = require('../models/models_kone')
-const { getCodeToMainCourseMap, unifyOpenUniversity } = require('./courses')
+const { allCodeAltenatives, findOneByCode } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
@@ -813,12 +813,6 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   return formattedStudents
 }
 
-const getMainCourse = (course, codeduplicates) => {
-  const formattedcode = unifyOpenUniversity(course.code)
-  const maincourse = codeduplicates[formattedcode]
-  return maincourse || course
-}
-
 const findCourses = async (studentnumbers, beforeDate) => {
   const res = await Course.findAll({
     attributes: ['code', 'name', 'coursetypecode'],
@@ -932,6 +926,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         numbers[num] = true
         return numbers
       }, {})
+
       const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
       return [allstudents, courses]
     } else {
@@ -944,9 +939,8 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     }
   }
   const params = parseQueryParams(query)
-  const [[allstudents, courses], codeToMainCourse, error] = await Promise.all([
+  const [[allstudents, courses], error] = await Promise.all([
     getStudentsAndCourses(query.selectedStudents, studentnumberlist),
-    getCodeToMainCourseMap(),
     isValidRequest(query, params)
   ])
   if (error) return error
@@ -960,20 +954,24 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const startYear = parseInt(query.year, 10)
   const allstudentslength = Object.keys(allstudents).length
-  courses.forEach(course => {
-    let { /* disciplines,  */ course_type } = course
-    const maincourse = getMainCourse(course, codeToMainCourse)
+
+  for (const course of courses) {
+    let { course_type } = course
+    const substitutions = allCodeAltenatives(course.code)
+    let maincourse = course
+
+    if (course.code !== substitutions[0]) {
+      maincourse = await findOneByCode(course.code)
+    }
+
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
     }
+
     const coursestats = stats[maincourse.code]
 
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
-    /* disciplines.forEach(({ discipline_id, name }) => {
-      coursestats.addCourseDiscipline(discipline_id, name)
-      bottlenecks.disciplines[discipline_id] = name
-    }) */
 
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
@@ -981,7 +979,8 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
     stats[maincourse.code] = coursestats
-  })
+  }
+
   bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.allStudents = allstudentslength
   return bottlenecks

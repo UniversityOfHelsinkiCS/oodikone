@@ -3,7 +3,6 @@ const {
   Student,
   Credit,
   Course,
-  // CourseType,
   ElementDetail,
   StudyrightElement,
   Studyright,
@@ -50,6 +49,15 @@ const byName = (name, language) =>
   })
 
 const byCode = code => Course.findByPk(code)
+
+const findOneByCode = code => {
+  return Course.findOne({
+    attributes: ['id', 'code', 'name'],
+    where: {
+      code: code
+    }
+  })
+}
 
 const creditsForCourses = async (codes, anonymizationSalt) => {
   const credits = await Credit.findAll({
@@ -146,7 +154,6 @@ const allCodeAltenatives = async code => {
   })
 
   const allSubstitutions = _.flatten(course.map(c => c.substitutions))
-  console.log('all substitutions: ', allSubstitutions)
 
   let subcodes = []
   if (allSubstitutions) {
@@ -252,7 +259,6 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
 }
 
 const maxYearsToCreatePopulationFrom = async coursecodes => {
-  console.log('max year course codes: ', coursecodes)
   const maxAttainmentDate = new Date(
     Math.max(
       ...(
@@ -406,5 +412,7 @@ module.exports = {
   byNameAndOrCodeLike,
   byCodes,
   maxYearsToCreatePopulationFrom,
-  unifyOpenUniversity
+  unifyOpenUniversity,
+  allCodeAltenatives,
+  findOneByCode
 }
