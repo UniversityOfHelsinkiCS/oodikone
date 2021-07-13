@@ -9,6 +9,7 @@
     "history": "^4.10.1",
     "jStat": "^1.8.6",
     "jwt-decode": "^3.1.2",
+    "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "piwik-react-router": "^0.12.1",
     "prop-types": "^15.7.2",
@@ -24,6 +25,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-scroll-to-component": "^1.0.2",
+    "redux": "^4.1.0",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
     "semantic-ui-css": "^2.4.1",
@@ -34,7 +36,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "stylelint": "stylelint 'src/**/*.css'",
+    "stylelint:fix": "stylelint --fix 'src/**/*.css'"
   },
   "browserslist": {
     "production": [
@@ -48,5 +52,11 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://backend:8080"
+  "proxy": "http://backend:8080",
+  "devDependencies": {
+    "stylelint": "^13.13.1",
+    "stylelint-config-prettier": "^8.0.2",
+    "stylelint-config-standard": "^22.0.0",
+    "stylelint-prettier": "^1.2.0"
+  }
 }
