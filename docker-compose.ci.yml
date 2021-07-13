@@ -26,7 +26,6 @@ services:
       - redis
       - sis-db
     environment:
-      ANALYTICS_URL: http://analytics:4568
       DB_URL: postgres://postgres@oodi-db:5432/oodi-db
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:1337
@@ -121,7 +120,6 @@ services:
       - frontend
       - backend
       - userservice
-      - analytics
     ports:
       -  1337:80
     volumes:
