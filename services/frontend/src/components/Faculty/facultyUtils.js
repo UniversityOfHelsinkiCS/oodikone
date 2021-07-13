@@ -3,7 +3,7 @@ export const calculateStatsForProgramme = (stats, fromYear, toYear) => {
     totalStudentCredits: 0,
     totalCoursesPassed: 0,
     totalCoursesFailed: 0,
-    totalStudents: []
+    totalStudents: [],
   }
 
   Object.entries(stats)

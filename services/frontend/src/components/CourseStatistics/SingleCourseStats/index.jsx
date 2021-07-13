@@ -9,7 +9,7 @@ import ResultTabs from '../ResultTabs'
 import {
   setSelectedCourse,
   clearSelectedCourse,
-  getMaxYearsToCreatePopulationFrom
+  getMaxYearsToCreatePopulationFrom,
 } from '../../../redux/singleCourseStats'
 import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
@@ -28,7 +28,7 @@ const countFilteredStudents = (stat, filter) =>
     const [category, students] = entry
     return {
       ...acc,
-      [category]: students.filter(filter).length
+      [category]: students.filter(filter).length,
     }
   }, {})
 
@@ -45,7 +45,7 @@ const SingleCourseStats = ({
   programmes,
   maxYearsToCreatePopulationFrom,
   getMaxYearsToCreatePopulationFrom,
-  userHasAccessToAllStats
+  userHasAccessToAllStats,
 }) => {
   const { language } = useLanguage()
   const [primary, setPrimary] = useState([ALL.value])
@@ -57,7 +57,7 @@ const SingleCourseStats = ({
   const parseQueryFromUrl = () => {
     const { separate } = qs.parse(location.search)
     return {
-      separate: JSON.parse(separate)
+      separate: JSON.parse(separate),
     }
   }
 
@@ -68,7 +68,7 @@ const SingleCourseStats = ({
       setSeparate(separate)
     }
     getMaxYearsToCreatePopulationFrom({
-      courseCodes: JSON.stringify(stats.alternatives)
+      courseCodes: JSON.stringify(stats.alternatives),
     })
     setSelectedCourse(coursecode)
 
@@ -135,13 +135,13 @@ const SingleCourseStats = ({
     if (from == null || to == null) {
       return {
         filteredYears: years,
-        filteredSemesters: semesters
+        filteredSemesters: semesters,
       }
     }
     const timeFilter = ({ value }) => value >= from && value <= to
     return {
       filteredYears: years.filter(timeFilter),
-      filteredSemesters: semesters.filter(timeFilter)
+      filteredSemesters: semesters.filter(timeFilter),
     }
   }
 
@@ -166,7 +166,7 @@ const SingleCourseStats = ({
     return {
       grades,
       categories,
-      passRate
+      passRate,
     }
   }
 
@@ -182,7 +182,7 @@ const SingleCourseStats = ({
       categories,
       passRate,
       failRate,
-      total
+      total,
     }
   }
 
@@ -202,7 +202,7 @@ const SingleCourseStats = ({
           students,
           coursecode,
           rowObfuscated: obfuscated,
-          userHasAccessToAllStats
+          userHasAccessToAllStats,
         }
       })
 
@@ -213,7 +213,7 @@ const SingleCourseStats = ({
       name,
       stats: formattedStats.concat(totals),
       userHasAccessToAllStats,
-      totals
+      totals,
     }
   }
 
@@ -268,7 +268,7 @@ const SingleCourseStats = ({
       : undefined
     return {
       primary: pstats || undefined,
-      comparison: cstats || undefined
+      comparison: cstats || undefined,
     }
   }
 
@@ -289,7 +289,7 @@ const SingleCourseStats = ({
         students: uniqueExcludedStudents,
         description: 'All students that are not in primary group selection',
         text: 'Excluded',
-        value: 'EXCLUDED'
+        value: 'EXCLUDED',
       })
     }
     return result.filter(({ key }) => !comparison.includes('EXCLUDED') || !excludedProgrammes.includes(key))
@@ -400,7 +400,7 @@ SingleCourseStats.propTypes = {
     programmes: objectOf(
       shape({
         name: shape({}),
-        students: shape({})
+        students: shape({}),
       })
     ),
     statistics: arrayOf(
@@ -410,13 +410,13 @@ SingleCourseStats.propTypes = {
         attempts: objectOf(
           shape({
             failed: arrayOf(string),
-            passed: arrayOf(string)
+            passed: arrayOf(string),
           })
-        )
+        ),
       })
     ),
     name: shape({ fi: string, en: string, sv: string }),
-    coursecode: string
+    coursecode: string,
   }).isRequired,
   programmes: arrayOf(shape({})).isRequired,
   years: arrayOf(shape({})).isRequired,
@@ -426,11 +426,11 @@ SingleCourseStats.propTypes = {
   clearSelectedCourse: func.isRequired,
   getSemesters: func.isRequired,
   history: shape({
-    push: func
+    push: func,
   }).isRequired,
   getMaxYearsToCreatePopulationFrom: func.isRequired,
   maxYearsToCreatePopulationFrom: number.isRequired,
-  userHasAccessToAllStats: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
 }
 
 const mapStateToProps = state => {
@@ -441,17 +441,17 @@ const mapStateToProps = state => {
       .map(({ yearcode, yearname }) => ({
         key: yearcode,
         text: yearname,
-        value: yearcode
+        value: yearcode,
       }))
       .reverse(),
     semesters: Object.values(semesters)
       .map(({ semestercode, name, yearcode }) => ({
         key: semestercode,
         texts: Object.values(name),
-        value: yearcode
+        value: yearcode,
       }))
       .reverse(),
-    maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom
+    maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom,
   }
 }
 
@@ -459,7 +459,7 @@ const mapDispatchToProps = {
   setSelectedCourse,
   clearSelectedCourse,
   getSemesters,
-  getMaxYearsToCreatePopulationFrom
+  getMaxYearsToCreatePopulationFrom,
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(SingleCourseStats))

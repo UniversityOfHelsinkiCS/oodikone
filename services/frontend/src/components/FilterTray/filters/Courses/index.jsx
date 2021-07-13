@@ -27,7 +27,7 @@ const Courses = () => {
     .map(cs => ({
       key: `course-filter-option-${cs.course.code}`,
       text: makeLabel(cs),
-      value: cs.course.code
+      value: cs.course.code,
     }))
 
   const onChange = (_, { value }) => {

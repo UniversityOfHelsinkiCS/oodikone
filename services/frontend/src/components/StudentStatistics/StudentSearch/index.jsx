@@ -22,7 +22,7 @@ const StudentSearch = ({
   studentNumber,
   findStudents,
   showNames,
-  pending
+  pending,
 }) => {
   const [loading, setLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
@@ -107,7 +107,7 @@ const StudentSearch = ({
               display: 'inline-block',
               width: '100%',
               height: '100%',
-              padding: '.78571429em .78571429em'
+              padding: '.78571429em .78571429em',
             }}
             to={`/students/${s.studentNumber}`}
           >
@@ -116,9 +116,9 @@ const StudentSearch = ({
         ),
         cellProps: {
           style: {
-            padding: '0'
-          }
-        }
+            padding: '0',
+          },
+        },
       },
       {
         key: 'started',
@@ -131,7 +131,7 @@ const StudentSearch = ({
               display: 'inline-block',
               width: '100%',
               height: '100%',
-              padding: '.78571429em .78571429em'
+              padding: '.78571429em .78571429em',
             }}
             to={`/students/${s.studentNumber}`}
           >
@@ -140,9 +140,9 @@ const StudentSearch = ({
         ),
         cellProps: {
           style: {
-            padding: '0'
-          }
-        }
+            padding: '0',
+          },
+        },
       },
       {
         key: 'credits',
@@ -155,7 +155,7 @@ const StudentSearch = ({
               display: 'inline-block',
               width: '100%',
               height: '100%',
-              padding: '.78571429em .78571429em'
+              padding: '.78571429em .78571429em',
             }}
             to={`/students/${s.studentNumber}`}
           >
@@ -164,10 +164,10 @@ const StudentSearch = ({
         ),
         cellProps: {
           style: {
-            padding: '0'
-          }
-        }
-      }
+            padding: '0',
+          },
+        },
+      },
     ]
 
     if (showNames) {
@@ -182,7 +182,7 @@ const StudentSearch = ({
               display: 'inline-block',
               width: '100%',
               height: '100%',
-              padding: '.78571429em .78571429em'
+              padding: '.78571429em .78571429em',
             }}
             to={`/students/${s.studentNumber}`}
           >
@@ -191,9 +191,9 @@ const StudentSearch = ({
         ),
         cellProps: {
           style: {
-            padding: '0'
-          }
-        }
+            padding: '0',
+          },
+        },
       })
       columns.push({
         key: 'firstnames',
@@ -206,7 +206,7 @@ const StudentSearch = ({
               display: 'inline-block',
               width: '100%',
               height: '100%',
-              padding: '.78571429em .78571429em'
+              padding: '.78571429em .78571429em',
             }}
             to={`/students/${s.studentNumber}`}
           >
@@ -215,9 +215,9 @@ const StudentSearch = ({
         ),
         cellProps: {
           style: {
-            padding: '0'
-          }
-        }
+            padding: '0',
+          },
+        },
       })
     }
 
@@ -237,7 +237,7 @@ const StudentSearch = ({
   }
 
   return (
-    <Fragment>
+    <>
       <Container>
         <Search
           input={{ fluid: true }}
@@ -252,7 +252,7 @@ const StudentSearch = ({
         <SegmentDimmer isLoading={loading} />
         {renderSearchResults()}
       </Segment>
-    </Fragment>
+    </>
   )
 }
 StudentSearch.propTypes = {
@@ -263,10 +263,10 @@ StudentSearch.propTypes = {
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
   showNames: bool.isRequired,
-  pending: bool.isRequired
+  pending: bool.isRequired,
 }
 StudentSearch.defaultProps = {
-  studentNumber: undefined
+  studentNumber: undefined,
 }
 
 const formatStudentRows = makeFormatStudentRows()
@@ -275,12 +275,12 @@ const mapStateToProps = ({ students, settings }) => ({
   students: formatStudentRows(students),
   showNames: settings.namesVisible,
   selected: students.selected,
-  pending: students.pending
+  pending: students.pending,
 })
 
 const mapDispatchToProps = dispatch => ({
   findStudents: searchStr => dispatch(findStudents(searchStr)),
-  getStudent: studentNumber => dispatch(getStudent(studentNumber))
+  getStudent: studentNumber => dispatch(getStudent(studentNumber)),
 })
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Timeout(StudentSearch)))

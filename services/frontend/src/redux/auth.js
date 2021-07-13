@@ -1,7 +1,7 @@
 import { decodeToken } from '../common'
 
 export const login = () => ({
-  type: 'LOGIN_ATTEMPT'
+  type: 'LOGIN_ATTEMPT',
 })
 
 export const logout = () => ({ type: 'LOGOUT_ATTEMPT' })
@@ -12,14 +12,14 @@ const reducer = (state = { pending: false, error: false, token: null }, action) 
       return {
         ...state,
         pending: true,
-        error: false
+        error: false,
       }
 
     case 'LOGIN_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
 
     case 'LOGIN_SUCCESS':
@@ -27,14 +27,14 @@ const reducer = (state = { pending: false, error: false, token: null }, action) 
         ...state,
         pending: false,
         error: false,
-        token: decodeToken(action.token)
+        token: decodeToken(action.token),
       }
 
     case 'LOGOUT_ATTEMPT':
       return {
         ...state,
         pending: true,
-        error: false
+        error: false,
       }
 
     case 'LOGOUT_FAILURE':
@@ -42,7 +42,7 @@ const reducer = (state = { pending: false, error: false, token: null }, action) 
         ...state,
         pending: false,
         error: true,
-        token: null
+        token: null,
       }
 
     case 'LOGOUT_SUCCESS':
@@ -50,7 +50,7 @@ const reducer = (state = { pending: false, error: false, token: null }, action) 
         ...state,
         pending: false,
         error: false,
-        token: null
+        token: null,
       }
 
     default:

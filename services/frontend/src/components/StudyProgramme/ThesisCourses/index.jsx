@@ -15,7 +15,7 @@ const ThesisCourses = ({ studyprogramme, createThesis, getTheses }) => {
     })
   }
   return (
-    <React.Fragment>
+    <>
       <Message content="The set of courses used for calculating thesis productivity statistics" />
       <Expandable fluid title="Add thesis course">
         <CourseSearchForm />
@@ -30,17 +30,17 @@ const ThesisCourses = ({ studyprogramme, createThesis, getTheses }) => {
         />
       </Expandable>
       <ThesisCourseList studyprogramme={studyprogramme} />
-    </React.Fragment>
+    </>
   )
 }
 
 ThesisCourses.propTypes = {
   studyprogramme: string.isRequired,
   createThesis: func.isRequired,
-  getTheses: func.isRequired
+  getTheses: func.isRequired,
 }
 
 export default connect(null, {
   createThesis: createNewThesisCourse,
-  getTheses: getThesisCourses
+  getTheses: getThesisCourses,
 })(ThesisCourses)

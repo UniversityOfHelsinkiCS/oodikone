@@ -7,7 +7,7 @@ import { getPreview } from '../../redux/userAccessEmail'
 const Light = ({ children }) => <span style={{ fontWeight: 'normal' }}>{children}</span>
 
 Light.propTypes = {
-  children: node.isRequired
+  children: node.isRequired,
 }
 
 const EmailHeader = ({ isLoading, subject, to }) => {
@@ -20,7 +20,7 @@ const EmailHeader = ({ isLoading, subject, to }) => {
   }
 
   return (
-    <Fragment>
+    <>
       <Segment>
         <Label attached="top">
           <Light>To: </Light>
@@ -33,19 +33,19 @@ const EmailHeader = ({ isLoading, subject, to }) => {
           {subject}
         </Label>
       </Segment>
-    </Fragment>
+    </>
   )
 }
 
 EmailHeader.defaultProps = {
   subject: undefined,
-  to: undefined
+  to: undefined,
 }
 
 EmailHeader.propTypes = {
   isLoading: bool.isRequired,
   subject: string,
-  to: string
+  to: string,
 }
 
 const EmailPreview = ({ userEmail, isLoading, error, subject, html, onPreviewRequested }) => {
@@ -83,7 +83,7 @@ const EmailPreview = ({ userEmail, isLoading, error, subject, html, onPreviewReq
 EmailPreview.defaultProps = {
   subject: null,
   html: null,
-  error: null
+  error: null,
 }
 
 EmailPreview.propTypes = {
@@ -92,7 +92,7 @@ EmailPreview.propTypes = {
   userEmail: string.isRequired,
   subject: string,
   html: string,
-  error: string
+  error: string,
 }
 
 const mapStateToProps = ({ userAccessEmail: { preview } }) => {
@@ -101,12 +101,12 @@ const mapStateToProps = ({ userAccessEmail: { preview } }) => {
     isLoading: pending,
     error,
     subject: data && data.subject,
-    html: data && data.html
+    html: data && data.html,
   }
 }
 
 const mapDispatchToProps = {
-  onPreviewRequested: getPreview
+  onPreviewRequested: getPreview,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EmailPreview)

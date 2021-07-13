@@ -18,7 +18,7 @@ const TagsTable = ({ student, language }) => {
   )
   if (data.length === 0) return null
   return (
-    <Fragment>
+    <>
       <Header content="Tags" />
       <SortableTable
         data={data}
@@ -28,13 +28,13 @@ const TagsTable = ({ student, language }) => {
             key: 'PROGRAMME',
             title: 'Programme',
             getRowVal: t => getTextIn(t.programme.name, language),
-            cellProps: { collapsing: true }
+            cellProps: { collapsing: true },
           },
           {
             key: 'CODE',
             title: 'Code',
             getRowVal: t => t.programme.code,
-            cellProps: { collapsing: true }
+            cellProps: { collapsing: true },
           },
           {
             key: 'TAGS',
@@ -43,17 +43,17 @@ const TagsTable = ({ student, language }) => {
             getRowContent: t =>
               sortBy(t.tags, t => t.tag.tagname).map(t => (
                 <Label key={t.tag.tag_id} content={t.tag.tagname} color={t.tag.personal_user_id ? 'purple' : null} />
-              ))
-          }
+              )),
+          },
         ]}
       />
-    </Fragment>
+    </>
   )
 }
 
 TagsTable.propTypes = {
   student: shape({}).isRequired,
-  language: string.isRequired
+  language: string.isRequired,
 }
 
 export default TagsTable

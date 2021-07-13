@@ -15,20 +15,20 @@ const MulticolorBarChart = props => {
         neverReflow
         config={{
           title: {
-            text: chartTitle
+            text: chartTitle,
           },
           xAxis: {
-            categories: ['2018']
+            categories: ['2018'],
           },
           yAxis: {
             title: {
-              text: 'Cumulative credits'
-            }
+              text: 'Cumulative credits',
+            },
           },
           chart: {
-            type: 'column'
+            type: 'column',
           },
-          series: chartData
+          series: chartData,
         }}
       />
     )
@@ -38,7 +38,7 @@ const MulticolorBarChart = props => {
 
 MulticolorBarChart.propTypes = {
   chartTitle: string.isRequired,
-  chartData: arrayOf(graphDataType).isRequired
+  chartData: arrayOf(graphDataType).isRequired,
 }
 
 export default MulticolorBarChart

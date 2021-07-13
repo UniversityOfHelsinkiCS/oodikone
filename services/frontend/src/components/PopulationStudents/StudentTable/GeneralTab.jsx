@@ -11,7 +11,7 @@ import {
   getNewestProgramme,
   reformatDate,
   copyToClipboard,
-  getUserIsAdmin
+  getUserIsAdmin,
 } from '../../../common'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
@@ -27,7 +27,7 @@ const GeneralTab = ({
   populationStatistics,
   queryStudyrights,
   isAdmin,
-  studentToTargetCourseDateMap
+  studentToTargetCourseDateMap,
 }) => {
   const { language } = useLanguage()
   const { filteredStudents } = useFilters()
@@ -94,7 +94,7 @@ const GeneralTab = ({
             acc.push({
               name: populationStatistics.elementdetails.data[el.code].name.fi,
               startdate: el.startdate,
-              enddate: el.enddate
+              enddate: el.enddate,
             })
           }
         })
@@ -217,7 +217,7 @@ const GeneralTab = ({
           {!s.obfuscated ? s.studentNumber : 'hidden'}
         </span>
       ),
-      headerProps: { colSpan: 2 }
+      headerProps: { colSpan: 2 },
     },
     {
       key: 'icon',
@@ -233,7 +233,7 @@ const GeneralTab = ({
             <Icon name="level up alternate" />
           </Item>
         ),
-      cellProps: { collapsing: true, className: 'iconCellNoPointer' }
+      cellProps: { collapsing: true, className: 'iconCellNoPointer' },
     }
   )
   if (!(coursePopulation || customPopulation)) {
@@ -243,27 +243,27 @@ const GeneralTab = ({
       getRowVal: s => {
         const credits = getStudentTotalCredits(s)
         return credits
-      }
+      },
     })
   }
   columns.push({
     key: 'all credits',
     title: 'All Credits',
-    getRowVal: s => s.credits
+    getRowVal: s => s.credits,
   })
 
   if (!(coursePopulation || customPopulation)) {
     columns.push({
       key: 'transferred from',
       title: 'Transferred From',
-      getRowVal: s => (s.transferredStudyright ? transferFrom(s) : '')
+      getRowVal: s => (s.transferredStudyright ? transferFrom(s) : ''),
     })
   }
   if (containsStudyTracks() && !(coursePopulation || customPopulation)) {
     columns.push({
       key: 'studytrack',
       title: 'Study Track',
-      getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0]
+      getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0],
     })
   }
 
@@ -272,19 +272,19 @@ const GeneralTab = ({
       {
         key: 'priority',
         title: 'priority',
-        getRowVal: s => priorityText(s.studyrights)
+        getRowVal: s => priorityText(s.studyrights),
       },
       {
         key: 'extent',
         title: 'extent',
-        getRowVal: s => extentCodes(s.studyrights)
+        getRowVal: s => extentCodes(s.studyrights),
       }
     )
   }
   columns.push({
     key: 'tags',
     title: 'Tags',
-    getRowVal: s => (!s.obfuscated ? tags(s.tags) : '')
+    getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
   })
 
   if (!(coursePopulation || customPopulation)) {
@@ -293,7 +293,7 @@ const GeneralTab = ({
         key: 'studystartdate',
         title: 'start of studyright',
         getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
-        getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD')
+        getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD'),
       })
     }
 
@@ -302,7 +302,7 @@ const GeneralTab = ({
       key: 'studystartdateactual',
       title: 'started in studyright',
       getRowVal: s => new Date(getActualStartDate(s.studentNumber)).getTime(),
-      getRowContent: s => reformatDate(getActualStartDate(s.studentNumber), 'YYYY-MM-DD')
+      getRowContent: s => reformatDate(getActualStartDate(s.studentNumber), 'YYYY-MM-DD'),
     })
 
     columns.push({
@@ -312,7 +312,7 @@ const GeneralTab = ({
       getRowContent: s =>
         studentToStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
-          : ''
+          : '',
     })
   }
 
@@ -321,12 +321,12 @@ const GeneralTab = ({
       {
         key: 'programme',
         title: 'Study Programme',
-        getRowVal: s => getTextIn(mainProgramme(s.studyrights, s.studentNumber), language) || 'No programme'
+        getRowVal: s => getTextIn(mainProgramme(s.studyrights, s.studentNumber), language) || 'No programme',
       },
       {
         key: 'startyear',
         title: 'Start Year at Uni',
-        getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : '')
+        getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : ''),
       }
     )
   }
@@ -335,7 +335,7 @@ const GeneralTab = ({
     columns.push({
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
-      getRowVal: s => (s.option ? getTextIn(s.option.name, language) : '')
+      getRowVal: s => (s.option ? getTextIn(s.option.name, language) : ''),
     })
 
   if (showNames) {
@@ -343,7 +343,7 @@ const GeneralTab = ({
       {
         key: 'email',
         title: (
-          <React.Fragment>
+          <>
             email
             <Popup
               trigger={<Icon link name="copy" onClick={copyToClipboardAll} style={{ float: 'right' }} />}
@@ -354,10 +354,10 @@ const GeneralTab = ({
               onOpen={() => handlePopupOpen('0')}
               position="top right"
             />
-          </React.Fragment>
+          </>
         ),
         getRowVal: s => s.email,
-        headerProps: { colSpan: 2 }
+        headerProps: { colSpan: 2 },
       },
       {
         key: 'copy email',
@@ -384,7 +384,7 @@ const GeneralTab = ({
             />
           ) : null,
         headerProps: { onClick: null, sorted: null },
-        cellProps: { collapsing: true, className: 'iconCellNoPointer' }
+        cellProps: { collapsing: true, className: 'iconCellNoPointer' },
       }
     )
   }
@@ -393,7 +393,7 @@ const GeneralTab = ({
     columns.push({
       key: 'updatedAt',
       title: 'Last Updated At',
-      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  HH:mm:ss')
+      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
     })
   }
 
@@ -406,7 +406,7 @@ const GeneralTab = ({
           basic: true,
           compact: 'very',
           padded: false,
-          celled: true
+          celled: true,
         }}
         columns={columns}
         data={selectedStudents.map(sn => students[sn])}
@@ -418,7 +418,7 @@ const GeneralTab = ({
 GeneralTab.defaultProps = {
   studentToTargetCourseDateMap: null,
   customPopulation: false,
-  coursePopulation: false
+  coursePopulation: false,
 }
 
 GeneralTab.propTypes = {
@@ -428,21 +428,21 @@ GeneralTab.propTypes = {
   populationStatistics: shape({}).isRequired,
   queryStudyrights: arrayOf(string).isRequired,
   isAdmin: bool.isRequired,
-  studentToTargetCourseDateMap: shape({})
+  studentToTargetCourseDateMap: shape({}),
 }
 
 const mapStateToProps = state => {
   const {
     populations,
     auth: {
-      token: { roles }
-    }
+      token: { roles },
+    },
   } = state
 
   return {
     isAdmin: getUserIsAdmin(roles),
     populationStatistics: populations.data,
-    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : []
+    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
   }
 }
 

@@ -9,5 +9,5 @@ module.exports = {
   isProduction,
   isDev,
   SENTRY_RELEASE,
-  TAG
+  TAG,
 }

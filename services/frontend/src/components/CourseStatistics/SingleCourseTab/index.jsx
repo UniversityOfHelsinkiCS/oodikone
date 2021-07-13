@@ -53,7 +53,7 @@ SingleCourseTab.propTypes = {
   stats: shape({}).isRequired,
   courses: arrayOf(shape({})).isRequired,
   selected: oneOfType([number, string]).isRequired,
-  userHasAccessToAllStats: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
 }
 
 const mapStateToProps = state => ({
@@ -62,8 +62,8 @@ const mapStateToProps = state => ({
     key: code,
     value: code,
     text: <Header content={<>{name}</>} />,
-    content: name
-  }))
+    content: name,
+  })),
 })
 
 export default connect(mapStateToProps, {})(SingleCourseTab)

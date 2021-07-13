@@ -85,7 +85,7 @@ export default () => {
             acc.push({
               name: populationStatistics.elementdetails.data[el.code].name.fi,
               startdate: el.startdate,
-              enddate: el.enddate
+              enddate: el.enddate,
             })
           }
         })
@@ -106,7 +106,7 @@ export default () => {
       m => {
         const res = m.code.match(/\d+/)
         return res ? Number(res[0]) : Number.MAX_VALUE
-      }
+      },
     ])
 
     const worksheet = xlsx.utils.json_to_sheet(
@@ -128,7 +128,7 @@ export default () => {
         ...sortedMandatory.reduce((acc, m) => {
           acc[`${getTextIn(m.name, language)}\n${m.code}`] = hasPassedMandatory(s.studentNumber, m.code)
           return acc
-        }, {})
+        }, {}),
       }))
     )
     const workbook = xlsx.utils.book_new()

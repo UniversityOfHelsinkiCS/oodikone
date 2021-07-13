@@ -51,7 +51,7 @@ const routes = {
   coursepopulation: '/coursepopulation',
   custompopulation: '/custompopulation',
   updater: '/updater',
-  trends: '/trends'
+  trends: '/trends',
 }
 
 const Routes = () => (

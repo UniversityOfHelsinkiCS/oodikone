@@ -15,5 +15,5 @@ export default {
   Graduated: `Tiettynä lukuvuonna aloittaneista opiskelijoista on valmistunut`,
   Transferred: `Koulutusohjelmaan tai siitä pois kyseisenä lukuvuonna siirtyneet opiskelijat`,
   Credits: `Kunakin vuonna aloittaneista opiskelijoista ne, jotka ovat ylittäneet tietyn opintopisterajapyykin`,
-  Thesis: `Loppututkielman kirjoittaneiden määrä`
+  Thesis: `Loppututkielman kirjoittaneiden määrä`,
 }

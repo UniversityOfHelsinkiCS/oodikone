@@ -14,7 +14,7 @@ const sortAlternatives = alternatives => {
         return 3 // unknown, comes before open uni?
       },
       a => a.latestInstanceDate || new Date(),
-      'code'
+      'code',
     ],
     ['asc', 'desc', 'desc']
   )
@@ -41,7 +41,7 @@ const filterCourseSearchResults = (courses, unifyOpenUniCourses) => {
         ...course,
         alternatives: [{ code: course.code, latestInstanceDate: new Date(course.latest_instance_date) }],
         min_attainment_date: new Date(course.min_attainment_date),
-        max_attainment_date: new Date(course.max_attainment_date)
+        max_attainment_date: new Date(course.max_attainment_date),
       }
     } else {
       const mergedCourse = mergedCourses[groupId]
@@ -53,14 +53,14 @@ const filterCourseSearchResults = (courses, unifyOpenUniCourses) => {
       )
       mergedCourse.alternatives.push({
         code: course.code,
-        latestInstanceDate: new Date(course.latest_instance_date)
+        latestInstanceDate: new Date(course.latest_instance_date),
       })
     }
   })
 
   const result = Object.values(mergedCourses).map(course => ({
     ...course,
-    alternatives: getAlternatives(course)
+    alternatives: getAlternatives(course),
   }))
 
   return result

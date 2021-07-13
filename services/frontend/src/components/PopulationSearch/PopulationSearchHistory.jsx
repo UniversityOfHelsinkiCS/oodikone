@@ -36,7 +36,7 @@ const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
       group: 'Programme Usage',
       name: 'populations query',
       label: programme,
-      value: 1
+      value: 1,
     })
   }, [programmeCode])
   return null
@@ -49,11 +49,11 @@ class PopulationSearchHistory extends Component {
       pending: bool,
       error: bool,
       data: shape({}),
-      query: object
+      query: object,
     }).isRequired,
     units: object, // eslint-disable-line
     tags: arrayOf(shape({})).isRequired,
-    history: shape({}).isRequired
+    history: shape({}).isRequired,
   }
 
   constructor() {
@@ -63,8 +63,8 @@ class PopulationSearchHistory extends Component {
       query: {
         studentStatuses: [],
         semesters: ['FALL', 'SPRING'],
-        months: 0
-      }
+        months: 0,
+      },
     }
   }
 
@@ -77,8 +77,8 @@ class PopulationSearchHistory extends Component {
           months: nextProps.populations.query.months,
           year: nextProps.populations.query.year,
           semesters: nextProps.populations.query.semesters,
-          studentStatuses: nextProps.populations.query.studentStatuses || []
-        }
+          studentStatuses: nextProps.populations.query.studentStatuses || [],
+        },
       })
     }
   }
@@ -107,8 +107,8 @@ class PopulationSearchHistory extends Component {
         query: {
           ...query,
           semesters,
-          months: this.months(this.props.populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING')
-        }
+          months: this.months(this.props.populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'),
+        },
       })
     }
   }
@@ -121,8 +121,8 @@ class PopulationSearchHistory extends Component {
     this.setState({
       query: {
         ...query,
-        studentStatuses
-      }
+        studentStatuses,
+      },
     })
   }
 
@@ -132,8 +132,8 @@ class PopulationSearchHistory extends Component {
     this.setState({
       query: {
         ...query,
-        months
-      }
+        months,
+      },
     })
   }
 
@@ -155,7 +155,7 @@ class PopulationSearchHistory extends Component {
       studentStatuses,
       semesters,
       studyRights: JSON.stringify(studyRights),
-      years
+      years,
     }
     const searchString = qs.stringify(queryObject)
 
@@ -287,7 +287,7 @@ class PopulationSearchHistory extends Component {
             units={[
               units.data.programmes[programmeCode],
               units.data.degrees[degreeCode],
-              units.data.studyTracks[studyTrackCode]
+              units.data.studyTracks[studyTrackCode],
             ].filter(Boolean)}
             removeSampleFn={this.removePopulation}
             updating={populations.updating}
@@ -326,13 +326,13 @@ class PopulationSearchHistory extends Component {
 const mapStateToProps = ({ populations, populationDegreesAndProgrammes, tags }) => ({
   populations,
   units: populationDegreesAndProgrammes,
-  tags: tags.data
+  tags: tags.data,
 })
 
 const mapDispatchToProps = dispatch => ({
   removePopulation: uuid => {
     dispatch(removePopulation(uuid))
-  }
+  },
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(PopulationSearchHistory)

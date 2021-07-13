@@ -37,11 +37,11 @@ const FilterTray = ({ children, filterSet, visible }) => {
 FilterTray.propTypes = {
   children: PropTypes.node.isRequired,
   filterSet: PropTypes.node.isRequired,
-  visible: PropTypes.bool
+  visible: PropTypes.bool,
 }
 
 FilterTray.defaultProps = {
-  visible: true
+  visible: true,
 }
 
 export default FilterTray

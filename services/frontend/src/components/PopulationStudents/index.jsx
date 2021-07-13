@@ -42,7 +42,7 @@ const StudentTableTabs = ({ panes, filterPanes }) => {
 
 StudentTableTabs.propTypes = {
   panes: arrayOf(object).isRequired,
-  filterPanes: func.isRequired
+  filterPanes: func.isRequired,
 }
 
 class PopulationStudents extends Component {
@@ -101,22 +101,22 @@ class PopulationStudents extends Component {
             title: 'last name',
             getRowVal: s => (s.total ? null : s.lastname),
             cellProps: { title: 'last name' },
-            child: true
+            child: true,
           },
           {
             key: 'firstname',
             title: 'given names',
             getRowVal: s => (s.total ? null : s.firstnames),
             cellProps: { title: 'first names' },
-            child: true
+            child: true,
           },
           {
             key: 'email',
             title: 'email',
             getRowVal: s => (s.total ? null : s.email),
             cellProps: { title: 'emails' },
-            child: true
-          }
+            child: true,
+          },
         ]
       : []
     nameColumns.push(
@@ -126,7 +126,7 @@ class PopulationStudents extends Component {
         cellProps: { title: 'student number' },
         getRowVal: s => (s.total ? '*' : s.studentNumber),
         getRowContent: s => (s.total ? 'Summary:' : s.studentNumber),
-        child: true
+        child: true,
       },
       {
         key: 'icon',
@@ -144,7 +144,7 @@ class PopulationStudents extends Component {
             </Item>
           ),
         cellProps: { collapsing: true, className: 'iconCell' },
-        child: true
+        child: true,
       },
       {
         key: 'totalpassed',
@@ -156,7 +156,7 @@ class PopulationStudents extends Component {
                 .reduce((acc, e) => acc + e, 0)
             : totalMandatoryPassed(s.studentNumber),
         cellProps: { title: 'total passed' },
-        child: true
+        child: true,
       }
     )
 
@@ -179,11 +179,11 @@ class PopulationStudents extends Component {
 
     const mandatoryTitle = m => {
       return (
-        <Fragment>
+        <>
           {getTextIn(m.name, this.props.language)}
           <br />
           {m.code}
-        </Fragment>
+        </>
       )
     }
 
@@ -205,7 +205,7 @@ class PopulationStudents extends Component {
         key: 'general',
         title: <b>Labels:</b>,
         parent: true,
-        headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } }
+        headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } },
       },
       ...sortedlabels
         .filter(({ code }) => visibleLabels.has(code))
@@ -217,7 +217,7 @@ class PopulationStudents extends Component {
             </div>
           ),
           parent: true,
-          headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber }
+          headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber },
         }))
     )
 
@@ -232,7 +232,7 @@ class PopulationStudents extends Component {
               const res = m.code.match(/\d+/)
               return res ? Number(res[0]) : Number.MAX_VALUE
             },
-            'code'
+            'code',
           ])
             .filter(course => visibleCourseCodes.has(course.code))
             .map(m => ({
@@ -247,10 +247,10 @@ class PopulationStudents extends Component {
               },
               child: true,
               childOf: e.label,
-              code: m.code
+              code: m.code,
             }))
         )
-      )
+      ),
     ]
 
     const totals = this.props.filteredStudents.reduce(
@@ -278,7 +278,7 @@ class PopulationStudents extends Component {
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             />
           </Tab.Pane>
-        )
+        ),
       },
       {
         menuItem: 'Courses',
@@ -297,7 +297,7 @@ class PopulationStudents extends Component {
                       basic: true,
                       striped: true,
                       singleLine: true,
-                      textAlign: 'center'
+                      textAlign: 'center',
                     }}
                     collapsingHeaders
                     showNames={this.props.showNames}
@@ -308,7 +308,7 @@ class PopulationStudents extends Component {
               </div>
             </div>
           </Tab.Pane>
-        )
+        ),
       },
       {
         menuItem: 'Tags',
@@ -323,7 +323,7 @@ class PopulationStudents extends Component {
                     width: '100%',
                     display: 'flex',
                     justifyContent: 'center',
-                    alignItems: 'center'
+                    alignItems: 'center',
                   }}
                 >
                   <h3>
@@ -341,19 +341,19 @@ class PopulationStudents extends Component {
                 </div>
               )}
               {this.props.tags.length > 0 && (
-                <React.Fragment>
+                <>
                   <TagPopulation
                     tags={this.props.tags}
                     selectedStudents={this.props.filteredStudents.map(stu => stu.studentNumber)}
                     studytrack={this.props.queryStudyrights[0]}
                   />
                   <TagList studytrack={this.props.queryStudyrights[0]} selectedStudents={this.props.filteredStudents} />
-                </React.Fragment>
+                </>
               )}
             </div>
           </Tab.Pane>
-        )
-      }
+        ),
+      },
     ]
 
     const filteredPanes = panesToFilter => {
@@ -364,7 +364,7 @@ class PopulationStudents extends Component {
     }
 
     return (
-      <Fragment>
+      <>
         <Grid columns="two">
           <Grid.Column>
             <StudentNameVisibilityToggle />
@@ -378,7 +378,7 @@ class PopulationStudents extends Component {
           )}
         </Grid>
         <StudentTableTabs panes={panes} filterPanes={filteredPanes} />
-      </Fragment>
+      </>
     )
   }
 
@@ -407,7 +407,7 @@ PopulationStudents.defaultProps = {
   studentToTargetCourseDateMap: null,
   customPopulation: false,
   coursePopulation: false,
-  dataExport: null
+  dataExport: null,
 }
 
 PopulationStudents.propTypes = {
@@ -418,7 +418,7 @@ PopulationStudents.propTypes = {
   mandatoryCourses: arrayOf(
     shape({
       name: shape({}).isRequired,
-      code: string.isRequired
+      code: string.isRequired,
     })
   ).isRequired,
   mandatoryPassed: shape({}).isRequired,
@@ -430,7 +430,7 @@ PopulationStudents.propTypes = {
   coursePopulation: bool,
   customPopulation: bool,
   filteredStudents: arrayOf(shape({})).isRequired,
-  dataExport: node
+  dataExport: node,
 }
 
 const mapStateToProps = state => {
@@ -441,8 +441,8 @@ const mapStateToProps = state => {
     populationMandatoryCourses,
     tags,
     auth: {
-      token: { roles }
-    }
+      token: { roles },
+    },
   } = state
 
   const mandatoryCodes = populationMandatoryCourses.data
@@ -467,12 +467,12 @@ const mapStateToProps = state => {
     mandatoryCourses: populationMandatoryCourses.data,
     mandatoryPassed,
     tags: tags.data,
-    userRoles: getUserRoles(roles)
+    userRoles: getUserRoles(roles),
   }
 }
 
 export default connect(mapStateToProps, {
   toggleStudentListVisibility,
   getTagsByStudytrack: getTagsByStudytrackAction,
-  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction
+  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction,
 })(withRouter(PopulationStudents))

@@ -20,15 +20,15 @@ const ErrorContainer = props => {
 }
 
 const mapStateToProps = ({ errors }) => ({
-  errors: errors.length ? errors : []
+  errors: errors.length ? errors : [],
 })
 
 ErrorContainer.defaultProps = {
-  errors: []
+  errors: [],
 }
 
 ErrorContainer.propTypes = {
-  errors: arrayOf(object)
+  errors: arrayOf(object),
 }
 
 export default connect(mapStateToProps)(ErrorContainer)

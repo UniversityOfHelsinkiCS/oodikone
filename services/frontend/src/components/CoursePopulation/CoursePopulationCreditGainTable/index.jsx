@@ -55,7 +55,7 @@ const CoursePopulationCreditGainTable = ({
   to,
   studentToTargetCourseDateMap,
   populationStatistics,
-  faculties
+  faculties,
 }) => {
   const [programmeCreditsStatistics, setStatistics] = useState({})
   const [facultyCreditsStatistics, setFacStatistics] = useState({})
@@ -83,7 +83,7 @@ const CoursePopulationCreditGainTable = ({
         const faculty = faculties.find(fac => fac.code === programme.facultyCode) || {
           // in case there isn't a faculty associated with studyright
           code: '0000',
-          name: { fi: 'No associated faculty' }
+          name: { fi: 'No associated faculty' },
         }
 
         if (!facultyCredits[faculty.code]) {
@@ -131,7 +131,7 @@ const CoursePopulationCreditGainTable = ({
             headerText="Faculty"
           />
         </Tab.Pane>
-      )
+      ),
     },
     {
       menuItem: 'Programme',
@@ -144,8 +144,8 @@ const CoursePopulationCreditGainTable = ({
             headerText="Programme"
           />
         </Tab.Pane>
-      )
-    }
+      ),
+    },
   ]
 
   return (
@@ -157,19 +157,19 @@ const CoursePopulationCreditGainTable = ({
 }
 
 CoursePopulationCreditGainTable.defaultProps = {
-  studentToTargetCourseDateMap: null
+  studentToTargetCourseDateMap: null,
 }
 
 CreditGainTableRow.propTypes = {
   statistics: shape({}).isRequired,
-  code: string.isRequired
+  code: string.isRequired,
 }
 
 CreditGainTable.propTypes = {
   data: shape({}).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   totalCredits: number.isRequired,
-  headerText: string.isRequired
+  headerText: string.isRequired,
 }
 
 CoursePopulationCreditGainTable.propTypes = {
@@ -180,13 +180,13 @@ CoursePopulationCreditGainTable.propTypes = {
   to: number.isRequired,
   studentToTargetCourseDateMap: shape({}),
   populationStatistics: shape({}).isRequired,
-  faculties: arrayOf(shape({})).isRequired
+  faculties: arrayOf(shape({})).isRequired,
 }
 
 const mapStateToProps = ({ populations, faculties }) => {
   return {
     faculties: faculties.data,
-    populationStatistics: populations.data
+    populationStatistics: populations.data,
   }
 }
 

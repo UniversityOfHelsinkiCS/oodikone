@@ -35,74 +35,74 @@ const reducer = (state = { data: [] }, action) => {
     case 'GET_MANDATORY_COURSE_LABELS_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'GET_MANDATORY_COURSE_LABELS_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'GET_MANDATORY_COURSE_LABELS_SUCCESS':
       return {
         ...state,
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'ADD_MANDATORY_COURSE_LABELS_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'ADD_MANDATORY_COURSE_LABELS_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'ADD_MANDATORY_COURSE_LABELS_SUCCESS':
       return {
         ...state,
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'DELETE_MANDATORY_COURSE_LABELS_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'DELETE_MANDATORY_COURSE_LABELS_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'DELETE_MANDATORY_COURSE_LABELS_SUCCESS':
       return {
         ...state,
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     case 'MOVE_MANDATORY_COURSE_LABELS_ATTEMPT':
       return {
         ...state,
-        pending: true
+        pending: true,
       }
     case 'MOVE_MANDATORY_COURSE_LABELS_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'MOVE_MANDATORY_COURSE_LABELS_SUCCESS':
       return {
         ...state,
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     default:
       return state

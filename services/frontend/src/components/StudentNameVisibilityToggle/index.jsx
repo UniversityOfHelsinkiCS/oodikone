@@ -28,11 +28,11 @@ const StudentNameVisibilityToggle = ({ showNames, toggleStudentNameVisibility: t
 
 StudentNameVisibilityToggle.propTypes = {
   showNames: bool.isRequired,
-  toggleStudentNameVisibility: func.isRequired
+  toggleStudentNameVisibility: func.isRequired,
 }
 
 const mapStateToProps = state => ({
-  showNames: state.settings.namesVisible
+  showNames: state.settings.namesVisible,
 })
 
 export default connect(mapStateToProps, { toggleStudentNameVisibility })(withRouter(StudentNameVisibilityToggle))

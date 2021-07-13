@@ -17,7 +17,7 @@ const SendFailBanner = ({ userEmail, error }) => (
 
 SendFailBanner.propTypes = {
   userEmail: string.isRequired,
-  error: string.isRequired
+  error: string.isRequired,
 }
 
 const EmailConfirm = ({ userEmail, isLoading, error, open, onCancel, onConfirm }) => (
@@ -42,7 +42,7 @@ const EmailConfirm = ({ userEmail, isLoading, error, open, onCancel, onConfirm }
 )
 
 EmailConfirm.defaultProps = {
-  error: undefined
+  error: undefined,
 }
 
 EmailConfirm.propTypes = {
@@ -51,7 +51,7 @@ EmailConfirm.propTypes = {
   open: bool.isRequired,
   isLoading: bool.isRequired,
   onCancel: func.isRequired,
-  onConfirm: func.isRequired
+  onConfirm: func.isRequired,
 }
 
 const EmailNotification = ({ userEmail, onEmailSend, isSendLoading, sendError, onClearErrors }) => {
@@ -85,7 +85,7 @@ const EmailNotification = ({ userEmail, onEmailSend, isSendLoading, sendError, o
   return userIsMissingEmail ? (
     <DisabledEmailButton />
   ) : (
-    <Fragment>
+    <>
       <SendEmailButton onClick={handleButtonClick} />
       <EmailConfirm
         open={confirmOpen}
@@ -95,13 +95,13 @@ const EmailNotification = ({ userEmail, onEmailSend, isSendLoading, sendError, o
         error={sendError}
         isLoading={isSendLoading}
       />
-    </Fragment>
+    </>
   )
 }
 
 EmailNotification.defaultProps = {
   userEmail: undefined,
-  sendError: null
+  sendError: null,
 }
 
 EmailNotification.propTypes = {
@@ -109,17 +109,17 @@ EmailNotification.propTypes = {
   onEmailSend: func.isRequired,
   isSendLoading: bool.isRequired,
   sendError: string,
-  onClearErrors: func.isRequired
+  onClearErrors: func.isRequired,
 }
 
 const mapStateToProps = ({ userAccessEmail }) => ({
   isSendLoading: userAccessEmail.sending.pending,
-  sendError: userAccessEmail.sending.error
+  sendError: userAccessEmail.sending.error,
 })
 
 const mapDispatchToProps = {
   onEmailSend: sendEmail,
-  onClearErrors: clearErrors
+  onClearErrors: clearErrors,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EmailNotification)

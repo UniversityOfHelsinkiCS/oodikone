@@ -18,15 +18,15 @@ class CourseGroup extends Component {
   static propTypes = {
     groupId: string.isRequired,
     history: shape({
-      push: func.isRequired
+      push: func.isRequired,
     }).isRequired,
-    studyProgrammeId: string.isRequired
+    studyProgrammeId: string.isRequired,
   }
 
   state = {
     isLoading: true,
     teachers: [],
-    activeTeacherIds: []
+    activeTeacherIds: [],
   }
 
   async componentDidMount() {
@@ -34,7 +34,7 @@ class CourseGroup extends Component {
       const { groupId } = this.props
       const [courseGroup, academicYears] = await Promise.all([
         callApi(`${CG_API_BASE_PATH}/${groupId}`),
-        callApi(`${CG_API_BASE_PATH}/academic-years`)
+        callApi(`${CG_API_BASE_PATH}/academic-years`),
       ])
 
       const { name, totalCredits, totalStudents, totalCourses, teachers, semester } = courseGroup.data
@@ -48,7 +48,7 @@ class CourseGroup extends Component {
         totalCourses,
         teachers,
         isLoading: false,
-        showOnlyActiveTeachers: false
+        showOnlyActiveTeachers: false,
       })
     } catch (e) {
       if (e.message.toLowerCase() === 'network error') {
@@ -70,7 +70,7 @@ class CourseGroup extends Component {
             totalCredits,
             totalStudents,
             totalCourses,
-            teachers
+            teachers,
           })
         })
         .catch(e => {
@@ -100,7 +100,7 @@ class CourseGroup extends Component {
       this.setState({
         activeTeacherIds: newActiveTeachers,
         isLoading: false,
-        showOnlyActiveTeachers: resetActiveTeachers ? false : showOnlyActiveTeachers
+        showOnlyActiveTeachers: resetActiveTeachers ? false : showOnlyActiveTeachers,
       })
     })
   }
@@ -124,7 +124,7 @@ class CourseGroup extends Component {
     const teacherIds = hasActiveTeachers ? activeTeacherIds : getTeacherIds(teachers)
 
     return (
-      <Fragment>
+      <>
         <Teachers
           activeTeacherIds={activeTeacherIds}
           teachers={teachers}
@@ -133,7 +133,7 @@ class CourseGroup extends Component {
           showOnlyActiveTeachers={showOnlyActiveTeachers}
         />
         <Courses teacherIds={teacherIds} semesterCode={semesterCode} />
-      </Fragment>
+      </>
     )
   }
 
@@ -148,13 +148,13 @@ class CourseGroup extends Component {
       isLoading,
       name,
       semesterCode,
-      academicYears
+      academicYears,
     } = this.state
 
     const navigateTo = programme =>
       history.push(
         getCompiledPath('/study-programme/:programme', {
-          programme
+          programme,
         })
       )
     const statisticsTeachers = teachers.filter(t => activeTeacherIds.includes(t.id))

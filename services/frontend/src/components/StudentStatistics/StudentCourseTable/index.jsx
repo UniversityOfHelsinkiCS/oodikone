@@ -54,7 +54,7 @@ const StudentCourseTable = ({ headers, rows, noResultText }) => {
 StudentCourseTable.propTypes = {
   headers: arrayOf(string).isRequired,
   rows: arrayOf(array).isRequired,
-  noResultText: string.isRequired
+  noResultText: string.isRequired,
 }
 
 export default StudentCourseTable

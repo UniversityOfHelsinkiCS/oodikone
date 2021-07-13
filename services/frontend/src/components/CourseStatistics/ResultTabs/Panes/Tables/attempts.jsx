@@ -13,7 +13,7 @@ const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
   title,
   getRowVal,
   getRowContent,
-  getCellProps: s => defineCellColor(s)
+  getCellProps: s => defineCellColor(s),
 })
 
 const getTableData = (stats, notThesisGrades, isRelative) =>
@@ -23,7 +23,7 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
       code,
       attempts: { grades },
       coursecode,
-      rowObfuscated
+      rowObfuscated,
     } = stat
 
     const attempts = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
@@ -40,7 +40,7 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
       passRate: stat.attempts.passRate,
       attempts,
       rowObfuscated,
-      ...gradeSpread
+      ...gradeSpread,
     }
   })
 
@@ -56,7 +56,7 @@ const getGradeColumns = (notThesisGrades, addHTAndTT) => {
     getSortableColumn('3', '3', s => (s.rowObfuscated ? 'NA' : s['3'])),
     getSortableColumn('4', '4', s => (s.rowObfuscated ? 'NA' : s['4'])),
     getSortableColumn('5', '5', s => (s.rowObfuscated ? 'NA' : s['5'])),
-    getSortableColumn('OTHER_PASSED', 'Other passed', s => (s.rowObfuscated ? 'NA' : s['Hyv.']))
+    getSortableColumn('OTHER_PASSED', 'Other passed', s => (s.rowObfuscated ? 'NA' : s['Hyv.'])),
   ]
   if (addHTAndTT)
     columns.splice(
@@ -76,10 +76,10 @@ const AttemptsTable = ({
   isRelative,
   userHasAccessToAllStats,
   headerVisible = false,
-  showGrades
+  showGrades,
 }) => {
   const {
-    attempts: { grades }
+    attempts: { grades },
   } = stats[0]
   const notThesisGrades = !isThesisGrades(grades)
 
@@ -89,7 +89,7 @@ const AttemptsTable = ({
       to: yearcode,
       coursecodes: JSON.stringify(uniq(alternatives)),
       years,
-      separate
+      separate,
     }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
@@ -111,7 +111,7 @@ const AttemptsTable = ({
           )}
         </div>
       )
-    )
+    ),
   }
 
   let columns = [
@@ -124,14 +124,14 @@ const AttemptsTable = ({
       'Pass rate',
       s => (s.rowObfuscated ? 'NA' : s.passRate),
       s => (s.rowObfuscated ? 'NA' : `${Number(s.passRate || 0).toFixed(2)} %`)
-    )
+    ),
   ]
 
   if (showGrades) {
     columns = [
       timeColumn,
       getSortableColumn('ATTEMPTS', 'Total attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
-      ...getGradeColumns(notThesisGrades, includesHTOrTT(stats))
+      ...getGradeColumns(notThesisGrades, includesHTOrTT(stats)),
     ]
   }
 
@@ -166,11 +166,11 @@ AttemptsTable.propTypes = {
   isRelative: bool.isRequired,
   userHasAccessToAllStats: bool.isRequired,
   headerVisible: bool.isRequired,
-  showGrades: bool.isRequired
+  showGrades: bool.isRequired,
 }
 
 AttemptsTable.defaultProps = {
-  separate: false
+  separate: false,
 }
 
 export default connect(null)(AttemptsTable)

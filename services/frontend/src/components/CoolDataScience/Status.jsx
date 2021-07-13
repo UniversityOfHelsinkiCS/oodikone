@@ -38,7 +38,7 @@ const StatusContainer = ({
   max1,
   showYearlyValues,
   yearlyValues,
-  showByYear
+  showByYear,
 }) => {
   const diff = Math.round(current - previous)
   const p = getP(current, previous)
@@ -66,7 +66,7 @@ const StatusContainer = ({
         minWidth: '240px',
         cursor: clickable ? 'pointer' : 'default',
         flex: 1,
-        margin: 0
+        margin: 0,
       }}
       textAlign="center"
       compact
@@ -77,7 +77,7 @@ const StatusContainer = ({
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          overflowWrap: 'break-word'
+          overflowWrap: 'break-word',
         }}
       >
         <span className="status-title">{title}</span>
@@ -85,7 +85,7 @@ const StatusContainer = ({
           <Icon
             style={{
               color: getColor(change),
-              transform: `rotateZ(${-mapValueToRange(change, min1, max1, -45, 45)}deg)`
+              transform: `rotateZ(${-mapValueToRange(change, min1, max1, -45, 45)}deg)`,
             }}
             size="huge"
             name="arrow right"
@@ -141,7 +141,7 @@ StatusContainer.propTypes = {
   max1: PropTypes.number.isRequired,
   showYearlyValues: PropTypes.bool.isRequired,
   yearlyValues: PropTypes.shape({}).isRequired,
-  showByYear: PropTypes.bool.isRequired
+  showByYear: PropTypes.bool.isRequired,
 }
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
@@ -230,7 +230,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
                 border: '1px solid #dededf',
                 borderRight: 'none',
                 borderBottom: 'none',
-                backgroundColor: 'white'
+                backgroundColor: 'white',
               }}
             />
             <Checkbox
@@ -305,7 +305,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
           gridTemplateColumns: 'repeat(auto-fill, 240px)',
           gridTemplateRows: 'repeat(auto-fill) 20px',
           gridGap: '20px',
-          justifyContent: 'center'
+          justifyContent: 'center',
         }}
       >
         {_.orderBy(
@@ -348,12 +348,12 @@ const Status = ({ getStatusDispatch, data, loading }) => {
 Status.propTypes = {
   data: shape({}).isRequired,
   loading: bool.isRequired,
-  getStatusDispatch: func.isRequired
+  getStatusDispatch: func.isRequired,
 }
 
 const mapStateToProps = ({ coolDataScience }) => ({
   data: coolDataScience.data.status,
-  loading: coolDataScience.pending.status
+  loading: coolDataScience.pending.status,
 })
 
 export default connect(mapStateToProps, { getStatusDispatch: getStatus })(Status)

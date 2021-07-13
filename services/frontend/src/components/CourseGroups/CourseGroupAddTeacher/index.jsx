@@ -14,7 +14,7 @@ const DEFAULT_STATE = {
   courseGroup: undefined,
   isLoading: true,
   searchterm: '',
-  displayResults: false
+  displayResults: false,
 }
 
 class CourseGroupAddTeacher extends Component {
@@ -25,7 +25,7 @@ class CourseGroupAddTeacher extends Component {
       .then(res => {
         this.setState({
           courseGroup: res.data,
-          isLoading: false
+          isLoading: false,
         })
       })
       .catch(e => {
@@ -77,8 +77,8 @@ class CourseGroupAddTeacher extends Component {
         key: 'icon',
         getRowContent: () => <Icon name="add user" />,
         cellProps: { collapsing: true },
-        headerProps: { onClick: null, sorted: null }
-      }
+        headerProps: { onClick: null, sorted: null },
+      },
     ]
 
     const groupColumns = [
@@ -102,7 +102,7 @@ class CourseGroupAddTeacher extends Component {
                     callApi(`/course-groups/${this.props.groupId}`).then(res => {
                       this.setState({
                         courseGroup: res.data,
-                        isLoading: false
+                        isLoading: false,
                       })
                     })
                   })
@@ -114,16 +114,16 @@ class CourseGroupAddTeacher extends Component {
               }}
             />
           ),
-          textAlign: 'center'
+          textAlign: 'center',
         }),
-        headerProps: { onClick: null, sorted: null }
-      }
+        headerProps: { onClick: null, sorted: null },
+      },
     ]
 
     return (
       <Segment loading={isLoading}>
         {!courseGroup ? null : (
-          <Fragment>
+          <>
             <Header size="large">{courseGroup.name}</Header>
             <Segment>
               <Header size="medium">Add teacher</Header>
@@ -135,7 +135,7 @@ class CourseGroupAddTeacher extends Component {
                 showNoResults={false}
               />
               {this.state.displayResults && (
-                <Fragment>
+                <>
                   {this.props.teachers.length <= 0 ? (
                     <div>No teachers matched your search</div>
                   ) : (
@@ -150,7 +150,7 @@ class CourseGroupAddTeacher extends Component {
                               callApi(`/course-groups/${this.props.groupId}`).then(res => {
                                 this.setState({
                                   courseGroup: res.data,
-                                  isLoading: false
+                                  isLoading: false,
                                 })
                               })
                             })
@@ -159,21 +159,21 @@ class CourseGroupAddTeacher extends Component {
                                 window.location.reload(true)
                               }
                             })
-                        }
+                        },
                       })}
                       tableProps={{ celled: false, sortable: false }}
                       columns={searchResultColumns}
                       data={this.props.teachers}
                     />
                   )}
-                </Fragment>
+                </>
               )}
             </Segment>
             <Segment>
               <Header size="medium">Teachers in group</Header>
               <SortableTable getRowKey={gc => gc.id} columns={groupColumns} data={courseGroup.teachers} />
             </Segment>
-          </Fragment>
+          </>
         )}
       </Segment>
     )
@@ -185,13 +185,13 @@ CourseGroupAddTeacher.propTypes = {
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
   teachers: arrayOf(object).isRequired,
-  findTeachers: func.isRequired
+  findTeachers: func.isRequired,
 }
 
 const mapStateToProps = ({ teachers }) => {
   const { list } = teachers
   return {
-    teachers: list
+    teachers: list,
   }
 }
 

@@ -22,13 +22,8 @@ const verticalTitle = (...params) => {
 }
 
 const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
-  const {
-    courseStatistics,
-    filterInput,
-    onCourseNameCellClick,
-    onGoToCourseStatisticsClick,
-    modules
-  } = UsePopulationCourseContext()
+  const { courseStatistics, filterInput, onCourseNameCellClick, onGoToCourseStatisticsClick, modules } =
+    UsePopulationCourseContext()
   const { language } = useSelector(({ settings }) => settings)
   const [page, setPage] = useState(0)
   const { courseIsSelected } = useCourseFilter()
@@ -188,13 +183,13 @@ const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
 }
 
 const mapStateToProps = state => ({
-  showNames: state.settings.namesVisible
+  showNames: state.settings.namesVisible,
 })
 
 Students.propTypes = {
   showNames: bool.isRequired,
   expandedGroups: instanceOf(Set).isRequired,
-  toggleGroupExpansion: func.isRequired
+  toggleGroupExpansion: func.isRequired,
 }
 
 export default connect(mapStateToProps)(Students)

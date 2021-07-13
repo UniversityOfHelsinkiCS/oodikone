@@ -15,7 +15,7 @@ export default () => {
     female: { label: 'Female', value: 2 },
     male: { label: 'Male', value: 1 },
     other: { label: 'Other', value: 9 },
-    unknown: { label: 'Unknown', value: 0 }
+    unknown: { label: 'Unknown', value: 0 },
   }
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default () => {
   const options = Object.entries(genderCodes).map(([key, gender]) => ({
     key,
     text: `${gender.label} (${count(gender.value)})`,
-    value: gender.value
+    value: gender.value,
   }))
 
   return (

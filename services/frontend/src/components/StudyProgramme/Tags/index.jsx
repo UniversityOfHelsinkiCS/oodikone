@@ -39,7 +39,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
       tagname: tagname.trim(),
       studytrack: studyprogramme,
       year: year ? reformatDate(year, YEAR_DATE_FORMAT) : null,
-      personal_user_id: personal ? userId : null
+      personal_user_id: personal ? userId : null,
     }
     createTag(newTag)
     setTagname('')
@@ -98,12 +98,12 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
       key: 'name',
       title: 'Name',
       getRowVal: tag => tag.tagname,
-      getRowContent: tag => decorateTagName(tag)
+      getRowContent: tag => decorateTagName(tag),
     },
     {
       key: 'year',
       title: 'Associated start year',
-      getRowVal: tag => tag.year
+      getRowVal: tag => tag.year,
     },
     {
       key: 'delete',
@@ -121,8 +121,8 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
           />
         </Form.Field>
       ),
-      headerProps: { onClick: null, sorted: null }
-    }
+      headerProps: { onClick: null, sorted: null },
+    },
   ]
 
   return (
@@ -174,7 +174,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
 
 const mapStateToProps = state => ({
   tags: state.tags.data,
-  userId: state.auth.token.id
+  userId: state.auth.token.id,
 })
 
 Tags.propTypes = {
@@ -183,13 +183,13 @@ Tags.propTypes = {
   deleteTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studyprogramme: string.isRequired,
-  userId: string.isRequired
+  userId: string.isRequired,
 }
 
 export default withRouter(
   connect(mapStateToProps, {
     createTag: createTagAction,
     deleteTag: deleteTagAction,
-    getTagsByStudytrack: getTagsByStudytrackAction
+    getTagsByStudytrack: getTagsByStudytrackAction,
   })(Tags)
 )

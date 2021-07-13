@@ -26,61 +26,61 @@ const reducer = (state = { data: {} }, action) => {
       return {
         pending: true,
         selected: state.selected,
-        data: state.data
+        data: state.data,
       }
     case 'GET_ALL_DUPLICATES_FAILURE':
       return {
         pending: false,
         error: true,
         selected: state.selected,
-        data: state.data
+        data: state.data,
       }
     case 'GET_ALL_DUPLICATES_SUCCESS':
       return {
         pending: false,
         error: false,
         selected: action.response.code,
-        data: action.response
+        data: action.response,
       }
     case 'ADD_DUPLICATE_ATTEMPT':
       return {
         pending: true,
         selected: state.selected,
-        data: state.data
+        data: state.data,
       }
     case 'ADD_DUPLICATE_FAILURE':
       return {
         pending: false,
         error: true,
         selected: state.selected,
-        data: state.data
+        data: state.data,
       }
     case 'ADD_DUPLICATE_SUCCESS':
       return {
         pending: false,
         error: false,
         selected: action.response.code,
-        data: action.response
+        data: action.response,
       }
     case 'REMOVE_DUPLICATE_ATTEMPT':
       return {
         pending: true,
         selected: state.selected,
-        data: state.data
+        data: state.data,
       }
     case 'REMOVE_DUPLICATE_FAILURE':
       return {
         pending: false,
         error: true,
         selected: state.selected,
-        data: state.data
+        data: state.data,
       }
     case 'REMOVE_DUPLICATE_SUCCESS':
       return {
         pending: false,
         error: false,
         selected: action.response.code,
-        data: action.response
+        data: action.response,
       }
     default:
       return state

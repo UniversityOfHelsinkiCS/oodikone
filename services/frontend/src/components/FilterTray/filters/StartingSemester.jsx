@@ -30,7 +30,7 @@ const StartingSemester = () => {
 
   const options = [
     { key: 'during-this-semester', text: `During (${count(true)})`, value: 1 },
-    { key: 'before-this-semester', text: `Before (${count(false)})`, value: 2 }
+    { key: 'before-this-semester', text: `Before (${count(false)})`, value: 2 },
   ]
 
   return (

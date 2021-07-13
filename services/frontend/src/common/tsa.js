@@ -6,7 +6,7 @@ import { callApi } from '../apiConnection'
 // manually if-else whether matomo is enabled
 const Matomo = require('piwik-react-router')({
   enableLinkTracking: false,
-  injectScript: false
+  injectScript: false,
 })
 
 const safely = (fn, defaultValue) => {
@@ -53,14 +53,14 @@ const setUserId = userId => {
 
 const TSA = {
   Influx: {
-    sendEvent: sendGrafanaEvent
+    sendEvent: sendGrafanaEvent,
   },
   Matomo: {
     connectToHistory,
     sendEvent,
     setUserId,
-    setDocumentTitle
-  }
+    setDocumentTitle,
+  },
 }
 
 export default TSA

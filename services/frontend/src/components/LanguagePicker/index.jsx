@@ -11,7 +11,7 @@ export default () => {
   const options = LANGUAGE_CODES.map(code => ({
     key: code,
     text: code.toUpperCase(),
-    value: code
+    value: code,
   }))
 
   return (

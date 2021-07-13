@@ -2,7 +2,7 @@ import { arrayOf, number, oneOfType, shape, string, oneOf } from 'prop-types'
 
 export const viewModeNames = {
   ATTEMPTS: 'Attempts',
-  STUDENT: 'Students'
+  STUDENT: 'Students',
 }
 
 export const getDataObject = (name, data, stack) => ({ name, data, stack })
@@ -16,7 +16,7 @@ export const getMaxValueOfSeries = series =>
 export const dataSeriesType = shape({
   name: string,
   code: oneOfType([string, number]),
-  stats: arrayOf(shape({}))
+  stats: arrayOf(shape({})),
 })
 
 export const viewModeType = oneOf(Object.values(viewModeNames))
@@ -38,7 +38,7 @@ export const getThesisGradeSpread = (series, isRelative) => {
     LUB: [],
     NSLA: [],
     A: [],
-    I: []
+    I: [],
   }
   const newSeries = series.reduce(
     (acc, cur, i) => {
@@ -83,7 +83,7 @@ export const getGradeSpread = (series, isRelative) => {
     5: [],
     HT: [],
     TT: [],
-    'Hyv.': []
+    'Hyv.': [],
   }
   const newSeries = series.reduce(
     (acc, cur, i) => {

@@ -26,5 +26,5 @@ const makePopulationsToData = createSelector([getPopulations], populations => {
 })
 
 export default {
-  makePopulationsToData
+  makePopulationsToData,
 }

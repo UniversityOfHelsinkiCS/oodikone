@@ -27,7 +27,7 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
     createMultipleStudentTag(
       studentnumbers.map(sn => ({
         tag_id: selectedValue,
-        studentnumber: sn
+        studentnumber: sn,
       })),
       studytrack
     )
@@ -90,7 +90,7 @@ const TagModal = ({ tags, studytrack, createMultipleStudentTag, pending, success
 }
 
 TagModal.defaultProps = {
-  error: null
+  error: null,
 }
 
 TagModal.propTypes = {
@@ -99,17 +99,17 @@ TagModal.propTypes = {
   studytrack: string.isRequired,
   pending: bool.isRequired,
   success: bool.isRequired,
-  error: string
+  error: string,
 }
 
 const mapStateToProps = ({ tagstudent }) => ({
   pending: tagstudent.pending,
   success: tagstudent.success,
-  error: tagstudent.error
+  error: tagstudent.error,
 })
 
 export default withRouter(
   connect(mapStateToProps, {
-    createMultipleStudentTag: createMultipleStudentTagAction
+    createMultipleStudentTag: createMultipleStudentTagAction,
   })(TagModal)
 )

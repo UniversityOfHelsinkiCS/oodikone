@@ -40,7 +40,7 @@ const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags })
             <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
             <div>
               {studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes '}
-              {"students who haven't enrolled present nor absent"}
+              students who haven't enrolled present nor absent
             </div>
             <div>
               {studentStatuses.includes('NONDEGREE') ? 'Includes ' : 'Excludes '}
@@ -79,11 +79,11 @@ PopulationQueryCard.propTypes = {
     year: oneOfType([string, number]),
     semester: string,
     studyRights: shape({ programme: string, degree: string, studyTrack: string }),
-    uuid: string
+    uuid: string,
   }).isRequired,
   removeSampleFn: func.isRequired,
   units: arrayOf(object).isRequired,
-  tags: arrayOf(shape({})).isRequired
+  tags: arrayOf(shape({})).isRequired,
 }
 
 export default withRouter(PopulationQueryCard)

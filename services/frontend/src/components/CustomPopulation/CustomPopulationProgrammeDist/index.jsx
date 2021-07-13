@@ -10,7 +10,7 @@ const CustomPopulationProgrammeDist = ({
   samples,
   selectedStudents,
   studentToTargetCourseDateMap,
-  populationStatistics
+  populationStatistics,
 }) => {
   const { language } = useLanguage()
   const [tableRows, setRows] = useState([])
@@ -47,7 +47,7 @@ const CustomPopulationProgrammeDist = ({
           style={{ margin: '0px' }}
           percent={Math.round((students.length / selectedStudents.length) * 100)}
           progress
-        />
+        />,
       ])
       const sortedRows = rows.sort((a, b) => b[1] - a[1])
       setRows(sortedRows)
@@ -60,19 +60,19 @@ const CustomPopulationProgrammeDist = ({
 }
 
 CustomPopulationProgrammeDist.defaultProps = {
-  studentToTargetCourseDateMap: null
+  studentToTargetCourseDateMap: null,
 }
 
 CustomPopulationProgrammeDist.propTypes = {
   samples: arrayOf(shape({})).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   studentToTargetCourseDateMap: shape({}),
-  populationStatistics: shape({}).isRequired
+  populationStatistics: shape({}).isRequired,
 }
 
 const mapStateToProps = ({ populations }) => {
   return {
-    populationStatistics: populations.data
+    populationStatistics: populations.data,
   }
 }
 

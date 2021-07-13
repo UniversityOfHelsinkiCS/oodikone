@@ -24,7 +24,7 @@ const MENU = {
   SUM: 'Summary',
   COURSE: 'Course',
   QUERY: 'New query',
-  FACULTY: 'Faculty statistics'
+  FACULTY: 'Faculty statistics',
 }
 
 const CourseStatistics = props => {
@@ -37,7 +37,7 @@ const CourseStatistics = props => {
     initCourseCode,
     userRoles,
     rights,
-    diffIsEmpty
+    diffIsEmpty,
   } = props
 
   const [activeIndex, setActiveIndex] = useState(0)
@@ -68,14 +68,14 @@ const CourseStatistics = props => {
     let panes = [
       {
         menuItem: MENU.SUM,
-        render: () => <SummaryTab onClickCourse={switchToCourse} userHasAccessToAllStats={userHasAccessToAllStats} />
+        render: () => <SummaryTab onClickCourse={switchToCourse} userHasAccessToAllStats={userHasAccessToAllStats} />,
       },
       {
         menuItem: MENU.COURSE,
         render: () => (
           <SingleCourseTab selected={selected || initCourseCode} userHasAccessToAllStats={userHasAccessToAllStats} />
-        )
-      }
+        ),
+      },
     ]
 
     if (userHasAccessToAllStats) {
@@ -83,8 +83,8 @@ const CourseStatistics = props => {
         ...panes,
         {
           menuItem: MENU.FACULTY,
-          render: () => <FacultyLevelStatistics />
-        }
+          render: () => <FacultyLevelStatistics />,
+        },
       ]
     }
 
@@ -100,10 +100,10 @@ const CourseStatistics = props => {
             sendAnalytics('Clicked new query', 'Course stats')
             history.push('/coursestatistics')
             clearCourseStats()
-          }
+          },
         },
-        render: () => null
-      }
+        render: () => null,
+      },
     ]
 
     return !singleCourseStats ? panes : panes.filter(p => p.menuItem !== MENU.SUM)
@@ -165,15 +165,15 @@ CourseStatistics.propTypes = {
   initCourseCode: string.isRequired,
   userRoles: arrayOf(string).isRequired,
   rights: arrayOf(string).isRequired,
-  diffIsEmpty: bool.isRequired
+  diffIsEmpty: bool.isRequired,
 }
 
 const mapStateToProps = ({
   courseStats,
   oodiSisDiff,
   auth: {
-    token: { roles, rights }
-  }
+    token: { roles, rights },
+  },
 }) => {
   const courses = Object.keys(courseStats.data)
   return {
@@ -185,7 +185,7 @@ const mapStateToProps = ({
     singleCourseStats: courses.length === 1,
     loading: courseStats.pending || oodiSisDiff.pending,
     initCourseCode: courses[0] || '',
-    diffIsEmpty: Object.keys(oodiSisDiff.data).length === 0
+    diffIsEmpty: Object.keys(oodiSisDiff.data).length === 0,
   }
 }
 

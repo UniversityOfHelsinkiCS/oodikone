@@ -61,14 +61,14 @@ const CourseSearchForm = props => {
 CourseSearchForm.propTypes = {
   findCoursesV2: func.isRequired,
   clearCourses: func.isRequired,
-  pending: bool.isRequired
+  pending: bool.isRequired,
 }
 
 const mapStateToProps = state => ({
-  pending: state.courseSearch.pending
+  pending: state.courseSearch.pending,
 })
 
 export default connect(mapStateToProps, {
   findCoursesV2,
-  clearCourses
+  clearCourses,
 })(CourseSearchForm)

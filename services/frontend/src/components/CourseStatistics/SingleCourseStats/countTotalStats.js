@@ -42,9 +42,9 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
           categories: {
             passedFirst: newPassedFirst,
             passedEventually: newPassedEventually,
-            neverPassed: newNeverPassed
-          }
-        }
+            neverPassed: newNeverPassed,
+          },
+        },
       }
     },
     {
@@ -55,22 +55,22 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       attempts: {
         categories: {
           passed: 0,
-          failed: 0
+          failed: 0,
         },
         passRate: 0,
-        grades: {}
+        grades: {},
       },
       students: {
         categories: {
           passedFirst: 0,
           passedEventually: 0,
-          neverPassed: 0
+          neverPassed: 0,
         },
         passRate: 0,
         failRate: 0,
-        total: 0
+        total: 0,
       },
-      studentnumbers: []
+      studentnumbers: [],
     }
   )
 

@@ -17,7 +17,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
       to: yearcode,
       coursecodes: JSON.stringify(uniq(alternatives)),
       years,
-      separate
+      separate,
     }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
@@ -51,20 +51,20 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
               </div>
             ),
             getCellProps: s => defineCellColor(s),
-            headerProps: { rowSpan: 2, width: 3 }
+            headerProps: { rowSpan: 2, width: 3 },
           },
           {
             key: 'TOTAL',
             title: 'All students',
             getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.total),
             getCellProps: s => defineCellColor(s),
-            headerProps: { rowSpan: 2, width: 3 }
+            headerProps: { rowSpan: 2, width: 3 },
           },
           {
             key: 'PASSED',
             title: 'Passed',
             parent: true,
-            headerProps: { colSpan: 3, width: 5 }
+            headerProps: { colSpan: 3, width: 5 },
           },
           {
             key: 'PASS_FIRST',
@@ -72,7 +72,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedFirst || 0),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
-            child: true
+            child: true,
           },
           {
             key: 'PASS_EVENTUALLY',
@@ -80,7 +80,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedEventually || 0),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
-            child: true
+            child: true,
           },
           {
             key: 'PASS_RATE',
@@ -89,13 +89,13 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate || 0)),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
-            child: true
+            child: true,
           },
           {
             key: 'FAIL',
             title: 'Failed',
             parent: true,
-            headerProps: { colSpan: 3, width: 5 }
+            headerProps: { colSpan: 3, width: 5 },
           },
           {
             key: 'NEVER PASSED',
@@ -103,7 +103,7 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.neverPassed || 0),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 2 },
-            child: true
+            child: true,
           },
           {
             key: 'FAIL_RATE',
@@ -112,8 +112,8 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
             getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
             getCellProps: s => defineCellColor(s),
             cellProps: { width: 1 },
-            child: true
-          }
+            child: true,
+          },
         ]}
         data={stats}
       />
@@ -130,11 +130,11 @@ StudentTable.propTypes = {
   alternatives: arrayOf(string).isRequired,
   separate: bool,
   userHasAccessToAllStats: bool.isRequired,
-  headerVisible: bool.isRequired
+  headerVisible: bool.isRequired,
 }
 
 StudentTable.defaultProps = {
-  separate: false
+  separate: false,
 }
 
 export default connect(null)(StudentTable)

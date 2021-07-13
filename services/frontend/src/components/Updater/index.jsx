@@ -27,7 +27,7 @@ const Updater = () => {
   const updateSISPopulationStudentsByProgramme = () =>
     apiCall('/updater/update/v2/students_by_programme', 'post', {
       programme: SISProgrammeName.trim(),
-      year: Number(SISProgrammeYear.trim())
+      year: Number(SISProgrammeYear.trim()),
     })
   const refreshStatisticsV2 = () => apiCall('/updater/refresh_statistic_v2', 'post')
   const abortSisUpdater = () => apiCall('/updater/abort', 'get')

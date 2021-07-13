@@ -19,22 +19,22 @@ const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CA
 const defaultConfig = () => {
   return {
     chart: {
-      type: 'column'
+      type: 'column',
     },
     credits: {
-      text: 'oodikone | TOSKA'
+      text: 'oodikone | TOSKA',
     },
     title: {
       text: '',
       style: {
-        display: 'none'
-      }
+        display: 'none',
+      },
     },
 
     yAxis: {
       min: 0,
       title: {
-        text: 'Tavoiteajassa'
+        text: 'Tavoiteajassa',
       },
       stackLabels: {
         enabled: true,
@@ -42,9 +42,9 @@ const defaultConfig = () => {
           fontWeight: 'bold',
           color:
             // theme
-            (Highcharts.defaultOptions.title.style && Highcharts.defaultOptions.title.style.color) || 'gray'
-        }
-      }
+            (Highcharts.defaultOptions.title.style && Highcharts.defaultOptions.title.style.color) || 'gray',
+        },
+      },
     },
     legend: {
       align: 'right',
@@ -55,7 +55,7 @@ const defaultConfig = () => {
       backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
       borderColor: '#CCC',
       borderWidth: 1,
-      shadow: false
+      shadow: false,
     },
     tooltip: {
       shared: true,
@@ -63,16 +63,16 @@ const defaultConfig = () => {
         return `<span style="color:${this.color}">●</span> ${this.series.name}: <b>${this.y}</b> (${(
           this.z * 100
         ).toFixed(1)}%)<br/>`
-      }
+      },
     },
     plotOptions: {
       series: {
         stacking: 'normal',
         dataLabels: {
-          enabled: true
-        }
-      }
-    }
+          enabled: true,
+        },
+      },
+    },
   }
 }
 
@@ -89,7 +89,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
           if (tick) {
             tick.label.css({
               color: 'black',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
             })
           }
         },
@@ -97,12 +97,12 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
           if (this.selectedTick && this.selectedTick.label) {
             this.selectedTick.label.css({
               color: 'grey',
-              fontWeight: 'normal'
+              fontWeight: 'normal',
             })
             this.selectedTick = null
           }
-        }
-      }
+        },
+      },
     }
     return serie
   }
@@ -114,50 +114,50 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
       data: data.map(entry => ({
         y: entry.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
-        z: entry.currentlyCancelled / entry.totalStudents
-      }))
+        z: entry.currentlyCancelled / entry.totalStudents,
+      })),
     },
     {
       color: '#ff7979',
       name: 'ei tahdissa',
       data: data.map(entry => ({
         custom: {
-          code: entry.code
+          code: entry.code,
         },
         y: entry.totalStudents - entry.students3y - entry.students4y - entry.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
-        z: (entry.totalStudents - entry.students3y - entry.students4y - entry.currentlyCancelled) / entry.totalStudents
-      }))
+        z: (entry.totalStudents - entry.students3y - entry.students4y - entry.currentlyCancelled) / entry.totalStudents,
+      })),
     },
     {
       color: '#f9ca24',
       name: '4v tahdissa',
       data: data.map(entry => ({
         custom: {
-          code: entry.code
+          code: entry.code,
         },
         y: entry.students4y,
-        z: entry.students4y / entry.totalStudents
-      }))
+        z: entry.students4y / entry.totalStudents,
+      })),
     },
     {
       color: '#6ab04c',
       name: '3v tahdissa',
       data: data.map(entry => ({
         custom: {
-          code: entry.code
+          code: entry.code,
         },
         y: entry.students3y,
-        z: entry.students3y / entry.totalStudents
-      }))
-    }
+        z: entry.students3y / entry.totalStudents,
+      })),
+    },
   ].map(addMouseOverHandler)
 
   const categories = data.map(entry => entry.name)
 
   return Highcharts.merge(defaultConfig(), {
     chart: {
-      type
+      type,
     },
     xAxis: {
       categories,
@@ -199,7 +199,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
                 'rectangle'
               )
               .css({
-                color: 'black'
+                color: 'black',
               })
               .attr({
                 fill: 'white',
@@ -207,7 +207,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
                 r: 1,
                 opacity: 0.8,
                 'stroke-width': 1,
-                stroke: 'black'
+                stroke: 'black',
               })
               .add()
               .toFront()
@@ -215,7 +215,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
             if (tick) {
               tick.label.css({
                 color: 'black',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
               })
             }
           },
@@ -223,17 +223,17 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
             if (this.selectedTick && this.selectedTick.label) {
               this.selectedTick.label.css({
                 color: '#666666',
-                fontWeight: 'normal'
+                fontWeight: 'normal',
               })
               this.selectedTick = null
               this.chart.myLabel.destroy()
             }
-          }
+          },
         },
         style: {
-          cursor: 'pointer'
-        }
-      }
+          cursor: 'pointer',
+        },
+      },
     },
     series: orgSeries,
     plotOptions: {
@@ -249,11 +249,11 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
                 const datapoint = data.find(entry => entry.code === point.custom.code)
                 clickHandler(datapoint.programmes || datapoint.studytracks)
               }
-            }
-          }
-        }
-      }
-    }
+            },
+          },
+        },
+      },
+    },
   })
 }
 
@@ -263,7 +263,7 @@ const sorters = {
   '4v tahti': (a, b) => a.students4y - b.students4y,
   '3v tahti': (a, b) => a.students3y - b.students3y,
   'ei tahdissa': (a, b) => countNotInTarget(a) + a.currentlyCancelled - (countNotInTarget(b) + b.currentlyCancelled),
-  peruutettu: (a, b) => a.currentlyCancelled - b.currentlyCancelled
+  peruutettu: (a, b) => a.currentlyCancelled - b.currentlyCancelled,
 }
 
 const ClickableChart = React.memo(({ data, sorter, isSideways, clickHandler }) => {
@@ -286,7 +286,7 @@ const NonClickableChart = React.memo(({ data, sorter, isSideways }) => {
 })
 
 NonClickableChart.defaultProps = {
-  isSideways: false
+  isSideways: false,
 }
 
 NonClickableChart.propTypes = {
@@ -297,15 +297,15 @@ NonClickableChart.propTypes = {
       students3y: PropTypes.number,
       students4y: PropTypes.number,
       totalStudents: PropTypes.number,
-      currentlyCancelled: PropTypes.number
+      currentlyCancelled: PropTypes.number,
     })
   ).isRequired,
   sorter: PropTypes.func.isRequired,
-  isSideways: PropTypes.bool
+  isSideways: PropTypes.bool,
 }
 
 ClickableChart.defaultProps = {
-  isSideways: false
+  isSideways: false,
 }
 
 ClickableChart.propTypes = {
@@ -316,12 +316,12 @@ ClickableChart.propTypes = {
       students3y: PropTypes.number,
       students4y: PropTypes.number,
       totalStudents: PropTypes.number,
-      currentlyCancelled: PropTypes.number
+      currentlyCancelled: PropTypes.number,
     })
   ).isRequired,
   sorter: PropTypes.func.isRequired,
   clickHandler: func.isRequired,
-  isSideways: PropTypes.bool
+  isSideways: PropTypes.bool,
 }
 
 const ProtoC = ({
@@ -331,7 +331,7 @@ const ProtoC = ({
   isLoading,
   programme = 'KH50_005',
   protoCProgrammeData,
-  protoCProgrammeLoading
+  protoCProgrammeLoading,
 }) => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
@@ -346,12 +346,12 @@ const ProtoC = ({
       getProtoCProgrammeDispatch({
         includeOldAttainments: includeOldAttainments.toString(),
         excludeNonEnrolled: excludeNonEnrolled.toString(),
-        code: programme
+        code: programme,
       })
     } else {
       getProtoCDispatch({
         includeOldAttainments: includeOldAttainments.toString(),
-        excludeNonEnrolled: excludeNonEnrolled.toString()
+        excludeNonEnrolled: excludeNonEnrolled.toString(),
       })
     }
   }, [includeOldAttainments, excludeNonEnrolled])
@@ -536,7 +536,7 @@ const ProtoC = ({
 }
 
 ProtoC.defaultProps = {
-  programme: ''
+  programme: '',
 }
 
 ProtoC.propTypes = {
@@ -546,17 +546,17 @@ ProtoC.propTypes = {
   getProtoCProgrammeDispatch: func.isRequired,
   protoCProgrammeLoading: bool.isRequired,
   protoCProgrammeData: shape({}).isRequired,
-  programme: string
+  programme: string,
 }
 
 const mapStateToProps = ({ coolDataScience }) => ({
   data: coolDataScience.data.protoC,
   protoCProgrammeData: coolDataScience.data.protoCProgramme,
   isLoading: coolDataScience.pending.protoC,
-  protoCProgrammeLoading: coolDataScience.pending.protoCProgramme
+  protoCProgrammeLoading: coolDataScience.pending.protoCProgramme,
 })
 
 export default connect(mapStateToProps, {
   getProtoCDispatch: getProtoC,
-  getProtoCProgrammeDispatch: getProtoCProgramme
+  getProtoCProgrammeDispatch: getProtoCProgramme,
 })(ProtoC)

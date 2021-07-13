@@ -13,7 +13,7 @@ import UserSearchList from './UserSearchList'
 
 class EnableUsers extends Component {
   state = {
-    enabledOnly: true
+    enabledOnly: true,
   }
 
   componentDidMount() {
@@ -100,8 +100,8 @@ class EnableUsers extends Component {
 EnableUsers.propTypes = {
   match: shape({
     params: shape({
-      studentNumber: string
-    })
+      studentNumber: string,
+    }),
   }).isRequired,
   getUsers: func.isRequired,
   pending: bool.isRequired,
@@ -116,16 +116,16 @@ EnableUsers.propTypes = {
       units: arrayOf(
         shape({
           id: string,
-          name: shape({}).isRequired
+          name: shape({}).isRequired,
         })
-      )
+      ),
     })
   ).isRequired,
   error: bool.isRequired,
   units: arrayOf(shape({})).isRequired,
   elementdetails: arrayOf(shape({ code: string, type: number, name: shape({}) })).isRequired,
   getElementDetails: func.isRequired,
-  history: shape({}).isRequired
+  history: shape({}).isRequired,
 }
 
 const sortUsers = makeSortUsers()
@@ -136,13 +136,13 @@ const mapStateToProps = ({ users, units, elementdetails }) => ({
   enabledOnly: users.enabledOnly,
   users: sortUsers(users),
   pending: typeof users.pending === 'boolean' ? users.pending : true,
-  error: users.error || false
+  error: users.error || false,
 })
 
 export default withRouter(
   connect(mapStateToProps, {
     getUsers,
     getUnits,
-    getElementDetails
+    getElementDetails,
   })(EnableUsers)
 )

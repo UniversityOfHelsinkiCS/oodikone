@@ -14,19 +14,19 @@ export const getStudent = studentNumber => {
 
 export const selectStudent = studentNumber => ({
   type: 'SELECT_STUDENT_SUCCESS',
-  response: studentNumber
+  response: studentNumber,
 })
 
 export const removeStudentSelection = () => ({
-  type: 'REMOVE_SELECTED_SUCCESS'
+  type: 'REMOVE_SELECTED_SUCCESS',
 })
 
 export const resetStudent = () => ({
-  type: 'RESET_STUDENT_SUCCESS'
+  type: 'RESET_STUDENT_SUCCESS',
 })
 
 export const clearStudentError = () => ({
-  type: 'CLEAR_STUDENT_ERROR'
+  type: 'CLEAR_STUDENT_ERROR',
 })
 
 const reducer = (state = { data: [], pending: false, error: false, fetching: false }, action) => {
@@ -38,7 +38,7 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
         error: false,
         selected: state.selected,
         lastSearch: action.requestSettings.query,
-        data: state.data
+        data: state.data,
       }
     case 'FIND_STUDENTS_FAILURE':
       return {
@@ -47,7 +47,7 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
         error: true,
         selected: state.selected,
         lastSearch: state.lastSearch,
-        data: state.data
+        data: state.data,
       }
     case 'FIND_STUDENTS_SUCCESS':
       return {
@@ -59,21 +59,21 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
         data:
           state.lastSearch === action.query
             ? [...state.data.filter(student => student.fetched), ...action.response]
-            : state.data
+            : state.data,
       }
     case 'GET_STUDENT_ATTEMPT':
       return {
         ...state,
         pending: true,
         error: false,
-        fetching: true
+        fetching: true,
       }
     case 'GET_STUDENT_FAILURE':
       return {
         ...state,
         pending: false,
         error: true,
-        fetching: false
+        fetching: false,
       }
     case 'GET_STUDENT_SUCCESS':
       return {
@@ -84,13 +84,13 @@ const reducer = (state = { data: [], pending: false, error: false, fetching: fal
         lastSearch: state.lastSearch,
         data: [
           ...state.data.filter(student => student.studentNumber !== action.response.studentNumber),
-          { ...action.response, ...{ fetched: true } }
-        ]
+          { ...action.response, ...{ fetched: true } },
+        ],
       }
     case 'CLEAR_STUDENT_ERROR':
       return {
         ...state,
-        error: false
+        error: false,
       }
     case 'SELECT_STUDENTS_SUCCESS':
       return { ...state, selected: action.response }

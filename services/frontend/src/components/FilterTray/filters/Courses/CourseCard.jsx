@@ -19,35 +19,35 @@ const CourseCard = ({ courseStats }) => {
   const subFilters = [
     {
       label: 'All',
-      func: ({ studentNumber }) => Object.keys(students.all).includes(studentNumber)
+      func: ({ studentNumber }) => Object.keys(students.all).includes(studentNumber),
     },
     {
       label: 'Passed',
-      func: ({ studentNumber }) => Object.keys(students.passed).includes(studentNumber)
+      func: ({ studentNumber }) => Object.keys(students.passed).includes(studentNumber),
     },
     {
       label: 'Passed After Failure',
       func: ({ studentNumber }) => Object.keys(students.retryPassed).includes(studentNumber),
-      info: 'Student passed the course after failing it at least once.'
+      info: 'Student passed the course after failing it at least once.',
     },
     {
       label: 'Failed',
-      func: ({ studentNumber }) => Object.keys(students.failed).includes(studentNumber)
+      func: ({ studentNumber }) => Object.keys(students.failed).includes(studentNumber),
     },
     {
       label: 'Failed Many Times',
-      func: ({ studentNumber }) => Object.keys(students.failedMany).includes(studentNumber)
+      func: ({ studentNumber }) => Object.keys(students.failedMany).includes(studentNumber),
     },
     {
       label: 'Not Participated',
-      func: ({ studentNumber }) => !Object.keys(students.all).includes(studentNumber)
+      func: ({ studentNumber }) => !Object.keys(students.all).includes(studentNumber),
     },
     {
       label: "Didn't pass",
       func: ({ studentNumber }) =>
         !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
-      info: "Students that failed or didn't participate in the course"
-    }
+      info: "Students that failed or didn't participate in the course",
+    },
   ]
 
   // Apply filter on mount or selection change.
@@ -109,7 +109,7 @@ const CourseCard = ({ courseStats }) => {
 CourseCard.propTypes = {
   courseStats: PropTypes.shape({
     course: PropTypes.object,
-    students: PropTypes.object
-  }).isRequired
+    students: PropTypes.object,
+  }).isRequired,
 }
 export default CourseCard

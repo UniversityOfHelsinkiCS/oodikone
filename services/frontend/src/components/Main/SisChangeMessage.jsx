@@ -21,7 +21,7 @@ const SisChangeMessage = props => {
   const reasons = [
     'Osalla opiskelijoista voi olla opintopisteiden kokonaismäärässä eroja. Mahdollinen eroavaisuus on merkitty kyseisen opiskelijan sivulla. Tämä koskee erityisesti tiedekuntia, joissa on runsaasti osasuorituksia.',
     'Populaatioiden osalta vaihto-opiskelijoiden, tutkintoon johtamattomien opinto-oikeuksien ja ohjelmaan siirrettyjen opiskelijoiden näyttäminen ei kaikissa tapauksissa toimi oikein.',
-    'Trendien osalta ainoastaan "See current status" -sivu toimii, muut eivät näytä vuositahteja oikein.'
+    'Trendien osalta ainoastaan "See current status" -sivu toimii, muut eivät näytä vuositahteja oikein.',
   ]
 
   // Kasvatustiedehuomiot
@@ -60,13 +60,13 @@ const SisChangeMessage = props => {
 
 const mapStateToProps = ({
   auth: {
-    token: { roles, rights }
-  }
+    token: { roles, rights },
+  },
 }) => ({
   userRoles: getUserRoles(roles),
-  rights
+  rights,
 })
 
 export default connect(mapStateToProps, null, null, {
-  areStatePropsEqual: isEqual
+  areStatePropsEqual: isEqual,
 })(SisChangeMessage)

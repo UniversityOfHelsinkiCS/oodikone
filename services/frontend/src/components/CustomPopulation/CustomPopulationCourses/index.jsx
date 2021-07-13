@@ -36,18 +36,18 @@ CustomPopulationCourses.propTypes = {
   selectedStudents: arrayOf(string).isRequired,
   query: shape({}).isRequired,
   error: bool.isRequired,
-  showFilter: bool
+  showFilter: bool,
 }
 
 CustomPopulationCourses.defaultProps = {
-  showFilter: false
+  showFilter: false,
 }
 
 const mapStateToProps = ({ populationCourses }) => ({
   courses: populationCourses.data,
   pending: populationCourses.pending,
   query: populationCourses.query,
-  error: populationCourses.error
+  error: populationCourses.error,
 })
 
 export default connect(mapStateToProps)(CustomPopulationCourses)

@@ -15,7 +15,7 @@ const PopulationCourses = ({
   populationCourses,
   selectedStudents,
   query,
-  filteredStudents
+  filteredStudents,
 }) => {
   const { setCoursesOnce, resetCourses, runCourseQuery } = useCourseFilter()
 
@@ -44,7 +44,7 @@ const PopulationCourses = ({
       selectedStudents,
       selectedStudentsByYear,
       year: query.year,
-      years: query.years
+      years: query.years,
     }
   }
 
@@ -87,7 +87,7 @@ const PopulationCourses = ({
 }
 
 PopulationCourses.defaultPropTypes = {
-  query: {}
+  query: {},
 }
 
 PopulationCourses.propTypes = {
@@ -95,12 +95,12 @@ PopulationCourses.propTypes = {
   populationCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
   selectedStudents: arrayOf(string).isRequired,
   query: shape({}).isRequired,
-  filteredStudents: arrayOf(shape({})).isRequired
+  filteredStudents: arrayOf(shape({})).isRequired,
 }
 
 const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses }) => ({
   populationCourses,
-  populationSelectedStudentCourses
+  populationSelectedStudentCourses,
 })
 
 export default connect(mapStateToProps)(PopulationCourses)

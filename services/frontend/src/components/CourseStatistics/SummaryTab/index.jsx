@@ -48,7 +48,7 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
       passrate,
       realisations: realisations.map(obj => {
         return unObjectifyProperty({ obj, property: 'realisation' })
-      })
+      }),
     }
   })
 
@@ -86,14 +86,12 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
           </Form.Field>
         </Form>
       </Segment>
-      {
-        <AttemptsTable
-          categoryName="Course"
-          onClickCourse={onClickCourse}
-          data={data}
-          userHasAccessToAllStats={userHasAccessToAllStats}
-        />
-      }
+      <AttemptsTable
+        categoryName="Course"
+        onClickCourse={onClickCourse}
+        data={data}
+        userHasAccessToAllStats={userHasAccessToAllStats}
+      />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>
       )}
@@ -108,13 +106,13 @@ SummaryTab.propTypes = {
       name: shape({
         fi: string,
         en: string,
-        sv: string
+        sv: string,
       }),
       summary: shape({
         failed: number,
         passed: number,
-        passrate: oneOfType([number, string])
-      })
+        passrate: oneOfType([number, string]),
+      }),
     })
   ).isRequired,
   programmes: arrayOf(shape({})).isRequired,
@@ -122,10 +120,10 @@ SummaryTab.propTypes = {
   setValue: func.isRequired,
   queryInfo: shape({
     courses: arrayOf(shape({})),
-    timeframe: arrayOf(shape({}))
+    timeframe: arrayOf(shape({})),
   }).isRequired,
   onClickCourse: func.isRequired,
-  userHasAccessToAllStats: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
 }
 
 const mapStateToProps = state => {
@@ -138,7 +136,7 @@ const mapStateToProps = state => {
     form: state.courseSummaryForm,
     statistics: selectors.summaryStatistics(state, { programmes, programmeCodes }, userHasAccessToAllStats),
     queryInfo: selectors.getQueryInfo(state),
-    programmes
+    programmes,
   }
 }
 

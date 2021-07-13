@@ -21,7 +21,7 @@ const TeacherStatistics = ({
   pending,
   isAdmin,
   rights,
-  history
+  history,
 }) => {
   const { language } = useLanguage()
   const [semesterStart, setSemesterStart] = useState(null)
@@ -88,7 +88,7 @@ const TeacherStatistics = ({
   const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
   const localizedProviderOptions = providerOptions.map(({ name, ...rest }) => ({
     ...rest,
-    text: getTextIn(name, language)
+    text: getTextIn(name, language),
   }))
   const filteredOptions = semesters.filter(sem => {
     const options =
@@ -172,7 +172,7 @@ TeacherStatistics.propTypes = {
   pending: bool.isRequired,
   history: shape({}).isRequired,
   rights: arrayOf(string).isRequired,
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
 }
 
 const mapStateToProps = state => {
@@ -180,14 +180,14 @@ const mapStateToProps = state => {
     providers,
     teacherStatistics,
     auth: {
-      token: { rights, roles }
-    }
+      token: { rights, roles },
+    },
   } = state
   const { semesters } = state.semesters.data
   const providerOptions = providers.data.map(p => ({
     key: p.providercode,
     value: p.providercode,
-    name: p.name
+    name: p.name,
   }))
   const semesterOptions = !semesters
     ? []
@@ -196,7 +196,7 @@ const mapStateToProps = state => {
         .map(({ semestercode, name }, idx) => ({
           key: idx,
           value: semestercode,
-          text: name.en
+          text: name.en,
         }))
   const statistics = Object.values(teacherStatistics.data).map(teacher => ({
     id: teacher.id,
@@ -204,7 +204,7 @@ const mapStateToProps = state => {
     credits: teacher.stats.credits,
     passed: teacher.stats.passed,
     failed: teacher.stats.failed,
-    transferred: teacher.stats.transferred
+    transferred: teacher.stats.transferred,
   }))
   return {
     providers: providerOptions,
@@ -213,12 +213,12 @@ const mapStateToProps = state => {
     pending: teacherStatistics.pending,
     error: teacherStatistics.error,
     rights,
-    isAdmin: getUserIsAdmin(roles)
+    isAdmin: getUserIsAdmin(roles),
   }
 }
 
 export default connect(mapStateToProps, {
   getProviders,
   getSemesters,
-  getTeacherStatistics
+  getTeacherStatistics,
 })(withRouter(TeacherStatistics))

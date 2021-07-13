@@ -24,7 +24,7 @@ export default {
       myöhemmin keväällä 2019, tulisi merkityksi lukuvuodelle 2017-2018 sarakkeeseen "passed eventually".  
       
       Total-rivillä näkyy niiden opiskelijoiden kokonaismäärä, jotka ovat kurssista joskus arvosanan saaneet.
-    `
+    `,
   },
   1: {
     Attempts: `
@@ -44,7 +44,7 @@ export default {
 
       Esimerkiksi opiskelija, joka on yrittänyt kurssia syksyllä 2017 ja saanut silloin hylätyn arvosanan ja läpäissyt kurssin
       myöhemmin keväällä 2019, tulisi merkityksi lukuvuodelle 2017-2018 pylvääseen "passed eventually".        
-    `
+    `,
   },
   2: {
     Attempts: `
@@ -58,6 +58,6 @@ export default {
 
       Graafi näyttää suorituskertojen arvosanajakauman eri lukuvuosille. Mahdollinen kategoria
       "Other passed" sisältää sekä arvosanan "Hyv." että kurssin hyväksiluvut.
-    `
-  }
+    `,
+  },
 }

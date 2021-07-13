@@ -44,7 +44,7 @@ export const getYears = () => {
 const reducer = (
   state = {
     data: { protoC: {}, protoCProgramme: {}, status: {}, uber: [], years: [], graduated: {} },
-    pending: { protoC: false, protoCProgramme: false, status: false, uber: false, years: false, graduated: false }
+    pending: { protoC: false, protoCProgramme: false, status: false, uber: false, years: false, graduated: false },
   },
   action
 ) => {
@@ -54,216 +54,216 @@ const reducer = (
         ...state,
         data: {
           ...state.data,
-          protoC: {}
+          protoC: {},
         },
         pending: {
           ...state.pending,
-          protoC: true
-        }
+          protoC: true,
+        },
       }
     case 'GET_PROTOC_FAILED':
       return {
         ...state,
         data: {
           ...state.data,
-          protoC: {}
+          protoC: {},
         },
         pending: {
           ...state.pending,
-          protoC: false
-        }
+          protoC: false,
+        },
       }
     case 'GET_PROTOC_SUCCESS':
       return {
         ...state,
         data: {
           ...state.data,
-          protoC: action.response || {}
+          protoC: action.response || {},
         },
         pending: {
           ...state.pending,
-          protoC: false
-        }
+          protoC: false,
+        },
       }
     case 'GET_PROTOC_PROGRAMME_ATTEMPT':
       return {
         ...state,
         data: {
           ...state.data,
-          protoCProgramme: {}
+          protoCProgramme: {},
         },
         pending: {
           ...state.pending,
-          protoCProgramme: true
-        }
+          protoCProgramme: true,
+        },
       }
     case 'GET_PROTOC_PROGRAMME_FAILED':
       return {
         ...state,
         data: {
           ...state.data,
-          protoCProgramme: {}
+          protoCProgramme: {},
         },
         pending: {
           ...state.pending,
-          protoCProgramme: false
-        }
+          protoCProgramme: false,
+        },
       }
     case 'GET_PROTOC_PROGRAMME_SUCCESS':
       return {
         ...state,
         data: {
           ...state.data,
-          protoCProgramme: action.response || {}
+          protoCProgramme: action.response || {},
         },
         pending: {
           ...state.pending,
-          protoCProgramme: false
-        }
+          protoCProgramme: false,
+        },
       }
     case 'GET_STATUS_ATTEMPT':
       return {
         ...state,
         data: {
           ...state.data,
-          status: {}
+          status: {},
         },
         pending: {
           ...state.pending,
-          status: true
-        }
+          status: true,
+        },
       }
     case 'GET_STATUS_FAILED':
       return {
         ...state,
         data: {
           ...state.data,
-          status: {}
+          status: {},
         },
         pending: {
           ...state.pending,
-          status: false
-        }
+          status: false,
+        },
       }
     case 'GET_STATUS_SUCCESS':
       return {
         ...state,
         data: {
           ...state.data,
-          status: action.response || {}
+          status: action.response || {},
         },
         pending: {
           ...state.pending,
-          status: false
-        }
+          status: false,
+        },
       }
     case 'GET_UBER_ATTEMPT':
       return {
         ...state,
         data: {
           ...state.data,
-          uber: []
+          uber: [],
         },
         pending: {
           ...state.pending,
-          uber: true
-        }
+          uber: true,
+        },
       }
     case 'GET_UBER_FAILED':
       return {
         ...state,
         data: {
           ...state.data,
-          uber: []
+          uber: [],
         },
         pending: {
           ...state.pending,
-          uber: false
-        }
+          uber: false,
+        },
       }
     case 'GET_UBER_SUCCESS':
       return {
         ...state,
         data: {
           ...state.data,
-          uber: action.response || []
+          uber: action.response || [],
         },
         pending: {
           ...state.pending,
-          uber: false
-        }
+          uber: false,
+        },
       }
     case 'GET_YEARS_ATTEMPT':
       return {
         ...state,
         data: {
           ...state.data,
-          years: []
+          years: [],
         },
         pending: {
           ...state.pending,
-          years: true
-        }
+          years: true,
+        },
       }
     case 'GET_YEARS_FAILED':
       return {
         ...state,
         data: {
           ...state.data,
-          years: []
+          years: [],
         },
         pending: {
           ...state.pending,
-          years: false
-        }
+          years: false,
+        },
       }
     case 'GET_YEARS_SUCCESS':
       return {
         ...state,
         data: {
           ...state.data,
-          years: action.response || []
+          years: action.response || [],
         },
         pending: {
           ...state.pending,
-          years: false
-        }
+          years: false,
+        },
       }
     case 'GET_GRADUATED_ATTEMPT':
       return {
         ...state,
         data: {
           ...state.data,
-          graduated: {}
+          graduated: {},
         },
         pending: {
           ...state.pending,
-          graduated: true
-        }
+          graduated: true,
+        },
       }
     case 'GET_GRADUATED_FAILED':
       return {
         ...state,
         data: {
           ...state.data,
-          graduated: {}
+          graduated: {},
         },
         pending: {
           ...state.pending,
-          graduated: false
-        }
+          graduated: false,
+        },
       }
     case 'GET_GRADUATED_SUCCESS':
       return {
         ...state,
         data: {
           ...state.data,
-          graduated: action.response || {}
+          graduated: action.response || {},
         },
         pending: {
           ...state.pending,
-          graduated: false
-        }
+          graduated: false,
+        },
       }
     default:
       return state

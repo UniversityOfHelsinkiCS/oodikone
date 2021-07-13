@@ -1,9 +1,9 @@
 export const clearLoading = () => ({
-  type: 'SET_NOT_LOADING'
+  type: 'SET_NOT_LOADING',
 })
 
 export const setLoading = () => ({
-  type: 'SET_LOADING'
+  type: 'SET_LOADING',
 })
 
 const reducer = (state = false, action) => {

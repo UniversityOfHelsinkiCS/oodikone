@@ -7,24 +7,24 @@ export const getSingleCourseStats = ({ fromYear, toYear, courseCodes, separate, 
     startyearcode: fromYear,
     endyearcode: toYear,
     separate,
-    unifyOpenUniCourses
+    unifyOpenUniCourses,
   }
   return callController(route, 'GET_SINGLE_COURSE_STATS_', [], 'get', params, params)
 }
 
 export const setSelectedCourse = code => ({
   type: 'SET_SELECTED_COURSE',
-  selectedCourse: code
+  selectedCourse: code,
 })
 
 export const clearSelectedCourse = () => ({
-  type: 'CLEAR_SELECTED_COURSE'
+  type: 'CLEAR_SELECTED_COURSE',
 })
 
 export const getMaxYearsToCreatePopulationFrom = ({ courseCodes }) => {
   const route = '/v3/populationstatistics/maxYearsToCreatePopulationFrom'
   const params = {
-    courseCodes
+    courseCodes,
   }
 
   return callController(route, 'GET_MAX_YEARS_TO_CREATE_POPULATION_FROM_', null, 'get', null, params)
@@ -40,35 +40,35 @@ const reducer = (
         ...state,
         stats: {},
         pending: true,
-        error: false
+        error: false,
       }
     case 'GET_SINGLE_COURSE_STATS_SUCCESS':
       return {
         ...state,
         stats: action.response[0],
         pending: false,
-        error: false
+        error: false,
       }
     case 'GET_SINGLE_COURSE_STATS_FAILURE':
       return {
         ...state,
         pending: false,
-        error: true
+        error: true,
       }
     case 'SET_SELECTED_COURSE':
       return {
         ...state,
-        selectedCourse: action.selectedCourse
+        selectedCourse: action.selectedCourse,
       }
     case 'CLEAR_SELECTED_COURSE':
       return {
         ...state,
-        selectedCourse: null
+        selectedCourse: null,
       }
     case 'GET_MAX_YEARS_TO_CREATE_POPULATION_FROM_SUCCESS':
       return {
         ...state,
-        maxYearsToCreatePopulationFrom: action.response
+        maxYearsToCreatePopulationFrom: action.response,
       }
     default:
       return state

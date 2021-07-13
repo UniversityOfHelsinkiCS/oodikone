@@ -9,7 +9,7 @@ import AccessDenied from '../AccessDenied'
 
 class ErrorBoundary extends Component {
   state = {
-    hasError: false
+    hasError: false,
   }
 
   static getDerivedStateFromError() {
@@ -30,7 +30,7 @@ class ErrorBoundary extends Component {
     Sentry.configureScope(scope => {
       scope.setUser({
         username: userId,
-        mockedBy
+        mockedBy,
       })
     })
     TSA.Matomo.setUserId(mockedBy || userId)
@@ -70,23 +70,23 @@ ErrorBoundary.propTypes = {
   auth: shape({
     token: shape({
       enabled: bool,
-      pending: bool
+      pending: bool,
     }),
-    error: bool
+    error: bool,
   }).isRequired,
   // eslint-disable-next-line react/no-unused-prop-types
   actionHistory: arrayOf(shape({})),
   login: func.isRequired,
-  children: node.isRequired
+  children: node.isRequired,
 }
 
 ErrorBoundary.defaultProps = {
-  actionHistory: null
+  actionHistory: null,
 }
 
 const mapStateToProps = ({ actionHistory, auth }) => ({
   auth,
-  actionHistory
+  actionHistory,
 })
 
 export default connect(mapStateToProps, { login: loginAction })(ErrorBoundary)

@@ -4,7 +4,7 @@ import { ALL } from '../selectors/courseStats'
 const prefix = 'COURSE_SUMMARY_FORM'
 
 export const fields = {
-  programmes: 'programmes'
+  programmes: 'programmes',
 }
 
 const reducer = formreducer(prefix, { [fields.programmes]: [ALL.value] })

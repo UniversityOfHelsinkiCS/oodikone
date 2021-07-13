@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const defaultState = {
   currentValue: { min: '', max: '' },
-  requestedValue: { min: null, max: null }
+  requestedValue: { min: null, max: null },
 }
 
 const CreditFilterContext = createContext([[], () => {}])
@@ -15,7 +15,7 @@ export const CreditFilterProvider = ({ children }) => {
 }
 
 CreditFilterProvider.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 }
 
 export default () => {
@@ -27,8 +27,8 @@ export default () => {
       ...prev,
       currentValue: {
         ...prev.currentValue,
-        ...newValue
-      }
+        ...newValue,
+      },
     }))
 
   const setRequestedValue = newValue =>
@@ -36,8 +36,8 @@ export default () => {
       ...prev,
       requestedValue: {
         ...prev.currentValue,
-        ...newValue
-      }
+        ...newValue,
+      },
     }))
 
   return { currentValue, requestedValue, setCurrentValue, setRequestedValue }

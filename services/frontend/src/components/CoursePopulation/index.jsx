@@ -36,7 +36,7 @@ const CoursePopulation = ({
   getSemestersDispatch,
   semesters,
   getFacultiesDispatch,
-  getCustomPopulationCoursesByStudentnumbers
+  getCustomPopulationCoursesByStudentnumbers,
 }) => {
   const { language } = useLanguage()
   const { setAllStudents, filteredStudents } = useFilters()
@@ -69,7 +69,7 @@ const CoursePopulation = ({
     // Data fetching for courses of population tab
     if (!studentData.students) return
     getCustomPopulationCoursesByStudentnumbers({
-      studentnumberlist: studentData.students.map(student => student.studentNumber)
+      studentnumberlist: studentData.students.map(student => student.studentNumber),
     })
   }, [studentData.students])
 
@@ -91,7 +91,7 @@ const CoursePopulation = ({
 
     return {
       dateFrom: findDateByCode(Number(from)).startdate,
-      dateTo: findDateByCode(Number(to)).enddate
+      dateTo: findDateByCode(Number(to)).enddate,
     }
   }
 
@@ -104,7 +104,7 @@ const CoursePopulation = ({
         fromYear: from,
         toYear: to,
         courseCodes: parsedCourseCodes,
-        separate
+        separate,
       })
       setCodes(parsedCourseCodes)
       if (years) {
@@ -157,7 +157,7 @@ const CoursePopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Grade distribution
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(0),
       content: {
@@ -172,8 +172,8 @@ const CoursePopulation = ({
               codes={codes}
             />
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 1,
@@ -182,7 +182,7 @@ const CoursePopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Programme distribution
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(1),
       content: {
@@ -195,8 +195,8 @@ const CoursePopulation = ({
               selectedStudents={selectedStudents}
             />
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 2,
@@ -205,7 +205,7 @@ const CoursePopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Courses of population
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(2),
       content: {
@@ -213,8 +213,8 @@ const CoursePopulation = ({
           <div ref={programmeRef}>
             <CustomPopulationCourses selectedStudents={selectedStudents} showFilter={false} />
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 3,
@@ -223,7 +223,7 @@ const CoursePopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Credit gains
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(3),
       content: {
@@ -238,8 +238,8 @@ const CoursePopulation = ({
               to={dateTo}
             />
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 4,
@@ -248,7 +248,7 @@ const CoursePopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Students ({selectedStudents.length})
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(4),
       content: {
@@ -261,9 +261,9 @@ const CoursePopulation = ({
               language={language}
             />
           </div>
-        )
-      }
-    }
+        ),
+      },
+    },
   ]
 
   return (
@@ -300,10 +300,10 @@ CoursePopulation.propTypes = {
   courseData: shape({}).isRequired,
   semesters: shape({
     semesters: shape({}),
-    years: shape({})
+    years: shape({}),
   }).isRequired,
   getFacultiesDispatch: func.isRequired,
-  getCustomPopulationCoursesByStudentnumbers: func.isRequired
+  getCustomPopulationCoursesByStudentnumbers: func.isRequired,
 }
 
 const mapStateToProps = ({
@@ -311,15 +311,15 @@ const mapStateToProps = ({
   populations,
   semesters,
   auth: {
-    token: { roles }
-  }
+    token: { roles },
+  },
 }) => {
   return {
     studentData: populations.data,
     pending: populations.pending,
     courseData: singleCourseStats.stats || {},
     semesters: semesters.data,
-    isAdmin: getUserIsAdmin(roles)
+    isAdmin: getUserIsAdmin(roles),
   }
 }
 
@@ -329,6 +329,6 @@ export default withRouter(
     getSingleCourseStatsDispatch: getSingleCourseStats,
     getSemestersDispatch: getSemesters,
     getFacultiesDispatch: getFaculties,
-    getCustomPopulationCoursesByStudentnumbers
+    getCustomPopulationCoursesByStudentnumbers,
   })(CoursePopulation)
 )

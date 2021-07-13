@@ -28,7 +28,7 @@ const CustomPopulation = ({
   loading,
   customPopulationSearches,
   latestCreatedCustomPopulationSearchId,
-  searchedCustomPopulationSearchId
+  searchedCustomPopulationSearchId,
 }) => {
   const { language } = useLanguage()
   const [activeIndex, setIndex] = useState([])
@@ -92,7 +92,7 @@ const CustomPopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Credit accumulation (for {selectedStudents.length} students)
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(0),
       content: {
@@ -106,8 +106,8 @@ const CustomPopulation = ({
               language={language}
             />
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 1,
@@ -116,7 +116,7 @@ const CustomPopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Programme distribution
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(1),
       content: {
@@ -125,8 +125,8 @@ const CustomPopulation = ({
             <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
             <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 2,
@@ -135,7 +135,7 @@ const CustomPopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Courses of population
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(2),
       content: {
@@ -143,8 +143,8 @@ const CustomPopulation = ({
           <div ref={coursesRef}>
             <CustomPopulationCourses selectedStudents={selectedStudents} />
           </div>
-        )
-      }
+        ),
+      },
     },
     {
       key: 3,
@@ -153,7 +153,7 @@ const CustomPopulation = ({
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Students ({selectedStudents.length})
           </span>
-        )
+        ),
       },
       onTitleClick: () => handleClick(3),
       content: {
@@ -166,9 +166,9 @@ const CustomPopulation = ({
               customPopulation
             />
           </div>
-        )
-      }
-    }
+        ),
+      },
+    },
   ]
   const renderCustomPopulation = () => (
     <div>
@@ -212,7 +212,7 @@ const CustomPopulation = ({
 
 CustomPopulation.defaultProps = {
   latestCreatedCustomPopulationSearchId: null,
-  searchedCustomPopulationSearchId: null
+  searchedCustomPopulationSearchId: null,
 }
 
 CustomPopulation.propTypes = {
@@ -222,7 +222,7 @@ CustomPopulation.propTypes = {
   customPopulationSearches: arrayOf(shape({})).isRequired,
   latestCreatedCustomPopulationSearchId: string,
   searchedCustomPopulationSearchId: string,
-  getCustomPopulationSearchesDispatch: func.isRequired
+  getCustomPopulationSearchesDispatch: func.isRequired,
 }
 
 const mapStateToProps = ({ populations, populationCourses, customPopulationSearch }) => ({
@@ -232,10 +232,10 @@ const mapStateToProps = ({ populations, populationCourses, customPopulationSearc
   customPopulationFlag: populations.customPopulationFlag,
   customPopulationSearches: customPopulationSearch.customPopulationSearches,
   latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
-  searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId
+  searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId,
 })
 
 export default connect(mapStateToProps, {
   getCustomPopulationCoursesByStudentnumbers,
-  getCustomPopulationSearchesDispatch: getCustomPopulationSearches
+  getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
 })(CustomPopulation)

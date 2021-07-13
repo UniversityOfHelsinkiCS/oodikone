@@ -35,7 +35,7 @@ const TagPopulation = ({ createMultipleStudentTag, tags, studytrack, selectedStu
     selectedStudents.forEach(sn => {
       const tag = {
         tag_id: selectedValue,
-        studentnumber: sn
+        studentnumber: sn,
       }
       tagList.push(tag)
     })
@@ -101,14 +101,14 @@ TagPopulation.propTypes = {
   deleteMultipleStudentTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studytrack: string.isRequired,
-  selectedStudents: arrayOf(string).isRequired
+  selectedStudents: arrayOf(string).isRequired,
 }
 
 const mapStateToProps = ({ tagstudent }) => ({
-  created: tagstudent.created
+  created: tagstudent.created,
 })
 
 export default connect(mapStateToProps, {
   createMultipleStudentTag: createMultipleStudentTagAction,
-  deleteMultipleStudentTag: deleteMultipleStudentTagAction
+  deleteMultipleStudentTag: deleteMultipleStudentTagAction,
 })(TagPopulation)

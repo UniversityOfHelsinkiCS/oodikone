@@ -64,7 +64,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
             display: 'inline-block',
             width: '100%',
             height: '100%',
-            padding: '.78571429em .78571429em'
+            padding: '.78571429em .78571429em',
           }}
           to={`/study-programme/${prog.code}`}
         >
@@ -73,9 +73,9 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
       ),
       cellProps: {
         style: {
-          padding: '0'
-        }
-      }
+          padding: '0',
+        },
+      },
     },
     {
       key: 'programmename',
@@ -88,7 +88,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
             display: 'inline-block',
             width: '100%',
             height: '100%',
-            padding: '.78571429em .78571429em'
+            padding: '.78571429em .78571429em',
           }}
           to={`/study-programme/${prog.code}`}
         >
@@ -97,10 +97,10 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
       ),
       cellProps: {
         style: {
-          padding: '0'
-        }
-      }
-    }
+          padding: '0',
+        },
+      },
+    },
   ]
   if (studyprogrammes == null) {
     return <Message>You do not have access to any programmes</Message>
@@ -140,11 +140,11 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
 StudyProgrammeSelector.propTypes = {
   studyprogrammes: arrayOf(shape({ name: shape({}), code: string })),
   selected: bool.isRequired,
-  language: string.isRequired
+  language: string.isRequired,
 }
 
 StudyProgrammeSelector.defaultProps = {
-  studyprogrammes: null
+  studyprogrammes: null,
 }
 
 const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
@@ -153,7 +153,7 @@ const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
 
   return {
     studyprogrammes: programmes ? Object.values(programmes) : programmes,
-    language
+    language,
   }
 }
 

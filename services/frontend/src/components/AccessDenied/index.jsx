@@ -26,7 +26,7 @@ const names = [
   'joonashak',
   'vaahtokarkki',
   'otahontas',
-  'saarasat'
+  'saarasat',
 ]
 
 const dummyData = names.map(name => ({
@@ -34,7 +34,7 @@ const dummyData = names.map(name => ({
   data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].reduce((acc, i) => {
     acc[i] = (acc[i - 1] || 0) + (random(0, 3) === 0 ? 0 : random(10.0, 100.0))
     return acc
-  }, [])
+  }, []),
 }))
 
 const AccessDenied = ({ notEnabled, logout }) => {
@@ -61,25 +61,25 @@ const AccessDenied = ({ notEnabled, logout }) => {
           constructorType="stockChart"
           config={{
             title: {
-              text: 'Students of Computer Science 2018-2020'
+              text: 'Students of Computer Science 2018-2020',
             },
 
             yAxis: {
               title: {
-                text: 'Cumulative credits'
-              }
+                text: 'Cumulative credits',
+              },
             },
 
             plotOptions: {
               series: {
                 label: {
-                  connectorAllowed: false
+                  connectorAllowed: false,
                 },
-                pointStart: 2010
-              }
+                pointStart: 2010,
+              },
             },
 
-            series: dummyData
+            series: dummyData,
           }}
         />
 
@@ -115,11 +115,11 @@ const AccessDenied = ({ notEnabled, logout }) => {
 
 AccessDenied.propTypes = {
   notEnabled: bool.isRequired,
-  logout: func.isRequired
+  logout: func.isRequired,
 }
 
 const mapDispatchToProps = {
-  logout: logoutAction
+  logout: logoutAction,
 }
 
 export default connect(null, mapDispatchToProps)(AccessDenied)

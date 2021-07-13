@@ -21,7 +21,7 @@ export default () => {
 
   const filterFunctions = limit => ({
     min: student => getStudentTotalCredits(student) >= Number(limit),
-    max: student => getStudentTotalCredits(student) < Number(limit)
+    max: student => getStudentTotalCredits(student) < Number(limit),
   })
 
   const updateFilters = key => {
@@ -64,10 +64,12 @@ export default () => {
     })
   }, [requestedValue])
 
-  const onChange = key => (_, { value }) => {
-    setCurrentValue({ [key]: value })
-    setUpdatedAt(prev => ({ ...prev, [key]: now() }))
-  }
+  const onChange =
+    key =>
+    (_, { value }) => {
+      setCurrentValue({ [key]: value })
+      setUpdatedAt(prev => ({ ...prev, [key]: now() }))
+    }
 
   const onKeyDown = key => event => {
     if (event.keyCode === 13) {

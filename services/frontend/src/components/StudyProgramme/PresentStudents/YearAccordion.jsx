@@ -40,8 +40,8 @@ const YearAccordion = ({ active, handleClick, index, years, students, bold }) =>
                   key: 'fetch',
                   content: 'Show population',
                   positive: true,
-                  onClick: () => onClick()
-                }
+                  onClick: () => onClick(),
+                },
               ]}
             />
           </Table.Cell>
@@ -89,7 +89,7 @@ const YearAccordion = ({ active, handleClick, index, years, students, bold }) =>
 }
 
 YearAccordion.defaultProps = {
-  bold: false
+  bold: false,
 }
 
 YearAccordion.propTypes = {
@@ -98,7 +98,7 @@ YearAccordion.propTypes = {
   index: number.isRequired,
   years: string.isRequired,
   students: arrayOf(shape({})).isRequired,
-  bold: bool
+  bold: bool,
 }
 
 export default YearAccordion

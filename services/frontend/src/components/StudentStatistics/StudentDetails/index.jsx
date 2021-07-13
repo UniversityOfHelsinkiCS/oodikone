@@ -35,7 +35,7 @@ const StudentDetails = ({
   pending,
   error,
   fetching,
-  clearCourseStats
+  clearCourseStats,
 }) => {
   const { language } = useLanguage()
   const [graphYearStart, setGraphYear] = useState('')
@@ -96,7 +96,7 @@ const StudentDetails = ({
       return {
         semestercode,
         startdate: new Date(startdate).getTime(),
-        enddate: new Date(enddate).getTime()
+        enddate: new Date(enddate).getTime(),
       }
     }
 
@@ -201,12 +201,12 @@ StudentDetails.propTypes = {
       shape({
         course: shape({
           code: string,
-          name: Object
+          name: Object,
         }),
         credits: integer,
         date: string,
         grade: string,
-        passed: bool
+        passed: bool,
       })
     ),
     credits: integer,
@@ -217,9 +217,9 @@ StudentDetails.propTypes = {
       shape({
         programme: shape({ code: string, name: shape({}) }),
         studentnumber: string,
-        tag: shape({ studytrack: string, tagname: string })
+        tag: shape({ studytrack: string, tagname: string }),
       })
-    )
+    ),
   }),
   pending: bool.isRequired,
   error: bool.isRequired,
@@ -228,13 +228,13 @@ StudentDetails.propTypes = {
   getDegreesAndProgrammes: func.isRequired,
   semesters: shape({
     semesters: shape({}),
-    years: shape({})
-  }).isRequired
+    years: shape({}),
+  }).isRequired,
 }
 
 StudentDetails.defaultProps = {
   student: {},
-  studentNumber: ''
+  studentNumber: '',
 }
 
 const mapStateToProps = ({
@@ -242,8 +242,8 @@ const mapStateToProps = ({
   semesters,
   populationDegreesAndProgrammes,
   auth: {
-    token: { roles }
-  }
+    token: { roles },
+  },
 }) => ({
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
@@ -251,7 +251,7 @@ const mapStateToProps = ({
   semesters: semesters.data,
   fetching: students.fetching,
   isAdmin: getUserIsAdmin(roles),
-  degreesAndProgrammes: populationDegreesAndProgrammes.data || {}
+  degreesAndProgrammes: populationDegreesAndProgrammes.data || {},
 })
 
 const mapDispatchToProps = {
@@ -260,7 +260,7 @@ const mapDispatchToProps = {
   resetStudent,
   getStudent,
   getSemesters,
-  getDegreesAndProgrammes
+  getDegreesAndProgrammes,
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentDetails))

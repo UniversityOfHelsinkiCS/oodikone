@@ -9,7 +9,7 @@ import {
   saveCustomPopulationSearch,
   updateCustomPopulationSearch,
   selectCustomPopulationSearch,
-  deleteCustomPopulationSearch
+  deleteCustomPopulationSearch,
 } from '../../redux/customPopulationSearch'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import SearchHistory from '../SearchHistory'
@@ -24,7 +24,7 @@ const CustomPopulationSearch = ({
   deleteCustomPopulationSearchDispatch,
   loading,
   customPopulationSearches,
-  customPopulationSearchSaving
+  customPopulationSearchSaving,
 }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
@@ -128,7 +128,7 @@ const CustomPopulationSearch = ({
             ...s,
             text: s.name,
             timestamp: s.updatedAt,
-            params: { id: s.id }
+            params: { id: s.id },
           }))}
           updateItem={() => null}
           handleSearch={onSelectSearch}
@@ -163,7 +163,7 @@ CustomPopulationSearch.propTypes = {
   getCustomPopulationSearchesDispatch: func.isRequired,
   updateCustomPopulationSearchDispatch: func.isRequired,
   selectCustomPopulationSearchDispatch: func.isRequired,
-  deleteCustomPopulationSearchDispatch: func.isRequired
+  deleteCustomPopulationSearchDispatch: func.isRequired,
 }
 
 const mapStateToProps = ({ populations, populationCourses, customPopulationSearch }) => ({
@@ -171,7 +171,7 @@ const mapStateToProps = ({ populations, populationCourses, customPopulationSearc
   custompop: populations.data.students || [],
   courses: populationCourses.data,
   customPopulationSearches: customPopulationSearch.customPopulationSearches,
-  customPopulationSearchSaving: customPopulationSearch.saving
+  customPopulationSearchSaving: customPopulationSearch.saving,
 })
 
 export default connect(mapStateToProps, {
@@ -181,5 +181,5 @@ export default connect(mapStateToProps, {
   getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
   updateCustomPopulationSearchDispatch: updateCustomPopulationSearch,
   selectCustomPopulationSearchDispatch: selectCustomPopulationSearch,
-  deleteCustomPopulationSearchDispatch: deleteCustomPopulationSearch
+  deleteCustomPopulationSearchDispatch: deleteCustomPopulationSearch,
 })(CustomPopulationSearch)

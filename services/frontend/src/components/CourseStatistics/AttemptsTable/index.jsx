@@ -38,7 +38,7 @@ AttemptsTable.propTypes = {
   categoryName: string.isRequired,
   data: arrayOf(courseDataWithRealisationsType).isRequired,
   onClickCourse: func.isRequired,
-  userHasAccessToAllStats: bool.isRequired
+  userHasAccessToAllStats: bool.isRequired,
 }
 
 export default AttemptsTable

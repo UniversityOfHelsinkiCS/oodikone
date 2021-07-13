@@ -14,7 +14,7 @@ const FacultySelector = ({ faculties, facultyYearlyStats, fromYear, toYear, hand
       studentCredits: 0,
       coursesPassed: 0,
       coursesFailed: 0,
-      students: []
+      students: [],
     }
 
     const faculty = facultyYearlyStats.find(f => f.id === facultyCode)
@@ -36,7 +36,7 @@ const FacultySelector = ({ faculties, facultyYearlyStats, fromYear, toYear, hand
       totalStudentCredits: 0,
       totalCoursesPassed: 0,
       totalCoursesFailed: 0,
-      totalStudents: []
+      totalStudents: [],
     }
     return Object.entries(calculateYearlyStatsForFaculty(facultyCode))
       .filter(([year]) => year >= fromYear && year <= toYear)
@@ -45,7 +45,7 @@ const FacultySelector = ({ faculties, facultyYearlyStats, fromYear, toYear, hand
           totalStudentCredits: res.totalStudentCredits + curr.studentCredits,
           totalCoursesPassed: res.totalCoursesPassed + curr.coursesPassed,
           totalCoursesFailed: res.totalCoursesFailed + curr.coursesFailed,
-          totalStudents: [...new Set(res.totalStudents.concat(curr.students))]
+          totalStudents: [...new Set(res.totalStudents.concat(curr.students))],
         }),
         { ...initial }
       )
@@ -64,7 +64,7 @@ const FacultySelector = ({ faculties, facultyYearlyStats, fromYear, toYear, hand
     () =>
       faculties.map(({ code, name }) => ({
         name: getTextIn(name, language),
-        data: calculateYearlyStatsForFaculty(code)
+        data: calculateYearlyStatsForFaculty(code),
       })),
     []
   )
@@ -73,39 +73,39 @@ const FacultySelector = ({ faculties, facultyYearlyStats, fromYear, toYear, hand
     {
       key: 'name',
       title: 'name',
-      getRowVal: faculty => getTextIn(faculty.name, language)
+      getRowVal: faculty => getTextIn(faculty.name, language),
     },
     {
       key: 'code',
       title: 'code',
-      getRowVal: faculty => faculty.code
+      getRowVal: faculty => faculty.code,
     },
     {
       key: 'studentCredits',
       title: 'Student credits',
-      getRowVal: ({ code }) => Math.round(totalStats[code].totalStudentCredits)
+      getRowVal: ({ code }) => Math.round(totalStats[code].totalStudentCredits),
     },
     {
       key: 'coursesPassed',
       title: 'Courses passed',
       getRowVal: ({ code }) => calculateTotalPassedCourses(totalStats[code]),
-      getRowContent: ({ code }) => `${calculateTotalPassedCourses(totalStats[code]).toFixed(2)}%`
+      getRowContent: ({ code }) => `${calculateTotalPassedCourses(totalStats[code]).toFixed(2)}%`,
     },
     {
       key: 'coursesFailed',
       title: 'Courses failed',
       getRowVal: ({ code }) => calculateTotalFailedCourses(totalStats[code]),
-      getRowContent: ({ code }) => `${calculateTotalFailedCourses(totalStats[code]).toFixed(2)}%`
+      getRowContent: ({ code }) => `${calculateTotalFailedCourses(totalStats[code]).toFixed(2)}%`,
     },
     {
       key: 'students',
       title: 'Students',
-      getRowVal: ({ code }) => totalStats[code].totalStudents.length
-    }
+      getRowVal: ({ code }) => totalStats[code].totalStudents.length,
+    },
   ]
 
   return (
-    <React.Fragment>
+    <>
       <SortableTable
         columns={headers}
         getRowKey={faculty => faculty.code}
@@ -113,7 +113,7 @@ const FacultySelector = ({ faculties, facultyYearlyStats, fromYear, toYear, hand
         data={faculties}
       />
       <FacultyStatsGraph data={graphData} />
-    </React.Fragment>
+    </>
   )
 }
 
@@ -122,7 +122,7 @@ FacultySelector.propTypes = {
   facultyYearlyStats: arrayOf(shape({})).isRequired,
   fromYear: number.isRequired,
   toYear: number.isRequired,
-  handleSelect: func.isRequired
+  handleSelect: func.isRequired,
 }
 
 export default FacultySelector

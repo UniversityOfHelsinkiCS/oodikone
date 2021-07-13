@@ -12,7 +12,7 @@ const ClearFilterButton = ({ disabled, onClick, name }) => (
 ClearFilterButton.propTypes = {
   disabled: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
-  name: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
 }
 
 export default ClearFilterButton

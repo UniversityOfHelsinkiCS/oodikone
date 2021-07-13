@@ -4,13 +4,8 @@ import SortableHeaderCell from '../SortableHeaderCell'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
 const PassFailHeader = () => {
-  const {
-    onSortableColumnHeaderClick,
-    filterInput,
-    tableColumnNames,
-    sortCriteria,
-    reversed
-  } = UsePopulationCourseContext()
+  const { onSortableColumnHeaderClick, filterInput, tableColumnNames, sortCriteria, reversed } =
+    UsePopulationCourseContext()
 
   const getSortableHeaderCell = (label, columnName, rowSpan = 1) => (
     <SortableHeaderCell

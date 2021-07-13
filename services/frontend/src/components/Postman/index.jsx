@@ -9,7 +9,7 @@ class Postman extends Component {
     secret: '',
     data: {},
     useOodi: false,
-    pending: false
+    pending: false,
   }
 
   doOodiApiRequest = async () => {
@@ -36,7 +36,7 @@ class Postman extends Component {
     } catch (error) {
       this.setState({
         pending: false,
-        data: { error: true, ...error }
+        data: { error: true, ...error },
       })
     }
   }

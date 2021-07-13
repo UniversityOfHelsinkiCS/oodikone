@@ -3,7 +3,7 @@ import { arrayOf, func, number, shape } from 'prop-types'
 import { Form } from 'semantic-ui-react'
 
 const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
-  <Fragment>
+  <>
     <Form.Group inline>
       <Form.Dropdown
         label="From:"
@@ -30,19 +30,19 @@ const YearFilter = ({ years, fromYear, toYear, handleChange }) => (
         selectOnNavigation={false}
       />
     </Form.Group>
-  </Fragment>
+  </>
 )
 
 YearFilter.propTypes = {
   years: arrayOf(shape({})).isRequired,
   fromYear: number,
   toYear: number,
-  handleChange: func.isRequired
+  handleChange: func.isRequired,
 }
 
 YearFilter.defaultProps = {
   fromYear: undefined,
-  toYear: undefined
+  toYear: undefined,
 }
 
 export default YearFilter

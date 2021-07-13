@@ -29,7 +29,7 @@ const InfoBox = ({ content }) => {
 }
 
 InfoBox.propTypes = {
-  content: PropTypes.node.isRequired
+  content: PropTypes.node.isRequired,
 }
 
 export default InfoBox

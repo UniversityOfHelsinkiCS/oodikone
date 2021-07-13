@@ -10,16 +10,16 @@ const devOptions = {
     uid: getTestUser() || 'tktl',
     displayName: 'Development Kayttaja',
     'shib-session-id': 'mock-session',
-    'X-sis': !getTestUserOodi()
-  }
+    'X-sis': !getTestUserOodi(),
+  },
 }
 
 const testOptions = {
   headers: {
     uid: 'tester',
     displayName: 'Testing Käyttäjä',
-    'shib-session-id': 'mock-session'
-  }
+    'shib-session-id': 'mock-session',
+  },
 }
 
 const getDefaultConfig = () => {
@@ -31,8 +31,8 @@ const getDefaultConfig = () => {
   }
   return {
     headers: {
-      'X-sis': !getTestUserOodi()
-    }
+      'X-sis': !getTestUserOodi(),
+    },
   }
 }
 
@@ -47,13 +47,13 @@ export const api = axios.create({ ...createDefaultAxiosConfig() })
 const types = {
   attempt: prefix => `${prefix}ATTEMPT`,
   failure: prefix => `${prefix}FAILURE`,
-  success: prefix => `${prefix}SUCCESS`
+  success: prefix => `${prefix}SUCCESS`,
 }
 
 export const actionTypes = prefix => ({
   attempt: types.attempt(prefix),
   failure: types.failure(prefix),
-  success: types.success(prefix)
+  success: types.success(prefix),
 })
 
 export const logout = async () => {
@@ -99,7 +99,7 @@ export const callController = (route, prefix, data, method = 'get', query, param
     prefix,
     query,
     params,
-    onProgress
+    onProgress,
   }
   return { type: `${prefix}ATTEMPT`, requestSettings }
 }
@@ -150,7 +150,7 @@ export const handleAuth = store => next => async action => {
 
       api.defaults.headers.common = {
         ...api.defaults.headers.common,
-        'x-access-token': token
+        'x-access-token': token,
       }
       store.dispatch({ type: 'LOGIN_SUCCESS', token })
     } catch (err) {

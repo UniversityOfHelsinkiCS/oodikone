@@ -16,7 +16,7 @@ const pane = (title, Content, icon) => ({
     <Tab.Pane style={{ borderWidth: '0' }}>
       <Content />
     </Tab.Pane>
-  )
+  ),
 })
 
 const TeachersTabs = withRouter(({ admin, history }) => {
@@ -25,7 +25,7 @@ const TeachersTabs = withRouter(({ admin, history }) => {
     ? [
         pane('Statistics', TeacherStatistics, 'table'),
         pane('Leaderboard', TeacherLeaderBoard, 'trophy'),
-        pane('Search', TeacherSearchTab, 'user')
+        pane('Search', TeacherSearchTab, 'user'),
       ]
     : [pane('Statistics', TeacherStatistics, 'table')]
 
@@ -41,9 +41,9 @@ const TeachersTabs = withRouter(({ admin, history }) => {
 
 const Teachers = ({
   match: {
-    params: { teacherid }
+    params: { teacherid },
   },
-  isAdmin
+  isAdmin,
 }) => {
   useTitle('Teachers')
   return (
@@ -59,21 +59,27 @@ const Teachers = ({
 Teachers.propTypes = {
   match: shape({
     params: shape({
-      teacherid: string
-    })
+      teacherid: string,
+    }),
   }),
-  isAdmin: bool.isRequired
+  isAdmin: bool.isRequired,
 }
 TeachersTabs.propTypes = {
-  admin: bool.isRequired
+  admin: bool.isRequired,
 }
 
 Teachers.defaultProps = {
   match: {
-    params: { teacherid: undefined }
-  }
+    params: { teacherid: undefined },
+  },
 }
 
-export default connect(({ auth: { token: { roles } } }) => ({
-  isAdmin: getUserIsAdmin(roles)
-}))(withRouter(Teachers))
+export default connect(
+  ({
+    auth: {
+      token: { roles },
+    },
+  }) => ({
+    isAdmin: getUserIsAdmin(roles),
+  })
+)(withRouter(Teachers))

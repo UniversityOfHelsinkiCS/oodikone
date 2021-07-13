@@ -86,7 +86,7 @@ const FacultyLevelStatistics = () => {
   const { language: activeLanguage } = useLanguage()
   const { courseStats, language } = useSelector(({ courseStats }) => ({
     courseStats: courseStats.data,
-    language: activeLanguage
+    language: activeLanguage,
   }))
   const yearcodes = uniq(flatten(Object.values(courseStats).map(c => Object.keys(c.facultyStats))))
     .sort()
@@ -97,13 +97,13 @@ const FacultyLevelStatistics = () => {
   const dropdownOptions = yearcodes.map(year => ({
     key: year,
     text: `${1949 + Number(year)}-${1950 + Number(year)}`,
-    value: year
+    value: year,
   }))
 
   const yearsCourseStats = Object.values(courseStats)
     .map(course => ({
       course,
-      courseInstance: course.facultyStats[selectedYear]
+      courseInstance: course.facultyStats[selectedYear],
     }))
     .sort((a, b) => (a.courseInstance === undefined) - (b.courseInstance === undefined))
 
@@ -138,18 +138,18 @@ CourseTableRow.propTypes = {
   facultyCode: string.isRequired,
   students: number.isRequired,
   credits: number.isRequired,
-  facultyName: string.isRequired
+  facultyName: string.isRequired,
 }
 
 CourseTable.propTypes = {
   course: shape({}).isRequired,
   courseInstance: shape({}),
   language: string.isRequired,
-  selectedYear: string.isRequired
+  selectedYear: string.isRequired,
 }
 
 CourseTable.defaultProps = {
-  courseInstance: null
+  courseInstance: null,
 }
 
 export default FacultyLevelStatistics

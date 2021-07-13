@@ -31,7 +31,7 @@ const AgeFilter = () => {
 
   const filterFunctions = limit => ({
     min: student => getAge(student.birthdate) >= Number(limit),
-    max: student => getAge(student.birthdate) < Number(limit)
+    max: student => getAge(student.birthdate) < Number(limit),
   })
 
   const updateFilters = key => {
@@ -59,10 +59,12 @@ const AgeFilter = () => {
     return () => clearTimeout(timer)
   }, [updatedAt])
 
-  const onChange = key => (_, { value }) => {
-    setCurrentValue({ [key]: value })
-    setUpdatedAt(prev => ({ ...prev, [key]: now() }))
-  }
+  const onChange =
+    key =>
+    (_, { value }) => {
+      setCurrentValue({ [key]: value })
+      setUpdatedAt(prev => ({ ...prev, [key]: now() }))
+    }
 
   const onKeyDown = key => event => {
     if (event.keyCode === 13) {

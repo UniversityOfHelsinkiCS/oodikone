@@ -19,7 +19,7 @@ const FrontPage = props => {
     courseStatistics: checkUserAccess(['courseStatistics', 'admin'], userRoles) || rights.length > 0,
     teachers: userRoles.includes('admin') || userRoles.includes('teachers'),
     trends: true,
-    feedback: true
+    feedback: true,
   }
 
   return (
@@ -72,12 +72,7 @@ const FrontPage = props => {
         </p>
 
         <Divider section />
-        <p>
-          Oodikone was last updated on:{' '}
-          {moment(process.env.BUILT_AT)
-            .toDate()
-            .toLocaleString()}
-        </p>
+        <p>Oodikone was last updated on: {moment(process.env.BUILT_AT).toDate().toLocaleString()}</p>
       </Container>
       <Image src={images.toskaLogo} size="medium" centered style={{ bottom: 0 }} />
     </div>
@@ -86,23 +81,23 @@ const FrontPage = props => {
 
 FrontPage.propTypes = {
   userRoles: propTypes.arrayOf(propTypes.string),
-  rights: propTypes.arrayOf(propTypes.string)
+  rights: propTypes.arrayOf(propTypes.string),
 }
 
 FrontPage.defaultProps = {
   userRoles: [],
-  rights: []
+  rights: [],
 }
 
 const mapStateToProps = ({
   auth: {
-    token: { roles, rights }
-  }
+    token: { roles, rights },
+  },
 }) => ({
   userRoles: getUserRoles(roles),
-  rights
+  rights,
 })
 
 export default connect(mapStateToProps, null, null, {
-  areStatePropsEqual: isEqual
+  areStatePropsEqual: isEqual,
 })(FrontPage)

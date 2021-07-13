@@ -43,7 +43,7 @@ const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
 
 PassingSemesters.propTypes = {
   expandedGroups: instanceOf(Set).isRequired,
-  toggleGroupExpansion: func.isRequired
+  toggleGroupExpansion: func.isRequired,
 }
 
 export default PassingSemesters

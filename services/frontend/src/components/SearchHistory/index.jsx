@@ -41,7 +41,7 @@ const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) =>
           key: id,
           value: id,
           text,
-          description: moment(timestamp).format('DD.MM LT')
+          description: moment(timestamp).format('DD.MM LT'),
         }))}
         onChange={handleChange}
         closeOnChange
@@ -57,7 +57,7 @@ const SearchHistory = ({ items, handleSearch, updateItem, disabled, header }) =>
 
 SearchHistory.defaultProps = {
   disabled: false,
-  header: 'Previous searches'
+  header: 'Previous searches',
 }
 
 SearchHistory.propTypes = {
@@ -65,13 +65,13 @@ SearchHistory.propTypes = {
     shape({
       text: string,
       params: shape({}),
-      timestamp: date
+      timestamp: date,
     })
   ).isRequired,
   handleSearch: func.isRequired,
   updateItem: func.isRequired,
   disabled: bool,
-  header: string
+  header: string,
 }
 
 export default SearchHistory

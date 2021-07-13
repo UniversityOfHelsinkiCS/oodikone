@@ -28,7 +28,7 @@ FilterCard.propTypes = {
   children: PropTypes.node.isRequired,
   contextKey: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  active: PropTypes.bool.isRequired
+  active: PropTypes.bool.isRequired,
 }
 
 export default FilterCard

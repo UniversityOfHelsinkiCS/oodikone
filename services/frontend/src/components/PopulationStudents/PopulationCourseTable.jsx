@@ -15,7 +15,7 @@ const intoCollapsing = column => ({
   headerProps: { ...column.headerProps, colSpan: 1, rowSpan: 2 },
   key: column.key,
   collapsed: true,
-  parent: column.parent
+  parent: column.parent,
 })
 
 const initialCollapsing = columns => {
@@ -30,7 +30,7 @@ const initialCollapsing = columns => {
 
 const DIRECTIONS = {
   ASC: 'ascending',
-  DESC: 'descending'
+  DESC: 'descending',
 }
 
 const PopulationCourseTable = ({
@@ -42,7 +42,7 @@ const PopulationCourseTable = ({
   getRowProps,
   getRowKey,
   collapsingHeaders,
-  chunkifyBy
+  chunkifyBy,
 }) => {
   const [direction, setDirection] = useState(defaultdescending ? DIRECTIONS.DESC : DIRECTIONS.ASC)
   const [selected, setSelected] = useState(defaultsortkey == null ? columns[0].key : defaultsortkey)
@@ -183,7 +183,7 @@ PopulationCourseTable.propTypes = {
       getCellProps: func,
       cellProps: shape({}),
       group: bool,
-      children: arrayOf()
+      children: arrayOf(),
     })
   ).isRequired,
   data: arrayOf(shape({})).isRequired,
@@ -191,7 +191,7 @@ PopulationCourseTable.propTypes = {
   defaultsortkey: string,
   collapsingHeaders: bool,
   showNames: bool,
-  chunkifyBy: string
+  chunkifyBy: string,
 }
 
 PopulationCourseTable.defaultProps = {
@@ -201,7 +201,7 @@ PopulationCourseTable.defaultProps = {
   defaultsortkey: null,
   collapsingHeaders: false,
   showNames: undefined,
-  chunkifyBy: undefined
+  chunkifyBy: undefined,
 }
 
 export default PopulationCourseTable

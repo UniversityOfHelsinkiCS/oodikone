@@ -95,12 +95,12 @@ CoursePopulationCreditDist.propTypes = {
   samples: arrayOf(shape({})).isRequired,
   codes: arrayOf(string).isRequired,
   from: number.isRequired,
-  to: number.isRequired
+  to: number.isRequired,
 }
 
 const mapStateToProps = ({ singleCourseStats }) => ({
   singleCourseStats: singleCourseStats.stats,
-  pending: singleCourseStats.pending
+  pending: singleCourseStats.pending,
 })
 
 export default connect(mapStateToProps)(CoursePopulationCreditDist)

@@ -45,19 +45,19 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
 PopulationSearch.propTypes = {
   history: PropTypes.shape({
     location: PropTypes.shape({
-      search: PropTypes.string.isRequired
-    }).isRequired
+      search: PropTypes.string.isRequired,
+    }).isRequired,
   }).isRequired,
   location: PropTypes.shape({
-    search: PropTypes.string.isRequired
+    search: PropTypes.string.isRequired,
   }).isRequired,
   populationFound: PropTypes.bool.isRequired,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = ({ populations }) => ({
   populationFound: populations.data.students !== undefined,
-  loading: !!populations.pending
+  loading: !!populations.pending,
 })
 
 export default connect(mapStateToProps)(PopulationSearch)

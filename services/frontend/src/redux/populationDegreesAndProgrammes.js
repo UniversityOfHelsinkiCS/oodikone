@@ -5,7 +5,7 @@ const prefix = 'GET_POPULATIONS_DEGREES_AND_PROGRAMMES_'
 const types = {
   attempt: `${prefix}ATTEMPT`,
   failure: `${prefix}FAILURE`,
-  success: `${prefix}SUCCESS`
+  success: `${prefix}SUCCESS`,
 }
 
 export const getDegreesAndProgrammes = () => {
@@ -18,19 +18,19 @@ const reducer = (state = { data: {} }, action) => {
     case types.attempt:
       return {
         pending: true,
-        data: state.data
+        data: state.data,
       }
     case types.failure:
       return {
         pending: false,
         error: true,
-        data: action.response
+        data: action.response,
       }
     case types.success:
       return {
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     default:
       return state

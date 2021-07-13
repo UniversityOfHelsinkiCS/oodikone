@@ -10,7 +10,7 @@ import useLanguage from '../LanguagePicker/useLanguage'
 
 const initialState = {
   programme: undefined,
-  loading: false
+  loading: false,
 }
 
 const AccessRights = ({ uid, programmes, pending, ...props }) => {
@@ -29,7 +29,7 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
       key: code,
       value: code,
       text: getTextIn(name, language),
-      description: code
+      description: code,
     }))
     .sort((p1, p2) => p1.text.localeCompare(p2.text))
 
@@ -45,7 +45,7 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
         onChange={(_, { value }) =>
           setState({
             ...state,
-            programme: value
+            programme: value,
           })
         }
         fluid
@@ -75,14 +75,14 @@ AccessRights.propTypes = {
   // used in filteredDropdownProgrammeSelector
   rights: PropTypes.arrayOf(PropTypes.string).isRequired,
   programmes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  pending: PropTypes.bool.isRequired
+  pending: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = (state, props) => ({
   programmes: selectors.filteredDropdownProgrammeSelector(state, props),
-  pending: Boolean(state.users.userunitpending)
+  pending: Boolean(state.users.userunitpending),
 })
 
 export default connect(mapStateToProps, { addUserUnits }, null, {
-  areStatePropsEqual: isEqual
+  areStatePropsEqual: isEqual,
 })(AccessRights)

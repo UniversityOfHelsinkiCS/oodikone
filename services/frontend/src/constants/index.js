@@ -33,7 +33,7 @@ import {
   chart32,
   chart33,
   chart34,
-  chart35
+  chart35,
 } from '../styles/variables'
 /*
 lightgreen: '#90EE90',
@@ -58,7 +58,7 @@ export const API_BASE_PATH = `${assumeBasename()}api`
 export const AVAILABLE_LANGUAGES = [
   { name: 'fi', code: 'fi' },
   { name: 'en', code: 'en' },
-  { name: 'sv', code: 'sv' }
+  { name: 'sv', code: 'sv' },
 ]
 export const DEFAULT_LANG = 'fi'
 
@@ -68,101 +68,101 @@ export const API_DATE_FORMAT = 'YYYY.MM.DD'
 
 export const passRateAttemptGraphOptions = (categories, max, title, skipFirstColor) => ({
   chart: {
-    type: 'column'
+    type: 'column',
   },
   colors: skipFirstColor ? [green, red] : [chartblue, green, red],
 
   title: {
-    text: title
+    text: title,
   },
 
   xAxis: {
-    categories
+    categories,
   },
 
   yAxis: {
     allowDecimals: false,
     title: {
-      text: 'Number of Students'
+      text: 'Number of Students',
     },
     max,
-    floor: -max
+    floor: -max,
   },
 
   plotOptions: {
     column: {
       stacking: 'normal',
-      borderRadius: 3
-    }
-  }
+      borderRadius: 3,
+    },
+  },
 })
 
 export const passRateStudGraphOptions = (categories, max, title, skipFirstColor) => ({
   chart: {
-    type: 'column'
+    type: 'column',
   },
   colors: skipFirstColor
     ? [chartlgreen, chartdarkg, chartlred, chartdarkred]
     : [chartblue, chartlgreen, chartdarkg, chartlred, chartdarkred],
 
   title: {
-    text: title
+    text: title,
   },
 
   xAxis: {
-    categories
+    categories,
   },
 
   yAxis: {
     allowDecimals: false,
     title: {
-      text: 'Number of Students'
+      text: 'Number of Students',
     },
     max,
-    floor: -max
+    floor: -max,
   },
 
   plotOptions: {
     column: {
       stacking: 'normal',
-      borderRadius: 1
-    }
-  }
+      borderRadius: 1,
+    },
+  },
 })
 
 export const gradeGraphOptions = (categories, max, title) => ({
   chart: {
-    type: 'column'
+    type: 'column',
   },
   colors: [red, chartblue, chartblue, chartblue, chartblue, chartblue, green, green],
 
   title: {
-    text: title
+    text: title,
   },
 
   legend: {
-    enabled: false
+    enabled: false,
   },
 
   xAxis: {
-    categories
+    categories,
   },
 
   yAxis: {
     allowDecimals: false,
     title: {
-      text: 'Number of Students'
+      text: 'Number of Students',
     },
     max,
-    floor: -max
+    floor: -max,
   },
 
   plotOptions: {
     column: {
       stacking: 'normal',
-      borderRadius: 2
-    }
-  }
+      borderRadius: 2,
+    },
+  },
 })
 
 export const CHART_COLORS = [
@@ -200,13 +200,13 @@ export const CHART_COLORS = [
   chart32,
   chart33,
   chart34,
-  chart35
+  chart35,
 ]
 
 export const PRIORITYCODE_TEXTS = {
   1: 'Main',
   2: 'Secondary',
-  30: 'Graduated'
+  30: 'Graduated',
 }
 
 export const ERROR_STATUSES_NOT_TO_CAPTURE = []

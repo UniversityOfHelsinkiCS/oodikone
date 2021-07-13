@@ -40,7 +40,7 @@ CollapsibleModuleTable.propTypes = {
   children: func.isRequired,
   emptyColSpan: number.isRequired,
   expandedGroups: instanceOf(Set).isRequired,
-  toggleGroupExpansion: func.isRequired
+  toggleGroupExpansion: func.isRequired,
 }
 
 export default CollapsibleModuleTable

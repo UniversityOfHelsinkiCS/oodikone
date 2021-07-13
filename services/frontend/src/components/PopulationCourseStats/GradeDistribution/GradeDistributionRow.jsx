@@ -110,12 +110,12 @@ const GradeDistributionRow = ({ courseStatistics, gradeTypes }) => {
 
 CourseRow.propTypes = {
   courseStatistics: shape({ course: shape({ code: string }) }).isRequired,
-  gradeTypes: arrayOf(number).isRequired
+  gradeTypes: arrayOf(number).isRequired,
 }
 
 GradeDistributionRow.propTypes = {
   courseStatistics: shape({ course: shape({ code: string }) }).isRequired,
-  gradeTypes: arrayOf(number).isRequired
+  gradeTypes: arrayOf(number).isRequired,
 }
 
 export default GradeDistributionRow

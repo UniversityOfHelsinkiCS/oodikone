@@ -12,19 +12,19 @@ const reducer = (state = { data: [] }, action) => {
       return {
         ...state,
         pending: true,
-        error: false
+        error: false,
       }
     case 'GET_ELEMENTDETAILS_FAILURE':
       return {
         pending: false,
         error: true,
-        data: []
+        data: [],
       }
     case 'GET_ELEMENTDETAILS_SUCCESS':
       return {
         pending: false,
         error: false,
-        data: action.response
+        data: action.response,
       }
     default:
       return state

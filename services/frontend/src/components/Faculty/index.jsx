@@ -21,7 +21,7 @@ const Faculty = ({
   error,
   facultyYearlyStats,
   history,
-  match
+  match,
 }) => {
   const { language } = useLanguage()
   const [selectedFaculty, setSelectedFaculty] = useState(null)
@@ -43,7 +43,7 @@ const Faculty = ({
 
   useEffect(() => {
     const {
-      params: { facultyid }
+      params: { facultyid },
     } = match
     if (facultyid) setSelectedFaculty(facultyid)
     else setSelectedFaculty(null)
@@ -69,7 +69,7 @@ const Faculty = ({
     return {
       fromYear: filterYears[filterYears.length - 1],
       toYear: filterYears[0],
-      years: filterYears.map(y => ({ key: y, text: y, value: y }))
+      years: filterYears.map(y => ({ key: y, text: y, value: y })),
     }
   }
 
@@ -109,7 +109,7 @@ const Faculty = ({
       <Segment className="contentSegment" loading={!hasLoaded}>
         {!hasLoaded && null}
         {hasLoaded && (
-          <React.Fragment>
+          <>
             <Segment>
               <Form>
                 <Header content="Filter by time range" as="h4" />
@@ -134,7 +134,7 @@ const Faculty = ({
                 toYear={toYear}
               />
             )}
-          </React.Fragment>
+          </>
         )}
       </Segment>
     </div>
@@ -150,20 +150,20 @@ Faculty.propTypes = {
   history: shape({}).isRequired,
   match: shape({}).isRequired,
   pending: bool.isRequired,
-  error: bool.isRequired
+  error: bool.isRequired,
 }
 
 const mapStateToProps = ({ faculties }) => ({
   faculties: faculties.data,
   facultyYearlyStats: faculties.yearlyStats,
   pending: faculties.userFacultiesPending,
-  error: faculties.userFacultiesError
+  error: faculties.userFacultiesError,
 })
 
 const mapDispatchToProps = {
   getUserFaculties,
   getFacultiesYearlyStats,
-  getFacultyProgrammes
+  getFacultyProgrammes,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Faculty))

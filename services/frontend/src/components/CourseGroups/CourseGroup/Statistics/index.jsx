@@ -31,7 +31,7 @@ const Index = ({ totalStudents, totalCourses, totalCredits, totalTeachers, activ
     const accumulator = {
       credits: 0,
       students: 0,
-      courses: 0
+      courses: 0,
     }
 
     const filteredStatistics = activeTeachers.reduce((acc, cur) => {
@@ -65,7 +65,7 @@ Index.propTypes = {
   totalCredits: number,
   totalTeachers: number,
   activeTeachers: arrayOf(teacherType),
-  isLoading: bool.isRequired
+  isLoading: bool.isRequired,
 }
 
 Index.defaultProps = {
@@ -73,7 +73,7 @@ Index.defaultProps = {
   totalStudents: undefined,
   totalCourses: undefined,
   totalCredits: undefined,
-  activeTeachers: undefined
+  activeTeachers: undefined,
 }
 
 export default Index

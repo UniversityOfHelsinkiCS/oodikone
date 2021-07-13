@@ -57,8 +57,8 @@ const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, find
       key: 'icon',
       getRowContent: () => <Icon name={icon} />,
       cellProps: { collapsing: true },
-      headerProps: { onClick: null, sorted: null }
-    }
+      headerProps: { onClick: null, sorted: null },
+    },
   ]
 
   return (
@@ -81,7 +81,7 @@ const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, find
                 getRowKey={s => s.id}
                 getRowProps={teacher => ({
                   className: 'clickable',
-                  onClick: () => onClick(teacher)
+                  onClick: () => onClick(teacher),
                 })}
                 tableProps={{ celled: false, sortable: false }}
                 columns={columns}
@@ -101,13 +101,13 @@ TeacherSearch.propTypes = {
   teachers: arrayOf(object).isRequired,
   findTeachers: func.isRequired,
   onClick: func.isRequired,
-  icon: string.isRequired
+  icon: string.isRequired,
 }
 
 const mapStateToProps = ({ teachers }) => {
   const { list } = teachers
   return {
-    teachers: list
+    teachers: list,
   }
 }
 

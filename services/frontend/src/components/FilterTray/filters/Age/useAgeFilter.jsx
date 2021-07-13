@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 
 const defaultState = {
   currentValue: { min: '', max: '' },
-  requestedValue: { min: null, max: null }
+  requestedValue: { min: null, max: null },
 }
 
 const AgeFilterContext = createContext([[], () => {}])
@@ -15,7 +15,7 @@ export const AgeFilterProvider = ({ children }) => {
 }
 
 AgeFilterProvider.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 }
 
 const useAgeFilter = () => {
@@ -27,8 +27,8 @@ const useAgeFilter = () => {
       ...prev,
       currentValue: {
         ...prev.currentValue,
-        ...newValue
-      }
+        ...newValue,
+      },
     }))
 
   return { currentValue, setCurrentValue }

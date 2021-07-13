@@ -37,7 +37,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, 
     'Graduated',
     'Credits for studyprogramme majors',
     'Credits for non major students',
-    'Hyväksiluettu (not included in Credits column)'
+    'Hyväksiluettu (not included in Credits column)',
   ].filter(_ => _)
 
   const handleChange = (event, { value }) => {
@@ -58,7 +58,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, 
     )
 
   return (
-    <React.Fragment>
+    <>
       <Header>
         <Grid columns={2}>
           <Grid.Row>
@@ -112,7 +112,7 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, 
           </Table.Body>
         </Table>
       </Segment>
-    </React.Fragment>
+    </>
   )
 }
 
@@ -128,9 +128,9 @@ ProductivityTable.propTypes = {
         bThesis: number,
         graduated: number,
         creditsForMajors: number,
-        transferredCredits: number
+        transferredCredits: number,
       })
-    )
+    ),
   }),
   thesis: arrayOf(
     shape({
@@ -138,20 +138,20 @@ ProductivityTable.propTypes = {
       courseCode: string,
       thesisType: string,
       createdAt: string,
-      updatedAt: string
+      updatedAt: string,
     })
   ),
   loading: bool.isRequired,
   error: bool.isRequired,
   showCredits: bool.isRequired,
-  newProgramme: bool.isRequired
+  newProgramme: bool.isRequired,
 }
 
 ProductivityTable.defaultProps = {
   productivity: null,
-  thesis: undefined
+  thesis: undefined,
 }
 
 export default connect(null, {
-  dispatchGetProductivity: getProductivity
+  dispatchGetProductivity: getProductivity,
 })(ProductivityTable)

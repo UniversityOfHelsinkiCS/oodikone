@@ -56,13 +56,13 @@ CourseTable.propTypes = {
   title: string.isRequired,
   emptyListText: string,
   controlIcon: string,
-  mandatory: bool
+  mandatory: bool,
 }
 
 CourseTable.defaultProps = {
   emptyListText: 'No results.',
   controlIcon: null,
-  mandatory: false
+  mandatory: false,
 }
 
 function areEqual(prevProps, nextProps) {

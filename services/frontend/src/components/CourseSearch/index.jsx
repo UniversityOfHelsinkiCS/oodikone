@@ -63,13 +63,13 @@ CourseSearch.propTypes = {
   courseList: arrayOf(object).isRequired,
   setTimeout: func.isRequired,
   clearTimeout: func.isRequired,
-  handleResultSelect: func.isRequired
+  handleResultSelect: func.isRequired,
 }
 
 const sortCourses = makeSortCourses()
 
 const mapStateToProps = ({ courses }) => ({
-  courseList: sortCourses(courses)
+  courseList: sortCourses(courses),
 })
 
 export default connect(mapStateToProps)(Timeout(CourseSearch))

@@ -32,7 +32,7 @@ export default () => {
   const options = Object.keys(countsByYear).map(year => ({
     key: `year-${year}`,
     text: `${year} (${countsByYear[year]})`,
-    value: Number(year)
+    value: Number(year),
   }))
 
   return (

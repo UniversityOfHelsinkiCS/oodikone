@@ -68,8 +68,8 @@ const CourseDiffTable = ({ data }) => (
                   </Table.Cell>
                   <Table.Cell collapsing>{missingStudents.length}</Table.Cell>
                   <Table.Cell collapsing>{extraStudents.length}</Table.Cell>
-                </>
-              ]
+                </>,
+              ],
             },
             content: {
               children: (
@@ -77,8 +77,8 @@ const CourseDiffTable = ({ data }) => (
                   <CreditDiffTable title="Missing credits" color="red" students={missingStudents} />
                   <CreditDiffTable title="Extra credits" color="green" students={extraStudents} />
                 </>
-              )
-            }
+              ),
+            },
           }
         })}
     />
@@ -107,18 +107,18 @@ const CourseDiff = () => {
 }
 
 CourseDiffTable.propTypes = {
-  data: arrayOf(shape({})).isRequired
+  data: arrayOf(shape({})).isRequired,
 }
 
 CreditDiffTable.propTypes = {
   title: string.isRequired,
   color: string.isRequired,
-  students: arrayOf(shape({})).isRequired
+  students: arrayOf(shape({})).isRequired,
 }
 
 DiffStatistics.propTypes = {
   totalMissing: number.isRequired,
-  totalExtra: number.isRequired
+  totalExtra: number.isRequired,
 }
 
 export default CourseDiff

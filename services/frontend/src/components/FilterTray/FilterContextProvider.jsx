@@ -25,7 +25,7 @@ const FilterContextProvider = ({ children }) => (
 )
 
 FilterContextProvider.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 }
 
 export default FilterContextProvider

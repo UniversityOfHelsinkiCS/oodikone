@@ -20,7 +20,7 @@ const CourseCodeMapper = ({
   getMandatoryCourses,
   courseCodeDuplicates,
   mandatoryCourses,
-  findCoursesDispatch
+  findCoursesDispatch,
 }) => {
   const { language } = useLanguage()
   const [codes, setCodes] = useState({})
@@ -125,16 +125,16 @@ CourseCodeMapper.propTypes = {
       arrayOf(
         shape({
           name: shape({}),
-          code: string
+          code: string,
         })
       )
-    )
-  }).isRequired
+    ),
+  }).isRequired,
 }
 
 const mapStateToProps = ({ courseCodeDuplicates, populationMandatoryCourses }) => ({
   mandatoryCourses: populationMandatoryCourses,
-  courseCodeDuplicates
+  courseCodeDuplicates,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -142,7 +142,7 @@ const mapDispatchToProps = dispatch => ({
   addDuplicate: (code1, code2) => dispatch(addDuplicate(code1, code2)),
   removeDuplicate: code => dispatch(removeDuplicate(code)),
   findCoursesDispatch: (query, language) => dispatch(findCourses(query, language)),
-  getMandatoryCourses: studyprogramme => dispatch(getMandatoryCourses(studyprogramme))
+  getMandatoryCourses: studyprogramme => dispatch(getMandatoryCourses(studyprogramme)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(CourseCodeMapper)

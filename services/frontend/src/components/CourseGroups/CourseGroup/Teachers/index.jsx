@@ -10,7 +10,7 @@ const teacherColumnTypes = {
   NAME: 'name',
   CODE: 'code',
   COURSES: 'courses',
-  CREDITS: 'credits'
+  CREDITS: 'credits',
 }
 
 const TeacherItem = ({ teacher, isActive, handleFilterClick }) => {
@@ -41,7 +41,7 @@ const TeacherItem = ({ teacher, isActive, handleFilterClick }) => {
 TeacherItem.propTypes = {
   handleFilterClick: func.isRequired,
   teacher: teacherType.isRequired,
-  isActive: bool.isRequired
+  isActive: bool.isRequired,
 }
 
 const Index = ({ teachers, showOnlyActiveTeachers, activeTeacherIds, handleFilterClick, handleActiveToggleChange }) => {
@@ -94,7 +94,7 @@ const Index = ({ teachers, showOnlyActiveTeachers, activeTeacherIds, handleFilte
   }
 
   return (
-    <Fragment>
+    <>
       <Header size="medium" className="headerWithControl">
         Teachers
         <div className="activeToggleContainer">
@@ -115,7 +115,7 @@ const Index = ({ teachers, showOnlyActiveTeachers, activeTeacherIds, handleFilte
           return <TeacherItem key={t.id} teacher={t} isActive={isActive} handleFilterClick={handleFilterClick} />
         })}
       </List>
-    </Fragment>
+    </>
   )
 }
 
@@ -124,7 +124,7 @@ Index.propTypes = {
   activeTeacherIds: arrayOf(number).isRequired,
   handleFilterClick: func.isRequired,
   handleActiveToggleChange: func.isRequired,
-  showOnlyActiveTeachers: bool.isRequired
+  showOnlyActiveTeachers: bool.isRequired,
 }
 
 export default Index
