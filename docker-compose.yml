@@ -10,6 +10,7 @@ x-build_defaults: &build_defaults
     TAG: development
 
 services:
+
   adminer:
     <<: *defaults
     container_name: adminer
@@ -17,7 +18,7 @@ services:
       ADMINER_DESIGN: pepa-linha
     image: adminer:4.8.0
     ports:
-      - "5050:8080"
+      - 5050:8080
     volumes:
       - ./adminer-plugins:/var/www/html/plugins-enabled
 
@@ -27,7 +28,6 @@ services:
     build:
       <<: *build_defaults
       context: services/backend
-      dockerfile: oodikone2-backend/Dockerfile
     container_name: backend
     depends_on:
       - kone-db
@@ -37,7 +37,7 @@ services:
     environment:
       DB_URL: postgres://postgres@oodi-db:5432/oodi-db
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
-      FRONT_URL: http://localhost:8081
+      FRONT_URL: http://localhost:3000
       REDIS: redis
       SECRET_TOKEN: dev
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
@@ -46,7 +46,7 @@ services:
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       USERSERVICE_URL: http://userservice:4567
     ports:
-      - "8080:8080"
+      - 8080:8080
     profiles:
       - oodikone
     volumes:
@@ -55,10 +55,9 @@ services:
 
   frontend:
     <<: *defaults
-    <<: *command_default
     build:
-      <<: *build_defaults
-      context: services/oodikone2-frontend
+      context: services/frontend
+      target: development
     container_name: frontend
     environment:
       ADMINER_URL: http://localhost:5050/?pgsql=oodi-db&username=postgres
@@ -68,13 +67,12 @@ services:
       SIS_IMPORTER_ADMINER_URL: http://localhost:5050/?pgsql=sis-importer-db&username=postgres
       USER_ADMINER_URL: http://localhost:5050/?pgsql=user-db&username=postgres
     ports:
-      - "8081:8081"
-      - "7777:7777"
+      - 3000:3000
     profiles:
       - oodikone
     volumes:
       - frontend-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-frontend/:/usr/src/app
+      - ./services/frontend/:/usr/src/app
 
   kone-db:
     <<: *defaults
@@ -201,10 +199,8 @@ services:
 
   userservice:
     <<: *defaults
-    <<: *command_default
     build:
-      <<: *build_defaults
-      context: services/oodikone2-userservice
+      context: services/userservice
       target: development
     container_name: userservice
     depends_on:

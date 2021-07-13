@@ -8,7 +8,7 @@ const useSisRouter = require('../util/useSisRouter')
 const filterStudentTags = (student, userId) => {
   return {
     ...student,
-    tags: student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
+    tags: student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId),
   }
 }
 
@@ -16,7 +16,7 @@ router.get('/students', async (req, res) => {
   const {
     roles,
     decodedToken: { userId },
-    query: { searchTerm }
+    query: { searchTerm },
   } = req
 
   const trimmedSearchTerm = searchTerm ? searchTerm.trim() : undefined
@@ -35,10 +35,7 @@ router.get('/students', async (req, res) => {
     if (trimmedSearchTerm) {
       results = await Student.bySearchTerm(trimmedSearchTerm)
     }
-    return res
-      .status(200)
-      .json(results)
-      .end()
+    return res.status(200).json(results).end()
   } else {
     const unitsUserCanAccess = await userService.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
@@ -54,23 +51,14 @@ router.get('/students/:id', async (req, res) => {
   if (roles && roles.includes('admin')) {
     const results = await Student.withId(studentId)
     return results.error
-      ? res
-          .status(400)
-          .json({ error: 'error finding student' })
-          .end()
-      : res
-          .status(200)
-          .json(filterStudentTags(results, decodedToken.id))
-          .end()
+      ? res.status(400).json({ error: 'error finding student' }).end()
+      : res.status(200).json(filterStudentTags(results, decodedToken.id)).end()
   }
 
   const uid = req.decodedToken.userId
   const student = await Student.withId(studentId)
   if (student.error) {
-    return res
-      .status(400)
-      .json({ error: 'error finding student' })
-      .end()
+    return res.status(400).json({ error: 'error finding student' }).end()
   }
   const units = await userService.getUnitsFromElementDetails(uid)
 
@@ -82,15 +70,9 @@ router.get('/students/:id', async (req, res) => {
   )
 
   if (rights.some(right => right !== null)) {
-    res
-      .status(200)
-      .json(filterStudentTags(student, decodedToken.id))
-      .end()
+    res.status(200).json(filterStudentTags(student, decodedToken.id)).end()
   } else {
-    res
-      .status(400)
-      .json({ error: 'error finding student' })
-      .end()
+    res.status(400).json({ error: 'error finding student' }).end()
   }
 })
 

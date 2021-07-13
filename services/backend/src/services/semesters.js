@@ -7,12 +7,12 @@ const getCurrentSemester = async () => {
   const currentSemester = await Semester.findOne({
     where: {
       startdate: {
-        [Op.lte]: today
+        [Op.lte]: today,
       },
       enddate: {
-        [Op.gte]: today
-      }
-    }
+        [Op.gte]: today,
+      },
+    },
   })
   return currentSemester
 }
@@ -29,14 +29,14 @@ const getSemestersAndYears = async () => {
           yearcode,
           yearname,
           startdate: Math.min(acc.years[yearcode].startdate, startdate),
-          enddate: Math.max(acc.years[yearcode].enddate, enddate)
+          enddate: Math.max(acc.years[yearcode].enddate, enddate),
         }
       }
       return acc
     },
     {
       years: {},
-      semesters: {}
+      semesters: {},
     }
   )
   return result
@@ -45,7 +45,7 @@ const getSemestersAndYears = async () => {
 const getMaxYearcode = async () => {
   const aa = await Semester.findAll({
     attributes: [[sequelize.fn('max', sequelize.col('yearcode')), 'maxYearCode']],
-    raw: true
+    raw: true,
   })
   return aa[0].maxYearCode
 }
@@ -53,5 +53,5 @@ const getMaxYearcode = async () => {
 module.exports = {
   getSemestersAndYears,
   getMaxYearcode,
-  getCurrentSemester
+  getCurrentSemester,
 }

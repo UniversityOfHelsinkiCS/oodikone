@@ -3,7 +3,7 @@ const {
   ANALYTICS_INFLUXDB_URL,
   ANALYTICS_INFLUXDB_DB,
   ANALYTICS_INFLUXDB_PASSWORD,
-  ANALYTICS_INFLUXDB_USER
+  ANALYTICS_INFLUXDB_USER,
 } = require('../../conf-backend')
 const lineProtocol = require('./influxLineSerializer.js')
 
@@ -20,10 +20,10 @@ const TSA_ENABLED = !!(ANALYTICS_INFLUXDB_URL && ANALYTICS_INFLUXDB_DB)
 const influxHttp = axios.create({
   baseURL: ANALYTICS_INFLUXDB_URL,
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded'
+    'Content-Type': 'application/x-www-form-urlencoded',
   },
   withCredentials: true,
-  auth: null
+  auth: null,
 })
 
 /**
@@ -34,12 +34,12 @@ const write = obj => {
   return influxHttp.post('/write', payload, {
     params: {
       db: ANALYTICS_INFLUXDB_DB,
-      precision: 'ms' // date.getTime() timestamps
+      precision: 'ms', // date.getTime() timestamps
     },
     auth: {
       username: ANALYTICS_INFLUXDB_USER,
-      password: ANALYTICS_INFLUXDB_PASSWORD
-    }
+      password: ANALYTICS_INFLUXDB_PASSWORD,
+    },
   })
 }
 
@@ -61,12 +61,12 @@ const sendTsaEvent = (userId, { group, name, label, value }) => {
       userId,
       eventGroup: group,
       eventName: name,
-      eventLabel: label
+      eventLabel: label,
     },
     fields: {
-      eventValue: value
+      eventValue: value,
     },
-    timestamp: new Date()
+    timestamp: new Date(),
   })
 }
 

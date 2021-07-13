@@ -2,16 +2,16 @@ module.exports = {
   up: async queryInterface => {
     return queryInterface.sequelize.transaction(async transaction => {
       await queryInterface.sequelize.query('ALTER TABLE transfers DROP CONSTRAINT "transfers_studyrightid_fkey"', {
-        transaction
+        transaction,
       })
       await queryInterface.sequelize.query('ALTER TABLE transfers DROP CONSTRAINT "transfers_sourcecode_fkey"', {
-        transaction
+        transaction,
       })
       await queryInterface.sequelize.query('ALTER TABLE transfers DROP CONSTRAINT "transfers_studentnumber_fkey"', {
-        transaction
+        transaction,
       })
       await queryInterface.sequelize.query('ALTER TABLE transfers DROP CONSTRAINT "transfers_targetcode_fkey"', {
-        transaction
+        transaction,
       })
       await queryInterface.sequelize.query(
         'ALTER TABLE transfers ADD CONSTRAINT "transfers_studyrightid_fkey" FOREIGN KEY (studyrightid) REFERENCES studyright(studyrightid) ON UPDATE CASCADE ON DELETE CASCADE NOT DEFERRABLE',
@@ -35,5 +35,5 @@ module.exports = {
       )
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

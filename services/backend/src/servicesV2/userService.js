@@ -23,7 +23,7 @@ const login = async (uid, full_name, hyGroups, affiliations, email) => {
     full_name,
     hyGroups,
     affiliations,
-    email
+    email,
   })
   return response.data
 }
@@ -31,7 +31,7 @@ const login = async (uid, full_name, hyGroups, affiliations, email) => {
 const superlogin = async (uid, asUser) => {
   const response = await client.post('/superlogin', {
     uid,
-    asUser
+    asUser,
   })
   return response.data
 }
@@ -80,7 +80,7 @@ const createUser = async (username, full_name, email) => {
   const response = await client.post('/user', {
     username,
     full_name,
-    email
+    email,
   })
   return response.data
 }
@@ -124,7 +124,7 @@ const getUserDataFor = async uid => {
 
   return {
     ...userData,
-    faculties: new Set(userData.faculties)
+    faculties: new Set(userData.faculties),
   }
 }
 
@@ -158,5 +158,5 @@ module.exports = {
   getRolesFor,
   setFaculties,
   getUserDataFor,
-  getStudentsUserCanAccess
+  getStudentsUserCanAccess,
 }

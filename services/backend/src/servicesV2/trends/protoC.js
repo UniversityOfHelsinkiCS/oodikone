@@ -10,7 +10,7 @@ const calculateProtoC = async query => {
 
   const data = await getTargetStudentCounts({
     includeOldAttainments: query.include_old_attainments === 'true',
-    excludeNonEnrolled: query.exclude_non_enrolled === 'true'
+    excludeNonEnrolled: query.exclude_non_enrolled === 'true',
   })
 
   const programmeData = data.filter(d => d.programmeType !== 30)
@@ -25,7 +25,7 @@ const calculateProtoC = async query => {
       students3y: parseInt(programmeRow.students3y, 10),
       // 4y group includes 3y group, make 4y count exclusive:
       students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
-      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
+      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10),
     }))
     .value()
 
@@ -40,7 +40,7 @@ const calculateProtoC = async query => {
           totalStudents: studytrackdata.programmeTotalStudents,
           students3y: studytrackdata.students3y,
           students4y: studytrackdata.students4y,
-          currentlyCancelled: studytrackdata.currentlyCancelled
+          currentlyCancelled: studytrackdata.currentlyCancelled,
         })
       }
       return acc2
@@ -58,7 +58,7 @@ const calculateProtoC = async query => {
       students3y: parseInt(programmeRow.students3y, 10),
       // 4y group includes 3y group, make 4y count exclusive:
       students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
-      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
+      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10),
     }))
     .groupBy(r => r.orgCode)
     .mapValues(rows => ({
@@ -76,7 +76,7 @@ const calculateProtoC = async query => {
           programmeTotalStudents: totalStudents,
           students3y,
           students4y,
-          currentlyCancelled
+          currentlyCancelled,
         }) => ({
           code,
           name,
@@ -84,9 +84,9 @@ const calculateProtoC = async query => {
           students3y,
           students4y,
           currentlyCancelled,
-          studytracks: studytrackToBachelorProgrammes[code]
+          studytracks: studytrackToBachelorProgrammes[code],
         })
-      )
+      ),
     }))
     .value()
   return newmankelid
@@ -100,7 +100,7 @@ const calculateProtoCProgramme = async query => {
   const data = await getTargetStudentCounts({
     codes: codes,
     includeOldAttainments: query.include_old_attainments === 'true',
-    excludeNonEnrolled: query.exclude_non_enrolled === 'true'
+    excludeNonEnrolled: query.exclude_non_enrolled === 'true',
   })
   const programmeData = data.find(d => d.programmeType === 20)
   const studytrackData = data.filter(d => d.programmeType !== 20)
@@ -114,7 +114,7 @@ const calculateProtoCProgramme = async query => {
       students3y: parseInt(programmeRow.students3y, 10),
       // 4y group includes 3y group, make 4y count exclusive:
       students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
-      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
+      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10),
     }))
     .value()
 
@@ -129,7 +129,7 @@ const calculateProtoCProgramme = async query => {
           totalStudents: studytrackdata.programmeTotalStudents,
           students3y: studytrackdata.students3y,
           students4y: studytrackdata.students4y,
-          currentlyCancelled: studytrackdata.currentlyCancelled
+          currentlyCancelled: studytrackdata.currentlyCancelled,
         })
       }
       return acc2
@@ -148,7 +148,7 @@ const calculateProtoCProgramme = async query => {
     // 4y group includes 3y group, make 4y count exclusive:
     students4y: parseInt(programmeData.students4y, 10) - parseInt(programmeData.students3y, 10),
     currentlyCancelled: parseInt(programmeData.currentlyCancelled, 10),
-    studytracks: studytrackToBachelorProgrammes[programmeData.programmeCode]
+    studytracks: studytrackToBachelorProgrammes[programmeData.programmeCode],
   }
   return programmeDataMankeld
 }
@@ -202,5 +202,5 @@ module.exports = {
   getProtoC,
   refreshProtoC,
   getProtoCProgramme,
-  refreshProtoCProgramme
+  refreshProtoCProgramme,
 }

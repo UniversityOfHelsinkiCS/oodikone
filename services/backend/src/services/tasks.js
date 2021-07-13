@@ -4,7 +4,7 @@ const TOPTEACHER = {
   task: 'update top teachers',
   computing: false,
   status: 'Not started',
-  progress: undefined
+  progress: undefined,
 }
 
 const startTopTeacherUpdate = async (from, to) => {
@@ -32,5 +32,5 @@ const getTeacherUpdateStatus = () => getTaskStatus()
 module.exports = {
   getTaskStatus,
   startTopTeacherUpdate,
-  getTeacherUpdateStatus
+  getTeacherUpdateStatus,
 }

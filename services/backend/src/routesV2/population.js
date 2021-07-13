@@ -16,7 +16,7 @@ const filterPersonalTags = (population, userId) => {
     students: population.students.map(student => {
       student.tags = student.tags.filter(({ tag }) => !tag.personal_user_id || tag.personal_user_id === userId)
       return student
-    })
+    }),
   }
 }
 
@@ -93,7 +93,7 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
     const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, from, to)
     const {
       decodedToken: { userId },
-      roles
+      roles,
     } = req
 
     if (roles && roles.includes('admin')) {
@@ -109,7 +109,7 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
         year: 1900,
         studyRights: [],
         semesters: ['FALL', 'SPRING'],
-        months: 10000
+        months: 10000,
       },
       studentnumberlist
     )
@@ -137,7 +137,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
     const studentnumbers = await Student.findByTag(tag)
     const {
       decodedToken: { userId },
-      roles
+      roles,
     } = req
     if (roles && roles.includes('admin')) {
       studentnumberlist = studentnumbers
@@ -152,7 +152,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
         studyRights: [],
         semesters: ['FALL', 'SPRING'],
         months: 10000,
-        tag
+        tag,
       },
       studentnumberlist
     )
@@ -180,7 +180,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
     let studentnumberlist
     const {
       decodedToken: { userId },
-      roles
+      roles,
     } = req
 
     if (roles && roles.includes('admin')) {
@@ -196,7 +196,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
         year: 1900,
         studyRights: [],
         semesters: ['FALL', 'SPRING'],
-        months: 10000
+        months: 10000,
       },
       studentnumberlist
     )
@@ -251,7 +251,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
             ...req.query,
             studyRights,
             year,
-            months: newMonths
+            months: newMonths,
           })
           return populationStudents
         })
@@ -298,7 +298,7 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
   const studentnumbers = await Student.findByTag(tag)
   const {
     decodedToken: { userId },
-    roles
+    roles,
   } = req
   if (roles && roles.includes('admin')) {
     studentnumberlist = studentnumbers
@@ -318,7 +318,7 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
         studyRights,
         semesters,
         months: newMonths,
-        tag: foundTag
+        tag: foundTag,
       },
       studentnumberlist
     )
@@ -364,7 +364,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
         year: 1900,
         studyRights: [],
         semesters,
-        months: 10000
+        months: 10000,
       },
       studentnumbers
     )
@@ -383,10 +383,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
       courses,
       studyrights,
       gender_code,
-      studentNumber: crypto
-        .createHash('md5')
-        .update(`${studentNumber}${randomHash}`)
-        .digest('hex'),
+      studentNumber: crypto.createHash('md5').update(`${studentNumber}${randomHash}`).digest('hex'),
       firstnames: '',
       lastname: '',
       name: '',
@@ -394,7 +391,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
       started: null,
       credits: '',
       tags: [],
-      obfuscated: true
+      obfuscated: true,
     })
 
     result.students = result.students.map(s => (studentsUserCanAccess.has(s.studentNumber) ? s : obfuscateStudent(s)))
@@ -430,7 +427,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
         year: 1900,
         studyRights: [],
         semesters: ['FALL', 'SPRING'],
-        months: 10000
+        months: 10000,
       },
       filteredStudentNumbers
     )

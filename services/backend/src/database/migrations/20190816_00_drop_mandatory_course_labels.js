@@ -4,5 +4,5 @@ module.exports = {
       await queryInterface.dropTable('mandatory_course_labels', { transaction })
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

@@ -8,15 +8,15 @@ const sequelize = new Sequelize(conf.DB_URL, {
   logging: false,
   pool: {
     min: 0,
-    max: conf.DB_MAX_CONNECTIONS
-  }
+    max: conf.DB_MAX_CONNECTIONS,
+  },
 })
 sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
 
 const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
   schema: conf.DB_SCHEMA_KONE,
   searchPath: conf.DB_SCHEMA_KONE,
-  logging: false
+  logging: false,
 })
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
@@ -44,15 +44,15 @@ const initializeDatabaseConnection = async () => {
         storageOptions: {
           sequelize: sequelizeKone,
           tableName: 'migrations',
-          schema: conf.DB_SCHEMA_KONE
+          schema: conf.DB_SCHEMA_KONE,
         },
         logging: console.log,
         migrations: {
           params: [sequelizeKone.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/src/database/migrations_kone`,
           pattern: /\.js$/,
-          schema: conf.DB_SCHEMA_KONE
-        }
+          schema: conf.DB_SCHEMA_KONE,
+        },
       })
       const migrations = await migrator.up()
 
@@ -83,5 +83,5 @@ module.exports = {
   sequelize,
   sequelizeKone,
   initializeDatabaseConnection,
-  forceSyncDatabase
+  forceSyncDatabase,
 }

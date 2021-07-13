@@ -78,5 +78,5 @@ module.exports = {
   oldToNew,
   validateParamLength,
   isNewHYStudyProgramme,
-  lruMemoize
+  lruMemoize,
 }

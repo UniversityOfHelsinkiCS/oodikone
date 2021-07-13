@@ -68,5 +68,5 @@ module.exports = {
   patchFacultyYearlyStats,
   getFacultyYearlyStats,
   patchNonGraduatedStudents,
-  getNonGraduatedStudents
+  getNonGraduatedStudents,
 }

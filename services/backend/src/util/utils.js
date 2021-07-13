@@ -30,5 +30,5 @@ const parseHyGroups = hyGroups => {
 module.exports = {
   mapToProviders,
   hasRequiredGroup,
-  parseHyGroups
+  parseHyGroups,
 }

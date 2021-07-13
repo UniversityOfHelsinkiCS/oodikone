@@ -1,7 +1,7 @@
 const REDIS_KEY_UBER = 'UBER_DATA_V2'
 const { getRedisCDS, saveToRedis } = require('./shared')
 const {
-  dbConnections: { sequelize }
+  dbConnections: { sequelize },
 } = require('../../databaseV2/connection')
 const _ = require('lodash')
 
@@ -144,7 +144,7 @@ const getUberData = async ({ startDate, includeOldAttainments }) => {
       `,
     {
       type: sequelize.QueryTypes.SELECT,
-      bind: [checkpoints, startDate]
+      bind: [checkpoints, startDate],
     }
   )
 }
@@ -157,7 +157,7 @@ const mankeliUberData = data =>
       programmeTotalStudents: parseInt(programmeRow.programmeTotalStudents, 10),
       students3y: parseInt(programmeRow.students3y, 10),
       // 4y group includes 3y group, make the 4y group exclusive
-      students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10)
+      students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
     }))
     .groupBy(row => row.programmeCode)
     .map(programmeRows => ({
@@ -167,10 +167,10 @@ const mankeliUberData = data =>
           date,
           totalStudents,
           students3y,
-          students4y
+          students4y,
         }))
         .sort((a, b) => a.date - b.date)
-        .value()
+        .value(),
     }))
     // Then, group all programmes under the correct organization
     .groupBy(p => p.orgCode)
@@ -186,7 +186,7 @@ const mankeliUberData = data =>
           date: snapshots[0].date,
           totalStudents: _.sumBy(snapshots, s => s.totalStudents),
           students3y: _.sumBy(snapshots, s => s.students3y),
-          students4y: _.sumBy(snapshots, s => s.students4y)
+          students4y: _.sumBy(snapshots, s => s.students4y),
         }))
         .sort((a, b) => a.date - b.date)
         .value(),
@@ -198,10 +198,10 @@ const mankeliUberData = data =>
         .map(({ programmeCode: code, programmeName: name, snapshots }) => ({
           code,
           name,
-          snapshots
+          snapshots,
         }))
         .sort((a, b) => a.name.localeCompare(b.name))
-        .value()
+        .value(),
     }))
     .sort((a, b) => a.name.localeCompare(b.name))
     .value()
@@ -209,7 +209,7 @@ const mankeliUberData = data =>
 const calculateUber = async query => {
   const data = await getUberData({
     startDate: new Date(query.start_date),
-    includeOldAttainments: query.include_old_attainments === 'true'
+    includeOldAttainments: query.include_old_attainments === 'true',
   })
   const mankeld = mankeliUberData(data)
   return mankeld
@@ -239,5 +239,5 @@ const refreshUber = async query => {
 
 module.exports = {
   getUber,
-  refreshUber
+  refreshUber,
 }

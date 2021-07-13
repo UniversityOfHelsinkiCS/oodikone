@@ -14,10 +14,10 @@ module.exports = {
         { transaction }
       )
       await queryInterface.sequelize.query("SELECT setval('tag_tag_id_seq', (SELECT MAX(tag_id) FROM tag))", {
-        transaction
+        transaction,
       })
       await queryInterface.sequelize.query("SELECT setval('tag_student_id_seq', (SELECT MAX(id) FROM tag_student))", {
-        transaction
+        transaction,
       })
       await queryInterface.sequelize.query(
         "SELECT setval('teacher_course_group_id_seq', (SELECT MAX(id) FROM teacher_course_groups))",
@@ -25,5 +25,5 @@ module.exports = {
       )
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

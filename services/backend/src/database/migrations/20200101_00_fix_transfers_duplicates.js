@@ -12,16 +12,16 @@ module.exports = {
                 AND a.sourcecode = b.sourcecode
                 AND a.targetcode = b.targetcode`,
       {
-        raw: true
+        raw: true,
       }
     )
     await queryInterface.addIndex(
       'transfers',
       ['studyrightid', 'sourcecode', 'targetcode', 'transferdate', 'studentnumber'],
       {
-        unique: true
+        unique: true,
       }
     )
   },
-  down: async () => {}
+  down: async () => {},
 }

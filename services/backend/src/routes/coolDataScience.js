@@ -6,7 +6,7 @@ const {
   getStatus,
   getUber,
   getStartYears,
-  getGraduatedStatus
+  getGraduatedStatus,
 } = require('../services/coolDataScience')
 const useSisRouter = require('../util/useSisRouter')
 const trendsV2 = require('../routesV2/trends')

@@ -8,7 +8,7 @@ const run2 = async () => {
     semesters: ['FALL', 'SPRING'],
     year: 2017, // 2015
     studyRights: ['KH10_001'], // ['KH50_005'], // ['320001']
-    months: 16 // 41
+    months: 16, // 41
   }
 
   const result = await bottlenecksOf(o) // eslint-disable-line
@@ -27,7 +27,7 @@ const run1 = async () => {
     semesters: ['FALL', 'SPRING'],
     year: 2018, // 2015
     studyRights: ['KH50_001'], // ['KH50_005'], // ['320001']
-    months: 41 // 41
+    months: 41, // 41
   }
 
   const a = await optimizedStatisticsOf(o)

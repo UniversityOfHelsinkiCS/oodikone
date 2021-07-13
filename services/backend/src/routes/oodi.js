@@ -9,14 +9,14 @@ const agent =
   KEY_PATH && CERT_PATH
     ? new https.Agent({
         cert: fs.readFileSync(CERT_PATH, 'utf8'),
-        key: fs.readFileSync(KEY_PATH, 'utf8')
+        key: fs.readFileSync(KEY_PATH, 'utf8'),
       })
     : new https.Agent({
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
       })
 
 const instance = axios.create({
-  httpsAgent: agent
+  httpsAgent: agent,
 })
 
 const getUrl = instance.get

@@ -7,7 +7,7 @@ const {
   StudyrightElement,
   Studyright,
   Semester,
-  Organization
+  Organization,
 } = require('../modelsV2')
 
 const { parseCredit } = require('./parseCredits')
@@ -22,17 +22,17 @@ const byNameOrCode = (searchTerm, language) =>
         {
           name: {
             [language]: {
-              [Op.iLike]: searchTerm
-            }
-          }
+              [Op.iLike]: searchTerm,
+            },
+          },
         },
         {
           code: {
-            [Op.like]: searchTerm
-          }
-        }
-      ]
-    }
+            [Op.like]: searchTerm,
+          },
+        },
+      ],
+    },
   })
 
 const byName = (name, language) =>
@@ -40,12 +40,12 @@ const byName = (name, language) =>
     where: {
       name: {
         [language]: {
-          [Op.eq]: name
-        }
-      }
+          [Op.eq]: name,
+        },
+      },
     },
     order: [['latest_instance_date', 'DESC']],
-    limit: 1
+    limit: 1,
   })
 
 const byCode = code => Course.findByPk(code)
@@ -54,8 +54,8 @@ const findOneByCode = code => {
   return Course.findOne({
     attributes: ['id', 'code', 'name'],
     where: {
-      code: code
-    }
+      code: code,
+    },
   })
 }
 
@@ -74,39 +74,39 @@ const creditsForCourses = async (codes, anonymizationSalt) => {
               attributes: ['name', 'type'],
               where: {
                 type: {
-                  [Op.eq]: 20
-                }
-              }
+                  [Op.eq]: 20,
+                },
+              },
             },
             {
               model: Studyright,
               attributes: ['prioritycode', 'faculty_code'],
               where: {
                 prioritycode: {
-                  [Op.eq]: 1
-                }
+                  [Op.eq]: 1,
+                },
               },
               include: {
-                model: Organization
-              }
-            }
-          ]
-        }
+                model: Organization,
+              },
+            },
+          ],
+        },
       },
       {
         model: Semester,
-        attributes: ['semestercode', 'name', 'yearcode', 'yearname']
-      }
+        attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
+      },
     ],
     where: {
       course_code: {
-        [Op.in]: codes
+        [Op.in]: codes,
       },
       student_studentnumber: {
-        [Op.ne]: null
-      }
+        [Op.ne]: null,
+      },
     },
-    order: [['attainment_date', 'ASC']]
+    order: [['attainment_date', 'ASC']],
   })
   const parsedCredits = credits.map(credit => parseCredit(credit, anonymizationSalt))
   return parsedCredits
@@ -116,7 +116,7 @@ const bySearchTerm = async (term, language) => {
   const formatCourse = course => ({
     name: course.name[language],
     code: course.code,
-    date: course.latest_instance_date
+    date: course.latest_instance_date,
   })
 
   try {
@@ -124,7 +124,7 @@ const bySearchTerm = async (term, language) => {
     return result.map(formatCourse)
   } catch (e) {
     return {
-      error: e
+      error: e,
     }
   }
 }
@@ -133,7 +133,7 @@ const createCourse = async (code, name, latest_instance_date) =>
   Course.create({
     code,
     name,
-    latest_instance_date
+    latest_instance_date,
   })
 
 const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
@@ -149,8 +149,8 @@ const allCodeAltenatives = async code => {
     raw: true,
     attributes: ['id', 'code', 'substitutions'],
     where: {
-      code: code
-    }
+      code: code,
+    },
   })
 
   const allSubstitutions = _.flatten(course.map(c => c.substitutions))
@@ -162,9 +162,9 @@ const allCodeAltenatives = async code => {
       attributes: ['code'],
       where: {
         id: {
-          [Op.in]: allSubstitutions
-        }
-      }
+          [Op.in]: allSubstitutions,
+        },
+      },
     })
   }
 
@@ -198,9 +198,9 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
     creditsForCourses(codes, anonymizationSalt),
     Course.findOne({
       where: {
-        code: coursecode
-      }
-    })
+        code: coursecode,
+      },
+    }),
   ])
 
   const counter = new CourseYearlyStatsCounter()
@@ -216,7 +216,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
       attainment_date,
       programmes,
       coursecode,
-      credits
+      credits,
     } = credit
 
     const groupcode = separate ? semestercode : yearcode
@@ -227,17 +227,17 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
         name: {
           en: 'Other',
           fi: 'Muu',
-          sv: 'Andra'
+          sv: 'Andra',
         },
         faculty_code: 'OTHER',
         organization: {
           name: {
             en: 'Other',
             fi: 'Muu',
-            sv: 'Andra'
-          }
-        }
-      }
+            sv: 'Andra',
+          },
+        },
+      },
     ]
     counter.markStudyProgrammes(
       studentnumber,
@@ -254,7 +254,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
     ...statistics,
     coursecode,
     alternatives: codes,
-    name: course.name
+    name: course.name,
   }
 }
 
@@ -265,10 +265,10 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
         await Course.findAll({
           where: {
             code: {
-              [Op.in]: coursecodes
-            }
+              [Op.in]: coursecodes,
+            },
           },
-          attributes: ['max_attainment_date']
+          attributes: ['max_attainment_date'],
         })
       ).map(c => new Date(c.max_attainment_date).getTime())
     )
@@ -279,13 +279,13 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
   const credits = await Credit.findAll({
     where: {
       course_code: {
-        [Op.in]: coursecodes
+        [Op.in]: coursecodes,
       },
       attainment_date: {
-        [Op.gt]: attainmentThreshold
-      }
+        [Op.gt]: attainmentThreshold,
+      },
     },
-    order: [['attainment_date', 'ASC']]
+    order: [['attainment_date', 'ASC']],
   })
 
   const yearlyStudents = Object.values(
@@ -323,16 +323,16 @@ const nameLikeTerm = name => {
     name: {
       [Op.or]: {
         fi: {
-          [Op.iLike]: term
+          [Op.iLike]: term,
         },
         sv: {
-          [Op.iLike]: term
+          [Op.iLike]: term,
         },
         en: {
-          [Op.iLike]: term
-        }
-      }
-    }
+          [Op.iLike]: term,
+        },
+      },
+    },
   }
 }
 
@@ -340,9 +340,9 @@ const byCodes = codes => {
   return Course.findAll({
     where: {
       code: {
-        [Op.in]: codes
-      }
-    }
+        [Op.in]: codes,
+      },
+    },
   })
 }
 
@@ -351,8 +351,8 @@ const codeLikeTerm = code =>
     ? undefined
     : {
         code: {
-          [Op.iLike]: `%${code.trim()}%`
-        }
+          [Op.iLike]: `%${code.trim()}%`,
+        },
       }
 
 const byNameAndOrCodeLike = async (name, code) => {
@@ -367,12 +367,12 @@ const byNameAndOrCodeLike = async (name, code) => {
       'enddate',
       'max_attainment_date',
       'min_attainment_date',
-      'substitutions'
+      'substitutions',
     ],
     where: {
       ...nameLikeTerm(name),
-      ...codeLikeTerm(code)
-    }
+      ...codeLikeTerm(code),
+    },
   })
 
   let substitutionGroupIndex = 0
@@ -414,5 +414,5 @@ module.exports = {
   maxYearsToCreatePopulationFrom,
   unifyOpenUniversity,
   allCodeAltenatives,
-  findOneByCode
+  findOneByCode,
 }

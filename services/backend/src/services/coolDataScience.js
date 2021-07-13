@@ -8,7 +8,7 @@ const { getAssociations } = require('../services/studyrights')
 const { redisClient } = require('./redis')
 const userServiceClient = axios.create({
   baseURL: USERSERVICE_URL,
-  headers: { secret: process.env.USERSERVICE_SECRET }
+  headers: { secret: process.env.USERSERVICE_SECRET },
 })
 
 const STUDYRIGHT_START_DATE = '2017-07-31 21:00:00+00'
@@ -164,8 +164,8 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
     {
       type: sequelize.QueryTypes.SELECT,
       replacements: {
-        codes: codes
-      }
+        codes: codes,
+      },
     }
   )
 }
@@ -309,7 +309,7 @@ const getUberData = async ({ startDate, includeOldAttainments }) => {
       `,
     {
       type: sequelize.QueryTypes.SELECT,
-      bind: [checkpoints, startDate]
+      bind: [checkpoints, startDate],
     }
   )
 }
@@ -328,7 +328,7 @@ const mankeliUberData = data =>
       programmeTotalStudents: parseInt(programmeRow.programmeTotalStudents, 10),
       students3y: parseInt(programmeRow.students3y, 10),
       // 4y group includes 3y group, make the 4y group exclusive
-      students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10)
+      students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
     }))
     .groupBy(row => row.programmeCode)
     .map(programmeRows => ({
@@ -338,10 +338,10 @@ const mankeliUberData = data =>
           date,
           totalStudents,
           students3y,
-          students4y
+          students4y,
         }))
         .sort((a, b) => a.date - b.date)
-        .value()
+        .value(),
     }))
     // Then, group all programmes under the correct organization
     .groupBy(p => p.orgCode)
@@ -357,7 +357,7 @@ const mankeliUberData = data =>
           date: snapshots[0].date,
           totalStudents: _.sumBy(snapshots, s => s.totalStudents),
           students3y: _.sumBy(snapshots, s => s.students3y),
-          students4y: _.sumBy(snapshots, s => s.students4y)
+          students4y: _.sumBy(snapshots, s => s.students4y),
         }))
         .sort((a, b) => a.date - b.date)
         .value(),
@@ -369,10 +369,10 @@ const mankeliUberData = data =>
         .map(({ programmeCode: code, programmeName: name, snapshots }) => ({
           code,
           name,
-          snapshots
+          snapshots,
         }))
         .sort((a, b) => a.name.localeCompare(b.name))
-        .value()
+        .value(),
     }))
     .sort((a, b) => a.name.localeCompare(b.name))
     .value()
@@ -387,7 +387,7 @@ const getCurrentStudyYearStartDate = _.memoize(
     `,
           {
             type: sequelize.QueryTypes.SELECT,
-            replacements: { a: new Date(unixMillis) }
+            replacements: { a: new Date(unixMillis) },
           }
         )
       )[0].startdate
@@ -402,7 +402,7 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
   return sequelize.query(
     `
     SELECT SUM(cr.credits) AS ` +
-    alias + // HAX, alias doesn't come from user so no sql injection
+      alias + // HAX, alias doesn't come from user so no sql injection
       `,COUNT(DISTINCT(cr.student_studentnumber)) AS ` +
       alias2 +
       `, cp.providercode, co.code, co.name FROM credit cr
@@ -417,7 +417,7 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
     `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { a, b }
+      replacements: { a, b },
     }
   )
 }
@@ -436,7 +436,7 @@ const getGraduatedBetween = async (start, end) => {
     `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { start, end }
+      replacements: { start, end },
     }
   )
 }
@@ -482,7 +482,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     yearRange,
     diff => ({
       from: new Date(startTime - diff * Y_TO_MS),
-      to: new Date(unixMillis - diff * Y_TO_MS)
+      to: new Date(unixMillis - diff * Y_TO_MS),
     }),
     'acc',
     'students'
@@ -493,26 +493,21 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     yearRange.slice(0, -1),
     diff => ({
       from: new Date(startTime - diff * Y_TO_MS),
-      to: new Date(startTime - (diff - 1) * Y_TO_MS)
+      to: new Date(startTime - (diff - 1) * Y_TO_MS),
     }),
     'total',
     'students'
   )
 
   /* Gather all required data */
-  const [
-    yearlyAccCredits,
-    yearlyTotalCredits,
-    elementDetails,
-    faculties,
-    { data: facultyProgrammes }
-  ] = await Promise.all([
-    Promise.all(yearlyAccCreditsPromises),
-    Promise.all(yearlyTotalCreditsPromises),
-    ElementDetails.findAll(),
-    Organisation.findAll(),
-    userServiceClient.get('/faculty_programmes')
-  ])
+  const [yearlyAccCredits, yearlyTotalCredits, elementDetails, faculties, { data: facultyProgrammes }] =
+    await Promise.all([
+      Promise.all(yearlyAccCreditsPromises),
+      Promise.all(yearlyTotalCreditsPromises),
+      ElementDetails.findAll(),
+      Organisation.findAll(),
+      userServiceClient.get('/faculty_programmes'),
+    ])
 
   /* Construct some helper maps */
   const facultyCodeToFaculty = faculties.reduce((res, curr) => {
@@ -530,7 +525,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     const [p] = mapToProviders([curr.code])
     res[p] = {
       code: curr.code,
-      name: curr.name
+      name: curr.name,
     }
     return res
   }, {})
@@ -583,7 +578,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
         drill: courses,
         yearly: _.mergeWith({}, ...yearlyValues, mergele),
         current: _.sumBy(courseValues, 'current'),
-        previous: _.sumBy(courseValues, 'previous')
+        previous: _.sumBy(courseValues, 'previous'),
       }
     }
     return acc
@@ -601,7 +596,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
           name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
           yearly: {},
           current: 0,
-          previous: 0
+          previous: 0,
         }
       }
       acc[facultyCode]['drill'][programmeCode] = programmeStats
@@ -620,7 +615,7 @@ const calculateProtoC = async query => {
 
   const data = await getTargetStudentCounts({
     includeOldAttainments: query.include_old_attainments === 'true',
-    excludeNonEnrolled: query.exclude_non_enrolled === 'true'
+    excludeNonEnrolled: query.exclude_non_enrolled === 'true',
   })
 
   const programmeData = data.filter(d => d.programmeType !== 30)
@@ -635,7 +630,7 @@ const calculateProtoC = async query => {
       students3y: parseInt(programmeRow.students3y, 10),
       // 4y group includes 3y group, make 4y count exclusive:
       students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
-      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
+      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10),
     }))
     .value()
 
@@ -650,7 +645,7 @@ const calculateProtoC = async query => {
           totalStudents: studytrackdata.programmeTotalStudents,
           students3y: studytrackdata.students3y,
           students4y: studytrackdata.students4y,
-          currentlyCancelled: studytrackdata.currentlyCancelled
+          currentlyCancelled: studytrackdata.currentlyCancelled,
         })
       }
       return acc2
@@ -668,7 +663,7 @@ const calculateProtoC = async query => {
       students3y: parseInt(programmeRow.students3y, 10),
       // 4y group includes 3y group, make 4y count exclusive:
       students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
-      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
+      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10),
     }))
     .groupBy(r => r.orgCode)
     .mapValues(rows => ({
@@ -686,7 +681,7 @@ const calculateProtoC = async query => {
           programmeTotalStudents: totalStudents,
           students3y,
           students4y,
-          currentlyCancelled
+          currentlyCancelled,
         }) => ({
           code,
           name,
@@ -694,9 +689,9 @@ const calculateProtoC = async query => {
           students3y,
           students4y,
           currentlyCancelled,
-          studytracks: studytrackToBachelorProgrammes[code]
+          studytracks: studytrackToBachelorProgrammes[code],
         })
-      )
+      ),
     }))
     .value()
   return newmankelid
@@ -710,7 +705,7 @@ const calculateProtoCProgramme = async query => {
   const data = await getTargetStudentCounts({
     codes: codes,
     includeOldAttainments: query.include_old_attainments === 'true',
-    excludeNonEnrolled: query.exclude_non_enrolled === 'true'
+    excludeNonEnrolled: query.exclude_non_enrolled === 'true',
   })
   const programmeData = data.find(d => d.programmeType === 20)
   const studytrackData = data.filter(d => d.programmeType !== 20)
@@ -724,7 +719,7 @@ const calculateProtoCProgramme = async query => {
       students3y: parseInt(programmeRow.students3y, 10),
       // 4y group includes 3y group, make 4y count exclusive:
       students4y: parseInt(programmeRow.students4y, 10) - parseInt(programmeRow.students3y, 10),
-      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10)
+      currentlyCancelled: parseInt(programmeRow.currentlyCancelled, 10),
     }))
     .value()
 
@@ -739,7 +734,7 @@ const calculateProtoCProgramme = async query => {
           totalStudents: studytrackdata.programmeTotalStudents,
           students3y: studytrackdata.students3y,
           students4y: studytrackdata.students4y,
-          currentlyCancelled: studytrackdata.currentlyCancelled
+          currentlyCancelled: studytrackdata.currentlyCancelled,
         })
       }
       return acc2
@@ -758,7 +753,7 @@ const calculateProtoCProgramme = async query => {
     // 4y group includes 3y group, make 4y count exclusive:
     students4y: parseInt(programmeData.students4y, 10) - parseInt(programmeData.students3y, 10),
     currentlyCancelled: parseInt(programmeData.currentlyCancelled, 10),
-    studytracks: studytrackToBachelorProgrammes[programmeData.programmeCode]
+    studytracks: studytrackToBachelorProgrammes[programmeData.programmeCode],
   }
   return programmeDataMankeld
 }
@@ -766,7 +761,7 @@ const calculateProtoCProgramme = async query => {
 const calculateUber = async query => {
   const data = await getUberData({
     startDate: new Date(query.start_date),
-    includeOldAttainments: query.include_old_attainments === 'true'
+    includeOldAttainments: query.include_old_attainments === 'true',
   })
   const mankeld = mankeliUberData(data)
   return mankeld
@@ -782,12 +777,12 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
 
   const yearlyRange = diff => ({
     from: new Date(startTime - diff * Y_TO_MS),
-    to: new Date(unixMillis - diff * Y_TO_MS)
+    to: new Date(unixMillis - diff * Y_TO_MS),
   })
 
   const totalRange = diff => ({
     from: new Date(startTime - diff * Y_TO_MS),
-    to: new Date(startTime - (diff - 1) * Y_TO_MS)
+    to: new Date(startTime - (diff - 1) * Y_TO_MS),
   })
 
   const dataArray = yearRange.map(async year => {
@@ -832,7 +827,7 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
           name: element.name,
           current: 0,
           previous: 0,
-          yearly: {}
+          yearly: {},
         }
       }
       acc[curr.faculty_code]['drill'][curr.code]['yearly'][data.year] = { acc: Number(curr.sum) }
@@ -1009,7 +1004,7 @@ const getStartYears = async () => {
   `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { startDate: STUDYRIGHT_START_DATE, currentDate: CURRENT_DATE }
+      replacements: { startDate: STUDYRIGHT_START_DATE, currentDate: CURRENT_DATE },
     }
   )
 }
@@ -1086,5 +1081,5 @@ module.exports = {
   refreshProtoCProgramme,
   refreshStatusGraduated,
   getStartYears,
-  getGraduatedStatus
+  getGraduatedStatus,
 }

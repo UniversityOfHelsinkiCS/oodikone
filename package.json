@@ -18,7 +18,7 @@
     "lint:userservice": "eslint services/userservice",
     "linttest:other": "zx ./scripts/lint-other.mjs",
     "lint": "concurrently 'npm run lint:*'",
-    "lintfix:backend": "npm run lintfix --prefix services/backend/oodikone2-backend",
+    "lintfix:backend": "prettier --write services/backend/**/*.{js,json} && eslint --fix services/backend",
     "lintfixtest:frontend": "npm run lintfix --prefix services/oodikone2-frontend",
     "lintfix:userservice": "prettier --write services/userservice/**/*.{js,json} && eslint --fix services/userservice",
     "lintfix": "concurrently 'npm run lintfix:*'",

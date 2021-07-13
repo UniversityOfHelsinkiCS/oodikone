@@ -82,5 +82,5 @@ module.exports = {
   rescheduleScheduled,
   rescheduleFetched,
   updateNoStudents,
-  updateDaily
+  updateDaily,
 }

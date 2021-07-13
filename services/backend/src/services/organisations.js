@@ -6,9 +6,9 @@ const byCode = code => {
   return Organisation.findOne({
     where: {
       code: {
-        [Op.eq]: code
-      }
-    }
+        [Op.eq]: code,
+      },
+    },
   })
 }
 
@@ -18,5 +18,5 @@ const all = () => {
 
 module.exports = {
   byCode,
-  all
+  all,
 }

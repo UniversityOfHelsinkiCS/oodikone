@@ -25,7 +25,7 @@ const updateSISStudentsByProgramme = async details => {
       semesters: ['FALL', 'SPRING'],
       studyRights: { programme },
       year: Number(year),
-      studentStatuses: ['CANCELLED', 'EXCHANGE', 'NONDEGREE', 'TRANSFERRED']
+      studentStatuses: ['CANCELLED', 'EXCHANGE', 'NONDEGREE', 'TRANSFERRED'],
     }
     const sisResult = await sisOptimized(query)
     const oodiResult = await oodiOptimized(query)
@@ -74,5 +74,5 @@ module.exports = {
   updateStudentsByStudentNumber,
   updateSISRedisCache,
   abort,
-  updateCoursesByCourseCode
+  updateCoursesByCourseCode,
 }

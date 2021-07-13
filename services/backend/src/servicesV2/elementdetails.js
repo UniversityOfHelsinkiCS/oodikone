@@ -6,17 +6,17 @@ const byId = id => ElementDetail.findByPk(id)
 const byType = type =>
   ElementDetail.findAll({
     where: {
-      type
-    }
+      type,
+    },
   })
 
 const byCodes = codes =>
   ElementDetail.findAll({
     where: {
       code: {
-        [Op.in]: codes
-      }
-    }
+        [Op.in]: codes,
+      },
+    },
   })
 
 module.exports = { byId, byType, byCodes }

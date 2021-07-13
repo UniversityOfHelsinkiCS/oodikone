@@ -34,7 +34,7 @@ module.exports = {
       $$ LANGUAGE SQL STABLE;
       `,
       {
-        multipleStatements: true
+        multipleStatements: true,
       }
     )
 
@@ -73,9 +73,9 @@ module.exports = {
       $$ LANGUAGE SQL STABLE;
       `,
       {
-        multipleStatements: true
+        multipleStatements: true,
       }
     )
   },
-  down: async () => {}
+  down: async () => {},
 }

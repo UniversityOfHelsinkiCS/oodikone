@@ -6,7 +6,7 @@ const {
   getStatus,
   getUber,
   getStartYears,
-  getGraduatedStatus
+  getGraduatedStatus,
 } = require('../servicesV2/trends')
 
 router.get('/start-years', async (req, res) => {

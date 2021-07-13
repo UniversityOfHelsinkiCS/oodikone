@@ -54,7 +54,7 @@ const checkRequiredGroup = async (req, res, next) => {
 
   if (tokenOutdated) {
     return res.status(401).json({
-      error: 'Token needs to be refreshed - enabled does not match hy-group requirement'
+      error: 'Token needs to be refreshed - enabled does not match hy-group requirement',
     })
   }
 
@@ -87,5 +87,5 @@ module.exports = {
   roles,
   checkRequiredGroup,
   checkUserBlacklisting,
-  checkIfNonAdminAskingOldOodiData
+  checkIfNonAdminAskingOldOodiData,
 }

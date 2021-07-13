@@ -28,7 +28,7 @@ const courseCodes = [
   'AY5823953',
   'AY5823954',
   'AY5823955',
-  'AY5823956'
+  'AY5823956',
 ]
 
 const createReport = async () => {
@@ -39,16 +39,16 @@ const createReport = async () => {
         where: {
           course_code: courseCode,
           attainment_date: {
-            [Op.gte]: startDate
-          }
-        }
+            [Op.gte]: startDate,
+          },
+        },
       })
 
       const { fmseiStudentnumbers, otherStudentnumbers } = await credits.reduce(
         async (accPromise, credit) => {
           const student = await Student.findOne({
             where: { studentnumber: credit.student_studentnumber },
-            include: [{ model: Studyright }]
+            include: [{ model: Studyright }],
           })
           const acc = await accPromise
 
@@ -61,12 +61,12 @@ const createReport = async () => {
             )
             return {
               fmseiStudentnumbers: acc.fmseiStudentnumbers.concat(student.studentnumber),
-              otherStudentnumbers: acc.otherStudentnumbers
+              otherStudentnumbers: acc.otherStudentnumbers,
             }
           }
           return {
             fmseiStudentnumbers: acc.fmseiStudentnumbers,
-            otherStudentnumbers: acc.otherStudentnumbers.concat(student.studentnumber)
+            otherStudentnumbers: acc.otherStudentnumbers.concat(student.studentnumber),
           }
         },
         { fmseiStudentnumbers: [], otherStudentnumbers: [] }
@@ -78,10 +78,10 @@ const createReport = async () => {
         courseStats: acc.courseStats.concat({
           courseCode: courseCode,
           fmsei: fmseiStudentnumbers.length,
-          other: otherStudentnumbers.length
+          other: otherStudentnumbers.length,
         }),
         fmseiStudentnumbers: acc.fmseiStudentnumbers.concat(fmseiStudentnumbers),
-        otherStudentnumbers: acc.otherStudentnumbers.concat(otherStudentnumbers)
+        otherStudentnumbers: acc.otherStudentnumbers.concat(otherStudentnumbers),
       }
     },
     { courseStats: [], fmseiStudentnumbers: [], otherStudentnumbers: [] }
@@ -91,13 +91,13 @@ const createReport = async () => {
     include: [
       {
         model: Credit,
-        separate: true
-      }
-    ]
+        separate: true,
+      },
+    ],
   })
 
   const otherStudents = await Student.findAll({
-    where: { studentnumber: otherStudentnumbers }
+    where: { studentnumber: otherStudentnumbers },
   })
   console.log('SPLIT')
   otherStudents.forEach(s => console.log(`${new Date(s.birthdate).getFullYear()};${s.gender_fi}`))

@@ -15,7 +15,7 @@ class CourseStatsCounter {
       code,
       name,
       disciplines: {},
-      coursetypes: {}
+      coursetypes: {},
     }
     this.students = {
       all: {},
@@ -24,7 +24,7 @@ class CourseStatsCounter {
       retryPassed: {},
       failedMany: {},
       improvedPassedGrade: {},
-      markedToSemester: {}
+      markedToSemester: {},
     }
     this.stats = {
       students: 0,
@@ -37,7 +37,7 @@ class CourseStatsCounter {
       percentage: undefined,
       passedOfPopulation: undefined,
       triedOfPopulation: undefined,
-      passingSemesters: this.initializePassingSemesters()
+      passingSemesters: this.initializePassingSemesters(),
     }
     this.grades = {}
   }
@@ -45,7 +45,7 @@ class CourseStatsCounter {
   initializePassingSemesters() {
     const passingSemesters = {
       BEFORE: 0,
-      LATER: 0
+      LATER: 0,
     }
 
     for (let i = 0; i < 7; i++) {
@@ -149,7 +149,7 @@ class CourseStatsCounter {
   getPassingSemestersCumulative() {
     const passingSemesters = this.stats.passingSemesters
     const attemptStats = {
-      BEFORE: passingSemesters['BEFORE']
+      BEFORE: passingSemesters['BEFORE'],
     }
 
     attemptStats['0-FALL'] = passingSemesters['BEFORE'] + passingSemesters['0-FALL']
@@ -185,11 +185,11 @@ class CourseStatsCounter {
       stats,
       students,
       course: this.course,
-      grades: this.grades
+      grades: this.grades,
     }
   }
 }
 
 module.exports = {
-  CourseStatsCounter
+  CourseStatsCounter,
 }

@@ -28,7 +28,7 @@ const groups = [
   'Draama',
   'Mediakasvatus',
   'Tiedekeskuspedagogiikka',
-  'Svenska studier'
+  'Svenska studier',
 ]
 
 run()

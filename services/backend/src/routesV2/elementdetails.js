@@ -5,7 +5,7 @@ const MandatoryCourses = require('../servicesV2/mandatoryCourses')
 const {
   productivityStatsForStudytrack,
   throughputStatsForStudytrack,
-  optionData
+  optionData,
 } = require('../servicesV2/studyprogramme')
 const { findProgrammeTheses /* , createThesisCourse, deleteThesisCourse */ } = require('../services/thesis')
 
@@ -16,7 +16,7 @@ const {
   setThroughput,
   patchProductivity,
   patchThroughput,
-  getNonGraduatedStudents
+  getNonGraduatedStudents,
 } = require('../servicesV2/analyticsService')
 
 const programmeStatsSince = new Date('2017-07-31')
@@ -60,14 +60,14 @@ router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
     const {
       roles,
       decodedToken,
-      params: { id }
+      params: { id },
     } = req
     if (!id) return res.status(400).json({ error: 'programme id missing' })
 
     const nonGraduatedStudents = await getNonGraduatedStudents(id)
     if (!nonGraduatedStudents) return res.status(200).json({})
     const {
-      data: { formattedData, studentnumbers }
+      data: { formattedData, studentnumbers },
     } = nonGraduatedStudents
 
     const filteredData = { ...formattedData }
@@ -147,7 +147,7 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   } catch (e) {
     try {
       await patchProductivity({
-        [code]: { status: 'RECALCULATION ERRORED' }
+        [code]: { status: 'RECALCULATION ERRORED' },
       })
     } catch (e) {
       console.error(e)

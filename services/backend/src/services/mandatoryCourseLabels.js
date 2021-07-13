@@ -35,12 +35,12 @@ const find = (studyprogramme_id, { id }) => {
     attributes: ['id', 'label', 'orderNumber'],
     where: {
       studyprogramme_id: {
-        [Op.eq]: studyprogramme_id
+        [Op.eq]: studyprogramme_id,
       },
       id: {
-        [Op.eq]: id
-      }
-    }
+        [Op.eq]: id,
+      },
+    },
   })
 }
 
@@ -49,9 +49,9 @@ const labelsByStudyprogramme = studyProgrammeId => {
     attributes: ['id', 'label', 'orderNumber'],
     where: {
       studyprogramme_id: {
-        [Op.eq]: studyProgrammeId
-      }
-    }
+        [Op.eq]: studyProgrammeId,
+      },
+    },
   })
 }
 
@@ -60,5 +60,5 @@ module.exports = {
   create,
   destroy,
   move,
-  find
+  find,
 }

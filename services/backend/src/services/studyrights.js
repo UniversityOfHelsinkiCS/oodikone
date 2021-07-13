@@ -15,9 +15,9 @@ const byStudent = studentNumber => {
   return Studyright.findAll({
     where: {
       student_studentnumber: {
-        [Op.eq]: studentNumber
-      }
-    }
+        [Op.eq]: studentNumber,
+      },
+    },
   })
 }
 
@@ -26,9 +26,9 @@ const getActiveStudyrightElementsOfCodeBeforeDate = async (code, date) =>
     where: {
       code,
       enddate: {
-        [Op.gte]: date
-      }
-    }
+        [Op.gte]: date,
+      },
+    },
   })
 
 const getActiveStudyrightsFromIdsBeforeDate = async (studyrightIds, date) =>
@@ -36,13 +36,13 @@ const getActiveStudyrightsFromIdsBeforeDate = async (studyrightIds, date) =>
     where: {
       graduated: 0,
       studyrightid: {
-        [Op.in]: studyrightIds
+        [Op.in]: studyrightIds,
       },
       canceldate: null,
       enddate: {
-        [Op.gte]: date
-      }
-    }
+        [Op.gte]: date,
+      },
+    },
   })
 
 const nonGraduatedStudentsOfElementDetail = async code => {
@@ -56,7 +56,7 @@ const nonGraduatedStudentsOfElementDetail = async code => {
   studyrightElements.forEach(({ startdate, enddate, studentnumber }) => {
     studentToDatesMap[studentnumber] = {
       startdate,
-      enddate
+      enddate,
     }
   })
 
@@ -79,9 +79,9 @@ const nonGraduatedStudentsOfElementDetail = async code => {
             await hasEnrolledForSemester(student_studentnumber, currentSemesterCode),
             await StudyrightElement.findAll({
               where: {
-                studyrightid
-              }
-            })
+                studyrightid,
+              },
+            }),
           ])
 
           // If student is in new master's programme,
@@ -92,14 +92,12 @@ const nonGraduatedStudentsOfElementDetail = async code => {
           }
 
           if (studentnumbers.has(student_studentnumber)) return res()
-          const year = moment(studentToDatesMap[student_studentnumber].startdate)
-            .tz('Europe/Helsinki')
-            .year()
+          const year = moment(studentToDatesMap[student_studentnumber].startdate).tz('Europe/Helsinki').year()
           if (!result[year]) result[year] = []
           studentnumbers.add(student_studentnumber)
           result[year].push({
             studentNumber: student_studentnumber,
-            enrolled
+            enrolled,
           })
           res()
         })
@@ -119,16 +117,16 @@ const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, star
     attributes: ['studentnumber'],
     where: {
       code: {
-        [Op.in]: codes
+        [Op.in]: codes,
       },
       startdate: {
-        [Op.between]: [startedAfter, startedBefore]
-      }
+        [Op.between]: [startedAfter, startedBefore],
+      },
     },
     group: [col('studentnumber')],
     having: where(fn('count', fn('distinct', col('code'))), {
-      [Op.eq]: codes.length
-    })
+      [Op.eq]: codes.length,
+    }),
   })
   return studyrights.map(srelement => srelement.studentnumber)
 }
@@ -173,7 +171,7 @@ const uniqueStudyrightCodeArrays = elementcodes =>
 `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { elementcodes }
+      replacements: { elementcodes },
     }
   )
 
@@ -195,7 +193,7 @@ const allUniqueStudyrightCodeArrays = () =>
   ;
 `,
     {
-      type: sequelize.QueryTypes.SELECT
+      type: sequelize.QueryTypes.SELECT,
     }
   )
 
@@ -218,7 +216,7 @@ const formatStudyrightElements = (elements, associations) =>
     name: element.name,
     enabled: true,
     type: element.type,
-    associations: associations && associations[element.code]
+    associations: associations && associations[element.code],
   }))
 
 const getAllStudyrightElementsAndAssociations = async () => {
@@ -247,9 +245,9 @@ const getAllDegreesAndProgrammes = async () => {
   const elementDetails = ElementDetails.findAll({
     where: {
       type: {
-        [Op.in]: [10, 20]
-      }
-    }
+        [Op.in]: [10, 20],
+      },
+    },
   })
   return formatStudyrightElements(elementDetails)
 }
@@ -258,9 +256,9 @@ const getAllProgrammes = async () => {
   const elementDetails = ElementDetails.findAll({
     where: {
       type: {
-        [Op.in]: [20]
-      }
-    }
+        [Op.in]: [20],
+      },
+    },
   })
   return elementDetails
 }
@@ -278,18 +276,18 @@ const associatedStudyrightElements = async (offset, limit) => {
       attributes: ['studyrightid', 'startdate', 'enddate'],
       include: {
         model: ElementDetails,
-        attributes: ['type', 'name', 'code']
-      }
+        attributes: ['type', 'name', 'code'],
+      },
     },
     limit,
-    offset
+    offset,
   })
   const groupings = studyrights.map(({ studyright_elements: sres }) =>
     sres.map(sre => ({
       ...sre.element_detail.get(),
       studyrightid: sre.get().studyrightid,
       startdate: sre.get().startdate,
-      enddate: sre.get().enddate
+      enddate: sre.get().enddate,
     }))
   )
   return groupings
@@ -298,7 +296,7 @@ const associatedStudyrightElements = async (offset, limit) => {
 const StudyRightType = {
   DEGREE: 10,
   PROGRAMME: 20,
-  STUDYTRACK: 30
+  STUDYTRACK: 30,
 }
 
 const calculateAssociationsFromDb = async (chunksize = 100000) => {
@@ -327,14 +325,14 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             type,
             name,
             code,
-            programmes: {}
+            programmes: {},
           }
         } else if (type === StudyRightType.STUDYTRACK) {
           associations.studyTracks[code] = associations.studyTracks[code] || {
             type,
             name,
             code,
-            programmes: {}
+            programmes: {},
           }
         } else if (type === StudyRightType.PROGRAMME) {
           associations.programmes[code] = associations.programmes[code] || {
@@ -342,14 +340,14 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             name: name,
             code: code,
             enrollmentStartYears: {},
-            studytracks: []
+            studytracks: [],
           }
           const momentstartdate = moment(startdate)
           const enrollment = getEnrollmentStartYear(momentstartdate)
           const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
           enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
             degrees: {},
-            studyTracks: {}
+            studyTracks: {},
           }
           const enrollmentStartYear = enrollmentStartYears[enrollment]
 
@@ -360,18 +358,18 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                 enrollmentStartYear.degrees[e.code] = {
                   type: e.type,
                   name: e.name,
-                  code: e.code
+                  code: e.code,
                 }
                 associations.degrees[e.code] = associations.degrees[e.code] || {
                   type: e.type,
                   name: e.name,
                   code: e.code,
-                  programmes: {}
+                  programmes: {},
                 }
                 associations.degrees[e.code].programmes[code] = {
                   type: type,
                   name: name,
-                  code: code
+                  code: code,
                 }
               } else if (e.type === StudyRightType.STUDYTRACK) {
                 const momentenddate = moment(enddate)
@@ -387,7 +385,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                   enrollmentStartYear.studyTracks[e.code] = {
                     type: e.type,
                     name: e.name,
-                    code: e.code
+                    code: e.code,
                   }
                   if (!associations.programmes[code].studytracks.includes(e.code))
                     associations.programmes[code].studytracks.push(e.code)
@@ -396,12 +394,12 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                   type: e.type,
                   name: e.name,
                   code: e.code,
-                  programmes: {}
+                  programmes: {},
                 }
                 associations.studyTracks[e.code].programmes[code] = {
                   type: type,
                   name: name,
-                  code: code
+                  code: code,
                 }
               }
             })
@@ -483,5 +481,5 @@ module.exports = {
   refreshAssociationsInRedis,
   getAllProgrammes,
   getAllElementDetails,
-  nonGraduatedStudentsOfElementDetail
+  nonGraduatedStudentsOfElementDetail,
 }

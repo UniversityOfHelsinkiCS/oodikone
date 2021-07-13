@@ -7,9 +7,9 @@ const findForPopulation = pops =>
   Filters.findAll({
     where: {
       population: {
-        [Op.eq]: pops
-      }
-    }
+        [Op.eq]: pops,
+      },
+    },
   })
 
 const createNewFilter = async filter => {
@@ -19,14 +19,14 @@ const deleteFilter = async filter => {
   Filters.destroy({
     where: {
       id: {
-        [Op.eq]: filter.id
-      }
-    }
+        [Op.eq]: filter.id,
+      },
+    },
   })
   return filter
 }
 module.exports = {
   createNewFilter,
   deleteFilter,
-  findForPopulation
+  findForPopulation,
 }

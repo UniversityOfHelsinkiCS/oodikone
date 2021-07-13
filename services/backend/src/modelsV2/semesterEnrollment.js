@@ -6,52 +6,52 @@ class SemesterEnrollment extends Model {}
 SemesterEnrollment.init(
   {
     enrollmenttype: {
-      type: INTEGER
+      type: INTEGER,
     },
     org: {
-      type: STRING
+      type: STRING,
     },
     studentnumber: {
       type: STRING,
       references: {
         model: 'student',
-        key: 'studentnumber'
+        key: 'studentnumber',
       },
       onUpdate: 'cascade',
       onDelete: 'cascade',
-      primaryKey: true
+      primaryKey: true,
     },
     semestercode: {
-      type: INTEGER
+      type: INTEGER,
     },
     semestercomposite: {
       type: STRING,
       references: {
         model: 'semesters',
-        key: 'composite'
+        key: 'composite',
       },
       onUpdate: 'cascade',
       onDelete: 'cascade',
-      primaryKey: true
+      primaryKey: true,
     },
     enrollment_date: {
-      type: DATE
+      type: DATE,
     },
     statutory_absence: {
-      type: BOOLEAN
+      type: BOOLEAN,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: false,
     sequelize: dbConnections.sequelize,
     modelName: 'semester_enrollment',
-    tableName: 'semester_enrollments'
+    tableName: 'semester_enrollments',
   }
 )
 

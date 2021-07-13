@@ -40,7 +40,7 @@ const MATOMO_SITE_ID = process.env.MATOMO_SITE_ID
 const MATOMO_URL = process.env.MATOMO_URL
 
 const FEATURES = {
-  ERROR_HANDLER: false
+  ERROR_HANDLER: false,
 }
 
 const formatURL = url => {
@@ -62,7 +62,7 @@ if (process.env.NODE_ENV === 'dev' && process.env.FEATURES) {
 
 const OODI = {
   test: 'http://localhost',
-  anon: process.env.OODI_ADDR_ANON
+  anon: process.env.OODI_ADDR_ANON,
 }
 
 const OODI_ADDR = OODI[process.env.NODE_ENV] || process.env.OODI_ADDR
@@ -106,5 +106,5 @@ module.exports = {
   ANALYTICS_INFLUXDB_PASSWORD,
   ANALYTICS_INFLUXDB_DB,
   MATOMO_SITE_ID,
-  MATOMO_URL: MATOMO_URL && addSlashToEnd(MATOMO_URL)
+  MATOMO_URL: MATOMO_URL && addSlashToEnd(MATOMO_URL),
 }

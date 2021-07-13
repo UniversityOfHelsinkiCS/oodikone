@@ -6,8 +6,8 @@ const { INTEGER } = require('sequelize')
 module.exports = {
   up: async queryInterface => {
     await queryInterface.addColumn('programme_modules', 'order', {
-      type: INTEGER
+      type: INTEGER,
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

@@ -38,7 +38,7 @@ const CREDIT_TYPE_CODES = {
   PASSED: 4,
   FAILED: 10,
   IMPROVED: 7,
-  APPROVED: 9
+  APPROVED: 9,
 }
 
 Credit.passed = ({ credittypecode }) =>
@@ -88,12 +88,12 @@ Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
 ProgrammeModule.belongsToMany(ProgrammeModule, {
   as: 'parents',
   through: ProgrammeModuleChild,
-  foreignKey: 'child_id'
+  foreignKey: 'child_id',
 })
 ProgrammeModule.belongsToMany(ProgrammeModule, {
   as: 'children',
   through: ProgrammeModuleChild,
-  foreignKey: 'parent_id'
+  foreignKey: 'parent_id',
 })
 
 module.exports = {
@@ -115,5 +115,5 @@ module.exports = {
   Transfer,
   ProgrammeModule,
   ProgrammeModuleChild,
-  ExcludedCourse
+  ExcludedCourse,
 }

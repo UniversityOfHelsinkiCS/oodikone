@@ -11,9 +11,9 @@ const formatStudyrightElement = ({ code, element_detail, startdate, studyright: 
     organization: studyright.organization
       ? {
           name: studyright.organization.name,
-          code: studyright.organization.code
+          code: studyright.organization.code,
         }
-      : null
+      : null,
   }
 }
 
@@ -29,7 +29,7 @@ const parseCredit = (credit, anonymizationSalt) => {
       .digest('hex')
 
     const anonymizedStudent = {
-      studentnumber: anonymizedStudentNumber
+      studentnumber: anonymizedStudentNumber,
     }
 
     return {
@@ -45,7 +45,7 @@ const parseCredit = (credit, anonymizationSalt) => {
       passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
       studentnumber: anonymizedStudentNumber,
       programmes: studyright_elements.map(formatStudyrightElement),
-      credits
+      credits,
     }
   }
 
@@ -61,7 +61,7 @@ const parseCredit = (credit, anonymizationSalt) => {
     passed: !Credit.failed(credit) || Credit.passed(credit) || Credit.improved(credit),
     studentnumber,
     programmes: studyright_elements.map(formatStudyrightElement),
-    credits
+    credits,
   }
 }
 

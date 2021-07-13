@@ -18,7 +18,7 @@ const appendData = msg => {
   data[code] = {
     name,
     n: 1,
-    studentNumbers: new Set([studentNumber])
+    studentNumbers: new Set([studentNumber]),
   }
 }
 
@@ -51,5 +51,5 @@ const makeCsv = () => {
 
 module.exports = {
   output,
-  makeCsv
+  makeCsv,
 }

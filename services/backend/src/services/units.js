@@ -6,24 +6,24 @@ const hasStudent = async (code, studentnumber) =>
   StudyrightElement.findOne({
     where: {
       studentnumber,
-      code
-    }
+      code,
+    },
   })
 
 const parseUnitFromElement = element => ({
   id: element.code,
   name: element.name.fi,
   enabled: true,
-  type: element.type
+  type: element.type,
 })
 
 const getUnitsFromElementDetails = async () => {
   const elementdetails = await ElementDetails.findAll({
     where: {
       type: {
-        [Op.or]: ['10', '20']
-      }
-    }
+        [Op.or]: ['10', '20'],
+      },
+    },
   })
   return elementdetails.map(parseUnitFromElement)
 }
@@ -37,5 +37,5 @@ module.exports = {
   hasStudent,
   getUnitsFromElementDetails,
   getUnitFromElementDetail,
-  parseUnitFromElement
+  parseUnitFromElement,
 }

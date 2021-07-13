@@ -10,7 +10,7 @@ const getProductivity = async id => {
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return {
-    [id]: JSON.parse(dataFromRedis)
+    [id]: JSON.parse(dataFromRedis),
   }
 }
 
@@ -20,12 +20,12 @@ const setProductivity = async data => {
   const dataToRedis = {
     ...data,
     status: 'DONE',
-    lastUpdated: moment().format()
+    lastUpdated: moment().format(),
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return {
-    [id]: dataToRedis
+    [id]: dataToRedis,
   }
 }
 
@@ -36,12 +36,12 @@ const patchProductivity = async data => {
   const patchedData = {
     ...dataFromRedis,
     ...data,
-    lastUpdated: moment().format()
+    lastUpdated: moment().format(),
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
   if (setOperationStatus !== 'OK') return null
   return {
-    [id]: patchedData
+    [id]: patchedData,
   }
 }
 
@@ -50,7 +50,7 @@ const getThroughput = async id => {
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return {
-    [id]: JSON.parse(dataFromRedis)
+    [id]: JSON.parse(dataFromRedis),
   }
 }
 
@@ -62,12 +62,12 @@ const setThroughput = async data => {
     totals: dataToSet.totals,
     stTotals: dataToSet.stTotals,
     status: 'DONE',
-    lastUpdated: moment().format()
+    lastUpdated: moment().format(),
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return {
-    [id]: dataToRedis
+    [id]: dataToRedis,
   }
 }
 
@@ -79,12 +79,12 @@ const patchThroughput = async data => {
   const patchedData = {
     ...dataFromRedis,
     status,
-    lastUpdated: moment().format()
+    lastUpdated: moment().format(),
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
   if (setOperationStatus !== 'OK') return null
   return {
-    [id]: patchedData
+    [id]: patchedData,
   }
 }
 
@@ -110,14 +110,14 @@ const patchNonGraduatedStudents = async data => {
   const patchedData = {
     data: {
       ...dataFromRedis.data,
-      ...dataToPatch
+      ...dataToPatch,
     },
-    lastUpdated: moment().format()
+    lastUpdated: moment().format(),
   }
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
   if (setOperationStatus !== 'OK') return null
   return {
-    [id]: patchedData
+    [id]: patchedData,
   }
 }
 
@@ -138,5 +138,5 @@ module.exports = {
   patchFacultyYearlyStats,
   getFacultyYearlyStats,
   patchNonGraduatedStudents,
-  getNonGraduatedStudents
+  getNonGraduatedStudents,
 }

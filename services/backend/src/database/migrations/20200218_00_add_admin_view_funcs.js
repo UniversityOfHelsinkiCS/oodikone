@@ -30,9 +30,9 @@ module.exports = {
             END;
         $$ LANGUAGE SQL;`,
       {
-        multipleStatements: true
+        multipleStatements: true,
       }
     )
   },
-  down: async () => {}
+  down: async () => {},
 }
