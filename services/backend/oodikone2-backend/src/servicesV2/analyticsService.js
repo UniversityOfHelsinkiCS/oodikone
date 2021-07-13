@@ -7,6 +7,7 @@ const client = axios.create({ baseURL: ANALYTICS_URL })
 
 const createRedisKeyForProductivity = id => `PRODUCTIVITY_${id}`
 const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
+const createRedisKeyForNonGraduatedStudents = id => `NONGRADUATEDSTUDENTS_${id}`
 
 const getProductivity = async id => {
   const redisKey = createRedisKeyForProductivity(id)
@@ -102,13 +103,28 @@ const getFacultyYearlyStats = async data => {
 }
 
 const patchNonGraduatedStudents = async data => {
-  const response = await client.patch('/v2/nongraduatedstudents', { data })
-  return response.data
+  const [id, dataToPatch] = Object.entries(data)[0]
+  const redisKey = createRedisKeyForNonGraduatedStudents(id)
+  const dataFromRedis = JSON.parse(await redisClient.getAsync(redisKey))
+  const patchedData = {
+    data: {
+      ...dataFromRedis.data,
+      ...dataToPatch
+    },
+    lastUpdated: moment().format()
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
+  if (setOperationStatus !== 'OK') return null
+  return {
+    [id]: patchedData
+  }
 }
 
 const getNonGraduatedStudents = async id => {
-  const response = await client.get(`/v2/nongraduatedstudents/${id}`)
-  return response.data
+  const redisKey = createRedisKeyForNonGraduatedStudents(id)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
 }
 
 module.exports = {
