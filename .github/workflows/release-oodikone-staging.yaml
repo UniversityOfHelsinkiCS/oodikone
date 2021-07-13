@@ -25,7 +25,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: "Build  images"
-        run: ./run.sh oodikone ci build analytics backend frontend userservice
+        run: ./run.sh oodikone ci build backend frontend userservice
       - name: "Start frontend"
         run: ./run.sh oodikone ci up -d frontend
       - name: "Add frontend to sentry"
@@ -37,7 +37,7 @@ jobs:
             sh -c 'npm run sentry-cli -- releases new --finalize "$(cat /SENTRY_RELEASE_VERSION)" && '\
             'npm run sentry-cli -- releases files "$(cat /SENTRY_RELEASE_VERSION)" upload-sourcemaps --rewrite dist'
       - name: "Push to docker hub"
-        run: ./run.sh oodikone ci push analytics backend frontend userservice
+        run: ./run.sh oodikone ci push backend frontend userservice
       - name: "Send notification to slack"
         uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
         with:
