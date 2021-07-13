@@ -9,9 +9,9 @@ const byCodes = codes =>
   HyGroup.findAll({
     where: {
       code: {
-        [Op.in]: codes
-      }
-    }
+        [Op.in]: codes,
+      },
+    },
   })
 
 const create = code => HyGroup.create({ code })

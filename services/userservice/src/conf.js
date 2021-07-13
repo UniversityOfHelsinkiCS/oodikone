@@ -18,5 +18,5 @@ module.exports = {
   SECRET,
   TOKEN_SECRET,
   requiredGroup,
-  courseStatisticsGroup
+  courseStatisticsGroup,
 }

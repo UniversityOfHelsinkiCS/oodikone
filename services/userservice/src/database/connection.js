@@ -3,7 +3,7 @@ const Umzug = require('umzug')
 const { DB_URL } = require('../conf')
 
 const sequelize = new Sequelize(DB_URL, {
-  logging: false
+  logging: false,
 })
 const initializeDatabaseConnection = async () => {
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -26,14 +26,14 @@ const initializeDatabaseConnection = async () => {
       storage: 'sequelize',
       storageOptions: {
         sequelize: sequelize,
-        tableName: 'migrations'
+        tableName: 'migrations',
       },
       logging: console.log,
       migrations: {
         params: [sequelize.getQueryInterface(), Sequelize],
         path: `${process.cwd()}/src/database/migrations`,
-        pattern: /\.js$/
-      }
+        pattern: /\.js$/,
+      },
     })
     const migrations = await migrator.up()
 

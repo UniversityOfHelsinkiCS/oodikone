@@ -660,5 +660,5 @@ ALTER TABLE ONLY user_unit
 --
 `
     ),
-  down: async () => {}
+  down: async () => {},
 }

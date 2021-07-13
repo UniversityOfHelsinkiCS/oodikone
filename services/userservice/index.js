@@ -38,7 +38,7 @@ initializeDatabaseConnection()
       res.json({
         roles,
         rights,
-        faculties
+        faculties,
       })
     })
 

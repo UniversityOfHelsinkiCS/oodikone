@@ -11,7 +11,7 @@ const {
   Affiliation,
   FacultyProgrammes,
   UserFaculties,
-  sequelize
+  sequelize,
 } = require('../models')
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
@@ -34,7 +34,7 @@ const generateToken = async (uid, mockedBy = null) => {
     rights: programmes,
     roles: user.accessgroup,
     createdAt: moment().toISOString(),
-    version: TOKEN_VERSION
+    version: TOKEN_VERSION,
   }
   const token = jwt.sign(payload, TOKEN_SECRET)
 
@@ -130,18 +130,18 @@ const userIncludes = [
   {
     separate: true,
     model: UserElementDetails,
-    as: 'programme'
+    as: 'programme',
   },
   {
     model: AccessGroup,
     as: 'accessgroup',
-    attributes: ['id', 'group_code', 'group_info']
+    attributes: ['id', 'group_code', 'group_info'],
   },
   {
     required: false,
     model: HyGroup,
     as: 'hy_group',
-    where: { code: requiredGroup }
+    where: { code: requiredGroup },
   },
   {
     separate: true,
@@ -149,13 +149,13 @@ const userIncludes = [
     as: 'faculty',
     include: {
       model: FacultyProgrammes,
-      as: 'programme'
-    }
+      as: 'programme',
+    },
   },
   {
     model: Affiliation,
-    as: 'affiliation'
-  }
+    as: 'affiliation',
+  },
 ]
 
 const getUserData = user => {
@@ -171,19 +171,19 @@ const getUserData = user => {
 const byUsernameMinified = async username => {
   const userMinified = await User.findOne({
     where: {
-      username
+      username,
     },
     include: [
       {
         separate: true,
         model: UserElementDetails,
         as: 'programme',
-        attributes: ['elementDetailCode']
+        attributes: ['elementDetailCode'],
       },
       {
         model: AccessGroup,
         as: 'accessgroup',
-        attributes: ['group_code']
+        attributes: ['group_code'],
       },
       {
         separate: true,
@@ -192,11 +192,11 @@ const byUsernameMinified = async username => {
         include: {
           model: FacultyProgrammes,
           as: 'programme',
-          attributes: ['programme_code']
+          attributes: ['programme_code'],
         },
-        attributes: ['faculty_code']
-      }
-    ]
+        attributes: ['faculty_code'],
+      },
+    ],
   })
   return userMinified
 }
@@ -205,10 +205,10 @@ const byUsername = async username => {
   const user = await User.findOne({
     where: {
       username: {
-        [Op.eq]: username
-      }
+        [Op.eq]: username,
+      },
     },
-    include: userIncludes
+    include: userIncludes,
   })
   return user
 }
@@ -217,7 +217,7 @@ const createUser = async (username, fullname, email) => {
   return User.create({
     username: username,
     full_name: fullname,
-    email
+    email,
   })
 }
 
@@ -229,10 +229,10 @@ const byId = async id => {
   const user = await User.findOne({
     where: {
       id: {
-        [Op.eq]: id
-      }
+        [Op.eq]: id,
+      },
     },
-    include: userIncludes
+    include: userIncludes,
   })
   return user
 }
@@ -240,7 +240,7 @@ const byId = async id => {
 const getUserProgrammes = user => {
   const elementdetails = [
     ...user.programme.map(p => p.elementDetailCode),
-    ...flatMap(user.faculty, f => f.programme.map(p => p.programme_code))
+    ...flatMap(user.faculty, f => f.programme.map(p => p.programme_code)),
   ]
   return elementdetails
 }
@@ -251,7 +251,7 @@ const getUserAccessGroups = async username => {
 
 const findAll = async () => {
   const users = await User.findAll({
-    include: userIncludes
+    include: userIncludes,
   })
   return users
 }
@@ -265,7 +265,7 @@ const addProgrammes = async (uid, codes) => {
 const removeProgrammes = async (uid, codes) => {
   for (const code of codes) {
     await UserElementDetails.destroy({
-      where: { userId: uid, elementDetailCode: code }
+      where: { userId: uid, elementDetailCode: code },
     })
   }
 }
@@ -334,5 +334,5 @@ module.exports = {
   getUserAccessGroups,
   getRoles,
   getUserData,
-  setFaculties
+  setFaculties,
 }

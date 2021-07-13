@@ -9,9 +9,9 @@ const byCodes = codes =>
   AccessGroup.findAll({
     where: {
       group_code: {
-        [Op.in]: codes
-      }
-    }
+        [Op.in]: codes,
+      },
+    },
   })
 
 module.exports = { byId, byCodes, findAll }
