@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const {
-  dbConnections: { sequelize }
+  dbConnections: { sequelize },
 } = require('../../databaseV2/connection')
 const { mapToProviders } = require('../../util/utils')
 const { ElementDetail, Organization } = require('../../modelsV2')
@@ -18,7 +18,7 @@ const getCurrentStudyYearStartDate = _.memoize(
     `,
           {
             type: sequelize.QueryTypes.SELECT,
-            replacements: { a: new Date(unixMillis) }
+            replacements: { a: new Date(unixMillis) },
           }
         )
       )[0].startdate
@@ -33,7 +33,7 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
   return sequelize.query(
     `
     SELECT SUM(cr.credits) AS ` +
-    alias + // HAX, alias doesn't come from user so no sql injection
+      alias + // HAX, alias doesn't come from user so no sql injection
       `,COUNT(DISTINCT(cr.student_studentnumber)) AS ` +
       alias2 +
       `, o.code AS organizationcode, co.code, co.id, co.name FROM credit cr
@@ -49,7 +49,7 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
     `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { a, b }
+      replacements: { a, b },
     }
   )
 }
@@ -95,7 +95,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     yearRange,
     diff => ({
       from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
-      to: new Date(unixMillis - diff * YEAR_TO_MILLISECONDS)
+      to: new Date(unixMillis - diff * YEAR_TO_MILLISECONDS),
     }),
     'acc',
     'students'
@@ -106,26 +106,21 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     yearRange.slice(0, -1),
     diff => ({
       from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
-      to: new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS)
+      to: new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS),
     }),
     'total',
     'students'
   )
 
   /* Gather all required data */
-  const [
-    yearlyAccCredits,
-    yearlyTotalCredits,
-    elementDetails,
-    faculties,
-    { data: facultyProgrammes }
-  ] = await Promise.all([
-    Promise.all(yearlyAccCreditsPromises),
-    Promise.all(yearlyTotalCreditsPromises),
-    ElementDetail.findAll(),
-    Organization.findAll(),
-    userServiceClient.get('/faculty_programmes')
-  ])
+  const [yearlyAccCredits, yearlyTotalCredits, elementDetails, faculties, { data: facultyProgrammes }] =
+    await Promise.all([
+      Promise.all(yearlyAccCreditsPromises),
+      Promise.all(yearlyTotalCreditsPromises),
+      ElementDetail.findAll(),
+      Organization.findAll(),
+      userServiceClient.get('/faculty_programmes'),
+    ])
 
   /* Construct some helper maps */
   const facultyCodeToFaculty = faculties.reduce((res, curr) => {
@@ -143,7 +138,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     const [p] = mapToProviders([curr.code])
     res[p] = {
       code: curr.code,
-      name: curr.name
+      name: curr.name,
     }
     return res
   }, {})
@@ -196,7 +191,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
         drill: courses,
         yearly: _.mergeWith({}, ...yearlyValues, mergele),
         current: _.sumBy(courseValues, 'current'),
-        previous: _.sumBy(courseValues, 'previous')
+        previous: _.sumBy(courseValues, 'previous'),
       }
     }
     return acc
@@ -214,7 +209,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
           name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
           yearly: {},
           current: 0,
-          previous: 0
+          previous: 0,
         }
       }
       acc[facultyCode]['drill'][programmeCode] = programmeStats
@@ -250,5 +245,5 @@ const refreshStatus = async (unixMillis, showByYear) => {
 
 module.exports = {
   getStatus,
-  refreshStatus
+  refreshStatus,
 }

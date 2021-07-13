@@ -20,5 +20,5 @@ CREATE TABLE IF NOT EXISTS "public"."usage_statistics" (
 -- 2019-07-03 15:39:09.675736+00
 `)
   },
-  down: async () => {}
+  down: async () => {},
 }

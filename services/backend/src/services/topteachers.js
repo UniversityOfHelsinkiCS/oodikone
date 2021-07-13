@@ -7,12 +7,12 @@ const category = (name, rediskey) => ({ name, rediskey })
 
 const ID = {
   ALL: 'all',
-  OPENUNI: 'openuni'
+  OPENUNI: 'openuni',
 }
 
 const categories = {
   [ID.ALL]: category('All', 'TOP_TEACHERS_ALL'),
-  [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI')
+  [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI'),
 }
 
 const deleteCategory = async categoryid => {
@@ -36,7 +36,7 @@ const getCategoriesAndYears = async () => {
   const { years } = await getSemestersAndYears(new Date())
   return {
     years: Object.values(years),
-    categories: Object.entries(categories).map(([id, { name }]) => ({ id, name }))
+    categories: Object.entries(categories).map(([id, { name }]) => ({ id, name })),
   }
 }
 
@@ -50,21 +50,21 @@ const creditsWithTeachersForYear = yearcode =>
         attributes: [],
         where: {
           yearcode: {
-            [Op.eq]: yearcode
-          }
-        }
+            [Op.eq]: yearcode,
+          },
+        },
       },
       {
         model: Teacher,
         attributes: ['id', 'name', 'code'],
-        required: true
+        required: true,
       },
       {
         model: Course,
         attributes: ['code', 'name', 'coursetypecode'],
-        required: true
-      }
-    ]
+        required: true,
+      },
+    ],
   })
 
 const updatedStats = (statistics, teacher, passed, failed, credits, transferred) => {
@@ -75,12 +75,12 @@ const updatedStats = (statistics, teacher, passed, failed, credits, transferred)
       ...stats,
       passed: stats.passed + 1,
       credits: transferred ? stats.credits : stats.credits + credits,
-      transferred: transferred ? stats.transferred + credits : stats.transferred
+      transferred: transferred ? stats.transferred + credits : stats.transferred,
     }
   } else if (failed) {
     return {
       ...stats,
-      failed: stats.failed + 1
+      failed: stats.failed + 1,
     }
   } else {
     return stats
@@ -95,7 +95,7 @@ const filterTopTeachers = (stats, limit = 50) =>
     .slice(0, limit)
     .map(({ credits, ...rest }) => ({
       ...rest,
-      credits: Math.floor(credits)
+      credits: Math.floor(credits),
     }))
 
 const findTopTeachers = async yearcode => {
@@ -124,7 +124,7 @@ const findTopTeachers = async yearcode => {
     })
   return {
     all: filterTopTeachers(all),
-    openuni: filterTopTeachers(openuni)
+    openuni: filterTopTeachers(openuni),
   }
 }
 
@@ -149,5 +149,5 @@ module.exports = {
   findTopTeachers,
   findAndSaveTeachers,
   findAndSaveTopTeachers,
-  ID
+  ID,
 }

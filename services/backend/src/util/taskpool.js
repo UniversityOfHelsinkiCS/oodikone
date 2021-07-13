@@ -54,10 +54,10 @@ const taskpool = (poolsize = 5) => {
   return {
     execute,
     enqueue,
-    complete
+    complete,
   }
 }
 
 module.exports = {
-  taskpool
+  taskpool,
 }

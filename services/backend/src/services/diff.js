@@ -1,7 +1,7 @@
 // Returns an array containing all values that are in a but not in b taking account duplicates
 const difference = (a, b) => {
   return a.filter(
-    function(v) {
+    function (v) {
       return !this.get(v) || !this.set(v, this.get(v) - 1)
     },
     b.reduce((acc, v) => acc.set(v, (acc.get(v) || 0) + 1), new Map())
@@ -12,7 +12,7 @@ const mapStudentNumbers = (studentnumbers, yearcode, name) =>
   studentnumbers.map(studentnumber => ({
     studentnumber,
     yearcode,
-    year: name
+    year: name,
   }))
 
 const getDiffForCourse = (oodiCourseStats, sisCourseStats) => {
@@ -24,7 +24,7 @@ const getDiffForCourse = (oodiCourseStats, sisCourseStats) => {
       if (!sisYearlyStats) {
         return {
           missingStudents: mapStudentNumbers(oodiYearlyStats.students.studentnumbers),
-          extraStudents: []
+          extraStudents: [],
         }
       }
 
@@ -47,7 +47,7 @@ const getDiffForCourse = (oodiCourseStats, sisCourseStats) => {
 
       return {
         missingStudents: courseDiff.missingStudents.concat(missingStudents),
-        extraStudents: courseDiff.extraStudents.concat(extraStudents)
+        extraStudents: courseDiff.extraStudents.concat(extraStudents),
       }
     },
     { missingStudents: [], extraStudents: [] }

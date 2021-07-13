@@ -130,5 +130,5 @@ CREATE TABLE "public"."unit_tag" (
 -- 2019-07-01 15:26:14.147541+00
 `)
   },
-  down: async () => {}
+  down: async () => {},
 }

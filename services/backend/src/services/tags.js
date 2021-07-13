@@ -6,8 +6,8 @@ const Op = Sequelize.Op
 const findTagById = tag_id =>
   Tag.findOne({
     where: {
-      tag_id
-    }
+      tag_id,
+    },
   })
 
 const findTags = () => Tag.findAll({})
@@ -16,9 +16,9 @@ const findTagsByStudytrack = async studytrack => {
   return Tag.findAll({
     where: {
       studytrack: {
-        [Op.eq]: studytrack
-      }
-    }
+        [Op.eq]: studytrack,
+      },
+    },
   })
 }
 
@@ -27,9 +27,9 @@ const findTagsFromStudytrackById = async (studytrack, tag_ids) => {
     where: {
       studytrack,
       tag_id: {
-        [Op.in]: tag_ids
-      }
-    }
+        [Op.in]: tag_ids,
+      },
+    },
   })
 }
 
@@ -37,7 +37,7 @@ const createNewTag = async tag => {
   if (isNaN(tag.year)) {
     const newTag = {
       ...tag,
-      year: null
+      year: null,
     }
     return Tag.create(newTag)
   }
@@ -48,9 +48,9 @@ const deleteTag = async tag => {
   return Tag.destroy({
     where: {
       tag_id: {
-        [Op.eq]: tag.tag_id
-      }
-    }
+        [Op.eq]: tag.tag_id,
+      },
+    },
   })
 }
 
@@ -60,5 +60,5 @@ module.exports = {
   findTags,
   findTagsByStudytrack,
   findTagsFromStudytrackById,
-  deleteTag
+  deleteTag,
 }

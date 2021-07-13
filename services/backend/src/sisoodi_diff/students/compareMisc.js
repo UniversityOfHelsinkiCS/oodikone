@@ -21,5 +21,5 @@ const compareCredits = (totalCredits, courses, msg) => {
 
 module.exports = {
   compareStarted,
-  compareCredits
+  compareCredits,
 }

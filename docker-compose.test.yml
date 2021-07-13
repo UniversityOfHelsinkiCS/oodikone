@@ -2,8 +2,6 @@ services:
 
   userservice-test:
     build:
-      args:
-        NODE_ENV: test
       target: test
       context: services/oodikone2-userservice
     container_name: userservice-test

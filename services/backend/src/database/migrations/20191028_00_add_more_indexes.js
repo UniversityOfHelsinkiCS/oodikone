@@ -12,5 +12,5 @@ module.exports = {
       await queryInterface.addIndex('transfers', ['targetcode'], { transaction })
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

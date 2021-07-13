@@ -8,26 +8,26 @@ ExcludedCourse.init(
     id: {
       primaryKey: true,
       type: INTEGER,
-      autoIncrement: true
+      autoIncrement: true,
     },
     programme_code: {
-      type: STRING
+      type: STRING,
     },
     course_code: {
-      type: STRING
+      type: STRING,
     },
     created_at: {
-      type: DATE
+      type: DATE,
     },
     updated_at: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'excluded_course',
-    tableName: 'excluded_courses'
+    tableName: 'excluded_courses',
   }
 )
 

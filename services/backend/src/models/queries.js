@@ -33,7 +33,7 @@ const getAcademicYearsFrom = startSemesterCode =>
       order by yearname, semestercode`,
     {
       replacements: { startSemesterCode },
-      type: sequelize.QueryTypes.SELECT
+      type: sequelize.QueryTypes.SELECT,
     }
   )
 
@@ -54,7 +54,7 @@ const getAcademicYearStatistics = (teacherIds, startSemester) => {
         c.semestercode <= :endSemester`,
     {
       replacements: { teacherIds, startSemester, endSemester },
-      type: sequelize.QueryTypes.SELECT
+      type: sequelize.QueryTypes.SELECT,
     }
   )
 }
@@ -78,7 +78,7 @@ const getTeacherAcademicYearStatisticsByIds = (teacherIds, startSemester) => {
       group by ct.teacher_id`,
     {
       replacements: { teacherIds, startSemester, endSemester },
-      type: sequelize.QueryTypes.SELECT
+      type: sequelize.QueryTypes.SELECT,
     }
   )
 }
@@ -106,7 +106,7 @@ const getAcademicYearCoursesByTeacherIds = (teacherIds, startSemester) => {
         group by course_code, t.name, t.code, co.name`,
     {
       replacements: { teacherIds, startSemester, endSemester },
-      type: sequelize.QueryTypes.SELECT
+      type: sequelize.QueryTypes.SELECT,
     }
   )
 }
@@ -123,7 +123,7 @@ WHERE cg.programmeid = :programmeid
 `,
     {
       replacements: { programmeid },
-      type: sequelize.QueryTypes.SELECT
+      type: sequelize.QueryTypes.SELECT,
     }
   )
 
@@ -151,7 +151,7 @@ WHERE ct.teacher_id IN (:teacherids)
   `,
       {
         replacements: { startSemester, endSemester, teacherids },
-        type: sequelize.QueryTypes.SELECT
+        type: sequelize.QueryTypes.SELECT,
       }
     )
     if (stats.length !== 1) throw 'expecting single row'
@@ -168,5 +168,5 @@ module.exports = {
   getAcademicYearStatistics,
   getAcademicYearStatisticsForStudyProgramme,
   getTeacherAcademicYearStatisticsByIds,
-  getAcademicYearCoursesByTeacherIds
+  getAcademicYearCoursesByTeacherIds,
 }

@@ -28,7 +28,7 @@ initializeDatabaseConnection()
     if (IS_PRODUCTION && ['staging', 'latest'].includes(process.env.TAG)) {
       Sentry.init({
         dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
-        environment: process.env.TAG
+        environment: process.env.TAG,
       })
       app.use(Sentry.Handlers.requestHandler())
     }

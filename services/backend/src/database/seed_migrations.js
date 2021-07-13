@@ -24,5 +24,5 @@ const seedAllMigrations = async () => {
 }
 
 module.exports = {
-  seedAllMigrations
+  seedAllMigrations,
 }

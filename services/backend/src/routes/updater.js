@@ -7,7 +7,7 @@ const {
   updateSISRedisCache,
   updateStudentsByStudentNumber,
   abort,
-  updateCoursesByCourseCode
+  updateCoursesByCourseCode,
 } = require('../services/sisUpdaterService')
 const { refreshStatisticsV2 } = require('../events')
 

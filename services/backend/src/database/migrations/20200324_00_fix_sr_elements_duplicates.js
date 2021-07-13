@@ -12,13 +12,13 @@ module.exports = {
                 AND a.code = b.code`,
       {
         raw: true,
-        underscored: false
+        underscored: false,
       }
     )
     await queryInterface.removeIndex('studyright_elements', ['startdate', 'enddate', 'studyrightid', 'code'])
     await queryInterface.addIndex('studyright_elements', ['startdate', 'studyrightid', 'code', 'studentnumber'], {
-      unique: true
+      unique: true,
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

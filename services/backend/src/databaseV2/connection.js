@@ -14,9 +14,9 @@ class DbConnection extends EventEmitter {
         max: 25,
         min: 0,
         acquire: 10000,
-        idle: 300000000
+        idle: 300000000,
       },
-      logging: false
+      logging: false,
     })
   }
 
@@ -40,5 +40,5 @@ class DbConnection extends EventEmitter {
 const dbConnections = new DbConnection()
 dbConnections
 module.exports = {
-  dbConnections
+  dbConnections,
 }

@@ -11,10 +11,10 @@ const transporter = nodemailer.createTransport(
     port: 587,
     secure: false, // false -> TLS, true -> SSL
     logger: false,
-    debug: false // include SMTP traffic in the logs
+    debug: false, // include SMTP traffic in the logs
   },
   {
-    from: 'Oodikone Robot <noreply@helsinki.fi>'
+    from: 'Oodikone Robot <noreply@helsinki.fi>',
   }
 )
 
@@ -29,9 +29,9 @@ const message1 = user => {
       {
         filename: 'toska.png',
         path: `${process.cwd()}/assets/toska.png`,
-        cid: 'toskalogoustcid'
-      }
-    ]
+        cid: 'toskalogoustcid',
+      },
+    ],
   }
 }
 const message2 = email => {
@@ -56,7 +56,7 @@ const message2 = email => {
     <p>Helsingin Yliopisto, TOSKA.</p>
     <p>grp-toska@helsinki.fi</p>
     <p>Pietari Kalmin katu 5, Exactum BK113</p>
-    <img style="max-width: 13.5%;height: auto;" src="https://i.imgur.com/tnNDAJk.png" /> `
+    <img style="max-width: 13.5%;height: auto;" src="https://i.imgur.com/tnNDAJk.png" /> `,
   }
 }
 const feedback = (content, user, email, full_name) => {
@@ -72,9 +72,9 @@ const feedback = (content, user, email, full_name) => {
       {
         filename: 'toska.png',
         path: `${process.cwd()}/assets/toska.png`,
-        cid: 'toskalogoustcid'
-      }
-    ]
+        cid: 'toskalogoustcid',
+      },
+    ],
   }
 }
 

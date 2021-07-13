@@ -17,21 +17,21 @@ const getStudentNumbersFromProgramme = async (studyProgrammeCode, year = null) =
   const whereConditions = year
     ? {
         code: {
-          [Op.eq]: studyProgrammeCode
+          [Op.eq]: studyProgrammeCode,
         },
-        [Op.and]: where(fn('DATE_PART', 'year', col('startdate')), year)
+        [Op.and]: where(fn('DATE_PART', 'year', col('startdate')), year),
       }
     : {
         code: {
-          [Op.eq]: studyProgrammeCode
-        }
+          [Op.eq]: studyProgrammeCode,
+        },
       }
 
   try {
     const studentNumberObjects = await StudyrightElement.findAll({
       attributes: ['studentnumber'],
       where: whereConditions,
-      raw: true
+      raw: true,
     })
     const studentNumbers = studentNumberObjects.map(sn => sn.studentnumber)
     return studentNumbers

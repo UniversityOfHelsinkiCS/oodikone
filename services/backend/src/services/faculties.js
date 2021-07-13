@@ -16,12 +16,12 @@ const calculateFacultyYearlyStats = async () => {
         where: {
           student_studentnumber: studentNumber,
           credittypecode: [4, 10],
-          isStudyModule: false
-        }
+          isStudyModule: false,
+        },
       }),
     args => args[0],
     {
-      max: 10000
+      max: 10000,
     }
   )
 
@@ -43,9 +43,9 @@ const calculateFacultyYearlyStats = async () => {
 
     const facultyStudents = await StudyrightElement.findAll({
       where: {
-        code: programme_code
+        code: programme_code,
       },
-      attributes: ['studentnumber']
+      attributes: ['studentnumber'],
     })
 
     await eachLimit(facultyStudents, DB_MAX_CRON_CONNECTIONS, async student => {
@@ -87,5 +87,5 @@ const calculateFacultyYearlyStats = async () => {
 }
 
 module.exports = {
-  calculateFacultyYearlyStats
+  calculateFacultyYearlyStats,
 }

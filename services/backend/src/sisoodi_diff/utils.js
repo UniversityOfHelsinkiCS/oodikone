@@ -25,5 +25,5 @@ const onlyStudyModulesFromCourses = course => course.filter(course => course.isS
 module.exports = {
   mayhemifiedDatesMatch,
   excludeStudyModulesFromCourses,
-  onlyStudyModulesFromCourses
+  onlyStudyModulesFromCourses,
 }

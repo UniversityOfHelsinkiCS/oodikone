@@ -10,7 +10,7 @@ const {
   getAcademicYearStatistics,
   getAcademicYearStatisticsForStudyProgramme,
   getTeacherAcademicYearStatisticsByIds,
-  getAcademicYearCoursesByTeacherIds
+  getAcademicYearCoursesByTeacherIds,
 } = require('../models/queries')
 
 const ACADEMIC_YEAR_START_SEMESTER = 111 // academic year 2005-06
@@ -32,20 +32,20 @@ const getTeachersForCourseGroup = async courseGroupId => {
     model: CourseGroup,
     include: {
       model: TeacherCourseGroup,
-      required: true
+      required: true,
     },
     where: {
-      id: courseGroupId
-    }
+      id: courseGroupId,
+    },
   })
   const teacherIds = flatMap(courseGroups, e => e.teacher_course_groups.map(tcg => tcg.teacher_id))
   const teachers = await Teacher.findAll({
     attributes: ['name', 'code', 'id'],
     where: {
       id: {
-        [Op.in]: teacherIds
-      }
-    }
+        [Op.in]: teacherIds,
+      },
+    },
   })
   return teachers
 }
@@ -87,7 +87,7 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
       totalCredits: 0,
       totalStudents: 0,
       totalCourses: 0,
-      semester: startSemester
+      semester: startSemester,
     }
   }
 
@@ -110,7 +110,7 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
     ...t,
     courses: t.courses ? Number(t.courses) : 0,
     credits: t.credits ? Number(t.credits) : 0,
-    students: t.students ? Number(t.students) : 0
+    students: t.students ? Number(t.students) : 0,
   }))
 
   const courseGroupInfo = {
@@ -120,7 +120,7 @@ const getCourseGroup = async (courseGroupId, semesterCode) => {
     totalCredits: credits || 0,
     totalStudents: Number(students),
     totalCourses: Number(courses),
-    semester: startSemester
+    semester: startSemester,
   }
 
   return courseGroupInfo
@@ -165,5 +165,5 @@ module.exports = {
   getCourseGroup,
   getCoursesByTeachers,
   addTeacher,
-  removeTeacher
+  removeTeacher,
 }

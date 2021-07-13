@@ -4,5 +4,5 @@ module.exports = {
       await queryInterface.dropTable('ldapuser', { transaction })
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

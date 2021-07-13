@@ -8,7 +8,7 @@ const {
   Studyright,
   StudyrightElement,
   ElementDetails,
-  SemesterEnrollment
+  SemesterEnrollment,
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
@@ -19,9 +19,9 @@ const updateStudent = student => {
   return Student.update(student, {
     where: {
       studentnumber: {
-        [Op.eq]: student.studentnumber
-      }
-    }
+        [Op.eq]: student.studentnumber,
+      },
+    },
   })
 }
 
@@ -33,8 +33,8 @@ const byId = async id => {
           model: Credit,
           separate: true,
           include: {
-            model: Course
-          }
+            model: Course,
+          },
         },
         {
           model: Studyright,
@@ -44,38 +44,38 @@ const byId = async id => {
               model: ElementDetails,
               where: {
                 type: {
-                  [Op.in]: [10, 20, 30]
-                }
-              }
-            }
-          }
+                  [Op.in]: [10, 20, 30],
+                },
+              },
+            },
+          },
         },
         {
-          model: SemesterEnrollment
-        }
-      ]
+          model: SemesterEnrollment,
+        },
+      ],
     }),
     TagStudent.findAll({
       include: [
         {
-          model: Tag
-        }
+          model: Tag,
+        },
       ],
       where: {
-        studentnumber: id
-      }
-    })
+        studentnumber: id,
+      },
+    }),
   ])
   const tagprogrammes = await ElementDetails.findAll({
     where: {
       code: {
-        [Op.in]: tags.map(t => t.tag.studytrack)
-      }
-    }
+        [Op.in]: tags.map(t => t.tag.studytrack),
+      },
+    },
   })
   student.tags = tags.map(t => ({
     ...t.get(),
-    programme: tagprogrammes.find(p => p.code === t.tag.studytrack)
+    programme: tagprogrammes.find(p => p.code === t.tag.studytrack),
   }))
   return student
 }
@@ -103,7 +103,7 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate) =>
       {
         replacements: { coursecodes, minYearCode: from, maxYearCode: to },
         type: sequelize.QueryTypes.SELECT,
-        raw: true
+        raw: true,
       }
     )
   ).map(st => st.studentnumber)
@@ -114,9 +114,9 @@ const findByTag = async tag => {
       attributes: ['studentnumber'],
       where: {
         tag_id: {
-          [Op.eq]: tag
-        }
-      }
+          [Op.eq]: tag,
+        },
+      },
     })
   ).map(st => st.studentnumber)
 }
@@ -136,7 +136,7 @@ const formatStudent = ({
   transfers,
   updatedAt,
   createdAt,
-  tags
+  tags,
 }) => {
   const toCourse = ({ grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
     course = course.get()
@@ -144,14 +144,14 @@ const formatStudent = ({
       course: {
         code: course.code,
         name: course.name,
-        coursetypecode: course.coursetypecode
+        coursetypecode: course.coursetypecode,
       },
       date: attainment_date,
       course_code: course.code,
       passed: Credit.passed({ credittypecode }),
       grade,
       credits,
-      isStudyModuleCredit: isStudyModule
+      isStudyModuleCredit: isStudyModule,
     }
   }
 
@@ -159,7 +159,7 @@ const formatStudent = ({
   semester_enrollments = semester_enrollments || []
   const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({
     semestercode,
-    enrollmenttype
+    enrollmenttype,
   }))
 
   const courseByDate = (a, b) => {
@@ -183,7 +183,7 @@ const formatStudent = ({
     email,
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
-    tags
+    tags,
   }
 }
 
@@ -194,7 +194,7 @@ const withId = async id => {
   } catch (e) {
     console.log(e)
     return {
-      error: e
+      error: e,
     }
   }
 }
@@ -208,23 +208,23 @@ const nameLike = terms => {
   if (!second) {
     return {
       ['abbreviatedname']: {
-        [Op.iLike]: `%${first}%`
-      }
+        [Op.iLike]: `%${first}%`,
+      },
     }
   } else {
     return {
       [Op.or]: [
         {
           ['abbreviatedname']: {
-            [Op.iLike]: `%%${first}%${second}%%`
-          }
+            [Op.iLike]: `%%${first}%${second}%%`,
+          },
         },
         {
           ['abbreviatedname']: {
-            [Op.iLike]: `%%${second}%${first}%%`
-          }
-        }
-      ]
+            [Op.iLike]: `%%${second}%${first}%%`,
+          },
+        },
+      ],
     }
   }
 }
@@ -235,8 +235,8 @@ const studentnumberLike = terms => {
   }
   return {
     studentnumber: {
-      [Op.iLike]: `%${terms[0]}%`
-    }
+      [Op.iLike]: `%${terms[0]}%`,
+    },
   }
 }
 
@@ -244,8 +244,8 @@ const bySearchTerm = async searchterm => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
     where: {
-      [Op.or]: [nameLike(terms), studentnumberLike(terms)]
-    }
+      [Op.or]: [nameLike(terms), studentnumberLike(terms)],
+    },
   })
   return matches.map(formatStudent)
 }
@@ -258,13 +258,13 @@ const bySearchTermAndElements = async (searchterm, codes) => {
       required: true,
       where: {
         code: {
-          [Op.in]: codes
-        }
-      }
+          [Op.in]: codes,
+        },
+      },
     },
     where: {
-      [Op.or]: [nameLike(terms), studentnumberLike(terms)]
-    }
+      [Op.or]: [nameLike(terms), studentnumberLike(terms)],
+    },
   })
   return matches.map(formatStudent)
 }
@@ -278,16 +278,16 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
       required: true,
       where: {
         code: {
-          [Op.in]: codes
-        }
-      }
+          [Op.in]: codes,
+        },
+      },
     },
     where: {
       studentnumber: {
-        [Op.in]: studentnumbers
-      }
+        [Op.in]: studentnumbers,
+      },
     },
-    raw: true
+    raw: true,
   })
   return students.map(student => student.studentnumber)
 }
@@ -296,8 +296,8 @@ const hasEnrolledForSemester = async (studentnumber, semestercode) => {
   const enrollment = await SemesterEnrollment.findOne({
     where: {
       studentnumber,
-      semestercode
-    }
+      semestercode,
+    },
   })
   return !!(enrollment && enrollment.enrollmenttype === 1)
 }
@@ -312,5 +312,5 @@ module.exports = {
   findByCourseAndSemesters,
   findByTag,
   splitByEmptySpace,
-  hasEnrolledForSemester
+  hasEnrolledForSemester,
 }

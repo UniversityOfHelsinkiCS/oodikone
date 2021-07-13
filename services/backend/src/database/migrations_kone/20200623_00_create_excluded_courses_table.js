@@ -8,29 +8,29 @@ module.exports = {
         id: {
           primaryKey: true,
           type: INTEGER,
-          autoIncrement: true
+          autoIncrement: true,
         },
         programme_code: {
-          type: STRING
+          type: STRING,
         },
         course_code: {
-          type: STRING
+          type: STRING,
         },
         created_at: {
-          type: DATE
+          type: DATE,
         },
         updated_at: {
-          type: DATE
-        }
+          type: DATE,
+        },
       },
       {
         uniqueKeys: {
           Items_unique: {
-            fields: ['programme_code', 'course_code']
-          }
-        }
+            fields: ['programme_code', 'course_code'],
+          },
+        },
       }
     )
   },
-  down: async () => {}
+  down: async () => {},
 }

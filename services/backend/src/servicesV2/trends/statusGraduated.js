@@ -1,6 +1,6 @@
 const _ = require('lodash')
 const {
-  dbConnections: { sequelize }
+  dbConnections: { sequelize },
 } = require('../../databaseV2/connection')
 const { getRedisCDS, saveToRedis } = require('./shared')
 const { ElementDetail, Organization } = require('../../modelsV2')
@@ -16,7 +16,7 @@ const getCurrentStudyYearStartDate = _.memoize(
     `,
           {
             type: sequelize.QueryTypes.SELECT,
-            replacements: { a: new Date(unixMillis) }
+            replacements: { a: new Date(unixMillis) },
           }
         )
       )[0].startdate
@@ -41,7 +41,7 @@ const getGraduatedBetween = async (start, end) => {
     `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { start, end }
+      replacements: { start, end },
     }
   )
 }
@@ -56,12 +56,12 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
 
   const yearlyRange = diff => ({
     from: new Date(startTime - diff * Y_TO_MS),
-    to: new Date(unixMillis - diff * Y_TO_MS)
+    to: new Date(unixMillis - diff * Y_TO_MS),
   })
 
   const totalRange = diff => ({
     from: new Date(startTime - diff * Y_TO_MS),
-    to: new Date(startTime - (diff - 1) * Y_TO_MS)
+    to: new Date(startTime - (diff - 1) * Y_TO_MS),
   })
 
   const dataArray = yearRange.map(async year => {
@@ -106,7 +106,7 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
           name: element.name,
           current: 0,
           previous: 0,
-          yearly: {}
+          yearly: {},
         }
       }
       acc[curr.faculty_code]['drill'][curr.code]['yearly'][data.year] = { acc: Number(curr.sum) }
@@ -171,5 +171,5 @@ const refreshStatusGraduated = async (unixMillis, showByYear) => {
 
 module.exports = {
   getGraduatedStatus,
-  refreshStatusGraduated
+  refreshStatusGraduated,
 }

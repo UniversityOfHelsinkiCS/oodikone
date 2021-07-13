@@ -7,8 +7,8 @@ const likefy = term => `%${term}%`
 
 const nameLike = terms => ({
   name: {
-    [Op.and]: terms.map(term => ({ [Op.iLike]: likefy(term) }))
-  }
+    [Op.and]: terms.map(term => ({ [Op.iLike]: likefy(term) })),
+  },
 })
 
 const codeLike = terms => {
@@ -17,8 +17,8 @@ const codeLike = terms => {
   }
   return {
     code: {
-      [Op.iLike]: likefy(terms[0])
-    }
+      [Op.iLike]: likefy(terms[0]),
+    },
   }
 }
 
@@ -32,11 +32,11 @@ const bySearchTerm = async rawTerm => {
   const terms = splitByEmptySpace(searchTerm)
   return Teacher.findAll({
     attributes: {
-      exclude: ['createdAt', 'updatedAt']
+      exclude: ['createdAt', 'updatedAt'],
     },
     where: {
-      [Op.or]: [nameLike(terms), codeLike(terms), matchesId(searchTerm)]
-    }
+      [Op.or]: [nameLike(terms), codeLike(terms), matchesId(searchTerm)],
+    },
   })
 }
 
@@ -50,14 +50,14 @@ const findTeacherCredits = teacherid =>
         {
           model: Course,
           attributes: ['name', 'code'],
-          required: true
+          required: true,
         },
         {
           model: Semester,
-          attributes: ['semestercode', 'name', 'yearname', 'yearcode']
-        }
-      ]
-    }
+          attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
+        },
+      ],
+    },
   })
 
 const parseCreditInfo = credit => ({
@@ -68,7 +68,7 @@ const parseCreditInfo = credit => ({
   passed: Credit.passed(credit) || Credit.improved(credit),
   failed: Credit.failed(credit),
   course: credit.course,
-  semester: credit.semester
+  semester: credit.semester,
 })
 
 const markCredit = (stats, passed, failed, credits, transferred) => {
@@ -77,7 +77,7 @@ const markCredit = (stats, passed, failed, credits, transferred) => {
       passed: 0,
       failed: 0,
       credits: 0,
-      transferred: 0
+      transferred: 0,
     }
   }
   if (passed) {
@@ -85,12 +85,12 @@ const markCredit = (stats, passed, failed, credits, transferred) => {
       ...stats,
       credits: transferred ? stats.credits : stats.credits + credits,
       passed: stats.passed + 1,
-      transferred: transferred ? stats.transferred + credits : stats.transferred
+      transferred: transferred ? stats.transferred + credits : stats.transferred,
     }
   } else if (failed) {
     return {
       ...stats,
-      failed: stats.failed + 1
+      failed: stats.failed + 1,
     }
   }
   return stats
@@ -100,7 +100,7 @@ const parseAndMarkCredit = (stats, key, credit) => {
   const { passed, failed, credits, transferred } = parseCreditInfo(credit)
   return {
     ...stats,
-    [key]: markCredit(stats[key], passed, failed, credits, transferred)
+    [key]: markCredit(stats[key], passed, failed, credits, transferred),
   }
 }
 
@@ -112,8 +112,8 @@ const markCreditForSemester = (semesters, credit) => {
     ...semesters,
     [semestercode]: {
       ...rest,
-      stats: markCredit(stats, passed, failed, credits, transferred)
-    }
+      stats: markCredit(stats, passed, failed, credits, transferred),
+    },
   }
 }
 
@@ -125,8 +125,8 @@ const markCreditForYear = (years, credit) => {
     ...years,
     [yearcode]: {
       ...rest,
-      stats: markCredit(stats, passed, failed, credits, transferred)
-    }
+      stats: markCredit(stats, passed, failed, credits, transferred),
+    },
   }
 }
 
@@ -140,8 +140,8 @@ const markCreditForCourse = (courses, credit) => {
     [code]: {
       ...rest,
       semesters: parseAndMarkCredit(semesters, semestercode, credit, transferred),
-      stats: markCredit(stats, passed, failed, credits, transferred)
-    }
+      stats: markCredit(stats, passed, failed, credits, transferred),
+    },
   }
 }
 
@@ -152,19 +152,19 @@ const teacherStats = async teacherid => {
       ...rest,
       semesters: markCreditForSemester(semesters, credit),
       years: markCreditForYear(years, credit),
-      courses: markCreditForCourse(courses, credit)
+      courses: markCreditForCourse(courses, credit),
     }),
     {
       semesters: {},
       courses: {},
-      years: {}
+      years: {},
     }
   )
   return {
     name: teacher.name,
     code: teacher.code,
     id: teacher.id,
-    statistics
+    statistics,
   }
 }
 
@@ -186,10 +186,10 @@ const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => 
             required: true,
             where: {
               providercode: {
-                [Op.in]: providers
-              }
-            }
-          }
+                [Op.in]: providers,
+              },
+            },
+          },
         },
         {
           model: Semester,
@@ -197,12 +197,12 @@ const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => 
           attributes: [],
           where: {
             semestercode: {
-              [Op.between]: [semestercodeStart, semestercodeEnd]
-            }
-          }
-        }
-      ]
-    }
+              [Op.between]: [semestercodeStart, semestercodeEnd],
+            },
+          },
+        },
+      ],
+    },
   })
   return teachers.map(({ id }) => id)
 }
@@ -216,7 +216,7 @@ const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) =>
       include: [
         {
           model: Course,
-          required: true
+          required: true,
         },
         {
           model: Semester,
@@ -224,17 +224,17 @@ const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) =>
           attributes: ['semestercode', 'name', 'yearname', 'yearcode'],
           where: {
             semestercode: {
-              [Op.between]: [semestercodeStart, semestercodeEnd]
-            }
-          }
-        }
-      ]
+              [Op.between]: [semestercodeStart, semestercodeEnd],
+            },
+          },
+        },
+      ],
     },
     where: {
       id: {
-        [Op.in]: teacherIds
-      }
-    }
+        [Op.in]: teacherIds,
+      },
+    },
   })
 
 const isRegularCourse = credit => !credit.isStudyModule
@@ -252,7 +252,7 @@ const calculateCreditStatistics = credits =>
       passed: 0,
       failed: 0,
       credits: 0,
-      transferred: 0
+      transferred: 0,
     }
   )
 
@@ -266,8 +266,8 @@ const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) =
         name: teacher.name,
         code: teacher.code,
         id: teacher.id,
-        stats: calculateCreditStatistics(teacher.credits)
-      }
+        stats: calculateCreditStatistics(teacher.credits),
+      },
     }),
     {}
   )
@@ -279,5 +279,5 @@ module.exports = {
   teacherStats,
   yearlyStatistics,
   getCredits,
-  splitByEmptySpace
+  splitByEmptySpace,
 }

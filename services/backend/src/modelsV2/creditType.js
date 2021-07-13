@@ -7,23 +7,23 @@ CreditType.init(
   {
     credittypecode: {
       primaryKey: true,
-      type: INTEGER
+      type: INTEGER,
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'credit_type',
-    tableName: 'credit_types'
+    tableName: 'credit_types',
   }
 )
 

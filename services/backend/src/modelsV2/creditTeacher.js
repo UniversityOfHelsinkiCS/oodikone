@@ -7,38 +7,38 @@ CreditTeacher.init(
   {
     composite: {
       type: STRING,
-      unique: true
+      unique: true,
     },
     credit_id: {
       type: STRING,
       references: {
         model: 'credit',
-        key: 'id'
+        key: 'id',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     teacher_id: {
       type: STRING,
       references: {
         model: 'teacher',
-        key: 'id'
+        key: 'id',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: false,
     sequelize: dbConnections.sequelize,
     modelName: 'credit_teacher',
-    tableName: 'credit_teachers'
+    tableName: 'credit_teachers',
   }
 )
 

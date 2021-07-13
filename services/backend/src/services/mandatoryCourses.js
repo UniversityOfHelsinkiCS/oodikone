@@ -9,23 +9,23 @@ const byStudyprogramme = async studyProgrammeId => {
     include: [
       {
         model: MandatoryCourseLabels,
-        attributes: ['id', 'label', 'orderNumber']
-      }
+        attributes: ['id', 'label', 'orderNumber'],
+      },
     ],
     where: {
       studyprogramme_id: {
-        [Op.eq]: studyProgrammeId
-      }
-    }
+        [Op.eq]: studyProgrammeId,
+      },
+    },
   })
 
   const courses = await Course.findAll({
     model: Course,
     where: {
       code: {
-        [Op.in]: mandatoryCourses.map(c => c.course_code)
-      }
-    }
+        [Op.in]: mandatoryCourses.map(c => c.course_code),
+      },
+    },
   })
   const courseCodeToCourse = courses.reduce((acc, c) => {
     acc[c.code] = c
@@ -37,14 +37,14 @@ const byStudyprogramme = async studyProgrammeId => {
     code: mc.course_code,
     label: mc.mandatory_course_label,
     // this is because fuck life
-    visible: { visibility: true, id: null }
+    visible: { visibility: true, id: null },
   }))
 }
 
 const create = (studyProgrammeId, code) => {
   return MandatoryCourse.create({
     studyprogramme_id: studyProgrammeId,
-    course_code: code
+    course_code: code,
   })
 }
 
@@ -54,24 +54,24 @@ const find = async (studyProgrammeId, code) => {
     include: [
       {
         model: MandatoryCourseLabels,
-        attributes: ['id', 'label', 'orderNumber']
-      }
+        attributes: ['id', 'label', 'orderNumber'],
+      },
     ],
     where: {
       studyprogramme_id: {
-        [Op.eq]: studyProgrammeId
+        [Op.eq]: studyProgrammeId,
       },
       course_code: {
-        [Op.eq]: code
-      }
-    }
+        [Op.eq]: code,
+      },
+    },
   })
   if (!mandatoryCourse) return null
 
   const course = await Course.findOne({
     where: {
-      code: mandatoryCourse.course_code
-    }
+      code: mandatoryCourse.course_code,
+    },
   })
   if (!course) return null
 
@@ -82,21 +82,21 @@ const remove = (studyProgrammeId, code) => {
   return MandatoryCourse.destroy({
     where: {
       studyprogramme_id: studyProgrammeId,
-      course_code: code
-    }
+      course_code: code,
+    },
   })
 }
 
 const updateLabel = (studyProgrammeId, code, { id }) => {
   return MandatoryCourse.update(
     {
-      label: id
+      label: id,
     },
     {
       where: {
         course_code: code,
-        studyprogramme_id: studyProgrammeId
-      }
+        studyprogramme_id: studyProgrammeId,
+      },
     }
   )
 }
@@ -106,5 +106,5 @@ module.exports = {
   find,
   remove,
   byStudyprogramme,
-  updateLabel
+  updateLabel,
 }

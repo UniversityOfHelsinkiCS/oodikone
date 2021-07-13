@@ -16,16 +16,10 @@ router.post('/email', async (req, res) => {
     await mailservice.transporter.sendMail(feedback, error => {
       if (error) {
         console.log('Error occured')
-        res
-          .status(400)
-          .json(error)
-          .end()
+        res.status(400).json(error).end()
       } else {
         console.log('Message sent succesfully!')
-        res
-          .status(200)
-          .json('success')
-          .end()
+        res.status(200).json('success').end()
       }
       mailservice.transporter.close()
     })

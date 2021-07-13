@@ -16,7 +16,7 @@ const {
   SemesterEnrollment,
   Semester,
   Transfers,
-  StudyrightElement
+  StudyrightElement,
 } = require('../models')
 const { Tag, TagStudent } = require('../models/models_kone')
 const { getCodeToMainCourseMap, unifyOpenUniversity } = require('./courses')
@@ -57,7 +57,7 @@ const formatStudentForPopulationStatistics = (
     gender_en,
     tags,
     option,
-    birthdate
+    birthdate,
   },
   credits,
   startDate,
@@ -67,12 +67,7 @@ const formatStudentForPopulationStatistics = (
 ) => {
   const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule }) => {
     const attainment_date_normailized =
-      attainment_date < startDate
-        ? startDateMoment
-            .clone()
-            .add(1, 'day')
-            .toISOString()
-        : attainment_date
+      attainment_date < startDate ? startDateMoment.clone().add(1, 'day').toISOString() : attainment_date
     const passed = Credit.passed({ credittypecode })
 
     return {
@@ -82,7 +77,7 @@ const formatStudentForPopulationStatistics = (
       grade: passed ? grade : 'Hyl.',
       credits,
       isStudyModuleCredit: isStudyModule,
-      credittypecode
+      credittypecode,
     }
   }
 
@@ -108,14 +103,11 @@ const formatStudentForPopulationStatistics = (
     studyrightStart: startDate,
     starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]'),
     option,
-    birthdate
+    birthdate,
   }
 }
 
-const dateMonthsFromNow = (date, months) =>
-  moment(date)
-    .add(months, 'months')
-    .format('YYYY-MM-DD')
+const dateMonthsFromNow = (date, months) => moment(date).add(months, 'months').format('YYYY-MM-DD')
 
 const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDate, studyright, tag) => {
   const studentTags = await TagStudent.findAll({
@@ -123,14 +115,14 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     include: [
       {
         model: Tag,
-        attributes: ['tag_id', 'tagname', 'personal_user_id']
-      }
+        attributes: ['tag_id', 'tagname', 'personal_user_id'],
+      },
     ],
     where: {
       studentnumber: {
-        [Op.in]: studentnumbers
-      }
-    }
+        [Op.in]: studentnumbers,
+      },
+    },
   })
 
   const { studentnumbersWithTag, studentNumberToTags } = studentTags.reduce(
@@ -149,30 +141,30 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
   const creditsOfStudentOther = {
     attainment_date: {
-      [Op.between]: [attainmentDateFrom, endDate]
+      [Op.between]: [attainmentDateFrom, endDate],
     },
     student_studentnumber: {
-      [Op.in]: studentnumbers
-    }
+      [Op.in]: studentnumbers,
+    },
   }
 
   // takes into accout possible progress tests taken earlier than the start date
   const creditsOfStudentLaakis = {
     student_studentnumber: {
-      [Op.in]: studentnumbers
+      [Op.in]: studentnumbers,
     },
     [Op.or]: [
       {
         attainment_date: {
-          [Op.between]: [attainmentDateFrom, endDate]
-        }
+          [Op.between]: [attainmentDateFrom, endDate],
+        },
       },
       {
         course_code: {
-          [Op.in]: ['375063', '339101']
-        }
-      }
-    ]
+          [Op.in]: ['375063', '339101'],
+        },
+      },
+    ],
   }
 
   const creditsOfStudent = ['320001', 'MH30_001'].includes(studyright[0])
@@ -188,10 +180,10 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         {
           model: Credit,
           attributes: [],
-          where: creditsOfStudent
-        }
+          where: creditsOfStudent,
+        },
       ],
-      raw: true
+      raw: true,
     }),
     Student.findAll({
       attributes: [
@@ -208,13 +200,13 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'gender_fi',
         'gender_sv',
         'gender_en',
-        'birthdate'
+        'birthdate',
       ],
       include: [
         {
           model: Transfers,
           attributes: ['transferdate', 'sourcecode', 'targetcode'],
-          separate: true
+          separate: true,
         },
         {
           model: Studyright,
@@ -227,7 +219,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'canceldate',
             'prioritycode',
             'faculty_code',
-            'studystartdate'
+            'studystartdate',
           ],
           separate: true,
           include: [
@@ -236,10 +228,10 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
               required: true,
               attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code'],
               include: {
-                model: ElementDetails
-              }
-            }
-          ]
+                model: ElementDetails,
+              },
+            },
+          ],
         },
         {
           model: SemesterEnrollment,
@@ -251,17 +243,17 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             required: true,
             where: {
               startdate: {
-                [Op.between]: [startDate, endDate]
-              }
-            }
-          }
-        }
+                [Op.between]: [startDate, endDate],
+              },
+            },
+          },
+        },
       ],
       where: {
         studentnumber: {
-          [Op.in]: studentnumbers
-        }
-      }
+          [Op.in]: studentnumbers,
+        },
+      },
     }),
     Credit.findAll({
       attributes: [
@@ -271,15 +263,15 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'attainment_date',
         'isStudyModule',
         'student_studentnumber',
-        'course_code'
+        'course_code',
       ],
       where: creditsOfStudent,
-      raw: true
+      raw: true,
     }),
     StudyrightExtent.findAll({
       attributes: [
         sequelize.literal('DISTINCT ON("studyright_extent"."extentcode") "studyright_extent"."extentcode"'),
-        'name'
+        'name',
       ],
       include: [
         {
@@ -288,19 +280,19 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           required: true,
           where: {
             student_studentnumber: {
-              [Op.in]: studentnumbers
-            }
-          }
-        }
+              [Op.in]: studentnumbers,
+            },
+          },
+        },
       ],
-      raw: true
+      raw: true,
     }),
     Semester.findAll({
       attributes: [
         sequelize.literal('DISTINCT ON("semester"."semestercode") "semester"."semestercode"'),
         'name',
         'startdate',
-        'enddate'
+        'enddate',
       ],
       include: {
         model: SemesterEnrollment,
@@ -308,16 +300,16 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         required: true,
         where: {
           studentnumber: {
-            [Op.in]: studentnumbers
-          }
-        }
+            [Op.in]: studentnumbers,
+          },
+        },
       },
       where: {
         startdate: {
-          [Op.between]: [startDate, endDate]
-        }
+          [Op.between]: [startDate, endDate],
+        },
       },
-      raw: true
+      raw: true,
     }),
     sequelize.query(
       `
@@ -326,9 +318,9 @@ EXISTS (SELECT 1 FROM transfers WHERE studentnumber IN (:studentnumbers) AND (co
 EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumbers))`,
       {
         replacements: { studentnumbers },
-        type: sequelize.QueryTypes.SELECT
+        type: sequelize.QueryTypes.SELECT,
       }
-    )
+    ),
   ])
 
   students.forEach(student => {
@@ -340,7 +332,7 @@ EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumber
 const count = (column, count, distinct = false) => {
   const countable = !distinct ? sequelize.col(column) : sequelize.fn('DISTINCT', sequelize.col(column))
   return sequelize.where(sequelize.fn('COUNT', countable), {
-    [Op.eq]: count
+    [Op.eq]: count,
   })
 }
 
@@ -349,12 +341,12 @@ const getEarliestYear = async (studentnumberlist, studyRights) => {
     attributes: ['startdate'],
     where: {
       studentnumber: {
-        [Op.in]: studentnumberlist
+        [Op.in]: studentnumberlist,
       },
       code: {
-        [Op.eq]: studyRights.programme
-      }
-    }
+        [Op.eq]: studyRights.programme,
+      },
+    },
   })
   const startyears = startdates.map(l => Number(new Date(l.startdate).getFullYear()))
   return Math.min(...startyears)
@@ -377,8 +369,8 @@ const studentnumbersWithAllStudyrightElements = async (
   const filteredExtents = [10] // always filter out secondary subject students
   let studyrightWhere = {
     extentcode: {
-      [Op.notIn]: filteredExtents
-    }
+      [Op.notIn]: filteredExtents,
+    },
   }
   if (!exchangeStudents) {
     filteredExtents.push(7, 34)
@@ -395,13 +387,13 @@ const studentnumbersWithAllStudyrightElements = async (
     const taggedStudentnumbers = await TagStudent.findAll({
       attributes: ['studentnumber'],
       where: {
-        tag_id: tag
-      }
+        tag_id: tag,
+      },
     })
     studentWhere.where = {
       student_studentnumber: {
-        [Op.in]: taggedStudentnumbers.map(sn => sn.studentnumber)
-      }
+        [Op.in]: taggedStudentnumbers.map(sn => sn.studentnumber),
+      },
     }
   }
 
@@ -413,21 +405,21 @@ const studentnumbersWithAllStudyrightElements = async (
       required: true,
       where: {
         code: {
-          [Op.in]: studyRights
-        }
+          [Op.in]: studyRights,
+        },
       },
       include: {
         model: ElementDetails,
-        attributes: []
-      }
+        attributes: [],
+      },
     },
     group: [sequelize.col('studyright.studyrightid')],
     where: {
       [Op.or]: [
         {
           ['$studyright_elements->element_detail.type$']: {
-            [Op.ne]: 20
-          }
+            [Op.ne]: 20,
+          },
         },
         sequelize.where(
           sequelize.fn(
@@ -436,15 +428,15 @@ const studentnumbersWithAllStudyrightElements = async (
             sequelize.col('studyright.studystartdate')
           ),
           {
-            [Op.between]: [formattedStartDate, endDate]
+            [Op.between]: [formattedStartDate, endDate],
           }
-        )
+        ),
       ],
-      ...studyrightWhere
+      ...studyrightWhere,
     },
     ...studentWhere,
     having: count('studyright_elements.code', studyRights.length, true),
-    raw: true
+    raw: true,
   })
 
   let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
@@ -459,13 +451,13 @@ const studentnumbersWithAllStudyrightElements = async (
     const enrolments = await SemesterEnrollment.findAll({
       where: {
         studentnumber: {
-          [Op.in]: studentnumbers
+          [Op.in]: studentnumbers,
         },
         semestercode,
         enrollment_date: {
-          [Op.not]: null
-        }
-      }
+          [Op.not]: null,
+        },
+      },
     })
     const studentsByStudentnumber = students.reduce((res, curr) => {
       res[curr.student_studentnumber] = curr
@@ -484,38 +476,38 @@ const studentnumbersWithAllStudyrightElements = async (
     attributes: ['studyrightid'],
     where: {
       student_studentnumber: {
-        [Op.in]: studentnumbers
-      }
+        [Op.in]: studentnumbers,
+      },
     },
     include: {
       attributes: [],
       model: StudyrightElement,
       where: {
         code: {
-          [Op.in]: studyRights
-        }
-      }
+          [Op.in]: studyRights,
+        },
+      },
     },
     group: ['studyright.studyrightid'],
     having: count('studyright_elements.id', studyRights.length, true),
-    raw: true
+    raw: true,
   })
 
   const allStudytracksForStudents = await StudyrightElement.findAll({
     where: {
       studyrightid: {
-        [Op.in]: rights.map(r => r.studyrightid)
-      }
+        [Op.in]: rights.map(r => r.studyrightid),
+      },
     },
     include: {
       model: ElementDetails,
       where: {
         type: {
-          [Op.eq]: 30
-        }
-      }
+          [Op.eq]: 30,
+        },
+      },
     },
-    raw: true
+    raw: true,
   })
 
   const formattedStudytracks = studentnumbers.reduce((acc, curr) => {
@@ -538,16 +530,16 @@ const studentnumbersWithAllStudyrightElements = async (
         attributes: ['studentnumber'],
         where: {
           sourcecode: {
-            [Op.in]: studyRights
+            [Op.in]: studyRights,
           },
           transferdate: {
-            [Op.gt]: startDate
+            [Op.gt]: startDate,
           },
           studentnumber: {
-            [Op.in]: studentnumberlist
-          }
+            [Op.in]: studentnumberlist,
+          },
         },
-        raw: true
+        raw: true,
       })
     ).map(s => s.studentnumber)
 
@@ -562,13 +554,9 @@ const parseQueryParams = query => {
   const { semesters, studentStatuses, studyRights, months, year, tag } = query
   const startDate = semesters.includes('FALL')
     ? `${year}-${semesterStart[semesters.find(s => s === 'FALL')]}`
-    : `${moment(year, 'YYYY')
-        .add(1, 'years')
-        .format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
+    : `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterStart[semesters.find(s => s === 'SPRING')]}`
   const endDate = semesters.includes('SPRING')
-    ? `${moment(year, 'YYYY')
-        .add(1, 'years')
-        .format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}`
+    ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}`
     : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
   const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
@@ -585,7 +573,7 @@ const parseQueryParams = query => {
     months,
     startDate,
     endDate,
-    tag
+    tag,
   }
 }
 
@@ -616,20 +604,20 @@ const getOptionsForStudents = async (students, code, level) => {
         model: StudyrightElement,
         where: {
           studentnumber: {
-            [Op.in]: students
+            [Op.in]: students,
           },
-          code: code
-        }
-      }
+          code: code,
+        },
+      },
     ],
     where: {
       ...graduated,
       extentcode: currentExtent,
       student_studentnumber: {
-        [Op.in]: students
-      }
+        [Op.in]: students,
+      },
     },
-    attributes: ['student_studentnumber', 'givendate']
+    attributes: ['student_studentnumber', 'givendate'],
   })
 
   const currentStudyrightsMap = currentStudyrights.reduce((obj, studyright) => {
@@ -643,29 +631,29 @@ const getOptionsForStudents = async (students, code, level) => {
         model: StudyrightElement,
         where: {
           studentnumber: {
-            [Op.in]: students
+            [Op.in]: students,
           },
           code: {
-            [Op.in]: programmes.map(p => p.code)
-          }
+            [Op.in]: programmes.map(p => p.code),
+          },
         },
         include: [
           {
             model: ElementDetails,
-            attributes: ['name']
-          }
+            attributes: ['name'],
+          },
         ],
-        attributes: ['code', 'startdate']
-      }
+        attributes: ['code', 'startdate'],
+      },
     ],
     where: {
       extentcode: optionExtent,
       student_studentnumber: {
-        [Op.in]: students
-      }
+        [Op.in]: students,
+      },
     },
     order: [[StudyrightElement, 'startdate', 'DESC']],
-    attributes: ['student_studentnumber', 'givendate']
+    attributes: ['student_studentnumber', 'givendate'],
   })
 
   return options
@@ -674,7 +662,7 @@ const getOptionsForStudents = async (students, code, level) => {
     .reduce((obj, element) => {
       obj[element.student_studentnumber] = {
         code: element.studyright_elements[0].code,
-        name: element.studyright_elements[0].element_detail.name
+        name: element.studyright_elements[0].element_detail.name,
       }
       return obj
     }, {})
@@ -724,12 +712,12 @@ const formatStudentsForApi = async (
       students: [],
       transfers: {
         targets: {},
-        sources: {}
+        sources: {},
       },
       studyrights: {
         degrees: [],
-        programmes: []
-      }
+        programmes: [],
+      },
     }
   )
 
@@ -756,7 +744,7 @@ const formatStudentsForApi = async (
     extents,
     semesters,
     courses,
-    elementdetails
+    elementdetails,
   }
   return returnvalue
 }
@@ -794,7 +782,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     cancelledStudents,
     nondegreeStudents,
     transferredStudents,
-    tag
+    tag,
   } = parseQueryParams(formattedQueryParams)
 
   // db startdate is formatted to utc so need to change it when querying
@@ -857,23 +845,23 @@ const findCourses = async (studentnumbers, beforeDate) => {
         attributes: ['grade', 'student_studentnumber', 'credittypecode', 'attainment_date', 'course_code'],
         where: {
           student_studentnumber: {
-            [Op.in]: studentnumbers
+            [Op.in]: studentnumbers,
           },
           attainment_date: {
-            [Op.lt]: beforeDate
-          }
-        }
+            [Op.lt]: beforeDate,
+          },
+        },
       },
       {
         attributes: ['discipline_id', 'name'],
-        model: Discipline
+        model: Discipline,
       },
       {
         attributes: ['coursetypecode', 'name'],
         model: CourseType,
-        required: true
-      }
-    ]
+        required: true,
+      },
+    ],
   })
   return res
 }
@@ -887,7 +875,7 @@ const parseCreditInfo = credit => ({
   passingGrade: Credit.passed(credit),
   failingGrade: Credit.failed(credit),
   improvedGrade: Credit.improved(credit),
-  date: credit.attainment_date
+  date: credit.attainment_date,
 })
 
 const bottlenecksOf = async (query, studentnumberlist) => {
@@ -899,7 +887,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       exchangeStudents,
       cancelledStudents,
       nondegreeStudents,
-      transferredStudents
+      transferredStudents,
     } = params
     if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
       return { error: 'Semester should be either SPRING OR FALL' }
@@ -942,7 +930,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         cancelledStudents,
         nondegreeStudents,
         transferredStudents,
-        tag
+        tag,
       } = params
       const studentnumbers =
         selectedStudents ||
@@ -975,13 +963,13 @@ const bottlenecksOf = async (query, studentnumberlist) => {
   const [[allstudents, courses], codeToMainCourse, error] = await Promise.all([
     getStudentsAndCourses(query.selectedStudents, studentnumberlist),
     getCodeToMainCourseMap(),
-    isValidRequest(query, params)
+    isValidRequest(query, params),
   ])
   if (error) return error
 
   const bottlenecks = {
     disciplines: {},
-    coursetypes: {}
+    coursetypes: {},
   }
 
   const stats = {}
@@ -1024,5 +1012,5 @@ module.exports = {
   universityEnrolmentDates,
   optimizedStatisticsOf,
   bottlenecksOf,
-  getEarliestYear
+  getEarliestYear,
 }

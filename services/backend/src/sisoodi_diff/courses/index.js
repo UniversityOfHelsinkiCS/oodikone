@@ -23,7 +23,7 @@ const calculateTotals = diff =>
       return {
         totalMissingInSis: totals.totalMissingInSis + course.missingStudents.length,
         totalExtraInSis: totals.totalExtraInSis + course.extraStudents.length,
-        totalIgnored: totals.totalIgnored + course.ignoredStudentsCount
+        totalIgnored: totals.totalIgnored + course.ignoredStudentsCount,
       }
     },
     { totalMissingInSis: 0, totalExtraInSis: 0, totalIgnored: 0 }

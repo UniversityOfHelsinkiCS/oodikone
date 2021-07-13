@@ -4,5 +4,5 @@ module.exports = {
       await queryInterface.removeColumn('element_details', 'faculty_code', { transaction })
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

@@ -2,12 +2,12 @@ const axios = require('axios')
 const { redisClient } = require('../redis')
 const { USERSERVICE_URL } = require('../../conf-backend')
 const {
-  dbConnections: { sequelize }
+  dbConnections: { sequelize },
 } = require('../../databaseV2/connection')
 
 const userServiceClient = axios.create({
   baseURL: USERSERVICE_URL,
-  headers: { secret: process.env.USERSERVICE_SECRET }
+  headers: { secret: process.env.USERSERVICE_SECRET },
 })
 
 const getRedisCDS = async REDIS_KEY => {
@@ -168,8 +168,8 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
     {
       type: sequelize.QueryTypes.SELECT,
       replacements: {
-        codes: codes
-      }
+        codes: codes,
+      },
     }
   )
 }
@@ -178,5 +178,5 @@ module.exports = {
   getRedisCDS,
   saveToRedis,
   userServiceClient,
-  getTargetStudentCounts
+  getTargetStudentCounts,
 }

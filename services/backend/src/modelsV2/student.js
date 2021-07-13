@@ -7,7 +7,7 @@ Student.init(
   {
     studentnumber: {
       primaryKey: true,
-      type: STRING
+      type: STRING,
     },
     lastname: { type: STRING },
     firstnames: { type: STRING },
@@ -26,17 +26,17 @@ Student.init(
     home_country_en: { type: STRING },
     gender_code: { type: INTEGER },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'student',
-    tableName: 'student'
+    tableName: 'student',
   }
 )
 

@@ -1230,5 +1230,5 @@ ALTER TABLE ONLY transfers
       )
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

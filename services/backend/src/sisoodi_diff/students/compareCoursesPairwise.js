@@ -28,7 +28,7 @@ const compareOodiToSis = (data, msg) => {
         {
           code: courseCode,
           name,
-          studentNumber: studentNumber
+          studentNumber: studentNumber,
         },
         'code'
       )

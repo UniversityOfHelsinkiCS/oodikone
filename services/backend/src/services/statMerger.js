@@ -64,7 +64,7 @@ const populationCourseStatsMerger = multiyearstats => {
           } else {
             stats.coursestatistics[index].students[key2] = {
               ...stats.coursestatistics[index].students[key2],
-              ...c.students[key2]
+              ...c.students[key2],
             }
           }
         })
@@ -104,5 +104,5 @@ const populationStudentsMerger = multiyearstudents => {
 
 module.exports = {
   populationCourseStatsMerger,
-  populationStudentsMerger
+  populationStudentsMerger,
 }

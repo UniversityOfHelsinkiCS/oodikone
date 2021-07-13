@@ -22,13 +22,13 @@ const accessLogger = morgan((tokens, req, res) => {
     tokens['status'](req, res),
     '-',
     tokens['response-time'](req, res),
-    'ms'
+    'ms',
   ].join(' ')
 
   logger.info(message, {
     ...meta,
     // pass this as a custom field so we can filter by it in graylog
-    isUsageStats: true
+    isUsageStats: true,
   })
 })
 

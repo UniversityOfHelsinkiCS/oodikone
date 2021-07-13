@@ -7,49 +7,49 @@ Course.init(
   {
     id: {
       type: STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     code: {
-      type: STRING
+      type: STRING,
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     latest_instance_date: {
-      type: DATE
+      type: DATE,
     },
     is_study_module: {
-      type: BOOLEAN
+      type: BOOLEAN,
     },
     coursetypecode: {
-      type: STRING
+      type: STRING,
     },
     startdate: {
-      type: DATE
+      type: DATE,
     },
     enddate: {
-      type: DATE
+      type: DATE,
     },
     max_attainment_date: {
-      type: DATE
+      type: DATE,
     },
     min_attainment_date: {
-      type: DATE
+      type: DATE,
     },
     createdAt: {
       field: 'created_at',
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
       field: 'updated_at',
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: false,
     sequelize: dbConnections.sequelize,
     modelName: 'course',
-    tableName: 'course'
+    tableName: 'course',
   }
 )
 

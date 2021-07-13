@@ -3,13 +3,13 @@ const {
   getCustomPopulationSearchesByUser,
   createCustomPopulationSearch,
   updateCustomPopulationSearch,
-  deleteCustomPopulationSearch
+  deleteCustomPopulationSearch,
 } = require('../services/customPopulationSearch')
 
 router.get('/', async (req, res) => {
   try {
     const {
-      decodedToken: { id }
+      decodedToken: { id },
     } = req
     const customPopulationSearches = await getCustomPopulationSearchesByUser(id)
     res.json(customPopulationSearches)
@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
   try {
     const {
       decodedToken: { id },
-      body: { name, students }
+      body: { name, students },
     } = req
 
     if (!name) return res.status(400).json({ error: 'name missing' })
@@ -41,7 +41,7 @@ router.put('/:id', async (req, res) => {
   try {
     const {
       decodedToken: { id: userId },
-      body: { students }
+      body: { students },
     } = req
     const { id } = req.params
 
@@ -62,7 +62,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const {
-      decodedToken: { id: userId }
+      decodedToken: { id: userId },
     } = req
     const { id } = req.params
 

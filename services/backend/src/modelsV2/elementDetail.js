@@ -9,16 +9,16 @@ ElementDetail.init(
     name: { type: JSONB },
     type: { type: INTEGER },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     sequelize: dbConnections.sequelize,
     modelName: 'element_detail',
-    tableName: 'element_details'
+    tableName: 'element_details',
   }
 )
 

@@ -3,29 +3,29 @@ const { CustomPopulationSearch } = require('../models/models_kone')
 const getCustomPopulationSearchesByUser = async userId =>
   CustomPopulationSearch.findAll({
     where: {
-      userId
-    }
+      userId,
+    },
   })
 
 const createCustomPopulationSearch = async (name, userId, students) =>
   CustomPopulationSearch.create({
     name,
     userId,
-    students
+    students,
   })
 
 const updateCustomPopulationSearch = async (userId, id, students) => {
   const targetCustomPopulationSearch = await CustomPopulationSearch.findOne({
     where: {
       id,
-      userId
-    }
+      userId,
+    },
   })
 
   if (!targetCustomPopulationSearch) return null
 
   return targetCustomPopulationSearch.update({
-    students
+    students,
   })
 }
 
@@ -33,13 +33,13 @@ const deleteCustomPopulationSearch = async (userId, id) =>
   CustomPopulationSearch.destroy({
     where: {
       id,
-      userId
-    }
+      userId,
+    },
   })
 
 module.exports = {
   getCustomPopulationSearchesByUser,
   createCustomPopulationSearch,
   updateCustomPopulationSearch,
-  deleteCustomPopulationSearch
+  deleteCustomPopulationSearch,
 }

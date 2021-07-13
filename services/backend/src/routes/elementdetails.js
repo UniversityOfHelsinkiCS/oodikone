@@ -12,7 +12,7 @@ const {
   patchProductivity,
   patchThroughput,
   getNonGraduatedStudents,
-  ping
+  ping,
 } = require('../services/analyticsService')
 const elementDetailsV2 = require('../routesV2/elementdetails')
 const useSisRouter = require('../util/useSisRouter')
@@ -42,14 +42,14 @@ router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
     const {
       roles,
       decodedToken,
-      params: { id }
+      params: { id },
     } = req
     if (!id) return res.status(400).json({ error: 'programme id missing' })
 
     const nonGraduatedStudents = await getNonGraduatedStudents(id)
     if (!nonGraduatedStudents) return res.status(200).json({})
     const {
-      data: { formattedData, studentnumbers }
+      data: { formattedData, studentnumbers },
     } = nonGraduatedStudents
 
     const filteredData = { ...formattedData }
@@ -157,7 +157,7 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
     } catch (e) {
       try {
         await patchProductivity({
-          [code]: { status: 'RECALCULATION ERRORED' }
+          [code]: { status: 'RECALCULATION ERRORED' },
         })
       } catch (e) {
         console.error(e)

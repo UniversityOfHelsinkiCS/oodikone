@@ -40,7 +40,7 @@ router.get('/tags/:studytrack', async (req, res) => {
 router.post('/tags', async (req, res) => {
   try {
     const {
-      tag: { studytrack, tagname, year, personal_user_id }
+      tag: { studytrack, tagname, year, personal_user_id },
     } = req.body
     const { rights, roles, decodedToken } = req
 

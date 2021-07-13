@@ -3,5 +3,5 @@ module.exports = {
     await queryInterface.bulkDelete('tag', [])
     await queryInterface.addColumn('tag', 'year', { type: Sequelize.STRING })
   },
-  down: async () => {}
+  down: async () => {},
 }

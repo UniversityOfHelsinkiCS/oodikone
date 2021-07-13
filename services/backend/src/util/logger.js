@@ -12,8 +12,8 @@ if (process.env.LOG_PORT && process.env.LOG_HOST) {
       protocol: process.env.LOG_PROTOCOL || 'https',
       environment: process.env.NODE_ENV,
       protocolOptions: {
-        path: process.env.LOG_PATH || '/gelf'
-      }
+        path: process.env.LOG_PATH || '/gelf',
+      },
     })
   )
 }

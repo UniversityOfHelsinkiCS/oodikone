@@ -7,63 +7,63 @@ Studyright.init(
   {
     studyrightid: {
       primaryKey: true,
-      type: STRING
+      type: STRING,
     },
     canceldate: {
-      type: DATE
+      type: DATE,
     },
     startdate: {
-      type: DATE
+      type: DATE,
     },
     enddate: {
-      type: DATE
+      type: DATE,
     },
     givendate: {
-      type: DATE
+      type: DATE,
     },
     studystartdate: {
-      type: DATE
+      type: DATE,
     },
     graduated: {
-      type: INTEGER
+      type: INTEGER,
     },
     // irtisanomisperuste
     studentStudentnumber: {
       type: STRING,
       references: {
         model: 'student',
-        key: 'studentnumber'
+        key: 'studentnumber',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     facultyCode: {
-      type: STRING
+      type: STRING,
     },
     prioritycode: {
-      type: INTEGER
+      type: INTEGER,
     },
     extentcode: {
       type: INTEGER,
       references: {
         model: 'studyright_extents',
-        key: 'extentcode'
+        key: 'extentcode',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'studyright',
-    tableName: 'studyright'
+    tableName: 'studyright',
   }
 )
 

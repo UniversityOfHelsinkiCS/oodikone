@@ -21,7 +21,7 @@ class CourseYearlyStatsCounter {
       name: organization.name,
       students: [],
       passed: [],
-      credits: 0
+      credits: 0,
     }
   }
 
@@ -34,18 +34,18 @@ class CourseYearlyStatsCounter {
         grades: {},
         categories: {
           passed: [],
-          failed: []
-        }
+          failed: [],
+        },
       },
       students: {
         categories: {
           passedFirst: [],
           passedEventually: [],
-          neverPassed: []
+          neverPassed: [],
         },
-        studentnumbers: []
+        studentnumbers: [],
       },
-      yearcode
+      yearcode,
     }
   }
 
@@ -124,13 +124,13 @@ class CourseYearlyStatsCounter {
         this.students.set(studentnumber, {
           earliestAttainment: attainment_date,
           category: 'passedFirst',
-          code: groupcode
+          code: groupcode,
         })
       } else {
         this.students.set(studentnumber, {
           earliestAttainment: attainment_date,
           category: 'neverPassed',
-          code: groupcode
+          code: groupcode,
         })
       }
     } else {
@@ -140,14 +140,14 @@ class CourseYearlyStatsCounter {
           this.students.set(studentnumber, {
             earliestAttainment: attainment_date,
             category: 'passedFirst',
-            code: groupcode
+            code: groupcode,
           })
         } else {
           if (student.category == 'passedFirst') {
             this.students.set(studentnumber, {
               earliestAttainment: attainment_date,
               category: 'passedEventually',
-              code: groupcode
+              code: groupcode,
             })
           }
         }
@@ -168,8 +168,8 @@ class CourseYearlyStatsCounter {
           name: { en: '', fi: '', sv: '' },
           credits: {},
           passed: {},
-          students: {}
-        }
+          students: {},
+        },
       }
     }
 
@@ -184,7 +184,7 @@ class CourseYearlyStatsCounter {
 
     const groupStatistics = Object.values(this.groups).map(({ ...rest }) => {
       const normalStats = {
-        ...rest
+        ...rest,
       }
 
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {
@@ -205,19 +205,19 @@ class CourseYearlyStatsCounter {
           attempts: {
             categories: {
               failed: [],
-              passed: []
+              passed: [],
             },
-            grades: gradeSpread
+            grades: gradeSpread,
           },
           yearcode: rest.yearcode,
           students: {
             categories: {
               passedFirst: [],
               passedEventually: [],
-              neverPassed: []
+              neverPassed: [],
             },
-            studentnumbers: []
-          }
+            studentnumbers: [],
+          },
         }
         return obfuscatedStats
       }
@@ -235,8 +235,8 @@ class CourseYearlyStatsCounter {
           allCredits: 0,
           allPassed: [],
           allStudents: [],
-          faculties: {}
-        }
+          faculties: {},
+        },
       ]
     }
     return this.facultyStats
@@ -247,7 +247,7 @@ class CourseYearlyStatsCounter {
       programmes: this.parseProgrammeStatistics(anonymizationSalt),
       statistics: this.parseGroupStatistics(anonymizationSalt),
       facultyStats: this.parseFacultyStatistics(anonymizationSalt),
-      obfuscated: this.obfuscated
+      obfuscated: this.obfuscated,
     }
   }
 }

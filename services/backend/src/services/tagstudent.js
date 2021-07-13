@@ -12,10 +12,10 @@ const getStudentTagsByStudytrack = studytrack => {
       attributes: ['tag_id', 'tagname', 'personal_user_id'],
       where: {
         studytrack: {
-          [Op.eq]: studytrack
-        }
-      }
-    }
+          [Op.eq]: studytrack,
+        },
+      },
+    },
   })
 }
 
@@ -23,13 +23,13 @@ const getStudentTagsByStudentnumber = async studentnumber => {
   return TagStudent.findAll({
     where: {
       studentnumber: {
-        [Op.eq]: studentnumber
-      }
+        [Op.eq]: studentnumber,
+      },
     },
     include: {
       model: Tag,
-      attributes: ['tag_id', 'tagname', 'personal_user_id']
-    }
+      attributes: ['tag_id', 'tagname', 'personal_user_id'],
+    },
   })
 }
 
@@ -45,12 +45,12 @@ const deleteMultipleStudentTags = async (tagId, studentnumbers) => {
   return TagStudent.destroy({
     where: {
       tag_id: {
-        [Op.eq]: tagId
+        [Op.eq]: tagId,
       },
       studentnumber: {
-        [Op.in]: studentnumbers
-      }
-    }
+        [Op.in]: studentnumbers,
+      },
+    },
   })
 }
 
@@ -58,8 +58,8 @@ const deleteStudentTag = async (studentnumber, tag_id) => {
   return TagStudent.destroy({
     where: {
       tag_id,
-      studentnumber
-    }
+      studentnumber,
+    },
   })
 }
 
@@ -70,5 +70,5 @@ module.exports = {
   createStudentTag,
   createMultipleStudentTags,
   deleteStudentTag,
-  deleteMultipleStudentTags
+  deleteMultipleStudentTags,
 }

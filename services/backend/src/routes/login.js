@@ -37,7 +37,7 @@ router.post('/login', async (req, res) => {
         .status(401)
         .json({
           message: `Not enough headers login, uid: ${req.headers.uid}
-        session-id ${req.headers['shib-session-id']}`
+        session-id ${req.headers['shib-session-id']}`,
         })
         .end()
     }
@@ -57,10 +57,7 @@ router.delete('/logout', async (req, res) => {
         .send({ logoutUrl: `${logoutUrl}?return=${returnUrl}` })
         .end()
     }
-    res
-      .status(200)
-      .send({ logoutUrl: returnUrl })
-      .end()
+    res.status(200).send({ logoutUrl: returnUrl }).end()
   } catch (err) {
     res.status(500).json({ message: 'Error with logout', err })
   }

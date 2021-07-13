@@ -6,17 +6,17 @@ const {
   refreshStatusGraduated,
   refreshUber,
   refreshProtoCProgramme,
-  getStartYears
+  getStartYears,
 } = require('./services/coolDataScience')
 const { refreshAssociationsInRedis: refreshAssociationsInRedisV2 } = require('./servicesV2/studyrights')
 const {
   getAllProgrammes: getAllProgrammesV2,
-  nonGraduatedStudentsOfElementDetail: nonGraduatedStudentsOfElementDetailV2
+  nonGraduatedStudentsOfElementDetail: nonGraduatedStudentsOfElementDetailV2,
 } = require('./servicesV2/studyrights')
 
 const {
   productivityStatsForStudytrack: productivityStatsForStudytrackV2,
-  throughputStatsForStudytrack: throughputStatsForStudytrackV2
+  throughputStatsForStudytrack: throughputStatsForStudytrackV2,
 } = require('./servicesV2/studyprogramme')
 
 const topteachersV2 = require('./servicesV2/topteachers')
@@ -30,7 +30,7 @@ const {
   setThroughput: setThroughputV2,
   patchProductivity: patchProductivityV2,
   patchThroughput: patchThroughputV2,
-  patchNonGraduatedStudents: patchNonGraduatedStudentsV2
+  patchNonGraduatedStudents: patchNonGraduatedStudentsV2,
 } = require('./servicesV2/analyticsService')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
@@ -87,7 +87,7 @@ const refreshOverviewV2 = async () => {
       } catch (e) {
         try {
           await patchProductivityV2({
-            [code]: { status: 'RECALCULATION ERRORED' }
+            [code]: { status: 'RECALCULATION ERRORED' },
           })
         } catch (e) {
           console.error(e)
@@ -236,5 +236,5 @@ const refreshCDS = async () => {
 module.exports = {
   startCron,
   refreshStatisticsV2,
-  refreshCDS
+  refreshCDS,
 }

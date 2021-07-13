@@ -7,23 +7,23 @@ Teacher.init(
   {
     id: {
       primaryKey: true,
-      type: STRING
+      type: STRING,
     },
     name: {
-      type: STRING
+      type: STRING,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'teacher',
-    tableName: 'teacher'
+    tableName: 'teacher',
   }
 )
 

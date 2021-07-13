@@ -35,9 +35,9 @@ const byProgrammeCode = async code => {
   const excluded = await ExcludedCourse.findAll({
     where: {
       programme_code: {
-        [Op.eq]: code
-      }
-    }
+        [Op.eq]: code,
+      },
+    },
   })
 
   // this labels the modules to match the old system in frontend
@@ -45,7 +45,7 @@ const byProgrammeCode = async code => {
     const label = {
       id: module.label_name.fi,
       label: `${module.label_code}\n${module.label_name.fi}`,
-      orderNumber: module.module_order
+      orderNumber: module.module_order,
     }
     // check if course is excluded, and hide if it is
     const foundCourse = excluded.find(course => course.course_code === module.code)
@@ -68,9 +68,9 @@ const removeExcludedCourses = async ids => {
   return ExcludedCourse.destroy({
     where: {
       id: {
-        [Op.or]: ids
-      }
-    }
+        [Op.or]: ids,
+      },
+    },
   })
 }
 

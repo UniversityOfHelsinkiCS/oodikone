@@ -13,7 +13,7 @@ router.post('/:uid', async (req, res) => {
         .status(401)
         .json({
           message: `Not enough headers login, uid:
-        ${req.headers.uid} session-id ${req.headers['shib-session-id']}`
+        ${req.headers.uid} session-id ${req.headers['shib-session-id']}`,
         })
         .end()
     }

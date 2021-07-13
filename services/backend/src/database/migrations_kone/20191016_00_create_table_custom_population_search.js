@@ -6,21 +6,21 @@ module.exports = {
       id: {
         type: BIGINT,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
       userId: {
-        type: BIGINT
+        type: BIGINT,
       },
       name: {
         type: STRING,
-        allowNull: false
+        allowNull: false,
       },
       students: {
-        type: ARRAY(STRING)
+        type: ARRAY(STRING),
       },
       createdAt: DATE,
-      updatedAt: DATE
+      updatedAt: DATE,
     })
   },
-  down: () => {}
+  down: () => {},
 }

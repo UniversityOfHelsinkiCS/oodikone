@@ -15,7 +15,7 @@ const parseargs = (args, SEPARATOR = '=') =>
       const [key, val] = arg.split(SEPARATOR)
       return {
         ...acc,
-        [key.trim()]: val.trim()
+        [key.trim()]: val.trim(),
       }
     }, {})
 

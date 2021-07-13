@@ -10,7 +10,7 @@ const {
   StudyrightElement,
   Studyright,
   Semester,
-  Organisation
+  Organisation,
 } = require('../models')
 const { sequelizeKone, CourseDuplicates, MandatoryCourse } = require('../models/models_kone')
 const { parseCredit } = require('./parseCredits')
@@ -25,17 +25,17 @@ const byNameOrCode = (searchTerm, language) =>
         {
           name: {
             [language]: {
-              [Op.iLike]: searchTerm
-            }
-          }
+              [Op.iLike]: searchTerm,
+            },
+          },
         },
         {
           code: {
-            [Op.like]: searchTerm
-          }
-        }
-      ]
-    }
+            [Op.like]: searchTerm,
+          },
+        },
+      ],
+    },
   })
 
 const byName = (name, language) =>
@@ -43,12 +43,12 @@ const byName = (name, language) =>
     where: {
       name: {
         [language]: {
-          [Op.eq]: name
-        }
-      }
+          [Op.eq]: name,
+        },
+      },
     },
     order: [['latest_instance_date', 'DESC']],
-    limit: 1
+    limit: 1,
   })
 
 const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) => {
@@ -58,10 +58,10 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
           model: Discipline,
           where: {
             discipline_id: {
-              [Op.eq]: discipline
-            }
-          }
-        }
+              [Op.eq]: discipline,
+            },
+          },
+        },
       }
     : null
 
@@ -71,16 +71,16 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
           {
             name: {
               [language]: {
-                [Op.iLike]: `%${searchTerm}%`
-              }
-            }
+                [Op.iLike]: `%${searchTerm}%`,
+              },
+            },
           },
           {
             code: {
-              [Op.iLike]: `%${searchTerm}%`
-            }
-          }
-        ]
+              [Op.iLike]: `%${searchTerm}%`,
+            },
+          },
+        ],
       }
     : null
 
@@ -89,10 +89,10 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
         [Op.and]: [
           {
             coursetypecode: {
-              [Op.eq]: type
-            }
-          }
-        ]
+              [Op.eq]: type,
+            },
+          },
+        ],
       }
     : null
 
@@ -100,8 +100,8 @@ const byNameOrCodeTypeAndDiscipline = (searchTerm, type, discipline, language) =
     ...includeDiscipline,
     where: {
       ...whereNameOrCode,
-      ...whereType
-    }
+      ...whereType,
+    },
   })
 }
 
@@ -122,36 +122,36 @@ const creditsForCourses = async (codes, anonymizationSalt) => {
               attributes: ['name', 'type'],
               where: {
                 type: {
-                  [Op.eq]: 20
-                }
-              }
+                  [Op.eq]: 20,
+                },
+              },
             },
             {
               model: Studyright,
               attributes: ['prioritycode', 'faculty_code'],
               where: {
                 prioritycode: {
-                  [Op.eq]: 1
-                }
+                  [Op.eq]: 1,
+                },
               },
               include: {
-                model: Organisation
-              }
-            }
-          ]
-        }
+                model: Organisation,
+              },
+            },
+          ],
+        },
       },
       {
         model: Semester,
-        attributes: ['semestercode', 'name', 'yearcode', 'yearname']
-      }
+        attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
+      },
     ],
     where: {
       course_code: {
-        [Op.in]: codes
-      }
+        [Op.in]: codes,
+      },
     },
-    order: [['attainment_date', 'ASC']]
+    order: [['attainment_date', 'ASC']],
   })
 
   const parsedCredits = credits.map(credit => parseCredit(credit, anonymizationSalt))
@@ -162,7 +162,7 @@ const bySearchTerm = async (term, language) => {
   const formatCourse = course => ({
     name: course.name[language],
     code: course.code,
-    date: course.latest_instance_date
+    date: course.latest_instance_date,
   })
 
   try {
@@ -170,7 +170,7 @@ const bySearchTerm = async (term, language) => {
     return result.map(formatCourse)
   } catch (e) {
     return {
-      error: e
+      error: e,
     }
   }
 }
@@ -179,7 +179,7 @@ const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) =
   const formatCourse = course => ({
     name: course.name[language],
     code: course.code,
-    date: course.latest_instance_date
+    date: course.latest_instance_date,
   })
   const removeDuplicates = courses => {
     let newList = []
@@ -202,7 +202,7 @@ const bySearchTermTypeAndDiscipline = async (term, type, discipline, language) =
     return removeDuplicates(result.map(formatCourse))
   } catch (e) {
     return {
-      error: e
+      error: e,
     }
   }
 }
@@ -211,7 +211,7 @@ const createCourse = async (code, name, latest_instance_date) =>
   Course.create({
     code,
     name,
-    latest_instance_date
+    latest_instance_date,
   })
 
 const findDuplicates = async (oldPrefixes, newPrefixes) => {
@@ -256,8 +256,8 @@ const deleteDuplicateCode = async code => {
   try {
     await CourseDuplicates.destroy({
       where: {
-        coursecode: code
-      }
+        coursecode: code,
+      },
     })
     await sequelizeKone.query(
       `DELETE FROM course_duplicates
@@ -276,9 +276,9 @@ const getDuplicateCodesWithCourses = async () => {
   const courses = await Course.findAll({
     where: {
       code: {
-        [Op.in]: courseDuplicates.map(e => e.coursecode)
-      }
-    }
+        [Op.in]: courseDuplicates.map(e => e.coursecode),
+      },
+    },
   })
   const codeToCourse = courses.reduce((acc, c) => {
     acc[c.code] = c
@@ -312,10 +312,10 @@ const getMandatoryCourse = courses => {
     attributes: ['course_code'],
     where: {
       course_code: {
-        [Op.in]: courses
-      }
+        [Op.in]: courses,
+      },
     },
-    raw: true
+    raw: true,
   })
 }
 
@@ -337,14 +337,14 @@ const getMainCodeToDuplicates = async () => {
           return 3 // unknown, comes before open uni?
         },
         c => c.latest_instance_date || new Date(),
-        'code'
+        'code',
       ],
       ['asc', 'desc', 'desc']
     )[0]
     const promisedAcc = await acc
     promisedAcc[main.code] = {
       maincourse: { code: main.code, name: main.name },
-      duplicates: courses.map(c => ({ code: c.code, name: c.name }))
+      duplicates: courses.map(c => ({ code: c.code, name: c.name })),
     }
     return promisedAcc
   }, {})
@@ -414,10 +414,10 @@ const setDuplicateCode = async (code1, code2) => {
           await CourseDuplicates.bulkCreate(
             [
               { groupid, coursecode: code1 },
-              { groupid, coursecode: code2 }
+              { groupid, coursecode: code2 },
             ],
             {
-              ignoreDuplicates: true
+              ignoreDuplicates: true,
             }
           )
         } else {
@@ -442,8 +442,8 @@ const alternativeCodes = async code => {
 const getGroupId = async code => {
   const duplicates = await CourseDuplicates.findOne({
     where: {
-      coursecode: code
-    }
+      coursecode: code,
+    },
   })
   return duplicates ? duplicates.groupid : code
 }
@@ -460,10 +460,10 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
             where: {
               code: {
                 [Op.regexp]: {
-                  [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`)
-                }
-              }
-            }
+                  [Op.any]: nonOpenUniCodes.map(c => `^AY?${c}(en|fi|sv)?$`),
+                },
+              },
+            },
           })
         ).map(course => course.code)
       : []
@@ -474,7 +474,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
   const uniqueCodes = _.uniq(codes)
   const [credits, course] = await Promise.all([
     creditsForCourses(uniqueCodes, anonymizationSalt),
-    Course.findByPk(coursecode)
+    Course.findByPk(coursecode),
   ])
   const counter = new CourseYearlyStatsCounter()
   for (let credit of credits) {
@@ -489,7 +489,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
       attainment_date,
       programmes,
       coursecode,
-      credits
+      credits,
     } = credit
 
     const groupcode = separate ? semestercode : yearcode
@@ -500,17 +500,17 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
         name: {
           en: 'Other',
           fi: 'Muu',
-          sv: 'Andra'
+          sv: 'Andra',
         },
         faculty_code: 'OTHER',
         organization: {
           name: {
             en: 'Other',
             fi: 'Muu',
-            sv: 'Andra'
-          }
-        }
-      }
+            sv: 'Andra',
+          },
+        },
+      },
     ]
     counter.markStudyProgrammes(
       studentnumber,
@@ -527,7 +527,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
     ...statistics,
     coursecode,
     alternatives: uniqueCodes,
-    name: course.name
+    name: course.name,
   }
 }
 
@@ -538,10 +538,10 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
         await Course.findAll({
           where: {
             code: {
-              [Op.in]: coursecodes
-            }
+              [Op.in]: coursecodes,
+            },
           },
-          attributes: ['max_attainment_date']
+          attributes: ['max_attainment_date'],
         })
       ).map(c => new Date(c.max_attainment_date).getTime())
     )
@@ -552,13 +552,13 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
   const credits = await Credit.findAll({
     where: {
       course_code: {
-        [Op.in]: coursecodes
+        [Op.in]: coursecodes,
       },
       attainment_date: {
-        [Op.gt]: attainmentThreshold
-      }
+        [Op.gt]: attainmentThreshold,
+      },
     },
-    order: [['attainment_date', 'ASC']]
+    order: [['attainment_date', 'ASC']],
   })
 
   const yearlyStudents = Object.values(
@@ -596,16 +596,16 @@ const nameLikeTerm = name => {
     name: {
       [Op.or]: {
         fi: {
-          [Op.iLike]: term
+          [Op.iLike]: term,
         },
         sv: {
-          [Op.iLike]: term
+          [Op.iLike]: term,
         },
         en: {
-          [Op.iLike]: term
-        }
-      }
-    }
+          [Op.iLike]: term,
+        },
+      },
+    },
   }
 }
 
@@ -614,8 +614,8 @@ const codeLikeTerm = code =>
     ? undefined
     : {
         code: {
-          [Op.iLike]: `%${code.trim()}%`
-        }
+          [Op.iLike]: `%${code.trim()}%`,
+        },
       }
 
 const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
@@ -635,12 +635,12 @@ const byNameAndOrCodeLike = async (name, code) => {
       'startdate',
       'enddate',
       'max_attainment_date',
-      'min_attainment_date'
+      'min_attainment_date',
     ],
     where: {
       ...nameLikeTerm(name),
-      ...codeLikeTerm(code)
-    }
+      ...codeLikeTerm(code),
+    },
   })
 
   const groups = {}
@@ -658,7 +658,7 @@ const byNameAndOrCodeLike = async (name, code) => {
             if ((mainCourse && !isOpenUniCourseCode(course.code)) || !isOpenUniCourseCode(course.code)) {
               groupMeta[groupid] = {
                 name: mainCourse ? mainCourse.name : course.name,
-                code: mainCourse ? mainCourse.code : course.code
+                code: mainCourse ? mainCourse.code : course.code,
               }
             }
           }
@@ -674,9 +674,9 @@ const byCodes = codes => {
   return Course.findAll({
     where: {
       code: {
-        [Op.in]: codes
-      }
-    }
+        [Op.in]: codes,
+      },
+    },
   })
 }
 
@@ -698,5 +698,5 @@ module.exports = {
   byCodes,
   getMainCodeToDuplicatesAndCodeToMainCode,
   maxYearsToCreatePopulationFrom,
-  unifyOpenUniversity
+  unifyOpenUniversity,
 }

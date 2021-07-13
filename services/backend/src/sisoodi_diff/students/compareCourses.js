@@ -11,5 +11,5 @@ const compareCourses = async (data, msg) => {
 }
 
 module.exports = {
-  compareCourses
+  compareCourses,
 }

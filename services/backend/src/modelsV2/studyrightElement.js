@@ -7,53 +7,53 @@ StudyrightElement.init(
   {
     id: {
       type: STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     startdate: {
-      type: DATE
+      type: DATE,
     },
     enddate: {
-      type: DATE
+      type: DATE,
     },
     studyrightid: {
       type: STRING,
       references: {
         model: 'studyright',
-        key: 'studyrightid'
+        key: 'studyrightid',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     code: {
       type: STRING,
       references: {
         model: 'element_details',
-        key: 'code'
+        key: 'code',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     studentnumber: {
       type: STRING,
       references: {
         model: 'student',
-        key: 'studentnumber'
+        key: 'studentnumber',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: false,
     sequelize: dbConnections.sequelize,
     modelName: 'studyright_element',
-    tableName: 'studyright_elements'
+    tableName: 'studyright_elements',
   }
 )
 

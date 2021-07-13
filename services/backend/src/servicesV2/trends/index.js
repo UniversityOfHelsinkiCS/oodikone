@@ -1,5 +1,5 @@
 const {
-  dbConnections: { sequelize }
+  dbConnections: { sequelize },
 } = require('../../databaseV2/connection')
 
 // TODO: change getStatus -> getStatusAttainments
@@ -37,7 +37,7 @@ const getStartYears = async () => {
   `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { startDate: STUDYRIGHT_START_DATE, currentDate: CURRENT_DATE }
+      replacements: { startDate: STUDYRIGHT_START_DATE, currentDate: CURRENT_DATE },
     }
   )
 }
@@ -54,5 +54,5 @@ module.exports = {
   refreshStatusGraduated,
   refreshUber,
   withErr,
-  getStartYears
+  getStartYears,
 }

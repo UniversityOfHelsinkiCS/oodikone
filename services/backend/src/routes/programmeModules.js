@@ -3,7 +3,7 @@ const {
   byProgrammeCode,
   addExcludedCourses,
   removeExcludedCourses,
-  modulesByProgrammeCode
+  modulesByProgrammeCode,
 } = require('../servicesV2/programmeModules')
 
 router.get('/v3/programme_modules/:code', async (req, res) => {
