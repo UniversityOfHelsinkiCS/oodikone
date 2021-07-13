@@ -13,21 +13,19 @@ USER_DATA_FILE="$DUMP_DIR/hyuserdata"
 
 ## Following the naming convention in docker-compose, these are names for services
 ## and for the anonymous database. Real databases have suffix "-real".
-ANALYTICS_DB_NAME="analytics-db"
 KONE_DB_NAME="kone-db"
 SIS_DB_NAME="sis-db"
 SIS_IMPORTER_DB_NAME="sis-importer-db"
 USER_DB_NAME="user-db"
-DATABASES=("$ANALYTICS_DB_NAME" "$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
+DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
 OODI_DB_NAME="oodi-db" # TODO: Remove when oodi is removed
 
 ## Urls should be in same order as databases
-ANALYTICS_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-analytics-pg.sqz"
 KONE_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-kone-pg.sqz"
 SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-sis.sqz"
 SIS_IMPORTER_DB_REAL_DUMP_URL="importer:/home/importer_user/importer-db/backup/importer-db.sqz"
 USER_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-user-pg.sqz"
-REAL_DUMP_URLS=("$ANALYTICS_DB_REAL_DUMP_URL" "$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
+REAL_DUMP_URLS=("$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
 OODI_DB_REAL_DUMP_URL="svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/latest-pg.sqz" # TODO: Remove when oodi is removed
 
 # Source utility functions
@@ -136,7 +134,6 @@ set_up_oodikone() {
 
   folders_to_set_up=(
     "$PROJECT_ROOT"
-    "$PROJECT_ROOT/services/oodikone2-analytics"
     "$PROJECT_ROOT/services/oodikone2-frontend"
     "$PROJECT_ROOT/services/oodikone2-userservice"
     "$PROJECT_ROOT/services/backend/oodikone2-backend"
