@@ -9,20 +9,13 @@ import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
 import { useIsAdmin } from '../../common/hooks'
+import { isDev } from '../../conf'
 
-const {
-  USER_ADMINER_URL,
-  ADMINER_URL,
-  ANALYTICS_ADMINER_URL,
-  KONE_ADMINER_URL,
-  SIS_ADMINER_URL,
-  SIS_IMPORTER_ADMINER_URL
-} = process.env
+const { USER_ADMINER_URL, ADMINER_URL, KONE_ADMINER_URL, SIS_ADMINER_URL, SIS_IMPORTER_ADMINER_URL } = process.env
 
 const adminerUrls = [
   { url: ADMINER_URL, text: 'Database' },
   { url: USER_ADMINER_URL, text: 'User database' },
-  { url: ANALYTICS_ADMINER_URL, text: 'Analytics database' },
   { url: KONE_ADMINER_URL, text: 'Kone database' },
   { url: SIS_ADMINER_URL, text: 'Sis database' },
   { url: SIS_IMPORTER_ADMINER_URL, text: 'Sis importer database' }
@@ -124,7 +117,7 @@ const NavigationBar = props => {
     )
   const testUsers = ['tktl', 'mluukkai']
   const renderUserMenu = () =>
-    process.env.NODE_ENV === 'development' ? (
+    isDev ? (
       <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
         <Dropdown.Menu>
           {adminerUrls.map(({ url, text }) => (

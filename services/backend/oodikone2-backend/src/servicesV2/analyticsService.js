@@ -1,12 +1,9 @@
-const axios = require('axios')
 const { redisClient } = require('./redis')
-const { ANALYTICS_URL } = require('../conf-backend')
 const moment = require('moment')
-
-const client = axios.create({ baseURL: ANALYTICS_URL })
 
 const createRedisKeyForProductivity = id => `PRODUCTIVITY_${id}`
 const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
+const createRedisKeyForNonGraduatedStudents = id => `NONGRADUATEDSTUDENTS_${id}`
 
 const getProductivity = async id => {
   const redisKey = createRedisKeyForProductivity(id)
@@ -92,23 +89,43 @@ const patchThroughput = async data => {
 }
 
 const patchFacultyYearlyStats = async data => {
-  const response = await client.patch('/facultystats', { data })
-  return response.data
+  const redisKey = 'FACULTY_YEARLY_STATS'
+  const dataToPatch = Object.entries(data).reduce((acc, [id, data]) => [...acc, { id, data }], [])
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToPatch))
+  if (setOperationStatus !== 'OK') return null
+  return dataToPatch
 }
 
-const getFacultyYearlyStats = async data => {
-  const response = await client.get('/facultystats', { data })
-  return response.data
+const getFacultyYearlyStats = async () => {
+  const redisKey = 'FACULTY_YEARLY_STATS'
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
 }
 
 const patchNonGraduatedStudents = async data => {
-  const response = await client.patch('/v2/nongraduatedstudents', { data })
-  return response.data
+  const [id, dataToPatch] = Object.entries(data)[0]
+  const redisKey = createRedisKeyForNonGraduatedStudents(id)
+  const dataFromRedis = JSON.parse(await redisClient.getAsync(redisKey))
+  const patchedData = {
+    data: {
+      ...dataFromRedis.data,
+      ...dataToPatch
+    },
+    lastUpdated: moment().format()
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
+  if (setOperationStatus !== 'OK') return null
+  return {
+    [id]: patchedData
+  }
 }
 
 const getNonGraduatedStudents = async id => {
-  const response = await client.get(`/v2/nongraduatedstudents/${id}`)
-  return response.data
+  const redisKey = createRedisKeyForNonGraduatedStudents(id)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
 }
 
 module.exports = {

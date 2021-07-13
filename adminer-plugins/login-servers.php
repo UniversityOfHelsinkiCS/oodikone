@@ -7,7 +7,6 @@ $driver = "pgsql";
 */
 return new AdminerLoginServers(
     $servers = array(
-        "analytics-db" => array("server" => "analytics-db", "driver" => $driver),
         "kone-db" => array("server" => "kone-db", "driver" => $driver),
         "oodi-db" => array("server" => "oodi-db", "driver" => $driver),
         "sis-db" => array("server" => "sis-db", "driver" => $driver),

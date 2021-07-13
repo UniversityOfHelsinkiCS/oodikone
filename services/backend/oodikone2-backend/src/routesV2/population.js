@@ -1,10 +1,8 @@
 const crypto = require('crypto')
 const Sentry = require('@sentry/node')
 const router = require('express').Router()
-/* const { isValidStudentId } = require('../util/index') */
 const Population = require('../servicesV2/populations')
 const Filters = require('../services/filters')
-/* const { updateStudents } = require('../services/updaterService') */
 const Student = require('../servicesV2/students')
 const StudyrightService = require('../servicesV2/studyrights')
 const UserService = require('../servicesV2/userService')
@@ -40,6 +38,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     }
 
     if (req.body.years) {
+      console.log('years väylä')
       const upperYearBound = new Date().getFullYear() + 1
       const multicoursestatPromises = Promise.all(
         req.body.years.map(year => {
@@ -54,6 +53,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       )
       const multicoursestats = await multicoursestatPromises
       const result = StatMergeService.populationCourseStatsMerger(multicoursestats)
+      console.log('result: ', result)
       if (result.error) {
         res.status(400).json(result)
         return
@@ -61,6 +61,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
       res.json(result)
     } else {
+      console.log('bottleneck väylä')
       const result = await Population.bottlenecksOf(req.body)
 
       if (result.error) {
@@ -485,22 +486,6 @@ router.delete('/v2/populationstatistics/filters', async (req, res) => {
   }
 })
 
-/* router.post('/updatedatabase', async (req, res) => {
-  const studentnumbers = req.body
-  if (!(studentnumbers && studentnumbers.every(sn => isValidStudentId(sn)))) {
-    res.status(400).end()
-    return
-  }
-  try {
-    const response = await updateStudents(studentnumbers)
-    if (response) {
-      res.status(200).json('Scheduled')
-    }
-  } catch (err) {
-    res.status(500).json(err)
-  }
-}) */
-
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   try {
     const { rights, roles } = req
@@ -515,15 +500,6 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
     res.status(500).json(err)
   }
 })
-
-/* router.get('/v3/populationstatistics/studyprogrammes/unfiltered', async (req, res) => {
-  try {
-    const studyrights = await StudyrightService.getAssociations()
-    res.json(studyrights)
-  } catch (err) {
-    res.status(500).json(err)
-  }
-}) */
 
 router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   try {

@@ -4,30 +4,8 @@ const Course = require('../servicesV2/courses')
 const { validateParamLength } = require('../util')
 const logger = require('../util/logger')
 
-/* router.get('/courses', async (req, res) => {
-  let results = []
-  if (req.query.name) {
-    results = await Course.bySearchTerm(req.query.name, req.query.language)
-  }
-
-  res.json(results)
-}) */
-
-/* router.get('/coursesmulti', async (req, res) => {
-  let results = []
-  if (req.query.name || req.query.discipline || req.query.type) {
-    results = await Course.bySearchTermTypeAndDiscipline(
-      req.query.name,
-      req.query.type,
-      req.query.discipline,
-      req.query.language
-    ) // eslint-disable-line
-  }
-  res.json(results)
-}) */
-
 router.get('/v2/coursesmulti', async (req, res) => {
-  let results = { courses: [], groups: {}, groupMeta: {} }
+  let results = { courses: [] } // , groups: {}, groupMeta: {}
   const { name, code } = req.query
 
   if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
@@ -37,16 +15,6 @@ router.get('/v2/coursesmulti', async (req, res) => {
   results = await Course.byNameAndOrCodeLike(name, code)
   res.json(results)
 })
-
-/* router.get('/coursetypes', async (req, res) => {
-  const coursetypes = await Course.getAllCourseTypes()
-  res.json(coursetypes)
-}) */
-
-/* router.get('/coursedisciplines', async (req, res) => {
-  const courseDisciplines = await Course.getAllDisciplines()
-  res.json(courseDisciplines)
-}) */
 
 router.get('/v3/courseyearlystats', async (req, res) => {
   try {
@@ -80,26 +48,6 @@ router.get('/v3/courseyearlystats', async (req, res) => {
     res.status(500).send('Something went wrong with handling the request.')
   }
 })
-
-/* router.get('/courses/duplicatecodes/:programme', async (req, res) => {
-  // const { programme } = req.params
-  const results = await Course.getMainCourseToCourseMap()
-  return res.json(results)
-}) */
-
-/* router.post('/courses/duplicatecodes/:code1/:code2', async (req, res) => {
-  const { code1, code2 } = req.params
-  await Course.setDuplicateCode(code1, code2)
-  const results = await Course.getMainCourseToCourseMap()
-  res.status(200).json(results)
-}) */
-
-/* router.delete('/courses/duplicatecodes/:code', async (req, res) => {
-  const { code } = req.params
-  await Course.deleteDuplicateCode(code)
-  const results = await Course.getMainCourseToCourseMap()
-  res.status(200).json(results)
-}) */
 
 router.use('*', (req, res, next) => next())
 

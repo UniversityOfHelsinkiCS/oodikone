@@ -146,7 +146,7 @@ const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNu
 }
 
 const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights, mappedTransfers) => {
-  const mapStudyrightElements = (studyrightid, startdate, studentnumber, code, childCode, degreeCode, transfersByStudyRightId, formattedStudyRightsById) => {
+  const mapStudyrightElements = (studyrightid, startdate, studentnumber, code, childCode, transfersByStudyRightId, formattedStudyRightsById) => {
     const defaultProps = {
       studyrightid,
       startdate,
@@ -172,12 +172,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
     // we should probably map degree in a different manner since degree can be per many
     // programmes and studytracks. Now the correct one might be overwritten later.
     return [
-      {
-      ...defaultProps,
-      id: `${defaultProps.studyrightid}-${degreeCode}`,
-      code: degreeCode,
-      enddate,
-      },
       {
         ...defaultProps,
         id: `${defaultProps.studyrightid}-${code}`,
@@ -235,47 +229,44 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         }
 
         if (isBaMa(mainStudyRightEducation)) {
-          const [baDegree, baProgramme, baStudytrack] = mapStudyrightElements(
+          const [baProgramme, baStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`,
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            snapshot.phase1_education_classification_urn,
             transfersByStudyRightId,
             formattedStudyRightsById
           )
 
-          const [maDegree, maProgramme, maStudytrack] = mapStudyrightElements(
+          const [maProgramme, maStudytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-2`,
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase2ChildGroupId],
-            snapshot.phase2_education_classification_urn,
             transfersByStudyRightId,
             formattedStudyRightsById
           )
 
           const possibleBScDuplicate = snapshotStudyRightElements.find(element => element.code === baProgramme.code)
           if (possibleBScDuplicate) {
-            snapshotStudyRightElements.push(maDegree, maProgramme, maStudytrack)
+            snapshotStudyRightElements.push(maProgramme, maStudytrack)
           } else {
-            snapshotStudyRightElements.push(baDegree, baProgramme, baStudytrack, maDegree, maProgramme, maStudytrack)
+            snapshotStudyRightElements.push(baProgramme, baStudytrack, maProgramme, maStudytrack)
           }
 
         } else {
-          const [degree, programme, studytrack] = mapStudyrightElements(
+          const [programme, studytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattiifx
             startDate,
             studentnumber,
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1GroupId],
             moduleGroupIdToCode[snapshot.accepted_selection_path.educationPhase1ChildGroupId],
-            snapshot.phase1_education_classification_urn,
             transfersByStudyRightId,
             formattedStudyRightsById
           )
-          snapshotStudyRightElements.push(degree, programme, studytrack)
+          snapshotStudyRightElements.push(programme, studytrack)
         }
       })
 

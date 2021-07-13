@@ -167,7 +167,7 @@ const SearchForm = props => {
     if (isValidName || isValidCode) {
       return props.findCoursesV2({ name: courseName, code: courseCode })
     }
-    if (courseName.length === 0 && courseCode.length === 0) {
+    if (courseName.length < 5 && courseCode.length < 2) {
       props.clearCourses()
     }
     return Promise.resolve()
@@ -348,12 +348,12 @@ SearchForm.propTypes = {
 }
 
 const mapStateToProps = state => {
-  const { groups, courses, groupMeta } = getCourseSearchResults(state)
+  const { courses } = getCourseSearchResults(state)
   const { pending: courseStatsPending } = state.courseStats
   const { unifyOpenUniCourses } = state.courseSearch
-
   return {
-    matchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses),
+    matchingCourses: filterCourseSearchResults(courses, unifyOpenUniCourses),
+    // newMatchingCourses: filterCourseSearchResults(groups, courses, groupMeta, unifyOpenUniCourses, newMeta),
     isLoading: courseStatsPending,
     coursesLoading: state.courseSearch.pending,
     unifyOpenUniCourses

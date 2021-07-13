@@ -69,7 +69,7 @@ describe("Population Statistics tests", () => {
 
     cy.get(".card").within(() => {
       cy.contains("Tietojenkäsittelytieteen kandiohjelma");
-      cy.contains("Sample size: 40 students");
+      cy.contains("Sample size: 149 students");
       cy.contains("Excludes exchange students");
       cy.contains("Excludes students who haven't enrolled present nor absent");
       cy.contains("Excludes students with non-degree study right");
@@ -79,7 +79,7 @@ describe("Population Statistics tests", () => {
     cy.contains("Courses of population").click({ force: true });
 
     cy.route("/api/v3/courseyearlystats**").as("coursePage");
-    cy.wait(1500); // a bit hacky way, wait until ui is ready
+    cy.wait(3000); // a bit hacky way, wait until ui is ready
     cy.cs("expand-TKT1").click();
     cy.cs("coursestats-link-TKT10002").click();
     cy.wait("@coursePage");
@@ -91,7 +91,7 @@ describe("Population Statistics tests", () => {
     const existing = "010113437"
     const nonExisting = "66666666"
     cy.selectStudyProgramme("Tietojenkäsittelytieteen kandiohjelma");
-    cy.contains("Students (40)").click();
+    cy.contains("Students (149)").click();
     cy.contains(existing);
     cy.contains(nonExisting).should("not.exist");
     cy.contains("button", "Check studentnumbers").click();
@@ -131,7 +131,7 @@ describe("Population Statistics tests", () => {
         cy.get("@enrollmentSelect").should("not.have.value", beforeVal);
       });
     cy.selectStudyProgramme("Datatieteen maisteriohjelma");
-    cy.contains("Students (5)").click();
+    cy.contains("Students (13)").click();
     cy.get("[data-cy=student-table-tabs]").contains("Tags").click();
     cy.contains("No tags defined. You can define them here.").find("a").click();
     cy.contains("Tags").click();
@@ -175,14 +175,14 @@ describe("Population Statistics tests", () => {
 
     cy.get("[data-cy='credit-stats-table-name-header']").should(
       "contain",
-      "Statistic for n = 40 Students"
+      "Statistic for n = 149 Students"
     );
-    cy.get("[data-cy='credit-stats-mean']").should("contain", "123.11");
-    cy.get("[data-cy='credit-stats-stdev']").should("contain", "57.16");
-    cy.get("[data-cy='credit-stats-min']").should("contain", "23");
-    cy.get("[data-cy='credit-stats-q1']").should("contain", "81");
+    cy.get("[data-cy='credit-stats-mean']").should("contain", "123.89");
+    cy.get("[data-cy='credit-stats-stdev']").should("contain", "61.32");
+    cy.get("[data-cy='credit-stats-min']").should("contain", "11");
+    cy.get("[data-cy='credit-stats-q1']").should("contain", "70");
     cy.get("[data-cy='credit-stats-q2']").should("contain", "129");
-    cy.get("[data-cy='credit-stats-q3']").should("contain", "151");
+    cy.get("[data-cy='credit-stats-q3']").should("contain", "168");
     cy.get("[data-cy='credit-stats-max']").should("contain", "314");
   });
 });
