@@ -21,39 +21,6 @@ services:
     volumes:
       - ./adminer-plugins:/var/www/html/plugins-enabled
 
-  analytics:
-    <<: *defaults
-    <<: *command_default
-    build:
-      <<: *build_defaults
-      context: services/oodikone2-analytics
-    container_name: analytics
-    depends_on:
-      - analytics-db
-    environment:
-      DB_URL: postgres://postgres@analytics-db:5432/analytics-db
-    ports:
-      - "4568:4568"
-    profiles:
-      - oodikone
-    volumes:
-      - analytics-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-analytics/:/usr/src/app
-
-  analytics-db:
-    <<: *defaults
-    container_name: analytics-db
-    environment:
-      POSTGRES_DB: analytics-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:9.6.3
-    ports:
-      - "5423:5432"
-    profiles:
-      - oodikone
-    volumes:
-      - analytics-db-data:/data
-
   backend:
     <<: *defaults
     <<: *command_default
@@ -257,8 +224,6 @@ services:
       - ./services/oodikone2-userservice/:/usr/src/app
 
 volumes:
-  analytics-db-data:
-  analytics-nodemod:
   backend-nodemod:
   frontend-nodemod:
   kone-db-data:
