@@ -11,13 +11,7 @@ import LanguagePicker from '../LanguagePicker'
 import { useIsAdmin } from '../../common/hooks'
 import { isDev } from '../../conf'
 
-const {
-  USER_ADMINER_URL,
-  ADMINER_URL,
-  KONE_ADMINER_URL,
-  SIS_ADMINER_URL,
-  SIS_IMPORTER_ADMINER_URL
-} = process.env
+const { USER_ADMINER_URL, ADMINER_URL, KONE_ADMINER_URL, SIS_ADMINER_URL, SIS_IMPORTER_ADMINER_URL } = process.env
 
 const adminerUrls = [
   { url: ADMINER_URL, text: 'Database' },
