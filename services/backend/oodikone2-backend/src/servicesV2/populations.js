@@ -954,10 +954,9 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const startYear = parseInt(query.year, 10)
   const allstudentslength = Object.keys(allstudents).length
-  // courses.forEach(course => {
+
   for (const course of courses) {
-    // console.log('course: ', course)
-    let { /* disciplines,  */ course_type } = course
+    let { course_type } = course
     const substitutions = allCodeAltenatives(course.code)
     let maincourse = course
 
@@ -973,10 +972,6 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
-    /* disciplines.forEach(({ discipline_id, name }) => {
-      coursestats.addCourseDiscipline(discipline_id, name)
-      bottlenecks.disciplines[discipline_id] = name
-    }) */
 
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
