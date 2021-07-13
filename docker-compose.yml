@@ -35,7 +35,6 @@ services:
       - redis
       - sis-db
     environment:
-      ANALYTICS_URL: http://analytics:4568
       DB_URL: postgres://postgres@oodi-db:5432/oodi-db
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:8081
@@ -63,7 +62,6 @@ services:
     container_name: frontend
     environment:
       ADMINER_URL: http://localhost:5050/?pgsql=oodi-db&username=postgres
-      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics-db&username=postgres
       BACKEND_ADDR: backend
       KONE_ADMINER_URL: http://localhost:5050/?pgsql=kone-db&username=postgres
       SIS_ADMINER_URL: http://localhost:5050/?pgsql=sis-db&username=postgres
