@@ -1,18 +1,3 @@
-node_modules
-.vscode
-.nyc_output
-src/tester.js
-update.sh
-.env
-logs/*
-run_update_script.sh
-student_numbers
-debug.log
-npm-debug.log
-
-studentnumbers.txt
-studentnumbers*.txt
-src/anonymized_API
-
+# Student diff output
 /student_diff_*
 /diff_partial_att_data.json
