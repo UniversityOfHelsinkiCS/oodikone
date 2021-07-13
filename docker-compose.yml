@@ -21,39 +21,6 @@ services:
     volumes:
       - ./adminer-plugins:/var/www/html/plugins-enabled
 
-  analytics:
-    <<: *defaults
-    <<: *command_default
-    build:
-      <<: *build_defaults
-      context: services/oodikone2-analytics
-    container_name: analytics
-    depends_on:
-      - analytics-db
-    environment:
-      DB_URL: postgres://postgres@analytics-db:5432/analytics-db
-    ports:
-      - "4568:4568"
-    profiles:
-      - oodikone
-    volumes:
-      - analytics-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-analytics/:/usr/src/app
-
-  analytics-db:
-    <<: *defaults
-    container_name: analytics-db
-    environment:
-      POSTGRES_DB: analytics-db
-      POSTGRES_HOST_AUTH_METHOD: trust
-    image: postgres:9.6.3
-    ports:
-      - "5423:5432"
-    profiles:
-      - oodikone
-    volumes:
-      - analytics-db-data:/data
-
   backend:
     <<: *defaults
     <<: *command_default
@@ -68,7 +35,6 @@ services:
       - redis
       - sis-db
     environment:
-      ANALYTICS_URL: http://analytics:4568
       DB_URL: postgres://postgres@oodi-db:5432/oodi-db
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:8081
@@ -96,7 +62,6 @@ services:
     container_name: frontend
     environment:
       ADMINER_URL: http://localhost:5050/?pgsql=oodi-db&username=postgres
-      ANALYTICS_ADMINER_URL: http://localhost:5050/?pgsql=analytics-db&username=postgres
       BACKEND_ADDR: backend
       KONE_ADMINER_URL: http://localhost:5050/?pgsql=kone-db&username=postgres
       SIS_ADMINER_URL: http://localhost:5050/?pgsql=sis-db&username=postgres
@@ -257,8 +222,6 @@ services:
       - ./services/oodikone2-userservice/:/usr/src/app
 
 volumes:
-  analytics-db-data:
-  analytics-nodemod:
   backend-nodemod:
   frontend-nodemod:
   kone-db-data:

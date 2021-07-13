@@ -19,11 +19,11 @@ const {
   throughputStatsForStudytrack: throughputStatsForStudytrackV2
 } = require('./servicesV2/studyprogramme')
 
-const { calculateFacultyYearlyStats } = require('./services/faculties')
 const topteachersV2 = require('./servicesV2/topteachers')
 const { isNewHYStudyProgramme } = require('./util')
 
-const { patchFacultyYearlyStats } = require('./services/analyticsService')
+const { calculateFacultyYearlyStats } = require('./services/faculties')
+const { patchFacultyYearlyStats } = require('./servicesV2/analyticsService')
 
 const {
   setProductivity: setProductivityV2,
@@ -35,6 +35,7 @@ const {
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
+// This is currently done with old data, update to use sis db
 const refreshFacultyYearlyStats = async () => {
   try {
     console.log('Refreshing faculty yearly stats...')
@@ -214,6 +215,7 @@ const refreshStatisticsV2 = async () => {
   await refreshOverviewV2()
   await refreshNonGraduatedStudentsOfOldProgrammesV2()
   await refreshTeacherLeaderboardV2()
+  await refreshFacultyYearlyStats() // using old data
 }
 
 const startCron = () => {
@@ -224,10 +226,6 @@ const startCron = () => {
   }
 }
 
-// OLD, add these to cron after fixing to work with SIS data
-const refreshStatistics = async () => {
-  await refreshFacultyYearlyStats()
-}
 const refreshCDS = async () => {
   await refreshProtoCtoRedis()
   await refreshStatusToRedis()
@@ -237,7 +235,6 @@ const refreshCDS = async () => {
 
 module.exports = {
   startCron,
-  refreshStatistics,
   refreshStatisticsV2,
   refreshCDS
 }
