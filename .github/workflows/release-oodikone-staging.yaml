@@ -37,10 +37,10 @@ jobs:
           build-args: |
             TAG: staging
             SENTRY_RELEASE=${{ github.sha }}
-      - name: Create a container 
+      - name: Create a container
         run: docker create --name frontend toska/oodikone2-frontend:staging
       - name: Copy assets from the container
-        run: docker cp palaute:/usr/src/app/dist ./dist
+        run: docker cp frontend:/usr/src/app/dist ./dist
       - name: Create Sentry release
         uses: getsentry/action-release@v1
         env:
