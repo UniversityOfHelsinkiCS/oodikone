@@ -36,7 +36,8 @@
   },
   "lint-staged": {
     "services/**/*.{js,jsx,json}": "eslint",
-    "updater/**/*.{js,jsx,json}": "eslint"
+    "updater/**/*.{js,jsx,json}": "eslint",
+    "**/*/Dockerfile": "hadolint"
   },
   "repository": {
     "type": "git",
