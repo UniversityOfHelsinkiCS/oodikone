@@ -1,6 +1,5 @@
 {
   "name": "oodikone",
-  "version": "1.0.0",
   "description": "An application for analyzing university data.",
   "scripts": {
     "cypress": "cypress",
@@ -32,13 +31,17 @@
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
     "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",
     "diff:transfers": "docker exec backend node /usr/src/app/src/sisoodi_diff/transfers.js",
-    "diff:trends": "docker exec backend node /usr/src/app/src/sisoodi_diff/trends.js"
+    "diff:trends": "docker exec backend node /usr/src/app/src/sisoodi_diff/trends.js",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "services/**/*.{js,jsx,json}": "eslint",
+    "updater/**/*.{js,jsx,json}": "eslint"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/UniversityOfHelsinkiCS/oodikone.git"
   },
-  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/UniversityOfHelsinkiCS/oodikone/issues"
@@ -60,6 +63,8 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "husky": "^7.0.1",
+    "lint-staged": "^11.0.1",
     "prettier": "^2.3.2",
     "stylelint": "^13.13.1",
     "stylelint-config-prettier": "^8.0.2",
