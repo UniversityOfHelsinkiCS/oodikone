@@ -20,6 +20,7 @@
   "rules": {
     "no-console": "off",
     "react/no-unescaped-entities": "off",
+    "no-async-promise-executor": "off",
     "prettier/prettier": "error"
   }
 }

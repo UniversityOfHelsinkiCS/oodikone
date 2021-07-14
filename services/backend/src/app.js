@@ -9,7 +9,6 @@ const { PORT } = conf
 const { initializeDatabaseConnection } = require('./database/connection')
 const { dbConnections } = require('./databaseV2/connection')
 
-const IS_PRODUCTION = process.env.NODE_ENV === 'production'
 const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT || ''
 const SENTRY_RELEASE = process.env.SENTRY_ENVIRONMENT || ''
 
