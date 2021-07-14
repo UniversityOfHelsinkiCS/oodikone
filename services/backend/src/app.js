@@ -39,7 +39,7 @@ initializeDatabaseConnection()
     app.use(bodyParser.json())
 
     let BASE_URL = ''
-    if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test') {
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
       BASE_URL = '/api'
     }
 
