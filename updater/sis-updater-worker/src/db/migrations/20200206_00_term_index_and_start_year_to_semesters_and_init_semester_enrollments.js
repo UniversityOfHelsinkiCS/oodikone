@@ -5,50 +5,50 @@ module.exports = {
     await Promise.all([
       queryInterface.createTable('semester_enrollments', {
         enrollmenttype: {
-          type: INTEGER
+          type: INTEGER,
         },
         org: {
-          type: STRING
+          type: STRING,
         },
         studentnumber: {
           type: STRING,
           references: {
             model: 'student',
-            key: 'studentnumber'
+            key: 'studentnumber',
           },
           onUpdate: 'cascade',
           onDelete: 'cascade',
-          primaryKey: true
+          primaryKey: true,
         },
         semestercode: {
-          type: INTEGER
+          type: INTEGER,
         },
         semestercomposite: {
           type: STRING,
           references: {
             model: 'semesters',
-            key: 'composite'
+            key: 'composite',
           },
           onUpdate: 'cascade',
           onDelete: 'cascade',
-          primaryKey: true
+          primaryKey: true,
         },
         statutory_absence: {
-          type: BOOLEAN
+          type: BOOLEAN,
         },
         enrollment_date: {
-          type: DATE
+          type: DATE,
         },
         createdAt: {
-          type: DATE
+          type: DATE,
         },
         updatedAt: {
-          type: DATE
-        }
+          type: DATE,
+        },
       }),
       queryInterface.addColumn('semesters', 'term_index', INTEGER),
-      queryInterface.addColumn('semesters', 'start_year', INTEGER)
+      queryInterface.addColumn('semesters', 'start_year', INTEGER),
     ])
   },
-  down: async () => {}
+  down: async () => {},
 }

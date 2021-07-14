@@ -1,12 +1,5 @@
 const { sortBy, uniqBy, flatten, groupBy } = require('lodash')
-const {
-  Organization,
-  Course,
-  CourseType,
-  CourseProvider,
-  CreditType,
-  StudyrightExtent
-} = require('../db/models')
+const { Organization, Course, CourseType, CourseProvider, CreditType, StudyrightExtent } = require('../db/models')
 const { selectFromByIdsOrderBy, bulkCreate } = require('../db')
 const { courseProviderMapper, courseMapper, mapCourseType, mapSemester, mapStudyrightExtent } = require('./mapper')
 
@@ -49,9 +42,13 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     const [groupId, courses] = groupedCourse
 
     // Take substitutions from all course units
-    const substitutions = [...new Set(courses.reduce((acc, curr) => {
-      return [...acc, ...flatten(curr.substitutions).map(({courseUnitGroupId}) => courseUnitGroupId)]
-    }, []))]
+    const substitutions = [
+      ...new Set(
+        courses.reduce((acc, curr) => {
+          return [...acc, ...flatten(curr.substitutions).map(({ courseUnitGroupId }) => courseUnitGroupId)]
+        }, [])
+      ),
+    ]
 
     // Take organisation for the newest course_unit of this groupid
     const coursesSortedByStartDate = sortBy(courses, 'validity_period.startDate')
@@ -94,5 +91,5 @@ module.exports = {
   updateCourseUnits,
   updateCourseTypes,
   updateCreditTypes,
-  updateStudyrightExtents
+  updateStudyrightExtents,
 }

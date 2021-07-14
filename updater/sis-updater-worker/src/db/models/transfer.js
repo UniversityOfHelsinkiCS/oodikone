@@ -7,59 +7,59 @@ Transfer.init(
   {
     id: {
       type: STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     sourcecode: {
       type: STRING,
       references: {
         model: 'element_details',
-        key: 'code'
+        key: 'code',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     targetcode: {
       type: STRING,
       references: {
         model: 'element_details',
-        key: 'code'
+        key: 'code',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     transferdate: {
-      type: DATE
+      type: DATE,
     },
     studentnumber: {
       type: STRING,
       references: {
         model: 'student',
-        key: 'studentnumber'
+        key: 'studentnumber',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     studyrightid: {
       type: STRING,
       references: {
         model: 'studyright',
-        key: 'studyrightid'
+        key: 'studyrightid',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'transfer',
-    tableName: 'transfers'
+    tableName: 'transfers',
   }
 )
 

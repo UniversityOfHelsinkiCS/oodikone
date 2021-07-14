@@ -7,47 +7,47 @@ Semester.init(
   {
     composite: {
       type: STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     semestercode: {
-      type: INTEGER
+      type: INTEGER,
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     startdate: {
-      type: DATE
+      type: DATE,
     },
     enddate: {
-      type: DATE
+      type: DATE,
     },
     yearcode: {
-      type: INTEGER
+      type: INTEGER,
     },
     org: {
-      type: STRING
+      type: STRING,
     },
     yearname: {
-      type: STRING
+      type: STRING,
     },
     termIndex: {
-      type: INTEGER
+      type: INTEGER,
     },
     startYear: {
-      type: INTEGER
+      type: INTEGER,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'semester',
-    tableName: 'semesters'
+    tableName: 'semesters',
   }
 )
 

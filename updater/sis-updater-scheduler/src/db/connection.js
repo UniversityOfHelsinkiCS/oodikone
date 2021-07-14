@@ -17,12 +17,12 @@ class KnexConnection extends EventEmitter {
           host: SIS_IMPORTER_HOST,
           user: SIS_IMPORTER_USER,
           password: SIS_IMPORTER_PASSWORD,
-          database: SIS_IMPORTER_DATABASE
+          database: SIS_IMPORTER_DATABASE,
         },
         pool: {
           min: 0,
-          max: 5
-        }
+          max: 5,
+        },
       })
       await this.knex.raw('select 1+1 as result')
       this.emit('connect')
@@ -32,7 +32,7 @@ class KnexConnection extends EventEmitter {
         return
       }
       console.log(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
-      console.log("Error: ", e)
+      console.log('Error: ', e)
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }
@@ -40,5 +40,5 @@ class KnexConnection extends EventEmitter {
 
 const knexConnection = new KnexConnection()
 module.exports = {
-  knexConnection
+  knexConnection,
 }

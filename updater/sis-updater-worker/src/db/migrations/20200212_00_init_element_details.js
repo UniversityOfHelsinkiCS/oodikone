@@ -8,12 +8,12 @@ module.exports = {
       name: { type: JSONB },
       type: { type: INTEGER },
       createdAt: {
-        type: DATE
+        type: DATE,
       },
       updatedAt: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

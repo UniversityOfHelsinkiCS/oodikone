@@ -5,36 +5,36 @@ module.exports = {
     await queryInterface.createTable('semesters', {
       composite: {
         type: STRING,
-        primaryKey: true
+        primaryKey: true,
       },
       semestercode: {
-        type: INTEGER
+        type: INTEGER,
       },
       name: {
-        type: JSONB
+        type: JSONB,
       },
       startdate: {
-        type: DATE
+        type: DATE,
       },
       enddate: {
-        type: DATE
+        type: DATE,
       },
       yearcode: {
-        type: INTEGER
+        type: INTEGER,
       },
       org: {
-        type: STRING
+        type: STRING,
       },
       yearname: {
-        type: STRING
+        type: STRING,
       },
       created_at: {
-        type: DATE
+        type: DATE,
       },
       updated_at: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

@@ -18,7 +18,7 @@ const redisPromisify = async (func, ...params) =>
 
 const client = redis.createClient({
   url: process.env.REDIS_URI,
-  retry_strategy: redisRetry
+  retry_strategy: redisRetry,
 })
 
 const set = async (key, val) => await redisPromisify(client.set, key, val)
@@ -30,5 +30,5 @@ const incrby = async (key, val) => await redisPromisify(client.incrby, key, val)
 module.exports = {
   set,
   get,
-  incrby
+  incrby,
 }

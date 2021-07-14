@@ -11,7 +11,7 @@ const CREDIT_TYPE_CODES = {
   PASSED: 4,
   FAILED: 10,
   IMPROVED: 7,
-  APPROVED: 9
+  APPROVED: 9,
 }
 
 let loadedAt = null
@@ -25,7 +25,7 @@ const localMapToRedisKey = {
   orgToUniOrgId: 'ORG_TO_UNI_ORG_ID',
   orgToStartYearToSemesters: 'ORG_TO_START_YEAR_TO_SEMESTERS',
   countries: 'COUNTRIES',
-  moduleGroupIdToDegree: 'MODULE_GROUP_ID_TO_DEGREE'
+  moduleGroupIdToDegree: 'MODULE_GROUP_ID_TO_DEGREE',
 }
 
 const localMaps = {
@@ -37,7 +37,7 @@ const localMaps = {
   orgToUniOrgId: null,
   orgToStartYearToSemesters: null,
   countries: null,
-  moduleGroupIdToDegree: null
+  moduleGroupIdToDegree: null,
 }
 
 const loadMapsIfNeeded = async () => {
@@ -77,7 +77,7 @@ const calculateMapsToRedis = async () =>
     initOrgToUniOrgId(),
     initOrgToStartYearToSemesters(),
     initCountries(),
-    initModuleGroupIdToDegree()
+    initModuleGroupIdToDegree(),
   ])
 
 const loadMapsFromRedis = async () =>
@@ -97,7 +97,7 @@ const initDaysToSemesters = async () => {
         const newDay = new Date(i)
         res[newDay.toDateString()] = {
           semestercode: curr.semestercode,
-          composite: curr.composite
+          composite: curr.composite,
         }
       }
       return res
@@ -168,12 +168,12 @@ const initGradeScaleIdToGradeIdsToGrades = async () =>
           localId,
           numericCorrespondence,
           passed,
-          abbreviation: { fi }
+          abbreviation: { fi },
         } = curr
         if (!res[localId])
           res[localId] = {
             value: numericCorrespondence || fi,
-            passed
+            passed,
           }
         return res
       }, {})
@@ -251,7 +251,7 @@ const educationTypeToExtentcode = {
   'urn:code:education-type:non-degree-education:separate-studies:alumni-studies': null, // Parent is 99
   'urn:code:education-type:non-degree-education:separate-studies:separate-study-advisor-studies': null, // Parent is 99
   'urn:code:education-type:non-degree-education:separate-studies:separate-personal-studies': null, // Parent is 99
-  'urn:code:education-type:non-degree-education:separate-studies:adult-educator-pedagogical-studies': null // Parent is 99
+  'urn:code:education-type:non-degree-education:separate-studies:adult-educator-pedagogical-studies': null, // Parent is 99
 }
 
 const getCreditTypeCodeFromAttainment = (attainment, passed) => {
@@ -265,20 +265,20 @@ const getCreditTypeCodeFromAttainment = (attainment, passed) => {
 const creditTypeIdToCreditType = {
   4: {
     credittypecode: CREDIT_TYPE_CODES.PASSED,
-    name: { en: 'Completed', fi: 'Suoritettu', sv: 'Genomförd' }
+    name: { en: 'Completed', fi: 'Suoritettu', sv: 'Genomförd' },
   },
   7: {
     credittypecode: CREDIT_TYPE_CODES.IMPROVED,
-    name: { en: 'Improved (grade)', fi: 'Korotettu', sv: 'Höjd' }
+    name: { en: 'Improved (grade)', fi: 'Korotettu', sv: 'Höjd' },
   },
   9: {
     credittypecode: CREDIT_TYPE_CODES.APPROVED,
-    name: { en: 'Transferred', fi: 'Hyväksiluettu', sv: 'Tillgodoräknad' }
+    name: { en: 'Transferred', fi: 'Hyväksiluettu', sv: 'Tillgodoräknad' },
   },
   10: {
     credittypecode: CREDIT_TYPE_CODES.FAILED,
-    name: { en: 'Failed', fi: 'Hylätty', sv: 'Underkänd' }
-  }
+    name: { en: 'Failed', fi: 'Hylätty', sv: 'Underkänd' },
+  },
 }
 
 const creditTypeIdsToCreditTypes = ids => ids.map(id => creditTypeIdToCreditType[id])
@@ -298,5 +298,5 @@ module.exports = {
   getDegrees,
   loadMapsIfNeeded,
   loadMapsOnDemand,
-  CREDIT_TYPE_CODES
+  CREDIT_TYPE_CODES,
 }

@@ -15,34 +15,34 @@ for (let year = startYear; year <= endYear; year++) {
     name: {
       en: `Autumn ${year}`,
       fi: `Syksy ${year}`,
-      sv: `Hösten ${year}`
+      sv: `Hösten ${year}`,
     },
     startdate: `${year}-08-01`,
-    enddate: `${year+1}-01-01`,
+    enddate: `${year + 1}-01-01`,
     yearcode,
     org,
-    yearname: `${year}-${year+1}`,
+    yearname: `${year}-${year + 1}`,
     term_index: 0,
-    start_year: year
+    start_year: year,
   })
 
   semesters.push({
     composite: `${org}-${semestercode}`,
     semestercode: semestercode++,
     name: {
-      en: `Spring ${year+1}`,
-      fi: `Kevät ${year+1}`,
-      sv: `Våren ${year+1}`
+      en: `Spring ${year + 1}`,
+      fi: `Kevät ${year + 1}`,
+      sv: `Våren ${year + 1}`,
     },
-    startdate: `${year+1}-01-01`,
-    enddate: `${year+1}-08-01`,
+    startdate: `${year + 1}-01-01`,
+    enddate: `${year + 1}-08-01`,
     yearcode,
     org,
-    yearname: `${year}-${year+1}`,
+    yearname: `${year}-${year + 1}`,
     term_index: 1,
-    start_year: year
+    start_year: year,
   })
-  yearcode++;
+  yearcode++
 }
 
 module.exports = {
@@ -52,5 +52,5 @@ module.exports = {
 
   down: async queryInterface => {
     await queryInterface.bulkDelete('semesters', null, {})
-  }
-};
+  },
+}
