@@ -14,16 +14,20 @@ export default () => {
   const genderCodes = {
     female: { label: 'Female', value: 2 },
     male: { label: 'Male', value: 1 },
-    other: { label: 'Other', value: 9 },
+    other: { label: 'Other', value: 3 },
     unknown: { label: 'Unknown', value: 0 }
   }
 
   useEffect(() => {
-    if (!value) {
+    if (
+      !Object.values(genderCodes)
+        .map(gc => gc.value)
+        .includes(value)
+    ) {
       removeFilter(name)
       analytics.clearFilter(name)
     } else {
-      addFilter(name, student => value === student.gender_code)
+      addFilter(name, student => value === Number(student.gender_code))
       analytics.setFilter(name, value)
     }
   }, [value])
@@ -34,7 +38,7 @@ export default () => {
     countsByGender[gc] = countsByGender[gc] ? countsByGender[gc] + 1 : 1
   })
 
-  const count = genderCode => withoutFilter(name).filter(student => student.gender_code === genderCode).length
+  const count = genderCode => withoutFilter(name).filter(student => Number(student.gender_code) === genderCode).length
 
   const options = Object.entries(genderCodes).map(([key, gender]) => ({
     key,
