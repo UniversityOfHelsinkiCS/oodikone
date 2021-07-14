@@ -1,16 +1,19 @@
-FROM node:14-alpine
+FROM node:14.17-alpine3.13 as base
 
 WORKDIR /usr/src/app
 EXPOSE 8080
-CMD ["npm", "start"]
 
-COPY ./oodikone2-backend/package* ./
-
+FROM base as development
+ENV NODE_ENV=development
+COPY ./package* /usr/src/app/
 RUN npm ci
+COPY . /usr/src/app/
+CMD ["npm", "run", "dev"]
 
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-ARG TAG=local
-ENV TAG=${TAG}
-
-COPY ./oodikone2-backend /usr/src/app
+FROM base as production
+ENV NODE_ENV=production
+COPY --chown=node:node ./package* /usr/src/app/
+RUN npm ci --production
+COPY --chown=node:node . /usr/src/app/
+USER node
+CMD ["npm", "start"]
