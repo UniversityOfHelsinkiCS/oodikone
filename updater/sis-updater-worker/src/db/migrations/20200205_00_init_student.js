@@ -5,7 +5,7 @@ module.exports = {
     await queryInterface.createTable('student', {
       studentnumber: {
         primaryKey: true,
-        type: STRING
+        type: STRING,
       },
       lastname: { type: STRING },
       firstnames: { type: STRING },
@@ -23,8 +23,8 @@ module.exports = {
       home_country_en: { type: STRING },
       gender_code: { type: STRING },
       created_at: { type: DATE },
-      updated_at: { type: DATE }
+      updated_at: { type: DATE },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

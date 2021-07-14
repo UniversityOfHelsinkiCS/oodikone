@@ -5,18 +5,18 @@ module.exports = {
     await queryInterface.createTable('credit_types', {
       credittypecode: {
         primaryKey: true,
-        type: INTEGER
+        type: INTEGER,
       },
       name: {
-        type: JSONB
+        type: JSONB,
       },
       created_at: {
-        type: DATE
+        type: DATE,
       },
       updated_at: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

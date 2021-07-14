@@ -7,7 +7,7 @@ async function creditResolver(rule, n) {
   const data = await resolver(rule.rule, n + 1)
   return {
     credits: rule.credits,
-    data: data
+    data: data,
   }
 }
 
@@ -25,10 +25,7 @@ async function moduleResolver(rule, n) {
   const { knex } = knexConnection
   const id = rule.moduleGroupId
 
-  const mod = await knex('modules')
-    .where({ group_id: id })
-    .orderBy('curriculum_period_ids', 'desc')
-    .first()
+  const mod = await knex('modules').where({ group_id: id }).orderBy('curriculum_period_ids', 'desc').first()
 
   if (mod.type == 'StudyModule') {
     const result = await moduleRuleResolver(mod, n)
@@ -39,7 +36,7 @@ async function moduleResolver(rule, n) {
       targetCredits: mod.targetCredits,
       code: mod.code,
       type: mod.type,
-      result
+      result,
     }
   }
 
@@ -50,7 +47,7 @@ async function moduleResolver(rule, n) {
       name: mod.name.fi,
       type: mod.type,
       result,
-      allMandatory: mod.type.allMandatory
+      allMandatory: mod.type.allMandatory,
     }
   }
 
@@ -58,7 +55,7 @@ async function moduleResolver(rule, n) {
     id: mod.id,
     name: mod.name.fi,
     type: mod.type,
-    result: 'unhandled module type: ' + mod.type
+    result: 'unhandled module type: ' + mod.type,
   }
 }
 
@@ -68,7 +65,7 @@ async function compositeResolver(rule, n) {
   if (includeRules) {
     return {
       data: result,
-      rule
+      rule,
     }
   }
 
@@ -79,14 +76,12 @@ async function courseResolver(rule) {
   const { knex } = knexConnection
 
   const id = rule.courseUnitGroupId
-  const course = await knex('course_units')
-    .where({ group_id: id })
-    .first()
+  const course = await knex('course_units').where({ group_id: id }).first()
 
   return {
     id: course.id,
     name: course.name ? course.name.fi : '',
-    code: course.code
+    code: course.code,
   }
 }
 
@@ -114,7 +109,7 @@ async function resolver(rule, n) {
     return {
       type: rule.type,
       data,
-      rule: includeRules ? rule : null
+      rule: includeRules ? rule : null,
     }
   }
   if (rule.type == 'CompositeRule') {
@@ -123,7 +118,7 @@ async function resolver(rule, n) {
       type: rule.type,
       allMandatory: rule.allMandatory,
       data,
-      rule: includeRules ? rule : null
+      rule: includeRules ? rule : null,
     }
   }
   if (rule.type == 'ModuleRule') {
@@ -131,20 +126,20 @@ async function resolver(rule, n) {
 
     return {
       type: rule.type,
-      data
+      data,
     }
   }
   if (rule.type == 'CourseUnitRule') {
     const data = await courseResolver(rule)
     return {
       type: rule.type,
-      data
+      data,
     }
   }
 
   return {
     type: rule.type,
-    fact: 'Unhandled rule'
+    fact: 'Unhandled rule',
   }
 }
 
@@ -152,9 +147,7 @@ const getStructure = async code => {
   const { knex } = knexConnection
 
   seen = []
-  const result = await knex('modules')
-    .where({ code: code })
-    .first()
+  const result = await knex('modules').where({ code: code }).first()
 
   const id = result.groupId
   const type = result.type
@@ -166,7 +159,7 @@ const getStructure = async code => {
     id,
     type,
     name,
-    data
+    data,
   }
 }
 

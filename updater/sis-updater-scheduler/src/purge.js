@@ -1,4 +1,4 @@
-const axios = require('axios').default;
+const axios = require('axios').default
 const { NATS_GROUP, SIS_PURGE_CHANNEL, REDIS_LAST_PREPURGE_INFO } = require('./config')
 const { logger } = require('./utils/logger')
 const { stan, opts } = require('./utils/stan')
@@ -21,15 +21,15 @@ const TABLES_TO_PURGE = [
   'studyright',
   'studyright_elements',
   'studyright_extents',
-  'teacher'
+  'teacher',
 ]
 
 let collectedPrePurgeTableData = {} // Collect data from nats, since synchronous (ack) should be ok.
 let stanChannel // Channel is initialized once for purge
 
-const sendToSlack = async (text) => {
+const sendToSlack = async text => {
   const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK
-  logger.info("Sending to slack", { text })
+  logger.info('Sending to slack', { text })
   if (!SLACK_WEBHOOK) return logger.info('SLACK_WEBHOOK environment variable must be set')
 
   try {
@@ -39,15 +39,16 @@ const sendToSlack = async (text) => {
   }
 }
 
-const sendToNats = (channel, data) => new Promise((res, rej) => {
-  stan.publish(channel, JSON.stringify(data), err => {
-    if (err) {
-      console.log('failed publishing', err)
-      rej(err)
-    }
-    res()
+const sendToNats = (channel, data) =>
+  new Promise((res, rej) => {
+    stan.publish(channel, JSON.stringify(data), err => {
+      if (err) {
+        console.log('failed publishing', err)
+        rej(err)
+      }
+      res()
+    })
   })
-})
 
 const prePurgeGetImportantDatesFromNow = () => {
   const rowsOlderThanWillBeDeleted = new Date()
@@ -58,7 +59,7 @@ const prePurgeGetImportantDatesFromNow = () => {
 
   return {
     rowsOlderThanWillBeDeleted,
-    dateAfterWhichPurgeCanBeRun
+    dateAfterWhichPurgeCanBeRun,
   }
 }
 
@@ -67,10 +68,10 @@ const prePurgeGetImportantDatesFromNow = () => {
 const getPrePurgeInfo = async () => {
   const infoString = await redisGet(REDIS_LAST_PREPURGE_INFO)
   const info = JSON.parse(infoString)
-  return info || {}
+  return info || {}
 }
 
-const setPurgeInfo = async (purgeTargetDate) => {
+const setPurgeInfo = async purgeTargetDate => {
   const purgeAfterDate = prePurgeGetImportantDatesFromNow().dateAfterWhichPurgeCanBeRun
   const info = { purgeAfterDate, purgeTargetDate }
   await redisSet(REDIS_LAST_PREPURGE_INFO, JSON.stringify(info))
@@ -80,14 +81,17 @@ const collectResponses = (table, count) => {
   collectedPrePurgeTableData = { ...collectedPrePurgeTableData, [table]: count }
 }
 
-const setupPurge = (before) => {
-  const counts = Object.keys(collectedPrePurgeTableData).map(table => {
-    if (collectedPrePurgeTableData[table] === 0) return
+const setupPurge = before => {
+  const counts = Object.keys(collectedPrePurgeTableData)
+    .map(table => {
+      if (collectedPrePurgeTableData[table] === 0) return
 
-    return `${collectedPrePurgeTableData[table]} rows from ${table}`
-  }).filter(s => s).join(',\n')
+      return `${collectedPrePurgeTableData[table]} rows from ${table}`
+    })
+    .filter(s => s)
+    .join(',\n')
 
-  const status = counts ? `${counts}\n + CASCADEs for all tables` : "No data will be deleted."
+  const status = counts ? `${counts}\n + CASCADEs for all tables` : 'No data will be deleted.'
 
   const string = `Next purge after ${MINIMUM_DAYS_BETWEEN_PREPURGE_AND_PURGE}+ days will attempt to delete data older than ${before}. According to prepurge count:\n${status}`
 
@@ -126,7 +130,7 @@ const startPrePurge = async () => {
 }
 
 const startPurge = async () => {
-  const allowedToPurge = (purgeAfterDate) => {
+  const allowedToPurge = purgeAfterDate => {
     if (!purgeAfterDate) {
       logger.info(`Purge was scheduled, but there was no date to purge after. Purge was not executed.`)
 
@@ -134,7 +138,7 @@ const startPurge = async () => {
     }
     const runPurgeAfterDate = new Date(purgeAfterDate)
     const now = new Date()
-  
+
     if (now.getTime() < runPurgeAfterDate.getTime()) {
       logger.info(`Purge was scheduled, but ${runPurgeAfterDate} is after ${now}. Purge was not executed.`)
       return false
@@ -152,5 +156,5 @@ const startPurge = async () => {
 
 module.exports = {
   startPrePurge,
-  startPurge
+  startPurge,
 }

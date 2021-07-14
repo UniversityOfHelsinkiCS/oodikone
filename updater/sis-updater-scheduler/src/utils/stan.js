@@ -8,7 +8,7 @@ const stan = natsStreaming.connect('sis-updater-nats', HOSTNAME, {
   maxPubAcksInflight: Infinity,
   maxReconnectAttempts: -1,
   waitOnFirstConnect: true,
-  connectTimeout: 60 * 1000 * 5
+  connectTimeout: 60 * 1000 * 5,
 })
 
 const opts = stan.subscriptionOptions()
@@ -20,5 +20,5 @@ opts.setMaxInFlight(1)
 
 module.exports = {
   stan,
-  opts
+  opts,
 }

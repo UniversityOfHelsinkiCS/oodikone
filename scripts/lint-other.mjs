@@ -19,9 +19,11 @@ await $`docker-compose -f docker-compose.test.yml config -q`
 
 // Lint dockerfiles
 const dockerfiles = [
-    "services/backend/oodikone2-backend/Dockerfile",
-    "services/oodikone2-frontend/Dockerfile",
-    "services/oodikone2-userservice/Dockerfile"
+    "services/backend/Dockerfile",
+    "services/frontend/Dockerfile",
+    "services/userservice/Dockerfile",
+    "updater/sis-updater-scheduler/Dockerfile",
+    "updater/sis-updater-worker/Dockerfile",
 ]
 await Promise.all(dockerfiles.map(file => $`hadolint ${file}`))
 

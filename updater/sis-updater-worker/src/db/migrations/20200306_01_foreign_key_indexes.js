@@ -7,8 +7,8 @@ module.exports = {
       queryInterface.addIndex('credit', ['semester_composite']),
       queryInterface.addIndex('course_providers', ['coursecode']),
       queryInterface.addIndex('course_providers', ['organizationcode']),
-      queryInterface.addIndex('semester_enrollments', ['semestercomposite'])
+      queryInterface.addIndex('semester_enrollments', ['semestercomposite']),
     ])
   },
-  down: async () => {}
+  down: async () => {},
 }

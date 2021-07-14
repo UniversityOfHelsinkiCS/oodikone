@@ -5,54 +5,54 @@ module.exports = {
     await queryInterface.createTable('studyright', {
       studyrightid: {
         primaryKey: true,
-        type: STRING
+        type: STRING,
       },
       canceldate: {
-        type: DATE
+        type: DATE,
       },
       startdate: {
-        type: DATE
+        type: DATE,
       },
       enddate: {
-        type: DATE
+        type: DATE,
       },
       givendate: {
-        type: DATE
+        type: DATE,
       },
       studystartdate: {
-        type: DATE
+        type: DATE,
       },
       graduated: {
-        type: INTEGER
+        type: INTEGER,
       },
       // irtisanomisperuste
       student_studentnumber: {
         type: STRING,
         references: {
           model: 'student',
-          key: 'studentnumber'
-        }
+          key: 'studentnumber',
+        },
       },
       faculty_code: {
-        type: STRING
+        type: STRING,
       },
       prioritycode: {
-        type: INTEGER
+        type: INTEGER,
       },
       extentcode: {
         type: INTEGER,
         references: {
           model: 'studyright_extents',
-          key: 'extentcode'
-        }
+          key: 'extentcode',
+        },
       },
       created_at: {
-        type: DATE
+        type: DATE,
       },
       updated_at: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

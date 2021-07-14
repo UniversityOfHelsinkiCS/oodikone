@@ -8,7 +8,7 @@ const {
   updateCourseUnits,
   updateCourseTypes,
   updateCreditTypes,
-  updateStudyrightExtents
+  updateStudyrightExtents,
 } = require('./updateMeta')
 
 const idToHandler = {
@@ -19,7 +19,7 @@ const idToHandler = {
   study_levels: updateCourseTypes,
   credit_types: updateCreditTypes,
   education_types: updateStudyrightExtents,
-  programme_modules: updateProgrammeModules
+  programme_modules: updateProgrammeModules,
 }
 
 const update = async ({ entityIds, type }) => {
@@ -45,5 +45,5 @@ const update = async ({ entityIds, type }) => {
 }
 
 module.exports = {
-  update
+  update,
 }

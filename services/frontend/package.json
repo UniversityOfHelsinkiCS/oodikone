@@ -1,0 +1,55 @@
+{
+  "name": "frontend",
+  "private": true,
+  "scripts": {
+    "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build"
+  },
+  "dependencies": {
+    "@sentry/browser": "^6.9.0",
+    "axios": "^0.21.1",
+    "highcharts": "^9.1.2",
+    "highcharts-custom-events": "^3.0.10",
+    "history": "^4.10.1",
+    "jStat": "^1.8.6",
+    "jwt-decode": "^3.1.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "path-to-regexp": "^0.1.7",
+    "piwik-react-router": "^0.12.1",
+    "prop-types": "^15.7.2",
+    "qs": "^6.10.1",
+    "query-string": "^6.14.1",
+    "react": "^16.14.0",
+    "react-context-devtool": "^2.0.3",
+    "react-datetime": "^3.0.4",
+    "react-dom": "^16.14.0",
+    "react-highcharts": "^16.1.0",
+    "react-markdown": "^6.0.2",
+    "react-redux": "^7.2.4",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
+    "react-scroll-to-component": "^1.0.2",
+    "redux": "^4.1.0",
+    "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^2.0.3",
+    "unfuck-spa-shibboleth-session": "^3.1.3",
+    "uuid": "^3.4.0",
+    "xlsx": "^0.17.0"
+  },
+  "proxy": "http://backend:8080",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

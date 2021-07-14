@@ -5,18 +5,18 @@ module.exports = {
     await queryInterface.createTable('studyright_extents', {
       extentcode: {
         type: INTEGER,
-        primaryKey: true
+        primaryKey: true,
       },
       name: {
-        type: JSONB
+        type: JSONB,
       },
       createdAt: {
-        type: DATE
+        type: DATE,
       },
       updatedAt: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }
