@@ -1,13 +1,16 @@
 import * as Sentry from '@sentry/browser'
-import { isProduction, SENTRY_RELEASE, TAG } from '../conf'
-import { BASE_PATH } from '../constants'
+import { SENTRY_RELEASE, SENTRY_ENVIRONMENT } from '../conf'
 
 const initializeSentry = () => {
-  if (!isProduction || BASE_PATH !== '/' || (TAG !== 'staging' && TAG !== 'latest')) return
+
+  console.log("Sentry release", SENTRY_RELEASE)
+  if (!SENTRY_RELEASE || !SENTRY_ENVIRONMENT) return
+
+  console.log("Initializing sentry!")
 
   Sentry.init({
     dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
-    environment: TAG,
+    environment: SENTRY_ENVIRONMENT,
     release: SENTRY_RELEASE,
   })
 }
