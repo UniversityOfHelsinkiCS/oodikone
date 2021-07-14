@@ -12,7 +12,7 @@
     "updater:real": "./run.sh updater real up --detach",
     "both": "docker-compose --profile oodikone --profile updater up --detach",
     "both:real": "./run.sh both real up --detach",
-    "docker:down": "./run.sh both down --remove-orphans",
+    "docker:down": "docker-compose down --remove-orphans",
     "lint:backend": "eslint services/backend",
     "lint:frontend": "concurrently 'eslint --ext .jsx,.js services/frontend' 'stylelint services/frontend/src/**/*.css'",
     "lint:userservice": "eslint services/userservice",
