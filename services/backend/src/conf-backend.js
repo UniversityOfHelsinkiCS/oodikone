@@ -49,7 +49,7 @@ const formatURL = url => {
 
 const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
 
-if (process.env.NODE_ENV === 'dev' && process.env.FEATURES) {
+if (process.env.NODE_ENV === 'development' && process.env.FEATURES) {
   const toggled = process.env.FEATURES.split(',')
   toggled
     .map(toggle => toggle.trim())
@@ -73,7 +73,7 @@ let requiredGroup = ['grp-oodikone-users', 'grp-oodikone-basic-users']
 if (process.env.NODE_ENV === 'staging') {
   requiredGroup = ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
 }
-if (process.env.NODE_ENV === 'dev' || isTest) {
+if (process.env.NODE_ENV === 'development' || isTest) {
   requiredGroup = null
 }
 
