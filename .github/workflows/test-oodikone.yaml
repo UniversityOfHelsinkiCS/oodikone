@@ -20,48 +20,41 @@ jobs:
   lint_backend:
     name: "Lint backend"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/backend/oodikone2-backend
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Install dependencies
+      - name: "Install dependencies"
         run: npm ci
-      - name: Run linter
-        run: npm run lint
+      - name: "Run backend linter"
+        run: npm run lint:backend
+
   lint_frontend:
     name: "Lint frontend"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/oodikone2-frontend
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Install dependencies
+      - name: "Install dependencies"
         run: npm ci
-      - name: Run linter
-        run: npm run lint
+      - name: "Run frontend linter"
+        run: npm run lint:frontend
+
   lint_userservice:
     name: "Lint userservice"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/oodikone2-userservice
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Install dependencies
+      - name: "Install dependencies"
         run: npm ci
-      - name: Run linter
-        run: npm run lint
+      - name: "Run frontend linter"
+        run: npm run lint:userservice
 
   # === Build images ===
 
@@ -70,55 +63,63 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TAG: trunk
-      CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Pull previous build from Docker hub
-        run: ./run.sh oodikone ci pull backend
-      - name: Build image
-        run: ./run.sh oodikone ci build backend
-      - name: Save built image
-        run: docker save toska/oodikone2-backend:trunk -o /tmp/backend.tar
-      - name: Upload image for other jobs
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: "Build image and export it"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-backend:trunk
+          cache-to: type=inline
+          context: services/backend
+          tags: toska/oodikone2-backend:trunk
+          target: production
+          outputs: type=docker,dest=/tmp/backend.tar
+      - name: "Upload image for other jobs"
         uses: actions/upload-artifact@v2
         with:
           path: /tmp/backend.tar
+
   build_frontend:
     name: "Build frontend"
     runs-on: ubuntu-latest
     env:
       TAG: trunk
-      CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Pull previous build from Docker hub
-        run: ./run.sh oodikone ci pull frontend
-      - name: Build image
-        run: ./run.sh oodikone ci build frontend
-      - name: Save built image
-        run: docker save toska/oodikone2-frontend:trunk -o /tmp/frontend.tar
-      - name: Upload image for other jobs
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: "Build image and export it"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-frontend:trunk
+          cache-to: type=inline
+          context: services/frontend
+          tags: toska/oodikone2-frontend:trunk
+          target: production
+          outputs: type=docker,dest=/tmp/frontend.tar
+      - name: "Upload image for other jobs"
         uses: actions/upload-artifact@v2
         with:
           path: /tmp/frontend.tar
+
   build_userservice:
     name: "Build userservice"
     runs-on: ubuntu-latest
     env:
       TAG: trunk
-      CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Pull previous build from Docker hub
-        run: ./run.sh oodikone ci pull userservice
-      - name: Build image
-        run: ./run.sh oodikone ci build userservice
-      - name: Save built image
-        run: docker save toska/oodikone2-userservice:trunk -o /tmp/userservice.tar
-      - name: Upload image for other jobs
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: "Build image and export it"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-userservice:trunk
+          cache-to: type=inline
+          context: services/userservice
+          tags: toska/oodikone2-userservice:trunk
+          target: production
+          outputs: type=docker,dest=/tmp/userservice.tar
+      - name: "Upload image for other jobs"
         uses: actions/upload-artifact@v2
         with:
           path: /tmp/userservice.tar
@@ -131,7 +132,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Run tests included in docker build
-        run: docker-compose -f docker-compose.test.yml up --build userservice-test 
+        run: docker-compose -f docker-compose.test.yml up --build userservice-test
 
   # === End-to-end tests ===
 
