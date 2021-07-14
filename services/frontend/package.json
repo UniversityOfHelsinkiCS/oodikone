@@ -52,11 +52,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://backend:8080",
-  "devDependencies": {
-    "stylelint": "^13.13.1",
-    "stylelint-config-prettier": "^8.0.2",
-    "stylelint-config-standard": "^22.0.0",
-    "stylelint-prettier": "^1.2.0"
-  }
+  "proxy": "http://backend:8080"
 }
