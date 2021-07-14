@@ -7,30 +7,30 @@ Organization.init(
   {
     id: {
       type: STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     code: {
       type: STRING,
       references: {
         table: 'organization',
-        field: 'code'
-      }
+        field: 'code',
+      },
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'organization',
-    tableName: 'organization'
+    tableName: 'organization',
   }
 )
 

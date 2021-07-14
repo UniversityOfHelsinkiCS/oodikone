@@ -72,5 +72,5 @@ module.exports = {
         on delete cascade on update cascade`
     )
   },
-  down: async () => {}
+  down: async () => {},
 }

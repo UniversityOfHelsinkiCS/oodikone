@@ -5,42 +5,42 @@ module.exports = {
     await queryInterface.createTable('course', {
       id: {
         type: STRING,
-        primaryKey: true
+        primaryKey: true,
       },
       name: {
-        type: JSONB
+        type: JSONB,
       },
       code: {
-        type: STRING
+        type: STRING,
       },
       latest_instance_date: {
-        type: DATE
+        type: DATE,
       },
       is_study_module: {
-        type: BOOLEAN
+        type: BOOLEAN,
       },
       coursetypecode: {
-        type: STRING
+        type: STRING,
       },
       startdate: {
-        type: DATE
+        type: DATE,
       },
       enddate: {
-        type: DATE
+        type: DATE,
       },
       max_attainment_date: {
-        type: DATE
+        type: DATE,
       },
       min_attainment_date: {
-        type: DATE
+        type: DATE,
       },
       created_at: {
-        type: DATE
+        type: DATE,
       },
       updated_at: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }
