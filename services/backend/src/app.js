@@ -10,6 +10,8 @@ const { initializeDatabaseConnection } = require('./database/connection')
 const { dbConnections } = require('./databaseV2/connection')
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production'
+const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT || ''
+const SENTRY_RELEASE = process.env.SENTRY_ENVIRONMENT || ''
 
 initializeDatabaseConnection()
   .then(() => {
@@ -25,10 +27,11 @@ initializeDatabaseConnection()
 
     const app = express()
 
-    if (IS_PRODUCTION && ['staging', 'latest'].includes(process.env.TAG)) {
+    if (SENTRY_ENVIRONMENT && SENTRY_RELEASE) {
       Sentry.init({
         dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
-        environment: process.env.TAG,
+        environment: SENTRY_ENVIRONMENT,
+        release: SENTRY_RELEASE,
       })
       app.use(Sentry.Handlers.requestHandler())
     }
