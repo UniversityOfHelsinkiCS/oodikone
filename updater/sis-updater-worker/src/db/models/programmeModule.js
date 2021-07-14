@@ -7,32 +7,32 @@ ProgrammeModule.init(
   {
     id: {
       primaryKey: true,
-      type: STRING
+      type: STRING,
     },
     code: {
-      type: STRING
+      type: STRING,
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     type: {
-      type: STRING
+      type: STRING,
     },
     order: {
-      type: INTEGER
+      type: INTEGER,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'programme_module',
-    tableName: 'programme_modules'
+    tableName: 'programme_modules',
   }
 )
 

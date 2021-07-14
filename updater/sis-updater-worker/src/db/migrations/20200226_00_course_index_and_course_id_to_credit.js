@@ -7,10 +7,10 @@ module.exports = {
       type: STRING,
       references: {
         model: 'course',
-        key: 'id'
-      }
+        key: 'id',
+      },
     })
     await queryInterface.addIndex('course', ['code'])
   },
-  down: async () => {}
+  down: async () => {},
 }

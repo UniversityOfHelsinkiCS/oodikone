@@ -2,14 +2,22 @@ const express = require('express')
 require('express-async-errors')
 const { logger } = require('./utils/logger')
 const { stan } = require('./utils/stan')
-const { scheduleMeta, scheduleStudents, scheduleProgrammes, scheduleByStudentNumbers, scheduleByCourseCodes } = require('./scheduler')
+const {
+  scheduleMeta,
+  scheduleStudents,
+  scheduleProgrammes,
+  scheduleByStudentNumbers,
+  scheduleByCourseCodes,
+} = require('./scheduler')
 const { getStructure } = require('./explorer')
 const { getCourses } = require('./courseParser')
 const { SECRET_TOKEN } = require('./config')
 
-const bakeMessage = res => (message = '', status = 200) => {
-  res.status(status).json({ message })
-}
+const bakeMessage =
+  res =>
+  (message = '', status = 200) => {
+    res.status(status).json({ message })
+  }
 
 const message = (_, res, next) => {
   res.locals.msg = bakeMessage(res)
@@ -50,7 +58,7 @@ app.get('/v1/programmes', async (_, res) => {
 })
 
 app.post('/v1/students', async (req, res) => {
-  const studentnumbers = req.body.studentnumbers.map(n => n[0] === '0' ? n : `0${n}`)
+  const studentnumbers = req.body.studentnumbers.map(n => (n[0] === '0' ? n : `0${n}`))
 
   logger.info(JSON.stringify(studentnumbers))
 
@@ -113,5 +121,5 @@ const startServer = () => {
 }
 
 module.exports = {
-  startServer
+  startServer,
 }

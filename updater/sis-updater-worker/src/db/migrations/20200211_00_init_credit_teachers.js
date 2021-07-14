@@ -5,33 +5,33 @@ module.exports = {
     await queryInterface.createTable('credit_teachers', {
       composite: {
         type: STRING,
-        primaryKey: true
+        primaryKey: true,
       },
       credit_id: {
         type: STRING,
         references: {
           model: 'credit',
-          key: 'id'
+          key: 'id',
         },
         onUpdate: 'cascade',
-        onDelete: 'cascade'
+        onDelete: 'cascade',
       },
       teacher_id: {
         type: STRING,
         references: {
           model: 'teacher',
-          key: 'id'
+          key: 'id',
         },
         onUpdate: 'cascade',
-        onDelete: 'cascade'
+        onDelete: 'cascade',
       },
       createdAt: {
-        type: DATE
+        type: DATE,
       },
       updatedAt: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

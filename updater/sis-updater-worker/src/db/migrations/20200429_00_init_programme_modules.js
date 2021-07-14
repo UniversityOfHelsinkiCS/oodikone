@@ -5,24 +5,24 @@ module.exports = {
     await queryInterface.createTable('programme_modules', {
       id: {
         primaryKey: true,
-        type: STRING
+        type: STRING,
       },
       code: {
-        type: STRING
+        type: STRING,
       },
       name: {
-        type: JSONB
+        type: JSONB,
       },
       type: {
-        type: STRING
+        type: STRING,
       },
       created_at: {
-        type: DATE
+        type: DATE,
       },
       updated_at: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

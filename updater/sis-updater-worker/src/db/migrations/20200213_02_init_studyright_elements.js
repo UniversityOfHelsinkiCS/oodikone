@@ -5,42 +5,42 @@ module.exports = {
     await queryInterface.createTable('studyright_elements', {
       id: {
         type: STRING,
-        primaryKey: true
+        primaryKey: true,
       },
       startdate: {
-        type: DATE
+        type: DATE,
       },
       enddate: {
-        type: DATE
+        type: DATE,
       },
       studyrightid: {
         type: STRING,
         references: {
           model: 'studyright',
-          key: 'studyrightid'
-        }
+          key: 'studyrightid',
+        },
       },
       code: {
         type: STRING,
         references: {
           model: 'element_details',
-          key: 'code'
-        }
+          key: 'code',
+        },
       },
       studentnumber: {
         type: STRING,
         references: {
           model: 'student',
-          key: 'studentnumber'
-        }
+          key: 'studentnumber',
+        },
       },
       createdAt: {
-        type: DATE
+        type: DATE,
       },
       updatedAt: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

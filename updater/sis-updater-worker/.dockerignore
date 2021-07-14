@@ -1,2 +1,4 @@
-node_modules
-debug.log
+.dockerignore
+Dockerfile
+node_modules/
+*.log

@@ -26,14 +26,16 @@ jobs:
         context: updater/sis-updater-scheduler/
         push: true
         tags: toska/sis-updater-scheduler:latest
+        target: production
 
     - name: "Send notification to slack"
-      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
+      uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
       with:
         webhook-url: ${{ secrets.WEBHOOK_URL }}
         message-type: deployment
         softa-url: https://oodikone.cs.helsinki.fi
         deployment-target: production
+        softa-to-deploy: sis-updater-scheduler
 
   report_failure:
     runs-on: ubuntu-latest
@@ -43,8 +45,9 @@ jobs:
     if: failure()
     steps:
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment-failure
           deployment-target: production
+          softa-to-deploy: sis-updater-scheduler

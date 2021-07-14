@@ -7,50 +7,114 @@ on:
     paths:
       - '.github/workflows/release-oodikone-staging.yaml'
       - 'services/**'
-      - 'docker-compose.ci.yml'
 
 jobs:
-  build_and_release:
-    name: "Build images and release"
+
+  build_and_release_backend:
+    name: "Build and release backend"
     runs-on: ubuntu-latest
-    env:
-      TAG: staging
-      CACHE_TAG: staging
     steps:
-      - name: "Checkout repo"
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
       - name: "Login to DockerHub"
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: "Build  images"
-        run: ./run.sh oodikone ci build backend frontend userservice
-      - name: "Start frontend"
-        run: ./run.sh oodikone ci up -d frontend
-      - name: "Add frontend to sentry"
-        run: |
-          docker exec --env SENTRY_URL=${{ secrets.SENTRY_URL }} --env SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} --env SENTRY_ORG=toska --env SENTRY_PROJECT=oodikone frontend \
-            sh +e -c 'npm install sentry-cli && npm run sentry-cli -- releases info "$(cat /SENTRY_RELEASE_VERSION)" && '\
-            'npm run sentry-cli -- releases delete "$(cat /SENTRY_RELEASE_VERSION)" || true'
-          docker exec --env SENTRY_URL=${{ secrets.SENTRY_URL }} --env SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} --env SENTRY_ORG=toska --env SENTRY_PROJECT=oodikone frontend \
-            sh -c 'npm run sentry-cli -- releases new --finalize "$(cat /SENTRY_RELEASE_VERSION)" && '\
-            'npm run sentry-cli -- releases files "$(cat /SENTRY_RELEASE_VERSION)" upload-sourcemaps --rewrite dist'
-      - name: "Push to docker hub"
-        run: ./run.sh oodikone ci push backend frontend userservice
+      - name: "Build and push"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-backend:staging
+          cache-to: type=inline
+          context: services/backend
+          push: true
+          tags: toska/oodikone2-backend:staging
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=staging
+
+  build_and_release_frontend:
+    name: "Build and release frontend"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: "Login to DockerHub"
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "Build and push"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-frontend:staging
+          cache-to: type=inline
+          context: services/frontend
+          push: true
+          tags: toska/oodikone2-frontend:staging
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=staging
+      - name: "Create a container from built image "
+        run: docker create --name frontend toska/oodikone2-frontend:staging
+      - name: "Copy assets from the container"
+        run: docker cp frontend:/usr/src/app/build ./build
+      - name: "Create Sentry release"
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: toska
+          SENTRY_PROJECT: oodikone
+        with:
+          environment: staging
+          set_commits: 'skip'
+          sourcemaps: './build/static/js'
+          url_prefix: '~/oodikone/static/js'
+
+  build_and_release_userservice:
+    name: "Build and release userservice"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: "Login to DockerHub"
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "Build and push"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-userservice:staging
+          cache-to: type=inline
+          context: services/userservice
+          push: true
+          tags: toska/oodikone2-userservice:staging
+
+  report_success:
+    runs-on: ubuntu-latest
+    name: "Report deployment success to oodikone notifications"
+    needs:
+    - build_and_release_backend
+    - build_and_release_frontend
+    - build_and_release_userservice
+    if: success()
+    steps:
       - name: "Send notification to slack"
         uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment
-          softa-url: https://oodikone-staging.cs.helsinki.fi/
+          message-type: deployment-success
           deployment-target: staging
 
   report_failure:
     runs-on: ubuntu-latest
     name: Report deployment failure to oodikone notifications
     needs:
-    - build_and_release
+    - build_and_release_backend
+    - build_and_release_frontend
+    - build_and_release_userservice
     if: failure()
     steps:
       - name: "Send notification to slack"

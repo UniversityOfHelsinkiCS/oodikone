@@ -13,8 +13,8 @@ module.exports = {
       queryInterface.addIndex('studyright_elements', ['code']),
       queryInterface.addIndex('studyright_elements', ['startdate']),
       queryInterface.addIndex('semester_enrollments', ['studentnumber']),
-      queryInterface.addIndex('element_details', ['type'])
+      queryInterface.addIndex('element_details', ['type']),
     ])
   },
-  down: async () => {}
+  down: async () => {},
 }

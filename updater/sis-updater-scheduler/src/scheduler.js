@@ -13,7 +13,7 @@ const {
   REDIS_TOTAL_STUDENTS_KEY,
   REDIS_LAST_HOURLY_SCHEDULE,
   REDIS_LATEST_MESSAGE_RECEIVED,
-  LATEST_MESSAGE_RECEIVED_THRESHOLD
+  LATEST_MESSAGE_RECEIVED_THRESHOLD,
 } = require('./config')
 const { startPrePurge, startPurge } = require('./purge')
 const { logger } = require('./utils/logger')
@@ -30,7 +30,7 @@ const IMPORTER_TABLES = {
   studyrights: 'studyrights',
   termRegistrations: 'term_registrations',
   studyRightPrimalities: 'study_right_primalities',
-  degreeTitles: 'degree_titles'
+  degreeTitles: 'degree_titles',
 }
 
 const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
@@ -53,7 +53,7 @@ const scheduleFromDb = async ({
   scheduleId,
   limit,
   whereIn,
-  clean = true
+  clean = true,
 }) => {
   const { knex } = knexConnection
   const knexBuilder = knex(table)
@@ -74,17 +74,17 @@ const scheduleFromDb = async ({
 const scheduleMeta = async (clean = true) => {
   await scheduleFromDb({
     table: IMPORTER_TABLES.organisations,
-    clean
+    clean,
   })
 
   await scheduleFromDb({
     table: IMPORTER_TABLES.studyLevels,
-    clean
+    clean,
   })
 
   await scheduleFromDb({
     table: IMPORTER_TABLES.educationTypes,
-    clean
+    clean,
   })
 
   const creditTypes = [4, 7, 9, 10]
@@ -95,7 +95,7 @@ const scheduleMeta = async (clean = true) => {
     distinct: 'group_id',
     pluck: 'group_id',
     limit: isDev ? DEV_SCHEDULE_COUNT : null,
-    clean
+    clean,
   })
 
   await scheduleFromDb({
@@ -105,7 +105,7 @@ const scheduleMeta = async (clean = true) => {
     distinct: 'group_id',
     pluck: 'group_id',
     limit: isDev ? DEV_SCHEDULE_COUNT : null,
-    clean
+    clean,
   })
 }
 
@@ -115,7 +115,7 @@ const scheduleStudents = async () => {
     table: IMPORTER_TABLES.persons,
     whereNotNull: 'student_number',
     pluck: 'id',
-    limit: isDev ? DEV_SCHEDULE_COUNT : null
+    limit: isDev ? DEV_SCHEDULE_COUNT : null,
   })
 }
 
@@ -135,13 +135,13 @@ const getHourlyPersonsToUpdate = async () => {
     updatedAttainmentStudents,
     updatedStudyrightStudents,
     updatedTermRegistrationStudents,
-    updatedStudyRightPrimalitiesStudents
+    updatedStudyRightPrimalitiesStudents,
   ] = await Promise.all([
     getUpdatedFrom(IMPORTER_TABLES.persons, 'id').whereNotNull('student_number'),
     getUpdatedFrom(IMPORTER_TABLES.attainments, 'person_id'),
     getUpdatedFrom(IMPORTER_TABLES.studyrights, 'person_id'),
     getUpdatedFrom(IMPORTER_TABLES.termRegistrations, 'student_id'),
-    getUpdatedFrom(IMPORTER_TABLES.studyRightPrimalities, 'student_id')
+    getUpdatedFrom(IMPORTER_TABLES.studyRightPrimalities, 'student_id'),
   ])
 
   return Array.from(
@@ -150,18 +150,20 @@ const getHourlyPersonsToUpdate = async () => {
       ...updatedAttainmentStudents,
       ...updatedStudyrightStudents,
       ...updatedTermRegistrationStudents,
-      ...updatedStudyRightPrimalitiesStudents
+      ...updatedStudyRightPrimalitiesStudents,
     ])
   )
 }
 
 const scheduleByStudentNumbers = async studentNumbers => {
   const { knex } = knexConnection
-  const personsToUpdate = await knex('persons')
-    .column('id', 'student_number')
-    .whereIn('student_number', studentNumbers)
+  const personsToUpdate = await knex('persons').column('id', 'student_number').whereIn('student_number', studentNumbers)
 
-  await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students', SIS_MISC_SCHEDULE_CHANNEL))
+  await eachLimit(
+    chunk(personsToUpdate, CHUNK_SIZE),
+    10,
+    async s => await createJobs(s, 'students', SIS_MISC_SCHEDULE_CHANNEL)
+  )
 }
 
 const scheduleByCourseCodes = async courseCodes => {
@@ -244,5 +246,5 @@ module.exports = {
   schedulePurge,
   scheduleByStudentNumbers,
   scheduleByCourseCodes,
-  isUpdaterActive
+  isUpdaterActive,
 }

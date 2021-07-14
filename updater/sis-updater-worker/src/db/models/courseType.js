@@ -7,23 +7,23 @@ CourseType.init(
   {
     coursetypecode: {
       type: STRING,
-      primaryKey: true
+      primaryKey: true,
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
     sequelize: dbConnections.sequelize,
     modelName: 'course_type',
-    tableName: 'course_types'
+    tableName: 'course_types',
   }
 )
 
