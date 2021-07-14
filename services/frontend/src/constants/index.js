@@ -1,4 +1,5 @@
-import {
+import colors from '../styles/variables'
+const {
   chart1,
   chart2,
   chart3,
@@ -34,16 +35,9 @@ import {
   chart33,
   chart34,
   chart35,
-} from '../styles/variables'
-/*
-lightgreen: '#90EE90',
-  chartblue: '#178aa5',
-  chartdarkg: '#367a1c',
-  chartlgreen: '#80e061',
-  chartdarkred: '#a03530',
-  chartlred: '#e2726d'
-*/
-import { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } from '../styles/variables/colors'
+} = colors 
+
+const { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } = colors
 
 const assumeBasename = () => {
   const POSSIBLE_BASENAMES = ['testing']
