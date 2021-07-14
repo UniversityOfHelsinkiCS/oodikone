@@ -1,13 +1,8 @@
 x-defaults: &defaults
   restart: unless-stopped
 
-x-command_default: &command_default
-  command: ["npm", "run", "dev"]
-
 x-build_defaults: &build_defaults
-  args:
-    NODE_ENV: development
-    TAG: development
+  target: development
 
 services:
 
@@ -24,7 +19,6 @@ services:
 
   backend:
     <<: *defaults
-    <<: *command_default
     build:
       <<: *build_defaults
       context: services/backend
@@ -51,13 +45,13 @@ services:
       - oodikone
     volumes:
       - backend-nodemod:/usr/src/app/node_modules
-      - ./services/backend/oodikone2-backend/:/usr/src/app
+      - ./services/backend/:/usr/src/app
 
   frontend:
     <<: *defaults
     build:
+      <<: *build_defaults
       context: services/frontend
-      target: development
     container_name: frontend
     environment:
       ADMINER_URL: http://localhost:5050/?pgsql=oodi-db&username=postgres
@@ -78,8 +72,6 @@ services:
     <<: *defaults
     container_name: kone-db
     image: registry.toska.cs.helsinki.fi/kone-db
-    ports:
-      - "5425:5432"
     profiles:
       - oodikone
     volumes:
@@ -89,8 +81,6 @@ services:
     <<: *defaults
     container_name: oodi-db
     image: registry.toska.cs.helsinki.fi/oodi-db
-    ports:
-      - "5421:5432"
     profiles:
       - oodikone
     volumes:
@@ -110,8 +100,6 @@ services:
     <<: *defaults
     container_name: sis-db
     image: registry.toska.cs.helsinki.fi/sis-db
-    ports:
-      - "5426:5432"
     volumes:
       - sis-db-data:/data
 
@@ -134,7 +122,6 @@ services:
 
   sis-updater-scheduler:
     <<: *defaults
-    <<: *command_default
     build:
       <<: *build_defaults
       context: updater/sis-updater-scheduler
@@ -153,7 +140,7 @@ services:
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
     ports:
-      - "8082:8082"
+      - 8082:8082
     profiles:
       - updater
     volumes:
@@ -162,7 +149,6 @@ services:
 
   sis-updater-worker:
     <<: *defaults
-    <<: *command_default
     build:
       <<: *build_defaults
       context: updater/sis-updater-worker
@@ -190,8 +176,6 @@ services:
     <<: *defaults
     container_name: user-db
     image: registry.toska.cs.helsinki.fi/user-db
-    ports:
-      - "5422:5432"
     profiles:
       - oodikone
     volumes:
@@ -200,8 +184,8 @@ services:
   userservice:
     <<: *defaults
     build:
+      <<: *build_defaults
       context: services/userservice
-      target: development
     container_name: userservice
     depends_on:
       - user-db
@@ -210,12 +194,12 @@ services:
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       TOKEN_SECRET: IWannaBeTheVeryBest
     ports:
-      - "4567:4567"
+      - 4567:4567
     profiles:
       - oodikone
     volumes:
       - userservice-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-userservice/:/usr/src/app
+      - ./services/userservice/:/usr/src/app
 
 volumes:
   backend-nodemod:
