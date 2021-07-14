@@ -7,7 +7,7 @@ import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import FacultyLevelStatistics from './FacultyLevelStatistics'
-import CourseDiff from './CourseDiff'
+// import CourseDiff from './CourseDiff'
 import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
@@ -42,7 +42,7 @@ const CourseStatistics = props => {
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [selected, setSelected] = useState(initCourseCode)
-  const [showDiff, setShowDiff] = useState(false)
+  // const [showDiff, setShowDiff] = useState(false)
   const { onProgress, progress } = useProgress(loading)
   useTitle('Course statistics')
 
@@ -129,11 +129,12 @@ const CourseStatistics = props => {
 
   const getContent = () => {
     if ((statsIsEmpty && diffIsEmpty) || history.location.search === '') {
-      return <SearchForm onProgress={onProgress} showDiff={showDiff} setShowDiff={setShowDiff} />
+      return <SearchForm onProgress={onProgress} /* showDiff={showDiff} setShowDiff={setShowDiff} */ />
     }
-    if (showDiff) {
+
+    /* if (showDiff) {
       return <CourseDiff />
-    }
+    } */
     return (
       <Tab
         menu={{ attached: false, borderless: false }}
