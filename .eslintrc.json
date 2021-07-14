@@ -8,7 +8,15 @@
   "parserOptions": {
     "requireConfigFile": false
   },
-  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "plugin:cypress/recommended"
+  ],
+  "plugins": [
+    "prettier",
+    "cypress"
+  ],
   "rules": {
     "no-console": 0,
     "prettier/prettier": "error"
