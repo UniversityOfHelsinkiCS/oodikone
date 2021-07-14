@@ -35,7 +35,7 @@ jobs:
         message-type: deployment
         softa-url: https://oodikone.cs.helsinki.fi
         deployment-target: production
-        softa-to-deloy: sis-updater-scheduler
+        softa-to-deploy: sis-updater-scheduler
 
   report_failure:
     runs-on: ubuntu-latest
@@ -50,4 +50,4 @@ jobs:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment-failure
           deployment-target: production
-          softa-to-deloy: sis-updater-scheduler
+          softa-to-deploy: sis-updater-scheduler
