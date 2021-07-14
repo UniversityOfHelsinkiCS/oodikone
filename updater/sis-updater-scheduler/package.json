@@ -1,16 +1,9 @@
 {
   "name": "sis-updater-scheduler",
-  "version": "1.0.0",
-  "description": "",
-  "main": "./src/index.js",
+  "private": true,
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "nodemon ./src/index.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "nodemon": "^2.0.2"
   },
   "dependencies": {
     "async": "^3.1.1",
@@ -27,5 +20,8 @@
     "redis": "^3.1.1",
     "winston": "^3.2.1",
     "winston-log2gelf": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
