@@ -1,14 +1,6 @@
 {
-  "name": "oodikone-backend",
-  "version": "0.0.1",
-  "description": "Backend for Oodikone",
-  "main": "index.js",
-  "jest": {
-    "setupFilesAfterEnv": [
-      "./test/jest/globals.js"
-    ],
-    "testEnvironment": "node"
-  },
+  "name": "backend",
+  "private": true,
   "scripts": {
     "start": "node --max_old_space_size=4096 index.js",
     "dev": "nodemon --max_old_space_size=4096 index.js",
@@ -18,8 +10,6 @@
     "diff:transfers": "node /usr/src/app/src/sisoodi_diff/transfers.js",
     "diff:trends": "node /usr/src/app/src/sisoodi_diff/trends.js"
   },
-  "author": "Matti Luukkainen",
-  "license": "MIT",
   "dependencies": {
     "@sentry/node": "^5.30.0",
     "async": "^3.2.0",
@@ -58,6 +48,12 @@
     "nodemon": "^1.19.4",
     "nyc": "^13.3.0",
     "supertest": "^3.4.2"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./test/jest/globals.js"
+    ],
+    "testEnvironment": "node"
   },
   "ava": {
     "files": [

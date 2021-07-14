@@ -1,6 +1,10 @@
 {
   "name": "frontend",
   "private": true,
+  "scripts": {
+    "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build"
+  },
   "dependencies": {
     "@sentry/browser": "^6.9.0",
     "axios": "^0.21.1",
@@ -35,10 +39,7 @@
     "uuid": "^3.4.0",
     "xlsx": "^0.17.0"
   },
-  "scripts": {
-    "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
-    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build"
-  },
+  "proxy": "http://backend:8080",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -50,6 +51,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "http://backend:8080"
+  }
 }
