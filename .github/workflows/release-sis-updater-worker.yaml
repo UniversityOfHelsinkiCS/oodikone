@@ -26,6 +26,7 @@ jobs:
         context: updater/sis-updater-worker/
         push: true
         tags: toska/sis-updater-worker:latest
+        target: production
 
     - name: "Send notification to slack"
       uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
