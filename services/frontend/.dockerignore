@@ -1,4 +1,5 @@
 .dockerignore
+.eslintrc.json
 .gitignore
 Dockerfile
 build/
