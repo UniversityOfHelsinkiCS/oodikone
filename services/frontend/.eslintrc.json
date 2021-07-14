@@ -7,7 +7,10 @@
   "parserOptions": {
     "requireConfigFile": false
   },
-  "extends": ["airbnb", "plugin:prettier/recommended"],
+  "extends": [
+    "airbnb",
+    "plugin:prettier/recommended"
+  ],
   "rules": {
     "no-param-reassign": [
       2,
@@ -33,7 +36,14 @@
     "no-shadow": 0,
     "react-hooks/rules-of-hooks": "error",
     "prettier/prettier": "error",
-    "react/jsx-props-no-spreading": 0
+    "react/jsx-props-no-spreading": 0,
+    "react/jsx-filename-extension": 0
   },
-  "plugins": ["react", "import", "prefer-object-spread", "babel", "react-hooks"]
+  "plugins": [
+    "react",
+    "import",
+    "prefer-object-spread",
+    "babel",
+    "react-hooks"
+  ]
 }
