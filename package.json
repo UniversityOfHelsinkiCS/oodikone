@@ -38,7 +38,11 @@
     "services/**/*.{js,jsx,json}": "eslint",
     "updater/**/*.{js,jsx,json}": "eslint",
     ".github/workflows/*": "actionlint",
-    "**/*/Dockerfile": "hadolint"
+    "**/*/Dockerfile": "hadolint",
+    "docker-compose.yml": "docker-compose config -q",
+    "docker-compose.real.yml": "docker-compose -f docker-compose.yml -f docker-compose.real.yml config -q",
+    "docker-compose.ci.yml": "docker-compose -f docker-compose.ci.yml config -q",
+    "docker-compose.test.yml": "docker-compose -f docker-compose.test.yml config -q"
   },
   "repository": {
     "type": "git",
