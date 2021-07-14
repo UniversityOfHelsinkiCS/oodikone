@@ -325,7 +325,7 @@ SearchForm.propTypes = {
   location: shape({}).isRequired,
   unifyOpenUniCourses: bool.isRequired,
   toggleUnifyOpenUniCourses: func.isRequired,
-  onProgress: func
+  onProgress: func,
 }
 
 const mapStateToProps = state => {
@@ -346,6 +346,6 @@ export default withRouter(
     clearCourses,
     findCoursesV2,
     clearCourseStats,
-    toggleUnifyOpenUniCourses
+    toggleUnifyOpenUniCourses,
   })(SearchForm)
 )

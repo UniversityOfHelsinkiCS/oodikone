@@ -15,7 +15,7 @@ export default () => {
     female: { label: 'Female', value: 2 },
     male: { label: 'Male', value: 1 },
     other: { label: 'Other', value: 3 },
-    unknown: { label: 'Unknown', value: 0 }
+    unknown: { label: 'Unknown', value: 0 },
   }
 
   useEffect(() => {
