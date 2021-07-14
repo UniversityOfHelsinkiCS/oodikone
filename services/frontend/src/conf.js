@@ -8,5 +8,5 @@ module.exports = {
   isProduction,
   isDev,
   SENTRY_RELEASE,
-  SENTRY_ENVIRONMENT
+  SENTRY_ENVIRONMENT,
 }
