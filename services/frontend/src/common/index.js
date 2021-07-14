@@ -136,6 +136,7 @@ export const cancelablePromise = promise => {
   let hasCanceled = false
 
   const wrappedPromise = new Promise(async (res, rej) => {
+    // eslint-disable-line no-async-promise-executor
     try {
       await promise
       if (hasCanceled) res(false)

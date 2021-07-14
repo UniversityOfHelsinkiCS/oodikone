@@ -37,7 +37,13 @@
     "react-hooks/rules-of-hooks": "error",
     "prettier/prettier": "error",
     "react/jsx-props-no-spreading": 0,
-    "react/jsx-filename-extension": 0
+    "react/jsx-filename-extension": 0,
+    "no-async-promise-executor": 0,
+    "no-implied-eval": 0,
+    "react/state-in-constructor": 0,
+    "react/static-property-placement": 0,
+    "react/no-deprecated": 0,
+    "react/no-unescaped-entities": 0
   },
   "plugins": [
     "react",
