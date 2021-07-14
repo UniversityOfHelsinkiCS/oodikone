@@ -18,8 +18,8 @@
     "cypress"
   ],
   "rules": {
-    "no-console": 0,
-    "prettier/prettier": "error",
-    "react/no-unescaped-entities": 0,
+    "no-console": "off",
+    "react/no-unescaped-entities": "off",
+    "prettier/prettier": "error"
   }
 }
