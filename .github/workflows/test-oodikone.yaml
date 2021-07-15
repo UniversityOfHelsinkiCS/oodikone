@@ -70,9 +70,13 @@ jobs:
       - name: "Build image and export it"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-backend:trunk
+          cache-from: |
+            type=registry,ref=toska/oodikone2-backend:trunk
+            type=registry,ref=toska/oodikone2-backend:staging
+            type=registry,ref=toska/oodikone2-backend:latest
           cache-to: type=inline
           context: services/backend
+          push: false
           tags: toska/oodikone2-backend:trunk
           target: production
           outputs: type=docker,dest=/tmp/backend.tar
@@ -92,9 +96,13 @@ jobs:
       - name: "Build image and export it"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-frontend:trunk
+          cache-from: |
+            type=registry,ref=toska/oodikone2-frontend:trunk
+            type=registry,ref=toska/oodikone2-frontend:staging
+            type=registry,ref=toska/oodikone2-frontend:latest
           cache-to: type=inline
           context: services/frontend
+          push: false
           tags: toska/oodikone2-frontend:trunk
           target: production
           outputs: type=docker,dest=/tmp/frontend.tar
@@ -114,9 +122,13 @@ jobs:
       - name: "Build image and export it"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-userservice:trunk
+          cache-from: |
+            type=registry,ref=toska/oodikone2-userservice:trunk
+            type=registry,ref=toska/oodikone2-userservice:staging
+            type=registry,ref=toska/oodikone2-userservice:latest
           cache-to: type=inline
           context: services/userservice
+          push: false
           tags: toska/oodikone2-userservice:trunk
           target: production
           outputs: type=docker,dest=/tmp/userservice.tar
@@ -591,7 +603,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: test-failure
