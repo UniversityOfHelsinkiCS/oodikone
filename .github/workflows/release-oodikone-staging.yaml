@@ -118,6 +118,7 @@ jobs:
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment
+          softa-url: https://oodikone-staging.cs.helsinki.fi/
           deployment-target: staging
 
   report_failure:

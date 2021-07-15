@@ -125,6 +125,7 @@ jobs:
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment
+          softa-url: https://oodikone.cs.helsinki.fi/
           deployment-target: production
 
   report_failure:
