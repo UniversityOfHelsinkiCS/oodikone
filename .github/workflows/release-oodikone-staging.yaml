@@ -1,4 +1,4 @@
-name: Release oodikone to staging
+name: "Release oodikone to staging"
 
 on:
   push:
@@ -24,14 +24,18 @@ jobs:
       - name: "Build and push"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-backend:staging
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=staging
+          cache-from: |
+            type=registry,ref=toska/oodikone2-backend:trunk
+            type=registry,ref=toska/oodikone2-backend:staging
+            type=registry,ref=toska/oodikone2-backend:latest
           cache-to: type=inline
           context: services/backend
           push: true
           tags: toska/oodikone2-backend:staging
-          build-args: |
-            SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_ENVIRONMENT=staging
+          target: production
 
   build_and_release_frontend:
     name: "Build and release frontend"
@@ -47,14 +51,18 @@ jobs:
       - name: "Build and push"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-frontend:staging
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=staging
+          cache-from: |
+            type=registry,ref=toska/oodikone2-frontend:trunk
+            type=registry,ref=toska/oodikone2-frontend:staging
+            type=registry,ref=toska/oodikone2-frontend:latest
           cache-to: type=inline
           context: services/frontend
           push: true
           tags: toska/oodikone2-frontend:staging
-          build-args: |
-            SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_ENVIRONMENT=staging
+          target: production
       - name: "Create a container from built image "
         run: docker create --name frontend toska/oodikone2-frontend:staging
       - name: "Copy assets from the container"
@@ -86,11 +94,15 @@ jobs:
       - name: "Build and push"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-userservice:staging
+          cache-from: |
+            type=registry,ref=toska/oodikone2-userservice:trunk
+            type=registry,ref=toska/oodikone2-userservice:staging
+            type=registry,ref=toska/oodikone2-userservice:latest
           cache-to: type=inline
           context: services/userservice
           push: true
           tags: toska/oodikone2-userservice:staging
+          target: production
 
   report_success:
     runs-on: ubuntu-latest
@@ -102,15 +114,15 @@ jobs:
     if: success()
     steps:
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment-success
+          message-type: deployment
           deployment-target: staging
 
   report_failure:
     runs-on: ubuntu-latest
-    name: Report deployment failure to oodikone notifications
+    name: "Report deployment failure to oodikone notifications"
     needs:
     - build_and_release_backend
     - build_and_release_frontend
@@ -118,7 +130,7 @@ jobs:
     if: failure()
     steps:
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment-failure
