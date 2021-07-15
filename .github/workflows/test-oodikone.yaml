@@ -12,7 +12,6 @@ on:
       - docker-compose.ci.yml
       - nginx.conf
       - package*.json
-      - run.sh
 
 jobs:
   # === Static tests / linting ===
@@ -167,7 +166,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -211,7 +210,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -255,7 +254,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -299,7 +298,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -343,7 +342,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -387,7 +386,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -431,7 +430,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -475,7 +474,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -524,7 +523,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Check that exit statuses are not errors
         run: |
           docker ps -a
@@ -568,10 +567,10 @@ jobs:
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}docker-compose -f docker-compose.ci.yml logs
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: "Push to docker hub"
-        run: ./run.sh oodikone ci push
+        run: docker-compose -f docker-compose.ci.yml push
 
   report_failure:
     runs-on: ubuntu-latest
@@ -599,4 +598,4 @@ jobs:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: test-failure
       - name: "Print logs on failure"
-        run: ./run.sh oodikone ci logs
+        run: docker-compose -f docker-compose.ci.yml logs
