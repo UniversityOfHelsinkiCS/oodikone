@@ -2,20 +2,20 @@
 
 An application for analyzing university data, running at [https://oodikone.cs.helsinki.fi/](https://oodikone.cs.helsinki.fi/).
 
-## Requirements
+## ✔️ Requirements
 
 To run Oodikone locally, you will need the following:
 
 1. Applications:
 
-- [Docker](https://docs.docker.com/install/) (at least version 20),
-- [Docker Compose](https://docs.docker.com/compose/install/)(at least version 0.29) and
-- [npm](https://docs.npmjs.com/cli/v7) (at least version 7)
+- [Docker](https://docs.docker.com/install/) (version 20.10+),
+- [Docker Compose](https://docs.docker.com/compose/install/)(version 0.29+) and
+- [npm](https://docs.npmjs.com/cli/v7) (version 7+)
 
 2. Access to Toska Docker Hub, see Toska Gitlab for more information on how to login
 3. (Optional) For real data setup, access to Toskas production servers.
 
-## Installation
+## 🚀 Installation
 
 Launch the CLI and follow the instructions:
 
@@ -25,178 +25,77 @@ npm run cli
 
 _Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary_ 😊
 
-The acual oodikone can be accessed at [http://localhost:8081/](http://localhost:8081/) and Adminer at [http://localhost:5050/](http://localhost:5050/?pgsql=db&username=postgres). Adminer requires you to login with username `postgres` and password `postgres`.
+What different CLI options do:
 
-### Populate Redis on Fresh Install
+1. Set up oodikone from scratch:
 
-On a fresh install some features do not work because the redis store is empty. To populate redis, navigate to [http://localhost:8081/updater](http://localhost:8081/updater), and click _Refresh Statistics_.
+- Cleans up any previous installations
+- Installs all needed npm packages locally
+- Sets up pre-commit linting hooks.
+- Pulls and builds all needed Docker images and sets up dockerized development environment
+- **Note:** Running this option cleans up all real data too, so please don't run option 2 before this.
 
-### What the CLI does
+2. Reset all real data:
 
-- Builds and runs the Dockerized development environment.
-- Downloads a database dump from the production servers.
-- Creates the database schema and populates it with the downloaded dump.
-- Adds git-hooks to run linting on push. (Use `git push --no-verify` to circumvent this behavior.)
+- Cleans up any previous real data databases
+- Downloads needed database dumps from production servers.
+- Creates real data databases and populates them with downloaded dumps.
 
-### Daily Refresh
+3. Reset sis-importer data
 
-It is recommended to run the "morning script" daily when starting work. It prunes Docker, refreshes the repository and rebuilds the containers before starting Oodikone again.
+- Like option 2, but only for sis-importer database. Useful when developing updater microservice.
 
-```bash
-./oodikone.sh -m
-```
+4. Reset old oodi data:
 
-## Development Environment
+- Like option 2, but for old oodi data, which is not refreshed anymore. Is only needed when setting up real databases after running option 1.
 
-The development environment is entirely configured in the docker-compose.yml file located in this repository. The file defines the containers/environments for:
+## ⌨️ Development
 
-- Frontend
-- Backend
-- Userservice
-- The databases used by the services
-- Adminer & other dev tools
+### Basics
 
-The mapping of ports and environment variables are also defined in the docker-compose file. You can start, stop and manage the development environment by running the following commands from a terminal shell in this directory.
+The development environment is entirely configured in the `docker-compose.yml` file located in this repository. The file defines the services for oodikone's two main components: **oodikone** and **updater**.
 
-### Start the development environment
+Running oodikone with real data requires separated databases and redis, which are defined in `docker-compose.real.yml` file. Otherwise real data development environment uses the configuration as anonymized data development environment.
 
-With anonymized data:
+Some useful commands are predefined in `package.json` and can be run with `npm run <command>` as follows:
 
-```bash
-npm start
-```
+- `npm run oodikone`: starts oodikone with anonymized data
+- `npm run oodikone:real`: starts oodikone with real data
+- `npm run updater`: starts updater with anonymized data
+- `npm run updater:real`: starts oodikone with real data
+- `npm run both`: starts oodikone and updater with anonymized data
+- `npm run both:real`: starts oodikone and updater with real data
+- `npm run docker:down`: stops the whole environment
 
-With real data:
+If you're first timer, just run `npm run oodikone` after setting up oodikone according to [installation](#installation). After starting and waiting for a while for containers to compile, oodikone can be accessed at [http://localhost:3000/](http://localhost:3000/) and Adminer (database investigation tool) at [http://localhost:5050/](http://localhost:5050/). Adminer requires you to login with username `postgres` and with any password you choose (for example `p`).
 
-```bash
-npm run start:real
-```
+### Anon / real data users
 
-### Stop the development environment
+Some notes about mluukkai / tkl user here.
 
-```bash
-npm run docker:down
-```
+### Run.sh script
 
-### Restart container(s)
+As said, the development environment runs entirely inside docker containers. To keep `package.json` clean and not filled with predefined scripts, we have created a simple helper script called `./run.sh`. The script allows you to use docker-compose commands without the need to write long list of parameters. Try to run `./run.sh` in the root of the project and see what happens!
 
-All:
+`./run.sh` is simply a wrapper script to run oodikone, updater or both services in either anon or real mode. If you take a look at `package.json`, you can see that most of the predefined scripts above use `./run.sh` under the hood.
 
-```bash
-npm run docker:restart
-```
+It is recommended to spend some time to become familiar with `docker` and `docker-compose` cli commands. You can then use them directly or with `./run.sh` wrapper. Here is some examples for day-to-day development situations:
 
-Only backend:
+- `./run.sh oodikone anon pull`: Pull all images related to oodikone development
+- `./run.sh updater real up --build --force-recreate --detach`: Start updater detached (=in the background) in real data mode, but build new images before starting
+- `docker-compose ps`: view the containers in the running environment
+- `docker-compose logs frontend`: print logs for just frontend
+- `docker-compose logs --follow --tail 100 backend`: print last hundred rows of backend logs and begin to follow them in your terminal window
+- `docker exec -it userservice sh`: open bash terminal inside userservice container
+- `docker exec -it sis-db psql -U postgres sis-db-real`: open psql client to investigate sis real data database.
 
-```bash
-npm run docker:restart:backend
-```
+### Linting and tests
 
-Only frontend:
-
-```bash
-npm run docker:restart:frontend
-```
-
-### View the containers in the running environment
-
-```bash
-docker-compose ps
-```
-
-### View logs
-
-All:
-
-```bash
-npm run docker:logs
-```
-
-Only backend:
-
-```bash
-npm run docker:logs:backend
-```
-
-Only frontend:
-
-```bash
-npm run docker:logs:frontend
-```
-
-### Attach a terminal shell to a container
-
-```bash
-docker exec -it <container> <command>
-```
-
-For example:
-
-```bash
-docker exec -it backend bash
-```
-
-### Use `psql` or other database CLI tools
-
-```bash
-docker exec -it -u <username> <container> psql -d <db name>
-```
-
-For example:
-
-```bash
-docker exec -it -u postgres oodi_db psql -d tkt_oodi
-```
-
-## Testing
-
-Testing is implemented as a combination of unit tests (jest) and end-to-end tests (Cypress). Oodikone must be using the anonymous dataset when running tests (see [Installation](#Installation)).
+Linting and other stuff here
 
 The test suite is run in CI on every push to `trunk`. Take advantage of this as running the tests can take upwards of 15 minutes.
 
-**Note:** All containers must be up and ready before running tests. (Use `npm start`).
-
-### Run All Tests
-
-```bash
-npm test
-```
-
-### Run End-to-End Tests
-
-```bash
-npm run cypress:run
-```
-
-## Open Cypress GUI
-
-```bash
-npm run cypress:open
-```
-
-## How to Updater
-
-Before running updater you must run `importer-db` setup via the CLI (see [Installation](#Installation)).
-
-If you want to use the control panel UI, first start Oodikone in real data mode:
-
-```bash
-npm run docker:up:real
-```
-
-Followed by acual updater:
-
-```bash
-npm run updater:dev:up
-```
-
-When you are done, close hanging containers with:
-
-```bash
-npm run updater:dev:down
-```
-
-### updater scheduler
+### Updater stuff
 
 Stop with HTTP GET
 
@@ -220,50 +119,18 @@ body
 }
 ```
 
-## Other commands
+## 📖 Documentation
 
-### How to `scp` backup files from oodikone via melkki-proxy
+Testing + CI docs link here.
 
-This is how the setup script fetches the database dump from production servers. It will require you to have access to both melkki.cs.helsinki.fi as well as oodikone.cs.helsinki.fi. The command uses `scp` to transfer all backup files recursively from a known location on the production server by using the melkki server as a proxy, allowing you to get the dump even if you are not in the university network.
+##❓FAQ
 
-#### Command
+### Modules are missing after updating package.json
 
-```bash
-scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/* ./backups/
+You should always install the dependencies **inside** the container to have the application **inside** the container access them. This might be the case when someone else installs a new library and you only pull the changes in package.json. Use `docker exec -it <service> sh` to get inside the container and run `npm ci` to install modules.
 
--r : recursively copy files
--o : options for defining the proxy command
-```
+### Everything is broken, can't get oodikone running, data is not there etc.
 
-#### [Unix StackExchange answer](https://unix.stackexchange.com/questions/355640/how-to-scp-via-an-intermediate-machine)
+Just do clean install by launching cli with `npm cli` and running option 1: _Set up oodikone from scratch_.
 
-> It's possible and relatively easy, even when you need to use certificates > for authentication (typical in AWS environments).
->
-> The command below will copy files from a remotePath on server2 directly > into your machine at localPath. Internally the scp request is proxied via > server1.
->
-> ```bash
-> scp -i user2-cert.pem -o ProxyCommand="ssh -i user1-cert.pem -W %h:%p > user1@server1" user2@server2:/<remotePath> <localpath>
-> ```
->
-> If you use password authentication instead, try with:
->
-> ```bash
-> scp -o ProxyCommand="ssh -W %h:%p user1@server1" > user2@server2:/<remotePath> <localpath>
-> ```
->
-> If you use the same user credentials in both servers:
->
-> ```bash
-> scp -o ProxyCommand="ssh -W %h:%p commonuser@server1" > commonuser@server2:/<remotePath> <localpath>
-> ```
-
-## Known situations and ways to handle them
-
-- Problem: Oodikone doesn't start and database container (e.g. db_sis) logs include the line "can't open '/docker-entrypoint-initdb.d/'
-  - Possible reason: You probably have too restricting read rights in `scripts/docker-entrypoint-initdb.d` -folder. This could be for example caused by fairly strict `umask` setting, such as `077` in your OS.
-  - Possible solution: Either change the umask on whole OS (to `022` for example) or set the correct read rights for docker-entrypoint -folder by running `chmod 755 scripts/docker-entrypoint-initdb.d`
-- Problem: Packages aren't updated in development containers after update in package.json, even after rebuilding containers and images
-  - Possible reason: `node_modules` folder is binded to external docker volume (i.e not to disk) in our development environment. These volumes aren't updated unless explicitly told so.
-  - Possible solution: Either:
-    a) update packages inside the failing container by first logging to container `docker exec -it container_name sh` and then running `npm install`
-    b) remove volume that contains failing containers `node_modules` by stopping and removing the failing container followed by `docker volume prune`.
+## Maintainers and contribution
