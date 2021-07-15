@@ -46,10 +46,11 @@ const PopulationSearchForm = props => {
     isLoading: false,
     momentYear: Datetime.moment('2017-01-01'),
   })
-  const [didMount, setDidMount] = useState(false)
+  // const [didMount, setDidMount] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
 
   const fetchPopulationPromises = useRef()
+  const isMounted = useRef(true)
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
 
@@ -117,7 +118,7 @@ const PopulationSearchForm = props => {
       ])
     )
     const success = await fetchPopulationPromises.current.promise
-    if (success) {
+    if (success && isMounted.current) {
       setState({
         isLoading: false,
       })
@@ -127,24 +128,32 @@ const PopulationSearchForm = props => {
   const fetchPopulationFromUrlParams = () => {
     const previousQuery = queries
     const query = parseQueryFromUrl()
-    if (!checkPreviousQuery(query, previousQuery)) {
+    const formattedQuery = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
+    if (!checkPreviousQuery(formattedQuery, previousQuery)) {
       setState({ query })
       fetchPopulation(query)
     }
   }
 
   useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+
+  useEffect(() => {
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
-      setState({ query: initialQuery() }) // eslint-disable-line
+      setState({ query: initialQuery() })
       props.getDegreesAndProgrammes()
     }
     if (!semesters.years) {
       props.getSemesters()
     }
     if (location.search) {
+      console.log('location search: ', location.search)
       fetchPopulationFromUrlParams()
     }
-    if (!location.search) {
+    if (!location.search && isMounted.current) {
       setState({
         query: {
           ...query,
@@ -154,7 +163,7 @@ const PopulationSearchForm = props => {
         },
       })
     }
-    setDidMount(true)
+    // setDidMount(true)
     return () => {
       if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
     }
@@ -190,7 +199,12 @@ const PopulationSearchForm = props => {
   }
 
   useEffect(() => {
-    if (studyProgrammes && Object.values(studyProgrammes).length === 1 && !query.studyRights.programme && didMount) {
+    if (
+      studyProgrammes &&
+      Object.values(studyProgrammes).length === 1 &&
+      !query.studyRights.programme &&
+      isMounted.current
+    ) {
       handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
     }
   })
@@ -523,7 +537,7 @@ const PopulationSearchForm = props => {
 
   const renderStudyGroupSelector = () => {
     const { studyRights } = query
-    if (props.pending || !didMount) {
+    if (props.pending) {
       return <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
     }
     if (Object.values(studyProgrammes).length === 0 && !props.pending) {
