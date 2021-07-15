@@ -24,7 +24,10 @@ jobs:
       - name: "Build and push"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-backend:staging
+          cache-from: |
+            type=registry,ref=toska/oodikone2-backend:trunk
+            type=registry,ref=toska/oodikone2-backend:staging
+            type=registry,ref=toska/oodikone2-backend:latest
           cache-to: type=inline
           context: services/backend
           push: true
@@ -47,7 +50,10 @@ jobs:
       - name: "Build and push"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-frontend:staging
+          cache-from: |
+            type=registry,ref=toska/oodikone2-frontend:trunk
+            type=registry,ref=toska/oodikone2-frontend:staging
+            type=registry,ref=toska/oodikone2-frontend:latest
           cache-to: type=inline
           context: services/frontend
           push: true
@@ -86,7 +92,10 @@ jobs:
       - name: "Build and push"
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=toska/oodikone2-userservice:staging
+          cache-from: |
+            type=registry,ref=toska/oodikone2-userservice:trunk
+            type=registry,ref=toska/oodikone2-userservice:staging
+            type=registry,ref=toska/oodikone2-userservice:latest
           cache-to: type=inline
           context: services/userservice
           push: true
@@ -102,10 +111,10 @@ jobs:
     if: success()
     steps:
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
-          message-type: deployment-success
+          message-type: deployment
           deployment-target: staging
 
   report_failure:
@@ -118,7 +127,7 @@ jobs:
     if: failure()
     steps:
       - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment-failure

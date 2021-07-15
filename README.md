@@ -1,18 +1,19 @@
-# oodikone
+# Oodikone
 
-[![CircleCI](https://circleci.com/gh/UniversityOfHelsinkiCS/oodikone/tree/master.svg?style=svg)](https://app.circleci.com/pipelines/github/UniversityOfHelsinkiCS/oodikone)
-
-An application for analyzing university data. The entire development environment runs in a Docker network that's defined in the `docker-compose.yml` file. The specifics of what this means for setting up the environment and accessing logs is discussed in a later section.
+An application for analyzing university data, running at [https://oodikone.cs.helsinki.fi/](https://oodikone.cs.helsinki.fi/).
 
 ## Requirements
 
 To run Oodikone locally, you will need the following:
 
-1. [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) running on your system.
-2. Membership of [Toska's GitHub organisation](https://github.com/UniversityOfHelsinkiCS).
-3. SSH key set up for GitHub (see [docs](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh)).
-4. Local clone of this repository.
-5. Run the CLI (see [Installation](#Installation))
+1. Applications:
+
+- [Docker](https://docs.docker.com/install/) (at least version 20),
+- [Docker Compose](https://docs.docker.com/compose/install/)(at least version 0.29) and
+- [npm](https://docs.npmjs.com/cli/v7) (at least version 7)
+
+2. Access to Toska Docker Hub, see Toska Gitlab for more information on how to login
+3. (Optional) For real data setup, access to Toskas production servers.
 
 ## Installation
 
@@ -22,13 +23,13 @@ Launch the CLI and follow the instructions:
 npm run cli
 ```
 
-*Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary* 😊
+_Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary_ 😊
 
 The acual oodikone can be accessed at [http://localhost:8081/](http://localhost:8081/) and Adminer at [http://localhost:5050/](http://localhost:5050/?pgsql=db&username=postgres). Adminer requires you to login with username `postgres` and password `postgres`.
 
 ### Populate Redis on Fresh Install
 
-On a fresh install some features do not work because the redis store is empty. To populate redis, navigate to [http://localhost:8081/updater](http://localhost:8081/updater), and click *Refresh Statistics*.
+On a fresh install some features do not work because the redis store is empty. To populate redis, navigate to [http://localhost:8081/updater](http://localhost:8081/updater), and click _Refresh Statistics_.
 
 ### What the CLI does
 
@@ -212,10 +213,10 @@ http://localhost:8082/v1/students?token=dev
 body
 
 ```bash
-{ 
+{
     "studentnumbers": [
         "014598456"
-    ] 
+    ]
 }
 ```
 
@@ -255,7 +256,6 @@ scp -r -o ProxyCommand="ssh -W %h:%p melkki.cs.helsinki.fi" oodikone.cs.helsinki
 > ```bash
 > scp -o ProxyCommand="ssh -W %h:%p commonuser@server1" > commonuser@server2:/<remotePath> <localpath>
 > ```
->
 
 ## Known situations and ways to handle them
 
