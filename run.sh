@@ -13,7 +13,7 @@ set -euoE pipefail
 # Set up constants
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
-# Set up logging
+# Set up messages and exiting
 source "$PROJECT_ROOT"/scripts/utils.sh
 
 usage() {
@@ -21,8 +21,8 @@ usage() {
 Usage: $(basename "${BASH_SOURCE[0]}") option [version] command --flag
 
 Parameters:
-* Option: oodikone/updater/both/morning
-* Version: anon/real/ci. Not necessary in all cases, such as when running down or logs.
+* Option: oodikone/updater/both
+* Version: anon/real. Not necessary in all cases, such as when running down or logs.
 * Command: will be passed to docker-compose.
 EOF
 }
@@ -34,12 +34,9 @@ parse_params() {
   [[ ${#args[@]} -eq 0 ]] && usage && die "Wrong number of arguments"
   option=${args[0]}
 
-  # If option is morning, other parameters aren't needed
-  [[ "$option" == "morning" ]] && return 0
-
-  # Else, parse arguments
+  #  parse arguments
   [[ ("$option" != "oodikone" && "$option" != "updater" && "$option" != "both") ]] && \
-  usage && die "Wrong option: $option"
+    usage && die "Wrong option: $option"
 
   [[ ${#args[@]} -eq 1 ]] && usage && die "Wrong number of arguments"
 
@@ -50,8 +47,8 @@ parse_params() {
     compose_command=${args[*]:1}
   else
     version=${args[1]}
-    [[ "$version" != "anon" && "$version" != "real" && "$version" != "ci" ]] && \
-usage && die "Wrong version $version"
+    [[ "$version" != "anon" && "$version" != "real" ]] && usage && \
+      die "Wrong version $version"
     compose_command=${args[*]:2}
   fi
   return 0
@@ -72,10 +69,7 @@ parse_profiles() {
 parse_env() {
   env=""
   if [[ "$version" == "real" ]]; then
-    env="-f docker-compose.yml -f docker-compose.real.yml"
-  elif [[ "$version" == "ci" ]]; then
-    env="-f docker-compose.ci.yml"
-    profiles=""
+    env="--file docker-compose.yml --file docker-compose.real.yml"
   fi
   return 0
 }
@@ -83,14 +77,6 @@ parse_env() {
 # === Run script ===
 
 parse_params "$@"
-
-# Do only morning cleanup for morning option
-if [[ "$option" == "morning" ]];then
-  git checkout trunk
-  git pull
-  docker-compose down --rmi all --remove-orphans
-  return 0
-fi
 
 # Create command that will be run. Empty command and "down" command will be handled
 # differently.

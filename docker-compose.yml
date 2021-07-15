@@ -1,15 +1,11 @@
 x-defaults: &defaults
   restart: unless-stopped
 
-x-command_default: &command_default
-  command: ["npm", "run", "dev"]
-
 x-build_defaults: &build_defaults
-  args:
-    NODE_ENV: development
-    TAG: development
+  target: development
 
 services:
+
   adminer:
     <<: *defaults
     container_name: adminer
@@ -17,17 +13,15 @@ services:
       ADMINER_DESIGN: pepa-linha
     image: adminer:4.8.0
     ports:
-      - "5050:8080"
+      - 5050:8080
     volumes:
       - ./adminer-plugins:/var/www/html/plugins-enabled
 
   backend:
     <<: *defaults
-    <<: *command_default
     build:
       <<: *build_defaults
       context: services/backend
-      dockerfile: oodikone2-backend/Dockerfile
     container_name: backend
     depends_on:
       - kone-db
@@ -37,7 +31,7 @@ services:
     environment:
       DB_URL: postgres://postgres@oodi-db:5432/oodi-db
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
-      FRONT_URL: http://localhost:8081
+      FRONT_URL: http://localhost:3000
       REDIS: redis
       SECRET_TOKEN: dev
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
@@ -46,19 +40,18 @@ services:
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       USERSERVICE_URL: http://userservice:4567
     ports:
-      - "8080:8080"
+      - 8080:8080
     profiles:
       - oodikone
     volumes:
       - backend-nodemod:/usr/src/app/node_modules
-      - ./services/backend/oodikone2-backend/:/usr/src/app
+      - ./services/backend/:/usr/src/app
 
   frontend:
     <<: *defaults
-    <<: *command_default
     build:
       <<: *build_defaults
-      context: services/oodikone2-frontend
+      context: services/frontend
     container_name: frontend
     environment:
       ADMINER_URL: http://localhost:5050/?pgsql=oodi-db&username=postgres
@@ -68,20 +61,17 @@ services:
       SIS_IMPORTER_ADMINER_URL: http://localhost:5050/?pgsql=sis-importer-db&username=postgres
       USER_ADMINER_URL: http://localhost:5050/?pgsql=user-db&username=postgres
     ports:
-      - "8081:8081"
-      - "7777:7777"
+      - 3000:3000
     profiles:
       - oodikone
     volumes:
       - frontend-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-frontend/:/usr/src/app
+      - ./services/frontend/:/usr/src/app
 
   kone-db:
     <<: *defaults
     container_name: kone-db
     image: registry.toska.cs.helsinki.fi/kone-db
-    ports:
-      - "5425:5432"
     profiles:
       - oodikone
     volumes:
@@ -91,8 +81,6 @@ services:
     <<: *defaults
     container_name: oodi-db
     image: registry.toska.cs.helsinki.fi/oodi-db
-    ports:
-      - "5421:5432"
     profiles:
       - oodikone
     volumes:
@@ -112,8 +100,6 @@ services:
     <<: *defaults
     container_name: sis-db
     image: registry.toska.cs.helsinki.fi/sis-db
-    ports:
-      - "5426:5432"
     volumes:
       - sis-db-data:/data
 
@@ -136,7 +122,6 @@ services:
 
   sis-updater-scheduler:
     <<: *defaults
-    <<: *command_default
     build:
       <<: *build_defaults
       context: updater/sis-updater-scheduler
@@ -155,7 +140,7 @@ services:
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
     ports:
-      - "8082:8082"
+      - 8082:8082
     profiles:
       - updater
     volumes:
@@ -164,7 +149,6 @@ services:
 
   sis-updater-worker:
     <<: *defaults
-    <<: *command_default
     build:
       <<: *build_defaults
       context: updater/sis-updater-worker
@@ -192,8 +176,6 @@ services:
     <<: *defaults
     container_name: user-db
     image: registry.toska.cs.helsinki.fi/user-db
-    ports:
-      - "5422:5432"
     profiles:
       - oodikone
     volumes:
@@ -201,11 +183,9 @@ services:
 
   userservice:
     <<: *defaults
-    <<: *command_default
     build:
       <<: *build_defaults
-      context: services/oodikone2-userservice
-      target: development
+      context: services/userservice
     container_name: userservice
     depends_on:
       - user-db
@@ -214,12 +194,12 @@ services:
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       TOKEN_SECRET: IWannaBeTheVeryBest
     ports:
-      - "4567:4567"
+      - 4567:4567
     profiles:
       - oodikone
     volumes:
       - userservice-nodemod:/usr/src/app/node_modules
-      - ./services/oodikone2-userservice/:/usr/src/app
+      - ./services/userservice/:/usr/src/app
 
 volumes:
   backend-nodemod:

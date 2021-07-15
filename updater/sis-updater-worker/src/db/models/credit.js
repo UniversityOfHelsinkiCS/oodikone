@@ -7,80 +7,80 @@ Credit.init(
   {
     id: {
       primaryKey: true,
-      type: STRING
+      type: STRING,
     },
     grade: {
-      type: STRING
+      type: STRING,
     },
     student_studentnumber: {
       type: STRING,
       references: {
         model: 'student',
-        key: 'studentnumber'
+        key: 'studentnumber',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     credits: {
-      type: DOUBLE
+      type: DOUBLE,
     },
     createdate: {
-      type: DATE
+      type: DATE,
     },
     credittypecode: {
       type: INTEGER,
       references: {
         model: 'credit_types',
-        key: 'credittypecode'
+        key: 'credittypecode',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     attainment_date: {
-      type: DATE
+      type: DATE,
     },
     course_code: {
-      type: STRING
+      type: STRING,
     },
     course_id: {
       type: STRING,
       references: {
         model: 'course',
-        key: 'id'
+        key: 'id',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     semester_composite: {
       type: STRING,
       references: {
         model: 'semesters',
-        key: 'composite'
+        key: 'composite',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     semestercode: {
-      type: INTEGER
+      type: INTEGER,
     },
     isStudyModule: {
-      type: BOOLEAN
+      type: BOOLEAN,
     },
     org: {
-      type: STRING
+      type: STRING,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: false,
     sequelize: dbConnections.sequelize,
     modelName: 'credit',
-    tableName: 'credit'
+    tableName: 'credit',
   }
 )
 

@@ -17,5 +17,5 @@ module.exports = {
       WHERE composite = 'hy-university-root-id-1'
       `
     )
-  }
-};
+  },
+}

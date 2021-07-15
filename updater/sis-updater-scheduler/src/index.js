@@ -5,13 +5,7 @@ const { schedule: scheduleCron } = require('./utils/cron')
 const { stan } = require('./utils/stan')
 const { isDev, REDIS_LAST_WEEKLY_SCHEDULE, REDIS_LAST_HOURLY_SCHEDULE } = require('./config')
 const { startServer } = require('./server')
-const {
-  scheduleHourly,
-  scheduleWeekly,
-  schedulePrePurge,
-  schedulePurge,
-  isUpdaterActive,
-} = require('./scheduler')
+const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
 
 stan.on('error', e => {
   console.log('NATS connection failed', e)

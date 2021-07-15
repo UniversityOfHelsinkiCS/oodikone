@@ -11,13 +11,13 @@ const {
 } = require('./shared')
 
 // Keeping previous oodi logic:
-// 0 = Not known	
+// 0 = Not known
 // 1 = Male
 // 2 = Female
 // 3 = Other
 // Oodi also had 9 = Määrittelemätön, but Sis doesn't have this data
 const parseGender = gender_urn => {
-  if (!gender_urn) return 0;
+  if (!gender_urn) return 0
   if (gender_urn === 'urn:code:gender:male') return 1
   if (gender_urn === 'urn:code:gender:female') return 2
   return 3
@@ -29,7 +29,13 @@ const parseGender = gender_urn => {
 const validStates = ['INCLUDED', 'SUBSTITUTED', 'ATTAINED']
 
 // Basically all types at the moment
-const validTypes = ['CourseUnitAttainment', 'CustomCourseUnitAttainment', 'CustomModuleAttainment', 'ModuleAttainment', 'DegreeProgrammeAttainment']
+const validTypes = [
+  'CourseUnitAttainment',
+  'CustomCourseUnitAttainment',
+  'CustomModuleAttainment',
+  'ModuleAttainment',
+  'DegreeProgrammeAttainment',
+]
 
 const now = new Date()
 
@@ -71,7 +77,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
 
   // Filter out test student from oodi data
-  if (student_number === "012023965") return null
+  if (student_number === '012023965') return null
 
   const gender_code = parseGender(gender_urn)
 
@@ -86,8 +92,9 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     studyRightsOfStudent.length > 0 ? sortBy(studyRightsOfStudent.map(sr => sr.valid.startDate))[0] : null
 
   // Current db doesn't have studentnumbers in attainment table so have to use person_id for now.
-  const attainmentsOfStudent = attainments.filter(attainment => (attainment.person_id === id && !attainmentsToBeExluced.has(attainment.id)))
-
+  const attainmentsOfStudent = attainments.filter(
+    attainment => attainment.person_id === id && !attainmentsToBeExluced.has(attainment.id)
+  )
 
   return {
     lastname: last_name,
@@ -118,57 +125,53 @@ const mapTeacher = person => ({
 const moduleTypes = new Set(['ModuleAttainment', 'DegreeProgrammeAttainment'])
 const isModule = courseType => moduleTypes.has(courseType)
 
-const creditMapper = (
-  personIdToStudentNumber,
-  courseUnitIdToCourseGroupId,
-  moduleGroupIdToModuleCode,
-  courseGroupIdToCourseCode
-) => attainment => {
-  const {
-    id,
-    credits,
-    person_id,
-    registration_date,
-    grade_scale_id,
-    grade_id,
-    organisations,
-    attainment_date,
-    type,
-    course_unit_id,
-    module_group_id,
-    nodes
-  } = attainment
+const creditMapper =
+  (personIdToStudentNumber, courseUnitIdToCourseGroupId, moduleGroupIdToModuleCode, courseGroupIdToCourseCode) =>
+  attainment => {
+    const {
+      id,
+      credits,
+      person_id,
+      registration_date,
+      grade_scale_id,
+      grade_id,
+      organisations,
+      attainment_date,
+      type,
+      course_unit_id,
+      module_group_id,
+      nodes,
+    } = attainment
 
-  const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
-  const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
-  const targetSemester = getSemesterByDate(new Date(attainment_date))
+    const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
+    const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
+    const targetSemester = getSemesterByDate(new Date(attainment_date))
 
-  if (!targetSemester) return null
+    if (!targetSemester) return null
 
-  const course_code = !isModule(type)
-    ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
-    : moduleGroupIdToModuleCode[module_group_id]
+    const course_code = !isModule(type)
+      ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
+      : moduleGroupIdToModuleCode[module_group_id]
 
+    // These are leaf attainments that have no other attainments attached to them
+    const isStudyModule = nodes && nodes[0] !== undefined
 
-  // These are leaf attainments that have no other attainments attached to them
-  const isStudyModule = nodes && nodes[0] !== undefined
-
-  return {
-    id: id,
-    grade: getGrade(grade_scale_id, grade_id).value,
-    student_studentnumber: personIdToStudentNumber[person_id],
-    credits: credits,
-    createdate: registration_date,
-    credittypecode: getCreditTypeCodeFromAttainment(attainment, getGrade(grade_scale_id, grade_id).passed),
-    attainment_date: attainment_date,
-    course_id: !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id,
-    course_code,
-    semestercode: targetSemester.semestercode,
-    semester_composite: targetSemester.composite,
-    isStudyModule,
-    org: attainmentUniOrg,
+    return {
+      id: id,
+      grade: getGrade(grade_scale_id, grade_id).value,
+      student_studentnumber: personIdToStudentNumber[person_id],
+      credits: credits,
+      createdate: registration_date,
+      credittypecode: getCreditTypeCodeFromAttainment(attainment, getGrade(grade_scale_id, grade_id).passed),
+      attainment_date: attainment_date,
+      course_id: !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id,
+      course_code,
+      semestercode: targetSemester.semestercode,
+      semester_composite: targetSemester.composite,
+      isStudyModule,
+      org: attainmentUniOrg,
+    }
   }
-}
 
 const termRegistrationTypeToEnrollmenttype = termRegistrationType => {
   switch (termRegistrationType) {
@@ -181,39 +184,39 @@ const termRegistrationTypeToEnrollmenttype = termRegistrationType => {
   }
 }
 
-const semesterEnrollmentMapper = (personIdToStudentNumber, studyrightToUniOrgId) => (
-  studentId,
-  studyRightId
-) => termRegistration => {
-  const {
-    studyTerm: { termIndex, studyYearStartYear },
-    registrationDate,
-    termRegistrationType,
-    statutoryAbsence,
-  } = termRegistration
+const semesterEnrollmentMapper =
+  (personIdToStudentNumber, studyrightToUniOrgId) => (studentId, studyRightId) => termRegistration => {
+    const {
+      studyTerm: { termIndex, studyYearStartYear },
+      registrationDate,
+      termRegistrationType,
+      statutoryAbsence,
+    } = termRegistration
 
-  const enrollmenttype = termRegistrationTypeToEnrollmenttype(termRegistrationType)
-  const studentnumber = personIdToStudentNumber[studentId]
-  const { semestercode } = getSemester(studyrightToUniOrgId[studyRightId], studyYearStartYear, termIndex)
-  const enrollment_date = registrationDate
-  const org = studyrightToUniOrgId[studyRightId]
+    const enrollmenttype = termRegistrationTypeToEnrollmenttype(termRegistrationType)
+    const studentnumber = personIdToStudentNumber[studentId]
+    const { semestercode } = getSemester(studyrightToUniOrgId[studyRightId], studyYearStartYear, termIndex)
+    const enrollment_date = registrationDate
+    const org = studyrightToUniOrgId[studyRightId]
 
-  return {
-    enrollmenttype,
-    studentnumber,
-    semestercode,
-    enrollment_date,
-    org,
-    semestercomposite: `${org}-${semestercode}`,
-    statutory_absence: statutoryAbsence,
+    return {
+      enrollmenttype,
+      studentnumber,
+      semestercode,
+      enrollment_date,
+      org,
+      semestercomposite: `${org}-${semestercode}`,
+      statutory_absence: statutoryAbsence,
+    }
   }
-}
 
-const courseProviderMapper = courseGroupId => ({ organisationId }) => ({
-  composite: `${courseGroupId}-${organisationId}`,
-  coursecode: courseGroupId,
-  organizationcode: organisationId,
-})
+const courseProviderMapper =
+  courseGroupId =>
+  ({ organisationId }) => ({
+    composite: `${courseGroupId}-${organisationId}`,
+    coursecode: courseGroupId,
+    organizationcode: organisationId,
+  })
 
 const timify = t => new Date(t).getTime()
 
@@ -259,7 +262,7 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
     startdate,
     enddate,
     is_study_module: false, // VALIDATE THIS PLS
-    substitutions
+    substitutions,
   }
 }
 

@@ -5,18 +5,18 @@ module.exports = {
     await queryInterface.createTable('course_types', {
       coursetypecode: {
         type: STRING,
-        primaryKey: true
+        primaryKey: true,
       },
       name: {
-        type: JSONB
+        type: JSONB,
       },
       created_at: {
-        type: DATE
+        type: DATE,
       },
       updated_at: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

@@ -7,22 +7,22 @@ StudyrightExtent.init(
   {
     extentcode: {
       type: INTEGER,
-      primaryKey: true
+      primaryKey: true,
     },
     name: {
-      type: JSONB
+      type: JSONB,
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     sequelize: dbConnections.sequelize,
     modelName: 'studyright_extent',
-    tableName: 'studyright_extents'
+    tableName: 'studyright_extents',
   }
 )
 

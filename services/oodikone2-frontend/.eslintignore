@@ -1,5 +1,0 @@
-dist/
-config/
-webpack.config.*
-cypress/*
-node_modules/

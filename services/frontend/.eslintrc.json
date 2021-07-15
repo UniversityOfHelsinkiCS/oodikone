@@ -1,0 +1,55 @@
+{
+  "root": true,
+  "env": {
+    "browser": true
+  },
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "requireConfigFile": false
+  },
+  "extends": [
+    "airbnb",
+    "plugin:prettier/recommended"
+  ],
+  "rules": {
+    "react/no-did-mount-set-state": "off",
+    "react/destructuring-assignment": "off",
+    "react/no-typos": "off",
+    "react/sort-comp": "off",
+    "react/forbid-prop-types": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/label-has-for": "off",
+    "jsx-a11y/label-has-associated-control": "off",
+    "no-plusplus": "off",
+    "no-shadow": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-filename-extension": "off",
+    "no-async-promise-executor": "off",
+    "no-implied-eval": "off",
+    "react/state-in-constructor": "off",
+    "react/static-property-placement": "off",
+    "react/no-deprecated": "off",
+    "react/no-unescaped-entities": "off",
+    "react/prefer-stateless-function": "error",
+    "import/no-unresolved": "error",
+    "react/jsx-no-bind": "error",
+    "prefer-object-spread/prefer-object-spread": "error",
+    "babel/no-invalid-this": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "prettier/prettier": "error",
+    "no-param-reassign": [
+      "error",
+      {
+        "props": false
+      }
+    ]
+  },
+  "plugins": [
+    "react",
+    "import",
+    "prefer-object-spread",
+    "babel",
+    "react-hooks"
+  ]
+}

@@ -29,8 +29,8 @@ async function creditResolver(rule, n) {
     return [
       {
         credits: rule.credits.min,
-        children: data
-      }
+        children: data,
+      },
     ]
   }
 
@@ -46,10 +46,7 @@ async function moduleResolver(rule, n) {
   const { knex } = knexConnection
   const id = rule.moduleGroupId
 
-  const mod = await knex('modules')
-    .where({ group_id: id })
-    .orderBy('curriculum_period_ids', 'desc')
-    .first()
+  const mod = await knex('modules').where({ group_id: id }).orderBy('curriculum_period_ids', 'desc').first()
 
   if (mod.type == 'StudyModule') {
     const result = await resolver(mod.rule, n)
@@ -67,7 +64,7 @@ async function moduleResolver(rule, n) {
   return {
     name: mod.name.fi,
     type: mod.type,
-    result: 'unhandled module type: ' + mod.type
+    result: 'unhandled module type: ' + mod.type,
   }
 }
 
@@ -80,14 +77,12 @@ async function courseResolver(rule) {
   const { knex } = knexConnection
 
   const id = rule.courseUnitGroupId
-  const course = await knex('course_units')
-    .where({ group_id: id })
-    .first()
+  const course = await knex('course_units').where({ group_id: id }).first()
 
   return {
     id: course.group_id,
     code: course.code,
-    name: course.name ? course.name.fi : ''
+    name: course.name ? course.name.fi : '',
   }
 }
 
@@ -115,7 +110,7 @@ async function resolver(rule, n) {
 
   return {
     type: rule.type,
-    fact: 'Unhandled rule'
+    fact: 'Unhandled rule',
   }
 }
 
@@ -123,9 +118,7 @@ const getCourses = async (code, doSuperFlatten) => {
   superFlatten = doSuperFlatten
   const { knex } = knexConnection
 
-  const result = await knex('modules')
-    .where({ code: code })
-    .first()
+  const result = await knex('modules').where({ code: code }).first()
 
   const id = result.group_id
   const name = result.name.fi

@@ -20,7 +20,7 @@ const redisPromisify = async (func, ...params) =>
 
 const client = redis.createClient({
   url: process.env.REDIS_URI,
-  retry_strategy: redisRetry
+  retry_strategy: redisRetry,
 })
 
 const lock = promisify(redisLock(client))
@@ -44,5 +44,5 @@ module.exports = {
   incrby,
   expire,
   getObject,
-  setObject
+  setObject,
 }

@@ -5,58 +5,58 @@ module.exports = {
     await queryInterface.createTable('transfers', {
       id: {
         type: STRING,
-        primaryKey: true
+        primaryKey: true,
       },
       sourcecode: {
         type: STRING,
         references: {
           model: 'element_details',
-          key: 'code'
+          key: 'code',
         },
         onUpdate: 'cascade',
-        onDelete: 'cascade'
+        onDelete: 'cascade',
       },
       targetcode: {
         type: STRING,
         references: {
           model: 'element_details',
-          key: 'code'
+          key: 'code',
         },
         onUpdate: 'cascade',
-        onDelete: 'cascade'
+        onDelete: 'cascade',
       },
       transferdate: {
-        type: DATE
+        type: DATE,
       },
       studentnumber: {
         type: STRING,
         references: {
           model: 'student',
-          key: 'studentnumber'
+          key: 'studentnumber',
         },
         onUpdate: 'cascade',
-        onDelete: 'cascade'
+        onDelete: 'cascade',
       },
       studyrightid: {
         type: STRING,
         references: {
           model: 'studyright',
-          key: 'studyrightid'
+          key: 'studyrightid',
         },
         onUpdate: 'cascade',
-        onDelete: 'cascade'
+        onDelete: 'cascade',
       },
       created_at: {
-        type: DATE
+        type: DATE,
       },
       updated_at: {
-        type: DATE
-      }
+        type: DATE,
+      },
     })
 
     await queryInterface.addIndex('transfers', ['studentnumber'])
     await queryInterface.addIndex('transfers', ['sourcecode'])
     await queryInterface.addIndex('transfers', ['targetcode'])
   },
-  down: async () => {}
+  down: async () => {},
 }

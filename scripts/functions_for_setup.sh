@@ -11,8 +11,8 @@ PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 DUMP_DIR="$PROJECT_ROOT/.databasedumps"
 USER_DATA_FILE="$DUMP_DIR/hyuserdata"
 
-## Following the naming convention in docker-compose, these are names for services
-## and for the anonymous database. Real databases have suffix "-real".
+## Following the naming convention in docker-compose, these are names for database
+## services. The real data databases inside service will have names suffixed by "-real".
 KONE_DB_NAME="kone-db"
 SIS_DB_NAME="sis-db"
 SIS_IMPORTER_DB_NAME="sis-importer-db"
@@ -20,7 +20,7 @@ USER_DB_NAME="user-db"
 DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
 OODI_DB_NAME="oodi-db" # TODO: Remove when oodi is removed
 
-## Urls should be in same order as databases
+## Urls should be in same order as databases as both are iterated through by indexes.
 KONE_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-kone-pg.sqz"
 SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-sis.sqz"
 SIS_IMPORTER_DB_REAL_DUMP_URL="importer:/home/importer_user/importer-db/backup/importer-db.sqz"
@@ -34,10 +34,12 @@ source "$PROJECT_ROOT"/scripts/utils.sh
 # === Function ===
 
 draw_mopo() {
-  # Some hacks to print mopo as green, since colours from common config don't work
-  # Please feel free to fix this. And tell otahontas how you did it!
-  local mopogreen=$(tput setaf 34)
-  local normal=$(tput sgr0)
+  # Some hacks to print mopo as green, since colours from common config don't work when
+  # catting images. Please feel free to fix this. And tell otahontas how you did it!
+  local mopogreen
+  mopogreen=$(tput setaf 34)
+  local normal
+  normal=$(tput sgr0)
   if [ "$(tput cols)" -gt "100" ]; then
     while IFS="" read -r p || [ -n "$p" ]; do
       printf '%40s\n' "${mopogreen}$p${normal}"
@@ -45,7 +47,7 @@ draw_mopo() {
   fi
 }
 
-retry () {
+retry() {
   sleep 5
   for i in {1..60}; do
     "$@" && break || warningmsg "Retry attempt $i failed, waiting..." && sleep 5;
@@ -67,18 +69,17 @@ check_if_postgres_is_ready() {
 
 reset_databases() {
   local databases=("$@")
-  local database_name_suffix="-real"
   local database_dump_dir=$DUMP_DIR
 
   infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
 
   docker-compose down
-  docker-compose up -d ${databases[*]}
+  docker-compose up -d "${databases[@]}"
 
-  for database in ${databases[@]}; do
+  for database in "${databases[@]}"; do
     local database_dump="$database_dump_dir/$database.sqz"
     local database_container="$database"
-    local database_name="$database$database_name_suffix"
+    local database_name="$database-real"
 
     infomsg "Attempting to create database $database_name from dump $database_dump inside container $database_container"
 
@@ -108,7 +109,7 @@ reset_all_real_data() {
     local url="${REAL_DUMP_URLS[$i]}"
     download_real_dump "$database" "$url"
   done
-  reset_databases ${DATABASES[*]}
+  reset_databases "${DATABASES[@]}"
 }
 
 reset_sis_importer_data() {
@@ -127,29 +128,41 @@ reset_old_oodi_data() {
   reset_databases $database
 }
 
-set_up_oodikone() {
+set_up_oodikone_from_scratch() {
   draw_mopo
-
-  infomsg "Installing npm packages locally to enable linting"
-
   folders_to_set_up=(
     "$PROJECT_ROOT"
-    "$PROJECT_ROOT/services/oodikone2-frontend"
-    "$PROJECT_ROOT/services/oodikone2-userservice"
-    "$PROJECT_ROOT/services/backend/oodikone2-backend"
+    "$PROJECT_ROOT/services/frontend"
+    "$PROJECT_ROOT/services/userservice"
+    "$PROJECT_ROOT/services/backend"
+    "$PROJECT_ROOT/updater/sis-updater-scheduler"
+    "$PROJECT_ROOT/updater/sis-updater-worker"
   )
 
+  infomsg "Cleaning up docker setup and node_modules from possible previous installations"
+  local compose_down_args="--remove-orphans --volumes --rmi all"
+  "$PROJECT_ROOT"/run.sh both down "$compose_down_args"
+  docker-compose --file "$PROJECT_ROOT"/docker-compose.test.yml "$compose_down_args"
+  docker-compose --file "$PROJECT_ROOT"/docker-compose.ci.yml "$compose_down_args"
   for folder in "${folders_to_set_up[@]}"; do
-    cd "$folder" || return 1
-    ([[ -d node_modules ]] && warningmsg "Packages already installed in $folder") || npm ci
+    cd "$folder" || die "Couldn't change directory to folder $folder"
+    rm -rf node_modules|| die "Couldn't remove node_modules in folder $folder"
   done
-  cd "$PROJECT_ROOT" || return 1
 
-  infomsg "Cleaning up previous docker containers, volumes and networks"
-  "$PROJECT_ROOT"/run.sh both down --remove-orphans --volumes
+  infomsg "Installing npm packages locally to root and each subfolder to enable \
+linting and formatting"
+
+  for folder in "${folders_to_set_up[@]}"; do
+    cd "$folder" || die "Couldn't change directory to folder $folder"
+    ([[ -d node_modules ]] && die "$folder already has node_modules, exiting!") || npm ci
+  done
+  cd "$PROJECT_ROOT" || die "Couldn't change directory to project root"
+
+  infomsg "Setting up husky for pre-commit linting"
+  npm run prepare
 
   infomsg "Pulling images"
-  "$PROJECT_ROOT"/run.sh oodikone anon build
+  "$PROJECT_ROOT"/run.sh oodikone anon pull
 
   infomsg "Building images"
   "$PROJECT_ROOT"/run.sh oodikone anon build

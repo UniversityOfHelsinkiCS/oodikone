@@ -7,32 +7,32 @@ CourseProvider.init(
   {
     composite: {
       type: STRING,
-      unique: true
+      unique: true,
     },
     coursecode: {
       type: STRING,
       references: {
         model: 'course',
-        key: 'id'
+        key: 'id',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     organizationcode: {
       type: STRING,
       references: {
         model: 'organization',
-        key: 'id'
+        key: 'id',
       },
       onUpdate: 'cascade',
-      onDelete: 'cascade'
+      onDelete: 'cascade',
     },
     createdAt: {
-      type: DATE
+      type: DATE,
     },
     updatedAt: {
-      type: DATE
-    }
+      type: DATE,
+    },
   },
   {
     underscored: true,
@@ -42,9 +42,9 @@ CourseProvider.init(
     indexes: [
       {
         unique: true,
-        fields: ['coursecode', 'organizationcode']
-      }
-    ]
+        fields: ['coursecode', 'organizationcode'],
+      },
+    ],
   }
 )
 

@@ -19,9 +19,9 @@ class DbConnections extends EventEmitter {
         max: 25,
         min: 0,
         acquire: 10000,
-        idle: 300000000
+        idle: 300000000,
       },
-      logging: false
+      logging: false,
     })
   }
 
@@ -40,12 +40,12 @@ class DbConnections extends EventEmitter {
             host: SIS_IMPORTER_HOST,
             user: SIS_IMPORTER_USER,
             password: SIS_IMPORTER_PASSWORD,
-            database: SIS_IMPORTER_DATABASE
+            database: SIS_IMPORTER_DATABASE,
           },
           pool: {
             min: 0,
-            max: 25
-          }
+            max: 25,
+          },
         })
         await this.knex.raw('select 1+1 as result')
         this.establish('knexConnection')
@@ -73,14 +73,14 @@ class DbConnections extends EventEmitter {
         storage: 'sequelize',
         storageOptions: {
           sequelize: this.sequelize,
-          tableName: 'migrations'
+          tableName: 'migrations',
         },
         logging: console.log,
         migrations: {
           params: [this.sequelize.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/src/db/migrations`,
-          pattern: /\.js$/
-        }
+          pattern: /\.js$/,
+        },
       })
       const migrations = await migrator.up()
       console.log('Migrations up to date', migrations)
@@ -95,5 +95,5 @@ class DbConnections extends EventEmitter {
 
 const dbConnections = new DbConnections()
 module.exports = {
-  dbConnections
+  dbConnections,
 }

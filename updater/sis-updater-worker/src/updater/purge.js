@@ -15,7 +15,7 @@ const {
   StudyrightExtent,
   Studyright,
   StudyrightElement,
-  ProgrammeModule
+  ProgrammeModule,
 } = require('../db/models')
 const { lock } = require('../utils/redis')
 const { PURGE_LOCK, SIS_PURGE_CHANNEL } = require('../config')
@@ -38,26 +38,27 @@ const tableToModel = {
   studyright_elements: StudyrightElement,
   studyright_extents: StudyrightExtent,
   teacher: Teacher,
-  programme_modules: ProgrammeModule
+  programme_modules: ProgrammeModule,
 }
 
-const sendToNats = (channel, data) => new Promise((res, rej) => {
-  stan.publish(channel, JSON.stringify(data), err => {
-    if (err) {
-      console.log('failed publishing', err)
-      rej(err)
-    }
-    res()
+const sendToNats = (channel, data) =>
+  new Promise((res, rej) => {
+    stan.publish(channel, JSON.stringify(data), err => {
+      if (err) {
+        console.log('failed publishing', err)
+        rej(err)
+      }
+      res()
+    })
   })
-})
 
 const prePurge = async ({ table, before }) => {
   const count = await tableToModel[table].count({
     where: {
       updatedAt: {
-        [Op.lt]: new Date(before)
-      }
-    }
+        [Op.lt]: new Date(before),
+      },
+    },
   })
 
   sendToNats(SIS_PURGE_CHANNEL, { action: 'PREPURGE_STATUS', table, count, before })
@@ -68,22 +69,22 @@ const purge = async ({ table, before }) => {
   const deletedCount = await tableToModel[table].destroy({
     where: {
       updatedAt: {
-        [Op.lt]: new Date(before)
-      }
-    }
+        [Op.lt]: new Date(before),
+      },
+    },
   })
 
   logger.info({
     message: 'Purge',
     table,
-    count: deletedCount
+    count: deletedCount,
   })
   unlock()
 }
 
-const purgeByStudentNumber = async (studentNumbers) => {
+const purgeByStudentNumber = async studentNumbers => {
   await Student.destroy({
-    where: { studentnumber: studentNumbers }
+    where: { studentnumber: studentNumbers },
   })
 }
 
