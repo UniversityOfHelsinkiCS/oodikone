@@ -1,4 +1,4 @@
-name: Release oodikone to staging
+name: "Release oodikone to staging"
 
 on:
   push:
@@ -122,7 +122,7 @@ jobs:
 
   report_failure:
     runs-on: ubuntu-latest
-    name: Report deployment failure to oodikone notifications
+    name: "Report deployment failure to oodikone notifications"
     needs:
     - build_and_release_backend
     - build_and_release_frontend
