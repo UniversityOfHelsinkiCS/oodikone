@@ -2,8 +2,10 @@
   "name": "oodikone",
   "description": "An application for analyzing university data.",
   "scripts": {
+    "concurrently": "concurrently",
     "cypress": "cypress",
-    "zx": "zx",
+    "eslint": "eslint",
+    "stylelint": "stylelint",
     "cli": "./cli.sh",
     "oodikone": "docker-compose --profile oodikone up --detach",
     "oodikone:real": "./run.sh oodikone real up --detach",
@@ -12,21 +14,6 @@
     "both": "docker-compose --profile oodikone --profile updater up --detach",
     "both:real": "./run.sh both real up --detach",
     "docker:down": "docker-compose down --remove-orphans",
-    "lint:backend": "eslint services/backend",
-    "lint:frontend": "concurrently 'eslint --ext .jsx,.js services/frontend' 'stylelint services/frontend/src/**/*.css'",
-    "lint:userservice": "eslint services/userservice",
-    "lint:sis-updater-scheduler": "eslint updater/sis-updater-scheduler",
-    "lint:sis-updater-worker": "eslint updater/sis-updater-worker",
-    "lint:cypress": "eslint cypress",
-    "lint": "concurrently 'npm run lint:*'",
-    "lintfix:backend": "prettier --write services/backend/**/*.{js,json} && eslint --fix services/backend",
-    "lintfix:frontend": "eslint --ext .jsx,.js --fix services/frontend && stylelint services/frontend/src/**/*.css",
-    "lintfix:userservice": "prettier --write services/userservice/**/*.{js,json} && eslint --fix services/userservice",
-    "lintfix:sis-updater-scheduler": "prettier --write updater/sis-updater-scheduler/**/*.{js,json} && eslint --fix updater/sis-updater-scheduler",
-    "lintfix:sis-updater-worker": "prettier --write updater/sis-updater-worker/**/*.{js,json} && eslint --fix updater/sis-updater-worker",
-    "lintfix:cypress": "prettier --write cypress/**/*.{js,json} && eslint --fix cypress",
-    "lintfix": "concurrently 'npm run lintfix:*'",
-    "linttest:other": "zx ./scripts/lint-other.mjs",
     "diff:students": "docker exec backend node /usr/src/app/src/sisoodi_diff/students/index.js",
     "diff:populations": "docker exec backend node /usr/src/app/src/sisoodi_diff/populations.js",
     "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",
@@ -35,10 +22,12 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "services/**/*.{js,jsx,json}": "eslint",
-    "updater/**/*.{js,jsx,json}": "eslint",
+    "{services,updater}/**/*.{js,jsx}": "eslint --fix",
+    "*.{js,json,md}": "prettier --write",
+    "*.css": "stylelint --fix",
     ".github/workflows/*": "actionlint",
     "**/*/Dockerfile": "hadolint",
+    ".sh": "shellcheck",
     "docker-compose.yml": "docker-compose config -q",
     "docker-compose.real.yml": "docker-compose -f docker-compose.yml -f docker-compose.real.yml config -q",
     "docker-compose.ci.yml": "docker-compose -f docker-compose.ci.yml config -q",
@@ -75,7 +64,6 @@
     "stylelint": "^13.13.1",
     "stylelint-config-prettier": "^8.0.2",
     "stylelint-config-standard": "^22.0.0",
-    "stylelint-prettier": "^1.2.0",
-    "zx": "^2.0.0"
+    "stylelint-prettier": "^1.2.0"
   }
 }
