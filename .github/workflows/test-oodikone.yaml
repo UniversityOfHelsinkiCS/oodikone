@@ -62,8 +62,6 @@ jobs:
   build_backend:
     name: "Build backend"
     runs-on: ubuntu-latest
-    env:
-      TAG: trunk
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -88,8 +86,6 @@ jobs:
   build_frontend:
     name: "Build frontend"
     runs-on: ubuntu-latest
-    env:
-      TAG: trunk
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -114,8 +110,6 @@ jobs:
   build_userservice:
     name: "Build userservice"
     runs-on: ubuntu-latest
-    env:
-      TAG: trunk
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -142,10 +136,9 @@ jobs:
     name: "Run userservice integration tests"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Run tests included in docker build
-        run: docker-compose -f docker-compose.test.yml up --build userservice-test
+      - uses: actions/checkout@v2
+      - name: "Run tests included in docker build"
+        run: docker-compose --file docker-compose.test.yml up --build userservice-test
 
   # === End-to-end tests ===
 
@@ -156,317 +149,6 @@ jobs:
       - build_frontend
       - build_userservice
     runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
-        uses: actions/download-artifact@v2
-        with:
-          path: /tmp/
-      - name: Load built images
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
-        with:
-          browser: chrome
-          spec: cypress/integration/Course_population.js
-        env:
-          CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: Cypress videos
-          path: ./cypress/videos/*
-
-  test_course_statistics:
-    name: "Test course statistics"
-    needs:
-      - build_backend
-      - build_frontend
-      - build_userservice
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
-        uses: actions/download-artifact@v2
-        with:
-          path: /tmp/
-      - name: Load built images
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
-        with:
-          browser: chrome
-          spec: cypress/integration/Course_statistics.js
-        env:
-          CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: Cypress videos
-          path: ./cypress/videos/*
-
-  test_custom_population:
-    name: "Test custom population"
-    needs:
-      - build_backend
-      - build_frontend
-      - build_userservice
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
-        uses: actions/download-artifact@v2
-        with:
-          path: /tmp/
-      - name: Load built images
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
-        with:
-          browser: chrome
-          spec: cypress/integration/Custom_population.js
-        env:
-          CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: Cypress videos
-          path: ./cypress/videos/*
-
-  test_population_statistics:
-    name: "Test population statistics"
-    needs:
-      - build_backend
-      - build_frontend
-      - build_userservice
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
-        uses: actions/download-artifact@v2
-        with:
-          path: /tmp/
-      - name: Load built images
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
-        with:
-          browser: chrome
-          spec: cypress/integration/Population_statistics.js
-        env:
-          CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: Cypress videos
-          path: ./cypress/videos/*
-
-  test_filters:
-    name: "Test filters"
-    needs:
-      - build_backend
-      - build_frontend
-      - build_userservice
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
-        uses: actions/download-artifact@v2
-        with:
-          path: /tmp/
-      - name: Load built images
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
-        with:
-          browser: chrome
-          spec: cypress/integration/Filters.js
-        env:
-          CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: Cypress videos
-          path: ./cypress/videos/*
-
-  test_student_statistics:
-    name: "Test student statistics"
-    needs:
-      - build_backend
-      - build_frontend
-      - build_userservice
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
-        uses: actions/download-artifact@v2
-        with:
-          path: /tmp/
-      - name: Load built images
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
-        with:
-          browser: chrome
-          spec: cypress/integration/Student_statistics.js
-        env:
-          CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: Cypress videos
-          path: ./cypress/videos/*
-
-  test_studyprogramme_overview:
-    name: "Test studyprogramme overview"
-    needs:
-      - build_backend
-      - build_frontend
-      - build_userservice
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
-        uses: actions/download-artifact@v2
-        with:
-          path: /tmp/
-      - name: Load built images
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
-        uses: docker/login-action@v1
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Run cypress
-        uses: cypress-io/github-action@v2
-        with:
-          browser: chrome
-          spec: cypress/integration/Studyprogramme_overview.js
-        env:
-          CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: Cypress videos
-          path: ./cypress/videos/*
-
-  test_teachers_and_users:
-    name: "Test teachers and users"
-    needs:
-      - build_backend
-      - build_frontend
-      - build_userservice
-    runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
     steps:
       - uses: actions/checkout@v2
       - name: "Download images"
@@ -485,7 +167,287 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: "Run services, pull rest of the needed images"
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+      - name: "Run cypress"
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Course_population.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: "Upload video if tests fail"
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_course_statistics:
+    name: "Test course statistics"
+    needs:
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Download images"
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: "Load built images"
+        run: |
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: "Login to toska docker registry"
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+      - name: "Run cypress"
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Course_statistics.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: "Upload video if tests fail"
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_custom_population:
+    name: "Test custom population"
+    needs:
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Download images"
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: "Load built images"
+        run: |
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: "Login to toska docker registry"
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+      - name: "Run cypress"
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Custom_population.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: "Upload video if tests fail"
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_population_statistics:
+    name: "Test population statistics"
+    needs:
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Download images"
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: "Load built images"
+        run: |
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: "Login to toska docker registry"
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+      - name: "Run cypress"
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Population_statistics.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: "Upload video if tests fail"
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_filters:
+    name: "Test filters"
+    needs:
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Download images"
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: "Load built images"
+        run: |
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: "Login to toska docker registry"
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+      - name: "Run cypress"
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Filters.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: "Upload video if tests fail"
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_student_statistics:
+    name: "Test student statistics"
+    needs:
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Download images"
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: "Load built images"
+        run: |
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: "Login to toska docker registry"
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+      - name: "Run cypress"
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Student_statistics.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: "Upload video if tests fail"
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_studyprogramme_overview:
+    name: "Test studyprogramme overview"
+    needs:
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Download images"
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: "Load built images"
+        run: |
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: "Login to toska docker registry"
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+      - name: "Run cypress"
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          spec: cypress/integration/Studyprogramme_overview.js
+        env:
+          CYPRESS_baseUrl: http://localhost:1337
+      - name: "Upload video if tests fail"
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: Cypress videos
+          path: ./cypress/videos/*
+
+  test_teachers_and_users:
+    name: "Test teachers and users"
+    needs:
+      - build_backend
+      - build_frontend
+      - build_userservice
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Download images"
+        uses: actions/download-artifact@v2
+        with:
+          path: /tmp/
+      - name: "Load built images"
+        run: |
+          docker load --input /tmp/artifact/backend.tar
+          docker load --input /tmp/artifact/frontend.tar
+          docker load --input /tmp/artifact/userservice.tar
+      - name: "Login to toska docker registry"
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
       - name: "Run cypress"
         uses: cypress-io/github-action@v2
         with:
@@ -495,7 +457,7 @@ jobs:
             cypress/integration/Users.js
         env:
           CYPRESS_baseUrl: http://localhost:1337
-      - name: "Upload video if failing"
+      - name: "Upload video if tests fail"
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -512,9 +474,6 @@ jobs:
       - build_frontend
       - build_userservice
     runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
     steps:
       - uses: actions/checkout@v2
       - name: "Download images"
@@ -533,7 +492,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: "Run services, pull rest of the needed images"
-        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
+        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
       - name: "Check that exit statuses are not errors"
         run: |
           docker ps -a
@@ -559,16 +518,13 @@ jobs:
     - test_teachers_and_users
     - test_service_exit_statuses
     runs-on: ubuntu-latest
-    env:
-      TAG: trunk
-      CACHE_TAG: trunk
     steps:
       - uses: actions/checkout@v2
-      - name: Download images
+      - name: "Download images"
         uses: actions/download-artifact@v2
         with:
           path: /tmp/
-      - name: Load built images
+      - name: "Load built images"
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
@@ -579,7 +535,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: "Push to docker hub"
-        run: docker-compose -f docker-compose.ci.yml push
+        run: docker-compose --file docker-compose.ci.yml push
 
   report_failure:
     runs-on: ubuntu-latest
@@ -608,4 +564,4 @@ jobs:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: test-failure
       - name: "Print logs on failure"
-        run: docker-compose -f docker-compose.ci.yml logs
+        run: docker-compose --file docker-compose.ci.yml logs
