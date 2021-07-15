@@ -2,19 +2,18 @@ const { educationTypeToExtentcode } = require('../shared')
 const { Studyright, StudyrightElement, Student } = require('../../db/models')
 const { selectFromByIds } = require('../../db')
 
-const fixVarhaiskasvatusStudyRights = async (studentsToBeFixed) => {
+const fixVarhaiskasvatusStudyRights = async studentsToBeFixed => {
   const students = await selectFromByIds('persons', studentsToBeFixed)
-  for ( const student of students ) {
+  for (const student of students) {
     const bsc = await StudyrightElement.findOne({
       where: {
-        studentnumber: student. student_number,
-        code: 'KH60_001'
+        studentnumber: student.student_number,
+        code: 'KH60_001',
       },
       include: {
         model: Studyright,
-        attributes: [ 'graduated' ]
-        
-      }
+        attributes: ['graduated'],
+      },
     })
 
     bsc.startdate = new Date(studentsThatNeedToBeFixed.find(s => s.id === student.id).started)
@@ -22,14 +21,14 @@ const fixVarhaiskasvatusStudyRights = async (studentsToBeFixed) => {
 
     const msc = await StudyrightElement.findOne({
       where: {
-        studentnumber: student. student_number,
-        code: 'MH60_001'
-      }
+        studentnumber: student.student_number,
+        code: 'MH60_001',
+      },
     })
 
-    if ( bsc.studyright.graduated ) {
-      const bscEnd = new Date(bsc.enddate) 
-      bscEnd.setDate(bscEnd.getDate() + 1);
+    if (bsc.studyright.graduated) {
+      const bscEnd = new Date(bsc.enddate)
+      bscEnd.setDate(bscEnd.getDate() + 1)
       msc.startdate = bscEnd
       await msc.save()
     }
@@ -56,5 +55,5 @@ const studentsThatNeedToBeFixed = [
 
 module.exports = {
   fixVarhaiskasvatusStudyRights,
-  studentsThatNeedToBeFixed
+  studentsThatNeedToBeFixed,
 }

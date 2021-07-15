@@ -1,7 +1,10 @@
 const { maxBy } = require('lodash')
 
 const getLatestSnapshot = entities => {
-  return maxBy(entities.filter(e => e.document_state !== 'DELETED'), e => e.modification_ordinal)
+  return maxBy(
+    entities.filter(e => e.document_state !== 'DELETED'),
+    e => e.modification_ordinal
+  )
 }
 
 const isActive = entity => {
@@ -40,5 +43,5 @@ module.exports = {
   getLatestSnapshot,
   isActive,
   getMinMaxDate,
-  isBaMa
+  isBaMa,
 }

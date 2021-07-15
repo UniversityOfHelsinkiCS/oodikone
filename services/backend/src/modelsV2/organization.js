@@ -1,0 +1,37 @@
+const { Model, STRING, DATE, JSONB } = require('sequelize')
+const { dbConnections } = require('../databaseV2/connection')
+
+class Organization extends Model {}
+
+Organization.init(
+  {
+    id: {
+      type: STRING,
+      primaryKey: true,
+    },
+    code: {
+      type: STRING,
+      references: {
+        table: 'organization',
+        field: 'code',
+      },
+    },
+    name: {
+      type: JSONB,
+    },
+    createdAt: {
+      type: DATE,
+    },
+    updatedAt: {
+      type: DATE,
+    },
+  },
+  {
+    underscored: true,
+    sequelize: dbConnections.sequelize,
+    modelName: 'organization',
+    tableName: 'organization',
+  }
+)
+
+module.exports = Organization

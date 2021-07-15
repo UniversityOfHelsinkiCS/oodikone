@@ -32,8 +32,8 @@ async function creditResolver(rule, n) {
     return [
       {
         credits: rule.credits.min,
-        children: data
-      }
+        children: data,
+      },
     ]
   }
 
@@ -49,10 +49,7 @@ async function moduleResolver(rule, n) {
   const { knex } = dbConnections
   const id = rule.moduleGroupId
 
-  const mod = await knex('modules')
-    .where({ group_id: id })
-    .orderBy('curriculum_period_ids', 'desc')
-    .first()
+  const mod = await knex('modules').where({ group_id: id }).orderBy('curriculum_period_ids', 'desc').first()
 
   if (!mod) {
     return { error: 'Could not find module' }
@@ -73,7 +70,7 @@ async function moduleResolver(rule, n) {
 
   return {
     name: mod.name,
-    type: 'unknown'
+    type: 'unknown',
   }
 }
 
@@ -86,9 +83,7 @@ async function courseResolver(rule) {
   const { knex } = dbConnections
 
   const id = rule.courseUnitGroupId
-  const course = await knex('course_units')
-    .where({ group_id: id })
-    .first()
+  const course = await knex('course_units').where({ group_id: id }).first()
 
   if (!course) {
     return { error: 'could not find course' }
@@ -98,7 +93,7 @@ async function courseResolver(rule) {
     id: course.group_id,
     code: course.code,
     name: course.name,
-    type: 'course'
+    type: 'course',
   }
 }
 
@@ -126,7 +121,7 @@ async function resolver(rule, n) {
 
   return {
     type: rule.type,
-    fact: 'Unhandled rule'
+    fact: 'Unhandled rule',
   }
 }
 
@@ -142,13 +137,13 @@ const recursiveWrite = async (module, parentId) => {
     id: module.id,
     code: module.code,
     name: module.name,
-    type: module.type
+    type: module.type,
   }
 
   let join = {
     composite: `${parentId}-${module.id}`,
     parentId: parentId,
-    childId: module.id
+    childId: module.id,
   }
 
   programmes[module.id] = newModule
@@ -172,7 +167,7 @@ const updateProgrammeModules = async (entityIds = []) => {
       id: module.group_id,
       code: module.code,
       name: module.name,
-      type: 'module'
+      type: 'module',
     }
     programmes[module.group_id] = topModule
     const submodule = await resolver(module.rule)

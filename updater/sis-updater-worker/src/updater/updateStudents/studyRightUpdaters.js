@@ -5,8 +5,11 @@ const { ElementDetail, Studyright, StudyrightElement } = require('../../db/model
 const { selectFromByIds, bulkCreate } = require('../../db')
 const { getDegrees, getEducation, getEducationType, getOrganisationCode } = require('../shared')
 
-const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNumber, personIdToStudyRightIdToPrimality) => {
-
+const updateStudyRights = async (
+  groupedStudyRightSnapshots,
+  personIdToStudentNumber,
+  personIdToStudyRightIdToPrimality
+) => {
   const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
     const defaultProps = {
       studyrightid: `${studyright.id}-1`, // duplikaattifix
@@ -15,7 +18,7 @@ const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNu
       givendate: studyright.grant_date,
       studentStudentnumber: personIdToStudentNumber[studyright.person_id],
       graduated: studyright.study_right_graduation ? 1 : 0,
-      studystartdate: studyright.valid.startDate, 
+      studystartdate: studyright.valid.startDate,
     }
     return {
       ...defaultProps,
@@ -27,25 +30,26 @@ const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNu
     // is this really needed?
     if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
 
-    if (['RESCINDED','CANCELLED_BY_ADMINISTRATION'].includes(studyright.state)) return studyright.study_right_cancellation.cancellationDate
+    if (['RESCINDED', 'CANCELLED_BY_ADMINISTRATION'].includes(studyright.state))
+      return studyright.study_right_cancellation.cancellationDate
     if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
     return null
   }
 
   const parseEndDate = (studyright, phase_number = 1, isBaMa = false) => {
-
     // Set eternal studyright enddate to match what we used to use in oodi-oodikone
     // instead of showing it as "Unavailable" in frontend
-    const isEternalStudyRight = studyright => studyright
-        && studyright.study_right_expiration_rules_urn
-        && studyright.study_right_expiration_rules_urn.includes("urn:code:study-right-expiration-rules:eternal")
-  
+    const isEternalStudyRight = studyright =>
+      studyright &&
+      studyright.study_right_expiration_rules_urn &&
+      studyright.study_right_expiration_rules_urn.includes('urn:code:study-right-expiration-rules:eternal')
+
     if (isEternalStudyRight(studyright)) studyright.valid.endDate = '2112-12-21'
 
     if (isBaMa && phase_number === 2) {
       return studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate
-              ? studyright.study_right_graduation.phase2GraduationDate
-              : studyright.valid.endDate
+        ? studyright.study_right_graduation.phase2GraduationDate
+        : studyright.valid.endDate
     }
     return studyright.study_right_graduation
       ? studyright.study_right_graduation.phase1GraduationDate
@@ -62,9 +66,9 @@ const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNu
       SECONDARY: 2,
       RESCINDED: 5,
       GRADUATED: 30,
-      OPTION: 6
+      OPTION: 6,
     }
-  
+
     // Logic still a bit repetitive, plz make this better!
     if (!isBaMa) {
       if (studyright.state === 'GRADUATED') return PRIORITYCODES.GRADUATED
@@ -85,9 +89,7 @@ const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNu
     if (studyright.state === 'RESCINDED') return PRIORITYCODES.RESCINDED
 
     if (isPrimality) {
-      return get(studyright, 'study_right_graduation.phase1GraduationDate')
-            ? PRIORITYCODES.MAIN
-            : PRIORITYCODES.OPTION
+      return get(studyright, 'study_right_graduation.phase1GraduationDate') ? PRIORITYCODES.MAIN : PRIORITYCODES.OPTION
     }
     return PRIORITYCODES.SECONDARY
   }
@@ -145,19 +147,33 @@ const updateStudyRights = async (groupedStudyRightSnapshots, personIdToStudentNu
   return formattedStudyRights
 }
 
-const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber, formattedStudyRights, mappedTransfers) => {
-  const mapStudyrightElements = (studyrightid, startdate, studentnumber, code, childCode, transfersByStudyRightId, formattedStudyRightsById) => {
+const updateStudyRightElements = async (
+  groupedStudyRightSnapshots,
+  moduleGroupIdToCode,
+  personIdToStudentNumber,
+  formattedStudyRights,
+  mappedTransfers
+) => {
+  const mapStudyrightElements = (
+    studyrightid,
+    startdate,
+    studentnumber,
+    code,
+    childCode,
+    transfersByStudyRightId,
+    formattedStudyRightsById
+  ) => {
     const defaultProps = {
       studyrightid,
       startdate,
       studentnumber,
     }
-  
-    // be default, well use the enddate in studyright and given startdate 
+
+    // be default, well use the enddate in studyright and given startdate
     // (might be horrible logic, check later)
     let enddate = formattedStudyRightsById[studyrightid].enddate
     let realStartDate = startdate
-  
+
     // except when studyright has been transferred, then override
     if (transfersByStudyRightId[studyrightid]) {
       const transfer = transfersByStudyRightId[studyrightid]
@@ -168,7 +184,7 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         startdate = transfer.transferdate
       }
     }
-  
+
     // we should probably map degree in a different manner since degree can be per many
     // programmes and studytracks. Now the correct one might be overwritten later.
     return [
@@ -177,14 +193,14 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         id: `${defaultProps.studyrightid}-${code}`,
         code,
         enddate,
-        startdate: realStartDate
+        startdate: realStartDate,
       },
       {
         ...defaultProps,
         id: `${defaultProps.studyrightid}-${childCode}`,
         code: childCode,
         enddate,
-        startdate: realStartDate
+        startdate: realStartDate,
       },
     ]
   }
@@ -213,7 +229,11 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
       }
 
       const snapshotStudyRightElements = []
-      const orderedSnapshots = orderBy(snapshots, [s => new Date(s.snapshot_date_time), s =>  Number(s.modification_ordinal)], ['desc', 'desc'] )
+      const orderedSnapshots = orderBy(
+        snapshots,
+        [s => new Date(s.snapshot_date_time), s => Number(s.modification_ordinal)],
+        ['desc', 'desc']
+      )
 
       orderedSnapshots.sort(possibleBscFirst).forEach(snapshot => {
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
@@ -222,7 +242,11 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
         let startDate = snapshot.first_snapshot_date_time
 
         // fix for varhaiskasvatus, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
-        if ( snapshot.accepted_selection_path && snapshot.accepted_selection_path.educationPhase1GroupId ==='hy-DP-114256570' && snapshot.accepted_selection_path.educationPhase1ChildGroupId === 'otm-ebd2a5bb-190b-49cc-bccf-44c7e5eef14b') {
+        if (
+          snapshot.accepted_selection_path &&
+          snapshot.accepted_selection_path.educationPhase1GroupId === 'hy-DP-114256570' &&
+          snapshot.accepted_selection_path.educationPhase1ChildGroupId === 'otm-ebd2a5bb-190b-49cc-bccf-44c7e5eef14b'
+        ) {
           if (orderedSnapshots.sort(possibleBscFirst)[0].state === 'PASSIVE') {
             startDate = snapshot.valid.startDate
           }
@@ -255,7 +279,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           } else {
             snapshotStudyRightElements.push(baProgramme, baStudytrack, maProgramme, maStudytrack)
           }
-
         } else {
           const [programme, studytrack] = mapStudyrightElements(
             `${mainStudyRight.id}-1`, //mainStudyRight.id, duplikaattiifx
@@ -269,7 +292,6 @@ const updateStudyRightElements = async (groupedStudyRightSnapshots, moduleGroupI
           snapshotStudyRightElements.push(programme, studytrack)
         }
       })
-
 
       res.push(...uniqBy(snapshotStudyRightElements, 'code'))
       return res
@@ -289,7 +311,7 @@ const updateElementDetails = async studyRights => {
           educationPhase1GroupId,
           educationPhase1ChildGroupId,
           educationPhase2GroupId,
-          educationPhase2ChildGroupId
+          educationPhase2ChildGroupId,
         },
       } = curr
       acc[20].add(educationPhase1GroupId)
@@ -330,5 +352,5 @@ const updateElementDetails = async studyRights => {
 module.exports = {
   updateStudyRights,
   updateStudyRightElements,
-  updateElementDetails
+  updateElementDetails,
 }

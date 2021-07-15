@@ -6,9 +6,9 @@ module.exports = {
       type: STRING,
       references: {
         model: 'semesters',
-        key: 'composite'
-      }
+        key: 'composite',
+      },
     })
   },
-  down: async () => {}
+  down: async () => {},
 }

@@ -28,8 +28,10 @@ cleanup() {
 # === CLI ===
 
 show_welcome() {
-  local cashmoneyyellow=$(tput setaf 221)
-  local normal=$(tput sgr0)
+  local cashmoneyyellow
+  cashmoneyyellow=$(tput setaf 221)
+  local normal
+  normal=$(tput sgr0)
   if [ "$(tput cols)" -gt "76" ]; then
     while IFS="" read -r p || [ -n "$p" ]; do
       printf '%40s\n' "${cashmoneyyellow}$p${normal}"
@@ -37,9 +39,8 @@ show_welcome() {
   fi
   infomsg "Welcome to Oodikone CLI!"
   msg "This tool helps you in managing the project configuration. If you are new to
-Oodikone development, you should probably run \"Set up oodikone\" which will
-take care of setting up and starting Oodikone for you. See README for more
-details."
+Oodikone development, you should probably run \"Set up oodikone from scratch.\" which
+will take care of setting up Oodikone for you. See README for more details."
   msg ""
 }
 
@@ -47,7 +48,7 @@ details."
 PS3="Please enter your choice: "
 
 options=(
-  "Set up oodikone."
+  "Set up oodikone from scratch."
   "Reset all real data."
   "Reset sis-importer data."
   "Reset old oodi data."
@@ -62,8 +63,8 @@ get_username
 while true; do
   select opt in "${options[@]}"; do
     case $opt in
-      "Set up oodikone.")
-        set_up_oodikone;;
+      "Set up oodikone from scratch.")
+        set_up_oodikone_from_scratch;;
       "Reset all real data.")
         reset_all_real_data;;
       "Reset sis-importer data.")

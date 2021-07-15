@@ -12,7 +12,6 @@ on:
       - docker-compose.ci.yml
       - nginx.conf
       - package*.json
-      - run.sh
 
 jobs:
   # === Static tests / linting ===
@@ -20,48 +19,43 @@ jobs:
   lint_backend:
     name: "Lint backend"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/backend/oodikone2-backend
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Install dependencies
-        run: npm ci
-      - name: Run linter
-        run: npm run lint
+      - name: "Install dependencies"
+        run: npm ci && cd services/backend && npm ci
+      - name: "Run backend linter"
+        run: npm run eslint services/backend
+
   lint_frontend:
     name: "Lint frontend"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/oodikone2-frontend
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Install dependencies
-        run: npm ci
-      - name: Run linter
-        run: npm run lint
+      - name: "Install dependencies"
+        run: npm ci && cd services/frontend && npm ci
+      - name: "Run frontend linter"
+        run: npm run concurrently \
+              'eslint --ext .jsx,.js services/frontend' \
+              'stylelint services/frontend/src/**/*.css'
+
   lint_userservice:
     name: "Lint userservice"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: services/oodikone2-userservice
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 14
-      - name: Install dependencies
-        run: npm ci
-      - name: Run linter
-        run: npm run lint
+      - name: "Install dependencies"
+        run: npm ci && cd services/userservice && npm ci
+      - name: "Run frontend linter"
+        run: npm run eslint services/userservice
 
   # === Build images ===
 
@@ -70,55 +64,63 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TAG: trunk
-      CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Pull previous build from Docker hub
-        run: ./run.sh oodikone ci pull backend
-      - name: Build image
-        run: ./run.sh oodikone ci build backend
-      - name: Save built image
-        run: docker save toska/oodikone2-backend:trunk -o /tmp/backend.tar
-      - name: Upload image for other jobs
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: "Build image and export it"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-backend:trunk
+          cache-to: type=inline
+          context: services/backend
+          tags: toska/oodikone2-backend:trunk
+          target: production
+          outputs: type=docker,dest=/tmp/backend.tar
+      - name: "Upload image for other jobs"
         uses: actions/upload-artifact@v2
         with:
           path: /tmp/backend.tar
+
   build_frontend:
     name: "Build frontend"
     runs-on: ubuntu-latest
     env:
       TAG: trunk
-      CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Pull previous build from Docker hub
-        run: ./run.sh oodikone ci pull frontend
-      - name: Build image
-        run: ./run.sh oodikone ci build frontend
-      - name: Save built image
-        run: docker save toska/oodikone2-frontend:trunk -o /tmp/frontend.tar
-      - name: Upload image for other jobs
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: "Build image and export it"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-frontend:trunk
+          cache-to: type=inline
+          context: services/frontend
+          tags: toska/oodikone2-frontend:trunk
+          target: production
+          outputs: type=docker,dest=/tmp/frontend.tar
+      - name: "Upload image for other jobs"
         uses: actions/upload-artifact@v2
         with:
           path: /tmp/frontend.tar
+
   build_userservice:
     name: "Build userservice"
     runs-on: ubuntu-latest
     env:
       TAG: trunk
-      CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Pull previous build from Docker hub
-        run: ./run.sh oodikone ci pull userservice
-      - name: Build image
-        run: ./run.sh oodikone ci build userservice
-      - name: Save built image
-        run: docker save toska/oodikone2-userservice:trunk -o /tmp/userservice.tar
-      - name: Upload image for other jobs
+      - uses: actions/checkout@v2
+      - uses: docker/setup-buildx-action@v1
+      - name: "Build image and export it"
+        uses: docker/build-push-action@v2
+        with:
+          cache-from: type=registry,ref=toska/oodikone2-userservice:trunk
+          cache-to: type=inline
+          context: services/userservice
+          tags: toska/oodikone2-userservice:trunk
+          target: production
+          outputs: type=docker,dest=/tmp/userservice.tar
+      - name: "Upload image for other jobs"
         uses: actions/upload-artifact@v2
         with:
           path: /tmp/userservice.tar
@@ -131,7 +133,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Run tests included in docker build
-        run: docker-compose -f docker-compose.test.yml up --build userservice-test 
+        run: docker-compose -f docker-compose.test.yml up --build userservice-test
 
   # === End-to-end tests ===
 
@@ -164,7 +166,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -208,7 +210,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -252,7 +254,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -296,7 +298,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -340,7 +342,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -384,7 +386,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -428,7 +430,7 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
       - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
       - name: Run cypress
         uses: cypress-io/github-action@v2
         with:
@@ -454,26 +456,25 @@ jobs:
       TAG: trunk
       CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
+      - uses: actions/checkout@v2
+      - name: "Download images"
         uses: actions/download-artifact@v2
         with:
           path: /tmp/
-      - name: Load built images
+      - name: "Load built images"
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
+      - name: "Login to toska docker registry"
         uses: docker/login-action@v1
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
-      - name: Run cypress
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
+      - name: "Run cypress"
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
@@ -482,7 +483,7 @@ jobs:
             cypress/integration/Users.js
         env:
           CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
+      - name: "Upload video if failing"
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -503,26 +504,25 @@ jobs:
       TAG: trunk
       CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
+      - uses: actions/checkout@v2
+      - name: "Download images"
         uses: actions/download-artifact@v2
         with:
           path: /tmp/
-      - name: Load built images
+      - name: "Load built images"
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
+      - name: "Login to toska docker registry"
         uses: docker/login-action@v1
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
-        run: ./run.sh oodikone ci up -d --no-recreate
-      - name: Check that exit statuses are not errors
+      - name: "Run services, pull rest of the needed images"
+        run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
+      - name: "Check that exit statuses are not errors"
         run: |
           docker ps -a
           if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
@@ -551,8 +551,7 @@ jobs:
       TAG: trunk
       CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - name: Download images
         uses: actions/download-artifact@v2
         with:
@@ -562,17 +561,17 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
-      - name: Login to DockerHub
+      - name: "Login to DockerHub"
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: "Push to docker hub"
-        run: ./run.sh oodikone ci push
+        run: docker-compose -f docker-compose.ci.yml push
 
   report_failure:
     runs-on: ubuntu-latest
-    name: Report test failure to oodikone notifications
+    name: "Report test failure to oodikone notifications"
     needs:
     - lint_backend
     - lint_frontend
@@ -590,10 +589,11 @@ jobs:
     - push_to_dockerhub
     if: failure()
     steps:
+      - uses: actions/checkout@v2
       - name: "Send notification to slack"
         uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: test-failure
       - name: "Print logs on failure"
-        run: ./run.sh oodikone ci logs
+        run: docker-compose -f docker-compose.ci.yml logs

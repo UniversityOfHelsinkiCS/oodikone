@@ -3,22 +3,10 @@ version: "3.9"
 x-defaults: &defaults
   restart: unless-stopped
 
-x-build_defaults: &build_defaults
-  args:
-    TAG: ${TAG}
-
 services:
 
   backend:
     <<: *defaults
-    build:
-      <<: *build_defaults
-      cache_from:
-        - toska/oodikone2-backend:trunk
-        - toska/oodikone2-backend:staging
-        - toska/oodikone2-backend:latest
-      context: services/backend
-      dockerfile: oodikone2-backend/Dockerfile
     container_name: backend
     depends_on:
       - kone-db
@@ -36,39 +24,24 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       USERSERVICE_URL: http://userservice:4567
-    image: toska/oodikone2-backend:${TAG}
-    ports:
-      - "9229:9229"
+    image: toska/oodikone2-backend:trunk
 
   frontend:
     <<: *defaults
-    build:
-      <<: *build_defaults
-      cache_from:
-        - toska/oodikone2-frontend:trunk
-        - toska/oodikone2-frontend:staging
-        - toska/oodikone2-frontend:latest
-      context: services/oodikone2-frontend
     container_name: frontend
     environment:
       BACKEND_ADDR: backend
-    image: toska/oodikone2-frontend:${TAG}
-    ports:
-      - "5000:5000"
+    image: toska/oodikone2-frontend:trunk
 
   kone-db:
     <<: *defaults
     container_name: kone-db
     image: registry.toska.cs.helsinki.fi/kone-db
-    ports:
-      - "5425:5432"
 
   oodi-db: # TODO: Remove when oodi stuff has been removed from oodikone
     <<: *defaults
     container_name: oodi-db
     image: registry.toska.cs.helsinki.fi/oodi-db
-    ports:
-      - "5421:5432"
 
   redis:
     <<: *defaults
@@ -76,32 +49,20 @@ services:
     container_name: redis
     image: redis
     ports:
-      - "6379:6379"
+      - 6379:6379
 
   sis-db:
     <<: *defaults
     container_name: sis-db
     image: registry.toska.cs.helsinki.fi/sis-db
-    ports:
-      - "5426:5432"
 
   user-db:
     <<: *defaults
     container_name: user-db
     image: registry.toska.cs.helsinki.fi/user-db
-    ports:
-      - "5422:5432"
 
   userservice:
     <<: *defaults
-    build:
-      <<: *build_defaults
-      cache_from:
-        - toska/oodikone2-userservice:trunk
-        - toska/oodikone2-userservice:staging
-        - toska/oodikone2-userservice:latest
-      context: services/oodikone2-userservice
-      target: production
     container_name: userservice
     depends_on:
       - user-db
@@ -109,9 +70,7 @@ services:
       DB_URL: postgres://postgres@user-db:5432/user-db
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       TOKEN_SECRET: IWannaBeTheVeryBest
-    image: toska/oodikone2-userservice:${TAG}
-    ports:
-      - "4567:4567"
+    image: toska/oodikone2-userservice:trunk
 
   nginx:
     image: nginx:latest
