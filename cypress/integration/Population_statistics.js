@@ -15,6 +15,7 @@ describe('Population Statistics tests', () => {
     cy.init()
   })
 
+  /*
   const checkAmountOfStudents = assertion => {
     let students = 0
     cy.contains('Credit accumulation')
@@ -25,6 +26,7 @@ describe('Population Statistics tests', () => {
         expect(students).to.equal(assertion)
       })
   }
+  */
 
   it('Population statistics search form is usable', () => {
     cy.cs('navbar-studyProgramme').click()
@@ -48,8 +50,9 @@ describe('Population Statistics tests', () => {
       })
 
     cy.contains('Select study programme')
+    cy.get('[data-cy=select-study-programme]')
       .click()
-      .siblings()
+      .children()
       .contains('Tietojenkäsittelytieteen maisteriohjelma')
       .click()
   })
@@ -68,7 +71,8 @@ describe('Population Statistics tests', () => {
     })
     cy.contains('Courses of population').click({ force: true })
 
-    cy.route('/api/v3/courseyearlystats**').as('coursePage')
+    cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(3000) // a bit hacky way, wait until ui is ready
     cy.cs('expand-TKT1').click()
     cy.cs('coursestats-link-TKT10002').click()
@@ -88,7 +92,7 @@ describe('Population Statistics tests', () => {
     cy.contains('Check for studentnumbers')
     cy.get('textarea').type(existing).type('{enter}').type(nonExisting)
     cy.contains('button', 'check students').click()
-    cy.contains('#checkstudentsresults', 'Results').within(e => {
+    cy.contains('#checkstudentsresults', 'Results').within(() => {
       cy.contains('Student numbers in list and in oodi').click()
       cy.contains('#found', existing)
       cy.contains('Student numbers in list but not in oodi').click()
