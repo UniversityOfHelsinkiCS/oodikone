@@ -456,26 +456,25 @@ jobs:
       TAG: trunk
       CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
+      - uses: actions/checkout@v2
+      - name: "Download images"
         uses: actions/download-artifact@v2
         with:
           path: /tmp/
-      - name: Load built images
+      - name: "Load built images"
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
+      - name: "Login to toska docker registry"
         uses: docker/login-action@v1
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
+      - name: "Run services, pull rest of the needed images"
         run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Run cypress
+      - name: "Run cypress"
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
@@ -484,7 +483,7 @@ jobs:
             cypress/integration/Users.js
         env:
           CYPRESS_baseUrl: http://localhost:1337
-      - name: Upload video
+      - name: "Upload video if failing"
         uses: actions/upload-artifact@v2
         if: failure()
         with:
@@ -505,26 +504,25 @@ jobs:
       TAG: trunk
       CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-      - name: Download images
+      - uses: actions/checkout@v2
+      - name: "Download images"
         uses: actions/download-artifact@v2
         with:
           path: /tmp/
-      - name: Load built images
+      - name: "Load built images"
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
-      - name: Login to toska docker registry
+      - name: "Login to toska docker registry"
         uses: docker/login-action@v1
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: Run services, pull rest of the needed images
+      - name: "Run services, pull rest of the needed images"
         run: docker-compose -f docker-compose.ci.yml up --detach --no-recreate
-      - name: Check that exit statuses are not errors
+      - name: "Check that exit statuses are not errors"
         run: |
           docker ps -a
           if [[ $(docker ps --all | grep -Eo '(Exited|Restarting) \([0-9]+\)' | grep -Eo '[0-9]+' | awk 'BEGIN {sum=0} { sum += $1 } END { print sum }') != '0' ]]; then
@@ -553,8 +551,7 @@ jobs:
       TAG: trunk
       CACHE_TAG: trunk
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - name: Download images
         uses: actions/download-artifact@v2
         with:
@@ -564,17 +561,17 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
           docker load --input /tmp/artifact/userservice.tar
-      - name: Login to DockerHub
+      - name: "Login to DockerHub"
         uses: docker/login-action@v1
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}docker-compose -f docker-compose.ci.yml logs
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: "Push to docker hub"
         run: docker-compose -f docker-compose.ci.yml push
 
   report_failure:
     runs-on: ubuntu-latest
-    name: Report test failure to oodikone notifications
+    name: "Report test failure to oodikone notifications"
     needs:
     - lint_backend
     - lint_frontend
@@ -592,6 +589,7 @@ jobs:
     - push_to_dockerhub
     if: failure()
     steps:
+      - uses: actions/checkout@v2
       - name: "Send notification to slack"
         uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.1
         with:
