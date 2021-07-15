@@ -158,6 +158,8 @@ linting and formatting"
   done
   cd "$PROJECT_ROOT" || die "Couldn't change directory to project root"
 
+  infomsg "Setting up husky for pre-commit linting"
+  npm run prepare
 
   infomsg "Pulling images"
   "$PROJECT_ROOT"/run.sh oodikone anon pull
