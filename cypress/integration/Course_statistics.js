@@ -140,6 +140,7 @@ describe('Course Statistics tests', () => {
       // [time, passed, failed, passrate]
       ['Total', 511, 486, 25],
     ]
+    /*
     const studentTableContents = [
       // time, students, passedfirsttry, passedeventually, pass%, neverpassed, fail%]
       ['Total', 289, 254, 13, '92.39 %', 22, '7.61 %'],
@@ -149,6 +150,8 @@ describe('Course Statistics tests', () => {
       ['2014-15', 16, 16, 0, '100.00 %', 0, '0.00 %'],
       ['2013-14', 5, 3, 2, '100.00 %', 0, '0.00 %'],
     ]
+    */
+
     const gradesTableContents = [
       // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
       ['Total', 511, 25, 11, 17, 21, 59, 365, 13],
@@ -176,12 +179,13 @@ describe('Course Statistics tests', () => {
       })
       cy.contains('Show population').should('not.be.enabled')
 
+      /*
       const timeRangeFilter =
         timeRange =>
         ([time]) => {
           return (timeRange.from <= time && time <= timeRange.to) || time === 'Total'
         }
-
+*/
       cy.contains('#CourseStatPanes a.item', 'Table').click()
       cy.contains('#CourseStatPanes a.item', 'Attempts').click()
       cy.get('#CourseStatPanes table>tbody').within(() => {
@@ -626,7 +630,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Users').click()
       cy.contains('Oodikone users')
       cy.contains('mocking').should('not.exist')
-      cy.contains('tr', 'User manager').within($row => {
+      cy.contains('tr', 'User manager').within(() => {
         cy.contains('.button', 'Edit').click()
       })
 
@@ -637,6 +641,7 @@ describe('Course Statistics tests', () => {
       cy.get('i.spy').click()
       cy.wait('@superlogin')
       cy.contains('mocking as usermk')
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(1000)
 
       cy.get('[data-cy=navbar-courseStatistics]').click()
@@ -671,16 +676,17 @@ describe('Course Statistics tests', () => {
       })
 
       cy.contains('Stop mocking').click()
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(1000)
 
       cy.contains('Users').click()
       cy.contains('Oodikone users')
-      cy.contains('tr', 'User manager').within($row => {
+      cy.contains('tr', 'User manager').within(() => {
         cy.contains('.button', 'Edit').click()
       })
       cy.contains('Access Groups')
         .siblings()
-        .within($row => {
+        .within(() => {
           cy.get("i[class='dropdown icon clear']").click()
         })
       cy.get('[data-cy=access-groups-save]').click()

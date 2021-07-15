@@ -13,7 +13,7 @@ const clearSemanticUIMultipleDropDownSelection = dataCyAttribute => {
 }
 
 const clearSingleDropdownSelection = dataCyAttribute => {
-  cy.cs(dataCyAttribute).find("i.clear").click();
+  cy.cs(dataCyAttribute).find('i.clear').click()
 }
 
 // Helper tool to create pre and post steps for each filter step. Created to avoid copypasting clicking and checking
@@ -96,17 +96,17 @@ describe('Population Statistics', () => {
     })
   })
 
-  it("Gender filter works", () => {
-    runTestStepWithPreAndPostParts("genderFilter-header", () => {
-      cy.selectFromDropdown("genderFilter-dropdown", 0);
-      checkFilteringResult(36);
-      cy.selectFromDropdown("genderFilter-dropdown", 1);
-      checkFilteringResult(112);
-      cy.selectFromDropdown("genderFilter-dropdown", 2);
-      checkFilteringResult(0);
-      cy.selectFromDropdown("genderFilter-dropdown", 3);
-      checkFilteringResult(0);
-      clearSingleDropdownSelection("genderFilter-dropdown")
+  it('Gender filter works', () => {
+    runTestStepWithPreAndPostParts('genderFilter-header', () => {
+      cy.selectFromDropdown('genderFilter-dropdown', 0)
+      checkFilteringResult(36)
+      cy.selectFromDropdown('genderFilter-dropdown', 1)
+      checkFilteringResult(112)
+      cy.selectFromDropdown('genderFilter-dropdown', 2)
+      checkFilteringResult(0)
+      cy.selectFromDropdown('genderFilter-dropdown', 3)
+      checkFilteringResult(0)
+      clearSingleDropdownSelection('genderFilter-dropdown')
     })
   })
 
@@ -121,17 +121,17 @@ describe('Population Statistics', () => {
     })
   })
 
-  it("Courses filter works", () => {
-    runTestStepWithPreAndPostParts("courseFilter-header", () => {
-      const courses = ["TKT20001", "MAT11002"]
-      cy.cs("courseFilter-course-dropdown").click().contains(courses[0]).click();
-      checkFilteringResult(140);
-      cy.selectFromDropdown(`courseFilter-${courses[0]}-dropdown`, 1);
-      checkFilteringResult(131);
-      cy.cs("courseFilter-course-dropdown").click().contains(courses[1]).click();
-      checkFilteringResult(56);
-      cy.selectFromDropdown(`courseFilter-${courses[1]}-dropdown`, 2);
-      checkFilteringResult(2);
+  it('Courses filter works', () => {
+    runTestStepWithPreAndPostParts('courseFilter-header', () => {
+      const courses = ['TKT20001', 'MAT11002']
+      cy.cs('courseFilter-course-dropdown').click().contains(courses[0]).click()
+      checkFilteringResult(140)
+      cy.selectFromDropdown(`courseFilter-${courses[0]}-dropdown`, 1)
+      checkFilteringResult(131)
+      cy.cs('courseFilter-course-dropdown').click().contains(courses[1]).click()
+      checkFilteringResult(56)
+      cy.selectFromDropdown(`courseFilter-${courses[1]}-dropdown`, 2)
+      checkFilteringResult(2)
       courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
     })
   })
@@ -183,17 +183,17 @@ describe('Course Statistics', () => {
     })
   })
 
-  it("Gender filter works", () => {
-    runTestStepWithPreAndPostParts("genderFilter-header", () => {
-      cy.selectFromDropdown("genderFilter-dropdown", 0);
-      checkFilteringResult(27);
-      cy.selectFromDropdown("genderFilter-dropdown", 1);
-      checkFilteringResult(91);
-      cy.selectFromDropdown("genderFilter-dropdown", 2);
-      checkFilteringResult(0);
-      cy.selectFromDropdown("genderFilter-dropdown", 3);
-      checkFilteringResult(0);
-      clearSingleDropdownSelection("genderFilter-dropdown")
+  it('Gender filter works', () => {
+    runTestStepWithPreAndPostParts('genderFilter-header', () => {
+      cy.selectFromDropdown('genderFilter-dropdown', 0)
+      checkFilteringResult(27)
+      cy.selectFromDropdown('genderFilter-dropdown', 1)
+      checkFilteringResult(91)
+      cy.selectFromDropdown('genderFilter-dropdown', 2)
+      checkFilteringResult(0)
+      cy.selectFromDropdown('genderFilter-dropdown', 3)
+      checkFilteringResult(0)
+      clearSingleDropdownSelection('genderFilter-dropdown')
     })
   })
 
@@ -208,20 +208,20 @@ describe('Course Statistics', () => {
     })
   })
 
-  it("Filter combinations work", () => {
-    runTestStepWithPreAndPostParts("gradeFilter-header", () => {
-      runTestStepWithPreAndPostParts("ageFilter-header", () => {
-        cy.cs("gradeFilter-3").click();
-        cy.cs("ageFilter-min").type("20");
-        cy.cs("ageFilter-max").type("30");
-        checkFilteringResult(1);
-        cy.cs("ageFilter-min").find("input").clear();
-        cy.cs("ageFilter-max").find("input").clear();
-        cy.cs("gradeFilter-3").click();
-      });
-    });
-  });
-});
+  it('Filter combinations work', () => {
+    runTestStepWithPreAndPostParts('gradeFilter-header', () => {
+      runTestStepWithPreAndPostParts('ageFilter-header', () => {
+        cy.cs('gradeFilter-3').click()
+        cy.cs('ageFilter-min').type('20')
+        cy.cs('ageFilter-max').type('30')
+        checkFilteringResult(1)
+        cy.cs('ageFilter-min').find('input').clear()
+        cy.cs('ageFilter-max').find('input').clear()
+        cy.cs('gradeFilter-3').click()
+      })
+    })
+  })
+})
 
 describe('Custom Population Statistics', () => {
   let runTestStepWithPreAndPostParts
@@ -246,18 +246,18 @@ describe('Custom Population Statistics', () => {
       cy.cs('ageFilter-max').find('input').clear()
     })
   })
-  
-  it("Gender filter works", () => {
-    cy.cs("genderFilter-header").click();
-    cy.selectFromDropdown("genderFilter-dropdown", 0);
-    checkFilteringResult(3);
-    cy.selectFromDropdown("genderFilter-dropdown", 1);
-    checkFilteringResult(2);
-    cy.selectFromDropdown("genderFilter-dropdown", 2);
-    checkFilteringResult(0);
-    clearSingleDropdownSelection("genderFilter-dropdown")
-    checkFilteringResult(5, true);
-  });
+
+  it('Gender filter works', () => {
+    cy.cs('genderFilter-header').click()
+    cy.selectFromDropdown('genderFilter-dropdown', 0)
+    checkFilteringResult(3)
+    cy.selectFromDropdown('genderFilter-dropdown', 1)
+    checkFilteringResult(2)
+    cy.selectFromDropdown('genderFilter-dropdown', 2)
+    checkFilteringResult(0)
+    clearSingleDropdownSelection('genderFilter-dropdown')
+    checkFilteringResult(5, true)
+  })
 
   it('Starting year filter works', () => {
     runTestStepWithPreAndPostParts('startYearAtUni-header', () => {
@@ -266,18 +266,18 @@ describe('Custom Population Statistics', () => {
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
     })
   })
-  
-  it("Courses filter works", () => {
-    runTestStepWithPreAndPostParts("courseFilter-header", () => {
-      const courses = ["MAT11001", "TKT20004"]
-      cy.cs("courseFilter-course-dropdown").click().contains(courses[0]).click();
-      checkFilteringResult(4);
-      cy.selectFromDropdown(`courseFilter-${courses[0]}-dropdown`, 1);
-      checkFilteringResult(4);
-      cy.cs("courseFilter-course-dropdown").click().contains(courses[1]).click();
-      checkFilteringResult(3);
-      cy.selectFromDropdown(`courseFilter-${courses[1]}-dropdown`, 3);
-      checkFilteringResult(1);
+
+  it('Courses filter works', () => {
+    runTestStepWithPreAndPostParts('courseFilter-header', () => {
+      const courses = ['MAT11001', 'TKT20004']
+      cy.cs('courseFilter-course-dropdown').click().contains(courses[0]).click()
+      checkFilteringResult(4)
+      cy.selectFromDropdown(`courseFilter-${courses[0]}-dropdown`, 1)
+      checkFilteringResult(4)
+      cy.cs('courseFilter-course-dropdown').click().contains(courses[1]).click()
+      checkFilteringResult(3)
+      cy.selectFromDropdown(`courseFilter-${courses[1]}-dropdown`, 3)
+      checkFilteringResult(1)
       courses.forEach(course => cy.cs(`courseFilter-${course}-clear`).click())
     })
   })
