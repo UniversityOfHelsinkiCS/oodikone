@@ -58,6 +58,9 @@ Studyright.init(
     updatedAt: {
       type: DATE,
     },
+    admissionType: {
+      type: STRING,
+    },
   },
   {
     underscored: true,
