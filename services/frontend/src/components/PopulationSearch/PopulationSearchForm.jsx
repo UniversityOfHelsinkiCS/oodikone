@@ -46,11 +46,10 @@ const PopulationSearchForm = props => {
     isLoading: false,
     momentYear: Datetime.moment('2017-01-01'),
   })
-  // const [didMount, setDidMount] = useState(false)
+  const [didMount, setDidMount] = useState(false)
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('populationSearch', 8)
 
   const fetchPopulationPromises = useRef()
-  const isMounted = useRef(true)
 
   const setState = newState => setTotalState({ ...totalState, ...newState })
 
@@ -118,7 +117,7 @@ const PopulationSearchForm = props => {
       ])
     )
     const success = await fetchPopulationPromises.current.promise
-    if (success && isMounted.current) {
+    if (success) {
       setState({
         isLoading: false,
       })
@@ -136,12 +135,6 @@ const PopulationSearchForm = props => {
   }
 
   useEffect(() => {
-    return () => {
-      isMounted.current = false
-    }
-  }, [])
-
-  useEffect(() => {
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       setState({ query: initialQuery() })
       props.getDegreesAndProgrammes()
@@ -150,10 +143,9 @@ const PopulationSearchForm = props => {
       props.getSemesters()
     }
     if (location.search) {
-      console.log('location search: ', location.search)
       fetchPopulationFromUrlParams()
     }
-    if (!location.search && isMounted.current) {
+    if (!location.search) {
       setState({
         query: {
           ...query,
@@ -163,7 +155,7 @@ const PopulationSearchForm = props => {
         },
       })
     }
-    // setDidMount(true)
+    setDidMount(true)
     return () => {
       if (fetchPopulationPromises.current) fetchPopulationPromises.current.cancel()
     }
@@ -199,12 +191,7 @@ const PopulationSearchForm = props => {
   }
 
   useEffect(() => {
-    if (
-      studyProgrammes &&
-      Object.values(studyProgrammes).length === 1 &&
-      !query.studyRights.programme &&
-      isMounted.current
-    ) {
+    if (studyProgrammes && Object.values(studyProgrammes).length === 1 && !query.studyRights.programme && didMount) {
       handleProgrammeChange(null, { value: Object.values(studyProgrammes)[0].code })
     }
   })
@@ -537,7 +524,7 @@ const PopulationSearchForm = props => {
 
   const renderStudyGroupSelector = () => {
     const { studyRights } = query
-    if (props.pending) {
+    if (props.pending || !didMount) {
       return <Icon name="spinner" loading size="big" color="black" style={{ marginLeft: '45%' }} />
     }
     if (Object.values(studyProgrammes).length === 0 && !props.pending) {
