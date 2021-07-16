@@ -409,7 +409,9 @@ const PopulationSearchForm = props => {
               ) : null
             }
             closeOnSelect
-            value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`}
+            renderInput={dateInputProps => (
+              <input {...dateInputProps} value={`${year}-${moment().year(year).add(1, 'years').format('YYYY')}`} />
+            )}
             isValidDate={validYearCheck}
             onChange={handleYearSelection}
           />
