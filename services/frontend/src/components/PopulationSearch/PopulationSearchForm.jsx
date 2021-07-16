@@ -127,7 +127,8 @@ const PopulationSearchForm = props => {
   const fetchPopulationFromUrlParams = () => {
     const previousQuery = queries
     const query = parseQueryFromUrl()
-    if (!checkPreviousQuery(query, previousQuery)) {
+    const formattedQuery = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
+    if (!checkPreviousQuery(formattedQuery, previousQuery)) {
       setState({ query })
       fetchPopulation(query)
     }
@@ -135,7 +136,7 @@ const PopulationSearchForm = props => {
 
   useEffect(() => {
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
-      setState({ query: initialQuery() }) // eslint-disable-line
+      setState({ query: initialQuery() })
       props.getDegreesAndProgrammes()
     }
     if (!semesters.years) {
