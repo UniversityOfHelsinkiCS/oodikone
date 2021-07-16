@@ -131,7 +131,7 @@ describe('Population Statistics tests', () => {
     cy.contains('Create new tag')
   })
 
-  it.only('Advanced settings work', () => {
+  it('Advanced settings work', () => {
     cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
     cy.get('[data-cy=advanced-toggle]').click()
     cy.contains('Statistics until')
