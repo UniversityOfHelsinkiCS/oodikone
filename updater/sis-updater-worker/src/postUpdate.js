@@ -34,7 +34,6 @@ const postUpdate = async (updateMsg, currentChunkStartTime) => {
     updateMsg.entityIds || [],
     studentsThatNeedToBeFixed.map(s => s.id)
   )
-  console.log(updateMsg)
   if (studentsToBeFixed.length > 0) {
     await fixVarhaiskasvatusStudyRights(studentsToBeFixed)
   }
