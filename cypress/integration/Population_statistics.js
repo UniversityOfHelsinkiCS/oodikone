@@ -131,7 +131,7 @@ describe('Population Statistics tests', () => {
     cy.contains('Create new tag')
   })
 
-  it.skip('Advanced settings work', () => {
+  it('Advanced settings work', () => {
     cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
     cy.get('[data-cy=advanced-toggle]').click()
     cy.contains('Statistics until')
@@ -139,7 +139,8 @@ describe('Population Statistics tests', () => {
     cy.cs('toggle-fall').click()
     cy.contains('Fetch population').click()
 
-    cy.contains('Credit accumulation (for 0 students)')
+    // cy.contains('Credit accumulation (for 0 students)')
+    cy.contains('No statistics found for the given query.')
 
     // only fall
     cy.get('[data-cy=advanced-toggle]').click()
@@ -149,7 +150,7 @@ describe('Population Statistics tests', () => {
     cy.contains('Fetch population').click()
 
     // FIXME: This fails randomly both locally and on CI.
-    cy.contains('Credit accumulation (for 194 students)')
+    cy.contains('Credit accumulation (for 149 students)')
 
     // spring + fall and include cancelled
     cy.get('[data-cy=advanced-toggle]').click()
@@ -157,7 +158,7 @@ describe('Population Statistics tests', () => {
     cy.cs('toggle-cancelled').click()
     cy.contains('Fetch population').click()
 
-    cy.contains('Credit accumulation (for 202 students)')
+    cy.contains('Credit accumulation (for 170 students)')
   })
 
   it('Credit Statistics, Statistics pane works', () => {
