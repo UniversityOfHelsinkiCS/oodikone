@@ -8,7 +8,7 @@ import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 
 const AdmissionType = ({ code }) => {
-  const { addFilter, removeFilter, activeFilters } = useFilters()
+  const { addFilter, removeFilter, activeFilters, withoutFilter } = useFilters()
   const analytics = useAnalytics()
   const [value, setValue] = useState(null)
   const name = 'admissionTypeFilter'
@@ -23,23 +23,24 @@ const AdmissionType = ({ code }) => {
     YP: 'Yhteispisteet',
   }
 
+  const filterFunction = value => student =>
+    student.studyrights.some(sr => sr.studyright_elements.some(e => e.code === code) && value === sr.admission_type)
+
   useEffect(() => {
     if (!value) {
       removeFilter(name)
       analytics.clearFilter(name)
     } else {
-      addFilter(name, student =>
-        student.studyrights.some(
-          sr => sr.studyright_elements.some(elem => elem.code === code) && value === sr.admission_type
-        )
-      )
+      addFilter(name, filterFunction(value))
       analytics.setFilter(name, value)
     }
   }, [value])
 
+  const count = admissionType => withoutFilter(name).filter(filterFunction(admissionType)).length
+
   const options = Object.entries(admissionTypes).map(([key, admissionType]) => ({
     key,
-    text: `${admissionType} (0)`,
+    text: `${admissionType} (${count(admissionType)})`,
     value: admissionType,
   }))
 

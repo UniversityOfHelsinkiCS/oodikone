@@ -32,12 +32,6 @@ export default () => {
     }
   }, [value])
 
-  const countsByGender = {}
-  withoutFilter(name).forEach(student => {
-    const gc = student.gender_code
-    countsByGender[gc] = countsByGender[gc] ? countsByGender[gc] + 1 : 1
-  })
-
   const count = genderCode => withoutFilter(name).filter(student => Number(student.gender_code) === genderCode).length
 
   const options = Object.entries(genderCodes).map(([key, gender]) => ({
