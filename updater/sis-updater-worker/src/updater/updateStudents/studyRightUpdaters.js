@@ -1,9 +1,9 @@
 const { educationTypeToExtentcode } = require('../shared')
 const { isBaMa } = require('../../utils')
-const { get, sortBy, sortedUniqBy, orderBy, uniqBy, has } = require('lodash')
+const { get, sortBy, sortedUniqBy, orderBy, uniqBy } = require('lodash')
 const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
 const { selectFromByIds, bulkCreate } = require('../../db')
-const { getDegrees, getEducation, getEducationType, getOrganisationCode } = require('../shared')
+const { getEducation, getEducationType, getOrganisationCode } = require('../shared')
 
 const updateStudyRights = async (
   groupedStudyRightSnapshots,
@@ -215,7 +215,7 @@ const updateStudyRightElements = async (
     return res
   }, {})
 
-  const possibleBscFirst = (s1, s2) => {
+  const possibleBscFirst = s1 => {
     if (!s1.accepted_selection_path.educationPhase2GroupId) return -1
     return 1
   }
