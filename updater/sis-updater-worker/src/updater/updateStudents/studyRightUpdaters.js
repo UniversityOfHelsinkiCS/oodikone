@@ -2,7 +2,7 @@ const { educationTypeToExtentcode } = require('../shared')
 const { isBaMa } = require('../../utils')
 const { get, sortBy, sortedUniqBy, orderBy, uniqBy } = require('lodash')
 const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
-const { selectFromByIds, bulkCreate } = require('../../db')
+const { selectFromByIds, bulkCreate, selectAllFrom } = require('../../db')
 const { getEducation, getEducationType, getOrganisationCode } = require('../shared')
 
 const updateStudyRights = async (
@@ -10,7 +10,7 @@ const updateStudyRights = async (
   personIdToStudentNumber,
   personIdToStudyRightIdToPrimality
 ) => {
-  const studyrightMapper = personIdToStudentNumber => (studyright, overrideProps) => {
+  const studyrightMapper = (personIdToStudentNumber, admissionNamesById) => (studyright, overrideProps) => {
     const defaultProps = {
       studyrightid: `${studyright.id}-1`, // duplikaattifix
       facultyCode: getOrganisationCode(studyright.organisation_id),
@@ -19,6 +19,7 @@ const updateStudyRights = async (
       studentStudentnumber: personIdToStudentNumber[studyright.person_id],
       graduated: studyright.study_right_graduation ? 1 : 0,
       studystartdate: studyright.valid.startDate,
+      admissionType: admissionNamesById[studyright.admission_type_urn],
     }
     return {
       ...defaultProps,
@@ -94,7 +95,12 @@ const updateStudyRights = async (
     return PRIORITYCODES.SECONDARY
   }
 
-  const mapStudyright = studyrightMapper(personIdToStudentNumber)
+  const admissionNamesById = (await selectAllFrom('admission_types')).reduce(
+    (acc, curr) => ({ ...acc, [curr.id]: curr.name.fi }),
+    {}
+  )
+
+  const mapStudyright = studyrightMapper(personIdToStudentNumber, admissionNamesById)
 
   // Take only the latest study rights
   const latestStudyRights = Object.values(groupedStudyRightSnapshots).reduce((acc, curr) => {
