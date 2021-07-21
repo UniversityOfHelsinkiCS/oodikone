@@ -105,7 +105,6 @@ const NavigationBar = props => {
         </Menu.Item>
       )
     )
-  const testUsers = ['tktl', 'mluukkai']
   const renderUserMenu = () =>
     isDev ? (
       <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
@@ -121,17 +120,14 @@ const NavigationBar = props => {
               icon="database"
             />
           ))}
-          {testUsers.map(user => (
-            <Dropdown.Item
-              key={user}
-              icon="user"
-              text={`Use as: ${user}`}
-              onClick={() => {
-                setTestUser(user)
-                window.location.reload()
-              }}
-            />
-          ))}
+          <Dropdown.Item
+            icon="user"
+            text="Use as mluukkai"
+            onClick={() => {
+              setTestUser('mluukkai')
+              window.location.reload()
+            }}
+          />
           <Dropdown.Item icon="log out" text="Logout" onClick={logout} />
         </Dropdown.Menu>
       </Menu.Item>
