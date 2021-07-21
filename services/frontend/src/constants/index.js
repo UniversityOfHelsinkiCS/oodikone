@@ -1,5 +1,7 @@
 import colors from '../styles/variables'
 
+import { basePath, apiBasePath } from '../conf'
+
 const {
   chart1,
   chart2,
@@ -40,23 +42,14 @@ const {
 
 const { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } = colors
 
-const assumeBasename = () => {
-  const POSSIBLE_BASENAMES = ['testing']
-  const haystack = window.location.pathname.split('/')
-  const needle = haystack.find(path => POSSIBLE_BASENAMES.includes(path))
-  return needle ? `/${needle}/` : '/'
-}
-
-export const BASE_PATH = assumeBasename()
-
-export const API_BASE_PATH = `${assumeBasename()}api`
+export const BASE_PATH = basePath
+export const API_BASE_PATH = apiBasePath
 export const AVAILABLE_LANGUAGES = [
   { name: 'fi', code: 'fi' },
   { name: 'en', code: 'en' },
   { name: 'sv', code: 'sv' },
 ]
 export const DEFAULT_LANG = 'fi'
-
 export const DISPLAY_DATE_FORMAT = 'DD.MM.YYYY'
 export const DISPLAY_DATE_FORMAT_DEV = 'DD.MM.YYYY HH:mm:ss'
 export const API_DATE_FORMAT = 'YYYY.MM.DD'
