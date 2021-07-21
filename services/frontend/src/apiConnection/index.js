@@ -1,48 +1,22 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
-import { API_BASE_PATH, BASE_PATH, ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
-import { getMocked, setMocking, setTestUser, getTestUser, getTestUserOodi } from '../common'
-import { isDev } from '../conf'
+import { ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
+import { getMocked, setMocking, getTestUserOodi } from '../common'
+import { apiBasePath, isDev } from '../conf'
 
-const isTestEnv = BASE_PATH === '/testing/'
-const devOptions = {
-  headers: {
-    uid: getTestUser() || 'tktl',
-    displayName: 'Development Kayttaja',
-    'shib-session-id': 'mock-session',
+const getHeaders = () => {
+  const defaultHeaders = {
     'X-sis': !getTestUserOodi(),
-  },
-}
-
-const testOptions = {
-  headers: {
-    uid: 'tester',
-    displayName: 'Testing Käyttäjä',
+  }
+  const devHeaders = {
+    uid: 'mluukkai',
+    displayName: 'Matti Luukkainen',
     'shib-session-id': 'mock-session',
-  },
+  }
+  return isDev ? { ...defaultHeaders, ...devHeaders } : { ...defaultHeaders }
 }
 
-const getDefaultConfig = () => {
-  if (isTestEnv) {
-    return { ...testOptions }
-  }
-  if (isDev) {
-    return { ...devOptions }
-  }
-  return {
-    headers: {
-      'X-sis': !getTestUserOodi(),
-    },
-  }
-}
-
-const createDefaultAxiosConfig = () => {
-  const config = getDefaultConfig()
-  config.baseURL = API_BASE_PATH
-  return config
-}
-
-export const api = axios.create({ ...createDefaultAxiosConfig() })
+export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders() })
 
 const types = {
   attempt: prefix => `${prefix}ATTEMPT`,
@@ -58,20 +32,13 @@ export const actionTypes = prefix => ({
 
 export const logout = async () => {
   setMocking(null)
-  setTestUser(null)
   const returnUrl = window.location.origin
   const response = await api.delete('/logout', { data: { returnUrl } })
   window.location = response.data.logoutUrl
 }
 
 export const callApi = async (url, method = 'get', data, params, timeout = 0, progressCallback = null) => {
-  let options = { headers: {}, timeout }
-  if (isDev) {
-    options = devOptions
-  }
-  if (isTestEnv) {
-    options = testOptions
-  }
+  const options = { headers: getHeaders(), timeout }
 
   const onDownloadProgress = ({ loaded, total }) => {
     if (progressCallback) progressCallback(Math.round((loaded / total) * 100))
