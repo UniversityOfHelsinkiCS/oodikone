@@ -1,6 +1,5 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
-import { ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
 import { getMocked, setMocking, getTestUserOodi } from '../common'
 import { apiBasePath, isDev } from '../conf'
 
@@ -74,15 +73,13 @@ export const callController = (route, prefix, data, method = 'get', query, param
 const handleError = (err, actionHistory = []) => {
   const { response } = err
   if (response && response.status) {
-    if (!ERROR_STATUSES_NOT_TO_CAPTURE.includes(response.status)) {
-      Sentry.withScope(s => {
-        s.setExtra('config', err.config)
-        s.setExtra('request', err.request)
-        s.setExtra('response', err.response)
-        s.setExtra('actionHistory', JSON.stringify(actionHistory))
-        Sentry.captureException(err)
-      })
-    }
+    Sentry.withScope(s => {
+      s.setExtra('config', err.config)
+      s.setExtra('request', err.request)
+      s.setExtra('response', err.response)
+      s.setExtra('actionHistory', JSON.stringify(actionHistory))
+      Sentry.captureException(err)
+    })
   }
 }
 

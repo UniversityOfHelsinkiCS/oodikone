@@ -1,7 +1,5 @@
 import colors from '../styles/variables'
 
-import { basePath, apiBasePath } from '../conf'
-
 const {
   chart1,
   chart2,
@@ -42,8 +40,6 @@ const {
 
 const { chartblue, red, green, chartdarkg, chartlgreen, chartdarkred, chartlred } = colors
 
-export const BASE_PATH = basePath
-export const API_BASE_PATH = apiBasePath
 export const AVAILABLE_LANGUAGES = [
   { name: 'fi', code: 'fi' },
   { name: 'en', code: 'en' },
@@ -196,8 +192,6 @@ export const PRIORITYCODE_TEXTS = {
   2: 'Secondary',
   30: 'Graduated',
 }
-
-export const ERROR_STATUSES_NOT_TO_CAPTURE = []
 
 // Increment this if search history code changes
 // so it will be reseted for all users.
