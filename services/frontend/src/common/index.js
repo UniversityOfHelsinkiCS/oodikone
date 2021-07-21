@@ -12,11 +12,6 @@ export const setMocking = userid =>
   userid ? localStorage.setItem(MOCK_USERID, userid) : localStorage.removeItem(MOCK_USERID)
 export const getMocked = () => localStorage.getItem(MOCK_USERID)
 
-const TEST_USERID = 'TEST_USERID'
-export const setTestUser = userid =>
-  userid ? localStorage.setItem(TEST_USERID, userid) : localStorage.removeItem(TEST_USERID)
-export const getTestUser = () => localStorage.getItem(TEST_USERID)
-
 export const OODI_DB_FLAG = 'OODI_DB_FLAG'
 export const setTestUserOodi = booleanFlag =>
   booleanFlag ? localStorage.setItem(OODI_DB_FLAG, booleanFlag) : localStorage.removeItem(OODI_DB_FLAG)
