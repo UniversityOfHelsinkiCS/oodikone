@@ -1,4 +1,6 @@
 /// <reference types="Cypress" />
+//
+// TODO: Refactor this to be part of course population tests
 
 describe('Course population tests', () => {
   beforeEach(() => {
