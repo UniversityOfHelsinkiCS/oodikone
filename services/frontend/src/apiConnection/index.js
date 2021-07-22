@@ -13,6 +13,7 @@ const getHeaders = () => {
     'shib-session-id': 'mock-session',
     hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users',
     eduPersonAffiliation: 'member;employee;faculty',
+    mail: 'grp-toska+mockadmin@helsinki.fi',
   }
   return isDev ? { ...defaultHeaders, ...devUserHeaders } : { ...defaultHeaders }
 }
