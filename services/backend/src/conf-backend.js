@@ -69,13 +69,11 @@ const OODI_ADDR = OODI[process.env.NODE_ENV] || process.env.OODI_ADDR
 const ACCESS_TOKEN_HEADER_KEY = 'x-access-token'
 const OODI_SECRET_HEADER_KEY = 'x-oodi-secret'
 
-let requiredGroup = ['grp-oodikone-users', 'grp-oodikone-basic-users']
-if (process.env.NODE_ENV === 'staging') {
-  requiredGroup = ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
-}
-if (process.env.NODE_ENV === 'development' || isTest) {
-  requiredGroup = null
-}
+const isStaging = process.env.NODE_ENV === 'staging'
+
+const requiredGroup = isStaging
+  ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
+  : ['grp-oodikone-users', 'grp-oodikone-basic-users']
 
 module.exports = {
   frontend_addr,

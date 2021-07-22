@@ -7,12 +7,14 @@ const getHeaders = () => {
   const defaultHeaders = {
     'X-sis': !getTestUserOodi(),
   }
-  const devHeaders = {
+  const devUserHeaders = {
     uid: 'mluukkai',
     displayName: 'Matti Luukkainen',
     'shib-session-id': 'mock-session',
+    hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users',
+    eduPersonAffiliation: 'member;employee;faculty',
   }
-  return isDev ? { ...defaultHeaders, ...devHeaders } : { ...defaultHeaders }
+  return isDev ? { ...defaultHeaders, ...devUserHeaders } : { ...defaultHeaders }
 }
 
 export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders() })
