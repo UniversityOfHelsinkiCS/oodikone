@@ -1,25 +1,25 @@
 /// <reference types="Cypress" />
+//
+// Note: here we need to set keys to be all lowercase, since
+// we're replacing headers after they've left browser / frontend.
+// This cypress user is used just for login and modifying users. Tests themselves should
+// be ran by mocking users.
+const cypressUserHeaders = {
+  uid: 'cypress',
+  displayname: 'Cypress User',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
+  edupersonaffiliation: 'member;employee;faculty',
+  mail: 'grp-toska+mockcypressuser@helsinki.fi',
+}
 
 /**
- * Initialize headers and load the base URL or optional path.
+ Set up headers and load the base URL or optional path.
  */
 Cypress.Commands.add('init', (path = '') => {
-  cy.server({
-    onAnyRequest: function (route, proxy) {
-      proxy.xhr.setRequestHeader('uid', 'tktl')
-      proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
-      proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
-      proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
-    },
+  cy.intercept('', req => {
+    req.headers = cypressUserHeaders
   })
-
-  // Babel throws an error probably because of markdown files. I'm sorry about this :lul:.
-  cy.on('uncaught:exception', (err, runnable) => {
-    expect(err.message).to.include("Cannot read property 'helpers' of undefined")
-    done()
-    return false
-  })
-
   const baseUrl = Cypress.config().baseUrl
   cy.visit(baseUrl.concat(path))
 })
