@@ -7,6 +7,7 @@ const getHeaders = () => {
   const defaultHeaders = {
     'X-sis': !getTestUserOodi(),
   }
+  // Set up dev user for development environment, mimicking production admin user
   const devUserHeaders = {
     uid: 'mluukkai',
     displayName: 'Matti Luukkainen',
