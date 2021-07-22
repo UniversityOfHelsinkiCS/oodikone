@@ -36,8 +36,7 @@ describe('Population Statistics', () => {
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
   before(() => {
-    cy.init()
-    cy.visit(baseUrl.concat(pathToCSBach2018))
+    cy.init(pathToCSBach2018)
   })
 
   it('Transfer filter is on not transferred by default', () => {
@@ -121,8 +120,21 @@ describe('Population Statistics', () => {
     })
   })
 
+  it('Admission type filter works', () => {
+    runTestStepWithPreAndPostParts('admissionTypeFilter-header', () => {
+      cy.selectFromDropdown('admissionTypeFilter-dropdown', 0)
+      checkFilteringResult(5)
+      cy.selectFromDropdown('admissionTypeFilter-dropdown', 2)
+      checkFilteringResult(10)
+      clearSingleDropdownSelection('admissionTypeFilter-dropdown')
+    })
+  })
+
   it('Courses filter works', () => {
     runTestStepWithPreAndPostParts('courseFilter-header', () => {
+      // courses takes some time to load, wait for it
+      cy.cs('courseFilter-course-dropdown').click()
+      cy.wait(5000)
       const courses = ['TKT20001', 'MAT11002']
       cy.cs('courseFilter-course-dropdown').click().contains(courses[0]).click()
       checkFilteringResult(140)
@@ -158,8 +170,7 @@ describe('Course Statistics', () => {
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
   before(() => {
-    cy.init()
-    cy.visit(baseUrl.concat(pathToDSAndAlgoSpring2019))
+    cy.init(pathToDSAndAlgoSpring2019)
   })
 
   it('Grade filter works', () => {
