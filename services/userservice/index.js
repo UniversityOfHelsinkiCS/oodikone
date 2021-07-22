@@ -58,15 +58,6 @@ initializeDatabaseConnection()
       res.json(User.getUserData(user))
     })
 
-    app.post('/user', async (req, res) => {
-      console.log('POST')
-      const { username, full_name, email } = req.body
-      console.log(username, full_name, email)
-
-      const user = await User.createUser(username, full_name, email)
-
-      res.json(user)
-    })
     app.post('/login', async (req, res) => {
       const { uid, full_name, hyGroups, affiliations, email } = req.body
       console.log(uid, full_name, 'logging in!')
