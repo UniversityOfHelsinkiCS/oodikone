@@ -2,23 +2,44 @@
 //
 // Note: here we need to set keys to be all lowercase, since
 // we're replacing headers after they've left browser / frontend.
-// This cypress user is used just for login and modifying users. Tests themselves should
-// be ran by mocking users.
-const cypressUserHeaders = {
-  uid: 'cypress',
-  displayname: 'Cypress User',
+// All of these users are available in anon user-db
+const adminUserHeaders = {
+  uid: 'admin',
+  displayname: 'Admin User',
   'shib-session-id': 'mock-cypress-session',
   hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
   edupersonaffiliation: 'member;employee;faculty',
-  mail: 'grp-toska+mockcypressuser@helsinki.fi',
+  mail: 'grp-toska+mockadminuser@helsinki.fi',
 }
 
+const basicUserHeaders = {
+  uid: 'basic',
+  displayname: 'Basic User',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
+  edupersonaffiliation: 'member',
+  mail: 'grp-toska+mockbasicuser@helsinki.fi',
+}
+
+const noRightsUserHeaders = {
+  uid: 'norights',
+  displayname: 'Norights User',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'grp-oodikone-users',
+  edupersonaffiliation: 'member',
+  mail: 'grp-toska+mocknorightuser@helsinki.fi',
+}
+
+const userHeaders = [adminUserHeaders, basicUserHeaders, noRightsUserHeaders]
+
 /**
- Set up headers and load the base URL or optional path.
+ Set up headers to login, set up correct user (admin / basic / etc.) and open given path.
  */
-Cypress.Commands.add('init', (path = '') => {
+Cypress.Commands.add('init', (path = '', userId = 'basic') => {
   cy.intercept('', req => {
-    req.headers = cypressUserHeaders
+    const headersToUse = userHeaders.find(({ uid }) => uid === userId)
+    if (!headersToUse) return
+    req.headers = headersToUse
   })
   const baseUrl = Cypress.config().baseUrl
   cy.visit(baseUrl.concat(path))

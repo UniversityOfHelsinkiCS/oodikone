@@ -2,9 +2,7 @@
 
 describe('Course population tests', () => {
   beforeEach(() => {
-    cy.init()
-    cy.contains('Course statistics').click()
-    cy.contains('Search for courses')
+    cy.init('/coursestatistics')
   })
 
   it('Can find course population', () => {
@@ -20,7 +18,6 @@ describe('Course population tests', () => {
     cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
     cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
     cy.contains('TKT20003')
-    // cy.contains("Students (all=24)");
 
     cy.contains('Students (127)').click()
     cy.contains('010135486')

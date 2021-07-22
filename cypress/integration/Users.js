@@ -17,7 +17,6 @@ describe('Users tests', () => {
       .within($row => {
         cy.get("div[role='listitem']").should('have.length', 1).contains('Tietojenkäsittelytieteen kandiohjelma')
       })
-
     cy.route('POST', '/api/superlogin/normk').as('superlogin')
     cy.get('i.spy').click()
     cy.wait('@superlogin')
