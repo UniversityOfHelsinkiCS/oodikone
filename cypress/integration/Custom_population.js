@@ -74,15 +74,6 @@ const containsSpecificStudents = (studentnumbers = []) => {
   studentnumbers.forEach(s => cy.contains(s))
 }
 
-const loginAs = username => {
-  cy.contains('Users').click()
-  cy.contains(username).siblings().contains('Edit').click()
-  cy.get('.spy').click()
-  cy.visit(`${Cypress.config().baseUrl}/custompopulation`)
-  cy.url().should('include', '/custompopulation')
-  cy.contains('Custom population')
-}
-
 describe('Custom population tests', () => {
   const nonExistentStudentNumbers = ['123', 'X', '-', ' ']
   beforeEach(() => {
@@ -128,22 +119,16 @@ describe('Custom population tests', () => {
       cy.get('button').contains('Custom population')
     })
 
-    // Check login as when anon user database rights have been corrected
-    // it("Doesn't return students to whom the user doesn't have rights to", () => {
-    //   const kasvatusStudents = ["010102273", "010112616", "010116531"];
-    //   const kapistelyStudents = ["010623419", "010942404", "010484975"];
-    //   loginAs("Normaalikäyttäjä");
-
-    //   searchFor(kasvatusStudents);
-    //   cy.contains("Credit accumulation").should("not.exist");
-    //   cy.contains("Programme distribution").should("not.exist");
-    //   cy.contains("Courses of population").should("not.exist");
-
-    //   searchFor(kapistelyStudents.concat(kasvatusStudents));
-    //   hasLanded();
-    //   containsAmountOfStudents(3);
-    //   containsSpecificStudents(kapistelyStudents);
-    // });
+    it("Doesn't return students user has no right to", () => {
+      // TODO: check that this doesn't create false positives, since this test goes
+      // through even if following students are not in anon sis-db.
+      const studentsForEduBachStudents = ['014990067', '013069465', '014853890']
+      searchFor(studentsForEduBachStudents)
+      cy.contains('Credit accumulation').should('not.exist')
+      cy.contains('Programme distribution').should('not.exist')
+      cy.contains('Courses of population').should('not.exist')
+      cy.get('button').contains('Custom population')
+    })
   })
 
   describe('Custom population search saving', () => {
