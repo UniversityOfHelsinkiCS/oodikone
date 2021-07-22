@@ -76,15 +76,6 @@ const getRolesFor = async user => {
   return response.data
 }
 
-const createUser = async (username, full_name, email) => {
-  const response = await client.post('/user', {
-    username,
-    full_name,
-    email,
-  })
-  return response.data
-}
-
 const enableElementDetails = async (uid, codes) => {
   const response = await client.post('/add_rights', { uid, codes })
   return response.data.user
@@ -143,7 +134,6 @@ const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
 module.exports = {
   ping,
   byUsername,
-  createUser,
   updateUser,
   byId,
   getUserElementDetails,

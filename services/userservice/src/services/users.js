@@ -323,7 +323,6 @@ const determineAccessToCourseStats = async (user, hyGroups) => {
 module.exports = {
   byUsername,
   byUsernameMinified,
-  createUser,
   updateUser,
   findAll,
   byId,
