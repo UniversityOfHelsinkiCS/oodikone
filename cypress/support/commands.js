@@ -21,7 +21,16 @@ const basicUserHeaders = {
   mail: 'grp-toska+mockbasicuser@helsinki.fi',
 }
 
-const noRightsUserHeaders = {
+const onlycoursestatisticsUserHeaders = {
+  uid: 'onlycoursestatistics',
+  displayName: 'Onlycoursestatistics User',
+  'shib-session-id': 'mock-session',
+  hyGroupCn: 'grp-oodikone-basic-users',
+  eduPersonAffiliation: 'member',
+  mail: 'grp-toska+mockonlycoursestatisticsuser@helsinki.fi',
+}
+
+const norightsUserHeaders = {
   uid: 'norights',
   displayname: 'Norights User',
   'shib-session-id': 'mock-cypress-session',
@@ -30,7 +39,7 @@ const noRightsUserHeaders = {
   mail: 'grp-toska+mocknorightuser@helsinki.fi',
 }
 
-const userHeaders = [adminUserHeaders, basicUserHeaders, noRightsUserHeaders]
+const userHeaders = [adminUserHeaders, basicUserHeaders, onlycoursestatisticsUserHeaders, norightsUserHeaders]
 
 /**
  Set up headers to login, set up correct user (admin / basic / etc.) and open given path.
@@ -38,6 +47,7 @@ const userHeaders = [adminUserHeaders, basicUserHeaders, noRightsUserHeaders]
 Cypress.Commands.add('init', (path = '', userId = 'basic') => {
   cy.intercept('', req => {
     const headersToUse = userHeaders.find(({ uid }) => uid === userId)
+    console.log('jees', JSON.stringify(headersToUse))
     if (!headersToUse) return
     req.headers = headersToUse
   })
