@@ -117,4 +117,8 @@ You should always install the dependencies **inside** the container to have the 
 
 Just do clean install by launching cli with `npm cli` and running option 1: _Set up oodikone from scratch_.
 
-## Maintainers and contribution
+## ✌🏼 Maintainers and contribution
+
+Toska of course. 
+
+University of Helsinki
