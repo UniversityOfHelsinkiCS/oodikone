@@ -131,10 +131,12 @@ describe('Population Statistics', () => {
   })
 
   it('Courses filter works', () => {
+    // courses takes some time to load, wait for it to complete
+    cy.intercept('/api/v2/populationstatistics/courses').as('coursesOfPopulation')
+    cy.wait('@coursesOfPopulation')
     runTestStepWithPreAndPostParts('courseFilter-header', () => {
-      // courses takes some time to load, wait for it
+      cy.wait('@coursesOfPopulation', { timeout: 120000 })
       cy.cs('courseFilter-course-dropdown').click()
-      cy.wait(5000)
       const courses = ['TKT20001', 'MAT11002']
       cy.cs('courseFilter-course-dropdown').click().contains(courses[0]).click()
       checkFilteringResult(140)
