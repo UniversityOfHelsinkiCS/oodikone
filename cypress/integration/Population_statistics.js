@@ -99,6 +99,9 @@ describe('Population Statistics tests', () => {
       cy.cs('toggle-fall').click()
       cy.contains('Fetch population').click()
 
+      // moar waiting hack
+      cy.wait(10000)
+
       cy.contains('No statistics found for the given query.')
 
       // only fall
