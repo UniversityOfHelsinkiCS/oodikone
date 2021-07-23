@@ -93,9 +93,9 @@ There's no separate "lintfix" / "format" / "lint" command available, since pre-c
 
 However, if you want to run linting / formatting manually from command line, `package.json` defines `npm run eslint`, `npm run prettier` and `npm run stylelint` which you can use as an entrypoint.
 
-### Testing
+## 🔨 Testing & CI 
 
-There are two types of tests in this project: jest integration tests for single service and cypress end-to-end tests: 
+There are three types of tests in this project: static tests with eslint/prettier/other tools, jest integration tests for single service and cypress end-to-end tests. Linting is described above and other do work as follows:
 
 - Cypress
     - can be launched in interactive mode with `npm run cypress open`. `package.json` defines entrypoint `npm run cypress` so you can basically run cypress with any arguments you want
@@ -106,6 +106,13 @@ There are two types of tests in this project: jest integration tests for single 
     - are ran with `docker-compose.test.yml`
     - test command and environment themselves are in Dockerfile for service in question
     - can be debugged by overriding default command in `docker-compose.test.yml` and running docker container in interactive mode
+
+Continuous integration (CI) works with Github actions and is defined in workflow files in `.github/workflows` folder:
+- oodikone setup for cypress and other tests in CI is defined in `docker-compose.ci.yml`. Take a look at this too if debugging github action workflows.
+- tests are run on every push to branches other than `master`. Pull requests can't be merged to master unless tests are ok.
+- after successful merge to `master`, oodikone is deployed to staging
+- after creating a release, oodikone is deployed to production
+- updater is deployed to production on every push to `trunk`.
 
 ## ❓FAQ
 
