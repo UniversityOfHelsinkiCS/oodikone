@@ -119,6 +119,25 @@ describe('Course Statistics tests', () => {
       cy.contains('AYTKT10004 Avoin yo: Tietokantojen perusteet')
     })
 
+    it('Can find course population', () => {
+      cy.url().should('include', '/coursestatistics')
+      cy.contains('Search for courses')
+      cy.get("input[placeholder='Search by a course code']").type('TKT20003')
+      cy.contains('tr', 'TKT20003').click()
+      cy.contains('Fetch statistics').should('be.enabled').click()
+
+      cy.contains('Käyttöjärjestelmät')
+      cy.contains('TKT20003')
+
+      cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
+      cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
+      cy.contains('TKT20003')
+
+      cy.contains('Students (127)').click()
+      cy.contains('010135486')
+      cy.contains('010431753')
+    })
+
     describe('When searching unified course stats', () => {
       beforeEach(() => {
         cy.url().should('include', '/coursestatistics')
@@ -225,7 +244,7 @@ describe('Course Statistics tests', () => {
     })
   })
 
-  it.only('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
+  it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
     cy.get('[data-cy=navbar-courseStatistics]').click()
     cy.get('[data-cy=course-code-input]').type('TKT20003')
