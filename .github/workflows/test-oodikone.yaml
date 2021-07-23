@@ -181,6 +181,9 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   test_course_statistics:
     name: "Test course statistics"
@@ -221,6 +224,9 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   test_custom_population:
     name: "Test custom population"
@@ -261,6 +267,9 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   test_population_statistics:
     name: "Test population statistics"
@@ -301,6 +310,9 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   test_filters:
     name: "Test filters"
@@ -341,6 +353,9 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   test_student_statistics:
     name: "Test student statistics"
@@ -381,6 +396,9 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   test_studyprogramme_overview:
     name: "Test studyprogramme overview"
@@ -421,6 +439,9 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   test_teachers_and_users:
     name: "Test teachers and users"
@@ -463,7 +484,9 @@ jobs:
         with:
           name: Cypress videos
           path: ./cypress/videos/*
-
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   # === Other tests ===
 
@@ -500,6 +523,9 @@ jobs:
             echo 'Some process had nonzero exit code';
             exit 1;
           fi
+      - name: "Print logs on failure"
+        if: failure()
+        run: docker-compose --file docker-compose.ci.yml logs
 
   push_to_dockerhub:
     name: "Push images to docker hub for caching"
@@ -563,5 +589,3 @@ jobs:
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: test-failure
-      - name: "Print logs on failure"
-        run: docker-compose --file docker-compose.ci.yml logs
