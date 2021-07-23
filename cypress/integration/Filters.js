@@ -132,7 +132,7 @@ describe('Population Statistics', () => {
 
   it('Courses filter works', () => {
     // courses takes some time to load, wait for it to complete
-    cy.intercept('/api/v2/populationstatistics/courses').as('coursesOfPopulation')
+    cy.intercept({ path: '/api/v2/populationstatistics/courses' }).as('coursesOfPopulation')
     cy.wait('@coursesOfPopulation')
     runTestStepWithPreAndPostParts('courseFilter-header', () => {
       cy.wait('@coursesOfPopulation', { timeout: 120000 })

@@ -47,8 +47,7 @@ const userHeaders = [adminUserHeaders, basicUserHeaders, onlycoursestatisticsUse
 Cypress.Commands.add('init', (path = '', userId = 'basic') => {
   cy.intercept('', req => {
     const headersToUse = userHeaders.find(({ uid }) => uid === userId)
-    console.log('jees', JSON.stringify(headersToUse))
-    if (!headersToUse) return
+    if (!headersToUse) throw Error(`${userId} is not valid user id!`)
     req.headers = headersToUse
   })
   const baseUrl = Cypress.config().baseUrl
