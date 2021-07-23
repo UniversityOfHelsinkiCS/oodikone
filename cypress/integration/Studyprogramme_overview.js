@@ -9,9 +9,10 @@ const deleteTag = name => {
 
 describe('Studyprogramme overview', () => {
   // check is used by couple of tests
-  const checkProgressAndProductivity = () => {
-    // Graduation feature is shown for only for devs, these are the values for normal user
-    const CSBachPopulationProgress2018 = [
+  const checkProgressAndProductivity = (user = 'basic') => {
+    // Column amount depends on user. Note that with dev user, you'll see even more
+    // stuff than with admin or basic.
+    const CSBachPopulationProgress2018ForAdmin = [
       '160',
       '42 (26%)',
       '118 (73%)',
@@ -27,15 +28,29 @@ describe('Studyprogramme overview', () => {
       '41',
       '16',
     ]
-    cy.get('.attached > :nth-child(1)').click()
-    cy.get('table').should('have.length', 3)
+    const CSBachPopulationProgress2018ForBasic = [
+      '160',
+      '42 (26%)',
+      '118 (73%)',
+      '159 (99%)',
+      '159',
+      '11',
+      '1',
+      '150',
+      '123',
+      '76',
+      '41',
+      '16',
+    ] // cancelled and transferred from are missing
+
+    const population = user === 'basic' ? CSBachPopulationProgress2018ForBasic : CSBachPopulationProgress2018ForAdmin
     cy.contains('Population progress')
     cy.contains('Yearly productivity')
 
     cy.contains('2018-2019')
       .siblings()
       .each((elem, index) => {
-        cy.wrap(elem).contains(CSBachPopulationProgress2018[index])
+        cy.wrap(elem).contains(population[index])
       })
     const populationproductivity2019 = ['7388.0', '17', '7329.00', '59.00', '349.00']
     cy.get('table')
@@ -76,7 +91,12 @@ describe('Studyprogramme overview', () => {
 
     it('renders progress and productivity tables with calculated status', () => {
       doRecalculation()
-      checkProgressAndProductivity()
+
+      // check contains also study programme options for admin
+      cy.contains('Study programme options')
+      cy.get('table').should('have.length', 3)
+
+      checkProgressAndProductivity('admin')
 
       // Grab update dates to be compared later
       cy.cs('throughputUpdateStatus')
@@ -98,7 +118,7 @@ describe('Studyprogramme overview', () => {
 
     it('renders progress and productivity tables with calculated status after recalculating stats again', () => {
       doRecalculation()
-      checkProgressAndProductivity()
+      checkProgressAndProductivity('admin')
 
       // Check new calculation statuses are reported
       const newProgressCalculatedTextElement = cy.cs('throughputUpdateStatus').invoke('text')
@@ -126,6 +146,9 @@ describe('Studyprogramme overview', () => {
     })
 
     it('renders progress and productivity tables with previosly calculated values', () => {
+      // check doesn't contain study programme options for admin
+      cy.contains('Study programme options').should('not.exist')
+      cy.get('table').should('have.length', 2)
       checkProgressAndProductivity()
     })
 
