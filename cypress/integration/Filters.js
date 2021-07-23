@@ -134,6 +134,8 @@ describe('Population Statistics', () => {
     // courses takes some time to load, wait for it to complete
     cy.intercept({ path: '**/courses' }).as('coursesOfPopulation')
     cy.wait('@coursesOfPopulation')
+    // moar waiting hack
+    cy.wait(10000)
     runTestStepWithPreAndPostParts('courseFilter-header', () => {
       cy.cs('courseFilter-course-dropdown').click()
       const courses = ['TKT20001', 'MAT11002']
