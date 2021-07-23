@@ -1,48 +1,25 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
-import { API_BASE_PATH, BASE_PATH, ERROR_STATUSES_NOT_TO_CAPTURE } from '../constants'
-import { getMocked, setMocking, setTestUser, getTestUser, getTestUserOodi } from '../common'
-import { isDev } from '../conf'
+import { getMocked, setMocking, getTestUserOodi } from '../common'
+import { apiBasePath, isDev } from '../conf'
 
-const isTestEnv = BASE_PATH === '/testing/'
-const devOptions = {
-  headers: {
-    uid: getTestUser() || 'tktl',
-    displayName: 'Development Kayttaja',
-    'shib-session-id': 'mock-session',
+const getHeaders = () => {
+  const defaultHeaders = {
     'X-sis': !getTestUserOodi(),
-  },
-}
-
-const testOptions = {
-  headers: {
-    uid: 'tester',
-    displayName: 'Testing Käyttäjä',
+  }
+  // Set up dev user for development environment, mimicking production admin user
+  const devUserHeaders = {
+    uid: 'mluukkai',
+    displayName: 'Matti Luukkainen',
     'shib-session-id': 'mock-session',
-  },
+    hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users',
+    eduPersonAffiliation: 'member;employee;faculty',
+    mail: 'grp-toska+mockmluukkai@helsinki.fi',
+  }
+  return isDev ? { ...defaultHeaders, ...devUserHeaders } : { ...defaultHeaders }
 }
 
-const getDefaultConfig = () => {
-  if (isTestEnv) {
-    return { ...testOptions }
-  }
-  if (isDev) {
-    return { ...devOptions }
-  }
-  return {
-    headers: {
-      'X-sis': !getTestUserOodi(),
-    },
-  }
-}
-
-const createDefaultAxiosConfig = () => {
-  const config = getDefaultConfig()
-  config.baseURL = API_BASE_PATH
-  return config
-}
-
-export const api = axios.create({ ...createDefaultAxiosConfig() })
+export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders() })
 
 const types = {
   attempt: prefix => `${prefix}ATTEMPT`,
@@ -58,20 +35,13 @@ export const actionTypes = prefix => ({
 
 export const logout = async () => {
   setMocking(null)
-  setTestUser(null)
   const returnUrl = window.location.origin
   const response = await api.delete('/logout', { data: { returnUrl } })
   window.location = response.data.logoutUrl
 }
 
 export const callApi = async (url, method = 'get', data, params, timeout = 0, progressCallback = null) => {
-  let options = { headers: {}, timeout }
-  if (isDev) {
-    options = devOptions
-  }
-  if (isTestEnv) {
-    options = testOptions
-  }
+  const options = { headers: getHeaders(), timeout }
 
   const onDownloadProgress = ({ loaded, total }) => {
     if (progressCallback) progressCallback(Math.round((loaded / total) * 100))
@@ -107,15 +77,13 @@ export const callController = (route, prefix, data, method = 'get', query, param
 const handleError = (err, actionHistory = []) => {
   const { response } = err
   if (response && response.status) {
-    if (!ERROR_STATUSES_NOT_TO_CAPTURE.includes(response.status)) {
-      Sentry.withScope(s => {
-        s.setExtra('config', err.config)
-        s.setExtra('request', err.request)
-        s.setExtra('response', err.response)
-        s.setExtra('actionHistory', JSON.stringify(actionHistory))
-        Sentry.captureException(err)
-      })
-    }
+    Sentry.withScope(s => {
+      s.setExtra('config', err.config)
+      s.setExtra('request', err.request)
+      s.setExtra('response', err.response)
+      s.setExtra('actionHistory', JSON.stringify(actionHistory))
+      Sentry.captureException(err)
+    })
   }
 }
 

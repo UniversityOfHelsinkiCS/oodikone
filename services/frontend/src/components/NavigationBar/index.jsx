@@ -4,22 +4,12 @@ import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
-import { getUserRoles, setMocking, setTestUser, setTestUserOodi, getTestUserOodi, checkUserAccess } from '../../common'
+import { getUserRoles, setMocking, setTestUserOodi, getTestUserOodi, checkUserAccess } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
 import { useIsAdmin } from '../../common/hooks'
-import { isDev } from '../../conf'
-
-const { USER_ADMINER_URL, ADMINER_URL, KONE_ADMINER_URL, SIS_ADMINER_URL, SIS_IMPORTER_ADMINER_URL } = process.env
-
-const adminerUrls = [
-  { url: ADMINER_URL, text: 'Database' },
-  { url: USER_ADMINER_URL, text: 'User database' },
-  { url: KONE_ADMINER_URL, text: 'Kone database' },
-  { url: SIS_ADMINER_URL, text: 'Sis database' },
-  { url: SIS_IMPORTER_ADMINER_URL, text: 'Sis importer database' },
-]
+import { isDev, adminerUrls } from '../../conf'
 
 const allNavigationItems = {
   populations: {
@@ -115,7 +105,6 @@ const NavigationBar = props => {
         </Menu.Item>
       )
     )
-  const testUsers = ['tktl', 'mluukkai']
   const renderUserMenu = () =>
     isDev ? (
       <Menu.Item as={Dropdown} style={{ backgroundColor: 'purple', color: 'white' }} text="Dev controls" tabIndex="-1">
@@ -129,17 +118,6 @@ const NavigationBar = props => {
               }}
               text={text}
               icon="database"
-            />
-          ))}
-          {testUsers.map(user => (
-            <Dropdown.Item
-              key={user}
-              icon="user"
-              text={`Use as: ${user}`}
-              onClick={() => {
-                setTestUser(user)
-                window.location.reload()
-              }}
             />
           ))}
           <Dropdown.Item icon="log out" text="Logout" onClick={logout} />

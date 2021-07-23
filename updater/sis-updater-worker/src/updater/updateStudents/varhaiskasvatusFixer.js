@@ -1,5 +1,4 @@
-const { educationTypeToExtentcode } = require('../shared')
-const { Studyright, StudyrightElement, Student } = require('../../db/models')
+const { Studyright, StudyrightElement } = require('../../db/models')
 const { selectFromByIds } = require('../../db')
 
 const fixVarhaiskasvatusStudyRights = async studentsToBeFixed => {

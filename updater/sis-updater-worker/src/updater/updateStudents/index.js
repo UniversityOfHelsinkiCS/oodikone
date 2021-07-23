@@ -11,7 +11,7 @@ const {
   CourseProvider,
 } = require('../../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
-const { getEducation, getUniOrgId, loadMapsIfNeeded, getEducationType } = require('../shared')
+const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
 const { studentMapper, mapTeacher, creditMapper, semesterEnrollmentMapper, courseProviderMapper } = require('../mapper')
 
 const { dbConnections } = require('../../db/connection')
