@@ -23,7 +23,7 @@ router.post('/login', async (req, res) => {
   try {
     const uid = req.headers['uid']
     if (req.headers['shib-session-id'] && uid) {
-      const full_name = req.headers.displayname || 'Shib Valmis'
+      const full_name = req.headers.displayname || ''
       const mail = req.headers.mail || ''
       const hyGroups = parseHyGroups(req.headers['hygroupcn'])
       const affiliations = parseHyGroups(req.headers['edupersonaffiliation'])

@@ -106,7 +106,8 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
 
     isNew = true
   } else {
-    user = await updateUser(user, { full_name, mail })
+    console.log('mail', mail)
+    user = await updateUser(user, { full_name, email: mail })
     await updateGroups(user, affiliations, hyGroups)
   }
 
@@ -222,6 +223,7 @@ const createUser = async (username, fullname, email) => {
 }
 
 const updateUser = async (userObject, values) => {
+  await User.upsert({ id: userObject.id, ...values })
   return userObject.update(values)
 }
 
@@ -321,7 +323,6 @@ const determineAccessToCourseStats = async (user, hyGroups) => {
 module.exports = {
   byUsername,
   byUsernameMinified,
-  createUser,
   updateUser,
   findAll,
   byId,

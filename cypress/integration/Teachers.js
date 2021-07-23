@@ -2,9 +2,8 @@
 
 describe('Teachers page tests', () => {
   beforeEach(() => {
-    cy.init()
-    cy.contains('Teachers').click()
-    cy.contains('Teacher statistics by course providers')
+    // login as admin = has teacher rights
+    cy.init('/teachers', 'admin')
   })
 
   const teacher1 = 'Landgraf Leo'

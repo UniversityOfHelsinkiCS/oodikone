@@ -1,25 +1,55 @@
 /// <reference types="Cypress" />
+//
+// Note: here we need to set keys to be all lowercase, since
+// we're replacing headers after they've left browser / frontend.
+// All of these users are available in anon user-db
+const adminUserHeaders = {
+  uid: 'admin',
+  displayname: 'Admin User',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
+  edupersonaffiliation: 'member;employee;faculty',
+  mail: 'grp-toska+mockadminuser@helsinki.fi',
+}
+
+const basicUserHeaders = {
+  uid: 'basic',
+  displayname: 'Basic User',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
+  edupersonaffiliation: 'member',
+  mail: 'grp-toska+mockbasicuser@helsinki.fi',
+}
+
+const onlycoursestatisticsUserHeaders = {
+  uid: 'onlycoursestatistics',
+  displayName: 'Onlycoursestatistics User',
+  'shib-session-id': 'mock-session',
+  hyGroupCn: 'grp-oodikone-basic-users',
+  eduPersonAffiliation: 'member',
+  mail: 'grp-toska+mockonlycoursestatisticsuser@helsinki.fi',
+}
+
+const norightsUserHeaders = {
+  uid: 'norights',
+  displayname: 'Norights User',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'grp-oodikone-users',
+  edupersonaffiliation: 'member',
+  mail: 'grp-toska+mocknorightuser@helsinki.fi',
+}
+
+const userHeaders = [adminUserHeaders, basicUserHeaders, onlycoursestatisticsUserHeaders, norightsUserHeaders]
 
 /**
- * Initialize headers and load the base URL or optional path.
+ Set up headers to login, set up correct user (admin / basic / etc.) and open given path.
  */
-Cypress.Commands.add('init', (path = '') => {
-  cy.server({
-    onAnyRequest: function (route, proxy) {
-      proxy.xhr.setRequestHeader('uid', 'tktl')
-      proxy.xhr.setRequestHeader('shib-session-id', 'mock-shibboleth')
-      proxy.xhr.setRequestHeader('hygroupcn', 'grp-oodikone-users')
-      proxy.xhr.setRequestHeader('edupersonaffiliation', 'asdasd')
-    },
+Cypress.Commands.add('init', (path = '', userId = 'basic') => {
+  cy.intercept('', req => {
+    const headersToUse = userHeaders.find(({ uid }) => uid === userId)
+    if (!headersToUse) throw Error(`${userId} is not valid user id!`)
+    req.headers = headersToUse
   })
-
-  // Babel throws an error probably because of markdown files. I'm sorry about this :lul:.
-  cy.on('uncaught:exception', (err, runnable) => {
-    expect(err.message).to.include("Cannot read property 'helpers' of undefined")
-    done()
-    return false
-  })
-
   const baseUrl = Cypress.config().baseUrl
   cy.visit(baseUrl.concat(path))
 })

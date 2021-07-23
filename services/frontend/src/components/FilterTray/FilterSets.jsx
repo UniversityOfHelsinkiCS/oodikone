@@ -10,6 +10,7 @@ import useAnalytics from './useAnalytics'
 import Grade from './filters/Grade'
 import Date from './filters/Date'
 import Age from './filters/Age'
+import AdmissionType from './filters/AdmissionType'
 
 export const PopulationStatisticsFilters = () => {
   const analytics = useAnalytics()
@@ -27,6 +28,7 @@ export const PopulationStatisticsFilters = () => {
       <Age />
       <Gender />
       <StartYearAtUni />
+      <AdmissionType />
       <Courses />
     </>
   )

@@ -22,7 +22,7 @@ Usage: $(basename "${BASH_SOURCE[0]}") option [version] command --flag
 
 Parameters:
 * Option: oodikone/updater/both
-* Version: anon/real. Not necessary in all cases, such as when running down or logs.
+* Version: anon/real. Not necessary when running down/logs/pull.
 * Command: will be passed to docker-compose.
 EOF
 }
@@ -40,9 +40,9 @@ parse_params() {
 
   [[ ${#args[@]} -eq 1 ]] && usage && die "Wrong number of arguments"
 
-  # Down or logs can be passed without version. Otherwise parse version and then pass
+  # Some arguments can be passed without version. Otherwise parse version and then pass
   # rest to compose
-  if [[ "${args[1]}" == "down" || "${args[1]}" == "logs" ]]; then
+  if [[ "${args[1]}" == "down" || "${args[1]}" == "logs" || "${args[1]}" == "pull" ]]; then
     version=""
     compose_command=${args[*]:1}
   else

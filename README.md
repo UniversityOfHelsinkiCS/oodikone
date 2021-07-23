@@ -7,12 +7,10 @@ An application for analyzing university data, running at [https://oodikone.cs.he
 To run Oodikone locally, you will need the following:
 
 1. Applications:
-
-- [Docker](https://docs.docker.com/install/) (version 20.10+),
-- [Docker Compose](https://docs.docker.com/compose/install/)(version 0.29+) and
-- [npm](https://docs.npmjs.com/cli/v7) (version 7+)
-
-2. Access to Toska Docker Hub, see Toska Gitlab for more information on how to login
+    - [Docker](https://docs.docker.com/install/) (version 20.10+),
+    - [Docker Compose](https://docs.docker.com/compose/install/)(version 0.29+) and
+    - [npm](https://docs.npmjs.com/cli/v7) (version 7+)
+2. Access to Toska Docker Hub, see Toska Gitlabs password document for more information on how to login
 3. (Optional) For real data setup, access to Toskas production servers.
 
 ## 🚀 Installation
@@ -28,26 +26,20 @@ _Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary
 What different CLI options do:
 
 1. Set up oodikone from scratch:
-
-- Cleans up any previous installations
-- Installs all needed npm packages locally
-- Sets up pre-commit linting hooks.
-- Pulls and builds all needed Docker images and sets up dockerized development environment
-- **Note:** Running this option cleans up all real data too, so please don't run option 2 before this.
-
+    - Cleans up any previous installations
+    - Installs all needed npm packages locally
+    - Sets up pre-commit linting hooks.
+    - Pulls and builds all needed Docker images and sets up dockerized development environment. 
+    - Setup happens with anonymized data, which developers should use by default.
+    - **Note:** Running this option cleans up all real data too, so please don't run option 2 before this.
 2. Reset all real data:
-
-- Cleans up any previous real data databases
-- Downloads needed database dumps from production servers.
-- Creates real data databases and populates them with downloaded dumps.
-
+    - Cleans up any previous real data databases
+    - Downloads needed database dumps from production servers.
+    - Creates real data databases and populates them with downloaded dumps.
 3. Reset sis-importer data
-
-- Like option 2, but only for sis-importer database. Useful when developing updater microservice.
-
+    - Like option 2, but only for sis-importer database. Useful when developing updater microservice.
 4. Reset old oodi data:
-
-- Like option 2, but for old oodi data, which is not refreshed anymore. Is only needed when setting up real databases after running option 1.
+    - Like option 2, but for old oodi data, which is not refreshed anymore. Is only needed when setting up real databases after running option 1.
 
 ## ⌨️ Development
 
@@ -57,7 +49,7 @@ The development environment is entirely configured in the `docker-compose.yml` f
 
 Running oodikone with real data requires separated databases and redis, which are defined in `docker-compose.real.yml` file. Otherwise real data development environment uses the configuration as anonymized data development environment.
 
-Some useful commands are predefined in `package.json` and can be run with `npm run <command>` as follows:
+Some useful commands are defined in `package.json` and can be run with `npm run <command>` as follows:
 
 - `npm run oodikone`: starts oodikone with anonymized data
 - `npm run oodikone:real`: starts oodikone with real data
@@ -67,11 +59,7 @@ Some useful commands are predefined in `package.json` and can be run with `npm r
 - `npm run both:real`: starts oodikone and updater with real data
 - `npm run docker:down`: stops the whole environment
 
-If you're first timer, just run `npm run oodikone` after setting up oodikone according to [installation](#installation). After starting and waiting for a while for containers to compile, oodikone can be accessed at [http://localhost:3000/](http://localhost:3000/) and Adminer (database investigation tool) at [http://localhost:5050/](http://localhost:5050/). Adminer requires you to login with username `postgres` and with any password you choose (for example `p`).
-
-### Anon / real data users
-
-Some notes about mluukkai / tkl user here.
+Once you have ran setup for oodikone , you can just execute the first one (`npm run oodikone`). After starting and waiting for a while for containers to compile, oodikone can be accessed at [http://localhost:3000/](http://localhost:3000/) and Adminer (database investigation tool) at [http://localhost:5050/](http://localhost:5050/). Adminer requires you to login with username `postgres` and with any password you choose (for example `p`).
 
 ### Run.sh script
 
@@ -89,41 +77,44 @@ It is recommended to spend some time to become familiar with `docker` and `docke
 - `docker exec -it userservice sh`: open bash terminal inside userservice container
 - `docker exec -it sis-db psql -U postgres sis-db-real`: open psql client to investigate sis real data database.
 
-### Linting and tests
+### User types for development
 
-Linting and other stuff here
+By default, you're login as `mluukkai` dev user when running oodikone in development mode. If you want to debug with certain type of user, you can use mocking: go to "Users" -page, click on "edit" on user you want to use and then click icon on the right corner of user card. Another way is to mock user headers - see frontend's api configuration for how this is done.
 
-The test suite is run in CI on every push to `trunk`. Take advantage of this as running the tests can take upwards of 15 minutes.
+Anon data contains some preset user types, corresponding to most usual user types in real data. These are used in testing too (see "Testing" below for more info).
 
-### Updater stuff
+### Linting
 
-Stop with HTTP GET
+Cli script sets up pre-commit hooks that are used to lint and fix files before committing. If your `package.json` file doesn't include "lint-staged" -key, please set hooks manually with `npm run prepare`. 
 
-```bash
-http://localhost:8082/v1/abort?token=dev
-```
+For more information on how files are tested, take a look at "lint-staged" in `package.json`. Some files (e.g. github action files, dockerfiles, shell scripts) are checked with external tools and may require you to install those tools in case you're modifying files in question. 
 
-Schedule students with HTTP POST
+There's no separate "lintfix" / "format" / "lint" command available, since pre-commit hooks will fix formatting and basic linting errors for you. In case pre-commit fails, you should fix the erroring code manually. 
 
-```bash
-http://localhost:8082/v1/students?token=dev
-```
+However, if you want to run linting / formatting manually from command line, `package.json` defines `npm run eslint`, `npm run prettier` and `npm run stylelint` which you can use as an entrypoint.
 
-body
+## 🔨 Testing & CI 
 
-```bash
-{
-    "studentnumbers": [
-        "014598456"
-    ]
-}
-```
+There are three types of tests in this project: static tests with eslint/prettier/other tools, jest integration tests for single service and cypress end-to-end tests. Linting is described above and other do work as follows:
 
-## 📖 Documentation
+- Cypress
+    - can be launched in interactive mode with `npm run cypress open`. `package.json` defines entrypoint `npm run cypress` so you can basically run cypress with any arguments you want
+    - are defined in cypress -folder and cypress.json
+    - whole cypress test stack takes about 15 to 20 mins to run. Since tests are ran in our Github actions CI pipe, you're encouraged to take advantage of this instead of running all tests locally.
+    - There are some different user types and cypress commands defined for testing. Take a look at these when debugging tests.
+- Jest
+    - are ran with `docker-compose.test.yml`
+    - test command and environment themselves are in Dockerfile for service in question
+    - can be debugged by overriding default command in `docker-compose.test.yml` and running docker container in interactive mode
 
-Testing + CI docs link here.
+Continuous integration (CI) works with Github actions and is defined in workflow files in `.github/workflows` folder:
+- oodikone setup for cypress and other tests in CI is defined in `docker-compose.ci.yml`. Take a look at this too if debugging github action workflows.
+- tests are run on every push to branches other than `master`. Pull requests can't be merged to master unless tests are ok.
+- after successful merge to `master`, oodikone is deployed to staging
+- after creating a release, oodikone is deployed to production
+- updater is deployed to production on every push to `trunk`.
 
-##❓FAQ
+## ❓FAQ
 
 ### Modules are missing after updating package.json
 
@@ -133,4 +124,8 @@ You should always install the dependencies **inside** the container to have the 
 
 Just do clean install by launching cli with `npm cli` and running option 1: _Set up oodikone from scratch_.
 
-## Maintainers and contribution
+## ✌🏼 Maintainers and contribution
+
+Toska of course. 
+
+University of Helsinki
