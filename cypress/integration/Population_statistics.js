@@ -74,8 +74,8 @@ describe('Population Statistics tests', () => {
       cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
       // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(3000) // a bit hacky way, wait until ui is ready
-      cy.cs('expand-TKT1').click()
-      cy.cs('coursestats-link-TKT10002').click()
+      cy.get('[data-cy=expand-TKT1]').click()
+      cy.get('[data-cy=coursestats-link-TKT10002]').click()
       cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
       cy.contains('TKT10002, 581325 Ohjelmoinnin perusteet')
