@@ -14,6 +14,7 @@ const { parseCredit } = require('./parseCredits')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../servicesV2/course_yearly_stats_counter')
 const _ = require('lodash')
+// const { CourseProvider } = require('../models')
 
 const byNameOrCode = (searchTerm, language) =>
   Course.findAll({
@@ -368,6 +369,7 @@ const byNameAndOrCodeLike = async (name, code) => {
       'max_attainment_date',
       'min_attainment_date',
       'substitutions',
+      'responsible_organisation',
     ],
     where: {
       ...nameLikeTerm(name),
@@ -375,9 +377,11 @@ const byNameAndOrCodeLike = async (name, code) => {
     },
   })
 
+  console.log('courses: ', courses)
   let substitutionGroupIndex = 0
   const subsGroups = {}
   const visited = []
+
   const dfs = async courseId => {
     if (visited.includes(courseId)) return
     visited.push(courseId)
