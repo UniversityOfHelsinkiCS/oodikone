@@ -377,7 +377,8 @@ const byNameAndOrCodeLike = async (name, code) => {
     },
   })
 
-  courses.sort(c => (c.code.match(/^[A-Za-z]/) ? -1 : 1))
+  courses.sort(c => (c.code.match(/^[A-Za-z]/) ? 1 : 0))
+  console.log(courses)
   let substitutionGroupIndex = 0
   const visited = []
 
@@ -400,7 +401,7 @@ const byNameAndOrCodeLike = async (name, code) => {
       organizeSubgroups(course)
     }
   })
-  console.log(courses)
+  // console.log(courses)
   return { courses }
 }
 
