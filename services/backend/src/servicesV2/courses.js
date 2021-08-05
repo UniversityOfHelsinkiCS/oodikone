@@ -377,49 +377,30 @@ const byNameAndOrCodeLike = async (name, code) => {
     },
   })
 
-  /*
-  const courses = []
-  plainCourses.forEach(el => {
-    if (el.code.match(/^[A-Za-z]/)) {
-      courses.unshift(el)
-    } else {
-      courses.push(el)
-    }
-  })
-*/
   courses.sort(c => (c.code.match(/^[A-Za-z]/) ? -1 : 1))
-  console.log(courses)
   let substitutionGroupIndex = 0
   const visited = []
 
-  const organizeSubgroups = courseId => {
-    if (visited.includes(courseId)) return
-    visited.push(courseId)
-    const course = courses.find(course => course.id === courseId)
+  const organizeSubgroups = cour => {
+    if (visited.includes(cour.code)) return
+    // visited.push(cour.id)
 
-    if (!course) return
-
-    course.subsId = substitutionGroupIndex
-
-    course.substitutions.forEach(courseId => {
-      if (visited.includes(courseId)) return
-      console.log(courseId)
-      visited.push(courseId)
-      const courseTwo = courses.find(c => c.id === courseId)
-
-      if (!courseTwo) return
-
-      courseTwo.subsId = substitutionGroupIndex
+    let temp = courses.filter(c => cour.substitutions.includes(c.id))
+    temp.unshift(cour)
+    temp.forEach(cu => {
+      if (visited.includes(cour.code)) return
+      visited.push(cu.id)
+      cu.subsId = substitutionGroupIndex
     })
   }
 
   courses.forEach(course => {
     if (!visited.includes(course.id)) {
       substitutionGroupIndex++
-      organizeSubgroups(course.id)
+      organizeSubgroups(course)
     }
   })
-
+  console.log(courses)
   return { courses }
 }
 
