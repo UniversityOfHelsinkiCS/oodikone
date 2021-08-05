@@ -377,32 +377,48 @@ const byNameAndOrCodeLike = async (name, code) => {
     },
   })
 
-  console.log('courses: ', courses)
+  /*
+  const courses = []
+  plainCourses.forEach(el => {
+    if (el.code.match(/^[A-Za-z]/)) {
+      courses.unshift(el)
+    } else {
+      courses.push(el)
+    }
+  })
+*/
+  courses.sort(c => (c.code.match(/^[A-Za-z]/) ? -1 : 1))
+  console.log(courses)
   let substitutionGroupIndex = 0
-  const subsGroups = {}
   const visited = []
 
-  const dfs = async courseId => {
+  const organizeSubgroups = courseId => {
     if (visited.includes(courseId)) return
     visited.push(courseId)
     const course = courses.find(course => course.id === courseId)
 
     if (!course) return
 
-    subsGroups[course.code] = substitutionGroupIndex
     course.subsId = substitutionGroupIndex
 
-    for (const courseId of course.substitutions) {
-      dfs(courseId)
-    }
+    course.substitutions.forEach(courseId => {
+      if (visited.includes(courseId)) return
+      console.log(courseId)
+      visited.push(courseId)
+      const courseTwo = courses.find(c => c.id === courseId)
+
+      if (!courseTwo) return
+
+      courseTwo.subsId = substitutionGroupIndex
+    })
   }
 
-  for (const course of courses) {
+  courses.forEach(course => {
     if (!visited.includes(course.id)) {
       substitutionGroupIndex++
-      dfs(course.id)
+      organizeSubgroups(course.id)
     }
-  }
+  })
 
   return { courses }
 }

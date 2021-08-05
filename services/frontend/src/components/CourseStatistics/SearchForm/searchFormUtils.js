@@ -28,7 +28,6 @@ const sortAlternatives = alternatives => {
 const getAlternatives = course => sortAlternatives(course.alternatives)
 
 const filterCourseSearchResults = (courses, unifyOpenUniCourses) => {
-  console.log('courses: ', courses)
   const mergedCourses = {}
   const sortedCourses = sortAlternatives(courses)
   sortedCourses.forEach(course => {
