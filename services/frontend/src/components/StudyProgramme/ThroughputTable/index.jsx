@@ -348,13 +348,15 @@ const ThroughputTable = ({
                   ) : null}
                 </Table.HeaderCell>
                 <Table.HeaderCell>{throughput.totals.students}</Table.HeaderCell>
-                {Object.keys(throughput.totals.genders).map(genderKey => (
-                  <Table.HeaderCell key={`${genderKey}total`}>
-                    {`${throughput.totals.genders[genderKey]} (${Math.floor(
-                      (throughput.totals.genders[genderKey] / throughput.totals.students) * 100
-                    )}%)`}
-                  </Table.HeaderCell>
-                ))}
+                {Object.keys(throughput.totals.genders)
+                  .sort()
+                  .map(genderKey => (
+                    <Table.HeaderCell key={`${genderKey}total`}>
+                      {`${throughput.totals.genders[genderKey]} (${Math.floor(
+                        (throughput.totals.genders[genderKey] / throughput.totals.students) * 100
+                      )}%)`}
+                    </Table.HeaderCell>
+                  ))}
                 {renderRatioOfFinns ? (
                   <Table.HeaderCell>
                     {`${throughput.totals.nationalities.Finland || 0} (${
