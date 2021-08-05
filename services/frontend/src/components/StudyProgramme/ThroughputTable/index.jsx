@@ -110,6 +110,8 @@ const ThroughputTable = ({
   const CANCELLED_FEATURE_TOGGLED_ON = userRoles.includes('admin')
 
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
+  genders.sort()
+
   const renderGenders = genders.length > 0
 
   const calculateTotalNationalities = () =>
@@ -265,7 +267,7 @@ const ThroughputTable = ({
 
             <Table.Row>
               {renderGenders || renderRatioOfFinns ? <Table.HeaderCell content="Total" /> : null}
-              {[...genders].sort().map(gender => (
+              {genders.map(gender => (
                 <Table.HeaderCell key={gender} content={gender} />
               ))}
               {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}
