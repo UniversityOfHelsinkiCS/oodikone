@@ -253,7 +253,7 @@ const GeneralTab = ({
       key: 'grade for single course',
       title: 'Grade',
       getRowVal: s => {
-        const grade = s.courses.filter(c => c.course_code === coursecode)
+        const grade = s.courses.filter(c => coursecode.includes(c.course_code))
         if (grade) {
           return grade[grade.length - 1].grade
         }
@@ -261,6 +261,7 @@ const GeneralTab = ({
       },
     })
   }
+
   columns.push({
     key: 'all credits',
     title: 'All Credits',

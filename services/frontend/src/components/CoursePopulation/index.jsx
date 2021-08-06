@@ -122,7 +122,8 @@ const CoursePopulation = ({
   }, [semesters])
 
   const header = courseData ? `${getTextIn(courseData.name, language)} ${headerYears}` : null
-  const coursecode = courseData ? courseData.coursecode : ''
+  const coursecode = courseData ? courseData.alternatives : []
+
   const subHeader = codes.join(', ')
 
   if (!dateFrom || !dateTo) return null
