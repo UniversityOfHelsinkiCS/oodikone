@@ -17,67 +17,57 @@ const ignores = {
   KH60_001: {
     2018: {
       oodi: [
-        '014323074' // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
-      ]
+        '014323074', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
+      ],
     },
     2020: {
       oodi: [
         '013466013', // https://jira.it.helsinki.fi/browse/DOO-4545 // koulutus puuttuu
         '014340963',
         '014179998',
-        '013743299'
-      ]
-    }
+        '013743299',
+      ],
+    },
   },
 
   MH40_002: {
     2020: {
-      sis: ['014840890'] // https://jira.it.helsinki.fi/browse/DOO-4572
-    }
+      sis: ['014840890'], // https://jira.it.helsinki.fi/browse/DOO-4572
+    },
   },
   MH40_005: {
     2019: {
-      oodi: ['015095686'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
-    }
-  },
-  MH40_014: {
-    2020: {
-      oodi: ['013349512'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
-    }
-  },
-  MH40_015: {
-    2020: {
-      oodi: ['014143791'] //  https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2831
-    }
+      oodi: ['015095686'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2786
+    },
   },
   MH55_001: {
     2019: {
-      oodi: ['014744501'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2844
-    }
+      oodi: ['014744501'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2844
+    },
   },
   MH70_008: {
     2017: {
-      oodi: ['014404139'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
-    }
+      oodi: ['014404139'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2850
+    },
   },
   MH70_007: {
     2020: {
-      sis: ['014918968', '014934081', '014954922', '014887918'] // https://jira.it.helsinki.fi/browse/DOO-4572
-    }
+      sis: ['014918968', '014934081', '014954922', '014887918'], // https://jira.it.helsinki.fi/browse/DOO-4572
+    },
   },
   MH80_001: {
     2020: {
-      oodi: ['014343643'] // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
-    }
+      oodi: ['014343643'], // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2827
+    },
   },
   MH60_001: {
     2017: {
       sis: [
-        '014741193' // https://jira.it.helsinki.fi/browse/DOO-4570
-      ]
+        '014741193', // https://jira.it.helsinki.fi/browse/DOO-4570
+      ],
     },
     2019: {
-      oodi: ['014323074'] // https://jira.it.helsinki.fi/browse/DOO-4570
+      oodi: ['014323074'], // https://jira.it.helsinki.fi/browse/DOO-4570
     },
     2020: {
       sis: [
@@ -85,13 +75,13 @@ const ignores = {
         '014590027', // https://jira.it.helsinki.fi/browse/DOO-4571
         '014590807', // https://jira.it.helsinki.fi/browse/DOO-4571
         '014734511', // https://jira.it.helsinki.fi/browse/DOO-4571
-        '013299358' // https://jira.it.helsinki.fi/browse/DOO-4571
+        '013299358', // https://jira.it.helsinki.fi/browse/DOO-4571
       ],
       oodi: [
         '014741193', // https://jira.it.helsinki.fi/browse/DOO-4570
-        '014954744' // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3046
-      ]
-    }
+        '014954744', // https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3046
+      ],
+    },
   },
   // there are many inconsistencies in masters, so they're grouped by the reason, not
   // by program for now
@@ -276,7 +266,7 @@ const ignores = {
       '014863767', // MH60_001
       '014920231', // MH60_001
       '014936487', // MH60_001
-      '015159111' // MH60_001
+      '015159111', // MH60_001
     ],
     // in oodi, but not in sis
     oodi: [
@@ -338,21 +328,21 @@ const ignores = {
       '010664397', // KH50_005 opintoaika loppunut/luopunut
       '014769816', // KH55_001 luopunut
       '014845154', // KH60_001 oodissa väärä loppumispvm
-      '014821974' // MH60_001 alotusv väärin oodissa
-    ]
-  }
+      '014821974', // MH60_001 alotusv väärin oodissa
+    ],
+  },
 }
 
 // For collecting all diff studentnumbers and printing them by reason
 let allGrouped = {
   oodiOnly: {
     cancelledInSis: [],
-    unknown: []
+    unknown: [],
   },
   sisOnly: {
     cancelledInOodi: [],
-    unknown: []
-  }
+    unknown: [],
+  },
 }
 
 const populationDiff = async (programme, year) => {
@@ -364,7 +354,7 @@ const populationDiff = async (programme, year) => {
     semesters: ['FALL', 'SPRING'],
     months,
     studyRights: { programme },
-    year
+    year,
   }
 
   const resultSis = await populationsSis.optimizedStatisticsOf(query)
@@ -445,19 +435,19 @@ const checkIfCancelledInOodi = async (code, sisOnly) => {
   const cancelledInOodi = await Studyright.findAll({
     where: {
       canceldate: {
-        [Op.ne]: null
-      }
+        [Op.ne]: null,
+      },
     },
     where: {
       student_studentnumber: {
-        [Op.in]: sisOnly
-      }
+        [Op.in]: sisOnly,
+      },
     },
     include: {
       model: StudyrightElement,
       required: true,
-      where: { code }
-    }
+      where: { code },
+    },
   })
   return cancelledInOodi
 }
@@ -466,19 +456,19 @@ const checkIfCancelledInSis = async (code, oodiOnly) => {
   const cancelledInSis = await SISStudyright.findAll({
     where: {
       canceldate: {
-        [Op.ne]: null
-      }
+        [Op.ne]: null,
+      },
     },
     where: {
       student_studentnumber: {
-        [Op.in]: oodiOnly
-      }
+        [Op.in]: oodiOnly,
+      },
     },
     include: {
       model: SISStudyrightElement,
       required: true,
-      where: { code }
-    }
+      where: { code },
+    },
   })
   return cancelledInSis
 }
@@ -494,14 +484,14 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
   const sisRights = await SISStudyright.findAll({
     where: {
       student_studentnumber: {
-        [Op.in]: oodiOnly
-      }
+        [Op.in]: oodiOnly,
+      },
     },
     include: {
       model: SISStudyrightElement,
       required: true,
-      where: { code }
-    }
+      where: { code },
+    },
   }).reduce((acc, curr) => ({ ...acc, [curr.studentStudentnumber]: curr }), {})
 
   const notInSisProgramme = oodiOnly.filter(sn => !sisRights[sn])
@@ -511,10 +501,10 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
     where: {
       targetcode: code,
       studentnumber: {
-        [Op.in]: notInSisProgramme
-      }
+        [Op.in]: notInSisProgramme,
+      },
     },
-    raw: true
+    raw: true,
   })
 
   let studentNumbersTransferredToThisProgramme = transferredToThisProgramme.map(s => s.studentnumber)
@@ -548,7 +538,7 @@ const weirdInSIS = async (oodiOnly, resultOodi, code) => {
     cancelledstudents,
     transferredInPakkoSiirto,
     transferredAtSomeOtherDate,
-    notInProgramme: _.difference(notInSisProgramme, studentNumbersTransferredToThisProgramme)
+    notInProgramme: _.difference(notInSisProgramme, studentNumbersTransferredToThisProgramme),
   }
 }
 
@@ -577,11 +567,11 @@ const masterCodes = async () => {
       attributes: ['code'],
       where: {
         code: {
-          [Op.like]: 'MH%'
-        }
+          [Op.like]: 'MH%',
+        },
       },
       group: ['code'],
-      order: ['code']
+      order: ['code'],
     })
   ).map(s => s.code)
 }
@@ -592,11 +582,11 @@ const bscCodes = async () => {
       attributes: ['code'],
       where: {
         code: {
-          [Op.like]: 'KH%'
-        }
+          [Op.like]: 'KH%',
+        },
       },
       group: ['code'],
-      order: ['code']
+      order: ['code'],
     })
   ).map(s => s.code)
 }
@@ -703,5 +693,5 @@ main()
 */
 
 module.exports = {
-  ignores
+  ignores,
 }
