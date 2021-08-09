@@ -265,7 +265,7 @@ class PopulationStudents extends Component {
     const mandatoryCourseData = [totals, ...this.props.filteredStudents]
 
     // FIXME: here only for refactorment
-    const { showNames, studentToTargetCourseDateMap } = this.props
+    const { showNames, studentToTargetCourseDateMap, coursecode } = this.props
     const panes = [
       {
         menuItem: 'General',
@@ -276,6 +276,7 @@ class PopulationStudents extends Component {
               coursePopulation={coursePopulation}
               customPopulation={customPopulation}
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+              coursecode={coursecode}
             />
           </Tab.Pane>
         ),
@@ -408,6 +409,7 @@ PopulationStudents.defaultProps = {
   customPopulation: false,
   coursePopulation: false,
   dataExport: null,
+  coursecode: '',
 }
 
 PopulationStudents.propTypes = {
@@ -431,6 +433,7 @@ PopulationStudents.propTypes = {
   customPopulation: bool,
   filteredStudents: arrayOf(shape({})).isRequired,
   dataExport: node,
+  coursecode: string,
 }
 
 const mapStateToProps = state => {

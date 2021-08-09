@@ -28,6 +28,7 @@ const GeneralTab = ({
   queryStudyrights,
   isAdmin,
   studentToTargetCourseDateMap,
+  coursecode,
 }) => {
   const { language } = useLanguage()
   const { filteredStudents } = useFilters()
@@ -246,6 +247,21 @@ const GeneralTab = ({
       },
     })
   }
+
+  if (coursecode) {
+    columns.push({
+      key: 'grade for single course',
+      title: 'Grade',
+      getRowVal: s => {
+        const grade = s.courses.filter(c => coursecode.includes(c.course_code))
+        if (grade) {
+          return grade[grade.length - 1].grade
+        }
+        return ''
+      },
+    })
+  }
+
   columns.push({
     key: 'all credits',
     title: 'All Credits',
@@ -419,6 +435,7 @@ GeneralTab.defaultProps = {
   studentToTargetCourseDateMap: null,
   customPopulation: false,
   coursePopulation: false,
+  coursecode: '',
 }
 
 GeneralTab.propTypes = {
@@ -429,6 +446,7 @@ GeneralTab.propTypes = {
   queryStudyrights: arrayOf(string).isRequired,
   isAdmin: bool.isRequired,
   studentToTargetCourseDateMap: shape({}),
+  coursecode: string,
 }
 
 const mapStateToProps = state => {

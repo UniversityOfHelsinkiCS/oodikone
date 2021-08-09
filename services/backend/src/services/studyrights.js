@@ -242,7 +242,7 @@ const getStudyrightElementsAndAssociationsForUser = async username => {
 }
 
 const getAllDegreesAndProgrammes = async () => {
-  const elementDetails = ElementDetails.findAll({
+  const elementDetails = await ElementDetails.findAll({
     where: {
       type: {
         [Op.in]: [10, 20],
