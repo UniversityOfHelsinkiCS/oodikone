@@ -110,6 +110,8 @@ const ThroughputTable = ({
   const CANCELLED_FEATURE_TOGGLED_ON = userRoles.includes('admin')
 
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
+  genders.sort()
+
   const renderGenders = genders.length > 0
 
   const calculateTotalNationalities = () =>
@@ -265,7 +267,7 @@ const ThroughputTable = ({
 
             <Table.Row>
               {renderGenders || renderRatioOfFinns ? <Table.HeaderCell content="Total" /> : null}
-              {[...genders].sort().map(gender => (
+              {genders.map(gender => (
                 <Table.HeaderCell key={gender} content={gender} />
               ))}
               {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}
@@ -346,13 +348,15 @@ const ThroughputTable = ({
                   ) : null}
                 </Table.HeaderCell>
                 <Table.HeaderCell>{throughput.totals.students}</Table.HeaderCell>
-                {Object.keys(throughput.totals.genders).map(genderKey => (
-                  <Table.HeaderCell key={`${genderKey}total`}>
-                    {`${throughput.totals.genders[genderKey]} (${Math.floor(
-                      (throughput.totals.genders[genderKey] / throughput.totals.students) * 100
-                    )}%)`}
-                  </Table.HeaderCell>
-                ))}
+                {Object.keys(throughput.totals.genders)
+                  .sort()
+                  .map(genderKey => (
+                    <Table.HeaderCell key={`${genderKey}total`}>
+                      {`${throughput.totals.genders[genderKey]} (${Math.floor(
+                        (throughput.totals.genders[genderKey] / throughput.totals.students) * 100
+                      )}%)`}
+                    </Table.HeaderCell>
+                  ))}
                 {renderRatioOfFinns ? (
                   <Table.HeaderCell>
                     {`${throughput.totals.nationalities.Finland || 0} (${
