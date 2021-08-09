@@ -50,6 +50,8 @@ const studentsThatNeedToBeFixed = [
   { id: 'hy-hlo-57634714', started: '2018-05-02' },
   { id: 'hy-hlo-114941473', started: '2019-01-22' },
   { id: 'hy-hlo-97547785', started: '2019-12-18' },
+  // new entries
+  { id: 'hy-hlo-62121710', started: '2020-12-19' },
 ]
 
 module.exports = {
