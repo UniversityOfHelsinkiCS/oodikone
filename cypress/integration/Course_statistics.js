@@ -138,6 +138,18 @@ describe('Course Statistics tests', () => {
       cy.contains('010431753')
     })
 
+    it('Population of course shows grades for each student', () => {
+      cy.get("input[placeholder='Search by a course code']").type('TKT20001')
+      cy.contains(/^TKT20001$/).click()
+      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.contains('TKT20001, 58131 Tietorakenteet ja algoritmit')
+      cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
+      cy.contains('Population of course Tietorakenteet ja algoritmit 2018-2019')
+      cy.contains('Students (197)').click()
+      cy.contains('td', '010262566').siblings().contains('4')
+      cy.contains('td', '010674989').siblings().contains('1')
+    })
+
     describe('When searching unified course stats', () => {
       beforeEach(() => {
         cy.url().should('include', '/coursestatistics')
