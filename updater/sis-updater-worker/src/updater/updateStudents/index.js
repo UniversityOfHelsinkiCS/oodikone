@@ -53,7 +53,7 @@ const groupStudyrightSnapshots = studyrightSnapshots => {
     }
 
     const orderedSnapshots = orderBy(
-      snapshots,
+      snapshots.filter(snapshot => !!snapshot.snapshot_date_time),
       [s => new Date(s.snapshot_date_time), s => Number(s.modification_ordinal)],
       ['desc', 'desc']
     )
