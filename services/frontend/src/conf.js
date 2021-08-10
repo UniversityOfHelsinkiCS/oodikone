@@ -15,12 +15,16 @@ const adminerUrls = databaseNames.map(db => ({ url: `${adminerBaseUrl}/?pgsql=${
 const basePath = process.env.PUBLIC_URL || ''
 const apiBasePath = `${basePath}/api`
 
+// Build at time
+const builtAt = process.env.REACT_APP_BUILT_AT || ''
+
 module.exports = {
   adminerUrls,
   isProduction,
   isDev,
   basePath,
   apiBasePath,
+  builtAt,
   SENTRY_RELEASE,
   SENTRY_ENVIRONMENT,
 }
