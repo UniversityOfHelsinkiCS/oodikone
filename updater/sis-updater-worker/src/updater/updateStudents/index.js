@@ -53,19 +53,27 @@ const groupStudyrightSnapshots = studyrightSnapshots => {
     }
 
     const orderedSnapshots = orderBy(
-      snapshots.filter(snapshot => !!snapshot.snapshot_date_time),
+      snapshots,
       [s => new Date(s.snapshot_date_time), s => Number(s.modification_ordinal)],
       ['desc', 'desc']
     )
 
     const groupedByPhases = groupBy(orderedSnapshots, byPhases)
 
+    // Get snapshot date time from oldest snapshot where date time is available. If no date
+    // times are available (e.g. all are null), take study start date of the oldest one
+    const parseSnapshotDateTime = snapshots => {
+      let oldestFirst = [...snapshots]
+      oldestFirst.reverse()
+      const firstWithSnapshotDateTime = snapshots.find(s => !!s.snapshot_date_time)
+      if (firstWithSnapshotDateTime) return firstWithSnapshotDateTime.snapshot_date_time
+      return oldestFirst[0].study_start_date
+    }
+
     const snapshotsWithRightDate = Object.keys(groupedByPhases).map(key => {
       const snapshots = groupedByPhases[key]
       const most_recent = snapshots[0]
-      const the_first = snapshots[snapshots.length - 1]
-      most_recent.first_snapshot_date_time = the_first.snapshot_date_time
-
+      most_recent.first_snapshot_date_time = parseSnapshotDateTime(snapshots)
       return most_recent
     })
 
