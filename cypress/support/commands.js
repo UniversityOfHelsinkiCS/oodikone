@@ -50,6 +50,8 @@ Cypress.Commands.add('init', (path = '', userId = 'basic') => {
     if (!headersToUse) throw Error(`${userId} is not valid user id!`)
     req.headers = headersToUse
   })
+  // Hide SIS warning flag to avoid screen size problems when running headlessly
+  window.localStorage.setItem('SIS_WARNING_FLAG', 'true')
   const baseUrl = Cypress.config().baseUrl
   cy.visit(baseUrl.concat(path))
 })
