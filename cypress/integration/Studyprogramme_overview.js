@@ -185,7 +185,6 @@ describe('Studyprogramme overview', () => {
 
       cy.get('.ui > label').click()
       cy.contains('Create new tag').click()
-      cy.get('.purple')
       cy.contains(name)
       deleteTag(name)
     })
