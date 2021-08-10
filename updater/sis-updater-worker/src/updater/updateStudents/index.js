@@ -65,7 +65,7 @@ const groupStudyrightSnapshots = studyrightSnapshots => {
     const parseSnapshotDateTime = snapshots => {
       let oldestFirst = [...snapshots]
       oldestFirst.reverse()
-      const firstWithSnapshotDateTime = snapshots.find(s => !!s.snapshot_date_time)
+      const firstWithSnapshotDateTime = oldestFirst.find(s => !!s.snapshot_date_time)
       if (firstWithSnapshotDateTime) return firstWithSnapshotDateTime.snapshot_date_time
       return oldestFirst[0].study_start_date
     }
