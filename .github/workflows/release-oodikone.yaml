@@ -49,8 +49,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: "Set current date as env variable"
-        run: echo NOW::"$(date --iso-8601=seconds)" >> "$GITHUB_ENV"
+      - name: "Get current time"
+        id: get_current_time
+        run: echo ::set-output name=NOW::"$(date --iso-8601=seconds)"
       - name: "Extract release version"
         # Github context (e.g. github.ref) only has ref formatted as /refs/tags/vX.X.X
         # This steps extracts release version from GITHUB_REF env var
@@ -63,7 +64,7 @@ jobs:
           build-args: |
             SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
             SENTRY_ENVIRONMENT=production
-            BUILT_AT=${{ env.NOW }}
+            BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           cache-from: |
             type=registry,ref=toska/oodikone2-frontend:trunk
             type=registry,ref=toska/oodikone2-frontend:staging
