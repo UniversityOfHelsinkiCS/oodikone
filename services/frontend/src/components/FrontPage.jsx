@@ -7,6 +7,7 @@ import propTypes from 'prop-types'
 import { isEqual } from 'lodash'
 import { images, getUserRoles, checkUserAccess } from '../common'
 import { useTitle } from '../common/hooks'
+import { builtAt } from '../conf'
 
 const FrontPage = props => {
   const { userRoles, rights } = props
@@ -72,7 +73,7 @@ const FrontPage = props => {
         </p>
 
         <Divider section />
-        <p>Oodikone was last updated on: {moment(process.env.BUILT_AT).toDate().toLocaleString()}</p>
+        {builtAt ? <p>Oodikone was last updated on: {moment(builtAt).toDate().toLocaleString()}</p> : null}
       </Container>
       <Image src={images.toskaLogo} size="medium" centered style={{ bottom: 0 }} />
     </div>
