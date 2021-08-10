@@ -13,11 +13,26 @@ const {
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
 const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
 const { studentMapper, mapTeacher, creditMapper, semesterEnrollmentMapper, courseProviderMapper } = require('../mapper')
-
 const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
+
+// Accepted selection path is not available when degree programme doesn't have
+// studytrack or major subject. This is a known bug on SIS and has been reported
+// to funidata.
+// In these cases, degree programmes module group id must be fetched from education.
+const addSelectionPaths = studyrightSnapshots =>
+  studyrightSnapshots.map(snapshot =>
+    Object.keys(snapshot.accepted_selection_path).length === 0
+      ? {
+          ...snapshot,
+          accepted_selection_path: {
+            educationPhase1GroupId: getEducation(snapshot.education_id).structure.phase1.options[0].moduleGroupId,
+          },
+        }
+      : snapshot
+  )
 
 // Group snapshots by studyright id and find out when studyrights have begun
 const groupStudyrightSnapshots = studyrightSnapshots => {
@@ -132,7 +147,9 @@ const updateStudents = async personIds => {
     selectFromByIds('study_right_primalities', personIds, 'student_id'),
   ])
 
-  const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshots)
+  const studyRightSnapshotsWithAddedSelectionPaths = addSelectionPaths(studyRightSnapshots)
+
+  const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshotsWithAddedSelectionPaths)
 
   const personIdToStudentNumber = students.reduce((res, curr) => {
     res[curr.id] = curr.student_number
@@ -147,7 +164,9 @@ const updateStudents = async personIds => {
 
   const attainmentsToBeExluced = getAttainmentsToBeExcluded()
 
-  const mappedStudents = students.map(studentMapper(attainments, studyRightSnapshots, attainmentsToBeExluced))
+  const mappedStudents = students.map(
+    studentMapper(attainments, studyRightSnapshotsWithAddedSelectionPaths, attainmentsToBeExluced)
+  )
   await bulkCreate(Student, mappedStudents)
 
   const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
