@@ -19,7 +19,11 @@
     "diff:courses": "docker exec backend node /usr/src/app/src/sisoodi_diff/courses/index.js",
     "diff:transfers": "docker exec backend node /usr/src/app/src/sisoodi_diff/transfers.js",
     "diff:trends": "docker exec backend node /usr/src/app/src/sisoodi_diff/trends.js",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint:docker-compose": "docker-compose config -q && :",
+    "lint:docker-compose:real": "docker-compose -f docker-compose.yml -f docker-compose.real.yml config -q && :",
+    "lint:docker-compose:ci": "docker-compose -f docker-compose.ci.yml config -q && :",
+    "lint:docker-compose:test": "docker-compose -f docker-compose.test.yml config -q && :"
   },
   "lint-staged": {
     "{services,updater}/**/*.{js,jsx}": "eslint --fix",
@@ -28,10 +32,10 @@
     ".github/workflows/*": "actionlint",
     "Dockerfile": "hadolint",
     "*.sh": "shellcheck -x",
-    "docker-compose.yml": "docker-compose config -q",
-    "docker-compose.real.yml": "docker-compose -f docker-compose.yml -f docker-compose.real.yml config -q",
-    "docker-compose.ci.yml": "docker-compose -f docker-compose.ci.yml config -q",
-    "docker-compose.test.yml": "docker-compose -f docker-compose.test.yml config -q"
+    "docker-compose.yml": "npm run lint:docker-compose",
+    "docker-compose.real.yml": "npm run lint:docker-compose:real",
+    "docker-compose.ci.yml": "npm run lint:docker-compose:ci",
+    "docker-compose.test.yml": "npm run lint:docker-compose:test"
   },
   "repository": {
     "type": "git",

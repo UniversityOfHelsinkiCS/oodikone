@@ -53,13 +53,6 @@ services:
       <<: *build_defaults
       context: services/frontend
     container_name: frontend
-    environment:
-      ADMINER_URL: http://localhost:5050/?pgsql=oodi-db&username=postgres
-      BACKEND_ADDR: backend
-      KONE_ADMINER_URL: http://localhost:5050/?pgsql=kone-db&username=postgres
-      SIS_ADMINER_URL: http://localhost:5050/?pgsql=sis-db&username=postgres
-      SIS_IMPORTER_ADMINER_URL: http://localhost:5050/?pgsql=sis-importer-db&username=postgres
-      USER_ADMINER_URL: http://localhost:5050/?pgsql=user-db&username=postgres
     ports:
       - 3000:3000
     profiles:

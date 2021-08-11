@@ -29,8 +29,6 @@ services:
   frontend:
     <<: *defaults
     container_name: frontend
-    environment:
-      BACKEND_ADDR: backend
     image: toska/oodikone2-frontend:trunk
 
   kone-db:

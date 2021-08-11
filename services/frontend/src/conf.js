@@ -15,12 +15,8 @@ const adminerUrls = databaseNames.map(db => ({ url: `${adminerBaseUrl}/?pgsql=${
 const basePath = process.env.REACT_APP_PUBLIC_URL || ''
 const apiBasePath = `${basePath}/api`
 
-// Build at time
+// Update time for frontpage
 const builtAt = process.env.REACT_APP_BUILT_AT || ''
-
-console.log('builtAt in conf: ', builtAt)
-
-console.log('whole process env', JSON.stringify(process.env, null, 2))
 
 module.exports = {
   adminerUrls,
