@@ -47,9 +47,6 @@ Course.init(
     substitutions: {
       type: JSONB,
     },
-    responsible_organisation: {
-      type: STRING,
-    },
   },
   {
     underscored: false,

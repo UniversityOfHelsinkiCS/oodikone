@@ -2,7 +2,7 @@ import { orderBy } from 'lodash'
 
 // handle special case where the course's actual code starts with "A" so it is mistakenly taken as Open Uni course
 // const isAvoin = code => !!code.match(/^[A][0-9]|^AY/)
-const isAvoinTwo = course => course.responsible_organisation === 'hy-org-48645785'
+const isAvoinTwo = course => course.organizations.some(c => c === 'hy-org-48645785')
 
 const sortAlternatives = alternatives => {
   const result = orderBy(
