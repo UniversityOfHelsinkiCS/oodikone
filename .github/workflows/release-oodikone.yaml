@@ -90,6 +90,7 @@ jobs:
           set_commits: 'skip'
           sourcemaps: './build/static/js'
           url_prefix: '~/oodikone/static/js'
+          version: ${{ steps.extract_version.outputs.VERSION }}
 
   build_and_release_userservice:
     name: "Build and release userservice"
