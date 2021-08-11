@@ -14,6 +14,7 @@ const { parseCredit } = require('./parseCredits')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('../servicesV2/course_yearly_stats_counter')
 const _ = require('lodash')
+// const { CourseProvider } = require('../models')
 
 const byNameOrCode = (searchTerm, language) =>
   Course.findAll({
@@ -356,50 +357,75 @@ const codeLikeTerm = code =>
       }
 
 const byNameAndOrCodeLike = async (name, code) => {
-  let courses = await Course.findAll({
-    raw: true,
-    attributes: [
-      'id',
-      'name',
-      'code',
-      'latest_instance_date',
-      'startdate',
-      'enddate',
-      'max_attainment_date',
-      'min_attainment_date',
-      'substitutions',
-    ],
+  let rawCourses = await Course.findAll({
+    include: {
+      model: Organization,
+      required: true,
+    },
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code),
     },
   })
 
+  const courses = rawCourses
+    .map(
+      ({
+        id,
+        code,
+        name,
+        latest_instance_date,
+        is_study_module,
+        coursetypecode,
+        startdate,
+        max_attainment_date,
+        min_attainment_date,
+        createdAt,
+        updatedAt,
+        substitutions,
+        organizations,
+      }) => {
+        return {
+          id,
+          code,
+          name,
+          latest_instance_date,
+          is_study_module,
+          coursetypecode,
+          startdate,
+          max_attainment_date,
+          min_attainment_date,
+          createdAt,
+          updatedAt,
+          substitutions,
+          organizations: organizations.map(o => o.id),
+        }
+      }
+    )
+    .sort(a => (a.code.match(/^[A-Za-z]{3}[0-9]{1}/) ? -1 : 1))
+
   let substitutionGroupIndex = 0
-  const subsGroups = {}
   const visited = []
-  const dfs = async courseId => {
-    if (visited.includes(courseId)) return
-    visited.push(courseId)
-    const course = courses.find(course => course.id === courseId)
 
-    if (!course) return
+  const organizeSubgroups = course => {
+    if (visited.includes(course.code)) return
 
-    subsGroups[course.code] = substitutionGroupIndex
-    course.subsId = substitutionGroupIndex
-
-    for (const courseId of course.substitutions) {
-      dfs(courseId)
-    }
+    let temp = courses.filter(c => (course.substitutions ? course.substitutions.includes(c.id) : false))
+    temp.unshift(course)
+    temp.forEach(cu => {
+      if (visited.includes(course.code)) return
+      visited.push(cu.id)
+      cu.subsId = substitutionGroupIndex
+    })
   }
 
-  for (const course of courses) {
+  courses.forEach(course => {
     if (!visited.includes(course.id)) {
       substitutionGroupIndex++
-      dfs(course.id)
+      organizeSubgroups(course)
     }
-  }
-
+  })
+  console.log(courses)
   return { courses }
 }
 

@@ -1,7 +1,8 @@
 import { orderBy } from 'lodash'
 
 // handle special case where the course's actual code starts with "A" so it is mistakenly taken as Open Uni course
-const isAvoin = code => !!code.match(/^[A][0-9]|^AY/)
+// const isAvoin = code => !!code.match(/^[A][0-9]|^AY/)
+const isAvoinTwo = course => course.organizations.some(c => c === 'hy-org-48645785')
 
 const sortAlternatives = alternatives => {
   const result = orderBy(
@@ -30,7 +31,7 @@ const filterCourseSearchResults = (courses, unifyOpenUniCourses) => {
   const mergedCourses = {}
   const sortedCourses = sortAlternatives(courses)
   sortedCourses.forEach(course => {
-    const groupId = isAvoin(course.code) && !unifyOpenUniCourses ? course.code : course.subsId
+    const groupId = isAvoinTwo(course) && !unifyOpenUniCourses ? course.code : course.subsId
 
     if (!(course.max_attainment_date && course.min_attainment_date)) {
       return
