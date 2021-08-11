@@ -23,6 +23,8 @@ const FrontPage = props => {
     feedback: true,
   }
 
+  console.log('builtAt in fronptage: ', builtAt)
+
   return (
     <div>
       <Container text style={{ paddingTop: 50 }} textAlign="justified">
