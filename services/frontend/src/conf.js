@@ -20,6 +20,8 @@ const builtAt = process.env.REACT_APP_BUILT_AT || ''
 
 console.log('builtAt in conf: ', builtAt)
 
+console.log('whole process env', JSON.stringify(process.env, null, 2))
+
 module.exports = {
   adminerUrls,
   isProduction,
