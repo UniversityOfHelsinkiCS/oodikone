@@ -1,6 +1,6 @@
 /// <reference types="Cypress" />
 
-const baseUrl = Cypress.config().baseUrl
+// const baseUrl = Cypress.config().baseUrl
 
 const checkFilteringResult = studentCount => {
   cy.contains(`Students (${studentCount})`)
@@ -131,12 +131,12 @@ describe('Population Statistics', () => {
   })
 
   // TODO: this fails in CI, but not locally. Investigate and fix
-  it.skip('Courses filter works', () => {
+  it('Courses filter works', () => {
     // courses takes some time to load, wait for it to complete
-    cy.intercept({ path: '**/courses' }).as('coursesOfPopulation')
-    cy.wait('@coursesOfPopulation')
+    // cy.intercept({ path: '**/courses' }).as('coursesOfPopulation')
+    // cy.wait('@coursesOfPopulation')
     // moar waiting hack
-    cy.wait(10000)
+    // cy.wait(10000)
     runTestStepWithPreAndPostParts('courseFilter-header', () => {
       cy.cs('courseFilter-course-dropdown').click()
       const courses = ['TKT20001', 'MAT11002']

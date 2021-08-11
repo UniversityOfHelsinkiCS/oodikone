@@ -119,6 +119,42 @@ describe('Course Statistics tests', () => {
       cy.contains('AYTKT10004 Avoin yo: Tietokantojen perusteet')
     })
 
+    it('Searching course by name displays right courses, 10 credit courses', () => {
+      cy.url().should('include', '/coursestatistics')
+      cy.contains('Search for courses')
+      cy.get("input[placeholder='Search by entering a course name']").type('tietorakenteet ja algoritmit')
+
+      cy.contains('Tietorakenteet ja algoritmit')
+      cy.contains('Avoin yo: Tietorakenteet ja algoritmit')
+      cy.contains('AYTKT20001')
+      cy.contains('TKT20001, 58131')
+      cy.contains('td', /^TKT20001/).click()
+
+      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.contains('Search for courses').should('not.exist')
+
+      cy.contains('TKT20001, 58131 Tietorakenteet ja algoritmit')
+      cy.get('.right').click()
+      cy.contains('No results')
+
+      cy.get("input[placeholder='Search by entering a course name']").type('tietorakenteet ja algoritmit')
+      cy.contains('td', /^AYTKT20001/).click()
+
+      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.contains('Search for courses').should('not.exist')
+      cy.contains('AYTKT20001 Avoin yo: Tietorakenteet ja algoritmit')
+
+      cy.get('.right').click()
+      cy.contains('No results')
+      cy.get("input[name='unifyOpenUniCourses']").parent().click()
+      cy.get("input[placeholder='Search by entering a course name']").type('tietorakenteet ja algoritmit')
+      cy.contains('td', 'TKT20001, 58131, AYTKT20001').click()
+
+      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.contains('Search for courses').should('not.exist')
+      cy.contains('TKT20001, 58131, AYTKT20001 Tietorakenteet ja algoritmit')
+    })
+
     it('Can find course population', () => {
       cy.url().should('include', '/coursestatistics')
       cy.contains('Search for courses')
