@@ -12,11 +12,13 @@ const databaseNames = ['kone-db', 'oodi-db', 'sis-db', 'sis-importer-db', 'user-
 const adminerUrls = databaseNames.map(db => ({ url: `${adminerBaseUrl}/?pgsql=${db}&username=postgres`, text: db }))
 
 // Base paths
-const basePath = process.env.PUBLIC_URL || ''
+const basePath = process.env.REACT_APP_PUBLIC_URL || ''
 const apiBasePath = `${basePath}/api`
 
 // Build at time
 const builtAt = process.env.REACT_APP_BUILT_AT || ''
+
+console.log('builtAt in conf: ', builtAt)
 
 module.exports = {
   adminerUrls,
