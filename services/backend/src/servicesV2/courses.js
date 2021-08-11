@@ -357,39 +357,63 @@ const codeLikeTerm = code =>
       }
 
 const byNameAndOrCodeLike = async (name, code) => {
-  let courses = await Course.findAll({
-    raw: true,
-    attributes: [
-      'id',
-      'name',
-      'code',
-      'latest_instance_date',
-      'startdate',
-      'enddate',
-      'max_attainment_date',
-      'min_attainment_date',
-      'substitutions',
-      'responsible_organisation',
-    ],
+  let rawCourses = await Course.findAll({
+    include: {
+      model: Organization,
+      required: true,
+    },
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code),
     },
   })
 
-  courses.sort(c => (c.code.match(/^[A-Za-z]/) ? 1 : 0))
-  console.log(courses)
+  const courses = rawCourses
+    .map(
+      ({
+        id,
+        code,
+        name,
+        latest_instance_date,
+        is_study_module,
+        coursetypecode,
+        startdate,
+        max_attainment_date,
+        min_attainment_date,
+        createdAt,
+        updatedAt,
+        substitutions,
+        organizations,
+      }) => {
+        return {
+          id,
+          code,
+          name,
+          latest_instance_date,
+          is_study_module,
+          coursetypecode,
+          startdate,
+          max_attainment_date,
+          min_attainment_date,
+          createdAt,
+          updatedAt,
+          substitutions,
+          organizations: organizations.map(o => o.id),
+        }
+      }
+    )
+    .sort(a => (a.code.match(/^[A-Za-z]{3}[0-9]{1}/) ? -1 : 1))
+
   let substitutionGroupIndex = 0
   const visited = []
 
-  const organizeSubgroups = cour => {
-    if (visited.includes(cour.code)) return
-    // visited.push(cour.id)
+  const organizeSubgroups = course => {
+    if (visited.includes(course.code)) return
 
-    let temp = courses.filter(c => cour.substitutions.includes(c.id))
-    temp.unshift(cour)
+    let temp = courses.filter(c => (course.substitutions ? course.substitutions.includes(c.id) : false))
+    temp.unshift(course)
     temp.forEach(cu => {
-      if (visited.includes(cour.code)) return
+      if (visited.includes(course.code)) return
       visited.push(cu.id)
       cu.subsId = substitutionGroupIndex
     })
@@ -401,7 +425,7 @@ const byNameAndOrCodeLike = async (name, code) => {
       organizeSubgroups(course)
     }
   })
-  // console.log(courses)
+  console.log(courses)
   return { courses }
 }
 
