@@ -220,7 +220,7 @@ const courseProviderMapper =
 
 const timify = t => new Date(t).getTime()
 
-const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => {
+const courseMapper = courseIdToAttainments => (groupedCourse, substitutions, organisation) => {
   const [groupId, courses] = groupedCourse
   const { code, name, study_level: coursetypecode } = courses[0]
 
@@ -263,6 +263,7 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
     enddate,
     is_study_module: false, // VALIDATE THIS PLS
     substitutions,
+    responsible_organisation: organisation,
   }
 }
 
