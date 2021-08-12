@@ -85,7 +85,7 @@ const TeacherStatistics = ({
 
   const userProviders = mapToProviders(rights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
-  const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
+  const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.code))
   const localizedProviderOptions = providerOptions.map(({ name, ...rest }) => ({
     ...rest,
     text: getTextIn(name, language),
@@ -184,11 +184,7 @@ const mapStateToProps = state => {
     },
   } = state
   const { semesters } = state.semesters.data
-  const providerOptions = providers.data.map(p => ({
-    key: p.providercode,
-    value: p.providercode,
-    name: p.name,
-  }))
+  const providerOptions = providers.data
   const semesterOptions = !semesters
     ? []
     : Object.values(semesters)
