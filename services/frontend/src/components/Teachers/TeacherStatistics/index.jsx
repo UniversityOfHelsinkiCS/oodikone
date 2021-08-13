@@ -186,7 +186,7 @@ const mapStateToProps = state => {
     },
   } = state
   const { semesters } = state.semesters.data
-  const providerOptions = providers.data
+  const providerOptions = providers.data.map(prov => ({ key: prov.code, value: prov.code, name: prov.name }))
   const semesterOptions = !semesters
     ? []
     : Object.values(semesters)
