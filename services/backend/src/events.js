@@ -1,13 +1,5 @@
 const { CronJob } = require('cron')
 const moment = require('moment')
-const {
-  refreshProtoC,
-  refreshStatus,
-  refreshStatusGraduated,
-  refreshUber,
-  refreshProtoCProgramme,
-  getStartYears,
-} = require('./services/coolDataScience')
 
 const {
   refreshProtoC: refreshProtoCV2,
@@ -149,77 +141,6 @@ const refreshNonGraduatedStudentsOfOldProgrammesV2 = async () => {
   }
 }
 
-const refreshProtoCtoRedis = async () => {
-  try {
-    const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false' }
-    const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false' }
-    const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true' }
-    const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true' }
-    console.log('Refreshing CDS ProtoC')
-    await refreshProtoC(defaultQuery)
-    await refreshProtoC(onlyOld)
-    await refreshProtoC(onlyEnr)
-    await refreshProtoC(bothToggles)
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-const refreshStatusToRedis = async () => {
-  try {
-    const unixMillis = moment().valueOf()
-    const date = new Date(Number(unixMillis))
-
-    date.setHours(23, 59, 59, 999)
-    const showByYearOff = 'false'
-    const showByYear = 'true'
-    console.log('Refreshing CDS Status')
-    await refreshStatus(date.getTime(), showByYearOff)
-    await refreshStatus(date.getTime(), showByYear)
-
-    console.log('Refreshing CDS Graduated')
-    await refreshStatusGraduated(date.getTime(), showByYearOff)
-    await refreshStatusGraduated(date.getTime(), showByYear)
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-const refreshUberToRedis = async () => {
-  try {
-    const years = await getStartYears()
-    const mappedYears = years.map(({ studystartdate }) => studystartdate)
-    mappedYears.forEach(async year => {
-      console.log('Refreshing CDS Uber data for date', year)
-      const defaultQuery = { include_old_attainments: 'false', start_date: year }
-      const oldAttainmentsQuery = { include_old_attainments: 'true', start_date: year }
-      await refreshUber(defaultQuery)
-      await refreshUber(oldAttainmentsQuery)
-    })
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-const refreshProtoCProgrammeToRedis = async () => {
-  try {
-    const codes = (await getAllProgrammesV2()).map(p => p.code).filter(code => code.includes('KH'))
-    codes.forEach(async code => {
-      const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false', code }
-      const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false', code }
-      const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true', code }
-      const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true', code }
-      console.log('Refreshing CDS ProtoCProgramme for code ', code)
-      await refreshProtoCProgramme(defaultQuery)
-      await refreshProtoCProgramme(onlyOld)
-      await refreshProtoCProgramme(onlyEnr)
-      await refreshProtoCProgramme(bothToggles)
-    })
-  } catch (e) {
-    console.log(e)
-  }
-}
-
 const refreshProtoCtoRedisV2 = async () => {
   try {
     const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false' }
@@ -316,15 +237,7 @@ const startCron = () => {
   }
 }
 
-const refreshCDS = async () => {
-  await refreshProtoCtoRedis()
-  await refreshStatusToRedis()
-  await refreshUberToRedis()
-  await refreshProtoCProgrammeToRedis()
-}
-
 module.exports = {
   startCron,
   refreshStatisticsV2,
-  refreshCDS,
 }
