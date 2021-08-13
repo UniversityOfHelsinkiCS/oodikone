@@ -8,6 +8,16 @@ const {
   refreshProtoCProgramme,
   getStartYears,
 } = require('./services/coolDataScience')
+
+const {
+  refreshProtoC: refreshProtoCV2,
+  refreshStatus: refreshStatusV2,
+  refreshStatusGraduated: refreshStatusGraduatedV2,
+  refreshUber: refreshUberV2,
+  refreshProtoCProgramme: refreshProtoCProgrammeV2,
+  getStartYears: getStartYearsV2,
+} = require('./servicesV2/trends')
+
 const { refreshAssociationsInRedis: refreshAssociationsInRedisV2 } = require('./servicesV2/studyrights')
 const {
   getAllProgrammes: getAllProgrammesV2,
@@ -20,8 +30,8 @@ const {
 } = require('./servicesV2/studyprogramme')
 
 const topteachersV2 = require('./servicesV2/topteachers')
-const { isNewHYStudyProgramme } = require('./util')
 
+const { isNewHYStudyProgramme } = require('./util')
 const { calculateFacultyYearlyStats } = require('./services/faculties')
 const { patchFacultyYearlyStats } = require('./servicesV2/analyticsService')
 
@@ -210,6 +220,78 @@ const refreshProtoCProgrammeToRedis = async () => {
   }
 }
 
+const refreshProtoCtoRedisV2 = async () => {
+  try {
+    const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false' }
+    const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false' }
+    const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true' }
+    const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true' }
+    console.log('Refreshing CDS ProtoC')
+    await refreshProtoCV2(defaultQuery)
+    await refreshProtoCV2(onlyOld)
+    await refreshProtoCV2(onlyEnr)
+    await refreshProtoCV2(bothToggles)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const refreshStatusToRedisV2 = async () => {
+  try {
+    const unixMillis = moment().valueOf()
+    const date = new Date(Number(unixMillis))
+
+    date.setHours(23, 59, 59, 999)
+    const showByYearOff = 'false'
+    const showByYear = 'true'
+    console.log('Refreshing CDS Status')
+    await refreshStatusV2(date.getTime(), showByYearOff)
+    await refreshStatusV2(date.getTime(), showByYear)
+
+    console.log('Refreshing CDS Graduated')
+    await refreshStatusGraduatedV2(date.getTime(), showByYearOff)
+    await refreshStatusGraduatedV2(date.getTime(), showByYear)
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const refreshUberToRedisV2 = async () => {
+  try {
+    const years = await getStartYearsV2()
+    const mappedYears = years.map(({ studystartdate }) => studystartdate)
+    mappedYears.forEach(async year => {
+      console.log('Refreshing CDS Uber data for date', year)
+      const defaultQuery = { include_old_attainments: 'false', start_date: year }
+      const oldAttainmentsQuery = { include_old_attainments: 'true', start_date: year }
+      await refreshUberV2(defaultQuery)
+      await refreshUberV2(oldAttainmentsQuery)
+    })
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const refreshProtoCProgrammeToRedisV2 = async () => {
+  try {
+    const codes = (await getAllProgrammesV2()).map(p => p.code).filter(code => code.includes('KH'))
+    codes.forEach(async code => {
+      console.log('refreshing code', code)
+      const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false', code }
+      const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false', code }
+      const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true', code }
+      const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true', code }
+      console.log('Refreshing CDS ProtoCProgramme for code ', code)
+      await refreshProtoCProgrammeV2(defaultQuery)
+      await refreshProtoCProgrammeV2(onlyOld)
+      await refreshProtoCProgrammeV2(onlyEnr)
+      await refreshProtoCProgrammeV2(bothToggles)
+    })
+  } catch (e) {
+    console.log(e)
+  }
+}
+
 const refreshStatisticsV2 = async () => {
   await refreshStudyrightAssociationsV2()
   await refreshOverviewV2()
@@ -218,10 +300,18 @@ const refreshStatisticsV2 = async () => {
   await refreshFacultyYearlyStats() // using old data
 }
 
+const refreshTrendsV2 = async () => {
+  await refreshProtoCtoRedisV2()
+  await refreshStatusToRedisV2()
+  await refreshUberToRedisV2()
+  await refreshProtoCProgrammeToRedisV2()
+}
+
 const startCron = () => {
   if (process.env.NODE_ENV === 'production') {
     schedule('0 6 * * *', async () => {
       await refreshStatisticsV2()
+      await refreshTrendsV2()
     })
   }
 }

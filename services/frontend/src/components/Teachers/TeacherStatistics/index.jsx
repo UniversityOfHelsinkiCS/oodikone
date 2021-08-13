@@ -51,6 +51,9 @@ const TeacherStatistics = ({
     KH57_001
     500-K001
     --------
+    KH74_001
+    740-K001
+    --------
     KH80_003
     800-K003
     --------
@@ -58,13 +61,12 @@ const TeacherStatistics = ({
     */
   const mapToProviders = rights =>
     rights.map(r => {
+      const isNumber = str => !Number.isNaN(Number(str))
       if (r.includes('_')) {
-        let newPrefix = ''
-        let newSuffix = ''
-        const split = r.split('_')
-        newPrefix = `${split[0][2]}00`
-        newSuffix = `${split[0][0]}${split[1]}`
-        const providercode = `${newPrefix}-${newSuffix}`
+        const [left, right] = r.split('_')
+        const prefix = [...left].filter(isNumber).join('')
+        const suffix = `${left[0]}${right}`
+        const providercode = `${prefix}0-${suffix}`
         return providercode
       }
       return r
@@ -85,7 +87,7 @@ const TeacherStatistics = ({
 
   const userProviders = mapToProviders(rights)
   const invalidQueryParams = provs.length === 0 || !semesterStart
-  const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.value))
+  const providerOptions = isAdmin ? providers : providers.filter(p => userProviders.includes(p.code))
   const localizedProviderOptions = providerOptions.map(({ name, ...rest }) => ({
     ...rest,
     text: getTextIn(name, language),
@@ -184,11 +186,7 @@ const mapStateToProps = state => {
     },
   } = state
   const { semesters } = state.semesters.data
-  const providerOptions = providers.data.map(p => ({
-    key: p.providercode,
-    value: p.providercode,
-    name: p.name,
-  }))
+  const providerOptions = providers.data.map(prov => ({ key: prov.code, value: prov.code, name: prov.name }))
   const semesterOptions = !semesters
     ? []
     : Object.values(semesters)
