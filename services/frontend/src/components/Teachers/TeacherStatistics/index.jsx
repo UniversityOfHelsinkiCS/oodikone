@@ -51,6 +51,9 @@ const TeacherStatistics = ({
     KH57_001
     500-K001
     --------
+    KH74_001
+    740-K001
+    --------
     KH80_003
     800-K003
     --------
@@ -58,13 +61,12 @@ const TeacherStatistics = ({
     */
   const mapToProviders = rights =>
     rights.map(r => {
+      const isNumber = str => !Number.isNaN(Number(str))
       if (r.includes('_')) {
-        let newPrefix = ''
-        let newSuffix = ''
-        const split = r.split('_')
-        newPrefix = `${split[0][2]}00`
-        newSuffix = `${split[0][0]}${split[1]}`
-        const providercode = `${newPrefix}-${newSuffix}`
+        const [left, right] = r.split('_')
+        const prefix = [...left].filter(isNumber).join('')
+        const suffix = `${left[0]}${right}`
+        const providercode = `${prefix}0-${suffix}`
         return providercode
       }
       return r
