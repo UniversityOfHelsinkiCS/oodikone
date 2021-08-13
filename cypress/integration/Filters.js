@@ -130,8 +130,7 @@ describe('Population Statistics', () => {
     })
   })
 
-  // TODO: this fails in CI, but not locally. Investigate and fix
-  it.only('Courses filter works', () => {
+  it('Courses filter works', () => {
     // courses takes some time to load, wait for it to complete
     cy.intercept({ path: '**/courses' }).as('coursesOfPopulation')
     cy.wait('@coursesOfPopulation')
