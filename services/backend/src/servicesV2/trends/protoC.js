@@ -102,10 +102,13 @@ const calculateProtoCProgramme = async query => {
     includeOldAttainments: query.include_old_attainments === 'true',
     excludeNonEnrolled: query.exclude_non_enrolled === 'true',
   })
+
   const programmeData = data.find(d => d.programmeType === 20)
   const studytrackData = data.filter(d => d.programmeType !== 20)
 
-  // mankel through studytracks
+  if (!programmeData) return {}
+
+  // mankel through studytracks if studyrightdata available
   const studytrackMankelid = _(studytrackData)
     // seems to return the numerical columns as strings, parse them first
     .map(programmeRow => ({
@@ -122,7 +125,7 @@ const calculateProtoCProgramme = async query => {
   const studytrackToBachelorProgrammes = Object.keys(associations.programmes).reduce((acc, curr) => {
     if (!curr.includes('KH')) return acc
     const studytracksForProgramme = studytrackMankelid.reduce((acc2, studytrackdata) => {
-      if (associations.programmes[curr].studytracks.includes(studytrackdata.programmeCode)) {
+      if (studytrackdata && associations.programmes[curr].studytracks.includes(studytrackdata.programmeCode)) {
         acc2.push({
           code: studytrackdata.programmeCode,
           name: studytrackdata.programmeName,
