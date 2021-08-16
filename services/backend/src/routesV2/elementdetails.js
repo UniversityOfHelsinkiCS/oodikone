@@ -1,13 +1,12 @@
 const router = require('express').Router()
 const { getStudentsUserCanAccess } = require('../servicesV2/userService')
-//const { getAllDegreesAndProgrammes, getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 const MandatoryCourses = require('../servicesV2/mandatoryCourses')
 const {
   productivityStatsForStudytrack,
   throughputStatsForStudytrack,
   optionData,
 } = require('../servicesV2/studyprogramme')
-const { findProgrammeTheses /* , createThesisCourse, deleteThesisCourse */ } = require('../services/thesis')
+const { findProgrammeTheses } = require('../services/thesis')
 
 const {
   getProductivity,
@@ -20,24 +19,6 @@ const {
 } = require('../servicesV2/analyticsService')
 
 const programmeStatsSince = new Date('2017-07-31')
-
-/* router.get('/elementdetails/all', async (req, res) => {
-  try {
-    const elementdetails = await getAllElementDetails()
-    res.json(elementdetails)
-  } catch (e) {
-    res.status(500).json(e)
-  }
-}) */
-
-/* router.get('/studyprogrammes', async (req, res) => {
-  try {
-    const studyrights = await getAllDegreesAndProgrammes()
-    res.json(studyrights)
-  } catch (err) {
-    res.status(500).json(err)
-  }
-}) */
 
 router.get('/v2/studyprogrammes/:id/optiondata', async (req, res) => {
   const code = req.params.id
@@ -91,15 +72,6 @@ router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
     res.status(422).end()
   }
 })
-
-/* router.get('/v2/studyprogrammes/ping', async (req, res) => {
-  try {
-    const result = await ping()
-    res.json(result)
-  } catch (e) {
-    res.status(500).end()
-  }
-}) */
 
 router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
   const code = req.params.id
@@ -216,37 +188,6 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   }
   console.log(`Throughput stats recalculation for studyprogramme ${code} done`)
 })
-
-/* router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {
-  const { id } = req.params
-  if (id) {
-    const thesis = await findProgrammeTheses(id)
-    res.json(thesis)
-  } else {
-    res.status(422).end()
-  }
-}) */
-
-/* router.post('/v2/studyprogrammes/:id/thesis', async (req, res) => {
-  const { id } = req.params
-  const { course, thesisType } = req.body
-  if (id && course && thesisType) {
-    const thesis = await createThesisCourse(id, course, thesisType)
-    res.status(201).json(thesis)
-  } else {
-    res.status(422).end()
-  }
-}) */
-
-/* router.delete('/v2/studyprogrammes/:id/thesis/:course', async (req, res) => {
-  const { id, course } = req.params
-  if (id && course) {
-    const deleted = await deleteThesisCourse(id, course)
-    res.status(204).json(deleted)
-  } else {
-    res.status(422).end()
-  }
-}) */
 
 router.use('*', (req, res, next) => next())
 
