@@ -88,21 +88,6 @@ const patchThroughput = async data => {
   }
 }
 
-const patchFacultyYearlyStats = async data => {
-  const redisKey = 'FACULTY_YEARLY_STATS'
-  const dataToPatch = Object.entries(data).reduce((acc, [id, data]) => [...acc, { id, data }], [])
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToPatch))
-  if (setOperationStatus !== 'OK') return null
-  return dataToPatch
-}
-
-const getFacultyYearlyStats = async () => {
-  const redisKey = 'FACULTY_YEARLY_STATS'
-  const dataFromRedis = await redisClient.getAsync(redisKey)
-  if (!dataFromRedis) return null
-  return JSON.parse(dataFromRedis)
-}
-
 const patchNonGraduatedStudents = async data => {
   const [id, dataToPatch] = Object.entries(data)[0]
   const redisKey = createRedisKeyForNonGraduatedStudents(id)
@@ -135,8 +120,6 @@ module.exports = {
   getThroughput,
   setThroughput,
   patchThroughput,
-  patchFacultyYearlyStats,
-  getFacultyYearlyStats,
   patchNonGraduatedStudents,
   getNonGraduatedStudents,
 }
