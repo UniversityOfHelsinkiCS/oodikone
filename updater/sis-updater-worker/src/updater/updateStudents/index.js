@@ -194,7 +194,7 @@ const updateStudents = async personIds => {
     ),
     updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber),
-    await bulkCreate(Transfer, mappedTransfers),
+    await bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
   ])
 }
 
