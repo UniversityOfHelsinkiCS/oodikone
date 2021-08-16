@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { shape, string, arrayOf, func, bool } from 'prop-types'
+import { shape, string, func, bool } from 'prop-types'
 import { Header, Segment, Tab, Button } from 'semantic-ui-react'
 import { isEqual, uniqBy } from 'lodash'
 import DegreeCoursesTable from './DegreeCourses'
@@ -9,7 +9,6 @@ import CourseCodeMapper from '../CourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import StudyTrackOverview from './StudyTrackOverview'
-import AggregateView from '../CourseGroups/AggregateView'
 import ThesisCourses from './ThesisCourses'
 import PresentStudents from './PresentStudents'
 import '../PopulationQueryCard/populationQueryCard.css'
@@ -28,7 +27,7 @@ import useLanguage from '../LanguagePicker/useLanguage'
 
 const StudyProgramme = props => {
   const { language } = useLanguage()
-  const [tab, setTab] = useTabs('p_tab', props.match.params.courseGroupId ? 2 : 0, props.history)
+  const [tab, setTab] = useTabs('p_tab', 0, props.history)
   useTitle('Study programmes')
 
   useEffect(() => {
@@ -63,8 +62,8 @@ const StudyProgramme = props => {
   }
 
   const getPanes = () => {
-    const { match, rights, userRoles, programmes } = props
-    const { studyProgrammeId, courseGroupId } = match.params
+    const { match, programmes } = props
+    const { studyProgrammeId } = match.params
     const filteredStudytracks = programmes[studyProgrammeId]
       ? Object.values(programmes[studyProgrammeId].enrollmentStartYears).reduce((acc, curr) => {
           acc.push(...Object.values(curr.studyTracks))
@@ -91,13 +90,6 @@ const StudyProgramme = props => {
       },
       { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> }
     )
-
-    if ((userRoles.includes('coursegroups') && rights.includes(studyProgrammeId)) || userRoles.includes('admin')) {
-      panes.push({
-        menuItem: 'Course Groups',
-        render: () => <AggregateView programmeId={studyProgrammeId} courseGroupId={courseGroupId} />,
-      })
-    }
     panes.push({
       menuItem: 'Thesis Courses',
       render: () => <ThesisCourses studyprogramme={studyProgrammeId} />,
@@ -188,13 +180,10 @@ StudyProgramme.propTypes = {
   match: shape({
     params: shape({
       studyProgrammeId: string,
-      courseGroupId: string,
     }),
   }),
   programmes: shape({}),
   history: shape({}).isRequired,
-  rights: arrayOf(string).isRequired,
-  userRoles: arrayOf(string).isRequired,
   getProductivityDispatch: func.isRequired,
   getThroughputDispatch: func.isRequired,
   isAdmin: bool.isRequired,

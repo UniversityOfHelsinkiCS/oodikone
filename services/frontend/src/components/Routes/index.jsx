@@ -58,7 +58,6 @@ const Routes = () => (
       <Route exact path="/" component={FrontPage} />
       <Route exact path="/populations" component={Populations} />
       <Route exact path="/study-programme/:studyProgrammeId?" component={StudyProgramme} />
-      <Route exact path="/study-programme/:studyProgrammeId/course-group/:courseGroupId" component={StudyProgramme} />
       <Route exact path={routes.students} component={StudentStatistics} />
       <Route exact path={routes.courseStatistics} component={CourseStatistics} />
       <Route exact path={routes.users} component={EnableUsers} />
