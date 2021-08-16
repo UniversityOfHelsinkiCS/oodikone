@@ -12,7 +12,6 @@ const { refreshAssociationsInRedis } = require('./servicesV2/studyrights')
 const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./servicesV2/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./servicesV2/studyprogramme')
 const { findAndSaveTeachers } = require('./servicesV2/topteachers')
-const { patchFacultyYearlyStats } = require('./servicesV2/analyticsService')
 const {
   setProductivity,
   setThroughput,
@@ -21,20 +20,8 @@ const {
   patchNonGraduatedStudents,
 } = require('./servicesV2/analyticsService')
 const { isNewHYStudyProgramme } = require('./util')
-const { calculateFacultyYearlyStats } = require('./services/faculties')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
-
-// This is currently done with old data, update to use sis db
-const refreshFacultyYearlyStats = async () => {
-  try {
-    console.log('Refreshing faculty yearly stats...')
-    const data = await calculateFacultyYearlyStats()
-    await patchFacultyYearlyStats(data)
-  } catch (e) {
-    console.error(e)
-  }
-}
 
 const refreshStudyrightAssociations = async () => {
   try {
@@ -206,7 +193,6 @@ const refreshStatistics = async () => {
   await refreshOverview()
   await refreshNonGraduatedStudentsOfOldProgrammes()
   await refreshTeacherLeaderboard()
-  await refreshFacultyYearlyStats() // using old data
 }
 
 const refreshTrends = async () => {
