@@ -6,21 +6,6 @@ const ThesisTypeEnums = {
   BACHELOR: 'BACHELOR',
 }
 
-const CourseGroup = sequelizeKone.define('course_groups', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true,
-  },
-  name: {
-    type: Sequelize.STRING,
-    unique: true,
-  },
-  programmeid: {
-    type: Sequelize.STRING,
-  },
-})
-
 const ExcludedCourse = sequelizeKone.define(
   'excluded_courses',
   {
@@ -46,15 +31,6 @@ const ExcludedCourse = sequelizeKone.define(
     underscored: true,
   }
 )
-
-const TeacherCourseGroup = sequelizeKone.define('teacher_course_groups', {
-  course_group_id: {
-    type: Sequelize.BIGINT,
-  },
-  teacher_id: {
-    type: Sequelize.STRING,
-  },
-})
 
 const MandatoryCourse = sequelizeKone.define('mandatory_courses', {
   course_code: {
@@ -248,26 +224,15 @@ MandatoryCourseLabels.hasMany(MandatoryCourse, {
   sourceKey: 'id',
 })
 
-TeacherCourseGroup.belongsTo(CourseGroup, {
-  foreignKey: 'course_group_id',
-  sourceKey: 'id',
-})
-CourseGroup.hasMany(TeacherCourseGroup, {
-  foreignKey: 'course_group_id',
-  sourceKey: 'id',
-})
-
 TagStudent.belongsTo(Tag, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 Tag.hasMany(TagStudent, { foreignKey: 'tag_id', sourceKey: 'tag_id' })
 
 module.exports = {
-  TeacherCourseGroup,
   MandatoryCourse,
   TagStudent,
   Tag,
   Filters,
   UsageStatistic,
-  CourseGroup,
   CourseDuplicates,
   ThesisCourse,
   ThesisTypeEnums,
