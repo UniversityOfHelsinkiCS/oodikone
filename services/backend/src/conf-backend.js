@@ -1,14 +1,6 @@
-const { NODE_ENV } = process.env
 const isTest = process.env.NODE_ENV === 'test'
 let DB_URL = process.env.DB_URL
 let DB_URL_KONE = process.env.DB_URL_KONE
-if (isTest) {
-  DB_URL = process.env.TEST_DB
-  DB_URL_KONE = process.env.TEST_DB_KONE
-} else if (NODE_ENV === 'anon') {
-  DB_URL = process.env.ANON_DB
-  DB_URL_KONE = process.env.ANON_DB_KONE
-}
 
 let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
 if (isNaN(DB_MAX_CONNECTIONS)) {
@@ -48,17 +40,6 @@ const formatURL = url => {
 }
 
 const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
-
-if (process.env.NODE_ENV === 'development' && process.env.FEATURES) {
-  const toggled = process.env.FEATURES.split(',')
-  toggled
-    .map(toggle => toggle.trim())
-    .forEach(feature => {
-      if (FEATURES[feature] !== undefined) {
-        FEATURES[feature] = true
-      }
-    })
-}
 
 const OODI = {
   test: 'http://localhost',
