@@ -5,7 +5,7 @@ const { validateParamLength } = require('../util')
 const logger = require('../util/logger')
 
 router.get('/v2/coursesmulti', async (req, res) => {
-  let results = { courses: [] } // , groups: {}, groupMeta: {}
+  let results = { courses: [] }
   const { name, code } = req.query
 
   if (!(validateParamLength(name, 5) || validateParamLength(code, 2))) {
