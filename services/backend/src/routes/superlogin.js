@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const userService = require('../services/userService')
+const userService = require('../servicesV2/userService')
 
 router.post('/:uid', async (req, res) => {
   try {
