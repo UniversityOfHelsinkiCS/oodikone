@@ -19,14 +19,12 @@ import courses from './courses'
 import courseInstances from './courseInstances'
 import graphSpinner from './graphSpinner'
 import settings from './settings'
-import courseCodeDuplicates from './coursecodeduplicates'
 import teachers from './teachers'
 import providers from './providers'
 import semesters from './semesters'
 import teacherStatistics from './teacherStatistics'
 import teachersTop from './teachersTop'
 import teachersTopCategories from './teachersTopCategories'
-import courseTypes from './coursetypes'
 import courseSearch from './coursesearch'
 import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
@@ -65,14 +63,12 @@ export default combineReducers({
   courseInstances,
   graphSpinner,
   settings,
-  courseCodeDuplicates,
   teachers,
   providers,
   semesters,
   teacherStatistics,
   teachersTop,
   teachersTopCategories,
-  courseTypes,
   courseSearch,
   courseStats,
   courseSummaryForm,
