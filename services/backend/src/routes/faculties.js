@@ -1,9 +1,10 @@
 const router = require('express').Router()
-const { all } = require('../services/organisations')
+const { faculties } = require('../servicesV2/organisations')
 
 router.get('/', async (req, res) => {
-  const faculties = await all()
-  res.json(faculties)
+  const facultyList = await faculties()
+  console.log('faculties')
+  res.json(facultyList)
 })
 
 module.exports = router
