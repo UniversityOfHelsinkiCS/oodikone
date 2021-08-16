@@ -346,7 +346,6 @@ function PopulationCourseStats(props) {
 PopulationCourseStats.propTypes = {
   courses: shape({
     coursestatistics: arrayOf(object),
-    coursetypes: shape({}),
     disciplines: shape({}),
   }).isRequired,
   populationCourses: shape({
