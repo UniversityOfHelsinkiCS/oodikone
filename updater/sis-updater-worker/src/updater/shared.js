@@ -1,6 +1,6 @@
 const { each } = require('async')
 const { Semester, Organization } = require('../db/models')
-const { selectAllFrom, selectAllFromSnapshots, selectColumnsFrom, selectWithoutNull } = require('../db')
+const { selectAllFrom, selectAllFromSnapshots } = require('../db')
 const { getObject: redisGet, setObject: redisSet, lock: redisLock, expire: redisExpire } = require('../utils/redis')
 
 const TIME_LIMIT_BETWEEN_RELOADS = 1000 * 60 * 30
@@ -25,7 +25,6 @@ const localMapToRedisKey = {
   orgToUniOrgId: 'ORG_TO_UNI_ORG_ID',
   orgToStartYearToSemesters: 'ORG_TO_START_YEAR_TO_SEMESTERS',
   countries: 'COUNTRIES',
-  moduleGroupIdToDegree: 'MODULE_GROUP_ID_TO_DEGREE',
 }
 
 const localMaps = {
@@ -37,7 +36,6 @@ const localMaps = {
   orgToUniOrgId: null,
   orgToStartYearToSemesters: null,
   countries: null,
-  moduleGroupIdToDegree: null,
 }
 
 const loadMapsIfNeeded = async () => {
@@ -77,7 +75,6 @@ const calculateMapsToRedis = async () =>
     initOrgToUniOrgId(),
     initOrgToStartYearToSemesters(),
     initCountries(),
-    initModuleGroupIdToDegree(),
   ])
 
 const loadMapsFromRedis = async () =>
@@ -117,25 +114,6 @@ const initEducationTypes = async () =>
   )
 
 const getEducationType = id => localMaps.educationTypes[id]
-
-const initModuleGroupIdToDegree = async () => {
-  const selectWithoutNullDegree = selectWithoutNull('degree_title_urns')
-  const moduleGroupIdsAndDegreeUrns = await selectWithoutNullDegree(
-    selectColumnsFrom('modules', ['group_id', 'degree_title_urns'])
-  )
-  const degreeTitlesByUrns = (await selectAllFrom('degree_titles')).reduce((acc, curr) => {
-    acc[curr.id] = curr
-    return acc
-  }, {})
-  const moduleGroupIdToDegree = moduleGroupIdsAndDegreeUrns.reduce((acc, curr) => {
-    acc[curr.group_id] = curr.degree_title_urns.map(urn => degreeTitlesByUrns[urn])
-    return acc
-  }, {})
-
-  return redisSet(localMapToRedisKey.moduleGroupIdToDegree, moduleGroupIdToDegree)
-}
-
-const getDegrees = groupId => localMaps.moduleGroupIdToDegree[groupId]
 
 const initOrganisationIdToCode = async () =>
   redisSet(
@@ -295,7 +273,6 @@ module.exports = {
   getUniOrgId,
   getSemester,
   getCountry,
-  getDegrees,
   loadMapsIfNeeded,
   loadMapsOnDemand,
   CREDIT_TYPE_CODES,
