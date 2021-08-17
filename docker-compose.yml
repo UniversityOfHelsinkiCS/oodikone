@@ -29,7 +29,6 @@ services:
       - redis
       - sis-db
     environment:
-      DB_URL: postgres://postgres@oodi-db:5432/oodi-db
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:3000
       REDIS: redis
@@ -69,15 +68,6 @@ services:
       - oodikone
     volumes:
       - kone-db-data:/data
-
-  oodi-db: # TODO: Remove when oodi stuff has been removed from oodikone
-    <<: *defaults
-    container_name: oodi-db
-    image: registry.toska.cs.helsinki.fi/oodi-db
-    profiles:
-      - oodikone
-    volumes:
-      - oodi-db-data:/data
 
   redis:
     <<: *defaults
@@ -198,7 +188,6 @@ volumes:
   backend-nodemod:
   frontend-nodemod:
   kone-db-data:
-  oodi-db-data: # TODO: Remove when oodi stuff has been removed from oodikone
   redis-data:
   sis-db-data:
   sis-importer-db-data:
