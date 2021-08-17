@@ -104,20 +104,6 @@ const MandatoryCourseLabels = sequelizeKone.define('mandatory_course_labels', {
   },
 })
 
-const MigrationKone = sequelizeKone.define(
-  'migrations',
-  {
-    name: {
-      type: Sequelize.STRING,
-      primaryKey: true,
-    },
-  },
-  {
-    tableName: 'migrations',
-    timestamps: false,
-  }
-)
-
 const CourseDuplicates = sequelizeKone.define('course_duplicates', {
   groupid: {
     primaryKey: true,
@@ -179,7 +165,6 @@ module.exports = {
   ThesisCourse,
   ThesisTypeEnums,
   MandatoryCourseLabels,
-  MigrationKone,
   CustomPopulationSearch,
   sequelizeKone,
   ExcludedCourse,
