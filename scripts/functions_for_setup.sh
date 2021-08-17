@@ -18,7 +18,6 @@ SIS_DB_NAME="sis-db"
 SIS_IMPORTER_DB_NAME="sis-importer-db"
 USER_DB_NAME="user-db"
 DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
-OODI_DB_NAME="oodi-db" # TODO: Remove when oodi is removed
 
 ## Urls should be in same order as databases as both are iterated through by indexes.
 KONE_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-kone-pg.sqz"
@@ -26,7 +25,6 @@ SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-si
 SIS_IMPORTER_DB_REAL_DUMP_URL="importer:/home/importer_user/importer-db/backup/importer-db.sqz"
 USER_DB_REAL_DUMP_URL="oodikone.cs.helsinki.fi:/home/tkt_oodi/backups/latest-user-pg.sqz"
 REAL_DUMP_URLS=("$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
-OODI_DB_REAL_DUMP_URL="svm-77.cs.helsinki.fi:/home/tkt_oodi/backups/latest-pg.sqz" # TODO: Remove when oodi is removed
 
 # Source utility functions
 source "$PROJECT_ROOT"/scripts/utils.sh
@@ -116,14 +114,6 @@ reset_sis_importer_data() {
   infomsg "Downloading sis-importer-db dump"
   local database=$SIS_IMPORTER_DB_NAME
   local url=$SIS_IMPORTER_DB_REAL_DUMP_URL
-  download_real_dump $database $url
-  reset_databases $database
-}
-
-reset_old_oodi_data() {
-  infomsg "Downloading old oodi-db dump"
-  local database=$OODI_DB_NAME
-  local url=$OODI_DB_REAL_DUMP_URL
   download_real_dump $database $url
   reset_databases $database
 }
