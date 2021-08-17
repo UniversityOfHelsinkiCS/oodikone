@@ -8,7 +8,7 @@ const SENTRY_ENVIRONMENT = process.env.REACT_APP_SENTRY_ENVIRONMENT || ''
 
 // Adminer is only used in dev mode, imo hardcoding this url here is ok.
 const adminerBaseUrl = 'http://localhost:5050'
-const databaseNames = ['kone-db', 'oodi-db', 'sis-db', 'sis-importer-db', 'user-db']
+const databaseNames = ['kone-db', 'sis-db', 'sis-importer-db', 'user-db']
 const adminerUrls = databaseNames.map(db => ({ url: `${adminerBaseUrl}/?pgsql=${db}&username=postgres`, text: db }))
 
 // Base paths
