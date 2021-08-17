@@ -51,7 +51,6 @@ options=(
   "Set up oodikone from scratch."
   "Reset all real data."
   "Reset sis-importer data."
-  "Reset old oodi data."
   "Quit."
 )
 
@@ -69,8 +68,6 @@ while true; do
         reset_all_real_data;;
       "Reset sis-importer data.")
         reset_sis_importer_data;;
-      "Reset old oodi data.")
-        reset_old_oodi_data;;
       "Quit.")
         break 2;;
       *) msg "${RED}Invalid option:${NOFORMAT} $REPLY

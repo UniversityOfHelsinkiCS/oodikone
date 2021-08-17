@@ -1,14 +1,13 @@
 import React from 'react'
-import { Menu, Dropdown, Button, Icon, Label } from 'semantic-ui-react'
+import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
 import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
-import { getUserRoles, setMocking, setTestUserOodi, getTestUserOodi, checkUserAccess } from '../../common'
+import { getUserRoles, setMocking, checkUserAccess } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
-import { useIsAdmin } from '../../common/hooks'
 import { isDev, adminerUrls } from '../../conf'
 
 const allNavigationItems = {
@@ -26,13 +25,11 @@ const allNavigationItems = {
   users: { path: '/users', key: 'users', label: 'Users', reqRights: ['users'] },
   trends: { path: '/trends', key: 'trends', label: 'Trends' },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['dev', 'admin'] },
-  sandbox: { path: '/sandbox', key: 'sandbox', label: 'Sandbox', reqRights: ['dev'] },
   feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
 }
 
 const NavigationBar = props => {
   const { logout, userRoles, rights, mockedBy, userId } = props
-  const isAdmin = useIsAdmin()
 
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
@@ -53,12 +50,6 @@ const NavigationBar = props => {
   }
 
   const visibleNavigationItems = refreshNavigationRoutes()
-
-  const setFlagSIS = () => {
-    const flag = getTestUserOodi()
-    setTestUserOodi(!flag)
-    window.location.reload()
-  }
 
   const returnToSelf = () => {
     setMocking(null)
@@ -128,15 +119,6 @@ const NavigationBar = props => {
       </Menu.Item>
     )
 
-  const renderOodiSwitch = isSis => (
-    <Menu.Item>
-      <Button className={isSis ? 'sis-danger-zone-button' : ''} onClick={setFlagSIS} basic={!isSis} color="red">
-        <Icon className="heartbeat" />
-        {isSis ? 'Stop Oodi destruction' : 'Destroy oodikone with Oodi'}
-      </Button>
-    </Menu.Item>
-  )
-
   const renderLanguagePicker = () => (
     <Menu.Item>
       <LanguagePicker />
@@ -155,7 +137,6 @@ const NavigationBar = props => {
       {renderNavigationRoutes()}
       {renderUserMenu()}
       {renderLanguagePicker()}
-      {isAdmin && renderOodiSwitch(!!getTestUserOodi())}
       {mockedBy && renderStopMockingButton()}
     </Menu>
   )
