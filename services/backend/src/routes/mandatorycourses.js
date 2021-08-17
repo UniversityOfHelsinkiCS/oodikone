@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const MandatoryCourses = require('../services/mandatoryCourses')
+const MandatoryCourses = require('../servicesV2/mandatoryCourses')
 
 router.delete('/:programme', async (req, res) => {
   const { programme } = req.params
