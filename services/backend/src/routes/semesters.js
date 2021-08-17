@@ -1,5 +1,11 @@
 const router = require('express').Router()
-const semestersV2 = require('../routesV2/semesters')
-const useSisRouter = require('../util/useSisRouter')
+const { getSemestersAndYears } = require('../servicesV2/semesters')
 
-module.exports = useSisRouter(semestersV2, router)
+router.get('/semesters/codes', async (req, res) => {
+  const providers = await getSemestersAndYears()
+  res.json(providers)
+})
+
+router.use('*', (req, res, next) => next())
+
+module.exports = router
