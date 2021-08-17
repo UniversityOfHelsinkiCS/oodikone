@@ -7,18 +7,18 @@ const {
   refreshUber,
   refreshProtoCProgramme,
   getStartYears,
-} = require('./servicesV2/trends')
-const { refreshAssociationsInRedis } = require('./servicesV2/studyrights')
-const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./servicesV2/studyrights')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./servicesV2/studyprogramme')
-const { findAndSaveTeachers } = require('./servicesV2/topteachers')
+} = require('./services/trends')
+const { refreshAssociationsInRedis } = require('./services/studyrights')
+const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./services/studyrights')
+const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studyprogramme')
+const { findAndSaveTeachers } = require('./services/topteachers')
 const {
   setProductivity,
   setThroughput,
   patchProductivity,
   patchThroughput,
   patchNonGraduatedStudents,
-} = require('./servicesV2/analyticsService')
+} = require('./services/analyticsService')
 const { isNewHYStudyProgramme } = require('./util')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })

@@ -1,12 +1,7 @@
 const teachers = require('../services/teachers')
 const topteachers = require('../services/topteachers')
-const r = require('./router').routerWithWrapper()
-const { FEATURES } = require('../conf-backend')
+const router = require('express').Router()
 const { mapToProviders } = require('../util/utils')
-const teacherV2 = require('../routesV2/teachers')
-const useSisRouter = require('../util/useSisRouter')
-
-const router = FEATURES.ERROR_HANDLER ? r.wrapper : r.router
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query
@@ -69,4 +64,6 @@ router.get('/:id', async (req, res) => {
   res.json(result)
 })
 
-module.exports = useSisRouter(teacherV2, r.router)
+router.use('*', (req, res, next) => next())
+
+module.exports = router

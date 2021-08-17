@@ -19,7 +19,6 @@ import TagsTable from './TagsTable'
 import CourseParticipationTable from './CourseParticipationTable'
 import StudentGraphs from './StudentGraphs'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import sisDestructionStyle from '../../../common/sisDestructionStyle'
 
 const StudentDetails = ({
   student,
@@ -161,7 +160,7 @@ const StudentDetails = ({
   }
 
   return (
-    <Segment className="contentSegment" style={sisDestructionStyle}>
+    <Segment className="contentSegment">
       <StudentInfoCard student={student} />
       <StudentGraphs
         student={student}

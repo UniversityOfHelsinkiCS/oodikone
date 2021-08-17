@@ -72,7 +72,7 @@ export const getThesisGradeSpread = (series, isRelative) => {
 }
 
 export const getGradeSpread = (series, isRelative) => {
-  const failedKeys = ['Eisa', 'Hyl.', '0', 'Luop']
+  const failedKeys = ['eisa', 'hyl.', 'hyl', '0', 'luop']
 
   const baseAccumalator = {
     0: [],
@@ -85,12 +85,13 @@ export const getGradeSpread = (series, isRelative) => {
     TT: [],
     'Hyv.': [],
   }
+
   const newSeries = series.reduce(
     (acc, cur, i) => {
       const currentEntries = Object.entries(cur)
       let failed = 0
       currentEntries.forEach(([k, v]) => {
-        if (failedKeys.includes(k)) {
+        if (failedKeys.includes(k.toLowerCase())) {
           failed += v
         } else {
           acc[k].push(v)

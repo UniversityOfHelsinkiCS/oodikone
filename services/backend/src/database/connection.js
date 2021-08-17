@@ -1,17 +1,42 @@
 const Sequelize = require('sequelize')
+const EventEmitter = require('events')
 const Umzug = require('umzug')
 const conf = require('../conf-backend')
+const { SIS_DB_URL } = process.env
+class DbConnection extends EventEmitter {
+  constructor() {
+    super()
+    this.RETRY_ATTEMPTS = 15
+    this.established = false
 
-const sequelize = new Sequelize(conf.DB_URL, {
-  schema: conf.DB_SCHEMA,
-  searchPath: conf.DB_SCHEMA,
-  logging: false,
-  pool: {
-    min: 0,
-    max: conf.DB_MAX_CONNECTIONS,
-  },
-})
-sequelize.query(`SET SESSION search_path to ${conf.DB_SCHEMA}`)
+    this.sequelize = new Sequelize(SIS_DB_URL, {
+      dialect: 'postgres',
+      pool: {
+        max: 25,
+        min: 0,
+        acquire: 10000,
+        idle: 300000000,
+      },
+      logging: false,
+    })
+  }
+
+  async connect(attempt = 1) {
+    try {
+      await this.sequelize.authenticate()
+      this.emit('connect')
+      this.established = true
+    } catch (e) {
+      if (attempt > this.RETRY_ATTEMPTS) {
+        this.emit('error', e)
+        return
+      }
+      console.log(`Sis database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
+      console.log(e)
+      setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
+    }
+  }
+}
 
 const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
   schema: conf.DB_SCHEMA_KONE,
@@ -25,7 +50,6 @@ const initializeDatabaseConnection = async () => {
   const waitSeconds = 60
   for (let i = 1; i <= waitSeconds; i++) {
     try {
-      await sequelize.authenticate()
       await sequelizeKone.authenticate()
       break
     } catch (e) {
@@ -66,21 +90,16 @@ const initializeDatabaseConnection = async () => {
 
 const forceSyncDatabase = async () => {
   try {
-    await sequelize.getQueryInterface().createSchema(conf.DB_SCHEMA)
-  } catch (e) {
-    // console.log(e)
-  }
-  try {
     await sequelizeKone.getQueryInterface().createSchema(conf.DB_SCHEMA_KONE)
   } catch (e) {
-    // console.log(e)
+    //console.log(e)
   }
-  await sequelize.sync({ force: true })
   await sequelizeKone.sync({ force: true })
 }
 
+const dbConnections = new DbConnection()
 module.exports = {
-  sequelize,
+  dbConnections,
   sequelizeKone,
   initializeDatabaseConnection,
   forceSyncDatabase,

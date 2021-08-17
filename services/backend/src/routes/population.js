@@ -3,17 +3,12 @@ const Sentry = require('@sentry/node')
 const router = require('express').Router()
 const Population = require('../services/populations')
 const Filters = require('../services/filters')
-const { updateStudents } = require('../services/updaterService')
-const { isValidStudentId } = require('../util/index')
-
 const Student = require('../services/students')
 const StudyrightService = require('../services/studyrights')
 const UserService = require('../services/userService')
 const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
-const populationV2 = require('../routesV2/population')
-const useSisRouter = require('../util/useSisRouter')
 
 const filterPersonalTags = (population, userId) => {
   return {
@@ -43,6 +38,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     }
 
     if (req.body.years) {
+      console.log('years väylä')
       const upperYearBound = new Date().getFullYear() + 1
       const multicoursestatPromises = Promise.all(
         req.body.years.map(year => {
@@ -57,6 +53,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       )
       const multicoursestats = await multicoursestatPromises
       const result = StatMergeService.populationCourseStatsMerger(multicoursestats)
+      console.log('result: ', result)
       if (result.error) {
         res.status(400).json(result)
         return
@@ -64,6 +61,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
       res.json(result)
     } else {
+      console.log('bottleneck väylä')
       const result = await Population.bottlenecksOf(req.body)
 
       if (result.error) {
@@ -217,6 +215,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 router.get('/v3/populationstatistics', async (req, res) => {
   const { year, semesters, studyRights: studyRightsJSON } = req.query
   const { decodedToken } = req
+
   try {
     if (!year || !semesters || !studyRightsJSON) {
       res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
@@ -357,7 +356,6 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
 
   const semesters = ['FALL', 'SPRING']
   const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), from, to, separate)
-
   try {
     const result = await Population.optimizedStatisticsOf(
       {
@@ -460,6 +458,7 @@ router.get('/v2/populationstatistics/filters', async (req, res) => {
     res.status(400).end()
   }
 })
+
 router.post('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
   const filter = req.body
@@ -472,6 +471,7 @@ router.post('/v2/populationstatistics/filters', async (req, res) => {
     res.status(400).end()
   }
 })
+
 router.delete('/v2/populationstatistics/filters', async (req, res) => {
   let results = []
   const filter = req.body
@@ -480,22 +480,6 @@ router.delete('/v2/populationstatistics/filters', async (req, res) => {
     res.status(200).json(results)
   } catch (err) {
     res.status(400).end()
-  }
-})
-
-router.post('/updatedatabase', async (req, res) => {
-  const studentnumbers = req.body
-  if (!(studentnumbers && studentnumbers.every(sn => isValidStudentId(sn)))) {
-    res.status(400).end()
-    return
-  }
-  try {
-    const response = await updateStudents(studentnumbers)
-    if (response) {
-      res.status(200).json({ ...response })
-    }
-  } catch (err) {
-    res.status(500).json(err)
   }
 })
 
@@ -529,8 +513,11 @@ router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req
     const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(JSON.parse(courseCodes))
     return res.json(maxYearsToCreatePopulationFrom)
   } catch (err) {
+    console.log('err', err)
     res.status(500).json(err)
   }
 })
 
-module.exports = useSisRouter(populationV2, router)
+router.use('*', (req, res, next) => next())
+
+module.exports = router

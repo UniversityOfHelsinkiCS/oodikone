@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { faculties } = require('../servicesV2/organisations')
+const { faculties } = require('../services/organisations')
 
 router.get('/', async (req, res) => {
   const facultyList = await faculties()

@@ -7,9 +7,9 @@ An application for analyzing university data, running at [https://oodikone.cs.he
 To run Oodikone locally, you will need the following:
 
 1. Applications:
-    - [Docker](https://docs.docker.com/install/) (version 20.10+),
-    - [Docker Compose](https://docs.docker.com/compose/install/)(version 0.29+) and
-    - [npm](https://docs.npmjs.com/cli/v7) (version 7+)
+   - [Docker](https://docs.docker.com/install/) (version 20.10+),
+   - [Docker Compose](https://docs.docker.com/compose/install/)(version 0.29+) and
+   - [npm](https://docs.npmjs.com/cli/v7) (version 7+)
 2. Access to Toska Docker Hub, see Toska Gitlabs password document for more information on how to login
 3. (Optional) For real data setup, access to Toskas production servers.
 
@@ -26,20 +26,18 @@ _Please use a terminal at least 80 characters wide, the CLI is a bit rudimentary
 What different CLI options do:
 
 1. Set up oodikone from scratch:
-    - Cleans up any previous installations
-    - Installs all needed npm packages locally
-    - Sets up pre-commit linting hooks.
-    - Pulls and builds all needed Docker images and sets up dockerized development environment. 
-    - Setup happens with anonymized data, which developers should use by default.
-    - **Note:** Running this option cleans up all real data too, so please don't run option 2 before this.
+   - Cleans up any previous installations
+   - Installs all needed npm packages locally
+   - Sets up pre-commit linting hooks.
+   - Pulls and builds all needed Docker images and sets up dockerized development environment.
+   - Setup happens with anonymized data, which developers should use by default.
+   - **Note:** Running this option cleans up all real data too, so please don't run option 2 before this.
 2. Reset all real data:
-    - Cleans up any previous real data databases
-    - Downloads needed database dumps from production servers.
-    - Creates real data databases and populates them with downloaded dumps.
+   - Cleans up any previous real data databases
+   - Downloads needed database dumps from production servers.
+   - Creates real data databases and populates them with downloaded dumps.
 3. Reset sis-importer data
-    - Like option 2, but only for sis-importer database. Useful when developing updater microservice.
-4. Reset old oodi data:
-    - Like option 2, but for old oodi data, which is not refreshed anymore. Is only needed when setting up real databases after running option 1.
+   - Like option 2, but only for sis-importer database. Useful when developing updater microservice.
 
 ## ⌨️ Development
 
@@ -85,29 +83,30 @@ Anon data contains some preset user types, corresponding to most usual user type
 
 ### Linting
 
-Cli script sets up pre-commit hooks that are used to lint and fix files before committing. If your `package.json` file doesn't include "lint-staged" -key, please set hooks manually with `npm run prepare`. 
+Cli script sets up pre-commit hooks that are used to lint and fix files before committing. If your `package.json` file doesn't include "lint-staged" -key, please set hooks manually with `npm run prepare`.
 
-For more information on how files are tested, take a look at "lint-staged" in `package.json`. Some files (e.g. github action files, dockerfiles, shell scripts) are checked with external tools and may require you to install those tools in case you're modifying files in question. 
+For more information on how files are tested, take a look at "lint-staged" in `package.json`. Some files (e.g. github action files, dockerfiles, shell scripts) are checked with external tools and may require you to install those tools in case you're modifying files in question.
 
-There's no separate "lintfix" / "format" / "lint" command available, since pre-commit hooks will fix formatting and basic linting errors for you. In case pre-commit fails, you should fix the erroring code manually. 
+There's no separate "lintfix" / "format" / "lint" command available, since pre-commit hooks will fix formatting and basic linting errors for you. In case pre-commit fails, you should fix the erroring code manually.
 
 However, if you want to run linting / formatting manually from command line, `package.json` defines `npm run eslint`, `npm run prettier` and `npm run stylelint` which you can use as an entrypoint.
 
-## 🔨 Testing & CI 
+## 🔨 Testing & CI
 
 There are three types of tests in this project: static tests with eslint/prettier/other tools, jest integration tests for single service and cypress end-to-end tests. Linting is described above and other do work as follows:
 
 - Cypress
-    - can be launched in interactive mode with `npm run cypress open`. `package.json` defines entrypoint `npm run cypress` so you can basically run cypress with any arguments you want
-    - are defined in cypress -folder and cypress.json
-    - whole cypress test stack takes about 15 to 20 mins to run. Since tests are ran in our Github actions CI pipe, you're encouraged to take advantage of this instead of running all tests locally.
-    - There are some different user types and cypress commands defined for testing. Take a look at these when debugging tests.
+  - can be launched in interactive mode with `npm run cypress open`. `package.json` defines entrypoint `npm run cypress` so you can basically run cypress with any arguments you want
+  - are defined in cypress -folder and cypress.json
+  - whole cypress test stack takes about 15 to 20 mins to run. Since tests are ran in our Github actions CI pipe, you're encouraged to take advantage of this instead of running all tests locally.
+  - There are some different user types and cypress commands defined for testing. Take a look at these when debugging tests.
 - Jest
-    - are ran with `docker-compose.test.yml`
-    - test command and environment themselves are in Dockerfile for service in question
-    - can be debugged by overriding default command in `docker-compose.test.yml` and running docker container in interactive mode
+  - are ran with `docker-compose.test.yml`
+  - test command and environment themselves are in Dockerfile for service in question
+  - can be debugged by overriding default command in `docker-compose.test.yml` and running docker container in interactive mode
 
 Continuous integration (CI) works with Github actions and is defined in workflow files in `.github/workflows` folder:
+
 - oodikone setup for cypress and other tests in CI is defined in `docker-compose.ci.yml`. Take a look at this too if debugging github action workflows.
 - tests are run on every push to branches other than `master`. Pull requests can't be merged to master unless tests are ok.
 - after successful merge to `master`, oodikone is deployed to staging
@@ -126,6 +125,6 @@ Just do clean install by launching cli with `npm cli` and running option 1: _Set
 
 ## ✌🏼 Maintainers and contribution
 
-Toska of course. 
+Toska of course.
 
 University of Helsinki

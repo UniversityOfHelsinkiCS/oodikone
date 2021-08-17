@@ -9,7 +9,7 @@ const prefix = 'GET_COURSE_SEARCH_RESULT_'
 export const clearCourses = () => ({ type: 'CLEAR_SEARCH_RESULTS' })
 
 export const findCourses = ({ name, type }, language = 'fi') => {
-  const route = '/coursesmulti'
+  const route = '/v2/coursesmulti'
   const params = { name, type, language }
   return callController(route, prefix, [], 'get', params, params)
 }
