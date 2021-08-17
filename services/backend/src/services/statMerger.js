@@ -82,7 +82,6 @@ const populationStudentsMerger = multiyearstudents => {
   samples.courses = []
   samples.elementdetails = {}
   samples.elementdetails.data = {}
-  samples.elementdetails.degrees = []
   samples.elementdetails.programmes = []
   samples.transfers = {}
   samples.transfers.targets = {}
@@ -94,7 +93,6 @@ const populationStudentsMerger = multiyearstudents => {
     samples.semesters = samples.semesters.concat(year.semesters)
     samples.courses = samples.courses.concat(year.courses)
     samples.elementdetails.data = Object.assign(samples.elementdetails.data, year.elementdetails.data)
-    samples.elementdetails.degrees = samples.elementdetails.degrees.concat(year.elementdetails.degrees)
     samples.elementdetails.programmes = samples.elementdetails.programmes.concat(year.elementdetails.programmes)
     samples.transfers.targets = { ...samples.transfers.targets, ...year.transfers.targets }
     samples.transfers.sources = { ...samples.transfers.sources, ...year.transfers.sources }
