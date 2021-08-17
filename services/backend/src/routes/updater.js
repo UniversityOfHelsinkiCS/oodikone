@@ -2,7 +2,6 @@ const router = require('express').Router()
 const {
   updateSISMetadata,
   updateSISStudents,
-  updateSISStudentsByProgramme,
   updateSISProgrammes,
   updateSISRedisCache,
   updateStudentsByStudentNumber,
@@ -79,20 +78,6 @@ router.get('/update/v2/programmes', async (req, res) => {
     const response = await updateSISProgrammes()
     if (response) {
       res.status(200).json('Update SIS programmes scheduled')
-    }
-  } catch (err) {
-    console.log(err)
-    res.status(500).json({ error: 'error' })
-  }
-})
-
-router.post('/update/v2/students_by_programme', async (req, res) => {
-  const { roles } = req
-  if (!roles.includes('dev')) return res.status(403).send('No rights, please stop')
-  try {
-    const response = await updateSISStudentsByProgramme(req.body)
-    if (response) {
-      res.status(200).json(`Update for ${req.body.programme} scheduled`)
     }
   } catch (err) {
     console.log(err)

@@ -13,7 +13,6 @@ import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
 import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 import useLanguage from '../LanguagePicker/useLanguage'
-import sisDestructionStyle from '../../common/sisDestructionStyle'
 import sendEvent from '../../common/sendEvent'
 
 const sendAnalytics = sendEvent.populationStatistics
@@ -179,7 +178,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
 
   return (
     <>
-      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} style={sisDestructionStyle} />
+      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
     </>
   )
 }

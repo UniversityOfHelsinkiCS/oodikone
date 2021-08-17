@@ -36,8 +36,6 @@ const byStudyprogramme = async studyProgrammeId => {
     name: courseCodeToCourse[mc.course_code].name,
     code: mc.course_code,
     label: mc.mandatory_course_label,
-    // this is because fuck life
-    visible: { visibility: true, id: null },
   }))
 }
 

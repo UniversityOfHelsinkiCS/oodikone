@@ -1,5 +1,7 @@
 const Sequelize = require('sequelize')
-const { sequelize } = require('../database/connection')
+const {
+  dbConnections: { sequelize },
+} = require('../database/connection')
 const moment = require('moment')
 const {
   Student,
@@ -7,7 +9,7 @@ const {
   Course,
   Studyright,
   StudyrightElement,
-  ElementDetails,
+  ElementDetail,
   SemesterEnrollment,
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
@@ -41,7 +43,7 @@ const byId = async id => {
           include: {
             model: StudyrightElement,
             include: {
-              model: ElementDetails,
+              model: ElementDetail,
               where: {
                 type: {
                   [Op.in]: [10, 20, 30],
@@ -66,7 +68,7 @@ const byId = async id => {
       },
     }),
   ])
-  const tagprogrammes = await ElementDetails.findAll({
+  const tagprogrammes = await ElementDetail.findAll({
     where: {
       code: {
         [Op.in]: tags.map(t => t.tag.studytrack),
@@ -138,9 +140,20 @@ const formatStudent = ({
   createdAt,
   tags,
 }) => {
-  const toCourse = ({ grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
-    course = course.get()
+  const toCourse = ({ id, grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
+    try {
+      course = course.get()
+    } catch (e) {
+      // TODO: this should not be here 1.6.2021
+      course = {
+        code: '99999 - MISSING FROM SIS',
+        name: 'missing',
+        coursetypecode: 'missing',
+      }
+    }
+
     return {
+      id,
       course: {
         code: course.code,
         name: course.name,
@@ -169,6 +182,12 @@ const formatStudent = ({
   if (credits === undefined) {
     credits = []
   }
+
+  const formattedCredits = credits
+    .sort(courseByDate)
+    .map(toCourse)
+    .filter(c => c.course.name !== 'missing')
+
   return {
     firstnames,
     lastname,
@@ -176,7 +195,7 @@ const formatStudent = ({
     studentNumber: studentnumber,
     started: dateofuniversityenrollment,
     credits: creditcount || 0,
-    courses: credits.sort(courseByDate).map(toCourse),
+    courses: formattedCredits,
     name: abbreviatedname,
     transfers: transfers || [],
     gender,
@@ -203,27 +222,23 @@ const removeEmptySpaces = str => str.replace(/\s\s+/g, ' ')
 
 const splitByEmptySpace = str => removeEmptySpaces(str).split(' ')
 
+const likefy = term => `%${term}%`
+
+const columnLike = (column, term) => ({
+  [column]: {
+    [Op.iLike]: likefy(term),
+  },
+})
+
 const nameLike = terms => {
   const [first, second] = terms
   if (!second) {
-    return {
-      ['abbreviatedname']: {
-        [Op.iLike]: `%${first}%`,
-      },
-    }
+    return columnLike('abbreviatedname', first)
   } else {
     return {
       [Op.or]: [
-        {
-          ['abbreviatedname']: {
-            [Op.iLike]: `%%${first}%${second}%%`,
-          },
-        },
-        {
-          ['abbreviatedname']: {
-            [Op.iLike]: `%%${second}%${first}%%`,
-          },
-        },
+        columnLike('abbreviatedname', `%${first}%${second}%`),
+        columnLike('abbreviatedname', `%${second}%${first}%`),
       ],
     }
   }
@@ -235,7 +250,7 @@ const studentnumberLike = terms => {
   }
   return {
     studentnumber: {
-      [Op.iLike]: `%${terms[0]}%`,
+      [Op.iLike]: likefy(terms[0]),
     },
   }
 }

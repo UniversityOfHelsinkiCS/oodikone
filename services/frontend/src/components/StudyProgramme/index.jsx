@@ -5,7 +5,6 @@ import { shape, string, func, bool } from 'prop-types'
 import { Header, Segment, Tab, Button } from 'semantic-ui-react'
 import { isEqual, uniqBy } from 'lodash'
 import DegreeCoursesTable from './DegreeCourses'
-import CourseCodeMapper from '../CourseCodeMapper'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import StudyTrackOverview from './StudyTrackOverview'
@@ -83,13 +82,10 @@ const StudyProgramme = props => {
         ),
       })
     }
-    panes.push(
-      {
-        menuItem: 'Degree Courses',
-        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
-      },
-      { menuItem: 'Code Mapper', render: () => <CourseCodeMapper studyprogramme={studyProgrammeId} /> }
-    )
+    panes.push({
+      menuItem: 'Degree Courses',
+      render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
+    })
     panes.push({
       menuItem: 'Thesis Courses',
       render: () => <ThesisCourses studyprogramme={studyProgrammeId} />,

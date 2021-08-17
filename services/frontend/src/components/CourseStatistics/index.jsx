@@ -7,14 +7,12 @@ import './courseStatistics.css'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import FacultyLevelStatistics from './FacultyLevelStatistics'
-// import CourseDiff from './CourseDiff'
 import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
 import { clearCourseStats } from '../../redux/coursestats'
 import { getUserRoles, checkUserAccess } from '../../common'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
-import sisDestructionStyle from '../../common/sisDestructionStyle'
 import TSA from '../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Course Statistics'
@@ -28,21 +26,11 @@ const MENU = {
 }
 
 const CourseStatistics = props => {
-  const {
-    singleCourseStats,
-    clearCourseStats,
-    history,
-    statsIsEmpty,
-    loading,
-    initCourseCode,
-    userRoles,
-    rights,
-    diffIsEmpty,
-  } = props
+  const { singleCourseStats, clearCourseStats, history, statsIsEmpty, loading, initCourseCode, userRoles, rights } =
+    props
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [selected, setSelected] = useState(initCourseCode)
-  // const [showDiff, setShowDiff] = useState(false)
   const { onProgress, progress } = useProgress(loading)
   useTitle('Course statistics')
 
@@ -128,13 +116,10 @@ const CourseStatistics = props => {
   const panes = getPanes()
 
   const getContent = () => {
-    if ((statsIsEmpty && diffIsEmpty) || history.location.search === '') {
-      return <SearchForm onProgress={onProgress} /* showDiff={showDiff} setShowDiff={setShowDiff} */ />
+    if (statsIsEmpty || history.location.search === '') {
+      return <SearchForm onProgress={onProgress} />
     }
 
-    /* if (showDiff) {
-      return <CourseDiff />
-    } */
     return (
       <Tab
         menu={{ attached: false, borderless: false }}
@@ -149,7 +134,7 @@ const CourseStatistics = props => {
       <Header className="segmentTitle" size="large">
         Course Statistics
       </Header>
-      <Segment className="contentSegment" style={sisDestructionStyle}>
+      <Segment className="contentSegment">
         {getContent()}
         <ProgressBar fixed progress={progress} />
       </Segment>
@@ -166,12 +151,10 @@ CourseStatistics.propTypes = {
   initCourseCode: string.isRequired,
   userRoles: arrayOf(string).isRequired,
   rights: arrayOf(string).isRequired,
-  diffIsEmpty: bool.isRequired,
 }
 
 const mapStateToProps = ({
   courseStats,
-  oodiSisDiff,
   auth: {
     token: { roles, rights },
   },
@@ -180,13 +163,12 @@ const mapStateToProps = ({
   return {
     userRoles: getUserRoles(roles),
     rights,
-    pending: courseStats.pending || oodiSisDiff.pending,
+    pending: courseStats.pending,
     error: courseStats.error,
     statsIsEmpty: courses.length === 0,
     singleCourseStats: courses.length === 1,
-    loading: courseStats.pending || oodiSisDiff.pending,
+    loading: courseStats.pending,
     initCourseCode: courses[0] || '',
-    diffIsEmpty: Object.keys(oodiSisDiff.data).length === 0,
   }
 }
 

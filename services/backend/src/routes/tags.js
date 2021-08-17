@@ -3,8 +3,6 @@ const Tags = require('../services/tags')
 const TagStudent = require('../services/tagstudent')
 const Students = require('../services/students')
 const { difference } = require('lodash')
-const tagsV2 = require('../routesV2/tags')
-const useSisRouter = require('../util/useSisRouter')
 
 const filterRelevantTags = (tags, userId) => {
   return tags.filter(tag => !tag.personal_user_id || tag.personal_user_id === userId)
@@ -198,4 +196,6 @@ router.delete('/studenttags/delete_many', async (req, res) => {
   }
 })
 
-module.exports = useSisRouter(tagsV2, router)
+router.use('*', (req, res, next) => next())
+
+module.exports = router

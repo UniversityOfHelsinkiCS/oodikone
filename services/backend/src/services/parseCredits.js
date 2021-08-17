@@ -1,18 +1,21 @@
 const crypto = require('crypto')
 const { Credit } = require('../models')
 
-const formatStudyrightElement = ({ code, element_detail, startdate, studyright }) => ({
-  code,
-  name: element_detail.name,
-  startdate,
-  faculty_code: studyright.faculty_code || null,
-  organization: studyright.organization
-    ? {
-        name: studyright.organization.name,
-        code: studyright.organization.code,
-      }
-    : null,
-})
+const formatStudyrightElement = ({ code, element_detail, startdate, studyright: sr }) => {
+  const studyright = sr.get({ plain: true })
+  return {
+    code,
+    name: element_detail.name,
+    startdate,
+    faculty_code: studyright.faculty_code || null,
+    organization: studyright.organization
+      ? {
+          name: studyright.organization.name,
+          code: studyright.organization.code,
+        }
+      : null,
+  }
+}
 
 const parseCredit = (credit, anonymizationSalt) => {
   const { student, semester, grade, course_code, credits, attainment_date } = credit

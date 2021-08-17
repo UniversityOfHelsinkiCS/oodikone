@@ -1,13 +1,13 @@
 import { callController } from '../apiConnection'
 
 export const findCourses = (searchStr, language) => {
-  const route = `/courses/?name=${searchStr}&language=${language}`
+  const route = `/v2/courses/?name=${searchStr}&language=${language}`
   const prefix = 'FIND_COURSES_'
   return callController(route, prefix)
 }
 
 export const findMultipleCourses = ({ searchStr, type }, language = 'fi') => {
-  const route = `/coursesmulti/?${searchStr ? `name=${searchStr}` : ''}
+  const route = `/v2/coursesmulti/?${searchStr ? `name=${searchStr}` : ''}
     ${type ? `&type=${type}` : ''}&language=${language}`
   const prefix = 'FIND_COURSES_MULTI_'
   return callController(route, prefix)
