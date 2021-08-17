@@ -1,10 +1,7 @@
 const teachers = require('../servicesV2/teachers')
 const topteachers = require('../servicesV2/topteachers')
 const router = require('express').Router()
-// const { FEATURES } = require('../conf-backend') // this probably isn't needed and should be deprecated
 const { mapToProviders } = require('../util/utils')
-
-// const router = FEATURES.ERROR_HANDLER ? r.wrapper : r.router
 
 router.get('/', async (req, res) => {
   const { searchTerm } = req.query
