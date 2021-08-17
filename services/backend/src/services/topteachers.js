@@ -1,6 +1,6 @@
 const { redisClient } = require('../services/redis')
 const { getSemestersAndYears, getMaxYearcode } = require('./semesters')
-const { Teacher, Semester, Credit, Course } = require('../modelsV2')
+const { Teacher, Semester, Credit, Course } = require('../models')
 const { Op } = require('sequelize')
 
 const category = (name, rediskey) => ({ name, rediskey })

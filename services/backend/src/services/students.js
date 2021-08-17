@@ -11,7 +11,7 @@ const {
   StudyrightElement,
   ElementDetail,
   SemesterEnrollment,
-} = require('../modelsV2')
+} = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
 

@@ -3,7 +3,7 @@ const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
 const { getRedisCDS, saveToRedis } = require('./shared')
-const { ElementDetail, Organization } = require('../../modelsV2')
+const { ElementDetail, Organization } = require('../../models')
 const REDIS_KEY_GRADUATED = 'GRADUATED_DATA_V2'
 
 const getCurrentStudyYearStartDate = _.memoize(

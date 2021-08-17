@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Organization } = require('../modelsV2')
+const { Organization } = require('../models')
 const Op = Sequelize.Op
 
 // Have facultyfetching to work like it worked during oodi-db time

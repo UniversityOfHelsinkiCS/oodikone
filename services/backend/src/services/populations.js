@@ -14,7 +14,7 @@ const {
   Semester,
   Transfer,
   StudyrightElement,
-} = require('../modelsV2')
+} = require('../models')
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
