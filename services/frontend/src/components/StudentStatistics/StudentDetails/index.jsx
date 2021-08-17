@@ -38,7 +38,6 @@ const StudentDetails = ({
 }) => {
   const { language } = useLanguage()
   const [graphYearStart, setGraphYear] = useState('')
-  const [degreename, setDegreename] = useState('')
   const [studyrightid, setStudyrightid] = useState('')
 
   useEffect(() => {
@@ -134,18 +133,14 @@ const StudentDetails = ({
   const handleStartDateChange = (elements, id) => {
     if (id === studyrightid) {
       setGraphYear('')
-      setDegreename('')
       setStudyrightid('')
       return
     }
 
-    const getTarget = () =>
-      elements.degree ||
-      sortBy(elements.programmes, 'startdate', ['desc'])[0] || { startdate: graphYearStart, name: degreename }
+    const getTarget = () => sortBy(elements.programmes, 'startdate', ['desc'])[0] || { startdate: graphYearStart }
 
-    const { startdate, name } = getTarget()
+    const { startdate } = getTarget()
     setGraphYear(startdate)
-    setDegreename(name)
     setStudyrightid(id)
   }
 
