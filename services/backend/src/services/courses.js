@@ -14,7 +14,6 @@ const { parseCredit } = require('./parseCredits')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
 const _ = require('lodash')
-// const { CourseProvider } = require('../models')
 
 const byNameOrCode = (searchTerm, language) =>
   Course.findAll({

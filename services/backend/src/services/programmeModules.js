@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const { ExcludedCourse } = require('../models/models_kone')
 const { Op } = Sequelize
 
-const { dbConnections: sisConnections } = require('../databaseV2/connection')
+const { dbConnections: sisConnections } = require('../database/connection')
 const { sequelizeKone } = require('../database/connection')
 
 const recursivelyGetModuleAndChildren = async (code, type) => {

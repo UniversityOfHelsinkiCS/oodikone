@@ -1,5 +1,5 @@
 const { Model, STRING, DATE, INTEGER } = require('sequelize')
-const { dbConnections } = require('../databaseV2/connection')
+const { dbConnections } = require('../database/connection')
 
 class Student extends Model {}
 
