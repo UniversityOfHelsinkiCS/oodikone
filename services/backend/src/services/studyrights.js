@@ -1,7 +1,7 @@
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const { Studyright, StudyrightElement, ElementDetail } = require('../modelsV2')
+const { Studyright, StudyrightElement, ElementDetail } = require('../models')
 const { getUserElementDetails } = require('./userService')
 const { hasEnrolledForSemester } = require('./students')
 const { getCurrentSemester } = require('./semesters')

@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { ElementDetail, StudyrightElement } = require('../modelsV2')
+const { ElementDetail, StudyrightElement } = require('../models')
 const Op = Sequelize.Op
 
 const hasStudent = async (code, studentnumber) =>

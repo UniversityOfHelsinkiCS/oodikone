@@ -1,5 +1,5 @@
 const sequelize = require('sequelize')
-const { Semester } = require('../modelsV2')
+const { Semester } = require('../models')
 const Op = sequelize.Op
 
 const getCurrentSemester = async () => {

@@ -8,7 +8,7 @@ const {
   Studyright,
   Semester,
   Organization,
-} = require('../modelsV2')
+} = require('../models')
 
 const { parseCredit } = require('./parseCredits')
 const Op = Sequelize.Op

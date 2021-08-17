@@ -11,7 +11,7 @@ const {
   StudyrightElement,
   ElementDetail,
   Transfer,
-} = require('../modelsV2')
+} = require('../models')
 const { getAssociations, getAllProgrammes } = require('./studyrights')
 const { ThesisCourse, ThesisTypeEnums } = require('../models/models_kone')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')

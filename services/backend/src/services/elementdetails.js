@@ -1,4 +1,4 @@
-const { ElementDetail } = require('../modelsV2')
+const { ElementDetail } = require('../models')
 const { Op } = require('sequelize')
 
 const byId = id => ElementDetail.findByPk(id)

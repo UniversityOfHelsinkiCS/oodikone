@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Course } = require('../modelsV2')
+const { Course } = require('../models')
 const { MandatoryCourse, MandatoryCourseLabels } = require('../models/models_kone')
 const { Op } = Sequelize
 

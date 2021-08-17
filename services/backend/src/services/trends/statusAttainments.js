@@ -3,7 +3,7 @@ const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
 const { mapToProviders } = require('../../util/utils')
-const { ElementDetail, Organization } = require('../../modelsV2')
+const { ElementDetail, Organization } = require('../../models')
 const { getRedisCDS, saveToRedis, userServiceClient } = require('./shared')
 
 const REDIS_KEY_STATUS = 'STATUS_DATA_V2'
