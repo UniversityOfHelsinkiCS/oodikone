@@ -44,62 +44,6 @@ const MandatoryCourse = sequelizeKone.define('mandatory_courses', {
   },
 })
 
-const Filters = sequelizeKone.define('filters', {
-  id: {
-    type: Sequelize.STRING,
-    primaryKey: true,
-  },
-  name: {
-    type: Sequelize.STRING,
-  },
-  description: {
-    type: Sequelize.STRING,
-  },
-  filters: {
-    type: Sequelize.JSONB,
-  },
-  population: {
-    type: Sequelize.JSONB,
-  },
-})
-
-const UsageStatistic = sequelizeKone.define(
-  'usage_statistics',
-  {
-    id: {
-      primaryKey: true,
-      type: Sequelize.STRING,
-    },
-    username: {
-      type: Sequelize.STRING,
-    },
-    name: {
-      type: Sequelize.STRING,
-    },
-    time: {
-      type: Sequelize.INTEGER,
-    },
-    admin: {
-      type: Sequelize.BOOLEAN,
-    },
-    method: {
-      type: Sequelize.STRING,
-    },
-    URL: {
-      type: Sequelize.STRING,
-    },
-    status: {
-      type: Sequelize.INTEGER,
-    },
-    data: {
-      type: Sequelize.JSONB,
-    },
-  },
-  {
-    timestamps: false,
-  }
-)
-
 const TagStudent = sequelizeKone.define(
   'tag_student',
   {
@@ -231,8 +175,6 @@ module.exports = {
   MandatoryCourse,
   TagStudent,
   Tag,
-  Filters,
-  UsageStatistic,
   CourseDuplicates,
   ThesisCourse,
   ThesisTypeEnums,

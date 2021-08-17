@@ -2,7 +2,6 @@ const crypto = require('crypto')
 const Sentry = require('@sentry/node')
 const router = require('express').Router()
 const Population = require('../services/populations')
-const Filters = require('../services/filters')
 const Student = require('../services/students')
 const StudyrightService = require('../services/studyrights')
 const UserService = require('../services/userService')
@@ -439,46 +438,6 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     res.status(200).json(filterPersonalTags(result, decodedToken.id))
   } catch (err) {
     console.log(err)
-    res.status(400).end()
-  }
-})
-
-router.get('/v2/populationstatistics/filters', async (req, res) => {
-  let results = []
-  let rights = req.query.studyRights
-  if (!Array.isArray(rights)) {
-    // studyRights should always be an array
-    rights = [rights]
-  }
-  try {
-    results = await Filters.findForPopulation(rights)
-    res.status(200).json(results)
-  } catch (err) {
-    console.log(err)
-    res.status(400).end()
-  }
-})
-
-router.post('/v2/populationstatistics/filters', async (req, res) => {
-  let results = []
-  const filter = req.body
-
-  try {
-    results = await Filters.createNewFilter(filter)
-    res.status(200).json(results)
-  } catch (err) {
-    console.log(err)
-    res.status(400).end()
-  }
-})
-
-router.delete('/v2/populationstatistics/filters', async (req, res) => {
-  let results = []
-  const filter = req.body
-  try {
-    results = await Filters.deleteFilter(filter)
-    res.status(200).json(results)
-  } catch (err) {
     res.status(400).end()
   }
 })
