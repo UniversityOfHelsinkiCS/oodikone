@@ -4,9 +4,6 @@ import { getMocked, setMocking } from '../common'
 import { apiBasePath, isDev } from '../conf'
 
 const getHeaders = () => {
-  const defaultHeaders = {
-    'X-sis': 'true',
-  }
   // Set up dev user for development environment, mimicking production admin user
   const devUserHeaders = {
     uid: 'mluukkai',
@@ -16,7 +13,7 @@ const getHeaders = () => {
     eduPersonAffiliation: 'member;employee;faculty',
     mail: 'grp-toska+mockmluukkai@helsinki.fi',
   }
-  return isDev ? { ...defaultHeaders, ...devUserHeaders } : { ...defaultHeaders }
+  return isDev ? { ...devUserHeaders } : {}
 }
 
 export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders() })
