@@ -4,4 +4,3 @@ Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisääno
 - **Study programme:** haluttu koulutusohjelma.
 - **Select tag (Optional):** itsetehty tai valmis tägi.
 - **Study track (Optional):** opintosuunta.
-- **Degree (optional):** tutkintotaso.
