@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const userService = require('../servicesV2/userService')
+const userService = require('../services/userService')
 
 router.post('/language', async (req, res) => {
   const { language } = req.body

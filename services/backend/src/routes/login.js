@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const mailservice = require('../services/mailservice')
-const userService = require('../servicesV2/userService')
+const userService = require('../services/userService')
 const { parseHyGroups } = require('../util/utils')
 
 const sendEmail = async uid => {

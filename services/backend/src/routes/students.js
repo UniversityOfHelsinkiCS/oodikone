@@ -1,8 +1,8 @@
 const router = require('express').Router()
-const Student = require('../servicesV2/students')
-const userService = require('../servicesV2/userService')
-const Unit = require('../servicesV2/units')
-const { mismatchedStudents } = require('../servicesV2/student_credit_total_mismatches')
+const Student = require('../services/students')
+const userService = require('../services/userService')
+const Unit = require('../services/units')
+const { mismatchedStudents } = require('../services/student_credit_total_mismatches')
 
 const filterStudentTags = (student, userId) => {
   return {

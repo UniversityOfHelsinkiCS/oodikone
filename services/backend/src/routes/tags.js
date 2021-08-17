@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const Tags = require('../services/tags')
 const TagStudent = require('../services/tagstudent')
-const Students = require('../servicesV2/students')
+const Students = require('../services/students')
 const { difference } = require('lodash')
 
 const filterRelevantTags = (tags, userId) => {

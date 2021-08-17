@@ -1,15 +1,18 @@
-const { Studyright, StudyrightElement, sequelize, ElementDetails } = require('../models')
+const {
+  dbConnections: { sequelize },
+} = require('../databaseV2/connection')
+const { Studyright, StudyrightElement, ElementDetail } = require('../modelsV2')
 const { getUserElementDetails } = require('./userService')
 const { hasEnrolledForSemester } = require('./students')
 const { getCurrentSemester } = require('./semesters')
 const moment = require('moment')
-const { redisClient } = require('./redis')
+const { redisClient } = require('../services/redis')
 const _ = require('lodash')
 const { Op, col, where, fn } = require('sequelize')
 
 const createStudyright = apiData => Studyright.create(apiData)
 
-const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS'
+const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 
 const byStudent = studentNumber => {
   return Studyright.findAll({
@@ -73,7 +76,7 @@ const nonGraduatedStudentsOfElementDetail = async code => {
   const studentsToBeFiltered = new Set()
   await Promise.all(
     studyrights.map(
-      ({ student_studentnumber, studyrightid }) =>
+      ({ studentStudentnumber: student_studentnumber, studyrightid }) =>
         new Promise(async res => {
           const [enrolled, studentElementDetails] = await Promise.all([
             await hasEnrolledForSemester(student_studentnumber, currentSemesterCode),
@@ -222,7 +225,7 @@ const formatStudyrightElements = (elements, associations) =>
 const getAllStudyrightElementsAndAssociations = async () => {
   let studyright_elements = await redisClient.getAsync('studyright_elements')
   if (!studyright_elements) {
-    const [associations, studyrightelements] = await Promise.all([getAssociatedStudyrights(), ElementDetails.findAll()])
+    const [associations, studyrightelements] = await Promise.all([getAssociatedStudyrights(), ElementDetail.findAll()])
     await redisClient.setAsync(
       'studyright_elements',
       JSON.stringify(formatStudyrightElements(studyrightelements, associations))
@@ -242,7 +245,7 @@ const getStudyrightElementsAndAssociationsForUser = async username => {
 }
 
 const getAllDegreesAndProgrammes = async () => {
-  const elementDetails = await ElementDetails.findAll({
+  const elementDetails = ElementDetail.findAll({
     where: {
       type: {
         [Op.in]: [10, 20],
@@ -253,7 +256,7 @@ const getAllDegreesAndProgrammes = async () => {
 }
 
 const getAllProgrammes = async () => {
-  const elementDetails = ElementDetails.findAll({
+  const elementDetails = ElementDetail.findAll({
     where: {
       type: {
         [Op.in]: [20],
@@ -264,7 +267,7 @@ const getAllProgrammes = async () => {
 }
 
 const getAllElementDetails = async () => {
-  const elementDetails = ElementDetails.findAll()
+  const elementDetails = ElementDetail.findAll()
   return elementDetails
 }
 
@@ -275,7 +278,7 @@ const associatedStudyrightElements = async (offset, limit) => {
       model: StudyrightElement,
       attributes: ['studyrightid', 'startdate', 'enddate'],
       include: {
-        model: ElementDetails,
+        model: ElementDetail,
         attributes: ['type', 'name', 'code'],
       },
     },
@@ -315,7 +318,6 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
   const isValid = ({ type }) => types.has(type)
   const associations = { programmes: {}, degrees: {}, studyTracks: {} }
   while (offset <= total) {
-    console.log(`${offset}/${total}`)
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
     elementgroups.forEach(fullgroup => {
       const group = fullgroup.filter(isValid)
@@ -343,7 +345,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
             studytracks: [],
           }
           const momentstartdate = moment(startdate)
-          const enrollment = getEnrollmentStartYear(momentstartdate)
+          const enrollment = momentstartdate.isValid() ? getEnrollmentStartYear(momentstartdate) : null
           const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
           enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
             degrees: {},
