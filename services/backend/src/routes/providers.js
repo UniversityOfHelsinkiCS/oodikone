@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { getAllProviders } = require('../servicesV2/providers')
+const { getAllProviders } = require('../services/providers')
 
 router.get('/providers', async (req, res) => {
   const providers = await getAllProviders()

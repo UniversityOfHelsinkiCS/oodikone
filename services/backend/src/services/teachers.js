@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { Teacher, Credit, Course, Semester, Provider } = require('../models/index')
+const { Teacher, Credit, Course, Semester, Organization } = require('../models')
 
 const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
@@ -10,17 +10,6 @@ const nameLike = terms => ({
     [Op.and]: terms.map(term => ({ [Op.iLike]: likefy(term) })),
   },
 })
-
-const codeLike = terms => {
-  if (terms.length !== 1) {
-    return undefined
-  }
-  return {
-    code: {
-      [Op.iLike]: likefy(terms[0]),
-    },
-  }
-}
 
 const matchesId = searchTerm => ({ id: { [Op.eq]: searchTerm } })
 
@@ -35,14 +24,14 @@ const bySearchTerm = async rawTerm => {
       exclude: ['createdAt', 'updatedAt'],
     },
     where: {
-      [Op.or]: [nameLike(terms), codeLike(terms), matchesId(searchTerm)],
+      [Op.or]: [nameLike(terms), matchesId(searchTerm)],
     },
   })
 }
 
 const findTeacherCredits = teacherid =>
   Teacher.findByPk(teacherid, {
-    attributes: ['name', 'code', 'id'],
+    attributes: ['name', 'id'],
     include: {
       model: Credit,
       attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
@@ -162,7 +151,6 @@ const teacherStats = async teacherid => {
   )
   return {
     name: teacher.name,
-    code: teacher.code,
     id: teacher.id,
     statistics,
   }
@@ -181,11 +169,11 @@ const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => 
           attributes: [],
           required: true,
           include: {
-            model: Provider,
+            model: Organization,
             attributes: [],
             required: true,
             where: {
-              providercode: {
+              code: {
                 [Op.in]: providers,
               },
             },
@@ -209,7 +197,7 @@ const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => 
 
 const getCredits = (teacherIds, semestercodeStart, semestercodeEnd) =>
   Teacher.findAll({
-    attributes: ['name', 'code', 'id'],
+    attributes: ['name', 'id'],
     include: {
       model: Credit,
       attributes: ['credits', 'grade', 'id', 'student_studentnumber', 'credittypecode', 'isStudyModule'],
@@ -264,7 +252,6 @@ const yearlyStatistics = async (providers, semestercodeStart, semestercodeEnd) =
       ...acc,
       [teacher.id]: {
         name: teacher.name,
-        code: teacher.code,
         id: teacher.id,
         stats: calculateCreditStatistics(teacher.credits),
       },

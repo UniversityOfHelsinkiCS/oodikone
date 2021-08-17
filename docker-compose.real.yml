@@ -2,7 +2,6 @@ services:
 
   backend:
     environment:
-      DB_URL: postgres://postgres@oodi-db:5432/oodi-db-real
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db-real
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db-real
 

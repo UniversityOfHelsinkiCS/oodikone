@@ -1,25 +1,25 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
-const { getCurrentSemester } = require('../services/semesters')
 const { sortBy } = require('lodash')
 
 const {
   Student,
   Credit,
   Course,
-  sequelize,
   Studyright,
   StudyrightExtent,
-  ElementDetails,
-  Discipline,
+  ElementDetail,
   CourseType,
   SemesterEnrollment,
   Semester,
-  Transfers,
+  Transfer,
   StudyrightElement,
 } = require('../models')
+const {
+  dbConnections: { sequelize },
+} = require('../database/connection')
 const { Tag, TagStudent } = require('../models/models_kone')
-const { getCodeToMainCourseMap, unifyOpenUniversity } = require('./courses')
+const { allCodeAltenatives, findOneByCode } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
@@ -197,14 +197,14 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'email',
         'updatedAt',
         'gender_code',
-        'gender_fi',
-        'gender_sv',
-        'gender_en',
         'birthdate',
+        /* 'gender_fi',
+        'gender_sv',
+        'gender_en' */
       ],
       include: [
         {
-          model: Transfers,
+          model: Transfer,
           attributes: ['transferdate', 'sourcecode', 'targetcode'],
           separate: true,
         },
@@ -220,6 +220,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'prioritycode',
             'faculty_code',
             'studystartdate',
+            'admission_type',
           ],
           separate: true,
           include: [
@@ -228,7 +229,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
               required: true,
               attributes: ['id', 'startdate', 'enddate', 'studyrightid', 'code'],
               include: {
-                model: ElementDetails,
+                model: ElementDetail,
               },
             },
           ],
@@ -326,6 +327,7 @@ EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumber
   students.forEach(student => {
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
+
   return { students, credits, extents, semesters, elementdetails, courses }
 }
 
@@ -366,6 +368,7 @@ const studentnumbersWithAllStudyrightElements = async (
 
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
+
   const filteredExtents = [10] // always filter out secondary subject students
   let studyrightWhere = {
     extentcode: {
@@ -398,7 +401,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   const students = await Studyright.findAll({
-    attributes: ['student_studentnumber', 'graduated', 'enddate'],
+    attributes: ['student_studentnumber', 'graduated'],
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -409,7 +412,7 @@ const studentnumbersWithAllStudyrightElements = async (
         },
       },
       include: {
-        model: ElementDetails,
+        model: ElementDetail,
         attributes: [],
       },
     },
@@ -439,37 +442,7 @@ const studentnumbersWithAllStudyrightElements = async (
     raw: true,
   })
 
-  let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
-
-  // Oodi canceldates don't match SIS studyright statuses, so
-  // - filter out all students who haven't enrolled for semester
-  // - filter out all students who have enrolled for both semesters but whose studyright has ended
-  // - don't use above filtering to graduated students
-  if (!cancelledStudents) {
-    const { semestercode } = await getCurrentSemester()
-
-    const enrolments = await SemesterEnrollment.findAll({
-      where: {
-        studentnumber: {
-          [Op.in]: studentnumbers,
-        },
-        semestercode,
-        enrollment_date: {
-          [Op.not]: null,
-        },
-      },
-    })
-    const studentsByStudentnumber = students.reduce((res, curr) => {
-      res[curr.student_studentnumber] = curr
-      return res
-    }, {})
-    const today = new Date()
-    const graduated = [...new Set(students.filter(s => s.graduated).map(s => s.student_studentnumber))]
-    const enrolledStudentnumbers = enrolments
-      .map(e => e.studentnumber)
-      .filter(s => new Date(studentsByStudentnumber[s].enddate) >= today)
-    studentnumbers = [...new Set(graduated.concat(enrolledStudentnumbers))]
-  }
+  const studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
@@ -493,6 +466,7 @@ const studentnumbersWithAllStudyrightElements = async (
     raw: true,
   })
 
+  // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const allStudytracksForStudents = await StudyrightElement.findAll({
     where: {
       studyrightid: {
@@ -500,7 +474,7 @@ const studentnumbersWithAllStudyrightElements = async (
       },
     },
     include: {
-      model: ElementDetails,
+      model: ElementDetail,
       where: {
         type: {
           [Op.eq]: 30,
@@ -520,13 +494,12 @@ const studentnumbersWithAllStudyrightElements = async (
     if (!newestStudytrack) return false
     return studyRights.includes(newestStudytrack.code)
   })
-
   const studentnumberlist = filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
 
   // fetch students that have transferred out of the programme and filter out these studentnumbers
   if (!transferredStudents) {
     const transferredOutStudents = (
-      await Transfers.findAll({
+      await Transfer.findAll({
         attributes: ['studentnumber'],
         where: {
           sourcecode: {
@@ -562,6 +535,7 @@ const parseQueryParams = query => {
   const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
   const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
+
   return {
     exchangeStudents,
     cancelledStudents,
@@ -617,11 +591,11 @@ const getOptionsForStudents = async (students, code, level) => {
         [Op.in]: students,
       },
     },
-    attributes: ['student_studentnumber', 'givendate'],
+    attributes: ['studentStudentnumber', 'givendate'],
   })
 
   const currentStudyrightsMap = currentStudyrights.reduce((obj, studyright) => {
-    obj[studyright.student_studentnumber] = studyright.givendate
+    obj[studyright.studentStudentnumber] = studyright.givendate
     return obj
   }, {})
 
@@ -639,7 +613,7 @@ const getOptionsForStudents = async (students, code, level) => {
         },
         include: [
           {
-            model: ElementDetails,
+            model: ElementDetail,
             attributes: ['name'],
           },
         ],
@@ -653,14 +627,14 @@ const getOptionsForStudents = async (students, code, level) => {
       },
     },
     order: [[StudyrightElement, 'startdate', 'DESC']],
-    attributes: ['student_studentnumber', 'givendate'],
+    attributes: ['studentStudentnumber', 'givendate'],
   })
 
   return options
-    .filter(m => m.student_studentnumber in currentStudyrightsMap)
-    .filter(m => m.givendate.getTime() === currentStudyrightsMap[m.student_studentnumber].getTime())
+    .filter(m => m.studentStudentnumber in currentStudyrightsMap)
+    .filter(m => m.givendate.getTime() === currentStudyrightsMap[m.studentStudentnumber].getTime())
     .reduce((obj, element) => {
-      obj[element.student_studentnumber] = {
+      obj[element.studentStudentnumber] = {
         code: element.studyright_elements[0].code,
         name: element.studyright_elements[0].element_detail.name,
       }
@@ -801,7 +775,6 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
       )
   // wtf
   // plz
-  // okay
   const code = studyRights[0] || ''
   let optionData = {}
   if (code.includes('MH')) {
@@ -825,14 +798,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     formattedQueryParams,
     optionData
   )
-
   return formattedStudents
-}
-
-const getMainCourse = (course, codeduplicates) => {
-  const formattedcode = unifyOpenUniversity(course.code)
-  const maincourse = codeduplicates[formattedcode]
-  return maincourse || course
 }
 
 const findCourses = async (studentnumbers, beforeDate) => {
@@ -852,10 +818,10 @@ const findCourses = async (studentnumbers, beforeDate) => {
           },
         },
       },
-      {
+      /* {
         attributes: ['discipline_id', 'name'],
-        model: Discipline,
-      },
+        model: Discipline
+      }, */
       {
         attributes: ['coursetypecode', 'name'],
         model: CourseType,
@@ -948,6 +914,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         numbers[num] = true
         return numbers
       }, {})
+
       const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
       return [allstudents, courses]
     } else {
@@ -960,9 +927,8 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     }
   }
   const params = parseQueryParams(query)
-  const [[allstudents, courses], codeToMainCourse, error] = await Promise.all([
+  const [[allstudents, courses], error] = await Promise.all([
     getStudentsAndCourses(query.selectedStudents, studentnumberlist),
-    getCodeToMainCourseMap(),
     isValidRequest(query, params),
   ])
   if (error) return error
@@ -976,20 +942,24 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const startYear = parseInt(query.year, 10)
   const allstudentslength = Object.keys(allstudents).length
-  courses.forEach(course => {
-    let { disciplines, course_type } = course
-    const maincourse = getMainCourse(course, codeToMainCourse)
+
+  for (const course of courses) {
+    let { course_type } = course
+    const substitutions = allCodeAltenatives(course.code)
+    let maincourse = course
+
+    if (course.code !== substitutions[0]) {
+      maincourse = await findOneByCode(course.code)
+    }
+
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
     }
+
     const coursestats = stats[maincourse.code]
 
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
-    disciplines.forEach(({ discipline_id, name }) => {
-      coursestats.addCourseDiscipline(discipline_id, name)
-      bottlenecks.disciplines[discipline_id] = name
-    })
 
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
@@ -997,15 +967,12 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
     stats[maincourse.code] = coursestats
-  })
+  }
+
   bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.allStudents = allstudentslength
   return bottlenecks
 }
-
-// const optionStatistics = programme => {
-
-// }
 
 module.exports = {
   studentnumbersWithAllStudyrightElements,
