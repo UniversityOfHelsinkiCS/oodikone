@@ -104,16 +104,6 @@ const MandatoryCourseLabels = sequelizeKone.define('mandatory_course_labels', {
   },
 })
 
-const CourseDuplicates = sequelizeKone.define('course_duplicates', {
-  groupid: {
-    primaryKey: true,
-    type: Sequelize.INTEGER,
-  },
-  coursecode: {
-    type: Sequelize.STRING,
-  },
-})
-
 const ThesisCourse = sequelizeKone.define('thesis_courses', {
   programmeCode: {
     primaryKey: true,
@@ -161,7 +151,6 @@ module.exports = {
   MandatoryCourse,
   TagStudent,
   Tag,
-  CourseDuplicates,
   ThesisCourse,
   ThesisTypeEnums,
   MandatoryCourseLabels,
