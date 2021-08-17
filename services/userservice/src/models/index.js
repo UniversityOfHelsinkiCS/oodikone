@@ -133,20 +133,6 @@ const Affiliation = sequelize.define('affiliations', {
   },
 })
 
-const Migration = sequelize.define(
-  'migrations',
-  {
-    name: {
-      type: Sequelize.STRING,
-      primaryKey: true,
-    },
-  },
-  {
-    tablename: 'migrations',
-    timestamps: false,
-  }
-)
-
 User.hasMany(UserElementDetails, { as: 'programme' })
 UserElementDetails.belongsTo(User)
 
@@ -175,7 +161,6 @@ UserFaculties.hasMany(FacultyProgrammes, {
 module.exports = {
   User,
   UserElementDetails,
-  Migration,
   AccessGroup,
   HyGroup,
   Affiliation,
