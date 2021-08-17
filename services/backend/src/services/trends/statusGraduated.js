@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const {
   dbConnections: { sequelize },
-} = require('../../databaseV2/connection')
+} = require('../../database/connection')
 const { getRedisCDS, saveToRedis } = require('./shared')
 const { ElementDetail, Organization } = require('../../modelsV2')
 const REDIS_KEY_GRADUATED = 'GRADUATED_DATA_V2'

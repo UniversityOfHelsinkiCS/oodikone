@@ -6,8 +6,7 @@ const conf = require('./conf-backend')
 const routes = require('./routes')
 const { startCron } = require('./events')
 const { PORT } = conf
-const { initializeDatabaseConnection } = require('./database/connection')
-const { dbConnections } = require('./databaseV2/connection')
+const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
 
 const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT || ''
 const SENTRY_RELEASE = process.env.SENTRY_ENVIRONMENT || ''

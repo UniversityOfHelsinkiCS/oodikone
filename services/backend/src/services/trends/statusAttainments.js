@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const {
   dbConnections: { sequelize },
-} = require('../../databaseV2/connection')
+} = require('../../database/connection')
 const { mapToProviders } = require('../../util/utils')
 const { ElementDetail, Organization } = require('../../modelsV2')
 const { getRedisCDS, saveToRedis, userServiceClient } = require('./shared')

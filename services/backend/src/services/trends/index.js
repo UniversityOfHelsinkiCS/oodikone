@@ -1,6 +1,6 @@
 const {
   dbConnections: { sequelize },
-} = require('../../databaseV2/connection')
+} = require('../../database/connection')
 
 // TODO: change getStatus -> getStatusAttainments
 const { getStatus, refreshStatus } = require('./statusAttainments')

@@ -2,7 +2,7 @@ const REDIS_KEY_UBER = 'UBER_DATA_V2'
 const { getRedisCDS, saveToRedis } = require('./shared')
 const {
   dbConnections: { sequelize },
-} = require('../../databaseV2/connection')
+} = require('../../database/connection')
 const _ = require('lodash')
 
 const isSameDateIgnoringYear = (a, b) =>

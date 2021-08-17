@@ -9,7 +9,6 @@ const {
   Studyright,
   StudyrightExtent,
   ElementDetail,
-  //Discipline,
   CourseType,
   SemesterEnrollment,
   Semester,
@@ -18,7 +17,7 @@ const {
 } = require('../modelsV2')
 const {
   dbConnections: { sequelize },
-} = require('../databaseV2/connection')
+} = require('../database/connection')
 const { Tag, TagStudent } = require('../models/models_kone')
 const { allCodeAltenatives, findOneByCode } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
