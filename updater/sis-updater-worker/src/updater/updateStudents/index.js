@@ -322,7 +322,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
         if (!courseProvider) {
           const mapCourseProvider = courseProviderMapper(parsedCourseCode)
 
-          // Only map provider if its responsible and its degree programme
+          // Only map provider if it is responsible and it is degree programme
           const correctProvider = att.organisations.find(
             o =>
               idsOfDegreeProgrammes.has(o.organisationId) &&
