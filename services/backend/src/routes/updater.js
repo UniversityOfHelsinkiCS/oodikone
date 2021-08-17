@@ -9,7 +9,7 @@ const {
   abort,
   updateCoursesByCourseCode,
 } = require('../services/sisUpdaterService')
-const { refreshStatisticsV2 } = require('../events')
+const { refreshStatistics } = require('../events')
 
 router.get('/update/v2/meta', async (req, res) => {
   const { roles } = req
@@ -117,7 +117,7 @@ router.get('/refresh_redis_cache', async (req, res) => {
 
 router.post('/refresh_statistic_v2', async (req, res) => {
   try {
-    refreshStatisticsV2()
+    refreshStatistics()
     res.status(200).json('Refreshing sis statistics')
   } catch (err) {
     console.error(err)
