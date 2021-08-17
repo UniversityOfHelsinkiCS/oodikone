@@ -23,7 +23,7 @@ const updater = require('./routes/updater')
 const tsaAnalytics = require('./routes/tsaAnalytics')
 const matomoInit = require('./routes/matomo-init')
 const customPopulationSearch = require('./routes/customPopulationSearch')
-const coolDataScience = require('./routes/coolDataScience')
+const trends = require('./routes/trends')
 const programmeModules = require('./routes/programmeModules')
 
 module.exports = (app, url) => {
@@ -58,5 +58,5 @@ module.exports = (app, url) => {
   app.use(`${url}/mandatory-course-labels`, mandatoryCourseLabels)
   app.use(`${url}/tsa`, tsaAnalytics)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
-  app.use(`${url}/cool-data-science`, coolDataScience)
+  app.use(`${url}/cool-data-science`, trends)
 }
