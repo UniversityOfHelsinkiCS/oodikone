@@ -16,7 +16,6 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET
 const SECRET_TOKEN = process.env.SECRET_TOKEN
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
 const USERSERVICE_URL = process.env.USERSERVICE_URL
-const UPDATER_URL = process.env.UPDATER_URL
 const SIS_UPDATER_URL = process.env.SIS_UPDATER_URL
 const PORT = isTest ? 8079 : 8080
 const ANALYTICS_INFLUXDB_URL = process.env.ANALYTICS_INFLUXDB_URL
@@ -54,7 +53,6 @@ module.exports = {
   PORT,
   requiredGroup,
   isTest,
-  UPDATER_URL,
   SIS_UPDATER_URL,
   ANALYTICS_INFLUXDB_URL: formatURL(ANALYTICS_INFLUXDB_URL),
   ANALYTICS_INFLUXDB_USER,
