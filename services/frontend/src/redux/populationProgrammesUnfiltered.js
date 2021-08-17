@@ -1,6 +1,6 @@
 import { callController } from '../apiConnection'
 
-const prefix = 'GET_POPULATIONS_DEGREES_AND_PROGRAMMES_UNFILTERED'
+const prefix = 'GET_POPULATIONS_PROGRAMMES_UNFILTERED'
 
 const types = {
   attempt: `${prefix}ATTEMPT`,
@@ -8,7 +8,7 @@ const types = {
   success: `${prefix}SUCCESS`,
 }
 
-export const getDegreesAndProgrammesUnfiltered = () => {
+export const getProgrammesUnfiltered = () => {
   const route = '/v3/populationstatistics/studyprogrammes/unfiltered'
   return callController(route, prefix)
 }

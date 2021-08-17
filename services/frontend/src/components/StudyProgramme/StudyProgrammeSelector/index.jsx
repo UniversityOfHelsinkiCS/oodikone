@@ -147,8 +147,8 @@ StudyProgrammeSelector.defaultProps = {
   studyprogrammes: null,
 }
 
-const mapStateToProps = ({ populationDegreesAndProgrammes, settings }) => {
-  const { programmes } = populationDegreesAndProgrammes.data
+const mapStateToProps = ({ populationProgrammes, settings }) => {
+  const { programmes } = populationProgrammes.data
   const { language } = settings
 
   return {
