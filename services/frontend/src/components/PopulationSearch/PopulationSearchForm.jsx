@@ -15,7 +15,7 @@ import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getSemesters } from '../../redux/semesters'
 
-import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
+import { getProgrammes } from '../../redux/populationProgrammes'
 import { getTagsByStudytrackAction } from '../../redux/tags'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, cancelablePromise } from '../../common'
 import { useSearchHistory } from '../../common/hooks'
@@ -137,7 +137,7 @@ const PopulationSearchForm = props => {
   useEffect(() => {
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       setState({ query: initialQuery() })
-      props.getDegreesAndProgrammes()
+      props.getProgrammes()
     }
     if (!semesters.years) {
       props.getSemesters()
@@ -570,7 +570,7 @@ const PopulationSearchForm = props => {
 
 PopulationSearchForm.propTypes = {
   language: string.isRequired,
-  getDegreesAndProgrammes: func.isRequired,
+  getProgrammes: func.isRequired,
   getPopulationStatistics: func.isRequired,
   getPopulationCourses: func.isRequired,
   getMandatoryCourses: func.isRequired,
@@ -590,14 +590,14 @@ PopulationSearchForm.propTypes = {
   clearPopulations: func.isRequired,
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, tags }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationProgrammes, tags }) => {
   const { language } = settings
-  const { pending } = populationDegreesAndProgrammes
+  const { pending } = populationProgrammes
   return {
     semesters: semesters.data,
     language,
     queries: populations.query || {},
-    studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
+    studyProgrammes: populationProgrammes.data.programmes || {},
     pending,
     tags: tags.data,
   }
@@ -609,7 +609,7 @@ export default withRouter(
     getPopulationCourses,
     getPopulationSelectedStudentCourses,
     getMandatoryCourses,
-    getDegreesAndProgrammes,
+    getProgrammes,
     setLoading,
     getSemesters,
     getTagsByStudytrackAction,
