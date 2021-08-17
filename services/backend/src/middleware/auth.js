@@ -75,17 +75,9 @@ const checkUserBlacklisting = async (req, res, next) => {
   next()
 }
 
-const checkIfNonAdminAskingOldOodiData = async (req, res, next) => {
-  if (req.headers['x-sis'] === 'false' && !req.roles.includes('admin')) {
-    return res.status(403).json({ error: 'Requesting data from old oodi backend without admin rights' })
-  }
-  next()
-}
-
 module.exports = {
   checkAuth,
   roles,
   checkRequiredGroup,
   checkUserBlacklisting,
-  checkIfNonAdminAskingOldOodiData,
 }
