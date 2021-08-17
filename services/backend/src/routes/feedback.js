@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const mailservice = require('../services/mailservice')
-const userService = require('../services/userService')
+const userService = require('../servicesV2/userService')
 
 router.post('/email', async (req, res) => {
   const { content } = req.body
