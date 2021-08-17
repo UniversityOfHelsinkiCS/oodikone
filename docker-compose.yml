@@ -25,7 +25,6 @@ services:
     container_name: backend
     depends_on:
       - kone-db
-      - oodi-db
       - redis
       - sis-db
     environment:
