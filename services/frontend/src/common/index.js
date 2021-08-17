@@ -12,11 +12,6 @@ export const setMocking = userid =>
   userid ? localStorage.setItem(MOCK_USERID, userid) : localStorage.removeItem(MOCK_USERID)
 export const getMocked = () => localStorage.getItem(MOCK_USERID)
 
-export const OODI_DB_FLAG = 'OODI_DB_FLAG'
-export const setTestUserOodi = booleanFlag =>
-  booleanFlag ? localStorage.setItem(OODI_DB_FLAG, booleanFlag) : localStorage.removeItem(OODI_DB_FLAG)
-export const getTestUserOodi = () => localStorage.getItem(OODI_DB_FLAG)
-
 export const SIS_WARNING_FLAG = 'SIS_WARNING_FLAG'
 export const setHideSisWarningFlag = booleanFlag =>
   booleanFlag ? localStorage.setItem(SIS_WARNING_FLAG, booleanFlag) : localStorage.removeItem(SIS_WARNING_FLAG)

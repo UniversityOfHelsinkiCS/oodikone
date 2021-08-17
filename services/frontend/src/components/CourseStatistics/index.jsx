@@ -13,7 +13,6 @@ import { useProgress, useTitle } from '../../common/hooks'
 import { clearCourseStats } from '../../redux/coursestats'
 import { getUserRoles, checkUserAccess } from '../../common'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
-import sisDestructionStyle from '../../common/sisDestructionStyle'
 import TSA from '../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Course Statistics'
@@ -135,7 +134,7 @@ const CourseStatistics = props => {
       <Header className="segmentTitle" size="large">
         Course Statistics
       </Header>
-      <Segment className="contentSegment" style={sisDestructionStyle}>
+      <Segment className="contentSegment">
         {getContent()}
         <ProgressBar fixed progress={progress} />
       </Segment>

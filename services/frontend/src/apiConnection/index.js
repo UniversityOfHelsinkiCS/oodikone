@@ -1,11 +1,11 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
-import { getMocked, setMocking, getTestUserOodi } from '../common'
+import { getMocked, setMocking } from '../common'
 import { apiBasePath, isDev } from '../conf'
 
 const getHeaders = () => {
   const defaultHeaders = {
-    'X-sis': !getTestUserOodi(),
+    'X-sis': 'true',
   }
   // Set up dev user for development environment, mimicking production admin user
   const devUserHeaders = {

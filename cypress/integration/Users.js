@@ -14,7 +14,6 @@ describe('Users tests', () => {
       cy.get('.navBar').contains('Users').should('not.exist')
       cy.get('.navBar').contains('Faculty').should('not.exist')
       cy.get('.navBar').contains('Updater').should('not.exist')
-      cy.get('.navBar').contains('Sandbox').should('not.exist')
     })
   })
 
