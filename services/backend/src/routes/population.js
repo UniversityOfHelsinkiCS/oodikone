@@ -1,13 +1,13 @@
 const crypto = require('crypto')
 const Sentry = require('@sentry/node')
 const router = require('express').Router()
-const Population = require('../servicesV2/populations')
+const Population = require('../services/populations')
 const Filters = require('../services/filters')
-const Student = require('../servicesV2/students')
-const StudyrightService = require('../servicesV2/studyrights')
-const UserService = require('../servicesV2/userService')
+const Student = require('../services/students')
+const StudyrightService = require('../services/studyrights')
+const UserService = require('../services/userService')
 const TagService = require('../services/tags')
-const CourseService = require('../servicesV2/courses')
+const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
 
 const filterPersonalTags = (population, userId) => {

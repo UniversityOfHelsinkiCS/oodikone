@@ -1,4 +1,4 @@
-const { redisClient } = require('../servicesV2/redis')
+const { redisClient } = require('./redis')
 const moment = require('moment')
 
 const MAKE_REDIS_HASH_KEY = id => `BLACKLIST ${id}`

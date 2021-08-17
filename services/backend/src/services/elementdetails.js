@@ -1,17 +1,17 @@
-const { ElementDetails } = require('../models/index')
+const { ElementDetail } = require('../modelsV2/index')
 const { Op } = require('sequelize')
 
-const byId = id => ElementDetails.findByPk(id)
+const byId = id => ElementDetail.findByPk(id)
 
 const byType = type =>
-  ElementDetails.findAll({
+  ElementDetail.findAll({
     where: {
       type,
     },
   })
 
 const byCodes = codes =>
-  ElementDetails.findAll({
+  ElementDetail.findAll({
     where: {
       code: {
         [Op.in]: codes,

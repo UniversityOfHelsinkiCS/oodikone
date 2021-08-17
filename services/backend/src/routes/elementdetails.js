@@ -1,11 +1,11 @@
 const router = require('express').Router()
-const { getStudentsUserCanAccess } = require('../servicesV2/userService')
-const MandatoryCourses = require('../servicesV2/mandatoryCourses')
+const { getStudentsUserCanAccess } = require('../services/userService')
+const MandatoryCourses = require('../services/mandatoryCourses')
 const {
   productivityStatsForStudytrack,
   throughputStatsForStudytrack,
   optionData,
-} = require('../servicesV2/studyprogramme')
+} = require('../services/studyprogramme')
 const { findProgrammeTheses } = require('../services/thesis')
 
 const {
@@ -16,7 +16,7 @@ const {
   patchProductivity,
   patchThroughput,
   getNonGraduatedStudents,
-} = require('../servicesV2/analyticsService')
+} = require('../services/analyticsService')
 
 const programmeStatsSince = new Date('2017-07-31')
 

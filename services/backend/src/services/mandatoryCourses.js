@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize')
-const { Course } = require('../models')
+const { Course } = require('../modelsV2')
 const { MandatoryCourse, MandatoryCourseLabels } = require('../models/models_kone')
 const { Op } = Sequelize
 
@@ -36,8 +36,6 @@ const byStudyprogramme = async studyProgrammeId => {
     name: courseCodeToCourse[mc.course_code].name,
     code: mc.course_code,
     label: mc.mandatory_course_label,
-    // this is because fuck life
-    visible: { visibility: true, id: null },
   }))
 }
 

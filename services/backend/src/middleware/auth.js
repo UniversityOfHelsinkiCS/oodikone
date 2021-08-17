@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const conf = require('../conf-backend')
 const blacklist = require('../services/blacklist')
-const { getUserDataFor } = require('../servicesV2/userService')
+const { getUserDataFor } = require('../services/userService')
 const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
 const { hasRequiredGroup, parseHyGroups } = require('../util/utils')
 

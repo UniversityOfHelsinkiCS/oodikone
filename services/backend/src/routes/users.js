@@ -1,8 +1,8 @@
 const router = require('express').Router()
-const userService = require('../servicesV2/userService')
+const userService = require('../services/userService')
 const mailservice = require('../services/mailservice')
 const blacklist = require('../services/blacklist')
-const { userDataCache } = require('../servicesV2/cache')
+const { userDataCache } = require('../services/cache')
 
 const addUserToBlacklist = async (user, decodedToken) => {
   if (user) {

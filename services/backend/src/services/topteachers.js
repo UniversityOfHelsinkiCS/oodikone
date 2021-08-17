@@ -1,6 +1,6 @@
-const { redisClient } = require('./redis')
+const { redisClient } = require('../services/redis')
 const { getSemestersAndYears, getMaxYearcode } = require('./semesters')
-const { Teacher, Semester, Credit, Course } = require('../models/index')
+const { Teacher, Semester, Credit, Course } = require('../modelsV2/index')
 const { Op } = require('sequelize')
 
 const category = (name, rediskey) => ({ name, rediskey })
@@ -11,8 +11,8 @@ const ID = {
 }
 
 const categories = {
-  [ID.ALL]: category('All', 'TOP_TEACHERS_ALL'),
-  [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI'),
+  [ID.ALL]: category('All', 'TOP_TEACHERS_ALL_V2'),
+  [ID.OPENUNI]: category('Open University', 'TOP_TEACHERS_OPEN_UNI_V2'),
 }
 
 const deleteCategory = async categoryid => {
@@ -56,7 +56,7 @@ const creditsWithTeachersForYear = yearcode =>
       },
       {
         model: Teacher,
-        attributes: ['id', 'name', 'code'],
+        attributes: ['id', 'name'],
         required: true,
       },
       {

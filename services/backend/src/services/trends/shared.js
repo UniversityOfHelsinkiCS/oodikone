@@ -1,5 +1,5 @@
 const axios = require('axios')
-const { redisClient } = require('../redis')
+const { redisClient } = require('../../services/redis')
 const { USERSERVICE_URL } = require('../../conf-backend')
 const {
   dbConnections: { sequelize },

@@ -7,7 +7,7 @@ const {
   getUber,
   getStartYears,
   getGraduatedStatus,
-} = require('../servicesV2/trends')
+} = require('../services/trends')
 
 router.get('/start-years', async (req, res) => {
   const years = await getStartYears()

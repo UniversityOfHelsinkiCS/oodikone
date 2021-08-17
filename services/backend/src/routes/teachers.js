@@ -1,5 +1,5 @@
-const teachers = require('../servicesV2/teachers')
-const topteachers = require('../servicesV2/topteachers')
+const teachers = require('../services/teachers')
+const topteachers = require('../services/topteachers')
 const router = require('express').Router()
 const { mapToProviders } = require('../util/utils')
 
