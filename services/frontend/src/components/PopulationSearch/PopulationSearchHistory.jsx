@@ -249,7 +249,7 @@ class PopulationSearchHistory extends Component {
           <Form.Checkbox
             className="populationStatisticsRadio"
             key="TRANSFERRED"
-            label="Transferred from students"
+            label="Students who have transferred out of the programme"
             value="TRANSFERRED"
             name="studentStatusGroup"
             checked={studentStatuses.includes('TRANSFERRED')}
