@@ -2,6 +2,8 @@ name: "Test oodikone and release to staging"
 
 on:
   push:
+    branches:
+      - master
     paths:
       - '.github/workflows/test-oodikone.yaml'
       - 'cypress/**'
