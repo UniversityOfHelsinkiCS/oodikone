@@ -29,7 +29,6 @@ jobs:
             SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
             SENTRY_ENVIRONMENT=production
           cache-from: |
-            type=registry,ref=toska/oodikone2-backend:trunk
             type=registry,ref=toska/oodikone2-backend:staging
             type=registry,ref=toska/oodikone2-backend:latest
           cache-to: type=inline
@@ -66,7 +65,6 @@ jobs:
             SENTRY_ENVIRONMENT=production
             BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           cache-from: |
-            type=registry,ref=toska/oodikone2-frontend:trunk
             type=registry,ref=toska/oodikone2-frontend:staging
             type=registry,ref=toska/oodikone2-frontend:latest
           cache-to: type=inline
@@ -107,7 +105,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           cache-from: |
-            type=registry,ref=toska/oodikone2-userservice:trunk
             type=registry,ref=toska/oodikone2-userservice:staging
             type=registry,ref=toska/oodikone2-userservice:latest
           cache-to: type=inline
