@@ -13,7 +13,7 @@ export default {
   Vanhojen koulutusohjelmien lakkauttaminen ja opiskelijoiden siirtäminen uusiin ohjelmiin voi aiheuttaa tavallista suuremmat opintopistemäärät lukuvuodelle 2020-2021.`,
   Year: `Lukuvuosi`,
   Students: `Opiskelijat, jotka ovat koulutusohjelmassa aloittaneet, opinto-oikeutensa peruneet sekä koulutusohjelmaan tai siitä pois siirtyneet.`,
-  Started: `Koulutusohjelmassa kunakin lukuvuonna aloittaneet opiskelijat.`,
+  Started: `Koulutusohjelmassa kunakin lukuvuonna aloittaneet opiskelijat. EI sisällä ohjelmaan siirtyneitä opiskelijoita.`,
   Cancelled: `Koulutusohjelmaan oikeuttavan opinto-oikeutensa kunakin lukuvuonna peruttaneet`,
   Graduated: `Tiettynä lukuvuonna aloittaneista opiskelijoista on valmistunut`,
   Transferred: `Koulutusohjelmaan kyseisenä lukuvuonna siirtyneet opiskelijat. 
