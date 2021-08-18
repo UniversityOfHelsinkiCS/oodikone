@@ -19,7 +19,7 @@ import Tags from './Tags'
 import { getThroughput } from '../../redux/throughput'
 import { getProductivity } from '../../redux/productivity'
 import { getPresentStudents, clearPresentStudents } from '../../redux/presentStudents'
-import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
+import { getProgrammes } from '../../redux/populationProgrammes'
 
 import { callApi } from '../../apiConnection'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -30,7 +30,7 @@ const StudyProgramme = props => {
   useTitle('Study programmes')
 
   useEffect(() => {
-    props.getDegreesAndProgrammesDispatch()
+    props.getProgrammesDispatch()
   }, [])
 
   const refreshProductivity = () => {
@@ -185,7 +185,7 @@ StudyProgramme.propTypes = {
   isAdmin: bool.isRequired,
   getPresentStudentsDispatch: func.isRequired,
   clearPresentStudentsDispatch: func.isRequired,
-  getDegreesAndProgrammesDispatch: func.isRequired,
+  getProgrammesDispatch: func.isRequired,
 }
 
 StudyProgramme.defaultProps = {
@@ -196,12 +196,12 @@ StudyProgramme.defaultProps = {
 }
 
 const mapStateToProps = ({
-  populationDegreesAndProgrammes,
+  populationProgrammes,
   auth: {
     token: { rights, roles },
   },
 }) => {
-  const programmes = populationDegreesAndProgrammes.data ? populationDegreesAndProgrammes.data.programmes : {}
+  const programmes = populationProgrammes.data ? populationProgrammes.data.programmes : {}
   return {
     programmes,
     rights,
@@ -217,7 +217,7 @@ export default connect(
     getProductivityDispatch: getProductivity,
     getPresentStudentsDispatch: getPresentStudents,
     clearPresentStudentsDispatch: clearPresentStudents,
-    getDegreesAndProgrammesDispatch: getDegreesAndProgrammes,
+    getProgrammesDispatch: getProgrammes,
   },
   null,
   {

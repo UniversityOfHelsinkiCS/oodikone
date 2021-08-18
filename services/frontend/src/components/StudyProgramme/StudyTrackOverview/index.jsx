@@ -249,9 +249,9 @@ Overview.propTypes = {
   }).isRequired // eslint-disable-line
 }
 
-const mapStateToProps = ({ studyProgrammeThroughput, populationDegreesAndProgrammes, settings }) => ({
+const mapStateToProps = ({ studyProgrammeThroughput, populationProgrammes, settings }) => ({
   throughput: studyProgrammeThroughput,
-  studyprogrammes: populationDegreesAndProgrammes.data.programmes || {},
+  studyprogrammes: populationProgrammes.data.programmes || {},
   language: settings.language,
 })
 

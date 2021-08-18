@@ -654,11 +654,10 @@ const formatStudentsForApi = async (
   elementdetails = elementdetails.reduce(
     (acc, e) => {
       acc.data[e.code] = e
-      if (e.type === 10) acc.degrees.push(e.code)
       if (e.type === 20) acc.programmes.push(e.code)
       return acc
     },
-    { programmes: [], degrees: [], data: {} }
+    { programmes: [], data: {} }
   )
   credits = credits.reduce((acc, e) => {
     acc[e.student_studentnumber] = acc[e.student_studentnumber] || []
@@ -689,7 +688,6 @@ const formatStudentsForApi = async (
         sources: {},
       },
       studyrights: {
-        degrees: [],
         programmes: [],
       },
     }

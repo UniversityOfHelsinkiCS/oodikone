@@ -244,17 +244,6 @@ const getStudyrightElementsAndAssociationsForUser = async username => {
   return formatStudyrightElements(studyrightelementcodes, associations)
 }
 
-const getAllDegreesAndProgrammes = async () => {
-  const elementDetails = ElementDetail.findAll({
-    where: {
-      type: {
-        [Op.in]: [10, 20],
-      },
-    },
-  })
-  return formatStudyrightElements(elementDetails)
-}
-
 const getAllProgrammes = async () => {
   const elementDetails = ElementDetail.findAll({
     where: {
@@ -297,7 +286,6 @@ const associatedStudyrightElements = async (offset, limit) => {
 }
 
 const StudyRightType = {
-  DEGREE: 10,
   PROGRAMME: 20,
   STUDYTRACK: 30,
 }
@@ -314,22 +302,15 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
   }
   const total = await Studyright.count()
   let offset = 0
-  const types = new Set([StudyRightType.DEGREE, StudyRightType.PROGRAMME, StudyRightType.STUDYTRACK])
+  const types = new Set([StudyRightType.PROGRAMME, StudyRightType.STUDYTRACK])
   const isValid = ({ type }) => types.has(type)
-  const associations = { programmes: {}, degrees: {}, studyTracks: {} }
+  const associations = { programmes: {}, studyTracks: {} }
   while (offset <= total) {
     const elementgroups = await associatedStudyrightElements(offset, chunksize)
     elementgroups.forEach(fullgroup => {
       const group = fullgroup.filter(isValid)
       group.forEach(({ type, code, name, studyrightid, startdate, enddate }) => {
-        if (type === StudyRightType.DEGREE) {
-          associations.degrees[code] = associations.degrees[code] || {
-            type,
-            name,
-            code,
-            programmes: {},
-          }
-        } else if (type === StudyRightType.STUDYTRACK) {
+        if (type === StudyRightType.STUDYTRACK) {
           associations.studyTracks[code] = associations.studyTracks[code] || {
             type,
             name,
@@ -348,7 +329,6 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
           const enrollment = momentstartdate.isValid() ? getEnrollmentStartYear(momentstartdate) : null
           const enrollmentStartYears = associations.programmes[code].enrollmentStartYears
           enrollmentStartYears[enrollment] = enrollmentStartYears[enrollment] || {
-            degrees: {},
             studyTracks: {},
           }
           const enrollmentStartYear = enrollmentStartYears[enrollment]
@@ -356,24 +336,7 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
           group
             .filter(e => e.studyrightid === studyrightid && e.code !== code)
             .forEach(e => {
-              if (e.type === StudyRightType.DEGREE) {
-                enrollmentStartYear.degrees[e.code] = {
-                  type: e.type,
-                  name: e.name,
-                  code: e.code,
-                }
-                associations.degrees[e.code] = associations.degrees[e.code] || {
-                  type: e.type,
-                  name: e.name,
-                  code: e.code,
-                  programmes: {},
-                }
-                associations.degrees[e.code].programmes[code] = {
-                  type: type,
-                  name: name,
-                  code: code,
-                }
-              } else if (e.type === StudyRightType.STUDYTRACK) {
+              if (e.type === StudyRightType.STUDYTRACK) {
                 const momentenddate = moment(enddate)
                 const estartdate = moment(e.startdate)
                 const eenddate = moment(e.enddate)
@@ -443,18 +406,12 @@ const getFilteredAssociations = async codes => {
   const associations = await getAssociations()
   associations.programmes = _.pick(associations.programmes, codes)
 
-  const degrees = []
   const studyTracks = []
   Object.keys(associations.programmes).forEach(k => {
     Object.keys(associations.programmes[k].enrollmentStartYears).forEach(year => {
       const yearData = associations.programmes[k].enrollmentStartYears[year]
-      degrees.push(...Object.keys(yearData.degrees))
       studyTracks.push(...Object.keys(yearData.studyTracks))
     })
-  })
-  associations.degrees = _.pick(associations.degrees, degrees)
-  Object.keys(associations.degrees).forEach(k => {
-    associations.degrees[k].programmes = _.pick(associations.degrees[k].programmes, codes)
   })
   associations.studyTracks = _.pick(associations.studyTracks, studyTracks)
   Object.keys(associations.studyTracks).forEach(k => {
@@ -476,7 +433,6 @@ module.exports = {
   getAssociatedStudyrights,
   getAllStudyrightElementsAndAssociations,
   getStudyrightElementsAndAssociationsForUser,
-  getAllDegreesAndProgrammes,
   getAssociations,
   getFilteredAssociations,
   getUserAssociations,
