@@ -84,6 +84,7 @@ services:
     image: registry.toska.cs.helsinki.fi/sis-db
     volumes:
       - sis-db-data:/data
+    shm_size: 2gb
 
   sis-importer-db:
     <<: *defaults

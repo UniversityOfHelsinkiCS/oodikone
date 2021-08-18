@@ -95,7 +95,10 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     yearRange,
     diff => ({
       from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
-      to: new Date(unixMillis - diff * YEAR_TO_MILLISECONDS),
+      to:
+        showByYear === 'true'
+          ? new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS)
+          : new Date(unixMillis - diff * YEAR_TO_MILLISECONDS),
     }),
     'acc',
     'students'
