@@ -207,7 +207,7 @@ const ThroughputTable = ({
   return (
     <>
       <div style={{ marginTop: '2em' }}>
-        <InfoBox content={infotooltips.PopulationOverview.Overview} />
+        <InfoBox content={infotooltips.PopulationOverview.PopulationProgress} />
       </div>
       <Header>
         {studytrack ? `Population progress for selected studytrack` : 'Population progress'}

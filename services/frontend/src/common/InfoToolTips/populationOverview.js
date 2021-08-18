@@ -1,14 +1,16 @@
 export default {
-  Overview: `Tämä koontisivu sisältää koulutusohjelman kaikkien opiskelijoiden perustiedot lukuvuosittain. Luvut perustuvat opinto-oikeuksiin kyseisessä ohjelmassa.
+  PopulationProgress: `Tämä koontisivu sisältää koulutusohjelman kaikkien opiskelijoiden perustiedot lukuvuosittain. Luvut perustuvat opinto-oikeuksiin kyseisessä ohjelmassa.
 
   Population progress:
   Vuosittain ohjelmassa aloittaneet, ohjelman keskeyttäneet / peruneet sekä ohjelmaan siirtyneet opiskelijat. 
   Huomattavaa on, että sama opiskelija voi olla kahdessa luokassa, jos hän on esimerkiksi aloittanut opinnot jo, mutta keskeyttänyt ne lukuvuoden aikana.
-  Tarkemmat tiedot saat esille klikkaamalla nuolta kunkin lukuvuoden kohdalla.
-  
+  Tarkemmat tiedot saat esille klikkaamalla nuolta kunkin lukuvuoden kohdalla.`,
+  YearlyProductivity: `
   Yearly productivity:
   Koulutusohjelman kunakin kalenterivuonna tuottamat opintopisteet, valmistuneiden määrän, ohjelman pääaineopiskelijoiden
-  opintopisteet sekä muiden kuin pääaineopiskelijoiden opintopisteet. Mukana on myös kuhunkin koulutusohjelmaan hyväksiluetut opintopisteet.`,
+  opintopisteet sekä muiden kuin pääaineopiskelijoiden opintopisteet. Mukana on myös kuhunkin koulutusohjelmaan hyväksiluetut opintopisteet.
+  
+  Vanhojen koulutusohjelmien lakkauttaminen ja opiskelijoiden siirtäminen uusiin ohjelmiin voi aiheuttaa tavallista suuremmat opintopistemäärät lukuvuodelle 2020-2021.`,
   Year: `Lukuvuosi`,
   Students: `Opiskelijat, jotka ovat koulutusohjelmassa aloittaneet, opinto-oikeutensa peruneet sekä koulutusohjelmaan tai siitä pois siirtyneet.`,
   Started: `Koulutusohjelmassa kunakin lukuvuonna aloittaneet opiskelijat.`,
