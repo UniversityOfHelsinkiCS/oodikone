@@ -1,17 +1,16 @@
-name: "Test oodikone"
+name: "Test oodikone and release to staging"
 
 on:
   push:
-    branches-ignore:
-      - master
     paths:
-      - .github/workflows/test-oodikone.yaml
-      - cypress/**
-      - cypress.json
-      - services/**
-      - docker-compose.ci.yml
-      - nginx.conf
-      - package*.json
+      - '.github/workflows/test-oodikone.yaml'
+      - 'cypress/**'
+      - 'cypress.json'
+      - 'services/**'
+      - 'docker-compose.ci.yml'
+      - 'docker-compose.test.yml'
+      - 'nginx.conf'
+      - 'package*.json'
 
 jobs:
   # === Static tests / linting ===
@@ -68,14 +67,16 @@ jobs:
       - name: "Build image and export it"
         uses: docker/build-push-action@v2
         with:
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=staging
           cache-from: |
-            type=registry,ref=toska/oodikone2-backend:trunk
             type=registry,ref=toska/oodikone2-backend:staging
             type=registry,ref=toska/oodikone2-backend:latest
           cache-to: type=inline
           context: services/backend
           push: false
-          tags: toska/oodikone2-backend:trunk
+          tags: toska/oodikone2-backend:staging
           target: production
           outputs: type=docker,dest=/tmp/backend.tar
       - name: "Upload image for other jobs"
@@ -89,17 +90,23 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
+      - name: "Get current time"
+        id: get_current_time
+        run: echo ::set-output name=NOW::"$(date --iso-8601=seconds)"
       - name: "Build image and export it"
         uses: docker/build-push-action@v2
         with:
+          build-args: |
+            SENTRY_RELEASE=${{ github.sha }}
+            SENTRY_ENVIRONMENT=staging
+            BUILT_AT=${{ steps.get_current_time.outputs.NOW }}
           cache-from: |
-            type=registry,ref=toska/oodikone2-frontend:trunk
             type=registry,ref=toska/oodikone2-frontend:staging
             type=registry,ref=toska/oodikone2-frontend:latest
           cache-to: type=inline
           context: services/frontend
           push: false
-          tags: toska/oodikone2-frontend:trunk
+          tags: toska/oodikone2-frontend:staging
           target: production
           outputs: type=docker,dest=/tmp/frontend.tar
       - name: "Upload image for other jobs"
@@ -117,13 +124,12 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           cache-from: |
-            type=registry,ref=toska/oodikone2-userservice:trunk
             type=registry,ref=toska/oodikone2-userservice:staging
             type=registry,ref=toska/oodikone2-userservice:latest
           cache-to: type=inline
           context: services/userservice
           push: false
-          tags: toska/oodikone2-userservice:trunk
+          tags: toska/oodikone2-userservice:staging
           target: production
           outputs: type=docker,dest=/tmp/userservice.tar
       - name: "Upload image for other jobs"
@@ -132,6 +138,7 @@ jobs:
           path: /tmp/userservice.tar
 
   # === Integration tests ===
+  #
   run_userservice_integration_tests:
     name: "Run userservice integration tests"
     runs-on: ubuntu-latest
@@ -484,8 +491,11 @@ jobs:
         if: failure()
         run: docker-compose --file docker-compose.ci.yml logs
 
-  push_to_dockerhub:
-    name: "Push images to docker hub for caching"
+  # === Release ===
+
+  release_images:
+    name: "Release built images"
+    runs-on: ubuntu-latest
     needs:
     - lint_backend
     - lint_frontend
@@ -499,7 +509,6 @@ jobs:
     - test_studyprogramme_overview
     - test_teachers_and_users
     - test_service_exit_statuses
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: "Download images"
@@ -516,10 +525,42 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "Create a container from frontend"
+        run: docker create --name frontend toska/oodikone2-frontend:staging
+      - name: "Copy assets from the container"
+        run: docker cp frontend:/usr/src/app/build ./build
+      - name: "Create Sentry release"
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: toska
+          SENTRY_PROJECT: oodikone
+        with:
+          environment: staging
+          set_commits: 'skip'
+          sourcemaps: './build/static/js'
+          url_prefix: '~/oodikone/static/js'
+          version: ${{ github.sha }}
       - name: "Push to docker hub"
         run: docker-compose --file docker-compose.ci.yml push
+      - name: "Send deployment success notification to slack"
+        if: success()
+        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment
+          softa-url: https://oodikone-staging.cs.helsinki.fi/
+          deployment-target: staging
+      - name: "Send deployment failure notification to slack"
+        if: failure()
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          message-type: deployment-failure
+          deployment-target: staging
 
-  report_failure:
+  report_test_failure:
     runs-on: ubuntu-latest
     name: "Report test failure to oodikone notifications"
     needs:
@@ -535,7 +576,6 @@ jobs:
     - test_studyprogramme_overview
     - test_teachers_and_users
     - test_service_exit_statuses
-    - push_to_dockerhub
     if: failure()
     steps:
       - uses: actions/checkout@v2
