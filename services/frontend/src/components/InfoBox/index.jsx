@@ -12,8 +12,8 @@ const InfoBox = ({ content }) => {
     <Message icon className="ok-infobox" color="green">
       <div className="content-container">
         <Icon name="info circle" size="huge" />
-        <Message.Content>
-          <ReactMarkdown source={content} escapeHtml={false} />
+        <Message.Content className="ok-infobox content">
+          <ReactMarkdown escapeHtml={false}>{content}</ReactMarkdown>
         </Message.Content>
       </div>
       <Button onClick={toggleOpen} className="ok-infobox-close">
