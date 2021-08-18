@@ -13,33 +13,33 @@ describe('Studyprogramme overview', () => {
     // Column amount depends on user. Note that with dev user, you'll see even more
     // stuff than with admin or basic.
     const CSBachPopulationProgress2018ForAdmin = [
-      '160',
-      '42 (26%)',
-      '118 (73%)',
-      '159 (99%)',
-      '159',
-      '11',
-      '11',
+      '162',
+      '44 (27%)',
+      '118 (72%)',
+      '161 (99%)',
+      '161',
       '1',
-      '0',
-      '150',
-      '123',
-      '76',
-      '41',
+      '11',
+      '11',
+      '152',
+      '125',
+      '78',
+      '42',
       '16',
     ]
     const CSBachPopulationProgress2018ForBasic = [
-      '160',
-      '42 (26%)',
-      '118 (73%)',
-      '159 (99%)',
-      '159',
-      '11',
+      '162',
+      '44 (27%)',
+      '118 (72%)',
+      '161 (99%)',
+      '161',
       '1',
-      '150',
-      '123',
-      '76',
-      '41',
+      '11',
+      '11',
+      '152',
+      '125',
+      '78',
+      '42',
       '16',
     ] // cancelled and transferred from are missing
 
@@ -52,7 +52,7 @@ describe('Studyprogramme overview', () => {
       .each((elem, index) => {
         cy.wrap(elem).contains(population[index])
       })
-    const populationproductivity2019 = ['7388.0', '17', '7329.00', '59.00', '349.00']
+    const populationproductivity2019 = ['7388.0', '17', '7388.00', '0.00', '349.00']
     cy.get('table')
       .eq(1)
       .contains('2019')
