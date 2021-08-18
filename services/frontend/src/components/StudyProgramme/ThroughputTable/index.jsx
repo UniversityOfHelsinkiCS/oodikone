@@ -173,7 +173,6 @@ const ThroughputTable = ({
   }
 
   const headerCellPopUp = (title, cell) => {
-    if (!userRoles.includes('admin')) return cell
     return (
       <Popup trigger={cell} wide="very" position="left center">
         <Popup.Content>{infotooltips.PopulationOverview[title]}</Popup.Content>
