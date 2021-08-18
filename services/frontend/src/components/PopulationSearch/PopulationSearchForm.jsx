@@ -15,7 +15,7 @@ import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getSemesters } from '../../redux/semesters'
 
-import { getDegreesAndProgrammes } from '../../redux/populationDegreesAndProgrammes'
+import { getProgrammes } from '../../redux/populationProgrammes'
 import { getTagsByStudytrackAction } from '../../redux/tags'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, cancelablePromise } from '../../common'
 import { useSearchHistory } from '../../common/hooks'
@@ -137,7 +137,7 @@ const PopulationSearchForm = props => {
   useEffect(() => {
     if (!studyProgrammes || Object.values(studyProgrammes).length === 0) {
       setState({ query: initialQuery() })
-      props.getDegreesAndProgrammes()
+      props.getProgrammes()
     }
     if (!semesters.years) {
       props.getSemesters()
@@ -239,32 +239,23 @@ const PopulationSearchForm = props => {
           studyRights: {
             ...query.studyRights,
             studyTrack: null,
-            degree: null,
           },
         },
       })
       return
     }
 
-    // When changing year, remove degree and track selections
-    // if they are no longer possible to select
-    let { degree, studyTrack } = query.studyRights
-    if (degree || studyTrack) {
+    // When changing year, remove track selection, if it is no longer possible to select
+    let { studyTrack } = query.studyRights
+    if (studyTrack) {
       if (!query.studyRights.programme) {
-        degree = null
         studyTrack = null
       } else {
         const associations = studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()]
         if (!associations) {
-          degree = null
           studyTrack = null
-        } else {
-          if (!associations.degrees[query.studyRights.degree]) {
-            degree = null
-          }
-          if (!associations.studyTracks[query.studyRights.studyTrack]) {
-            studyTrack = null
-          }
+        } else if (!associations.studyTracks[query.studyRights.studyTrack]) {
+          studyTrack = null
         }
       }
     }
@@ -282,7 +273,6 @@ const PopulationSearchForm = props => {
         studyRights: {
           ...query.studyRights,
           studyTrack,
-          degree,
         },
       },
     })
@@ -307,23 +297,6 @@ const PopulationSearchForm = props => {
     const { year } = query
     const previousYear = momentFromFormat(year, YEAR_DATE_FORMAT).subtract(1, 'year')
     handleYearSelection(previousYear)
-  }
-
-  const handleDegreeChange = (e, { value }) => {
-    const degree = value
-    if (degree === '') {
-      handleClear('degree')
-      return
-    }
-    setState({
-      query: {
-        ...query,
-        studyRights: {
-          ...query.studyRights,
-          degree,
-        },
-      },
-    })
   }
 
   const handleStudyTrackChange = (e, { value }) => {
@@ -462,33 +435,13 @@ const PopulationSearchForm = props => {
     </Form.Field>
   )
 
-  const renderAdditionalDegreeOrStudyTrackOrTagDropdown = (
+  const renderAdditionalStudyTrackOrTagDropdown = (
     studyRights,
     studyTracksToRender,
-    degreesToRender,
     shouldRenderTags,
     tagOptions,
     chosenTag
   ) => {
-    const renderableDegrees = () => (
-      <>
-        <label>Degree (Optional)</label>
-        <Form.Dropdown
-          placeholder="Select degree"
-          search={textAndDescriptionSearch}
-          floating
-          selection
-          noResultsMessage="No selectable degrees"
-          value={studyRights.degree}
-          options={degreesToRender}
-          onChange={handleDegreeChange}
-          closeOnChange
-          clearable
-          selectOnBlur={false}
-          selectOnNavigation={false}
-        />
-      </>
-    )
     const renderableTracks = () => (
       <>
         <label>Study Track (Optional)</label>
@@ -511,10 +464,7 @@ const PopulationSearchForm = props => {
     if (studyRights.programme) {
       return (
         <Form.Group>
-          <Form.Field width={8}>
-            {shouldRenderTags ? renderTagDropdown(tagOptions, chosenTag) : null}
-            {degreesToRender && degreesToRender.length > 1 ? renderableDegrees() : null}
-          </Form.Field>
+          <Form.Field width={8}>{shouldRenderTags ? renderTagDropdown(tagOptions, chosenTag) : null}</Form.Field>
           <Form.Field width={8}>
             {studyTracksToRender && studyTracksToRender.length > 0 ? renderableTracks() : null}
           </Form.Field>
@@ -544,14 +494,10 @@ const PopulationSearchForm = props => {
       const sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name, language))
       programmesToRender = renderableList(sortedStudyProgrammes)
     }
-    let degreesToRender
     let studyTracksToRender
     if (studyRights.programme && validYearCheck(momentYear)) {
       const associations = studyProgrammes[studyRights.programme].enrollmentStartYears[momentYear.year()]
       if (associations) {
-        const sortedStudyDegrees = sortBy(associations.degrees, s => getTextIn(s.name, language))
-        degreesToRender = renderableList(sortedStudyDegrees)
-
         const sortedStudyTracks = sortBy(associations.studyTracks, s => getTextIn(s.name, language))
         studyTracksToRender = renderableList(sortedStudyTracks)
       }
@@ -564,10 +510,9 @@ const PopulationSearchForm = props => {
     return (
       <div>
         {renderStudyProgrammeDropdown(studyRights, programmesToRender)}
-        {renderAdditionalDegreeOrStudyTrackOrTagDropdown(
+        {renderAdditionalStudyTrackOrTagDropdown(
           studyRights,
           studyTracksToRender,
-          degreesToRender,
           shouldRenderTags,
           tagOptions,
           chosenTag
@@ -625,13 +570,12 @@ const PopulationSearchForm = props => {
 
 PopulationSearchForm.propTypes = {
   language: string.isRequired,
-  getDegreesAndProgrammes: func.isRequired,
+  getProgrammes: func.isRequired,
   getPopulationStatistics: func.isRequired,
   getPopulationCourses: func.isRequired,
   getMandatoryCourses: func.isRequired,
   queries: shape({}).isRequired,
   studyProgrammes: shape({}), //eslint-disable-line
-  degrees: arrayOf(dropdownType), //eslint-disable-line
   studyTracks: arrayOf(dropdownType), //eslint-disable-line
   setLoading: func.isRequired,
   pending: bool, //eslint-disable-line
@@ -646,14 +590,14 @@ PopulationSearchForm.propTypes = {
   clearPopulations: func.isRequired,
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationDegreesAndProgrammes, tags }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationProgrammes, tags }) => {
   const { language } = settings
-  const { pending } = populationDegreesAndProgrammes
+  const { pending } = populationProgrammes
   return {
     semesters: semesters.data,
     language,
     queries: populations.query || {},
-    studyProgrammes: populationDegreesAndProgrammes.data.programmes || {},
+    studyProgrammes: populationProgrammes.data.programmes || {},
     pending,
     tags: tags.data,
   }
@@ -665,7 +609,7 @@ export default withRouter(
     getPopulationCourses,
     getPopulationSelectedStudentCourses,
     getMandatoryCourses,
-    getDegreesAndProgrammes,
+    getProgrammes,
     setLoading,
     getSemesters,
     getTagsByStudytrackAction,

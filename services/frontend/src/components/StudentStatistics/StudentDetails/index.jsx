@@ -12,7 +12,7 @@ import { getSemesters } from '../../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
 import { getUserIsAdmin } from '../../../common'
 import { clearCourseStats } from '../../../redux/coursestats'
-import { getDegreesAndProgrammes } from '../../../redux/populationDegreesAndProgrammes'
+import { getProgrammes } from '../../../redux/populationProgrammes'
 import BachelorHonours from './BachelorHonours'
 import StudyrightsTable from './StudyrightsTable'
 import TagsTable from './TagsTable'
@@ -22,14 +22,14 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 
 const StudentDetails = ({
   student,
-  degreesAndProgrammes,
+  Programmes,
   studentNumber,
   getStudent,
   semesters,
   student: { semesterenrollments },
   resetStudent,
   removeStudentSelection,
-  getDegreesAndProgrammes,
+  getProgrammes,
   getSemesters,
   pending,
   error,
@@ -38,11 +38,10 @@ const StudentDetails = ({
 }) => {
   const { language } = useLanguage()
   const [graphYearStart, setGraphYear] = useState('')
-  const [degreename, setDegreename] = useState('')
   const [studyrightid, setStudyrightid] = useState('')
 
   useEffect(() => {
-    getDegreesAndProgrammes()
+    getProgrammes()
     getSemesters()
   }, [])
 
@@ -134,18 +133,14 @@ const StudentDetails = ({
   const handleStartDateChange = (elements, id) => {
     if (id === studyrightid) {
       setGraphYear('')
-      setDegreename('')
       setStudyrightid('')
       return
     }
 
-    const getTarget = () =>
-      elements.degree ||
-      sortBy(elements.programmes, 'startdate', ['desc'])[0] || { startdate: graphYearStart, name: degreename }
+    const getTarget = () => sortBy(elements.programmes, 'startdate', ['desc'])[0] || { startdate: graphYearStart }
 
-    const { startdate, name } = getTarget()
+    const { startdate } = getTarget()
     setGraphYear(startdate)
-    setDegreename(name)
     setStudyrightid(id)
   }
 
@@ -171,18 +166,14 @@ const StudentDetails = ({
       />
       <TagsTable student={student} language={language} />
       <StudyrightsTable
-        degreesAndProgrammes={degreesAndProgrammes}
+        Programmes={Programmes}
         student={student}
         language={language}
         handleStartDateChange={handleStartDateChange}
         showPopulationStatistics={showPopulationStatistics}
         studyrightid={studyrightid}
       />
-      <BachelorHonours
-        student={student}
-        programmes={degreesAndProgrammes.programmes || {}}
-        absentYears={getAbsentYears()}
-      />
+      <BachelorHonours student={student} programmes={Programmes.programmes || {}} absentYears={getAbsentYears()} />
       <CourseParticipationTable student={student} language={language} clearCourseStats={clearCourseStats} />
     </Segment>
   )
@@ -192,7 +183,7 @@ StudentDetails.propTypes = {
   getStudent: func.isRequired,
   resetStudent: func.isRequired,
   clearCourseStats: func.isRequired,
-  degreesAndProgrammes: shape({}).isRequired,
+  Programmes: shape({}).isRequired,
   removeStudentSelection: func.isRequired,
   studentNumber: string,
   student: shape({
@@ -224,7 +215,7 @@ StudentDetails.propTypes = {
   error: bool.isRequired,
   fetching: bool.isRequired,
   getSemesters: func.isRequired,
-  getDegreesAndProgrammes: func.isRequired,
+  getProgrammes: func.isRequired,
   semesters: shape({
     semesters: shape({}),
     years: shape({}),
@@ -239,7 +230,7 @@ StudentDetails.defaultProps = {
 const mapStateToProps = ({
   students,
   semesters,
-  populationDegreesAndProgrammes,
+  populationProgrammes,
   auth: {
     token: { roles },
   },
@@ -250,7 +241,7 @@ const mapStateToProps = ({
   semesters: semesters.data,
   fetching: students.fetching,
   isAdmin: getUserIsAdmin(roles),
-  degreesAndProgrammes: populationDegreesAndProgrammes.data || {},
+  Programmes: populationProgrammes.data || {},
 })
 
 const mapDispatchToProps = {
@@ -259,7 +250,7 @@ const mapDispatchToProps = {
   resetStudent,
   getStudent,
   getSemesters,
-  getDegreesAndProgrammes,
+  getProgrammes,
 }
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentDetails))

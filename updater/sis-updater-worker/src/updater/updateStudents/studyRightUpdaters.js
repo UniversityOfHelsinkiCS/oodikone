@@ -191,8 +191,6 @@ const updateStudyRightElements = async (
       }
     }
 
-    // we should probably map degree in a different manner since degree can be per many
-    // programmes and studytracks. Now the correct one might be overwritten later.
     return [
       {
         ...defaultProps,
@@ -307,7 +305,7 @@ const updateStudyRightElements = async (
   await bulkCreate(StudyrightElement, studyRightElements)
 }
 
-// Parse possible values for degrees, programmes and studytracks based on phases the student has been accepted to.
+// Parse possible values for programmes and studytracks based on phases the student has been accepted to.
 // If elements aren't updated, db doesn't have right elementdetail codes and adding studyrightelements to db fails.
 const updateElementDetails = async studyRights => {
   const groupedEducationPhases = studyRights.reduce(

@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 import { reformatDate, getTextIn } from '../../../common'
 
 const StudyrightsTable = ({
-  degreesAndProgrammes,
+  Programmes,
   student,
   language,
   handleStartDateChange,
@@ -18,7 +18,7 @@ const StudyrightsTable = ({
 }) => {
   if (!student) return null
 
-  const { programmes } = degreesAndProgrammes
+  const { programmes } = Programmes
   const programmeCodes = programmes ? Object.keys(programmes) : []
   const studyRightHeaders = ['Programme', 'Study Track', 'Graduated']
 
@@ -160,7 +160,7 @@ StudyrightsTable.defaultProps = {
 }
 
 StudyrightsTable.propTypes = {
-  degreesAndProgrammes: shape({}).isRequired,
+  Programmes: shape({}).isRequired,
   student: shape({}).isRequired,
   language: string.isRequired,
   handleStartDateChange: func.isRequired,

@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 
-const associationsSelector = state => state.populationDegreesAndProgrammesUnfiltered.data
+const associationsSelector = state => state.populationProgrammesUnfiltered.data
 
 const toOptions = elements =>
   !elements

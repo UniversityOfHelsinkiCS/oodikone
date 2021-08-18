@@ -8,7 +8,7 @@ import { getTextIn, getUserRoles, setMocking, textAndDescriptionSearch } from '.
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
 import { getFaculties } from '../../redux/faculties'
-import { getDegreesAndProgrammesUnfiltered } from '../../redux/populationDegreesAndProgrammesUnfiltered'
+import { getProgrammesUnfiltered } from '../../redux/populationProgrammesUnfiltered'
 import AccessRights from './AccessRights'
 import AccessGroups from './AccessGroups'
 import EmailNotification from './EmailNotification'
@@ -30,7 +30,7 @@ const UserPage = ({
   removeUserUnits,
   getAccessGroups,
   getFaculties,
-  getDegreesAndProgrammesUnfiltered,
+  getProgrammesUnfiltered,
 }) => {
   const { language } = useLanguage()
 
@@ -39,7 +39,7 @@ const UserPage = ({
     if (accessGroups.data.length === 0) getAccessGroups()
     if (faculties.length === 0) getFaculties()
     if (Object.keys(associations).length === 0 && !pending) {
-      getDegreesAndProgrammesUnfiltered()
+      getProgrammesUnfiltered()
     }
   }, [])
 
@@ -219,7 +219,7 @@ UserPage.propTypes = {
   removeUserUnits: func.isRequired,
   setFaculties: func.isRequired,
   goBack: func.isRequired,
-  getDegreesAndProgrammesUnfiltered: func.isRequired,
+  getProgrammesUnfiltered: func.isRequired,
   associations: shape({}).isRequired,
   pending: bool.isRequired,
   history: shape({
@@ -236,8 +236,8 @@ UserPage.propTypes = {
 const mapStateToProps = state => ({
   units: state.units.data,
   faculties: state.faculties.data,
-  associations: state.populationDegreesAndProgrammesUnfiltered.data,
-  pending: !!state.populationDegreesAndProgrammesUnfiltered.pending,
+  associations: state.populationProgrammesUnfiltered.data,
+  pending: !!state.populationProgrammesUnfiltered.pending,
   elementdetails: state.elementdetails.data,
   accessGroups: state.accessGroups,
   isAdmin: getUserRoles(state.auth.token.roles).includes('admin'),
@@ -246,7 +246,7 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   removeUserUnits,
   setFaculties,
-  getDegreesAndProgrammesUnfiltered,
+  getProgrammesUnfiltered,
   getAccessGroups,
   getFaculties,
   getElementDetails,

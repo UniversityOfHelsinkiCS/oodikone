@@ -249,7 +249,7 @@ class PopulationSearchHistory extends Component {
           <Form.Checkbox
             className="populationStatisticsRadio"
             key="TRANSFERRED"
-            label="Transferred from students"
+            label="Students who have transferred out of the programme"
             value="TRANSFERRED"
             name="studentStatusGroup"
             checked={studentStatuses.includes('TRANSFERRED')}
@@ -272,7 +272,7 @@ class PopulationSearchHistory extends Component {
     if (!units.data.programmes || !populations.query || !populations.data.students) {
       return null
     }
-    const { programme: programmeCode, degree: degreeCode, studyTrack: studyTrackCode } = populations.query.studyRights
+    const { programme: programmeCode, studyTrack: studyTrackCode } = populations.query.studyRights
 
     // I'm sorry about the awful layout fix but we are going to rework this whole area from ground up, so no point in wasting more time now.
     return (
@@ -284,11 +284,7 @@ class PopulationSearchHistory extends Component {
             population={populations.data}
             query={populations.query}
             queryId={0}
-            units={[
-              units.data.programmes[programmeCode],
-              units.data.degrees[degreeCode],
-              units.data.studyTracks[studyTrackCode],
-            ].filter(Boolean)}
+            units={[units.data.programmes[programmeCode], units.data.studyTracks[studyTrackCode]].filter(Boolean)}
             removeSampleFn={this.removePopulation}
             updating={populations.updating}
             tags={tags}
@@ -323,9 +319,9 @@ class PopulationSearchHistory extends Component {
   }
 }
 
-const mapStateToProps = ({ populations, populationDegreesAndProgrammes, tags }) => ({
+const mapStateToProps = ({ populations, populationProgrammes, tags }) => ({
   populations,
-  units: populationDegreesAndProgrammes,
+  units: populationProgrammes,
   tags: tags.data,
 })
 
