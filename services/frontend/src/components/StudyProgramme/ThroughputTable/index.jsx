@@ -1,6 +1,6 @@
-import React, { Fragment, useState } from 'react'
+import React, { useState } from 'react'
 import moment from 'moment'
-import { Header, Table, Grid, Icon, Label, Segment, Dropdown, Button, Modal, Popup } from 'semantic-ui-react'
+import { Header, Table, Icon, Label, Segment, Dropdown, Button, Modal, Popup } from 'semantic-ui-react'
 import { shape, number, arrayOf, bool, string, node } from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -106,7 +106,6 @@ const ThroughputTable = ({
   if (error) return <h1>Oh no so error {error}</h1>
 
   const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
-  const CANCELLED_FEATURE_TOGGLED_ON = userRoles.includes('admin')
 
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   genders.sort()
@@ -183,7 +182,7 @@ const ThroughputTable = ({
   }
 
   const renderStudentsHeader = () => {
-    let colSpan = 1
+    let colSpan = 4
     let rowSpan = 1
 
     if (renderGenders) colSpan += genders.length
@@ -208,27 +207,21 @@ const ThroughputTable = ({
   }
   return (
     <>
+      <div style={{ marginTop: '2em' }}>
+        <InfoBox content={infotooltips.PopulationOverview.Overview} />
+      </div>
       <Header>
-        <Grid columns={2}>
-          <Grid.Row>
-            <Grid.Column>
-              {studytrack ? `Population progress for selected studytrack` : 'Population progress'}
-              {throughput && (
-                <Header.Subheader data-cy="throughputUpdateStatus">
-                  {`Last updated ${
-                    throughput.lastUpdated ? moment(throughput.lastUpdated).format('HH:mm:ss MM-DD-YYYY') : 'unknown'
-                  }`}
-                  {throughput.status === 'RECALCULATING' && (
-                    <Label content="Recalculating! Refresh page in a few minutes" color="red" />
-                  )}
-                </Header.Subheader>
-              )}
-            </Grid.Column>
-            <Grid.Column>
-              <InfoBox content={infotooltips.PopulationOverview.Overview} />
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
+        {studytrack ? `Population progress for selected studytrack` : 'Population progress'}
+        {throughput && (
+          <Header.Subheader data-cy="throughputUpdateStatus">
+            {`Last updated ${
+              throughput.lastUpdated ? moment(throughput.lastUpdated).format('HH:mm:ss MM-DD-YYYY') : 'unknown'
+            }`}
+            {throughput.status === 'RECALCULATING' && (
+              <Label content="Recalculating! Refresh page in a few minutes" color="red" />
+            )}
+          </Header.Subheader>
+        )}
       </Header>
       <Segment basic loading={loading} style={{ overflowX: 'auto' }}>
         <Table celled structured compact striped selectable className="fixed-header">
@@ -236,25 +229,7 @@ const ThroughputTable = ({
             <Table.Row>
               <Table.HeaderCell rowSpan="2">{isStudytrackView ? 'Studytrack' : 'Year'}</Table.HeaderCell>
               {renderStudentsHeader()}
-              {headerCellPopUp(
-                'Started',
-                <Table.HeaderCell rowSpan="2" colSpan="1">
-                  Started
-                </Table.HeaderCell>
-              )}
-              {headerCellPopUp(
-                'Transferred',
-                <Table.HeaderCell rowSpan="2" colSpan="1">
-                  Transferred to
-                </Table.HeaderCell>
-              )}
-              {CANCELLED_FEATURE_TOGGLED_ON &&
-                headerCellPopUp(
-                  'Cancelled',
-                  <Table.HeaderCell rowSpan="2" colSpan="1">
-                    Cancelled
-                  </Table.HeaderCell>
-                )}
+
               {headerCellPopUp(
                 'Graduated',
                 <Table.HeaderCell colSpan={GRADUATED_FEATURE_TOGGLED_ON ? '3' : '1'}>Graduated</Table.HeaderCell>
@@ -270,7 +245,24 @@ const ThroughputTable = ({
                 <Table.HeaderCell key={gender} content={gender} />
               ))}
               {renderRatioOfFinns ? <Table.HeaderCell content="Finnish" /> : null}
-
+              {headerCellPopUp(
+                'Started',
+                <Table.HeaderCell rowSpan="2" colSpan="1">
+                  Started
+                </Table.HeaderCell>
+              )}
+              {headerCellPopUp(
+                'Transferred',
+                <Table.HeaderCell rowSpan="2" colSpan="1">
+                  Transferred to
+                </Table.HeaderCell>
+              )}
+              {headerCellPopUp(
+                'Cancelled',
+                <Table.HeaderCell rowSpan="2" colSpan="1">
+                  Cancelled
+                </Table.HeaderCell>
+              )}
               <Table.HeaderCell>Graduated overall</Table.HeaderCell>
               {GRADUATED_FEATURE_TOGGLED_ON && (
                 <>
@@ -316,7 +308,7 @@ const ThroughputTable = ({
                   {renderRatioOfFinns && ratioOfFinnsIn(year)}
                   <Table.Cell>{year.started}</Table.Cell>
                   <Table.Cell>{year.transferred}</Table.Cell>
-                  {CANCELLED_FEATURE_TOGGLED_ON && <Table.Cell>{year.cancelled}</Table.Cell>}
+                  <Table.Cell>{year.cancelled}</Table.Cell>
                   <Table.Cell>{year.graduated}</Table.Cell>
 
                   {GRADUATED_FEATURE_TOGGLED_ON && (
@@ -364,7 +356,7 @@ const ThroughputTable = ({
                 ) : null}
                 <Table.HeaderCell>{throughput.totals.started}</Table.HeaderCell>
                 <Table.HeaderCell>{throughput.totals.transferred}</Table.HeaderCell>
-                {CANCELLED_FEATURE_TOGGLED_ON && <Table.HeaderCell>{throughput.totals.cancelled}</Table.HeaderCell>}
+                <Table.HeaderCell>{throughput.totals.cancelled}</Table.HeaderCell>
                 <Table.HeaderCell>{throughput.totals.graduated}</Table.HeaderCell>
                 {GRADUATED_FEATURE_TOGGLED_ON && (
                   <>

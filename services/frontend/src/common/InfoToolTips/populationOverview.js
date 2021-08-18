@@ -1,8 +1,8 @@
 export default {
-  Overview: `Tämä koontisivu sisältää koulutusohjelman opiskelijoiden perustiedot lukuvuosittain.
-  
+  Overview: `Tämä koontisivu sisältää koulutusohjelman kaikkien opiskelijoiden perustiedot lukuvuosittain. Luvut perustuvat opinto-oikeuksiin kyseisessä ohjelmassa.
+
   Population progress:
-  Vuosittain ohjelmassa aloittaneet, ohjelman keskeyttäneet / peruneet sekä ohjelmaan tai siitä pois siirtyneet opiskelijat. 
+  Vuosittain ohjelmassa aloittaneet, ohjelman keskeyttäneet / peruneet sekä ohjelmaan siirtyneet opiskelijat. 
   Huomattavaa on, että sama opiskelija voi olla kahdessa luokassa, jos hän on esimerkiksi aloittanut opinnot jo, mutta keskeyttänyt ne lukuvuoden aikana.
   
   Yearly productivity:
@@ -13,7 +13,9 @@ export default {
   Started: `Koulutusohjelmassa kunakin lukuvuonna aloittaneet opiskelijat.`,
   Cancelled: `Koulutusohjelmaan oikeuttavan opinto-oikeutensa kunakin lukuvuonna peruttaneet`,
   Graduated: `Tiettynä lukuvuonna aloittaneista opiskelijoista on valmistunut`,
-  Transferred: `Koulutusohjelmaan tai siitä pois kyseisenä lukuvuonna siirtyneet opiskelijat`,
+  Transferred: `Koulutusohjelmaan kyseisenä lukuvuonna siirtyneet opiskelijat. 
+  
+  Vanhojen koulutusohjelmien lakkauttaminen aiheuttaa tavallista suuremmat siirtoluvut lukuvuodelle 2020-2021.`,
   Credits: `Kunakin vuonna aloittaneista opiskelijoista ne, jotka ovat ylittäneet tietyn opintopisterajapyykin`,
   Thesis: `Loppututkielman kirjoittaneiden määrä`,
 }
