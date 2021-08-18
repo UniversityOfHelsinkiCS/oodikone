@@ -4,6 +4,7 @@ export default {
   Population progress:
   Vuosittain ohjelmassa aloittaneet, ohjelman keskeyttäneet / peruneet sekä ohjelmaan siirtyneet opiskelijat. 
   Huomattavaa on, että sama opiskelija voi olla kahdessa luokassa, jos hän on esimerkiksi aloittanut opinnot jo, mutta keskeyttänyt ne lukuvuoden aikana.
+  Tarkemmat tiedot saat esille klikkaamalla nuolta kunkin lukuvuoden kohdalla.
   
   Yearly productivity:
   Koulutusohjelman kunakin kalenterivuonna tuottamat opintopisteet, valmistuneiden määrän, ohjelman pääaineopiskelijoiden
