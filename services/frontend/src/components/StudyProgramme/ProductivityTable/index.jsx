@@ -4,6 +4,8 @@ import { Table, Header, Grid, Label, Segment, Dropdown } from 'semantic-ui-react
 import { connect } from 'react-redux'
 import { shape, number, arrayOf, bool, string, oneOfType } from 'prop-types'
 import { getProductivity } from '../../../redux/productivity'
+import InfoBox from '../../InfoBox'
+import infotooltips from '../../../common/InfoToolTips'
 import './productivityTable.css'
 
 const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, newProgramme }) => {
@@ -59,6 +61,9 @@ const ProductivityTable = ({ productivity, thesis, loading, error, showCredits, 
 
   return (
     <>
+      <div style={{ marginTop: '2em' }}>
+        <InfoBox content={infotooltips.PopulationOverview.YearlyProductivity} />
+      </div>
       <Header>
         <Grid columns={2}>
           <Grid.Row>

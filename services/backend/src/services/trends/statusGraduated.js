@@ -56,7 +56,7 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
 
   const yearlyRange = diff => ({
     from: new Date(startTime - diff * Y_TO_MS),
-    to: new Date(unixMillis - diff * Y_TO_MS),
+    to: showByYear === 'true' ? new Date(startTime - (diff - 1) * Y_TO_MS) : new Date(unixMillis - diff * Y_TO_MS),
   })
 
   const totalRange = diff => ({
