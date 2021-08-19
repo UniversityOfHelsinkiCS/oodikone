@@ -3,7 +3,7 @@ name: "Release sis-updater-worker"
 on:
   push:
     branches:
-      - trunk
+      - master
     paths:
       - '.github/workflows/release-sis-updater-worker.yaml'
       - 'updater/sis-updater-worker/**'
