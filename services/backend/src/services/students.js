@@ -82,6 +82,7 @@ const byId = async id => {
   const mappedEnrollments = student.semester_enrollments.map(enrollment => ({
     ...enrollment.dataValues,
     name: semesters.find(sem => sem.semestercode === enrollment.semestercode).name,
+    yearname: semesters.find(sem => sem.semestercode === enrollment.semestercode).yearname,
   }))
 
   student.semester_enrollments = mappedEnrollments
@@ -181,7 +182,8 @@ const formatStudent = ({
 
   studyrights = studyrights || []
   semester_enrollments = semester_enrollments || []
-  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype, name }) => ({
+  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype, name, yearname }) => ({
+    yearname,
     name,
     semestercode,
     enrollmenttype,
