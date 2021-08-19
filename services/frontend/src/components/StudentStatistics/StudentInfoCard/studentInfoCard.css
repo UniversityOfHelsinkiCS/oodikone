@@ -10,3 +10,12 @@
 .controlIcon {
   cursor: pointer;
 }
+
+.enrollmentAccordion {
+  margin-bottom: 10px;
+}
+
+.enrollmentRow {
+  margin-left: 10px !important;
+  color: #565656 !important;
+}
