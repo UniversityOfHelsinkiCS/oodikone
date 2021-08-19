@@ -5,11 +5,11 @@ import PopulationCourseStatsFlat from '../../PopulationCourseStats/PopulationCou
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
 const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, error, showFilter }) => {
-  const { setCoursesOnce, resetCourses } = useCourseFilter()
+  const { setCourses, resetCourses } = useCourseFilter()
 
   useEffect(() => {
     if (!pending && !error && courses.coursestatistics) {
-      setCoursesOnce(courses.coursestatistics)
+      setCourses(courses.coursestatistics)
     }
   }, [courses])
 
