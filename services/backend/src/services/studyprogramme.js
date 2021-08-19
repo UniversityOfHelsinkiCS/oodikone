@@ -268,7 +268,17 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
   const year = 1950
   const startDate = `${year}-${semesterStart['FALL']}`
   const endDate = `${moment(new Date(), 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
-  const studentnumbers = await studentnumbersWithAllStudyrightElements([studytrack], startDate, endDate, false, true)
+  // This includes ALL students: exchange students, the ones that have transferred to program, the ones
+  // with non-degree studyright and the ones that have cancelled their studyright
+  const studentnumbers = await studentnumbersWithAllStudyrightElements(
+    [studytrack],
+    startDate,
+    endDate,
+    true, // exchange students
+    true, // cancelled students
+    true, // non-degree students
+    true // transferred to students
+  )
   const promises = [
     graduatedStatsForStudytrack(studytrack, since),
     productivityStatsForProvider(providercode, since),
@@ -430,22 +440,6 @@ const tranferredToStudyprogram = async (studentnumbers, startDate, studytrack, e
   })
 }
 
-const transferredFromStudyprogram = async (studentnumbers, startDate, studytrack, endDate) => {
-  return await Transfer.count({
-    where: {
-      studentnumber: {
-        [Op.in]: studentnumbers,
-      },
-      transferdate: {
-        [Op.between]: [startDate, endDate],
-      },
-      sourcecode: studytrack,
-    },
-    distinct: true,
-    col: 'studentnumber',
-  })
-}
-
 const formatCreditsForProductivity = credits => {
   return credits.map(formatCredit).reduce(function (acc, curr) {
     var key = curr['year']
@@ -522,7 +516,17 @@ const startedStudyright = async (studentnumbers, startDate, studytrack, endDate)
 
 const optionData = async (startDate, endDate, code, level) => {
   const programmes = await getAllProgrammes()
-  const students = await studentnumbersWithAllStudyrightElements([code], startDate, endDate, false, true)
+  // This includes ALL students: exchange students, the ones that have transferred to program, the ones
+  // with non-degree studyright and the ones that have cancelled their studyright
+  const students = await studentnumbersWithAllStudyrightElements(
+    [code],
+    startDate,
+    endDate,
+    true, // exchange students
+    true, // cancelled students
+    true, // non-degree students
+    true // transferred to students
+  )
 
   let graduated
   let currentExtent
@@ -643,7 +647,6 @@ const statsForClass = async (studentnumbers, startDate, studyprogramme, endDate)
     gendersFromClass(studentnumbers),
     tranferredToStudyprogram(studentnumbers, startDate, studyprogramme, endDate),
     nationalitiesFromClass(studentnumbers),
-    transferredFromStudyprogram(studentnumbers, startDate, studyprogramme, new Date()),
     cancelledStudyright(studentnumbers, startDate, studyprogramme, endDate),
     startedStudyright(studentnumbers, startDate, studyprogramme, endDate),
   ])
@@ -679,7 +682,6 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
     inTargetTime: 0,
     transferred: 0,
     nationalities: {},
-    transferredFrom: 0,
     cancelled: 0,
     started: 0,
   }
@@ -712,15 +714,17 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
           [studyprogramme, curr],
           startDate,
           endDate,
-          false,
-          true
+          true, // exchange students
+          true, // cancelled students
+          true, // non-degree students
+          true // transferred to students
         )
         const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
           studyprogramme,
           startDate,
           studentnumbers
         )
-        const [credits, graduated, theses, genders, transferredTo, nationalities, transferredFrom, cancelled, started] =
+        const [credits, graduated, theses, genders, transferredTo, nationalities, cancelled, started] =
           await statsForClass(studentnumbers, startDate, studyprogramme, endDate)
 
         delete genders[null]
@@ -753,7 +757,6 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
             inTargetTime: 0,
             transferred: 0,
             nationalities: {},
-            transferredFrom: 0,
             cancelled: 0,
             started: 0,
           }
@@ -782,7 +785,6 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
         stTotals[curr].medianGraduationTime = median(allGraduationTimes)
         stTotals[curr].inTargetTime = stTotals[curr].inTargetTime + inTargetTime
         stTotals[curr].transferred = stTotals[curr].transferred + transferredTo
-        stTotals[curr].transferredFrom += transferredFrom
         stTotals[curr].cancelled += cancelled
         stTotals[curr].started += started
         return {
@@ -800,7 +802,6 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
             creditValues,
             transferred: transferredTo,
             nationalities,
-            transferredFrom,
             cancelled,
             started,
           },
@@ -811,15 +812,17 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
         [studyprogramme],
         startDate,
         endDate,
-        false,
-        true
+        true, // exchange students
+        true, // cancelled students
+        true, // non-degree students
+        true // transferred to students
       )
       const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
         studyprogramme,
         startDate,
         studentnumbers
       )
-      const [credits, graduated, theses, genders, transferredTo, nationalities, transferredFrom, cancelled, started] =
+      const [credits, graduated, theses, genders, transferredTo, nationalities, cancelled, started] =
         await statsForClass(studentnumbers, startDate, studyprogramme, endDate)
       // theres so much shit in the data that transefferFrom doesnt rly mean anything
       delete genders[null]
@@ -857,7 +860,6 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
       totals.medianGraduationTime = median(allGraduationTimes)
       totals.inTargetTime = totals.inTargetTime + inTargetTime
       totals.transferred = totals.transferred + transferredTo
-      totals.transferredFrom += transferredFrom
       totals.cancelled += cancelled
       totals.started += started
       return {
@@ -873,7 +875,6 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
         creditValues,
         transferred: transferredTo,
         nationalities,
-        transferredFrom,
         cancelled,
         started,
         studytrackdata,

@@ -3,11 +3,9 @@ import PopulationOverview from './populationOverview'
 import CoolDataScience from './coolDataScience'
 import CourseStatistics from './courseStatistics'
 
-const infotooltips = {
+export default {
   PopulationStatistics,
   PopulationOverview,
   CoolDataScience,
   CourseStatistics,
 }
-
-export default infotooltips
