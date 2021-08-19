@@ -22,12 +22,12 @@ services:
       TOKEN_SECRET: IWannaBeTheVeryBest
       USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       USERSERVICE_URL: http://userservice:4567
-    image: toska/oodikone2-backend:trunk
+    image: toska/oodikone2-backend:staging
 
   frontend:
     <<: *defaults
     container_name: frontend
-    image: toska/oodikone2-frontend:trunk
+    image: toska/oodikone2-frontend:staging
 
   kone-db:
     <<: *defaults
@@ -61,7 +61,7 @@ services:
       DB_URL: postgres://postgres@user-db:5432/user-db
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       TOKEN_SECRET: IWannaBeTheVeryBest
-    image: toska/oodikone2-userservice:trunk
+    image: toska/oodikone2-userservice:staging
 
   nginx:
     image: nginx:latest
