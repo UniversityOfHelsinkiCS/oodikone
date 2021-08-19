@@ -9,6 +9,7 @@ import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants
 import './studentInfoCard.css'
 import { removeStudentSelection, resetStudent } from '../../../redux/students'
 import { callApi } from '../../../apiConnection'
+import EnrollmentAccordion from './EnrollmentAccordion'
 
 const StudentInfoCard = props => {
   const { student, showName, updating } = props
@@ -51,9 +52,10 @@ const StudentInfoCard = props => {
               {student.mismatch && '*There is difference between the total credits of this student in Oodi and Sisu'}
             </i>
           </p>
-          <p style={{ fontSize: 14 }}>{`Updated at ${formattedTimestamp}`}</p>
         </Card.Description>
         <div style={{ paddingTop: '4px' }}>
+          <EnrollmentAccordion semesterEnrollments={student.semesterenrollments} />
+          <p style={{ fontSize: 14 }}>{`Updated at ${formattedTimestamp}`}</p>
           <Button disabled={updating} compact size="medium" labelPosition="left" onClick={updateStudent}>
             <Icon loading={updating} name="refresh" />
             update student
