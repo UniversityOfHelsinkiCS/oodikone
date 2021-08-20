@@ -14,6 +14,10 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
 
   const groupedEnrollments = _.groupBy(semesterEnrollments, 'yearname')
 
+  const sortedKeys = Object.keys(groupedEnrollments).sort((a, b) => {
+    return groupedEnrollments[b][0].semestercode - groupedEnrollments[a][0].semestercode
+  })
+
   return (
     <div className={active ? 'enrollmentAccordion' : ''}>
       <Accordion>
@@ -31,17 +35,18 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {Object.keys(groupedEnrollments).map(key => {
+              {sortedKeys.map(key => {
                 const semester = groupedEnrollments[key]
-                return (
-                  <Table.Row>
+                const date = new Date()
+                return semester[0].startYear <= date.getFullYear() ? (
+                  <Table.Row key={key}>
                     <Table.Cell>{key}</Table.Cell>
 
                     <Table.Cell>{semester[0].enrollmenttype === 1 ? 'Present' : 'Absent'}</Table.Cell>
 
                     <Table.Cell>{semester[1].enrollmenttype === 1 ? 'Present' : 'Absent'}</Table.Cell>
                   </Table.Row>
-                )
+                ) : null
               })}
             </Table.Body>
           </Table>
