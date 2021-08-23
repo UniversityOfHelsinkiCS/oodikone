@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { Icon, Accordion } from 'semantic-ui-react'
-import { array, func } from 'prop-types'
+import { Icon, Accordion, Table } from 'semantic-ui-react'
+import { array } from 'prop-types'
+import _ from 'lodash'
 
 import './studentInfoCard.css'
 
@@ -11,7 +12,11 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
     setActive(!active)
   }
 
-  const sortedEnrollments = semesterEnrollments.sort((a, b) => b.semestercode - a.semestercode)
+  const groupedEnrollments = _.groupBy(semesterEnrollments, 'yearname')
+
+  const sortedKeys = Object.keys(groupedEnrollments).sort((a, b) => {
+    return groupedEnrollments[b][0].semestercode - groupedEnrollments[a][0].semestercode
+  })
 
   return (
     <div className={active ? 'enrollmentAccordion' : ''}>
@@ -21,11 +26,30 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
           Enrollments
         </Accordion.Title>
         <Accordion.Content active={active}>
-          {sortedEnrollments.map(enrollment => (
-            <p key={enrollment.semestercode} className="enrollmentRow">{`${enrollment.name.en} - ${
-              enrollment.enrollmenttype === 1 ? 'Present' : 'Absent'
-            }`}</p>
-          ))}
+          <Table celled>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Semester</Table.HeaderCell>
+                <Table.HeaderCell>Autumn</Table.HeaderCell>
+                <Table.HeaderCell>Spring</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {sortedKeys.map(key => {
+                const semester = groupedEnrollments[key]
+                const date = new Date()
+                return semester[0].startYear <= date.getFullYear() ? (
+                  <Table.Row key={key}>
+                    <Table.Cell>{key}</Table.Cell>
+
+                    <Table.Cell>{semester[0].enrollmenttype === 1 ? 'Present' : 'Absent'}</Table.Cell>
+
+                    <Table.Cell>{semester[1].enrollmenttype === 1 ? 'Present' : 'Absent'}</Table.Cell>
+                  </Table.Row>
+                ) : null
+              })}
+            </Table.Body>
+          </Table>
         </Accordion.Content>
       </Accordion>
     </div>
@@ -34,7 +58,6 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
 
 EnrollmentAccordion.propTypes = {
   semesterEnrollments: array.isRequired,
-  sort: func.isRequired,
 }
 
 export default EnrollmentAccordion
