@@ -10,3 +10,7 @@
 .controlIcon {
   cursor: pointer;
 }
+
+.enrollmentAccordion {
+  margin-bottom: 10px;
+}

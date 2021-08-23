@@ -11,6 +11,7 @@ const {
   StudyrightElement,
   ElementDetail,
   SemesterEnrollment,
+  Semester,
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
@@ -75,6 +76,21 @@ const byId = async id => {
       },
     },
   })
+
+  const semesters = await Semester.findAll()
+
+  const mappedEnrollments = student.semester_enrollments.map(enrollment => {
+    const semester = semesters.find(sem => sem.semestercode === enrollment.semestercode)
+    return {
+      ...enrollment.dataValues,
+      name: semester.name,
+      yearname: semester.yearname,
+      startYear: semester.startYear,
+    }
+  })
+
+  student.semester_enrollments = mappedEnrollments
+
   student.tags = tags.map(t => ({
     ...t.get(),
     programme: tagprogrammes.find(p => p.code === t.tag.studytrack),
@@ -170,10 +186,15 @@ const formatStudent = ({
 
   studyrights = studyrights || []
   semester_enrollments = semester_enrollments || []
-  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype }) => ({
-    semestercode,
-    enrollmenttype,
-  }))
+  const semesterenrollments = semester_enrollments.map(
+    ({ semestercode, enrollmenttype, name, yearname, startYear }) => ({
+      yearname,
+      name,
+      startYear,
+      semestercode,
+      enrollmenttype,
+    })
+  )
 
   const courseByDate = (a, b) => {
     return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1
