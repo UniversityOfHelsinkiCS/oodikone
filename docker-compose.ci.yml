@@ -13,6 +13,7 @@ services:
       - redis
       - sis-db
     environment:
+      CI: "true"
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:1337
       REDIS: redis
@@ -27,6 +28,8 @@ services:
   frontend:
     <<: *defaults
     container_name: frontend
+    environment:
+      REACT_APP_CI: "true"
     image: toska/oodikone2-frontend:staging
 
   kone-db:
