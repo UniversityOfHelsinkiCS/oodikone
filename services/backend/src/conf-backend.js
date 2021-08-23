@@ -1,4 +1,18 @@
+// Node env to use
 const isTest = process.env.NODE_ENV === 'test'
+const isStaging = process.env.NODE_ENV === 'staging'
+
+// Sentry
+const sentryRelease = process.env.SENTRY_RELEASE || ''
+const sentryEnvironment = process.env.SENTRY_ENVIRONMENT || ''
+const runningInCI = process.env.CI === 'true'
+
+// IAM group
+const requiredGroup = isStaging
+  ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
+  : ['grp-oodikone-users', 'grp-oodikone-basic-users']
+
+// Other stuff
 const DB_URL_KONE = process.env.DB_URL_KONE
 
 let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
@@ -33,14 +47,6 @@ const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
 
 const ACCESS_TOKEN_HEADER_KEY = 'x-access-token'
 
-const isStaging = process.env.NODE_ENV === 'staging'
-
-const runningInCI = process.env.CI === 'true'
-
-const requiredGroup = isStaging
-  ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
-  : ['grp-oodikone-users', 'grp-oodikone-basic-users']
-
 module.exports = {
   frontend_addr,
   DB_URL_KONE,
@@ -63,4 +69,6 @@ module.exports = {
   MATOMO_SITE_ID,
   MATOMO_URL: MATOMO_URL && addSlashToEnd(MATOMO_URL),
   runningInCI,
+  sentryRelease,
+  sentryEnvironment,
 }
