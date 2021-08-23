@@ -12,10 +12,8 @@ const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT || ''
 const SENTRY_RELEASE = process.env.SENTRY_ENVIRONMENT || ''
 
 const initializeSentry = () => {
-  console.log('Are we running in CI??', runningInCI)
   if (!SENTRY_ENVIRONMENT || !SENTRY_RELEASE || runningInCI) return
 
-  console.log('OKAY, Initializing sentry')
   Sentry.init({
     dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
     environment: SENTRY_ENVIRONMENT,

@@ -5,7 +5,7 @@ const isDev = process.env.NODE_ENV === 'development'
 // Sentry
 const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE || ''
 const SENTRY_ENVIRONMENT = process.env.REACT_APP_SENTRY_ENVIRONMENT || ''
-const runningInCI = process.env.REACT_APP_CI === 'true'
+const runningInCypress = !!window.Cypress
 
 // Adminer is only used in dev mode, imo hardcoding this url here is ok.
 const adminerBaseUrl = 'http://localhost:5050'
@@ -26,7 +26,7 @@ module.exports = {
   basePath,
   apiBasePath,
   builtAt,
-  runningInCI,
+  runningInCypress,
   SENTRY_RELEASE,
   SENTRY_ENVIRONMENT,
 }
