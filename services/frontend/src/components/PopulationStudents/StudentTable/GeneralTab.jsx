@@ -3,6 +3,7 @@ import { shape, bool, string, arrayOf } from 'prop-types'
 import { Item, Icon, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { flatten } from 'lodash'
+import moment from 'moment'
 import { connect } from 'react-redux'
 import SortableTable from '../../SortableTable'
 import {
@@ -255,7 +256,8 @@ const GeneralTab = ({
       getRowVal: s => {
         const grade = s.courses.filter(c => coursecode.includes(c.course_code))
         if (grade) {
-          return grade[grade.length - 1].grade
+          grade.sort((a, b) => (moment(a.date).isBefore(b.date) ? 1 : -1))
+          return grade[0].grade
         }
         return ''
       },
