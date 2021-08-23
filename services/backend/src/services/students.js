@@ -79,10 +79,15 @@ const byId = async id => {
 
   const semesters = await Semester.findAll()
 
-  const mappedEnrollments = student.semester_enrollments.map(enrollment => ({
-    ...enrollment.dataValues,
-    name: semesters.find(sem => sem.semestercode === enrollment.semestercode).name,
-  }))
+  const mappedEnrollments = student.semester_enrollments.map(enrollment => {
+    const semester = semesters.find(sem => sem.semestercode === enrollment.semestercode)
+    return {
+      ...enrollment.dataValues,
+      name: semester.name,
+      yearname: semester.yearname,
+      startYear: semester.startYear,
+    }
+  })
 
   student.semester_enrollments = mappedEnrollments
 
@@ -181,11 +186,15 @@ const formatStudent = ({
 
   studyrights = studyrights || []
   semester_enrollments = semester_enrollments || []
-  const semesterenrollments = semester_enrollments.map(({ semestercode, enrollmenttype, name }) => ({
-    name,
-    semestercode,
-    enrollmenttype,
-  }))
+  const semesterenrollments = semester_enrollments.map(
+    ({ semestercode, enrollmenttype, name, yearname, startYear }) => ({
+      yearname,
+      name,
+      startYear,
+      semestercode,
+      enrollmenttype,
+    })
+  )
 
   const courseByDate = (a, b) => {
     return moment(a.attainment_date).isSameOrBefore(b.attainment_date) ? -1 : 1

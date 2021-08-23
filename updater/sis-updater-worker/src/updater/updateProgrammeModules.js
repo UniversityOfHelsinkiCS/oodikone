@@ -58,14 +58,28 @@ async function moduleResolver(rule, n) {
   if (mod.type == 'StudyModule') {
     const result = await resolver(mod.rule, n)
     if (mod.code.slice(0, 3) === 'KK-') return null
-    const moduleCourses = { id: mod.group_id, code: mod.code, name: mod.name, type: 'module', children: result }
+    const moduleCourses = {
+      id: mod.group_id,
+      code: mod.code,
+      name: mod.name,
+      type: 'module',
+      study_level: mod.study_level,
+      children: result,
+    }
     return moduleCourses
   }
 
   if (mod.type == 'GroupingModule') {
     const module = await moduleRuleResolver(mod, n)
     if (superFlatten) return customFlatten(module)
-    return { id: mod.group_id, code: mod.code, name: mod.name, type: 'module', children: module }
+    return {
+      id: mod.group_id,
+      code: mod.code,
+      name: mod.name,
+      type: 'module',
+      study_level: mod.study_level,
+      children: module,
+    }
   }
 
   return {
@@ -93,6 +107,7 @@ async function courseResolver(rule) {
     id: course.group_id,
     code: course.code,
     name: course.name,
+    study_level: course.study_level,
     type: 'course',
   }
 }
@@ -138,6 +153,11 @@ const recursiveWrite = async (module, parentId) => {
     code: module.code,
     name: module.name,
     type: module.type,
+    studyLevel: module.study_level,
+  }
+  if (module.type !== 'course') {
+    console.log('new module', newModule)
+    console.log('new modules orig details', module)
   }
 
   let join = {
@@ -168,6 +188,7 @@ const updateProgrammeModules = async (entityIds = []) => {
       code: module.code,
       name: module.name,
       type: 'module',
+      studyLevel: module.study_level,
     }
     programmes[module.group_id] = topModule
     const submodule = await resolver(module.rule)

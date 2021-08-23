@@ -21,6 +21,9 @@ ProgrammeModule.init(
     order: {
       type: INTEGER,
     },
+    studyLevel: {
+      type: STRING,
+    },
     createdAt: {
       type: DATE,
     },
