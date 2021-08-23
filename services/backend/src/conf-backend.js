@@ -35,6 +35,8 @@ const ACCESS_TOKEN_HEADER_KEY = 'x-access-token'
 
 const isStaging = process.env.NODE_ENV === 'staging'
 
+const runningInCI = process.env.CI === 'true'
+
 const requiredGroup = isStaging
   ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
   : ['grp-oodikone-users', 'grp-oodikone-basic-users']
@@ -60,4 +62,5 @@ module.exports = {
   ANALYTICS_INFLUXDB_DB,
   MATOMO_SITE_ID,
   MATOMO_URL: MATOMO_URL && addSlashToEnd(MATOMO_URL),
+  runningInCI,
 }
