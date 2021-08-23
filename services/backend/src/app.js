@@ -5,21 +5,9 @@ const Sentry = require('@sentry/node')
 const conf = require('./conf-backend')
 const routes = require('./routes')
 const { startCron } = require('./events')
-const { PORT, runningInCI } = conf
+const { PORT } = conf
 const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
-
-const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT || ''
-const SENTRY_RELEASE = process.env.SENTRY_ENVIRONMENT || ''
-
-const initializeSentry = () => {
-  if (!SENTRY_ENVIRONMENT || !SENTRY_RELEASE || runningInCI) return
-
-  Sentry.init({
-    dsn: 'https://020b79f0cbb14aad94cc9d69a1ea9d52@sentry.cs.helsinki.fi/2',
-    environment: SENTRY_ENVIRONMENT,
-    release: SENTRY_RELEASE,
-  })
-}
+const { initializeSentry } = require('./util/sentry')
 
 initializeDatabaseConnection()
   .then(() => {
@@ -34,8 +22,9 @@ initializeDatabaseConnection()
     })
 
     const app = express()
-    initializeSentry()
+    initializeSentry(app)
     app.use(Sentry.Handlers.requestHandler())
+    app.use(Sentry.Handlers.tracingHandler())
 
     startCron()
 
