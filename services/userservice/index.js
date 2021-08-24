@@ -5,7 +5,7 @@ const User = require('./src/services/users')
 const AccessGroup = require('./src/services/accessgroups')
 const FacultyProgrammes = require('./src/services/facultyprogrammes')
 const { initializeDatabaseConnection } = require('./src/database/connection')
-const { initializeSentry } = require('./src/util/sentry')
+const initializeSentry = require('./src/util/sentry')
 
 initializeDatabaseConnection()
   .then(() => {
