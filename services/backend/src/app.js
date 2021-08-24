@@ -7,7 +7,7 @@ const routes = require('./routes')
 const { startCron } = require('./events')
 const { PORT } = conf
 const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
-const { initializeSentry } = require('./util/sentry')
+const initializeSentry = require('./util/sentry')
 
 initializeDatabaseConnection()
   .then(() => {
