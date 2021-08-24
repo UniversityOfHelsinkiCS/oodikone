@@ -10,7 +10,8 @@ import useAnalytics from '../useAnalytics'
 const AdmissionType = ({ code }) => {
   const { addFilter, removeFilter, activeFilters, withoutFilter } = useFilters()
   const analytics = useAnalytics()
-  const [value, setValue] = useState(null)
+  // Using undefined as default, since students can be filtered with null value
+  const [value, setValue] = useState(undefined)
   const name = 'admissionTypeFilter'
 
   // Naming follows convention from SIS API (e.g urn:code:admissiont-type:m for "Muu")
@@ -21,10 +22,14 @@ const AdmissionType = ({ code }) => {
     AV: 'Avoin väylä',
     KP: 'Koepisteet',
     YP: 'Yhteispisteet',
+    N: null,
   }
 
-  const filterFunction = value => student =>
-    student.studyrights.some(sr => sr.studyright_elements.some(e => e.code === code) && value === sr.admission_type)
+  const filterFunction = value => student => {
+    return value === 'Ei valintatapaa'
+      ? student.studyrights.some(sr => sr.studyright_elements.some(e => e.code === code) && !sr.admission_type)
+      : student.studyrights.some(sr => sr.studyright_elements.some(e => e.code === code) && value === sr.admission_type)
+  }
 
   useEffect(() => {
     if (!value) {
@@ -38,11 +43,14 @@ const AdmissionType = ({ code }) => {
 
   const count = admissionType => withoutFilter(name).filter(filterFunction(admissionType)).length
 
-  const options = Object.entries(admissionTypes).map(([key, admissionType]) => ({
-    key,
-    text: `${admissionType} (${count(admissionType)})`,
-    value: admissionType,
-  }))
+  const options = Object.entries(admissionTypes).map(([key, admissionType]) => {
+    const value = admissionType || 'Ei valintatapaa'
+    return {
+      key,
+      text: `${value} (${count(admissionType)})`,
+      value,
+    }
+  })
 
   return (
     <FilterCard
