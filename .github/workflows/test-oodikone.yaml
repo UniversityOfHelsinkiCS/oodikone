@@ -548,7 +548,10 @@ jobs:
           url_prefix: '~/oodikone/static/js'
           version: ${{ github.sha }}
       - name: "Push to docker hub"
-        run: docker-compose --file docker-compose.ci.yml push
+        run: |
+          docker push toska/oodikone2-backend:staging
+          docker push toska/oodikone2-frontend:staging
+          docker push toska/oodikone2-userservice:staging
       - name: "Send deployment success notification to slack"
         if: success()
         uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
