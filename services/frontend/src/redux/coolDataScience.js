@@ -14,10 +14,10 @@ export const getProtoCProgramme = ({ includeOldAttainments, excludeNonEnrolled, 
   return callController(route, prefix, [], 'get', null, params)
 }
 
-export const getStatus = ({ date, showByYear }) => {
+export const getStatus = ({ date, showByYear, showByStudents }) => {
   const route = '/cool-data-science/status'
   const prefix = 'GET_STATUS_'
-  const params = { date, showByYear }
+  const params = { date, showByYear, showByStudents }
   return callController(route, prefix, [], 'get', null, params)
 }
 
