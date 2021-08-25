@@ -1,7 +1,5 @@
 const axios = require('axios')
-
-const inProduction = process.env.NODE_ENV === 'production'
-const pateToken = process.env.PATE_API_TOKEN || ''
+const { isProduction, pateToken } = require('../conf-backend')
 
 const pateClient = axios.create({
   baseURL: 'https://pate.toska.cs.helsinki.fi',
@@ -21,7 +19,7 @@ const baseSettings = {
 }
 
 const sendEmail = async (options = {}) => {
-  if (!inProduction) {
+  if (!isProduction) {
     const errorMessage = 'Skipped sending email in non-production environment'
     console.log(errorMessage, options)
     return { error: errorMessage }

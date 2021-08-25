@@ -61,30 +61,28 @@ const initializeDatabaseConnection = async () => {
       await sleep(1000)
     }
   }
-  if (!conf.isTest) {
-    try {
-      const migrator = new Umzug({
-        storage: 'sequelize',
-        storageOptions: {
-          sequelize: sequelizeKone,
-          tableName: 'migrations',
-          schema: conf.DB_SCHEMA_KONE,
-        },
-        logging: console.log,
-        migrations: {
-          params: [sequelizeKone.getQueryInterface(), Sequelize],
-          path: `${process.cwd()}/src/database/migrations_kone`,
-          pattern: /\.js$/,
-          schema: conf.DB_SCHEMA_KONE,
-        },
-      })
-      const migrations = await migrator.up()
+  try {
+    const migrator = new Umzug({
+      storage: 'sequelize',
+      storageOptions: {
+        sequelize: sequelizeKone,
+        tableName: 'migrations',
+        schema: conf.DB_SCHEMA_KONE,
+      },
+      logging: console.log,
+      migrations: {
+        params: [sequelizeKone.getQueryInterface(), Sequelize],
+        path: `${process.cwd()}/src/database/migrations_kone`,
+        pattern: /\.js$/,
+        schema: conf.DB_SCHEMA_KONE,
+      },
+    })
+    const migrations = await migrator.up()
 
-      console.log('Kone Migrations up to date', migrations)
-    } catch (e) {
-      console.log('Kone Migration error')
-      throw e
-    }
+    console.log('Kone Migrations up to date', migrations)
+  } catch (e) {
+    console.log('Kone Migration error')
+    throw e
   }
 }
 

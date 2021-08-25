@@ -10,7 +10,7 @@ if (process.env.LOG_PORT && process.env.LOG_HOST) {
       host: process.env.LOG_HOST,
       port: process.env.LOG_PORT,
       protocol: process.env.LOG_PROTOCOL || 'https',
-      environment: process.env.NODE_ENV,
+      environment: 'production',
       protocolOptions: {
         path: process.env.LOG_PATH || '/gelf',
       },
@@ -18,9 +18,7 @@ if (process.env.LOG_PORT && process.env.LOG_HOST) {
   )
 }
 
-if (process.env.NODE_ENV !== 'test') {
-  transports.push(new winston.transports.File({ filename: 'debug.log' }))
-}
+transports.push(new winston.transports.File({ filename: 'debug.log' }))
 
 transports.push(new winston.transports.Console({ level: 'debug' }))
 

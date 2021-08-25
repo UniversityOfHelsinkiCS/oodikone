@@ -1,6 +1,7 @@
 // Node env to use
-const isTest = process.env.NODE_ENV === 'test'
 const isStaging = process.env.NODE_ENV === 'staging'
+const isDev = process.env.NODE_ENV === 'development'
+const isProduction = process.env.NODE_ENV === 'production'
 
 // Sentry
 const sentryRelease = process.env.SENTRY_RELEASE || ''
@@ -11,6 +12,14 @@ const runningInCI = process.env.CI === 'true'
 const requiredGroup = isStaging
   ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
   : ['grp-oodikone-users', 'grp-oodikone-basic-users']
+
+// Pate
+const pateToken = process.env.PATE_API_TOKEN || ''
+
+// Networking: Urls & ports
+const baseUrl = isDev ? '/api' : ''
+const frontUrl = process.env.FRONT_URL
+const backendPort = 8080
 
 // Other stuff
 const DB_URL_KONE = process.env.DB_URL_KONE
@@ -24,14 +33,12 @@ if (DB_MAX_CRON_CONNECTIONS < 1) {
   DB_MAX_CRON_CONNECTIONS = 1
 }
 
-const frontend_addr = process.env.FRONT_URL
 const redis = process.env.REDIS
 const TOKEN_SECRET = process.env.TOKEN_SECRET
 const SECRET_TOKEN = process.env.SECRET_TOKEN
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
 const USERSERVICE_URL = process.env.USERSERVICE_URL
 const SIS_UPDATER_URL = process.env.SIS_UPDATER_URL
-const PORT = isTest ? 8079 : 8080
 const ANALYTICS_INFLUXDB_URL = process.env.ANALYTICS_INFLUXDB_URL
 const ANALYTICS_INFLUXDB_USER = process.env.ANALYTICS_INFLUXDB_USER
 const ANALYTICS_INFLUXDB_PASSWORD = process.env.ANALYTICS_INFLUXDB_PASSWORD
@@ -48,7 +55,6 @@ const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
 const ACCESS_TOKEN_HEADER_KEY = 'x-access-token'
 
 module.exports = {
-  frontend_addr,
   DB_URL_KONE,
   DB_MAX_CONNECTIONS,
   DB_MAX_CRON_CONNECTIONS,
@@ -58,9 +64,7 @@ module.exports = {
   DB_SCHEMA_KONE,
   USERSERVICE_URL: formatURL(USERSERVICE_URL),
   ACCESS_TOKEN_HEADER_KEY,
-  PORT,
   requiredGroup,
-  isTest,
   SIS_UPDATER_URL,
   ANALYTICS_INFLUXDB_URL: formatURL(ANALYTICS_INFLUXDB_URL),
   ANALYTICS_INFLUXDB_USER,
@@ -71,4 +75,9 @@ module.exports = {
   runningInCI,
   sentryRelease,
   sentryEnvironment,
+  isProduction,
+  pateToken,
+  baseUrl,
+  frontUrl,
+  backendPort,
 }
