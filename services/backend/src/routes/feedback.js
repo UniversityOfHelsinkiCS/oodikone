@@ -13,14 +13,11 @@ router.post('/email', async (req, res) => {
     userEmail: email,
     userFullName: full_name,
   })
-  if (!result) {
-    const errorMessage = 'Error occured when sending email'
-    console.log(errorMessage)
-    res.status(400).json(errorMessage).end()
-  } else {
-    console.log('Message sent succesfully!')
-    res.status(200).json('success').end()
+  if (result.error) {
+    return res.status(400).json(result).end()
   }
+  console.log('Message sent succesfully!')
+  res.status(200).json('success').end()
 })
 
 module.exports = router
