@@ -14,7 +14,12 @@ router.post('/login', async (req, res) => {
 
       console.log(uid, 'trying to login, referring to userservice.')
       let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail)
-      isNew && sendNotificationAboutNewUser({ userId: uid, userFullName: full_name })
+      if (isNew) {
+        const result = await sendNotificationAboutNewUser({ userId: uid, userFullName: full_name })
+        if (result.error) {
+          return res.status(400).json(result).end()
+        }
+      }
       res.status(200).json({ token })
     } else {
       res
