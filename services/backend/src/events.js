@@ -20,6 +20,7 @@ const {
   patchNonGraduatedStudents,
 } = require('./services/analyticsService')
 const { isNewHYStudyProgramme } = require('./util')
+const { isProduction } = require('./conf-backend')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -207,7 +208,7 @@ const refreshTrends = async () => {
 }
 
 const startCron = () => {
-  if (process.env.NODE_ENV === 'production') {
+  if (isProduction) {
     schedule('0 6 * * *', async () => {
       await refreshStatistics()
       await refreshTrends()
