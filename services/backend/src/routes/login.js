@@ -1,23 +1,7 @@
 const router = require('express').Router()
-const mailservice = require('../services/mailservice')
 const userService = require('../services/userService')
 const { parseHyGroups } = require('../util/utils')
-
-const sendEmail = async uid => {
-  if (process.env.SMTP !== undefined) {
-    const message = mailservice.message1(uid)
-    await mailservice.transporter.sendMail(message, error => {
-      if (error) {
-        console.log('Error occurred')
-        console.log(error.message)
-      } else {
-        console.log('Message sent successfully!')
-      }
-      // only needed when using pooled connections
-      mailservice.transporter.close()
-    })
-  }
-}
+const { sendNotificationAboutNewUser } = require('../services/mailservice')
 
 router.post('/login', async (req, res) => {
   try {
@@ -30,7 +14,7 @@ router.post('/login', async (req, res) => {
 
       console.log(uid, 'trying to login, referring to userservice.')
       let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail)
-      isNew && sendEmail(uid)
+      isNew && sendNotificationAboutNewUser({ userId: uid, userFullName: full_name })
       res.status(200).json({ token })
     } else {
       res

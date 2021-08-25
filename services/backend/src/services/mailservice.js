@@ -51,6 +51,27 @@ const sendFeedbackToToska = ({ feedbackContent, userId, userEmail, userFullName 
   })
 }
 
+const sendNotificationAboutNewUser = ({ userId, userFullName }) =>
+  sendEmail({
+    template: {
+      from: 'Oodikone Robot',
+    },
+    emails: [
+      {
+        to: 'Toska <grp-toska@helsinki.fi>',
+        subject: 'New user in Oodikone ✔',
+        text: `${userFullName} (${userId}) just logged into Oodikone for the first time!`,
+      },
+    ],
+    settings: {
+      hideToska: true,
+      disableToska: true,
+      color: 'orange',
+      header: 'Sent by Oodikone',
+      dryrun: false,
+    },
+  })
+
 const nodemailer = require('nodemailer')
 
 // NB! Store the account object values somewhere if you want
@@ -71,22 +92,6 @@ const transporter = nodemailer.createTransport(
   }
 )
 
-const message1 = user => {
-  return {
-    to: 'Toska <grp-toska@helsinki.fi>',
-    subject: 'New user in Oodikone ✔',
-    text: `${user} just logged into oodikone for the first time!`,
-    html: `<p>${user} just logged into oodikone for the first time! </p><br />
-          <img src="cid:toskalogoustcid"/>`,
-    attachments: [
-      {
-        filename: 'toska.png',
-        path: `${process.cwd()}/assets/toska.png`,
-        cid: 'toskalogoustcid',
-      },
-    ],
-  }
-}
 const message2 = email => {
   return {
     to: [email, 'grp-toska@helsinki.fi'],
@@ -113,4 +118,4 @@ const message2 = email => {
   }
 }
 
-module.exports = { transporter, message1, message2, sendFeedbackToToska }
+module.exports = { transporter, message2, sendFeedbackToToska, sendNotificationAboutNewUser }
