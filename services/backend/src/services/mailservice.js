@@ -1,3 +1,56 @@
+const axios = require('axios')
+
+const inProduction = process.env.NODE_ENV === 'production'
+const pateToken = process.env.PATE_API_TOKEN || ''
+
+const pateClient = axios.create({
+  baseURL: 'https://pate.toska.cs.helsinki.fi',
+  params: {
+    token: pateToken,
+  },
+})
+
+const sendEmail = async (options = {}) => {
+  if (!inProduction) {
+    console.log('Skipped sending email in non-production environment', options)
+    return null
+  }
+
+  if (!pateToken) {
+    console.log('Skipped sending email since pate token was not available', options)
+    return null
+  }
+
+  const { data } = await pateClient.post('/', options)
+
+  return data
+}
+
+const sendFeedbackToToska = ({ feedbackContent, userId, userEmail, userFullName }) => {
+  const userDetails = `Sent by ${userFullName}, userid: ${userId}, email: ${userEmail}`
+  const text = [feedbackContent, userDetails].join('<br />')
+  return sendEmail({
+    template: {
+      from: 'Oodikone Robot',
+    },
+    emails: [
+      {
+        to: 'Toska <grp-toska@helsinki.fi>',
+        replyTo: userEmail,
+        subject: `Oodikone feedback from ${userFullName}`,
+        text,
+      },
+    ],
+    settings: {
+      hideToska: true,
+      disableToska: true,
+      color: 'orange',
+      header: 'Sent by Oodikone',
+      dryrun: false,
+    },
+  })
+}
+
 const nodemailer = require('nodemailer')
 
 // NB! Store the account object values somewhere if you want
@@ -59,23 +112,5 @@ const message2 = email => {
     <img style="max-width: 13.5%;height: auto;" src="https://i.imgur.com/tnNDAJk.png" /> `,
   }
 }
-const feedback = (content, user, email, full_name) => {
-  return {
-    to: 'Toska <grp-toska@helsinki.fi>',
-    replyTo: email,
-    subject: 'New message from Oodikone feedback',
-    text: `New message from user ${user}`,
-    html: `${content}
-    <p>sent by ${full_name}, userid: ${user}, email: ${email}</p>
-    <img src="cid:toskalogoustcid"/>`,
-    attachments: [
-      {
-        filename: 'toska.png',
-        path: `${process.cwd()}/assets/toska.png`,
-        cid: 'toskalogoustcid',
-      },
-    ],
-  }
-}
 
-module.exports = { transporter, message1, message2, feedback }
+module.exports = { transporter, message1, message2, sendFeedbackToToska }
