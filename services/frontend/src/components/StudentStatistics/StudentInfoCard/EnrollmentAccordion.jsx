@@ -5,6 +5,16 @@ import _ from 'lodash'
 
 import './studentInfoCard.css'
 
+const getEnrollmentStatus = (semester, season) => {
+  if (semester.name.en.includes('Spring') && season === 'SPRING') {
+    return semester.enrollmenttype === 1 ? 'Present' : 'Absent'
+  }
+  if (semester.name.en.includes('Autumn') && season === 'FALL') {
+    return semester.enrollmenttype === 1 ? 'Present' : 'Absent'
+  }
+  return 'Absent'
+}
+
 const EnrollmentAccordion = ({ semesterEnrollments }) => {
   const [active, setActive] = useState(false)
 
@@ -42,9 +52,13 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
                   <Table.Row key={key}>
                     <Table.Cell>{key}</Table.Cell>
 
-                    <Table.Cell>{semester[0].enrollmenttype === 1 ? 'Present' : 'Absent'}</Table.Cell>
+                    <Table.Cell>{getEnrollmentStatus(semester[0], 'FALL')}</Table.Cell>
 
-                    <Table.Cell>{semester[1].enrollmenttype === 1 ? 'Present' : 'Absent'}</Table.Cell>
+                    <Table.Cell>
+                      {semester.length > 1
+                        ? getEnrollmentStatus(semester[1], 'SPRING')
+                        : getEnrollmentStatus(semester[0], 'SPRING')}
+                    </Table.Cell>
                   </Table.Row>
                 ) : null
               })}
