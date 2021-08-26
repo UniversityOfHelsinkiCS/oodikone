@@ -19,7 +19,7 @@ const {
   dbConnections: { sequelize },
 } = require('../database/connection')
 const { Tag, TagStudent } = require('../models/models_kone')
-const { allCodeAltenatives, findOneByCode } = require('./courses')
+const { /*allCodeAltenatives, */ findOneByCode } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
@@ -842,6 +842,14 @@ const parseCreditInfo = credit => ({
   date: credit.attainment_date,
 })
 
+const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+
+const unifyOpenUniversity = code => {
+  const regexresult = isOpenUniCourseCode(code)
+  if (!regexresult) return code
+  return regexresult[1]
+}
+
 const bottlenecksOf = async (query, studentnumberlist) => {
   const isValidRequest = async (query, params) => {
     const {
@@ -853,6 +861,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       nondegreeStudents,
       transferredStudents,
     } = params
+
     if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
       return { error: 'Semester should be either SPRING OR FALL' }
     }
@@ -883,6 +892,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     }
     return null
   }
+
   const getStudentsAndCourses = async (selectedStudents, studentnumberlist) => {
     if (!studentnumberlist) {
       const {
@@ -943,13 +953,25 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   for (const course of courses) {
     let { course_type } = course
-    const substitutions = allCodeAltenatives(course.code)
     let maincourse = course
+    if (isOpenUniCourseCode) {
+      const nonOpen = unifyOpenUniversity(course.code)
+      // const substitutions = await allCodeAltenatives(course.code)
+      console.log('nonOpen:', nonOpen)
+      const response = await findOneByCode(nonOpen)
 
-    if (course.code !== substitutions[0]) {
-      maincourse = await findOneByCode(course.code)
+      if (response) {
+        maincourse = response
+      }
+
+      /*
+      if (substitutions) {
+        if (course.code !== substitutions[0]) {
+          maincourse = await findOneByCode(nonOpen)
+        }
+      }
+      */
     }
-
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
     }

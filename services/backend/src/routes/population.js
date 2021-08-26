@@ -37,7 +37,6 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     }
 
     if (req.body.years) {
-      console.log('years väylä')
       const upperYearBound = new Date().getFullYear() + 1
       const multicoursestatPromises = Promise.all(
         req.body.years.map(year => {
