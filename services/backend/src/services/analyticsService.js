@@ -91,7 +91,8 @@ const patchThroughput = async data => {
 const patchNonGraduatedStudents = async data => {
   const [id, dataToPatch] = Object.entries(data)[0]
   const redisKey = createRedisKeyForNonGraduatedStudents(id)
-  const dataFromRedis = JSON.parse(await redisClient.getAsync(redisKey))
+  const dataFromRedisRaw = await redisClient.getAsync(redisKey)
+  const dataFromRedis = dataFromRedisRaw ? JSON.parse(dataFromRedisRaw) : { data: null }
   const patchedData = {
     data: {
       ...dataFromRedis.data,

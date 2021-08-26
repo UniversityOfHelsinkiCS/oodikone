@@ -1,13 +1,18 @@
 const express = require('express')
+const Sentry = require('@sentry/node')
 
 const User = require('./src/services/users')
 const AccessGroup = require('./src/services/accessgroups')
 const FacultyProgrammes = require('./src/services/facultyprogrammes')
 const { initializeDatabaseConnection } = require('./src/database/connection')
+const initializeSentry = require('./src/util/sentry')
 
 initializeDatabaseConnection()
   .then(() => {
     const app = express()
+    initializeSentry(app)
+    app.use(Sentry.Handlers.requestHandler())
+    app.use(Sentry.Handlers.tracingHandler())
     const port = 4567
     const bodyParser = require('body-parser')
     const checkSecret = require('./src/middlewares/secret')

@@ -189,17 +189,21 @@ const refreshProtoCProgrammeToRedis = async () => {
 }
 
 const refreshStatistics = async () => {
+  console.log('Starting refreshing statistics')
   await refreshStudyrightAssociations()
   await refreshOverview()
   await refreshNonGraduatedStudentsOfOldProgrammes()
   await refreshTeacherLeaderboard()
+  console.log('Statistics refreshed!')
 }
 
 const refreshTrends = async () => {
+  console.log('Starting refreshing trends')
   await refreshProtoCtoRedis()
   await refreshStatusToRedis()
   await refreshUberToRedis()
   await refreshProtoCProgrammeToRedis()
+  console.log('Trends refreshed!')
 }
 
 const startCron = () => {

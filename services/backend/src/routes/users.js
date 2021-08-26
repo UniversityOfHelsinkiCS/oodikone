@@ -1,8 +1,8 @@
 const router = require('express').Router()
 const userService = require('../services/userService')
-const mailservice = require('../services/mailservice')
 const blacklist = require('../services/blacklist')
 const { userDataCache } = require('../services/cache')
+const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailservice')
 
 const addUserToBlacklist = async (user, decodedToken) => {
   if (user) {
@@ -35,29 +35,22 @@ router.post('/modifyaccess', async (req, res) => {
 })
 
 router.get('/email/preview', (req, res) => {
-  const { subject, html } = mailservice.message2(null)
-  res.json({ subject, html })
+  const { accessMessageSubject, accessMessageText } = previewNotificationAboutAccessToUser()
+  res.json({ subject: accessMessageSubject, html: accessMessageText })
 })
 
 router.post('/email', async (req, res) => {
-  if (!process.env.SMTP) {
-    return res.status(500).json({ error: 'Email system has not been configured' })
-  }
-
-  const email = req.body.email
-  if (!email) {
+  const userEmail = req.body.email
+  if (!userEmail) {
     return res.status(400).json({ error: 'email is missing' })
   }
 
-  const message = mailservice.message2(email)
-  try {
-    const info = await mailservice.transporter.sendMail(message)
-    console.log('Message sent successfully', info)
-    res.status(200).end()
-  } catch (e) {
-    console.error('Error occurred while sending user email', e)
-    res.status(500).json({ error: e.message })
+  const result = await sendNotificationAboutAccessToUser(userEmail)
+  if (result.error) {
+    return res.status(400).json(result).end()
   }
+  console.log('Message sent successfully')
+  res.status(200).end()
 })
 
 router.post('/:uid/elements', async (req, res) => {

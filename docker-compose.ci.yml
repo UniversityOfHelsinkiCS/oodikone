@@ -1,5 +1,3 @@
-version: "3.9"
-
 x-defaults: &defaults
   restart: unless-stopped
 
@@ -13,6 +11,7 @@ services:
       - redis
       - sis-db
     environment:
+      CI: "true"
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:1337
       REDIS: redis
@@ -58,6 +57,7 @@ services:
     depends_on:
       - user-db
     environment:
+      CI: "true"
       DB_URL: postgres://postgres@user-db:5432/user-db
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       TOKEN_SECRET: IWannaBeTheVeryBest
