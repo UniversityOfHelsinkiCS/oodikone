@@ -6,7 +6,7 @@ const {
   throughputStatsForStudytrack,
   optionData,
 } = require('../services/studyprogramme')
-const { findProgrammeTheses } = require('../services/thesis')
+const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
 
 const {
   getProductivity,
@@ -187,6 +187,37 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
     console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
   }
   console.log(`Throughput stats recalculation for studyprogramme ${code} done`)
+})
+
+router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {
+  const { id } = req.params
+  if (id) {
+    const thesis = await findProgrammeTheses(id)
+    res.json(thesis)
+  } else {
+    res.status(422).end()
+  }
+})
+
+router.post('/v2/studyprogrammes/:id/thesis', async (req, res) => {
+  const { id } = req.params
+  const { course, thesisType } = req.body
+  if (id && course && thesisType) {
+    const thesis = await createThesisCourse(id, course, thesisType)
+    res.status(201).json(thesis)
+  } else {
+    res.status(422).end()
+  }
+})
+
+router.delete('/v2/studyprogrammes/:id/thesis/:course', async (req, res) => {
+  const { id, course } = req.params
+  if (id && course) {
+    const deleted = await deleteThesisCourse(id, course)
+    res.status(204).json(deleted)
+  } else {
+    res.status(422).end()
+  }
 })
 
 router.use('*', (req, res, next) => next())

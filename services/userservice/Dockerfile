@@ -21,6 +21,11 @@ CMD ["npm", "run", "test"]
 
 FROM base as production
 ENV NODE_ENV=production
+ENV NODE_ENV=production
+ARG SENTRY_ENVIRONMENT
+ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
+ARG SENTRY_RELEASE
+ENV SENTRY_RELEASE=$SENTRY_RELEASE
 EXPOSE 4567
 COPY --chown=node:node ./package* /usr/src/app/
 RUN npm ci --production

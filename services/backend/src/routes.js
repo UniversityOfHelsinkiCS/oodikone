@@ -28,7 +28,18 @@ const programmeModules = require('./routes/programmeModules')
 
 module.exports = (app, url) => {
   app.use(url, ping)
-  app.use(shibbolethHeadersFix(['hyGroupCn', 'SHIB_LOGOUT_URL', 'eduPersonAffiliation', 'uid', 'displayName', 'mail']))
+  app.use(
+    shibbolethHeadersFix([
+      'hyGroupCn',
+      'SHIB_LOGOUT_URL',
+      'eduPersonAffiliation',
+      'uid',
+      'displayName',
+      'mail',
+      'hyPersonSisuId',
+      'preferredLanguage',
+    ])
+  )
   app.use(url, matomoInit)
   app.use(url, login)
   app.use(`${url}/superlogin`, superlogin)

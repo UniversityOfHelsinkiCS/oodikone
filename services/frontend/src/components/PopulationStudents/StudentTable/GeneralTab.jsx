@@ -334,6 +334,18 @@ const GeneralTab = ({
     })
   }
 
+  if (!(coursePopulation || customPopulation)) {
+    const code = queryStudyrights[0]
+    columns.push({
+      key: 'admission type',
+      title: 'admission type',
+      getRowVal: s => {
+        const studyright = s.studyrights.find(sr => sr.studyright_elements.some(e => e.code === code))
+        return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
+      },
+    })
+  }
+
   if (coursePopulation || customPopulation) {
     columns.push(
       {
