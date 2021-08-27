@@ -14,23 +14,7 @@
     "both": "./run.sh both anon up --detach",
     "both:real": "./run.sh both real up --detach",
     "docker:down": "./run.sh both anon down --remove-orphans; ./run.sh both real down",
-    "prepare": "husky install",
-    "lint:docker-compose": "docker-compose config --quiet && :",
-    "lint:docker-compose:real": "docker-compose --file docker-compose.yml --file docker-compose.real.yml config --quiet && :",
-    "lint:docker-compose:ci": "docker-compose --file docker-compose.ci.yml config -quiet && :",
-    "lint:docker-compose:test": "docker-compose --file docker-compose.test.yml config -quiet && :"
-  },
-  "lint-staged": {
-    "{services,updater}/**/*.{js,jsx}": "eslint --fix",
-    "*.{js,json,md}": "prettier --write",
-    "*.css": "stylelint --fix",
-    ".github/workflows/*": "actionlint",
-    "Dockerfile": "hadolint",
-    "*.sh": "shellcheck -x",
-    "docker-compose.yml": "npm run lint:docker-compose",
-    "docker-compose.real.yml": "npm run lint:docker-compose:real",
-    "docker-compose.ci.yml": "npm run lint:docker-compose:ci",
-    "docker-compose.test.yml": "npm run lint:docker-compose:test"
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
