@@ -956,21 +956,11 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     let maincourse = course
     if (isOpenUniCourseCode) {
       const nonOpen = unifyOpenUniversity(course.code)
-      // const substitutions = await allCodeAltenatives(course.code)
-      console.log('nonOpen:', nonOpen)
       const response = await findOneByCode(nonOpen)
 
       if (response) {
         maincourse = response
       }
-
-      /*
-      if (substitutions) {
-        if (course.code !== substitutions[0]) {
-          maincourse = await findOneByCode(nonOpen)
-        }
-      }
-      */
     }
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
