@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 FROM base as development
 ENV NODE_ENV=development
-COPY package* /usr/src/app
+COPY ./package* /usr/src/app/
 RUN npm ci
 COPY . /usr/src/app
 CMD ["npm", "run", "dev"]
