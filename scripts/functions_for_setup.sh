@@ -71,7 +71,7 @@ reset_databases() {
 
   infomsg "Restoring PostgreSQL dumps from backups. This might take a while."
 
-  docker-compose down
+  npm run docker:down
   docker-compose up -d "${databases[@]}"
 
   for database in "${databases[@]}"; do
