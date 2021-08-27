@@ -283,9 +283,9 @@ describe('Custom Population Statistics', () => {
     runTestStepWithPreAndPostParts('courseFilter-header', () => {
       const courses = ['MAT11001', 'TKT20004']
       cy.cs('courseFilter-course-dropdown').click().contains(courses[0]).click()
-      checkFilteringResult(4)
+      checkFilteringResult(5)
       cy.selectFromDropdown(`courseFilter-${courses[0]}-dropdown`, 1)
-      checkFilteringResult(4)
+      checkFilteringResult(5)
       cy.cs('courseFilter-course-dropdown').click().contains(courses[1]).click()
       checkFilteringResult(3)
       cy.selectFromDropdown(`courseFilter-${courses[1]}-dropdown`, 3)
