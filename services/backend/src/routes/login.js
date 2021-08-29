@@ -11,9 +11,10 @@ router.post('/login', async (req, res) => {
       const mail = req.headers.mail || ''
       const hyGroups = parseHyGroups(req.headers['hygroupcn'])
       const affiliations = parseHyGroups(req.headers['edupersonaffiliation'])
+      const hyPersonSisuId = req.headers.hypersonsisuid || ''
 
       console.log(uid, 'trying to login, referring to userservice.')
-      let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail)
+      let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId)
       if (isNew) {
         const result = await sendNotificationAboutNewUser({ userId: uid, userFullName: full_name })
         if (result.error) {

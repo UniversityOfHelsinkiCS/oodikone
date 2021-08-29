@@ -12,6 +12,7 @@ const getHeaders = () => {
     hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users',
     eduPersonAffiliation: 'member;employee;faculty',
     mail: 'grp-toska+mockmluukkai@helsinki.fi',
+    hyPersonSisuId: 'hy-hlo-1441871',
   }
   return isDev ? { ...devUserHeaders } : {}
 }

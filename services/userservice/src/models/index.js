@@ -91,6 +91,7 @@ const User = sequelize.define(
     },
     email: { type: Sequelize.STRING },
     language: { type: Sequelize.STRING },
+    sisu_person_id: { type: Sequelize.STRING },
   },
   {
     tableName: 'users',

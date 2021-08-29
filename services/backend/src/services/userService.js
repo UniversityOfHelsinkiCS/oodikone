@@ -17,13 +17,14 @@ const findAll = async () => {
   return response.data
 }
 
-const login = async (uid, full_name, hyGroups, affiliations, email) => {
+const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
   const response = await client.post('/login', {
     uid,
     full_name,
     hyGroups,
     affiliations,
     email,
+    hyPersonSisuId,
   })
   return response.data
 }

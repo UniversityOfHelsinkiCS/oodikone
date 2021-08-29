@@ -88,7 +88,7 @@ const updateGroups = async (user, affiliations, hyGroups) => {
   await user.removeHy_group(await HyGroupService.byCodes(hyGroupsToDelete))
 }
 
-const login = async (uid, full_name, hyGroups, affiliations, mail) => {
+const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId) => {
   let user = await byUsername(uid)
   let isNew = false
   await createMissingGroups(hyGroups, HyGroupService)
@@ -96,7 +96,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
 
   if (!user) {
     console.log('New user')
-    user = await createUser(uid, full_name, mail)
+    user = await createUser(uid, full_name, mail, hyPersonSisuId)
 
     const userHyGroups = await HyGroupService.byCodes(hyGroups)
     await user.addHy_group(userHyGroups)
@@ -106,7 +106,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail) => {
 
     isNew = true
   } else {
-    console.log('mail', mail)
+    user = await updateUser(user, { full_name, email: mail, sisu_person_id: hyPersonSisuId })
     user = await updateUser(user, { full_name, email: mail })
     await updateGroups(user, affiliations, hyGroups)
   }
@@ -214,11 +214,12 @@ const byUsername = async username => {
   return user
 }
 
-const createUser = async (username, fullname, email) => {
+const createUser = async (username, fullname, email, hyPersonSisuId) => {
   return User.create({
     username: username,
     full_name: fullname,
     email,
+    sisu_person_id: hyPersonSisuId,
   })
 }
 
