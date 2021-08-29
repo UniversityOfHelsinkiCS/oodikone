@@ -16,10 +16,24 @@ const requiredGroup = isStaging
 // Pate
 const pateToken = process.env.PATE_API_TOKEN || ''
 
+// Importer client
+const importerToken = process.env.IMPORTER_DB_API_TOKEN || ''
+const importerUrl = process.env.IMPORTER_DB_API_URL || ''
+
 // Networking: Urls & ports
 const baseUrl = isDev ? '/api' : ''
 const frontUrl = process.env.FRONT_URL
 const backendPort = 8080
+
+// Analytics
+const ANALYTICS_INFLUXDB_URL = process.env.ANALYTICS_INFLUXDB_URL
+const ANALYTICS_INFLUXDB_USER = process.env.ANALYTICS_INFLUXDB_USER
+const ANALYTICS_INFLUXDB_PASSWORD = process.env.ANALYTICS_INFLUXDB_PASSWORD
+const ANALYTICS_INFLUXDB_DB = process.env.ANALYTICS_INFLUXDB_DB
+
+// Matomo
+const MATOMO_SITE_ID = process.env.MATOMO_SITE_ID
+const MATOMO_URL = process.env.MATOMO_URL
 
 // Other stuff
 const DB_URL_KONE = process.env.DB_URL_KONE
@@ -39,12 +53,6 @@ const SECRET_TOKEN = process.env.SECRET_TOKEN
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
 const USERSERVICE_URL = process.env.USERSERVICE_URL
 const SIS_UPDATER_URL = process.env.SIS_UPDATER_URL
-const ANALYTICS_INFLUXDB_URL = process.env.ANALYTICS_INFLUXDB_URL
-const ANALYTICS_INFLUXDB_USER = process.env.ANALYTICS_INFLUXDB_USER
-const ANALYTICS_INFLUXDB_PASSWORD = process.env.ANALYTICS_INFLUXDB_PASSWORD
-const ANALYTICS_INFLUXDB_DB = process.env.ANALYTICS_INFLUXDB_DB
-const MATOMO_SITE_ID = process.env.MATOMO_SITE_ID
-const MATOMO_URL = process.env.MATOMO_URL
 
 const formatURL = url => {
   return !!url && !url.startsWith('http') ? `http://${url}` : url
@@ -80,4 +88,6 @@ module.exports = {
   baseUrl,
   frontUrl,
   backendPort,
+  importerToken,
+  importerUrl,
 }
