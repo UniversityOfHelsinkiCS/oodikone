@@ -1,6 +1,0 @@
-POST http://localhost:8080/api/users/enable
-Content-Type: application/json
-
-{
-  "id": 2
-}
