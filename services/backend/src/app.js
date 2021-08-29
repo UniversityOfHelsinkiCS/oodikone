@@ -1,6 +1,5 @@
 const express = require('express')
 const cors = require('cors')
-const bodyParser = require('body-parser')
 const Sentry = require('@sentry/node')
 const { baseUrl, backendPort, frontUrl } = require('./conf-backend')
 const routes = require('./routes')
@@ -28,7 +27,7 @@ initializeDatabaseConnection()
     startCron()
 
     app.use(cors({ credentials: true, origin: frontUrl }))
-    app.use(bodyParser.json())
+    app.use(express.json())
 
     routes(app, baseUrl)
 
