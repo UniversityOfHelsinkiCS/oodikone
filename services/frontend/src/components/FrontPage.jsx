@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Container, Header, Image, Divider, List } from 'semantic-ui-react'
 import moment from 'moment'
-import { connect } from 'react-redux'
-import propTypes from 'prop-types'
-import { isEqual } from 'lodash'
+import { useSelector } from 'react-redux'
 import { images, getUserRoles, checkUserAccess } from '../common'
 import { useTitle } from '../common/hooks'
 import { builtAt } from '../conf'
@@ -49,10 +47,11 @@ const OodiToOodikone = () => {
   )
 }
 
-const FrontPage = props => {
-  const { userRoles, rights } = props
-
+const FrontPage = () => {
+  const { roles, rights } = useSelector(state => state.auth.token)
+  const userRoles = getUserRoles(roles)
   useTitle()
+
   const showItems = {
     populations: userRoles.includes('admin') || rights.length !== 0,
     studyProgramme: userRoles.includes('admin') || rights.length !== 0,
@@ -122,25 +121,4 @@ const FrontPage = props => {
   )
 }
 
-FrontPage.propTypes = {
-  userRoles: propTypes.arrayOf(propTypes.string),
-  rights: propTypes.arrayOf(propTypes.string),
-}
-
-FrontPage.defaultProps = {
-  userRoles: [],
-  rights: [],
-}
-
-const mapStateToProps = ({
-  auth: {
-    token: { roles, rights },
-  },
-}) => ({
-  userRoles: getUserRoles(roles),
-  rights,
-})
-
-export default connect(mapStateToProps, null, null, {
-  areStatePropsEqual: isEqual,
-})(FrontPage)
+export default FrontPage
