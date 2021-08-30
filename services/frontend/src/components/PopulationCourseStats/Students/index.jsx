@@ -55,18 +55,21 @@ const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
     })
 
     const allStudents = Array.from(studentSet)
-    return allStudents.map(student => {
-      let passed = 0
-      courseStatistics.forEach(course => {
-        if (course.students.passed[student]) {
-          passed++
-        }
+    return allStudents
+      .map(student => {
+        let passed = 0
+        courseStatistics.forEach(course => {
+          if (course.students.passed[student]) {
+            passed++
+          }
+        })
+
+        const found = filteredStudents?.find(s => s?.studentNumber === student)
+        const name = found ? `${found.lastname} ${found.firstnames}` : null
+
+        return { studentnumber: student, name, passed }
       })
-
-      const { firstnames, lastname } = filteredStudents.find(s => s.studentNumber === student)
-
-      return { studentnumber: student, name: `${lastname} ${firstnames}`, passed }
-    })
+      .filter(s => !!s.name)
   }, [courseStatistics])
 
   const maxPages = Math.floor(students.length / 10)
