@@ -64,5 +64,5 @@ module.exports = (app, url) => {
   app.use(`${url}/tsa`, tsaAnalytics)
   app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(`${url}/cool-data-science`, trends)
-  app.use(`${url}/studyguidancegroups`, auth.roles(['personGroups']), studyGuidanceGroups)
+  app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
 }
