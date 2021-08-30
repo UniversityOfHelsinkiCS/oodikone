@@ -5,7 +5,6 @@ x-build_defaults: &build_defaults
   target: development
 
 services:
-
   adminer:
     <<: *defaults
     container_name: adminer
@@ -27,6 +26,8 @@ services:
       - kone-db
       - redis
       - sis-db
+    env_file:
+      - .env
     environment:
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:3000
@@ -70,11 +71,11 @@ services:
 
   redis:
     <<: *defaults
-    command: "redis-server --appendonly yes"
+    command: 'redis-server --appendonly yes'
     container_name: redis
     image: redis
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis-data:/data
 
@@ -97,7 +98,7 @@ services:
 
   sis-updater-nats:
     <<: *defaults
-    command: "-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore"
+    command: '-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
     container_name: sis-updater-nats
     image: nats-streaming:0.16.2
     profiles:
