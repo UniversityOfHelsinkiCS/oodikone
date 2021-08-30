@@ -43,7 +43,7 @@ jobs:
       - name: 'Run frontend linter'
         run: |
           npm run eslint -- --ext .jsx,.js services/frontend
-          npm run stylelint -- "services/frontend/src/**/*.cs"
+          npm run stylelint -- services/frontend/src/**/*.cs
 
   lint_userservice:
     name: 'Lint userservice'
