@@ -41,9 +41,9 @@ jobs:
       - name: 'Install dependencies'
         run: npm ci && cd services/frontend && npm ci
       - name: 'Run frontend linter'
-        run: |
-          npm run eslint -- --ext .jsx,.js services/frontend
-          npm run stylelint -- services/frontend/src/**/*.cs
+        run: npm run concurrently \
+          'eslint --ext .jsx,.js services/frontend' \
+          'stylelint services/frontend/src/**/*.css'
 
   lint_userservice:
     name: 'Lint userservice'
