@@ -10,6 +10,7 @@ const adminUserHeaders = {
   hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
   edupersonaffiliation: 'member;employee;faculty',
   mail: 'grp-toska+mockadminuser@helsinki.fi',
+  hypersonsisuid: 'hy-hlo-6666666',
 }
 
 const basicUserHeaders = {
@@ -19,6 +20,7 @@ const basicUserHeaders = {
   hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
   edupersonaffiliation: 'member',
   mail: 'grp-toska+mockbasicuser@helsinki.fi',
+  hypersonsisuid: 'hy-hlo-1234567',
 }
 
 const onlycoursestatisticsUserHeaders = {
@@ -28,6 +30,7 @@ const onlycoursestatisticsUserHeaders = {
   hyGroupCn: 'grp-oodikone-basic-users',
   eduPersonAffiliation: 'member',
   mail: 'grp-toska+mockonlycoursestatisticsuser@helsinki.fi',
+  hypersonsisuid: 'hy-hlo-7654321',
 }
 
 const norightsUserHeaders = {
@@ -37,6 +40,7 @@ const norightsUserHeaders = {
   hygroupcn: 'grp-oodikone-users',
   edupersonaffiliation: 'member',
   mail: 'grp-toska+mocknorightuser@helsinki.fi',
+  hypersonsisuid: 'hy-hlo-0000000',
 }
 
 const userHeaders = [adminUserHeaders, basicUserHeaders, onlycoursestatisticsUserHeaders, norightsUserHeaders]
