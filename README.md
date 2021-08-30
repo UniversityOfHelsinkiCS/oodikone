@@ -10,12 +10,19 @@ To run Oodikone locally, you will need the following:
    - [Docker](https://docs.docker.com/install/) (version 20.10+),
    - [Docker Compose](https://docs.docker.com/compose/install/)(version 0.29+) and
    - [npm](https://docs.npmjs.com/cli/v7) (version 7+)
-2. Access to Toska Docker Hub, see Toska Gitlabs password document for more information on how to login
-3. (Optional) For real data setup, access to Toskas production servers.
+2. Access to Toska Docker Hub,
+3. For real data setup, access to Toskas production servers.
+4. For some features to work, access to Toskas service tokens
 
 ## 🚀 Installation
 
-Launch the CLI and follow the instructions:
+Pre-installation steps:
+
+- Clone this repo
+- Login to toskas docker hub (see Toskas Gitlab for more information)
+- Populate `.env.template` file with correct tokens and rename it to `.env`
+
+Then launch the CLI and follow the instructions:
 
 ```bash
 npm run cli
