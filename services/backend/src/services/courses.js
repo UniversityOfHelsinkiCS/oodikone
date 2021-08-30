@@ -424,7 +424,6 @@ const byNameAndOrCodeLike = async (name, code) => {
       organizeSubgroups(course)
     }
   })
-  console.log(courses)
   return { courses }
 }
 
