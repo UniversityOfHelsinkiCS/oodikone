@@ -402,7 +402,6 @@ const getAssociations = async (doRefresh = false) => {
 }
 
 const getFilteredAssociations = async codes => {
-  console.log(codes)
   const associations = await getAssociations()
   associations.programmes = _.pick(associations.programmes, codes)
 

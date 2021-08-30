@@ -10,8 +10,6 @@ const importerClient = axios.create({
 })
 
 const getImporterClient = () => {
-  console.log('importerToken', importerToken)
-  console.log('importerUrl', importerUrl)
   if (!importerToken || !importerUrl) {
     console.log("Importer token or importer url not set, can't return client!")
     return null
