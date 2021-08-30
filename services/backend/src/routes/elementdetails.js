@@ -17,8 +17,27 @@ const {
   patchThroughput,
   getNonGraduatedStudents,
 } = require('../services/analyticsService')
+const { getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 
 const programmeStatsSince = new Date('2017-07-31')
+
+router.get('/elementdetails/all', async (req, res) => {
+  try {
+    const elementdetails = await getAllElementDetails()
+    res.json(elementdetails)
+  } catch (e) {
+    res.status(500).json(e)
+  }
+})
+
+router.get('/studyprogrammes', async (req, res) => {
+  try {
+    const studyrights = await getAllProgrammes()
+    res.json(studyrights)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
 
 router.get('/v2/studyprogrammes/:id/optiondata', async (req, res) => {
   const code = req.params.id
