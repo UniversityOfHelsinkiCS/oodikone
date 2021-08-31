@@ -54,6 +54,35 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
   )
 }
 
+const getTotalCreditsOfCoursesBetweenWithEnrolledStudents = async (a, b, alias = 'sum', alias2 = 'sum2') => {
+  return sequelize.query(
+    `SELECT SUM(cr.credits) AS ` +
+      alias +
+      `, COUNT(DISTINCT(s.studentnumber)) AS ` +
+      alias2 +
+      `, o.code AS organizationcode, co.code, co.id, co.name FROM credit cr
+    INNER JOIN course co ON cr.course_code = co.code
+    INNER JOIN course_providers cp ON cp.coursecode = co.id
+    INNER JOIN organization o ON o.id = cp.organizationcode
+    INNER JOIN student s ON cr.student_studentnumber = s.studentnumber
+    INNER JOIN semester_enrollments se on s.studentnumber = se.studentnumber
+    INNER JOIN semesters sem on sem.semestercode = se.semestercode
+    INNER JOIN studyright_elements sel on sel.studentnumber = s.studentnumber
+  WHERE
+    cr.attainment_date BETWEEN :a AND :b
+    AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
+    AND cr.credittypecode IN (4, 9)
+    AND sem.startdate > :a
+    AND se.enrollmenttype = '1'
+  GROUP BY co.id, o.code
+  -- HAVING SUM(cr.credits) > 0`,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { a, b },
+    }
+  )
+}
+
 const sumMerge = (a, b) => {
   if (!a) return b
   if (!b) return a
@@ -66,13 +95,16 @@ const mergele = (a, b) => {
   return _.mergeWith(a, b, sumMerge)
 }
 
-const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', alias2 = 'sum2') => {
+const makeYearlyCreditsPromises = (currentYear, years, showByStudents, getRange, alias = 'sum', alias2 = 'sum2') => {
   return years.map(
     year =>
       new Promise(async res => {
         const diff = currentYear - year
         const { from, to } = getRange(diff)
-        const creditsByCourse = await getTotalCreditsOfCoursesBetween(from, to, alias, alias2)
+        const creditsByCourse =
+          showByStudents !== 'true'
+            ? await getTotalCreditsOfCoursesBetween(from, to, alias, alias2)
+            : await getTotalCreditsOfCoursesBetweenWithEnrolledStudents(from, to, alias, alias2)
         res(
           creditsByCourse.map(c => {
             c['year'] = year
@@ -83,7 +115,7 @@ const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', 
   )
 }
 
-const calculateStatusStatistics = async (unixMillis, showByYear) => {
+const calculateStatusStatistics = async (unixMillis, showByYear, showByStudents) => {
   const YEAR_TO_MILLISECONDS = 31556952000
   /* Memoize parses booleans into strings... */
   const startDate = showByYear === 'true' ? getCurrentYearStartDate() : await getCurrentStudyYearStartDate(unixMillis)
@@ -93,6 +125,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
     startYear,
     yearRange,
+    showByStudents,
     diff => ({
       from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
       to:
@@ -107,6 +140,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   const yearlyTotalCreditsPromises = makeYearlyCreditsPromises(
     startYear,
     yearRange.slice(0, -1),
+    showByStudents,
     diff => ({
       from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
       to: new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS),
@@ -226,14 +260,14 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   return groupedByFaculty
 }
 
-const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
+const getStatus = async (unixMillis, showByYear, showByStudents, doRefresh = false) => {
   // redis keys for different queries. adds a new key for every queried day.
   // might cause issues, might not but def not until I am out :D
 
   const KEY = `${REDIS_KEY_STATUS}_DATE_${unixMillis}_YEARLY_${showByYear.toUpperCase()}`
   const status = await getRedisCDS(KEY)
   if (!status || doRefresh) {
-    const data = await calculateStatusStatistics(unixMillis, showByYear)
+    const data = await calculateStatusStatistics(unixMillis, showByYear, showByStudents)
     await saveToRedis(data, KEY, true)
     return data
   }

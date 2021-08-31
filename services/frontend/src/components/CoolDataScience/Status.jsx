@@ -39,6 +39,7 @@ const StatusContainer = ({
   showYearlyValues,
   yearlyValues,
   showByYear,
+  showByStudents,
 }) => {
   const diff = Math.round(current - previous)
   const p = getP(current, previous)
@@ -116,7 +117,7 @@ const StatusContainer = ({
                     {(total > 0 || totalStudents > 0) &&
                       ` / ${
                         // same logic as before to check if render num of students or credits
-                        totalStudents <= total && total > 0
+                        totalStudents <= total && total > 0 && !showByStudents
                           ? Math.round(total).toLocaleString('fi')
                           : `${totalStudents} students`
                       }`}
@@ -142,6 +143,7 @@ StatusContainer.propTypes = {
   showYearlyValues: PropTypes.bool.isRequired,
   yearlyValues: PropTypes.shape({}).isRequired,
   showByYear: PropTypes.bool.isRequired,
+  showByStudents: PropTypes.bool.isRequired,
 }
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
@@ -347,6 +349,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
               max1={medianDiff * 2}
               yearlyValues={stats.yearly}
               showByYear={showByYear}
+              showByStudents={showByStudents}
             />
           )
         })}

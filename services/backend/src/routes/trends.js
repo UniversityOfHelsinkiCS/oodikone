@@ -60,7 +60,7 @@ router.get(
 router.get(
   '/status',
   withErr(async (req, res) => {
-    const { date: unixMillis, showByYear } = req.query
+    const { date: unixMillis, showByYear, showByStudents } = req.query
     const date = new Date(Number(unixMillis))
     const endOfToday = new Date()
     endOfToday.setHours(23, 59, 59, 999)
@@ -71,7 +71,7 @@ router.get(
 
     // End of day
     date.setHours(23, 59, 59, 999)
-    const status = await getStatus(date.getTime(), showByYear)
+    const status = await getStatus(date.getTime(), showByYear, showByStudents)
     res.json(status)
   })
 )
