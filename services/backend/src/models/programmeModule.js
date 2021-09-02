@@ -18,6 +18,16 @@ ProgrammeModule.init(
     type: {
       type: STRING,
     },
+    studyLevel: {
+      type: STRING,
+    },
+    organization_id: {
+      type: STRING,
+      references: {
+        model: 'organization',
+        key: 'id',
+      },
+    },
     createdAt: {
       type: DATE,
     },
