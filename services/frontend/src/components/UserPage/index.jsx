@@ -51,15 +51,21 @@ const UserPage = ({
     window.location.reload()
   }
 
-  const renderUnitList = (elementdetailcodes, elementdetails, user) => {
-    if (!elementdetailcodes) return null
+  const renderUnitList = (usersElementdetailCodes, elementdetails, user) => {
+    if (!usersElementdetailCodes) return null
     const nameInLanguage = element => getTextIn(element.name, language)
-    elementdetailcodes.sort()
+    const elementDetailCodesAvailable = new Set(elementdetails.map(({ code }) => code))
+    const usersElementdetailCodesAvailable = usersElementdetailCodes.filter(obj =>
+      elementDetailCodesAvailable.has(obj.elementDetailCode)
+    )
+    usersElementdetailCodesAvailable.sort()
     return (
       <List divided>
-        {elementdetails.length > 0 &&
-          elementdetailcodes.map(({ elementDetailCode: code }) => {
+        {usersElementdetailCodesAvailable.length > 0 &&
+          usersElementdetailCodesAvailable.map(({ elementDetailCode: code }) => {
+            console.log('elementDetailCode', code)
             const element = elementdetails.find(e => e.code === code)
+            console.log('element', element)
             return (
               <List.Item key={code}>
                 <List.Content floated="right">
@@ -74,7 +80,8 @@ const UserPage = ({
                   />
                 </List.Content>
                 <List.Content>
-                  {element.type === 30 ? <Icon name="minus" /> : null} {`${nameInLanguage(element)} (${code})`}
+                  {element && element.type === 30 ? <Icon name="minus" /> : null}{' '}
+                  {`${nameInLanguage(element)} (${code})`}
                 </List.Content>
               </List.Item>
             )
