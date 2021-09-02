@@ -9,6 +9,8 @@ const isStaging = NODE_ENV === 'staging'
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 
+const hyOneGroup = 'hy-one'
+
 const requiredGroup = isStaging
   ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
   : ['grp-oodikone-users', 'grp-oodikone-basic-users']
@@ -22,4 +24,5 @@ module.exports = {
   sentryRelease,
   sentryEnvironment,
   runningInCI,
+  hyOneGroup,
 }
