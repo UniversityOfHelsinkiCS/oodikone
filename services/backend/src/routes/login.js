@@ -12,7 +12,6 @@ router.post('/login', async (req, res) => {
       const hyGroups = parseHyGroups(req.headers['hygroupcn'])
       const affiliations = parseHyGroups(req.headers['edupersonaffiliation'])
       const hyPersonSisuId = req.headers.hypersonsisuid || ''
-      console.log('headers', JSON.stringify(req.headers, null, 2))
       console.log(uid, 'trying to login, referring to userservice.')
       let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId)
       if (isNew) {
