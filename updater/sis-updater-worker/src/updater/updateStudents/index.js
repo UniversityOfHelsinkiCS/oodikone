@@ -11,7 +11,7 @@ const {
   CourseProvider,
 } = require('../../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
-const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
+const { getEducation, getUniOrgId, getEducationType, loadMapsIfNeeded } = require('../shared')
 const { studentMapper, mapTeacher, creditMapper, semesterEnrollmentMapper, courseProviderMapper } = require('../mapper')
 const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
@@ -36,9 +36,17 @@ const addSelectionPaths = studyrightSnapshots =>
 
 // Group snapshots by studyright id and find out when studyrights have begun
 const groupStudyrightSnapshots = studyrightSnapshots => {
+  const studyRightHasDegreeEducation = studyRight => {
+    const education = getEducation(studyRight.education_id)
+    if (!education) return false
+    const educationType = getEducationType(education.education_type)
+    if (!educationType) return false
+    return !educationType.parent_id.startsWith('urn:code:education-type:non-degree-education')
+  }
+
   const snapshotsBystudyright = Object.entries(
     groupBy(
-      studyrightSnapshots.filter(s => s.document_state === 'ACTIVE'),
+      studyrightSnapshots.filter(s => s.document_state === 'ACTIVE' && studyRightHasDegreeEducation(s)),
       'id'
     )
   )
