@@ -31,8 +31,14 @@ const updateStudyRights = async (
     // is this really needed?
     if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
 
-    if (['RESCINDED', 'CANCELLED_BY_ADMINISTRATION'].includes(studyright.state))
-      return studyright.study_right_cancellation.cancellationDate
+    if (['RESCINDED', 'CANCELLED_BY_ADMINISTRATION'].includes(studyright.state)) {
+      if (studyright.study_right_cancellation && studyright.study_right_cancellation.cancellationDate)
+        return studyright.study_right_cancellation.cancellationDate
+      if (studyright.valid && studyright.valid.endDate) return studyright.valid.endDate
+      // otherwise we must use startdate, since it's always available. Probably not
+      // correct, but shows something
+      return studyright.valid.startDate
+    }
     if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
     return null
   }
