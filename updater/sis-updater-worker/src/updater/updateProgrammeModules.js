@@ -155,10 +155,6 @@ const recursiveWrite = async (module, parentId) => {
     type: module.type,
     studyLevel: module.study_level,
   }
-  if (module.type !== 'course') {
-    console.log('new module', newModule)
-    console.log('new modules orig details', module)
-  }
 
   let join = {
     composite: `${parentId}-${module.id}`,
@@ -189,6 +185,9 @@ const updateProgrammeModules = async (entityIds = []) => {
       name: module.name,
       type: 'module',
       studyLevel: module.study_level,
+      organization_id: module.organisations.find(
+        o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation'
+      ).organisationId,
     }
     programmes[module.group_id] = topModule
     const submodule = await resolver(module.rule)
