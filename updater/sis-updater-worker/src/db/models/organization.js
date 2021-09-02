@@ -19,6 +19,9 @@ Organization.init(
     name: {
       type: JSONB,
     },
+    parent_id: {
+      type: STRING,
+    },
     createdAt: {
       type: DATE,
     },
