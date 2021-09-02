@@ -16,7 +16,7 @@ const {
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
 const HyGroupService = require('./hygroups')
-const { requiredGroup, courseStatisticsGroup, TOKEN_SECRET } = require('../conf')
+const { requiredGroup, courseStatisticsGroup, TOKEN_SECRET, hyOneGroup } = require('../conf')
 const Op = Sequelize.Op
 
 const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
@@ -112,6 +112,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuI
   }
 
   await determineAccessToCourseStats(user, hyGroups)
+  await determineAccessToTeachersForOne(user, hyGroups)
 
   console.log('Generating token')
   const token = await generateToken(uid)
@@ -318,6 +319,14 @@ const determineAccessToCourseStats = async (user, hyGroups) => {
     await modifyRights(user.id, { courseStatistics: true })
   } else if (!hyGroups.includes(courseStatisticsGroup) && alreadyAccess) {
     await modifyRights(user.id, { courseStatistics: false })
+  }
+}
+
+const determineAccessToTeachersForOne = async (user, hyGroups) => {
+  const accessGroups = (user && user.accessgroup) || []
+  const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'teachers')
+  if (hyGroups.includes(hyOneGroup) && !alreadyAccess) {
+    await modifyRights(user.id, { teachers: true })
   }
 }
 
