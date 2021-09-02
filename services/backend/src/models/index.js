@@ -99,6 +99,8 @@ ProgrammeModule.belongsToMany(ProgrammeModule, {
   foreignKey: 'parent_id',
 })
 
+Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
+
 module.exports = {
   Organization,
   Course,
