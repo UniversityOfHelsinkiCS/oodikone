@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
-const { Organization } = require('../models')
+const { Organization, ProgrammeModule } = require('../models')
 const Op = Sequelize.Op
+const { dbConnections } = require('../database/connection')
 
 // Have facultyfetching to work like it worked during oodi-db time
 const facultiesInOodi = [
@@ -33,6 +34,36 @@ const faculties = () => {
   })
 }
 
+const degreeProgrammeCodesOfFaculty = async facultyCode =>
+  (
+    await ProgrammeModule.findAll({
+      attributes: ['code'],
+      include: {
+        model: Organization,
+        where: {
+          code: facultyCode,
+        },
+      },
+    })
+  ).map(({ code }) => code)
+
+const providersOfFaculty = async facultyCode => {
+  const [result] = await dbConnections.sequelize.query(
+    `SELECT childOrg.code
+     FROM organization parentOrg
+     INNER JOIN organization childOrg 
+     ON childOrg.parent_id = parentOrg.id
+     WHERE parentOrg.code = ?`,
+    { replacements: [facultyCode] }
+  )
+  return result.map(({ code }) => code)
+}
+
+const isFaculty = facultyCode => facultiesInOodi.includes(facultyCode)
+
 module.exports = {
   faculties,
+  degreeProgrammeCodesOfFaculty,
+  isFaculty,
+  providersOfFaculty,
 }
