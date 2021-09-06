@@ -16,6 +16,7 @@ class CourseStatsCounter {
       name,
       disciplines: {},
       coursetypes: {},
+      substitutions: [],
     }
     this.students = {
       all: {},
@@ -140,6 +141,10 @@ class CourseStatsCounter {
 
   addCourseType(typecode, name) {
     this.course.coursetypes[typecode] = name
+  }
+
+  addCourseSubstitutions(subs) {
+    this.course.substitutions = subs
   }
 
   addCourseDiscipline(id, name) {

@@ -801,7 +801,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
 
 const findCourses = async (studentnumbers, beforeDate) => {
   const res = await Course.findAll({
-    attributes: ['code', 'name', 'coursetypecode'],
+    attributes: ['code', 'name', 'coursetypecode', 'substitutions'],
     include: [
       {
         required: true,
@@ -969,6 +969,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     const coursestats = stats[maincourse.code]
 
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
+    coursestats.addCourseSubstitutions(course.substitutions)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
 
     course.credits.forEach(credit => {
@@ -981,6 +982,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.allStudents = allstudentslength
+  console.log('bottleneck: ', bottlenecks)
   return bottlenecks
 }
 
