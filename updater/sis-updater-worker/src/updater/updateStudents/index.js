@@ -11,37 +11,48 @@ const {
   CourseProvider,
 } = require('../../db/models')
 const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
-const { getEducation, getUniOrgId, loadMapsIfNeeded } = require('../shared')
+const { getEducation, getUniOrgId, getEducationType, loadMapsIfNeeded } = require('../shared')
 const { studentMapper, mapTeacher, creditMapper, semesterEnrollmentMapper, courseProviderMapper } = require('../mapper')
 const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
 const { getAttainmentsToBeExcluded } = require('./excludedPartialAttainments')
 
+// Check if studyright is degree leading or not
+const studyRightHasDegreeEducation = studyRight => {
+  const education = getEducation(studyRight.education_id)
+  if (!education) return false
+  const educationType = getEducationType(education.education_type)
+  if (!educationType) return false
+  return !educationType.parent_id.startsWith('urn:code:education-type:non-degree-education')
+}
+
 // Accepted selection path is not available when degree programme doesn't have
 // studytrack or major subject. This is a known bug on SIS and has been reported
 // to funidata.
 // In these cases, degree programmes module group id must be fetched from education.
-const addSelectionPaths = studyrightSnapshots =>
-  studyrightSnapshots.map(snapshot =>
-    Object.keys(snapshot.accepted_selection_path).length === 0
-      ? {
-          ...snapshot,
-          accepted_selection_path: {
-            educationPhase1GroupId: getEducation(snapshot.education_id).structure.phase1.options[0].moduleGroupId,
-          },
-        }
-      : snapshot
-  )
+const addSelectionPathIfNeeded = snapshot =>
+  Object.keys(snapshot.accepted_selection_path).length === 0
+    ? {
+        ...snapshot,
+        accepted_selection_path: {
+          educationPhase1GroupId: getEducation(snapshot.education_id).structure.phase1.options[0].moduleGroupId,
+        },
+      }
+    : snapshot
+
+// Parse useful snapshots from the whole list and enrich snapshots when needed
+const parseStudyrightSnapshots = studyrightSnapshots =>
+  studyrightSnapshots.reduce((parsed, current) => {
+    if (current.document_state !== 'ACTIVE') return parsed
+    if (!studyRightHasDegreeEducation(current)) return parsed
+    parsed.push(addSelectionPathIfNeeded(current))
+    return parsed
+  }, [])
 
 // Group snapshots by studyright id and find out when studyrights have begun
 const groupStudyrightSnapshots = studyrightSnapshots => {
-  const snapshotsBystudyright = Object.entries(
-    groupBy(
-      studyrightSnapshots.filter(s => s.document_state === 'ACTIVE'),
-      'id'
-    )
-  )
+  const snapshotsBystudyright = Object.entries(groupBy(studyrightSnapshots, 'id'))
 
   return snapshotsBystudyright.reduce((res, [id, snapshots]) => {
     const byPhases = s => {
@@ -147,7 +158,7 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
 const updateStudents = async personIds => {
   await loadMapsIfNeeded()
 
-  const [students, studyRightSnapshots, attainments, termRegistrations, studyRightPrimalities] = await Promise.all([
+  const [students, studyrightSnapshots, attainments, termRegistrations, studyRightPrimalities] = await Promise.all([
     selectFromByIds('persons', personIds),
     selectFromByIds('studyrights', personIds, 'person_id'),
     selectFromByIds('attainments', personIds, 'person_id'),
@@ -155,9 +166,9 @@ const updateStudents = async personIds => {
     selectFromByIds('study_right_primalities', personIds, 'student_id'),
   ])
 
-  const studyRightSnapshotsWithAddedSelectionPaths = addSelectionPaths(studyRightSnapshots)
+  const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
 
-  const groupedStudyRightSnapshots = groupStudyrightSnapshots(studyRightSnapshotsWithAddedSelectionPaths)
+  const groupedStudyRightSnapshots = groupStudyrightSnapshots(parsedStudyrightSnapshots)
 
   const personIdToStudentNumber = students.reduce((res, curr) => {
     res[curr.id] = curr.student_number
@@ -172,9 +183,7 @@ const updateStudents = async personIds => {
 
   const attainmentsToBeExluced = getAttainmentsToBeExcluded()
 
-  const mappedStudents = students.map(
-    studentMapper(attainments, studyRightSnapshotsWithAddedSelectionPaths, attainmentsToBeExluced)
-  )
+  const mappedStudents = students.map(studentMapper(attainments, parsedStudyrightSnapshots, attainmentsToBeExluced))
   await bulkCreate(Student, mappedStudents)
 
   const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
