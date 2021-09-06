@@ -455,10 +455,34 @@ const mapStateToProps = state => {
   let mandatoryPassed = {}
 
   if (populationCourses.data.coursestatistics) {
+    const mandatorycodesMapCourseCodeToCourseID = new Map()
+    populationMandatoryCourses.data
+      .filter(course => course.visible && course.visible.visibility)
+      .forEach(c => mandatorycodesMapCourseCodeToCourseID.set(c.code, c.id))
+    // console.log('mandatory codes to map copurse: ', mandatorycodesMapCourseCodeToCourseID)
     const courses = populationCourses.data.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
       const foundCourse = !!courses.find(c => c.course.code === code)
-      obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
+
+      const searchCode = mandatorycodesMapCourseCodeToCourseID.get(code)
+
+      let foundSubsCourse
+      if (searchCode) {
+        foundSubsCourse = courses.find(c => {
+          if (!c.course.substitutions) return false
+          if (c.course.substitutions.length === null) return false
+          return c.course.substitutions.includes(searchCode)
+        })
+      }
+
+      let passedArray = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
+      // console.log('found subs course: ', foundSubsCourse)
+      if (foundSubsCourse) {
+        passedArray = passedArray
+          ? [...passedArray, ...Object.keys(foundSubsCourse.students.passed)]
+          : Object.keys(foundSubsCourse.students.passed)
+      }
+      obj[code] = passedArray
       return obj
     }, {})
   }
