@@ -37,6 +37,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     }
 
     if (req.body.years) {
+      console.log('bottleneck on years')
       const upperYearBound = new Date().getFullYear() + 1
       const multicoursestatPromises = Promise.all(
         req.body.years.map(year => {
@@ -59,7 +60,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
       res.json(result)
     } else {
-      console.log('bottleneck väylä')
+      console.log('bottleneck ei ole years')
       const result = await Population.bottlenecksOf(req.body)
 
       if (result.error) {
