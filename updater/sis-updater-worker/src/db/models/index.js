@@ -29,6 +29,9 @@ Student.hasMany(SemesterEnrollment, { foreignKey: 'studentnumber', sourceKey: 's
 SemesterEnrollment.belongsTo(Semester, { foreignKey: 'semestercomposite', targetKey: 'composite' })
 Semester.hasMany(SemesterEnrollment, { foreignKey: 'semestercomposite', sourceKey: 'composite' })
 
+ProgrammeModule.belongsTo(Organization, { foreignKey: 'organization_id' })
+Organization.hasMany(ProgrammeModule, { foreignKey: 'organization_id' })
+
 Credit.notUnnecessary = credit => {
   return credit.credits > 0 && credit.credits <= 12
 }
@@ -95,6 +98,8 @@ ProgrammeModule.belongsToMany(ProgrammeModule, {
   through: ProgrammeModuleChild,
   foreignKey: 'childId',
 })
+
+Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
 
 module.exports = {
   Organization,

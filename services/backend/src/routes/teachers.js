@@ -1,5 +1,6 @@
 const teachers = require('../services/teachers')
 const topteachers = require('../services/topteachers')
+const { isFaculty, providersOfFaculty } = require('../services/organisations')
 const router = require('express').Router()
 const { mapToProviders } = require('../util/utils')
 
@@ -51,7 +52,19 @@ router.get('/stats', async (req, res) => {
   if (!(providers.every(p => providerRights.includes(p)) || roles.includes('admin'))) {
     return res.status(403).send('You do not have rights to see this data')
   }
-  const result = await teachers.yearlyStatistics(providers, semesterStart, semesterEnd || semesterStart + 1)
+
+  // combine provider list that may include programmes and faculties
+  const parsedProviders = [
+    ...new Set(
+      await providers.reduce(
+        async (acc, curr) =>
+          isFaculty(curr) ? [...(await acc), ...(await providersOfFaculty(curr))] : [...(await acc), curr],
+        []
+      )
+    ),
+  ]
+
+  const result = await teachers.yearlyStatistics(parsedProviders, semesterStart, semesterEnd || semesterStart + 1)
   res.json(result)
 })
 
