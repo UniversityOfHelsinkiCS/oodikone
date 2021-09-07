@@ -85,14 +85,18 @@ class PopulationStudents extends Component {
   }
 
   renderStudentTable() {
+    console.log('mandatory courses: ', this.props.mandatoryCourses)
     const { customPopulation, coursePopulation } = this.props
     const verticalTitle = title => <div className="verticalTitle">{title}</div>
 
     const hasPassedMandatory = (studentNumber, code) =>
       this.props.mandatoryPassed[code] && this.props.mandatoryPassed[code].includes(studentNumber)
 
-    const totalMandatoryPassed = studentNumber =>
-      this.props.mandatoryCourses.reduce((acc, m) => (hasPassedMandatory(studentNumber, m.code) ? acc + 1 : acc), 0)
+    const totalMandatoryPassed = studentNumber => {
+      this.props.mandatoryCourses.reduce((acc, m) => {
+        return hasPassedMandatory(studentNumber, m.code) ? acc + 1 : acc
+      }, 0)
+    }
 
     const nameColumns = this.props.showNames
       ? [
@@ -165,6 +169,7 @@ class PopulationStudents extends Component {
     const labelToMandatoryCourses = this.props.mandatoryCourses.reduce((acc, e) => {
       const label = e.label ? e.label.label : ''
       acc[label] = acc[label] || []
+      if (acc[label].some(l => l.code === e.code)) return acc
       acc[label].push(e)
       if (e.label) mandatoryCourseLabels.push({ ...e.label, code: e.label_code })
       else mandatoryCourseLabels.push({ id: 'null', label: '', code: '' })
@@ -222,6 +227,7 @@ class PopulationStudents extends Component {
     )
 
     const getTotalRowVal = (t, m) => t[m.code]
+
     const mandatoryCourseColumns = [
       ...nameColumns,
       ...labelColumns,
@@ -255,7 +261,10 @@ class PopulationStudents extends Component {
 
     const totals = this.props.filteredStudents.reduce(
       (acc, s) => {
+        const passedCourses = new Set()
         this.props.mandatoryCourses.forEach(m => {
+          if (passedCourses.has(m.code)) return
+          passedCourses.add(m.code)
           if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
         })
         return acc
@@ -459,7 +468,7 @@ const mapStateToProps = state => {
     populationMandatoryCourses.data
       .filter(course => course.visible && course.visible.visibility)
       .forEach(c => mandatorycodesMapCourseCodeToCourseID.set(c.code, c.id))
-    // console.log('mandatory codes to map copurse: ', mandatorycodesMapCourseCodeToCourseID)
+
     const courses = populationCourses.data.coursestatistics
     mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
       const foundCourse = !!courses.find(c => c.course.code === code)
@@ -476,7 +485,7 @@ const mapStateToProps = state => {
       }
 
       let passedArray = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
-      // console.log('found subs course: ', foundSubsCourse)
+
       if (foundSubsCourse) {
         passedArray = passedArray
           ? [...passedArray, ...Object.keys(foundSubsCourse.students.passed)]
