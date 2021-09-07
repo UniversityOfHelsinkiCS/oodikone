@@ -44,6 +44,7 @@ services:
     volumes:
       - backend-nodemod:/usr/src/app/node_modules
       - ./services/backend/:/usr/src/app
+    shm_size: 2gb
 
   frontend:
     <<: *defaults
