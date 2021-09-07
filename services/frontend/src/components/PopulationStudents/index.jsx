@@ -85,7 +85,6 @@ class PopulationStudents extends Component {
   }
 
   renderStudentTable() {
-    console.log('mandatory courses: ', this.props.mandatoryCourses)
     const { customPopulation, coursePopulation } = this.props
     const verticalTitle = title => <div className="verticalTitle">{title}</div>
 
