@@ -126,7 +126,13 @@ const moduleTypes = new Set(['ModuleAttainment', 'DegreeProgrammeAttainment'])
 const isModule = courseType => moduleTypes.has(courseType)
 
 const creditMapper =
-  (personIdToStudentNumber, courseUnitIdToCourseGroupId, moduleGroupIdToModuleCode, courseGroupIdToCourseCode) =>
+  (
+    personIdToStudentNumber,
+    courseUnitIdToCourseGroupId,
+    moduleGroupIdToModuleCode,
+    courseGroupIdToCourseCode,
+    studyrightIdToOrganisationsName
+  ) =>
   attainment => {
     const {
       id,
@@ -141,6 +147,7 @@ const creditMapper =
       course_unit_id,
       module_group_id,
       nodes,
+      study_right_id,
     } = attainment
 
     const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
@@ -149,9 +156,19 @@ const creditMapper =
 
     if (!targetSemester) return null
 
-    const course_code = !isModule(type)
+    let course_code = !isModule(type)
       ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
       : moduleGroupIdToModuleCode[module_group_id]
+
+    // check if avoin and add AY in the start of the code
+    if (study_right_id) {
+      const organisationName = studyrightIdToOrganisationsName[study_right_id]
+      if (organisationName) {
+        if (organisationName['fi'].startswith('Avoin yliopisto')) {
+          course_code = course_code.startswith('AY') ? course_code : 'AY'.concat(course_code)
+        }
+      }
+    }
 
     // These are leaf attainments that have no other attainments attached to them
     const isStudyModule = nodes && nodes[0] !== undefined
