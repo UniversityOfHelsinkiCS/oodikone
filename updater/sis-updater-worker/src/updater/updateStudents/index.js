@@ -436,7 +436,8 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode,
-    fixedAttainments
+    fixedAttainments,
+    studyrightIdToOrganisationsName
   )
 
   const credits = fixedAttainments
@@ -461,6 +462,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     .filter(c => !!c)
 
   const courses = Array.from(coursesToBeCreated.values())
+  console.log('courses: ', courses)
 
   await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
