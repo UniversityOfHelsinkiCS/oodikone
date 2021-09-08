@@ -208,8 +208,9 @@ const updateStudents = async personIds => {
 }
 
 const updateAttainments = async (attainments, personIdToStudentNumber, attainmentsToBeExluced) => {
+  // console.log('attainments: ', attainments)
   const personIdToEmployeeNumber = await updateTeachers(attainments)
-  const [courseUnits, modules] = await Promise.all([
+  const [courseUnits, modules, studyrights] = await Promise.all([
     selectFromByIds(
       'course_units',
       attainments.map(a => a.course_unit_id).filter(id => !!id)
@@ -219,8 +220,19 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       attainments.map(a => a.module_group_id).filter(id => !!id),
       'group_id'
     ),
+    selectFromByIds(
+      'studyrights',
+      attainments.map(a => a.study_right_id).filter(id => !!id)
+    ),
   ])
-
+  // console.log('studyrights : ', studyrights)
+  const [studyrightOrganisations] = await Promise.all([
+    selectFromByIds(
+      'organisations',
+      studyrights.map(studyright => studyright.organisation_id).filter(id => !!id)
+    ),
+  ])
+  console.log('studyrights organisations: ', studyrightOrganisations)
   const courseUnitIdToCourseGroupId = courseUnits.reduce((res, curr) => {
     res[curr.id] = curr.group_id
     return res
@@ -231,6 +243,17 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     return res
   }, {})
 
+  const organisationIdToName = studyrightOrganisations.reduce((res, curr) => {
+    res[curr.id] = curr.name
+    return res
+  }, {})
+  console.log('organisation id to name: ', organisationIdToName)
+
+  const studyrightIdToOrganisationsName = studyrights.reduce((res, curr) => {
+    res[curr.id] = organisationIdToName[curr.organisation_id]
+    return res
+  }, {})
+  console.log('studyright to organisation name', studyrightIdToOrganisationsName)
   const idsOfFaculties = dbConnections.knex
     .select('id')
     .from('organisations')
