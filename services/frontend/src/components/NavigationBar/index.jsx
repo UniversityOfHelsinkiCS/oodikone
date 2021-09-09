@@ -24,6 +24,12 @@ const allNavigationItems = {
   teachers: { path: '/teachers', key: 'teachers', label: 'Teachers', reqRights: ['teachers'] },
   users: { path: '/users', key: 'users', label: 'Users', reqRights: ['users'] },
   trends: { path: '/trends', key: 'trends', label: 'Trends' },
+  studyGuidanceGroups: {
+    path: '/studyGuidanceGroups',
+    key: 'studyGuidanceGroups',
+    label: 'Study guidance groups',
+    reqRights: ['studyGuidanceGroups'],
+  },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['dev', 'admin'] },
   feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
 }
