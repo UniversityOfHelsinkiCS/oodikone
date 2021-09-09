@@ -88,7 +88,7 @@ const updateGroups = async (user, affiliations, hyGroups) => {
   await user.removeHy_group(await HyGroupService.byCodes(hyGroupsToDelete))
 }
 
-const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId) => {
+const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId, hasStudyGuidanceGroupAccess) => {
   let user = await byUsername(uid)
   let isNew = false
   await createMissingGroups(hyGroups, HyGroupService)
@@ -113,6 +113,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuI
 
   await determineAccessToCourseStats(user, hyGroups)
   await determineAccessToTeachersForOne(user, hyGroups)
+  await determineAccessToStudyGuidanceGroups(user, hasStudyGuidanceGroupAccess)
 
   console.log('Generating token')
   const token = await generateToken(uid)
@@ -327,6 +328,16 @@ const determineAccessToTeachersForOne = async (user, hyGroups) => {
   const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'teachers')
   if (hyGroups.includes(hyOneGroup) && !alreadyAccess) {
     await modifyRights(user.id, { teachers: true })
+  }
+}
+
+const determineAccessToStudyGuidanceGroups = async (user, hasStudyGuidanceGroupAccess) => {
+  const accessGroups = (user && user.accessgroup) || []
+  const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'studyGuidanceGroups')
+  if (hasStudyGuidanceGroupAccess && !alreadyAccess) {
+    await modifyRights(user.id, { studyGuidanceGroups: true })
+  } else if (!hasStudyGuidanceGroupAccess && alreadyAccess) {
+    await modifyRights(user.id, { studyGuidanceGroups: false })
   }
 }
 
