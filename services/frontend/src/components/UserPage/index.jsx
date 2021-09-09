@@ -63,9 +63,7 @@ const UserPage = ({
       <List divided>
         {usersElementdetailCodesAvailable.length > 0 &&
           usersElementdetailCodesAvailable.map(({ elementDetailCode: code }) => {
-            console.log('elementDetailCode', code)
             const element = elementdetails.find(e => e.code === code)
-            console.log('element', element)
             return (
               <List.Item key={code}>
                 <List.Content floated="right">

@@ -25,7 +25,7 @@ const allNavigationItems = {
   users: { path: '/users', key: 'users', label: 'Users', reqRights: ['users'] },
   trends: { path: '/trends', key: 'trends', label: 'Trends' },
   studyGuidanceGroups: {
-    path: '/studyGuidanceGroups',
+    path: '/studyguidancegroups',
     key: 'studyGuidanceGroups',
     label: 'Study guidance groups',
     reqRights: ['studyGuidanceGroups'],
