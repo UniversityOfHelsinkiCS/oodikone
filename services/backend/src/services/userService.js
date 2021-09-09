@@ -5,6 +5,7 @@ const elementDetailService = require('./elementdetails')
 const { filterStudentnumbersByAccessrights } = require('./students')
 const { userDataCache } = require('./cache')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
+const { getImporterClient } = require('../util/importerClient')
 
 const ping = async () => {
   const url = '/ping'
@@ -17,7 +18,24 @@ const findAll = async () => {
   return response.data
 }
 
+const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
+  if (!hyPersonSisuId) {
+    const errorMessage = 'Not possible to get groups without personId header'
+    console.log(errorMessage)
+    return false
+  }
+  const importerClient = getImporterClient()
+  try {
+    const { data } = await importerClient.get(`/person-groups/person/${hyPersonSisuId}`)
+    return data && Object.values(data).length > 0
+  } catch (e) {
+    console.log('Error happened while retrieving study guidance groups:', e)
+  }
+  return false
+}
+
 const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
+  const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
   const response = await client.post('/login', {
     uid,
     full_name,
@@ -25,6 +43,7 @@ const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisu
     affiliations,
     email,
     hyPersonSisuId,
+    hasStudyGuidanceGroupAccess,
   })
   return response.data
 }
