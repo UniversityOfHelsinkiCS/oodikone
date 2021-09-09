@@ -232,7 +232,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       studyrights.map(studyright => studyright.organisation_id).filter(id => !!id)
     ),
   ])
-  console.log('studyrights organisations: ', studyrightOrganisations)
+  // console.log('studyrights organisations: ', studyrightOrganisations)
   const courseUnitIdToCourseGroupId = courseUnits.reduce((res, curr) => {
     res[curr.id] = curr.group_id
     return res
@@ -247,13 +247,15 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     res[curr.id] = curr.name
     return res
   }, {})
-  console.log('organisation id to name: ', organisationIdToName)
+  // console.log('organisation id to name: ', organisationIdToName)
 
   const studyrightIdToOrganisationsName = studyrights.reduce((res, curr) => {
     res[curr.id] = organisationIdToName[curr.organisation_id]
     return res
   }, {})
+
   console.log('studyright to organisation name', studyrightIdToOrganisationsName)
+
   const idsOfFaculties = dbConnections.knex
     .select('id')
     .from('organisations')
@@ -436,7 +438,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode,
-    fixedAttainments,
     studyrightIdToOrganisationsName
   )
 
@@ -462,7 +463,8 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     .filter(c => !!c)
 
   const courses = Array.from(coursesToBeCreated.values())
-  console.log('courses: ', courses)
+  // console.log('courses: ', courses)
+  console.log('credits: ', credits)
 
   await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
