@@ -67,8 +67,6 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
         .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
         .map(mapCourseProvider)
     )
-    console.log('courseProviders: ', courseProviders)
-
     return mapCourse(groupedCourse, substitutions, organisation)
   })
 
