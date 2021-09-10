@@ -1,4 +1,5 @@
 const { readFileSync } = require('fs')
+const { logger } = require('../../utils/logger')
 
 const getAttainmentsToBeExcluded = () => {
   try {
@@ -7,8 +8,7 @@ const getAttainmentsToBeExcluded = () => {
     const attainmentIds = data.split('\n')
     return new Set(attainmentIds)
   } catch (error) {
-    console.log(error)
-    throw new Error()
+    logger.error({ message: 'Reading excluded attainments from csv failed', meta: error.stack })
   }
 }
 
