@@ -1,7 +1,6 @@
 import React from 'react'
 import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
-import { func, string, arrayOf } from 'prop-types'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import { getUserRoles, setMocking, checkUserAccess } from '../../common'
@@ -22,7 +21,7 @@ const allNavigationItems = {
   students: { path: '/students', key: 'students', label: 'Student statistics' },
   courseStatistics: { path: '/coursestatistics', key: 'courseStatistics', label: 'Course statistics' },
   teachers: { path: '/teachers', key: 'teachers', label: 'Teachers', reqRights: ['teachers'] },
-  users: { path: '/users', key: 'users', label: 'Users', reqRights: ['users'] },
+  users: { path: '/users', key: 'users', label: 'Users', reqRights: ['admin'] },
   trends: { path: '/trends', key: 'trends', label: 'Trends' },
   studyGuidanceGroups: {
     path: '/studyguidancegroups',
@@ -30,7 +29,7 @@ const allNavigationItems = {
     label: 'Study guidance groups',
     reqRights: ['studyGuidanceGroups'],
   },
-  updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['dev', 'admin'] },
+  updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['admin'] },
   feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
 }
 
@@ -146,21 +145,6 @@ const NavigationBar = props => {
       {mockedBy && renderStopMockingButton()}
     </Menu>
   )
-}
-
-NavigationBar.propTypes = {
-  logout: func.isRequired,
-  userRoles: arrayOf(string),
-  rights: arrayOf(string),
-  mockedBy: string,
-  userId: string,
-}
-
-NavigationBar.defaultProps = {
-  mockedBy: null,
-  userId: 'unknown',
-  userRoles: [],
-  rights: [],
 }
 
 const mapStateToProps = ({
