@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize')
 const { ExcludedCourse } = require('../models/models_kone')
 const { Op } = Sequelize
+const logger = require('../util/logger')
 
 const { dbConnections: sisConnections } = require('../database/connection')
 const { sequelizeKone } = require('../database/connection')
@@ -23,8 +24,7 @@ const recursivelyGetModuleAndChildren = async (code, type) => {
     )
     return result
   } catch (e) {
-    console.error('Error when searching with code: ', code)
-    console.error('Details: ', e)
+    logger.error(`Error when searching modules and children with code: ${code}`)
     return []
   }
 }

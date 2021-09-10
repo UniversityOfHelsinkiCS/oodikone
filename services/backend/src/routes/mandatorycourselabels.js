@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const MandatoryCourseLabels = require('../services/mandatoryCourseLabels')
+const logger = require('../util/logger')
 
 router.get('/:programme/labels', async (req, res) => {
   const { programme } = req.params
@@ -8,7 +9,7 @@ router.get('/:programme/labels', async (req, res) => {
       const labels = await MandatoryCourseLabels.labelsByStudyprogramme(programme)
       res.status(200).json(labels)
     } catch (err) {
-      console.error(err)
+      logger.error(err)
       res.status(400).json(err.message)
     }
   } else {
@@ -25,7 +26,7 @@ router.delete('/:programme/labels', async (req, res) => {
       const labels = await MandatoryCourseLabels.labelsByStudyprogramme(programme)
       res.status(200).json(labels)
     } catch (err) {
-      console.error(err)
+      logger.error(err)
       res.status(400).json(err.message)
     }
   } else {
@@ -42,7 +43,7 @@ router.post('/:programme/move', async (req, res) => {
       const labels = await MandatoryCourseLabels.labelsByStudyprogramme(programme)
       res.status(200).json(labels)
     } catch (err) {
-      console.error(err)
+      logger.error(err)
       res.status(400).json(err.message)
     }
   } else {
@@ -59,7 +60,7 @@ router.post('/:programme/labels', async (req, res) => {
       const labels = await MandatoryCourseLabels.labelsByStudyprogramme(programme)
       res.status(200).json(labels)
     } catch (err) {
-      console.error(err)
+      logger.error(err)
       res.status(400).json(err.message)
     }
   } else {
