@@ -5,6 +5,7 @@ const Umzug = require('umzug')
 const { lock } = require('../utils/redis')
 const { MIGRATIONS_LOCK } = require('../config')
 const { DB_URL, SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE } = process.env
+const { logger } = require('../utils/logger')
 
 class DbConnections extends EventEmitter {
   constructor() {
@@ -61,7 +62,7 @@ class DbConnections extends EventEmitter {
         this.emit('error', e)
         return
       }
-      console.log(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
+      logger.error(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }
@@ -75,7 +76,6 @@ class DbConnections extends EventEmitter {
           sequelize: this.sequelize,
           tableName: 'migrations',
         },
-        logging: console.log,
         migrations: {
           params: [this.sequelize.getQueryInterface(), Sequelize],
           path: `${process.cwd()}/src/db/migrations`,
@@ -83,9 +83,9 @@ class DbConnections extends EventEmitter {
         },
       })
       const migrations = await migrator.up()
-      console.log('Migrations up to date', migrations)
+      logger.info({ message: 'Migrations up to date', meta: JSON.stringify(migrations) })
     } catch (e) {
-      console.log('Migration error', e)
+      logger.error({ message: 'Migration error', meta: JSON.stringify(e) })
       throw e
     } finally {
       unlock()
