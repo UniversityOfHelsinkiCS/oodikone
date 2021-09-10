@@ -1,3 +1,4 @@
+require('express-async-errors')
 const express = require('express')
 const cors = require('cors')
 const Sentry = require('@sentry/node')
@@ -6,6 +7,7 @@ const routes = require('./routes')
 const { startCron } = require('./events')
 const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
 const initializeSentry = require('./util/sentry')
+const errorMiddleware = require('./middleware/errormiddleware')
 
 initializeDatabaseConnection()
   .then(() => {
@@ -37,6 +39,8 @@ initializeDatabaseConnection()
     })
 
     app.use(Sentry.Handlers.errorHandler())
+
+    app.use(errorMiddleware)
 
     const server = app.listen(backendPort, () => console.log(`Backend listening on port ${backendPort}!`))
     process.on('SIGTERM', () => {
