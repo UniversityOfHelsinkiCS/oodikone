@@ -3,7 +3,6 @@ import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'sema
 import { connect, useSelector } from 'react-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import { string, number, shape, bool, arrayOf, func } from 'prop-types'
 import { getTextIn, getUserRoles, setMocking, textAndDescriptionSearch } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
@@ -196,49 +195,6 @@ const UserPage = ({
   )
 }
 
-UserPage.propTypes = {
-  user: shape({
-    id: string,
-    full_name: string,
-    is_enabled: bool,
-    elementdetails: arrayOf(string),
-    programme: arrayOf(
-      shape({
-        code: string,
-        name: shape({}),
-        type: number,
-      })
-    ),
-    faculty: arrayOf(
-      shape({
-        faculty_code: string,
-        programme: arrayOf(
-          shape({
-            code: string,
-            name: shape({}),
-            type: number,
-          })
-        ),
-      })
-    ),
-  }).isRequired,
-  removeUserUnits: func.isRequired,
-  setFaculties: func.isRequired,
-  goBack: func.isRequired,
-  getProgrammesUnfiltered: func.isRequired,
-  associations: shape({}).isRequired,
-  pending: bool.isRequired,
-  history: shape({
-    push: func.isRequired,
-  }).isRequired,
-  getAccessGroups: func.isRequired,
-  getFaculties: func.isRequired,
-  getElementDetails: func.isRequired,
-  elementdetails: arrayOf(shape({ type: number, code: string, name: shape({}) })).isRequired,
-  faculties: arrayOf(shape({ code: string, name: shape({}) })).isRequired,
-  accessGroups: shape({}).isRequired,
-  isAdmin: bool.isRequired,
-}
 const mapStateToProps = state => ({
   units: state.units.data,
   faculties: state.faculties.data,

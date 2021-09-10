@@ -1,30 +1,31 @@
 import React from 'react'
-import { func, bool, shape } from 'prop-types'
 import { Card, Icon, Button } from 'semantic-ui-react'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { reformatDate } from '../../../common'
-import { studentDetailsType } from '../../../constants/types'
+import { useSelector, useDispatch } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+import { reformatDate, getUserIsAdmin } from '../../../common'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants'
 import './studentInfoCard.css'
 import { removeStudentSelection, resetStudent } from '../../../redux/students'
 import { callApi } from '../../../apiConnection'
+
 import EnrollmentAccordion from './EnrollmentAccordion'
 
-const StudentInfoCard = props => {
-  const { student, showName, updating } = props
+const StudentInfoCard = ({ student }) => {
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const { namesVisible: showName } = useSelector(state => state.settings)
+  const { updating } = useSelector(state => state.populations)
+  const { roles } = useSelector(state => state.auth.token)
+  const isAdmin = getUserIsAdmin(roles)
   const name = showName ? `${student.name}, ` : ''
   const email = showName && student.email ? `${student.email}` : ''
   const onRemove = () => {
-    props.history.push('/students')
-    props.resetStudent()
-    props.removeStudentSelection()
+    history.push('/students')
+    dispatch(resetStudent())
+    dispatch(removeStudentSelection())
   }
 
-  const formattedTimestamp = reformatDate(
-    student.updatedAt,
-    props.has_dev_role ? DISPLAY_DATE_FORMAT_DEV : DISPLAY_DATE_FORMAT
-  )
+  const formattedTimestamp = reformatDate(student.updatedAt, isAdmin ? DISPLAY_DATE_FORMAT_DEV : DISPLAY_DATE_FORMAT)
 
   const updateStudent = async () => {
     await callApi('/updater/update/v2/students', 'post', [student.studentNumber])
@@ -66,25 +67,4 @@ const StudentInfoCard = props => {
   )
 }
 
-StudentInfoCard.propTypes = {
-  student: studentDetailsType.isRequired,
-  showName: bool.isRequired,
-  removeStudentSelection: func.isRequired,
-  resetStudent: func.isRequired,
-  history: shape({}).isRequired,
-  updating: bool.isRequired,
-  has_dev_role: bool.isRequired,
-}
-
-const mapStateToProps = state => ({
-  showName: state.settings.namesVisible,
-  updating: state.populations.updating,
-  has_dev_role: state.auth.token.roles.find(r => r.group_code === 'dev') !== undefined,
-})
-
-export default withRouter(
-  connect(mapStateToProps, {
-    removeStudentSelection,
-    resetStudent,
-  })(StudentInfoCard)
-)
+export default StudentInfoCard

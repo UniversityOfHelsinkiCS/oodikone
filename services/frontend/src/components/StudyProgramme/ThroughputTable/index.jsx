@@ -1,11 +1,10 @@
 import React, { useState } from 'react'
 import moment from 'moment'
 import { Header, Table, Icon, Label, Segment, Dropdown, Button, Modal, Popup } from 'semantic-ui-react'
-import { shape, number, arrayOf, bool, string, node } from 'prop-types'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { flatten, uniq, range } from 'lodash'
-import { getUserRoles } from '../../../common'
+import { getUserIsAdmin } from '../../../common'
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 
@@ -55,25 +54,6 @@ const TotalPopulationLink = ({ confirm, years, studyprogramme, studytrack, child
   )
 }
 
-PopulationStatisticsLink.propTypes = {
-  studytrack: string.isRequired,
-  studyprogramme: string.isRequired,
-  year: string.isRequired,
-  children: node.isRequired,
-}
-
-TotalPopulationLink.defaultProps = {
-  confirm: false,
-}
-
-TotalPopulationLink.propTypes = {
-  studyprogramme: string.isRequired,
-  years: arrayOf(shape({})).isRequired,
-  children: node.isRequired,
-  confirm: bool,
-  studytrack: string.isRequired,
-}
-
 const ThroughputTable = ({
   throughput,
   thesis,
@@ -81,7 +61,6 @@ const ThroughputTable = ({
   error,
   studyprogramme,
   studytrack,
-  userRoles,
   history,
   newProgramme,
   isStudytrackView,
@@ -89,6 +68,7 @@ const ThroughputTable = ({
   const [lowerYear, setLower] = useState(null)
   const [upperYear, setUpper] = useState(null)
   const [yearDifference, setDifference] = useState(null)
+  const { roles } = useSelector(state => state.auth.token)
 
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
 
@@ -105,7 +85,7 @@ const ThroughputTable = ({
 
   if (error) return <h1>Oh no so error {error}</h1>
 
-  const GRADUATED_FEATURE_TOGGLED_ON = userRoles.includes('dev')
+  const GRADUATED_FEATURE_TOGGLED_ON = getUserIsAdmin(roles)
 
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   genders.sort()
@@ -406,50 +386,4 @@ const ThroughputTable = ({
   )
 }
 
-ThroughputTable.propTypes = {
-  throughput: shape({
-    lastUpdated: string,
-    status: string,
-    data: arrayOf(
-      shape({
-        year: string,
-        credits: arrayOf(number),
-        thesisM: number,
-        thesisB: number,
-        graduated: number,
-      })
-    ),
-  }),
-  thesis: arrayOf(
-    shape({
-      programmeCode: string,
-      courseCode: string,
-      thesisType: string,
-      createdAt: string,
-      updatedAt: string,
-    })
-  ),
-  studyprogramme: string.isRequired,
-  studytrack: string,
-  loading: bool.isRequired,
-  error: bool.isRequired,
-  userRoles: arrayOf(string).isRequired,
-  history: shape({}).isRequired,
-  newProgramme: bool.isRequired,
-  isStudytrackView: bool,
-}
-
-ThroughputTable.defaultProps = {
-  throughput: null,
-  thesis: undefined,
-  studytrack: '',
-  isStudytrackView: false,
-}
-
-const mapStateToProps = ({
-  auth: {
-    token: { roles },
-  },
-}) => ({ userRoles: getUserRoles(roles) })
-
-export default connect(mapStateToProps)(ThroughputTable)
+export default ThroughputTable
