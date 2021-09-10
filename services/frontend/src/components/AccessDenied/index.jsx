@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Transition, Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
-import { bool, func } from 'prop-types'
 import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { random } from 'lodash'
-import { logout as logoutAction } from '../../redux/auth'
+import { logout } from '../../redux/auth'
 import { images } from '../../common'
 import MulticolorBarChart from './MulticolorBarChart'
 
@@ -38,7 +37,7 @@ const dummyData = names.map(name => ({
   }, []),
 }))
 
-const AccessDenied = ({ notEnabled, logout }) => {
+const AccessDenied = ({ notEnabled }) => {
   const header = notEnabled ? 'Welcome to Oodikone!' : 'Something broke'
   const subheader = notEnabled
     ? `You're currently not allowed to enter
@@ -47,6 +46,7 @@ const AccessDenied = ({ notEnabled, logout }) => {
     pressing log out or contacting grp-toska@helsinki.fi`
 
   const [easterEgg, setEasterEgg] = useState(false)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (notEnabled) {
@@ -95,7 +95,7 @@ const AccessDenied = ({ notEnabled, logout }) => {
           <p>{header}</p>
           <Header.Subheader>{subheader}</Header.Subheader>
           <br />
-          <Button onClick={logout} color="pink">
+          <Button onClick={() => dispatch(logout())} color="pink">
             {' '}
             Log out{' '}
           </Button>
@@ -114,13 +114,4 @@ const AccessDenied = ({ notEnabled, logout }) => {
   )
 }
 
-AccessDenied.propTypes = {
-  notEnabled: bool.isRequired,
-  logout: func.isRequired,
-}
-
-const mapDispatchToProps = {
-  logout: logoutAction,
-}
-
-export default connect(null, mapDispatchToProps)(AccessDenied)
+export default AccessDenied
