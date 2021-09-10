@@ -7,10 +7,7 @@
   "parserOptions": {
     "requireConfigFile": false
   },
-  "extends": [
-    "airbnb",
-    "plugin:prettier/recommended"
-  ],
+  "extends": ["airbnb", "plugin:prettier/recommended"],
   "rules": {
     "react/no-did-mount-set-state": "off",
     "react/destructuring-assignment": "off",
@@ -31,6 +28,7 @@
     "react/static-property-placement": "off",
     "react/no-deprecated": "off",
     "react/no-unescaped-entities": "off",
+    "react/prop-types": "off",
     "react/prefer-stateless-function": "error",
     "import/no-unresolved": "error",
     "react/jsx-no-bind": "error",
@@ -45,11 +43,5 @@
       }
     ]
   },
-  "plugins": [
-    "react",
-    "import",
-    "prefer-object-spread",
-    "babel",
-    "react-hooks"
-  ]
+  "plugins": ["react", "import", "prefer-object-spread", "babel", "react-hooks"]
 }
