@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import { Loader } from 'semantic-ui-react'
+import ProtectedRoute from './ProtectedRoute'
 
 // From https://dev.to/goenning/how-to-retry-when-react-lazy-fails-mb5
 const retry = async (fn, retriesLeft = 3, interval = 500) =>
@@ -56,18 +57,34 @@ const Routes = () => (
   <Suspense fallback={<Loader active inline="centered" />}>
     <Switch>
       <Route exact path="/" component={FrontPage} />
-      <Route exact path="/populations" component={Populations} />
-      <Route exact path="/study-programme/:studyProgrammeId?" component={StudyProgramme} />
-      <Route exact path={routes.students} component={StudentStatistics} />
-      <Route exact path={routes.courseStatistics} component={CourseStatistics} />
-      <Route exact path={routes.users} component={EnableUsers} />
-      <Route exact path={routes.teachers} component={Teachers} />
       <Route exact path={routes.feedback} component={Feedback} />
-      <Route exact path={routes.coursepopulation} component={CoursePopulation} />
-      <Route exact path={routes.custompopulation} component={CustomPopulation} />
-      <Route exact path={routes.updater} component={Updater} />
       <Route path={routes.trends} component={Trends} />
-      <Route path={routes.studyGuidanceGroups} component={StudyGuidanceGroups} />
+      <ProtectedRoute requireUserHasRights exact path="/populations" component={Populations} />
+      <ProtectedRoute
+        requireUserHasRights
+        exact
+        path="/study-programme/:studyProgrammeId?"
+        component={StudyProgramme}
+      />
+      <ProtectedRoute requireUserHasRights exact path={routes.students} component={StudentStatistics} />
+      <ProtectedRoute
+        requiredRoles={['courseStatistics']}
+        requireUserHasRights
+        exact
+        path={routes.courseStatistics}
+        component={CourseStatistics}
+      />
+      <ProtectedRoute requiredRoles={['admin']} exact path={routes.users} component={EnableUsers} />
+      <ProtectedRoute requiredRoles={['teachers']} exact path={routes.teachers} component={Teachers} />
+      <ProtectedRoute requireUserHasRights exact path={routes.coursepopulation} component={CoursePopulation} />
+      <ProtectedRoute requireUserHasRights exact path={routes.custompopulation} component={CustomPopulation} />
+      <ProtectedRoute requiredRoles={['admin']} requireUserHasRights exact path={routes.updater} component={Updater} />
+      <ProtectedRoute
+        requiredRoles={['studyGuidanceGroups']}
+        exact
+        path={routes.studyGuidanceGroups}
+        component={StudyGuidanceGroups}
+      />
       <Redirect from="/cool-data-science" to="/trends" />
       <Redirect to="/" />
     </Switch>
