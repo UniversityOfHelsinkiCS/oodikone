@@ -1,26 +1,45 @@
 const winston = require('winston')
-const Log2gelf = require('winston-log2gelf')
+const { isProduction } = require('../conf-backend')
+
+const { combine, timestamp, printf, splat } = winston.format
 
 const transports = []
 
-if (process.env.LOG_PORT && process.env.LOG_HOST) {
+transports.push(new winston.transports.File({ filename: 'debug.log' }))
+
+if (!isProduction) {
+  const devFormat = printf(
+    ({ level, message, timestamp, ...rest }) => `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
+  )
+
   transports.push(
-    new Log2gelf({
-      hostname: process.env.LOG_HOSTNAME || 'oodikone-backend',
-      host: process.env.LOG_HOST,
-      port: process.env.LOG_PORT,
-      protocol: process.env.LOG_PROTOCOL || 'https',
-      environment: 'production',
-      protocolOptions: {
-        path: process.env.LOG_PATH || '/gelf',
-      },
+    new winston.transports.Console({
+      level: 'debug',
+      format: combine(splat(), timestamp(), devFormat),
     })
   )
 }
 
-transports.push(new winston.transports.File({ filename: 'debug.log' }))
+if (isProduction) {
+  const levels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    http: 3,
+    verbose: 4,
+    debug: 5,
+    silly: 6,
+  }
 
-transports.push(new winston.transports.Console({ level: 'debug' }))
+  const prodFormat = winston.format.printf(({ level, ...rest }) =>
+    JSON.stringify({
+      level: levels[level],
+      ...rest,
+    })
+  )
+
+  transports.push(new winston.transports.Console({ format: prodFormat }))
+}
 
 const logger = winston.createLogger({ transports })
 
