@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { string, number, shape, bool, arrayOf, func } from 'prop-types'
@@ -33,6 +33,7 @@ const UserPage = ({
   getProgrammesUnfiltered,
 }) => {
   const { language } = useLanguage()
+  const { userId: currentUserId } = useSelector(state => state?.auth?.token)
 
   useEffect(() => {
     if (elementdetails.length === 0) getElementDetails()
@@ -92,7 +93,7 @@ const UserPage = ({
     <Card fluid>
       <Card.Content>
         <Card.Header>
-          {isAdmin && user.is_enabled && (
+          {isAdmin && user.username !== currentUserId && user.is_enabled && (
             <Popup
               content="Show Oodikone as this user"
               trigger={
