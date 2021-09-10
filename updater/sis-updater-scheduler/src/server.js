@@ -101,7 +101,7 @@ app.get('/v1/courses/:code', async (req, res) => {
     const studyModule = await getCourses(req.params.code, superFlatten)
     res.json(studyModule)
   } catch (e) {
-    console.log(e)
+    logger.error({ message: 'gailed to get courses codes recursively', meta: e.stack })
     res.json({ error: e })
   }
 })
@@ -116,7 +116,7 @@ app.use(errorBoundary)
 const PORT = 8082
 const startServer = () => {
   app.listen(PORT, () => {
-    console.log(`Scheduler server listening on port ${PORT}`)
+    logger.info(`Scheduler server listening on port ${PORT}`)
   })
 }
 

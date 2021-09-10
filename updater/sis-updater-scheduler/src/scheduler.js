@@ -205,9 +205,11 @@ const scheduleProgrammes = async () => {
 
   const entityIds = modules.map(m => m.id)
 
-  createJobs(entityIds, 'programme_modules')
-    .then(() => console.log('scheduling programmes', entityIds))
-    .catch(e => console.log('Failed upadting modules', e))
+  try {
+    await createJobs(entityIds, 'programme_modules')
+  } catch (e) {
+    logger.error({ message: 'Programme module scheduling failed', meta: e.stack })
+  }
 }
 
 const scheduleWeekly = async () => {
