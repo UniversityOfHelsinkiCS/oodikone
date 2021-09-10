@@ -21,6 +21,7 @@ const {
 } = require('./services/analyticsService')
 const { isNewHYStudyProgramme } = require('./util')
 const { isProduction } = require('./conf-backend')
+const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
@@ -74,9 +75,9 @@ const refreshOverview = async () => {
 }
 
 const refreshTeacherLeaderboard = async () => {
-  const startyearcode = new Date().getFullYear() - 1950
-  const endyearcode = startyearcode + 1
-  await findAndSaveTeachers(startyearcode, endyearcode)
+  const startyearcode = 51 // Start from autumn 2001
+  const currentSemester = await getCurrentSemester()
+  await findAndSaveTeachers(startyearcode, currentSemester.getDataValue('semestercode'))
   logger.info('Teacher leaderboard refreshed')
 }
 
