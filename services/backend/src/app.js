@@ -8,17 +8,18 @@ const { startCron } = require('./events')
 const { initializeDatabaseConnection, dbConnections } = require('./database/connection')
 const initializeSentry = require('./util/sentry')
 const errorMiddleware = require('./middleware/errormiddleware')
+const logger = require('./util/logger')
 
 initializeDatabaseConnection()
   .then(() => {
     dbConnections.connect()
 
     dbConnections.on('connect', () => {
-      console.log('Connected to sis db successfully')
+      logger.info('Connected to sis db successfully')
     })
 
     dbConnections.on('error', () => {
-      console.log('Failed connecting to sis db')
+      logger.error('Failed to connect to sis db!')
     })
 
     const app = express()
@@ -33,7 +34,7 @@ initializeDatabaseConnection()
 
     routes(app, baseUrl)
 
-    app.get('*', async (req, res) => {
+    app.get('*', async (_, res) => {
       const results = { error: 'unknown endpoint' }
       res.status(404).json(results)
     })
@@ -42,14 +43,14 @@ initializeDatabaseConnection()
 
     app.use(errorMiddleware)
 
-    const server = app.listen(backendPort, () => console.log(`Backend listening on port ${backendPort}!`))
+    const server = app.listen(backendPort, () => logger.info(`Backend listening on port ${backendPort}!`))
     process.on('SIGTERM', () => {
       server.close(() => {
-        console.log('Process terminated')
+        logger.info('Process terminated')
       })
     })
   })
   .catch(e => {
     process.exitCode = 1
-    console.log(e)
+    logger.error(e)
   })
