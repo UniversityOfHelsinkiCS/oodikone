@@ -982,7 +982,6 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.allStudents = allstudentslength
-  console.log('bottleneck: ', bottlenecks)
   return bottlenecks
 }
 

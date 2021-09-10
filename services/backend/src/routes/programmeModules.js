@@ -28,34 +28,24 @@ router.get('/v3/programme_modules/:code/modules', async (req, res) => {
 
 router.delete('/v3/programme_modules', async (req, res) => {
   const { programmecode, ids } = req.body
-  try {
-    await removeExcludedCourses(ids)
-    const result = await byProgrammeCode(programmecode)
-    if (!result) {
-      res.status(400).end()
-      return
-    }
-    res.json(result)
-  } catch (e) {
-    console.log(e)
-    res.json(500).json(e)
+  await removeExcludedCourses(ids)
+  const result = await byProgrammeCode(programmecode)
+  if (!result) {
+    res.status(400).end()
+    return
   }
+  res.json(result)
 })
 
 router.post('/v3/programme_modules/:programmecode/', async (req, res) => {
   const { programmecode, coursecodes } = req.body
-  try {
-    await addExcludedCourses(programmecode, coursecodes)
-    const result = await byProgrammeCode(programmecode)
-    if (!result) {
-      res.status(400).end()
-      return
-    }
-    res.json(result)
-  } catch (e) {
-    console.log(e)
-    res.json(500).json(e)
+  await addExcludedCourses(programmecode, coursecodes)
+  const result = await byProgrammeCode(programmecode)
+  if (!result) {
+    res.status(400).end()
+    return
   }
+  res.json(result)
 })
 
 module.exports = router

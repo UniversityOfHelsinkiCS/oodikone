@@ -1,6 +1,6 @@
 const axios = require('axios')
-
 const { importerToken, importerUrl } = require('../conf-backend')
+const logger = require('./logger')
 
 const importerClient = axios.create({
   headers: {
@@ -11,7 +11,7 @@ const importerClient = axios.create({
 
 const getImporterClient = () => {
   if (!importerToken || !importerUrl) {
-    console.log("Importer token or importer url not set, can't return client!")
+    logger.error("Importer token or importer url not set, can't return client!")
     return null
   }
   return importerClient
