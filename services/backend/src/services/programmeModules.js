@@ -3,12 +3,11 @@ const { ExcludedCourse } = require('../models/models_kone')
 const { Op } = Sequelize
 const logger = require('../util/logger')
 
-const { dbConnections: sisConnections } = require('../database/connection')
-const { sequelizeKone } = require('../database/connection')
+const { dbConnections } = require('../database/connection')
 
 const recursivelyGetModuleAndChildren = async (code, type) => {
   // TODO use only sis connection once sis is stable
-  const connection = sisConnections.established ? sisConnections.sequelize : sequelizeKone
+  const connection = dbConnections.sequelize
   try {
     const [result] = await connection.query(
       `WITH RECURSIVE children as (
