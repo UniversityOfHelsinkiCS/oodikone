@@ -36,6 +36,7 @@
     "babel/no-invalid-this": "error",
     "react-hooks/rules-of-hooks": "error",
     "prettier/prettier": "error",
+    "no-console": "error",
     "no-param-reassign": [
       "error",
       {
