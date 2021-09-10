@@ -19,7 +19,7 @@ const HyGroupService = require('./hygroups')
 const { requiredGroup, courseStatisticsGroup, TOKEN_SECRET, hyOneGroup } = require('../conf')
 const Op = Sequelize.Op
 
-const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
+const TOKEN_VERSION = 1.1 // When token structure changes, increment in userservice, backend and frontend
 const generateToken = async (uid, mockedBy = null) => {
   const user = await byUsername(uid)
   const userData = getUserData(user)
@@ -35,6 +35,7 @@ const generateToken = async (uid, mockedBy = null) => {
     roles: user.accessgroup,
     createdAt: moment().toISOString(),
     version: TOKEN_VERSION,
+    sisPersonId: user.sisu_person_id,
   }
   const token = jwt.sign(payload, TOKEN_SECRET)
 
