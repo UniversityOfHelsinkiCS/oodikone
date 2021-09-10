@@ -11,7 +11,7 @@
   "extends": ["eslint:recommended", "plugin:prettier/recommended", "plugin:cypress/recommended"],
   "plugins": ["prettier", "cypress"],
   "rules": {
-    "no-console": "error",
+    "no-console": "warning",
     "react/no-unescaped-entities": "off",
     "no-async-promise-executor": "off",
     "prettier/prettier": "error"
