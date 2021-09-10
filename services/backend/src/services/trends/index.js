@@ -14,7 +14,6 @@ const CURRENT_DATE = new Date()
 
 const withErr = handler => (req, res, next) =>
   handler(req, res, next).catch(e => {
-    console.error(e)
     res.status(500).json({ error: { message: e.message, stack: e.stack } })
   })
 

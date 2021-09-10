@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const userService = require('../services/userService')
 const { sendFeedbackToToska } = require('../services/mailservice')
+const logger = require('../util/logger')
 
 router.post('/email', async (req, res) => {
   const { content } = req.body
@@ -16,7 +17,8 @@ router.post('/email', async (req, res) => {
   if (result.error) {
     return res.status(400).json(result).end()
   }
-  console.log('Message sent succesfully!')
+  logger.info(`${uid} succesfully sent some feedback mail to toska`)
+
   res.status(200).json('success').end()
 })
 
