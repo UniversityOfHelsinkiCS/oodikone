@@ -6,7 +6,7 @@ const { filterStudentnumbersByAccessrights } = require('./students')
 const { userDataCache } = require('./cache')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
 const { getImporterClient } = require('../util/importerClient')
-const logger = require('../utils/logger')
+const logger = require('../util/logger')
 
 const ping = async () => {
   const url = '/ping'
