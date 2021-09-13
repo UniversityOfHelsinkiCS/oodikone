@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { flatten, uniq, range } from 'lodash'
 import { getUserIsAdmin } from '../../../common'
+import { isDev } from '../../../conf'
 import InfoBox from '../../InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 
@@ -85,7 +86,8 @@ const ThroughputTable = ({
 
   if (error) return <h1>Oh no so error {error}</h1>
 
-  const GRADUATED_FEATURE_TOGGLED_ON = getUserIsAdmin(roles)
+  // toggle only on dev env and with admin user
+  const GRADUATED_FEATURE_TOGGLED_ON = getUserIsAdmin(roles) && isDev
 
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   genders.sort()
