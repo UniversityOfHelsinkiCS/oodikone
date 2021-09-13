@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   } = req
   if (!sisPersonId) {
     logger.error(`User ${uid} tried to get person groups but personId was ${sisPersonId} in header`)
-    return res.status(400).json({ error: 'Not possible to get groups without personId header' })
+    return res.status(400).json({ error: 'Not possible to get groups without personId' })
   }
   const importerClient = getImporterClient()
   if (!importerClient) {
