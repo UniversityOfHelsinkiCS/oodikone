@@ -11,6 +11,9 @@ router.get('/', async (req, res) => {
     return res.status(400).json({ error: 'Not possible to get groups without personId header' })
   }
   const importerClient = getImporterClient()
+  if (!importerClient) {
+    return []
+  }
   const { data } = await importerClient.get(`/person-groups/person/${sisPersonId}`)
   return res.json(Object.values(data))
 })

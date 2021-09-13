@@ -25,6 +25,7 @@ const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
     return false
   }
   const importerClient = getImporterClient()
+  if (!importerClient) return false
   const { data } = await importerClient.get(`/person-groups/person/${hyPersonSisuId}`)
   return data && Object.values(data).length > 0
 }
