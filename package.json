@@ -6,6 +6,7 @@
     "concurrently": "concurrently",
     "eslint": "eslint",
     "stylelint": "stylelint",
+    "prettier": "prettier",
     "cli": "./cli.sh",
     "oodikone": "./run.sh oodikone anon up --detach",
     "oodikone:real": "./run.sh oodikone real up --detach",
