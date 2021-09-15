@@ -20,10 +20,10 @@ USER_DB_NAME="user-db"
 DATABASES=("$KONE_DB_NAME" "$SIS_DB_NAME" "$SIS_IMPORTER_DB_NAME" "$USER_DB_NAME")
 
 ## Urls should be in same order as databases as both are iterated through by indexes.
-KONE_DB_REAL_DUMP_URL="svm-101:/home/oodikone_user/backups/latest-kone-pg.sqz"
+KONE_DB_REAL_DUMP_URL="svm-101:/home/oodikone_user/backups/latest-kone-db.sqz"
 SIS_DB_REAL_DUMP_URL="svm-96.cs.helsinki.fi:/home/updater_user/backups/latest-sis.sqz"
 SIS_IMPORTER_DB_REAL_DUMP_URL="importer:/home/importer_user/importer-db/backup/importer-db.sqz"
-USER_DB_REAL_DUMP_URL="svm-101:/home/oodikone_user/backups/latest-user-pg.sqz"
+USER_DB_REAL_DUMP_URL="svm-101:/home/oodikone_user/backups/latest-user-db.sqz"
 REAL_DUMP_URLS=("$KONE_DB_REAL_DUMP_URL" "$SIS_DB_REAL_DUMP_URL" "$SIS_IMPORTER_DB_REAL_DUMP_URL" "$USER_DB_REAL_DUMP_URL")
 
 # Source utility functions
