@@ -9,7 +9,6 @@ import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import TSA from '../../common/tsa'
 import InfoToolTips from '../../common/InfoToolTips'
-import InfoBox from '../InfoBox'
 import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
 import ReactMarkdown from 'react-markdown'
 
@@ -676,7 +675,7 @@ const ProtoC = ({
       </Segment>
       <RenderBelowGraph />
       <Message>
-        <ReactMarkdown children={CoolDataScience.protoC} />
+        <ReactMarkdown children={CoolDataScience.protoC} escapeHtml={false} />
       </Message>
     </Segment>
   )
