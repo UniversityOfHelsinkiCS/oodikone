@@ -466,7 +466,10 @@ const ProtoC = ({
             />
           </div>
           <Message>
-            <ReactMarkdown source={CoolDataScience.protoC2} escapeHtml={false} />
+            {
+              // eslint-disable-next-line react/no-children-prop
+              <ReactMarkdown children={CoolDataScience.protoC2} escapeHtml={false} />
+            }
           </Message>
         </Segment>
       </Segment>
@@ -529,7 +532,10 @@ const ProtoC = ({
           />
         </div>
         <Message>
-          <ReactMarkdown source={CoolDataScience.protoC2} escapeHtml={false} />
+          {
+            // eslint-disable-next-line react/no-children-prop
+            <ReactMarkdown children={CoolDataScience.protoC2} escapeHtml={false} />
+          }
         </Message>
       </Segment>
     </Segment>
