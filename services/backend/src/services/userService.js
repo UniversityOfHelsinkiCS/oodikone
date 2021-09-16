@@ -5,6 +5,8 @@ const elementDetailService = require('./elementdetails')
 const { filterStudentnumbersByAccessrights } = require('./students')
 const { userDataCache } = require('./cache')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
+const { getImporterClient } = require('../util/importerClient')
+const logger = require('../util/logger')
 
 const ping = async () => {
   const url = '/ping'
@@ -17,7 +19,19 @@ const findAll = async () => {
   return response.data
 }
 
+const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
+  if (!hyPersonSisuId) {
+    logger.error('Not possible to get groups without personId header')
+    return false
+  }
+  const importerClient = getImporterClient()
+  if (!importerClient) return false
+  const { data } = await importerClient.get(`/person-groups/person/${hyPersonSisuId}`)
+  return data && Object.values(data).length > 0
+}
+
 const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
+  const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
   const response = await client.post('/login', {
     uid,
     full_name,
@@ -25,6 +39,7 @@ const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisu
     affiliations,
     email,
     hyPersonSisuId,
+    hasStudyGuidanceGroupAccess,
   })
   return response.data
 }
@@ -70,10 +85,8 @@ const updateUser = async (uid, fields) => {
 }
 
 const getRolesFor = async user => {
-  console.log('roles for', user)
   const url = `/get_roles/${user}`
   const response = await client.get(url)
-  console.log(response.data)
   return response.data
 }
 

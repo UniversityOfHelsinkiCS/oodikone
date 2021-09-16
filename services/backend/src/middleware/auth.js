@@ -5,7 +5,7 @@ const { getUserDataFor } = require('../services/userService')
 const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
 const { hasRequiredGroup, parseHyGroups } = require('../util/utils')
 
-const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
+const TOKEN_VERSION = 1.1 // When token structure changes, increment in userservice, backend and frontend
 
 const checkAuth = async (req, res, next) => {
   const token = req.headers[ACCESS_TOKEN_HEADER_KEY]

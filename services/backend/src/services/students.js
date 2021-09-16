@@ -15,6 +15,7 @@ const {
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
+const logger = require('../util/logger')
 
 const createStudent = student => Student.create(student)
 
@@ -232,7 +233,7 @@ const withId = async id => {
     const result = await byId(id)
     return formatStudent(result)
   } catch (e) {
-    console.log(e)
+    logger.error({ message: 'error when fetching single student', meta: e })
     return {
       error: e,
     }

@@ -4,9 +4,7 @@ const { combine, timestamp, printf, splat } = winston.format
 
 const transports = []
 
-if (process.env.NODE_ENV !== 'test') {
-  transports.push(new winston.transports.File({ filename: 'debug.log' }))
-}
+transports.push(new winston.transports.File({ filename: 'debug.log' }))
 
 if (isDev) {
   const devFormat = printf(({ level, message, timestamp, ...rest }) => {

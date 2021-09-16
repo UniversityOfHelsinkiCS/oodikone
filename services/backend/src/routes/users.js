@@ -3,6 +3,7 @@ const userService = require('../services/userService')
 const blacklist = require('../services/blacklist')
 const { userDataCache } = require('../services/cache')
 const { sendNotificationAboutAccessToUser, previewNotificationAboutAccessToUser } = require('../services/mailservice')
+const logger = require('../util/logger')
 
 const addUserToBlacklist = async (user, decodedToken) => {
   if (user) {
@@ -49,7 +50,7 @@ router.post('/email', async (req, res) => {
   if (result.error) {
     return res.status(400).json(result).end()
   }
-  console.log('Message sent successfully')
+  logger.info('Succesfully sent message about oodikone access to user')
   res.status(200).end()
 })
 
