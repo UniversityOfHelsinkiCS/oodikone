@@ -217,7 +217,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
 }
 
 const StudyGuidanceGroups = () => {
-  useTitle('Stugy guidance groups')
+  useTitle('Study guidance groups')
   const dispatch = useDispatch()
   const { pending, data } = useSelector(state => state.studyGuidanceGroups)
   const match = useRouteMatch('/studyguidancegroups/:groupid')
