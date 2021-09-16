@@ -339,7 +339,10 @@ const Status = ({ getStatusDispatch, data, loading }) => {
       </div>
       {renderSettings()}
       <Message>
-        <ReactMarkdown source={CoolDataScience.status} escapeHtml={false} />
+        {
+          // eslint-disable-next-line react/no-children-prop
+          <ReactMarkdown children={CoolDataScience.status} escapeHtml={false} />
+        }
       </Message>
     </>
   )

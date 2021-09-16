@@ -59,10 +59,13 @@ export default {
   
   Tilannekuvassa voi porautua kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. 
   
-  Valinta Näytä edelliset vuodet näyttää vuosittaisen opintopiste-kertymän tähän päivään
+  Valinta "Näytä edelliset vuodet" näyttää vuosittaisen opintopiste-kertymän tähän päivään
   mennessä vuonna X sekä koko lukuvuoden X opintopisteet muodossa "kerääntymä vuonna X / koko lukuvuoden X opintopisteet".
-  Valinta Näytä vuositasolla laskee kertymän kalenterivuoden alusta,
-  eikä lukuvuoden alusta. Kohdasta Näytä päivänä voi valita tarkastelupäivän, joka on oletusarvoisesti tämänhetkinen päivä.
+  
+  Valinta "Näytä kalenterivuosittain" laskee kertymän kalenterivuoden alusta,
+  eikä lukuvuoden alusta.
+  
+  Kohdasta "Näytä päivänä" voi valita tarkastelupäivän, joka on oletusarvoisesti tämänhetkinen päivä.
   
   Avoimen yliopiston suorituksia ei vielä lasketa mukaan.
   `,
