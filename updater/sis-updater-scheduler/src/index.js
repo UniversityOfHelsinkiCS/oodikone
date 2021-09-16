@@ -8,22 +8,22 @@ const { startServer } = require('./server')
 const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
 
 stan.on('error', e => {
-  console.log('NATS connection failed', e)
+  logger.error({ message: 'NATS connection failed', meta: e.stack })
   if (!process.env.CI) process.exit(1)
 })
 
 stan.on('connect', ({ clientID }) => {
-  console.log(`Connected to NATS as ${clientID}`)
+  logger.info(`Connected to NATS as ${clientID}`)
   knexConnection.connect()
 })
 
 knexConnection.on('error', e => {
-  console.log('Knex database connection failed', e)
+  logger.error({ message: 'Knex database connection failed', meta: e.stack })
   if (!process.env.CI) process.exit(1)
 })
 
 knexConnection.on('connect', async () => {
-  console.log('Knex database connection established successfully')
+  logger.info('Knex database connection established successfully')
   startServer()
 
   // Monday-Friday at every minute 30

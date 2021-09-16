@@ -45,7 +45,7 @@ const sendToNats = (channel, data) =>
   new Promise((res, rej) => {
     stan.publish(channel, JSON.stringify(data), err => {
       if (err) {
-        console.log('failed publishing', err)
+        logger.error({ message: 'Failed publishing to nats', meta: err.stack })
         rej(err)
       }
       res()

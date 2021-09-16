@@ -2,8 +2,8 @@
 // temp disable prop types
 import React, { useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useRouteMatch } from 'react-router-dom'
-import { Loader, Segment, Message, Header, Accordion } from 'semantic-ui-react'
+import { Link, useRouteMatch, useHistory } from 'react-router-dom'
+import { Button, Loader, Segment, Message, Header, Accordion, Divider } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import { useProgress, useTitle } from '../../common/hooks'
 import { getStudyGuidanceGroups } from '../../redux/studyGuidanceGroups'
@@ -23,6 +23,7 @@ import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 
 const SingleStudyGroupView = ({ group }) => {
+  const history = useHistory()
   const dispatch = useDispatch()
   const { data, pending } = useSelector(state => state.populations)
   const { language } = useSelector(state => state.settings)
@@ -158,21 +159,25 @@ const SingleStudyGroupView = ({ group }) => {
   if (!group) return null
 
   return (
-    <FilterTray filterSet={<CustomPopulationFilters />}>
-      <div className="segmentContainer">
-        <Segment className="contentSegment">
-          {pending ? <Loader active>Loading</Loader> : null}
-          {!pending && custompop ? (
-            <>
-              <Header className="segmentTitle" size="medium" textAlign="center">
-                Population of group {getTextIn(group.name, language)}
-              </Header>
-              <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
-            </>
-          ) : null}
-        </Segment>
-      </div>
-    </FilterTray>
+    <div>
+      <Button icon="arrow circle left" content="Back" onClick={() => history.push('/studyguidancegroups')} />
+      <Divider />
+      <FilterTray filterSet={<CustomPopulationFilters />}>
+        <div className="segmentContainer">
+          <Segment className="contentSegment">
+            {pending ? <Loader active>Loading</Loader> : null}
+            {!pending && custompop ? (
+              <>
+                <Header className="segmentTitle" size="medium" textAlign="center">
+                  Population of group {getTextIn(group.name, language)}
+                </Header>
+                <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+              </>
+            ) : null}
+          </Segment>
+        </div>
+      </FilterTray>
+    </div>
   )
 }
 
@@ -192,7 +197,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
             height: '100%',
             padding: '.78571429em .78571429em',
           }}
-          to={`studyguidancegroups/${group.id}`}
+          to={`/studyguidancegroups/${group.id}`}
         >
           {getTextIn(group.name, language)}
         </Link>

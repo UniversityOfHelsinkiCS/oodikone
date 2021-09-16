@@ -57,7 +57,7 @@ module.exports = (app, url) => {
   app.use(`${url}/faculties`, faculties)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
-  app.use(`${url}/users`, auth.roles(['users']), users)
+  app.use(`${url}/users`, auth.roles(['admin']), users)
   app.use(`${url}/feedback`, feedback)
   app.use(`${url}/mandatory_courses`, mandatoryCourses)
   app.use(`${url}/mandatory-course-labels`, mandatoryCourseLabels)

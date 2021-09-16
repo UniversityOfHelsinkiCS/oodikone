@@ -85,29 +85,27 @@ const purgeMsgHandler = async purgeMsg => {
 const miscMsgHandler = async miscMessage => {
   const studentNumbers = miscMessage.entityIds.map(s => s.student_number)
   const msgInUpdateFormat = { ...miscMessage, entityIds: miscMessage.entityIds.map(s => s.id) }
-
-  // TODO the single student purge
   await purgeByStudentNumber(studentNumbers)
   await updateMsgHandler(msgInUpdateFormat)
 }
 
 stan.on('error', e => {
-  console.log('NATS connection failed', e)
+  logger.error({ message: 'NATS connection failed', meta: e })
   if (!process.env.CI) process.exit(1)
 })
 
 stan.on('connect', ({ clientID }) => {
-  console.log(`Connected to NATS as ${clientID}`)
+  logger.info(`Connected to NATS as ${clientID}`)
   dbConnections.connect()
 })
 
 dbConnections.on('error', () => {
-  console.log('DB connections failed')
+  logger.error('DB connections failed')
   if (!process.env.CI) process.exit(1)
 })
 
 dbConnections.on('connect', async () => {
-  console.log('DB connections established')
+  logger.info('DB connections established')
 
   const updaterChannel = stan.subscribe(SIS_UPDATER_SCHEDULE_CHANNEL, NATS_GROUP, opts)
   updaterChannel.on('message', handleMessage(updateMsgHandler))

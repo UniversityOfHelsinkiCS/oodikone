@@ -1,5 +1,6 @@
 require('./src/app')
+const logger = require('./src/util/logger')
 
 process.on('unhandledRejection', reason => {
-  console.log(reason)
+  logger.error({ message: 'unhandledRejection: ', meta: reason })
 })

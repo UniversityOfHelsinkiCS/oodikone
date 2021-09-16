@@ -19,7 +19,7 @@ const HyGroupService = require('./hygroups')
 const { requiredGroup, courseStatisticsGroup, TOKEN_SECRET, hyOneGroup } = require('../conf')
 const Op = Sequelize.Op
 
-const TOKEN_VERSION = 1 // When token structure changes, increment in userservice, backend and frontend
+const TOKEN_VERSION = 1.1 // When token structure changes, increment in userservice, backend and frontend
 const generateToken = async (uid, mockedBy = null) => {
   const user = await byUsername(uid)
   const userData = getUserData(user)
@@ -35,6 +35,7 @@ const generateToken = async (uid, mockedBy = null) => {
     roles: user.accessgroup,
     createdAt: moment().toISOString(),
     version: TOKEN_VERSION,
+    sisPersonId: user.sisu_person_id,
   }
   const token = jwt.sign(payload, TOKEN_SECRET)
 
@@ -88,7 +89,7 @@ const updateGroups = async (user, affiliations, hyGroups) => {
   await user.removeHy_group(await HyGroupService.byCodes(hyGroupsToDelete))
 }
 
-const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId) => {
+const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId, hasStudyGuidanceGroupAccess) => {
   let user = await byUsername(uid)
   let isNew = false
   await createMissingGroups(hyGroups, HyGroupService)
@@ -113,6 +114,7 @@ const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuI
 
   await determineAccessToCourseStats(user, hyGroups)
   await determineAccessToTeachersForOne(user, hyGroups)
+  await determineAccessToStudyGuidanceGroups(user, hasStudyGuidanceGroupAccess)
 
   console.log('Generating token')
   const token = await generateToken(uid)
@@ -327,6 +329,16 @@ const determineAccessToTeachersForOne = async (user, hyGroups) => {
   const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'teachers')
   if (hyGroups.includes(hyOneGroup) && !alreadyAccess) {
     await modifyRights(user.id, { teachers: true })
+  }
+}
+
+const determineAccessToStudyGuidanceGroups = async (user, hasStudyGuidanceGroupAccess) => {
+  const accessGroups = (user && user.accessgroup) || []
+  const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'studyGuidanceGroups')
+  if (hasStudyGuidanceGroupAccess && !alreadyAccess) {
+    await modifyRights(user.id, { studyGuidanceGroups: true })
+  } else if (!hasStudyGuidanceGroupAccess && alreadyAccess) {
+    await modifyRights(user.id, { studyGuidanceGroups: false })
   }
 }
 

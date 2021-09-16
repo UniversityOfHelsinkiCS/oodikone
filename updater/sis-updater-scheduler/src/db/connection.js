@@ -1,6 +1,7 @@
 const knex = require('knex')
 const EventEmitter = require('events')
 const { SIS_IMPORTER_HOST, SIS_IMPORTER_USER, SIS_IMPORTER_PASSWORD, SIS_IMPORTER_DATABASE } = process.env
+const { logger } = require('../utils/logger')
 
 class KnexConnection extends EventEmitter {
   constructor() {
@@ -31,8 +32,8 @@ class KnexConnection extends EventEmitter {
         this.emit('error', e)
         return
       }
-      console.log(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
-      console.log('Error: ', e)
+      logger.error(`Knex database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
+      logger.error(`Error while connecting: ${JSON.stringify(e, null, 2)}`)
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }

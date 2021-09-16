@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react'
 import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import { string, number, shape, bool, arrayOf, func } from 'prop-types'
 import { getTextIn, getUserRoles, setMocking, textAndDescriptionSearch } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
@@ -33,6 +32,7 @@ const UserPage = ({
   getProgrammesUnfiltered,
 }) => {
   const { language } = useLanguage()
+  const { userId: currentUserId } = useSelector(state => state?.auth?.token)
 
   useEffect(() => {
     if (elementdetails.length === 0) getElementDetails()
@@ -63,9 +63,7 @@ const UserPage = ({
       <List divided>
         {usersElementdetailCodesAvailable.length > 0 &&
           usersElementdetailCodesAvailable.map(({ elementDetailCode: code }) => {
-            console.log('elementDetailCode', code)
             const element = elementdetails.find(e => e.code === code)
-            console.log('element', element)
             return (
               <List.Item key={code}>
                 <List.Content floated="right">
@@ -94,7 +92,7 @@ const UserPage = ({
     <Card fluid>
       <Card.Content>
         <Card.Header>
-          {isAdmin && user.is_enabled && (
+          {isAdmin && user.username !== currentUserId && user.is_enabled && (
             <Popup
               content="Show Oodikone as this user"
               trigger={
@@ -197,49 +195,6 @@ const UserPage = ({
   )
 }
 
-UserPage.propTypes = {
-  user: shape({
-    id: string,
-    full_name: string,
-    is_enabled: bool,
-    elementdetails: arrayOf(string),
-    programme: arrayOf(
-      shape({
-        code: string,
-        name: shape({}),
-        type: number,
-      })
-    ),
-    faculty: arrayOf(
-      shape({
-        faculty_code: string,
-        programme: arrayOf(
-          shape({
-            code: string,
-            name: shape({}),
-            type: number,
-          })
-        ),
-      })
-    ),
-  }).isRequired,
-  removeUserUnits: func.isRequired,
-  setFaculties: func.isRequired,
-  goBack: func.isRequired,
-  getProgrammesUnfiltered: func.isRequired,
-  associations: shape({}).isRequired,
-  pending: bool.isRequired,
-  history: shape({
-    push: func.isRequired,
-  }).isRequired,
-  getAccessGroups: func.isRequired,
-  getFaculties: func.isRequired,
-  getElementDetails: func.isRequired,
-  elementdetails: arrayOf(shape({ type: number, code: string, name: shape({}) })).isRequired,
-  faculties: arrayOf(shape({ code: string, name: shape({}) })).isRequired,
-  accessGroups: shape({}).isRequired,
-  isAdmin: bool.isRequired,
-}
 const mapStateToProps = state => ({
   units: state.units.data,
   faculties: state.faculties.data,

@@ -154,16 +154,15 @@ const Status = ({ getStatusDispatch, data, loading }) => {
   const [showSettings, setShowSettings] = useState(true)
   const [selectedDate, setSelectedDate] = useState(moment())
   const [codes, setCodes] = useState([])
-  const [showByStudents, setShowByStudents] = useState(false)
   const { CoolDataScience } = InfoToolTips
 
   const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
 
   useEffect(() => {
     if (selectedDate && isValidDate(selectedDate)) {
-      getStatusDispatch({ date: selectedDate.valueOf(), showByYear, showByStudents })
+      getStatusDispatch({ date: selectedDate.valueOf(), showByYear })
     }
-  }, [selectedDate, showByYear, showByStudents])
+  }, [selectedDate, showByYear])
 
   useEffect(() => {
     if (codes.length > 0) {
@@ -190,12 +189,6 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     const byYear = showByYear
     setShowByYear(!showByYear)
     sendAnalytics(`S Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
-  }
-
-  const handleShowByStudentsToggled = () => {
-    const byStudents = showByStudents
-    setShowByStudents(!showByStudents)
-    sendAnalytics(`S Show by students toggle ${!byStudents ? 'on' : 'off'}`, 'Status')
   }
 
   const pushToDrillStack = (values, code) => {
@@ -252,13 +245,6 @@ const Status = ({ getStatusDispatch, data, loading }) => {
               label="Näytä kalenterivuosittain"
               onChange={handleShowByYearToggled}
               checked={showByYear}
-            />
-            <VerticalLine />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä suhteessa opiskelijamäärään"
-              onChange={handleShowByStudentsToggled}
-              checked={showByStudents}
             />
             <VerticalLine />
             <Form>

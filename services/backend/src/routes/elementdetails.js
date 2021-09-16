@@ -7,7 +7,6 @@ const {
   optionData,
 } = require('../services/studyprogramme')
 const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
-
 const {
   getProductivity,
   setProductivity,
@@ -18,25 +17,18 @@ const {
   getNonGraduatedStudents,
 } = require('../services/analyticsService')
 const { getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
+const logger = require('../util/logger')
 
 const programmeStatsSince = new Date('2017-07-31')
 
 router.get('/elementdetails/all', async (req, res) => {
-  try {
-    const elementdetails = await getAllElementDetails()
-    res.json(elementdetails)
-  } catch (e) {
-    res.status(500).json(e)
-  }
+  const elementdetails = await getAllElementDetails()
+  res.json(elementdetails)
 })
 
 router.get('/studyprogrammes', async (req, res) => {
-  try {
-    const studyrights = await getAllProgrammes()
-    res.json(studyrights)
-  } catch (err) {
-    res.status(500).json(err)
-  }
+  const studyrights = await getAllProgrammes()
+  res.json(studyrights)
 })
 
 router.get('/v2/studyprogrammes/:id/optiondata', async (req, res) => {
@@ -56,31 +48,26 @@ router.get('/v2/studyprogrammes/:id/optiondata', async (req, res) => {
 })
 
 router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
-  try {
-    const {
-      roles,
-      decodedToken,
-      params: { id },
-    } = req
-    if (!id) return res.status(400).json({ error: 'programme id missing' })
+  const {
+    roles,
+    decodedToken,
+    params: { id },
+  } = req
+  if (!id) return res.status(400).json({ error: 'programme id missing' })
 
-    const nonGraduatedStudents = await getNonGraduatedStudents(id)
-    if (!nonGraduatedStudents) return res.status(200).json({})
-    const {
-      data: { formattedData, studentnumbers },
-    } = nonGraduatedStudents
+  const nonGraduatedStudents = await getNonGraduatedStudents(id)
+  if (!nonGraduatedStudents) return res.status(200).json({})
+  const {
+    data: { formattedData, studentnumbers },
+  } = nonGraduatedStudents
 
-    const filteredData = { ...formattedData }
-    const studentsUserCanAccess = await getStudentsUserCanAccess(studentnumbers, roles, decodedToken.userId)
-    Object.keys(filteredData).forEach(year => {
-      filteredData[year] = filteredData[year].filter(({ studentNumber }) => studentsUserCanAccess.has(studentNumber))
-    })
+  const filteredData = { ...formattedData }
+  const studentsUserCanAccess = await getStudentsUserCanAccess(studentnumbers, roles, decodedToken.userId)
+  Object.keys(filteredData).forEach(year => {
+    filteredData[year] = filteredData[year].filter(({ studentNumber }) => studentsUserCanAccess.has(studentNumber))
+  })
 
-    res.json(filteredData)
-  } catch (e) {
-    console.error('e', e)
-    res.status(500).json({ error: 'error' })
-  }
+  res.json(filteredData)
 })
 
 router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
@@ -99,14 +86,14 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
     try {
       data = await getProductivity(code)
     } catch (e) {
-      console.error(e)
+      logger.error(`Failed to get code ${code} productivity`)
     }
     if (!data) {
       try {
         const stats = await productivityStatsForStudytrack(code, programmeStatsSince)
         data = await setProductivity(stats)
       } catch (e) {
-        console.error(e)
+        logger.error(`Failed to update code ${code} patching status to recalculation erroring`)
       }
     }
     return res.json(data)
@@ -118,14 +105,8 @@ router.get('/v2/studyprogrammes/:id/productivity', async (req, res) => {
 router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
   const code = req.query.code
 
-  console.log('Productivity stats recalculation starting')
-  try {
-    await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-    res.status(200).end()
-  } catch (e) {
-    console.error(e)
-    return res.status(500).end()
-  }
+  await patchThroughput({ [code]: { status: 'RECALCULATING' } })
+  res.status(200).end()
 
   try {
     if (code.includes('MH') || code.includes('KH')) {
@@ -141,13 +122,13 @@ router.get('/v2/studyprogrammes/productivity/recalculate', async (req, res) => {
         [code]: { status: 'RECALCULATION ERRORED' },
       })
     } catch (e) {
-      console.error(e)
+      logger.error(`Failed to update code ${code} patching status to recalculation erroring`)
       return
     }
-    console.error(e)
-    console.log(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
+
+    logger.error(`Failed to update productivity stats for code: ${code}, reason: ${e.message}`)
   }
-  console.log(`Productivity stats recalculation for studyprogramme ${code} done`)
+  logger.info(`Produdtiviy stats recalculation for studyprogramme ${code} done`)
 })
 
 router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
@@ -159,14 +140,14 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
     try {
       data = await getThroughput(code)
     } catch (e) {
-      console.error(e)
+      logger.error(`Failed to get code ${code} throughput`)
     }
     if (!data) {
       try {
         const result = await throughputStatsForStudytrack(req.params.id, programmeStatsSince.getFullYear())
         data = await setThroughput(result)
       } catch (e) {
-        console.error(e)
+        logger.error(`Failed to update code ${code} patching status to recalculation erroring`)
       }
     }
     return res.json({ ...data, thesis: await thesisPromise })
@@ -178,14 +159,8 @@ router.get('/v2/studyprogrammes/:id/throughput', async (req, res) => {
 router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
   const code = req.query.code
 
-  console.log('Throughput stats recalculation starting')
-  try {
-    await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-    res.status(200).end()
-  } catch (e) {
-    console.error(e)
-    return res.status(500).end()
-  }
+  await patchThroughput({ [code]: { status: 'RECALCULATING' } })
+  res.status(200).end()
 
   try {
     if (code.includes('MH') || code.includes('KH')) {
@@ -199,13 +174,12 @@ router.get('/v2/studyprogrammes/throughput/recalculate', async (req, res) => {
     try {
       await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
     } catch (e) {
-      console.error(e)
+      logger.error(`Failed to update code ${code} patching status to recalculation erroring`)
       return
     }
-    console.error(e)
-    console.log(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
+    logger.error(`Failed to update throughput stats for code: ${code}, reason: ${e.message}`)
   }
-  console.log(`Throughput stats recalculation for studyprogramme ${code} done`)
+  logger.info(`Throughput stats recalculation for studyprogramme ${code} done`)
 })
 
 router.get('/v2/studyprogrammes/:id/thesis', async (req, res) => {

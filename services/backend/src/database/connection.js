@@ -3,6 +3,8 @@ const EventEmitter = require('events')
 const Umzug = require('umzug')
 const conf = require('../conf-backend')
 const { SIS_DB_URL } = process.env
+const logger = require('../util/logger')
+
 class DbConnection extends EventEmitter {
   constructor() {
     super()
@@ -31,8 +33,7 @@ class DbConnection extends EventEmitter {
         this.emit('error', e)
         return
       }
-      console.log(`Sis database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`)
-      console.log(e)
+      logger.error({ message: `Sis database connection failed! Attempt ${attempt}/${this.RETRY_ATTEMPTS}`, meta: e })
       setTimeout(() => this.connect(attempt + 1), 1000 * attempt)
     }
   }
@@ -54,10 +55,9 @@ const initializeDatabaseConnection = async () => {
       break
     } catch (e) {
       if (i === waitSeconds) {
-        console.log(`Could not connect to database in ${waitSeconds} seconds`)
+        logger.error(`Could not connect to database in ${waitSeconds} seconds`)
         throw e
       }
-      console.log('.')
       await sleep(1000)
     }
   }
@@ -69,7 +69,6 @@ const initializeDatabaseConnection = async () => {
         tableName: 'migrations',
         schema: conf.DB_SCHEMA_KONE,
       },
-      logging: console.log,
       migrations: {
         params: [sequelizeKone.getQueryInterface(), Sequelize],
         path: `${process.cwd()}/src/database/migrations_kone`,
@@ -78,21 +77,11 @@ const initializeDatabaseConnection = async () => {
       },
     })
     const migrations = await migrator.up()
-
-    console.log('Kone Migrations up to date', migrations)
+    logger.info({ message: 'Kone Migrations up to date', meta: migrations })
   } catch (e) {
-    console.log('Kone Migration error')
+    logger.error('Kone Migration error')
     throw e
   }
-}
-
-const forceSyncDatabase = async () => {
-  try {
-    await sequelizeKone.getQueryInterface().createSchema(conf.DB_SCHEMA_KONE)
-  } catch (e) {
-    //console.log(e)
-  }
-  await sequelizeKone.sync({ force: true })
 }
 
 const dbConnections = new DbConnection()
@@ -100,5 +89,4 @@ module.exports = {
   dbConnections,
   sequelizeKone,
   initializeDatabaseConnection,
-  forceSyncDatabase,
 }
