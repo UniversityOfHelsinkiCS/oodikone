@@ -5,9 +5,10 @@ export default {
   **3 vuoden tahdissa** olevat opiskelijat 60op × ((tämä päivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet, 
   
   **4 vuoden tahdissa** olevat opiskelijat 45op × ((tämä päivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet,
-  peruutettu, jos optinto-oikeus merkattu perutuksi,
   
   **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - peruutettu).
+
+  **peruutettu**, jos opinto-oikeus merkattu perutuksi
     
   **Include only at least once enrolled students** suodattaa pois opiskelijat jotka eivät ole ollenkaan ilmoittautunut. 
   Vakiona opiskelijat jotka eivät ole ilmoittautunut millekkään lukuvuodelle (läsnä tai poissa olevaksi)
@@ -22,9 +23,10 @@ export default {
   **3 vuoden tahdissa** olevat opiskelijat 60op × ((tämä päivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet, 
   
   **4 vuoden tahdissa** olevat opiskelijat 45op × ((tämä päivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet,
-  peruutettu, jos optinto-oikeus merkattu perutuksi,
   
   **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - peruutettu).
+
+  **peruutettu**, jos opinto-oikeus merkattu perutuksi
   
   **Include only at least once enrolled students** suodattaa pois opiskelijat,
   jotka eivät ole ollenkaan ilmoittautunut. Vakiona opiskelijat, jotka eivät ole ilmoittautunut millekkään lukuvuodelle (läsnä tai poissa olevaksi) on sisällytetty laskuihin.
@@ -35,12 +37,19 @@ export default {
   protoG: `Graafi ottaa huomioon vain opiskelijat joiden opinto-oikeus on alkanut 1.8 joka vuodelta vuoden 2017 jälkeen. 
   Opiskelijat jotka ovat vaihtaneet ohjelmaa tiedekunnan sisällä suodatetaan pois.
   
-  Opiskelijoiden tavoiteaika lasketaan seuraavasti: **3 vuoden tahdissa** olevat opiskelijat 60op × ((tarkastuspäivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet, 
-  4 vuoden tahdissa olevat opiskelijat 45op × ((tarkastuspäivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet,
-  peruutettu jos opinto-oikeus merkattu perutuksi,
-  ei tahdissa = (kaikki opiskelijat - 3v - 4v - peruutettu). **Tarkastuspäivät** ovat 31.7, 30.11 ja 1.4 joka vuodelle.
+  **3 vuoden tahdissa** olevat opiskelijat 60op × ((tarkastuspäivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet, 
   
-  Vakiona opintopisteet ennen opinto-oikeutta suodatetaan pois. **Include old attainments** laskee mukaan opiskelijan ennen opinto-oikeuden alkua saadut opintopisteet.`,
+  **4 vuoden tahdissa** olevat opiskelijat 45op × ((tarkastuspäivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet,
+
+  **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - peruutettu). 
+  
+  **Tarkastuspäivät** ovat 31.7, 30.11 ja 1.4 joka vuodelle.
+
+  **peruutettu**, jos opinto-oikeus merkattu perutuksi
+
+  **Include attainments attained before the studyright start** laskee mukaan opiskelijan ennen opinto-oikeuden alkua saadut opintopisteet.
+  Vakiona opintopisteet ennen opinto-oikeutta suodatetaan pois.
+  `,
   status: `
   Tilannekuva näyttää "reaaliaikaisesti" eri tiedekuntien, ohjelmien ja kurssien tuottamat opintopisteet nykyisen lukuvuoden aikana 
   verrattuna edelliseen lukuvuoteen. 
