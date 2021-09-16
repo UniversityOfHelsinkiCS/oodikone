@@ -351,7 +351,10 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
       </div>
       {renderSettings()}
       <Message>
-        <ReactMarkdown source={CoolDataScience.statusGraduated} escapeHtml={false} />
+        {
+          // eslint-disable-next-line react/no-children-prop
+          <ReactMarkdown children={CoolDataScience.statusGraduated} escapeHtml={false} />
+        }
       </Message>
     </>
   )
