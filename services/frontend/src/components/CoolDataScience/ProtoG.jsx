@@ -291,7 +291,9 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
           </Table>
         )}
         <Message>
-          <ReactMarkdown source={CoolDataScience.protoG} escapeHtml={false} />
+          {//eslint-disable-next-line react/no-children-prop
+            <ReactMarkdown children={CoolDataScience.protoC} escapeHtml={false} />
+          }
         </Message>
       </Segment>
     </Segment>

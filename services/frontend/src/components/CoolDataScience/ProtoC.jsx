@@ -5,12 +5,12 @@ import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 import { Segment, Loader, Dimmer, Checkbox, Button, Message, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
-import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import TSA from '../../common/tsa'
 import InfoToolTips from '../../common/InfoToolTips'
 import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
+import ReactMarkdown from 'react-markdown'
 
 HighchartsCustomEvents(Highcharts)
 
@@ -568,6 +568,8 @@ const ProtoC = ({
 
   const { CoolDataScience } = InfoToolTips
 
+  console.log({ CoolDataScience })
+
   // create list from sorters and deprecate this
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)
@@ -578,7 +580,7 @@ const ProtoC = ({
     })
 
   const SorterButtons = () => (
-    <div align="center" style={{ marginTop: '10px' }}>
+    <div align="center" style={{ marginTop: '15px' }}>
       <Button.Group>
         <Button style={{ cursor: 'default' }} active color="black">
           Sort by:
@@ -622,14 +624,11 @@ const ProtoC = ({
           checked={includeOldAttainments}
         />
       </div>
-      <Message>
-        <ReactMarkdown source={CoolDataScience.protoC} escapeHtml={false} />
-      </Message>
     </>
   )
 
   const DrilldownMessage = () => (
-    <Message color='blue'
+    <Message style={{ margin: '2em' }} color='blue'
       content="Graafissa pystyy pisteitä klikkaamalla porautumaan ensin ohjelmatasolle ja edelleen opintosuuntatasolle. 
       Uusi graafi avautuu nykyisen alle."
     />
@@ -675,6 +674,9 @@ const ProtoC = ({
         )}
       </Segment>
       <RenderBelowGraph />
+      <Message>
+        <ReactMarkdown children={CoolDataScience.protoC} escapeHtml={false} />
+      </Message>
     </Segment>
   )
 }

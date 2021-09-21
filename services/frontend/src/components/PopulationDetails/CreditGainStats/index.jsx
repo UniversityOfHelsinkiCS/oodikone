@@ -5,7 +5,7 @@ import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
-import info from '../../../common/markdown/populationStatistics/creditStatistics.info.md'
+import infotooltips from '../../../common/InfoToolTips'
 import './creditGainStats.css'
 
 const CreditGainStats = ({ filteredStudents }) => {
@@ -29,7 +29,7 @@ const CreditGainStats = ({ filteredStudents }) => {
 
   return (
     <div id="credit-gain-stats">
-      <InfoBox content={info} />
+      <InfoBox content={infotooltips.PopulationStatistics.CreditStatistics} />
       {filteredStudents && (
         <Tab
           onTabChange={handleTabChange}

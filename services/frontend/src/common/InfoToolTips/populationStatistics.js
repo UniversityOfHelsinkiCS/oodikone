@@ -2,6 +2,34 @@ export default {
   Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella ilmoittautuneita, haluttu ajanjakso valitaan tästä.
 
   **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat, tutkinnonsuoritusoikeudesta luopuneet ja erillisopinto-oikeudella opiskelevat. Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.`,
+  QueryCard: `**Valitun koulutusohjelmavuosikurssin perustiedot.**
+  
+  **Sample size** luku sisältää läsnä- ja poissaolevaksi ilmoittautuneet opiskelijat, muttei "excludes"-ryhmiä, jotka voi määritellä "advanced settings" -kohdasta.
+  
+  **Fall** = 1.8. - 31.12. ilmoittautuneet ja **Spring** = 1.1. - 31.7. ilmoittautuneet.
+  
+  **Showing XX months**: Dataa näytetään ohjelman vuosikurssin alkamispäivästä lähtien haluttuun kuukauteen asti (oletusarvoisesti "tähän päivään").
+  
+  **Updated** kertoo milloin data on päivitetty.`,
+  CreditAccumulation: `**Credit Accumulation**
+  
+  Opiskelijoiden kumulatiiviset opintopistekertymät opiskelijakohtaisina kuvaajina.
+  Kun hiiren vie kuvaajien päälle, saa näkyviin jokaista kuvaajaa vastaavan opiskelijanumeron.
+  Opiskelijanumeron yhteydessä olevaa ympyrää klikkaamalla siirtyy ”student statistics” puolelle ja näkee valitun opiskelijan opintotiedot.
+
+  X-akselin skaalaa voi säätää harmaista painikkeista ”1m”, ”3m”, ”6m”, ”YTD”, ”1y” ja ”ALL” tai kuvaajan alla olevan sinisen näkymän harmaita ”kahvoja” siirtämällä.
+  Y-akselin skaalaa voi säätää harmaista painikkeista ”small” ”medium” ja "large”`,
+  CreditStatistics: `**Opintopistekertymä**
+  
+  Taulukon rivit skaalautuvat valitun tarkastelujakson mukaan.
+  Jos tarkastelujaksoksi valitsee 12 kuukautta, on ylin kategoria 55 opintopistettä tai yli, eli opiskelija etenee tavoiteajassa.
+  Taulukosta näkee silmäyksellä tavoiteajassa etenevät (ylin kategoria) ja esim. nollasuorittajat.
+  
+  **Huom! nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, ellei heitä ole erikseen suodatettu populaatiosta pois.**
+  
+  Kategorioita voi myös itsessään käyttää suodattimina. Klikkaamalla rivin vasemmassa reunassa olevaa suodatinta jäävät näkyviin vain sen kategorian opiskelijat.
+  Suodatin aukeaa samalla ikkunan vasempaan laitaan, josta sitä voi käyttää vapaavalintaisilla arvoilla.
+  `,
   Filters: {
     Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, 
     josta voi lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota.`,
