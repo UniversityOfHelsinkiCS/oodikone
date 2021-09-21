@@ -8,7 +8,7 @@ import PopulationSearchHistory from './PopulationSearchHistory'
 import ProgressBar from '../ProgressBar'
 import InfoBox from '../InfoBox'
 import { useProgress } from '../../common/hooks'
-import info from '../../common/markdown/populationStatistics/search.info.md'
+import infotoolTips from '../../common/InfoToolTips'
 
 const PopulationSearch = ({ populationFound, history, location, loading }) => {
   const { onProgress, progress } = useProgress(loading)
@@ -18,7 +18,7 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
   return (
     <Segment>
       <Header size="medium">{title}</Header>
-      {(!populationFound || !history.location.search) && <InfoBox content={info} />}
+      {(!populationFound || !history.location.search) && <InfoBox content={infotoolTips.PopulationStatistics.Search} />}
       <PopulationSearchForm onProgress={onProgress} />
       <Divider />
       {location.search !== '' && !loading && (
