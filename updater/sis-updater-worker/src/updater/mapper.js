@@ -150,25 +150,27 @@ const creditMapper =
       study_right_id,
     } = attainment
 
-    // let course_unit_id_temp = course_unit_id
     const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
     const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
     const targetSemester = getSemesterByDate(new Date(attainment_date))
-    // console.log('studyright id to ogani:', studyrightIdToOrganisationsName)
+
     if (!targetSemester) return null
 
     let course_code = !isModule(type)
       ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
       : moduleGroupIdToModuleCode[module_group_id]
 
-    // check if avoin and add AY in the start of the code
-    if (study_right_id !== null) {
-      // console.log('study right id: ', study_right_id)
+    let course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
+
+    // because of new ayless codes
+    if (study_right_id !== null && !isModule(type)) {
       const organisationName = studyrightIdToOrganisationsName[study_right_id]
       if (organisationName) {
         if (organisationName['fi'].startsWith('Avoin yliopisto')) {
-          course_code = course_code.startsWith('AY') ? course_code : 'AY'.concat(course_code)
-          // course_unit_id_temp = course_unit_id.concat('ay')
+          if (!course_code.startsWith('AY')) {
+            course_code = 'AY'.concat(course_code)
+            course_id = course_id.concat('-ay')
+          }
         }
       }
     }
@@ -184,7 +186,7 @@ const creditMapper =
       createdate: registration_date,
       credittypecode: getCreditTypeCodeFromAttainment(attainment, getGrade(grade_scale_id, grade_id).passed),
       attainment_date: attainment_date,
-      course_id: !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id,
+      course_id: course_id,
       course_code,
       semestercode: targetSemester.semestercode,
       semester_composite: targetSemester.composite,

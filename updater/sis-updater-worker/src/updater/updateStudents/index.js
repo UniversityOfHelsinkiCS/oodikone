@@ -208,7 +208,6 @@ const updateStudents = async personIds => {
 }
 
 const updateAttainments = async (attainments, personIdToStudentNumber, attainmentsToBeExluced) => {
-  // console.log('attainments: ', attainments)
   const personIdToEmployeeNumber = await updateTeachers(attainments)
   const [courseUnits, modules, studyrights] = await Promise.all([
     selectFromByIds(
@@ -225,14 +224,14 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       attainments.map(a => a.study_right_id).filter(id => !!id)
     ),
   ])
-  // console.log('studyrights : ', studyrights)
+
   const [studyrightOrganisations] = await Promise.all([
     selectFromByIds(
       'organisations',
       studyrights.map(studyright => studyright.organisation_id).filter(id => !!id)
     ),
   ])
-  // console.log('studyrights organisations: ', studyrightOrganisations)
+
   const courseUnitIdToCourseGroupId = courseUnits.reduce((res, curr) => {
     res[curr.id] = curr.group_id
     return res
@@ -247,14 +246,12 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     res[curr.id] = curr.name
     return res
   }, {})
-  // console.log('organisation id to name: ', organisationIdToName)
 
   const studyrightIdToOrganisationsName = studyrights.reduce((res, curr) => {
     res[curr.id] = organisationIdToName[curr.organisation_id]
     return res
   }, {})
 
-  /*
   const coursesWithOpenUniStudyrightId = attainments.reduce((res, curr) => {
     if (curr.study_right_id !== null && curr.type === 'CourseUnitAttainment') {
       const organisationName = studyrightIdToOrganisationsName[curr.study_right_id]
@@ -266,8 +263,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     }
     return res
   }, [])
-*/
-  // console.log('studyright to organisation name', studyrightIdToOrganisationsName)
 
   const idsOfFaculties = dbConnections.knex
     .select('id')
@@ -289,7 +284,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       },
     },
   })
-  // console.log('course groupId to course code full: ', courseGroupIdToCourseCodeFullCourses)
 
   const courseGroupIdToCourseCode = courseGroupIdToCourseCodeFullCourses.reduce((res, curr) => {
     res[curr.id] = curr.code
@@ -308,7 +302,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const coursesToBeCreated = new Map()
   const courseProvidersToBeCreated = []
 
-  /*
   const fixNewAyCodelessOpenUniCourses = (courseGroupIdToCourseCodeFullCourses, coursesWithOpenUniStudyrightId) => {
     const coursesWithNoAy = coursesWithOpenUniStudyrightId.reduce((res, curr) => {
       const foundCourse = courseGroupIdToCourseCodeFullCourses.find(c => c.id === curr)
@@ -321,7 +314,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     return coursesWithNoAy
   }
 
-  
   fixNewAyCodelessOpenUniCourses(courseGroupIdToCourseCodeFullCourses, coursesWithOpenUniStudyrightId).forEach(
     course => {
       coursesToBeCreated.set('AY'.concat(course.code), {
@@ -341,8 +333,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       })
     }
   )
- 
-*/
+
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
     const addCourseUnitToCustomCourseUnitAttainments = (courses, attIdToCourseCode) => async att => {
@@ -512,8 +503,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     .filter(c => !!c)
 
   const courses = Array.from(coursesToBeCreated.values())
-  // console.log('courses: ', courses)
-  // console.log('credits: ', credits)
 
   await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
