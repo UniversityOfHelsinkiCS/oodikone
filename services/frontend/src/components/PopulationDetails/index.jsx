@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { object, arrayOf, bool, shape, node } from 'prop-types'
 import { Message, Accordion, Label } from 'semantic-ui-react'
 import { useLocalStorage } from '../../common/hooks'
+
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
@@ -11,9 +12,9 @@ import CreditGainStats from './CreditGainStats'
 import AgeStats from './AgeStats'
 import useFilters from '../FilterTray/useFilters'
 import useFilterTray from '../FilterTray/useFilterTray'
-import info from '../../common/markdown/populationStatistics/creditAccumulation.info.md'
 import useLanguage from '../LanguagePicker/useLanguage'
 import sendEvent from '../../common/sendEvent'
+import infotooltips from '../../common/InfoToolTips'
 
 const sendAnalytics = sendEvent.populationStatistics
 
@@ -53,6 +54,8 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
   }
 
   const renderCreditGainGraphs = () => {
+    const { CreditAccumulation } = infotooltips.PopulationStatistics
+
     const graphs = (
       <CreditAccumulationGraphHighCharts
         students={samples}
@@ -66,7 +69,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
     )
     return (
       <>
-        <InfoBox content={info} />
+        <InfoBox content={CreditAccumulation} />
         {samples.length > 0 && graphs}
       </>
     )
