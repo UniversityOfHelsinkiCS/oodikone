@@ -79,7 +79,7 @@ describe('Population Statistics', () => {
     runTestStepWithPreAndPostParts('credit-filter-header', () => {
       cy.cs('credit-filter-min').type('50')
       cy.cs('credit-filter-max').type('150')
-      checkFilteringResult(113)
+      checkFilteringResult(116)
       cy.cs('credit-filter-min').find('input').clear()
       cy.cs('credit-filter-max').find('input').clear()
     })
@@ -179,7 +179,7 @@ describe('Course Statistics', () => {
       cy.cs('gradeFilter-5').click()
       checkFilteringResult(20)
       cy.cs('gradeFilter-3').click()
-      checkFilteringResult(39)
+      checkFilteringResult(38)
       cy.cs('gradeFilter-3').click()
       cy.cs('gradeFilter-5').click()
     })
