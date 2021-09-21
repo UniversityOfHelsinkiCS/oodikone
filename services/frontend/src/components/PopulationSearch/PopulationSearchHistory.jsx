@@ -13,7 +13,6 @@ import './populationSearch.css'
 import infotooltips from '../../common/InfoToolTips'
 import { getTextIn } from '../../common'
 import InfoBox from '../InfoBox'
-import info from '../../common/markdown/populationStatistics/queryCard.info.md'
 import FilterActiveNote from './FilterActiveNote'
 
 const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
@@ -268,7 +267,8 @@ class PopulationSearchHistory extends Component {
   renderQueryCards = () => {
     const { populations, units, tags } = this.props
     const { showAdvancedSettings } = this.state
-    const { Advanced } = infotooltips.PopulationStatistics
+    const { Advanced, QueryCard } = infotooltips.PopulationStatistics
+
     if (!units.data.programmes || !populations.query || !populations.data.students) {
       return null
     }
@@ -290,7 +290,7 @@ class PopulationSearchHistory extends Component {
             tags={tags}
           />
           <div style={{ marginLeft: '5px', marginTop: '15px' }}>
-            <InfoBox content={info} />
+            <InfoBox content={QueryCard} />
           </div>
         </div>
         <div style={{ marginLeft: '100px' }}>

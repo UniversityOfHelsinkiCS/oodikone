@@ -126,6 +126,10 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 
 You should always install the dependencies **inside** the container to have the application **inside** the container access them. This might be the case when someone else installs a new library and you only pull the changes in package.json. Use `docker exec -it <service> sh` to get inside the container and run `npm ci` to install modules.
 
+### I get the "You are not authorized to use Oodikone" -message when I try to work with anon-data
+
+Make sure you have your VPN on
+
 ### Everything is broken, can't get oodikone running, data is not there etc.
 
 Just do clean install by launching cli with `npm cli` and running option 1: _Set up oodikone from scratch_.
