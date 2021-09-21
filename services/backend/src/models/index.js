@@ -44,8 +44,12 @@ const CREDIT_TYPE_CODES = {
   APPROVED: 9,
 }
 
-Credit.passed = ({ credittypecode }) =>
-  credittypecode === CREDIT_TYPE_CODES.PASSED || credittypecode === CREDIT_TYPE_CODES.APPROVED
+Credit.passed = ({ credittypecode, grade }) =>
+  (credittypecode === CREDIT_TYPE_CODES.PASSED ||
+    credittypecode === CREDIT_TYPE_CODES.APPROVED ||
+    credittypecode === CREDIT_TYPE_CODES.IMPROVED) &&
+  !['EISA', 'Hyl.', 'HYL', '0', 'LUOP'].includes(grade)
+
 Credit.failed = credit => credit.credittypecode === CREDIT_TYPE_CODES.FAILED
 Credit.improved = credit => credit.credittypecode === CREDIT_TYPE_CODES.IMPROVED
 
