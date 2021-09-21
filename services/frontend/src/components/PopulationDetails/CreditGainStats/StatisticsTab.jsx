@@ -6,7 +6,7 @@ import { getStudentTotalCredits } from '../../../common'
 
 const StatisticsTab = ({ filteredStudents }) => {
   const credits = filteredStudents.map(student => getStudentTotalCredits(student))
-  const formatNumber = (x, decimals) => (Number.isNaN(x) ? 0 : x).toFixed(decimals)
+  const formatNumber = (x, decimals) => (Number.isNaN(x) || !x ? 0 : x).toFixed(decimals)
   const quartiles = jStat.quartiles(credits)
 
   return (
