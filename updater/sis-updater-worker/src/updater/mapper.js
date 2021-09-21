@@ -150,6 +150,7 @@ const creditMapper =
       study_right_id,
     } = attainment
 
+    // let course_unit_id_temp = course_unit_id
     const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
     const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
     const targetSemester = getSemesterByDate(new Date(attainment_date))
@@ -164,11 +165,10 @@ const creditMapper =
     if (study_right_id !== null) {
       // console.log('study right id: ', study_right_id)
       const organisationName = studyrightIdToOrganisationsName[study_right_id]
-      console.log('organisations name: ', organisationName)
       if (organisationName) {
-        console.log('organisationsName[fi]: ', organisationName['fi'])
         if (organisationName['fi'].startsWith('Avoin yliopisto')) {
           course_code = course_code.startsWith('AY') ? course_code : 'AY'.concat(course_code)
+          // course_unit_id_temp = course_unit_id.concat('ay')
         }
       }
     }
@@ -254,10 +254,8 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
     (res, curr) => {
       const courseAttainments = courseIdToAttainments[curr.id]
       if (!courseAttainments || courseAttainments.length === 0) return res
-
       let min_attainment_date = res.min_attainment_date
       let max_attainment_date = res.max_attainment_date
-
       if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
         min_attainment_date = courseAttainments[0].attainment_date
       if (
