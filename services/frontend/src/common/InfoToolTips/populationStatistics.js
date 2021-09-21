@@ -51,6 +51,14 @@ export default {
   - **grades** - arvosanajakauma.
   - **when passed** - kurssisuorituksen ajankohta. Huom.! *Passed*-sarakkeen kokonaissumma ei välttämättä täsmää puolivuosittaisten lukumäärien summan kanssa johtuen tuplakirjauksista Oodissa.
   `,
+  Search: `Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisäänotto-lukuvuoden mukaisesti,
+  vuosikurssi kerrallaan. Uudet koulutusohjelmat ovat pääsääntöisesti alkaneet 1.8.2017,
+  joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
+
+  - **Class of:** lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen.
+  - **Study programme:** haluttu koulutusohjelma.
+  - **Select tag (Optional):** itsetehty tai valmis tägi.
+  - **Study track (Optional):** opintosuunta.`,
   Filters: {
     Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, 
     josta voi lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota.`,
