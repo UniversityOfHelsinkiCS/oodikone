@@ -36,6 +36,8 @@ const updateCourseUnits = async courseUnits => {
 
 const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   const courseProviders = []
+  // console.log('courseIdToAttainments: ', courseIdToAttainments)
+  // console.log('groupid to course: ', groupIdToCourse)
   const mapCourse = courseMapper(courseIdToAttainments)
 
   const courses = Object.entries(groupIdToCourse).map(groupedCourse => {
@@ -49,14 +51,6 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
         }, [])
       ),
     ]
-    // take responsible organisation from all course units
-    const organisation = [
-      ...new Set(
-        courses.reduce((acc, curr) => {
-          return [...acc, ...flatten(curr.organisations).map(({ organisationId }) => organisationId)]
-        }, [])
-      ),
-    ][0]
 
     // Take organisation for the newest course_unit of this groupid
     const coursesSortedByStartDate = sortBy(courses, 'validity_period.startDate')
@@ -67,7 +61,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
         .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
         .map(mapCourseProvider)
     )
-    return mapCourse(groupedCourse, substitutions, organisation)
+    return mapCourse(groupedCourse, substitutions)
   })
 
   await bulkCreate(Course, courses)
