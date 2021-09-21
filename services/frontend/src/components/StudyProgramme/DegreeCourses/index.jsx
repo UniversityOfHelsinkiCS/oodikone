@@ -26,7 +26,7 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
   }, [])
 
   useEffect(() => {
-    if (!mandatoryCourses) return
+    if (!mandatoryCourses || !mandatoryCourses.length) return
     const modules = {}
     mandatoryCourses.forEach(course => {
       const code = course.label_code
@@ -118,6 +118,9 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
 
   const calculateModuleVisibility = code => {
     const module = modules.find(({ module }) => module === code)
+    if (!module.courses) {
+      return 'no courses'
+    }
     if (module.courses.every(course => course.visible.visibility)) {
       return 'visible'
     }
@@ -141,10 +144,12 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
   return (
     <Table>
       <Table.Header>
-        <Table.HeaderCell>Name</Table.HeaderCell>
-        <Table.HeaderCell>Code</Table.HeaderCell>
-        <Table.HeaderCell>Label</Table.HeaderCell>
-        <Table.HeaderCell>Set visibility</Table.HeaderCell>
+        <Table.Row>
+          <Table.HeaderCell>Name</Table.HeaderCell>
+          <Table.HeaderCell>Code</Table.HeaderCell>
+          <Table.HeaderCell>Label</Table.HeaderCell>
+          <Table.HeaderCell>Set visibility</Table.HeaderCell>
+        </Table.Row>
       </Table.Header>
       <Table.Body>
         {modules.map(({ module, courses }) => (
