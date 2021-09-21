@@ -22,8 +22,7 @@ import TagList from '../TagList'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
-import info from '../../common/markdown/populationStatistics/students.info.md'
-import infoForCoursePop from '../../common/markdown/coursePopulation/students.info.md'
+import infotoolTips from '../../common/InfoToolTips'
 
 // TODO: Refactoring in process, contains lot of duplicate code.
 
@@ -400,7 +399,13 @@ class PopulationStudents extends Component {
       <Ref innerRef={this.handleRef}>
         <>
           <span style={{ marginRight: '0.5rem' }}>
-            <InfoBox content={this.props.coursePopulation ? infoForCoursePop : info} />
+            <InfoBox
+              content={
+                this.props.coursePopulation
+                  ? infotoolTips.CoursePopulation.Students
+                  : infotoolTips.PopulationStatistics.Students
+              }
+            />
           </span>
           {this.state.admin ? (
             <CheckStudentList students={this.props.filteredStudents.map(stu => stu.studentNumber)} />
