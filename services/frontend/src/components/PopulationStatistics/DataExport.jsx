@@ -66,6 +66,13 @@ export default () => {
     return studentTags.join(', ')
   }
 
+  const getAdmissionType = studyRights => {
+    const code = queryStudyrights[0]
+    if (!code || !studyRights) return ''
+    const studyright = studyRights.find(sr => sr.studyright_elements.some(e => e.code === code))
+    return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
+  }
+
   const studytrack = studyrights => {
     let startdate = '1900-01-01'
     let enddate = '2020-04-20'
@@ -123,6 +130,7 @@ export default () => {
         studytrack: studytrack(s.studyrights).map(st => st.name)[0],
         tags: tags(s.tags),
         'start year at university': reformatDate(s.started, 'YYYY'),
+        'admission type': getAdmissionType(s.studyrights),
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber),
         ...sortedMandatory.reduce((acc, m) => {
