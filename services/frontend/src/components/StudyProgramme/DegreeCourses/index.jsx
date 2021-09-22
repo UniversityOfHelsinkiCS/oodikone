@@ -157,7 +157,7 @@ const DegreeCourses = ({ studyProgramme, setExclusion, removeExclusion }) => {
             <Table.Row key={module}>
               <Table.Cell style={{ cursor: 'pointer' }} onClick={() => toggleVisible(module)}>
                 <Icon name={visible[module] ? 'angle down' : 'angle right'} />
-                <b>{courses[0].label_name ? getTextIn(courses[0].label_name, language) : module}</b>
+                <b>{courses[0] && courses[0].label_name ? getTextIn(courses[0].label_name, language) : module}</b>
               </Table.Cell>
               <Table.Cell>{module}</Table.Cell>
               <Table.Cell>
