@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Button, Icon, Label } from 'semantic-ui-react'
-import { getTextIn } from '../../common'
+import { getTextIn, reformatDate } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import SortableTable from '../SortableTable'
 
@@ -82,6 +82,17 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
                 name={user.is_enabled ? 'check' : 'remove'}
               />
             ),
+          },
+          {
+            key: 'LASTLOGIN',
+            title: 'Last login',
+            getRowVal: user => (user.last_login ? user.last_login : 'Not saved'),
+            getRowContent: user =>
+              user.last_login ? (
+                <p>{reformatDate(user.last_login, 'DD.MM.YYYY')}</p>
+              ) : (
+                <p style={{ color: 'gray' }}>Not saved</p>
+              ),
           },
           {
             key: 'EDIT',
