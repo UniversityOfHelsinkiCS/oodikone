@@ -26,7 +26,7 @@ const refreshStudyrightAssociations = async () => {
 
 const refreshOverview = async () => {
   logger.info('Refreshing throughput and productivity for programmes...')
-  const codes = (await getAllProgrammes()).map(p => p.code)
+  const codes = (await getAllProgrammes()).map(p => p.code).filter(code => code.includes('KH') || code.includes('MH'))
   let ready = 0
   for (const code of codes) {
     let programmeStatsSince = new Date('2017-07-31')
