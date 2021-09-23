@@ -1,6 +1,5 @@
 import React, { memo, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { bool, shape, arrayOf, any } from 'prop-types'
 import { Header, Segment } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
 import PopulationDetails from '../PopulationDetails'
@@ -46,17 +45,6 @@ const PopulationStatistics = memo(props => {
     </FilterTray>
   )
 })
-
-PopulationStatistics.propTypes = {
-  location: shape({}).isRequired,
-  history: shape({}).isRequired,
-  samples: arrayOf(shape({})).isRequired,
-  queryIsSet: bool.isRequired,
-  isLoading: bool.isRequired,
-  selectedStudentsByYear: shape({}).isRequired,
-  query: shape({}).isRequired,
-  students: arrayOf(any).isRequired,
-}
 
 const mapStateToProps = state => {
   // haha copied from other place :mintu:
