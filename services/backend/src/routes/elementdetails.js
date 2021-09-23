@@ -1,5 +1,4 @@
 const router = require('express').Router()
-const { getStudentsUserCanAccess } = require('../services/userService')
 const MandatoryCourses = require('../services/mandatoryCourses')
 const {
   productivityStatsForStudytrack,
@@ -14,7 +13,6 @@ const {
   setThroughput,
   patchProductivity,
   patchThroughput,
-  getNonGraduatedStudents,
 } = require('../services/analyticsService')
 const { getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 const logger = require('../util/logger')
@@ -45,29 +43,6 @@ router.get('/v2/studyprogrammes/:id/optiondata', async (req, res) => {
 
   const data = await optionData(new Date('2017-07-31'), new Date(), code, level)
   res.json(data)
-})
-
-router.get('/v2/studyprogrammes/:id/present_students', async (req, res) => {
-  const {
-    roles,
-    decodedToken,
-    params: { id },
-  } = req
-  if (!id) return res.status(400).json({ error: 'programme id missing' })
-
-  const nonGraduatedStudents = await getNonGraduatedStudents(id)
-  if (!nonGraduatedStudents) return res.status(200).json({})
-  const {
-    data: { formattedData, studentnumbers },
-  } = nonGraduatedStudents
-
-  const filteredData = { ...formattedData }
-  const studentsUserCanAccess = await getStudentsUserCanAccess(studentnumbers, roles, decodedToken.userId)
-  Object.keys(filteredData).forEach(year => {
-    filteredData[year] = filteredData[year].filter(({ studentNumber }) => studentsUserCanAccess.has(studentNumber))
-  })
-
-  res.json(filteredData)
 })
 
 router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
