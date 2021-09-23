@@ -103,15 +103,16 @@ const refreshNonGraduatedStudentsOfOldProgrammes = async () => {
 }
 
 const refreshProtoCtoRedis = async () => {
+  logger.info('Refreshing CDS ProtoC')
   const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false' }
   const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false' }
   const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true' }
   const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true' }
-  logger.info('Refreshing CDS ProtoC')
-  await refreshProtoC(defaultQuery)
-  await refreshProtoC(onlyOld)
-  await refreshProtoC(onlyEnr)
-  await refreshProtoC(bothToggles)
+  await refreshProtoC(defaultQuery),
+    await refreshProtoC(onlyOld),
+    await refreshProtoC(onlyEnr),
+    await refreshProtoC(bothToggles)
+  logger.info('Refreshing CDS ProtoC doned')
 }
 
 const refreshStatusToRedis = async () => {
@@ -124,73 +125,91 @@ const refreshStatusToRedis = async () => {
   logger.info('Refreshing CDS Status')
   await refreshStatus(date.getTime(), showByYearOff)
   await refreshStatus(date.getTime(), showByYear)
+  logger.info('Refreshing CDS Status doned')
 
   logger.info('Refreshing CDS Graduated')
   await refreshStatusGraduated(date.getTime(), showByYearOff)
   await refreshStatusGraduated(date.getTime(), showByYear)
+  logger.info('Refreshing CDS graduated doned')
 }
 
 const refreshUberToRedis = async () => {
-  const years = await getStartYears()
-  const mappedYears = years.map(({ studystartdate }) => studystartdate)
-  mappedYears.forEach(async year => {
-    logger.info(`Refreshing CDS Uber data for date ${year}`)
+  const years = (await getStartYears()).map(({ studystartdate }) => studystartdate)
+  for (const year of years) {
+    const formattedYear = new Date(year).getFullYear()
+    logger.info(`Refreshing CDS uber year ${formattedYear}`)
     const defaultQuery = { include_old_attainments: 'false', start_date: year }
     const oldAttainmentsQuery = { include_old_attainments: 'true', start_date: year }
-    await refreshUber(defaultQuery)
-    await refreshUber(oldAttainmentsQuery)
-  })
+    try {
+      await refreshUber(defaultQuery)
+      await refreshUber(oldAttainmentsQuery)
+      logger.info(`Refreshing CDS uber year ${formattedYear} doned`)
+    } catch (e) {
+      logger.error({ message: `Error when refreshing CDS uber year ${formattedYear}`, meta: e })
+    }
+  }
+  logger.info(`Refreshing CDS Uber data doned`)
 }
 
 const refreshProtoCProgrammeToRedis = async () => {
   const codes = (await getAllProgrammes()).map(p => p.code).filter(code => code.includes('KH'))
-  codes.forEach(async code => {
-    logger.info(`Refreshing protocprogramme code ${code}`)
+  for (const code of codes) {
+    logger.info(`Refreshing ProtoCProgramme code ${code}`)
     const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false', code }
     const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false', code }
     const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true', code }
     const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true', code }
-    await refreshProtoCProgramme(defaultQuery)
-    await refreshProtoCProgramme(onlyOld)
-    await refreshProtoCProgramme(onlyEnr)
-    await refreshProtoCProgramme(bothToggles)
-  })
+    try {
+      await refreshProtoCProgramme(defaultQuery)
+      await refreshProtoCProgramme(onlyOld)
+      await refreshProtoCProgramme(onlyEnr)
+      await refreshProtoCProgramme(bothToggles)
+      logger.info(`Refreshing ProtoCProgramme code ${code} doned`)
+    } catch (e) {
+      logger.error({ message: `Error when refreshing ProtocProgramme code ${code}`, meta: e })
+    }
+  }
+  logger.info(`Refreshing protocprogramme doned`)
 }
 
 const refreshStatistics = async () => {
-  try {
-    await refreshStudyrightAssociations()
-    await refreshOverview()
-    await refreshNonGraduatedStudentsOfOldProgrammes()
-    await refreshTeacherLeaderboard()
-  } catch (e) {
-    logger.error({ message: 'Error happened while refreshing', meta: e })
+  const statfuncs = [
+    refreshStudyrightAssociations,
+    refreshOverview,
+    refreshNonGraduatedStudentsOfOldProgrammes,
+    refreshTeacherLeaderboard,
+  ]
+  logger.info('Refreshing statistics')
+  for (const func of statfuncs) {
+    await func()
   }
   logger.info('Statistics refreshed!')
 }
 
 const refreshTrends = async () => {
-  try {
-    await refreshProtoCtoRedis()
-    await refreshStatusToRedis()
-    await refreshUberToRedis()
-    await refreshProtoCProgrammeToRedis()
-  } catch (e) {
-    logger.error({ message: 'Error happened while refreshing', meta: e })
+  const trendfuncs = [refreshProtoCtoRedis, refreshStatusToRedis, refreshUberToRedis, refreshProtoCProgrammeToRedis]
+  logger.info('Refreshing trends')
+  for (const func of trendfuncs) {
+    await func()
   }
   logger.info('Trends refreshed!')
+}
+
+const refreshAll = async () => {
+  for (const func of [refreshStatistics, refreshTrends]) {
+    await func()
+  }
 }
 
 const startCron = () => {
   if (isProduction) {
     schedule('0 6 * * *', async () => {
-      await refreshStatistics()
-      await refreshTrends()
+      await refreshAll()
     })
   }
 }
 
 module.exports = {
   startCron,
-  refreshStatistics,
+  refreshStatistics: refreshAll,
 }
