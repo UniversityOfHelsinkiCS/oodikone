@@ -8,8 +8,6 @@ const { redisClient } = require('../services/redis')
 const _ = require('lodash')
 const { Op, col, where, fn } = require('sequelize')
 
-const createStudyright = apiData => Studyright.create(apiData)
-
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 
 const byStudent = studentNumber => {
@@ -334,7 +332,6 @@ const getUserAssociations = async userid => {
 
 module.exports = {
   byStudent,
-  createStudyright,
   studentNumbersWithAllStudyRightElements,
   getAssociatedStudyrights,
   getAllStudyrightElementsAndAssociations,
