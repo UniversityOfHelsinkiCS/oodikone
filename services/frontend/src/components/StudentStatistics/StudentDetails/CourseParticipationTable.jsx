@@ -14,8 +14,9 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
   const courseRowsByAcademicYear = {}
 
   student.courses.sort(byDateDesc).forEach(c => {
-    const { date, grade, credits, course, isStudyModuleCredit, passed } = c
+    const { date, grade, credits, course, isStudyModuleCredit, passed, credittypecode } = c
     let icon = null
+
     if (isStudyModuleCredit) {
       icon = <Icon name="certificate" color="purple" />
     } else if (passed) {
@@ -36,7 +37,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
         reformatDate(date, 'DD.MM.YYYY'),
         `${
           isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)
-        } (${course.code})`,
+        } ${credittypecode === 7 ? `, ${course.code} (korotettu)` : `(${course.code})`}`,
         <div>
           {icon}
           {grade}
@@ -54,7 +55,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
         reformatDate(date, 'DD.MM.YYYY'),
         `${
           isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)
-        } (${course.code})`,
+        } ${credittypecode === 7 ? `, ${course.code} (korotettu)` : `(${course.code})`}`,
         <div>
           {icon}
           {grade}

@@ -181,6 +181,7 @@ const formatStudent = ({
       passed: Credit.passed({ credittypecode }) || Credit.improved({ credittypecode }),
       grade,
       credits,
+      credittypecode,
       isStudyModuleCredit: isStudyModule,
     }
   }
