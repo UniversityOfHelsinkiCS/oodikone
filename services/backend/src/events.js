@@ -108,10 +108,10 @@ const refreshProtoCtoRedis = async () => {
   const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false' }
   const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true' }
   const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true' }
-  await refreshProtoC(defaultQuery),
-    await refreshProtoC(onlyOld),
-    await refreshProtoC(onlyEnr),
-    await refreshProtoC(bothToggles)
+  await refreshProtoC(defaultQuery)
+  await refreshProtoC(onlyOld)
+  await refreshProtoC(onlyEnr)
+  await refreshProtoC(bothToggles)
   logger.info('Refreshing CDS ProtoC doned')
 }
 
