@@ -30,6 +30,61 @@ export default {
   Kategorioita voi myös itsessään käyttää suodattimina. Klikkaamalla rivin vasemmassa reunassa olevaa suodatinta jäävät näkyviin vain sen kategorian opiskelijat.
   Suodatin aukeaa samalla ikkunan vasempaan laitaan, josta sitä voi käyttää vapaavalintaisilla arvoilla.
   `,
+  CoursesOfPopulation: `**Courses of population**
+
+  Tämä taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
+  
+  Opiskelijat on mahdollista suodattaa kurssin perusteella käyttämällä kurssirivin vasemmassa laidassa olevaa suodatinpainiketta.
+  Kurssisuodatin aukeaa ikkunan vasempaan laitaan ja tarjoaa lisää vaihtoehtoja suodatukseen. Voit myös valita monta kurssia kerralla suodattimeen.
+  
+  Klikkaamalla kurssin nimen vieressä olevaa sinistä nuolta, siirryt ko. kurssin *Course Statistics* -näkymään.
+  
+  Taulukon tietoja voi suodattaa antamalla opiskelijoiden vähimmäismäärän kurssilla kenttään *Limit to courses where student number at least*.
+  Lisäksi kurssin nimi- ja koodisarakkeissa on hakukentät *("filter here")* suodattamista varten.
+  Suodattimet saa tyhjennettyä painamalla kentän vieressä olevaa ruksia.
+  
+  **Huom! Nämä suodattimet vaikuttavat vain tähän taulukkoon, eivät koko populatioon.**
+  
+  **Taulukot**
+  
+  - **pass/fail** - oletusnäkymä, joka sisältää kurssisuoritukset, hylätyt sekä yritykset. Taulukon tiedot voi järjestää sarakkeita (n, after retry, percentage, many times, per student, passed ja attempted) klikkaamalla.
+  - **grades** - arvosanajakauma.
+  - **when passed** - kurssisuorituksen ajankohta. Huom.! *Passed*-sarakkeen kokonaissumma ei välttämättä täsmää puolivuosittaisten lukumäärien summan kanssa johtuen tuplakirjauksista Oodissa.
+  `,
+  Search: `Tässä osiossa voi tarkastella koulutusohjelmakohtaisia populaatioita sisäänotto-lukuvuoden mukaisesti,
+  vuosikurssi kerrallaan. Uudet koulutusohjelmat ovat pääsääntöisesti alkaneet 1.8.2017,
+  joten oletusvalinnat näyttävät tiedot tästä päivämäärästä lähtien.
+
+  - **Class of:** lukuvuosi, jolloin opiskelija on ilmoittautunut ensimmäisen kerran (läsnä- tai poissaolevaksi) ohjelmaan. Ilmoittautumisen opinto-oikeus voi olla ensi- tai toissijainen.
+  - **Study programme:** haluttu koulutusohjelma.
+  - **Select tag (Optional):** itsetehty tai valmis tägi.
+  - **Study track (Optional):** opintosuunta.`,
+  Students: `**Students**
+
+  Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
+  
+  **General**
+  
+  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä nuolta, siirtyy "student statistic" näkymään valitun opiskelijan osalta.
+  
+  - **credits since start of studyright:**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson / populaation ajalta.
+  - **all credits:** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
+  - **transferred from:** opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
+  - **studytracks:** opintosuunta
+  
+  **Mandatory Courses**
+  
+  Tällä välilehdellä näkyy, mitä pakollisiksi määriteltyjä kursseja opiskelija on suorittanut.
+  Kurssit voi määrittää kohdassa "Study program" > "Overview" > haluttu koulutusohjelma. Scrollatessa kurssitaulukkoa alaspäin, kurssin nimen saa näkyviin viemällä kursorin halutun solun kohdalle.
+  
+  **Tags**
+  
+  Opiskelijoille voi luoda tag:eja ryhmittelyä varten kohdassa "Study Program" > "Overview" > haluttu koulutusohjelma.
+  
+  **Download**
+  
+  Klikkaamalla tätä harmaata kuvaketta, saa ladattua .xlsx tiedoston, joka sisältää kaikki "General" ja "Mandatory Courses" välilehtien tiedot.
+  `,
   Filters: {
     Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, 
     josta voi lisätä haluamiaan suodattimia, jotka rajaavat valittua populaatiota.`,

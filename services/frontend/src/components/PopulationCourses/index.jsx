@@ -8,7 +8,7 @@ import PopulationCourseStats from '../PopulationCourseStats'
 import InfoBox from '../InfoBox'
 import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
-import info from '../../common/markdown/populationStatistics/coursesOfPopulation.info.md'
+import infotooltips from '../../common/InfoToolTips'
 
 const PopulationCourses = ({
   populationSelectedStudentCourses,
@@ -72,7 +72,7 @@ const PopulationCourses = ({
 
   return (
     <Segment basic>
-      <InfoBox content={info} />
+      <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
       {query.studyRights.programme && <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />}
       <SegmentDimmer isLoading={pending} />
       <PopulationCourseStats
