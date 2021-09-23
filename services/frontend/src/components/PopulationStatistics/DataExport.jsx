@@ -19,6 +19,7 @@ export default () => {
   const queryStudyrights = useSelector(({ populations }) =>
     populations.query ? Object.values(populations.query.studyRights) : []
   )
+  const queryYear = useSelector(({ populations }) => populations?.query?.year)
 
   // FIXME:
   const mandatoryPassed = useSelector(({ populationCourses, populationMandatoryCourses }) => {
@@ -130,7 +131,7 @@ export default () => {
         studytrack: studytrack(s.studyrights).map(st => st.name)[0],
         tags: tags(s.tags),
         'start year at university': reformatDate(s.started, 'YYYY'),
-        'admission type': getAdmissionType(s.studyrights),
+        'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber),
         ...sortedMandatory.reduce((acc, m) => {
