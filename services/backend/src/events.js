@@ -9,17 +9,10 @@ const {
   getStartYears,
 } = require('./services/trends')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
-const { getAllProgrammes, nonGraduatedStudentsOfElementDetail } = require('./services/studyrights')
+const { getAllProgrammes } = require('./services/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studyprogramme')
 const { findAndSaveTeachers } = require('./services/topteachers')
-const {
-  setProductivity,
-  setThroughput,
-  patchProductivity,
-  patchThroughput,
-  patchNonGraduatedStudents,
-} = require('./services/analyticsService')
-const { isNewHYStudyProgramme } = require('./util')
+const { setProductivity, setThroughput, patchProductivity, patchThroughput } = require('./services/analyticsService')
 const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
@@ -79,27 +72,6 @@ const refreshTeacherLeaderboard = async () => {
   const currentSemester = await getCurrentSemester()
   await findAndSaveTeachers(startyearcode, currentSemester.getDataValue('semestercode'))
   logger.info('Teacher leaderboard refreshed')
-}
-
-const refreshNonGraduatedStudentsOfOldProgrammes = async () => {
-  const oldProgrammeCodes = (await getAllProgrammes()).map(p => p.code).filter(c => !isNewHYStudyProgramme(c))
-  let i = 0
-  logger.info('Refreshing non-graduated students of old programmes...')
-  await Promise.all(
-    oldProgrammeCodes.map(
-      c =>
-        new Promise(async res => {
-          try {
-            const [nonGraduatedStudents, studentnumbers] = await nonGraduatedStudentsOfElementDetail(c)
-            await patchNonGraduatedStudents({ [c]: { formattedData: nonGraduatedStudents, studentnumbers } })
-            logger.info(`${++i}/${oldProgrammeCodes.length} of old programmes done`)
-          } catch (e) {
-            logger.error(`Failed refreshing non-graduated students of programme ${c}!`)
-          }
-          res()
-        })
-    )
-  )
 }
 
 const refreshProtoCtoRedis = async () => {
@@ -173,12 +145,7 @@ const refreshProtoCProgrammeToRedis = async () => {
 }
 
 const refreshStatistics = async () => {
-  const statfuncs = [
-    refreshStudyrightAssociations,
-    refreshOverview,
-    refreshNonGraduatedStudentsOfOldProgrammes,
-    refreshTeacherLeaderboard,
-  ]
+  const statfuncs = [refreshStudyrightAssociations, refreshOverview, refreshTeacherLeaderboard]
   logger.info('Refreshing statistics')
   for (const func of statfuncs) {
     await func()
