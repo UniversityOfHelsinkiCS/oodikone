@@ -1,4 +1,4 @@
-const { CronJob } = require('cron')
+//const { CronJob } = require('cron')
 const moment = require('moment')
 const {
   refreshProtoC,
@@ -17,7 +17,7 @@ const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
 
-const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
+//const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
 const refreshStudyrightAssociations = async () => {
   await refreshAssociationsInRedis()
@@ -170,9 +170,9 @@ const refreshAll = async () => {
 
 const startCron = () => {
   if (isProduction) {
-    schedule('0 6 * * *', async () => {
-      await refreshAll()
-    })
+    // schedule('0 6 * * *', async () => {
+    //   await refreshAll()
+    // })
   }
 }
 
