@@ -449,7 +449,6 @@ GeneralTab.defaultProps = {
   studentToTargetCourseDateMap: null,
   customPopulation: false,
   coursePopulation: false,
-  coursecode: '',
 }
 
 GeneralTab.propTypes = {
@@ -460,7 +459,6 @@ GeneralTab.propTypes = {
   queryStudyrights: arrayOf(string).isRequired,
   isAdmin: bool.isRequired,
   studentToTargetCourseDateMap: shape({}),
-  coursecode: string,
 }
 
 const mapStateToProps = state => {
