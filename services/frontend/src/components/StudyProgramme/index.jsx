@@ -60,8 +60,8 @@ const StudyProgramme = props => {
   const getPanes = () => {
     const { match, programmes } = props
     const { studyProgrammeId } = match.params
-    const filteredStudytracks = programmes[studyProgrammeId]
-      ? Object.values(programmes[studyProgrammeId].enrollmentStartYears).reduce((acc, curr) => {
+    const filteredStudytracks = programmes?.[studyProgrammeId]
+      ? Object.values(programmes?.[studyProgrammeId].enrollmentStartYears).reduce((acc, curr) => {
           acc.push(...Object.values(curr.studyTracks))
           return uniqBy(acc, 'code')
         }, [])
@@ -114,7 +114,7 @@ const StudyProgramme = props => {
 
   const { match, programmes } = props
   const { studyProgrammeId } = match.params
-  const programmeName = programmes[studyProgrammeId] && getTextIn(programmes[studyProgrammeId].name, language)
+  const programmeName = programmes?.[studyProgrammeId] && getTextIn(programmes?.[studyProgrammeId].name, language)
   const panes = getPanes()
 
   useEffect(() => {
