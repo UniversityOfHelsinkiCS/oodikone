@@ -169,7 +169,7 @@ const creditMapper =
         if (organisationName['fi'].startsWith('Avoin yliopisto')) {
           if (!course_code.startsWith('AY')) {
             course_code = 'AY'.concat(course_code)
-            course_id = course_id.concat('-ay')
+            // course_id = course_id.concat('-ay')
           }
         }
       }
