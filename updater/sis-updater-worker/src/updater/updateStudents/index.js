@@ -300,11 +300,13 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const creditTeachers = []
 
   const coursesToBeCreated = new Map()
+  const coursesToBeUpdated = new Map()
   const courseProvidersToBeCreated = []
 
-  const fixNewAyCodelessOpenUniCourses = (courseGroupIdToCourseCodeFullCourses, coursesWithOpenUniStudyrightId) => {
+  const findAyCodelessOpenUniCourses = (courseGroupIdToCourseCodeFullCourses, coursesWithOpenUniStudyrightId) => {
     const coursesWithNoAy = coursesWithOpenUniStudyrightId.reduce((res, curr) => {
       const foundCourse = courseGroupIdToCourseCodeFullCourses.find(c => c.id === curr)
+
       if (!foundCourse.code.startsWith('AY')) {
         res.push(foundCourse)
       }
@@ -314,25 +316,43 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     return coursesWithNoAy
   }
 
-  fixNewAyCodelessOpenUniCourses(courseGroupIdToCourseCodeFullCourses, coursesWithOpenUniStudyrightId).forEach(
-    course => {
-      coursesToBeCreated.set('AY'.concat(course.code), {
-        id: course.id.concat('-ay'),
-        name: course.name,
-        code: 'AY'.concat(course.code),
-        latest_instance_date: course.latest_instance_date,
-        is_study_module: course.is_study_module,
-        coursetypecode: course.coursetypecode,
-        startdate: course.startdate,
-        enddate: course.enddate,
-        max_attainment_date: course.max_attainment_date,
-        min_attainment_date: course.min_attainment_date,
-        createdAt: course.createdAt,
-        updatedAt: course.updatedAt,
-        substitutions: course.substitutions,
-      })
-    }
+  const ayCodelessOpenUniCourses = findAyCodelessOpenUniCourses(
+    courseGroupIdToCourseCodeFullCourses,
+    coursesWithOpenUniStudyrightId
   )
+
+  const coursesWithAyCodeAlreadyExist = await Course.findAll({
+    raw: true,
+    where: {
+      code: {
+        [Op.in]: Object.values(ayCodelessOpenUniCourses.map(c => 'AY'.concat(c.code))),
+      },
+    },
+  })
+
+  const fixAyCodelessOpenUniCourses = (ayCodelessOpenUniCourses, coursesWithAyCodeAlreadyExist) => {
+    ayCodelessOpenUniCourses.forEach(course => {
+      const courseWithidForAyCodeExist = coursesWithAyCodeAlreadyExist.find(
+        c => c.code === 'AY'.concat(course.code) && !c.id.endsWith('-ay')
+      )
+
+      if (courseWithidForAyCodeExist) {
+        coursesToBeUpdated.set(courseWithidForAyCodeExist.code, {
+          ...courseWithidForAyCodeExist,
+        })
+      } else {
+        coursesToBeCreated.set('AY'.concat(course.code), {
+          ...course,
+          id: course.id.concat('-ay'),
+          code: 'AY'.concat(course.code),
+        })
+      }
+    })
+  }
+
+  fixAyCodelessOpenUniCourses(ayCodelessOpenUniCourses, coursesWithAyCodeAlreadyExist)
+  // console.log('courses to be created: ', coursesToBeCreated)
+  // console.log('courses to be updated: ', coursesToBeUpdated)
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
