@@ -131,7 +131,8 @@ const creditMapper =
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode,
-    studyrightIdToOrganisationsName
+    studyrightIdToOrganisationsName,
+    courseCodeToAyCodelessId
   ) =>
   attainment => {
     const {
@@ -155,6 +156,7 @@ const creditMapper =
     const targetSemester = getSemesterByDate(new Date(attainment_date))
 
     if (!targetSemester) return null
+    // console.log('courseCodeToAyCodelessId: ', courseCodeToAyCodelessId)
 
     let course_code = !isModule(type)
       ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
@@ -169,7 +171,7 @@ const creditMapper =
         if (organisationName['fi'].startsWith('Avoin yliopisto')) {
           if (!course_code.startsWith('AY')) {
             course_code = 'AY'.concat(course_code)
-            // course_id = course_id.concat('-ay')
+            course_id = courseCodeToAyCodelessId.get(course_code)
           }
         }
       }
