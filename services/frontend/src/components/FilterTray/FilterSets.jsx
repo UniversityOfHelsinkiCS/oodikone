@@ -13,9 +13,8 @@ import Age from './filters/Age'
 import AdmissionType from './filters/AdmissionType'
 import Tags from './filters/Tags'
 
-export const PopulationStatisticsFilters = () => {
+export const PopulationStatisticsFilters = ({ query }) => {
   const analytics = useAnalytics()
-
   useEffect(() => {
     analytics.setTarget('Population Statistics')
   })
@@ -29,7 +28,7 @@ export const PopulationStatisticsFilters = () => {
       <Age />
       <Gender />
       <StartYearAtUni />
-      <AdmissionType />
+      {parseInt(query?.year, 10) >= 2020 ? <AdmissionType /> : null}
       <Courses />
       <Tags />
     </>

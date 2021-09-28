@@ -224,6 +224,7 @@ const StudyGuidanceGroups = () => {
   const groupid = match?.params?.groupid
 
   useEffect(() => {
+    if (data && data.length > 0) return
     dispatch(getStudyGuidanceGroups())
   }, [])
 

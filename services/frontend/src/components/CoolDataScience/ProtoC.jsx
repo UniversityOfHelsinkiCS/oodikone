@@ -568,8 +568,6 @@ const ProtoC = ({
 
   const { CoolDataScience } = InfoToolTips
 
-  console.log({ CoolDataScience })
-
   // create list from sorters and deprecate this
   const sorterNames = Object.keys(sorters)
     .map(sorterName => sorterName)

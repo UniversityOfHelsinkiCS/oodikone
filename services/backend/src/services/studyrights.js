@@ -3,14 +3,10 @@ const {
 } = require('../database/connection')
 const { Studyright, StudyrightElement, ElementDetail } = require('../models')
 const { getUserElementDetails } = require('./userService')
-const { hasEnrolledForSemester } = require('./students')
-const { getCurrentSemester } = require('./semesters')
 const moment = require('moment')
 const { redisClient } = require('../services/redis')
 const _ = require('lodash')
 const { Op, col, where, fn } = require('sequelize')
-
-const createStudyright = apiData => Studyright.create(apiData)
 
 const REDIS_KEY = 'STUDYRIGHT_ASSOCIATIONS_V2'
 
@@ -22,97 +18,6 @@ const byStudent = studentNumber => {
       },
     },
   })
-}
-
-const getActiveStudyrightElementsOfCodeBeforeDate = async (code, date) =>
-  await StudyrightElement.findAll({
-    where: {
-      code,
-      enddate: {
-        [Op.gte]: date,
-      },
-    },
-  })
-
-const getActiveStudyrightsFromIdsBeforeDate = async (studyrightIds, date) =>
-  await Studyright.findAll({
-    where: {
-      graduated: 0,
-      studyrightid: {
-        [Op.in]: studyrightIds,
-      },
-      canceldate: null,
-      enddate: {
-        [Op.gte]: date,
-      },
-    },
-  })
-
-const nonGraduatedStudentsOfElementDetail = async code => {
-  const today = new Date()
-  const currentSemesterCode = (await getCurrentSemester()).semestercode
-
-  // Get studyrights of target code that haven't ended yet
-  const studyrightElements = await getActiveStudyrightElementsOfCodeBeforeDate(code, today)
-  const studentToDatesMap = {}
-
-  studyrightElements.forEach(({ startdate, enddate, studentnumber }) => {
-    studentToDatesMap[studentnumber] = {
-      startdate,
-      enddate,
-    }
-  })
-
-  const studyrights = await getActiveStudyrightsFromIdsBeforeDate(
-    studyrightElements.map(sE => sE.studyrightid),
-    today
-  )
-
-  // Filter out students that are in new master's programmes,
-  // see if student is currently enrolled and format the result
-  // to shape of { year1: [studentnumbers], ... }
-  const result = {}
-  const studentnumbers = new Set()
-  const studentsToBeFiltered = new Set()
-  await Promise.all(
-    studyrights.map(
-      ({ studentStudentnumber: student_studentnumber, studyrightid }) =>
-        new Promise(async res => {
-          const [enrolled, studentElementDetails] = await Promise.all([
-            await hasEnrolledForSemester(student_studentnumber, currentSemesterCode),
-            await StudyrightElement.findAll({
-              where: {
-                studyrightid,
-              },
-            }),
-          ])
-
-          // If student is in new master's programme,
-          // then don't include them in the result
-          if (studentElementDetails.find(e => e.code.match(/^M[A-Z]*[0-9]*_[0-9]*$/))) {
-            studentsToBeFiltered.add(student_studentnumber)
-            return res()
-          }
-
-          if (studentnumbers.has(student_studentnumber)) return res()
-          const year = moment(studentToDatesMap[student_studentnumber].startdate).tz('Europe/Helsinki').year()
-          if (!result[year]) result[year] = []
-          studentnumbers.add(student_studentnumber)
-          result[year].push({
-            studentNumber: student_studentnumber,
-            enrolled,
-          })
-          res()
-        })
-    )
-  )
-
-  // Filter out some special cases
-  Object.keys(result).forEach(year => {
-    result[year] = result[year].filter(({ studentNumber }) => !studentsToBeFiltered.has(studentNumber))
-  })
-
-  return [result, [...studentnumbers]]
 }
 
 const studentNumbersWithAllStudyRightElements = async (codes, startedAfter, startedBefore) => {
@@ -427,7 +332,6 @@ const getUserAssociations = async userid => {
 
 module.exports = {
   byStudent,
-  createStudyright,
   studentNumbersWithAllStudyRightElements,
   getAssociatedStudyrights,
   getAllStudyrightElementsAndAssociations,
@@ -438,5 +342,4 @@ module.exports = {
   refreshAssociationsInRedis,
   getAllProgrammes,
   getAllElementDetails,
-  nonGraduatedStudentsOfElementDetail,
 }

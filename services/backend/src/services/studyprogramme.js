@@ -385,7 +385,9 @@ const graduationsFromClass = async (studentnumbers, studytrack) => {
 const genderCodeToValue = code => {
   if (code === '1') return 'Male'
   if (code === '2') return 'Female'
-  return 'Other'
+  if (code === '3') return 'Other'
+  if (code === '0') return 'Unknown'
+  return 'Unknown'
 }
 
 const gendersFromClass = async studentnumbers => {

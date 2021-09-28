@@ -178,9 +178,10 @@ const formatStudent = ({
       },
       date: attainment_date,
       course_code: course.code,
-      passed: Credit.passed({ credittypecode }),
+      passed: Credit.passed({ credittypecode }) || Credit.improved({ credittypecode }),
       grade,
       credits,
+      credittypecode,
       isStudyModuleCredit: isStudyModule,
     }
   }
@@ -329,16 +330,6 @@ const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
   return students.map(student => student.studentnumber)
 }
 
-const hasEnrolledForSemester = async (studentnumber, semestercode) => {
-  const enrollment = await SemesterEnrollment.findOne({
-    where: {
-      studentnumber,
-      semestercode,
-    },
-  })
-  return !!(enrollment && enrollment.enrollmenttype === 1)
-}
-
 module.exports = {
   withId,
   bySearchTerm,
@@ -349,5 +340,4 @@ module.exports = {
   findByCourseAndSemesters,
   findByTag,
   splitByEmptySpace,
-  hasEnrolledForSemester,
 }

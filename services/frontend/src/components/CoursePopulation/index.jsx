@@ -121,7 +121,6 @@ const CoursePopulation = ({
   }, [semesters])
 
   const header = courseData ? `${getTextIn(courseData.name, language)} ${headerYears}` : null
-  const coursecode = courseData ? courseData.alternatives : []
 
   const subHeader = codes.join(', ')
 
@@ -260,7 +259,7 @@ const CoursePopulation = ({
               filteredStudents={studentData.students.filter(stu => selectedStudents.includes(stu.studentNumber))}
               coursePopulation
               language={language}
-              coursecode={coursecode}
+              coursecode={codes}
             />
           </div>
         ),

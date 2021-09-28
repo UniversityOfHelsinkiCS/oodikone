@@ -19,6 +19,7 @@ export default () => {
   const queryStudyrights = useSelector(({ populations }) =>
     populations.query ? Object.values(populations.query.studyRights) : []
   )
+  const queryYear = useSelector(({ populations }) => populations?.query?.year)
 
   // FIXME:
   const mandatoryPassed = useSelector(({ populationCourses, populationMandatoryCourses }) => {
@@ -64,6 +65,13 @@ export default () => {
   const tags = tags => {
     const studentTags = tags.map(t => t.tag.tagname)
     return studentTags.join(', ')
+  }
+
+  const getAdmissionType = studyRights => {
+    const code = queryStudyrights[0]
+    if (!code || !studyRights) return ''
+    const studyright = studyRights.find(sr => sr.studyright_elements.some(e => e.code === code))
+    return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
   }
 
   const studytrack = studyrights => {
@@ -123,6 +131,7 @@ export default () => {
         studytrack: studytrack(s.studyrights).map(st => st.name)[0],
         tags: tags(s.tags),
         'start year at university': reformatDate(s.started, 'YYYY'),
+        'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber),
         ...sortedMandatory.reduce((acc, m) => {

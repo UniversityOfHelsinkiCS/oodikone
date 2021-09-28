@@ -79,7 +79,7 @@ describe('Studyprogramme overview', () => {
     let originalProductivityCalculatedText
     const doRecalculation = () => {
       // Wait for page to load before clicking to admin page, TODO: change to cy.intercept
-      cy.wait(2000)
+      cy.wait(5000)
       cy.get('.attached').contains('Admin').click()
       cy.contains('recalculate productivity').click()
       cy.contains('recalculate throughput').click()

@@ -112,10 +112,14 @@ const Overview = ({
             ...selectedYearData,
             credits: selectedYearData.creditValues,
             genders: {
-              Male: Number(selectedYearData.genders.Male),
-              Female: Number(selectedYearData.genders.Female),
+              Male: Number(selectedYearData.genders.Male) || 0,
+              Female: Number(selectedYearData.genders.Female) || 0,
+              Other: Number(selectedYearData.genders.Other) || 0,
             },
-            students: Number(selectedYearData.genders.Male) + Number(selectedYearData.genders.Female),
+            students:
+              (Number(selectedYearData.genders.Male) || 0) +
+              (Number(selectedYearData.genders.Female) || 0) +
+              (Number(selectedYearData.genders.Other) || 0),
           },
         }
         setData(newData)

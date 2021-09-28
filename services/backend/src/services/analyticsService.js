@@ -3,7 +3,6 @@ const moment = require('moment')
 
 const createRedisKeyForProductivity = id => `PRODUCTIVITY_${id}`
 const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
-const createRedisKeyForNonGraduatedStudents = id => `NONGRADUATEDSTUDENTS_${id}`
 
 const getProductivity = async id => {
   const redisKey = createRedisKeyForProductivity(id)
@@ -88,32 +87,6 @@ const patchThroughput = async data => {
   }
 }
 
-const patchNonGraduatedStudents = async data => {
-  const [id, dataToPatch] = Object.entries(data)[0]
-  const redisKey = createRedisKeyForNonGraduatedStudents(id)
-  const dataFromRedisRaw = await redisClient.getAsync(redisKey)
-  const dataFromRedis = dataFromRedisRaw ? JSON.parse(dataFromRedisRaw) : { data: null }
-  const patchedData = {
-    data: {
-      ...dataFromRedis.data,
-      ...dataToPatch,
-    },
-    lastUpdated: moment().format(),
-  }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(patchedData))
-  if (setOperationStatus !== 'OK') return null
-  return {
-    [id]: patchedData,
-  }
-}
-
-const getNonGraduatedStudents = async id => {
-  const redisKey = createRedisKeyForNonGraduatedStudents(id)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
-  if (!dataFromRedis) return null
-  return JSON.parse(dataFromRedis)
-}
-
 module.exports = {
   getProductivity,
   setProductivity,
@@ -121,6 +94,4 @@ module.exports = {
   getThroughput,
   setThroughput,
   patchThroughput,
-  patchNonGraduatedStudents,
-  getNonGraduatedStudents,
 }
