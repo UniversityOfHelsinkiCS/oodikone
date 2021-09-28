@@ -30,6 +30,7 @@ const GeneralTab = ({
   isAdmin,
   studentToTargetCourseDateMap,
   coursecode,
+  queryYear,
 }) => {
   const { language } = useLanguage()
   const { filteredStudents } = useFilters()
@@ -334,7 +335,7 @@ const GeneralTab = ({
     })
   }
 
-  if (!(coursePopulation || customPopulation)) {
+  if (!(coursePopulation || customPopulation) && parseInt(queryYear, 10) >= 2020) {
     const code = queryStudyrights[0]
     columns.push({
       key: 'admission type',
@@ -473,6 +474,7 @@ const mapStateToProps = state => {
     isAdmin: getUserIsAdmin(roles),
     populationStatistics: populations.data,
     queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
+    queryYear: populations?.query?.year,
   }
 }
 
