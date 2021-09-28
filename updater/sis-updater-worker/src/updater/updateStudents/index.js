@@ -357,7 +357,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
           })
           if (!courseProvider) {
             const mapCourseProvider = courseProviderMapper('AY'.concat(course.code))
-            courseProvidersToBeCreated.push(mapCourseProvider('hy-234234'))
+            courseProvidersToBeCreated.push(mapCourseProvider('hy-org-48645785'))
           }
         }
       }
