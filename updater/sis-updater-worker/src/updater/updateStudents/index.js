@@ -332,8 +332,8 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
         },
       },
     })
-    const createCourseUnits = (ayCodelessOpenUniCourses, coursesWithAyCodeAlreadyExist) => {
-      ayCodelessOpenUniCourses.forEach(course => {
+    const createCourseUnits = async (ayCodelessOpenUniCourses, coursesWithAyCodeAlreadyExist) => {
+      for (const course of ayCodelessOpenUniCourses) {
         const courseWithIdForAyCodeExist = coursesWithAyCodeAlreadyExist.find(
           c => c.code === 'AY'.concat(course.code) && !c.id.endsWith('-ay')
         )
@@ -350,8 +350,17 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             code: 'AY'.concat(course.code),
           })
           courseCodeToAyCodelessId.set('AY'.concat(course.code), course.id.concat('-ay'))
+          const courseProvider = await CourseProvider.findOne({
+            where: {
+              coursecode: course ? course.id : 'AY'.concat(course.code),
+            },
+          })
+          if (!courseProvider) {
+            const mapCourseProvider = courseProviderMapper('AY'.concat(course.code))
+            courseProvidersToBeCreated.push(mapCourseProvider('hy-234234'))
+          }
         }
-      })
+      }
     }
 
     createCourseUnits(ayCodelessOpenUniCourses, coursesWithAyCodeAlreadyExist)
