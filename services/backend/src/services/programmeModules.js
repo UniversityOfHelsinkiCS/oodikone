@@ -30,7 +30,7 @@ const recursivelyGetModuleAndChildren = async (code, type) => {
 
 const byProgrammeCode = async code => {
   const result = await recursivelyGetModuleAndChildren(code, 'course')
-
+  if (!result.length) return []
   const excluded = await ExcludedCourse.findAll({
     where: {
       programme_code: {

@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { shape, string, func, bool } from 'prop-types'
 import { Header, Segment, Tab, Button } from 'semantic-ui-react'
 import { isEqual, uniqBy } from 'lodash'
 import DegreeCoursesTable from './DegreeCourses'
@@ -9,16 +8,14 @@ import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import StudyTrackOverview from './StudyTrackOverview'
 import ThesisCourses from './ThesisCourses'
-import PresentStudents from './PresentStudents'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getTextIn, getUserRoles, getUserIsAdmin, isNewHYStudyProgramme } from '../../common'
+import { getTextIn, getUserRoles, getUserIsAdmin } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
 
 import { getThroughput } from '../../redux/throughput'
 import { getProductivity } from '../../redux/productivity'
-import { getPresentStudents, clearPresentStudents } from '../../redux/presentStudents'
 import { getProgrammes } from '../../redux/populationProgrammes'
 
 import { callApi } from '../../apiConnection'
@@ -63,8 +60,8 @@ const StudyProgramme = props => {
   const getPanes = () => {
     const { match, programmes } = props
     const { studyProgrammeId } = match.params
-    const filteredStudytracks = programmes[studyProgrammeId]
-      ? Object.values(programmes[studyProgrammeId].enrollmentStartYears).reduce((acc, curr) => {
+    const filteredStudytracks = programmes?.[studyProgrammeId]
+      ? Object.values(programmes?.[studyProgrammeId].enrollmentStartYears).reduce((acc, curr) => {
           acc.push(...Object.values(curr.studyTracks))
           return uniqBy(acc, 'code')
         }, [])
@@ -94,12 +91,6 @@ const StudyProgramme = props => {
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />,
     })
-    if (!isNewHYStudyProgramme(studyProgrammeId)) {
-      panes.push({
-        menuItem: 'Present students',
-        render: () => <PresentStudents />,
-      })
-    }
     if (props.isAdmin) {
       panes.push({
         menuItem: 'Admin',
@@ -123,15 +114,8 @@ const StudyProgramme = props => {
 
   const { match, programmes } = props
   const { studyProgrammeId } = match.params
-  const programmeName = programmes[studyProgrammeId] && getTextIn(programmes[studyProgrammeId].name, language)
+  const programmeName = programmes?.[studyProgrammeId] && getTextIn(programmes?.[studyProgrammeId].name, language)
   const panes = getPanes()
-
-  useEffect(() => {
-    if (studyProgrammeId && !isNewHYStudyProgramme(studyProgrammeId)) {
-      props.clearPresentStudentsDispatch()
-      props.getPresentStudentsDispatch(studyProgrammeId)
-    }
-  }, [studyProgrammeId])
 
   useEffect(() => {
     if (!programmeName) {
@@ -172,29 +156,6 @@ const StudyProgramme = props => {
   )
 }
 
-StudyProgramme.propTypes = {
-  match: shape({
-    params: shape({
-      studyProgrammeId: string,
-    }),
-  }),
-  programmes: shape({}),
-  history: shape({}).isRequired,
-  getProductivityDispatch: func.isRequired,
-  getThroughputDispatch: func.isRequired,
-  isAdmin: bool.isRequired,
-  getPresentStudentsDispatch: func.isRequired,
-  clearPresentStudentsDispatch: func.isRequired,
-  getProgrammesDispatch: func.isRequired,
-}
-
-StudyProgramme.defaultProps = {
-  match: {
-    params: { studyProgrammeId: undefined },
-  },
-  programmes: {},
-}
-
 const mapStateToProps = ({
   populationProgrammes,
   auth: {
@@ -215,8 +176,6 @@ export default connect(
   {
     getThroughputDispatch: getThroughput,
     getProductivityDispatch: getProductivity,
-    getPresentStudentsDispatch: getPresentStudents,
-    clearPresentStudentsDispatch: clearPresentStudents,
     getProgrammesDispatch: getProgrammes,
   },
   null,
