@@ -8,21 +8,13 @@ const {
 
 router.get('/v3/programme_modules/:code', async (req, res) => {
   const { code } = req.params
-  const module = await byProgrammeCode(code)
-  if (!module) {
-    res.status(400).end()
-    return
-  }
-  res.json(module)
+  const result = await byProgrammeCode(code)
+  res.json(result)
 })
 
 router.get('/v3/programme_modules/:code/modules', async (req, res) => {
   const { code } = req.params
   const result = await modulesByProgrammeCode(code)
-  if (!result) {
-    res.status(400).end()
-    return
-  }
   res.json(result)
 })
 

@@ -8,11 +8,26 @@ import { isEqual } from 'lodash'
 import { images, getUserRoles, checkUserAccess } from '../common'
 import { useTitle } from '../common/hooks'
 import { builtAt } from '../conf'
+import oodis from '../static/oodis.json'
+
+const OodiToOodikone = () => (
+  <div style={{ margin: 'auto', width: '50%' }}>
+    {oodis.oodis[Math.floor(Math.random() * oodis.oodis.length)].split('\n').map((l, index) => (
+      // eslint-disable-next-line react/no-array-index-key
+      <p key={index} style={{ textAlign: 'center', fontStyle: 'italic', margin: 0 }}>
+        {l}
+      </p>
+    ))}
+    <p style={{ marginTop: '1.3em', textAlign: 'center' }}>
+      - <a href="http://www.helsinki.fi/discovery">{oodis.author}</a>
+    </p>
+  </div>
+)
 
 const FrontPage = props => {
   const { userRoles, rights } = props
   useTitle()
-
+  console.log('oodi pituus: ', oodis.oodis.length)
   const showItems = {
     populations: userRoles.includes('admin') || rights.length !== 0,
     studyProgramme: userRoles.includes('admin') || rights.length !== 0,
@@ -32,6 +47,8 @@ const FrontPage = props => {
         <Header as="h3" style={{ textAlign: 'center' }}>
           Exploratory Research on Study Data
         </Header>
+        <OodiToOodikone />
+
         {showItems.populations && (
           <>
             <Divider section />
