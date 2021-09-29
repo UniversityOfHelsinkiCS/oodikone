@@ -1,4 +1,4 @@
-//const { CronJob } = require('cron')
+const { CronJob } = require('cron')
 const moment = require('moment')
 const {
   refreshProtoC,
@@ -17,7 +17,7 @@ const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
 
-//const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
+const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
 const refreshStudyrightAssociations = async () => {
   await refreshAssociationsInRedis()
@@ -68,9 +68,9 @@ const refreshOverview = async () => {
 }
 
 const refreshTeacherLeaderboard = async () => {
-  const startyearcode = 51 // Start from autumn 2001
-  const currentSemester = await getCurrentSemester()
-  await findAndSaveTeachers(startyearcode, currentSemester.getDataValue('semestercode'))
+  // refresh this and previous year
+  const currentSemestersYearCode = (await getCurrentSemester()).getDataValue('yearcode')
+  await findAndSaveTeachers(currentSemestersYearCode - 1, currentSemestersYearCode)
   logger.info('Teacher leaderboard refreshed')
 }
 
@@ -170,13 +170,15 @@ const refreshAll = async () => {
 
 const startCron = () => {
   if (isProduction) {
-    // schedule('0 6 * * *', async () => {
-    //   await refreshAll()
-    // })
+    // refresh 3am every day
+    schedule('0 3 * * *', async () => {
+      await refreshStatus()
+    })
   }
 }
 
 module.exports = {
   startCron,
   refreshStatistics: refreshAll,
+  refreshTrends,
 }
