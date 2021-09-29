@@ -348,6 +348,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             ...course,
             id: course.id.concat('-ay'),
             code: 'AY'.concat(course.code),
+            substitutions: course.substitutions,
           })
           courseCodeToAyCodelessId.set('AY'.concat(course.code), course.id.concat('-ay'))
           const courseProvider = await CourseProvider.findOne({
