@@ -119,7 +119,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
 
 const mapTeacher = person => ({
   id: person.id,
-  name: `${person.last_name} ${person.first_names}`.trim(),
+  name: person.first_names ? `${person.last_name} ${person.first_names}`.trim() : person.last_name,
 })
 
 const moduleTypes = new Set(['ModuleAttainment', 'DegreeProgrammeAttainment'])
