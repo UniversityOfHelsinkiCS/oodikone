@@ -208,7 +208,7 @@ const updateStudents = async personIds => {
 }
 
 const updateAttainments = async (attainments, personIdToStudentNumber, attainmentsToBeExluced) => {
-  const personIdToEmployeeNumber = await updateTeachers(attainments)
+  await updateTeachers(attainments)
   const [courseUnits, modules] = await Promise.all([
     selectFromByIds(
       'course_units',
@@ -429,8 +429,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       a.acceptor_persons
         .filter(p => p.roleUrn === 'urn:code:attainment-acceptor-type:approved-by' && !!p.personId)
         .forEach(p => {
-          const employeeNumber = personIdToEmployeeNumber[p.personId]
-          creditTeachers.push({ composite: `${a.id}-${employeeNumber}`, credit_id: a.id, teacher_id: employeeNumber })
+          creditTeachers.push({ composite: `${a.id}-${p.personId}`, credit_id: a.id, teacher_id: p.personId })
         })
 
       return mapCredit(a)
@@ -464,17 +463,10 @@ const updateTeachers = async attainments => {
     )
   ).filter(p => !!p)
 
-  const personIdToEmployeeNumber = {}
-  const teachers = (await selectFromByIds('persons', acceptorPersonIds))
-    .filter(p => !!p.employee_number && p.date_of_birth && p.first_names)
-    .map(p => {
-      personIdToEmployeeNumber[p.id] = p.employee_number
-      return mapTeacher(p)
-    })
+  const teachers = (await selectFromByIds('persons', acceptorPersonIds)).map(p => mapTeacher(p))
 
   // Sort to avoid deadlocks
   await bulkCreate(Teacher, sortBy(teachers, ['id']))
-  return personIdToEmployeeNumber
 }
 
 // why we are using two terms for the same thing: term registration and semester enrollment

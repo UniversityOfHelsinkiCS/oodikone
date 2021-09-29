@@ -118,7 +118,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
 }
 
 const mapTeacher = person => ({
-  id: person.employee_number,
+  id: person.id,
   name: `${person.last_name} ${person.first_names}`.trim(),
 })
 
