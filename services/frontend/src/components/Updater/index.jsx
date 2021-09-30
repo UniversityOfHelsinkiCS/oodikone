@@ -33,6 +33,8 @@ const Updater = () => {
   const abortSisUpdater = () => apiCall('/updater/abort', 'get')
   const refreshSISRedisCache = () => apiCall('/updater/refresh_redis_cache', 'get')
   const updateSISCourses = () => apiCall('/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
+  const refreshAllTeacherLeaderboards = () => apiCall('/teachers/top', 'post')
+  const refreshTrends = () => apiCall('/updater/refresh_trends', 'post')
 
   return (
     <Segment>
@@ -43,6 +45,8 @@ const Updater = () => {
           <Form.Button content="Update programmes" onClick={() => updateSISProgrammes()} />
           <Form.Button content="Refresh updater redis cache" onClick={() => refreshSISRedisCache()} />
           <Form.Button content="Refresh oodikone statistics" onClick={() => refreshStatisticsV2()} />
+          <Form.Button content="Refresh all teacher leaderboards" onClick={() => refreshAllTeacherLeaderboards()} />
+          <Form.Button content="Refresh trends" onClick={() => refreshTrends()} />
         </Form.Group>
         <Form.Group>
           <Form.Button content="Stop Updating" negative onClick={abortSisUpdater} />

@@ -1,7 +1,8 @@
 const { redisClient } = require('../services/redis')
-const { getSemestersAndYears, getMaxYearcode } = require('./semesters')
+const { getSemestersAndYears, getCurrentSemester } = require('./semesters')
 const { Teacher, Semester, Credit, Course } = require('../models')
 const { Op } = require('sequelize')
+const logger = require('../util/logger')
 
 const category = (name, rediskey) => ({ name, rediskey })
 
@@ -128,11 +129,13 @@ const findTopTeachers = async yearcode => {
   }
 }
 
-const findAndSaveTeachers = async (startcode = 50, to) => {
-  const endcode = to ? to : await getMaxYearcode()
+const findAndSaveTeachers = async (startcode = 1, to) => {
+  const endcode = to || (await getCurrentSemester()).getDataValue('yearcode')
   for (let code = startcode; code <= endcode; code++) {
     await findAndSaveTopTeachers(code)
+    logger.info(`Teacher leaderboard for yearcode ${code} calculated`)
   }
+  logger.info(`Teacher leaderboard calculations done`)
 }
 
 const findAndSaveTopTeachers = async yearcode => {
