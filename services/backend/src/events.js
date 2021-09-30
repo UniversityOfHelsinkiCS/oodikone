@@ -130,15 +130,18 @@ const refreshProtoCProgrammeToRedis = async () => {
     const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false', code }
     const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true', code }
     const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true', code }
-    try {
-      await refreshProtoCProgramme(defaultQuery)
-      await refreshProtoCProgramme(onlyOld)
-      await refreshProtoCProgramme(onlyEnr)
-      await refreshProtoCProgramme(bothToggles)
-      logger.info(`Refreshing ProtoCProgramme code ${code} doned`)
-    } catch (e) {
-      logger.error({ message: `Error when refreshing ProtocProgramme code ${code}`, meta: e })
+    const queries = [defaultQuery, onlyOld, onlyEnr, bothToggles]
+    for (const query of queries) {
+      try {
+        await refreshProtoCProgramme(query)
+      } catch (e) {
+        logger.error({
+          message: `Error when refreshing ProtocProgramme code ${code}, query ${Object.keys({ query })[0]}`,
+          meta: e,
+        }) // object.keys is hax to print query variable name
+      }
     }
+    logger.info(`Refreshing ProtoCProgramme code ${code} doned`)
   }
   logger.info(`Refreshing protocprogramme doned`)
 }
@@ -161,17 +164,13 @@ const refreshTrends = async () => {
   logger.info('Trends refreshed!')
 }
 
-// const refreshAll = async () => {
-//   for (const func of [refreshStatistics, refreshTrends]) {
-//     await func()
-//   }
-// }
-
 const startCron = () => {
   if (isProduction) {
     // refresh 3am every day
     schedule('0 3 * * *', async () => {
-      await refreshStatistics()
+      for (const func of [refreshStatistics, refreshTrends]) {
+        await func()
+      }
     })
   }
 }
