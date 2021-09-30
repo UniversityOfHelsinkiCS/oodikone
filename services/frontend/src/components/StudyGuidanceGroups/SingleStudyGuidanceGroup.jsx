@@ -172,8 +172,13 @@ const SingleStudyGuidanceGroupContainer = ({ groupid }) => {
     if (!group) return
     const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
     if (groupStudentNumbers.length === 0) return
-    dispatch(getCustomPopulation({ studentnumberlist: groupStudentNumbers }))
-    dispatch(getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: groupStudentNumbers }))
+    dispatch(getCustomPopulation({ studentnumberlist: groupStudentNumbers, usingStudyGuidanceGroups: true }))
+    dispatch(
+      getCustomPopulationCoursesByStudentnumbers({
+        studentnumberlist: groupStudentNumbers,
+        usingStudyGuidanceGroups: true,
+      })
+    )
   }, [])
 
   if (!group) {

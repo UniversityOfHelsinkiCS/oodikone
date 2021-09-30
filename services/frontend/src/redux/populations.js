@@ -53,12 +53,12 @@ export const getCoursePopulation = ({ coursecodes, from, to, onProgress, separat
   return callController(route, prefix, null, 'get', query, params, onProgress)
 }
 
-export const getCustomPopulation = ({ studentnumberlist, onProgress }) => {
+export const getCustomPopulation = ({ studentnumberlist, onProgress, usingStudyGuidanceGroups }) => {
   const route = '/v3/populationstatisticsbystudentnumbers'
   const prefix = 'GET_CUSTOM_POP_'
-  const params = { studentnumberlist }
+  const params = { studentnumberlist, usingStudyGuidanceGroups }
   const query = { studentnumberlist, studyRights: { programme: 'KH555' } }
-  const body = { studentnumberlist }
+  const body = { studentnumberlist, usingStudyGuidanceGroups }
   return callController(route, prefix, body, 'post', query, params, onProgress)
 }
 
