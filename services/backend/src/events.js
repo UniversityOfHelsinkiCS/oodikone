@@ -71,7 +71,6 @@ const refreshTeacherLeaderboard = async () => {
   // refresh this and previous year
   const currentSemestersYearCode = (await getCurrentSemester()).getDataValue('yearcode')
   await findAndSaveTeachers(currentSemestersYearCode - 1, currentSemestersYearCode)
-  logger.info('Teacher leaderboard refreshed')
 }
 
 const refreshProtoCtoRedis = async () => {
@@ -162,23 +161,23 @@ const refreshTrends = async () => {
   logger.info('Trends refreshed!')
 }
 
-const refreshAll = async () => {
-  for (const func of [refreshStatistics, refreshTrends]) {
-    await func()
-  }
-}
+// const refreshAll = async () => {
+//   for (const func of [refreshStatistics, refreshTrends]) {
+//     await func()
+//   }
+// }
 
 const startCron = () => {
   if (isProduction) {
     // refresh 3am every day
     schedule('0 3 * * *', async () => {
-      await refreshStatus()
+      await refreshStatistics()
     })
   }
 }
 
 module.exports = {
   startCron,
-  refreshStatistics: refreshAll,
+  refreshStatistics,
   refreshTrends,
 }
