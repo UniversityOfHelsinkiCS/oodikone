@@ -139,3 +139,7 @@ Just do clean install by launching cli with `npm cli` and running option 1: _Set
 Toska of course.
 
 University of Helsinki
+
+## Tietosuoja / data protection
+
+See [tietosuoja.md](tietosuoja.md).
