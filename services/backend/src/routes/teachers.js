@@ -25,6 +25,7 @@ router.get('/top', async (req, res) => {
   if (!yearcode) {
     return res.status(422).send('Missing required yearcode query param')
   }
+
   const result = await topteachers.getTeacherStats(category, yearcode)
   res.json(result)
 })

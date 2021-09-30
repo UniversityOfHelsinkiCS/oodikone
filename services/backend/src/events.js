@@ -1,4 +1,4 @@
-//const { CronJob } = require('cron')
+const { CronJob } = require('cron')
 const moment = require('moment')
 const {
   refreshProtoC,
@@ -17,7 +17,7 @@ const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
 
-//const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
+const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
 const refreshStudyrightAssociations = async () => {
   await refreshAssociationsInRedis()
@@ -68,10 +68,9 @@ const refreshOverview = async () => {
 }
 
 const refreshTeacherLeaderboard = async () => {
-  const startyearcode = 51 // Start from autumn 2001
-  const currentSemester = await getCurrentSemester()
-  await findAndSaveTeachers(startyearcode, currentSemester.getDataValue('semestercode'))
-  logger.info('Teacher leaderboard refreshed')
+  // refresh this and previous year
+  const currentSemestersYearCode = (await getCurrentSemester()).getDataValue('yearcode')
+  await findAndSaveTeachers(currentSemestersYearCode - 1, currentSemestersYearCode)
 }
 
 const refreshProtoCtoRedis = async () => {
@@ -131,15 +130,18 @@ const refreshProtoCProgrammeToRedis = async () => {
     const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false', code }
     const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true', code }
     const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true', code }
-    try {
-      await refreshProtoCProgramme(defaultQuery)
-      await refreshProtoCProgramme(onlyOld)
-      await refreshProtoCProgramme(onlyEnr)
-      await refreshProtoCProgramme(bothToggles)
-      logger.info(`Refreshing ProtoCProgramme code ${code} doned`)
-    } catch (e) {
-      logger.error({ message: `Error when refreshing ProtocProgramme code ${code}`, meta: e })
+    const queries = [defaultQuery, onlyOld, onlyEnr, bothToggles]
+    for (const query of queries) {
+      try {
+        await refreshProtoCProgramme(query)
+      } catch (e) {
+        logger.error({
+          message: `Error when refreshing ProtocProgramme code ${code}, query ${Object.keys({ query })[0]}`,
+          meta: e,
+        }) // object.keys is hax to print query variable name
+      }
     }
+    logger.info(`Refreshing ProtoCProgramme code ${code} doned`)
   }
   logger.info(`Refreshing protocprogramme doned`)
 }
@@ -162,21 +164,19 @@ const refreshTrends = async () => {
   logger.info('Trends refreshed!')
 }
 
-const refreshAll = async () => {
-  for (const func of [refreshStatistics, refreshTrends]) {
-    await func()
-  }
-}
-
 const startCron = () => {
   if (isProduction) {
-    // schedule('0 6 * * *', async () => {
-    //   await refreshAll()
-    // })
+    // refresh 3am every day
+    schedule('0 3 * * *', async () => {
+      for (const func of [refreshStatistics, refreshTrends]) {
+        await func()
+      }
+    })
   }
 }
 
 module.exports = {
   startCron,
-  refreshStatistics: refreshAll,
+  refreshStatistics,
+  refreshTrends,
 }
