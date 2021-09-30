@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Container, Header, Image, Divider, List } from 'semantic-ui-react'
 import moment from 'moment'
 import { connect } from 'react-redux'
@@ -8,26 +7,52 @@ import { isEqual } from 'lodash'
 import { images, getUserRoles, checkUserAccess } from '../common'
 import { useTitle } from '../common/hooks'
 import { builtAt } from '../conf'
-import oodis from '../static/oodis.json'
+import oodiTXT from '../static/oodi.txt'
 
-const OodiToOodikone = () => (
-  <div style={{ margin: 'auto', width: '50%' }}>
-    {oodis.oodis[Math.floor(Math.random() * oodis.oodis.length)].split('\n').map((l, index) => (
-      // eslint-disable-next-line react/no-array-index-key
-      <p key={index} style={{ textAlign: 'center', fontStyle: 'italic', margin: 0 }}>
-        {l}
+const OodiToOodikone = () => {
+  const [oodis, setOodis] = useState([])
+  useEffect(() => {
+    const getOodis = async () => {
+      try {
+        const data = await fetch(oodiTXT)
+        setOodis(
+          (await data.text())
+            .split('**')
+            .map(o => o.trim())
+            .filter(oodi => !!oodi)
+        )
+      } catch (error) {
+        setOodis([])
+      }
+    }
+    getOodis()
+  }, [])
+
+  if (!oodis || oodis.length === 0) {
+    return null
+  }
+  const oodi = oodis[Math.floor(Math.random() * oodis.length)].split('\n')
+  return (
+    <div style={{ margin: 'auto', width: '50%' }}>
+      {oodi.map((l, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <p key={index} style={{ textAlign: 'center', fontStyle: 'italic', margin: 0 }}>
+          {index === 0 && '\u201C'}
+          {l}
+          {index === oodi.length - 1 && '\u201D'}
+        </p>
+      ))}
+      <p style={{ marginTop: '1.3em', textAlign: 'center' }}>
+        - <a href="http://www.helsinki.fi/discovery">R. U. Nokone</a>
       </p>
-    ))}
-    <p style={{ marginTop: '1.3em', textAlign: 'center' }}>
-      - <a href="http://www.helsinki.fi/discovery">{oodis.author}</a>
-    </p>
-  </div>
-)
+    </div>
+  )
+}
 
 const FrontPage = props => {
   const { userRoles, rights } = props
+
   useTitle()
-  console.log('oodi pituus: ', oodis.oodis.length)
   const showItems = {
     populations: userRoles.includes('admin') || rights.length !== 0,
     studyProgramme: userRoles.includes('admin') || rights.length !== 0,

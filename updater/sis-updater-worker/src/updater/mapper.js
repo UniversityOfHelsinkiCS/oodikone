@@ -126,7 +126,14 @@ const moduleTypes = new Set(['ModuleAttainment', 'DegreeProgrammeAttainment'])
 const isModule = courseType => moduleTypes.has(courseType)
 
 const creditMapper =
-  (personIdToStudentNumber, courseUnitIdToCourseGroupId, moduleGroupIdToModuleCode, courseGroupIdToCourseCode) =>
+  (
+    personIdToStudentNumber,
+    courseUnitIdToCourseGroupId,
+    moduleGroupIdToModuleCode,
+    courseGroupIdToCourseCode,
+    studyrightIdToOrganisationsName,
+    courseCodeToAyCodelessId
+  ) =>
   attainment => {
     const {
       id,
@@ -141,6 +148,7 @@ const creditMapper =
       course_unit_id,
       module_group_id,
       nodes,
+      study_right_id,
     } = attainment
 
     const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
@@ -148,10 +156,26 @@ const creditMapper =
     const targetSemester = getSemesterByDate(new Date(attainment_date))
 
     if (!targetSemester) return null
+    // console.log('courseCodeToAyCodelessId: ', courseCodeToAyCodelessId)
 
-    const course_code = !isModule(type)
+    let course_code = !isModule(type)
       ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
       : moduleGroupIdToModuleCode[module_group_id]
+
+    let course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
+
+    // because of new ayless codes
+    if (study_right_id !== null && !isModule(type)) {
+      const organisationName = studyrightIdToOrganisationsName[study_right_id]
+      if (organisationName) {
+        if (organisationName['fi'].startsWith('Avoin yliopisto')) {
+          if (!course_code.startsWith('AY')) {
+            course_code = 'AY'.concat(course_code)
+            course_id = courseCodeToAyCodelessId.get(course_code)
+          }
+        }
+      }
+    }
 
     // These are leaf attainments that have no other attainments attached to them
     const isStudyModule = nodes && nodes[0] !== undefined
@@ -164,7 +188,7 @@ const creditMapper =
       createdate: registration_date,
       credittypecode: getCreditTypeCodeFromAttainment(attainment, getGrade(grade_scale_id, grade_id).passed),
       attainment_date: attainment_date,
-      course_id: !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id,
+      course_id: course_id,
       course_code,
       semestercode: targetSemester.semestercode,
       semester_composite: targetSemester.composite,
@@ -220,7 +244,7 @@ const courseProviderMapper =
 
 const timify = t => new Date(t).getTime()
 
-const courseMapper = courseIdToAttainments => (groupedCourse, substitutions, organisation) => {
+const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => {
   const [groupId, courses] = groupedCourse
   const { code, name, study_level: coursetypecode } = courses[0]
 
@@ -234,10 +258,8 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions, org
     (res, curr) => {
       const courseAttainments = courseIdToAttainments[curr.id]
       if (!courseAttainments || courseAttainments.length === 0) return res
-
       let min_attainment_date = res.min_attainment_date
       let max_attainment_date = res.max_attainment_date
-
       if (!min_attainment_date || timify(min_attainment_date) > timify(courseAttainments[0].attainment_date))
         min_attainment_date = courseAttainments[0].attainment_date
       if (
@@ -263,7 +285,6 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions, org
     enddate,
     is_study_module: false, // VALIDATE THIS PLS
     substitutions,
-    responsible_organisation: organisation,
   }
 }
 
