@@ -172,7 +172,7 @@ const allCodeAltenatives = async code => {
   const temp = courses
     .map(c => c.code)
     .map(c => {
-      if (c.match(/^A/)) return [c, 4] // open university codes come last
+      if (c.match(/^AY?/)) return [c, 4] // open university codes come last
       if (c.match(/^\d/)) return [c, 2] // old numeric codes come second
       if (c.match(/^[A-Za-z]/)) return [c, 1] // new letter based codes come first
       return [c, 3] // unknown, comes before open uni?
