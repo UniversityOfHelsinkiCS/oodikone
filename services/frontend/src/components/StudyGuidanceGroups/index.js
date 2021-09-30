@@ -158,6 +158,15 @@ const SingleStudyGroupView = ({ group }) => {
 
   if (!group) return null
 
+  if (!custompop || custompop.length === 0) {
+    return (
+      <div>
+        <Button icon="arrow circle left" content="Back" onClick={() => history.push('/studyguidancegroups')} />
+        <Message>There aren't any students in this study guidance group.</Message>
+      </div>
+    )
+  }
+
   return (
     <div>
       <Button icon="arrow circle left" content="Back" onClick={() => history.push('/studyguidancegroups')} />
@@ -228,6 +237,8 @@ const StudyGuidanceGroups = () => {
     dispatch(getStudyGuidanceGroups())
   }, [])
 
+  const group = data.find(g => g.id === groupid)
+
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large">
@@ -236,7 +247,8 @@ const StudyGuidanceGroups = () => {
       <Segment className="contentSegment">
         {pending ? <Loader active>Loading</Loader> : null}
         {!pending && !groupid ? <StudyGuidanceGroupOverview groups={data} /> : null}
-        {!pending && groupid ? <SingleStudyGroupView group={data.find(g => g.id === groupid)} /> : null}
+        {!pending && groupid && !group ? <Message>No access to this group</Message> : null}
+        {!pending && groupid && group ? <SingleStudyGroupView group={group} /> : null}
       </Segment>
     </div>
   )
