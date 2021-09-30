@@ -265,7 +265,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       .map(org => org.id)
   )
 
-  const courseGroupIdToCourseCodeFullCourses = await Course.findAll({
+  const sisDbCoursesForStudentAttainments = await Course.findAll({
     where: {
       id: {
         [Op.in]: Object.values(courseUnitIdToCourseGroupId),
@@ -273,7 +273,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     },
   })
 
-  const courseGroupIdToCourseCode = courseGroupIdToCourseCodeFullCourses.reduce((res, curr) => {
+  const courseGroupIdToCourseCode = sisDbCoursesForStudentAttainments.reduce((res, curr) => {
     res[curr.id] = curr.code
     return res
   }, {})
@@ -294,8 +294,8 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const courseProvidersToBeCreated = []
 
   // because of AY-codeless open uni courses
-  const fixAyCodelessOpenUniCourses = async (attainments, courseGroupIdToCourseCodeFullCourses) => {
-    const coursesWithOpenUniStudyrightId = attainments.reduce((res, curr) => {
+  const fixAyCodelessOpenUniCourses = async (attainments, sisDbCoursesForStudentAttainments) => {
+    const groupIdsWithOpenUnStudyright = attainments.reduce((res, curr) => {
       if (curr.study_right_id !== null && curr.type === 'CourseUnitAttainment') {
         const organisationName = studyrightIdToOrganisationsName[curr.study_right_id]
         if (organisationName) {
@@ -307,67 +307,75 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       return res
     }, [])
 
-    const findAyCodelessOpenUniCourses = (courseGroupIdToCourseCodeFullCourses, coursesWithOpenUniStudyrightId) => {
-      const coursesWithNoAy = coursesWithOpenUniStudyrightId.reduce((res, curr) => {
-        const foundCourse = courseGroupIdToCourseCodeFullCourses.find(c => c.id === curr)
+    const coursesWithNoAyCodeAndOpenUniStudyright = groupIdsWithOpenUnStudyright.reduce((res, curr) => {
+      const foundCourse = sisDbCoursesForStudentAttainments.find(c => c.id === curr)
 
-        if (!foundCourse.code.startsWith('AY')) {
-          res.push(foundCourse)
-        }
-        return res
-      }, [])
+      if (!foundCourse.code.startsWith('AY')) {
+        res.push(foundCourse)
+      }
+      return res
+    }, [])
 
-      return coursesWithNoAy
-    }
-
-    const ayCodelessOpenUniCourses = findAyCodelessOpenUniCourses(
-      courseGroupIdToCourseCodeFullCourses,
-      coursesWithOpenUniStudyrightId
-    )
     const coursesWithAyCodeAlreadyExist = await Course.findAll({
       raw: true,
       where: {
         code: {
-          [Op.in]: Object.values(ayCodelessOpenUniCourses.map(c => 'AY'.concat(c.code))),
+          [Op.in]: Object.values(coursesWithNoAyCodeAndOpenUniStudyright.map(c => 'AY'.concat(c.code))),
         },
       },
     })
-    const createCourseUnits = async (ayCodelessOpenUniCourses, coursesWithAyCodeAlreadyExist) => {
-      for (const course of ayCodelessOpenUniCourses) {
-        const courseWithIdForAyCodeExist = coursesWithAyCodeAlreadyExist.find(
-          c => c.code === 'AY'.concat(course.code) && !c.id.endsWith('-ay')
+
+    for (const course of coursesWithNoAyCodeAndOpenUniStudyright) {
+      const courseWithIdForAyCodeExist = coursesWithAyCodeAlreadyExist.find(
+        c => c.code === 'AY'.concat(course.code) && !c.id.endsWith('-ay')
+      )
+      // array jossa array on kentän nimet
+      if (courseWithIdForAyCodeExist) {
+        const latest_instance_date = getFirstDateIfIsAfter(
+          course.latest_instance_date,
+          courseWithIdForAyCodeExist.latest_instance_date
+        )
+        const max_attainment_date = getFirstDateIfIsAfter(
+          course.max_attainment_date,
+          courseWithIdForAyCodeExist.max_attainment_date
+        )
+        const min_attainment_date = getFirstDateIfIsBefore(
+          course.min_attainment_date,
+          courseWithIdForAyCodeExist.min_attainment_date
         )
 
-        if (courseWithIdForAyCodeExist) {
+        if (latest_instance_date || max_attainment_date || min_attainment_date) {
           coursesToBeUpdated.set(courseWithIdForAyCodeExist.code, {
             ...courseWithIdForAyCodeExist,
+            latest_instance_date: latest_instance_date,
+            max_attainment_date: max_attainment_date,
+            min_attainment_date: min_attainment_date,
           })
-          courseCodeToAyCodelessId.set('AY'.concat(course.code), courseWithIdForAyCodeExist.id)
-        } else {
-          coursesToBeCreated.set('AY'.concat(course.code), {
-            ...course,
-            id: course.id.concat('-ay'),
-            code: 'AY'.concat(course.code),
-            substitutions: course.substitutions,
-          })
-          courseCodeToAyCodelessId.set('AY'.concat(course.code), course.id.concat('-ay'))
-          const courseProvider = await CourseProvider.findOne({
-            where: {
-              coursecode: course ? course.id : 'AY'.concat(course.code),
-            },
-          })
-          if (!courseProvider) {
-            const mapCourseProvider = courseProviderMapper('AY'.concat(course.code))
-            courseProvidersToBeCreated.push(mapCourseProvider('hy-org-48645785'))
-          }
+        }
+
+        courseCodeToAyCodelessId.set('AY'.concat(course.code), courseWithIdForAyCodeExist.id)
+      } else {
+        coursesToBeCreated.set('AY'.concat(course.code), {
+          ...course,
+          id: course.id.concat('-ay'),
+          code: 'AY'.concat(course.code),
+          substitutions: course.substitutions,
+        })
+        courseCodeToAyCodelessId.set('AY'.concat(course.code), course.id.concat('-ay'))
+        const courseProvider = await CourseProvider.findOne({
+          where: {
+            coursecode: course ? course.id : 'AY'.concat(course.code),
+          },
+        })
+        if (!courseProvider) {
+          const mapCourseProvider = courseProviderMapper('AY'.concat(course.code))
+          courseProvidersToBeCreated.push(mapCourseProvider('hy-org-48645785'))
         }
       }
     }
-
-    createCourseUnits(ayCodelessOpenUniCourses, coursesWithAyCodeAlreadyExist)
   }
 
-  await fixAyCodelessOpenUniCourses(attainments, courseGroupIdToCourseCodeFullCourses)
+  await fixAyCodelessOpenUniCourses(attainments, sisDbCoursesForStudentAttainments)
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
@@ -539,7 +547,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     .filter(c => !!c)
 
   const courses = Array.from(coursesToBeCreated.values())
-
+  const coursesUpdate = Array.from(coursesToBeUpdated.values())
   await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
   await bulkCreate(
@@ -554,6 +562,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     null,
     ['composite']
   )
+  await bulkCreate(Course, coursesUpdate)
 }
 
 const updateTeachers = async attainments => {
@@ -622,6 +631,24 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
   const semesterEnrollments = flatten(Object.values(enrolmentsByStudents).map(semesterEnrolmentsOfStudent))
 
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
+}
+
+const getFirstDateIfIsAfter = (dateOne, dateTwo) => {
+  const isAfter = new Date(dateOne) > new Date(dateTwo) ? dateOne : dateTwo
+  if (isAfter) {
+    return dateOne
+  } else {
+    return null
+  }
+}
+
+const getFirstDateIfIsBefore = (dateOne, dateTwo) => {
+  const isAfter = new Date(dateOne) < new Date(dateTwo) ? dateOne : dateTwo
+  if (isAfter) {
+    return dateOne
+  } else {
+    return null
+  }
 }
 
 module.exports = {

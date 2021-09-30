@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useEffect, useState } from 'react'
 import { Container, Header, Image, Divider, List } from 'semantic-ui-react'
 import moment from 'moment'
@@ -16,7 +15,6 @@ const OodiToOodikone = () => {
     const getOodis = async () => {
       try {
         const data = await fetch(oodiTXT)
-        console.log(data)
         setOodis(
           (await data.text())
             .split('**')
@@ -24,7 +22,7 @@ const OodiToOodikone = () => {
             .filter(oodi => !!oodi)
         )
       } catch (error) {
-        console.error(error)
+        setOodis([])
       }
     }
     getOodis()
@@ -37,11 +35,11 @@ const OodiToOodikone = () => {
   return (
     <div style={{ margin: 'auto', width: '50%' }}>
       {oodi.map((l, index) => (
-        <p key={l} style={{ textAlign: 'center', fontStyle: 'italic', margin: 0 }}>
-          {index === 0 && '"'}
-          {console.log(l)}
+        // eslint-disable-next-line react/no-array-index-key
+        <p key={index} style={{ textAlign: 'center', fontStyle: 'italic', margin: 0 }}>
+          {index === 0 && '\u201C'}
           {l}
-          {index === oodi.length - 1 && '"'}
+          {index === oodi.length - 1 && '\u201D'}
         </p>
       ))}
       <p style={{ marginTop: '1.3em', textAlign: 'center' }}>
@@ -55,7 +53,6 @@ const FrontPage = props => {
   const { userRoles, rights } = props
 
   useTitle()
-  // console.log('oodi pituus: ', oodis.oodis.length)
   const showItems = {
     populations: userRoles.includes('admin') || rights.length !== 0,
     studyProgramme: userRoles.includes('admin') || rights.length !== 0,
