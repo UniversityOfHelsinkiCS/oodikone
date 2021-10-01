@@ -49,12 +49,12 @@ export const getCoursePopulationCourses = ({ coursecodes, from, to }) => {
   return callController(route, prefix, body, 'post', query, params)
 }
 
-export const getCustomPopulationCoursesByStudentnumbers = ({ studentnumberlist }) => {
+export const getCustomPopulationCoursesByStudentnumbers = ({ studentnumberlist, usingStudyGuidanceGroups }) => {
   const route = '/v2/populationstatistics/coursesbystudentnumberlist'
   const prefix = 'GET_COURSES_OF_CUSTOM_POP_BY_SN_'
-  const params = { studentnumberlist }
-  const query = { studentnumberlist }
-  const body = { studentnumberlist }
+  const params = { studentnumberlist, usingStudyGuidanceGroups }
+  const query = { studentnumberlist, usingStudyGuidanceGroups }
+  const body = { studentnumberlist, usingStudyGuidanceGroups }
 
   return callController(route, prefix, body, 'post', query, params)
 }

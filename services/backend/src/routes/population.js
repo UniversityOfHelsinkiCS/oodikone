@@ -8,6 +8,8 @@ const UserService = require('../services/userService')
 const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
+const { getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
+const { logger } = require('../util/logger')
 
 const filterPersonalTags = (population, userId) => {
   return {
@@ -158,12 +160,15 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
   }
   let studentnumberlist
   const {
-    decodedToken: { userId },
+    decodedToken: { userId, sisPersonId },
     roles,
   } = req
 
   if (roles && roles.includes('admin')) {
     studentnumberlist = req.body.studentnumberlist
+  } else if (req.body.usingStudyGuidanceGroups) {
+    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(sisPersonId)
+    studentnumberlist = req.body.studentnumberlist.filter(s => studentsUserCanAccess.has(s))
   } else {
     const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
@@ -367,14 +372,21 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
 })
 
 router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
-  const { studentnumberlist } = req.body
+  const { studentnumberlist, usingStudyGuidanceGroups } = req.body
   const { roles, decodedToken } = req
 
-  const studentsUserCanAccess = await UserService.getStudentsUserCanAccess(
-    studentnumberlist,
-    roles,
-    decodedToken.userId
-  )
+  if (usingStudyGuidanceGroups) {
+    if (!decodedToken.sisPersonId) {
+      logger.error(
+        `User ${decodedToken.userId} tried to get person groups but personId was ${decodedToken.sisPersonId} in header`
+      )
+      return res.status(400).json({ error: 'Not possible to get groups without personId' })
+    }
+  }
+
+  const studentsUserCanAccess = usingStudyGuidanceGroups
+    ? await getAllStudentsUserHasInGroups(decodedToken.sisPersonId)
+    : await UserService.getStudentsUserCanAccess(studentnumberlist, roles, decodedToken.userId)
   const filteredStudentNumbers = studentnumberlist.filter(s => studentsUserCanAccess.has(s))
 
   const result = await Population.optimizedStatisticsOf(
