@@ -15,7 +15,7 @@ const FilterTray = ({ children, filterSet, visible }) => {
 
   return (
     <>
-      <div style={{ display: 'inline-flex', alignItems: 'flex-start' }}>
+      <div style={{ display: 'inline-flex', alignItems: 'flex-start', width: '100%' }}>
         <Segment style={{ marginLeft: '0.5rem', width: '12rem', position: 'sticky', top: '10px' }}>
           <Header size="small" style={{ textAlign: 'center' }}>
             Filter students
