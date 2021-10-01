@@ -36,8 +36,6 @@ const updateCourseUnits = async courseUnits => {
 
 const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   const courseProviders = []
-  // console.log('courseIdToAttainments: ', courseIdToAttainments)
-  // console.log('groupid to course: ', groupIdToCourse)
   const mapCourse = courseMapper(courseIdToAttainments)
 
   const courses = Object.entries(groupIdToCourse).map(groupedCourse => {
