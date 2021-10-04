@@ -64,8 +64,7 @@ parse_profiles() {
   return 0
 }
 
-# Set which docker-compose files to use based on version. In ci, profiles are also
-# emptied, since they're passed from github actions.
+# Set which docker-compose files to use based on version.
 parse_env() {
   env=""
   if [[ "$version" == "real" ]]; then
