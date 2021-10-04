@@ -309,9 +309,10 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
 
     const coursesWithNoAyCodeAndOpenUniStudyright = groupIdsWithOpenUnStudyright.reduce((res, curr) => {
       const foundCourse = sisDbCoursesForStudentAttainments.find(c => c.id === curr)
-
-      if (!foundCourse.code.startsWith('AY')) {
-        res.push(foundCourse)
+      if (foundCourse) {
+        if (foundCourse && !foundCourse.code.startsWith('AY')) {
+          res.push(foundCourse)
+        }
       }
       return res
     }, [])
