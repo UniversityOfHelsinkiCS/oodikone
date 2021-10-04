@@ -156,7 +156,6 @@ const creditMapper =
     const targetSemester = getSemesterByDate(new Date(attainment_date))
 
     if (!targetSemester) return null
-    // console.log('courseCodeToAyCodelessId: ', courseCodeToAyCodelessId)
 
     let course_code = !isModule(type)
       ? courseGroupIdToCourseCode[courseUnitIdToCourseGroupId[course_unit_id]]
@@ -164,14 +163,16 @@ const creditMapper =
 
     let course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
 
-    // because of new ayless codes
-    if (study_right_id !== null && !isModule(type)) {
-      const organisationName = studyrightIdToOrganisationsName[study_right_id]
-      if (organisationName) {
-        if (organisationName['fi'].startsWith('Avoin yliopisto')) {
-          if (!course_code.startsWith('AY')) {
-            course_code = 'AY'.concat(course_code)
-            course_id = courseCodeToAyCodelessId.get(course_code)
+    // if ay studyright and no ay code
+    if (study_right_id !== null && course_code) {
+      if (!isModule(type)) {
+        const organisationName = studyrightIdToOrganisationsName[study_right_id]
+        if (organisationName) {
+          if (organisationName['fi'].startsWith('Avoin yliopisto')) {
+            if (!course_code.startsWith('AY')) {
+              course_code = 'AY'.concat(course_code)
+              course_id = courseCodeToAyCodelessId.get(course_code)
+            }
           }
         }
       }
