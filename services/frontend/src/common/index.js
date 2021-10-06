@@ -12,11 +12,6 @@ export const setMocking = userid =>
   userid ? localStorage.setItem(MOCK_USERID, userid) : localStorage.removeItem(MOCK_USERID)
 export const getMocked = () => localStorage.getItem(MOCK_USERID)
 
-export const SIS_WARNING_FLAG = 'SIS_WARNING_FLAG'
-export const setHideSisWarningFlag = booleanFlag =>
-  booleanFlag ? localStorage.setItem(SIS_WARNING_FLAG, booleanFlag) : localStorage.removeItem(SIS_WARNING_FLAG)
-export const getHideSisWarningFlag = () => localStorage.getItem(SIS_WARNING_FLAG)
-
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>
     option.text

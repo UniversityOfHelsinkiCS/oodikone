@@ -6,7 +6,6 @@ import TSA from '../../common/tsa'
 import Header from '../Header'
 import ErrorContainer from '../ErrorContainer'
 import Routes from '../Routes'
-import SisChangeMessage from './SisChangeMessage'
 import './main.css'
 import { isDev, basePath } from '../../conf'
 
@@ -24,7 +23,6 @@ export default () => {
       <Router basename={basePath} history={history}>
         <main className="routeViewContainer">
           <Header />
-          <SisChangeMessage />
           <ErrorContainer />
           <Routes />
         </main>
