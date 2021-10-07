@@ -1,8 +1,7 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Radio, Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
 import { connect } from 'react-redux'
-import { func, shape, string, bool, arrayOf, number } from 'prop-types'
 import { getUsers } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
@@ -11,121 +10,89 @@ import { copyToClipboard } from '../../common'
 import UserPageNew from '../UserPage'
 import UserSearchList from './UserSearchList'
 
-class EnableUsers extends Component {
-  state = {
-    enabledOnly: true,
-  }
+const EnableUsers = props => {
+  const [enabledOnly, setEnabledOnly] = useState(true)
+  const [popupTimeout, setPopupTimeout] = useState(null)
+  const [popupOpen, setPopupOpen] = useState(false)
 
-  componentDidMount() {
-    if (this.props.elementdetails.length === 0) this.props.getElementDetails()
-    if (this.props.units.length === 0) this.props.getUnits()
-    if (this.props.users.length === 0) this.props.getUsers()
+  useEffect(() => {
+    if (props.elementdetails.length === 0) props.getElementDetails()
+    if (props.units.length === 0) props.getUnits()
+    if (props.users.length === 0) props.getUsers()
     document.title = 'Users - Oodikone'
+
+    return () => {
+      clearTimeout(popupTimeout)
+    }
+  }, [])
+
+  const toggleEnabledOnly = () => {
+    if (props.enabledOnly) props.getUsers()
+    setEnabledOnly(!enabledOnly)
   }
 
-  componentWillUnmount = () => {
-    clearTimeout(this.popupTimeout)
-  }
-
-  toggleEnabledOnly() {
-    if (this.props.enabledOnly) this.props.getUsers()
-    const { enabledOnly } = this.state
-    this.setState({ enabledOnly: !enabledOnly })
-  }
-
-  openUsersPage = () => {
-    const { history } = this.props
+  const openUsersPage = () => {
+    const { history } = props
     history.push('/users')
   }
 
-  copyEmailsToClippoard = () => {
-    const clipboardString = this.props.users
+  const copyEmailsToClippoard = () => {
+    const clipboardString = props.users
       .filter(u => u.is_enabled && u.email)
       .map(u => u.email)
       .join('; ')
     copyToClipboard(clipboardString)
   }
 
-  renderUserPage = userid => {
-    const { users } = this.props
+  const renderUserPage = userid => {
+    const { users } = props
     const user = users.find(u => u.id === userid)
-    return !user ? <Loader active /> : <UserPageNew userid={userid} user={user} goBack={this.openUsersPage} />
+    return !user ? <Loader active /> : <UserPageNew userid={userid} user={user} goBack={openUsersPage} />
   }
 
-  handlePopupOpen = () => {
-    this.setState({ popupOpen: true })
-    this.popupTimeout = setTimeout(() => {
-      this.setState({ popupOpen: false })
-    }, 1500)
-  }
-
-  handlePopupClose = () => {
-    this.popupTimeout = null
-  }
-
-  render() {
-    const { match, pending, users, error, elementdetails } = this.props
-    const { enabledOnly } = this.state
-    const { userid } = match.params
-    return (
-      <div style={{ marginBottom: '10px' }} className="segmentContainer">
-        <Header className="segmentTitle" size="large">
-          Oodikone users
-        </Header>
-        <Radio
-          label={`Showing ${enabledOnly ? 'only enabled' : 'all'} users`}
-          toggle
-          onClick={() => this.toggleEnabledOnly()}
-        />
-        <Segment loading={pending} className="contentSegment">
-          {!userid ? (
-            <UserSearchList enabledOnly={enabledOnly} users={users} error={error} elementdetails={elementdetails} />
-          ) : (
-            this.renderUserPage(userid)
-          )}
-        </Segment>
-        <Popup
-          trigger={<Icon link name="envelope" onClick={this.copyEmailsToClippoard} style={{ float: 'right' }} />}
-          content="Copied email(s)!"
-          on="click"
-          onOpen={this.handlePopupOpen}
-          onClose={this.handlePopupClose}
-          open={this.state.popupOpen}
-        />
-      </div>
+  const handlePopupOpen = () => {
+    setPopupOpen(true)
+    setPopupTimeout(
+      setTimeout(() => {
+        setPopupOpen(false)
+      }, 1500)
     )
   }
-}
 
-EnableUsers.propTypes = {
-  match: shape({
-    params: shape({
-      studentNumber: string,
-    }),
-  }).isRequired,
-  getUsers: func.isRequired,
-  pending: bool.isRequired,
-  getUnits: func.isRequired,
-  enabledOnly: bool.isRequired,
-  users: arrayOf(
-    shape({
-      id: string,
-      full_name: string,
-      is_enabled: bool,
-      username: string,
-      units: arrayOf(
-        shape({
-          id: string,
-          name: shape({}).isRequired,
-        })
-      ),
-    })
-  ).isRequired,
-  error: bool.isRequired,
-  units: arrayOf(shape({})).isRequired,
-  elementdetails: arrayOf(shape({ code: string, type: number, name: shape({}) })).isRequired,
-  getElementDetails: func.isRequired,
-  history: shape({}).isRequired,
+  const handlePopupClose = () => {
+    setPopupOpen(false)
+    setPopupTimeout(null)
+  }
+
+  const { match, pending, users, error, elementdetails } = props
+  const { userid } = match.params
+  return (
+    <div style={{ marginBottom: '10px' }} className="segmentContainer">
+      <Header className="segmentTitle" size="large">
+        Oodikone users
+      </Header>
+      <Radio
+        label={`Showing ${enabledOnly ? 'only enabled' : 'all'} users`}
+        toggle
+        onClick={() => toggleEnabledOnly()}
+      />
+      <Segment loading={pending} className="contentSegment">
+        {!userid ? (
+          <UserSearchList enabledOnly={enabledOnly} users={users} error={error} elementdetails={elementdetails} />
+        ) : (
+          renderUserPage(userid)
+        )}
+      </Segment>
+      <Popup
+        trigger={<Icon link name="envelope" onClick={copyEmailsToClippoard} style={{ float: 'right' }} />}
+        content="Copied email(s)!"
+        on="click"
+        onOpen={handlePopupOpen}
+        onClose={handlePopupClose}
+        open={popupOpen}
+      />
+    </div>
+  )
 }
 
 const sortUsers = makeSortUsers()
