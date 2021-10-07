@@ -1,21 +1,16 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Button, Icon, Label } from 'semantic-ui-react'
 import { getTextIn, reformatDate } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import SortableTable from '../SortableTable'
+import { useShowAsUser } from '../../common/hooks'
 
 const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
   const { language } = useLanguage()
 
-  let usersToRender
-
-  if (enabledOnly) {
-    usersToRender = users.filter(u => u.is_enabled)
-  } else {
-    usersToRender = users
-  }
+  const usersToRender = enabledOnly ? users.filter(u => u.is_enabled) : users
+  const showAsUser = useShowAsUser()
 
   return error ? null : (
     <div>
@@ -95,6 +90,14 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
               ),
           },
           {
+            key: 'SHOWAS',
+            title: 'Show as user',
+            getRowVal: user => (
+              <Button circular size="tiny" basic icon="spy" onClick={() => showAsUser(user.username)} />
+            ),
+            headerProps: { onClick: null, sorted: null },
+          },
+          {
             key: 'EDIT',
             title: '',
             getRowVal: user => (
@@ -111,13 +114,6 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
       />
     </div>
   )
-}
-
-UserSearchList.propTypes = {
-  enabledOnly: PropTypes.bool.isRequired,
-  users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  error: PropTypes.bool.isRequired,
-  elementdetails: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
 }
 
 export default UserSearchList

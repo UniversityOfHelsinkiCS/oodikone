@@ -2,6 +2,8 @@ import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { chunk, isEqual } from 'lodash'
 import qs from 'query-string'
 import { useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
+import { setMocking } from './index'
 
 import { SEARCH_HISTORY_VERSION } from '../constants'
 import TSA from './tsa'
@@ -284,4 +286,16 @@ export const useToggle = (initialValue = false) => {
     setValue(v => !v)
   }, [])
   return [value, toggle]
+}
+
+export const useShowAsUser = () => {
+  const history = useHistory()
+
+  const showAsUser = uid => {
+    setMocking(uid)
+    history.push('/')
+    window.location.reload()
+  }
+
+  return showAsUser
 }
