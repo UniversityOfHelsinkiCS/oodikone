@@ -1,38 +1,38 @@
 import React, { useState, useEffect } from 'react'
-import { withRouter } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { useHistory, useParams } from 'react-router-dom'
 import { Radio, Icon, Header, Segment, Loader, Popup } from 'semantic-ui-react'
-import { connect } from 'react-redux'
 import { getUsers } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
-import { makeSortUsers } from '../../selectors/users'
 import { copyToClipboard } from '../../common'
 import UserPageNew from '../UserPage'
 import UserSearchList from './UserSearchList'
+import { useToggle, useTitle } from '../../common/hooks'
 
 const EnableUsers = props => {
-  const [enabledOnly, setEnabledOnly] = useState(true)
+  useTitle('Users')
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const [enabledOnly, toggleEnabledOnly] = useToggle(true)
   const [popupTimeout, setPopupTimeout] = useState(null)
   const [popupOpen, setPopupOpen] = useState(false)
+  const { data: units } = useSelector(({ units }) => units)
+  const { data: elementdetails } = useSelector(({ elementdetails }) => elementdetails)
+  const { data: users, pending } = useSelector(({ users }) => users)
+  const { userid } = useParams()
 
   useEffect(() => {
-    if (props.elementdetails.length === 0) props.getElementDetails()
-    if (props.units.length === 0) props.getUnits()
-    if (props.users.length === 0) props.getUsers()
-    document.title = 'Users - Oodikone'
+    if (elementdetails.length === 0) dispatch(getElementDetails())
+    if (units.length === 0) dispatch(getUnits())
+    if (users.length === 0) dispatch(getUsers())
 
     return () => {
       clearTimeout(popupTimeout)
     }
   }, [])
 
-  const toggleEnabledOnly = () => {
-    if (props.enabledOnly) props.getUsers()
-    setEnabledOnly(!enabledOnly)
-  }
-
   const openUsersPage = () => {
-    const { history } = props
     history.push('/users')
   }
 
@@ -45,7 +45,6 @@ const EnableUsers = props => {
   }
 
   const renderUserPage = userid => {
-    const { users } = props
     const user = users.find(u => u.id === userid)
     return !user ? <Loader active /> : <UserPageNew userid={userid} user={user} goBack={openUsersPage} />
   }
@@ -64,8 +63,10 @@ const EnableUsers = props => {
     setPopupTimeout(null)
   }
 
-  const { match, pending, users, error, elementdetails } = props
-  const { userid } = match.params
+  const isLoading = pending === undefined || pending === true
+  const error = users.error || false
+  const sortedUsers = [...users].sort((a, b) => a.full_name.localeCompare(b.full_name))
+
   return (
     <div style={{ marginBottom: '10px' }} className="segmentContainer">
       <Header className="segmentTitle" size="large">
@@ -76,9 +77,9 @@ const EnableUsers = props => {
         toggle
         onClick={() => toggleEnabledOnly()}
       />
-      <Segment loading={pending} className="contentSegment">
+      <Segment loading={isLoading} className="contentSegment">
         {!userid ? (
-          <UserSearchList enabledOnly={enabledOnly} users={users} error={error} elementdetails={elementdetails} />
+          <UserSearchList enabledOnly={enabledOnly} users={sortedUsers} error={error} elementdetails={elementdetails} />
         ) : (
           renderUserPage(userid)
         )}
@@ -95,21 +96,4 @@ const EnableUsers = props => {
   )
 }
 
-const sortUsers = makeSortUsers()
-
-const mapStateToProps = ({ users, units, elementdetails }) => ({
-  units: units.data,
-  elementdetails: elementdetails.data,
-  enabledOnly: users.enabledOnly,
-  users: sortUsers(users),
-  pending: typeof users.pending === 'boolean' ? users.pending : true,
-  error: users.error || false,
-})
-
-export default withRouter(
-  connect(mapStateToProps, {
-    getUsers,
-    getUnits,
-    getElementDetails,
-  })(EnableUsers)
-)
+export default EnableUsers

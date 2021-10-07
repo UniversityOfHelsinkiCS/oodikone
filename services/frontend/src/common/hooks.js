@@ -276,3 +276,12 @@ export const useIsAdmin = () => {
   if (!roles) return false
   return roles.some(role => role.group_code === 'admin')
 }
+
+// From: https://www.joshwcomeau.com/snippets/react-hooks/use-toggle/
+export const useToggle = (initialValue = false) => {
+  const [value, setValue] = useState(initialValue)
+  const toggle = useCallback(() => {
+    setValue(v => !v)
+  }, [])
+  return [value, toggle]
+}
