@@ -87,7 +87,7 @@ jobs:
           environment: production
           set_commits: 'skip'
           sourcemaps: './build/static/js'
-          url_prefix: '~/oodikone/static/js'
+          url_prefix: '~/static/js'
           version: ${{ steps.extract_version.outputs.VERSION }}
 
   build_and_release_userservice:
