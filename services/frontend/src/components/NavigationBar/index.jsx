@@ -3,11 +3,12 @@ import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
-import { getUserRoles, setMocking, checkUserAccess } from '../../common'
+import { getUserRoles, checkUserAccess } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
 import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
+import { useShowAsUser } from '../../common/hooks'
 
 const allNavigationItems = {
   populations: {
@@ -35,6 +36,7 @@ const allNavigationItems = {
 
 const NavigationBar = props => {
   const { logout, userRoles, rights, mockedBy, userId } = props
+  const showAsUser = useShowAsUser()
 
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
@@ -55,11 +57,6 @@ const NavigationBar = props => {
   }
 
   const visibleNavigationItems = refreshNavigationRoutes()
-
-  const returnToSelf = () => {
-    setMocking(null)
-    window.location.reload()
-  }
 
   const renderHome = () => (
     <Menu.Item as={Link} to="/" tabIndex="-1">
@@ -132,7 +129,7 @@ const NavigationBar = props => {
 
   const renderStopMockingButton = () => (
     <Menu.Item>
-      <Button onClick={returnToSelf}>Stop mocking as {userId}</Button>
+      <Button onClick={() => showAsUser(null)}>Stop mocking as {userId}</Button>
     </Menu.Item>
   )
 

@@ -3,7 +3,7 @@ import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'sema
 import { connect, useSelector } from 'react-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import { getTextIn, getUserRoles, setMocking, textAndDescriptionSearch } from '../../common'
+import { getTextIn, getUserRoles, textAndDescriptionSearch } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
 import { getFaculties } from '../../redux/faculties'
@@ -13,6 +13,7 @@ import AccessGroups from './AccessGroups'
 import EmailNotification from './EmailNotification'
 import { getElementDetails } from '../../redux/elementdetails'
 import useLanguage from '../LanguagePicker/useLanguage'
+import { useShowAsUser } from '../../common/hooks'
 
 const UserPage = ({
   user,
@@ -22,7 +23,6 @@ const UserPage = ({
   faculties,
   setFaculties,
   goBack,
-  history,
   associations,
   pending,
   getElementDetails,
@@ -33,6 +33,7 @@ const UserPage = ({
 }) => {
   const { language } = useLanguage()
   const { userId: currentUserId } = useSelector(state => state?.auth?.token)
+  const showAsUser = useShowAsUser()
 
   useEffect(() => {
     if (elementdetails.length === 0) getElementDetails()
@@ -44,12 +45,6 @@ const UserPage = ({
   }, [])
 
   const removeAccess = (uid, unit) => () => removeUserUnits(uid, [unit])
-
-  const showAs = uid => {
-    setMocking(uid)
-    history.push('/')
-    window.location.reload()
-  }
 
   const renderUnitList = (usersElementdetailCodes, elementdetails, user) => {
     if (!usersElementdetailCodes) return null
@@ -96,7 +91,14 @@ const UserPage = ({
             <Popup
               content="Show Oodikone as this user"
               trigger={
-                <Button floated="right" circular size="tiny" basic icon="spy" onClick={() => showAs(user.username)} />
+                <Button
+                  floated="right"
+                  circular
+                  size="tiny"
+                  basic
+                  icon="spy"
+                  onClick={() => showAsUser(user.username)}
+                />
               }
             />
           )}
