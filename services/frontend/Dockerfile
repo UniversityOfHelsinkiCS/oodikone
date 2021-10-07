@@ -22,4 +22,4 @@ COPY --chown=node:node . /usr/src/app/
 RUN npm run build && npm install -g serve@12.0.0 && chown -R node:node /usr/src/app/build
 USER node
 EXPOSE 5000
-CMD ["serve", "--listen", "5000", "build"]
+CMD ["serve", "--single", "--listen", "5000", "build"]
