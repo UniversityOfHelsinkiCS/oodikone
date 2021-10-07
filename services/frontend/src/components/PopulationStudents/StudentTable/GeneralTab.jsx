@@ -250,7 +250,7 @@ const GeneralTab = ({
     })
   }
 
-  if (coursecode) {
+  if (coursecode.length > 0) {
     columns.push({
       key: 'grade for single course',
       title: 'Grade',

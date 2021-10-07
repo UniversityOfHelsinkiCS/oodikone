@@ -422,7 +422,7 @@ PopulationStudents.defaultProps = {
   customPopulation: false,
   coursePopulation: false,
   dataExport: null,
-  coursecode: '',
+  coursecode: [],
 }
 
 PopulationStudents.propTypes = {
@@ -446,7 +446,7 @@ PopulationStudents.propTypes = {
   customPopulation: bool,
   filteredStudents: arrayOf(shape({})).isRequired,
   dataExport: node,
-  coursecode: string,
+  coursecode: arrayOf(string),
 }
 
 const mapStateToProps = state => {

@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { shape, arrayOf, string, bool } from 'prop-types'
-import { Segment } from 'semantic-ui-react'
+import { Segment, Button } from 'semantic-ui-react'
 import uuidv4 from 'uuid/v4'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
+import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import InfoBox from '../InfoBox'
 import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
@@ -18,6 +19,7 @@ const PopulationCourses = ({
   filteredStudents,
 }) => {
   const { setCoursesOnce, resetCourses, runCourseQuery } = useCourseFilter()
+  const [showByStudytrack, setShowByStudytrack] = useState(true)
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -70,18 +72,29 @@ const PopulationCourses = ({
     return resetCourses
   }, [])
 
+  const changeStructure = () => {
+    setShowByStudytrack(!showByStudytrack)
+  }
+
   return (
     <Segment basic>
       <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
       {query.studyRights.programme && <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />}
+      <Button basic onClick={changeStructure}>
+        {showByStudytrack === true ? 'Most attained courses' : 'Organise by programme structure'}
+      </Button>
       <SegmentDimmer isLoading={pending} />
-      <PopulationCourseStats
-        key={selectedPopulationCourses.query.uuid}
-        courses={selectedPopulationCourses.data}
-        query={selectedPopulationCourses.query}
-        pending={pending}
-        selectedStudents={selectedStudents}
-      />
+      {showByStudytrack ? (
+        <PopulationCourseStats
+          key={selectedPopulationCourses.query.uuid}
+          courses={selectedPopulationCourses.data}
+          query={selectedPopulationCourses.query}
+          pending={pending}
+          selectedStudents={selectedStudents}
+        />
+      ) : (
+        <CustomPopulationCourses selectedStudents={selectedStudents} showFilter={false} />
+      )}
     </Segment>
   )
 }
