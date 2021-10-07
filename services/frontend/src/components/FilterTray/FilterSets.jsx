@@ -48,6 +48,7 @@ export const CoursePopulationFilters = () => {
       <Age />
       <Gender />
       <StartYearAtUni />
+      <Courses />
     </>
   )
 }
