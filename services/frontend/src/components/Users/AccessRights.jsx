@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { Form, Divider } from 'semantic-ui-react'
-import PropTypes from 'prop-types'
 import { isEqual } from 'lodash'
 import { textAndDescriptionSearch, getTextIn } from '../../common'
 import selectors from '../../selectors/programmes'
@@ -67,15 +66,6 @@ const AccessRights = ({ uid, programmes, pending, ...props }) => {
       />
     </Form>
   )
-}
-
-AccessRights.propTypes = {
-  addUserUnits: PropTypes.func.isRequired,
-  uid: PropTypes.string.isRequired,
-  // used in filteredDropdownProgrammeSelector
-  rights: PropTypes.arrayOf(PropTypes.string).isRequired,
-  programmes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-  pending: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = (state, props) => ({

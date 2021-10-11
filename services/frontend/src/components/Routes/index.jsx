@@ -30,7 +30,7 @@ const FrontPage = React.lazy(() => retry(() => import('../FrontPage')))
 const Populations = React.lazy(() => retry(() => import('../PopulationStatistics')))
 const StudentStatistics = React.lazy(() => retry(() => import('../StudentStatistics')))
 const CourseStatistics = React.lazy(() => retry(() => import('../CourseStatistics')))
-const EnableUsers = React.lazy(() => retry(() => import('../EnableUsers')))
+const Users = React.lazy(() => retry(() => import('../Users')))
 const StudyProgramme = React.lazy(() => retry(() => import('../StudyProgramme')))
 const Teachers = React.lazy(() => retry(() => import('../Teachers')))
 const Feedback = React.lazy(() => retry(() => import('../Feedback')))
@@ -74,7 +74,7 @@ const Routes = () => (
         path={routes.courseStatistics}
         component={CourseStatistics}
       />
-      <ProtectedRoute requiredRoles={['admin']} exact path={routes.users} component={EnableUsers} />
+      <ProtectedRoute requiredRoles={['admin']} exact path={routes.users} component={Users} />
       <ProtectedRoute requiredRoles={['teachers']} exact path={routes.teachers} component={Teachers} />
       <ProtectedRoute requireUserHasRights exact path={routes.coursepopulation} component={CoursePopulation} />
       <ProtectedRoute requireUserHasRights exact path={routes.custompopulation} component={CustomPopulation} />
