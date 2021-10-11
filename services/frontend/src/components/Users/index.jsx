@@ -6,11 +6,11 @@ import { getUsers } from '../../redux/users'
 import { getUnits } from '../../redux/units'
 import { getElementDetails } from '../../redux/elementdetails'
 import { copyToClipboard } from '../../common'
-import UserPageNew from '../UserPage'
+import UserPageNew from './UserPage'
 import UserSearchList from './UserSearchList'
 import { useToggle, useTitle } from '../../common/hooks'
 
-const EnableUsers = props => {
+const Users = () => {
   useTitle('Users')
   const dispatch = useDispatch()
   const history = useHistory()
@@ -37,7 +37,7 @@ const EnableUsers = props => {
   }
 
   const copyEmailsToClippoard = () => {
-    const clipboardString = props.users
+    const clipboardString = users
       .filter(u => u.is_enabled && u.email)
       .map(u => u.email)
       .join('; ')
@@ -96,4 +96,4 @@ const EnableUsers = props => {
   )
 }
 
-export default EnableUsers
+export default Users

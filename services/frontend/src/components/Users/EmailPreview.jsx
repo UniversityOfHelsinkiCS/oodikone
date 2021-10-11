@@ -1,14 +1,9 @@
 import React, { useEffect, Fragment } from 'react'
-import { bool, func, string, node } from 'prop-types'
 import { Label, Message, Segment } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { getPreview } from '../../redux/userAccessEmail'
 
 const Light = ({ children }) => <span style={{ fontWeight: 'normal' }}>{children}</span>
-
-Light.propTypes = {
-  children: node.isRequired,
-}
 
 const EmailHeader = ({ isLoading, subject, to }) => {
   if (isLoading) {
@@ -35,17 +30,6 @@ const EmailHeader = ({ isLoading, subject, to }) => {
       </Segment>
     </>
   )
-}
-
-EmailHeader.defaultProps = {
-  subject: undefined,
-  to: undefined,
-}
-
-EmailHeader.propTypes = {
-  isLoading: bool.isRequired,
-  subject: string,
-  to: string,
 }
 
 const EmailPreview = ({ userEmail, isLoading, error, subject, html, onPreviewRequested }) => {
@@ -78,21 +62,6 @@ const EmailPreview = ({ userEmail, isLoading, error, subject, html, onPreviewReq
       </Segment>
     </Segment.Group>
   )
-}
-
-EmailPreview.defaultProps = {
-  subject: null,
-  html: null,
-  error: null,
-}
-
-EmailPreview.propTypes = {
-  onPreviewRequested: func.isRequired,
-  isLoading: bool.isRequired,
-  userEmail: string.isRequired,
-  subject: string,
-  html: string,
-  error: string,
 }
 
 const mapStateToProps = ({ userAccessEmail: { preview } }) => {

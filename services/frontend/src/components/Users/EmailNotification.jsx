@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, Fragment } from 'react'
-import { bool, func, string } from 'prop-types'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Button, Icon, Modal, Message } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { sendEmail, clearErrors } from '../../redux/userAccessEmail'
@@ -14,11 +13,6 @@ const DisabledEmailButton = props => (
 const SendFailBanner = ({ userEmail, error }) => (
   <Message error header={`Email could not be sent to ${userEmail}`} list={[error]} />
 )
-
-SendFailBanner.propTypes = {
-  userEmail: string.isRequired,
-  error: string.isRequired,
-}
 
 const EmailConfirm = ({ userEmail, isLoading, error, open, onCancel, onConfirm }) => (
   <Modal open={open} onClose={onCancel}>
@@ -40,19 +34,6 @@ const EmailConfirm = ({ userEmail, isLoading, error, open, onCancel, onConfirm }
     </Modal.Actions>
   </Modal>
 )
-
-EmailConfirm.defaultProps = {
-  error: undefined,
-}
-
-EmailConfirm.propTypes = {
-  userEmail: string.isRequired,
-  error: string,
-  open: bool.isRequired,
-  isLoading: bool.isRequired,
-  onCancel: func.isRequired,
-  onConfirm: func.isRequired,
-}
 
 const EmailNotification = ({ userEmail, onEmailSend, isSendLoading, sendError, onClearErrors }) => {
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -97,19 +78,6 @@ const EmailNotification = ({ userEmail, onEmailSend, isSendLoading, sendError, o
       />
     </>
   )
-}
-
-EmailNotification.defaultProps = {
-  userEmail: undefined,
-  sendError: null,
-}
-
-EmailNotification.propTypes = {
-  userEmail: string,
-  onEmailSend: func.isRequired,
-  isSendLoading: bool.isRequired,
-  sendError: string,
-  onClearErrors: func.isRequired,
 }
 
 const mapStateToProps = ({ userAccessEmail }) => ({
