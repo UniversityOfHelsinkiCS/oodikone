@@ -23,20 +23,22 @@ const StudyGuidanceGroups = () => {
   const isLoaded = pending === false
 
   return (
-    <div className="segmentContainer">
-      <Header className="segmentTitle" size="large">
-        Study guidance groups
-      </Header>
-      <Segment className="contentSegment">
-        {isLoading ? (
-          <Loader active inline="centered">
-            Loading
-          </Loader>
-        ) : null}
-        {isLoaded && !groupid ? <StudyGuidanceGroupOverview /> : null}
-        {isLoaded && groupid ? <SingleStudyGuidanceGroup groupid={groupid} /> : null}
-      </Segment>
-    </div>
+    <>
+      <div className="segmentContainer">
+        <Header className="segmentTitle" size="large">
+          Study guidance groups
+        </Header>
+        <Segment className="contentSegment">
+          {isLoading ? (
+            <Loader active inline="centered">
+              Loading
+            </Loader>
+          ) : null}
+          {isLoaded && !groupid ? <StudyGuidanceGroupOverview /> : null}
+        </Segment>
+      </div>
+      <div>{isLoaded && groupid ? <SingleStudyGuidanceGroup groupid={groupid} /> : null}</div>
+    </>
   )
 }
 

@@ -2,7 +2,7 @@
 // temp disable prop types
 import React, { useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Button, Loader, Header, Accordion, Divider } from 'semantic-ui-react'
+import { Button, Loader, Header, Accordion, Divider, Segment } from 'semantic-ui-react'
 import { useHistory } from 'react-router-dom'
 import scrollToComponent from 'react-scroll-to-component'
 import { getCustomPopulation } from '../../redux/populations'
@@ -150,12 +150,16 @@ const SingleStudyGroupContent = ({ population, language }) => {
 
 const SingleStudyGroupViewWrapper = ({ history, groupName, language, children }) => {
   return (
-    <div>
-      <Button icon="arrow circle left" content="Back" onClick={() => history.push('/studyguidancegroups')} />
-      <Divider />
-      <Header size="medium">{getTextIn(groupName, language)}</Header>
-      <div className="segmentContainer">{children}</div>
-    </div>
+    <>
+      <div className="segmentContainer">
+        <Segment className="contentSegment">
+          <Button icon="arrow circle left" content="Back" onClick={() => history.push('/studyguidancegroups')} />
+          <Divider />
+          <Header size="medium">{getTextIn(groupName, language)}</Header>
+        </Segment>
+      </div>
+      {children}
+    </>
   )
 }
 
