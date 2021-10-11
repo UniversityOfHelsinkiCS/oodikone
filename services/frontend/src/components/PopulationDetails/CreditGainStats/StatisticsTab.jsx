@@ -1,6 +1,5 @@
 import React from 'react'
-import { jStat } from 'jStat'
-import PropTypes from 'prop-types'
+import { jStat } from 'jstat'
 import { Table } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../common'
 
@@ -52,10 +51,6 @@ const StatisticsTab = ({ filteredStudents }) => {
       </Table.Body>
     </Table>
   )
-}
-
-StatisticsTab.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default StatisticsTab

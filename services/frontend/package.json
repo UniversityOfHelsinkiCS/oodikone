@@ -12,7 +12,7 @@
     "highcharts": "^9.1.2",
     "highcharts-custom-events": "^3.0.10",
     "history": "^4.10.1",
-    "jStat": "^1.8.6",
+    "jstat": "^1.9.5",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
