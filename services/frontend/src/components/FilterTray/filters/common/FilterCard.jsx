@@ -18,7 +18,7 @@ const FilterCard = ({ title, children, contextKey, name, active }) => {
           {title}
         </Header>
       </div>
-      {open && children}
+      {(active || open) && children}
     </div>
   )
 }
