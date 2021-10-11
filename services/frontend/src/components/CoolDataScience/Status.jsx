@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes, { shape, bool, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
 import _ from 'lodash'
@@ -129,19 +128,6 @@ const StatusContainer = ({
       )}
     </Segment>
   )
-}
-
-StatusContainer.propTypes = {
-  title: PropTypes.string.isRequired,
-  current: PropTypes.number.isRequired,
-  previous: PropTypes.number.isRequired,
-  clickable: PropTypes.bool.isRequired,
-  handleClick: PropTypes.func.isRequired,
-  min1: PropTypes.number.isRequired,
-  max1: PropTypes.number.isRequired,
-  showYearlyValues: PropTypes.bool.isRequired,
-  yearlyValues: PropTypes.shape({}).isRequired,
-  showByYear: PropTypes.bool.isRequired,
 }
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
@@ -346,12 +332,6 @@ const Status = ({ getStatusDispatch, data, loading }) => {
       </Message>
     </>
   )
-}
-
-Status.propTypes = {
-  data: shape({}).isRequired,
-  loading: bool.isRequired,
-  getStatusDispatch: func.isRequired,
 }
 
 const mapStateToProps = ({ coolDataScience }) => ({

@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Segment } from 'semantic-ui-react'
 import { Switch, Route, Link, useRouteMatch, useHistory } from 'react-router-dom'
 import { useTitle } from '../../common/hooks'
@@ -32,18 +31,8 @@ const NavTile = ({ to, title, imageSrc }) => {
   )
 }
 
-NavTile.propTypes = {
-  to: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  imageSrc: PropTypes.string.isRequired,
-}
-
 const NavTiles = ({ children }) => {
   return <div className="cool-ds-nav-tiles">{children}</div>
-}
-
-NavTiles.propTypes = {
-  children: PropTypes.node.isRequired,
 }
 
 const baseURI = '/trends'
