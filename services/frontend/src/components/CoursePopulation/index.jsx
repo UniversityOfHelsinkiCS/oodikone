@@ -21,6 +21,7 @@ import infotooltips from '../../common/InfoToolTips'
 import InfoBox from '../InfoBox'
 import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
+import useProgrammeFilter from '../FilterTray/filters/Programmes/useProgrammeFilter'
 import { CoursePopulationFilters } from '../FilterTray/FilterSets'
 import useLanguage from '../LanguagePicker/useLanguage'
 import { queryParamsFromUrl } from '../../common/query'
@@ -39,6 +40,7 @@ const CoursePopulation = ({
 }) => {
   const { language } = useLanguage()
   const { setAllStudents, filteredStudents } = useFilters()
+  const { setCourseCodes } = useProgrammeFilter()
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
   const [codes, setCodes] = useState([])
@@ -106,6 +108,7 @@ const CoursePopulation = ({
         separate,
       })
       setCodes(parsedCourseCodes)
+      setCourseCodes(parsedCourseCodes)
       if (years) {
         setYears(years)
       } else {
