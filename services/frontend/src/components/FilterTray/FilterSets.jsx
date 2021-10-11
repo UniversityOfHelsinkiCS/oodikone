@@ -6,6 +6,7 @@ import CreditsEarned from './filters/CreditsEarned'
 import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Courses from './filters/Courses'
+import Programmes from './filters/Programmes'
 import useAnalytics from './useAnalytics'
 import Grade from './filters/Grade'
 import Date from './filters/Date'
@@ -49,6 +50,7 @@ export const CoursePopulationFilters = () => {
       <Gender />
       <StartYearAtUni />
       <Courses />
+      <Programmes />
     </>
   )
 }

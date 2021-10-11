@@ -5,6 +5,8 @@ import { arrayOf, string, shape } from 'prop-types'
 import SearchResultTable from '../../SearchResultTable'
 import { getNewestProgramme, getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
+import useProgrammeFilter from '../../FilterTray/filters/Programmes/useProgrammeFilter'
+import FilterToggleIcon from '../../FilterToggleIcon'
 
 const CustomPopulationProgrammeDist = ({
   samples,
@@ -13,7 +15,9 @@ const CustomPopulationProgrammeDist = ({
   populationStatistics,
 }) => {
   const { language } = useLanguage()
+  const { selectedProgrammes, toggleFilterProgramme } = useProgrammeFilter()
   const [tableRows, setRows] = useState([])
+
   useEffect(() => {
     if (Object.keys(populationStatistics).length > 0) {
       const allProgrammes = {}
@@ -41,7 +45,8 @@ const CustomPopulationProgrammeDist = ({
         }
       })
       const rows = Object.entries(allProgrammes).map(([code, { programme, students }]) => [
-        `${getTextIn(programme.name, language)}, ${code}`,
+        getTextIn(programme.name, language),
+        code,
         students.length,
         <Progress
           style={{ margin: '0px' }}
@@ -49,14 +54,32 @@ const CustomPopulationProgrammeDist = ({
           progress
         />,
       ])
-      const sortedRows = rows.sort((a, b) => b[1] - a[1])
+      const sortedRows = rows.sort((a, b) => b[2] - a[2])
       setRows(sortedRows)
     }
   }, [selectedStudents])
 
-  const headers = ['Programmes', `Students (all=${selectedStudents.length})`, 'Percentage of population']
+  const headers = ['Programme', 'Code', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
-  return <SearchResultTable headers={headers} rows={tableRows} selectable noResultText="placeholder" />
+  const handleFilterToggle = code => {
+    toggleFilterProgramme(code)
+  }
+
+  const isProgrammeFilterActive = code => selectedProgrammes.find(p => p.code === code) !== undefined
+
+  return (
+    <SearchResultTable
+      headers={headers}
+      rows={tableRows}
+      selectable
+      noResultText="placeholder"
+      actionTrigger={row => (
+        <span style={{ display: 'inline-block', marginRight: '0.3em' }}>
+          <FilterToggleIcon onClick={() => handleFilterToggle(row[1])} isActive={isProgrammeFilterActive(row[1])} />
+        </span>
+      )}
+    />
+  )
 }
 
 CustomPopulationProgrammeDist.defaultProps = {
