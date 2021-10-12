@@ -223,3 +223,36 @@ export const validateInputLength = (input, minLength) => input && input.trim().l
 export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
 export const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]*$/))
+
+export const bachelorHonoursProgrammes = [
+  'KH50_001',
+  'KH50_002',
+  'KH50_003',
+  'KH50_004',
+  'KH50_005',
+  'KH50_006',
+  'KH50_007',
+  'KH50_008',
+]
+
+export const bachelorHonoursBasicModules = {
+  KH50_001: ['MAT110', 'MAT120', 'MAT130', 'MAT120', 'TKT1'],
+  KH50_002: ['FYS1100', 'FYS1200'],
+  KH50_003: ['KEK100'],
+  KH50_004: ['MAT110', 'FYS1100', 'FYS1200', 'KEK100'],
+  KH50_005: ['TKT1'],
+  KH50_006: ['GEOK_100'],
+  KH50_007: ['MAA-100'],
+  KH50_008: ['BSCH1000', 'BSCS1000', 'BSMA1000', 'BSMS1000', 'BSPH1000'],
+}
+
+export const bachelorHonoursIntermediateModules = {
+  KH50_001: ['mat217', 'MAT210', 'MAT220', 'MAT240', 'MAT213', 'MAT230', 'MAT218', 'MAT011'],
+  KH50_002: ['FYS2100', 'FYS2200', 'FYS2300', 'FYS2400', 'FYS2500', 'FYS2600'],
+  KH50_003: ['KEK200'],
+  KH50_004: ['MFK-M200', 'MFK-F200', 'MFK-K200'],
+  KH50_005: ['TKT2'],
+  KH50_006: ['GEOK_200'],
+  KH50_007: ['MAA-200'],
+  KH50_008: ['BSCH2000', 'BSCS2000', 'BSMA2000', 'BSMS2000', 'BSPH2000'],
+}
