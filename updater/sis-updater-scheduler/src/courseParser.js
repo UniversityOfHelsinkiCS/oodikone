@@ -78,6 +78,9 @@ async function courseResolver(rule) {
 
   const id = rule.courseUnitGroupId
   const course = await knex('course_units').where({ group_id: id }).first()
+  if (!course) {
+    return { error: 'course not found' }
+  }
 
   return {
     id: course.group_id,
