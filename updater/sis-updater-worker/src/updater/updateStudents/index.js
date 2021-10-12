@@ -310,7 +310,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     const coursesWithNoAyCodeAndOpenUniStudyright = groupIdsWithOpenUnStudyright.reduce((res, curr) => {
       const foundCourse = sisDbCoursesForStudentAttainments.find(c => c.id === curr)
       if (foundCourse) {
-        if (foundCourse && !foundCourse.code.startsWith('AY')) {
+        if (!foundCourse.code.startsWith('AY')) {
           res.push(foundCourse)
         }
       }
@@ -330,7 +330,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       const courseWithIdForAyCodeExist = coursesWithAyCodeAlreadyExist.find(
         c => c.code === 'AY'.concat(course.code) && !c.id.endsWith('-ay')
       )
-      // array jossa array on kentän nimet
+
       if (courseWithIdForAyCodeExist) {
         const latest_instance_date = getFirstDateIfIsAfter(
           course.latest_instance_date,
@@ -357,10 +357,11 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
         courseCodeToAyCodelessId.set('AY'.concat(course.code), courseWithIdForAyCodeExist.id)
       } else {
         coursesToBeCreated.set('AY'.concat(course.code), {
-          ...course,
+          ...course.dataValues,
+          name: course.name,
           id: course.id.concat('-ay'),
           code: 'AY'.concat(course.code),
-          substitutions: course.substitutions,
+          substitutions: [course.id],
         })
         courseCodeToAyCodelessId.set('AY'.concat(course.code), course.id.concat('-ay'))
         const courseProvider = await CourseProvider.findOne({
