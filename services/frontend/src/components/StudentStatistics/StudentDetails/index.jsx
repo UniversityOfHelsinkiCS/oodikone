@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { func, shape, string, arrayOf, integer, bool } from 'prop-types'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { Segment, Loader } from 'semantic-ui-react'
 import { isEmpty, sortBy } from 'lodash'
 import moment from 'moment'
@@ -10,7 +10,7 @@ import { withRouter } from 'react-router-dom'
 import { getStudent, removeStudentSelection, resetStudent } from '../../../redux/students'
 import { getSemesters } from '../../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
-import { getUserIsAdmin } from '../../../common'
+import { getUserIsAdmin, bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '../../../common'
 import { clearCourseStats } from '../../../redux/coursestats'
 import { getProgrammes } from '../../../redux/populationProgrammes'
 import BachelorHonours from './BachelorHonours'
@@ -19,6 +19,7 @@ import TagsTable from './TagsTable'
 import CourseParticipationTable from './CourseParticipationTable'
 import StudentGraphs from './StudentGraphs'
 import useLanguage from '../../LanguagePicker/useLanguage'
+import { getMandatoryCourseModules } from '../../../redux/populationMandatoryCourses'
 
 const StudentDetails = ({
   student,
@@ -36,9 +37,11 @@ const StudentDetails = ({
   fetching,
   clearCourseStats,
 }) => {
+  const dispatch = useDispatch()
   const { language } = useLanguage()
   const [graphYearStart, setGraphYear] = useState('')
   const [studyrightid, setStudyrightid] = useState('')
+  const [honoursCode, setHonoursCode] = useState(null)
 
   useEffect(() => {
     getProgrammes()
@@ -53,6 +56,22 @@ const StudentDetails = ({
       removeStudentSelection()
     }
   }, [studentNumber])
+
+  useEffect(() => {
+    if (Programmes.programmes && student && student.studyrights) {
+      const bachelorStudyrights = student.studyrights.filter(sr => sr.extentcode === 1)
+      const newestBachelorProgramme = getNewestProgramme(
+        bachelorStudyrights,
+        student.studentNumber,
+        null,
+        Programmes.programmes
+      )
+      // currently only for matlu
+      const shouldRender = bachelorCodes.includes(newestBachelorProgramme.code)
+      if (shouldRender) dispatch(getMandatoryCourseModules(newestBachelorProgramme.code))
+      if (shouldRender) setHonoursCode(newestBachelorProgramme.code)
+    }
+  }, [Programmes, student])
 
   const getAbsentYears = () => {
     semesterenrollments.sort((a, b) => a.semestercode - b.semestercode)
@@ -173,7 +192,7 @@ const StudentDetails = ({
         showPopulationStatistics={showPopulationStatistics}
         studyrightid={studyrightid}
       />
-      <BachelorHonours student={student} programmes={Programmes.programmes || {}} absentYears={getAbsentYears()} />
+      {honoursCode && <BachelorHonours student={student} absentYears={getAbsentYears()} programmeCode={honoursCode} />}
       <CourseParticipationTable student={student} language={language} clearCourseStats={clearCourseStats} />
     </Segment>
   )
