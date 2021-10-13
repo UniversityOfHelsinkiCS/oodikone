@@ -191,6 +191,11 @@ const activeTeachers = async (providers, semestercodeStart, semestercodeEnd) => 
         },
       ],
     },
+    where: {
+      id: {
+        [Op.notLike]: '%hy-hlo-org%',
+      },
+    },
   })
   return teachers.map(({ id }) => id)
 }

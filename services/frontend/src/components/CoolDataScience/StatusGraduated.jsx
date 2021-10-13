@@ -309,7 +309,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
   return (
     <>
-      <h2>Uusista ohjelmista valmistuneet</h2>
+      <h2>Koulutusohjelmista valmistuneet</h2>
       <DrilldownMessage />
       <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px' }}>
         {drillStack.length > 0 && (
