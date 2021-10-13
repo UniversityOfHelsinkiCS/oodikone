@@ -1,11 +1,13 @@
 const winston = require('winston')
-const { isProduction } = require('../conf-backend')
+const path = require('path')
+const { isProduction, PWD } = require('../conf-backend')
 
 const { combine, timestamp, printf, splat } = winston.format
 
 const transports = []
-
-transports.push(new winston.transports.File({ filename: 'debug.log', level: 'debug' }))
+// Write logfile to docker containers pwd
+const filename = path.join(PWD, 'debug.log')
+transports.push(new winston.transports.File({ filename, level: 'debug' }))
 
 if (!isProduction) {
   const devFormat = printf(
