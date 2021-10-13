@@ -6,7 +6,6 @@ const logger = require('../util/logger')
 const { dbConnections } = require('../database/connection')
 
 const recursivelyGetModuleAndChildren = async (code, type) => {
-  // TODO use only sis connection once sis is stable
   const connection = dbConnections.sequelize
   try {
     const [result] = await connection.query(
