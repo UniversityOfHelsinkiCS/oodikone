@@ -62,6 +62,8 @@ const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
 
 const ACCESS_TOKEN_HEADER_KEY = 'x-access-token'
 
+const PWD = process.env.PWD || '/usr/src/app'
+
 module.exports = {
   DB_URL_KONE,
   DB_MAX_CONNECTIONS,
@@ -90,4 +92,5 @@ module.exports = {
   backendPort,
   importerToken,
   importerUrl,
+  PWD,
 }
