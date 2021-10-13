@@ -1,14 +1,7 @@
-const axios = require('axios')
 const { redisClient } = require('../../services/redis')
-const { USERSERVICE_URL } = require('../../conf-backend')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
-
-const userServiceClient = axios.create({
-  baseURL: USERSERVICE_URL,
-  headers: { secret: process.env.USERSERVICE_SECRET },
-})
 
 const getRedisCDS = async REDIS_KEY => {
   const raw = await redisClient.getAsync(REDIS_KEY)
@@ -177,6 +170,5 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
 module.exports = {
   getRedisCDS,
   saveToRedis,
-  userServiceClient,
   getTargetStudentCounts,
 }

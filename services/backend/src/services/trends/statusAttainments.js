@@ -4,7 +4,8 @@ const {
 } = require('../../database/connection')
 const { mapToProviders } = require('../../util/utils')
 const { ElementDetail, Organization } = require('../../models')
-const { getRedisCDS, saveToRedis, userServiceClient } = require('./shared')
+const { getRedisCDS, saveToRedis } = require('./shared')
+const { facultiesAndProgrammesForTrends } = require('../../services/organisations')
 
 const REDIS_KEY_STATUS = 'STATUS_DATA_V3'
 
@@ -244,14 +245,13 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   )
 
   /* Gather all required data */
-  const [yearlyAccCredits, yearlyTotalCredits, elementDetails, faculties, { data: facultyProgrammes }] =
-    await Promise.all([
-      Promise.all(yearlyAccCreditsPromises),
-      Promise.all(yearlyTotalCreditsPromises),
-      ElementDetail.findAll(),
-      Organization.findAll(),
-      userServiceClient.get('/faculty_programmes'),
-    ])
+  const [yearlyAccCredits, yearlyTotalCredits, elementDetails, faculties] = await Promise.all([
+    Promise.all(yearlyAccCreditsPromises),
+    Promise.all(yearlyTotalCreditsPromises),
+    ElementDetail.findAll(),
+    Organization.findAll(),
+  ])
+  const facultyProgrammes = facultiesAndProgrammesForTrends
 
   const yearlyOrgStatPromises = yearRange.map(async year => [
     year,
