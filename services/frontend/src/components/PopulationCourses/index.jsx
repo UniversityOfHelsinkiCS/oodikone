@@ -79,10 +79,11 @@ const PopulationCourses = ({
   return (
     <Segment basic>
       <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
-      {query.studyRights.programme && <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />}
-      <Button basic onClick={changeStructure}>
-        {showByStudytrack === true ? 'Most attained courses' : 'Organise by programme structure'}
+      <Button primary onClick={changeStructure} style={{ marginLeft: '1em' }}>
+        {showByStudytrack === true ? 'Show the most attained courses' : 'Show by programme structure'}
       </Button>
+      {query.studyRights.programme && <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />}
+
       <SegmentDimmer isLoading={pending} />
       {showByStudytrack ? (
         <PopulationCourseStats
