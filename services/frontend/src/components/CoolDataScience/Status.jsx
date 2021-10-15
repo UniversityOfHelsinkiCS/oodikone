@@ -27,32 +27,47 @@ const mapValueToRange = (x, min1, max1, min2, max2) => {
   return ((x - min1) * (max2 - min2)) / (max1 - min1) + min2
 }
 
-const StatusContainer = ({
-  title,
-  current,
-  previous,
-  clickable,
-  handleClick,
-  min1,
-  max1,
-  showYearlyValues,
-  yearlyValues,
-  showByYear,
-}) => {
-  const diff = Math.round(current - previous)
+const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, showRelativeValues, showByYear }) => {
+  const title = getTextIn(stats.name)
+  const clickable = !!stats.drill
+
+  let current
+  let previous
+
+  if (!stats.drill) {
+    current = stats.currentStudents
+    previous = stats.previousStudents
+  } else {
+    current = stats.current
+    previous = stats.previous
+
+    if (showRelativeValues) {
+      current /= stats.currentStudents
+      previous /= stats.previousStudents
+    }
+  }
+
+  const diff = current - previous
   const p = getP(current, previous)
-  const change = Math.round((p - 1) * 1000) / 10
+  const change = p - 1
 
   const getColor = v => {
-    if (v > 2.5) return '#6ab04c'
-    if (v < -2.5) return '#ff7979'
+    if (v > 0.025) return '#6ab04c'
+    if (v < -0.025) return '#ff7979'
     return '#7B9FCF'
   }
 
-  const plussify = x => {
-    if (x > 0) return `+${x.toLocaleString('fi')}`
-    return x.toLocaleString('fi')
-  }
+  const plussify = (x, decimals = 0) =>
+    x.toLocaleString('fi', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+      signDisplay: 'always',
+    })
+
+  const roundToPrecision = (value, precision) => Math.round(value * 10 ** precision) / 10 ** precision
+
+  const getDisplayValue = (value, denominator) =>
+    showRelativeValues ? roundToPrecision(denominator === 0 ? 0 : value / denominator, 2) : value
 
   return (
     <Segment
@@ -84,46 +99,52 @@ const StatusContainer = ({
           <Icon
             style={{
               color: getColor(change),
-              transform: `rotateZ(${-mapValueToRange(change, min1, max1, -45, 45)}deg)`,
+              transform: `rotateZ(${-mapValueToRange(change * 100, min1, max1, -45, 45)}deg)`,
             }}
             size="huge"
             name="arrow right"
           />
         </div>
         <div>
-          <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(change) }}>{plussify(diff)}</span>
+          <span style={{ fontSize: 20, fontWeight: 'bold', color: getColor(change) }}>
+            {plussify(diff, showRelativeValues ? 2 : 0)}
+          </span>
           <br />
-          <span style={{ fontWeight: 'bold', color: getColor(change) }}>({plussify(change)}%)</span>
+          <span style={{ fontWeight: 'bold', color: getColor(change) }}>({plussify(change * 100, 1)}%)</span>
+          <br />
         </div>
       </div>
       {showYearlyValues && (
-        <div style={{ marginTop: '10px', textAlign: 'start' }}>
-          {_.orderBy(Object.entries(yearlyValues), ([y]) => y, ['desc']).map(
-            ([year, { acc, total, accStudents, totalStudents }]) => {
-              return (
-                <div style={{ margin: '5px 0' }} key={`${title}-${year}`}>
-                  <span>
-                    <b>
-                      {year}
-                      {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
-                    </b>{' '}
-                    {/* render num of students instead of credits if no credits are given from the course */}
-                    {accStudents <= acc ? Math.round(acc).toLocaleString('fi') : accStudents}
-                    {/* if no total students add students after accStudents */}
-                    {acc <= accStudents && totalStudents < 1 && ' students'}
-                    {/* render total if there are credits or students for either */}
-                    {(total > 0 || totalStudents > 0) &&
-                      ` / ${
-                        // same logic as before to check if render num of students or credits
-                        totalStudents <= total && total > 0
-                          ? Math.round(total).toLocaleString('fi')
-                          : `${totalStudents} students`
-                      }`}
-                  </span>
-                </div>
-              )
-            }
-          )}
+        <div className="years">
+          {_.orderBy(Object.entries(stats.yearly), ([y]) => y, ['desc']).map(([year, yearStats]) => {
+            return (
+              <span style={{ display: 'contents' }} className="year-row">
+                <b>
+                  {year}
+                  {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
+                </b>
+                {stats.type === 'course' ? (
+                  <>
+                    <span className="year-value">{yearStats.accStudents}</span>
+                    <span className="unit">students</span>
+                  </>
+                ) : (
+                  <>
+                    <span
+                      className="year-value"
+                      // eslint-disable-next-line react/no-danger
+                      dangerouslySetInnerHTML={{
+                        __html: `${getDisplayValue(yearStats.acc, yearStats.accStudents)
+                          .toLocaleString('fi', { minimumFractionDigits: 2 })
+                          .replace(/,?0*$/, match => `<span class="decimals">${match}</span>`)}`,
+                      }}
+                    />
+                    <span className="unit">credits{showRelativeValues ? '/student' : ''}</span>
+                  </>
+                )}
+              </span>
+            )
+          })}
         </div>
       )}
     </Segment>
@@ -136,6 +157,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
   const DATE_FORMAT = 'DD.MM.YYYY'
   const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
   const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
+  const [showRelativeValues, setShowRelativeValues] = useLocalStorage('showRelativeValues', false)
   const [drillStack, setDrillStack] = useState([])
   const [showSettings, setShowSettings] = useState(true)
   const [selectedDate, setSelectedDate] = useState(moment())
@@ -175,6 +197,11 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     const byYear = showByYear
     setShowByYear(!showByYear)
     sendAnalytics(`S Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
+  }
+
+  const handleShowRelativeValuesChanged = () => {
+    sendAnalytics(`S Show relative values toggle ${!showRelativeValues ? 'on' : 'off'}`)
+    setShowRelativeValues(!showRelativeValues)
   }
 
   const pushToDrillStack = (values, code) => {
@@ -233,6 +260,13 @@ const Status = ({ getStatusDispatch, data, loading }) => {
               checked={showByYear}
             />
             <VerticalLine />
+            <Checkbox
+              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+              label="Näytä suhteutettuna opiskelijoiden määrään"
+              onChange={handleShowRelativeValuesChanged}
+              checked={showRelativeValues}
+            />
+            <VerticalLine />
             <Form>
               <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.9em' }}>Näytä päivänä:</span>
@@ -271,11 +305,22 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     )
 
   const orderedAbsDiffs = _.orderBy(
-    Object.values(_.last(drillStack) || data).map(({ current, previous }) => {
-      return Math.abs(Math.floor((getP(current, previous) - 1) * 1000) / 10)
+    Object.values(_.last(drillStack) || data).map(({ current, currentStudents, previous, previousStudents }) => {
+      return Math.abs(
+        Math.floor(
+          (getP(
+            showRelativeValues ? current / currentStudents : current,
+            showRelativeValues ? previous / previousStudents : previous
+          ) -
+            1) *
+            1000
+        ) / 10
+      )
     })
   )
+
   const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
+
   return (
     <>
       <h2>Koulutusohjelmien tuottamat opintopisteet</h2>
@@ -301,23 +346,16 @@ const Status = ({ getStatusDispatch, data, loading }) => {
           ['desc']
         ).map(([code, stats]) => {
           const handleClick = () => pushToDrillStack(stats.drill, code)
-          // check if the course has credits or not (if credits is zero but there are students who have completed it)
-          const current =
-            !stats.drill && stats.current === 0 && stats.currentStudents > 1 ? stats.currentStudents : stats.current
-          const previous =
-            !stats.drill && stats.previous === 0 && stats.previousStudents > 1 ? stats.previousStudents : stats.previous
+
           return (
             <StatusContainer
               key={code}
-              clickable={!!stats.drill}
+              stats={stats}
               handleClick={handleClick}
-              title={getTextIn(stats.name)}
-              current={current}
-              previous={previous}
+              showRelativeValues={showRelativeValues}
               showYearlyValues={showYearlyValues}
               min1={-medianDiff * 2}
               max1={medianDiff * 2}
-              yearlyValues={stats.yearly}
               showByYear={showByYear}
             />
           )

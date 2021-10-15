@@ -10,6 +10,43 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
+.unit,
+.decimals {
+  opacity: 0;
+}
+
+.years {
+  margin-top: 10px;
+  text-align: start;
+  font-variant-numeric: tabular-nums;
+  display: grid;
+  grid-template-columns: fit-content(0) fit-content(0) auto;
+}
+
+.year-row .unit {
+  padding-left: 0.5em;
+  color: rgba(0, 0, 0, 0.3);
+  font-size: 0.9em;
+}
+
+.year-value {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 0.5em;
+}
+
+.year-row {
+  padding-left: 0.5em;
+  display: inline-block;
+}
+
+.status-card .years .year-row:hover .unit,
+.status-card .years .year-row:hover .decimals,
+.status-card:hover .years:not(:hover) .year-row:first-child .unit,
+.status-card:hover .years:not(:hover) .year-row:first-child .decimals {
+  opacity: 1;
+}
+
 .status-date-time-input {
   padding-right: 0;
   margin-left: 5px;
