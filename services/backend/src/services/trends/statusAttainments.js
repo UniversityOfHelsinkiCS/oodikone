@@ -29,6 +29,140 @@ const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)
 }
 
+const getOrganizationStudents = async (start, end) => {
+  const rows = await sequelize.query(
+    `
+    SELECT
+      sre.code AS code,
+      ARRAY_AGG(DISTINCT(sr.student_studentnumber)) AS students
+    FROM studyright sr
+    INNER JOIN studyright_elements sre ON sre.studyrightid = sr.studyrightid
+    INNER JOIN element_details ed ON ed.code = sre.code
+    WHERE ed.type = 20 AND (:start, :end) OVERLAPS (sr.startdate, sr.enddate)
+    GROUP BY sre.code
+  `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { start, end },
+    }
+  )
+
+  const codes = mapToProviders(rows.map(({ code }) => code))
+
+  const orgIdRows = await sequelize.query(
+    `
+    SELECT o.code, o.id FROM organization o WHERE o.code IN (:codes)
+  `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { codes },
+    }
+  )
+
+  const orgIds = Object.fromEntries(orgIdRows.map(({ code, id }) => [code, id]))
+
+  return rows.reduce((acc, { code, students }) => {
+    const [orgCode] = mapToProviders([code])
+    const orgId = orgIds[orgCode]
+    acc[orgId] = students
+    return acc
+  }, {})
+}
+
+const getOrganizationCredits = async (start, end) => {
+  const rows = await sequelize.query(
+    `
+    SELECT
+      cp.organizationcode AS code,
+      -- ARRAY_AGG(DISTINCT(cr.student_studentnumber)) AS students,
+      SUM(cr.credits) AS credits
+    FROM credit cr
+    INNER JOIN course co ON co.code = cr.course_code
+    INNER JOIN course_providers cp ON cp.coursecode = co.id
+    WHERE
+      cr.attainment_date BETWEEN :start AND :end AND
+      cr.credittypecode IN (4, 9) AND
+      (cr."isStudyModule" = FALSE OR cr."isStudyModule" IS NULL)
+    GROUP BY cp.organizationcode
+  `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { start, end },
+    }
+  )
+
+  return rows.reduce((acc, { code, credits }) => {
+    acc[code] = credits
+    return acc
+  }, {})
+}
+
+const getOrganizationStatistics = async (organizations, start, end) => {
+  const orgCredits = await getOrganizationCredits(start, end)
+  const orgStudents = await getOrganizationStudents(start, end)
+
+  const organizationStats = {}
+
+  let stack_pointer = 0
+  const stack = ['hy-university-root-id']
+
+  while (stack_pointer < stack.length) {
+    const orgId = stack[stack_pointer]
+    stack_pointer += 1
+
+    organizations.filter(({ parent_id }) => parent_id === orgId).forEach(({ id }) => stack.push(id))
+  }
+
+  const updateOrgStats = (orgId, stats, isDirect) => {
+    if (organizationStats[orgId] === undefined) {
+      organizationStats[orgId] = {
+        direct: { credits: 0, students: new Set() },
+        accumulated: { credits: 0, students: new Set() },
+      }
+    }
+
+    const orgStats = organizationStats[orgId]
+
+    const statsRefs = isDirect ? [orgStats.direct, orgStats.accumulated] : [orgStats.accumulated]
+
+    statsRefs.forEach(statsRef => {
+      statsRef.credits += stats.credits
+      stats.students.forEach(s => statsRef.students.add(s))
+    })
+  }
+
+  while (stack.length > 0) {
+    const orgId = stack.pop()
+    const credits = orgCredits[orgId] ?? 0
+    const students = orgStudents[orgId] ?? []
+
+    const org = organizations.find(({ id }) => id === orgId)
+    const parentOrgId = org.parent_id
+
+    updateOrgStats(orgId, { credits, students }, true)
+
+    if (parentOrgId) {
+      updateOrgStats(parentOrgId, organizationStats[orgId].accumulated, false)
+    }
+  }
+
+  return Object.entries(organizationStats).reduce((acc, [id, { direct, accumulated }]) => {
+    acc[id] = {
+      id,
+      direct: {
+        students: direct.students.size,
+        credits: direct.credits,
+      },
+      accumulated: {
+        students: accumulated.students.size,
+        credits: accumulated.credits,
+      },
+    }
+
+    return acc
+  }, {})
+}
+
 const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'sum2') => {
   return sequelize.query(
     `
@@ -52,18 +186,6 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
       replacements: { a, b },
     }
   )
-}
-
-const sumMerge = (a, b) => {
-  if (!a) return b
-  if (!b) return a
-  return a + b
-}
-
-const mergele = (a, b) => {
-  if (!a) return _.clone(b)
-  if (!b) return _.clone(a)
-  return _.mergeWith(a, b, sumMerge)
 }
 
 const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', alias2 = 'sum2') => {
@@ -125,6 +247,33 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
       userServiceClient.get('/faculty_programmes'),
     ])
 
+  const yearlyOrgStatPromises = yearRange.map(async year => [
+    year,
+    await getOrganizationStatistics(
+      faculties,
+      new Date(startTime - (startYear - year) * YEAR_TO_MILLISECONDS),
+      new Date(startTime - (startYear - year - 1) * YEAR_TO_MILLISECONDS)
+    ),
+  ])
+
+  const orgStats = await Promise.all(yearlyOrgStatPromises)
+  const yearlyOrgStats = Object.fromEntries(orgStats)
+  const [[, currentOrgStats], [, prevOrgStats]] = orgStats.reverse()
+
+  const getOrgYearlyStats = orgId =>
+    Object.entries(yearlyOrgStats).reduce((acc, [year, stats]) => {
+      const { credits, students } = stats[orgId].accumulated
+
+      acc[year] = {
+        acc: credits,
+        accStudents: students,
+        total: credits,
+        totalStudents: students,
+      }
+
+      return acc
+    }, {})
+
   /* Construct some helper maps */
   const facultyCodeToFaculty = faculties.reduce((res, curr) => {
     res[curr.code] = curr
@@ -144,6 +293,11 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
       name: curr.name,
     }
     return res
+  }, {})
+
+  const organizationCodeToOrganization = faculties.reduce((acc, org) => {
+    acc[org.code] = org
+    return acc
   }, {})
 
   /* Calculate course level stats and group by providers */
@@ -186,17 +340,27 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   /* Map providers into proper programmes and calculate programme level stats */
   const groupedByProgramme = Object.entries(coursesGroupedByProvider).reduce((acc, [organizationcode, courses]) => {
     const programme = providerToProgramme[organizationcode]
-    const courseValues = Object.values(courses)
-    const yearlyValues = courseValues.map(c => c.yearly)
+
     if (programme && programme.code) {
+      const orgId = organizationCodeToOrganization[organizationcode]?.id
+
+      const { students: currentStudents, credits: current } = currentOrgStats[orgId].accumulated
+      const { students: previousStudents, credits: previous } = prevOrgStats[orgId].accumulated
+
+      const yearly = getOrgYearlyStats(orgId)
+
       acc[programme.code] = {
+        type: 'programme',
         name: programme.name,
         drill: courses,
-        yearly: _.mergeWith({}, ...yearlyValues, mergele),
-        current: _.sumBy(courseValues, 'current'),
-        previous: _.sumBy(courseValues, 'previous'),
+        yearly,
+        current,
+        previous,
+        currentStudents,
+        previousStudents,
       }
     }
+
     return acc
   }, {})
 
@@ -207,18 +371,26 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     facultyCodes.forEach(facultyCode => {
       if (!facultyCode) return
       if (!acc[facultyCode]) {
+        const orgId = organizationCodeToOrganization[facultyCode].id
+
+        const { students: currentStudents, credits: current } = currentOrgStats[orgId].accumulated
+        const { students: previousStudents, credits: previous } = prevOrgStats[orgId].accumulated
+
+        const yearly = getOrgYearlyStats(orgId)
+
         acc[facultyCode] = {
+          type: 'faculty',
           drill: {},
           name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
-          yearly: {},
-          current: 0,
-          previous: 0,
+          yearly,
+          current,
+          previous,
+          currentStudents,
+          previousStudents,
         }
       }
+
       acc[facultyCode]['drill'][programmeCode] = programmeStats
-      acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
-      acc[facultyCode]['current'] += programmeStats.current
-      acc[facultyCode]['previous'] += programmeStats.previous
     })
     return acc
   }, {})
