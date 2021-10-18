@@ -348,7 +348,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
         students: 0,
         credits: 0,
       }
-      const { students: previousStudents, credits: previous } = prevOrgStats[orgId].accumulated ?? {
+      const { students: previousStudents, credits: previous } = prevOrgStats[orgId]?.accumulated ?? {
         students: 0,
         credits: 0,
       }
@@ -383,7 +383,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
           students: 0,
           credits: 0,
         }
-        const { students: previousStudents, credits: previous } = prevOrgStats[orgId].accumulated ?? {
+        const { students: previousStudents, credits: previous } = prevOrgStats[orgId]?.accumulated ?? {
           students: 0,
           credits: 0,
         }
