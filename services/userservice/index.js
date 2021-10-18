@@ -26,12 +26,6 @@ initializeDatabaseConnection()
       res.json(users.map(User.getUserData))
     })
 
-    app.get('/user/:uid', async (req, res) => {
-      const uid = req.params.uid
-      const user = await User.byUsername(uid)
-      res.json(User.getUserData(user))
-    })
-
     app.get('/user/:uid/user_data', async (req, res) => {
       const uid = req.params.uid
       const user = await User.byUsernameMinified(uid)
@@ -40,6 +34,8 @@ initializeDatabaseConnection()
       const faculties = user.faculty.map(({ faculty_code }) => faculty_code)
 
       res.json({
+        email: user.email,
+        full_name: user.full_name,
         roles,
         rights,
         faculties,

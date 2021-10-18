@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const userService = require('../services/userService')
+const { getUserDataFor } = require('../services/userService')
 const { sendFeedbackToToska } = require('../services/mailservice')
 const logger = require('../util/logger')
 
@@ -8,7 +8,8 @@ router.post('/email', async (req, res) => {
   const {
     decodedToken: { userId },
   } = req
-  const { email, full_name } = await userService.byUsername(userId)
+
+  const { email, full_name } = await getUserDataFor(userId)
 
   const result = await sendFeedbackToToska({
     feedbackContent: content,
