@@ -8,12 +8,6 @@ const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: proce
 const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
 
-const ping = async () => {
-  const url = '/ping'
-  const response = await axios.get(url)
-  return response.data
-}
-
 const findAll = async () => {
   const response = await client.get('/findall')
   return response.data
@@ -146,7 +140,6 @@ const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
 }
 
 module.exports = {
-  ping,
   byUsername,
   updateUser,
   byId,
