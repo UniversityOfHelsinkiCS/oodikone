@@ -7,11 +7,15 @@ const { userDataCache } = require('./cache')
 const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
 const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
+const { facultiesAndProgrammesForTrends } = require('../services/organisations')
 
-const findAll = async () => {
-  const response = await client.get('/findall')
-  return response.data
-}
+const enrichProgrammesFromFaculties = faculties =>
+  facultiesAndProgrammesForTrends.filter(f => faculties.includes(f.faculty_code)).map(f => f.programme_code)
+
+const enrichObjectsElementDetails = obj => ({
+  ...obj,
+  elementdetails: [...new Set([...obj.elementdetails, ...enrichProgrammesFromFaculties(obj.faculty)])],
+})
 
 const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
   if (!hyPersonSisuId) {
@@ -36,6 +40,10 @@ const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisu
     hasStudyGuidanceGroupAccess,
   })
   return response.data
+}
+
+const findAll = async () => {
+  return (await client.get('/findall'))?.data?.map(user => enrichObjectsElementDetails(user)) || []
 }
 
 const superlogin = async (uid, asUser) => {
