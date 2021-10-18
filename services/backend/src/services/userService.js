@@ -9,6 +9,7 @@ const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
 const { facultiesAndProgrammesForTrends } = require('../services/organisations')
 
+// Helpers
 const enrichProgrammesFromFaculties = faculties =>
   facultiesAndProgrammesForTrends.filter(f => faculties.includes(f.faculty_code)).map(f => f.programme_code)
 
@@ -28,6 +29,13 @@ const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
   return data && Object.values(data).length > 0
 }
 
+const byUsernameData = async uid => {
+  const url = `/user/${uid}/user_data`
+  const response = await client.get(url)
+  return response.data
+}
+
+// Exported
 const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
   const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
   const response = await client.post('/login', {
@@ -51,18 +59,6 @@ const superlogin = async (uid, asUser) => {
     uid,
     asUser,
   })
-  return response.data
-}
-
-const byUsername = async uid => {
-  const url = `/user/${uid}`
-  const response = await client.get(url)
-  return response.data
-}
-
-const byUsernameData = async uid => {
-  const url = `/user/${uid}/user_data`
-  const response = await client.get(url)
   return response.data
 }
 
@@ -148,7 +144,6 @@ const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
 }
 
 module.exports = {
-  byUsername,
   updateUser,
   byId,
   getUserElementDetails,
