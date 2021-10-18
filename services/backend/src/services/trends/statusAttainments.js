@@ -7,7 +7,10 @@ const { ElementDetail, Organization } = require('../../models')
 const { getRedisCDS, saveToRedis } = require('./shared')
 const { facultiesAndProgrammesForTrends } = require('../../services/organisations')
 
-const REDIS_KEY_STATUS = 'STATUS_DATA_V3'
+// NOTE: After changing the logic contained in this file, bump the number in this key.
+//       This will ensure that the statistics are recomputed in staging and production
+//       on the next request.
+const REDIS_KEY_STATUS = 'STATUS_DATA_V4'
 
 const getCurrentStudyYearStartDate = _.memoize(
   async unixMillis =>
@@ -30,52 +33,12 @@ const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)
 }
 
-const getOrganizationStudents = async (start, end) => {
-  const rows = await sequelize.query(
-    `
-    SELECT
-      sre.code AS code,
-      ARRAY_AGG(DISTINCT(sr.student_studentnumber)) AS students
-    FROM studyright sr
-    INNER JOIN studyright_elements sre ON sre.studyrightid = sr.studyrightid
-    INNER JOIN element_details ed ON ed.code = sre.code
-    WHERE ed.type = 20 AND (:start, :end) OVERLAPS (sr.startdate, sr.enddate)
-    GROUP BY sre.code
-  `,
-    {
-      type: sequelize.QueryTypes.SELECT,
-      replacements: { start, end },
-    }
-  )
-
-  const codes = mapToProviders(rows.map(({ code }) => code))
-
-  const orgIdRows = await sequelize.query(
-    `
-    SELECT o.code, o.id FROM organization o WHERE o.code IN (:codes)
-  `,
-    {
-      type: sequelize.QueryTypes.SELECT,
-      replacements: { codes },
-    }
-  )
-
-  const orgIds = Object.fromEntries(orgIdRows.map(({ code, id }) => [code, id]))
-
-  return rows.reduce((acc, { code, students }) => {
-    const [orgCode] = mapToProviders([code])
-    const orgId = orgIds[orgCode]
-    acc[orgId] = students
-    return acc
-  }, {})
-}
-
-const getOrganizationCredits = async (start, end) => {
+const getOrganizationDirectStudentsAndCredits = async (start, end) => {
   const rows = await sequelize.query(
     `
     SELECT
       cp.organizationcode AS code,
-      -- ARRAY_AGG(DISTINCT(cr.student_studentnumber)) AS students,
+      ARRAY_AGG(DISTINCT(cr.student_studentnumber)) AS students,
       SUM(cr.credits) AS credits
     FROM credit cr
     INNER JOIN course co ON co.code = cr.course_code
@@ -92,15 +55,14 @@ const getOrganizationCredits = async (start, end) => {
     }
   )
 
-  return rows.reduce((acc, { code, credits }) => {
-    acc[code] = credits
+  return rows.reduce((acc, { code, credits, students }) => {
+    acc[code] = { credits, students }
     return acc
   }, {})
 }
 
 const getOrganizationStatistics = async (organizations, start, end) => {
-  const orgCredits = await getOrganizationCredits(start, end)
-  const orgStudents = await getOrganizationStudents(start, end)
+  const orgDirectStats = await getOrganizationDirectStudentsAndCredits(start, end)
 
   const organizationStats = {}
 
@@ -134,8 +96,7 @@ const getOrganizationStatistics = async (organizations, start, end) => {
 
   while (stack.length > 0) {
     const orgId = stack.pop()
-    const credits = orgCredits[orgId] ?? 0
-    const students = orgStudents[orgId] ?? []
+    const { credits, students } = orgDirectStats[orgId] ?? { credits: 0, students: [] }
 
     const org = organizations.find(({ id }) => id === orgId)
     const parentOrgId = org.parent_id
