@@ -205,6 +205,12 @@ const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', 
   )
 }
 
+const getOrgStats = (stats, orgId) =>
+  stats[orgId] ?? {
+    accumulated: { students: 0, credits: 0 },
+    direct: { students: 0, credits: 0 },
+  }
+
 const calculateStatusStatistics = async (unixMillis, showByYear) => {
   const YEAR_TO_MILLISECONDS = 31556952000
   /* Memoize parses booleans into strings... */
@@ -262,7 +268,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
 
   const getOrgYearlyStats = orgId =>
     Object.entries(yearlyOrgStats).reduce((acc, [year, stats]) => {
-      const { credits, students } = stats[orgId].accumulated
+      const { credits, students } = getOrgStats(stats, orgId).accumulated
 
       acc[year] = {
         acc: credits,
@@ -344,14 +350,8 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     if (programme && programme.code) {
       const orgId = organizationCodeToOrganization[organizationcode]?.id
 
-      const { students: currentStudents, credits: current } = currentOrgStats[orgId]?.accumulated ?? {
-        students: 0,
-        credits: 0,
-      }
-      const { students: previousStudents, credits: previous } = prevOrgStats[orgId]?.accumulated ?? {
-        students: 0,
-        credits: 0,
-      }
+      const { students: currentStudents, credits: current } = getOrgStats(currentOrgStats, orgId).accumulated
+      const { students: previousStudents, credits: previous } = getOrgStats(prevOrgStats, orgId).accumulated
 
       const yearly = getOrgYearlyStats(orgId)
 
@@ -379,14 +379,8 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
       if (!acc[facultyCode]) {
         const orgId = organizationCodeToOrganization[facultyCode].id
 
-        const { students: currentStudents, credits: current } = currentOrgStats[orgId]?.accumulated ?? {
-          students: 0,
-          credits: 0,
-        }
-        const { students: previousStudents, credits: previous } = prevOrgStats[orgId]?.accumulated ?? {
-          students: 0,
-          credits: 0,
-        }
+        const { students: currentStudents, credits: current } = getOrgStats(currentOrgStats, orgId).accumulated
+        const { students: previousStudents, credits: previous } = getOrgStats(prevOrgStats, orgId).accumulated
 
         const yearly = getOrgYearlyStats(orgId)
 
