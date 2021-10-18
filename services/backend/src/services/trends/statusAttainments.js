@@ -6,7 +6,7 @@ const { mapToProviders } = require('../../util/utils')
 const { ElementDetail, Organization } = require('../../models')
 const { getRedisCDS, saveToRedis, userServiceClient } = require('./shared')
 
-const REDIS_KEY_STATUS = 'STATUS_DATA_V2'
+const REDIS_KEY_STATUS = 'STATUS_DATA_V3'
 
 const getCurrentStudyYearStartDate = _.memoize(
   async unixMillis =>
@@ -344,8 +344,14 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     if (programme && programme.code) {
       const orgId = organizationCodeToOrganization[organizationcode]?.id
 
-      const { students: currentStudents, credits: current } = currentOrgStats[orgId].accumulated
-      const { students: previousStudents, credits: previous } = prevOrgStats[orgId].accumulated
+      const { students: currentStudents, credits: current } = currentOrgStats[orgId]?.accumulated ?? {
+        students: 0,
+        credits: 0,
+      }
+      const { students: previousStudents, credits: previous } = prevOrgStats[orgId].accumulated ?? {
+        students: 0,
+        credits: 0,
+      }
 
       const yearly = getOrgYearlyStats(orgId)
 
@@ -373,8 +379,14 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
       if (!acc[facultyCode]) {
         const orgId = organizationCodeToOrganization[facultyCode].id
 
-        const { students: currentStudents, credits: current } = currentOrgStats[orgId].accumulated
-        const { students: previousStudents, credits: previous } = prevOrgStats[orgId].accumulated
+        const { students: currentStudents, credits: current } = currentOrgStats[orgId]?.accumulated ?? {
+          students: 0,
+          credits: 0,
+        }
+        const { students: previousStudents, credits: previous } = prevOrgStats[orgId].accumulated ?? {
+          students: 0,
+          credits: 0,
+        }
 
         const yearly = getOrgYearlyStats(orgId)
 
