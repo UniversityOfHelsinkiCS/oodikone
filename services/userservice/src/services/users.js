@@ -287,8 +287,7 @@ const setFaculties = async (uid, faculties) => {
   })
 }
 
-const modifyRights = async (uid, rights) => {
-  console.log(uid, rights)
+const modifyRights = async (username, rights) => {
   const rightsToAdd = Object.entries(rights)
     .map(([code, val]) => {
       if (val === true) {
@@ -304,7 +303,7 @@ const modifyRights = async (uid, rights) => {
     })
     .filter(code => code)
 
-  const user = await byId(uid)
+  const user = await byUsername(username)
   const accessGroupsToAdd = await AccessService.byCodes(rightsToAdd)
   const accessGroupsToRemove = await AccessService.byCodes(rightsToRemove)
 
