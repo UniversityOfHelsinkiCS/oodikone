@@ -41,15 +41,6 @@ initializeDatabaseConnection()
       })
     })
 
-    app.get('/user/id/:id', async (req, res) => {
-      const id = req.params.id
-      const user = await User.byId(id)
-
-      console.log(JSON.stringify(user))
-
-      res.json(User.getUserData(user))
-    })
-
     app.post('/login', async (req, res) => {
       const { uid, full_name, hyGroups, affiliations, email, hyPersonSisuId, hasStudyGuidanceGroupAccess } = req.body
       console.log(uid, full_name, 'logging in!')
@@ -137,16 +128,6 @@ initializeDatabaseConnection()
         res.status(200).json(groups)
       } catch (e) {
         res.status(400).end()
-      }
-    })
-
-    app.get('/get_roles/:user', async (req, res) => {
-      const user = req.params.user
-      try {
-        const roles = await User.getRoles(user)
-        res.status(200).json(roles)
-      } catch (e) {
-        res.status(400).json({ e })
       }
     })
 

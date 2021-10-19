@@ -74,12 +74,6 @@ const updateUser = async (uid, fields) => {
   return response.data
 }
 
-const getRolesFor = async user => {
-  const url = `/get_roles/${user}`
-  const response = await client.get(url)
-  return response.data
-}
-
 const enableElementDetails = async (uid, codes) => {
   const response = await client.post('/add_rights', { uid, codes })
   return response.data.user
@@ -150,7 +144,6 @@ module.exports = {
   modifyAccess,
   getAccessGroups,
   getUnitsFromElementDetails,
-  getRolesFor,
   setFaculties,
   getUserDataFor,
   getStudentsUserCanAccess,
