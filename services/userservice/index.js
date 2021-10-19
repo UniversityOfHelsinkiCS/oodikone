@@ -3,7 +3,6 @@ const Sentry = require('@sentry/node')
 
 const User = require('./src/services/users')
 const AccessGroup = require('./src/services/accessgroups')
-const FacultyProgrammes = require('./src/services/facultyprogrammes')
 const { initializeDatabaseConnection } = require('./src/database/connection')
 const initializeSentry = require('./src/util/sentry')
 
@@ -146,15 +145,6 @@ initializeDatabaseConnection()
       try {
         const roles = await User.getRoles(user)
         res.status(200).json(roles)
-      } catch (e) {
-        res.status(400).json({ e })
-      }
-    })
-
-    app.get('/faculty_programmes', async (req, res) => {
-      try {
-        const facultyProgrammes = await FacultyProgrammes.findAll()
-        res.status(200).json(facultyProgrammes)
       } catch (e) {
         res.status(400).json({ e })
       }
