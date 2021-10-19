@@ -253,6 +253,13 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
       userServiceClient.get('/faculty_programmes'),
     ])
 
+  facultyProgrammes.push({
+    faculty_code: 'H906',
+    programme_code: 'H906',
+    createdAt: '2019-06-26T15:10:16.911Z',
+    updatedAt: '2019-06-26T15:10:16.911Z',
+  })
+
   const yearlyOrgStatPromises = yearRange.map(async year => [
     year,
     await getOrganizationStatistics(
@@ -300,6 +307,11 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     }
     return res
   }, {})
+
+  providerToProgramme['H906'] = {
+    code: 'H906',
+    name: { en: 'Language Centre', fi: 'Kielikeskus', sv: 'Språkcentrum' },
+  }
 
   const organizationCodeToOrganization = faculties.reduce((acc, org) => {
     acc[org.code] = org
