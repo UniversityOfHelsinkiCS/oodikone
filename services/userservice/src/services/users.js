@@ -2,7 +2,6 @@ const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
 const moment = require('moment')
-const { flatMap } = require('lodash')
 const {
   User,
   UserElementDetails,
@@ -194,11 +193,6 @@ const byUsernameMinified = async username => {
         separate: true,
         model: UserFaculties,
         as: 'faculty',
-        include: {
-          model: FacultyProgrammes,
-          as: 'programme',
-          attributes: ['programme_code'],
-        },
         attributes: ['faculty_code'],
       },
     ],
@@ -245,13 +239,8 @@ const byId = async id => {
   return user
 }
 
-const getUserProgrammes = user => {
-  const elementdetails = [
-    ...user.programme.map(p => p.elementDetailCode),
-    ...flatMap(user.faculty, f => f.programme.map(p => p.programme_code)),
-  ]
-  return elementdetails
-}
+const getUserProgrammes = user => user.programme.map(p => p.elementDetailCode)
+
 const getUserAccessGroups = async username => {
   const user = await byUsername(username)
   return await user.getAccessgroup()

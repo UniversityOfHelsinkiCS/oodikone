@@ -34,7 +34,6 @@ const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
   return data && Object.values(data).length > 0
 }
 
-// ENRICH THIS!
 const byUsernameData = async username => {
   const url = `/user/${username}/user_data`
   const response = await client.get(url)
