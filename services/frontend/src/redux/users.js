@@ -6,11 +6,11 @@ export const getUsers = () => {
   return callController(route, prefix)
 }
 
-export const modifyAccessGroups = (uid, accessgroups) => {
+export const modifyAccessGroups = (username, accessgroups) => {
   const route = '/users/modifyaccess'
   const prefix = 'MODIFY_ACCESSGROUPS_'
   const method = 'post'
-  const data = { uid, accessgroups }
+  const data = { username, accessgroups }
   return callController(route, prefix, data, method)
 }
 

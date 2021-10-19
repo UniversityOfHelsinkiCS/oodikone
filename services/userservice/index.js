@@ -42,13 +42,6 @@ initializeDatabaseConnection()
       })
     })
 
-    app.get('/user/elementdetails/:username', async (req, res) => {
-      const username = req.params.username
-      const user = await User.byUsername(username)
-      const programmes = User.getUserProgrammes(user)
-      res.json(programmes)
-    })
-
     app.get('/user/id/:id', async (req, res) => {
       const id = req.params.id
       const user = await User.byId(id)
@@ -95,10 +88,10 @@ initializeDatabaseConnection()
     })
 
     app.post('/modifyaccess', async (req, res) => {
-      const { uid, accessgroups } = req.body
+      const { username, accessgroups } = req.body
       try {
-        await User.modifyRights(uid, accessgroups)
-        const user = await User.byId(uid)
+        await User.modifyRights(username, accessgroups)
+        const user = await User.byUsername(username)
         res.status(200).json(User.getUserData(user))
       } catch (e) {
         res.status(400).json({ e })

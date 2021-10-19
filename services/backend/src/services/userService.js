@@ -29,6 +29,7 @@ const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
   return data && Object.values(data).length > 0
 }
 
+// ENRICH THIS!
 const byUsernameData = async uid => {
   const url = `/user/${uid}/user_data`
   const response = await client.get(url)
@@ -60,13 +61,6 @@ const superlogin = async (uid, asUser) => {
     asUser,
   })
   return response.data
-}
-
-const getUserElementDetails = async username => {
-  const url = `/user/elementdetails/${username}`
-  const response = await client.get(url)
-  const elementdetailcodes = response.data
-  return elementDetailService.byCodes(elementdetailcodes)
 }
 
 const byId = async id => {
@@ -104,7 +98,12 @@ const setFaculties = async (uid, faculties) => {
 }
 
 const getUnitsFromElementDetails = async username => {
-  const elementDetails = await getUserElementDetails(username)
+  let userData = userDataCache.get(username)
+  if (!userData) {
+    userData = await byUsernameData(username)
+    userDataCache.set(username, userData)
+  }
+  const elementDetails = await elementDetailService.byCodes(userData.rights)
   return elementDetails.map(element => UnitService.parseUnitFromElement(element))
 }
 

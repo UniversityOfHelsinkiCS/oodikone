@@ -25,9 +25,11 @@ router.get('/access_groups', async (req, res) => {
 
 router.post('/modifyaccess', async (req, res) => {
   try {
-    const { uid } = req.body
+    const { username } = req.body
     const result = await userService.modifyAccess(req.body)
-    const user = await userService.byId(uid)
+    const user = {
+      username,
+    }
     await addUserToBlacklist(user, req.decodedToken)
     res.status(200).json(result)
   } catch (e) {
