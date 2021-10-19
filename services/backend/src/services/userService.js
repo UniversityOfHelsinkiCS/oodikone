@@ -18,6 +18,11 @@ const enrichObjectsElementDetails = obj => ({
   elementdetails: [...new Set([...obj.elementdetails, ...enrichProgrammesFromFaculties(obj.faculty)])],
 })
 
+const enrichGetUserDataForWithProgrammes = obj => ({
+  ...obj,
+  rights: [...new Set([...obj.rights, ...enrichProgrammesFromFaculties(obj.faculties)])],
+})
+
 const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
   if (!hyPersonSisuId) {
     logger.error('Not possible to get groups without personId header')
@@ -30,8 +35,8 @@ const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
 }
 
 // ENRICH THIS!
-const byUsernameData = async uid => {
-  const url = `/user/${uid}/user_data`
+const byUsernameData = async username => {
+  const url = `/user/${username}/user_data`
   const response = await client.get(url)
   return response.data
 }
@@ -60,12 +65,6 @@ const superlogin = async (uid, asUser) => {
     uid,
     asUser,
   })
-  return response.data
-}
-
-const byId = async id => {
-  const url = `/user/id/${id}`
-  const response = await client.get(url)
   return response.data
 }
 
@@ -120,7 +119,7 @@ const getAccessGroups = async () => {
 const getUserDataFor = async uid => {
   let userData = userDataCache.get(uid)
   if (!userData) {
-    userData = await byUsernameData(uid)
+    userData = enrichGetUserDataForWithProgrammes(await byUsernameData(uid))
     userDataCache.set(uid, userData)
   }
 
@@ -132,7 +131,7 @@ const getUserDataFor = async uid => {
 
 const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
   let studentsUserCanAccess
-  if (roles && roles.includes('admin')) {
+  if (roles?.includes('admin')) {
     studentsUserCanAccess = new Set(studentnumbers)
   } else {
     const unitsUserCanAccess = await getUnitsFromElementDetails(userId)
@@ -144,7 +143,6 @@ const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
 
 module.exports = {
   updateUser,
-  byId,
   login,
   superlogin,
   enableElementDetails,
