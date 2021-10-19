@@ -146,7 +146,6 @@ const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
 module.exports = {
   updateUser,
   byId,
-  getUserElementDetails,
   login,
   superlogin,
   enableElementDetails,
