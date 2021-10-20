@@ -2,16 +2,7 @@ const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
 const moment = require('moment')
-const {
-  User,
-  UserElementDetails,
-  AccessGroup,
-  HyGroup,
-  Affiliation,
-  FacultyProgrammes,
-  UserFaculties,
-  sequelize,
-} = require('../models')
+const { User, UserElementDetails, AccessGroup, HyGroup, Affiliation, UserFaculties, sequelize } = require('../models')
 const AccessService = require('./accessgroups')
 const AffiliationService = require('./affiliations')
 const HyGroupService = require('./hygroups')
@@ -151,10 +142,6 @@ const userIncludes = [
     separate: true,
     model: UserFaculties,
     as: 'faculty',
-    include: {
-      model: FacultyProgrammes,
-      as: 'programme',
-    },
   },
   {
     model: Affiliation,
@@ -248,7 +235,7 @@ const getUserAccessGroups = async username => {
 
 const findAll = async () => {
   const users = await User.findAll({
-    include: userIncludes, // OK POISTAA facultyprogrammes
+    include: userIncludes,
   })
   return users
 }
