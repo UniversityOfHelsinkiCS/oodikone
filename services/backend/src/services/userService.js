@@ -1,28 +1,42 @@
 const axios = require('axios')
+const _ = require('lodash')
 const { USERSERVICE_URL } = require('../conf-backend')
 const UnitService = require('./units')
 const elementDetailService = require('./elementdetails')
 const { filterStudentnumbersByAccessrights } = require('./students')
 const { userDataCache } = require('./cache')
-const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
 const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
 const { facultiesAndProgrammesForTrends } = require('../services/organisations')
 
-// Helpers
+const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
+
+// Private helpers
 const enrichProgrammesFromFaculties = faculties =>
   facultiesAndProgrammesForTrends.filter(f => faculties.includes(f.faculty_code)).map(f => f.programme_code)
 
-const enrichObjectsElementDetails = obj => ({
-  ...obj,
-  elementdetails: [...new Set([...obj.elementdetails, ...enrichProgrammesFromFaculties(obj.faculty)])],
-})
+const enrichWithProgrammes = toEnrich => {
+  if (Array.isArray(toEnrich)) {
+    return toEnrich.map(obj => enrichWithProgrammes(obj))
+  }
+  if (toEnrich.rights) {
+    return {
+      ...toEnrich,
+      rights: _.union(toEnrich.rights, enrichProgrammesFromFaculties(toEnrich.faculties)),
+    }
+  }
 
-const enrichGetUserDataForWithProgrammes = obj => ({
-  ...obj,
-  rights: [...new Set([...obj.rights, ...enrichProgrammesFromFaculties(obj.faculties)])],
-})
-
+  if (toEnrich.elementdetails) {
+    return {
+      ...toEnrich,
+      elementdetails: _.union(
+        toEnrich.elementdetails,
+        enrichProgrammesFromFaculties(toEnrich.faculty.map(f => f.faculty_code))
+      ),
+    }
+  }
+  return toEnrich
+}
 const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
   if (!hyPersonSisuId) {
     logger.error('Not possible to get groups without personId header')
@@ -35,61 +49,29 @@ const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
 }
 
 const byUsernameData = async username => {
+  // OK, enriched
   const url = `/user/${username}/user_data`
   const response = await client.get(url)
-  return response.data
+  return enrichWithProgrammes(response.data)
 }
 
-// Exported
-const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
-  const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
-  const response = await client.post('/login', {
-    uid,
-    full_name,
-    hyGroups,
-    affiliations,
-    email,
-    hyPersonSisuId,
-    hasStudyGuidanceGroupAccess,
-  })
-  return response.data
-}
+// Exported helpers
+const getUserDataFor = async username => {
+  // no need to enrich
+  let userData = userDataCache.get(username)
+  if (!userData) {
+    userData = await byUsernameData(username)
+    userDataCache.set(username, userData)
+  }
 
-const findAll = async () => {
-  return (await client.get('/findall'))?.data?.map(user => enrichObjectsElementDetails(user)) || []
-}
-
-const superlogin = async (uid, asUser) => {
-  const response = await client.post('/superlogin', {
-    uid,
-    asUser,
-  })
-  return response.data
-}
-
-const updateUser = async (uid, fields) => {
-  userDataCache.del(uid)
-  const url = `/user/${uid}`
-  const response = await client.put(url, fields)
-  return response.data
-}
-
-const enableElementDetails = async (uid, codes) => {
-  const response = await client.post('/add_rights', { uid, codes })
-  return response.data.user
-}
-
-const removeElementDetails = async (uid, codes) => {
-  const response = await client.post('/remove_rights', { uid, codes })
-  return response.data.user
-}
-
-const setFaculties = async (uid, faculties) => {
-  const response = await client.post('/set_faculties', { uid, faculties })
-  return response.data.user
+  return {
+    ...userData,
+    faculties: new Set(userData.faculties),
+  }
 }
 
 const getUnitsFromElementDetails = async username => {
+  // No need to enrich
   let userData = userDataCache.get(username)
   if (!userData) {
     userData = await byUsernameData(username)
@@ -99,30 +81,8 @@ const getUnitsFromElementDetails = async username => {
   return elementDetails.map(element => UnitService.parseUnitFromElement(element))
 }
 
-const modifyAccess = async body => {
-  const response = await client.post('/modifyaccess', body)
-  return response.data
-}
-
-const getAccessGroups = async () => {
-  const response = await client.get('/access_groups')
-  return response.data
-}
-
-const getUserDataFor = async uid => {
-  let userData = userDataCache.get(uid)
-  if (!userData) {
-    userData = enrichGetUserDataForWithProgrammes(await byUsernameData(uid))
-    userDataCache.set(uid, userData)
-  }
-
-  return {
-    ...userData,
-    faculties: new Set(userData.faculties),
-  }
-}
-
 const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
+  // No need to enrich
   let studentsUserCanAccess
   if (roles?.includes('admin')) {
     studentsUserCanAccess = new Set(studentnumbers)
@@ -133,6 +93,50 @@ const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
   }
   return studentsUserCanAccess
 }
+
+// FOR ROUTES 1-to-1 mapping
+const modifyAccess = async body => enrichWithProgrammes((await client.post('/modifyaccess', body)).data)
+
+const getAccessGroups = async () => enrichWithProgrammes((await client.get('/access_groups')).data)
+
+const enableElementDetails = async (uid, codes) =>
+  enrichWithProgrammes((await client.post('/add_rights', { uid, codes })).data.user)
+
+const findAll = async () => enrichWithProgrammes((await client.get('/findall')).data)
+
+const setFaculties = async (uid, faculties) =>
+  enrichWithProgrammes((await client.post('/set_faculties', { uid, faculties })).data.user)
+
+const removeElementDetails = async (uid, codes) =>
+  enrichWithProgrammes((await client.post('/remove_rights', { uid, codes })).data.user)
+
+const updateUser = async (username, fields) => {
+  userDataCache.del(username)
+  return enrichWithProgrammes((await client.put(`/user/${username}`, fields)).data)
+}
+
+const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
+  const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
+  return (
+    await client.post('/login', {
+      uid,
+      full_name,
+      hyGroups,
+      affiliations,
+      email,
+      hyPersonSisuId,
+      hasStudyGuidanceGroupAccess,
+    })
+  ).data
+}
+
+const superlogin = async (uid, asUser) =>
+  (
+    await client.post('/superlogin', {
+      uid,
+      asUser,
+    })
+  ).data
 
 module.exports = {
   updateUser,
