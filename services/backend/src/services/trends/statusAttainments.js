@@ -251,7 +251,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   const yearlyOrgStats = Object.fromEntries(orgStats)
   const [[, currentOrgStats], [, prevOrgStats]] = orgStats.reverse()
 
-  const defaultYearStats = _.chain(_.range(2017, startYear))
+  const defaultYearStats = _.chain(_.range(2017, startYear + 1))
     .map(year => [year, { acc: 0, accStudents: 0 }])
     .fromPairs()
     .value()
@@ -304,7 +304,9 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     acc[organizationcode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
       (acc, [courseCode, yearlyInstances]) => {
         acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
-        const array = [2020, 2019, 2018, 2017]
+
+        const array = _.range(2017, startYear + 1)
+
         array.forEach(year => {
           acc[courseCode]['yearly'][year] = {}
           acc[courseCode]['yearly'][year]['acc'] = 0
@@ -312,6 +314,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
           acc[courseCode]['yearly'][year]['total'] = 0
           acc[courseCode]['yearly'][year]['totalStudents'] = 0
         })
+
         yearlyInstances.forEach(instance => {
           if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
 
