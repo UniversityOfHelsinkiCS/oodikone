@@ -20,26 +20,21 @@
   text-align: start;
   font-variant-numeric: tabular-nums;
   display: grid;
-  grid-template-columns: fit-content(0) fit-content(0) auto;
-}
-
-.year-row .unit {
-  padding-left: 0.5em;
-  color: rgba(0, 0, 0, 0.3);
-  font-size: 0.9em;
+  grid-template-columns: fit-content(0) fit-content(0) fit-content(0) fit-content(0);
 }
 
 .year-label {
   white-space: nowrap;
+  padding-right: 0.5em;
 }
 
 .year-value {
   text-align: right;
   white-space: nowrap;
-  padding-left: 0.5em;
 }
 
 .year-row {
+  position: relative;
   padding-left: 0.5em;
   display: inline-block;
 }

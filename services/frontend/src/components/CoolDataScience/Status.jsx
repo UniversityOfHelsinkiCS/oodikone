@@ -64,10 +64,18 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
       signDisplay: 'always',
     })
 
-  const roundToPrecision = (value, precision) => Math.round(value * 10 ** precision) / 10 ** precision
+  const getDisplayValue = (value, denominator) => {
+    if (denominator === 0) {
+      return '∞'
+    }
 
-  const getDisplayValue = (value, denominator) =>
-    showRelativeValues ? roundToPrecision(denominator === 0 ? 0 : value / denominator, 2) : value
+    const relativeValue = showRelativeValues ? value / denominator : value
+
+    return relativeValue.toLocaleString('fi', {
+      minimumFractionDigits: showRelativeValues ? 2 : 0,
+      maximumFractionDigits: showRelativeValues ? 2 : 0,
+    })
+  }
 
   return (
     <Segment
@@ -130,16 +138,13 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
                   </>
                 ) : (
                   <>
-                    <span
-                      className="year-value"
-                      // eslint-disable-next-line react/no-danger
-                      dangerouslySetInnerHTML={{
-                        __html: `${getDisplayValue(yearStats.acc, yearStats.accStudents)
-                          .toLocaleString('fi', { minimumFractionDigits: 2 })
-                          .replace(/,?0*$/, match => `<span class="decimals">${match}</span>`)}`,
-                      }}
-                    />
-                    <span className="unit">credits{showRelativeValues ? '/student' : ''}</span>
+                    <span className="year-value accumulated">
+                      {getDisplayValue(yearStats.acc, yearStats.accStudents)}
+                    </span>
+                    <span style={{ color: '#AAA', margin: '0 0.3em' }}>{yearStats.total !== undefined && '/'}</span>
+                    <span className="year-value total">
+                      {yearStats.total !== undefined && getDisplayValue(yearStats.total, yearStats.totalStudents)}
+                    </span>
                   </>
                 )}
               </span>

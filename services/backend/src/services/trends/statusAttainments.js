@@ -80,13 +80,13 @@ const getOrganizationStatistics = async (organizations, start, end) => {
     if (organizationStats[orgId] === undefined) {
       organizationStats[orgId] = {
         direct: { credits: 0, students: new Set() },
-        accumulated: { credits: 0, students: new Set() },
+        aggregated: { credits: 0, students: new Set() },
       }
     }
 
     const orgStats = organizationStats[orgId]
 
-    const statsRefs = isDirect ? [orgStats.direct, orgStats.accumulated] : [orgStats.accumulated]
+    const statsRefs = isDirect ? [orgStats.direct, orgStats.aggregated] : [orgStats.aggregated]
 
     statsRefs.forEach(statsRef => {
       statsRef.credits += stats.credits
@@ -104,20 +104,20 @@ const getOrganizationStatistics = async (organizations, start, end) => {
     updateOrgStats(orgId, { credits, students }, true)
 
     if (parentOrgId) {
-      updateOrgStats(parentOrgId, organizationStats[orgId].accumulated, false)
+      updateOrgStats(parentOrgId, organizationStats[orgId].aggregated, false)
     }
   }
 
-  return Object.entries(organizationStats).reduce((acc, [id, { direct, accumulated }]) => {
+  return Object.entries(organizationStats).reduce((acc, [id, { direct, aggregated }]) => {
     acc[id] = {
       id,
       direct: {
         students: direct.students.size,
         credits: direct.credits,
       },
-      accumulated: {
-        students: accumulated.students.size,
-        credits: accumulated.credits,
+      aggregated: {
+        students: aggregated.students.size,
+        credits: aggregated.credits,
       },
     }
 
@@ -169,8 +169,14 @@ const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', 
 
 const getOrgStats = (stats, orgId) =>
   stats[orgId] ?? {
-    accumulated: { students: 0, credits: 0 },
-    direct: { students: 0, credits: 0 },
+    accumulated: {
+      aggregated: { students: 0, credits: 0 },
+      direct: { students: 0, credits: 0 },
+    },
+    total: {
+      aggregated: { students: 0, credits: 0 },
+      direct: { students: 0, credits: 0 },
+    },
   }
 
 const calculateStatusStatistics = async (unixMillis, showByYear) => {
@@ -214,32 +220,56 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   ])
   const facultyProgrammes = facultiesAndProgrammesForTrends
 
-  const yearlyOrgStatPromises = yearRange.map(async year => [
-    year,
-    await getOrganizationStatistics(
+  const yearlyOrgStatPromises = yearRange.map(async year => {
+    const accumulatedStats = await getOrganizationStatistics(
       faculties,
       new Date(startTime - (startYear - year) * YEAR_TO_MILLISECONDS),
-      new Date(startTime - (startYear - year - 1) * YEAR_TO_MILLISECONDS)
-    ),
-  ])
+      showByYear === 'true'
+        ? new Date(startTime - (startYear - year - 1) * YEAR_TO_MILLISECONDS)
+        : new Date(unixMillis - (startYear - year) * YEAR_TO_MILLISECONDS)
+    )
+
+    const totalStats =
+      year !== startYear &&
+      (await getOrganizationStatistics(
+        faculties,
+        new Date(startTime - (startYear - year) * YEAR_TO_MILLISECONDS),
+        new Date(startTime - (startYear - year - 1) * YEAR_TO_MILLISECONDS)
+      ))
+
+    return [
+      year,
+      _.merge(
+        _.mapValues(totalStats, total => ({ total })),
+        _.mapValues(accumulatedStats, accumulated => ({ accumulated }))
+      ),
+    ]
+  })
 
   const orgStats = await Promise.all(yearlyOrgStatPromises)
+
   const yearlyOrgStats = Object.fromEntries(orgStats)
   const [[, currentOrgStats], [, prevOrgStats]] = orgStats.reverse()
 
+  const defaultYearStats = _.chain(_.range(2017, startYear))
+    .map(year => [year, { acc: 0, accStudents: 0 }])
+    .fromPairs()
+    .value()
+
   const getOrgYearlyStats = orgId =>
-    Object.entries(yearlyOrgStats).reduce((acc, [year, stats]) => {
-      const { credits, students } = getOrgStats(stats, orgId).accumulated
+    _.chain(yearlyOrgStats)
+      .mapValues(stats => {
+        const orgStats = getOrgStats(stats, orgId)
 
-      acc[year] = {
-        acc: credits,
-        accStudents: students,
-        total: credits,
-        totalStudents: students,
-      }
-
-      return acc
-    }, {})
+        return {
+          acc: orgStats.accumulated.aggregated.credits,
+          accStudents: orgStats.accumulated.aggregated.students,
+          total: orgStats.total?.aggregated?.credits,
+          totalStudents: orgStats.total?.aggregated?.students,
+        }
+      })
+      .defaults(defaultYearStats)
+      .value()
 
   /* Construct some helper maps */
   const facultyCodeToFaculty = faculties.reduce((res, curr) => {
@@ -311,8 +341,8 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     if (programme && programme.code) {
       const orgId = organizationCodeToOrganization[organizationcode]?.id
 
-      const { students: currentStudents, credits: current } = getOrgStats(currentOrgStats, orgId).accumulated
-      const { students: previousStudents, credits: previous } = getOrgStats(prevOrgStats, orgId).accumulated
+      const { students: currentStudents, credits: current } = getOrgStats(currentOrgStats, orgId).accumulated.aggregated
+      const { students: previousStudents, credits: previous } = getOrgStats(prevOrgStats, orgId).accumulated.aggregated
 
       const yearly = getOrgYearlyStats(orgId)
 
@@ -341,7 +371,9 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
         const orgId = organizationCodeToOrganization[facultyCode].id
 
         const { students: currentStudents, credits: current } = getOrgStats(currentOrgStats, orgId).accumulated
+          .aggregated
         const { students: previousStudents, credits: previous } = getOrgStats(prevOrgStats, orgId).accumulated
+          .aggregated
 
         const yearly = getOrgYearlyStats(orgId)
 
