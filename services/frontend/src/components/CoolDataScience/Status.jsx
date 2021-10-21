@@ -119,7 +119,7 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
           {_.orderBy(Object.entries(stats.yearly), ([y]) => y, ['desc']).map(([year, yearStats]) => {
             return (
               <span style={{ display: 'contents' }} className="year-row">
-                <b>
+                <b className="year-label">
                   {year}
                   {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
                 </b>

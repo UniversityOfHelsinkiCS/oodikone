@@ -29,6 +29,10 @@
   font-size: 0.9em;
 }
 
+.year-label {
+  white-space: nowrap;
+}
+
 .year-value {
   text-align: right;
   white-space: nowrap;
