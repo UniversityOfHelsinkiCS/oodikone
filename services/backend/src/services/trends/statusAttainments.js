@@ -395,6 +395,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
 
       acc[programme.code] = {
         type: 'programme',
+        code: programme.code,
         name: programme.name,
         drill: courses,
         yearly,
@@ -426,6 +427,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
 
         acc[facultyCode] = {
           type: 'faculty',
+          code: facultyCode,
           drill: {},
           name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
           yearly,

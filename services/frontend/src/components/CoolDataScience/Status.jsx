@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
+import { Segment, Popup, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
@@ -106,7 +106,9 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
           overflowWrap: 'break-word',
         }}
       >
-        <span className="status-title">{title}</span>
+        <Popup position="bottom center" size="tiny" trigger={<span className="status-title">{title}</span>}>
+          {stats.code}
+        </Popup>
         <div style={{ margin: '10px 0' }}>
           <Icon
             style={{
