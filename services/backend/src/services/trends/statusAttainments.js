@@ -7,7 +7,7 @@ const { ElementDetail, Organization } = require('../../models')
 const { getRedisCDS, saveToRedis } = require('./shared')
 const { facultiesAndProgrammesForTrends } = require('../../services/organisations')
 
-const REDIS_KEY_STATUS = 'STATUS_DATA_V3'
+const REDIS_KEY_STATUS = 'STATUS_DATA_V5'
 
 const getCurrentStudyYearStartDate = _.memoize(
   async unixMillis =>
