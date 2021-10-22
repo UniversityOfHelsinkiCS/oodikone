@@ -342,7 +342,12 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   ).reduce((acc, [organizationcode, courseCredits]) => {
     acc[organizationcode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
       (acc, [courseCode, yearlyInstances]) => {
-        acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
+        acc[courseCode] = {
+          yearly: {},
+          name: yearlyInstances[0].name,
+          type: 'course',
+          code: courseCode,
+        }
 
         const array = _.range(2017, startYear + 1)
 
