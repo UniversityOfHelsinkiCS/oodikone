@@ -65,13 +65,17 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
     })
 
   const getDisplayValue = (value, denominator) => {
+    let displayValue
+
     if (denominator === 0) {
-      return '∞'
+      displayValue = value === 0 ? 0 : Infinity
+    } else if (showRelativeValues) {
+      displayValue = value / denominator
+    } else {
+      displayValue = value
     }
 
-    const relativeValue = showRelativeValues ? value / denominator : value
-
-    return relativeValue.toLocaleString('fi', {
+    return displayValue.toLocaleString('fi', {
       minimumFractionDigits: showRelativeValues ? 2 : 0,
       maximumFractionDigits: showRelativeValues ? 2 : 0,
     })
