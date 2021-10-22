@@ -10,17 +10,24 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
-.unit,
-.decimals {
-  opacity: 0;
-}
-
 .years {
   margin-top: 10px;
   text-align: start;
   font-variant-numeric: tabular-nums;
   display: grid;
-  grid-template-columns: fit-content(0) fit-content(0) fit-content(0) fit-content(0);
+  grid-template-columns: repeat(4, fit-content(0));
+}
+
+.subtitle {
+  color: #888;
+}
+
+.unit {
+  margin-left: 0.3em;
+}
+
+.years.item-type-course {
+  grid-template-columns: repeat(2, fit-content(0)) auto;
 }
 
 .year-label {
@@ -37,13 +44,6 @@
   position: relative;
   padding-left: 0.5em;
   display: inline-block;
-}
-
-.status-card .years .year-row:hover .unit,
-.status-card .years .year-row:hover .decimals,
-.status-card:hover .years:not(:hover) .year-row:first-child .unit,
-.status-card:hover .years:not(:hover) .year-row:first-child .decimals {
-  opacity: 1;
 }
 
 .status-date-time-input {

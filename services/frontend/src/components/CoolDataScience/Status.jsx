@@ -127,7 +127,7 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
         </div>
       </div>
       {showYearlyValues && (
-        <div className="years">
+        <div className={`years item-type-${stats.type}`}>
           {_.orderBy(Object.entries(stats.yearly), ([y]) => y, ['desc']).map(([year, yearStats]) => {
             return (
               <span style={{ display: 'contents' }} className="year-row">
