@@ -292,9 +292,9 @@ const determineAccessToCourseStats = async (user, hyGroups) => {
   const accessGroups = (user && user.accessgroup) || []
   const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'courseStatistics')
   if (hyGroups.includes(courseStatisticsGroup) && !alreadyAccess) {
-    await modifyRights(user.username, { courseStatistics: true })
+    await modifyRights(user.id, { courseStatistics: true })
   } else if (!hyGroups.includes(courseStatisticsGroup) && alreadyAccess) {
-    await modifyRights(user.username, { courseStatistics: false })
+    await modifyRights(user.id, { courseStatistics: false })
   }
 }
 

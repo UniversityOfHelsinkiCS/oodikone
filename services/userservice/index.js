@@ -1,3 +1,4 @@
+require('express-async-errors')
 const express = require('express')
 const Sentry = require('@sentry/node')
 
@@ -5,6 +6,7 @@ const User = require('./src/services/users')
 const AccessGroup = require('./src/services/accessgroups')
 const { initializeDatabaseConnection } = require('./src/database/connection')
 const initializeSentry = require('./src/util/sentry')
+const errorMiddleware = require('./src/middlewares/errorMiddleware')
 
 initializeDatabaseConnection()
   .then(() => {
@@ -130,6 +132,8 @@ initializeDatabaseConnection()
         res.status(400).end()
       }
     })
+
+    app.use(errorMiddleware)
 
     const server = app.listen(port, () => console.log(`Userservice listening on port ${port}!`))
     process.on('SIGTERM', () => {
