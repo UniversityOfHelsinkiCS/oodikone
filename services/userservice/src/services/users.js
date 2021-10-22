@@ -36,7 +36,6 @@ const createMissingGroups = async (group, service) => {
   const savedGroups = await service.findAll()
   group.forEach(async code => {
     if (!savedGroups.map(sg => sg.code).includes(code)) {
-      console.log(`Creating grp ${code}`)
       await service.create(code)
     }
   })
@@ -87,7 +86,6 @@ const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuI
   await createMissingGroups(affiliations, AffiliationService)
 
   if (!user) {
-    console.log('New user')
     user = await createUser(uid, full_name, mail, hyPersonSisuId, lastLogin)
 
     const userHyGroups = await HyGroupService.byCodes(hyGroups)
@@ -99,7 +97,6 @@ const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuI
     isNew = true
   } else {
     user = await updateUser(user, { full_name, email: mail, sisu_person_id: hyPersonSisuId, last_login: lastLogin })
-    user = await updateUser(user, { full_name, email: mail })
     await updateGroups(user, affiliations, hyGroups)
   }
 
@@ -295,9 +292,9 @@ const determineAccessToCourseStats = async (user, hyGroups) => {
   const accessGroups = (user && user.accessgroup) || []
   const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'courseStatistics')
   if (hyGroups.includes(courseStatisticsGroup) && !alreadyAccess) {
-    await modifyRights(user.id, { courseStatistics: true })
+    await modifyRights(user.username, { courseStatistics: true })
   } else if (!hyGroups.includes(courseStatisticsGroup) && alreadyAccess) {
-    await modifyRights(user.id, { courseStatistics: false })
+    await modifyRights(user.username, { courseStatistics: false })
   }
 }
 
@@ -305,7 +302,7 @@ const determineAccessToTeachersForOne = async (user, hyGroups) => {
   const accessGroups = (user && user.accessgroup) || []
   const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'teachers')
   if (hyGroups.includes(hyOneGroup) && !alreadyAccess) {
-    await modifyRights(user.id, { teachers: true })
+    await modifyRights(user.username, { teachers: true })
   }
 }
 
@@ -313,9 +310,9 @@ const determineAccessToStudyGuidanceGroups = async (user, hasStudyGuidanceGroupA
   const accessGroups = (user && user.accessgroup) || []
   const alreadyAccess = accessGroups.some(({ group_code }) => group_code === 'studyGuidanceGroups')
   if (hasStudyGuidanceGroupAccess && !alreadyAccess) {
-    await modifyRights(user.id, { studyGuidanceGroups: true })
+    await modifyRights(user.username, { studyGuidanceGroups: true })
   } else if (!hasStudyGuidanceGroupAccess && alreadyAccess) {
-    await modifyRights(user.id, { studyGuidanceGroups: false })
+    await modifyRights(user.username, { studyGuidanceGroups: false })
   }
 }
 
