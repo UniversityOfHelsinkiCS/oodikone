@@ -59,22 +59,6 @@ const UserFaculties = sequelize.define('user_faculties', {
     type: Sequelize.DATE,
   },
 })
-const FacultyProgrammes = sequelize.define('faculty_programmes', {
-  faculty_code: {
-    primaryKey: true,
-    type: Sequelize.STRING,
-  },
-  programme_code: {
-    primaryKey: true,
-    type: Sequelize.STRING,
-  },
-  createdAt: {
-    type: Sequelize.DATE,
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
-  },
-})
 
 const User = sequelize.define(
   'users',
@@ -154,11 +138,6 @@ User.belongsToMany(Affiliation, {
 Affiliation.belongsToMany(User, { through: 'user_affiliation' })
 
 User.hasMany(UserFaculties, { as: 'faculty', foreignKey: 'userId' })
-UserFaculties.hasMany(FacultyProgrammes, {
-  as: 'programme',
-  foreignKey: 'faculty_code',
-  sourceKey: 'faculty_code',
-})
 
 module.exports = {
   User,
@@ -167,6 +146,5 @@ module.exports = {
   HyGroup,
   Affiliation,
   UserFaculties,
-  FacultyProgrammes,
   sequelize,
 }

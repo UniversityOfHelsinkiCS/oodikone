@@ -30,7 +30,7 @@ const AccessGroups = ({
     selected.forEach(value => {
       rights[value] = true
     })
-    modifyAccessGroups(user.id, rights)
+    modifyAccessGroups(user.username, rights)
   }
 
   return (

@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react'
-import { string, func, shape, bool, oneOfType, array } from 'prop-types'
 import { connect } from 'react-redux'
 import ProductivityTable from '../ProductivityTable'
 import ThroughputTable from '../ThroughputTable'
@@ -51,29 +50,6 @@ const Overview = props => {
       <BachelorsTable bachelors={bachelors.data} loading={throughput.pending} />
     </>
   )
-}
-
-Overview.propTypes = {
-  studyprogramme: string.isRequired,
-  dispatchGetProductivity: func.isRequired,
-  dispatchGetThroughput: func.isRequired,
-  dispatchGetBachelors: func.isRequired,
-  history: shape({}).isRequired,
-  productivity: shape({
-    error: bool,
-    pending: bool,
-    data: shape({}),
-  }).isRequired, // eslint-disable-line
-  throughput: shape({
-    error: bool,
-    pending: bool,
-    data: shape({}),
-  }).isRequired, // eslint-disable-line
-  bachelors: shape({
-    error: bool,
-    pending: bool,
-    data: oneOfType([shape({}), array]),
-  }).isRequired // eslint-disable-line
 }
 
 const mapStateToProps = ({ studyProgrammeProductivity, studyProgrammeThroughput, studyProgrammeBachelors }) => ({
