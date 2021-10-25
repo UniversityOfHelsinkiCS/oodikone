@@ -4,9 +4,10 @@ const {
 } = require('../../database/connection')
 const { mapToProviders } = require('../../util/utils')
 const { ElementDetail, Organization } = require('../../models')
-const { getRedisCDS, saveToRedis, userServiceClient } = require('./shared')
+const { getRedisCDS, saveToRedis } = require('./shared')
+const { facultiesAndProgrammesForTrends } = require('../../services/organisations')
 
-const REDIS_KEY_STATUS = 'STATUS_DATA_V3'
+const REDIS_KEY_STATUS = 'STATUS_DATA_V5'
 
 const getCurrentStudyYearStartDate = _.memoize(
   async unixMillis =>
@@ -117,13 +118,13 @@ const getOrganizationStatistics = async (organizations, start, end) => {
     if (organizationStats[orgId] === undefined) {
       organizationStats[orgId] = {
         direct: { credits: 0, students: new Set() },
-        accumulated: { credits: 0, students: new Set() },
+        aggregated: { credits: 0, students: new Set() },
       }
     }
 
     const orgStats = organizationStats[orgId]
 
-    const statsRefs = isDirect ? [orgStats.direct, orgStats.accumulated] : [orgStats.accumulated]
+    const statsRefs = isDirect ? [orgStats.direct, orgStats.aggregated] : [orgStats.aggregated]
 
     statsRefs.forEach(statsRef => {
       statsRef.credits += stats.credits
@@ -142,20 +143,20 @@ const getOrganizationStatistics = async (organizations, start, end) => {
     updateOrgStats(orgId, { credits, students }, true)
 
     if (parentOrgId) {
-      updateOrgStats(parentOrgId, organizationStats[orgId].accumulated, false)
+      updateOrgStats(parentOrgId, organizationStats[orgId].aggregated, false)
     }
   }
 
-  return Object.entries(organizationStats).reduce((acc, [id, { direct, accumulated }]) => {
+  return Object.entries(organizationStats).reduce((acc, [id, { direct, aggregated }]) => {
     acc[id] = {
       id,
       direct: {
         students: direct.students.size,
         credits: direct.credits,
       },
-      accumulated: {
-        students: accumulated.students.size,
-        credits: accumulated.credits,
+      aggregated: {
+        students: aggregated.students.size,
+        credits: aggregated.credits,
       },
     }
 
@@ -188,13 +189,35 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
   )
 }
 
-const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', alias2 = 'sum2') => {
+const getTotalOpenUniCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'sum2') => {
+  return sequelize.query(
+    `
+    SELECT SUM(cr.credits) AS ${alias}, COUNT(DISTINCT(cr.student_studentnumber)) AS ${alias2}, co.code, o.code 
+    FROM credit cr
+    INNER JOIN course co ON cr.course_code = co.code 
+    INNER JOIN course_providers cp ON cp.coursecode = co.id
+    INNER JOIN organization o ON o.id = cp.organizationcode
+    LEFT JOIN studyright sr ON cr.student_studentnumber = sr.student_studentnumber
+    WHERE sr.studyrightid IS NULL AND cr.attainment_date BETWEEN '2020-07-31' AND '2021-08-01'
+        AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL) 
+        AND cr.credittypecode IN (4, 9) AND cp.organizationcode = 'hy-org-48645785'
+    GROUP BY co.id, o.code -- HAVING SUM(cr.credits) > 0 ;
+    `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { a, b },
+    }
+  )
+}
+const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', alias2 = 'sum2', avoin) => {
   return years.map(
     year =>
       new Promise(async res => {
         const diff = currentYear - year
         const { from, to } = getRange(diff)
-        const creditsByCourse = await getTotalCreditsOfCoursesBetween(from, to, alias, alias2)
+        const creditsByCourse = avoin
+          ? await getTotalOpenUniCreditsOfCoursesBetween(from, to, alias, alias2)
+          : await getTotalCreditsOfCoursesBetween(from, to, alias, alias2)
         res(
           creditsByCourse.map(c => {
             c['year'] = year
@@ -207,8 +230,14 @@ const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', 
 
 const getOrgStats = (stats, orgId) =>
   stats[orgId] ?? {
-    accumulated: { students: 0, credits: 0 },
-    direct: { students: 0, credits: 0 },
+    accumulated: {
+      aggregated: { students: 0, credits: 0 },
+      direct: { students: 0, credits: 0 },
+    },
+    total: {
+      aggregated: { students: 0, credits: 0 },
+      direct: { students: 0, credits: 0 },
+    },
   }
 
 const calculateStatusStatistics = async (unixMillis, showByYear) => {
@@ -218,74 +247,119 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   const startYear = startDate.getFullYear()
   const startTime = startDate.getTime()
   const yearRange = _.range(2017, startYear + 1)
+  const getRangeAcc = diff => ({
+    from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
+    to:
+      showByYear === 'true'
+        ? new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS)
+        : new Date(unixMillis - diff * YEAR_TO_MILLISECONDS),
+  })
+  const getRangeTotal = diff => ({
+    from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
+    to: new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS),
+  })
   const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
     startYear,
     yearRange,
-    diff => ({
-      from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
-      to:
-        showByYear === 'true'
-          ? new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS)
-          : new Date(unixMillis - diff * YEAR_TO_MILLISECONDS),
-    }),
+    getRangeAcc,
     'acc',
-    'students'
+    'students',
+    false
   )
-
+  const yearlyOpenUniAccCreditsPromises = makeYearlyCreditsPromises(
+    startYear,
+    yearRange,
+    getRangeAcc,
+    'acc',
+    'students',
+    true
+  )
   const yearlyTotalCreditsPromises = makeYearlyCreditsPromises(
     startYear,
     yearRange.slice(0, -1),
-    diff => ({
-      from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
-      to: new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS),
-    }),
+    getRangeTotal,
     'total',
-    'students'
+    'students',
+    false
+  )
+
+  const yearlyOpenUniTotalCreditsPromises = makeYearlyCreditsPromises(
+    startYear,
+    yearRange.slice(0, -1),
+    getRangeTotal,
+    'total',
+    'students',
+    true
   )
 
   /* Gather all required data */
-  const [yearlyAccCredits, yearlyTotalCredits, elementDetails, faculties, { data: facultyProgrammes }] =
-    await Promise.all([
-      Promise.all(yearlyAccCreditsPromises),
-      Promise.all(yearlyTotalCreditsPromises),
-      ElementDetail.findAll(),
-      Organization.findAll(),
-      userServiceClient.get('/faculty_programmes'),
-    ])
+  const [
+    yearlyAccCredits,
+    yearlyOpenUniAccCredits,
+    yearlyTotalCredits,
+    yearlyOpenUniTotalCredits,
+    elementDetails,
+    faculties,
+  ] = await Promise.all([
+    Promise.all(yearlyAccCreditsPromises),
+    Promise.all(yearlyOpenUniAccCreditsPromises),
+    Promise.all(yearlyTotalCreditsPromises),
+    Promise.all(yearlyOpenUniTotalCreditsPromises),
+    ElementDetail.findAll(),
+    Organization.findAll(),
+  ])
+  const facultyProgrammes = facultiesAndProgrammesForTrends
 
-  facultyProgrammes.push({
-    faculty_code: 'H906',
-    programme_code: 'H906',
-    createdAt: '2019-06-26T15:10:16.911Z',
-    updatedAt: '2019-06-26T15:10:16.911Z',
-  })
-
-  const yearlyOrgStatPromises = yearRange.map(async year => [
-    year,
-    await getOrganizationStatistics(
+  const yearlyOrgStatPromises = yearRange.map(async year => {
+    const accumulatedStats = await getOrganizationStatistics(
       faculties,
       new Date(startTime - (startYear - year) * YEAR_TO_MILLISECONDS),
-      new Date(startTime - (startYear - year - 1) * YEAR_TO_MILLISECONDS)
-    ),
-  ])
+      showByYear === 'true'
+        ? new Date(startTime - (startYear - year - 1) * YEAR_TO_MILLISECONDS)
+        : new Date(unixMillis - (startYear - year) * YEAR_TO_MILLISECONDS)
+    )
+
+    const totalStats =
+      year !== startYear &&
+      (await getOrganizationStatistics(
+        faculties,
+        new Date(startTime - (startYear - year) * YEAR_TO_MILLISECONDS),
+        new Date(startTime - (startYear - year - 1) * YEAR_TO_MILLISECONDS)
+      ))
+
+    return [
+      year,
+      _.merge(
+        _.mapValues(totalStats, total => ({ total })),
+        _.mapValues(accumulatedStats, accumulated => ({ accumulated }))
+      ),
+    ]
+  })
 
   const orgStats = await Promise.all(yearlyOrgStatPromises)
+
   const yearlyOrgStats = Object.fromEntries(orgStats)
   const [[, currentOrgStats], [, prevOrgStats]] = orgStats.reverse()
 
+  const defaultYearStats = _.chain(_.range(2017, startYear + 1))
+    .map(year => [year, { acc: 0, accStudents: 0 }])
+    .fromPairs()
+    .value()
+
   const getOrgYearlyStats = orgId =>
-    Object.entries(yearlyOrgStats).reduce((acc, [year, stats]) => {
-      const { credits, students } = getOrgStats(stats, orgId).accumulated
+    _.chain(yearlyOrgStats)
+      .mapValues(stats => {
+        const orgStats = getOrgStats(stats, orgId)
 
-      acc[year] = {
-        acc: credits,
-        accStudents: students,
-        total: credits,
-        totalStudents: students,
-      }
-
-      return acc
-    }, {})
+        return {
+          acc: orgStats.accumulated.aggregated.credits,
+          accStudents: orgStats.accumulated.aggregated.students,
+          total: orgStats.total?.aggregated?.credits,
+          totalStudents: orgStats.total?.aggregated?.students,
+        }
+      })
+      .defaults(defaultYearStats)
+      .value()
 
   /* Construct some helper maps */
   const facultyCodeToFaculty = faculties.reduce((res, curr) => {
@@ -313,6 +387,11 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     name: { en: 'Language Centre', fi: 'Kielikeskus', sv: 'Språkcentrum' },
   }
 
+  providerToProgramme['H930'] = {
+    code: 'H906',
+    name: { en: 'Language Centre', fi: 'Kielikeskus', sv: 'Språkcentrum' },
+  }
+
   const organizationCodeToOrganization = faculties.reduce((acc, org) => {
     acc[org.code] = org
     return acc
@@ -320,12 +399,27 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
 
   /* Calculate course level stats and group by providers */
   const coursesGroupedByProvider = Object.entries(
-    _.groupBy([..._.flatten(yearlyAccCredits), ..._.flatten(yearlyTotalCredits)], 'organizationcode')
+    _.groupBy(
+      [
+        ..._.flatten(yearlyAccCredits),
+        ..._.flatten(yearlyTotalCredits),
+        ..._.flatten(yearlyOpenUniAccCredits),
+        ..._.flatten(yearlyOpenUniTotalCredits),
+      ],
+      'organizationcode'
+    )
   ).reduce((acc, [organizationcode, courseCredits]) => {
     acc[organizationcode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
       (acc, [courseCode, yearlyInstances]) => {
-        acc[courseCode] = { yearly: {}, name: yearlyInstances[0].name }
-        const array = [2020, 2019, 2018, 2017]
+        acc[courseCode] = {
+          yearly: {},
+          name: yearlyInstances[0].name,
+          type: 'course',
+          code: courseCode,
+        }
+
+        const array = _.range(2017, startYear + 1)
+
         array.forEach(year => {
           acc[courseCode]['yearly'][year] = {}
           acc[courseCode]['yearly'][year]['acc'] = 0
@@ -333,6 +427,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
           acc[courseCode]['yearly'][year]['total'] = 0
           acc[courseCode]['yearly'][year]['totalStudents'] = 0
         })
+
         yearlyInstances.forEach(instance => {
           if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
 
@@ -362,13 +457,14 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     if (programme && programme.code) {
       const orgId = organizationCodeToOrganization[organizationcode]?.id
 
-      const { students: currentStudents, credits: current } = getOrgStats(currentOrgStats, orgId).accumulated
-      const { students: previousStudents, credits: previous } = getOrgStats(prevOrgStats, orgId).accumulated
+      const { students: currentStudents, credits: current } = getOrgStats(currentOrgStats, orgId).accumulated.aggregated
+      const { students: previousStudents, credits: previous } = getOrgStats(prevOrgStats, orgId).accumulated.aggregated
 
       const yearly = getOrgYearlyStats(orgId)
 
       acc[programme.code] = {
         type: 'programme',
+        code: programme.code,
         name: programme.name,
         drill: courses,
         yearly,
@@ -392,12 +488,15 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
         const orgId = organizationCodeToOrganization[facultyCode].id
 
         const { students: currentStudents, credits: current } = getOrgStats(currentOrgStats, orgId).accumulated
+          .aggregated
         const { students: previousStudents, credits: previous } = getOrgStats(prevOrgStats, orgId).accumulated
+          .aggregated
 
         const yearly = getOrgYearlyStats(orgId)
 
         acc[facultyCode] = {
           type: 'faculty',
+          code: facultyCode,
           drill: {},
           name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
           yearly,

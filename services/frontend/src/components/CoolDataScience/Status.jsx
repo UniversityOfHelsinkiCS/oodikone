@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
+import { Segment, Popup, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
@@ -64,10 +64,22 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
       signDisplay: 'always',
     })
 
-  const roundToPrecision = (value, precision) => Math.round(value * 10 ** precision) / 10 ** precision
+  const getDisplayValue = (value, denominator) => {
+    let displayValue
 
-  const getDisplayValue = (value, denominator) =>
-    showRelativeValues ? roundToPrecision(denominator === 0 ? 0 : value / denominator, 2) : value
+    if (denominator === 0) {
+      displayValue = value === 0 ? 0 : Infinity
+    } else if (showRelativeValues) {
+      displayValue = value / denominator
+    } else {
+      displayValue = value
+    }
+
+    return displayValue.toLocaleString('fi', {
+      minimumFractionDigits: showRelativeValues ? 2 : 0,
+      maximumFractionDigits: showRelativeValues ? 2 : 0,
+    })
+  }
 
   return (
     <Segment
@@ -94,7 +106,9 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
           overflowWrap: 'break-word',
         }}
       >
-        <span className="status-title">{title}</span>
+        <Popup position="bottom center" size="tiny" trigger={<span className="status-title">{title}</span>}>
+          {stats.code}
+        </Popup>
         <div style={{ margin: '10px 0' }}>
           <Icon
             style={{
@@ -115,11 +129,11 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
         </div>
       </div>
       {showYearlyValues && (
-        <div className="years">
+        <div className={`years item-type-${stats.type}`}>
           {_.orderBy(Object.entries(stats.yearly), ([y]) => y, ['desc']).map(([year, yearStats]) => {
             return (
               <span style={{ display: 'contents' }} className="year-row">
-                <b>
+                <b className="year-label">
                   {year}
                   {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
                 </b>
@@ -130,16 +144,13 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
                   </>
                 ) : (
                   <>
-                    <span
-                      className="year-value"
-                      // eslint-disable-next-line react/no-danger
-                      dangerouslySetInnerHTML={{
-                        __html: `${getDisplayValue(yearStats.acc, yearStats.accStudents)
-                          .toLocaleString('fi', { minimumFractionDigits: 2 })
-                          .replace(/,?0*$/, match => `<span class="decimals">${match}</span>`)}`,
-                      }}
-                    />
-                    <span className="unit">credits{showRelativeValues ? '/student' : ''}</span>
+                    <span className="year-value accumulated">
+                      {getDisplayValue(yearStats.acc, yearStats.accStudents)}
+                    </span>
+                    <span style={{ color: '#AAA', margin: '0 0.3em' }}>{yearStats.total !== undefined && '/'}</span>
+                    <span className="year-value total">
+                      {yearStats.total !== undefined && getDisplayValue(yearStats.total, yearStats.totalStudents)}
+                    </span>
                   </>
                 )}
               </span>

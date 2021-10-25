@@ -2,7 +2,6 @@ const {
   dbConnections: { sequelize },
 } = require('../database/connection')
 const { Studyright, StudyrightElement, ElementDetail } = require('../models')
-const { getUserElementDetails } = require('./userService')
 const moment = require('moment')
 const { redisClient } = require('../services/redis')
 const _ = require('lodash')
@@ -138,15 +137,6 @@ const getAllStudyrightElementsAndAssociations = async () => {
     studyright_elements = await redisClient.getAsync('studyright_elements')
   }
   return JSON.parse(studyright_elements)
-}
-
-const getStudyrightElementsAndAssociationsForUser = async username => {
-  const studyrightelementcodes = await getUserElementDetails(username)
-  if (studyrightelementcodes.length === 0) {
-    return []
-  }
-  const associations = await getAssociatedStudyrights(studyrightelementcodes)
-  return formatStudyrightElements(studyrightelementcodes, associations)
 }
 
 const getAllProgrammes = async () => {
@@ -324,21 +314,13 @@ const getFilteredAssociations = async codes => {
   return associations
 }
 
-const getUserAssociations = async userid => {
-  const codes = await getUserElementDetails(userid)
-  const associations = await getFilteredAssociations(codes)
-  return associations
-}
-
 module.exports = {
   byStudent,
   studentNumbersWithAllStudyRightElements,
   getAssociatedStudyrights,
   getAllStudyrightElementsAndAssociations,
-  getStudyrightElementsAndAssociationsForUser,
   getAssociations,
   getFilteredAssociations,
-  getUserAssociations,
   refreshAssociationsInRedis,
   getAllProgrammes,
   getAllElementDetails,

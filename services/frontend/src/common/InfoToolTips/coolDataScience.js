@@ -64,6 +64,8 @@ export default {
   
   Valinta "Näytä kalenterivuosittain" laskee kertymän kalenterivuoden alusta,
   eikä lukuvuoden alusta.
+
+  Valinta "Näytä suhteutettuna opiskelijoiden määrään" näyttää opintopistemäärät suhteutettuna kyseisen ajanjakson aikana kyseisen organisaation alaisuuteen kuuluvia kursseja suorittaineiden opiskelijoiden määrään. Tämä luku sisältää myös avoimen yliopiston opiskelijat.
   
   Kohdasta "Näytä päivänä" voi valita tarkastelupäivän, joka on oletusarvoisesti tämänhetkinen päivä.
   

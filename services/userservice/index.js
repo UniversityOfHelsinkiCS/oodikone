@@ -1,11 +1,12 @@
+require('express-async-errors')
 const express = require('express')
 const Sentry = require('@sentry/node')
 
 const User = require('./src/services/users')
 const AccessGroup = require('./src/services/accessgroups')
-const FacultyProgrammes = require('./src/services/facultyprogrammes')
 const { initializeDatabaseConnection } = require('./src/database/connection')
 const initializeSentry = require('./src/util/sentry')
+const errorMiddleware = require('./src/middlewares/errorMiddleware')
 
 initializeDatabaseConnection()
   .then(() => {
@@ -26,12 +27,6 @@ initializeDatabaseConnection()
       res.json(users.map(User.getUserData))
     })
 
-    app.get('/user/:uid', async (req, res) => {
-      const uid = req.params.uid
-      const user = await User.byUsername(uid)
-      res.json(User.getUserData(user))
-    })
-
     app.get('/user/:uid/user_data', async (req, res) => {
       const uid = req.params.uid
       const user = await User.byUsernameMinified(uid)
@@ -40,26 +35,12 @@ initializeDatabaseConnection()
       const faculties = user.faculty.map(({ faculty_code }) => faculty_code)
 
       res.json({
+        email: user.email,
+        full_name: user.full_name,
         roles,
         rights,
         faculties,
       })
-    })
-
-    app.get('/user/elementdetails/:username', async (req, res) => {
-      const username = req.params.username
-      const user = await User.byUsername(username)
-      const programmes = User.getUserProgrammes(user)
-      res.json(programmes)
-    })
-
-    app.get('/user/id/:id', async (req, res) => {
-      const id = req.params.id
-      const user = await User.byId(id)
-
-      console.log(JSON.stringify(user))
-
-      res.json(User.getUserData(user))
     })
 
     app.post('/login', async (req, res) => {
@@ -99,10 +80,10 @@ initializeDatabaseConnection()
     })
 
     app.post('/modifyaccess', async (req, res) => {
-      const { uid, accessgroups } = req.body
+      const { username, accessgroups } = req.body
       try {
-        await User.modifyRights(uid, accessgroups)
-        const user = await User.byId(uid)
+        await User.modifyRights(username, accessgroups)
+        const user = await User.byUsername(username)
         res.status(200).json(User.getUserData(user))
       } catch (e) {
         res.status(400).json({ e })
@@ -152,24 +133,7 @@ initializeDatabaseConnection()
       }
     })
 
-    app.get('/get_roles/:user', async (req, res) => {
-      const user = req.params.user
-      try {
-        const roles = await User.getRoles(user)
-        res.status(200).json(roles)
-      } catch (e) {
-        res.status(400).json({ e })
-      }
-    })
-
-    app.get('/faculty_programmes', async (req, res) => {
-      try {
-        const facultyProgrammes = await FacultyProgrammes.findAll()
-        res.status(200).json(facultyProgrammes)
-      } catch (e) {
-        res.status(400).json({ e })
-      }
-    })
+    app.use(errorMiddleware)
 
     const server = app.listen(port, () => console.log(`Userservice listening on port ${port}!`))
     process.on('SIGTERM', () => {
