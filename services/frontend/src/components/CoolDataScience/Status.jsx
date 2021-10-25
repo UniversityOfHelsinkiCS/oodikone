@@ -132,7 +132,7 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
         <div className={`years item-type-${stats.type}`}>
           {_.orderBy(Object.entries(stats.yearly), ([y]) => y, ['desc']).map(([year, yearStats]) => {
             return (
-              <span style={{ display: 'contents' }} className="year-row">
+              <span className="year-row">
                 <b className="year-label">
                   {year}
                   {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
@@ -140,6 +140,12 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
                 {stats.type === 'course' ? (
                   <>
                     <span className="year-value">{yearStats.accStudents}</span>
+                    {!!yearStats.totalStudents && (
+                      <>
+                        <span className="separator">{yearStats.totalStudents !== undefined && '/'}</span>
+                        <span className="year-value">{yearStats.totalStudents}</span>
+                      </>
+                    )}
                     <span className="unit">students</span>
                   </>
                 ) : (
@@ -147,7 +153,7 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
                     <span className="year-value accumulated">
                       {getDisplayValue(yearStats.acc, yearStats.accStudents)}
                     </span>
-                    <span style={{ color: '#AAA', margin: '0 0.3em' }}>{yearStats.total !== undefined && '/'}</span>
+                    <span className="separator">{yearStats.total !== undefined && '/'}</span>
                     <span className="year-value total">
                       {yearStats.total !== undefined && getDisplayValue(yearStats.total, yearStats.totalStudents)}
                     </span>
