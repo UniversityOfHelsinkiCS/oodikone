@@ -9,6 +9,7 @@
     "@sentry/browser": "^6.9.0",
     "@sentry/tracing": "^6.11.0",
     "axios": "^0.21.1",
+    "formik": "^2.2.9",
     "highcharts": "^9.1.2",
     "highcharts-custom-events": "^3.0.10",
     "history": "^4.10.1",
