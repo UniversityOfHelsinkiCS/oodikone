@@ -1,18 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  Divider,
-  Segment,
-  Button,
-  Popup,
-  Loader,
-  Icon,
-  Accordion,
-  Checkbox,
-  Message,
-  Form,
-  Breadcrumb,
-} from 'semantic-ui-react'
+import { Divider, Segment, Button, Popup, Loader, Icon, Checkbox, Message, Form, Breadcrumb } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
@@ -284,7 +272,7 @@ const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
   return (
     <>
       {children}
-      <Popup hoverable size="tiny" trigger={helpIcon} {...popupProps}>
+      <Popup hoverable size="tiny" trigger={helpIcon} {...popupProps} mouseEnterDelay={500}>
         <div>{tooltip}</div>
         <span style={{ color: '#2185d0', cursor: 'pointer' }} onClick={onOpenDetails}>
           Lue lisää...
@@ -297,7 +285,7 @@ const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
 const isValidDate = d => moment().diff(moment(d)) > 0
 
 const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
-  const { showYearlyValues, showByYear, showRelativeValues, showSettings, selectedDate } = settings
+  const { showYearlyValues, showByYear, showRelativeValues, selectedDate } = settings
   const DATE_FORMAT = 'DD.MM.YYYY'
 
   const changeSetting = (property, value) => {
@@ -310,108 +298,95 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
   }
 
   return (
-    <Accordion style={{ padding: 0, paddingTop: '10px', flex: 1 }}>
-      <Accordion.Title style={{ padding: 0, cursor: 'default' }} active={showSettings}>
-        <span style={{ cursor: 'pointer' }} onClick={() => changeSetting('showSettings', !showSettings)}>
-          <Icon name="setting" />
-          <span>Asetukset</span>
-        </span>
-      </Accordion.Title>
-      <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
-        <Segment style={{ display: 'flex', alignItems: 'stretch', padding: 0 }}>
-          <div
-            style={{
-              width: '10px',
-              height: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              background: 'red',
-              transform: 'rotateY(0deg) rotate(45deg)',
-              position: 'absolute',
-              top: '-6px',
-              left: '35px',
-              border: '1px solid #dededf',
-              borderRight: 'none',
-              borderBottom: 'none',
-              backgroundColor: 'white',
-            }}
+    <div style={{ display: 'flex', alignItems: 'stretch', padding: 0, flexDirection: 'column' }}>
+      <div
+        style={{
+          width: '10px',
+          height: '10px',
+          display: 'flex',
+          alignItems: 'center',
+          background: 'red',
+          transform: 'rotateY(0deg) rotate(45deg)',
+          position: 'absolute',
+          top: '-6px',
+          left: '35px',
+          border: '1px solid #dededf',
+          borderRight: 'none',
+          borderBottom: 'none',
+          backgroundColor: 'white',
+        }}
+      />
+      <div
+        style={{
+          borderRight: '1px solid rgba(34,36,38,.15)',
+          padding: '1em',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <WithHelpTooltip tooltip={actionTooltips.showYearlyValues.short} onOpenDetails={onOpenDetails}>
+          <Checkbox
+            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+            label={actionTooltips.showYearlyValues.label}
+            checked={showYearlyValues}
+            onChange={() => changeSetting('showYearlyValues', !showYearlyValues)}
           />
-          <div
-            style={{
-              borderRight: '1px solid rgba(34,36,38,.15)',
-              padding: '1em',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <WithHelpTooltip tooltip={actionTooltips.showYearlyValues.short} onOpenDetails={onOpenDetails}>
-              <Checkbox
-                style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-                label={actionTooltips.showYearlyValues.label}
-                checked={showYearlyValues}
-                onChange={() => changeSetting('showYearlyValues', !showYearlyValues)}
-              />
+        </WithHelpTooltip>
+      </div>
+      <div
+        style={{
+          borderRight: '1px solid rgba(34,36,38,.15)',
+          padding: '1em',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <WithHelpTooltip tooltip={actionTooltips.showByYear.short} onOpenDetails={onOpenDetails}>
+          <Checkbox
+            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+            label={actionTooltips.showByYear.label}
+            checked={showByYear}
+            onChange={() => changeSetting('showByYear', !showByYear)}
+          />
+        </WithHelpTooltip>
+      </div>
+      <div
+        style={{
+          borderRight: '1px solid rgba(34,36,38,.15)',
+          padding: '1em',
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <WithHelpTooltip tooltip={actionTooltips.showRelativeValues.short} onOpenDetails={onOpenDetails}>
+          <Checkbox
+            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+            label={actionTooltips.showRelativeValues.label}
+            checked={showRelativeValues}
+            onChange={() => changeSetting('showRelativeValues', !showRelativeValues)}
+          />
+        </WithHelpTooltip>
+      </div>
+      <div style={{ padding: '1em', display: 'flex', alignItems: 'center' }}>
+        <Form>
+          <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
+            <WithHelpTooltip tooltip={actionTooltips.showCountingFrom.short} onOpenDetails={onOpenDetails}>
+              <span style={{ fontSize: '0.9em' }}>{actionTooltips.showCountingFrom.label}</span>
             </WithHelpTooltip>
-          </div>
-          <div
-            style={{
-              borderRight: '1px solid rgba(34,36,38,.15)',
-              padding: '1em',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <WithHelpTooltip tooltip={actionTooltips.showByYear.short} onOpenDetails={onOpenDetails}>
-              <Checkbox
-                style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-                label={actionTooltips.showByYear.label}
-                checked={showByYear}
-                onChange={() => changeSetting('showByYear', !showByYear)}
-              />
-            </WithHelpTooltip>
-          </div>
-          <div
-            style={{
-              borderRight: '1px solid rgba(34,36,38,.15)',
-              padding: '1em',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <WithHelpTooltip tooltip={actionTooltips.showRelativeValues.short} onOpenDetails={onOpenDetails}>
-              <Checkbox
-                style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-                label={actionTooltips.showRelativeValues.label}
-                checked={showRelativeValues}
-                onChange={() => changeSetting('showRelativeValues', !showRelativeValues)}
-              />
-            </WithHelpTooltip>
-          </div>
-          <div style={{ padding: '1em', display: 'flex', alignItems: 'center' }}>
-            <Form>
-              <Form.Field
-                error={!isValidDate(selectedDate)}
-                style={{ display: 'flex', alignItems: 'center', marginLeft: '1em' }}
-              >
-                <WithHelpTooltip tooltip={actionTooltips.showCountingFrom.short} onOpenDetails={onOpenDetails}>
-                  <span style={{ fontSize: '0.9em' }}>{actionTooltips.showCountingFrom.label}</span>
-                </WithHelpTooltip>
-                <Datetime
-                  className="status-date-time-input"
-                  dateFormat={DATE_FORMAT}
-                  timeFormat={false}
-                  closeOnSelect
-                  value={moment(selectedDate)}
-                  locale="fi"
-                  isValidDate={isValidDate}
-                  onChange={value => changeSetting('selectedDate', value)}
-                />
-              </Form.Field>
-            </Form>
-          </div>
-        </Segment>
-      </Accordion.Content>
-    </Accordion>
+            <Datetime
+              className="status-date-time-input"
+              dateFormat={DATE_FORMAT}
+              timeFormat={false}
+              closeOnSelect
+              value={moment(selectedDate)}
+              locale="fi"
+              isValidDate={isValidDate}
+              onChange={value => changeSetting('selectedDate', value)}
+            />
+          </Form.Field>
+        </Form>
+      </div>
+    </div>
   )
 }
 
@@ -543,10 +518,42 @@ const Status = () => {
     />
   )
 
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }} ref={moreDetailsRef}>
         <h2 style={{ flexGrow: 1 }}>Koulutusohjelmien tuottamat opintopisteet</h2>
+        <Popup
+          trigger={
+            <Button>
+              <Icon name="settings" /> Asetukset
+            </Button>
+          }
+          position="bottom right"
+          on="click"
+          wide="very"
+          open={settingsOpen}
+          onOpen={() => setSettingsOpen(true)}
+          onClose={() => {
+            // Close the popup only after the event has had a chance to propagate.
+            setTimeout(() => setSettingsOpen(false), 0)
+          }}
+          style={{ padding: '0', paddingBottom: '0.5em', maxHeight: '80vh', overflowY: 'auto' }}
+        >
+          <StatusSettings
+            settings={settings}
+            onSettingsChange={setSettings}
+            onOpenDetails={() => {
+              window.scrollTo({
+                top: moreDetailsRef.current.offsetTop - 10,
+                behavior: 'smooth',
+              })
+
+              setUsageDetailsOpen(true)
+            }}
+          />
+        </Popup>
         <Popup
           trigger={
             <Button>
@@ -598,19 +605,6 @@ const Status = () => {
       ) : (
         <Loader active={loading} />
       )}
-
-      <StatusSettings
-        settings={settings}
-        onSettingsChange={setSettings}
-        onOpenDetails={() => {
-          window.scrollTo({
-            top: moreDetailsRef.current.offsetTop - 10,
-            behavior: 'smooth',
-          })
-
-          setUsageDetailsOpen(true)
-        }}
-      />
     </>
   )
 }
