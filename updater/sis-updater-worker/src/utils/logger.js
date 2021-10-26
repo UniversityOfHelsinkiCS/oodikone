@@ -2,12 +2,12 @@ const winston = require('winston')
 const { isDev } = require('../config')
 const { combine, timestamp, printf, splat } = winston.format
 
-const transports = []
+let transports = []
 
 if (isDev) {
-  const devFormat = printf(({ level, message, timestamp, ...rest }) => {
-    return `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
-  })
+  const devFormat = printf(
+    ({ level, message, timestamp, ...rest }) => `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
+  )
 
   transports.push(
     new winston.transports.Console({
@@ -15,9 +15,7 @@ if (isDev) {
       format: combine(splat(), timestamp(), devFormat),
     })
   )
-}
-
-if (!isDev) {
+} else {
   const levels = {
     error: 0,
     warn: 1,
@@ -34,7 +32,6 @@ if (!isDev) {
       ...rest,
     })
   )
-
   transports.push(new winston.transports.Console({ format: prodFormat }))
 }
 
