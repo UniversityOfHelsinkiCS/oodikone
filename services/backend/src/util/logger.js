@@ -1,15 +1,10 @@
 const winston = require('winston')
-const path = require('path')
-const { isProduction, PWD } = require('../conf-backend')
-
+const { isDev } = require('../conf-backend')
 const { combine, timestamp, printf, splat } = winston.format
 
-const transports = []
-// Write logfile to docker containers pwd
-const filename = path.join(PWD, 'debug.log')
-transports.push(new winston.transports.File({ filename, level: 'debug' }))
+let transports = []
 
-if (!isProduction) {
+if (isDev) {
   const devFormat = printf(
     ({ level, message, timestamp, ...rest }) => `${timestamp} ${level}: ${message} ${JSON.stringify(rest)}`
   )
@@ -20,9 +15,7 @@ if (!isProduction) {
       format: combine(splat(), timestamp(), devFormat),
     })
   )
-}
-
-if (isProduction) {
+} else {
   const levels = {
     error: 0,
     warn: 1,
@@ -40,7 +33,7 @@ if (isProduction) {
     })
   )
 
-  transports.push(new winston.transports.Console({ format: prodFormat, level: 'info' }))
+  transports.push(new winston.transports.Console({ format: prodFormat }))
 }
 
 const logger = winston.createLogger({ transports })
