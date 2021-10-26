@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { connect } from 'react-redux'
-import { Segment, Popup, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
+import { Segment, Popup, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form, Breadcrumb } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
 
+import { useHistory, useLocation } from 'react-router-dom'
 import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
@@ -175,11 +176,13 @@ const Status = ({ getStatusDispatch, data, loading }) => {
   const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
   const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
   const [showRelativeValues, setShowRelativeValues] = useLocalStorage('showRelativeValues', false)
-  const [drillStack, setDrillStack] = useState([])
   const [showSettings, setShowSettings] = useState(true)
   const [selectedDate, setSelectedDate] = useState(moment())
-  const [codes, setCodes] = useState([])
+  const history = useHistory()
+  const location = useLocation()
   const { CoolDataScience } = InfoToolTips
+
+  const drillStack = location.state?.drillStack ?? []
 
   const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
 
@@ -188,21 +191,6 @@ const Status = ({ getStatusDispatch, data, loading }) => {
       getStatusDispatch({ date: selectedDate.valueOf(), showByYear })
     }
   }, [selectedDate, showByYear])
-
-  useEffect(() => {
-    if (codes.length > 0) {
-      const updatedDrillStack = codes.reduce((acc, code) => {
-        const drilled = data[code]
-        // check if the code is on first level of drilldown
-        if (drilled) acc.push(drilled.drill)
-        // if not on first level then use the previous object in array
-        // this might be source of bugs but its the best I could come up with
-        else if (acc.length > 0 && acc[0][code]) acc.push(acc[0][code].drill)
-        return acc
-      }, [])
-      setDrillStack(updatedDrillStack)
-    }
-  }, [data])
 
   const handleShowYearlyValuesToggled = () => {
     const yearlyValues = showYearlyValues
@@ -221,21 +209,79 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     setShowRelativeValues(!showRelativeValues)
   }
 
-  const pushToDrillStack = (values, code) => {
-    const updatedCodes = [...codes].concat(code)
-    const updatedDrillStack = [...drillStack].concat(values)
-    setCodes(updatedCodes)
-    setDrillStack(updatedDrillStack)
+  const pushToDrillStack = code => {
+    history.push('/trends/status', {
+      drillStack: [...drillStack, code],
+    })
+
     sendAnalytics('S Drilldown clicked', 'Status')
   }
 
   const popFromDrillStack = () => {
-    const updatedDrillStack = _.dropRight([...drillStack], 1)
-    const updatedCodes = _.dropRight([...codes], 1)
-    setCodes(updatedCodes)
-    setDrillStack(updatedDrillStack)
+    history.goBack()
     sendAnalytics('S Drillup clicked', 'Status')
   }
+
+  const drilledData = useMemo(
+    () =>
+      _.chain(drillStack)
+        .reduce((data, code) => data && _.values(data).find(item => item.code === code)?.drill, data)
+        .defaultTo({})
+        .values()
+        .value(),
+    [data, drillStack]
+  )
+
+  const breadcrumb = useMemo(() => {
+    const stack = _.chain(drillStack)
+      .reduce(
+        ([stack, data], code) => {
+          let content = code
+          let next = null
+
+          if (data) {
+            const entry = data[code]
+
+            if (entry) {
+              content = getTextIn(entry.name)
+              next = entry.drill
+            }
+          }
+
+          const item = {
+            key: code,
+            content,
+            link: !!next,
+            active: !next,
+            onClick: () => {
+              history.push('/trends/status', {
+                drillStack: [...stack.map(({ key }) => key), code],
+              })
+            },
+          }
+
+          return [[...stack, item], next]
+        },
+        [[], data]
+      )
+      .value()[0]
+
+    const hy = {
+      key: '',
+      content: getTextIn({
+        fi: 'Helsingin Yliopisto',
+        en: 'University of Helsinki',
+        sv: 'Helsingfors universitet',
+      }),
+      link: true,
+      onClick: () =>
+        history.push('/trends/status', {
+          drillStack: [],
+        }),
+    }
+
+    return [hy, ...stack]
+  }, [data, drillStack])
 
   const renderSettings = () => {
     return (
@@ -322,7 +368,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     )
 
   const orderedAbsDiffs = _.orderBy(
-    Object.values(_.last(drillStack) || data).map(({ current, currentStudents, previous, previousStudents }) => {
+    Object.values(drilledData).map(({ current, currentStudents, previous, previousStudents }) => {
       return Math.abs(
         Math.floor(
           (getP(
@@ -342,9 +388,14 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     <>
       <h2>Koulutusohjelmien tuottamat opintopisteet</h2>
       <DrilldownMessage />
-      <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px' }}>
+      <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px', alignItems: 'center' }}>
+        <Breadcrumb icon="right angle" sections={breadcrumb} size="large" />
         {drillStack.length > 0 && (
-          <Icon onClick={popFromDrillStack} style={{ fontSize: '40px', cursor: 'pointer' }} name="arrow left" />
+          <Icon
+            onClick={popFromDrillStack}
+            style={{ cursor: 'pointer', color: 'rgba(0,0,0,.28)', marginLeft: '0.4em', marginTop: '-0.17em' }}
+            name="arrow left"
+          />
         )}
       </div>
       <div
@@ -357,12 +408,12 @@ const Status = ({ getStatusDispatch, data, loading }) => {
         }}
       >
         {_.orderBy(
-          Object.entries(_.last(drillStack) || data),
+          Object.entries(drilledData),
           ([, { current, previous, currentStudents, previousStudents }]) =>
             getP(current || currentStudents, previous || previousStudents), // oh god<r
           ['desc']
         ).map(([code, stats]) => {
-          const handleClick = () => pushToDrillStack(stats.drill, code)
+          const handleClick = () => pushToDrillStack(stats.code)
 
           return (
             <StatusContainer
