@@ -1,6 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { connect } from 'react-redux'
-import { Segment, Popup, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form, Breadcrumb } from 'semantic-ui-react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import {
+  Divider,
+  Segment,
+  Button,
+  Popup,
+  Loader,
+  Icon,
+  Accordion,
+  Checkbox,
+  Message,
+  Form,
+  Breadcrumb,
+} from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
@@ -26,6 +38,44 @@ const mapValueToRange = (x, min1, max1, min2, max2) => {
   if (x < min1) return min2
   if (x > max1) return max2
   return ((x - min1) * (max2 - min2)) / (max1 - min1) + min2
+}
+
+const actionTooltips = {
+  showByYear: {
+    label: 'Näytä kalenterivuosittain',
+    short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta',
+    long: `
+      Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
+      Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
+    `,
+  },
+
+  showYearlyValues: {
+    label: 'Näytä edelliset vuodet',
+    short: 'Näytä tilastot aiemmille vuosille',
+    long: 'Näyttää tilastot vuodesta 2017 eteenpäin. Huomaa, että nykyisen vuoden arvo vuosilistauksessa riippuu valinnastasi "Näytä kalenterivuosittain" -kohdassa.',
+  },
+
+  showRelativeValues: {
+    label: 'Näytä suhteutettuna opiskelijoiden määrään',
+    short: 'Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa',
+    long: `
+      Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.
+      Opiskelijoiden määrä perustuu ajanjaksolla kyseisen organisaation alaisista kursseista suoritusmerkintöjä saaneiden opiskelijoiden määrään.
+      Luku siis sisältää muutkin kuin kyseiseen ohjelman tai osaston opinto-oikeuden omaavat opiskelijat.
+    `,
+  },
+
+  showCountingFrom: {
+    label: 'Näytä päivänä',
+    short: 'Valitse päivä johon asti kertyneet tilastot näytetään',
+    long: `
+      Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
+      Esimerkiksi "Näytä kalenterivuosittain" valinnan ollessa pois päältä,
+      lasketaan kertyneet tilastot (vrt. lukuvuosien kokonaistilastot) kunkin lukuvuoden alusta
+      tätä päivämäärää vastaavaan päivään kyseisenä lukuvuonna.
+    `,
+  },
 }
 
 const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, showRelativeValues, showByYear }) => {
@@ -115,6 +165,8 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
             style={{
               color: getColor(change),
               transform: `rotateZ(${-mapValueToRange(change * 100, min1, max1, -45, 45)}deg)`,
+              transitionProperty: 'transform',
+              transitionDuration: '200ms',
             }}
             size="huge"
             name="arrow right"
@@ -169,45 +221,245 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
   )
 }
 
-const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
+const StatusContent = ({ data, settings, onDrill }) => {
+  const { showByYear, showRelativeValues, showYearlyValues } = settings
 
-const Status = ({ getStatusDispatch, data, loading }) => {
+  const orderedAbsDiffs = _.chain(data)
+    .map(({ current, currentStudents, previous, previousStudents }) => {
+      const currentValue = showRelativeValues ? current / currentStudents : current
+      const previousValue = showRelativeValues ? previous / previousStudents : previous
+      return Math.abs(Math.floor((getP(currentValue, previousValue) - 1) * 1000) / 10)
+    })
+    .orderBy()
+    .value()
+
+  const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
+
+  return (
+    <>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, 240px)',
+          gridTemplateRows: 'repeat(auto-fill) 20px',
+          gridGap: '20px',
+          justifyContent: 'center',
+        }}
+      >
+        {_.orderBy(
+          data,
+          ({ current, previous, currentStudents, previousStudents }) =>
+            getP(current || currentStudents, previous || previousStudents), // oh god<r
+          ['desc']
+        ).map(stats => {
+          const handleClick = () => onDrill(stats.code)
+
+          return (
+            <StatusContainer
+              key={stats.code}
+              stats={stats}
+              handleClick={handleClick}
+              showRelativeValues={showRelativeValues}
+              showYearlyValues={showYearlyValues}
+              min1={-medianDiff * 2}
+              max1={medianDiff * 2}
+              showByYear={showByYear}
+            />
+          )
+        })}
+      </div>
+    </>
+  )
+}
+
+const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
+  const helpIcon = (
+    <Icon style={{ marginLeft: '0.3em', marginTop: '-0.2em', color: '#888' }} name="question circle outline" />
+  )
+
+  const popupProps = _.defaults(rest, {
+    position: 'bottom center',
+  })
+
+  return (
+    <>
+      {children}
+      <Popup hoverable size="tiny" trigger={helpIcon} {...popupProps}>
+        <div>{tooltip}</div>
+        <span style={{ color: '#2185d0', cursor: 'pointer' }} onClick={onOpenDetails}>
+          Lue lisää...
+        </span>
+      </Popup>
+    </>
+  )
+}
+
+const isValidDate = d => moment().diff(moment(d)) > 0
+
+const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
+  const { showYearlyValues, showByYear, showRelativeValues, showSettings, selectedDate } = settings
   const DATE_FORMAT = 'DD.MM.YYYY'
-  const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
-  const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
-  const [showRelativeValues, setShowRelativeValues] = useLocalStorage('showRelativeValues', false)
-  const [showSettings, setShowSettings] = useState(true)
-  const [selectedDate, setSelectedDate] = useState(moment())
+
+  const changeSetting = (property, value) => {
+    sendAnalytics(`S Set setting "${property}" to ${value}`, 'Status')
+
+    onSettingsChange({
+      ...settings,
+      [property]: value,
+    })
+  }
+
+  return (
+    <Accordion style={{ padding: 0, paddingTop: '10px', flex: 1 }}>
+      <Accordion.Title style={{ padding: 0, cursor: 'default' }} active={showSettings}>
+        <span style={{ cursor: 'pointer' }} onClick={() => changeSetting('showSettings', !showSettings)}>
+          <Icon name="setting" />
+          <span>Asetukset</span>
+        </span>
+      </Accordion.Title>
+      <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
+        <Segment style={{ display: 'flex', alignItems: 'stretch', padding: 0 }}>
+          <div
+            style={{
+              width: '10px',
+              height: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              background: 'red',
+              transform: 'rotateY(0deg) rotate(45deg)',
+              position: 'absolute',
+              top: '-6px',
+              left: '35px',
+              border: '1px solid #dededf',
+              borderRight: 'none',
+              borderBottom: 'none',
+              backgroundColor: 'white',
+            }}
+          />
+          <div
+            style={{
+              borderRight: '1px solid rgba(34,36,38,.15)',
+              padding: '1em',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <WithHelpTooltip tooltip={actionTooltips.showYearlyValues.short} onOpenDetails={onOpenDetails}>
+              <Checkbox
+                style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+                label={actionTooltips.showYearlyValues.label}
+                checked={showYearlyValues}
+                onChange={() => changeSetting('showYearlyValues', !showYearlyValues)}
+              />
+            </WithHelpTooltip>
+          </div>
+          <div
+            style={{
+              borderRight: '1px solid rgba(34,36,38,.15)',
+              padding: '1em',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <WithHelpTooltip tooltip={actionTooltips.showByYear.short} onOpenDetails={onOpenDetails}>
+              <Checkbox
+                style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+                label={actionTooltips.showByYear.label}
+                checked={showByYear}
+                onChange={() => changeSetting('showByYear', !showByYear)}
+              />
+            </WithHelpTooltip>
+          </div>
+          <div
+            style={{
+              borderRight: '1px solid rgba(34,36,38,.15)',
+              padding: '1em',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <WithHelpTooltip tooltip={actionTooltips.showRelativeValues.short} onOpenDetails={onOpenDetails}>
+              <Checkbox
+                style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+                label={actionTooltips.showRelativeValues.label}
+                checked={showRelativeValues}
+                onChange={() => changeSetting('showRelativeValues', !showRelativeValues)}
+              />
+            </WithHelpTooltip>
+          </div>
+          <div style={{ padding: '1em', display: 'flex', alignItems: 'center' }}>
+            <Form>
+              <Form.Field
+                error={!isValidDate(selectedDate)}
+                style={{ display: 'flex', alignItems: 'center', marginLeft: '1em' }}
+              >
+                <WithHelpTooltip tooltip={actionTooltips.showCountingFrom.short} onOpenDetails={onOpenDetails}>
+                  <span style={{ fontSize: '0.9em' }}>{actionTooltips.showCountingFrom.label}</span>
+                </WithHelpTooltip>
+                <Datetime
+                  className="status-date-time-input"
+                  dateFormat={DATE_FORMAT}
+                  timeFormat={false}
+                  closeOnSelect
+                  value={moment(selectedDate)}
+                  locale="fi"
+                  isValidDate={isValidDate}
+                  onChange={value => changeSetting('selectedDate', value)}
+                />
+              </Form.Field>
+            </Form>
+          </div>
+        </Segment>
+      </Accordion.Content>
+    </Accordion>
+  )
+}
+
+const getDefaultSettings = () => ({
+  showYearlyValues: true,
+  showByYear: false,
+  showRelativeValues: false,
+  showSettings: true,
+  selectedDate: null,
+})
+
+const Status = () => {
+  const [explicitSettings, setSettings] = useLocalStorage('trendsStatusSettings', {})
+  const [usageDetailsOpen, setUsageDetailsOpen] = useState(false)
+  const moreDetailsRef = useRef(null)
   const history = useHistory()
   const location = useLocation()
-  const { CoolDataScience } = InfoToolTips
 
   const drillStack = location.state?.drillStack ?? []
 
-  const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
+  const data = useSelector(state => state.coolDataScience.data.status)
+  const loading = useSelector(state => state.coolDataScience.pending.status)
+  const dispatch = useDispatch()
+
+  const settings = useMemo(() => _.defaults(explicitSettings, getDefaultSettings()), [explicitSettings])
+
+  const { CoolDataScience } = InfoToolTips
 
   useEffect(() => {
-    if (selectedDate && isValidDate(selectedDate)) {
-      getStatusDispatch({ date: selectedDate.valueOf(), showByYear })
+    const { selectedDate, showByYear } = settings
+
+    let date
+
+    if (!selectedDate) {
+      date = moment().valueOf()
+    } else if (isValidDate(selectedDate)) {
+      date = moment(selectedDate).valueOf()
+    } else {
+      return
     }
-  }, [selectedDate, showByYear])
 
-  const handleShowYearlyValuesToggled = () => {
-    const yearlyValues = showYearlyValues
-    setShowYearlyValues(!showYearlyValues)
-    sendAnalytics(`S Show yearly values toggle ${!yearlyValues ? 'on' : 'off'}`, 'Status')
-  }
-
-  const handleShowByYearToggled = () => {
-    const byYear = showByYear
-    setShowByYear(!showByYear)
-    sendAnalytics(`S Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
-  }
-
-  const handleShowRelativeValuesChanged = () => {
-    sendAnalytics(`S Show relative values toggle ${!showRelativeValues ? 'on' : 'off'}`)
-    setShowRelativeValues(!showRelativeValues)
-  }
+    dispatch(
+      getStatus({
+        date,
+        showByYear,
+      })
+    )
+  }, [settings.selectedDate, settings.showByYear])
 
   const pushToDrillStack = code => {
     history.push('/trends/status', {
@@ -216,21 +468,6 @@ const Status = ({ getStatusDispatch, data, loading }) => {
 
     sendAnalytics('S Drilldown clicked', 'Status')
   }
-
-  const popFromDrillStack = () => {
-    history.goBack()
-    sendAnalytics('S Drillup clicked', 'Status')
-  }
-
-  const drilledData = useMemo(
-    () =>
-      _.chain(drillStack)
-        .reduce((data, code) => data && _.values(data).find(item => item.code === code)?.drill, data)
-        .defaultTo({})
-        .values()
-        .value(),
-    [data, drillStack]
-  )
 
   const breadcrumb = useMemo(() => {
     const stack = _.chain(drillStack)
@@ -255,7 +492,7 @@ const Status = ({ getStatusDispatch, data, loading }) => {
             active: !next,
             onClick: () => {
               history.push('/trends/status', {
-                drillStack: [...stack.map(({ key }) => key), code],
+                drillStack: [...stack.map(({ key }) => key).splice(1), code],
               })
             },
           }
@@ -283,72 +520,19 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     return [hy, ...stack]
   }, [data, drillStack])
 
-  const renderSettings = () => {
-    return (
-      <Accordion style={{ padding: 0, paddingTop: '10px', flex: 1 }}>
-        <Accordion.Title style={{ padding: 0, cursor: 'default' }} active={showSettings}>
-          <span style={{ cursor: 'pointer' }} onClick={() => setShowSettings(!showSettings)}>
-            <Icon name="setting" />
-            <span>Asetukset</span>
-          </span>
-        </Accordion.Title>
-        <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
-          <Segment style={{ display: 'flex', alignItems: 'center' }}>
-            <div
-              style={{
-                width: '10px',
-                height: '10px',
-                background: 'red',
-                transform: 'rotateY(0deg) rotate(45deg)',
-                position: 'absolute',
-                top: '-6px',
-                left: '35px',
-                border: '1px solid #dededf',
-                borderRight: 'none',
-                borderBottom: 'none',
-                backgroundColor: 'white',
-              }}
-            />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä edelliset vuodet"
-              onChange={handleShowYearlyValuesToggled}
-              checked={showYearlyValues}
-            />
-            <VerticalLine />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä kalenterivuosittain"
-              onChange={handleShowByYearToggled}
-              checked={showByYear}
-            />
-            <VerticalLine />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä suhteutettuna opiskelijoiden määrään"
-              onChange={handleShowRelativeValuesChanged}
-              checked={showRelativeValues}
-            />
-            <VerticalLine />
-            <Form>
-              <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.9em' }}>Näytä päivänä:</span>
-                <Datetime
-                  className="status-date-time-input"
-                  dateFormat={DATE_FORMAT}
-                  timeFormat={false}
-                  closeOnSelect
-                  value={selectedDate}
-                  locale="fi"
-                  isValidDate={isValidDate}
-                  onChange={setSelectedDate}
-                />
-              </Form.Field>
-            </Form>
-          </Segment>
-        </Accordion.Content>
-      </Accordion>
-    )
+  const drilledData = useMemo(
+    () =>
+      _.chain(drillStack)
+        .reduce((data, code) => data && _.values(data).find(item => item.code === code)?.drill, data)
+        .defaultTo({})
+        .values()
+        .value(),
+    [data, drillStack]
+  )
+
+  const popFromDrillStack = () => {
+    history.goBack()
+    sendAnalytics('S Drillup clicked', 'Status')
   }
 
   const DrilldownMessage = () => (
@@ -359,34 +543,44 @@ const Status = ({ getStatusDispatch, data, loading }) => {
     />
   )
 
-  if (!data || loading)
-    return (
-      <Segment style={{ padding: '40px' }} textAlign="center">
-        <Dimmer inverted active />
-        <Loader active={loading} />
-      </Segment>
-    )
-
-  const orderedAbsDiffs = _.orderBy(
-    Object.values(drilledData).map(({ current, currentStudents, previous, previousStudents }) => {
-      return Math.abs(
-        Math.floor(
-          (getP(
-            showRelativeValues ? current / currentStudents : current,
-            showRelativeValues ? previous / previousStudents : previous
-          ) -
-            1) *
-            1000
-        ) / 10
-      )
-    })
-  )
-
-  const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
-
   return (
     <>
-      <h2>Koulutusohjelmien tuottamat opintopisteet</h2>
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }} ref={moreDetailsRef}>
+        <h2 style={{ flexGrow: 1 }}>Koulutusohjelmien tuottamat opintopisteet</h2>
+        <Popup
+          trigger={
+            <Button>
+              <Icon name="question circle" /> Käyttöohje
+            </Button>
+          }
+          position="bottom right"
+          on="click"
+          wide="very"
+          open={usageDetailsOpen}
+          onOpen={() => setUsageDetailsOpen(true)}
+          onClose={() => setUsageDetailsOpen(false)}
+          style={{ padding: '0', paddingBottom: '0.5em', maxHeight: '80vh', overflowY: 'auto' }}
+        >
+          <div style={{ padding: '1em' }}>
+            {
+              // eslint-disable-next-line react/no-children-prop
+              <ReactMarkdown children={CoolDataScience.status} escapeHtml={false} />
+            }
+          </div>
+          {_.toPairs(actionTooltips).map(([key, { label, long }]) => (
+            <div key={key}>
+              <Divider />
+              <div style={{ padding: '0 1em' }}>
+                <b>
+                  Valinta "<i>{label}</i>"
+                </b>
+                <div style={{ margin: '0.5em' }}>{long}</div>
+              </div>
+            </div>
+          ))}
+        </Popup>
+      </div>
+
       <DrilldownMessage />
       <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px', alignItems: 'center' }}>
         <Breadcrumb icon="right angle" sections={breadcrumb} size="large" />
@@ -398,51 +592,27 @@ const Status = ({ getStatusDispatch, data, loading }) => {
           />
         )}
       </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 240px)',
-          gridTemplateRows: 'repeat(auto-fill) 20px',
-          gridGap: '20px',
-          justifyContent: 'center',
-        }}
-      >
-        {_.orderBy(
-          Object.entries(drilledData),
-          ([, { current, previous, currentStudents, previousStudents }]) =>
-            getP(current || currentStudents, previous || previousStudents), // oh god<r
-          ['desc']
-        ).map(([code, stats]) => {
-          const handleClick = () => pushToDrillStack(stats.code)
 
-          return (
-            <StatusContainer
-              key={code}
-              stats={stats}
-              handleClick={handleClick}
-              showRelativeValues={showRelativeValues}
-              showYearlyValues={showYearlyValues}
-              min1={-medianDiff * 2}
-              max1={medianDiff * 2}
-              showByYear={showByYear}
-            />
-          )
-        })}
-      </div>
-      {renderSettings()}
-      <Message>
-        {
-          // eslint-disable-next-line react/no-children-prop
-          <ReactMarkdown children={CoolDataScience.status} escapeHtml={false} />
-        }
-      </Message>
+      {data && !loading ? (
+        <StatusContent settings={settings} onDrill={pushToDrillStack} data={drilledData} />
+      ) : (
+        <Loader active={loading} />
+      )}
+
+      <StatusSettings
+        settings={settings}
+        onSettingsChange={setSettings}
+        onOpenDetails={() => {
+          window.scrollTo({
+            top: moreDetailsRef.current.offsetTop - 10,
+            behavior: 'smooth',
+          })
+
+          setUsageDetailsOpen(true)
+        }}
+      />
     </>
   )
 }
 
-const mapStateToProps = ({ coolDataScience }) => ({
-  data: coolDataScience.data.status,
-  loading: coolDataScience.pending.status,
-})
-
-export default connect(mapStateToProps, { getStatusDispatch: getStatus })(Status)
+export default Status
