@@ -133,7 +133,7 @@ const NavigationBar = props => {
   )
 
   return (
-    <Menu stackable fluid style={{ overflow: 'auto' }}>
+    <Menu data-cy="navBar" stackable fluid style={{ overflow: 'auto' }}>
       {renderHome()}
       {renderNavigationRoutes()}
       {renderUserMenu()}
