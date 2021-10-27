@@ -19,16 +19,28 @@ export default {
 
   X-akselin skaalaa voi säätää harmaista painikkeista ”1m”, ”3m”, ”6m”, ”YTD”, ”1y” ja ”ALL” tai kuvaajan alla olevan sinisen näkymän harmaita ”kahvoja” siirtämällä.
   Y-akselin skaalaa voi säätää harmaista painikkeista ”small” ”medium” ja "large”`,
-  CreditStatistics: `**Opintopistekertymä**
+  CreditStatistics: `
+  **Credits gained**
+
+  Taulukko kertoo opintopistekertymän valitulle opiskelijapopulaatiolle. Opintopisteluokat on suhteutettu tarkasteltavan populaation aloitusvuoteen. 
+  Ylin luokka kertoo siksi aina tavoiteajassa etenevien määrän ja suhteellisen osuuden. 
   
-  Taulukon rivit skaalautuvat valitun tarkastelujakson mukaan.
-  Jos tarkastelujaksoksi valitsee 12 kuukautta, on ylin kategoria 55 opintopistettä tai yli, eli opiskelija etenee tavoiteajassa.
-  Taulukosta näkee silmäyksellä tavoiteajassa etenevät (ylin kategoria) ja esim. nollasuorittajat.
-  
-  **Huom! nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, ellei heitä ole erikseen suodatettu populaatiosta pois.**
-  
+  Huom! nollasuorittajissa on mukana myös poissaolevaksi ilmoittautuneet, ellei heitä ole erikseen suodatettu populaatiosta pois.
+
   Kategorioita voi myös itsessään käyttää suodattimina. Klikkaamalla rivin vasemmassa reunassa olevaa suodatinta jäävät näkyviin vain sen kategorian opiskelijat.
   Suodatin aukeaa samalla ikkunan vasempaan laitaan, josta sitä voi käyttää vapaavalintaisilla arvoilla.
+  
+  **Credit statistics**
+
+  Taulukko kertoo kaikkien tarkasteluun valittujen opiskelijoiden opintopistemääristä tähän päivään mennessä. Statistiikka on suodatettu käytettyjen filttereiden mukaan.
+  Esimerkiksi, jos mukaan on valittu vain naisopiskelijat, statistiikat koskevat vain heitä. 
+  
+  + **Total** on kokonaisopintopistemäärä kyseiselle populaatiolle.
+  + **Mean** kuvaa opintopistemäärän opiskelijakohtaista keskiarvoa.
+  + **Keskihajonta** kuvaa vaihtelua opintopistemäärissä. Karkeasti, mitä suurempi keskihajonta, sitä enemmän opintopistemäärissä on vaihtelua opiskelijoiden kesken.
+  + **Min ja Max** kertovat pienimmän ja suurimman opintopistemäärän, jotka jollain opiskelijoilla kyseisessä populaatiossa on.
+
+  Mikäli valintatapatieto kyseiselle populaatiolle on saatavissa, näytetään myös samat statistiikat per valintatapa.  
   `,
   CoursesOfPopulation: `**Courses of population**
 

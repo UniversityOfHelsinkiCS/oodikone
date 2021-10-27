@@ -32,7 +32,7 @@ const StatisticsTab = ({ allStudents, query }) => {
   return (
     <Grid padded centered>
       <Grid.Row>
-        <StatisticsTable type="All students" filteredStudents={allStudents} />
+        <StatisticsTable type="All students of the population" filteredStudents={allStudents} />
       </Grid.Row>
       <Grid.Row>{admissionTypes.map(type => getStatisticsTable(type))}</Grid.Row>
     </Grid>
