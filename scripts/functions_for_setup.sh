@@ -158,16 +158,6 @@ reset_single_database() {
     download_real_dump $database $url
     reset_databases $database
   fi
-
-  # Set custom shell back to original values
-  PS3="Please enter your choice: "
-
-  options=(
-    "Set up oodikone from scratch."
-    "Reset all real data."
-    "Reset single database."
-    "Quit."
-  )
 }
 
 set_up_oodikone_from_scratch() {

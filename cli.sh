@@ -44,20 +44,22 @@ will take care of setting up Oodikone for you. See README for more details."
   msg ""
 }
 
-# Define custom shell prompt for the interactive select loop
-PS3="Please enter your choice: "
+set_custom_select_prompt() {
+  PS3="Please enter your choice: "
 
-options=(
-  "Set up oodikone from scratch."
-  "Reset all real data."
-  "Reset single database."
-  "Quit."
-)
+  options=(
+    "Set up oodikone from scratch."
+    "Reset all real data."
+    "Reset single database."
+    "Quit."
+  )
+}
 
-# Run scripts before showing interactive prompt
+# Run scripts and set the prompt
 show_welcome
 init_dirs
 get_username
+set_custom_select_prompt
 
 while true; do
   select opt in "${options[@]}"; do
@@ -67,7 +69,9 @@ while true; do
       "Reset all real data.")
         reset_all_real_data;;
       "Reset single database.")
-        reset_single_database;;
+        reset_single_database
+        set_custom_select_prompt # Set prompt back to initial values
+        ;;
       "Quit.")
         break 2;;
       *) msg "${RED}Invalid option:${NOFORMAT} $REPLY
