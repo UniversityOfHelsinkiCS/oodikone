@@ -111,7 +111,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
       content: {
         content: !query.years ? (
           <div ref={creditGainRef}>
-            <CreditGainStats filteredStudents={filteredStudents} />
+            <CreditGainStats query={query} filteredStudents={filteredStudents} />
           </div>
         ) : (
           <div>This table is omitted when searching population of multiple years</div>
