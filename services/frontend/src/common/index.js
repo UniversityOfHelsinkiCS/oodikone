@@ -224,6 +224,7 @@ export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
 export const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]*$/))
 
+// These are the new Bachelor's programmes in Matlu, that have BH possibility
 export const bachelorHonoursProgrammes = [
   'KH50_001',
   'KH50_002',
@@ -235,6 +236,8 @@ export const bachelorHonoursProgrammes = [
   'KH50_008',
 ]
 
+// Basic modules from Sisu programme structures. All modules that can be found for the past years' structures
+// taken into account
 export const bachelorHonoursBasicModules = {
   KH50_001: ['MAT110', 'MAT120', 'MAT130', 'MAT120', 'TKT1'],
   KH50_002: ['FYS1100', 'FYS1200'],
@@ -246,6 +249,8 @@ export const bachelorHonoursBasicModules = {
   KH50_008: ['BSCH1000', 'BSCS1000', 'BSMA1000', 'BSMS1000', 'BSPH1000'],
 }
 
+// Similarly intermediate modules from Sisu programme structures. All modules that can be found for the past years' structures
+// taken into account
 export const bachelorHonoursIntermediateModules = {
   KH50_001: ['mat217', 'MAT210', 'MAT220', 'MAT240', 'MAT213', 'MAT230', 'MAT218', 'MAT011'],
   KH50_002: ['FYS2100', 'FYS2200', 'FYS2300', 'FYS2400', 'FYS2500', 'FYS2600'],
