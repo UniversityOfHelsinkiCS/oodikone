@@ -50,7 +50,7 @@ PS3="Please enter your choice: "
 options=(
   "Set up oodikone from scratch."
   "Reset all real data."
-  "Reset sis-importer data."
+  "Reset single database."
   "Quit."
 )
 
@@ -66,8 +66,8 @@ while true; do
         set_up_oodikone_from_scratch;;
       "Reset all real data.")
         reset_all_real_data;;
-      "Reset sis-importer data.")
-        reset_sis_importer_data;;
+      "Reset single database.")
+        reset_single_database;;
       "Quit.")
         break 2;;
       *) msg "${RED}Invalid option:${NOFORMAT} $REPLY

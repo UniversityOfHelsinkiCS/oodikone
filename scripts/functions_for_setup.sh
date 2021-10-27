@@ -110,12 +110,64 @@ reset_all_real_data() {
   reset_databases "${DATABASES[@]}"
 }
 
-reset_sis_importer_data() {
-  infomsg "Downloading sis-importer-db dump"
-  local database=$SIS_IMPORTER_DB_NAME
-  local url=$SIS_IMPORTER_DB_REAL_DUMP_URL
-  download_real_dump $database $url
-  reset_databases $database
+reset_single_database() {
+  # Define custom shell prompt for the nested interactive select loop
+  PS3="Please enter which database to reset: "
+
+  options=(
+    "kone-db"
+    "sis-db"
+    "sis-importer-db"
+    "user-db"
+    "Return to main menu."
+  )
+
+  local database=""
+  local url=""
+
+  while true; do
+    select opt in "${options[@]}"; do
+      case $opt in
+        "kone-db")
+          local database=$KONE_DB_NAME
+          local url=$KONE_DB_REAL_DUMP_URL
+          break 2;;
+        "sis-db")
+          local database=$SIS_DB_NAME
+          local url=$SIS_DB_REAL_DUMP_URL
+          break 2;;
+        "sis-importer-db")
+          local database=$SIS_IMPORTER_DB_NAME
+          local url=$SIS_IMPORTER_DB_REAL_DUMP_URL
+          break 2;;
+        "user-db")
+          local database=$USER_DB_NAME
+          local url=$USER_DB_REAL_DUMP_URL
+          break 2;;
+        "Return to main menu.")
+          break 2;;
+        *) msg "${RED}Invalid option:${NOFORMAT} $REPLY
+  ";;
+      esac
+      break
+    done
+  done
+
+  if [ -n "$database" ]; then
+    infomsg "Downloading $database dump"
+    download_real_dump $database $url
+    reset_databases $database
+  fi
+
+  # Set custom shell back to original values
+  PS3="Please enter your choice: "
+
+  options=(
+    "Set up oodikone from scratch."
+    "Reset all real data."
+    "Reset single database."
+    "Quit."
+  )
 }
 
 set_up_oodikone_from_scratch() {
