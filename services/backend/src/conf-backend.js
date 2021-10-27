@@ -18,7 +18,6 @@ const pateToken = process.env.PATE_API_TOKEN || ''
 
 // Importer client
 const importerToken = process.env.IMPORTER_DB_API_TOKEN || ''
-const importerUrl = process.env.IMPORTER_DB_API_URL || ''
 
 // Networking: Urls & ports
 const baseUrl = isDev ? '/api' : ''
@@ -89,5 +88,4 @@ module.exports = {
   frontUrl,
   backendPort,
   importerToken,
-  importerUrl,
 }
