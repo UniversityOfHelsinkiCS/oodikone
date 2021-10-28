@@ -104,6 +104,9 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Credit statistics
+            <Label style={{ marginLeft: '1rem', marginBottom: '0.5rem' }} color="red">
+              NEW!
+            </Label>
           </span>
         ),
       },
@@ -124,9 +127,6 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Age distribution
-            <Label style={{ marginLeft: '1rem', marginBottom: '0.5rem' }} color="red">
-              NEW!
-            </Label>
           </span>
         ),
       },
