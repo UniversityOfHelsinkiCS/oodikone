@@ -25,17 +25,22 @@ const StatisticsTab = ({ allStudents, query }) => {
 
   const getStatisticsTable = type => {
     const filteredStudents = allStudents.filter(s => filterFunction(s, type))
-    if (filteredStudents.length === allStudents.length) return null
     return <StatisticsTable type={type || 'Ei valintatapaa'} filteredStudents={filteredStudents} />
   }
+
+  const admissionTypesAvailable = !allStudents.every(s => filterFunction(s, null))
 
   return (
     <Grid padded centered>
       <Grid.Row>
         <StatisticsTable type="All students of the population" filteredStudents={allStudents} />
       </Grid.Row>
-      <Divider horizontal>By admission type</Divider>
-      <Grid.Row>{admissionTypes.map(type => getStatisticsTable(type))}</Grid.Row>
+      {admissionTypesAvailable && (
+        <>
+          <Divider horizontal>By admission type</Divider>
+          <Grid.Row>{admissionTypes.map(type => getStatisticsTable(type))}</Grid.Row>
+        </>
+      )}
     </Grid>
   )
 }
