@@ -26,7 +26,7 @@ const CreditsGainedTable = ({ filteredStudents, type }) => {
   ]
 
   return (
-    <div className="credits-gained-table">
+    <div className="credits-gained-table" data-cy={`credits-gained-table-${type}`}>
       <h3>{type}</h3>
       <Table celled>
         <Table.Header>
@@ -42,7 +42,7 @@ const CreditsGainedTable = ({ filteredStudents, type }) => {
           </Table.Row>
         </Table.Header>
 
-        <Table.Body>
+        <Table.Body data-cy="credits-gained-table-body">
           {limits.map(([min, max]) => (
             <CollapsibleCreditRow
               key={`table-row-${min}-${max}`}

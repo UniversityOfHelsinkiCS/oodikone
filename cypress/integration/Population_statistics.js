@@ -13,6 +13,8 @@ const setPopStatsUntil = (until, includeSettings = []) => {
 describe('Population Statistics tests', () => {
   const pathToCSBach2017 =
     '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22KH50_005%22}&tag&year=2017'
+  const pathToCSMaster2019 =
+    '/populations?months=27&semesters=FALL&semesters=SPRING&studyRights=%7B%22programme%22%3A%22MH50_009%22%7D&tag&year=2019'
   describe('when using basic user', () => {
     beforeEach(() => {
       cy.init('/populations')
@@ -121,6 +123,31 @@ describe('Population Statistics tests', () => {
       cy.contains('Fetch population').click()
 
       cy.contains('Credit accumulation (for 170 students)')
+    })
+
+    it('Credit Statistics, Credits Gained tab works', () => {
+      cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
+      cy.contains('Credit statistics').click()
+      cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the population')
+      cy.get('.credits-gained-table').should('contain', '(n=149)')
+      cy.get('.credits-gained-table').should('contain', '255 ≤ credits')
+      cy.get('.credits-gained-table').should('contain', '128 ≤ credits < 192')
+      cy.get('.credits-gained-table').should('contain', '1 ≤ credits < 64')
+      cy.get("[data-cy='credits-gained-table-body'] > tr:nth-child(1) > td:nth-child(3)").should('contain', '2')
+      cy.get("[data-cy='credits-gained-table-body'] > tr:nth-child(3) > td:nth-child(3)").should('contain', '57')
+      cy.get("[data-cy='credits-gained-table-body'] > tr:nth-child(5) > td:nth-child(3)").should('contain', '30')
+
+      cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('not.exist')
+    })
+
+    it('Credit Statistics, Credits Gained tab shows stats by admissions', () => {
+      cy.visit(pathToCSMaster2019)
+      cy.contains('Credit statistics').click()
+      cy.get('.credits-gained-divider').click()
+      cy.get("[data-cy='credits-gained-table-Avoin väylä']").should('exist')
+      cy.get("[data-cy='credits-gained-table-Yhteispisteet']").should('exist')
+      cy.get("[data-cy='credits-gained-table-Muu']").should('exist')
+      cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('exist')
     })
 
     it('Credit Statistics, Statistics pane works', () => {
