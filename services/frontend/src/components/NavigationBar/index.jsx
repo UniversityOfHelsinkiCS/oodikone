@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import { isEqual } from 'lodash'
 import { getUserRoles, checkUserAccess } from '../../common'
 import { logout as logoutAction } from '../../redux/auth'
-import './navigationBar.css'
 import LanguagePicker from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
 import { useShowAsUser } from '../../common/hooks'
@@ -134,7 +133,7 @@ const NavigationBar = props => {
   )
 
   return (
-    <Menu stackable fluid className="navBar">
+    <Menu data-cy="navBar" stackable fluid style={{ overflow: 'auto' }}>
       {renderHome()}
       {renderNavigationRoutes()}
       {renderUserMenu()}

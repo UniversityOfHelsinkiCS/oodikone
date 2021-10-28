@@ -45,15 +45,7 @@ const StudentInfoCard = ({ student }) => {
           <div className="startDate">{`Started: ${reformatDate(student.started, DISPLAY_DATE_FORMAT)}`}</div>
           <div className="startDate">{email}</div>
         </Card.Meta>
-        <Card.Description>
-          {`Credits: ${student.credits || 0}`}
-          {student.mismatch && '*'}
-          <p>
-            <i>
-              {student.mismatch && '*There is difference between the total credits of this student in Oodi and Sisu'}
-            </i>
-          </p>
-        </Card.Description>
+        <Card.Description>{`Credits: ${student.credits || 0}`}</Card.Description>
         <div style={{ paddingTop: '4px' }}>
           <EnrollmentAccordion semesterEnrollments={student.semesterenrollments} />
           <p style={{ fontSize: 14 }}>{`Updated at ${formattedTimestamp}`}</p>

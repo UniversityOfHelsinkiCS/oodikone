@@ -8,7 +8,7 @@ import CreditsGainedTab from './CreditsGainedTab'
 import infotooltips from '../../../common/InfoToolTips'
 import './creditGainStats.css'
 
-const CreditGainStats = ({ filteredStudents }) => {
+const CreditGainStats = ({ filteredStudents, query }) => {
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
@@ -20,7 +20,7 @@ const CreditGainStats = ({ filteredStudents }) => {
   const renderQuartersTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <StatisticsTab filteredStudents={filteredStudents} />
+        <StatisticsTab allStudents={filteredStudents} query={query} />
       </Tab.Pane>
     )
   }, [filteredStudents])
