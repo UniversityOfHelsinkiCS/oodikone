@@ -11,7 +11,7 @@ const CreditGainStats = ({ filteredStudents, query }) => {
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <CreditsGainedTab filteredStudents={filteredStudents} />
+        <CreditsGainedTab allStudents={filteredStudents} query={query} />
       </Tab.Pane>
     )
   }, [filteredStudents])
