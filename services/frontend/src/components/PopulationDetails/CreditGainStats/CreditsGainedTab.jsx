@@ -34,7 +34,7 @@ const CreditsGainedTab = ({ allStudents, query }) => {
   return (
     <Grid>
       <Grid.Row>
-        <Grid.Column width={16}>
+        <Grid.Column width={16} data-cy="credits-gained-main-table">
           <CreditsGainedTable type="All students of the population" filteredStudents={allStudents} />
         </Grid.Column>
       </Grid.Row>
