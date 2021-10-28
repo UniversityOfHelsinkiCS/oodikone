@@ -1,5 +1,5 @@
 import React from 'react'
-import { Grid } from 'semantic-ui-react'
+import { Divider, Grid } from 'semantic-ui-react'
 
 import StatisticsTable from './StatisticsTable'
 
@@ -34,6 +34,7 @@ const StatisticsTab = ({ allStudents, query }) => {
       <Grid.Row>
         <StatisticsTable type="All students of the population" filteredStudents={allStudents} />
       </Grid.Row>
+      <Divider horizontal>By admission type</Divider>
       <Grid.Row>{admissionTypes.map(type => getStatisticsTable(type))}</Grid.Row>
     </Grid>
   )
