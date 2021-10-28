@@ -1,4 +1,5 @@
 import { callController } from '../apiConnection'
+import itemreducer from './common/itemreducer'
 
 const prefix = 'GET_STUDY_GUIDANCE_GROUPS_'
 
@@ -7,29 +8,6 @@ export const getStudyGuidanceGroups = () => {
   return callController(route, prefix)
 }
 
-const reducer = (state = { data: [] }, action) => {
-  switch (action.type) {
-    case `${prefix}ATTEMPT`:
-      return {
-        ...state,
-        pending: true,
-      }
-    case `${prefix}FAILURE`:
-      return {
-        ...state,
-        pending: false,
-        error: true,
-      }
-    case `${prefix}SUCCESS`:
-      return {
-        ...state,
-        pending: false,
-        error: false,
-        data: action.response,
-      }
-    default:
-      return state
-  }
-}
+const reducer = itemreducer(prefix)
 
 export default reducer
