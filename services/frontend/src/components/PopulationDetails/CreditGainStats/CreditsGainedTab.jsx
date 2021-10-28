@@ -39,7 +39,12 @@ const CreditsGainedTab = ({ allStudents, query }) => {
         </Grid.Column>
       </Grid.Row>
       {admissionTypesAvailable && (
-        <Divider horizontal style={{ cursor: 'pointer' }} onClick={() => setShow(!show)}>
+        <Divider
+          className="credits-gained-divider"
+          horizontal
+          style={{ cursor: 'pointer' }}
+          onClick={() => setShow(!show)}
+        >
           By admission type <Icon name={`angle ${show ? 'down' : 'right'}`} />
           <Label style={{ marginLeft: '1rem', marginBottom: '0.5rem' }} color="red">
             NEW!
