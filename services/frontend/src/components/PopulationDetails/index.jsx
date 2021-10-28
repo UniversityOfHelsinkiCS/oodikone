@@ -1,7 +1,7 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 import { object, arrayOf, bool, shape, node } from 'prop-types'
-import { Message, Accordion, Label } from 'semantic-ui-react'
+import { Message, Accordion } from 'semantic-ui-react'
 import { useLocalStorage } from '../../common/hooks'
 
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
@@ -104,9 +104,6 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
             Credit statistics
-            <Label style={{ marginLeft: '1rem', marginBottom: '0.5rem' }} color="red">
-              NEW!
-            </Label>
           </span>
         ),
       },
