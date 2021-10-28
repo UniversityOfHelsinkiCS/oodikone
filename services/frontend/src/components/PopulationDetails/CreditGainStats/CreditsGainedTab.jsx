@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react'
-import PropTypes from 'prop-types'
 import { useLocation } from 'react-router-dom'
 import { Table } from 'semantic-ui-react'
 import { getMonths } from '../../../common/query'
@@ -53,10 +52,6 @@ const CreditsGainedTab = ({ filteredStudents }) => {
       </Table.Body>
     </Table>
   )
-}
-
-CreditsGainedTab.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default CreditsGainedTab
