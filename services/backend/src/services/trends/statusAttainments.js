@@ -213,6 +213,7 @@ const getTotalOpenUniCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias
     }
   )
 }
+
 const makeYearlyCreditsPromises = (currentYear, years, getRange, alias = 'sum', alias2 = 'sum2', avoin) => {
   return years.map(
     year =>
@@ -538,12 +539,6 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
             previousStudents: programmeStats.previousStudents,
           }
         }
-        /*
-        acc[facultyCode]['drill'][programmeCode] = programmeStats
-        acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
-        acc[facultyCode]['current'] += programmeStats.current
-        acc[facultyCode]['previous'] += programmeStats.previous
-        */
       }
 
       if (!acc[facultyCode]) {
@@ -577,7 +572,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   return groupedByFaculty
 }
 
-const getStatus = async (unixMillis, showByYear, doRefresh = true) => {
+const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
   // redis keys for different queries. adds a new key for every queried day.
   // might cause issues, might not but def not until I am out :D
 
