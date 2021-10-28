@@ -192,15 +192,19 @@ const getTotalCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'su
 const getTotalOpenUniCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias2 = 'sum2') => {
   return sequelize.query(
     `
-    SELECT SUM(cr.credits) AS ${alias}, COUNT(DISTINCT(cr.student_studentnumber)) AS ${alias2}, co.code, o.code 
+    SELECT SUM(cr.credits) AS ${alias}, COUNT(DISTINCT(cr.student_studentnumber)) AS ${alias2},
+    o.code AS organizationcode, co.code, co.id
     FROM credit cr
-    INNER JOIN course co ON cr.course_code = co.code 
+    INNER JOIN course co ON cr.course_code = co.code
     INNER JOIN course_providers cp ON cp.coursecode = co.id
     INNER JOIN organization o ON o.id = cp.organizationcode
-    LEFT JOIN studyright sr ON cr.student_studentnumber = sr.student_studentnumber
-    WHERE sr.studyrightid IS NULL AND cr.attainment_date BETWEEN '2020-07-31' AND '2021-08-01'
-        AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL) 
-        AND cr.credittypecode IN (4, 9) AND cp.organizationcode = 'hy-org-48645785'
+    AND cr.attainment_date BETWEEN :a AND :b
+    AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
+    AND cr.credittypecode IN (4, 9) AND cp.organizationcode = 'hy-org-48645785'
+    AND cr.student_studentnumber NOT IN
+      (SELECT student_studentnumber FROM studyright
+      WHERE studyright.student_studentnumber = cr.student_studentnumber
+      AND cr.attainment_date BETWEEN studyright.startdate AND studyright.enddate)
     GROUP BY co.id, o.code -- HAVING SUM(cr.credits) > 0
     `,
     {
@@ -375,6 +379,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   }, {})
 
   programmeToFaculties['H906'] = ['H906']
+  programmeToFaculties['H930'] = ['H930']
 
   const providerToProgramme = elementDetails.reduce((res, curr) => {
     const [p] = mapToProviders([curr.code])
@@ -439,8 +444,8 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
           acc[courseCode]['yearly'][year] = {}
           acc[courseCode]['yearly'][year]['acc'] = 0
           acc[courseCode]['yearly'][year]['accStudents'] = 0
-          acc[courseCode]['yearly'][year]['total'] = 0
-          acc[courseCode]['yearly'][year]['totalStudents'] = 0
+          acc[courseCode]['yearly'][year]['total'] = undefined
+          acc[courseCode]['yearly'][year]['totalStudents'] = undefined
         })
 
         yearlyInstances.forEach(instance => {
@@ -471,7 +476,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     const programme = providerToProgramme[organizationcode]
 
     if (programme && programme.code) {
-      if (programme.code === 'H906') {
+      if (programme.code === 'H906' || programme.code === 'H930') {
         const courseValues = Object.values(courses)
         const yearlyValues = courseValues.map(c => c.yearly)
 
@@ -481,8 +486,10 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
           name: programme.name,
           drill: courses,
           yearly: _.mergeWith({}, ...yearlyValues, mergele),
-          current: _.sumBy(courseValues, 'current'),
-          previous: _.sumBy(courseValues, 'previous'),
+          current: _.sumBy(courseValues, 'current') | undefined,
+          previous: _.sumBy(courseValues, 'previous') | undefined,
+          currentStudents: _.sumBy(courseValues, 'currentStudents') || 'undefined',
+          previousStudents: _.sumBy(courseValues, 'previousStudents') | 'undefined',
         }
 
         return acc
@@ -517,21 +524,26 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     if (!facultyCodes) return acc
     facultyCodes.forEach(facultyCode => {
       if (!facultyCode) return
-      if (facultyCode === 'H906') {
+      if (facultyCode === 'H906' || facultyCode === 'H930') {
         if (!acc[facultyCode]) {
           acc[facultyCode] = {
+            type: 'faculty',
+            code: facultyCode,
             drill: {},
             name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
-            yearly: {},
-            current: 0,
-            previous: 0,
+            yearly: programmeStats.yearly,
+            current: programmeStats.current,
+            previous: programmeStats.previous,
+            currentStudents: programmeStats.currentStudents,
+            previousStudents: programmeStats.previousStudents,
           }
         }
+        /*
         acc[facultyCode]['drill'][programmeCode] = programmeStats
         acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
         acc[facultyCode]['current'] += programmeStats.current
         acc[facultyCode]['previous'] += programmeStats.previous
-        return
+        */
       }
 
       if (!acc[facultyCode]) {
