@@ -57,7 +57,7 @@ export default {
   Nuoli kuvaa muutosta, paljonko opintopisteitä on kertynyt tämänhetkisen lukuvuoden alusta tarkastelupäivään mennessä 
   suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna. Vain suoritetut ja hyväksiluetut opintopisteet huomioidaan.
   
-  Tilannekuvassa voi porautua kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. 
+  Tilannekuvassa voi porautua kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. Mahdolliset valinnat ovat selitettyinä alla.
   `,
   statusGraduated: `
   Tilannekuva näyttää "reaaliaikaisesti" eri tiedekuntien ja ohjelmien valmistumiset nykyisen lukuvuoden aikana 
