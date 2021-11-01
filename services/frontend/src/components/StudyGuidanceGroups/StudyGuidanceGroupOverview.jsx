@@ -50,7 +50,11 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
                 name={tagName}
                 search={textAndDescriptionSearch}
                 fluid
-                placeholder="Select study programme"
+                placeholder={
+                  group.tags?.[tagName]
+                    ? selectFieldItems.find(p => p.value === group.tags[tagName]).text
+                    : 'Select study programme'
+                }
                 options={selectFieldItems}
                 closeOnChange
                 value={formik.values[tagName]}
