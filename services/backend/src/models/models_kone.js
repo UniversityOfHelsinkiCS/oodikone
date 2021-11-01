@@ -135,6 +135,28 @@ const CustomPopulationSearch = sequelizeKone.define('custom_population_searches'
   },
 })
 
+const StudyGuidanceGroupTag = sequelizeKone.define(
+  'study_guidance_group_tags',
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true,
+    },
+    studyGuidanceGroupId: {
+      type: Sequelize.STRING,
+      unique: true,
+    },
+    studyProgramme: {
+      type: Sequelize.STRING,
+    },
+    year: {
+      type: Sequelize.STRING,
+    },
+  },
+  { underscored: true, timestamps: true }
+)
+
 MandatoryCourse.belongsTo(MandatoryCourseLabels, {
   foreignKey: 'label',
   sourceKey: 'id',
@@ -157,4 +179,5 @@ module.exports = {
   CustomPopulationSearch,
   sequelizeKone,
   ExcludedCourse,
+  StudyGuidanceGroupTag,
 }
