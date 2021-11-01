@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Formik } from 'formik'
 import { Form, Button, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import SortableTable from '../SortableTable'
-import { getTextIn } from '../../common'
+import { getTextIn, textAndDescriptionSearch } from '../../common'
 import StyledMessage from './StyledMessage'
 import { changeStudyGuidanceGroupTags } from '../../redux/studyGuidanceGroups'
+import { getElementDetails } from '../../redux/elementdetails'
 import { useToggle } from '../../common/hooks'
 
 const LinkToGroup = ({ group, language }) => (
@@ -29,20 +30,8 @@ const prettifyCamelCase = str => {
   const splitted = str.match(/[A-Za-z][a-z]*/g) || []
   return splitted.map(w => w.charAt(0).toLowerCase() + w.substring(1)).join(' ')
 }
-const studyProgrammeOptions = [
-  {
-    key: 'KH57_003',
-    text: 'Ympäristötieteiden kandiohjelma',
-    value: 'KH57_003',
-  },
-  {
-    key: 'MH20_001',
-    text: 'Oikeustieteen maisterin koulutusohjelma',
-    value: 'MH20_001',
-  },
-]
 
-const AssociateTagForm = ({ group, tagName, toggleEdit }) => {
+const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
   const dispatch = useDispatch()
 
   return (
@@ -59,9 +48,10 @@ const AssociateTagForm = ({ group, tagName, toggleEdit }) => {
             {tagName === 'studyProgramme' ? (
               <Form.Select
                 name={tagName}
+                search={textAndDescriptionSearch}
                 fluid
                 placeholder="Select study programme"
-                options={studyProgrammeOptions}
+                options={selectFieldItems}
                 closeOnChange
                 value={formik.values[tagName]}
                 onChange={(_, value) => formik.setFieldValue(tagName, value?.value)}
@@ -94,8 +84,8 @@ const AssociateTagForm = ({ group, tagName, toggleEdit }) => {
   )
 }
 
-const TagCell = ({ tagName, value, toggleEdit }) => {
-  const text = tagName === 'studyProgramme' ? studyProgrammeOptions.find(p => p.value === value).text : value
+const TagCell = ({ tagName, value, toggleEdit, studyProgrammes }) => {
+  const text = tagName === 'studyProgramme' ? studyProgrammes.find(p => p.value === value).text : value
   return (
     <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
       <p>{text}</p>
@@ -107,10 +97,27 @@ const TagCell = ({ tagName, value, toggleEdit }) => {
 }
 
 const StudyGuidanceGroupOverview = () => {
+  const dispatch = useDispatch()
   const { language } = useSelector(({ settings }) => settings)
   const { data: groups } = useSelector(({ studyGuidanceGroups }) => studyGuidanceGroups)
+  const { data: elementDetails } = useSelector(({ elementdetails }) => elementdetails)
   const [showEditStudyProgramme, toggleShowEditStudyProgramme] = useToggle()
   const [showEditYear, toggleShowEditYear] = useToggle()
+
+  useEffect(() => {
+    if (elementDetails && elementDetails.length > 0) return
+    dispatch(getElementDetails())
+  }, [dispatch])
+
+  const studyProgrammesFilteredForDropdown =
+    elementDetails
+      ?.filter(elem => elem.code.startsWith('KH') || elem.code.startsWith('MH'))
+      .map(elem => ({
+        key: elem.code,
+        value: elem.code,
+        description: elem.code,
+        text: getTextIn(elem.name, language),
+      })) || []
 
   const headers = [
     {
@@ -134,9 +141,15 @@ const StudyGuidanceGroupOverview = () => {
             tagName="studyProgramme"
             value={group.tags.studyProgramme}
             toggleEdit={toggleShowEditStudyProgramme}
+            studyProgrammes={studyProgrammesFilteredForDropdown}
           />
         ) : (
-          <AssociateTagForm group={group} tagName="studyProgramme" toggleEdit={toggleShowEditStudyProgramme} />
+          <AssociateTagForm
+            group={group}
+            tagName="studyProgramme"
+            toggleEdit={toggleShowEditStudyProgramme}
+            selectFieldItems={studyProgrammesFilteredForDropdown}
+          />
         ),
     },
     {
