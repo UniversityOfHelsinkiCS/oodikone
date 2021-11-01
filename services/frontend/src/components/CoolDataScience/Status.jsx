@@ -41,7 +41,14 @@ const actionTooltips = {
   showYearlyValues: {
     label: 'Näytä edelliset vuodet',
     short: 'Näytä tilastot vuosittain, alkaen vuodesta 2017.',
-    long: 'Näyttää tilastot vuodesta 2017 eteenpäin. Huomaa, että nykyisen vuoden arvo vuosilistauksessa riippuu valinnastasi "Näytä kalenterivuosittain" -kohdassa.',
+    long: `
+      Näyttää tilastot vuodesta 2017 eteenpäin.
+
+      Jokaiselta vuodelta näytetään kaksi tilastoa: ajanjakson kokonaistilasto ja ns. tähän mennessä "*kertynyt*" tilasto.
+      Kokonaistilasto vastaa nimensä mukaisesti koko ajanjaksoa, kun taas *kertynyt* tilasto kattaa ajanjakson vuoden 
+      tai lukuvuoden alusta "Näytä päivänä"-valintaa vastaavaan päivämäärään tuona vuotena. Luvut näytetään muodossa *<kerynyt>*/*<kokonais>*.
+      Kuluvalta vuodelta näytetään ainoastaan kertynyt tilasto.
+    `,
   },
 
   showRelativeValues: {
@@ -556,7 +563,9 @@ const Status = () => {
                 <b>
                   Valinta "<i>{label}</i>"
                 </b>
-                <div style={{ margin: '0.5em' }}>{long}</div>
+                <div style={{ margin: '0.5em', fontSize: '0.9em' }}>
+                  <ReactMarkdown escapeHtml={false}>{long.replace(/(^|\n)[ \t]+/g, '\n')}</ReactMarkdown>
+                </div>
               </div>
             </div>
           ))}
