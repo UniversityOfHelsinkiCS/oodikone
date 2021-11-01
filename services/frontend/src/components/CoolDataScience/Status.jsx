@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Divider, Segment, Button, Popup, Loader, Icon, Checkbox, Message, Form, Breadcrumb } from 'semantic-ui-react'
+import { Divider, Segment, Button, Popup, Loader, Icon, Checkbox, Form, Breadcrumb } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
@@ -31,7 +31,7 @@ const mapValueToRange = (x, min1, max1, min2, max2) => {
 const actionTooltips = {
   showByYear: {
     label: 'Näytä kalenterivuosittain',
-    short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta',
+    short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta.',
     long: `
       Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
       Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
@@ -40,13 +40,14 @@ const actionTooltips = {
 
   showYearlyValues: {
     label: 'Näytä edelliset vuodet',
-    short: 'Näytä tilastot aiemmille vuosille',
+    short: 'Näytä tilastot vuosittain, alkaen vuodesta 2017.',
     long: 'Näyttää tilastot vuodesta 2017 eteenpäin. Huomaa, että nykyisen vuoden arvo vuosilistauksessa riippuu valinnastasi "Näytä kalenterivuosittain" -kohdassa.',
   },
 
   showRelativeValues: {
     label: 'Näytä suhteutettuna opiskelijoiden määrään',
-    short: 'Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa',
+    short:
+      'Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.',
     long: `
       Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.
       Opiskelijoiden määrä perustuu ajanjaksolla kyseisen organisaation alaisista kursseista suoritusmerkintöjä saaneiden opiskelijoiden määrään.
@@ -56,7 +57,7 @@ const actionTooltips = {
 
   showCountingFrom: {
     label: 'Näytä päivänä',
-    short: 'Valitse päivä johon asti kertyneet tilastot näytetään',
+    short: 'Valitse päivä johon asti kertyneet tilastot näytetään.',
     long: `
       Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
       Esimerkiksi "Näytä kalenterivuosittain" valinnan ollessa pois päältä,
@@ -261,18 +262,24 @@ const StatusContent = ({ data, settings, onDrill }) => {
 }
 
 const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
-  const helpIcon = (
-    <Icon style={{ marginLeft: '0.3em', marginTop: '-0.2em', color: '#888' }} name="question circle outline" />
+  const popupContext = useRef()
+
+  const trigger = (
+    <div>
+      {children}
+      <div ref={popupContext} style={{ display: 'inline-block', paddingTop: '0.2em', cursor: 'help' }}>
+        <Icon ref={popupContext} style={{ marginLeft: '0.3em', color: '#888' }} name="question circle outline" />
+      </div>
+    </div>
   )
 
   const popupProps = _.defaults(rest, {
-    position: 'bottom center',
+    position: 'right center',
   })
 
   return (
     <>
-      {children}
-      <Popup hoverable size="tiny" trigger={helpIcon} {...popupProps} mouseEnterDelay={500}>
+      <Popup hoverable size="tiny" trigger={trigger} context={popupContext} {...popupProps} mouseEnterDelay={1000}>
         <div>{tooltip}</div>
         <span style={{ color: '#2185d0', cursor: 'pointer' }} onClick={onOpenDetails}>
           Lue lisää...
@@ -297,33 +304,15 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
     })
   }
 
+  const itemStyles = {
+    margin: '0.5rem 1rem',
+    display: 'flex',
+    alignItems: 'center',
+  }
+
   return (
     <div style={{ display: 'flex', alignItems: 'stretch', padding: 0, flexDirection: 'column' }}>
-      <div
-        style={{
-          width: '10px',
-          height: '10px',
-          display: 'flex',
-          alignItems: 'center',
-          background: 'red',
-          transform: 'rotateY(0deg) rotate(45deg)',
-          position: 'absolute',
-          top: '-6px',
-          left: '35px',
-          border: '1px solid #dededf',
-          borderRight: 'none',
-          borderBottom: 'none',
-          backgroundColor: 'white',
-        }}
-      />
-      <div
-        style={{
-          borderRight: '1px solid rgba(34,36,38,.15)',
-          padding: '1em',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
+      <div style={itemStyles}>
         <WithHelpTooltip tooltip={actionTooltips.showYearlyValues.short} onOpenDetails={onOpenDetails}>
           <Checkbox
             style={{ fontSize: '0.9em', fontWeight: 'normal' }}
@@ -333,14 +322,7 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
           />
         </WithHelpTooltip>
       </div>
-      <div
-        style={{
-          borderRight: '1px solid rgba(34,36,38,.15)',
-          padding: '1em',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
+      <div style={itemStyles}>
         <WithHelpTooltip tooltip={actionTooltips.showByYear.short} onOpenDetails={onOpenDetails}>
           <Checkbox
             style={{ fontSize: '0.9em', fontWeight: 'normal' }}
@@ -350,14 +332,7 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
           />
         </WithHelpTooltip>
       </div>
-      <div
-        style={{
-          borderRight: '1px solid rgba(34,36,38,.15)',
-          padding: '1em',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
+      <div style={itemStyles}>
         <WithHelpTooltip tooltip={actionTooltips.showRelativeValues.short} onOpenDetails={onOpenDetails}>
           <Checkbox
             style={{ fontSize: '0.9em', fontWeight: 'normal' }}
@@ -367,7 +342,7 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
           />
         </WithHelpTooltip>
       </div>
-      <div style={{ padding: '1em', display: 'flex', alignItems: 'center' }}>
+      <div style={itemStyles}>
         <Form>
           <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
             <WithHelpTooltip tooltip={actionTooltips.showCountingFrom.short} onOpenDetails={onOpenDetails}>
@@ -506,24 +481,21 @@ const Status = () => {
   )
 
   const popFromDrillStack = () => {
-    history.goBack()
+    const newDrillStack = [...drillStack]
+    newDrillStack.pop()
+    history.push('/trends/status', {
+      drillStack: newDrillStack,
+    })
+
     sendAnalytics('S Drillup clicked', 'Status')
   }
-
-  const DrilldownMessage = () => (
-    <Message
-      color="blue"
-      content="Klikkaamalla tiedekuntaa pystyt porautumaan koulutusohjelma tasolle ja ohjelmaa klikkaamalla pystyt porautumaan kurssitasolle.
-      Vasemmassa yläkulmassa olevaa nuolta klikkaamalla pääset edelliseen näkymään."
-    />
-  )
 
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
     <>
-      <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem' }} ref={moreDetailsRef}>
-        <h2 style={{ flexGrow: 1 }}>Koulutusohjelmien tuottamat opintopisteet</h2>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }} ref={moreDetailsRef}>
+        <h2 style={{ margin: 0, flexGrow: 1 }}>Koulutusohjelmien tuottamat opintopisteet</h2>
         <Popup
           trigger={
             <Button>
@@ -539,16 +511,19 @@ const Status = () => {
             // Close the popup only after the event has had a chance to propagate.
             setTimeout(() => setSettingsOpen(false), 0)
           }}
-          style={{ padding: '0', paddingBottom: '0.5em', maxHeight: '80vh', overflowY: 'auto' }}
+          style={{ padding: '0.25em 0em', maxHeight: '80vh' }}
         >
           <StatusSettings
             settings={settings}
             onSettingsChange={setSettings}
             onOpenDetails={() => {
-              window.scrollTo({
-                top: moreDetailsRef.current.offsetTop - 10,
-                behavior: 'smooth',
-              })
+              if (moreDetailsRef.current) {
+                moreDetailsRef.current.scrollIntoView({
+                  block: 'start',
+                  inline: 'end',
+                  behavior: 'smooth',
+                })
+              }
 
               setUsageDetailsOpen(true)
             }}
@@ -588,7 +563,6 @@ const Status = () => {
         </Popup>
       </div>
 
-      <DrilldownMessage />
       <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px', alignItems: 'center' }}>
         <Breadcrumb icon="right angle" sections={breadcrumb} size="large" />
         {drillStack.length > 0 && (
@@ -603,7 +577,7 @@ const Status = () => {
       {data && !loading ? (
         <StatusContent settings={settings} onDrill={pushToDrillStack} data={drilledData} />
       ) : (
-        <Loader active={loading} />
+        <Loader active={loading} inline="centered" />
       )}
     </>
   )
