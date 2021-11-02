@@ -1,5 +1,8 @@
 /// <reference types="Cypress" />
 
+const moment = require('moment')
+const _ = require('lodash')
+
 const setPopStatsUntil = (until, includeSettings = []) => {
   cy.contains('Advanced settings').siblings().get('[data-cy=advanced-toggle]').click()
   includeSettings.forEach(setting => {
@@ -129,13 +132,33 @@ describe('Population Statistics tests', () => {
       cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
       cy.contains('Credit statistics').click()
       cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the population')
+
+      const months = Math.ceil(moment.duration(moment().diff(moment('2017-08-1'))).asMonths())
+
+      const limits = [1, ..._.range(1, 4).map(p => Math.ceil(months * ((p * 15) / 12))), null]
+      const ranges = _.range(1, limits.length).map(i => _.slice(limits, i - 1, i + 1))
+
       cy.get('.credits-gained-table').should('contain', '(n=149)')
-      cy.get('.credits-gained-table').should('contain', '255 ≤ credits')
-      cy.get('.credits-gained-table').should('contain', '128 ≤ credits < 192')
-      cy.get('.credits-gained-table').should('contain', '1 ≤ credits < 64')
-      cy.get("[data-cy='credits-gained-table-body'] > tr:nth-child(1) > td:nth-child(3)").should('contain', '2')
-      cy.get("[data-cy='credits-gained-table-body'] > tr:nth-child(3) > td:nth-child(3)").should('contain', '57')
-      cy.get("[data-cy='credits-gained-table-body'] > tr:nth-child(5) > td:nth-child(3)").should('contain', '30')
+
+      for (const [start, end] of ranges) {
+        let value = 'credits'
+
+        if (start !== null) {
+          value = `${start} ≤ ${value}`
+        }
+
+        if (end !== null) {
+          value = `${value} < ${end}`
+        }
+
+        cy.get('.credits-gained-table').should('contain', value)
+      }
+
+      cy.get("[data-cy='credits-gained-table-body'] td:nth-child(3)").then($els => {
+        const sum = [...$els].map($el => parseInt($el.innerText)).reduce((a, b) => a + b, 0)
+
+        expect(sum).to.equal(149)
+      })
 
       cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('not.exist')
     })
