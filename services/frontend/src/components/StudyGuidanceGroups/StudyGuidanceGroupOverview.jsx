@@ -40,6 +40,7 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
         initialValues={{ [tagName]: '' }}
         onSubmit={values => {
           dispatch(changeStudyGuidanceGroupTags(group.id, values))
+          toggleEdit()
         }}
         validate={values => (!values[tagName] ? { [tagName]: `${tagName} is required` } : {})}
       >
@@ -51,9 +52,7 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
                 search={textAndDescriptionSearch}
                 fluid
                 placeholder={
-                  group.tags?.[tagName]
-                    ? selectFieldItems.find(p => p.value === group.tags[tagName]).text
-                    : 'Select study programme'
+                  selectFieldItems.find(p => p.value === group.tags?.[tagName])?.text || 'Select study programme'
                 }
                 options={selectFieldItems}
                 closeOnChange
@@ -65,6 +64,7 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
                 name={tagName}
                 dateFormat="YYYY"
                 timeFormat={false}
+                initialvalue={group.tags?.[tagName]}
                 renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
                 closeOnSelect
                 value={formik.values[tagName]}
@@ -88,15 +88,20 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
   )
 }
 
-const TagCell = ({ tagName, value, toggleEdit, studyProgrammes }) => {
-  const text = tagName === 'studyProgramme' ? studyProgrammes.find(p => p.value === value).text : value
-  return (
+const TagCell = ({ tagName, group, studyProgrammes }) => {
+  const [showEdit, toggleEdit] = useToggle()
+  const value = group.tags?.[tagName]
+  const text = tagName === 'studyProgramme' ? studyProgrammes.find(p => p.value === value)?.text : value
+
+  return group.tags?.[tagName] && !showEdit ? (
     <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
       <p>{text}</p>
       <Button type="button" onClick={() => toggleEdit()}>
         Edit {prettifyCamelCase(tagName)}
       </Button>
     </div>
+  ) : (
+    <AssociateTagForm group={group} tagName={tagName} toggleEdit={toggleEdit} selectFieldItems={studyProgrammes} />
   )
 }
 
@@ -105,8 +110,6 @@ const StudyGuidanceGroupOverview = () => {
   const { language } = useSelector(({ settings }) => settings)
   const { data: groups } = useSelector(({ studyGuidanceGroups }) => studyGuidanceGroups)
   const { data: elementDetails } = useSelector(({ elementdetails }) => elementdetails)
-  const [showEditStudyProgramme, toggleShowEditStudyProgramme] = useToggle()
-  const [showEditYear, toggleShowEditYear] = useToggle()
 
   useEffect(() => {
     if (elementDetails && elementDetails.length > 0) return
@@ -140,34 +143,16 @@ const StudyGuidanceGroupOverview = () => {
       title: 'Study programme',
       getRowVal: () => 'studyProgramme',
       headerProps: { onClick: null, sorted: null },
-      getRowContent: group =>
-        group.tags?.studyProgramme && !showEditStudyProgramme ? (
-          <TagCell
-            tagName="studyProgramme"
-            value={group.tags.studyProgramme}
-            toggleEdit={toggleShowEditStudyProgramme}
-            studyProgrammes={studyProgrammesFilteredForDropdown}
-          />
-        ) : (
-          <AssociateTagForm
-            group={group}
-            tagName="studyProgramme"
-            toggleEdit={toggleShowEditStudyProgramme}
-            selectFieldItems={studyProgrammesFilteredForDropdown}
-          />
-        ),
+      getRowContent: group => (
+        <TagCell tagName="studyProgramme" studyProgrammes={studyProgrammesFilteredForDropdown} group={group} />
+      ),
     },
     {
       key: 'associatedyear',
       title: 'Associated year',
       getRowVal: () => 'associatedYear',
       headerProps: { onClick: null, sorted: null },
-      getRowContent: group =>
-        group.tags?.year && !showEditYear ? (
-          <TagCell tagName="year" value={group.tags.year} toggleEdit={toggleShowEditYear} />
-        ) : (
-          <AssociateTagForm group={group} tagName="year" toggleEdit={toggleShowEditYear} />
-        ),
+      getRowContent: group => <TagCell tagName="year" group={group} />,
     },
   ]
 

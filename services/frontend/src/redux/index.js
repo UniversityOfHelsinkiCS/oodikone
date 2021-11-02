@@ -39,7 +39,7 @@ import singleCourseStats from './singleCourseStats'
 import userAccessEmail from './userAccessEmail'
 import customPopulationSearch from './customPopulationSearch'
 import coolDataScience from './coolDataScience'
-import studyGuidanceGroupReducers from './studyGuidanceGroups'
+import studyGuidanceGroups from './studyGuidanceGroups'
 
 export default combineReducers({
   actionHistory,
@@ -82,6 +82,5 @@ export default combineReducers({
   userAccessEmail,
   customPopulationSearch,
   coolDataScience,
-  studyGuidanceGroups: studyGuidanceGroupReducers.getReducer,
-  studyGuidanceGroupTags: studyGuidanceGroupReducers.changeTagsReducer,
+  studyGuidanceGroups,
 })
