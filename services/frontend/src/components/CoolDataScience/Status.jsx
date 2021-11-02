@@ -368,7 +368,10 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
       </div>
       <div style={itemStyles}>
         <Form>
-          <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
+          <Form.Field
+            error={selectedDate !== null && !isValidDate(selectedDate)}
+            style={{ display: 'flex', alignItems: 'center' }}
+          >
             <WithHelpTooltip tooltip={actionTooltips.showCountingFrom.short} onOpenDetails={onOpenDetails}>
               <span style={{ fontSize: '0.9em' }}>{actionTooltips.showCountingFrom.label}</span>
             </WithHelpTooltip>
@@ -380,7 +383,10 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
               value={moment(selectedDate)}
               locale="fi"
               isValidDate={isValidDate}
-              onChange={value => changeSetting('selectedDate', value)}
+              inputProps={{ placeholder: 'Valise päivämäärä' }}
+              onChange={value => {
+                changeSetting('selectedDate', value.format(DATE_FORMAT) === moment().format(DATE_FORMAT) ? null : value)
+              }}
             />
           </Form.Field>
         </Form>
