@@ -270,12 +270,18 @@ const StatusContent = ({ data, settings, onDrill }) => {
 
 const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
   const popupContext = useRef()
+  const [popupOpen, setPopupOpen] = useState(false)
 
   const trigger = (
     <div>
       {children}
       <div ref={popupContext} style={{ display: 'inline-block', paddingTop: '0.2em', cursor: 'help' }}>
-        <Icon ref={popupContext} style={{ marginLeft: '0.3em', color: '#888' }} name="question circle outline" />
+        <Icon
+          onClick={() => setPopupOpen(!popupOpen)}
+          ref={popupContext}
+          style={{ marginLeft: '0.3em', color: '#888' }}
+          name="question circle outline"
+        />
       </div>
     </div>
   )
@@ -286,7 +292,18 @@ const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
 
   return (
     <>
-      <Popup hoverable size="tiny" trigger={trigger} context={popupContext} {...popupProps} mouseEnterDelay={1000}>
+      <Popup
+        hoverable
+        size="tiny"
+        open={popupOpen}
+        onOpen={() => setPopupOpen(true)}
+        onClose={() => setPopupOpen(false)}
+        trigger={trigger}
+        context={popupContext}
+        {...popupProps}
+        on="hover"
+        mouseEnterDelay={1000}
+      >
         <div>{tooltip}</div>
         <span style={{ color: '#2185d0', cursor: 'pointer' }} onClick={onOpenDetails}>
           Lue lisää...
