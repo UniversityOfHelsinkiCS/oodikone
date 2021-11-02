@@ -139,6 +139,7 @@ const StudyGuidanceGroupOverview = () => {
       key: 'studyProgramme',
       title: 'Study programme',
       getRowVal: () => 'studyProgramme',
+      headerProps: { onClick: null, sorted: null },
       getRowContent: group =>
         group.tags?.studyProgramme && !showEditStudyProgramme ? (
           <TagCell
@@ -160,6 +161,7 @@ const StudyGuidanceGroupOverview = () => {
       key: 'associatedyear',
       title: 'Associated year',
       getRowVal: () => 'associatedYear',
+      headerProps: { onClick: null, sorted: null },
       getRowContent: group =>
         group.tags?.year && !showEditYear ? (
           <TagCell tagName="year" value={group.tags.year} toggleEdit={toggleShowEditYear} />
@@ -175,7 +177,11 @@ const StudyGuidanceGroupOverview = () => {
   return (
     <>
       <StyledMessage>
-        <p>Tällä sivulla pääset tarkastemaan ohjattavien opiskelijoidesi etenemistä ohjausryhmittäin.</p>
+        <p>
+          Tällä sivulla pääset tarkastemaan ohjattavien opiskelijoidesi etenemistä ohjausryhmittäin. Voit halutessasi
+          lisätä ohjausryhmään aloitusvuoden ja koulutusohjelman, jolloin yksittäisen ohjausryhmän näkymään avautuu
+          lisäominaisuuksia.{' '}
+        </p>
       </StyledMessage>
       <SortableTable columns={headers} getRowKey={group => group.id} data={groups} />
     </>
