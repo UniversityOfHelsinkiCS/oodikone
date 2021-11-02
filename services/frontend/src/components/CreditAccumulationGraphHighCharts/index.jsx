@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { renderToString } from 'react-dom/server'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { arrayOf, bool, object, string, func, number, shape } from 'prop-types'
 import { withRouter } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
 import { Button } from 'semantic-ui-react'
@@ -220,7 +219,7 @@ class CreditAccumulationGraphHighCharts extends Component {
       },
       xAxis: {
         max: students.maxDate,
-        min: students.minDateWithCredits || students.minDate,
+        min: students.minDateWithCredits || students.minDate || this.props.startYear,
         ordinal: false,
       },
       series: dataOfSelected,
@@ -306,25 +305,6 @@ class CreditAccumulationGraphHighCharts extends Component {
       </div>
     )
   }
-}
-
-CreditAccumulationGraphHighCharts.defaultProps = {
-  absences: [],
-  singleStudent: false,
-  render: true,
-  trayOpen: false,
-}
-
-CreditAccumulationGraphHighCharts.propTypes = {
-  singleStudent: bool,
-  students: arrayOf(object).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  setChartHeight: func.isRequired,
-  currentGraphSize: number.isRequired,
-  language: string.isRequired,
-  absences: arrayOf(shape({})),
-  render: bool,
-  trayOpen: bool,
 }
 
 const mapStateToProps = state => ({

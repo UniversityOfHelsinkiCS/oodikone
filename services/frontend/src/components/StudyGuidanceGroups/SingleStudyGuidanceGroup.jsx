@@ -20,7 +20,7 @@ import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationP
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 
-const SingleStudyGroupContent = ({ population, language }) => {
+const SingleStudyGroupContent = ({ population, group, language }) => {
   const custompop = population?.students || []
   const { setAllStudents, filteredStudents } = useFilters()
   const [trayOpen] = useFilterTray()
@@ -79,6 +79,7 @@ const SingleStudyGroupContent = ({ population, language }) => {
               render={false}
               trayOpen={trayOpen}
               language={language}
+              startYear={new Date(parseInt(group.tags.year, 10), 7, 1).getTime()}
             />
           </div>
         ),
@@ -208,7 +209,7 @@ const SingleStudyGuidanceGroupContainer = ({ groupid }) => {
           Loading
         </Loader>
       ) : null}
-      {renderGroup ? <SingleStudyGroupContent population={population} language={language} /> : null}
+      {renderGroup ? <SingleStudyGroupContent population={population} group={group} language={language} /> : null}
     </SingleStudyGroupViewWrapper>
   )
 }
