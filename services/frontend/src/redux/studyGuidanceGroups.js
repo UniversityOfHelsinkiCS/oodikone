@@ -67,7 +67,7 @@ const reducer = (state = initialState, action) => {
           group.id === action.response.studyGuidanceGroupId
             ? {
                 ...state.data.find(group => group.id === action.response.studyGuidanceGroupId),
-                tags: action.response,
+                tags: (({ studyGuidanceGroupId, ...rest }) => rest)(action.response), // omit id
               }
             : group
         ),

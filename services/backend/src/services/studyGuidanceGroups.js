@@ -21,7 +21,8 @@ const getAllGroupsAndStudents = async sisPersonId => {
   }
   const { data } = await importerClient.get(`/person-groups/person/${sisPersonId}`)
   const tagsByGroupId = (await StudyGuidanceGroupTag.findAll()).reduce((acc, curr) => {
-    return { ...acc, [curr.studyGuidanceGroupId]: curr }
+    const { studyProgramme, year } = curr
+    return { ...acc, [curr.studyGuidanceGroupId]: { studyProgramme, year } }
   }, {})
   return Object.values(data).map(group => ({ ...group, tags: tagsByGroupId[group.id] }))
 }
@@ -30,7 +31,7 @@ const changeGroupTags = async ({ groupId, tags }) => {
   const { studyProgramme, year } = tags
   const tagToUpdate = studyProgramme ? { studyProgramme } : { year }
 
-  await StudyGuidanceGroupTag.upsert(
+  const [result] = await StudyGuidanceGroupTag.upsert(
     {
       studyGuidanceGroupId: groupId,
       ...tagToUpdate,
@@ -41,6 +42,7 @@ const changeGroupTags = async ({ groupId, tags }) => {
       },
     }
   )
+  return result
 }
 
 module.exports = {

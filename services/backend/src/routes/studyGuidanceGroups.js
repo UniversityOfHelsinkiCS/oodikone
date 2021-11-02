@@ -33,10 +33,7 @@ router.put('/:id/tags', async (req, res) => {
     )
     return res.status(400).json({ error: 'Access denied' })
   }
-
-  await changeGroupTags({ groupId, tags })
-
-  return res.status(200)
+  return res.status(200).json(await changeGroupTags({ groupId, tags }))
 })
 
 module.exports = router
