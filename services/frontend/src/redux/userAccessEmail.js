@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import { combineReducers } from '@reduxjs/toolkit'
 import { callController, actionTypes } from '../apiConnection'
 
 const CLEAR_USER_ACCESS_ERRORS = 'CLEAR_USER_ACCESS_ERRORS'
