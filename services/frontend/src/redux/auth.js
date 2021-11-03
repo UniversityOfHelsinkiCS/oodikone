@@ -1,5 +1,8 @@
 import { decodeToken } from '../common'
 
+export const loginPrefix = 'LOGIN_'
+export const logoutPrefix = 'LOGOUT_'
+
 export const login = () => ({
   type: 'LOGIN_ATTEMPT',
 })
