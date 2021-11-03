@@ -86,5 +86,11 @@ export default configureStore({
     coolDataScience,
     studyGuidanceGroups,
   },
-  middleware: getDefaultMiddleware => [...getDefaultMiddleware(), handleRequest, handleAuth],
+  // oodikone is currently too heavy for other middlewares than thunk, but
+  // feel free to take use them at some point if possible
+  middleware: getDefaultMiddleware => [
+    ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
+    handleRequest,
+    handleAuth,
+  ],
 })
