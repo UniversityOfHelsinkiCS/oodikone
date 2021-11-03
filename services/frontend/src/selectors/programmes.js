@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 
 const associationsSelector = state => state.populationProgrammesUnfiltered.data
 

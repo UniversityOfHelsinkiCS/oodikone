@@ -6,6 +6,7 @@
     "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^1.6.2",
     "@sentry/browser": "^6.9.0",
     "@sentry/tracing": "^6.11.0",
     "axios": "^0.21.1",
@@ -27,13 +28,10 @@
     "react-dom": "^16.14.0",
     "react-highcharts": "^16.1.0",
     "react-markdown": "^6.0.2",
-    "react-redux": "^7.2.4",
+    "react-redux": "^7.2.6",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "react-scroll-to-component": "^1.0.2",
-    "redux": "^4.1.0",
-    "redux-thunk": "^2.3.0",
-    "reselect": "^4.0.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.0.3",
     "unfuck-spa-shibboleth-session": "^3.1.3",
