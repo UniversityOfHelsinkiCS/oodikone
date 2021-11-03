@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Formik } from 'formik'
 import { Form, Button, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
+import { isNaN } from 'lodash'
 import SortableTable from '../SortableTable'
 import { getTextIn, textAndDescriptionSearch } from '../../common'
 import StyledMessage from './StyledMessage'
@@ -29,6 +30,10 @@ const LinkToGroup = ({ group, language }) => (
 const prettifyCamelCase = str => {
   const splitted = str.match(/[A-Za-z][a-z]*/g) || []
   return splitted.map(w => w.charAt(0).toLowerCase() + w.substring(1)).join(' ')
+}
+
+const startYearToAcademicYear = year => {
+  return year === '' || isNaN(year) ? '' : `${year} - ${parseInt(year, 10) + 1}`
 }
 
 const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
@@ -65,7 +70,14 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
                 dateFormat="YYYY"
                 timeFormat={false}
                 initialvalue={group.tags?.[tagName]}
-                renderYear={(props, selectableYear) => <td {...props}>{selectableYear}</td>}
+                renderYear={(props, selectableYear) => <td {...props}>{startYearToAcademicYear(selectableYear)}</td>}
+                renderInput={({ value, ...rest }) => {
+                  return (
+                    <div>
+                      <input value={startYearToAcademicYear(value)} placeholder="Select year" {...rest} />
+                    </div>
+                  )
+                }}
                 closeOnSelect
                 value={formik.values[tagName]}
                 onChange={value => formik.setFieldValue(tagName, value?.format('YYYY'))}
@@ -90,8 +102,17 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
 
 const TagCell = ({ tagName, group, studyProgrammes }) => {
   const [showEdit, toggleEdit] = useToggle()
-  const value = group.tags?.[tagName]
-  const text = tagName === 'studyProgramme' ? studyProgrammes.find(p => p.value === value)?.text : value
+  const getText = () => {
+    switch (tagName) {
+      case 'studyProgramme':
+        return studyProgrammes.find(p => p.value === group.tags?.[tagName])?.text
+      case 'year':
+        return startYearToAcademicYear(group.tags?.[tagName])
+      default:
+        throw Error(`Wrong tagname: ${tagName}`)
+    }
+  }
+  const text = getText()
 
   return group.tags?.[tagName] && !showEdit ? (
     <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
@@ -141,7 +162,7 @@ const StudyGuidanceGroupOverview = () => {
     {
       key: 'studyProgramme',
       title: 'Study programme',
-      getRowVal: () => 'studyProgramme',
+      getRowVal: group => group.tags?.studyProgramme,
       headerProps: { onClick: null, sorted: null },
       getRowContent: group => (
         <TagCell tagName="studyProgramme" studyProgrammes={studyProgrammesFilteredForDropdown} group={group} />
@@ -149,8 +170,8 @@ const StudyGuidanceGroupOverview = () => {
     },
     {
       key: 'associatedyear',
-      title: 'Associated year',
-      getRowVal: () => 'associatedYear',
+      title: 'Associated starting academic year',
+      getRowVal: group => group.tags?.year,
       headerProps: { onClick: null, sorted: null },
       getRowContent: group => <TagCell tagName="year" group={group} />,
     },
