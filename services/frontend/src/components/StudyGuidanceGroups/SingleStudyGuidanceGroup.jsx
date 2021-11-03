@@ -79,7 +79,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
               render={false}
               trayOpen={trayOpen}
               language={language}
-              startYear={new Date(parseInt(group?.tags?.year, 10), 7, 1).getTime()}
+              startDate={new Date(parseInt(group?.tags?.year, 10), 7, 1).getTime()}
             />
           </div>
         ),
