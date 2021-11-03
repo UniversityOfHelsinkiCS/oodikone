@@ -20,10 +20,16 @@ const getHeaders = () => {
 
 export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders() })
 
+export const actionSuffixes = {
+  attempt: `ATTEMPT`,
+  failure: `FAILURE`,
+  success: `SUCCESS`,
+}
+
 export const actionTypes = prefix => ({
-  attempt: `${prefix}ATTEMPT`,
-  failure: `${prefix}FAILURE`,
-  success: `${prefix}SUCCESS`,
+  attempt: `${prefix}${actionSuffixes.attempt}`,
+  failure: `${prefix}${actionSuffixes.failure}`,
+  success: `${prefix}${actionSuffixes.success}`,
 })
 
 export const logout = async () => {
