@@ -1,4 +1,3 @@
-import { combineReducers } from 'redux'
 import actionHistory from './actionHistory'
 import users from './users'
 import populations from './populations'
@@ -41,7 +40,7 @@ import customPopulationSearch from './customPopulationSearch'
 import coolDataScience from './coolDataScience'
 import studyGuidanceGroups from './studyGuidanceGroups'
 
-export default combineReducers({
+export default {
   actionHistory,
   users,
   mandatoryCourseLabels,
@@ -83,4 +82,4 @@ export default combineReducers({
   customPopulationSearch,
   coolDataScience,
   studyGuidanceGroups,
-})
+}
