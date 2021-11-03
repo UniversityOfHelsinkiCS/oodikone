@@ -2,6 +2,7 @@ import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 import { getMocked, setMocking } from '../common'
 import { apiBasePath, isDev } from '../conf'
+import { loginPrefix, logoutPrefix } from '../redux/auth'
 
 const getHeaders = () => {
   // Set up dev user for development environment, mimicking production admin user
@@ -19,16 +20,10 @@ const getHeaders = () => {
 
 export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders() })
 
-const types = {
-  attempt: prefix => `${prefix}ATTEMPT`,
-  failure: prefix => `${prefix}FAILURE`,
-  success: prefix => `${prefix}SUCCESS`,
-}
-
 export const actionTypes = prefix => ({
-  attempt: types.attempt(prefix),
-  failure: types.failure(prefix),
-  success: types.success(prefix),
+  attempt: `${prefix}ATTEMPT`,
+  failure: `${prefix}FAILURE`,
+  success: `${prefix}SUCCESS`,
 })
 
 export const logout = async () => {
@@ -69,7 +64,8 @@ export const callController = (route, prefix, data, method = 'get', query, param
     params,
     onProgress,
   }
-  return { type: `${prefix}ATTEMPT`, requestSettings }
+  const { attempt } = actionTypes(prefix)
+  return { type: attempt, requestSettings }
 }
 
 const handleError = (err, actionHistory = []) => {
@@ -90,20 +86,24 @@ export const handleRequest = store => next => async action => {
   const { requestSettings } = action
   if (requestSettings) {
     const { route, method, data, prefix, query, params, onProgress } = requestSettings
+    const { success, failure } = actionTypes(prefix)
     try {
       const res = await callApi(route, method, data, params, 0, onProgress)
-      store.dispatch({ type: `${prefix}SUCCESS`, response: res.data, query })
+      store.dispatch({ type: success, response: res.data, query })
     } catch (e) {
-      store.dispatch({ type: `${prefix}FAILURE`, response: e, query })
+      store.dispatch({ type: failure, response: e, query })
       handleError(e, store.getState().actionHistory)
     }
   }
 }
 
 export const handleAuth = store => next => async action => {
+  const loginTypes = actionTypes(loginPrefix)
+  const logoutTypes = actionTypes(logoutPrefix)
   next(action)
   const { type } = action
-  if (type === 'LOGIN_ATTEMPT') {
+  if (type === loginTypes.attempt) {
+    const { success, failure } = loginTypes
     try {
       let token
       const mocked = getMocked()
@@ -118,17 +118,18 @@ export const handleAuth = store => next => async action => {
         ...api.defaults.headers.common,
         'x-access-token': token,
       }
-      store.dispatch({ type: 'LOGIN_SUCCESS', token })
+      store.dispatch({ type: success, token })
     } catch (err) {
-      store.dispatch({ type: 'LOGIN_FAILURE' })
+      store.dispatch({ type: failure })
       handleError(err, store.getState().actionHistory)
     }
-  } else if (type === 'LOGOUT_ATTEMPT') {
+  } else if (type === loginTypes.attempt) {
+    const { success, failure } = logoutTypes
     try {
       await logout()
-      store.dispatch({ type: 'LOGOUT_SUCCESSFUL' })
+      store.dispatch({ type: success })
     } catch (err) {
-      store.dispatch({ type: 'LOGOUT_FAILURE' })
+      store.dispatch({ type: failure })
       handleError(err, store.getState().actionHistory)
     }
   }
