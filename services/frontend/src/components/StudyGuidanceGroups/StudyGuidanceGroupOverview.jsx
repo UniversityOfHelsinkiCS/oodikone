@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { Formik } from 'formik'
 import { Form, Button, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
-import { isNaN } from 'lodash'
 import SortableTable from '../SortableTable'
 import { getTextIn, textAndDescriptionSearch } from '../../common'
 import StyledMessage from './StyledMessage'
@@ -33,7 +32,7 @@ const prettifyCamelCase = str => {
 }
 
 const startYearToAcademicYear = year => {
-  return year === '' || isNaN(year) ? '' : `${year} - ${parseInt(year, 10) + 1}`
+  return year === '' || Number.isNaN(year) ? '' : `${year} - ${parseInt(year, 10) + 1}`
 }
 
 const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
