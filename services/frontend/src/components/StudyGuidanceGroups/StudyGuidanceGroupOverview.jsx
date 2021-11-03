@@ -159,6 +159,18 @@ const StudyGuidanceGroupOverview = () => {
       },
     },
     {
+      key: 'students',
+      title: 'students',
+      getRowVal: group => group.members?.length || 0,
+      getRowContent: group => group.members?.length || 0,
+      cellProps: {
+        style: {
+          padding: '0',
+          textAlign: 'center',
+        },
+      },
+    },
+    {
       key: 'studyProgramme',
       title: 'Study programme',
       getRowVal: group => group.tags?.studyProgramme,
