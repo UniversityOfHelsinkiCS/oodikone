@@ -1,35 +1,37 @@
-import { callController } from '../apiConnection'
+import { createReducer } from '@reduxjs/toolkit'
+import { callController, actionTypes } from '../apiConnection'
+import { initialState, matcherReducers, defaultReducer } from './common'
 
-const prefix = 'GET_STUDY_GUIDANCE_GROUPS_'
-
-export const getStudyGuidanceGroups = () => {
-  const route = '/studyguidancegroups'
-  return callController(route, prefix)
+const baseUrl = '/studyguidancegroups'
+const getPrefix = 'GET_STUDY_GUIDANCE_GROUPS_'
+const getTypes = {
+  ...actionTypes(getPrefix),
+}
+const changeTagsPrefix = 'CHANGE_STUDY_GUIDANCE_GROUP_TAGS_'
+const changeTagsTypes = {
+  ...actionTypes(changeTagsPrefix),
 }
 
-const reducer = (state = { data: [] }, action) => {
-  switch (action.type) {
-    case `${prefix}ATTEMPT`:
-      return {
-        ...state,
-        pending: true,
-      }
-    case `${prefix}FAILURE`:
-      return {
-        ...state,
-        pending: false,
-        error: true,
-      }
-    case `${prefix}SUCCESS`:
-      return {
-        ...state,
-        pending: false,
-        error: false,
-        data: action.response,
-      }
-    default:
-      return state
-  }
-}
+export const getStudyGuidanceGroups = () => callController(baseUrl, getPrefix)
+
+export const changeStudyGuidanceGroupTags = (groupId, tags) =>
+  callController(`${baseUrl}/${groupId}/tags`, changeTagsPrefix, tags, 'put')
+
+const reducer = createReducer(
+  initialState,
+  {
+    [getTypes.success]: (state, action) => {
+      state.data = action.response
+    },
+    [changeTagsTypes.success]: (state, action) => {
+      state.data.find(group => group.id === action.response.studyGuidanceGroupId).tags = (({
+        studyGuidanceGroupId,
+        ...rest
+      }) => rest)(action.response)
+    },
+  },
+  matcherReducers,
+  defaultReducer
+)
 
 export default reducer

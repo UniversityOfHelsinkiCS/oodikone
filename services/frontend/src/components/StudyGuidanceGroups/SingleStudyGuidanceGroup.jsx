@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Button, Loader, Header, Accordion, Divider, Segment } from 'semantic-ui-react'
 import { useHistory } from 'react-router-dom'
 import scrollToComponent from 'react-scroll-to-component'
-import { getCustomPopulation } from '../../redux/populations'
+import { getCustomPopulation, clearPopulations } from '../../redux/populations'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import StyledMessage from './StyledMessage'
 import { getTextIn } from '../../common'
@@ -20,7 +20,7 @@ import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationP
 import InfoBox from '../InfoBox'
 import infotooltips from '../../common/InfoToolTips'
 
-const SingleStudyGroupContent = ({ population, language }) => {
+const SingleStudyGroupContent = ({ population, group, language }) => {
   const custompop = population?.students || []
   const { setAllStudents, filteredStudents } = useFilters()
   const [trayOpen] = useFilterTray()
@@ -79,6 +79,7 @@ const SingleStudyGroupContent = ({ population, language }) => {
               render={false}
               trayOpen={trayOpen}
               language={language}
+              startYear={new Date(parseInt(group?.tags?.year, 10), 7, 1).getTime()}
             />
           </div>
         ),
@@ -149,11 +150,17 @@ const SingleStudyGroupContent = ({ population, language }) => {
 }
 
 const SingleStudyGroupViewWrapper = ({ history, groupName, language, children }) => {
+  const dispatch = useDispatch()
+  const handleBack = () => {
+    dispatch(clearPopulations())
+    history.push('/studyguidancegroups')
+  }
+
   return (
     <>
       <div className="segmentContainer">
         <Segment className="contentSegment">
-          <Button icon="arrow circle left" content="Back" onClick={() => history.push('/studyguidancegroups')} />
+          <Button icon="arrow circle left" content="Back" onClick={handleBack} />
           <Divider />
           <Header size="medium">{getTextIn(groupName, language)}</Header>
         </Segment>
@@ -173,9 +180,8 @@ const SingleStudyGuidanceGroupContainer = ({ groupid }) => {
   const { data: population, pending } = useSelector(({ populations }) => populations)
 
   useEffect(() => {
-    if (!group) return
     const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-    if (groupStudentNumbers.length === 0) return
+    if (groupStudentNumbers.length === 0 || population?.students?.length > 0) return
     dispatch(getCustomPopulation({ studentnumberlist: groupStudentNumbers, usingStudyGuidanceGroups: true }))
     dispatch(
       getCustomPopulationCoursesByStudentnumbers({
@@ -208,7 +214,7 @@ const SingleStudyGuidanceGroupContainer = ({ groupid }) => {
           Loading
         </Loader>
       ) : null}
-      {renderGroup ? <SingleStudyGroupContent population={population} language={language} /> : null}
+      {renderGroup ? <SingleStudyGroupContent population={population} group={group} language={language} /> : null}
     </SingleStudyGroupViewWrapper>
   )
 }

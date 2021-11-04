@@ -79,7 +79,7 @@ const initializeDatabaseConnection = async () => {
     const migrations = await migrator.up()
     logger.info({ message: 'Kone Migrations up to date', meta: migrations })
   } catch (e) {
-    logger.error('Kone Migration error')
+    logger.error({ message: 'Kone Migration error: ', meta: e })
     throw e
   }
 }

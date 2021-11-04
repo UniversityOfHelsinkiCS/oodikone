@@ -1,5 +1,8 @@
 /// <reference types="Cypress" />
 
+const moment = require('moment')
+const _ = require('lodash')
+
 const setPopStatsUntil = (until, includeSettings = []) => {
   cy.contains('Advanced settings').siblings().get('[data-cy=advanced-toggle]').click()
   includeSettings.forEach(setting => {
@@ -13,6 +16,8 @@ const setPopStatsUntil = (until, includeSettings = []) => {
 describe('Population Statistics tests', () => {
   const pathToCSBach2017 =
     '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22KH50_005%22}&tag&year=2017'
+  const pathToCSMaster2019 =
+    '/populations?months=27&semesters=FALL&semesters=SPRING&studyRights=%7B%22programme%22%3A%22MH50_009%22%7D&tag&year=2019'
   describe('when using basic user', () => {
     beforeEach(() => {
       cy.init('/populations')
@@ -121,6 +126,51 @@ describe('Population Statistics tests', () => {
       cy.contains('Fetch population').click()
 
       cy.contains('Credit accumulation (for 170 students)')
+    })
+
+    it('Credit Statistics, Credits Gained tab works', () => {
+      cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
+      cy.contains('Credit statistics').click()
+      cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the population')
+
+      const months = Math.ceil(moment.duration(moment().diff(moment('2017-08-1'))).asMonths())
+
+      const limits = [1, ..._.range(1, 4).map(p => Math.ceil(months * ((p * 15) / 12))), null]
+      const ranges = _.range(1, limits.length).map(i => _.slice(limits, i - 1, i + 1))
+
+      cy.get('.credits-gained-table').should('contain', '(n=149)')
+
+      for (const [start, end] of ranges) {
+        let value = 'credits'
+
+        if (start !== null) {
+          value = `${start} ≤ ${value}`
+        }
+
+        if (end !== null) {
+          value = `${value} < ${end}`
+        }
+
+        cy.get('.credits-gained-table').should('contain', value)
+      }
+
+      cy.get("[data-cy='credits-gained-table-body'] td:nth-child(3)").then($els => {
+        const sum = [...$els].map($el => parseInt($el.innerText)).reduce((a, b) => a + b, 0)
+
+        expect(sum).to.equal(149)
+      })
+
+      cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('not.exist')
+    })
+
+    it('Credit Statistics, Credits Gained tab shows stats by admissions', () => {
+      cy.visit(pathToCSMaster2019)
+      cy.contains('Credit statistics').click()
+      cy.get('.credits-gained-divider').click()
+      cy.get("[data-cy='credits-gained-table-Avoin väylä']").should('exist')
+      cy.get("[data-cy='credits-gained-table-Yhteispisteet']").should('exist')
+      cy.get("[data-cy='credits-gained-table-Muu']").should('exist')
+      cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('exist')
     })
 
     it('Credit Statistics, Statistics pane works', () => {

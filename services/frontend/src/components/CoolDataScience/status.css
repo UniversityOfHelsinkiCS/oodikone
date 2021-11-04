@@ -26,10 +26,6 @@
   margin-left: 0.3em;
 }
 
-.years.item-type-course {
-  grid-template-columns: repeat(2, fit-content(0)) auto;
-}
-
 .year-label {
   white-space: nowrap;
   padding-right: 0.5em;
@@ -43,7 +39,16 @@
 .year-row {
   position: relative;
   padding-left: 0.5em;
-  display: inline-block;
+  display: contents;
+}
+
+.year-row .unit {
+  grid-column: 5;
+}
+
+.year-row .separator {
+  color: #aaa;
+  margin: 0 0.3em;
 }
 
 .status-date-time-input {

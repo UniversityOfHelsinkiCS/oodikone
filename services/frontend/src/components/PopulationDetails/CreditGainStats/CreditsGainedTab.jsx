@@ -1,62 +1,59 @@
-import React, { useMemo } from 'react'
-import PropTypes from 'prop-types'
-import { useLocation } from 'react-router-dom'
-import { Table } from 'semantic-ui-react'
-import { getMonths } from '../../../common/query'
-import { getStudentTotalCredits } from '../../../common'
-import CollapsibleCreditRow from './CollapsibleCreditRow'
+import React, { useState } from 'react'
+import { Divider, Icon, Grid, Label } from 'semantic-ui-react'
 
-const CreditsGainedTab = ({ filteredStudents }) => {
-  const months = getMonths(useLocation())
-  const creditList = useMemo(() => filteredStudents.map(student => getStudentTotalCredits(student)), [filteredStudents])
+import CreditsGainedTable from './CreditsGainedTable'
 
-  const studentCount = (min, max = Infinity) =>
-    max === 0
-      ? creditList.filter(credits => credits === 0).length
-      : creditList.filter(credits => credits < max && credits >= min).length
+const admissionTypes = [
+  'Todistusvalinta',
+  'Koepisteet',
+  'Yhteispisteet',
+  'Avoin väylä',
+  'Kilpailumenestys',
+  'Muu',
+  null,
+]
 
-  const limits = [
-    [Math.ceil(months * (60 / 12))],
-    [Math.ceil(months * (45 / 12)), Math.ceil(months * (60 / 12))],
-    [Math.ceil(months * (30 / 12)), Math.ceil(months * (45 / 12))],
-    [Math.ceil(months * (15 / 12)), Math.ceil(months * (30 / 12))],
-    [1, Math.ceil(months * (15 / 12))],
-    [null, 0],
-  ]
+const CreditsGainedTab = ({ allStudents, query }) => {
+  const [show, setShow] = useState(false)
+  if (!allStudents || !allStudents.length || !query) return null
+
+  const { studyRights } = query
+
+  const filterFunction = (student, type) =>
+    student.studyrights.some(
+      sr => sr.studyright_elements.some(e => e.code === studyRights?.programme) && type === sr.admission_type
+    )
+
+  const getCreditsGainedTable = type => {
+    const filteredStudents = allStudents.filter(s => filterFunction(s, type))
+    return <CreditsGainedTable type={type || 'Ei valintatapaa'} filteredStudents={filteredStudents} />
+  }
+
+  const admissionTypesAvailable = !allStudents.every(s => filterFunction(s, null))
 
   return (
-    <Table celled>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell collapsing />
-          <Table.HeaderCell>Credits Gained During First {months} Months</Table.HeaderCell>
-          <Table.HeaderCell>
-            Number of Students
-            <br />
-            <span style={{ fontWeight: 100 }}>(n={filteredStudents.length})</span>
-          </Table.HeaderCell>
-          <Table.HeaderCell>Percentage of Population</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-
-      <Table.Body>
-        {limits.map(([min, max]) => (
-          <CollapsibleCreditRow
-            key={`table-row-${min}-${max}`}
-            min={min}
-            max={max}
-            studentCount={studentCount}
-            filteredLength={filteredStudents.length}
-            months={Number(months)}
-          />
-        ))}
-      </Table.Body>
-    </Table>
+    <Grid>
+      <Grid.Row>
+        <Grid.Column width={16} data-cy="credits-gained-main-table">
+          <CreditsGainedTable type="All students of the population" filteredStudents={allStudents} />
+        </Grid.Column>
+      </Grid.Row>
+      {admissionTypesAvailable && (
+        <Divider
+          className="credits-gained-divider"
+          horizontal
+          style={{ cursor: 'pointer' }}
+          onClick={() => setShow(!show)}
+        >
+          By admission type <Icon name={`angle ${show ? 'down' : 'right'}`} />
+          <Label style={{ marginLeft: '1rem', marginBottom: '0.5rem' }} color="red">
+            NEW!
+          </Label>
+        </Divider>
+      )}
+      {show && <Grid.Row>{admissionTypes.map(type => getCreditsGainedTable(type))}</Grid.Row>}
+    </Grid>
   )
-}
-
-CreditsGainedTab.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default CreditsGainedTab

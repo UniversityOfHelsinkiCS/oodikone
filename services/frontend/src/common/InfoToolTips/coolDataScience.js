@@ -57,19 +57,7 @@ export default {
   Nuoli kuvaa muutosta, paljonko opintopisteitä on kertynyt tämänhetkisen lukuvuoden alusta tarkastelupäivään mennessä 
   suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna. Vain suoritetut ja hyväksiluetut opintopisteet huomioidaan.
   
-  Tilannekuvassa voi porautua kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. 
-  
-  Valinta "Näytä edelliset vuodet" näyttää vuosittaisen opintopiste-kertymän tähän päivään
-  mennessä vuonna X sekä koko lukuvuoden X opintopisteet muodossa "kerääntymä vuonna X / koko lukuvuoden X opintopisteet".
-  
-  Valinta "Näytä kalenterivuosittain" laskee kertymän kalenterivuoden alusta,
-  eikä lukuvuoden alusta.
-
-  Valinta "Näytä suhteutettuna opiskelijoiden määrään" näyttää opintopistemäärät suhteutettuna kyseisen ajanjakson aikana kyseisen organisaation alaisuuteen kuuluvia kursseja suorittaineiden opiskelijoiden määrään. Tämä luku sisältää myös avoimen yliopiston opiskelijat.
-  
-  Kohdasta "Näytä päivänä" voi valita tarkastelupäivän, joka on oletusarvoisesti tämänhetkinen päivä.
-  
-  Avoimen yliopiston suorituksia ei vielä lasketa mukaan.
+  Tilannekuvassa voi porautua kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. Mahdolliset valinnat ovat selitettyinä alla.
   `,
   statusGraduated: `
   Tilannekuva näyttää "reaaliaikaisesti" eri tiedekuntien ja ohjelmien valmistumiset nykyisen lukuvuoden aikana 

@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react'
-import PropTypes from 'prop-types'
 import { Tab } from 'semantic-ui-react'
 import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../InfoBox'
@@ -12,7 +11,7 @@ const CreditGainStats = ({ filteredStudents, query }) => {
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <CreditsGainedTab filteredStudents={filteredStudents} />
+        <CreditsGainedTab allStudents={filteredStudents} query={query} />
       </Tab.Pane>
     )
   }, [filteredStudents])
@@ -49,10 +48,6 @@ const CreditGainStats = ({ filteredStudents, query }) => {
       )}
     </div>
   )
-}
-
-CreditGainStats.propTypes = {
-  filteredStudents: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default CreditGainStats

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
-import { func, arrayOf, shape, bool, string, object, oneOfType } from 'prop-types'
 import { Form, Button, Message, Icon, Grid } from 'semantic-ui-react'
 import uuidv4 from 'uuid/v4'
 import Datetime from 'react-datetime'
@@ -21,7 +20,6 @@ import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, ca
 import { useSearchHistory } from '../../common/hooks'
 import { setLoading } from '../../redux/graphSpinner'
 import './populationSearch.css'
-import { dropdownType } from '../../constants/types'
 import SearchHistory from '../SearchHistory'
 
 const YEAR_DATE_FORMAT = 'YYYY'
@@ -566,28 +564,6 @@ const PopulationSearchForm = props => {
       </Form>
     </div>
   )
-}
-
-PopulationSearchForm.propTypes = {
-  language: string.isRequired,
-  getProgrammes: func.isRequired,
-  getPopulationStatistics: func.isRequired,
-  getPopulationCourses: func.isRequired,
-  getMandatoryCourses: func.isRequired,
-  queries: shape({}).isRequired,
-  studyProgrammes: shape({}), //eslint-disable-line
-  studyTracks: arrayOf(dropdownType), //eslint-disable-line
-  setLoading: func.isRequired,
-  pending: bool, //eslint-disable-line
-  getSemesters: func.isRequired,
-  semesters: shape({}).isRequired,
-  history: shape({}).isRequired,
-  location: shape({}).isRequired,
-  getTagsByStudytrackAction: func.isRequired,
-  tags: oneOfType([arrayOf(shape({ tag_id: string, tagname: string })), object]).isRequired,
-  onProgress: func.isRequired,
-  clearSelected: func.isRequired,
-  clearPopulations: func.isRequired,
 }
 
 const mapStateToProps = ({ semesters, settings, populations, populationProgrammes, tags }) => {

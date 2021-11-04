@@ -38,4 +38,6 @@ if (isDev) {
 
 const logger = winston.createLogger({ transports })
 
+logger.on('error', e => console.error('Logging failed! Reason: ', e)) // eslint-disable-line no-console
+
 module.exports = logger
