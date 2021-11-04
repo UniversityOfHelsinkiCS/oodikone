@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
-import { Segment, Popup, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { Divider, Segment, Button, Popup, Loader, Icon, Checkbox, Form, Breadcrumb } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
 
+import { useHistory, useLocation } from 'react-router-dom'
 import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
@@ -25,6 +26,52 @@ const mapValueToRange = (x, min1, max1, min2, max2) => {
   if (x < min1) return min2
   if (x > max1) return max2
   return ((x - min1) * (max2 - min2)) / (max1 - min1) + min2
+}
+
+const actionTooltips = {
+  showByYear: {
+    label: 'Näytä kalenterivuosittain',
+    short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta.',
+    long: `
+      Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
+      Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
+    `,
+  },
+
+  showYearlyValues: {
+    label: 'Näytä edelliset vuodet',
+    short: 'Näytä tilastot vuosittain, alkaen vuodesta 2017.',
+    long: `
+      Näyttää tilastot vuodesta 2017 eteenpäin.
+
+      Jokaiselta vuodelta näytetään kaksi tilastoa: ajanjakson kokonaistilasto ja ns. tähän mennessä "*kertynyt*" tilasto.
+      Kokonaistilasto vastaa nimensä mukaisesti koko ajanjaksoa, kun taas *kertynyt* tilasto kattaa ajanjakson vuoden 
+      tai lukuvuoden alusta "Näytä päivänä"-valintaa vastaavaan päivämäärään tuona vuotena. Luvut näytetään muodossa *<kerynyt>*/*<kokonais>*.
+      Kuluvalta vuodelta näytetään ainoastaan kertynyt tilasto.
+    `,
+  },
+
+  showRelativeValues: {
+    label: 'Näytä suhteutettuna opiskelijoiden määrään',
+    short:
+      'Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.',
+    long: `
+      Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.
+      Opiskelijoiden määrä perustuu ajanjaksolla kyseisen organisaation alaisista kursseista suoritusmerkintöjä saaneiden opiskelijoiden määrään.
+      Luku siis sisältää muutkin kuin kyseiseen ohjelman tai osaston opinto-oikeuden omaavat opiskelijat.
+    `,
+  },
+
+  showCountingFrom: {
+    label: 'Näytä päivänä',
+    short: 'Valitse päivä johon asti kertyneet tilastot näytetään.',
+    long: `
+      Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
+      Esimerkiksi "Näytä kalenterivuosittain" valinnan ollessa pois päältä,
+      lasketaan kertyneet tilastot (vrt. lukuvuosien kokonaistilastot) kunkin lukuvuoden alusta
+      tätä päivämäärää vastaavaan päivään kyseisenä lukuvuonna.
+    `,
+  },
 }
 
 const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, showRelativeValues, showByYear }) => {
@@ -114,6 +161,8 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
             style={{
               color: getColor(change),
               transform: `rotateZ(${-mapValueToRange(change * 100, min1, max1, -45, 45)}deg)`,
+              transitionProperty: 'transform',
+              transitionDuration: '200ms',
             }}
             size="huge"
             name="arrow right"
@@ -132,7 +181,7 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
         <div className={`years item-type-${stats.type}`}>
           {_.orderBy(Object.entries(stats.yearly), ([y]) => y, ['desc']).map(([year, yearStats]) => {
             return (
-              <span style={{ display: 'contents' }} className="year-row">
+              <span className="year-row">
                 <b className="year-label">
                   {year}
                   {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
@@ -140,6 +189,12 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
                 {stats.type === 'course' ? (
                   <>
                     <span className="year-value">{yearStats.accStudents}</span>
+                    {!!yearStats.totalStudents && (
+                      <>
+                        <span className="separator">{yearStats.totalStudents !== undefined && '/'}</span>
+                        <span className="year-value">{yearStats.totalStudents}</span>
+                      </>
+                    )}
                     <span className="unit">students</span>
                   </>
                 ) : (
@@ -147,7 +202,7 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
                     <span className="year-value accumulated">
                       {getDisplayValue(yearStats.acc, yearStats.accStudents)}
                     </span>
-                    <span style={{ color: '#AAA', margin: '0 0.3em' }}>{yearStats.total !== undefined && '/'}</span>
+                    <span className="separator">{yearStats.total !== undefined && '/'}</span>
                     <span className="year-value total">
                       {yearStats.total !== undefined && getDisplayValue(yearStats.total, yearStats.totalStudents)}
                     </span>
@@ -162,185 +217,22 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
   )
 }
 
-const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
+const StatusContent = ({ data, settings, onDrill }) => {
+  const { showByYear, showRelativeValues, showYearlyValues } = settings
 
-const Status = ({ getStatusDispatch, data, loading }) => {
-  const DATE_FORMAT = 'DD.MM.YYYY'
-  const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
-  const [showByYear, setShowByYear] = useLocalStorage('showByYear', false)
-  const [showRelativeValues, setShowRelativeValues] = useLocalStorage('showRelativeValues', false)
-  const [drillStack, setDrillStack] = useState([])
-  const [showSettings, setShowSettings] = useState(true)
-  const [selectedDate, setSelectedDate] = useState(moment())
-  const [codes, setCodes] = useState([])
-  const { CoolDataScience } = InfoToolTips
-
-  const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
-
-  useEffect(() => {
-    if (selectedDate && isValidDate(selectedDate)) {
-      getStatusDispatch({ date: selectedDate.valueOf(), showByYear })
-    }
-  }, [selectedDate, showByYear])
-
-  useEffect(() => {
-    if (codes.length > 0) {
-      const updatedDrillStack = codes.reduce((acc, code) => {
-        const drilled = data[code]
-        // check if the code is on first level of drilldown
-        if (drilled) acc.push(drilled.drill)
-        // if not on first level then use the previous object in array
-        // this might be source of bugs but its the best I could come up with
-        else if (acc.length > 0 && acc[0][code]) acc.push(acc[0][code].drill)
-        return acc
-      }, [])
-      setDrillStack(updatedDrillStack)
-    }
-  }, [data])
-
-  const handleShowYearlyValuesToggled = () => {
-    const yearlyValues = showYearlyValues
-    setShowYearlyValues(!showYearlyValues)
-    sendAnalytics(`S Show yearly values toggle ${!yearlyValues ? 'on' : 'off'}`, 'Status')
-  }
-
-  const handleShowByYearToggled = () => {
-    const byYear = showByYear
-    setShowByYear(!showByYear)
-    sendAnalytics(`S Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status')
-  }
-
-  const handleShowRelativeValuesChanged = () => {
-    sendAnalytics(`S Show relative values toggle ${!showRelativeValues ? 'on' : 'off'}`)
-    setShowRelativeValues(!showRelativeValues)
-  }
-
-  const pushToDrillStack = (values, code) => {
-    const updatedCodes = [...codes].concat(code)
-    const updatedDrillStack = [...drillStack].concat(values)
-    setCodes(updatedCodes)
-    setDrillStack(updatedDrillStack)
-    sendAnalytics('S Drilldown clicked', 'Status')
-  }
-
-  const popFromDrillStack = () => {
-    const updatedDrillStack = _.dropRight([...drillStack], 1)
-    const updatedCodes = _.dropRight([...codes], 1)
-    setCodes(updatedCodes)
-    setDrillStack(updatedDrillStack)
-    sendAnalytics('S Drillup clicked', 'Status')
-  }
-
-  const renderSettings = () => {
-    return (
-      <Accordion style={{ padding: 0, paddingTop: '10px', flex: 1 }}>
-        <Accordion.Title style={{ padding: 0, cursor: 'default' }} active={showSettings}>
-          <span style={{ cursor: 'pointer' }} onClick={() => setShowSettings(!showSettings)}>
-            <Icon name="setting" />
-            <span>Asetukset</span>
-          </span>
-        </Accordion.Title>
-        <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
-          <Segment style={{ display: 'flex', alignItems: 'center' }}>
-            <div
-              style={{
-                width: '10px',
-                height: '10px',
-                background: 'red',
-                transform: 'rotateY(0deg) rotate(45deg)',
-                position: 'absolute',
-                top: '-6px',
-                left: '35px',
-                border: '1px solid #dededf',
-                borderRight: 'none',
-                borderBottom: 'none',
-                backgroundColor: 'white',
-              }}
-            />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä edelliset vuodet"
-              onChange={handleShowYearlyValuesToggled}
-              checked={showYearlyValues}
-            />
-            <VerticalLine />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä kalenterivuosittain"
-              onChange={handleShowByYearToggled}
-              checked={showByYear}
-            />
-            <VerticalLine />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä suhteutettuna opiskelijoiden määrään"
-              onChange={handleShowRelativeValuesChanged}
-              checked={showRelativeValues}
-            />
-            <VerticalLine />
-            <Form>
-              <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.9em' }}>Näytä päivänä:</span>
-                <Datetime
-                  className="status-date-time-input"
-                  dateFormat={DATE_FORMAT}
-                  timeFormat={false}
-                  closeOnSelect
-                  value={selectedDate}
-                  locale="fi"
-                  isValidDate={isValidDate}
-                  onChange={setSelectedDate}
-                />
-              </Form.Field>
-            </Form>
-          </Segment>
-        </Accordion.Content>
-      </Accordion>
-    )
-  }
-
-  const DrilldownMessage = () => (
-    <Message
-      color="blue"
-      content="Klikkaamalla tiedekuntaa pystyt porautumaan koulutusohjelma tasolle ja ohjelmaa klikkaamalla pystyt porautumaan kurssitasolle.
-      Vasemmassa yläkulmassa olevaa nuolta klikkaamalla pääset edelliseen näkymään."
-    />
-  )
-
-  if (!data || loading)
-    return (
-      <Segment style={{ padding: '40px' }} textAlign="center">
-        <Dimmer inverted active />
-        <Loader active={loading} />
-      </Segment>
-    )
-
-  const orderedAbsDiffs = _.orderBy(
-    Object.values(_.last(drillStack) || data).map(({ current, currentStudents, previous, previousStudents }) => {
-      return Math.abs(
-        Math.floor(
-          (getP(
-            showRelativeValues ? current / currentStudents : current,
-            showRelativeValues ? previous / previousStudents : previous
-          ) -
-            1) *
-            1000
-        ) / 10
-      )
+  const orderedAbsDiffs = _.chain(data)
+    .map(({ current, currentStudents, previous, previousStudents }) => {
+      const currentValue = showRelativeValues ? current / currentStudents : current
+      const previousValue = showRelativeValues ? previous / previousStudents : previous
+      return Math.abs(Math.floor((getP(currentValue, previousValue) - 1) * 1000) / 10)
     })
-  )
+    .orderBy()
+    .value()
 
   const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
 
   return (
     <>
-      <h2>Koulutusohjelmien tuottamat opintopisteet</h2>
-      <DrilldownMessage />
-      <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px' }}>
-        {drillStack.length > 0 && (
-          <Icon onClick={popFromDrillStack} style={{ fontSize: '40px', cursor: 'pointer' }} name="arrow left" />
-        )}
-      </div>
       <div
         style={{
           display: 'grid',
@@ -351,16 +243,16 @@ const Status = ({ getStatusDispatch, data, loading }) => {
         }}
       >
         {_.orderBy(
-          Object.entries(_.last(drillStack) || data),
-          ([, { current, previous, currentStudents, previousStudents }]) =>
+          data,
+          ({ current, previous, currentStudents, previousStudents }) =>
             getP(current || currentStudents, previous || previousStudents), // oh god<r
           ['desc']
-        ).map(([code, stats]) => {
-          const handleClick = () => pushToDrillStack(stats.drill, code)
+        ).map(stats => {
+          const handleClick = () => onDrill(stats.code)
 
           return (
             <StatusContainer
-              key={code}
+              key={stats.code}
               stats={stats}
               handleClick={handleClick}
               showRelativeValues={showRelativeValues}
@@ -372,20 +264,355 @@ const Status = ({ getStatusDispatch, data, loading }) => {
           )
         })}
       </div>
-      {renderSettings()}
-      <Message>
-        {
-          // eslint-disable-next-line react/no-children-prop
-          <ReactMarkdown children={CoolDataScience.status} escapeHtml={false} />
-        }
-      </Message>
     </>
   )
 }
 
-const mapStateToProps = ({ coolDataScience }) => ({
-  data: coolDataScience.data.status,
-  loading: coolDataScience.pending.status,
+const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
+  const popupContext = useRef()
+  const [popupOpen, setPopupOpen] = useState(false)
+
+  const trigger = (
+    <div>
+      {children}
+      <div ref={popupContext} style={{ display: 'inline-block', paddingTop: '0.2em', cursor: 'help' }}>
+        <Icon
+          onClick={() => setPopupOpen(!popupOpen)}
+          ref={popupContext}
+          style={{ marginLeft: '0.3em', color: '#888' }}
+          name="question circle outline"
+        />
+      </div>
+    </div>
+  )
+
+  const popupProps = _.defaults(rest, {
+    position: 'right center',
+  })
+
+  return (
+    <>
+      <Popup
+        hoverable
+        size="tiny"
+        open={popupOpen}
+        onOpen={() => setPopupOpen(true)}
+        onClose={() => setPopupOpen(false)}
+        trigger={trigger}
+        context={popupContext}
+        {...popupProps}
+        on="hover"
+        mouseEnterDelay={1000}
+      >
+        <div>{tooltip}</div>
+        <span style={{ color: '#2185d0', cursor: 'pointer' }} onClick={onOpenDetails}>
+          Lue lisää...
+        </span>
+      </Popup>
+    </>
+  )
+}
+
+const isValidDate = d => moment().diff(moment(d)) > 0
+
+const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
+  const { showYearlyValues, showByYear, showRelativeValues, selectedDate } = settings
+  const DATE_FORMAT = 'DD.MM.YYYY'
+
+  const changeSetting = (property, value) => {
+    sendAnalytics(`S Set setting "${property}" to ${value}`, 'Status')
+
+    onSettingsChange({
+      ...settings,
+      [property]: value,
+    })
+  }
+
+  const itemStyles = {
+    margin: '0.5rem 1rem',
+    display: 'flex',
+    alignItems: 'center',
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'stretch', padding: 0, flexDirection: 'column' }}>
+      <div style={itemStyles}>
+        <WithHelpTooltip tooltip={actionTooltips.showYearlyValues.short} onOpenDetails={onOpenDetails}>
+          <Checkbox
+            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+            label={actionTooltips.showYearlyValues.label}
+            checked={showYearlyValues}
+            onChange={() => changeSetting('showYearlyValues', !showYearlyValues)}
+          />
+        </WithHelpTooltip>
+      </div>
+      <div style={itemStyles}>
+        <WithHelpTooltip tooltip={actionTooltips.showByYear.short} onOpenDetails={onOpenDetails}>
+          <Checkbox
+            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+            label={actionTooltips.showByYear.label}
+            checked={showByYear}
+            onChange={() => changeSetting('showByYear', !showByYear)}
+          />
+        </WithHelpTooltip>
+      </div>
+      <div style={itemStyles}>
+        <WithHelpTooltip tooltip={actionTooltips.showRelativeValues.short} onOpenDetails={onOpenDetails}>
+          <Checkbox
+            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+            label={actionTooltips.showRelativeValues.label}
+            checked={showRelativeValues}
+            onChange={() => changeSetting('showRelativeValues', !showRelativeValues)}
+          />
+        </WithHelpTooltip>
+      </div>
+      <div style={itemStyles}>
+        <Form>
+          <Form.Field
+            error={selectedDate !== null && !isValidDate(selectedDate)}
+            style={{ display: 'flex', alignItems: 'center' }}
+          >
+            <WithHelpTooltip tooltip={actionTooltips.showCountingFrom.short} onOpenDetails={onOpenDetails}>
+              <span style={{ fontSize: '0.9em' }}>{actionTooltips.showCountingFrom.label}</span>
+            </WithHelpTooltip>
+            <Datetime
+              className="status-date-time-input"
+              dateFormat={DATE_FORMAT}
+              timeFormat={false}
+              closeOnSelect
+              value={moment(selectedDate)}
+              locale="fi"
+              isValidDate={isValidDate}
+              inputProps={{ placeholder: 'Valise päivämäärä' }}
+              onChange={value => {
+                changeSetting('selectedDate', value.format(DATE_FORMAT) === moment().format(DATE_FORMAT) ? null : value)
+              }}
+            />
+          </Form.Field>
+        </Form>
+      </div>
+    </div>
+  )
+}
+
+const getDefaultSettings = () => ({
+  showYearlyValues: true,
+  showByYear: false,
+  showRelativeValues: false,
+  showSettings: true,
+  selectedDate: null,
 })
 
-export default connect(mapStateToProps, { getStatusDispatch: getStatus })(Status)
+const Status = () => {
+  const [explicitSettings, setSettings] = useLocalStorage('trendsStatusSettings', {})
+  const [usageDetailsOpen, setUsageDetailsOpen] = useState(false)
+  const moreDetailsRef = useRef(null)
+  const history = useHistory()
+  const location = useLocation()
+
+  const drillStack = location.state?.drillStack ?? []
+
+  const data = useSelector(state => state.coolDataScience.data.status)
+  const loading = useSelector(state => state.coolDataScience.pending.status)
+  const dispatch = useDispatch()
+
+  const settings = useMemo(() => _.defaults(explicitSettings, getDefaultSettings()), [explicitSettings])
+
+  const { CoolDataScience } = InfoToolTips
+
+  useEffect(() => {
+    const { selectedDate, showByYear } = settings
+
+    let date
+
+    if (!selectedDate) {
+      date = moment().valueOf()
+    } else if (isValidDate(selectedDate)) {
+      date = moment(selectedDate).valueOf()
+    } else {
+      return
+    }
+
+    dispatch(
+      getStatus({
+        date,
+        showByYear,
+      })
+    )
+  }, [settings.selectedDate, settings.showByYear])
+
+  const pushToDrillStack = code => {
+    history.push('/trends/status', {
+      drillStack: [...drillStack, code],
+    })
+
+    sendAnalytics('S Drilldown clicked', 'Status')
+  }
+
+  const breadcrumb = useMemo(() => {
+    const stack = _.chain(drillStack)
+      .reduce(
+        ([stack, data], code) => {
+          let content = code
+          let next = null
+
+          if (data) {
+            const entry = data[code]
+
+            if (entry) {
+              content = getTextIn(entry.name)
+              next = entry.drill
+            }
+          }
+
+          const item = {
+            key: code,
+            content,
+            link: !!next,
+            active: !next,
+            onClick: () => {
+              history.push('/trends/status', {
+                drillStack: [...stack.map(({ key }) => key).splice(1), code],
+              })
+            },
+          }
+
+          return [[...stack, item], next]
+        },
+        [[], data]
+      )
+      .value()[0]
+
+    const hy = {
+      key: '',
+      content: getTextIn({
+        fi: 'Helsingin Yliopisto',
+        en: 'University of Helsinki',
+        sv: 'Helsingfors universitet',
+      }),
+      link: true,
+      onClick: () =>
+        history.push('/trends/status', {
+          drillStack: [],
+        }),
+    }
+
+    return [hy, ...stack]
+  }, [data, drillStack])
+
+  const drilledData = useMemo(
+    () =>
+      _.chain(drillStack)
+        .reduce((data, code) => data && _.values(data).find(item => item.code === code)?.drill, data)
+        .defaultTo({})
+        .values()
+        .value(),
+    [data, drillStack]
+  )
+
+  const popFromDrillStack = () => {
+    const newDrillStack = [...drillStack]
+    newDrillStack.pop()
+    history.push('/trends/status', {
+      drillStack: newDrillStack,
+    })
+
+    sendAnalytics('S Drillup clicked', 'Status')
+  }
+
+  const [settingsOpen, setSettingsOpen] = useState(false)
+
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }} ref={moreDetailsRef}>
+        <h2 style={{ margin: 0, flexGrow: 1 }}>Koulutusohjelmien tuottamat opintopisteet</h2>
+        <Popup
+          trigger={
+            <Button>
+              <Icon name="settings" /> Asetukset
+            </Button>
+          }
+          position="bottom right"
+          on="click"
+          wide="very"
+          open={settingsOpen}
+          onOpen={() => setSettingsOpen(true)}
+          onClose={() => {
+            // Close the popup only after the event has had a chance to propagate.
+            setTimeout(() => setSettingsOpen(false), 0)
+          }}
+          style={{ padding: '0.25em 0em', maxHeight: '80vh' }}
+        >
+          <StatusSettings
+            settings={settings}
+            onSettingsChange={setSettings}
+            onOpenDetails={() => {
+              if (moreDetailsRef.current) {
+                moreDetailsRef.current.scrollIntoView({
+                  block: 'start',
+                  inline: 'end',
+                  behavior: 'smooth',
+                })
+              }
+
+              setUsageDetailsOpen(true)
+            }}
+          />
+        </Popup>
+        <Popup
+          trigger={
+            <Button>
+              <Icon name="question circle" /> Käyttöohje
+            </Button>
+          }
+          position="bottom right"
+          on="click"
+          wide="very"
+          open={usageDetailsOpen}
+          onOpen={() => setUsageDetailsOpen(true)}
+          onClose={() => setUsageDetailsOpen(false)}
+          style={{ padding: '0', paddingBottom: '0.5em', maxHeight: '80vh', overflowY: 'auto' }}
+        >
+          <div style={{ padding: '1em' }}>
+            {
+              // eslint-disable-next-line react/no-children-prop
+              <ReactMarkdown children={CoolDataScience.status} escapeHtml={false} />
+            }
+          </div>
+          {_.toPairs(actionTooltips).map(([key, { label, long }]) => (
+            <div key={key}>
+              <Divider />
+              <div style={{ padding: '0 1em' }}>
+                <b>
+                  Valinta "<i>{label}</i>"
+                </b>
+                <div style={{ margin: '0.5em', fontSize: '0.9em' }}>
+                  <ReactMarkdown escapeHtml={false}>{long.replace(/(^|\n)[ \t]+/g, '\n')}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          ))}
+        </Popup>
+      </div>
+
+      <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px', alignItems: 'center' }}>
+        <Breadcrumb icon="right angle" sections={breadcrumb} size="large" />
+        {drillStack.length > 0 && (
+          <Icon
+            onClick={popFromDrillStack}
+            style={{ cursor: 'pointer', color: 'rgba(0,0,0,.28)', marginLeft: '0.4em', marginTop: '-0.17em' }}
+            name="arrow left"
+          />
+        )}
+      </div>
+
+      {data && !loading ? (
+        <StatusContent settings={settings} onDrill={pushToDrillStack} data={drilledData} />
+      ) : (
+        <Loader active={loading} inline="centered" />
+      )}
+    </>
+  )
+}
+
+export default Status

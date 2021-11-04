@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Table } from 'semantic-ui-react'
-import { shape, arrayOf, string, func, bool, element, oneOfType } from 'prop-types'
 import { sortBy } from 'lodash'
 import { useChunk } from '../../common/hooks'
 
@@ -164,41 +163,6 @@ const SortableTable = ({
       </Table.Body>
     </Table>
   )
-}
-
-SortableTable.propTypes = {
-  tableProps: shape({}),
-  getRowKey: func.isRequired,
-  getRowProps: func,
-  columns: arrayOf(
-    shape({
-      key: string.isRequired,
-      title: oneOfType([element, string]),
-      headerProps: shape({}),
-      getRowVal: func,
-      getRowContent: func,
-      getCellProps: func,
-      cellProps: shape({}),
-      group: bool,
-      children: arrayOf(),
-    })
-  ).isRequired,
-  data: arrayOf(shape({})).isRequired,
-  defaultdescending: bool,
-  defaultsortkey: string,
-  collapsingHeaders: bool,
-  showNames: bool,
-  chunkifyBy: string,
-}
-
-SortableTable.defaultProps = {
-  tableProps: undefined,
-  getRowProps: undefined,
-  defaultdescending: false,
-  defaultsortkey: null,
-  collapsingHeaders: false,
-  showNames: undefined,
-  chunkifyBy: undefined,
 }
 
 export default SortableTable

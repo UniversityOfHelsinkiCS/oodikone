@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import { byDateDesc, reformatDate } from '../common'
 
 const getData = obj => obj

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Table, Progress, Icon } from 'semantic-ui-react'
-import { number, func } from 'prop-types'
+
 import ExternalCreditFilterToggle from './ExternalCreditFilterToggle'
 
 const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }) => {
@@ -74,19 +74,6 @@ const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }
       ))}
     </>
   )
-}
-
-CollapsibleCreditRow.propTypes = {
-  min: number,
-  max: number,
-  studentCount: func.isRequired,
-  filteredLength: number.isRequired,
-  months: number.isRequired,
-}
-
-CollapsibleCreditRow.defaultProps = {
-  min: undefined,
-  max: undefined,
 }
 
 export default CollapsibleCreditRow

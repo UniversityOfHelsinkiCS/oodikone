@@ -1,4 +1,5 @@
 import React from 'react'
+import './navigationBar.css'
 import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -133,7 +134,7 @@ const NavigationBar = props => {
   )
 
   return (
-    <Menu data-cy="navBar" stackable fluid style={{ overflow: 'auto' }}>
+    <Menu data-cy="navBar" stackable fluid className="navBar">
       {renderHome()}
       {renderNavigationRoutes()}
       {renderUserMenu()}

@@ -1,4 +1,4 @@
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import { sortBy, flatten } from 'lodash'
 
 const courseStatsSelector = state => state.courseStats.data

@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Segment, Header, Divider, Form, Button, Icon } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -39,19 +38,6 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
       <ProgressBar progress={progress} />
     </Segment>
   )
-}
-
-PopulationSearch.propTypes = {
-  history: PropTypes.shape({
-    location: PropTypes.shape({
-      search: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
-  location: PropTypes.shape({
-    search: PropTypes.string.isRequired,
-  }).isRequired,
-  populationFound: PropTypes.bool.isRequired,
-  loading: PropTypes.bool.isRequired,
 }
 
 const mapStateToProps = ({ populations }) => ({
