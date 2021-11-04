@@ -706,7 +706,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   return { ...groupedByFaculty, ...openUniGroupedByFaculty }
 }
 
-const getStatus = async (unixMillis, showByYear, doRefresh = true) => {
+const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
   // redis keys for different queries. adds a new key for every queried day.
   // might cause issues, might not but def not until I am out :D
 
