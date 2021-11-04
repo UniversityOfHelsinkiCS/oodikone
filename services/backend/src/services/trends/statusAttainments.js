@@ -193,7 +193,7 @@ const getTotalOpenUniCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias
   return sequelize.query(
     `
     SELECT SUM(cr.credits) AS ${alias}, COUNT(DISTINCT(cr.student_studentnumber)) AS ${alias2},
-    o.code AS organizationcode, co.code, co.id
+    o.code AS organizationcode, co.code, co.id, co.name
     FROM credit cr
     INNER JOIN course co ON cr.course_code = co.code
     INNER JOIN course_providers cp ON cp.coursecode = co.id
@@ -244,6 +244,27 @@ const getOrgStats = (stats, orgId) =>
       direct: { students: 0, credits: 0 },
     },
   }
+
+const getOrgsOfOpenUniReqularCounterparts = async codes => {
+  const rows = await sequelize.query(
+    `
+      SELECT co.id, co.code, cp.organizationcode, org.code AS organization
+      FROM course co, course_providers cp, organization org
+      WHERE co.code IN(:codes)
+      AND co.id = cp.coursecode
+      AND org.id = cp.organizationcode;
+    `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { codes },
+    }
+  )
+
+  return rows.reduce((acc, { code, organization }) => {
+    acc[code] = organization
+    return acc
+  }, {})
+}
 
 const calculateStatusStatistics = async (unixMillis, showByYear) => {
   const YEAR_TO_MILLISECONDS = 31556952000
@@ -314,6 +335,21 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     Organization.findAll(),
   ])
 
+  const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+
+  const unifyOpenUniversity = code => {
+    const regexresult = isOpenUniCourseCode(code)
+    if (!regexresult) return code
+    return regexresult[1]
+  }
+
+  const fromAyToNormalCourses = [
+    ...new Set(_.flatten(yearlyOpenUniAccCredits).map(c => unifyOpenUniversity(c.code))),
+    ...new Set(_.flatten(yearlyOpenUniTotalCredits).map(c => unifyOpenUniversity(c.code))),
+  ]
+
+  const orgsOfOpenUniReqularCounterparts = await getOrgsOfOpenUniReqularCounterparts(fromAyToNormalCourses)
+
   const facultyProgrammes = facultiesAndProgrammesForTrends
 
   const yearlyOrgStatPromises = yearRange.map(async year => {
@@ -380,7 +416,6 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
   }, {})
 
   programmeToFaculties['H906'] = ['H906']
-  programmeToFaculties['H930'] = ['H930']
 
   const providerToProgramme = elementDetails.reduce((res, curr) => {
     const [p] = mapToProviders([curr.code])
@@ -418,17 +453,64 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     return _.mergeWith(a, b, sumMerge)
   }
 
+  const refactoredOpenUniCredits = [..._.flatten(yearlyOpenUniAccCredits), ..._.flatten(yearlyOpenUniTotalCredits)].map(
+    ele => {
+      const org = orgsOfOpenUniReqularCounterparts[unifyOpenUniversity(ele.code)]
+      return {
+        ...ele,
+        organizationcode: org ? org : 'H930',
+      }
+    }
+  )
+
   /* Calculate course level stats and group by providers */
   const coursesGroupedByProvider = Object.entries(
-    _.groupBy(
-      [
-        ..._.flatten(yearlyAccCredits),
-        ..._.flatten(yearlyTotalCredits),
-        ..._.flatten(yearlyOpenUniAccCredits),
-        ..._.flatten(yearlyOpenUniTotalCredits),
-      ],
-      'organizationcode'
+    _.groupBy([..._.flatten(yearlyAccCredits), ..._.flatten(yearlyTotalCredits)], 'organizationcode')
+  ).reduce((acc, [organizationcode, courseCredits]) => {
+    acc[organizationcode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
+      (acc, [courseCode, yearlyInstances]) => {
+        acc[courseCode] = {
+          yearly: {},
+          name: yearlyInstances[0].name,
+          type: 'course',
+          code: courseCode,
+        }
+
+        const array = _.range(2017, startYear + 1)
+
+        array.forEach(year => {
+          acc[courseCode]['yearly'][year] = {}
+          acc[courseCode]['yearly'][year]['acc'] = 0
+          acc[courseCode]['yearly'][year]['accStudents'] = 0
+          acc[courseCode]['yearly'][year]['total'] = undefined
+          acc[courseCode]['yearly'][year]['totalStudents'] = undefined
+        })
+
+        yearlyInstances.forEach(instance => {
+          if (!acc[courseCode]['yearly'][instance.year]) acc[courseCode]['yearly'][instance.year] = {}
+
+          if (instance.acc !== undefined) {
+            acc[courseCode]['yearly'][instance.year]['acc'] = instance.acc
+            acc[courseCode]['yearly'][instance.year]['accStudents'] = Number(instance.students)
+          } else {
+            acc[courseCode]['yearly'][instance.year]['total'] = instance.total
+            acc[courseCode]['yearly'][instance.year]['totalStudents'] = Number(instance.students)
+          }
+        })
+
+        acc[courseCode]['current'] = _.get(acc, [courseCode, 'yearly', startYear, 'acc']) || 0
+        acc[courseCode]['previous'] = _.get(acc, [courseCode, 'yearly', startYear - 1, 'acc']) || 0
+        acc[courseCode]['currentStudents'] = _.get(acc, [courseCode, 'yearly', startYear, 'accStudents']) || 0
+        acc[courseCode]['previousStudents'] = _.get(acc, [courseCode, 'yearly', startYear - 1, 'accStudents']) || 0
+        return acc
+      },
+      {}
     )
+    return acc
+  }, {})
+
+  const openUniCoursesGroupedByProvider = Object.entries(
+    _.groupBy(refactoredOpenUniCredits, 'organizationcode')
   ).reduce((acc, [organizationcode, courseCredits]) => {
     acc[organizationcode] = Object.entries(_.groupBy(courseCredits, 'code')).reduce(
       (acc, [courseCode, yearlyInstances]) => {
@@ -477,7 +559,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     const programme = providerToProgramme[organizationcode]
 
     if (programme && programme.code) {
-      if (programme.code === 'H906' || programme.code === 'H930') {
+      if (programme.code === 'H906') {
         const courseValues = Object.values(courses)
         const yearlyValues = courseValues.map(c => c.yearly)
 
@@ -518,6 +600,34 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
 
     return acc
   }, {})
+
+  const openUniGroupedByProgramme = Object.entries(openUniCoursesGroupedByProvider).reduce(
+    (acc, [organizationcode, courses]) => {
+      const programme = providerToProgramme[organizationcode]
+
+      if (programme && programme.code) {
+        const courseValues = Object.values(courses)
+        const yearlyValues = courseValues.map(c => c.yearly)
+
+        acc[programme.code] = {
+          type: 'programme',
+          code: programme.code,
+          name: programme.name,
+          drill: courses,
+          yearly: _.mergeWith({}, ...yearlyValues, mergele),
+          current: _.sumBy(courseValues, 'current') | undefined,
+          previous: _.sumBy(courseValues, 'previous') | undefined,
+          currentStudents: _.sumBy(courseValues, 'currentStudents') || 'undefined',
+          previousStudents: _.sumBy(courseValues, 'previousStudents') | 'undefined',
+        }
+
+        return acc
+      }
+
+      return acc
+    },
+    {}
+  )
 
   /* Group programmes into faculties and calculate faculty level stats */
   const groupedByFaculty = Object.entries(groupedByProgramme).reduce((acc, [programmeCode, programmeStats]) => {
@@ -569,10 +679,34 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     return acc
   }, {})
 
-  return groupedByFaculty
+  const openUniGroupedByFaculty = Object.entries(openUniGroupedByProgramme).reduce(
+    (acc, [programmeCode, programmeStats]) => {
+      const facultyCode = 'H930'
+
+      if (!acc[facultyCode]) {
+        acc[facultyCode] = {
+          type: 'faculty',
+          code: facultyCode,
+          drill: {},
+          name: facultyCodeToFaculty[facultyCode] ? facultyCodeToFaculty[facultyCode].name : null,
+          yearly: {},
+          current: 0,
+          previous: 0,
+        }
+      }
+
+      acc[facultyCode]['drill'][programmeCode] = programmeStats
+      acc[facultyCode]['yearly'] = _.mergeWith(acc[facultyCode]['yearly'], programmeStats.yearly, mergele)
+      acc[facultyCode]['current'] += programmeStats.current
+      acc[facultyCode]['previous'] += programmeStats.previous
+      return acc
+    },
+    {}
+  )
+  return { ...groupedByFaculty, ...openUniGroupedByFaculty }
 }
 
-const getStatus = async (unixMillis, showByYear, doRefresh = false) => {
+const getStatus = async (unixMillis, showByYear, doRefresh = true) => {
   // redis keys for different queries. adds a new key for every queried day.
   // might cause issues, might not but def not until I am out :D
 
