@@ -28,7 +28,7 @@ const mapValueToRange = (x, min1, max1, min2, max2) => {
   return ((x - min1) * (max2 - min2)) / (max1 - min1) + min2
 }
 
-const actionTooltips = {
+const settingDefinitions = {
   showByYear: {
     label: 'Näytä kalenterivuosittain',
     short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta.',
@@ -36,6 +36,7 @@ const actionTooltips = {
       Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
       Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
     `,
+    defaultValue: false,
   },
 
   showYearlyValues: {
@@ -49,6 +50,7 @@ const actionTooltips = {
       tai lukuvuoden alusta "Näytä päivänä"-valintaa vastaavaan päivämäärään tuona vuotena. Luvut näytetään muodossa *<kerynyt>*/*<kokonais>*.
       Kuluvalta vuodelta näytetään ainoastaan kertynyt tilasto.
     `,
+    defaultValue: false,
   },
 
   showRelativeValues: {
@@ -60,6 +62,7 @@ const actionTooltips = {
       Opiskelijoiden määrä perustuu ajanjaksolla kyseisen organisaation alaisista kursseista suoritusmerkintöjä saaneiden opiskelijoiden määrään.
       Luku siis sisältää muutkin kuin kyseiseen ohjelman tai osaston opinto-oikeuden omaavat opiskelijat.
     `,
+    defaultValue: false,
   },
 
   showCountingFrom: {
@@ -71,10 +74,31 @@ const actionTooltips = {
       lasketaan kertyneet tilastot (vrt. lukuvuosien kokonaistilastot) kunkin lukuvuoden alusta
       tätä päivämäärää vastaavaan päivään kyseisenä lukuvuonna.
     `,
+    defaultValue: null,
+  },
+
+  showStudentCounts: {
+    label: 'Näytä kurssien opiskelijamäärät',
+    short: 'Näyttää suoritettujen opintopisteiden sijasta opiskelijoiden määrät kurssitason näkymässä.',
+    long: `
+      Oletuksena kurssitason näkymässä näytetään organisaatio- ja ohjelmatason näkymien tapaan suoritettujen opintopisteiden
+      kokonaismäärä. Kun tämä valinta on käytössä, tämän sijasta näytettävät luvut vastaavat kurssin suorittaneiden 
+      *yksilöityjen* opiskelijoiden määrää. Kukin opiskelija lasketaan siis vain kerran tähän tilastoon.
+    `,
+    defaultValue: false,
   },
 }
 
-const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, showRelativeValues, showByYear }) => {
+const StatusContainer = ({
+  stats,
+  handleClick,
+  min1,
+  max1,
+  showYearlyValues,
+  showRelativeValues,
+  showByYear,
+  showStudentCounts,
+}) => {
   const title = getTextIn(stats.name)
   const clickable = !!stats.drill
 
@@ -186,7 +210,7 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
                   {year}
                   {!showByYear && `-${`${Number(year) + 1}`.slice(-2)}`}:
                 </b>
-                {stats.type === 'course' ? (
+                {stats.type === 'course' && showStudentCounts ? (
                   <>
                     <span className="year-value">{yearStats.accStudents}</span>
                     {!!yearStats.totalStudents && (
@@ -218,7 +242,7 @@ const StatusContainer = ({ stats, handleClick, min1, max1, showYearlyValues, sho
 }
 
 const StatusContent = ({ data, settings, onDrill }) => {
-  const { showByYear, showRelativeValues, showYearlyValues } = settings
+  const { showByYear, showRelativeValues, showYearlyValues, showStudentCounts } = settings
 
   const orderedAbsDiffs = _.chain(data)
     .map(({ current, currentStudents, previous, previousStudents }) => {
@@ -257,6 +281,7 @@ const StatusContent = ({ data, settings, onDrill }) => {
               handleClick={handleClick}
               showRelativeValues={showRelativeValues}
               showYearlyValues={showYearlyValues}
+              showStudentCounts={showStudentCounts}
               min1={-medianDiff * 2}
               max1={medianDiff * 2}
               showByYear={showByYear}
@@ -316,7 +341,7 @@ const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
 const isValidDate = d => moment().diff(moment(d)) > 0
 
 const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
-  const { showYearlyValues, showByYear, showRelativeValues, selectedDate } = settings
+  const { selectedDate } = settings
   const DATE_FORMAT = 'DD.MM.YYYY'
 
   const changeSetting = (property, value) => {
@@ -334,46 +359,33 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
     alignItems: 'center',
   }
 
+  const createSettingToggle = key => (
+    <div style={itemStyles}>
+      <WithHelpTooltip tooltip={settingDefinitions[key].short} onOpenDetails={onOpenDetails}>
+        <Checkbox
+          style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+          label={settingDefinitions[key].label}
+          checked={settings[key]}
+          onChange={() => changeSetting(key, !settings[key])}
+        />
+      </WithHelpTooltip>
+    </div>
+  )
+
   return (
     <div style={{ display: 'flex', alignItems: 'stretch', padding: 0, flexDirection: 'column' }}>
-      <div style={itemStyles}>
-        <WithHelpTooltip tooltip={actionTooltips.showYearlyValues.short} onOpenDetails={onOpenDetails}>
-          <Checkbox
-            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-            label={actionTooltips.showYearlyValues.label}
-            checked={showYearlyValues}
-            onChange={() => changeSetting('showYearlyValues', !showYearlyValues)}
-          />
-        </WithHelpTooltip>
-      </div>
-      <div style={itemStyles}>
-        <WithHelpTooltip tooltip={actionTooltips.showByYear.short} onOpenDetails={onOpenDetails}>
-          <Checkbox
-            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-            label={actionTooltips.showByYear.label}
-            checked={showByYear}
-            onChange={() => changeSetting('showByYear', !showByYear)}
-          />
-        </WithHelpTooltip>
-      </div>
-      <div style={itemStyles}>
-        <WithHelpTooltip tooltip={actionTooltips.showRelativeValues.short} onOpenDetails={onOpenDetails}>
-          <Checkbox
-            style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-            label={actionTooltips.showRelativeValues.label}
-            checked={showRelativeValues}
-            onChange={() => changeSetting('showRelativeValues', !showRelativeValues)}
-          />
-        </WithHelpTooltip>
-      </div>
+      {createSettingToggle('showYearlyValues')}
+      {createSettingToggle('showByYear')}
+      {createSettingToggle('showRelativeValues')}
+      {createSettingToggle('showStudentCounts')}
       <div style={itemStyles}>
         <Form>
           <Form.Field
             error={selectedDate !== null && !isValidDate(selectedDate)}
             style={{ display: 'flex', alignItems: 'center' }}
           >
-            <WithHelpTooltip tooltip={actionTooltips.showCountingFrom.short} onOpenDetails={onOpenDetails}>
-              <span style={{ fontSize: '0.9em' }}>{actionTooltips.showCountingFrom.label}</span>
+            <WithHelpTooltip tooltip={settingDefinitions.showCountingFrom.short} onOpenDetails={onOpenDetails}>
+              <span style={{ fontSize: '0.9em' }}>{settingDefinitions.showCountingFrom.label}</span>
             </WithHelpTooltip>
             <Datetime
               className="status-date-time-input"
@@ -395,13 +407,12 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
   )
 }
 
-const getDefaultSettings = () => ({
-  showYearlyValues: true,
-  showByYear: false,
-  showRelativeValues: false,
-  showSettings: true,
-  selectedDate: null,
-})
+const getDefaultSettings = () =>
+  _.chain(settingDefinitions)
+    .toPairs()
+    .map(([key, { defaultValue }]) => [key, defaultValue])
+    .fromPairs()
+    .value()
 
 const Status = () => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsStatusSettings', {})
@@ -579,7 +590,7 @@ const Status = () => {
               <ReactMarkdown children={CoolDataScience.status} escapeHtml={false} />
             }
           </div>
-          {_.toPairs(actionTooltips).map(([key, { label, long }]) => (
+          {_.toPairs(settingDefinitions).map(([key, { label, long }]) => (
             <div key={key}>
               <Divider />
               <div style={{ padding: '0 1em' }}>
