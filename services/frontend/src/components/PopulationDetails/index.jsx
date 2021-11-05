@@ -18,7 +18,7 @@ import infotooltips from '../../common/InfoToolTips'
 
 const sendAnalytics = sendEvent.populationStatistics
 
-const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStudentsByYear, dataExport }) => {
+const PopulationDetails = ({ samples, queryIsSet, isLoading, query, dataExport }) => {
   const { allStudents, filteredStudents } = useFilters()
   const [trayOpen] = useFilterTray('filterTray')
   const { language } = useLanguage()
@@ -61,7 +61,6 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
         students={samples}
         title="Id"
         label={samples.label}
-        maxCredits={samples.maxCredits}
         selectedStudents={selectedStudents}
         trayOpen={trayOpen}
         language={language}
@@ -147,7 +146,6 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, selectedStud
           <div ref={courseTableRef}>
             <PopulationCourses
               selectedStudents={selectedStudents}
-              selectedStudentsByYear={selectedStudentsByYear}
               query={query}
               allStudents={allStudents}
               filteredStudents={filteredStudents}
@@ -187,7 +185,6 @@ PopulationDetails.propTypes = {
   samples: arrayOf(object).isRequired,
   queryIsSet: bool.isRequired,
   isLoading: bool.isRequired,
-  selectedStudentsByYear: shape({}).isRequired,
   query: shape({}).isRequired,
   dataExport: node,
 }
