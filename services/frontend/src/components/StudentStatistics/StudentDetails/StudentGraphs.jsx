@@ -24,7 +24,6 @@ const CreditsGraph = ({ graphYearStart, student, absences }) => {
     <CreditAccumulationGraphHighCharts
       singleStudent
       students={[student]}
-      selectedStudents={[student.studentNumber]}
       title="Credit Accumulation"
       startDate={selectedStart}
       endDate={endDate}

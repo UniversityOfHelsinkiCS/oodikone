@@ -172,11 +172,11 @@ const createGoalSeries = (starting, ending, absences) => {
   }
 }
 
-const createStudentCreditLines = (students, selectedStudents, singleStudent) => {
+const createStudentCreditLines = (students, singleStudent) => {
   return students.map(student => {
     const { started, studyrightStart } = student
 
-    const startDate = selectedStudents.length === 1 ? started : studyrightStart
+    const startDate = students.length === 1 ? started : studyrightStart
 
     const { points } = _.flow(
       sortCoursesByDate,
@@ -224,28 +224,13 @@ const getStudentCreditCount = student =>
     .sum()
     .value()
 
-const CreditAccumulationGraphHighCharts = ({
-  students,
-  selectedStudents,
-  singleStudent,
-  absences,
-  startDate,
-  endDate,
-}) => {
+const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, startDate, endDate }) => {
   const history = useHistory()
   const chartRef = useRef()
   const language = useLanguage()
   const [graphHeight, setGraphHeight] = useState(600)
 
-  const unfilteredSeriesData = useMemo(
-    () => createStudentCreditLines(students, selectedStudents, singleStudent),
-    [students, selectedStudents, singleStudent]
-  )
-
-  const seriesData = useMemo(
-    () => unfilteredSeriesData.filter(line => selectedStudents.includes(line.name)),
-    [unfilteredSeriesData, selectedStudents]
-  )
+  const seriesData = useMemo(() => createStudentCreditLines(students, singleStudent), [students, singleStudent])
 
   if (singleStudent) {
     const starting = students[0].studyrights

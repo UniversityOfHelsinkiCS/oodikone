@@ -58,10 +58,9 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, dataExport }
 
     const graphs = (
       <CreditAccumulationGraphHighCharts
-        students={samples}
+        students={filteredStudents}
         title="Id"
         label={samples.label}
-        selectedStudents={selectedStudents}
         trayOpen={trayOpen}
         language={language}
       />

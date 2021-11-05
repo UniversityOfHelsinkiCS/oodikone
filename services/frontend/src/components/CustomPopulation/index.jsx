@@ -99,8 +99,7 @@ const CustomPopulation = ({
         content: (
           <div ref={creditGainRef}>
             <CreditAccumulationGraphHighCharts
-              students={custompop}
-              selectedStudents={selectedStudents}
+              students={filteredStudents}
               render={false}
               trayOpen={trayOpen}
               language={language}
