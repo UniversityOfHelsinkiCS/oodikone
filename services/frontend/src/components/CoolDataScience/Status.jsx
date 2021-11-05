@@ -361,7 +361,7 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
 
   const createSettingToggle = key => (
     <div style={itemStyles}>
-      <WithHelpTooltip tooltip={settingDefinitions[key].short} onOpenDetails={onOpenDetails}>
+      <WithHelpTooltip tooltip={settingDefinitions[key].short} onOpenDetails={() => onOpenDetails(key)}>
         <Checkbox
           style={{ fontSize: '0.9em', fontWeight: 'normal' }}
           label={settingDefinitions[key].label}
@@ -384,7 +384,10 @@ const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
             error={selectedDate !== null && !isValidDate(selectedDate)}
             style={{ display: 'flex', alignItems: 'center' }}
           >
-            <WithHelpTooltip tooltip={settingDefinitions.showCountingFrom.short} onOpenDetails={onOpenDetails}>
+            <WithHelpTooltip
+              tooltip={settingDefinitions.showCountingFrom.short}
+              onOpenDetails={() => onOpenDetails('showCountingFrom')}
+            >
               <span style={{ fontSize: '0.9em' }}>{settingDefinitions.showCountingFrom.label}</span>
             </WithHelpTooltip>
             <Datetime
@@ -532,6 +535,23 @@ const Status = () => {
   }
 
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const attentionSeekers = useRef({})
+
+  const scrollToAttentionSeeker = el => {
+    el.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: 'smooth',
+    })
+  }
+
+  const attentionSeekerRef = key => ref => {
+    if (ref !== null && attentionSeekers.current[key] === true) {
+      scrollToAttentionSeeker(ref)
+    }
+
+    attentionSeekers.current[key] = ref
+  }
 
   return (
     <>
@@ -557,13 +577,19 @@ const Status = () => {
           <StatusSettings
             settings={settings}
             onSettingsChange={setSettings}
-            onOpenDetails={() => {
+            onOpenDetails={key => {
               if (moreDetailsRef.current) {
                 moreDetailsRef.current.scrollIntoView({
                   block: 'start',
                   inline: 'end',
                   behavior: 'smooth',
                 })
+              }
+
+              if (attentionSeekers.current[key]) {
+                scrollToAttentionSeeker(attentionSeekers.current[key])
+              } else {
+                attentionSeekers.current[key] = true
               }
 
               setUsageDetailsOpen(true)
@@ -593,7 +619,7 @@ const Status = () => {
           {_.toPairs(settingDefinitions).map(([key, { label, long }]) => (
             <div key={key}>
               <Divider />
-              <div style={{ padding: '0 1em' }}>
+              <div style={{ padding: '0 1em' }} ref={attentionSeekerRef(key)}>
                 <b>
                   Valinta "<i>{label}</i>"
                 </b>
