@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { createSelector } from 'reselect'
+import { createSelector } from '@reduxjs/toolkit'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 import PopulationDetails from '../PopulationDetails'
