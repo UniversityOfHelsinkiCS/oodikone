@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { shape, string, arrayOf } from 'prop-types'
 import { Menu, Tab, Input, Message } from 'semantic-ui-react'
-import { flattenDeep, cloneDeep } from 'lodash'
+import { flattenDeep } from 'lodash'
 import Highcharts from 'highcharts/highstock'
 import ReactHighcharts from 'react-highcharts'
 import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
@@ -14,27 +14,20 @@ const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CA
 
 const CreditsGraph = ({ graphYearStart, student, absences }) => {
   const { language } = useLanguage()
-  const selectedStart = graphYearStart || student.started
-  const filteredCourses = student.courses.filter(c => new Date(c.date) > new Date(selectedStart))
-  const newStudent = cloneDeep(student)
-  newStudent.courses = filteredCourses
-  const sample = [newStudent]
 
+  const selectedStart = new Date(graphYearStart ?? student.started)
   const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
-  sample.maxCredits = newStudent.courses.reduce((a, c) => {
-    if (c.isStudyModuleCredit || !c.passed) return a + 0
-    return a + c.credits
-  }, 0)
-  sample.maxDate = dates.length > 0 ? Math.max(...dates) : new Date().getTime()
-  sample.minDate = new Date(selectedStart).getTime()
+
+  const endDate = dates.length > 0 ? Math.max(...dates) : new Date().getTime()
 
   return (
     <CreditAccumulationGraphHighCharts
       singleStudent
-      students={sample}
+      students={[student]}
       selectedStudents={[student.studentNumber]}
       title="Credit Accumulation"
-      maxCredits={sample.maxCredits}
+      startDate={selectedStart}
+      endDate={endDate}
       absences={absences}
       language={language}
     />

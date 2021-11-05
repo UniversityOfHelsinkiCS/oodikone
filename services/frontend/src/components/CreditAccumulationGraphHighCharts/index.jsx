@@ -21,7 +21,15 @@ boost(Highcharts)
 
 const SINGLE_GRAPH_GOAL_SERIES_NAME = 'Goal'
 
-const createGraphOptions = ({ singleStudent, seriesData, graphHeight, tooltipFormatter, onPointClicked }) => {
+const createGraphOptions = ({
+  singleStudent,
+  seriesData,
+  graphHeight,
+  tooltipFormatter,
+  onPointClicked,
+  startDate,
+  endDate,
+}) => {
   const tooltip = {
     shared: false,
     split: false,
@@ -75,9 +83,13 @@ const createGraphOptions = ({ singleStudent, seriesData, graphHeight, tooltipFor
     },
     yAxis: {
       title: { text: 'Credits' },
+      min: 0,
+      max: undefined,
     },
     xAxis: {
       ordinal: false,
+      min: startDate,
+      max: endDate,
     },
     series: seriesData,
     chart: {
@@ -205,7 +217,21 @@ const createStudentCreditLines = (students, selectedStudents, singleStudent) => 
   })
 }
 
-const CreditAccumulationGraphHighCharts = ({ students, selectedStudents, singleStudent, absences }) => {
+const getStudentCreditCount = student =>
+  _.chain(student.courses)
+    .filter(c => c.passed && c.isStudyModuleCredit)
+    .map('credits')
+    .sum()
+    .value()
+
+const CreditAccumulationGraphHighCharts = ({
+  students,
+  selectedStudents,
+  singleStudent,
+  absences,
+  startDate,
+  endDate,
+}) => {
   const history = useHistory()
   const chartRef = useRef()
   const language = useLanguage()
@@ -222,7 +248,10 @@ const CreditAccumulationGraphHighCharts = ({ students, selectedStudents, singleS
   )
 
   if (singleStudent) {
-    const starting = new Date(students[0].started).getTime()
+    const starting = students[0].studyrights
+      .map(sr => new Date(sr.startdate))
+      .sort()[0]
+      .getTime()
     const ending = endDate ? new Date(endDate).getTime() : new Date().getTime()
 
     seriesData.push(createGoalSeries(starting, ending, absences))
@@ -232,6 +261,8 @@ const CreditAccumulationGraphHighCharts = ({ students, selectedStudents, singleS
     singleStudent,
     seriesData,
     graphHeight,
+    startDate: startDate ? new Date(startDate).getTime() : undefined,
+    endDate,
     tooltipFormatter: point => singleStudent && singleStudentTooltipFormatter(point, students[0], language),
     onPointClicked: point => {
       if (!singleStudent) {

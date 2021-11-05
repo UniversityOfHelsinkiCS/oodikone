@@ -13,7 +13,7 @@ import PopulationSearch from '../PopulationSearch'
 import DataExport from './DataExport'
 
 const PopulationStatistics = memo(props => {
-  const { queryIsSet, selectedStudentsByYear, query, samples, location, history, isLoading, students } = props
+  const { queryIsSet, query, samples, location, history, isLoading, students } = props
   const { setAllStudents } = useFilters()
   useTitle('Population statistics')
 
@@ -33,7 +33,6 @@ const PopulationStatistics = memo(props => {
           {location.search !== '' ? (
             <PopulationDetails
               queryIsSet={queryIsSet}
-              selectedStudentsByYear={selectedStudentsByYear}
               query={query}
               samples={samples}
               isLoading={isLoading}
