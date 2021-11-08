@@ -39,7 +39,7 @@ const StudentDetails = ({
 }) => {
   const dispatch = useDispatch()
   const { language } = useLanguage()
-  const [graphYearStart, setGraphYear] = useState('')
+  const [graphYearStart, setGraphYear] = useState(null)
   const [studyrightid, setStudyrightid] = useState('')
   const [honoursCode, setHonoursCode] = useState(null)
 
@@ -49,7 +49,7 @@ const StudentDetails = ({
   }, [])
 
   useEffect(() => {
-    setGraphYear('')
+    setGraphYear(null)
     if (studentNumber.length > 0) getStudent(studentNumber)
     else {
       resetStudent()
@@ -151,7 +151,7 @@ const StudentDetails = ({
 
   const handleStartDateChange = (elements, id) => {
     if (id === studyrightid) {
-      setGraphYear('')
+      setGraphYear(null)
       setStudyrightid('')
       return
     }
