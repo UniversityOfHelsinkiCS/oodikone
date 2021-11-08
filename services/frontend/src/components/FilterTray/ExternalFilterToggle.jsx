@@ -1,17 +1,24 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Popup, Button, Icon } from 'semantic-ui-react'
 import { contextKey as filterTrayContextKey } from './index'
 import useFilterTray from './useFilterTray'
 import useAnalytics from './useAnalytics'
 
+/**
+ * @param {func} applyFilter Function to apply the filter when toggled on
+ * @param {func} clearFilter Function to clear the filter when toggled off.
+ * @param {string} filterName Name to display in analytics.
+ * @param {active} bool Toggle state. Must  be controlled in the parent.
+ * @param {funcs} popupContent Content component to show in the tooltip, if given. Tooltip is not shown if omitted.
+ * @param {string} filterPanelContextKey Used to open the filter's panel, if given. If not given, the filter tray will not be opened either.
+ */
 const ExternalFilterToggle = ({
-  filterPanelContextKey,
   applyFilter,
   clearFilter,
   filterName,
   active,
   popupContent,
+  filterPanelContextKey,
 }) => {
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
   const [, setCreditFilterOpen] = useFilterTray(filterPanelContextKey)
@@ -53,26 +60,6 @@ const ExternalFilterToggle = ({
   ) : (
     <Toggle />
   )
-}
-
-ExternalFilterToggle.propTypes = {
-  /** Used to open the filter's panel, if given. If not given, the filter tray will not be opened either. */
-  filterPanelContextKey: PropTypes.string,
-  /** Function to apply the filter when toggled on. */
-  applyFilter: PropTypes.func.isRequired,
-  /** Function to clear the filter when toggled off. */
-  clearFilter: PropTypes.func.isRequired,
-  /** Name to display in analytics. */
-  filterName: PropTypes.string.isRequired,
-  /** Toggle state. Must be controlled in the parent. */
-  active: PropTypes.bool.isRequired,
-  /** Content to show in the tooltip, if given. Tooltip is not shown if omitted. */
-  popupContent: PropTypes.node,
-}
-
-ExternalFilterToggle.defaultProps = {
-  filterPanelContextKey: undefined,
-  popupContent: undefined,
 }
 
 export default ExternalFilterToggle

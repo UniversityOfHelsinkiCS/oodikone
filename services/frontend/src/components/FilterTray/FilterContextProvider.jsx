@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { CourseFilterProvider } from './filters/Courses/useCourseFilter'
 import { CreditFilterProvider } from './filters/CreditsEarned/useCreditFilter'
 import { AgeFilterProvider } from './filters/Age/useAgeFilter'
@@ -22,9 +21,5 @@ const filterProviders = [
 
 const FilterContextProvider = ({ children }) =>
   filterProviders.reduceRight((children, Provider) => <Provider>{children}</Provider>, children)
-
-FilterContextProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-}
 
 export default FilterContextProvider

@@ -1,8 +1,16 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Input, Label, Popup, Button, Icon } from 'semantic-ui-react'
 
-const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonDisabled, className, name }) => (
+const NumericInput = ({
+  onChange,
+  onKeyDown = () => {},
+  onClear,
+  value,
+  label,
+  clearButtonDisabled,
+  className,
+  name,
+}) => (
   <Input
     labelPosition="left"
     size="mini"
@@ -29,21 +37,5 @@ const NumericInput = ({ onChange, onKeyDown, onClear, value, label, clearButtonD
     />
   </Input>
 )
-
-NumericInput.propTypes = {
-  onChange: PropTypes.func.isRequired,
-  onKeyDown: PropTypes.func,
-  onClear: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
-  label: PropTypes.node.isRequired,
-  clearButtonDisabled: PropTypes.bool.isRequired,
-  className: PropTypes.string,
-  name: PropTypes.string.isRequired,
-}
-
-NumericInput.defaultProps = {
-  onKeyDown: () => {},
-  className: null,
-}
 
 export default NumericInput

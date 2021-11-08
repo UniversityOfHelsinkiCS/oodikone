@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { connect } from 'react-redux'
 import { Table, Form, Input, Tab, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
@@ -90,7 +89,7 @@ const initialState = props => ({
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-function PopulationCourseStats(props) {
+const PopulationCourseStats = props => {
   const { language } = useLanguage()
 
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
@@ -341,26 +340,6 @@ function PopulationCourseStats(props) {
       </PopulationCourseContext.Provider>
     </div>
   )
-}
-
-PopulationCourseStats.propTypes = {
-  courses: shape({
-    coursestatistics: arrayOf(object),
-    disciplines: shape({}),
-  }).isRequired,
-  populationCourses: shape({
-    data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) }),
-  }).isRequired,
-  clearCourseStats: func.isRequired,
-  pending: bool.isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  years: shape({}), // eslint-disable-line
-  showFilter: bool,
-  language: string.isRequired,
-}
-
-PopulationCourseStats.defaultProps = {
-  showFilter: false,
 }
 
 const mapStateToProps = state => {
