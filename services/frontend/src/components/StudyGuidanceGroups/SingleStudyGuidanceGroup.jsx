@@ -11,7 +11,7 @@ import StyledMessage from './StyledMessage'
 import { getTextIn } from '../../common'
 import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
-import { CustomPopulationFilters } from '../FilterTray/FilterSets'
+import { StudyGuidanceGroupFilters } from '../FilterTray/FilterSets'
 import useFilterTray from '../FilterTray/useFilterTray'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -142,7 +142,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   ]
 
   return (
-    <FilterTray filterSet={<CustomPopulationFilters />}>
+    <FilterTray filterSet={<StudyGuidanceGroupFilters />}>
       <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
     </FilterTray>
   )
