@@ -1,12 +1,11 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Segment, Header } from 'semantic-ui-react'
 import './filterTray.css'
 import useFilters from './useFilters'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ children, filterSet, visible }) => {
+const FilterTray = ({ children, filterSet, visible = true }) => {
   const { filteredStudents, allStudents } = useFilters()
 
   if (!visible || !allStudents.length) {
@@ -32,16 +31,6 @@ const FilterTray = ({ children, filterSet, visible }) => {
       </div>
     </>
   )
-}
-
-FilterTray.propTypes = {
-  children: PropTypes.node.isRequired,
-  filterSet: PropTypes.node.isRequired,
-  visible: PropTypes.bool,
-}
-
-FilterTray.defaultProps = {
-  visible: true,
 }
 
 export default FilterTray

@@ -2,7 +2,6 @@
  * Context for managing filtering.
  */
 import React, { createContext, useState, useContext, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import lodash from 'lodash'
 
 const defaultState = {
@@ -35,10 +34,6 @@ export const FilterProvider = ({ children }) => {
   }, [activeFilters, allStudents, creditDateFilter])
 
   return <FilterContext.Provider value={[state, setState]}>{children}</FilterContext.Provider>
-}
-
-FilterProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 }
 
 export default () => {

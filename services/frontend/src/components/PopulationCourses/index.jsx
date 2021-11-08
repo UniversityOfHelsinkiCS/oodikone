@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { shape, arrayOf, string, bool } from 'prop-types'
 import { Segment, Button } from 'semantic-ui-react'
 import uuidv4 from 'uuid/v4'
 import SegmentDimmer from '../SegmentDimmer'
@@ -15,7 +14,7 @@ const PopulationCourses = ({
   populationSelectedStudentCourses,
   populationCourses,
   selectedStudents,
-  query,
+  query = {},
   filteredStudents,
 }) => {
   const { setCoursesOnce, resetCourses, runCourseQuery } = useCourseFilter()
@@ -98,18 +97,6 @@ const PopulationCourses = ({
       )}
     </Segment>
   )
-}
-
-PopulationCourses.defaultPropTypes = {
-  query: {},
-}
-
-PopulationCourses.propTypes = {
-  populationSelectedStudentCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
-  populationCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  query: shape({}).isRequired,
-  filteredStudents: arrayOf(shape({})).isRequired,
 }
 
 const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses }) => ({

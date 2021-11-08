@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { shape, arrayOf, string, bool } from 'prop-types'
 import PopulationCourseStatsFlat from '../../PopulationCourseStats/PopulationCourseStatsFlat'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
-const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, error, showFilter }) => {
+const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, error, showFilter = false }) => {
   const { setCourses, resetCourses } = useCourseFilter()
 
   useEffect(() => {
@@ -28,19 +27,6 @@ const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, er
       showFilter={showFilter}
     />
   )
-}
-
-CustomPopulationCourses.propTypes = {
-  pending: bool.isRequired,
-  courses: shape([]).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  query: shape({}).isRequired,
-  error: bool.isRequired,
-  showFilter: bool,
-}
-
-CustomPopulationCourses.defaultProps = {
-  showFilter: false,
 }
 
 const mapStateToProps = ({ populationCourses }) => ({
