@@ -368,39 +368,10 @@ const byNameAndOrCodeLike = async (name, code) => {
   })
 
   const courses = rawCourses
-    .map(
-      ({
-        id,
-        code,
-        name,
-        latest_instance_date,
-        is_study_module,
-        coursetypecode,
-        startdate,
-        max_attainment_date,
-        min_attainment_date,
-        createdAt,
-        updatedAt,
-        substitutions,
-        organizations,
-      }) => {
-        return {
-          id,
-          code,
-          name,
-          latest_instance_date,
-          is_study_module,
-          coursetypecode,
-          startdate,
-          max_attainment_date,
-          min_attainment_date,
-          createdAt,
-          updatedAt,
-          substitutions,
-          organizations: organizations.map(o => o.id),
-        }
-      }
-    )
+    .map(course => {
+      // console.log('course: ', course)
+      return { ...course.dataValues, organizations: course.organizations.map(o => o.id) }
+    })
     .sort(a => (a.code.match(/^[A-Za-z]{3}[0-9]{1}/) ? -1 : 1))
 
   let substitutionGroupIndex = 0
