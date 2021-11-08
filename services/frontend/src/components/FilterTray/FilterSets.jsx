@@ -32,6 +32,7 @@ export const PopulationStatisticsFilters = ({ query }) => {
       {parseInt(query?.year, 10) >= 2020 ? <AdmissionType /> : null}
       <Courses />
       <Tags />
+      <Date />
     </>
   )
 }

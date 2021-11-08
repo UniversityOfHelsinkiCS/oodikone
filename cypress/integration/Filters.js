@@ -89,7 +89,7 @@ describe('Population Statistics', () => {
     runTestStepWithPreAndPostParts('ageFilter-header', () => {
       cy.cs('ageFilter-min').type('20')
       cy.cs('ageFilter-max').type('40')
-      checkFilteringResult(43)
+      checkFilteringResult(42)
       cy.cs('ageFilter-min').find('input').clear()
       cy.cs('ageFilter-max').find('input').clear()
     })
@@ -190,7 +190,7 @@ describe('Course Statistics', () => {
     runTestStepWithPreAndPostParts('ageFilter-header', () => {
       cy.cs('ageFilter-min').type('20')
       cy.cs('ageFilter-max').type('40')
-      checkFilteringResult(33)
+      checkFilteringResult(32)
       cy.cs('ageFilter-min').find('input').clear()
       cy.cs('ageFilter-max').find('input').clear()
     })
