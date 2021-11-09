@@ -1,5 +1,7 @@
 import React from 'react'
 
+import '../studyprogramme.css'
+
 const ReactHighcharts = require('react-highcharts')
 
 const LineGraph = ({ categories, data }) => {
@@ -12,8 +14,7 @@ const LineGraph = ({ categories, data }) => {
       text: 'oodikone | TOSKA',
     },
     chart: {
-      width: 950,
-      height: 400,
+      height: '400px',
     },
     xAxis: {
       categories,
@@ -27,7 +28,11 @@ const LineGraph = ({ categories, data }) => {
   }
 
   if (!data || !categories) return <div>No data available for the selected studyprogramme</div>
-  return <ReactHighcharts config={defaultConfig} />
+  return (
+    <div className="graph-container">
+      <ReactHighcharts config={defaultConfig} />
+    </div>
+  )
 }
 
 export default LineGraph

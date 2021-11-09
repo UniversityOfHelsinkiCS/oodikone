@@ -662,6 +662,14 @@ const getYears = since => {
   return years
 }
 
+const getYearsObject = years => {
+  let yearsObject = {}
+  for (const year of years) {
+    yearsObject = { ...yearsObject, [year]: 0 }
+  }
+  return yearsObject
+}
+
 const throughputStatsForStudytrack = async (studyprogramme, since) => {
   const associations = await getAssociations()
   const studyprogrammeYears = associations.programmes[studyprogramme]
@@ -908,15 +916,6 @@ const startedStudyrights = async (studytrack, since) =>
     },
   })
 
-const getStartedStats = async (studytrack, startDate, years) => {
-  const studyrights = await startedStudyrights(studytrack, startDate)
-  let stats = new Array(years.length).fill(0)
-  studyrights.forEach(({ studystartdate }) => {
-    stats[indexOf(years, studystartdate.getFullYear())] += 1
-  })
-  return stats
-}
-
 const graduatedStudyRights = async (studytrack, since) =>
   await Studyright.findAll({
     include: {
@@ -940,15 +939,6 @@ const graduatedStudyRights = async (studytrack, since) =>
     },
   })
 
-const getGraduatedStats = async (studytrack, startDate, years) => {
-  const studyrights = await graduatedStudyRights(studytrack, startDate)
-  let stats = new Array(years.length).fill(0)
-  studyrights.forEach(({ enddate }) => {
-    stats[indexOf(years, enddate.getFullYear())] += 1
-  })
-  return stats
-}
-
 const cancelledStudyRights = async (studytrack, since) => {
   return await Studyright.findAll({
     include: {
@@ -969,15 +959,6 @@ const cancelledStudyRights = async (studytrack, since) => {
   })
 }
 
-const getCancelledStats = async (studytrack, startDate, years) => {
-  const studyrights = await cancelledStudyRights(studytrack, startDate)
-  let stats = new Array(years.length).fill(0)
-  studyrights.forEach(({ canceldate }) => {
-    stats[indexOf(years, canceldate.getFullYear())] += 1
-  })
-  return stats
-}
-
 const transfersAway = async (studytrack, startDate) => {
   return await Transfer.findAll({
     where: {
@@ -989,15 +970,6 @@ const transfersAway = async (studytrack, startDate) => {
     distinct: true,
     col: 'studentnumber',
   })
-}
-
-const getTransferredAwayStats = async (studytrack, startDate, years) => {
-  const studyrights = await transfersAway(studytrack, startDate)
-  let stats = new Array(years.length).fill(0)
-  studyrights.forEach(({ transferdate }) => {
-    stats[indexOf(years, transferdate.getFullYear())] += 1
-  })
-  return stats
 }
 
 const transfersTo = async (studytrack, startDate) => {
@@ -1013,13 +985,72 @@ const transfersTo = async (studytrack, startDate) => {
   })
 }
 
+const getGraduatedStats = async (studytrack, startDate, years) => {
+  const studyrights = await graduatedStudyRights(studytrack, startDate)
+  let graphStats = new Array(years.length).fill(0)
+  let tableStats = getYearsObject(years)
+
+  studyrights.forEach(({ enddate }) => {
+    const graduationYear = enddate.getFullYear()
+    graphStats[indexOf(years, graduationYear)] += 1
+    tableStats[graduationYear] += 1
+  })
+  return { graphStats, tableStats }
+}
+
+const getStartedStats = async (studytrack, startDate, years) => {
+  const studyrights = await startedStudyrights(studytrack, startDate)
+  let graphStats = new Array(years.length).fill(0)
+  let tableStats = getYearsObject(years)
+
+  studyrights.forEach(({ studystartdate }) => {
+    const startYear = studystartdate.getFullYear()
+    graphStats[indexOf(years, startYear)] += 1
+    tableStats[startYear] += 1
+  })
+  return { graphStats, tableStats }
+}
+
+const getCancelledStats = async (studytrack, startDate, years) => {
+  const studyrights = await cancelledStudyRights(studytrack, startDate)
+  let graphStats = new Array(years.length).fill(0)
+  let tableStats = getYearsObject(years)
+
+  studyrights.forEach(({ canceldate }) => {
+    const cancelYear = canceldate.getFullYear()
+    graphStats[indexOf(years, cancelYear)] += 1
+    tableStats[cancelYear] += 1
+  })
+
+  return { graphStats, tableStats }
+}
+
+const getTransferredAwayStats = async (studytrack, startDate, years) => {
+  const studyrights = await transfersAway(studytrack, startDate)
+  let graphStats = new Array(years.length).fill(0)
+  let tableStats = getYearsObject(years)
+
+  studyrights.forEach(({ transferdate }) => {
+    const transferYear = transferdate.getFullYear()
+    graphStats[indexOf(years, transferYear)] += 1
+    tableStats[transferYear] += 1
+  })
+
+  return { graphStats, tableStats }
+}
+
 const getTransferredToStats = async (studytrack, startDate, years) => {
   const studyrights = await transfersTo(studytrack, startDate)
-  let stats = new Array(years.length).fill(0)
+  let graphStats = new Array(years.length).fill(0)
+  let tableStats = getYearsObject(years)
+
   studyrights.forEach(({ transferdate }) => {
-    stats[indexOf(years, transferdate.getFullYear())] += 1
+    const transferYear = transferdate.getFullYear()
+    graphStats[indexOf(years, transferYear)] += 1
+    tableStats[transferYear] += 1
   })
-  return stats
+
+  return { graphStats, tableStats }
 }
 
 const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
@@ -1030,31 +1061,44 @@ const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
   const transferredAway = await getTransferredAwayStats(studyprogramme, startDate, years)
   const transferredTo = await getTransferredToStats(studyprogramme, startDate, years)
 
+  const getTableStats = years =>
+    years
+      .reverse()
+      .map(year => [
+        year,
+        started.tableStats[year],
+        graduated.tableStats[year],
+        cancelled.tableStats[year],
+        transferredAway.tableStats[year],
+        transferredTo.tableStats[year],
+      ])
+
   return {
     id: studyprogramme,
     years,
     graphStats: [
       {
         name: 'Started',
-        data: started,
+        data: started.graphStats,
       },
       {
         name: 'Graduated',
-        data: graduated,
+        data: graduated.graphStats,
       },
       {
         name: 'Cancelled',
-        data: cancelled,
+        data: cancelled.graphStats,
       },
       {
         name: 'Transferred away',
-        data: transferredAway,
+        data: transferredAway.graphStats,
       },
       {
         name: 'Transferred To',
-        data: transferredTo,
+        data: transferredTo.graphStats,
       },
     ],
+    tableStats: getTableStats(years),
   }
 }
 
