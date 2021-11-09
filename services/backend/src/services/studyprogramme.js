@@ -886,20 +886,118 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
   return { id: studyprogramme, status: null, data: { years: arr, totals, stTotals } }
 }
 
-const graduatedFromStudyrights = (studyrights, years) => {
-  const stats = new Array(years.length).fill(0)
-  studyrights.forEach(({ year }) => (stats[indexOf(years, year)] += 1))
+const graduatedStudyRights = async (studytrack, since) =>
+  await Studyright.findAll({
+    include: {
+      model: StudyrightElement,
+      attributes: [],
+      required: true,
+      include: {
+        model: ElementDetail,
+        attributes: [],
+        required: true,
+        where: {
+          code: studytrack,
+        },
+      },
+    },
+    where: {
+      graduated: 1,
+      enddate: {
+        [Op.gte]: since,
+      },
+    },
+  })
+
+const getGraduatedStats = async (studytrack, startDate, years) => {
+  const studyrights = await graduatedStudyRights(studytrack, startDate)
+  let stats = new Array(years.length).fill(0)
+  studyrights.forEach(({ enddate }) => {
+    stats[indexOf(years, enddate.getFullYear())] += 1
+  })
   return stats
 }
 
-const getGraduatedStats = async (studytrack, since, years) => {
-  const studyrights = await findGraduated(studytrack, since)
-  return graduatedFromStudyrights(studyrights, years)
+const cancelledStudyRights = async (studytrack, since) => {
+  return await Studyright.findAll({
+    include: {
+      model: StudyrightElement,
+      attributes: [],
+      required: true,
+      where: {
+        code: {
+          [Op.eq]: studytrack,
+        },
+      },
+    },
+    where: {
+      canceldate: {
+        [Op.gte]: since,
+      },
+    },
+  })
+}
+
+const getCancelledStats = async (studytrack, startDate, years) => {
+  const studyrights = await cancelledStudyRights(studytrack, startDate)
+  let stats = new Array(years.length).fill(0)
+  studyrights.forEach(({ canceldate }) => {
+    stats[indexOf(years, canceldate.getFullYear())] += 1
+  })
+  return stats
+}
+
+const transfersAway = async (studytrack, startDate) => {
+  return await Transfer.findAll({
+    where: {
+      transferdate: {
+        [Op.gte]: startDate,
+      },
+      sourcecode: studytrack,
+    },
+    distinct: true,
+    col: 'studentnumber',
+  })
+}
+
+const getTransferredAwayStats = async (studytrack, startDate, years) => {
+  const studyrights = await transfersAway(studytrack, startDate)
+  let stats = new Array(years.length).fill(0)
+  studyrights.forEach(({ transferdate }) => {
+    stats[indexOf(years, transferdate.getFullYear())] += 1
+  })
+  return stats
+}
+
+const transfersTo = async (studytrack, startDate) => {
+  return await Transfer.findAll({
+    where: {
+      transferdate: {
+        [Op.gte]: startDate,
+      },
+      targetcode: studytrack,
+    },
+    distinct: true,
+    col: 'studentnumber',
+  })
+}
+
+const getTransferredToStats = async (studytrack, startDate, years) => {
+  const studyrights = await transfersTo(studytrack, startDate)
+  let stats = new Array(years.length).fill(0)
+  studyrights.forEach(({ transferdate }) => {
+    stats[indexOf(years, transferdate.getFullYear())] += 1
+  })
+  return stats
 }
 
 const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
   const years = getYears(startDate.getFullYear())
   const graduated = await getGraduatedStats(studyprogramme, startDate, years)
+  const cancelled = await getCancelledStats(studyprogramme, startDate, years)
+  const transferredAway = await getTransferredAwayStats(studyprogramme, startDate, years)
+  const transferredTo = await getTransferredToStats(studyprogramme, startDate, years)
+
   return {
     id: studyprogramme,
     years,
@@ -907,6 +1005,18 @@ const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
       {
         name: 'Graduated',
         data: graduated,
+      },
+      {
+        name: 'Cancelled',
+        data: cancelled,
+      },
+      {
+        name: 'Transferred away',
+        data: transferredAway,
+      },
+      {
+        name: 'Transferred To',
+        data: transferredTo,
       },
     ],
   }
