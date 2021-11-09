@@ -148,8 +148,9 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   )
 }
 
-const SingleStudyGroupViewWrapper = ({ history, groupName, language, children }) => {
+const SingleStudyGroupViewWrapper = ({ groupName, language, children }) => {
   const dispatch = useDispatch()
+  const history = useHistory()
   const handleBack = () => {
     dispatch(clearPopulations())
     history.push('/studyguidancegroups')
