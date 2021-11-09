@@ -1,7 +1,7 @@
 const sequelize = require('sequelize')
 const { Op } = sequelize
 const moment = require('moment')
-const { flatMap } = require('lodash')
+const { flatMap, indexOf } = require('lodash')
 const {
   Credit,
   Student,
@@ -886,6 +886,32 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
   return { id: studyprogramme, status: null, data: { years: arr, totals, stTotals } }
 }
 
+const graduatedFromStudyrights = (studyrights, years) => {
+  const stats = new Array(years.length).fill(0)
+  studyrights.forEach(({ year }) => (stats[indexOf(years, year)] += 1))
+  return stats
+}
+
+const getGraduatedStats = async (studytrack, since, years) => {
+  const studyrights = await findGraduated(studytrack, since)
+  return graduatedFromStudyrights(studyrights, years)
+}
+
+const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
+  const years = getYears(startDate.getFullYear())
+  const graduated = await getGraduatedStats(studyprogramme, startDate, years)
+  return {
+    id: studyprogramme,
+    years,
+    graphStats: [
+      {
+        name: 'Graduated',
+        data: graduated,
+      },
+    ],
+  }
+}
+
 module.exports = {
   getCreditsForProvider,
   productivityStatsFromCredits,
@@ -899,4 +925,5 @@ module.exports = {
   thesisProductivityFromCredits,
   thesisProductivityForStudytrack,
   optionData,
+  getBasicStatsForStudyTrack,
 }
