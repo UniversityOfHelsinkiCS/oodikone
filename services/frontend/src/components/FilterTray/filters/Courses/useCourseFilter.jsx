@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { getPopulationSelectedStudentCourses } from '../../../../redux/populationSelectedStudentCourses'
 
@@ -21,11 +20,6 @@ const CourseFilterProvider = ({ children, getPopulationSelectedStudentCourses })
   }, [])
 
   return <CourseFilterContext.Provider value={[state, setState]}>{children}</CourseFilterContext.Provider>
-}
-
-CourseFilterProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  getPopulationSelectedStudentCourses: PropTypes.func.isRequired,
 }
 
 const ConnectedProvider = connect(null, { getPopulationSelectedStudentCourses })(CourseFilterProvider)
