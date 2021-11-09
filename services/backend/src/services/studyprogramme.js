@@ -886,6 +886,37 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
   return { id: studyprogramme, status: null, data: { years: arr, totals, stTotals } }
 }
 
+const startedStudyrights = async (studytrack, since) =>
+  await Studyright.findAll({
+    include: {
+      model: StudyrightElement,
+      attributes: [],
+      required: true,
+      include: {
+        model: ElementDetail,
+        attributes: [],
+        required: true,
+        where: {
+          code: studytrack,
+        },
+      },
+    },
+    where: {
+      studystartdate: {
+        [Op.gte]: since,
+      },
+    },
+  })
+
+const getStartedStats = async (studytrack, startDate, years) => {
+  const studyrights = await startedStudyrights(studytrack, startDate)
+  let stats = new Array(years.length).fill(0)
+  studyrights.forEach(({ studystartdate }) => {
+    stats[indexOf(years, studystartdate.getFullYear())] += 1
+  })
+  return stats
+}
+
 const graduatedStudyRights = async (studytrack, since) =>
   await Studyright.findAll({
     include: {
@@ -993,6 +1024,7 @@ const getTransferredToStats = async (studytrack, startDate, years) => {
 
 const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
   const years = getYears(startDate.getFullYear())
+  const started = await getStartedStats(studyprogramme, startDate, years)
   const graduated = await getGraduatedStats(studyprogramme, startDate, years)
   const cancelled = await getCancelledStats(studyprogramme, startDate, years)
   const transferredAway = await getTransferredAwayStats(studyprogramme, startDate, years)
@@ -1002,6 +1034,10 @@ const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
     id: studyprogramme,
     years,
     graphStats: [
+      {
+        name: 'Started',
+        data: started,
+      },
       {
         name: 'Graduated',
         data: graduated,
