@@ -26,6 +26,7 @@ const customPopulationSearch = require('./routes/customPopulationSearch')
 const trends = require('./routes/trends')
 const programmeModules = require('./routes/programmeModules')
 const studyGuidanceGroups = require('./routes/studyGuidanceGroups')
+const studyProgramme = require('./routes/studyProgramme')
 
 module.exports = (app, url) => {
   app.use(url, ping)
@@ -54,6 +55,7 @@ module.exports = (app, url) => {
   app.use(url, semesters)
   app.use(url, tags)
   app.use(url, programmeModules)
+  app.use(url, studyProgramme)
   app.use(`${url}/faculties`, faculties)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)

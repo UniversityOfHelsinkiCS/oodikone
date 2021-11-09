@@ -5,9 +5,11 @@ import ThroughputTable from '../ThroughputTable'
 import BachelorsTable from '../BachelorsTable'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
+import { getBasicStats } from '../../../redux/studyProgramme'
 import { getBachelors } from '../../../redux/studyProgrammeBachelors'
 import { isNewHYStudyProgramme } from '../../../common'
 import { useIsAdmin } from '../../../common/hooks'
+import LineGraph from './LineGraph'
 
 const Overview = props => {
   const {
@@ -15,9 +17,11 @@ const Overview = props => {
     throughput,
     bachelors,
     studyprogramme,
+    basicStats,
     dispatchGetProductivity,
     dispatchGetThroughput,
     dispatchGetBachelors,
+    dispatchGetBasicStats,
     history,
   } = props
 
@@ -26,10 +30,12 @@ const Overview = props => {
   useEffect(() => {
     dispatchGetProductivity(studyprogramme)
     dispatchGetThroughput(studyprogramme)
+    dispatchGetBasicStats(studyprogramme)
     if (isAdmin) dispatchGetBachelors(studyprogramme)
   }, [])
   return (
     <>
+      <LineGraph categories={basicStats?.data?.years} data={basicStats?.data?.graphStats} />
       <ThroughputTable
         throughput={throughput.data[studyprogramme]}
         thesis={throughput.data.thesis}
@@ -52,14 +58,21 @@ const Overview = props => {
   )
 }
 
-const mapStateToProps = ({ studyProgrammeProductivity, studyProgrammeThroughput, studyProgrammeBachelors }) => ({
+const mapStateToProps = ({
+  studyProgrammeProductivity,
+  studyProgrammeThroughput,
+  studyProgrammeBachelors,
+  studyProgramme,
+}) => ({
   productivity: studyProgrammeProductivity,
   throughput: studyProgrammeThroughput,
   bachelors: studyProgrammeBachelors,
+  basicStats: studyProgramme?.data,
 })
 
 export default connect(mapStateToProps, {
   dispatchGetProductivity: getProductivity,
   dispatchGetThroughput: getThroughput,
   dispatchGetBachelors: getBachelors,
+  dispatchGetBasicStats: getBasicStats,
 })(Overview)
