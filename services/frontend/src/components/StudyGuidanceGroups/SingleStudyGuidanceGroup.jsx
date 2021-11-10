@@ -9,10 +9,8 @@ import FilterTray from 'components/FilterTray'
 import useFilters from 'components/FilterTray/useFilters'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import { StudyGuidanceGroupFilters } from 'components/FilterTray/FilterSets'
-import {
-  useGetStudyGuidanceGroupPopulationQuery,
-  useGetStudyGuidanceGroupPopulationCoursesQuery,
-} from 'redux/studyGuidanceGroups'
+import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
+import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import Wrapper from './Wrapper'
 import StyledMessage from './StyledMessage'
 
@@ -29,14 +27,11 @@ const takeOnlyCoursesStartingFromGivenAcademicYear = ({ students, year }) => {
 
 const SingleStudyGroupContent = ({ population, group }) => {
   const { setAllStudents, filteredStudents } = useFilters()
-  const creditGainRef = useRef()
-  const programmeRef = useRef()
-  const coursesRef = useRef()
-  const studentRef = useRef()
-  const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
+  const refs = [useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setIndex] = useState([])
   const [newestIndex, setNewest] = useState(null)
   const [creditsStartingFromAssociatedYear, toggleCreditsStartingFromAssociatedYear] = useToggle(!!group.tags?.year)
+  const [coursesStructuredByProgramme, toggleCoursesStructuredByProgramme] = useToggle(!!group.tags?.studyProgramme)
   const filteredStudentsWithFilteredCourses = takeOnlyCoursesStartingFromGivenAcademicYear({
     students: filteredStudents,
     year: group.tags?.year,
@@ -81,7 +76,7 @@ const SingleStudyGroupContent = ({ population, group }) => {
       onTitleClick: () => handleClick(0),
       content: {
         content: (
-          <div ref={creditGainRef}>
+          <div ref={refs[0]}>
             {group.tags?.year && (
               <Button primary onClick={() => toggleCreditsStartingFromAssociatedYear()}>
                 {creditsStartingFromAssociatedYear ? 'Show all credits' : 'Show starting from associated year'}
@@ -95,11 +90,36 @@ const SingleStudyGroupContent = ({ population, group }) => {
         ),
       },
     },
+    {
+      key: 1,
+      title: {
+        content: (
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Courses of population
+          </span>
+        ),
+      },
+      onTitleClick: () => handleClick(1),
+      content: {
+        content: (
+          <div ref={refs[1]}>
+            <StudyGuidanceGroupPopulationCourses
+              selectedStudents={filteredStudents.map(({ studentNumber }) => studentNumber)}
+              showStructured={coursesStructuredByProgramme}
+              toggleShowStructured={toggleCoursesStructuredByProgramme}
+              studyProgramme={group.tags?.studyProgramme}
+            />
+          </div>
+        ),
+      },
+    },
   ]
 
   return (
     <FilterTray filterSet={<StudyGuidanceGroupFilters />}>
-      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+      <div className="segmentContainer">
+        <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+      </div>
     </FilterTray>
   )
 }
@@ -125,11 +145,7 @@ const SingleStudyGroupViewWrapper = ({ groupName, language, isLoading, children 
 const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const { language } = useSelector(({ settings }) => settings)
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const { data: population, isLoading: populationIsLoading } =
-    useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
-  const { data: populationCourses, isLoading: populationCoursesIsLoading } =
-    useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers)
-  const isLoading = populationIsLoading || populationCoursesIsLoading
+  const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
 
   if (!group) {
     return (
@@ -152,14 +168,7 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
 
   return (
     <SingleStudyGroupViewWrapper groupName={group.name} language={language} isLoading={isLoading}>
-      {!isLoading && (
-        <SingleStudyGroupContent
-          population={population}
-          group={group}
-          language={language}
-          populationCourses={populationCourses}
-        />
-      )}
+      {!isLoading && <SingleStudyGroupContent population={data} group={group} language={language} />}
     </SingleStudyGroupViewWrapper>
   )
 }
