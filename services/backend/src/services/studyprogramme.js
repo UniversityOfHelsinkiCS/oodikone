@@ -1053,6 +1053,38 @@ const getTransferredToStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
+const getCreditStats = async ({ studytrack, startDate }) => {
+  const years = getYears(startDate.getFullYear())
+  const studentnumbers = await studentnumbersWithAllStudyrightElements(
+    [studytrack],
+    startDate,
+    new Date(),
+    true, // exchange students
+    true, // cancelled students
+    true, // non-degree students
+    true // transferred to students
+  )
+  const promises = [getMajorStudentsCredits(studytrack, startDate, years, studentnumbers)]
+
+  const [majorStudentsCredits] = await Promise.all(promises)
+  return majorStudentsCredits
+}
+
+const getMajorStudentsCredits = async (studytrack, startDate, years, studentnumbers) => {
+  const providercode = mapToProviders([studytrack])[0]
+  const credits = await getCreditsForMajors(providercode, startDate, studentnumbers)
+  let graphStats = new Array(years.length).fill(0)
+  let tableStats = getYearsObject(years)
+
+  credits.forEach(({ attainment_date }) => {
+    const attaintment_year = attainment_date.getFullYear()
+    graphStats[indexOf(years, attaintment_year)] += 1
+    tableStats[attaintment_year] += 1
+  })
+
+  return { graphStats, tableStats }
+}
+
 const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
   const years = getYears(startDate.getFullYear())
   const started = await getStartedStats(studyprogramme, startDate, years)
@@ -1116,4 +1148,5 @@ module.exports = {
   thesisProductivityForStudytrack,
   optionData,
   getBasicStatsForStudyTrack,
+  getCreditStats,
 }
