@@ -5,7 +5,7 @@ import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
 const CustomPopulationCourses = ({ selectedStudents, showFilter = false }) => {
   const { setCourses, resetCourses } = useCourseFilter()
-  const { data: courses, pending, query, error } = useSelector(({ populationCourses }) => populationCourses)
+  const { data: courses, pending, error } = useSelector(({ populationCourses }) => populationCourses)
 
   useEffect(() => {
     if (!pending && !error && courses.coursestatistics) {
@@ -21,10 +21,8 @@ const CustomPopulationCourses = ({ selectedStudents, showFilter = false }) => {
   return (
     <PopulationCourseStatsFlat
       courses={courses}
-      query={query}
       pending={pending}
       selectedStudents={selectedStudents}
-      customPopulation
       showFilter={showFilter}
     />
   )

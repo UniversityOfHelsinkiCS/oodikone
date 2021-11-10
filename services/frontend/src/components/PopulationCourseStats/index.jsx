@@ -267,7 +267,9 @@ const PopulationCourseStats = props => {
   }
 
   const onCourseNameCellClick = code => {
-    const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
+    const courseStatistic =
+      props.populationCourses.data.coursestatistics?.find(cs => cs.course.code === code) ||
+      props.courses.coursestatistics?.find(cs => cs.course.code === code)
     if (courseStatistic) {
       const isSelected = courseIsSelected(code)
       const name = 'Course Filtername'

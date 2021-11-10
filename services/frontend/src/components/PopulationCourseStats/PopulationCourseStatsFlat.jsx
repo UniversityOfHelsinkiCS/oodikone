@@ -88,7 +88,7 @@ const initialState = props => ({
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-const PopulationCourseStats = ({ courses, customPopulation, pending, query, selectedStudents, showFilter = true }) => {
+const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter = true }) => {
   const dispatch = useDispatch()
   const { years } = useSelector(({ semesters }) => semesters.data)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
@@ -96,11 +96,9 @@ const PopulationCourseStats = ({ courses, customPopulation, pending, query, sele
   const { language } = useLanguage()
   const props = {
     courses,
-    customPopulation,
     isAdmin,
     pending,
     populationCourses,
-    query,
     selectedStudents,
     showFilter,
     years,
@@ -252,7 +250,9 @@ const PopulationCourseStats = ({ courses, customPopulation, pending, query, sele
   }
 
   const onCourseNameCellClick = code => {
-    const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
+    const courseStatistic =
+      props.populationCourses.data.coursestatistics?.find(cs => cs.course.code === code) ||
+      props.courses.coursestatistics?.find(cs => cs.course.code === code)
     if (courseStatistic) {
       const isSelected = courseIsSelected(code)
       const name = 'Course Filtername'
