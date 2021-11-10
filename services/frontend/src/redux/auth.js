@@ -9,7 +9,7 @@ export const login = () => ({
 
 export const logout = () => ({ type: 'LOGOUT_ATTEMPT' })
 
-const reducer = (state = { pending: false, error: false, token: null }, action) => {
+const reducer = (state = { pending: false, error: false, token: null, encodedToken: null }, action) => {
   switch (action.type) {
     case 'LOGIN_ATTEMPT':
       return {
@@ -31,6 +31,7 @@ const reducer = (state = { pending: false, error: false, token: null }, action) 
         pending: false,
         error: false,
         token: decodeToken(action.token),
+        encodedToken: action.token,
       }
 
     case 'LOGOUT_ATTEMPT':
@@ -46,6 +47,7 @@ const reducer = (state = { pending: false, error: false, token: null }, action) 
         pending: false,
         error: true,
         token: null,
+        encodedToken: null,
       }
 
     case 'LOGOUT_SUCCESS':
@@ -54,6 +56,7 @@ const reducer = (state = { pending: false, error: false, token: null }, action) 
         pending: false,
         error: false,
         token: null,
+        encodedToken: null,
       }
 
     default:
