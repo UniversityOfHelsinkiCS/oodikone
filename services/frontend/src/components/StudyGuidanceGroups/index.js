@@ -1,26 +1,16 @@
-import React, { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { useRouteMatch } from 'react-router-dom'
-import { Header, Loader, Segment } from 'semantic-ui-react'
+import React from 'react'
+import { useParams } from 'react-router-dom'
+import { Header } from 'semantic-ui-react'
 import { useTitle } from '../../common/hooks'
-import { getStudyGuidanceGroups } from '../../redux/studyGuidanceGroups'
+import { useGetAllStudyGuidanceGroupsQuery } from '../../redux/studyGuidanceGroups'
 import StudyGuidanceGroupOverview from './StudyGuidanceGroupOverview'
 import SingleStudyGuidanceGroup from './SingleStudyGuidanceGroup'
+import Wrapper from './Wrapper'
 
 const StudyGuidanceGroups = () => {
   useTitle('Study guidance groups')
-  const dispatch = useDispatch()
-  const { pending, data: groups } = useSelector(({ studyGuidanceGroups }) => studyGuidanceGroups)
-  const match = useRouteMatch('/studyguidancegroups/:groupid')
-  const groupid = match?.params?.groupid
-
-  useEffect(() => {
-    if (groups && groups.length > 0) return
-    dispatch(getStudyGuidanceGroups())
-  }, [dispatch])
-
-  const isLoading = pending === undefined || pending === true
-  const isLoaded = pending === false
+  const { groupid } = useParams()
+  const { data, isLoading } = useGetAllStudyGuidanceGroupsQuery()
 
   return (
     <>
@@ -28,18 +18,13 @@ const StudyGuidanceGroups = () => {
         <Header className="segmentTitle" size="large">
           Study guidance groups
         </Header>
-        <Segment className="contentSegment">
-          {isLoading ? (
-            <Loader active inline="centered">
-              Loading
-            </Loader>
-          ) : null}
-          {isLoaded && !groupid ? <StudyGuidanceGroupOverview /> : null}
-        </Segment>
       </div>
-      <div>{isLoaded && groupid ? <SingleStudyGuidanceGroup groupid={groupid} /> : null}</div>
+      <Wrapper isLoading={isLoading}>{!isLoading && !groupid && <StudyGuidanceGroupOverview groups={data} />}</Wrapper>
+      {!isLoading && groupid && <SingleStudyGuidanceGroup group={data.find(group => group.id === groupid)} />}
     </>
   )
 }
+// Single group should be rendered outside of segmentcontainer. Here we avoid passing
+// isLoading flag / not loaded data to children components.
 
 export default StudyGuidanceGroups
