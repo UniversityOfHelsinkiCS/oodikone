@@ -1,30 +1,34 @@
-/* eslint-disable react/prop-types */
-// temp disable prop types
 import React, { useEffect, useState, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { Button, Loader, Header, Accordion, Divider, Segment } from 'semantic-ui-react'
+import { useSelector } from 'react-redux'
+import { Button, Header, Accordion, Divider } from 'semantic-ui-react'
 import { useHistory } from 'react-router-dom'
 import scrollToComponent from 'react-scroll-to-component'
-import { getCustomPopulation, clearPopulations } from '../../redux/populations'
-import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
+import { getTextIn } from 'common'
+import { useToggle } from 'common/hooks'
+import FilterTray from 'components/FilterTray'
+import useFilters from 'components/FilterTray/useFilters'
+import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
+import { StudyGuidanceGroupFilters } from 'components/FilterTray/FilterSets'
+import {
+  useGetStudyGuidanceGroupPopulationQuery,
+  useGetStudyGuidanceGroupPopulationCoursesQuery,
+} from 'redux/studyGuidanceGroups'
+import Wrapper from './Wrapper'
 import StyledMessage from './StyledMessage'
-import { getTextIn } from '../../common'
-import FilterTray from '../FilterTray'
-import useFilters from '../FilterTray/useFilters'
-import { StudyGuidanceGroupFilters } from '../FilterTray/FilterSets'
-import useFilterTray from '../FilterTray/useFilterTray'
-import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
-import PopulationStudents from '../PopulationStudents'
-import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
-import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
-import InfoBox from '../InfoBox'
-import infotooltips from '../../common/InfoToolTips'
 
-const SingleStudyGroupContent = ({ population, group, language }) => {
-  const custompop = population?.students || []
+const createAcademicYearStartDate = year => new Date(year, 7, 1)
+
+const takeOnlyCoursesStartingFromGivenAcademicYear = ({ students, year }) => {
+  if (!year) return students
+  const academicYearStartDate = createAcademicYearStartDate(year)
+  return students.map(student => ({
+    ...student,
+    courses: student.courses.filter(course => new Date(course.date) > academicYearStartDate),
+  }))
+}
+
+const SingleStudyGroupContent = ({ population, group }) => {
   const { setAllStudents, filteredStudents } = useFilters()
-  const [trayOpen] = useFilterTray()
-  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
   const creditGainRef = useRef()
   const programmeRef = useRef()
   const coursesRef = useRef()
@@ -32,6 +36,11 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
   const [activeIndex, setIndex] = useState([])
   const [newestIndex, setNewest] = useState(null)
+  const [creditsStartingFromAssociatedYear, toggleCreditsStartingFromAssociatedYear] = useToggle(!!group.tags?.year)
+  const filteredStudentsWithFilteredCourses = takeOnlyCoursesStartingFromGivenAcademicYear({
+    students: filteredStudents,
+    year: group.tags?.year,
+  })
 
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
@@ -49,9 +58,9 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   }
 
   useEffect(() => {
-    setAllStudents(custompop)
+    setAllStudents(population?.students || [])
     handleClick(0)
-  }, [custompop])
+  }, [population])
 
   useEffect(() => {
     if (newestIndex) {
@@ -65,7 +74,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Credit accumulation (for {selectedStudents.length} students)
+            Credit accumulation (for {filteredStudents.length} students)
           </span>
         ),
       },
@@ -73,68 +82,15 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
       content: {
         content: (
           <div ref={creditGainRef}>
+            {group.tags?.year && (
+              <Button primary onClick={() => toggleCreditsStartingFromAssociatedYear()}>
+                {creditsStartingFromAssociatedYear ? 'Show all credits' : 'Show starting from associated year'}
+              </Button>
+            )}
             <CreditAccumulationGraphHighCharts
-              students={filteredStudents}
-              render={false}
-              trayOpen={trayOpen}
-              language={language}
-              startDate={new Date(parseInt(group?.tags?.year, 10), 7, 1).getTime()}
+              students={creditsStartingFromAssociatedYear ? filteredStudentsWithFilteredCourses : filteredStudents}
+              startDate={creditsStartingFromAssociatedYear && createAcademicYearStartDate(group.tags?.year)}
             />
-          </div>
-        ),
-      },
-    },
-    {
-      key: 1,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Programme distribution
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(1),
-      content: {
-        content: (
-          <div ref={programmeRef}>
-            <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
-            <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
-          </div>
-        ),
-      },
-    },
-    {
-      key: 2,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Courses of population
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(2),
-      content: {
-        content: (
-          <div ref={coursesRef}>
-            <CustomPopulationCourses selectedStudents={selectedStudents} />
-          </div>
-        ),
-      },
-    },
-    {
-      key: 3,
-      title: {
-        content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Students ({selectedStudents.length})
-          </span>
-        ),
-      },
-      onTitleClick: () => handleClick(3),
-      content: {
-        content: (
-          <div ref={studentRef}>
-            <PopulationStudents language={language} filteredStudents={filteredStudents} customPopulation />
           </div>
         ),
       },
@@ -148,73 +104,62 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   )
 }
 
-const SingleStudyGroupViewWrapper = ({ groupName, language, children }) => {
-  const dispatch = useDispatch()
+const SingleStudyGroupViewWrapper = ({ groupName, language, isLoading, children }) => {
   const history = useHistory()
   const handleBack = () => {
-    dispatch(clearPopulations())
     history.push('/studyguidancegroups')
   }
 
   return (
     <>
-      <div className="segmentContainer">
-        <Segment className="contentSegment">
-          <Button icon="arrow circle left" content="Back" onClick={handleBack} />
-          <Divider />
-          <Header size="medium">{getTextIn(groupName, language)}</Header>
-        </Segment>
-      </div>
+      <Wrapper isLoading={isLoading}>
+        <Button icon="arrow circle left" content="Back" onClick={handleBack} />
+        <Divider />
+        <Header size="medium">{groupName && language && getTextIn(groupName, language)}</Header>
+      </Wrapper>
       {children}
     </>
   )
 }
 
-const SingleStudyGuidanceGroupContainer = ({ groupid }) => {
-  const dispatch = useDispatch()
-  const history = useHistory()
+const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const { language } = useSelector(({ settings }) => settings)
-  const { data: groups } = useSelector(({ studyGuidanceGroups }) => studyGuidanceGroups)
-  const group = groups.find(g => g.id === groupid)
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const { data: population, pending } = useSelector(({ populations }) => populations)
-
-  useEffect(() => {
-    const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-    if (groupStudentNumbers.length === 0 || population?.students?.length > 0) return
-    dispatch(getCustomPopulation({ studentnumberlist: groupStudentNumbers, usingStudyGuidanceGroups: true }))
-    dispatch(
-      getCustomPopulationCoursesByStudentnumbers({
-        studentnumberlist: groupStudentNumbers,
-        usingStudyGuidanceGroups: true,
-      })
-    )
-  }, [])
+  const { data: population, isLoading: populationIsLoading } =
+    useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
+  const { data: populationCourses, isLoading: populationCoursesIsLoading } =
+    useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers)
+  const isLoading = populationIsLoading || populationCoursesIsLoading
 
   if (!group) {
     return (
-      <StyledMessage>
-        Couldn't find group with id {groupid}! Please check that id is correct and you have rights to this study
-        guidance group.
-      </StyledMessage>
+      <SingleStudyGroupViewWrapper>
+        <StyledMessage>
+          Couldn't find group with this id! Please check that id is correct and you have rights to this study guidance
+          group.
+        </StyledMessage>
+      </SingleStudyGroupViewWrapper>
     )
   }
 
-  const isLoading = pending === undefined || pending === true
-  const isLoaded = pending === false && Object.keys(population).length > 0
-  const renderMessage = groupStudentNumbers.length === 0
-  const renderLoader = groupStudentNumbers.length > 0 && isLoading
-  const renderGroup = groupStudentNumbers.length > 0 && isLoaded
+  if (groupStudentNumbers.length === 0) {
+    return (
+      <SingleStudyGroupViewWrapper>
+        <StyledMessage>This study guidance group doesn't contain any students.</StyledMessage>
+      </SingleStudyGroupViewWrapper>
+    )
+  }
 
   return (
-    <SingleStudyGroupViewWrapper history={history} groupName={group.name} language={language}>
-      {renderMessage ? <StyledMessage>This study guidance group doesn't contain any students.</StyledMessage> : null}
-      {renderLoader ? (
-        <Loader active inline="centered">
-          Loading
-        </Loader>
-      ) : null}
-      {renderGroup ? <SingleStudyGroupContent population={population} group={group} language={language} /> : null}
+    <SingleStudyGroupViewWrapper groupName={group.name} language={language} isLoading={isLoading}>
+      {!isLoading && (
+        <SingleStudyGroupContent
+          population={population}
+          group={group}
+          language={language}
+          populationCourses={populationCourses}
+        />
+      )}
     </SingleStudyGroupViewWrapper>
   )
 }
