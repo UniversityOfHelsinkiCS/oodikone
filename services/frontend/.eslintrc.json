@@ -1,7 +1,8 @@
 {
   "root": true,
   "env": {
-    "browser": true
+    "browser": true,
+    "node": true
   },
   "parser": "@babel/eslint-parser",
   "parserOptions": {
@@ -30,7 +31,7 @@
     "react/no-unescaped-entities": "off",
     "react/prop-types": "off",
     "react/prefer-stateless-function": "error",
-    "import/no-unresolved": "error",
+    "import/no-unresolved": "off",
     "react/jsx-no-bind": "error",
     "prefer-object-spread/prefer-object-spread": "error",
     "babel/no-invalid-this": "error",

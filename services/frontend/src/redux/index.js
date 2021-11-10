@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query/react'
-import { handleRequest, handleAuth, RTKApi } from '../apiConnection'
+import { handleRequest, handleAuth, RTKApi } from 'apiConnection'
 import actionHistory from './actionHistory'
 import users from './users'
 import populations from './populations'

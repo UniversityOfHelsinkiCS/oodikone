@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom'
 import { Formik } from 'formik'
 import { Form, Button, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
-import SortableTable from '../SortableTable'
-import { getTextIn, textAndDescriptionSearch } from '../../common'
+import { getTextIn, textAndDescriptionSearch } from 'common'
+import { useChangeStudyGuidanceGroupTagsMutation } from 'redux/studyGuidanceGroups'
+import { getElementDetails } from 'redux/elementdetails'
+import { useToggle } from 'common/hooks'
+import SortableTable from 'components/SortableTable'
 import StyledMessage from './StyledMessage'
-import { useChangeStudyGuidanceGroupTagsMutation } from '../../redux/studyGuidanceGroups'
-import { getElementDetails } from '../../redux/elementdetails'
-import { useToggle } from '../../common/hooks'
 
 const LinkToGroup = ({ group, language }) => (
   <Link
