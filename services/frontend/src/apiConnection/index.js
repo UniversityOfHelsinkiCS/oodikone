@@ -4,7 +4,7 @@ import { getMocked, setMocking } from '../common'
 import { apiBasePath, isDev } from '../conf'
 import { loginPrefix, logoutPrefix } from '../redux/auth'
 
-const getHeaders = () => {
+export const getHeaders = () => {
   // Set up dev user for development environment, mimicking production admin user
   const devUserHeaders = {
     uid: 'mluukkai',
