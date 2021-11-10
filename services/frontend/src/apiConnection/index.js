@@ -1,5 +1,6 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { getMocked, setMocking } from '../common'
 import { apiBasePath, isDev } from '../conf'
 import { loginPrefix, logoutPrefix } from '../redux/auth'
@@ -140,3 +141,23 @@ export const handleAuth = store => next => async action => {
     }
   }
 }
+
+// Redux-toolkit query based API
+// Api can be extended with enhanceEndpoints method
+// All tags used for invalidating cache must be defined here
+export const RTKApi = createApi({
+  reducerPath: 'api',
+  tagTypes: ['StudyGuidanceGroups'],
+  baseQuery: fetchBaseQuery({
+    baseUrl: apiBasePath,
+    prepareHeaders: (headers, { getState }) => {
+      // Get token from state and add it to headers
+      const token = getState().auth.encodedToken
+      if (token) headers.set('x-access-token', token)
+      // Add possible default headers
+      Object.entries(getHeaders()).forEach(([key, value]) => headers.set(key, value))
+      return headers
+    },
+  }),
+  endpoints: () => ({}),
+})

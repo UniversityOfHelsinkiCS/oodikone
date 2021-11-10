@@ -1,37 +1,43 @@
-import { createReducer } from '@reduxjs/toolkit'
-import { callController, actionTypes } from '../apiConnection'
-import { initialState, matcherReducers, defaultReducer } from './common'
+import { RTKApi } from '../apiConnection'
 
-const baseUrl = '/studyguidancegroups'
-const getPrefix = 'GET_STUDY_GUIDANCE_GROUPS_'
-const getTypes = {
-  ...actionTypes(getPrefix),
-}
-const changeTagsPrefix = 'CHANGE_STUDY_GUIDANCE_GROUP_TAGS_'
-const changeTagsTypes = {
-  ...actionTypes(changeTagsPrefix),
-}
+const studyGuidanceGroupsApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getAllStudyGuidanceGroups: builder.query({
+      query: () => '/studyguidancegroups',
+      providesTags: result => [
+        ...result?.map(({ id }) => ({ type: 'StudyGuidanceGroups', id })),
+        { type: 'StudyGuidanceGroups', id: 'LIST' },
+      ],
+    }),
+    changeStudyGuidanceGroupTags: builder.mutation({
+      query: ({ groupId, tags }) => ({
+        url: `/studyguidancegroups/${groupId}/tags`,
+        method: 'PUT',
+        body: tags,
+      }),
+      invalidatesTags: ({ studyGuidanceGroupId }) => [{ type: 'StudyGuidanceGroups', id: studyGuidanceGroupId }],
+    }),
+    getStudyGuidanceGroupPopulation: builder.query({
+      query: studentnumberlist => ({
+        url: '/v3/populationstatisticsbystudentnumbers',
+        method: 'POST',
+        body: { studentnumberlist, usingStudyGuidanceGroups: true },
+      }),
+    }),
+    getStudyGuidanceGroupPopulationCourses: builder.query({
+      query: studentnumberlist => ({
+        url: '/v2/populationstatistics/coursesbystudentnumberlist',
+        method: 'POST',
+        body: { studentnumberlist, usingStudyGuidanceGroups: true },
+      }),
+    }),
+  }),
+  overrideExisting: false,
+})
 
-export const getStudyGuidanceGroups = () => callController(baseUrl, getPrefix)
-
-export const changeStudyGuidanceGroupTags = (groupId, tags) =>
-  callController(`${baseUrl}/${groupId}/tags`, changeTagsPrefix, tags, 'put')
-
-const reducer = createReducer(
-  initialState,
-  {
-    [getTypes.success]: (state, action) => {
-      state.data = action.response
-    },
-    [changeTagsTypes.success]: (state, action) => {
-      state.data.find(group => group.id === action.response.studyGuidanceGroupId).tags = (({
-        studyGuidanceGroupId,
-        ...rest
-      }) => rest)(action.response)
-    },
-  },
-  matcherReducers,
-  defaultReducer
-)
-
-export default reducer
+export const {
+  useGetAllStudyGuidanceGroupsQuery,
+  useChangeStudyGuidanceGroupTagsMutation,
+  useGetStudyGuidanceGroupPopulationQuery,
+  useGetStudyGuidanceGroupPopulationCoursesQuery,
+} = studyGuidanceGroupsApi
