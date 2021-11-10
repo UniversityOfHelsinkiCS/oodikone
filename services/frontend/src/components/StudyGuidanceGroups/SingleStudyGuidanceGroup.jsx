@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { useSelector } from 'react-redux'
-import { Button, Header, Accordion, Divider } from 'semantic-ui-react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Button, Header, Accordion, Divider, Label, Segment } from 'semantic-ui-react'
 import { useHistory } from 'react-router-dom'
 import scrollToComponent from 'react-scroll-to-component'
 import { getTextIn } from 'common'
@@ -10,6 +10,7 @@ import useFilters from 'components/FilterTray/useFilters'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import { StudyGuidanceGroupFilters } from 'components/FilterTray/FilterSets'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
+import { getElementDetails } from 'redux/elementdetails'
 import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import Wrapper from './Wrapper'
 import StyledMessage from './StyledMessage'
@@ -117,14 +118,18 @@ const SingleStudyGroupContent = ({ population, group }) => {
 
   return (
     <FilterTray filterSet={<StudyGuidanceGroupFilters />}>
-      <div className="segmentContainer">
+      <Segment className="contentSegment">
         <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
-      </div>
+      </Segment>
     </FilterTray>
   )
 }
 
-const SingleStudyGroupViewWrapper = ({ groupName, language, isLoading, children }) => {
+const startYearToAcademicYear = year => {
+  return year === '' || Number.isNaN(year) ? '' : `${year} - ${parseInt(year, 10) + 1}`
+}
+
+const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgrammes, children }) => {
   const history = useHistory()
   const handleBack = () => {
     history.push('/studyguidancegroups')
@@ -135,7 +140,15 @@ const SingleStudyGroupViewWrapper = ({ groupName, language, isLoading, children 
       <Wrapper isLoading={isLoading}>
         <Button icon="arrow circle left" content="Back" onClick={handleBack} />
         <Divider />
-        <Header size="medium">{groupName && language && getTextIn(groupName, language)}</Header>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <Header size="medium" style={{ marginRight: 'auto' }}>
+            {group.name && language && getTextIn(group.name, language)}
+          </Header>
+          {group.tags?.studyProgramme && (
+            <Label tag content={studyProgrammes.find(p => p.value === group.tags.studyProgramme)?.text} color="blue" />
+          )}
+          {group.tags?.year && <Label tag content={startYearToAcademicYear(group.tags.year)} color="blue" />}
+        </div>
       </Wrapper>
       {children}
     </>
@@ -143,9 +156,25 @@ const SingleStudyGroupViewWrapper = ({ groupName, language, isLoading, children 
 }
 
 const SingleStudyGuidanceGroupContainer = ({ group }) => {
+  const dispatch = useDispatch()
   const { language } = useSelector(({ settings }) => settings)
+  const { data: elementDetails } = useSelector(({ elementdetails }) => elementdetails)
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
+  const studyProgrammes =
+    elementDetails
+      ?.filter(elem => elem.code.startsWith('KH') || elem.code.startsWith('MH'))
+      .map(elem => ({
+        key: elem.code,
+        value: elem.code,
+        description: elem.code,
+        text: getTextIn(elem.name, language),
+      })) || []
+
+  useEffect(() => {
+    if (elementDetails && elementDetails.length > 0) return
+    dispatch(getElementDetails())
+  }, [dispatch])
 
   if (!group) {
     return (
@@ -167,7 +196,12 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
   }
 
   return (
-    <SingleStudyGroupViewWrapper groupName={group.name} language={language} isLoading={isLoading}>
+    <SingleStudyGroupViewWrapper
+      group={group}
+      language={language}
+      isLoading={isLoading}
+      studyProgrammes={studyProgrammes}
+    >
       {!isLoading && <SingleStudyGroupContent population={data} group={group} language={language} />}
     </SingleStudyGroupViewWrapper>
   )
