@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { shape, string, arrayOf } from 'prop-types'
 import { Menu, Tab, Input, Message } from 'semantic-ui-react'
 import { flattenDeep } from 'lodash'
 import Highcharts from 'highcharts/highstock'
@@ -7,36 +6,24 @@ import ReactHighcharts from 'react-highcharts'
 import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
 import { byDateDesc, reformatDate, getTextIn } from '../../../common'
 import TSA from '../../../common/tsa'
-import useLanguage from '../../LanguagePicker/useLanguage'
 
 const ANALYTICS_CATEGORY = 'Student stats'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const CreditsGraph = ({ graphYearStart, student, absences }) => {
-  const { language } = useLanguage()
-
   const selectedStart = new Date(graphYearStart ?? student.started)
   const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
-
   const endDate = dates.length > 0 ? Math.max(...dates) : new Date().getTime()
 
   return (
     <CreditAccumulationGraphHighCharts
       singleStudent
       students={[student]}
-      title="Credit Accumulation"
       startDate={selectedStart}
       endDate={endDate}
       absences={absences}
-      language={language}
     />
   )
-}
-
-CreditsGraph.propTypes = {
-  student: shape({}).isRequired,
-  absences: arrayOf(shape({})).isRequired,
-  graphYearStart: string.isRequired,
 }
 
 const chunkifyArray = (array, size = 1) => {
@@ -197,12 +184,6 @@ const GradeGraph = ({ student, semesters, language }) => {
   )
 }
 
-GradeGraph.propTypes = {
-  student: shape({}).isRequired,
-  semesters: shape({}).isRequired,
-  language: string.isRequired,
-}
-
 const StudentGraphs = ({ student, absences, graphYearStart, semesters, language }) => {
   const panes = [
     {
@@ -223,14 +204,6 @@ const StudentGraphs = ({ student, absences, graphYearStart, semesters, language 
     },
   ]
   return <Tab panes={panes} />
-}
-
-StudentGraphs.propTypes = {
-  student: shape({}).isRequired,
-  absences: arrayOf(shape({})).isRequired,
-  graphYearStart: string.isRequired,
-  semesters: shape({}).isRequired,
-  language: string.isRequired,
 }
 
 export default StudentGraphs
