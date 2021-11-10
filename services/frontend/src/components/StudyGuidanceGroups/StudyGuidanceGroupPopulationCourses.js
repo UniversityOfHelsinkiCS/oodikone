@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Segment, Button } from 'semantic-ui-react'
 import InfoBox from 'components/InfoBox'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
@@ -18,11 +18,12 @@ const StudyGuidanceGroupPopulationCourses = ({
 }) => {
   const { setCourses, resetCourses } = useCourseFilter()
   const dispatch = useDispatch()
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const { data: courses, isLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery(selectedStudents)
 
   useEffect(() => {
     // ensure mandatory courses are available for course stats structured
-    if (showStructured && studyProgramme) {
+    if (showStructured && studyProgramme && mandatoryCourses.length === 0) {
       dispatch(getMandatoryCourses(studyProgramme))
       dispatch(getMandatoryCourseModules(studyProgramme))
     }
