@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, Header, Accordion, Divider, Label, Segment } from 'semantic-ui-react'
 import { useHistory } from 'react-router-dom'
@@ -27,43 +27,69 @@ const takeOnlyCoursesStartingFromGivenAcademicYear = ({ students, year }) => {
   }))
 }
 
+const useIsMounted = () => {
+  const isMounted = useRef(false)
+
+  useEffect(() => {
+    isMounted.current = true
+
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
+
+  return useCallback(() => isMounted.current, [])
+}
+
+const useToggleAndSetNewestIndex = ({ defaultValue, indexOfPanelToScroll, setNewestIndex, isMounted }) => {
+  const [state, toggle] = useToggle(defaultValue)
+  useEffect(() => {
+    if (isMounted()) setNewestIndex(indexOfPanelToScroll)
+  }, [state])
+  return [state, toggle]
+}
+
 const SingleStudyGroupContent = ({ population, group, language }) => {
+  const isMounted = useIsMounted()
   const { setAllStudents, filteredStudents } = useFilters()
   const refs = [useRef(), useRef(), useRef(), useRef()]
-  const [activeIndex, setIndex] = useState([])
-  const [newestIndex, setNewest] = useState(null)
-  const [creditsStartingFromAssociatedYear, toggleCreditsStartingFromAssociatedYear] = useToggle(!!group.tags?.year)
-  const [coursesStructuredByProgramme, toggleCoursesStructuredByProgramme] = useToggle(!!group.tags?.studyProgramme)
+  const [activeIndex, setActiveIndex] = useState([])
+  const [newestIndex, setNewestIndex] = useState(null)
+  const [creditsStartingFromAssociatedYear, toggleCreditsStartingFromAssociatedYear] = useToggleAndSetNewestIndex({
+    defaultValue: !!group.tags?.year,
+    indexOfPanelToScroll: 0,
+    setNewestIndex,
+    isMounted,
+  })
+  const [coursesStructuredByProgramme, toggleCoursesStructuredByProgramme] = useToggleAndSetNewestIndex({
+    defaultValue: !!group.tags?.studyProgramme,
+    indexOfPanelToScroll: 1,
+    setNewestIndex,
+    isMounted,
+  })
   const filteredStudentsWithFilteredCourses = takeOnlyCoursesStartingFromGivenAcademicYear({
     students: filteredStudents,
     year: group.tags?.year,
   })
 
-  const handleClick = index => {
-    const indexes = [...activeIndex].sort()
-    if (indexes.includes(index)) {
-      indexes.splice(
-        indexes.findIndex(ind => ind === index),
-        1
-      )
+  const togglePanel = index => {
+    const currentActiveIndex = new Set(activeIndex)
+    if (currentActiveIndex.has(index)) {
+      currentActiveIndex.delete(index)
     } else {
-      indexes.push(index)
+      currentActiveIndex.add(index)
+      setNewestIndex(index)
     }
-    if (activeIndex.length < indexes.length) setNewest(index)
-    else setNewest(null)
-    setIndex(indexes)
+    setActiveIndex([...currentActiveIndex])
   }
+  useEffect(() => {
+    if (newestIndex) scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
+  }, [newestIndex])
 
   useEffect(() => {
     setAllStudents(population?.students || [])
-    handleClick(0)
+    togglePanel(0)
   }, [population])
-
-  useEffect(() => {
-    if (newestIndex) {
-      scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
-    }
-  }, [activeIndex])
 
   const panels = [
     {
@@ -75,7 +101,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
           </span>
         ),
       },
-      onTitleClick: () => handleClick(0),
+      onTitleClick: () => togglePanel(0),
       content: {
         content: (
           <div ref={refs[0]}>
@@ -101,7 +127,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
           </span>
         ),
       },
-      onTitleClick: () => handleClick(1),
+      onTitleClick: () => togglePanel(1),
       content: {
         content: (
           <div ref={refs[1]}>
@@ -124,7 +150,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
           </span>
         ),
       },
-      onTitleClick: () => handleClick(2),
+      onTitleClick: () => togglePanel(2),
       content: {
         content: (
           <div ref={refs[2]}>
@@ -159,7 +185,7 @@ const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgramm
       <Wrapper isLoading={isLoading}>
         <Button icon="arrow circle left" content="Back" onClick={handleBack} />
         <Divider />
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
           <Header size="medium" style={{ marginRight: 'auto' }}>
             {group.name && language && getTextIn(group.name, language)}
           </Header>
