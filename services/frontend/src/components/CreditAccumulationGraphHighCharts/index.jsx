@@ -217,13 +217,6 @@ const createStudentCreditLines = (students, singleStudent) => {
   })
 }
 
-const getStudentCreditCount = student =>
-  _.chain(student.courses)
-    .filter(c => c.passed && c.isStudyModuleCredit)
-    .map('credits')
-    .sum()
-    .value()
-
 const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, startDate, endDate }) => {
   const history = useHistory()
   const chartRef = useRef()
