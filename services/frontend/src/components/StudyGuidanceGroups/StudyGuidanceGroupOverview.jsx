@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import React from 'react'
+import { useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { Formik } from 'formik'
 import { Form, Button, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import { getTextIn, textAndDescriptionSearch } from 'common'
 import { useChangeStudyGuidanceGroupTagsMutation } from 'redux/studyGuidanceGroups'
-import { getElementDetails } from 'redux/elementdetails'
+import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import { useToggle } from 'common/hooks'
 import SortableTable from 'components/SortableTable'
-import StyledMessage from './StyledMessage'
+import { startYearToAcademicYear, StyledMessage } from './common'
 
 const LinkToGroup = ({ group, language }) => {
   const history = useHistory()
@@ -34,10 +34,6 @@ const LinkToGroup = ({ group, language }) => {
 const prettifyCamelCase = str => {
   const splitted = str.match(/[A-Za-z][a-z]*/g) || []
   return splitted.map(w => w.charAt(0).toLowerCase() + w.substring(1)).join(' ')
-}
-
-const startYearToAcademicYear = year => {
-  return year === '' || Number.isNaN(year) ? '' : `${year} - ${parseInt(year, 10) + 1}`
 }
 
 const cellWrapper = { display: 'flex', gap: '8px', width: '100%' }
@@ -139,24 +135,8 @@ const TagCell = ({ tagName, group, studyProgrammes }) => {
 }
 
 const StudyGuidanceGroupOverview = ({ groups }) => {
-  const dispatch = useDispatch()
   const { language } = useSelector(({ settings }) => settings)
-  const { data: elementDetails } = useSelector(({ elementdetails }) => elementdetails)
-
-  useEffect(() => {
-    if (elementDetails && elementDetails.length > 0) return
-    dispatch(getElementDetails())
-  }, [dispatch])
-
-  const studyProgrammesFilteredForDropdown =
-    elementDetails
-      ?.filter(elem => elem.code.startsWith('KH') || elem.code.startsWith('MH'))
-      .map(elem => ({
-        key: elem.code,
-        value: elem.code,
-        description: elem.code,
-        text: getTextIn(elem.name, language),
-      })) || []
+  const studyProgrammes = useFilteredAndFormattedElementDetails(language)
 
   const headers = [
     {
@@ -188,9 +168,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
       title: 'Study programme',
       getRowVal: group => group.tags?.studyProgramme,
       headerProps: { onClick: null, sorted: null },
-      getRowContent: group => (
-        <TagCell tagName="studyProgramme" studyProgrammes={studyProgrammesFilteredForDropdown} group={group} />
-      ),
+      getRowContent: group => <TagCell tagName="studyProgramme" studyProgrammes={studyProgrammes} group={group} />,
     },
     {
       key: 'associatedyear',
