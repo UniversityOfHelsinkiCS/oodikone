@@ -31,7 +31,11 @@ export default () => {
       return true
     }
 
-    setCreditDateFilter(filterFn)
+    setCreditDateFilter({
+      func: filterFn,
+      startDate: startDate !== label ? startDate : null,
+      endDate: endDate !== label ? endDate : null,
+    })
   }, [startDate, endDate])
 
   const reset = () => {

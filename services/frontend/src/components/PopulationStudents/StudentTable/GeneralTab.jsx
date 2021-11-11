@@ -15,7 +15,7 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 
 const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCourseDateMap, coursecode }) => {
   const { language } = useLanguage()
-  const { filteredStudents } = useFilters()
+  const { filteredStudents, creditDateFilterParams } = useFilters()
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
 
@@ -182,6 +182,18 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCo
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
+  const { startDate, endDate } = creditDateFilterParams
+
+  let creditColumnTitle = 'Credits Since Start of Studyright'
+
+  if (startDate && !endDate) {
+    creditColumnTitle = `Credits Since ${moment(startDate).format('DD.MM.YYYY')}`
+  } else if (endDate && !startDate) {
+    creditColumnTitle = `Credits Before ${moment(endDate).format('DD.MM.YYYY')}`
+  } else if (endDate && startDate) {
+    creditColumnTitle = `Credits Between ${moment(startDate).format('DD.MM.YYYY')} and ${moment(endDate).format('DD.MM.YYYY')}`
+  }
+
   // All columns components user is able to use
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
@@ -215,7 +227,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCo
     },
     creditsSinceStart: {
       key: 'creditsSinceStart',
-      title: 'credits since start of studyright',
+      title: creditColumnTitle,
       getRowVal: s => {
         const credits = getStudentTotalCredits(s)
         return credits
