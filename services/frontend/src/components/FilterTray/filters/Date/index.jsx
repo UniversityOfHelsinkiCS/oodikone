@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Form } from 'semantic-ui-react'
 import 'moment/locale/fi'
-import ClearFilterButton from '../common/ClearFilterButton'
 import FilterCard from '../common/FilterCard'
 import useFilters from '../../useFilters'
 import DateTime from './DateTime'
@@ -13,18 +12,17 @@ import DateTime from './DateTime'
  */
 export default () => {
   const { setCreditDateFilter } = useFilters()
-  const label = 'Select Date'
-  const [startDate, setStartDate] = useState(label)
-  const [endDate, setEndDate] = useState(label)
+  const [startDate, setStartDate] = useState(null)
+  const [endDate, setEndDate] = useState(null)
   const name = 'creditDateFilter'
 
   useEffect(() => {
     const filterFn = course => {
-      if (startDate !== label && startDate.isAfter(course.date)) {
+      if (startDate && startDate.isAfter(course.date)) {
         return false
       }
 
-      if (endDate !== label && endDate.isBefore(course.date)) {
+      if (endDate && endDate.isBefore(course.date)) {
         return false
       }
 
@@ -33,17 +31,11 @@ export default () => {
 
     setCreditDateFilter({
       func: filterFn,
-      startDate: startDate !== label ? startDate : null,
-      endDate: endDate !== label ? endDate : null,
+      startDate,
+      endDate,
     })
   }, [startDate, endDate])
 
-  const reset = () => {
-    setStartDate(label)
-    setEndDate(label)
-  }
-
-  const clearButtonDisabled = startDate === label && endDate === label
 
   const infoText = {
     label: 'Selected date range only.',
@@ -51,14 +43,7 @@ export default () => {
   }
 
   return (
-    <FilterCard
-      title="Date of Course Credits"
-      contextKey={name}
-      footer={<ClearFilterButton disabled={clearButtonDisabled} onClick={reset} name={name} />}
-      active={!clearButtonDisabled}
-      name={name}
-      info={infoText}
-    >
+    <FilterCard title="Date of Course Credits" contextKey={name} active={startDate || endDate} name={name} info={infoText}>
       <div className="card-content" style={{ marginTop: '0.5rem' }}>
         <Form>
           <Form.Field>
