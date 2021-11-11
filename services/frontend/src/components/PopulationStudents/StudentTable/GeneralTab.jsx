@@ -466,7 +466,6 @@ GeneralTab.propTypes = {
 
 const mapStateToProps = state => {
   const {
-    api,
     populations,
     auth: {
       token: { roles },
@@ -475,10 +474,7 @@ const mapStateToProps = state => {
 
   return {
     isAdmin: getUserIsAdmin(roles),
-    populationStatistics:
-      Object.keys(populations.data) > 0
-        ? populations.data
-        : api.queries[Object.keys(api.queries).find(key => key.startsWith('getStudyGuidanceGroupPopulation'))]?.data,
+    populationStatistics: populations.data,
     queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
     queryYear: populations?.query?.year,
   }
