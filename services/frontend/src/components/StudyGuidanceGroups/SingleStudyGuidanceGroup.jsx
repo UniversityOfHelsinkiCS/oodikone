@@ -7,6 +7,7 @@ import { getTextIn } from 'common'
 import { useToggle } from 'common/hooks'
 import FilterTray from 'components/FilterTray'
 import useFilters from 'components/FilterTray/useFilters'
+import PopulationStudents from 'components/PopulationStudents'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import { StudyGuidanceGroupFilters } from 'components/FilterTray/FilterSets'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
@@ -26,7 +27,7 @@ const takeOnlyCoursesStartingFromGivenAcademicYear = ({ students, year }) => {
   }))
 }
 
-const SingleStudyGroupContent = ({ population, group }) => {
+const SingleStudyGroupContent = ({ population, group, language }) => {
   const { setAllStudents, filteredStudents } = useFilters()
   const refs = [useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setIndex] = useState([])
@@ -110,6 +111,24 @@ const SingleStudyGroupContent = ({ population, group }) => {
               toggleShowStructured={toggleCoursesStructuredByProgramme}
               studyProgramme={group.tags?.studyProgramme}
             />
+          </div>
+        ),
+      },
+    },
+    {
+      key: 2,
+      title: {
+        content: (
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Students ({filteredStudents.length})
+          </span>
+        ),
+      },
+      onTitleClick: () => handleClick(2),
+      content: {
+        content: (
+          <div ref={refs[2]}>
+            <PopulationStudents customPopulation language={language} filteredStudents={filteredStudents} />
           </div>
         ),
       },
