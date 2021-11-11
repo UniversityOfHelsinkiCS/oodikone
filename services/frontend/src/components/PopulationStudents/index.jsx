@@ -1,12 +1,11 @@
-import React, { Component, Fragment } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
-import { string, arrayOf, object, func, bool, shape, node } from 'prop-types'
-import { Icon, Tab, Grid, Ref, Item, Dropdown } from 'semantic-ui-react'
+import { Icon, Tab, Grid, Item, Dropdown } from 'semantic-ui-react'
 import { withRouter, Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 import { getTextIn, getUserRoles } from '../../common'
-import { useTabChangeAnalytics } from '../../common/hooks'
+import { useTabChangeAnalytics, usePrevious } from '../../common/hooks'
 
 import { toggleStudentListVisibility } from '../../redux/settings'
 import { getTagsByStudytrackAction } from '../../redux/tags'
@@ -24,13 +23,10 @@ import GeneralTab from './StudentTable/GeneralTab'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
 import infotoolTips from '../../common/InfoToolTips'
 
-// TODO: Refactoring in process, contains lot of duplicate code.
-
 const sendAnalytics = sendEvent.populationStudents
 
+// refactor this
 const StudentTableTabs = ({ panes, filterPanes }) => {
-  // only its own component really because I needed to use hooks and didn't want to refactor
-  // this megamillion line component :) /Joona
   const { handleTabChange } = useTabChangeAnalytics(
     ANALYTICS_CATEGORIES.populationStudents,
     'Change students table tab'
@@ -39,64 +35,57 @@ const StudentTableTabs = ({ panes, filterPanes }) => {
   return <Tab onTabChange={handleTabChange} panes={filterPanes(panes)} data-cy="student-table-tabs" />
 }
 
-StudentTableTabs.propTypes = {
-  panes: arrayOf(object).isRequired,
-  filterPanes: func.isRequired,
-}
+const PopulationStudents = props => {
+  const [state, setState] = useState({})
+  const studentRef = useRef()
+  const {
+    getTagsByStudytrack,
+    getStudentTagsStudyTrack,
+    queryStudyrights,
+    userRoles,
+    showList,
+    customPopulation = false,
+    coursePopulation = false,
+    mandatoryPassed,
+    mandatoryCourses,
+    showNames,
+    language,
+    filteredStudents,
+    studentToTargetCourseDateMap,
+    coursecode = [],
+    tags,
+    dataExport,
+  } = props
+  const prevShowList = usePrevious(showList)
+  const admin = userRoles.includes('admin')
 
-class PopulationStudents extends Component {
-  constructor(props) {
-    super(props)
+  useEffect(() => {
+    if (tags && tags.length > 0) return
+    const queryStudyright = queryStudyrights[0]
+    getTagsByStudytrack(queryStudyright)
+    getStudentTagsStudyTrack(queryStudyright)
+    setState({ ...state, admin })
+  }, [])
 
-    this.state = {}
-
-    this.studentsRef = React.createRef()
-  }
-
-  componentDidMount() {
-    const queryStudyright = this.props.queryStudyrights[0]
-    const admin = this.props.userRoles.includes('admin')
-    if (queryStudyright) {
-      this.props.getTagsByStudytrack(queryStudyright)
-      this.props.getStudentTagsStudyTrack(queryStudyright)
+  useEffect(() => {
+    if (!prevShowList && showList) {
+      scrollToComponent(studentRef.current, { align: 'bottom' })
     }
-    this.setState({ admin })
-  }
+  }, [prevShowList])
 
-  componentDidUpdate = prevProps => {
-    if (!prevProps.showList && this.props.showList) {
-      scrollToComponent(this.studentsRef.current, { align: 'bottom' })
-    }
-  }
-
-  studyrightCodes = (studyrights, value) => {
-    const { queryStudyrights } = this.props
-    return studyrights
-      .filter(sr => {
-        const { studyright_elements: studyrightElements } = sr
-        return studyrightElements.filter(sre => queryStudyrights.includes(sre.code)).length >= queryStudyrights.length
-      })
-      .map(a => a[value])
-  }
-
-  handleRef = node => {
-    this.studentsRef.current = node
-  }
-
-  renderStudentTable() {
-    const { customPopulation, coursePopulation } = this.props
+  const renderStudentTable = () => {
     const verticalTitle = title => <div className="verticalTitle">{title}</div>
 
     const hasPassedMandatory = (studentNumber, code) =>
-      this.props.mandatoryPassed[code] && this.props.mandatoryPassed[code].includes(studentNumber)
+      mandatoryPassed[code] && mandatoryPassed[code].includes(studentNumber)
 
     const totalMandatoryPassed = studentNumber => {
-      this.props.mandatoryCourses.reduce((acc, m) => {
+      mandatoryCourses.reduce((acc, m) => {
         return hasPassedMandatory(studentNumber, m.code) ? acc + 1 : acc
       }, 0)
     }
 
-    const nameColumns = this.props.showNames
+    const nameColumns = showNames
       ? [
           {
             key: 'lastname',
@@ -164,7 +153,7 @@ class PopulationStudents extends Component {
 
     const mandatoryCourseLabels = []
 
-    const labelToMandatoryCourses = this.props.mandatoryCourses.reduce((acc, e) => {
+    const labelToMandatoryCourses = mandatoryCourses.reduce((acc, e) => {
       const label = e.label ? e.label.label : ''
       acc[label] = acc[label] || []
       if (acc[label].some(l => l.code === e.code)) return acc
@@ -183,14 +172,14 @@ class PopulationStudents extends Component {
     const mandatoryTitle = m => {
       return (
         <>
-          {getTextIn(m.name, this.props.language)}
+          {getTextIn(m.name, language)}
           <br />
           {m.code}
         </>
       )
     }
 
-    const { visibleLabels, visibleCourseCodes } = this.props.mandatoryCourses.reduce(
+    const { visibleLabels, visibleCourseCodes } = mandatoryCourses.reduce(
       (acc, cur) => {
         if (cur.visible && cur.visible.visibility) {
           acc.visibleLabels.add(cur.label_code)
@@ -242,8 +231,8 @@ class PopulationStudents extends Component {
             .map(m => ({
               key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
               title: verticalTitle(mandatoryTitle(m)),
-              cellProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
-              headerProps: { title: `${m.code}, ${getTextIn(m.name, this.props.language)}` },
+              cellProps: { title: `${m.code}, ${getTextIn(m.name, language)}` },
+              headerProps: { title: `${m.code}, ${getTextIn(m.name, language)}` },
               getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
               getRowContent: s => {
                 if (s.total) return getTotalRowVal(s, m)
@@ -257,22 +246,20 @@ class PopulationStudents extends Component {
       ),
     ]
 
-    const totals = this.props.filteredStudents.reduce(
+    const totals = filteredStudents.reduce(
       (acc, s) => {
         const passedCourses = new Set()
-        this.props.mandatoryCourses.forEach(m => {
+        mandatoryCourses.forEach(m => {
           if (passedCourses.has(m.code)) return
           passedCourses.add(m.code)
           if (hasPassedMandatory(s.studentNumber, m.code)) ++acc[m.code]
         })
         return acc
       },
-      this.props.mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
+      mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
     )
-    const mandatoryCourseData = [totals, ...this.props.filteredStudents]
+    const mandatoryCourseData = [totals, filteredStudents]
 
-    // FIXME: here only for refactorment
-    const { showNames, studentToTargetCourseDateMap, coursecode } = this.props
     const panes = [
       {
         menuItem: 'General',
@@ -294,7 +281,7 @@ class PopulationStudents extends Component {
           <Tab.Pane>
             <div style={{ display: 'flex' }}>
               <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-                {this.props.mandatoryCourses.length > 0 && (
+                {mandatoryCourses.length > 0 && (
                   <SortableTable
                     getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
                     tableProps={{
@@ -308,7 +295,7 @@ class PopulationStudents extends Component {
                       textAlign: 'center',
                     }}
                     collapsingHeaders
-                    showNames={this.props.showNames}
+                    showNames={showNames}
                     columns={mandatoryCourseColumns}
                     data={mandatoryCourseData}
                   />
@@ -323,7 +310,7 @@ class PopulationStudents extends Component {
         render: () => (
           <Tab.Pane>
             <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-              {this.props.tags.length === 0 && (
+              {tags.length === 0 && (
                 <div
                   style={{
                     paddingLeft: '10px',
@@ -337,7 +324,7 @@ class PopulationStudents extends Component {
                   <h3>
                     No tags defined. You can define them{' '}
                     <Link
-                      to={`/study-programme/${this.props.queryStudyrights[0]}?p_m_tab=0&p_tab=6`}
+                      to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=6`}
                       onClick={() => {
                         sendAnalytics('No tags defined button clicked', 'Tags tab')
                       }}
@@ -348,14 +335,14 @@ class PopulationStudents extends Component {
                   </h3>
                 </div>
               )}
-              {this.props.tags.length > 0 && (
+              {tags.length > 0 && (
                 <>
                   <TagPopulation
-                    tags={this.props.tags}
-                    selectedStudents={this.props.filteredStudents.map(stu => stu.studentNumber)}
-                    studytrack={this.props.queryStudyrights[0]}
+                    tags={tags}
+                    selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
+                    studytrack={queryStudyrights[0]}
                   />
-                  <TagList studytrack={this.props.queryStudyrights[0]} selectedStudents={this.props.filteredStudents} />
+                  <TagList studytrack={queryStudyrights[0]} selectedStudents={filteredStudents} />
                 </>
               )}
             </div>
@@ -377,10 +364,10 @@ class PopulationStudents extends Component {
           <Grid.Column>
             <StudentNameVisibilityToggle />
           </Grid.Column>
-          {this.props.dataExport && (
+          {dataExport && (
             <Grid.Column textAlign="right">
               <Dropdown text="Export Data" icon="save" button labeled className="icon" direction="left">
-                <Dropdown.Menu>{this.props.dataExport}</Dropdown.Menu>
+                <Dropdown.Menu>{dataExport}</Dropdown.Menu>
               </Dropdown>
             </Grid.Column>
           )}
@@ -390,63 +377,21 @@ class PopulationStudents extends Component {
     )
   }
 
-  render() {
-    if (this.props.filteredStudents.length === 0) {
-      return null
-    }
+  if (filteredStudents.length === 0) return null
 
-    return (
-      <Ref innerRef={this.handleRef}>
-        <>
-          <span style={{ marginRight: '0.5rem' }}>
-            <InfoBox
-              content={
-                this.props.coursePopulation
-                  ? infotoolTips.CoursePopulation.Students
-                  : infotoolTips.PopulationStatistics.Students
-              }
-            />
-          </span>
-          {this.state.admin ? (
-            <CheckStudentList students={this.props.filteredStudents.map(stu => stu.studentNumber)} />
-          ) : null}
-          {this.renderStudentTable()}
-        </>
-      </Ref>
-    )
-  }
-}
-
-PopulationStudents.defaultProps = {
-  studentToTargetCourseDateMap: null,
-  customPopulation: false,
-  coursePopulation: false,
-  dataExport: null,
-  coursecode: [],
-}
-
-PopulationStudents.propTypes = {
-  showNames: bool.isRequired,
-  showList: bool.isRequired,
-  language: string.isRequired,
-  queryStudyrights: arrayOf(string).isRequired,
-  mandatoryCourses: arrayOf(
-    shape({
-      name: shape({}).isRequired,
-      code: string.isRequired,
-    })
-  ).isRequired,
-  mandatoryPassed: shape({}).isRequired,
-  tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
-  getTagsByStudytrack: func.isRequired,
-  getStudentTagsStudyTrack: func.isRequired,
-  userRoles: arrayOf(string).isRequired,
-  studentToTargetCourseDateMap: shape({}),
-  coursePopulation: bool,
-  customPopulation: bool,
-  filteredStudents: arrayOf(shape({})).isRequired,
-  dataExport: node,
-  coursecode: arrayOf(string),
+  return (
+    <>
+      <span style={{ marginRight: '0.5rem' }} ref={studentRef}>
+        <InfoBox
+          content={
+            coursePopulation ? infotoolTips.CoursePopulation.Students : infotoolTips.PopulationStatistics.Students
+          }
+        />
+      </span>
+      {admin ? <CheckStudentList students={filteredStudents.map(stu => stu.studentNumber)} /> : null}
+      {renderStudentTable()}
+    </>
+  )
 }
 
 const mapStateToProps = state => {
