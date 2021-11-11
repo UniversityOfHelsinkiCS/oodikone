@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Button, Header, Accordion, Divider, Label, Segment } from 'semantic-ui-react'
 import { useHistory } from 'react-router-dom'
 import scrollToComponent from 'react-scroll-to-component'
@@ -11,10 +11,9 @@ import PopulationStudents from 'components/PopulationStudents'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import { StudyGuidanceGroupFilters } from 'components/FilterTray/FilterSets'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
-import { getElementDetails } from 'redux/elementdetails'
+import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
-import Wrapper from './Wrapper'
-import StyledMessage from './StyledMessage'
+import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
@@ -82,6 +81,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
     }
     setActiveIndex([...currentActiveIndex])
   }
+
   useEffect(() => {
     if (newestIndex) scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
   }, [newestIndex])
@@ -170,10 +170,6 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   )
 }
 
-const startYearToAcademicYear = year => {
-  return year === '' || Number.isNaN(year) ? '' : `${year} - ${parseInt(year, 10) + 1}`
-}
-
 const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgrammes, children }) => {
   const history = useHistory()
   const handleBack = () => {
@@ -201,25 +197,10 @@ const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgramm
 }
 
 const SingleStudyGuidanceGroupContainer = ({ group }) => {
-  const dispatch = useDispatch()
   const { language } = useSelector(({ settings }) => settings)
-  const { data: elementDetails } = useSelector(({ elementdetails }) => elementdetails)
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
+  const studyProgrammes = useFilteredAndFormattedElementDetails(language)
   const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
-  const studyProgrammes =
-    elementDetails
-      ?.filter(elem => elem.code.startsWith('KH') || elem.code.startsWith('MH'))
-      .map(elem => ({
-        key: elem.code,
-        value: elem.code,
-        description: elem.code,
-        text: getTextIn(elem.name, language),
-      })) || []
-
-  useEffect(() => {
-    if (elementDetails && elementDetails.length > 0) return
-    dispatch(getElementDetails())
-  }, [dispatch])
 
   if (!group) {
     return (
