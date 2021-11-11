@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { Formik } from 'formik'
 import { Form, Button, Icon } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
@@ -11,20 +11,25 @@ import { useToggle } from 'common/hooks'
 import SortableTable from 'components/SortableTable'
 import StyledMessage from './StyledMessage'
 
-const LinkToGroup = ({ group, language }) => (
-  <Link
-    style={{
-      color: 'black',
-      display: 'inline-block',
-      width: '100%',
-      height: '100%',
-      padding: '.78571429em .78571429em',
-    }}
-    to={`/studyguidancegroups/${group.id}`}
-  >
-    {getTextIn(group.name, language)}
-  </Link>
-)
+const LinkToGroup = ({ group, language }) => {
+  const history = useHistory()
+  const dest = `/studyguidancegroups/${group.id}`
+  return (
+    <Link
+      style={{
+        color: 'black',
+        display: 'inline-block',
+        width: '100%',
+        height: '100%',
+        padding: '.78571429em .78571429em',
+      }}
+      to={dest}
+    >
+      {getTextIn(group.name, language)}
+      <Icon color="blue" name="level up alternate" onClick={() => history.push(dest)} />
+    </Link>
+  )
+}
 
 const prettifyCamelCase = str => {
   const splitted = str.match(/[A-Za-z][a-z]*/g) || []
@@ -162,6 +167,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
         style: {
           padding: '0',
         },
+        className: 'iconCellNoPointer',
       },
     },
     {
