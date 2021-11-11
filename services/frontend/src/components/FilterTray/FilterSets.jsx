@@ -66,6 +66,9 @@ export const StudyGuidanceGroupFilters = () => (
     <Age />
     <Gender />
     <StartYearAtUni />
+    <AdmissionType />
+    <GraduatedFromProgramme />
+    <Tags />
     <Courses />
   </Filters>
 )
