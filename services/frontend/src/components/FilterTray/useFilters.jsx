@@ -27,7 +27,7 @@ export const FilterProvider = ({ children }) => {
     const withRegularFilters = applyFilters(activeFilters, allStudents)
     const filteredStudents = withRegularFilters.map(({ courses, ...rest }) => ({
       ...rest,
-      courses: creditDateFilter ? courses.filter(creditDateFilter) : courses,
+      courses: creditDateFilter ? courses.filter(creditDateFilter.func) : courses,
     }))
 
     setState(prev => ({ ...prev, filteredStudents }))
@@ -47,6 +47,8 @@ export default () => {
 
   const removeFilter = name => setState(prev => ({ ...prev, activeFilters: lodash.omit(prev.activeFilters, name) }))
 
+  const creditDateFilterParams = state.creditDateFilter && lodash.omit(state.creditDateFilter, 'func')
+
   /**
    * Apply all active filters except for the one named as the argument.
    * This provides a way for a filter to count objects without itself affecting the sample.
@@ -65,5 +67,6 @@ export default () => {
     addFilter,
     removeFilter,
     withoutFilter,
+    creditDateFilterParams,
   }
 }
