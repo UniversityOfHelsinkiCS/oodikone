@@ -77,6 +77,7 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
                   dateFormat="YYYY"
                   timeFormat={false}
                   initialvalue={group.tags?.[tagName]}
+                  inputProps={{ readOnly: true }}
                   renderYear={(props, selectableYear) => <td {...props}>{startYearToAcademicYear(selectableYear)}</td>}
                   renderInput={({ value, ...rest }) => {
                     return (
