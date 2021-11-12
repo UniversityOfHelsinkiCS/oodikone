@@ -167,14 +167,12 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
       key: 'studyProgramme',
       title: 'Study programme',
       getRowVal: group => group.tags?.studyProgramme,
-      headerProps: { onClick: null, sorted: null },
       getRowContent: group => <TagCell tagName="studyProgramme" studyProgrammes={studyProgrammes} group={group} />,
     },
     {
       key: 'associatedyear',
       title: 'Associated starting academic year',
       getRowVal: group => group.tags?.year,
-      headerProps: { onClick: null, sorted: null },
       getRowContent: group => <TagCell tagName="year" group={group} />,
     },
   ]
