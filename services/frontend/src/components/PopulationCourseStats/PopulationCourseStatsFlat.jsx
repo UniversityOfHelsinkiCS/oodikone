@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Table, Form, Input, Tab, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { orderBy, debounce } from 'lodash'
-import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
@@ -43,7 +41,7 @@ const lodashSortOrderTypes = {
   DESC: 'desc',
 }
 
-function updateCourseStatisticsCriteria(props, language, state) {
+const updateCourseStatisticsCriteria = (props, language, state) => {
   const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
   const {
     courses: { coursestatistics },
@@ -90,8 +88,21 @@ const initialState = props => ({
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-function PopulationCourseStats(props) {
+const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter = true }) => {
+  const dispatch = useDispatch()
+  const { years } = useSelector(({ semesters }) => semesters.data)
+  const populationCourses = useSelector(({ populationCourses }) => populationCourses)
+  const isAdmin = getUserIsAdmin(useSelector(({ auth }) => auth.token.roles))
   const { language } = useLanguage()
+  const props = {
+    courses,
+    isAdmin,
+    pending,
+    populationCourses,
+    selectedStudents,
+    showFilter,
+    years,
+  }
 
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [courseStatistics, setCourseStatistics] = useState(
@@ -105,7 +116,7 @@ function PopulationCourseStats(props) {
   const filterAnalytics = useAnalytics()
 
   useEffect(() => {
-    if (state && props.courses) {
+    if (!pending && state && props.courses) {
       const studentAmountLimit =
         state.selectedStudentsLength !== props.selectedStudents.length
           ? Math.round(props.selectedStudents.length * 0.3)
@@ -119,44 +130,46 @@ function PopulationCourseStats(props) {
       })
       setCourseStatistics(updateCourseStatisticsCriteria(props, language, state))
     }
-  }, [props.courses, props.selectedStudents])
+  }, [props.courses, props.selectedStudents, pending])
 
   useEffect(() => {
-    const { studentAmountLimit, codeFilter, nameFilter, reversed, sortCriteria } = state
-    const {
-      courses: { coursestatistics },
-      language,
-    } = props
-    const studentAmountFilter = ({ stats }) => {
-      const { students } = stats
-      return studentAmountLimit === 0 || students >= studentAmountLimit
+    if (!pending) {
+      const { studentAmountLimit, codeFilter, nameFilter, reversed, sortCriteria } = state
+      const {
+        courses: { coursestatistics },
+        language,
+      } = props
+      const studentAmountFilter = ({ stats }) => {
+        const { students } = stats
+        return studentAmountLimit === 0 || students >= studentAmountLimit
+      }
+      const courseCodeFilter = ({ course }) => {
+        const { code } = course
+        return code.toLowerCase().includes(codeFilter.toLowerCase())
+      }
+      const courseNameFilter = ({ course }) => {
+        const { name } = course
+        return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
+      }
+
+      const filteredCourses =
+        coursestatistics &&
+        coursestatistics
+          .filter(studentAmountFilter)
+          .filter(c => !codeFilter || courseCodeFilter(c))
+          .filter(c => !nameFilter || courseNameFilter(c))
+
+      const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
+
+      const sortedStatistics = orderBy(
+        filteredCourses,
+        [course => course.stats[sortCriteria], course => course.course.code],
+        [lodashSortOrder, lodashSortOrderTypes.ASC]
+      )
+
+      setCourseStatistics(sortedStatistics)
     }
-    const courseCodeFilter = ({ course }) => {
-      const { code } = course
-      return code.toLowerCase().includes(codeFilter.toLowerCase())
-    }
-    const courseNameFilter = ({ course }) => {
-      const { name } = course
-      return getTextIn(name, language).toLowerCase().includes(nameFilter.toLowerCase())
-    }
-
-    const filteredCourses =
-      coursestatistics &&
-      coursestatistics
-        .filter(studentAmountFilter)
-        .filter(c => !codeFilter || courseCodeFilter(c))
-        .filter(c => !nameFilter || courseNameFilter(c))
-
-    const lodashSortOrder = reversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
-
-    const sortedStatistics = orderBy(
-      filteredCourses,
-      [course => course.stats[sortCriteria], course => course.course.code],
-      [lodashSortOrder, lodashSortOrderTypes.ASC]
-    )
-
-    setCourseStatistics(sortedStatistics)
-  }, [state.studentAmountLimit, state.codeFilter, state.nameFilter])
+  }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, pending])
 
   const onFilterChange = (e, field) => {
     const {
@@ -174,8 +187,8 @@ function PopulationCourseStats(props) {
   )
 
   useEffect(() => {
-    setFilters(filterFields)
-  }, [filterFields])
+    if (!pending) setFilters(filterFields)
+  }, [filterFields, pending])
 
   const handleCourseStatisticsCriteriaChange = () => {
     // eslint-disable-next-line react/no-access-state-in-setstate
@@ -232,13 +245,14 @@ function PopulationCourseStats(props) {
   }
 
   const onGoToCourseStatisticsClick = courseCode => {
-    const { clearCourseStats: clearCourseStatsfn } = props
     sendAnalytics('Courses of Population course stats button clicked', courseCode)
-    clearCourseStatsfn()
+    dispatch(clearCourseStats())
   }
 
   const onCourseNameCellClick = code => {
-    const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
+    const courseStatistic =
+      props.populationCourses.data.coursestatistics?.find(cs => cs.course.code === code) ||
+      props.courses.coursestatistics?.find(cs => cs.course.code === code)
     if (courseStatistic) {
       const isSelected = courseIsSelected(code)
       const name = 'Course Filtername'
@@ -280,7 +294,6 @@ function PopulationCourseStats(props) {
     )
   }
 
-  const { courses, pending } = props
   const { sortCriteria, reversed } = state
   const contextValue = {
     courseStatistics,
@@ -324,8 +337,6 @@ function PopulationCourseStats(props) {
     return null
   }
 
-  const { showFilter = true } = props
-
   return (
     <div>
       {showFilter && (
@@ -343,37 +354,4 @@ function PopulationCourseStats(props) {
   )
 }
 
-PopulationCourseStats.propTypes = {
-  courses: shape({
-    coursestatistics: arrayOf(object),
-    disciplines: shape({}),
-  }).isRequired,
-  populationCourses: shape({
-    data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) }),
-  }).isRequired,
-  clearCourseStats: func.isRequired,
-  pending: bool.isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  years: shape({}), // eslint-disable-line
-  showFilter: bool,
-  language: string.isRequired,
-}
-
-PopulationCourseStats.defaultProps = {
-  showFilter: false,
-}
-
-const mapStateToProps = state => {
-  const { years } = state.semesters.data
-  const isAdmin = getUserIsAdmin(state.auth.token.roles)
-
-  return {
-    years,
-    populationCourses: state.populationCourses,
-    isAdmin,
-  }
-}
-
-export default connect(mapStateToProps, {
-  clearCourseStats,
-})(withRouter(PopulationCourseStats))
+export default PopulationCourseStats

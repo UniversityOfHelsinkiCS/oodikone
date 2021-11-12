@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { handleRequest, handleAuth } from '../apiConnection'
+import { setupListeners } from '@reduxjs/toolkit/query/react'
+import { handleRequest, handleAuth, RTKApi } from 'apiConnection'
 import actionHistory from './actionHistory'
 import users from './users'
 import populations from './populations'
@@ -40,9 +41,8 @@ import singleCourseStats from './singleCourseStats'
 import userAccessEmail from './userAccessEmail'
 import customPopulationSearch from './customPopulationSearch'
 import coolDataScience from './coolDataScience'
-import studyGuidanceGroups from './studyGuidanceGroups'
 
-export default configureStore({
+const store = configureStore({
   reducer: {
     actionHistory,
     users,
@@ -84,7 +84,7 @@ export default configureStore({
     userAccessEmail,
     customPopulationSearch,
     coolDataScience,
-    studyGuidanceGroups,
+    [RTKApi.reducerPath]: RTKApi.reducer,
   },
   // oodikone is currently too heavy for other middlewares than thunk, but
   // feel free to take use them at some point if possible
@@ -92,5 +92,8 @@ export default configureStore({
     ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
     handleRequest,
     handleAuth,
+    RTKApi.middleware,
   ],
 })
+setupListeners(store.dispatch)
+export default store

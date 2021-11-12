@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { connect, useSelector } from 'react-redux'
 import { Table, Input, Tab, Icon } from 'semantic-ui-react'
-import { func, arrayOf, object, shape, string, bool } from 'prop-types'
 import { orderBy, debounce } from 'lodash'
 import { withRouter } from 'react-router-dom'
 import { clearCourseStats } from '../../redux/coursestats'
@@ -92,7 +91,7 @@ const initialState = props => ({
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-function PopulationCourseStats(props) {
+const PopulationCourseStats = props => {
   const { language } = useLanguage()
 
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
@@ -268,7 +267,9 @@ function PopulationCourseStats(props) {
   }
 
   const onCourseNameCellClick = code => {
-    const courseStatistic = props.populationCourses.data.coursestatistics.find(cs => cs.course.code === code)
+    const courseStatistic =
+      props.populationCourses.data.coursestatistics?.find(cs => cs.course.code === code) ||
+      props.courses.coursestatistics?.find(cs => cs.course.code === code)
     if (courseStatistic) {
       const isSelected = courseIsSelected(code)
       const name = 'Course Filtername'
@@ -395,19 +396,6 @@ function PopulationCourseStats(props) {
       </PopulationCourseContext.Provider>
     </div>
   )
-}
-
-PopulationCourseStats.propTypes = {
-  courses: shape({
-    coursestatistics: arrayOf(object),
-  }).isRequired,
-  populationCourses: shape({
-    data: shape({ coursestatistics: arrayOf(shape({ course: shape({ code: string, name: shape({}) }) })) }),
-  }).isRequired,
-  clearCourseStats: func.isRequired,
-  pending: bool.isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  language: string.isRequired,
 }
 
 const mapStateToProps = ({ populationCourses }) => ({

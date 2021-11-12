@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import useAnalytics from './useAnalytics'
 import GraduatedFromProgramme from './filters/GraduatedFromProgramme'
 import TransferredToProgramme from './filters/TransferredToProgramme'
 import EnrollmentStatus from './filters/EnrollmentStatus'
@@ -7,70 +8,67 @@ import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Courses from './filters/Courses'
 import Programmes from './filters/Programmes'
-import useAnalytics from './useAnalytics'
 import Grade from './filters/Grade'
 import Date from './filters/Date'
 import Age from './filters/Age'
 import AdmissionType from './filters/AdmissionType'
 import Tags from './filters/Tags'
 
-export const PopulationStatisticsFilters = ({ query }) => {
+const Filters = ({ name, children }) => {
   const analytics = useAnalytics()
   useEffect(() => {
-    analytics.setTarget('Population Statistics')
+    analytics.setTarget(name)
   })
-
-  return (
-    <>
-      <GraduatedFromProgramme />
-      <TransferredToProgramme />
-      <EnrollmentStatus />
-      <CreditsEarned />
-      <Age />
-      <Gender />
-      <StartYearAtUni />
-      {parseInt(query?.year, 10) >= 2020 ? <AdmissionType /> : null}
-      <Courses />
-      <Tags />
-      <Date />
-    </>
-  )
+  return React.Children.toArray(children)
 }
 
-export const CoursePopulationFilters = () => {
-  const analytics = useAnalytics()
+export const PopulationStatisticsFilters = ({ query }) => (
+  <Filters name="Population Statistics">
+    <GraduatedFromProgramme />
+    <TransferredToProgramme />
+    <EnrollmentStatus />
+    <CreditsEarned />
+    <Age />
+    <Gender />
+    <StartYearAtUni />
+    {parseInt(query?.year, 10) >= 2020 ? <AdmissionType /> : null}
+    <Courses />
+    <Tags />
+    <Date />
+  </Filters>
+)
 
-  useEffect(() => {
-    analytics.setTarget('Course Population')
-  })
+export const CoursePopulationFilters = () => (
+  <Filters name="Course Population">
+    <Grade />
+    <Age />
+    <Gender />
+    <StartYearAtUni />
+    <Courses />
+    <Programmes />
+  </Filters>
+)
 
-  return (
-    <>
-      <Grade />
-      <Age />
-      <Gender />
-      <StartYearAtUni />
-      <Courses />
-      <Programmes />
-    </>
-  )
-}
+export const CustomPopulationFilters = () => (
+  <Filters name="Custom Population">
+    <EnrollmentStatus />
+    <Age />
+    <Gender />
+    <StartYearAtUni />
+    <Courses />
+    <Date />
+  </Filters>
+)
 
-export const CustomPopulationFilters = () => {
-  const analytics = useAnalytics()
-
-  useEffect(() => {
-    analytics.setTarget('Custom Population')
-  })
-
-  return (
-    <>
-      <EnrollmentStatus />
-      <Age />
-      <Gender />
-      <StartYearAtUni />
-      <Courses />
-      <Date />
-    </>
-  )
-}
+export const StudyGuidanceGroupFilters = () => (
+  <Filters name="Study Guidance Group">
+    <EnrollmentStatus />
+    <Age />
+    <Gender />
+    <StartYearAtUni />
+    <AdmissionType />
+    <GraduatedFromProgramme />
+    <Tags />
+    <Courses />
+  </Filters>
+)

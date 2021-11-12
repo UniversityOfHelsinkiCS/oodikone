@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext } from 'react'
-import PropTypes from 'prop-types'
 import TSA from '../../common/tsa'
 
 const FilterAnalyticsContext = createContext([[], () => {}])
@@ -8,10 +7,6 @@ FilterAnalyticsContext.displayName = 'Filter Analytics'
 export const FilterAnalyticsProvider = ({ children }) => {
   const [state, setState] = useState(null)
   return <FilterAnalyticsContext.Provider value={[state, setState]}>{children}</FilterAnalyticsContext.Provider>
-}
-
-FilterAnalyticsProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 }
 
 export default () => {

@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { Icon, Header } from 'semantic-ui-react'
 import useFilterTray from '../../useFilterTray'
 
@@ -21,14 +20,6 @@ const FilterCard = ({ title, children, contextKey, name, active }) => {
       {(active || open) && children}
     </div>
   )
-}
-
-FilterCard.propTypes = {
-  title: PropTypes.string.isRequired,
-  children: PropTypes.node.isRequired,
-  contextKey: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  active: PropTypes.bool.isRequired,
 }
 
 export default FilterCard

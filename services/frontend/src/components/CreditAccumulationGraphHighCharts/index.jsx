@@ -99,7 +99,8 @@ const createGraphOptions = ({
   }
 }
 
-const sortCoursesByDate = courses => courses.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+const sortCoursesByDate = courses =>
+  [...courses].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 
 const filterCoursesByDate = (courses, date) => courses.filter(c => moment(c.date).isSameOrAfter(moment(date)))
 
@@ -172,8 +173,8 @@ const createGoalSeries = (starting, ending, absences) => {
   }
 }
 
-const createStudentCreditLines = (students, singleStudent) => {
-  return students.map(student => {
+const createStudentCreditLines = (students, singleStudent) =>
+  students.map(student => {
     const { started, studyrightStart } = student
 
     const startDate = students.length === 1 ? started : studyrightStart
@@ -215,14 +216,6 @@ const createStudentCreditLines = (students, singleStudent) => {
       },
     }
   })
-}
-
-const getStudentCreditCount = student =>
-  _.chain(student.courses)
-    .filter(c => c.passed && c.isStudyModuleCredit)
-    .map('credits')
-    .sum()
-    .value()
 
 const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, startDate, endDate }) => {
   const history = useHistory()

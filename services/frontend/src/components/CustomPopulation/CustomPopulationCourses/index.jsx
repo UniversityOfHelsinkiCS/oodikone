@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
-import { shape, arrayOf, string, bool } from 'prop-types'
+import { useSelector } from 'react-redux'
 import PopulationCourseStatsFlat from '../../PopulationCourseStats/PopulationCourseStatsFlat'
 import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
-const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, error, showFilter }) => {
+const CustomPopulationCourses = ({ selectedStudents, showFilter = false }) => {
   const { setCourses, resetCourses } = useCourseFilter()
+  const { data: courses, pending, error } = useSelector(({ populationCourses }) => populationCourses)
 
   useEffect(() => {
     if (!pending && !error && courses.coursestatistics) {
@@ -21,33 +21,10 @@ const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, er
   return (
     <PopulationCourseStatsFlat
       courses={courses}
-      query={query}
       pending={pending}
       selectedStudents={selectedStudents}
-      customPopulation
       showFilter={showFilter}
     />
   )
 }
-
-CustomPopulationCourses.propTypes = {
-  pending: bool.isRequired,
-  courses: shape([]).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  query: shape({}).isRequired,
-  error: bool.isRequired,
-  showFilter: bool,
-}
-
-CustomPopulationCourses.defaultProps = {
-  showFilter: false,
-}
-
-const mapStateToProps = ({ populationCourses }) => ({
-  courses: populationCourses.data,
-  pending: populationCourses.pending,
-  query: populationCourses.query,
-  error: populationCourses.error,
-})
-
-export default connect(mapStateToProps)(CustomPopulationCourses)
+export default CustomPopulationCourses
