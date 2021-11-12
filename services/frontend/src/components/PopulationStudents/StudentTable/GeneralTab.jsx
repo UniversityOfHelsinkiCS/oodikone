@@ -37,6 +37,8 @@ const GeneralTab = ({
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
 
+  if (!populationStatistics) return null
+
   // TODO: Refactor this away:
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 

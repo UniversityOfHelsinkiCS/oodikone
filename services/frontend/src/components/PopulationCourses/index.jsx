@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { connect } from 'react-redux'
-import { shape, arrayOf, string, bool } from 'prop-types'
+import { useSelector } from 'react-redux'
 import { Segment, Button } from 'semantic-ui-react'
 import uuidv4 from 'uuid/v4'
 import SegmentDimmer from '../SegmentDimmer'
@@ -11,15 +10,13 @@ import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
 import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 import infotooltips from '../../common/InfoToolTips'
 
-const PopulationCourses = ({
-  populationSelectedStudentCourses,
-  populationCourses,
-  selectedStudents,
-  query,
-  filteredStudents,
-}) => {
+const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) => {
   const { setCoursesOnce, resetCourses, runCourseQuery } = useCourseFilter()
   const [showByStudytrack, setShowByStudytrack] = useState(true)
+  const populationCourses = useSelector(({ populationCourses }) => populationCourses)
+  const populationSelectedStudentCourses = useSelector(
+    ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
+  )
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
@@ -89,7 +86,6 @@ const PopulationCourses = ({
         <PopulationCourseStats
           key={selectedPopulationCourses.query.uuid}
           courses={selectedPopulationCourses.data}
-          query={selectedPopulationCourses.query}
           pending={pending}
           selectedStudents={selectedStudents}
         />
@@ -100,21 +96,4 @@ const PopulationCourses = ({
   )
 }
 
-PopulationCourses.defaultPropTypes = {
-  query: {},
-}
-
-PopulationCourses.propTypes = {
-  populationSelectedStudentCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
-  populationCourses: shape({ query: shape({}), data: shape({}), pending: bool }).isRequired,
-  selectedStudents: arrayOf(string).isRequired,
-  query: shape({}).isRequired,
-  filteredStudents: arrayOf(shape({})).isRequired,
-}
-
-const mapStateToProps = ({ populationSelectedStudentCourses, populationCourses }) => ({
-  populationCourses,
-  populationSelectedStudentCourses,
-})
-
-export default connect(mapStateToProps)(PopulationCourses)
+export default PopulationCourses

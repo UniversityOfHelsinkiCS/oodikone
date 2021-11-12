@@ -16,7 +16,6 @@ import InfoBox from '../InfoBox'
 import FilterTray from '../FilterTray'
 import useFilters from '../FilterTray/useFilters'
 import { CustomPopulationFilters } from '../FilterTray/FilterSets'
-import useFilterTray from '../FilterTray/useFilterTray'
 import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
 import UnihowDataExport from './UnihowDataExport'
@@ -35,7 +34,6 @@ const CustomPopulation = ({
   const [, setSelectedSearchId] = useState('')
   const [newestIndex, setNewest] = useState(null)
   const { setAllStudents, filteredStudents } = useFilters()
-  const [trayOpen] = useFilterTray()
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
   const { progress } = useProgress(loading)
@@ -98,12 +96,7 @@ const CustomPopulation = ({
       content: {
         content: (
           <div ref={creditGainRef}>
-            <CreditAccumulationGraphHighCharts
-              students={filteredStudents}
-              render={false}
-              trayOpen={trayOpen}
-              language={language}
-            />
+            <CreditAccumulationGraphHighCharts students={filteredStudents} />
           </div>
         ),
       },
