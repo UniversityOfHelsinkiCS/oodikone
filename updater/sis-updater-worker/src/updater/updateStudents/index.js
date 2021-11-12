@@ -358,20 +358,27 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
       } else {
         coursesToBeCreated.set('AY'.concat(course.code), {
           ...course.dataValues,
-          name: course.name,
           id: course.id.concat('-ay'),
           code: 'AY'.concat(course.code),
           substitutions: [course.id],
         })
+
+        const subs = [...course.substitutions, course.id.concat('-ay')]
+        coursesToBeUpdated.set(course.code, {
+          ...course.dataValues,
+          substitutions: subs,
+        })
+
         courseCodeToAyCodelessId.set('AY'.concat(course.code), course.id.concat('-ay'))
         const courseProvider = await CourseProvider.findOne({
           where: {
-            coursecode: course ? course.id : 'AY'.concat(course.code),
+            coursecode: `${course.id}-ay`,
           },
         })
+
         if (!courseProvider) {
-          const mapCourseProvider = courseProviderMapper('AY'.concat(course.code))
-          courseProvidersToBeCreated.push(mapCourseProvider('hy-org-48645785'))
+          const mapCourseProvider = courseProviderMapper(course.id.concat('-ay'))
+          courseProvidersToBeCreated.push(mapCourseProvider({ organisationId: 'hy-org-48645785' }))
         }
       }
     }

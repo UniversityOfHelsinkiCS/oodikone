@@ -369,7 +369,6 @@ const byNameAndOrCodeLike = async (name, code) => {
 
   const courses = rawCourses
     .map(course => {
-      // console.log('course: ', course)
       return { ...course.dataValues, organizations: course.organizations.map(o => o.id) }
     })
     .sort(a => (a.code.match(/^[A-Za-z]{3}[0-9]{1}/) ? -1 : 1))
