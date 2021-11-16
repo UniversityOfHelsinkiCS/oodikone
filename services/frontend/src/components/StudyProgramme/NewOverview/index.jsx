@@ -19,6 +19,7 @@ const Overview = props => {
   const {
     studyprogramme,
     basicStats,
+    creditStats,
     dispatchGetProductivity,
     dispatchGetThroughput,
     dispatchGetBachelors,
@@ -54,7 +55,7 @@ const Overview = props => {
       </div>
       {getDivider('Credits produced by the studyprogramme')}
       <div className="section-container">
-        <BarChart categories={basicStats?.data?.years} data={basicStats?.data?.graphStats} />
+        <BarChart categories={basicStats?.data?.years} data={creditStats?.data?.graphStats} />
         <DataTable titles={basicStatsTitles} data={basicStats?.data?.tableStats} />
       </div>
     </div>
