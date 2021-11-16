@@ -1053,39 +1053,67 @@ const getTransferredToStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
-const getCreditStats = async ({ studytrack, startDate }) => {
-  const years = getYears(startDate.getFullYear())
-  const studentnumbers = await studentnumbersWithAllStudyrightElements(
-    [studytrack],
-    startDate,
-    new Date(),
-    true, // exchange students
-    true, // cancelled students
-    true, // non-degree students
-    true // transferred to students
-  )
-  const promises = [getMajorStudentsCredits(studytrack, startDate, years, studentnumbers)]
-
-  const [majorStudentsCredits] = await Promise.all(promises)
-  return majorStudentsCredits
-}
-
-const getMajorStudentsCredits = async (studytrack, startDate, years, studentnumbers) => {
+const creditsForMajorStudents = async (studytrack, startDate, studentnumbers) => {
   const providercode = mapToProviders([studytrack])[0]
   const credits = await getCreditsForMajors(providercode, startDate, studentnumbers)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
-
-  credits.forEach(({ attainment_date }) => {
-    const attaintment_year = attainment_date.getFullYear()
-    graphStats[indexOf(years, attaintment_year)] += 1
-    tableStats[attaintment_year] += 1
-  })
-
-  return { graphStats, tableStats }
+  const summed = credits.reduce((sum, credit) => sum + (Number(credit.credits) || 0), 0)
+  return summed
 }
 
-const getBasicStatsForStudyTrack = async ({ studyprogramme, startDate }) => {
+const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
+  const years = getYears(startDate.getFullYear())
+  const associations = await getAssociations()
+  const studyprogrammeYears = associations.programmes[studyprogramme]
+    ? associations.programmes[studyprogramme].enrollmentStartYears
+    : {}
+
+  const majorStudentsCredits = await Promise.all(
+    years.map(async year => {
+      const startdate = `${year}-${semesterStart['FALL']}`
+      const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
+      const studytracks = studyprogrammeYears[year] ? Object.keys(studyprogrammeYears[year].studyTracks) : []
+      const studytrackdata = await studytracks.reduce(async (acc, curr) => {
+        const previousData = await acc
+        const studentnumbers = await studentnumbersWithAllStudyrightElements(
+          [studyprogramme, curr],
+          startdate,
+          endDate,
+          true, // exchange students
+          true, // cancelled students
+          true, // non-degree students
+          true // transferred to students
+        )
+        const creditsForStudyprogramme = await creditsForMajorStudents(studyprogramme, startdate, studentnumbers)
+        return previousData + creditsForStudyprogramme
+      }, 0)
+      return studytrackdata
+    })
+  )
+
+  return {
+    graphStats: {
+      name: 'Major students credits',
+      data: majorStudentsCredits,
+    },
+  }
+}
+
+// const getMajorStudentsCredits = async (studytrack, startDate, years, studentnumbers) => {
+//   const providercode = mapToProviders([studytrack])[0]
+//   const credits = await getCreditsForMajors(providercode, startDate, studentnumbers)
+//   let graphStats = new Array(years.length).fill(0)
+//   let tableStats = getYearsObject(years)
+
+//   credits.forEach(({ attainment_date }) => {
+//     const attaintment_year = attainment_date.getFullYear()
+//     graphStats[indexOf(years, attaintment_year)] += 1
+//     tableStats[attaintment_year] += 1
+//   })
+
+//   return { graphStats, tableStats }
+// }
+
+const getBasicStatsForStudytrack = async ({ studyprogramme, startDate }) => {
   const years = getYears(startDate.getFullYear())
   const started = await getStartedStats(studyprogramme, startDate, years)
   const graduated = await getGraduatedStats(studyprogramme, startDate, years)
@@ -1147,6 +1175,6 @@ module.exports = {
   thesisProductivityFromCredits,
   thesisProductivityForStudytrack,
   optionData,
-  getBasicStatsForStudyTrack,
-  getCreditStats,
+  getBasicStatsForStudytrack,
+  getCreditStatsForStudytrack,
 }

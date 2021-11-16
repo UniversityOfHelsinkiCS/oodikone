@@ -494,6 +494,7 @@ const studentnumbersWithAllStudyrightElements = async (
     if (!newestStudytrack) return false
     return studyRights.includes(newestStudytrack.code)
   })
+
   const studentnumberlist = filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
 
   // fetch students that have transferred out of the programme and filter out these studentnumbers

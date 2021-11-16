@@ -3,18 +3,27 @@ import { callController, actionTypes } from '../apiConnection'
 import { initialState, matcherReducers, defaultReducer } from './common'
 
 const baseUrl = '/v2/studyprogrammes'
-const getPrefix = 'GET_STUDY_PROGRAMME_BASIC_STATS'
-const getTypes = {
-  ...actionTypes(getPrefix),
+const getBasicsPrefix = 'GET_STUDY_PROGRAMME_BASIC_STATS_'
+const getBasics = {
+  ...actionTypes(getBasicsPrefix),
 }
 
-export const getBasicStats = id => callController(`${baseUrl}/${id}/basicstats`, getPrefix)
+const getCreditsPrefix = 'GET_STUDY_PROGRAMME_CREDIT_STATS_'
+const getCredits = {
+  ...actionTypes(getCreditsPrefix),
+}
+
+export const getBasicStats = id => callController(`${baseUrl}/${id}/basicstats`, getBasicsPrefix)
+export const getCreditStats = id => callController(`${baseUrl}/${id}/creditstats`, getCreditsPrefix)
 
 const reducer = createReducer(
   initialState,
   {
-    [getTypes.success]: (state, action) => {
-      state.data = action.response
+    [getBasics.success]: (state, action) => {
+      state.basicStats = action.response
+    },
+    [getCredits.success]: (state, action) => {
+      state.creditStats = action.response
     },
   },
   matcherReducers,
