@@ -14,6 +14,7 @@ import { useIsAdmin } from '../../../common/hooks'
 import '../studyprogramme.css'
 
 const basicStatsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
+const creditStatsTitles = ['', 'Major students credits']
 
 const Overview = props => {
   const {
@@ -55,8 +56,8 @@ const Overview = props => {
       </div>
       {getDivider('Credits produced by the studyprogramme')}
       <div className="section-container">
-        <BarChart categories={basicStats?.data?.years} data={creditStats?.data?.graphStats} />
-        <DataTable titles={basicStatsTitles} data={basicStats?.data?.tableStats} />
+        <BarChart categories={creditStats?.data?.years} data={creditStats?.data?.graphStats} />
+        <DataTable titles={creditStatsTitles} data={creditStats?.data?.tableStats} />
       </div>
     </div>
   )
