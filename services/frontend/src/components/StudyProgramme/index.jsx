@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { Header, Segment, Tab, Button } from 'semantic-ui-react'
 import { isEqual, uniqBy } from 'lodash'
 import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
+import NewOverview from './NewOverview'
 import StudyTrackOverview from './StudyTrackOverview'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn, getUserRoles, getUserIsAdmin } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
+import { isDev } from '../../conf'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
 
@@ -23,7 +25,9 @@ import useLanguage from '../LanguagePicker/useLanguage'
 
 const StudyProgramme = props => {
   const { language } = useLanguage()
+  const { roles } = useSelector(state => state.auth.token)
   const [tab, setTab] = useTabs('p_tab', 0, props.history)
+
   useTitle('Study programmes')
 
   useEffect(() => {
@@ -57,6 +61,8 @@ const StudyProgramme = props => {
       })
   }
 
+  const SHOW_NEW_OVERVIEW = getUserIsAdmin(roles) && isDev
+
   const getPanes = () => {
     const { match, programmes } = props
     const { studyProgrammeId } = match.params
@@ -71,6 +77,12 @@ const StudyProgramme = props => {
       menuItem: 'Overview',
       render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />,
     })
+    if (SHOW_NEW_OVERVIEW) {
+      panes.push({
+        menuItem: 'New Overview',
+        render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
+      })
+    }
     if (filteredStudytracks.length > 0) {
       panes.push({
         menuItem: 'Studytrack overview',
