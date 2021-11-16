@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { getBasicStatsForStudytrack, getCreditStatsForStudytrack } = require('../services/studyprogramme')
+const { getBasicStatsForStudytrack, getCreditStatsForStudytrack } = require('../services/newStudyprogramme')
 const { getBasicStats, setBasicStats, getCreditStats, setCreditStats } = require('../services/analyticsService')
 const logger = require('../util/logger')
 
