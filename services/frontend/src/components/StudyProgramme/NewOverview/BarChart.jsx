@@ -2,7 +2,7 @@ import React from 'react'
 
 const ReactHighcharts = require('react-highcharts')
 
-const BarChart = ({ data, years }) => {
+const BarChart = ({ data, categories }) => {
   const defaultConfig = {
     title: {
       text: '',
@@ -12,7 +12,7 @@ const BarChart = ({ data, years }) => {
       text: 'oodikone | TOSKA',
     },
     xAxis: {
-      categories: years,
+      categories,
     },
     chart: {
       type: 'column',
