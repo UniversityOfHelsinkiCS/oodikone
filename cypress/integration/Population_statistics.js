@@ -64,6 +64,7 @@ describe('Population Statistics tests', () => {
 
     it('Population statistics is usable on general level', () => {
       cy.visit(pathToCSBach2017)
+      cy.cs('filtered-students')
       setPopStatsUntil('toukokuu 2020')
 
       cy.get('.card').within(() => {
@@ -74,7 +75,8 @@ describe('Population Statistics tests', () => {
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
       })
-      cy.contains('Courses of population').click({ force: true })
+      cy.cs('filtered-students')
+      cy.contains('Courses of population').click()
 
       cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
       // eslint-disable-next-line cypress/no-unnecessary-waiting
@@ -165,7 +167,9 @@ describe('Population Statistics tests', () => {
 
     it('Credit Statistics, Credits Gained tab shows stats by admissions', () => {
       cy.visit(pathToCSMaster2019)
-      cy.contains('Credit statistics').click()
+      cy.cs('filtered-students')
+      cy.contains('Credit statistics')
+      cy.get("[data-cy='credit-statistics']").click()
       cy.get('.credits-gained-divider').click()
       cy.get("[data-cy='credits-gained-table-Avoin väylä']").should('exist')
       cy.get("[data-cy='credits-gained-table-Yhteispisteet']").should('exist')
@@ -175,7 +179,7 @@ describe('Population Statistics tests', () => {
 
     it('Credit Statistics, Statistics pane works', () => {
       cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
-      cy.contains('Credit statistics').click()
+      cy.contains('Credit statistics').click({ force: true })
       cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
 
       cy.get("[data-cy='credit-stats-table-name-header']").should('contain', 'Statistic for n = 149 Students')

@@ -100,7 +100,10 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, dataExport }
       key: 1,
       title: {
         content: (
-          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+          <span
+            style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}
+            data-cy="credit-statistics"
+          >
             Credit statistics
           </span>
         ),
