@@ -4,6 +4,7 @@ const moment = require('moment')
 const createRedisKeyForProductivity = id => `PRODUCTIVITY_${id}`
 const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
 const createRedisKeyForBasicStats = id => `BASIC_STATS_${id}`
+const createRedisKeyForCreditStats = id => `CREDIT_STATS_${id}`
 
 const getProductivity = async id => {
   const redisKey = createRedisKeyForProductivity(id)
@@ -27,26 +28,6 @@ const setProductivity = async data => {
   return {
     [id]: dataToRedis,
   }
-}
-
-const getBasicStats = async id => {
-  const redisKey = createRedisKeyForBasicStats(id)
-  const dataFromRedis = await redisClient.getAsync(redisKey)
-  if (!dataFromRedis) return null
-  return JSON.parse(dataFromRedis)
-}
-
-const setBasicStats = async data => {
-  const { id } = data
-  const redisKey = createRedisKeyForBasicStats(id)
-  const dataToRedis = {
-    ...data,
-    status: 'DONE',
-    lastUpdated: moment().format(),
-  }
-  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
-  if (setOperationStatus !== 'OK') return null
-  return dataToRedis
 }
 
 const patchProductivity = async data => {
@@ -108,13 +89,55 @@ const patchThroughput = async data => {
   }
 }
 
+const getBasicStats = async id => {
+  const redisKey = createRedisKeyForBasicStats(id)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
+}
+
+const setBasicStats = async data => {
+  const { id } = data
+  const redisKey = createRedisKeyForBasicStats(id)
+  const dataToRedis = {
+    ...data,
+    status: 'DONE',
+    lastUpdated: moment().format(),
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
+  return dataToRedis
+}
+
+const getCreditStats = async id => {
+  const redisKey = createRedisKeyForCreditStats(id)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
+}
+
+const setCreditStats = async data => {
+  const { id } = data
+  const redisKey = createRedisKeyForCreditStats(id)
+  const dataToRedis = {
+    ...data,
+    status: 'DONE',
+    lastUpdated: moment().format(),
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
+  return dataToRedis
+}
+
 module.exports = {
   getProductivity,
   setProductivity,
-  getBasicStats,
-  setBasicStats,
   patchProductivity,
   getThroughput,
   setThroughput,
   patchThroughput,
+  getBasicStats,
+  setBasicStats,
+  getCreditStats,
+  setCreditStats,
 }

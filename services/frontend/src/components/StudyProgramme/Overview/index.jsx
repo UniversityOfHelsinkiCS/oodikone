@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Divider } from 'semantic-ui-react'
 
 import LineGraph from './LineGraph'
+import BarChart from './BarChart'
 import DataTable from './DataTable'
 import ProductivityTable from '../ProductivityTable'
 import ThroughputTable from '../ThroughputTable'
@@ -10,7 +11,7 @@ import BachelorsTable from '../BachelorsTable'
 import InfoBox from '../../InfoBox'
 import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
-import { getBasicStats } from '../../../redux/studyProgramme'
+import { getBasicStats, getCreditStats } from '../../../redux/studyProgramme'
 import { getBachelors } from '../../../redux/studyProgrammeBachelors'
 import { isNewHYStudyProgramme } from '../../../common'
 import { useIsAdmin } from '../../../common/hooks'
@@ -29,6 +30,7 @@ const Overview = props => {
     dispatchGetThroughput,
     dispatchGetBachelors,
     dispatchGetBasicStats,
+    dispatchGetCreditStats,
     history,
   } = props
 
@@ -38,6 +40,7 @@ const Overview = props => {
     dispatchGetProductivity(studyprogramme)
     dispatchGetThroughput(studyprogramme)
     dispatchGetBasicStats(studyprogramme)
+    dispatchGetCreditStats(studyprogramme)
     if (isAdmin) dispatchGetBachelors(studyprogramme)
   }, [])
 
@@ -59,7 +62,7 @@ const Overview = props => {
       </div>
       {getDivider('Credits produced by the studyprogramme')}
       <div className="section-container">
-        <LineGraph categories={basicStats?.data?.years} data={basicStats?.data?.graphStats} />
+        <BarChart categories={basicStats?.data?.years} data={basicStats?.data?.graphStats} />
         <DataTable titles={basicStatsTitles} data={basicStats?.data?.tableStats} />
       </div>
       <ThroughputTable
@@ -93,7 +96,8 @@ const mapStateToProps = ({
   productivity: studyProgrammeProductivity,
   throughput: studyProgrammeThroughput,
   bachelors: studyProgrammeBachelors,
-  basicStats: studyProgramme?.data,
+  basicStats: studyProgramme?.basicStats,
+  creditStats: studyProgramme?.creditStats,
 })
 
 export default connect(mapStateToProps, {
@@ -101,4 +105,5 @@ export default connect(mapStateToProps, {
   dispatchGetThroughput: getThroughput,
   dispatchGetBachelors: getBachelors,
   dispatchGetBasicStats: getBasicStats,
+  dispatchGetCreditStats: getCreditStats,
 })(Overview)
