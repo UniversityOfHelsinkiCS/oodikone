@@ -223,11 +223,11 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCo
     },
     creditsSinceStartByYear: {
       key: 'creditsSinceStartByYear',
-      title: `credits since ${group?.tags.year}`,
+      title: `credits since ${group?.tags?.year}`,
       getRowVal: s => {
         const credits = getStudentTotalCredits({
           ...s,
-          courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags.year, 7, 1)),
+          courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags?.year, 7, 1)),
         })
         return credits
       },
