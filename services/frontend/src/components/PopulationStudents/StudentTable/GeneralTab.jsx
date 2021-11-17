@@ -180,7 +180,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCo
 
   const containsOption = cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH'))
 
-  const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020
+  const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
   // All columns components user is able to use
   const columnsAvailable = {
@@ -422,8 +422,10 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   const getStudyGuidanceGroupColumns = () => {
     const cols = ['programme', 'startYear']
     if (studyGuidanceGroup?.tags?.year) cols.push('creditsSinceStartByYear')
-    if (studyGuidanceGroup?.tags?.studyProgramme)
-      cols.push('studyStartDate', 'studyStartDateActual', 'endDate', 'admissionType')
+    if (studyGuidanceGroup?.tags?.studyProgramme) cols.push('studyStartDate', 'studyStartDateActual', 'endDate')
+    if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
+      cols.push('admissionType')
+    }
     return cols
   }
 
