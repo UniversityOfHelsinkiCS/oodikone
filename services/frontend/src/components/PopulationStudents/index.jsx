@@ -30,8 +30,6 @@ const PopulationStudents = ({
   studentToTargetCourseDateMap,
   dataExport,
   contentToInclude,
-  customPopulation = false,
-  coursePopulation = false,
   coursecode = [],
 }) => {
   const [state, setState] = useState({})
@@ -414,8 +412,14 @@ const PopulationStudents = ({
   )
 }
 
-const getContent = props => {
-  const contentByPopulationType = {
+const PopulationStudentsContainer = ({ ...props }) => {
+  const { variant } = props
+
+  if (!variant in ['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation']) {
+    throw new Error(`${variant} is not a proper variant!`)
+  }
+
+  const contentByVariant = {
     population: {
       panesToInclude: ['General', 'Courses', 'Tags'],
       infotoolTipContent: infotoolTips.PopulationStatistics.Students,
@@ -428,16 +432,13 @@ const getContent = props => {
       panesToInclude: ['General'],
       infotoolTipContent: infotoolTips.PopulationStatistics.Students,
     },
+    studyGuidanceGroupPopulation: {
+      panesToInclude: ['General'],
+      infotoolTipContent: infotoolTips.PopulationStatistics.Students,
+    },
   }
-  const { coursePopulation, customPopulation } = props
 
-  if (coursePopulation) return contentByPopulationType.coursePopulation
-  if (customPopulation) return contentByPopulationType.customPopulation
-  return contentByPopulationType.population
-}
-
-const PopulationStudentsContainer = ({ ...props }) => {
-  return <PopulationStudents contentToInclude={getContent(props)} {...props} />
+  return <PopulationStudents contentToInclude={contentByVariant[variant]} {...props} />
 }
 
 export default PopulationStudentsContainer
