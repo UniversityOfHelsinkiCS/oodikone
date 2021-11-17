@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { Item, Icon, Popup } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import _ from 'lodash'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { useIsAdmin } from 'common/hooks'
 import SortableTable from 'components/SortableTable'
 import { getStudentTotalCredits, getTextIn, getNewestProgramme, reformatDate, copyToClipboard } from 'common'
+import { useGetAllStudyGuidanceGroupsQuery, useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
 import useFilters from '../../FilterTray/useFilters'
@@ -391,36 +392,54 @@ const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDat
   )
 }
 
-const columnsByPopulationType = ({ customPopulation, coursePopulation }) => {
-  if (customPopulation) return ['programme', 'startYear']
-  if (coursePopulation) return ['gradeForSingleCourse', 'programme', 'startYear']
-  return [
-    'creditsSinceStart',
-    'transferredFrom',
-    'priority',
-    'extent',
-    'studyStartDate',
-    'studyStartDateActual',
-    'endDate',
-    'studyTrack',
-    'admissionType',
-  ]
+// study guidance groups -feature uses different population + rtk query, so it needs to
+// be rendered differently. TODO: should rafactor this, maybe with using allStudents
+// from useFilters and making sure that it contains same students than the population
+// backend returns with population query below (so caching works)
+const StudyGuidanceGroupGeneralTabContainer = ({ ...props }) => {
+  const { groupid } = useParams()
+  const { data: allGroups } = useGetAllStudyGuidanceGroupsQuery()
+  const group = allGroups.find(group => group.id === groupid)
+  const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
+  const { data: populations } = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
+  return <GeneralTab populations={populations} {...props} />
 }
 
-const GeneralTabContainer = ({ customPopulation, coursePopulation, ...props }) => {
+const GeneralTabContainer = ({ variant, ...props }) => {
   const populations = useSelector(({ populations }) => populations)
   const { namesVisible } = useSelector(({ settings }) => settings)
   const isAdmin = useIsAdmin()
+
+  const columnsByVariant = {
+    customPopulation: ['programme', 'startYear'],
+    coursePopulation: ['gradeForSingleCourse', 'programme', 'startYear'],
+    population: [
+      'creditsSinceStart',
+      'transferredFrom',
+      'priority',
+      'extent',
+      'studyStartDate',
+      'studyStartDateActual',
+      'endDate',
+      'studyTrack',
+      'admissionType',
+    ],
+    studyGuidanceGroupPopulation: ['programme', 'startYear'],
+  }
 
   const baseColumns = ['studentnumber', 'icon', 'allCredits', 'tags', 'updatedAt', 'option']
   const nameColumnsToAdd = namesVisible ? ['email', 'copyEmail', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'studyStartDate', 'updatedAt']
 
   const columnKeysToInclude = _.chain(baseColumns)
-    .union(columnsByPopulationType(customPopulation, coursePopulation))
+    .union(columnsByVariant[variant])
     .union(nameColumnsToAdd)
     .difference(adminColumnsToFilter)
     .value()
+
+  if (variant === 'studyGuidanceGroupPopulatin') {
+    return <StudyGuidanceGroupGeneralTabContainer columnKeysToInclude={columnKeysToInclude} {...props} />
+  }
 
   return <GeneralTab populations={populations} columnKeysToInclude={columnKeysToInclude} {...props} />
 }
