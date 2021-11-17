@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
 import { Item, Icon, Popup } from 'semantic-ui-react'
-import { useParams, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import _ from 'lodash'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { useIsAdmin } from 'common/hooks'
 import SortableTable from 'components/SortableTable'
 import { getStudentTotalCredits, getTextIn, getNewestProgramme, reformatDate, copyToClipboard } from 'common'
-import { useGetAllStudyGuidanceGroupsQuery, useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
+import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
 import useFilters from '../../FilterTray/useFilters'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDateMap, coursecode }) => {
+const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCourseDateMap, coursecode }) => {
   const { language } = useLanguage()
   const { filteredStudents } = useFilters()
   const [popupStates, setPopupStates] = useState({})
@@ -27,6 +27,7 @@ const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDat
   const students = Object.fromEntries(filteredStudents.map(stu => [stu.studentNumber, stu]))
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
+  const programmeCode = cleanedQueryStudyrights[0] || group?.tags?.studyProgramme
 
   const popupTimeoutLength = 1000
   let timeout = null
@@ -121,14 +122,14 @@ const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDat
         acc.push(curr.studyright_elements)
         return acc
       }, [])
-    ).filter(e => e.code === cleanedQueryStudyrights[0])
+    ).filter(e => e.code === programmeCode)
     res[sn] = targetStudyright[0] ? targetStudyright[0].startdate : null
     return res
   }, {})
 
   const studentToStudyrightActualStartMap = selectedStudents.reduce((res, sn) => {
     const targetStudyright = students[sn].studyrights.find(studyright =>
-      studyright.studyright_elements.some(e => e.code === cleanedQueryStudyrights[0])
+      studyright.studyright_elements.some(e => e.code === programmeCode)
     )
     res[sn] = targetStudyright ? targetStudyright.studystartdate : null
     return res
@@ -136,7 +137,7 @@ const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDat
 
   const studentToStudyrightEndMap = selectedStudents.reduce((res, sn) => {
     const targetStudyright = students[sn].studyrights.find(studyright =>
-      studyright.studyright_elements.some(e => e.code === cleanedQueryStudyrights[0])
+      studyright.studyright_elements.some(e => e.code === programmeCode)
     )
     res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
     return res
@@ -220,6 +221,17 @@ const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDat
         return credits
       },
     },
+    creditsSinceStartByYear: {
+      key: 'creditsSinceStartByYear',
+      title: `credits since ${group?.tags.year}`,
+      getRowVal: s => {
+        const credits = getStudentTotalCredits({
+          ...s,
+          courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags.year, 7, 1)),
+        })
+        return credits
+      },
+    },
     gradeForSingleCourse: {
       key: 'gradeForSingleCourse',
       title: 'Grade',
@@ -287,7 +299,7 @@ const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDat
       key: 'admissionType',
       title: 'admission type',
       getRowVal: s => {
-        const studyright = s.studyrights.find(sr => sr.studyright_elements.some(e => e.code === queryStudyrights[0]))
+        const studyright = s.studyrights.find(sr => sr.studyright_elements.some(e => e.code === programmeCode))
         return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
       },
     },
@@ -396,19 +408,24 @@ const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDat
 // be rendered differently. TODO: should rafactor this, maybe with using allStudents
 // from useFilters and making sure that it contains same students than the population
 // backend returns with population query below (so caching works)
-const StudyGuidanceGroupGeneralTabContainer = ({ ...props }) => {
-  const { groupid } = useParams()
-  const { data: allGroups } = useGetAllStudyGuidanceGroupsQuery()
-  const group = allGroups.find(group => group.id === groupid)
+const StudyGuidanceGroupGeneralTabContainer = ({ group, ...props }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
-  const { data: populations } = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
-  return <GeneralTab populations={populations} {...props} />
+  const populations = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
+  return <GeneralTab populations={populations} group={group} {...props} />
 }
 
-const GeneralTabContainer = ({ variant, ...props }) => {
+const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   const populations = useSelector(({ populations }) => populations)
   const { namesVisible } = useSelector(({ settings }) => settings)
   const isAdmin = useIsAdmin()
+
+  const getStudyGuidanceGroupColumns = () => {
+    const cols = ['programme', 'startYear']
+    if (studyGuidanceGroup?.tags?.year) cols.push('creditsSinceStartByYear')
+    if (studyGuidanceGroup?.tags?.studyProgramme)
+      cols.push('studyStartDate', 'studyStartDateActual', 'endDate', 'admissionType')
+    return cols
+  }
 
   const columnsByVariant = {
     customPopulation: ['programme', 'startYear'],
@@ -424,7 +441,7 @@ const GeneralTabContainer = ({ variant, ...props }) => {
       'studyTrack',
       'admissionType',
     ],
-    studyGuidanceGroupPopulation: ['programme', 'startYear'],
+    studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }
 
   const baseColumns = ['studentnumber', 'icon', 'allCredits', 'tags', 'updatedAt', 'option']
@@ -437,8 +454,14 @@ const GeneralTabContainer = ({ variant, ...props }) => {
     .difference(adminColumnsToFilter)
     .value()
 
-  if (variant === 'studyGuidanceGroupPopulatin') {
-    return <StudyGuidanceGroupGeneralTabContainer columnKeysToInclude={columnKeysToInclude} {...props} />
+  if (variant === 'studyGuidanceGroupPopulation') {
+    return (
+      <StudyGuidanceGroupGeneralTabContainer
+        group={studyGuidanceGroup}
+        columnKeysToInclude={columnKeysToInclude}
+        {...props}
+      />
+    )
   }
 
   return <GeneralTab populations={populations} columnKeysToInclude={columnKeysToInclude} {...props} />
