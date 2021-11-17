@@ -24,18 +24,17 @@ import infotoolTips from '../../common/InfoToolTips'
 
 const sendAnalytics = sendEvent.populationStudents
 
-const PopulationStudents = props => {
+const PopulationStudents = ({
+  language,
+  filteredStudents,
+  studentToTargetCourseDateMap,
+  dataExport,
+  customPopulation = false,
+  coursePopulation = false,
+  coursecode = [],
+}) => {
   const [state, setState] = useState({})
   const studentRef = useRef()
-  const {
-    customPopulation = false,
-    coursePopulation = false,
-    language,
-    filteredStudents,
-    studentToTargetCourseDateMap,
-    coursecode = [],
-    dataExport,
-  } = props
   const dispatch = useDispatch()
   const { namesVisible: showNames, studentlistVisible: showList } = useSelector(({ settings }) => settings)
   const { data: tags } = useSelector(({ tags }) => tags)
