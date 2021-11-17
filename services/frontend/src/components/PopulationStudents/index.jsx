@@ -25,16 +25,6 @@ import infotoolTips from '../../common/InfoToolTips'
 
 const sendAnalytics = sendEvent.populationStudents
 
-// refactor this
-const StudentTableTabs = ({ panes, filterPanes }) => {
-  const { handleTabChange } = useTabChangeAnalytics(
-    ANALYTICS_CATEGORIES.populationStudents,
-    'Change students table tab'
-  )
-
-  return <Tab onTabChange={handleTabChange} panes={filterPanes(panes)} data-cy="student-table-tabs" />
-}
-
 const PopulationStudents = props => {
   const [state, setState] = useState({})
   const studentRef = useRef()
@@ -58,6 +48,10 @@ const PopulationStudents = props => {
   } = props
   const prevShowList = usePrevious(showList)
   const admin = userRoles.includes('admin')
+  const { handleTabChange } = useTabChangeAnalytics(
+    ANALYTICS_CATEGORIES.populationStudents,
+    'Change students table tab'
+  )
 
   useEffect(() => {
     if (tags && tags.length > 0) return
@@ -372,7 +366,7 @@ const PopulationStudents = props => {
             </Grid.Column>
           )}
         </Grid>
-        <StudentTableTabs panes={panes} filterPanes={filteredPanes} />
+        <Tab onTabChange={handleTabChange} panes={filteredPanes(panes)} data-cy="student-table-tabs" />
       </>
     )
   }
