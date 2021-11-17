@@ -25,6 +25,9 @@ const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...r
     if (requiredRoles.includes('courseStatistics')) {
       return hasRequiredRoles || hasRequiredRights
     }
+    if (rest.path.includes('students')) {
+      return hasRequiredRoles || hasRequiredRights
+    }
     return hasRequiredRoles && hasRequiredRights
   }
 
