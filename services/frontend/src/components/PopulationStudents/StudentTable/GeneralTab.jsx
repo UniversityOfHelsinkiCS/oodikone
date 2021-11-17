@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Item, Icon, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { flatten } from 'lodash'
+import _ from 'lodash'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { useIsAdmin } from 'common/hooks'
@@ -12,23 +12,19 @@ import sendEvent from '../../../common/sendEvent'
 import useFilters from '../../FilterTray/useFilters'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const GeneralTab = ({ coursePopulation, customPopulation, studentToTargetCourseDateMap, coursecode }) => {
-  const isAdmin = useIsAdmin()
+const GeneralTab = ({ populations, columnKeysToInclude, studentToTargetCourseDateMap, coursecode }) => {
   const { language } = useLanguage()
   const { filteredStudents } = useFilters()
   const [popupStates, setPopupStates] = useState({})
-  const { data: populationStatistics, query } = useSelector(({ populations }) => populations)
-  const { namesVisible: showNames } = useSelector(({ settings }) => settings)
   const sendAnalytics = sendEvent.populationStudents
-  const queryStudyrights = query ? Object.values(query.studyRights) : []
-  const queryYear = query?.year
 
-  if (!populationStatistics || !populationStatistics.elementdetails) {
-    return null
-  }
+  const { data: populationStatistics, query } = populations
+
+  if (!populationStatistics || !populationStatistics.elementdetails) return null
 
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
   const students = Object.fromEntries(filteredStudents.map(stu => [stu.studentNumber, stu]))
+  const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
 
   const popupTimeoutLength = 1000
@@ -118,38 +114,32 @@ const GeneralTab = ({ coursePopulation, customPopulation, studentToTargetCourseD
     return null
   }
 
-  const studentToStudyrightStartMap = !(customPopulation || coursePopulation)
-    ? selectedStudents.reduce((res, sn) => {
-        const targetStudyright = flatten(
-          students[sn].studyrights.reduce((acc, curr) => {
-            acc.push(curr.studyright_elements)
-            return acc
-          }, [])
-        ).filter(e => e.code === cleanedQueryStudyrights[0])
-        res[sn] = targetStudyright[0] ? targetStudyright[0].startdate : null
-        return res
-      }, {})
-    : null
+  const studentToStudyrightStartMap = selectedStudents.reduce((res, sn) => {
+    const targetStudyright = _.flatten(
+      students[sn].studyrights.reduce((acc, curr) => {
+        acc.push(curr.studyright_elements)
+        return acc
+      }, [])
+    ).filter(e => e.code === cleanedQueryStudyrights[0])
+    res[sn] = targetStudyright[0] ? targetStudyright[0].startdate : null
+    return res
+  }, {})
 
-  const studentToStudyrightActualStartMap = !(customPopulation || coursePopulation)
-    ? selectedStudents.reduce((res, sn) => {
-        const targetStudyright = students[sn].studyrights.find(studyright =>
-          studyright.studyright_elements.some(e => e.code === cleanedQueryStudyrights[0])
-        )
-        res[sn] = targetStudyright ? targetStudyright.studystartdate : null
-        return res
-      }, {})
-    : null
+  const studentToStudyrightActualStartMap = selectedStudents.reduce((res, sn) => {
+    const targetStudyright = students[sn].studyrights.find(studyright =>
+      studyright.studyright_elements.some(e => e.code === cleanedQueryStudyrights[0])
+    )
+    res[sn] = targetStudyright ? targetStudyright.studystartdate : null
+    return res
+  }, {})
 
-  const studentToStudyrightEndMap = !(customPopulation || coursePopulation)
-    ? selectedStudents.reduce((res, sn) => {
-        const targetStudyright = students[sn].studyrights.find(studyright =>
-          studyright.studyright_elements.some(e => e.code === cleanedQueryStudyrights[0])
-        )
-        res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
-        return res
-      }, {})
-    : null
+  const studentToStudyrightEndMap = selectedStudents.reduce((res, sn) => {
+    const targetStudyright = students[sn].studyrights.find(studyright =>
+      studyright.studyright_elements.some(e => e.code === cleanedQueryStudyrights[0])
+    )
+    res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
+    return res
+  }, {})
 
   const getActualStartDate = studentNumber => {
     const studyRightStart = studentToStudyrightStartMap[studentNumber]
@@ -171,30 +161,30 @@ const GeneralTab = ({ coursePopulation, customPopulation, studentToTargetCourseD
     sendAnalytics('Copy all student emails to clipboard', 'Copy all student emails to clipboard')
   }
 
-  const containsStudyTracks = () => {
-    const allStudyrights = selectedStudents.map(sn => students[sn]).map(st => st.studyrights)
-    return allStudyrights
-      .map(
-        studyrights =>
-          studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
-            elemArr
-              .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
-              .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name, language)))
-            return acc
-          }, []).length > 0
-      )
-      .some(el => el === true)
-  }
-
-  const columns = []
-  if (showNames) {
-    columns.push(
-      { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
-      { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames }
+  // Filters to check data for whether to show certain columns
+  const containsStudyTracks = selectedStudents
+    .map(sn => students[sn])
+    .map(st => st.studyrights)
+    .map(
+      studyrights =>
+        studyrightCodes(studyrights, 'studyright_elements').reduce((acc, elemArr) => {
+          elemArr
+            .filter(el => populationStatistics.elementdetails.data[el.code].type === 30)
+            .forEach(el => acc.push(getTextIn(populationStatistics.elementdetails.data[el.code].name, language)))
+          return acc
+        }, []).length > 0
     )
-  }
-  columns.push(
-    {
+    .some(el => el === true)
+
+  const containsOption = cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH'))
+
+  const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020
+
+  // All columns components user is able to use
+  const columnsAvailable = {
+    lastname: { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
+    firstname: { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames },
+    studentnumber: {
       key: 'studentnumber',
       title: 'Student Number',
       getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
@@ -205,7 +195,7 @@ const GeneralTab = ({ coursePopulation, customPopulation, studentToTargetCourseD
       ),
       headerProps: { colSpan: 2 },
     },
-    {
+    icon: {
       key: 'icon',
       getRowVal: s =>
         !s.obfuscated && (
@@ -220,22 +210,17 @@ const GeneralTab = ({ coursePopulation, customPopulation, studentToTargetCourseD
           </Item>
         ),
       cellProps: { collapsing: true, className: 'iconCellNoPointer' },
-    }
-  )
-  if (!(coursePopulation || customPopulation)) {
-    columns.push({
-      key: 'credits since start',
+    },
+    creditsSinceStart: {
+      key: 'creditsSinceStart',
       title: 'credits since start of studyright',
       getRowVal: s => {
         const credits = getStudentTotalCredits(s)
         return credits
       },
-    })
-  }
-
-  if (coursecode.length > 0) {
-    columns.push({
-      key: 'grade for single course',
+    },
+    gradeForSingleCourse: {
+      key: 'gradeForSingleCourse',
       title: 'Grade',
       getRowVal: s => {
         const grade = s.courses.filter(c => coursecode.includes(c.course_code))
@@ -245,171 +230,148 @@ const GeneralTab = ({ coursePopulation, customPopulation, studentToTargetCourseD
         }
         return ''
       },
-    })
-  }
-
-  columns.push({
-    key: 'all credits',
-    title: 'All Credits',
-    getRowVal: s => s.credits,
-  })
-
-  if (!(coursePopulation || customPopulation)) {
-    columns.push({
-      key: 'transferred from',
+    },
+    allCredits: {
+      key: 'allCredits',
+      title: 'All Credits',
+      getRowVal: s => s.credits,
+    },
+    transferredFrom: {
+      key: 'transferredFrom',
       title: 'Transferred From',
       getRowVal: s => (s.transferredStudyright ? transferFrom(s) : ''),
-    })
-  }
-  if (containsStudyTracks() && !(coursePopulation || customPopulation)) {
-    columns.push({
-      key: 'studytrack',
+    },
+    studyTrack: containsStudyTracks && {
+      key: 'studyTrack',
       title: 'Study Track',
       getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0],
-    })
-  }
-
-  if (isAdmin && !(coursePopulation || customPopulation)) {
-    columns.push(
-      {
-        key: 'priority',
-        title: 'priority',
-        getRowVal: s => priorityText(s.studyrights),
-      },
-      {
-        key: 'extent',
-        title: 'extent',
-        getRowVal: s => extentCodes(s.studyrights),
-      }
-    )
-  }
-  columns.push({
-    key: 'tags',
-    title: 'Tags',
-    getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
-  })
-
-  if (!(coursePopulation || customPopulation)) {
-    if (isAdmin) {
-      columns.push({
-        key: 'studystartdate',
-        title: 'start of studyright',
-        getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
-        getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD'),
-      })
-    }
-
-    // potentially will replace the 'start of studyright' column - both present for validation
-    columns.push({
-      key: 'studystartdateactual',
+    },
+    priority: {
+      key: 'priority',
+      title: 'priority',
+      getRowVal: s => priorityText(s.studyrights),
+    },
+    extent: {
+      key: 'extent',
+      title: 'extent',
+      getRowVal: s => extentCodes(s.studyrights),
+    },
+    tags: {
+      key: 'tags',
+      title: 'Tags',
+      getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
+    },
+    studyStartDate: {
+      key: 'studyStartDate',
+      title: 'start of studyright',
+      getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
+      getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD'),
+    },
+    studyStartDateActual: {
+      key: 'studyStartDateActual',
       title: 'started in studyright',
       getRowVal: s => new Date(getActualStartDate(s.studentNumber)).getTime(),
       getRowContent: s => reformatDate(getActualStartDate(s.studentNumber), 'YYYY-MM-DD'),
-    })
-
-    columns.push({
-      key: 'enddate',
+    },
+    endDate: {
+      key: 'endDate',
       title: 'graduation date',
       getRowVal: s => new Date(studentToStudyrightEndMap[s.studentNumber]).getTime(),
       getRowContent: s =>
         studentToStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
           : '',
-    })
-  }
-
-  if (!(coursePopulation || customPopulation) && parseInt(queryYear, 10) >= 2020) {
-    const code = queryStudyrights[0]
-    columns.push({
-      key: 'admission type',
+    },
+    admissionType: shouldShowAdmissionType && {
+      key: 'admissionType',
       title: 'admission type',
       getRowVal: s => {
-        const studyright = s.studyrights.find(sr => sr.studyright_elements.some(e => e.code === code))
+        const studyright = s.studyrights.find(sr => sr.studyright_elements.some(e => e.code === queryStudyrights[0]))
         return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
       },
-    })
-  }
-
-  if (coursePopulation || customPopulation) {
-    columns.push(
-      {
-        key: 'programme',
-        title: 'Study Programme',
-        getRowVal: s => getTextIn(mainProgramme(s.studyrights, s.studentNumber), language) || 'No programme',
-      },
-      {
-        key: 'startyear',
-        title: 'Start Year at Uni',
-        getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : ''),
-      }
-    )
-  }
-
-  if (cleanedQueryStudyrights.some(code => code.startsWith('MH') || code.startsWith('KH')))
-    columns.push({
+    },
+    programme: {
+      key: 'programme',
+      title: 'Study Programme',
+      getRowVal: s => getTextIn(mainProgramme(s.studyrights, s.studentNumber), language) || 'No programme',
+    },
+    startYear: {
+      key: 'startYear',
+      title: 'Start Year at Uni',
+      getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : ''),
+    },
+    option: containsOption && {
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
       getRowVal: s => (s.option ? getTextIn(s.option.name, language) : ''),
-    })
-
-  if (showNames) {
-    columns.push(
-      {
-        key: 'email',
-        title: (
-          <>
-            email
-            <Popup
-              trigger={<Icon link name="copy" onClick={copyToClipboardAll} style={{ float: 'right' }} />}
-              content="Copied email list!"
-              on="click"
-              open={popupStates['0']}
-              onClose={() => handlePopupClose('0')}
-              onOpen={() => handlePopupOpen('0')}
-              position="top right"
-            />
-          </>
-        ),
-        getRowVal: s => s.email,
-        headerProps: { colSpan: 2 },
-      },
-      {
-        key: 'copy email',
-        getRowVal: s =>
-          s.email && !s.obfuscated ? (
-            <Popup
-              trigger={
-                <Icon
-                  link
-                  name="copy outline"
-                  onClick={() => {
-                    copyToClipboard(s.email)
-                    sendAnalytics("Copy student's email to clipboard", "Copy student's email to clipboard")
-                  }}
-                  style={{ float: 'right' }}
-                />
-              }
-              content="Email copied!"
-              on="click"
-              open={popupStates[s.studentNumber]}
-              onClose={() => handlePopupClose(s.studentNumber)}
-              onOpen={() => handlePopupOpen(s.studentNumber)}
-              position="top right"
-            />
-          ) : null,
-        headerProps: { onClick: null, sorted: null },
-        cellProps: { collapsing: true, className: 'iconCellNoPointer' },
-      }
-    )
-  }
-
-  if (isAdmin) {
-    columns.push({
+    },
+    email: {
+      key: 'email',
+      title: (
+        <>
+          email
+          <Popup
+            trigger={<Icon link name="copy" onClick={copyToClipboardAll} style={{ float: 'right' }} />}
+            content="Copied email list!"
+            on="click"
+            open={popupStates['0']}
+            onClose={() => handlePopupClose('0')}
+            onOpen={() => handlePopupOpen('0')}
+            position="top right"
+          />
+        </>
+      ),
+      getRowVal: s => s.email,
+      headerProps: { colSpan: 2 },
+    },
+    copyEmail: {
+      key: 'copyEmail',
+      getRowVal: s =>
+        s.email && !s.obfuscated ? (
+          <Popup
+            trigger={
+              <Icon
+                link
+                name="copy outline"
+                onClick={() => {
+                  copyToClipboard(s.email)
+                  sendAnalytics("Copy student's email to clipboard", "Copy student's email to clipboard")
+                }}
+                style={{ float: 'right' }}
+              />
+            }
+            content="Email copied!"
+            on="click"
+            open={popupStates[s.studentNumber]}
+            onClose={() => handlePopupClose(s.studentNumber)}
+            onOpen={() => handlePopupOpen(s.studentNumber)}
+            position="top right"
+          />
+        ) : null,
+      headerProps: { onClick: null, sorted: null },
+      cellProps: { collapsing: true, className: 'iconCellNoPointer' },
+    },
+    updatedAt: {
       key: 'updatedAt',
       title: 'Last Updated At',
       getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
-    })
+    },
   }
+  // Columns are shown in order they're declared above. JS guarantees this order of keys
+  // to stay for non-integer keys
+  const orderOfColumns = Object.keys(columnsAvailable).reduce(
+    (acc, curr, ind) => ({
+      ...acc,
+      [curr]: ind,
+    }),
+    {}
+  )
+
+  const columns = _.chain(columnKeysToInclude)
+    .map(colKey => columnsAvailable[colKey])
+    .sortBy(col => orderOfColumns[col.key])
+    .filter(col => !!col)
+    .value()
 
   return (
     <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
@@ -429,4 +391,38 @@ const GeneralTab = ({ coursePopulation, customPopulation, studentToTargetCourseD
   )
 }
 
-export default GeneralTab
+const columnsByPopulationType = ({ customPopulation, coursePopulation }) => {
+  if (customPopulation) return ['programme', 'startYear']
+  if (coursePopulation) return ['gradeForSingleCourse', 'programme', 'startYear']
+  return [
+    'creditsSinceStart',
+    'transferredFrom',
+    'priority',
+    'extent',
+    'studyStartDate',
+    'studyStartDateActual',
+    'endDate',
+    'studyTrack',
+    'admissionType',
+  ]
+}
+
+const GeneralTabContainer = ({ customPopulation, coursePopulation, ...props }) => {
+  const populations = useSelector(({ populations }) => populations)
+  const { namesVisible } = useSelector(({ settings }) => settings)
+  const isAdmin = useIsAdmin()
+
+  const baseColumns = ['studentnumber', 'icon', 'allCredits', 'tags', 'updatedAt', 'option']
+  const nameColumnsToAdd = namesVisible ? ['email', 'copyEmail', 'lastname', 'firstname'] : []
+  const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'studyStartDate', 'updatedAt']
+
+  const columnKeysToInclude = _.chain(baseColumns)
+    .union(columnsByPopulationType(customPopulation, coursePopulation))
+    .union(nameColumnsToAdd)
+    .difference(adminColumnsToFilter)
+    .value()
+
+  return <GeneralTab populations={populations} columnKeysToInclude={columnKeysToInclude} {...props} />
+}
+
+export default GeneralTabContainer
