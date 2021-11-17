@@ -154,7 +154,11 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
       content: {
         content: (
           <div ref={refs[2]}>
-            <PopulationStudents customPopulation language={language} filteredStudents={filteredStudents} />
+            <PopulationStudents
+              variant="studyGuidanceGroupPopulation"
+              language={language}
+              filteredStudents={filteredStudents}
+            />
           </div>
         ),
       },

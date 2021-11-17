@@ -169,7 +169,12 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, dataExport }
       content: {
         content: (
           <div ref={studentTableRef}>
-            <PopulationStudents language={language} filteredStudents={filteredStudents} dataExport={dataExport} />
+            <PopulationStudents
+              variant="population"
+              language={language}
+              filteredStudents={filteredStudents}
+              dataExport={dataExport}
+            />
           </div>
         ),
       },

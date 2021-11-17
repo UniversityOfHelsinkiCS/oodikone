@@ -258,9 +258,9 @@ const CoursePopulation = ({
         content: (
           <div ref={studentRef}>
             <PopulationStudents
+              variant="coursePopulation"
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
               filteredStudents={studentData.students.filter(stu => selectedStudents.includes(stu.studentNumber))}
-              coursePopulation
               language={language}
               coursecode={codes}
             />
