@@ -43,8 +43,8 @@ What different CLI options do:
    - Cleans up any previous real data databases
    - Downloads needed database dumps from production servers.
    - Creates real data databases and populates them with downloaded dumps.
-3. Reset sis-importer data
-   - Like option 2, but only for sis-importer database. Useful when developing updater microservice.
+3. Reset single database
+   - Like option 2, but only for single database. Leaves other databases untouched.
 
 ## ⌨️ Development
 
@@ -124,7 +124,7 @@ Continuous integration (CI) works with Github actions and is defined in workflow
 
 ### Modules are missing after updating package.json
 
-You should always install the dependencies **inside** the container to have the application **inside** the container access them. This might be the case when someone else installs a new library and you only pull the changes in package.json. Use `docker exec -it <service> sh` to get inside the container and run `npm ci` to install modules.
+You should always install the dependencies **inside** the container to have the application **inside** the container access them. Module might be missing for example when someone else installs a new library and you only pull the changes in package.json. Use `docker exec <service> npm ci` to install modules inside the container.
 
 ### I get the "You are not authorized to use Oodikone" -message when I try to work with anon-data
 
