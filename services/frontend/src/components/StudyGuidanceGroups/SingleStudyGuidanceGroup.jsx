@@ -167,7 +167,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   ]
 
   return (
-    <FilterTray filterSet={<StudyGuidanceGroupFilters />}>
+    <FilterTray filterSet={<StudyGuidanceGroupFilters group={group} />}>
       <Segment className="contentSegment">
         <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
       </Segment>

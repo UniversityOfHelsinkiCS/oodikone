@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
 import { Form, Radio } from 'semantic-ui-react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 
-const GraduatedFromProgramme = ({ code }) => {
+const GraduatedFromProgramme = ({ overrideCode = '' }) => {
+  const { query } = useSelector(({ populations }) => populations)
+  const code = overrideCode || query?.studyRights.programme || ''
   const { addFilter, removeFilter } = useFilters()
   const analytics = useAnalytics()
   const [value, setValue] = useState(null)
@@ -86,12 +87,4 @@ const GraduatedFromProgramme = ({ code }) => {
   )
 }
 
-GraduatedFromProgramme.propTypes = {
-  code: PropTypes.string.isRequired,
-}
-
-const mapStateToProps = ({ populations }) => ({
-  code: populations.query ? populations.query.studyRights.programme : '',
-})
-
-export default connect(mapStateToProps)(GraduatedFromProgramme)
+export default GraduatedFromProgramme
