@@ -296,7 +296,6 @@ const PopulationStudents = ({
         render: () => (
           <Tab.Pane>
             <GeneralTab
-              showNames={showNames}
               coursePopulation={coursePopulation}
               customPopulation={customPopulation}
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}

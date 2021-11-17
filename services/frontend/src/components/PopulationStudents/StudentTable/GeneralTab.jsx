@@ -1,52 +1,33 @@
 import React, { useState } from 'react'
-import { shape, bool, string, arrayOf } from 'prop-types'
 import { Item, Icon, Popup } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { flatten } from 'lodash'
 import moment from 'moment'
-import { connect } from 'react-redux'
-import SortableTable from '../../SortableTable'
-import {
-  getStudentTotalCredits,
-  getTextIn,
-  getNewestProgramme,
-  reformatDate,
-  copyToClipboard,
-  getUserIsAdmin,
-} from '../../../common'
+import { useSelector } from 'react-redux'
+import { useIsAdmin } from 'common/hooks'
+import SortableTable from 'components/SortableTable'
+import { getStudentTotalCredits, getTextIn, getNewestProgramme, reformatDate, copyToClipboard } from 'common'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
 import useFilters from '../../FilterTray/useFilters'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-// TODO: Refactoring in process, contains lot of duplicate code.
-
-const GeneralTab = ({
-  showNames,
-  coursePopulation,
-  customPopulation,
-  populationStatistics,
-  queryStudyrights,
-  isAdmin,
-  studentToTargetCourseDateMap,
-  coursecode,
-  queryYear,
-}) => {
+const GeneralTab = ({ coursePopulation, customPopulation, studentToTargetCourseDateMap, coursecode }) => {
+  const isAdmin = useIsAdmin()
   const { language } = useLanguage()
   const { filteredStudents } = useFilters()
   const [popupStates, setPopupStates] = useState({})
+  const { data: populationStatistics, query } = useSelector(({ populations }) => populations)
+  const { namesVisible: showNames } = useSelector(({ settings }) => settings)
   const sendAnalytics = sendEvent.populationStudents
+  const queryStudyrights = query ? Object.values(query.studyRights) : []
+  const queryYear = query?.year
 
-  if (!populationStatistics) return null
-
-  // TODO: Refactor this away:
-  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
-
-  // TODO: This fixes crashing upon using back button. Find the root cause and fix it.
-  if (!populationStatistics.elementdetails) {
+  if (!populationStatistics || !populationStatistics.elementdetails) {
     return null
   }
 
+  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
   const students = Object.fromEntries(filteredStudents.map(stu => [stu.studentNumber, stu]))
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
 
@@ -448,36 +429,4 @@ const GeneralTab = ({
   )
 }
 
-GeneralTab.defaultProps = {
-  studentToTargetCourseDateMap: null,
-  customPopulation: false,
-  coursePopulation: false,
-}
-
-GeneralTab.propTypes = {
-  showNames: bool.isRequired,
-  coursePopulation: bool,
-  customPopulation: bool,
-  populationStatistics: shape({}).isRequired,
-  queryStudyrights: arrayOf(string).isRequired,
-  isAdmin: bool.isRequired,
-  studentToTargetCourseDateMap: shape({}),
-}
-
-const mapStateToProps = state => {
-  const {
-    populations,
-    auth: {
-      token: { roles },
-    },
-  } = state
-
-  return {
-    isAdmin: getUserIsAdmin(roles),
-    populationStatistics: populations.data,
-    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
-    queryYear: populations?.query?.year,
-  }
-}
-
-export default connect(mapStateToProps)(GeneralTab)
+export default GeneralTab
