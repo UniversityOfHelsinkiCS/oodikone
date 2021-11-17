@@ -31,6 +31,8 @@ const PopulationStudents = ({
   dataExport,
   contentToInclude,
   coursecode = [],
+  variant,
+  studyGuidanceGroup,
 }) => {
   const [state, setState] = useState({})
   const studentRef = useRef()
@@ -293,7 +295,12 @@ const PopulationStudents = ({
         menuItem: 'General',
         render: () => (
           <Tab.Pane>
-            <GeneralTab studentToTargetCourseDateMap={studentToTargetCourseDateMap} coursecode={coursecode} />
+            <GeneralTab
+              variant={variant}
+              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+              coursecode={coursecode}
+              studyGuidanceGroup={studyGuidanceGroup}
+            />
           </Tab.Pane>
         ),
       },
@@ -410,7 +417,7 @@ const PopulationStudents = ({
 const PopulationStudentsContainer = ({ ...props }) => {
   const { variant } = props
 
-  if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].contains(variant)) {
+  if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant)) {
     throw new Error(`${variant} is not a proper variant!`)
   }
 

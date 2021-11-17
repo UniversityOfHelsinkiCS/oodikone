@@ -158,6 +158,7 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
               variant="studyGuidanceGroupPopulation"
               language={language}
               filteredStudents={filteredStudents}
+              studyGuidanceGroup={group}
             />
           </div>
         ),
