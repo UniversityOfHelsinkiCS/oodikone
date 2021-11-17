@@ -293,12 +293,7 @@ const PopulationStudents = ({
         menuItem: 'General',
         render: () => (
           <Tab.Pane>
-            <GeneralTab
-              coursePopulation={coursePopulation}
-              customPopulation={customPopulation}
-              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              coursecode={coursecode}
-            />
+            <GeneralTab studentToTargetCourseDateMap={studentToTargetCourseDateMap} coursecode={coursecode} />
           </Tab.Pane>
         ),
       },
@@ -415,7 +410,7 @@ const PopulationStudents = ({
 const PopulationStudentsContainer = ({ ...props }) => {
   const { variant } = props
 
-  if (!variant in ['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation']) {
+  if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].contains(variant)) {
     throw new Error(`${variant} is not a proper variant!`)
   }
 
