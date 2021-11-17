@@ -60,14 +60,16 @@ export const CustomPopulationFilters = () => (
   </Filters>
 )
 
-export const StudyGuidanceGroupFilters = () => (
+export const StudyGuidanceGroupFilters = ({ group }) => (
   <Filters name="Study Guidance Group">
     <EnrollmentStatus />
     <Age />
     <Gender />
     <StartYearAtUni />
-    <AdmissionType />
-    <GraduatedFromProgramme />
+    {group?.tags?.studyProgramme && group?.tags?.year >= 2020 && (
+      <AdmissionType overrideCode={group.tags.studyProgramme} />
+    )}
+    {group?.tags?.studyProgramme && <GraduatedFromProgramme overrideCode={group.tags.studyProgramme} />}
     <Tags />
     <Courses />
   </Filters>

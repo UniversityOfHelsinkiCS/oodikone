@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
 import { Form, Dropdown } from 'semantic-ui-react'
-import { connect } from 'react-redux'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 
-const AdmissionType = ({ code }) => {
+const AdmissionType = ({ overrideCode = '' }) => {
+  const { query } = useSelector(({ populations }) => populations)
+  const code = overrideCode || query?.studyRights.programme || ''
   const { addFilter, removeFilter, activeFilters, withoutFilter } = useFilters()
   const analytics = useAnalytics()
   // Using undefined as default, since students can be filtered with null value
@@ -81,12 +82,4 @@ const AdmissionType = ({ code }) => {
   )
 }
 
-AdmissionType.propTypes = {
-  code: PropTypes.string.isRequired,
-}
-
-const mapStateToProps = ({ populations }) => ({
-  code: populations.query ? populations.query.studyRights.programme : '',
-})
-
-export default connect(mapStateToProps)(AdmissionType)
+export default AdmissionType
