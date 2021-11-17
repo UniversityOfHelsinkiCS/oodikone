@@ -2,6 +2,7 @@ const router = require('express').Router()
 const Student = require('../services/students')
 const userService = require('../services/userService')
 const Unit = require('../services/units')
+const { getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
 
 const filterStudentTags = (student, userId) => {
   return {
@@ -13,7 +14,7 @@ const filterStudentTags = (student, userId) => {
 router.get('/students', async (req, res) => {
   const {
     roles,
-    decodedToken: { userId },
+    decodedToken: { userId, sisPersonId },
     query: { searchTerm },
   } = req
 
@@ -37,8 +38,14 @@ router.get('/students', async (req, res) => {
   } else {
     const unitsUserCanAccess = await userService.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
+    let extraStudents = []
+    if (roles.includes('studyGuidanceGroups')) {
+      const matchingOnlyByTerm = await Student.bySearchTerm(trimmedSearchTerm)
+      const studentsUserCanAccess = await getAllStudentsUserHasInGroups(sisPersonId)
+      extraStudents.push(...matchingOnlyByTerm.filter(s => studentsUserCanAccess.has(s.studentNumber)))
+    }
     const matchingStudents = await Student.bySearchTermAndElements(trimmedSearchTerm, codes)
-    res.json(matchingStudents)
+    res.json([...matchingStudents, ...extraStudents])
   }
 })
 
@@ -47,6 +54,17 @@ router.get('/students/:id', async (req, res) => {
   const { roles, decodedToken } = req
 
   if (roles && roles.includes('admin')) {
+    const results = await Student.withId(studentId)
+    return results.error
+      ? res.status(400).json({ error: 'error finding student' }).end()
+      : res.status(200).json(filterStudentTags(results, decodedToken.id)).end()
+  }
+
+  if (roles && roles.includes('studyGuidanceGroups')) {
+    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(decodedToken.sisPersonId)
+    if (!studentsUserCanAccess.has(studentId)) {
+      return res.status(400).json({ error: 'error finding student' }).end()
+    }
     const results = await Student.withId(studentId)
     return results.error
       ? res.status(400).json({ error: 'error finding student' }).end()
