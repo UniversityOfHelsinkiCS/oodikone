@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Icon, Tab, Grid, Item, Dropdown } from 'semantic-ui-react'
-import { withRouter, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
-import { getTextIn, getUserRoles } from '../../common'
-import { useTabChangeAnalytics, usePrevious } from '../../common/hooks'
+import { getTextIn } from '../../common'
+import { useTabChangeAnalytics, usePrevious, useIsAdmin } from '../../common/hooks'
 
-import { toggleStudentListVisibility } from '../../redux/settings'
 import { getTagsByStudytrackAction } from '../../redux/tags'
 import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
 
@@ -29,25 +28,23 @@ const PopulationStudents = props => {
   const [state, setState] = useState({})
   const studentRef = useRef()
   const {
-    getTagsByStudytrack,
-    getStudentTagsStudyTrack,
-    queryStudyrights,
-    userRoles,
-    showList,
     customPopulation = false,
     coursePopulation = false,
-    mandatoryPassed,
-    mandatoryCourses,
-    showNames,
     language,
     filteredStudents,
     studentToTargetCourseDateMap,
     coursecode = [],
-    tags,
     dataExport,
   } = props
+  const dispatch = useDispatch()
+  const { namesVisible: showNames, studentlistVisible: showList } = useSelector(({ settings }) => settings)
+  const { data: tags } = useSelector(({ tags }) => tags)
+  const { query } = useSelector(({ populations }) => populations)
+  const queryStudyrights = query ? Object.values(query.studyRights) : []
+  const { data: mandatoryCourses } = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses)
+  const { data: populationCourses } = useSelector(({ populationCourses }) => populationCourses)
   const prevShowList = usePrevious(showList)
-  const admin = userRoles.includes('admin')
+  const admin = useIsAdmin()
   const { handleTabChange } = useTabChangeAnalytics(
     ANALYTICS_CATEGORIES.populationStudents,
     'Change students table tab'
@@ -56,8 +53,8 @@ const PopulationStudents = props => {
   useEffect(() => {
     if (tags && tags.length > 0) return
     const queryStudyright = queryStudyrights[0]
-    getTagsByStudytrack(queryStudyright)
-    getStudentTagsStudyTrack(queryStudyright)
+    dispatch(getTagsByStudytrackAction(queryStudyright))
+    dispatch(getStudentTagsByStudytrackAction(queryStudyright))
     setState({ ...state, admin })
   }, [])
 
@@ -66,6 +63,41 @@ const PopulationStudents = props => {
       scrollToComponent(studentRef.current, { align: 'bottom' })
     }
   }, [prevShowList])
+
+  const mandatoryCodes = mandatoryCourses.filter(course => course.visible && course.visible.visibility).map(c => c.code)
+  let mandatoryPassed = {}
+  if (populationCourses.coursestatistics) {
+    const mandatorycodesMapCourseCodeToCourseID = new Map()
+    mandatoryCourses
+      .filter(course => course.visible && course.visible.visibility)
+      .forEach(c => mandatorycodesMapCourseCodeToCourseID.set(c.code, c.id))
+
+    const courses = populationCourses.coursestatistics
+    mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
+      const foundCourse = !!courses.find(c => c.course.code === code)
+
+      const searchCode = mandatorycodesMapCourseCodeToCourseID.get(code)
+
+      let foundSubsCourse
+      if (searchCode) {
+        foundSubsCourse = courses.find(c => {
+          if (!c.course.substitutions) return false
+          if (c.course.substitutions.length === null) return false
+          return c.course.substitutions.includes(searchCode)
+        })
+      }
+
+      let passedArray = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
+
+      if (foundSubsCourse) {
+        passedArray = passedArray
+          ? [...passedArray, ...Object.keys(foundSubsCourse.students.passed)]
+          : Object.keys(foundSubsCourse.students.passed)
+      }
+      obj[code] = passedArray
+      return obj
+    }, {})
+  }
 
   const renderStudentTable = () => {
     const verticalTitle = title => <div className="verticalTitle">{title}</div>
@@ -203,7 +235,11 @@ const PopulationStudents = props => {
             </div>
           ),
           parent: true,
-          headerProps: { colSpan: labelToMandatoryCourses[e.label].length, title: e.label, ordernumber: e.orderNumber },
+          headerProps: {
+            colSpan: labelToMandatoryCourses[e.label].length,
+            title: e.label,
+            ordernumber: e.orderNumber,
+          },
         }))
     )
 
@@ -388,70 +424,4 @@ const PopulationStudents = props => {
   )
 }
 
-const mapStateToProps = state => {
-  const {
-    settings,
-    populations,
-    populationCourses,
-    populationMandatoryCourses,
-    tags,
-    auth: {
-      token: { roles },
-    },
-  } = state
-
-  const mandatoryCodes = populationMandatoryCourses.data
-    .filter(course => course.visible && course.visible.visibility)
-    .map(c => c.code)
-
-  let mandatoryPassed = {}
-
-  if (populationCourses.data.coursestatistics) {
-    const mandatorycodesMapCourseCodeToCourseID = new Map()
-    populationMandatoryCourses.data
-      .filter(course => course.visible && course.visible.visibility)
-      .forEach(c => mandatorycodesMapCourseCodeToCourseID.set(c.code, c.id))
-
-    const courses = populationCourses.data.coursestatistics
-    mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
-      const foundCourse = !!courses.find(c => c.course.code === code)
-
-      const searchCode = mandatorycodesMapCourseCodeToCourseID.get(code)
-
-      let foundSubsCourse
-      if (searchCode) {
-        foundSubsCourse = courses.find(c => {
-          if (!c.course.substitutions) return false
-          if (c.course.substitutions.length === null) return false
-          return c.course.substitutions.includes(searchCode)
-        })
-      }
-
-      let passedArray = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
-
-      if (foundSubsCourse) {
-        passedArray = passedArray
-          ? [...passedArray, ...Object.keys(foundSubsCourse.students.passed)]
-          : Object.keys(foundSubsCourse.students.passed)
-      }
-      obj[code] = passedArray
-      return obj
-    }, {})
-  }
-
-  return {
-    showNames: settings.namesVisible,
-    showList: settings.studentlistVisible,
-    queryStudyrights: populations.query ? Object.values(populations.query.studyRights) : [],
-    mandatoryCourses: populationMandatoryCourses.data,
-    mandatoryPassed,
-    tags: tags.data,
-    userRoles: getUserRoles(roles),
-  }
-}
-
-export default connect(mapStateToProps, {
-  toggleStudentListVisibility,
-  getTagsByStudytrack: getTagsByStudytrackAction,
-  getStudentTagsStudyTrack: getStudentTagsByStudytrackAction,
-})(withRouter(PopulationStudents))
+export default PopulationStudents
