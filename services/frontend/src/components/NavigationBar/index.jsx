@@ -42,7 +42,7 @@ const NavigationBar = props => {
     const visibleNavigationItems = {}
     Object.keys(allNavigationItems).forEach(key => {
       if (key === 'populations' || key === 'students') {
-        if (!userRoles.includes('admin') && rights.length === 0) {
+        if (!checkUserAccess(['admin', 'studyGuidanceGroups'], userRoles) && rights.length === 0) {
           return
         }
       } else if (key === 'courseStatistics') {

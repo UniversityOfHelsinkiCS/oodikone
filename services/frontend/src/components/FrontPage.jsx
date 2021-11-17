@@ -53,11 +53,11 @@ const FrontPage = () => {
   useTitle()
 
   const showItems = {
-    populations: userRoles.includes('admin') || rights.length !== 0,
-    studyProgramme: userRoles.includes('admin') || rights.length !== 0,
-    students: userRoles.includes('admin') || rights.length !== 0,
+    populations: userRoles.includes('admin') || rights.length > 0,
+    studyProgramme: userRoles.includes('admin') || rights.length > 0,
+    students: checkUserAccess(['studyGuidanceGroups', 'admin'], userRoles) || rights.length > 0,
     courseStatistics: checkUserAccess(['courseStatistics', 'admin'], userRoles) || rights.length > 0,
-    teachers: userRoles.includes('admin') || userRoles.includes('teachers'),
+    teachers: checkUserAccess(['teachers', 'admin'], userRoles),
     trends: true,
     feedback: true,
   }

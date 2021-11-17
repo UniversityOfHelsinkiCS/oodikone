@@ -66,7 +66,13 @@ const Routes = () => (
         path="/study-programme/:studyProgrammeId?"
         component={StudyProgramme}
       />
-      <ProtectedRoute requireUserHasRights exact path={routes.students} component={StudentStatistics} />
+      <ProtectedRoute
+        requiredRoles={['admin', 'studyGuidanceGroups']}
+        requireUserHasRights
+        exact
+        path={routes.students}
+        component={StudentStatistics}
+      />
       <ProtectedRoute
         requiredRoles={['courseStatistics']}
         requireUserHasRights
