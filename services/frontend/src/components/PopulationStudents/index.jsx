@@ -29,6 +29,7 @@ const PopulationStudents = ({
   filteredStudents,
   studentToTargetCourseDateMap,
   dataExport,
+  contentToInclude,
   customPopulation = false,
   coursePopulation = false,
   coursecode = [],
@@ -289,7 +290,7 @@ const PopulationStudents = ({
     )
     const mandatoryCourseData = [totals, filteredStudents]
 
-    const panes = [
+    const panesAvailable = [
       {
         menuItem: 'General',
         render: () => (
@@ -380,12 +381,7 @@ const PopulationStudents = ({
       },
     ]
 
-    const filteredPanes = panesToFilter => {
-      if (coursePopulation || customPopulation) {
-        return panesToFilter.slice(0, 1)
-      }
-      return panesToFilter
-    }
+    const panes = panesAvailable.filter(pane => contentToInclude.panesToInclude.includes(pane.menuItem))
 
     return (
       <>
@@ -401,7 +397,7 @@ const PopulationStudents = ({
             </Grid.Column>
           )}
         </Grid>
-        <Tab onTabChange={handleTabChange} panes={filteredPanes(panes)} data-cy="student-table-tabs" />
+        <Tab onTabChange={handleTabChange} panes={panes} data-cy="student-table-tabs" />
       </>
     )
   }
@@ -411,11 +407,7 @@ const PopulationStudents = ({
   return (
     <>
       <span style={{ marginRight: '0.5rem' }} ref={studentRef}>
-        <InfoBox
-          content={
-            coursePopulation ? infotoolTips.CoursePopulation.Students : infotoolTips.PopulationStatistics.Students
-          }
-        />
+        <InfoBox content={contentToInclude.infotoolTipContent} />
       </span>
       {admin ? <CheckStudentList students={filteredStudents.map(stu => stu.studentNumber)} /> : null}
       {renderStudentTable()}
@@ -423,4 +415,30 @@ const PopulationStudents = ({
   )
 }
 
-export default PopulationStudents
+const getContent = props => {
+  const contentByPopulationType = {
+    population: {
+      panesToInclude: ['General', 'Courses', 'Tags'],
+      infotoolTipContent: infotoolTips.PopulationStatistics.Students,
+    },
+    coursePopulation: {
+      panesToInclude: ['General'],
+      infotoolTipContent: infotoolTips.CoursePopulation.Students,
+    },
+    customPopulation: {
+      panesToInclude: ['General'],
+      infotoolTipContent: infotoolTips.PopulationStatistics.Students,
+    },
+  }
+  const { coursePopulation, customPopulation } = props
+
+  if (coursePopulation) return contentByPopulationType.coursePopulation
+  if (customPopulation) return contentByPopulationType.customPopulation
+  return contentByPopulationType.population
+}
+
+const PopulationStudentsContainer = ({ ...props }) => {
+  return <PopulationStudents contentToInclude={getContent(props)} {...props} />
+}
+
+export default PopulationStudentsContainer
