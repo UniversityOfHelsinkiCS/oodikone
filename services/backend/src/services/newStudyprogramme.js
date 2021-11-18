@@ -49,6 +49,13 @@ const getStatsBasis = years => {
   }
 }
 
+const isMajorStudentCredit = (studyright, attainment_date) =>
+  studyright &&
+  (studyright.prioritycode === 1 || studyright.prioritycode === 30) && // Is studyright state = MAIN or state = GRADUATED
+  studyright.studystartdate <= attainment_date && // Has the credit been attained after studying in the programme started
+  studyright.enddate >= attainment_date && // Has the credit been attained before the studyright ended
+  (!studyright.canceldate || studyright.canceldate >= attainment_date) // If the studyright was cancelled, was the credit attained before it was cancelled
+
 const getCreditsForStudyProgramme = async (provider, since) =>
   await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
@@ -61,7 +68,6 @@ const getCreditsForStudyProgramme = async (provider, since) =>
       },
       include: {
         model: Organization,
-        attributes: [],
         required: true,
         where: {
           code: provider,
@@ -88,7 +94,6 @@ const getProgrammesStudents = async studyprogramme =>
       include: [
         {
           model: StudyrightElement,
-          attributes: [],
           required: true,
           where: {
             code: {
@@ -117,7 +122,6 @@ const getTransferredCredits = async (provider, since) =>
       },
       include: {
         model: Organization,
-        attributes: [],
         required: true,
         where: {
           code: provider,
@@ -138,11 +142,9 @@ const startedStudyrights = async (studytrack, since) =>
   await Studyright.findAll({
     include: {
       model: StudyrightElement,
-      attributes: [],
       required: true,
       include: {
         model: ElementDetail,
-        attributes: [],
         required: true,
         where: {
           code: studytrack,
@@ -160,11 +162,9 @@ const graduatedStudyRights = async (studytrack, since) =>
   await Studyright.findAll({
     include: {
       model: StudyrightElement,
-      attributes: [],
       required: true,
       include: {
         model: ElementDetail,
-        attributes: [],
         required: true,
         where: {
           code: studytrack,
@@ -183,7 +183,6 @@ const cancelledStudyRights = async (studytrack, since) => {
   return await Studyright.findAll({
     include: {
       model: StudyrightElement,
-      attributes: [],
       required: true,
       where: {
         code: {
@@ -288,13 +287,6 @@ const getTransferredToStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
-const isMajorStudentCredit = (studyright, attainment_date) =>
-  studyright &&
-  (studyright.prioritycode === 1 || studyright.prioritycode === 30) && // Is studyright state = MAIN or state = GRADUATED
-  studyright.studystartdate <= attainment_date && // Has the credit been attained after studying in the programme started
-  studyright.enddate >= attainment_date && // Has the credit been attained before the studyright ended
-  (!studyright.canceldate || studyright.canceldate >= attainment_date) // If the studyright was cancelled, was the credit attained before it was cancelled
-
 const getRegularCreditStats = async (studytrack, startDate, years) => {
   const providercode = mapToProviders([studytrack])[0]
   const studyrights = await getProgrammesStudents(studytrack)
@@ -303,10 +295,12 @@ const getRegularCreditStats = async (studytrack, startDate, years) => {
   let majors = getStatsBasis(years)
   let nonMajors = getStatsBasis(years)
 
-  // Map all credits for the studyprogramme and divide them into major students' and nonmajors' credits by year
   credits.forEach(({ student_studentnumber, attainment_date, credits }) => {
     const studyright = studyrights.find(studyright => studyright.studentnumber == student_studentnumber)
     const attainmentYear = attainment_date.getFullYear()
+
+    // Map all credits for the studyprogramme and
+    // divide them into major students' and nonmajors' credits by year
     if (isMajorStudentCredit(studyright, attainment_date)) {
       majors.graphStats[indexOf(years, attainmentYear)] += credits || 0
       majors.tableStats[attainmentYear] += credits || 0
