@@ -9,12 +9,12 @@
 
 .studyprogramme-overview .graph-container {
   width: 60%;
-  height: 30vh;
+  height: 300px;
 }
 
 .studyprogramme-overview .table-container {
   width: 35%;
-  height: 30vh;
+  height: 300px;
   margin-top: 2em;
   margin-left: 2em;
 }

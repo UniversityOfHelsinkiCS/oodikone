@@ -42,6 +42,70 @@ const getCreditsForMajors = async (provider, since, studentnumbers) =>
     },
   })
 
+const getCreditsForNonMajors = async (provider, since, studentnumbers) =>
+  await Credit.findAll({
+    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+    include: {
+      model: Course,
+      attributes: ['code'],
+      required: true,
+      where: {
+        is_study_module: false,
+      },
+      include: {
+        model: Organization,
+        attributes: [],
+        required: true,
+        where: {
+          code: provider,
+        },
+      },
+    },
+    where: {
+      credittypecode: {
+        [Op.notIn]: [10, 9, 7],
+      },
+      isStudyModule: {
+        [Op.not]: true,
+      },
+      attainment_date: {
+        [Op.gte]: since,
+      },
+      student_studentnumber: {
+        [Op.notIn]: studentnumbers,
+      },
+    },
+  })
+
+const getTransferredCredits = async (provider, since) =>
+  await Credit.findAll({
+    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'credittypecode'],
+    include: {
+      model: Course,
+      attributes: ['code'],
+      required: true,
+      where: {
+        is_study_module: false,
+      },
+      include: {
+        model: Organization,
+        attributes: [],
+        required: true,
+        where: {
+          code: provider,
+        },
+      },
+    },
+    where: {
+      credittypecode: {
+        [Op.eq]: [9],
+      },
+      attainment_date: {
+        [Op.gte]: since,
+      },
+    },
+  })
+
 const getYears = since => {
   const years = []
   for (let i = since; i <= new Date().getFullYear(); i++) {
@@ -220,7 +284,6 @@ const getTransferredToStats = async (studytrack, startDate, years) => {
 const getMajorStudentsStats = async (studytrack, startDate, studentnumbers, years) => {
   const providercode = mapToProviders([studytrack])[0]
   const credits = await getCreditsForMajors(providercode, startDate, studentnumbers)
-
   let graphStats = new Array(years.length).fill(0)
   let tableStats = getYearsObject(years)
 
@@ -229,6 +292,37 @@ const getMajorStudentsStats = async (studytrack, startDate, studentnumbers, year
     graphStats[indexOf(years, attainmentYear)] += credits || 0
     tableStats[attainmentYear] += credits || 0
   })
+
+  return { graphStats, tableStats }
+}
+
+const getNonMajorStudentsStats = async (studytrack, startDate, studentnumbers, years) => {
+  const providercode = mapToProviders([studytrack])[0]
+  const credits = await getCreditsForNonMajors(providercode, startDate, studentnumbers)
+  let graphStats = new Array(years.length).fill(0)
+  let tableStats = getYearsObject(years)
+
+  credits.forEach(({ attainment_date, credits }) => {
+    const attainmentYear = attainment_date.getFullYear()
+    graphStats[indexOf(years, attainmentYear)] += credits || 0
+    tableStats[attainmentYear] += credits || 0
+  })
+
+  return { graphStats, tableStats }
+}
+
+const getTransferredCreditStats = async (studytrack, startDate, years) => {
+  const providercode = mapToProviders([studytrack])[0]
+  const credits = await getTransferredCredits(providercode, startDate)
+  let graphStats = new Array(years.length).fill(0)
+  let tableStats = getYearsObject(years)
+
+  credits.forEach(({ attainment_date, credits }) => {
+    const attainmentYear = attainment_date.getFullYear()
+    graphStats[indexOf(years, attainmentYear)] += credits || 0
+    tableStats[attainmentYear] += credits || 0
+  })
+
   return { graphStats, tableStats }
 }
 
@@ -249,8 +343,13 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
     true // transferred to students
   )
   const majors = await getMajorStudentsStats(studyprogramme, startDate, studentnumbers, years)
+  const nonMajors = await getNonMajorStudentsStats(studyprogramme, startDate, studentnumbers, years)
+  const transferred = await getTransferredCreditStats(studyprogramme, startDate, years)
 
-  const getTableStats = years => years.reverse().map(year => [year, majors.tableStats[year]])
+  const getTableStats = years =>
+    years
+      .reverse()
+      .map(year => [year, majors.tableStats[year], nonMajors.tableStats[year], transferred.tableStats[year]])
 
   return {
     id: studyprogramme,
@@ -261,12 +360,20 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
         name: 'Major students credits',
         data: majors.graphStats,
       },
+      {
+        name: 'Non-major students credits',
+        data: nonMajors.graphStats,
+      },
+      {
+        name: 'Transferred credits',
+        data: transferred.graphStats,
+      },
     ],
   }
 }
 
 const getBasicStatsForStudytrack = async ({ studyprogramme, startDate }) => {
-  const years = getYears(startDate.getFullYear())
+  const years = getYears(startDate.getFullYear()).reverse()
   const started = await getStartedStats(studyprogramme, startDate, years)
   const graduated = await getGraduatedStats(studyprogramme, startDate, years)
   const cancelled = await getCancelledStats(studyprogramme, startDate, years)
@@ -274,16 +381,14 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, startDate }) => {
   const transferredTo = await getTransferredToStats(studyprogramme, startDate, years)
 
   const getTableStats = years =>
-    years
-      .reverse()
-      .map(year => [
-        year,
-        started.tableStats[year],
-        graduated.tableStats[year],
-        cancelled.tableStats[year],
-        transferredAway.tableStats[year],
-        transferredTo.tableStats[year],
-      ])
+    years.map(year => [
+      year,
+      started.tableStats[year],
+      graduated.tableStats[year],
+      cancelled.tableStats[year],
+      transferredAway.tableStats[year],
+      transferredTo.tableStats[year],
+    ])
 
   return {
     id: studyprogramme,

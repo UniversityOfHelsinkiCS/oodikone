@@ -6,50 +6,34 @@ import LineGraph from './LineGraph'
 import BarChart from './BarChart'
 import DataTable from './DataTable'
 import InfoBox from '../../InfoBox'
-import { getProductivity } from '../../../redux/productivity'
-import { getThroughput } from '../../../redux/throughput'
 import { getBasicStats, getCreditStats } from '../../../redux/studyProgramme'
-import { getBachelors } from '../../../redux/studyProgrammeBachelors'
-import { useIsAdmin } from '../../../common/hooks'
+import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
 const basicStatsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
-const creditStatsTitles = ['', 'Major students credits']
+const creditStatsTitles = ['', 'Major students credits', 'Non major students credits', 'Transferred credits']
 
 const Overview = props => {
-  const {
-    studyprogramme,
-    basicStats,
-    creditStats,
-    dispatchGetProductivity,
-    dispatchGetThroughput,
-    dispatchGetBachelors,
-    dispatchGetBasicStats,
-    dispatchGetCreditStats,
-  } = props
-
-  const isAdmin = useIsAdmin()
+  const toolTips = InfotoolTips.Studyprogramme
+  const { studyprogramme, basicStats, creditStats, dispatchGetBasicStats, dispatchGetCreditStats } = props
 
   useEffect(() => {
-    dispatchGetProductivity(studyprogramme)
-    dispatchGetThroughput(studyprogramme)
     dispatchGetBasicStats(studyprogramme)
     dispatchGetCreditStats(studyprogramme)
-    if (isAdmin) dispatchGetBachelors(studyprogramme)
   }, [])
 
-  const getDivider = title => (
+  const getDivider = (title, toolTipText) => (
     <>
       <div className="divider">
         <Divider horizontal>{title}</Divider>
       </div>
-      <InfoBox content="testi" />
+      <InfoBox content={toolTips[toolTipText]} />
     </>
   )
 
   return (
     <div className="studyprogramme-overview">
-      {getDivider('Students of the studyprogramme')}
+      {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
       <div className="section-container">
         <LineGraph categories={basicStats?.data?.years} data={basicStats?.data?.graphStats} />
         <DataTable titles={basicStatsTitles} data={basicStats?.data?.tableStats} />
@@ -63,23 +47,12 @@ const Overview = props => {
   )
 }
 
-const mapStateToProps = ({
-  studyProgrammeProductivity,
-  studyProgrammeThroughput,
-  studyProgrammeBachelors,
-  studyProgramme,
-}) => ({
-  productivity: studyProgrammeProductivity,
-  throughput: studyProgrammeThroughput,
-  bachelors: studyProgrammeBachelors,
+const mapStateToProps = ({ studyProgramme }) => ({
   basicStats: studyProgramme?.basicStats,
   creditStats: studyProgramme?.creditStats,
 })
 
 export default connect(mapStateToProps, {
-  dispatchGetProductivity: getProductivity,
-  dispatchGetThroughput: getThroughput,
-  dispatchGetBachelors: getBachelors,
   dispatchGetBasicStats: getBasicStats,
   dispatchGetCreditStats: getCreditStats,
 })(Overview)
