@@ -1,13 +1,19 @@
 const sequelize = require('sequelize')
 const { Op } = sequelize
-const moment = require('moment')
 const { indexOf } = require('lodash')
-const { Credit, Course, Organization, Studyright, StudyrightElement, ElementDetail, Transfer } = require('../models')
-const { studentnumbersWithAllStudyrightElements } = require('./populations')
-const { semesterStart, semesterEnd } = require('../util/semester')
+const {
+  Credit,
+  Course,
+  Organization,
+  Studyright,
+  StudyrightElement,
+  ElementDetail,
+  Transfer,
+  Student,
+} = require('../models')
 const { mapToProviders } = require('../util/utils')
 
-const getCreditsForMajors = async (provider, since, studentnumbers) =>
+const getCreditsForStudyProgramme = async (provider, since) =>
   await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
     include: {
@@ -35,51 +41,50 @@ const getCreditsForMajors = async (provider, since, studentnumbers) =>
       },
       attainment_date: {
         [Op.gte]: since,
-      },
-      student_studentnumber: {
-        [Op.in]: studentnumbers,
       },
     },
   })
 
-const getCreditsForNonMajors = async (provider, since, studentnumbers) =>
-  await Credit.findAll({
-    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
-    include: {
-      model: Course,
-      attributes: ['code'],
-      required: true,
-      where: {
-        is_study_module: false,
-      },
-      include: {
-        model: Organization,
-        attributes: [],
-        required: true,
-        where: {
-          code: provider,
+const formatStudyright = studyright => {
+  const { studyrightid, studystartdate, enddate, graduated, prioritycode, extentcode, student } = studyright
+  return {
+    studyrightid,
+    studystartdate,
+    enddate,
+    graduated,
+    prioritycode,
+    extentcode,
+    studentnumber: student.studentnumber,
+  }
+}
+
+const getProgrammesStudents = async studyprogramme =>
+  (
+    await Studyright.findAll({
+      attributes: ['studyrightid', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode'],
+      include: [
+        {
+          model: StudyrightElement,
+          attributes: [],
+          required: true,
+          where: {
+            code: {
+              [Op.in]: [studyprogramme],
+            },
+          },
         },
-      },
-    },
-    where: {
-      credittypecode: {
-        [Op.notIn]: [10, 9, 7],
-      },
-      isStudyModule: {
-        [Op.not]: true,
-      },
-      attainment_date: {
-        [Op.gte]: since,
-      },
-      student_studentnumber: {
-        [Op.notIn]: studentnumbers,
-      },
-    },
-  })
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
+    })
+  ).map(formatStudyright)
 
 const getTransferredCredits = async (provider, since) =>
   await Credit.findAll({
-    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'credittypecode'],
+    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'credittypecode', 'student_studentnumber'],
     include: {
       model: Course,
       attributes: ['code'],
@@ -281,34 +286,42 @@ const getTransferredToStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
-const getMajorStudentsStats = async (studytrack, startDate, studentnumbers, years) => {
-  const providercode = mapToProviders([studytrack])[0]
-  const credits = await getCreditsForMajors(providercode, startDate, studentnumbers)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
+const isMajorStudentCredit = (studyright, attainment_date) =>
+  studyright &&
+  (studyright.prioritycode === 1 || studyright.prioritycode === 30) && // Is studyright state = MAIN or state = GRADUATED
+  studyright.studystartdate <= attainment_date && // Has the credit been attained after studying in the programme started
+  studyright.enddate >= attainment_date && // Has the credit been attained before the studyright ended
+  (!studyright.canceldate || studyright.canceldate >= attainment_date) // If the studyright was cancelled, was the credit attained before it was cancelled
 
-  credits.forEach(({ attainment_date, credits }) => {
+const getRegularCreditStats = async (studytrack, startDate, years) => {
+  const providercode = mapToProviders([studytrack])[0]
+  const studyrights = await getProgrammesStudents(studytrack)
+  const credits = await getCreditsForStudyProgramme(providercode, startDate)
+
+  let majors = {
+    graphStats: new Array(years.length).fill(0),
+    tableStats: getYearsObject(years),
+  }
+
+  let nonMajors = {
+    graphStats: new Array(years.length).fill(0),
+    tableStats: getYearsObject(years),
+  }
+
+  // Map all credits for the studyprogramme and divide them into major students' and nonmajors' credits by year
+  credits.forEach(({ student_studentnumber, attainment_date, credits }) => {
+    const studyright = studyrights.find(studyright => studyright.studentnumber == student_studentnumber)
     const attainmentYear = attainment_date.getFullYear()
-    graphStats[indexOf(years, attainmentYear)] += credits || 0
-    tableStats[attainmentYear] += credits || 0
+    if (isMajorStudentCredit(studyright, attainment_date)) {
+      majors.graphStats[indexOf(years, attainmentYear)] += credits || 0
+      majors.tableStats[attainmentYear] += credits || 0
+    } else {
+      nonMajors.graphStats[indexOf(years, attainmentYear)] += credits || 0
+      nonMajors.tableStats[attainmentYear] += credits || 0
+    }
   })
 
-  return { graphStats, tableStats }
-}
-
-const getNonMajorStudentsStats = async (studytrack, startDate, studentnumbers, years) => {
-  const providercode = mapToProviders([studytrack])[0]
-  const credits = await getCreditsForNonMajors(providercode, startDate, studentnumbers)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
-
-  credits.forEach(({ attainment_date, credits }) => {
-    const attainmentYear = attainment_date.getFullYear()
-    graphStats[indexOf(years, attainmentYear)] += credits || 0
-    tableStats[attainmentYear] += credits || 0
-  })
-
-  return { graphStats, tableStats }
+  return { majors, nonMajors }
 }
 
 const getTransferredCreditStats = async (studytrack, startDate, years) => {
@@ -328,22 +341,7 @@ const getTransferredCreditStats = async (studytrack, startDate, years) => {
 
 const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
   const years = getYears(startDate.getFullYear())
-  const year = 1950
-  const since = `${year}-${semesterStart['FALL']}`
-  const endDate = `${moment(new Date(), 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
-  // This includes ALL students: exchange students, the ones that have transferred to program, the ones
-  // with non-degree studyright and the ones that have cancelled their studyright
-  const studentnumbers = await studentnumbersWithAllStudyrightElements(
-    [studyprogramme],
-    since,
-    endDate,
-    true, // exchange students
-    true, // cancelled students
-    true, // non-degree students
-    true // transferred to students
-  )
-  const majors = await getMajorStudentsStats(studyprogramme, startDate, studentnumbers, years)
-  const nonMajors = await getNonMajorStudentsStats(studyprogramme, startDate, studentnumbers, years)
+  const { majors, nonMajors } = await getRegularCreditStats(studyprogramme, startDate, years)
   const transferred = await getTransferredCreditStats(studyprogramme, startDate, years)
 
   const getTableStats = years =>
@@ -353,7 +351,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
 
   return {
     id: studyprogramme,
-    years,
+    years: years.reverse(),
     tableStats: getTableStats(years),
     graphStats: [
       {
