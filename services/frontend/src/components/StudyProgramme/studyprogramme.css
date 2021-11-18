@@ -1,0 +1,20 @@
+.studyprogramme-overview .divider {
+  margin-top: 4em;
+}
+
+.studyprogramme-overview .section-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.studyprogramme-overview .graph-container {
+  width: 60%;
+  height: 400px;
+}
+
+.studyprogramme-overview .table-container {
+  width: 35%;
+  height: 400px;
+  margin-top: 2em;
+  margin-left: 2em;
+}
