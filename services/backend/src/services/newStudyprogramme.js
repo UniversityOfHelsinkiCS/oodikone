@@ -13,6 +13,42 @@ const {
 } = require('../models')
 const { mapToProviders } = require('../util/utils')
 
+const formatStudyright = studyright => {
+  const { studyrightid, studystartdate, enddate, graduated, prioritycode, extentcode, student } = studyright
+  return {
+    studyrightid,
+    studystartdate,
+    enddate,
+    graduated,
+    prioritycode,
+    extentcode,
+    studentnumber: student.studentnumber,
+  }
+}
+
+const getYearsArray = since => {
+  const years = []
+  for (let i = since; i <= new Date().getFullYear(); i++) {
+    years.push(i)
+  }
+  return years
+}
+
+const getYearsObject = years => {
+  let yearsObject = {}
+  for (const year of years) {
+    yearsObject = { ...yearsObject, [year]: 0 }
+  }
+  return yearsObject
+}
+
+const getStatsBasis = years => {
+  return {
+    graphStats: new Array(years.length).fill(0),
+    tableStats: getYearsObject(years),
+  }
+}
+
 const getCreditsForStudyProgramme = async (provider, since) =>
   await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
@@ -44,19 +80,6 @@ const getCreditsForStudyProgramme = async (provider, since) =>
       },
     },
   })
-
-const formatStudyright = studyright => {
-  const { studyrightid, studystartdate, enddate, graduated, prioritycode, extentcode, student } = studyright
-  return {
-    studyrightid,
-    studystartdate,
-    enddate,
-    graduated,
-    prioritycode,
-    extentcode,
-    studentnumber: student.studentnumber,
-  }
-}
 
 const getProgrammesStudents = async studyprogramme =>
   (
@@ -110,22 +133,6 @@ const getTransferredCredits = async (provider, since) =>
       },
     },
   })
-
-const getYears = since => {
-  const years = []
-  for (let i = since; i <= new Date().getFullYear(); i++) {
-    years.push(i)
-  }
-  return years
-}
-
-const getYearsObject = years => {
-  let yearsObject = {}
-  for (const year of years) {
-    yearsObject = { ...yearsObject, [year]: 0 }
-  }
-  return yearsObject
-}
 
 const startedStudyrights = async (studytrack, since) =>
   await Studyright.findAll({
@@ -220,8 +227,7 @@ const transfersTo = async (studytrack, startDate) => {
 
 const getGraduatedStats = async (studytrack, startDate, years) => {
   const studyrights = await graduatedStudyRights(studytrack, startDate)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
+  const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ enddate }) => {
     const graduationYear = enddate.getFullYear()
@@ -233,8 +239,7 @@ const getGraduatedStats = async (studytrack, startDate, years) => {
 
 const getStartedStats = async (studytrack, startDate, years) => {
   const studyrights = await startedStudyrights(studytrack, startDate)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
+  const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ studystartdate }) => {
     const startYear = studystartdate.getFullYear()
@@ -246,8 +251,7 @@ const getStartedStats = async (studytrack, startDate, years) => {
 
 const getCancelledStats = async (studytrack, startDate, years) => {
   const studyrights = await cancelledStudyRights(studytrack, startDate)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
+  const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ canceldate }) => {
     const cancelYear = canceldate.getFullYear()
@@ -260,8 +264,7 @@ const getCancelledStats = async (studytrack, startDate, years) => {
 
 const getTransferredAwayStats = async (studytrack, startDate, years) => {
   const studyrights = await transfersAway(studytrack, startDate)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
+  const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ transferdate }) => {
     const transferYear = transferdate.getFullYear()
@@ -274,8 +277,7 @@ const getTransferredAwayStats = async (studytrack, startDate, years) => {
 
 const getTransferredToStats = async (studytrack, startDate, years) => {
   const studyrights = await transfersTo(studytrack, startDate)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
+  const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ transferdate }) => {
     const transferYear = transferdate.getFullYear()
@@ -298,15 +300,8 @@ const getRegularCreditStats = async (studytrack, startDate, years) => {
   const studyrights = await getProgrammesStudents(studytrack)
   const credits = await getCreditsForStudyProgramme(providercode, startDate)
 
-  let majors = {
-    graphStats: new Array(years.length).fill(0),
-    tableStats: getYearsObject(years),
-  }
-
-  let nonMajors = {
-    graphStats: new Array(years.length).fill(0),
-    tableStats: getYearsObject(years),
-  }
+  let majors = getStatsBasis(years)
+  let nonMajors = getStatsBasis(years)
 
   // Map all credits for the studyprogramme and divide them into major students' and nonmajors' credits by year
   credits.forEach(({ student_studentnumber, attainment_date, credits }) => {
@@ -327,8 +322,7 @@ const getRegularCreditStats = async (studytrack, startDate, years) => {
 const getTransferredCreditStats = async (studytrack, startDate, years) => {
   const providercode = mapToProviders([studytrack])[0]
   const credits = await getTransferredCredits(providercode, startDate)
-  let graphStats = new Array(years.length).fill(0)
-  let tableStats = getYearsObject(years)
+  const { graphStats, tableStats } = getStatsBasis(years)
 
   credits.forEach(({ attainment_date, credits }) => {
     const attainmentYear = attainment_date.getFullYear()
@@ -340,7 +334,7 @@ const getTransferredCreditStats = async (studytrack, startDate, years) => {
 }
 
 const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
-  const years = getYears(startDate.getFullYear())
+  const years = getYearsArray(startDate.getFullYear())
   const { majors, nonMajors } = await getRegularCreditStats(studyprogramme, startDate, years)
   const transferred = await getTransferredCreditStats(studyprogramme, startDate, years)
 
@@ -371,7 +365,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
 }
 
 const getBasicStatsForStudytrack = async ({ studyprogramme, startDate }) => {
-  const years = getYears(startDate.getFullYear()).reverse()
+  const years = getYearsArray(startDate.getFullYear()).reverse()
   const started = await getStartedStats(studyprogramme, startDate, years)
   const graduated = await getGraduatedStats(studyprogramme, startDate, years)
   const cancelled = await getCancelledStats(studyprogramme, startDate, years)
