@@ -76,8 +76,17 @@ const AgeFilter = () => {
 
   const active = Object.values(names).some(name => Object.keys(activeFilters).includes(name))
 
+  const infoText = null
+
   return (
-    <FilterCard title="Age" active={active} className="total-age-filter" contextKey={contextKey} name="ageFilter">
+    <FilterCard
+      title="Age"
+      active={active}
+      className="total-age-filter"
+      contextKey={contextKey}
+      name="ageFilter"
+      info={infoText}
+    >
       <Form>
         <div className="card-content">
           {Object.keys(currentValue).map(key => (

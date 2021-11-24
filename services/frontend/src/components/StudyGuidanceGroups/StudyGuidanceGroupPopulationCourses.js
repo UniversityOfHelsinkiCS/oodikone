@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Segment, Button } from 'semantic-ui-react'
-import InfoBox from 'components/InfoBox'
+import InfoBox from 'components/Info/InfoBox'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import PopulationCourseStats from 'components/PopulationCourseStats'
 import useCourseFilter from 'components/FilterTray/filters/Courses/useCourseFilter'

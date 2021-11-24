@@ -59,6 +59,11 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
     setSemesters([])
   }
 
+  const infoText = {
+    label: 'Filter students present or absent',
+    short: 'Filter students based on if they are present or absent in certain semester/semesters.',
+  }
+
   return (
     <FilterCard
       title="Enrollment Status"
@@ -66,6 +71,7 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
       active={active}
       footer={<ClearFilterButton disabled={!status && !semesters.length} onClick={clear} name={name} />}
       name={name}
+      info={infoText}
     >
       <div className="card-content">
         <Form>

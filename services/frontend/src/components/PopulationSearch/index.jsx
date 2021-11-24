@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import PopulationSearchForm from './PopulationSearchForm'
 import PopulationSearchHistory from './PopulationSearchHistory'
 import ProgressBar from '../ProgressBar'
-import InfoBox from '../InfoBox'
+import InfoBox from '../Info/InfoBox'
 import { useProgress } from '../../common/hooks'
 import infotoolTips from '../../common/InfoToolTips'
 

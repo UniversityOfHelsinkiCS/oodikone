@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { Tab } from 'semantic-ui-react'
 import { useTabChangeAnalytics } from '../../../common/hooks'
-import InfoBox from '../../InfoBox'
+import InfoBox from '../../Info/InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
 import infotooltips from '../../../common/InfoToolTips'

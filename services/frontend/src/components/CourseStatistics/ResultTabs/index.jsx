@@ -6,7 +6,7 @@ import { dataSeriesType, viewModeNames } from './Panes/util'
 import PassRate from './Panes/passRate'
 import Distribution from './Panes/distribution'
 import Tables from './Panes/tables'
-import InfoBox from '../../InfoBox'
+import InfoBox from '../../Info/InfoBox'
 import { useTabs } from '../../../common/hooks'
 
 import './resultTabs.css'
