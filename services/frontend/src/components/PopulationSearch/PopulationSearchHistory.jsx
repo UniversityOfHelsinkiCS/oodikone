@@ -12,7 +12,7 @@ import TSA from '../../common/tsa'
 import './populationSearch.css'
 import infotooltips from '../../common/InfoToolTips'
 import { getTextIn } from '../../common'
-import InfoBox from '../InfoBox'
+import InfoBox from '../Info/InfoBox'
 import FilterActiveNote from './FilterActiveNote'
 
 const PopulationsQueryTSA = ({ programmeCode, unitData }) => {

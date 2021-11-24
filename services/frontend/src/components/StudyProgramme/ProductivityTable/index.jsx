@@ -4,7 +4,7 @@ import { Table, Header, Grid, Label, Segment, Dropdown } from 'semantic-ui-react
 import { connect } from 'react-redux'
 import { shape, number, arrayOf, bool, string, oneOfType } from 'prop-types'
 import { getProductivity } from '../../../redux/productivity'
-import InfoBox from '../../InfoBox'
+import InfoBox from '../../Info/InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 import './productivityTable.css'
 

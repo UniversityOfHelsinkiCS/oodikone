@@ -41,6 +41,11 @@ export default () => {
 
   const clearButtonDisabled = startDate === label && endDate === label
 
+  const infoText = {
+    label: 'Selected date range only.',
+    short: 'Include course credits from the selected date range only. Does not filter out students.',
+  }
+
   return (
     <FilterCard
       title="Date of Course Credits"
@@ -48,10 +53,8 @@ export default () => {
       footer={<ClearFilterButton disabled={clearButtonDisabled} onClick={reset} name={name} />}
       active={!clearButtonDisabled}
       name={name}
+      info={infoText}
     >
-      <div className="description-text">
-        Include course credits from the selected date range only. Does not filter out students.
-      </div>
       <div className="card-content" style={{ marginTop: '0.5rem' }}>
         <Form>
           <Form.Field>
@@ -67,3 +70,6 @@ export default () => {
     </FilterCard>
   )
 }
+
+// <div className="description-text"></div>
+// Include course credits from the selected date range only. Does not filter out students.

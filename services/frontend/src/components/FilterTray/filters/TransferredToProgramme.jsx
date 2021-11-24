@@ -11,7 +11,7 @@ export default () => {
   const analytics = useAnalytics()
   const [value, setValue] = useState(0)
   const name = 'transferredToProgrammeFilter'
-  const active = value !== null
+  const active = value !== null && value !== 0
 
   const filterIsActive = name in activeFilters
   const prevValue = usePrevious(filterIsActive)
@@ -38,13 +38,20 @@ export default () => {
 
   const toggle = buttonValue => () => setValue(prev => (prev === buttonValue ? null : buttonValue))
 
+  const infoText = {
+    label: 'Include and exclude students from this program',
+    short: 'Possibility to exclude or include students who have transferred into this program',
+  }
+
   return (
     <FilterCard
       title="Transfer Status"
       contextKey={name}
       active={active}
+      className="total-transfer-filter"
       footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} name={name} />}
       name={name}
+      info={infoText}
     >
       <Form>
         <div className="card-content">
@@ -62,7 +69,7 @@ export default () => {
               checked={value === 1}
               onChange={toggle(1)}
               data-cy={`${name}-have`}
-              style={{ margin: '0.5rem 0' }}
+              style={{ margin: '0.5rem 0.5rem' }}
             />
             <Radio
               label="Not Transferred"

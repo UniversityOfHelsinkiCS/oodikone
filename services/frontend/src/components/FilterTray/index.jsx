@@ -15,7 +15,7 @@ const FilterTray = ({ children, filterSet, visible = true }) => {
   return (
     <>
       <div style={{ display: 'inline-flex', alignItems: 'flex-start', width: '100%' }}>
-        <Segment style={{ marginLeft: '0.5rem', width: '12rem', position: 'sticky', top: '10px' }}>
+        <Segment style={{ marginLeft: '0.5rem', width: '16rem', position: 'sticky', top: '10px' }}>
           <Header size="small" style={{ textAlign: 'center' }} data-cy="filtered-students">
             Filter students
           </Header>

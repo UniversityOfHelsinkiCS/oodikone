@@ -8,7 +8,7 @@ FilterTrayContext.displayName = 'Filter Tray'
 
 export const FilterTrayProvider = ({ children }) => {
   // transferredToProgrammeFilter is open by default since it is also active by default
-  const [state, setState] = useState({ transferredToProgrammeFilter: true })
+  const [state, setState] = useState({ transferredToProgrammeFilter: false })
   return <FilterTrayContext.Provider value={[state, setState]}>{children}</FilterTrayContext.Provider>
 }
 

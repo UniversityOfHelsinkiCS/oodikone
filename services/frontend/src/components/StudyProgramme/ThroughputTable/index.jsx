@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { flatten, uniq, range } from 'lodash'
 import { getUserIsAdmin } from '../../../common'
 import { isDev } from '../../../conf'
-import InfoBox from '../../InfoBox'
+import InfoBox from '../../Info/InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
 
 const getMonths = year => {
