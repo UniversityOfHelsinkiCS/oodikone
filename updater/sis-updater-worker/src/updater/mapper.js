@@ -149,11 +149,13 @@ const creditMapper =
       module_group_id,
       nodes,
       study_right_id,
+      attainment_language_urn,
     } = attainment
 
     const responsibleOrg = organisations.find(o => o.roleUrn === 'urn:code:organisation-role:responsible-organisation')
     const attainmentUniOrg = getUniOrgId(responsibleOrg.organisationId)
     const targetSemester = getSemesterByDate(new Date(attainment_date))
+    const language = attainment_language_urn.split(':').pop()
 
     if (!targetSemester) return null
 
@@ -195,6 +197,7 @@ const creditMapper =
       semester_composite: targetSemester.composite,
       isStudyModule,
       org: attainmentUniOrg,
+      language: language,
     }
   }
 
