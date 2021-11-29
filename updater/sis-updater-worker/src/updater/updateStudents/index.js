@@ -360,14 +360,16 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
           ...course.dataValues,
           id: course.id.concat('-ay'),
           code: 'AY'.concat(course.code),
-          substitutions: [course.id],
+          substitutions: course[course.id],
         })
 
-        const subs = [...course.substitutions, course.id.concat('-ay')]
-        coursesToBeUpdated.set(course.code, {
-          ...course.dataValues,
-          substitutions: subs,
-        })
+        if (!course.substitutions.include(course.id.concat('-ay'))) {
+          const subs = [...course.substitutions, course.id.concat('-ay')]
+          coursesToBeUpdated.set(course.code, {
+            ...course.dataValues,
+            substitutions: subs,
+          })
+        }
 
         courseCodeToAyCodelessId.set('AY'.concat(course.code), course.id.concat('-ay'))
         const courseProvider = await CourseProvider.findOne({
