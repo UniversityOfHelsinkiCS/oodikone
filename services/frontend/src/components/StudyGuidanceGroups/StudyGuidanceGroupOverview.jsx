@@ -70,6 +70,7 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
                 />
               ) : (
                 <Datetime
+                  className="studyguidancegroupoverview__yeartagselector"
                   name={tagName}
                   dateFormat="YYYY"
                   timeFormat={false}
