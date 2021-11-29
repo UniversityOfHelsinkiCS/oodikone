@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Radio } from 'semantic-ui-react'
 import FilterCard from './common/FilterCard'
-import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 import { usePrevious } from '../../../common/hooks'
@@ -11,7 +10,7 @@ export default () => {
   const analytics = useAnalytics()
   const [value, setValue] = useState(0)
   const name = 'transferredToProgrammeFilter'
-  const active = value !== null && value !== 0
+  const active = value !== null
 
   const filterIsActive = name in activeFilters
   const prevValue = usePrevious(filterIsActive)
@@ -43,13 +42,13 @@ export default () => {
     short: 'Possibility to exclude or include students who have transferred into this program',
   }
 
+  const rightMargin = { margin: '0 0.5rem 0' }
   return (
     <FilterCard
       title="Transfer Status"
       contextKey={name}
       active={active}
       className="total-transfer-filter"
-      footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} name={name} />}
       name={name}
       info={infoText}
     >
@@ -62,6 +61,7 @@ export default () => {
               checked={value === null}
               onChange={toggle(null)}
               data-cy={`${name}-all`}
+              style={rightMargin}
             />
             <Radio
               label="Transferred"
@@ -69,7 +69,7 @@ export default () => {
               checked={value === 1}
               onChange={toggle(1)}
               data-cy={`${name}-have`}
-              style={{ margin: '0.5rem 0.5rem' }}
+              style={rightMargin}
             />
             <Radio
               label="Not Transferred"
@@ -77,6 +77,7 @@ export default () => {
               checked={value === 0}
               onChange={toggle(0)}
               data-cy={`${name}-havenot`}
+              style={rightMargin}
             />
           </Form.Field>
         </div>
