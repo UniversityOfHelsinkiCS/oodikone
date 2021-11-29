@@ -288,7 +288,7 @@ const PopulationStudents = ({
       },
       mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
     )
-    const mandatoryCourseData = [totals, filteredStudents]
+    const mandatoryCourseData = [totals, ...filteredStudents]
 
     const panesAvailable = [
       {
