@@ -1,19 +1,16 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Dropdown } from 'semantic-ui-react'
-import FilterCard from '../common/FilterCard'
-import { getTextIn } from '../../../../common'
+import fp from 'lodash/fp'
+import { getTextIn, getStudentToTargetCourseDateMap, getNewestProgramme } from '../../../../common'
 import useLanguage from '../../../LanguagePicker/useLanguage'
-import useProgrammeFilter from './useProgrammeFilter'
-import useFilters from '../../useFilters'
+import createFilter from '../createFilter'
 
-const Programme = () => {
-  const { programmes, selectedProgrammes, studentToProgrammeMap, selectFilterProgramme, removeFilterProgramme } =
-    useProgrammeFilter()
-  const { removeFilter, addFilter } = useFilters()
+const ProgrammeFilterCard = ({ options, onOptionsChange, programmes }) => {
   const { language } = useLanguage()
-  const name = 'programmeFilter'
+  const { selectedProgrammes } = options
+  const name = 'programmeFilterCard'
 
-  const options = useMemo(
+  const dropdownOptions = useMemo(
     () =>
       programmes
         .map(program => ({
@@ -26,35 +23,74 @@ const Programme = () => {
   )
 
   const handleChange = (_, { value }) => {
-    value.filter(code => selectedProgrammes.findIndex(p => p.code === code) === -1).forEach(selectFilterProgramme)
-
-    selectedProgrammes.filter(({ code }) => value.indexOf(code) === -1).forEach(removeFilterProgramme)
+    onOptionsChange({
+      selectedProgrammes: value,
+    })
   }
 
-  useEffect(() => {
-    if (selectedProgrammes.length === 0) {
-      removeFilter(name)
-    } else {
-      addFilter(name, ({ studentNumber }) => {
-        return selectedProgrammes.findIndex(p => p.code === studentToProgrammeMap[studentNumber]) !== -1
-      })
-    }
-  }, [selectedProgrammes, studentToProgrammeMap])
-
   return (
-    <FilterCard title="Programme" active={selectedProgrammes.length > 0} className="programmes-filter" name={name}>
-      <Dropdown
-        options={options}
-        placeholder="Select Programme"
-        onChange={handleChange}
-        button
-        value={selectedProgrammes.map(p => p.code)}
-        name={name}
-        closeOnChange
-        multiple
-      />
-    </FilterCard>
+    <Dropdown
+      options={dropdownOptions}
+      placeholder="Select Programme"
+      onChange={handleChange}
+      button
+      value={selectedProgrammes}
+      name={name}
+      closeOnChange
+      multiple
+    />
   )
 }
 
-export default Programme
+const createStudentToProgrammeMap = (courses, students, elementDetails) => {
+  if (!elementDetails) {
+    return {}
+  }
+
+  const studentToTargetCourseDateMap = getStudentToTargetCourseDateMap(students, courses)
+
+  return fp.flow(
+    fp.map(student => [
+      student,
+      getNewestProgramme(student.studyrights, student.studentNumber, studentToTargetCourseDateMap, elementDetails),
+    ]),
+    fp.reduce(
+      ({ programmeMap, studentToProgrammeMap }, [student, programme]) => {
+        return {
+          programmeMap: { ...programmeMap, [programme.code]: programme },
+          studentToProgrammeMap: {
+            ...studentToProgrammeMap,
+            [student.studentNumber]: programme.code,
+          },
+        }
+      },
+      { programmeMap: {}, studentToProgrammeMap: {} }
+    ),
+    ({ programmeMap, studentToProgrammeMap }) => ({
+      programmes: Object.values(programmeMap),
+      studentToProgrammeMap,
+    })
+  )(students)
+}
+
+export default (courses, elementDetails) =>
+  createFilter({
+    key: 'Programme',
+
+    defaultOptions: {
+      selectedProgrammes: [],
+    },
+
+    precompute: [
+      students => createStudentToProgrammeMap(courses, students, elementDetails ?? []),
+      [courses, elementDetails],
+    ],
+
+    isActive: ({ selectedProgrammes }) => selectedProgrammes.length > 0,
+
+    filter({ studentNumber }, { selectedProgrammes }, { studentToProgrammeMap }) {
+      return selectedProgrammes.findIndex(pcode => pcode === studentToProgrammeMap[studentNumber]) !== -1
+    },
+
+    render: (props, { programmes }) => <ProgrammeFilterCard {...props} programmes={programmes} />,
+  })

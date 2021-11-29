@@ -1,70 +1,60 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
-import ClearFilterButton from './common/ClearFilterButton'
-import FilterCard from './common/FilterCard'
-import useFilters from '../useFilters'
-import useAnalytics from '../useAnalytics'
+import createFilter from './createFilter'
 
-export default () => {
-  const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
-  const analytics = useAnalytics()
-  const [value, setValue] = useState(null)
-  const name = 'genderFilter'
+const GENDERS = {
+  female: { label: 'Female', value: 2 },
+  male: { label: 'Male', value: 1 },
+  other: { label: 'Other', value: 3 },
+  unknown: { label: 'Unknown', value: 0 },
+}
 
-  const genderCodes = {
-    female: { label: 'Female', value: 2 },
-    male: { label: 'Male', value: 1 },
-    other: { label: 'Other', value: 3 },
-    unknown: { label: 'Unknown', value: 0 },
-  }
+const GenderFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
+  const name = 'genderFilterCard'
 
-  useEffect(() => {
-    if (
-      !Object.values(genderCodes)
-        .map(gc => gc.value)
-        .includes(value)
-    ) {
-      removeFilter(name)
-      analytics.clearFilter(name)
-    } else {
-      addFilter(name, student => value === Number(student.gender_code))
-      analytics.setFilter(name, value)
-    }
-  }, [value])
+  const { selected } = options
 
-  const count = genderCode => withoutFilter(name).filter(student => Number(student.gender_code) === genderCode).length
+  const count = genderCode => withoutSelf().filter(student => Number(student.gender_code) === genderCode).length
 
-  const options = Object.entries(genderCodes).map(([key, gender]) => ({
+  const dropdownOptions = Object.entries(GENDERS).map(([key, gender]) => ({
     key,
     text: `${gender.label} (${count(gender.value)})`,
     value: gender.value,
   }))
 
   return (
-    <FilterCard
-      title="Gender"
-      contextKey="genderFilter"
-      footer={<ClearFilterButton disabled={!value} onClick={() => setValue(null)} name={name} />}
-      active={Object.keys(activeFilters).includes(name)}
-      name={name}
-    >
-      <div className="card-content">
-        <Form>
-          <Dropdown
-            options={options}
-            value={value}
-            onChange={(_, { value: inputValue }) => setValue(inputValue)}
-            placeholder="Choose Gender"
-            className="mini"
-            selection
-            selectOnBlur={false}
-            fluid
-            button
-            clearable
-            data-cy={`${name}-dropdown`}
-          />
-        </Form>
-      </div>
-    </FilterCard>
+    <div className="card-content">
+      <Form>
+        <Dropdown
+          options={dropdownOptions}
+          value={selected}
+          onChange={(_, { value: inputValue }) => onOptionsChange({ selected: inputValue })}
+          placeholder="Choose Gender"
+          className="mini"
+          selection
+          selectOnBlur={false}
+          fluid
+          button
+          clearable
+          data-cy={`${name}-dropdown`}
+        />
+      </Form>
+    </div>
   )
 }
+
+export default createFilter({
+  key: 'Gender',
+
+  defaultOptions: {
+    selected: '',
+  },
+
+  isActive: ({ selected }) => selected !== '',
+
+  filter(student, { selected }) {
+    return selected === Number(student.gender_code)
+  },
+
+  component: GenderFilterCard,
+})

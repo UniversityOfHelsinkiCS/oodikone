@@ -5,12 +5,11 @@ import { shape, string } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import { useLanguage } from '../../../common/hooks'
 
 const PassFailRow = ({ courseStats }) => {
   const language = useLanguage()
-  const { courseIsSelected } = useCourseFilter()
+  // FIXME const { courseIsSelected } = useCourseFilter()
   const { onGoToCourseStatisticsClick, onCourseNameCellClick } = UsePopulationCourseContext()
   const { course, stats } = courseStats
   const { code, name } = course
@@ -25,7 +24,7 @@ const PassFailRow = ({ courseStats }) => {
     passedOfPopulation,
     triedOfPopulation,
   } = stats
-  const isActive = courseIsSelected(course.code)
+  const isActive = false // FIXME courseIsSelected(course.code)
   return (
     <Table.Row key={code} active={isActive} data-cy={name.fi}>
       <Popup

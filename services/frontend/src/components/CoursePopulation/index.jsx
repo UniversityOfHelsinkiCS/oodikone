@@ -9,6 +9,7 @@ import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
 import { getFaculties } from '../../redux/faculties'
 import { getSemesters } from '../../redux/semesters'
+import { getElementDetails } from '../../redux/elementdetails'
 import PopulationStudents from '../PopulationStudents'
 import CoursePopulationGradeDist from './CoursePopulationGradeDist'
 import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
@@ -20,17 +21,26 @@ import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import InfoBox from '../Info/InfoBox'
 import FilterTray from '../FilterTray'
-import useFilters from '../FilterTray/useFilters'
-import useProgrammeFilter from '../FilterTray/filters/Programmes/useProgrammeFilter'
-import { CoursePopulationFilters } from '../FilterTray/FilterSets'
+import {
+  ageFilter,
+  gradeFilter,
+  genderFilter,
+  courseFilter,
+  creditsEarnedFilter,
+  programmeFilter,
+} from '../FilterTray/filters'
+import { FilterView } from '../FilterTray/useFilters'
 import useLanguage from '../LanguagePicker/useLanguage'
 import { queryParamsFromUrl } from '../../common/query'
 
 const CoursePopulation = ({
   getCoursePopulationDispatch,
   getSingleCourseStatsDispatch,
+  getElementDetails,
   studentData,
+  courseStatistics,
   pending,
+  elementDetails,
   history,
   courseData,
   getSemestersDispatch,
@@ -39,9 +49,6 @@ const CoursePopulation = ({
   getCustomPopulationCoursesByStudentnumbers,
 }) => {
   const { language } = useLanguage()
-  const { setAllStudents, filteredStudents } = useFilters()
-  const { setCourseCodes } = useProgrammeFilter()
-  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
 
   const [codes, setCodes] = useState([])
   const [headerYears, setYears] = useState('')
@@ -65,7 +72,7 @@ const CoursePopulation = ({
 
   // Pass students to filter context.
   useEffect(() => {
-    setAllStudents(studentData.students || [])
+    // setAllStudents(studentData.students || [])
 
     // Data fetching for courses of population tab
     if (!studentData.students) return
@@ -75,6 +82,7 @@ const CoursePopulation = ({
   }, [studentData.students])
 
   useEffect(() => {
+    getElementDetails()
     getSemestersDispatch()
   }, [])
 
@@ -108,7 +116,6 @@ const CoursePopulation = ({
         separate,
       })
       setCodes(parsedCourseCodes)
-      setCourseCodes(parsedCourseCodes)
       if (years) {
         setYears(years)
       } else {
@@ -152,7 +159,7 @@ const CoursePopulation = ({
     setIndex(indexes)
   }
 
-  const panels = [
+  const panels = filtered => [
     {
       key: 0,
       title: {
@@ -168,10 +175,10 @@ const CoursePopulation = ({
           <div ref={gradeDistRef}>
             <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
             <CoursePopulationGradeDist
-              selectedStudents={selectedStudents}
+              selectedStudents={filtered.map(s => s.studentNumber)}
               from={dateFrom}
               to={dateTo}
-              samples={studentData.students}
+              samples={filtered}
               codes={codes}
             />
           </div>
@@ -194,8 +201,8 @@ const CoursePopulation = ({
             <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
             <CustomPopulationProgrammeDist
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              samples={studentData.students}
-              selectedStudents={selectedStudents}
+              samples={filtered}
+              selectedStudents={filtered.map(s => s.studentNumber)}
             />
           </div>
         ),
@@ -214,7 +221,7 @@ const CoursePopulation = ({
       content: {
         content: (
           <div ref={programmeRef}>
-            <CustomPopulationCourses selectedStudents={selectedStudents} showFilter={false} />
+            <CustomPopulationCourses selectedStudents={filtered.map(s => s.studentNumber)} showFilter={false} />
           </div>
         ),
       },
@@ -234,8 +241,8 @@ const CoursePopulation = ({
           <div ref={creditGainRef}>
             <CoursePopulationCreditGainTable
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              selectedStudents={selectedStudents}
-              samples={studentData.students}
+              selectedStudents={filtered.map(s => s.studentNumber)}
+              samples={filtered}
               codes={codes}
               from={dateFrom}
               to={dateTo}
@@ -249,7 +256,7 @@ const CoursePopulation = ({
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Students ({selectedStudents.length})
+            Students ({filtered.length})
           </span>
         ),
       },
@@ -260,7 +267,8 @@ const CoursePopulation = ({
             <PopulationStudents
               variant="coursePopulation"
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              filteredStudents={studentData.students.filter(stu => selectedStudents.includes(stu.studentNumber))}
+              filteredStudents={filtered}
+              coursePopulation
               language={language}
               coursecode={codes}
             />
@@ -270,20 +278,38 @@ const CoursePopulation = ({
     },
   ]
 
+  const courses = JSON.parse(queryParamsFromUrl(history.location).coursecodes)
+
   return (
-    <FilterTray filterSet={<CoursePopulationFilters />}>
-      <div className="segmentContainer">
-        <Segment className="contentSegment">
-          <Header className="segmentTitle" size="large" textAlign="center">
-            Population of course {header}
-          </Header>
-          <Header className="segmentTitle" size="medium" textAlign="center">
-            {subHeader}
-          </Header>
-          <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
-        </Segment>
-      </div>
-    </FilterTray>
+    <FilterView
+      name="CoursePopulation"
+      filters={[
+        genderFilter,
+        ageFilter,
+        courseFilter(courseStatistics),
+        creditsEarnedFilter,
+        programmeFilter(courses, elementDetails),
+        gradeFilter(courses, dateFrom, dateTo),
+      ]}
+      students={studentData.students}
+    >
+      {filtered => (
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <FilterTray />
+          <div className="segmentContainer">
+            <Segment className="contentSegment">
+              <Header className="segmentTitle" size="large" textAlign="center">
+                Population of course {header}
+              </Header>
+              <Header className="segmentTitle" size="medium" textAlign="center">
+                {subHeader}
+              </Header>
+              <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels(filtered)} />
+            </Segment>
+          </div>
+        </div>
+      )}
+    </FilterView>
   )
 }
 
@@ -307,6 +333,7 @@ const mapStateToProps = ({
   singleCourseStats,
   populations,
   semesters,
+  populationCourses,
   auth: {
     token: { roles },
   },
@@ -315,7 +342,9 @@ const mapStateToProps = ({
     studentData: populations.data,
     pending: populations.pending,
     courseData: singleCourseStats.stats || {},
+    courseStatistics: populationCourses?.data?.coursestatistics,
     semesters: semesters.data,
+    elementDetails: populations?.data?.elementdetails?.data,
     isAdmin: getUserIsAdmin(roles),
   }
 }
@@ -326,6 +355,7 @@ export default withRouter(
     getSingleCourseStatsDispatch: getSingleCourseStats,
     getSemestersDispatch: getSemesters,
     getFacultiesDispatch: getFaculties,
+    getElementDetails,
     getCustomPopulationCoursesByStudentnumbers,
   })(CoursePopulation)
 )

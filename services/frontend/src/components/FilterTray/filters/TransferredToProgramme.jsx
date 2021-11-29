@@ -1,87 +1,64 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
-import FilterCard from './common/FilterCard'
-import useFilters from '../useFilters'
-import useAnalytics from '../useAnalytics'
-import { usePrevious } from '../../../common/hooks'
+import createFilter from './createFilter'
 
-export default () => {
-  const { addFilter, removeFilter, activeFilters } = useFilters()
-  const analytics = useAnalytics()
-  const [value, setValue] = useState(0)
-  const name = 'transferredToProgrammeFilter'
-  const active = value !== null
+const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
+  const { transferred } = options
 
-  const filterIsActive = name in activeFilters
-  const prevValue = usePrevious(filterIsActive)
+  const toggle = buttonValue => () =>
+    onOptionsChange({
+      transferred: transferred === buttonValue ? null : buttonValue,
+    })
 
-  const filterFn = wanted => student => student.transferredStudyright === wanted
-
-  useEffect(() => {
-    if (active) {
-      addFilter(name, filterFn(!!value))
-      analytics.setFilter(name, value)
-    } else {
-      removeFilter(name)
-      analytics.clearFilter(name)
-    }
-  }, [value])
-
-  useEffect(() => {
-    // bit of a hack but basically to keep visual of the filter
-    // up to date with the actual state of the filter when controlled
-    // from outside. Better solution would be to treat context as one
-    // source of truth for filters.
-    if (prevValue && !filterIsActive) setValue(null)
-  }, [filterIsActive])
-
-  const toggle = buttonValue => () => setValue(prev => (prev === buttonValue ? null : buttonValue))
-
-  const infoText = {
-    label: 'Include and exclude students from this program',
-    short: 'Possibility to exclude or include students who have transferred into this program',
-  }
-
-  const rightMargin = { margin: '0 0.5rem 0' }
   return (
-    <FilterCard
-      title="Transfer Status"
-      contextKey={name}
-      active={active}
-      className="total-transfer-filter"
-      name={name}
-      info={infoText}
-    >
-      <Form>
-        <div className="card-content">
-          <Form.Field>
-            <Radio
-              label="All"
-              name="radioGroup"
-              checked={value === null}
-              onChange={toggle(null)}
-              data-cy={`${name}-all`}
-              style={rightMargin}
-            />
-            <Radio
-              label="Transferred"
-              name="radioGroup"
-              checked={value === 1}
-              onChange={toggle(1)}
-              data-cy={`${name}-have`}
-              style={rightMargin}
-            />
-            <Radio
-              label="Not Transferred"
-              name="radioGroup"
-              checked={value === 0}
-              onChange={toggle(0)}
-              data-cy={`${name}-havenot`}
-              style={rightMargin}
-            />
-          </Form.Field>
-        </div>
-      </Form>
-    </FilterCard>
+    <Form>
+      <div className="card-content">
+        <Form.Field>
+          <Radio
+            label="All"
+            name="radioGroup"
+            checked={transferred === null}
+            onChange={toggle(null)}
+            data-cy="transferred-to-programme-all"
+          />
+          <Radio
+            label="Transferred"
+            name="radioGroup"
+            checked={transferred === true}
+            onChange={toggle(true)}
+            data-cy="transferred-to-programme-have"
+            style={{ margin: '0.5rem 0' }}
+          />
+          <Radio
+            label="Not Transferred"
+            name="radioGroup"
+            checked={transferred === false}
+            onChange={toggle(false)}
+            data-cy="transferred-to-programme-havenot"
+          />
+        </Form.Field>
+      </div>
+    </Form>
   )
 }
+
+export default createFilter({
+  key: 'TransferredToProgramme',
+
+  title: 'Transferred to Programme',
+
+  info: {
+    label: 'Include and exclude students from this program',
+    short: 'Possibility to exclude or include students who have transferred into this program',
+  },
+
+  defaultOptions: {
+    transferred: null,
+  },
+
+  isActive: ({ transferred }) => transferred !== null,
+
+  filter: (student, { transferred }) => student.transferredStudyright === transferred,
+
+  component: TransferredToProgrammeFilterCard,
+})

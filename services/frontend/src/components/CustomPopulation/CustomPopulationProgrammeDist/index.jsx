@@ -5,7 +5,6 @@ import { arrayOf, string, shape } from 'prop-types'
 import SearchResultTable from '../../SearchResultTable'
 import { getNewestProgramme, getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import useProgrammeFilter from '../../FilterTray/filters/Programmes/useProgrammeFilter'
 import FilterToggleIcon from '../../FilterToggleIcon'
 
 const CustomPopulationProgrammeDist = ({
@@ -15,7 +14,10 @@ const CustomPopulationProgrammeDist = ({
   populationStatistics,
 }) => {
   const { language } = useLanguage()
-  const { selectedProgrammes, toggleFilterProgramme } = useProgrammeFilter()
+  // FIXME: const { selectedProgrammes, toggleFilterProgramme } = useProgrammeFilter()
+  const selectedProgrammes = []
+  const toggleFilterProgramme = () => {}
+
   const [tableRows, setRows] = useState([])
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import GraduatedFromProgramme from './filters/GraduatedFromProgramme'
 import TransferredToProgramme from './filters/TransferredToProgramme'
 import EnrollmentStatus from './filters/EnrollmentStatus'
 import CreditsEarned from './filters/CreditsEarned'
-import Gender from './filters/Gender'
+// import Gender from './filters/Gender'
 import StartYearAtUni from './filters/StartYearAtUni'
 import Courses from './filters/Courses'
 import Programmes from './filters/Programmes'
@@ -19,6 +19,7 @@ const Filters = ({ name, children }) => {
   useEffect(() => {
     analytics.setTarget(name)
   })
+
   return React.Children.toArray(children)
 }
 

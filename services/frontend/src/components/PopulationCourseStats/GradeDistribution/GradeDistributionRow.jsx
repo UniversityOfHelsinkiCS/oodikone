@@ -6,7 +6,6 @@ import { shape, string, number, arrayOf } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import { useLanguage } from '../../../common/hooks'
 
 const formatGradeDistribution = grades =>
@@ -25,14 +24,15 @@ const formatGradeDistribution = grades =>
 
 const CourseRow = ({ courseStatistics, gradeTypes }) => {
   const language = useLanguage()
-  const { courseIsSelected } = useCourseFilter()
+  // FIXME: Alternate implementation
+  // const { courseIsSelected } = useCourseFilter()
 
   const { onCourseNameCellClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
   const { course, grades } = courseStatistics
   const { name, code } = course
 
-  const isActive = courseIsSelected(course.code)
+  const isActive = false // FIXME courseIsSelected(course.code)
   let attempts = 0
   let failedGrades = 0
   let otherPassed = 0
