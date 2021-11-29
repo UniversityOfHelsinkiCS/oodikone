@@ -4,7 +4,6 @@ import { number, shape, string, func, bool } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import '../populationCourseStats.css'
-import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
@@ -64,10 +63,10 @@ const renderCumulativeStatistics = passingSemesters => (
 
 const PassingSemesterRow = ({ statistics, cumulative, onCourseNameClickFn }) => {
   const { language } = useLanguage()
-  const { courseIsSelected } = useCourseFilter()
+  // FIXME: const { courseIsSelected } = useCourseFilter()
   const { stats, course } = statistics
   const passingSemesters = cumulative ? stats.passingSemestersCumulative : stats.passingSemesters
-  const isActive = courseIsSelected(course.code)
+  const isActive = false // FIXME courseIsSelected(course.code)
 
   return (
     <Table.Row key={course.code} active={isActive}>

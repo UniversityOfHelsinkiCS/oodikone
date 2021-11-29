@@ -6,7 +6,6 @@ import { bool, instanceOf, func } from 'prop-types'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { getTextIn } from '../../../common'
-import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import useFilters from '../../FilterTray/useFilters'
 import StudentNameVisibilityToggle from '../../StudentNameVisibilityToggle'
 
@@ -26,7 +25,7 @@ const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
     UsePopulationCourseContext()
   const { language } = useSelector(({ settings }) => settings)
   const [page, setPage] = useState(0)
-  const { courseIsSelected } = useCourseFilter()
+  // FIXME: const { courseIsSelected } = useCourseFilter()
   const { filteredStudents } = useFilters()
 
   const hasCompleted = (courseCode, student) => {
@@ -133,13 +132,13 @@ const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
                         trigger={
                           <Table.Cell className="filterCell clickableCell">
                             <FilterToggleIcon
-                              isActive={courseIsSelected(col.code)}
+                              isActive={false /* FIXME courseIsSelected(col.code) */}
                               onClick={() => onCourseNameCellClick(col.code)}
                             />
                           </Table.Cell>
                         }
                         content={
-                          courseIsSelected(col.code) ? (
+                          /* FIXME courseIsSelected(col.code) */ false ? (
                             <span>
                               Poista rajaus kurssin <b>{getTextIn(col.name, language)}</b> perusteella
                             </span>

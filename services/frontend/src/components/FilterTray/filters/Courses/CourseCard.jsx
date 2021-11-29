@@ -1,69 +1,29 @@
-import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 import { Label, Dropdown, Button, Icon, Popup } from 'semantic-ui-react'
 import { getTextIn } from '../../../../common'
-import useCourseFilter from './useCourseFilter'
-import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
 import useLanguage from '../../../LanguagePicker/useLanguage'
+import { FilterType } from './filterType'
 
-const CourseCard = ({ courseStats }) => {
+const filterTexts = {
+  [FilterType.ALL]: { label: 'All' },
+  [FilterType.PASSED]: { label: 'Passed' },
+  [FilterType.PASSED_AFTER_FAILURE]: { label: 'Passed After Failure' },
+  [FilterType.FAILED]: { label: 'Failed' },
+  [FilterType.FAILED_MANY_TIMES]: { label: 'Failed Multiple Times' },
+  [FilterType.NOT_PARTICIPATED]: { label: 'Not Participated' },
+  [FilterType.DID_NOT_PASS]: { label: "Didn't Pass" },
+}
+
+const CourseCard = ({ course, filterType, onChange }) => {
   const { language } = useLanguage()
-  const { addFilter, removeFilter } = useFilters()
-  const { course, students } = courseStats
-  const { toggleCourseSelection } = useCourseFilter()
   const analytics = useAnalytics()
-  const [selectedOption, setSelectedOption] = useState(0)
-  const name = `courseFilter-${course.code}`
+  const name = 'course-filter'
 
-  const subFilters = [
-    {
-      label: 'All',
-      func: ({ studentNumber }) => Object.keys(students.all).includes(studentNumber),
-    },
-    {
-      label: 'Passed',
-      func: ({ studentNumber }) => Object.keys(students.passed).includes(studentNumber),
-    },
-    {
-      label: 'Passed After Failure',
-      func: ({ studentNumber }) => Object.keys(students.retryPassed).includes(studentNumber),
-      info: 'Student passed the course after failing it at least once.',
-    },
-    {
-      label: 'Failed',
-      func: ({ studentNumber }) => Object.keys(students.failed).includes(studentNumber),
-    },
-    {
-      label: 'Failed Many Times',
-      func: ({ studentNumber }) => Object.keys(students.failedMany).includes(studentNumber),
-    },
-    {
-      label: 'Not Participated',
-      func: ({ studentNumber }) => !Object.keys(students.all).includes(studentNumber),
-    },
-    {
-      label: "Didn't pass",
-      func: ({ studentNumber }) =>
-        !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
-      info: "Students that failed or didn't participate in the course",
-    },
-  ]
-
-  // Apply filter on mount or selection change.
-  useEffect(() => {
-    addFilter(name, subFilters[selectedOption].func)
-  }, [selectedOption])
-
-  // Remove filter on unmount.
-  useEffect(() => {
-    return () => removeFilter(name)
-  }, [])
-
-  const onClick = (_, { value }) => setSelectedOption(value)
+  const onClick = (_, { value }) => onChange(value)
 
   const clear = () => {
-    toggleCourseSelection(course.code)
+    onChange(null)
     analytics.clearFilter(course.code)
   }
 
@@ -73,8 +33,8 @@ const CourseCard = ({ courseStats }) => {
         {getTextIn(course.name, language)}
 
         <Dropdown
-          text={subFilters[selectedOption].label}
-          value={selectedOption}
+          text={filterTexts[filterType].label}
+          value={filterType}
           fluid
           className="mini"
           button
@@ -82,18 +42,18 @@ const CourseCard = ({ courseStats }) => {
           style={{ marginTop: '0.5rem' }}
         >
           <Dropdown.Menu>
-            {subFilters.map((option, i) => {
-              if (option.info) {
+            {Object.entries(filterTexts).map(([type, { label, info }]) => {
+              if (info) {
                 return (
                   <Popup
-                    key={option.label}
+                    key={label}
                     basic
-                    trigger={<Dropdown.Item text={option.label} value={i} onClick={onClick} />}
-                    content={option.info}
+                    trigger={<Dropdown.Item text={label} value={type} onClick={onClick} />}
+                    content={info}
                   />
                 )
               }
-              return <Dropdown.Item key={option.label} text={option.label} value={i} onClick={onClick} />
+              return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} />
             })}
           </Dropdown.Menu>
         </Dropdown>
@@ -106,10 +66,4 @@ const CourseCard = ({ courseStats }) => {
   )
 }
 
-CourseCard.propTypes = {
-  courseStats: PropTypes.shape({
-    course: PropTypes.object,
-    students: PropTypes.object,
-  }).isRequired,
-}
 export default CourseCard

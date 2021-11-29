@@ -1,48 +1,22 @@
-import React, { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
-import lodash from 'lodash'
+import React from 'react'
+import fp from 'lodash/fp'
 import { Form, Dropdown } from 'semantic-ui-react'
-import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
-import FilterCard from './common/FilterCard'
-import ClearFilterButton from './common/ClearFilterButton'
-import useFilters from '../useFilters'
-import useAnalytics from '../useAnalytics'
 import { getTextIn } from '../../../common'
+import createFilter from './createFilter'
 
-const EnrollmentStatus = ({ allSemesters, language }) => {
-  const [status, setStatus] = useState(null)
-  const [semesters, setSemesters] = useState([])
-  const { allStudents, addFilter, removeFilter } = useFilters()
-  const analytics = useAnalytics()
+const STATUS_OPTIONS = [
+  { key: 'enrl-status-present', text: 'Present', value: 1 },
+  { key: 'enrl-status-absent', text: 'Absent', value: 2 },
+]
+
+const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, language, semesterCodes }) => {
+  // const [status, setStatus] = useState(null)
+  // const [semesters, setSemesters] = useState([])
+  // const { allStudents, addFilter, removeFilter } = useFilters()
   const name = 'enrollmentStatusFilter'
-  const active = !!status && !!semesters.length
+  // const active = !!status && !!semesters.length
 
-  const statusOptions = [
-    { key: 'enrl-status-present', text: 'Present', value: 1 },
-    { key: 'enrl-status-absent', text: 'Absent', value: 2 },
-  ]
-
-  const semesterCodes = lodash(allStudents.map(student => student.semesterenrollments.map(enrl => enrl.semestercode)))
-    .flatten()
-    .uniq()
-    .value()
-
-  useEffect(() => {
-    if (active) {
-      addFilter(name, student =>
-        semesters.every(sem => {
-          const enrollment = student.semesterenrollments.find(enrl => enrl.semestercode === sem)
-          // If enrollment info not found, return false. This may or may not be what we want?
-          return enrollment ? enrollment.enrollmenttype === status : false
-        })
-      )
-      analytics.setFilter(name, `${statusOptions[status]} (${semesters.map(sem => allSemesters[sem].en).join(', ')})`)
-    } else {
-      removeFilter(name)
-      analytics.clearFilter(name)
-    }
-  }, [status, semesters])
+  const { semesters, status } = options
 
   if (!Object.keys(allSemesters).length) {
     return null
@@ -54,73 +28,86 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
     value: code,
   }))
 
-  const clear = () => {
-    setStatus(null)
-    setSemesters([])
-  }
-
-  const infoText = {
-    label: 'Filter students present or absent',
-    short: 'Filter students based on if they are present or absent in certain semester/semesters.',
-  }
-
   return (
-    <FilterCard
-      title="Enrollment Status"
-      contextKey="enrollmentStatus"
-      active={active}
-      footer={<ClearFilterButton disabled={!status && !semesters.length} onClick={clear} name={name} />}
-      name={name}
-      info={infoText}
-    >
-      <div className="card-content">
-        <Form>
-          <Form.Field>
-            <Dropdown
-              options={statusOptions}
-              value={status}
-              onChange={(_, { value }) => setStatus(value)}
-              placeholder="Choose Enrollment Status"
-              className="mini"
-              selection
-              fluid
-              button
-              clearable
-              data-cy={`${name}-status`}
-            />
-          </Form.Field>
-          <Form.Field>
-            <Dropdown
-              multiple
-              selection
-              fluid
-              options={semesterOptions}
-              button
-              className="mini"
-              placeholder="Choose Semesters"
-              onChange={(_, { value }) => setSemesters(value)}
-              value={semesters}
-              data-cy={`${name}-semesters`}
-            />
-          </Form.Field>
-        </Form>
-      </div>
-    </FilterCard>
+    <div className="card-content">
+      <Form>
+        <Form.Field>
+          <Dropdown
+            options={STATUS_OPTIONS}
+            value={status}
+            onChange={(_, { value }) =>
+              onOptionsChange({
+                ...options,
+                status: value !== '' ? value : null,
+              })
+            }
+            placeholder="Choose Enrollment Status"
+            className="mini"
+            selection
+            fluid
+            button
+            clearable
+            data-cy={`${name}-status`}
+          />
+        </Form.Field>
+        <Form.Field>
+          <Dropdown
+            multiple
+            selection
+            fluid
+            options={semesterOptions}
+            button
+            className="mini"
+            placeholder="Choose Semesters"
+            onChange={(_, { value }) =>
+              onOptionsChange({
+                ...options,
+                semesters: value,
+              })
+            }
+            value={semesters}
+            data-cy={`${name}-semesters`}
+          />
+        </Form.Field>
+      </Form>
+    </div>
   )
 }
 
-EnrollmentStatus.propTypes = {
-  allSemesters: PropTypes.shape({}),
-  language: PropTypes.string.isRequired,
-}
+export default (allSemesters, language) =>
+  createFilter({
+    key: 'EnrollmentStatus',
 
-EnrollmentStatus.defaultProps = {
-  allSemesters: {},
-}
+    title: 'Enrollment Status',
 
-const mapStateToProps = ({ semesters, settings }) => ({
-  allSemesters: semesters.data.semesters,
-  language: settings.language,
-})
+    info: {
+      label: 'Filter students present or absent',
+      short: 'Filter students based on if they are present or absent in certain semester/semesters.',
+    },
 
-export default withRouter(connect(mapStateToProps)(EnrollmentStatus))
+    defaultOptions: {
+      status: null,
+      semesters: [],
+    },
+
+    isActive: ({ status }) => status !== null,
+
+    precompute: [fp.flow(fp.map('semesterenrollments'), fp.flatten, fp.map('semestercode'), fp.uniq), []],
+
+    filter(student, { status, semesters }) {
+      return semesters.every(sem => {
+        const enrollment = student.semesterenrollments.find(enrl => enrl.semestercode === sem)
+        // If enrollment info not found, return false. This may or may not be what we want?
+        return enrollment ? enrollment.enrollmenttype === status : false
+      })
+    },
+
+    render: (props, semesterCodes) => (
+      <EnrollmentStatusFilterCard
+        {...props}
+        semesterCodes={semesterCodes}
+        allSemesters={allSemesters}
+        language={language}
+      />
+    ),
+  })

@@ -1,56 +1,54 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Label } from 'semantic-ui-react'
 import { getStudentTotalCredits } from '../../../../common'
-import FilterCard from '../common/FilterCard'
-import useCreditFilter from './useCreditFilter'
-import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
+import createFilter from '../createFilter'
 
 export const contextKey = 'creditFilter'
+const labels = { min: 'At Least', max: 'Less Than' }
 
-export default () => {
-  const { currentValue, requestedValue, setCurrentValue } = useCreditFilter()
-  const { addFilter, removeFilter, activeFilters } = useFilters()
+const CreditsEarnedFilterCard = ({ options, onOptionsChange }) => {
+  const [localOptions, setLocalOptions] = useState(options)
+  const { min, max } = localOptions
   const analytics = useAnalytics()
-  const [updatedAt, setUpdatedAt] = useState({ min: null, max: null })
-  const labels = { min: 'At Least', max: 'Less Than' }
+  const [updatedAt, setUpdatedAt] = useState(null)
 
   const now = () => new Date().getTime()
 
-  const names = Object.fromEntries(Object.keys(currentValue).map(key => [key, `totalCredits${key}`]))
+  const updateFilters = () => {
+    onOptionsChange({
+      min,
+      max,
+    })
 
-  const filterFunctions = limit => ({
-    min: student => getStudentTotalCredits(student) >= Number(limit),
-    max: student => getStudentTotalCredits(student) < Number(limit),
-  })
-
-  const updateFilters = key => {
-    const name = names[key]
-
-    if (currentValue[key] !== '') {
-      addFilter(name, filterFunctions(currentValue[key])[key])
-      analytics.setFilter(name, currentValue[key])
+    if (min !== null) {
+      analytics.setFilter('At Least', min)
     } else {
-      removeFilter(name)
-      analytics.clearFilter(name)
+      analytics.clearFilter('At Least')
+    }
+
+    if (max !== null) {
+      analytics.setFilter('Less than', max)
+    } else {
+      analytics.clearFilter('Less than')
     }
   }
 
   // Update filters automatically 2 sec after value change.
   useEffect(() => {
     const timer = setTimeout(() => {
-      Object.keys(updatedAt).forEach(key => {
-        if (updatedAt[key] && now() - updatedAt[key] > 1900) {
-          updateFilters(key)
-          setUpdatedAt(prev => ({ ...prev, [key]: null }))
-        }
-      })
+      if (updatedAt && now() - updatedAt > 1900) {
+        updateFilters()
+        setUpdatedAt(null)
+      }
     }, 2000)
+
     return () => clearTimeout(timer)
   }, [updatedAt])
 
   // Listen for external filtering requests (from credit stats table rows).
-  useEffect(() => {
+  // TODO: Reimplement using something else
+  /* useEffect(() => {
     Object.keys(currentValue).forEach(key => {
       const newValue = requestedValue[key] === null ? '' : requestedValue[key]
       const name = names[key]
@@ -62,50 +60,69 @@ export default () => {
         addFilter(name, filterFunctions(newValue)[key])
       }
     })
-  }, [requestedValue])
+  }, [requestedValue]) */
 
   const onChange =
     key =>
     (_, { value }) => {
-      setCurrentValue({ [key]: value })
-      setUpdatedAt(prev => ({ ...prev, [key]: now() }))
+      setLocalOptions({ ...localOptions, [key]: value })
+      setUpdatedAt(now())
     }
 
-  const onKeyDown = key => event => {
+  const onKeyDown = event => {
     if (event.keyCode === 13) {
       event.preventDefault()
-      setUpdatedAt(prev => ({ ...prev, [key]: null }))
-      updateFilters(key)
+      setUpdatedAt(null)
+      updateFilters()
     }
   }
 
-  const active = Object.values(names).some(name => Object.keys(activeFilters).includes(name))
-
   return (
-    <FilterCard
-      title="Credits"
-      active={active}
-      className="total-credits-filter"
-      contextKey={contextKey}
-      name="credit-filter"
-    >
-      <Form>
-        <div className="card-content">
-          {Object.keys(currentValue).map(key => (
-            <Form.Field key={`total-credits-filter-${key}`}>
-              <Label style={{ marginBottom: '0.5rem' }}>{labels[key]}</Label>
-              <Input
-                size="mini"
-                onChange={onChange(key)}
-                value={currentValue[key]}
-                onKeyDown={onKeyDown(key)}
-                data-cy={`credit-filter-${key}`}
-                style={{ width: '100px' }}
-              />
-            </Form.Field>
-          ))}
-        </div>
-      </Form>
-    </FilterCard>
+    <Form>
+      <div className="card-content">
+        {['min', 'max'].map(key => (
+          <Form.Field key={`total-credits-filter-${key}`}>
+            <Label style={{ marginBottom: '0.5rem' }}>{labels[key]}</Label>
+            <Input
+              size="mini"
+              onChange={onChange(key)}
+              value={localOptions[key]}
+              onKeyDown={onKeyDown}
+              data-cy={`credit-filter-${key}`}
+              style={{ width: '100px' }}
+            />
+          </Form.Field>
+        ))}
+      </div>
+    </Form>
   )
 }
+
+export default createFilter({
+  key: 'CreditsEarned',
+
+  title: 'Credits Earned',
+
+  defaultOptions: {
+    min: null,
+    max: null,
+  },
+
+  isActive: ({ min, max }) => min !== null || max !== null,
+
+  filter(student, { min, max }) {
+    const credits = getStudentTotalCredits(student)
+
+    if (min !== null && credits < min) {
+      return false
+    }
+
+    if (max !== null && credits > max) {
+      return false
+    }
+
+    return true
+  },
+
+  component: CreditsEarnedFilterCard,
+})

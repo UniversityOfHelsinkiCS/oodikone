@@ -1,28 +1,27 @@
 import React from 'react'
+import produce from 'immer'
+import _ from 'lodash'
 import { Dropdown } from 'semantic-ui-react'
-import FilterCard from '../common/FilterCard'
 import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
-import useCourseFilter from './useCourseFilter'
+import { FilterType } from './filterType'
 import './courseFilter.css'
-import useFilters from '../../useFilters'
 import useAnalytics from '../../useAnalytics'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 
 export const contextKey = 'coursesFilter'
 
-const Courses = () => {
+const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
+  const { courseFilters } = options
   const { language } = useLanguage()
-  const { courses: courseStats, selectedCourses, toggleCourseSelection } = useCourseFilter()
-  const { filteredStudents } = useFilters()
   const analytics = useAnalytics()
-  const name = 'courseFilter'
+  const name = 'course-filter-card'
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
   const makeLabel = cs => `${cs.course.code} - ${getTextIn(cs.course.name, language)}`
-  const options = courseStats
-    .filter(cs => cs.stats.students > Math.round(filteredStudents.length * 0.3))
-    .filter(cs => !selectedCourses.some(c => c.course.code === cs.course.code))
+  const dropdownOptions = Object.values(courseStats)
+    // .filter(cs => cs.stats.students > Math.round(filteredStudents.length * 0.3))
+    .filter(cs => !courseFilters[cs.course.code])
     .sort((a, b) => makeLabel(a).localeCompare(makeLabel(b)))
     .map(cs => ({
       key: `course-filter-option-${cs.course.code}`,
@@ -30,22 +29,26 @@ const Courses = () => {
       value: cs.course.code,
     }))
 
-  const onChange = (_, { value }) => {
-    const courseCode = value[0]
-    toggleCourseSelection(courseCode)
-    analytics.setFilter(name, courseCode)
+  const setCourseFilter = (code, type) =>
+    onOptionsChange(
+      produce(options, draft => {
+        if (type === null) {
+          delete draft.courseFilters[code]
+        } else {
+          draft.courseFilters[code] = type
+        }
+      })
+    )
+
+  const onChange = (_, { value }) => { // eslint-disable-line
+    setCourseFilter(value[0], FilterType.ALL)
+    analytics.setFilter(name, value[0])
   }
 
   return (
-    <FilterCard
-      title="Courses"
-      active={!!selectedCourses.length}
-      className="courses-filter"
-      contextKey={contextKey}
-      name={name}
-    >
+    <>
       <Dropdown
-        options={options}
+        options={dropdownOptions}
         placeholder="Select Course"
         selection
         className="mini course-filter-selection"
@@ -59,11 +62,54 @@ const Courses = () => {
         name={name}
         data-cy={`${name}-course-dropdown`}
       />
-      {selectedCourses.map(course => (
-        <CourseCard courseStats={course} key={`course-filter-selected-course-${course.course.code}`} />
+      {Object.entries(courseFilters).map(([code]) => (
+        <CourseCard
+          course={courseStats[code].course}
+          filterType={courseFilters[code] ?? FilterType.ALL}
+          onChange={type => setCourseFilter(code, type)}
+          key={`course-filter-selected-course-${code}`}
+        />
       ))}
-    </FilterCard>
+    </>
   )
 }
 
-export default Courses
+const filter =
+  (key, invert = false) =>
+  ({ studentNumber }, { students }) =>
+    Object.keys(students[key]).includes(studentNumber) !== invert
+
+const filterFunctions = {
+  [FilterType.ALL]: filter('all'),
+  [FilterType.PASSED]: filter('passed'),
+  [FilterType.PASSED_AFTER_FAILURE]: filter('retryPassed'),
+  [FilterType.FAILED]: filter('failed'),
+  [FilterType.FAILED_MANY_TIMES]: filter('failedMany'),
+  [FilterType.NOT_PARTICIPATED]: filter('all', true),
+  [FilterType.DID_NOT_PASS]: ({ studentNumber }, { students }) =>
+    !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
+}
+
+const createFilter = obj => obj
+
+export default courses => {
+  const courseMap = _.keyBy(courses, c => c.course.code)
+
+  return createFilter({
+    key: 'Courses',
+
+    defaultOptions: {
+      courseFilters: {},
+    },
+
+    isActive: ({ courseFilters }) => Object.entries(courseFilters).length > 0,
+
+    filter(student, { courseFilters }) {
+      return Object.entries(courseFilters).reduce((result, [code, filterType]) => {
+        return result && filterFunctions[filterType](student, courseMap[code])
+      }, true)
+    },
+
+    render: props => <CourseFilterCard {...props} courseStats={courseMap} />,
+  })
+}

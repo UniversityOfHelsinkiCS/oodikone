@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Segment, Button } from 'semantic-ui-react'
-import uuidv4 from 'uuid/v4'
+// import uuidv4 from 'uuid/v4'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import InfoBox from '../Info/InfoBox'
 import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
-import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 import infotooltips from '../../common/InfoToolTips'
 
 const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) => {
-  const { setCoursesOnce, resetCourses, runCourseQuery } = useCourseFilter()
+  // FIXME const { setCoursesOnce, resetCourses, runCourseQuery } = useCourseFilter()
   const [showByStudytrack, setShowByStudytrack] = useState(true)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
   const populationSelectedStudentCourses = useSelector(
@@ -24,7 +23,7 @@ const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) =
 
   const { pending } = selectedPopulationCourses
 
-  const makeCourseQueryOpts = () => {
+  /* const makeCourseQueryOpts = () => {
     const selectedStudentsByYear = {}
 
     if (filteredStudents && filteredStudents.length > 0) {
@@ -45,7 +44,7 @@ const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) =
       year: query.year,
       years: query.years,
     }
-  }
+  } */
 
   /**
    * These three hooks are required to make navigation work properly (context must be emptied
@@ -53,20 +52,20 @@ const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) =
    */
   useEffect(() => {
     if (filteredStudents.length) {
-      runCourseQuery(makeCourseQueryOpts())
+      // FIXME: runCourseQuery(makeCourseQueryOpts())
     }
   }, [filteredStudents])
 
   useEffect(() => {
-    const { pending, error, data } = selectedPopulationCourses
+    const { pending, error /* , data */ } = selectedPopulationCourses
     if (!pending && !error) {
-      setCoursesOnce(data.coursestatistics)
+      // FIXME setCoursesOnce(data.coursestatistics)
     }
   }, [selectedPopulationCourses.data])
 
   // Clear course filter data on unmount.
   useEffect(() => {
-    return resetCourses
+    return () => {} // FIXME: resetCourses
   }, [])
 
   const changeStructure = () => {

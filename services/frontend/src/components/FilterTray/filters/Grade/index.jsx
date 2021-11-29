@@ -1,12 +1,8 @@
-// FIXME: Remove when feature is ready.
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Form, Checkbox } from 'semantic-ui-react'
-import useFilters from '../../useFilters'
-import useAnalytics from '../../useAnalytics'
-import FilterCard from '../common/FilterCard'
-import ClearFilterButton from '../common/ClearFilterButton'
-import useGradeFilter from './useGradeFilter'
+import fp from 'lodash/fp'
+import { getHighestGradeOfCourseBetweenRange } from '../../../../common'
+import createFilter from '../createFilter'
 
 export const contextKey = 'gradeFilter'
 
@@ -14,59 +10,94 @@ export const contextKey = 'gradeFilter'
  * Grade filter.
  * Only applicable to a single course.
  */
-export default () => {
-  const { addFilter, removeFilter, activeFilters } = useFilters()
-  const { value, setValue, grades } = useGradeFilter()
-  const analytics = useAnalytics()
+const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
+  // const { addFilter, removeFilter, activeFilters } = useFilters()
+  // const { value, setValue, grades } = useGradeFilter()
+  const { selected } = options
   const name = 'gradeFilter'
-  const options = Object.keys(grades).sort((a, b) => b - a)
 
-  // Filter function update hook.
-  useEffect(() => {
-    if (value.length) {
-      const studentNumbers = value.reduce((a, b) => a.concat(grades[b]), [])
-      addFilter(name, student => studentNumbers.includes(student.studentNumber))
-    } else {
-      removeFilter(name)
-    }
-  }, [value])
+  const choices = Object.keys(grades).sort((a, b) => b - a)
 
-  const checked = grade => value.includes(grade)
+  const checked = grade => selected.includes(grade)
 
   const onChange = grade => () => {
     if (checked(grade)) {
-      setValue(value.filter(val => val !== grade))
+      onOptionsChange({
+        ...options,
+        selected: selected.filter(val => val !== grade),
+      })
     } else {
-      setValue(value.concat(grade))
+      onOptionsChange({
+        ...options,
+        selected: [...selected, grade],
+      })
     }
   }
 
+  const studentsWithoutSelf = withoutSelf()
+  const gradesWithoutSelf = fp.mapValues(
+    fp.filter(sn => studentsWithoutSelf.find(s => s.studentNumber === sn) !== undefined)
+  )(grades)
+
   return (
-    <FilterCard
-      title="Grade"
-      contextKey={contextKey}
-      footer={<ClearFilterButton disabled={!value.length} onClick={() => setValue([])} name={name} />}
-      active={Object.keys(activeFilters).includes(name)}
-      name={name}
-    >
-      <div className="card-content">
-        <Form>
-          {options.map(grade => (
-            <Form.Field key={`${name}-${grade}`}>
-              <Checkbox
-                label={
-                  <label data-cy={`${name}-${grade}`}>
-                    {grade}
-                    <span className="filter-option-count">{`(${grades[grade].length} students)`}</span>
-                  </label>
-                }
-                checked={checked(grade)}
-                onChange={onChange(grade)}
-              />
-            </Form.Field>
-          ))}
-        </Form>
-      </div>
-    </FilterCard>
+    <div className="card-content">
+      <Form>
+        {choices.map(grade => (
+          <Form.Field key={`${name}-${grade}`}>
+            <Checkbox
+              label={
+                <label data-cy={`${name}-${grade}`}>
+                  {grade}
+                  <span className="filter-option-count">{` (${gradesWithoutSelf[grade].length} students)`}</span>
+                </label>
+              }
+              checked={checked(grade)}
+              onChange={onChange(grade)}
+            />
+          </Form.Field>
+        ))}
+      </Form>
+    </div>
   )
 }
+
+export default (courseCodes, from, to) =>
+  createFilter({
+    key: 'Grade',
+
+    defaultOptions: {
+      selected: [],
+    },
+
+    isActive: ({ selected }) => selected.length > 0,
+
+    precompute: [
+      fp.flow(
+        fp.map(student => [student.studentNumber, student.courses]),
+        fp.filter(
+          fp.flow(
+            ([, courses]) => courses,
+            fp.map('course_code'),
+            courses => courseCodes.some(code => courses.includes(code))
+          )
+        ),
+        fp.map(([sn, courses]) => [sn, getHighestGradeOfCourseBetweenRange(courses, from, to)]),
+        fp.groupBy(([, { grade }]) => grade),
+        fp.mapValues(fp.map(([sn]) => sn)),
+        grades => ({ grades })
+      ),
+      [courseCodes, from, to],
+    ],
+
+    filter(student, { selected }, { grades }) {
+      return selected.some(selectedGrade => grades[selectedGrade].includes(student.studentNumber))
+    },
+
+    render: (props, { grades }) => <GradeFilterCard {...props} grades={grades} />,
+
+    actions: {
+      selectGrade(state, grade) {
+        state.selected = [grade]
+      },
+    },
+  })

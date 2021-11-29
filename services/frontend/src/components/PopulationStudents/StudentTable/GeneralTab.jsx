@@ -15,11 +15,13 @@ import useLanguage from '../../LanguagePicker/useLanguage'
 
 const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCourseDateMap, coursecode }) => {
   const { language } = useLanguage()
-  const { filteredStudents, creditDateFilterParams } = useFilters()
+  const { filteredStudents } = useFilters()
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
 
   const { data: populationStatistics, query } = populations
+
+  const creditDateFilterParams = {}
 
   if (!populationStatistics || !populationStatistics.elementdetails) return null
 

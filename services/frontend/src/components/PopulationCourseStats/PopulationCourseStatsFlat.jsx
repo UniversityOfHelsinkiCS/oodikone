@@ -9,7 +9,6 @@ import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution/GradeDistributionFlat'
 import PassFail from './PassFail/PassFailFlat'
 import { getUserIsAdmin, getTextIn } from '../../common'
-import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 import useFilterTray from '../FilterTray/useFilterTray'
 import { contextKey as filterTrayContextKey } from '../FilterTray'
 import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Courses'
@@ -112,7 +111,7 @@ const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter 
   const [state, setState] = useState(initialState(props))
   const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
   const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
-  const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
+  // FIXME: const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
   const filterAnalytics = useAnalytics()
 
   useEffect(() => {
@@ -254,7 +253,7 @@ const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter 
       props.populationCourses.data.coursestatistics?.find(cs => cs.course.code === code) ||
       props.courses.coursestatistics?.find(cs => cs.course.code === code)
     if (courseStatistic) {
-      const isSelected = courseIsSelected(code)
+      const isSelected = false // FIXME: courseIsSelected(code)
       const name = 'Course Filtername'
 
       if (isSelected) {
@@ -263,7 +262,7 @@ const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter 
         filterAnalytics.setFilterViaTable(name)
       }
 
-      toggleCourseSelection(code)
+      // FIXME: toggleCourseSelection(code)
       setFilterTrayOpen(true)
       setCourseFilterOpen(true)
     }

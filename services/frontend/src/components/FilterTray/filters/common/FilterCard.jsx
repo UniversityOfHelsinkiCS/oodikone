@@ -1,42 +1,52 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
 import WithHelpTooltip from '../../../Info/InfoWithHelpTooltip'
-import useFilterTray from '../../useFilterTray'
+import ClearFilterButton from './ClearFilterButton'
 
-const FilterCard = ({ title, children, contextKey, name, active, info }) => {
-  const [open, , toggleOpen] = useFilterTray(contextKey)
+const FilterCard = ({ title, children, name, active, onClear, info }) => {
+  const [open, setOpen] = useState(active)
+
+  const header = (
+    <>
+      <Icon
+        name={open ? 'caret down' : 'caret right'}
+        style={{
+          color: active ? '#DDD' : 'black',
+        }}
+      />
+      <Header size="tiny" style={{ margin: '0' }}>
+        {title}
+      </Header>
+      <div style={{ flexGrow: 1, minWidth: '1rem' }} />
+      {active && <ClearFilterButton onClick={onClear} />}
+    </>
+  );
 
   const renderWithHelp = info => {
     if (info) {
       return (
-        <WithHelpTooltip tooltip={info} data-cy="tooltip-div">
-          <Icon name={open ? 'caret down' : 'caret right'} style={{ visibility: active ? 'hidden' : 'visible' }} />
-          <Header size="tiny" style={{ marginTop: '0', marginBottom: 0 }}>
-            {title}
-          </Header>
-        </WithHelpTooltip>
+        <WithHelpTooltip tooltip={info} data-cy="tooltip-div">{header}</WithHelpTooltip>
       )
     }
-    return (
-      <>
-        <Icon name={open ? 'caret down' : 'caret right'} style={{ visibility: active ? 'hidden' : 'visible' }} />
-        <Header size="tiny" style={{ marginTop: '0', marginBottom: 0 }}>
-          {title}
-        </Header>
-      </>
-    )
+
+    return header;
   }
 
   return (
     <div>
       <div
-        style={{ display: 'flex', alignItems: 'center', cursor: active ? undefined : 'pointer', margin: '1rem 0' }}
-        onClick={active ? undefined : toggleOpen}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          cursor: active ? undefined : 'pointer',
+          margin: '1rem 0',
+        }}
+        onClick={!active && (() => setOpen(!open))}
         data-cy={`${name}-header`}
       >
         {renderWithHelp(info)}
       </div>
-      {(active || open) && children}
+      {open && children}
     </div>
   )
 }

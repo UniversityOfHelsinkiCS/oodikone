@@ -1,16 +1,20 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { getSemesters } from '../../redux/semesters' 
 import { Button, Header, Accordion, Divider, Label, Segment } from 'semantic-ui-react'
+import SegmentDimmer from 'components/SegmentDimmer'
 import { useHistory } from 'react-router-dom'
 import scrollToComponent from 'react-scroll-to-component'
 import { getTextIn } from 'common'
 import { useToggle } from 'common/hooks'
+import { FilterView } from '../FilterTray/useFilters'
 import FilterTray from 'components/FilterTray'
+import * as filters from 'components/FilterTray/filters'
 import useFilters from 'components/FilterTray/useFilters'
 import PopulationStudents from 'components/PopulationStudents'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import { StudyGuidanceGroupFilters } from 'components/FilterTray/FilterSets'
-import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
+import { useGetStudyGuidanceGroupPopulationQuery, useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
@@ -48,9 +52,8 @@ const useToggleAndSetNewestIndex = ({ defaultValue, indexOfPanelToScroll, setNew
   return [state, toggle]
 }
 
-const SingleStudyGroupContent = ({ population, group, language }) => {
+const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading, population, group, language }) => {
   const isMounted = useIsMounted()
-  const { setAllStudents, filteredStudents } = useFilters()
   const refs = [useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setActiveIndex] = useState([])
   const [newestIndex, setNewestIndex] = useState(null)
@@ -87,7 +90,6 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   }, [newestIndex])
 
   useEffect(() => {
-    setAllStudents(population?.students || [])
     togglePanel(0)
   }, [population])
 
@@ -131,12 +133,19 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
       content: {
         content: (
           <div ref={refs[1]}>
-            <StudyGuidanceGroupPopulationCourses
-              selectedStudents={filteredStudents.map(({ studentNumber }) => studentNumber)}
-              showStructured={coursesStructuredByProgramme}
-              toggleShowStructured={toggleCoursesStructuredByProgramme}
-              studyProgramme={group.tags?.studyProgramme}
-            />
+            {
+              coursesAreLoading
+                ? <SegmentDimmer isLoading={coursesAreLoading} />
+                : (
+                  <StudyGuidanceGroupPopulationCourses
+                    courses={courses}
+                    selectedStudents={filteredStudents.map(({ studentNumber }) => studentNumber)}
+                    showStructured={coursesStructuredByProgramme}
+                    toggleShowStructured={toggleCoursesStructuredByProgramme}
+                    studyProgramme={group.tags?.studyProgramme}
+                  />
+                )
+            }
           </div>
         ),
       },
@@ -167,13 +176,55 @@ const SingleStudyGroupContent = ({ population, group, language }) => {
   ]
 
   return (
-    <FilterTray filterSet={<StudyGuidanceGroupFilters group={group} />}>
-      <Segment className="contentSegment">
-        <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
-      </Segment>
-    </FilterTray>
+    <Segment className="contentSegment">
+      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+    </Segment>
   )
 }
+
+const SingleStudyGroupFilterView = (props) => {
+  const dispatch = useDispatch()
+  const allSemesters = useSelector((state) => state.semesters.data?.semesters);
+
+  useEffect(() => {
+    dispatch(getSemesters());
+  }, []);
+
+  console.log('Courses', props.courses)
+
+  const viewFilters = [
+    filters.enrollmentStatusFilter(allSemesters ?? [], props.language),
+    filters.ageFilter,
+    filters.genderFilter,
+    filters.startYearAtUniFilter,
+    filters.tagsFilter,
+    filters.courseFilter(props.courses),
+    filters.creditDateFilter,
+  ]
+
+  if (props.group?.tags?.studyProgramme && group?.tags?.year >= 2020) {
+    viewFilters.push(
+      filters.admissionTypeFilter(),
+    );
+  }
+
+  if (props.group?.tags?.studyprogramme) {
+    viewFilters.push(
+      filters.graduatedFromProgrammeFilter(group.tags.studyProgramme),
+    );
+  }
+
+  return (
+    <FilterView filters={viewFilters} students={props.population?.students ?? []}>
+      {(students) => (
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <FilterTray />
+          <SingleStudyGroupContent {...props } filteredStudents={students} />
+        </div>
+      )}
+    </FilterView>
+  );
+};
 
 const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgrammes, children }) => {
   const history = useHistory()
@@ -206,6 +257,7 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const studyProgrammes = useFilteredAndFormattedElementDetails(language)
   const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
+  const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers)
 
   if (!group) {
     return (
@@ -233,7 +285,15 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
       isLoading={isLoading}
       studyProgrammes={studyProgrammes}
     >
-      {!isLoading && <SingleStudyGroupContent population={data} group={group} language={language} />}
+      {!isLoading &&
+        <SingleStudyGroupFilterView
+          population={data}
+          language={language}
+          group={group}
+          courses={courses?.coursestatistics}
+          coursesAreLoading={coursesAreLoading}
+        />
+      }
     </SingleStudyGroupViewWrapper>
   )
 }

@@ -1,21 +1,20 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import PopulationCourseStatsFlat from '../../PopulationCourseStats/PopulationCourseStatsFlat'
-import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 
 const CustomPopulationCourses = ({ selectedStudents, showFilter = false }) => {
-  const { setCourses, resetCourses } = useCourseFilter()
+  // const { setCourses, resetCourses } = useCourseFilter()
   const { data: courses, pending, error } = useSelector(({ populationCourses }) => populationCourses)
 
   useEffect(() => {
     if (!pending && !error && courses.coursestatistics) {
-      setCourses(courses.coursestatistics)
+      // FIXME setCourses(courses.coursestatistics)
     }
   }, [courses])
 
   // Clear course filter data on unmount.
   useEffect(() => {
-    return resetCourses
+    return () => {} // FIXME: resetCourses
   }, [])
 
   return (

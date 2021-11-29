@@ -1,16 +1,40 @@
 import React from 'react'
-import { Segment, Header } from 'semantic-ui-react'
+import { Segment, Header, Button } from 'semantic-ui-react'
 import './filterTray.css'
 import useFilters from './useFilters'
+import FilterCard from './filters/common/FilterCard'
 
 export const contextKey = 'filterTray'
 
-const FilterTray = ({ children, filterSet, visible = true }) => {
-  const { filteredStudents, allStudents } = useFilters()
+const FilterTray = () => {
+  const {
+    filteredStudents,
+    allStudents,
+    precomputed,
+    filters,
+    withoutFilter,
+    filterOptions,
+    setFilterOptions,
+    resetFilter,
+  } = useFilters()
 
-  if (!visible || !allStudents.length) {
-    return children
-  }
+  const isAnyFilterActive = filters.some(({ key, isActive }) => isActive(filterOptions[key]))
+
+  const filterSet = filters.map(({ key, title, isActive, render, info }) => {
+    const props = {
+      options: filterOptions[key],
+      onOptionsChange: options => setFilterOptions(key, options),
+      withoutSelf: () => withoutFilter(key),
+    }
+
+    return (
+      <div key={key}>
+        <FilterCard title={title ?? key} active={isActive(filterOptions[key])} onClear={() => resetFilter(key)} info={info}>
+          {render(props, precomputed[key])}
+        </FilterCard>
+      </div>
+    )
+  })
 
   return (
     <>
@@ -25,9 +49,15 @@ const FilterTray = ({ children, filterSet, visible = true }) => {
             </b>{' '}
             out of {allStudents.length} shown
           </div>
+          {isAnyFilterActive && (
+            <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
+              <Button compact size="mini">
+                Reset All Filters
+              </Button>
+            </div>
+          )}
           {filterSet}
         </Segment>
-        {children}
       </div>
     </>
   )
