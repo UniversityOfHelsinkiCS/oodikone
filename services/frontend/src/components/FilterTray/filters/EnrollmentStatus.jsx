@@ -9,6 +9,7 @@ import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 import { getTextIn } from '../../../common'
+import infoText from '../../../common/InfoToolTips/filters'
 
 const EnrollmentStatus = ({ allSemesters, language }) => {
   const [status, setStatus] = useState(null)
@@ -59,11 +60,6 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
     setSemesters([])
   }
 
-  const infoText = {
-    label: 'Filter students present or absent',
-    short: 'Filter students based on if they are present or absent in certain semester/semesters.',
-  }
-
   return (
     <FilterCard
       title="Enrollment Status"
@@ -71,7 +67,7 @@ const EnrollmentStatus = ({ allSemesters, language }) => {
       active={active}
       footer={<ClearFilterButton disabled={!status && !semesters.length} onClick={clear} name={name} />}
       name={name}
-      info={infoText}
+      info={infoText.enrollmentStatus}
     >
       <div className="card-content">
         <Form>
