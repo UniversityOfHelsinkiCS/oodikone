@@ -5,6 +5,7 @@ import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
 import useAnalytics from '../useAnalytics'
 import { usePrevious } from '../../../common/hooks'
+import infoText from '../../../common/InfoToolTips/filters'
 
 export default () => {
   const { addFilter, removeFilter, activeFilters } = useFilters()
@@ -38,11 +39,6 @@ export default () => {
 
   const toggle = buttonValue => () => setValue(prev => (prev === buttonValue ? null : buttonValue))
 
-  const infoText = {
-    label: 'Include and exclude students from this program',
-    short: 'Possibility to exclude or include students who have transferred into this program',
-  }
-
   return (
     <FilterCard
       title="Transfer Status"
@@ -51,7 +47,7 @@ export default () => {
       className="total-transfer-filter"
       footer={<ClearFilterButton disabled={!active} onClick={() => setValue(null)} name={name} />}
       name={name}
-      info={infoText}
+      info={infoText.transferred}
     >
       <Form>
         <div className="card-content">
