@@ -10,6 +10,7 @@ import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import { useToggle } from 'common/hooks'
 import SortableTable from 'components/SortableTable'
 import { startYearToAcademicYear, StyledMessage } from './common'
+import './StudyGuidanceGroupOverview.css'
 
 const LinkToGroup = ({ group, language }) => {
   const history = useHistory()
@@ -69,12 +70,22 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
                 />
               ) : (
                 <Datetime
+                  className="studyguidancegroupoverview__yeartagselector"
                   name={tagName}
                   dateFormat="YYYY"
                   timeFormat={false}
                   initialvalue={group.tags?.[tagName]}
                   inputProps={{ readOnly: true }}
-                  renderYear={(props, selectableYear) => <td {...props}>{startYearToAcademicYear(selectableYear)}</td>}
+                  renderYear={(props, year) => {
+                    const shiftBy = 2 // fix to start from 2017 instead of 2019
+                    const shiftedProps = {
+                      ...props,
+                      key: props.key - shiftBy,
+                      'data-value': props['data-value'] - shiftBy,
+                    }
+                    const formattedAndShiftedYear = startYearToAcademicYear(year - shiftBy)
+                    return <td {...shiftedProps}> {formattedAndShiftedYear}</td>
+                  }}
                   renderInput={({ value, ...rest }) => {
                     return (
                       <div>

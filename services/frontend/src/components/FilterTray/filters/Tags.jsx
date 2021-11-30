@@ -43,6 +43,8 @@ export default () => {
     value: tag,
   }))
 
+  if (Object.entries(countsByTag).length === 0) return null
+
   return (
     <FilterCard
       title="Tags"

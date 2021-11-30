@@ -72,5 +72,6 @@ export const StudyGuidanceGroupFilters = ({ group }) => (
     {group?.tags?.studyProgramme && <GraduatedFromProgramme overrideCode={group.tags.studyProgramme} />}
     <Tags />
     <Courses />
+    <Date />
   </Filters>
 )
