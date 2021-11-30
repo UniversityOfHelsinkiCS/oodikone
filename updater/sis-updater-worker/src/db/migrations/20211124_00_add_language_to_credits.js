@@ -2,7 +2,7 @@ const { STRING } = require('sequelize')
 
 module.exports = {
   up: async queryInterface => {
-    await queryInterface.addColumn('credits', 'language', {
+    await queryInterface.addColumn('credit', 'language', {
       type: STRING,
     })
   },
