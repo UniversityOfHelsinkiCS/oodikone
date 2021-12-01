@@ -5,6 +5,7 @@ import { Divider } from 'semantic-ui-react'
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
+import GaugeChart from './GaugeChart'
 import DataTable from './DataTable'
 import InfoBox from '../../Info/InfoBox'
 import { getBasicStats, getCreditStats, getGraduationStats } from '../../../redux/studyProgramme'
@@ -58,6 +59,28 @@ const Overview = props => {
       <div className="section-container">
         <BarChart categories={graduationStats?.data?.years} data={graduationStats?.data?.graphStats} />
         <DataTable titles={graduationStatsTitles} data={graduationStats?.data?.tableStats} />
+      </div>
+      {getDivider('Graduation median time')}
+      <div className="section-container">
+        {graduationStats?.data?.years.map(year => (
+          <GaugeChart
+            year={year}
+            data={graduationStats?.data?.graduationMedianTime[year]}
+            amount={graduationStats?.data?.graduationAmounts[year]}
+            studyprogramme={studyprogramme}
+          />
+        ))}
+      </div>
+      {getDivider('Graduation mean time')}
+      <div className="section-container">
+        {graduationStats?.data?.years.map(year => (
+          <GaugeChart
+            year={year}
+            data={graduationStats?.data?.graduationMeanTime[year]}
+            amount={graduationStats?.data?.graduationAmounts[year]}
+            studyprogramme={studyprogramme}
+          />
+        ))}
       </div>
     </div>
   )
