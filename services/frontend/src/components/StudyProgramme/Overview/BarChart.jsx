@@ -2,21 +2,17 @@ import React from 'react'
 
 const ReactHighcharts = require('react-highcharts')
 
-const colors = ['#003E65', '#1392c2', '#036415']
-
-const BarChart = ({ data, categories }) => {
-  const dataWithColors = data.map((series, index) => ({ ...series, color: colors[index] }))
-
+const BarChart = ({ data }) => {
   const defaultConfig = {
     title: {
       text: '',
     },
-    series: dataWithColors,
+    series: data,
     credits: {
       text: 'oodikone | TOSKA',
     },
     xAxis: {
-      categories,
+      categories: ['2017', '2018', '2019', '2020', '2021'],
     },
     chart: {
       type: 'column',
