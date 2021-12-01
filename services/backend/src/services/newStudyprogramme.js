@@ -1,6 +1,7 @@
 const sequelize = require('sequelize')
 const { Op } = sequelize
-const { indexOf } = require('lodash')
+const moment = require('moment')
+const { indexOf, mean } = require('lodash')
 const {
   Credit,
   Course,
@@ -36,10 +37,10 @@ const getYearsArray = since => {
   return years
 }
 
-const getYearsObject = years => {
+const getYearsObject = (years, emptyArrays = false) => {
   let yearsObject = {}
   for (const year of years) {
-    yearsObject = { ...yearsObject, [year]: 0 }
+    yearsObject = { ...yearsObject, [year]: emptyArrays ? [] : 0 }
   }
   return yearsObject
 }
@@ -371,6 +372,53 @@ const getThesisStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
+const getMedian = values => {
+  if (values.length === 0) return 0
+  values.sort((a, b) => a - b)
+  const half = Math.floor(values.length / 2)
+  if (values.length % 2) return values[half]
+  return (values[half - 1] + values[half]) / 2.0
+}
+
+const getMean = values => {
+  if (values.length === 0) return 0
+  return Math.round(mean(values))
+}
+
+const getGraduationTimeStats = async (studytrack, startDate, years) => {
+  const studyrights = await graduatedStudyRights(studytrack, startDate)
+  let graduationAmounts = getYearsObject(years)
+  let graduationTimes = getYearsObject(years, true)
+
+  studyrights.forEach(({ enddate, studystartdate }) => {
+    const graduationYear = enddate?.getFullYear()
+    const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
+    graduationAmounts[graduationYear] += 1
+    graduationTimes[graduationYear] = [...graduationTimes[graduationYear], timeToGraduation]
+  })
+
+  const medians = getYearsObject(years, true)
+  const means = getYearsObject(years, true)
+
+  // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
+  const comparisonValue = studytrack.includes('KH') ? 72 : 48
+
+  // HighCharts graph require the data to have this format (ie. actual value, "empty value")
+  years.forEach(year => {
+    const median = getMedian(graduationTimes[year])
+    const mean = getMean(graduationTimes[year])
+    medians[year] = [
+      ['', median],
+      ['', comparisonValue - median],
+    ]
+    means[year] = [
+      ['', mean],
+      ['', comparisonValue - mean],
+    ]
+  })
+  return { medians, means, graduationAmounts }
+}
+
 const getBasicStatsForStudytrack = async ({ studyprogramme, startDate }) => {
   const years = getYearsArray(startDate.getFullYear())
   const started = await getStartedStats(studyprogramme, startDate, years)
@@ -456,6 +504,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, startDate }) =>
   const years = getYearsArray(startDate.getFullYear())
   const thesis = await getThesisStats(studyprogramme, startDate, years)
   const graduated = await getGraduatedStats(studyprogramme, startDate, years)
+  const graduationTimeStats = await getGraduationTimeStats(studyprogramme, startDate, years)
 
   const reversedYears = getYearsArray(startDate.getFullYear()).reverse()
   const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
@@ -474,6 +523,9 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, startDate }) =>
         data: thesis.graphStats,
       },
     ],
+    graduationMedianTime: graduationTimeStats.medians,
+    graduationMeanTime: graduationTimeStats.means,
+    graduationAmounts: graduationTimeStats.graduationAmounts,
   }
 }
 
