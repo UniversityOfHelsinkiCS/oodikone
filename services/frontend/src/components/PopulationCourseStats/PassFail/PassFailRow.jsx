@@ -6,11 +6,13 @@ import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import { useLanguage } from '../../../common/hooks'
+import { isCourseSelected, toggleCourseSelection } from '../../FilterView/filters/courses'
+import useFilters from '../../FilterView/useFilters'
 
 const PassFailRow = ({ courseStats }) => {
   const language = useLanguage()
-  // FIXME const { courseIsSelected } = useCourseFilter()
-  const { onGoToCourseStatisticsClick, onCourseNameCellClick } = UsePopulationCourseContext()
+  const { useFilterSelector, filterDispatch } = useFilters()
+  const { onGoToCourseStatisticsClick } = UsePopulationCourseContext()
   const { course, stats } = courseStats
   const { code, name } = course
   const {
@@ -24,13 +26,13 @@ const PassFailRow = ({ courseStats }) => {
     passedOfPopulation,
     triedOfPopulation,
   } = stats
-  const isActive = false // FIXME courseIsSelected(course.code)
+  const isActive = useFilterSelector(isCourseSelected(course.code))
   return (
     <Table.Row key={code} active={isActive} data-cy={name.fi}>
       <Popup
         trigger={
           <Table.Cell className="filterCell clickableCell">
-            <FilterToggleIcon isActive={isActive} onClick={() => onCourseNameCellClick(code)} />
+            <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleCourseSelection(course.code))} />
           </Table.Cell>
         }
         content={

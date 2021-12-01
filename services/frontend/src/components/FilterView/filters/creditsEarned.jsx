@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Label } from 'semantic-ui-react'
-import { getStudentTotalCredits } from '../../../../common'
-import useAnalytics from '../../useAnalytics'
-import createFilter from '../createFilter'
+import { getStudentTotalCredits } from '../../../common'
+import createFilter from './createFilter'
 
 export const contextKey = 'creditFilter'
 const labels = { min: 'At Least', max: 'Less Than' }
@@ -10,7 +9,6 @@ const labels = { min: 'At Least', max: 'Less Than' }
 const CreditsEarnedFilterCard = ({ options, onOptionsChange }) => {
   const [localOptions, setLocalOptions] = useState(options)
   const { min, max } = localOptions
-  const analytics = useAnalytics()
   const [updatedAt, setUpdatedAt] = useState(null)
 
   const now = () => new Date().getTime()
@@ -20,18 +18,6 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange }) => {
       min,
       max,
     })
-
-    if (min !== null) {
-      analytics.setFilter('At Least', min)
-    } else {
-      analytics.clearFilter('At Least')
-    }
-
-    if (max !== null) {
-      analytics.setFilter('Less than', max)
-    } else {
-      analytics.clearFilter('Less than')
-    }
   }
 
   // Update filters automatically 2 sec after value change.

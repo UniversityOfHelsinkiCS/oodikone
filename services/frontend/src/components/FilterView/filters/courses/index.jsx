@@ -6,7 +6,7 @@ import CourseCard from './CourseCard'
 import { getTextIn } from '../../../../common'
 import { FilterType } from './filterType'
 import './courseFilter.css'
-import useAnalytics from '../../useAnalytics'
+import createFilter from '../createFilter'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 
 export const contextKey = 'coursesFilter'
@@ -14,7 +14,6 @@ export const contextKey = 'coursesFilter'
 const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
   const { courseFilters } = options
   const { language } = useLanguage()
-  const analytics = useAnalytics()
   const name = 'course-filter-card'
 
   // Wrestle course stats into something semantic-ui eats without throwing up.
@@ -42,7 +41,6 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
 
   const onChange = (_, { value }) => { // eslint-disable-line
     setCourseFilter(value[0], FilterType.ALL)
-    analytics.setFilter(name, value[0])
   }
 
   return (
@@ -74,42 +72,58 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
   )
 }
 
-const filter =
+const createFilterFunc =
   (key, invert = false) =>
   ({ studentNumber }, { students }) =>
     Object.keys(students[key]).includes(studentNumber) !== invert
 
 const filterFunctions = {
-  [FilterType.ALL]: filter('all'),
-  [FilterType.PASSED]: filter('passed'),
-  [FilterType.PASSED_AFTER_FAILURE]: filter('retryPassed'),
-  [FilterType.FAILED]: filter('failed'),
-  [FilterType.FAILED_MANY_TIMES]: filter('failedMany'),
-  [FilterType.NOT_PARTICIPATED]: filter('all', true),
+  [FilterType.ALL]: createFilterFunc('all'),
+  [FilterType.PASSED]: createFilterFunc('passed'),
+  [FilterType.PASSED_AFTER_FAILURE]: createFilterFunc('retryPassed'),
+  [FilterType.FAILED]: createFilterFunc('failed'),
+  [FilterType.FAILED_MANY_TIMES]: createFilterFunc('failedMany'),
+  [FilterType.NOT_PARTICIPATED]: createFilterFunc('all', true),
   [FilterType.DID_NOT_PASS]: ({ studentNumber }, { students }) =>
     !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
 }
 
-const createFilter = obj => obj
+const filter = createFilter({
+  key: 'Courses',
 
-export default courses => {
-  const courseMap = _.keyBy(courses, c => c.course.code)
+  defaultOptions: {
+    courseFilters: {},
+  },
 
-  return createFilter({
-    key: 'Courses',
+  precompute: ({ args }) => _.keyBy(args.courses, 'course.code'),
 
-    defaultOptions: {
-      courseFilters: {},
+  isActive: ({ courseFilters }) => Object.entries(courseFilters).length > 0,
+
+  filter(student, { courseFilters }, { precomputed: courseMap }) {
+    return Object.entries(courseFilters).reduce((result, [code, filterType]) => {
+      return result && filterFunctions[filterType](student, courseMap[code])
+    }, true)
+  },
+
+  render: (props, { precomputed }) => <CourseFilterCard {...props} courseStats={precomputed} />,
+
+  selectors: {
+    isCourseSelected: ({ courseFilters }, course) => !!courseFilters[course],
+  },
+
+  actions: {
+    toggleCourseSelection: (options, code) => {
+      if (!options.courseFilters[code]) {
+        options.courseFilters[code] = FilterType.ALL
+      } else {
+        delete options.courseFilters[code]
+      }
     },
+  },
+})
 
-    isActive: ({ courseFilters }) => Object.entries(courseFilters).length > 0,
+export default filter
 
-    filter(student, { courseFilters }) {
-      return Object.entries(courseFilters).reduce((result, [code, filterType]) => {
-        return result && filterFunctions[filterType](student, courseMap[code])
-      }, true)
-    },
+export const { isCourseSelected } = filter.selectors
 
-    render: props => <CourseFilterCard {...props} courseStats={courseMap} />,
-  })
-}
+export const { toggleCourseSelection } = filter.actions

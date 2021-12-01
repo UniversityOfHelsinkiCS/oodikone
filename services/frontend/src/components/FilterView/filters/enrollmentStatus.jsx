@@ -74,40 +74,46 @@ const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, la
   )
 }
 
-export default (allSemesters, language) =>
-  createFilter({
-    key: 'EnrollmentStatus',
+export default createFilter({
+  key: 'EnrollmentStatus',
 
-    title: 'Enrollment Status',
+  title: 'Enrollment Status',
 
-    info: {
-      label: 'Filter students present or absent',
-      short: 'Filter students based on if they are present or absent in certain semester/semesters.',
-    },
+  info: {
+    label: 'Filter students present or absent',
+    short: 'Filter students based on if they are present or absent in certain semester/semesters.',
+  },
 
-    defaultOptions: {
-      status: null,
-      semesters: [],
-    },
+  defaultOptions: {
+    status: null,
+    semesters: [],
+  },
 
-    isActive: ({ status }) => status !== null,
+  isActive: ({ status }) => status !== null,
 
-    precompute: [fp.flow(fp.map('semesterenrollments'), fp.flatten, fp.map('semestercode'), fp.uniq), []],
+  precompute: fp.flow(
+    ({ students }) => students,
+    fp.map('semesterenrollments'),
+    fp.flatten,
+    fp.map('semestercode'),
+    fp.uniq,
+    semesterCodes => ({ semesterCodes })
+  ),
 
-    filter(student, { status, semesters }) {
-      return semesters.every(sem => {
-        const enrollment = student.semesterenrollments.find(enrl => enrl.semestercode === sem)
-        // If enrollment info not found, return false. This may or may not be what we want?
-        return enrollment ? enrollment.enrollmenttype === status : false
-      })
-    },
+  filter(student, { status, semesters }) {
+    return semesters.every(sem => {
+      const enrollment = student.semesterenrollments.find(enrl => enrl.semestercode === sem)
+      // If enrollment info not found, return false. This may or may not be what we want?
+      return enrollment ? enrollment.enrollmenttype === status : false
+    })
+  },
 
-    render: (props, semesterCodes) => (
-      <EnrollmentStatusFilterCard
-        {...props}
-        semesterCodes={semesterCodes}
-        allSemesters={allSemesters}
-        language={language}
-      />
-    ),
-  })
+  render: (props, { precomputed, args }) => (
+    <EnrollmentStatusFilterCard
+      {...props}
+      semesterCodes={precomputed.semesterCodes}
+      allSemesters={args.allSemesters}
+      language={args.language}
+    />
+  ),
+})

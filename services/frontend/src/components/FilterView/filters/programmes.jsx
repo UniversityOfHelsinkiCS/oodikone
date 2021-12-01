@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react'
 import { Dropdown } from 'semantic-ui-react'
 import fp from 'lodash/fp'
-import { getTextIn, getStudentToTargetCourseDateMap, getNewestProgramme } from '../../../../common'
-import useLanguage from '../../../LanguagePicker/useLanguage'
-import createFilter from '../createFilter'
+import { getTextIn, getStudentToTargetCourseDateMap, getNewestProgramme } from '../../../common'
+import useLanguage from '../../LanguagePicker/useLanguage'
+import createFilter from './createFilter'
 
 const ProgrammeFilterCard = ({ options, onOptionsChange, programmes }) => {
   const { language } = useLanguage()
@@ -73,24 +73,42 @@ const createStudentToProgrammeMap = (courses, students, elementDetails) => {
   )(students)
 }
 
-export default (courses, elementDetails) =>
-  createFilter({
-    key: 'Programme',
+const filter = createFilter({
+  key: 'Programme',
 
-    defaultOptions: {
-      selectedProgrammes: [],
+  defaultOptions: {
+    selectedProgrammes: [],
+  },
+
+  precompute: ({ students, args }) => createStudentToProgrammeMap(args.courses, students, args.elementDetails ?? []),
+
+  isActive: ({ selectedProgrammes }) => selectedProgrammes.length > 0,
+
+  filter({ studentNumber }, { selectedProgrammes }, { precomputed: { studentToProgrammeMap } }) {
+    return selectedProgrammes.some(pcode => pcode === studentToProgrammeMap[studentNumber])
+  },
+
+  selectors: {
+    isProgrammeSelected: ({ selectedProgrammes }, programme) => selectedProgrammes.includes(programme),
+  },
+
+  actions: {
+    toggleProgrammeSelection: (options, programme) => {
+      const index = options.selectedProgrammes.indexOf(programme)
+
+      if (index === -1) {
+        options.selectedProgrammes.push(programme)
+      } else {
+        options.selectedProgrammes.splice(index, 1)
+      }
     },
+  },
 
-    precompute: [
-      students => createStudentToProgrammeMap(courses, students, elementDetails ?? []),
-      [courses, elementDetails],
-    ],
+  render: (props, { precomputed }) => <ProgrammeFilterCard {...props} programmes={precomputed.programmes} />,
+})
 
-    isActive: ({ selectedProgrammes }) => selectedProgrammes.length > 0,
+export default filter
 
-    filter({ studentNumber }, { selectedProgrammes }, { studentToProgrammeMap }) {
-      return selectedProgrammes.findIndex(pcode => pcode === studentToProgrammeMap[studentNumber]) !== -1
-    },
+export const { isProgrammeSelected } = filter.selectors
 
-    render: (props, { programmes }) => <ProgrammeFilterCard {...props} programmes={programmes} />,
-  })
+export const { toggleProgrammeSelection } = filter.actions

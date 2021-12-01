@@ -5,6 +5,8 @@ import { arrayOf, string, shape } from 'prop-types'
 import SearchResultTable from '../../SearchResultTable'
 import { getNewestProgramme, getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
+import useFilters from '../../FilterView/useFilters'
+import { isProgrammeSelected, toggleProgrammeSelection } from '../../FilterView/filters/programmes'
 import FilterToggleIcon from '../../FilterToggleIcon'
 
 const CustomPopulationProgrammeDist = ({
@@ -14,9 +16,6 @@ const CustomPopulationProgrammeDist = ({
   populationStatistics,
 }) => {
   const { language } = useLanguage()
-  // FIXME: const { selectedProgrammes, toggleFilterProgramme } = useProgrammeFilter()
-  const selectedProgrammes = []
-  const toggleFilterProgramme = () => {}
 
   const [tableRows, setRows] = useState([])
 
@@ -63,24 +62,26 @@ const CustomPopulationProgrammeDist = ({
 
   const headers = ['Programme', 'Code', `Students (all=${selectedStudents.length})`, 'Percentage of population']
 
-  const handleFilterToggle = code => {
-    toggleFilterProgramme(code)
-  }
-
-  const isProgrammeFilterActive = code => selectedProgrammes.find(p => p.code === code) !== undefined
-
   return (
     <SearchResultTable
       headers={headers}
       rows={tableRows}
       selectable
       noResultText="placeholder"
-      actionTrigger={row => (
-        <span style={{ display: 'inline-block', marginRight: '0.3em' }}>
-          <FilterToggleIcon onClick={() => handleFilterToggle(row[1])} isActive={isProgrammeFilterActive(row[1])} />
-        </span>
-      )}
+      actionTrigger={row => <ProgrammeFilterToggleCell programme={row[1]} />}
     />
+  )
+}
+
+const ProgrammeFilterToggleCell = ({ programme }) => {
+  const { useFilterSelector, filterDispatch } = useFilters()
+
+  const isActive = useFilterSelector(isProgrammeSelected(programme))
+
+  return (
+    <span style={{ display: 'inline-block', marginRight: '0.3em' }}>
+      <FilterToggleIcon onClick={() => filterDispatch(toggleProgrammeSelection(programme))} isActive={isActive} />
+    </span>
   )
 }
 

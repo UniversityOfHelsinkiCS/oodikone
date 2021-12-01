@@ -1,7 +1,6 @@
 import React from 'react'
 import { Label, Dropdown, Button, Icon, Popup } from 'semantic-ui-react'
 import { getTextIn } from '../../../../common'
-import useAnalytics from '../../useAnalytics'
 import useLanguage from '../../../LanguagePicker/useLanguage'
 import { FilterType } from './filterType'
 
@@ -17,14 +16,12 @@ const filterTexts = {
 
 const CourseCard = ({ course, filterType, onChange }) => {
   const { language } = useLanguage()
-  const analytics = useAnalytics()
   const name = 'course-filter'
 
   const onClick = (_, { value }) => onChange(value)
 
   const clear = () => {
     onChange(null)
-    analytics.clearFilter(course.code)
   }
 
   return (

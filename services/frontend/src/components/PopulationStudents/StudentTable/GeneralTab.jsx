@@ -10,12 +10,10 @@ import { getStudentTotalCredits, getTextIn, getNewestProgramme, reformatDate, co
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
-import useFilters from '../../FilterTray/useFilters'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCourseDateMap, coursecode }) => {
+const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCourseDateMap, coursecode, filteredStudents }) => {
   const { language } = useLanguage()
-  const { filteredStudents } = useFilters()
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
 

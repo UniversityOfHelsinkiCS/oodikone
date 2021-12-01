@@ -13,10 +13,6 @@ import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
 import Students from './Students'
 import { getTextIn } from '../../common'
-import useFilterTray from '../FilterTray/useFilterTray'
-import { contextKey as filterTrayContextKey } from '../FilterTray'
-import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Courses'
-import useAnalytics from '../FilterTray/useAnalytics'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const sendAnalytics = sendEvent.populationStatistics
@@ -87,7 +83,7 @@ const initialState = props => ({
   codeFilter: '',
   nameFilter: '',
   activeView: null,
-  selectedStudentsLength: props.selectedStudentsLength || 0,
+  filteredStudentsLength: props.filteredStudentsLength || 0,
 })
 
 const PopulationCourseStats = props => {
@@ -102,28 +98,24 @@ const PopulationCourseStats = props => {
 
   const [state, setState] = useState(initialState(props))
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-  const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
-  const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
-  // FIXME: const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
-  const filterAnalytics = useAnalytics()
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Courses of Population tab changed')
 
   useEffect(() => {
     if (state && props.courses) {
       const studentAmountLimit =
-        state.selectedStudentsLength !== props.selectedStudents.length
-          ? Math.round(props.selectedStudents.length * 0.3)
+        state.filteredStudentsLength !== props.filteredStudents.length
+          ? Math.round(props.filteredStudents.length * 0.3)
           : state.studentAmountLimit
 
       setState({
         ...state,
         initialSortReady: true,
         studentAmountLimit,
-        selectedStudentsLength: props.selectedStudents.length,
+        filteredStudentsLength: props.filteredStudents.length,
       })
       setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses))
     }
-  }, [props.courses, props.selectedStudents])
+  }, [props.courses, props.filteredStudents])
 
   useEffect(() => {
     const { codeFilter, nameFilter, reversed, sortCriteria } = state
@@ -265,26 +257,6 @@ const PopulationCourseStats = props => {
     clearCourseStatsfn()
   }
 
-  const onCourseNameCellClick = code => {
-    const courseStatistic =
-      props.populationCourses.data.coursestatistics?.find(cs => cs.course.code === code) ||
-      props.courses.coursestatistics?.find(cs => cs.course.code === code)
-    if (courseStatistic) {
-      const isSelected = false // FIXME: courseIsSelected(code)
-      const name = 'Course Filtername'
-
-      if (isSelected) {
-        filterAnalytics.clearFilterViaTable(name)
-      } else {
-        filterAnalytics.setFilterViaTable(name)
-      }
-
-      // FIXME: toggleCourseSelection(code)
-      setFilterTrayOpen(true)
-      setCourseFilterOpen(true)
-    }
-  }
-
   const onFilterReset = field => {
     setFilterFields({ ...filterFields, [field]: '' })
   }
@@ -328,7 +300,6 @@ const PopulationCourseStats = props => {
     courseStatistics,
     modules,
     filterInput: renderFilterInputHeaderCell,
-    onCourseNameCellClick,
     onGoToCourseStatisticsClick,
     onSortableColumnHeaderClick,
     tableColumnNames,
@@ -360,7 +331,6 @@ const PopulationCourseStats = props => {
           <PassingSemesters
             filterInput={renderFilterInputHeaderCell}
             courseStatistics={courseStatistics}
-            onCourseNameClickFn={onCourseNameCellClick}
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
           />
@@ -371,7 +341,11 @@ const PopulationCourseStats = props => {
       menuItem: 'students',
       render: () => (
         <div className="menuTab" style={{ marginTop: '0.5em' }}>
-          <Students expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
+          <Students
+            filteredStudents={props.filteredStudents}
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
+          />
         </div>
       ),
     },

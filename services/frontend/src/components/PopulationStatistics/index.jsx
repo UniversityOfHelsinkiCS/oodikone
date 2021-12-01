@@ -5,9 +5,7 @@ import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 import PopulationDetails from '../PopulationDetails'
 import { useLanguage, useTitle } from '../../common/hooks'
-import selectors from '../../selectors/populationDetails'
-import FilterTray from '../FilterTray'
-import { FilterView } from '../FilterTray/useFilters'
+import FilterView from '../FilterView'
 import PopulationSearch from '../PopulationSearch'
 import DataExport from './DataExport'
 import {
@@ -22,7 +20,7 @@ import {
   tagsFilter,
   creditDateFilter,
   enrollmentStatusFilter,
-} from '../FilterTray/filters'
+} from '../FilterView/filters'
 
 const selectPopulations = createSelector(
   ({ populations }) => populations,
@@ -38,7 +36,6 @@ const PopulationStatistics = () => {
   const location = useLocation()
   const language = useLanguage()
   const history = useHistory()
-  const { samples } = useSelector(selectors.makePopulationsToData)
   const { query, queryIsSet, isLoading, students } = useSelector(selectPopulations)
   const courses = useSelector(store => store.populationCourses.data?.coursestatistics)
   const allSemesters = useSelector(store => store.semesters.data?.semesters)
@@ -50,14 +47,17 @@ const PopulationStatistics = () => {
   const filters = [
     genderFilter,
     ageFilter,
-    courseFilter(courses),
+    courseFilter({ courses }),
     creditsEarnedFilter,
-    graduatedFromProgrammeFilter(programmeCode),
+    graduatedFromProgrammeFilter({ code: programmeCode }),
     transferredToProgrammeFilter,
     startYearAtUniFilter,
     tagsFilter,
     creditDateFilter,
-    enrollmentStatusFilter(allSemesters ?? [], language),
+    enrollmentStatusFilter({
+      allSemesters: allSemesters ?? [],
+      language,
+    }),
   ]
 
   if (parseInt(query?.year, 10) >= 2020) {
@@ -66,8 +66,7 @@ const PopulationStatistics = () => {
 
   return (
     <FilterView name="PopulationStatistics" filters={filters} students={students}>
-      <div style={{ display: 'flex', flexDirection: 'row' }}>
-        <FilterTray visible={location.search !== ''} />
+      {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header className="segmentTitle" size="large">
             Population statistics
@@ -78,14 +77,15 @@ const PopulationStatistics = () => {
               <PopulationDetails
                 queryIsSet={queryIsSet}
                 query={query}
-                samples={samples}
                 isLoading={isLoading}
                 dataExport={<DataExport />}
+                allStudents={students}
+                filteredStudents={filteredStudents}
               />
             ) : null}
           </Segment>
         </div>
-      </div>
+      )}
     </FilterView>
   )
 }

@@ -1,12 +1,52 @@
 import React from 'react'
 import produce from 'immer'
-import fp from 'lodash/fp'
+import _ from 'lodash'
 import { setFilterOptions } from '../../../redux/filters'
 
-export default options => {
+const createFilter = options => {
   const Component = options.component
 
-  return {
+  const selectorFuncs = {
+    ...(options.selectors ?? {}),
+    selectOptions: opts => opts,
+    isActive: opts => options.isActive(opts),
+  }
+
+  const actionFuncs = {
+    ...(options.actions ?? {}),
+    setOptions: (_options, value) => value,
+  }
+
+  /**
+   * Selectors are wrapped redux selectors that act on the filter's options.
+   */
+  const selectors = _.mapValues(selectorFuncs, selector =>
+    selector.length === 1
+      ? state => selector(state[options.key] ?? options.defaultOptions)
+      : argument => state => selector(state[options.key] ?? options.defaultOptions, argument)
+  )
+
+  /**
+   * Actions are wrapped redux actions that act on the filter's options.
+   *
+   * Note that these actions cannot be dispatched using the vanilla redux
+   * dispatch function. You need to use the dipatch function obtained form
+   * the useFilterDispatch hook.
+   */
+  const actions = _.mapValues(actionFuncs, (action, name) => payload => (view, getContext) => {
+    const ctx = getContext(options.key)
+
+    return setFilterOptions({
+      view,
+      filter: options.key,
+      action: `${options.key}/${name}`,
+      options: produce(ctx.options, draft => action(draft, payload, ctx)),
+    })
+  })
+
+  const factory = args => ({
+    args,
+
     /**
      * Non-user-visible key for differentiating the filter.
      */
@@ -86,28 +126,15 @@ export default options => {
      */
     priority: options.priority ?? 0,
 
-    /**
-     * Selectors are wrapped redux selectors that act on the filter's options.
-     */
-    selectors: fp.mapValues(
-      options.selectors ?? {},
-      selector => state => selector(state[options.key] ?? options.defaultOptions)
-    ),
+    actions,
 
-    /**
-     * Actions are wrapped redux actions that act on the filter's options.
-     *
-     * Note that these actions cannot be dispatched using the vanilla redux
-     * dispatch function. You need to use the dipatch function obtained form
-     * the useFilterDispatch hook.
-     */
-    actions: fp.mapValues(
-      options.actions ?? {},
-      action => payload => (view, current) =>
-        setFilterOptions({
-          view,
-          options: produce(current, draft => action(draft, payload)),
-        })
-    ),
-  }
+    selectors,
+  })
+
+  factory.actions = actions
+  factory.selectors = selectors
+
+  return factory
 }
+
+export default createFilter

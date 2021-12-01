@@ -5,8 +5,9 @@ import { useSelector, connect } from 'react-redux'
 import { bool, instanceOf, func } from 'prop-types'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
+import useFilters from '../../FilterView/useFilters'
+import { isCourseSelected, toggleCourseSelection } from '../../FilterView/filters/courses'
 import { getTextIn } from '../../../common'
-import useFilters from '../../FilterTray/useFilters'
 import StudentNameVisibilityToggle from '../../StudentNameVisibilityToggle'
 
 const verticalTitle = (...params) => {
@@ -20,13 +21,61 @@ const verticalTitle = (...params) => {
   )
 }
 
-const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
-  const { courseStatistics, filterInput, onCourseNameCellClick, onGoToCourseStatisticsClick, modules } =
-    UsePopulationCourseContext()
+const StudentsRow = ({ course, pagedStudents, hasCompleted, onGoToCourseStatisticsClick }) => {
+  const { language } = useSelector(({ settings }) => settings)
+  const { useFilterSelector, filterDispatch } = useFilters()
+
+  const isActive = useFilterSelector(isCourseSelected(course.code))
+
+  return (
+    <Table.Row key={course.code}>
+      <Popup
+        trigger={
+          <Table.Cell className="filterCell clickableCell">
+            <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleCourseSelection(course.code))} />
+          </Table.Cell>
+        }
+        content={
+          isActive ? (
+            <span>
+              Poista rajaus kurssin <b>{getTextIn(course.name, language)}</b> perusteella
+            </span>
+          ) : (
+            <span>
+              Rajaa opiskelijat kurssin <b>{getTextIn(course.name, language)}</b> perusteella
+            </span>
+          )
+        }
+        position="top right"
+      />
+      <Table.Cell className="nameCell" key="name" content={course.name.fi} />
+      <Table.Cell className="iconCell clickableCell">
+        <p>
+          <Item
+            as={Link}
+            to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+              course.code
+            )}"]&separate=false&unifyOpenUniCourses=false`}
+          >
+            <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(course.code)} />
+          </Item>
+        </p>
+      </Table.Cell>
+      <Table.Cell key="code" content={course.code} />
+      {pagedStudents.map(student => (
+        <Table.Cell
+          key={student.studentnumber}
+          content={hasCompleted(student.studentnumber) ? <Icon fitted name="check" color="green" /> : null}
+        />
+      ))}
+    </Table.Row>
+  )
+}
+
+const Students = ({ filteredStudents, expandedGroups, toggleGroupExpansion, showNames }) => {
+  const { courseStatistics, filterInput, onGoToCourseStatisticsClick, modules } = UsePopulationCourseContext()
   const { language } = useSelector(({ settings }) => settings)
   const [page, setPage] = useState(0)
-  // FIXME: const { courseIsSelected } = useCourseFilter()
-  const { filteredStudents } = useFilters()
 
   const hasCompleted = (courseCode, student) => {
     const course = courseStatistics.find(c => c.course.code === courseCode)
@@ -127,54 +176,12 @@ const Students = ({ expandedGroups, toggleGroupExpansion, showNames }) => {
                 courses
                   .filter(c => c.visible.visibility)
                   .map(col => (
-                    <Table.Row key={col.code}>
-                      <Popup
-                        trigger={
-                          <Table.Cell className="filterCell clickableCell">
-                            <FilterToggleIcon
-                              isActive={false /* FIXME courseIsSelected(col.code) */}
-                              onClick={() => onCourseNameCellClick(col.code)}
-                            />
-                          </Table.Cell>
-                        }
-                        content={
-                          /* FIXME courseIsSelected(col.code) */ false ? (
-                            <span>
-                              Poista rajaus kurssin <b>{getTextIn(col.name, language)}</b> perusteella
-                            </span>
-                          ) : (
-                            <span>
-                              Rajaa opiskelijat kurssin <b>{getTextIn(col.name, language)}</b> perusteella
-                            </span>
-                          )
-                        }
-                        position="top right"
-                      />
-                      <Table.Cell className="nameCell" key="name" content={col.name.fi} />
-                      <Table.Cell className="iconCell clickableCell">
-                        <p>
-                          <Item
-                            as={Link}
-                            to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-                              col.code
-                            )}"]&separate=false&unifyOpenUniCourses=false`}
-                          >
-                            <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(col.code)} />
-                          </Item>
-                        </p>
-                      </Table.Cell>
-                      <Table.Cell key="code" content={col.code} />
-                      {pagedStudents.map(student => (
-                        <Table.Cell
-                          key={student.studentnumber}
-                          content={
-                            hasCompleted(col.code, student.studentnumber) ? (
-                              <Icon fitted name="check" color="green" />
-                            ) : null
-                          }
-                        />
-                      ))}
-                    </Table.Row>
+                    <StudentsRow
+                      course={col}
+                      pagedStudents={pagedStudents}
+                      hasCompleted={sn => hasCompleted(col.code, sn)}
+                      onGoToCourseStatisticsClick={onGoToCourseStatisticsClick}
+                    />
                   ))}
             </React.Fragment>
           ))}

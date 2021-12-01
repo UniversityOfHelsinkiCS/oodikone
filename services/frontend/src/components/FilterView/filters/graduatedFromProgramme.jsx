@@ -48,40 +48,42 @@ const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombined
   )
 }
 
-export default code => {
-  const isCombinedExtent = code && !code.includes('_')
+export default createFilter({
+  key: 'GraduatedFromProgramme',
 
-  return createFilter({
-    key: 'GraduatedFromProgramme',
+  title: 'Graduated From Programme',
 
-    title: 'Graduated From Programme',
+  defaultOptions: {
+    mode: null,
+  },
 
-    defaultOptions: {
-      mode: null,
-    },
+  precompute: ({ args }) => ({
+    isCombinedExtent: args.code && !args.code.includes('_'),
+  }),
 
-    isActive: ({ mode }) => mode !== null,
+  isActive: ({ mode }) => mode !== null,
 
-    filter(student, { mode }) {
-      let examinedStudyRights = student.studyrights
+  filter(student, { mode }, { args, precomputed }) {
+    let examinedStudyRights = student.studyrights
 
-      if (isCombinedExtent && mode > 0) {
-        examinedStudyRights = student.studyrights.filter(sr => sr.extentcode === mode)
-      }
+    if (precomputed.isCombinedExtent && mode > 0) {
+      examinedStudyRights = student.studyrights.filter(sr => sr.extentcode === mode)
+    }
 
-      const keepGraduated = mode > 0
+    const keepGraduated = mode > 0
 
-      return (
-        keepGraduated ===
-        examinedStudyRights.some(sr =>
-          sr.studyright_elements.some(sre => {
-            const dateMatch = new Date(sre.enddate) >= new Date(sr.enddate)
-            return sre.code === code && dateMatch && sr.graduated
-          })
-        )
+    return (
+      keepGraduated ===
+      examinedStudyRights.some(sr =>
+        sr.studyright_elements.some(sre => {
+          const dateMatch = new Date(sre.enddate) >= new Date(sr.enddate)
+          return sre.code === args.code && dateMatch && sr.graduated
+        })
       )
-    },
+    )
+  },
 
-    render: props => <GraduatedFromProgrammeFilterCard {...props} isCombinedExtent={isCombinedExtent} />,
-  })
-}
+  render: (props, { precomputed }) => (
+    <GraduatedFromProgrammeFilterCard {...props} isCombinedExtent={precomputed.isCombinedExtent} />
+  ),
+})
