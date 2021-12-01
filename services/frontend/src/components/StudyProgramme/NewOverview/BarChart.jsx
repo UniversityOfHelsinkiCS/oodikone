@@ -31,6 +31,9 @@ const BarChart = ({ data, categories }) => {
         },
       },
     },
+    tooltip: {
+      pointFormat: '<b>{series.name}: {point.percentage:.1f} %</b>',
+    },
     yAxis: {
       allowDecimals: false,
       min: 0,
