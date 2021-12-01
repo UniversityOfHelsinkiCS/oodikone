@@ -4,13 +4,12 @@ import { Segment, Button } from 'semantic-ui-react'
 import InfoBox from 'components/Info/InfoBox'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import PopulationCourseStats from 'components/PopulationCourseStats'
-import { useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
 import { getMandatoryCourses, getMandatoryCourseModules } from 'redux/populationMandatoryCourses'
 import infotooltips from 'common/InfoToolTips'
 
 const StudyGuidanceGroupPopulationCourses = ({
   courses,
-  selectedStudents,
+  filteredStudents,
   showStructured,
   toggleShowStructured,
   studyProgramme,
@@ -35,12 +34,12 @@ const StudyGuidanceGroupPopulationCourses = ({
         </Button>
       )}
       {showStructured ? (
-        <PopulationCourseStats courses={courses} pending={false} selectedStudents={selectedStudents} />
+        <PopulationCourseStats courses={courses} pending={false} filteredStudents={filteredStudents} />
       ) : (
         <PopulationCourseStatsFlat
           courses={courses}
           pending={false}
-          selectedStudents={selectedStudents}
+          filteredStudents={filteredStudents}
           showFilter={false}
         />
       )}
