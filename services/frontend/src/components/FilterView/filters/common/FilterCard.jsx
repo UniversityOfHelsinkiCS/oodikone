@@ -6,8 +6,17 @@ import ClearFilterButton from './ClearFilterButton'
 const FilterCard = ({ title, children, name, active, onClear, info }) => {
   const [open, setOpen] = useState(active)
 
-  const header = (
-    <>
+  let header = (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        cursor: active ? undefined : 'pointer',
+        flexGrow: 1,
+      }}
+      onClick={!active && (() => setOpen(!open))}
+      data-cy={`${name}-header`}
+    >
       <Icon
         name={open ? 'caret down' : 'caret right'}
         style={{
@@ -19,33 +28,20 @@ const FilterCard = ({ title, children, name, active, onClear, info }) => {
       </Header>
       <div style={{ flexGrow: 1, minWidth: '1rem' }} />
       {active && <ClearFilterButton onClick={onClear} />}
-    </>
-  );
+    </div>
+  )
 
-  const renderWithHelp = info => {
-    if (info) {
-      return (
-        <WithHelpTooltip tooltip={info} data-cy="tooltip-div">{header}</WithHelpTooltip>
-      )
-    }
-
-    return header;
+  if (info) {
+    header = (
+      <WithHelpTooltip containerStyle={{ alignItems: 'center' }} tooltip={info} data-cy="tooltip-div">
+        {header}
+      </WithHelpTooltip>
+    )
   }
 
   return (
-    <div>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          cursor: active ? undefined : 'pointer',
-          margin: '1rem 0',
-        }}
-        onClick={!active && (() => setOpen(!open))}
-        data-cy={`${name}-header`}
-      >
-        {renderWithHelp(info)}
-      </div>
+    <div style={{ margin: '1rem 0' }}>
+      <div style={{ marginBottom: '1rem' }}>{header}</div>
       {(active || open) && children}
     </div>
   )
