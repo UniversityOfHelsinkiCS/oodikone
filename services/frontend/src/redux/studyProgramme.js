@@ -13,8 +13,14 @@ const getCredits = {
   ...actionTypes(getCreditsPrefix),
 }
 
+const getGraduationPrefix = 'GET_STUDY_PROGRAMME_GRADUATION_STATS_'
+const getGraduation = {
+  ...actionTypes(getGraduationPrefix),
+}
+
 export const getBasicStats = id => callController(`${baseUrl}/${id}/basicstats`, getBasicsPrefix)
 export const getCreditStats = id => callController(`${baseUrl}/${id}/creditstats`, getCreditsPrefix)
+export const getGraduationStats = id => callController(`${baseUrl}/${id}/graduationstats`, getGraduationPrefix)
 
 const reducer = createReducer(
   initialState,
@@ -24,6 +30,9 @@ const reducer = createReducer(
     },
     [getCredits.success]: (state, action) => {
       state.creditStats = action.response
+    },
+    [getGraduation.success]: (state, action) => {
+      state.graduationStats = action.response
     },
   },
   matcherReducers,

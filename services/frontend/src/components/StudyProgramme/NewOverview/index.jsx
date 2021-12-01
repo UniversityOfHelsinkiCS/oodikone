@@ -3,23 +3,34 @@ import { connect } from 'react-redux'
 import { Divider } from 'semantic-ui-react'
 
 import LineGraph from './LineGraph'
+import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
 import DataTable from './DataTable'
 import InfoBox from '../../Info/InfoBox'
-import { getBasicStats, getCreditStats } from '../../../redux/studyProgramme'
+import { getBasicStats, getCreditStats, getGraduationStats } from '../../../redux/studyProgramme'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
 const basicStatsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
 const creditStatsTitles = ['', 'Major students credits', 'Non major students credits', 'Transferred credits']
+const graduationStatsTitles = ['', 'Graduated', 'Wrote thesis']
 
 const Overview = props => {
   const toolTips = InfotoolTips.Studyprogramme
-  const { studyprogramme, basicStats, creditStats, dispatchGetBasicStats, dispatchGetCreditStats } = props
+  const {
+    studyprogramme,
+    basicStats,
+    creditStats,
+    graduationStats,
+    dispatchGetBasicStats,
+    dispatchGetCreditStats,
+    dispatchGetGetGraduationStats,
+  } = props
 
   useEffect(() => {
     dispatchGetBasicStats(studyprogramme)
     dispatchGetCreditStats(studyprogramme)
+    dispatchGetGetGraduationStats(studyprogramme)
   }, [])
 
   const getDivider = (title, toolTipText) => (
@@ -40,8 +51,13 @@ const Overview = props => {
       </div>
       {getDivider('Credits produced by the studyprogramme')}
       <div className="section-container">
-        <BarChart categories={creditStats?.data?.years} data={creditStats?.data?.graphStats} />
+        <StackedBarChart categories={creditStats?.data?.years} data={creditStats?.data?.graphStats} />
         <DataTable titles={creditStatsTitles} data={creditStats?.data?.tableStats} />
+      </div>
+      {getDivider('Graduated and thesis writers of the programme')}
+      <div className="section-container">
+        <BarChart categories={graduationStats?.data?.years} data={graduationStats?.data?.graphStats} />
+        <DataTable titles={graduationStatsTitles} data={graduationStats?.data?.tableStats} />
       </div>
     </div>
   )
@@ -50,9 +66,11 @@ const Overview = props => {
 const mapStateToProps = ({ studyProgramme }) => ({
   basicStats: studyProgramme?.basicStats,
   creditStats: studyProgramme?.creditStats,
+  graduationStats: studyProgramme?.graduationStats,
 })
 
 export default connect(mapStateToProps, {
   dispatchGetBasicStats: getBasicStats,
   dispatchGetCreditStats: getCreditStats,
+  dispatchGetGetGraduationStats: getGraduationStats,
 })(Overview)

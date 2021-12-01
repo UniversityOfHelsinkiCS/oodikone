@@ -4,8 +4,8 @@ const ReactHighcharts = require('react-highcharts')
 
 const colors = ['#003E65', '#1392c2', '#036415']
 
-const BarChart = ({ data, categories }) => {
-  const dataWithColors = data.map((series, index) => ({ ...series, color: colors[index] }))
+const StackedBarChart = ({ data, categories }) => {
+  const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const defaultConfig = {
     title: {
@@ -25,14 +25,10 @@ const BarChart = ({ data, categories }) => {
     },
     plotOptions: {
       column: {
-        stacking: 'normal',
         dataLabels: {
           enabled: true,
         },
       },
-    },
-    tooltip: {
-      pointFormat: '<b>{series.name}: {point.percentage:.1f} %</b>',
     },
     yAxis: {
       allowDecimals: false,
@@ -45,4 +41,4 @@ const BarChart = ({ data, categories }) => {
   return <ReactHighcharts config={defaultConfig} />
 }
 
-export default BarChart
+export default StackedBarChart

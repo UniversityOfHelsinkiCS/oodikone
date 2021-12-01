@@ -5,6 +5,7 @@ const createRedisKeyForProductivity = id => `PRODUCTIVITY_${id}`
 const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
 const createRedisKeyForBasicStats = id => `BASIC_STATS_${id}`
 const createRedisKeyForCreditStats = id => `CREDIT_STATS_${id}`
+const createRedisKeyForGraduationStats = id => `GRADUATION_STATS_${id}`
 
 const getProductivity = async id => {
   const redisKey = createRedisKeyForProductivity(id)
@@ -129,6 +130,26 @@ const setCreditStats = async data => {
   return dataToRedis
 }
 
+const getGraduationStats = async id => {
+  const redisKey = createRedisKeyForGraduationStats(id)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
+}
+
+const setGraduationStats = async data => {
+  const { id } = data
+  const redisKey = createRedisKeyForGraduationStats(id)
+  const dataToRedis = {
+    ...data,
+    status: 'DONE',
+    lastUpdated: moment().format(),
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
+  return dataToRedis
+}
+
 module.exports = {
   getProductivity,
   setProductivity,
@@ -140,4 +161,6 @@ module.exports = {
   setBasicStats,
   getCreditStats,
   setCreditStats,
+  getGraduationStats,
+  setGraduationStats,
 }
