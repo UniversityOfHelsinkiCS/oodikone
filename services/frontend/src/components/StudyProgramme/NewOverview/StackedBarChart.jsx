@@ -2,17 +2,21 @@ import React from 'react'
 
 const ReactHighcharts = require('react-highcharts')
 
-const BarChart = ({ data }) => {
+const colors = ['#003E65', '#1392c2', '#036415']
+
+const StackedBarChart = ({ data, categories }) => {
+  const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
+
   const defaultConfig = {
     title: {
       text: '',
     },
-    series: data,
+    series: dataWithColors,
     credits: {
       text: 'oodikone | TOSKA',
     },
     xAxis: {
-      categories: ['2017', '2018', '2019', '2020', '2021'],
+      categories,
     },
     chart: {
       type: 'column',
@@ -27,6 +31,9 @@ const BarChart = ({ data }) => {
         },
       },
     },
+    tooltip: {
+      pointFormat: '<b>{series.name}: {point.percentage:.1f} %</b>',
+    },
     yAxis: {
       allowDecimals: false,
       min: 0,
@@ -38,4 +45,4 @@ const BarChart = ({ data }) => {
   return <ReactHighcharts config={defaultConfig} />
 }
 
-export default BarChart
+export default StackedBarChart
