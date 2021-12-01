@@ -65,7 +65,7 @@ const formatStudentForPopulationStatistics = (
   startDateMoment,
   endDateMoment
 ) => {
-  const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule }) => {
+  const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule, language }) => {
     const attainment_date_normailized =
       attainment_date < startDate ? startDateMoment.clone().add(1, 'day').toISOString() : attainment_date
     const passed = Credit.passed({ credittypecode })
@@ -78,6 +78,7 @@ const formatStudentForPopulationStatistics = (
       credits,
       isStudyModuleCredit: isStudyModule,
       credittypecode,
+      language,
     }
   }
 
@@ -265,6 +266,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'isStudyModule',
         'student_studentnumber',
         'course_code',
+        'language',
       ],
       where: creditsOfStudent,
       raw: true,

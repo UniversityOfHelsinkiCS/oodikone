@@ -75,6 +75,9 @@ Credit.init(
     updatedAt: {
       type: DATE,
     },
+    language: {
+      type: STRING,
+    },
   },
   {
     underscored: false,
