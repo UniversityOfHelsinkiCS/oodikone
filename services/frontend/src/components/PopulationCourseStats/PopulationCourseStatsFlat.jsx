@@ -73,14 +73,14 @@ const updateCourseStatisticsCriteria = (courseStats, language, state) => {
 const initialState = props => ({
   sortCriteria: tableColumnNames.STUDENTS,
   reversed: true,
-  studentAmountLimit: Math.round(props.selectedStudents.length * 0.3),
+  studentAmountLimit: Math.round(props.filteredStudents.length * 0.3),
   codeFilter: '',
   nameFilter: '',
   activeView: null,
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter = true }) => {
+const PopulationCourseStats = ({ courses, pending, filteredStudents, showFilter = true }) => {
   const dispatch = useDispatch()
   const { years } = useSelector(({ semesters }) => semesters.data)
   const isAdmin = getUserIsAdmin(useSelector(({ auth }) => auth.token.roles))
@@ -91,7 +91,7 @@ const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter 
     isAdmin,
     pending,
     populationCourses: courses,
-    selectedStudents,
+    selectedStudents: filteredStudents,
     showFilter,
     years,
   }
@@ -102,7 +102,7 @@ const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter 
 
   const courseStatistics = useMemo(
     () => updateCourseStatisticsCriteria(courses, language, state),
-    [courses, language, state],
+    [courses, language, state]
   )
 
   useEffect(() => {
@@ -139,15 +139,6 @@ const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter 
   useEffect(() => {
     if (!pending) setFilters(filterFields)
   }, [filterFields, pending])
-
-  const onSetFilterKeyPress = e => {
-    const { key } = e
-    const enterKey = 'Enter'
-    const isEnterKeyPress = key === enterKey
-    if (isEnterKeyPress) {
-      handleCourseStatisticsCriteriaChange()
-    }
-  }
 
   const onStudentAmountLimitChange = e => {
     const {
@@ -199,7 +190,6 @@ const PopulationCourseStats = ({ courses, pending, selectedStudents, showFilter 
             transparent
             placeholder="Filter..."
             onChange={e => onFilterChange(e, field)}
-            onKeyPress={onSetFilterKeyPress}
             value={getFilterValue(field)}
             icon={getFilterValue(field) ? <Icon name="delete" link onClick={() => onFilterReset(field)} /> : undefined}
           />

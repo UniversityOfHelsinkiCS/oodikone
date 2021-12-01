@@ -1,25 +1,23 @@
 import * as filters from 'components/FilterView/filters'
-import { Button, Header, Accordion, Divider, Label, Segment } from 'semantic-ui-react'
+import { Button, Header, Accordion, Divider, Label } from 'semantic-ui-react'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
-import FilterView from '../FilterView'
-import _ from 'lodash'
-import { getCustomPopulation, clearPopulations } from '../../redux/populations'
-import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
-import { getSemesters } from '../../redux/semesters' 
 import { getTextIn } from 'common'
-import InfoBox from 'components/Info/InfoBox'
-import infotooltips from '../../common/InfoToolTips'
 import PopulationStudents from 'components/PopulationStudents'
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 import scrollToComponent from 'react-scroll-to-component'
 import SegmentDimmer from 'components/SegmentDimmer'
-import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
-import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
-import { useGetStudyGuidanceGroupPopulationQuery, useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
+import {
+  useGetStudyGuidanceGroupPopulationQuery,
+  useGetStudyGuidanceGroupPopulationCoursesQuery,
+} from 'redux/studyGuidanceGroups'
 import { useHistory } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { useToggle } from 'common/hooks'
+import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
+import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
+import { getSemesters } from '../../redux/semesters'
+import FilterView from '../FilterView'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
@@ -79,7 +77,6 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
     year: group.tags?.year,
   })
 
-  const allSemesters = useSelector(state => state.semesters?.data ?? [])
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -145,19 +142,17 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
       content: {
         content: (
           <div ref={refs[1]}>
-            {
-              coursesAreLoading
-                ? <SegmentDimmer isLoading={coursesAreLoading} />
-                : (
-                  <StudyGuidanceGroupPopulationCourses
-                    courses={courses}
-                    selectedStudents={students.map(({ studentNumber }) => studentNumber)}
-                    showStructured={coursesStructuredByProgramme}
-                    toggleShowStructured={toggleCoursesStructuredByProgramme}
-                    studyProgramme={group.tags?.studyProgramme}
-                  />
-                )
-            }
+            {coursesAreLoading ? (
+              <SegmentDimmer isLoading={coursesAreLoading} />
+            ) : (
+              <StudyGuidanceGroupPopulationCourses
+                courses={courses}
+                filteredStudents={students}
+                showStructured={coursesStructuredByProgramme}
+                toggleShowStructured={toggleCoursesStructuredByProgramme}
+                studyProgramme={group.tags?.studyProgramme}
+              />
+            )}
           </div>
         ),
       },
@@ -187,67 +182,54 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
     },
   ]
 
+  return <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels(filteredStudents)} />
+}
+
+const SingleStudyGroupFilterView = props => {
+  const dispatch = useDispatch()
+  const allSemesters = useSelector(state => state.semesters.data?.semesters)
+
+  useEffect(() => {
+    dispatch(getSemesters())
+  }, [])
+
   const viewFilters = [
     filters.enrollmentStatusFilter({
-      allSemesters,
-      language,
+      allSemesters: allSemesters ?? [],
+      language: props.language,
     }),
     filters.ageFilter,
     filters.genderFilter,
     filters.startYearAtUniFilter,
     filters.tagsFilter,
-    filters.courseFilter({ courses }),
+    filters.courseFilter({
+      courses: props.courses ?? [],
+    }),
     filters.creditDateFilter,
   ]
 
-  return (
-    <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels(students)} />
-  )
-}
-
-const SingleStudyGroupFilterView = (props) => {
-  const dispatch = useDispatch()
-  const allSemesters = useSelector((state) => state.semesters.data?.semesters);
-
-  useEffect(() => {
-    dispatch(getSemesters());
-  }, []);
-
-  console.log('Courses', props.courses)
-
-  const viewFilters = [
-    filters.enrollmentStatusFilter(allSemesters ?? [], props.language),
-    filters.ageFilter,
-    filters.genderFilter,
-    filters.startYearAtUniFilter,
-    filters.tagsFilter,
-    filters.courseFilter(props.courses),
-    filters.creditDateFilter,
-  ]
-
-  if (props.group?.tags?.studyProgramme && group?.tags?.year >= 2020) {
+  if (props.group?.tags?.studyProgramme && props.group?.tags?.year && parseInt(props.group.tags.year, 10) >= 2020) {
     viewFilters.push(
-      filters.admissionTypeFilter(),
-    );
+      filters.admissionTypeFilter({
+        programme: props.group.tags.studyProgramme,
+      })
+    )
   }
 
-  if (props.group?.tags?.studyprogramme) {
+  if (props.group?.tags?.studyProgramme) {
     viewFilters.push(
-      filters.graduatedFromProgrammeFilter(group.tags.studyProgramme),
-    );
+      filters.graduatedFromProgrammeFilter({
+        programme: props.group.tags.studyProgramme,
+      })
+    )
   }
 
   return (
     <FilterView filters={viewFilters} students={props.population?.students ?? []}>
-      {(students) => (
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <FilterTray />
-          <SingleStudyGroupContent {...props } filteredStudents={students} />
-        </div>
-      )}
+      {students => <SingleStudyGroupContent {...props} filteredStudents={students} />}
     </FilterView>
-  );
-};
+  )
+}
 
 const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgrammes, children }) => {
   const history = useHistory()
@@ -280,7 +262,8 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
   const groupStudentNumbers = group?.members?.map(({ personStudentNumber }) => personStudentNumber) || []
   const studyProgrammes = useFilteredAndFormattedElementDetails(language)
   const { data, isLoading } = useGetStudyGuidanceGroupPopulationQuery(groupStudentNumbers)
-  const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers)
+  const { data: courses, isLoading: coursesAreLoading } =
+    useGetStudyGuidanceGroupPopulationCoursesQuery(groupStudentNumbers)
 
   if (!group) {
     return (
@@ -308,15 +291,17 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
       isLoading={isLoading}
       studyProgrammes={studyProgrammes}
     >
-      {!isLoading &&
-        <SingleStudyGroupFilterView
-          population={data}
-          language={language}
-          group={group}
-          courses={courses?.coursestatistics}
-          coursesAreLoading={coursesAreLoading}
-        />
-      }
+      {!isLoading && (
+        <div style={{ marginTop: '1rem' }}>
+          <SingleStudyGroupFilterView
+            population={data}
+            language={language}
+            group={group}
+            courses={courses?.coursestatistics}
+            coursesAreLoading={coursesAreLoading}
+          />
+        </div>
+      )}
     </SingleStudyGroupViewWrapper>
   )
 }
