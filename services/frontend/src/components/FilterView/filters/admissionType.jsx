@@ -60,21 +60,20 @@ const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }
   )
 }
 
-export default code =>
-  createFilter({
-    key: 'AdmissionType',
+export default createFilter({
+  key: 'AdmissionType',
 
-    title: 'Admission Type',
+  title: 'Admission Type',
 
-    defaultOptions: {
-      selected: null,
-    },
+  defaultOptions: {
+    selected: null,
+  },
 
-    isActive: ({ selected }) => selected !== null,
+  isActive: ({ selected }) => selected !== null,
 
-    filter(student, { selected }) {
-      return admissionTypeFilter(code)(selected)(student)
-    },
+  filter(student, { selected }, { args }) {
+    return admissionTypeFilter(args.programme)(selected)(student)
+  },
 
-    render: props => <AdmissionTypeFilterCard {...props} code={code} />,
-  })
+  render: (props, { args }) => <AdmissionTypeFilterCard {...props} code={args.programme} />,
+})

@@ -61,7 +61,11 @@ const PopulationStatistics = () => {
   ]
 
   if (parseInt(query?.year, 10) >= 2020) {
-    filters.push(admissionTypeFilter(programmeCode))
+    filters.push(
+      admissionTypeFilter({
+        programme: programmeCode,
+      })
+    )
   }
 
   return (
