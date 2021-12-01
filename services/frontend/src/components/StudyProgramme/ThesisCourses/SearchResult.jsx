@@ -3,12 +3,15 @@ import { connect } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
 import { arrayOf, shape, string, func } from 'prop-types'
 import { getCourseSearchResults } from '../../../selectors/courses'
+import useLanguage from '../../LanguagePicker/useLanguage'
 import SortableTable from '../../SortableTable'
 
-const SearchResult = ({ courses, getCourseActions }) =>
-  courses.length === 0 ? (
-    <Segment content="No results" />
-  ) : (
+const SearchResult = ({ courses, getCourseActions }) => {
+  const { language } = useLanguage()
+
+  if (!courses || courses.length === 0) return <Segment content="No results" />
+
+  return (
     <SortableTable
       getRowKey={c => c.code}
       tableProps={{ celled: true }}
@@ -22,7 +25,7 @@ const SearchResult = ({ courses, getCourseActions }) =>
         {
           key: 'name',
           title: 'Name',
-          getRowVal: c => c.name,
+          getRowVal: c => c.name[language],
           headerProps: { width: 12, textAlign: 'left' },
         },
         {
@@ -35,6 +38,7 @@ const SearchResult = ({ courses, getCourseActions }) =>
       data={courses}
     />
   )
+}
 
 SearchResult.propTypes = {
   courses: arrayOf(
