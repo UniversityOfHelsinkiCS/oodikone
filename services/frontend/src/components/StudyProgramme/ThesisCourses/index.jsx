@@ -1,6 +1,5 @@
 import React from 'react'
 import { Button, Message } from 'semantic-ui-react'
-import { string, func } from 'prop-types'
 import { connect } from 'react-redux'
 import CourseSearchForm from '../../CourseSearchForm'
 import ThesisCourseList from './ThesisCourseList'
@@ -32,12 +31,6 @@ const ThesisCourses = ({ studyprogramme, createThesis, getTheses }) => {
       <ThesisCourseList studyprogramme={studyprogramme} />
     </>
   )
-}
-
-ThesisCourses.propTypes = {
-  studyprogramme: string.isRequired,
-  createThesis: func.isRequired,
-  getTheses: func.isRequired,
 }
 
 export default connect(null, {

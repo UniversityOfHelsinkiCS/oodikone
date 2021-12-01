@@ -1,6 +1,17 @@
 const router = require('express').Router()
-const { getBasicStatsForStudytrack, getCreditStatsForStudytrack } = require('../services/newStudyprogramme')
-const { getBasicStats, setBasicStats, getCreditStats, setCreditStats } = require('../services/analyticsService')
+const {
+  getBasicStatsForStudytrack,
+  getCreditStatsForStudytrack,
+  getGraduationStatsForStudytrack,
+} = require('../services/newStudyprogramme')
+const {
+  getBasicStats,
+  setBasicStats,
+  getCreditStats,
+  setCreditStats,
+  getGraduationStats,
+  setGraduationStats,
+} = require('../services/analyticsService')
 const logger = require('../util/logger')
 
 router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
@@ -63,6 +74,40 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
         data = await setCreditStats(result)
       } catch (e) {
         logger.error(`Failed to update code ${code} credit stats`)
+      }
+    }
+    return res.json({ data })
+  } else {
+    res.status(422).end()
+  }
+})
+
+router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
+  const code = req.params.id
+  if (code) {
+    let data = null
+    try {
+      data = await getGraduationStats(code)
+    } catch (e) {
+      logger.error(`Failed to get code ${code} graduation stats`)
+    }
+    if (!data) {
+      try {
+        let result
+        if (code.includes('MH') || code.includes('KH')) {
+          result = await getGraduationStatsForStudytrack({
+            studyprogramme: req.params.id,
+            startDate: new Date('2017-01-01'),
+          })
+        } else {
+          result = await getGraduationStatsForStudytrack({
+            studyprogramme: req.params.id,
+            startDate: new Date('2000-01-01'),
+          })
+        }
+        data = await setGraduationStats(result)
+      } catch (e) {
+        logger.error(`Failed to update code ${code} graduation stats`)
       }
     }
     return res.json({ data })

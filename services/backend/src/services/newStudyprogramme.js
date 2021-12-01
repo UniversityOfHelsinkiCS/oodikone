@@ -11,6 +11,8 @@ const {
   Transfer,
   Student,
 } = require('../models')
+const { ThesisCourse } = require('../models/models_kone')
+
 const { mapToProviders } = require('../util/utils')
 
 const formatStudyright = studyright => {
@@ -137,6 +139,35 @@ const getTransferredCredits = async (provider, since) =>
       },
     },
   })
+
+const getThesisCredits = async (studyprogramme, startDate) => {
+  const thesiscourses = await ThesisCourse.findAll({
+    where: {
+      programmeCode: studyprogramme,
+    },
+  })
+  return await Credit.findAll({
+    include: {
+      model: Course,
+      required: true,
+      distinct: true,
+      col: 'student_studentnumber',
+      where: {
+        code: {
+          [Op.in]: thesiscourses.map(tc => tc.courseCode),
+        },
+      },
+    },
+    where: {
+      credittypecode: {
+        [Op.ne]: 10,
+      },
+      attainment_date: {
+        [Op.gte]: startDate,
+      },
+    },
+  })
+}
 
 const startedStudyrights = async (studytrack, since) =>
   await Studyright.findAll({
@@ -327,38 +358,17 @@ const getTransferredCreditStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
-const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
-  const years = getYearsArray(startDate.getFullYear())
-  const { majors, nonMajors } = await getRegularCreditStats(studyprogramme, startDate, years)
-  const transferred = await getTransferredCreditStats(studyprogramme, startDate, years)
+const getThesisStats = async (studytrack, startDate, years) => {
+  const credits = await getThesisCredits(studytrack, startDate)
+  const { graphStats, tableStats } = getStatsBasis(years)
 
-  const reversedYears = getYearsArray(startDate.getFullYear()).reverse()
-  const tableStats = reversedYears.map(year => [
-    year,
-    majors.tableStats[year],
-    nonMajors.tableStats[year],
-    transferred.tableStats[year],
-  ])
+  credits.forEach(({ attainment_date }) => {
+    const attainmentYear = attainment_date.getFullYear()
+    graphStats[indexOf(years, attainmentYear)] += 1
+    tableStats[attainmentYear] += 1
+  })
 
-  return {
-    id: studyprogramme,
-    years,
-    tableStats,
-    graphStats: [
-      {
-        name: 'Major students credits',
-        data: majors.graphStats,
-      },
-      {
-        name: 'Non-major students credits',
-        data: nonMajors.graphStats,
-      },
-      {
-        name: 'Transferred credits',
-        data: transferred.graphStats,
-      },
-    ],
-  }
+  return { graphStats, tableStats }
 }
 
 const getBasicStatsForStudytrack = async ({ studyprogramme, startDate }) => {
@@ -408,7 +418,67 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, startDate }) => {
   }
 }
 
+const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
+  const years = getYearsArray(startDate.getFullYear())
+  const { majors, nonMajors } = await getRegularCreditStats(studyprogramme, startDate, years)
+  const transferred = await getTransferredCreditStats(studyprogramme, startDate, years)
+
+  const reversedYears = getYearsArray(startDate.getFullYear()).reverse()
+  const tableStats = reversedYears.map(year => [
+    year,
+    majors.tableStats[year],
+    nonMajors.tableStats[year],
+    transferred.tableStats[year],
+  ])
+
+  return {
+    id: studyprogramme,
+    years,
+    tableStats,
+    graphStats: [
+      {
+        name: 'Major students credits',
+        data: majors.graphStats,
+      },
+      {
+        name: 'Non-major students credits',
+        data: nonMajors.graphStats,
+      },
+      {
+        name: 'Transferred credits',
+        data: transferred.graphStats,
+      },
+    ],
+  }
+}
+
+const getGraduationStatsForStudytrack = async ({ studyprogramme, startDate }) => {
+  const years = getYearsArray(startDate.getFullYear())
+  const thesis = await getThesisStats(studyprogramme, startDate, years)
+  const graduated = await getGraduatedStats(studyprogramme, startDate, years)
+
+  const reversedYears = getYearsArray(startDate.getFullYear()).reverse()
+  const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
+
+  return {
+    id: studyprogramme,
+    years,
+    tableStats,
+    graphStats: [
+      {
+        name: 'Graduated students',
+        data: graduated.graphStats,
+      },
+      {
+        name: 'Wrote thesis',
+        data: thesis.graphStats,
+      },
+    ],
+  }
+}
+
 module.exports = {
   getBasicStatsForStudytrack,
   getCreditStatsForStudytrack,
+  getGraduationStatsForStudytrack,
 }

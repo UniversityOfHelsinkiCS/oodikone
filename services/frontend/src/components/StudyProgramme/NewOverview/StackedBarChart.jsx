@@ -25,10 +25,14 @@ const StackedBarChart = ({ data, categories }) => {
     },
     plotOptions: {
       column: {
+        stacking: 'normal',
         dataLabels: {
           enabled: true,
         },
       },
+    },
+    tooltip: {
+      pointFormat: '<b>{series.name}: {point.percentage:.1f} %</b>',
     },
     yAxis: {
       allowDecimals: false,
