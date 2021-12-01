@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Segment } from 'semantic-ui-react'
-import { arrayOf, shape, string, func } from 'prop-types'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import SortableTable from '../../SortableTable'
@@ -38,16 +37,6 @@ const SearchResult = ({ courses, getCourseActions }) => {
       data={courses}
     />
   )
-}
-
-SearchResult.propTypes = {
-  courses: arrayOf(
-    shape({
-      code: string,
-      name: string,
-    })
-  ),
-  getCourseActions: func.isRequired,
 }
 
 SearchResult.defaultProps = {
