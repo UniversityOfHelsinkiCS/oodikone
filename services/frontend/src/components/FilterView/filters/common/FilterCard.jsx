@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
 import WithHelpTooltip from '../../../Info/InfoWithHelpTooltip'
-import ClearFilterButton from './ClearFilterButton'
+
+import './FilterCard.css'
 
 const FilterCard = ({ title, children, name, active, onClear, info }) => {
   const [open, setOpen] = useState(active)
@@ -11,23 +12,41 @@ const FilterCard = ({ title, children, name, active, onClear, info }) => {
       style={{
         display: 'flex',
         alignItems: 'center',
-        cursor: active ? undefined : 'pointer',
+        cursor: 'pointer',
         flexGrow: 1,
       }}
-      onClick={!active && (() => setOpen(!open))}
+      className="filter-card-header"
+      onClick={() => setOpen(!open)}
       data-cy={`${name}-header`}
     >
-      <Icon
-        name={open ? 'caret down' : 'caret right'}
-        style={{
-          color: active ? '#DDD' : 'black',
-        }}
-      />
+      <Icon name={open ? 'caret down' : 'caret right'} style={{ color: 'black', flexShrink: 0 }} />
       <Header size="tiny" style={{ margin: '0' }}>
         {title}
       </Header>
+      {active && (
+        <div
+          style={{
+            backgroundColor: '#2185d0',
+            flexShrink: 0,
+            marginLeft: '0.5rem',
+            borderRadius: '9999px',
+            width: '0.5rem',
+            height: '0.5rem',
+            marginTop: '0.2em',
+          }}
+        />
+      )}
       <div style={{ flexGrow: 1, minWidth: '1rem' }} />
-      {active && <ClearFilterButton onClick={onClear} />}
+      {active && (
+        <Icon
+          name="trash alternate outline"
+          onClick={evt => {
+            evt.stopPropagation()
+            onClear()
+          }}
+          className="filter-clear-icon"
+        />
+      )}
     </div>
   )
 
@@ -42,7 +61,7 @@ const FilterCard = ({ title, children, name, active, onClear, info }) => {
   return (
     <div style={{ margin: '1rem 0' }}>
       <div style={{ marginBottom: '1rem' }}>{header}</div>
-      {(active || open) && children}
+      {open && children}
     </div>
   )
 }
