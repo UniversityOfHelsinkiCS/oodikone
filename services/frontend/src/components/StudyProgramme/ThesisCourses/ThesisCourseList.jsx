@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { string, func, bool, arrayOf, shape } from 'prop-types'
 import { Dimmer, Loader, Segment, Button } from 'semantic-ui-react'
 import { getThesisCourses, deleteThesisCourse } from '../../../redux/thesisCourses'
 import SortableTable from '../../SortableTable'
@@ -51,19 +50,6 @@ const ThesisCourseList = ({ studyprogramme, getThesisCourses, pending, data, del
       )}
     </>
   )
-}
-
-ThesisCourseList.propTypes = {
-  studyprogramme: string.isRequired,
-  pending: bool.isRequired,
-  getThesisCourses: func.isRequired,
-  deleteThesisCourse: func.isRequired,
-  data: arrayOf(
-    shape({
-      courseCode: string,
-      thesisType: string,
-    })
-  ),
 }
 
 ThesisCourseList.defaultProps = {
