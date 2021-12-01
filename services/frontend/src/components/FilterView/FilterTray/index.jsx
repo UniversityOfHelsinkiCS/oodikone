@@ -13,6 +13,7 @@ const FilterTray = () => {
     filterOptions,
     setFilterOptions,
     resetFilter,
+    resetFilters,
     getContextByKey,
   } = useContext(FilterViewContext)
 
@@ -29,7 +30,12 @@ const FilterTray = () => {
 
     return (
       <div key={key}>
-        <FilterCard title={title ?? key} active={isActive(filterOptions[key])} onClear={() => resetFilter(key)} info={info}>
+        <FilterCard
+          title={title ?? key}
+          active={isActive(filterOptions[key])}
+          onClear={() => resetFilter(key)}
+          info={info}
+        >
           {render(props, ctx)}
         </FilterCard>
       </div>
@@ -51,7 +57,7 @@ const FilterTray = () => {
           </div>
           {isAnyFilterActive && (
             <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
-              <Button compact size="mini">
+              <Button compact size="mini" onClick={resetFilters}>
                 Reset All Filters
               </Button>
             </div>
