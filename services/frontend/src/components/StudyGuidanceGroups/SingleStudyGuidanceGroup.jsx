@@ -1,23 +1,25 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { getSemesters } from '../../redux/semesters' 
+import * as filters from 'components/FilterView/filters'
 import { Button, Header, Accordion, Divider, Label, Segment } from 'semantic-ui-react'
-import SegmentDimmer from 'components/SegmentDimmer'
-import { useHistory } from 'react-router-dom'
-import scrollToComponent from 'react-scroll-to-component'
-import { getTextIn } from 'common'
-import { useToggle } from 'common/hooks'
-import { FilterView } from '../FilterTray/useFilters'
-import FilterTray from 'components/FilterTray'
-import * as filters from 'components/FilterTray/filters'
-import useFilters from 'components/FilterTray/useFilters'
-import PopulationStudents from 'components/PopulationStudents'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
-import { StudyGuidanceGroupFilters } from 'components/FilterTray/FilterSets'
-import { useGetStudyGuidanceGroupPopulationQuery, useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
-import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
-import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
+import FilterView from '../FilterView'
+import _ from 'lodash'
+import { getCustomPopulation, clearPopulations } from '../../redux/populations'
+import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
+import { getSemesters } from '../../redux/semesters' 
+import { getTextIn } from 'common'
+import InfoBox from 'components/Info/InfoBox'
+import infotooltips from '../../common/InfoToolTips'
+import PopulationStudents from 'components/PopulationStudents'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
+import scrollToComponent from 'react-scroll-to-component'
+import SegmentDimmer from 'components/SegmentDimmer'
 import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
+import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
+import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
+import { useGetStudyGuidanceGroupPopulationQuery, useGetStudyGuidanceGroupPopulationCoursesQuery } from 'redux/studyGuidanceGroups'
+import { useHistory } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { useToggle } from 'common/hooks'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
 
@@ -53,26 +55,36 @@ const useToggleAndSetNewestIndex = ({ defaultValue, indexOfPanelToScroll, setNew
 }
 
 const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading, population, group, language }) => {
-  const isMounted = useIsMounted()
   const refs = [useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setActiveIndex] = useState([])
   const [newestIndex, setNewestIndex] = useState(null)
+  const isMounted = useIsMounted()
+
   const [creditsStartingFromAssociatedYear, toggleCreditsStartingFromAssociatedYear] = useToggleAndSetNewestIndex({
     defaultValue: !!group.tags?.year,
     indexOfPanelToScroll: 0,
     setNewestIndex,
     isMounted,
   })
+
   const [coursesStructuredByProgramme, toggleCoursesStructuredByProgramme] = useToggleAndSetNewestIndex({
     defaultValue: !!group.tags?.studyProgramme,
     indexOfPanelToScroll: 1,
     setNewestIndex,
     isMounted,
   })
+
   const filteredStudentsWithFilteredCourses = takeOnlyCoursesStartingFromGivenAcademicYear({
     students: filteredStudents,
     year: group.tags?.year,
   })
+
+  const allSemesters = useSelector(state => state.semesters?.data ?? [])
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getSemesters())
+  }, [])
 
   const togglePanel = index => {
     const currentActiveIndex = new Set(activeIndex)
@@ -93,13 +105,13 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
     togglePanel(0)
   }, [population])
 
-  const panels = [
+  const createPanels = students => [
     {
       key: 0,
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Credit accumulation (for {filteredStudents.length} students)
+            Credit accumulation (for {students.length} students)
           </span>
         ),
       },
@@ -113,7 +125,7 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
               </Button>
             )}
             <CreditAccumulationGraphHighCharts
-              students={creditsStartingFromAssociatedYear ? filteredStudentsWithFilteredCourses : filteredStudents}
+              students={creditsStartingFromAssociatedYear ? filteredStudentsWithFilteredCourses : students}
               startDate={creditsStartingFromAssociatedYear && createAcademicYearStartDate(group.tags?.year)}
             />
           </div>
@@ -139,7 +151,7 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
                 : (
                   <StudyGuidanceGroupPopulationCourses
                     courses={courses}
-                    selectedStudents={filteredStudents.map(({ studentNumber }) => studentNumber)}
+                    selectedStudents={students.map(({ studentNumber }) => studentNumber)}
                     showStructured={coursesStructuredByProgramme}
                     toggleShowStructured={toggleCoursesStructuredByProgramme}
                     studyProgramme={group.tags?.studyProgramme}
@@ -155,7 +167,7 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Students ({filteredStudents.length})
+            Students ({students.length})
           </span>
         ),
       },
@@ -166,7 +178,7 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
             <PopulationStudents
               variant="studyGuidanceGroupPopulation"
               language={language}
-              filteredStudents={filteredStudents}
+              filteredStudents={students}
               studyGuidanceGroup={group}
             />
           </div>
@@ -175,10 +187,21 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
     },
   ]
 
+  const viewFilters = [
+    filters.enrollmentStatusFilter({
+      allSemesters,
+      language,
+    }),
+    filters.ageFilter,
+    filters.genderFilter,
+    filters.startYearAtUniFilter,
+    filters.tagsFilter,
+    filters.courseFilter({ courses }),
+    filters.creditDateFilter,
+  ]
+
   return (
-    <Segment className="contentSegment">
-      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
-    </Segment>
+    <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels(students)} />
   )
 }
 

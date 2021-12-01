@@ -1,8 +1,8 @@
 import React from 'react'
 import { Form, Checkbox } from 'semantic-ui-react'
 import fp from 'lodash/fp'
-import { getHighestGradeOfCourseBetweenRange } from '../../../../common'
-import createFilter from '../createFilter'
+import { getHighestGradeOfCourseBetweenRange } from '../../../common'
+import createFilter from './createFilter'
 
 export const contextKey = 'gradeFilter'
 
@@ -61,43 +61,59 @@ const GradeFilterCard = ({ options, onOptionsChange, grades, withoutSelf }) => {
   )
 }
 
-export default (courseCodes, from, to) =>
-  createFilter({
-    key: 'Grade',
+export default createFilter({
+  key: 'Grade',
 
-    defaultOptions: {
-      selected: [],
-    },
+  defaultOptions: {
+    selected: [],
+  },
 
-    isActive: ({ selected }) => selected.length > 0,
+  isActive: ({ selected }) => selected.length > 0,
 
-    precompute: [
+  precompute: ({ students, args }) =>
+    fp.flow(
+      fp.map(student => [
+        student.studentNumber,
+        fp.filter(course => args.courseCodes.includes(course.course_code))(student.courses),
+      ]),
+      /* fp.filter(
       fp.flow(
-        fp.map(student => [student.studentNumber, student.courses]),
-        fp.filter(
-          fp.flow(
-            ([, courses]) => courses,
-            fp.map('course_code'),
-            courses => courseCodes.some(code => courses.includes(code))
-          )
-        ),
-        fp.map(([sn, courses]) => [sn, getHighestGradeOfCourseBetweenRange(courses, from, to)]),
-        fp.groupBy(([, { grade }]) => grade),
-        fp.mapValues(fp.map(([sn]) => sn)),
-        grades => ({ grades })
-      ),
-      [courseCodes, from, to],
-    ],
+        ([, courses]) => courses,
+        fp.map('course_code'),
+        courses => args.courseCodes.some(code => courses.includes(code))
+      )
+    ), */
+      fp.map(([sn, courses]) => [sn, getHighestGradeOfCourseBetweenRange(courses, args.from, args.to)]),
+      fp.groupBy(([, { grade }]) => grade),
+      fp.mapValues(fp.map(([sn]) => sn)),
+      grades => ({ grades })
+    )(students),
 
-    filter(student, { selected }, { grades }) {
-      return selected.some(selectedGrade => grades[selectedGrade].includes(student.studentNumber))
+  filter(student, { selected }, { precomputed }) {
+    return selected.some(selectedGrade => precomputed.grades[selectedGrade].includes(student.studentNumber))
+  },
+
+  render: (props, { precomputed }) => <GradeFilterCard {...props} grades={precomputed.grades} />,
+
+  selectors: {
+    isGradeSelected: ({ selected }, grade) => {
+      return selected.includes(grade)
+    },
+  },
+
+  actions: {
+    selectGrade(state, grade) {
+      if (state.selected.indexOf(grade) === -1) {
+        state.selected.push(grade)
+      }
     },
 
-    render: (props, { grades }) => <GradeFilterCard {...props} grades={grades} />,
+    unselectGrade(state, grade) {
+      const index = state.selected.indexOf(grade)
 
-    actions: {
-      selectGrade(state, grade) {
-        state.selected = [grade]
-      },
+      if (index !== -1) {
+        state.selected.splice(index, 1)
+      }
     },
-  })
+  },
+})

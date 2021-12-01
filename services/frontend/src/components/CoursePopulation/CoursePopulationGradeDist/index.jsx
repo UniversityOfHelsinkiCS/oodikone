@@ -8,7 +8,6 @@ import ExternalGradeFilterToggle from './ExternalGradeFilterToggle'
 
 const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStudents, samples, codes, from, to }) => {
   const [courseGrades, setCourseGrades] = useState([])
-  // const { setGrades } = useGradeFilter()
 
   useEffect(() => {
     if (samples && singleCourseStats.alternatives) {
@@ -33,7 +32,6 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
       })
 
       setCourseGrades(filteredGradeArray)
-      // FIXME: setGrades(grades)
     }
   }, [pending, selectedStudents])
 

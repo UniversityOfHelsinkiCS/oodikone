@@ -8,21 +8,17 @@ import { Form, Radio } from 'semantic-ui-react'
 import FilterCard from './common/FilterCard'
 import ClearFilterButton from './common/ClearFilterButton'
 import useFilters from '../useFilters'
-import useAnalytics from '../useAnalytics'
 
 const StartingSemester = () => {
   const { addFilter, removeFilter, withoutFilter, activeFilters } = useFilters()
-  const analytics = useAnalytics()
   const [value, setValue] = useState(null)
   const name = 'startingSemesterFilter'
 
   useEffect(() => {
     if (value === null) {
       removeFilter(name)
-      analytics.clearFilter()
     } else {
       addFilter(name, student => student.starting === (value === 1))
-      analytics.setFilter(name, value)
     }
   }, [value])
 

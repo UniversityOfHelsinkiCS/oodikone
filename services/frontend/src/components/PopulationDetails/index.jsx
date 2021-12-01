@@ -1,6 +1,5 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
-import { object, arrayOf, bool, shape, node } from 'prop-types'
 import { Message, Accordion } from 'semantic-ui-react'
 import { useLocalStorage } from '../../common/hooks'
 
@@ -10,17 +9,13 @@ import PopulationCourses from '../PopulationCourses'
 import InfoBox from '../Info/InfoBox'
 import CreditGainStats from './CreditGainStats'
 import AgeStats from './AgeStats'
-import useFilters from '../FilterTray/useFilters'
-import useFilterTray from '../FilterTray/useFilterTray'
 import useLanguage from '../LanguagePicker/useLanguage'
 import sendEvent from '../../common/sendEvent'
 import infotooltips from '../../common/InfoToolTips'
 
 const sendAnalytics = sendEvent.populationStatistics
 
-const PopulationDetails = ({ samples, queryIsSet, isLoading, query, dataExport }) => {
-  const { allStudents, filteredStudents } = useFilters()
-  const [trayOpen] = useFilterTray('filterTray')
+const PopulationDetails = ({ allStudents, filteredStudents, queryIsSet, isLoading, query, dataExport }) => {
   const { language } = useLanguage()
   // TODO: Refactor this away from children:
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
@@ -60,15 +55,14 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, dataExport }
       <CreditAccumulationGraphHighCharts
         students={filteredStudents}
         title="Id"
-        label={samples.label}
-        trayOpen={trayOpen}
+        trayOpen={() => {}}
         language={language}
       />
     )
     return (
       <>
         <InfoBox content={CreditAccumulation} />
-        {samples.length > 0 && graphs}
+        {filteredStudents.length > 0 && graphs}
       </>
     )
   }
@@ -77,7 +71,7 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, dataExport }
     return null
   }
 
-  if (samples.length === 0) {
+  if (filteredStudents.length === 0) {
     return <Message negative content="No statistics found for the given query." />
   }
 
@@ -186,18 +180,6 @@ const PopulationDetails = ({ samples, queryIsSet, isLoading, query, dataExport }
       <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
     </>
   )
-}
-
-PopulationDetails.propTypes = {
-  samples: arrayOf(object).isRequired,
-  queryIsSet: bool.isRequired,
-  isLoading: bool.isRequired,
-  query: shape({}).isRequired,
-  dataExport: node,
-}
-
-PopulationDetails.defaultProps = {
-  dataExport: null,
 }
 
 export default connect(null)(PopulationDetails)

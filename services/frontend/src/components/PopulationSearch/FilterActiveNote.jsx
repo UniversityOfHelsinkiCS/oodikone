@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import { Button, Message } from 'semantic-ui-react'
-import useFilters from '../FilterTray/useFilters'
+import transferredToProgrammeFilter from '../FilterView/filters/transferredToProgramme'
+import useFilters from '../FilterView/useFilters'
 
 const FilterActiveNote = () => {
-  const { removeFilter } = useFilters()
+  const { filterDispatch } = useFilters()
   const [clicked, setClicked] = useState(false)
 
   const handleClick = () => {
     setClicked(true)
-    removeFilter('transferredToProgrammeFilter')
+    filterDispatch(transferredToProgrammeFilter.actions.clear())
   }
 
   if (clicked) return true

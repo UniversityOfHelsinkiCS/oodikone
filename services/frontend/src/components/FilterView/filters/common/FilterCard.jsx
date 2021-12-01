@@ -46,7 +46,7 @@ const FilterCard = ({ title, children, name, active, onClear, info }) => {
       >
         {renderWithHelp(info)}
       </div>
-      {open && children}
+      {(active || open) && children}
     </div>
   )
 }

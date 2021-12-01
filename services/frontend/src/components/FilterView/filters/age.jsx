@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Label, Input } from 'semantic-ui-react'
-import useAnalytics from '../../useAnalytics'
-import createFilter from '../createFilter'
+import createFilter from './createFilter'
 
 export const contextKey = 'ageFilter'
 
@@ -23,24 +22,20 @@ const AgeFilterCard = ({ options, onOptionsChange }) => {
   // const { currentValue, setCurrentValue } = useAgeFilter()
   // const { addFilter, removeFilter, activeFilters } = useFilters()
 
-  const analytics = useAnalytics()
   const labels = { min: 'At Least', max: 'Less Than' }
 
   const now = () => new Date().getTime()
 
-  const names = Object.fromEntries(Object.keys(currentValue).map(key => [key, `age${key}`]))
-
   const updateFilters = () => {
     onOptionsChange({ ...currentValue })
-
-    Object.entries(currentValue).forEach(([key, value]) => {
-      if (value !== '') {
-        analytics.setFilter(names[key], value)
-      } else {
-        analytics.clearFilter(names[key])
-      }
-    })
   }
+
+  useEffect(() => {
+    setCurrentValue({
+      min: options.min,
+      max: options.max,
+    })
+  }, [options.min, options.max])
 
   // Update filters automatically 2 sec after value change.
   useEffect(() => {
@@ -77,7 +72,7 @@ const AgeFilterCard = ({ options, onOptionsChange }) => {
             <Input
               size="mini"
               onChange={onChange(key)}
-              value={currentValue[key]}
+              value={currentValue[key] ?? ''}
               onKeyDown={onKeyDown}
               data-cy={`ageFilter-${key}`}
               style={{ width: '100px' }}

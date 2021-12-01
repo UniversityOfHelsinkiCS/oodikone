@@ -19,8 +19,7 @@ import ProgressBar from '../ProgressBar'
 import { getStudentToTargetCourseDateMap, getUserIsAdmin, getTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
-import InfoBox from '../Info/InfoBox'
-import FilterTray from '../FilterTray'
+import InfoBox from 'components/Info/InfoBox'
 import {
   ageFilter,
   gradeFilter,
@@ -28,8 +27,8 @@ import {
   courseFilter,
   creditsEarnedFilter,
   programmeFilter,
-} from '../FilterTray/filters'
-import { FilterView } from '../FilterTray/useFilters'
+} from '../FilterView/filters'
+import FilterView from '../FilterView'
 import useLanguage from '../LanguagePicker/useLanguage'
 import { queryParamsFromUrl } from '../../common/query'
 
@@ -286,27 +285,28 @@ const CoursePopulation = ({
       filters={[
         genderFilter,
         ageFilter,
-        courseFilter(courseStatistics),
+        courseFilter({ courses: courseStatistics }),
         creditsEarnedFilter,
-        programmeFilter(courses, elementDetails),
-        gradeFilter(courses, dateFrom, dateTo),
+        programmeFilter({ courses, elementDetails }),
+        gradeFilter({
+          courseCodes: courses,
+          from: dateFrom,
+          to: dateTo,
+        }),
       ]}
       students={studentData.students}
     >
       {filtered => (
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <FilterTray />
-          <div className="segmentContainer">
-            <Segment className="contentSegment">
-              <Header className="segmentTitle" size="large" textAlign="center">
-                Population of course {header}
-              </Header>
-              <Header className="segmentTitle" size="medium" textAlign="center">
-                {subHeader}
-              </Header>
-              <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels(filtered)} />
-            </Segment>
-          </div>
+        <div className="segmentContainer">
+          <Segment className="contentSegment">
+            <Header className="segmentTitle" size="large" textAlign="center">
+              Population of course {header}
+            </Header>
+            <Header className="segmentTitle" size="medium" textAlign="center">
+              {subHeader}
+            </Header>
+            <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels(filtered)} />
+          </Segment>
         </div>
       )}
     </FilterView>

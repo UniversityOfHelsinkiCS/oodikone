@@ -1,28 +1,28 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Segment, Header, Button } from 'semantic-ui-react'
 import './filterTray.css'
-import useFilters from './useFilters'
-import FilterCard from './filters/common/FilterCard'
-
-export const contextKey = 'filterTray'
+import FilterViewContext from '../FilterViewContext'
+import FilterCard from '../filters/common/FilterCard'
 
 const FilterTray = () => {
   const {
     filteredStudents,
     allStudents,
-    precomputed,
     filters,
     withoutFilter,
     filterOptions,
     setFilterOptions,
     resetFilter,
-  } = useFilters()
+    getContextByKey,
+  } = useContext(FilterViewContext)
 
   const isAnyFilterActive = filters.some(({ key, isActive }) => isActive(filterOptions[key]))
 
   const filterSet = filters.map(({ key, title, isActive, render, info }) => {
+    const ctx = getContextByKey(key)
+
     const props = {
-      options: filterOptions[key],
+      options: ctx.options,
       onOptionsChange: options => setFilterOptions(key, options),
       withoutSelf: () => withoutFilter(key),
     }
@@ -30,7 +30,7 @@ const FilterTray = () => {
     return (
       <div key={key}>
         <FilterCard title={title ?? key} active={isActive(filterOptions[key])} onClear={() => resetFilter(key)} info={info}>
-          {render(props, precomputed[key])}
+          {render(props, ctx)}
         </FilterCard>
       </div>
     )
