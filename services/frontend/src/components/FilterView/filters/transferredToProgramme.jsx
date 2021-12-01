@@ -13,7 +13,7 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
   return (
     <Form>
       <div className="card-content">
-        <Form.Field>
+        <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
           <Radio
             label="All"
             name="radioGroup"

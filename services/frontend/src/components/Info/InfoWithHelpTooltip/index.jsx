@@ -2,13 +2,13 @@ import React, { useState, useRef } from 'react'
 import { Popup, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
 
-const InfoWithHelpTooltip = ({ children, tooltip, ...rest }) => {
+const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ...rest }) => {
   const popupContext = useRef()
   const [popupOpen, setPopupOpen] = useState(false)
   const [detailsOpen, setDetailsOPen] = useState(false)
 
   const trigger = (
-    <div style={{ display: 'flex' }} data-cy="tooltip-trigger">
+    <div style={{ display: 'flex', ...containerStyle }} data-cy="tooltip-trigger">
       {children}
       <div ref={popupContext} style={{ display: 'inline-block', cursor: 'help' }} data-cy="popup-context">
         <Icon

@@ -23,7 +23,7 @@ const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombined
   return (
     <Form>
       <div className="card-content">
-        <Form.Field>
+        <Form.Field style={{ display: 'flex', flexDirection: 'column' }}>
           <Radio
             label="All"
             checked={mode === null}
