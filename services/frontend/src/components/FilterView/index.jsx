@@ -45,13 +45,15 @@ const resolveFilterOptions = (options, filters) => {
   }
 }
 
-const FilterView = ({ children, name, filters: pFilters, students }) => {
+const FilterView = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp }) => {
   const storeFilterOptions = useSelector(state => selectViewFilters(state, name))
 
   const filters = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = _.keyBy(filters, 'key')
   const filterOptions = useMemo(() => resolveFilterOptions(storeFilterOptions, filters), [storeFilterOptions, filters])
   const orderedFilters = filters.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
+
+  const displayTray = displayTrayProp !== undefined ? !!displayTrayProp : true
 
   const precompute = fp.flow(
     fp.filter(({ precompute }) => precompute),
@@ -115,9 +117,7 @@ const FilterView = ({ children, name, filters: pFilters, students }) => {
   return (
     <FilterViewContext.Provider value={value}>
       <div style={{ display: 'flex', alignItems: 'start', justifyContent: 'center', gap: '0.75rem' }}>
-        <div style={{ alignSelf: 'flex-start', position: 'sticky', top: '1rem' }}>
-          <FilterTray />
-        </div>
+        <div style={{ alignSelf: 'flex-start', position: 'sticky', top: '1rem' }}>{displayTray && <FilterTray />}</div>
         <div style={{ flexGrow: 1 }}>{typeof children === 'function' ? children(filteredStudents) : children}</div>
       </div>
     </FilterViewContext.Provider>
