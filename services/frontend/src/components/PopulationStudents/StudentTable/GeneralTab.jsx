@@ -308,6 +308,11 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCo
       title: 'Study Programme',
       getRowVal: s => getTextIn(mainProgramme(s.studyrights, s.studentNumber), language) || 'No programme',
     },
+    language: {
+      key: 'language',
+      title: 'Language',
+      getRowVal: s => s.courses.find(c => coursecode.includes(c.course_code)).language,
+    },
     startYear: {
       key: 'startYear',
       title: 'Start Year at Uni',
@@ -431,7 +436,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   const columnsByVariant = {
     customPopulation: ['programme', 'startYear'],
-    coursePopulation: ['gradeForSingleCourse', 'programme', 'startYear'],
+    coursePopulation: ['gradeForSingleCourse', 'programme', 'language', 'startYear'],
     population: [
       'creditsSinceStart',
       'transferredFrom',
