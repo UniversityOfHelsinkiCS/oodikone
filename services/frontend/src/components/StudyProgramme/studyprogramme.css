@@ -5,16 +5,17 @@
 .studyprogramme-overview .section-container {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .studyprogramme-overview .graph-container {
-  width: 60%;
-  height: 400px;
+  min-width: 60%;
+  height: 500px;
 }
 
 .studyprogramme-overview .table-container {
   width: 35%;
-  height: 400px;
+  height: 500px;
   margin-top: 2em;
   margin-left: 2em;
 }

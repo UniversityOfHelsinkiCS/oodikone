@@ -20,8 +20,7 @@ const StackedBarChart = ({ data, categories }) => {
     },
     chart: {
       type: 'column',
-      width: 950,
-      height: 400,
+      height: '450px',
     },
     plotOptions: {
       column: {
@@ -42,7 +41,11 @@ const StackedBarChart = ({ data, categories }) => {
     },
   }
 
-  return <ReactHighcharts config={defaultConfig} />
+  return (
+    <div className="graph-container">
+      <ReactHighcharts config={defaultConfig} />
+    </div>
+  )
 }
 
 export default StackedBarChart
