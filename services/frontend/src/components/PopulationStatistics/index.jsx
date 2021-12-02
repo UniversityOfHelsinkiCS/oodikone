@@ -69,7 +69,12 @@ const PopulationStatistics = () => {
   }
 
   return (
-    <FilterView name="PopulationStatistics" filters={filters} students={students} displayTray={location.search !== ''}>
+    <FilterView
+      name="PopulationStatistics"
+      filters={filters}
+      students={students ?? []}
+      displayTray={location.search !== ''}
+    >
       {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header className="segmentTitle" size="large">

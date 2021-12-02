@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { shape, func, bool } from 'prop-types'
 import { Segment, Header, Accordion } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
+import InfoBox from 'components/Info/InfoBox'
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
@@ -19,13 +20,13 @@ import ProgressBar from '../ProgressBar'
 import { getStudentToTargetCourseDateMap, getUserIsAdmin, getTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
-import InfoBox from 'components/Info/InfoBox'
 import {
   ageFilter,
   gradeFilter,
   genderFilter,
   courseFilter,
   creditsEarnedFilter,
+  startYearAtUniFilter,
   programmeFilter,
 } from '../FilterView/filters'
 import FilterView from '../FilterView'
@@ -220,7 +221,7 @@ const CoursePopulation = ({
       content: {
         content: (
           <div ref={programmeRef}>
-            <CustomPopulationCourses selectedStudents={filtered.map(s => s.studentNumber)} showFilter={false} />
+            <CustomPopulationCourses filteredStudents={filtered} showFilter={false} />
           </div>
         ),
       },
@@ -287,6 +288,7 @@ const CoursePopulation = ({
         ageFilter,
         courseFilter({ courses: courseStatistics }),
         creditsEarnedFilter,
+        startYearAtUniFilter,
         programmeFilter({ courses, elementDetails }),
         gradeFilter({
           courseCodes: courses,

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
-import { Message, Accordion } from 'semantic-ui-react'
+import { Accordion } from 'semantic-ui-react'
 import { useLocalStorage } from '../../common/hooks'
 
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
@@ -17,9 +17,6 @@ const sendAnalytics = sendEvent.populationStatistics
 
 const PopulationDetails = ({ allStudents, filteredStudents, queryIsSet, isLoading, query, dataExport }) => {
   const { language } = useLanguage()
-  // TODO: Refactor this away from children:
-  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
-
   const [activeIndex, setActiveIndex] = useLocalStorage('populationActiveIndex', [])
   const creditGraphRef = useRef()
   const creditGainRef = useRef()
@@ -71,9 +68,9 @@ const PopulationDetails = ({ allStudents, filteredStudents, queryIsSet, isLoadin
     return null
   }
 
-  if (filteredStudents.length === 0) {
+  /* if (filteredStudents.length === 0) {
     return <Message negative content="No statistics found for the given query." />
-  }
+  } */
 
   const panels = [
     {
@@ -140,12 +137,7 @@ const PopulationDetails = ({ allStudents, filteredStudents, queryIsSet, isLoadin
       content: {
         content: (
           <div ref={courseTableRef}>
-            <PopulationCourses
-              selectedStudents={selectedStudents}
-              query={query}
-              allStudents={allStudents}
-              filteredStudents={filteredStudents}
-            />
+            <PopulationCourses query={query} allStudents={allStudents} filteredStudents={filteredStudents} />
           </div>
         ),
       },

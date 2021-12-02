@@ -1,13 +1,12 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
 import PopulationCourseStatsFlat from '../../PopulationCourseStats/PopulationCourseStatsFlat'
 
-const CustomPopulationCourses = ({ courses, pending, selectedStudents, query, showFilter }) => {
+const CustomPopulationCourses = ({ courses, pending, filteredStudents, showFilter }) => {
   return (
     <PopulationCourseStatsFlat
       courses={courses}
       pending={pending}
-      selectedStudents={selectedStudents}
+      filteredStudents={filteredStudents}
       showFilter={showFilter}
     />
   )

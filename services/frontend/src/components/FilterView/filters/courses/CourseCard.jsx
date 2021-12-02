@@ -16,7 +16,7 @@ const filterTexts = {
 
 const CourseCard = ({ course, filterType, onChange }) => {
   const { language } = useLanguage()
-  const name = 'course-filter'
+  const name = 'courseFilter'
 
   const onClick = (_, { value }) => onChange(value)
 
@@ -35,7 +35,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
           fluid
           className="mini"
           button
-          data-cy={`${name}-dropdown`}
+          data-cy={`${name}-${course.code}-dropdown`}
           style={{ marginTop: '0.5rem' }}
         >
           <Dropdown.Menu>
@@ -55,7 +55,14 @@ const CourseCard = ({ course, filterType, onChange }) => {
           </Dropdown.Menu>
         </Dropdown>
 
-        <Button compact size="tiny" onClick={clear} icon data-cy={`${name}-clear`} style={{ marginTop: '0.5rem' }}>
+        <Button
+          compact
+          size="tiny"
+          onClick={clear}
+          icon
+          data-cy={`${name}-${course.code}-clear`}
+          style={{ marginTop: '0.5rem' }}
+        >
           <Icon name="close" />
         </Button>
       </Label>

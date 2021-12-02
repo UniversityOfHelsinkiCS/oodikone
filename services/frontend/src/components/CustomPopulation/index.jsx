@@ -144,10 +144,7 @@ const CustomPopulation = ({
       content: {
         content: (
           <div ref={coursesRef}>
-            <CustomPopulationCourses
-              selectedStudents={_.map(students, 'studentNumber')}
-              courses={courses}
-            />
+            <CustomPopulationCourses filteredStudents={students} courses={courses} />
           </div>
         ),
       },

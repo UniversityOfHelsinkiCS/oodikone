@@ -73,7 +73,7 @@ const updateCourseStatisticsCriteria = (courseStats, language, state) => {
 const initialState = props => ({
   sortCriteria: tableColumnNames.STUDENTS,
   reversed: true,
-  studentAmountLimit: Math.round(props.filteredStudents.length * 0.3),
+  studentAmountLimit: Math.round((props?.filteredStudents?.length ?? 0) * 0.3),
   codeFilter: '',
   nameFilter: '',
   activeView: null,

@@ -3,13 +3,7 @@ import { Form, Radio } from 'semantic-ui-react'
 import createFilter from './createFilter'
 
 const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombinedExtent }) => {
-  // const { addFilter, removeFilter } = useFilters()
   const { mode } = options
-  // const [value, setValue] = useState(null)
-  const name = 'graduatedFromProgrammeFilter'
-  // const active = value !== null
-  // Old-style study programmes need separation between bachelor's and master's.
-  // const combinedExtent = !code.includes('_')
 
   const modeOptions = [{ key: 'graduated-false', text: `Not Graduated`, value: 0 }].concat(
     isCombinedExtent
@@ -29,7 +23,7 @@ const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombined
             checked={mode === null}
             onChange={() => onOptionsChange({ mode: null })}
             style={{ marginBottom: '0.5rem' }}
-            data-cy={`${name}-all`}
+            data-cy="option-all"
           />
           {modeOptions.map(option => (
             <Radio
@@ -39,7 +33,7 @@ const GraduatedFromProgrammeFilterCard = ({ options, onOptionsChange, isCombined
               style={{ marginBottom: '0.5rem' }}
               checked={mode === option.value}
               onChange={() => onOptionsChange({ mode: option.value })}
-              data-cy={`${name}-${option.key}`}
+              data-cy={`option-${option.key}`}
             />
           ))}
         </Form.Field>

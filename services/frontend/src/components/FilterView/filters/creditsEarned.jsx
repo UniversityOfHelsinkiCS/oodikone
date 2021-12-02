@@ -15,8 +15,8 @@ const CreditsEarnedFilterCard = ({ options, onOptionsChange }) => {
 
   const updateFilters = () => {
     onOptionsChange({
-      min,
-      max,
+      min: min === '' ? null : min,
+      max: max === '' ? null : max,
     })
   }
 
@@ -103,7 +103,7 @@ export default createFilter({
       return false
     }
 
-    if (max !== null && credits > max) {
+    if (max !== null && credits >= max) {
       return false
     }
 

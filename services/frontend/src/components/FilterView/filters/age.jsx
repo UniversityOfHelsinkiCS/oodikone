@@ -27,13 +27,20 @@ const AgeFilterCard = ({ options, onOptionsChange }) => {
   const now = () => new Date().getTime()
 
   const updateFilters = () => {
-    onOptionsChange({ ...currentValue })
+    const { min, max } = currentValue
+
+    onOptionsChange({
+      min: min === '' ? null : parseInt(min, 10),
+      max: max === '' ? null : parseInt(max, 10),
+    })
   }
 
   useEffect(() => {
+    const { min, max } = options
+
     setCurrentValue({
-      min: options.min,
-      max: options.max,
+      min: min !== null ? min : currentValue.min,
+      max: max !== null ? max : currentValue.max,
     })
   }, [options.min, options.max])
 
@@ -101,7 +108,7 @@ export default createFilter({
       return false
     }
 
-    if (max !== null && max < age) {
+    if (max !== null && max <= age) {
       return false
     }
 

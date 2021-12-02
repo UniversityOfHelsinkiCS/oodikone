@@ -4,8 +4,12 @@ import WithHelpTooltip from '../../../Info/InfoWithHelpTooltip'
 
 import './FilterCard.css'
 
-const FilterCard = ({ title, children, name, active, onClear, info }) => {
-  const [open, setOpen] = useState(active)
+const FilterCard = ({ filter, options, children, onClear }) => {
+  const title = filter.title ?? filter.key
+  const active = filter.isActive(options)
+  const { info, key } = filter
+
+  const [open, setOpen] = useState(false)
 
   let header = (
     <div
@@ -17,7 +21,7 @@ const FilterCard = ({ title, children, name, active, onClear, info }) => {
       }}
       className="filter-card-header"
       onClick={() => setOpen(!open)}
-      data-cy={`${name}-header`}
+      data-cy={`${key}-header`}
     >
       <Icon name={open ? 'caret down' : 'caret right'} style={{ color: 'black', flexShrink: 0 }} />
       <Header size="tiny" style={{ margin: '0' }}>
@@ -59,7 +63,7 @@ const FilterCard = ({ title, children, name, active, onClear, info }) => {
   }
 
   return (
-    <div style={{ margin: '1rem 0' }}>
+    <div style={{ margin: '1rem 0' }} data-cy={`${key}-filter-card`}>
       <div style={{ marginBottom: '1rem' }}>{header}</div>
       {open && children}
     </div>

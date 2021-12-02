@@ -52,7 +52,7 @@ export default createFilter({
     selected: null,
   },
 
-  isActive: ({ selected }) => selected !== null,
+  isActive: ({ selected }) => selected !== null && selected.length > 0,
 
   filter: (student, { selected }) => selected.includes(new Date(student.started).getFullYear()),
 
