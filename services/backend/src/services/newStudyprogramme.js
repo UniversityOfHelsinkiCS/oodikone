@@ -16,6 +16,7 @@ const { ThesisCourse } = require('../models/models_kone')
 
 const { mapToProviders } = require('../util/utils')
 
+// Helper functions
 const formatStudyright = studyright => {
   const { studyrightid, studystartdate, enddate, graduated, prioritycode, extentcode, student } = studyright
   return {
@@ -59,6 +60,20 @@ const isMajorStudentCredit = (studyright, attainment_date) =>
   studyright.enddate >= attainment_date && // Has the credit been attained before the studyright ended
   (!studyright.canceldate || studyright.canceldate >= attainment_date) // If the studyright was cancelled, was the credit attained before it was cancelled
 
+const getMedian = values => {
+  if (values.length === 0) return 0
+  values.sort((a, b) => a - b)
+  const half = Math.floor(values.length / 2)
+  if (values.length % 2) return values[half]
+  return (values[half - 1] + values[half]) / 2.0
+}
+
+const getMean = values => {
+  if (values.length === 0) return 0
+  return Math.round(mean(values))
+}
+
+// db-queries
 const getCreditsForStudyProgramme = async (provider, since) =>
   await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
@@ -370,19 +385,6 @@ const getThesisStats = async (studytrack, startDate, years) => {
   })
 
   return { graphStats, tableStats }
-}
-
-const getMedian = values => {
-  if (values.length === 0) return 0
-  values.sort((a, b) => a - b)
-  const half = Math.floor(values.length / 2)
-  if (values.length % 2) return values[half]
-  return (values[half - 1] + values[half]) / 2.0
-}
-
-const getMean = values => {
-  if (values.length === 0) return 0
-  return Math.round(mean(values))
 }
 
 const getGraduationTimeStats = async (studytrack, startDate, years) => {
