@@ -39,11 +39,8 @@ const lodashSortOrderTypes = {
   DESC: 'desc',
 }
 
-function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses) {
+function updateCourseStatisticsCriteria(courseStats, language, state, mandatoryCourses) {
   const { sortCriteria, codeFilter, nameFilter, reversed } = state
-  const {
-    courses: { coursestatistics },
-  } = props
 
   const courseCodeFilter = ({ course }) => {
     const { code } = course
@@ -59,9 +56,9 @@ function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses
   }
 
   const filteredCourses =
-    coursestatistics &&
+    courseStats &&
     mandatoryCourses &&
-    coursestatistics
+    courseStats
       .filter(mandatoryFilter)
       .filter(c => !codeFilter || courseCodeFilter(c))
       .filter(c => !nameFilter || courseNameFilter(c))
@@ -86,17 +83,29 @@ const initialState = props => ({
   filteredStudentsLength: props.filteredStudentsLength || 0,
 })
 
+const useDelayedMemo = (fn, watch) => {
+  const [cached, setCached] = useState(fn())
+
+  useEffect(() => setCached(fn()), watch)
+
+  return cached
+}
+
 const PopulationCourseStats = props => {
   const { language } = useLanguage()
 
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
-  const [courseStatistics, setCourseStatistics] = useState(
-    updateCourseStatisticsCriteria(props, language, initialState(props))
-  )
-  const [expandedGroups, setExpandedGroups] = useState(new Set())
 
   const [state, setState] = useState(initialState(props))
+
+  const courseStatistics = useDelayedMemo(
+    () => updateCourseStatisticsCriteria(props.courses?.coursestatistics, language, state),
+    [props.courses, state, language]
+  )
+
+  const [expandedGroups, setExpandedGroups] = useState(new Set())
+
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Courses of Population tab changed')
 
@@ -113,7 +122,6 @@ const PopulationCourseStats = props => {
         studentAmountLimit,
         filteredStudentsLength: props.filteredStudents.length,
       })
-      setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses))
     }
   }, [props.courses, props.filteredStudents])
 
@@ -190,8 +198,6 @@ const PopulationCourseStats = props => {
         }))
         .sort((a, b) => a.module.order - b.module.order)
     )
-
-    setCourseStatistics(sortedStatistics)
   }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, mandatoryCourses])
 
   const onFilterChange = (e, field) => {
@@ -214,41 +220,16 @@ const PopulationCourseStats = props => {
     setFilters(filterFields)
   }, [filterFields])
 
-  const handleCourseStatisticsCriteriaChange = () => {
-    // eslint-disable-next-line react/no-access-state-in-setstate
-    const courseStatistics = updateCourseStatisticsCriteria(props, language, state)
-    setCourseStatistics(courseStatistics)
-  }
-
-  const onSetFilterKeyPress = e => {
-    const { key } = e
-    const enterKey = 'Enter'
-    const isEnterKeyPress = key === enterKey
-    if (isEnterKeyPress) {
-      handleCourseStatisticsCriteriaChange()
-    }
-  }
-
   const onSortableColumnHeaderClick = criteria => {
     const { reversed, sortCriteria } = state
     const isActiveSortCriteria = sortCriteria === criteria
     const isReversed = isActiveSortCriteria ? !reversed : reversed
-
-    const lodashSortOrder = isReversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
-
-    const sortedStatistics = orderBy(
-      courseStatistics,
-      [course => course.stats[sortCriteria], course => course.course.code],
-      [lodashSortOrder, lodashSortOrderTypes.ASC]
-    )
 
     setState({
       ...state,
       sortCriteria: criteria,
       reversed: isReversed,
     })
-
-    setCourseStatistics(sortedStatistics)
   }
 
   const onGoToCourseStatisticsClick = courseCode => {
@@ -285,7 +266,6 @@ const PopulationCourseStats = props => {
             transparent
             placeholder="Filter..."
             onChange={e => onFilterChange(e, field)}
-            onKeyPress={onSetFilterKeyPress}
             value={getFilterValue(field)}
             icon={getFilterValue(field) ? <Icon name="delete" link onClick={() => onFilterReset(field)} /> : undefined}
           />
@@ -371,10 +351,6 @@ const PopulationCourseStats = props => {
   )
 }
 
-const mapStateToProps = ({ populationCourses }) => ({
-  populationCourses,
-})
-
-export default connect(mapStateToProps, {
+export default connect(null, {
   clearCourseStats,
 })(withRouter(PopulationCourseStats))

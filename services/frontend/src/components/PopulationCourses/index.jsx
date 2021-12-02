@@ -42,7 +42,11 @@ const PopulationCourses = ({ query = {}, filteredStudents }) => {
           filteredStudents={filteredStudents}
         />
       ) : (
-        <CustomPopulationCourses filteredStudents={filteredStudents} showFilter={false} />
+        <CustomPopulationCourses
+          courses={selectedPopulationCourses.data}
+          filteredStudents={filteredStudents}
+          showFilter={false}
+        />
       )}
     </Segment>
   )
