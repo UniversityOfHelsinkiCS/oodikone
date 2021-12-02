@@ -4,7 +4,7 @@ const ReactHighcharts = require('react-highcharts')
 
 const colors = ['#003E65', '#1392c2', '#036415']
 
-const StackedBarChart = ({ data, categories }) => {
+const BarChart = ({ data, categories }) => {
   const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const defaultConfig = {
@@ -20,8 +20,7 @@ const StackedBarChart = ({ data, categories }) => {
     },
     chart: {
       type: 'column',
-      width: 950,
-      height: 400,
+      height: '450px',
     },
     plotOptions: {
       column: {
@@ -38,7 +37,11 @@ const StackedBarChart = ({ data, categories }) => {
     },
   }
 
-  return <ReactHighcharts config={defaultConfig} />
+  return (
+    <div className="graph-container">
+      <ReactHighcharts config={defaultConfig} />
+    </div>
+  )
 }
 
-export default StackedBarChart
+export default BarChart

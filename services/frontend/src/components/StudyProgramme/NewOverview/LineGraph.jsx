@@ -18,7 +18,7 @@ const LineGraph = ({ categories, data }) => {
       text: 'oodikone | TOSKA',
     },
     chart: {
-      height: '400px',
+      height: '450px',
     },
     xAxis: {
       categories,
