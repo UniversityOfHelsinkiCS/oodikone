@@ -35,17 +35,17 @@ const Overview = ({ studyprogramme }) => {
     <div className="studyprogramme-overview">
       {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
       <div className="section-container">
-        <LineGraph categories={basics?.data?.years} data={basics?.data?.graphStats} />
+        <LineGraph data={basics?.data} />
         <DataTable titles={basicsTitles} data={basics?.data?.tableStats} />
       </div>
       {getDivider('Credits produced by the studyprogramme')}
       <div className="section-container">
-        <StackedBarChart categories={credits?.data?.years} data={credits?.data?.graphStats} />
+        <StackedBarChart data={credits?.data} />
         <DataTable titles={creditsTitles} data={credits?.data?.tableStats} />
       </div>
       {getDivider('Graduated and thesis writers of the programme')}
       <div className="section-container">
-        <BarChart categories={graduations?.data?.years} data={graduations?.data?.graphStats} />
+        <BarChart data={graduations?.data} />
         <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
       </div>
       {getDivider('Graduation median time')}
