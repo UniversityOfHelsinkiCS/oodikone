@@ -58,7 +58,7 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
         closeOnChange
         search
         name={name}
-        data-cy={`${name}-course-dropdown`}
+        data-cy="courseFilter-course-dropdown"
       />
       {Object.entries(courseFilters).map(([code]) => (
         <CourseCard

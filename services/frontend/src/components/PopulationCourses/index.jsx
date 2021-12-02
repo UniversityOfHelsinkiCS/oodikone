@@ -8,7 +8,7 @@ import InfoBox from '../Info/InfoBox'
 import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
 import infotooltips from '../../common/InfoToolTips'
 
-const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) => {
+const PopulationCourses = ({ query = {}, filteredStudents }) => {
   const [showByStudytrack, setShowByStudytrack] = useState(true)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
   const populationSelectedStudentCourses = useSelector(
@@ -42,7 +42,7 @@ const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) =
           filteredStudents={filteredStudents}
         />
       ) : (
-        <CustomPopulationCourses selectedStudents={selectedStudents} showFilter={false} />
+        <CustomPopulationCourses filteredStudents={filteredStudents} showFilter={false} />
       )}
     </Segment>
   )

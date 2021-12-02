@@ -19,14 +19,14 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
             name="radioGroup"
             checked={transferred === null}
             onChange={toggle(null)}
-            data-cy="transferred-to-programme-all"
+            data-cy="option-all"
           />
           <Radio
             label="Transferred"
             name="radioGroup"
             checked={transferred === true}
             onChange={toggle(true)}
-            data-cy="transferred-to-programme-have"
+            data-cy="option-have"
             style={{ margin: '0.5rem 0' }}
           />
           <Radio
@@ -34,7 +34,7 @@ const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
             name="radioGroup"
             checked={transferred === false}
             onChange={toggle(false)}
-            data-cy="transferred-to-programme-havenot"
+            data-cy="option-havenot"
           />
         </Form.Field>
       </div>
@@ -53,7 +53,7 @@ export default createFilter({
   },
 
   defaultOptions: {
-    transferred: null,
+    transferred: false,
   },
 
   isActive: ({ transferred }) => transferred !== null,

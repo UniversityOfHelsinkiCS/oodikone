@@ -19,7 +19,8 @@ const FilterTray = () => {
 
   const isAnyFilterActive = filters.some(({ key, isActive }) => isActive(filterOptions[key]))
 
-  const filterSet = filters.map(({ key, title, isActive, render, info }) => {
+  const filterSet = filters.map(filter => {
+    const { key, title, isActive, render, info } = filter
     const ctx = getContextByKey(key)
 
     const props = {
@@ -35,6 +36,8 @@ const FilterTray = () => {
           active={isActive(filterOptions[key])}
           onClear={() => resetFilter(key)}
           info={info}
+          filter={filter}
+          options={ctx.options}
         >
           {render(props, ctx)}
         </FilterCard>

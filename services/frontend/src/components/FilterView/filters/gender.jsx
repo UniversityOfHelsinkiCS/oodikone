@@ -10,8 +10,6 @@ const GENDERS = {
 }
 
 const GenderFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
-  const name = 'genderFilterCard'
-
   const { selected } = options
 
   const count = genderCode => withoutSelf().filter(student => Number(student.gender_code) === genderCode).length
@@ -36,7 +34,7 @@ const GenderFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
           fluid
           button
           clearable
-          data-cy={`${name}-dropdown`}
+          data-cy="genderFilter-dropdown"
         />
       </Form>
     </div>
