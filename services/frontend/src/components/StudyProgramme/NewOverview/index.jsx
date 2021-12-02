@@ -38,17 +38,17 @@ const Overview = ({ studyprogramme }) => {
         <LineGraph data={basics?.data} />
         <DataTable titles={basicsTitles} data={basics?.data?.tableStats} />
       </div>
-      {getDivider('Credits produced by the studyprogramme')}
+      {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
       <div className="section-container">
         <StackedBarChart data={credits?.data} />
         <DataTable titles={creditsTitles} data={credits?.data?.tableStats} />
       </div>
-      {getDivider('Graduated and thesis writers of the programme')}
+      {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
       <div className="section-container">
         <BarChart data={graduations?.data} />
         <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
       </div>
-      {getDivider('Graduation median time')}
+      {getDivider('Graduation median time', 'GraduationMedianTime')}
       <div className="section-container">
         {graduations?.data?.years.map(year => (
           <GaugeChart
@@ -60,7 +60,7 @@ const Overview = ({ studyprogramme }) => {
           />
         ))}
       </div>
-      {getDivider('Graduation mean time')}
+      {getDivider('Graduation mean time', 'GraduationMeanTime')}
       <div className="section-container">
         {graduations?.data?.years.map(year => (
           <GaugeChart
