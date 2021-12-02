@@ -208,10 +208,12 @@ const SingleStudyGroupFilterView = props => {
     )
   }
 
-  const initialOptions = {
-    [filters.creditDateFilter.key]: {
+  const initialOptions = {}
+
+  if (props.group?.tags?.year) {
+    initialOptions[filters.creditDateFilter.key] = {
       startDate: moment(createAcademicYearStartDate(props.group.tags?.year)),
-    },
+    }
   }
 
   return (
@@ -292,7 +294,7 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
             population={data}
             language={language}
             group={group}
-            courses={courses?.coursestatistics}
+            courses={courses}
             coursesAreLoading={coursesAreLoading}
           />
         </div>

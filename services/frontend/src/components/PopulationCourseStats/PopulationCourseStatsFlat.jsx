@@ -37,6 +37,10 @@ const lodashSortOrderTypes = {
 }
 
 const updateCourseStatisticsCriteria = (courseStats, language, state) => {
+  if (!courseStats) {
+    return []
+  }
+
   const { studentAmountLimit, sortCriteria, codeFilter, nameFilter, reversed } = state
 
   const studentAmountFilter = ({ stats }) => {
@@ -80,7 +84,7 @@ const initialState = props => ({
   selectedStudentsLength: props.selectedStudentsLength || 0,
 })
 
-const PopulationCourseStats = ({ courses, pending, filteredStudents, showFilter = true }) => {
+const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFilter = true }) => {
   const dispatch = useDispatch()
   const { years } = useSelector(({ semesters }) => semesters.data)
   const isAdmin = getUserIsAdmin(useSelector(({ auth }) => auth.token.roles))
@@ -101,7 +105,7 @@ const PopulationCourseStats = ({ courses, pending, filteredStudents, showFilter 
   const [state, setState] = useState(initialState(props))
 
   const courseStatistics = useMemo(
-    () => updateCourseStatisticsCriteria(courses, language, state),
+    () => updateCourseStatisticsCriteria(courses?.coursestatistics, language, state),
     [courses, language, state]
   )
 
@@ -257,4 +261,4 @@ const PopulationCourseStats = ({ courses, pending, filteredStudents, showFilter 
   )
 }
 
-export default PopulationCourseStats
+export default PopulationCourseStatsFlat
