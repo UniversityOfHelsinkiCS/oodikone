@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import produce from 'immer'
 import _ from 'lodash'
 import fp from 'lodash/fp'
 import { selectViewFilters, setFilterOptions, resetViewFilters, resetFilter } from '../../redux/filters'
@@ -45,9 +46,8 @@ const resolveFilterOptions = (options, filters) => {
   }
 }
 
-const FilterView = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp }) => {
-  const storeFilterOptions = useSelector(state => selectViewFilters(state, name))
-
+const FilterView = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp, initialOptions }) => {
+  const storeFilterOptions = useSelector(state => selectViewFilters(state, name, initialOptions))
   const filters = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = _.keyBy(filters, 'key')
   const filterOptions = useMemo(() => resolveFilterOptions(storeFilterOptions, filters), [storeFilterOptions, filters])
@@ -89,7 +89,17 @@ const FilterView = ({ children, name, filters: pFilters, students, displayTray: 
     fp.map(filter => [filter, getFilterContext(filter.key)]),
     fp.filter(([{ key, isActive }, ctx]) => isActive(filterOptions[key], ctx)),
     fp.reduce((students, [{ filter }, ctx]) => {
-      return students.filter(student => filter(student, ctx.options, ctx))
+      return students
+        .map(student => {
+          const res = []
+          const newStudent = produce(student, s => {
+            res.push(filter(s, ctx.options, ctx))
+          })
+          res.push(newStudent)
+          return res
+        })
+        .filter(([keep]) => keep)
+        .map(([, student]) => student)
     }, students)
   )
 

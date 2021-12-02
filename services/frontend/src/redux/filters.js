@@ -20,7 +20,9 @@ const slice = createSlice({
       const { view, filter } = action.payload
 
       if (state.views[view]) {
-        delete state.views[view][filter]
+        state.views[view][filter] = {}
+      } else {
+        state.views[view] = { [filter]: {} }
       }
     },
 
@@ -33,13 +35,23 @@ const slice = createSlice({
 
 export const selectViewFilters = createSelector(
   state => state?.filters?.views,
-  (state, view) => view,
-  (viewMap, viewKey) => {
-    if (viewMap && viewMap[viewKey]) {
-      return viewMap[viewKey]
+  (state, view, initial) => [view, initial],
+  (viewMap, [viewKey, initial]) => {
+    if (viewMap) {
+      const opts = viewMap[viewKey]
+
+      if (opts) {
+        return opts
+      }
+
+      if (initial) {
+        return initial
+      }
+
+      return {}
     }
 
-    return {}
+    return initial ?? {}
   }
 )
 

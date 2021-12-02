@@ -131,6 +131,7 @@ const createFilter = options => {
     selectors,
   })
 
+  factory.key = options.key
   factory.actions = actions
   factory.selectors = selectors
 

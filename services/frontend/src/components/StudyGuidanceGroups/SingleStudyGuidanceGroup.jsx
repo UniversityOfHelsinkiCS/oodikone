@@ -1,5 +1,6 @@
 import * as filters from 'components/FilterView/filters'
 import { Button, Header, Accordion, Divider, Label } from 'semantic-ui-react'
+import moment from 'moment'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
 import { getTextIn } from 'common'
 import PopulationStudents from 'components/PopulationStudents'
@@ -20,15 +21,6 @@ import { getSemesters } from '../../redux/semesters'
 import FilterView from '../FilterView'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
-
-const takeOnlyCoursesStartingFromGivenAcademicYear = ({ students, year }) => {
-  if (!year) return students
-  const academicYearStartDate = createAcademicYearStartDate(year)
-  return students.map(student => ({
-    ...student,
-    courses: student.courses.filter(course => new Date(course.date) > academicYearStartDate),
-  }))
-}
 
 const useIsMounted = () => {
   const isMounted = useRef(false)
@@ -70,11 +62,6 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
     indexOfPanelToScroll: 1,
     setNewestIndex,
     isMounted,
-  })
-
-  const filteredStudentsWithFilteredCourses = takeOnlyCoursesStartingFromGivenAcademicYear({
-    students: filteredStudents,
-    year: group.tags?.year,
   })
 
   const dispatch = useDispatch()
@@ -121,10 +108,7 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
                 {creditsStartingFromAssociatedYear ? 'Show all credits' : 'Show starting from associated year'}
               </Button>
             )}
-            <CreditAccumulationGraphHighCharts
-              students={creditsStartingFromAssociatedYear ? filteredStudentsWithFilteredCourses : students}
-              startDate={creditsStartingFromAssociatedYear && createAcademicYearStartDate(group.tags?.year)}
-            />
+            <CreditAccumulationGraphHighCharts students={students} />
           </div>
         ),
       },
@@ -224,8 +208,19 @@ const SingleStudyGroupFilterView = props => {
     )
   }
 
+  const initialOptions = {
+    [filters.creditDateFilter.key]: {
+      startDate: moment(createAcademicYearStartDate(props.group.tags?.year)),
+    },
+  }
+
   return (
-    <FilterView filters={viewFilters} students={props.population?.students ?? []}>
+    <FilterView
+      name={`StudyGuidanceGroup(${props.group.id})`}
+      filters={viewFilters}
+      students={props.population?.students ?? []}
+      initialOptions={initialOptions}
+    >
       {students => <SingleStudyGroupContent {...props} filteredStudents={students} />}
     </FilterView>
   )
