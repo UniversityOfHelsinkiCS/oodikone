@@ -3,11 +3,12 @@ import React from 'react'
 import '../studyprogramme.css'
 
 const ReactHighcharts = require('react-highcharts')
+require('highcharts-exporting')(ReactHighcharts.Highcharts)
 
 const colors = ['#003E65', '#1392c2', '#E68825', '#333737', '#036415']
 
-const LineGraph = ({ categories, data }) => {
-  const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
+const LineGraph = ({ data }) => {
+  const dataWithColors = data?.graphStats.map((series, index) => ({ ...series, color: colors[index] }))
 
   const defaultConfig = {
     title: {
@@ -17,11 +18,23 @@ const LineGraph = ({ categories, data }) => {
     credits: {
       text: 'oodikone | TOSKA',
     },
+    exporting: {
+      filename: `oodikone_student_statistics_of_studyprogramme_${data?.id}`,
+      width: 2200,
+      height: 1400,
+      sourceWidth: 1200,
+      sourceHeight: 600,
+      buttons: {
+        contextButton: {
+          menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'downloadPDF'],
+        },
+      },
+    },
     chart: {
       height: '450px',
     },
     xAxis: {
-      categories,
+      categories: data?.years,
     },
     yAxis: {
       allowDecimals: false,
@@ -31,7 +44,7 @@ const LineGraph = ({ categories, data }) => {
     },
   }
 
-  if (!data || !categories) return <div>No data available for the selected studyprogramme</div>
+  if (!data) return <></>
   return (
     <div className="graph-container">
       <ReactHighcharts config={defaultConfig} />
