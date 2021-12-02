@@ -10,16 +10,16 @@ const DataTable = ({ data, titles }) => {
         <Table.Header>
           <Table.Row>
             {titles?.map(title => (
-              <Table.HeaderCell>{title}</Table.HeaderCell>
+              <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
             ))}
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
           {data?.map(yearArray => (
-            <Table.Row>
+            <Table.Row key={`random-year-key-${Math.random()}`}>
               {yearArray?.map(value => (
-                <Table.Cell>{value}</Table.Cell>
+                <Table.Cell key={`random-key-${Math.random()}`}>{value}</Table.Cell>
               ))}
             </Table.Row>
           ))}
