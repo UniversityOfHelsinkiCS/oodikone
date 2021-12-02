@@ -52,6 +52,7 @@ const Overview = ({ studyprogramme }) => {
       <div className="section-container">
         {graduations?.data?.years.map(year => (
           <GaugeChart
+            key={year}
             year={year}
             data={graduations?.data?.graduationMedianTime[year]}
             amount={graduations?.data?.graduationAmounts[year]}
@@ -63,6 +64,7 @@ const Overview = ({ studyprogramme }) => {
       <div className="section-container">
         {graduations?.data?.years.map(year => (
           <GaugeChart
+            key={year}
             year={year}
             data={graduations?.data?.graduationMeanTime[year]}
             amount={graduations?.data?.graduationAmounts[year]}
