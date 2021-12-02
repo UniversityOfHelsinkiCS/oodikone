@@ -211,7 +211,7 @@ const findProgrammeThesisCredits = async code => {
     },
     where: {
       credittypecode: {
-        [Op.ne]: 10,
+        [Op.eq]: 4,
       },
     },
   })
