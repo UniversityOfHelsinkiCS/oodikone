@@ -20,11 +20,18 @@ const createFilter = options => {
   /**
    * Selectors are wrapped redux selectors that act on the filter's options.
    */
-  const selectors = _.mapValues(selectorFuncs, selector =>
-    selector.length === 1
-      ? state => selector(state[options.key] ?? options.defaultOptions)
-      : argument => state => selector(state[options.key] ?? options.defaultOptions, argument)
-  )
+  const selectors = _.mapValues(selectorFuncs, selector => {
+    if (selector.length === 1) {
+      const wrapper = options => selector(options)
+      wrapper.filter = options.key
+      return wrapper
+    }
+    return (...args) => {
+      const wrapper = options => selector(options, ...args)
+      wrapper.filter = options.key
+      return wrapper
+    }
+  })
 
   /**
    * Actions are wrapped redux actions that act on the filter's options.
