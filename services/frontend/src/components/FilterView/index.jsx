@@ -33,24 +33,25 @@ const applyFilters = (students, filters, options, precomputed) => {
     }, students)
 } */
 
-const resolveFilterOptions = (options, filters) => {
-  const providedOptions = Object.entries(options).filter(([key]) => filters.find(filter => filter.key === key))
-
-  const missingDefaultOptions = filters
-    .filter(({ key }) => providedOptions.find(([k]) => k === key) === undefined)
-    .map(({ key, defaultOptions }) => [key, defaultOptions])
-
-  return {
-    ...Object.fromEntries(providedOptions),
-    ...Object.fromEntries(missingDefaultOptions),
-  }
+const resolveFilterOptions = (store, filters, initialOptions) => {
+  return fp.flow(
+    fp.map(({ key, defaultOptions }) => [
+      key,
+      [store[key]?.options, !store[key] ? _.get(initialOptions, key) : null, defaultOptions],
+    ]),
+    fp.fromPairs,
+    fp.mapValues(values => _.find(values))
+  )(filters)
 }
 
 const FilterView = ({ children, name, filters: pFilters, students, displayTray: displayTrayProp, initialOptions }) => {
-  const storeFilterOptions = useSelector(state => selectViewFilters(state, name, initialOptions))
+  const storeFilterOptions = useSelector(state => selectViewFilters(state, name))
   const filters = pFilters.map(filter => (typeof filter === 'function' ? filter() : filter))
   const filtersByKey = _.keyBy(filters, 'key')
-  const filterOptions = useMemo(() => resolveFilterOptions(storeFilterOptions, filters), [storeFilterOptions, filters])
+  const filterOptions = useMemo(
+    () => resolveFilterOptions(storeFilterOptions, filters, initialOptions),
+    [storeFilterOptions, filters, initialOptions]
+  )
   const orderedFilters = filters.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0))
 
   const displayTray = displayTrayProp !== undefined ? !!displayTrayProp : true
@@ -108,6 +109,8 @@ const FilterView = ({ children, name, filters: pFilters, students, displayTray: 
     [students, orderedFilters, filterOptions, precomputed]
   )
 
+  const areOptionsDirty = key => !!storeFilterOptions[key]
+
   const dispatch = useDispatch()
 
   const value = {
@@ -118,6 +121,7 @@ const FilterView = ({ children, name, filters: pFilters, students, displayTray: 
     filterOptions,
     filters,
     precomputed,
+    areOptionsDirty,
     withoutFilter: key => applyFilters(orderedFilters.filter(filter => filter.key !== key)),
     setFilterOptions: (filter, options) => dispatch(setFilterOptions({ view: name, filter, options })),
     resetFilter: filter => dispatch(resetFilter({ view: name, filter })),

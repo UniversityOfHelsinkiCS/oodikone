@@ -15,9 +15,10 @@ const FilterTray = () => {
     resetFilter,
     resetFilters,
     getContextByKey,
+    areOptionsDirty,
   } = useContext(FilterViewContext)
 
-  const isAnyFilterActive = filters.some(({ key, isActive }) => isActive(filterOptions[key]))
+  const haveOptionsBeenChanged = filters.some(({ key }) => areOptionsDirty(key))
 
   const filterSet = filters.map(filter => {
     const { key, title, isActive, render, info } = filter
@@ -58,7 +59,7 @@ const FilterTray = () => {
             </b>{' '}
             out of {allStudents.length} shown
           </div>
-          {isAnyFilterActive && (
+          {haveOptionsBeenChanged && (
             <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
               <Button compact size="mini" onClick={resetFilters}>
                 Reset All Filters
