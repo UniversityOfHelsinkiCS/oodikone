@@ -4,7 +4,7 @@ import { Segment, Button } from 'semantic-ui-react'
 import InfoBox from 'components/Info/InfoBox'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import PopulationCourseStats from 'components/PopulationCourseStats'
-import { getMandatoryCourses, getMandatoryCourseModules } from 'redux/populationMandatoryCourses'
+import { getMandatoryCourses } from 'redux/populationMandatoryCourses'
 import infotooltips from 'common/InfoToolTips'
 
 const StudyGuidanceGroupPopulationCourses = ({
@@ -21,7 +21,6 @@ const StudyGuidanceGroupPopulationCourses = ({
     // ensure mandatory courses are available for course stats structured
     if (showStructured && studyProgramme && mandatoryCourses.length === 0) {
       dispatch(getMandatoryCourses(studyProgramme))
-      dispatch(getMandatoryCourseModules(studyProgramme))
     }
   }, [showStructured])
 
