@@ -15,6 +15,7 @@ const createFilter = options => {
   const actionFuncs = {
     ...(options.actions ?? {}),
     setOptions: (_options, value) => value,
+    reset: () => null,
   }
 
   /**
