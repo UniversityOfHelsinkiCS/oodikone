@@ -1,10 +1,10 @@
 import { useContext } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import FilterViewContext from './FilterViewContext'
 
 export default () => {
   const dispatch = useDispatch()
-  const { getContextByKey, viewName } = useContext(FilterViewContext)
+  const { getContextByKey, viewName, filterOptions } = useContext(FilterViewContext)
 
   const filterDispatch = filterAction => {
     dispatch({
@@ -13,7 +13,10 @@ export default () => {
     })
   }
 
-  const useFilterSelector = filterSelector => useSelector(state => filterSelector(state.filters.views[viewName] ?? {}))
+  const useFilterSelector = filterSelector => {
+    const options = filterOptions[filterSelector.filter]
+    return filterSelector(options)
+  }
 
   return {
     useFilterSelector,
