@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Segment, Button } from 'semantic-ui-react'
 import InfoBox from 'components/Info/InfoBox'
+import SegmentDimmer from 'components/SegmentDimmer'
 import PopulationCourseStatsFlat from 'components/PopulationCourseStats/PopulationCourseStatsFlat'
 import PopulationCourseStats from 'components/PopulationCourseStats'
 import { getMandatoryCourses } from 'redux/populationMandatoryCourses'
@@ -15,7 +16,9 @@ const StudyGuidanceGroupPopulationCourses = ({
   studyProgramme,
 }) => {
   const dispatch = useDispatch()
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+  const { data: mandatoryCourses, pending } = useSelector(
+    ({ populationMandatoryCourses }) => populationMandatoryCourses
+  )
 
   useEffect(() => {
     // ensure mandatory courses are available for course stats structured
@@ -42,6 +45,7 @@ const StudyGuidanceGroupPopulationCourses = ({
           showFilter={false}
         />
       )}
+      {pending && <SegmentDimmer isLoading={pending} />}
     </Segment>
   )
 }
