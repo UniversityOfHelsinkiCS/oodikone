@@ -13,17 +13,21 @@ const slice = createSlice({
         state.views[view] = {}
       }
 
-      state.views[view][filter] = options
+      if (!state.views[view][filter]) {
+        state.views[view][filter] = {}
+      }
+
+      state.views[view][filter].options = options
     },
 
     resetFilter(state, action) {
       const { view, filter } = action.payload
 
-      if (state.views[view]) {
-        state.views[view][filter] = {}
-      } else {
-        state.views[view] = { [filter]: {} }
+      if (!state.views[view]) {
+        state.views[view] = {}
       }
+
+      state.views[view][filter] = {}
     },
 
     resetViewFilters(state, action) {
@@ -35,23 +39,17 @@ const slice = createSlice({
 
 export const selectViewFilters = createSelector(
   state => state?.filters?.views,
-  (state, view, initial) => [view, initial],
-  (viewMap, [viewKey, initial]) => {
+  (state, view) => view,
+  (viewMap, viewKey) => {
     if (viewMap) {
       const opts = viewMap[viewKey]
 
       if (opts) {
         return opts
       }
-
-      if (initial) {
-        return initial
-      }
-
-      return {}
     }
 
-    return initial ?? {}
+    return {}
   }
 )
 

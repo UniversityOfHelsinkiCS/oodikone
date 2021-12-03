@@ -74,6 +74,11 @@ const PopulationStatistics = () => {
       filters={filters}
       students={students ?? []}
       displayTray={location.search !== ''}
+      initialOptions={{
+        [transferredToProgrammeFilter.key]: {
+          transferred: false,
+        },
+      }}
     >
       {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>

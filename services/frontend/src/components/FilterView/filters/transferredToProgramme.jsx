@@ -53,7 +53,7 @@ export default createFilter({
   },
 
   defaultOptions: {
-    transferred: false,
+    transferred: null,
   },
 
   isActive: ({ transferred }) => transferred !== null,
