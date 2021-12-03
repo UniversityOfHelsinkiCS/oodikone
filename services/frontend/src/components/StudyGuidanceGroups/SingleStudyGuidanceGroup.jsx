@@ -187,7 +187,7 @@ const SingleStudyGroupFilterView = props => {
     filters.startYearAtUniFilter,
     filters.tagsFilter,
     filters.courseFilter({
-      courses: props.courses ?? [],
+      courses: props.courses?.coursestatistics ?? [],
     }),
     filters.creditDateFilter,
   ]
