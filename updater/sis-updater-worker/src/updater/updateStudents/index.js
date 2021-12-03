@@ -363,7 +363,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
           substitutions: course[course.id],
         })
 
-        if (!course.substitutions.include(course.id.concat('-ay'))) {
+        if (!course.substitutions.includes(course.id.concat('-ay'))) {
           const subs = [...course.substitutions, course.id.concat('-ay')]
           coursesToBeUpdated.set(course.code, {
             ...course.dataValues,

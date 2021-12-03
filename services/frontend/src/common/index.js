@@ -261,3 +261,9 @@ export const bachelorHonoursIntermediateModules = {
   KH50_007: ['MAA-200'],
   KH50_008: ['BSCH2000', 'BSCS2000', 'BSMA2000', 'BSMS2000', 'BSPH2000'],
 }
+
+export const languageAbbreviationsOpened = {
+  fi: 'finnish',
+  sv: 'swedish',
+  en: 'english',
+}
