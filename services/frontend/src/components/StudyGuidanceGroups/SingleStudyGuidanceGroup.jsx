@@ -7,6 +7,8 @@ import PopulationStudents from 'components/PopulationStudents'
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 import scrollToComponent from 'react-scroll-to-component'
 import SegmentDimmer from 'components/SegmentDimmer'
+import useFilters from 'components/FilterView/useFilters'
+import creditDateFilter from 'components/FilterView/filters/date'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import {
   useGetStudyGuidanceGroupPopulationQuery,
@@ -45,17 +47,13 @@ const useToggleAndSetNewestIndex = ({ defaultValue, indexOfPanelToScroll, setNew
 }
 
 const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading, population, group, language }) => {
+  const { useFilterSelector, filterDispatch } = useFilters()
   const refs = [useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setActiveIndex] = useState([])
   const [newestIndex, setNewestIndex] = useState(null)
   const isMounted = useIsMounted()
 
-  const [creditsStartingFromAssociatedYear, toggleCreditsStartingFromAssociatedYear] = useToggleAndSetNewestIndex({
-    defaultValue: !!group.tags?.year,
-    indexOfPanelToScroll: 0,
-    setNewestIndex,
-    isMounted,
-  })
+  const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive)
 
   const [coursesStructuredByProgramme, toggleCoursesStructuredByProgramme] = useToggleAndSetNewestIndex({
     defaultValue: !!group.tags?.studyProgramme,
@@ -81,6 +79,19 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
     setActiveIndex([...currentActiveIndex])
   }
 
+  const toggleCreditDateFilter = () => {
+    if (creditDateFilterActive) {
+      filterDispatch(creditDateFilter.actions.reset())
+    } else {
+      filterDispatch(
+        creditDateFilter.actions.setOptions({
+          startDate: moment(createAcademicYearStartDate(group.tags?.year)),
+          endDate: null,
+        })
+      )
+    }
+  }
+
   useEffect(() => {
     if (newestIndex) scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
   }, [newestIndex])
@@ -104,8 +115,8 @@ const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading,
         content: (
           <div ref={refs[0]}>
             {group.tags?.year && (
-              <Button primary onClick={() => toggleCreditsStartingFromAssociatedYear()}>
-                {creditsStartingFromAssociatedYear ? 'Show all credits' : 'Show starting from associated year'}
+              <Button primary onClick={() => toggleCreditDateFilter()}>
+                {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
               </Button>
             )}
             <CreditAccumulationGraphHighCharts students={students} />
