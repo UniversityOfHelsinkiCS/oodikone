@@ -11,6 +11,7 @@ import { getFaculties } from '../../redux/faculties'
 import { getSemesters } from '../../redux/semesters'
 import PopulationStudents from '../PopulationStudents'
 import CoursePopulationGradeDist from './CoursePopulationGradeDist'
+import CoursePopulationLanguageDist from './CoursePopulationLanguageDist'
 import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
@@ -51,6 +52,7 @@ const CoursePopulation = ({
   const [newestIndex, setNewest] = useState(null)
 
   const gradeDistRef = useRef()
+  const languageDistRef = useRef()
   const programmeRef = useRef()
   const creditGainRef = useRef()
   const studentRef = useRef()
@@ -183,11 +185,36 @@ const CoursePopulation = ({
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Programme distribution
+            Language distribution
           </span>
         ),
       },
       onTitleClick: () => handleClick(1),
+      content: {
+        content: (
+          <div ref={languageDistRef}>
+            <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
+            <CoursePopulationLanguageDist
+              selectedStudents={selectedStudents}
+              from={dateFrom}
+              to={dateTo}
+              samples={studentData.students}
+              codes={codes}
+            />
+          </div>
+        ),
+      },
+    },
+    {
+      key: 2,
+      title: {
+        content: (
+          <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
+            Programme distribution
+          </span>
+        ),
+      },
+      onTitleClick: () => handleClick(2),
       content: {
         content: (
           <div ref={programmeRef}>
@@ -202,7 +229,7 @@ const CoursePopulation = ({
       },
     },
     {
-      key: 2,
+      key: 3,
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -210,7 +237,7 @@ const CoursePopulation = ({
           </span>
         ),
       },
-      onTitleClick: () => handleClick(2),
+      onTitleClick: () => handleClick(3),
       content: {
         content: (
           <div ref={programmeRef}>
@@ -220,7 +247,7 @@ const CoursePopulation = ({
       },
     },
     {
-      key: 3,
+      key: 4,
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -228,7 +255,7 @@ const CoursePopulation = ({
           </span>
         ),
       },
-      onTitleClick: () => handleClick(3),
+      onTitleClick: () => handleClick(4),
       content: {
         content: (
           <div ref={creditGainRef}>
@@ -245,7 +272,7 @@ const CoursePopulation = ({
       },
     },
     {
-      key: 4,
+      key: 5,
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
@@ -253,7 +280,7 @@ const CoursePopulation = ({
           </span>
         ),
       },
-      onTitleClick: () => handleClick(4),
+      onTitleClick: () => handleClick(5),
       content: {
         content: (
           <div ref={studentRef}>
