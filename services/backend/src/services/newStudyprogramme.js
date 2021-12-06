@@ -177,7 +177,7 @@ const getThesisCredits = async (studyprogramme, startDate) => {
     },
     where: {
       credittypecode: {
-        [Op.ne]: 10,
+        [Op.eq]: 4,
       },
       attainment_date: {
         [Op.gte]: startDate,
@@ -383,12 +383,12 @@ const getTransferredCreditStats = async (studytrack, startDate, years, isAcademi
   return { graphStats, tableStats }
 }
 
-const getThesisStats = async (studytrack, startDate, years) => {
+const getThesisStats = async (studytrack, startDate, years, isAcademicYear) => {
   const credits = await getThesisCredits(studytrack, startDate)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   credits.forEach(({ attainment_date }) => {
-    const attainmentYear = attainment_date.getFullYear()
+    const attainmentYear = defineYear(attainment_date, isAcademicYear)
     graphStats[indexOf(years, attainmentYear)] += 1
     tableStats[attainmentYear] += 1
   })
@@ -396,13 +396,13 @@ const getThesisStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
-const getGraduationTimeStats = async (studytrack, startDate, years) => {
+const getGraduationTimeStats = async (studytrack, startDate, years, isAcademicYear) => {
   const studyrights = await graduatedStudyRights(studytrack, startDate)
   let graduationAmounts = getYearsObject(years)
   let graduationTimes = getYearsObject(years, true)
 
   studyrights.forEach(({ enddate, studystartdate }) => {
-    const graduationYear = enddate?.getFullYear()
+    const graduationYear = defineYear(enddate, isAcademicYear)
     const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
     graduationAmounts[graduationYear] += 1
     graduationTimes[graduationYear] = [...graduationTimes[graduationYear], timeToGraduation]
@@ -522,13 +522,15 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType }) => {
   }
 }
 
-const getGraduationStatsForStudytrack = async ({ studyprogramme, startDate }) => {
-  const years = getYearsArray(startDate.getFullYear())
-  const thesis = await getThesisStats(studyprogramme, startDate, years)
-  const graduated = await getGraduatedStats(studyprogramme, startDate, years)
-  const graduationTimeStats = await getGraduationTimeStats(studyprogramme, startDate, years)
+const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType }) => {
+  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const startDate = getStartDate(studyprogramme, isAcademicYear)
+  const years = getYearsArray(startDate.getFullYear(), isAcademicYear)
+  const thesis = await getThesisStats(studyprogramme, startDate, years, isAcademicYear)
+  const graduated = await getGraduatedStats(studyprogramme, startDate, years, isAcademicYear)
+  const graduationTimeStats = await getGraduationTimeStats(studyprogramme, startDate, years, isAcademicYear)
 
-  const reversedYears = getYearsArray(startDate.getFullYear()).reverse()
+  const reversedYears = getYearsArray(startDate.getFullYear(), isAcademicYear).reverse()
   const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
 
   return {
