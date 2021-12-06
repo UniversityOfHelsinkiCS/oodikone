@@ -3,7 +3,7 @@ const {
   getBasicStatsForStudytrack,
   getCreditStatsForStudytrack,
   getGraduationStatsForStudytrack,
-} = require('../services/newStudyprogramme')
+} = require('../services/studyprogrammeStats')
 const {
   getBasicStats,
   setBasicStats,
