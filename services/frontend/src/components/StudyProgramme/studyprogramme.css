@@ -22,13 +22,12 @@
 }
 
 .studyprogramme-overview .graph-container {
-  min-width: 60%;
+  min-width: 55%;
   height: 500px;
 }
 
 .studyprogramme-overview .table-container {
-  width: 35%;
+  width: 40%;
   height: 500px;
-  margin-top: 2em;
   margin-left: 2em;
 }
