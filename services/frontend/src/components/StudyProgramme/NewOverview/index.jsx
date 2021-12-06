@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Radio } from 'semantic-ui-react'
+import { Divider, Loader, Radio } from 'semantic-ui-react'
 
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
 import LineGraph from './LineGraph'
@@ -44,45 +44,51 @@ const Overview = ({ studyprogramme }) => {
   return (
     <div className="studyprogramme-overview">
       {getRadioButton('kalenterivuosi', 'lukuvuosi', academicYear, setAcademicYear)}
-      {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
-      <div className="section-container">
-        <LineGraph data={basics?.data} />
-        <DataTable titles={basicsTitles} data={basics?.data?.tableStats} />
-      </div>
-      {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
-      <div className="section-container">
-        <StackedBarChart data={credits?.data} />
-        <DataTable titles={creditsTitles} data={credits?.data?.tableStats} />
-      </div>
-      {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
-      <div className="section-container">
-        <BarChart data={graduations?.data} />
-        <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
-      </div>
-      {getDivider('Graduation median time', 'GraduationMedianTime')}
-      <div className="section-container">
-        {graduations?.data?.years.map(year => (
-          <GaugeChart
-            key={year}
-            year={year}
-            data={graduations?.data?.graduationMedianTime[year]}
-            amount={graduations?.data?.graduationAmounts[year]}
-            studyprogramme={studyprogramme}
-          />
-        ))}
-      </div>
-      {getDivider('Graduation mean time', 'GraduationMeanTime')}
-      <div className="section-container">
-        {graduations?.data?.years.map(year => (
-          <GaugeChart
-            key={year}
-            year={year}
-            data={graduations?.data?.graduationMeanTime[year]}
-            amount={graduations?.data?.graduationAmounts[year]}
-            studyprogramme={studyprogramme}
-          />
-        ))}
-      </div>
+      {basics.isLoading || credits.isLoading || graduations.isLoading ? (
+        <Loader active={basics.isLoading || credits.isLoading || graduations.isLoading} />
+      ) : (
+        <>
+          {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
+          <div className="section-container">
+            <LineGraph data={basics?.data} />
+            <DataTable titles={basicsTitles} data={basics?.data?.tableStats} />
+          </div>
+          {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
+          <div className="section-container">
+            <StackedBarChart data={credits?.data} />
+            <DataTable titles={creditsTitles} data={credits?.data?.tableStats} />
+          </div>
+          {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
+          <div className="section-container">
+            <BarChart data={graduations?.data} />
+            <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
+          </div>
+          {getDivider('Graduation median time', 'GraduationMedianTime')}
+          <div className="section-container">
+            {graduations?.data?.years.map(year => (
+              <GaugeChart
+                key={year}
+                year={year}
+                data={graduations?.data?.graduationMedianTime[year]}
+                amount={graduations?.data?.graduationAmounts[year]}
+                studyprogramme={studyprogramme}
+              />
+            ))}
+          </div>
+          {getDivider('Graduation mean time', 'GraduationMeanTime')}
+          <div className="section-container">
+            {graduations?.data?.years.map(year => (
+              <GaugeChart
+                key={year}
+                year={year}
+                data={graduations?.data?.graduationMeanTime[year]}
+                amount={graduations?.data?.graduationAmounts[year]}
+                studyprogramme={studyprogramme}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
