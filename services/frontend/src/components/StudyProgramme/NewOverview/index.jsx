@@ -1,5 +1,5 @@
-import React from 'react'
-import { Divider } from 'semantic-ui-react'
+import React, { useState } from 'react'
+import { Divider, Radio } from 'semantic-ui-react'
 
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
 import LineGraph from './LineGraph'
@@ -16,11 +16,21 @@ const basicsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away
 const creditsTitles = ['', 'Major students credits', 'Non major students credits', 'Transferred credits']
 const graduationsTitles = ['', 'Graduated', 'Wrote thesis']
 
+const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
+  <div className="year-toggle">
+    <label className="toggle-label">{firstLabel}</label>
+    <Radio toggle checked={value} onChange={() => setValue(!value)} />
+    <label className="toggle-label">{secondLabel}</label>
+  </div>
+)
+
 const Overview = ({ studyprogramme }) => {
+  const [academicYear, setAcademicYear] = useState(false)
   const toolTips = InfotoolTips.Studyprogramme
-  const basics = useGetBasicStatsQuery({ id: studyprogramme })
-  const credits = useGetCreditStatsQuery({ id: studyprogramme })
-  const graduations = useGetGraduationStatsQuery({ id: studyprogramme })
+  const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
+  const basics = useGetBasicStatsQuery({ id: studyprogramme, yearType })
+  const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType })
+  const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType })
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -33,6 +43,7 @@ const Overview = ({ studyprogramme }) => {
 
   return (
     <div className="studyprogramme-overview">
+      {getRadioButton('lukuvuosi', 'kalenterivuosi', academicYear, setAcademicYear)}
       {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
       <div className="section-container">
         <LineGraph data={basics?.data} />

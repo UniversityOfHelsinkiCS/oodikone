@@ -16,28 +16,22 @@ const logger = require('../util/logger')
 
 router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
   const code = req.params.id
+  const yearType = req.query?.year_type
+
   if (code) {
     let data = null
     try {
-      data = await getBasicStats(code)
+      data = await getBasicStats(code, yearType)
     } catch (e) {
       logger.error(`Failed to get code ${code} basic stats`)
     }
     if (!data) {
       try {
-        let result
-        if (code.includes('MH') || code.includes('KH')) {
-          result = await getBasicStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2017-01-01'),
-          })
-        } else {
-          result = await getBasicStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2000-01-01'),
-          })
-        }
-        data = await setBasicStats(result)
+        let result = await getBasicStatsForStudytrack({
+          studyprogramme: req.params.id,
+          yearType,
+        })
+        data = await setBasicStats(result, yearType)
       } catch (e) {
         logger.error(`Failed to update code ${code} basic stats`)
       }
