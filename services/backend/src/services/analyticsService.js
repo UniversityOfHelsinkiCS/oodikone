@@ -3,7 +3,7 @@ const moment = require('moment')
 
 const createRedisKeyForProductivity = id => `PRODUCTIVITY_${id}`
 const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
-const createRedisKeyForBasicStats = id => `BASIC_STATS_${id}`
+const createRedisKeyForBasicStats = (id, yearType) => `BASIC_STATS_${id}_${yearType}_`
 const createRedisKeyForCreditStats = id => `CREDIT_STATS_${id}`
 const createRedisKeyForGraduationStats = id => `GRADUATION_STATS_${id}`
 
@@ -90,16 +90,16 @@ const patchThroughput = async data => {
   }
 }
 
-const getBasicStats = async id => {
-  const redisKey = createRedisKeyForBasicStats(id)
+const getBasicStats = async (id, yearType) => {
+  const redisKey = createRedisKeyForBasicStats(id, yearType)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setBasicStats = async data => {
+const setBasicStats = async (data, yearType) => {
   const { id } = data
-  const redisKey = createRedisKeyForBasicStats(id)
+  const redisKey = createRedisKeyForBasicStats(id, yearType)
   const dataToRedis = {
     ...data,
     status: 'DONE',

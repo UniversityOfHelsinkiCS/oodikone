@@ -30,10 +30,11 @@ const formatStudyright = studyright => {
   }
 }
 
-const getYearsArray = since => {
+const getYearsArray = (since, isAcademicYear) => {
   const years = []
   for (let i = since; i <= new Date().getFullYear(); i++) {
-    years.push(i)
+    const year = isAcademicYear ? `${i} - ${i + 1}` : i
+    years.push(year)
   }
   return years
 }
@@ -271,36 +272,44 @@ const transfersTo = async (studytrack, startDate) => {
   })
 }
 
-const getGraduatedStats = async (studytrack, startDate, years) => {
+const defineYear = (date, isAcademicYear) => {
+  if (!date) return ''
+  const year = date.getFullYear()
+  if (!isAcademicYear) return year
+  if (date < new Date(`${year}-07-31`)) return `${year - 1} - ${year}`
+  return `${year} - ${year + 1}`
+}
+
+const getGraduatedStats = async (studytrack, startDate, years, isAcademicYear) => {
   const studyrights = await graduatedStudyRights(studytrack, startDate)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ enddate }) => {
-    const graduationYear = enddate.getFullYear()
+    const graduationYear = defineYear(enddate, isAcademicYear)
     graphStats[indexOf(years, graduationYear)] += 1
     tableStats[graduationYear] += 1
   })
   return { graphStats, tableStats }
 }
 
-const getStartedStats = async (studytrack, startDate, years) => {
+const getStartedStats = async (studytrack, startDate, years, isAcademicYear) => {
   const studyrights = await startedStudyrights(studytrack, startDate)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ studystartdate }) => {
-    const startYear = studystartdate.getFullYear()
+    const startYear = defineYear(studystartdate, isAcademicYear)
     graphStats[indexOf(years, startYear)] += 1
     tableStats[startYear] += 1
   })
   return { graphStats, tableStats }
 }
 
-const getCancelledStats = async (studytrack, startDate, years) => {
+const getCancelledStats = async (studytrack, startDate, years, isAcademicYear) => {
   const studyrights = await cancelledStudyRights(studytrack, startDate)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ canceldate }) => {
-    const cancelYear = canceldate.getFullYear()
+    const cancelYear = defineYear(canceldate, isAcademicYear)
     graphStats[indexOf(years, cancelYear)] += 1
     tableStats[cancelYear] += 1
   })
@@ -308,12 +317,12 @@ const getCancelledStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
-const getTransferredAwayStats = async (studytrack, startDate, years) => {
+const getTransferredAwayStats = async (studytrack, startDate, years, isAcademicYear) => {
   const studyrights = await transfersAway(studytrack, startDate)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ transferdate }) => {
-    const transferYear = transferdate.getFullYear()
+    const transferYear = defineYear(transferdate, isAcademicYear)
     graphStats[indexOf(years, transferYear)] += 1
     tableStats[transferYear] += 1
   })
@@ -321,12 +330,12 @@ const getTransferredAwayStats = async (studytrack, startDate, years) => {
   return { graphStats, tableStats }
 }
 
-const getTransferredToStats = async (studytrack, startDate, years) => {
+const getTransferredToStats = async (studytrack, startDate, years, isAcademicYear) => {
   const studyrights = await transfersTo(studytrack, startDate)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ transferdate }) => {
-    const transferYear = transferdate.getFullYear()
+    const transferYear = defineYear(transferdate, isAcademicYear)
     graphStats[indexOf(years, transferYear)] += 1
     tableStats[transferYear] += 1
   })
@@ -421,15 +430,24 @@ const getGraduationTimeStats = async (studytrack, startDate, years) => {
   return { medians, means, graduationAmounts }
 }
 
-const getBasicStatsForStudytrack = async ({ studyprogramme, startDate }) => {
-  const years = getYearsArray(startDate.getFullYear())
-  const started = await getStartedStats(studyprogramme, startDate, years)
-  const graduated = await getGraduatedStats(studyprogramme, startDate, years)
-  const cancelled = await getCancelledStats(studyprogramme, startDate, years)
-  const transferredAway = await getTransferredAwayStats(studyprogramme, startDate, years)
-  const transferredTo = await getTransferredToStats(studyprogramme, startDate, years)
+const getStartDate = (studyprogramme, isAcademicYear) => {
+  if (studyprogramme.includes('KH' || 'MH') && isAcademicYear) return new Date('2017-08-01')
+  if (studyprogramme.includes('KH' || 'MH')) return new Date('2017-01-01')
+  if (isAcademicYear) return new Date('2000-08-01')
+  return new Date('2000-01-01')
+}
 
-  const reversedYears = getYearsArray(startDate.getFullYear()).reverse()
+const getBasicStatsForStudytrack = async ({ studyprogramme, yearType }) => {
+  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const startDate = getStartDate(studyprogramme, isAcademicYear)
+  const years = getYearsArray(startDate.getFullYear(), isAcademicYear)
+  const started = await getStartedStats(studyprogramme, startDate, years, isAcademicYear)
+  const graduated = await getGraduatedStats(studyprogramme, startDate, years, isAcademicYear)
+  const cancelled = await getCancelledStats(studyprogramme, startDate, years, isAcademicYear)
+  const transferredAway = await getTransferredAwayStats(studyprogramme, startDate, years, isAcademicYear)
+  const transferredTo = await getTransferredToStats(studyprogramme, startDate, years, isAcademicYear)
+
+  const reversedYears = getYearsArray(startDate.getFullYear(), isAcademicYear).reverse()
   const tableStats = reversedYears.map(year => [
     year,
     started.tableStats[year],
