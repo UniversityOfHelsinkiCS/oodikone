@@ -343,7 +343,7 @@ const getTransferredToStats = async (studytrack, startDate, years, isAcademicYea
   return { graphStats, tableStats }
 }
 
-const getRegularCreditStats = async (studytrack, startDate, years) => {
+const getRegularCreditStats = async (studytrack, startDate, years, isAcademicYear) => {
   const providercode = mapToProviders([studytrack])[0]
   const studyrights = await getProgrammesStudents(studytrack)
   const credits = await getCreditsForStudyProgramme(providercode, startDate)
@@ -353,7 +353,7 @@ const getRegularCreditStats = async (studytrack, startDate, years) => {
 
   credits.forEach(({ student_studentnumber, attainment_date, credits }) => {
     const studyright = studyrights.find(studyright => studyright.studentnumber == student_studentnumber)
-    const attainmentYear = attainment_date.getFullYear()
+    const attainmentYear = defineYear(attainment_date, isAcademicYear)
 
     // Map all credits for the studyprogramme and
     // divide them into major students' and nonmajors' credits by year
@@ -369,13 +369,13 @@ const getRegularCreditStats = async (studytrack, startDate, years) => {
   return { majors, nonMajors }
 }
 
-const getTransferredCreditStats = async (studytrack, startDate, years) => {
+const getTransferredCreditStats = async (studytrack, startDate, years, isAcademicYear) => {
   const providercode = mapToProviders([studytrack])[0]
   const credits = await getTransferredCredits(providercode, startDate)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   credits.forEach(({ attainment_date, credits }) => {
-    const attainmentYear = attainment_date.getFullYear()
+    const attainmentYear = defineYear(attainment_date, isAcademicYear)
     graphStats[indexOf(years, attainmentYear)] += credits || 0
     tableStats[attainmentYear] += credits || 0
   })
@@ -431,8 +431,8 @@ const getGraduationTimeStats = async (studytrack, startDate, years) => {
 }
 
 const getStartDate = (studyprogramme, isAcademicYear) => {
-  if (studyprogramme.includes('KH' || 'MH') && isAcademicYear) return new Date('2017-08-01')
-  if (studyprogramme.includes('KH' || 'MH')) return new Date('2017-01-01')
+  if ((studyprogramme.includes('KH') || studyprogramme.includes('MH')) && isAcademicYear) return new Date('2017-08-01')
+  if (studyprogramme.includes('KH') || studyprogramme.includes('MH')) return new Date('2017-01-01')
   if (isAcademicYear) return new Date('2000-08-01')
   return new Date('2000-01-01')
 }
@@ -486,12 +486,14 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, yearType }) => {
   }
 }
 
-const getCreditStatsForStudytrack = async ({ studyprogramme, startDate }) => {
-  const years = getYearsArray(startDate.getFullYear())
-  const { majors, nonMajors } = await getRegularCreditStats(studyprogramme, startDate, years)
-  const transferred = await getTransferredCreditStats(studyprogramme, startDate, years)
+const getCreditStatsForStudytrack = async ({ studyprogramme, yearType }) => {
+  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const startDate = getStartDate(studyprogramme, isAcademicYear)
+  const years = getYearsArray(startDate.getFullYear(), isAcademicYear)
+  const { majors, nonMajors } = await getRegularCreditStats(studyprogramme, startDate, years, isAcademicYear)
+  const transferred = await getTransferredCreditStats(studyprogramme, startDate, years, isAcademicYear)
 
-  const reversedYears = getYearsArray(startDate.getFullYear()).reverse()
+  const reversedYears = getYearsArray(startDate.getFullYear(), isAcademicYear).reverse()
   const tableStats = reversedYears.map(year => [
     year,
     majors.tableStats[year],

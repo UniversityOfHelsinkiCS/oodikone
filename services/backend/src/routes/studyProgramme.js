@@ -27,7 +27,7 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
     }
     if (!data) {
       try {
-        let result = await getBasicStatsForStudytrack({
+        const result = await getBasicStatsForStudytrack({
           studyprogramme: req.params.id,
           yearType,
         })
@@ -44,27 +44,21 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
   const code = req.params.id
+  const yearType = req.query?.year_type
+
   if (code) {
     let data = null
     try {
-      data = await getCreditStats(code)
+      data = await getCreditStats(code, yearType)
     } catch (e) {
       logger.error(`Failed to get code ${code} credit stats`)
     }
     if (!data) {
       try {
-        let result
-        if (code.includes('MH') || code.includes('KH')) {
-          result = await getCreditStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2017-01-01'),
-          })
-        } else {
-          result = await getCreditStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2000-01-01'),
-          })
-        }
+        const result = await getCreditStatsForStudytrack({
+          studyprogramme: req.params.id,
+          yearType,
+        })
         data = await setCreditStats(result)
       } catch (e) {
         logger.error(`Failed to update code ${code} credit stats`)
