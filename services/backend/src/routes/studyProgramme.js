@@ -59,7 +59,7 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
           studyprogramme: req.params.id,
           yearType,
         })
-        data = await setCreditStats(result)
+        data = await setCreditStats(result, yearType)
       } catch (e) {
         logger.error(`Failed to update code ${code} credit stats`)
       }
@@ -72,28 +72,22 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
   const code = req.params.id
+  const yearType = req.query?.year_type
+
   if (code) {
     let data = null
     try {
-      data = await getGraduationStats(code)
+      data = await getGraduationStats(code, yearType)
     } catch (e) {
       logger.error(`Failed to get code ${code} graduation stats`)
     }
     if (!data) {
       try {
-        let result
-        if (code.includes('MH') || code.includes('KH')) {
-          result = await getGraduationStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2017-01-01'),
-          })
-        } else {
-          result = await getGraduationStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2000-01-01'),
-          })
-        }
-        data = await setGraduationStats(result)
+        const result = await getGraduationStatsForStudytrack({
+          studyprogramme: req.params.id,
+          yearType,
+        })
+        data = await setGraduationStats(result, yearType)
       } catch (e) {
         logger.error(`Failed to update code ${code} graduation stats`)
       }
