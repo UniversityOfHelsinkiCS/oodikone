@@ -43,7 +43,7 @@ const Overview = ({ studyprogramme }) => {
 
   return (
     <div className="studyprogramme-overview">
-      {getRadioButton('lukuvuosi', 'kalenterivuosi', academicYear, setAcademicYear)}
+      {getRadioButton('kalenterivuosi', 'lukuvuosi', academicYear, setAcademicYear)}
       {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
       <div className="section-container">
         <LineGraph data={basics?.data} />
