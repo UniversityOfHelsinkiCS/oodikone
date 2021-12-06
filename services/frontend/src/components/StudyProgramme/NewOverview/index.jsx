@@ -13,7 +13,7 @@ import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
 const basicsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
-const creditsTitles = ['', 'Major students credits', 'Non major students credits', 'Transferred credits']
+const creditsTitles = ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits']
 const graduationsTitles = ['', 'Graduated', 'Wrote thesis']
 
 const getRadioButton = (firstLabel, secondLabel, value, setValue) => (

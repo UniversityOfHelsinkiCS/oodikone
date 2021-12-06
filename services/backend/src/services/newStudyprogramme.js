@@ -496,6 +496,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType }) => {
   const reversedYears = getYearsArray(startDate.getFullYear(), isAcademicYear).reverse()
   const tableStats = reversedYears.map(year => [
     year,
+    majors.tableStats[year] + nonMajors.tableStats[year] + transferred.tableStats[year],
     majors.tableStats[year],
     nonMajors.tableStats[year],
     transferred.tableStats[year],
