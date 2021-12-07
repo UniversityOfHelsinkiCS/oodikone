@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Progress } from 'semantic-ui-react'
-import { languageAbbreviationsOpened } from '../../../common'
+import { languageAbbreviations } from '../../../common'
 
 const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
   const [languages, setLanguages] = useState()
@@ -35,7 +35,9 @@ const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
     }
   }, [samples])
 
-  const getLanguage = lang => (lang in languageAbbreviationsOpened ? languageAbbreviationsOpened[lang[0]] : lang)
+  const getLanguage = lang => (lang in languageAbbreviations ? languageAbbreviations[lang] : lang)
+
+  if (total === 0) return <p>No data available!</p>
 
   return (
     <Table celled>
