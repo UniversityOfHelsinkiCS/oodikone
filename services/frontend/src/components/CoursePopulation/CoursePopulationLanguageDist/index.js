@@ -19,8 +19,8 @@ const CoursePopulationLanguageDist = ({ samples, codes, from, to }) => {
               new Date(from).getTime() <= new Date(course.date).getTime() &&
               new Date(course.date).getTime() <= new Date(to).getTime()
           )
-          .filter(course => course.passed === true)
-          .sort((a, b) => new Date(a.date) <= new Date(b.date))
+          // .filter(course => course.passed === true)
+          .sort((a, b) => (new Date(a.date) <= new Date(b.date) ? -1 : 1))
 
         if (filteredCourses[0] && filteredCourses[0].language !== null) {
           if (!lang[filteredCourses[0].language]) {

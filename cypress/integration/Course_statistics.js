@@ -186,6 +186,18 @@ describe('Course Statistics tests', () => {
       cy.contains('td', '010674989').siblings().contains('1')
     })
 
+    it.skip('Language distribution is correct', () => {
+      cy.get("input[placeholder='Search by a course code']").type('TKT20003')
+      cy.contains(/^TKT20003$/).click()
+      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.contains('TKT20003, 582219 Käyttöjärjestelmät')
+      cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
+      cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
+      cy.contains('Language distribution').click()
+      cy.contains('td', 'finnish').siblings().contains('122')
+      cy.contains('td', 'english').siblings().contains('5')
+    })
+
     describe('When searching unified course stats', () => {
       beforeEach(() => {
         cy.url().should('include', '/coursestatistics')
