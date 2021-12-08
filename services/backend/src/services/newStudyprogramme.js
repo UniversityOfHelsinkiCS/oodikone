@@ -9,9 +9,93 @@ const {
   ElementDetail,
   Transfer,
   Student,
+  SemesterEnrollment,
+  Semester,
 } = require('../models')
 const { ThesisCourse } = require('../models/models_kone')
 const { formatStudyright } = require('./studyprogrammeHelpers')
+
+const enrolledStudyrights = async studytrack => {
+  const studyrights = await Studyright.findAll({
+    attributes: ['studyrightid', 'studystartdate', 'enddate', 'prioritycode'],
+    include: [
+      {
+        model: StudyrightElement,
+        required: true,
+        where: { code: studytrack },
+      },
+      {
+        model: Student,
+        attributes: ['studentnumber'],
+        required: true,
+      },
+    ],
+  })
+
+  const studentnumbers = studyrights.map(s => s.student.studentnumber)
+
+  const students = await Student.findAll({
+    attributes: ['studentnumber'],
+    include: [
+      {
+        model: Studyright,
+        include: [
+          {
+            model: StudyrightElement,
+            required: true,
+            where: {
+              code: studytrack,
+            },
+          },
+        ],
+        attributes: ['studyrightid'],
+      },
+      {
+        model: SemesterEnrollment,
+        attributes: ['semestercode'],
+        include: [
+          {
+            model: Semester,
+            required: true,
+          },
+        ],
+        where: {
+          enrollmenttype: 1,
+        },
+      },
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers,
+      },
+    },
+  })
+
+  let enrollments = new Set()
+
+  students.forEach(student => {
+    student.semester_enrollments.forEach(e => {
+      const enrollmentStartDate = e.semester.startdate
+      const enrollmentEndDate = e.semester.enddate
+      const correctStudyRight = studyrights.find(
+        s =>
+          student.studentnumber === s.student.studentnumber &&
+          s.studystartdate <= enrollmentStartDate && // Studying in the programme should have started on the same day or earlier than the enrollment
+          s.enddate >= enrollmentEndDate && // Studying in the programme should have ended on the same day or later than the enrollment
+          (!s.canceldate || s.canceldate > enrollmentStartDate) && // Studyright should not be canceled OR the possible canceldate should be after the enrollmentStartDate
+          (s.prioritycode === 1 || s.prioritycode === 30) // Studyright should be primary or the student should have graduated
+      )
+      if (correctStudyRight) {
+        enrollments.add({
+          studentnumber: student.studentnumber,
+          startdate: e.semester.startdate,
+        })
+      }
+    })
+  })
+
+  return enrollments
+}
 
 const startedStudyrights = async (studytrack, since) =>
   await Studyright.findAll({
@@ -211,6 +295,7 @@ const getThesisCredits = async (studyprogramme, since) => {
 }
 
 module.exports = {
+  enrolledStudyrights,
   startedStudyrights,
   graduatedStudyRights,
   cancelledStudyRights,

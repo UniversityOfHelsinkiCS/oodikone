@@ -22,7 +22,24 @@ const {
   getCreditsForStudyProgramme,
   getTransferredCredits,
   getThesisCredits,
+  enrolledStudyrights,
 } = require('./newStudyprogramme')
+
+const getEnrolledStats = async (studytrack, since, years, isAcademicYear) => {
+  const students = await enrolledStudyrights(studytrack)
+  const { graphStats, tableStats } = getStatsBasis(years)
+
+  students.forEach(({ startdate }) => {
+    if (startdate.getMonth() === 7) {
+      const enrolledYear = defineYear(startdate, isAcademicYear)
+
+      graphStats[indexOf(years, enrolledYear)] += 1
+      tableStats[enrolledYear] += 1
+    }
+  })
+
+  return { graphStats, tableStats }
+}
 
 const getGraduatedStats = async (studytrack, since, years, isAcademicYear) => {
   const studyrights = await graduatedStudyRights(studytrack, since)
@@ -262,18 +279,28 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType }) => 
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
+  const enrolled = await getEnrolledStats(studyprogramme, since, years, isAcademicYear)
   const thesis = await getThesisStats(studyprogramme, since, years, isAcademicYear)
   const graduated = await getGraduatedStats(studyprogramme, since, years, isAcademicYear)
   const graduationTimeStats = await getGraduationTimeStats(studyprogramme, since, years, isAcademicYear)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
-  const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
+  const tableStats = reversedYears.map(year => [
+    year,
+    enrolled.tableStats[year],
+    graduated.tableStats[year],
+    thesis.tableStats[year],
+  ])
 
   return {
     id: studyprogramme,
     years,
     tableStats,
     graphStats: [
+      {
+        name: 'Enrolled students',
+        data: enrolled.graphStats,
+      },
       {
         name: 'Graduated students',
         data: graduated.graphStats,
