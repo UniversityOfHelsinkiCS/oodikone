@@ -7,8 +7,8 @@ module.exports = {
   '{services,updater}/**/*.{js,jsx}': files => `eslint --fix ${files.join(' ')}`,
   '*.{js,json,md,yml,yaml,html}': files => `prettier --write ${files.join(' ')}`,
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
-  Dockerfile: files => `${dockerCmdBase} hadolint/hadolint:v2.7.0-alpine hadolint ${relativeFilePaths(files)}`,
-  '*.sh': files => `${dockerCmdBase} koalaman/shellcheck-alpine:v0.7.2 ${relativeFilePaths(files)} -x`,
+  Dockerfile: files => `${dockerCmdBase} hadolint/hadolint:v2.7.0 hadolint ${relativeFilePaths(files)}`,
+  '*.sh': files => `${dockerCmdBase} koalaman/shellcheck:v0.7.2 ${relativeFilePaths(files)} -x`,
   '.github/workflows/*': files => `${dockerCmdBase} rhysd/actionlint:1.6.2 ${relativeFilePaths(files)}`,
   'docker-compose*': files => {
     const composeFiles = file => {
