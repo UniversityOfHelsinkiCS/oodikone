@@ -47,6 +47,9 @@ Course.init(
     substitutions: {
       type: JSONB,
     },
+    course_unit_type: {
+      type: STRING,
+    },
   },
   {
     underscored: false,
