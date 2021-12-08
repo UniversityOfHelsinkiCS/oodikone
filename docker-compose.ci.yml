@@ -90,8 +90,10 @@ services:
   # Following services are used to run sis-updater-worker when anon sis-db needs to be updated
   sis-importer-db:
     <<: *defaults
-    container_name: user-db
+    container_name: sis-importer-db
     image: registry.toska.cs.helsinki.fi/sis-importer-db
+    profiles:
+      - updater
 
   sis-updater-worker:
     <<: *defaults
@@ -112,9 +114,13 @@ services:
       SIS_IMPORTER_USER: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+    profiles:
+      - updater
 
   sis-updater-nats:
     <<: *defaults
     command: '-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
     container_name: sis-updater-nats
     image: nats-streaming:0.16.2
+    profiles:
+      - updater
