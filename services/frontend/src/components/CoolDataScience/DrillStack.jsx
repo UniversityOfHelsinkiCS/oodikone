@@ -2,6 +2,7 @@ import React, { useMemo } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Breadcrumb, Icon } from 'semantic-ui-react'
 import _ from 'lodash'
+import { getTextIn } from '../../common'
 import TSA from '../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Trends'
@@ -12,9 +13,15 @@ const getP = (a, b) => {
   return a / b
 }
 
-const DrillStack = ({ data, rootLabel, renderCard }) => {
+const DrillStack = ({ data, renderCard }) => {
   const history = useHistory()
   const location = useLocation()
+
+  const rootLabel = getTextIn({
+    fi: 'Helsingin Yliopisto',
+    en: 'University of Helsinki',
+    se: 'Helsingfors Universitet',
+  })
 
   const sortBy = ({ currentValue, previousValue }) => 1 - currentValue / previousValue
 

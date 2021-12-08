@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import PropTypes, { shape, bool, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
@@ -11,6 +11,7 @@ import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
 import InfoToolTips from '../../common/InfoToolTips'
+import DrillStack from './DrillStack'
 import { getStatusGraduated } from '../../redux/coolDataScience'
 import './status.css'
 
@@ -164,14 +165,25 @@ StatusContainer.defaultProps = {
 
 const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
 
+const createDrillData = data => {
+  if (!data) return null
+
+  return Object.values(data).map(item => ({
+    key: item.code,
+    label: getTextIn(item.name),
+    currentValue: item.current,
+    previousValue: item.previous,
+    children: createDrillData(item.drill),
+    ..._.omit(item, 'drill'),
+  }))
+}
+
 const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const DATE_FORMAT = 'DD.MM.YYYY'
   const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
   const [showByYear, setShowByYear] = useLocalStorage('showByYear', true)
-  const [drillStack, setDrillStack] = useState([])
   const [showSettings, setShowSettings] = useState(true)
   const [selectedDate, setSelectedDate] = useState(moment())
-  const [codes, setCodes] = useState([])
   const { CoolDataScience } = InfoToolTips
   const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
 
@@ -181,20 +193,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
     }
   }, [selectedDate, showByYear])
 
-  useEffect(() => {
-    if (codes.length > 0) {
-      const updatedDrillStack = codes.reduce((acc, code) => {
-        const drilled = data[code]
-        // check if the code is on first level of drilldown
-        if (drilled) acc.push(drilled.drill)
-        // if not on first level then use the previous object in array
-        // this might be source of bugs but its the best I could come up with
-        else if (acc.length > 0 && acc[0][code]) acc.push(acc[0][code].drill)
-        return acc
-      }, [])
-      setDrillStack(updatedDrillStack)
-    }
-  }, [data])
+  const drillData = useMemo(() => createDrillData(data), [data])
 
   const handleShowYearlyValuesToggled = () => {
     const yearlyValues = showYearlyValues
@@ -206,22 +205,6 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
     const byYear = showByYear
     setShowByYear(!showByYear)
     sendAnalytics(`SG Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status graduated')
-  }
-
-  const pushToDrillStack = (values, code) => {
-    const updatedCodes = [...codes].concat(code)
-    const updatedDrillStack = [...drillStack].concat(values)
-    setCodes(updatedCodes)
-    setDrillStack(updatedDrillStack)
-    sendAnalytics('SG Drilldown clicked', 'Status graduated')
-  }
-
-  const popFromDrillStack = () => {
-    const updatedDrillStack = _.dropRight([...drillStack], 1)
-    const updatedCodes = _.dropRight([...codes], 1)
-    setCodes(updatedCodes)
-    setDrillStack(updatedDrillStack)
-    sendAnalytics('SG Drillup clicked', 'Status graduated')
   }
 
   const renderSettings = () => {
@@ -285,14 +268,6 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
     )
   }
 
-  const DrilldownMessage = () => (
-    <Message
-      color="blue"
-      content="Klikkaamalla tiedekuntaa pystyt porautumaan koulutusohjelma tasolle.
-      Vasemmassa yläkulmassa olevaa nuolta klikkaamalla pääset edelliseen näkymään."
-    />
-  )
-
   if (!data || loading)
     return (
       <Segment style={{ padding: '40px' }} textAlign="center">
@@ -301,55 +276,30 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
       </Segment>
     )
 
-  const orderedAbsDiffs = _.orderBy(
-    Object.values(_.last(drillStack) || data).map(({ current, previous }) => {
-      return Math.abs(Math.floor((getP(current, previous) - 1) * 1000) / 10)
-    })
-  )
-  const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
   return (
     <>
       <h2>Koulutusohjelmista valmistuneet</h2>
-      <DrilldownMessage />
-      <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px' }}>
-        {drillStack.length > 0 && (
-          <Icon onClick={popFromDrillStack} style={{ fontSize: '40px', cursor: 'pointer' }} name="arrow left" />
+      <DrillStack
+        data={drillData}
+        renderCard={(data, drill, { medianDiff }) => (
+          <StatusContainer
+            key={data.code}
+            clickable={!!data.children}
+            handleClick={drill}
+            title={getTextIn(data.name)}
+            current={data.current}
+            previous={data.previous}
+            showYearlyValues={showYearlyValues}
+            min1={-medianDiff * 2}
+            max1={medianDiff * 2}
+            yearlyValues={data.yearly}
+            showByYear={showByYear}
+          />
         )}
-      </div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 240px)',
-          gridTemplateRows: 'repeat(auto-fill) 20px',
-          gridGap: '20px',
-          justifyContent: 'center',
-        }}
-      >
-        {_.orderBy(
-          Object.entries(_.last(drillStack) || data),
-          ([, { current, previous }]) => getP(current, previous), // oh god<r
-          ['desc']
-        ).map(([code, stats]) => {
-          const handleClick = () => pushToDrillStack(stats.drill, code)
+      />
 
-          return (
-            <StatusContainer
-              key={code}
-              clickable={!!stats.drill}
-              handleClick={handleClick}
-              title={getTextIn(stats.name)}
-              current={stats.current}
-              previous={stats.previous}
-              showYearlyValues={showYearlyValues}
-              min1={-medianDiff * 2}
-              max1={medianDiff * 2}
-              yearlyValues={stats.yearly}
-              showByYear={showByYear}
-            />
-          )
-        })}
-      </div>
       {renderSettings()}
+
       <Message>
         {
           // eslint-disable-next-line react/no-children-prop
