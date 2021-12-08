@@ -2,7 +2,6 @@ x-defaults: &defaults
   restart: unless-stopped
 
 services:
-
   backend:
     <<: *defaults
     container_name: backend
@@ -11,7 +10,7 @@ services:
       - redis
       - sis-db
     environment:
-      CI: "true"
+      CI: 'true'
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:1337
       REDIS: redis
@@ -31,11 +30,15 @@ services:
   kone-db:
     <<: *defaults
     container_name: kone-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: kone-db
+      POSTGRES_HOST_AUTH_METHOD: trust
     image: registry.toska.cs.helsinki.fi/kone-db
 
   redis:
     <<: *defaults
-    command: "redis-server --appendonly yes"
+    command: 'redis-server --appendonly yes'
     container_name: redis
     image: redis
     ports:
@@ -45,10 +48,19 @@ services:
     <<: *defaults
     container_name: sis-db
     image: registry.toska.cs.helsinki.fi/sis-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: sis-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    shm_size: 2gb
 
   user-db:
     <<: *defaults
     container_name: user-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: user-db
+      POSTGRES_HOST_AUTH_METHOD: trust
     image: registry.toska.cs.helsinki.fi/user-db
 
   userservice:
@@ -57,7 +69,7 @@ services:
     depends_on:
       - user-db
     environment:
-      CI: "true"
+      CI: 'true'
       DB_URL: postgres://postgres@user-db:5432/user-db
       SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
       TOKEN_SECRET: IWannaBeTheVeryBest
@@ -71,6 +83,38 @@ services:
       - backend
       - userservice
     ports:
-      -  1337:80
+      - 1337:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
+
+  # Following services are used to run sis-updater-worker when anon sis-db needs to be updated
+  sis-importer-db:
+    <<: *defaults
+    container_name: user-db
+    image: registry.toska.cs.helsinki.fi/sis-importer-db
+
+  sis-updater-worker:
+    <<: *defaults
+    build:
+      target: development
+      context: updater/sis-updater-worker
+    depends_on:
+      - redis
+      - sis-db
+      - sis-importer-db
+      - sis-updater-nats
+    environment:
+      DB_URL: postgres://postgres@sis-db:5432/sis-db
+      REDIS_URI: //redis:6379
+      SIS_IMPORTER_DATABASE: sis-importer-db
+      SIS_IMPORTER_HOST: sis-importer-db
+      SIS_IMPORTER_PASSWORD: postgres
+      SIS_IMPORTER_USER: postgres
+      SIS_NATS_TOKEN: dev
+      SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+
+  sis-updater-nats:
+    <<: *defaults
+    command: '-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
+    container_name: sis-updater-nats
+    image: nats-streaming:0.16.2
