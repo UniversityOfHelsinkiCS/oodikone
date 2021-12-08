@@ -1,0 +1,50 @@
+x-defaults: &defaults
+  restart: unless-stopped
+
+services:
+  kone-db:
+    <<: *defaults
+    container_name: kone-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: kone-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    image: registry.toska.cs.helsinki.fi/kone-db
+    # image: postgres:13.4-alpine
+    profiles:
+      - oodikone
+
+  sis-db:
+    <<: *defaults
+    container_name: sis-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: sis-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    # image: registry.toska.cs.helsinki.fi/sis-db
+    image: postgres:13.2
+    shm_size: 2gb
+
+  sis-importer-db:
+    <<: *defaults
+    container_name: sis-importer-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: sis-importer-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    # image: registry.toska.cs.helsinki.fi/sis-importer-db
+    image: postgres:13.1
+    profiles:
+      - updater
+
+  user-db:
+    <<: *defaults
+    container_name: user-db
+    environment:
+      PGDATA: /data
+      POSTGRES_DB: user-db
+      POSTGRES_HOST_AUTH_METHOD: trust
+    image: registry.toska.cs.helsinki.fi/user-db
+    # image: postgres:13.4-alpine
+    profiles:
+      - oodikone
