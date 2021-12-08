@@ -43,6 +43,11 @@ const Overview = ({ studyprogramme }) => {
 
   return (
     <div className="studyprogramme-overview">
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '10px' }}>
+        <p style={{ color: 'red' }}>
+          Please note that this view is still very much a work in progress. This view is only visible to some admins.
+        </p>
+      </div>
       {getRadioButton('kalenterivuosi', 'lukuvuosi', academicYear, setAcademicYear)}
       {basics.isLoading || credits.isLoading || graduations.isLoading ? (
         <Loader active={basics.isLoading || credits.isLoading || graduations.isLoading} />

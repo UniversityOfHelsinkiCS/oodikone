@@ -12,7 +12,6 @@ import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn, getUserRoles, getUserIsAdmin } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
-import { isDev } from '../../conf'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
 
@@ -61,7 +60,7 @@ const StudyProgramme = props => {
       })
   }
 
-  const SHOW_NEW_OVERVIEW = getUserIsAdmin(roles) && isDev
+  const SHOW_NEW_OVERVIEW = getUserIsAdmin(roles) && roles?.find(r => r.group_code === 'teachers')
 
   const getPanes = () => {
     const { match, programmes } = props
