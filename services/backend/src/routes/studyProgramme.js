@@ -23,7 +23,7 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
     try {
       data = await getBasicStats(code, yearType)
     } catch (e) {
-      logger.error(`Failed to get code ${code} basic stats`)
+      logger.error(`Failed to get code ${code} basic stats: ${e}`)
     }
     if (!data) {
       try {
@@ -33,7 +33,7 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
         })
         data = await setBasicStats(result, yearType)
       } catch (e) {
-        logger.error(`Failed to update code ${code} basic stats`)
+        logger.error(`Failed to update code ${code} basic stats: ${e}`)
       }
     }
     return res.json(data)
