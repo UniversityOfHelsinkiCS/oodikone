@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Divider, Segment, Button, Popup, Loader, Icon, Checkbox, Form, Breadcrumb } from 'semantic-ui-react'
+import { Divider, Segment, Button, Popup, Loader, Icon, Checkbox, Form } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
+import DrillStack from './DrillStack'
 
-import { useHistory, useLocation } from 'react-router-dom'
 import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
@@ -98,14 +98,14 @@ const StatusContainer = ({
   showRelativeValues,
   showByYear,
   showStudentCounts,
+  clickable,
 }) => {
   const title = getTextIn(stats.name)
-  const clickable = !!stats.drill
 
   let current
   let previous
 
-  if (!stats.drill) {
+  if (stats.type === 'course') {
     current = stats.currentStudents
     previous = stats.previousStudents
   } else {
@@ -241,55 +241,28 @@ const StatusContainer = ({
   )
 }
 
-const StatusContent = ({ data, settings, onDrill }) => {
+const StatusContent = ({ data, settings }) => {
   const { showByYear, showRelativeValues, showYearlyValues, showStudentCounts } = settings
 
-  const orderedAbsDiffs = _.chain(data)
-    .map(({ current, currentStudents, previous, previousStudents }) => {
-      const currentValue = showRelativeValues ? current / currentStudents : current
-      const previousValue = showRelativeValues ? previous / previousStudents : previous
-      return Math.abs(Math.floor((getP(currentValue, previousValue) - 1) * 1000) / 10)
-    })
-    .orderBy()
-    .value()
-
-  const medianDiff = orderedAbsDiffs[Math.round((orderedAbsDiffs.length - 1) / 2)]
-
   return (
-    <>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 240px)',
-          gridTemplateRows: 'repeat(auto-fill) 20px',
-          gridGap: '20px',
-          justifyContent: 'center',
-        }}
-      >
-        {_.orderBy(
-          data,
-          ({ current, previous, currentStudents, previousStudents }) =>
-            getP(current || currentStudents, previous || previousStudents), // oh god<r
-          ['desc']
-        ).map(stats => {
-          const handleClick = () => onDrill(stats.code)
-
-          return (
-            <StatusContainer
-              key={stats.code}
-              stats={stats}
-              handleClick={handleClick}
-              showRelativeValues={showRelativeValues}
-              showYearlyValues={showYearlyValues}
-              showStudentCounts={showStudentCounts}
-              min1={-medianDiff * 2}
-              max1={medianDiff * 2}
-              showByYear={showByYear}
-            />
-          )
-        })}
-      </div>
-    </>
+    <DrillStack
+      data={data}
+      rootLabel="Helsingin Yliopisto"
+      renderCard={(data, drill, { medianDiff }) => (
+        <StatusContainer
+          key={data.code}
+          clickable={!!data.children}
+          stats={data}
+          handleClick={drill}
+          showRelativeValues={showRelativeValues}
+          showYearlyValues={showYearlyValues}
+          showStudentCounts={showStudentCounts}
+          min1={-2 * medianDiff}
+          max1={2 * medianDiff}
+          showByYear={showByYear}
+        />
+      )}
+    />
   )
 }
 
@@ -417,20 +390,34 @@ const getDefaultSettings = () =>
     .fromPairs()
     .value()
 
+const createDrillData = (storeData, showRelativeValues) => {
+  if (!storeData) return null
+
+  return Object.values(storeData).map(item => ({
+    key: item.code,
+    label: getTextIn(item.name),
+    children: createDrillData(item.drill),
+    currentValue: showRelativeValues ? item.current / item.currentStudents : item.current,
+    previousValue: showRelativeValues ? item.previous / item.previousStudents : item.previous,
+    ..._.omit(item, 'drill'),
+  }))
+}
+
 const Status = () => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsStatusSettings', {})
   const [usageDetailsOpen, setUsageDetailsOpen] = useState(false)
   const moreDetailsRef = useRef(null)
-  const history = useHistory()
-  const location = useLocation()
 
-  const drillStack = location.state?.drillStack ?? []
-
-  const data = useSelector(state => state.coolDataScience.data.status)
+  const storeData = useSelector(state => state.coolDataScience.data.status)
   const loading = useSelector(state => state.coolDataScience.pending.status)
   const dispatch = useDispatch()
 
   const settings = useMemo(() => _.defaults(explicitSettings, getDefaultSettings()), [explicitSettings])
+
+  const data = useMemo(
+    () => createDrillData(storeData, settings.showRelativeValues),
+    [storeData, settings.showRelativeValues]
+  )
 
   const { CoolDataScience } = InfoToolTips
 
@@ -454,85 +441,6 @@ const Status = () => {
       })
     )
   }, [settings.selectedDate, settings.showByYear])
-
-  const pushToDrillStack = code => {
-    history.push('/trends/status', {
-      drillStack: [...drillStack, code],
-    })
-
-    sendAnalytics('S Drilldown clicked', 'Status')
-  }
-
-  const breadcrumb = useMemo(() => {
-    const stack = _.chain(drillStack)
-      .reduce(
-        ([stack, data], code) => {
-          let content = code
-          let next = null
-
-          if (data) {
-            const entry = data[code]
-
-            if (entry) {
-              content = getTextIn(entry.name)
-              next = entry.drill
-            }
-          }
-
-          const item = {
-            key: code,
-            content,
-            link: !!next,
-            active: !next,
-            onClick: () => {
-              history.push('/trends/status', {
-                drillStack: [...stack.map(({ key }) => key).splice(1), code],
-              })
-            },
-          }
-
-          return [[...stack, item], next]
-        },
-        [[], data]
-      )
-      .value()[0]
-
-    const hy = {
-      key: '',
-      content: getTextIn({
-        fi: 'Helsingin Yliopisto',
-        en: 'University of Helsinki',
-        sv: 'Helsingfors universitet',
-      }),
-      link: true,
-      onClick: () =>
-        history.push('/trends/status', {
-          drillStack: [],
-        }),
-    }
-
-    return [hy, ...stack]
-  }, [data, drillStack])
-
-  const drilledData = useMemo(
-    () =>
-      _.chain(drillStack)
-        .reduce((data, code) => data && _.values(data).find(item => item.code === code)?.drill, data)
-        .defaultTo({})
-        .values()
-        .value(),
-    [data, drillStack]
-  )
-
-  const popFromDrillStack = () => {
-    const newDrillStack = [...drillStack]
-    newDrillStack.pop()
-    history.push('/trends/status', {
-      drillStack: newDrillStack,
-    })
-
-    sendAnalytics('S Drillup clicked', 'Status')
-  }
 
   const [settingsOpen, setSettingsOpen] = useState(false)
   const attentionSeekers = useRef({})
@@ -632,19 +540,8 @@ const Status = () => {
         </Popup>
       </div>
 
-      <div style={{ display: 'flex', marginBottom: '20px', marginRight: '40px', alignItems: 'center' }}>
-        <Breadcrumb icon="right angle" sections={breadcrumb} size="large" />
-        {drillStack.length > 0 && (
-          <Icon
-            onClick={popFromDrillStack}
-            style={{ cursor: 'pointer', color: 'rgba(0,0,0,.28)', marginLeft: '0.4em', marginTop: '-0.17em' }}
-            name="arrow left"
-          />
-        )}
-      </div>
-
       {data && !loading ? (
-        <StatusContent settings={settings} onDrill={pushToDrillStack} data={drilledData} />
+        <StatusContent settings={settings} data={data} />
       ) : (
         <Loader active={loading} inline="centered" />
       )}
