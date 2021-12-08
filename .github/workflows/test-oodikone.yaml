@@ -59,7 +59,6 @@ jobs:
         run: npm run eslint services/userservice
 
   # === Build images ===
-
   build_backend:
     name: 'Build backend'
     runs-on: ubuntu-latest
@@ -142,6 +141,24 @@ jobs:
         with:
           path: /tmp/userservice.tar
 
+  build_and_push_anon_sis_db:
+    name: 'Build anon sis-db and push to toska hub if new migrations have been added'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: check_migrations
+        with:
+          filters: |
+            migrations:
+              - 'updater/sis-updater-worker/src/db/migrations/**'
+      - name: 'Run sis-updater-worker and '
+        if: steps.check_migrations.outputs.migrations == 'true'
+        run: |
+          docker-compose --file docker-compose.ci.yml up --detach sis-updater-worker
+          sleep 30 # wait for sis-updater-worker to start and run migrations
+          ./anonyymioodi/commit_and_push_to_toska_hub.sh sis-db
+
   # === Integration tests ===
   #
   run_userservice_integration_tests:
@@ -160,6 +177,7 @@ jobs:
       - build_backend
       - build_frontend
       - build_userservice
+      - build_and_push_anon_sis_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -203,6 +221,7 @@ jobs:
       - build_backend
       - build_frontend
       - build_userservice
+      - build_and_push_anon_sis_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -246,6 +265,7 @@ jobs:
       - build_backend
       - build_frontend
       - build_userservice
+      - build_and_push_anon_sis_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -289,6 +309,7 @@ jobs:
       - build_backend
       - build_frontend
       - build_userservice
+      - build_and_push_anon_sis_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -332,6 +353,7 @@ jobs:
       - build_backend
       - build_frontend
       - build_userservice
+      - build_and_push_anon_sis_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -375,6 +397,7 @@ jobs:
       - build_backend
       - build_frontend
       - build_userservice
+      - build_and_push_anon_sis_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -418,6 +441,7 @@ jobs:
       - build_backend
       - build_frontend
       - build_userservice
+      - build_and_push_anon_sis_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -465,6 +489,7 @@ jobs:
       - build_backend
       - build_frontend
       - build_userservice
+      - build_and_push_anon_sis_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
