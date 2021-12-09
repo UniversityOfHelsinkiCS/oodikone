@@ -130,6 +130,10 @@ You should always install the dependencies **inside** the container to have the 
 
 Make sure you have your VPN on
 
+### I made a change to sis-db models aand created a migration, but tests are failing in CI!
+
+Migrations are handled by sis-importer-worker, since oodikone is using only replica. Since CI is testing only services included in oodikone, your new changes aren't migrated and thus are failing. Open anonyymioodi-folder in this repo to find more about how to to update the anon sis-db.
+
 ### Everything is broken, can't get oodikone running, data is not there etc.
 
 Just do clean install by launching cli with `npm cli` and running option 1: _Set up oodikone from scratch_.

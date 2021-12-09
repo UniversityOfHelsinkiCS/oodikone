@@ -53,18 +53,7 @@ router.get('/students/:id', async (req, res) => {
   const { id: studentId } = req.params
   const { roles, decodedToken } = req
 
-  if (roles && roles.includes('admin')) {
-    const results = await Student.withId(studentId)
-    return results.error
-      ? res.status(400).json({ error: 'error finding student' }).end()
-      : res.status(200).json(filterStudentTags(results, decodedToken.id)).end()
-  }
-
-  if (roles && roles.includes('studyGuidanceGroups')) {
-    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(decodedToken.sisPersonId)
-    if (!studentsUserCanAccess.has(studentId)) {
-      return res.status(400).json({ error: 'error finding student' }).end()
-    }
+  if (roles?.includes('admin')) {
     const results = await Student.withId(studentId)
     return results.error
       ? res.status(400).json({ error: 'error finding student' }).end()
@@ -84,6 +73,13 @@ router.get('/students/:id', async (req, res) => {
       return jtn
     })
   )
+
+  if (roles?.includes('studyGuidanceGroups')) {
+    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(decodedToken.sisPersonId)
+    if (studentsUserCanAccess.has(studentId)) {
+      return res.status(200).json(filterStudentTags(student, decodedToken.id)).end()
+    }
+  }
 
   if (rights.some(right => right !== null)) {
     res.status(200).json(filterStudentTags(student, decodedToken.id)).end()

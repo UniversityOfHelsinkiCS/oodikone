@@ -7,7 +7,6 @@ import { getProductivity } from '../../../redux/productivity'
 import { getThroughput } from '../../../redux/throughput'
 import { getBachelors } from '../../../redux/studyProgrammeBachelors'
 import { isNewHYStudyProgramme } from '../../../common'
-import { useIsAdmin } from '../../../common/hooks'
 
 const Overview = props => {
   const {
@@ -21,12 +20,10 @@ const Overview = props => {
     history,
   } = props
 
-  const isAdmin = useIsAdmin()
-
   useEffect(() => {
     dispatchGetProductivity(studyprogramme)
     dispatchGetThroughput(studyprogramme)
-    if (isAdmin) dispatchGetBachelors(studyprogramme)
+    dispatchGetBachelors(studyprogramme)
   }, [])
   return (
     <>
