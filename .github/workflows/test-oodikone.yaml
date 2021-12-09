@@ -152,7 +152,13 @@ jobs:
           filters: |
             migrations:
               - 'updater/sis-updater-worker/src/db/migrations/**'
-      - name: 'Run sis-updater-worker and '
+      - name: 'Login to toska docker registry'
+        uses: docker/login-action@v1
+        with:
+          registry: registry.toska.cs.helsinki.fi
+          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+      - name: 'Let sis-updater-worker run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
           docker-compose --file docker-compose.ci.yml up --detach sis-updater-worker
