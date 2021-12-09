@@ -152,6 +152,7 @@ jobs:
           filters: |
             migrations:
               - 'updater/sis-updater-worker/src/db/migrations/**'
+              - '.github/workflows/test-oodikone.yaml'
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
