@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
 import DrillStack from './DrillStack'
 
+import WithHelpTooltip from './WithHelpTooltip'
 import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
@@ -246,6 +247,7 @@ const StatusContent = ({ data, settings }) => {
 
   return (
     <DrillStack
+      historyKey="Status"
       data={data}
       rootLabel="Helsingin Yliopisto"
       renderCard={(data, drill, { medianDiff }) => (
@@ -263,51 +265,6 @@ const StatusContent = ({ data, settings }) => {
         />
       )}
     />
-  )
-}
-
-const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
-  const popupContext = useRef()
-  const [popupOpen, setPopupOpen] = useState(false)
-
-  const trigger = (
-    <div>
-      {children}
-      <div ref={popupContext} style={{ display: 'inline-block', paddingTop: '0.2em', cursor: 'help' }}>
-        <Icon
-          onClick={() => setPopupOpen(!popupOpen)}
-          ref={popupContext}
-          style={{ marginLeft: '0.3em', color: '#888' }}
-          name="question circle outline"
-        />
-      </div>
-    </div>
-  )
-
-  const popupProps = _.defaults(rest, {
-    position: 'right center',
-  })
-
-  return (
-    <>
-      <Popup
-        hoverable
-        size="tiny"
-        open={popupOpen}
-        onOpen={() => setPopupOpen(true)}
-        onClose={() => setPopupOpen(false)}
-        trigger={trigger}
-        context={popupContext}
-        {...popupProps}
-        on="hover"
-        mouseEnterDelay={1000}
-      >
-        <div>{tooltip}</div>
-        <span style={{ color: '#2185d0', cursor: 'pointer' }} onClick={onOpenDetails}>
-          Lue lisää...
-        </span>
-      </Popup>
-    </>
   )
 }
 

@@ -1,12 +1,13 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import PropTypes, { shape, bool, func } from 'prop-types'
 import { connect } from 'react-redux'
-import { Segment, Loader, Dimmer, Icon, Accordion, Checkbox, Message, Form } from 'semantic-ui-react'
+import { Divider, Segment, Loader, Dimmer, Icon, Checkbox, Form, Popup, Button } from 'semantic-ui-react'
 import _ from 'lodash'
 import moment from 'moment'
 import ReactMarkdown from 'react-markdown'
 import Datetime from 'react-datetime'
 
+import WithHelpTooltip from './WithHelpTooltip'
 import TSA from '../../common/tsa'
 import { getTextIn } from '../../common'
 import { useLocalStorage } from '../../common/hooks'
@@ -21,6 +22,112 @@ const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CA
 const getP = (a, b) => {
   if (a === 0 || b === 0) return 1
   return a / b
+}
+
+const isValidDate = d => moment().diff(moment(d)) > 0
+
+const settingDefinitions = {
+  showByYear: {
+    label: 'Näytä kalenterivuosittain',
+    short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta.',
+    long: `
+      Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
+      Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
+    `,
+    defaultValue: false,
+  },
+
+  showYearlyValues: {
+    label: 'Näytä edelliset vuodet',
+    short: 'Näytä tilastot vuosittain, alkaen vuodesta 2017.',
+    long: `
+      Näyttää vuosittaisen valmistumiskertymän tähän päivään mennessä vuonna X
+      sekä koko lukuvuoden X valmistuneet muodossa *"kerääntymä vuonna X / koko
+      lukuvuoden X valmistuneet"*.
+    `,
+    defaultValue: false,
+  },
+
+  showCountingFrom: {
+    key: 'selectedDate',
+    label: 'Näytä päivänä',
+    short: 'Valitse päivä johon asti kertyneet tilastot näytetään.',
+    long: `
+      Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
+      Esimerkiksi "Näytä kalenterivuosittain" valinnan ollessa pois päältä,
+      lasketaan kertyneet tilastot (vrt. lukuvuosien kokonaistilastot) kunkin lukuvuoden alusta
+      tätä päivämäärää vastaavaan päivään kyseisenä lukuvuonna.
+    `,
+    defaultValue: () => moment(),
+  },
+}
+
+const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
+  const { selectedDate } = settings
+  const DATE_FORMAT = 'DD.MM.YYYY'
+
+  const changeSetting = (property, value) => {
+    sendAnalytics(`S Set setting "${property}" to ${value}`, 'Status')
+
+    onSettingsChange({
+      ...settings,
+      [property]: value,
+    })
+  }
+
+  const itemStyles = {
+    margin: '0.5rem 1rem',
+    display: 'flex',
+    alignItems: 'center',
+  }
+
+  const createSettingToggle = key => (
+    <div style={itemStyles}>
+      <WithHelpTooltip tooltip={settingDefinitions[key].short} onOpenDetails={() => onOpenDetails(key)}>
+        <Checkbox
+          style={{ fontSize: '0.9em', fontWeight: 'normal' }}
+          label={settingDefinitions[key].label}
+          checked={settings[key]}
+          onChange={() => changeSetting(key, !settings[key])}
+        />
+      </WithHelpTooltip>
+    </div>
+  )
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'stretch', padding: 0, flexDirection: 'column' }}>
+      {createSettingToggle('showYearlyValues')}
+      {createSettingToggle('showByYear')}
+      <div style={itemStyles}>
+        <Form>
+          <Form.Field
+            error={selectedDate !== null && !isValidDate(selectedDate)}
+            style={{ display: 'flex', alignItems: 'center' }}
+          >
+            <WithHelpTooltip
+              tooltip={settingDefinitions.showCountingFrom.short}
+              onOpenDetails={() => onOpenDetails('showCountingFrom')}
+            >
+              <span style={{ fontSize: '0.9em' }}>{settingDefinitions.showCountingFrom.label}</span>
+            </WithHelpTooltip>
+            <Datetime
+              className="status-date-time-input"
+              dateFormat={DATE_FORMAT}
+              timeFormat={false}
+              closeOnSelect
+              value={moment(selectedDate)}
+              locale="fi"
+              isValidDate={isValidDate}
+              inputProps={{ placeholder: 'Valise päivämäärä' }}
+              onChange={value => {
+                changeSetting('selectedDate', value.format(DATE_FORMAT) === moment().format(DATE_FORMAT) ? null : value)
+              }}
+            />
+          </Form.Field>
+        </Form>
+      </div>
+    </div>
+  )
 }
 
 const StatusContainer = ({
@@ -163,8 +270,6 @@ StatusContainer.defaultProps = {
   previous: 0,
 }
 
-const VerticalLine = () => <div style={{ margin: '0 10px', fontSize: '20px' }}>|</div>
-
 const createDrillData = data => {
   if (!data) return null
 
@@ -178,12 +283,26 @@ const createDrillData = data => {
   }))
 }
 
+const getDefaultSettings = () =>
+  _.chain(settingDefinitions)
+    .toPairs()
+    .map(([key, { key: definedKey, defaultValue }]) =>
+      typeof defaultValue === 'function' ? [definedKey ?? key, defaultValue()] : [definedKey ?? key, defaultValue]
+    )
+    .fromPairs()
+    .value()
+
 const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
-  const DATE_FORMAT = 'DD.MM.YYYY'
-  const [showYearlyValues, setShowYearlyValues] = useLocalStorage('showYearlyValues', true)
-  const [showByYear, setShowByYear] = useLocalStorage('showByYear', true)
-  const [showSettings, setShowSettings] = useState(true)
-  const [selectedDate, setSelectedDate] = useState(moment())
+  const [explicitSettings, setSettings] = useLocalStorage('trendsGraduationStatusSettings', {})
+  const [usageDetailsOpen, setUsageDetailsOpen] = useState(false)
+  const moreDetailsRef = useRef(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const attentionSeekers = useRef({})
+
+  const settings = useMemo(() => _.defaults(explicitSettings, getDefaultSettings()), [explicitSettings])
+
+  const { showYearlyValues, showByYear, selectedDate } = settings
+
   const { CoolDataScience } = InfoToolTips
   const isValidDate = d => moment.isMoment(d) && moment().diff(d) > 0
 
@@ -195,91 +314,111 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
 
   const drillData = useMemo(() => createDrillData(data), [data])
 
-  const handleShowYearlyValuesToggled = () => {
-    const yearlyValues = showYearlyValues
-    setShowYearlyValues(!showYearlyValues)
-    sendAnalytics(`SG Show yearly values toggle ${!yearlyValues ? 'on' : 'off'}`, 'Status graduated')
+  const scrollToAttentionSeeker = el => {
+    el.scrollIntoView({
+      block: 'nearest',
+      inline: 'nearest',
+      behavior: 'smooth',
+    })
   }
 
-  const handleShowByYearToggled = () => {
-    const byYear = showByYear
-    setShowByYear(!showByYear)
-    sendAnalytics(`SG Show by year toggle ${!byYear ? 'on' : 'off'}`, 'Status graduated')
-  }
+  const attentionSeekerRef = key => ref => {
+    if (ref !== null && attentionSeekers.current[key] === true) {
+      scrollToAttentionSeeker(ref)
+    }
 
-  const renderSettings = () => {
-    return (
-      <Accordion style={{ padding: 0, paddingTop: '10px', flex: 1 }}>
-        <Accordion.Title style={{ padding: 0, cursor: 'default' }} active={showSettings}>
-          <span style={{ cursor: 'pointer' }} onClick={() => setShowSettings(!showSettings)}>
-            <Icon name="setting" />
-            <span>Asetukset</span>
-          </span>
-        </Accordion.Title>
-        <Accordion.Content style={{ padding: 0, marginTop: '10px' }} active={showSettings}>
-          <Segment style={{ display: 'flex', alignItems: 'center' }}>
-            <div
-              style={{
-                width: '10px',
-                height: '10px',
-                background: 'red',
-                transform: 'rotateY(0deg) rotate(45deg)',
-                position: 'absolute',
-                top: '-6px',
-                left: '35px',
-                border: '1px solid #dededf',
-                borderRight: 'none',
-                borderBottom: 'none',
-                backgroundColor: 'white',
-              }}
-            />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä edelliset vuodet"
-              onChange={handleShowYearlyValuesToggled}
-              checked={showYearlyValues}
-            />
-            <VerticalLine />
-            <Checkbox
-              style={{ fontSize: '0.9em', fontWeight: 'normal' }}
-              label="Näytä kalenterivuosittain"
-              onChange={handleShowByYearToggled}
-              checked={showByYear}
-            />
-            <VerticalLine />
-            <Form>
-              <Form.Field error={!isValidDate(selectedDate)} style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.9em' }}>Näytä päivänä:</span>
-                <Datetime
-                  className="status-date-time-input"
-                  dateFormat={DATE_FORMAT}
-                  timeFormat={false}
-                  closeOnSelect
-                  value={selectedDate}
-                  locale="fi"
-                  isValidDate={isValidDate}
-                  onChange={setSelectedDate}
-                />
-              </Form.Field>
-            </Form>
-          </Segment>
-        </Accordion.Content>
-      </Accordion>
-    )
+    attentionSeekers.current[key] = ref
   }
 
   if (!data || loading)
     return (
-      <Segment style={{ padding: '40px' }} textAlign="center">
+      <div style={{ padding: '2rem' }}>
         <Dimmer inverted active />
         <Loader active={loading} />
-      </Segment>
+      </div>
     )
 
   return (
     <>
-      <h2>Koulutusohjelmista valmistuneet</h2>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }} ref={moreDetailsRef}>
+        <h2 style={{ margin: 0, flexGrow: 1 }}>Koulutusohjelmista valmistuneet</h2>
+        <Popup
+          trigger={
+            <Button>
+              <Icon name="settings" /> Asetukset
+            </Button>
+          }
+          position="bottom right"
+          on="click"
+          wide="very"
+          open={settingsOpen}
+          onOpen={() => setSettingsOpen(true)}
+          onClose={() => {
+            // Close the popup only after the event has had a chance to propagate.
+            setTimeout(() => setSettingsOpen(false), 0)
+          }}
+          style={{ padding: '0.25em 0em', maxHeight: '80vh' }}
+        >
+          <StatusSettings
+            settings={settings}
+            onSettingsChange={setSettings}
+            onOpenDetails={key => {
+              if (moreDetailsRef.current) {
+                moreDetailsRef.current.scrollIntoView({
+                  block: 'start',
+                  inline: 'end',
+                  behavior: 'smooth',
+                })
+              }
+
+              if (attentionSeekers.current[key]) {
+                scrollToAttentionSeeker(attentionSeekers.current[key])
+              } else {
+                attentionSeekers.current[key] = true
+              }
+
+              setUsageDetailsOpen(true)
+            }}
+          />
+        </Popup>
+        <Popup
+          trigger={
+            <Button>
+              <Icon name="question circle" /> Käyttöohje
+            </Button>
+          }
+          position="bottom right"
+          on="click"
+          wide="very"
+          open={usageDetailsOpen}
+          onOpen={() => setUsageDetailsOpen(true)}
+          onClose={() => setUsageDetailsOpen(false)}
+          style={{ padding: '0', paddingBottom: '0.5em', maxHeight: '80vh', overflowY: 'auto' }}
+        >
+          <div style={{ padding: '1em' }}>
+            {
+              // eslint-disable-next-line react/no-children-prop
+              <ReactMarkdown children={CoolDataScience.statusGraduated} escapeHtml={false} />
+            }
+          </div>
+          {_.toPairs(settingDefinitions).map(([key, { label, long }]) => (
+            <div key={key}>
+              <Divider />
+              <div style={{ padding: '0 1em' }} ref={attentionSeekerRef(key)}>
+                <b>
+                  Valinta "<i>{label}</i>"
+                </b>
+                <div style={{ margin: '0.5em', fontSize: '0.9em' }}>
+                  <ReactMarkdown escapeHtml={false}>{long.replace(/(^|\n)[ \t]+/g, '\n')}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          ))}
+        </Popup>
+      </div>
+
       <DrillStack
+        historyKey="StatusGraduated"
         data={drillData}
         renderCard={(data, drill, { medianDiff }) => (
           <StatusContainer
@@ -297,15 +436,6 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
           />
         )}
       />
-
-      {renderSettings()}
-
-      <Message>
-        {
-          // eslint-disable-next-line react/no-children-prop
-          <ReactMarkdown children={CoolDataScience.statusGraduated} escapeHtml={false} />
-        }
-      </Message>
     </>
   )
 }
