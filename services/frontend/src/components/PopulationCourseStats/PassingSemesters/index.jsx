@@ -8,7 +8,7 @@ import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import CumulativeCheckbox from './CumulativeCheckbox'
 
 const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
-  const { modules, onCourseNameCellClick, isActiveCourse } = UsePopulationCourseContext()
+  const { modules } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
 
   return (
@@ -25,13 +25,7 @@ const PassingSemesters = ({ expandedGroups, toggleGroupExpansion }) => {
           >
             {courses =>
               courses.map(stats => (
-                <PassingSemesterRow
-                  key={stats.course.code}
-                  statistics={stats}
-                  isActiveCourseFn={isActiveCourse}
-                  onCourseNameClickFn={onCourseNameCellClick}
-                  cumulative={cumulativeStats}
-                />
+                <PassingSemesterRow key={stats.course.code} statistics={stats} cumulative={cumulativeStats} />
               ))
             }
           </CollapsibleModuleTable>

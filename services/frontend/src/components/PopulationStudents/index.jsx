@@ -297,6 +297,7 @@ const PopulationStudents = ({
           <Tab.Pane>
             <GeneralTab
               variant={variant}
+              filteredStudents={filteredStudents}
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
               coursecode={coursecode}
               studyGuidanceGroup={studyGuidanceGroup}

@@ -4,8 +4,8 @@ const ReactHighcharts = require('react-highcharts')
 
 const colors = ['#003E65', '#1392c2', '#036415']
 
-const StackedBarChart = ({ data, categories }) => {
-  const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
+const BarChart = ({ data }) => {
+  const dataWithColors = data?.graphStats?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const defaultConfig = {
     title: {
@@ -16,12 +16,23 @@ const StackedBarChart = ({ data, categories }) => {
       text: 'oodikone | TOSKA',
     },
     xAxis: {
-      categories,
+      categories: data?.years,
     },
     chart: {
       type: 'column',
-      width: 950,
-      height: 400,
+      height: '450px',
+    },
+    exporting: {
+      filename: `oodikone_graduations_and_thesis_of_studyprogramme_${data?.id}`,
+      width: 2200,
+      height: 1400,
+      sourceWidth: 1200,
+      sourceHeight: 600,
+      buttons: {
+        contextButton: {
+          menuItems: ['viewFullscreen', 'downloadPNG', 'downloadSVG', 'downloadPDF'],
+        },
+      },
     },
     plotOptions: {
       column: {
@@ -38,7 +49,12 @@ const StackedBarChart = ({ data, categories }) => {
     },
   }
 
-  return <ReactHighcharts config={defaultConfig} />
+  if (!data) return <></>
+  return (
+    <div className="graph-container">
+      <ReactHighcharts config={defaultConfig} />
+    </div>
+  )
 }
 
-export default StackedBarChart
+export default BarChart

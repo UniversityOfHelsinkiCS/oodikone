@@ -3,17 +3,14 @@ import moment from 'moment'
 import xlsx from 'xlsx'
 import { Dropdown } from 'semantic-ui-react'
 import { getStudentGradeMean, getStudentGradeMeanWeightedByCredits, getStudentTotalCredits } from '../../common'
-import useFilters from '../FilterTray/useFilters'
 import sendEvent from '../../common/sendEvent'
 import DataExport from '../PopulationStatistics/DataExport'
 
 const sendAnalytics = sendEvent.populationStudents
 
-export default () => {
-  const { filteredStudents } = useFilters()
-
+export default ({ students }) => {
   const getXlsx = () => {
-    const data = filteredStudents.map(student => ({
+    const data = students.map(student => ({
       'Student Number': student.studentNumber,
       'Total Credits (no transferred credits)': getStudentTotalCredits(student, false),
       'Grade Mean (no transferred credits)': getStudentGradeMean(student, false),
@@ -27,7 +24,7 @@ export default () => {
     return workbook
   }
 
-  const filename = `oodikone_export_${filteredStudents.length}_students_${moment().format('YYYYMMDD-hhmmss')}.xlsx`
+  const filename = `oodikone_export_${students.length}_students_${moment().format('YYYYMMDD-hhmmss')}.xlsx`
 
   return (
     <>

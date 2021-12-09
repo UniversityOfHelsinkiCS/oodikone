@@ -13,11 +13,6 @@ import GradeDistribution from './GradeDistribution'
 import PassFail from './PassFail'
 import Students from './Students'
 import { getTextIn } from '../../common'
-import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
-import useFilterTray from '../FilterTray/useFilterTray'
-import { contextKey as filterTrayContextKey } from '../FilterTray'
-import { contextKey as coursesFilterContextKey } from '../FilterTray/filters/Courses'
-import useAnalytics from '../FilterTray/useAnalytics'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const sendAnalytics = sendEvent.populationStatistics
@@ -44,11 +39,8 @@ const lodashSortOrderTypes = {
   DESC: 'desc',
 }
 
-function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses) {
+function updateCourseStatisticsCriteria(courseStats, language, state, mandatoryCourses) {
   const { sortCriteria, codeFilter, nameFilter, reversed } = state
-  const {
-    courses: { coursestatistics },
-  } = props
 
   const courseCodeFilter = ({ course }) => {
     const { code } = course
@@ -64,9 +56,9 @@ function updateCourseStatisticsCriteria(props, language, state, mandatoryCourses
   }
 
   const filteredCourses =
-    coursestatistics &&
+    courseStats &&
     mandatoryCourses &&
-    coursestatistics
+    courseStats
       .filter(mandatoryFilter)
       .filter(c => !codeFilter || courseCodeFilter(c))
       .filter(c => !nameFilter || courseNameFilter(c))
@@ -88,43 +80,50 @@ const initialState = props => ({
   codeFilter: '',
   nameFilter: '',
   activeView: null,
-  selectedStudentsLength: props.selectedStudentsLength || 0,
+  filteredStudentsLength: props.filteredStudentsLength || 0,
 })
+
+const useDelayedMemo = (fn, watch) => {
+  const [cached, setCached] = useState(fn())
+
+  useEffect(() => setCached(fn()), watch)
+
+  return cached
+}
 
 const PopulationCourseStats = props => {
   const { language } = useLanguage()
 
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
-  const [courseStatistics, setCourseStatistics] = useState(
-    updateCourseStatisticsCriteria(props, language, initialState(props))
-  )
-  const [expandedGroups, setExpandedGroups] = useState(new Set())
 
   const [state, setState] = useState(initialState(props))
+
+  const courseStatistics = useDelayedMemo(
+    () => updateCourseStatisticsCriteria(props.courses?.coursestatistics, language, state),
+    [props.courses, state, language]
+  )
+
+  const [expandedGroups, setExpandedGroups] = useState(new Set())
+
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-  const [, setFilterTrayOpen] = useFilterTray(filterTrayContextKey)
-  const [, setCourseFilterOpen] = useFilterTray(coursesFilterContextKey)
-  const { toggleCourseSelection, courseIsSelected } = useCourseFilter()
-  const filterAnalytics = useAnalytics()
   const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Courses of Population tab changed')
 
   useEffect(() => {
     if (state && props.courses) {
       const studentAmountLimit =
-        state.selectedStudentsLength !== props.selectedStudents.length
-          ? Math.round(props.selectedStudents.length * 0.3)
+        state.filteredStudentsLength !== props.filteredStudents.length
+          ? Math.round(props.filteredStudents.length * 0.3)
           : state.studentAmountLimit
 
       setState({
         ...state,
         initialSortReady: true,
         studentAmountLimit,
-        selectedStudentsLength: props.selectedStudents.length,
+        filteredStudentsLength: props.filteredStudents.length,
       })
-      setCourseStatistics(updateCourseStatisticsCriteria(props, language, state, mandatoryCourses))
     }
-  }, [props.courses, props.selectedStudents])
+  }, [props.courses, props.filteredStudents])
 
   useEffect(() => {
     const { codeFilter, nameFilter, reversed, sortCriteria } = state
@@ -199,8 +198,6 @@ const PopulationCourseStats = props => {
         }))
         .sort((a, b) => a.module.order - b.module.order)
     )
-
-    setCourseStatistics(sortedStatistics)
   }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, mandatoryCourses])
 
   const onFilterChange = (e, field) => {
@@ -223,67 +220,22 @@ const PopulationCourseStats = props => {
     setFilters(filterFields)
   }, [filterFields])
 
-  const handleCourseStatisticsCriteriaChange = () => {
-    // eslint-disable-next-line react/no-access-state-in-setstate
-    const courseStatistics = updateCourseStatisticsCriteria(props, language, state)
-    setCourseStatistics(courseStatistics)
-  }
-
-  const onSetFilterKeyPress = e => {
-    const { key } = e
-    const enterKey = 'Enter'
-    const isEnterKeyPress = key === enterKey
-    if (isEnterKeyPress) {
-      handleCourseStatisticsCriteriaChange()
-    }
-  }
-
   const onSortableColumnHeaderClick = criteria => {
     const { reversed, sortCriteria } = state
     const isActiveSortCriteria = sortCriteria === criteria
     const isReversed = isActiveSortCriteria ? !reversed : reversed
-
-    const lodashSortOrder = isReversed ? lodashSortOrderTypes.DESC : lodashSortOrderTypes.ASC
-
-    const sortedStatistics = orderBy(
-      courseStatistics,
-      [course => course.stats[sortCriteria], course => course.course.code],
-      [lodashSortOrder, lodashSortOrderTypes.ASC]
-    )
 
     setState({
       ...state,
       sortCriteria: criteria,
       reversed: isReversed,
     })
-
-    setCourseStatistics(sortedStatistics)
   }
 
   const onGoToCourseStatisticsClick = courseCode => {
     const { clearCourseStats: clearCourseStatsfn } = props
     sendAnalytics('Courses of Population course stats button clicked', courseCode)
     clearCourseStatsfn()
-  }
-
-  const onCourseNameCellClick = code => {
-    const courseStatistic =
-      props.populationCourses.data.coursestatistics?.find(cs => cs.course.code === code) ||
-      props.courses.coursestatistics?.find(cs => cs.course.code === code)
-    if (courseStatistic) {
-      const isSelected = courseIsSelected(code)
-      const name = 'Course Filtername'
-
-      if (isSelected) {
-        filterAnalytics.clearFilterViaTable(name)
-      } else {
-        filterAnalytics.setFilterViaTable(name)
-      }
-
-      toggleCourseSelection(code)
-      setFilterTrayOpen(true)
-      setCourseFilterOpen(true)
-    }
   }
 
   const onFilterReset = field => {
@@ -314,7 +266,6 @@ const PopulationCourseStats = props => {
             transparent
             placeholder="Filter..."
             onChange={e => onFilterChange(e, field)}
-            onKeyPress={onSetFilterKeyPress}
             value={getFilterValue(field)}
             icon={getFilterValue(field) ? <Icon name="delete" link onClick={() => onFilterReset(field)} /> : undefined}
           />
@@ -329,7 +280,6 @@ const PopulationCourseStats = props => {
     courseStatistics,
     modules,
     filterInput: renderFilterInputHeaderCell,
-    onCourseNameCellClick,
     onGoToCourseStatisticsClick,
     onSortableColumnHeaderClick,
     tableColumnNames,
@@ -361,7 +311,6 @@ const PopulationCourseStats = props => {
           <PassingSemesters
             filterInput={renderFilterInputHeaderCell}
             courseStatistics={courseStatistics}
-            onCourseNameClickFn={onCourseNameCellClick}
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
           />
@@ -372,7 +321,11 @@ const PopulationCourseStats = props => {
       menuItem: 'students',
       render: () => (
         <div className="menuTab" style={{ marginTop: '0.5em' }}>
-          <Students expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
+          <Students
+            filteredStudents={props.filteredStudents}
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
+          />
         </div>
       ),
     },
@@ -398,10 +351,6 @@ const PopulationCourseStats = props => {
   )
 }
 
-const mapStateToProps = ({ populationCourses }) => ({
-  populationCourses,
-})
-
-export default connect(mapStateToProps, {
+export default connect(null, {
   clearCourseStats,
 })(withRouter(PopulationCourseStats))

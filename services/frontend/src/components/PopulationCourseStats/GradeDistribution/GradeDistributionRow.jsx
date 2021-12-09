@@ -5,8 +5,9 @@ import { Link } from 'react-router-dom'
 import { shape, string, number, arrayOf } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
+import useFilters from '../../FilterView/useFilters'
+import { isCourseSelected, toggleCourseSelection } from '../../FilterView/filters/courses'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
 import { useLanguage } from '../../../common/hooks'
 
 const formatGradeDistribution = grades =>
@@ -25,14 +26,14 @@ const formatGradeDistribution = grades =>
 
 const CourseRow = ({ courseStatistics, gradeTypes }) => {
   const language = useLanguage()
-  const { courseIsSelected } = useCourseFilter()
+  const { useFilterSelector, filterDispatch } = useFilters()
 
-  const { onCourseNameCellClick, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+  const { onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
   const { course, grades } = courseStatistics
   const { name, code } = course
 
-  const isActive = courseIsSelected(course.code)
+  const isActive = useFilterSelector(isCourseSelected(course.code))
   let attempts = 0
   let failedGrades = 0
   let otherPassed = 0
@@ -51,7 +52,7 @@ const CourseRow = ({ courseStatistics, gradeTypes }) => {
       <Popup
         trigger={
           <Table.Cell className="filterCell clickableCell">
-            <FilterToggleIcon isActive={isActive} onClick={() => onCourseNameCellClick(code)} />
+            <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleCourseSelection(course.code))} />
           </Table.Cell>
         }
         content={

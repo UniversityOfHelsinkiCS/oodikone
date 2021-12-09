@@ -1,37 +1,26 @@
-import React, { useEffect } from 'react'
-import { connect } from 'react-redux'
+import React from 'react'
 import { Divider } from 'semantic-ui-react'
 
+import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
+import GaugeChart from './GaugeChart'
 import DataTable from './DataTable'
 import InfoBox from '../../Info/InfoBox'
-import { getBasicStats, getCreditStats, getGraduationStats } from '../../../redux/studyProgramme'
+
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const basicStatsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
-const creditStatsTitles = ['', 'Major students credits', 'Non major students credits', 'Transferred credits']
-const graduationStatsTitles = ['', 'Graduated', 'Wrote thesis']
+const basicsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
+const creditsTitles = ['', 'Major students credits', 'Non major students credits', 'Transferred credits']
+const graduationsTitles = ['', 'Graduated', 'Wrote thesis']
 
-const Overview = props => {
+const Overview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
-  const {
-    studyprogramme,
-    basicStats,
-    creditStats,
-    graduationStats,
-    dispatchGetBasicStats,
-    dispatchGetCreditStats,
-    dispatchGetGetGraduationStats,
-  } = props
-
-  useEffect(() => {
-    dispatchGetBasicStats(studyprogramme)
-    dispatchGetCreditStats(studyprogramme)
-    dispatchGetGetGraduationStats(studyprogramme)
-  }, [])
+  const basics = useGetBasicStatsQuery({ id: studyprogramme })
+  const credits = useGetCreditStatsQuery({ id: studyprogramme })
+  const graduations = useGetGraduationStatsQuery({ id: studyprogramme })
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -46,31 +35,45 @@ const Overview = props => {
     <div className="studyprogramme-overview">
       {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
       <div className="section-container">
-        <LineGraph categories={basicStats?.data?.years} data={basicStats?.data?.graphStats} />
-        <DataTable titles={basicStatsTitles} data={basicStats?.data?.tableStats} />
+        <LineGraph data={basics?.data} />
+        <DataTable titles={basicsTitles} data={basics?.data?.tableStats} />
       </div>
-      {getDivider('Credits produced by the studyprogramme')}
+      {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
       <div className="section-container">
-        <StackedBarChart categories={creditStats?.data?.years} data={creditStats?.data?.graphStats} />
-        <DataTable titles={creditStatsTitles} data={creditStats?.data?.tableStats} />
+        <StackedBarChart data={credits?.data} />
+        <DataTable titles={creditsTitles} data={credits?.data?.tableStats} />
       </div>
-      {getDivider('Graduated and thesis writers of the programme')}
+      {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
       <div className="section-container">
-        <BarChart categories={graduationStats?.data?.years} data={graduationStats?.data?.graphStats} />
-        <DataTable titles={graduationStatsTitles} data={graduationStats?.data?.tableStats} />
+        <BarChart data={graduations?.data} />
+        <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
+      </div>
+      {getDivider('Graduation median time', 'GraduationMedianTime')}
+      <div className="section-container">
+        {graduations?.data?.years.map(year => (
+          <GaugeChart
+            key={year}
+            year={year}
+            data={graduations?.data?.graduationMedianTime[year]}
+            amount={graduations?.data?.graduationAmounts[year]}
+            studyprogramme={studyprogramme}
+          />
+        ))}
+      </div>
+      {getDivider('Graduation mean time', 'GraduationMeanTime')}
+      <div className="section-container">
+        {graduations?.data?.years.map(year => (
+          <GaugeChart
+            key={year}
+            year={year}
+            data={graduations?.data?.graduationMeanTime[year]}
+            amount={graduations?.data?.graduationAmounts[year]}
+            studyprogramme={studyprogramme}
+          />
+        ))}
       </div>
     </div>
   )
 }
 
-const mapStateToProps = ({ studyProgramme }) => ({
-  basicStats: studyProgramme?.basicStats,
-  creditStats: studyProgramme?.creditStats,
-  graduationStats: studyProgramme?.graduationStats,
-})
-
-export default connect(mapStateToProps, {
-  dispatchGetBasicStats: getBasicStats,
-  dispatchGetCreditStats: getCreditStats,
-  dispatchGetGetGraduationStats: getGraduationStats,
-})(Overview)
+export default Overview

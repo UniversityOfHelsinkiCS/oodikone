@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Segment, Button } from 'semantic-ui-react'
-import uuidv4 from 'uuid/v4'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import InfoBox from '../Info/InfoBox'
 import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
-import useCourseFilter from '../FilterTray/filters/Courses/useCourseFilter'
 import infotooltips from '../../common/InfoToolTips'
 
-const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) => {
-  const { setCoursesOnce, resetCourses, runCourseQuery } = useCourseFilter()
+const PopulationCourses = ({ query = {}, filteredStudents }) => {
   const [showByStudytrack, setShowByStudytrack] = useState(true)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
   const populationSelectedStudentCourses = useSelector(
@@ -23,51 +20,6 @@ const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) =
     : populationCourses
 
   const { pending } = selectedPopulationCourses
-
-  const makeCourseQueryOpts = () => {
-    const selectedStudentsByYear = {}
-
-    if (filteredStudents && filteredStudents.length > 0) {
-      filteredStudents.forEach(student => {
-        if (!selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()]) {
-          selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()] = []
-        }
-        selectedStudentsByYear[new Date(student.studyrightStart).getFullYear()].push(student.studentNumber)
-      })
-    }
-
-    return {
-      ...selectedPopulationCourses.query,
-      uuid: uuidv4(),
-      studyRights: [query.studyRights.programme],
-      selectedStudents,
-      selectedStudentsByYear,
-      year: query.year,
-      years: query.years,
-    }
-  }
-
-  /**
-   * These three hooks are required to make navigation work properly (context must be emptied
-   * when unmounting this view.)
-   */
-  useEffect(() => {
-    if (filteredStudents.length) {
-      runCourseQuery(makeCourseQueryOpts())
-    }
-  }, [filteredStudents])
-
-  useEffect(() => {
-    const { pending, error, data } = selectedPopulationCourses
-    if (!pending && !error) {
-      setCoursesOnce(data.coursestatistics)
-    }
-  }, [selectedPopulationCourses.data])
-
-  // Clear course filter data on unmount.
-  useEffect(() => {
-    return resetCourses
-  }, [])
 
   const changeStructure = () => {
     setShowByStudytrack(!showByStudytrack)
@@ -87,10 +39,14 @@ const PopulationCourses = ({ selectedStudents, query = {}, filteredStudents }) =
           key={selectedPopulationCourses.query.uuid}
           courses={selectedPopulationCourses.data}
           pending={pending}
-          selectedStudents={selectedStudents}
+          filteredStudents={filteredStudents}
         />
       ) : (
-        <CustomPopulationCourses selectedStudents={selectedStudents} showFilter={false} />
+        <CustomPopulationCourses
+          courses={selectedPopulationCourses.data}
+          filteredStudents={filteredStudents}
+          showFilter={false}
+        />
       )}
     </Segment>
   )
