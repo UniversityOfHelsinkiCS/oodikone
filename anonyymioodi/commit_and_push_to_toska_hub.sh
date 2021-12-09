@@ -46,4 +46,3 @@ database=${args[0]}
 docker commit "$database" "registry.toska.cs.helsinki.fi/$database"
 docker push "registry.toska.cs.helsinki.fi/$database"
 successmsg "Succesfully pushed"
-docker-compose down --remove-orphans
