@@ -24,6 +24,7 @@ Student.init(
     home_country_sv: { type: STRING },
     home_country_en: { type: STRING },
     gender_code: { type: INTEGER },
+    sis_person_id: { type: STRING },
     createdAt: {
       type: DATE,
     },

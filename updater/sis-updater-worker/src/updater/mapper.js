@@ -113,6 +113,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     home_country_fi: home_country ? home_country.name.fi : null,
     home_country_sv: home_country ? home_country.name.sv : null,
     home_country_en: home_country ? home_country.name.en : null,
+    sis_person_id: id,
   }
 }
 
