@@ -104,7 +104,6 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     email: primary_email,
     gender_code,
     national_student_number: oppija_id,
-    home_county_id: null, // wtf this is probably trash, current db has only null in this column
     birthdate: date_of_birth,
     creditcount: calculateTotalCreditsFromAttainments(attainmentsOfStudent),
     dateofuniversityenrollment,
@@ -114,6 +113,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     home_country_fi: home_country ? home_country.name.fi : null,
     home_country_sv: home_country ? home_country.name.sv : null,
     home_country_en: home_country ? home_country.name.en : null,
+    sis_person_id: id,
   }
 }
 

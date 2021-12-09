@@ -3,7 +3,7 @@ const {
   getBasicStatsForStudytrack,
   getCreditStatsForStudytrack,
   getGraduationStatsForStudytrack,
-} = require('../services/newStudyprogramme')
+} = require('../services/studyprogrammeStats')
 const {
   getBasicStats,
   setBasicStats,
@@ -16,30 +16,24 @@ const logger = require('../util/logger')
 
 router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
   const code = req.params.id
+  const yearType = req.query?.year_type
+
   if (code) {
     let data = null
     try {
-      data = await getBasicStats(code)
+      data = await getBasicStats(code, yearType)
     } catch (e) {
-      logger.error(`Failed to get code ${code} basic stats`)
+      logger.error(`Failed to get code ${code} basic stats: ${e}`)
     }
     if (!data) {
       try {
-        let result
-        if (code.includes('MH') || code.includes('KH')) {
-          result = await getBasicStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2017-01-01'),
-          })
-        } else {
-          result = await getBasicStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2000-01-01'),
-          })
-        }
-        data = await setBasicStats(result)
+        const result = await getBasicStatsForStudytrack({
+          studyprogramme: req.params.id,
+          yearType,
+        })
+        data = await setBasicStats(result, yearType)
       } catch (e) {
-        logger.error(`Failed to update code ${code} basic stats`)
+        logger.error(`Failed to update code ${code} basic stats: ${e}`)
       }
     }
     return res.json(data)
@@ -50,28 +44,22 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
   const code = req.params.id
+  const yearType = req.query?.year_type
+
   if (code) {
     let data = null
     try {
-      data = await getCreditStats(code)
+      data = await getCreditStats(code, yearType)
     } catch (e) {
       logger.error(`Failed to get code ${code} credit stats`)
     }
     if (!data) {
       try {
-        let result
-        if (code.includes('MH') || code.includes('KH')) {
-          result = await getCreditStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2017-01-01'),
-          })
-        } else {
-          result = await getCreditStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2000-01-01'),
-          })
-        }
-        data = await setCreditStats(result)
+        const result = await getCreditStatsForStudytrack({
+          studyprogramme: req.params.id,
+          yearType,
+        })
+        data = await setCreditStats(result, yearType)
       } catch (e) {
         logger.error(`Failed to update code ${code} credit stats`)
       }
@@ -84,28 +72,22 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
   const code = req.params.id
+  const yearType = req.query?.year_type
+
   if (code) {
     let data = null
     try {
-      data = await getGraduationStats(code)
+      data = await getGraduationStats(code, yearType)
     } catch (e) {
       logger.error(`Failed to get code ${code} graduation stats`)
     }
     if (!data) {
       try {
-        let result
-        if (code.includes('MH') || code.includes('KH')) {
-          result = await getGraduationStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2017-01-01'),
-          })
-        } else {
-          result = await getGraduationStatsForStudytrack({
-            studyprogramme: req.params.id,
-            startDate: new Date('2000-01-01'),
-          })
-        }
-        data = await setGraduationStats(result)
+        const result = await getGraduationStatsForStudytrack({
+          studyprogramme: req.params.id,
+          yearType,
+        })
+        data = await setGraduationStats(result, yearType)
       } catch (e) {
         logger.error(`Failed to update code ${code} graduation stats`)
       }
