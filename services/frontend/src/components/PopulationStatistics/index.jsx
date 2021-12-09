@@ -92,7 +92,7 @@ const PopulationStatistics = () => {
                 queryIsSet={queryIsSet}
                 query={query}
                 isLoading={isLoading}
-                dataExport={<DataExport />}
+                dataExport={<DataExport students={filteredStudents} />}
                 allStudents={students}
                 filteredStudents={filteredStudents}
               />

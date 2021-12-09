@@ -28,7 +28,7 @@ export default ({ students }) => {
 
   return (
     <>
-      <DataExport />
+      <DataExport students={students} />
       <Dropdown.Item
         onClick={() => {
           xlsx.writeFile(getXlsx(), filename)
