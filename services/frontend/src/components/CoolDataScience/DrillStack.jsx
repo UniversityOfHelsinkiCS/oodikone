@@ -13,7 +13,7 @@ const getP = (a, b) => {
   return a / b
 }
 
-const DrillStack = ({ data, renderCard }) => {
+const DrillStack = ({ data, renderCard, historyKey }) => {
   const history = useHistory()
   const location = useLocation()
 
@@ -25,7 +25,7 @@ const DrillStack = ({ data, renderCard }) => {
 
   const sortBy = ({ currentValue, previousValue }) => 1 - currentValue / previousValue
 
-  const path = location.state?.drillStack ?? []
+  const path = _.get(location.state, historyKey) ?? []
 
   const breadcrumbSections = useMemo(() => {
     const stack = _.chain(path)
@@ -50,7 +50,7 @@ const DrillStack = ({ data, renderCard }) => {
             active: !next,
             onClick: () => {
               history.push(location.pathname, {
-                drillStack: [...stack.map(({ key }) => key).splice(1), segment],
+                [historyKey]: [...stack.map(({ key }) => key).splice(1), segment],
               })
             },
           }
@@ -67,7 +67,7 @@ const DrillStack = ({ data, renderCard }) => {
       link: true,
       onClick: () =>
         history.push(location.pathname, {
-          drillStack: [],
+          [historyKey]: [],
         }),
     }
 
@@ -81,7 +81,7 @@ const DrillStack = ({ data, renderCard }) => {
 
   const pushToDrillStack = segment => {
     history.push(location.pathname, {
-      drillStack: [...path, segment],
+      [historyKey]: [...path, segment],
     })
   }
 
@@ -89,7 +89,7 @@ const DrillStack = ({ data, renderCard }) => {
     const newPath = [...path]
     newPath.pop()
     history.push(location.pathname, {
-      drillStack: newPath,
+      [historyKey]: newPath,
     })
 
     sendAnalytics('S Drillup clicked', 'Status')
