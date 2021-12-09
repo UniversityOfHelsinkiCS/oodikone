@@ -17,7 +17,6 @@ Student.init(
     dateofuniversityenrollment: { type: DATE },
     email: { type: STRING },
     national_student_number: { type: STRING },
-    home_county_id: { type: INTEGER },
     country_fi: { type: STRING },
     country_sv: { type: STRING },
     country_en: { type: STRING },
