@@ -43,15 +43,7 @@ const InfoWithHelpTooltip = ({ children, tooltip, containerStyle = {}, ...rest }
         on="hover"
         mouseEnterDelay={2000}
       >
-        {!detailsOpen && (
-          <>
-            <div>{tooltip.label}</div>
-            <span style={{ color: '#2185d0', cursor: 'pointer' }} onClick={() => setDetailsOPen(!detailsOpen)}>
-              Lue lisää...
-            </span>
-          </>
-        )}
-        {detailsOpen && <span>{tooltip.short}</span>}
+        <div>{tooltip.short}</div>
       </Popup>
     </>
   )

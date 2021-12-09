@@ -2,6 +2,7 @@ import React from 'react'
 import fp from 'lodash/fp'
 import { Form, Dropdown } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
+import filterInfo from '../../../common/InfoToolTips/filters'
 import createFilter from './createFilter'
 
 const STATUS_OPTIONS = [
@@ -79,11 +80,7 @@ export default createFilter({
 
   title: 'Enrollment Status',
 
-  info: {
-    label: 'Filter students present or absent',
-    short: 'Filter students based on if they are present or absent in certain semester/semesters.',
-  },
-
+  info: filterInfo.enrollmentStatus,
   defaultOptions: {
     status: null,
     semesters: [],

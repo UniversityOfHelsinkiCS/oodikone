@@ -1,6 +1,7 @@
 import React from 'react'
 import { Form, Radio } from 'semantic-ui-react'
 import createFilter from './createFilter'
+import filterInfo from '../../../common/InfoToolTips/filters'
 
 const TransferredToProgrammeFilterCard = ({ options, onOptionsChange }) => {
   const { transferred } = options
@@ -47,10 +48,7 @@ export default createFilter({
 
   title: 'Transferred to Programme',
 
-  info: {
-    label: 'Include and exclude students from this program',
-    short: 'Possibility to exclude or include students who have transferred into this program',
-  },
+  info: filterInfo.transferred,
 
   defaultOptions: {
     transferred: null,
