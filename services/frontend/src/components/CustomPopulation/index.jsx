@@ -2,39 +2,54 @@ import React, { useState, useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Segment, Header, Accordion, Message } from 'semantic-ui-react'
 import { shape, func, arrayOf, bool, string } from 'prop-types'
+import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
 import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
+import { getSemesters } from '../../redux/semesters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import CustomPopulationCourses from './CustomPopulationCourses'
 import CustomPopulationProgrammeDist from './CustomPopulationProgrammeDist'
 import ProgressBar from '../ProgressBar'
 import InfoBox from '../Info/InfoBox'
-import FilterTray from '../FilterTray'
-import useFilters from '../FilterTray/useFilters'
-import { CustomPopulationFilters } from '../FilterTray/FilterSets'
+import FilterView from '../FilterView'
+import {
+  ageFilter,
+  courseFilter,
+  programmeFilter,
+  creditsEarnedFilter,
+  genderFilter,
+  transferredToProgrammeFilter,
+  startYearAtUniFilter,
+  tagsFilter,
+  creditDateFilter,
+  enrollmentStatusFilter,
+} from '../FilterView/filters'
 import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
 import UnihowDataExport from './UnihowDataExport'
 
 const CustomPopulation = ({
-  getCustomPopulationSearchesDispatch,
+  allSemesters,
+  courses,
   custompop,
   customPopulationFlag,
-  loading,
   customPopulationSearches,
+  elementDetails,
+  getCustomPopulationSearchesDispatch,
+  getSemestersDispatch,
   latestCreatedCustomPopulationSearchId,
+  loading,
   searchedCustomPopulationSearchId,
 }) => {
   const { language } = useLanguage()
   const [activeIndex, setIndex] = useState([])
   const [, setSelectedSearchId] = useState('')
   const [newestIndex, setNewest] = useState(null)
-  const { setAllStudents, filteredStudents } = useFilters()
-  const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
+  const selectedStudents = custompop.map(stu => stu.studentNumber)
 
   const { progress } = useProgress(loading)
 
@@ -46,12 +61,8 @@ const CustomPopulation = ({
 
   useTitle('Custom population')
 
-  // Pass students to filter context.
   useEffect(() => {
-    setAllStudents(custompop || [])
-  }, [custompop])
-
-  useEffect(() => {
+    getSemestersDispatch()
     getCustomPopulationSearchesDispatch()
   }, [])
 
@@ -82,7 +93,7 @@ const CustomPopulation = ({
     setIndex(indexes)
   }
 
-  const panels = [
+  const createPanels = students => [
     {
       key: 0,
       title: {
@@ -96,7 +107,7 @@ const CustomPopulation = ({
       content: {
         content: (
           <div ref={creditGainRef}>
-            <CreditAccumulationGraphHighCharts students={filteredStudents} />
+            <CreditAccumulationGraphHighCharts students={students} />
           </div>
         ),
       },
@@ -115,7 +126,7 @@ const CustomPopulation = ({
         content: (
           <div ref={programmeRef}>
             <InfoBox content={infotooltips.PopulationStatistics.ProgrammeDistributionCoursePopulation} />
-            <CustomPopulationProgrammeDist samples={custompop} selectedStudents={selectedStudents} />
+            <CustomPopulationProgrammeDist samples={students} selectedStudents={_.map(students, 'studentNumber')} />
           </div>
         ),
       },
@@ -133,7 +144,7 @@ const CustomPopulation = ({
       content: {
         content: (
           <div ref={coursesRef}>
-            <CustomPopulationCourses selectedStudents={selectedStudents} />
+            <CustomPopulationCourses filteredStudents={students} courses={courses} />
           </div>
         ),
       },
@@ -143,7 +154,7 @@ const CustomPopulation = ({
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Students ({selectedStudents.length})
+            Students ({students.length})
           </span>
         ),
       },
@@ -154,8 +165,8 @@ const CustomPopulation = ({
             <PopulationStudents
               variant="customPopulation"
               language={language}
-              filteredStudents={filteredStudents}
-              dataExport={<UnihowDataExport />}
+              filteredStudents={students}
+              dataExport={<UnihowDataExport students={students} />}
               customPopulation
             />
           </div>
@@ -163,7 +174,8 @@ const CustomPopulation = ({
       },
     },
   ]
-  const renderCustomPopulation = () => (
+
+  const renderCustomPopulation = students => (
     <div>
       {custompop && (
         <Header className="segmentTitle" size="large" textAlign="center">
@@ -173,33 +185,54 @@ const CustomPopulation = ({
             : ''}
         </Header>
       )}
-      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={panels} />
+      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels(students)} />
     </div>
   )
 
+  const filters = [
+    genderFilter,
+    ageFilter,
+    courseFilter({ courses }),
+    creditsEarnedFilter,
+    transferredToProgrammeFilter,
+    startYearAtUniFilter,
+    tagsFilter,
+    programmeFilter({
+      courses: courses ? courses.map(c => c.course.code) : [],
+      elementDetails,
+    }),
+    creditDateFilter,
+    enrollmentStatusFilter({
+      allSemesters: allSemesters ?? [],
+      language,
+    }),
+  ]
+
   return (
-    <FilterTray filterSet={<CustomPopulationFilters />}>
-      <div className="segmentContainer">
-        <Message style={{ maxWidth: '800px' }}>
-          <Message.Header>Custom population</Message.Header>
-          <p>
-            Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
-            button will open a modal where you can enter a list of studentnumbers. You can also save a custom population
-            by giving it a name and clicking the save button in the modal. It will then appear in the saved populations
-            list. These populations are personal meaning that they will only show to you. You can only search
-            studentnumbers you have access rights to i.e. you have rights to the programme they are in.
-          </p>
-        </Message>
-        <CustomPopulationSearch />
-        {custompop.length > 0 && customPopulationFlag ? (
-          <Segment className="contentSegment">{renderCustomPopulation()}</Segment>
-        ) : (
-          <Segment className="contentSegment">
-            <ProgressBar progress={progress} />
-          </Segment>
-        )}
-      </div>
-    </FilterTray>
+    <FilterView name="CustomPopulation" filters={filters} students={custompop}>
+      {students => (
+        <div className="segmentContainer">
+          <Message style={{ maxWidth: '800px' }}>
+            <Message.Header>Custom population</Message.Header>
+            <p>
+              Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
+              button will open a modal where you can enter a list of studentnumbers. You can also save a custom
+              population by giving it a name and clicking the save button in the modal. It will then appear in the saved
+              populations list. These populations are personal meaning that they will only show to you. You can only
+              search studentnumbers you have access rights to i.e. you have rights to the programme they are in.
+            </p>
+          </Message>
+          <CustomPopulationSearch />
+          {custompop.length > 0 && customPopulationFlag ? (
+            <Segment className="contentSegment">{renderCustomPopulation(students)}</Segment>
+          ) : (
+            <Segment className="contentSegment">
+              <ProgressBar progress={progress} />
+            </Segment>
+          )}
+        </div>
+      )}
+    </FilterView>
   )
 }
 
@@ -218,17 +251,20 @@ CustomPopulation.propTypes = {
   getCustomPopulationSearchesDispatch: func.isRequired,
 }
 
-const mapStateToProps = ({ populations, populationCourses, customPopulationSearch }) => ({
+const mapStateToProps = ({ populations, populationCourses, customPopulationSearch, semesters }) => ({
   loading: populations.pending,
   custompop: populations.data.students || [],
-  courses: populationCourses.data,
+  courses: populationCourses.data?.coursestatistics,
   customPopulationFlag: populations.customPopulationFlag,
   customPopulationSearches: customPopulationSearch.customPopulationSearches,
   latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
   searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId,
+  elementDetails: populations.data.elementdetails?.data ?? [],
+  allSemesters: semesters.data?.semesters || [],
 })
 
 export default connect(mapStateToProps, {
   getCustomPopulationCoursesByStudentnumbers,
   getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
+  getSemestersDispatch: getSemesters,
 })(CustomPopulation)

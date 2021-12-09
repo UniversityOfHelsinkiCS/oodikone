@@ -6,7 +6,7 @@ const importerClient = axios.create({
   headers: {
     token: importerToken,
   },
-  baseURL: 'https://importer.cs.helsinki.fi',
+  baseURL: 'https://importer.cs.helsinki.fi/api/importer',
 })
 
 const getImporterClient = () => {

@@ -41,7 +41,7 @@ import singleCourseStats from './singleCourseStats'
 import userAccessEmail from './userAccessEmail'
 import customPopulationSearch from './customPopulationSearch'
 import coolDataScience from './coolDataScience'
-import studyProgramme from './studyProgramme'
+import filters from './filters'
 
 const store = configureStore({
   reducer: {
@@ -86,7 +86,7 @@ const store = configureStore({
     customPopulationSearch,
     coolDataScience,
     [RTKApi.reducerPath]: RTKApi.reducer,
-    studyProgramme,
+    filters,
   },
   // oodikone is currently too heavy for other middlewares than thunk, but
   // feel free to take use them at some point if possible

@@ -1,10 +1,11 @@
 import React, { Fragment } from 'react'
 import { Table, Popup } from 'semantic-ui-react'
-import { number, shape, string, func, bool } from 'prop-types'
+import { number, shape, string, bool } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import '../populationCourseStats.css'
-import useCourseFilter from '../../FilterTray/filters/Courses/useCourseFilter'
+import useFilters from '../../FilterView/useFilters'
+import { isCourseSelected, toggleCourseSelection } from '../../FilterView/filters/courses'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const getYearCount = (year, passingSemesters) => passingSemesters[`${year}-FALL`] + passingSemesters[`${year}-SPRING`]
@@ -62,19 +63,22 @@ const renderCumulativeStatistics = passingSemesters => (
   </>
 )
 
-const PassingSemesterRow = ({ statistics, cumulative, onCourseNameClickFn }) => {
+const PassingSemesterRow = ({ statistics, cumulative }) => {
   const { language } = useLanguage()
-  const { courseIsSelected } = useCourseFilter()
+  const { useFilterSelector, filterDispatch } = useFilters()
+
   const { stats, course } = statistics
   const passingSemesters = cumulative ? stats.passingSemestersCumulative : stats.passingSemesters
-  const isActive = courseIsSelected(course.code)
+
+  const courseIsSelected = useFilterSelector(isCourseSelected(course.code))
+  const isActive = courseIsSelected
 
   return (
     <Table.Row key={course.code} active={isActive}>
       <Popup
         trigger={
           <Table.Cell className="filterCell clickableCell">
-            <FilterToggleIcon isActive={isActive} onClick={() => onCourseNameClickFn(course.code)} />
+            <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleCourseSelection(course.code))} />
           </Table.Cell>
         }
         content={
@@ -113,7 +117,6 @@ PassingSemesterRow.propTypes = {
     }),
   }).isRequired,
   cumulative: bool.isRequired,
-  onCourseNameClickFn: func.isRequired,
 }
 
 export default PassingSemesterRow

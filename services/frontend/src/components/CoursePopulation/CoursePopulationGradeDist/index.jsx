@@ -4,12 +4,10 @@ import { Progress, Table } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
 import { shape, bool, arrayOf, string, number } from 'prop-types'
 import { getHighestGradeOfCourseBetweenRange } from '../../../common'
-import useGradeFilter from '../../FilterTray/filters/Grade/useGradeFilter'
 import ExternalGradeFilterToggle from './ExternalGradeFilterToggle'
 
 const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStudents, samples, codes, from, to }) => {
   const [courseGrades, setCourseGrades] = useState([])
-  const { setGrades } = useGradeFilter()
 
   useEffect(() => {
     if (samples && singleCourseStats.alternatives) {
@@ -34,7 +32,6 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
       })
 
       setCourseGrades(filteredGradeArray)
-      setGrades(grades)
     }
   }, [pending, selectedStudents])
 

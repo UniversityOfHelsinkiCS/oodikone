@@ -6,13 +6,11 @@ import xlsx from 'xlsx'
 import { getStudentTotalCredits, getTextIn, reformatDate } from '../../common'
 import sendEvent from '../../common/sendEvent'
 import { PRIORITYCODE_TEXTS } from '../../constants'
-import useFilters from '../FilterTray/useFilters'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const sendAnalytics = sendEvent.populationStudents
 
-export default () => {
-  const { filteredStudents } = useFilters()
+export default ({ students }) => {
   const { language } = useLanguage()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const populationStatistics = useSelector(({ populations }) => populations.data)
@@ -118,7 +116,7 @@ export default () => {
     ])
 
     const worksheet = xlsx.utils.json_to_sheet(
-      filteredStudents.map(s => ({
+      students.map(s => ({
         'last name': s.lastname,
         'given names': s.firstnames,
         'student number': s.studentNumber,
@@ -160,11 +158,7 @@ export default () => {
         text="Excel Workbook"
         icon="file excel"
       />
-      <Dropdown.Item
-        onClick={() => copyStudentNumbers(filteredStudents)}
-        text="Copy Student Numbers"
-        icon="copy outline"
-      />
+      <Dropdown.Item onClick={() => copyStudentNumbers(students)} text="Copy Student Numbers" icon="copy outline" />
     </>
   )
 }

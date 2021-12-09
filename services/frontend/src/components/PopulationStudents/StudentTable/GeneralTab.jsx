@@ -6,18 +6,28 @@ import moment from 'moment'
 import { useSelector } from 'react-redux'
 import { useIsAdmin } from 'common/hooks'
 import SortableTable from 'components/SortableTable'
+import useFilters from 'components/FilterView/useFilters'
+import creditDateFilter from 'components/FilterView/filters/date'
 import { getStudentTotalCredits, getTextIn, getNewestProgramme, reformatDate, copyToClipboard } from 'common'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
-import useFilters from '../../FilterTray/useFilters'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCourseDateMap, coursecode }) => {
+const GeneralTab = ({
+  group,
+  populations,
+  columnKeysToInclude,
+  studentToTargetCourseDateMap,
+  coursecode,
+  filteredStudents,
+}) => {
   const { language } = useLanguage()
-  const { filteredStudents } = useFilters()
+  const { useFilterSelector } = useFilters()
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
+
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
 
   const { data: populationStatistics, query } = populations
 
@@ -182,6 +192,22 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCo
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
+  let creditColumnTitle = 'Credits Since Start of Studyright'
+
+  if (creditDateFilterOptions) {
+    const { startDate, endDate } = creditDateFilterOptions
+
+    if (startDate && !endDate) {
+      creditColumnTitle = `Credits Since ${moment(startDate).format('DD.MM.YYYY')}`
+    } else if (endDate && !startDate) {
+      creditColumnTitle = `Credits Before ${moment(endDate).format('DD.MM.YYYY')}`
+    } else if (endDate && startDate) {
+      creditColumnTitle = `Credits Between ${moment(startDate).format('DD.MM.YYYY')} and ${moment(endDate).format(
+        'DD.MM.YYYY'
+      )}`
+    }
+  }
+
   // All columns components user is able to use
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
@@ -215,7 +241,7 @@ const GeneralTab = ({ group, populations, columnKeysToInclude, studentToTargetCo
     },
     creditsSinceStart: {
       key: 'creditsSinceStart',
-      title: 'credits since start of studyright',
+      title: creditColumnTitle,
       getRowVal: s => {
         const credits = getStudentTotalCredits(s)
         return credits

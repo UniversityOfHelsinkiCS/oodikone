@@ -19,8 +19,12 @@ const StudyGuidanceGroups = () => {
           Study guidance groups
         </Header>
       </div>
-      <Wrapper isLoading={isLoading}>{!isLoading && !groupid && <StudyGuidanceGroupOverview groups={data} />}</Wrapper>
-      {!isLoading && groupid && <SingleStudyGuidanceGroup group={data.find(group => group.id === groupid)} />}
+      <div style={{ padding: '0 1rem' }}>
+        <Wrapper isLoading={isLoading}>
+          {!isLoading && !groupid && <StudyGuidanceGroupOverview groups={data} />}
+        </Wrapper>
+        {!isLoading && groupid && <SingleStudyGuidanceGroup group={data.find(group => group.id === groupid)} />}
+      </div>
     </>
   )
 }

@@ -6,7 +6,7 @@ import CumulativeCheckbox from './CumulativeCheckbox'
 import PassingSemestersHeader from './PassingSemestersHeader'
 
 const PassingSemesters = () => {
-  const { courseStatistics, onCourseNameCellClick, isActiveCourse } = UsePopulationCourseContext()
+  const { courseStatistics } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
 
   return (
@@ -16,13 +16,7 @@ const PassingSemesters = () => {
         <PassingSemestersHeader />
         <Table.Body>
           {courseStatistics.map(stats => (
-            <PassingSemesterRow
-              key={stats.course.code}
-              statistics={stats}
-              isActiveCourseFn={isActiveCourse}
-              onCourseNameClickFn={onCourseNameCellClick}
-              cumulative={cumulativeStats}
-            />
+            <PassingSemesterRow key={stats.course.code} statistics={stats} cumulative={cumulativeStats} />
           ))}
         </Table.Body>
       </Table>

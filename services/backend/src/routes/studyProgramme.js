@@ -42,7 +42,7 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
         logger.error(`Failed to update code ${code} basic stats`)
       }
     }
-    return res.json({ data })
+    return res.json(data)
   } else {
     res.status(422).end()
   }
@@ -76,7 +76,7 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
         logger.error(`Failed to update code ${code} credit stats`)
       }
     }
-    return res.json({ data })
+    return res.json(data)
   } else {
     res.status(422).end()
   }
@@ -110,7 +110,7 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
         logger.error(`Failed to update code ${code} graduation stats`)
       }
     }
-    return res.json({ data })
+    return res.json(data)
   } else {
     res.status(422).end()
   }

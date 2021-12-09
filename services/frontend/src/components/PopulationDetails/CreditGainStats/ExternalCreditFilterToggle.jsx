@@ -1,41 +1,29 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 import { getMonths } from '../../../common/query'
-import useCreditFilter from '../../FilterTray/filters/CreditsEarned/useCreditFilter'
-import { contextKey as creditFilterContextKey } from '../../FilterTray/filters/CreditsEarned'
-import ExternalFilterToggle from '../../FilterTray/ExternalFilterToggle'
+import FilterToggle from '../../FilterView/FilterToggle'
+import creditFilter from '../../FilterView/filters/creditsEarned'
+import useFilters from '../../FilterView/useFilters'
 
 const ExternalCreditFilterToggle = ({ min, max }) => {
-  const { currentValue: currentFilterValue, setRequestedValue } = useCreditFilter()
+  const { filterDispatch } = useFilters()
+  const { min: currentMin, max: currentMax } = useSelector(creditFilter.selectors.selectOptions)
 
   const months = getMonths(useLocation())
   const limitedMax = max === 0 ? 1 : max
-
-  const currentMin = currentFilterValue.min === '' ? null : Number(currentFilterValue.min)
-  const currentMax = currentFilterValue.max === '' ? null : Number(currentFilterValue.max)
   const active = currentMin === min && currentMax === limitedMax
 
   return (
-    <ExternalFilterToggle
-      filterPanelContextKey={creditFilterContextKey}
-      applyFilter={() => setRequestedValue({ min, max: limitedMax })}
-      clearFilter={() => setRequestedValue({ min: null, max: null })}
+    <FilterToggle
+      filter={creditFilter}
       active={active}
+      applyFilter={() => filterDispatch(creditFilter.actions.setOptions({ min, max: limitedMax }))}
+      clearFilter={() => filterDispatch(creditFilter.actions.clear())}
       popupContent={`Rajaa opiskelijat ensimmäisen ${months} kuukauden aikana saatujen opintopisteiden perusteella`}
       filterName="Credit Filter"
     />
   )
-}
-
-ExternalCreditFilterToggle.propTypes = {
-  min: PropTypes.number,
-  max: PropTypes.number,
-}
-
-ExternalCreditFilterToggle.defaultProps = {
-  min: null,
-  max: null,
 }
 
 export default ExternalCreditFilterToggle
