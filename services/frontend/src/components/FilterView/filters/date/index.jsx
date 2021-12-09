@@ -3,6 +3,7 @@ import { Form } from 'semantic-ui-react'
 import 'moment/locale/fi'
 import DateTime from './DateTime'
 import createFilter from '../createFilter'
+import filterInfo from '../../../../common/InfoToolTips/filters'
 
 /**
  * Filter courses according to the date when credits were earned.
@@ -51,10 +52,7 @@ export default createFilter({
 
   title: 'Date of Course Credits',
 
-  info: {
-    label: 'Selected date range only.',
-    short: 'Include course credits from the selected date range only. Does not filter out students.',
-  },
+  info: filterInfo.courseCredits,
 
   priority: 100,
 
