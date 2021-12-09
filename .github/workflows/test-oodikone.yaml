@@ -235,6 +235,8 @@ jobs:
       - build_frontend
       - build_userservice
       - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -279,6 +281,8 @@ jobs:
       - build_frontend
       - build_userservice
       - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -323,6 +327,8 @@ jobs:
       - build_frontend
       - build_userservice
       - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -367,6 +373,8 @@ jobs:
       - build_frontend
       - build_userservice
       - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -411,6 +419,8 @@ jobs:
       - build_frontend
       - build_userservice
       - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -455,6 +465,8 @@ jobs:
       - build_frontend
       - build_userservice
       - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -499,6 +511,8 @@ jobs:
       - build_frontend
       - build_userservice
       - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -547,6 +561,8 @@ jobs:
       - build_frontend
       - build_userservice
       - build_and_push_anon_sis_db
+      - build_and_push_anon_kone_db
+      - build_and_push_anon_user_db
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
