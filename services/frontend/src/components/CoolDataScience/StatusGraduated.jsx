@@ -26,41 +26,23 @@ const getP = (a, b) => {
 
 const isValidDate = d => moment().diff(moment(d)) > 0
 
-const settingDefinitions = {
-  showByYear: {
-    label: 'Näytä kalenterivuosittain',
-    short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta.',
-    long: `
-      Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
-      Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
-    `,
-    defaultValue: false,
-  },
+const settingDefinitions = _.merge(
+  {
+    showByYear: {
+      defaultValue: false,
+    },
 
-  showYearlyValues: {
-    label: 'Näytä edelliset vuodet',
-    short: 'Näytä tilastot vuosittain, alkaen vuodesta 2017.',
-    long: `
-      Näyttää vuosittaisen valmistumiskertymän tähän päivään mennessä vuonna X
-      sekä koko lukuvuoden X valmistuneet muodossa *"kerääntymä vuonna X / koko
-      lukuvuoden X valmistuneet"*.
-    `,
-    defaultValue: false,
-  },
+    showYearlyValues: {
+      defaultValue: false,
+    },
 
-  showCountingFrom: {
-    key: 'selectedDate',
-    label: 'Näytä päivänä',
-    short: 'Valitse päivä johon asti kertyneet tilastot näytetään.',
-    long: `
-      Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
-      Esimerkiksi "Näytä kalenterivuosittain" valinnan ollessa pois päältä,
-      lasketaan kertyneet tilastot (vrt. lukuvuosien kokonaistilastot) kunkin lukuvuoden alusta
-      tätä päivämäärää vastaavaan päivään kyseisenä lukuvuonna.
-    `,
-    defaultValue: () => moment(),
+    showCountingFrom: {
+      key: 'selectedDate',
+      defaultValue: () => moment(),
+    },
   },
-}
+  InfoToolTips.CoolDataScience.statusGraduated.settings
+)
 
 const StatusSettings = ({ onSettingsChange, settings, onOpenDetails }) => {
   const { selectedDate } = settings
@@ -292,6 +274,8 @@ const getDefaultSettings = () =>
     .fromPairs()
     .value()
 
+const unindent = s => s.replace(/(^|\n)[ \t]+/g, '\n')
+
 const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsGraduationStatusSettings', {})
   const [usageDetailsOpen, setUsageDetailsOpen] = useState(false)
@@ -402,7 +386,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
           <div style={{ padding: '1em' }}>
             {
               // eslint-disable-next-line react/no-children-prop
-              <ReactMarkdown children={CoolDataScience.statusGraduated} escapeHtml={false} />
+              <ReactMarkdown children={unindent(CoolDataScience.statusGraduated.general)} escapeHtml={false} />
             }
           </div>
           {_.toPairs(settingDefinitions).map(([key, { label, long }]) => (
@@ -413,7 +397,7 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
                   Valinta "<i>{label}</i>"
                 </b>
                 <div style={{ margin: '0.5em', fontSize: '0.9em' }}>
-                  <ReactMarkdown escapeHtml={false}>{long.replace(/(^|\n)[ \t]+/g, '\n')}</ReactMarkdown>
+                  <ReactMarkdown escapeHtml={false}>{unindent(long)}</ReactMarkdown>
                 </div>
               </div>
             </div>
