@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import PropTypes, { shape, bool, func } from 'prop-types'
 import { connect } from 'react-redux'
 import { Loader } from 'semantic-ui-react'
@@ -33,6 +33,7 @@ const settingDefinitions = [
     key: 'showCountingFrom',
     type: 'date',
     defaultValue: () => moment(),
+    persist: false,
   },
 ].map(setting => ({ ...setting, ...InfoToolTips.CoolDataScience.statusGraduated.settings[setting.key] }))
 
@@ -113,8 +114,12 @@ const getDefaultSettings = () =>
 
 const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsGraduationStatusSettings', {})
+  const [nonpersistentExplicitSettings, setNonpersistentSettings] = useState({})
 
-  const settings = useMemo(() => _.defaults(explicitSettings, getDefaultSettings()), [explicitSettings])
+  const settings = useMemo(
+    () => _.defaults({ ...explicitSettings, ...nonpersistentExplicitSettings }, getDefaultSettings()),
+    [explicitSettings, nonpersistentExplicitSettings]
+  )
 
   if (typeof settings.showCountingFrom === 'string') {
     settings.showCountingFrom = moment(settings.showCountingFrom)
@@ -138,10 +143,17 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
   const changeSetting = (property, value) => {
     sendAnalytics(`S Set setting "${property}" to ${value}`, 'Status')
 
-    setSettings({
-      ...settings,
-      [property]: value,
-    })
+    if (settingDefinitions.find(s => s.key === property).persist === false) {
+      setNonpersistentSettings({
+        ...nonpersistentExplicitSettings,
+        [property]: value,
+      })
+    } else {
+      setSettings({
+        ...settings,
+        [property]: value,
+      })
+    }
   }
 
   return (
