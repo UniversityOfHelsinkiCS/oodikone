@@ -301,6 +301,10 @@ const Status = ({ getStatusGraduatedDispatch, data, loading }) => {
 
   const settings = useMemo(() => _.defaults(explicitSettings, getDefaultSettings()), [explicitSettings])
 
+  if (typeof settings.selectedDate === 'string') {
+    settings.selectedDate = moment(settings.selectedDate)
+  }
+
   const { showYearlyValues, showByYear, selectedDate } = settings
 
   const { CoolDataScience } = InfoToolTips
