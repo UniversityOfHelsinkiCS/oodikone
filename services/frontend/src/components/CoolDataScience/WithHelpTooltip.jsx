@@ -2,18 +2,21 @@ import React, { useRef, useState } from 'react'
 import { Icon, Popup } from 'semantic-ui-react'
 import _ from 'lodash'
 
-const WithHelpTooltip = ({ children, tooltip, onOpenDetails, ...rest }) => {
+const WithHelpTooltip = ({ children, tooltip, onOpenDetails, iconStyle = {}, iconPosition = {}, ...rest }) => {
   const popupContext = useRef()
   const [popupOpen, setPopupOpen] = useState(false)
 
   const trigger = (
     <div>
       {children}
-      <div ref={popupContext} style={{ display: 'inline-block', paddingTop: '0.2em', cursor: 'help' }}>
+      <div
+        ref={popupContext}
+        style={{ marginLeft: '0.3em', display: 'inline-block', paddingTop: '0.2em', cursor: 'help', ...iconStyle }}
+      >
         <Icon
           onClick={() => setPopupOpen(!popupOpen)}
           ref={popupContext}
-          style={{ marginLeft: '0.3em', color: '#888' }}
+          style={{ position: 'relative', color: '#888', ...iconPosition }}
           name="question circle outline"
         />
       </div>

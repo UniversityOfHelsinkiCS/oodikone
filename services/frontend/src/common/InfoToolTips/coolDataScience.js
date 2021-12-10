@@ -91,7 +91,7 @@ export default {
         `,
       },
       showCountingFrom: {
-        label: 'Näytä päivänä',
+        label: 'Valitse päivämäärä',
         short: 'Valitse päivä johon asti kertyneet tilastot näytetään.',
         long: `
           Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
