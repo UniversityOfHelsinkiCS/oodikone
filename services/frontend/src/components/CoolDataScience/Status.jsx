@@ -29,66 +29,18 @@ const mapValueToRange = (x, min1, max1, min2, max2) => {
   return ((x - min1) * (max2 - min2)) / (max1 - min1) + min2
 }
 
-const settingDefinitions = {
-  showByYear: {
-    label: 'Näytä kalenterivuosittain',
-    short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta.',
-    long: `
-      Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
-      Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
-    `,
-    defaultValue: false,
-  },
-
-  showYearlyValues: {
-    label: 'Näytä edelliset vuodet',
-    short: 'Näytä tilastot vuosittain, alkaen vuodesta 2017.',
-    long: `
-      Näyttää tilastot vuodesta 2017 eteenpäin.
-
-      Jokaiselta vuodelta näytetään kaksi tilastoa: ajanjakson kokonaistilasto ja ns. tähän mennessä "*kertynyt*" tilasto.
-      Kokonaistilasto vastaa nimensä mukaisesti koko ajanjaksoa, kun taas *kertynyt* tilasto kattaa ajanjakson vuoden 
-      tai lukuvuoden alusta "Näytä päivänä"-valintaa vastaavaan päivämäärään tuona vuotena. Luvut näytetään muodossa *<kerynyt>*/*<kokonais>*.
-      Kuluvalta vuodelta näytetään ainoastaan kertynyt tilasto.
-    `,
-    defaultValue: false,
-  },
-
-  showRelativeValues: {
-    label: 'Näytä suhteutettuna opiskelijoiden määrään',
-    short:
-      'Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.',
-    long: `
-      Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.
-      Opiskelijoiden määrä perustuu ajanjaksolla kyseisen organisaation alaisista kursseista suoritusmerkintöjä saaneiden opiskelijoiden määrään.
-      Luku siis sisältää muutkin kuin kyseiseen ohjelman tai osaston opinto-oikeuden omaavat opiskelijat.
-    `,
-    defaultValue: false,
-  },
-
-  showCountingFrom: {
-    label: 'Näytä päivänä',
-    short: 'Valitse päivä johon asti kertyneet tilastot näytetään.',
-    long: `
-      Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
-      Esimerkiksi "Näytä kalenterivuosittain" valinnan ollessa pois päältä,
-      lasketaan kertyneet tilastot (vrt. lukuvuosien kokonaistilastot) kunkin lukuvuoden alusta
-      tätä päivämäärää vastaavaan päivään kyseisenä lukuvuonna.
-    `,
-    defaultValue: null,
-  },
-
-  showStudentCounts: {
-    label: 'Näytä kurssien opiskelijamäärät',
-    short: 'Näyttää suoritettujen opintopisteiden sijasta opiskelijoiden määrät kurssitason näkymässä.',
-    long: `
-      Oletuksena kurssitason näkymässä näytetään organisaatio- ja ohjelmatason näkymien tapaan suoritettujen opintopisteiden
-      kokonaismäärä. Kun tämä valinta on käytössä, tämän sijasta näytettävät luvut vastaavat kurssin suorittaneiden 
-      *yksilöityjen* opiskelijoiden määrää. Kukin opiskelija lasketaan siis vain kerran tähän tilastoon.
-    `,
-    defaultValue: false,
-  },
+const settingDefaultValues = {
+  showByYear: false,
+  showYearlyValues: false,
+  showRelativeValues: false,
+  showCountingFrom: null,
+  showStudentCounts: false,
 }
+
+const settingDefinitions = _.merge(
+  _.mapValues(settingDefaultValues, v => ({ defaultValue: v })),
+  InfoToolTips.CoolDataScience.status.settings
+)
 
 const StatusContainer = ({
   stats,
@@ -360,6 +312,8 @@ const createDrillData = (storeData, showRelativeValues) => {
   }))
 }
 
+const unindent = s => s.replace(/(^|\n)[ \t]+/g, '\n')
+
 const Status = () => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsStatusSettings', {})
   const [usageDetailsOpen, setUsageDetailsOpen] = useState(false)
@@ -478,7 +432,7 @@ const Status = () => {
           <div style={{ padding: '1em' }}>
             {
               // eslint-disable-next-line react/no-children-prop
-              <ReactMarkdown children={CoolDataScience.status} escapeHtml={false} />
+              <ReactMarkdown children={unindent(CoolDataScience.status.general)} escapeHtml={false} />
             }
           </div>
           {_.toPairs(settingDefinitions).map(([key, { label, long }]) => (
@@ -489,7 +443,7 @@ const Status = () => {
                   Valinta "<i>{label}</i>"
                 </b>
                 <div style={{ margin: '0.5em', fontSize: '0.9em' }}>
-                  <ReactMarkdown escapeHtml={false}>{long.replace(/(^|\n)[ \t]+/g, '\n')}</ReactMarkdown>
+                  <ReactMarkdown escapeHtml={false}>{unindent(long)}</ReactMarkdown>
                 </div>
               </div>
             </div>

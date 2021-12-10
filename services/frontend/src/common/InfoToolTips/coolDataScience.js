@@ -50,23 +50,108 @@ export default {
   **Include attainments attained before the studyright start** laskee mukaan opiskelijan ennen opinto-oikeuden alkua saadut opintopisteet.
   Vakiona opintopisteet ennen opinto-oikeutta suodatetaan pois.
   `,
-  status: `
-  Tilannekuva näyttää "reaaliaikaisesti" eri tiedekuntien, ohjelmien ja kurssien tuottamat opintopisteet nykyisen lukuvuoden aikana 
-  verrattuna edelliseen lukuvuoteen. 
-  
-  Nuoli kuvaa muutosta, paljonko opintopisteitä on kertynyt tämänhetkisen lukuvuoden alusta tarkastelupäivään mennessä 
-  suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna. Vain suoritetut ja hyväksiluetut opintopisteet huomioidaan.
-  
-  Tilannekuvassa voi porautua kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. Mahdolliset valinnat ovat selitettyinä alla.
-  `,
-  statusGraduated: `
-  Tilannekuva näyttää "reaaliaikaisesti" eri tiedekuntien ja ohjelmien valmistumiset nykyisen lukuvuoden aikana 
-  verrattuna edelliseen lukuvuoteen. 
-  
-  Nuoli kuvaa muutosta, paljonko valmistuneita on kertynyt tämänhetkisen lukuvuoden alusta tarkastelupäivään mennessä 
-  suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna.
-  
-  Tilannekuvassa voi porautua kortteja klikkaamalla ohjelmatasolle. 
-  Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. 
-  `,
+  status: {
+    general: `
+      Tilannekuva näyttää "reaaliaikaisesti" eri tiedekuntien, ohjelmien ja kurssien tuottamat opintopisteet nykyisen lukuvuoden aikana 
+      verrattuna edelliseen lukuvuoteen. 
+      
+      Nuoli kuvaa muutosta, paljonko opintopisteitä on kertynyt tämänhetkisen lukuvuoden alusta tarkastelupäivään mennessä 
+      suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna. Vain suoritetut ja hyväksiluetut opintopisteet huomioidaan.
+      
+      Tilannekuvassa voi porautua kortteja klikkaamalla ensin ohjelmatasolle ja edelleen kurssitasolle. Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. Mahdolliset valinnat ovat selitettyinä alla.
+    `,
+    settings: {
+      showByYear: {
+        label: 'Näytä kalenterivuosittain',
+        short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta.',
+        long: `
+          Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
+          Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
+        `,
+      },
+      showYearlyValues: {
+        label: 'Näytä edelliset vuodet',
+        short: 'Näytä tilastot vuosittain, alkaen vuodesta 2017.',
+        long: `
+          Näyttää tilastot vuodesta 2017 eteenpäin.
+          Jokaiselta vuodelta näytetään kaksi tilastoa: ajanjakson kokonaistilasto ja ns. tähän mennessä "*kertynyt*" tilasto.
+          Kokonaistilasto vastaa nimensä mukaisesti koko ajanjaksoa, kun taas *kertynyt* tilasto kattaa ajanjakson vuoden 
+          tai lukuvuoden alusta "Näytä päivänä"-valintaa vastaavaan päivämäärään tuona vuotena. Luvut näytetään muodossa *<kerynyt>*/*<kokonais>*.
+          Kuluvalta vuodelta näytetään ainoastaan kertynyt tilasto.
+        `,
+      },
+      showRelativeValues: {
+        label: 'Näytä suhteutettuna opiskelijoiden määrään',
+        short:
+          'Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.',
+        long: `
+          Näyttää tilastot suhteutettuna opiskelijoiden määrään kyseisellä aikavälillä ja kyseisessä organisaatiossa.
+          Opiskelijoiden määrä perustuu ajanjaksolla kyseisen organisaation alaisista kursseista suoritusmerkintöjä saaneiden opiskelijoiden määrään.
+          Luku siis sisältää muutkin kuin kyseiseen ohjelman tai osaston opinto-oikeuden omaavat opiskelijat.
+        `,
+      },
+      showCountingFrom: {
+        label: 'Näytä päivänä',
+        short: 'Valitse päivä johon asti kertyneet tilastot näytetään.',
+        long: `
+          Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
+          Esimerkiksi "Näytä kalenterivuosittain" valinnan ollessa pois päältä,
+          lasketaan kertyneet tilastot (vrt. lukuvuosien kokonaistilastot) kunkin lukuvuoden alusta
+          tätä päivämäärää vastaavaan päivään kyseisenä lukuvuonna.
+        `,
+      },
+      showStudentCounts: {
+        label: 'Näytä kurssien opiskelijamäärät',
+        short: 'Näyttää suoritettujen opintopisteiden sijasta opiskelijoiden määrät kurssitason näkymässä.',
+        long: `
+          Oletuksena kurssitason näkymässä näytetään organisaatio- ja ohjelmatason näkymien tapaan suoritettujen opintopisteiden
+          kokonaismäärä. Kun tämä valinta on käytössä, tämän sijasta näytettävät luvut vastaavat kurssin suorittaneiden 
+          *yksilöityjen* opiskelijoiden määrää. Kukin opiskelija lasketaan siis vain kerran tähän tilastoon.
+        `,
+      },
+    },
+  },
+  statusGraduated: {
+    general: `
+      Tilannekuva näyttää "reaaliaikaisesti" eri tiedekuntien ja ohjelmien valmistumiset nykyisen lukuvuoden aikana 
+      verrattuna edelliseen lukuvuoteen. 
+      
+      Nuoli kuvaa muutosta, paljonko valmistuneita on kertynyt tämänhetkisen lukuvuoden alusta tarkastelupäivään mennessä 
+      suhteessa edellisen lukuvuoden alusta vastaavaan tarkastelupäivään viime vuonna.
+      
+      Tilannekuvassa voi porautua kortteja klikkaamalla ohjelmatasolle. 
+      Asetukset-nappi avaa valikon, josta voi valita missä muodossa data halutaan nähdä. 
+    `,
+    settings: {
+      showByYear: {
+        label: 'Näytä kalenterivuosittain',
+        short: 'Näytä tilastot kalenterivuosittain lukuvuosien sijasta.',
+        long: `
+          Kun tämä valinta on käytössä, vuosittaiset ajanjaksot lasketaan kalenterivuoden alusta sen loppuun.
+          Muulloin vuosittaiset ajanjaksot lasketaan lukukauden alusta seuraavan lukukauden alkuun.
+        `,
+      },
+
+      showYearlyValues: {
+        label: 'Näytä edelliset vuodet',
+        short: 'Näytä tilastot vuosittain, alkaen vuodesta 2017.',
+        long: `
+          Näyttää vuosittaisen valmistumiskertymän tähän päivään mennessä vuonna X
+          sekä koko lukuvuoden X valmistuneet muodossa *"kerääntymä vuonna X / koko
+          lukuvuoden X valmistuneet"*.
+        `,
+      },
+
+      showCountingFrom: {
+        label: 'Näytä päivänä',
+        short: 'Valitse päivä johon asti kertyneet tilastot näytetään.',
+        long: `
+          Tämä valinta määrittää päivämäärän, jota käyttäen kertyneet tilastot lasketaan.
+          Esimerkiksi "Näytä kalenterivuosittain" valinnan ollessa pois päältä,
+          lasketaan kertyneet tilastot (vrt. lukuvuosien kokonaistilastot) kunkin lukuvuoden alusta
+          tätä päivämäärää vastaavaan päivään kyseisenä lukuvuonna.
+        `,
+      },
+    },
+  },
 }
