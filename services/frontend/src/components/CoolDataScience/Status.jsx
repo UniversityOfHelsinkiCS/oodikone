@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Loader } from 'semantic-ui-react'
 import _ from 'lodash'
@@ -43,6 +43,7 @@ const settingDefinitions = _.map(
       key: 'showCountingFrom',
       type: 'date',
       defaultValue: () => moment(),
+      persist: false,
     },
   ],
   setting => ({
@@ -85,8 +86,8 @@ const StatusContainer = ({
   if (showYearlyValues) {
     yearlyValues = _.orderBy(Object.entries(stats.yearly), ([y]) => y, ['desc']).map(([year, yearStats]) => ({
       label: showByYear ? year : `${year}-${`${Number(year) + 1}`.slice(-2)}`,
-      accumulated: yearStats.acc,
-      total: yearStats.total,
+      accumulated: showStudentCounts && stats.type === 'course' ? yearStats.accStudents : yearStats.acc,
+      total: showStudentCounts && stats.type === 'course' ? yearStats.totalStudents : yearStats.total,
     }))
   }
 
@@ -155,12 +156,16 @@ const isValidDate = d => moment().diff(moment(d)) > 0
 
 const Status = () => {
   const [explicitSettings, setSettings] = useLocalStorage('trendsStatusSettings', {})
+  const [nonpersistentExplicitSettings, setNonpersistentSettings] = useState({})
 
   const storeData = useSelector(state => state.coolDataScience.data.status)
   const loading = useSelector(state => state.coolDataScience.pending.status)
   const dispatch = useDispatch()
 
-  const settings = useMemo(() => _.defaults(explicitSettings, getDefaultSettings()), [explicitSettings])
+  const settings = useMemo(
+    () => _.defaults({ ...explicitSettings, ...nonpersistentExplicitSettings }, getDefaultSettings()),
+    [explicitSettings, nonpersistentExplicitSettings]
+  )
 
   const data = useMemo(
     () => createDrillData(storeData, settings.showRelativeValues),
@@ -193,10 +198,17 @@ const Status = () => {
   const changeSetting = (property, value) => {
     sendAnalytics(`S Set setting "${property}" to ${value}`, 'Status')
 
-    setSettings({
-      ...settings,
-      [property]: value,
-    })
+    if (settingDefinitions.find(s => s.key === property).persist === false) {
+      setNonpersistentSettings({
+        ...nonpersistentExplicitSettings,
+        [property]: value,
+      })
+    } else {
+      setSettings({
+        ...settings,
+        [property]: value,
+      })
+    }
   }
 
   return (
