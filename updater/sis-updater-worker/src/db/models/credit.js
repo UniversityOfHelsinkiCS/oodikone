@@ -78,6 +78,9 @@ Credit.init(
     language: {
       type: STRING,
     },
+    is_open: {
+      type: BOOLEAN,
+    },
   },
   {
     underscored: false,
