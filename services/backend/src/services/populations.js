@@ -1,6 +1,7 @@
 const { Op } = require('sequelize')
 const moment = require('moment')
 const { sortBy } = require('lodash')
+const { sortMainCode } = require('../util/utils')
 
 const {
   Student,
@@ -19,7 +20,6 @@ const {
   dbConnections: { sequelize },
 } = require('../database/connection')
 const { Tag, TagStudent } = require('../models/models_kone')
-const { /*allCodeAltenatives, */ findOneByCode } = require('./courses')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
@@ -845,12 +845,25 @@ const parseCreditInfo = credit => ({
   date: credit.attainment_date,
 })
 
-const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+// const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
 
-const unifyOpenUniversity = code => {
+/* const unifyOpenUniversity = code => {
   const regexresult = isOpenUniCourseCode(code)
   if (!regexresult) return code
   return regexresult[1]
+}
+ */
+const findMainCourse = async code => {
+  const course = await Course.findOne({
+    where: { code: code },
+  })
+  const sortedCourses = sortMainCode([...course.substitutions, code])
+  const result = await Course.findOne({
+    attributes: ['code', 'name'],
+    where: { code: sortedCourses[0] },
+  })
+
+  return result
 }
 
 const bottlenecksOf = async (query, studentnumberlist) => {
@@ -921,6 +934,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
           transferredStudents,
           tag
         ))
+
       const allstudents = studentnumbers.reduce((numbers, num) => {
         numbers[num] = true
         return numbers
@@ -957,14 +971,14 @@ const bottlenecksOf = async (query, studentnumberlist) => {
   for (const course of courses) {
     let { course_type } = course
     let maincourse = course
-    if (isOpenUniCourseCode) {
+    const sortedMaincourse = await findMainCourse(course.code)
+    if (sortedMaincourse) maincourse = sortedMaincourse
+
+    /*  if (isOpenUniCourseCode) {
       const nonOpen = unifyOpenUniversity(course.code)
       const response = await findOneByCode(nonOpen)
+ */
 
-      if (response) {
-        maincourse = response
-      }
-    }
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
     }
@@ -985,6 +999,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.allStudents = allstudentslength
+
   return bottlenecks
 }
 

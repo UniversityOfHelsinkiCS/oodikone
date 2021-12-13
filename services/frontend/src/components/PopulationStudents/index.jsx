@@ -66,6 +66,7 @@ const PopulationStudents = ({
 
   const mandatoryCodes = mandatoryCourses.filter(course => course.visible && course.visible.visibility).map(c => c.code)
   let mandatoryPassed = {}
+
   if (populationCourses.coursestatistics) {
     const mandatorycodesMapCourseCodeToCourseID = new Map()
     mandatoryCourses
