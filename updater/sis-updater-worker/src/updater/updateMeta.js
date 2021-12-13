@@ -62,6 +62,21 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     return mapCourse(groupedCourse, substitutions)
   })
 
+  // change substitutions ids to course codes
+
+  for (const course of courses) {
+    const newSubstitutions = []
+    for (const sub of course.substitutions) {
+      const subs = await Course.findOne({
+        attributes: ['code'],
+        where: { id: sub },
+      })
+
+      if (subs) newSubstitutions.push(subs.dataValues.code)
+    }
+    course.substitutions = newSubstitutions
+  }
+
   await bulkCreate(Course, courses)
   await bulkCreate(
     CourseProvider,
