@@ -131,8 +131,7 @@ const creditMapper =
     courseUnitIdToCourseGroupId,
     moduleGroupIdToModuleCode,
     courseGroupIdToCourseCode,
-    studyrightIdToOrganisationsName,
-    courseCodeToAyCodelessId
+    studyrightIdToOrganisationsName
   ) =>
   attainment => {
     const {
@@ -165,15 +164,17 @@ const creditMapper =
 
     let course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
 
-    // if ay studyright and no ay code
+    // check if ay code or no ay code but ay studyright
+    let isOpen = false
     if (study_right_id !== null && course_code) {
       if (!isModule(type)) {
-        const organisationName = studyrightIdToOrganisationsName[study_right_id]
-        if (organisationName) {
-          if (organisationName['fi'].startsWith('Avoin yliopisto')) {
-            if (!course_code.startsWith('AY')) {
-              course_code = 'AY'.concat(course_code)
-              course_id = courseCodeToAyCodelessId.get(course_code)
+        if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
+          isOpen = true
+        } else {
+          const organisationName = studyrightIdToOrganisationsName[study_right_id]
+          if (organisationName) {
+            if (organisationName['fi'].startsWith('Avoin yliopisto')) {
+              isOpen = true
             }
           }
         }
@@ -198,6 +199,7 @@ const creditMapper =
       isStudyModule,
       org: attainmentUniOrg,
       language: language,
+      isOpen: isOpen,
     }
   }
 

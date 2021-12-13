@@ -294,7 +294,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const courseProvidersToBeCreated = []
 
   // because of AY-codeless open uni courses
-  const fixAyCodelessOpenUniCourses = async (attainments, sisDbCoursesForStudentAttainments) => {
+  /*  const fixAyCodelessOpenUniCourses = async (attainments, sisDbCoursesForStudentAttainments) => {
     const groupIdsWithOpenUnStudyright = attainments.reduce((res, curr) => {
       if (curr.study_right_id !== null && curr.type === 'CourseUnitAttainment') {
         const organisationName = studyrightIdToOrganisationsName[curr.study_right_id]
@@ -386,7 +386,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     }
   }
 
-  await fixAyCodelessOpenUniCourses(attainments, sisDbCoursesForStudentAttainments)
+  await fixAyCodelessOpenUniCourses(attainments, sisDbCoursesForStudentAttainments) */
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
   const fixCustomCourseUnitAttainments = async attainments => {
@@ -637,7 +637,7 @@ const updateTermRegistrations = async (termRegistrations, personIdToStudentNumbe
   await bulkCreate(SemesterEnrollment, semesterEnrollments)
 }
 
-const getFirstDateIfIsAfter = (dateOne, dateTwo) => {
+/* const getFirstDateIfIsAfter = (dateOne, dateTwo) => {
   const isAfter = new Date(dateOne) > new Date(dateTwo) ? dateOne : dateTwo
   if (isAfter) {
     return dateOne
@@ -653,7 +653,7 @@ const getFirstDateIfIsBefore = (dateOne, dateTwo) => {
   } else {
     return null
   }
-}
+} */
 
 module.exports = {
   updateStudents,

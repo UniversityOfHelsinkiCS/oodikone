@@ -11,9 +11,10 @@ const {
 } = require('../models')
 
 const { parseCredit } = require('./parseCredits')
+const { sortMainCode } = require('../util/utils')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
-const _ = require('lodash')
+// const _ = require('lodash')
 
 const byNameOrCode = (searchTerm, language) =>
   Course.findAll({
@@ -59,7 +60,14 @@ const findOneByCode = code => {
   })
 }
 
-const creditsForCourses = async (codes, anonymizationSalt) => {
+const creditsForCourses = async (codes, anonymizationSalt, unifyOpenUniCourses) => {
+  let is_open = null
+  /* {
+    [Op.in]: [true, false],
+  } */
+  if (!unifyOpenUniCourses) {
+    is_open = null
+  }
   const credits = await Credit.findAll({
     include: [
       {
@@ -105,6 +113,7 @@ const creditsForCourses = async (codes, anonymizationSalt) => {
       student_studentnumber: {
         [Op.ne]: null,
       },
+      is_open,
     },
     order: [['attainment_date', 'ASC']],
   })
@@ -144,7 +153,23 @@ const unifyOpenUniversity = code => {
   return regexresult[1]
 }
 
-const allCodeAltenatives = async code => {
+const allCodeAlternatives = async code => {
+  const course = await Course.findOne({
+    where: { code: code },
+  })
+  // console.log('course: ', course)
+  return [...course.substitutions, code]
+    .map(c => {
+      if (c.match(/^AY?/)) return [c, 4] // open university codes come last
+      if (c.match(/^\d/)) return [c, 2] // old numeric codes come second
+      if (c.match(/^[A-Za-z]/)) return [c, 1] // new letter based codes come first
+      return [c, 3] // unknown, comes before open uni?
+    })
+    .sort((a, b) => a[1] - b[1])
+    .map(c => c[0])
+}
+
+/* const allCodeAltenatives = async code => {
   let course = await Course.findAll({
     raw: true,
     attributes: ['id', 'code', 'substitutions'],
@@ -180,11 +205,20 @@ const allCodeAltenatives = async code => {
     .sort((a, b) => a[1] - b[1])
     .map(c => c[0])
 
+  console.log('all substitutions: ', allSubstitutions)
   return allSubstitutions ? _.uniq(temp) : [code]
 }
-
+ */
 const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anonymizationSalt) => {
-  let codes = await allCodeAltenatives(coursecode)
+  const courseForSubs = await Course.findOne({
+    where: { code: coursecode },
+  })
+  let codes = sortMainCode([...courseForSubs.substitutions, coursecode])
+  // let codes = await allCodeAlternatives(coursecode)
+  // let codes2 = await allCodeAlternatives2(coursecode)
+
+  // console.log('codes: ', codes)
+  // console.log('codes2: ', codes2)
 
   if (isOpenUniCourseCode(coursecode) && !unifyOpenUniCourses) {
     codes = [coursecode]
@@ -195,7 +229,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
   }
 
   const [credits, course] = await Promise.all([
-    creditsForCourses(codes, anonymizationSalt),
+    creditsForCourses(codes, anonymizationSalt, unifyOpenUniCourses),
     Course.findOne({
       where: {
         code: coursecode,
@@ -204,6 +238,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
   ])
 
   const counter = new CourseYearlyStatsCounter()
+
   for (let credit of credits) {
     const {
       studentnumber,
@@ -407,6 +442,6 @@ module.exports = {
   byCodes,
   maxYearsToCreatePopulationFrom,
   unifyOpenUniversity,
-  allCodeAltenatives,
+  allCodeAlternatives,
   findOneByCode,
 }
