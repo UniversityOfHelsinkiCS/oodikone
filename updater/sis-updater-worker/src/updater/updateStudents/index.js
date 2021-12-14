@@ -436,6 +436,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
             name: att.name,
             code: parsedCourseCode,
             coursetypecode: att.study_level_urn,
+            course_unit_type: att.course_unit_type_urn,
           })
         }
 
