@@ -73,6 +73,28 @@ const getStartDate = (studyprogramme, isAcademicYear) => {
   return new Date('2000-01-01')
 }
 
+// There are 9 course_unit_types
+// 1. urn:code:course-unit-type:regular
+// 2. urn:code:course-unit-type:bachelors-thesis
+// 3. urn:code:course-unit-type:masters-thesis
+// 4. urn:code:course-unit-type:doctors-thesis
+// 5. urn:code:course-unit-type:licentiate-thesis
+// 6. urn:code:course-unit-type:bachelors-maturity-examination
+// 7. urn:code:course-unit-type:masters-maturity-examination
+// 8. urn:code:course-unit-type:communication-and-linguistic-studies
+// 9. urn:code:course-unit-type:practical-training-homeland
+// Four of these are thesis types
+
+const getThesisType = studyprogramme => {
+  if (studyprogramme.includes('MH') || studyprogramme.includes('ma'))
+    return ['urn:code:course-unit-type:masters-thesis']
+  if (studyprogramme.includes('KH') || studyprogramme.includes('ba'))
+    return ['urn:code:course-unit-type:bachelors-thesis']
+  if (/^(T)[0-9]{6}$/.test(studyprogramme))
+    return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
+  return 'thesis-type-not-defined'
+}
+
 module.exports = {
   formatStudyright,
   getYearsArray,
@@ -83,4 +105,5 @@ module.exports = {
   getMean,
   defineYear,
   getStartDate,
+  getThesisType,
 }

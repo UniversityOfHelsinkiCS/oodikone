@@ -11,6 +11,7 @@ const {
   getMedian,
   getMean,
   getStartDate,
+  getThesisType,
 } = require('./studyprogrammeHelpers')
 const {
   graduatedStudyRights,
@@ -143,7 +144,9 @@ const getTransferredCreditStats = async (studytrack, since, years, isAcademicYea
 }
 
 const getThesisStats = async (studytrack, since, years, isAcademicYear) => {
-  const credits = await getThesisCredits(studytrack, since)
+  const providercode = mapToProviders([studytrack])[0]
+  const thesisType = getThesisType(studytrack)
+  const credits = await getThesisCredits(providercode, since, thesisType)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   credits.forEach(({ attainment_date }) => {
