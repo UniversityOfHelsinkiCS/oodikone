@@ -2,6 +2,7 @@ import * as filters from 'components/FilterView/filters'
 import { Button, Header, Accordion, Divider, Label } from 'semantic-ui-react'
 import moment from 'moment'
 import CreditAccumulationGraphHighCharts from 'components/CreditAccumulationGraphHighCharts'
+import _ from 'lodash'
 import { getTextIn } from 'common'
 import PopulationStudents from 'components/PopulationStudents'
 import React, { useCallback, useEffect, useState, useRef } from 'react'
@@ -46,12 +47,16 @@ const useToggleAndSetNewestIndex = ({ defaultValue, indexOfPanelToScroll, setNew
   return [state, toggle]
 }
 
-const SingleStudyGroupContent = ({ filteredStudents, courses, coursesAreLoading, population, group, language }) => {
+const SingleStudyGroupContent = ({ filteredStudents, population, group, language }) => {
   const { useFilterSelector, filterDispatch } = useFilters()
   const refs = [useRef(), useRef(), useRef(), useRef()]
   const [activeIndex, setActiveIndex] = useState([])
   const [newestIndex, setNewestIndex] = useState(null)
   const isMounted = useIsMounted()
+
+  const { data: courses, isLoading: coursesAreLoading } = useGetStudyGuidanceGroupPopulationCoursesQuery(
+    _.map(filteredStudents, 'studentNumber')
+  )
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive)
 
@@ -299,15 +304,11 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
       isLoading={isLoading}
       studyProgrammes={studyProgrammes}
     >
-      {!isLoading && (
+      {isLoading || coursesAreLoading ? (
+        <SegmentDimmer isLoading />
+      ) : (
         <div style={{ marginTop: '1rem' }}>
-          <SingleStudyGroupFilterView
-            population={data}
-            language={language}
-            group={group}
-            courses={courses}
-            coursesAreLoading={coursesAreLoading}
-          />
+          <SingleStudyGroupFilterView population={data} language={language} group={group} courses={courses} />
         </div>
       )}
     </SingleStudyGroupViewWrapper>
