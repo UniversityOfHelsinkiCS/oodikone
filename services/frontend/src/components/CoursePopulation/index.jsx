@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { useSelector, useDispatch, connect } from 'react-redux'
 import { shape, func, bool } from 'prop-types'
 import { Segment, Header, Accordion } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
@@ -242,7 +242,7 @@ const CoursePopulation = ({
       content: {
         content: (
           <div ref={programmeRef}>
-            <CustomPopulationCourses filteredStudents={filtered} showFilter={false} />
+            <CustomPopulationCoursesWrapper filteredStudents={filtered} showFilter={false} />
           </div>
         ),
       },
@@ -317,7 +317,7 @@ const CoursePopulation = ({
           to: dateTo,
         }),
       ]}
-      students={studentData.students}
+      students={studentData.students ?? []}
     >
       {filtered => (
         <div className="segmentContainer">
@@ -334,6 +334,22 @@ const CoursePopulation = ({
       )}
     </FilterView>
   )
+}
+
+const CustomPopulationCoursesWrapper = props => {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(
+      getCustomPopulationCoursesByStudentnumbers({
+        studentnumberlist: props.filteredStudents.map(student => student.studentNumber),
+      })
+    )
+  }, [props.filteredStudents])
+
+  const courses = useSelector(state => state.populationCourses?.data)
+
+  return <CustomPopulationCourses {...props} courses={courses} />
 }
 
 CoursePopulation.propTypes = {
