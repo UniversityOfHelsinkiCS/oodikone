@@ -24,7 +24,7 @@ const studyRightHasDegreeEducation = studyRight => {
   if (!education) return false
   const educationType = getEducationType(education.education_type)
   if (!educationType) return false
-  return !educationType.parent_id.startsWith('urn:code:education-type:non-degree-education')
+  return educationType.parent_id !== 'urn:code:education-type:non-degree-education'
 }
 
 // Accepted selection path is not available when degree programme doesn't have
