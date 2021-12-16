@@ -39,8 +39,6 @@ const CustomPopulation = ({ getCustomPopulationSearchesDispatch, getSemestersDis
   const elementDetails = useSelector(state => state.populations.data.elementdetails?.data ?? [])
   const custompop = useSelector(state => state.populations.data?.students || [])
 
-  const { searchedCustomPopulationSearchId } = useSelector(state => state.customPopulationSearch)
-
   useTitle('Custom population')
 
   useEffect(() => {
@@ -71,12 +69,7 @@ const CustomPopulation = ({ getCustomPopulationSearchesDispatch, getSemestersDis
   )
 
   return (
-    <FilterView
-      name="CustomPopulation"
-      filters={filters}
-      students={custompop}
-      displayTray={!!searchedCustomPopulationSearchId}
-    >
+    <FilterView name="CustomPopulation" filters={filters} students={custompop} displayTray={custompop.length > 0}>
       {students => <CustomPopulationContent students={students} custompop={custompop} />}
     </FilterView>
   )
