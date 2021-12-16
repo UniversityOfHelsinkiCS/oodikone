@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { useSelector, useDispatch, connect } from 'react-redux'
+import { createSelector } from '@reduxjs/toolkit'
+import { useSelector, useDispatch } from 'react-redux'
 import { Segment, Header, Accordion, Message } from 'semantic-ui-react'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
-import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
+import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
 import { getSemesters } from '../../redux/semesters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -31,32 +32,44 @@ import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
 import UnihowDataExport from './UnihowDataExport'
 
-const CustomPopulation = ({ getCustomPopulationSearchesDispatch, getSemestersDispatch }) => {
-  const { language } = useLanguage()
+const selectCustomPopulationData = createSelector(
+  state => state.semesters.data,
+  state => state.populations.data,
+  (semesters, populations) => ({
+    allSemesters: semesters?.semesters ?? [],
+    elementDetails: populations?.elementDetails?.data ?? [],
+    custompop: populations?.students ?? [],
+  })
+)
 
-  const allSemesters = useSelector(state => state.semesters.data?.semesters || [])
-  const courses = useSelector(state => state.populationCourses.data?.coursestatistics)
-  const elementDetails = useSelector(state => state.populations.data.elementdetails?.data ?? [])
-  const custompop = useSelector(state => state.populations.data?.students || [])
+const CustomPopulation = () => {
+  const { language } = useLanguage()
+  const dispatch = useDispatch()
+
+  const { allSemesters, elementDetails, custompop } = useSelector(selectCustomPopulationData)
+
+  const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
+    studentNumbers: custompop.map(s => s.studentNumber),
+  })
 
   useTitle('Custom population')
 
   useEffect(() => {
-    getSemestersDispatch()
-    getCustomPopulationSearchesDispatch()
+    dispatch(getSemesters())
+    dispatch(getCustomPopulationSearches())
   }, [])
 
   const filters = useMemo(
     () => [
       genderFilter,
       ageFilter,
-      courseFilter({ courses }),
+      courseFilter({ courses: courseStats?.coursestatistics ?? [] }),
       creditsEarnedFilter,
       transferredToProgrammeFilter,
       startYearAtUniFilter,
       tagsFilter,
       programmeFilter({
-        courses: courses ? courses.map(c => c.course.code) : [],
+        courses: courseStats?.coursestatistics ? courseStats?.coursestatistics.map(c => c.course.code) : [],
         elementDetails,
       }),
       creditDateFilter,
@@ -65,7 +78,7 @@ const CustomPopulation = ({ getCustomPopulationSearchesDispatch, getSemestersDis
         language,
       }),
     ],
-    [courses, elementDetails, allSemesters, language]
+    [courseStats, elementDetails, allSemesters, language]
   )
 
   return (
@@ -85,33 +98,18 @@ const CustomPopulationContent = ({ students, custompop }) => {
   const studentRef = useRef()
   const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
 
-  const dispatch = useDispatch()
-
   const { customPopulationSearches, searchedCustomPopulationSearchId } = useSelector(
     state => state.customPopulationSearch
   )
 
-  const courses = useSelector(state => state.populationCourses.data)
   const populations = useSelector(state => state.populations)
   const { customPopulationFlag } = populations
 
   const { progress } = useProgress(populations.loading)
 
-  const studentsRef = useRef()
-
-  useEffect(() => {
-    const studentNumbers = students.map(s => s.studentNumber)
-
-    if (!_.isEqual(studentsRef.current, studentNumbers)) {
-      studentsRef.current = studentNumbers
-
-      dispatch(
-        getCustomPopulationCoursesByStudentnumbers({
-          studentnumberlist: studentNumbers,
-        })
-      )
-    }
-  }, [students])
+  const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
+    studentNumbers: students.map(s => s.studentNumber),
+  })
 
   useEffect(() => {
     if (newestIndex) {
@@ -184,7 +182,7 @@ const CustomPopulationContent = ({ students, custompop }) => {
       content: {
         content: (
           <div ref={coursesRef}>
-            <CustomPopulationCourses filteredStudents={students} courses={courses} />
+            <CustomPopulationCourses filteredStudents={students} courses={courseStats} />
           </div>
         ),
       },
@@ -253,20 +251,4 @@ const CustomPopulationContent = ({ students, custompop }) => {
   )
 }
 
-const mapStateToProps = ({ populations, populationCourses, customPopulationSearch, semesters }) => ({
-  loading: populations.pending,
-  custompop: populations.data.students || [],
-  courses: populationCourses.data?.coursestatistics,
-  customPopulationFlag: populations.customPopulationFlag,
-  customPopulationSearches: customPopulationSearch.customPopulationSearches,
-  latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
-  searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId,
-  elementDetails: populations.data.elementdetails?.data ?? [],
-  allSemesters: semesters.data?.semesters || [],
-})
-
-export default connect(mapStateToProps, {
-  getCustomPopulationCoursesByStudentnumbers,
-  getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
-  getSemestersDispatch: getSemesters,
-})(CustomPopulation)
+export default CustomPopulation

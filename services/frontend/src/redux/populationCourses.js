@@ -1,4 +1,4 @@
-import { callController } from '../apiConnection'
+import { RTKApi, callController } from '../apiConnection'
 
 export const getPopulationCourses = ({
   semesters,
@@ -48,6 +48,22 @@ export const getCoursePopulationCourses = ({ coursecodes, from, to }) => {
 
   return callController(route, prefix, body, 'post', query, params)
 }
+
+const courseStatisticsApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getStudentListCourseStatistics: builder.query({
+      query: ({ studentNumbers }) => ({
+        url: '/v2/populationstatistics/coursesbystudentnumberlist',
+        method: 'POST',
+        body: {
+          studentnumberlist: studentNumbers,
+        },
+      }),
+    }),
+  }),
+})
+
+export const { useGetStudentListCourseStatisticsQuery } = courseStatisticsApi
 
 export const getCustomPopulationCoursesByStudentnumbers = ({ studentnumberlist, usingStudyGuidanceGroups }) => {
   const route = '/v2/populationstatistics/coursesbystudentnumberlist'
