@@ -7,6 +7,7 @@ import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import NewOverview from './NewOverview'
+import NewStudytrackOverview from './NewStudytrackOverview'
 import StudyTrackOverview from './StudyTrackOverview'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
@@ -78,7 +79,7 @@ const StudyProgramme = props => {
     })
     if (SHOW_NEW_OVERVIEW) {
       panes.push({
-        menuItem: 'New Overview',
+        menuItem: 'Basic information (NEW)',
         render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
       })
     }
@@ -88,6 +89,12 @@ const StudyProgramme = props => {
         render: () => (
           <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} admin={props.isAdmin} />
         ),
+      })
+    }
+    if (SHOW_NEW_OVERVIEW) {
+      panes.push({
+        menuItem: 'Populations and Studytracks (NEW)',
+        render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
       })
     }
     panes.push({

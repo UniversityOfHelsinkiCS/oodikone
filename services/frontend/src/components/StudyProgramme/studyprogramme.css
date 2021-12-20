@@ -31,3 +31,7 @@
   height: 500px;
   margin-left: 2em;
 }
+
+.studytrack-overview .studytrack-selector {
+  margin: 60px 200px 60px 60px;
+}
