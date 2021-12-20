@@ -6,6 +6,7 @@ const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
 const createRedisKeyForBasicStats = (id, yearType) => `BASIC_STATS_${id}_${yearType}`
 const createRedisKeyForCreditStats = (id, yearType) => `CREDIT_STATS_${id}_${yearType}`
 const createRedisKeyForGraduationStats = (id, yearType) => `GRADUATION_STATS_${id}_${yearType}`
+const createRedisKeyForStudytrackStats = id => `STUDYTRACK_STATS_${id}`
 
 const getProductivity = async id => {
   const redisKey = createRedisKeyForProductivity(id)
@@ -150,6 +151,26 @@ const setGraduationStats = async (data, yearType) => {
   return dataToRedis
 }
 
+const getStudytrackStats = async id => {
+  const redisKey = createRedisKeyForStudytrackStats(id)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
+}
+
+const setStudytrackStats = async data => {
+  const { id } = data
+  const redisKey = createRedisKeyForStudytrackStats(id)
+  const dataToRedis = {
+    ...data,
+    status: 'DONE',
+    lastUpdated: moment().format(),
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
+  return dataToRedis
+}
+
 module.exports = {
   getProductivity,
   setProductivity,
@@ -163,4 +184,6 @@ module.exports = {
   setCreditStats,
   getGraduationStats,
   setGraduationStats,
+  getStudytrackStats,
+  setStudytrackStats,
 }

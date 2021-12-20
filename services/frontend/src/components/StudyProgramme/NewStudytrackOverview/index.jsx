@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { Divider } from 'semantic-ui-react'
+import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import InfoBox from '../../Info/InfoBox'
 import StudytrackSelector from './StudytrackSelector'
 
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const StudytrackOverview = () => {
+const StudytrackOverview = ({ studyprogramme }) => {
   const [track, setTrack] = useState('All students of the studyprogramme')
   const toolTips = InfotoolTips.Studyprogramme
+  const stats = useGetStudytrackStatsQuery({ id: studyprogramme })
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -30,6 +32,7 @@ const StudytrackOverview = () => {
         }`,
         toolTips.PopulationOverview
       )}
+      {stats?.id}
     </div>
   )
 }
