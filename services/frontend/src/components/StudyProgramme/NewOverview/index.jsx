@@ -69,7 +69,7 @@ const Overview = ({ studyprogramme }) => {
             <BarChart data={graduations?.data} />
             <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
           </div>
-          {getDivider('Average graduation times', 'GraduationMedianTime')}
+          {getDivider('Average graduation times', 'AverageGraduationTimes')}
           {getRadioButton('Mean time', 'Median time', showMeanTime, setShowMeanTime)}
           {showMeanTime ? (
             <div className="section-container">
