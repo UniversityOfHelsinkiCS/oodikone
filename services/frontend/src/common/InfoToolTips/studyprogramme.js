@@ -30,4 +30,5 @@ export default {
   GraduationMeanTime: `Näyttää kyseisenä vuonna valmistuneiden opintojen keston **keskiarvon** kuukausina.
   
   Mukana ovat vain valmistuneet opiskelijat. Kandiohjelmissa tavoiteaika on 36 kk, maisteriohjelmissa 24 kk`,
+  StudytrackOverview: ``,
 }
