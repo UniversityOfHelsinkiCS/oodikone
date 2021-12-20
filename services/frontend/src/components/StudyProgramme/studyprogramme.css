@@ -1,7 +1,7 @@
-.studyprogramme-overview .year-toggle {
+.studyprogramme-overview .radio-toggle {
   display: flex;
   justify-content: center;
-  margin: 30px;
+  margin: 20px 35px 35px 35px;
 }
 
 .studyprogramme-overview .toggle-label {
