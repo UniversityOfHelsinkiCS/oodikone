@@ -1,19 +1,32 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Segment, Button } from 'semantic-ui-react'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import InfoBox from '../Info/InfoBox'
 import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
+import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import infotooltips from '../../common/InfoToolTips'
 
 const PopulationCourses = ({ query = {}, filteredStudents }) => {
   const [showByStudytrack, setShowByStudytrack] = useState(true)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
+  const dispatch = useDispatch()
+
   const populationSelectedStudentCourses = useSelector(
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
+
+  useEffect(() => {
+    dispatch(
+      getPopulationSelectedStudentCourses({
+        ...query,
+        studyRights: [query.studyRights.programme],
+        selectedStudents: filteredStudents.map(s => s.studentNumber),
+      })
+    )
+  }, [query, filteredStudents])
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses

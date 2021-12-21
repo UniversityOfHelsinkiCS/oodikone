@@ -13,7 +13,7 @@ describe('Student Statistics tests', () => {
     studentnumber: '010654019',
   }
 
-  it.only('Student statistics search form is usable', () => {
+  it('Student statistics search form is usable', () => {
     cy.contains('Show student names')
     cy.url().should('include', '/students')
     cy.get('.prompt').type(student.lastname)
@@ -80,11 +80,21 @@ describe('Student Statistics tests', () => {
     cy.contains('Student number').should('not.exist')
   })
 
-  it.only('Can jump to population page', () => {
+  it('Can jump to population page', () => {
     cy.get('.prompt').type(student.studentnumber)
     cy.contains(student.studentnumber).click()
     cy.get('i.level.up.alternate.icon').eq(0).click()
     cy.contains('Population statistics')
     cy.contains('Tietojenkäsittelytieteen kandiohjelma')
+  })
+})
+
+// Use admin to see all students
+describe('Testing with admin rights', () => {
+  it('Does not crash if student has no studyright or courses', () => {
+    const studentNumber = '011825096'
+    cy.init(`/students/${studentNumber}`, 'admin') // use admin to see all students
+    cy.contains('Started: Unavailable')
+    cy.contains('Credits: 0')
   })
 })

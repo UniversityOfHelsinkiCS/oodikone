@@ -12,7 +12,6 @@ const {
   SemesterEnrollment,
   Semester,
 } = require('../models')
-const { ThesisCourse } = require('../models/models_kone')
 const { formatStudyright } = require('./studyprogrammeHelpers')
 
 const enrolledStudyrights = async studytrack => {
@@ -265,34 +264,38 @@ const getTransferredCredits = async (provider, since) =>
     },
   })
 
-const getThesisCredits = async (studyprogramme, since) => {
-  const thesiscourses = await ThesisCourse.findAll({
-    where: {
-      programmeCode: studyprogramme,
-    },
-  })
-  return await Credit.findAll({
+const getThesisCredits = async (provider, since, thesisType) =>
+  await Credit.findAll({
+    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
     include: {
       model: Course,
+      attributes: ['code'],
       required: true,
-      distinct: true,
-      col: 'student_studentnumber',
       where: {
-        code: {
-          [Op.in]: thesiscourses.map(tc => tc.courseCode),
+        course_unit_type: {
+          [Op.in]: thesisType,
+        },
+      },
+      include: {
+        model: Organization,
+        required: true,
+        where: {
+          code: provider,
         },
       },
     },
     where: {
       credittypecode: {
-        [Op.eq]: 4,
+        [Op.notIn]: [10, 9, 7],
+      },
+      isStudyModule: {
+        [Op.not]: true,
       },
       attainment_date: {
         [Op.gte]: since,
       },
     },
   })
-}
 
 module.exports = {
   enrolledStudyrights,

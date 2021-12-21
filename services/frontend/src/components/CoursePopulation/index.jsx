@@ -7,7 +7,7 @@ import scrollToComponent from 'react-scroll-to-component'
 import InfoBox from 'components/Info/InfoBox'
 import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
-import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
+import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
 import { getFaculties } from '../../redux/faculties'
 import { getSemesters } from '../../redux/semesters'
 import { getElementDetails } from '../../redux/elementdetails'
@@ -39,7 +39,6 @@ const CoursePopulation = ({
   getSingleCourseStatsDispatch,
   getElementDetails,
   studentData,
-  courseStatistics,
   pending,
   elementDetails,
   history,
@@ -47,7 +46,6 @@ const CoursePopulation = ({
   getSemestersDispatch,
   semesters,
   getFacultiesDispatch,
-  getCustomPopulationCoursesByStudentnumbers,
 }) => {
   const { language } = useLanguage()
 
@@ -72,16 +70,9 @@ const CoursePopulation = ({
     [studentData.students, codes]
   )
 
-  // Pass students to filter context.
-  useEffect(() => {
-    // setAllStudents(studentData.students || [])
-
-    // Data fetching for courses of population tab
-    if (!studentData.students) return
-    getCustomPopulationCoursesByStudentnumbers({
-      studentnumberlist: studentData.students.map(student => student.studentNumber),
-    })
-  }, [studentData.students])
+  const { data: courseStatistics } = useGetStudentListCourseStatisticsQuery({
+    studentNumbers: studentData.students ? studentData.students.map(student => student.studentNumber) : [],
+  })
 
   useEffect(() => {
     getElementDetails()
@@ -242,7 +233,7 @@ const CoursePopulation = ({
       content: {
         content: (
           <div ref={programmeRef}>
-            <CustomPopulationCourses filteredStudents={filtered} showFilter={false} />
+            <CustomPopulationCoursesWrapper filteredStudents={filtered} showFilter={false} />
           </div>
         ),
       },
@@ -307,7 +298,7 @@ const CoursePopulation = ({
       filters={[
         genderFilter,
         ageFilter,
-        courseFilter({ courses: courseStatistics }),
+        courseFilter({ courses: courseStatistics?.coursestatistics }),
         creditsEarnedFilter,
         startYearAtUniFilter,
         programmeFilter({ courses, elementDetails }),
@@ -317,7 +308,7 @@ const CoursePopulation = ({
           to: dateTo,
         }),
       ]}
-      students={studentData.students}
+      students={studentData.students ?? []}
     >
       {filtered => (
         <div className="segmentContainer">
@@ -336,6 +327,16 @@ const CoursePopulation = ({
   )
 }
 
+const CustomPopulationCoursesWrapper = props => {
+  const { data: courseStatistics, isLoading } = useGetStudentListCourseStatisticsQuery({
+    studentNumbers: props.filteredStudents.map(student => student.studentNumber),
+  })
+
+  if (isLoading) return null
+
+  return <CustomPopulationCourses {...props} courses={courseStatistics} />
+}
+
 CoursePopulation.propTypes = {
   getCoursePopulationDispatch: func.isRequired,
   getSingleCourseStatsDispatch: func.isRequired,
@@ -349,14 +350,12 @@ CoursePopulation.propTypes = {
     years: shape({}),
   }).isRequired,
   getFacultiesDispatch: func.isRequired,
-  getCustomPopulationCoursesByStudentnumbers: func.isRequired,
 }
 
 const mapStateToProps = ({
   singleCourseStats,
   populations,
   semesters,
-  populationCourses,
   auth: {
     token: { roles },
   },
@@ -365,7 +364,6 @@ const mapStateToProps = ({
     studentData: populations.data,
     pending: populations.pending,
     courseData: singleCourseStats.stats || {},
-    courseStatistics: populationCourses?.data?.coursestatistics,
     semesters: semesters.data,
     elementDetails: populations?.data?.elementdetails?.data,
     isAdmin: getUserIsAdmin(roles),
@@ -379,6 +377,5 @@ export default withRouter(
     getSemestersDispatch: getSemesters,
     getFacultiesDispatch: getFaculties,
     getElementDetails,
-    getCustomPopulationCoursesByStudentnumbers,
   })(CoursePopulation)
 )

@@ -101,7 +101,11 @@ const filter = createFilter({
 
   filter(student, { courseFilters }, { precomputed: courseMap }) {
     return Object.entries(courseFilters).reduce((result, [code, filterType]) => {
-      return result && filterFunctions[filterType](student, courseMap[code])
+      const stats = courseMap[code]
+
+      if (!stats) return false
+
+      return result && filterFunctions[filterType](student, stats)
     }, true)
   },
 
