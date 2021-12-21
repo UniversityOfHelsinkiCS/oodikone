@@ -35,3 +35,14 @@
 .studytrack-overview .studytrack-selector {
   margin: 60px 200px 60px 60px;
 }
+
+.studytrack-overview .header-row {
+  font-weight: bold;
+}
+
+.studytrack-overview .datatable {
+  text-align: 'center';
+  margin: '20px', '60px', '200px', '0px';
+  min-height: '300px';
+  width: '1600px';
+}
