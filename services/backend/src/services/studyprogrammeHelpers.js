@@ -14,6 +14,15 @@ const formatStudyright = studyright => {
   }
 }
 
+const formatStudent = student => {
+  const { studentnumber, gender_code, home_country_en } = student
+  return {
+    studentnumber,
+    gender_code,
+    home_country_en,
+  }
+}
+
 const getYearsArray = (since, isAcademicYear) => {
   const years = []
   for (let i = since; i <= new Date().getFullYear(); i++) {
@@ -97,6 +106,7 @@ const getThesisType = studyprogramme => {
 
 module.exports = {
   formatStudyright,
+  formatStudent,
   getYearsArray,
   getYearsObject,
   getStatsBasis,

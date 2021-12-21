@@ -12,7 +12,22 @@ const {
   SemesterEnrollment,
   Semester,
 } = require('../models')
-const { formatStudyright } = require('./studyprogrammeHelpers')
+const { formatStudyright, formatStudent } = require('./studyprogrammeHelpers')
+
+const whereStudents = studentnumbers => {
+  return studentnumbers ? studentnumbers : { [Op.not]: null }
+}
+
+const studytrackStudents = async studentnumbers =>
+  (
+    await Student.findAll({
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers,
+        },
+      },
+    })
+  ).map(formatStudent)
 
 const enrolledStudyrights = async studytrack => {
   const studyrights = await Studyright.findAll({
@@ -96,27 +111,37 @@ const enrolledStudyrights = async studytrack => {
   return enrollments
 }
 
-const startedStudyrights = async (studytrack, since) =>
-  await Studyright.findAll({
-    include: {
-      model: StudyrightElement,
-      required: true,
-      include: {
-        model: ElementDetail,
-        required: true,
-        where: {
-          code: studytrack,
+const startedStudyrights = async (studytrack, since, studentnumbers) =>
+  (
+    await Studyright.findAll({
+      include: [
+        {
+          model: StudyrightElement,
+          required: true,
+          include: {
+            model: ElementDetail,
+            required: true,
+            where: {
+              code: studytrack,
+            },
+          },
         },
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
+      where: {
+        studystartdate: {
+          [Op.gte]: since,
+        },
+        student_studentnumber: whereStudents(studentnumbers),
       },
-    },
-    where: {
-      studystartdate: {
-        [Op.gte]: since,
-      },
-    },
-  })
+    })
+  ).map(formatStudyright)
 
-const graduatedStudyRights = async (studytrack, since) =>
+const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
   await Studyright.findAll({
     include: {
       model: StudyrightElement,
@@ -134,6 +159,7 @@ const graduatedStudyRights = async (studytrack, since) =>
       enddate: {
         [Op.gte]: since,
       },
+      student_studentnumber: whereStudents(studentnumbers),
     },
   })
 
@@ -298,6 +324,7 @@ const getThesisCredits = async (provider, since, thesisType) =>
   })
 
 module.exports = {
+  studytrackStudents,
   enrolledStudyrights,
   startedStudyrights,
   graduatedStudyRights,
