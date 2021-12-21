@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { connect } from 'react-redux'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
+import { createSelector } from '@reduxjs/toolkit'
+import { useSelector, useDispatch } from 'react-redux'
 import { Segment, Header, Accordion, Message } from 'semantic-ui-react'
-import { shape, func, arrayOf, bool, string } from 'prop-types'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
-import { getCustomPopulationCoursesByStudentnumbers } from '../../redux/populationCourses'
+import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
 import { getSemesters } from '../../redux/semesters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -32,51 +32,90 @@ import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
 import UnihowDataExport from './UnihowDataExport'
 
-const CustomPopulation = ({
-  allSemesters,
-  courses,
-  custompop,
-  customPopulationFlag,
-  customPopulationSearches,
-  elementDetails,
-  getCustomPopulationSearchesDispatch,
-  getSemestersDispatch,
-  latestCreatedCustomPopulationSearchId,
-  loading,
-  searchedCustomPopulationSearchId,
-}) => {
+const selectCustomPopulationData = createSelector(
+  state => state.semesters.data,
+  state => state.populations.data,
+  (semesters, populations) => ({
+    allSemesters: semesters?.semesters ?? [],
+    elementDetails: populations?.elementDetails?.data ?? [],
+    custompop: populations?.students ?? [],
+  })
+)
+
+const CustomPopulation = () => {
+  const { language } = useLanguage()
+  const dispatch = useDispatch()
+
+  const { allSemesters, elementDetails, custompop } = useSelector(selectCustomPopulationData)
+
+  const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
+    studentNumbers: custompop.map(s => s.studentNumber),
+  })
+
+  useTitle('Custom population')
+
+  useEffect(() => {
+    dispatch(getSemesters())
+    dispatch(getCustomPopulationSearches())
+  }, [])
+
+  const filters = useMemo(
+    () => [
+      genderFilter,
+      ageFilter,
+      courseFilter({ courses: courseStats?.coursestatistics ?? [] }),
+      creditsEarnedFilter,
+      transferredToProgrammeFilter,
+      startYearAtUniFilter,
+      tagsFilter,
+      programmeFilter({
+        courses: courseStats?.coursestatistics ? courseStats?.coursestatistics.map(c => c.course.code) : [],
+        elementDetails,
+      }),
+      creditDateFilter,
+      enrollmentStatusFilter({
+        allSemesters: allSemesters ?? [],
+        language,
+      }),
+    ],
+    [courseStats, elementDetails, allSemesters, language]
+  )
+
+  return (
+    <FilterView name="CustomPopulation" filters={filters} students={custompop} displayTray={custompop.length > 0}>
+      {students => <CustomPopulationContent students={students} custompop={custompop} />}
+    </FilterView>
+  )
+}
+
+const CustomPopulationContent = ({ students, custompop }) => {
   const { language } = useLanguage()
   const [activeIndex, setIndex] = useState([])
-  const [, setSelectedSearchId] = useState('')
   const [newestIndex, setNewest] = useState(null)
-  const selectedStudents = custompop.map(stu => stu.studentNumber)
-
-  const { progress } = useProgress(loading)
-
   const creditGainRef = useRef()
   const programmeRef = useRef()
   const coursesRef = useRef()
   const studentRef = useRef()
   const refs = [creditGainRef, programmeRef, coursesRef, studentRef]
 
-  useTitle('Custom population')
+  const { customPopulationSearches, searchedCustomPopulationSearchId } = useSelector(
+    state => state.customPopulationSearch
+  )
 
-  useEffect(() => {
-    getSemestersDispatch()
-    getCustomPopulationSearchesDispatch()
-  }, [])
+  const populations = useSelector(state => state.populations)
+  const { customPopulationFlag } = populations
+
+  const { progress } = useProgress(populations.loading)
+
+  const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
+    studentNumbers: students.map(s => s.studentNumber),
+  })
 
   useEffect(() => {
     if (newestIndex) {
       scrollToComponent(refs[newestIndex].current, { align: 'bottom' })
     }
   }, [activeIndex])
-
-  useEffect(() => {
-    if (latestCreatedCustomPopulationSearchId) {
-      setSelectedSearchId(latestCreatedCustomPopulationSearchId)
-    }
-  }, [latestCreatedCustomPopulationSearchId])
 
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
@@ -92,14 +131,13 @@ const CustomPopulation = ({
     else setNewest(null)
     setIndex(indexes)
   }
-
-  const createPanels = students => [
+  const createPanels = () => [
     {
       key: 0,
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Credit accumulation (for {selectedStudents.length} students)
+            Credit accumulation (for {students.length} students)
           </span>
         ),
       },
@@ -144,7 +182,7 @@ const CustomPopulation = ({
       content: {
         content: (
           <div ref={coursesRef}>
-            <CustomPopulationCourses filteredStudents={students} courses={courses} />
+            <CustomPopulationCourses filteredStudents={students} courses={courseStats} />
           </div>
         ),
       },
@@ -175,7 +213,7 @@ const CustomPopulation = ({
     },
   ]
 
-  const renderCustomPopulation = students => (
+  const renderCustomPopulation = () => (
     <div>
       {custompop && (
         <Header className="segmentTitle" size="large" textAlign="center">
@@ -185,86 +223,32 @@ const CustomPopulation = ({
             : ''}
         </Header>
       )}
-      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels(students)} />
+      <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels()} />
     </div>
   )
 
-  const filters = [
-    genderFilter,
-    ageFilter,
-    courseFilter({ courses }),
-    creditsEarnedFilter,
-    transferredToProgrammeFilter,
-    startYearAtUniFilter,
-    tagsFilter,
-    programmeFilter({
-      courses: courses ? courses.map(c => c.course.code) : [],
-      elementDetails,
-    }),
-    creditDateFilter,
-    enrollmentStatusFilter({
-      allSemesters: allSemesters ?? [],
-      language,
-    }),
-  ]
-
   return (
-    <FilterView name="CustomPopulation" filters={filters} students={custompop}>
-      {students => (
-        <div className="segmentContainer">
-          <Message style={{ maxWidth: '800px' }}>
-            <Message.Header>Custom population</Message.Header>
-            <p>
-              Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
-              button will open a modal where you can enter a list of studentnumbers. You can also save a custom
-              population by giving it a name and clicking the save button in the modal. It will then appear in the saved
-              populations list. These populations are personal meaning that they will only show to you. You can only
-              search studentnumbers you have access rights to i.e. you have rights to the programme they are in.
-            </p>
-          </Message>
-          <CustomPopulationSearch />
-          {custompop.length > 0 && customPopulationFlag ? (
-            <Segment className="contentSegment">{renderCustomPopulation(students)}</Segment>
-          ) : (
-            <Segment className="contentSegment">
-              <ProgressBar progress={progress} />
-            </Segment>
-          )}
-        </div>
+    <div className="segmentContainer">
+      <Message style={{ maxWidth: '800px' }}>
+        <Message.Header>Custom population</Message.Header>
+        <p>
+          Here you can create custom population using a list of studentnumbers. Clicking the blue custom population
+          button will open a modal where you can enter a list of studentnumbers. You can also save a custom population
+          by giving it a name and clicking the save button in the modal. It will then appear in the saved populations
+          list. These populations are personal meaning that they will only show to you. You can only search
+          studentnumbers you have access rights to i.e. you have rights to the programme they are in.
+        </p>
+      </Message>
+      <CustomPopulationSearch />
+      {custompop.length > 0 && customPopulationFlag ? (
+        <Segment className="contentSegment">{renderCustomPopulation(students)}</Segment>
+      ) : (
+        <Segment className="contentSegment">
+          <ProgressBar progress={progress} />
+        </Segment>
       )}
-    </FilterView>
+    </div>
   )
 }
 
-CustomPopulation.defaultProps = {
-  latestCreatedCustomPopulationSearchId: null,
-  searchedCustomPopulationSearchId: null,
-}
-
-CustomPopulation.propTypes = {
-  custompop: arrayOf(shape({})).isRequired,
-  customPopulationFlag: bool.isRequired,
-  loading: bool.isRequired,
-  customPopulationSearches: arrayOf(shape({})).isRequired,
-  latestCreatedCustomPopulationSearchId: string,
-  searchedCustomPopulationSearchId: string,
-  getCustomPopulationSearchesDispatch: func.isRequired,
-}
-
-const mapStateToProps = ({ populations, populationCourses, customPopulationSearch, semesters }) => ({
-  loading: populations.pending,
-  custompop: populations.data.students || [],
-  courses: populationCourses.data?.coursestatistics,
-  customPopulationFlag: populations.customPopulationFlag,
-  customPopulationSearches: customPopulationSearch.customPopulationSearches,
-  latestCreatedCustomPopulationSearchId: customPopulationSearch.latestCreatedCustomPopulationSearchId,
-  searchedCustomPopulationSearchId: customPopulationSearch.searchedCustomPopulationSearchId,
-  elementDetails: populations.data.elementdetails?.data ?? [],
-  allSemesters: semesters.data?.semesters || [],
-})
-
-export default connect(mapStateToProps, {
-  getCustomPopulationCoursesByStudentnumbers,
-  getCustomPopulationSearchesDispatch: getCustomPopulationSearches,
-  getSemestersDispatch: getSemesters,
-})(CustomPopulation)
+export default CustomPopulation

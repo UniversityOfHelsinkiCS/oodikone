@@ -26,7 +26,7 @@ const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
     checkFilteringResult(amountWithoutFiltering)
     testStepFunctionToRun()
     checkFilteringResult(amountWithoutFiltering)
-    cy.get(`[data-cy="${filterName}-header"]`).click()
+    cy.get(`[data-cy="${filterName}-header"]`).click({ force: true })
   }
 }
 
@@ -290,7 +290,7 @@ describe('Custom Population Statistics', () => {
     })
   })
 
-  it.only('Courses filter works', () => {
+  it('Courses filter works', () => {
     runTestStepWithPreAndPostParts('Courses', () => {
       const courses = ['MAT11001', 'TKT20004']
       cy.cs('courseFilter-course-dropdown')

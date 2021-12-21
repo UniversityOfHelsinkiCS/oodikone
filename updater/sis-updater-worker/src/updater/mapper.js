@@ -252,7 +252,7 @@ const timify = t => new Date(t).getTime()
 
 const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => {
   const [groupId, courses] = groupedCourse
-  const { code, name, study_level: coursetypecode } = courses[0]
+  const { code, name, study_level: coursetypecode, course_unit_type } = courses[0]
 
   const { min: startdate, max: enddate } = getMinMaxDate(
     courses,
@@ -291,6 +291,7 @@ const courseMapper = courseIdToAttainments => (groupedCourse, substitutions) => 
     enddate,
     is_study_module: false, // VALIDATE THIS PLS
     substitutions,
+    course_unit_type,
   }
 }
 

@@ -226,9 +226,12 @@ const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, 
   const seriesData = useMemo(() => createStudentCreditLines(students, singleStudent), [students, singleStudent])
 
   if (singleStudent) {
-    const starting = students[0].studyrights
-      .map(sr => new Date(sr.startdate))
-      .sort()[0]
+    const starting = _.chain(students[0].studyRights || students[0].courses)
+      .map(elem => new Date(elem.startdate || elem.date))
+      .sortBy()
+      .head()
+      .defaultTo(new Date())
+      .value()
       .getTime()
     const ending = endDate ? new Date(endDate).getTime() : new Date().getTime()
 

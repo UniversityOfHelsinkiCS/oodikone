@@ -1,30 +1,41 @@
 const { getImporterClient } = require('../util/importerClient')
 const importerClient = getImporterClient()
 const { StudyGuidanceGroupTag } = require('../models/models_kone')
+const logger = require('../util/logger')
 
 const getAllStudentsUserHasInGroups = async sisPersonId => {
   if (!importerClient) {
     return new Set()
   }
-  const { data } = await importerClient.get(`/person-groups/person/${sisPersonId}`)
-  return new Set(
-    Object.values(data)
-      .map(group => group.members)
-      .flat()
-      .map(member => member.personStudentNumber)
-  )
+  try {
+    const { data } = await importerClient.get(`/person-groups/person/${sisPersonId}`)
+    return new Set(
+      Object.values(data)
+        .map(group => group.members)
+        .flat()
+        .map(member => member.personStudentNumber)
+    )
+  } catch (error) {
+    logger.error("Couldn't fetch users studyguidance groups")
+    return new Set()
+  }
 }
 
 const getAllGroupsAndStudents = async sisPersonId => {
   if (!importerClient) {
     return []
   }
-  const { data } = await importerClient.get(`/person-groups/person/${sisPersonId}`)
-  const tagsByGroupId = (await StudyGuidanceGroupTag.findAll()).reduce((acc, curr) => {
-    const { studyProgramme, year } = curr
-    return { ...acc, [curr.studyGuidanceGroupId]: { studyProgramme, year } }
-  }, {})
-  return Object.values(data).map(group => ({ ...group, tags: tagsByGroupId[group.id] }))
+  try {
+    const { data } = await importerClient.get(`/person-groups/person/${sisPersonId}`)
+    const tagsByGroupId = (await StudyGuidanceGroupTag.findAll()).reduce((acc, curr) => {
+      const { studyProgramme, year } = curr
+      return { ...acc, [curr.studyGuidanceGroupId]: { studyProgramme, year } }
+    }, {})
+    return Object.values(data).map(group => ({ ...group, tags: tagsByGroupId[group.id] }))
+  } catch (error) {
+    logger.error("Couldn't fetch users studyguidance groups")
+    return []
+  }
 }
 
 const changeGroupTags = async ({ groupId, tags }) => {
