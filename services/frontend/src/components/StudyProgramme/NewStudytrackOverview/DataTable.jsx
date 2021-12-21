@@ -12,7 +12,7 @@ const getRow = (year, array, show, setShow) => {
   if (array[0] === 'TOTAL') {
     return (
       <Table.Row className="header-row" onClick={() => setShow(!show)}>
-        {array.map(value => (value ? getYearCell(year, show) : <Table.Cell>{value}</Table.Cell>))}
+        {array.map(value => (value === 'TOTAL' ? getYearCell(year, show) : <Table.Cell>{value}</Table.Cell>))}
       </Table.Row>
     )
   }

@@ -23,8 +23,9 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year) =>
 
   const data = await studytracks.reduce(async (all, track) => {
     const previousData = await all
+    const codes = track === studyprogramme ? [studyprogramme] : [studyprogramme, track]
     const studentnumbers = await studentnumbersWithAllStudyrightElements(
-      [studyprogramme, track],
+      codes,
       startDate,
       endDate,
       true,
