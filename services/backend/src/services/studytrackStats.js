@@ -1,12 +1,70 @@
-// const { getAssociations } = require('./studyrights')
-// const { getYearsArray } = require('./studyprogrammeHelpers')
+const moment = require('moment')
 
-const getStudytrackStatsForStudyprogramme = async studyprogramme => {
-  //  const years = getYearsArray(since)
-  //  const associations = await getAssociations()
-  //  const programmeYears = associations.programmes[studyprogramme]
-  //  const stats = years.map(async year => (programmeYears[year] ? Object.keys(programmeYears[year].studytracks) : []))
-  return { id: studyprogramme }
+const { getAssociations } = require('./studyrights')
+const { studentnumbersWithAllStudyrightElements } = require('./populations')
+const { getStartDate, getYearsArray } = require('./studyprogrammeHelpers')
+const { studytrackStudents, startedStudyrights, graduatedStudyRights } = require('./newStudyprogramme')
+const { semesterStart, semesterEnd } = require('../util/semester')
+
+const getStudentData = students => {
+  const data = { female: 0, male: 0, finnish: 0 }
+
+  students.forEach(({ gender_code, home_country_en }) => {
+    data.male += gender_code === '1' ? 1 : 0
+    data.female += gender_code === '2' ? 1 : 0
+    data.finnish += home_country_en === 'Finland' ? 1 : 0
+  })
+  return data
+}
+
+const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year) => {
+  const startDate = `${year}-${semesterStart['FALL']}`
+  const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
+
+  const data = await studytracks.reduce(async (all, track) => {
+    const previousData = await all
+    const studentnumbers = await studentnumbersWithAllStudyrightElements(
+      [studyprogramme, track],
+      startDate,
+      endDate,
+      true,
+      true,
+      true,
+      true
+    )
+    const started = await startedStudyrights(track, startDate, studentnumbers)
+    const startedStudentnumbers = [...new Set(started.map(s => s.studentnumber))]
+    const students = await studytrackStudents(startedStudentnumbers)
+    const studentData = getStudentData(students)
+    const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
+
+    return [
+      ...previousData,
+      [track, started.length, studentData.male, studentData.female, studentData.finnish, graduated.length],
+    ]
+  }, [])
+
+  return data
+}
+
+const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
+  const isAcademicYear = true
+  const since = getStartDate(studyprogramme, isAcademicYear)
+  const years = getYearsArray(since.getFullYear())
+
+  const associations = await getAssociations()
+  const studytracks = associations.programmes[studyprogramme]
+    ? [studyprogramme, ...associations.programmes[studyprogramme].studytracks]
+    : [studyprogramme]
+
+  const data = await Promise.all(
+    years.map(async year => {
+      const dataOfYear = await getStudytrackDataForTheYear(studyprogramme, studytracks, year)
+      return { year: `${year}-${year + 1}`, data: dataOfYear }
+    })
+  )
+
+  return { id: studyprogramme, data }
 }
 
 module.exports = {
