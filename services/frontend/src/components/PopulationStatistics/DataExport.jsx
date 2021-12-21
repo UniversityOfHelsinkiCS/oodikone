@@ -65,10 +65,24 @@ export default ({ students }) => {
     return studentTags.join(', ')
   }
 
-  const getAdmissionType = studyRights => {
+  const findCorrectStudyright = studyrights => {
     const code = queryStudyrights[0]
-    if (!code || !studyRights) return ''
-    const studyright = studyRights.find(sr => sr.studyright_elements.some(e => e.code === code))
+    if (!code || !studyrights) return ''
+    return studyrights.find(sr => sr.studyright_elements.some(e => e.code === code))
+  }
+
+  const getStartOfStudyright = studyrights => {
+    const studyright = findCorrectStudyright(studyrights)
+    return studyright?.startdate ? studyright.startdate : ''
+  }
+
+  const getStartedInStudyright = studyrights => {
+    const studyright = findCorrectStudyright(studyrights)
+    return studyright?.studystartdate ? studyright.studystartdate : ''
+  }
+
+  const getAdmissionType = studyrights => {
+    const studyright = findCorrectStudyright(studyrights)
     return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
   }
 
@@ -129,6 +143,8 @@ export default ({ students }) => {
         studytrack: studytrack(s.studyrights).map(st => st.name)[0],
         tags: tags(s.tags),
         'start year at university': reformatDate(s.started, 'YYYY'),
+        'start of studyright': getStartOfStudyright(s.studyrights),
+        'started in studyright': getStartedInStudyright(s.studyrights),
         'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber),
