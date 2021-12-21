@@ -77,24 +77,12 @@ const StudyProgramme = props => {
       menuItem: 'Overview',
       render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />,
     })
-    if (SHOW_NEW_OVERVIEW) {
-      panes.push({
-        menuItem: 'Basic information (NEW)',
-        render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
-      })
-    }
     if (filteredStudytracks.length > 0) {
       panes.push({
         menuItem: 'Studytrack overview',
         render: () => (
           <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} admin={props.isAdmin} />
         ),
-      })
-    }
-    if (SHOW_NEW_OVERVIEW) {
-      panes.push({
-        menuItem: 'Populations and Studytracks (NEW)',
-        render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
       })
     }
     panes.push({
@@ -109,6 +97,18 @@ const StudyProgramme = props => {
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />,
     })
+    if (SHOW_NEW_OVERVIEW) {
+      panes.push({
+        menuItem: 'Basic information (NEW)',
+        render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
+      })
+    }
+    if (SHOW_NEW_OVERVIEW) {
+      panes.push({
+        menuItem: 'Populations and Studytracks (NEW)',
+        render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
+      })
+    }
     if (props.isAdmin) {
       panes.push({
         menuItem: 'Admin',
