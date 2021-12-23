@@ -133,4 +133,5 @@ export default {
   ProgrammeDistributionCoursePopulation: `Näyttää sen koulutusohjelman, jossa opiskelija oli suorittaessaan kurssin`,
   GradeDistributionCoursePopulation: `Näyttää korkeimman arvosanan, jonka opiskelija on saanut valitulla aikavälillä.`,
   CreditDistributionCoursePopulation: `Näyttää tiedekunta-/ohjelmankohtaisen opintopistejakauman.`,
+  LanguageDistributionCoursePopulation: `Näyttää kielijakauman kurssin suorituskielistä.`,
 }
