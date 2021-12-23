@@ -61,13 +61,14 @@ const findOneByCode = code => {
 }
 
 const creditsForCourses = async (codes, anonymizationSalt, unifyOpenUniCourses) => {
-  let is_open = null
-  /* {
-    [Op.in]: [true, false],
-  } */
-  if (!unifyOpenUniCourses) {
-    is_open = null
+  let is_open = false
+
+  if (unifyOpenUniCourses) {
+    is_open = {
+      [Op.in]: [false, true],
+    }
   }
+
   const credits = await Credit.findAll({
     include: [
       {
@@ -113,10 +114,11 @@ const creditsForCourses = async (codes, anonymizationSalt, unifyOpenUniCourses) 
       student_studentnumber: {
         [Op.ne]: null,
       },
-      is_open,
+      [Op.or]: [{ is_open }, { is_open: null }],
     },
     order: [['attainment_date', 'ASC']],
   })
+
   const parsedCredits = credits.map(credit => parseCredit(credit, anonymizationSalt))
   return parsedCredits
 }
