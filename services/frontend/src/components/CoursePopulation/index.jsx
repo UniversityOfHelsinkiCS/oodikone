@@ -190,7 +190,7 @@ const CoursePopulation = ({
       content: {
         content: (
           <div ref={languageDistRef}>
-            <InfoBox content={infotooltips.PopulationStatistics.GradeDistributionCoursePopulation} />
+            <InfoBox content={infotooltips.PopulationStatistics.LanguageDistributionCoursePopulation} />
             <CoursePopulationLanguageDist from={dateFrom} to={dateTo} samples={studentData.students} codes={codes} />
           </div>
         ),
