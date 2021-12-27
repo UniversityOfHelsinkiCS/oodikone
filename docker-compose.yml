@@ -26,18 +26,17 @@ services:
       - kone-db
       - redis
       - sis-db
+      - user-db
     env_file:
       - .env
     environment:
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
+      DB_URL_USER: postgres://postgres@user-db:5432/user-db
       FRONT_URL: http://localhost:3000
       REDIS: redis
       SECRET_TOKEN: dev
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
-      TOKEN_SECRET: IWannaBeTheVeryBest
-      USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      USERSERVICE_URL: http://userservice:4567
     ports:
       - 8080:8080
     profiles:
@@ -165,26 +164,6 @@ services:
     volumes:
       - user-db-data:/data
 
-  userservice:
-    <<: *defaults
-    build:
-      <<: *build_defaults
-      context: services/userservice
-    container_name: userservice
-    depends_on:
-      - user-db
-    environment:
-      DB_URL: postgres://postgres@user-db:5432/user-db
-      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      TOKEN_SECRET: IWannaBeTheVeryBest
-    ports:
-      - 4567:4567
-    profiles:
-      - oodikone
-    volumes:
-      - userservice-nodemod:/usr/src/app/node_modules
-      - ./services/userservice/:/usr/src/app
-
 volumes:
   backend-nodemod:
   frontend-nodemod:
@@ -195,4 +174,3 @@ volumes:
   sis-updater-scheduler-nodemod:
   sis-updater-worker-nodemod:
   user-db-data:
-  userservice-nodemod:

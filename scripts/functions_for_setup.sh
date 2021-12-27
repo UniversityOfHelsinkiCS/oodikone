@@ -165,7 +165,6 @@ set_up_oodikone_from_scratch() {
   folders_to_set_up=(
     "$PROJECT_ROOT"
     "$PROJECT_ROOT/services/frontend"
-    "$PROJECT_ROOT/services/userservice"
     "$PROJECT_ROOT/services/backend"
     "$PROJECT_ROOT/updater/sis-updater-scheduler"
     "$PROJECT_ROOT/updater/sis-updater-worker"

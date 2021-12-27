@@ -79,7 +79,7 @@ It is recommended to spend some time to become familiar with `docker` and `docke
 - `docker-compose ps`: view the containers in the running environment
 - `docker-compose logs frontend`: print logs for just frontend
 - `docker-compose logs --follow --tail 100 backend`: print last hundred rows of backend logs and begin to follow them in your terminal window
-- `docker exec -it userservice sh`: open bash terminal inside userservice container
+- `docker exec -it backend sh`: open bash terminal inside backend container
 - `docker exec -it sis-db psql -U postgres sis-db-real`: open psql client to investigate sis real data database.
 
 ### User types for development

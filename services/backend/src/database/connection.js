@@ -46,6 +46,10 @@ const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
 })
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
+const sequelizeUser = new Sequelize(conf.DB_URL_USER, {
+  logging: false,
+})
+
 const initializeDatabaseConnection = async () => {
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
   const waitSeconds = 60
@@ -55,7 +59,7 @@ const initializeDatabaseConnection = async () => {
       break
     } catch (e) {
       if (i === waitSeconds) {
-        logger.error(`Could not connect to database in ${waitSeconds} seconds`)
+        logger.error(`Could not connect to kone database in ${waitSeconds} seconds`)
         throw e
       }
       await sleep(1000)
@@ -82,11 +86,45 @@ const initializeDatabaseConnection = async () => {
     logger.error({ message: 'Kone Migration error: ', meta: e })
     throw e
   }
+
+  for (let i = 1; i <= waitSeconds; i++) {
+    try {
+      await sequelizeUser.authenticate()
+      break
+    } catch (e) {
+      if (i === waitSeconds) {
+        logger.error(`Could not connect to user database in ${waitSeconds} seconds`)
+        throw e
+      }
+      await sleep(1000)
+    }
+  }
+
+  try {
+    const migrator = new Umzug({
+      storage: 'sequelize',
+      storageOptions: {
+        sequelize: sequelizeUser,
+        tableName: 'migrations',
+      },
+      migrations: {
+        params: [sequelizeUser.getQueryInterface(), Sequelize],
+        path: `${process.cwd()}/src/database/migrations_user`,
+        pattern: /\.js$/,
+      },
+    })
+    const migrations = await migrator.up()
+    logger.info({ message: 'Kone Migrations up to date', meta: migrations })
+  } catch (e) {
+    logger.error({ message: 'Kone Migration error: ', meta: e })
+    throw e
+  }
 }
 
 const dbConnections = new DbConnection()
 module.exports = {
   dbConnections,
   sequelizeKone,
+  sequelizeUser,
   initializeDatabaseConnection,
 }
