@@ -1,4 +1,4 @@
-const { NODE_ENV, DB_URL, SECRET, TOKEN_SECRET, SENTRY_RELEASE, SENTRY_ENVIRONMENT, CI } = process.env
+const { NODE_ENV, DB_URL, SECRET, SENTRY_RELEASE, SENTRY_ENVIRONMENT, CI } = process.env
 
 // Sentry
 const sentryRelease = SENTRY_RELEASE || ''
@@ -18,7 +18,6 @@ const requiredGroup = isStaging
 module.exports = {
   DB_URL,
   SECRET,
-  TOKEN_SECRET,
   requiredGroup,
   courseStatisticsGroup,
   sentryRelease,
