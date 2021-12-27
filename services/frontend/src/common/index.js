@@ -1,5 +1,4 @@
 import moment from 'moment'
-import jwtDecode from 'jwt-decode'
 import Datetime from 'react-datetime'
 import { filter, maxBy, sortBy, intersection } from 'lodash'
 import pathToRegexp from 'path-to-regexp'
@@ -18,14 +17,6 @@ export const textAndDescriptionSearch = (dropDownOptions, param) =>
       ? option.text.toLowerCase().concat(option.description.toLowerCase()).includes(param.toLowerCase())
       : null
   )
-
-export const decodeToken = token => {
-  try {
-    return jwtDecode(token)
-  } catch (e) {
-    return null
-  }
-}
 
 export const images = {
   toskaLogo,
