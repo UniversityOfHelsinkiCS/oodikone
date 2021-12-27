@@ -40,6 +40,7 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year) =>
     const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
     const label = track === studyprogramme ? 'TOTAL' : track
 
+    if (started.length === 0) return previousData
     return [
       ...previousData,
       [label, started.length, studentData.male, studentData.female, studentData.finnish, graduated.length],
