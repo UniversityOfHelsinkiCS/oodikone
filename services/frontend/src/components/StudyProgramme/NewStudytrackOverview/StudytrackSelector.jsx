@@ -4,6 +4,9 @@ import { Dropdown } from 'semantic-ui-react'
 import '../studyprogramme.css'
 
 const StudytrackSelector = ({ track, setTrack, studytracks }) => {
+  if (!studytracks) return null
+  const formattedStudytracks = ['All students of the studyprogramme', ...studytracks]
+
   const handleStudytrackChange = (event, { value }) => {
     event.preventDefault()
     setTrack(value)
@@ -17,7 +20,7 @@ const StudytrackSelector = ({ track, setTrack, studytracks }) => {
         selection
         value={track}
         onChange={handleStudytrackChange}
-        options={studytracks?.map(o => ({ key: o, value: o, text: o }))}
+        options={formattedStudytracks.map(o => ({ key: o, value: o, text: o }))}
       />
     </div>
   )

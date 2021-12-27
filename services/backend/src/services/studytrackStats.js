@@ -1,4 +1,5 @@
 const moment = require('moment')
+const _ = require('lodash')
 
 const { getAssociations } = require('./studyrights')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
@@ -62,24 +63,45 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year) =>
   return data
 }
 
+const getStudytrackNames = (allStudytracks, programmesStudytracks) => {
+  const studytrackNameObject = {}
+  let studytrackNameArray = []
+  programmesStudytracks.forEach(track => {
+    const trackName = allStudytracks[track]?.name['fi']
+    if (trackName) {
+      studytrackNameObject[track] = trackName
+      studytrackNameArray = [...studytrackNameArray, trackName]
+    }
+  })
+  return { studytrackNameObject, studytrackNameArray: _.uniq(studytrackNameArray) }
+}
+
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
   const isAcademicYear = true
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear()).reverse()
 
   const associations = await getAssociations()
-  const studytracks = associations.programmes[studyprogramme]
+  const programmesStudytracks = associations.programmes[studyprogramme]
     ? [studyprogramme, ...associations.programmes[studyprogramme].studytracks]
     : [studyprogramme]
 
+  const allStudytracks = associations.studyTracks
+  const { studytrackNameArray, studytrackNameObject } = getStudytrackNames(allStudytracks, programmesStudytracks)
+
   const data = await Promise.all(
     years.map(async year => {
-      const dataOfYear = await getStudytrackDataForTheYear(studyprogramme, studytracks, year)
+      const dataOfYear = await getStudytrackDataForTheYear(
+        studyprogramme,
+        programmesStudytracks,
+        year,
+        studytrackNameObject
+      )
       return { year: `${year}-${year + 1}`, data: dataOfYear }
     })
   )
 
-  return { id: studyprogramme, data }
+  return { id: studyprogramme, data, studytrackNameArray }
 }
 
 module.exports = {
