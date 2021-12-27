@@ -45,19 +45,6 @@ jobs:
           'eslint --ext .jsx,.js services/frontend' \
           'stylelint services/frontend/src/**/*.css'
 
-  lint_userservice:
-    name: 'Lint userservice'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 14
-      - name: 'Install dependencies'
-        run: npm ci && cd services/userservice && npm ci
-      - name: 'Run frontend linter'
-        run: npm run eslint services/userservice
-
   # === Build images ===
   build_backend:
     name: 'Build backend'
@@ -114,32 +101,6 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           path: /tmp/frontend.tar
-
-  build_userservice:
-    name: 'Build userservice'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: docker/setup-buildx-action@v1
-      - name: 'Build image and export it'
-        uses: docker/build-push-action@v2
-        with:
-          build-args: |
-            SENTRY_RELEASE=${{ github.sha }}
-            SENTRY_ENVIRONMENT=staging
-          cache-from: |
-            type=registry,ref=toska/oodikone2-userservice:staging
-            type=registry,ref=toska/oodikone2-userservice:latest
-          cache-to: type=inline
-          context: services/userservice
-          push: false
-          tags: toska/oodikone2-userservice:staging
-          target: production
-          outputs: type=docker,dest=/tmp/userservice.tar
-      - name: 'Upload image for other jobs'
-        uses: actions/upload-artifact@v2
-        with:
-          path: /tmp/userservice.tar
 
   build_and_push_anon_sis_db:
     name: 'Build anon sis-db and push to toska hub if new migrations have been added'
@@ -201,7 +162,7 @@ jobs:
         with:
           filters: |
             migrations:
-              - 'services/userservice/src/database/migrations/**'
+              - 'services/backend/src/database/migrations_user/**'
               - '.github/workflows/test-oodikone.yaml'
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
@@ -209,31 +170,19 @@ jobs:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: 'Let userservice run migrations, then push new version of image to toska hub'
+      - name: 'Let backend run migrations, then push new version of image to toska hub'
         if: steps.check_migrations.outputs.migrations == 'true'
         run: |
-          docker-compose --file docker-compose.ci.yml up --detach userservice
+          docker-compose --file docker-compose.ci.yml up --detach backend
           sleep 30 # wait for sis-updater-worker to start and run migrations
           ./anonyymioodi/commit_and_push_to_toska_hub.sh user-db
 
-  # === Integration tests ===
-  #
-  run_userservice_integration_tests:
-    name: 'Run userservice integration tests'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: 'Run tests included in docker build'
-        run: docker-compose --file docker-compose.test.yml up --build userservice-test
-
   # === End-to-end tests ===
-
   test_course_statistics:
     name: 'Test course statistics'
     needs:
       - build_backend
       - build_frontend
-      - build_userservice
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -248,7 +197,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
@@ -279,7 +227,6 @@ jobs:
     needs:
       - build_backend
       - build_frontend
-      - build_userservice
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -294,7 +241,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
@@ -325,7 +271,6 @@ jobs:
     needs:
       - build_backend
       - build_frontend
-      - build_userservice
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -340,7 +285,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
@@ -371,7 +315,6 @@ jobs:
     needs:
       - build_backend
       - build_frontend
-      - build_userservice
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -386,7 +329,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
@@ -417,7 +359,6 @@ jobs:
     needs:
       - build_backend
       - build_frontend
-      - build_userservice
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -432,7 +373,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
@@ -463,7 +403,6 @@ jobs:
     needs:
       - build_backend
       - build_frontend
-      - build_userservice
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -478,7 +417,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
@@ -509,7 +447,6 @@ jobs:
     needs:
       - build_backend
       - build_frontend
-      - build_userservice
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -524,7 +461,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
@@ -559,7 +495,6 @@ jobs:
     needs:
       - build_backend
       - build_frontend
-      - build_userservice
       - build_and_push_anon_sis_db
       - build_and_push_anon_kone_db
       - build_and_push_anon_user_db
@@ -574,7 +509,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to toska docker registry'
         uses: docker/login-action@v1
         with:
@@ -602,8 +536,6 @@ jobs:
     needs:
       - lint_backend
       - lint_frontend
-      - lint_userservice
-      - run_userservice_integration_tests
       - test_course_statistics
       - test_custom_population
       - test_filters
@@ -622,7 +554,6 @@ jobs:
         run: |
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
-          docker load --input /tmp/artifact/userservice.tar
       - name: 'Login to DockerHub'
         uses: docker/login-action@v1
         with:
@@ -649,7 +580,6 @@ jobs:
         run: |
           docker push toska/oodikone2-backend:staging
           docker push toska/oodikone2-frontend:staging
-          docker push toska/oodikone2-userservice:staging
       - name: 'Send deployment success notification to slack'
         if: success()
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
@@ -672,8 +602,6 @@ jobs:
     needs:
       - lint_backend
       - lint_frontend
-      - lint_userservice
-      - run_userservice_integration_tests
       - test_course_statistics
       - test_custom_population
       - test_filters

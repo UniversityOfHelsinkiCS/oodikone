@@ -9,17 +9,16 @@ services:
       - kone-db
       - redis
       - sis-db
+      - user-db
     environment:
       CI: 'true'
+      DB_URL_USER: postgres://postgres@user-db:5432/user-db
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db
       FRONT_URL: http://localhost:1337
       REDIS: redis
       SECRET_TOKEN: dev
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db
       SIS_UPDATER_URL: http://sis-updater-scheduler:8082
-      TOKEN_SECRET: IWannaBeTheVeryBest
-      USERSERVICE_SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      USERSERVICE_URL: http://userservice:4567
     image: toska/oodikone2-backend:staging
 
   frontend:
@@ -63,25 +62,12 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     image: registry.toska.cs.helsinki.fi/user-db
 
-  userservice:
-    <<: *defaults
-    container_name: userservice
-    depends_on:
-      - user-db
-    environment:
-      CI: 'true'
-      DB_URL: postgres://postgres@user-db:5432/user-db
-      SECRET: Luukk4inenApprov3dVitunMinttuSalainenAvain666NurmivaaraPJ2019
-      TOKEN_SECRET: IWannaBeTheVeryBest
-    image: toska/oodikone2-userservice:staging
-
   nginx:
     image: nginx:latest
     container_name: nginx
     depends_on:
       - frontend
       - backend
-      - userservice
     ports:
       - 1337:80
     volumes:

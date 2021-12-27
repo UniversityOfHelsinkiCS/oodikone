@@ -1,4 +1,4 @@
-const { AccessGroup } = require('../models/index')
+const { AccessGroup } = require('../../models/models_user')
 const { Op } = require('sequelize')
 
 const byId = id => AccessGroup.findByPk(id)

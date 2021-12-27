@@ -1,4 +1,4 @@
-name: "Release oodikone to production"
+name: 'Release oodikone to production'
 
 on:
   release:
@@ -6,23 +6,23 @@ on:
 
 jobs:
   build_and_release_backend:
-    name: "Build and release backend"
+    name: 'Build and release backend'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
-      - name: "Login to DockerHub"
+      - name: 'Login to DockerHub'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: "Extract release version"
+      - name: 'Extract release version'
         # Github context (e.g. github.ref) only has ref formatted as /refs/tags/vX.X.X
         # This steps extracts release version from GITHUB_REF env var
         # See: https://github.community/t/how-to-get-just-the-tag-name/16241/10
         id: extract_version
         run: echo ::set-output name=VERSION::"${GITHUB_REF#refs/tags/}"
-      - name: "Build and push"
+      - name: 'Build and push'
         uses: docker/build-push-action@v2
         with:
           build-args: |
@@ -38,26 +38,26 @@ jobs:
           target: production
 
   build_and_release_frontend:
-    name: "Build and release frontend"
+    name: 'Build and release frontend'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
-      - name: "Login to DockerHub"
+      - name: 'Login to DockerHub'
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: "Get current time"
+      - name: 'Get current time'
         id: get_current_time
         run: echo ::set-output name=NOW::"$(date --iso-8601=seconds)"
-      - name: "Extract release version"
+      - name: 'Extract release version'
         # Github context (e.g. github.ref) only has ref formatted as /refs/tags/vX.X.X
         # This steps extracts release version from GITHUB_REF env var
         # See: https://github.community/t/how-to-get-just-the-tag-name/16241/10
         id: extract_version
         run: echo ::set-output name=VERSION::"${GITHUB_REF#refs/tags/}"
-      - name: "Build and push"
+      - name: 'Build and push'
         uses: docker/build-push-action@v2
         with:
           build-args: |
@@ -72,11 +72,11 @@ jobs:
           push: true
           tags: toska/oodikone2-frontend:latest
           target: production
-      - name: "Create a container from built image "
+      - name: 'Create a container from built image '
         run: docker create --name frontend toska/oodikone2-frontend:latest
-      - name: "Copy assets from the container"
+      - name: 'Copy assets from the container'
         run: docker cp frontend:/usr/src/app/build ./build
-      - name: "Create Sentry release"
+      - name: 'Create Sentry release'
         uses: getsentry/action-release@v1
         env:
           SENTRY_URL: ${{ secrets.SENTRY_URL }}
@@ -90,49 +90,16 @@ jobs:
           url_prefix: '~/static/js'
           version: ${{ steps.extract_version.outputs.VERSION }}
 
-  build_and_release_userservice:
-    name: "Build and release userservice"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: docker/setup-buildx-action@v1
-      - name: "Login to DockerHub"
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: "Extract release version"
-        # Github context (e.g. github.ref) only has ref formatted as /refs/tags/vX.X.X
-        # This steps extracts release version from GITHUB_REF env var
-        # See: https://github.community/t/how-to-get-just-the-tag-name/16241/10
-        id: extract_version
-        run: echo ::set-output name=VERSION::"${GITHUB_REF#refs/tags/}"
-      - name: "Build and push"
-        uses: docker/build-push-action@v2
-        with:
-          build-args: |
-            SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
-            SENTRY_ENVIRONMENT=production
-          cache-from: |
-            type=registry,ref=toska/oodikone2-userservice:staging
-            type=registry,ref=toska/oodikone2-userservice:latest
-          cache-to: type=inline
-          context: services/userservice
-          push: true
-          tags: toska/oodikone2-userservice:latest
-          target: production
-
   report_success:
     runs-on: ubuntu-latest
-    name: "Report deployment success to oodikone notifications"
+    name: 'Report deployment success to oodikone notifications'
     needs:
-    - build_and_release_backend
-    - build_and_release_frontend
-    - build_and_release_userservice
+      - build_and_release_backend
+      - build_and_release_frontend
     if: success()
     steps:
-      - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+      - name: 'Send notification to slack'
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment
@@ -141,15 +108,14 @@ jobs:
 
   report_failure:
     runs-on: ubuntu-latest
-    name: "Report deployment failure to oodikone notifications"
+    name: 'Report deployment failure to oodikone notifications'
     needs:
-    - build_and_release_backend
-    - build_and_release_frontend
-    - build_and_release_userservice
+      - build_and_release_backend
+      - build_and_release_frontend
     if: failure()
     steps:
-      - name: "Send notification to slack"
-        uses:  UniversityOfHelsinkiCS/slackbot-action@v1.4.2
+      - name: 'Send notification to slack'
+        uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           message-type: deployment-failure

@@ -44,7 +44,7 @@ curl --request GET --url 'http://localhost:8082/v1/students?token=dev'
 - Ensure the newest user-db/kone-db image is pulled from the registry with `docker pull`
 - Start oodikone, let it run migrations
 - Modify db to wanted state. Tips:
-  - Easy way to create new users is to modify dev user details in the frontend API config. Userservice creates a new user during login if the given uid is not present in user-db.
+  - Easy way to create new users is to modify dev user details in the frontend API config. A new user is created during login if the given uid is not present in user-db.
 
 By default, previous user-db/kone-db images are used as a base. If you want to build the image from a clean Postgres image, just comment out toska hub image and uncomment the clean Postgres image.
 

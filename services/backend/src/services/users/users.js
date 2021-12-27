@@ -1,13 +1,28 @@
 const Sequelize = require('sequelize')
 const _ = require('lodash')
 const moment = require('moment')
-const { User, UserElementDetails, AccessGroup, HyGroup, UserFaculties, sequelize } = require('../models')
+const {
+  User,
+  UserElementDetails,
+  AccessGroup,
+  HyGroup,
+  UserFaculties,
+  sequelizeUser,
+} = require('../../models/models_user')
 const AccessService = require('./accessgroups')
 const HyGroupService = require('./hygroups')
-const { requiredGroup, courseStatisticsGroup, hyOneGroup } = require('../conf')
 const Op = Sequelize.Op
 
-const TOKEN_VERSION = 1.1 // When token structure changes, increment in userservice, backend and frontend
+// move these to conf
+const courseStatisticsGroup = 'grp-oodikone-basic-users'
+const hyOneGroup = 'hy-one'
+const requiredGroup =
+  process.env.NODE_ENV === 'staging'
+    ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
+    : ['grp-oodikone-users', 'grp-oodikone-basic-users']
+
+// Refactor this token version away
+const TOKEN_VERSION = 1.1 // When token structure changes, increment in backend and frontend
 
 // help for refactoring away from token
 const generateTokenData = async (uid, mockedBy = null) => {
@@ -245,7 +260,7 @@ const removeProgrammes = async (uid, codes) => {
 }
 
 const setFaculties = async (uid, faculties) => {
-  await sequelize.transaction(async transaction => {
+  await sequelizeUser.transaction(async transaction => {
     await UserFaculties.destroy({ where: { userId: uid }, transaction })
     for (const faculty of faculties) {
       await UserFaculties.create({ userId: uid, faculty_code: faculty }, { transaction })

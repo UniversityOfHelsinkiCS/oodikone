@@ -1,6 +1,4 @@
-const axios = require('axios')
 const _ = require('lodash')
-const { USERSERVICE_URL } = require('../conf-backend')
 const UnitService = require('./units')
 const elementDetailService = require('./elementdetails')
 const { filterStudentnumbersByAccessrights } = require('./students')
@@ -8,8 +6,8 @@ const { userDataCache } = require('./cache')
 const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
 const { facultiesAndProgrammesForTrends } = require('../services/organisations')
-
-const client = axios.create({ baseURL: USERSERVICE_URL, headers: { secret: process.env.USERSERVICE_SECRET } })
+const User = require('./users/users')
+const AccessGroup = require('./users/accessgroups')
 
 // Private helpers
 const enrichProgrammesFromFaculties = faculties =>
@@ -50,9 +48,18 @@ const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
 
 const byUsernameData = async username => {
   // OK, enriched
-  const url = `/user/${username}/user_data`
-  const response = await client.get(url)
-  return enrichWithProgrammes(response.data)
+  const user = await User.byUsernameMinified(username)
+  const roles = user.accessgroup.map(({ group_code }) => group_code)
+  const rights = User.getUserProgrammes(user)
+  const faculties = user.faculty.map(({ faculty_code }) => faculty_code)
+  const data = {
+    email: user.email,
+    full_name: user.full_name,
+    roles,
+    rights,
+    faculties,
+  }
+  return enrichWithProgrammes(data)
 }
 
 // Exported helpers
@@ -95,48 +102,61 @@ const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
 }
 
 // FOR ROUTES 1-to-1 mapping
-const modifyAccess = async body => enrichWithProgrammes((await client.post('/modifyaccess', body)).data)
+const modifyAccess = async body => {
+  const { username, accessgroups } = body
+  await User.modifyRights(username, accessgroups)
+  const user = await User.byUsername(username)
+  return enrichWithProgrammes(User.getUserData(user))
+}
 
-const getAccessGroups = async () => enrichWithProgrammes((await client.get('/access_groups')).data)
+const getAccessGroups = async () => enrichWithProgrammes(await AccessGroup.findAll())
 
-const enableElementDetails = async (uid, codes) =>
-  enrichWithProgrammes((await client.post('/add_rights', { uid, codes })).data.user)
+const enableElementDetails = async (uid, codes) => {
+  await User.addProgrammes(uid, codes)
+  const user = await User.byId(uid)
+  return enrichWithProgrammes(User.getUserData(user))
+}
 
-const findAll = async () => enrichWithProgrammes((await client.get('/findall')).data)
+const findAll = async () => enrichWithProgrammes((await User.findAll()).map(User.getUserData))
 
-const setFaculties = async (uid, faculties) =>
-  enrichWithProgrammes((await client.post('/set_faculties', { uid, faculties })).data.user)
+const setFaculties = async (uid, faculties) => {
+  await User.setFaculties(uid, faculties)
+  const user = await User.byId(uid)
+  return enrichWithProgrammes(User.getUserData(user))
+}
 
-const removeElementDetails = async (uid, codes) =>
-  enrichWithProgrammes((await client.post('/remove_rights', { uid, codes })).data.user)
+const removeElementDetails = async (uid, codes) => {
+  await User.removeProgrammes(uid, codes)
+  const user = await User.byId(uid)
+  return enrichWithProgrammes(User.getUserData(user))
+}
 
 const updateUser = async (username, fields) => {
   userDataCache.del(username)
-  return enrichWithProgrammes((await client.put(`/user/${username}`, fields)).data)
+  const uid = username
+  const user = await User.byUsername(uid)
+  if (!user) {
+    throw new Error(`User ${uid} not found`)
+  }
+  await User.updateUser(user, fields)
+  const returnedUser = await User.byUsername(username)
+  return enrichWithProgrammes(User.getUserData(returnedUser))
 }
 
 const getLoginDataWithoutToken = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
   const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
-  return (
-    await client.post('/loginwithouttoken', {
-      uid,
-      full_name,
-      hyGroups,
-      affiliations,
-      email,
-      hyPersonSisuId,
-      hasStudyGuidanceGroupAccess,
-    })
-  ).data
+  const result = await User.loginWithoutToken(
+    uid,
+    full_name,
+    hyGroups,
+    email,
+    hyPersonSisuId,
+    hasStudyGuidanceGroupAccess
+  )
+  return result
 }
 
-const superlogin = async (uid, asUser) =>
-  (
-    await client.post('/superlogin', {
-      uid,
-      asUser,
-    })
-  ).data
+const superlogin = async (uid, asUser) => await User.superlogin(uid, asUser)
 
 module.exports = {
   updateUser,

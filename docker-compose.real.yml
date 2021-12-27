@@ -1,7 +1,7 @@
 services:
-
   backend:
     environment:
+      DB_URL_USER: postgres://postgres@user-db:5432/user-db-real
       DB_URL_KONE: postgres://postgres@kone-db:5432/kone-db-real
       SIS_DB_URL: postgres://postgres@sis-db:5432/sis-db-real
 
@@ -17,10 +17,6 @@ services:
     environment:
       DB_URL: postgres://postgres@sis-db:5432/sis-db-real
       SIS_IMPORTER_DATABASE: sis-importer-db-real
-
-  userservice:
-    environment:
-      DB_URL: postgres://postgres@user-db:5432/user-db-real
 
 volumes:
   redis-data-real:

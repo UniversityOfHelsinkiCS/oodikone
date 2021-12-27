@@ -36,6 +36,7 @@ const MATOMO_URL = process.env.MATOMO_URL
 
 // Other stuff
 const DB_URL_KONE = process.env.DB_URL_KONE
+const DB_URL_USER = process.env.DB_URL_USER
 
 let DB_MAX_CONNECTIONS = parseInt(process.env.DB_MAX_CONNECTIONS, 10)
 if (isNaN(DB_MAX_CONNECTIONS)) {
@@ -47,10 +48,8 @@ if (DB_MAX_CRON_CONNECTIONS < 1) {
 }
 
 const redis = process.env.REDIS
-const TOKEN_SECRET = process.env.TOKEN_SECRET
 const SECRET_TOKEN = process.env.SECRET_TOKEN
 const DB_SCHEMA_KONE = process.env.DB_SCHEMA_KONE || 'public'
-const USERSERVICE_URL = process.env.USERSERVICE_URL
 const SIS_UPDATER_URL = process.env.SIS_UPDATER_URL
 
 const formatURL = url => {
@@ -60,14 +59,13 @@ const formatURL = url => {
 const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
 
 module.exports = {
+  DB_URL_USER,
   DB_URL_KONE,
   DB_MAX_CONNECTIONS,
   DB_MAX_CRON_CONNECTIONS,
   redis,
-  TOKEN_SECRET,
   SECRET_TOKEN,
   DB_SCHEMA_KONE,
-  USERSERVICE_URL: formatURL(USERSERVICE_URL),
   requiredGroup,
   SIS_UPDATER_URL,
   ANALYTICS_INFLUXDB_URL: formatURL(ANALYTICS_INFLUXDB_URL),
