@@ -44,13 +44,12 @@ initializeDatabaseConnection()
     })
 
     app.post('/login', async (req, res) => {
-      const { uid, full_name, hyGroups, affiliations, email, hyPersonSisuId, hasStudyGuidanceGroupAccess } = req.body
+      const { uid, full_name, hyGroups, email, hyPersonSisuId, hasStudyGuidanceGroupAccess } = req.body
       console.log(uid, full_name, 'logging in!')
       const { token, isNew } = await User.login(
         uid,
         full_name,
         hyGroups,
-        affiliations,
         email,
         hyPersonSisuId,
         hasStudyGuidanceGroupAccess
