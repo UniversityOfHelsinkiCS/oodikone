@@ -40,8 +40,12 @@ const DataTable = ({ data, titles }) => {
       <Table>
         <Table.Header>
           <Table.Row>
-            {titles.map(title => (
-              <Table.HeaderCell textAlign="left" style={{ fontWeight: 'bold' }}>
+            {titles.map((title, index) => (
+              <Table.HeaderCell
+                colSpan={index === 0 ? 1 : 2}
+                textAlign="left"
+                style={{ fontWeight: 'bold', paddingLeft: '50px' }}
+              >
                 {title}
               </Table.HeaderCell>
             ))}
