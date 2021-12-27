@@ -25,10 +25,13 @@ export default {
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
   `,
   AverageGraduationTimes: `
-  **Median time** Näyttää kyseisenä vuonna valmistuneiden opintojen keston **mediaanin** kuukausina.
+  **Median time**: Näyttää kyseisenä vuonna valmistuneiden opintojen keston **mediaanin** kuukausina.
 
-  **Mean time** Näyttää kyseisenä vuonna valmistuneiden opintojen keston **keskiarvon** kuukausina.
+  **Mean time**: Näyttää kyseisenä vuonna valmistuneiden opintojen keston **keskiarvon** kuukausina.
   
   Mukana ovat **vain valmistuneet opiskelijat**. Kandiohjelmissa tavoiteaika on 36 kk, maisteriohjelmissa 24 kk`,
-  StudytrackOverview: ``,
+  StudytrackOverview: `
+  Taulukko näyttää kyseisenä lukuvuonna aloittaneet pääaineopiskelijat. Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet.
+  Viimeisenä taulukossa on lukuvuonna aloittaneista valmistuneiden määrä. 
+  `,
 }
