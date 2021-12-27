@@ -1,38 +1,35 @@
-const jwt = require('jsonwebtoken')
-const conf = require('../conf-backend')
-const blacklist = require('../services/blacklist')
-const { getUserDataFor } = require('../services/userService')
-const { ACCESS_TOKEN_HEADER_KEY } = require('../conf-backend')
+const { getUserDataFor, getLoginDataWithoutToken } = require('../services/userService')
 const { hasRequiredGroup, parseHyGroups } = require('../util/utils')
 
-const TOKEN_VERSION = 1.1 // When token structure changes, increment in userservice, backend and frontend
-
 const checkAuth = async (req, res, next) => {
-  const token = req.headers[ACCESS_TOKEN_HEADER_KEY]
   const uid = req.headers['uid']
-
-  if (!token) {
-    return res.status(403).json({ error: 'No token in headers' })
-  }
-
-  jwt.verify(token, conf.TOKEN_SECRET, async (err, decoded) => {
-    if (err) {
-      return res.status(403).json(err)
-    }
-
-    if (decoded.version !== TOKEN_VERSION) {
-      return res.status(401).json({ error: 'Token needs to be refreshed - invalid version' })
-    }
-
-    if (decoded.mockedBy ? decoded.mockedBy !== uid : decoded.userId !== uid) {
-      return res.status(403).json({ error: 'User shibboleth id and token id did not match' })
-    }
-
+  if (req.headers['shib-session-id'] && uid) {
+    const full_name = req.headers.displayname || ''
+    const mail = req.headers.mail || ''
+    const hyGroups = parseHyGroups(req.headers['hygroupcn'])
+    const affiliations = parseHyGroups(req.headers['edupersonaffiliation'])
+    const hyPersonSisuId = req.headers.hypersonsisuid || ''
+    const { payload: decoded } = await getLoginDataWithoutToken(
+      uid,
+      full_name,
+      hyGroups,
+      affiliations,
+      mail,
+      hyPersonSisuId
+    )
     const userData = await getUserDataFor(decoded.userId)
     req.decodedToken = decoded
     Object.assign(req, userData)
     next()
-  })
+  } else {
+    return res
+      .status(401)
+      .json({
+        message: `Not enough headers to login, uid: ${req.headers.uid}
+        session-id ${req.headers['shib-session-id']}`,
+      })
+      .end()
+  }
 }
 
 const roles = requiredRoles => async (req, res, next) => {
@@ -64,20 +61,8 @@ const checkRequiredGroup = async (req, res, next) => {
   next()
 }
 
-const checkUserBlacklisting = async (req, res, next) => {
-  const { userId, createdAt } = req.decodedToken
-  const isBlacklisted = await blacklist.isUserBlacklisted(userId, createdAt)
-
-  if (isBlacklisted) {
-    return res.status(401).json({ error: 'Token needs to be refreshed - blacklisted' })
-  }
-
-  next()
-}
-
 module.exports = {
   checkAuth,
   roles,
   checkRequiredGroup,
-  checkUserBlacklisting,
 }

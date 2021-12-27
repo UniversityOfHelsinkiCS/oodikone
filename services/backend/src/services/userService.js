@@ -115,10 +115,10 @@ const updateUser = async (username, fields) => {
   return enrichWithProgrammes((await client.put(`/user/${username}`, fields)).data)
 }
 
-const login = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
+const getLoginDataWithoutToken = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
   const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
   return (
-    await client.post('/login', {
+    await client.post('/loginwithouttoken', {
       uid,
       full_name,
       hyGroups,
@@ -140,7 +140,6 @@ const superlogin = async (uid, asUser) =>
 
 module.exports = {
   updateUser,
-  login,
   superlogin,
   enableElementDetails,
   removeElementDetails,
@@ -151,4 +150,5 @@ module.exports = {
   setFaculties,
   getUserDataFor,
   getStudentsUserCanAccess,
+  getLoginDataWithoutToken,
 }

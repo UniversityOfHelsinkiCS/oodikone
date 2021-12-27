@@ -150,10 +150,7 @@ export const RTKApi = createApi({
   tagTypes: ['StudyGuidanceGroups'],
   baseQuery: fetchBaseQuery({
     baseUrl: apiBasePath,
-    prepareHeaders: (headers, { getState }) => {
-      // Get token from state and add it to headers
-      const token = getState().auth.encodedToken
-      if (token) headers.set('x-access-token', token)
+    prepareHeaders: headers => {
       // Add possible default headers
       Object.entries(getHeaders()).forEach(([key, value]) => headers.set(key, value))
       return headers

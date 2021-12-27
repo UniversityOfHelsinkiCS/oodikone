@@ -1,5 +1,3 @@
-import { decodeToken } from '../common'
-
 export const loginPrefix = 'LOGIN_'
 export const logoutPrefix = 'LOGOUT_'
 
@@ -30,7 +28,7 @@ const reducer = (state = { pending: false, error: false, token: null, encodedTok
         ...state,
         pending: false,
         error: false,
-        token: decodeToken(action.token),
+        token: action.token,
         encodedToken: action.token,
       }
 

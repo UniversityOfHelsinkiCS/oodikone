@@ -59,8 +59,6 @@ const formatURL = url => {
 
 const addSlashToEnd = url => (url.endsWith('/') ? url : url + '/')
 
-const ACCESS_TOKEN_HEADER_KEY = 'x-access-token'
-
 module.exports = {
   DB_URL_KONE,
   DB_MAX_CONNECTIONS,
@@ -70,7 +68,6 @@ module.exports = {
   SECRET_TOKEN,
   DB_SCHEMA_KONE,
   USERSERVICE_URL: formatURL(USERSERVICE_URL),
-  ACCESS_TOKEN_HEADER_KEY,
   requiredGroup,
   SIS_UPDATER_URL,
   ANALYTICS_INFLUXDB_URL: formatURL(ANALYTICS_INFLUXDB_URL),
