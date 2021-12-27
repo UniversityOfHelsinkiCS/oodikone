@@ -65,7 +65,7 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year) =>
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
   const isAcademicYear = true
   const since = getStartDate(studyprogramme, isAcademicYear)
-  const years = getYearsArray(since.getFullYear())
+  const years = getYearsArray(since.getFullYear()).reverse()
 
   const associations = await getAssociations()
   const studytracks = associations.programmes[studyprogramme]
