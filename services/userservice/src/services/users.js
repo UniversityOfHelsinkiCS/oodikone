@@ -9,7 +9,9 @@ const { requiredGroup, courseStatisticsGroup, TOKEN_SECRET, hyOneGroup } = requi
 const Op = Sequelize.Op
 
 const TOKEN_VERSION = 1.1 // When token structure changes, increment in userservice, backend and frontend
-const generateToken = async (uid, mockedBy = null) => {
+
+// help for refactoring away from token
+const generateTokenData = async (uid, mockedBy = null) => {
   const user = await byUsername(uid)
   const userData = getUserData(user)
   const programmes = userData.elementdetails
@@ -26,11 +28,16 @@ const generateToken = async (uid, mockedBy = null) => {
     version: TOKEN_VERSION,
     sisPersonId: user.sisu_person_id,
   }
-  const token = jwt.sign(payload, TOKEN_SECRET)
+  return payload
+}
 
+const generateToken = async (uid, mockedBy = null) => {
+  const payload = await generateTokenData(uid, mockedBy)
+  const token = jwt.sign(payload, TOKEN_SECRET)
   // return the information including token as JSON
   return token
 }
+
 const createMissingGroups = async (group, service) => {
   const savedGroups = await service.findAll()
   group.forEach(async code => {
@@ -60,7 +67,7 @@ const updateGroups = async (user, hyGroups) => {
   await user.removeHy_group(await HyGroupService.byCodes(hyGroupsToDelete))
 }
 
-const login = async (uid, full_name, hyGroups, mail, hyPersonSisuId, hasStudyGuidanceGroupAccess) => {
+const loginBase = async (uid, full_name, hyGroups, mail, hyPersonSisuId, hasStudyGuidanceGroupAccess) => {
   let user = await byUsername(uid)
   let isNew = false
   const lastLogin = new Date()
@@ -82,11 +89,31 @@ const login = async (uid, full_name, hyGroups, mail, hyPersonSisuId, hasStudyGui
   await determineAccessToTeachersForOne(user, hyGroups)
   await determineAccessToStudyGuidanceGroups(user, hasStudyGuidanceGroupAccess)
 
-  console.log('Generating token')
-  const token = await generateToken(uid)
-  console.log('Token done')
-  return { token, isNew }
+  return isNew
 }
+
+const loginWithoutToken = async (
+  uid,
+  full_name,
+  hyGroups,
+  affiliations,
+  mail,
+  hyPersonSisuId,
+  hasStudyGuidanceGroupAccess
+) => {
+  const isNew = await loginBase(
+    uid,
+    full_name,
+    hyGroups,
+    affiliations,
+    mail,
+    hyPersonSisuId,
+    hasStudyGuidanceGroupAccess
+  )
+  const payload = await generateTokenData(uid)
+  return { payload, isNew }
+}
+
 const superlogin = async (uid, asUser) => {
   const user = await byUsername(uid)
   if (user && user.accessgroup.map(r => r.group_code).includes('admin')) {
@@ -299,11 +326,11 @@ module.exports = {
   getUserProgrammes,
   addProgrammes,
   removeProgrammes,
-  login,
   superlogin,
   modifyRights,
   getUserAccessGroups,
   getRoles,
   getUserData,
   setFaculties,
+  loginWithoutToken,
 }
