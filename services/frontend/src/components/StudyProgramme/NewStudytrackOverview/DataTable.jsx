@@ -1,12 +1,17 @@
 import React, { useState } from 'react'
 import { Icon, Table } from 'semantic-ui-react'
 
-const getYearCell = (year, show) => (
-  <Table.Cell>
-    <Icon name={`${show ? 'angle down' : 'angle right'}`} />
-    {year.year}
-  </Table.Cell>
-)
+const getYearCell = (year, show) => {
+  if (year?.data.length === 1) {
+    return <Table.Cell>{year.year}</Table.Cell>
+  }
+  return (
+    <Table.Cell>
+      <Icon name={`${show ? 'angle down' : 'angle right'}`} />
+      {year.year}
+    </Table.Cell>
+  )
+}
 
 const getRow = (year, array, show, setShow) => {
   if (array[0] === 'TOTAL') {
