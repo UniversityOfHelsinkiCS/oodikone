@@ -18,7 +18,7 @@ const getStudentData = students => {
   return data
 }
 
-const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year) => {
+const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year, studytrackNames) => {
   const startDate = `${year}-${semesterStart['FALL']}`
   const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
 
@@ -39,7 +39,7 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year) =>
     const students = await studytrackStudents(startedStudentnumbers)
     const studentData = getStudentData(students)
     const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
-    const label = track === studyprogramme ? 'TOTAL' : track
+    const label = track === studyprogramme ? 'TOTAL' : studytrackNames[track]
 
     if (started.length === 0) return previousData
     return [
@@ -69,8 +69,8 @@ const getStudytrackNames = (allStudytracks, programmesStudytracks) => {
   programmesStudytracks.forEach(track => {
     const trackName = allStudytracks[track]?.name['fi']
     if (trackName) {
-      studytrackNameObject[track] = trackName
-      studytrackNameArray = [...studytrackNameArray, trackName]
+      studytrackNameObject[track] = `${trackName}, ${track}`
+      studytrackNameArray = [...studytrackNameArray, `${trackName}, ${track}`]
     }
   })
   return { studytrackNameObject, studytrackNameArray: _.uniq(studytrackNameArray) }
