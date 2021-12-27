@@ -38,7 +38,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
             ? 'the programme by starting year'
             : `the studytrack ${track} by starting year`
         }`,
-        toolTips.PopulationOverview
+        'StudytrackOverview'
       )}
       <DataTable titles={populationTitles} data={stats.data} />
     </div>
