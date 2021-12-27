@@ -43,10 +43,10 @@ initializeDatabaseConnection()
       })
     })
 
-    app.post('/login', async (req, res) => {
+    app.post('/loginwithouttoken', async (req, res) => {
       const { uid, full_name, hyGroups, email, hyPersonSisuId, hasStudyGuidanceGroupAccess } = req.body
-      console.log(uid, full_name, 'logging in!')
-      const { token, isNew } = await User.login(
+      console.log(uid, full_name, 'getting the login data without token!')
+      const { payload, isNew } = await User.loginWithoutToken(
         uid,
         full_name,
         hyGroups,
@@ -54,7 +54,7 @@ initializeDatabaseConnection()
         hyPersonSisuId,
         hasStudyGuidanceGroupAccess
       )
-      res.status(200).json({ token, isNew })
+      res.status(200).json({ payload, isNew })
     })
 
     app.post('/superlogin', async (req, res) => {
