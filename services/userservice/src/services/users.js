@@ -2,9 +2,8 @@ const Sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
 const _ = require('lodash')
 const moment = require('moment')
-const { User, UserElementDetails, AccessGroup, HyGroup, Affiliation, UserFaculties, sequelize } = require('../models')
+const { User, UserElementDetails, AccessGroup, HyGroup, UserFaculties, sequelize } = require('../models')
 const AccessService = require('./accessgroups')
-const AffiliationService = require('./affiliations')
 const HyGroupService = require('./hygroups')
 const { requiredGroup, courseStatisticsGroup, TOKEN_SECRET, hyOneGroup } = require('../conf')
 const Op = Sequelize.Op
@@ -41,24 +40,7 @@ const createMissingGroups = async (group, service) => {
   })
 }
 
-const updateGroups = async (user, affiliations, hyGroups) => {
-  let affiliationsToBeUpdated = (await user.getAffiliation()).map(af => af.code)
-  let affiliationsToAdd = []
-  let affiliationsToDelete = []
-
-  affiliations.forEach(async affilitation => {
-    if (!affiliationsToBeUpdated.includes(affilitation)) {
-      affiliationsToAdd = affiliationsToAdd.concat(affilitation)
-    }
-  })
-  affiliationsToBeUpdated.forEach(async affilitation => {
-    if (!affiliations.includes(affilitation)) {
-      affiliationsToDelete = affiliationsToDelete.concat(affilitation)
-    }
-  })
-  await user.addAffiliation(await AffiliationService.byCodes(affiliationsToAdd))
-  await user.removeAffiliation(await AffiliationService.byCodes(affiliationsToDelete))
-
+const updateGroups = async (user, hyGroups) => {
   let hyGroupsToBeUpdated = (await user.getHy_group()).map(hg => hg.code)
   let hyGroupsToAdd = []
   let hyGroupsToDelete = []
@@ -78,12 +60,11 @@ const updateGroups = async (user, affiliations, hyGroups) => {
   await user.removeHy_group(await HyGroupService.byCodes(hyGroupsToDelete))
 }
 
-const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId, hasStudyGuidanceGroupAccess) => {
+const login = async (uid, full_name, hyGroups, mail, hyPersonSisuId, hasStudyGuidanceGroupAccess) => {
   let user = await byUsername(uid)
   let isNew = false
   const lastLogin = new Date()
   await createMissingGroups(hyGroups, HyGroupService)
-  await createMissingGroups(affiliations, AffiliationService)
 
   if (!user) {
     user = await createUser(uid, full_name, mail, hyPersonSisuId, lastLogin)
@@ -91,13 +72,10 @@ const login = async (uid, full_name, hyGroups, affiliations, mail, hyPersonSisuI
     const userHyGroups = await HyGroupService.byCodes(hyGroups)
     await user.addHy_group(userHyGroups)
 
-    const userAffiliations = await AffiliationService.byCodes(affiliations)
-    await user.addAffiliation(userAffiliations)
-
     isNew = true
   } else {
     user = await updateUser(user, { full_name, email: mail, sisu_person_id: hyPersonSisuId, last_login: lastLogin })
-    await updateGroups(user, affiliations, hyGroups)
+    await updateGroups(user, hyGroups)
   }
 
   await determineAccessToCourseStats(user, hyGroups)
@@ -139,10 +117,6 @@ const userIncludes = [
     separate: true,
     model: UserFaculties,
     as: 'faculty',
-  },
-  {
-    model: Affiliation,
-    as: 'affiliation',
   },
 ]
 
