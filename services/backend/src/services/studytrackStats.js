@@ -2,7 +2,7 @@ const moment = require('moment')
 
 const { getAssociations } = require('./studyrights')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
-const { getStartDate, getYearsArray } = require('./studyprogrammeHelpers')
+const { getStartDate, getYearsArray, getPercentage } = require('./studyprogrammeHelpers')
 const { studytrackStudents, startedStudyrights, graduatedStudyRights } = require('./newStudyprogramme')
 const { semesterStart, semesterEnd } = require('../util/semester')
 
@@ -43,7 +43,19 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year) =>
     if (started.length === 0) return previousData
     return [
       ...previousData,
-      [label, started.length, studentData.male, studentData.female, studentData.finnish, graduated.length],
+      [
+        label,
+        started.length,
+        getPercentage(started.length, started.length),
+        studentData.male,
+        getPercentage(studentData.male, started.length),
+        studentData.female,
+        getPercentage(studentData.female, started.length),
+        studentData.finnish,
+        getPercentage(studentData.finnish, started.length),
+        graduated.length,
+        getPercentage(graduated.length, started.length),
+      ],
     ]
   }, [])
 

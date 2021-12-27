@@ -104,6 +104,13 @@ const getThesisType = studyprogramme => {
   return 'thesis-type-not-defined'
 }
 
+const getPercentage = (value, total) => {
+  if (typeof value !== 'number' || typeof total !== 'number') return 'NA'
+  if (total === 0) return 'NA'
+  if (value === 0) return '0 %'
+  return `${((value / total) * 100).toFixed(1)} %`
+}
+
 module.exports = {
   formatStudyright,
   formatStudent,
@@ -116,4 +123,5 @@ module.exports = {
   defineYear,
   getStartDate,
   getThesisType,
+  getPercentage,
 }
