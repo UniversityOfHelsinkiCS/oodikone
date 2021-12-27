@@ -1,11 +1,10 @@
 const Sequelize = require('sequelize')
-const jwt = require('jsonwebtoken')
 const _ = require('lodash')
 const moment = require('moment')
 const { User, UserElementDetails, AccessGroup, HyGroup, UserFaculties, sequelize } = require('../models')
 const AccessService = require('./accessgroups')
 const HyGroupService = require('./hygroups')
-const { requiredGroup, courseStatisticsGroup, TOKEN_SECRET, hyOneGroup } = require('../conf')
+const { requiredGroup, courseStatisticsGroup, hyOneGroup } = require('../conf')
 const Op = Sequelize.Op
 
 const TOKEN_VERSION = 1.1 // When token structure changes, increment in userservice, backend and frontend
@@ -29,13 +28,6 @@ const generateTokenData = async (uid, mockedBy = null) => {
     sisPersonId: user.sisu_person_id,
   }
   return payload
-}
-
-const generateToken = async (uid, mockedBy = null) => {
-  const payload = await generateTokenData(uid, mockedBy)
-  const token = jwt.sign(payload, TOKEN_SECRET)
-  // return the information including token as JSON
-  return token
 }
 
 const createMissingGroups = async (group, service) => {
@@ -117,7 +109,7 @@ const loginWithoutToken = async (
 const superlogin = async (uid, asUser) => {
   const user = await byUsername(uid)
   if (user && user.accessgroup.map(r => r.group_code).includes('admin')) {
-    const token = await generateToken(asUser, uid)
+    const token = await generateTokenData(asUser, uid)
     return token
   }
   return undefined
