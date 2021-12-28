@@ -1,5 +1,4 @@
 const moment = require('moment')
-const _ = require('lodash')
 
 const { getAssociations } = require('./studyrights')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
@@ -64,16 +63,12 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year, st
 }
 
 const getStudytrackNames = (allStudytracks, programmesStudytracks) => {
-  const studytrackNameObject = {}
-  let studytrackNameArray = []
+  const names = {}
   programmesStudytracks.forEach(track => {
     const trackName = allStudytracks[track]?.name['fi']
-    if (trackName) {
-      studytrackNameObject[track] = `${trackName}, ${track}`
-      studytrackNameArray = [...studytrackNameArray, `${trackName}, ${track}`]
-    }
+    if (trackName) names[track] = `${trackName}, ${track}`
   })
-  return { studytrackNameObject, studytrackNameArray: _.uniq(studytrackNameArray) }
+  return names
 }
 
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
@@ -87,21 +82,20 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
     : [studyprogramme]
 
   const allStudytracks = associations.studyTracks
-  const { studytrackNameArray, studytrackNameObject } = getStudytrackNames(allStudytracks, programmesStudytracks)
+  const studytrackNames = getStudytrackNames(allStudytracks, programmesStudytracks)
 
   const data = await Promise.all(
     years.map(async year => {
-      const dataOfYear = await getStudytrackDataForTheYear(
-        studyprogramme,
-        programmesStudytracks,
-        year,
-        studytrackNameObject
-      )
+      const dataOfYear = await getStudytrackDataForTheYear(studyprogramme, programmesStudytracks, year, studytrackNames)
       return { year: `${year}-${year + 1}`, data: dataOfYear }
     })
   )
 
-  return { id: studyprogramme, data, studytrackNameArray }
+  return {
+    id: studyprogramme,
+    data,
+    studytrackNames: { studyprogramme: 'All students of the studyprogramme', ...studytrackNames },
+  }
 }
 
 module.exports = {

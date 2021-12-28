@@ -31,7 +31,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
           Please note that this view is still very much a work in progress. This view is only visible to some admins.
         </p>
       </div>
-      <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackNameArray} />
+      <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackNames} />
       {getDivider(
         `Students of ${
           track === 'All students of the studyprogramme'
