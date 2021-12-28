@@ -1,8 +1,8 @@
 import React from 'react'
 import { Container, Header, Message } from 'semantic-ui-react'
-import { useSelector } from 'react-redux'
 import { Route } from 'react-router-dom'
-import { getUserRoles, checkUserAccess, getUserIsAdmin } from '../../common'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { checkUserAccess } from '../../common'
 
 const NoAccessToPageBanner = () => (
   <Container text style={{ paddingTop: 50 }} textAlign="justified">
@@ -17,10 +17,10 @@ const NoAccessToPageBanner = () => (
 )
 
 const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...rest }) => {
-  const { roles, rights } = useSelector(state => state.auth.token)
+  const { rights, isAdmin, userRoles } = useGetAuthorizedUserQuery()
   const hasAccessToRoute = () => {
-    if (getUserIsAdmin(roles)) return true
-    const hasRequiredRoles = requiredRoles.length > 0 ? checkUserAccess(requiredRoles, getUserRoles(roles)) : true
+    if (isAdmin) return true
+    const hasRequiredRoles = requiredRoles.length > 0 ? checkUserAccess(requiredRoles, userRoles) : true
     const hasRequiredRights = requireUserHasRights ? rights.length > 0 : true
     if (requiredRoles.includes('courseStatistics')) {
       return hasRequiredRoles || hasRequiredRights

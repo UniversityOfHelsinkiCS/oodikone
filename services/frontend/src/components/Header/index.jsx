@@ -1,12 +1,11 @@
 import React from 'react'
-import { withRouter } from 'react-router-dom'
 import NavigationBar from '../NavigationBar'
 import './header.css'
 
-const Header = props => (
+const Header = () => (
   <header className="header" role="banner" id="main-menu">
-    <NavigationBar location={props.location} />
+    <NavigationBar />
   </header>
 )
 
-export default withRouter(Header)
+export default Header

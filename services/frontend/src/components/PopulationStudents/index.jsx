@@ -4,8 +4,9 @@ import { Icon, Tab, Grid, Item, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { getTextIn } from '../../common'
-import { useTabChangeAnalytics, usePrevious, useIsAdmin } from '../../common/hooks'
+import { useTabChangeAnalytics, usePrevious } from '../../common/hooks'
 
 import { getTagsByStudytrackAction } from '../../redux/tags'
 import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
@@ -44,7 +45,8 @@ const PopulationStudents = ({
   const { data: mandatoryCourses } = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses)
   const { data: populationCourses } = useSelector(({ populationCourses }) => populationCourses)
   const prevShowList = usePrevious(showList)
-  const admin = useIsAdmin()
+  const { isAdmin } = useGetAuthorizedUserQuery()
+  const admin = isAdmin
   const { handleTabChange } = useTabChangeAnalytics(
     ANALYTICS_CATEGORIES.populationStudents,
     'Change students table tab'

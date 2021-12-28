@@ -6,6 +6,7 @@ import { Button, List, Segment, Header, Confirm, Form, Icon, Popup, Message, Ite
 import { arrayOf, string, shape, func } from 'prop-types'
 import moment from 'moment'
 
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import TagModal from '../TagModal'
 import { reformatDate } from '../../../common'
 import SortableTable from '../../SortableTable'
@@ -13,11 +14,12 @@ import { getTagsByStudytrackAction, createTagAction, deleteTagAction } from '../
 
 const YEAR_DATE_FORMAT = 'YYYY'
 
-const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme, userId }) => {
+const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme }) => {
   const [tagname, setTagname] = useState('')
   const [confirm, setConfirm] = useState(null)
   const [year, setYear] = useState(null)
   const [personal, setPersonal] = useState(false)
+  const { id: userId } = useGetAuthorizedUserQuery()
 
   useEffect(() => {
     getTagsByStudytrack(studyprogramme)
@@ -174,7 +176,6 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme,
 
 const mapStateToProps = state => ({
   tags: state.tags.data,
-  userId: state.auth.token.id,
 })
 
 Tags.propTypes = {
@@ -183,7 +184,6 @@ Tags.propTypes = {
   deleteTag: func.isRequired,
   tags: arrayOf(shape({ tag_id: string, tagname: string, studytrack: string })).isRequired,
   studyprogramme: string.isRequired,
-  userId: string.isRequired,
 }
 
 export default withRouter(

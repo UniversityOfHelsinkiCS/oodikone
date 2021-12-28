@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import moment from 'moment'
 import { Header, Table, Icon, Label, Segment, Dropdown, Button, Modal, Popup } from 'semantic-ui-react'
-import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { flatten, uniq, range } from 'lodash'
-import { getUserIsAdmin } from '../../../common'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { isDev } from '../../../conf'
 import InfoBox from '../../Info/InfoBox'
 import infotooltips from '../../../common/InfoToolTips'
@@ -69,7 +68,7 @@ const ThroughputTable = ({
   const [lowerYear, setLower] = useState(null)
   const [upperYear, setUpper] = useState(null)
   const [yearDifference, setDifference] = useState(null)
-  const { roles } = useSelector(state => state.auth.token)
+  const { isAdmin } = useGetAuthorizedUserQuery()
 
   const data = throughput && throughput.data ? throughput.data.filter(year => year.credits.length > 0) : []
 
@@ -87,7 +86,7 @@ const ThroughputTable = ({
   if (error) return <h1>Oh no so error {error}</h1>
 
   // toggle only on dev env and with admin user
-  const GRADUATED_FEATURE_TOGGLED_ON = getUserIsAdmin(roles) && isDev
+  const GRADUATED_FEATURE_TOGGLED_ON = isAdmin && isDev
 
   const genders = data.length > 0 ? uniq(flatten(data.map(year => Object.keys(year.genders)))) : []
   genders.sort()

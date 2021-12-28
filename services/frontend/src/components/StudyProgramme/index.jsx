@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { Header, Segment, Tab, Button } from 'semantic-ui-react'
 import { isEqual, uniqBy } from 'lodash'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
@@ -11,7 +12,7 @@ import NewStudytrackOverview from './NewStudytrackOverview'
 import StudyTrackOverview from './StudyTrackOverview'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
-import { getTextIn, getUserRoles, getUserIsAdmin } from '../../common'
+import { getTextIn } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
@@ -25,7 +26,7 @@ import useLanguage from '../LanguagePicker/useLanguage'
 
 const StudyProgramme = props => {
   const { language } = useLanguage()
-  const { roles } = useSelector(state => state.auth.token)
+  const { roles, isAdmin } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, props.history)
 
   useTitle('Study programmes')
@@ -61,7 +62,7 @@ const StudyProgramme = props => {
       })
   }
 
-  const SHOW_NEW_OVERVIEW = getUserIsAdmin(roles) && roles?.find(r => r.group_code === 'teachers')
+  const SHOW_NEW_OVERVIEW = isAdmin && roles?.find(r => r.group_code === 'teachers')
 
   const getPanes = () => {
     const { match, programmes } = props
@@ -80,9 +81,7 @@ const StudyProgramme = props => {
     if (filteredStudytracks.length > 0) {
       panes.push({
         menuItem: 'Studytrack overview',
-        render: () => (
-          <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} admin={props.isAdmin} />
-        ),
+        render: () => <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} admin={isAdmin} />,
       })
     }
     panes.push({
@@ -109,7 +108,7 @@ const StudyProgramme = props => {
         render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
       })
     }
-    if (props.isAdmin) {
+    if (isAdmin) {
       panes.push({
         menuItem: 'Admin',
         render: () => (
@@ -174,18 +173,10 @@ const StudyProgramme = props => {
   )
 }
 
-const mapStateToProps = ({
-  populationProgrammes,
-  auth: {
-    token: { rights, roles },
-  },
-}) => {
+const mapStateToProps = ({ populationProgrammes }) => {
   const programmes = populationProgrammes.data ? populationProgrammes.data.programmes : {}
   return {
     programmes,
-    rights,
-    userRoles: getUserRoles(roles),
-    isAdmin: getUserIsAdmin(roles),
   }
 }
 

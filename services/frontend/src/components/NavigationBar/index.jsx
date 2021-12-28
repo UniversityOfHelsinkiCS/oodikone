@@ -2,10 +2,9 @@ import React from 'react'
 import './navigationBar.css'
 import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
-import { connect } from 'react-redux'
-import { isEqual } from 'lodash'
-import { getUserRoles, checkUserAccess } from '../../common'
-import { logout as logoutAction } from '../../redux/auth'
+import { useDispatch } from 'react-redux'
+import { checkUserAccess } from '../../common'
+import { logout, useGetAuthorizedUserQuery } from '../../redux/auth'
 import LanguagePicker from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
 import { useShowAsUser } from '../../common/hooks'
@@ -34,8 +33,9 @@ const allNavigationItems = {
   feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
 }
 
-const NavigationBar = props => {
-  const { logout, userRoles, rights, mockedBy, userId } = props
+const NavigationBar = () => {
+  const dispatch = useDispatch()
+  const { rights, mockedBy, userId, userRoles } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
 
   const refreshNavigationRoutes = () => {
@@ -65,6 +65,10 @@ const NavigationBar = props => {
       </span>
     </Menu.Item>
   )
+
+  const handleLogout = () => {
+    dispatch(logout())
+  }
 
   const renderNavigationRoutes = () =>
     Object.values(visibleNavigationItems).map(({ items, path, key, label, tag }) =>
@@ -112,11 +116,11 @@ const NavigationBar = props => {
               icon="database"
             />
           ))}
-          <Dropdown.Item icon="log out" text="Logout" onClick={logout} />
+          <Dropdown.Item icon="log out" text="Logout" onClick={handleLogout} />
         </Dropdown.Menu>
       </Menu.Item>
     ) : (
-      <Menu.Item link onClick={logout} icon="log out" tabIndex="-1">
+      <Menu.Item link onClick={handleLogout} icon="log out" tabIndex="-1">
         Logout
       </Menu.Item>
     )
@@ -144,21 +148,4 @@ const NavigationBar = props => {
   )
 }
 
-const mapStateToProps = ({
-  auth: {
-    token: { roles, rights, mockedBy, userId },
-  },
-}) => ({
-  userRoles: getUserRoles(roles),
-  rights,
-  mockedBy,
-  userId,
-})
-
-const mapDispatchToProps = {
-  logout: logoutAction,
-}
-
-export default connect(mapStateToProps, mapDispatchToProps, null, {
-  areStatePropsEqual: isEqual,
-})(NavigationBar)
+export default NavigationBar

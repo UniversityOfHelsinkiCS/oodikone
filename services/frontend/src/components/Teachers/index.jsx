@@ -1,13 +1,11 @@
 import React from 'react'
-import { shape, string, bool } from 'prop-types'
-import { connect } from 'react-redux'
 import { Header, Segment, Tab } from 'semantic-ui-react'
-import { withRouter } from 'react-router-dom'
+import { useHistory, useParams } from 'react-router-dom'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import TeacherSearchTab from './TeacherSearchTab'
 import TeacherPage from './TeacherPage'
 import TeacherStatistics from './TeacherStatistics'
 import TeacherLeaderBoard from './TeacherLeaderBoard'
-import { getUserIsAdmin } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
 
 const pane = (title, Content, icon) => ({
@@ -19,9 +17,11 @@ const pane = (title, Content, icon) => ({
   ),
 })
 
-const TeachersTabs = withRouter(({ admin, history }) => {
+const TeachersTabs = () => {
+  const history = useHistory()
+  const { isAdmin } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('t_tab', 0, history)
-  const panes = admin
+  const panes = isAdmin
     ? [
         pane('Statistics', TeacherStatistics, 'table'),
         pane('Leaderboard', TeacherLeaderBoard, 'trophy'),
@@ -37,49 +37,19 @@ const TeachersTabs = withRouter(({ admin, history }) => {
       onTabChange={setTab}
     />
   )
-})
+}
 
-const Teachers = ({
-  match: {
-    params: { teacherid },
-  },
-  isAdmin,
-}) => {
+const Teachers = () => {
   useTitle('Teachers')
+  const { teacherid } = useParams()
   return (
     <div className="segmentContainer">
       <Header className="segmentTitle" size="large" content="Teacher statistics" />
       <Segment className="contentSegment">
-        {teacherid ? <TeacherPage teacherid={teacherid} /> : <TeachersTabs admin={isAdmin} />}
+        {teacherid ? <TeacherPage teacherid={teacherid} /> : <TeachersTabs />}
       </Segment>
     </div>
   )
 }
 
-Teachers.propTypes = {
-  match: shape({
-    params: shape({
-      teacherid: string,
-    }),
-  }),
-  isAdmin: bool.isRequired,
-}
-TeachersTabs.propTypes = {
-  admin: bool.isRequired,
-}
-
-Teachers.defaultProps = {
-  match: {
-    params: { teacherid: undefined },
-  },
-}
-
-export default connect(
-  ({
-    auth: {
-      token: { roles },
-    },
-  }) => ({
-    isAdmin: getUserIsAdmin(roles),
-  })
-)(withRouter(Teachers))
+export default Teachers

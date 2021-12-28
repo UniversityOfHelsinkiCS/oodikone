@@ -10,7 +10,7 @@ import { withRouter } from 'react-router-dom'
 import { getStudent, removeStudentSelection, resetStudent } from '../../../redux/students'
 import { getSemesters } from '../../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
-import { getUserIsAdmin, bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '../../../common'
+import { bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '../../../common'
 import { clearCourseStats } from '../../../redux/coursestats'
 import { getProgrammes } from '../../../redux/populationProgrammes'
 import BachelorHonours from './BachelorHonours'
@@ -246,20 +246,12 @@ StudentDetails.defaultProps = {
   studentNumber: '',
 }
 
-const mapStateToProps = ({
-  students,
-  semesters,
-  populationProgrammes,
-  auth: {
-    token: { roles },
-  },
-}) => ({
+const mapStateToProps = ({ students, semesters, populationProgrammes }) => ({
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
   semesters: semesters.data,
   fetching: students.fetching,
-  isAdmin: getUserIsAdmin(roles),
   Programmes: populationProgrammes.data || {},
 })
 

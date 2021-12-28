@@ -1,43 +1,24 @@
-/**
- * Context for language selection.
- */
 import React, { createContext, useState, useContext, useEffect } from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { LANGUAGE_CODES } from '../../constants'
 import { callApi } from '../../apiConnection'
 
 const LanguageContext = createContext([[], () => {}])
 LanguageContext.displayName = 'Language'
 
-const LanguageProvider = ({ children, token }) => {
+export const LanguageProvider = ({ children }) => {
   const [state, setState] = useState(LANGUAGE_CODES[0])
+  const user = useGetAuthorizedUserQuery()
 
   // Load selected language.
   useEffect(() => {
-    if (token && LANGUAGE_CODES.includes(token.language)) {
-      setState(token.language)
+    if (LANGUAGE_CODES.includes(user?.language)) {
+      setState(user.language)
     }
-  }, [token])
+  }, [user])
 
   return <LanguageContext.Provider value={[state, setState]}>{children}</LanguageContext.Provider>
 }
-
-LanguageProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  token: PropTypes.shape({
-    language: PropTypes.string,
-  }),
-}
-
-LanguageProvider.defaultProps = {
-  token: null,
-}
-
-const mapStateToProps = ({ auth }) => ({ token: auth.token })
-
-const ConnectedProvider = connect(mapStateToProps)(LanguageProvider)
-export { ConnectedProvider as LanguageProvider }
 
 export default () => {
   const [state, setState] = useContext(LanguageContext)

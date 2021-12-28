@@ -8,7 +8,7 @@ import { PopulationCourseContext } from './PopulationCourseContext'
 import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution/GradeDistributionFlat'
 import PassFail from './PassFail/PassFailFlat'
-import { getUserIsAdmin, getTextIn } from '../../common'
+import { getTextIn } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Population statistics', action, name, value)
@@ -87,12 +87,10 @@ const initialState = props => ({
 const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFilter = true }) => {
   const dispatch = useDispatch()
   const { years } = useSelector(({ semesters }) => semesters.data)
-  const isAdmin = getUserIsAdmin(useSelector(({ auth }) => auth.token.roles))
   const { language } = useLanguage()
 
   const props = {
     courses,
-    isAdmin,
     pending,
     populationCourses: courses,
     selectedStudents: filteredStudents,

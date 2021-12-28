@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'semantic-ui-react'
-import { connect, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import { getTextIn, getUserRoles, textAndDescriptionSearch } from '../../common'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { getTextIn, textAndDescriptionSearch } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
 import { getFaculties } from '../../redux/faculties'
@@ -19,7 +20,6 @@ const UserPage = ({
   user,
   elementdetails,
   accessGroups,
-  isAdmin,
   faculties,
   setFaculties,
   goBack,
@@ -32,7 +32,7 @@ const UserPage = ({
   getProgrammesUnfiltered,
 }) => {
   const { language } = useLanguage()
-  const { userId: currentUserId } = useSelector(state => state?.auth?.token)
+  const { userId: currentUserId, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
 
   useEffect(() => {
@@ -204,7 +204,6 @@ const mapStateToProps = state => ({
   pending: !!state.populationProgrammesUnfiltered.pending,
   elementdetails: state.elementdetails.data,
   accessGroups: state.accessGroups,
-  isAdmin: getUserRoles(state.auth.token.roles).includes('admin'),
 })
 
 export default connect(mapStateToProps, {
