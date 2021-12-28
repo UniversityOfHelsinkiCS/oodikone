@@ -36,7 +36,7 @@ const getRow = (year, array, show, setShow) => {
 }
 
 const DataTable = ({ data, titles }) => {
-  const [show, setShow] = useState(true)
+  const [show, setShow] = useState(false)
 
   if (!data) return null
 
