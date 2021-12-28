@@ -13,6 +13,7 @@ import '../studyprogramme.css'
 const populationTitles = ['', 'All started', 'Men', 'Women', 'Finnish', 'Graduated']
 const creditTableTitles = [
   '',
+  'All started',
   'Under 30 credits',
   '30-59 credits',
   '60-89 credits',
