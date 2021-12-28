@@ -2,13 +2,23 @@ import React, { useState } from 'react'
 import { Divider } from 'semantic-ui-react'
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import InfoBox from '../../Info/InfoBox'
+import BarChart from './BarChart'
+import BasicDataTable from './BasicDataTable'
+import StudytrackDataTable from './StudytrackDataTable'
 import StudytrackSelector from './StudytrackSelector'
-import DataTable from './DataTable'
 
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
 const populationTitles = ['', 'All started', 'Men', 'Women', 'Finnish', 'Graduated']
+const creditTableTitles = [
+  'Under 30 credits',
+  '30-59 credits',
+  '60-89 credits',
+  '90-119 credits',
+  '120-149 credits',
+  '150 or more credits',
+]
 
 const StudytrackOverview = ({ studyprogramme }) => {
   const [track, setTrack] = useState('All students of the studyprogramme')
@@ -40,7 +50,19 @@ const StudytrackOverview = ({ studyprogramme }) => {
         }`,
         'StudytrackOverview'
       )}
-      <DataTable titles={populationTitles} data={stats.data} />
+      <StudytrackDataTable titles={populationTitles} data={stats.data} />
+      {getDivider(
+        `Students of ${
+          track === 'All students of the studyprogramme'
+            ? 'the programme by starting year'
+            : `the studytrack ${track} by starting year`
+        }`,
+        'StudytrackOverview'
+      )}
+      <div className="section-container">
+        <BarChart data={[]} />
+        <BasicDataTable data={[]} titles={creditTableTitles} />
+      </div>
     </div>
   )
 }
