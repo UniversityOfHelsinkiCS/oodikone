@@ -16,13 +16,15 @@ const DataTable = ({ data, titles }) => {
         </Table.Header>
 
         <Table.Body>
-          {data?.map(yearArray => (
-            <Table.Row key={`random-year-key-${Math.random()}`}>
-              {yearArray?.map(value => (
-                <Table.Cell key={`random-key-${Math.random()}`}>{value}</Table.Cell>
-              ))}
-            </Table.Row>
-          ))}
+          {data?.map(year =>
+            year.credits?.map(array => (
+              <Table.Row key={`random-year-key-${Math.random()}`}>
+                {array.map(value => (
+                  <Table.Cell key={`random-key-${Math.random()}`}>{value === 'TOTAL' ? year.year : value}</Table.Cell>
+                ))}
+              </Table.Row>
+            ))
+          )}
         </Table.Body>
       </Table>
     </div>

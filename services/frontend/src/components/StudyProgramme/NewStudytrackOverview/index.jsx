@@ -12,6 +12,7 @@ import '../studyprogramme.css'
 
 const populationTitles = ['', 'All started', 'Men', 'Women', 'Finnish', 'Graduated']
 const creditTableTitles = [
+  '',
   'Under 30 credits',
   '30-59 credits',
   '60-89 credits',
@@ -61,7 +62,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
       )}
       <div className="section-container">
         <BarChart data={[]} />
-        <BasicDataTable data={[]} titles={creditTableTitles} />
+        <BasicDataTable data={stats?.data?.data} titles={creditTableTitles} />
       </div>
     </div>
   )
