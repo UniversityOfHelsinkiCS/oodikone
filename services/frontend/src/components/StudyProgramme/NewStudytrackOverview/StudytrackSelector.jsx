@@ -5,7 +5,6 @@ import '../studyprogramme.css'
 
 const StudytrackSelector = ({ track, setTrack, studytracks }) => {
   if (!studytracks) return null
-  const formattedStudytracks = ['All students of the studyprogramme', ...studytracks]
 
   const handleStudytrackChange = (event, { value }) => {
     event.preventDefault()
@@ -20,7 +19,7 @@ const StudytrackSelector = ({ track, setTrack, studytracks }) => {
         selection
         value={track}
         onChange={handleStudytrackChange}
-        options={formattedStudytracks.map(o => ({ key: o, value: o, text: o }))}
+        options={Object.entries(studytracks).map(([code, track]) => ({ key: code, value: code, text: track }))}
       />
     </div>
   )
