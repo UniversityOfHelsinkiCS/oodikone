@@ -52,7 +52,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
         }`,
         'StudytrackOverview'
       )}
-      <StudytrackDataTable titles={populationTitles} data={stats?.data?.data} />
+      <StudytrackDataTable titles={populationTitles} data={stats?.data?.mainData} />
       {getDivider(
         `Progress of students of ${
           track === 'All students of the studyprogramme'
@@ -62,8 +62,8 @@ const StudytrackOverview = ({ studyprogramme }) => {
         'StudytrackOverview'
       )}
       <div className="section-container">
-        <BarChart data={[]} />
-        <BasicDataTable data={stats?.data?.data} titles={creditTableTitles} />
+        <BarChart data={stats?.data} />
+        <BasicDataTable data={stats?.data?.creditTableStats} titles={creditTableTitles} />
       </div>
     </div>
   )

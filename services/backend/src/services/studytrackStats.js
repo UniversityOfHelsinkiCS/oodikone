@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { indexOf } = require('lodash')
 
 const { getAssociations } = require('./studyrights')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
@@ -8,7 +9,6 @@ const { semesterStart, semesterEnd } = require('../util/semester')
 
 const getStudentData = students => {
   const data = { female: 0, male: 0, finnish: 0, lte30: 0, lte60: 0, lte90: 0, lte120: 0, lte150: 0, mte150: 0 }
-
   students.forEach(({ gender_code, home_country_en, creditcount }) => {
     data.male += gender_code === '1' ? 1 : 0
     data.female += gender_code === '2' ? 1 : 0
@@ -23,7 +23,43 @@ const getStudentData = students => {
   return data
 }
 
-const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year, studytrackNames) => {
+const getEmptyArray = length => new Array(length).fill(0)
+
+const getCreditGraphStats = years => ({
+  lte30: {
+    name: 'Less than 30 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte60: {
+    name: '30-59 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte90: {
+    name: '60-89 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte120: {
+    name: '90-119 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte150: {
+    name: '120-149 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte150: {
+    name: 'More than 150 credits',
+    data: getEmptyArray(years.length),
+  },
+})
+
+const getStudytrackDataForTheYear = async ({
+  studyprogramme,
+  studytracks,
+  year,
+  studytrackNames,
+  years,
+  creditGraphStats,
+}) => {
   const startDate = `${year}-${semesterStart['FALL']}`
   const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
 
@@ -40,12 +76,21 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year, st
         true,
         true
       )
-      const label = track === studyprogramme ? 'TOTAL' : studytrackNames[track]
+      const label = track === studyprogramme ? `${year} - ${year + 1}` : studytrackNames[track]
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const startedStudentnumbers = [...new Set(started.map(s => s.studentnumber))]
       const students = await studytrackStudents(startedStudentnumbers)
       const studentData = getStudentData(students)
       const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
+
+      if (studyprogramme === track) {
+        creditGraphStats.lte30.data[indexOf(years, year)] = studentData.lte30
+        creditGraphStats.lte60.data[indexOf(years, year)] = studentData.lte60
+        creditGraphStats.lte90.data[indexOf(years, year)] = studentData.lte90
+        creditGraphStats.lte120.data[indexOf(years, year)] = studentData.lte120
+        creditGraphStats.lte150.data[indexOf(years, year)] = studentData.lte150
+        creditGraphStats.mte150.data[indexOf(years, year)] = studentData.mte150
+      }
 
       if (started.length === 0) return previousData
       return {
@@ -65,10 +110,10 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year, st
             getPercentage(graduated.length, started.length),
           ],
         ],
-        credits:
+        creditTableStats:
           track === studyprogramme
             ? [
-                ...previousData.credits,
+                ...previousData.creditTableStats,
                 [
                   label,
                   started.length,
@@ -80,12 +125,11 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year, st
                   studentData.mte150,
                 ],
               ]
-            : previousData.credits,
+            : previousData.creditTableStats,
       }
     },
-    { mainData: [], credits: [] }
+    { mainData: [], creditTableStats: [] }
   )
-
   return data
 }
 
@@ -101,26 +145,42 @@ const getStudytrackNames = (allStudytracks, programmesStudytracks) => {
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
   const isAcademicYear = true
   const since = getStartDate(studyprogramme, isAcademicYear)
-  const years = getYearsArray(since.getFullYear()).reverse()
+  const years = getYearsArray(since.getFullYear())
 
   const associations = await getAssociations()
-  const programmesStudytracks = associations.programmes[studyprogramme]
+  const studytracks = associations.programmes[studyprogramme]
     ? [studyprogramme, ...associations.programmes[studyprogramme].studytracks]
     : [studyprogramme]
 
   const allStudytracks = associations.studyTracks
-  const studytrackNames = getStudytrackNames(allStudytracks, programmesStudytracks)
+  const studytrackNames = getStudytrackNames(allStudytracks, studytracks)
+
+  const creditGraphStats = await getCreditGraphStats(years)
 
   const data = await Promise.all(
     years.map(async year => {
-      const dataOfYear = await getStudytrackDataForTheYear(studyprogramme, programmesStudytracks, year, studytrackNames)
-      return { year: `${year}-${year + 1}`, mainData: dataOfYear.mainData, credits: dataOfYear.credits }
+      const dataOfYear = await getStudytrackDataForTheYear({
+        studyprogramme,
+        studytracks,
+        year,
+        studytrackNames,
+        years,
+        creditGraphStats,
+      })
+      return {
+        year: `${year}-${year + 1}`,
+        mainData: dataOfYear.mainData,
+        creditTableStats: dataOfYear.creditTableStats,
+      }
     })
   )
 
   return {
     id: studyprogramme,
-    data,
+    years: getYearsArray(since.getFullYear(), isAcademicYear),
+    mainData: data.map(dataByYear => ({ year: dataByYear.year, data: dataByYear.mainData })).reverse(),
+    creditTableStats: data.map(year => year.creditTableStats).reverse(),
+    creditGraphStats: Object.values(creditGraphStats),
     studytrackNames: { studyprogramme: 'All students of the studyprogramme', ...studytrackNames },
   }
 }
