@@ -4,12 +4,12 @@ import { Link } from 'react-router-dom'
 import _ from 'lodash'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
-import { useIsAdmin } from 'common/hooks'
 import SortableTable from 'components/SortableTable'
 import useFilters from 'components/FilterView/useFilters'
 import creditDateFilter from 'components/FilterView/filters/date'
 import { getStudentTotalCredits, getTextIn, getNewestProgramme, reformatDate, copyToClipboard } from 'common'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
 import useLanguage from '../../LanguagePicker/useLanguage'
@@ -448,7 +448,7 @@ const StudyGuidanceGroupGeneralTabContainer = ({ group, ...props }) => {
 const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   const populations = useSelector(({ populations }) => populations)
   const { namesVisible } = useSelector(({ settings }) => settings)
-  const isAdmin = useIsAdmin()
+  const { isAdmin } = useGetAuthorizedUserQuery()
 
   const getStudyGuidanceGroupColumns = () => {
     const cols = ['programme', 'startYear']

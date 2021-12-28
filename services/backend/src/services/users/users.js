@@ -21,9 +21,6 @@ const requiredGroup =
     ? ['grp-oodikone-staging-users', 'grp-oodikone-basic-staging-users']
     : ['grp-oodikone-users', 'grp-oodikone-basic-users']
 
-// Refactor this token version away
-const TOKEN_VERSION = 1.1 // When token structure changes, increment in backend and frontend
-
 // help for refactoring away from token
 const generateTokenData = async (uid, mockedBy = null) => {
   const user = await byUsername(uid)
@@ -39,7 +36,6 @@ const generateTokenData = async (uid, mockedBy = null) => {
     rights: programmes,
     roles: user.accessgroup,
     createdAt: moment().toISOString(),
-    version: TOKEN_VERSION,
     sisPersonId: user.sisu_person_id,
   }
   return payload

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Header, Segment, Tab, Message } from 'semantic-ui-react'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
-import { bool, shape, func, string, arrayOf } from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
+import { useHistory } from 'react-router-dom'
 import './courseStatistics.css'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import SearchForm from './SearchForm'
 import SingleCourseTab from './SingleCourseTab'
 import FacultyLevelStatistics from './FacultyLevelStatistics'
@@ -11,7 +11,7 @@ import SummaryTab from './SummaryTab'
 import ProgressBar from '../ProgressBar'
 import { useProgress, useTitle } from '../../common/hooks'
 import { clearCourseStats } from '../../redux/coursestats'
-import { getUserRoles, checkUserAccess } from '../../common'
+import { checkUserAccess } from '../../common'
 import { userHasAccessToAllCourseStats } from './courseStatisticsUtils'
 import TSA from '../../common/tsa'
 
@@ -25,9 +25,16 @@ const MENU = {
   FACULTY: 'Faculty statistics',
 }
 
-const CourseStatistics = props => {
-  const { singleCourseStats, clearCourseStats, history, statsIsEmpty, loading, initCourseCode, userRoles, rights } =
-    props
+const CourseStatistics = () => {
+  const history = useHistory()
+  const dispatch = useDispatch()
+  const { rights, userRoles } = useGetAuthorizedUserQuery()
+  const courseStats = useSelector(({ courseStats }) => courseStats)
+  const { pending: loading } = courseStats
+  const courses = Object.keys(courseStats.data)
+  const statsIsEmpty = courses.length === 0
+  const singleCourseStats = courses.length === 1
+  const initCourseCode = courses[0] || ''
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [selected, setSelected] = useState(initCourseCode)
@@ -87,7 +94,7 @@ const CourseStatistics = props => {
           onClick: () => {
             sendAnalytics('Clicked new query', 'Course stats')
             history.push('/coursestatistics')
-            clearCourseStats()
+            dispatch(clearCourseStats)
           },
         },
         render: () => null,
@@ -97,7 +104,7 @@ const CourseStatistics = props => {
     return !singleCourseStats ? panes : panes.filter(p => p.menuItem !== MENU.SUM)
   }
 
-  const handleTabChange = (e, { activeIndex, panes }) => {
+  const handleTabChange = (_, { activeIndex, panes }) => {
     if (panes[activeIndex].menuItem.key !== 'query') {
       setActiveIndex(activeIndex)
     }
@@ -142,34 +149,4 @@ const CourseStatistics = props => {
   )
 }
 
-CourseStatistics.propTypes = {
-  statsIsEmpty: bool.isRequired,
-  singleCourseStats: bool.isRequired,
-  history: shape({}).isRequired,
-  clearCourseStats: func.isRequired,
-  loading: bool.isRequired,
-  initCourseCode: string.isRequired,
-  userRoles: arrayOf(string).isRequired,
-  rights: arrayOf(string).isRequired,
-}
-
-const mapStateToProps = ({
-  courseStats,
-  auth: {
-    token: { roles, rights },
-  },
-}) => {
-  const courses = Object.keys(courseStats.data)
-  return {
-    userRoles: getUserRoles(roles),
-    rights,
-    pending: courseStats.pending,
-    error: courseStats.error,
-    statsIsEmpty: courses.length === 0,
-    singleCourseStats: courses.length === 1,
-    loading: courseStats.pending,
-    initCourseCode: courses[0] || '',
-  }
-}
-
-export default withRouter(connect(mapStateToProps, { clearCourseStats })(CourseStatistics))
+export default CourseStatistics

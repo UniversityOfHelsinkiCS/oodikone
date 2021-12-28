@@ -20,7 +20,7 @@ export const useTabChangeAnalytics = (category, action) => {
   const previousTabIndex = React.useRef(0)
 
   const handleTabChange = useCallback(
-    (e, data) => {
+    (_, data) => {
       const { activeIndex, panes } = data
 
       if (previousTabIndex.current !== activeIndex) {
@@ -58,7 +58,7 @@ export const useTabs = (id, initialTab, { location, replace }) => {
 
   return [
     tab,
-    (e, { activeIndex }) => {
+    (_, { activeIndex }) => {
       setTab(activeIndex)
     },
   ]
@@ -271,12 +271,6 @@ export const useLocalStorage = (key, initialValue) => {
 export const useLanguage = () => {
   const { language } = useSelector(({ settings }) => settings)
   return language
-}
-
-export const useIsAdmin = () => {
-  const { roles } = useSelector(({ auth }) => auth.token)
-  if (!roles) return false
-  return roles.some(role => role.group_code === 'admin')
 }
 
 // From: https://www.joshwcomeau.com/snippets/react-hooks/use-toggle/

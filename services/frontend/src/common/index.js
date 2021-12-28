@@ -23,9 +23,6 @@ export const images = {
   irtomikko,
 }
 
-export const getUserRoles = roles => (roles ? roles.map(r => r.group_code) : [])
-export const getUserIsAdmin = roles => getUserRoles(roles).includes('admin')
-
 export const checkUserAccess = (requiredRoles, userRoles) => {
   return intersection(userRoles, requiredRoles).length > 0
 }

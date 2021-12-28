@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { shape, func, arrayOf, bool, string } from 'prop-types'
 import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { getProviders } from '../../../redux/providers'
 import { getSemesters } from '../../../redux/semesters'
 import { getTeacherStatistics } from '../../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
-import { getUserIsAdmin, getTextIn } from '../../../common'
+import { getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
 const TeacherStatistics = ({
@@ -19,8 +19,6 @@ const TeacherStatistics = ({
   providers,
   statistics,
   pending,
-  isAdmin,
-  rights,
   history,
 }) => {
   const { language } = useLanguage()
@@ -29,6 +27,7 @@ const TeacherStatistics = ({
   const [display, setDisplay] = useState(false)
   // awful variable name but for some reason we need providers for props and state :kuolemakiitos:
   const [provs, setProviders] = useState([])
+  const { rights, isAdmin } = useGetAuthorizedUserQuery()
 
   useEffect(() => {
     getProviders()
@@ -164,27 +163,8 @@ const TeacherStatistics = ({
   )
 }
 
-TeacherStatistics.propTypes = {
-  providers: arrayOf(shape({})).isRequired,
-  semesters: arrayOf(shape({})).isRequired,
-  statistics: arrayOf(shape({})).isRequired,
-  getSemesters: func.isRequired,
-  getProviders: func.isRequired,
-  getTeacherStatistics: func.isRequired,
-  pending: bool.isRequired,
-  history: shape({}).isRequired,
-  rights: arrayOf(string).isRequired,
-  isAdmin: bool.isRequired,
-}
-
 const mapStateToProps = state => {
-  const {
-    providers,
-    teacherStatistics,
-    auth: {
-      token: { rights, roles },
-    },
-  } = state
+  const { providers, teacherStatistics } = state
   const { semesters } = state.semesters.data
   const providerOptions = providers.data.map(prov => ({ key: prov.code, value: prov.code, name: prov.name }))
   const semesterOptions = !semesters
@@ -210,8 +190,6 @@ const mapStateToProps = state => {
     statistics,
     pending: teacherStatistics.pending,
     error: teacherStatistics.error,
-    rights,
-    isAdmin: getUserIsAdmin(roles),
   }
 }
 

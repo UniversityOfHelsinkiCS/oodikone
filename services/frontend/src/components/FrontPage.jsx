@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Container, Header, Image, Divider, List } from 'semantic-ui-react'
 import moment from 'moment'
-import { useSelector } from 'react-redux'
-import { images, getUserRoles, checkUserAccess } from '../common'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { images, checkUserAccess } from '../common'
 import { useTitle } from '../common/hooks'
 import { builtAt } from '../conf'
 import oodiTXT from '../static/oodi.txt'
@@ -48,8 +48,7 @@ const OodiToOodikone = () => {
 }
 
 const FrontPage = () => {
-  const { roles, rights } = useSelector(state => state.auth.token)
-  const userRoles = getUserRoles(roles)
+  const { rights, userRoles } = useGetAuthorizedUserQuery()
   useTitle()
 
   const showItems = {

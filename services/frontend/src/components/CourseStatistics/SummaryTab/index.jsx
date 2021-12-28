@@ -1,8 +1,8 @@
 import React from 'react'
 import { Form, Label, Segment, Header } from 'semantic-ui-react'
-import { connect } from 'react-redux'
-import { shape, arrayOf, func, oneOfType, number, string, bool } from 'prop-types'
+import { connect, useSelector } from 'react-redux'
 import { flatten } from 'lodash'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import { fields, setValue } from '../../../redux/coursesSummaryForm'
 import AttemptsTable from '../AttemptsTable'
@@ -27,9 +27,19 @@ const unObjectifyProperty = ({ obj, property }) => {
   return { ...obj, [property]: suspectField }
 }
 
-const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClickCourse, userHasAccessToAllStats }) => {
+const SummaryTab = ({ setValue, onClickCourse }) => {
+  const { roles, rights } = useGetAuthorizedUserQuery()
+  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, rights)
+  const programmes = useSelector(state => selectors.getAllStudyProgrammes(state))
+  const programmeCodes = useSelector(({ courseSummaryForm }) => courseSummaryForm[fields.programmes])
+  const form = useSelector(({ courseSummaryForm }) => courseSummaryForm)
+  const statistics = useSelector(state =>
+    selectors.summaryStatistics(state, { programmes, programmeCodes }, userHasAccessToAllStats)
+  )
+  const queryInfo = useSelector(state => selectors.getQueryInfo(state))
+
   const { language } = useLanguage()
-  const handleChange = (e, { name, value }) => {
+  const handleChange = (_, { name, value }) => {
     let selected = [...value].filter(v => v !== ALL.value)
     if ((!form[fields.programmes].includes(ALL.value) && value.includes(ALL.value)) || value.length === 0) {
       selected = [ALL.value]
@@ -99,45 +109,4 @@ const SummaryTab = ({ form, setValue, statistics, programmes, queryInfo, onClick
   )
 }
 
-SummaryTab.propTypes = {
-  statistics: arrayOf(
-    shape({
-      coursecode: oneOfType([number, string]),
-      name: shape({
-        fi: string,
-        en: string,
-        sv: string,
-      }),
-      summary: shape({
-        failed: number,
-        passed: number,
-        passrate: oneOfType([number, string]),
-      }),
-    })
-  ).isRequired,
-  programmes: arrayOf(shape({})).isRequired,
-  form: shape({}).isRequired,
-  setValue: func.isRequired,
-  queryInfo: shape({
-    courses: arrayOf(shape({})),
-    timeframe: arrayOf(shape({})),
-  }).isRequired,
-  onClickCourse: func.isRequired,
-  userHasAccessToAllStats: bool.isRequired,
-}
-
-const mapStateToProps = state => {
-  const { roles } = state.auth.token
-  const { rights } = state.auth.token
-  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, rights)
-  const programmes = selectors.getAllStudyProgrammes(state)
-  const programmeCodes = state.courseSummaryForm[fields.programmes]
-  return {
-    form: state.courseSummaryForm,
-    statistics: selectors.summaryStatistics(state, { programmes, programmeCodes }, userHasAccessToAllStats),
-    queryInfo: selectors.getQueryInfo(state),
-    programmes,
-  }
-}
-
-export default connect(mapStateToProps, { setValue })(SummaryTab)
+export default connect(null, { setValue })(SummaryTab)

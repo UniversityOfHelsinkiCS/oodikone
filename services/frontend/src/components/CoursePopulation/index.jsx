@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { shape, func, bool } from 'prop-types'
 import { Segment, Header, Accordion } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import InfoBox from 'components/Info/InfoBox'
@@ -18,7 +17,7 @@ import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import ProgressBar from '../ProgressBar'
-import { getStudentToTargetCourseDateMap, getUserIsAdmin, getTextIn } from '../../common'
+import { getStudentToTargetCourseDateMap, getTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import {
@@ -337,36 +336,13 @@ const CustomPopulationCoursesWrapper = props => {
   return <CustomPopulationCourses {...props} courses={courseStatistics} />
 }
 
-CoursePopulation.propTypes = {
-  getCoursePopulationDispatch: func.isRequired,
-  getSingleCourseStatsDispatch: func.isRequired,
-  getSemestersDispatch: func.isRequired,
-  pending: bool.isRequired,
-  studentData: shape({}).isRequired,
-  history: shape({}).isRequired,
-  courseData: shape({}).isRequired,
-  semesters: shape({
-    semesters: shape({}),
-    years: shape({}),
-  }).isRequired,
-  getFacultiesDispatch: func.isRequired,
-}
-
-const mapStateToProps = ({
-  singleCourseStats,
-  populations,
-  semesters,
-  auth: {
-    token: { roles },
-  },
-}) => {
+const mapStateToProps = ({ singleCourseStats, populations, semesters }) => {
   return {
     studentData: populations.data,
     pending: populations.pending,
     courseData: singleCourseStats.stats || {},
     semesters: semesters.data,
     elementDetails: populations?.data?.elementdetails?.data,
-    isAdmin: getUserIsAdmin(roles),
   }
 }
 

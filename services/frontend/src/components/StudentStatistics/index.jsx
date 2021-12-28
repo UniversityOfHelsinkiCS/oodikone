@@ -7,7 +7,6 @@ import StudentSearch from './StudentSearch'
 import StudentDetails from './StudentDetails'
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import { useTitle } from '../../common/hooks'
-import { getUserRoles } from '../../common'
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
 const StudentStatistics = props => {
@@ -30,16 +29,6 @@ const StudentStatistics = props => {
   )
 }
 
-const mapStateToProps = ({
-  students,
-  auth: {
-    token: { roles, rights },
-  },
-}) => ({
-  userRoles: getUserRoles(roles),
-  rights,
-  student: students.data.find(student => student.studentNumber === students.selected),
-})
 const mapDispatchToProps = dispatch => ({
   toggleStudentNameVisibility,
   findStudents: searchStr => dispatch(findStudents(searchStr)),
@@ -47,4 +36,4 @@ const mapDispatchToProps = dispatch => ({
   selectStudent: studentNumber => dispatch(selectStudent(studentNumber)),
 })
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(StudentStatistics))
+export default withRouter(connect(null, mapDispatchToProps)(StudentStatistics))

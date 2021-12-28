@@ -1,6 +1,5 @@
 import React, { Component, Suspense } from 'react'
 import { connect } from 'react-redux'
-import { node, shape, bool, func, arrayOf } from 'prop-types'
 import { Loader } from 'semantic-ui-react'
 import * as Sentry from '@sentry/browser'
 import TSA from '../../common/tsa'
@@ -64,20 +63,6 @@ class ErrorBoundary extends Component {
       </Suspense>
     )
   }
-}
-
-ErrorBoundary.propTypes = {
-  auth: shape({
-    token: shape({
-      enabled: bool,
-      pending: bool,
-    }),
-    error: bool,
-  }).isRequired,
-  // eslint-disable-next-line react/no-unused-prop-types
-  actionHistory: arrayOf(shape({})),
-  login: func.isRequired,
-  children: node.isRequired,
 }
 
 ErrorBoundary.defaultProps = {

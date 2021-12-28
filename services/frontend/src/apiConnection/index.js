@@ -130,7 +130,7 @@ export const handleAuth = store => next => async action => {
       store.dispatch({ type: failure })
       handleError(err, store.getState().actionHistory)
     }
-  } else if (type === loginTypes.attempt) {
+  } else if (type === logoutTypes.attempt) {
     const { success, failure } = logoutTypes
     try {
       await logout()

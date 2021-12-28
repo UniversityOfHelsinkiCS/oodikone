@@ -2,7 +2,8 @@ import React from 'react'
 import { Card, Icon, Button } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { reformatDate, getUserIsAdmin } from '../../../common'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { reformatDate } from '../../../common'
 import { DISPLAY_DATE_FORMAT, DISPLAY_DATE_FORMAT_DEV } from '../../../constants'
 import './studentInfoCard.css'
 import { removeStudentSelection, resetStudent } from '../../../redux/students'
@@ -15,8 +16,7 @@ const StudentInfoCard = ({ student }) => {
   const history = useHistory()
   const { namesVisible: showName } = useSelector(state => state.settings)
   const { updating } = useSelector(state => state.populations)
-  const { roles } = useSelector(state => state.auth.token)
-  const isAdmin = getUserIsAdmin(roles)
+  const { isAdmin } = useGetAuthorizedUserQuery()
   const name = showName ? `${student.name}, ` : ''
   const email = showName && student.email ? `${student.email}` : ''
   const onRemove = () => {
