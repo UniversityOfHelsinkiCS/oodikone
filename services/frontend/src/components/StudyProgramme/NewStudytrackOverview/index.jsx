@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider } from 'semantic-ui-react'
+import { Divider, Loader } from 'semantic-ui-react'
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
@@ -43,28 +43,34 @@ const StudytrackOverview = ({ studyprogramme }) => {
           Please note that this view is still very much a work in progress. This view is only visible to some admins.
         </p>
       </div>
-      <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackNames} />
-      {getDivider(
-        `Students of ${
-          track === 'All students of the studyprogramme'
-            ? 'the programme by starting year'
-            : `the studytrack ${track} by starting year`
-        }`,
-        'StudytrackOverview'
+      {stats.isLoading ? (
+        <Loader active={stats.isLoading} />
+      ) : (
+        <>
+          <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackNames} />
+          {getDivider(
+            `Students of ${
+              track === 'All students of the studyprogramme'
+                ? 'the programme by starting year'
+                : `the studytrack ${track} by starting year`
+            }`,
+            'StudytrackOverview'
+          )}
+          <StudytrackDataTable titles={populationTitles} data={stats?.data?.mainData} />
+          {getDivider(
+            `Progress of students of ${
+              track === 'All students of the studyprogramme'
+                ? 'the programme by starting year'
+                : `the studytrack ${track} by starting year`
+            }`,
+            'StudytrackOverview'
+          )}
+          <div className="section-container">
+            <BarChart data={stats?.data} />
+            <BasicDataTable data={stats?.data?.creditTableStats} titles={creditTableTitles} />
+          </div>
+        </>
       )}
-      <StudytrackDataTable titles={populationTitles} data={stats?.data?.mainData} />
-      {getDivider(
-        `Progress of students of ${
-          track === 'All students of the studyprogramme'
-            ? 'the programme by starting year'
-            : `the studytrack ${track} by starting year`
-        }`,
-        'StudytrackOverview'
-      )}
-      <div className="section-container">
-        <BarChart data={stats?.data} />
-        <BasicDataTable data={stats?.data?.creditTableStats} titles={creditTableTitles} />
-      </div>
     </div>
   )
 }
