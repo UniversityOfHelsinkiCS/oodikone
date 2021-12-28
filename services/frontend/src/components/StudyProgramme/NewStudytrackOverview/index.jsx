@@ -50,9 +50,9 @@ const StudytrackOverview = ({ studyprogramme }) => {
         }`,
         'StudytrackOverview'
       )}
-      <StudytrackDataTable titles={populationTitles} data={stats.data} />
+      <StudytrackDataTable titles={populationTitles} data={stats?.data?.data} />
       {getDivider(
-        `Students of ${
+        `Progress of students of ${
           track === 'All students of the studyprogramme'
             ? 'the programme by starting year'
             : `the studytrack ${track} by starting year`
