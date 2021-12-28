@@ -17,7 +17,7 @@ const DataTable = ({ data, titles }) => {
 
         <Table.Body>
           {data?.map(year =>
-            year.credits?.map(array => (
+            year.map(array => (
               <Table.Row key={`random-year-key-${Math.random()}`}>
                 {array.map(value => (
                   <Table.Cell key={`random-key-${Math.random()}`}>{value === 'TOTAL' ? year.year : value}</Table.Cell>
