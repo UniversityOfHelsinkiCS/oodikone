@@ -11,6 +11,7 @@
   font-weight: bold;
 }
 
+.studytrack-overview .divider,
 .studyprogramme-overview .divider {
   margin-top: 4em;
 }
@@ -22,7 +23,8 @@
   flex-wrap: wrap;
 }
 
-.studytrack-overview .graph-container .studyprogramme-overview .graph-container {
+.studytrack-overview .graph-container,
+.studyprogramme-overview .graph-container {
   min-width: 55%;
   height: 500px;
 }
