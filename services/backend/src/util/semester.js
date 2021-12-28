@@ -29,8 +29,16 @@ const getPassingSemester = (startYear, date) => {
   return yearCount < 6 ? `${yearCount}-${semester}` : 'LATER'
 }
 
+const getAcademicYearDates = year => {
+  return {
+    startDate: `${year}-${semesterStart['FALL']}`,
+    endDate: `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`,
+  }
+}
+
 module.exports = {
   getPassingSemester,
+  getAcademicYearDates,
   semesterEnd,
   semesterStart,
 }

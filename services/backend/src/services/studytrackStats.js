@@ -1,11 +1,10 @@
-const moment = require('moment')
 const { indexOf } = require('lodash')
 
 const { getAssociations } = require('./studyrights')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { getStartDate, getYearsArray, getPercentage } = require('./studyprogrammeHelpers')
 const { studytrackStudents, startedStudyrights, graduatedStudyRights } = require('./newStudyprogramme')
-const { semesterStart, semesterEnd } = require('../util/semester')
+const { getAcademicYearDates } = require('../util/semester')
 
 const getStudentData = students => {
   const data = { female: 0, male: 0, finnish: 0, lte30: 0, lte60: 0, lte90: 0, lte120: 0, lte150: 0, mte150: 0 }
@@ -60,8 +59,7 @@ const getStudytrackDataForTheYear = async ({
   years,
   creditGraphStats,
 }) => {
-  const startDate = `${year}-${semesterStart['FALL']}`
-  const endDate = `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
+  const { startDate, endDate } = getAcademicYearDates(year)
 
   const data = await studytracks.reduce(
     async (all, track) => {
