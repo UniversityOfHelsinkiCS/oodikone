@@ -15,11 +15,12 @@ const formatStudyright = studyright => {
 }
 
 const formatStudent = student => {
-  const { studentnumber, gender_code, home_country_en } = student
+  const { studentnumber, gender_code, home_country_en, creditcount } = student
   return {
     studentnumber,
     gender_code,
     home_country_en,
+    creditcount,
   }
 }
 

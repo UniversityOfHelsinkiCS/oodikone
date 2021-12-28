@@ -4,7 +4,7 @@ import { Icon, Table } from 'semantic-ui-react'
 const getKey = year => `${year.year}-${Math.random()}`
 
 const getYearCell = (year, show) => {
-  if (year?.data.length === 1) {
+  if (year?.mainData.length === 1) {
     return <Table.Cell key={getKey(year)}>{year.year}</Table.Cell>
   }
   return (
@@ -61,8 +61,7 @@ const StudytrackDataTable = ({ data, titles }) => {
             ))}
           </Table.Row>
         </Table.Header>
-
-        <Table.Body>{data?.data?.map(year => year.data.map(array => getRow(year, array, show, setShow)))}</Table.Body>
+        <Table.Body>{data?.map(year => year.mainData.map(array => getRow(year, array, show, setShow)))}</Table.Body>
       </Table>
     </div>
   )
