@@ -40,7 +40,11 @@ const BarChart = ({ data }) => {
     },
   }
 
-  return <ReactHighcharts config={defaultConfig} />
+  return (
+    <div className="graph-container">
+      <ReactHighcharts config={defaultConfig} />
+    </div>
+  )
 }
 
 export default BarChart
