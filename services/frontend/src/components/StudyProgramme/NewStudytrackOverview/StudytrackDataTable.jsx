@@ -39,7 +39,7 @@ const getRow = (year, array, show, setShow) => {
   return null
 }
 
-const DataTable = ({ data, titles }) => {
+const StudytrackDataTable = ({ data, titles }) => {
   const [show, setShow] = useState(false)
 
   if (!data) return null
@@ -68,4 +68,4 @@ const DataTable = ({ data, titles }) => {
   )
 }
 
-export default DataTable
+export default StudytrackDataTable
