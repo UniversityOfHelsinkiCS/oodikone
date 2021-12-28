@@ -65,18 +65,22 @@ const getStudytrackDataForTheYear = async (studyprogramme, studytracks, year, st
             getPercentage(graduated.length, started.length),
           ],
         ],
-        credits: [
-          ...previousData.credits,
-          [
-            label,
-            studentData.lte30,
-            studentData.lte60,
-            studentData.lte90,
-            studentData.lte120,
-            studentData.lte150,
-            studentData.mte150,
-          ],
-        ],
+        credits:
+          track === studyprogramme
+            ? [
+                ...previousData.credits,
+                [
+                  label,
+                  started.length,
+                  studentData.lte30,
+                  studentData.lte60,
+                  studentData.lte90,
+                  studentData.lte120,
+                  studentData.lte150,
+                  studentData.mte150,
+                ],
+              ]
+            : previousData.credits,
       }
     },
     { mainData: [], credits: [] }
