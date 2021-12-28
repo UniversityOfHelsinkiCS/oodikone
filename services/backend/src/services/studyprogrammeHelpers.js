@@ -112,6 +112,35 @@ const getPercentage = (value, total) => {
   return `${((value / total) * 100).toFixed(1)} %`
 }
 
+const getEmptyArray = length => new Array(length).fill(0)
+
+const getCreditGraphStats = years => ({
+  lte30: {
+    name: 'Less than 30 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte60: {
+    name: '30-59 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte90: {
+    name: '60-89 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte120: {
+    name: '90-119 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte150: {
+    name: '120-149 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte150: {
+    name: 'More than 150 credits',
+    data: getEmptyArray(years.length),
+  },
+})
+
 module.exports = {
   formatStudyright,
   formatStudent,
@@ -125,4 +154,5 @@ module.exports = {
   getStartDate,
   getThesisType,
   getPercentage,
+  getCreditGraphStats,
 }
