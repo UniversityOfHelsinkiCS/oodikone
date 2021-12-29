@@ -66,7 +66,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
             'StudytrackProgress'
           )}
           <div className="section-container">
-            <BarChart data={stats?.data} />
+            <BarChart data={stats?.data} track={track} />
             <BasicDataTable data={stats?.data?.creditTableStats} titles={creditTableTitles} />
           </div>
         </>
