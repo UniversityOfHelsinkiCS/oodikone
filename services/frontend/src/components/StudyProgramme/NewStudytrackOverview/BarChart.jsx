@@ -1,11 +1,13 @@
 import React from 'react'
+import NoDataMessage from '../NoDataMessage'
 
 const ReactHighcharts = require('react-highcharts')
 
 const colors = ['#333737', '#003E65', '#E68825', '#1392c2', '#003E65', '#036415']
 
 const BarChart = ({ data, track }) => {
-  if (!data) return null
+  if (!data || !data.creditGraphStats[track])
+    return <NoDataMessage message="No progress data for the studytrack found. Try with another studytrack" />
 
   const correctData = data?.creditGraphStats[track]
   const dataWithColors = Object.values(correctData).map((series, index) => ({ ...series, color: colors[index] }))
