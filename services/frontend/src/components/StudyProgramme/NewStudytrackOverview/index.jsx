@@ -23,7 +23,7 @@ const creditTableTitles = [
 ]
 
 const StudytrackOverview = ({ studyprogramme }) => {
-  const [track, setTrack] = useState('All students of the studyprogramme')
+  const [track, setTrack] = useState('')
   const toolTips = InfotoolTips.Studyprogramme
   const stats = useGetStudytrackStatsQuery({ id: studyprogramme })
 
@@ -50,8 +50,8 @@ const StudytrackOverview = ({ studyprogramme }) => {
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackNames} />
           {getDivider(
             `Students of ${
-              track === 'All students of the studyprogramme'
-                ? 'the programme by starting year'
+              track === '' || track === 'studyprogramme'
+                ? 'the studyprogramme by starting year'
                 : `the studytrack ${track} by starting year`
             }`,
             'StudytrackOverview'
@@ -59,11 +59,11 @@ const StudytrackOverview = ({ studyprogramme }) => {
           <StudytrackDataTable titles={populationTitles} data={stats?.data?.mainData} />
           {getDivider(
             `Progress of students of ${
-              track === 'All students of the studyprogramme'
-                ? 'the programme by starting year'
+              track === '' || track === 'studyprogramme'
+                ? 'the studyprogramme by starting year'
                 : `the studytrack ${track} by starting year`
             }`,
-            'StudytrackOverview'
+            'StudytrackProgress'
           )}
           <div className="section-container">
             <BarChart data={stats?.data} />
