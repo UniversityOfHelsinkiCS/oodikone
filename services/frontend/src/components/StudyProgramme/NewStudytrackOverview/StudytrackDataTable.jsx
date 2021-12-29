@@ -3,8 +3,8 @@ import { Icon, Table } from 'semantic-ui-react'
 
 const getKey = year => `${year}-${Math.random()}`
 
-const getYearCell = (yearlyData, year, show) => {
-  if (yearlyData.length === 1) {
+const getFirstCell = (yearlyData, year, show, singleTrack) => {
+  if (yearlyData.length === 1 || singleTrack) {
     return <Table.Cell key={getKey(year)}>{year}</Table.Cell>
   }
   return (
@@ -15,13 +15,13 @@ const getYearCell = (yearlyData, year, show) => {
   )
 }
 
-const getRow = ({ yearlyData, array, show, setShow }) => {
-  if (array[0].includes('20')) {
+const getRow = ({ yearlyData, array, show, setShow, singleTrack }) => {
+  if (array[0].includes('20') && !singleTrack) {
     return (
       <Table.Row key={getKey(array[0])} className="header-row" onClick={() => setShow(!show)}>
         {array.map((value, index) =>
           index === 0 ? (
-            getYearCell(yearlyData, array[0], show)
+            getFirstCell(yearlyData, array[0], show, singleTrack)
           ) : (
             <Table.Cell key={getKey(array[0])}>{value}</Table.Cell>
           )
@@ -30,7 +30,7 @@ const getRow = ({ yearlyData, array, show, setShow }) => {
     )
   }
 
-  if (show) {
+  if (show || singleTrack) {
     return (
       <Table.Row key={getKey(array[0])} className="regular-row">
         {array.map(value => (
@@ -43,12 +43,12 @@ const getRow = ({ yearlyData, array, show, setShow }) => {
   return null
 }
 
-const StudytrackDataTable = ({ data, titles }) => {
+const StudytrackDataTable = ({ allData, dataOfStudytrack, titles }) => {
   const [show, setShow] = useState(false)
 
-  if (!data) return null
+  if (!allData && !dataOfStudytrack) return null
 
-  const sortedMainStats = Object.values(data)
+  const sortedMainStats = Object.values(allData)
     .reverse()
     .sort((a, b) => a[0] - b[0])
 
@@ -71,7 +71,11 @@ const StudytrackDataTable = ({ data, titles }) => {
         </Table.Header>
 
         <Table.Body>
-          {sortedMainStats?.map(yearlyData => yearlyData.map(array => getRow({ yearlyData, array, show, setShow })))}
+          {dataOfStudytrack
+            ? dataOfStudytrack.map(array =>
+                getRow({ yearlyData: dataOfStudytrack, array, show, setShow, singleTrack: true })
+              )
+            : sortedMainStats?.map(yearlyData => yearlyData.map(array => getRow({ yearlyData, array, show, setShow })))}
         </Table.Body>
       </Table>
     </div>
