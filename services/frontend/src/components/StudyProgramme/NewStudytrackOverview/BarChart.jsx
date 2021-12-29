@@ -6,7 +6,9 @@ const colors = ['#333737', '#003E65', '#E68825', '#1392c2', '#003E65', '#036415'
 
 const BarChart = ({ data, track }) => {
   if (!data) return null
-  const dataWithColors = data?.creditGraphStats?.map((series, index) => ({ ...series, color: colors[index] }))
+
+  const correctData = data?.creditGraphStats[track]
+  const dataWithColors = Object.values(correctData).map((series, index) => ({ ...series, color: colors[index] }))
 
   const getFileName = () => {
     if (track === '' || track === 'studyprogramme') {

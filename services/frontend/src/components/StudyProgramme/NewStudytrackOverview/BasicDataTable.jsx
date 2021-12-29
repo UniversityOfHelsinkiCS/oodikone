@@ -1,8 +1,8 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
-const DataTable = ({ data, titles }) => {
-  if (!data || !titles) return null
+const DataTable = ({ data, titles, track }) => {
+  if (!data || !data[track]?.length || !titles) return null
 
   return (
     <div className="table-container">
@@ -16,7 +16,7 @@ const DataTable = ({ data, titles }) => {
         </Table.Header>
 
         <Table.Body>
-          {data?.map(array => (
+          {data[track].map(array => (
             <Table.Row key={`random-year-key-${Math.random()}`}>
               {array.map(value => (
                 <Table.Cell key={`random-key-${Math.random()}`}>{value}</Table.Cell>

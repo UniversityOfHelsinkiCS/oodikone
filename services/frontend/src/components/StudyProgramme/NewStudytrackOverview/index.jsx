@@ -25,7 +25,7 @@ const creditTableTitles = [
 const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const stats = useGetStudytrackStatsQuery({ id: studyprogramme })
-  const [track, setTrack] = useState('')
+  const [track, setTrack] = useState('KH20_001')
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -66,8 +66,12 @@ const StudytrackOverview = ({ studyprogramme }) => {
             'StudytrackProgress'
           )}
           <div className="section-container">
-            <BarChart data={stats?.data} track={track} />
-            <BasicDataTable data={stats?.data?.creditTableStats} titles={creditTableTitles} />
+            <BarChart data={stats?.data} track={track || studyprogramme} />
+            <BasicDataTable
+              data={stats?.data?.creditTableStats}
+              track={track || studyprogramme}
+              titles={creditTableTitles}
+            />
           </div>
         </>
       )}
