@@ -31,7 +31,9 @@ const newLetterBasedCode = /^[A-Za-z]{3,}/ // new letter based codes come first
 const oldNumericCode = /^\d/ // old numeric codes come second
 const bscCourses = /BSC?(.+?)(?:en|fi|sv)?$/ // bscs courses goes third
 const openUniCode = /^AY?(.+?)(?:en|fi|sv)?$/ // open university codes come last
-const codeRegexes = [openUniCode, oldNumericCode, bscCourses, newLetterBasedCode]
+const digi = /DIGI-A?(.+?)(?:en|fi|sv)?$/ // digi-a goes on top courses goes third
+
+const codeRegexes = [digi, openUniCode, oldNumericCode, bscCourses, newLetterBasedCode]
 
 const getSortRank = code => {
   for (let i = 0; i < codeRegexes.length; i++) {
