@@ -1,26 +1,30 @@
 import React, { useState } from 'react'
 import { Icon, Table } from 'semantic-ui-react'
 
-const getKey = year => `${year.year}-${Math.random()}`
+const getKey = year => `${year}-${Math.random()}`
 
-const getYearCell = (year, show) => {
-  if (year?.data.length === 1) {
-    return <Table.Cell key={getKey(year)}>{year.year}</Table.Cell>
+const getYearCell = (yearlyData, year, show) => {
+  if (yearlyData.length === 1) {
+    return <Table.Cell key={getKey(year)}>{year}</Table.Cell>
   }
   return (
     <Table.Cell key={getKey(year)}>
       <Icon name={`${show ? 'angle down' : 'angle right'}`} />
-      {year.year}
+      {year}
     </Table.Cell>
   )
 }
 
-const getRow = (year, array, show, setShow) => {
+const getRow = ({ yearlyData, array, show, setShow }) => {
   if (array[0].includes('20')) {
     return (
-      <Table.Row key={getKey(year)} className="header-row" onClick={() => setShow(!show)}>
+      <Table.Row key={getKey(array[0])} className="header-row" onClick={() => setShow(!show)}>
         {array.map((value, index) =>
-          index === 0 ? getYearCell(year, show) : <Table.Cell key={getKey(year)}>{value}</Table.Cell>
+          index === 0 ? (
+            getYearCell(yearlyData, array[0], show)
+          ) : (
+            <Table.Cell key={getKey(array[0])}>{value}</Table.Cell>
+          )
         )}
       </Table.Row>
     )
@@ -28,9 +32,9 @@ const getRow = (year, array, show, setShow) => {
 
   if (show) {
     return (
-      <Table.Row key={getKey(year)} className="regular-row">
+      <Table.Row key={getKey(array[0])} className="regular-row">
         {array.map(value => (
-          <Table.Cell key={getKey(year)}>{value}</Table.Cell>
+          <Table.Cell key={getKey(array[0])}>{value}</Table.Cell>
         ))}
       </Table.Row>
     )
@@ -43,6 +47,10 @@ const StudytrackDataTable = ({ data, titles }) => {
   const [show, setShow] = useState(false)
 
   if (!data) return null
+
+  const sortedMainStats = Object.values(data)
+    .reverse()
+    .sort((a, b) => a[0] - b[0])
 
   return (
     <div className="datatable">
@@ -62,7 +70,9 @@ const StudytrackDataTable = ({ data, titles }) => {
           </Table.Row>
         </Table.Header>
 
-        <Table.Body>{data?.map(year => year.data.map(array => getRow(year, array, show, setShow)))}</Table.Body>
+        <Table.Body>
+          {sortedMainStats?.map(yearlyData => yearlyData.map(array => getRow({ yearlyData, array, show, setShow })))}
+        </Table.Body>
       </Table>
     </div>
   )
