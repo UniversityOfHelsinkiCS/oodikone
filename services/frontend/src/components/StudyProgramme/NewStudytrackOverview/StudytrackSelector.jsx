@@ -17,9 +17,15 @@ const StudytrackSelector = ({ track, setTrack, studytracks }) => {
       <Dropdown
         fluid
         selection
+        name="studytrack"
+        placeholder="All students of the studyprogramme"
         value={track}
         onChange={handleStudytrackChange}
-        options={Object.entries(studytracks).map(([code, track]) => ({ key: code, value: code, text: track }))}
+        options={Object.entries(studytracks).map(([code, track]) => ({
+          key: code,
+          value: code,
+          text: code === 'studyprogramme' ? track : `${track}, ${code}`,
+        }))}
       />
     </div>
   )

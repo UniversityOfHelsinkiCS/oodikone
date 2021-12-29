@@ -23,9 +23,9 @@ const creditTableTitles = [
 ]
 
 const StudytrackOverview = ({ studyprogramme }) => {
-  const [track, setTrack] = useState('')
   const toolTips = InfotoolTips.Studyprogramme
   const stats = useGetStudytrackStatsQuery({ id: studyprogramme })
+  const [track, setTrack] = useState('')
 
   const getDivider = (title, toolTipText) => (
     <>

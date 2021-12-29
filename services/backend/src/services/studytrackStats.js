@@ -90,7 +90,6 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, year, 
         true,
         true
       )
-      const label = studytrackNames[track]
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const startedStudentnumbers = [...new Set(started.map(s => s.studentnumber))]
       const students = await studytrackStudents(startedStudentnumbers)
@@ -102,7 +101,7 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, year, 
         mainData: [
           ...previousData.mainData,
           [
-            label,
+            studytrackNames[track],
             started.length,
             getPercentage(started.length, started.length),
             studentData.male,
@@ -118,7 +117,7 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, year, 
         creditTableStats: [
           ...previousData.creditTableStats,
           [
-            label,
+            studytrackNames[track],
             started.length,
             studentData.lte30,
             studentData.lte60,
@@ -139,7 +138,7 @@ const getStudytrackNames = (allStudytracks, programmesStudytracks) => {
   const names = {}
   programmesStudytracks.forEach(track => {
     const trackName = allStudytracks[track]?.name['fi']
-    if (trackName) names[track] = `${trackName}, ${track}`
+    if (trackName) names[track] = trackName
   })
   return names
 }
