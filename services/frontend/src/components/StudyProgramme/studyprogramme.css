@@ -49,3 +49,7 @@
   min-height: '300px';
   width: '1600px';
 }
+
+.studytrack-overview .no-data-message {
+  margin: 20px 0;
+}
