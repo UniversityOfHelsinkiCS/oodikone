@@ -23,7 +23,7 @@ const getRow = ({ yearlyData, array, show, setShow, singleTrack }) => {
           index === 0 ? (
             getFirstCell(yearlyData, array[0], show, singleTrack)
           ) : (
-            <Table.Cell key={getKey(array[0])}>{value}</Table.Cell>
+            <Table.Cell textAlign="left">{value}</Table.Cell>
           )
         )}
       </Table.Row>
@@ -33,9 +33,17 @@ const getRow = ({ yearlyData, array, show, setShow, singleTrack }) => {
   if (show || singleTrack) {
     return (
       <Table.Row key={getKey(array[0])} className="regular-row">
-        {array.map(value => (
-          <Table.Cell key={getKey(array[0])}>{value}</Table.Cell>
-        ))}
+        {array.map((value, index) =>
+          index === 0 && !singleTrack ? (
+            <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(array[0])}>
+              {value}
+            </Table.Cell>
+          ) : (
+            <Table.Cell textAlign="left" key={getKey(array[0])}>
+              {value}
+            </Table.Cell>
+          )
+        )}
       </Table.Row>
     )
   }
@@ -54,7 +62,7 @@ const StudytrackDataTable = ({ allData, dataOfStudytrack, titles }) => {
 
   return (
     <div className="datatable">
-      <Table>
+      <Table celled>
         <Table.Header>
           <Table.Row>
             {titles.map((title, index) => (
@@ -62,7 +70,7 @@ const StudytrackDataTable = ({ allData, dataOfStudytrack, titles }) => {
                 key={title}
                 colSpan={index === 0 ? 1 : 2}
                 textAlign="left"
-                style={{ fontWeight: 'bold', paddingLeft: '50px' }}
+                style={{ fontWeight: 'bold' }}
               >
                 {title}
               </Table.HeaderCell>
