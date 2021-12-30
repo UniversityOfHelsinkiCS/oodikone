@@ -42,7 +42,10 @@ const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
   }
   const importerClient = getImporterClient()
   if (!importerClient) return false
-  const { data } = await importerClient.get(`/person-groups/person/${hyPersonSisuId}`)
+  const answerTimeout = new Promise(resolve => setTimeout(resolve, 2000))
+  const result = await Promise.race([importerClient.get(`/person-groups/person/${hyPersonSisuId}`), answerTimeout])
+  if (!result) return false
+  const { data } = result
   return data && Object.values(data).length > 0
 }
 
