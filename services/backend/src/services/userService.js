@@ -1,4 +1,3 @@
-const _ = require('lodash')
 const UnitService = require('./units')
 const elementDetailService = require('./elementdetails')
 const { filterStudentnumbersByAccessrights } = require('./students')
@@ -8,6 +7,7 @@ const logger = require('../util/logger')
 const { facultiesAndProgrammesForTrends } = require('../services/organisations')
 const User = require('./users/users')
 const AccessGroup = require('./users/accessgroups')
+const _ = require('lodash')
 
 // Private helpers
 const enrichProgrammesFromFaculties = faculties =>
@@ -143,7 +143,7 @@ const updateUser = async (username, fields) => {
   return enrichWithProgrammes(User.getUserData(returnedUser))
 }
 
-const getLoginDataWithoutToken = async (uid, full_name, hyGroups, affiliations, email, hyPersonSisuId) => {
+const getLoginDataWithoutToken = async (uid, full_name, hyGroups, email, hyPersonSisuId) => {
   const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
   const result = await User.loginWithoutToken(
     uid,
@@ -158,6 +158,14 @@ const getLoginDataWithoutToken = async (uid, full_name, hyGroups, affiliations, 
 
 const superlogin = async (uid, asUser) => await User.superlogin(uid, asUser)
 
+const getUser = async ({ username, name, email, iamGroups, sisId }) => {
+  const { payload: user, isNew } = await getLoginDataWithoutToken(username, name, iamGroups, email, sisId)
+  if (isNew) {
+    //console.log('send mail here')
+  }
+  return user
+}
+
 module.exports = {
   updateUser,
   superlogin,
@@ -171,4 +179,5 @@ module.exports = {
   getUserDataFor,
   getStudentsUserCanAccess,
   getLoginDataWithoutToken,
+  getUser,
 }

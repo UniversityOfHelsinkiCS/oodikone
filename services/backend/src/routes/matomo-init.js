@@ -28,7 +28,7 @@ _paq.push(["enableLinkTracking"]);
 
 const script = config.MATOMO_URL ? acual : ''
 
-router.get('/matomo-init', (req, res) => {
+router.get('/matomo-init', (_, res) => {
   res.contentType('text/javascript; charset=UTF-8')
   res.send(script)
 })

@@ -1,6 +1,14 @@
-const shibbolethHeadersFix = require('unfuck-utf8-headers-middleware')
-const accessLogger = require('./middleware/accesslogger')
+const Sentry = require('@sentry/node')
+const express = require('express')
+const cors = require('cors')
+const { frontUrl } = require('./conf-backend')
+const shibbolethCharsetMiddleware = require('./middleware/shibbolethCharsetMiddleware')
+const matomoInit = require('./routes/matomo-init')
+const currentUserMiddleware = require('./middleware/currentUserMiddleware')
+const accessLogger = require('./middleware/accessLogger')
 const sentryUserId = require('./middleware/sentryUserId')
+const auth = require('./middleware/auth')
+
 const courses = require('./routes/courses')
 const students = require('./routes/students')
 const population = require('./routes/population')
@@ -9,7 +17,6 @@ const superlogin = require('./routes/superlogin')
 const language = require('./routes/language')
 const users = require('./routes/users')
 const elementdetails = require('./routes/elementdetails')
-const auth = require('./middleware/auth')
 const teachers = require('./routes/teachers')
 const providers = require('./routes/providers')
 const faculties = require('./routes/faculties')
@@ -20,28 +27,28 @@ const feedback = require('./routes/feedback')
 const tags = require('./routes/tags')
 const updater = require('./routes/updater')
 const tsaAnalytics = require('./routes/tsaAnalytics')
-const matomoInit = require('./routes/matomo-init')
 const customPopulationSearch = require('./routes/customPopulationSearch')
 const trends = require('./routes/trends')
 const programmeModules = require('./routes/programmeModules')
 const studyGuidanceGroups = require('./routes/studyGuidanceGroups')
 const studyProgramme = require('./routes/studyProgramme')
+const initializeSentry = require('./util/sentry')
+
+const errorMiddleware = require('./middleware/errorMiddleware')
 
 module.exports = (app, url) => {
-  app.use(
-    shibbolethHeadersFix([
-      'hyGroupCn',
-      'SHIB_LOGOUT_URL',
-      'eduPersonAffiliation',
-      'uid',
-      'displayName',
-      'mail',
-      'hyPersonSisuId',
-      'preferredLanguage',
-    ])
-  )
+  initializeSentry(app)
+  app.use(Sentry.Handlers.requestHandler())
+  app.use(Sentry.Handlers.tracingHandler())
+
+  app.use(cors({ credentials: true, origin: frontUrl }))
+  app.use(express.json())
+
+  app.use(shibbolethCharsetMiddleware)
   app.use(url, matomoInit)
-  app.use(auth.checkAuth, auth.checkRequiredGroup, accessLogger, sentryUserId)
+  app.use(currentUserMiddleware)
+  app.use(accessLogger)
+  app.use(sentryUserId)
   app.use(url, login)
   app.use(`${url}/superlogin`, superlogin)
   app.use(url, elementdetails)
@@ -65,4 +72,10 @@ module.exports = (app, url) => {
   app.use(`${url}/custom-population-search`, customPopulationSearch)
   app.use(`${url}/cool-data-science`, trends)
   app.use(`${url}/studyguidancegroups`, auth.roles(['studyGuidanceGroups']), studyGuidanceGroups)
+  app.get('*', async (_, res) => {
+    const results = { error: 'unknown endpoint' }
+    res.status(404).json(results)
+  })
+  app.use(Sentry.Handlers.errorHandler())
+  app.use(errorMiddleware)
 }

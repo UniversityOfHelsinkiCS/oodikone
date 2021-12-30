@@ -15,7 +15,8 @@ class ApplicationError extends Error {
 
   toJSON() {
     return {
-      error: this.message,
+      message: this.message,
+      ...this.extra,
     }
   }
 }
