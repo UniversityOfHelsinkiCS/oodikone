@@ -3,7 +3,7 @@ import NoDataMessage from '../NoDataMessage'
 
 const ReactHighcharts = require('react-highcharts')
 
-const colors = ['#333737', '#003E65', '#E68825', '#1392c2', '#003E65', '#036415']
+const colors = ['#333737', '#bdc2c7', '#1392c2', '#195f8a', '#54997b', '#036415']
 
 const BarChart = ({ data, track }) => {
   if (!data || !data.creditGraphStats[track])
