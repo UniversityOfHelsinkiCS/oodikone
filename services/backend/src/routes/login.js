@@ -1,14 +1,17 @@
 const router = require('express').Router()
 
-router.post('/login', async (req, res) => {
+router.get('/login', async (req, res) => {
   logger.info(JSON.stringify(req.headers, null, 2))
-  const { decodedToken } = req
+  const { decodedToken, logoutUrl } = req
 
   if (!decodedToken) {
     throw new ApplicationError('User not found', 404)
   }
 
-  res.send({token: decodedToken})
+  res.send({
+    token: decodedToken,
+    logoutUrl,
+  })
 
   // handle the isNew thingy and mail sending somewhere!
   // let { token, isNew } = await userService.login(uid, full_name, hyGroups, affiliations, mail, hyPersonSisuId)
@@ -20,3 +23,4 @@ router.post('/login', async (req, res) => {
   // }
   // res.status(200).json({ token })
 })
+module.exports = router
