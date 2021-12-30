@@ -16,7 +16,6 @@ const faculties = require('./routes/faculties')
 const semesters = require('./routes/semesters')
 const mandatoryCourses = require('./routes/mandatorycourses')
 const mandatoryCourseLabels = require('./routes/mandatorycourselabels')
-const ping = require('./routes/ping')
 const feedback = require('./routes/feedback')
 const tags = require('./routes/tags')
 const updater = require('./routes/updater')
@@ -29,7 +28,6 @@ const studyGuidanceGroups = require('./routes/studyGuidanceGroups')
 const studyProgramme = require('./routes/studyProgramme')
 
 module.exports = (app, url) => {
-  app.use(url, ping)
   app.use(
     shibbolethHeadersFix([
       'hyGroupCn',
