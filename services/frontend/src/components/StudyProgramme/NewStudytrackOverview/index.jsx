@@ -53,7 +53,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
         <Loader active={stats.isLoading} />
       ) : (
         <>
-          <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackNames} />
+          <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
           {getDivider(
             `Students of ${
               track === '' || track === 'studyprogramme'
