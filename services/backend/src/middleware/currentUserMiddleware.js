@@ -1,5 +1,5 @@
 const { ApplicationError } = require('../util/customErrors')
-const { getUser, getUserDataFor } = require('../services/userService')
+const { getUser, getUserDataFor, getMockedUser } = require('../services/userService')
 const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
 
@@ -20,7 +20,7 @@ const currentUserMiddleware = async (req, _, next) => {
   const { displayname: name, mail: email, hygroupcn: iamGroups, hypersonsisuid: sisId } = req.headers
   const parsedIamGroups = parseIamGroups(iamGroups)
 
-  const user = await getUser({
+  req.decodedToken = await getUser({
     username,
     name,
     email,
@@ -32,17 +32,21 @@ const currentUserMiddleware = async (req, _, next) => {
     throw new ApplicationError('User is not enabled', 403, { logoutUrl })
   }
 
-  req.decodedToken = user
+  const showAsUser = req.headers['x-show-as-user']
+
+  if (showAsUser) {
+    const mockedUser = await getMockedUser(username, showAsUser)
+    if (mockedUser) {
+      req.decodedToken = mockedUser
+    }
+  }
   req.logoutUrl = logoutUrl
 
   // TODO: remove this garbo
-  const userData = await getUserDataFor(user.userId)
+  const userData = await getUserDataFor(req.decodedToken.userId)
   Object.assign(req, userData)
 
-  // console.log('userData', req.userData)
-  // console.log('user', req.decodedToken)
-  // console.log('logoutUrl', req.logoutUrl)
-  return next()
+  next()
 }
 
 module.exports = currentUserMiddleware

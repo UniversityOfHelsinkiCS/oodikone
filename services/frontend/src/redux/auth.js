@@ -1,4 +1,7 @@
 import { RTKApi } from 'apiConnection'
+import { useHistory } from 'react-router-dom'
+import { showAsUserKey } from 'common'
+import { isDev } from 'conf'
 
 const authorizationApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
@@ -9,15 +12,15 @@ const authorizationApi = RTKApi.injectEndpoints({
       queryFn: (_, { getState }) => {
         const loginQuerySelector = RTKApi.endpoints.login.select()
         const { data, error } = loginQuerySelector(getState())
-        const logoutUrl = data.logoutUrl ?? error.logoutUrl
+        const logoutUrl = data?.logoutUrl ?? error?.data?.logoutUrl
         if (logoutUrl) {
           window.location.href = logoutUrl
         }
         return {
           error: {
-            status: 500,
-            statusText: 'Internal Server Error',
-            data: 'Logout url was not available, not able to logout correctly!',
+            data: {
+              message: 'Logout url was not available, not able to logout correctly!',
+            },
           },
         }
       },
@@ -45,4 +48,37 @@ export const useGetAuthorizedUserQuery = () => {
   }
 }
 
-export const { useLogoutMutation } = authorizationApi
+export const useShowAsUser = () => {
+  const history = useHistory()
+
+  const showAsUser = (username, reload = true) => {
+    if (username) {
+      window.localStorage.setItem(showAsUserKey, username)
+    } else {
+      window.localStorage.removeItem(showAsUserKey)
+    }
+
+    if (reload) {
+      history.push('/')
+      window.location.reload()
+    }
+  }
+
+  return showAsUser
+}
+
+const { useLogoutMutation: internalMutation } = authorizationApi
+
+const devLogout = () => window.location.reload()
+
+export const useLogoutMutation = () => {
+  const [productionLogout, ...rest] = internalMutation()
+  const showAsUser = useShowAsUser()
+
+  const handleLogout = () => {
+    showAsUser(null, false)
+    const logout = isDev ? devLogout : productionLogout
+    logout()
+  }
+  return [handleLogout, ...rest]
+}

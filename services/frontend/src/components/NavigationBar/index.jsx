@@ -2,12 +2,11 @@ import React from 'react'
 import './navigationBar.css'
 import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
-import { useLogoutMutation } from 'redux/auth'
+import { useLogoutMutation, useShowAsUser } from 'redux/auth'
 import { checkUserAccess } from '../../common'
 import { useGetAuthorizedUserQuery } from '../../redux/auth'
 import LanguagePicker from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
-import { useShowAsUser } from '../../common/hooks'
 
 const allNavigationItems = {
   populations: {

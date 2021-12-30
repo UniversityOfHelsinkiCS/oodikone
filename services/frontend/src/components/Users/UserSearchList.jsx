@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button, Icon, Label } from 'semantic-ui-react'
+import { useShowAsUser } from 'redux/auth'
 import { getTextIn, reformatDate } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import SortableTable from '../SortableTable'
-import { useShowAsUser } from '../../common/hooks'
 
 const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
   const { language } = useLanguage()
