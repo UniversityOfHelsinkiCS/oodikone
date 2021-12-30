@@ -14,12 +14,12 @@ const populationTitles = ['', 'All started', 'Men', 'Women', 'Finnish', 'Graduat
 const creditTableTitles = [
   '',
   'All started',
-  'Under 30 credits',
+  '< 30 credits',
   '30-59 credits',
   '60-89 credits',
   '90-119 credits',
   '120-149 credits',
-  '150 or more credits',
+  '> 150 credits',
 ]
 
 const StudytrackOverview = ({ studyprogramme }) => {
