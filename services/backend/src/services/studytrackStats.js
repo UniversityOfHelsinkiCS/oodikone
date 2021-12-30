@@ -8,6 +8,7 @@ const {
   getPercentage,
   getCreditGraphStats,
   getYearsObject,
+  creditThresholds,
 } = require('./studyprogrammeHelpers')
 const { studytrackStudents, startedStudyrights, graduatedStudyRights } = require('./newStudyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
@@ -28,18 +29,9 @@ const getStudentData = students => {
   return data
 }
 
-const getStudytrackDataForTheYear = async ({
-  studyprogramme,
-  studytracks,
-  studytrackNames,
-  year,
-  years,
-  mainStatsByTrack,
-  mainStatsByYear,
-  creditTableStats,
-  creditGraphStats,
-  emptyTracks,
-}) => {
+// Goes through the programme and all its studytracks for the said year and adds the wanted stats to the data objects
+const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studytrackNames, year, years, data }) => {
+  const { mainStatsByYear, mainStatsByTrack, creditGraphStats, creditTableStats, emptyTracks } = data
   const { startDate, endDate } = getAcademicYearDates(year)
 
   await Promise.all(
@@ -54,24 +46,26 @@ const getStudytrackDataForTheYear = async ({
         true,
         true
       )
+
+      // All the stats are counted for the students who actually started studying
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const startedStudentnumbers = [...new Set(started.map(s => s.studentnumber))]
       const students = await studytrackStudents(startedStudentnumbers)
       const studentData = getStudentData(students)
       const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
+      // If the track has no stats for that year, it should be removed from the table and dropdown options
       if (started.length === 0) {
         emptyTracks.has(track) ? emptyTracks.set(track, emptyTracks.get(track) + 1) : emptyTracks.set(track, 1)
         return
       }
 
-      creditGraphStats[track].lte30.data[indexOf(years, year)] = studentData.lte30
-      creditGraphStats[track].lte60.data[indexOf(years, year)] = studentData.lte60
-      creditGraphStats[track].lte90.data[indexOf(years, year)] = studentData.lte90
-      creditGraphStats[track].lte120.data[indexOf(years, year)] = studentData.lte120
-      creditGraphStats[track].lte150.data[indexOf(years, year)] = studentData.lte150
-      creditGraphStats[track].mte150.data[indexOf(years, year)] = studentData.mte150
+      // Count stats for creditgraph for the year per track
+      creditThresholds.forEach(
+        threshold => (creditGraphStats[track][threshold].data[indexOf(years, year)] = studentData[threshold])
+      )
 
+      // Count stats for the credit progress table for the year per track
       creditTableStats[track] = [
         ...creditTableStats[track],
         [
@@ -86,6 +80,7 @@ const getStudytrackDataForTheYear = async ({
         ],
       ]
 
+      // Count stats for the main studytrack table grouped by tracks
       mainStatsByTrack[track] = [
         ...mainStatsByTrack[track],
         [
@@ -103,6 +98,7 @@ const getStudytrackDataForTheYear = async ({
         ],
       ]
 
+      // Count stats for the main studytrack table grouped by year
       mainStatsByYear[year] = [
         ...mainStatsByYear[year],
         [
@@ -123,7 +119,9 @@ const getStudytrackDataForTheYear = async ({
   )
 }
 
-const getStudytrackNames = (studyprogramme, studytrackNames, studytracks, emptyTracks, years) => {
+// Defines the studytrack names for the studytrack selector
+// If the track has no stats for any year, it should be removed the dropdown options
+const getStudytrackOptions = (studyprogramme, studytrackNames, studytracks, emptyTracks, years) => {
   const names = { [studyprogramme]: 'All students of the programme' }
   studytracks.forEach(track => {
     const trackName = studytrackNames[track]?.name['fi']
@@ -134,6 +132,24 @@ const getStudytrackNames = (studyprogramme, studytrackNames, studytracks, emptyT
   return names
 }
 
+// Creates empty objects for each statistic type, which are then updated with the studytrack data
+const getEmptyStatsObjects = (years, studytracks) => {
+  const mainStatsByYear = getYearsObject(years, true)
+  const mainStatsByTrack = {}
+  const creditGraphStats = {}
+  const creditTableStats = {}
+  const emptyTracks = new Map()
+
+  studytracks.forEach(async track => {
+    mainStatsByTrack[track] = []
+    creditGraphStats[track] = await getCreditGraphStats(years)
+    creditTableStats[track] = []
+  })
+
+  return { mainStatsByYear, mainStatsByTrack, creditGraphStats, creditTableStats, emptyTracks }
+}
+
+// Combines all the data for the Populations and Studytracks -view
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
   const isAcademicYear = true
   const since = getStartDate(studyprogramme, isAcademicYear)
@@ -146,18 +162,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
 
   const studytrackNames = associations.studyTracks
 
-  const mainStatsByTrack = {}
-  const creditGraphStats = {}
-  const creditTableStats = {}
-  const mainStatsByYear = getYearsObject(years, true)
-
-  studytracks.forEach(async track => {
-    mainStatsByTrack[track] = []
-    creditGraphStats[track] = await getCreditGraphStats(years)
-    creditTableStats[track] = []
-  })
-
-  const emptyTracks = new Map()
+  const data = getEmptyStatsObjects(years, studytracks)
 
   await Promise.all(
     years.map(async year => {
@@ -167,24 +172,20 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
         studytrackNames,
         year,
         years,
-        mainStatsByTrack,
-        mainStatsByYear,
-        creditGraphStats,
-        creditTableStats,
-        emptyTracks,
+        data,
       })
     })
   )
 
-  const studytrackOptions = getStudytrackNames(studyprogramme, studytrackNames, studytracks, emptyTracks, years)
+  const studytrackOptions = getStudytrackOptions(studyprogramme, studytrackNames, studytracks, data.emptyTracks, years)
 
   return {
     id: studyprogramme,
     years: getYearsArray(since.getFullYear(), isAcademicYear),
-    mainStatsByTrack,
-    mainStatsByYear,
-    creditTableStats,
-    creditGraphStats,
+    mainStatsByTrack: data.mainStatsByTrack,
+    mainStatsByYear: data.mainStatsByYear,
+    creditTableStats: data.creditTableStats,
+    creditGraphStats: data.creditGraphStats,
     studytrackOptions,
   }
 }

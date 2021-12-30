@@ -141,6 +141,8 @@ const getCreditGraphStats = years => ({
   },
 })
 
+const creditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'mte150']
+
 module.exports = {
   formatStudyright,
   formatStudent,
@@ -155,4 +157,5 @@ module.exports = {
   getThesisType,
   getPercentage,
   getCreditGraphStats,
+  creditThresholds,
 }
