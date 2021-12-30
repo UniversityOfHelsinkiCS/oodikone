@@ -6,6 +6,7 @@ const logger = require('../util/logger')
 
 router.post('/login', async (req, res) => {
   const uid = req.headers['uid']
+  logger.info(JSON.stringify(req.headers, null, 2))
   if (req.headers['shib-session-id'] && uid) {
     const full_name = req.headers.displayname || ''
     const mail = req.headers.mail || ''
