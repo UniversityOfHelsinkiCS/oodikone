@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
-import { Loader } from 'semantic-ui-react'
+import SegmentDimmer from 'components/SegmentDimmer'
 import ProtectedRoute from './ProtectedRoute'
 
 // From https://dev.to/goenning/how-to-retry-when-react-lazy-fails-mb5
@@ -54,7 +54,7 @@ const routes = {
 }
 
 const Routes = () => (
-  <Suspense fallback={<Loader active inline="centered" />}>
+  <Suspense fallback={<SegmentDimmer isLoading />}>
     <Switch>
       <Route exact path="/" component={FrontPage} />
       <Route exact path={routes.feedback} component={Feedback} />

@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Transition, Dimmer, Header, Image, Container, Button } from 'semantic-ui-react'
 import Highcharts from 'highcharts'
 import ReactHighchart from 'react-highcharts'
-import { useDispatch } from 'react-redux'
 import { random } from 'lodash'
-import { logout } from '../../redux/auth'
+import { useLogoutMutation } from 'redux/auth'
 import { images } from '../../common'
 import MulticolorBarChart from './MulticolorBarChart'
 
@@ -47,7 +46,7 @@ const AccessDenied = ({ notEnabled }) => {
     pressing log out or contacting grp-toska@helsinki.fi`
 
   const [easterEgg, setEasterEgg] = useState(false)
-  const dispatch = useDispatch()
+  const [logout] = useLogoutMutation()
 
   useEffect(() => {
     if (notEnabled) {
@@ -96,7 +95,7 @@ const AccessDenied = ({ notEnabled }) => {
           <p>{header}</p>
           <Header.Subheader>{subheader}</Header.Subheader>
           <br />
-          <Button onClick={() => dispatch(logout())} color="pink">
+          <Button onClick={() => logout()} color="pink">
             {' '}
             Log out{' '}
           </Button>

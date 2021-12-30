@@ -1,9 +1,7 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { getMocked, setMocking } from '../common'
 import { apiBasePath, isDev } from '../conf'
-import { loginPrefix, logoutPrefix } from '../redux/auth'
 
 export const getHeaders = () => {
   // Set up dev user for development environment, mimicking production admin user
@@ -12,9 +10,9 @@ export const getHeaders = () => {
     displayName: 'Matti Luukkainen',
     'shib-session-id': 'mock-session',
     hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users',
-    eduPersonAffiliation: 'member;employee;faculty',
     mail: 'grp-toska+mockmluukkai@helsinki.fi',
     hyPersonSisuId: 'hy-hlo-1441871',
+    shib_logout_url: 'https://helsinki.fi/shibboleth-sp/Logout',
   }
   return isDev ? { ...devUserHeaders } : {}
 }
@@ -32,13 +30,6 @@ export const actionTypes = prefix => ({
   failure: `${prefix}${actionSuffixes.failure}`,
   success: `${prefix}${actionSuffixes.success}`,
 })
-
-export const logout = async () => {
-  setMocking(null)
-  const returnUrl = window.location.origin
-  const response = await api.delete('/logout', { data: { returnUrl } })
-  window.location = response.data.logoutUrl
-}
 
 export const callApi = async (url, method = 'get', data, params, timeout = 0, progressCallback = null) => {
   const options = { headers: getHeaders(), timeout }
@@ -100,44 +91,6 @@ export const handleRequest = store => next => async action => {
     } catch (e) {
       store.dispatch({ type: failure, response: e, query })
       handleError(e, store.getState().actionHistory)
-    }
-  }
-}
-
-export const handleAuth = store => next => async action => {
-  const loginTypes = actionTypes(loginPrefix)
-  const logoutTypes = actionTypes(logoutPrefix)
-  next(action)
-  const { type } = action
-  if (type === loginTypes.attempt) {
-    const { success, failure } = loginTypes
-    try {
-      let token
-      const mocked = getMocked()
-      if (mocked) {
-        token = (await callApi(`/superlogin/${mocked}`, 'post')).data
-      } else {
-        // eslint-disable-next-line prefer-destructuring
-        token = (await callApi('/login', 'post')).data.token
-      }
-
-      api.defaults.headers.common = {
-        ...api.defaults.headers.common,
-        'x-access-token': token,
-      }
-      store.dispatch({ type: success, token })
-    } catch (err) {
-      store.dispatch({ type: failure })
-      handleError(err, store.getState().actionHistory)
-    }
-  } else if (type === logoutTypes.attempt) {
-    const { success, failure } = logoutTypes
-    try {
-      await logout()
-      store.dispatch({ type: success })
-    } catch (err) {
-      store.dispatch({ type: failure })
-      handleError(err, store.getState().actionHistory)
     }
   }
 }

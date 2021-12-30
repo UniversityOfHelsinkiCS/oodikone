@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query/react'
-import { handleRequest, handleAuth, RTKApi } from 'apiConnection'
+import { handleRequest, RTKApi } from 'apiConnection'
 import actionHistory from './actionHistory'
 import users from './users'
 import populations from './populations'
@@ -36,7 +36,6 @@ import feedback from './feedback'
 import mandatoryCourseLabels from './mandatoryCourseLabels'
 import tags from './tags'
 import tagstudent from './tagstudent'
-import auth from './auth'
 import singleCourseStats from './singleCourseStats'
 import userAccessEmail from './userAccessEmail'
 import customPopulationSearch from './customPopulationSearch'
@@ -80,7 +79,6 @@ const store = configureStore({
     feedback,
     tags,
     tagstudent,
-    auth,
     singleCourseStats,
     userAccessEmail,
     customPopulationSearch,
@@ -93,7 +91,6 @@ const store = configureStore({
   middleware: getDefaultMiddleware => [
     ...getDefaultMiddleware({ immutableCheck: false, serializableCheck: false }),
     handleRequest,
-    handleAuth,
     RTKApi.middleware,
   ],
 })

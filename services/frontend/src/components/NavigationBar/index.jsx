@@ -2,9 +2,9 @@ import React from 'react'
 import './navigationBar.css'
 import { Menu, Dropdown, Button, Label } from 'semantic-ui-react'
 import { NavLink, Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useLogoutMutation } from 'redux/auth'
 import { checkUserAccess } from '../../common'
-import { logout, useGetAuthorizedUserQuery } from '../../redux/auth'
+import { useGetAuthorizedUserQuery } from '../../redux/auth'
 import LanguagePicker from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
 import { useShowAsUser } from '../../common/hooks'
@@ -34,12 +34,13 @@ const allNavigationItems = {
 }
 
 const NavigationBar = () => {
-  const dispatch = useDispatch()
-  const { rights, mockedBy, userId, userRoles } = useGetAuthorizedUserQuery()
+  const { isLoading, rights, mockedBy, userId, userRoles } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
+  const [logout] = useLogoutMutation()
 
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
+    if (isLoading) return visibleNavigationItems
     Object.keys(allNavigationItems).forEach(key => {
       if (key === 'populations' || key === 'students') {
         if (!checkUserAccess(['admin', 'studyGuidanceGroups'], userRoles) && rights.length === 0) {
@@ -58,17 +59,14 @@ const NavigationBar = () => {
 
   const visibleNavigationItems = refreshNavigationRoutes()
 
+  // Min-content sets logo always to the left
   const renderHome = () => (
-    <Menu.Item as={Link} to="/" tabIndex="-1">
+    <Menu.Item as={Link} to="/" tabIndex="-1" style={{ width: 'min-content' }}>
       <span className="logo">
         <h2 className="logoText">oodikone</h2>
       </span>
     </Menu.Item>
   )
-
-  const handleLogout = () => {
-    dispatch(logout())
-  }
 
   const renderNavigationRoutes = () =>
     Object.values(visibleNavigationItems).map(({ items, path, key, label, tag }) =>
@@ -116,11 +114,11 @@ const NavigationBar = () => {
               icon="database"
             />
           ))}
-          <Dropdown.Item icon="log out" text="Logout" onClick={handleLogout} />
+          <Dropdown.Item icon="log out" text="Logout" onClick={() => logout()} />
         </Dropdown.Menu>
       </Menu.Item>
     ) : (
-      <Menu.Item link onClick={handleLogout} icon="log out" tabIndex="-1">
+      <Menu.Item link onClick={() => logout()} icon="log out" tabIndex="-1">
         Logout
       </Menu.Item>
     )
@@ -140,10 +138,10 @@ const NavigationBar = () => {
   return (
     <Menu data-cy="navBar" stackable fluid className="navBar">
       {renderHome()}
-      {renderNavigationRoutes()}
-      {renderUserMenu()}
-      {renderLanguagePicker()}
-      {mockedBy && renderStopMockingButton()}
+      {!isLoading && renderNavigationRoutes()}
+      {!isLoading && renderUserMenu()}
+      {!isLoading && renderLanguagePicker()}
+      {!isLoading && mockedBy && renderStopMockingButton()}
     </Menu>
   )
 }
