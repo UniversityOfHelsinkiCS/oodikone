@@ -1,3 +1,4 @@
+const Sentry = require('@sentry/node')
 const { ApplicationError } = require('../util/customErrors')
 const { getUser, getUserDataFor, getMockedUser } = require('../services/userService')
 const { requiredGroup } = require('../conf-backend')
@@ -41,6 +42,8 @@ const currentUserMiddleware = async (req, _, next) => {
     }
   }
   req.logoutUrl = logoutUrl
+
+  Sentry.setUser({ username: req.decodedToken.mockedBy || req.decodedToken.userId })
 
   // TODO: remove this garbo
   const userData = await getUserDataFor(req.decodedToken.userId)
