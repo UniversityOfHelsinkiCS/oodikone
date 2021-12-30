@@ -5,6 +5,7 @@ const { userDataCache } = require('./cache')
 const { getImporterClient } = require('../util/importerClient')
 const logger = require('../util/logger')
 const { facultiesAndProgrammesForTrends } = require('../services/organisations')
+const { sendNotificationAboutNewUser } = require('../services/mailservice')
 const User = require('./users/users')
 const AccessGroup = require('./users/accessgroups')
 const _ = require('lodash')
@@ -164,7 +165,7 @@ const getMockedUser = async (uid, asUser) => await User.superlogin(uid, asUser)
 const getUser = async ({ username, name, email, iamGroups, sisId }) => {
   const { payload: user, isNew } = await getLoginDataWithoutToken(username, name, iamGroups, email, sisId)
   if (isNew) {
-    //console.log('send mail here')
+    await sendNotificationAboutNewUser({ userId: username, userFullName: name })
   }
   return user
 }
