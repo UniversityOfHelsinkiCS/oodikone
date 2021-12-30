@@ -9,7 +9,7 @@ const DataTable = ({ data, titles, track }) => {
 
   return (
     <div className="table-container">
-      <Table celled>
+      <Table compact celled>
         <Table.Header>
           <Table.Row>
             {titles?.map(title => (
