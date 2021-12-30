@@ -123,8 +123,8 @@ const getStudytrackDataForTheYear = async ({
   )
 }
 
-const getStudytrackNames = (studytrackNames, studytracks, emptyTracks, years) => {
-  const names = {}
+const getStudytrackNames = (studyprogramme, studytrackNames, studytracks, emptyTracks, years) => {
+  const names = { [studyprogramme]: 'All students of the programme' }
   studytracks.forEach(track => {
     const trackName = studytrackNames[track]?.name['fi']
     if (trackName && emptyTracks.get(track) !== years.length) {
@@ -176,7 +176,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
     })
   )
 
-  const studytrackOptions = getStudytrackNames(studytrackNames, studytracks, emptyTracks, years)
+  const studytrackOptions = getStudytrackNames(studyprogramme, studytrackNames, studytracks, emptyTracks, years)
 
   return {
     id: studyprogramme,
