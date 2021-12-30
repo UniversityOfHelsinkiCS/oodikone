@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import InfoBox from '../../Info/InfoBox'
@@ -25,7 +25,13 @@ const creditTableTitles = [
 const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const stats = useGetStudytrackStatsQuery({ id: studyprogramme })
-  const [track, setTrack] = useState('KH20_001')
+  const [track, setTrack] = useState(studyprogramme)
+
+  useEffect(() => {
+    if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {
+      setTrack(studyprogramme)
+    }
+  }, [studyprogramme, track, stats])
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -60,7 +66,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
             track={track || studyprogramme}
             titles={populationTitles}
             allData={stats?.data?.mainStatsByYear}
-            dataOfStudytrack={track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
+            dataOfStudytrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
           />
           {getDivider(
             `Progress of students of ${
