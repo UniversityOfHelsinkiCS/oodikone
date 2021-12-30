@@ -3,7 +3,7 @@ import { Button, Card, Divider, List, Icon, Popup, Dropdown, Header } from 'sema
 import { connect } from 'react-redux'
 import { sortBy } from 'lodash'
 import { withRouter } from 'react-router-dom'
-import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { useGetAuthorizedUserQuery, useShowAsUser } from 'redux/auth'
 import { getTextIn, textAndDescriptionSearch } from '../../common'
 import { removeUserUnits, setFaculties } from '../../redux/users'
 import { getAccessGroups } from '../../redux/accessGroups'
@@ -14,7 +14,6 @@ import AccessGroups from './AccessGroups'
 import EmailNotification from './EmailNotification'
 import { getElementDetails } from '../../redux/elementdetails'
 import useLanguage from '../LanguagePicker/useLanguage'
-import { useShowAsUser } from '../../common/hooks'
 
 const UserPage = ({
   user,

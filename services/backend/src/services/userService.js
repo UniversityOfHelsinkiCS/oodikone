@@ -159,7 +159,7 @@ const getLoginDataWithoutToken = async (uid, full_name, hyGroups, email, hyPerso
   return result
 }
 
-const superlogin = async (uid, asUser) => await User.superlogin(uid, asUser)
+const getMockedUser = async (uid, asUser) => await User.superlogin(uid, asUser)
 
 const getUser = async ({ username, name, email, iamGroups, sisId }) => {
   const { payload: user, isNew } = await getLoginDataWithoutToken(username, name, iamGroups, email, sisId)
@@ -171,7 +171,6 @@ const getUser = async ({ username, name, email, iamGroups, sisId }) => {
 
 module.exports = {
   updateUser,
-  superlogin,
   enableElementDetails,
   removeElementDetails,
   findAll,
@@ -183,4 +182,5 @@ module.exports = {
   getStudentsUserCanAccess,
   getLoginDataWithoutToken,
   getUser,
+  getMockedUser,
 }

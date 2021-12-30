@@ -6,11 +6,6 @@ import { API_DATE_FORMAT, DISPLAY_DATE_FORMAT } from '../constants'
 import toskaLogo from '../assets/toska.png'
 import irtomikko from '../assets/irtomikko.png'
 
-const MOCK_USERID = 'MOCK_USERID'
-export const setMocking = userid =>
-  userid ? localStorage.setItem(MOCK_USERID, userid) : localStorage.removeItem(MOCK_USERID)
-export const getMocked = () => localStorage.getItem(MOCK_USERID)
-
 export const textAndDescriptionSearch = (dropDownOptions, param) =>
   filter(dropDownOptions, option =>
     option.text
@@ -255,3 +250,5 @@ export const languageAbbreviations = {
   sv: 'swedish',
   en: 'english',
 }
+
+export const showAsUserKey = 'showAsUser'

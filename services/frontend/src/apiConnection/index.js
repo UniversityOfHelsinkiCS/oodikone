@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as Sentry from '@sentry/browser'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { showAsUserKey } from 'common'
 import { apiBasePath, isDev } from '../conf'
 
 export const getHeaders = () => {
@@ -14,7 +15,13 @@ export const getHeaders = () => {
     hyPersonSisuId: 'hy-hlo-1441871',
     shib_logout_url: 'https://helsinki.fi/shibboleth-sp/Logout',
   }
-  return isDev ? { ...devUserHeaders } : {}
+  const headers = isDev ? { ...devUserHeaders } : {}
+
+  // Set up possible show as user -headers
+  const showAsUser = window.localStorage.getItem(showAsUserKey)
+  if (showAsUser) headers['x-show-as-user'] = showAsUser
+
+  return headers
 }
 
 export const api = axios.create({ baseURL: apiBasePath, headers: getHeaders() })
