@@ -6,7 +6,6 @@ const shibbolethCharsetMiddleware = require('./middleware/shibbolethCharsetMiddl
 const matomoInit = require('./routes/matomo-init')
 const currentUserMiddleware = require('./middleware/currentUserMiddleware')
 const accessLogger = require('./middleware/accessLogger')
-const sentryUserId = require('./middleware/sentryUserId')
 const auth = require('./middleware/auth')
 
 const courses = require('./routes/courses')
@@ -47,7 +46,6 @@ module.exports = (app, url) => {
   app.use(url, matomoInit)
   app.use(currentUserMiddleware)
   app.use(accessLogger)
-  app.use(sentryUserId)
   app.use(url, login)
   app.use(url, elementdetails)
   app.use(url, courses)

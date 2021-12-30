@@ -1,7 +1,7 @@
 const router = require('express').Router()
+const { ApplicationError } = require('../util/customErrors')
 
 router.get('/login', async (req, res) => {
-  logger.info(JSON.stringify(req.headers, null, 2))
   const { decodedToken, logoutUrl } = req
 
   if (!decodedToken) {
