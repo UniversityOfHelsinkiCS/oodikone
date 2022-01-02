@@ -38,7 +38,6 @@ const selectCustomPopulationData = createSelector(
   state => state.populations.data,
   (semesters, populations) => ({
     allSemesters: semesters?.semesters ?? [],
-    elementDetails: populations?.elementDetails?.data ?? [],
     custompop: populations?.students ?? [],
   })
 )
@@ -47,7 +46,7 @@ const CustomPopulation = () => {
   const { language } = useLanguage()
   const dispatch = useDispatch()
 
-  const { allSemesters, elementDetails, custompop } = useSelector(selectCustomPopulationData)
+  const { allSemesters, custompop } = useSelector(selectCustomPopulationData)
 
   const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
     studentNumbers: custompop.map(s => s.studentNumber),
@@ -69,10 +68,7 @@ const CustomPopulation = () => {
       transferredToProgrammeFilter,
       startYearAtUniFilter,
       tagsFilter,
-      programmeFilter({
-        courses: courseStats?.coursestatistics ? courseStats?.coursestatistics.map(c => c.course.code) : [],
-        elementDetails,
-      }),
+      programmeFilter,
       creditDateFilter,
       enrollmentStatusFilter({
         allSemesters: allSemesters ?? [],
@@ -80,7 +76,7 @@ const CustomPopulation = () => {
       }),
       studyTrackFilter,
     ],
-    [courseStats, elementDetails, allSemesters, language]
+    [courseStats, allSemesters, language]
   )
 
   return (

@@ -1,9 +1,9 @@
 import React from 'react'
 import { Form, Dropdown } from 'semantic-ui-react'
-import createFilter from './createFilter'
 import { getTextIn } from 'common'
 import moment from 'moment'
 import _ from 'lodash'
+import createFilter from './createFilter'
 
 const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt }) => {
   const { selected } = options
@@ -11,7 +11,9 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt 
   const dropdownOptions = _.chain(withoutSelf())
     .flatMap(student => student.studyrights)
     .flatMap(sr => sr.studyright_elements)
-    .filter(sre => sre.element_detail.type === 30 && (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate)))
+    .filter(
+      sre => sre.element_detail.type === 30 && (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate))
+    )
     .map(sre => sre.element_detail)
     .keyBy('code')
     .values()
@@ -31,8 +33,8 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt 
   const handleChange = (_, { value }) => {
     onOptionsChange({
       selected: value,
-    });
-  };
+    })
+  }
 
   return (
     <Form>
@@ -50,8 +52,8 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt 
         fluid
       />
     </Form>
-  );
-};
+  )
+}
 
 export default createFilter({
   key: 'StudyTrack',
@@ -69,9 +71,11 @@ export default createFilter({
 
     return student.studyrights
       .flatMap(sr => sr.studyright_elements)
-      .filter(sre => sre.element_detail.type === 30 && (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate)))
+      .filter(
+        sre => sre.element_detail.type === 30 && (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate))
+      )
       .map(sre => sre.element_detail.code)
-      .some(code => selected.includes(code));
+      .some(code => selected.includes(code))
   },
 
   render: (props, { args }) => <StudyTrackFilterCard {...props} activeAt={_.get(args, 'activeAt')} />,

@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import moment from 'moment'
+import _ from 'lodash'
 import { Segment, Header, Accordion } from 'semantic-ui-react'
 import scrollToComponent from 'react-scroll-to-component'
 import InfoBox from 'components/Info/InfoBox'
@@ -40,7 +42,6 @@ const CoursePopulation = ({
   getElementDetails,
   studentData,
   pending,
-  elementDetails,
   history,
   courseData,
   getSemestersDispatch,
@@ -292,6 +293,17 @@ const CoursePopulation = ({
 
   const courses = JSON.parse(queryParamsFromUrl(history.location).coursecodes)
 
+  const studyRightPredicate = (student, sre) => {
+    const date = _.chain(student)
+      .get('courses')
+      .filter(c => courses.includes(c.course_code))
+      .map('date')
+      .max()
+      .value()
+
+    return moment(date).isBetween(sre.startdate, sre.enddate)
+  }
+
   return (
     <FilterView
       name="CoursePopulation"
@@ -301,7 +313,16 @@ const CoursePopulation = ({
         courseFilter({ courses: courseStatistics?.coursestatistics }),
         creditsEarnedFilter,
         startYearAtUniFilter,
-        programmeFilter({ courses, elementDetails }),
+        programmeFilter({
+          additionalModes: [
+            {
+              key: 'attainment',
+              label: 'Attainment',
+              predicate: studyRightPredicate,
+              description: 'Student had an active study right at the time of course attainment.',
+            },
+          ],
+        }),
         gradeFilter({
           courseCodes: courses,
           from: dateFrom,
@@ -311,6 +332,9 @@ const CoursePopulation = ({
           activeAt: dateFrom,
         }),
       ]}
+      initialOptions={{
+        [programmeFilter.key]: { mode: 'attainment', selectedProgrammes: [] },
+      }}
       students={studentData.students ?? []}
     >
       {filtered => (
