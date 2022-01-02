@@ -19,7 +19,7 @@ const TagsFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
       <Message color="orange" size="tiny">
         No tags have been defined for any of the selected students.
       </Message>
-    );
+    )
   }
 
   return (

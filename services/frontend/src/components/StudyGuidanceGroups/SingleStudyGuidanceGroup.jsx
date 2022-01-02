@@ -207,6 +207,20 @@ const SingleStudyGroupFilterView = props => {
     }),
     filters.creditDateFilter,
     filters.studyTrackFilter,
+    filters.programmeFilter({
+      additionalModes: props.group?.tags?.year
+        ? [
+            {
+              key: 'assoc-year',
+              label: 'Since Assoc. Year',
+              description:
+                'Student has had a study right since the start year associated with this study guidance group.',
+              predicate: (_student, sre) =>
+                moment(createAcademicYearStartDate(props.group.tags?.year)).isBetween(sre.startdate, sre.enddate),
+            },
+          ]
+        : [],
+    }),
   ]
 
   if (props.group?.tags?.studyProgramme && props.group?.tags?.year && parseInt(props.group.tags.year, 10) >= 2020) {
