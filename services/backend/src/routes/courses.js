@@ -42,6 +42,4 @@ router.get('/v3/courseyearlystats', async (req, res) => {
   }
 })
 
-router.use('*', (req, res, next) => next())
-
 module.exports = router

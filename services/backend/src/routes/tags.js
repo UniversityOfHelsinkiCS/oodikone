@@ -137,6 +137,4 @@ router.delete('/studenttags/delete_many', async (req, res) => {
   res.status(200).json(filterRelevantStudentTags(result, user.id))
 })
 
-router.use('*', (req, res, next) => next())
-
 module.exports = router

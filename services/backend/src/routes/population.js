@@ -425,6 +425,4 @@ router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req
   return res.json(maxYearsToCreatePopulationFrom)
 })
 
-router.use('*', (req, res, next) => next())
-
 module.exports = router

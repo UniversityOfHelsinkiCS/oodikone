@@ -126,6 +126,4 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   }
 })
 
-router.use('*', (req, res, next) => next())
-
 module.exports = router

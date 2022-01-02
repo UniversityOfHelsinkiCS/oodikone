@@ -6,6 +6,4 @@ router.get('/semesters/codes', async (req, res) => {
   res.json(providers)
 })
 
-router.use('*', (req, res, next) => next())
-
 module.exports = router
