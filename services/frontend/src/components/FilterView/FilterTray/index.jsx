@@ -20,31 +20,33 @@ const FilterTray = () => {
 
   const haveOptionsBeenChanged = filters.some(({ key }) => areOptionsDirty(key))
 
-  const filterSet = filters.map(filter => {
-    const { key, title, isActive, render, info } = filter
-    const ctx = getContextByKey(key)
+  const filterSet = filters
+    .sort((a, b) => (a.title ?? a.key).localeCompare(b.title ?? b.key))
+    .map(filter => {
+      const { key, title, isActive, render, info } = filter
+      const ctx = getContextByKey(key)
 
-    const props = {
-      options: ctx.options,
-      onOptionsChange: options => setFilterOptions(key, options),
-      withoutSelf: () => withoutFilter(key),
-    }
+      const props = {
+        options: ctx.options,
+        onOptionsChange: options => setFilterOptions(key, options),
+        withoutSelf: () => withoutFilter(key),
+      }
 
-    return (
-      <div key={key}>
-        <FilterCard
-          title={title ?? key}
-          active={isActive(filterOptions[key])}
-          onClear={() => resetFilter(key)}
-          info={info}
-          filter={filter}
-          options={ctx.options}
-        >
-          {render(props, ctx)}
-        </FilterCard>
-      </div>
-    )
-  })
+      return (
+        <div key={key}>
+          <FilterCard
+            title={title ?? key}
+            active={isActive(filterOptions[key])}
+            onClear={() => resetFilter(key)}
+            info={info}
+            filter={filter}
+            options={ctx.options}
+          >
+            {render(props, ctx)}
+          </FilterCard>
+        </div>
+      )
+    })
 
   return (
     <>
