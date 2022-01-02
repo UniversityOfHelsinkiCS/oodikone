@@ -20,6 +20,7 @@ import {
   tagsFilter,
   creditDateFilter,
   enrollmentStatusFilter,
+  studyTrackFilter,
 } from '../FilterView/filters'
 
 const selectPopulations = createSelector(
@@ -58,6 +59,7 @@ const PopulationStatistics = () => {
       allSemesters: allSemesters ?? [],
       language,
     }),
+    studyTrackFilter,
   ]
 
   if (parseInt(query?.year, 10) >= 2020) {

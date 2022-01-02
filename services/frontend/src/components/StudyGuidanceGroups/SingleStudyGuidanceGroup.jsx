@@ -206,6 +206,7 @@ const SingleStudyGroupFilterView = props => {
       courses: props.courses?.coursestatistics ?? [],
     }),
     filters.creditDateFilter,
+    filters.studyTrackFilter,
   ]
 
   if (props.group?.tags?.studyProgramme && props.group?.tags?.year && parseInt(props.group.tags.year, 10) >= 2020) {

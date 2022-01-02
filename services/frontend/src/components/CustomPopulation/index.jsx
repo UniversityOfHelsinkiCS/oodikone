@@ -27,6 +27,7 @@ import {
   tagsFilter,
   creditDateFilter,
   enrollmentStatusFilter,
+  studyTrackFilter,
 } from '../FilterView/filters'
 import useLanguage from '../LanguagePicker/useLanguage'
 import CustomPopulationSearch from './CustomPopulationSearch'
@@ -77,6 +78,7 @@ const CustomPopulation = () => {
         allSemesters: allSemesters ?? [],
         language,
       }),
+      studyTrackFilter,
     ],
     [courseStats, elementDetails, allSemesters, language]
   )

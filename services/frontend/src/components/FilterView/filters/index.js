@@ -11,6 +11,7 @@ import admissionType from './admissionType'
 import tags from './tags'
 import date from './date'
 import enrollmentStatus from './enrollmentStatus'
+import studyTrack from './studyTrack'
 
 export const genderFilter = gender
 export const ageFilter = age
@@ -25,3 +26,4 @@ export const admissionTypeFilter = admissionType
 export const tagsFilter = tags
 export const creditDateFilter = date
 export const enrollmentStatusFilter = enrollmentStatus
+export const studyTrackFilter = studyTrack
