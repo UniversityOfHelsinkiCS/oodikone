@@ -28,6 +28,7 @@ import {
   creditsEarnedFilter,
   startYearAtUniFilter,
   programmeFilter,
+  studyTrackFilter,
 } from '../FilterView/filters'
 import FilterView from '../FilterView'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -305,6 +306,9 @@ const CoursePopulation = ({
           courseCodes: courses,
           from: dateFrom,
           to: dateTo,
+        }),
+        studyTrackFilter({
+          activeAt: dateFrom,
         }),
       ]}
       students={studentData.students ?? []}
