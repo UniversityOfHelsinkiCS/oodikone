@@ -188,6 +188,4 @@ router.delete('/v2/studyprogrammes/:id/thesis/:course', async (req, res) => {
   }
 })
 
-router.use('*', (req, res, next) => next())
-
 module.exports = router

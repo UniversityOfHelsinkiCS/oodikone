@@ -78,6 +78,4 @@ router.get('/:id', async (req, res) => {
   res.json(result)
 })
 
-router.use('*', (req, res, next) => next())
-
 module.exports = router

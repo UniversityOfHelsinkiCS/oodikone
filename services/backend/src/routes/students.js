@@ -88,6 +88,4 @@ router.get('/students/:id', async (req, res) => {
   }
 })
 
-router.use('*', (req, res, next) => next())
-
 module.exports = router
