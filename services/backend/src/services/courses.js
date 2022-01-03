@@ -11,10 +11,9 @@ const {
 } = require('../models')
 
 const { parseCredit } = require('./parseCredits')
-const { sortMainCode } = require('../util/utils')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
-// const _ = require('lodash')
+const { sortMainCode, getSortRank } = require('../util/utils')
 
 const byNameOrCode = (searchTerm, language) =>
   Course.findAll({
@@ -159,68 +158,15 @@ const allCodeAlternatives = async code => {
   const course = await Course.findOne({
     where: { code: code },
   })
-  // console.log('course: ', course)
-  return [...course.substitutions, code]
-    .map(c => {
-      if (c.match(/^AY?/)) return [c, 4] // open university codes come last
-      if (c.match(/^\d/)) return [c, 2] // old numeric codes come second
-      if (c.match(/^[A-Za-z]/)) return [c, 1] // new letter based codes come first
-      return [c, 3] // unknown, comes before open uni?
-    })
-    .sort((a, b) => a[1] - b[1])
-    .map(c => c[0])
+
+  return sortMainCode([...course.substitutions, code])
 }
 
-/* const allCodeAltenatives = async code => {
-  let course = await Course.findAll({
-    raw: true,
-    attributes: ['id', 'code', 'substitutions'],
-    where: {
-      code: code,
-    },
-  })
-
-  const allSubstitutions = _.flatten(course.map(c => c.substitutions))
-
-  let subcodes = []
-  if (allSubstitutions) {
-    subcodes = await Course.findAll({
-      raw: true,
-      attributes: ['code'],
-      where: {
-        id: {
-          [Op.in]: allSubstitutions,
-        },
-      },
-    })
-  }
-
-  const courses = [...course, ...subcodes]
-  const temp = courses
-    .map(c => c.code)
-    .map(c => {
-      if (c.match(/^AY?/)) return [c, 4] // open university codes come last
-      if (c.match(/^\d/)) return [c, 2] // old numeric codes come second
-      if (c.match(/^[A-Za-z]/)) return [c, 1] // new letter based codes come first
-      return [c, 3] // unknown, comes before open uni?
-    })
-    .sort((a, b) => a[1] - b[1])
-    .map(c => c[0])
-
-  console.log('all substitutions: ', allSubstitutions)
-  return allSubstitutions ? _.uniq(temp) : [code]
-}
- */
 const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anonymizationSalt) => {
   const courseForSubs = await Course.findOne({
     where: { code: coursecode },
   })
   let codes = sortMainCode([...courseForSubs.substitutions, coursecode])
-  // let codes = await allCodeAlternatives(coursecode)
-  // let codes2 = await allCodeAlternatives2(coursecode)
-
-  // console.log('codes: ', codes)
-  // console.log('codes2: ', codes2)
 
   if (isOpenUniCourseCode(coursecode) && !unifyOpenUniCourses) {
     codes = [coursecode]
@@ -394,10 +340,6 @@ const codeLikeTerm = code =>
 
 const byNameAndOrCodeLike = async (name, code) => {
   let rawCourses = await Course.findAll({
-    include: {
-      model: Organization,
-      required: true,
-    },
     where: {
       ...nameLikeTerm(name),
       ...codeLikeTerm(code),
@@ -406,9 +348,9 @@ const byNameAndOrCodeLike = async (name, code) => {
 
   const courses = rawCourses
     .map(course => {
-      return { ...course.dataValues, organizations: course.organizations.map(o => o.id) }
+      return { ...course.dataValues }
     })
-    .sort(a => (a.code.match(/^[A-Za-z]{3}[0-9]{1}/) ? -1 : 1))
+    .sort((x, y) => getSortRank(x.code) - getSortRank(y.code))
 
   let substitutionGroupIndex = 0
   const visited = []
@@ -416,7 +358,7 @@ const byNameAndOrCodeLike = async (name, code) => {
   const organizeSubgroups = course => {
     if (visited.includes(course.code)) return
 
-    let temp = courses.filter(c => (course.substitutions ? course.substitutions.includes(c.id) : false))
+    let temp = courses.filter(c => course.substitutions.includes(c.code))
     temp.unshift(course)
     temp.forEach(cu => {
       if (visited.includes(course.code)) return

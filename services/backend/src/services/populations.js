@@ -819,10 +819,6 @@ const findCourses = async (studentnumbers, beforeDate) => {
           },
         },
       },
-      /* {
-        attributes: ['discipline_id', 'name'],
-        model: Discipline
-      }, */
       {
         attributes: ['coursetypecode', 'name'],
         model: CourseType,
