@@ -41,6 +41,7 @@ const currentUserMiddleware = async (req, _, next) => {
       req.decodedToken = mockedUser
     }
   }
+  req.user = req.decodedToken // temp push user to req object
   req.logoutUrl = logoutUrl
 
   Sentry.setUser({ username: req.decodedToken.mockedBy || req.decodedToken.userId })
