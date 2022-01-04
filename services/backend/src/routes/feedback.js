@@ -6,7 +6,7 @@ const logger = require('../util/logger')
 router.post('/email', async (req, res) => {
   const { content } = req.body
   const {
-    decodedToken: { userId },
+    user: { userId },
   } = req
 
   const { email, full_name } = await getUserDataFor(userId)

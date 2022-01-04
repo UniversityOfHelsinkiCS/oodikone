@@ -8,7 +8,7 @@ const {
 
 router.get('/', async (req, res) => {
   const {
-    decodedToken: { id },
+    user: { id },
   } = req
   const customPopulationSearches = await getCustomPopulationSearchesByUser(id)
   res.json(customPopulationSearches)
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const {
-    decodedToken: { id },
+    user: { id },
     body: { name, students },
   } = req
 
@@ -29,7 +29,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const {
-    decodedToken: { id: userId },
+    user: { id: userId },
     body: { students },
   } = req
   const { id } = req.params
@@ -46,7 +46,7 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   const {
-    decodedToken: { id: userId },
+    user: { id: userId },
   } = req
   const { id } = req.params
 

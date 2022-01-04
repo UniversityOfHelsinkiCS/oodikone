@@ -14,7 +14,7 @@ const filterStudentTags = (student, userId) => {
 router.get('/students', async (req, res) => {
   const {
     roles,
-    decodedToken: { userId, sisPersonId },
+    user: { userId, sisPersonId },
     query: { searchTerm },
   } = req
 
@@ -51,16 +51,16 @@ router.get('/students', async (req, res) => {
 
 router.get('/students/:id', async (req, res) => {
   const { id: studentId } = req.params
-  const { roles, decodedToken } = req
+  const { roles, user } = req
 
   if (roles?.includes('admin')) {
     const results = await Student.withId(studentId)
     return results.error
       ? res.status(400).json({ error: 'error finding student' }).end()
-      : res.status(200).json(filterStudentTags(results, decodedToken.id)).end()
+      : res.status(200).json(filterStudentTags(results, user.id)).end()
   }
 
-  const uid = req.decodedToken.userId
+  const uid = req.user.userId
   const student = await Student.withId(studentId)
   if (student.error) {
     return res.status(400).json({ error: 'error finding student' }).end()
@@ -75,14 +75,14 @@ router.get('/students/:id', async (req, res) => {
   )
 
   if (roles?.includes('studyGuidanceGroups')) {
-    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(decodedToken.sisPersonId)
+    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(user.sisPersonId)
     if (studentsUserCanAccess.has(studentId)) {
-      return res.status(200).json(filterStudentTags(student, decodedToken.id)).end()
+      return res.status(200).json(filterStudentTags(student, user.id)).end()
     }
   }
 
   if (rights.some(right => right !== null)) {
-    res.status(200).json(filterStudentTags(student, decodedToken.id)).end()
+    res.status(200).json(filterStudentTags(student, user.id)).end()
   } else {
     res.status(400).json({ error: 'error finding student' }).end()
   }

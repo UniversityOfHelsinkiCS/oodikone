@@ -83,7 +83,7 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
   let studentnumberlist
   const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, from, to)
   const {
-    decodedToken: { userId },
+    user: { userId },
     roles,
   } = req
 
@@ -123,7 +123,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
   let studentnumberlist
   const studentnumbers = await Student.findByTag(tag)
   const {
-    decodedToken: { userId },
+    user: { userId },
     roles,
   } = req
   if (roles && roles.includes('admin')) {
@@ -160,7 +160,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
   }
   let studentnumberlist
   const {
-    decodedToken: { userId, sisPersonId },
+    user: { userId, sisPersonId },
     roles,
   } = req
 
@@ -195,7 +195,7 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 
 router.get('/v3/populationstatistics', async (req, res) => {
   const { year, semesters, studyRights: studyRightsJSON } = req.query
-  const { decodedToken } = req
+  const { user } = req
 
   if (!year || !semesters || !studyRightsJSON) {
     res.status(400).json({ error: 'The query should have a year, semester and studyRights defined' })
@@ -245,7 +245,7 @@ router.get('/v3/populationstatistics', async (req, res) => {
       return
     }
 
-    res.json(filterPersonalTags(result, decodedToken.id))
+    res.json(filterPersonalTags(result, user.id))
   } else {
     const result = await Population.optimizedStatisticsOf({ ...req.query, studyRights })
     if (result.error) {
@@ -254,13 +254,13 @@ router.get('/v3/populationstatistics', async (req, res) => {
       return
     }
 
-    res.json(filterPersonalTags(result, decodedToken.id))
+    res.json(filterPersonalTags(result, user.id))
   }
 })
 
 router.get('/v3/populationstatisticsbytag', async (req, res) => {
   const { tag, studyRights: studyRightsJSON, months, year } = req.query
-  const { decodedToken } = req
+  const { user } = req
 
   if (!tag) return res.status(400).json({ error: 'The query should have a tag defined' })
   const foundTag = await TagService.findTagById(tag)
@@ -270,7 +270,7 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
   let studentnumberlist
   const studentnumbers = await Student.findByTag(tag)
   const {
-    decodedToken: { userId },
+    user: { userId },
     roles,
   } = req
   if (roles && roles.includes('admin')) {
@@ -301,12 +301,12 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
     return
   }
 
-  res.json(filterPersonalTags(result, decodedToken.id))
+  res.json(filterPersonalTags(result, user.id))
 })
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: sep } = req.query
-  const { decodedToken, roles } = req
+  const { user, roles } = req
   const separate = sep ? JSON.parse(sep) : false
 
   if (!coursecodes || !from || !to) {
@@ -339,7 +339,7 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   if (roles && roles.includes('admin')) {
     studentsUserCanAccess = new Set(studentnumbers)
   } else {
-    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(decodedToken.userId)
+    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(user.userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
     studentsUserCanAccess = new Set(await Student.filterStudentnumbersByAccessrights(studentnumbers, codes))
   }
@@ -368,25 +368,23 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     return
   }
 
-  res.json(filterPersonalTags(result, decodedToken.id))
+  res.json(filterPersonalTags(result, user.id))
 })
 
 router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
   const { studentnumberlist, usingStudyGuidanceGroups } = req.body
-  const { roles, decodedToken } = req
+  const { roles, user } = req
 
   if (usingStudyGuidanceGroups) {
-    if (!decodedToken.sisPersonId) {
-      logger.error(
-        `User ${decodedToken.userId} tried to get person groups but personId was ${decodedToken.sisPersonId} in header`
-      )
+    if (!user.sisPersonId) {
+      logger.error(`User ${user.userId} tried to get person groups but personId was ${user.sisPersonId} in header`)
       return res.status(400).json({ error: 'Not possible to get groups without personId' })
     }
   }
 
   const studentsUserCanAccess = usingStudyGuidanceGroups
-    ? await getAllStudentsUserHasInGroups(decodedToken.sisPersonId)
-    : await UserService.getStudentsUserCanAccess(studentnumberlist, roles, decodedToken.userId)
+    ? await getAllStudentsUserHasInGroups(user.sisPersonId)
+    : await UserService.getStudentsUserCanAccess(studentnumberlist, roles, user.userId)
   const filteredStudentNumbers = studentnumberlist.filter(s => studentsUserCanAccess.has(s))
 
   const result = await Population.optimizedStatisticsOf(
@@ -402,7 +400,7 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     Sentry.captureException(new Error(result.error))
     return
   }
-  res.status(200).json(filterPersonalTags(result, decodedToken.id))
+  res.status(200).json(filterPersonalTags(result, user.id))
 })
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {

@@ -4,7 +4,7 @@ const { getAllGroupsAndStudents, changeGroupTags } = require('../services/studyG
 
 router.get('/', async (req, res) => {
   const {
-    decodedToken: { uid, sisPersonId },
+    user: { uid, sisPersonId },
   } = req
   if (!sisPersonId) {
     logger.error(`User ${uid} tried to get person groups but personId was ${sisPersonId} in header`)
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
 
 router.put('/:id/tags', async (req, res) => {
   const {
-    decodedToken: { uid, sisPersonId },
+    user: { uid, sisPersonId },
     body: tags,
     params: { id: groupId },
   } = req
