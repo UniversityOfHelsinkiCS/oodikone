@@ -17,10 +17,10 @@ const NoAccessToPageBanner = () => (
 )
 
 const ProtectedRoute = ({ requiredRoles = [], requireUserHasRights = false, ...rest }) => {
-  const { rights, isAdmin, userRoles } = useGetAuthorizedUserQuery()
+  const { rights, isAdmin, roles } = useGetAuthorizedUserQuery()
   const hasAccessToRoute = () => {
     if (isAdmin) return true
-    const hasRequiredRoles = requiredRoles.length > 0 ? checkUserAccess(requiredRoles, userRoles) : true
+    const hasRequiredRoles = requiredRoles.length > 0 ? checkUserAccess(requiredRoles, roles) : true
     const hasRequiredRights = requireUserHasRights ? rights.length > 0 : true
     if (requiredRoles.includes('courseStatistics')) {
       return hasRequiredRoles || hasRequiredRights

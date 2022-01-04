@@ -37,12 +37,14 @@ export const useGetAuthorizedUserQuery = () => {
   if (isLoading || error) return { data, isLoading, error, ...rest }
 
   const { token } = data
-  const userRoles = token?.roles?.map(r => r.group_code) ?? []
+
+  // rewrite the roles array coming from backend
+  const roles = token?.roles?.map(r => r.group_code) ?? []
 
   return {
     ...token,
-    userRoles,
-    isAdmin: userRoles.includes('admin'),
+    roles,
+    isAdmin: roles.includes('admin'),
     isLoading,
     ...rest,
   }
