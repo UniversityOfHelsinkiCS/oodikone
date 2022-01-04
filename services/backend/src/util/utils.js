@@ -29,6 +29,7 @@ const getSortRank = code => {
 }
 
 const sortMainCode = codeArray => {
+  if (!codeArray) return []
   return codeArray.sort(function (x, y) {
     return getSortRank(y) - getSortRank(x)
   })

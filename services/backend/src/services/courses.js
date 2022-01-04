@@ -166,7 +166,8 @@ const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anony
   const courseForSubs = await Course.findOne({
     where: { code: coursecode },
   })
-  let codes = sortMainCode([...courseForSubs.substitutions, coursecode])
+
+  let codes = courseForSubs.substitutions ? sortMainCode([...courseForSubs.substitutions, coursecode]) : [coursecode]
 
   if (isOpenUniCourseCode(coursecode) && !unifyOpenUniCourses) {
     codes = [coursecode]
@@ -358,7 +359,10 @@ const byNameAndOrCodeLike = async (name, code) => {
   const organizeSubgroups = course => {
     if (visited.includes(course.code)) return
 
-    let temp = courses.filter(c => course.substitutions.includes(c.code))
+    let temp = []
+    if (course.substitutions !== null) {
+      temp = courses.filter(c => course.substitutions.includes(c.code))
+    }
     temp.unshift(course)
     temp.forEach(cu => {
       if (visited.includes(course.code)) return
