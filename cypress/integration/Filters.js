@@ -270,7 +270,7 @@ describe('Course Statistics', () => {
       cy.cs('startYearAtUni-dropdown').selectFromDropdown([0])
       checkFilteringResult(1)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
-      cy.cs('startYearAtUni-dropdown').selectFromDropdown(11)
+      cy.cs('startYearAtUni-dropdown').selectFromDropdown(12)
       checkFilteringResult(29)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
     })
