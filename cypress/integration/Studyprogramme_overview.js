@@ -21,8 +21,6 @@ describe('Studyprogramme overview', () => {
       '1',
       '11',
       '11',
-      '11',
-      '22 months',
       '152',
       '125',
       '78',
