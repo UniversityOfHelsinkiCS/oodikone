@@ -107,10 +107,12 @@ const ProgrammeFilterCard = ({
         search
         selection
         value={selectedProgrammes}
+        data-cy="Programme-filter-dropdown"
       />
       <div style={{ marginTop: '0.5em' }}>
         Mode:{' '}
         <Dropdown
+          data-cy="Programme-filter-mode-selector"
           compact
           inline
           placeholder="Type"

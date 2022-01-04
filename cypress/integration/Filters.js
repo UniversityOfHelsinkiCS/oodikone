@@ -48,6 +48,30 @@ describe('Population Statistics', () => {
     card.cs('TransferredToProgramme-header').click()
   })
 
+  it('Programme defaults to "Active Study Right" mode', () => {
+    runTestStepWithPreAndPostParts('Programme', () => {
+      cy.cs('Programme-filter-mode-selector').children().eq(0).should('contain', 'Active Study Right')
+    })
+  })
+
+  it('Programme filter works', () => {
+    runTestStepWithPreAndPostParts('Programme', () => {
+      const card = cy.cs('Programme-filter-card')
+      const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(0)
+      checkFilteringResult(5)
+      programmeDropdown.get('i.delete').click()
+    })
+  })
+
+  it('Study track filter works', () => {
+    runTestStepWithPreAndPostParts('StudyTrack', () => {
+      const card = cy.cs('StudyTrack-filter-card')
+      const programmeDropdown = card.cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
+      checkFilteringResult(1)
+      programmeDropdown.get('i.delete').click()
+    })
+  })
+
   it('Graduation filter works', () => {
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
       const card = cy.cs('GraduatedFromProgramme-filter-card')
@@ -193,6 +217,30 @@ describe('Course Statistics', () => {
     })
   })
 
+  it('Programme defaults to "Attainment" mode', () => {
+    runTestStepWithPreAndPostParts('Programme', () => {
+      cy.cs('Programme-filter-mode-selector').children().eq(0).should('contain', 'Attainment')
+    })
+  })
+
+  it('Programme filter works', () => {
+    runTestStepWithPreAndPostParts('Programme', () => {
+      const card = cy.cs('Programme-filter-card')
+      const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(1)
+      checkFilteringResult(116)
+      programmeDropdown.get('i.delete').click()
+    })
+  })
+
+  it('Study track filter works', () => {
+    runTestStepWithPreAndPostParts('StudyTrack', () => {
+      const card = cy.cs('StudyTrack-filter-card')
+      const programmeDropdown = card.cs('StudyTrack-filter-dropdown').selectFromDropdown(0)
+      checkFilteringResult(1)
+      programmeDropdown.get('i.delete').click()
+    })
+  })
+
   it('Age filter works', () => {
     runTestStepWithPreAndPostParts('Age', () => {
       cy.cs('ageFilter-min').type('20')
@@ -265,6 +313,21 @@ describe('Custom Population Statistics', () => {
       checkFilteringResult(1)
       cy.cs('ageFilter-min').find('input').clear()
       cy.cs('ageFilter-max').find('input').clear()
+    })
+  })
+
+  it('Programme defaults to "Active Study Right" mode', () => {
+    runTestStepWithPreAndPostParts('Programme', () => {
+      cy.cs('Programme-filter-mode-selector').children().eq(0).should('contain', 'Active Study Right')
+    })
+  })
+
+  it('Programme filter works', () => {
+    runTestStepWithPreAndPostParts('Programme', () => {
+      const card = cy.cs('Programme-filter-card')
+      const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(0)
+      checkFilteringResult(5)
+      programmeDropdown.get('i.delete').click()
     })
   })
 
