@@ -39,11 +39,13 @@ class DbConnection extends EventEmitter {
   }
 }
 
+// Old-style kone + user db connections
 const sequelizeKone = new Sequelize(conf.DB_URL_KONE, {
   schema: conf.DB_SCHEMA_KONE,
   searchPath: conf.DB_SCHEMA_KONE,
   logging: false,
 })
+
 sequelizeKone.query(`SET SESSION search_path to ${conf.DB_SCHEMA_KONE}`)
 
 const sequelizeUser = new Sequelize(conf.DB_URL_USER, {
@@ -52,76 +54,55 @@ const sequelizeUser = new Sequelize(conf.DB_URL_USER, {
 
 const initializeDatabaseConnection = async () => {
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-  const waitSeconds = 60
-  for (let i = 1; i <= waitSeconds; i++) {
-    try {
-      await sequelizeKone.authenticate()
-      break
-    } catch (e) {
-      if (i === waitSeconds) {
-        logger.error(`Could not connect to kone database in ${waitSeconds} seconds`)
-        throw e
+  const rounds = 60
+
+  for (const [seq, dbName] of [
+    [sequelizeKone, 'kone-db'],
+    [sequelizeUser, 'user-db'],
+  ]) {
+    logger.info(`Connecting to ${dbName}...`)
+    for (let round = 1; round <= rounds; round++) {
+      try {
+        await seq.authenticate()
+        break
+      } catch (error) {
+        if (round === rounds) {
+          logger.error(`${dbName} database connection failed!`)
+          throw error
+        }
+        await sleep(1000)
       }
-      await sleep(1000)
     }
-  }
-  try {
+    logger.info(`${dbName} database connection established`)
+
+    const schema = dbName === 'kone-db' ? conf.DB_SCHEMA_KONE : undefined
+    const migrationsFolder = dbName === 'kone-db' ? 'migrations_kone' : 'migrations_user'
     const migrator = new Umzug({
       storage: 'sequelize',
       storageOptions: {
-        sequelize: sequelizeKone,
+        sequelize: seq,
         tableName: 'migrations',
-        schema: conf.DB_SCHEMA_KONE,
+        schema,
       },
       migrations: {
-        params: [sequelizeKone.getQueryInterface(), Sequelize],
-        path: `${process.cwd()}/src/database/migrations_kone`,
+        params: [seq.getQueryInterface(), Sequelize],
+        path: `${process.cwd()}/src/database/${migrationsFolder}`,
         pattern: /\.js$/,
-        schema: conf.DB_SCHEMA_KONE,
+        schema,
       },
     })
-    const migrations = await migrator.up()
-    logger.info({ message: 'Kone Migrations up to date', meta: migrations })
-  } catch (e) {
-    logger.error({ message: 'Kone Migration error: ', meta: e })
-    throw e
-  }
-
-  for (let i = 1; i <= waitSeconds; i++) {
     try {
-      await sequelizeUser.authenticate()
-      break
-    } catch (e) {
-      if (i === waitSeconds) {
-        logger.error(`Could not connect to user database in ${waitSeconds} seconds`)
-        throw e
-      }
-      await sleep(1000)
+      const migrations = await migrator.up()
+      logger.info({ message: `${dbName} migrations up to date: `, meta: migrations.map(m => m.file) })
+    } catch (error) {
+      logger.error({ message: `${dbName} migrations failed`, meta: error })
+      throw error
     }
-  }
-
-  try {
-    const migrator = new Umzug({
-      storage: 'sequelize',
-      storageOptions: {
-        sequelize: sequelizeUser,
-        tableName: 'migrations',
-      },
-      migrations: {
-        params: [sequelizeUser.getQueryInterface(), Sequelize],
-        path: `${process.cwd()}/src/database/migrations_user`,
-        pattern: /\.js$/,
-      },
-    })
-    const migrations = await migrator.up()
-    logger.info({ message: 'Kone Migrations up to date', meta: migrations })
-  } catch (e) {
-    logger.error({ message: 'Kone Migration error: ', meta: e })
-    throw e
   }
 }
 
 const dbConnections = new DbConnection()
+
 module.exports = {
   dbConnections,
   sequelizeKone,
