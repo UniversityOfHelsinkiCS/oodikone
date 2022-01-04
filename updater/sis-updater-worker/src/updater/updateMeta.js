@@ -62,7 +62,7 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
     return mapCourse(groupedCourse, substitutions)
   })
 
-  // change substitutions ids to course codes
+  // change substitutions ids to course codes and update
 
   for (const course of courses) {
     const newSubstitutions = []
