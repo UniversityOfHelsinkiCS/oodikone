@@ -11,6 +11,7 @@ const mapToProviders = elementDetails =>
     return r
   })
 
+// sort substitutions so that main code is first
 const newLetterBasedCode = /^[A-Za-z]{3,}/ // new letter based codes come first
 const oldNumericCode = /^\d/ // old numeric codes come second
 const openUniCode = /^AY?(.+?)(?:en|fi|sv)?$/ // open university codes come last
