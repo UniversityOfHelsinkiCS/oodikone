@@ -9,8 +9,12 @@ router.post('/event', (req, res) => {
     return res.status(400).json({ error: 'group, name and value are required' })
   }
 
+  const {
+    user: { userId },
+  } = req
+
   // don't await here because frontend doesn't care if it succeeds
-  tsaService.sendTsaEvent(req.decodedToken.userId, { group, name, label, value }).catch(e => {
+  tsaService.sendTsaEvent(userId, { group, name, label, value }).catch(e => {
     Sentry.withScope(scope => {
       // if error was caused by a 400, dig out the JSON response for Sentry
       if (e.isAxiosError && e.response && e.response.data) {

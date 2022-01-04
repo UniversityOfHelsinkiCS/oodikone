@@ -21,7 +21,7 @@ const currentUserMiddleware = async (req, _, next) => {
   const { displayname: name, mail: email, hygroupcn: iamGroups, hypersonsisuid: sisId } = req.headers
   const parsedIamGroups = parseIamGroups(iamGroups)
 
-  req.decodedToken = await getUser({
+  req.user = await getUser({
     username,
     name,
     email,
@@ -38,16 +38,17 @@ const currentUserMiddleware = async (req, _, next) => {
   if (showAsUser) {
     const mockedUser = await getMockedUser(username, showAsUser)
     if (mockedUser) {
-      req.decodedToken = mockedUser
+      req.user = mockedUser
     }
   }
-  req.user = req.decodedToken // temp push user to req object
   req.logoutUrl = logoutUrl
 
-  Sentry.setUser({ username: req.decodedToken.mockedBy || req.decodedToken.userId })
+  const { userId, mockedBy } = req.user
+
+  Sentry.setUser({ username: mockedBy ?? userId })
 
   // TODO: remove this garbo
-  const userData = await getUserDataFor(req.decodedToken.userId)
+  const userData = await getUserDataFor(userId)
   Object.assign(req, userData)
 
   next()
