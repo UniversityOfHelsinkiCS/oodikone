@@ -39,22 +39,17 @@ describe('Users tests', () => {
 
     it("mocking normal user shows only the mocked user's programmes", () => {
       cy.contains('mocking').should('not.exist')
-      cy.contains('tr', 'basic').within($row => {
+      cy.contains('tr', 'basic').within(() => {
         cy.contains('.button', 'Edit').click()
       })
-      cy.intercept({
-        method: 'POST',
-        path: '/api/superlogin/basic',
-      }).as('superlogin')
       cy.get('i.spy').click()
-      cy.wait('@superlogin')
       cy.contains('mocking as basic')
       cy.wait(1000)
       cy.contains('Study programme').click().siblings().contains('Search by class').click()
       cy.contains('label', 'Study programme')
       cy.contains('label', 'Study programme')
         .siblings()
-        .within($row => {
+        .within(() => {
           cy.get("div[role='option']").should('have.length', 2).contains('Tietojenkäsittelytieteen kandiohjelma')
         })
     })
