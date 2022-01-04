@@ -2,11 +2,15 @@
 
 (name anonyymioodi for :culture: reasons)
 
-This repository contains a guide and scripts to create docker images from database dumps and/or push database images to Toska Hub docker registry. Images are mostly used by oodikone.
+This folder contains a guide and scripts to create anonymous database images for oodikone, mainly used for testing.
 
-## How to update database images
+## How to create / modify database images
 
-Updating images varies a bit depending on the db you're trying to update. Complete steps as defined below and run `./commit_and_push_to_toska_hub.sh <dbname>` to publish the image you've created.
+Creating / modifying images varies a bit depending on the db. Generally, to modify images, you can either use `psql` directly in docker by running `docker exec -it <dbname> psql -U postgres <dbname>` or start adminer with oodikone's docker-compose. 
+
+By default, previous db images from Toska Hub are used as a base. If needed, comment out Toska hub image and uncomment corresponding clean postgres image in docker-compose before running other steps.
+
+See more details on how to create / modify databases below.
 
 ### Sis-importer-db
 
@@ -15,11 +19,11 @@ The following steps are for building a clean sis-importer-db image from scratch.
 - See [sis-importer/importer-db-staging-sampletaker](https://github.com/UniversityOfHelsinkiCS/sis-importer/tree/master/importer-db-staging-sampletaker) and create `sis-importer-db.sqz` dump
 - Move `sis-importer-db.sqz` to this folder
 - Run `./create_container_from_dump.sh sis-importer-db`
-- Enrich data according to what's in `enrich_data.sql` file
+- Enrich db with command in file `enrich_data.sql` either by piping command to container or by running command inside container.
 
 ### Sis-db:
 
-The following steps are for building a clean sis-importer-db image from scratch using the sis-updater. If you want to just modify the existing image a bit, follow the steps defined for user-db / kone-db.
+The following steps are for building a clean sis-db image from scratch using oodikone's updater. If you want to just modify the existing image a bit, follow the steps defined for user-db / kone-db.
 
 - Temporarily replace sis-db -service in oodikone's docker-compose.yml with sis-db -service from this repo's docker-compose.yml
 - Ensure the newest sis-importer-db image is pulled from toska hub in oodikone repo
@@ -32,25 +36,21 @@ curl --request GET --url 'http://localhost:8082/v1/meta?token=dev' && \
 curl --request GET --url 'http://localhost:8082/v1/programmes?token=dev' && \
 curl --request GET --url 'http://localhost:8082/v1/students?token=dev'
 ```
-
-(It might be a good idea to follow sis-updater-worker logs while updater is running)
-
+(or run these from frontend. You might also want to follow sis-updater-workers logs to ensure things are running smoothly.)
 - Clean up any extra stuff you don't want to keep in sis-db.
-- (Bonus: check that cypress tests run okay)
+- Bonus: check that cypress tests run okay
 
 ### User-db / kone-db
 
-- Temporarily replace user-db/kone-db -service in oodikone's docker-compose.yml with the same service from this repo's docker-compose.yml
-- Ensure the newest user-db/kone-db image is pulled from the registry with `docker pull`
-- Start oodikone, let it run migrations
+- Temporarily replace the db service in oodikone's docker-compose.yml with the same db service from this folder's docker-compose.yml
+- Ensure the newest user-db/kone-db image is pulled from the registry with `docker-compose pull`
 - Modify db to wanted state. Tips:
-  - Easy way to create new users is to modify dev user details in the frontend API config. A new user is created during login if the given uid is not present in user-db.
+  - Run oodikone if you want to upgrade something from frontend (e.g. tags in kone-db, courses in sis-db etc.).
+  - Easy way to create new users to user-db is to modify dev user details in the frontend API config. A new user is created during login if the given uid is not present in user-db.
 
-By default, previous user-db/kone-db images are used as a base. If you want to build the image from a clean Postgres image, just comment out toska hub image and uncomment the clean Postgres image.
+## Publishing the image
 
-## How to modify database images
-
-If you need to clean up / modify / do whatever with dbs, either use `psql` directly in docker by running `docker exec -it <dbname> psql -U postgres <dbname>` or start adminer with oodikone's docker-compose.
+After completing the steps above and making sure your local version has the correct data, run `./commit_and_push_to_toska_hub.sh <dbname>` to publish the db image to Toska Hub.
 
 ## How to update Postgres versions
 
