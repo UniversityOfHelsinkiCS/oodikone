@@ -50,6 +50,7 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt 
         search
         multiple
         fluid
+        data-cy="StudyTrack-filter-dropdown"
       />
     </Form>
   )

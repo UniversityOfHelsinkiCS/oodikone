@@ -77,7 +77,12 @@ Cypress.Commands.add('selectFromDropdown', { prevSubject: true }, (s, index) => 
 
   indexes.forEach(i => {
     subject.click()
-    subject.children('.menu').children().eq(i).click({ force: true })
+
+    if (typeof i === 'number') {
+      subject.children('.menu').children().eq(i).click({ force: true })
+    } else {
+      subject.children('.menu').containing(i).eq(0).click({ force: true })
+    }
   })
 
   // Close multiple selection so it does not block elements underneath it.
