@@ -84,6 +84,7 @@ export default createFilter({
       )
     ), */
       fp.map(([sn, courses]) => [sn, getHighestGradeOfCourseBetweenRange(courses, args.from, args.to)]),
+      fp.filter(([, grade]) => grade !== undefined),
       fp.groupBy(([, { grade }]) => grade),
       fp.mapValues(fp.map(([sn]) => sn)),
       grades => ({ grades })
