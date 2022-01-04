@@ -28,7 +28,7 @@ const MENU = {
 const CourseStatistics = () => {
   const history = useHistory()
   const dispatch = useDispatch()
-  const { rights, userRoles } = useGetAuthorizedUserQuery()
+  const { rights, roles } = useGetAuthorizedUserQuery()
   const courseStats = useSelector(({ courseStats }) => courseStats)
   const { pending: loading } = courseStats
   const courses = Object.keys(courseStats.data)
@@ -57,7 +57,7 @@ const CourseStatistics = () => {
     setSelected(coursecode)
   }
 
-  const userHasAccessToAllStats = userHasAccessToAllCourseStats(userRoles, rights)
+  const userHasAccessToAllStats = userHasAccessToAllCourseStats(roles, rights)
 
   const getPanes = () => {
     let panes = [
@@ -109,7 +109,8 @@ const CourseStatistics = () => {
       setActiveIndex(activeIndex)
     }
   }
-  if (!checkUserAccess(['courseStatistics', 'admin'], userRoles) && rights.length < 1)
+
+  if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length < 1)
     return (
       <div className="segmentContainer">
         <Message

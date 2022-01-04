@@ -48,15 +48,15 @@ const OodiToOodikone = () => {
 }
 
 const FrontPage = () => {
-  const { rights, userRoles } = useGetAuthorizedUserQuery()
+  const { rights, roles } = useGetAuthorizedUserQuery()
   useTitle()
 
   const showItems = {
-    populations: userRoles.includes('admin') || rights.length > 0,
-    studyProgramme: userRoles.includes('admin') || rights.length > 0,
-    students: checkUserAccess(['studyGuidanceGroups', 'admin'], userRoles) || rights.length > 0,
-    courseStatistics: checkUserAccess(['courseStatistics', 'admin'], userRoles) || rights.length > 0,
-    teachers: checkUserAccess(['teachers', 'admin'], userRoles),
+    populations: roles.includes('admin') || rights.length > 0,
+    studyProgramme: roles.includes('admin') || rights.length > 0,
+    students: checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0,
+    courseStatistics: checkUserAccess(['courseStatistics', 'admin'], roles) || rights.length > 0,
+    teachers: checkUserAccess(['teachers', 'admin'], roles),
     trends: true,
     feedback: true,
   }

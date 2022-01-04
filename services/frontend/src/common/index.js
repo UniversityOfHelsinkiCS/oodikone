@@ -18,8 +18,8 @@ export const images = {
   irtomikko,
 }
 
-export const checkUserAccess = (requiredRoles, userRoles) => {
-  return intersection(userRoles, requiredRoles).length > 0
+export const checkUserAccess = (requiredRoles, roles) => {
+  return intersection(requiredRoles, roles).length > 0
 }
 
 export const containsOnlyNumbers = str => str.match('^\\d+$')

@@ -62,7 +62,7 @@ const StudyProgramme = props => {
       })
   }
 
-  const SHOW_NEW_OVERVIEW = isAdmin && roles?.find(r => r.group_code === 'teachers')
+  const SHOW_NEW_OVERVIEW = isAdmin && roles.includes('teachers')
 
   const getPanes = () => {
     const { match, programmes } = props
