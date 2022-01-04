@@ -351,7 +351,7 @@ const byNameAndOrCodeLike = async (name, code) => {
     .map(course => {
       return { ...course.dataValues }
     })
-    .sort((x, y) => getSortRank(x.code) - getSortRank(y.code))
+    .sort((x, y) => getSortRank(y.code) - getSortRank(x.code))
 
   let substitutionGroupIndex = 0
   const visited = []
@@ -363,6 +363,7 @@ const byNameAndOrCodeLike = async (name, code) => {
     if (course.substitutions !== null) {
       temp = courses.filter(c => course.substitutions.includes(c.code))
     }
+
     temp.unshift(course)
     temp.forEach(cu => {
       if (visited.includes(course.code)) return

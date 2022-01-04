@@ -120,8 +120,8 @@ describe('Population Statistics', () => {
       cy.cs('startYearAtUni-dropdown').selectFromDropdown(0)
       checkFilteringResult(1)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
-      cy.cs('startYearAtUni-dropdown').selectFromDropdown(10)
-      checkFilteringResult(130)
+      cy.cs('startYearAtUni-dropdown').selectFromDropdown(14)
+      checkFilteringResult(121)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
     })
   })
@@ -222,7 +222,7 @@ describe('Course Statistics', () => {
       cy.cs('startYearAtUni-dropdown').selectFromDropdown([0])
       checkFilteringResult(1)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
-      cy.cs('startYearAtUni-dropdown').selectFromDropdown(6)
+      cy.cs('startYearAtUni-dropdown').selectFromDropdown(11)
       checkFilteringResult(29)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
     })
@@ -290,7 +290,7 @@ describe('Custom Population Statistics', () => {
     })
   })
 
-  it('Courses filter works', () => {
+  it.skip('Courses filter works', () => {
     runTestStepWithPreAndPostParts('Courses', () => {
       const courses = ['MAT11001', 'TKT20004']
       cy.cs('courseFilter-course-dropdown')
