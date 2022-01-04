@@ -95,7 +95,7 @@ describe('Population Statistics', () => {
     runTestStepWithPreAndPostParts('Age', () => {
       cy.cs('ageFilter-min').type('20')
       cy.cs('ageFilter-max').type('40')
-      checkFilteringResult(42)
+      checkFilteringResult(41)
       cy.cs('ageFilter-min').find('input').clear()
       cy.cs('ageFilter-max').find('input').clear()
     })
