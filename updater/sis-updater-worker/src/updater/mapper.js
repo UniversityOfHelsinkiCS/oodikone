@@ -165,16 +165,16 @@ const creditMapper =
     let course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
 
     // check if ay code or no ay code but ay studyright
-    let isOpen = false
+    let is_open = false
     if (study_right_id !== null && course_code) {
       if (!isModule(type)) {
         if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
-          isOpen = true
+          is_open = true
         } else {
           const organisationName = studyrightIdToOrganisationsName[study_right_id]
           if (organisationName) {
             if (organisationName['fi'].startsWith('Avoin yliopisto')) {
-              isOpen = true
+              is_open = true
             }
           }
         }
@@ -183,6 +183,8 @@ const creditMapper =
 
     // These are leaf attainments that have no other attainments attached to them
     const isStudyModule = nodes && nodes[0] !== undefined
+
+    // console.log('isOpen: ', is_open)
 
     return {
       id: id,
@@ -199,7 +201,7 @@ const creditMapper =
       isStudyModule,
       org: attainmentUniOrg,
       language: language,
-      isOpen: isOpen,
+      is_open: is_open,
     }
   }
 

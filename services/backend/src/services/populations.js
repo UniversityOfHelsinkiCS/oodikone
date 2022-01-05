@@ -841,23 +841,22 @@ const parseCreditInfo = credit => ({
   date: credit.attainment_date,
 })
 
-// const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
-
-/* const unifyOpenUniversity = code => {
-  const regexresult = isOpenUniCourseCode(code)
-  if (!regexresult) return code
-  return regexresult[1]
-}
- */
 const findMainCourse = async code => {
   const course = await Course.findOne({
     where: { code: code },
   })
-  const sortedCourses = sortMainCode([...course.substitutions, code])
-  const result = await Course.findOne({
-    attributes: ['code', 'name'],
-    where: { code: sortedCourses[0] },
-  })
+
+  let result = []
+
+  if (course.substitutions) {
+    const sortedCourses = sortMainCode([...course.substitutions, code])
+    result = await Course.findOne({
+      attributes: ['code', 'name'],
+      where: { code: sortedCourses[0] },
+    })
+  } else {
+    return course
+  }
 
   return result
 }
