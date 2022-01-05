@@ -185,7 +185,7 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
       name: { en: 'No programme at the time of attainment', fi: 'Ei ohjelmaa suorituksen hetkellä' },
       startdate: '',
       code: '00000',
-    };
+    }
   }
 
   return { name: { en: 'No programme', fi: 'Ei ohjelmaa' }, startdate: '', code: '00000' }
