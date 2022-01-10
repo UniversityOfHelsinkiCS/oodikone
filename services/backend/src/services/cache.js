@@ -4,7 +4,7 @@ const LRU = require('lru-cache')
 const userDataCache = new LRU({
   max: 25,
   length: () => 1,
-  maxAge: 1000 * 60 * 60,
+  maxAge: 1,
 })
 
 module.exports = {

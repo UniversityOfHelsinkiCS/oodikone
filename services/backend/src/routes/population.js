@@ -83,11 +83,10 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
   let studentnumberlist
   const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, from, to)
   const {
-    user: { userId },
-    roles,
+    user: { userId, roles },
   } = req
 
-  if (roles && roles.includes('admin')) {
+  if (roles?.includes('admin')) {
     studentnumberlist = studentnumbers
   } else {
     const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
@@ -123,10 +122,9 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
   let studentnumberlist
   const studentnumbers = await Student.findByTag(tag)
   const {
-    user: { userId },
-    roles,
+    user: { userId, roles },
   } = req
-  if (roles && roles.includes('admin')) {
+  if (roles?.includes('admin')) {
     studentnumberlist = studentnumbers
   } else {
     const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
@@ -160,11 +158,10 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
   }
   let studentnumberlist
   const {
-    user: { userId, sisPersonId },
-    roles,
+    user: { userId, sisPersonId, roles },
   } = req
 
-  if (roles && roles.includes('admin')) {
+  if (roles?.includes('admin')) {
     studentnumberlist = req.body.studentnumberlist
   } else if (req.body.usingStudyGuidanceGroups) {
     const studentsUserCanAccess = await getAllStudentsUserHasInGroups(sisPersonId)
@@ -204,9 +201,11 @@ router.get('/v3/populationstatistics', async (req, res) => {
   let studyRights = null
   try {
     studyRights = JSON.parse(studyRightsJSON)
-    const { rights, roles } = req
+    const {
+      user: { rights, roles },
+    } = req
 
-    if (!roles || !roles.includes('admin')) {
+    if (!roles?.includes('admin!')) {
       if (!rights.includes(studyRights.programme)) {
         res.status(403).json([])
         return
@@ -270,10 +269,9 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
   let studentnumberlist
   const studentnumbers = await Student.findByTag(tag)
   const {
-    user: { userId },
-    roles,
+    user: { userId, roles },
   } = req
-  if (roles && roles.includes('admin')) {
+  if (roles?.includes('admin')) {
     studentnumberlist = studentnumbers
   } else {
     const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
@@ -306,7 +304,9 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: sep } = req.query
-  const { user, roles } = req
+  const {
+    user: { id, userId, roles },
+  } = req
   const separate = sep ? JSON.parse(sep) : false
 
   if (!coursecodes || !from || !to) {
@@ -336,10 +336,10 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   )
 
   let studentsUserCanAccess
-  if (roles && roles.includes('admin')) {
+  if (roles?.includes('admin')) {
     studentsUserCanAccess = new Set(studentnumbers)
   } else {
-    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(user.userId)
+    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
     studentsUserCanAccess = new Set(await Student.filterStudentnumbersByAccessrights(studentnumbers, codes))
   }
@@ -368,23 +368,25 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     return
   }
 
-  res.json(filterPersonalTags(result, user.id))
+  res.json(filterPersonalTags(result, id))
 })
 
 router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
   const { studentnumberlist, usingStudyGuidanceGroups } = req.body
-  const { roles, user } = req
+  const {
+    user: { roles, sisPersonId, userId, id },
+  } = req
 
   if (usingStudyGuidanceGroups) {
-    if (!user.sisPersonId) {
-      logger.error(`User ${user.userId} tried to get person groups but personId was ${user.sisPersonId} in header`)
+    if (!sisPersonId) {
+      logger.error(`User ${userId} tried to get person groups but personId was ${sisPersonId} in header`)
       return res.status(400).json({ error: 'Not possible to get groups without personId' })
     }
   }
 
   const studentsUserCanAccess = usingStudyGuidanceGroups
-    ? await getAllStudentsUserHasInGroups(user.sisPersonId)
-    : await UserService.getStudentsUserCanAccess(studentnumberlist, roles, user.userId)
+    ? await getAllStudentsUserHasInGroups(sisPersonId)
+    : await UserService.getStudentsUserCanAccess(studentnumberlist, roles, userId)
   const filteredStudentNumbers = studentnumberlist.filter(s => studentsUserCanAccess.has(s))
 
   const result = await Population.optimizedStatisticsOf(
@@ -400,12 +402,14 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     Sentry.captureException(new Error(result.error))
     return
   }
-  res.status(200).json(filterPersonalTags(result, user.id))
+  res.status(200).json(filterPersonalTags(result, id))
 })
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
-  const { rights, roles } = req
-  if (roles && roles.includes('admin')) {
+  const {
+    user: { rights, roles },
+  } = req
+  if (roles?.includes('admin')) {
     const studyrights = await StudyrightService.getAssociations()
     res.json(studyrights)
   } else {

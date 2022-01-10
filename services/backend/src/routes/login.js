@@ -2,16 +2,10 @@ const router = require('express').Router()
 const { ApplicationError } = require('../util/customErrors')
 
 router.get('/login', async (req, res) => {
-  const { user: userFromReq, logoutUrl } = req
+  const { user, logoutUrl } = req
 
-  if (!userFromReq) {
+  if (!user) {
     throw new ApplicationError('User not found', 404)
-  }
-  const roles = userFromReq.roles.map(role => role.group_code)
-  const user = {
-    ...userFromReq,
-    roles,
-    isAdmin: roles.includes('admin'),
   }
 
   res.send({
@@ -19,4 +13,5 @@ router.get('/login', async (req, res) => {
     logoutUrl,
   })
 })
+
 module.exports = router

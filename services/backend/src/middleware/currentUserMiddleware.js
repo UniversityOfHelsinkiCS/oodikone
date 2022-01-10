@@ -1,6 +1,6 @@
 const Sentry = require('@sentry/node')
 const { ApplicationError } = require('../util/customErrors')
-const { getUser, getUserDataFor, getMockedUser } = require('../services/userService')
+const { getUser, getMockedUser } = require('../services/userService')
 const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
 
@@ -8,28 +8,25 @@ const parseIamGroups = iamGroups => iamGroups?.split(';').filter(Boolean) ?? []
 
 const hasRequiredIamGroup = iamGroups => _.intersection(iamGroups, requiredGroup).length > 0
 
-const currentUserMiddleware = async (req, _, next) => {
+const currentUserMiddleware = async (req, _res, next) => {
   const { uid: username, 'shib-session-id': sessionId, shib_logout_url: logoutUrl } = req.headers
 
-  if (!sessionId) {
-    throw new ApplicationError('No session id found in request headers', 403, { logoutUrl })
+  if (!sessionId || !username) {
+    throw new ApplicationError('Not enough data in request headers', 403, { logoutUrl })
   }
 
-  if (!username) {
-    throw new ApplicationError('No username found in request headers', 403, { logoutUrl })
-  }
-  const { displayname: name, mail: email, hygroupcn: iamGroups, hypersonsisuid: sisId } = req.headers
-  const parsedIamGroups = parseIamGroups(iamGroups)
+  const { displayname: name, mail: email, hygroupcn, hypersonsisuid: sisId } = req.headers
+  const iamGroups = parseIamGroups(hygroupcn)
 
   req.user = await getUser({
     username,
     name,
     email,
-    iamGroups: parsedIamGroups,
+    iamGroups,
     sisId,
   })
 
-  if (!hasRequiredIamGroup(parsedIamGroups)) {
+  if (!hasRequiredIamGroup(iamGroups)) {
     throw new ApplicationError('User is not enabled', 403, { logoutUrl })
   }
 
@@ -46,10 +43,6 @@ const currentUserMiddleware = async (req, _, next) => {
   const { userId, mockedBy } = req.user
 
   Sentry.setUser({ username: mockedBy ?? userId })
-
-  // TODO: remove this garbo
-  const userData = await getUserDataFor(userId)
-  Object.assign(req, userData)
 
   next()
 }
