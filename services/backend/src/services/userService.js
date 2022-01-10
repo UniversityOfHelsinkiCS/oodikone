@@ -160,14 +160,29 @@ const getLoginDataWithoutToken = async (uid, full_name, hyGroups, email, hyPerso
   return result
 }
 
-const getMockedUser = async (uid, asUser) => await User.superlogin(uid, asUser)
+const getMockedUser = async (uid, asUser) => {
+  const user = await User.superlogin(uid, asUser)
+  if (!user) return null
+  const userData = _.omit(await getUserDataFor(user.userId), ['email', 'full_name', 'faculties'])
+  return {
+    ...user,
+    ...userData,
+    isAdmin: userData.roles.includes('admin'),
+  }
+}
 
 const getUser = async ({ username, name, email, iamGroups, sisId }) => {
   const { payload: user, isNew } = await getLoginDataWithoutToken(username, name, iamGroups, email, sisId)
   if (isNew) {
     await sendNotificationAboutNewUser({ userId: username, userFullName: name })
   }
-  return user
+
+  const userData = _.omit(await getUserDataFor(user.userId), ['email', 'full_name', 'faculties'])
+  return {
+    ...user,
+    ...userData,
+    isAdmin: userData.roles.includes('admin'),
+  }
 }
 
 module.exports = {

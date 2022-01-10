@@ -13,8 +13,7 @@ const filterStudentTags = (student, userId) => {
 
 router.get('/students', async (req, res) => {
   const {
-    roles,
-    user: { userId, sisPersonId },
+    user: { userId, sisPersonId, roles },
     query: { searchTerm },
   } = req
 
@@ -29,7 +28,7 @@ router.get('/students', async (req, res) => {
     return res.status(400).json({ error: 'at least one search term must be longer than 3 characters' })
   }
 
-  if (roles && roles.includes('admin')) {
+  if (roles?.includes('admin')) {
     let results = []
     if (trimmedSearchTerm) {
       results = await Student.bySearchTerm(trimmedSearchTerm)
@@ -39,7 +38,7 @@ router.get('/students', async (req, res) => {
     const unitsUserCanAccess = await userService.getUnitsFromElementDetails(userId)
     const codes = unitsUserCanAccess.map(unit => unit.id)
     let extraStudents = []
-    if (roles.includes('studyGuidanceGroups')) {
+    if (roles?.includes('studyGuidanceGroups')) {
       const matchingOnlyByTerm = await Student.bySearchTerm(trimmedSearchTerm)
       const studentsUserCanAccess = await getAllStudentsUserHasInGroups(sisPersonId)
       extraStudents.push(...matchingOnlyByTerm.filter(s => studentsUserCanAccess.has(s.studentNumber)))
@@ -51,16 +50,17 @@ router.get('/students', async (req, res) => {
 
 router.get('/students/:id', async (req, res) => {
   const { id: studentId } = req.params
-  const { roles, user } = req
+  const {
+    user: { roles, id, sisPersonId, userId: uid },
+  } = req
 
   if (roles?.includes('admin')) {
     const results = await Student.withId(studentId)
     return results.error
       ? res.status(400).json({ error: 'error finding student' }).end()
-      : res.status(200).json(filterStudentTags(results, user.id)).end()
+      : res.status(200).json(filterStudentTags(results, id)).end()
   }
 
-  const uid = req.user.userId
   const student = await Student.withId(studentId)
   if (student.error) {
     return res.status(400).json({ error: 'error finding student' }).end()
@@ -75,14 +75,14 @@ router.get('/students/:id', async (req, res) => {
   )
 
   if (roles?.includes('studyGuidanceGroups')) {
-    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(user.sisPersonId)
+    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(sisPersonId)
     if (studentsUserCanAccess.has(studentId)) {
-      return res.status(200).json(filterStudentTags(student, user.id)).end()
+      return res.status(200).json(filterStudentTags(student, id)).end()
     }
   }
 
   if (rights.some(right => right !== null)) {
-    res.status(200).json(filterStudentTags(student, user.id)).end()
+    res.status(200).json(filterStudentTags(student, id)).end()
   } else {
     res.status(400).json({ error: 'error finding student' }).end()
   }

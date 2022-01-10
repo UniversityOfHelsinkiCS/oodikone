@@ -42,7 +42,9 @@ router.get('/top/categories', async (req, res) => {
 })
 
 router.get('/stats', async (req, res) => {
-  const { rights, roles } = req
+  const {
+    user: { rights, roles },
+  } = req
 
   const { providers, semesterStart, semesterEnd } = req.query
   if (!providers || !semesterStart) {
