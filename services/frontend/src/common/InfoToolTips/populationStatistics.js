@@ -71,6 +71,10 @@ export default {
   - **Study programme:** haluttu koulutusohjelma.
   - **Select tag (Optional):** itsetehty tai valmis tägi.
   - **Study track (Optional):** opintosuunta.`,
+  TagAndTrackMovedIntoFilters: `
+  Tägien ja opintosuuntien valinnat ovat siirtyneet tästä omiksi filtereikseen.
+  Voit tehdä valinnat siirryttyäsi tarkastelemaan ohjelman tilastoja.
+  `,
   Students: `**Students**
 
   Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
