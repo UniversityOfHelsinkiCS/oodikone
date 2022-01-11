@@ -1,15 +1,39 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { Icon, Header } from 'semantic-ui-react'
+import _ from 'lodash'
 import WithHelpTooltip from '../../../Info/InfoWithHelpTooltip'
 
 import './FilterCard.css'
+
+const useChange = value => {
+  const prevValue = useRef()
+
+  if (prevValue.current === undefined) {
+    prevValue.current = value
+    return true
+  }
+
+  const change = !_.isEqual(value, prevValue.current)
+
+  prevValue.current = value
+
+  return change
+}
 
 const FilterCard = ({ filter, options, children, onClear }) => {
   const title = filter.title ?? filter.key
   const active = filter.isActive(options)
   const { info, key } = filter
 
-  const [open, setOpen] = useState(false)
+  const hasChanged = useChange(options)
+
+  const [manuallyOpened, setManuallyOpened] = useState(null)
+
+  if (hasChanged && manuallyOpened === false) {
+    setManuallyOpened(null)
+  }
+
+  const open = manuallyOpened !== null ? manuallyOpened : active
 
   let header = (
     <div
@@ -20,7 +44,7 @@ const FilterCard = ({ filter, options, children, onClear }) => {
         flexGrow: 1,
       }}
       className="filter-card-header"
-      onClick={() => setOpen(!open)}
+      onClick={() => setManuallyOpened(!open)}
       data-cy={`${key}-header`}
     >
       <Icon name={open ? 'caret down' : 'caret right'} style={{ color: 'black', flexShrink: 0 }} />
@@ -65,7 +89,7 @@ const FilterCard = ({ filter, options, children, onClear }) => {
   return (
     <div style={{ margin: '1rem 0' }} data-cy={`${key}-filter-card`}>
       <div style={{ marginBottom: '1rem' }}>{header}</div>
-      {open && children}
+      {open && <div onClick={() => setManuallyOpened(true)}>{children}</div>}
     </div>
   )
 }
