@@ -301,7 +301,7 @@ const CoursePopulation = ({
       .max()
       .value()
 
-    return moment(date).isBetween(sre.startdate, sre.enddate)
+    return moment(date).isBetween(sre.startdate, sre.enddate, 'day', '[]')
   }
 
   return (

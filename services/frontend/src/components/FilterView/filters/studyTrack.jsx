@@ -13,7 +13,7 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt 
   const dropdownOptions = _.chain(withoutSelf())
     .flatMap(student => student.studyrights)
     .flatMap(sr => sr.studyright_elements)
-    .filter(sre => sre.element_detail.type === 30 && activeAtMoment.isBetween(sre.startdate, sre.enddate))
+    .filter(sre => sre.element_detail.type === 30 && activeAtMoment.isBetween(sre.startdate, sre.enddate, 'day', '[]'))
     .map(sre => sre.element_detail)
     .keyBy('code')
     .values()
@@ -73,7 +73,9 @@ export default createFilter({
     return student.studyrights
       .flatMap(sr => sr.studyright_elements)
       .filter(
-        sre => sre.element_detail.type === 30 && (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate))
+        sre =>
+          sre.element_detail.type === 30 &&
+          (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate, 'day', '[]'))
       )
       .map(sre => sre.element_detail.code)
       .some(code => selected.includes(code))
