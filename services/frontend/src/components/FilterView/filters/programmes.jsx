@@ -180,7 +180,7 @@ const createStudentToProgrammeMap = (students, studyRightPredicate) => {
 
 const MODE_PREDICATES = {
   any: () => true,
-  active: (_, sre) => moment().isBetween(sre.startdate, sre.enddate),
+  active: (_, sre) => moment().isBetween(sre.startdate, sre.enddate, 'day', '[]'),
 }
 
 const filter = createFilter({
