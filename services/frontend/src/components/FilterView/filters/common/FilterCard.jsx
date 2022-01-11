@@ -87,7 +87,7 @@ const FilterCard = ({ filter, options, children, onClear }) => {
   }
 
   return (
-    <div style={{ margin: '1rem 0' }} data-cy={`${key}-filter-card`}>
+    <div style={{ margin: '1rem 0' }} data-cy={`${key}-filter-card`} data-open={open}>
       <div style={{ marginBottom: '1rem' }}>{header}</div>
       {open && <div onClick={() => setManuallyOpened(true)}>{children}</div>}
     </div>

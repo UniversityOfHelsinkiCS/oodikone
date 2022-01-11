@@ -22,11 +22,25 @@ const clearSingleDropdownSelection = dataCyAttribute => {
 // functions don't take any parameters and using global object for matching test step name seemed overcomplicated.
 const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
   return (filterName, testStepFunctionToRun) => {
-    cy.get(`[data-cy="${filterName}-header"]`).click()
-    checkFilteringResult(amountWithoutFiltering)
-    testStepFunctionToRun()
-    checkFilteringResult(amountWithoutFiltering)
-    cy.get(`[data-cy="${filterName}-header"]`).click({ force: true })
+    const card = cy.cs(`${filterName}-filter-card`)
+
+    card.invoke('attr', 'data-open').then(open => {
+      console.log('open', open)
+
+      const getHeader = () => cy.cs(`${filterName}-header`)
+
+      if (open === 'false') {
+        getHeader().click({ force: true })
+      }
+
+      checkFilteringResult(amountWithoutFiltering)
+      testStepFunctionToRun()
+      checkFilteringResult(amountWithoutFiltering)
+
+      if (open === 'false') {
+        getHeader().click({ force: true })
+      }
+    })
   }
 }
 
@@ -42,10 +56,11 @@ describe('Population Statistics', () => {
 
   it('Transfer filter is on not transferred by default', () => {
     cy.contains('By default only students who have not transferred to this study programme are shown.')
-    const card = cy.cs('TransferredToProgramme-filter-card')
-    card.cs('TransferredToProgramme-header').click()
-    card.get('[data-cy="option-havenot"] input').should('be.checked')
-    card.cs('TransferredToProgramme-header').click()
+
+    runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
+      const card = cy.cs('TransferredToProgramme-filter-card')
+      card.get('[data-cy="option-havenot"] input').should('be.checked')
+    })
   })
 
   it('Programme defaults to "Active Study Right" mode', () => {
@@ -74,25 +89,25 @@ describe('Population Statistics', () => {
 
   it('Graduation filter works', () => {
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
-      const card = cy.cs('GraduatedFromProgramme-filter-card')
+      const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
 
       const graduated = 11
-      card.cs('option-graduated-true').click()
+      getCard().cs('option-graduated-true').click()
       checkFilteringResult(graduated)
-      card.cs('option-graduated-false').click()
+      getCard().cs('option-graduated-false').click()
       checkFilteringResult(defaultAmountOfStudents - graduated)
-      card.get('[data-cy="GraduatedFromProgramme-filter-card"] [data-cy="option-all"]').click()
+      getCard().cs('option-all').click()
     })
   })
 
   it('Transfer filter works', () => {
     runTestStepWithPreAndPostParts('TransferredToProgramme', () => {
       const transferred = 1
-      cy.cs('option-have').click()
+      cy.cs('TransferredToProgramme-filter-card').cs('option-have').click()
       checkFilteringResult(transferred)
-      cy.cs('option-all').click()
+      cy.cs('TransferredToProgramme-filter-card').cs('option-all').click()
       checkFilteringResult(defaultAmountOfStudents + transferred)
-      cy.cs('option-havenot').click()
+      cy.cs('TransferredToProgramme-filter-card').cs('option-havenot').click()
     })
   })
 
@@ -183,14 +198,14 @@ describe('Population Statistics', () => {
   it('Filter combinations work', () => {
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
       runTestStepWithPreAndPostParts('Age', () => {
-        const card = cy.cs('GraduatedFromProgramme-filter-card')
-        card.cs('option-graduated-true').click()
+        const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
+        getCard().cs('option-graduated-true').click()
         cy.cs('ageFilter-min').type('20')
         cy.cs('ageFilter-max').type('30')
         checkFilteringResult(11)
         cy.cs('ageFilter-min').find('input').clear()
         cy.cs('ageFilter-max').find('input').clear()
-        card.cs('option-all').click()
+        getCard().cs('option-all').click()
       })
     })
   })
