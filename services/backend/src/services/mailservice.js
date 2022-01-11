@@ -1,6 +1,6 @@
 const axios = require('axios')
 const { isProduction, pateToken } = require('../conf-backend')
-const logger = require('../util/logger')
+const { ApplicationError } = require('../util/customErrors')
 
 const pateClient = axios.create({
   baseURL: 'https://pate.toska.cs.helsinki.fi',
@@ -20,33 +20,22 @@ const baseSettings = {
 }
 
 const sendEmail = async (options = {}) => {
-  if (!isProduction) {
-    const errorMessage = 'Skipped sending email in non-production environment'
-    logger.error({ message: errorMessage, meta: options })
-    return { error: errorMessage }
-  }
-
-  if (!pateToken) {
-    const errorMessage = 'Skipped sending email since pate token was not available'
-    logger.error({ message: errorMessage, meta: options })
-    return { error: errorMessage }
-  }
-
-  const { data } = await pateClient.post('/', options)
-
-  return data
+  if (!isProduction) throw new ApplicationError('Email sending is disabled in development mode.')
+  if (!pateToken) throw new ApplicationError('Email sending failed because pate token is missing.')
+  await pateClient.post('/', options)
 }
 
-const sendFeedbackToToska = ({ feedbackContent, userId, userEmail, userFullName }) => {
-  const userDetails = `Sent by ${userFullName}, userid: ${userId}, email: ${userEmail}`
+const sendFeedbackToToska = async ({ feedbackContent, user }) => {
+  const { name, userId, email } = user
+  const userDetails = `Sent by ${name}, userid: ${userId}, email: ${email}`
   const text = [feedbackContent, userDetails].join('<br />')
-  return sendEmail({
+  await sendEmail({
     template,
     emails: [
       {
         to: 'Toska <grp-toska@helsinki.fi>',
-        replyTo: userEmail,
-        subject: `Oodikone feedback from ${userFullName}`,
+        replyTo: email,
+        subject: `Oodikone feedback from ${name}`,
         text,
       },
     ],
