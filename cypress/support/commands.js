@@ -62,9 +62,13 @@ Cypress.Commands.add('init', (path = '', userId = 'basic') => {
  * Shorthand for using "Cypress Selectors" (CS), i.e., `data-cy` attributes.
  */
 Cypress.Commands.add('cs', { prevSubject: 'optional' }, (subject, name) => {
-  const p = subject === undefined ? cy : cy.wrap(subject)
+  const selector = `[data-cy="${name}"]`
 
-  return p.get(`[data-cy='${name}']`)
+  if (subject === undefined) {
+    return cy.get(selector)
+  } else {
+    return cy.wrap(subject).find(selector)
+  }
 })
 
 /**
