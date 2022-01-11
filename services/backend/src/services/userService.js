@@ -163,7 +163,7 @@ const getLoginDataWithoutToken = async (uid, full_name, hyGroups, email, hyPerso
 const getMockedUser = async (uid, asUser) => {
   const user = await User.superlogin(uid, asUser)
   if (!user) return null
-  const userData = _.omit(await getUserDataFor(user.userId), ['email', 'full_name', 'faculties'])
+  const userData = _.omit(await getUserDataFor(user.userId), ['full_name', 'faculties'])
   return {
     ...user,
     ...userData,
@@ -177,7 +177,7 @@ const getUser = async ({ username, name, email, iamGroups, sisId }) => {
     await sendNotificationAboutNewUser({ userId: username, userFullName: name })
   }
 
-  const userData = _.omit(await getUserDataFor(user.userId), ['email', 'full_name', 'faculties'])
+  const userData = _.omit(await getUserDataFor(user.userId), ['full_name', 'faculties'])
   return {
     ...user,
     ...userData,
