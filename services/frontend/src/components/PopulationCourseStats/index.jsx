@@ -93,21 +93,18 @@ const useDelayedMemo = (fn, watch) => {
 
 const PopulationCourseStats = props => {
   const { language } = useLanguage()
-
   const [filterFields, setFilterFields] = useState({ codeFilter: '', nameFilter: '' })
   const [modules, setModules] = useState([])
-
   const [state, setState] = useState(initialState(props))
+  const [expandedGroups, setExpandedGroups] = useState(new Set())
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
+
+  const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Courses of Population tab changed')
 
   const courseStatistics = useDelayedMemo(
-    () => updateCourseStatisticsCriteria(props.courses?.coursestatistics, language, state),
+    () => updateCourseStatisticsCriteria(props.courses?.coursestatistics, language, state, mandatoryCourses),
     [props.courses, state, language]
   )
-
-  const [expandedGroups, setExpandedGroups] = useState(new Set())
-
-  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-  const { handleTabChange } = useTabChangeAnalytics('Population statistics', 'Courses of Population tab changed')
 
   useEffect(() => {
     if (state && props.courses) {
