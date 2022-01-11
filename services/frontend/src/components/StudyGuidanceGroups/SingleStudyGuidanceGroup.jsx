@@ -216,7 +216,12 @@ const SingleStudyGroupFilterView = props => {
               description:
                 'Student has had a study right since the start year associated with this study guidance group.',
               predicate: (_student, sre) =>
-                moment(createAcademicYearStartDate(props.group.tags?.year)).isBetween(sre.startdate, sre.enddate),
+                moment(createAcademicYearStartDate(props.group.tags?.year)).isBetween(
+                  sre.startdate,
+                  sre.enddate,
+                  'day',
+                  '[]'
+                ),
             },
           ]
         : [],
