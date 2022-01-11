@@ -160,7 +160,7 @@ export const getNewestProgramme = (studyrights, studentNumber, studentToTargetCo
         elementDetails[srE.code] &&
         elementDetails[srE.code].type === 20 &&
         (studentToTargetCourseDateMap && studentNumber
-          ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(moment(srE.startdate), moment(srE.enddate))
+          ? moment(studentToTargetCourseDateMap[studentNumber]).isBetween(srE.startdate, srE.enddate, 'day', '[]')
           : true)
     )
     if (studyrightElements.length > 0) {

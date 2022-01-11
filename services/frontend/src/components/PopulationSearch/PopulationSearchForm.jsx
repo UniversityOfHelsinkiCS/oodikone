@@ -8,6 +8,7 @@ import Datetime from 'react-datetime'
 import { sortBy, isEqual } from 'lodash'
 import moment from 'moment'
 
+import infoTooltips from 'common/InfoToolTips'
 import { getPopulationStatistics, clearPopulations } from '../../redux/populations'
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
@@ -15,7 +16,6 @@ import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
 import { getSemesters } from '../../redux/semesters'
 
 import { getProgrammes } from '../../redux/populationProgrammes'
-import { getTagsByStudytrackAction } from '../../redux/tags'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, cancelablePromise } from '../../common'
 import { useSearchHistory } from '../../common/hooks'
 import { setLoading } from '../../redux/graphSpinner'
@@ -53,7 +53,7 @@ const PopulationSearchForm = props => {
 
   const { query, isLoading, momentYear } = totalState
 
-  const { studyProgrammes, location, semesters, queries, history, tags, language, onProgress } = props
+  const { studyProgrammes, location, semesters, queries, history, language, onProgress } = props
 
   const parseQueryFromUrl = () => {
     const initial = initialQuery()
@@ -111,7 +111,6 @@ const PopulationSearchForm = props => {
         props.getPopulationCourses(request),
         [],
         props.getMandatoryCourses(formattedQueryParams.studyRights.programme),
-        props.getTagsByStudytrackAction(query.studyRights.programme),
       ])
     )
     const success = await fetchPopulationPromises.current.promise
@@ -171,9 +170,8 @@ const PopulationSearchForm = props => {
     })
   }
 
-  const handleProgrammeChange = (e, { value }) => {
+  const handleProgrammeChange = (_e, { value }) => {
     const programme = value
-    props.getTagsByStudytrackAction(value)
     if (programme === '') {
       handleClear('programme')
       return
@@ -206,7 +204,7 @@ const PopulationSearchForm = props => {
   }
 
   const getSearchHistoryTextFromQuery = () => {
-    const { studyRights, semesters, months, year, studentStatuses, tag } = query
+    const { studyRights, semesters, months, year, studentStatuses } = query
     const studyRightsText = `${getTextIn(studyProgrammes[studyRights.programme].name, language)} ${Object.values(
       studyRights
     )
@@ -215,9 +213,8 @@ const PopulationSearchForm = props => {
     const timeText = `${semesters.join(', ')}/${year}-${parseInt(year, 10) + 1}, ${months} months`
     const studentStatusesText =
       studentStatuses.length > 0 ? `includes ${studentStatuses.map(s => s.toLowerCase()).join(', ')} students` : null
-    const tagText = !tag ? null : `Tag: ${tags.find(t => t.tag_id === tag).tagname}`
 
-    return [studyRightsText, timeText, studentStatusesText, tagText].filter(t => t).join(' - ')
+    return [studyRightsText, timeText, studentStatusesText].filter(t => t).join(' - ')
   }
 
   const handleSubmit = () => {
@@ -257,12 +254,11 @@ const PopulationSearchForm = props => {
         }
       }
     }
-    const tag = tags.find(t => t.tag_id === query.tag)
+
     setState({
       momentYear,
       query: {
         ...query,
-        tag: query.tag && tag.year ? null : query.tag,
         year: reformatDate(momentYear, YEAR_DATE_FORMAT),
         months: months(
           reformatDate(momentYear, YEAR_DATE_FORMAT),
@@ -274,15 +270,6 @@ const PopulationSearchForm = props => {
         },
       },
     })
-  }
-
-  const getMonths = (year, end, term) => {
-    if (moment.isMoment(end)) {
-      const lastDayOfMonth = moment(end).endOf('month')
-      const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
-      return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
-    }
-    return -1
   }
 
   const addYear = () => {
@@ -297,23 +284,6 @@ const PopulationSearchForm = props => {
     handleYearSelection(previousYear)
   }
 
-  const handleStudyTrackChange = (e, { value }) => {
-    const studyTrack = value
-    if (studyTrack === '') {
-      handleClear('studyTrack')
-      return
-    }
-    setState({
-      query: {
-        ...query,
-        studyRights: {
-          ...query.studyRights,
-          studyTrack,
-        },
-      },
-    })
-  }
-
   const validYearCheck = momentYear => {
     if (!moment.isMoment(momentYear)) {
       return false
@@ -322,31 +292,6 @@ const PopulationSearchForm = props => {
       return momentYear.year() >= 1900 && momentYear.isSameOrBefore(moment().subtract(6, 'months'))
     }
     return props.studyProgrammes[query.studyRights.programme].enrollmentStartYears[momentYear.year()] != null
-  }
-
-  const handleTagSelection = (e, { value }) => {
-    const tag = tags.find(t => t.tag_id === value)
-    if (!tag) {
-      setState({
-        query: {
-          ...query,
-          tag: null,
-          months: query.months,
-        },
-      })
-    } else {
-      const months = tag.year
-        ? getMonths(reformatDate(moment(`${tag.year}-01-01`), YEAR_DATE_FORMAT), moment(), 'FALL')
-        : query.months
-      setState({
-        query: {
-          ...query,
-          tag: tag.tag_id,
-          year: tag.year || query.year,
-          months,
-        },
-      })
-    }
   }
 
   const renderableList = list =>
@@ -418,57 +363,15 @@ const PopulationSearchForm = props => {
     </Form.Field>
   )
 
-  const renderTagDropdown = (tagOptions, chosenTag) => (
-    <Form.Field>
-      <label>Select tag (Optional)</label>
-      <Form.Dropdown
-        placeholder="select tag"
-        selection
-        value={chosenTag.tag_id}
-        options={tagOptions}
-        onChange={handleTagSelection}
-        selectOnBlur={false}
-        selectOnNavigation={false}
-      />
-    </Form.Field>
-  )
-
-  const renderAdditionalStudyTrackOrTagDropdown = (
-    studyRights,
-    studyTracksToRender,
-    shouldRenderTags,
-    tagOptions,
-    chosenTag
-  ) => {
-    const renderableTracks = () => (
-      <>
-        <label>Study Track (Optional)</label>
-        <Form.Dropdown
-          placeholder="Select study track"
-          search={textAndDescriptionSearch}
-          floating
-          selection
-          noResultsMessage="No selectable study track"
-          value={studyRights.studyTrack}
-          options={studyTracksToRender}
-          onChange={handleStudyTrackChange}
-          closeOnChange
-          clearable
-          selectOnBlur={false}
-          selectOnNavigation={false}
-        />
-      </>
-    )
+  const renderAdditionalStudyTrackOrTagDropdown = studyRights => {
     if (studyRights.programme) {
       return (
-        <Form.Group>
-          <Form.Field width={8}>{shouldRenderTags ? renderTagDropdown(tagOptions, chosenTag) : null}</Form.Field>
-          <Form.Field width={8}>
-            {studyTracksToRender && studyTracksToRender.length > 0 ? renderableTracks() : null}
-          </Form.Field>
-        </Form.Group>
+        <Message size="tiny" style={{ maxWidth: '25em' }}>
+          {infoTooltips.PopulationStatistics.TagAndTrackMovedIntoFilters}
+        </Message>
       )
     }
+
     return null
   }
 
@@ -492,29 +395,11 @@ const PopulationSearchForm = props => {
       const sortedStudyProgrammes = sortBy(studyProgrammes, s => getTextIn(s.name, language))
       programmesToRender = renderableList(sortedStudyProgrammes)
     }
-    let studyTracksToRender
-    if (studyRights.programme && validYearCheck(momentYear)) {
-      const associations = studyProgrammes[studyRights.programme].enrollmentStartYears[momentYear.year()]
-      if (associations) {
-        const sortedStudyTracks = sortBy(associations.studyTracks, s => getTextIn(s.name, language))
-        studyTracksToRender = renderableList(sortedStudyTracks)
-      }
-    }
-    const tagOptions = [{ key: 0, text: '', value: '' }]
-    tags.forEach(tag => tagOptions.push({ key: tag.tag_id, text: tag.tagname, value: tag.tag_id }))
-    const chosenTag = tags.find(tag => tag.tag_id === query.tag) || { tagname: '', tag_id: '' }
-    const shouldRenderTags = tags.filter(tag => tag.studytrack === query.studyRights.programme).length > 0
 
     return (
       <div>
         {renderStudyProgrammeDropdown(studyRights, programmesToRender)}
-        {renderAdditionalStudyTrackOrTagDropdown(
-          studyRights,
-          studyTracksToRender,
-          shouldRenderTags,
-          tagOptions,
-          chosenTag
-        )}
+        {renderAdditionalStudyTrackOrTagDropdown(studyRights)}
       </div>
     )
   }
@@ -566,7 +451,7 @@ const PopulationSearchForm = props => {
   )
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationProgrammes, tags }) => {
+const mapStateToProps = ({ semesters, settings, populations, populationProgrammes }) => {
   const { language } = settings
   const { pending } = populationProgrammes
   return {
@@ -575,7 +460,6 @@ const mapStateToProps = ({ semesters, settings, populations, populationProgramme
     queries: populations.query || {},
     studyProgrammes: populationProgrammes.data.programmes || {},
     pending,
-    tags: tags.data,
   }
 }
 
@@ -588,7 +472,6 @@ export default withRouter(
     getProgrammes,
     setLoading,
     getSemesters,
-    getTagsByStudytrackAction,
     clearSelected,
     clearPopulations,
   })(PopulationSearchForm)

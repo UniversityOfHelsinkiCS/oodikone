@@ -55,8 +55,12 @@ const PopulationStudents = ({
   useEffect(() => {
     if (tags && tags.length > 0) return
     const queryStudyright = queryStudyrights[0]
-    dispatch(getTagsByStudytrackAction(queryStudyright))
-    dispatch(getStudentTagsByStudytrackAction(queryStudyright))
+
+    if (queryStudyright) {
+      dispatch(getTagsByStudytrackAction(queryStudyright))
+      dispatch(getStudentTagsByStudytrackAction(queryStudyright))
+    }
+
     setState({ ...state, admin })
   }, [])
 
