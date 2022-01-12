@@ -1,5 +1,6 @@
 const morgan = require('morgan')
 const logger = require('../util/logger')
+const _ = require('lodash')
 
 // So this appears to be a hack to get neatly formatted stats like response-time etc. from morgan
 // without actually using morgan what it's used for (LOGGING REQUESTS!).
@@ -27,7 +28,8 @@ const accessLogger = morgan((tokens, req, res) => {
   ].join(' ')
 
   logger.info(message, {
-    ...meta,
+    // don't log student list which might be huge
+    ..._.omit(meta, ['studentsUserCanAccess']),
     // pass this as a custom field so we can filter by it in graylog
     isUsageStats: true,
   })

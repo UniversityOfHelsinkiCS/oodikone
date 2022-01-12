@@ -9,16 +9,28 @@ const parseIamGroups = iamGroups => iamGroups?.split(';').filter(Boolean) ?? []
 const hasRequiredIamGroup = iamGroups => _.intersection(iamGroups, requiredGroup).length > 0
 
 const currentUserMiddleware = async (req, _res, next) => {
-  const { uid: username, 'shib-session-id': sessionId, shib_logout_url: logoutUrl } = req.headers
+  const {
+    'shib-session-id': sessionId,
+    'x-show-as-user': showAsUser,
+    displayname: name,
+    hygroupcn,
+    hypersonsisuid: sisId,
+    mail: email,
+    shib_logout_url: logoutUrl,
+    uid: username,
+  } = req.headers
 
   if (!sessionId || !username) {
     throw new ApplicationError('Not enough data in request headers', 403, { logoutUrl })
   }
 
-  const { displayname: name, mail: email, hygroupcn, hypersonsisuid: sisId } = req.headers
   const iamGroups = parseIamGroups(hygroupcn)
 
-  req.user = await getUser({
+  if (!hasRequiredIamGroup(iamGroups)) {
+    throw new ApplicationError('User does not have required iam group', 403, { logoutUrl })
+  }
+
+  let user = await getUser({
     username,
     name,
     email,
@@ -26,23 +38,14 @@ const currentUserMiddleware = async (req, _res, next) => {
     sisId,
   })
 
-  if (!hasRequiredIamGroup(iamGroups)) {
-    throw new ApplicationError('User is not enabled', 403, { logoutUrl })
+  if (showAsUser && user.isAdmin) {
+    user = await getMockedUser({ userToMock: showAsUser, mockedBy: username })
   }
 
-  const showAsUser = req.headers['x-show-as-user']
+  Sentry.setUser({ username: user.mockedBy ?? username })
 
-  if (showAsUser) {
-    const mockedUser = await getMockedUser(username, showAsUser)
-    if (mockedUser) {
-      req.user = mockedUser
-    }
-  }
+  req.user = user
   req.logoutUrl = logoutUrl
-
-  const { userId, mockedBy } = req.user
-
-  Sentry.setUser({ username: mockedBy ?? userId })
 
   next()
 }

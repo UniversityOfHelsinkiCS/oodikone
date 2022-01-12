@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const { ApplicationError } = require('../util/customErrors')
+const _ = require('lodash')
 
 router.get('/login', async (req, res) => {
   const { user, logoutUrl } = req
@@ -9,7 +10,8 @@ router.get('/login', async (req, res) => {
   }
 
   res.send({
-    user,
+    // don't send possibly huge list of students to frontend
+    user: _.omit(user, ['studentsUserCanAccess']),
     logoutUrl,
   })
 })
