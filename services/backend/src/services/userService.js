@@ -1,188 +1,279 @@
-const UnitService = require('./units')
-const elementDetailService = require('./elementdetails')
-const { filterStudentnumbersByAccessrights } = require('./students')
-const { userDataCache } = require('./cache')
-const { getImporterClient } = require('../util/importerClient')
-const logger = require('../util/logger')
+const Sequelize = require('sequelize')
+const { Op } = Sequelize
+const LRU = require('lru-cache')
+const { getStudentnumbersByElementdetails } = require('./students')
 const { facultiesAndProgrammesForTrends } = require('../services/organisations')
 const { sendNotificationAboutNewUser } = require('../services/mailservice')
-const User = require('./users/users')
-const AccessGroup = require('./users/accessgroups')
+const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
 const _ = require('lodash')
+const { User, UserElementDetails, AccessGroup, UserFaculties, sequelizeUser } = require('../models/models_user')
 
-// Private helpers
-const enrichProgrammesFromFaculties = faculties =>
-  facultiesAndProgrammesForTrends.filter(f => faculties.includes(f.faculty_code)).map(f => f.programme_code)
+const courseStatisticsGroup = 'grp-oodikone-basic-users'
+const hyOneGroup = 'hy-one'
+const toskaGroup = 'grp-toska'
 
-const enrichWithProgrammes = toEnrich => {
-  if (Array.isArray(toEnrich)) {
-    return toEnrich.map(obj => enrichWithProgrammes(obj))
-  }
-  if (toEnrich.rights) {
-    return {
-      ...toEnrich,
-      rights: _.union(toEnrich.rights, enrichProgrammesFromFaculties(toEnrich.faculties)),
-    }
-  }
+// Max 25 users can be stored in the cache
+const userDataCache = new LRU({
+  max: 25,
+  length: () => 1,
+  maxAge: 1000 * 60 * 60,
+})
 
-  if (toEnrich.elementdetails) {
-    return {
-      ...toEnrich,
-      elementdetails: _.union(
-        toEnrich.elementdetails,
-        enrichProgrammesFromFaculties(toEnrich.faculty.map(f => f.faculty_code))
-      ),
-    }
-  }
-  return toEnrich
-}
-const checkStudyGuidanceGroupsAccess = async hyPersonSisuId => {
-  if (!hyPersonSisuId) {
-    logger.error('Not possible to get groups without personId header')
-    return false
-  }
-  const importerClient = getImporterClient()
-  if (!importerClient) return false
-  const answerTimeout = new Promise(resolve => setTimeout(resolve, 2000))
-  const result = await Promise.race([importerClient.get(`/person-groups/person/${hyPersonSisuId}`), answerTimeout])
-  if (!result) return false
-  const { data } = result
-  return data && Object.values(data).length > 0
-}
+// Stuff to work with old userservice based user-db (separate microservice, now deprecated)
+const userIncludes = [
+  {
+    separate: true,
+    model: UserElementDetails,
+    as: 'programme',
+  },
+  {
+    model: AccessGroup,
+    as: 'accessgroup',
+    attributes: ['id', 'group_code', 'group_info'],
+  },
+  {
+    separate: true,
+    model: UserFaculties,
+    as: 'faculty',
+  },
+]
 
-const byUsernameData = async username => {
-  // OK, enriched
-  const user = await User.byUsernameMinified(username)
-  const roles = user.accessgroup.map(({ group_code }) => group_code)
-  const rights = User.getUserProgrammes(user)
-  const faculties = user.faculty.map(({ faculty_code }) => faculty_code)
-  const data = {
-    email: user.email,
-    full_name: user.full_name,
-    roles,
-    rights,
-    faculties,
-  }
-  return enrichWithProgrammes(data)
-}
+const accessGroupsByCodes = codes =>
+  AccessGroup.findAll({
+    where: {
+      group_code: {
+        [Op.in]: codes,
+      },
+    },
+  })
 
-// Exported helpers
-const getUserDataFor = async username => {
-  // no need to enrich
-  let userData = userDataCache.get(username)
-  if (!userData) {
-    userData = await byUsernameData(username)
-    userDataCache.set(username, userData)
-  }
+const byUsername = async username =>
+  await User.findOne({
+    where: {
+      username,
+    },
+    include: userIncludes,
+  })
 
-  return {
-    ...userData,
-    faculties: new Set(userData.faculties),
-  }
-}
+const byId = async id =>
+  await User.findOne({
+    where: {
+      id,
+    },
+    include: userIncludes,
+  })
 
-const getUnitsFromElementDetails = async username => {
-  // No need to enrich
-  let userData = userDataCache.get(username)
-  if (!userData) {
-    userData = await byUsernameData(username)
-    userDataCache.set(username, userData)
+// Crud things from old userservice
+
+// some fields that frontend needs
+const formatUserForAdminView = user => ({
+  ...user.get(),
+  elementdetails: user.programme.map(p => p.elementDetailCode),
+  is_enabled: true, // this is probably not needed: is here mainly because old userservice created users for every logged in user, even if they hadn't correct iamgroups
+})
+
+const addProgrammes = async (id, codes) => {
+  for (const code of codes) {
+    await UserElementDetails.upsert({ userId: id, elementDetailCode: code })
   }
-  const elementDetails = await elementDetailService.byCodes(userData.rights)
-  return elementDetails.map(element => UnitService.parseUnitFromElement(element))
+  const user = await byId(id)
+  userDataCache.del(user.username)
 }
 
-const getStudentsUserCanAccess = async (studentnumbers, roles, userId) => {
-  // No need to enrich
-  let studentsUserCanAccess
-  if (roles?.includes('admin')) {
-    studentsUserCanAccess = new Set(studentnumbers)
-  } else {
-    const unitsUserCanAccess = await getUnitsFromElementDetails(userId)
-    const codes = unitsUserCanAccess.map(unit => unit.id)
-    studentsUserCanAccess = new Set(await filterStudentnumbersByAccessrights(studentnumbers, codes))
+const removeProgrammes = async (id, codes) => {
+  for (const code of codes) {
+    await UserElementDetails.destroy({
+      where: { userId: id, elementDetailCode: code },
+    })
   }
-  return studentsUserCanAccess
+  const user = await byId(id)
+  userDataCache.del(user.username)
 }
 
-// FOR ROUTES 1-to-1 mapping
+const modifyRights = async (username, rights) => {
+  const rightsToAdd = Object.entries(rights)
+    .map(([code, val]) => {
+      if (val === true) {
+        return code
+      }
+    })
+    .filter(code => code)
+  const rightsToRemove = Object.entries(rights)
+    .map(([code, val]) => {
+      if (val === false) {
+        return code
+      }
+    })
+    .filter(code => code)
+
+  const user = await byUsername(username)
+  const accessGroupsToAdd = await accessGroupsByCodes(rightsToAdd)
+  const accessGroupsToRemove = await accessGroupsByCodes(rightsToRemove)
+
+  await user.addAccessgroup(accessGroupsToAdd)
+  await user.removeAccessgroup(accessGroupsToRemove)
+  userDataCache.del(username)
+}
+
 const modifyAccess = async body => {
   const { username, accessgroups } = body
-  await User.modifyRights(username, accessgroups)
-  const user = await User.byUsername(username)
-  return enrichWithProgrammes(User.getUserData(user))
+  await modifyRights(username, accessgroups)
+  userDataCache.del(username)
+  return formatUserForAdminView(await byUsername(username))
 }
 
-const getAccessGroups = async () => enrichWithProgrammes(await AccessGroup.findAll())
-
-const enableElementDetails = async (uid, codes) => {
-  await User.addProgrammes(uid, codes)
-  const user = await User.byId(uid)
-  return enrichWithProgrammes(User.getUserData(user))
+const enableElementDetails = async (id, codes) => {
+  await addProgrammes(id, codes)
+  const user = await byId(id)
+  userDataCache.del(user.username)
+  return formatUserForAdminView(user)
 }
 
-const findAll = async () => enrichWithProgrammes((await User.findAll()).map(User.getUserData))
-
-const setFaculties = async (uid, faculties) => {
-  await User.setFaculties(uid, faculties)
-  const user = await User.byId(uid)
-  return enrichWithProgrammes(User.getUserData(user))
+const setFaculties = async (id, faculties) => {
+  await sequelizeUser.transaction(async transaction => {
+    await UserFaculties.destroy({ where: { userId: id }, transaction })
+    for (const faculty of faculties) {
+      await UserFaculties.create({ userId: id, faculty_code: faculty }, { transaction })
+    }
+  })
+  const user = await byId(id)
+  userDataCache.del(user.username)
+  return formatUserForAdminView(user)
 }
 
-const removeElementDetails = async (uid, codes) => {
-  await User.removeProgrammes(uid, codes)
-  const user = await User.byId(uid)
-  return enrichWithProgrammes(User.getUserData(user))
+const removeElementDetails = async (id, codes) => {
+  await removeProgrammes(id, codes)
+  const user = await byId(id)
+  userDataCache.del(user.userId)
+  return formatUserForAdminView(user)
 }
 
 const updateUser = async (username, fields) => {
-  userDataCache.del(username)
-  const uid = username
-  const user = await User.byUsername(uid)
+  const user = await byUsername(username)
   if (!user) {
-    throw new Error(`User ${uid} not found`)
+    throw new Error(`User ${username} not found`)
   }
-  await User.updateUser(user, fields)
-  const returnedUser = await User.byUsername(username)
-  return enrichWithProgrammes(User.getUserData(returnedUser))
+  await User.upsert({ id: user.id, ...fields })
+  user.update(fields)
+
+  userDataCache.del(username)
+
+  return formatUserForAdminView(await byUsername(username))
 }
 
-const getLoginDataWithoutToken = async (uid, full_name, hyGroups, email, hyPersonSisuId) => {
-  const hasStudyGuidanceGroupAccess = await checkStudyGuidanceGroupsAccess(hyPersonSisuId)
-  const result = await User.loginWithoutToken(
-    uid,
-    full_name,
-    hyGroups,
-    email,
-    hyPersonSisuId,
-    hasStudyGuidanceGroupAccess
+const getAccessGroups = async () => await AccessGroup.findAll()
+
+// newer logic
+const enrichProgrammesFromFaculties = faculties =>
+  facultiesAndProgrammesForTrends.filter(f => faculties.includes(f.faculty_code)).map(f => f.programme_code)
+
+const findAll = async () =>
+  (
+    await User.findAll({
+      include: userIncludes,
+    })
+  ).map(user => ({
+    ...user.get(),
+    is_enabled: true,
+    elementdetails: _.uniqBy([
+      ...user.programme.map(p => p.elementDetailCode),
+      ...enrichProgrammesFromFaculties(user.faculty.map(f => f.faculty_code)),
+    ]),
+  }))
+
+const formatUser = async userFromDb => {
+  const [accessGroups, programmes, faculties] = [
+    ['accessgroup', 'group_code'],
+    ['programme', 'elementDetailCode'],
+    ['faculty', 'faculty_code'],
+  ].map(([field, code]) => userFromDb[field].map(entry => entry[code]))
+
+  const rights = _.uniqBy([...programmes, ...enrichProgrammesFromFaculties(faculties)])
+
+  const {
+    dataValues: { id, username: userId, full_name: name, email, language, sisu_person_id: sisPersonId },
+  } = userFromDb
+
+  const studentsUserCanAccess = _.uniqBy(
+    (await Promise.all([getStudentnumbersByElementdetails(rights), getAllStudentsUserHasInGroups(sisPersonId)])).flat()
   )
-  return result
+
+  // attribute naming is a bit confusing, but it's used so widely in oodikone, that it's not probably worth changing
+  return {
+    id, // our internal id, not the one from sis, (e.g. 101)
+    userId, // acually username (e.g. mluukkai)
+    name,
+    language,
+    sisPersonId, //
+    email,
+    is_enabled: true, // this is probably not needed: is here mainly because old userservice created users for every logged in user, even if they hadn't correct iamgroups
+    rights,
+    roles: accessGroups,
+    studentsUserCanAccess, // studentnumbers used in various parts of backend. For admin this is usually empty, since no programmes / faculties are set.
+    isAdmin: accessGroups.includes('admin'),
+  }
 }
 
-const getMockedUser = async (uid, asUser) => {
-  const user = await User.superlogin(uid, asUser)
-  if (!user) return null
-  const userData = _.omit(await getUserDataFor(user.userId), ['full_name', 'faculties'])
-  return {
-    ...user,
-    ...userData,
-    isAdmin: userData.roles.includes('admin'),
+const getMockedUser = async ({ userToMock, mockedBy }) => {
+  if (userDataCache.has(userToMock)) {
+    return userDataCache.get(userToMock)
   }
+  const toReturn = {
+    ...(await formatUser(await byUsername(userToMock))),
+    mockedBy,
+  }
+  userDataCache.set(userToMock, toReturn)
 }
 
 const getUser = async ({ username, name, email, iamGroups, sisId }) => {
-  const { payload: user, isNew } = await getLoginDataWithoutToken(username, name, iamGroups, email, sisId)
-  if (isNew) {
-    await sendNotificationAboutNewUser({ userId: username, userFullName: name })
+  if (userDataCache.has(username)) {
+    return userDataCache.get(username)
   }
 
-  const userData = _.omit(await getUserDataFor(user.userId), ['full_name', 'faculties'])
-  return {
-    ...user,
-    ...userData,
-    isAdmin: userData.roles.includes('admin'),
+  const isNewUser = !(await User.findOne({ where: { username } }))
+  const language = 'fi'
+
+  await User.upsert({
+    full_name: name,
+    username,
+    email,
+    language,
+    sisu_person_id: sisId,
+    last_login: new Date(),
+  })
+
+  const userFromDb = await byUsername(username)
+  const formattedUser = await formatUser(userFromDb)
+  const { roles: currentAccessGroups } = formattedUser
+
+  // Modify accessgroups based on current groups and iamGroups
+  let newAccessGroups = []
+  if (await checkStudyGuidanceGroupsAccess(sisId)) newAccessGroups.push('studyGuidanceGroups')
+  if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
+  if (iamGroups.includes(hyOneGroup) || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
+  if (iamGroups.includes(toskaGroup) || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
+  if (_.difference(newAccessGroups, currentAccessGroups).length > 0) {
+    userFromDb.setAccessgroup(
+      (
+        await AccessGroup.findAll({
+          where: {
+            group_code: {
+              [Op.in]: newAccessGroups,
+            },
+          },
+        })
+      ).map(({ id }) => id)
+    )
   }
+
+  if (isNewUser) await sendNotificationAboutNewUser({ userId: username, userFullName: name })
+
+  const toReturn = {
+    ...formattedUser,
+    roles: newAccessGroups,
+  }
+  userDataCache.set(username, toReturn)
+  return toReturn
 }
 
 module.exports = {
@@ -192,11 +283,7 @@ module.exports = {
   findAll,
   modifyAccess,
   getAccessGroups,
-  getUnitsFromElementDetails,
   setFaculties,
-  getUserDataFor,
-  getStudentsUserCanAccess,
-  getLoginDataWithoutToken,
   getUser,
   getMockedUser,
 }

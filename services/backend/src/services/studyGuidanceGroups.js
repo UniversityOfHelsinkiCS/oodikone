@@ -2,6 +2,7 @@ const { getImporterClient } = require('../util/importerClient')
 const importerClient = getImporterClient()
 const { StudyGuidanceGroupTag } = require('../models/models_kone')
 const logger = require('../util/logger')
+const _ = require('lodash')
 
 const getGroupsFromImporter = async sisPersonId => {
   if (!importerClient) {
@@ -30,7 +31,7 @@ const getAllGroupsAndStudents = async sisPersonId => {
 }
 
 const getAllStudentsUserHasInGroups = async sisPersonId =>
-  new Set(
+  _.uniqBy(
     (await getGroupsFromImporter(sisPersonId))
       .map(group => group.members)
       .flat()

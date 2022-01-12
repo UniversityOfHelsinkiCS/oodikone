@@ -288,56 +288,71 @@ const bySearchTerm = async searchterm => {
   return matches.map(formatStudent)
 }
 
-const bySearchTermAndElements = async (searchterm, codes) => {
+const bySearchTermAndStudentNumbers = async (searchterm, studentnumbers) => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
-    include: {
-      model: StudyrightElement,
-      required: true,
-      where: {
-        code: {
-          [Op.in]: codes,
+    where: {
+      [Op.and]: {
+        [Op.or]: [nameLike(terms), studentnumberLike(terms)],
+        studentnumber: {
+          [Op.in]: studentnumbers,
         },
       },
-    },
-    where: {
-      [Op.or]: [nameLike(terms), studentnumberLike(terms)],
     },
   })
   return matches.map(formatStudent)
 }
 
-const filterStudentnumbersByAccessrights = async (studentnumbers, codes) => {
-  const students = await Student.findAll({
-    attributes: ['studentnumber'],
-    include: {
-      attributes: [],
-      model: StudyrightElement,
-      required: true,
-      where: {
-        code: {
-          [Op.in]: codes,
+const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
+  (
+    await Student.findAll({
+      attributes: ['studentnumber'],
+      include: {
+        attributes: [],
+        model: StudyrightElement,
+        required: true,
+        where: {
+          code: {
+            [Op.in]: codes,
+          },
         },
       },
-    },
-    where: {
-      studentnumber: {
-        [Op.in]: studentnumbers,
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers,
+        },
       },
-    },
-    raw: true,
-  })
-  return students.map(student => student.studentnumber)
-}
+      raw: true,
+    })
+  ).map(({ studentnumber }) => studentnumber)
+
+const getStudentnumbersByElementdetails = async codes =>
+  (
+    await Student.findAll({
+      attributes: ['studentnumber'],
+      include: {
+        attributes: [],
+        model: StudyrightElement,
+        required: true,
+        where: {
+          code: {
+            [Op.in]: codes,
+          },
+        },
+      },
+      raw: true,
+    })
+  ).map(({ studentnumber }) => studentnumber)
 
 module.exports = {
   withId,
   bySearchTerm,
   createStudent,
   updateStudent,
-  bySearchTermAndElements,
+  bySearchTermAndStudentNumbers,
   filterStudentnumbersByAccessrights,
   findByCourseAndSemesters,
   findByTag,
   splitByEmptySpace,
+  getStudentnumbersByElementdetails,
 }
