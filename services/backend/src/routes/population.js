@@ -180,14 +180,12 @@ router.get('/v3/populationstatistics', async (req, res) => {
   try {
     studyRights = JSON.parse(studyRightsJSON)
     const {
-      user: { rights, roles },
+      user: { rights, isAdmin },
     } = req
 
-    if (!roles?.includes('admin!')) {
-      if (!rights.includes(studyRights.programme)) {
-        res.status(403).json([])
-        return
-      }
+    if (!isAdmin && !rights.includes(studyRights.programme)) {
+      res.status(403).json([])
+      return
     }
   } catch (e) {
     res.status(400).json({ error: 'The query had invalid studyRights' })
