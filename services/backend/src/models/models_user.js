@@ -83,23 +83,6 @@ const User = sequelizeUser.define(
     timestamps: false,
   }
 )
-const HyGroup = sequelizeUser.define('hy_group', {
-  id: {
-    primaryKey: true,
-    type: Sequelize.BIGINT,
-    autoIncrement: true,
-  },
-
-  code: { type: Sequelize.STRING },
-
-  createdAt: {
-    type: Sequelize.DATE,
-  },
-
-  updatedAt: {
-    type: Sequelize.DATE,
-  },
-})
 
 User.hasMany(UserElementDetails, { as: 'programme' })
 UserElementDetails.belongsTo(User)
@@ -110,16 +93,12 @@ User.belongsToMany(AccessGroup, {
 })
 AccessGroup.belongsToMany(User, { through: 'user_accessgroup' })
 
-User.belongsToMany(HyGroup, { through: 'user_hy_group', as: 'hy_group' })
-HyGroup.belongsToMany(User, { through: 'user_hy_group' })
-
 User.hasMany(UserFaculties, { as: 'faculty', foreignKey: 'userId' })
 
 module.exports = {
   User,
   UserElementDetails,
   AccessGroup,
-  HyGroup,
   UserFaculties,
   sequelizeUser,
 }

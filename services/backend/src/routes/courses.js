@@ -16,7 +16,9 @@ router.get('/v2/coursesmulti', async (req, res) => {
 })
 
 router.get('/v3/courseyearlystats', async (req, res) => {
-  const { rights, roles } = req
+  const {
+    user: { rights, roles },
+  } = req
 
   const allowedRoles = roles && ['admin', 'courseStatistics'].find(role => roles.includes(role))
 
