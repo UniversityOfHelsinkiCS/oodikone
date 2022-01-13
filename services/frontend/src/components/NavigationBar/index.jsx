@@ -28,12 +28,17 @@ const allNavigationItems = {
     label: 'Study guidance groups',
     reqRights: ['studyGuidanceGroups'],
   },
+  customPopulations: {
+    path: '/custompopulation',
+    key: 'customPopulation',
+    label: 'Custom populations',
+  },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['admin'] },
   feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
 }
 
 const NavigationBar = () => {
-  const { isLoading, rights, mockedBy, userId, roles } = useGetAuthorizedUserQuery()
+  const { isLoading, rights, mockedBy, userId, roles, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
   const [logout] = useLogoutMutation()
 
@@ -41,12 +46,13 @@ const NavigationBar = () => {
     const visibleNavigationItems = {}
     if (isLoading) return visibleNavigationItems
     Object.keys(allNavigationItems).forEach(key => {
-      if (key === 'populations' || key === 'students') {
-        if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) {
-          return
-        }
+      if (key === 'populations') {
+        if (!isAdmin && rights.length === 0) return
+      }
+      if (key === 'students' || key === 'customPopulations') {
+        if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) return
       } else if (key === 'courseStatistics') {
-        if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length < 1) return
+        if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length === 0) return
       }
       const { reqRights } = allNavigationItems[key]
       if (!reqRights || reqRights.every(r => roles.includes(r))) {
