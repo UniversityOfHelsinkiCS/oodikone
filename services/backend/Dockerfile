@@ -17,7 +17,7 @@ ENV SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT
 ARG SENTRY_RELEASE
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
 COPY --chown=node:node ./package* /usr/src/app/
-RUN npm ci --production
+RUN npm ci --production && apk add --no-cache vim curl nano
 COPY --chown=node:node . /usr/src/app/
 USER node
 CMD ["npm", "start"]
