@@ -23,7 +23,7 @@ const main = async () => {
   const facultyCode = 'H50'
   const programme = 'KH50_005'
   const studyrightStartDate = '2020-08-01'
-  const presense = 'LÄSNÄOLEVA'
+  const presence = 'LÄSNÄOLEVA'
 
   const months = 12 // some amount of months, dunno
   const year = 2020
@@ -39,7 +39,7 @@ const main = async () => {
   const oodikoneStudents = oodikoneStuff.students.map(s => s.studentNumber)
 
   const { data: rapoStuff } = await api.get(
-    `studyrights?faculty=${facultyCode}&presense=${presense}&education=${programme}&studyrightStartDate=${studyrightStartDate}`
+    `studyrights?faculty=${facultyCode}&presence=${presence}&education=${programme}&studyrightStartDate=${studyrightStartDate}`
   )
 
   console.log('=== RAPOSTUFF ===')
