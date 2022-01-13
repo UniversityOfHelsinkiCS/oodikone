@@ -10,7 +10,7 @@ export const getHeaders = () => {
     uid: 'mluukkai',
     displayName: 'Matti Luukkainen',
     'shib-session-id': 'mock-session',
-    hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users',
+    hyGroupCn: 'grp-oodikone-users;grp-oodikone-basic-users;grp-toska',
     mail: 'grp-toska+mockmluukkai@helsinki.fi',
     hyPersonSisuId: 'hy-hlo-1441871',
     shib_logout_url: 'https://helsinki.fi/shibboleth-sp/Logout',
