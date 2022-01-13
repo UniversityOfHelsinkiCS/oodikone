@@ -1,8 +1,17 @@
 /* eslint no-console: 0 */
 
+// script needs rapo certs, so you need to run this in production pannu
+//
+// possible workflows:
+// - go to oodikone pannu, then "docker exec -it backend sh", then run this script with "npm
+// run rapodiff". Modify with vim / nano until you're happy, then copy changes to local version and commit.
+// - or bind mount a file to backend container in pannu, overriding this file. Modify that file
+// inside or outside container, however you want. Keep file in pannu, or put it to pannu's git repo (oodikone-server-setup).
+
 const axios = require('axios').default
 const fs = require('fs')
 const https = require('https')
+const _ = require('lodash')
 
 const { optimizedStatisticsOf } = require('./services/populations')
 
@@ -38,16 +47,18 @@ const main = async () => {
   const oodikoneStuff = await optimizedStatisticsOf(oodikoneQuery)
   const oodikoneStudents = oodikoneStuff.students.map(s => s.studentNumber)
 
-  const { data: rapoStuff } = await api.get(
+  const rapoUrl = encodeURI(
     `studyrights?faculty=${facultyCode}&presence=${presence}&education=${programme}&studyrightStartDate=${studyrightStartDate}`
   )
 
-  console.log('=== RAPOSTUFF ===')
-  console.log(JSON.stringify(rapoStuff, null, 2))
+  const { data: rapoStuff } = await api.get(rapoUrl)
+  const rapoStudents = rapoStuff.map(s => s.opiskelijanumero)
 
-  console.log('=== OODIKONE ===')
-  console.log(JSON.stringify(oodikoneStuff, null, 2))
-  console.log(JSON.stringify(oodikoneStudents, null, 2))
+  const onlyInOodikone = _.difference(oodikoneStudents, rapoStudents)
+  const onlyInRapo = _.difference(rapoStudents, oodikoneStudents)
+
+  console.log('Only in Oodikone:', onlyInOodikone)
+  console.log('Only in Rapo:', onlyInRapo)
 }
 
-main()
+main().then(() => process.exit(0));
