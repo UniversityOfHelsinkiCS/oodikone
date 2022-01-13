@@ -7,7 +7,7 @@ const adminUserHeaders = {
   uid: 'admin',
   displayname: 'Admin User',
   'shib-session-id': 'mock-cypress-session',
-  hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users',
+  hygroupcn: 'grp-oodikone-users;grp-oodikone-basic-users;grp-toska',
   edupersonaffiliation: 'member;employee;faculty',
   mail: 'grp-toska+mockadminuser@helsinki.fi',
   hypersonsisuid: 'hy-hlo-6666666',
