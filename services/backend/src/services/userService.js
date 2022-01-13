@@ -223,6 +223,7 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
     mockedBy,
   }
   userDataCache.set(userToMock, toReturn)
+  return toReturn
 }
 
 const getUser = async ({ username, name, email, iamGroups, sisId }) => {
