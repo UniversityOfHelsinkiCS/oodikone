@@ -4,11 +4,7 @@
   "scripts": {
     "start": "node --max_old_space_size=4096 index.js",
     "dev": "nodemon --max_old_space_size=4096 index.js",
-    "diff:students": "node /usr/src/app/src/sisoodi_diff/students/index.js",
-    "diff:populations": "node /usr/src/app/src/sisoodi_diff/populations.js",
-    "diff:courses": "node /usr/src/app/src/sisoodi_diff/courses/index.js",
-    "diff:transfers": "node /usr/src/app/src/sisoodi_diff/transfers.js",
-    "diff:trends": "node /usr/src/app/src/sisoodi_diff/trends.js"
+    "rapodiff": "node /usr/src/app/src/rapodiff.js"
   },
   "dependencies": {
     "@sentry/node": "^5.30.0",
