@@ -1,6 +1,6 @@
 const Sentry = require('@sentry/node')
 const { ApplicationError } = require('../util/customErrors')
-const { getUser, getUserDataFor, getMockedUser } = require('../services/userService')
+const { getUser, getMockedUser } = require('../services/userService')
 const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
 
@@ -8,48 +8,44 @@ const parseIamGroups = iamGroups => iamGroups?.split(';').filter(Boolean) ?? []
 
 const hasRequiredIamGroup = iamGroups => _.intersection(iamGroups, requiredGroup).length > 0
 
-const currentUserMiddleware = async (req, _, next) => {
-  const { uid: username, 'shib-session-id': sessionId, shib_logout_url: logoutUrl } = req.headers
+const currentUserMiddleware = async (req, _res, next) => {
+  const {
+    'shib-session-id': sessionId,
+    'x-show-as-user': showAsUser,
+    displayname: name,
+    hygroupcn,
+    hypersonsisuid: sisId,
+    mail: email,
+    shib_logout_url: logoutUrl,
+    uid: username,
+  } = req.headers
 
-  if (!sessionId) {
-    throw new ApplicationError('No session id found in request headers', 403, { logoutUrl })
+  if (!sessionId || !username) {
+    throw new ApplicationError('Not enough data in request headers', 403, { logoutUrl })
   }
 
-  if (!username) {
-    throw new ApplicationError('No username found in request headers', 403, { logoutUrl })
-  }
-  const { displayname: name, mail: email, hygroupcn: iamGroups, hypersonsisuid: sisId } = req.headers
-  const parsedIamGroups = parseIamGroups(iamGroups)
+  const iamGroups = parseIamGroups(hygroupcn)
 
-  req.user = await getUser({
+  if (!hasRequiredIamGroup(iamGroups)) {
+    throw new ApplicationError('User does not have required iam group', 403, { logoutUrl })
+  }
+
+  let user = await getUser({
     username,
     name,
     email,
-    iamGroups: parsedIamGroups,
+    iamGroups,
     sisId,
   })
 
-  if (!hasRequiredIamGroup(parsedIamGroups)) {
-    throw new ApplicationError('User is not enabled', 403, { logoutUrl })
+  if (showAsUser && user.isAdmin) {
+    user = await getMockedUser({ userToMock: showAsUser, mockedBy: username })
   }
 
-  const showAsUser = req.headers['x-show-as-user']
+  Sentry.setUser({ username: user.mockedBy ?? username })
 
-  if (showAsUser) {
-    const mockedUser = await getMockedUser(username, showAsUser)
-    if (mockedUser) {
-      req.user = mockedUser
-    }
-  }
+  req.user = user
   req.logoutUrl = logoutUrl
-
-  const { userId, mockedBy } = req.user
-
-  Sentry.setUser({ username: mockedBy ?? userId })
-
-  // TODO: remove this garbo
-  const userData = await getUserDataFor(userId)
-  Object.assign(req, userData)
 
   next()
 }

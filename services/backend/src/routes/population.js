@@ -1,15 +1,14 @@
 const crypto = require('crypto')
 const Sentry = require('@sentry/node')
 const router = require('express').Router()
+const _ = require('lodash')
 const Population = require('../services/populations')
 const Student = require('../services/students')
 const StudyrightService = require('../services/studyrights')
-const UserService = require('../services/userService')
 const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
-const { getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
-const { logger } = require('../util/logger')
+const { ApplicationError } = require('../util/customErrors')
 
 const filterPersonalTags = (population, userId) => {
   return {
@@ -80,20 +79,13 @@ router.post('/v2/populationstatistics/coursesbycoursecode', async (req, res) => 
   if (Math.abs(to - from + 1) > maxYearsToCreatePopulationFrom) {
     return res.status(400).json({ error: `Max years to create population from is ${maxYearsToCreatePopulationFrom}` })
   }
-  let studentnumberlist
-  const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, from, to)
+
   const {
-    user: { userId },
-    roles,
+    user: { isAdmin, studentsUserCanAccess },
   } = req
 
-  if (roles && roles.includes('admin')) {
-    studentnumberlist = studentnumbers
-  } else {
-    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
-    const codes = unitsUserCanAccess.map(unit => unit.id)
-    studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
-  }
+  const studentnumbers = await Student.findByCourseAndSemesters(coursecodes, from, to)
+  const studentnumberlist = isAdmin ? studentnumbers : _.intersection(studentnumbers, studentsUserCanAccess)
 
   const result = await Population.bottlenecksOf(
     {
@@ -120,19 +112,12 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
     res.status(400).json({ error: 'The body should have a tag defined' })
     return
   }
-  let studentnumberlist
-  const studentnumbers = await Student.findByTag(tag)
   const {
-    user: { userId },
-    roles,
+    user: { isAdmin, studentsUserCanAccess },
   } = req
-  if (roles && roles.includes('admin')) {
-    studentnumberlist = studentnumbers
-  } else {
-    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
-    const codes = unitsUserCanAccess.map(unit => unit.id)
-    studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
-  }
+  const studentnumbers = await Student.findByTag(tag)
+  const studentnumberlist = isAdmin ? studentnumbers : _.intersection(studentnumbers, studentsUserCanAccess)
+
   const result = await Population.bottlenecksOf(
     {
       year: 1900,
@@ -154,26 +139,16 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
 })
 
 router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, res) => {
-  if (!req.body.studentnumberlist) {
-    res.status(400).json({ error: 'The body should have a studentnumberlist defined' })
-    return
-  }
-  let studentnumberlist
   const {
-    user: { userId, sisPersonId },
-    roles,
+    user: { isAdmin, studentsUserCanAccess },
+    body: { studentnumberlist: studentnumbersInReq },
   } = req
 
-  if (roles && roles.includes('admin')) {
-    studentnumberlist = req.body.studentnumberlist
-  } else if (req.body.usingStudyGuidanceGroups) {
-    const studentsUserCanAccess = await getAllStudentsUserHasInGroups(sisPersonId)
-    studentnumberlist = req.body.studentnumberlist.filter(s => studentsUserCanAccess.has(s))
-  } else {
-    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
-    const codes = unitsUserCanAccess.map(unit => unit.id)
-    studentnumberlist = await Student.filterStudentnumbersByAccessrights(req.body.studentnumberlist, codes)
+  if (!studentnumbersInReq) {
+    throw new ApplicationError('The body should have a studentnumberlist defined', 400)
   }
+
+  const studentnumberlist = isAdmin ? studentnumbersInReq : _.intersection(studentnumbersInReq, studentsUserCanAccess)
 
   const result = await Population.bottlenecksOf(
     {
@@ -204,13 +179,13 @@ router.get('/v3/populationstatistics', async (req, res) => {
   let studyRights = null
   try {
     studyRights = JSON.parse(studyRightsJSON)
-    const { rights, roles } = req
+    const {
+      user: { rights, isAdmin },
+    } = req
 
-    if (!roles || !roles.includes('admin')) {
-      if (!rights.includes(studyRights.programme)) {
-        res.status(403).json([])
-        return
-      }
+    if (!isAdmin && !rights.includes(studyRights.programme)) {
+      res.status(403).json([])
+      return
     }
   } catch (e) {
     res.status(400).json({ error: 'The query had invalid studyRights' })
@@ -259,27 +234,21 @@ router.get('/v3/populationstatistics', async (req, res) => {
 })
 
 router.get('/v3/populationstatisticsbytag', async (req, res) => {
-  const { tag, studyRights: studyRightsJSON, months, year } = req.query
-  const { user } = req
+  const {
+    user: { id, isAdmin, studentsUserCanAccess },
+    query: { tag, studyRights: studyRightsJSON, months, year },
+  } = req
 
   if (!tag) return res.status(400).json({ error: 'The query should have a tag defined' })
   const foundTag = await TagService.findTagById(tag)
   if (!foundTag) return res.status(404).json({ error: 'Tag not found' })
 
   const semesters = ['FALL', 'SPRING']
-  let studentnumberlist
+
   const studentnumbers = await Student.findByTag(tag)
-  const {
-    user: { userId },
-    roles,
-  } = req
-  if (roles && roles.includes('admin')) {
-    studentnumberlist = studentnumbers
-  } else {
-    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(userId)
-    const codes = unitsUserCanAccess.map(unit => unit.id)
-    studentnumberlist = await Student.filterStudentnumbersByAccessrights(studentnumbers, codes)
-  }
+
+  const studentnumberlist = isAdmin ? studentnumbers : _.intersection(studentnumbers, studentsUserCanAccess)
+
   const studyRights = JSON.parse(studyRightsJSON)
   const newStartYear = await Population.getEarliestYear(studentnumberlist, studyRights)
   const yearDifference = Number(year) - Number(newStartYear)
@@ -301,12 +270,14 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
     return
   }
 
-  res.json(filterPersonalTags(result, user.id))
+  res.json(filterPersonalTags(result, id))
 })
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: sep } = req.query
-  const { user, roles } = req
+  const {
+    user: { id, isAdmin, studentsUserCanAccess: allStudentsUserCanAccess },
+  } = req
   const separate = sep ? JSON.parse(sep) : false
 
   if (!coursecodes || !from || !to) {
@@ -335,14 +306,9 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     studentnumbers
   )
 
-  let studentsUserCanAccess
-  if (roles && roles.includes('admin')) {
-    studentsUserCanAccess = new Set(studentnumbers)
-  } else {
-    const unitsUserCanAccess = await UserService.getUnitsFromElementDetails(user.userId)
-    const codes = unitsUserCanAccess.map(unit => unit.id)
-    studentsUserCanAccess = new Set(await Student.filterStudentnumbersByAccessrights(studentnumbers, codes))
-  }
+  const studentsUserCanAccess = isAdmin
+    ? new Set(studentnumbers)
+    : new Set(_.intersection(studentnumbers, allStudentsUserCanAccess))
 
   const randomHash = crypto.randomBytes(12).toString('hex')
   const obfuscateStudent = ({ studyrights, studentNumber, courses, gender_code }) => ({
@@ -368,24 +334,16 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     return
   }
 
-  res.json(filterPersonalTags(result, user.id))
+  res.json(filterPersonalTags(result, id))
 })
 
 router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
-  const { studentnumberlist, usingStudyGuidanceGroups } = req.body
-  const { roles, user } = req
+  const { studentnumberlist } = req.body
+  const {
+    user: { isAdmin, id, studentsUserCanAccess },
+  } = req
 
-  if (usingStudyGuidanceGroups) {
-    if (!user.sisPersonId) {
-      logger.error(`User ${user.userId} tried to get person groups but personId was ${user.sisPersonId} in header`)
-      return res.status(400).json({ error: 'Not possible to get groups without personId' })
-    }
-  }
-
-  const studentsUserCanAccess = usingStudyGuidanceGroups
-    ? await getAllStudentsUserHasInGroups(user.sisPersonId)
-    : await UserService.getStudentsUserCanAccess(studentnumberlist, roles, user.userId)
-  const filteredStudentNumbers = studentnumberlist.filter(s => studentsUserCanAccess.has(s))
+  const filteredStudentNumbers = isAdmin ? studentnumberlist : _.intersection(studentnumberlist, studentsUserCanAccess)
 
   const result = await Population.optimizedStatisticsOf(
     {
@@ -400,12 +358,14 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
     Sentry.captureException(new Error(result.error))
     return
   }
-  res.status(200).json(filterPersonalTags(result, user.id))
+  res.status(200).json(filterPersonalTags(result, id))
 })
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
-  const { rights, roles } = req
-  if (roles && roles.includes('admin')) {
+  const {
+    user: { rights, roles },
+  } = req
+  if (roles?.includes('admin')) {
     const studyrights = await StudyrightService.getAssociations()
     res.json(studyrights)
   } else {

@@ -9,6 +9,7 @@ on:
       - 'cypress/**'
       - 'cypress.json'
       - 'services/**'
+      - '!services/backend/src/rapodiff.js'
       - 'docker-compose.ci.yml'
       - 'docker-compose.test.yml'
       - 'nginx.conf'

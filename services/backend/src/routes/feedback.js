@@ -1,28 +1,19 @@
 const router = require('express').Router()
-const { getUserDataFor } = require('../services/userService')
 const { sendFeedbackToToska } = require('../services/mailservice')
 const logger = require('../util/logger')
 
-router.post('/email', async (req, res) => {
-  const { content } = req.body
+router.post('/email', async req => {
   const {
-    user: { userId },
+    body: { content },
+    user,
   } = req
 
-  const { email, full_name } = await getUserDataFor(userId)
-
-  const result = await sendFeedbackToToska({
+  await sendFeedbackToToska({
     feedbackContent: content,
-    userId,
-    userEmail: email,
-    userFullName: full_name,
+    user,
   })
-  if (result.error) {
-    return res.status(400).json(result).end()
-  }
-  logger.info(`${userId} succesfully sent some feedback mail to toska`)
 
-  res.status(200).json('success').end()
+  logger.info(`${user.userId} succesfully sent feedback to toska`)
 })
 
 module.exports = router
