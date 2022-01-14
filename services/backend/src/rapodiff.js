@@ -61,4 +61,4 @@ const main = async () => {
   console.log('Only in Rapo:', onlyInRapo)
 }
 
-main().then(() => process.exit(0));
+main().then(() => process.exit(0))
