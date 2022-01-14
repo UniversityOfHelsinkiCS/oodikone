@@ -186,7 +186,7 @@ describe('Course Statistics tests', () => {
       cy.contains('td', '010674989').siblings().contains('1')
     })
 
-    it.skip('Language distribution is correct', () => {
+    it('Language distribution is correct', () => {
       cy.get("input[placeholder='Search by a course code']").type('TKT20003')
       cy.contains(/^TKT20003$/).click()
       cy.contains('Fetch statistics').should('be.enabled').click()

@@ -38,7 +38,7 @@ describe('Student Statistics tests', () => {
     cy.url().should('include', '/students')
     cy.get('.prompt').type(student.studentnumber)
     cy.contains(student.studentnumber).click()
-    cy.contains('Started: 01.08.2011')
+    cy.contains('Started: 01.08.2017')
     cy.contains('Tietojenkäsittelytieteen kandiohjelma (01.08.2017 - 01.08.2025')
     cy.contains(student.lastname).should('not.exist')
     cy.contains(student.firstnames).should('not.exist')
