@@ -9,6 +9,7 @@ import StudyProgrammeSelector from './StudyProgrammeSelector'
 import Overview from './Overview'
 import NewOverview from './NewOverview'
 import NewStudytrackOverview from './NewStudytrackOverview'
+import NewUpdateView from './NewUpdateView'
 import StudyTrackOverview from './StudyTrackOverview'
 import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
@@ -96,6 +97,17 @@ const StudyProgramme = props => {
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />,
     })
+    if (isAdmin) {
+      panes.push({
+        menuItem: 'Admin',
+        render: () => (
+          <>
+            <Button onClick={() => refreshThroughput()}>recalculate throughput</Button>
+            <Button onClick={() => refreshProductivity()}>recalculate productivity</Button>
+          </>
+        ),
+      })
+    }
     if (SHOW_NEW_OVERVIEW) {
       panes.push({
         menuItem: 'Basic information (NEW)',
@@ -108,15 +120,10 @@ const StudyProgramme = props => {
         render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
       })
     }
-    if (isAdmin) {
+    if (SHOW_NEW_OVERVIEW) {
       panes.push({
-        menuItem: 'Admin',
-        render: () => (
-          <>
-            <Button onClick={() => refreshThroughput()}>recalculate throughput</Button>
-            <Button onClick={() => refreshProductivity()}>recalculate productivity</Button>
-          </>
-        ),
+        menuItem: 'Update statistics (NEW)',
+        render: () => <NewUpdateView studyprogramme={studyProgrammeId} />,
       })
     }
     return panes

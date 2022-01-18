@@ -126,4 +126,76 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   }
 })
 
+router.get('/v2/studyprogrammes/:id/update_basicview', async (req, res) => {
+  const code = req.params.id
+  const academic = 'ACADEMIC_YEAR'
+  const calendar = 'CALENDAR_YEAR'
+
+  if (code) {
+    let status = null
+    try {
+      const basicStatsAcademic = await getBasicStatsForStudytrack({
+        studyprogramme: req.params.id,
+        yearType: academic,
+      })
+      await setBasicStats(basicStatsAcademic, academic)
+
+      const basicStatsCalendar = await getBasicStatsForStudytrack({
+        studyprogramme: req.params.id,
+        yearType: calendar,
+      })
+      await setBasicStats(basicStatsCalendar, calendar)
+
+      const creditStatsAcademic = await getCreditStatsForStudytrack({
+        studyprogramme: req.params.id,
+        yearType: academic,
+      })
+      await setCreditStats(creditStatsAcademic, academic)
+
+      const creditStatsCalendar = await getCreditStatsForStudytrack({
+        studyprogramme: req.params.id,
+        yearType: calendar,
+      })
+      await setCreditStats(creditStatsCalendar, calendar)
+
+      const graduationStatsAcademic = await getGraduationStatsForStudytrack({
+        studyprogramme: req.params.id,
+        yearType: academic,
+      })
+      await setGraduationStats(graduationStatsAcademic, academic)
+
+      const graduationStatsCalendar = await getGraduationStatsForStudytrack({
+        studyprogramme: req.params.id,
+        yearType: calendar,
+      })
+      await setGraduationStats(graduationStatsCalendar, calendar)
+
+      status = 'OK'
+    } catch (e) {
+      logger.error(`Failed to update code ${code} basic stats: ${e}`)
+    }
+    return res.json(status)
+  } else {
+    res.status(422).end()
+  }
+})
+
+router.get('/v2/studyprogrammes/:id/update_studytrackview', async (req, res) => {
+  const code = req.params.id
+
+  if (code) {
+    let status = null
+    try {
+      const result = await getStudytrackStatsForStudyprogramme({ studyprogramme: req.params.id })
+      await setStudytrackStats(result)
+      status = 'OK'
+    } catch (e) {
+      logger.error(`Failed to update code ${code} studytrack stats: ${e}`)
+    }
+    return res.json(status)
+  } else {
+    res.status(422).end()
+  }
+})
+
 module.exports = router
