@@ -14,9 +14,21 @@ const studyprogrammeApi = RTKApi.injectEndpoints({
     getStudytrackStats: builder.query({
       query: ({ id }) => `/v2/studyprogrammes/${id}/studytrackstats`,
     }),
+    updateBasicView: builder.query({
+      query: ({ id }) => `/v2/studyprogrammes/${id}/update_basicview`,
+    }),
+    updateStudytrackView: builder.query({
+      query: ({ id }) => `/v2/studyprogrammes/${id}/update_studytrackview`,
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery, useGetStudytrackStatsQuery } =
-  studyprogrammeApi
+export const {
+  useGetBasicStatsQuery,
+  useGetCreditStatsQuery,
+  useGetGraduationStatsQuery,
+  useGetStudytrackStatsQuery,
+  useUpdateBasicViewQuery,
+  useUpdateStudytrackViewQuery,
+} = studyprogrammeApi

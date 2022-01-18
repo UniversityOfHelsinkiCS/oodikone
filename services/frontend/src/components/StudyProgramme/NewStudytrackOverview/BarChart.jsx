@@ -6,7 +6,7 @@ const ReactHighcharts = require('react-highcharts')
 const colors = ['#333737', '#bdc2c7', '#1392c2', '#195f8a', '#54997b', '#036415']
 
 const BarChart = ({ data, track }) => {
-  if (!data || !data.creditGraphStats[track])
+  if (!data || !data.creditGraphStats || !data.creditGraphStats[track])
     return <NoDataMessage message="No progress data for the studytrack found. Try with another studytrack" />
 
   const correctData = data?.creditGraphStats[track]

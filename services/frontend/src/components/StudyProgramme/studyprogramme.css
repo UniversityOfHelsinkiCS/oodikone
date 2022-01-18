@@ -50,3 +50,11 @@
 .studytrack-overview .no-data-message {
   margin: 20px 0;
 }
+
+.update-view {
+  margin: 2em 0;
+}
+
+.update-view .button-container {
+  margin: 1em 0;
+}
