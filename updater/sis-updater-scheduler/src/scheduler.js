@@ -1,9 +1,11 @@
 const { chunk } = require('lodash')
 const { eachLimit } = require('async')
+const uuid = require('uuid')
 const { knexConnection } = require('./db/connection')
-const { stan } = require('./utils/stan')
+const { stan, opts } = require('./utils/stan')
 const { incrby: redisIncrementBy, get: redisGet } = require('./utils/redis')
 const {
+  NATS_GROUP,
   SIS_UPDATER_SCHEDULE_CHANNEL,
   SIS_MISC_SCHEDULE_CHANNEL,
   CHUNK_SIZE,
@@ -36,11 +38,43 @@ const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNE
   const redisKey = type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
   await redisIncrementBy(redisKey, entityIds.length)
 
-  return new Promise((res, rej) => {
-    stan.publish(channel, JSON.stringify({ entityIds, type }), err => {
-      if (err) return rej(err)
-      res()
-    })
+  const id = uuid.v4()
+
+  const completionChannel = stan.subscribe('SIS_COMPLETED_CHANNEL-' + id, NATS_GROUP, opts)
+
+  return new Promise((resolve, reject) => {
+    const messageHandler = msg => {
+      let data = null
+
+      try {
+        data = JSON.parse(msg.getData())
+      } catch (err) {
+        logger.error({
+          message: 'Unable to parse completion message.',
+          meta: err.stack,
+        })
+
+        return
+      }
+
+      if (data.id === id) {
+        if (data.success) {
+          resolve()
+        } else {
+          logger.error('Job failed: ' + data.message)
+          reject(data.message)
+        }
+
+        completionChannel.off('message', messageHandler)
+        completionChannel.unsubscribe()
+      }
+
+      msg.ack()
+    }
+
+    completionChannel.on('message', messageHandler)
+
+    stan.publish(channel, JSON.stringify({ id, entityIds, type }))
   })
 }
 
@@ -195,6 +229,7 @@ const scheduleHourly = async () => {
     await eachLimit(chunk(personsToUpdate, CHUNK_SIZE), 10, async s => await createJobs(s, 'students'))
   } catch (e) {
     logger.error({ message: 'Hourly scheduling failed', meta: e.stack })
+    throw e
   }
 }
 
@@ -209,6 +244,7 @@ const scheduleProgrammes = async () => {
     await createJobs(entityIds, 'programme_modules')
   } catch (e) {
     logger.error({ message: 'Programme module scheduling failed', meta: e.stack })
+    throw e
   }
 }
 
@@ -218,6 +254,7 @@ const scheduleWeekly = async () => {
     await scheduleStudents()
   } catch (e) {
     logger.error({ message: 'Weekly scheduling failed', meta: e.stack })
+    throw e
   }
 }
 
@@ -226,6 +263,7 @@ const schedulePrePurge = async () => {
     await startPrePurge()
   } catch (e) {
     logger.error({ message: 'Purge failed', meta: e.stack })
+    throw e
   }
 }
 
@@ -234,6 +272,7 @@ const schedulePurge = async () => {
     await startPurge()
   } catch (e) {
     logger.error({ message: 'Purge failed', meta: e.stack })
+    throw e
   }
 }
 

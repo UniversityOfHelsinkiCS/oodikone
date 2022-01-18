@@ -19,9 +19,33 @@ const {
 } = require('./config')
 
 const handleMessage = messageHandler => async msg => {
+  let data = null
+
   try {
-    await messageHandler(JSON.parse(msg.getData()))
+    data = JSON.parse(msg.getData())
+  } catch (err) {
+    logger.error({
+      message: 'Failed to parse message',
+      meta: err.stack,
+    })
+  }
+
+  try {
+    await messageHandler(data)
+
+    if (data.id) {
+      logger.info('Completion Ack ' + data.id + ' (Success)')
+      stan.publish('SIS_COMPLETED_CHANNEL-' + data.id, JSON.stringify({ id: data.id, success: true }))
+    }
   } catch (e) {
+    if (data.id) {
+      logger.info('Completion Ack ' + data.id + ' (Failure)')
+      stan.publish(
+        'SIS_COMPLETED_CHANNEL-' + data.id,
+        JSON.stringify({ id: data.id, success: false, message: e.message })
+      )
+    }
+
     logger.error({ message: 'Failed handling message', meta: e.stack })
   } finally {
     try {
