@@ -1,3 +1,5 @@
+version: '2.1'
+
 x-defaults: &defaults
   restart: unless-stopped
 
@@ -97,7 +99,7 @@ services:
 
   sis-updater-nats:
     <<: *defaults
-    command: '-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
+    command: '-cid sis-updater-nats -m 8222 -p 4222 --max_channels 1000 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
     container_name: sis-updater-nats
     image: nats-streaming:0.16.2
     profiles:
@@ -122,6 +124,8 @@ services:
       SIS_IMPORTER_USER: postgres
       SIS_NATS_TOKEN: dev
       SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+      SCHEDULE_IMMEDIATE: '${SCHEDULE_IMMEDIATE}'
+      EXIT_AFTER_IMMEDIATES: '${EXIT_AFTER_IMMEDIATES}'
     ports:
       - 8082:8082
     profiles:

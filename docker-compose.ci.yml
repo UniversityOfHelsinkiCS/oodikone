@@ -103,9 +103,35 @@ services:
     profiles:
       - updater
 
+  sis-updater-scheduler:
+    <<: *defaults
+    build:
+      target: development
+      context: updater/sis-updater-scheduler
+    container_name: sis-updater-scheduler
+    depends_on:
+      - redis
+      - sis-importer-db
+      - sis-updater-nats
+    environment:
+      REDIS_URI: //redis:6379
+      SECRET_TOKEN: dev
+      SIS_IMPORTER_DATABASE: sis-importer-db
+      SIS_IMPORTER_HOST: sis-importer-db
+      SIS_IMPORTER_PASSWORD: postgres
+      SIS_IMPORTER_USER: postgres
+      SIS_NATS_TOKEN: dev
+      SIS_NATS_URI: sis-updater-nats://sis-updater-nats:4222
+      SCHEDULE_IMMEDIATE: '${SCHEDULE_IMMEDIATE}'
+      EXIT_AFTER_IMMEDIATES: '${EXIT_AFTER_IMMEDIATES}'
+    ports:
+      - 8082:8082
+    profiles:
+      - updater
+
   sis-updater-nats:
     <<: *defaults
-    command: '-cid sis-updater-nats -m 8222 -p 4222 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
+    command: '-cid sis-updater-nats -m 8222 -p 4222 --max_channels 1000 --max_age 2h --hb_fail_count 2 --hb_timeout 10s --hb_interval 10s --auth dev --file_slice_max_bytes 0 --file_slice_max_age 60s --max_msgs 0 -store file -dir datastore'
     container_name: sis-updater-nats
     image: nats-streaming:0.16.2
     profiles:
