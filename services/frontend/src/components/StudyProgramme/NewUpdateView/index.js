@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Button, Icon } from 'semantic-ui-react'
+import { Button, Icon, Loader } from 'semantic-ui-react'
 import { useUpdateBasicViewQuery, useUpdateStudytrackViewQuery } from '../../../redux/studyProgramme'
 
 const getStatusIcon = stats => {
+  if (stats.isLoading) return <Loader active />
   if (stats.isSuccess) return <Icon name="check" color="green" />
   if (stats.isError) return <Icon name="close" color="red" />
   return ''
@@ -18,14 +19,14 @@ const NewUpdateView = ({ studyprogramme }) => {
     <div className="update-view">
       <div className="button-container">
         <h4>Update data on Basic Information -view</h4>
-        <Button color="blue" onClick={() => setSkipBasic(false)}>
+        <Button disabled={basicstats.isLoading} color="blue" onClick={() => setSkipBasic(false)}>
           Update
         </Button>
         {getStatusIcon(basicstats)}
       </div>
       <div className="button-container">
         <h4>Update data on Populations and Studytracks -view</h4>
-        <Button color="blue" onClick={() => setSkipStudytrack()}>
+        <Button disabled={studytrackstats.isLoading} color="blue" onClick={() => setSkipStudytrack()}>
           Update
         </Button>
         {getStatusIcon(studytrackstats)}
