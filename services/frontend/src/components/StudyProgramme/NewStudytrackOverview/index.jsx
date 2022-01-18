@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Divider, Loader } from 'semantic-ui-react'
+import { Divider, Loader, Radio } from 'semantic-ui-react'
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
@@ -22,10 +22,19 @@ const creditTableTitles = [
   '> 150 credits',
 ]
 
+const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
+  <div className="radio-toggle">
+    <label className="toggle-label">{firstLabel}</label>
+    <Radio toggle checked={value} onChange={() => setValue(!value)} />
+    <label className="toggle-label">{secondLabel}</label>
+  </div>
+)
+
 const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const stats = useGetStudytrackStatsQuery({ id: studyprogramme })
   const [track, setTrack] = useState(studyprogramme)
+  const [transferred, setTransferred] = useState(false)
 
   useEffect(() => {
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {
@@ -54,6 +63,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
       ) : (
         <>
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
+          {getRadioButton('Exclude transferred students', 'Include transferred students', transferred, setTransferred)}
           {getDivider(
             `Students of ${
               track === '' || track === 'studyprogramme'
