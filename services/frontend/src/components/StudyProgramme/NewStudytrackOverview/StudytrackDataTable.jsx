@@ -51,14 +51,25 @@ const getRow = ({ yearlyData, array, show, setShow, singleTrack }) => {
   return null
 }
 
-const StudytrackDataTable = ({ allData, dataOfStudytrack, titles }) => {
+const StudytrackDataTable = ({ dataOfAllTracks, dataOfSingleTrack, titles }) => {
   const [show, setShow] = useState(false)
 
-  if (!allData && !dataOfStudytrack) return null
+  if (!dataOfAllTracks && !dataOfSingleTrack) return null
 
-  const sortedMainStats = Object.values(allData)
-    .reverse()
-    .sort((a, b) => a[0] - b[0])
+  const sortedMainStats = []
+  Object.values(dataOfAllTracks).forEach(arrays => {
+    if (arrays.length) {
+      const copy = [...arrays]
+      const sortedYear = copy.sort((a, b) => {
+        if (a[0] < b[0]) return 1
+        if (a[0] > b[0]) return -1
+        return 0
+      })
+      sortedMainStats.push(sortedYear.reverse())
+    }
+  })
+
+  sortedMainStats.reverse()
 
   return (
     <div className="datatable">
@@ -79,9 +90,9 @@ const StudytrackDataTable = ({ allData, dataOfStudytrack, titles }) => {
         </Table.Header>
 
         <Table.Body>
-          {dataOfStudytrack
-            ? dataOfStudytrack.map(array =>
-                getRow({ yearlyData: dataOfStudytrack, array, show, setShow, singleTrack: true })
+          {dataOfSingleTrack
+            ? dataOfSingleTrack.map(array =>
+                getRow({ yearlyData: dataOfSingleTrack, array, show, setShow, singleTrack: true })
               )
             : sortedMainStats?.map(yearlyData => yearlyData.map(array => getRow({ yearlyData, array, show, setShow })))}
         </Table.Body>
