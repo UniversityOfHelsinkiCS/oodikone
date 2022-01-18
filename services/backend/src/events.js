@@ -11,6 +11,7 @@ const {
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studyprogramme')
+const { updateBasicView, updateStudytrackView } = require('./services/studyprogrammeUpdates')
 const { findAndSaveTeachers } = require('./services/topteachers')
 const { setProductivity, setThroughput, patchProductivity, patchThroughput } = require('./services/analyticsService')
 const { isProduction } = require('./conf-backend')
@@ -65,6 +66,23 @@ const refreshOverview = async () => {
     logger.info(`${ready}/${codes.length} programmes done`)
   }
   logger.info('Throughput and productivity for programmes refreshed')
+}
+
+const refreshNewOverviews = async () => {
+  logger.info('Refreshing studyprogramme and studytrack overview statistics for all programmes')
+  const codes = (await getAllProgrammes()).map(p => p.code).filter(code => code.includes('KH') || code.includes('MH'))
+  let ready = 0
+  for (const code of codes) {
+    try {
+      await updateBasicView(code)
+      await updateStudytrackView(code)
+      ready += 1
+    } catch (e) {
+      logger.error({ message: `Failed to update overview stats for programme ${code}`, meta: e })
+    }
+    logger.info(`${ready}/${codes.length} programmes done`)
+  }
+  logger.info('Studyprogramme and studytrack overview stats refreshed!')
 }
 
 const refreshTeacherLeaderboard = async () => {
@@ -166,9 +184,10 @@ const refreshTrends = async () => {
 
 const startCron = () => {
   if (isProduction) {
+    logger.info('Cronjob for refreshing stats started: runs at 3am every day.')
     // refresh 3am every day
     schedule('0 3 * * *', async () => {
-      for (const func of [refreshStatistics, refreshTrends]) {
+      for (const func of [refreshStatistics, refreshTrends, refreshNewOverviews]) {
         await func()
       }
     })
