@@ -15,14 +15,13 @@ export const LanguageProvider = ({ children }) => {
     if (LANGUAGE_CODES.includes(user?.language)) {
       setState(user.language)
     }
-  }, [user])
+  }, [])
 
   return <LanguageContext.Provider value={[state, setState]}>{children}</LanguageContext.Provider>
 }
 
 export default () => {
   const [state, setState] = useContext(LanguageContext)
-
   const setLanguage = newLanguage => {
     if (!LANGUAGE_CODES.includes(newLanguage)) {
       throw new Error('Illegal language code passed to useLanguage hook!')

@@ -5,12 +5,12 @@ import { shape, string } from 'prop-types'
 import { getTextIn } from '../../../common'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import { useLanguage } from '../../../common/hooks'
+import useLanguage from '../../LanguagePicker/useLanguage'
 import { isCourseSelected, toggleCourseSelection } from '../../FilterView/filters/courses'
 import useFilters from '../../FilterView/useFilters'
 
 const PassFailRow = ({ courseStats }) => {
-  const language = useLanguage()
+  const { language } = useLanguage()
   const { useFilterSelector, filterDispatch } = useFilters()
   const { onGoToCourseStatisticsClick } = UsePopulationCourseContext()
   const { course, stats } = courseStats
