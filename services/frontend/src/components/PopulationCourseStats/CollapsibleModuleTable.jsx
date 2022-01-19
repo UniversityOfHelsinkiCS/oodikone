@@ -1,11 +1,11 @@
 import React from 'react'
 import { Table, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, number, instanceOf } from 'prop-types'
-import { useLanguage } from '../../common/hooks'
+import useLanguage from '../LanguagePicker/useLanguage'
 import { getTextIn } from '../../common'
 
 const CollapsibleModuleTable = ({ modules, emptyColSpan, children, expandedGroups, toggleGroupExpansion }) => {
-  const language = useLanguage()
+  const { language } = useLanguage()
 
   if (!modules) return null
 
