@@ -59,6 +59,7 @@ const StatusContainer = ({
   max1,
   showYearlyValues,
   showRelativeValues,
+  showCountingFrom,
   showByYear,
   showStudentCounts,
   clickable,
@@ -84,11 +85,31 @@ const StatusContainer = ({
   let yearlyValues = null
 
   if (showYearlyValues) {
-    yearlyValues = _.orderBy(Object.entries(stats.yearly), ([y]) => y, ['desc']).map(([year, yearStats]) => ({
-      label: showByYear ? year : `${year}-${`${Number(year) + 1}`.slice(-2)}`,
-      accumulated: showStudentCounts && stats.type === 'course' ? yearStats.accStudents : yearStats.acc,
-      total: showStudentCounts && stats.type === 'course' ? yearStats.totalStudents : yearStats.total,
-    }))
+    yearlyValues = _.chain(stats.yearly)
+      .toPairs()
+      .map(([year, stats]) => ({
+        dateRange: {
+          start: showByYear ? moment([year]).startOf('year') : moment([year]).month(7).date(1),
+          end: showByYear
+            ? moment([year]).startOf('year')
+            : moment([parseInt(year, 10) + 1])
+                .month(6)
+                .date(31),
+        },
+        stats,
+      }))
+      .filter(({ dateRange: { start } }) => moment(showCountingFrom).isSameOrAfter(start))
+      .orderBy(({ dateRange: { start } }) => start, ['desc'])
+      .map(({ dateRange, stats }) => ({
+        label: _.chain([dateRange.start, dateRange.end])
+          .map(date => date.year())
+          .uniq()
+          .join('-')
+          .value(),
+        accumulated: showStudentCounts && stats.type === 'course' ? stats.accStudents : stats.acc,
+        total: showStudentCounts && stats.type === 'course' ? stats.totalStudents : stats.total,
+      }))
+      .value()
   }
 
   return (
@@ -108,7 +129,7 @@ const StatusContainer = ({
 }
 
 const StatusContent = ({ data, settings }) => {
-  const { showByYear, showRelativeValues, showYearlyValues, showStudentCounts } = settings
+  const { showByYear, showRelativeValues, showYearlyValues, showStudentCounts, showCountingFrom } = settings
 
   return (
     <DrillStack
@@ -124,6 +145,7 @@ const StatusContent = ({ data, settings }) => {
           showRelativeValues={showRelativeValues}
           showYearlyValues={showYearlyValues}
           showStudentCounts={showStudentCounts}
+          showCountingFrom={showCountingFrom}
           min1={-2 * medianDiff}
           max1={2 * medianDiff}
           showByYear={showByYear}
