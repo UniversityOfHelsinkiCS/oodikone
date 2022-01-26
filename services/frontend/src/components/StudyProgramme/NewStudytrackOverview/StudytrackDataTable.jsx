@@ -1,39 +1,27 @@
 import React, { useState } from 'react'
 import { Icon, Table } from 'semantic-ui-react'
-import { Link } from 'react-router-dom'
-import moment from 'moment'
 
-const PopulationStatisticsLink = ({ studytrack, studyprogramme, year: yearLabel }) => {
-  const year = Number(yearLabel.slice(0, 4))
-  const months = Math.ceil(moment.duration(moment().diff(`${year}-08-01`)).asMonths())
-  const href = studytrack
-    ? `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%2C"studyTrack"%3A"${studytrack}"%7D&year=${year}`
-    : `/populations?months=${months}&semesters=FALL&semesters=` +
-      `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%7D&year=${year}`
-  return (
-    <Link title={`Population statistics of class ${yearLabel}`} to={href}>
-      <Icon name="level up alternate" />
-    </Link>
-  )
-}
+import PopulationLink from './PopulationLink'
 
 const getKey = year => `${year}-${Math.random()}`
 
 const getFirstCell = (yearlyData, year, show, studytrack, studyprogramme) => {
+  // No folding needed, since the year has only one row of data
   if (yearlyData.length === 1 || studytrack) {
     return (
       <Table.Cell key={getKey(year)}>
         {year}
-        <PopulationStatisticsLink studyprogramme={studyprogramme} studytrack={studytrack} year={year} />
+        <PopulationLink studyprogramme={studyprogramme} studytrack={studytrack} year={year} />
       </Table.Cell>
     )
   }
+
+  // Shows folding icon for showing or hiding studytrack data
   return (
     <Table.Cell key={getKey(year)}>
       <Icon name={`${show ? 'angle down' : 'angle right'}`} />
       {year}
-      <PopulationStatisticsLink studyprogramme={studyprogramme} year={year} />
+      <PopulationLink studyprogramme={studyprogramme} year={year} />
     </Table.Cell>
   )
 }
@@ -62,7 +50,7 @@ const getRow = ({ yearlyData, array, show, setShow, studytrack, studyprogramme }
           index === 0 && !studytrack ? (
             <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(array[0])}>
               {value}
-              <PopulationStatisticsLink studyprogramme={studyprogramme} studytrack={studytrack} year={year} />
+              <PopulationLink studyprogramme={studyprogramme} studytrack={studytrack} year={year} />
             </Table.Cell>
           ) : (
             <Table.Cell textAlign="left" key={getKey(array[0])}>
