@@ -48,7 +48,7 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studyt
       )
 
       // All the stats are counted for the students who actually started studying
-      const all = await allStudyrights(track, startDate, studentnumbers)
+      const all = await allStudyrights(track, studentnumbers)
       const allStudentnumbers = [...new Set(all.map(s => s.studentnumber))]
       const students = await studytrackStudents(allStudentnumbers)
       const studentData = getStudentData(students)
@@ -90,14 +90,14 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studyt
           getPercentage(all.length, all.length),
           started.length,
           getPercentage(started.length, all.length),
+          graduated.length,
+          getPercentage(graduated.length, all.length),
           studentData.male,
           getPercentage(studentData.male, all.length),
           studentData.female,
           getPercentage(studentData.female, all.length),
           studentData.finnish,
           getPercentage(studentData.finnish, all.length),
-          graduated.length,
-          getPercentage(graduated.length, all.length),
         ],
       ]
 
@@ -110,14 +110,14 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studyt
           getPercentage(all.length, all.length),
           started.length,
           getPercentage(started.length, all.length),
+          graduated.length,
+          getPercentage(graduated.length, all.length),
           studentData.male,
           getPercentage(studentData.male, all.length),
           studentData.female,
           getPercentage(studentData.female, all.length),
           studentData.finnish,
           getPercentage(studentData.finnish, all.length),
-          graduated.length,
-          getPercentage(graduated.length, all.length),
         ],
       ]
     })
