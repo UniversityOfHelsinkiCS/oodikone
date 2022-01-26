@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Divider, Loader, Radio } from 'semantic-ui-react'
+
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
@@ -73,7 +74,8 @@ const StudytrackOverview = ({ studyprogramme }) => {
             'StudytrackOverview'
           )}
           <StudytrackDataTable
-            track={track || studyprogramme}
+            studyprogramme={studyprogramme}
+            studytrack={track !== studyprogramme && track}
             titles={populationTitles}
             dataOfAllTracks={stats?.data?.mainStatsByYear}
             dataOfSingleTrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
