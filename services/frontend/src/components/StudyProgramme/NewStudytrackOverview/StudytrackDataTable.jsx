@@ -5,36 +5,40 @@ import PopulationLink from './PopulationLink'
 
 const getKey = year => `${year}-${Math.random()}`
 
-const getFirstCell = (yearlyData, year, show, studytrack, studyprogramme) => {
-  // No folding needed, since the year has only one row of data
-  if (yearlyData.length === 1 || studytrack) {
-    return (
-      <Table.Cell key={getKey(year)}>
-        {year}
-        <PopulationLink studyprogramme={studyprogramme} studytrack={studytrack} year={year} />
-      </Table.Cell>
-    )
-  }
-
-  // Shows folding icon for showing or hiding studytrack data
+const getFirstCell = (yearlyData, year, show, studyprogramme) => {
   return (
     <Table.Cell key={getKey(year)}>
-      <Icon name={`${show ? 'angle down' : 'angle right'}`} />
+      {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
       <PopulationLink studyprogramme={studyprogramme} year={year} />
     </Table.Cell>
   )
 }
 
-const getRow = ({ yearlyData, array, show, setShow, studytrack, studyprogramme }) => {
+const getSingleTrackRow = ({ yearlyData, row, studyprogramme }) => {
+  const year = yearlyData && yearlyData[0] && yearlyData[0][0]
+  return (
+    <Table.Row key={getKey(row[0])} className="regular-row">
+      {row.map((value, index) => (
+        <Table.Cell textAlign="left" key={getKey(row[0])}>
+          {value}
+          {index === 0 && <PopulationLink studyprogramme={studyprogramme} year={year} />}
+        </Table.Cell>
+      ))}
+    </Table.Row>
+  )
+}
+
+const getRow = ({ yearlyData, row, show, setShow, studyprogramme }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
 
-  if (array[0].includes('20') && !studytrack) {
+  // Get row for the studyprogramme
+  if (row[0].includes('20')) {
     return (
-      <Table.Row key={getKey(array[0])} className="header-row" onClick={() => setShow(!show)}>
-        {array.map((value, index) =>
+      <Table.Row key={getKey(row[0])} className="header-row" onClick={() => setShow(!show)}>
+        {row.map((value, index) =>
           index === 0 ? (
-            getFirstCell(yearlyData, array[0], show, studytrack, studyprogramme)
+            getFirstCell(yearlyData, row[0], show, studyprogramme)
           ) : (
             <Table.Cell textAlign="left">{value}</Table.Cell>
           )
@@ -43,17 +47,18 @@ const getRow = ({ yearlyData, array, show, setShow, studytrack, studyprogramme }
     )
   }
 
-  if (show || studytrack) {
+  // Get row for any possible studytrack under the header studyprogramme row, if they are folded open
+  if (show) {
     return (
-      <Table.Row key={getKey(array[0])} className="regular-row">
-        {array.map((value, index) =>
-          index === 0 && !studytrack ? (
-            <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(array[0])}>
+      <Table.Row key={getKey(row[0])} className="regular-row">
+        {row.map((value, index) =>
+          index === 0 ? (
+            <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(row[0])}>
               {value}
-              <PopulationLink studyprogramme={studyprogramme} studytrack={studytrack} year={year} />
+              <PopulationLink studyprogramme={studyprogramme} year={year} />
             </Table.Cell>
           ) : (
-            <Table.Cell textAlign="left" key={getKey(array[0])}>
+            <Table.Cell textAlign="left" key={getKey(row[0])}>
               {value}
             </Table.Cell>
           )
@@ -65,7 +70,7 @@ const getRow = ({ yearlyData, array, show, setShow, studytrack, studyprogramme }
   return null
 }
 
-const StudytrackDataTable = ({ studyprogramme, dataOfAllTracks, studytrack, dataOfSingleTrack, titles }) => {
+const StudytrackDataTable = ({ studyprogramme, dataOfAllTracks, singleTrack, dataOfSingleTrack, titles }) => {
   const [show, setShow] = useState(false)
 
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
@@ -104,12 +109,10 @@ const StudytrackDataTable = ({ studyprogramme, dataOfAllTracks, studytrack, data
         </Table.Header>
 
         <Table.Body>
-          {studytrack
-            ? dataOfSingleTrack.map(array =>
-                getRow({ yearlyData: dataOfSingleTrack, array, show, setShow, studyprogramme, studytrack })
-              )
+          {singleTrack
+            ? dataOfSingleTrack.map(row => getSingleTrackRow({ yearlyData: dataOfSingleTrack, row, studyprogramme }))
             : sortedMainStats?.map(yearlyData =>
-                yearlyData.map(array => getRow({ yearlyData, array, show, setShow, studyprogramme, studytrack }))
+                yearlyData.map(row => getRow({ yearlyData, row, studyprogramme, show, setShow }))
               )}
         </Table.Body>
       </Table>
