@@ -32,9 +32,9 @@ const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
 
 const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
-  const stats = useGetStudytrackStatsQuery({ id: studyprogramme })
-  const [track, setTrack] = useState(studyprogramme)
   const [transferred, setTransferred] = useState(false)
+  const [track, setTrack] = useState(studyprogramme)
+  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, transferred })
 
   useEffect(() => {
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {

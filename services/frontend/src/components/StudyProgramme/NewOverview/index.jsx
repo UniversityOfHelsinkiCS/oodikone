@@ -26,12 +26,13 @@ const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
 
 const Overview = ({ studyprogramme }) => {
   const [academicYear, setAcademicYear] = useState(false)
+  const [transferred, setTransferred] = useState(false)
   const [showMeanTime, setShowMeanTime] = useState(true)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const basics = useGetBasicStatsQuery({ id: studyprogramme, yearType })
-  const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType })
-  const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType })
+  const basics = useGetBasicStatsQuery({ id: studyprogramme, yearType, transferred })
+  const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType, transferred })
+  const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, transferred })
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -50,6 +51,7 @@ const Overview = ({ studyprogramme }) => {
         </p>
       </div>
       {getRadioButton('kalenterivuosi', 'lukuvuosi', academicYear, setAcademicYear)}
+      {getRadioButton('Exclude transferred students', 'Include transferred students', transferred, setTransferred)}
       {basics.isLoading || credits.isLoading || graduations.isLoading ? (
         <Loader active={basics.isLoading || credits.isLoading || graduations.isLoading} />
       ) : (
