@@ -11,7 +11,7 @@ import StudytrackSelector from './StudytrackSelector'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const populationTitles = ['', 'All', 'Started', 'Men', 'Women', 'Finnish', 'Graduated']
+const populationTitles = ['', 'All', 'Started', 'Graduated', 'Men', 'Women', 'Finnish']
 const creditTableTitles = [
   '',
   'All started',
