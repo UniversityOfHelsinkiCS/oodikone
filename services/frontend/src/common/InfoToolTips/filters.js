@@ -6,7 +6,8 @@ export default {
   },
   transferred: {
     label: 'Include and exclude students from this program',
-    short: 'Mahdollisuus suodattaa opiskelijat, jotka ovat siirtyneet tutkinto-ohjelmaan',
+    short:
+      'Mahdollisuus suodattaa opiskelijat, jotka ovat siirtyneet nykyiseen 2017 alkaneeseen tutkinto-ohjelmaan vanhasta tutkinto-ohjelmasta',
   },
   courseCredits: {
     label: null,
