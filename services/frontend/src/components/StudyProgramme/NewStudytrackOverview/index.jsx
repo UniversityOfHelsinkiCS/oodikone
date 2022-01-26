@@ -54,11 +54,6 @@ const StudytrackOverview = ({ studyprogramme }) => {
 
   return (
     <div className="studytrack-overview">
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '10px' }}>
-        <p style={{ color: 'red' }}>
-          Please note that this view is still very much a work in progress. This view is only visible to some admins.
-        </p>
-      </div>
       {stats.isLoading ? (
         <Loader active={stats.isLoading} />
       ) : (
