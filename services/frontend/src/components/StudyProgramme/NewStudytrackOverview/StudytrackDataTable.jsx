@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Icon, Table } from 'semantic-ui-react'
+import * as _ from 'lodash'
 
 import PopulationLink from './PopulationLink'
 
@@ -15,21 +16,21 @@ const getFirstCell = (yearlyData, year, show, studyprogramme) => {
   )
 }
 
-const getSingleTrackRow = ({ yearlyData, row, studyprogramme }) => {
+const getSingleTrackRow = ({ yearlyData, row, studyprogramme, code }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
       {row.map((value, index) => (
         <Table.Cell textAlign="left" key={getKey(row[0])}>
           {value}
-          {index === 0 && <PopulationLink studyprogramme={studyprogramme} year={year} />}
+          {index === 0 && <PopulationLink studyprogramme={studyprogramme} year={year} studytrack={code} />}
         </Table.Cell>
       ))}
     </Table.Row>
   )
 }
 
-const getRow = ({ yearlyData, row, show, setShow, studyprogramme }) => {
+const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
 
   // Get row for the studyprogramme
@@ -54,8 +55,12 @@ const getRow = ({ yearlyData, row, show, setShow, studyprogramme }) => {
         {row.map((value, index) =>
           index === 0 ? (
             <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(row[0])}>
-              {value}
-              <PopulationLink studyprogramme={studyprogramme} year={year} />
+              {value} {_.findKey(studytracks, value)}
+              <PopulationLink
+                studyprogramme={studyprogramme}
+                year={year}
+                studytrack={_.findKey(studytracks, s => s === value)}
+              />
             </Table.Cell>
           ) : (
             <Table.Cell textAlign="left" key={getKey(row[0])}>
@@ -70,7 +75,14 @@ const getRow = ({ yearlyData, row, show, setShow, studyprogramme }) => {
   return null
 }
 
-const StudytrackDataTable = ({ studyprogramme, dataOfAllTracks, singleTrack, dataOfSingleTrack, titles }) => {
+const StudytrackDataTable = ({
+  studyprogramme,
+  dataOfAllTracks,
+  studytracks,
+  singleTrack,
+  dataOfSingleTrack,
+  titles,
+}) => {
   const [show, setShow] = useState(false)
 
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
@@ -110,9 +122,11 @@ const StudytrackDataTable = ({ studyprogramme, dataOfAllTracks, singleTrack, dat
 
         <Table.Body>
           {singleTrack
-            ? dataOfSingleTrack.map(row => getSingleTrackRow({ yearlyData: dataOfSingleTrack, row, studyprogramme }))
+            ? dataOfSingleTrack.map(row =>
+                getSingleTrackRow({ yearlyData: dataOfSingleTrack, row, studyprogramme, code: singleTrack })
+              )
             : sortedMainStats?.map(yearlyData =>
-                yearlyData.map(row => getRow({ yearlyData, row, studyprogramme, show, setShow }))
+                yearlyData.map(row => getRow({ yearlyData, row, studyprogramme, show, setShow, studytracks }))
               )}
         </Table.Body>
       </Table>
