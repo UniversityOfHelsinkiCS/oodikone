@@ -70,7 +70,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
           )}
           <StudytrackDataTable
             studyprogramme={studyprogramme}
-            studytrack={track !== studyprogramme && track}
+            singleTrack={track && track !== studyprogramme}
             titles={populationTitles}
             dataOfAllTracks={stats?.data?.mainStatsByYear}
             dataOfSingleTrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
