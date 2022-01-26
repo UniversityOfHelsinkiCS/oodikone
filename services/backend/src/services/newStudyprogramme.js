@@ -111,7 +111,7 @@ const enrolledStudyrights = async studytrack => {
   return enrollments
 }
 
-const allStudyrights = async (studytrack, since, studentnumbers) =>
+const allStudyrights = async (studytrack, studentnumbers) =>
   (
     await Studyright.findAll({
       include: [
