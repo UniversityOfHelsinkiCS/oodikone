@@ -7,15 +7,19 @@ const LanguageContext = createContext([[], () => {}])
 LanguageContext.displayName = 'Language'
 
 export const LanguageProvider = ({ children }) => {
-  const [state, setState] = useState(LANGUAGE_CODES[0])
+  let language = 'fi'
+  const [state, setState] = useState(language)
   const user = useGetAuthorizedUserQuery()
+  if (user) {
+    language = user.language
+  }
 
   // Load selected language.
   useEffect(() => {
     if (LANGUAGE_CODES.includes(user?.language)) {
       setState(user.language)
     }
-  }, [])
+  }, [language])
 
   return <LanguageContext.Provider value={[state, setState]}>{children}</LanguageContext.Provider>
 }
