@@ -10,7 +10,7 @@ const {
   getYearsObject,
   creditThresholds,
 } = require('./studyprogrammeHelpers')
-const { studytrackStudents, startedStudyrights, graduatedStudyRights } = require('./newStudyprogramme')
+const { studytrackStudents, allStudyrights, startedStudyrights, graduatedStudyRights } = require('./newStudyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
 
 const getStudentData = students => {
@@ -48,14 +48,15 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studyt
       )
 
       // All the stats are counted for the students who actually started studying
-      const started = await startedStudyrights(track, startDate, studentnumbers)
-      const startedStudentnumbers = [...new Set(started.map(s => s.studentnumber))]
-      const students = await studytrackStudents(startedStudentnumbers)
+      const all = await allStudyrights(track, studentnumbers)
+      const allStudentnumbers = [...new Set(all.map(s => s.studentnumber))]
+      const students = await studytrackStudents(allStudentnumbers)
       const studentData = getStudentData(students)
+      const started = await startedStudyrights(track, startDate, studentnumbers)
       const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
-      if (started.length === 0) {
+      if (all.length === 0) {
         emptyTracks.has(track) ? emptyTracks.set(track, emptyTracks.get(track) + 1) : emptyTracks.set(track, 1)
         return
       }
@@ -70,7 +71,7 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studyt
         ...creditTableStats[track],
         [
           `${year} - ${year + 1}`,
-          started.length,
+          all.length,
           studentData.lte30,
           studentData.lte60,
           studentData.lte90,
@@ -85,16 +86,18 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studyt
         ...mainStatsByTrack[track],
         [
           `${year} - ${year + 1}`,
+          all.length,
+          getPercentage(all.length, all.length),
           started.length,
-          getPercentage(started.length, started.length),
-          studentData.male,
-          getPercentage(studentData.male, started.length),
-          studentData.female,
-          getPercentage(studentData.female, started.length),
-          studentData.finnish,
-          getPercentage(studentData.finnish, started.length),
+          getPercentage(started.length, all.length),
           graduated.length,
-          getPercentage(graduated.length, started.length),
+          getPercentage(graduated.length, all.length),
+          studentData.male,
+          getPercentage(studentData.male, all.length),
+          studentData.female,
+          getPercentage(studentData.female, all.length),
+          studentData.finnish,
+          getPercentage(studentData.finnish, all.length),
         ],
       ]
 
@@ -103,16 +106,18 @@ const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studyt
         ...mainStatsByYear[year],
         [
           studytrackNames[track]?.name['fi'] || `${year} - ${year + 1}`,
+          all.length,
+          getPercentage(all.length, all.length),
           started.length,
-          getPercentage(started.length, started.length),
-          studentData.male,
-          getPercentage(studentData.male, started.length),
-          studentData.female,
-          getPercentage(studentData.female, started.length),
-          studentData.finnish,
-          getPercentage(studentData.finnish, started.length),
+          getPercentage(started.length, all.length),
           graduated.length,
-          getPercentage(graduated.length, started.length),
+          getPercentage(graduated.length, all.length),
+          studentData.male,
+          getPercentage(studentData.male, all.length),
+          studentData.female,
+          getPercentage(studentData.female, all.length),
+          studentData.finnish,
+          getPercentage(studentData.finnish, all.length),
         ],
       ]
     })

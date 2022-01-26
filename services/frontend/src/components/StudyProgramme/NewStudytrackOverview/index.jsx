@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Divider, Loader } from 'semantic-ui-react'
+import { Divider, Loader, Radio } from 'semantic-ui-react'
+
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
@@ -10,7 +11,7 @@ import StudytrackSelector from './StudytrackSelector'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const populationTitles = ['', 'All started', 'Men', 'Women', 'Finnish', 'Graduated']
+const populationTitles = ['', 'All', 'Started', 'Graduated', 'Men', 'Women', 'Finnish']
 const creditTableTitles = [
   '',
   'All started',
@@ -22,10 +23,19 @@ const creditTableTitles = [
   '> 150 credits',
 ]
 
+const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
+  <div className="radio-toggle">
+    <label className="toggle-label">{firstLabel}</label>
+    <Radio toggle checked={value} onChange={() => setValue(!value)} />
+    <label className="toggle-label">{secondLabel}</label>
+  </div>
+)
+
 const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
-  const stats = useGetStudytrackStatsQuery({ id: studyprogramme })
+  const [transferred, setTransferred] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
+  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, transferred })
 
   useEffect(() => {
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {
@@ -44,16 +54,12 @@ const StudytrackOverview = ({ studyprogramme }) => {
 
   return (
     <div className="studytrack-overview">
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '10px' }}>
-        <p style={{ color: 'red' }}>
-          Please note that this view is still very much a work in progress. This view is only visible to some admins.
-        </p>
-      </div>
       {stats.isLoading ? (
         <Loader active={stats.isLoading} />
       ) : (
         <>
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
+          {getRadioButton('Exclude transferred students', 'Include transferred students', transferred, setTransferred)}
           {getDivider(
             `Students of ${
               track === '' || track === 'studyprogramme'
@@ -63,7 +69,9 @@ const StudytrackOverview = ({ studyprogramme }) => {
             'StudytrackOverview'
           )}
           <StudytrackDataTable
-            track={track || studyprogramme}
+            studyprogramme={studyprogramme}
+            singleTrack={track !== studyprogramme && track}
+            studytracks={stats?.data?.studytrackOptions}
             titles={populationTitles}
             dataOfAllTracks={stats?.data?.mainStatsByYear}
             dataOfSingleTrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
