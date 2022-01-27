@@ -16,6 +16,7 @@ const {
   REDIS_LAST_HOURLY_SCHEDULE,
   REDIS_LATEST_MESSAGE_RECEIVED,
   LATEST_MESSAGE_RECEIVED_THRESHOLD,
+  ENABLE_WORKER_REPORTING,
 } = require('./config')
 const { startPrePurge, startPurge } = require('./purge')
 const { logger } = require('./utils/logger')
@@ -37,6 +38,11 @@ const IMPORTER_TABLES = {
 const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
   const redisKey = type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
   await redisIncrementBy(redisKey, entityIds.length)
+
+  if (!ENABLE_WORKER_REPORTING) {
+    stan.publish(channel, JSON.stringify({ entityIds, type }))
+    return
+  }
 
   const id = uuid.v4()
 

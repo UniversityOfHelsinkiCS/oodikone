@@ -3,7 +3,13 @@ const { logger } = require('./utils/logger')
 const { set: redisSet } = require('./utils/redis')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { stan } = require('./utils/stan')
-const { isDev, REDIS_LAST_WEEKLY_SCHEDULE, REDIS_LAST_HOURLY_SCHEDULE } = require('./config')
+const {
+  isDev,
+  REDIS_LAST_WEEKLY_SCHEDULE,
+  REDIS_LAST_HOURLY_SCHEDULE,
+  EXIT_AFTER_IMMEDIATES,
+  SCHEDULE_IMMEDIATE,
+} = require('./config')
 const { startServer } = require('./server')
 const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
 
@@ -46,18 +52,11 @@ const scheduleJob = async type => {
   logger.info(`Job '${type}' finished.`)
 }
 
-const runImmediates = async () => {
-  const jobs = (process.env.SCHEDULE_IMMEDIATE || 'none').split(',')
-  await Promise.all(jobs.map(scheduleJob))
-}
-
 const handleImmediates = async () => {
-  const exit = process.env.EXIT_AFTER_IMMEDIATES === 'yes'
-
   try {
-    await runImmediates()
+    await Promise.all(SCHEDULE_IMMEDIATE.map(scheduleJob))
 
-    if (exit) {
+    if (EXIT_AFTER_IMMEDIATES) {
       process.exit(0)
     }
   } catch (e) {
@@ -66,7 +65,7 @@ const handleImmediates = async () => {
       meta: e.stack,
     })
 
-    if (exit) {
+    if (EXIT_AFTER_IMMEDIATES) {
       process.exit(1)
     }
   }
