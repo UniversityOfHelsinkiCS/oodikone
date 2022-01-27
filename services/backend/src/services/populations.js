@@ -524,7 +524,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   // fetch students that have transferred to the programme and filter out these studentnumbers
-  if (!transferredToStudents) {
+  if (transferredToStudents) {
     const transfersTo = (
       await Transfer.findAll({
         attributes: ['studentnumber'],
