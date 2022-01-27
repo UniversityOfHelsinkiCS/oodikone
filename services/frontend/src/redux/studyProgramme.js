@@ -3,13 +3,16 @@ import { RTKApi } from 'apiConnection'
 const studyprogrammeApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
     getBasicStats: builder.query({
-      query: ({ id, yearType }) => `/v2/studyprogrammes/${id}/basicstats?year_type=${yearType}`,
+      query: ({ id, yearType, specialGroups }) =>
+        `/v2/studyprogrammes/${id}/basicstats?year_type=${yearType}&special_groups=${specialGroups}`,
     }),
     getCreditStats: builder.query({
-      query: ({ id, yearType }) => `/v2/studyprogrammes/${id}/creditstats?year_type=${yearType}`,
+      query: ({ id, yearType, specialGroups }) =>
+        `/v2/studyprogrammes/${id}/creditstats?year_type=${yearType}&special_groups=${specialGroups}`,
     }),
     getGraduationStats: builder.query({
-      query: ({ id, yearType }) => `/v2/studyprogrammes/${id}/graduationstats?year_type=${yearType}`,
+      query: ({ id, yearType, specialGroups }) =>
+        `/v2/studyprogrammes/${id}/graduationstats?year_type=${yearType}&special_groups=${specialGroups}`,
     }),
     getStudytrackStats: builder.query({
       query: ({ id, specialGroups }) => `/v2/studyprogrammes/${id}/studytrackstats?special_groups=${specialGroups}`,

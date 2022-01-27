@@ -191,15 +191,16 @@ const getGraduationTimeStats = async (studytrack, since, years, isAcademicYear) 
   return { medians, means, graduationAmounts }
 }
 
-const getBasicStatsForStudytrack = async ({ studyprogramme, yearType }) => {
+const getBasicStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const special = specialGroups === 'SPECIAL_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const started = await getStartedStats(studyprogramme, since, years, isAcademicYear)
-  const graduated = await getGraduatedStats(studyprogramme, since, years, isAcademicYear)
-  const cancelled = await getCancelledStats(studyprogramme, since, years, isAcademicYear)
-  const transferredAway = await getTransferredAwayStats(studyprogramme, since, years, isAcademicYear)
-  const transferredTo = await getTransferredToStats(studyprogramme, since, years, isAcademicYear)
+  const started = await getStartedStats(studyprogramme, since, years, isAcademicYear, special)
+  const graduated = await getGraduatedStats(studyprogramme, since, years, isAcademicYear, special)
+  const cancelled = await getCancelledStats(studyprogramme, since, years, isAcademicYear, special)
+  const transferredAway = await getTransferredAwayStats(studyprogramme, since, years, isAcademicYear, special)
+  const transferredTo = await getTransferredToStats(studyprogramme, since, years, isAcademicYear, special)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const tableStats = reversedYears.map(year => [
@@ -240,12 +241,13 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, yearType }) => {
   }
 }
 
-const getCreditStatsForStudytrack = async ({ studyprogramme, yearType }) => {
+const getCreditStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const special = specialGroups === 'SPECIAL_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const { majors, nonMajors } = await getRegularCreditStats(studyprogramme, since, years, isAcademicYear)
-  const transferred = await getTransferredCreditStats(studyprogramme, since, years, isAcademicYear)
+  const { majors, nonMajors } = await getRegularCreditStats(studyprogramme, since, years, isAcademicYear, special)
+  const transferred = await getTransferredCreditStats(studyprogramme, since, years, isAcademicYear, special)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const tableStats = reversedYears.map(year => [
@@ -277,13 +279,14 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType }) => {
   }
 }
 
-const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType }) => {
+const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const special = specialGroups === 'SPECIAL_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-  const thesis = await getThesisStats(studyprogramme, since, years, isAcademicYear)
-  const graduated = await getGraduatedStats(studyprogramme, since, years, isAcademicYear)
-  const graduationTimeStats = await getGraduationTimeStats(studyprogramme, since, years, isAcademicYear)
+  const thesis = await getThesisStats(studyprogramme, since, years, isAcademicYear, special)
+  const graduated = await getGraduatedStats(studyprogramme, since, years, isAcademicYear, special)
+  const graduationTimeStats = await getGraduationTimeStats(studyprogramme, since, years, isAcademicYear, special)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
