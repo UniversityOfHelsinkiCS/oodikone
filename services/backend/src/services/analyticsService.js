@@ -6,7 +6,7 @@ const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
 const createRedisKeyForBasicStats = (id, yearType) => `BASIC_STATS_${id}_${yearType}`
 const createRedisKeyForCreditStats = (id, yearType) => `CREDIT_STATS_${id}_${yearType}`
 const createRedisKeyForGraduationStats = (id, yearType) => `GRADUATION_STATS_${id}_${yearType}`
-const createRedisKeyForStudytrackStats = id => `STUDYTRACK_STATS_${id}`
+const createRedisKeyForStudytrackStats = (id, specialGroups) => `STUDYTRACK_STATS_${id}_${specialGroups}`
 
 const getProductivity = async id => {
   const redisKey = createRedisKeyForProductivity(id)
@@ -151,16 +151,16 @@ const setGraduationStats = async (data, yearType) => {
   return dataToRedis
 }
 
-const getStudytrackStats = async id => {
-  const redisKey = createRedisKeyForStudytrackStats(id)
+const getStudytrackStats = async (id, specialGroups) => {
+  const redisKey = createRedisKeyForStudytrackStats(id, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setStudytrackStats = async data => {
+const setStudytrackStats = async (data, specialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForStudytrackStats(id)
+  const redisKey = createRedisKeyForStudytrackStats(id, specialGroups)
   const dataToRedis = {
     ...data,
     status: 'DONE',

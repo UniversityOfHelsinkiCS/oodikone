@@ -33,15 +33,15 @@ const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
 
 const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
-  const [transferred, setTransferred] = useState(false)
+  const [specialGroups, setSpecialGroups] = useState(true)
   const [track, setTrack] = useState(studyprogramme)
-  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, transferred })
+  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, specialGroups })
 
   useEffect(() => {
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {
       setTrack(studyprogramme)
     }
-  }, [studyprogramme, track, stats])
+  }, [studyprogramme, track, stats, specialGroups])
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -59,7 +59,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
       ) : (
         <>
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
-          {getRadioButton('Exclude transferred students', 'Include transferred students', transferred, setTransferred)}
+          {getRadioButton('Major students', 'All students', specialGroups, setSpecialGroups)}
           {getDivider(
             `Students of ${
               track === '' || track === 'studyprogramme'

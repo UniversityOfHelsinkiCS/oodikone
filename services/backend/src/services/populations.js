@@ -363,8 +363,9 @@ const studentnumbersWithAllStudyrightElements = async (
   exchangeStudents,
   cancelledStudents,
   nondegreeStudents,
-  transferredStudents,
-  tag
+  transferredOutStudents,
+  tag,
+  transferredToStudents
 ) => {
   // eslint-disable-line
 
@@ -497,11 +498,11 @@ const studentnumbersWithAllStudyrightElements = async (
     return studyRights.includes(newestStudytrack.code)
   })
 
-  const studentnumberlist = filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
+  let studentnumberlist = filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
 
   // fetch students that have transferred out of the programme and filter out these studentnumbers
-  if (!transferredStudents) {
-    const transferredOutStudents = (
+  if (!transferredOutStudents) {
+    const transfersOut = (
       await Transfer.findAll({
         attributes: ['studentnumber'],
         where: {
@@ -519,8 +520,29 @@ const studentnumbersWithAllStudyrightElements = async (
       })
     ).map(s => s.studentnumber)
 
-    const notTransferredStudents = studentnumberlist.filter(sn => !transferredOutStudents.includes(sn))
-    return notTransferredStudents
+    studentnumberlist = studentnumberlist.filter(sn => !transfersOut.includes(sn))
+  }
+
+  // fetch students that have transferred to the programme and filter out these studentnumbers
+  if (!transferredToStudents) {
+    const transfersTo = (
+      await Transfer.findAll({
+        attributes: ['studentnumber'],
+        where: {
+          targetcode: {
+            [Op.in]: studyRights,
+          },
+          transferdate: {
+            [Op.gt]: startDate,
+          },
+          studentnumber: {
+            [Op.in]: studentnumberlist,
+          },
+        },
+        raw: true,
+      })
+    ).map(s => s.studentnumber)
+    studentnumberlist = studentnumberlist.filter(sn => !transfersTo.includes(sn))
   }
 
   return studentnumberlist
