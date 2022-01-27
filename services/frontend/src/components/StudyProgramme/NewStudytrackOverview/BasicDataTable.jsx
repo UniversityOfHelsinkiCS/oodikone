@@ -7,6 +7,15 @@ const DataTable = ({ data, titles, track }) => {
   if (!data || !data[track]?.length || !titles)
     return <NoDataMessage message="No progress data found for the studytrack. Try with another studytrack" />
 
+  const copy = [...data[track]]
+  const sortedData = copy.sort((a, b) => {
+    if (a[0] < b[0]) return -1
+    if (a[0] > b[0]) return 1
+    return 0
+  })
+
+  sortedData.reverse()
+
   return (
     <div className="table-container">
       <Table compact celled>
@@ -19,7 +28,7 @@ const DataTable = ({ data, titles, track }) => {
         </Table.Header>
 
         <Table.Body>
-          {data[track].map(array => (
+          {sortedData.map(array => (
             <Table.Row key={`random-year-key-${Math.random()}`}>
               {array.map(value => (
                 <Table.Cell key={`random-key-${Math.random()}`}>{value}</Table.Cell>
