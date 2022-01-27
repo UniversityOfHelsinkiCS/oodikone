@@ -56,29 +56,29 @@ const getStudytrackDataForTheYear = async ({
 
       let studentnumbers = []
       if (special) {
-        studentnumbers = await studentnumbersWithAllStudyrightElements({
-          studyRights: codes,
-          startDate,
-          endDate,
-        })
-      } else {
-        const {
-          exchangeStudents,
-          cancelledStudents,
-          nondegreeStudents,
-          transferredOutStudents,
-          transferredToStudents,
-        } = false
-        studentnumbers = await studentnumbersWithAllStudyrightElements({
+        studentnumbers = await studentnumbersWithAllStudyrightElements(
           codes,
           startDate,
           endDate,
-          exchangeStudents,
-          cancelledStudents,
-          nondegreeStudents,
-          transferredOutStudents,
-          transferredToStudents,
-        })
+          true,
+          true,
+          true,
+          true,
+          null,
+          true
+        )
+      } else {
+        studentnumbers = await studentnumbersWithAllStudyrightElements(
+          codes,
+          startDate,
+          endDate,
+          false,
+          false,
+          false,
+          false,
+          null,
+          false
+        )
       }
 
       // All the stats are counted for the students who actually started studying

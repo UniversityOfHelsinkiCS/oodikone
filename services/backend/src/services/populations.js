@@ -356,17 +356,17 @@ const getEarliestYear = async (studentnumberlist, studyRights) => {
   return Math.min(...startyears)
 }
 
-const studentnumbersWithAllStudyrightElements = async ({
+const studentnumbersWithAllStudyrightElements = async (
   studyRights,
   startDate,
   endDate,
-  exchangeStudents = true,
-  cancelledStudents = true,
-  nondegreeStudents = true,
-  transferredOutStudents = true,
-  transferredToStudents = true,
+  exchangeStudents,
+  cancelledStudents,
+  nondegreeStudents,
+  transferredOutStudents,
   tag,
-}) => {
+  transferredToStudents
+) => {
   // eslint-disable-line
 
   // db startdate is formatted to utc so need to change it when querying
@@ -787,15 +787,15 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
 
   const studentnumbers = studentnumberlist
     ? studentnumberlist
-    : await studentnumbersWithAllStudyrightElements({
+    : await studentnumbersWithAllStudyrightElements(
         studyRights,
-        startDate: formattedStartDate,
+        formattedStartDate,
         endDate,
         exchangeStudents,
         cancelledStudents,
         nondegreeStudents,
-        transferredOutStudents: transferredStudents,
-      })
+        transferredStudents
+      )
   // wtf
   // plz
   const code = studyRights[0] || ''
@@ -907,16 +907,16 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE or TRANSFERRED' }
     }
     if (query.selectedStudents) {
-      const allStudents = await studentnumbersWithAllStudyrightElements({
+      const allStudents = await studentnumbersWithAllStudyrightElements(
         studyRights,
         startDate,
         endDate,
         exchangeStudents,
         cancelledStudents,
         nondegreeStudents,
-        transferredOutStudents: transferredStudents,
-        tag: query.tag,
-      })
+        transferredStudents,
+        query.tag
+      )
       const disallowedRequest = checkThatSelectedStudentsAreUnderRequestedStudyright(
         query.selectedStudents,
         allStudents
@@ -941,16 +941,16 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       } = params
       const studentnumbers =
         selectedStudents ||
-        (await studentnumbersWithAllStudyrightElements({
+        (await studentnumbersWithAllStudyrightElements(
           studyRights,
           startDate,
           endDate,
           exchangeStudents,
           cancelledStudents,
           nondegreeStudents,
-          transferredOutStudents: transferredStudents,
-          tag,
-        }))
+          transferredStudents,
+          tag
+        ))
 
       const allstudents = studentnumbers.reduce((numbers, num) => {
         numbers[num] = true
