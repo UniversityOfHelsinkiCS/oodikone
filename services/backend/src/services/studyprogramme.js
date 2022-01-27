@@ -270,15 +270,11 @@ const productivityStatsForStudytrack = async (studytrack, since) => {
   const endDate = `${moment(new Date(), 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
   // This includes ALL students: exchange students, the ones that have transferred to program, the ones
   // with non-degree studyright and the ones that have cancelled their studyright
-  const studentnumbers = await studentnumbersWithAllStudyrightElements(
-    [studytrack],
+  const studentnumbers = await studentnumbersWithAllStudyrightElements({
+    studyRights: [studytrack],
     startDate,
     endDate,
-    true, // exchange students
-    true, // cancelled students
-    true, // non-degree students
-    true // transferred to students
-  )
+  })
   const promises = [
     graduatedStatsForStudytrack(studytrack, since),
     productivityStatsForProvider(providercode, since),
@@ -520,15 +516,11 @@ const optionData = async (startDate, endDate, code, level) => {
   const programmes = await getAllProgrammes()
   // This includes ALL students: exchange students, the ones that have transferred to program, the ones
   // with non-degree studyright and the ones that have cancelled their studyright
-  const students = await studentnumbersWithAllStudyrightElements(
-    [code],
+  const students = await studentnumbersWithAllStudyrightElements({
+    studyRights: [code],
     startDate,
     endDate,
-    true, // exchange students
-    true, // cancelled students
-    true, // non-degree students
-    true // transferred to students
-  )
+  })
 
   let graduated
   let currentExtent
@@ -712,15 +704,11 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
       const studytracks = studyprogrammeYears[year] ? Object.keys(studyprogrammeYears[year].studyTracks) : []
       const studytrackdata = await studytracks.reduce(async (acc, curr) => {
         const previousData = await acc
-        const studentnumbers = await studentnumbersWithAllStudyrightElements(
-          [studyprogramme, curr],
+        const studentnumbers = await studentnumbersWithAllStudyrightElements({
+          studyRights: [studyprogramme, curr],
           startDate,
           endDate,
-          true, // exchange students
-          true, // cancelled students
-          true, // non-degree students
-          true // transferred to students
-        )
+        })
         const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
           studyprogramme,
           startDate,
@@ -810,15 +798,11 @@ const throughputStatsForStudytrack = async (studyprogramme, since) => {
         }
       }, {})
 
-      const studentnumbers = await studentnumbersWithAllStudyrightElements(
-        [studyprogramme],
+      const studentnumbers = await studentnumbersWithAllStudyrightElements({
+        studyRights: [studyprogramme],
         startDate,
         endDate,
-        true, // exchange students
-        true, // cancelled students
-        true, // non-degree students
-        true // transferred to students
-      )
+      })
       const creditsForStudyprogramme = await productivityCreditsFromStudyprogrammeStudents(
         studyprogramme,
         startDate,
