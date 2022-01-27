@@ -10,7 +10,15 @@ const {
   getYearsObject,
   creditThresholds,
 } = require('./studyprogrammeHelpers')
-const { studytrackStudents, allStudyrights, startedStudyrights, graduatedStudyRights } = require('./newStudyprogramme')
+const {
+  studytrackStudents,
+  allStudyrights,
+  startedStudyrights,
+  enrolledStudents,
+  absentStudents,
+  cancelledStudyRights,
+  graduatedStudyRights,
+} = require('./newStudyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
 
 const getStudentData = students => {
@@ -79,6 +87,9 @@ const getStudytrackDataForTheYear = async ({
       const students = await studytrackStudents(allStudentnumbers)
       const studentData = getStudentData(students)
       const started = await startedStudyrights(track, startDate, studentnumbers)
+      const enrolled = await enrolledStudents(track, startDate, studentnumbers)
+      const absent = await absentStudents(track, startDate, studentnumbers)
+      const cancelled = await cancelledStudyRights(track, startDate, studentnumbers)
       const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
@@ -116,6 +127,12 @@ const getStudytrackDataForTheYear = async ({
           getPercentage(all.length, all.length),
           started.length,
           getPercentage(started.length, all.length),
+          enrolled.length,
+          getPercentage(enrolled.length, all.length),
+          absent.length,
+          getPercentage(absent.length, all.length),
+          cancelled.length,
+          getPercentage(cancelled.length, all.length),
           graduated.length,
           getPercentage(graduated.length, all.length),
           studentData.male,
@@ -136,6 +153,12 @@ const getStudytrackDataForTheYear = async ({
           getPercentage(all.length, all.length),
           started.length,
           getPercentage(started.length, all.length),
+          enrolled.length,
+          getPercentage(enrolled.length, all.length),
+          absent.length,
+          getPercentage(absent.length, all.length),
+          cancelled.length,
+          getPercentage(cancelled.length, all.length),
           graduated.length,
           getPercentage(graduated.length, all.length),
           studentData.male,

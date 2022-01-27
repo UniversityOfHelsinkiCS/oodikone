@@ -13,6 +13,7 @@ const {
   Semester,
 } = require('../models')
 const { formatStudyright, formatStudent } = require('./studyprogrammeHelpers')
+const { getCurrentSemester } = require('./semesters')
 
 const whereStudents = studentnumbers => {
   return studentnumbers ? studentnumbers : { [Op.not]: null }
@@ -29,30 +30,22 @@ const studytrackStudents = async studentnumbers =>
     })
   ).map(formatStudent)
 
-const enrolledStudyrights = async studytrack => {
-  const studyrights = await Studyright.findAll({
-    attributes: ['studyrightid', 'studystartdate', 'enddate', 'prioritycode'],
-    include: [
-      {
-        model: StudyrightElement,
-        required: true,
-        where: { code: studytrack },
-      },
-      {
-        model: Student,
-        attributes: ['studentnumber'],
-        required: true,
-      },
-    ],
-  })
-
-  const studentnumbers = studyrights.map(s => s.student.studentnumber)
+const enrolledStudents = async (studytrack, since, studentnumbers) => {
+  const currentSemester = await getCurrentSemester()
 
   const students = await Student.findAll({
     attributes: ['studentnumber'],
     include: [
       {
         model: Studyright,
+        where: {
+          studystartdate: {
+            [Op.gte]: since,
+          },
+          enddate: {
+            [Op.gte]: new Date(),
+          },
+        },
         include: [
           {
             model: StudyrightElement,
@@ -71,6 +64,9 @@ const enrolledStudyrights = async studytrack => {
           {
             model: Semester,
             required: true,
+            where: {
+              semestercode: currentSemester.semestercode,
+            },
           },
         ],
         where: {
@@ -85,30 +81,59 @@ const enrolledStudyrights = async studytrack => {
     },
   })
 
-  let enrollments = new Set()
+  return students.filter(s => s.semester_enrollments?.length)
+}
 
-  students.forEach(student => {
-    student.semester_enrollments.forEach(e => {
-      const enrollmentStartDate = e.semester.startdate
-      const enrollmentEndDate = e.semester.enddate
-      const correctStudyRight = studyrights.find(
-        s =>
-          student.studentnumber === s.student.studentnumber &&
-          s.studystartdate <= enrollmentStartDate && // Studying in the programme should have started on the same day or earlier than the enrollment
-          s.enddate >= enrollmentEndDate && // Studying in the programme should have ended on the same day or later than the enrollment
-          (!s.canceldate || s.canceldate > enrollmentStartDate) && // Studyright should not be canceled OR the possible canceldate should be after the enrollmentStartDate
-          (s.prioritycode === 1 || s.prioritycode === 30) // Studyright should be primary or the student should have graduated
-      )
-      if (correctStudyRight) {
-        enrollments.add({
-          studentnumber: student.studentnumber,
-          startdate: e.semester.startdate,
-        })
-      }
-    })
+const absentStudents = async (studytrack, since, studentnumbers) => {
+  const currentSemester = await getCurrentSemester()
+  const students = await Student.findAll({
+    attributes: ['studentnumber'],
+    include: [
+      {
+        model: Studyright,
+        where: {
+          studystartdate: {
+            [Op.gte]: since,
+          },
+          enddate: {
+            [Op.gte]: new Date(),
+          },
+        },
+        include: [
+          {
+            model: StudyrightElement,
+            required: true,
+            where: {
+              code: studytrack,
+            },
+          },
+        ],
+        attributes: ['studyrightid'],
+      },
+      {
+        model: SemesterEnrollment,
+        attributes: ['semestercode'],
+        include: [
+          {
+            model: Semester,
+            required: true,
+            where: {
+              semestercode: currentSemester.semestercode,
+            },
+          },
+        ],
+        where: {
+          enrollmenttype: 2,
+        },
+      },
+    ],
+    where: {
+      studentnumber: {
+        [Op.in]: studentnumbers,
+      },
+    },
   })
-
-  return enrollments
+  return students.filter(s => s.semester_enrollments?.length)
 }
 
 const allStudyrights = async (studytrack, studentnumbers) =>
@@ -190,7 +215,7 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
     },
   })
 
-const cancelledStudyRights = async (studytrack, since) => {
+const cancelledStudyRights = async (studytrack, since, studentnumbers) => {
   return await Studyright.findAll({
     include: {
       model: StudyrightElement,
@@ -205,6 +230,7 @@ const cancelledStudyRights = async (studytrack, since) => {
       canceldate: {
         [Op.gte]: since,
       },
+      student_studentnumber: whereStudents(studentnumbers),
     },
   })
 }
@@ -352,7 +378,8 @@ const getThesisCredits = async (provider, since, thesisType) =>
 
 module.exports = {
   studytrackStudents,
-  enrolledStudyrights,
+  enrolledStudents,
+  absentStudents,
   allStudyrights,
   startedStudyrights,
   graduatedStudyRights,
