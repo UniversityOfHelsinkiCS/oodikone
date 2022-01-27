@@ -30,22 +30,48 @@ const getStudentData = students => {
 }
 
 // Goes through the programme and all its studytracks for the said year and adds the wanted stats to the data objects
-const getStudytrackDataForTheYear = async ({ studyprogramme, studytracks, studytrackNames, year, years, data }) => {
+const getStudytrackDataForTheYear = async ({
+  studyprogramme,
+  special,
+  studytracks,
+  studytrackNames,
+  year,
+  years,
+  data,
+}) => {
   const { mainStatsByYear, mainStatsByTrack, creditGraphStats, creditTableStats, emptyTracks } = data
   const { startDate, endDate } = getAcademicYearDates(year)
 
   await Promise.all(
     studytracks.map(async track => {
       const codes = studyprogramme === track ? [studyprogramme] : [studyprogramme, track]
-      const studentnumbers = await studentnumbersWithAllStudyrightElements(
-        codes,
-        startDate,
-        endDate,
-        true,
-        true,
-        true,
-        true
-      )
+
+      let studentnumbers = []
+      if (special) {
+        studentnumbers = await studentnumbersWithAllStudyrightElements(
+          codes,
+          startDate,
+          endDate,
+          true,
+          true,
+          true,
+          true,
+          null,
+          true
+        )
+      } else {
+        studentnumbers = await studentnumbersWithAllStudyrightElements(
+          codes,
+          startDate,
+          endDate,
+          false,
+          false,
+          false,
+          false,
+          null,
+          false
+        )
+      }
 
       // All the stats are counted for the students who actually started studying
       const all = await allStudyrights(track, studentnumbers)
@@ -155,8 +181,9 @@ const getEmptyStatsObjects = (years, studytracks) => {
 }
 
 // Combines all the data for the Populations and Studytracks -view
-const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
+const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, specialGroups }) => {
   const isAcademicYear = true
+  const special = specialGroups === 'SPECIAL_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear())
 
@@ -173,6 +200,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme }) => {
     years.map(async year => {
       return await getStudytrackDataForTheYear({
         studyprogramme,
+        special,
         studytracks,
         studytrackNames,
         year,
