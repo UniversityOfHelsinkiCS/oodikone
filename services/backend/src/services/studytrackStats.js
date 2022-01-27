@@ -83,8 +83,7 @@ const getStudytrackDataForTheYear = async ({
 
       // All the stats are counted for the students who actually started studying
       const all = await allStudyrights(track, studentnumbers)
-      const allStudentnumbers = [...new Set(all.map(s => s.studentnumber))]
-      const students = await studytrackStudents(allStudentnumbers)
+      const students = await studytrackStudents(studentnumbers)
       const studentData = getStudentData(students)
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const enrolled = await enrolledStudents(track, startDate, studentnumbers)
