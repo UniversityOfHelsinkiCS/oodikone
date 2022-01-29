@@ -21,9 +21,13 @@ const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
   <div className="radio-toggle">
     <label className="toggle-label">{firstLabel}</label>
     <Radio toggle checked={value} onChange={() => setValue(!value)} />
-    <WithHelpTooltip tooltip={{ short: toolTip }}>
+    {toolTip ? (
+      <WithHelpTooltip tooltip={{ short: toolTip }}>
+        <label className="toggle-label">{secondLabel}</label>
+      </WithHelpTooltip>
+    ) : (
       <label className="toggle-label">{secondLabel}</label>
-    </WithHelpTooltip>
+    )}
   </div>
 )
 
@@ -72,7 +76,7 @@ const Overview = ({ studyprogramme }) => {
             <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
           </div>
           {getDivider('Average graduation times', 'AverageGraduationTimes')}
-          {getRadioButton('Mean time', 'Median time', showMeanTime, setShowMeanTime)}
+          {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
           {showMeanTime ? (
             <div className="section-container">
               {graduations?.data?.years.map(year => (
