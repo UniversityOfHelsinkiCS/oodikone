@@ -65,7 +65,7 @@ const getStudytrackDataForTheYear = async ({
           true,
           true,
           null,
-          true
+          false
         )
       } else {
         studentnumbers = await studentnumbersWithAllStudyrightElements(
@@ -77,7 +77,7 @@ const getStudytrackDataForTheYear = async ({
           false,
           false,
           null,
-          false
+          true
         )
       }
 
