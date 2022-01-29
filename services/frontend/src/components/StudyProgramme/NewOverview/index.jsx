@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Divider, Loader, Radio } from 'semantic-ui-react'
 
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
+import WithHelpTooltip from '../../Info/InfoWithHelpTooltip'
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
@@ -16,11 +17,13 @@ const basicsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away
 const creditsTitles = ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits']
 const graduationsTitles = ['', 'Graduated', 'Wrote thesis']
 
-const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
+const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
   <div className="radio-toggle">
     <label className="toggle-label">{firstLabel}</label>
     <Radio toggle checked={value} onChange={() => setValue(!value)} />
-    <label className="toggle-label">{secondLabel}</label>
+    <WithHelpTooltip tooltip={{ short: toolTip }}>
+      <label className="toggle-label">{secondLabel}</label>
+    </WithHelpTooltip>
   </div>
 )
 
@@ -45,8 +48,10 @@ const Overview = ({ studyprogramme }) => {
 
   return (
     <div className="studyprogramme-overview">
-      {getRadioButton('kalenterivuosi', 'lukuvuosi', academicYear, setAcademicYear)}
-      {getRadioButton('Major students', 'All students', specialGroups, setSpecialGroups)}
+      <div className="toggle-container">
+        {getRadioButton(toolTips.YearToggle, 'Calendar year ', 'Academic year', academicYear, setAcademicYear)}
+        {getRadioButton(toolTips.StudentToggle, 'Major students', 'All students', specialGroups, setSpecialGroups)}
+      </div>
       {basics.isLoading || credits.isLoading || graduations.isLoading ? (
         <Loader active={basics.isLoading || credits.isLoading || graduations.isLoading} />
       ) : (
