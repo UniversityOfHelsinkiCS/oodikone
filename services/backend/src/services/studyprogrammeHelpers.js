@@ -79,8 +79,8 @@ const defineYear = (date, isAcademicYear) => {
 const getStartDate = (studyprogramme, isAcademicYear) => {
   if ((studyprogramme.includes('KH') || studyprogramme.includes('MH')) && isAcademicYear) return new Date('2017-08-01')
   if (studyprogramme.includes('KH') || studyprogramme.includes('MH')) return new Date('2017-01-01')
-  if (isAcademicYear) return new Date('2000-08-01')
-  return new Date('2000-01-01')
+  if (isAcademicYear) return new Date('2017-08-01')
+  return new Date('2017-01-01')
 }
 
 // There are 9 course_unit_types
