@@ -43,8 +43,7 @@
 
 .studytrack-overview .table-container,
 .studyprogramme-overview .table-container {
-  width: 40%;
-  height: 500px;
+  min-width: 40%;
   margin-left: 2em;
 }
 
