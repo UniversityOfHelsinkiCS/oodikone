@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Divider, Loader, Radio } from 'semantic-ui-react'
 
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
+import WithHelpTooltip from '../../Info/InfoWithHelpTooltip'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
 import BasicDataTable from './BasicDataTable'
@@ -34,11 +35,13 @@ const creditTableTitles = [
   '> 150 credits',
 ]
 
-const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
+const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
   <div className="radio-toggle">
     <label className="toggle-label">{firstLabel}</label>
     <Radio toggle checked={value} onChange={() => setValue(!value)} />
-    <label className="toggle-label">{secondLabel}</label>
+    <WithHelpTooltip tooltip={{ short: toolTip }}>
+      <label className="toggle-label">{secondLabel}</label>
+    </WithHelpTooltip>
   </div>
 )
 
@@ -70,7 +73,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
       ) : (
         <>
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
-          {getRadioButton('Major students', 'All students', specialGroups, setSpecialGroups)}
+          {getRadioButton(toolTips.StudentToggle, 'Major students', 'All students', specialGroups, setSpecialGroups)}
           {getDivider(
             `Students of ${
               track === '' || track === 'studyprogramme'
