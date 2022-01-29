@@ -41,7 +41,9 @@ const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks })
           index === 0 ? (
             getFirstCell(yearlyData, row[0], show, studyprogramme)
           ) : (
-            <Table.Cell textAlign="left">{value}</Table.Cell>
+            <Table.Cell key={getKey(value)} textAlign="left">
+              {value}
+            </Table.Cell>
           )
         )}
       </Table.Row>
