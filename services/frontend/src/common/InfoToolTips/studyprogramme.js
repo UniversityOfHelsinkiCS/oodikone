@@ -1,4 +1,13 @@
 export default {
+  YearToggle: `
+  Academic year: Näyttää tilastot akateemisille vuosille jaoteltuna, esimerkiksi 1.8.2019-31.7.2020
+  Calendar year: Näyttää tilastot kalenterivuosille jaoteltuna, esimerkiksi 1.1.2019-31.12.2019 
+  `,
+  StudentToggle: `
+  All students: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat, opintonsa keskeyttäneet opiskelijat, ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.
+  
+  Major students: Valinnasta on poissuljettu kaikki edellä mainitut erikoisryhmät.
+  `,
   StudentsOfTheStudyprogramme: `
   **Started**: Sisältää kyseisenä vuonna aloitetut opinto-oikeudet riippumatta siitä, minä vuonna kyseinen opiskeluoikeus on myönnetty. Opiskelija on myös voinut keskeyttää opintonsa tai siirtyä pois ohjelmasta.\n
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
