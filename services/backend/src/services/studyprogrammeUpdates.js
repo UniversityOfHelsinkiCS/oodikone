@@ -55,8 +55,21 @@ const updateBasicView = async code => {
 }
 
 const updateStudytrackView = async code => {
-  const result = await getStudytrackStatsForStudyprogramme({ studyprogramme: code })
-  await setStudytrackStats(result)
+  const specialIncluded = 'SPECIAL_INCLUDED'
+  const specialExcluded = 'SPECIAL_EXCLUDED'
+
+  const studytrackStatsSpecialIncluded = await getStudytrackStatsForStudyprogramme({
+    studyprogramme: code,
+    specialGroups: specialIncluded,
+  })
+  await setStudytrackStats(studytrackStatsSpecialIncluded, specialIncluded)
+
+  const studytrackStatsSpecialExcluded = await getStudytrackStatsForStudyprogramme({
+    studyprogramme: code,
+    specialGroups: specialExcluded,
+  })
+  await setStudytrackStats(studytrackStatsSpecialExcluded, specialExcluded)
+
   return 'OK'
 }
 
