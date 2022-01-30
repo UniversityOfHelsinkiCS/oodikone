@@ -1,3 +1,17 @@
+@media only screen and (min-width: 3240px) {
+  .studytrack-overview,
+  .studyprogramme-overview {
+    max-width: 80%;
+  }
+}
+
+@media only screen and (min-width: 3240px) {
+  .studytrack-overview .section-container,
+  .studyprogramme-overview .section-container {
+    justify-content: center !important;
+  }
+}
+
 .studyprogramme-overview .toggle-container {
   display: flex;
   justify-content: center;
@@ -37,14 +51,15 @@
 
 .studytrack-overview .graph-container,
 .studyprogramme-overview .graph-container {
-  min-width: 55%;
+  min-width: 50%;
   height: 500px;
 }
 
 .studytrack-overview .table-container,
 .studyprogramme-overview .table-container {
-  min-width: 40%;
-  margin-left: 2em;
+  max-width: 45%;
+  margin-left: 1em;
+  flex-grow: 2;
 }
 
 .studytrack-overview .studytrack-selector {
