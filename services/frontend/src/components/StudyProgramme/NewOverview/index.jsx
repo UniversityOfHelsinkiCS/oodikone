@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Loader, Radio } from 'semantic-ui-react'
+import { Divider, Loader, Message, Radio } from 'semantic-ui-react'
 
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
 import WithHelpTooltip from '../../Info/InfoWithHelpTooltip'
@@ -68,47 +68,65 @@ const Overview = ({ studyprogramme }) => {
         <Loader active style={{ marginTop: '10em' }} />
       ) : (
         <>
-          {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
-          <div className="section-container">
-            <LineGraph data={basics?.data} />
-            <DataTable titles={basicsTitles} data={basics?.data?.tableStats} />
-          </div>
-          {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
-          <div className="section-container">
-            <StackedBarChart data={credits?.data} />
-            <DataTable titles={creditsTitles} data={credits?.data?.tableStats} />
-          </div>
-          {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
-          <div className="section-container">
-            <BarChart data={graduations?.data} />
-            <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
-          </div>
-          {getDivider('Average graduation times', 'AverageGraduationTimes')}
-          {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
-          {showMeanTime ? (
-            <div className="section-container">
-              {graduations?.data?.years.map(year => (
-                <GaugeChart
-                  key={year}
-                  year={year}
-                  data={graduations?.data?.graduationMedianTime[year]}
-                  amount={graduations?.data?.graduationAmounts[year]}
-                  studyprogramme={studyprogramme}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="section-container">
-              {graduations?.data?.years.map(year => (
-                <GaugeChart
-                  key={year}
-                  year={year}
-                  data={graduations?.data?.graduationMeanTime[year]}
-                  amount={graduations?.data?.graduationAmounts[year]}
-                  studyprogramme={studyprogramme}
-                />
-              ))}
-            </div>
+          {!studyprogramme.includes('KH') && !studyprogramme.includes('MH') && (
+            <Message>
+              Please note, that the data is not complete only for current Master's and Bachelor's programmes
+            </Message>
+          )}
+          {basics.isSuccess && basics.data && (
+            <>
+              {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
+              <div className="section-container">
+                <LineGraph data={basics?.data} />
+                <DataTable titles={basicsTitles} data={basics?.data?.tableStats} />
+              </div>
+            </>
+          )}
+          {credits.isSuccess && credits.data && (
+            <>
+              {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
+              <div className="section-container">
+                <StackedBarChart data={credits?.data} />
+                <DataTable titles={creditsTitles} data={credits?.data?.tableStats} />
+              </div>
+            </>
+          )}
+          {graduations.isSuccess && graduations.data && (
+            <>
+              {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
+              <div className="section-container">
+                <BarChart data={graduations?.data} />
+                <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
+              </div>
+
+              {getDivider('Average graduation times', 'AverageGraduationTimes')}
+              {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
+              {showMeanTime ? (
+                <div className="section-container">
+                  {graduations?.data?.years.map(year => (
+                    <GaugeChart
+                      key={year}
+                      year={year}
+                      data={graduations?.data?.graduationMedianTime[year]}
+                      amount={graduations?.data?.graduationAmounts[year]}
+                      studyprogramme={studyprogramme}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="section-container">
+                  {graduations?.data?.years.map(year => (
+                    <GaugeChart
+                      key={year}
+                      year={year}
+                      data={graduations?.data?.graduationMeanTime[year]}
+                      amount={graduations?.data?.graduationAmounts[year]}
+                      studyprogramme={studyprogramme}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </>
       )}
