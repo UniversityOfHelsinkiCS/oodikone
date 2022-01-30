@@ -110,7 +110,7 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   const code = req.params.id
-  const specialGroups = req.query?.special_groups === 'true' ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
+  const specialGroups = req.query?.special_groups
 
   if (code) {
     let data = null
