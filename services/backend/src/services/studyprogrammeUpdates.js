@@ -12,44 +12,33 @@ const {
 } = require('../services/analyticsService')
 
 const updateBasicView = async code => {
-  const academic = 'ACADEMIC_YEAR'
-  const calendar = 'CALENDAR_YEAR'
+  const yearTypes = ['ACADEMIC_YEAR', 'CALENDAR_YEAR']
+  const special = ['SPECIAL_INCLUDED', 'SPECIAL_EXCLUDED']
 
-  const basicStatsAcademic = await getBasicStatsForStudytrack({
-    studyprogramme: code,
-    yearType: academic,
-  })
-  await setBasicStats(basicStatsAcademic, academic)
+  yearTypes.forEach(async yearType => {
+    special.forEach(async specialGroups => {
+      const basicStats = await getBasicStatsForStudytrack({
+        studyprogramme: code,
+        yearType,
+        specialGroups,
+      })
+      await setBasicStats(basicStats, yearType, specialGroups)
 
-  const basicStatsCalendar = await getBasicStatsForStudytrack({
-    studyprogramme: code,
-    yearType: calendar,
-  })
-  await setBasicStats(basicStatsCalendar, calendar)
+      const creditStats = await getCreditStatsForStudytrack({
+        studyprogramme: code,
+        yearType,
+        specialGroups,
+      })
+      await setCreditStats(creditStats, yearType, specialGroups)
 
-  const creditStatsAcademic = await getCreditStatsForStudytrack({
-    studyprogramme: code,
-    yearType: academic,
+      const graduationStats = await getGraduationStatsForStudytrack({
+        studyprogramme: code,
+        yearType,
+        specialGroups,
+      })
+      await setGraduationStats(graduationStats, yearType, specialGroups)
+    })
   })
-  await setCreditStats(creditStatsAcademic, academic)
-
-  const creditStatsCalendar = await getCreditStatsForStudytrack({
-    studyprogramme: code,
-    yearType: calendar,
-  })
-  await setCreditStats(creditStatsCalendar, calendar)
-
-  const graduationStatsAcademic = await getGraduationStatsForStudytrack({
-    studyprogramme: code,
-    yearType: academic,
-  })
-  await setGraduationStats(graduationStatsAcademic, academic)
-
-  const graduationStatsCalendar = await getGraduationStatsForStudytrack({
-    studyprogramme: code,
-    yearType: calendar,
-  })
-  await setGraduationStats(graduationStatsCalendar, calendar)
 
   return 'OK'
 }

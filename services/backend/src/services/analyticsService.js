@@ -3,9 +3,10 @@ const moment = require('moment')
 
 const createRedisKeyForProductivity = id => `PRODUCTIVITY_${id}`
 const createRedisKeyForThroughput = id => `THROUGHPUT_${id}`
-const createRedisKeyForBasicStats = (id, yearType) => `BASIC_STATS_${id}_${yearType}`
-const createRedisKeyForCreditStats = (id, yearType) => `CREDIT_STATS_${id}_${yearType}`
-const createRedisKeyForGraduationStats = (id, yearType) => `GRADUATION_STATS_${id}_${yearType}`
+const createRedisKeyForBasicStats = (id, yearType, specialGroups) => `BASIC_STATS_${id}_${yearType}_${specialGroups}`
+const createRedisKeyForCreditStats = (id, yearType, specialGroups) => `CREDIT_STATS_${id}_${yearType}_${specialGroups}`
+const createRedisKeyForGraduationStats = (id, yearType, specialGroups) =>
+  `GRADUATION_STATS_${id}_${yearType}_${specialGroups}`
 const createRedisKeyForStudytrackStats = (id, specialGroups) => `STUDYTRACK_STATS_${id}_${specialGroups}`
 
 const getProductivity = async id => {
@@ -91,16 +92,16 @@ const patchThroughput = async data => {
   }
 }
 
-const getBasicStats = async (id, yearType) => {
-  const redisKey = createRedisKeyForBasicStats(id, yearType)
+const getBasicStats = async (id, yearType, specialGroups) => {
+  const redisKey = createRedisKeyForBasicStats(id, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setBasicStats = async (data, yearType) => {
+const setBasicStats = async (data, yearType, specialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForBasicStats(id, yearType)
+  const redisKey = createRedisKeyForBasicStats(id, yearType, specialGroups)
   const dataToRedis = {
     ...data,
     status: 'DONE',
@@ -111,16 +112,16 @@ const setBasicStats = async (data, yearType) => {
   return dataToRedis
 }
 
-const getCreditStats = async (id, yearType) => {
-  const redisKey = createRedisKeyForCreditStats(id, yearType)
+const getCreditStats = async (id, yearType, specialGroups) => {
+  const redisKey = createRedisKeyForCreditStats(id, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setCreditStats = async (data, yearType) => {
+const setCreditStats = async (data, yearType, specialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForCreditStats(id, yearType)
+  const redisKey = createRedisKeyForCreditStats(id, yearType, specialGroups)
   const dataToRedis = {
     ...data,
     status: 'DONE',
@@ -131,16 +132,16 @@ const setCreditStats = async (data, yearType) => {
   return dataToRedis
 }
 
-const getGraduationStats = async (id, yearType) => {
-  const redisKey = createRedisKeyForGraduationStats(id, yearType)
+const getGraduationStats = async (id, yearType, specialGroups) => {
+  const redisKey = createRedisKeyForGraduationStats(id, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setGraduationStats = async (data, yearType) => {
+const setGraduationStats = async (data, yearType, specialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForGraduationStats(id, yearType)
+  const redisKey = createRedisKeyForGraduationStats(id, yearType, specialGroups)
   const dataToRedis = {
     ...data,
     status: 'DONE',
