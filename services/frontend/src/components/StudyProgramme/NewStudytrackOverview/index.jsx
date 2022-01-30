@@ -49,7 +49,8 @@ const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const [specialGroups, setSpecialGroups] = useState(true)
   const [track, setTrack] = useState(studyprogramme)
-  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, specialGroups })
+  const special = specialGroups ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
+  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, specialGroups: special })
 
   useEffect(() => {
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {

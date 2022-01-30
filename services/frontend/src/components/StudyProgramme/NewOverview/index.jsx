@@ -37,9 +37,10 @@ const Overview = ({ studyprogramme }) => {
   const [showMeanTime, setShowMeanTime] = useState(true)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const basics = useGetBasicStatsQuery({ id: studyprogramme, yearType, specialGroups })
-  const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType, specialGroups })
-  const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, specialGroups })
+  const special = specialGroups ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
+  const basics = useGetBasicStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
+  const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
+  const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
 
   const getDivider = (title, toolTipText) => (
     <>
