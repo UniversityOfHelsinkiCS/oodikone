@@ -77,6 +77,40 @@ const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks })
   return null
 }
 
+const sortTrackDataByYear = data => {
+  if (!data || !data.length) return []
+
+  const copy = [...data]
+  const sortedData = copy.sort((a, b) => {
+    if (a[0] < b[0]) return -1
+    if (a[0] > b[0]) return 1
+    return 0
+  })
+
+  sortedData.reverse()
+  return sortedData
+}
+
+const sortMainDataByYear = data => {
+  if (!data || !data.length) return []
+
+  const sortedData = []
+  data.forEach(arrays => {
+    if (arrays.length) {
+      const copy = [...arrays]
+      const sortedYear = copy.sort((a, b) => {
+        if (a[0] < b[0]) return 1
+        if (a[0] > b[0]) return -1
+        return 0
+      })
+      sortedData.push(sortedYear.reverse())
+    }
+  })
+
+  sortedData.reverse()
+  return sortedData
+}
+
 const StudytrackDataTable = ({
   studyprogramme,
   dataOfAllTracks,
@@ -89,20 +123,8 @@ const StudytrackDataTable = ({
 
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
 
-  const sortedMainStats = []
-  Object.values(dataOfAllTracks).forEach(arrays => {
-    if (arrays.length) {
-      const copy = [...arrays]
-      const sortedYear = copy.sort((a, b) => {
-        if (a[0] < b[0]) return 1
-        if (a[0] > b[0]) return -1
-        return 0
-      })
-      sortedMainStats.push(sortedYear.reverse())
-    }
-  })
-
-  sortedMainStats.reverse()
+  const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
+  const sortedTrackStats = sortTrackDataByYear(dataOfSingleTrack)
 
   return (
     <div className="datatable">
@@ -124,7 +146,7 @@ const StudytrackDataTable = ({
 
         <Table.Body>
           {singleTrack
-            ? dataOfSingleTrack.map(row =>
+            ? sortedTrackStats.map(row =>
                 getSingleTrackRow({ yearlyData: dataOfSingleTrack, row, studyprogramme, code: singleTrack })
               )
             : sortedMainStats?.map(yearlyData =>
