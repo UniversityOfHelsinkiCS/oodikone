@@ -50,14 +50,22 @@ const Overview = ({ studyprogramme }) => {
     </>
   )
 
+  const isFetchingOrLoading =
+    basics.isLoading ||
+    credits.isLoading ||
+    graduations.isLoading ||
+    basics.isFetching ||
+    credits.isFetching ||
+    graduations.isFetching
+
   return (
     <div className="studyprogramme-overview">
       <div className="toggle-container">
         {getRadioButton(toolTips.YearToggle, 'Calendar year ', 'Academic year', academicYear, setAcademicYear)}
         {getRadioButton(toolTips.StudentToggle, 'Major students', 'All students', specialGroups, setSpecialGroups)}
       </div>
-      {basics.isLoading || credits.isLoading || graduations.isLoading ? (
-        <Loader active={basics.isLoading || credits.isLoading || graduations.isLoading} />
+      {isFetchingOrLoading ? (
+        <Loader active style={{ marginTop: '10em' }} />
       ) : (
         <>
           {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}

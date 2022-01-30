@@ -68,8 +68,8 @@ const StudytrackOverview = ({ studyprogramme }) => {
 
   return (
     <div className="studytrack-overview">
-      {stats.isLoading ? (
-        <Loader active={stats.isLoading} />
+      {stats.isLoading || stats.isFetching ? (
+        <Loader active style={{ marginTop: '10em' }} />
       ) : (
         <>
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
