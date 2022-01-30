@@ -25,22 +25,6 @@ const {
   getThesisCredits,
 } = require('./newStudyprogramme')
 
-// const getEnrolledStats = async (studytrack, since, years, isAcademicYear) => {
-//   const students = await enrolledStudyrights(studytrack)
-//   const { graphStats, tableStats } = getStatsBasis(years)
-
-//   students.forEach(({ startdate }) => {
-//     if (startdate.getMonth() === 7) {
-//       const enrolledYear = defineYear(startdate, isAcademicYear)
-
-//       graphStats[indexOf(years, enrolledYear)] += 1
-//       tableStats[enrolledYear] += 1
-//     }
-//   })
-
-//   return { graphStats, tableStats }
-// }
-
 const getGraduatedStats = async (studytrack, since, years, isAcademicYear) => {
   const studyrights = await graduatedStudyRights(studytrack, since)
   const { graphStats, tableStats } = getStatsBasis(years)
