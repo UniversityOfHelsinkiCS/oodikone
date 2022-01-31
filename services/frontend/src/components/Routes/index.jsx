@@ -26,7 +26,7 @@ const retry = async (fn, retriesLeft = 3, interval = 500) =>
       })
   })
 
-const FrontPage = React.lazy(() => retry(() => import('../FrontPage')))
+const FrontPage = React.lazy(() => retry(() => import('../Frontpage')))
 const Populations = React.lazy(() => retry(() => import('../PopulationStatistics')))
 const StudentStatistics = React.lazy(() => retry(() => import('../StudentStatistics')))
 const CourseStatistics = React.lazy(() => retry(() => import('../CourseStatistics')))
