@@ -103,7 +103,7 @@ const Overview = ({ studyprogramme }) => {
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
               {showMeanTime ? (
-                <div className="section-container">
+                <div className="section-container-centered">
                   {graduations?.data?.years.map(year => (
                     <GaugeChart
                       key={year}
@@ -115,7 +115,7 @@ const Overview = ({ studyprogramme }) => {
                   ))}
                 </div>
               ) : (
-                <div className="section-container">
+                <div className="section-container-centered">
                   {graduations?.data?.years.map(year => (
                     <GaugeChart
                       key={year}
