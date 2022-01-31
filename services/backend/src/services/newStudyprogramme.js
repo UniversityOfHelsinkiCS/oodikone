@@ -194,46 +194,65 @@ const startedStudyrights = async (studytrack, since, studentnumbers) =>
   ).map(formatStudyright)
 
 const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
-  await Studyright.findAll({
-    include: {
-      model: StudyrightElement,
-      required: true,
-      include: {
-        model: ElementDetail,
-        required: true,
-        where: {
-          code: studytrack,
+  (
+    await Studyright.findAll({
+      include: [
+        {
+          model: StudyrightElement,
+          required: true,
+          include: {
+            model: ElementDetail,
+            required: true,
+            where: {
+              code: studytrack,
+            },
+          },
         },
-      },
-    },
-    where: {
-      graduated: 1,
-      enddate: {
-        [Op.gte]: since,
-      },
-      student_studentnumber: whereStudents(studentnumbers),
-    },
-  })
-
-const cancelledStudyRights = async (studytrack, since, studentnumbers) => {
-  return await Studyright.findAll({
-    include: {
-      model: StudyrightElement,
-      required: true,
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
       where: {
-        code: {
-          [Op.eq]: studytrack,
+        graduated: 1,
+        enddate: {
+          [Op.gte]: since,
         },
+        student_studentnumber: whereStudents(studentnumbers),
       },
-    },
-    where: {
-      canceldate: {
-        [Op.gte]: since,
+    })
+  ).map(formatStudyright)
+
+const cancelledStudyRights = async (studytrack, since, studentnumbers) =>
+  (
+    await Studyright.findAll({
+      include: [
+        {
+          model: StudyrightElement,
+          required: true,
+          include: {
+            model: ElementDetail,
+            required: true,
+            where: {
+              code: studytrack,
+            },
+          },
+        },
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
+      where: {
+        canceldate: {
+          [Op.gte]: since,
+        },
+        student_studentnumber: whereStudents(studentnumbers),
       },
-      student_studentnumber: whereStudents(studentnumbers),
-    },
-  })
-}
+    })
+  ).map(formatStudyright)
 
 const transfersAway = async (studytrack, since) => {
   return await Transfer.findAll({

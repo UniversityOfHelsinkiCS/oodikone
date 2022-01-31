@@ -2,11 +2,12 @@ const { mean } = require('lodash')
 
 // Helper functions
 const formatStudyright = studyright => {
-  const { studyrightid, studystartdate, enddate, graduated, prioritycode, extentcode, student } = studyright
+  const { studyrightid, studystartdate, enddate, canceldate, graduated, prioritycode, extentcode, student } = studyright
   return {
     studyrightid,
     studystartdate,
     enddate,
+    canceldate,
     graduated,
     prioritycode,
     extentcode,
