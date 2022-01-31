@@ -8,7 +8,10 @@ require('highcharts-exporting')(ReactHighcharts.Highcharts)
 const colors = ['#003E65', '#1392c2', '#E68825', '#333737', '#036415']
 
 const LineGraph = ({ data }) => {
-  const dataWithColors = data?.graphStats.map((series, index) => ({ ...series, color: colors[index] }))
+  const dataWithColors = data?.graphStats.map((series, index) => ({
+    ...series,
+    color: colors[index],
+  }))
 
   const defaultConfig = {
     title: {

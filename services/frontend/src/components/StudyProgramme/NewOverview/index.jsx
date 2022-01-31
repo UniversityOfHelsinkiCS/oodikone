@@ -13,10 +13,6 @@ import InfoBox from '../../Info/InfoBox'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const basicsTitles = ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
-const creditsTitles = ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits']
-const graduationsTitles = ['', 'Graduated', 'Wrote thesis']
-
 const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
   <div className="radio-toggle">
     <label className="toggle-label">{firstLabel}</label>
@@ -79,7 +75,7 @@ const Overview = ({ studyprogramme }) => {
               {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
               <div className="section-container">
                 <LineGraph data={basics?.data} />
-                <DataTable titles={basicsTitles} data={basics?.data?.tableStats} />
+                <DataTable data={basics?.data} />
               </div>
             </>
           )}
@@ -88,7 +84,7 @@ const Overview = ({ studyprogramme }) => {
               {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
               <div className="section-container">
                 <StackedBarChart data={credits?.data} />
-                <DataTable titles={creditsTitles} data={credits?.data?.tableStats} />
+                <DataTable data={credits?.data} />
               </div>
             </>
           )}
@@ -97,7 +93,7 @@ const Overview = ({ studyprogramme }) => {
               {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
               <div className="section-container">
                 <BarChart data={graduations?.data} />
-                <DataTable titles={graduationsTitles} data={graduations?.data?.tableStats} />
+                <DataTable data={graduations?.data} />
               </div>
 
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
