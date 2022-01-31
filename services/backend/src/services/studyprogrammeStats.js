@@ -27,15 +27,27 @@ const {
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { getYearStartAndEndDates } = require('../util/semester')
 
-const getStartedStats = async ({ studyprogramme, since, years, isAcademicYear }) => {
-  const studyrights = await startedStudyrights(studyprogramme, since)
+const getStartedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
 
-  studyrights.forEach(({ studystartdate }) => {
-    const startYear = defineYear(studystartdate, isAcademicYear)
-    graphStats[indexOf(years, startYear)] += 1
-    tableStats[startYear] += 1
-  })
+  await Promise.all(
+    years.map(async year => {
+      const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
+      const studentnumbersOfTheYear = await getCorrectStudentnumbers({
+        codes: [studyprogramme],
+        startDate,
+        endDate,
+        includeAllSpecials,
+      })
+      const studyrights = await startedStudyrights(studyprogramme, since, studentnumbersOfTheYear)
+
+      studyrights.forEach(({ studystartdate }) => {
+        const startYear = defineYear(studystartdate, isAcademicYear)
+        graphStats[indexOf(years, startYear)] += 1
+        tableStats[startYear] += 1
+      })
+    })
+  )
   return { graphStats, tableStats }
 }
 
@@ -236,12 +248,13 @@ const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllS
   return studentnumbers
 }
 
-const getBasicStatsForStudytrack = async ({ studyprogramme, yearType }) => {
+const getBasicStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
-  const queryParameters = { studyprogramme, since, years, isAcademicYear }
+  const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
   const started = await getStartedStats(queryParameters)
   const graduated = await getGraduatedStats(queryParameters)
   const cancelled = await getCancelledStats(queryParameters)
@@ -249,46 +262,66 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, yearType }) => {
   const transferredTo = await getTransferredToStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
-  const tableStats = reversedYears.map(year => [
-    year,
-    started.tableStats[year],
-    graduated.tableStats[year],
-    cancelled.tableStats[year],
-    transferredAway.tableStats[year],
-    transferredTo.tableStats[year],
-  ])
+  const titles = includeAllSpecials
+    ? ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
+    : ['', 'Started', 'Graduated']
+  const tableStats = reversedYears.map(year =>
+    includeAllSpecials
+      ? [
+          year,
+          started.tableStats[year],
+          graduated.tableStats[year],
+          cancelled.tableStats[year],
+          transferredAway.tableStats[year],
+          transferredTo.tableStats[year],
+        ]
+      : [year, started.tableStats[year], graduated.tableStats[year]]
+  )
 
   return {
     id: studyprogramme,
     years,
-    graphStats: [
-      {
-        name: 'Started',
-        data: started.graphStats,
-      },
-      {
-        name: 'Graduated',
-        data: graduated.graphStats,
-      },
-      {
-        name: 'Cancelled',
-        data: cancelled.graphStats,
-      },
-      {
-        name: 'Transferred away',
-        data: transferredAway.graphStats,
-      },
-      {
-        name: 'Transferred To',
-        data: transferredTo.graphStats,
-      },
-    ],
+    graphStats: includeAllSpecials
+      ? [
+          {
+            name: 'Started',
+            data: started.graphStats,
+          },
+          {
+            name: 'Graduated',
+            data: graduated.graphStats,
+          },
+          {
+            name: 'Cancelled',
+            data: cancelled.graphStats,
+          },
+          {
+            name: 'Transferred away',
+            data: transferredAway.graphStats,
+          },
+          {
+            name: 'Transferred To',
+            data: transferredTo.graphStats,
+          },
+        ]
+      : [
+          {
+            name: 'Started',
+            data: started.graphStats,
+          },
+          {
+            name: 'Graduated',
+            data: graduated.graphStats,
+          },
+        ],
     tableStats,
+    titles,
   }
 }
 
-const getCreditStatsForStudytrack = async ({ studyprogramme, yearType }) => {
+const getCreditStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
@@ -297,6 +330,11 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType }) => {
   const transferred = await getTransferredCreditStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
+
+  const titles = includeAllSpecials
+    ? ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits']
+    : ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits']
+
   const tableStats = reversedYears.map(year => [
     year,
     majors.tableStats[year] + nonMajors.tableStats[year] + transferred.tableStats[year],
@@ -323,6 +361,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType }) => {
         data: transferred.graphStats,
       },
     ],
+    titles,
   }
 }
 
@@ -338,6 +377,8 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
   const graduationTimeStats = await getGraduationTimeStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
+
+  const titles = ['', 'Graduated', 'Wrote thesis']
   const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
 
   return {
@@ -357,6 +398,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
     graduationMedianTime: graduationTimeStats.medians,
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
+    titles,
   }
 }
 
