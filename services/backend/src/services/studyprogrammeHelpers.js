@@ -42,6 +42,14 @@ const getYearsObject = (years, emptyArrays = false) => {
   return yearsObject
 }
 
+const getAcademicYearsObject = (years, emptyArrays = false) => {
+  let yearsObject = {}
+  for (const year of years) {
+    yearsObject = { ...yearsObject, [`${year} - ${year + 1}`]: emptyArrays ? [] : 0 }
+  }
+  return yearsObject
+}
+
 const getStatsBasis = years => {
   return {
     graphStats: new Array(years.length).fill(0),
@@ -149,6 +157,7 @@ module.exports = {
   formatStudent,
   getYearsArray,
   getYearsObject,
+  getAcademicYearsObject,
   getStatsBasis,
   isMajorStudentCredit,
   getMedian,

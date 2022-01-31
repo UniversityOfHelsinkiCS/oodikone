@@ -6,6 +6,7 @@ import WithHelpTooltip from '../../Info/InfoWithHelpTooltip'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
 import BasicDataTable from './BasicDataTable'
+import GaugeChart from './GaugeChart'
 import StudytrackDataTable from './StudytrackDataTable'
 import StudytrackSelector from './StudytrackSelector'
 
@@ -47,6 +48,7 @@ const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
 
 const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
+  const [showMeanTime, setShowMeanTime] = useState(true)
   const [specialGroups, setSpecialGroups] = useState(true)
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
@@ -106,6 +108,19 @@ const StudytrackOverview = ({ studyprogramme }) => {
               track={track || studyprogramme}
               titles={creditTableTitles}
             />
+          </div>
+          {getDivider('Average graduation times', 'AverageGraduationTimes')}
+          {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
+          <div className="section-container-centered">
+            {stats?.data?.years.map(year => (
+              <GaugeChart
+                key={year}
+                year={year}
+                data={stats?.data?.graduationMedianTime[track][year]}
+                amount={stats?.data?.graduationAmounts[track][year]}
+                studyprogramme={studyprogramme}
+              />
+            ))}
           </div>
         </>
       )}

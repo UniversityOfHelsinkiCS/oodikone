@@ -1,14 +1,18 @@
 const { indexOf } = require('lodash')
+const moment = require('moment')
 
 const { getAssociations } = require('./studyrights')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const {
+  getMedian,
+  getMean,
   getStartDate,
   getYearsArray,
   getPercentage,
   getCreditGraphStats,
   getYearsObject,
   creditThresholds,
+  getAcademicYearsObject,
 } = require('./studyprogrammeHelpers')
 const {
   studytrackStudents,
@@ -37,6 +41,39 @@ const getStudentData = students => {
   return data
 }
 
+const getGraduationTimeStats = async ({
+  year,
+  graduated,
+  studyprogramme,
+  track,
+  graduationMeanTime,
+  graduationMedianTime,
+  graduationAmounts,
+}) => {
+  // Count how long each student took to graduate
+  let graduationTimes = []
+  graduated.forEach(({ enddate, studystartdate }) => {
+    const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
+    graduationAmounts[track][year] += 1
+    graduationTimes = [...graduationTimes, timeToGraduation]
+  })
+
+  // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
+  const comparisonValue = studyprogramme.includes('KH') ? 72 : 48
+
+  // HighCharts graph requires the data to have this format (ie. actual value, "empty value")
+  const median = getMedian(graduationTimes)
+  const mean = getMean(graduationTimes)
+  graduationMedianTime[track][year] = [
+    ['', median],
+    ['', comparisonValue - median],
+  ]
+  graduationMeanTime[track][year] = [
+    ['', mean],
+    ['', comparisonValue - mean],
+  ]
+}
+
 // Goes through the programme and all its studytracks for the said year and adds the wanted stats to the data objects
 const getStudytrackDataForTheYear = async ({
   studyprogramme,
@@ -47,7 +84,16 @@ const getStudytrackDataForTheYear = async ({
   years,
   data,
 }) => {
-  const { mainStatsByYear, mainStatsByTrack, creditGraphStats, creditTableStats, emptyTracks } = data
+  const {
+    mainStatsByYear,
+    mainStatsByTrack,
+    creditGraphStats,
+    creditTableStats,
+    graduationMeanTime,
+    graduationMedianTime,
+    graduationAmounts,
+    emptyTracks,
+  } = data
   const { startDate, endDate } = getAcademicYearDates(year)
 
   await Promise.all(
@@ -81,7 +127,7 @@ const getStudytrackDataForTheYear = async ({
         )
       }
 
-      // All the stats are counted for the students who actually started studying
+      // Get all the studyrights and students for the calculations
       const all = await allStudyrights(track, studentnumbers)
       const students = await studytrackStudents(studentnumbers)
       const studentData = getStudentData(students)
@@ -168,6 +214,17 @@ const getStudytrackDataForTheYear = async ({
           getPercentage(studentData.finnish, all.length),
         ],
       ]
+
+      // Count stats for the graduation time charts grouped by year
+      await getGraduationTimeStats({
+        year: `${year} - ${year + 1}`,
+        graduated,
+        studyprogramme,
+        track,
+        graduationMedianTime,
+        graduationMeanTime,
+        graduationAmounts,
+      })
     })
   )
 }
@@ -191,15 +248,30 @@ const getEmptyStatsObjects = (years, studytracks) => {
   const mainStatsByTrack = {}
   const creditGraphStats = {}
   const creditTableStats = {}
+  const graduationMedianTime = {}
+  const graduationMeanTime = {}
+  const graduationAmounts = {}
   const emptyTracks = new Map()
 
   studytracks.forEach(async track => {
     mainStatsByTrack[track] = []
     creditGraphStats[track] = await getCreditGraphStats(years)
     creditTableStats[track] = []
+    graduationMedianTime[track] = getAcademicYearsObject(years, true)
+    graduationMeanTime[track] = getAcademicYearsObject(years, true)
+    graduationAmounts[track] = getAcademicYearsObject(years)
   })
 
-  return { mainStatsByYear, mainStatsByTrack, creditGraphStats, creditTableStats, emptyTracks }
+  return {
+    mainStatsByYear,
+    mainStatsByTrack,
+    creditGraphStats,
+    creditTableStats,
+    graduationMedianTime,
+    graduationMeanTime,
+    graduationAmounts,
+    emptyTracks,
+  }
 }
 
 // Combines all the data for the Populations and Studytracks -view
@@ -241,6 +313,9 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, specialGrou
     mainStatsByYear: data.mainStatsByYear,
     creditTableStats: data.creditTableStats,
     creditGraphStats: data.creditGraphStats,
+    graduationMedianTime: data.graduationMedianTime,
+    graduationMeanTime: data.graduationMeanTime,
+    graduationAmounts: data.graduationAmounts,
     studytrackOptions,
   }
 }
