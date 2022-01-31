@@ -362,7 +362,7 @@ const getTransferredCredits = async (provider, since) =>
     },
   })
 
-const getThesisCredits = async (provider, since, thesisType) =>
+const getThesisCredits = async (provider, since, thesisType, studentnumbers) =>
   await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
     include: {
@@ -392,6 +392,7 @@ const getThesisCredits = async (provider, since, thesisType) =>
       attainment_date: {
         [Op.gte]: since,
       },
+      student_studentnumber: whereStudents(studentnumbers),
     },
   })
 

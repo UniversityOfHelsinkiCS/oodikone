@@ -36,9 +36,27 @@ const getAcademicYearDates = year => {
   }
 }
 
+const getYearStartAndEndDates = (year, isAcademicYear) => {
+  if (isAcademicYear) {
+    const firstYear = year.slice(0, 4)
+    return {
+      startDate: new Date(`${firstYear}-${semesterStart['FALL']}`).toISOString(),
+      endDate: new Date(
+        `${moment(firstYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`
+      ).toISOString(),
+    }
+  }
+
+  return {
+    startDate: new Date(`${year}-01-01`).toISOString(),
+    endDate: new Date(`${year}-12-31`).toISOString(),
+  }
+}
+
 module.exports = {
   getPassingSemester,
   getAcademicYearDates,
+  getYearStartAndEndDates,
   semesterEnd,
   semesterStart,
 }
