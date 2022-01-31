@@ -66,7 +66,7 @@ const NavigationBar = () => {
 
   // Min-content sets logo always to the left
   const renderHome = () => (
-    <Menu.Item as={Link} to="/" tabIndex="-1" style={{ width: 'min-content' }}>
+    <Menu.Item as={Link} to="/" tabIndex="-1">
       <span className="logo">
         <h2 className="logoText">oodikone</h2>
       </span>
