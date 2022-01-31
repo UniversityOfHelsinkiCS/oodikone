@@ -49,6 +49,13 @@
   flex-wrap: wrap;
 }
 
+.studytrack-overview .section-container-centered,
+.studyprogramme-overview .section-container-centered {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .studytrack-overview .graph-container,
 .studyprogramme-overview .graph-container {
   min-width: 50%;
