@@ -75,6 +75,24 @@ const StudyProgramme = props => {
         }, [])
       : []
     const panes = []
+    if (SHOW_NEW_OVERVIEW) {
+      panes.push({
+        menuItem: 'Basic information (NEW)',
+        render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
+      })
+    }
+    if (SHOW_NEW_OVERVIEW) {
+      panes.push({
+        menuItem: 'Populations and Studytracks (NEW)',
+        render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
+      })
+    }
+    if (SHOW_NEW_OVERVIEW) {
+      panes.push({
+        menuItem: 'Update statistics (NEW)',
+        render: () => <NewUpdateView studyprogramme={studyProgrammeId} />,
+      })
+    }
     panes.push({
       menuItem: 'Overview',
       render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />,
@@ -106,24 +124,6 @@ const StudyProgramme = props => {
             <Button onClick={() => refreshProductivity()}>recalculate productivity</Button>
           </>
         ),
-      })
-    }
-    if (SHOW_NEW_OVERVIEW) {
-      panes.push({
-        menuItem: 'Basic information (NEW)',
-        render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
-      })
-    }
-    if (SHOW_NEW_OVERVIEW) {
-      panes.push({
-        menuItem: 'Populations and Studytracks (NEW)',
-        render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
-      })
-    }
-    if (SHOW_NEW_OVERVIEW) {
-      panes.push({
-        menuItem: 'Update statistics (NEW)',
-        render: () => <NewUpdateView studyprogramme={studyProgrammeId} />,
       })
     }
     return panes
