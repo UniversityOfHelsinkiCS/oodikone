@@ -1,6 +1,31 @@
 const { mean } = require('lodash')
+const { studentnumbersWithAllStudyrightElements } = require('./populations')
 
 // Helper functions
+
+const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials }) => {
+  let studentnumbers = []
+  const exchangeStudents = includeAllSpecials
+  const cancelledStudents = includeAllSpecials
+  const nondegreeStudents = includeAllSpecials
+  const transferredOutStudents = includeAllSpecials
+  const transferredToStudents = !includeAllSpecials
+
+  studentnumbers = await studentnumbersWithAllStudyrightElements(
+    codes,
+    startDate,
+    endDate,
+    exchangeStudents,
+    cancelledStudents,
+    nondegreeStudents,
+    transferredOutStudents,
+    null,
+    transferredToStudents
+  )
+
+  return studentnumbers
+}
+
 const formatStudyright = studyright => {
   const {
     studyrightid,
@@ -168,6 +193,7 @@ const getCreditGraphStats = years => ({
 const creditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'mte150']
 
 module.exports = {
+  getCorrectStudentnumbers,
   formatStudyright,
   formatStudent,
   getYearsArray,
