@@ -2,7 +2,17 @@ const { mean } = require('lodash')
 
 // Helper functions
 const formatStudyright = studyright => {
-  const { studyrightid, studystartdate, enddate, canceldate, graduated, prioritycode, extentcode, student } = studyright
+  const {
+    studyrightid,
+    studystartdate,
+    enddate,
+    canceldate,
+    graduated,
+    prioritycode,
+    extentcode,
+    student,
+    studyright_elements,
+  } = studyright
   return {
     studyrightid,
     studystartdate,
@@ -12,6 +22,11 @@ const formatStudyright = studyright => {
     prioritycode,
     extentcode,
     studentnumber: student.studentnumber,
+    code: studyright_elements?.length ? studyright_elements[0].code : null,
+    name:
+      studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
+        ? studyright_elements[0].element_detail.name
+        : null,
   }
 }
 

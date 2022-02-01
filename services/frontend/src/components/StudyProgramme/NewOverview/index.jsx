@@ -75,7 +75,7 @@ const Overview = ({ studyprogramme }) => {
               {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
               <div className="section-container">
                 <LineGraph data={basics?.data} />
-                <DataTable data={basics?.data} />
+                <DataTable data={basics?.data?.tableStats} titles={basics?.data?.titles} />
               </div>
             </>
           )}
@@ -84,7 +84,7 @@ const Overview = ({ studyprogramme }) => {
               {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
               <div className="section-container">
                 <StackedBarChart data={credits?.data} />
-                <DataTable data={credits?.data} />
+                <DataTable data={credits?.data?.tableStats} titles={credits?.data?.titles} />
               </div>
             </>
           )}
@@ -93,7 +93,7 @@ const Overview = ({ studyprogramme }) => {
               {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
               <div className="section-container">
                 <BarChart data={graduations?.data} />
-                <DataTable data={graduations?.data} />
+                <DataTable data={graduations?.data?.tableStats} titles={graduations?.data?.titles} />
               </div>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
@@ -111,6 +111,16 @@ const Overview = ({ studyprogramme }) => {
                     studyprogramme={studyprogramme}
                   />
                 ))}
+              </div>
+              {getDivider(
+                studyprogramme.includes('KH') ? 'Studies after this programme' : 'Studies before this programme',
+                'AverageGraduationTimes'
+              )}
+              <div className="section-container-centered">
+                <DataTable
+                  data={graduations?.data?.programmesAfterGraduation}
+                  titles={graduations?.data?.programmesAfterTitles}
+                />
               </div>
             </>
           )}
