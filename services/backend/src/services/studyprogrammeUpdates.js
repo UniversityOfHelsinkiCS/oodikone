@@ -1,8 +1,6 @@
-const {
-  getBasicStatsForStudytrack,
-  getCreditStatsForStudytrack,
-  getGraduationStatsForStudytrack,
-} = require('../services/studyprogrammeStats')
+const { getBasicStatsForStudytrack } = require('../services/studyprogrammeBasics')
+const { getCreditStatsForStudytrack } = require('../services/studyprogrammeCredits')
+const { getGraduationStatsForStudytrack } = require('../services/studyprogrammeGraduations')
 const { getStudytrackStatsForStudyprogramme } = require('../services/studytrackStats')
 const {
   setBasicStats,
