@@ -7,12 +7,26 @@ const {
   isMajorStudentCredit,
   getYearsArray,
   getStartDate,
+  isSpecialGroupCredit,
 } = require('./studyprogrammeHelpers')
-const { getProgrammesStudents, getCreditsForStudyProgramme, getTransferredCredits } = require('./newStudyprogramme')
+const {
+  getProgrammesStudents,
+  getCreditsForStudyProgramme,
+  getTransferredCredits,
+  transfersAway,
+  transfersTo,
+} = require('./newStudyprogramme')
 
-const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicYear }) => {
+const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const providercode = mapToProviders([studyprogramme])[0]
   const studyrights = await getProgrammesStudents(studyprogramme)
+
+  let transfers = []
+  if (!includeAllSpecials) {
+    const transferredAway = await transfersAway(studyprogramme, since)
+    const transferredTo = await transfersTo(studyprogramme, since)
+    transfers = [...transferredAway, ...transferredTo].map(s => s.studyrightid)
+  }
   const credits = await getCreditsForStudyProgramme(providercode, since)
 
   let majors = getStatsBasis(years)
@@ -21,6 +35,10 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
   credits.forEach(({ student_studentnumber, attainment_date, credits }) => {
     const studyright = studyrights.find(studyright => studyright.studentnumber == student_studentnumber)
     const attainmentYear = defineYear(attainment_date, isAcademicYear)
+
+    if (!includeAllSpecials && isSpecialGroupCredit(studyright, attainment_date, transfers)) {
+      return
+    }
 
     if (isMajorStudentCredit(studyright, attainment_date)) {
       majors.graphStats[indexOf(years, attainmentYear)] += credits || 0
@@ -54,7 +72,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType, specialGr
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
-  const queryParameters = { studyprogramme, since, years, isAcademicYear }
+  const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
   const { majors, nonMajors } = await getRegularCreditStats(queryParameters)
   const transferred = await getTransferredCreditStats(queryParameters)
 

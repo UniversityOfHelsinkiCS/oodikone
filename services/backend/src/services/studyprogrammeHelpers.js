@@ -100,9 +100,20 @@ const getStatsBasis = years => {
 const isMajorStudentCredit = (studyright, attainment_date) =>
   studyright &&
   (studyright.prioritycode === 1 || studyright.prioritycode === 30) && // Is studyright state = MAIN or state = GRADUATED
+  studyright.studystartdate && // The student has started studying in the programme
   studyright.studystartdate <= attainment_date && // Has the credit been attained after studying in the programme started
   studyright.enddate >= attainment_date && // Has the credit been attained before the studyright ended
   (!studyright.canceldate || studyright.canceldate >= attainment_date) // If the studyright was cancelled, was the credit attained before it was cancelled
+
+const isSpecialGroupCredit = (studyright, attainment_date, transfers) => {
+  if (!studyright || studyright == undefined) return true
+  if (studyright.canceldate) return true
+  if (studyright.studystartdate > attainment_date) return true
+  if (studyright.enddate && attainment_date > studyright.enddate) return true
+  if ([7, 9, 16, 34, 33, 99, 14, 13].includes(studyright.extentcode)) return true
+  if (transfers.includes(studyright.studyrightid)) return true
+  return false
+}
 
 const getMedian = values => {
   if (values.length === 0) return 0
@@ -201,6 +212,7 @@ module.exports = {
   getAcademicYearsObject,
   getStatsBasis,
   isMajorStudentCredit,
+  isSpecialGroupCredit,
   getMedian,
   getMean,
   defineYear,
