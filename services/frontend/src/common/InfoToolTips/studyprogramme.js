@@ -39,6 +39,11 @@ export default {
   **Mean time**: Näyttää kyseisenä vuonna valmistuneiden opintojen keston **keskiarvon** kuukausina.
   
   Mukana ovat **vain valmistuneet opiskelijat**. Kandiohjelmissa tavoiteaika on 36 kk, maisteriohjelmissa 24 kk`,
+  ProgrammesAfterGraduation: `
+  Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
+
+  Mukana ovat **vain valmistuneet opiskelijat ja maisteriohjelmat**.
+  `,
   StudytrackOverview: `  
   Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
   Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, tutkinnonsuoritusoikeudesta luopuneet ja erillisopinto-oikeudella opiskelevat.

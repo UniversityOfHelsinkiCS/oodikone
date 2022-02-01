@@ -112,20 +112,21 @@ const Overview = ({ studyprogramme }) => {
                   />
                 ))}
               </div>
-              {getDivider(
-                studyprogramme.includes('KH') ? 'Studies after this programme' : 'Studies before this programme',
-                'AverageGraduationTimes'
+              {studyprogramme.includes('KH') && (
+                <>
+                  {getDivider('Primary master programme studies after this programme', 'ProgrammesAfterGraduation')}
+                  <div className="section-container">
+                    <StackedBarChart
+                      data={graduations?.data?.programmesAfterGraphStats}
+                      labels={graduations?.data?.years}
+                    />
+                    <DataTable
+                      data={graduations?.data?.programmesAfterTableStats}
+                      titles={graduations?.data?.programmesAfterTitles}
+                    />
+                  </div>
+                </>
               )}
-              <div className="section-container-centered">
-                <StackedBarChart
-                  data={graduations?.data?.programmesAfterGraphStats}
-                  labels={graduations?.data?.years}
-                />
-                <DataTable
-                  data={graduations?.data?.programmesAfterTableStats}
-                  titles={graduations?.data?.programmesAfterTitles}
-                />
-              </div>
             </>
           )}
         </>
