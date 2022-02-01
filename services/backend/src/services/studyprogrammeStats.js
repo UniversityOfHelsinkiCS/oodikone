@@ -226,14 +226,22 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   return { medians, means, graduationAmounts }
 }
 
-const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAcademicYear }) => {
+const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const graduated = await graduatedStudyRights(studyprogramme, since)
   const graduatedStudents = graduated.map(s => s.studentnumber)
-  const studyrightsAfterThisProgramme = await followingStudyrights(since, graduatedStudents)
+  let studyrightsAfterThisProgramme = await followingStudyrights(since, graduatedStudents)
   const studyprogrammeCodes = uniqBy(studyrightsAfterThisProgramme, 'code').map(s => ({ code: s.code, name: s.name }))
 
   const stats = {}
   studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject(years) }))
+
+  if (!includeAllSpecials) {
+    const transferredAway = await transfersAway(studyprogramme, since)
+    const transferredTo = await transfersTo(studyprogramme, since)
+    const transfers = [...transferredAway, ...transferredTo].map(s => s.studyrightid)
+    studyrightsAfterThisProgramme.filter(s => !transfers.includes(s.studyrightid) && !s.canceldate)
+  }
+
   studyrightsAfterThisProgramme.forEach(({ studystartdate, code }) => {
     const startYear = defineYear(studystartdate, isAcademicYear)
     if (years.includes(startYear) && code) {
@@ -245,7 +253,11 @@ const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAc
     .map(p => [p.code, p.name['fi'], ...years.map(year => p[year])])
     .filter(p => p[0].includes('MH'))
 
-  return tableStats
+  const graphStats = Object.values(stats)
+    .map(p => ({ name: p.name['fi'], code: p.code, data: years.map(year => p[year]) }))
+    .filter(p => p.code.includes('MH'))
+
+  return { tableStats, graphStats }
 }
 
 const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials }) => {
@@ -424,7 +436,8 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
     graduationMedianTime: graduationTimeStats.medians,
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
-    programmesAfterGraduation,
+    programmesAfterTableStats: programmesAfterGraduation.tableStats,
+    programmesAfterGraphStats: programmesAfterGraduation.graphStats,
     programmesAfterTitles,
   }
 }
