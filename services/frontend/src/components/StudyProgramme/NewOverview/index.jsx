@@ -95,34 +95,23 @@ const Overview = ({ studyprogramme }) => {
                 <BarChart data={graduations?.data} />
                 <DataTable data={graduations?.data} />
               </div>
-
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
-              {showMeanTime ? (
-                <div className="section-container-centered">
-                  {graduations?.data?.years.map(year => (
-                    <GaugeChart
-                      key={year}
-                      year={year}
-                      data={graduations?.data?.graduationMedianTime[year]}
-                      amount={graduations?.data?.graduationAmounts[year]}
-                      studyprogramme={studyprogramme}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="section-container-centered">
-                  {graduations?.data?.years.map(year => (
-                    <GaugeChart
-                      key={year}
-                      year={year}
-                      data={graduations?.data?.graduationMeanTime[year]}
-                      amount={graduations?.data?.graduationAmounts[year]}
-                      studyprogramme={studyprogramme}
-                    />
-                  ))}
-                </div>
-              )}
+              <div className="section-container-centered">
+                {graduations?.data?.years.map(year => (
+                  <GaugeChart
+                    key={year}
+                    year={year}
+                    data={
+                      showMeanTime
+                        ? graduations?.data?.graduationMeanTime[year]
+                        : graduations?.data?.graduationMedianTime[year]
+                    }
+                    amount={graduations?.data?.graduationAmounts[year]}
+                    studyprogramme={studyprogramme}
+                  />
+                ))}
+              </div>
             </>
           )}
         </>
