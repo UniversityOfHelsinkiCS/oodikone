@@ -83,13 +83,13 @@ const StudyProgramme = props => {
     }
     if (SHOW_NEW_OVERVIEW) {
       panes.push({
-        menuItem: 'Populations and Studytracks (NEW)',
+        menuItem: 'Studytracks and student populations (NEW)',
         render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
       })
     }
     if (SHOW_NEW_OVERVIEW) {
       panes.push({
-        menuItem: 'Update statistics (NEW)',
+        menuItem: 'Update statistics',
         render: () => <NewUpdateView studyprogramme={studyProgrammeId} />,
       })
     }
