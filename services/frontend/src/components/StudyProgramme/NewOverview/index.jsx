@@ -83,7 +83,7 @@ const Overview = ({ studyprogramme }) => {
             <>
               {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
               <div className="section-container">
-                <StackedBarChart data={credits?.data} />
+                <StackedBarChart data={credits?.data?.graphStats} labels={credits?.data?.years} />
                 <DataTable data={credits?.data?.tableStats} titles={credits?.data?.titles} />
               </div>
             </>
@@ -117,8 +117,12 @@ const Overview = ({ studyprogramme }) => {
                 'AverageGraduationTimes'
               )}
               <div className="section-container-centered">
+                <StackedBarChart
+                  data={graduations?.data?.programmesAfterGraphStats}
+                  labels={graduations?.data?.years}
+                />
                 <DataTable
-                  data={graduations?.data?.programmesAfterGraduation}
+                  data={graduations?.data?.programmesAfterTableStats}
                   titles={graduations?.data?.programmesAfterTitles}
                 />
               </div>

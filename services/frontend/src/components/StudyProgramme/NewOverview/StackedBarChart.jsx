@@ -4,8 +4,8 @@ const ReactHighcharts = require('react-highcharts')
 
 const colors = ['#003E65', '#1392c2', '#036415']
 
-const StackedBarChart = ({ data }) => {
-  const dataWithColors = data?.graphStats?.map((series, index) => ({ ...series, color: colors[index] }))
+const StackedBarChart = ({ data, labels }) => {
+  const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const defaultConfig = {
     title: {
@@ -16,7 +16,7 @@ const StackedBarChart = ({ data }) => {
       text: 'oodikone | TOSKA',
     },
     xAxis: {
-      categories: data?.years,
+      categories: labels,
     },
     chart: {
       type: 'column',
