@@ -1,5 +1,5 @@
 const moment = require('moment')
-const { indexOf } = require('lodash')
+const { indexOf, uniqBy } = require('lodash')
 
 const { mapToProviders } = require('../util/utils')
 const {
@@ -23,6 +23,7 @@ const {
   getCreditsForStudyProgramme,
   getTransferredCredits,
   getThesisCredits,
+  followingStudyrights,
 } = require('./newStudyprogramme')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { getYearStartAndEndDates } = require('../util/semester')
@@ -225,6 +226,28 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   return { medians, means, graduationAmounts }
 }
 
+const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAcademicYear }) => {
+  const graduated = await graduatedStudyRights(studyprogramme, since)
+  const graduatedStudents = graduated.map(s => s.studentnumber)
+  const studyrightsAfterThisProgramme = await followingStudyrights(since, graduatedStudents)
+  const studyprogrammeCodes = uniqBy(studyrightsAfterThisProgramme, 'code').map(s => ({ code: s.code, name: s.name }))
+
+  const stats = {}
+  studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject(years) }))
+  studyrightsAfterThisProgramme.forEach(({ studystartdate, code }) => {
+    const startYear = defineYear(studystartdate, isAcademicYear)
+    if (years.includes(startYear) && code) {
+      stats[code][startYear] += 1
+    }
+  })
+
+  const tableStats = Object.values(stats)
+    .map(p => [p.code, p.name['fi'], ...years.map(year => p[year])])
+    .filter(p => p[0].includes('MH'))
+
+  return tableStats
+}
+
 const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials }) => {
   let studentnumbers = []
   const exchangeStudents = includeAllSpecials
@@ -375,16 +398,19 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
   const thesis = await getThesisStats(queryParameters)
   const graduated = await getGraduatedStats(queryParameters)
   const graduationTimeStats = await getGraduationTimeStats(queryParameters)
+  const programmesAfterGraduation = await getProgrammesAfterGraduation(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
 
   const titles = ['', 'Graduated', 'Wrote thesis']
+  const programmesAfterTitles = ['Programme', 'Code', ...years]
   const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
 
   return {
     id: studyprogramme,
     years,
     tableStats,
+    titles,
     graphStats: [
       {
         name: 'Graduated students',
@@ -398,7 +424,8 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
     graduationMedianTime: graduationTimeStats.medians,
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
-    titles,
+    programmesAfterGraduation,
+    programmesAfterTitles,
   }
 }
 
