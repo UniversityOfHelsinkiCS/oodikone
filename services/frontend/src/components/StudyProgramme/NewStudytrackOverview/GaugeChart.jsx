@@ -38,9 +38,6 @@ const GaugeChart = ({ data, year, amount, studyprogramme }) => {
     credits: {
       text: '',
     },
-    tooltip: {
-      pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
-    },
     exporting: {
       enabled: false,
     },
