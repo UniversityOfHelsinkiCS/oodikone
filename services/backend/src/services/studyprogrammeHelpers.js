@@ -38,6 +38,7 @@ const formatStudyright = studyright => {
     student,
     studyright_elements,
   } = studyright
+
   return {
     studyrightid,
     studystartdate,
@@ -106,12 +107,12 @@ const isMajorStudentCredit = (studyright, attainment_date) =>
   (!studyright.canceldate || studyright.canceldate >= attainment_date) // If the studyright was cancelled, was the credit attained before it was cancelled
 
 const isSpecialGroupCredit = (studyright, attainment_date, transfers) => {
-  if (!studyright || studyright == undefined) return true
-  if (studyright.canceldate) return true
-  if (studyright.studystartdate > attainment_date) return true
-  if (studyright.enddate && attainment_date > studyright.enddate) return true
-  if ([7, 9, 16, 34, 33, 99, 14, 13].includes(studyright.extentcode)) return true
-  if (transfers.includes(studyright.studyrightid)) return true
+  if (!studyright) return true // If there is no studyright matching the credit, is not a major student credit
+  if (studyright.canceldate) return true // Cancelled studyrights are in the special groups
+  if (studyright.studystartdate > attainment_date) return true // Credits before the studyright started are not major student credits
+  if (studyright.enddate && attainment_date > studyright.enddate) return true // Credits after studyright are not major student credits
+  if ([7, 9, 16, 34, 33, 99, 14, 13].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
+  if (transfers.includes(studyright.studyrightid)) return true // Excludes both transfers in and out of the programme
   return false
 }
 
