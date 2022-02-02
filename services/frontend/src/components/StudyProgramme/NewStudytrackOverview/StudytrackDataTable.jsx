@@ -18,8 +18,7 @@ const getFirstCell = (yearlyData, year, show, studyprogramme) => {
   )
 }
 
-const getSingleTrackRow = ({ yearlyData, row, studyprogramme, code, hidePercentages }) => {
-  const year = yearlyData && yearlyData[0] && yearlyData[0][0]
+const getSingleTrackRow = ({ row, studyprogramme, code, hidePercentages }) => {
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
       {row.map((value, index) => (
@@ -27,7 +26,7 @@ const getSingleTrackRow = ({ yearlyData, row, studyprogramme, code, hidePercenta
           {shouldBeHidden(hidePercentages, value) ? null : (
             <Table.Cell textAlign="left" key={getKey(row[0])}>
               {value}
-              {index === 0 && <PopulationLink studyprogramme={studyprogramme} year={year} studytrack={code} />}
+              {index === 0 && <PopulationLink studyprogramme={studyprogramme} year={row[0]} studytrack={code} />}
             </Table.Cell>
           )}
         </>
@@ -171,13 +170,7 @@ const StudytrackDataTable = ({
         <Table.Body>
           {singleTrack
             ? sortedTrackStats.map(row =>
-                getSingleTrackRow({
-                  yearlyData: dataOfSingleTrack,
-                  row,
-                  studyprogramme,
-                  code: singleTrack,
-                  hidePercentages,
-                })
+                getSingleTrackRow({ row, studyprogramme, code: singleTrack, hidePercentages })
               )
             : sortedMainStats?.map(yearlyData =>
                 yearlyData.map(row =>
