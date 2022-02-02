@@ -16,7 +16,7 @@ class DbConnection extends EventEmitter {
       pool: {
         max: 25,
         min: 0,
-        acquire: 20000,
+        acquire: 30000,
         idle: 300000000,
       },
       logging: false,
