@@ -135,7 +135,7 @@ const getStudytrackDataForTheYear = async ({
       const enrolled = await enrolledStudents(track, startDate, studentnumbers)
       const absent = await absentStudents(track, studentnumbers)
       const cancelled = await cancelledStudyRights(track, startDate, studentnumbers)
-      const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
+      const graduated = await graduatedStudyRights(track, null, studentnumbers)
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
       if (all.length === 0) {
