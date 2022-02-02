@@ -96,6 +96,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
             titles={populationTitles}
             dataOfAllTracks={stats?.data?.mainStatsByYear}
             dataOfSingleTrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
+            years={stats?.data?.years}
           />
           {getDivider(
             `Progress of students of ${

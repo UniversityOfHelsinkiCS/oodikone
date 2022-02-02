@@ -192,7 +192,9 @@ const getStudytrackDataForTheYear = async ({
       mainStatsByYear[year] = [
         ...mainStatsByYear[year],
         [
-          studytrackNames[track]?.name['fi'] || `${year} - ${year + 1}`,
+          studytrackNames[track]?.name['fi']
+            ? `${studytrackNames[track]?.name['fi']}, ${track}`
+            : `${year} - ${year + 1}`,
           all.length,
           getPercentage(all.length, all.length),
           started.length,
