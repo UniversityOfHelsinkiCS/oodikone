@@ -19,6 +19,10 @@ const whereStudents = studentnumbers => {
   return studentnumbers ? studentnumbers : { [Op.not]: null }
 }
 
+const sinceDate = since => {
+  return since ? { [Op.gte]: since } : { [Op.not]: null }
+}
+
 const studytrackStudents = async studentnumbers =>
   (
     await Student.findAll({
@@ -193,9 +197,7 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
       ],
       where: {
         graduated: 1,
-        enddate: {
-          [Op.gte]: since,
-        },
+        enddate: sinceDate(since),
         student_studentnumber: whereStudents(studentnumbers),
       },
     })
