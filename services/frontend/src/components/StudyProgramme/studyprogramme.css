@@ -62,9 +62,22 @@
   height: 500px;
 }
 
+.studytrack-overview .graph-container-narrow,
+.studyprogramme-overview .graph-container-narrow {
+  min-width: 40%;
+  height: 500px;
+}
+
 .studytrack-overview .table-container,
 .studyprogramme-overview .table-container {
   max-width: 45%;
+  margin-left: 1em;
+  flex-grow: 2;
+}
+
+.studytrack-overview .table-container-wide,
+.studyprogramme-overview .table-container-wide {
+  max-width: 55%;
   margin-left: 1em;
   flex-grow: 2;
 }

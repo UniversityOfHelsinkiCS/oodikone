@@ -2,9 +2,9 @@ import React from 'react'
 
 const ReactHighcharts = require('react-highcharts')
 
-const colors = ['#003E65', '#1392c2', '#036415']
+const colors = ['#003E65', '#1392c2', '#036415', '#bdc2c7', '#E68825', '#333737', '#54997b', '#195f8a']
 
-const StackedBarChart = ({ data, labels }) => {
+const StackedBarChart = ({ data, labels, wideTable }) => {
   const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const defaultConfig = {
@@ -55,7 +55,7 @@ const StackedBarChart = ({ data, labels }) => {
 
   if (!data) return <></>
   return (
-    <div className="graph-container">
+    <div className={`graph-container${wideTable ? '-narrow' : ''}`}>
       <ReactHighcharts config={defaultConfig} />
     </div>
   )
