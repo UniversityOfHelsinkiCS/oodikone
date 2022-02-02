@@ -38,14 +38,6 @@ const enrolledStudents = async (studytrack, since, studentnumbers) => {
     include: [
       {
         model: Studyright,
-        where: {
-          studystartdate: {
-            [Op.gte]: since,
-          },
-          enddate: {
-            [Op.gte]: new Date(),
-          },
-        },
         include: [
           {
             model: StudyrightElement,
@@ -84,21 +76,13 @@ const enrolledStudents = async (studytrack, since, studentnumbers) => {
   return students.filter(s => s.semester_enrollments?.length)
 }
 
-const absentStudents = async (studytrack, since, studentnumbers) => {
+const absentStudents = async (studytrack, studentnumbers) => {
   const currentSemester = await getCurrentSemester()
   const students = await Student.findAll({
     attributes: ['studentnumber'],
     include: [
       {
         model: Studyright,
-        where: {
-          studystartdate: {
-            [Op.gte]: since,
-          },
-          enddate: {
-            [Op.gte]: new Date(),
-          },
-        },
         include: [
           {
             model: StudyrightElement,
@@ -113,17 +97,9 @@ const absentStudents = async (studytrack, since, studentnumbers) => {
       {
         model: SemesterEnrollment,
         attributes: ['semestercode'],
-        include: [
-          {
-            model: Semester,
-            required: true,
-            where: {
-              semestercode: currentSemester.semestercode,
-            },
-          },
-        ],
         where: {
           enrollmenttype: 2,
+          semestercode: currentSemester.semestercode,
         },
       },
     ],
@@ -133,7 +109,8 @@ const absentStudents = async (studytrack, since, studentnumbers) => {
       },
     },
   })
-  return students.filter(s => s.semester_enrollments?.length)
+
+  return students
 }
 
 const allStudyrights = async (studytrack, studentnumbers) =>
