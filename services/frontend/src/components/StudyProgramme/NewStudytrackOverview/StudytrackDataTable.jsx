@@ -35,11 +35,11 @@ const getSingleTrackRow = ({ row, studyprogramme, code, hidePercentages }) => {
   )
 }
 
-const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks, hidePercentages }) => {
+const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks, hidePercentages, years }) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
 
   // Get row for the studyprogramme
-  if (row[0].includes('20')) {
+  if (years.includes(row[0])) {
     return (
       <Table.Row key={getKey(row[0])} className="header-row" onClick={() => setShow(!show)}>
         {row.map((value, index) =>
@@ -139,6 +139,7 @@ const StudytrackDataTable = ({
   singleTrack,
   dataOfSingleTrack,
   titles,
+  years,
 }) => {
   const [show, setShow] = useState(false)
   const [hidePercentages, setHidePercentages] = useState(false)
@@ -174,7 +175,7 @@ const StudytrackDataTable = ({
               )
             : sortedMainStats?.map(yearlyData =>
                 yearlyData.map(row =>
-                  getRow({ yearlyData, row, studyprogramme, show, setShow, studytracks, hidePercentages })
+                  getRow({ yearlyData, row, studyprogramme, show, setShow, studytracks, hidePercentages, years })
                 )
               )}
         </Table.Body>
