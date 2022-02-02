@@ -55,12 +55,24 @@ const Overview = ({ studyprogramme }) => {
     credits.isFetching ||
     graduations.isFetching
 
+  const isError =
+    (basics.isError && credits.isError && graduations.isError) ||
+    (basics.isSuccess &&
+      !basics.data &&
+      credits.isSuccess &&
+      !credits.data &&
+      graduations.isSuccess &&
+      !graduations.data)
+
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+
   return (
     <div className="studyprogramme-overview">
       <div className="toggle-container">
         {getRadioButton(toolTips.YearToggle, 'Calendar year ', 'Academic year', academicYear, setAcademicYear)}
         {getRadioButton(toolTips.StudentToggle, 'Major students', 'All students', specialGroups, setSpecialGroups)}
       </div>
+
       {isFetchingOrLoading ? (
         <Loader active style={{ marginTop: '10em' }} />
       ) : (
