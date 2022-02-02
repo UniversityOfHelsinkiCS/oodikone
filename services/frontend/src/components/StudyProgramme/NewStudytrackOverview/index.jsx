@@ -69,6 +69,10 @@ const StudytrackOverview = ({ studyprogramme }) => {
     </>
   )
 
+  const isError = (stats.isSuccess && !stats.data) || stats.isError
+
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+
   return (
     <div className="studytrack-overview">
       {stats.isLoading || stats.isFetching ? (
