@@ -7,9 +7,9 @@ const {
   getStartDate,
 } = require('./studyprogrammeHelpers')
 const {
+  allStudyrights,
   graduatedStudyRights,
   startedStudyrights,
-  cancelledStudyRights,
   transfersAway,
   transfersTo,
 } = require('./newStudyprogramme')
@@ -63,14 +63,16 @@ const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear,
   return { graphStats, tableStats }
 }
 
-const getCancelledStats = async ({ studyprogramme, since, years, isAcademicYear }) => {
-  const studyrights = await cancelledStudyRights(studyprogramme, since)
+const getCancelledStats = async ({ studyprogramme, years, isAcademicYear }) => {
+  const studyrights = await allStudyrights(studyprogramme)
   const { graphStats, tableStats } = getStatsBasis(years)
 
   studyrights.forEach(({ canceldate }) => {
-    const cancelYear = defineYear(canceldate, isAcademicYear)
-    graphStats[indexOf(years, cancelYear)] += 1
-    tableStats[cancelYear] += 1
+    if (canceldate !== null && canceldate !== undefined) {
+      const cancelYear = defineYear(canceldate, isAcademicYear)
+      graphStats[indexOf(years, cancelYear)] += 1
+      tableStats[cancelYear] += 1
+    }
   })
 
   return { graphStats, tableStats }
