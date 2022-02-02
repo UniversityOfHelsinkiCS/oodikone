@@ -133,7 +133,7 @@ const getStudytrackDataForTheYear = async ({
       const studentData = getStudentData(students)
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const enrolled = await enrolledStudents(track, startDate, studentnumbers)
-      const absent = await absentStudents(track, startDate, studentnumbers)
+      const absent = await absentStudents(track, studentnumbers)
       const cancelled = await cancelledStudyRights(track, startDate, studentnumbers)
       const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
