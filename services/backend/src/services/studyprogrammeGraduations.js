@@ -168,7 +168,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
 
   const titles = ['', 'Graduated', 'Wrote thesis']
-  const programmesAfterTitles = ['Programme', 'Code', ...years]
+  const programmesAfterTitles = ['Code', 'Programme', ...years]
   const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
 
   return {

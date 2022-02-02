@@ -129,10 +129,12 @@ const Overview = ({ studyprogramme }) => {
                   {getDivider('Primary master programme studies after this programme', 'ProgrammesAfterGraduation')}
                   <div className="section-container">
                     <StackedBarChart
+                      wideTable
                       data={graduations?.data?.programmesAfterGraphStats}
                       labels={graduations?.data?.years}
                     />
                     <DataTable
+                      wideTable
                       data={graduations?.data?.programmesAfterTableStats}
                       titles={graduations?.data?.programmesAfterTitles}
                     />
