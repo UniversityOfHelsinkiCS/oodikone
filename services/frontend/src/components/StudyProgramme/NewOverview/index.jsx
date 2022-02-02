@@ -29,11 +29,11 @@ const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
 
 const Overview = ({ studyprogramme }) => {
   const [academicYear, setAcademicYear] = useState(false)
-  const [specialGroups, setSpecialGroups] = useState(true)
+  const [specialGroups, setSpecialGroups] = useState(false)
   const [showMeanTime, setShowMeanTime] = useState(true)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const special = specialGroups ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED'
+  const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const basics = useGetBasicStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
   const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
   const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
@@ -70,7 +70,7 @@ const Overview = ({ studyprogramme }) => {
     <div className="studyprogramme-overview">
       <div className="toggle-container">
         {getRadioButton(toolTips.YearToggle, 'Calendar year ', 'Academic year', academicYear, setAcademicYear)}
-        {getRadioButton(toolTips.StudentToggle, 'Major students', 'All students', specialGroups, setSpecialGroups)}
+        {getRadioButton(toolTips.StudentToggle, 'All students', 'Major students', specialGroups, setSpecialGroups)}
       </div>
 
       {isFetchingOrLoading ? (
