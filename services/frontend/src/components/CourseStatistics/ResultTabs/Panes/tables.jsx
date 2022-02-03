@@ -14,6 +14,7 @@ export const TablesSettings = ({ value, onChange }) => {
       {Object.entries(viewModeNames).map(([key, name]) => (
         <Menu.Item
           active={viewMode === key}
+          data-cy={`viewMode-${name}`}
           name={name}
           onClick={() =>
             onChange({
@@ -36,6 +37,7 @@ export const TablesSettings = ({ value, onChange }) => {
         <Radio
           toggle
           label="Show grades"
+          data-cy="gradeToggle"
           disabled={viewMode !== 'ATTEMPTS'}
           checked={showGrades}
           onChange={() => onChange({ ...value, showGrades: !showGrades })}
