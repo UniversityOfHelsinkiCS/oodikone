@@ -175,7 +175,7 @@ const getPercentage = (value, total) => {
 
 const getEmptyArray = length => new Array(length).fill(0)
 
-const getCreditGraphStats = years => ({
+const getBachelorCreditGraphStats = years => ({
   lte30: {
     name: 'Less than 30 credits',
     data: getEmptyArray(years.length),
@@ -202,7 +202,37 @@ const getCreditGraphStats = years => ({
   },
 })
 
-const creditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'mte150']
+const getMasterCreditGraphStats = years => ({
+  lte200: {
+    name: 'Less than 200 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte220: {
+    name: '200-219 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte240: {
+    name: '220-239 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte260: {
+    name: '240-259 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte280: {
+    name: '260-279 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte280: {
+    name: 'More than 280 credits',
+    data: getEmptyArray(years.length),
+  },
+})
+
+const bachelorCreditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'mte150']
+const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'mte280']
+const bachelorCreditAmounts = [30, 60, 90, 120, 150, 150]
+const masterCreditAmounts = [200, 220, 240, 260, 280, 280]
 
 module.exports = {
   getCorrectStudentnumbers,
@@ -220,6 +250,10 @@ module.exports = {
   getStartDate,
   getThesisType,
   getPercentage,
-  getCreditGraphStats,
-  creditThresholds,
+  getBachelorCreditGraphStats,
+  getMasterCreditGraphStats,
+  bachelorCreditThresholds,
+  masterCreditThresholds,
+  bachelorCreditAmounts,
+  masterCreditAmounts,
 }
