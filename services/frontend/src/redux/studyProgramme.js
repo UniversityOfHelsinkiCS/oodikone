@@ -15,7 +15,8 @@ const studyprogrammeApi = RTKApi.injectEndpoints({
         `/v2/studyprogrammes/${id}/graduationstats?year_type=${yearType}&special_groups=${specialGroups}`,
     }),
     getStudytrackStats: builder.query({
-      query: ({ id, specialGroups }) => `/v2/studyprogrammes/${id}/studytrackstats?special_groups=${specialGroups}`,
+      query: ({ id, graduated, specialGroups }) =>
+        `/v2/studyprogrammes/${id}/studytrackstats?graduated=${graduated}&special_groups=${specialGroups}`,
     }),
     updateBasicView: builder.query({
       query: ({ id }) => `/v2/studyprogrammes/${id}/update_basicview`,

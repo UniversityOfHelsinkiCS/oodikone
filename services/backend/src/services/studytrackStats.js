@@ -83,6 +83,7 @@ const getGraduationTimeStats = async ({
 const getStudytrackDataForTheYear = async ({
   studyprogramme,
   special,
+  graduatedIncluded,
   studytracks,
   studytrackNames,
   year,
@@ -106,7 +107,7 @@ const getStudytrackDataForTheYear = async ({
   await Promise.all(
     studytracks.map(async track => {
       const codes = studyprogramme === track ? [studyprogramme] : [studyprogramme, track]
-
+      const filterGraduated = graduatedIncluded ? false : true
       let studentnumbers = []
       if (special) {
         studentnumbers = await studentnumbersWithAllStudyrightElements(
@@ -118,7 +119,8 @@ const getStudytrackDataForTheYear = async ({
           true,
           true,
           null,
-          false
+          false,
+          filterGraduated
         )
       } else {
         studentnumbers = await studentnumbersWithAllStudyrightElements(
@@ -130,7 +132,8 @@ const getStudytrackDataForTheYear = async ({
           false,
           false,
           null,
-          true
+          true,
+          filterGraduated
         )
       }
 
@@ -276,9 +279,10 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
 }
 
 // Combines all the data for the Populations and Studytracks -view
-const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, specialGroups }) => {
+const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, specialGroups }) => {
   const isAcademicYear = true
   const special = specialGroups === 'SPECIAL_INCLUDED'
+  const graduatedIncluded = graduated === 'GRADUATED_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear())
 
@@ -298,6 +302,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, specialGrou
       return await getStudytrackDataForTheYear({
         studyprogramme,
         special,
+        graduatedIncluded,
         studytracks,
         studytrackNames,
         year,
@@ -318,9 +323,9 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, specialGrou
     mainStatsByYear: data.mainStatsByYear,
     creditTableStats: data.creditTableStats,
     creditGraphStats: data.creditGraphStats,
-    graduationMedianTime: data.graduationMedianTime,
-    graduationMeanTime: data.graduationMeanTime,
-    graduationAmounts: data.graduationAmounts,
+    graduationMedianTime: graduated ? data.graduationMedianTime : null,
+    graduationMeanTime: graduated ? data.graduationMeanTime : null,
+    graduationAmounts: graduated ? data.graduationAmounts : null,
     studytrackOptions,
   }
 }

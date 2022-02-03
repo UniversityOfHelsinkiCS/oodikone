@@ -8,6 +8,11 @@ export default {
   
   Major students: Valinnasta on poissuljettu kaikki edellä mainitut erikoisryhmät.
   `,
+  GradToggle: `
+  Graduated included: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.
+  
+  Graduated excluded: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
+  `,
   StudentsOfTheStudyprogramme: `
   **Started**: Sisältää kyseisenä vuonna aloitetut opinto-oikeudet riippumatta siitä, minä vuonna kyseinen opiskeluoikeus on myönnetty. Opiskelija on myös voinut keskeyttää opintonsa tai siirtyä pois ohjelmasta.\n
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.

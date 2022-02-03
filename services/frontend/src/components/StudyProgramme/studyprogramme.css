@@ -12,6 +12,7 @@
   }
 }
 
+.studytrack-overview .toggle-container,
 .studyprogramme-overview .toggle-container {
   display: flex;
   justify-content: center;
