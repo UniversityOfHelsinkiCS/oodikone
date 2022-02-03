@@ -80,15 +80,24 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType, specialGr
 
   const titles = includeAllSpecials
     ? ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits']
-    : ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits']
+    : ['', 'Total', 'Major students credits', 'Transferred credits']
 
-  const tableStats = reversedYears.map(year => [
-    year,
-    majors.tableStats[year] + nonMajors.tableStats[year] + transferred.tableStats[year],
-    majors.tableStats[year],
-    nonMajors.tableStats[year],
-    transferred.tableStats[year],
-  ])
+  const tableStats = reversedYears.map(year =>
+    includeAllSpecials
+      ? [
+          year,
+          majors.tableStats[year] + nonMajors.tableStats[year] + transferred.tableStats[year],
+          majors.tableStats[year],
+          nonMajors.tableStats[year],
+          transferred.tableStats[year],
+        ]
+      : [
+          year,
+          majors.tableStats[year] + nonMajors.tableStats[year] + transferred.tableStats[year],
+          majors.tableStats[year],
+          transferred.tableStats[year],
+        ]
+  )
 
   return {
     id: studyprogramme,
