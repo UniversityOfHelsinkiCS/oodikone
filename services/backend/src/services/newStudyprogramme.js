@@ -12,7 +12,7 @@ const {
   SemesterEnrollment,
   Semester,
 } = require('../models')
-const { formatStudyright, formatStudent } = require('./studyprogrammeHelpers')
+const { formatStudyright, formatStudent, formatTransfer } = require('./studyprogrammeHelpers')
 const { getCurrentSemester } = require('./semesters')
 
 const whereStudents = studentnumbers => {
@@ -234,33 +234,41 @@ const followingStudyrights = async (since, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const transfersAway = async (studytrack, since) => {
-  return await Transfer.findAll({
-    where: {
-      transferdate: {
-        [Op.gte]: since,
+const transfersAway = async (studytrack, since) =>
+  (
+    await Transfer.findAll({
+      where: {
+        transferdate: {
+          [Op.gte]: since,
+        },
+        sourcecode: studytrack,
       },
-      sourcecode: studytrack,
-    },
-    distinct: true,
-    col: 'studentnumber',
-  })
+      distinct: true,
+      col: 'studentnumber',
+    })
+  ).map(formatTransfer)
+
+const transfersTo = async (studytrack, since) =>
+  (
+    await Transfer.findAll({
+      where: {
+        transferdate: {
+          [Op.gte]: since,
+        },
+        targetcode: studytrack,
+      },
+      distinct: true,
+      col: 'studentnumber',
+    })
+  ).map(formatTransfer)
+
+const allTransfers = async (studytrack, since) => {
+  const transferredTo = await transfersTo(studytrack, since)
+  const transferredAway = await transfersAway(studytrack, since)
+  return [...transferredTo, ...transferredAway]
 }
 
-const transfersTo = async (studytrack, since) => {
-  return await Transfer.findAll({
-    where: {
-      transferdate: {
-        [Op.gte]: since,
-      },
-      targetcode: studytrack,
-    },
-    distinct: true,
-    col: 'studentnumber',
-  })
-}
-
-const getProgrammesStudents = async studyprogramme =>
+const getProgrammesStudyrights = async studyprogramme =>
   (
     await Studyright.findAll({
       attributes: ['studyrightid', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode'],
@@ -386,7 +394,8 @@ module.exports = {
   followingStudyrights,
   transfersAway,
   transfersTo,
-  getProgrammesStudents,
+  allTransfers,
+  getProgrammesStudyrights,
   getCreditsForStudyProgramme,
   getTransferredCredits,
   getThesisCredits,
