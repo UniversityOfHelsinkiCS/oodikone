@@ -2,7 +2,6 @@ const { indexOf } = require('lodash')
 const moment = require('moment')
 
 const { getAssociations } = require('./studyrights')
-const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const {
   getMedian,
   getMean,
@@ -13,10 +12,8 @@ const {
   getMasterCreditGraphStats,
   getYearsObject,
   getAcademicYearsObject,
-  bachelorCreditThresholds,
-  masterCreditThresholds,
-  bachelorCreditAmounts,
-  masterCreditAmounts,
+  getCorrectStudentnumbers,
+  getCreditThresholds,
 } = require('./studyprogrammeHelpers')
 const {
   studytrackStudents,
@@ -83,7 +80,7 @@ const getGraduationTimeStats = async ({
 const getStudytrackDataForTheYear = async ({
   studyprogramme,
   special,
-  graduatedIncluded,
+  includeGraduated,
   studytracks,
   studytrackNames,
   year,
@@ -107,35 +104,14 @@ const getStudytrackDataForTheYear = async ({
   await Promise.all(
     studytracks.map(async track => {
       const codes = studyprogramme === track ? [studyprogramme] : [studyprogramme, track]
-      const filterGraduated = graduatedIncluded ? false : true
-      let studentnumbers = []
-      if (special) {
-        studentnumbers = await studentnumbersWithAllStudyrightElements(
-          codes,
-          startDate,
-          endDate,
-          true,
-          true,
-          true,
-          true,
-          null,
-          false,
-          filterGraduated
-        )
-      } else {
-        studentnumbers = await studentnumbersWithAllStudyrightElements(
-          codes,
-          startDate,
-          endDate,
-          false,
-          false,
-          false,
-          false,
-          null,
-          true,
-          filterGraduated
-        )
-      }
+
+      const studentnumbers = await getCorrectStudentnumbers({
+        codes,
+        startDate,
+        endDate,
+        includeAllSpecials: special,
+        includeGraduated,
+      })
 
       // Get all the studyrights and students for the calculations
       const all = await allStudyrights(track, null, studentnumbers)
@@ -282,7 +258,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, specialGroups }) => {
   const isAcademicYear = true
   const special = specialGroups === 'SPECIAL_INCLUDED'
-  const graduatedIncluded = graduated === 'GRADUATED_INCLUDED'
+  const includeGraduated = graduated === 'GRADUATED_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear())
 
@@ -294,15 +270,14 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
   const studytrackNames = associations.studyTracks
 
   const data = getEmptyStatsObjects(years, studytracks, studyprogramme)
-  const creditThresholdKeys = studyprogramme.includes('KH') ? bachelorCreditThresholds : masterCreditThresholds
-  const creditThresholdAmounts = studyprogramme.includes('KH') ? bachelorCreditAmounts : masterCreditAmounts
+  const { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(studyprogramme)
 
   await Promise.all(
     years.map(async year => {
       return await getStudytrackDataForTheYear({
         studyprogramme,
         special,
-        graduatedIncluded,
+        includeGraduated,
         studytracks,
         studytrackNames,
         year,
