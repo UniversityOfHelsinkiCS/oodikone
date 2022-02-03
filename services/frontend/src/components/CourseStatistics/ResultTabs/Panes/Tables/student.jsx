@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import qs from 'query-string'
 import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
@@ -10,7 +10,7 @@ import { defineCellColor } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllStats, headerVisible = false }) => {
+const getColumns = (showDetails, userHasAccessToAllStats, alternatives, separate) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -23,6 +23,86 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
     return `/coursepopulation?${searchString}`
   }
 
+  const columns = [
+    {
+      key: 'TIME',
+      title: 'Time',
+      getRowVal: s => s.code,
+      getRowContent: s => (
+        <div style={{ whiteSpace: 'nowrap' }}>
+          {s.name}
+          {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+          {s.name !== 'Total' && userHasAccessToAllStats && (
+            <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+              <Icon name="level up alternate" />
+            </Item>
+          )}
+        </div>
+      ),
+      getCellProps: s => defineCellColor(s),
+    },
+    {
+      key: 'TOTAL',
+      title: 'Total Students',
+      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.total),
+      getCellProps: s => defineCellColor(s),
+    },
+    {
+      key: 'PASS_RATE',
+      title: 'Pass-%',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.passRate),
+      getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate || 0)),
+      getCellProps: s => defineCellColor(s),
+    },
+    {
+      key: 'PASS_FIRST',
+      title: 'On First Attempt',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedFirst || 0),
+      getCellProps: s => defineCellColor(s),
+      headerProps: { style: { borderLeft: '0' } },
+      onlyInDetailedView: true,
+    },
+    {
+      key: 'PASS_EVENTUALLY',
+      title: 'Eventually',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedEventually || 0),
+      getCellProps: s => defineCellColor(s),
+      headerProps: { style: { borderLeft: '0' } },
+      onlyInDetailedView: true,
+    },
+    {
+      key: 'FAIL_RATE',
+      title: 'Fail-%',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.failRate),
+      getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
+      getCellProps: s => defineCellColor(s),
+    },
+    {
+      key: 'NEVER PASSED',
+      title: 'Yet to Pass',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.neverPassed || 0),
+      getCellProps: s => defineCellColor(s),
+      headerProps: { style: { borderLeft: '0' } },
+      onlyInDetailedView: true,
+    },
+  ]
+
+  return columns.filter(column => showDetails || !column.onlyInDetailedView)
+}
+
+const StudentTable = ({
+  data: { name, stats },
+  settings: { showDetails },
+  alternatives,
+  separate,
+  userHasAccessToAllStats,
+  headerVisible = false,
+}) => {
+  const columns = useMemo(
+    () => getColumns(showDetails, userHasAccessToAllStats, alternatives, separate),
+    [showDetails, userHasAccessToAllStats, alternatives, separate]
+  )
+
   return (
     <div>
       {headerVisible && (
@@ -33,88 +113,8 @@ const StudentTable = ({ stats, name, alternatives, separate, userHasAccessToAllS
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}
-        tableProps={{ celled: true, structured: true }}
-        columns={[
-          {
-            key: 'TIME',
-            title: 'Time',
-            getRowVal: s => s.code,
-            getRowContent: s => (
-              <div>
-                {s.name}
-                {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
-                {s.name !== 'Total' && userHasAccessToAllStats && (
-                  <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-                    <Icon name="level up alternate" />
-                  </Item>
-                )}
-              </div>
-            ),
-            getCellProps: s => defineCellColor(s),
-            headerProps: { rowSpan: 2, width: 3 },
-          },
-          {
-            key: 'TOTAL',
-            title: 'All students',
-            getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.total),
-            getCellProps: s => defineCellColor(s),
-            headerProps: { rowSpan: 2, width: 3 },
-          },
-          {
-            key: 'PASSED',
-            title: 'Passed',
-            parent: true,
-            headerProps: { colSpan: 3, width: 5 },
-          },
-          {
-            key: 'PASS_FIRST',
-            title: 'first try',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedFirst || 0),
-            getCellProps: s => defineCellColor(s),
-            cellProps: { width: 2 },
-            child: true,
-          },
-          {
-            key: 'PASS_EVENTUALLY',
-            title: 'passed eventually',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedEventually || 0),
-            getCellProps: s => defineCellColor(s),
-            cellProps: { width: 2 },
-            child: true,
-          },
-          {
-            key: 'PASS_RATE',
-            title: 'percentage',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.passRate),
-            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate || 0)),
-            getCellProps: s => defineCellColor(s),
-            cellProps: { width: 1 },
-            child: true,
-          },
-          {
-            key: 'FAIL',
-            title: 'Failed',
-            parent: true,
-            headerProps: { colSpan: 3, width: 5 },
-          },
-          {
-            key: 'NEVER PASSED',
-            title: 'never passed',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.neverPassed || 0),
-            getCellProps: s => defineCellColor(s),
-            cellProps: { width: 2 },
-            child: true,
-          },
-          {
-            key: 'FAIL_RATE',
-            title: 'percentage',
-            getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.failRate),
-            getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
-            getCellProps: s => defineCellColor(s),
-            cellProps: { width: 1 },
-            child: true,
-          },
-        ]}
+        tableProps={{ celled: true, fixed: true, style: { width: 'auto' } }}
+        columns={columns}
         data={stats}
       />
       {!userHasAccessToAllStats && (
