@@ -61,9 +61,11 @@ const StudytrackOverview = ({ studyprogramme }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const [showMeanTime, setShowMeanTime] = useState(true)
   const [specialGroups, setSpecialGroups] = useState(false)
+  const [graduated, setGraduated] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, specialGroups: special })
+  const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
+  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, specialGroups: special, graduated: grad })
 
   useEffect(() => {
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {
@@ -91,7 +93,10 @@ const StudytrackOverview = ({ studyprogramme }) => {
       ) : (
         <>
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
-          {getRadioButton(toolTips.StudentToggle, 'All students', 'Major students', specialGroups, setSpecialGroups)}
+          <div className="toggle-container">
+            {getRadioButton(toolTips.StudentToggle, 'All students', 'Major students', specialGroups, setSpecialGroups)}
+            {getRadioButton(toolTips.GradToggle, 'Graduated included', 'Graduated excluded', graduated, setGraduated)}
+          </div>
           {getDivider(
             `Students of ${
               track === '' || track === 'studyprogramme'
@@ -125,19 +130,23 @@ const StudytrackOverview = ({ studyprogramme }) => {
               titles={studyprogramme.includes('KH') ? bachelorCreditTableTitles : mastersCreditTableTitles}
             />
           </div>
-          {getDivider('Average graduation times', 'AverageGraduationTimes')}
-          {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
-          <div className="section-container-centered">
-            {stats?.data?.years.map(year => (
-              <GaugeChart
-                key={year}
-                year={year}
-                data={stats?.data?.graduationMedianTime[track][year]}
-                amount={stats?.data?.graduationAmounts[track][year]}
-                studyprogramme={studyprogramme}
-              />
-            ))}
-          </div>
+          {stats?.isSuccess && stats?.graduationAmounts && (
+            <>
+              {getDivider('Average graduation times', 'AverageGraduationTimes')}
+              {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
+              <div className="section-container-centered">
+                {stats?.data?.years.map(year => (
+                  <GaugeChart
+                    key={year}
+                    year={year}
+                    data={stats?.data?.graduationMedianTime[track][year]}
+                    amount={stats?.data?.graduationAmounts[track][year]}
+                    studyprogramme={studyprogramme}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
     </div>

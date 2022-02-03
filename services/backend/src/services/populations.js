@@ -365,7 +365,8 @@ const studentnumbersWithAllStudyrightElements = async (
   nondegreeStudents,
   transferredOutStudents,
   tag,
-  transferredToStudents
+  transferredToStudents,
+  graduatedStudents
 ) => {
   // eslint-disable-line
 
@@ -543,6 +544,40 @@ const studentnumbersWithAllStudyrightElements = async (
       })
     ).map(s => s.studentnumber)
     studentnumberlist = studentnumberlist.filter(sn => !transfersTo.includes(sn))
+  }
+
+  // fetch students that have graduated from the programme and filter out these studentnumbers
+  if (graduatedStudents) {
+    const graduated = (
+      await Student.findAll({
+        attributes: ['studentnumber'],
+        include: [
+          {
+            model: Studyright,
+            include: [
+              {
+                model: StudyrightElement,
+                required: true,
+                where: {
+                  code: {
+                    [Op.in]: studyRights,
+                  },
+                },
+              },
+            ],
+            where: {
+              graduated: 1,
+            },
+          },
+        ],
+        where: {
+          studentnumber: {
+            [Op.in]: studentnumbers,
+          },
+        },
+      })
+    ).map(s => s.studentnumber)
+    studentnumberlist = studentnumberlist.filter(sn => !graduated.includes(sn))
   }
 
   return studentnumberlist
