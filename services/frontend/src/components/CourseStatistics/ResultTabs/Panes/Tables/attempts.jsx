@@ -1,10 +1,10 @@
 import React from 'react'
 import qs from 'query-string'
+import _, { uniq } from 'lodash'
 import { Link } from 'react-router-dom'
-import { arrayOf, number, oneOfType, shape, string, bool } from 'prop-types'
 import { connect } from 'react-redux'
 import { Header, Icon, Item } from 'semantic-ui-react'
-import { uniq } from 'lodash'
+
 import SortableTable from '../../../../SortableTable'
 import { defineCellColor, getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
 
@@ -40,7 +40,7 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
       passRate: stat.attempts.passRate,
       attempts,
       rowObfuscated,
-      ...gradeSpread,
+      ..._.mapValues(gradeSpread, x => x[0]),
     }
   })
 
@@ -69,14 +69,13 @@ const getGradeColumns = (notThesisGrades, addHTAndTT) => {
 }
 
 const AttemptsTable = ({
-  stats,
-  name,
+  data: { stats, name },
+  settings: { showGrades },
   alternatives,
   separate,
   isRelative,
   userHasAccessToAllStats,
   headerVisible = false,
-  showGrades,
 }) => {
   const {
     attempts: { grades },
@@ -147,7 +146,7 @@ const AttemptsTable = ({
       <SortableTable
         defaultdescending
         getRowKey={s => s.code}
-        tableProps={{ celled: true, structured: true }}
+        tableProps={{ celled: true, style: { width: 'auto' } }}
         columns={columns}
         data={data}
       />
@@ -156,21 +155,6 @@ const AttemptsTable = ({
       )}
     </div>
   )
-}
-
-AttemptsTable.propTypes = {
-  stats: arrayOf(shape({})).isRequired,
-  name: oneOfType([number, string]).isRequired,
-  alternatives: arrayOf(string).isRequired,
-  separate: bool,
-  isRelative: bool.isRequired,
-  userHasAccessToAllStats: bool.isRequired,
-  headerVisible: bool.isRequired,
-  showGrades: bool.isRequired,
-}
-
-AttemptsTable.defaultProps = {
-  separate: false,
 }
 
 export default connect(null)(AttemptsTable)

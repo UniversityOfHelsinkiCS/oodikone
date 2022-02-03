@@ -1,12 +1,11 @@
 /* eslint-disable quotes */
 import React from 'react'
-import { Grid } from 'semantic-ui-react'
-import { bool } from 'prop-types'
+import { Menu, Radio } from 'semantic-ui-react'
+import HelpButton from '../HelpButton'
 import { gradeGraphOptions } from '../../../../constants'
 import {
   getDataObject,
   getMaxValueOfSeries,
-  dataSeriesType,
   getGradeSpread,
   getThesisGradeSpread,
   isThesisSeries,
@@ -71,61 +70,47 @@ const getGradeSeries = series => {
       }
 }
 
-const Distribution = ({ primary, comparison, isRelative, userHasAccessToAllStats }) => {
-  const primaryStats = primary.stats.filter(stat => stat.name !== 'Total' || isRelative)
-
-  const statYears = primaryStats.map(year => year.name)
-  const comparisonStats = comparison ? comparison.stats.filter(stat => stat.name !== 'Total' || isRelative) : []
-  const primaryGrades = primaryStats.flatMap(s => s.attempts.grades)
-  const comparisonGrades = comparisonStats.flatMap(s => s.attempts.grades)
-
-  const gradeGraphSeries = getGradeSeries(primaryGrades)
-  const comparisonGraphSeries = getGradeSeries(comparisonGrades)
-
-  const maxGradeValue = isRelative ? 1 : getMaxValueOfSeries(gradeGraphSeries.absolute)
-
-  const primaryDistributionOptions = comparison
-    ? gradeGraphOptions(statYears, maxGradeValue, 'Primary Grades')
-    : gradeGraphOptions(statYears, maxGradeValue, 'Grades')
-  const comparisonDistributionOptions = gradeGraphOptions(statYears, maxGradeValue, 'Comparison Grades')
+export const DistributionSettings = ({ value, onChange }) => {
+  const { isRelative } = value
 
   return (
-    <>
-      <Grid.Row>
-        <Grid.Column>
-          <StackedBarChart
-            options={primaryDistributionOptions}
-            series={isRelative ? gradeGraphSeries.relative : gradeGraphSeries.absolute}
-          />
-        </Grid.Column>
-      </Grid.Row>
-      {comparison && (
-        <Grid.Row>
-          <Grid.Column>
-            <StackedBarChart
-              options={comparisonDistributionOptions}
-              series={isRelative ? comparisonGraphSeries.relative : comparisonGraphSeries.absolute}
-            />
-          </Grid.Column>
-        </Grid.Row>
-      )}
-      {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
-      )}
-    </>
+    <Menu secondary style={{ marginBottom: 0 }}>
+      <Menu.Item>
+        <Radio
+          toggle
+          label="Show relative"
+          checked={isRelative}
+          onChange={() => onChange({ ...value, isRelative: !isRelative })}
+        />
+        <Menu.Item>
+          <HelpButton tab="GradeDistribution" />
+        </Menu.Item>
+      </Menu.Item>
+    </Menu>
   )
 }
 
-Distribution.propTypes = {
-  primary: dataSeriesType.isRequired,
-  comparison: dataSeriesType,
-  isRelative: bool,
-  userHasAccessToAllStats: bool.isRequired,
-}
+export const Distribution = ({ data, settings: { isRelative }, userHasAccessToAllStats }) => {
+  const stats = data.stats.filter(stat => stat.name !== 'Total' || isRelative)
 
-Distribution.defaultProps = {
-  comparison: undefined,
-  isRelative: false,
-}
+  const statYears = stats.map(year => year.name)
+  const grades = stats.flatMap(s => s.attempts.grades)
 
-export default Distribution
+  const gradeGraphSeries = getGradeSeries(grades)
+
+  const maxGradeValue = isRelative ? 1 : getMaxValueOfSeries(gradeGraphSeries.absolute)
+
+  const primaryDistributionOptions = gradeGraphOptions(statYears, maxGradeValue, 'Grades')
+
+  return (
+    <div>
+      <StackedBarChart
+        options={primaryDistributionOptions}
+        series={isRelative ? gradeGraphSeries.relative : gradeGraphSeries.absolute}
+      />
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
+      )}
+    </div>
+  )
+}

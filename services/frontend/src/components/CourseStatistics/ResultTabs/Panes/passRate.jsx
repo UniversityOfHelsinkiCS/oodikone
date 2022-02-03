@@ -1,17 +1,10 @@
 /* eslint-disable quotes */
 import React from 'react'
-import { Grid } from 'semantic-ui-react'
-import { bool } from 'prop-types'
+import { Menu, Radio } from 'semantic-ui-react'
 import StackedBarChart from '../../../StackedBarChart'
 import { passRateAttemptGraphOptions, passRateStudGraphOptions } from '../../../../constants'
-import {
-  viewModeNames,
-  getDataObject,
-  getMaxValueOfSeries,
-  dataSeriesType,
-  viewModeType,
-  absoluteToRelative,
-} from './util'
+import HelpButton from '../HelpButton'
+import { viewModeNames, getDataObject, getMaxValueOfSeries, absoluteToRelative } from './util'
 
 const getPassRateAttemptSeriesFromStats = stats => {
   const all = []
@@ -70,62 +63,62 @@ const getPassRateStudSeriesFromStats = stats => {
   }
 }
 
-const PassRate = ({ primary, comparison, viewMode, isRelative = false, userHasAccessToAllStats }) => {
-  const isAttemptsMode = viewMode === viewModeNames.ATTEMPTS
-
-  const primaryStats = primary.stats.filter(stat => stat.name !== 'Total')
-  const statYears = primaryStats.map(year => year.name)
-  const comparisonStats = comparison ? comparison.stats : []
-  const passGraphSerieFn = isAttemptsMode ? getPassRateAttemptSeriesFromStats : getPassRateStudSeriesFromStats
-
-  const passGraphSerie = passGraphSerieFn(primaryStats)
-  const comparisonGraphSerie = passGraphSerieFn(comparisonStats)
-
-  const maxPassRateVal = isRelative ? 1 : getMaxValueOfSeries(passGraphSerie.absolute)
-  const graphOptionsFn = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudGraphOptions
-  const primaryGraphOptions = comparison
-    ? graphOptionsFn(statYears, maxPassRateVal, 'Primary pass rate chart', isRelative)
-    : graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart', isRelative)
-  const comparisonGraphOptions = graphOptionsFn(statYears, maxPassRateVal, 'Comparison pass rate chart', isRelative)
+export const PassRateSettings = ({ value, onChange }) => {
+  const { viewMode, isRelative } = value
 
   return (
-    <>
-      <Grid.Row>
-        <Grid.Column>
-          <StackedBarChart
-            options={primaryGraphOptions}
-            series={isRelative ? passGraphSerie.relative : passGraphSerie.absolute}
-          />
-        </Grid.Column>
-      </Grid.Row>
-      {comparison && (
-        <Grid.Row>
-          <Grid.Column>
-            <StackedBarChart
-              options={comparisonGraphOptions}
-              series={isRelative ? comparisonGraphSerie.relative : comparisonGraphSerie.absolute}
-            />
-          </Grid.Column>
-        </Grid.Row>
-      )}
-      {!userHasAccessToAllStats && (
-        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
-      )}
-    </>
+    <Menu secondary style={{ marginBottom: 0 }}>
+      {Object.entries(viewModeNames).map(([key, name]) => (
+        <Menu.Item
+          active={viewMode === key}
+          name={name}
+          onClick={() =>
+            onChange({
+              ...value,
+              viewMode: key,
+            })
+          }
+        />
+      ))}
+      <Menu.Item>
+        <Radio
+          toggle
+          label="Show relative"
+          checked={isRelative}
+          onChange={() => onChange({ ...value, isRelative: !isRelative })}
+        />
+      </Menu.Item>
+      <Menu.Item>
+        <HelpButton tab="PassRate" viewMode={viewMode} />
+      </Menu.Item>
+    </Menu>
   )
 }
 
-PassRate.propTypes = {
-  primary: dataSeriesType.isRequired,
-  comparison: dataSeriesType,
-  viewMode: viewModeType.isRequired,
-  isRelative: bool,
-  userHasAccessToAllStats: bool.isRequired,
-}
+export const PassRate = ({ data, settings: { viewMode, isRelative }, userHasAccessToAllStats }) => {
+  const isAttemptsMode = viewMode === 'ATTEMPTS'
 
-PassRate.defaultProps = {
-  comparison: undefined,
-  isRelative: false,
-}
+  const stats = data.stats.filter(stat => stat.name !== 'Total')
+  const statYears = stats.map(year => year.name)
+  // const comparisonStats = comparison ? comparison.stats : []
+  const passGraphSerieFn = isAttemptsMode ? getPassRateAttemptSeriesFromStats : getPassRateStudSeriesFromStats
 
-export default PassRate
+  const passGraphSerie = passGraphSerieFn(stats)
+  // const comparisonGraphSerie = passGraphSerieFn(comparisonStats)
+
+  const maxPassRateVal = isRelative ? 1 : getMaxValueOfSeries(passGraphSerie.absolute)
+  const graphOptionsFn = isAttemptsMode ? passRateAttemptGraphOptions : passRateStudGraphOptions
+  const primaryGraphOptions = graphOptionsFn(statYears, maxPassRateVal, 'Pass rate chart', isRelative)
+
+  return (
+    <div>
+      <StackedBarChart
+        options={primaryGraphOptions}
+        series={isRelative ? passGraphSerie.relative : passGraphSerie.absolute}
+      />
+      {!userHasAccessToAllStats && (
+        <span className="totalsDisclaimer">* Years with 5 students or less are shown as 0 in the chart</span>
+      )}
+    </div>
+  )
+}

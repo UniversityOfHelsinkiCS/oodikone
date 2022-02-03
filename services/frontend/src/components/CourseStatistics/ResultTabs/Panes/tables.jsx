@@ -1,85 +1,59 @@
-import React, { Fragment } from 'react'
-import { connect } from 'react-redux'
-import { Grid } from 'semantic-ui-react'
-import { string, arrayOf, bool } from 'prop-types'
-import { dataSeriesType, viewModeNames, viewModeType } from './util'
+import React from 'react'
+import { useSelector } from 'react-redux'
+import { Menu, Radio } from 'semantic-ui-react'
+import { viewModeNames } from './util'
+import HelpButton from '../HelpButton'
 import StudentTable from './Tables/student'
 import AttemptsTable from './Tables/attempts'
 
-const Tables = ({
-  primary,
-  comparison,
-  viewMode,
-  alternatives,
-  separate,
-  isRelative,
-  showGrades,
-  userHasAccessToAllStats,
-}) => {
-  const getViewMode = statistics => {
-    const { name, stats } = statistics
-    const headerVisible = !!comparison
-
-    switch (viewMode) {
-      case viewModeNames.ATTEMPTS:
-        return (
-          <AttemptsTable
-            separate={separate}
-            name={name}
-            stats={stats}
-            alternatives={alternatives}
-            isRelative={isRelative}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-            headerVisible={headerVisible}
-            showGrades={showGrades}
-          />
-        )
-      case viewModeNames.STUDENT:
-        return (
-          <StudentTable
-            separate={separate}
-            name={name}
-            stats={stats}
-            alternatives={alternatives}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-            headerVisible={headerVisible}
-          />
-        )
-      default:
-        return null
-    }
-  }
+export const TablesSettings = ({ value, onChange }) => {
+  const { viewMode, showDetails, showGrades } = value
 
   return (
-    <>
-      <Grid.Column id="PrimaryDataTable">{getViewMode(primary)}</Grid.Column>
-      {comparison && <Grid.Column id="ComparisonDataTable">{getViewMode(comparison)}</Grid.Column>}
-    </>
+    <Menu secondary style={{ marginBottom: 0 }}>
+      {Object.entries(viewModeNames).map(([key, name]) => (
+        <Menu.Item
+          active={viewMode === key}
+          name={name}
+          onClick={() =>
+            onChange({
+              ...value,
+              viewMode: key,
+            })
+          }
+        />
+      ))}
+      <Menu.Item>
+        <Radio
+          toggle
+          label="Show details"
+          disabled={viewMode !== 'STUDENT'}
+          checked={showDetails}
+          onChange={() => onChange({ ...value, showDetails: !showDetails })}
+        />
+      </Menu.Item>
+      <Menu.Item>
+        <Radio
+          toggle
+          label="Show grades"
+          disabled={viewMode !== 'ATTEMPTS'}
+          checked={showGrades}
+          onChange={() => onChange({ ...value, showGrades: !showGrades })}
+        />
+      </Menu.Item>
+      <Menu.Item>
+        <HelpButton tab="Tables" viewMode={viewMode} />
+      </Menu.Item>
+    </Menu>
   )
 }
 
-Tables.propTypes = {
-  primary: dataSeriesType.isRequired,
-  comparison: dataSeriesType,
-  viewMode: viewModeType.isRequired,
-  alternatives: arrayOf(string).isRequired,
-  separate: bool,
-  isRelative: bool.isRequired,
-  showGrades: bool.isRequired,
-  userHasAccessToAllStats: bool.isRequired,
+export const Tables = props => {
+  const alternatives = useSelector(state => state.courseStats.data[state.singleCourseStats.selectedCourse].alternatives)
+
+  const viewModes = { ATTEMPTS: AttemptsTable, STUDENT: StudentTable }
+
+  const Content = viewModes[props.settings.viewMode]
+
+  return <Content {...props} alternatives={alternatives} />
 }
-
-Tables.defaultProps = {
-  comparison: null,
-  separate: false,
-}
-
-const mapStateToProps = state => {
-  const { selectedCourse } = state.singleCourseStats
-
-  return {
-    alternatives: state.courseStats.data[selectedCourse].alternatives,
-  }
-}
-
-export default connect(mapStateToProps)(Tables)
