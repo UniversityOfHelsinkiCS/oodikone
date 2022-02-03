@@ -10,23 +10,24 @@ const {
   isSpecialGroupCredit,
 } = require('./studyprogrammeHelpers')
 const {
-  getProgrammesStudents,
+  getProgrammesStudyrights,
   getCreditsForStudyProgramme,
   getTransferredCredits,
-  transfersAway,
-  transfersTo,
+  allTransfers,
 } = require('./newStudyprogramme')
 
+// Fetches all the credits for the studyprogramme and divides them into major-students and non-major students credits
+// Division is done on the basis that whether the student had a primary studyright to the programme on the attainment_date
+// If special groups are excluded, the transfer students are filtered away from the major-students as well
 const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const providercode = mapToProviders([studyprogramme])[0]
-  const studyrights = await getProgrammesStudents(studyprogramme)
+  let studyrights = await getProgrammesStudyrights(studyprogramme, since)
+  const transfers = (await allTransfers(studyprogramme, since)).map(t => t.studyrightid)
 
-  let transfers = []
   if (!includeAllSpecials) {
-    const transferredAway = await transfersAway(studyprogramme, since)
-    const transferredTo = await transfersTo(studyprogramme, since)
-    transfers = [...transferredAway, ...transferredTo].map(s => s.studyrightid)
+    studyrights.filter(s => !transfers.includes(s.studyrightid))
   }
+
   const credits = await getCreditsForStudyProgramme(providercode, since)
 
   let majors = getStatsBasis(years)
@@ -52,6 +53,7 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
   return { majors, nonMajors }
 }
 
+// Fetches all the credits with the type "transferred / hyväksiluettu" and divides them by year
 const getTransferredCreditStats = async ({ studyprogramme, since, years, isAcademicYear }) => {
   const providercode = mapToProviders([studyprogramme])[0]
   const credits = await getTransferredCredits(providercode, since)

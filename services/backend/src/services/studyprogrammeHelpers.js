@@ -68,6 +68,16 @@ const formatStudent = student => {
   }
 }
 
+const formatTransfer = transfer => {
+  const { sourcecode, transfercode, transferdate, studyrightid } = transfer
+  return {
+    sourcecode,
+    transfercode,
+    transferdate,
+    studyrightid,
+  }
+}
+
 const getYearsArray = (since, isAcademicYear) => {
   const years = []
   for (let i = since; i <= new Date().getFullYear(); i++) {
@@ -247,6 +257,7 @@ module.exports = {
   getCorrectStudentnumbers,
   formatStudyright,
   formatStudent,
+  formatTransfer,
   getYearsArray,
   getYearsObject,
   getAcademicYearsObject,
