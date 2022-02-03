@@ -25,7 +25,7 @@ const populationTitles = [
   'Women',
   'Finnish',
 ]
-const creditTableTitles = [
+const bachelorCreditTableTitles = [
   '',
   'All started',
   '< 30 credits',
@@ -34,6 +34,17 @@ const creditTableTitles = [
   '90-119 credits',
   '120-149 credits',
   '> 150 credits',
+]
+
+const mastersCreditTableTitles = [
+  '',
+  'All started',
+  '< 200 credits',
+  '200-219 credits',
+  '220-239 credits',
+  '240-259 credits',
+  '260-279 credits',
+  '> 280 credits',
 ]
 
 const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
@@ -111,7 +122,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
             <BasicDataTable
               data={stats?.data?.creditTableStats}
               track={track || studyprogramme}
-              titles={creditTableTitles}
+              titles={studyprogramme.includes('KH') ? bachelorCreditTableTitles : mastersCreditTableTitles}
             />
           </div>
           {getDivider('Average graduation times', 'AverageGraduationTimes')}
