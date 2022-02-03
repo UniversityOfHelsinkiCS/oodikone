@@ -3,13 +3,14 @@ const { studentnumbersWithAllStudyrightElements } = require('./populations')
 
 // Helper functions
 
-const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials }) => {
+const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials, includeGraduated = true }) => {
   let studentnumbers = []
   const exchangeStudents = includeAllSpecials
   const cancelledStudents = includeAllSpecials
   const nondegreeStudents = includeAllSpecials
   const transferredOutStudents = includeAllSpecials
   const transferredToStudents = !includeAllSpecials
+  const graduatedStudents = !includeGraduated
 
   studentnumbers = await studentnumbersWithAllStudyrightElements(
     codes,
@@ -20,7 +21,8 @@ const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllS
     nondegreeStudents,
     transferredOutStudents,
     null,
-    transferredToStudents
+    transferredToStudents,
+    graduatedStudents
   )
 
   return studentnumbers
@@ -234,6 +236,13 @@ const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280'
 const bachelorCreditAmounts = [30, 60, 90, 120, 150, 150]
 const masterCreditAmounts = [200, 220, 240, 260, 280, 280]
 
+const getCreditThresholds = studyprogramme => {
+  if (studyprogramme.includes('KH')) {
+    return { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
+  }
+  return { creditThresholdKeys: masterCreditThresholds, creditThresholdAmounts: masterCreditAmounts }
+}
+
 module.exports = {
   getCorrectStudentnumbers,
   formatStudyright,
@@ -252,8 +261,5 @@ module.exports = {
   getPercentage,
   getBachelorCreditGraphStats,
   getMasterCreditGraphStats,
-  bachelorCreditThresholds,
-  masterCreditThresholds,
-  bachelorCreditAmounts,
-  masterCreditAmounts,
+  getCreditThresholds,
 }
