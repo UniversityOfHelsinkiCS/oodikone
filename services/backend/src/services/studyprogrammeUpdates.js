@@ -44,18 +44,36 @@ const updateBasicView = async code => {
 const updateStudytrackView = async code => {
   const specialIncluded = 'SPECIAL_INCLUDED'
   const specialExcluded = 'SPECIAL_EXCLUDED'
+  const graduatedIncluded = 'GRADUATED_INCLUDED'
+  const graduatedExcluded = 'GRADUATED_EXCLUDED'
 
-  const studytrackStatsSpecialIncluded = await getStudytrackStatsForStudyprogramme({
+  const statsSpecialAndGraduated = await getStudytrackStatsForStudyprogramme({
     studyprogramme: code,
     specialGroups: specialIncluded,
+    graduated: graduatedIncluded,
   })
-  await setStudytrackStats(studytrackStatsSpecialIncluded, specialIncluded)
+  await setStudytrackStats(statsSpecialAndGraduated, graduatedIncluded, specialIncluded)
 
-  const studytrackStatsSpecialExcluded = await getStudytrackStatsForStudyprogramme({
+  const statsSpecialNotGraduated = await getStudytrackStatsForStudyprogramme({
+    studyprogramme: code,
+    specialGroups: specialIncluded,
+    graduated: graduatedExcluded,
+  })
+  await setStudytrackStats(statsSpecialNotGraduated, graduatedExcluded, specialIncluded)
+
+  const statsNotSpecialAndGraduated = await getStudytrackStatsForStudyprogramme({
     studyprogramme: code,
     specialGroups: specialExcluded,
+    graduated: graduatedIncluded,
   })
-  await setStudytrackStats(studytrackStatsSpecialExcluded, specialExcluded)
+  await setStudytrackStats(statsNotSpecialAndGraduated, graduatedIncluded, specialExcluded)
+
+  const statsNotSpecialNotGraduated = await getStudytrackStatsForStudyprogramme({
+    studyprogramme: code,
+    specialGroups: specialExcluded,
+    graduated: graduatedExcluded,
+  })
+  await setStudytrackStats(statsNotSpecialNotGraduated, graduatedExcluded, specialExcluded)
 
   return 'OK'
 }
