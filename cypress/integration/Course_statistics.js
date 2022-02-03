@@ -20,15 +20,13 @@ describe('Course Statistics tests', () => {
 
       cy.contains('.tabular.menu a', 'Table').click()
       cy.contains('All')
-      cy.contains('.modeSelectorRow a', 'Attempts').click()
-      cy.contains('.modeSelectorRow a', 'Students').click()
+      cy.cs('viewMode-Attempts').click()
+      cy.cs('viewMode-Students').click()
 
       cy.contains('.tabular.menu a', 'Pass rate chart').click()
-      cy.get('div.modeSelectorContainer').click()
       cy.contains('svg', 'Pass rate chart')
 
       cy.contains('.tabular.menu a', 'Grade distribution chart').click()
-      cy.get('div.modeSelectorContainer').click()
       cy.contains('svg', 'Grades')
 
       cy.contains('a', 'New query').click()
@@ -194,7 +192,7 @@ describe('Course Statistics tests', () => {
       cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
       cy.contains('Language distribution').click()
-      cy.contains('td', 'finnish').siblings().contains('122')
+      cy.contains('td', 'finnish').siblings().contains('107')
       cy.contains('td', 'english').siblings().contains('5')
     })
 
@@ -304,7 +302,7 @@ describe('Course Statistics tests', () => {
     })
   })
 
-  it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
+  it.only('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
     cy.get('[data-cy=navbar-courseStatistics]').click()
     cy.get('[data-cy=course-code-input]').type('TKT20003')
@@ -313,6 +311,8 @@ describe('Course Statistics tests', () => {
     cy.contains('Filter statistics by study programmes').should('not.exist')
     cy.contains('Faculty statistics').should('not.exist')
     cy.contains('Show population').should('not.exist')
+
+    cy.cs('viewMode-Attempts').click()
 
     const attemptsTableContents = [
       // [time, passed, failed, passrate]
