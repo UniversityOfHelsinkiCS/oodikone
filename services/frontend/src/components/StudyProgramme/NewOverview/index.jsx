@@ -125,7 +125,8 @@ const Overview = ({ studyprogramme }) => {
                         ? graduations?.data?.graduationMeanTime[year]
                         : graduations?.data?.graduationMedianTime[year]
                     }
-                    amount={graduations?.data?.graduationAmounts[year]}
+                    graduationAmount={graduations?.data?.graduationAmounts[year]}
+                    totalAmount={graduations?.data?.totalAmounts[year]}
                     studyprogramme={studyprogramme}
                   />
                 ))}

@@ -7,6 +7,7 @@ const {
   getStatsBasis,
   defineYear,
   getYearsObject,
+  getAcademicYearsObject,
   getYearsArray,
   getMedian,
   getMean,
@@ -77,6 +78,7 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
 const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   let graduationAmounts = getYearsObject(years)
   let graduationTimes = getYearsObject(years, true)
+  let totalAmounts = isAcademicYear ? getAcademicYearsObject(years) : getYearsObject(years)
 
   await Promise.all(
     years.map(async year => {
@@ -89,6 +91,7 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
       })
 
       const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
+      totalAmounts[year] = studentnumbersOfTheYear.length
 
       studyrights.forEach(({ enddate, studystartdate }) => {
         const graduationYear = defineYear(enddate, isAcademicYear)
@@ -117,7 +120,7 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
       ['', comparisonValue - mean],
     ]
   })
-  return { medians, means, graduationAmounts }
+  return { medians, means, graduationAmounts, totalAmounts }
 }
 
 const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
@@ -190,6 +193,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
     graduationMedianTime: graduationTimeStats.medians,
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
+    totalAmounts: graduationTimeStats.totalAmounts,
     programmesAfterTableStats: programmesAfterGraduation.tableStats,
     programmesAfterGraphStats: programmesAfterGraduation.graphStats,
     programmesAfterTitles,
