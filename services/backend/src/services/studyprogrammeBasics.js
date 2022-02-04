@@ -16,6 +16,27 @@ const {
 } = require('./newStudyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
 
+const getAllStats = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
+  const { graphStats, tableStats } = getStatsBasis(years)
+
+  await Promise.all(
+    years.map(async year => {
+      const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
+      const studentnumbersOfTheYear = await getCorrectStudentnumbers({
+        codes: [studyprogramme],
+        startDate,
+        endDate,
+        includeAllSpecials,
+      })
+      const all = await allStudyrights(studyprogramme, null, studentnumbersOfTheYear)
+
+      graphStats[indexOf(years, year)] = all.length
+      tableStats[year] += all.length
+    })
+  )
+  return { graphStats, tableStats }
+}
+
 const getStartedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
 
@@ -112,6 +133,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, yearType, specialGro
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
+  const all = await getAllStats(queryParameters)
   const started = await getStartedStats(queryParameters)
   const graduated = await getGraduatedStats(queryParameters)
   const cancelled = await getCancelledStats(queryParameters)
@@ -124,13 +146,14 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, yearType, specialGro
     includeAllSpecials
       ? [
           year,
+          all.tableStats[year],
           started.tableStats[year],
           graduated.tableStats[year],
           cancelled.tableStats[year],
           transferredAway.tableStats[year],
           transferredTo.tableStats[year],
         ]
-      : [year, started.tableStats[year], graduated.tableStats[year]]
+      : [year, all.tableStats[year], started.tableStats[year], graduated.tableStats[year]]
   )
 
   return {
