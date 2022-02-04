@@ -241,6 +241,9 @@ const getMasterCreditGraphStats = years => ({
   },
 })
 
+const getCreditGraphStats = (studyprogramme, years) =>
+  studyprogramme.includes('KH') ? getBachelorCreditGraphStats(years) : getMasterCreditGraphStats(years)
+
 const bachelorCreditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'mte150']
 const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'mte280']
 const bachelorCreditAmounts = [30, 60, 90, 120, 150, 150]
@@ -252,6 +255,54 @@ const getCreditThresholds = studyprogramme => {
   }
   return { creditThresholdKeys: masterCreditThresholds, creditThresholdAmounts: masterCreditAmounts }
 }
+
+const tableTitles = {
+  basics: {
+    SPECIAL_EXCLUDED: ['', 'Started', 'Graduated'],
+    SPECIAL_INCLUDED: ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to'],
+  },
+  credits: {
+    SPECIAL_EXCLUDED: ['', 'Total', 'Major students credits', 'Transferred credits'],
+    SPECIAL_INCLUDED: ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits'],
+  },
+  creditProgress: {
+    bachelor: [
+      '',
+      'All started',
+      '< 30 credits',
+      '30-59 credits',
+      '60-89 credits',
+      '90-119 credits',
+      '120-149 credits',
+      '> 150 credits',
+    ],
+    master: [
+      '',
+      'All started',
+      '< 200 credits',
+      '200-219 credits',
+      '220-239 credits',
+      '240-259 credits',
+      '260-279 credits',
+      '> 280 credits',
+    ],
+  },
+  studytracks: [
+    '',
+    'All',
+    'Started',
+    'Currently enrolled',
+    'Absent',
+    'Cancelled',
+    'Graduated',
+    'Men',
+    'Women',
+    'Finnish',
+  ],
+}
+
+const getCreditProgressTableTitles = studyprogramme =>
+  studyprogramme.includes('KH') ? tableTitles.bachelorCreditProgress : tableTitles.masterCreditProgress
 
 module.exports = {
   getCorrectStudentnumbers,
@@ -272,5 +323,8 @@ module.exports = {
   getPercentage,
   getBachelorCreditGraphStats,
   getMasterCreditGraphStats,
+  getCreditGraphStats,
   getCreditThresholds,
+  tableTitles,
+  getCreditProgressTableTitles,
 }

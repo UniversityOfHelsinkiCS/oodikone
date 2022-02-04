@@ -5,6 +5,7 @@ const {
   defineYear,
   getYearsArray,
   getStartDate,
+  tableTitles,
 } = require('./studyprogrammeHelpers')
 const {
   allStudyrights,
@@ -118,9 +119,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, yearType, specialGro
   const transferredTo = await getTransferredToStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
-  const titles = includeAllSpecials
-    ? ['', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to']
-    : ['', 'Started', 'Graduated']
+  const titles = tableTitles['basics'][specialGroups]
   const tableStats = reversedYears.map(year =>
     includeAllSpecials
       ? [
