@@ -60,9 +60,10 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
         endDate,
         includeAllSpecials,
       })
+
       const credits = await getThesisCredits(providercode, since, thesisType, studentnumbersOfTheYear)
 
-      credits.forEach(({ attainment_date }) => {
+      credits?.forEach(({ attainment_date }) => {
         const attainmentYear = defineYear(attainment_date, isAcademicYear)
         graphStats[indexOf(years, attainmentYear)] += 1
         tableStats[attainmentYear] += 1

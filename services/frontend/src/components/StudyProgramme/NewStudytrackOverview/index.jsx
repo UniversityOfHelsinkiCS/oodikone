@@ -102,7 +102,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
               titles={stats?.data?.creditTableTitles}
             />
           </div>
-          {stats?.isSuccess && stats?.graduationAmounts && (
+          {stats?.isSuccess && stats?.data?.graduationAmounts && (
             <>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
