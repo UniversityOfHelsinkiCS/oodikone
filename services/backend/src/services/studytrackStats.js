@@ -97,6 +97,7 @@ const getStudytrackDataForTheYear = async ({
     graduationMeanTime,
     graduationMedianTime,
     graduationAmounts,
+    totalAmounts,
     emptyTracks,
   } = data
   const { startDate, endDate } = getAcademicYearDates(year)
@@ -194,6 +195,7 @@ const getStudytrackDataForTheYear = async ({
       ]
 
       // Count stats for the graduation time charts grouped by year
+      totalAmounts[track][`${year} - ${year + 1}`] = await all.length
       await getGraduationTimeStats({
         year: `${year} - ${year + 1}`,
         graduated,
@@ -229,6 +231,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
   const graduationMedianTime = {}
   const graduationMeanTime = {}
   const graduationAmounts = {}
+  const totalAmounts = {}
   const emptyTracks = new Map()
 
   studytracks.forEach(async track => {
@@ -238,6 +241,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
     graduationMedianTime[track] = getAcademicYearsObject(years, true)
     graduationMeanTime[track] = getAcademicYearsObject(years, true)
     graduationAmounts[track] = getAcademicYearsObject(years)
+    totalAmounts[track] = getAcademicYearsObject(years)
   })
 
   return {
@@ -248,6 +252,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
     graduationMedianTime,
     graduationMeanTime,
     graduationAmounts,
+    totalAmounts,
     emptyTracks,
   }
 }
@@ -296,10 +301,12 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
     mainStatsByYear: data.mainStatsByYear,
     creditTableStats: data.creditTableStats,
     creditGraphStats: data.creditGraphStats,
-    graduationMedianTime: graduated ? data.graduationMedianTime : null,
-    graduationMeanTime: graduated ? data.graduationMeanTime : null,
-    graduationAmounts: graduated ? data.graduationAmounts : null,
+    graduationMedianTime: data.graduationMedianTime,
+    graduationMeanTime: data.graduationMeanTime,
+    graduationAmounts: data.graduationAmounts,
+    totalAmounts: data.totalAmounts,
     studytrackOptions,
+    includeGraduated,
     populationTitles: tableTitles['studytracks'],
     creditTableTitles: tableTitles['creditProgress'][studyprogramme.includes('KH') ? 'bachelor' : 'master'],
   }

@@ -102,7 +102,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
               titles={stats?.data?.creditTableTitles}
             />
           </div>
-          {stats?.isSuccess && stats?.data?.graduationAmounts && (
+          {stats?.isSuccess && stats?.data?.includeGraduated && (
             <>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
@@ -112,7 +112,8 @@ const StudytrackOverview = ({ studyprogramme }) => {
                     key={year}
                     year={year}
                     data={stats?.data?.graduationMedianTime[track][year]}
-                    amount={stats?.data?.graduationAmounts[track][year]}
+                    graduationAmount={stats?.data?.graduationAmounts[track][year]}
+                    totalAmount={stats?.data?.totalAmounts[track][year]}
                     studyprogramme={studyprogramme}
                   />
                 ))}
