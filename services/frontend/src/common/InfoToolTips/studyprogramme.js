@@ -4,9 +4,9 @@ export default {
   Calendar year: Näyttää tilastot kalenterivuosille jaoteltuna, esimerkiksi 1.1.2019-31.12.2019 
   `,
   StudentToggle: `
-  All students: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat, opintonsa keskeyttäneet opiskelijat, ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.
+  All studyrights included: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat, opintonsa keskeyttäneet opiskelijat, ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.
   
-  Major students: Valinnasta on poissuljettu kaikki edellä mainitut erikoisryhmät.
+  Special studyrights excluded: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
   `,
   GradToggle: `
   Graduated included: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.
