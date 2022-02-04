@@ -14,6 +14,8 @@ export default {
   Graduated excluded: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
   `,
   StudentsOfTheStudyprogramme: `
+  **All**: Sisältää kaikki kyseisenä vuonna alkaneet opinto-oikeudet riippumatta siitä, onko opintoja aloitettu tai onko niitä aloitettu ko. vuonna. Mukana myös ohjelmaan siirtyneet opiskelijat.**
+
   **Started**: Sisältää kyseisenä vuonna aloitetut opinto-oikeudet riippumatta siitä, minä vuonna kyseinen opiskeluoikeus on myönnetty. Opiskelija on myös voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.\n
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
   
