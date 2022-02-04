@@ -14,27 +14,29 @@ export default {
   Graduated excluded: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
   `,
   StudentsOfTheStudyprogramme: `
-  **Started**: Sisältää kyseisenä vuonna aloitetut opinto-oikeudet riippumatta siitä, minä vuonna kyseinen opiskeluoikeus on myönnetty. Opiskelija on myös voinut keskeyttää opintonsa tai siirtyä pois ohjelmasta.\n
+  **Started**: Sisältää kyseisenä vuonna aloitetut opinto-oikeudet riippumatta siitä, minä vuonna kyseinen opiskeluoikeus on myönnetty. Opiskelija on myös voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.\n
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
+  
   **Cancelled**: Sisältää kyseisenä vuonna perutut opiskeluoikeudet riippumatta siitä, onko kyseinen opiskelija ikinä edes alkanut opiskelemaan ohjelmassa tai opiskelun aloitusvuodesta.
   
-  **Transferred away**: Sisältää kyseisenä vuonna pois ohjelmasta siirtyneet opinto-oikeudet. Sama opiskelija voi esiintyä tilastoissa useana vuonna. Kyseiset opiskelijat ovat saattaneet aloittaa ohjelmassa tai eivät koskaan ole aloittaneet ohjelmassa. 
+  **Transferred away**: Sisältää kyseisenä vuonna pois ohjelmasta siirtyneet opiskelijat (opinto-oikeudet). Sama opiskelija voi esiintyä tilastoissa useana vuonna, mikäli hän on siirtynyt ohjelmaan ja siitä pois useasti.
   
-  **Transferred to**: Sisältää kyseisenä vuonna ohjelmaan siirtyneet opinto-oikeudet.
+  **Transferred to**: Sisältää kyseisenä vuonna ohjelmaan siirtyneet opiskelijat (opinto-oikeudet).
 
   HUOM! Ohjelmaan siirtyneiden määrä on erityisen suuri vuonna 2020, jolloin vanhoista koulutusohjelmista luovuttiin ja opiskelijat siirtyivät uusiin ohjelmiin.
   `,
   CreditsProducedByTheStudyprogramme: `
-  Sisältää opintopisteet suoritusvuosittain (Sisussa näkyvä kurssin suorituspäivä)
+  Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan.
 
-  **Major students' credits**: Sisältää ne opintopisteet, joiden suorittajalla on suoritushetkellä ollut ensisijainen opinto-oikeus kyseiseen koulutusohjelmaan.
+  **Major students' credits**: Sisältää ne opintopisteet, joiden suorittajalla on suoritushetkellä ollut ensisijainen opinto-oikeus kyseiseen koulutusohjelmaan. Sisältää myös ohjelmaan siirtyneet ensisijaiset opiskelijat.
 
-  **Non-major students' credits**: Sisältää koulutusohjelman tuottamat opintopisteet, joiden suorittajalla EI ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan.
+  **Non-major students' credits**: Sisältää koulutusohjelman tuottamat opintopisteet, joiden suorittajalla EI ole ollut suoritushetkellä ensisijaista opinto-oikeutta kyseiseen koulutusohjelmaan. Sisältää
+  esimerkiksi vaihto-opiskelijat ja erillis-opinto-oikeudella opiskelevat. Sisältää myös opintopisteet, jotka opiskelija on suorittanut koulutusohjelmaan ennen opintojen aloittamista koulutusohjelmassa tai opintojen päätyttyä.
   
-  **Transferred credits**: Sisältää opintopisteet, jotka on suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan.
+  **Transferred credits**: Sisältää opintopisteet, jotka on suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet.
   `,
   GraduatedAndThesisWritersOfTheProgramme: `
-  **Wrote thesis**: Sisältää kyseisenä vuonna kandidaatintutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
+  **Wrote thesis**: Sisältää kyseisenä vuonna kandidaatintutkielman tai pro gradu-tutkielman hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.
 
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
   `,
@@ -47,7 +49,7 @@ export default {
   ProgrammesAfterGraduation: `
   Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
 
-  Mukana ovat **vain valmistuneet opiskelijat ja maisteriohjelmat**.
+  Mukana ovat **vain valmistuneet opiskelijat ja vain maisteriohjelmat**.
   `,
   StudytrackOverview: `  
   Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
