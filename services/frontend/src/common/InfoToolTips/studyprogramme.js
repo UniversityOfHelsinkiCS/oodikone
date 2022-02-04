@@ -43,11 +43,11 @@ export default {
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
   `,
   AverageGraduationTimes: `
-  **Median time**: Näyttää kyseisenä vuonna valmistuneiden opintojen keston **mediaanin** kuukausina.
+  **Median time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Luku sisältää mahdolliset poissaolokuukaudet.
 
-  **Mean time**: Näyttää kyseisenä vuonna valmistuneiden opintojen keston **keskiarvon** kuukausina.
+  **Mean time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina. Luku sisältää mahdolliset poissaolokuukaudet.
   
-  Mukana ovat **vain valmistuneet opiskelijat**. Kandiohjelmissa tavoiteaika on 36 kk, maisteriohjelmissa 24 kk`,
+  n = **valmistuneet opiskelijat / kaikki ohjelmassa kyseisenä vuonna alkaneet opinto-oikeudet**. Kandiohjelmissa tavoiteaika on 36 kk, maisteriohjelmissa 24 kk`,
   ProgrammesAfterGraduation: `
   Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
 
