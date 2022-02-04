@@ -94,7 +94,13 @@ const StudytrackOverview = ({ studyprogramme }) => {
         <>
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
           <div className="toggle-container">
-            {getRadioButton(toolTips.StudentToggle, 'All students', 'Major students', specialGroups, setSpecialGroups)}
+            {getRadioButton(
+              toolTips.StudentToggle,
+              'All studyrights included',
+              'Special studyrights excluded',
+              specialGroups,
+              setSpecialGroups
+            )}
             {getRadioButton(toolTips.GradToggle, 'Graduated included', 'Graduated excluded', graduated, setGraduated)}
           </div>
           {getDivider(

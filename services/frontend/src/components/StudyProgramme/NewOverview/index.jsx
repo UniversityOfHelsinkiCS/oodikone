@@ -70,7 +70,13 @@ const Overview = ({ studyprogramme }) => {
     <div className="studyprogramme-overview">
       <div className="toggle-container">
         {getRadioButton(toolTips.YearToggle, 'Calendar year ', 'Academic year', academicYear, setAcademicYear)}
-        {getRadioButton(toolTips.StudentToggle, 'All students', 'Major students', specialGroups, setSpecialGroups)}
+        {getRadioButton(
+          toolTips.StudentToggle,
+          'All studyrights included',
+          'Special studyrights excluded',
+          specialGroups,
+          setSpecialGroups
+        )}
       </div>
 
       {isFetchingOrLoading ? (
