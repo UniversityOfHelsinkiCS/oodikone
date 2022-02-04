@@ -8,12 +8,12 @@ const {
   getStartDate,
   getYearsArray,
   getPercentage,
-  getBachelorCreditGraphStats,
-  getMasterCreditGraphStats,
   getYearsObject,
   getAcademicYearsObject,
   getCorrectStudentnumbers,
   getCreditThresholds,
+  getCreditGraphStats,
+  tableTitles,
 } = require('./studyprogrammeHelpers')
 const {
   studytrackStudents,
@@ -233,9 +233,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
 
   studytracks.forEach(async track => {
     mainStatsByTrack[track] = []
-    creditGraphStats[track] = studyprogramme.includes('KH')
-      ? getBachelorCreditGraphStats(years)
-      : getMasterCreditGraphStats(years)
+    creditGraphStats[track] = getCreditGraphStats(studyprogramme, years)
     creditTableStats[track] = []
     graduationMedianTime[track] = getAcademicYearsObject(years, true)
     graduationMeanTime[track] = getAcademicYearsObject(years, true)
@@ -302,6 +300,8 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
     graduationMeanTime: graduated ? data.graduationMeanTime : null,
     graduationAmounts: graduated ? data.graduationAmounts : null,
     studytrackOptions,
+    populationTitles: tableTitles['studytracks'],
+    creditTableTitles: tableTitles['creditProgress'][studyprogramme.includes('KH') ? 'bachelor' : 'master'],
   }
 }
 

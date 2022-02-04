@@ -8,6 +8,7 @@ const {
   getYearsArray,
   getStartDate,
   isSpecialGroupCredit,
+  tableTitles,
 } = require('./studyprogrammeHelpers')
 const {
   getProgrammesStudyrights,
@@ -79,10 +80,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType, specialGr
   const transferred = await getTransferredCreditStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
-
-  const titles = includeAllSpecials
-    ? ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits']
-    : ['', 'Total', 'Major students credits', 'Transferred credits']
+  const titles = tableTitles['credits'][specialGroups]
 
   const tableStats = reversedYears.map(year =>
     includeAllSpecials

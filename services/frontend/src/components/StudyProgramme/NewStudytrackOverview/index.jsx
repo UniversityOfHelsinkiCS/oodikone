@@ -13,40 +13,6 @@ import StudytrackSelector from './StudytrackSelector'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const populationTitles = [
-  '',
-  'All',
-  'Started',
-  'Currently enrolled',
-  'Absent',
-  'Cancelled',
-  'Graduated',
-  'Men',
-  'Women',
-  'Finnish',
-]
-const bachelorCreditTableTitles = [
-  '',
-  'All started',
-  '< 30 credits',
-  '30-59 credits',
-  '60-89 credits',
-  '90-119 credits',
-  '120-149 credits',
-  '> 150 credits',
-]
-
-const mastersCreditTableTitles = [
-  '',
-  'All started',
-  '< 200 credits',
-  '200-219 credits',
-  '220-239 credits',
-  '240-259 credits',
-  '260-279 credits',
-  '> 280 credits',
-]
-
 const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
   <div className="radio-toggle">
     <label className="toggle-label">{firstLabel}</label>
@@ -115,7 +81,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
             studyprogramme={studyprogramme}
             singleTrack={track !== studyprogramme && track}
             studytracks={stats?.data?.studytrackOptions}
-            titles={populationTitles}
+            titles={stats?.data?.populationTitles}
             dataOfAllTracks={stats?.data?.mainStatsByYear}
             dataOfSingleTrack={track && track !== studyprogramme ? stats?.data?.mainStatsByTrack[track] : null}
             years={stats?.data?.years}
@@ -133,7 +99,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
             <BasicDataTable
               data={stats?.data?.creditTableStats}
               track={track || studyprogramme}
-              titles={studyprogramme.includes('KH') ? bachelorCreditTableTitles : mastersCreditTableTitles}
+              titles={stats?.data?.creditTableTitles}
             />
           </div>
           {stats?.isSuccess && stats?.graduationAmounts && (
