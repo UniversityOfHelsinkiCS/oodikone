@@ -2,7 +2,7 @@ import React from 'react'
 
 const ReactHighcharts = require('react-highcharts')
 
-const GaugeChart = ({ data, year, graduationAmount, totalAmount, studyprogramme }) => {
+const GaugeChart = ({ data, year, graduationAmount, studyprogramme }) => {
   if (!data || !graduationAmount || !data.length) return null
 
   const thresholdValues = studyprogramme.includes('KH') ? [36, 41] : [24, 27]
@@ -29,7 +29,7 @@ const GaugeChart = ({ data, year, graduationAmount, totalAmount, studyprogramme 
       y: 60,
     },
     subtitle: {
-      text: `${year}<br/> n = ${graduationAmount} / ${totalAmount}`,
+      text: `${year}<br/> n = ${graduationAmount}`,
       style: {
         fontWeight: 'bold',
         fontSize: '15px',

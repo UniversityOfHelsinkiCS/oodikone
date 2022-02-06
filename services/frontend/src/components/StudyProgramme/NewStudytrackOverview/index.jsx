@@ -71,7 +71,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
           </div>
           {getDivider(
             `Students of ${
-              track === '' || track === 'studyprogramme'
+              track === '' || track === studyprogramme
                 ? 'the studyprogramme by starting year'
                 : `the studytrack ${track} by starting year`
             }`,
@@ -88,7 +88,7 @@ const StudytrackOverview = ({ studyprogramme }) => {
           />
           {getDivider(
             `Progress of students of ${
-              track === '' || track === 'studyprogramme'
+              track === '' || track === studyprogramme
                 ? 'the studyprogramme by starting year'
                 : `the studytrack ${track} by starting year`
             }`,

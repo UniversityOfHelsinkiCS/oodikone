@@ -268,7 +268,7 @@ const tableTitles = {
   creditProgress: {
     bachelor: [
       '',
-      'All started',
+      'All',
       '< 30 credits',
       '30-59 credits',
       '60-89 credits',
@@ -278,7 +278,7 @@ const tableTitles = {
     ],
     master: [
       '',
-      'All started',
+      'All',
       '< 200 credits',
       '200-219 credits',
       '220-239 credits',
