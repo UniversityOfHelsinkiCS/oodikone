@@ -41,7 +41,9 @@ const Overview = ({ studyprogramme }) => {
   const getDivider = (title, toolTipText) => (
     <>
       <div className="divider">
-        <Divider horizontal>{title}</Divider>
+        <Divider data-cy={`Section-${toolTipText}`} horizontal>
+          {title}
+        </Divider>
       </div>
       <InfoBox content={toolTips[toolTipText]} />
     </>
