@@ -16,7 +16,7 @@ export default {
   StudentsOfTheStudyprogramme: `
   **All**: Sisältää kaikki kyseisenä vuonna alkaneet opinto-oikeudet riippumatta siitä, onko opintoja aloitettu tai onko niitä aloitettu ko. vuonna. Mukana myös ohjelmaan siirtyneet opiskelijat.
 
-  **Started**: Sisältää kyseisenä vuonna aloitetut opinto-oikeudet riippumatta siitä, minä vuonna kyseinen opiskeluoikeus on myönnetty. Opiskelija on myös voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.\n
+  **Started studying**: Sisältää kyseisenä vuonna aloittaneet opiskelijat (aloitetut opinto-oikeudet) riippumatta siitä, minä vuonna kyseinen opiskeluoikeus on myönnetty. Opiskelija on myös voinut myöhemmin keskeyttää opintonsa tai siirtyä pois ohjelmasta.\n
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
   
   **Cancelled**: Sisältää kyseisenä vuonna perutut opiskeluoikeudet riippumatta siitä, onko kyseinen opiskelija ikinä edes alkanut opiskelemaan ohjelmassa tai opiskelun aloitusvuodesta.
@@ -55,6 +55,11 @@ export default {
   `,
   StudytrackOverview: `  
   Kuvaa koulutusohjelman kyseiseen ohjelmaan opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
+  
+  HUOM!
+  **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna.
+  **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
+  
   Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, tutkinnonsuoritusoikeudesta luopuneet ja erillisopinto-oikeudella opiskelevat.
   Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. 
 
