@@ -14,7 +14,7 @@ describe('Studyprogramme overview', () => {
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
-    it('Basic information -tab loads', () => {
+    it.skip('Basic information -tab loads', () => {
       cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('[data-cy=Section-StudentsOfTheStudyprogramme]')
       cy.get('[data-cy=Section-CreditsProducedByTheStudyprogramme]')
@@ -24,12 +24,52 @@ describe('Studyprogramme overview', () => {
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
-    it('Studytracks and student populations -tab loads', () => {
+    it.skip('Studytracks and student populations -tab loads', () => {
       cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and student populations').click()
       cy.get('[data-cy=Section-StudytrackOverview]')
       cy.get('[data-cy=Section-StudytrackProgress]')
       cy.get('[data-cy=Section-AverageGraduationTimes]')
+    })
+
+    it('Basic information contains correct students', () => {
+      const thisYear = new Date().getFullYear()
+      const years = []
+      for (let year = thisYear; year > 2021; year--) {
+        years.push(year)
+      }
+
+      const studentsTableContents = [
+        // [Year, All, Started, Graduated, Cancelled, Transferred Away, Transferred to]
+        ...years.map(year => [year, 0, 0, 0, 0, 0, 0]),
+        [2021, 0, 0, 0, 0, 1, 0],
+        [2020, 12, 10, 36, 16, 3, 2],
+        [2019, 87, 86, 17, 14, 0, 1],
+        [2018, 161, 162, 1, 3, 0, 0],
+        [2017, 171, 173, 0, 0, 0, 0],
+      ]
+
+      cy.checkTableStats(studentsTableContents, 'StudentsOfTheStudyprogramme')
+    })
+
+    it('Basic information contains correct credits', () => {
+      const thisYear = new Date().getFullYear()
+      const years = []
+      for (let year = thisYear; year > 2021; year--) {
+        years.push(year)
+      }
+
+      const creditTableContents = [
+        // [Year, Total, Major credits, Non-major credits, Transferred credits]
+        ...years.map(year => [year, 0, 0, 0, 0]),
+        [2021, 0, 0, 0, 0],
+        [2020, 4928, 548, 4213, 167],
+        [2019, 7737, 1644, 5744, 349],
+        [2018, 6730, 1820, 4638, 272],
+        [2017, 2900, 788, 1724, 388],
+      ]
+
+      cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
     })
 
     it('can create and delete tags for population', () => {

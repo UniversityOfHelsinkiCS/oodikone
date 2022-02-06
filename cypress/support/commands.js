@@ -104,3 +104,18 @@ Cypress.Commands.add('selectStudyProgramme', name => {
   cy.cs('select-study-programme').click().children().contains(name).click()
   cy.contains('See population').click()
 })
+
+Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
+  cy.get(`[data-cy=${tableName}]>tbody`).within(() => {
+    correctStats.forEach((values, trIndex) => {
+      cy.get('tr')
+        .eq(trIndex)
+        .within(() => {
+          values.forEach((value, tdIndex) => {
+            cy.get('td').eq(tdIndex).contains(value)
+          })
+        })
+    })
+    cy.get('tr').should('have.length', correctStats.length)
+  })
+})
