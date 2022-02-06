@@ -1,12 +1,12 @@
 import React from 'react'
 import { Table } from 'semantic-ui-react'
 
-const DataTable = ({ data, titles, wideTable }) => {
+const DataTable = ({ data, cypress, titles, wideTable }) => {
   if (!data || !titles) return null
 
   return (
     <div className={`table-container${wideTable ? '-wide' : ''}`}>
-      <Table celled>
+      <Table data-cy={cypress} celled>
         <Table.Header>
           <Table.Row>
             {titles?.map(title => (
