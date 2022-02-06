@@ -10,10 +10,8 @@ const {
 } = require('./services/trends')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
-const { productivityStatsForStudytrack, throughputStatsForStudytrack } = require('./services/studyprogramme')
 const { updateBasicView, updateStudytrackView } = require('./services/studyprogrammeUpdates')
 const { findAndSaveTeachers } = require('./services/topteachers')
-const { setProductivity, setThroughput, patchProductivity, patchThroughput } = require('./services/analyticsService')
 const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
@@ -23,49 +21,6 @@ const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start
 const refreshStudyrightAssociations = async () => {
   await refreshAssociationsInRedis()
   logger.info('Studyright associations refreshed!')
-}
-
-const refreshOverview = async () => {
-  logger.info('Refreshing throughput and productivity for programmes...')
-  const codes = (await getAllProgrammes()).map(p => p.code).filter(code => code.includes('KH') || code.includes('MH'))
-  let ready = 0
-  for (const code of codes) {
-    let programmeStatsSince = new Date('2017-07-31')
-    if (code.includes('MH') || code.includes('KH')) {
-      programmeStatsSince = new Date('2017-07-31')
-    } else {
-      programmeStatsSince = new Date('2000-07-31')
-    }
-    try {
-      await patchThroughput({ [code]: { status: 'RECALCULATING' } })
-      const data = await throughputStatsForStudytrack(code, programmeStatsSince.getFullYear())
-      await setThroughput(data)
-    } catch (e) {
-      logger.error({ message: `failed to recalculate throughput for ${code}`, meta: e })
-      try {
-        await patchThroughput({ [code]: { status: 'RECALCULATION ERRORED' } })
-      } catch (e) {
-        logger.error({ message: 'failed to update throughtput status to error', meta: e })
-      }
-    }
-    try {
-      await patchProductivity({ [code]: { status: 'RECALCULATING' } })
-      const data = await productivityStatsForStudytrack(code, programmeStatsSince)
-      await setProductivity(data)
-    } catch (e) {
-      logger.error({ message: `failed to recalculate productivity for ${code}`, meta: e })
-      try {
-        await patchProductivity({
-          [code]: { status: 'RECALCULATION ERRORED' },
-        })
-      } catch (e) {
-        logger.error({ message: 'failed to update productivity status to error', meta: e })
-      }
-    }
-    ready += 1
-    logger.info(`${ready}/${codes.length} programmes done`)
-  }
-  logger.info('Throughput and productivity for programmes refreshed')
 }
 
 const refreshNewOverviews = async () => {
@@ -165,7 +120,7 @@ const refreshProtoCProgrammeToRedis = async () => {
 }
 
 const refreshStatistics = async () => {
-  const statfuncs = [refreshStudyrightAssociations, refreshOverview, refreshTeacherLeaderboard]
+  const statfuncs = [refreshStudyrightAssociations, refreshTeacherLeaderboard]
   logger.info('Refreshing statistics')
   for (const func of statfuncs) {
     await func()
