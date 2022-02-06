@@ -13,6 +13,25 @@ describe('Studyprogramme overview', () => {
       cy.init('/study-programme/KH50_005')
     })
 
+    // If the backend breaks for one of the sections, the section header is not rendered and this will fail
+    it('Basic information -tab loads', () => {
+      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.get('[data-cy=Section-StudentsOfTheStudyprogramme]')
+      cy.get('[data-cy=Section-CreditsProducedByTheStudyprogramme]')
+      cy.get('[data-cy=Section-GraduatedAndThesisWritersOfTheProgramme]')
+      cy.get('[data-cy=Section-ProgrammesAfterGraduation]')
+      cy.get('[data-cy=Section-AverageGraduationTimes]')
+    })
+
+    // If the backend breaks for one of the sections, the section header is not rendered and this will fail
+    it('Studytracks and student populations -tab loads', () => {
+      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.get('.attached').contains('Studytracks and student populations').click()
+      cy.get('[data-cy=Section-StudytrackOverview]')
+      cy.get('[data-cy=Section-StudytrackProgress]')
+      cy.get('[data-cy=Section-AverageGraduationTimes]')
+    })
+
     it('can create and delete tags for population', () => {
       const name = `tag-${new Date().getTime()}`
       cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
