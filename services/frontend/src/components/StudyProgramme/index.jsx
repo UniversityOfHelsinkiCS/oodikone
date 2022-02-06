@@ -1,17 +1,14 @@
 import React, { useCallback, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Header, Segment, Tab, Button } from 'semantic-ui-react'
-import { isEqual, uniqBy } from 'lodash'
+import { Header, Segment, Tab } from 'semantic-ui-react'
+import { isEqual } from 'lodash'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
-import Overview from './Overview'
 import NewOverview from './NewOverview'
 import NewStudytrackOverview from './NewStudytrackOverview'
 import NewUpdateView from './NewUpdateView'
-import StudyTrackOverview from './StudyTrackOverview'
-import ThesisCourses from './ThesisCourses'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
@@ -22,12 +19,11 @@ import { getThroughput } from '../../redux/throughput'
 import { getProductivity } from '../../redux/productivity'
 import { getProgrammes } from '../../redux/populationProgrammes'
 
-import { callApi } from '../../apiConnection'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const StudyProgramme = props => {
   const { language } = useLanguage()
-  const { roles, isAdmin } = useGetAuthorizedUserQuery()
+  const { isAdmin } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, props.history)
 
   useTitle('Study programmes')
@@ -36,71 +32,22 @@ const StudyProgramme = props => {
     props.getProgrammesDispatch()
   }, [])
 
-  const refreshProductivity = () => {
-    callApi('/v2/studyprogrammes/productivity/recalculate', 'get', null, {
-      code: props.match.params.studyProgrammeId,
-    })
-      .then(() => {
-        props.getProductivityDispatch(props.match.params.studyProgrammeId)
-      })
-      .catch(e => {
-        if (e.message.toLowerCase() === 'network error') {
-          window.location.reload(true)
-        }
-      })
-  }
-  const refreshThroughput = () => {
-    callApi('/v2/studyprogrammes/throughput/recalculate', 'get', null, {
-      code: props.match.params.studyProgrammeId,
-    })
-      .then(() => {
-        props.getThroughputDispatch(props.match.params.studyProgrammeId)
-      })
-      .catch(e => {
-        if (e.message.toLowerCase() === 'network error') {
-          window.location.reload(true)
-        }
-      })
-  }
-
-  const SHOW_NEW_OVERVIEW = isAdmin && roles.includes('teachers')
-
   const getPanes = () => {
-    const { match, programmes } = props
+    const { match } = props
     const { studyProgrammeId } = match.params
-    const filteredStudytracks = programmes?.[studyProgrammeId]
-      ? Object.values(programmes?.[studyProgrammeId].enrollmentStartYears).reduce((acc, curr) => {
-          acc.push(...Object.values(curr.studyTracks))
-          return uniqBy(acc, 'code')
-        }, [])
-      : []
     const panes = []
-    if (SHOW_NEW_OVERVIEW) {
-      panes.push({
-        menuItem: 'Basic information (NEW)',
-        render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
-      })
-    }
-    if (SHOW_NEW_OVERVIEW) {
-      panes.push({
-        menuItem: 'Studytracks and student populations (NEW)',
-        render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
-      })
-    }
-    if (SHOW_NEW_OVERVIEW) {
+    panes.push({
+      menuItem: 'Basic information (NEW)',
+      render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
+    })
+    panes.push({
+      menuItem: 'Studytracks and student populations (NEW)',
+      render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
+    })
+    if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
         render: () => <NewUpdateView studyprogramme={studyProgrammeId} />,
-      })
-    }
-    panes.push({
-      menuItem: 'Overview',
-      render: () => <Overview studyprogramme={studyProgrammeId} history={props.history} />,
-    })
-    if (filteredStudytracks.length > 0) {
-      panes.push({
-        menuItem: 'Studytrack overview',
-        render: () => <StudyTrackOverview studyprogramme={studyProgrammeId} history={props.history} admin={isAdmin} />,
       })
     }
     panes.push({
@@ -108,24 +55,9 @@ const StudyProgramme = props => {
       render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
     })
     panes.push({
-      menuItem: 'Thesis Courses',
-      render: () => <ThesisCourses studyprogramme={studyProgrammeId} />,
-    })
-    panes.push({
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />,
     })
-    if (isAdmin) {
-      panes.push({
-        menuItem: 'Admin',
-        render: () => (
-          <>
-            <Button onClick={() => refreshThroughput()}>recalculate throughput</Button>
-            <Button onClick={() => refreshProductivity()}>recalculate productivity</Button>
-          </>
-        ),
-      })
-    }
     return panes
   }
 
