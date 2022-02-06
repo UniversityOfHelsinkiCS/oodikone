@@ -121,7 +121,11 @@ const Overview = ({ studyprogramme }) => {
               {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
               <div className="section-container">
                 <BarChart data={graduations?.data} />
-                <DataTable data={graduations?.data?.tableStats} titles={graduations?.data?.titles} />
+                <DataTable
+                  cypress="GraduatedAndThesisWritersOfTheProgramme"
+                  data={graduations?.data?.tableStats}
+                  titles={graduations?.data?.titles}
+                />
               </div>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
