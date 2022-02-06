@@ -46,11 +46,11 @@ describe('Studyprogramme overview', () => {
       const tableContents = [
         // [Year, All, Started, Graduated, Cancelled, Transferred Away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0, 0]),
-        [2021, 0, 0, 0, 0, 1, 0],
-        [2020, 12, 10, 36, 16, 3, 2],
-        [2019, 87, 86, 17, 14, 0, 1],
-        [2018, 161, 162, 1, 3, 0, 0],
-        [2017, 171, 173, 0, 0, 0, 0],
+        [2021, 0, 0, 0, 1, 0],
+        [2020, 10, 36, 16, 3, 2],
+        [2019, 86, 17, 14, 0, 1],
+        [2018, 162, 1, 3, 0, 0],
+        [2017, 173, 0, 0, 0, 0],
       ]
 
       cy.checkTableStats(tableContents, 'StudentsOfTheStudyprogramme')
