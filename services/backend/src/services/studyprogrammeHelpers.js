@@ -258,8 +258,8 @@ const getCreditThresholds = studyprogramme => {
 
 const tableTitles = {
   basics: {
-    SPECIAL_EXCLUDED: ['', 'All', 'Started', 'Graduated'],
-    SPECIAL_INCLUDED: ['', 'All', 'Started', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to'],
+    SPECIAL_EXCLUDED: ['', 'All', 'Started studying', 'Graduated'],
+    SPECIAL_INCLUDED: ['', 'All', 'Started studying', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to'],
   },
   credits: {
     SPECIAL_EXCLUDED: ['', 'Total', 'Major students credits', 'Transferred credits'],
@@ -290,7 +290,7 @@ const tableTitles = {
   studytracks: [
     '',
     'All',
-    'Started',
+    'Started studying',
     'Currently enrolled',
     'Absent',
     'Cancelled',
