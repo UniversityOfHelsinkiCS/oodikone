@@ -53,122 +53,14 @@ const PaneContent = ({ component: Component, settings: SettingsComponent, initia
 
 const ResultTabs = ({ primary, comparison, history }) => {
   const [tab, setTab] = useTabs('cs_tab', 0, history)
-  // const [viewMode, setViewMode] = useState(viewModeNames.STUDENT)
-  // const [selectedView, setSelectedView] = useState(false)
-  // const [isRelative, setIsRelative] = useState(false)
-  // const [showGrades, setShowGrades] = useState(false)
   const { userHasAccessToAllStats } = primary
-
-  /* const handleModeChange = newViewMode => {
-    sendAnalytics(`Current view mode '${newViewMode}'`, 'Course statistics')
-    setViewMode(newViewMode)
-  } */
-
-  /* useEffect(() => {
-    const newViewMode = selectedView ? viewModeNames.ATTEMPTS : viewModeNames.STUDENT
-    handleModeChange(newViewMode)
-  }, [selectedView]) */
 
   const handleTabChange = (...params) => {
     const { activeIndex } = params[1]
     const currentTab = params[1].panes[activeIndex]
     sendAnalytics(`Current tab '${currentTab.menuItem.content}'`, 'Course statistics')
     setTab(...params)
-    // setViewMode(resetViewMode ? viewMode : viewModeNames.ATTEMPTS)
   }
-
-  /* const getRadioButton = (firstLabel, secondLabel, value, setValue) => (
-    <div className="toggleContainer">
-      <label className="toggleLabel">{firstLabel}</label>
-      <Radio toggle data-cy="gradeToggle" checked={value} onChange={() => setValue(!value)} />
-      <label className="toggleLabel">{secondLabel}</label>
-    </div>
-  ) */
-
-  /* const renderViewModeSelector = () => {
-    const isTogglePane = tab !== 0
-    const getButtonMenu = () => (
-      <Menu secondary>
-        {Object.values(viewModeNames).map(name => (
-          <Menu.Item key={name} name={name} active={viewMode === name} onClick={() => handleModeChange(name)} />
-        ))}
-        {viewMode === 'Attempts' && getRadioButton('Totals', 'Grade distribution', showGrades, setShowGrades)}
-        {viewMode === 'Attempts' && showGrades && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
-      </Menu>
-    )
-
-    const getToggle = () => {
-      return (
-        <div className="chartToggleContainer">
-          {tab === 1 && getRadioButton('Student', 'Attempts', selectedView, setSelectedView)}
-          {(tab === 2 || comparison) && getRadioButton('Absolute', 'Relative', isRelative, setIsRelative)}
-        </div>
-      )
-    }
-
-    // Remove "false" and activate infoboxes when the texts for them are ready
-    return (
-      <div className="modeSelectorContainer">
-        {isTogglePane ? getToggle() : getButtonMenu()}
-        <InfoBox content={infotooltips.CourseStatistics[tab][viewMode]} />
-      </div>
-    )
-  } */
-
-  /* const getPanes = () => {
-    return [
-      {
-        menuItem: { key: 'Table', icon: 'table', content: 'Table' },
-        render: () => (
-          <Tables
-            separate={separate}
-            comparison={comparison}
-            primary={primary}
-            viewMode={viewMode}
-            isRelative={isRelative}
-            showGrades={showGrades}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-          />
-        ),
-      },
-      {
-        menuItem: { key: 'pass', icon: 'balance', content: 'Pass rate chart' },
-        render: () => (
-          <PassRate
-            comparison={comparison}
-            primary={primary}
-            viewMode={viewMode}
-            isRelative={isRelative && !!comparison}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-          />
-        ),
-      },
-      {
-        menuItem: { key: 'grade', icon: 'chart bar', content: 'Grade distribution chart' },
-        render: () => (
-          <Distribution
-            comparison={comparison}
-            primary={primary}
-            isRelative={isRelative}
-            userHasAccessToAllStats={userHasAccessToAllStats}
-          />
-        ),
-      },
-    ];
-
-    return paneMenuItems.map(p => {
-      const { menuItem, renderFn } = p
-      return {
-        menuItem,
-        render: () => (
-          <Grid padded="vertically" columns="equal">
-            <Grid.Row className="modeSelectorRow">{renderViewModeSelector()}</Grid.Row>
-            {renderFn()}
-          </Grid>
-        ),
-      }
-    })
-  } */
 
   const paneTypes = [
     {
