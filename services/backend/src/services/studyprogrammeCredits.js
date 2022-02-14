@@ -69,6 +69,8 @@ const getTransferredCreditStats = async ({ studyprogramme, since, years, isAcade
   return { graphStats, tableStats }
 }
 
+// Fetches all credits for the studytrack and combines them into the statistics for the table
+// and graph in the studyprogramme overview
 const getCreditStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
