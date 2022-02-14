@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { withRouter } from 'react-router-dom'
-import { connect } from 'react-redux'
+import { useHistory, withRouter } from 'react-router-dom'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import { Header, Segment, Tab } from 'semantic-ui-react'
-import { isEqual } from 'lodash'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
@@ -20,9 +19,12 @@ import { getProgrammes } from '../../redux/populationProgrammes'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const StudyProgramme = props => {
+  const dispatch = useDispatch()
+  const history = useHistory()
+  const programmes = useSelector(state => state.populationProgrammes?.data?.programmes)
   const { language } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
-  const [tab, setTab] = useTabs('p_tab', 0, props.history)
+  const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduated, setGraduated] = useState(false)
@@ -30,7 +32,7 @@ const StudyProgramme = props => {
   useTitle('Study programmes')
 
   useEffect(() => {
-    props.getProgrammesDispatch()
+    dispatch(getProgrammes())
   }, [])
 
   const getPanes = () => {
@@ -42,7 +44,7 @@ const StudyProgramme = props => {
       render: () => (
         <BasicOverview
           studyprogramme={studyProgrammeId}
-          history={props.history}
+          history={history}
           specialGroups={specialGroups}
           setSpecialGroups={setSpecialGroups}
           academicYear={academicYear}
@@ -55,7 +57,7 @@ const StudyProgramme = props => {
       render: () => (
         <StudytrackOverview
           studyprogramme={studyProgrammeId}
-          history={props.history}
+          history={history}
           specialGroups={specialGroups}
           setSpecialGroups={setSpecialGroups}
           graduated={graduated}
@@ -82,12 +84,12 @@ const StudyProgramme = props => {
 
   const handleSelect = useCallback(
     programme => {
-      props.history.push(`/study-programme/${programme}`, { selected: programme })
+      history.push(`/study-programme/${programme}`, { selected: programme })
     },
-    [props.history]
+    [history]
   )
 
-  const { match, programmes } = props
+  const { match } = props
   const { studyProgrammeId } = match.params
   const programmeName = programmes?.[studyProgrammeId] && getTextIn(programmes?.[studyProgrammeId].name, language)
   const panes = getPanes()
@@ -131,20 +133,4 @@ const StudyProgramme = props => {
   )
 }
 
-const mapStateToProps = ({ populationProgrammes }) => {
-  const programmes = populationProgrammes.data ? populationProgrammes.data.programmes : {}
-  return {
-    programmes,
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  {
-    getProgrammesDispatch: getProgrammes,
-  },
-  null,
-  {
-    areStatePropsEqual: isEqual,
-  }
-)(withRouter(StudyProgramme))
+export default connect()(withRouter(StudyProgramme))
