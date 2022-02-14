@@ -27,9 +27,7 @@ const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
   </div>
 )
 
-const Overview = ({ studyprogramme }) => {
-  const [academicYear, setAcademicYear] = useState(false)
-  const [specialGroups, setSpecialGroups] = useState(false)
+const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
   const [showMeanTime, setShowMeanTime] = useState(true)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
