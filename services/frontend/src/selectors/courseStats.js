@@ -6,14 +6,14 @@ const courseStatsSelector = state => {
   return state.courseStats.data
 }
 
-const getCourseStats = createSelector([courseStatsSelector], courseStats => {
+const openOrReqularSelector = state => state.courseSearch.openOrReqular
+
+const getCourseStats = createSelector([courseStatsSelector, openOrReqularSelector], (courseStats, openOrReqular) => {
   const stats = {}
+
   Object.entries(courseStats).forEach(entry => {
-    // console.log('entry: ', entry)
     const [coursecode] = entry
-    // console.log('coursecode: ', coursecode)
-    const data = entry[1].unify
-    // console.log('data: ', data)
+    const data = entry[1][openOrReqular]
     const { statistics } = data
     stats[coursecode] = {
       ...data,
