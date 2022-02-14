@@ -15,8 +15,6 @@ import { useTabs, useTitle } from '../../common/hooks'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
 
-import { getThroughput } from '../../redux/throughput'
-import { getProductivity } from '../../redux/productivity'
 import { getProgrammes } from '../../redux/populationProgrammes'
 
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -143,8 +141,6 @@ const mapStateToProps = ({ populationProgrammes }) => {
 export default connect(
   mapStateToProps,
   {
-    getThroughputDispatch: getThroughput,
-    getProductivityDispatch: getProductivity,
     getProgrammesDispatch: getProgrammes,
   },
   null,
