@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
+import { connect /* useSelector */ } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
 import { shape, arrayOf, oneOfType, number, string, bool } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
@@ -14,6 +14,12 @@ const SingleCourseTab = ({ selected, stats, courses, userHasAccessToAllStats }) 
   useEffect(() => {
     setSelection(selected)
   }, [selected])
+  // console.log('selection: ', selection)
+  // console.log('courses: ', courses)
+
+  // let newStats = null
+  // newStats = useSelector(selectors.getCourseStats)
+  // console.log('newStats: ', newStats)
 
   if (!stats[selection]) return null
   return (
