@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Header, Segment, Tab } from 'semantic-ui-react'
@@ -25,6 +25,9 @@ const StudyProgramme = props => {
   const { language } = useLanguage()
   const { isAdmin } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, props.history)
+  const [academicYear, setAcademicYear] = useState(false)
+  const [specialGroups, setSpecialGroups] = useState(false)
+  const [graduated, setGraduated] = useState(false)
 
   useTitle('Study programmes')
 
@@ -38,11 +41,29 @@ const StudyProgramme = props => {
     const panes = []
     panes.push({
       menuItem: 'Basic information (NEW)',
-      render: () => <NewOverview studyprogramme={studyProgrammeId} history={props.history} />,
+      render: () => (
+        <NewOverview
+          studyprogramme={studyProgrammeId}
+          history={props.history}
+          specialGroups={specialGroups}
+          setSpecialGroups={setSpecialGroups}
+          academicYear={academicYear}
+          setAcademicYear={setAcademicYear}
+        />
+      ),
     })
     panes.push({
       menuItem: 'Studytracks and student populations (NEW)',
-      render: () => <NewStudytrackOverview studyprogramme={studyProgrammeId} history={props.history} />,
+      render: () => (
+        <NewStudytrackOverview
+          studyprogramme={studyProgrammeId}
+          history={props.history}
+          specialGroups={specialGroups}
+          setSpecialGroups={setSpecialGroups}
+          graduated={graduated}
+          setGraduated={setGraduated}
+        />
+      ),
     })
     if (isAdmin) {
       panes.push({

@@ -23,11 +23,9 @@ const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
   </div>
 )
 
-const StudytrackOverview = ({ studyprogramme }) => {
+const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, graduated, setGraduated }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const [showMeanTime, setShowMeanTime] = useState(true)
-  const [specialGroups, setSpecialGroups] = useState(false)
-  const [graduated, setGraduated] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
