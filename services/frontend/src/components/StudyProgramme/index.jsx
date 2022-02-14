@@ -6,9 +6,9 @@ import { isEqual } from 'lodash'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
-import NewOverview from './NewOverview'
-import NewStudytrackOverview from './NewStudytrackOverview'
-import NewUpdateView from './NewUpdateView'
+import BasicOverview from './BasicOverview'
+import StudytrackOverview from './StudytrackOverview'
+import UpdateView from './UpdateView'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
@@ -40,7 +40,7 @@ const StudyProgramme = props => {
     panes.push({
       menuItem: 'Basic information (NEW)',
       render: () => (
-        <NewOverview
+        <BasicOverview
           studyprogramme={studyProgrammeId}
           history={props.history}
           specialGroups={specialGroups}
@@ -53,7 +53,7 @@ const StudyProgramme = props => {
     panes.push({
       menuItem: 'Studytracks and student populations (NEW)',
       render: () => (
-        <NewStudytrackOverview
+        <StudytrackOverview
           studyprogramme={studyProgrammeId}
           history={props.history}
           specialGroups={specialGroups}
@@ -66,7 +66,7 @@ const StudyProgramme = props => {
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
-        render: () => <NewUpdateView studyprogramme={studyProgrammeId} />,
+        render: () => <UpdateView studyprogramme={studyProgrammeId} />,
       })
     }
     panes.push({
