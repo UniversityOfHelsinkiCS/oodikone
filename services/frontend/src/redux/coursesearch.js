@@ -24,7 +24,14 @@ export const toggleUnifyOpenUniCourses = () => ({
   type: 'TOGGLE_UNIFY_OPEN_UNI_COURSES',
 })
 
-const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false }, action) => {
+export const toggleOpenAndReqularCourses = showType => {
+  return {
+    type: 'TOGGLE_OPEN_AND_REQULAR_COURSES',
+    showType,
+  }
+}
+
+const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false, openOrReqular: 'unify' }, action) => {
   switch (action.type) {
     case 'GET_COURSE_SEARCH_RESULT_ATTEMPT':
       return {
@@ -48,10 +55,11 @@ const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false 
             ? action.response
             : state.data,
       }
-    case 'TOGGLE_UNIFY_OPEN_UNI_COURSES':
+
+    case 'TOGGLE_OPEN_AND_REQULAR_COURSES':
       return {
         ...state,
-        unifyOpenUniCourses: !state.unifyOpenUniCourses,
+        openOrReqular: action.showType,
       }
     case 'CLEAR_SEARCH_RESULTS':
       return {

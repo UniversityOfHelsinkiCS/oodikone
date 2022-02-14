@@ -1,17 +1,23 @@
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { Menu, Radio, Form } from 'semantic-ui-react'
 import { viewModeNames } from './util'
 import HelpButton from '../HelpButton'
 import StudentTable from './Tables/student'
 import AttemptsTable from './Tables/attempts'
+import { toggleOpenAndReqularCourses } from '../../../../redux/coursesearch'
 
 export const TablesSettings = ({ value, onChange }) => {
   const { viewMode, showDetails, showGrades } = value
-  const [unifyRadioValue, setUnifyRadioValue] = useState('unify')
+  const dispatch = useDispatch()
+  // const [unifyRadioValue, setUnifyRadioValue] = useState('unify')
+
+  const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
+  //  console.log('openOr Reqular: ', openOrReqular)
 
   const toggleUnifyRadioValue = (event, { value }) => {
-    setUnifyRadioValue(value)
+    //  console.log('value: ', value)
+    dispatch(toggleOpenAndReqularCourses(value))
   }
 
   return (
@@ -57,28 +63,28 @@ export const TablesSettings = ({ value, onChange }) => {
               </Form.Field>
               <Form.Field>
                 <Radio
-                  label="Choose this"
+                  label="reqular"
                   name="radioGroup"
                   value="reqular"
-                  checked={unifyRadioValue === 'reqular'}
+                  checked={openOrReqular === 'reqular'}
                   onChange={toggleUnifyRadioValue}
                 />
               </Form.Field>
               <Form.Field>
                 <Radio
-                  label="Or that"
+                  label="open"
                   name="radioGroup"
                   value="open"
-                  checked={unifyRadioValue === 'open'}
+                  checked={openOrReqular === 'open'}
                   onChange={toggleUnifyRadioValue}
                 />
               </Form.Field>
               <Form.Field>
                 <Radio
-                  label="Or that"
+                  label="unify"
                   name="radioGroup"
-                  value="unified"
-                  checked={unifyRadioValue === 'unify'}
+                  value="unify"
+                  checked={openOrReqular === 'unify'}
                   onChange={toggleUnifyRadioValue}
                 />
               </Form.Field>

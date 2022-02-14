@@ -292,10 +292,25 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
 }
 
 const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses, anonymizationSalt) => {
-  const stats = await Promise.all(
-    coursecodes.map(code => yearlyStatsOfNew(code, separate, unifyOpenUniCourses, anonymizationSalt))
+  let yesUnify = true
+  const noUnify = false
+
+  /* const stats = await Promise.all(
+    coursecodes.map(code => yearlyStatsOfNew(code, separate, yesUnify, anonymizationSalt))
+  ) */
+
+  const statsReqular = await Promise.all(
+    coursecodes.map(async code => {
+      // console.log('ollaanko täälllä????')
+      const unify = await yearlyStatsOfNew(code, separate, yesUnify, anonymizationSalt)
+      const reqular = await yearlyStatsOfNew(code, separate, noUnify, anonymizationSalt)
+
+      return { unify, reqular }
+    })
   )
-  return stats
+  // console.log('stats: ', statsReqular)
+
+  return statsReqular
 }
 
 const nameLikeTerm = name => {

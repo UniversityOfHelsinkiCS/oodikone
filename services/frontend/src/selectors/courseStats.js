@@ -1,12 +1,19 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { sortBy, flatten } from 'lodash'
 
-const courseStatsSelector = state => state.courseStats.data
+const courseStatsSelector = state => {
+  // console.log('state courseStats: ', state.courseStats)
+  return state.courseStats.data
+}
 
 const getCourseStats = createSelector([courseStatsSelector], courseStats => {
   const stats = {}
   Object.entries(courseStats).forEach(entry => {
-    const [coursecode, data] = entry
+    // console.log('entry: ', entry)
+    const [coursecode] = entry
+    // console.log('coursecode: ', coursecode)
+    const data = entry[1].unify
+    // console.log('data: ', data)
     const { statistics } = data
     stats[coursecode] = {
       ...data,
