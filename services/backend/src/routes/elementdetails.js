@@ -1,6 +1,5 @@
 const router = require('express').Router()
 const MandatoryCourses = require('../services/mandatoryCourses')
-const { optionData } = require('../services/studyprogramme')
 const { findProgrammeTheses, createThesisCourse, deleteThesisCourse } = require('../services/thesis')
 const { getAllProgrammes, getAllElementDetails } = require('../services/studyrights')
 
@@ -12,22 +11,6 @@ router.get('/elementdetails/all', async (req, res) => {
 router.get('/studyprogrammes', async (req, res) => {
   const studyrights = await getAllProgrammes()
   res.json(studyrights)
-})
-
-router.get('/v2/studyprogrammes/:id/optiondata', async (req, res) => {
-  const code = req.params.id
-
-  let level
-  if (code.includes('MH')) {
-    level = 'MSC'
-  } else if (code.includes('KH')) {
-    level = 'BSC'
-  } else {
-    return res.json([])
-  }
-
-  const data = await optionData(new Date('2017-07-31'), new Date(), code, level)
-  res.json(data)
 })
 
 router.get('/v2/studyprogrammes/:id/mandatory_courses', async (req, res) => {
