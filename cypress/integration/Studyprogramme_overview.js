@@ -294,7 +294,7 @@ describe('Studyprogramme overview', () => {
         ],
       ]
 
-      cy.checkTableStats(tableContents, 'StudentsOfTheStudyprogramme')
+      cy.checkTableStats(tableContents, 'StudytrackOverview')
     })
 
     it('Student progress data is shown correctly', () => {
@@ -307,7 +307,7 @@ describe('Studyprogramme overview', () => {
         ['2017 - 2018', 171, 10, 22, 18, 22, 24, 75],
       ]
 
-      cy.checkTableStats(tableContents, 'StudytrackOverview')
+      cy.checkTableStats(tableContents, 'StudytrackProgress')
     })
 
     /* Tag-tests*/
