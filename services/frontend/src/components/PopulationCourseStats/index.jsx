@@ -195,7 +195,7 @@ const PopulationCourseStats = props => {
         }))
         .sort((a, b) => a.module.order - b.module.order)
     )
-  }, [state.studentAmountLimit, state.codeFilter, state.nameFilter, mandatoryCourses])
+  }, [state.studentAmountLimit, props.courses.coursestatistics, state.codeFilter, state.nameFilter, mandatoryCourses])
 
   const onFilterChange = (e, field) => {
     const {
