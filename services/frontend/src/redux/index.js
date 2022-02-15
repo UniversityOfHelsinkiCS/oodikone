@@ -9,7 +9,6 @@ import populationSelectedStudentCourses from './populationSelectedStudentCourses
 import populationProgrammes from './populationProgrammes'
 import populationProgrammesUnfiltered from './populationProgrammesUnfiltered'
 import populationMandatoryCourses from './populationMandatoryCourses'
-import studyProgrammeBachelors from './studyProgrammeBachelors'
 import faculties from './faculties'
 import units from './units'
 import elementdetails from './elementdetails'
@@ -51,7 +50,6 @@ const store = configureStore({
     populationProgrammes,
     populationProgrammesUnfiltered,
     populationMandatoryCourses,
-    studyProgrammeBachelors,
     faculties,
     units,
     students,
