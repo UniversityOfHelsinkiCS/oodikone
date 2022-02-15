@@ -76,7 +76,11 @@ const GaugeChart = ({ cypress, data, year, graduationAmount, studyprogramme }) =
     ],
   }
 
-  return <ReactHighcharts data-cy={`Graph-${cypress}`} config={defaultConfig} />
+  return (
+    <div data-cy={`Graph-${cypress}`}>
+      <ReactHighcharts config={defaultConfig} />
+    </div>
+  )
 }
 
 export default GaugeChart

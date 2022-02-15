@@ -182,6 +182,11 @@ describe('Studyprogramme overview', () => {
         .should('contain', 36)
         .should('contain', 35)
 
+      cy.get('[data-cy=Graph-2019-AverageGraduationTimes]')
+        .should('contain', '2019')
+        .should('contain', 'n = 17')
+        .should('contain', '22 kk')
+
       cy.get('[data-cy=Graph-ProgrammesAfterGraduation')
         .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')
         .should('contain', 'Datatieteen maisteriohjelma')
@@ -308,6 +313,24 @@ describe('Studyprogramme overview', () => {
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
+    })
+
+    it('Studytrack overview graphs render', () => {
+      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.get('.attached').contains('Studytracks and student populations').click()
+
+      cy.get('[data-cy=Graph-StudytrackProgress]')
+        .should('contain', 'Less than 30 credits')
+        .should('contain', '30-59 credits')
+        .should('contain', 'More than 150 credits')
+        .should('contain', '5.8%')
+        .should('contain', '4.3%')
+        .should('contain', '15.1%')
+
+      cy.get('[data-cy=Graph-2018-AverageGraduationTimes]')
+        .should('contain', '2018 - 2019')
+        .should('contain', 'n = 11 / 162')
+        .should('contain', '22 kk')
     })
 
     /* Tag-tests*/
