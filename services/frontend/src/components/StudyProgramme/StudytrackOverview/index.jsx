@@ -95,7 +95,7 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
             'StudytrackProgress'
           )}
           <div className="section-container">
-            <BarChart data={stats?.data} track={track || studyprogramme} />
+            <BarChart cypress="StudytrackProgress" data={stats?.data} track={track || studyprogramme} />
             <BasicDataTable
               cypress="StudytrackProgress"
               data={stats?.data?.creditTableStats}
@@ -110,6 +110,7 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
               <div className="section-container-centered">
                 {stats?.data?.years.map(year => (
                   <GaugeChart
+                    cypress={`${year.slice(0, 4)}-AverageGraduationTimes`}
                     key={year}
                     year={year}
                     data={stats?.data?.graduationMedianTime[track][year]}

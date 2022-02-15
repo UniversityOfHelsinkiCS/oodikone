@@ -5,7 +5,7 @@ const ReactHighcharts = require('react-highcharts')
 
 const colors = ['#333737', '#bdc2c7', '#1392c2', '#195f8a', '#54997b', '#036415']
 
-const BarChart = ({ data, track }) => {
+const BarChart = ({ cypress, data, track }) => {
   if (!data || !data.creditGraphStats || !data.creditGraphStats[track])
     return <NoDataMessage message="No progress data for the studytrack found. Try with another studytrack" />
 
@@ -64,7 +64,7 @@ const BarChart = ({ data, track }) => {
   }
 
   return (
-    <div className="graph-container">
+    <div className="graph-container" data-cy={`Graph-${cypress}`}>
       <ReactHighcharts config={defaultConfig} />
     </div>
   )

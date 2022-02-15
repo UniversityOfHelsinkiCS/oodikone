@@ -142,6 +142,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
               <div className="section-container-centered">
                 {graduations?.data?.years.map(year => (
                   <GaugeChart
+                    cypress={`${year}-AverageGraduationTimes`}
                     key={year}
                     year={year}
                     data={
