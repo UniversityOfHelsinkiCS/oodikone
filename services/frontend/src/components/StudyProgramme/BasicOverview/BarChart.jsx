@@ -4,7 +4,7 @@ const ReactHighcharts = require('react-highcharts')
 
 const colors = ['#003E65', '#1392c2', '#036415']
 
-const BarChart = ({ data }) => {
+const BarChart = ({ cypress, data }) => {
   const dataWithColors = data?.graphStats?.map((series, index) => ({ ...series, color: colors[index] }))
 
   const defaultConfig = {
@@ -51,7 +51,7 @@ const BarChart = ({ data }) => {
 
   if (!data) return <></>
   return (
-    <div className="graph-container">
+    <div className="graph-container" data-cy={`Graph-${cypress}`}>
       <ReactHighcharts config={defaultConfig} />
     </div>
   )

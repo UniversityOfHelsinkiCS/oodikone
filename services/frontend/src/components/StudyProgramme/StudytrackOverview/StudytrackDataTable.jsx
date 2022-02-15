@@ -152,7 +152,7 @@ const StudytrackDataTable = ({
   return (
     <div className="datatable">
       {getRadioButton(null, 'Show percentages', 'Hide percentages', hidePercentages, setHidePercentages)}
-      <Table celled>
+      <Table data-cy="Table-StudytrackOverview" celled>
         <Table.Header>
           <Table.Row>
             {titles.map((title, index) => (

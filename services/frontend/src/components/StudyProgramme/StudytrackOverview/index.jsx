@@ -97,6 +97,7 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
           <div className="section-container">
             <BarChart data={stats?.data} track={track || studyprogramme} />
             <BasicDataTable
+              cypress="StudytrackProgress"
               data={stats?.data?.creditTableStats}
               track={track || studyprogramme}
               titles={stats?.data?.creditTableTitles}

@@ -18,7 +18,7 @@ const DataTable = ({ data, titles, track }) => {
 
   return (
     <div className="table-container">
-      <Table compact celled>
+      <Table data-cy="StudytrackProgress" compact celled>
         <Table.Header>
           <Table.Row>
             {titles?.map(title => (

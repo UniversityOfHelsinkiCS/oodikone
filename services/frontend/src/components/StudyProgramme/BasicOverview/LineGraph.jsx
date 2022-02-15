@@ -7,7 +7,7 @@ require('highcharts-exporting')(ReactHighcharts.Highcharts)
 
 const colors = ['#003E65', '#1392c2', '#E68825', '#333737', '#036415']
 
-const LineGraph = ({ data }) => {
+const LineGraph = ({ cypress, data }) => {
   const dataWithColors = data?.graphStats.map((series, index) => ({
     ...series,
     color: colors[index],
@@ -49,7 +49,7 @@ const LineGraph = ({ data }) => {
 
   if (!data) return <></>
   return (
-    <div className="graph-container">
+    <div className="graph-container" data-cy={`Graph-${cypress}`}>
       <ReactHighcharts config={defaultConfig} />
     </div>
   )

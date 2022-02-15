@@ -6,7 +6,7 @@ const DataTable = ({ data, cypress, titles, wideTable }) => {
 
   return (
     <div className={`table-container${wideTable ? '-wide' : ''}`}>
-      <Table data-cy={cypress} celled>
+      <Table data-cy={`Table-${cypress}`} celled>
         <Table.Header>
           <Table.Row>
             {titles?.map(title => (
