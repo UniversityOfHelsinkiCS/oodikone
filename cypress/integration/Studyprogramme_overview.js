@@ -21,12 +21,11 @@ const getEmptyYears = isAcademicYear => {
 }
 
 describe('Studyprogramme overview', () => {
-  describe('when opening programme page with basic user', () => {
+  /* Basic information overview -tests*/
+  describe('Basic information -view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
     })
-
-    /* Basic information overview -tests*/
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
     it('Basic information -tab loads', () => {
@@ -196,8 +195,13 @@ describe('Studyprogramme overview', () => {
         .should('contain', 4)
         .should('contain', 13)
     })
+  })
 
-    /* Studytrack overview -tests*/
+  /* Studytrack overview -tests*/
+  describe('Basic information -view works for basic user', () => {
+    beforeEach(() => {
+      cy.init('/study-programme')
+    })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
     it('Studytracks and student populations -tab loads', () => {
@@ -332,8 +336,13 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'n = 11 / 162')
         .should('contain', '22 kk')
     })
+  })
 
-    /* Tag-tests*/
+  /* Tag-tests*/
+  describe('Basic information -view works for basic user', () => {
+    beforeEach(() => {
+      cy.init('/study-programme')
+    })
 
     it('can create and delete tags for population', () => {
       const name = `tag-${new Date().getTime()}`
