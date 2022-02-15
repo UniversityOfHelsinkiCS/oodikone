@@ -106,7 +106,7 @@ Cypress.Commands.add('selectStudyProgramme', name => {
 })
 
 Cypress.Commands.add('checkTableStats', (correctStats, tableName) => {
-  cy.get(`[data-cy=${tableName}]>tbody`).within(() => {
+  cy.get(`[data-cy=Table-${tableName}]>tbody`).within(() => {
     correctStats.forEach((values, trIndex) => {
       cy.get('tr')
         .eq(trIndex)

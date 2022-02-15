@@ -13,10 +13,10 @@ import InfoBox from '../../Info/InfoBox'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
+const getRadioButton = (cypress, toolTip, firstLabel, secondLabel, value, setValue) => (
   <div className="radio-toggle">
     <label className="toggle-label">{firstLabel}</label>
-    <Radio toggle checked={value} onChange={() => setValue(!value)} />
+    <Radio data-cy={cypress} toggle checked={value} onChange={() => setValue(!value)} />
     {toolTip ? (
       <WithHelpTooltip tooltip={{ short: toolTip }}>
         <label className="toggle-label">{secondLabel}</label>
@@ -69,8 +69,16 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
   return (
     <div className="studyprogramme-overview">
       <div className="toggle-container">
-        {getRadioButton(toolTips.YearToggle, 'Calendar year ', 'Academic year', academicYear, setAcademicYear)}
         {getRadioButton(
+          'YearToggle',
+          toolTips.YearToggle,
+          'Calendar year ',
+          'Academic year',
+          academicYear,
+          setAcademicYear
+        )}
+        {getRadioButton(
+          'StudentToggle',
           toolTips.StudentToggle,
           'All studyrights included',
           'Special studyrights excluded',
@@ -92,7 +100,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
             <>
               {getDivider('Students of the studyprogramme', 'StudentsOfTheStudyprogramme')}
               <div className="section-container">
-                <LineGraph data={basics?.data} />
+                <LineGraph cypress="StudentsOfTheStudyprogramme" data={basics?.data} />
                 <DataTable
                   cypress="StudentsOfTheStudyprogramme"
                   data={basics?.data?.tableStats}
@@ -105,7 +113,11 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
             <>
               {getDivider('Credits produced by the studyprogramme', 'CreditsProducedByTheStudyprogramme')}
               <div className="section-container">
-                <StackedBarChart data={credits?.data?.graphStats} labels={credits?.data?.years} />
+                <StackedBarChart
+                  cypress="CreditsProducedByTheStudyprogramme"
+                  data={credits?.data?.graphStats}
+                  labels={credits?.data?.years}
+                />
                 <DataTable
                   cypress="CreditsProducedByTheStudyprogramme"
                   data={credits?.data?.tableStats}
@@ -118,7 +130,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
             <>
               {getDivider('Graduated and thesis writers of the programme', 'GraduatedAndThesisWritersOfTheProgramme')}
               <div className="section-container">
-                <BarChart data={graduations?.data} />
+                <BarChart cypress="GraduatedAndThesisWritersOfTheProgramme" data={graduations?.data} />
                 <DataTable
                   cypress="GraduatedAndThesisWritersOfTheProgramme"
                   data={graduations?.data?.tableStats}
@@ -126,7 +138,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                 />
               </div>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
-              {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
+              {getRadioButton('GraduationTimeToggle', null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
               <div className="section-container-centered">
                 {graduations?.data?.years.map(year => (
                   <GaugeChart
@@ -148,6 +160,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                   {getDivider('Primary master programme studies after this programme', 'ProgrammesAfterGraduation')}
                   <div className="section-container">
                     <StackedBarChart
+                      cypress="ProgrammesAfterGraduation"
                       wideTable
                       data={graduations?.data?.programmesAfterGraphStats}
                       labels={graduations?.data?.years}

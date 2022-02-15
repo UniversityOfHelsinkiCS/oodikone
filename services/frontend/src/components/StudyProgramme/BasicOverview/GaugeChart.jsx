@@ -2,7 +2,7 @@ import React from 'react'
 
 const ReactHighcharts = require('react-highcharts')
 
-const GaugeChart = ({ data, year, graduationAmount, studyprogramme }) => {
+const GaugeChart = ({ cypress, data, year, graduationAmount, studyprogramme }) => {
   if (!data || !graduationAmount || !data.length) return null
 
   const thresholdValues = studyprogramme.includes('KH') ? [36, 41] : [24, 27]
@@ -76,7 +76,7 @@ const GaugeChart = ({ data, year, graduationAmount, studyprogramme }) => {
     ],
   }
 
-  return <ReactHighcharts config={defaultConfig} />
+  return <ReactHighcharts data-cy={`Graph-${cypress}`} config={defaultConfig} />
 }
 
 export default GaugeChart
