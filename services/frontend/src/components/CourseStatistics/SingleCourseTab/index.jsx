@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react'
-import { connect /* useSelector */ } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Segment, Label, Header, Divider, Form } from 'semantic-ui-react'
-import { shape, arrayOf, oneOfType, number, string, bool } from 'prop-types'
+import { oneOfType, number, string, bool } from 'prop-types'
 import SingleCourseStats from '../SingleCourseStats'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import selectors from '../../../selectors/courseStats'
 import { getTextIn } from '../../../common'
 
-const SingleCourseTab = ({ selected, stats, courses, userHasAccessToAllStats }) => {
+const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
   const [selection, setSelection] = useState(selected)
   const { language } = useLanguage()
+  const stats = useSelector(selectors.getCourseStats)
+  const courses = useSelector(selectors.getCourses).map(({ code, name }) => ({
+    key: code,
+    value: code,
+    text: <Header content={<>{name}</>} />,
+    content: name,
+  }))
 
   useEffect(() => {
     setSelection(selected)
   }, [selected])
-  // console.log('selection: ', selection)
-  // console.log('courses: ', courses)
-
-  // let newStats = null
-  // newStats = useSelector(selectors.getCourseStats)
-  // console.log('newStats: ', newStats)
 
   if (!stats[selection]) return null
   return (
@@ -56,20 +57,9 @@ const SingleCourseTab = ({ selected, stats, courses, userHasAccessToAllStats }) 
 }
 
 SingleCourseTab.propTypes = {
-  stats: shape({}).isRequired,
-  courses: arrayOf(shape({})).isRequired,
+  // courses: arrayOf(shape({})).isRequired,
   selected: oneOfType([number, string]).isRequired,
   userHasAccessToAllStats: bool.isRequired,
 }
 
-const mapStateToProps = state => ({
-  stats: selectors.getCourseStats(state),
-  courses: selectors.getCourses(state).map(({ code, name }) => ({
-    key: code,
-    value: code,
-    text: <Header content={<>{name}</>} />,
-    content: name,
-  })),
-})
-
-export default connect(mapStateToProps, {})(SingleCourseTab)
+export default SingleCourseTab

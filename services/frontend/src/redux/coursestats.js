@@ -20,7 +20,7 @@ export const getCourseStats = ({ courseCodes, separate, unifyOpenUniCourses }, o
 const responseToObj = coursestats => {
   const data = {}
   coursestats.forEach(stat => {
-    data[stat.unify.coursecode] = stat
+    data[stat.unifyStats.coursecode] = stat
   })
   return data
 }
