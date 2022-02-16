@@ -33,6 +33,7 @@ const formatStudyright = studyright => {
     studyrightid,
     studystartdate,
     enddate,
+    givendate,
     canceldate,
     graduated,
     prioritycode,
@@ -45,6 +46,7 @@ const formatStudyright = studyright => {
     studyrightid,
     studystartdate,
     enddate,
+    givendate,
     canceldate,
     graduated,
     prioritycode,
@@ -69,10 +71,10 @@ const formatStudent = student => {
 }
 
 const formatTransfer = transfer => {
-  const { sourcecode, transfercode, transferdate, studyrightid } = transfer
+  const { sourcecode, targetcode, transferdate, studyrightid } = transfer
   return {
     sourcecode,
-    transfercode,
+    targetcode,
     transferdate,
     studyrightid,
   }

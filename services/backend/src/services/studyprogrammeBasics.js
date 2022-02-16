@@ -16,27 +16,6 @@ const {
 } = require('./newStudyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
 
-// const getAllStats = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
-//   const { graphStats, tableStats } = getStatsBasis(years)
-
-//   await Promise.all(
-//     years.map(async year => {
-//       const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
-//       const studentnumbersOfTheYear = await getCorrectStudentnumbers({
-//         codes: [studyprogramme],
-//         startDate,
-//         endDate,
-//         includeAllSpecials,
-//       })
-//       const all = await allStudyrights(studyprogramme, null, studentnumbersOfTheYear)
-
-//       graphStats[indexOf(years, year)] = all.length
-//       tableStats[year] += all.length
-//     })
-//   )
-//   return { graphStats, tableStats }
-// }
-
 const getStartedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
 
