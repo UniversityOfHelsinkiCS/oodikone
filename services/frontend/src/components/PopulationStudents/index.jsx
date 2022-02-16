@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Icon, Tab, Grid, Item, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { orderBy, uniqBy, flatten, sortBy, isNumber } from 'lodash'
+import { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { getTextIn } from '../../common'
@@ -145,30 +145,37 @@ const PopulationStudents = ({
       : []
     nameColumns.push(
       {
-        key: 'studentnumber',
-        title: verticalTitle('student number'),
-        cellProps: { title: 'student number' },
-        getRowVal: s => (s.total ? '*' : s.studentNumber),
-        getRowContent: s => (s.total ? 'Summary:' : s.studentNumber),
-        child: true,
-      },
-      {
-        key: 'icon',
-        title: '',
-        getRowVal: s =>
-          !s.total && (
-            <Item
-              as={Link}
-              to={`/students/${s.studentNumber}`}
-              onClick={() => {
-                sendAnalytics('Student details button clicked', 'Mandatory courses table')
-              }}
-            >
-              <Icon name="level up alternate" />
-            </Item>
-          ),
-        cellProps: { collapsing: true, className: 'iconCell' },
-        child: true,
+        key: 'studentnumber-parent',
+        mergeHeader: true,
+        merge: true,
+        title: 'Student Number',
+        children: [
+          {
+            key: 'studentnumber',
+            cellProps: { title: 'student number' },
+            getRowVal: s => (s.total ? '*' : s.studentNumber),
+            getRowContent: s => (s.total ? 'Summary:' : s.studentNumber),
+            child: true,
+          },
+          {
+            key: 'icon',
+            title: '',
+            getRowVal: s =>
+              !s.total && (
+                <Item
+                  as={Link}
+                  to={`/students/${s.studentNumber}`}
+                  onClick={() => {
+                    sendAnalytics('Student details button clicked', 'Mandatory courses table')
+                  }}
+                >
+                  <Icon name="level up alternate" />
+                </Item>
+              ),
+            cellProps: { collapsing: true, className: 'iconCell' },
+            child: true,
+          },
+        ],
       },
       {
         key: 'totalpassed',
@@ -224,6 +231,8 @@ const PopulationStudents = ({
       { visibleLabels: new Set(), visibleCourseCodes: new Set() }
     )
 
+    const getTotalRowVal = (t, m) => t[m.code]
+
     const labelColumns = []
     labelColumns.push(
       {
@@ -231,6 +240,7 @@ const PopulationStudents = ({
         title: <b>Labels:</b>,
         parent: true,
         headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } },
+        children: nameColumns,
       },
       ...sortedlabels
         .filter(({ code }) => visibleLabels.has(code))
@@ -247,17 +257,7 @@ const PopulationStudents = ({
             title: e.label,
             ordernumber: e.orderNumber,
           },
-        }))
-    )
-
-    const getTotalRowVal = (t, m) => t[m.code]
-
-    const mandatoryCourseColumns = [
-      ...nameColumns,
-      ...labelColumns,
-      ...flatten(
-        sortedlabels.map(e =>
-          sortBy(labelToMandatoryCourses[e.label], [
+          children: sortBy(labelToMandatoryCourses[e.label], [
             m => {
               const res = m.code.match(/\d+/)
               return res ? Number(res[0]) : Number.MAX_VALUE
@@ -270,7 +270,8 @@ const PopulationStudents = ({
               title: verticalTitle(mandatoryTitle(m)),
               cellProps: { title: `${m.code}, ${getTextIn(m.name, language)}` },
               headerProps: { title: `${m.code}, ${getTextIn(m.name, language)}` },
-              getRowVal: s => (s.total ? getTotalRowVal(s, m) : hasPassedMandatory(s.studentNumber, m.code)),
+              getRowVal: s =>
+                s.total ? getTotalRowVal(s, m) : JSON.stringify(hasPassedMandatory(s.studentNumber, m.code)),
               getRowContent: s => {
                 if (s.total) return getTotalRowVal(s, m)
                 return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
@@ -278,10 +279,11 @@ const PopulationStudents = ({
               child: true,
               childOf: e.label,
               code: m.code,
-            }))
-        )
-      ),
-    ]
+            })),
+        }))
+    )
+
+    const mandatoryCourseColumns = [...labelColumns]
 
     const totals = filteredStudents.reduce(
       (acc, s) => {
@@ -317,9 +319,10 @@ const PopulationStudents = ({
         render: () => (
           <Tab.Pane>
             <div style={{ display: 'flex' }}>
-              <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
+              <div style={{ maxHeight: '80vh', width: '100%' }}>
                 {mandatoryCourses.length > 0 && (
                   <SortableTable
+                    title={`Courses of population's students`}
                     getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
                     tableProps={{
                       celled: true,
