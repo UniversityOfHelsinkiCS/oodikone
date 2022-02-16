@@ -182,7 +182,18 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
     },
   ]
 
-  return <Accordion activeIndex={activeIndex} exclusive={false} styled fluid panels={createPanels(filteredStudents)} />
+  return (
+    <div style={{ overflow: 'hidden', flexGrow: 1, padding: '1px' }}>
+      <Accordion
+        activeIndex={activeIndex}
+        exclusive={false}
+        styled
+        fluid
+        panels={createPanels(filteredStudents)}
+        style={{ overflow: 'hidden' }}
+      />
+    </div>
+  )
 }
 
 const SingleStudyGroupFilterView = props => {

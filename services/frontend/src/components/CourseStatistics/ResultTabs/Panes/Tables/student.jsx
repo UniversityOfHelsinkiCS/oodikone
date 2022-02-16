@@ -28,6 +28,7 @@ const getColumns = (showDetails, userHasAccessToAllStats, alternatives, separate
       key: 'TIME',
       title: 'Time',
       getRowVal: s => s.code,
+      getRowExportVal: s => s.name,
       getRowContent: s => (
         <div style={{ whiteSpace: 'nowrap' }}>
           {s.name}
@@ -110,9 +111,10 @@ const StudentTable = ({
         </Header>
       )}
       <SortableTable
+        title={`Student statistics for group ${name}`}
         defaultdescending
         getRowKey={s => s.code}
-        tableProps={{ celled: true, fixed: true, style: { width: 'auto' } }}
+        tableProps={{ celled: true, fixed: true }}
         columns={columns}
         data={stats}
       />

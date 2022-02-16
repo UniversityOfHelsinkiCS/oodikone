@@ -212,32 +212,39 @@ const GeneralTab = ({
   const columnsAvailable = {
     lastname: { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
     firstname: { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames },
-    studentnumber: {
-      key: 'studentnumber',
+    'studentnumber-parent': {
+      key: 'studentnumber-parent',
       title: 'Student Number',
-      getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
-      getRowContent: s => (
-        <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
-          {!s.obfuscated ? s.studentNumber : 'hidden'}
-        </span>
-      ),
-      headerProps: { colSpan: 2 },
-    },
-    icon: {
-      key: 'icon',
-      getRowVal: s =>
-        !s.obfuscated && (
-          <Item
-            as={Link}
-            to={`/students/${s.studentNumber}`}
-            onClick={() => {
-              sendAnalytics('Student details button clicked', 'General tab')
-            }}
-          >
-            <Icon name="level up alternate" />
-          </Item>
-        ),
-      cellProps: { collapsing: true, className: 'iconCellNoPointer' },
+      mergeHeader: true,
+      merge: true,
+      children: [
+        {
+          key: 'studentnumber',
+          getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
+          getRowContent: s => (
+            <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
+              {!s.obfuscated ? s.studentNumber : 'hidden'}
+            </span>
+          ),
+          headerProps: { colSpan: 2 },
+        },
+        {
+          key: 'icon',
+          getRowVal: s =>
+            !s.obfuscated && (
+              <Item
+                as={Link}
+                to={`/students/${s.studentNumber}`}
+                onClick={() => {
+                  sendAnalytics('Student details button clicked', 'General tab')
+                }}
+              >
+                <Icon name="level up alternate" />
+              </Item>
+            ),
+          cellProps: { collapsing: true, className: 'iconCellNoPointer' },
+        },
+      ],
     },
     creditsSinceStart: {
       key: 'creditsSinceStart',
@@ -304,13 +311,13 @@ const GeneralTab = ({
       key: 'studyStartDate',
       title: 'start of studyright',
       getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
-      getRowContent: s => reformatDate(studentToStudyrightStartMap[s.studentNumber], 'YYYY-MM-DD'),
+      formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
     },
     studyStartDateActual: {
       key: 'studyStartDateActual',
       title: 'started in studyright',
+      formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
       getRowVal: s => new Date(getActualStartDate(s.studentNumber)).getTime(),
-      getRowContent: s => reformatDate(getActualStartDate(s.studentNumber), 'YYYY-MM-DD'),
     },
     endDate: {
       key: 'endDate',
@@ -398,7 +405,8 @@ const GeneralTab = ({
     updatedAt: {
       key: 'updatedAt',
       title: 'Last Updated At',
-      getRowVal: s => reformatDate(s.updatedAt, 'YYYY-MM-DD  HH:mm:ss'),
+      getRowVal: s => s.updatedAt,
+      formatValue: value => reformatDate(value, 'YYYY-MM-DD  HH:mm:ss'),
     },
   }
   // Columns are shown in order they're declared above. JS guarantees this order of keys
@@ -418,20 +426,20 @@ const GeneralTab = ({
     .value()
 
   return (
-    <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-      <SortableTable
-        getRowKey={s => s.studentNumber}
-        tableProps={{
-          collapsing: true,
-          basic: true,
-          compact: 'very',
-          padded: false,
-          celled: true,
-        }}
-        columns={columns}
-        data={selectedStudents.map(sn => students[sn])}
-      />
-    </div>
+    <SortableTable
+      style={{ height: '80vh' }}
+      title="General student information"
+      getRowKey={s => s.studentNumber}
+      tableProps={{
+        collapsing: true,
+        basic: true,
+        compact: 'very',
+        padded: false,
+        celled: true,
+      }}
+      columns={columns}
+      data={selectedStudents.map(sn => students[sn])}
+    />
   )
 }
 
@@ -477,7 +485,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }
 
-  const baseColumns = ['studentnumber', 'icon', 'allCredits', 'tags', 'updatedAt', 'option']
+  const baseColumns = ['studentnumber-parent', 'allCredits', 'tags', 'updatedAt', 'option']
   const nameColumnsToAdd = namesVisible ? ['email', 'copyEmail', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'studyStartDate', 'updatedAt']
 
