@@ -156,24 +156,22 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                   />
                 ))}
               </div>
-              {studyprogramme.includes('KH') && (
-                <>
-                  {getDivider('Primary master programme studies after this programme', 'ProgrammesAfterGraduation')}
-                  <div className="section-container">
-                    <StackedBarChart
-                      cypress="ProgrammesAfterGraduation"
-                      wideTable
-                      data={graduations?.data?.programmesAfterGraphStats}
-                      labels={graduations?.data?.years}
-                    />
-                    <DataTable
-                      wideTable
-                      data={graduations?.data?.programmesAfterTableStats}
-                      titles={graduations?.data?.programmesAfterTitles}
-                    />
-                  </div>
-                </>
-              )}
+              <>
+                {getDivider('Primary master programme studies after this programme', 'ProgrammesAfterGraduation')}
+                <div className="section-container">
+                  <StackedBarChart
+                    cypress="ProgrammesAfterGraduation"
+                    wideTable
+                    data={graduations?.data?.programmesAfterGraphStats}
+                    labels={graduations?.data?.years}
+                  />
+                  <DataTable
+                    wideTable
+                    data={graduations?.data?.programmesAfterTableStats}
+                    titles={graduations?.data?.programmesAfterTitles}
+                  />
+                </div>
+              </>
             </>
           )}
         </>
