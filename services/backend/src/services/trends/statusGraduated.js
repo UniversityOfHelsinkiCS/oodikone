@@ -93,7 +93,9 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
       // init faculty
       if (!acc[curr.faculty_code]) {
         const org = orgs.find(o => o.code === curr.faculty_code)
-        acc[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
+        if (org) {
+          acc[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
+        }
       }
       if (!acc[curr.faculty_code]['yearly'][data.year])
         acc[curr.faculty_code]['yearly'][data.year] = { acc: 0, total: 0 }
