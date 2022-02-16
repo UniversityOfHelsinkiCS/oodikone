@@ -31,7 +31,10 @@ export const toggleOpenAndReqularCourses = showType => {
   }
 }
 
-const reducer = (state = { data: {}, pending: false, unifyOpenUniCourses: false, openOrReqular: 'unify' }, action) => {
+const reducer = (
+  state = { data: {}, pending: false, unifyOpenUniCourses: true, openOrReqular: 'unifyStats' },
+  action
+) => {
   switch (action.type) {
     case 'GET_COURSE_SEARCH_RESULT_ATTEMPT':
       return {

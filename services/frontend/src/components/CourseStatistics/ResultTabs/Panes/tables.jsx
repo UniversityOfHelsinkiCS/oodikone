@@ -65,8 +65,8 @@ export const TablesSettings = ({ value, onChange }) => {
                 <Radio
                   label="reqular"
                   name="radioGroup"
-                  value="reqular"
-                  checked={openOrReqular === 'reqular'}
+                  value="reqularStats"
+                  checked={openOrReqular === 'reqularStats'}
                   onChange={toggleUnifyRadioValue}
                 />
               </Form.Field>
@@ -74,8 +74,8 @@ export const TablesSettings = ({ value, onChange }) => {
                 <Radio
                   label="open"
                   name="radioGroup"
-                  value="open"
-                  checked={openOrReqular === 'open'}
+                  value="openStats"
+                  checked={openOrReqular === 'openStats'}
                   onChange={toggleUnifyRadioValue}
                 />
               </Form.Field>
@@ -83,8 +83,8 @@ export const TablesSettings = ({ value, onChange }) => {
                 <Radio
                   label="unify"
                   name="radioGroup"
-                  value="unify"
-                  checked={openOrReqular === 'unify'}
+                  value="unifyStats"
+                  checked={openOrReqular === 'unifyStats'}
                   onChange={toggleUnifyRadioValue}
                 />
               </Form.Field>

@@ -59,14 +59,19 @@ const findOneByCode = code => {
   })
 }
 
-const creditsForCourses = async (codes, anonymizationSalt, unifyOpenUniCourses) => {
+const creditsForCourses = async (codes, anonymizationSalt, unification) => {
   let is_open = false
 
-  if (unifyOpenUniCourses) {
+  if (unification === 'open') is_open = true
+
+  if (unification === 'unify') {
     is_open = {
       [Op.in]: [false, true],
     }
   }
+  // console.log('is open: ', is_open)
+  // console.log('unification: ', unification)
+  // console.log('codes: ', codes)
 
   const credits = await Credit.findAll({
     include: [
@@ -162,23 +167,23 @@ const allCodeAlternatives = async code => {
   return sortMainCode([...course.substitutions, code])
 }
 
-const yearlyStatsOfNew = async (coursecode, separate, unifyOpenUniCourses, anonymizationSalt) => {
+const yearlyStatsOfNew = async (coursecode, separate, unification, anonymizationSalt) => {
   const courseForSubs = await Course.findOne({
     where: { code: coursecode },
   })
 
   let codes = courseForSubs.substitutions ? sortMainCode([...courseForSubs.substitutions, coursecode]) : [coursecode]
-
-  if (isOpenUniCourseCode(coursecode) && !unifyOpenUniCourses) {
+  // console.log('codes in yearlyStats: ', codes)
+  if (unification === 'reqular') {
     codes = [coursecode]
   }
 
-  if (!isOpenUniCourseCode(coursecode) && !unifyOpenUniCourses) {
-    codes = codes.filter(code => !code.match(/^[A][0-9]|^AY/))
+  /* if (unification === 'open') {
+    codes = codes.filter(course => isOpenUniCourseCode(course))
   }
-
+ */
   const [credits, course] = await Promise.all([
-    creditsForCourses(codes, anonymizationSalt, unifyOpenUniCourses),
+    creditsForCourses(codes, anonymizationSalt, unification),
     Course.findOne({
       where: {
         code: coursecode,
@@ -292,8 +297,7 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
 }
 
 const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses, anonymizationSalt) => {
-  let yesUnify = true
-  const noUnify = false
+  const [unify, reqular, open] = ['unify', 'reqular', 'open']
 
   /* const stats = await Promise.all(
     coursecodes.map(code => yearlyStatsOfNew(code, separate, yesUnify, anonymizationSalt))
@@ -302,10 +306,11 @@ const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses, ano
   const statsReqular = await Promise.all(
     coursecodes.map(async code => {
       // console.log('ollaanko täälllä????')
-      const unify = await yearlyStatsOfNew(code, separate, yesUnify, anonymizationSalt)
-      const reqular = await yearlyStatsOfNew(code, separate, noUnify, anonymizationSalt)
+      const unifyStats = await yearlyStatsOfNew(code, separate, unify, anonymizationSalt)
+      const reqularStats = await yearlyStatsOfNew(code, separate, reqular, anonymizationSalt)
+      const openStats = await yearlyStatsOfNew(code, separate, open, anonymizationSalt)
 
-      return { unify, reqular }
+      return { unifyStats, reqularStats, openStats }
     })
   )
   // console.log('stats: ', statsReqular)
