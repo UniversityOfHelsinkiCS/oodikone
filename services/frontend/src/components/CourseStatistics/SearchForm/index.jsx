@@ -1,11 +1,11 @@
-import React, { useState, useEffect, Fragment } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Segment, Header, Form } from 'semantic-ui-react'
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
 import { sortBy } from 'lodash'
-import { func, arrayOf, shape, bool } from 'prop-types'
-import { clearCourses, findCoursesV2, toggleUnifyOpenUniCourses } from '../../../redux/coursesearch'
+import { func, shape, bool } from 'prop-types'
+import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
 import { useSearchHistory, usePrevious } from '../../../common/hooks'
@@ -15,7 +15,6 @@ import AutoSubmitSearchInput from '../../AutoSubmitSearchInput'
 import CourseTable from '../CourseTable'
 import SearchHistory from '../../SearchHistory'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import filterCourseSearchResults from './searchFormUtils'
 
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent('Course statistics search', action, name, value)
 
@@ -55,13 +54,18 @@ const useTSASearchResultsHook = (coursesLoading, courseName, courseCode, matchin
 
 const SearchForm = props => {
   const { language } = useLanguage()
+  const dispatch = useDispatch()
+  const isLoading = useSelector(state => state.courseStats.pending)
+  const coursesLoading = useSelector(state => state.courseSearch.pending)
+  const matchingCourses = useSelector(getCourseSearchResults)
   const [state, setState] = useState({
     ...INITIAL,
   })
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
 
   const { courseName, courseCode, selectedCourses, separate } = state
-  const { coursesLoading, isLoading, matchingCourses /* unifyOpenUniCourses */ } = props
+
+  // const { coursesLoading, isLoading, matchingCourses /* unifyOpenUniCourses */ } = props
 
   const parseQueryFromUrl = () => {
     const { location } = props
@@ -71,7 +75,7 @@ const SearchForm = props => {
       ...rest,
       courseCodes: JSON.parse(courseCodes),
       separate: JSON.parse(separate),
-      unifyOpenUniCourses: JSON.parse(unifyOpenUniCourses || false),
+      // unifyOpenUniCourses: JSON.parse(unifyOpenUniCourses || false),
     }
     return query
   }
@@ -79,14 +83,14 @@ const SearchForm = props => {
   const fetchStatisticsFromUrlParams = () => {
     const query = parseQueryFromUrl()
     setState({ ...state, ...query })
-    props.getCourseStats(query, props.onProgress)
+    dispatch(getCourseStats(query, props.onProgress))
   }
 
   useEffect(() => {
     const { location } = props
     if (!location.search) {
-      props.clearCourses()
-      props.clearCourseStats()
+      dispatch(clearCourses())
+      dispatch(clearCourseStats())
     }
   }, [])
 
@@ -143,7 +147,6 @@ const SearchForm = props => {
     const params = {
       courseCodes: codes,
       separate,
-      unifyOpenUniCourses: props.unifyOpenUniCourses,
     }
     const searchHistoryText = codes.map(code => `${getTextIn(selectedCourses[code].name, language)} ${code}`)
     addItemToSearchHistory({
@@ -158,10 +161,10 @@ const SearchForm = props => {
     const isValidCode = validateInputLength(courseCode, 2)
 
     if (isValidName || isValidCode) {
-      return props.findCoursesV2({ name: courseName, code: courseCode })
+      return dispatch(findCoursesV2({ name: courseName, code: courseCode }))
     }
     if (courseName.length < 5 && courseCode.length < 2) {
-      props.clearCourses()
+      dispatch(clearCourses())
     }
     return Promise.resolve()
   }
@@ -171,14 +174,6 @@ const SearchForm = props => {
     setState({ ...state, separate: newValue })
     sendAnalytics('Toggle Separate stats for spring & fall', `${newValue}`)
   }
-
-  /* const onToggleUnifyOpenUniCoursesCheckbox = () => {
-    const newValue = !unifyOpenUniCourses
-    sendAnalytics('Toggle Unify open university courses', `${newValue}`)
-
-    setState({ ...state, selectedCourses: {} })
-    props.toggleUnifyOpenUniCourses()
-  } */
 
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
@@ -304,38 +299,10 @@ SearchForm.defaultProps = {
 }
 
 SearchForm.propTypes = {
-  findCoursesV2: func.isRequired,
-  getCourseStats: func.isRequired,
-  clearCourses: func.isRequired,
-  clearCourseStats: func.isRequired,
-  matchingCourses: arrayOf(shape({})).isRequired,
-  isLoading: bool.isRequired,
   coursesLoading: bool.isRequired,
   history: shape({}).isRequired,
   location: shape({}).isRequired,
-  unifyOpenUniCourses: bool.isRequired,
-  // toggleUnifyOpenUniCourses: func.isRequired,
   onProgress: func,
 }
 
-const mapStateToProps = state => {
-  const { courses } = getCourseSearchResults(state)
-  const { pending: courseStatsPending } = state.courseStats
-  const { unifyOpenUniCourses } = state.courseSearch
-  return {
-    matchingCourses: filterCourseSearchResults(courses, unifyOpenUniCourses),
-    isLoading: courseStatsPending,
-    coursesLoading: state.courseSearch.pending,
-    unifyOpenUniCourses,
-  }
-}
-
-export default withRouter(
-  connect(mapStateToProps, {
-    getCourseStats,
-    clearCourses,
-    findCoursesV2,
-    clearCourseStats,
-    toggleUnifyOpenUniCourses,
-  })(SearchForm)
-)
+export default withRouter(SearchForm)
