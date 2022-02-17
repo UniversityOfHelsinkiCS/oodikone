@@ -69,9 +69,6 @@ const creditsForCourses = async (codes, anonymizationSalt, unification) => {
       [Op.in]: [false, true],
     }
   }
-  // console.log('is open: ', is_open)
-  // console.log('unification: ', unification)
-  // console.log('codes: ', codes)
 
   const credits = await Credit.findAll({
     include: [
@@ -173,15 +170,11 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
   })
 
   let codes = courseForSubs.substitutions ? sortMainCode([...courseForSubs.substitutions, coursecode]) : [coursecode]
-  // console.log('codes in yearlyStats: ', codes)
+
   if (unification === 'reqular') {
-    codes = [coursecode]
+    codes = codes.filter(course => !isOpenUniCourseCode(course))
   }
 
-  /* if (unification === 'open') {
-    codes = codes.filter(course => isOpenUniCourseCode(course))
-  }
- */
   const [credits, course] = await Promise.all([
     creditsForCourses(codes, anonymizationSalt, unification),
     Course.findOne({
@@ -299,13 +292,8 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
 const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses, anonymizationSalt) => {
   const [unify, reqular, open] = ['unify', 'reqular', 'open']
 
-  /* const stats = await Promise.all(
-    coursecodes.map(code => yearlyStatsOfNew(code, separate, yesUnify, anonymizationSalt))
-  ) */
-
   const statsReqular = await Promise.all(
     coursecodes.map(async code => {
-      // console.log('ollaanko täälllä????')
       const unifyStats = await yearlyStatsOfNew(code, separate, unify, anonymizationSalt)
       const reqularStats = await yearlyStatsOfNew(code, separate, reqular, anonymizationSalt)
       const openStats = await yearlyStatsOfNew(code, separate, open, anonymizationSalt)
@@ -313,7 +301,6 @@ const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses, ano
       return { unifyStats, reqularStats, openStats }
     })
   )
-  // console.log('stats: ', statsReqular)
 
   return statsReqular
 }

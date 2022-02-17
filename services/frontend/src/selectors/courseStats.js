@@ -1,12 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { sortBy, flatten } from 'lodash'
 
-const courseStatsSelector = state => {
-  // console.log('state courseStats: ', state.courseStats)
-  return state.courseStats.data
-}
-
+const courseStatsSelector = state => state.courseStats.data
 const openOrReqularSelector = state => state.courseSearch.openOrReqular
+const singleCourseStatsSelector = state => state.singleCourseStats
 
 const getCourseStats = createSelector([courseStatsSelector, openOrReqularSelector], (courseStats, openOrReqular) => {
   const stats = {}
@@ -22,6 +19,13 @@ const getCourseStats = createSelector([courseStatsSelector, openOrReqularSelecto
   })
   return stats
 })
+
+const getCourseAlternatives = createSelector(
+  [courseStatsSelector, openOrReqularSelector, singleCourseStatsSelector],
+  (courseStats, openOrReqular, singleCourseStats) => {
+    return courseStats[singleCourseStats.selectedCourse][openOrReqular].alternatives
+  }
+)
 
 const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
 
@@ -192,6 +196,7 @@ const getCourses = createSelector(getCourseStats, stats =>
 export default {
   getCourseStats,
   getCourses,
+  getCourseAlternatives,
   getAllStudyProgrammes,
   summaryStatistics,
   ALL,

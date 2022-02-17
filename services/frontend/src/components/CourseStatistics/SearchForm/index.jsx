@@ -61,7 +61,7 @@ const SearchForm = props => {
   const [searchHistory, addItemToSearchHistory, updateItemInSearchHistory] = useSearchHistory('courseSearch', 6)
 
   const { courseName, courseCode, selectedCourses, separate } = state
-  const { coursesLoading, isLoading, matchingCourses, unifyOpenUniCourses } = props
+  const { coursesLoading, isLoading, matchingCourses /* unifyOpenUniCourses */ } = props
 
   const parseQueryFromUrl = () => {
     const { location } = props
@@ -172,13 +172,13 @@ const SearchForm = props => {
     sendAnalytics('Toggle Separate stats for spring & fall', `${newValue}`)
   }
 
-  const onToggleUnifyOpenUniCoursesCheckbox = () => {
+  /* const onToggleUnifyOpenUniCoursesCheckbox = () => {
     const newValue = !unifyOpenUniCourses
     sendAnalytics('Toggle Unify open university courses', `${newValue}`)
 
     setState({ ...state, selectedCourses: {} })
     props.toggleUnifyOpenUniCourses()
-  }
+  } */
 
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
@@ -234,16 +234,6 @@ const SearchForm = props => {
                   minSearchLength={0}
                   data-cy="course-code-input"
                 />
-              </Form.Field>
-              <Form.Field width={4} style={{ display: 'flex', flexDirection: 'column' }}>
-                <label>Unify open university courses:</label>
-                <span style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                  <Form.Checkbox
-                    name="unifyOpenUniCourses"
-                    onChange={onToggleUnifyOpenUniCoursesCheckbox}
-                    checked={unifyOpenUniCourses}
-                  />
-                </span>
               </Form.Field>
             </Form.Group>
             <div style={!noSelectedCourses ? searchBoxStyle : null}>
@@ -324,7 +314,7 @@ SearchForm.propTypes = {
   history: shape({}).isRequired,
   location: shape({}).isRequired,
   unifyOpenUniCourses: bool.isRequired,
-  toggleUnifyOpenUniCourses: func.isRequired,
+  // toggleUnifyOpenUniCourses: func.isRequired,
   onProgress: func,
 }
 
