@@ -6,17 +6,15 @@ import HelpButton from '../HelpButton'
 import StudentTable from './Tables/student'
 import AttemptsTable from './Tables/attempts'
 import { toggleOpenAndReqularCourses } from '../../../../redux/coursesearch'
+import selectors from '../../../../selectors/courseStats'
 
 export const TablesSettings = ({ value, onChange }) => {
   const { viewMode, showDetails, showGrades } = value
   const dispatch = useDispatch()
-  // const [unifyRadioValue, setUnifyRadioValue] = useState('unify')
 
   const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
   //  console.log('openOr Reqular: ', openOrReqular)
-
   const toggleUnifyRadioValue = (event, { value }) => {
-    //  console.log('value: ', value)
     dispatch(toggleOpenAndReqularCourses(value))
   }
 
@@ -63,20 +61,22 @@ export const TablesSettings = ({ value, onChange }) => {
               </Form.Field>
               <Form.Field>
                 <Radio
-                  label="reqular"
+                  label="university"
                   name="radioGroup"
                   value="reqularStats"
                   checked={openOrReqular === 'reqularStats'}
                   onChange={toggleUnifyRadioValue}
+                  data-cy="unify_radio_reqular"
                 />
               </Form.Field>
               <Form.Field>
                 <Radio
-                  label="open"
+                  label="open university"
                   name="radioGroup"
                   value="openStats"
                   checked={openOrReqular === 'openStats'}
                   onChange={toggleUnifyRadioValue}
+                  data-cy="unify_radio_open"
                 />
               </Form.Field>
               <Form.Field>
@@ -86,6 +86,7 @@ export const TablesSettings = ({ value, onChange }) => {
                   value="unifyStats"
                   checked={openOrReqular === 'unifyStats'}
                   onChange={toggleUnifyRadioValue}
+                  data-cy="unify_radio_unify"
                 />
               </Form.Field>
             </Form.Group>
@@ -100,7 +101,7 @@ export const TablesSettings = ({ value, onChange }) => {
 }
 
 export const Tables = props => {
-  const alternatives = useSelector(state => state.courseStats.data[state.singleCourseStats.selectedCourse].alternatives)
+  const alternatives = useSelector(selectors.getCourseAlternatives)
   const viewModes = { ATTEMPTS: AttemptsTable, STUDENT: StudentTable }
   const Content = viewModes[props.settings.viewMode]
 

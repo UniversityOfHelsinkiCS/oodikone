@@ -1,11 +1,7 @@
-// import { actions } from './common/itemreducer'
 import { callController } from '../apiConnection/index'
 
 const prefix = 'GET_COURSE_SEARCH_RESULT_'
 
-// const storeActions = actions(prefix)
-
-// export const clearCourses = storeActions.clear
 export const clearCourses = () => ({ type: 'CLEAR_SEARCH_RESULTS' })
 
 export const findCourses = ({ name, type }, language = 'fi') => {
@@ -64,11 +60,13 @@ const reducer = (
         ...state,
         openOrReqular: action.showType,
       }
+
     case 'CLEAR_SEARCH_RESULTS':
       return {
         ...state,
         data: {},
       }
+
     default:
       return state
   }
