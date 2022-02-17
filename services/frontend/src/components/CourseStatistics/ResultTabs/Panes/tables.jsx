@@ -13,7 +13,6 @@ export const TablesSettings = ({ value, onChange }) => {
   const dispatch = useDispatch()
 
   const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
-  //  console.log('openOr Reqular: ', openOrReqular)
   const toggleUnifyRadioValue = (event, { value }) => {
     dispatch(toggleOpenAndReqularCourses(value))
   }
@@ -22,6 +21,7 @@ export const TablesSettings = ({ value, onChange }) => {
     <Menu secondary style={{ marginBottom: 0 }}>
       {Object.entries(viewModeNames).map(([key, name]) => (
         <Menu.Item
+          key={key}
           active={viewMode === key}
           data-cy={`viewMode-${name}`}
           name={name}

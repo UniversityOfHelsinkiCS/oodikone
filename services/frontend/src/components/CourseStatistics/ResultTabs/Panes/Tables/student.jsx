@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Header, Icon, Item } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { uniq } from 'lodash'
-import { shape, string, number, oneOfType, arrayOf, bool } from 'prop-types'
+import { string, object, arrayOf, bool } from 'prop-types'
 import SortableTable from '../../../../SortableTable'
 import { defineCellColor } from '../util'
 
@@ -125,12 +125,10 @@ const StudentTable = ({
 }
 
 StudentTable.propTypes = {
-  stats: arrayOf(shape({})).isRequired,
-  name: oneOfType([number, string]).isRequired,
+  data: object.isRequired,
   alternatives: arrayOf(string).isRequired,
   separate: bool,
   userHasAccessToAllStats: bool.isRequired,
-  headerVisible: bool.isRequired,
 }
 
 StudentTable.defaultProps = {

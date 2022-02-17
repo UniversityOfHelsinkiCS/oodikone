@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import qs from 'query-string'
 import { sortBy } from 'lodash'
-import { func, shape, bool } from 'prop-types'
+import { func, shape } from 'prop-types'
 import { clearCourses, findCoursesV2 } from '../../../redux/coursesearch'
 import { getCourseStats, clearCourseStats } from '../../../redux/coursestats'
 import { getCourseSearchResults } from '../../../selectors/courses'
@@ -299,7 +299,6 @@ SearchForm.defaultProps = {
 }
 
 SearchForm.propTypes = {
-  coursesLoading: bool.isRequired,
   history: shape({}).isRequired,
   location: shape({}).isRequired,
   onProgress: func,
