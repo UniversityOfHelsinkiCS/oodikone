@@ -19,7 +19,7 @@ import CoursePopulationCreditGainTable from './CoursePopulationCreditGainTable'
 import CustomPopulationProgrammeDist from '../CustomPopulation/CustomPopulationProgrammeDist'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
 import ProgressBar from '../ProgressBar'
-import { getStudentToTargetCourseDateMap, getTextIn } from '../../common'
+import { getStudentToTargetCourseDateMap, getTextIn, getUnifyTextIn } from '../../common'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import {
@@ -47,9 +47,9 @@ const CoursePopulation = ({
   getSemestersDispatch,
   semesters,
   getFacultiesDispatch,
+  unifyOpen,
 }) => {
   const { language } = useLanguage()
-
   const [codes, setCodes] = useState([])
   const [headerYears, setYears] = useState('')
   const [dateFrom, setDateFrom] = useState(null)
@@ -124,7 +124,8 @@ const CoursePopulation = ({
     }
   }, [semesters])
 
-  const header = courseData ? `${getTextIn(courseData.name, language)} ${headerYears}` : null
+  const avoin = getUnifyTextIn(unifyOpen)
+  const header = courseData ? `${avoin} ${getTextIn(courseData.name, language)} ${headerYears}` : null
 
   const subHeader = codes.join(', ')
 
@@ -364,11 +365,12 @@ const CustomPopulationCoursesWrapper = props => {
   return <CustomPopulationCourses {...props} courses={courseStatistics} />
 }
 
-const mapStateToProps = ({ singleCourseStats, populations, semesters }) => {
+const mapStateToProps = ({ singleCourseStats, populations, semesters, courseSearch }) => {
   return {
     studentData: populations.data,
     pending: populations.pending,
-    courseData: singleCourseStats.stats || {},
+    courseData: singleCourseStats.stats?.[courseSearch.openOrReqular],
+    unifyOpen: courseSearch.openOrReqular,
     semesters: semesters.data,
     elementDetails: populations?.data?.elementdetails?.data,
   }

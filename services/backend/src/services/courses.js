@@ -171,9 +171,9 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
 
   let codes = courseForSubs.substitutions ? sortMainCode([...courseForSubs.substitutions, coursecode]) : [coursecode]
 
-  if (unification === 'reqular') {
+  /*  if (unification === 'reqular') {
     codes = codes.filter(course => !isOpenUniCourseCode(course))
-  }
+  } */
 
   const [credits, course] = await Promise.all([
     creditsForCourses(codes, anonymizationSalt, unification),
@@ -232,6 +232,7 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
     counter.markCreditToStudentCategories(studentnumber, passed, attainment_date, groupcode)
   }
   const statistics = counter.getFinalStatistics(anonymizationSalt)
+
   return {
     ...statistics,
     coursecode,
