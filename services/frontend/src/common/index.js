@@ -101,6 +101,22 @@ export const getTextIn = (texts, language) => {
   return null
 }
 
+export const getUnifyTextIn = unify => {
+  switch (unify) {
+    case 'reqularStats':
+      return ''
+
+    case 'openStats':
+      return 'Open University: '
+
+    case 'unifyStats':
+      return 'Unified with open uni: '
+
+    default:
+      return ''
+  }
+}
+
 export const cancelablePromise = promise => {
   let hasCanceled = false
 
