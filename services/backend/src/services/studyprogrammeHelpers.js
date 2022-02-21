@@ -28,6 +28,13 @@ const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllS
   return studentnumbers
 }
 
+const defineStartDate = (studyright_elements, studystartdate) => {
+  if (studyright_elements?.length && studyright_elements[0].startdate > studystartdate) {
+    return studyright_elements[0].startdate
+  }
+  return studystartdate
+}
+
 const formatStudyright = studyright => {
   const {
     studyrightid,
@@ -44,7 +51,7 @@ const formatStudyright = studyright => {
 
   return {
     studyrightid,
-    studystartdate,
+    studystartdate: defineStartDate(studyright_elements, studystartdate),
     enddate,
     givendate,
     canceldate,
