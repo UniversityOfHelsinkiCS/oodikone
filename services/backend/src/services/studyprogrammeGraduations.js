@@ -16,8 +16,6 @@ const {
 } = require('./studyprogrammeHelpers')
 const {
   graduatedStudyRights,
-  transfersAway,
-  transfersTo,
   getThesisCredits,
   followingStudyrights,
   previousStudyrights,
@@ -172,33 +170,44 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAca
 const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const graduated = await graduatedStudyRights(studyprogramme, since)
   const graduatedStudents = graduated.map(s => s.studentnumber)
-  let studyrightsAfterThisProgramme = await followingStudyrights(since, graduatedStudents)
-  const studyprogrammeCodes = uniqBy(studyrightsAfterThisProgramme, 'code').map(s => ({ code: s.code, name: s.name }))
 
+  // Get studyrights for masters studyprogramme. This excludes studytracks.
+  const programmes = await getAllProgrammes()
+  let studyrightsAfterThisProgramme = await followingStudyrights(since, programmes, graduatedStudents)
+  const studyprogrammeCodes = uniqBy(studyrightsAfterThisProgramme, 'code').map(s => ({ code: s.code, name: s.name }))
   const stats = {}
   studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject(years) }))
 
-  if (!includeAllSpecials) {
-    const transferredAway = await transfersAway(studyprogramme, since)
-    const transferredTo = await transfersTo(studyprogramme, since)
-    const transfers = [...transferredAway, ...transferredTo].map(s => s.studyrightid)
-    studyrightsAfterThisProgramme.filter(s => !transfers.includes(s.studyrightid) && !s.canceldate)
-  }
+  // Map transfers to the Bachelor's programme
+  const transfers = await allTransfers(studyprogramme, since)
+  const studyrightTransferMap = new Map()
+  transfers.forEach(t => studyrightTransferMap.set(t.studyrightid, t))
 
-  studyrightsAfterThisProgramme.forEach(({ studystartdate, code }) => {
+  studyrightsAfterThisProgramme.forEach(({ studentnumber, studystartdate, code, givendate }) => {
+    const bachelorStudyright = graduated.find(s => s.studentnumber === studentnumber)
+
+    // If special studyrights are excluded, transfers to the bachelor programme should be excluded
+    if (!includeAllSpecials && studyrightTransferMap.get(bachelorStudyright.studyrightid)) {
+      return
+    }
+
+    // If all studyrights are included, and transfer exists, define the start year in the programme, based on when the student transferred to it
+    // Otherwise, the year is defined based on when the student started in the chosen master's programme
     const startYear = defineYear(studystartdate, isAcademicYear)
-    if (years.includes(startYear) && code) {
+
+    // The master studyright should have been given on the same date as the bachelor's
+    if (years.includes(startYear) && code && bachelorStudyright.givendate.getTime() === givendate.getTime()) {
       stats[code][startYear] += 1
     }
   })
 
   const tableStats = Object.values(stats)
+    .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
     .map(p => [p.code, p.name['fi'], ...years.map(year => p[year])])
-    .filter(p => p[0].includes('MH'))
 
   const graphStats = Object.values(stats)
+    .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
     .map(p => ({ name: p.name['fi'], code: p.code, data: years.map(year => p[year]) }))
-    .filter(p => p.code.includes('MH'))
 
   return { tableStats, graphStats }
 }
