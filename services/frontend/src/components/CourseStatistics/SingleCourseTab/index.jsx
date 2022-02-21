@@ -57,7 +57,6 @@ const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
 }
 
 SingleCourseTab.propTypes = {
-  // courses: arrayOf(shape({})).isRequired,
   selected: oneOfType([number, string]).isRequired,
   userHasAccessToAllStats: bool.isRequired,
 }
