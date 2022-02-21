@@ -203,13 +203,18 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const followingStudyrights = async (since, studentnumbers) =>
+const followingStudyrights = async (since, programmes, studentnumbers) =>
   (
     await Studyright.findAll({
       include: [
         {
           model: StudyrightElement,
           required: true,
+          where: {
+            code: {
+              [Op.in]: programmes.map(p => p.code),
+            },
+          },
           include: [
             {
               model: ElementDetail,
