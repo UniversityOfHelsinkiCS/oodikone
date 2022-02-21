@@ -213,14 +213,14 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
   const thesis = await getThesisStats(queryParameters)
   const graduated = await getGraduatedStats(queryParameters)
   const graduationTimeStats = await getGraduationTimeStats(queryParameters)
-  const programmesAfterGraduation = studyprogramme.includes('KH')
+  const programmesBeforeOrAfter = studyprogramme.includes('KH')
     ? await getProgrammesAfterGraduation(queryParameters)
     : await getProgrammesBeforeStarting(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
 
   const titles = ['', 'Graduated', 'Wrote thesis']
-  const programmesAfterTitles = ['Code', 'Programme', ...years]
+  const programmesBeforeOrAfterTitles = ['Code', 'Programme', ...years]
   const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
 
   return {
@@ -242,9 +242,9 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, speci
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
     totalAmounts: graduationTimeStats.totalAmounts,
-    programmesAfterTableStats: programmesAfterGraduation.tableStats,
-    programmesAfterGraphStats: programmesAfterGraduation.graphStats,
-    programmesAfterTitles,
+    programmesBeforeOrAfterTableStats: programmesBeforeOrAfter.tableStats,
+    programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter.graphStats,
+    programmesBeforeOrAfterTitles,
   }
 }
 

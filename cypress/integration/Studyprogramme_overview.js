@@ -33,7 +33,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Section-StudentsOfTheStudyprogramme]')
       cy.get('[data-cy=Section-CreditsProducedByTheStudyprogramme]')
       cy.get('[data-cy=Section-GraduatedAndThesisWritersOfTheProgramme]')
-      cy.get('[data-cy=Section-ProgrammesAfterGraduation]')
+      cy.get('[data-cy=Section-ProgrammesBeforeOrAfter]')
       cy.get('[data-cy=Section-AverageGraduationTimes]')
     })
 
@@ -186,7 +186,7 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'n = 17')
         .should('contain', '22 kk')
 
-      cy.get('[data-cy=Graph-ProgrammesAfterGraduation')
+      cy.get('[data-cy=Graph-ProgrammesBeforeOrAfter')
         .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')
         .should('contain', 'Datatieteen maisteriohjelma')
         .should('contain', 'Matematiikan ja tilastotieteen maisteriohjelma')

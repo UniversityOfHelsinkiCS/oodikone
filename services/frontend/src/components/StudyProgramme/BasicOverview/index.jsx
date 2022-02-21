@@ -157,18 +157,23 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                 ))}
               </div>
               <>
-                {getDivider('Primary master programme studies after this programme', 'ProgrammesAfterGraduation')}
+                {getDivider(
+                  studyprogramme.includes('KH')
+                    ? 'Primary master programme studies after this programme'
+                    : 'Primary bachelor programme studies before this programme',
+                  'ProgrammesBeforeOrAfter'
+                )}
                 <div className="section-container">
                   <StackedBarChart
-                    cypress="ProgrammesAfterGraduation"
+                    cypress="ProgrammesBeforeOrAfter"
                     wideTable
-                    data={graduations?.data?.programmesAfterGraphStats}
+                    data={graduations?.data?.programmesBeforeOrAfterGraphStats}
                     labels={graduations?.data?.years}
                   />
                   <DataTable
                     wideTable
-                    data={graduations?.data?.programmesAfterTableStats}
-                    titles={graduations?.data?.programmesAfterTitles}
+                    data={graduations?.data?.programmesBeforeOrAfterTableStats}
+                    titles={graduations?.data?.programmesBeforeOrAfterTitles}
                   />
                 </div>
               </>
