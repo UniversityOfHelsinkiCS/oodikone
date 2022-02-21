@@ -108,43 +108,36 @@ describe('Course Statistics tests', () => {
       cy.contains('TKT10004, 581328, AYTKT10004, A581328 Tietokantojen perusteet')
       cy.get('.right').click()
       cy.contains('No results')
+    })
 
-      // cy.get("input[placeholder='Search by entering a course name']").type('tietokantojen perusteet')
-      // cy.contains('td', /^AYTKT10004/).click()
+    it('Provider organization toggle works', () => {
+      cy.url().should('include', '/coursestatistics')
+      cy.contains('Search for courses')
+      cy.get("input[placeholder='Search by entering a course name']").type('tietokantojen perusteet')
 
-      // cy.contains('Fetch statistics').should('be.enabled').click()
-      // cy.contains('Search for courses').should('not.exist')
-      // cy.contains('AYTKT10004 Avoin yo: Tietokantojen perusteet')
+      cy.contains('td', /^TKT10004/).click()
+      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.contains('Search for courses').should('not.exist')
+
+      cy.contains('TKT10004, 581328, AYTKT10004, A581328 Tietokantojen perusteet')
+      cy.get('[data-cy=unify_radio_reqular]').click()
+      cy.contains('TKT10004, 581328 Tietokantojen perusteet')
     })
 
     it('Searching course by name displays right courses, 10 credit courses', () => {
       cy.url().should('include', '/coursestatistics')
       cy.contains('Search for courses')
       cy.get("input[placeholder='Search by entering a course name']").type('tietorakenteet ja algoritmit')
-
       cy.contains('Tietorakenteet ja algoritmit')
-      // cy.contains('Avoin yo: Tietorakenteet ja algoritmit')
       cy.contains('AYTKT20001')
       cy.contains('TKT20001, 58131')
       cy.contains('td', /^TKT20001/).click()
-
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('Search for courses').should('not.exist')
 
       cy.contains('TKT20001, 58131, AYTKT20001 Tietorakenteet ja algoritmit')
       cy.get('.right').click()
       cy.contains('No results')
-
-      // cy.get("input[placeholder='Search by entering a course name']").type('tietorakenteet ja algoritmit')
-      // cy.contains('td', /^AYTKT20001/).click()
-
-      // cy.contains('Fetch statistics').should('be.enabled').click()
-      // cy.contains('Search for courses').should('not.exist')
-      // cy.contains('AYTKT20001 Avoin yo: Tietorakenteet ja algoritmit')
-
-      // cy.get('.right').click()
-      // cy.contains('No results')
-      // cy.get("input[name='unifyOpenUniCourses']").parent().click()
       cy.get("input[placeholder='Search by entering a course name']").type('tietorakenteet ja algoritmit')
       cy.contains('td', 'TKT20001, 58131, AYTKT20001').click()
 
@@ -200,7 +193,6 @@ describe('Course Statistics tests', () => {
       beforeEach(() => {
         cy.url().should('include', '/coursestatistics')
         cy.contains('Search for courses')
-        // cy.get("input[name='unifyOpenUniCourses']").parent().click()
         cy.get("input[placeholder='Search by a course code']").type('TKT10002')
         cy.contains('td', 'TKT10002, AYTKT10002').click()
         cy.contains('Fetch statistics').should('be.enabled').click()
@@ -213,6 +205,16 @@ describe('Course Statistics tests', () => {
       const attemptsTableContents = [
         // [time, passed, failed, passrate]
         ['Total', 511, 486, 25],
+      ]
+
+      const attemptsTableContentsOpen = [
+        // [time, passed, failed, passrate]
+        ['Total', 175, 175, 0],
+      ]
+
+      const attemptsTableContentsReqular = [
+        // [time, passed, failed, passrate]
+        ['Total', 312, 298, 14],
       ]
 
       const gradesTableContents = [
@@ -269,6 +271,42 @@ describe('Course Statistics tests', () => {
           })
           cy.get('tr').should('have.length', 17)
         })
+      })
+
+      it.only('Toggling course provider changes stats correctly', () => {
+        cy.get('[data-cy=unify_radio_reqular]').click()
+        cy.get("div[name='toYear']").within(() => {
+          cy.get("div[role='option']").first().should('have.text', '2020-2021')
+          cy.contains("div[role='option']", yearRange.to).should('have.class', 'selected')
+          cy.get("div[role='option']").last().should('have.text', yearRange.from)
+          cy.get("div[role='option']").should('have.length', 21)
+        })
+        cy.contains('#CourseStatPanes a.item', 'Table').click()
+        cy.contains('#CourseStatPanes a.item', 'Attempts').click()
+        cy.get('#CourseStatPanes table>tbody').within(() => {
+          attemptsTableContentsReqular.forEach((values, trIndex) => {
+            cy.get('tr')
+              .eq(trIndex)
+              .within(() => {
+                values.forEach((value, tdIndex) => {
+                  cy.get('td').eq(tdIndex).contains(value)
+                })
+              })
+          })
+        })
+        cy.get('[data-cy=unify_radio_open]').click()
+        cy.get('#CourseStatPanes table>tbody').within(() => {
+          attemptsTableContentsOpen.forEach((values, trIndex) => {
+            cy.get('tr')
+              .eq(trIndex)
+              .within(() => {
+                values.forEach((value, tdIndex) => {
+                  cy.get('td').eq(tdIndex).contains(value)
+                })
+              })
+          })
+        })
+        cy.get('[data-cy=unify_radio_unify]').click()
       })
 
       it('after changing time range shows same stats', () => {

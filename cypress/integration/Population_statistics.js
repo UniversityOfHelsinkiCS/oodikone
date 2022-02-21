@@ -85,7 +85,7 @@ describe('Population Statistics tests', () => {
       cy.get('[data-cy=coursestats-link-TKT10002]').click()
       cy.wait('@coursePage')
       cy.url().should('include', '/coursestatistics')
-      cy.contains('TKT10002, 581325 Ohjelmoinnin perusteet')
+      cy.contains('TKT10002, 581325, AYTKT10002, A581325 Ohjelmoinnin perusteet')
     })
 
     it("Empty 'tags' tab has a link to the page where tags can be created", () => {
