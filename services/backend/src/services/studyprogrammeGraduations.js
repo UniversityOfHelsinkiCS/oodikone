@@ -163,6 +163,11 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAca
     const masterStudyright = all.find(s => s.studentnumber === studentnumber)
     const transfer = transfers.get(masterStudyright.studyrightid)
 
+    // If special studyrights are excluded, transfers to the master's programme should be excluded
+    if (!includeAllSpecials && transfers.get(masterStudyright.studyrightid)) {
+      return
+    }
+
     // If all studyrights are included, and transfer exists, define the start year in the programme, based on when the student transferred to it
     // Otherwise, the year is defined based on when the student started in the chosen master's programme
     const programmeStartDate = includeAllSpecials && transfer ? transfer.transferdate : masterStudyright?.studystartdate
