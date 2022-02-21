@@ -171,14 +171,14 @@ describe('Course Statistics tests', () => {
       cy.contains('010431753')
     })
 
-    it.only('Population of course shows grades for each student', () => {
+    it('Population of course shows grades for each student', () => {
       cy.get("input[placeholder='Search by a course code']").type('TKT20001')
-      cy.contains(/^TKT20001$/).click()
+      cy.contains(/^TKT20001, AYTKT20001$/).click()
       cy.contains('Fetch statistics').should('be.enabled').click()
-      cy.contains('TKT20001, 58131 Tietorakenteet ja algoritmit')
+      cy.contains('TKT20001, 58131, AYTKT20001 Tietorakenteet ja algoritmit')
       cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
-      cy.contains('Population of course Tietorakenteet ja algoritmit 2018-2019')
-      cy.contains('Students (197)').click()
+      cy.contains('Population of course Unified with open uni: Tietorakenteet ja algoritmit 2018-2019')
+      cy.contains('Students (204)').click()
       cy.contains('td', '010262566').siblings().contains('4')
       cy.contains('td', '010674989').siblings().contains('1')
     })
@@ -188,10 +188,11 @@ describe('Course Statistics tests', () => {
       cy.contains(/^TKT20003$/).click()
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('TKT20003, 582219 Käyttöjärjestelmät')
+      cy.get('[data-cy=unify_radio_reqular]').click()
       cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
       cy.contains('Language distribution').click()
-      cy.contains('td', 'finnish').siblings().contains('107')
+      cy.contains('td', 'finnish').siblings().contains('122')
       cy.contains('td', 'english').siblings().contains('5')
     })
 
@@ -199,7 +200,7 @@ describe('Course Statistics tests', () => {
       beforeEach(() => {
         cy.url().should('include', '/coursestatistics')
         cy.contains('Search for courses')
-        cy.get("input[name='unifyOpenUniCourses']").parent().click()
+        // cy.get("input[name='unifyOpenUniCourses']").parent().click()
         cy.get("input[placeholder='Search by a course code']").type('TKT10002')
         cy.contains('td', 'TKT10002, AYTKT10002').click()
         cy.contains('Fetch statistics').should('be.enabled').click()
