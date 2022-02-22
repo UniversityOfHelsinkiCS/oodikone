@@ -273,7 +273,7 @@ describe('Course Statistics tests', () => {
         })
       })
 
-      it.only('Toggling course provider changes stats correctly', () => {
+      it('Toggling course provider changes stats correctly', () => {
         cy.get('[data-cy=unify_radio_reqular]').click()
         cy.get("div[name='toYear']").within(() => {
           cy.get("div[role='option']").first().should('have.text', '2020-2021')
