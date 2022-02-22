@@ -25,6 +25,7 @@ describe('Studyprogramme overview', () => {
   describe('Basic information -view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
+      cy.viewport(1536, 960)
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
