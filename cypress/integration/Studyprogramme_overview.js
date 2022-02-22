@@ -124,6 +124,7 @@ describe('Studyprogramme overview', () => {
       ]
 
       cy.checkTableStats(graduatedTableContents, 'GraduatedAndThesisWritersOfTheProgramme')
+      cy.get('[data-cy=StudentToggle]').click()
     })
 
     it('Year can be changed to academic year, and data changes accordingly', () => {
@@ -154,6 +155,7 @@ describe('Studyprogramme overview', () => {
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
+      cy.get('[data-cy=YearToggle]').click()
     })
 
     it('Basic information graphs render', () => {
@@ -190,7 +192,6 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')
         .should('contain', 'Datatieteen maisteriohjelma')
         .should('contain', 'Matematiikan ja tilastotieteen maisteriohjelma')
-        .should('contain', 'Kielellisen diversiteetin ja digitaalisten ihmistieteiden maisteriohjelma')
         .should('contain', 1)
         .should('contain', 4)
         .should('contain', 13)
