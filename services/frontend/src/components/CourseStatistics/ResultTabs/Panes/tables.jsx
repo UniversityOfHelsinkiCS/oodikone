@@ -18,85 +18,86 @@ export const TablesSettings = ({ value, onChange }) => {
   }
 
   return (
-    <Menu secondary style={{ marginBottom: 0 }}>
-      {Object.entries(viewModeNames).map(([key, name]) => (
-        <Menu.Item
-          key={key}
-          active={viewMode === key}
-          data-cy={`viewMode-${name}`}
-          name={name}
-          onClick={() =>
-            onChange({
-              ...value,
-              viewMode: key,
-            })
-          }
-        />
-      ))}
-      <Menu.Item>
-        <Radio
-          toggle
-          label="Show details"
-          disabled={viewMode !== 'STUDENT'}
-          checked={showDetails}
-          onChange={() => onChange({ ...value, showDetails: !showDetails })}
-        />
-      </Menu.Item>
-      <Menu.Item>
-        <Radio
-          toggle
-          label="Show grades"
-          data-cy="gradeToggle"
-          disabled={viewMode !== 'ATTEMPTS'}
-          checked={showGrades}
-          onChange={() => onChange({ ...value, showGrades: !showGrades })}
-        />
-      </Menu.Item>
-      <Menu.Item>
+    <div>
+      <Menu secondary>
+        {Object.entries(viewModeNames).map(([key, name]) => (
+          <Menu.Item
+            key={key}
+            active={viewMode === key}
+            data-cy={`viewMode-${name}`}
+            name={name}
+            onClick={() =>
+              onChange({
+                ...value,
+                viewMode: key,
+              })
+            }
+          />
+        ))}
+        <Menu.Item>
+          <Radio
+            toggle
+            label="Show details"
+            disabled={viewMode !== 'STUDENT'}
+            checked={showDetails}
+            onChange={() => onChange({ ...value, showDetails: !showDetails })}
+          />
+        </Menu.Item>
+        <Menu.Item>
+          <Radio
+            toggle
+            label="Show grades"
+            data-cy="gradeToggle"
+            disabled={viewMode !== 'ATTEMPTS'}
+            checked={showGrades}
+            onChange={() => onChange({ ...value, showGrades: !showGrades })}
+          />
+        </Menu.Item>
+
+        <Menu.Item>
+          <HelpButton tab="Tables" viewMode={viewMode} />
+        </Menu.Item>
+      </Menu>
+      <Menu secondary style={{ marginLeft: '0.5rem' }}>
         <Form>
-          <div style={{ marginTop: '1em' }}>
-            <Form.Group inline>
-              <Form.Field>
-                <b>course provider type</b>
-              </Form.Field>
-              <Form.Field>
-                <Radio
-                  label="university"
-                  name="radioGroup"
-                  value="reqularStats"
-                  checked={openOrReqular === 'reqularStats'}
-                  onChange={toggleUnifyRadioValue}
-                  data-cy="unify_radio_reqular"
-                />
-              </Form.Field>
-              <Form.Field>
-                <Radio
-                  label="open university"
-                  name="radioGroup"
-                  value="openStats"
-                  checked={openOrReqular === 'openStats'}
-                  onChange={toggleUnifyRadioValue}
-                  data-cy="unify_radio_open"
-                />
-              </Form.Field>
-              <Form.Field>
-                <Radio
-                  label="unify"
-                  name="radioGroup"
-                  value="unifyStats"
-                  checked={openOrReqular === 'unifyStats'}
-                  onChange={toggleUnifyRadioValue}
-                  data-cy="unify_radio_unify"
-                />
-              </Form.Field>
-            </Form.Group>
-          </div>
+          <Form.Group>
+            <Form.Field>
+              <b>Provider organization:</b>
+            </Form.Field>
+            <Form.Field>
+              <Radio
+                label="university"
+                name="radioGroup"
+                value="reqularStats"
+                checked={openOrReqular === 'reqularStats'}
+                onChange={toggleUnifyRadioValue}
+                data-cy="unify_radio_reqular"
+              />
+            </Form.Field>
+            <Form.Field>
+              <Radio
+                label="open university"
+                name="radioGroup"
+                value="openStats"
+                checked={openOrReqular === 'openStats'}
+                onChange={toggleUnifyRadioValue}
+                data-cy="unify_radio_open"
+              />
+            </Form.Field>
+            <Form.Field>
+              <Radio
+                label="unify"
+                name="radioGroup"
+                value="unifyStats"
+                checked={openOrReqular === 'unifyStats'}
+                onChange={toggleUnifyRadioValue}
+                data-cy="unify_radio_unify"
+              />
+            </Form.Field>
+          </Form.Group>
         </Form>
-      </Menu.Item>
-      <Menu.Item>
-        <HelpButton tab="Tables" viewMode={viewMode} />
-      </Menu.Item>
-    </Menu>
+      </Menu>
+    </div>
   )
 }
 
