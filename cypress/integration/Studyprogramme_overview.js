@@ -45,10 +45,10 @@ describe('Studyprogramme overview', () => {
         // [Year, Started, Graduated, Cancelled, Transferred Away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
         [2021, 0, 0, 0, 1, 0],
-        [2020, 10, 36, 16, 3, 2],
-        [2019, 86, 17, 14, 0, 1],
-        [2018, 162, 1, 3, 0, 0],
-        [2017, 173, 0, 0, 0, 0],
+        [2020, 12, 36, 16, 3, 2],
+        [2019, 87, 17, 14, 0, 1],
+        [2018, 161, 1, 3, 0, 0],
+        [2017, 171, 0, 0, 0, 0],
       ]
 
       cy.checkTableStats(tableContents, 'StudentsOfTheStudyprogramme')
@@ -86,7 +86,7 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(tableContents, 'GraduatedAndThesisWritersOfTheProgramme')
     })
 
-    it('Special studyrights can be excluded and basic data changes accordingly', () => {
+    it.skip('Special studyrights can be excluded and basic data changes accordingly', () => {
       cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
       cy.get('[data-cy=StudentToggle]').click()
       const years = getEmptyYears()
