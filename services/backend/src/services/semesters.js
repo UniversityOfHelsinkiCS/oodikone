@@ -1,3 +1,4 @@
+const moment = require('moment')
 const sequelize = require('sequelize')
 const { Semester } = require('../models')
 const Op = sequelize.Op
@@ -28,8 +29,8 @@ const getSemestersAndYears = async () => {
         acc.years[yearcode] = {
           yearcode,
           yearname,
-          startdate: Math.min(acc.years[yearcode].startdate, startdate),
-          enddate: Math.max(acc.years[yearcode].enddate, enddate),
+          startdate: moment.min(moment(acc.years[yearcode].startdate), moment(startdate)),
+          enddate: moment.max(moment(acc.years[yearcode].enddate), moment(enddate)),
         }
       }
       return acc
