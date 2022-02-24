@@ -1,27 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { Divider, Loader, Radio } from 'semantic-ui-react'
+import { Divider, Loader } from 'semantic-ui-react'
 
 import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
-import WithHelpTooltip from '../../Info/InfoWithHelpTooltip'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
 import BasicDataTable from './BasicDataTable'
 import GaugeChart from './GaugeChart'
 import StudytrackDataTable from './StudytrackDataTable'
 import StudytrackSelector from './StudytrackSelector'
+import Toggle from '../Toggle'
 
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
-
-const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
-  <div className="radio-toggle">
-    <label className="toggle-label">{firstLabel}</label>
-    <Radio toggle checked={value} onChange={() => setValue(!value)} />
-    <WithHelpTooltip tooltip={{ short: toolTip }}>
-      <label className="toggle-label">{secondLabel}</label>
-    </WithHelpTooltip>
-  </div>
-)
 
 const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, graduated, setGraduated }) => {
   const toolTips = InfotoolTips.Studyprogramme
@@ -60,14 +50,22 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
         <>
           <StudytrackSelector track={track} setTrack={setTrack} studytracks={stats?.data?.studytrackOptions} />
           <div className="toggle-container">
-            {getRadioButton(
-              toolTips.StudentToggle,
-              'All studyrights included',
-              'Special studyrights excluded',
-              specialGroups,
-              setSpecialGroups
-            )}
-            {getRadioButton(toolTips.GradToggle, 'Graduated included', 'Graduated excluded', graduated, setGraduated)}
+            <Toggle
+              cypress="StudentToggle"
+              toolTips={toolTips.StudentToggle}
+              firstLabel="All studyrights"
+              secondLabel="Special studyrights excluded"
+              value={specialGroups}
+              setValue={setSpecialGroups}
+            />
+            <Toggle
+              cypress="GraduatedToggle"
+              toolTips={toolTips.GraduatedToggle}
+              firstLabel="Graduated included"
+              secondLabel="Graduated excluded"
+              value={graduated}
+              setValue={setGraduated}
+            />
           </div>
           {getDivider(
             `Students of ${
@@ -106,7 +104,12 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
           {stats?.isSuccess && stats?.data?.includeGraduated && (
             <>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
-              {getRadioButton(null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
+              <Toggle
+                firstLabel="Mean time"
+                secondLabel="Median time"
+                value={showMeanTime}
+                setValue={setShowMeanTime}
+              />
               <div className="section-container-centered">
                 {stats?.data?.years.map(year => (
                   <GaugeChart

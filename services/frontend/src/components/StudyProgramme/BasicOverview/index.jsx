@@ -1,31 +1,17 @@
 import React, { useState } from 'react'
-import { Divider, Loader, Message, Radio } from 'semantic-ui-react'
+import { Divider, Loader, Message } from 'semantic-ui-react'
 
 import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQuery } from 'redux/studyProgramme'
-import WithHelpTooltip from '../../Info/InfoWithHelpTooltip'
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
 import GaugeChart from './GaugeChart'
 import DataTable from './DataTable'
+import Toggle from '../Toggle'
 import InfoBox from '../../Info/InfoBox'
 
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
-
-const getRadioButton = (cypress, toolTip, firstLabel, secondLabel, value, setValue) => (
-  <div className="radio-toggle">
-    <label className="toggle-label">{firstLabel}</label>
-    <Radio data-cy={cypress} toggle checked={value} onChange={() => setValue(!value)} />
-    {toolTip ? (
-      <WithHelpTooltip tooltip={{ short: toolTip }}>
-        <label className="toggle-label">{secondLabel}</label>
-      </WithHelpTooltip>
-    ) : (
-      <label className="toggle-label">{secondLabel}</label>
-    )}
-  </div>
-)
 
 const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
   const [showMeanTime, setShowMeanTime] = useState(true)
@@ -69,22 +55,22 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
   return (
     <div className="studyprogramme-overview">
       <div className="toggle-container">
-        {getRadioButton(
-          'YearToggle',
-          toolTips.YearToggle,
-          'Calendar year ',
-          'Academic year',
-          academicYear,
-          setAcademicYear
-        )}
-        {getRadioButton(
-          'StudentToggle',
-          toolTips.StudentToggle,
-          'All studyrights included',
-          'Special studyrights excluded',
-          specialGroups,
-          setSpecialGroups
-        )}
+        <Toggle
+          cypress="YearToggle"
+          toolTips={toolTips.YearToggle}
+          firstLabel="Calendar year"
+          secondLabel="Academic year"
+          value={academicYear}
+          setValue={setAcademicYear}
+        />
+        <Toggle
+          cypress="StudentToggle"
+          toolTips={toolTips.StudentToggle}
+          firstLabel="All studyrights"
+          secondLabel="Special studyrights excluded"
+          value={specialGroups}
+          setValue={setSpecialGroups}
+        />
       </div>
 
       {isFetchingOrLoading ? (
@@ -138,7 +124,13 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                 />
               </div>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
-              {getRadioButton('GraduationTimeToggle', null, 'Mean time', 'Median time', showMeanTime, setShowMeanTime)}
+              <Toggle
+                cypress="GraduationTimeToggle"
+                firstLabel="Mean time"
+                secondLabel="Median time"
+                value={showMeanTime}
+                setValue={setShowMeanTime}
+              />
               <div className="section-container-centered">
                 {graduations?.data?.years.map(year => (
                   <GaugeChart
