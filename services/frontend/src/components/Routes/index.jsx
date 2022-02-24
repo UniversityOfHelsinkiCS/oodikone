@@ -83,7 +83,13 @@ const Routes = () => (
       <ProtectedRoute requiredRoles={['admin']} exact path={routes.users} component={Users} />
       <ProtectedRoute requiredRoles={['teachers']} exact path={routes.teachers} component={Teachers} />
       <ProtectedRoute requireUserHasRights exact path={routes.coursepopulation} component={CoursePopulation} />
-      <ProtectedRoute requireUserHasRights exact path={routes.custompopulation} component={CustomPopulation} />
+      <ProtectedRoute
+        requiredRoles={['admin', 'studyGuidanceGroups']}
+        requireUserHasRights
+        exact
+        path={routes.custompopulation}
+        component={CustomPopulation}
+      />
       <ProtectedRoute requiredRoles={['admin']} requireUserHasRights exact path={routes.updater} component={Updater} />
       <ProtectedRoute
         requiredRoles={['studyGuidanceGroups']}
