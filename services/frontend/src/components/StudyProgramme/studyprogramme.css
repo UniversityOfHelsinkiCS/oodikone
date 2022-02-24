@@ -39,6 +39,22 @@
   font-weight: bold;
 }
 
+.studytrack-overview .toggle-label-checked,
+.studyprogramme-overview .toggle-label-checked {
+  cursor: pointer;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-weight: bold;
+  opacity: 0.5;
+}
+
+.studytrack-overview .ui.toggle.checkbox input:checked ~ label::before,
+.studyprogramme-overview .ui.toggle.checkbox input:checked ~ label::before,
+.studytrack-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
+.studyprogramme-overview .ui.toggle.checkbox input:focus:checked ~ label::before {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
 .studyprogramme-overview .divider {
   margin-top: 4em;
 }
