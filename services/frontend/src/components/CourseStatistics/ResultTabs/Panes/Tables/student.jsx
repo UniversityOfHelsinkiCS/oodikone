@@ -92,9 +92,8 @@ const getColumns = (showDetails, userHasAccessToAllStats, alternatives, separate
 
 const StudentTable = ({
   data: { name, stats },
-  settings: { showDetails },
+  settings: { showDetails, separate },
   alternatives,
-  separate,
   userHasAccessToAllStats,
   headerVisible = false,
 }) => {

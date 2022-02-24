@@ -51,7 +51,7 @@ const PaneContent = ({ component: Component, settings: SettingsComponent, initia
   )
 }
 
-const ResultTabs = ({ primary, comparison, history }) => {
+const ResultTabs = ({ primary, comparison, history, separate }) => {
   const [tab, setTab] = useTabs('cs_tab', 0, history)
   const { userHasAccessToAllStats } = primary
 
@@ -66,14 +66,14 @@ const ResultTabs = ({ primary, comparison, history }) => {
     {
       label: 'Tables',
       icon: 'table',
-      initialSettings: { showDetails: false, viewMode: 'STUDENT' },
+      initialSettings: { showDetails: false, viewMode: 'STUDENT', separate },
       settings: TablesSettings,
       component: Tables,
     },
     {
       label: 'Pass rate chart',
       icon: 'balance',
-      initialSettings: { viewMode: 'STUDENT' },
+      initialSettings: { viewMode: 'STUDENT', separate },
       settings: PassRateSettings,
       component: PassRate,
     },
