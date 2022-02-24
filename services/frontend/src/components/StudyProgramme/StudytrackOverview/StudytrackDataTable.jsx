@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Icon, Radio, Table } from 'semantic-ui-react'
+import { Icon, Table } from 'semantic-ui-react'
 import * as _ from 'lodash'
 
 import PopulationLink from './PopulationLink'
+import Toggle from '../Toggle'
 
 const getKey = year => `${year}-${Math.random()}`
 
@@ -124,14 +125,6 @@ const sortMainDataByYear = data => {
   return sortedData
 }
 
-const getRadioButton = (toolTip, firstLabel, secondLabel, value, setValue) => (
-  <div className="radio-toggle">
-    <label className="toggle-label">{firstLabel}</label>
-    <Radio toggle checked={value} onChange={() => setValue(!value)} />
-    <label className="toggle-label">{secondLabel}</label>
-  </div>
-)
-
 const StudytrackDataTable = ({
   studyprogramme,
   dataOfAllTracks,
@@ -151,7 +144,12 @@ const StudytrackDataTable = ({
 
   return (
     <div className="datatable">
-      {getRadioButton(null, 'Show percentages', 'Hide percentages', hidePercentages, setHidePercentages)}
+      <Toggle
+        firstLabel="Show percentages"
+        secondLabel="Hide percentages"
+        value={hidePercentages}
+        setValue={setHidePercentages}
+      />
       <Table data-cy="Table-StudytrackOverview" celled>
         <Table.Header>
           <Table.Row>
