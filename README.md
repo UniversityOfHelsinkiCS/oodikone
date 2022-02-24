@@ -48,6 +48,10 @@ What different CLI options do:
 
 ## ⌨️ Development
 
+### Architecture
+
+![Oodikone architecture](Oodikone.png)
+
 ### Basics
 
 The development environment is entirely configured in the `docker-compose.yml` file located in this repository. The file defines the services for oodikone's two main components: **oodikone** and **updater**.
