@@ -70,9 +70,8 @@ const getGradeColumns = (notThesisGrades, addHTAndTT) => {
 
 const AttemptsTable = ({
   data: { stats, name },
-  settings: { showGrades },
+  settings: { showGrades, separate },
   alternatives,
-  separate,
   isRelative,
   userHasAccessToAllStats,
   headerVisible = false,
