@@ -19,7 +19,13 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
-  const stats = useGetStudytrackStatsQuery({ id: studyprogramme, specialGroups: special, graduated: grad })
+  const yearsCombined = true
+  const stats = useGetStudytrackStatsQuery({
+    id: studyprogramme,
+    specialGroups: special,
+    graduated: grad,
+    yearsCombined,
+  })
 
   useEffect(() => {
     if (!track && stats?.data?.mainStatsByTrack[studyprogramme]) {
