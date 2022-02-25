@@ -32,7 +32,7 @@ const getPassingSemester = (startYear, date) => {
 const getAcademicYearDates = year => {
   return {
     startDate: `${year}-${semesterStart['FALL']}`,
-    endDate: `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`,
+    endDate: '2022-07-31', //`${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`,
   }
 }
 

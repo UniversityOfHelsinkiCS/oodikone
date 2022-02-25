@@ -81,6 +81,7 @@ const getStudytrackDataForTheYear = async ({
   studyprogramme,
   special,
   includeGraduated,
+  // yearsCombined,
   studytracks,
   studytrackNames,
   year,
@@ -122,7 +123,7 @@ const getStudytrackDataForTheYear = async ({
       const enrolled = await enrolledStudents(track, startDate, studentnumbers)
       const absent = await absentStudents(track, studentnumbers)
       const cancelled = all.filter(s => s.canceldate !== null && s.canceldate !== undefined)
-      const graduated = await graduatedStudyRights(track, null, studentnumbers)
+      const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
       if (all.length === 0) {
@@ -258,12 +259,12 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
 }
 
 // Combines all the data for the Populations and Studytracks -view
-const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, specialGroups }) => {
+const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, specialGroups, yearsCombined }) => {
   const isAcademicYear = true
   const special = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
-  const years = getYearsArray(since.getFullYear())
+  const years = getYearsArray(since.getFullYear(), false, yearsCombined)
 
   const associations = await getAssociations()
   const studytracks = associations.programmes[studyprogramme]
@@ -281,6 +282,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
         studyprogramme,
         special,
         includeGraduated,
+        yearsCombined,
         studytracks,
         studytrackNames,
         year,
