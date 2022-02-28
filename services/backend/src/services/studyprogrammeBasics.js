@@ -13,7 +13,7 @@ const {
   startedStudyrights,
   transfersAway,
   transfersTo,
-} = require('./newStudyprogramme')
+} = require('./studyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
 
 const getStartedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
