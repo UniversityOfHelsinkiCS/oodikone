@@ -9,10 +9,24 @@ const {
   CreditTeacher,
   Transfer,
   CourseProvider,
+  Enrollment,
 } = require('../../db/models')
-const { selectFromByIds, selectFromSnapshotsByIds, bulkCreate, getCourseUnitsByCodes } = require('../../db')
+const {
+  selectFromByIds,
+  selectFromSnapshotsByIds,
+  bulkCreate,
+  getCourseUnitsByCodes,
+  selectFromActiveSnapshotsByIds,
+} = require('../../db')
 const { getEducation, getUniOrgId, getEducationType, loadMapsIfNeeded } = require('../shared')
-const { studentMapper, mapTeacher, creditMapper, semesterEnrollmentMapper, courseProviderMapper } = require('../mapper')
+const {
+  studentMapper,
+  mapTeacher,
+  creditMapper,
+  semesterEnrollmentMapper,
+  courseProviderMapper,
+  enrollmentMapper,
+} = require('../mapper')
 const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
 const { updateStudyRights, updateStudyRightElements, updateElementDetails } = require('./studyRightUpdaters')
@@ -158,13 +172,15 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
 const updateStudents = async personIds => {
   await loadMapsIfNeeded()
 
-  const [students, studyrightSnapshots, attainments, termRegistrations, studyRightPrimalities] = await Promise.all([
-    selectFromByIds('persons', personIds),
-    selectFromByIds('studyrights', personIds, 'person_id'),
-    selectFromByIds('attainments', personIds, 'person_id'),
-    selectFromByIds('term_registrations', personIds, 'student_id'),
-    selectFromByIds('study_right_primalities', personIds, 'student_id'),
-  ])
+  const [students, studyrightSnapshots, attainments, termRegistrations, studyRightPrimalities, enrollments] =
+    await Promise.all([
+      selectFromByIds('persons', personIds),
+      selectFromByIds('studyrights', personIds, 'person_id'),
+      selectFromByIds('attainments', personIds, 'person_id'),
+      selectFromByIds('term_registrations', personIds, 'student_id'),
+      selectFromByIds('study_right_primalities', personIds, 'student_id'),
+      selectFromByIds('enrolments', personIds, 'person_id'),
+    ])
 
   const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
 
@@ -203,8 +219,69 @@ const updateStudents = async personIds => {
     ),
     updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber),
+    updateEnrollments(enrollments, personIdToStudentNumber),
     await bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
   ])
+}
+
+const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
+  const [courseUnitRealisations, courseUnits, studyRights] = await Promise.all([
+    selectFromByIds(
+      'course_unit_realisations',
+      enrollments.map(({ course_unit_realisation_id }) => course_unit_realisation_id).filter(id => !!id)
+    ),
+    selectFromByIds(
+      'course_units',
+      enrollments.map(({ course_unit_id }) => course_unit_id).filter(id => !!id)
+    ),
+    selectFromActiveSnapshotsByIds(
+      'studyrights',
+      enrollments.map(({ study_right_id }) => study_right_id).filter(id => !!id)
+    ),
+  ])
+
+  const realisationIdToActivityPeriod = courseUnitRealisations.reduce((res, cur) => {
+    res[cur.id] = cur.activity_period
+    return res
+  }, {})
+
+  const courseUnitIdToCourseGroupId = courseUnits.reduce((res, curr) => {
+    res[curr.id] = curr.group_id
+    return res
+  }, {})
+
+  const sisDbCoursesForStudentAttainments = await Course.findAll({
+    where: {
+      id: {
+        [Op.in]: Object.values(courseUnitIdToCourseGroupId),
+      },
+    },
+  })
+  const courseGroupIdToCourseCode = sisDbCoursesForStudentAttainments.reduce((res, curr) => {
+    res[curr.id] = curr.code
+    return res
+  }, {})
+
+  const educations = await selectFromByIds(
+    'educations',
+    studyRights.map(({ education_id }) => education_id).filter(id => !!id)
+  )
+
+  const studyRightIdToEducationType = studyRights.reduce((res, curr) => {
+    res[curr.id] = educations.find(e => e.id === curr.education_id).education_type
+    return res
+  }, {})
+
+  const mapEnrollment = enrollmentMapper(
+    personIdToStudentNumber,
+    courseUnitIdToCourseGroupId,
+    realisationIdToActivityPeriod,
+    courseGroupIdToCourseCode,
+    studyRightIdToEducationType
+  )
+
+  const mappedEnrollments = enrollments.filter(({ document_state }) => document_state === 'ACTIVE').map(mapEnrollment)
+  await bulkCreate(Enrollment, mappedEnrollments)
 }
 
 const updateAttainments = async (attainments, personIdToStudentNumber, attainmentsToBeExluced) => {

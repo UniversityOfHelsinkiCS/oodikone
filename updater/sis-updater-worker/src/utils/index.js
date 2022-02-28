@@ -7,6 +7,14 @@ const getLatestSnapshot = entities => {
   )
 }
 
+const getActiveSnapshot = entities => {
+  const now = new Date()
+  return maxBy(
+    entities.filter(e => e.document_state === 'ACTIVE').filter(e => now >= new Date(e.snapshot_date_time)),
+    e => new Date(e.snapshot_date_time)
+  )
+}
+
 const isActive = entity => {
   return entity.document_state === 'ACTIVE'
 }
@@ -44,4 +52,5 @@ module.exports = {
   isActive,
   getMinMaxDate,
   isBaMa,
+  getActiveSnapshot,
 }
