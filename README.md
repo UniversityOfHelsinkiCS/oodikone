@@ -8,7 +8,7 @@ To run Oodikone locally, you will need the following:
 
 1. Applications:
    - [Docker](https://docs.docker.com/install/) (version 20.10+),
-   - [Docker Compose](https://docs.docker.com/compose/install/)(version 0.29+) and
+   - [Docker Compose](https://docs.docker.com/compose/install/)(version 1.29+) and
    - [npm](https://docs.npmjs.com/cli/v7) (version 7+)
 2. Access to Toska Docker Hub,
 3. For real data setup, access to Toskas production servers.
