@@ -22,7 +22,7 @@ const {
   enrolledStudents,
   absentStudents,
   graduatedStudyRights,
-} = require('./newStudyprogramme')
+} = require('./studyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
 
 const getStudentData = (students, thresholdKeys, thresholdAmounts) => {

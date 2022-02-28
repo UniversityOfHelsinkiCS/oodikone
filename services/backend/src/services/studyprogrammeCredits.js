@@ -15,7 +15,7 @@ const {
   getCreditsForStudyProgramme,
   getTransferredCredits,
   allTransfers,
-} = require('./newStudyprogramme')
+} = require('./studyprogramme')
 
 // Fetches all the credits for the studyprogramme and divides them into major-students and non-major students credits
 // Division is done on the basis that whether the student had a primary studyright to the programme on the attainment_date

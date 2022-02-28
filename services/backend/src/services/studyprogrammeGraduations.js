@@ -21,7 +21,7 @@ const {
   previousStudyrights,
   allStudyrights,
   allTransfers,
-} = require('./newStudyprogramme')
+} = require('./studyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
 
