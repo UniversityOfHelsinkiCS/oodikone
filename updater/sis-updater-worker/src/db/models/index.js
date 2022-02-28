@@ -16,6 +16,7 @@ const StudyrightElement = require('./studyrightElement')
 const Transfer = require('./transfer')
 const ProgrammeModule = require('./programmeModule')
 const ProgrammeModuleChild = require('./programmeModuleChild')
+const Enrollment = require('./enrollment')
 
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
@@ -101,6 +102,9 @@ ProgrammeModule.belongsToMany(ProgrammeModule, {
 
 Organization.hasMany(Organization, { foreignKey: 'parent_id', as: 'children' })
 
+Enrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+
 module.exports = {
   Organization,
   Course,
@@ -120,4 +124,5 @@ module.exports = {
   Transfer,
   ProgrammeModule,
   ProgrammeModuleChild,
+  Enrollment,
 }

@@ -2,7 +2,7 @@ const { chunk } = require('lodash')
 const { eachLimit } = require('async')
 const { dbConnections } = require('./connection')
 const { logger } = require('../utils/logger')
-const { getLatestSnapshot, isActive } = require('../utils')
+const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
@@ -39,6 +39,17 @@ const selectFromSnapshotsByIds = async (table, ids, col = 'id') =>
     .filter(s => !!s)
     .filter(isActive)
 
+const selectFromActiveSnapshotsByIds = async (table, ids, col = 'id') =>
+  (
+    await dbConnections.knex
+      .select(dbConnections.knex.raw(`array_agg(to_json(${table}.*)) as data`))
+      .from(table)
+      .whereIn(col, ids)
+      .groupBy('id')
+  )
+    .map(({ data }) => getActiveSnapshot(data))
+    .filter(s => !!s)
+
 const getColumnsToUpdate = (model, keys) => Object.keys(model.rawAttributes).filter(a => !keys.includes(a))
 
 const bulkCreate = async (model, entities, transaction = null, properties = ['id']) => {
@@ -70,4 +81,5 @@ module.exports = {
   selectColumnsFrom,
   selectWithoutNull,
   getCourseUnitsByCodes,
+  selectFromActiveSnapshotsByIds,
 }

@@ -330,6 +330,33 @@ const mapStudyrightExtent = educationType => ({
   name: educationType.name,
 })
 
+const enrollmentMapper =
+  (
+    personIdToStudentNumber,
+    courseUnitIdToCourseGroupId,
+    realisationIdToActivityPeriod,
+    courseGroupIdToCourseCode,
+    studyRightIdToEducationType
+  ) =>
+  enrollment => {
+    const { startDate } = realisationIdToActivityPeriod[enrollment.course_unit_realisation_id] || {}
+    const targetSemester = getSemesterByDate(new Date(startDate || enrollment.enrolment_date_time))
+    const course_id = courseUnitIdToCourseGroupId[enrollment.course_unit_id]
+    return {
+      id: enrollment.id,
+      studentnumber: personIdToStudentNumber[enrollment.person_id],
+      state: enrollment.state,
+      course_code: courseGroupIdToCourseCode[course_id],
+      semestercode: targetSemester.semestercode,
+      semester_composite: targetSemester.composite,
+      enrollment_date_time: enrollment.enrolment_date_time,
+      is_open:
+        studyRightIdToEducationType[enrollment.study_right_id] ===
+        'urn:code:education-type:non-degree-education:open-university-studies',
+      course_id,
+    }
+  }
+
 module.exports = {
   studentMapper,
   mapTeacher,
@@ -340,4 +367,5 @@ module.exports = {
   mapCourseType,
   mapSemester,
   mapStudyrightExtent,
+  enrollmentMapper,
 }
