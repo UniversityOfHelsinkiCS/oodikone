@@ -14,7 +14,7 @@ const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CA
 
 const PaneContent = ({ component: Component, settings: SettingsComponent, initialSettings, datasets, ...rest }) => {
   const [settings, setSettings] = useState(initialSettings)
-  const [splitDirection, setSplitDirection] = useState('column')
+  const [splitDirection, setSplitDirection] = useState('row')
 
   return (
     <Tab.Pane>
