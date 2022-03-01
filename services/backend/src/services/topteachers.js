@@ -107,7 +107,9 @@ const findTopTeachers = async yearcode => {
     .filter(isRegularCourse)
     .map(credit => {
       const { credits, course, credittypecode } = credit
-      const teachers = credit.teachers.map(({ id, name }) => ({ id, name }))
+      const teachers = credit.teachers
+        .filter(({ id }) => !id.includes('hy-hlo-org')) // Remove faculties from the leaderboards
+        .map(({ id, name }) => ({ id, name }))
       const passed = Credit.passed(credit) || Credit.improved(credit)
       const failed = Credit.failed(credit)
       const transferred = credittypecode === 9
