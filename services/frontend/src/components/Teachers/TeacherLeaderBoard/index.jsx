@@ -113,7 +113,12 @@ const TeacherLeaderBoard = ({
               onOpen={handleOpen}
             />
 
-            <TeacherStatisticsTable statistics={statistics} onClickFn={id => history.push(`/teachers/${id}`)} />
+            <TeacherStatisticsTable
+              statistics={statistics}
+              onClickFn={id => history.push(`/teachers/${id}`)}
+              unifyOpenUniCourses={false}
+              renderLink={false}
+            />
           </Segment>
         </div>
       )}
