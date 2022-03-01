@@ -285,6 +285,13 @@ const ColumnContent = ({ column, data, isGroup, parents }) => {
 const Row = ({ data, isGroup, parents }) => {
   const { columns, columnSpans } = useContext(SortableTableContext)
 
+  const resolveProp = value => {
+    if (typeof value === 'function') {
+      return value(data, isGroup, parents)
+    }
+    return value
+  }
+
   const cells = []
 
   const stack = _.clone(columns)
@@ -292,7 +299,7 @@ const Row = ({ data, isGroup, parents }) => {
   while (stack.length > 0) {
     const [column] = stack.splice(0, 1)
 
-    let cellProps = {}
+    let cellProps = resolveProp(column.cellProps) ?? {}
 
     if (column.parent?.merge && column.childIndex > 0) {
       cellProps = _.merge(cellProps, {
@@ -306,14 +313,16 @@ const Row = ({ data, isGroup, parents }) => {
       })
     }
 
-    if (getCellContent(column, data, isGroup, parents)) {
+    const content = getCellContent(column, data, isGroup, parents)
+
+    if (content !== undefined && content !== null) {
       cells.push(
         <td colSpan={columnSpans[column.key]} {...cellProps}>
           <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
         </td>
       )
     } else if (column.children && column.children.length > 0) {
-      stack.splice(0, 0, ...column.children)
+      stack.splice(0, 0, ...column.children.map((c, i) => ({ ...c, childIndex: i })))
     } else {
       cells.push(<td {...cellProps} />)
     }
@@ -520,19 +529,22 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
 
     const valuesKey = column.mergeHeader ? column.children[0].key : column.key
 
-    rows[currentDepth].push(
-      <th colSpan={columnSpans[column.key]} rowSpan={rowspan} style={style}>
-        <ColumnHeader
-          column={column}
-          state={columnOptions[valuesKey] ?? getDefaultColumnOptions()}
-          dispatch={dispatch}
-          values={values[valuesKey]}
-        />
-      </th>
-    )
+    if (!column.noHeader) {
+      rows[currentDepth].push(
+        <th colSpan={columnSpans[column.key]} rowSpan={rowspan} style={style}>
+          <ColumnHeader
+            column={column}
+            state={columnOptions[valuesKey] ?? getDefaultColumnOptions()}
+            dispatch={dispatch}
+            values={values[valuesKey]}
+          />
+        </th>
+      )
+    }
 
     if (column.children && !column.mergeHeader) {
-      const children = column.children.map(c => ({ ...c, depth: currentDepth + 1 }))
+      const childDepth = column.noHeader ? currentDepth : currentDepth + 1
+      const children = column.children.map(c => ({ ...c, depth: childDepth }))
       stack = [...children, ...stack]
     }
   }
@@ -621,26 +633,16 @@ const getColumnValues = (data, columns) => {
     .value()
 }
 
-const injectParentPointers = (columns, parent) => {
-  const byKey = {}
-
-  const newColumns = columns.map((col, i) => {
-    let c = { ...col, parent, childIndex: parent ? i : undefined }
-
+const injectParentPointers = columns => {
+  columns.forEach(col => {
     if (col.children) {
-      const [children, byKeyChildren] = injectParentPointers(col.children, col)
+      col.children.forEach(child => {
+        child.parent = col
+      })
 
-      Object.assign(byKey, byKeyChildren)
-
-      c = { ...col, parent, children }
+      injectParentPointers(col.children)
     }
-
-    byKey[c.key] = c
-
-    return c
   })
-
-  return [newColumns, byKey]
 }
 
 export const group = (definition, children) => {
@@ -669,6 +671,88 @@ const filterNonGroupRows = data => {
     .value()
 }
 
+const findFirstLeafColumn = pColumns => {
+  let columns = pColumns
+
+  while (columns[0]?.children) columns = columns[0].children
+
+  return columns[0]
+}
+
+const insertParentColumn = (rootColumns, childColumn, props = {}) => {
+  let collection
+
+  if (childColumn.parent) {
+    collection = childColumn.parent.children
+  } else {
+    collection = rootColumns
+  }
+
+  const index = collection.findIndex(e => e.key === childColumn.key)
+
+  const newParent = {
+    ...props,
+    parent: childColumn.parent,
+    children: [childColumn],
+  }
+
+  collection[index] = newParent
+  childColumn.parent = newParent
+
+  return newParent
+}
+
+const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGroups) => {
+  if (groupDepth > 0) {
+    const firstColumn = findFirstLeafColumn(columns)
+
+    const newParent = insertParentColumn(columns, firstColumn, {
+      ...firstColumn,
+      getRowContent: undefined,
+      getRowVal: undefined,
+      key: '__group_parent',
+      mergeHeader: true,
+      merge: true,
+      noHeader: false,
+    })
+
+    const groupColumns = _.range(0, groupDepth).map(i => ({
+      key: `__group_${i}`,
+      cellProps: (__, _isGroup, [group]) => ({
+        onClick: () => toggleGroup(group.key),
+        style: { cursor: 'pointer' },
+      }),
+      getRowContent: (__, isGroup, parents) =>
+        isGroup &&
+        parents.length === i + 1 && (
+          <Icon
+            name={`chevron ${_.includes(expandedGroups, parents[0].key) ? 'down' : 'right'}`}
+            style={{ margin: 0 }}
+          />
+        ),
+      cellStyle: { paddingRight: 0 },
+    }))
+
+    newParent.children.splice(0, 0, ...groupColumns)
+  }
+}
+
+const extractColumnKeys = columns => {
+  return _.chain(columns)
+    .flatMap(column => {
+      const pairs = [{ key: column.key, column }]
+
+      if (column.children) {
+        pairs.push(..._.toPairs(extractColumnKeys(column.children)))
+      }
+
+      return pairs
+    })
+    .map(({ key, column }) => [key, column])
+    .fromPairs()
+    .value()
+}
+
 const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeader, contextMenuItems }) => {
   const [state, dispatch] = useReducer(tableStateReducer, null, getInitialState)
   const groupDepth = useMemo(() => calculateGroupDepth(data), [data])
@@ -683,38 +767,16 @@ const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeade
     [dispatch]
   )
 
-  const tmpColumns = useMemo(() => {
-    const columns = _.clone(pColumns)
+  const [columns, columnsByKey] = useMemo(() => {
+    const columns = _.cloneDeep(pColumns)
 
-    if (groupDepth > 0) {
-      columns[0] = {
-        key: '__group_parent',
-        mergeHeader: true,
-        merge: true,
-        title: columns[0].title,
-        children: [
-          ..._.range(0, groupDepth).map(i => ({
-            key: `__group_${i}`,
-            getRowContent: (__, isGroup, parents) =>
-              isGroup &&
-              parents.length === i + 1 && (
-                <Icon
-                  name={`chevron ${_.includes(state.expandedGroups, parents[0].key) ? 'down' : 'right'}`}
-                  style={{ margin: 0 }}
-                  onClick={() => toggleGroup(parents[0].key)}
-                />
-              ),
-            cellStyle: { paddingRight: 0 },
-          })),
-          columns[0],
-        ],
-      }
-    }
+    injectParentPointers(columns)
+    insertGroupColumns(columns, groupDepth, toggleGroup, state.expandedGroups)
 
-    return columns
-  }, [pColumns, groupDepth, toggleGroup, state])
+    const byKey = extractColumnKeys(columns)
 
-  const [columns, columnsByKey] = useMemo(() => injectParentPointers(tmpColumns), [tmpColumns])
+    return [columns, byKey]
+  }, [pColumns, groupDepth, toggleGroup, state.expandedGroups])
 
   const [columnSpans, columnDepth] = useMemo(() => computeColumnSpans(columns), [columns])
 
