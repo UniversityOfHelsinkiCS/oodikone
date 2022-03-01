@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Segment, Message, Button, Popup } from 'semantic-ui-react'
+import { Segment, Message } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { func, arrayOf, bool, shape, any, string } from 'prop-types'
@@ -8,7 +8,6 @@ import { getTopTeachersCategories } from '../../../redux/teachersTopCategories'
 import { getTopTeachers } from '../../../redux/teachersTop'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import LeaderForm from './LeaderForm'
-import { callApi } from '../../../apiConnection'
 
 const TeacherLeaderBoard = ({
   getTopTeachersCategories,
@@ -22,31 +21,12 @@ const TeacherLeaderBoard = ({
 }) => {
   const [selectedyear, setSelectedyear] = useState(null)
   const [selectedcategory, setSelectedcategory] = useState(null)
-  const [recalculating, setRecalculating] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     getTopTeachersCategories()
   }, [])
 
-  const handleOpen = () => {
-    setIsOpen(true)
-    setRecalculating(true)
-    setTimeout(() => {
-      setIsOpen(false)
-    }, 5000)
-  }
-
-  const handleClose = () => {
-    setIsOpen(false)
-  }
-
-  const refresh = () => {
-    callApi('/teachers/top', 'post', { startyearcode: selectedyear, endyearcode: selectedyear + 1 }, null)
-  }
-
   const updateAndSubmitForm = args => {
-    setRecalculating(false)
     const year = args.selectedyear || selectedyear
     const category = args.selectedcategory || selectedcategory
     getTopTeachers(year, category)
@@ -96,22 +76,6 @@ const TeacherLeaderBoard = ({
           />
           <Segment>
             <Message>{`Last updated: ${updated}`}</Message>
-            <Popup
-              trigger={
-                <Button
-                  disabled={recalculating}
-                  content="Recalculate this year"
-                  onClick={() => {
-                    refresh()
-                  }}
-                />
-              }
-              content="Recalculation started. Recalculation might take multiple minutes. Refresh page to see the results"
-              on="click"
-              open={isOpen}
-              onClose={handleClose}
-              onOpen={handleOpen}
-            />
 
             <TeacherStatisticsTable
               statistics={statistics}
