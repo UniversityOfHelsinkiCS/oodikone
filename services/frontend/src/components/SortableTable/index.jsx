@@ -1,10 +1,12 @@
 /* eslint-disable no-return-assign */
 
-import React, { useState, useMemo, useReducer } from 'react'
+import React, { useState, useMemo, useReducer, createContext, useContext, useCallback } from 'react'
 import { Icon, Input, Dropdown } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import produce from 'immer'
+
+const SortableTableContext = createContext(null)
 
 /* const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
   const [selected, setSelected] = useState(_.uniq(_.map(columns, 'title')))
@@ -144,96 +146,145 @@ const computeColumnSpans = columns => {
 
 const getColumnValue = (row, columnDef) => (columnDef.getRowVal ? columnDef.getRowVal(row) : undefined)
 
-const evaluateColumnFilters = (row, column, options) => {
-  let defaultDiscard = false
-  let result = null
+const createRowSortingFunction = (columnsByKey, state) => {
+  const sortByColumn = Object.entries(state.columnOptions).find(([, options]) => options.sort)
 
-  options.valueFilters.forEach(({ value, type }) => {
-    const colValue = getColumnValue(row, column)
-    if (type === 'include') {
-      if (value === colValue) {
-        result = true
+  if (!sortByColumn) {
+    return undefined
+  }
+
+  const [columnKey, { sort }] = sortByColumn
+  const column = columnsByKey[columnKey]
+
+  if (sort === 'desc') {
+    return (a, b) => {
+      const va = getColumnValue(a, column)
+      const vb = getColumnValue(b, column)
+
+      if (va === vb) {
+        return 0
       }
-
-      defaultDiscard = true
-    } else if (type === 'exclude' && value === colValue) {
-      result = false
+      if (va < vb) {
+        return 1
+      }
+      return -1
     }
-  })
-
-  if (result !== null) {
-    return result
   }
+  return (a, b) => {
+    const va = getColumnValue(a, column)
+    const vb = getColumnValue(b, column)
 
-  return !defaultDiscard
+    if (va === vb) {
+      return 0
+    }
+    if (va < vb) {
+      return -1
+    }
+    return 1
+  }
 }
 
-const evaluateFilters = (row, columnsByKey, state) => {
-  return Object.entries(state.columnOptions).every(([column, options]) =>
-    evaluateColumnFilters(row, columnsByKey[column], options)
-  )
+const ValueFilterType = {
+  Include: 'include',
+  Exclude: 'exclude',
 }
 
-const sortRows = (rows, columnsByKey, state) => {
-  const sortOption = _.chain(state.columnOptions)
+const VALUE_FILTER_FUNCTIONS = {
+  [ValueFilterType.Include]: (a, b) => (a === b ? true : null),
+  [ValueFilterType.Exclude]: (a, b) => (a === b ? false : null),
+}
+
+const createRowFilteringFunction = (columnsByKey, state) => {
+  const filters = _.chain(state.columnOptions)
     .toPairs()
-    .find(([, opt]) => opt.sort)
+    .filter(([, options]) => options.valueFilters.length > 0)
+    .map(([column, { valueFilters }]) => {
+      const defaultResult = !valueFilters.some(({ type }) => type === ValueFilterType.Include)
+
+      return row => {
+        const columnValue = getColumnValue(row, columnsByKey[column])
+
+        return _.chain(valueFilters)
+          .reduce((acc, { type, value }) => {
+            const result = VALUE_FILTER_FUNCTIONS[type](columnValue, value)
+
+            if (result === null) {
+              return acc
+            }
+
+            return acc === null ? result : acc && result
+          }, null)
+          .thru(result => (result === null ? defaultResult : result))
+          .value()
+      }
+    })
+    // valueFilters.map(({ value, type }) => ({ column, value, type })))
     .value()
 
-  if (!sortOption) {
-    return rows
-  }
-
-  const [key, { sort }] = sortOption
-
-  return _.orderBy(rows, [r => getColumnValue(r, columnsByKey[key])], [sort])
+  return row => filters.every(func => func(row))
 }
 
-const groupRows = (data, groupBy, columnsByKey, state) => {
-  const pre = _.chain(data)
-    .filter(row => evaluateFilters(row, columnsByKey, state))
-    .thru(rows => sortRows(rows, columnsByKey, state))
-    .value()
+const DataItemTypeKey = Symbol('DATA_ITEM_TYPE')
 
-  if (!groupBy) {
-    return { grouped: false, rows: pre }
-  }
-
-  let groups = _.chain(pre)
-    .groupBy(data, row => getColumnValue(row, columnsByKey[groupBy[0]]))
-    .value()
-
-  if (groupBy.length > 1) {
-    groups = _.chain(groups)
-      .values()
-      .map(rows => groupRows(rows, _.slice(groupBy, 1), columnsByKey))
-      .value()
-
-    return { grouped: true, groups }
-  }
-
-  return { grouped: true, groups: _.values(groups) }
+const DataItemType = {
+  Group: 'group',
+  Row: 'row',
 }
 
-const ColumnContent = ({ column, data }) => {
+const getDataItemType = item => {
+  if (item[DataItemTypeKey] === DataItemType.Group) {
+    return DataItemType.Group
+  }
+
+  return DataItemType.Row
+}
+
+const filterAndSortRows = (items, predicate, orderFunc) => {
+  return _.chain(items)
+    .filter(item => getDataItemType(item) === DataItemType.Group || predicate(item))
+    .thru(items => (orderFunc !== undefined ? items.sort(orderFunc) : items))
+    .map(item => {
+      if (getDataItemType(item) === DataItemType.Group) {
+        return {
+          ...item,
+          children: filterAndSortRows(item.children, predicate, orderFunc),
+        }
+      }
+      return item
+    })
+    .filter(item => getDataItemType(item) === DataItemType.Row || item.children.length > 0)
+    .value()
+}
+
+const getCellContent = (column, data, isGroup, parents) => {
+  if (column.getRowContent) {
+    return column.getRowContent(data, isGroup, parents ?? [])
+  }
+
+  let value
+
+  if (column.getRowVal) {
+    value = column.getRowVal(data, isGroup, parents ?? [])
+  }
+
+  if (column.formatValue) {
+    value = column.formatValue(value)
+  }
+
+  return value
+}
+
+const ColumnContent = ({ column, data, isGroup, parents }) => {
   try {
-    if (column.getRowContent) {
-      return column.getRowContent(data)
-    }
-
-    const value = column.getRowVal(data)
-
-    if (column.formatValue) {
-      return column.formatValue(value)
-    }
-
-    return value
+    return getCellContent(column, data, isGroup, parents)
   } catch (e) {
     return 'Error'
   }
 }
 
-const Row = ({ data, columns, columnSpans }) => {
+const Row = ({ data, isGroup, parents }) => {
+  const { columns, columnSpans } = useContext(SortableTableContext)
+
   const cells = []
 
   const stack = _.clone(columns)
@@ -241,19 +292,24 @@ const Row = ({ data, columns, columnSpans }) => {
   while (stack.length > 0) {
     const [column] = stack.splice(0, 1)
 
-    const value = getColumnValue(data, column)
-    const content = column.getRowContent && column.getRowContent(data)
+    let cellProps = {}
 
-    const cellProps = {}
-
-    if (column.parent?.merge) {
-      cellProps.style = { borderLeft: 'none' }
+    if (column.parent?.merge && column.childIndex > 0) {
+      cellProps = _.merge(cellProps, {
+        style: { borderLeft: 'none' },
+      })
     }
 
-    if (value || content) {
+    if (column.cellStyle) {
+      cellProps = _.merge(cellProps, {
+        style: column.cellStyle,
+      })
+    }
+
+    if (getCellContent(column, data, isGroup, parents)) {
       cells.push(
         <td colSpan={columnSpans[column.key]} {...cellProps}>
-          <ColumnContent column={column} data={data} />
+          <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
         </td>
       )
     } else if (column.children && column.children.length > 0) {
@@ -263,17 +319,74 @@ const Row = ({ data, columns, columnSpans }) => {
     }
   }
 
-  return <tr>{cells}</tr>
+  return <tr className={isGroup ? 'group-header-row' : ''}>{cells}</tr>
 }
 
-const RowGroup = ({ content, columns, columnsByKey, columnSpans }) => {
-  if (!content.grouped) {
-    return content.rows.map(row => (
-      <Row data={row} columns={columns} columnsByKey={columnsByKey} columnSpans={columnSpans} />
-    ))
+const mergeColumnDefinitions = (original, overlay) => {
+  const result = _.cloneDeep(original)
+
+  if (!overlay) {
+    return result
   }
 
-  return <></>
+  const byKey = {}
+
+  const flattenColumns = column => {
+    byKey[column.key] = column
+
+    if (column.children) {
+      column.children.forEach(flattenColumns)
+    }
+  }
+
+  result.forEach(flattenColumns)
+
+  Object.entries(overlay).forEach(([columnKey, overlayDef]) => {
+    const orig = byKey[columnKey]
+
+    if (orig !== undefined) {
+      _.assign(orig, _.merge(orig, overlayDef))
+    }
+  })
+
+  return result
+}
+
+const DataItem = ({ item, parents = [] }) => {
+  const context = useContext(SortableTableContext)
+
+  const type = getDataItemType(item)
+
+  if (type === DataItemType.Row) {
+    return <Row data={item} parents={parents} />
+  }
+
+  const overriddenContext = {
+    ...context,
+    columns: mergeColumnDefinitions(context.columns, item.definition.columnOverrides),
+  }
+
+  const headerRowData =
+    typeof item.definition.headerRowData === 'function'
+      ? item.definition.headerRowData(item)
+      : item.definition.headerRowData
+
+  const headerRow = (
+    <SortableTableContext.Provider value={overriddenContext}>
+      <Row data={headerRowData} isGroup parents={[item.definition, ...parents]} />
+    </SortableTableContext.Provider>
+  )
+
+  const childRows = _.includes(context.state.expandedGroups, item.definition.key)
+    ? item.children.map(child => <DataItem item={child} parents={[item.definition, ...parents]} />)
+    : undefined
+
+  return (
+    <>
+      {headerRow}
+      {childRows}
+    </>
+  )
 }
 
 const ColumnHeader = ({ column, state, dispatch, values }) => {
@@ -281,13 +394,51 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
 
   const [search, setSearch] = useState('')
 
-  if (!column.title) {
-    return <></>
-  }
-
   const filterColumnKey = column.mergeHeader ? column.children[0].key : column.key
 
   const sortIcon = { desc: 'sort down', asc: 'sort up' }[sort] ?? 'sort'
+
+  const valueItems = useMemo(() => {
+    if (!values) {
+      return []
+    }
+
+    const t = values
+      .filter(value => search === '' || `${value}`.indexOf(search) > -1)
+      .map(value => {
+        let icon = 'square outline'
+
+        const filter = valueFilters.find(f => f.value === value)
+
+        if (filter) {
+          if (filter.type === 'exclude') {
+            icon = 'minus square outline'
+          } else if (filter.type === 'include') {
+            icon = 'plus square outline'
+          }
+        }
+
+        const text = column.formatValue ? column.formatValue(value) : value
+
+        return (
+          <Dropdown.Item
+            icon={icon}
+            text={text}
+            onClick={evt => {
+              dispatch({ type: 'CYCLE_VALUE_FILTER', payload: { column: filterColumnKey, value } })
+              evt.preventDefault()
+              evt.stopPropagation()
+            }}
+          />
+        )
+      })
+
+    return t
+  }, [values, search])
+
+  if (!column.title) {
+    return <></>
+  }
 
   return (
     <div
@@ -315,37 +466,7 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
               value={search}
               onChange={evt => setSearch(evt.target.value)}
             />
-            <Dropdown.Menu scrolling>
-              {values
-                .filter(value => search === '' || `${value}`.indexOf(search) > -1)
-                .map(value => {
-                  let icon = 'square outline'
-
-                  const filter = valueFilters.find(f => f.value === value)
-
-                  if (filter) {
-                    if (filter.type === 'exclude') {
-                      icon = 'minus square outline'
-                    } else if (filter.type === 'include') {
-                      icon = 'plus square outline'
-                    }
-                  }
-
-                  const text = column.formatValue ? column.formatValue(value) : value
-
-                  return (
-                    <Dropdown.Item
-                      icon={icon}
-                      text={text}
-                      onClick={evt => {
-                        dispatch({ type: 'CYCLE_VALUE_FILTER', payload: { column: filterColumnKey, value } })
-                        evt.preventDefault()
-                        evt.stopPropagation()
-                      }}
-                    />
-                  )
-                })}
-            </Dropdown.Menu>
+            <Dropdown.Menu scrolling>{valueItems}</Dropdown.Menu>
             <Dropdown.Divider />
             <Dropdown.Item
               active={sort === 'asc'}
@@ -376,6 +497,7 @@ const getDefaultColumnOptions = () => ({
 
 const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatch, values) => {
   let stack = _.clone(columns)
+
   const rows = _.range(0, columnDepth).map(() => [])
 
   while (stack.length > 0) {
@@ -386,7 +508,9 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
     }
 
     const currentDepth = column.depth ?? 0
-    const rowspan = column.children && column.children.length > 0 ? 1 : columnDepth - currentDepth
+
+    const rowspan =
+      column.children && column.children.length > 0 && !column.mergeHeader ? 1 : columnDepth - currentDepth
 
     const style = {}
 
@@ -402,12 +526,12 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
           column={column}
           state={columnOptions[valuesKey] ?? getDefaultColumnOptions()}
           dispatch={dispatch}
-          values={values[valuesKey] ?? []}
+          values={values[valuesKey]}
         />
       </th>
     )
 
-    if (column.children) {
+    if (column.children && !column.mergeHeader) {
       const children = column.children.map(c => ({ ...c, depth: currentDepth + 1 }))
       stack = [...children, ...stack]
     }
@@ -418,6 +542,7 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
 
 const getInitialState = () => ({
   columnOptions: {},
+  expandedGroups: [],
 })
 
 const tableStateReducer = produce((state, { type, payload }) => {
@@ -462,6 +587,17 @@ const tableStateReducer = produce((state, { type, payload }) => {
         .filter(([key]) => key !== payload.column)
         .forEach(([, value]) => (value.sort = undefined))
     },
+    TOGGLE_GROUP: () => {
+      const { group } = payload
+
+      const index = state.expandedGroups.indexOf(group)
+
+      if (index > -1) {
+        state.expandedGroups.splice(index, 1)
+      } else {
+        state.expandedGroups.push(group)
+      }
+    },
   }[type]())
 })
 
@@ -488,8 +624,8 @@ const getColumnValues = (data, columns) => {
 const injectParentPointers = (columns, parent) => {
   const byKey = {}
 
-  const newColumns = columns.map(col => {
-    let c = { ...col, parent }
+  const newColumns = columns.map((col, i) => {
+    let c = { ...col, parent, childIndex: parent ? i : undefined }
 
     if (col.children) {
       const [children, byKeyChildren] = injectParentPointers(col.children, col)
@@ -507,27 +643,111 @@ const injectParentPointers = (columns, parent) => {
   return [newColumns, byKey]
 }
 
-const SortableTable = ({ columns: pColumns, title, data, groupBy, style, actions, noHeader, contextMenuItems }) => {
+export const group = (definition, children) => {
+  return {
+    definition,
+    children,
+    [DataItemTypeKey]: DataItemType.Group,
+  }
+}
+
+const calculateGroupDepth = data => {
+  return _.chain(data)
+    .map(item => (getDataItemType(item) === DataItemType.Group ? 1 + calculateGroupDepth(item.children) : 0))
+    .max()
+    .value()
+}
+
+const filterNonGroupRows = data => {
+  return _.chain(data)
+    .flatMapDeep(item => {
+      if (getDataItemType(item) === DataItemType.Group) {
+        return filterNonGroupRows(item.children)
+      }
+      return item
+    })
+    .value()
+}
+
+const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeader, contextMenuItems }) => {
   const [state, dispatch] = useReducer(tableStateReducer, null, getInitialState)
-  const [columns, columnsByKey] = useMemo(() => injectParentPointers(pColumns), [pColumns])
+  const groupDepth = useMemo(() => calculateGroupDepth(data), [data])
+
+  const toggleGroup = useCallback(
+    groupKey => {
+      dispatch({
+        type: 'TOGGLE_GROUP',
+        payload: { group: groupKey },
+      })
+    },
+    [dispatch]
+  )
+
+  const tmpColumns = useMemo(() => {
+    const columns = _.clone(pColumns)
+
+    if (groupDepth > 0) {
+      columns[0] = {
+        key: '__group_parent',
+        mergeHeader: true,
+        merge: true,
+        title: columns[0].title,
+        children: [
+          ..._.range(0, groupDepth).map(i => ({
+            key: `__group_${i}`,
+            getRowContent: (__, isGroup, parents) =>
+              isGroup &&
+              parents.length === i + 1 && (
+                <Icon
+                  name={`chevron ${_.includes(state.expandedGroups, parents[0].key) ? 'down' : 'right'}`}
+                  style={{ margin: 0 }}
+                  onClick={() => toggleGroup(parents[0].key)}
+                />
+              ),
+            cellStyle: { paddingRight: 0 },
+          })),
+          columns[0],
+        ],
+      }
+    }
+
+    return columns
+  }, [pColumns, groupDepth, toggleGroup, state])
+
+  const [columns, columnsByKey] = useMemo(() => injectParentPointers(tmpColumns), [tmpColumns])
+
   const [columnSpans, columnDepth] = useMemo(() => computeColumnSpans(columns), [columns])
 
-  const values = useMemo(() => getColumnValues(data, columns), [data, columns])
+  const nonGroupRows = useMemo(() => filterNonGroupRows(data), [data])
+  const values = useMemo(() => getColumnValues(nonGroupRows, columns), [data, columns])
+
   const headers = useMemo(
     () => createHeaders(columns, columnSpans, columnDepth, state.columnOptions, dispatch, values),
     [columns, columnSpans, columnDepth, state.columnOptions, dispatch, values]
   )
 
-  const groupedRows = useMemo(() => groupRows(data, groupBy, columnsByKey, state), [data, groupBy, columnsByKey, state])
+  const rowFilteringFunc = useMemo(() => createRowFilteringFunction(columnsByKey, state), [columnsByKey, state])
+  const rowSortingFunc = useMemo(() => createRowSortingFunction(columnsByKey, state), [columnsByKey, state])
+
+  const sortedData = useMemo(
+    () => filterAndSortRows(data, rowFilteringFunc, rowSortingFunc),
+    [data, rowFilteringFunc, rowSortingFunc]
+  )
 
   const content = (
     <table
       className="ui table single line collapsing basic striped celled"
-      style={!noHeader ? { borderRadius: 0, borderLeft: 'none', borderTop: 'none', background: 'white' } : {}}
+      style={
+        !noHeader
+          ? { borderRadius: 0, borderLeft: 'none', borderTop: 'none', background: 'white', margin: '1px' }
+          : { margin: '1px' }
+      }
     >
       <thead>{headers}</thead>
       <tbody>
-        <RowGroup content={groupedRows} columns={columns} columnsByKey={columnsByKey} columnSpans={columnSpans} />
+        {sortedData.map(item => (
+          <DataItem item={item} key={item.key} />
+        ))}
       </tbody>
     </table>
   )
@@ -536,16 +756,28 @@ const SortableTable = ({ columns: pColumns, title, data, groupBy, style, actions
     return content
   }
 
+  const context = {
+    state,
+    dispatch,
+    values,
+    columns,
+    columnsByKey,
+    columnSpans,
+    columnDepth,
+  }
+
   return (
-    <FigureContainer style={style}>
-      <FigureContainer.Header actions={actions} contextMenuItems={contextMenuItems}>
-        <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
-        {title}
-      </FigureContainer.Header>
-      <FigureContainer.Content style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c' }}>
-        {content}
-      </FigureContainer.Content>
-    </FigureContainer>
+    <SortableTableContext.Provider value={context}>
+      <FigureContainer style={style}>
+        <FigureContainer.Header actions={actions} contextMenuItems={contextMenuItems}>
+          <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
+          {title}
+        </FigureContainer.Header>
+        <FigureContainer.Content style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c' }}>
+          {content}
+        </FigureContainer.Content>
+      </FigureContainer>
+    </SortableTableContext.Provider>
   )
 }
 
