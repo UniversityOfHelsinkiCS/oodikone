@@ -39,10 +39,8 @@ describe('Teachers page tests', () => {
   it('Check leaderboad works', () => {
     cy.get('.borderless > :nth-child(2)').click({ force: true })
     cy.get(':nth-child(1) > .ui > .search').click({ force: true })
-    cy.get(':nth-child(1) > .ui > .search').click({ force: true })
-    cy.contains('2019-2020').click({ force: true })
-    cy.get(':nth-child(1) > .ui > .search').click({ force: true })
+    cy.contains('2020-2021').click({ force: true })
     cy.contains('Passed')
-    cy.contains('Ahokas Jarmo Ilkka')
+    cy.contains('Kaila Erkki Tapio')
   })
 })
