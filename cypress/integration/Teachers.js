@@ -40,6 +40,8 @@ describe('Teachers page tests', () => {
     cy.get('.borderless > :nth-child(2)').click({ force: true })
     cy.get(':nth-child(1) > .ui > .search').click({ force: true })
     cy.contains('2020-2021').click({ force: true })
+    cy.wait(5000)
+    cy.reload()
     cy.contains('Passed')
     cy.contains('Kaila Erkki Tapio')
   })
