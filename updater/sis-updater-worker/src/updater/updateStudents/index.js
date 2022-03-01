@@ -268,7 +268,8 @@ const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
   )
 
   const studyRightIdToEducationType = studyRights.reduce((res, curr) => {
-    res[curr.id] = educations.find(e => e.id === curr.education_id).education_type
+    const education = educations.find(e => e.id === curr.education_id)
+    res[curr.id] = education ? education.education_type : null
     return res
   }, {})
 
