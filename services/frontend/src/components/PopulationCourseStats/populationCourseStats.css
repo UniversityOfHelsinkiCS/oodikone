@@ -33,9 +33,3 @@
   white-space: initial;
   text-align: center;
 }
-
-.menuTab {
-  overflow-y: auto;
-  max-height: 80vh;
-  padding: 0;
-}

@@ -1,49 +1,117 @@
-import React from 'react'
-import { Table, Icon } from 'semantic-ui-react'
-import { instanceOf, func } from 'prop-types'
-import { useSelector } from 'react-redux'
+import React, { useMemo } from 'react'
+import { Link } from 'react-router-dom'
+import { Icon } from 'semantic-ui-react'
+import SortableTable, { group } from 'components/SortableTable'
+import _ from 'lodash'
 import { getTextIn } from '../../../common'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import GradeDistributionHeader from './GradeDistributionHeader'
-import GradeDistributionRow from './GradeDistributionRow'
 
-const gradeTypes = [1, 2, 3, 4, 5]
+const GRADE_DISTRIBUTION_COLUMNS = [
+  {
+    key: 'name-parent',
+    mergeHeader: true,
+    merge: true,
+    children: [
+      {
+        key: 'name',
+        title: 'Name',
+        getRowVal: row => getTextIn(row.name),
+      },
+      {
+        key: 'icon',
+        getRowContent: row => (
+          <Link
+            to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+              row.code
+            )}"]&separate=false&unifyOpenUniCourses=false`}
+          >
+            <Icon name="level up alternate" />
+          </Link>
+        ),
+      },
+    ],
+  },
+  {
+    key: 'code',
+    title: 'Code',
+    getRowVal: row => row.code,
+  },
+  {
+    key: 'stats',
+    noHeader: true,
+    getRowVal: (__, isGroup) => (isGroup ? ' ' : null),
+    children: [
+      {
+        key: 'attempts',
+        title: 'Attempts',
+        getRowVal: row => row.attempts,
+      },
+      ..._.range(0, 6).map(grade => ({
+        key: `grade-${grade}`,
+        title: `${grade}`,
+        getRowVal: row => row.grades[grade]?.count ?? 0,
+      })),
+      {
+        key: 'other-passed',
+        title: 'Other Passed',
+        getRowVal: row => row.otherPassed,
+      },
+    ],
+  },
+]
 
-const GradeDistribution = ({ expandedGroups, toggleGroupExpansion }) => {
+const GradeDistribution = () => {
   const { modules } = UsePopulationCourseContext()
 
-  const { language } = useSelector(({ settings }) => settings)
+  const data = useMemo(() => {
+    return modules.map(({ module, courses }) =>
+      group(
+        {
+          key: `module-${module.code}`,
+          module,
+          headerRowData: ({ definition: { module }, children }) => ({
+            name: module.name,
+            code: module.code,
+            attempts: _.chain(children).map('attempts').sum().value(),
+            otherPassed: _.chain(children).map('otherPassed').sum().value(),
+            grades: _.range(0, 6).map(grade => ({
+              count: _.chain(children)
+                .map(course => course.grades[grade]?.count ?? 0)
+                .sum()
+                .value(),
+            })),
+          }),
+        },
+        courses.map(course => ({
+          name: course.course.name,
+          code: course.course.code,
+          attempts: _.chain(course.grades).values().map('count').sum().value(),
+          otherPassed: _.chain(course.grades)
+            .omit(_.range(0, 6))
+            .filter(g => g.status.passingGrade || g.status.improvedGrade)
+            .map('count')
+            .sum()
+            .value(),
+          grades: {
+            ...course.grades,
+            0: {
+              count: _.chain(course.grades)
+                .filter(g => g.status.failingGrade)
+                .map('count')
+                .sum()
+                .value(),
+            },
+          },
+        }))
+      )
+    )
+  }, [modules])
 
   return (
-    <Table celled sortable className="fixed-header">
-      <GradeDistributionHeader gradeTypes={gradeTypes} />
-      <Table.Body>
-        {modules.map(({ module, courses }) => (
-          <React.Fragment key={module.code}>
-            <Table.Row>
-              <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleGroupExpansion(module.code)}>
-                <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
-                <b>{getTextIn(module.name, language)}</b>
-              </Table.Cell>
-              <Table.Cell>
-                <b>{module.code}</b>
-              </Table.Cell>
-              <Table.Cell colSpan="8" />
-            </Table.Row>
-            {expandedGroups.has(module.code) &&
-              courses.map(course => (
-                <GradeDistributionRow key={course.course.code} courseStatistics={course} gradeTypes={gradeTypes} />
-              ))}
-          </React.Fragment>
-        ))}
-      </Table.Body>
-    </Table>
+    <>
+      <SortableTable title="Grade distribution of courses" data={data} columns={GRADE_DISTRIBUTION_COLUMNS} />
+    </>
   )
-}
-
-GradeDistribution.propTypes = {
-  expandedGroups: instanceOf(Set).isRequired,
-  toggleGroupExpansion: func.isRequired,
 }
 
 export default GradeDistribution

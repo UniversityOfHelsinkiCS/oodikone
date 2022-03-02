@@ -1,38 +1,34 @@
 import React, { useCallback } from 'react'
-import { connect } from 'react-redux'
-import { func, bool } from 'prop-types'
+import { useDispatch, useSelector } from 'react-redux'
 import { Radio } from 'semantic-ui-react'
-import { withRouter } from 'react-router-dom'
 
 import TSA from '../../common/tsa'
 import { toggleStudentNameVisibility } from '../../redux/settings'
 
-const StudentNameVisibilityToggle = ({ showNames, toggleStudentNameVisibility: toggle }) => {
+export const useStudentNameVisibility = () => {
+  const visible = useSelector(state => state.settings.namesVisible)
+  const dispatch = useDispatch()
+
+  const toggle = useCallback(() => {
+    dispatch(toggleStudentNameVisibility())
+  }, [dispatch])
+
+  return { visible, toggle }
+}
+
+const StudentNameVisibilityToggle = ({ style = {} }) => {
+  const { visible, toggle } = useStudentNameVisibility()
+
   const handleChange = useCallback(() => {
-    TSA.Matomo.sendEvent('Common', 'Toggle student name visibility', showNames ? 'hide' : 'show')
+    TSA.Matomo.sendEvent('Common', 'Toggle student name visibility', visible ? 'hide' : 'show')
     toggle()
-  }, [showNames, toggle])
+  }, [visible, toggle])
 
   return (
-    <div style={{ marginTop: 15, marginBottom: 10 }}>
-      <Radio
-        data-cy="toggleStudentNames"
-        toggle
-        label="Show student names"
-        checked={showNames}
-        onChange={handleChange}
-      />
+    <div style={{ marginTop: 15, marginBottom: 10, ...style }}>
+      <Radio data-cy="toggleStudentNames" toggle label="Show student names" checked={visible} onChange={handleChange} />
     </div>
   )
 }
 
-StudentNameVisibilityToggle.propTypes = {
-  showNames: bool.isRequired,
-  toggleStudentNameVisibility: func.isRequired,
-}
-
-const mapStateToProps = state => ({
-  showNames: state.settings.namesVisible,
-})
-
-export default connect(mapStateToProps, { toggleStudentNameVisibility })(withRouter(StudentNameVisibilityToggle))
+export default StudentNameVisibilityToggle

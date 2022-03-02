@@ -9,9 +9,10 @@ const Header = ({ children, actions, contextItems }) => {
   const { isFullscreen, setFullscreen } = useContext(FigureContext)
 
   return (
-    <Card.Content style={{ flexGrow: 0, display: 'flex', alignItems: 'center', padding: '1em' }}>
+    <Card.Content style={{ flexGrow: 0, display: 'flex', alignItems: 'center', padding: '1em', height: '3.25em' }}>
       <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{children}</div>
       <div style={{ flexGrow: 1 }} />
+      <div style={{ marginRight: '1em' }}>{actions}</div>
       <Popup
         trigger={
           <Icon
@@ -25,7 +26,6 @@ const Header = ({ children, actions, contextItems }) => {
       >
         Toggle Fullscreen
       </Popup>
-      <div>{actions}</div>
       {contextItems && (
         <div>
           <Dropdown position="bottom center" icon="ellipsis vertical">
