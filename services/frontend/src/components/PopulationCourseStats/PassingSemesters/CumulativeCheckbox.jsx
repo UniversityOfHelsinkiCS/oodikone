@@ -14,7 +14,9 @@ const CumulativeCheckbox = ({ cumulativeStats, setCumulativeStats }) => {
     setCumulativeStats(!cumulativeStats)
   }
 
-  return <Checkbox toggle checked={cumulativeStats} onChange={handleChange} label="Show cumulative stats" />
+  return (
+    <Checkbox toggle checked={cumulativeStats} onChange={handleChange} label="Show cumulative stats" size="small" />
+  )
 }
 
 CumulativeCheckbox.propTypes = {

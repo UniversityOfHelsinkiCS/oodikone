@@ -1,99 +1,75 @@
-import React, { useState, useMemo } from 'react'
-import { Table, Icon, Popup, Item, Pagination } from 'semantic-ui-react'
+import React, { useState, useMemo, useCallback } from 'react'
+import { Icon, Button, Popup, Item, Pagination } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { useSelector, connect } from 'react-redux'
-import { bool, instanceOf, func } from 'prop-types'
+import { useSelector } from 'react-redux'
+import _ from 'lodash'
+import SortableTable, { group } from 'components/SortableTable'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import FilterToggleIcon from '../../FilterToggleIcon'
 import useFilters from '../../FilterView/useFilters'
 import { isCourseSelected, toggleCourseSelection } from '../../FilterView/filters/courses'
 import { getTextIn } from '../../../common'
-import StudentNameVisibilityToggle from '../../StudentNameVisibilityToggle'
+import { useStudentNameVisibility } from '../../StudentNameVisibilityToggle'
 
-const verticalTitle = (...params) => {
-  // https://stackoverflow.com/a/41396815
-  return (
-    <div className="studentVerticalTitle">
-      {params.map(p => (
-        <div key={p}>{p}</div>
-      ))}
-    </div>
-  )
-}
-
-const StudentsRow = ({ course, pagedStudents, hasCompleted, onGoToCourseStatisticsClick }) => {
+const CourseFilterToggle = ({ course }) => {
   const { language } = useSelector(({ settings }) => settings)
   const { useFilterSelector, filterDispatch } = useFilters()
 
   const isActive = useFilterSelector(isCourseSelected(course.code))
 
   return (
-    <Table.Row key={course.code}>
-      <Popup
-        trigger={
-          <Table.Cell className="filterCell clickableCell">
-            <FilterToggleIcon isActive={isActive} onClick={() => filterDispatch(toggleCourseSelection(course.code))} />
-          </Table.Cell>
-        }
-        content={
-          isActive ? (
-            <span>
-              Poista rajaus kurssin <b>{getTextIn(course.name, language)}</b> perusteella
-            </span>
-          ) : (
-            <span>
-              Rajaa opiskelijat kurssin <b>{getTextIn(course.name, language)}</b> perusteella
-            </span>
-          )
-        }
-        position="top right"
-      />
-      <Table.Cell className="nameCell" key="name" content={course.name.fi} />
-      <Table.Cell className="iconCell clickableCell">
-        <p>
-          <Item
-            as={Link}
-            to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-              course.code
-            )}"]&separate=false&unifyOpenUniCourses=false`}
-          >
-            <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(course.code)} />
-          </Item>
-        </p>
-      </Table.Cell>
-      <Table.Cell key="code" content={course.code} />
-      {pagedStudents.map(student => (
-        <Table.Cell
-          key={student.studentnumber}
-          content={hasCompleted(student.studentnumber) ? <Icon fitted name="check" color="green" /> : null}
+    <Popup
+      trigger={
+        <FilterToggleIcon
+          style={{ cursor: 'pointer' }}
+          isActive={isActive}
+          onClick={() => filterDispatch(toggleCourseSelection(course.code))}
         />
-      ))}
-    </Table.Row>
+      }
+      content={
+        isActive ? (
+          <span>
+            Poista rajaus kurssin <b>{getTextIn(course.name, language)}</b> perusteella
+          </span>
+        ) : (
+          <span>
+            Rajaa opiskelijat kurssin <b>{getTextIn(course.name, language)}</b> perusteella
+          </span>
+        )
+      }
+      position="top right"
+    />
   )
 }
 
-const Students = ({ filteredStudents, expandedGroups, toggleGroupExpansion, showNames }) => {
-  const { courseStatistics, filterInput, onGoToCourseStatisticsClick, modules } = UsePopulationCourseContext()
-  const { language } = useSelector(({ settings }) => settings)
+const Students = ({ filteredStudents }) => {
+  const { courseStatistics, onGoToCourseStatisticsClick, modules } = UsePopulationCourseContext()
+  const { visible: namesVisible, toggle: toggleStudentNames } = useStudentNameVisibility()
   const [page, setPage] = useState(0)
 
-  const hasCompleted = (courseCode, student) => {
-    const course = courseStatistics.find(c => c.course.code === courseCode)
-    if (!course) return false
+  const hasCompleted = useCallback(
+    (courseCode, student) => {
+      const course = courseStatistics.find(c => c.course.code === courseCode)
+      if (!course) return false
 
-    return Boolean(course.students.passed[student])
-  }
+      return Boolean(course.students.passed[student])
+    },
+    [courseStatistics]
+  )
 
-  const countCompleted = (courses, student) => {
-    let completed = 0
-    courses.forEach(course => {
-      if (hasCompleted(course.code, student)) {
-        completed++
-      }
-    })
+  const countCompleted = useCallback(
+    (courses, student) => {
+      let completed = 0
+      courses.forEach(course => {
+        if (hasCompleted(course.code, student)) {
+          completed++
+        }
+      })
 
-    return completed
-  }
+      return completed
+    },
+    [hasCompleted]
+  )
 
   const students = useMemo(() => {
     const studentSet = new Set()
@@ -124,81 +100,120 @@ const Students = ({ filteredStudents, expandedGroups, toggleGroupExpansion, show
 
   const pagedStudents = students.slice(page * 10, page * 10 + 10)
 
+  const data = useMemo(() => {
+    return _.chain(modules)
+      .map(({ module, courses }) =>
+        group(
+          {
+            key: `module-${module.code}`,
+            headerRowData: {
+              name: module.name,
+              code: module.code,
+              courses,
+            },
+          },
+          courses
+        )
+      )
+      .value()
+  }, [modules])
+
+  const columns = useMemo(
+    () => [
+      {
+        key: 'course',
+        title: 'Course',
+        children: [
+          {
+            key: 'title-parent',
+            mergeHeader: 'title',
+            merge: true,
+            children: [
+              {
+                key: 'title',
+                title: 'Name',
+                getRowVal: row => getTextIn(row.name),
+              },
+              {
+                key: 'filter-toggle',
+                getRowContent: (row, isGroup) => {
+                  if (isGroup) return null
+
+                  return <CourseFilterToggle course={row} />
+                },
+              },
+              {
+                key: 'go-to-course',
+                getRowContent: (row, isGroup) =>
+                  !isGroup && (
+                    <Item
+                      as={Link}
+                      to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                        row.code
+                      )}"]&separate=false&unifyOpenUniCourses=false`}
+                    >
+                      <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(row.code)} />
+                    </Item>
+                  ),
+              },
+            ],
+          },
+          {
+            key: 'code',
+            title: 'Code',
+            getRowVal: row => row.code,
+          },
+        ],
+      },
+      {
+        key: 'students',
+        title: 'Students',
+        children: pagedStudents.map(student => ({
+          key: `student-${student.studentnumber}`,
+          title: `${namesVisible ? student.name : student.studentnumber}`,
+          getRowVal: (row, isGroup) =>
+            isGroup
+              ? countCompleted(row.courses, student.studentnumber)
+              : hasCompleted(row.code, student.studentnumber),
+          getRowContent: (row, isGroup) =>
+            isGroup
+              ? countCompleted(row.courses, student.studentnumber)
+              : hasCompleted(row.code, student.studentnumber) && <Icon fitted name="check" color="green" />,
+        })),
+      },
+    ],
+    [modules, pagedStudents]
+  )
+
   return (
     <div>
-      <div style={{ marginBottom: '1.5rem' }}>
-        <StudentNameVisibilityToggle />
-      </div>
-      <Pagination
-        secondary
-        activePage={page + 1}
-        totalPages={maxPages + 1}
-        onPageChange={(e, { activePage }) => setPage(activePage - 1)}
-        ellipsisItem={null}
-        firstItem={null}
-        lastItem={null}
+      <SortableTable
+        title={
+          <>
+            Courses passed by students
+            <Pagination
+              style={{ marginLeft: '1em' }}
+              size="mini"
+              secondary
+              activePage={page + 1}
+              totalPages={maxPages + 1}
+              onPageChange={(e, { activePage }) => setPage(activePage - 1)}
+              ellipsisItem={null}
+              firstItem={null}
+              lastItem={null}
+            />
+          </>
+        }
+        actions={
+          <Button size="tiny" onClick={() => toggleStudentNames()}>
+            {namesVisible ? 'Hide student names' : 'Show student names'}
+          </Button>
+        }
+        columns={columns}
+        data={data}
       />
-      <Table sortable className="fixed-header" striped celled>
-        <Table.Header>
-          <Table.Row>
-            {filterInput('nameFilter', 'Name', '3')}
-            {filterInput('codeFilter', 'Code')}
-            {pagedStudents.map(student => (
-              <Table.HeaderCell
-                key={student.studentnumber}
-                content={
-                  <Link style={{ color: 'black' }} to={`/students/${student.studentnumber}`}>
-                    {showNames ? verticalTitle(student.name) : verticalTitle(student.studentnumber)}
-                  </Link>
-                }
-              />
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {modules.map(({ module, courses }) => (
-            <React.Fragment key={module.code}>
-              <Table.Row>
-                <Table.Cell style={{ cursor: 'pointer' }} colSpan="3" onClick={() => toggleGroupExpansion(module.code)}>
-                  <Icon name={expandedGroups.has(module.code) ? 'angle down' : 'angle right'} />
-                  <b>{getTextIn(module.name, language)}</b>
-                </Table.Cell>
-                <Table.Cell>
-                  <b>{module.code}</b>
-                </Table.Cell>
-                {pagedStudents.map(student => (
-                  <Table.Cell key={`${module.code}-${student.studentnumber}`}>
-                    {countCompleted(courses, student.studentnumber)}
-                  </Table.Cell>
-                ))}
-              </Table.Row>
-              {expandedGroups.has(module.code) &&
-                courses
-                  .filter(c => c.visible.visibility)
-                  .map(col => (
-                    <StudentsRow
-                      course={col}
-                      pagedStudents={pagedStudents}
-                      hasCompleted={sn => hasCompleted(col.code, sn)}
-                      onGoToCourseStatisticsClick={onGoToCourseStatisticsClick}
-                    />
-                  ))}
-            </React.Fragment>
-          ))}
-        </Table.Body>
-      </Table>
     </div>
   )
 }
 
-const mapStateToProps = state => ({
-  showNames: state.settings.namesVisible,
-})
-
-Students.propTypes = {
-  showNames: bool.isRequired,
-  expandedGroups: instanceOf(Set).isRequired,
-  toggleGroupExpansion: func.isRequired,
-}
-
-export default connect(mapStateToProps)(Students)
+export default Students

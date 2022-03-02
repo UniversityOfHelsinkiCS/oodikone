@@ -303,7 +303,7 @@ const Row = ({ data, isGroup, parents }) => {
 
     if (column.parent?.merge && column.childIndex > 0) {
       cellProps = _.merge(cellProps, {
-        style: { borderLeft: 'none' },
+        style: { borderLeft: 'none', paddingLeft: 0 },
       })
     }
 
@@ -449,6 +449,8 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
     return <></>
   }
 
+  const hasChildren = column.children && column.children.length > 0
+
   return (
     <div
       style={{ display: 'flex', alignItems: 'center' }}
@@ -460,8 +462,13 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
       }
     >
       <span style={{ flexGrow: 1, marginRight: '0.5em' }}>{column.title}</span>
-      <Icon name={sortIcon} style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }} />
-      {(!column.children || column.children.length === 0 || column.mergeHeader) && (
+      {(!hasChildren || column.mergeHeader) && (
+        <Icon
+          name={sortIcon}
+          style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
+        />
+      )}
+      {(!hasChildren || column.mergeHeader) && (
         <Dropdown
           icon="filter"
           style={{ color: valueFilters.length > 0 ? 'rgb(33, 133, 208)' : '#bbb', top: '1px' }}
@@ -504,12 +511,33 @@ const getDefaultColumnOptions = () => ({
   valueFilters: [],
 })
 
+const resolveDisplayColumn = column => {
+  let displayColumn = null
+
+  if (column.mergeHeader) {
+    if (column.mergeHeader === true) {
+      ;[displayColumn] = column.children
+    } else if (typeof column.mergeHeader === 'string') {
+      displayColumn = column.children.find(c => c.key === column.mergeHeader)
+    }
+  }
+
+  if (displayColumn === null) {
+    return column
+  }
+
+  return resolveDisplayColumn(displayColumn)
+}
+
 const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatch, values) => {
   let stack = _.clone(columns)
 
   const rows = _.range(0, columnDepth).map(() => [])
+  let i = 0
 
   while (stack.length > 0) {
+    i += 1
+
     const [column] = stack.splice(0, 1)
 
     if (column.parent?.mergeHeader) {
@@ -521,22 +549,28 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
     const rowspan =
       column.children && column.children.length > 0 && !column.mergeHeader ? 1 : columnDepth - currentDepth
 
-    const style = {}
+    const style = {
+      backgroundColor: 'white',
+    }
+
+    if (rows[currentDepth].length === 0 && i > 1) {
+      style.borderLeft = '1px solid rgba(34,36,38,.1)'
+    }
 
     if (column.merged) {
       style.borderLeft = 'none'
     }
 
-    const valuesKey = column.mergeHeader ? column.children[0].key : column.key
-
     if (!column.noHeader) {
+      const displayColumn = resolveDisplayColumn(column)
+
       rows[currentDepth].push(
         <th colSpan={columnSpans[column.key]} rowSpan={rowspan} style={style}>
           <ColumnHeader
-            column={column}
-            state={columnOptions[valuesKey] ?? getDefaultColumnOptions()}
+            column={displayColumn}
+            state={columnOptions[displayColumn.key] ?? getDefaultColumnOptions()}
             dispatch={dispatch}
-            values={values[valuesKey]}
+            values={values[displayColumn.key]}
           />
         </th>
       )
@@ -690,6 +724,10 @@ const insertParentColumn = (rootColumns, childColumn, props = {}) => {
 
   const index = collection.findIndex(e => e.key === childColumn.key)
 
+  if (childColumn.parent && childColumn.parent.mergeHeader === childColumn.key) {
+    childColumn.parent.mergeHeader = props.key
+  }
+
   const newParent = {
     ...props,
     parent: childColumn.parent,
@@ -707,11 +745,10 @@ const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGroups) =>
     const firstColumn = findFirstLeafColumn(columns)
 
     const newParent = insertParentColumn(columns, firstColumn, {
-      ...firstColumn,
+      key: '__group_parent',
       getRowContent: undefined,
       getRowVal: undefined,
-      key: '__group_parent',
-      mergeHeader: true,
+      mergeHeader: firstColumn.key,
       merge: true,
       noHeader: false,
     })
@@ -730,7 +767,6 @@ const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGroups) =>
             style={{ margin: 0 }}
           />
         ),
-      cellStyle: { paddingRight: 0 },
     }))
 
     newParent.children.splice(0, 0, ...groupColumns)
@@ -743,7 +779,7 @@ const extractColumnKeys = columns => {
       const pairs = [{ key: column.key, column }]
 
       if (column.children) {
-        pairs.push(..._.toPairs(extractColumnKeys(column.children)))
+        _.toPairs(extractColumnKeys(column.children)).forEach(([key, column]) => pairs.push({ key, column }))
       }
 
       return pairs
@@ -796,16 +832,22 @@ const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeade
     [data, rowFilteringFunc, rowSortingFunc]
   )
 
+  const tableStyles = {
+    position: 'relative',
+  }
+
+  if (!noHeader) {
+    Object.assign(tableStyles, {
+      borderRadius: 0,
+      borderLeft: 'none',
+      borderTop: 'none',
+      background: 'white',
+    })
+  }
+
   const content = (
-    <table
-      className="ui table single line collapsing basic striped celled"
-      style={
-        !noHeader
-          ? { borderRadius: 0, borderLeft: 'none', borderTop: 'none', background: 'white', margin: '1px' }
-          : { margin: '1px' }
-      }
-    >
-      <thead>{headers}</thead>
+    <table className="ui table single line collapsing basic striped celled" style={tableStyles}>
+      <thead style={{ position: 'sticky', top: 0 }}>{headers}</thead>
       <tbody>
         {sortedData.map(item => (
           <DataItem item={item} key={item.key} />
@@ -835,7 +877,9 @@ const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeade
           <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
           {title}
         </FigureContainer.Header>
-        <FigureContainer.Content style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c' }}>
+        <FigureContainer.Content
+          style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c', maxHeight: '80vh' }}
+        >
           {content}
         </FigureContainer.Content>
       </FigureContainer>

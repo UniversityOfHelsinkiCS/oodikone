@@ -282,48 +282,49 @@ const PopulationCourseStats = props => {
     tableColumnNames,
     sortCriteria,
     reversed,
+    courses,
   }
 
   const panes = [
     {
       menuItem: 'pass/fail',
       render: () => (
-        <div className="menuTab">
+        <Tab.Pane className="menuTab">
           <PassFail expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
-        </div>
+        </Tab.Pane>
       ),
     },
     {
       menuItem: 'grades',
       render: () => (
-        <div className="menuTab">
+        <Tab.Pane className="menuTab">
           <GradeDistribution expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
-        </div>
+        </Tab.Pane>
       ),
     },
     {
       menuItem: 'when passed',
       render: () => (
-        <div className="menuTab" style={{ marginTop: '0.5em' }}>
+        <Tab.Pane className="menuTab">
           <PassingSemesters
             filterInput={renderFilterInputHeaderCell}
             courseStatistics={courseStatistics}
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
           />
-        </div>
+        </Tab.Pane>
       ),
     },
     {
       menuItem: 'students',
       render: () => (
-        <div className="menuTab" style={{ marginTop: '0.5em' }}>
+        <Tab.Pane className="menuTab">
           <Students
             filteredStudents={props.filteredStudents}
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
           />
-        </div>
+        </Tab.Pane>
       ),
     },
   ]
