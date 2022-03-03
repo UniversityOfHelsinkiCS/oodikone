@@ -136,6 +136,7 @@ const Students = ({ filteredStudents }) => {
               },
               {
                 key: 'filter-toggle',
+                export: false,
                 getRowContent: (row, isGroup) => {
                   if (isGroup) return null
 
@@ -144,6 +145,7 @@ const Students = ({ filteredStudents }) => {
               },
               {
                 key: 'go-to-course',
+                export: false,
                 getRowContent: (row, isGroup) =>
                   !isGroup && (
                     <Item
@@ -179,6 +181,7 @@ const Students = ({ filteredStudents }) => {
             isGroup
               ? countCompleted(row.courses, student.studentnumber)
               : hasCompleted(row.code, student.studentnumber) && <Icon fitted name="check" color="green" />,
+          formatValue: value => (value ? 'Passed' : 'Not passed'),
         })),
       },
     ],

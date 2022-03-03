@@ -5,108 +5,10 @@ import { Icon, Input, Dropdown } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import produce from 'immer'
+import ExportModal from './ExportModal'
+import { group, getDataItemType, DataItemType } from './common'
 
 const SortableTableContext = createContext(null)
-
-/* const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
-  const [selected, setSelected] = useState(_.uniq(_.map(columns, 'title')))
-
-  const getColumnValue = (row, { getRowExportVal, getRowVal }) => getRowExportVal ? getRowExportVal(row) : getRowVal(row);
-
-  const sampledValues = useMemo(
-    () => _.chain(columns)
-      .omit('parent')
-      .map((column) => [column.title, _.sampleSize(data, 10).map((row) => getColumnValue(row, column))])
-      .fromPairs()
-      .value(),
-    [columns, data],
-  )
-
-  const handleExport = () => {
-    const transformRow = (row) => _.chain(columns)
-      .filter(c => _.includes(selected, c.title))
-      .map((column) => [column.title, getColumnValue(row, column)])
-      .fromPairs()
-      .value();
-
-    const rows = data.map(transformRow);
-
-    const sheet = xlsx.utils.json_to_sheet(rows);
-    const book = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(book, sheet);
-    xlsx.writeFile(book, 'Oodikone_Export.xlsx');
-  };
-
-  const toggleSelection = (key) => {
-    setSelected(prev => {
-      const i = prev.indexOf(key);
-
-      if (i > -1) {
-        const n = [...prev];
-        n.splice(i, 1);
-        return n;
-      } else {
-        return [...prev, key];
-      }
-    });
-  };
-
-  return (
-    <Modal
-      onOpen={onOpen}
-      onClose={onClose}
-      open={open}
-    >
-      <Modal.Header>Export to Excel</Modal.Header>
-      <Modal.Content>
-        <p>
-          Exporting {data.length} rows into an Excel (.xlsx) file. Choose which columns you want to include in the generated field from the list below.
-        </p>
-
-        <Table celled striped>
-          <Table.Header>
-            <Table.HeaderCell />
-            <Table.HeaderCell>Column</Table.HeaderCell>
-            <Table.HeaderCell>Sample Values</Table.HeaderCell>
-          </Table.Header>
-          <Table.Body>
-            {
-              columns
-                .filter(x => !x.parent)
-                .map((column) => (
-                  <Table.Row onClick={() => toggleSelection(column.title)} style={{ cursor: 'pointer' }}>
-                    <Table.Cell collapsing verticalAlign='middle'>
-                      <Checkbox checked={_.includes(selected, column.title)} />
-                    </Table.Cell>
-                    <Table.Cell collapsing>{column.title}</Table.Cell>
-                    <Table.Cell style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                      <div style={{ width: '0' }}>
-                        {sampledValues[column.title]
-                          .map((value) => (
-                            <span style={{
-                              border: '1px solid #dedede',
-                              borderRadius: '3px',
-                              padding: '0px 3px',
-                              backgroundColor: '#f9fafb',
-                              marginRight: '0.25em',
-                              color: '#555',
-                            }}>{value}</span>
-                          ))
-                        }
-                      </div>
-                    </Table.Cell>
-                  </Table.Row>
-                ))
-            }
-          </Table.Body>
-        </Table>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button content="Export" onClick={() => handleExport()} />
-      </Modal.Actions>
-    </Modal>
-  );
-}; */
 
 const computeColumnSpans = columns => {
   const stack = _.cloneDeep(columns)
@@ -232,21 +134,6 @@ const createRowFilteringFunction = (columnsByKey, state) => {
     .value()
 
   return row => filters.every(func => func(row))
-}
-
-const DataItemTypeKey = Symbol('DATA_ITEM_TYPE')
-
-const DataItemType = {
-  Group: 'group',
-  Row: 'row',
-}
-
-const getDataItemType = item => {
-  if (item[DataItemTypeKey] === DataItemType.Group) {
-    return DataItemType.Group
-  }
-
-  return DataItemType.Row
 }
 
 const filterAndSortRows = (items, predicate, orderFunc) => {
@@ -425,8 +312,17 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
       return []
     }
 
-    const t = values
+    const t = _.uniq(values)
       .filter(value => search === '' || `${value}`.indexOf(search) > -1)
+      .sort((a, b) => {
+        if (typeof a === 'number' && typeof b === 'number') {
+          return a - b
+        }
+        if (a instanceof Date && b instanceof Date) {
+          return a.getTime() - b.getTime()
+        }
+        return `${a}` - `${b}`
+      })
       .map(value => {
         let icon = 'square outline'
 
@@ -445,7 +341,7 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
         return (
           <Dropdown.Item
             icon={icon}
-            text={text}
+            text={`${text}`}
             onClick={evt => {
               dispatch({ type: 'CYCLE_VALUE_FILTER', payload: { column: filterColumnKey, value } })
               evt.preventDefault()
@@ -694,14 +590,6 @@ const injectParentPointers = columns => {
   })
 }
 
-export const group = (definition, children) => {
-  return {
-    definition,
-    children,
-    [DataItemTypeKey]: DataItemType.Group,
-  }
-}
-
 const calculateGroupDepth = data => {
   return _.chain(data)
     .map(item => (getDataItemType(item) === DataItemType.Group ? 1 + calculateGroupDepth(item.children) : 0))
@@ -770,6 +658,7 @@ const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGroups) =>
 
     const groupColumns = _.range(0, groupDepth).map(i => ({
       key: `__group_${i}`,
+      export: false,
       cellProps: (__, _isGroup, [group]) => ({
         onClick: () => toggleGroup(group.key),
         style: { cursor: 'pointer' },
@@ -811,10 +700,11 @@ const SortableTable = ({
   style,
   actions,
   noHeader,
-  contextMenuItems,
+  contextMenuItems: pContextMenuItems,
   singleLine = true,
   figure = true,
 }) => {
+  const [exportModalOpen, setExportModalOpen] = useState(false)
   const [state, dispatch] = useReducer(tableStateReducer, null, getInitialState)
   const groupDepth = useMemo(() => calculateGroupDepth(data), [data])
 
@@ -910,21 +800,34 @@ const SortableTable = ({
     return <SortableTableContext.Provider value={context}>{content}</SortableTableContext.Provider>
   }
 
+  const contextMenuItems = [
+    {
+      label: 'Export to CSV',
+      onClick: () => setExportModalOpen(true),
+    },
+    ...(pContextMenuItems ?? []),
+  ]
+
   return (
-    <SortableTableContext.Provider value={context}>
-      <FigureContainer style={style}>
-        <FigureContainer.Header actions={actions} contextMenuItems={contextMenuItems}>
-          <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
-          {title}
-        </FigureContainer.Header>
-        <FigureContainer.Content
-          style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c', maxHeight: '80vh' }}
-        >
-          {content}
-        </FigureContainer.Content>
-      </FigureContainer>
-    </SortableTableContext.Provider>
+    <>
+      <ExportModal open={exportModalOpen} onClose={() => setExportModalOpen(false)} data={data} columns={columns} />
+      <SortableTableContext.Provider value={context}>
+        <FigureContainer style={style}>
+          <FigureContainer.Header actions={actions} contextItems={contextMenuItems}>
+            <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
+            {title}
+          </FigureContainer.Header>
+          <FigureContainer.Content
+            style={{ padding: 0, overflow: 'auto', backgroundColor: '#e8e8e91c', maxHeight: '80vh' }}
+          >
+            {content}
+          </FigureContainer.Content>
+        </FigureContainer>
+      </SortableTableContext.Provider>
+    </>
   )
 }
+
+export { group }
 
 export default SortableTable
