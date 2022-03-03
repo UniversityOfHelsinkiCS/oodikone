@@ -7,7 +7,7 @@ import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
 import TSA from '../../common/tsa'
 import GradeDistribution from './GradeDistribution'
-import PassFail from './PassFail/PassFailFlat'
+import PassFail from './PassFail'
 import { getTextIn } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 
@@ -216,7 +216,7 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
       menuItem: 'pass/fail',
       render: () => (
         <div className="menuTab">
-          <PassFail />
+          <PassFail flat />
         </div>
       ),
     },
@@ -224,7 +224,7 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
       menuItem: 'grades',
       render: () => (
         <div className="menuTab">
-          <GradeDistribution />
+          <GradeDistribution flat />
         </div>
       ),
     },

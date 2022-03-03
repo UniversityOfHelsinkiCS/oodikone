@@ -7,8 +7,30 @@ import { getTextIn } from '../../../common'
 import CourseFilterToggle from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 
-const GradeDistribution = () => {
-  const { modules, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+const mapCourseData = course => ({
+  name: course.course.name,
+  code: course.course.code,
+  attempts: _.chain(course.grades).values().map('count').sum().value(),
+  otherPassed: _.chain(course.grades)
+    .omit(_.range(0, 6))
+    .filter(g => g.status.passingGrade || g.status.improvedGrade)
+    .map('count')
+    .sum()
+    .value(),
+  grades: {
+    ...course.grades,
+    0: {
+      count: _.chain(course.grades)
+        .filter(g => g.status.failingGrade)
+        .map('count')
+        .sum()
+        .value(),
+    },
+  },
+})
+
+const GradeDistribution = ({ flat }) => {
+  const { modules, courseStatistics, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
   const columns = useMemo(
     () => [
@@ -80,6 +102,10 @@ const GradeDistribution = () => {
   )
 
   const data = useMemo(() => {
+    if (flat) {
+      return courseStatistics.map(mapCourseData)
+    }
+
     return modules.map(({ module, courses }) =>
       group(
         {
@@ -98,27 +124,7 @@ const GradeDistribution = () => {
             })),
           }),
         },
-        courses.map(course => ({
-          name: course.course.name,
-          code: course.course.code,
-          attempts: _.chain(course.grades).values().map('count').sum().value(),
-          otherPassed: _.chain(course.grades)
-            .omit(_.range(0, 6))
-            .filter(g => g.status.passingGrade || g.status.improvedGrade)
-            .map('count')
-            .sum()
-            .value(),
-          grades: {
-            ...course.grades,
-            0: {
-              count: _.chain(course.grades)
-                .filter(g => g.status.failingGrade)
-                .map('count')
-                .sum()
-                .value(),
-            },
-          },
-        }))
+        courses.map(mapCourseData)
       )
     )
   }, [modules])
