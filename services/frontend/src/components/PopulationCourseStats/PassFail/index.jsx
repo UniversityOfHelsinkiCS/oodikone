@@ -1,133 +1,11 @@
 import React, { useMemo } from 'react'
 import _ from 'lodash'
 import SortableTable, { group } from 'components/SortableTable'
+import { Item, Icon } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import CourseFilterToggle from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import { getTextIn } from '../../../common'
-
-const PASS_FAIL_COLUMNS = [
-  {
-    key: 'course',
-    title: 'Course',
-    children: [
-      {
-        key: 'course-name',
-        title: 'Name',
-        getRowVal: (row, isGroup) => getTextIn(isGroup ? row.label_name : row.name),
-      },
-      {
-        key: 'course-code',
-        title: 'Code',
-        getRowVal: (row, isGroup) => (isGroup ? row.label_code : row.code),
-      },
-    ],
-  },
-  {
-    key: 'statistics',
-    noHeader: true,
-    getRowVal: (_, isGroup) => (isGroup ? ' ' : undefined),
-    children: [
-      {
-        key: 'passed',
-        title: 'Passed',
-        children: [
-          {
-            key: 'passed-n',
-            title: 'Total',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.passed ?? 0,
-          },
-          {
-            key: 'passed-after-retry',
-            title: 'After Retry',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.retryPassed ?? 0,
-          },
-          {
-            key: 'passed-percentage',
-            title: 'Passed-%',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.percentage ?? 0,
-            formatValue: value =>
-              value &&
-              new Intl.NumberFormat('fi-FI', {
-                style: 'percent',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(value / 100),
-          },
-        ],
-      },
-      {
-        key: 'failed',
-        title: 'Failed',
-        children: [
-          {
-            key: 'failed-n',
-            title: 'Total',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.failed ?? 0,
-          },
-          {
-            key: 'failed-many',
-            title: 'Multiple Times',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.failedMany ?? 0,
-          },
-        ],
-      },
-      {
-        key: 'attempts',
-        title: 'Attempts',
-        children: [
-          {
-            key: 'attempts-n',
-            title: 'Total',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.attempts,
-          },
-          {
-            key: 'attempts-per-student',
-            title: 'per Student',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.perStudent,
-            formatValue: value =>
-              new Intl.NumberFormat('fi-FI', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(value),
-          },
-        ],
-      },
-      {
-        key: 'of-population',
-        title: 'Percentage of Population',
-        children: [
-          {
-            key: 'passed-of-population',
-            title: 'Passed',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.passedOfPopulation,
-            formatValue: value =>
-              new Intl.NumberFormat('fi-FI', {
-                style: 'percent',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(value / 100),
-          },
-          {
-            key: 'attempted-of-population',
-            title: 'Attempted',
-            cellStyle: { textAlign: 'right' },
-            getRowVal: row => row.stats?.triedOfPopulation,
-            formatValue: value =>
-              new Intl.NumberFormat('fi-FI', {
-                style: 'percent',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(value / 100),
-          },
-        ],
-      },
-    ],
-  },
-]
 
 const createModuleAggregateRow = ({ definition, children }) => ({
   label_code: definition.module.code,
@@ -146,7 +24,166 @@ const createModuleAggregateRow = ({ definition, children }) => ({
 })
 
 const PassFail = () => {
-  const { modules } = UsePopulationCourseContext()
+  const { modules, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+
+  const columns = useMemo(
+    () => [
+      {
+        key: 'course',
+        title: 'Course',
+        children: [
+          {
+            key: 'course-name-parent',
+            mergeHeader: true,
+            merge: true,
+            children: [
+              {
+                key: 'course-name',
+                title: 'Name',
+                getRowVal: (row, isGroup) => getTextIn(isGroup ? row.label_name : row.name),
+              },
+              {
+                key: 'filter-toggle',
+                export: false,
+                getRowContent: (row, isGroup) => {
+                  if (isGroup) return null
+
+                  return <CourseFilterToggle course={row} />
+                },
+              },
+              {
+                key: 'go-to-course',
+                export: false,
+                getRowContent: (row, isGroup) =>
+                  !isGroup && (
+                    <Item
+                      as={Link}
+                      to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                        row.code
+                      )}"]&separate=false&unifyOpenUniCourses=false`}
+                    >
+                      <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(row.code)} />
+                    </Item>
+                  ),
+              },
+            ],
+          },
+          {
+            key: 'course-code',
+            title: 'Code',
+            getRowVal: (row, isGroup) => (isGroup ? row.label_code : row.code),
+          },
+        ],
+      },
+      {
+        key: 'statistics',
+        noHeader: true,
+        getRowVal: (_, isGroup) => (isGroup ? ' ' : undefined),
+        children: [
+          {
+            key: 'passed',
+            title: 'Passed',
+            children: [
+              {
+                key: 'passed-n',
+                title: 'Total',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.passed ?? 0,
+              },
+              {
+                key: 'passed-after-retry',
+                title: 'After Retry',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.retryPassed ?? 0,
+              },
+              {
+                key: 'passed-percentage',
+                title: 'Passed-%',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.percentage ?? 0,
+                formatValue: value =>
+                  value &&
+                  new Intl.NumberFormat('fi-FI', {
+                    style: 'percent',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(value / 100),
+              },
+            ],
+          },
+          {
+            key: 'failed',
+            title: 'Failed',
+            children: [
+              {
+                key: 'failed-n',
+                title: 'Total',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.failed ?? 0,
+              },
+              {
+                key: 'failed-many',
+                title: 'Multiple Times',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.failedMany ?? 0,
+              },
+            ],
+          },
+          {
+            key: 'attempts',
+            title: 'Attempts',
+            children: [
+              {
+                key: 'attempts-n',
+                title: 'Total',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.attempts,
+              },
+              {
+                key: 'attempts-per-student',
+                title: 'per Student',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.perStudent,
+                formatValue: value =>
+                  new Intl.NumberFormat('fi-FI', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(value),
+              },
+            ],
+          },
+          {
+            key: 'of-population',
+            title: 'Percentage of Population',
+            children: [
+              {
+                key: 'passed-of-population',
+                title: 'Passed',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.passedOfPopulation,
+                formatValue: value =>
+                  new Intl.NumberFormat('fi-FI', {
+                    style: 'percent',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(value / 100),
+              },
+              {
+                key: 'attempted-of-population',
+                title: 'Attempted',
+                cellStyle: { textAlign: 'right' },
+                getRowVal: row => row.stats?.triedOfPopulation,
+                formatValue: value =>
+                  new Intl.NumberFormat('fi-FI', {
+                    style: 'percent',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  }).format(value / 100),
+              },
+            ],
+          },
+        ],
+      },
+    ],
+    [onGoToCourseStatisticsClick]
+  )
 
   const data = useMemo(
     () =>
@@ -168,7 +205,7 @@ const PassFail = () => {
 
   return (
     <>
-      <SortableTable title="Pass and fail statistics of courses" data={data} columns={PASS_FAIL_COLUMNS} />
+      <SortableTable title="Pass and fail statistics of courses" data={data} columns={columns} />
     </>
   )
 }

@@ -1,46 +1,12 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { Icon, Button, Popup, Item, Pagination } from 'semantic-ui-react'
+import { Icon, Button, Item, Pagination } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
 import _ from 'lodash'
 import SortableTable, { group } from 'components/SortableTable'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
-import FilterToggleIcon from '../../FilterToggleIcon'
-import useFilters from '../../FilterView/useFilters'
-import { isCourseSelected, toggleCourseSelection } from '../../FilterView/filters/courses'
+import CourseFilterToggle from '../CourseFilterToggle'
 import { getTextIn } from '../../../common'
 import { useStudentNameVisibility } from '../../StudentNameVisibilityToggle'
-
-const CourseFilterToggle = ({ course }) => {
-  const { language } = useSelector(({ settings }) => settings)
-  const { useFilterSelector, filterDispatch } = useFilters()
-
-  const isActive = useFilterSelector(isCourseSelected(course.code))
-
-  return (
-    <Popup
-      trigger={
-        <FilterToggleIcon
-          style={{ cursor: 'pointer' }}
-          isActive={isActive}
-          onClick={() => filterDispatch(toggleCourseSelection(course.code))}
-        />
-      }
-      content={
-        isActive ? (
-          <span>
-            Poista rajaus kurssin <b>{getTextIn(course.name, language)}</b> perusteella
-          </span>
-        ) : (
-          <span>
-            Rajaa opiskelijat kurssin <b>{getTextIn(course.name, language)}</b> perusteella
-          </span>
-        )
-      }
-      position="top right"
-    />
-  )
-}
 
 const Students = ({ filteredStudents }) => {
   const { courseStatistics, onGoToCourseStatisticsClick, modules } = UsePopulationCourseContext()
