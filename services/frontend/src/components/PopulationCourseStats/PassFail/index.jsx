@@ -23,8 +23,8 @@ const createModuleAggregateRow = ({ definition, children }) => ({
   },
 })
 
-const PassFail = () => {
-  const { modules, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+const PassFail = ({ flat }) => {
+  const { modules, courseStatistics, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
   const columns = useMemo(
     () => [
@@ -40,7 +40,7 @@ const PassFail = () => {
               {
                 key: 'course-name',
                 title: 'Name',
-                getRowVal: (row, isGroup) => getTextIn(isGroup ? row.label_name : row.name),
+                getRowVal: (row, isGroup) => getTextIn(isGroup ? row.label_name : row.name ?? row.course.name),
               },
               {
                 key: 'filter-toggle',
@@ -71,7 +71,7 @@ const PassFail = () => {
           {
             key: 'course-code',
             title: 'Code',
-            getRowVal: (row, isGroup) => (isGroup ? row.label_code : row.code),
+            getRowVal: (row, isGroup) => (isGroup ? row.label_code : row.code ?? row.course.code),
           },
         ],
       },
@@ -185,23 +185,25 @@ const PassFail = () => {
     [onGoToCourseStatisticsClick]
   )
 
-  const data = useMemo(
-    () =>
-      _.chain(modules)
-        .map(({ module, courses }) =>
-          group(
-            {
-              key: `module-${module.code}`,
-              module,
-              headerRowData: createModuleAggregateRow,
-              columnOverrides: {},
-            },
-            courses
-          )
+  const data = useMemo(() => {
+    if (flat) {
+      return courseStatistics
+    }
+
+    return _.chain(modules)
+      .map(({ module, courses }) =>
+        group(
+          {
+            key: `module-${module.code}`,
+            module,
+            headerRowData: createModuleAggregateRow,
+            columnOverrides: {},
+          },
+          courses
         )
-        .value(),
-    [modules]
-  )
+      )
+      .value()
+  }, [modules])
 
   return (
     <>
