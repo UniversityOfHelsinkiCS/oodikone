@@ -202,11 +202,21 @@ const createRowFilteringFunction = (columnsByKey, state) => {
       const defaultResult = !valueFilters.some(({ type }) => type === ValueFilterType.Include)
 
       return row => {
-        const columnValue = getColumnValue(row, columnsByKey[column])
+        let columnValues = getColumnValue(row, columnsByKey[column])
+
+        if (!Array.isArray(columnValues)) {
+          columnValues = [columnValues]
+        }
 
         return _.chain(valueFilters)
           .reduce((acc, { type, value }) => {
-            const result = VALUE_FILTER_FUNCTIONS[type](columnValue, value)
+            const result = columnValues.reduce((acc2, columnValue) => {
+              if (acc2 !== null) {
+                return acc2
+              }
+
+              return VALUE_FILTER_FUNCTIONS[type](columnValue, value)
+            }, null)
 
             if (result === null) {
               return acc
@@ -407,6 +417,9 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
 
   const sortIcon = { desc: 'sort down', asc: 'sort up' }[sort] ?? 'sort'
 
+  const sortable = column.sortable !== false
+  const filterable = column.filterable !== false
+
   const valueItems = useMemo(() => {
     if (!values) {
       return []
@@ -443,7 +456,7 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
       })
 
     return t
-  }, [values, search])
+  }, [values, search, valueFilters])
 
   if (!column.title) {
     return <></>
@@ -454,21 +467,23 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
   return (
     <div
       style={{ display: 'flex', alignItems: 'center' }}
-      onClick={() =>
-        dispatch({
-          type: 'TOGGLE_COLUMN_SORT',
-          payload: { column: filterColumnKey },
-        })
-      }
+      onClick={() => {
+        if (sortable) {
+          dispatch({
+            type: 'TOGGLE_COLUMN_SORT',
+            payload: { column: filterColumnKey },
+          })
+        }
+      }}
     >
       <span style={{ flexGrow: 1, marginRight: '0.5em' }}>{column.title}</span>
-      {(!hasChildren || column.mergeHeader) && (
+      {sortable && (!hasChildren || column.mergeHeader) && (
         <Icon
           name={sortIcon}
           style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
         />
       )}
-      {(!hasChildren || column.mergeHeader) && (
+      {filterable && (!hasChildren || column.mergeHeader) && (
         <Dropdown
           icon="filter"
           style={{ color: valueFilters.length > 0 ? 'rgb(33, 133, 208)' : '#bbb', top: '1px' }}
@@ -651,7 +666,7 @@ const getColumnValues = (data, columns) => {
   return _.chain(columns)
     .flatMapDeep(column => {
       const values = _.chain(data)
-        .map(row => getColumnValue(row, column))
+        .flatMap(row => getColumnValue(row, column))
         .uniq()
         .value()
 
@@ -789,7 +804,17 @@ const extractColumnKeys = columns => {
     .value()
 }
 
-const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeader, contextMenuItems }) => {
+const SortableTable = ({
+  columns: pColumns,
+  title,
+  data,
+  style,
+  actions,
+  noHeader,
+  contextMenuItems,
+  singleLine = true,
+  figure = true,
+}) => {
   const [state, dispatch] = useReducer(tableStateReducer, null, getInitialState)
   const groupDepth = useMemo(() => calculateGroupDepth(data), [data])
 
@@ -834,9 +859,10 @@ const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeade
 
   const tableStyles = {
     position: 'relative',
+    width: '100%',
   }
 
-  if (!noHeader) {
+  if (figure) {
     Object.assign(tableStyles, {
       borderRadius: 0,
       borderLeft: 'none',
@@ -845,9 +871,19 @@ const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeade
     })
   }
 
+  const classNames = ['ui', 'table', 'collapsing', 'striped', 'celled']
+
+  if (singleLine) {
+    classNames.push('single', 'line')
+  }
+
+  if (figure) {
+    classNames.push('basic')
+  }
+
   const content = (
-    <table className="ui table single line collapsing basic striped celled" style={tableStyles}>
-      <thead style={{ position: 'sticky', top: 0 }}>{headers}</thead>
+    <table className={classNames.join(' ')} style={tableStyles}>
+      <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>{headers}</thead>
       <tbody>
         {sortedData.map(item => (
           <DataItem item={item} key={item.key} />
@@ -868,6 +904,10 @@ const SortableTable = ({ columns: pColumns, title, data, style, actions, noHeade
     columnsByKey,
     columnSpans,
     columnDepth,
+  }
+
+  if (!figure) {
+    return <SortableTableContext.Provider value={context}>{content}</SortableTableContext.Provider>
   }
 
   return (
