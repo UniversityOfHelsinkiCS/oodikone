@@ -28,7 +28,7 @@ const Header = ({ children, actions, contextItems }) => {
       </Popup>
       {contextItems && (
         <div>
-          <Dropdown position="bottom center" icon="ellipsis vertical">
+          <Dropdown position="bottom center" direction="left" icon="ellipsis vertical">
             <Dropdown.Menu>
               {contextItems.map(({ label, onClick }) => (
                 <Dropdown.Item onClick={onClick}>{label}</Dropdown.Item>
@@ -42,8 +42,19 @@ const Header = ({ children, actions, contextItems }) => {
 }
 
 const Content = ({ children, ...rest }) => {
+  const { isFullscreen } = useContext(FigureContext)
+
+  const style = {
+    ...rest.style,
+    overflow: 'auto',
+  }
+
+  if (isFullscreen) {
+    style.maxHeight = 'initial'
+  }
+
   return (
-    <Card.Content {...rest} style={{ ...rest.style, overflow: 'auto' }}>
+    <Card.Content {...rest} style={style}>
       {children}
     </Card.Content>
   )

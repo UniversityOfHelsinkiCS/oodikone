@@ -93,7 +93,7 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
   const sampledValues = useMemo(() => ValueSamplerVisitor.visit(data, exportColumns).sample(10), [exportColumns, data])
 
   const handleExport = () => {
-    const columns = exportColumns.filter(ec => _.includes(selected, ec.title))
+    const columns = exportColumns.filter(ec => _.includes(selected, ec.key))
     const { rows } = ExportVisitor.visit(data, columns)
     const sheet = xlsx.utils.json_to_sheet(rows)
     const book = xlsx.utils.book_new()
