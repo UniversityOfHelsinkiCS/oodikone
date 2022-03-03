@@ -6,7 +6,7 @@ import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import produce from 'immer'
 import ExportModal from './ExportModal'
-import { group, getDataItemType, DataItemType } from './common'
+import { group, getDataItemType, DataVisitor, DataItemType } from './common'
 
 const SortableTableContext = createContext(null)
 
@@ -507,6 +507,12 @@ const getInitialState = () => ({
 
 const tableStateReducer = produce((state, { type, payload }) => {
   ;({
+    RESET_FILTERS: () => {
+      state.columnOptions = getInitialState().columnOptions
+    },
+    SET_UNFOLDED_GROUPS: () => {
+      state.expandedGroups = payload.groups
+    },
     CYCLE_VALUE_FILTER: () => {
       if (!state.columnOptions[payload.column]) {
         state.columnOptions[payload.column] = getDefaultColumnOptions()
@@ -696,6 +702,17 @@ const extractColumnKeys = columns => {
     .value()
 }
 
+class GroupKeyVisitor extends DataVisitor {
+  constructor() {
+    super()
+    this.groups = []
+  }
+
+  visitGroup(ctx) {
+    this.groups.push(ctx.item.definition.key)
+  }
+}
+
 const SortableTable = ({
   columns: pColumns,
   title,
@@ -703,6 +720,8 @@ const SortableTable = ({
   style,
   actions,
   noHeader,
+  stretch,
+  collapsing,
   contextMenuItems: pContextMenuItems,
   singleLine = true,
   figure = true,
@@ -720,6 +739,22 @@ const SortableTable = ({
     },
     [dispatch]
   )
+
+  const handleUnfoldAllGroups = useCallback(() => {
+    const { groups } = GroupKeyVisitor.visit(data)
+
+    dispatch({
+      type: 'SET_UNFOLDED_GROUPS',
+      payload: { groups },
+    })
+  }, [data])
+
+  const handleFoldAllGroups = useCallback(() => {
+    dispatch({
+      type: 'SET_UNFOLDED_GROUPS',
+      payload: { groups: [] },
+    })
+  }, [data])
 
   const [columns, columnsByKey] = useMemo(() => {
     const columns = _.cloneDeep(pColumns)
@@ -752,7 +787,16 @@ const SortableTable = ({
 
   const tableStyles = {
     position: 'relative',
-    width: '100%',
+  }
+
+  if (stretch) {
+    tableStyles.width = '100%'
+  }
+
+  const figureStyles = { ...style }
+
+  if (collapsing) {
+    figureStyles.width = 'fit-content'
   }
 
   if (figure) {
@@ -808,6 +852,22 @@ const SortableTable = ({
       label: 'Export to CSV',
       onClick: () => setExportModalOpen(true),
     },
+    {
+      label: 'Reset filters',
+      onClick: () => dispatch({ type: 'RESET_FILTERS' }),
+    },
+    ...(groupDepth > 0
+      ? [
+          {
+            label: 'Unfold all groups',
+            onClick: handleUnfoldAllGroups,
+          },
+          {
+            label: 'Fold all groups',
+            onClick: handleFoldAllGroups,
+          },
+        ]
+      : []),
     ...(pContextMenuItems ?? []),
   ]
 
@@ -815,7 +875,7 @@ const SortableTable = ({
     <>
       <ExportModal open={exportModalOpen} onClose={() => setExportModalOpen(false)} data={data} columns={columns} />
       <SortableTableContext.Provider value={context}>
-        <FigureContainer style={style}>
+        <FigureContainer style={figureStyles}>
           <FigureContainer.Header actions={actions} contextItems={contextMenuItems}>
             <Icon style={{ color: '#c2c2c2', position: 'relative', top: '1px', marginRight: '0.5em' }} name="table" />{' '}
             {title}
