@@ -325,14 +325,17 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
       })
       .map(value => {
         let icon = 'square outline'
+        let color = 'inherit'
 
         const filter = valueFilters.find(f => f.value === value)
 
         if (filter) {
           if (filter.type === 'exclude') {
             icon = 'minus square outline'
+            color = 'red'
           } else if (filter.type === 'include') {
             icon = 'plus square outline'
+            color = 'green'
           }
         }
 
@@ -340,8 +343,8 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
 
         return (
           <Dropdown.Item
-            icon={icon}
-            text={`${text}`}
+            icon={<Icon name={icon} style={{ color }} />}
+            text={text ? `${text}` : <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>}
             onClick={evt => {
               dispatch({ type: 'CYCLE_VALUE_FILTER', payload: { column: filterColumnKey, value } })
               evt.preventDefault()
