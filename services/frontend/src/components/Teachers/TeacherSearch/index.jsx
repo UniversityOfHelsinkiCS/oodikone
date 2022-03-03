@@ -56,7 +56,7 @@ const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, find
     {
       key: 'icon',
       getRowContent: () => <Icon name={icon} />,
-      cellProps: { collapsing: true },
+      export: false,
       headerProps: { onClick: null, sorted: null },
     },
   ]

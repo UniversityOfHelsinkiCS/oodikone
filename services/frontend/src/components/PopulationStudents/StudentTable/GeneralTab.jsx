@@ -243,7 +243,7 @@ const GeneralTab = ({
                 <Icon name="level up alternate" />
               </Item>
             ),
-          cellProps: { collapsing: true, className: 'iconCellNoPointer' },
+          cellProps: { className: 'iconCellNoPointer' },
         },
       ],
     },
@@ -401,7 +401,7 @@ const GeneralTab = ({
           />
         ) : null,
       headerProps: { onClick: null, sorted: null },
-      cellProps: { collapsing: true, className: 'iconCellNoPointer' },
+      cellProps: { className: 'iconCellNoPointer' },
     },
     updatedAt: {
       key: 'updatedAt',

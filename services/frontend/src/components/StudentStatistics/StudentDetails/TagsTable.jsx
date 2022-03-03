@@ -28,13 +28,11 @@ const TagsTable = ({ student, language }) => {
             key: 'PROGRAMME',
             title: 'Programme',
             getRowVal: t => getTextIn(t.programme.name, language),
-            cellProps: { collapsing: true },
           },
           {
             key: 'CODE',
             title: 'Code',
             getRowVal: t => t.programme.code,
-            cellProps: { collapsing: true },
           },
           {
             key: 'TAGS',
