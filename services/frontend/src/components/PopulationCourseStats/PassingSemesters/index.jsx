@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from 'react'
 import _ from 'lodash'
-import { Button } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import { Item, Icon, Button } from 'semantic-ui-react'
 import SortableTable, { group } from 'components/SortableTable'
 import { getTextIn } from '../../../common'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
+import CourseFilterToggle from '../CourseFilterToggle'
 
 const semesterColumn = (year, semester, cumulative) => ({
   key: `semester-${year}-${semester}`,
@@ -32,15 +34,46 @@ const yearColumn = (year, cumulative) => ({
 })
 
 const PassingSemesters = () => {
-  const { modules } = UsePopulationCourseContext()
+  const { modules, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
 
   const columns = useMemo(
     () => [
       {
-        key: 'name',
-        title: 'Name',
-        getRowVal: (row, isGroup, parents) => getTextIn(isGroup ? parents[0].module.name : row.name),
+        key: 'course-name',
+        mergeHeader: true,
+        merge: true,
+        children: [
+          {
+            key: 'name',
+            title: 'Name',
+            getRowVal: (row, isGroup, parents) => getTextIn(isGroup ? parents[0].module.name : row.name),
+          },
+          {
+            key: 'filter-toggle',
+            export: false,
+            getRowContent: (row, isGroup) => {
+              if (isGroup) return null
+
+              return <CourseFilterToggle course={row} />
+            },
+          },
+          {
+            key: 'go-to-course',
+            export: false,
+            getRowContent: (row, isGroup) =>
+              !isGroup && (
+                <Item
+                  as={Link}
+                  to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                    row.code
+                  )}"]&separate=false&unifyOpenUniCourses=false`}
+                >
+                  <Icon name="level up alternate" onClick={() => onGoToCourseStatisticsClick(row.code)} />
+                </Item>
+              ),
+          },
+        ],
       },
       {
         key: 'code',
@@ -75,7 +108,7 @@ const PassingSemesters = () => {
         ],
       },
     ],
-    [cumulativeStats]
+    [cumulativeStats, onGoToCourseStatisticsClick]
   )
 
   const data = useMemo(

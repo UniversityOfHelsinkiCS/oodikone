@@ -229,11 +229,14 @@ const PopulationCourseStats = props => {
     })
   }
 
-  const onGoToCourseStatisticsClick = courseCode => {
-    const { clearCourseStats: clearCourseStatsfn } = props
-    sendAnalytics('Courses of Population course stats button clicked', courseCode)
-    clearCourseStatsfn()
-  }
+  const onGoToCourseStatisticsClick = useCallback(
+    courseCode => {
+      const { clearCourseStats: clearCourseStatsfn } = props
+      sendAnalytics('Courses of Population course stats button clicked', courseCode)
+      clearCourseStatsfn()
+    },
+    [sendAnalytics, props.clearCourseStats]
+  )
 
   const onFilterReset = field => {
     setFilterFields({ ...filterFields, [field]: '' })
