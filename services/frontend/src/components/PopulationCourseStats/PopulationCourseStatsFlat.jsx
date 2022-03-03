@@ -215,17 +215,17 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
     {
       menuItem: 'pass/fail',
       render: () => (
-        <div className="menuTab">
+        <Tab.Pane>
           <PassFail flat />
-        </div>
+        </Tab.Pane>
       ),
     },
     {
       menuItem: 'grades',
       render: () => (
-        <div className="menuTab">
+        <Tab.Pane>
           <GradeDistribution flat />
-        </div>
+        </Tab.Pane>
       ),
     },
   ]
