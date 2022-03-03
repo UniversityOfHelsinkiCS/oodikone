@@ -214,12 +214,12 @@ const GeneralTab = ({
     firstname: { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames },
     'studentnumber-parent': {
       key: 'studentnumber-parent',
-      title: 'Student Number',
       mergeHeader: true,
       merge: true,
       children: [
         {
           key: 'studentnumber',
+          title: 'Student Number',
           getRowVal: s => (!s.obfuscated ? s.studentNumber : 'hidden'),
           getRowContent: s => (
             <span style={s.obfuscated ? { fontStyle: 'italic', color: 'graytext' } : {}}>
@@ -230,6 +230,7 @@ const GeneralTab = ({
         },
         {
           key: 'icon',
+          export: false,
           getRowVal: s =>
             !s.obfuscated && (
               <Item
@@ -310,19 +311,19 @@ const GeneralTab = ({
     studyStartDate: {
       key: 'studyStartDate',
       title: 'start of studyright',
-      getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]).getTime(),
+      getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]),
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
     },
     studyStartDateActual: {
       key: 'studyStartDateActual',
       title: 'started in studyright',
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
-      getRowVal: s => new Date(getActualStartDate(s.studentNumber)).getTime(),
+      getRowVal: s => new Date(getActualStartDate(s.studentNumber)),
     },
     endDate: {
       key: 'endDate',
       title: 'graduation date',
-      getRowVal: s => new Date(studentToStudyrightEndMap[s.studentNumber]).getTime(),
+      getRowVal: s => new Date(studentToStudyrightEndMap[s.studentNumber]),
       getRowContent: s =>
         studentToStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
@@ -405,7 +406,7 @@ const GeneralTab = ({
     updatedAt: {
       key: 'updatedAt',
       title: 'Last Updated At',
-      getRowVal: s => s.updatedAt,
+      getRowVal: s => new Date(s.updatedAt),
       formatValue: value => reformatDate(value, 'YYYY-MM-DD  HH:mm:ss'),
     },
   }

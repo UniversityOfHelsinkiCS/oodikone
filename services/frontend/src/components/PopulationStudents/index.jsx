@@ -159,7 +159,7 @@ const PopulationStudents = ({
           },
           {
             key: 'icon',
-            title: '',
+            export: false,
             getRowVal: s =>
               !s.total && (
                 <Item
