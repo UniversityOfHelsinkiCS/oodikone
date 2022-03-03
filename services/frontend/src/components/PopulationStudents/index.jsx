@@ -172,7 +172,7 @@ const PopulationStudents = ({
                   <Icon name="level up alternate" />
                 </Item>
               ),
-            cellProps: { collapsing: true, className: 'iconCell' },
+            cellProps: { className: 'iconCell' },
             child: true,
           },
         ],
