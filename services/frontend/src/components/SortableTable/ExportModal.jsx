@@ -8,19 +8,21 @@ import xlsx from 'xlsx'
 import { getDataItemType, getColumnValue, DataItemType, DataVisitor } from './common'
 
 const getExportColumns = columns => {
-  const stack = [...columns]
+  const stack = _.cloneDeep(columns)
 
   const exportColumns = []
 
   while (stack.length > 0) {
     const [column] = stack.splice(0, 1)
 
+    const parents = column.parents ?? []
+
     if (column.export === false) {
       continue
     }
 
     if (column.children && column.children.length > 0) {
-      stack.splice(0, 0, ...column.children)
+      stack.splice(0, 0, ...column.children.map(c => ({ ...c, parents: [...parents, column] })))
       continue
     }
 
@@ -47,6 +49,13 @@ const flattenData = data => {
   return flat
 }
 
+const getColumnTitle = column => {
+  return [...(column.parents ?? []), column]
+    .filter(c => c.title)
+    .map(c => c.title)
+    .join(' - ')
+}
+
 class ExportVisitor extends DataVisitor {
   constructor(columns) {
     super()
@@ -56,7 +65,7 @@ class ExportVisitor extends DataVisitor {
 
   visitRow(ctx) {
     const row = _.chain(this.columns)
-      .map(column => [column.title, getColumnValue(ctx, column)])
+      .map(column => [getColumnTitle(column), getColumnValue(ctx, column)])
       .fromPairs()
       .value()
 
@@ -147,7 +156,7 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
                 <Table.Cell collapsing verticalAlign="middle">
                   <Checkbox checked={_.includes(selected, column.key)} />
                 </Table.Cell>
-                <Table.Cell collapsing>{column.title}</Table.Cell>
+                <Table.Cell collapsing>{getColumnTitle(column)}</Table.Cell>
                 <Table.Cell style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
                   <div style={{ width: '0' }}>
                     {sampledValues[column.key].map(value => (
