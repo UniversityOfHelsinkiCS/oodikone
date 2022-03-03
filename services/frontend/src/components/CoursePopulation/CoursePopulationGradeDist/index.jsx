@@ -10,7 +10,7 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
   const [courseGrades, setCourseGrades] = useState([])
 
   useEffect(() => {
-    if (samples && singleCourseStats.unifyStats.alternatives) {
+    if (samples && singleCourseStats?.unifyStats?.alternatives) {
       const filteredGradeArray = []
       const grades = {}
 
