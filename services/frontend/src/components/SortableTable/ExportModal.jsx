@@ -86,10 +86,9 @@ class ValueSamplerVisitor extends DataVisitor {
 }
 
 const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
-  const [selected, setSelected] = useState(_.uniq(_.map(columns, 'key')))
-
   const exportColumns = useMemo(() => getExportColumns(columns), [columns])
   const flatData = useMemo(() => flattenData(data), [data])
+  const [selected, setSelected] = useState(_.uniq(_.map(exportColumns, 'key')))
 
   const sampledValues = useMemo(() => ValueSamplerVisitor.visit(data, exportColumns).sample(10), [exportColumns, data])
 
@@ -124,6 +123,18 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
           generated field from the list below.
         </p>
 
+        <div>
+          <Button
+            onClick={() => setSelected(exportColumns.map(c => c.key))}
+            disabled={selected.length === exportColumns.length}
+          >
+            Include all
+          </Button>
+          <Button onClick={() => setSelected([])} disabled={selected.length === 0}>
+            Exclude all
+          </Button>
+        </div>
+
         <Table celled striped>
           <Table.Header>
             <Table.HeaderCell />
@@ -132,9 +143,9 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
           </Table.Header>
           <Table.Body>
             {exportColumns.map(column => (
-              <Table.Row onClick={() => toggleSelection(column.title)} style={{ cursor: 'pointer' }}>
+              <Table.Row key={column.key} onClick={() => toggleSelection(column.key)} style={{ cursor: 'pointer' }}>
                 <Table.Cell collapsing verticalAlign="middle">
-                  <Checkbox checked={_.includes(selected, column.title)} />
+                  <Checkbox checked={_.includes(selected, column.key)} />
                 </Table.Cell>
                 <Table.Cell collapsing>{column.title}</Table.Cell>
                 <Table.Cell style={{ overflow: 'hidden', whiteSpace: 'nowrap' }}>
@@ -161,7 +172,8 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
         </Table>
       </Modal.Content>
       <Modal.Actions>
-        <Button content="Export" onClick={() => handleExport()} />
+        <Button content="Cancel" onClick={() => onClose()} />
+        <Button primary content="Export" onClick={() => handleExport()} />
       </Modal.Actions>
     </Modal>
   )
