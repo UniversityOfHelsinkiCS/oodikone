@@ -117,20 +117,35 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
       {bachelorProgrammes.length > 0 ? (
         <>
           <Header>Bachelor programmes</Header>
-          <SortableTable columns={headers} getRowKey={programme => programme.code} data={bachelorProgrammes} />
+          <SortableTable
+            figure={false}
+            columns={headers}
+            getRowKey={programme => programme.code}
+            data={bachelorProgrammes}
+          />
         </>
       ) : null}
       {masterProgrammes.length > 0 ? (
         <>
           <Header>Master programmes</Header>
-          <SortableTable columns={headers} getRowKey={programme => programme.code} data={masterProgrammes} />
+          <SortableTable
+            figure={false}
+            columns={headers}
+            getRowKey={programme => programme.code}
+            data={masterProgrammes}
+          />
         </>
       ) : null}
 
       {otherProgrammes.length > 0 ? (
         <>
           <Header>Doctoral programmes and old programmes</Header>
-          <SortableTable columns={headers} getRowKey={programme => programme.code} data={otherProgrammes} />
+          <SortableTable
+            figure={false}
+            columns={headers}
+            getRowKey={programme => programme.code}
+            data={otherProgrammes}
+          />
         </>
       ) : null}
     </>

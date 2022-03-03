@@ -139,11 +139,11 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                     year={year}
                     data={
                       showMeanTime
-                        ? graduations?.data?.graduationMeanTime[year]
-                        : graduations?.data?.graduationMedianTime[year]
+                        ? graduations?.data?.graduationMeanTime?.[year]
+                        : graduations?.data?.graduationMedianTime?.[year]
                     }
-                    graduationAmount={graduations?.data?.graduationAmounts[year]}
-                    totalAmount={graduations?.data?.totalAmounts[year]}
+                    graduationAmount={graduations?.data?.graduationAmounts?.[year]}
+                    totalAmount={graduations?.data?.totalAmounts?.[year]}
                     studyprogramme={studyprogramme}
                   />
                 ))}

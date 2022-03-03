@@ -38,7 +38,7 @@ const prettifyCamelCase = str => {
 }
 
 const cellWrapper = { display: 'flex', gap: '8px', width: '100%' }
-const cellContent = { flex: '0 1 50%' }
+const cellContent = { flexGrow: 1 }
 
 const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
   const [changeStudyGuidanceGroupTags, { isLoading }] = useChangeStudyGuidanceGroupTagsMutation()
@@ -99,7 +99,7 @@ const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
                 />
               )}
             </div>
-            <div style={cellContent}>
+            <div style={{ ...cellContent, flexGrow: 0 }}>
               <Button type="submit" style={{ margin: '0' }} disabled={isLoading}>
                 Add {prettifyCamelCase(tagName)}
               </Button>
@@ -134,7 +134,7 @@ const TagCell = ({ tagName, group, studyProgrammes }) => {
   return group.tags?.[tagName] && !showEdit ? (
     <div style={{ ...cellWrapper, alignItems: 'baseline' }}>
       <p style={{ ...cellContent, textAlign: 'center' }}>{getText()}</p>
-      <div style={cellContent}>
+      <div style={{ ...cellContent, flexGrow: 0 }}>
         <Button type="button" onClick={() => toggleEdit()}>
           Edit {prettifyCamelCase(tagName)}
         </Button>
@@ -152,7 +152,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
   const headers = [
     {
       key: 'name',
-      title: 'name',
+      title: 'Name',
       getRowVal: group => getTextIn(group.name, language),
       getRowContent: group => <LinkToGroup group={group} language={language} />,
       cellProps: {
@@ -164,7 +164,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
     },
     {
       key: 'students',
-      title: 'students',
+      title: 'Students',
       getRowVal: group => group.members?.length || 0,
       getRowContent: group => group.members?.length || 0,
       cellProps: {
@@ -176,14 +176,16 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
     },
     {
       key: 'studyProgramme',
-      title: 'Study programme',
+      title: 'Study Programme',
       getRowVal: group => group.tags?.studyProgramme,
+      formatValue: value => studyProgrammes.find(p => p.value === value)?.text,
       getRowContent: group => <TagCell tagName="studyProgramme" studyProgrammes={studyProgrammes} group={group} />,
     },
     {
       key: 'associatedyear',
-      title: 'Associated starting academic year',
+      title: 'Associated Starting Academic Year',
       getRowVal: group => group.tags?.year,
+      formatValue: startYearToAcademicYear,
       getRowContent: group => <TagCell tagName="year" group={group} />,
     },
   ]
@@ -200,7 +202,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
           lisäominaisuuksia.{' '}
         </p>
       </StyledMessage>
-      <SortableTable columns={headers} getRowKey={group => group.id} data={groups} />
+      <SortableTable figure={false} columns={headers} getRowKey={group => group.id} data={groups} />
     </>
   )
 }

@@ -15,6 +15,8 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
   return error ? null : (
     <div>
       <SortableTable
+        singleLine={false}
+        figure={false}
         getRowKey={user => user.id}
         tableProps={{ celled: true, structured: true }}
         columns={[
@@ -51,6 +53,19 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
             key: 'PROGRAMMES',
             title: 'Programmes',
             getRowVal: user => {
+              if (!user.elementdetails || user.elementdetails.length === 0) {
+                return []
+              }
+
+              const nameInLanguage = code => {
+                const elem = elementdetails.find(e => e.code === code)
+                if (!elem) return null
+                return getTextIn(elem.name, language)
+              }
+
+              return user.elementdetails.map(element => nameInLanguage(element))
+            },
+            getRowContent: user => {
               const nameInLanguage = code => {
                 const elem = elementdetails.find(e => e.code === code)
                 if (!elem) return null
@@ -70,6 +85,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
             key: 'OODIACCESS',
             title: 'Has access',
             getRowVal: user => user.is_enabled,
+            formatValue: value => (value ? 'Has access' : 'No access'),
             getRowContent: user => (
               <Icon
                 style={{ margin: 'auto' }}
@@ -92,6 +108,8 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
           {
             key: 'SHOWAS',
             title: 'Show as user',
+            filterable: false,
+            sortable: false,
             getRowVal: user => (
               <Button circular size="tiny" basic icon="spy" onClick={() => showAsUser(user.username)} />
             ),
@@ -100,6 +118,8 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
           {
             key: 'EDIT',
             title: '',
+            filterable: false,
+            sortable: false,
             getRowVal: user => (
               <Button.Group compact widths={2}>
                 <Button basic size="mini" as={Link} to={`users/${user.id}`}>
