@@ -16,7 +16,7 @@ describe('Teachers page tests', () => {
     cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
     cy.cs('course-providers').children('.icon').click()
     cy.get('.form > .fluid').click()
-    cy.contains('Name')
+    cy.contains('Teacher')
     cy.contains(teacher1)
     cy.contains(teacher2)
   })
@@ -32,7 +32,7 @@ describe('Teachers page tests', () => {
     cy.url().should('include', '/teachers')
     cy.get('.borderless > :nth-child(3)').click()
     cy.get('.prompt').type(teacher1.split()[0])
-    cy.contains(teacher1).click()
+    cy.contains('td', teacher1).click()
     cy.contains('Aineopintojen harjoitustyö: Tietokantasovellus')
   })
 

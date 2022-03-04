@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Search, Segment, Icon } from 'semantic-ui-react'
 import { func, arrayOf, object, string } from 'prop-types'
 import { withRouter } from 'react-router-dom'
@@ -51,15 +51,34 @@ const TeacherSearch = ({ icon, teachers, onClick, setTimeout, clearTimeout, find
     }
   }
 
-  const columns = [
-    { key: 'name', title: 'Name', getRowVal: s => s.name, headerProps: { onClick: null, sorted: null, colSpan: 2 } },
-    {
-      key: 'icon',
-      getRowContent: () => <Icon name={icon} />,
-      export: false,
-      headerProps: { onClick: null, sorted: null },
-    },
-  ]
+  const columns = useMemo(
+    () => [
+      {
+        key: 'name-parent',
+        mergeHeader: true,
+        merge: true,
+        children: [
+          {
+            key: 'name',
+            title: 'Name',
+            getRowVal: s => s.name,
+            cellProps: row => ({
+              onClick: () => onClick(row),
+            }),
+          },
+          {
+            key: 'icon',
+            getRowContent: () => <Icon name={icon} />,
+            export: false,
+            cellProps: row => ({
+              onClick: () => onClick(row),
+            }),
+          },
+        ],
+      },
+    ],
+    [onClick]
+  )
 
   return (
     <div>

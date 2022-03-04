@@ -1,10 +1,10 @@
 /// <reference types="Cypress" />
 
 const deleteTag = name => {
-  cy.contains(name).siblings().contains('Delete').click()
+  cy.contains('td', name).siblings().contains('Delete').click()
   cy.contains('Are you sure you want to delete tag')
   cy.contains('Confirm').click()
-  cy.contains(name).should('not.exist')
+  cy.contains('td', name).should('not.exist')
 }
 
 const getEmptyYears = isAcademicYear => {
@@ -30,7 +30,7 @@ describe('Studyprogramme overview', () => {
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
     it('Basic information -tab loads', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('[data-cy=Section-StudentsOfTheStudyprogramme]')
       cy.get('[data-cy=Section-CreditsProducedByTheStudyprogramme]')
       cy.get('[data-cy=Section-GraduatedAndThesisWritersOfTheProgramme]')
@@ -39,7 +39,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Basic information contains correct students', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       const years = getEmptyYears()
       const tableContents = [
         // [Year, Started, Graduated, Cancelled, Transferred Away, Transferred to]
@@ -55,7 +55,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Basic information contains correct credits', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       const years = getEmptyYears()
       const tableContents = [
         // [Year, Total, Major credits, Non-major credits, Transferred credits]
@@ -71,7 +71,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Basic information contains correct thesis writers and graduates', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       const years = getEmptyYears()
       const tableContents = [
         // [Year, Graduated, Wrote thesis]
@@ -87,7 +87,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it.skip('Special studyrights can be excluded and basic data changes accordingly', () => {
-      cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen maisteriohjelma').click()
       cy.get('[data-cy=StudentToggle]').click()
       const years = getEmptyYears()
       const studentTableContents = [
@@ -129,7 +129,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Year can be changed to academic year, and data changes accordingly', () => {
-      cy.contains('Tietojenkäsittelytieteen maisteriohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen maisteriohjelma').click()
       cy.get('[data-cy=YearToggle]').click()
       const isAcademicYear = true
       const years = getEmptyYears(isAcademicYear)
@@ -160,7 +160,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Basic information graphs render', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
 
       cy.get('[data-cy=Graph-StudentsOfTheStudyprogramme')
         .should('contain', 'Started')
@@ -207,7 +207,7 @@ describe('Studyprogramme overview', () => {
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
     it('Studytracks and student populations -tab loads', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and student populations').click()
       cy.get('[data-cy=Section-StudytrackOverview]')
       cy.get('[data-cy=Section-StudytrackProgress]')
@@ -215,7 +215,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Students of the studyprogramme are shown correctly', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and student populations').click()
       const tableContents = [
         // [Year, All, Started studying, Currently enrolled, Absent, Cancelled, Graduated, Men, Women, Finnish]
@@ -309,7 +309,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Student progress data is shown correctly', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and student populations').click()
       const tableContents = [
         ['2020 - 2021', 12, 5, 2, 2, 0, 2, 1],
@@ -322,7 +322,7 @@ describe('Studyprogramme overview', () => {
     })
 
     it('Studytrack overview graphs render', () => {
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and student populations').click()
 
       cy.get('[data-cy=Graph-StudytrackProgress]')
@@ -348,7 +348,7 @@ describe('Studyprogramme overview', () => {
 
     it('can create and delete tags for population', () => {
       const name = `tag-${new Date().getTime()}`
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Tags').click()
       cy.get('.tagNameSelectInput > .ui > input').type(name)
       cy.get('.yearSelectInput').type('2018')
@@ -360,7 +360,7 @@ describe('Studyprogramme overview', () => {
 
     it('can create personal tags', () => {
       const name = `tag-${new Date().getTime()}`
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Tags').click()
       cy.get('.tagNameSelectInput > .ui > input').type(name)
       cy.get('.yearSelectInput').type('2018')
@@ -376,7 +376,7 @@ describe('Studyprogramme overview', () => {
 
       const student = '010113437'
 
-      cy.contains('Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Tags').click()
       cy.get('.tagNameSelectInput > .ui > input').type(name)
       cy.get('.yearSelectInput').type('2018')
@@ -384,7 +384,7 @@ describe('Studyprogramme overview', () => {
       cy.contains(name)
 
       cy.contains('Add tags to students').click()
-      cy.get('.form > .field > .dropdown').click().get('.ui > .search').type(name).click()
+      cy.get('.form > .field > .dropdown').click().get('.ui > input.search').type(name).click()
 
       cy.get('.form > .field > .dropdown > .visible').contains(name).click()
 
@@ -393,7 +393,7 @@ describe('Studyprogramme overview', () => {
 
       cy.contains('Student statistics').click()
       cy.get('.prompt').type(student)
-      cy.contains(student).click()
+      cy.contains('a', student).click()
       cy.contains(name)
 
       cy.go('back')
@@ -403,7 +403,7 @@ describe('Studyprogramme overview', () => {
 
       cy.contains('Student statistics').click()
       cy.get('.prompt').type(student)
-      cy.contains(student).click()
+      cy.contains('a', student).click()
       cy.contains(name).should('not.exist')
     })
   })

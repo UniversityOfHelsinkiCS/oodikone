@@ -37,7 +37,7 @@ describe('Student Statistics tests', () => {
   it('Can get student specific page by clicking student', () => {
     cy.url().should('include', '/students')
     cy.get('.prompt').type(student.studentnumber)
-    cy.contains(student.studentnumber).click()
+    cy.contains('td a', student.studentnumber).click()
     cy.contains('Started: 01.08.2017')
     cy.contains('Tietojenkäsittelytieteen kandiohjelma (01.08.2017 - 01.08.2025')
     cy.contains(student.lastname).should('not.exist')
@@ -54,7 +54,7 @@ describe('Student Statistics tests', () => {
 
   it('Can get back to search menu', () => {
     cy.get('.prompt').type(student.studentnumber)
-    cy.contains(student.studentnumber).click()
+    cy.contains('td a', student.studentnumber).click()
     cy.get('.remove').click()
     cy.contains('Student number').should('not.exist')
     cy.contains('Credits').should('not.exist')
@@ -62,7 +62,7 @@ describe('Student Statistics tests', () => {
 
   it('Can jump to course', () => {
     cy.get('.prompt').type(student.studentnumber)
-    cy.contains(student.studentnumber).click()
+    cy.contains('td a', student.studentnumber).click()
     cy.contains('Introduction to Machine Learning (DATA11002)')
       .siblings()
       .within(() => {
@@ -82,7 +82,7 @@ describe('Student Statistics tests', () => {
 
   it('Can jump to population page', () => {
     cy.get('.prompt').type(student.studentnumber)
-    cy.contains(student.studentnumber).click()
+    cy.contains('td a', student.studentnumber).click()
     cy.get('i.level.up.alternate.icon').eq(0).click()
     cy.contains('Population statistics')
     cy.contains('Tietojenkäsittelytieteen kandiohjelma')
