@@ -340,7 +340,7 @@ describe('Course Statistics tests', () => {
     })
   })
 
-  it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
+  it.only('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
     cy.get('[data-cy=navbar-courseStatistics]').click()
     cy.get('[data-cy=course-code-input]').type('TKT20003')

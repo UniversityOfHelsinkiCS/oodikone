@@ -500,72 +500,75 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
   return rows.map(cells => <tr>{cells}</tr>)
 }
 
-const getInitialState = () => ({
-  columnOptions: {},
+const getInitialState = defaultSort => () => ({
+  columnOptions: defaultSort ? { [defaultSort[0]]: { valueFilters: [], sort: defaultSort[1] } } : {},
   expandedGroups: [],
 })
 
-const tableStateReducer = produce((state, { type, payload }) => {
-  ;({
-    RESET_FILTERS: () => {
-      state.columnOptions = getInitialState().columnOptions
-    },
-    SET_UNFOLDED_GROUPS: () => {
-      state.expandedGroups = payload.groups
-    },
-    CYCLE_VALUE_FILTER: () => {
-      if (!state.columnOptions[payload.column]) {
-        state.columnOptions[payload.column] = getDefaultColumnOptions()
-      }
-
-      const existingIndex = state.columnOptions[payload.column].valueFilters.findIndex(vf => vf.value === payload.value)
-      const existing = state.columnOptions[payload.column].valueFilters[existingIndex]
-
-      if (existing) {
-        if (existing.type === 'include') {
-          existing.type = 'exclude'
-        } else {
-          state.columnOptions[payload.column].valueFilters.splice(existingIndex, 1)
+const tableStateReducer = (...args) =>
+  produce((state, { type, payload }) => {
+    ;({
+      RESET_FILTERS: () => {
+        state.columnOptions = getInitialState(...args).columnOptions
+      },
+      SET_UNFOLDED_GROUPS: () => {
+        state.expandedGroups = payload.groups
+      },
+      CYCLE_VALUE_FILTER: () => {
+        if (!state.columnOptions[payload.column]) {
+          state.columnOptions[payload.column] = getDefaultColumnOptions()
         }
-      } else {
-        state.columnOptions[payload.column].valueFilters.push({ value: payload.value, type: 'include' })
-      }
-    },
-    TOGGLE_COLUMN_SORT: () => {
-      if (!state.columnOptions[payload.column]) {
-        state.columnOptions[payload.column] = getDefaultColumnOptions()
-      }
 
-      if (payload.direction) {
-        if (state.columnOptions[payload.column].sort === payload.direction) {
-          state.columnOptions[payload.column].sort = undefined
+        const existingIndex = state.columnOptions[payload.column].valueFilters.findIndex(
+          vf => vf.value === payload.value
+        )
+        const existing = state.columnOptions[payload.column].valueFilters[existingIndex]
+
+        if (existing) {
+          if (existing.type === 'include') {
+            existing.type = 'exclude'
+          } else {
+            state.columnOptions[payload.column].valueFilters.splice(existingIndex, 1)
+          }
         } else {
-          state.columnOptions[payload.column].sort = payload.direction
+          state.columnOptions[payload.column].valueFilters.push({ value: payload.value, type: 'include' })
         }
-      } else {
-        const cycle = [undefined, 'desc', 'asc']
-        const index = cycle.indexOf(state.columnOptions[payload.column].sort)
-        const value = cycle[(index + 1) % (cycle.length + 1)]
-        state.columnOptions[payload.column].sort = value
-      }
+      },
+      TOGGLE_COLUMN_SORT: () => {
+        if (!state.columnOptions[payload.column]) {
+          state.columnOptions[payload.column] = getDefaultColumnOptions()
+        }
 
-      Object.entries(state.columnOptions)
-        .filter(([key]) => key !== payload.column)
-        .forEach(([, value]) => (value.sort = undefined))
-    },
-    TOGGLE_GROUP: () => {
-      const { group } = payload
+        if (payload.direction) {
+          if (state.columnOptions[payload.column].sort === payload.direction) {
+            state.columnOptions[payload.column].sort = undefined
+          } else {
+            state.columnOptions[payload.column].sort = payload.direction
+          }
+        } else {
+          const cycle = [undefined, 'desc', 'asc']
+          const index = cycle.indexOf(state.columnOptions[payload.column].sort)
+          const value = cycle[(index + 1) % (cycle.length + 1)]
+          state.columnOptions[payload.column].sort = value
+        }
 
-      const index = state.expandedGroups.indexOf(group)
+        Object.entries(state.columnOptions)
+          .filter(([key]) => key !== payload.column)
+          .forEach(([, value]) => (value.sort = undefined))
+      },
+      TOGGLE_GROUP: () => {
+        const { group } = payload
 
-      if (index > -1) {
-        state.expandedGroups.splice(index, 1)
-      } else {
-        state.expandedGroups.push(group)
-      }
-    },
-  }[type]())
-})
+        const index = state.expandedGroups.indexOf(group)
+
+        if (index > -1) {
+          state.expandedGroups.splice(index, 1)
+        } else {
+          state.expandedGroups.push(group)
+        }
+      },
+    }[type]())
+  })
 
 const getColumnValues = (data, columns) => {
   return _.chain(columns)
@@ -717,6 +720,7 @@ const SortableTable = ({
   columns: pColumns,
   title,
   data,
+  defaultSort,
   style,
   actions,
   noHeader,
@@ -727,7 +731,7 @@ const SortableTable = ({
   figure = true,
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
-  const [state, dispatch] = useReducer(tableStateReducer, null, getInitialState)
+  const [state, dispatch] = useReducer(tableStateReducer(defaultSort), null, getInitialState(defaultSort))
   const groupDepth = useMemo(() => calculateGroupDepth(data), [data])
 
   const toggleGroup = useCallback(

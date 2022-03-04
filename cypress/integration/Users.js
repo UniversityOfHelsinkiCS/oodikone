@@ -39,9 +39,7 @@ describe('Users tests', () => {
 
     it("mocking normal user shows only the mocked user's programmes", () => {
       cy.contains('mocking').should('not.exist')
-      cy.contains('tr', 'basic').within(() => {
-        cy.contains('.button', 'Edit').click()
-      })
+      cy.cs('user-edit-button-basic').click()
       cy.get('i.spy').click()
       cy.contains('mocking as basic')
       cy.wait(1000)

@@ -143,9 +143,8 @@ const AttemptsTable = ({
         </Header>
       )}
       <SortableTable
-        defaultdescending
-        getRowKey={s => s.code}
-        tableProps={{ celled: true, style: { width: 'auto' } }}
+        title={`Yearly attempt statistics for group ${name}`}
+        defaultSort={['TIME', 'desc']}
         columns={columns}
         data={data}
       />

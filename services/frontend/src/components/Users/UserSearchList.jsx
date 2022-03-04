@@ -15,6 +15,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
   return error ? null : (
     <div>
       <SortableTable
+        stretch
         singleLine={false}
         figure={false}
         getRowKey={user => user.id}
@@ -122,7 +123,13 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
             sortable: false,
             getRowVal: user => (
               <Button.Group compact widths={2}>
-                <Button basic size="mini" as={Link} to={`users/${user.id}`}>
+                <Button
+                  basic
+                  size="mini"
+                  as={Link}
+                  to={`users/${user.id}`}
+                  data-cy={`user-edit-button-${user.username}`}
+                >
                   Edit
                 </Button>
               </Button.Group>
