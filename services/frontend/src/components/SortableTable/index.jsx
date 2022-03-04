@@ -509,7 +509,7 @@ const tableStateReducer = (...args) =>
   produce((state, { type, payload }) => {
     ;({
       RESET_FILTERS: () => {
-        state.columnOptions = getInitialState(...args).columnOptions
+        state.columnOptions = getInitialState(...args)().columnOptions
       },
       SET_UNFOLDED_GROUPS: () => {
         state.expandedGroups = payload.groups
