@@ -672,6 +672,7 @@ const insertGroupColumns = (columns, groupDepth, toggleGroup, expandedGroups) =>
       key: `__group_${i}`,
       export: false,
       cellProps: (__, _isGroup, [group]) => ({
+        'data-cy': `toggle-group-${group.key}`,
         onClick: () => toggleGroup(group.key),
         style: { cursor: 'pointer' },
       }),
