@@ -187,7 +187,7 @@ const PassFail = ({ flat }) => {
 
   const data = useMemo(() => {
     if (flat) {
-      return courseStatistics
+      return courseStatistics.map(course => ({ ...course, code: course.course.code, name: course.course.name }))
     }
 
     return _.chain(modules)
