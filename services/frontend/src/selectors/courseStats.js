@@ -26,6 +26,20 @@ const getCourseAlternatives = createSelector(
     return courseStats[singleCourseStats.selectedCourse][openOrReqular].alternatives
   }
 )
+const getAvailableStats = createSelector([courseStatsSelector], courseStats => {
+  const availableStats = {}
+
+  Object.entries(courseStats).forEach(entry => {
+    const [coursecode] = entry
+
+    availableStats[coursecode] = {
+      unify: entry[1].unifyStats.statistics.length > 0,
+      open: entry[1].openStats.statistics.length > 0,
+      university: entry[1].reqularStats.statistics.length > 0,
+    }
+  })
+  return availableStats
+})
 
 const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
 
@@ -194,6 +208,7 @@ const getCourses = createSelector(getCourseStats, stats =>
 )
 
 export default {
+  getAvailableStats,
   getCourseStats,
   getCourses,
   getCourseAlternatives,

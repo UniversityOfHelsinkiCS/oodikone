@@ -34,6 +34,7 @@ const countFilteredStudents = (stat, filter) =>
 
 const SingleCourseStats = ({
   stats,
+  availableStats,
   setSelectedCourse,
   clearSelectedCourse,
   history,
@@ -247,7 +248,6 @@ const SingleCourseStats = ({
 
   const filteredProgrammeStatistics = () => {
     const filter = p => validProgCode(p)
-
     const excludedProgrammes = getExcluded()
 
     const primaryProgrammes = primary
@@ -324,6 +324,8 @@ const SingleCourseStats = ({
       return { ...e, students: [...students], size: students.size }
     })
     .filter(e => e.size > 0)
+  // console.log('stats.statistics: ', stats.statistics)
+
   if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
   const options = filteredProgrammes
@@ -389,7 +391,12 @@ const SingleCourseStats = ({
           </Form>
         </Segment>
       )}
-      <ResultTabs separate={separate} primary={statistics.primary} comparison={statistics.comparison} />
+      <ResultTabs
+        separate={separate}
+        primary={statistics.primary}
+        comparison={statistics.comparison}
+        availableStats={availableStats}
+      />
     </div>
   )
 }

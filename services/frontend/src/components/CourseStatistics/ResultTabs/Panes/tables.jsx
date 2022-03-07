@@ -1,21 +1,15 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { Menu, Radio, Form } from 'semantic-ui-react'
+import { useSelector } from 'react-redux'
+import { Menu, Radio } from 'semantic-ui-react'
 import { viewModeNames } from './util'
 import HelpButton from '../HelpButton'
 import StudentTable from './Tables/student'
 import AttemptsTable from './Tables/attempts'
-import { toggleOpenAndReqularCourses } from '../../../../redux/coursesearch'
 import selectors from '../../../../selectors/courseStats'
+import UnifyRadioButtons from '../UnifyRadioButtons'
 
-export const TablesSettings = ({ value, onChange }) => {
+export const TablesSettings = ({ value, onChange, availableStats }) => {
   const { viewMode, showDetails, showGrades } = value
-  const dispatch = useDispatch()
-
-  const openOrReqular = useSelector(state => state.courseSearch.openOrReqular)
-  const toggleUnifyRadioValue = (event, { value }) => {
-    dispatch(toggleOpenAndReqularCourses(value))
-  }
 
   return (
     <div>
@@ -58,45 +52,7 @@ export const TablesSettings = ({ value, onChange }) => {
           <HelpButton tab="Tables" viewMode={viewMode} />
         </Menu.Item>
       </Menu>
-      <Menu secondary style={{ marginLeft: '0.5rem' }}>
-        <Form>
-          <Form.Group>
-            <Form.Field>
-              <b>Provider organization:</b>
-            </Form.Field>
-            <Form.Field>
-              <Radio
-                label="university"
-                name="radioGroup"
-                value="reqularStats"
-                checked={openOrReqular === 'reqularStats'}
-                onChange={toggleUnifyRadioValue}
-                data-cy="unify_radio_reqular"
-              />
-            </Form.Field>
-            <Form.Field>
-              <Radio
-                label="open university"
-                name="radioGroup"
-                value="openStats"
-                checked={openOrReqular === 'openStats'}
-                onChange={toggleUnifyRadioValue}
-                data-cy="unify_radio_open"
-              />
-            </Form.Field>
-            <Form.Field>
-              <Radio
-                label="unify"
-                name="radioGroup"
-                value="unifyStats"
-                checked={openOrReqular === 'unifyStats'}
-                onChange={toggleUnifyRadioValue}
-                data-cy="unify_radio_unify"
-              />
-            </Form.Field>
-          </Form.Group>
-        </Form>
-      </Menu>
+      <UnifyRadioButtons availableStats={availableStats} />
     </div>
   )
 }
