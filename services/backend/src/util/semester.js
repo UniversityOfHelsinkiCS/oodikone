@@ -29,10 +29,11 @@ const getPassingSemester = (startYear, date) => {
   return yearCount < 6 ? `${yearCount}-${semester}` : 'LATER'
 }
 
-const getAcademicYearDates = year => {
+const getAcademicYearDates = (year, yearsCombined) => {
+  const correctEndYear = yearsCombined ? new Date().getFullYear() : year
   return {
     startDate: `${year}-${semesterStart['FALL']}`,
-    endDate: '2022-07-31', //`${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`,
+    endDate: `${moment(correctEndYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`,
   }
 }
 
