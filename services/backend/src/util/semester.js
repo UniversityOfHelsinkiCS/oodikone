@@ -30,9 +30,10 @@ const getPassingSemester = (startYear, date) => {
 }
 
 const getAcademicYearDates = (year, yearsCombined) => {
-  const correctEndYear = yearsCombined ? new Date().getFullYear() : year
+  const startYear = typeof year === 'number' ? year : Number(year.slice(0, 4))
+  const correctEndYear = yearsCombined ? new Date().getFullYear() : startYear
   return {
-    startDate: `${year}-${semesterStart['FALL']}`,
+    startDate: `${startYear}-${semesterStart['FALL']}`,
     endDate: `${moment(correctEndYear, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd['SPRING']}`,
   }
 }

@@ -9,7 +9,6 @@ const {
   getYearsArray,
   getPercentage,
   getYearsObject,
-  getAcademicYearsObject,
   getCorrectStudentnumbers,
   getCreditThresholds,
   getCreditGraphStats,
@@ -89,6 +88,7 @@ const getStudytrackDataForTheYear = async ({
   creditThresholdAmounts,
 }) => {
   const { specialGroups: includeAllSpecials, graduated: includeGraduated, yearsCombined } = settings
+  const { startDate, endDate } = getAcademicYearDates(year, yearsCombined)
   const {
     mainStatsByYear,
     mainStatsByTrack,
@@ -100,7 +100,6 @@ const getStudytrackDataForTheYear = async ({
     totalAmounts,
     emptyTracks,
   } = data
-  const { startDate, endDate } = getAcademicYearDates(year, yearsCombined)
 
   await Promise.all(
     studytracks.map(async track => {
@@ -137,14 +136,14 @@ const getStudytrackDataForTheYear = async ({
       // Count stats for the credit progress table for the year per track
       creditTableStats[track] = [
         ...creditTableStats[track],
-        [`${year} - ${year + 1}`, all.length, ...creditThresholdKeys.map(threshold => studentData[threshold])],
+        [year, all.length, ...creditThresholdKeys.map(threshold => studentData[threshold])],
       ]
 
       // Count stats for the main studytrack table grouped by tracks
       mainStatsByTrack[track] = [
         ...mainStatsByTrack[track],
         [
-          `${year} - ${year + 1}`,
+          year,
           all.length,
           getPercentage(all.length, all.length),
           started.length,
@@ -170,9 +169,7 @@ const getStudytrackDataForTheYear = async ({
       mainStatsByYear[year] = [
         ...mainStatsByYear[year],
         [
-          studytrackNames[track]?.name['fi']
-            ? `${studytrackNames[track]?.name['fi']}, ${track}`
-            : `${year} - ${year + 1}`,
+          studytrackNames[track]?.name['fi'] ? `${studytrackNames[track]?.name['fi']}, ${track}` : year,
           all.length,
           getPercentage(all.length, all.length),
           started.length,
@@ -195,9 +192,9 @@ const getStudytrackDataForTheYear = async ({
       ]
 
       // Count stats for the graduation time charts grouped by year
-      totalAmounts[track][`${year} - ${year + 1}`] = await all.length
+      totalAmounts[track][year] = await all.length
       await getGraduationTimeStats({
-        year: `${year} - ${year + 1}`,
+        year,
         graduated,
         studyprogramme,
         track,
@@ -224,7 +221,7 @@ const getStudytrackOptions = (studyprogramme, studytrackNames, studytracks, empt
 
 // Creates empty objects for each statistic type, which are then updated with the studytrack data
 const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
-  const mainStatsByYear = getYearsObject(years, true)
+  const mainStatsByYear = getYearsObject({ years, emptyArrays: true })
   const mainStatsByTrack = {}
   const creditGraphStats = {}
   const creditTableStats = {}
@@ -238,10 +235,10 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
     mainStatsByTrack[track] = []
     creditGraphStats[track] = getCreditGraphStats(studyprogramme, years)
     creditTableStats[track] = []
-    graduationMedianTime[track] = getAcademicYearsObject(years, true)
-    graduationMeanTime[track] = getAcademicYearsObject(years, true)
-    graduationAmounts[track] = getAcademicYearsObject(years)
-    totalAmounts[track] = getAcademicYearsObject(years)
+    graduationMedianTime[track] = getYearsObject({ years, emptyArrays: true })
+    graduationMeanTime[track] = getYearsObject({ years, emptyArrays: true })
+    graduationAmounts[track] = getYearsObject({ years })
+    totalAmounts[track] = getYearsObject({ years })
   })
 
   return {
@@ -261,7 +258,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
 const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings }) => {
   const isAcademicYear = true
   const since = getStartDate(studyprogramme, isAcademicYear)
-  const years = getYearsArray(since.getFullYear(), false, settings.yearsCombined)
+  const years = getYearsArray(since.getFullYear(), isAcademicYear, settings.yearsCombined)
 
   const associations = await getAssociations()
   const studytracks = associations.programmes[studyprogramme]
@@ -293,7 +290,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
 
   return {
     id: studyprogramme,
-    years: getYearsArray(since.getFullYear(), isAcademicYear),
+    years: getYearsArray(since.getFullYear(), isAcademicYear, settings.yearsCombined),
     mainStatsByTrack: data.mainStatsByTrack,
     mainStatsByYear: data.mainStatsByYear,
     creditTableStats: data.creditTableStats,
