@@ -105,9 +105,8 @@ const getTransferredToStats = async ({ studyprogramme, since, years, isAcademicY
   return { graphStats, tableStats }
 }
 
-const getBasicStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
-  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
-  const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
+const getBasicStatsForStudytrack = async ({ studyprogramme, settings }) => {
+  const { includeAllSpecials, isAcademicYear } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
@@ -119,7 +118,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, yearType, specialGro
   const transferredTo = await getTransferredToStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
-  const titles = tableTitles['basics'][specialGroups]
+  const titles = tableTitles['basics'][includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED']
   const tableStats = reversedYears.map(year =>
     includeAllSpecials
       ? [

@@ -218,9 +218,8 @@ const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAc
   return graphAndTableStats
 }
 
-const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
-  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
-  const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
+const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => {
+  const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
