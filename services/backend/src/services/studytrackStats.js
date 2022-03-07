@@ -79,9 +79,7 @@ const getGraduationTimeStats = async ({
 // Goes through the programme and all its studytracks for the said year and adds the wanted stats to the data objects
 const getStudytrackDataForTheYear = async ({
   studyprogramme,
-  special,
-  includeGraduated,
-  // yearsCombined,
+  settings,
   studytracks,
   studytrackNames,
   year,
@@ -90,6 +88,7 @@ const getStudytrackDataForTheYear = async ({
   creditThresholdKeys,
   creditThresholdAmounts,
 }) => {
+  const { specialGroups: includeAllSpecials, graduated: includeGraduated, yearsCombined } = settings
   const {
     mainStatsByYear,
     mainStatsByTrack,
@@ -101,7 +100,7 @@ const getStudytrackDataForTheYear = async ({
     totalAmounts,
     emptyTracks,
   } = data
-  const { startDate, endDate } = getAcademicYearDates(year)
+  const { startDate, endDate } = getAcademicYearDates(year, yearsCombined)
 
   await Promise.all(
     studytracks.map(async track => {
@@ -111,7 +110,7 @@ const getStudytrackDataForTheYear = async ({
         codes,
         startDate,
         endDate,
-        includeAllSpecials: special,
+        includeAllSpecials,
         includeGraduated,
       })
 
@@ -259,13 +258,10 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
 }
 
 // Combines all the data for the Populations and Studytracks -view
-const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, specialGroups, yearsCombined }) => {
+const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings }) => {
   const isAcademicYear = true
-  const special = specialGroups === 'SPECIAL_INCLUDED'
-  const includeGraduated = graduated === 'GRADUATED_INCLUDED'
-  const combined = yearsCombined === 'YEARS_COMBINED'
   const since = getStartDate(studyprogramme, isAcademicYear)
-  const years = getYearsArray(since.getFullYear(), false, combined)
+  const years = getYearsArray(since.getFullYear(), false, settings.yearsCombined)
 
   const associations = await getAssociations()
   const studytracks = associations.programmes[studyprogramme]
@@ -281,9 +277,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
     years.map(async year => {
       return await getStudytrackDataForTheYear({
         studyprogramme,
-        special,
-        includeGraduated,
-        yearsCombined: combined,
+        settings,
         studytracks,
         studytrackNames,
         year,
@@ -309,7 +303,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
     graduationAmounts: data.graduationAmounts,
     totalAmounts: data.totalAmounts,
     studytrackOptions,
-    includeGraduated,
+    includeGraduated: settings.graduated,
     populationTitles: tableTitles['studytracks'],
     creditTableTitles: tableTitles['creditProgress'][studyprogramme.includes('KH') ? 'bachelor' : 'master'],
   }

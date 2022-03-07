@@ -3,10 +3,10 @@ const moment = require('moment')
 
 const createRedisKeyForBasicStats = (id, yearType, specialGroups) => `BASIC_STATS_${id}_${yearType}_${specialGroups}`
 const createRedisKeyForCreditStats = (id, yearType, specialGroups) => `CREDIT_STATS_${id}_${yearType}_${specialGroups}`
-const createRedisKeyForGraduationStats = (id, yearType, specialGroups, yearsCombined) =>
-  `GRADUATION_STATS_${id}_${yearType}_${specialGroups}_${yearsCombined}`
-const createRedisKeyForStudytrackStats = (id, graduated, specialGroups, yearsCombined) =>
-  `STUDYTRACK_STATS_${id}_${graduated}_${specialGroups}_${yearsCombined}`
+const createRedisKeyForGraduationStats = (id, yearType, specialGroups) =>
+  `GRADUATION_STATS_${id}_${yearType}_${specialGroups}`
+const createRedisKeyForStudytrackStats = (id, settings) =>
+  `STUDYTRACK_STATS_${id}_${settings.graduated}_${settings.specialGroups}_${settings.yearsCombined}`
 
 const getBasicStats = async (id, yearType, specialGroups) => {
   const redisKey = createRedisKeyForBasicStats(id, yearType, specialGroups)
@@ -68,16 +68,16 @@ const setGraduationStats = async (data, yearType, specialGroups) => {
   return dataToRedis
 }
 
-const getStudytrackStats = async (id, graduated, specialGroups, yearsCombined) => {
-  const redisKey = createRedisKeyForStudytrackStats(id, graduated, specialGroups, yearsCombined)
+const getStudytrackStats = async (id, settings) => {
+  const redisKey = createRedisKeyForStudytrackStats(id, settings)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setStudytrackStats = async (data, graduated, specialGroups, yearsCombined) => {
+const setStudytrackStats = async (data, settings) => {
   const { id } = data
-  const redisKey = createRedisKeyForStudytrackStats(id, graduated, specialGroups, yearsCombined)
+  const redisKey = createRedisKeyForStudytrackStats(id, settings)
   const dataToRedis = {
     ...data,
     status: 'DONE',

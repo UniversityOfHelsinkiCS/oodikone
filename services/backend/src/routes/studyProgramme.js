@@ -108,26 +108,23 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   const code = req.params.id
-  const graduated = req.query?.graduated
-  const specialGroups = req.query?.special_groups
-  const yearsCombined = req.query?.years_combined
+  const settings = {
+    graduated: req.query?.graduated === 'GRADUATED_INCLUDED',
+    specialGroups: req.query?.special_groups === 'SPECIAL_INCLUDED',
+    yearsCombined: req.query?.years_combined === 'YEARS_COMBINED',
+  }
 
   if (code) {
     let data = null
     try {
-      data = await getStudytrackStats(code, graduated, specialGroups, yearsCombined)
+      data = await getStudytrackStats(code, settings)
     } catch (e) {
       logger.error(`Failed to get code ${code} studytrack stats: ${e}`)
     }
     if (!data) {
       try {
-        const result = await getStudytrackStatsForStudyprogramme({
-          studyprogramme: code,
-          specialGroups,
-          graduated,
-          yearsCombined,
-        })
-        data = await setStudytrackStats(result, graduated, specialGroups, yearsCombined)
+        const result = await getStudytrackStatsForStudyprogramme({ studyprogramme: code, settings })
+        data = await setStudytrackStats(result, settings)
       } catch (e) {
         logger.error(`Failed to update code ${code} studytrack stats: ${e}`)
       }
