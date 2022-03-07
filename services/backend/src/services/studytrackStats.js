@@ -263,8 +263,9 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
   const isAcademicYear = true
   const special = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
+  const combined = yearsCombined === 'YEARS_COMBINED'
   const since = getStartDate(studyprogramme, isAcademicYear)
-  const years = getYearsArray(since.getFullYear(), false, yearsCombined)
+  const years = getYearsArray(since.getFullYear(), false, combined)
 
   const associations = await getAssociations()
   const studytracks = associations.programmes[studyprogramme]
@@ -282,7 +283,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
         studyprogramme,
         special,
         includeGraduated,
-        yearsCombined,
+        yearsCombined: combined,
         studytracks,
         studytrackNames,
         year,
