@@ -32,8 +32,10 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
       try {
         const result = await getBasicStatsForStudytrack({
           studyprogramme: req.params.id,
-          yearType,
-          specialGroups,
+          settings: {
+            isAcademicYear: yearType === 'ACADEMIC_YEAR',
+            includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
+          },
         })
         data = await setBasicStats(result, yearType, specialGroups)
       } catch (e) {
@@ -62,8 +64,10 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
       try {
         const result = await getCreditStatsForStudytrack({
           studyprogramme: req.params.id,
-          yearType,
-          specialGroups,
+          settings: {
+            isAcademicYear: yearType === 'ACADEMIC_YEAR',
+            includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
+          },
         })
         data = await setCreditStats(result, yearType, specialGroups)
       } catch (e) {
@@ -92,8 +96,10 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
       try {
         const result = await getGraduationStatsForStudytrack({
           studyprogramme: req.params.id,
-          yearType,
-          specialGroups,
+          settings: {
+            isAcademicYear: yearType === 'ACADEMIC_YEAR',
+            includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
+          },
         })
         data = await setGraduationStats(result, yearType, specialGroups)
       } catch (e) {
@@ -108,23 +114,28 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
 
 router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   const code = req.params.id
-  const settings = {
-    graduated: req.query?.graduated === 'GRADUATED_INCLUDED',
-    specialGroups: req.query?.special_groups === 'SPECIAL_INCLUDED',
-    yearsCombined: req.query?.years_combined === 'YEARS_COMBINED',
-  }
+  const graduated = req.query?.graduated
+  const specialGroups = req.query?.special_groups
+  const yearsCombined = req.query?.years_combined
 
   if (code) {
     let data = null
     try {
-      data = await getStudytrackStats(code, settings)
+      data = await getStudytrackStats(code, graduated, specialGroups, yearsCombined)
     } catch (e) {
       logger.error(`Failed to get code ${code} studytrack stats: ${e}`)
     }
     if (!data) {
       try {
-        const result = await getStudytrackStatsForStudyprogramme({ studyprogramme: code, settings })
-        data = await setStudytrackStats(result, settings)
+        const result = await getStudytrackStatsForStudyprogramme({
+          studyprogramme: code,
+          settings: {
+            graduated: graduated === 'GRADUATED_INCLUDED',
+            specialGroups: specialGroups === 'SPECIAL_INCLUDED',
+            yearsCombined: yearsCombined === 'YEARS_COMBINED',
+          },
+        })
+        data = await setStudytrackStats(result, graduated, specialGroups, yearsCombined)
       } catch (e) {
         logger.error(`Failed to update code ${code} studytrack stats: ${e}`)
       }
