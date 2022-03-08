@@ -9,6 +9,7 @@ import ExportModal from './ExportModal'
 import { group, getDataItemType, SortableTableContext, DataItemType } from './common'
 import DefaultColumnFilter from './defaultFilter'
 import DateColumnFilter from './dateFilter'
+import RangeColumnFilter from './rangeFilter'
 import SortingFilteringVisitor from './SortingFilteringVisitor'
 import GroupKeyVisitor from './GroupKeyVisitor'
 import ValueVisitor from './ValueVisitor'
@@ -195,6 +196,7 @@ const DataItem = ({ item, parents = [] }) => {
 const ColumnFilters = {
   default: DefaultColumnFilter,
   date: DateColumnFilter,
+  range: RangeColumnFilter,
 }
 
 const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
@@ -612,7 +614,10 @@ const SortableTable = ({
 
   const [columnSpans, columnDepth] = useMemo(() => computeColumnSpans(columns), [columns])
 
-  const values = useMemo(() => ValueVisitor.visit(data, columns).values, [data, columns])
+  const values = useMemo(
+    () => _.mapValues(ValueVisitor.visit(data, Object.values(columns)).values, set => [...set]),
+    [data, columns]
+  )
 
   const headers = useMemo(
     () => createHeaders(columns, columnSpans, columnDepth, state.columnOptions, dispatch, values),
