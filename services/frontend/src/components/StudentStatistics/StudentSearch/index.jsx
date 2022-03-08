@@ -223,6 +223,7 @@ const StudentSearch = ({
 
     return (
       <SortableTable
+        figure={false}
         getRowKey={s => s.studentNumber}
         tableProps={{ celled: false }}
         columns={columns}
