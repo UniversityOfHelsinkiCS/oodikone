@@ -34,6 +34,7 @@ const GeneralTab = ({
   if (!populationStatistics || !populationStatistics.elementdetails) return null
 
   const selectedStudents = filteredStudents.map(stu => stu.studentNumber)
+
   const students = Object.fromEntries(filteredStudents.map(stu => [stu.studentNumber, stu]))
   const queryStudyrights = query ? Object.values(query.studyRights) : []
   const cleanedQueryStudyrights = queryStudyrights.filter(sr => !!sr)
@@ -342,6 +343,12 @@ const GeneralTab = ({
       title: 'Study Programme',
       getRowVal: s => getTextIn(mainProgramme(s.studyrights, s.studentNumber), language) || 'No programme',
     },
+    passDate: {
+      key: 'passDate',
+      title: 'Attainment date',
+      getRowVal: s => s.courses.find(c => coursecode.includes(c.course_code)).date,
+      formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
+    },
     language: {
       key: 'language',
       title: 'Language',
@@ -471,7 +478,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   const columnsByVariant = {
     customPopulation: ['programme', 'startYear'],
-    coursePopulation: ['gradeForSingleCourse', 'programme', 'language', 'startYear'],
+    coursePopulation: ['gradeForSingleCourse', 'programme', 'passDate', 'language', 'startYear'],
     population: [
       'creditsSinceStart',
       'transferredFrom',
