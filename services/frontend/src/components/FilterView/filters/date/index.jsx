@@ -1,7 +1,6 @@
 import React from 'react'
-import { Form } from 'semantic-ui-react'
 import 'moment/locale/fi'
-import DateTime from './DateTime'
+import DateRangeSelector from 'components/DateRangeSelector'
 import createFilter from '../createFilter'
 import filterInfo from '../../../../common/InfoToolTips/filters'
 
@@ -16,32 +15,16 @@ const CreditDateFilterCard = ({ options, onOptionsChange }) => {
   return (
     <>
       <div className="card-content" style={{ marginTop: '0.5rem' }}>
-        <Form>
-          <Form.Field>
-            <label>Start Date:</label>
-            <DateTime
-              value={startDate}
-              onChange={date =>
-                onOptionsChange({
-                  ...options,
-                  startDate: date,
-                })
-              }
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>End Date:</label>
-            <DateTime
-              value={endDate}
-              onChange={date =>
-                onOptionsChange({
-                  ...options,
-                  endDate: date,
-                })
-              }
-            />
-          </Form.Field>
-        </Form>
+        <DateRangeSelector
+          showSemesters
+          value={[startDate, endDate]}
+          onChange={([startDate, endDate]) =>
+            onOptionsChange({
+              startDate,
+              endDate,
+            })
+          }
+        />
       </div>
     </>
   )
