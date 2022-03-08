@@ -41,6 +41,13 @@ const PassFail = ({ flat }) => {
                 key: 'course-name',
                 title: 'Name',
                 getRowVal: (row, isGroup) => getTextIn(isGroup ? row.label_name : row.name ?? row.course.name),
+                cellProps: {
+                  style: {
+                    maxWidth: '20em',
+                    whiteSpace: 'normal',
+                    overflow: 'hidden',
+                  },
+                },
               },
               {
                 key: 'filter-toggle',
