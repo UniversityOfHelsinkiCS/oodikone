@@ -48,6 +48,13 @@ const PassingSemesters = () => {
             key: 'name',
             title: 'Name',
             getRowVal: (row, isGroup, parents) => getTextIn(isGroup ? parents[0].module.name : row.name),
+            cellProps: {
+              style: {
+                maxWidth: '20em',
+                whiteSpace: 'normal',
+                overflow: 'hidden',
+              },
+            },
           },
           {
             key: 'filter-toggle',
