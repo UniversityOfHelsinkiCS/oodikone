@@ -5,7 +5,9 @@ import React, { useState, useMemo } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
 import _ from 'lodash'
 import xlsx from 'xlsx'
-import { getDataItemType, getColumnValue, DataItemType, DataVisitor } from './common'
+import { getDataItemType, DataItemType } from './common'
+import ValueVisitor from './ValueVisitor'
+import ExportVisitor from './ExportVisitor'
 
 const getExportColumns = columns => {
   const stack = _.cloneDeep(columns)
@@ -56,50 +58,12 @@ const getColumnTitle = column => {
     .join(' - ')
 }
 
-class ExportVisitor extends DataVisitor {
-  constructor(columns) {
-    super()
-    this.columns = columns
-    this.rows = []
-  }
-
-  visitRow(ctx) {
-    const row = _.chain(this.columns)
-      .map(column => [getColumnTitle(column), getColumnValue(ctx, column)])
-      .fromPairs()
-      .value()
-
-    this.rows.push(row)
-  }
-}
-
-class ValueSamplerVisitor extends DataVisitor {
-  constructor(columns) {
-    super()
-    this.columns = columns
-    this.values = _.fromPairs(_.map(columns, c => [c.key, new Set()]))
-  }
-
-  visitRow(ctx) {
-    this.columns.forEach(column => {
-      const value = getColumnValue(ctx, column)
-      this.values[column.key].add(value)
-    })
-  }
-
-  sample(n) {
-    return _.chain(this.values)
-      .mapValues(v => _.sampleSize([...v], n))
-      .value()
-  }
-}
-
 const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
   const exportColumns = useMemo(() => getExportColumns(columns), [columns])
   const flatData = useMemo(() => flattenData(data), [data])
   const [selected, setSelected] = useState(_.uniq(_.map(exportColumns, 'key')))
 
-  const sampledValues = useMemo(() => ValueSamplerVisitor.visit(data, exportColumns).sample(10), [exportColumns, data])
+  const sampledValues = useMemo(() => ValueVisitor.visit(data, exportColumns).sample(10), [exportColumns, data])
 
   const handleExport = () => {
     const columns = exportColumns.filter(ec => _.includes(selected, ec.key))

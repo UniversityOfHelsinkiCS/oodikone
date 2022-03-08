@@ -1,14 +1,18 @@
 /* eslint-disable no-return-assign */
 
-import React, { useState, useMemo, useReducer, createContext, useContext, useCallback } from 'react'
-import { Icon, Input, Dropdown } from 'semantic-ui-react'
+import React, { useState, useMemo, useReducer, useContext, useCallback } from 'react'
+import { Icon, Dropdown } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import produce from 'immer'
 import ExportModal from './ExportModal'
-import { group, getDataItemType, DataVisitor, DataItemType } from './common'
-
-const SortableTableContext = createContext(null)
+import { group, getDataItemType, SortableTableContext, DataItemType } from './common'
+import DefaultColumnFilter from './defaultFilter'
+import DateColumnFilter from './dateFilter'
+import SortingFilteringVisitor from './SortingFilteringVisitor'
+import GroupKeyVisitor from './GroupKeyVisitor'
+import ValueVisitor from './ValueVisitor'
+import './style.css'
 
 const computeColumnSpans = columns => {
   const stack = _.cloneDeep(columns)
@@ -44,113 +48,6 @@ const computeColumnSpans = columns => {
   }
 
   return [spans, maxDepth]
-}
-
-const getColumnValue = (row, columnDef) => (columnDef.getRowVal ? columnDef.getRowVal(row) : undefined)
-
-const createRowSortingFunction = (columnsByKey, state) => {
-  const sortByColumn = Object.entries(state.columnOptions).find(([, options]) => options.sort)
-
-  if (!sortByColumn) {
-    return undefined
-  }
-
-  const [columnKey, { sort }] = sortByColumn
-  const column = columnsByKey[columnKey]
-
-  if (sort === 'desc') {
-    return (a, b) => {
-      const va = getColumnValue(a, column)
-      const vb = getColumnValue(b, column)
-
-      if (va === vb) {
-        return 0
-      }
-      if (va < vb) {
-        return 1
-      }
-      return -1
-    }
-  }
-  return (a, b) => {
-    const va = getColumnValue(a, column)
-    const vb = getColumnValue(b, column)
-
-    if (va === vb) {
-      return 0
-    }
-    if (va < vb) {
-      return -1
-    }
-    return 1
-  }
-}
-
-const ValueFilterType = {
-  Include: 'include',
-  Exclude: 'exclude',
-}
-
-const VALUE_FILTER_FUNCTIONS = {
-  [ValueFilterType.Include]: (a, b) => (a === b ? true : null),
-  [ValueFilterType.Exclude]: (a, b) => (a === b ? false : null),
-}
-
-const createRowFilteringFunction = (columnsByKey, state) => {
-  const filters = _.chain(state.columnOptions)
-    .toPairs()
-    .filter(([, options]) => options.valueFilters.length > 0)
-    .map(([column, { valueFilters }]) => {
-      const defaultResult = !valueFilters.some(({ type }) => type === ValueFilterType.Include)
-
-      return row => {
-        let columnValues = getColumnValue(row, columnsByKey[column])
-
-        if (!Array.isArray(columnValues)) {
-          columnValues = [columnValues]
-        }
-
-        return _.chain(valueFilters)
-          .reduce((acc, { type, value }) => {
-            const result = columnValues.reduce((acc2, columnValue) => {
-              if (acc2 !== null) {
-                return acc2
-              }
-
-              return VALUE_FILTER_FUNCTIONS[type](columnValue, value)
-            }, null)
-
-            if (result === null) {
-              return acc
-            }
-
-            return acc === null ? result : acc && result
-          }, null)
-          .thru(result => (result === null ? defaultResult : result))
-          .value()
-      }
-    })
-    // valueFilters.map(({ value, type }) => ({ column, value, type })))
-    .value()
-
-  return row => filters.every(func => func(row))
-}
-
-const filterAndSortRows = (items, predicate, orderFunc) => {
-  return _.chain(items)
-    .filter(item => getDataItemType(item) === DataItemType.Group || predicate(item))
-    .thru(items => (orderFunc !== undefined ? items.sort(orderFunc) : items))
-    .map(item => {
-      if (getDataItemType(item) === DataItemType.Group) {
-        return {
-          ...item,
-          children: filterAndSortRows(item.children, predicate, orderFunc),
-        }
-      }
-      return item
-    })
-    .filter(item => getDataItemType(item) === DataItemType.Row || item.children.length > 0)
-    .value()
 }
 
 const getCellContent = (column, data, isGroup, parents) => {
@@ -295,10 +192,13 @@ const DataItem = ({ item, parents = [] }) => {
   )
 }
 
-const ColumnHeader = ({ column, state, dispatch, values, colSpan, rowSpan, style }) => {
-  const { valueFilters, sort } = state
+const ColumnFilters = {
+  default: DefaultColumnFilter,
+  date: DateColumnFilter,
+}
 
-  const [search, setSearch] = useState('')
+const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
+  const { sort } = state
 
   const filterColumnKey = column.mergeHeader ? column.children[0].key : column.key
 
@@ -307,61 +207,24 @@ const ColumnHeader = ({ column, state, dispatch, values, colSpan, rowSpan, style
   const sortable = column.sortable !== false
   const filterable = column.filterable !== false
 
-  const valueItems = useMemo(() => {
-    if (!values) {
-      return []
-    }
-
-    const t = _.uniq(values)
-      .filter(value => search === '' || `${value}`.indexOf(search) > -1)
-      .sort((a, b) => {
-        if (typeof a === 'number' && typeof b === 'number') {
-          return a - b
-        }
-        if (a instanceof Date && b instanceof Date) {
-          return a.getTime() - b.getTime()
-        }
-        return `${a}` - `${b}`
-      })
-      .map(value => {
-        let icon = 'square outline'
-        let color = 'inherit'
-
-        const filter = valueFilters.find(f => f.value === value)
-
-        if (filter) {
-          if (filter.type === 'exclude') {
-            icon = 'minus square outline'
-            color = 'red'
-          } else if (filter.type === 'include') {
-            icon = 'plus square outline'
-            color = 'green'
-          }
-        }
-
-        const text = column.formatValue ? column.formatValue(value) : value
-
-        return (
-          <Dropdown.Item
-            icon={<Icon name={icon} style={{ color }} />}
-            text={text ? `${text}` : <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>}
-            onClick={evt => {
-              dispatch({ type: 'CYCLE_VALUE_FILTER', payload: { column: filterColumnKey, value } })
-              evt.preventDefault()
-              evt.stopPropagation()
-            }}
-          />
-        )
-      })
-
-    return t
-  }, [values, search, valueFilters])
-
   if (!column.title) {
     return <></>
   }
 
   const hasChildren = column.children && column.children.length > 0
+
+  const { component: FilterComponent, isActive } = ColumnFilters[column.filterType ?? 'default']
+
+  const filterComponentDispatch = evt => {
+    dispatch({
+      type: 'COLUMN_FILTER_EVENT',
+      payload: {
+        column: column.key,
+        filterType: column.filterType ?? 'default',
+        event: evt,
+      },
+    })
+  }
 
   return (
     <th
@@ -393,18 +256,21 @@ const ColumnHeader = ({ column, state, dispatch, values, colSpan, rowSpan, style
         {filterable && (!hasChildren || column.mergeHeader) && (
           <Dropdown
             icon="filter"
-            style={{ color: valueFilters.length > 0 ? 'rgb(33, 133, 208)' : '#bbb', top: '1px' }}
-            closeOnChange={false}
+            style={{
+              color:
+                isActive &&
+                isActive(state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions())
+                  ? 'rgb(33, 133, 208)'
+                  : '#bbb',
+              top: '1px',
+            }}
           >
-            <Dropdown.Menu>
-              <Input
-                icon="search"
-                iconPosition="left"
-                onClick={e => e.stopPropagation()}
-                value={search}
-                onChange={evt => setSearch(evt.target.value)}
+            <Dropdown.Menu onClick={evt => evt.stopPropagation()}>
+              <FilterComponent
+                dispatch={filterComponentDispatch}
+                column={column}
+                options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
               />
-              <Dropdown.Menu scrolling>{valueItems}</Dropdown.Menu>
               <Dropdown.Divider />
               <Dropdown.Item
                 active={sort === 'asc'}
@@ -510,8 +376,17 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
   return rows.map(cells => <tr>{cells}</tr>)
 }
 
-const getInitialState = defaultSort => () => ({
-  columnOptions: defaultSort ? { [defaultSort[0]]: { valueFilters: [], sort: defaultSort[1] } } : {},
+const getInitialState = (defaultSort, columns) => () => ({
+  columnOptions: _.chain(columns)
+    .map(({ key }) => [
+      key,
+      {
+        filterOptions: undefined,
+        sort: defaultSort?.[0] === key ? defaultSort?.[1] : null,
+      },
+    ])
+    .fromPairs()
+    .value(),
   expandedGroups: [],
 })
 
@@ -521,28 +396,23 @@ const tableStateReducer = (...args) =>
       RESET_FILTERS: () => {
         state.columnOptions = getInitialState(...args)().columnOptions
       },
+      COLUMN_FILTER_EVENT: () => {
+        const { initialOptions, reduce } = ColumnFilters[payload.filterType]
+
+        if (state.columnOptions[payload.column] === undefined) {
+          state.columnOptions[payload.column] = {}
+        }
+
+        if (state.columnOptions[payload.column].filterOptions === undefined) {
+          state.columnOptions[payload.column].filterOptions = initialOptions()
+        }
+
+        const { filterOptions } = state.columnOptions[payload.column]
+
+        reduce(filterOptions, payload.event)
+      },
       SET_UNFOLDED_GROUPS: () => {
         state.expandedGroups = payload.groups
-      },
-      CYCLE_VALUE_FILTER: () => {
-        if (!state.columnOptions[payload.column]) {
-          state.columnOptions[payload.column] = getDefaultColumnOptions()
-        }
-
-        const existingIndex = state.columnOptions[payload.column].valueFilters.findIndex(
-          vf => vf.value === payload.value
-        )
-        const existing = state.columnOptions[payload.column].valueFilters[existingIndex]
-
-        if (existing) {
-          if (existing.type === 'include') {
-            existing.type = 'exclude'
-          } else {
-            state.columnOptions[payload.column].valueFilters.splice(existingIndex, 1)
-          }
-        } else {
-          state.columnOptions[payload.column].valueFilters.push({ value: payload.value, type: 'include' })
-        }
       },
       TOGGLE_COLUMN_SORT: () => {
         if (!state.columnOptions[payload.column]) {
@@ -580,26 +450,6 @@ const tableStateReducer = (...args) =>
     }[type]())
   })
 
-const getColumnValues = (data, columns) => {
-  return _.chain(columns)
-    .flatMapDeep(column => {
-      const values = _.chain(data)
-        .flatMap(row => getColumnValue(row, column))
-        .uniq()
-        .value()
-
-      return [
-        { key: column.key, values },
-        column.children
-          ? _.toPairs(getColumnValues(data, column.children)).map(([key, values]) => ({ key, values }))
-          : [],
-      ]
-    })
-    .map(({ key, values }) => [key, values])
-    .fromPairs()
-    .value()
-}
-
 const injectParentPointers = columns => {
   columns.forEach(col => {
     if (col.children) {
@@ -616,17 +466,6 @@ const calculateGroupDepth = data => {
   return _.chain(data)
     .map(item => (getDataItemType(item) === DataItemType.Group ? 1 + calculateGroupDepth(item.children) : 0))
     .max()
-    .value()
-}
-
-const filterNonGroupRows = data => {
-  return _.chain(data)
-    .flatMapDeep(item => {
-      if (getDataItemType(item) === DataItemType.Group) {
-        return filterNonGroupRows(item.children)
-      }
-      return item
-    })
     .value()
 }
 
@@ -716,17 +555,6 @@ const extractColumnKeys = columns => {
     .value()
 }
 
-class GroupKeyVisitor extends DataVisitor {
-  constructor() {
-    super()
-    this.groups = []
-  }
-
-  visitGroup(ctx) {
-    this.groups.push(ctx.item.definition.key)
-  }
-}
-
 const SortableTable = ({
   columns: pColumns,
   title,
@@ -784,20 +612,16 @@ const SortableTable = ({
 
   const [columnSpans, columnDepth] = useMemo(() => computeColumnSpans(columns), [columns])
 
-  const nonGroupRows = useMemo(() => filterNonGroupRows(data), [data])
-  const values = useMemo(() => getColumnValues(nonGroupRows, columns), [data, columns])
+  const values = useMemo(() => ValueVisitor.visit(data, columns).values, [data, columns])
 
   const headers = useMemo(
     () => createHeaders(columns, columnSpans, columnDepth, state.columnOptions, dispatch, values),
     [columns, columnSpans, columnDepth, state.columnOptions, dispatch, values]
   )
 
-  const rowFilteringFunc = useMemo(() => createRowFilteringFunction(columnsByKey, state), [columnsByKey, state])
-  const rowSortingFunc = useMemo(() => createRowSortingFunction(columnsByKey, state), [columnsByKey, state])
-
   const sortedData = useMemo(
-    () => filterAndSortRows(data, rowFilteringFunc, rowSortingFunc),
-    [data, rowFilteringFunc, rowSortingFunc]
+    () => SortingFilteringVisitor.mutate(data, columnsByKey, state, ColumnFilters),
+    [data, columnsByKey, state]
   )
 
   const tableStyles = {

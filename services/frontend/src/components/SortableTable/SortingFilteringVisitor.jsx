@@ -1,0 +1,77 @@
+import _ from 'lodash'
+import DataVisitor from './DataVisitor'
+import { getColumnValue } from './common'
+
+export default class SortingFilteringVisitor extends DataVisitor {
+  constructor(columns, state, filterTypes) {
+    super()
+    this.columns = columns
+    this.state = state
+    this.filterTypes = filterTypes
+    this.sentinel = Symbol('FILTERED')
+  }
+
+  createRowSortingFunction(pCtx) {
+    const sortByColumn = Object.entries(this.state.columnOptions).find(([, options]) => options.sort)
+
+    if (!sortByColumn) {
+      return undefined
+    }
+
+    const [columnKey, { sort }] = sortByColumn
+    const column = this.columns[columnKey]
+
+    if (sort === 'desc') {
+      return (a, b) => {
+        const va = getColumnValue(pCtx.withItem(a), column)
+        const vb = getColumnValue(pCtx.withItem(b), column)
+
+        if (va === vb) {
+          return 0
+        }
+        if (va < vb) {
+          return 1
+        }
+        return -1
+      }
+    }
+    return (a, b) => {
+      const va = getColumnValue(pCtx.withItem(a), column)
+      const vb = getColumnValue(pCtx.withItem(b), column)
+
+      if (va === vb) {
+        return 0
+      }
+      if (va < vb) {
+        return -1
+      }
+      return 1
+    }
+  }
+
+  visitRow(ctx) {
+    const passes = _.chain(this.state.columnOptions)
+      .toPairs()
+      .filter(([, options]) => options.filterOptions !== undefined)
+      .map(([column, { filterOptions }]) => {
+        const { filter } = this.filterTypes[this.columns[column].filterType ?? 'default']
+        return filter(ctx, this.columns[column], filterOptions)
+      })
+      .every()
+      .value()
+
+    if (!passes) {
+      return this.sentinel
+    }
+
+    return ctx.item
+  }
+
+  visitItems(pItems, pCtx) {
+    const items = super.visitItems(pItems, pCtx)
+
+    const func = this.createRowSortingFunction(pCtx)
+
+    return items.filter(i => i !== this.sentinel).sort(func)
+  }
+}

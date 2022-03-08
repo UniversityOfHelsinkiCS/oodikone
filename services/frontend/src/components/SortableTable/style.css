@@ -1,0 +1,22 @@
+.ui.table .sortable-table-date-picker {
+  color: black;
+  font-weight: normal;
+}
+
+.ui.table .sortable-table-date-picker .rdt td.rdtActive {
+  background-color: #428bca;
+  color: white;
+}
+
+.ui.table .sortable-table-date-picker .rdt th,
+.ui.table .sortable-table-date-picker .rdt td {
+  border: none;
+  padding: 0;
+  text-align: center;
+  color: black;
+  font-weight: normal;
+}
+
+.ui.striped.table thead .sortable-table-date-picker .rdt tr {
+  background-color: white !important;
+}
