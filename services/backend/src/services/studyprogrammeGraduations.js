@@ -151,7 +151,7 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAca
 
   // Get studyrights for bachelor studyprogrammes. This excludes studytracks.
   const programmes = await getAllProgrammes()
-  let studyrightsBeforeMasters = await previousStudyrights(since, programmes, allStudents)
+  let studyrightsBeforeMasters = await previousStudyrights(programmes, allStudents)
   const studyprogrammeCodes = uniqBy(studyrightsBeforeMasters, 'code').map(s => ({ code: s.code, name: s.name }))
   const stats = {}
   studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject({ years }) }))

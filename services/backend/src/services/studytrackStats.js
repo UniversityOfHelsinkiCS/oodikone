@@ -114,7 +114,7 @@ const getStudytrackDataForTheYear = async ({
       })
 
       // Get all the studyrights and students for the calculations
-      const all = await allStudyrights(track, null, studentnumbers)
+      const all = await allStudyrights(track, studentnumbers)
       const students = await studytrackStudents(studentnumbers)
       const studentData = getStudentData(students, creditThresholdKeys, creditThresholdAmounts)
       const started = await startedStudyrights(track, startDate, studentnumbers)
