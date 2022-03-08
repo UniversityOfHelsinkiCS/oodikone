@@ -295,7 +295,7 @@ const DataItem = ({ item, parents = [] }) => {
   )
 }
 
-const ColumnHeader = ({ column, state, dispatch, values }) => {
+const ColumnHeader = ({ column, state, dispatch, values, colSpan, rowSpan, style }) => {
   const { valueFilters, sort } = state
 
   const [search, setSearch] = useState('')
@@ -364,60 +364,69 @@ const ColumnHeader = ({ column, state, dispatch, values }) => {
   const hasChildren = column.children && column.children.length > 0
 
   return (
-    <div
-      style={{ display: 'flex', alignItems: 'center' }}
-      onClick={() => {
-        if (sortable) {
-          dispatch({
-            type: 'TOGGLE_COLUMN_SORT',
-            payload: { column: filterColumnKey },
-          })
-        }
+    <th
+      colSpan={colSpan}
+      rowSpan={rowSpan}
+      style={{
+        ...style,
+        cursor: sortable ? 'pointer' : 'initial',
       }}
     >
-      <span style={{ flexGrow: 1, marginRight: '0.5em' }}>{column.title}</span>
-      {sortable && (!hasChildren || column.mergeHeader) && (
-        <Icon
-          name={sortIcon}
-          style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
-        />
-      )}
-      {filterable && (!hasChildren || column.mergeHeader) && (
-        <Dropdown
-          icon="filter"
-          style={{ color: valueFilters.length > 0 ? 'rgb(33, 133, 208)' : '#bbb', top: '1px' }}
-          closeOnChange={false}
-        >
-          <Dropdown.Menu>
-            <Input
-              icon="search"
-              iconPosition="left"
-              onClick={e => e.stopPropagation()}
-              value={search}
-              onChange={evt => setSearch(evt.target.value)}
-            />
-            <Dropdown.Menu scrolling>{valueItems}</Dropdown.Menu>
-            <Dropdown.Divider />
-            <Dropdown.Item
-              active={sort === 'asc'}
-              onClick={() =>
-                dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
-              }
-            >
-              Sort: Ascending
-            </Dropdown.Item>
-            <Dropdown.Item
-              active={sort === 'desc'}
-              onClick={() =>
-                dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'desc' } })
-              }
-            >
-              Sort: Descending
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      )}
-    </div>
+      <div
+        style={{ display: 'flex', alignItems: 'center' }}
+        onClick={() => {
+          if (sortable) {
+            dispatch({
+              type: 'TOGGLE_COLUMN_SORT',
+              payload: { column: filterColumnKey },
+            })
+          }
+        }}
+      >
+        <span style={{ flexGrow: 1, marginRight: '0.5em' }}>{column.title}</span>
+        {sortable && (!hasChildren || column.mergeHeader) && (
+          <Icon
+            name={sortIcon}
+            style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
+          />
+        )}
+        {filterable && (!hasChildren || column.mergeHeader) && (
+          <Dropdown
+            icon="filter"
+            style={{ color: valueFilters.length > 0 ? 'rgb(33, 133, 208)' : '#bbb', top: '1px' }}
+            closeOnChange={false}
+          >
+            <Dropdown.Menu>
+              <Input
+                icon="search"
+                iconPosition="left"
+                onClick={e => e.stopPropagation()}
+                value={search}
+                onChange={evt => setSearch(evt.target.value)}
+              />
+              <Dropdown.Menu scrolling>{valueItems}</Dropdown.Menu>
+              <Dropdown.Divider />
+              <Dropdown.Item
+                active={sort === 'asc'}
+                onClick={() =>
+                  dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
+                }
+              >
+                Sort: Ascending
+              </Dropdown.Item>
+              <Dropdown.Item
+                active={sort === 'desc'}
+                onClick={() =>
+                  dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'desc' } })
+                }
+              >
+                Sort: Descending
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
+      </div>
+    </th>
   )
 }
 
@@ -479,14 +488,15 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
       const displayColumn = resolveDisplayColumn(column)
 
       rows[currentDepth].push(
-        <th colSpan={columnSpans[column.key]} rowSpan={rowspan} style={style}>
-          <ColumnHeader
-            column={displayColumn}
-            state={columnOptions[displayColumn.key] ?? getDefaultColumnOptions()}
-            dispatch={dispatch}
-            values={values[displayColumn.key]}
-          />
-        </th>
+        <ColumnHeader
+          colSpan={columnSpans[column.key]}
+          rowSpan={rowspan}
+          style={style}
+          column={displayColumn}
+          state={columnOptions[displayColumn.key] ?? getDefaultColumnOptions()}
+          dispatch={dispatch}
+          values={values[displayColumn.key]}
+        />
       )
     }
 
