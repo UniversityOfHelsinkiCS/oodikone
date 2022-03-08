@@ -171,54 +171,58 @@ const StudentSearch = ({
     ]
 
     if (showNames) {
-      columns.push({
-        key: 'lastname',
-        title: 'Last names',
-        getRowVal: s => s.lastname,
-        getRowContent: s => (
-          <Link
-            style={{
-              color: 'black',
-              display: 'inline-block',
-              width: '100%',
-              height: '100%',
-              padding: '.78571429em .78571429em',
-            }}
-            to={`/students/${s.studentNumber}`}
-          >
-            {s.lastname}
-          </Link>
-        ),
-        cellProps: {
-          style: {
-            padding: '0',
+      const nameColumns = [
+        {
+          key: 'lastname',
+          title: 'Last names',
+          getRowVal: s => s.lastname,
+          getRowContent: s => (
+            <Link
+              style={{
+                color: 'black',
+                display: 'inline-block',
+                width: '100%',
+                height: '100%',
+                padding: '.78571429em .78571429em',
+              }}
+              to={`/students/${s.studentNumber}`}
+            >
+              {s.lastname}
+            </Link>
+          ),
+          cellProps: {
+            style: {
+              padding: '0',
+            },
           },
         },
-      })
-      columns.push({
-        key: 'firstnames',
-        title: 'Given names',
-        getRowVal: s => s.firstnames,
-        getRowContent: s => (
-          <Link
-            style={{
-              color: 'black',
-              display: 'inline-block',
-              width: '100%',
-              height: '100%',
-              padding: '.78571429em .78571429em',
-            }}
-            to={`/students/${s.studentNumber}`}
-          >
-            {s.firstnames}
-          </Link>
-        ),
-        cellProps: {
-          style: {
-            padding: '0',
+        {
+          key: 'firstnames',
+          title: 'Given names',
+          getRowVal: s => s.firstnames,
+          getRowContent: s => (
+            <Link
+              style={{
+                color: 'black',
+                display: 'inline-block',
+                width: '100%',
+                height: '100%',
+                padding: '.78571429em .78571429em',
+              }}
+              to={`/students/${s.studentNumber}`}
+            >
+              {s.firstnames}
+            </Link>
+          ),
+          cellProps: {
+            style: {
+              padding: '0',
+            },
           },
         },
-      })
+      ]
+
+      columns.splice(0, 0, ...nameColumns)
     }
 
     return (
