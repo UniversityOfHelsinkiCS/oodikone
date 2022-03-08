@@ -312,18 +312,21 @@ const GeneralTab = ({
     studyStartDate: {
       key: 'studyStartDate',
       title: 'start of studyright',
+      filterType: 'date',
       getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]),
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
     },
     studyStartDateActual: {
       key: 'studyStartDateActual',
       title: 'started in studyright',
+      filterType: 'date',
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
       getRowVal: s => new Date(getActualStartDate(s.studentNumber)),
     },
     endDate: {
       key: 'endDate',
       title: 'graduation date',
+      filterType: 'date',
       getRowVal: s => new Date(studentToStudyrightEndMap[s.studentNumber]),
       getRowContent: s =>
         studentToStudyrightEndMap[s.studentNumber]
@@ -357,7 +360,7 @@ const GeneralTab = ({
     startYear: {
       key: 'startYear',
       title: 'Start Year at Uni',
-      getRowVal: s => (!s.obfuscated ? reformatDate(s.started, 'YYYY') : ''),
+      getRowVal: s => (!s.obfuscated ? moment(s.started).year : ''),
     },
     option: containsOption && {
       key: 'option',
@@ -413,6 +416,7 @@ const GeneralTab = ({
     updatedAt: {
       key: 'updatedAt',
       title: 'Last Updated At',
+      filterType: 'date',
       getRowVal: s => new Date(s.updatedAt),
       formatValue: value => reformatDate(value, 'YYYY-MM-DD  HH:mm:ss'),
     },
