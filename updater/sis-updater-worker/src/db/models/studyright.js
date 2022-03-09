@@ -27,6 +27,9 @@ Studyright.init(
     graduated: {
       type: INTEGER,
     },
+    active: {
+      type: INTEGER,
+    },
     // irtisanomisperuste
     studentStudentnumber: {
       type: STRING,
