@@ -204,7 +204,12 @@ const updateStudents = async personIds => {
 
   const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
     updateElementDetails(flatten(Object.values(groupedStudyRightSnapshots))),
-    updateStudyRights(groupedStudyRightSnapshots, personIdToStudentNumber, personIdToStudyRightIdToPrimality),
+    updateStudyRights(
+      groupedStudyRightSnapshots,
+      personIdToStudentNumber,
+      personIdToStudyRightIdToPrimality,
+      termRegistrations
+    ),
   ])
 
   const mappedTransfers = await parseTransfers(groupedStudyRightSnapshots, moduleGroupIdToCode, personIdToStudentNumber)

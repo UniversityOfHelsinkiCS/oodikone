@@ -3,13 +3,23 @@ const { isBaMa } = require('../../utils')
 const { get, sortBy, sortedUniqBy, orderBy, uniqBy } = require('lodash')
 const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
 const { selectFromByIds, bulkCreate, selectAllFrom } = require('../../db')
-const { getEducation, getEducationType, getOrganisationCode } = require('../shared')
+const {
+  getEducation,
+  getEducationType,
+  getOrganisationCode,
+  getUniOrgId,
+  getSemester,
+  getSemesterByDate,
+} = require('../shared')
 
 const updateStudyRights = async (
   groupedStudyRightSnapshots,
   personIdToStudentNumber,
-  personIdToStudyRightIdToPrimality
+  personIdToStudyRightIdToPrimality,
+  personsTermRegistrations
 ) => {
+  const currentSemester = getSemesterByDate(new Date())
+
   const studyrightMapper = (personIdToStudentNumber, admissionNamesById) => (studyright, overrideProps) => {
     const defaultProps = {
       studyrightid: `${studyright.id}-1`, // duplikaattifix
@@ -27,20 +37,38 @@ const updateStudyRights = async (
     }
   }
 
-  const parseCancelDate = (studyright, phase_number = 1, isBaMa = false) => {
-    // is this really needed?
-    if (isBaMa && phase_number === 1 && get(studyright, 'study_right_graduation.phase1GraduationDate')) return null
-
-    if (['RESCINDED', 'CANCELLED_BY_ADMINISTRATION'].includes(studyright.state)) {
-      if (studyright.study_right_cancellation && studyright.study_right_cancellation.cancellationDate)
-        return studyright.study_right_cancellation.cancellationDate
-      if (studyright.valid && studyright.valid.endDate) return studyright.valid.endDate
-      // otherwise we must use startdate, since it's always available. Probably not
-      // correct, but shows something
-      return studyright.valid.startDate
+  const parseActivity = (studyright, termRegistrations) => {
+    // These are the states which indicate that the studyright has been cancelled by student or administration, thus studyright is not active
+    if (['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE'].includes(studyright.state)) {
+      return 0
     }
-    if (studyright.state === 'PASSIVE') return studyright.snapshot_date_time
-    return null
+
+    // If the student has graduated, the studyright is not active
+    if (studyright.study_right_graduation) {
+      return 0
+    }
+
+    // If the student has registered to be absent or attending for this semester, the studyright is active
+    if (termRegistrations && termRegistrations.term_registrations) {
+      const studyrightToUniOrgId = getUniOrgId(studyright.organisation_id)
+
+      const activeSemesters = termRegistrations.term_registrations.reduce((res, curr) => {
+        if (!curr || !curr.studyTerm) return res
+        const { studyTerm, termRegistrationType } = curr
+        const { semestercode } = getSemester(studyrightToUniOrgId, studyTerm.studyYearStartYear, studyTerm.termIndex)
+        if (['ATTENDING', 'ABSENT'].includes(termRegistrationType)) {
+          return res.concat(semestercode)
+        }
+        return res
+      }, [])
+
+      if (activeSemesters.includes(currentSemester.semestercode)) {
+        return 1
+      }
+    }
+
+    // Default not active
+    return 0
   }
 
   const parseEndDate = (studyright, phase_number = 1, isBaMa = false) => {
@@ -116,21 +144,24 @@ const updateStudyRights = async (
 
   const formattedStudyRights = latestStudyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
+    const termRegistrations = personsTermRegistrations.find(t => t.study_right_id === studyright.id)
     if (!studyRightEducation) return acc
 
     if (isBaMa(studyRightEducation)) {
       const studyRightBach = mapStudyright(studyright, {
         extentcode: 1,
         prioritycode: parsePriorityCode(studyright, 1, true),
-        canceldate: parseCancelDate(studyright, 1, true),
+        active: parseActivity(studyright, termRegistrations),
         enddate: parseEndDate(studyright, 1, true),
+        canceldate: null,
       })
 
       const studyRightMast = mapStudyright(studyright, {
         extentcode: 2,
         prioritycode: parsePriorityCode(studyright, 2, true),
-        canceldate: parseCancelDate(studyright, 2, true),
+        active: parseActivity(studyright, termRegistrations),
         enddate: parseEndDate(studyright, 2, true),
+        canceldate: null,
         studyrightid: `${studyright.id}-2`,
         graduated: studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate ? 1 : 0,
         studystartdate: studyright.study_right_graduation
@@ -141,12 +172,12 @@ const updateStudyRights = async (
       acc.push(studyRightMast, studyRightBach)
     } else {
       const educationType = getEducationType(studyRightEducation.education_type)
-
       const mappedStudyright = mapStudyright(studyright, {
         extentcode: educationTypeToExtentcode[educationType.id] || educationTypeToExtentcode[educationType.parent_id],
         prioritycode: parsePriorityCode(studyright),
-        canceldate: parseCancelDate(studyright),
+        active: parseActivity(studyright, termRegistrations),
         enddate: parseEndDate(studyright),
+        canceldate: null,
       })
 
       acc.push(mappedStudyright)
