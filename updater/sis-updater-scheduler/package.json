@@ -22,6 +22,6 @@
     "winston-log2gelf": "^2.3.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "nodemon": "^2.0.15"
   }
 }
