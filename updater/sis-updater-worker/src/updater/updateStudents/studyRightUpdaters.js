@@ -43,11 +43,6 @@ const updateStudyRights = async (
       return 0
     }
 
-    // If the student has graduated, the studyright is not active
-    if (studyright.study_right_graduation) {
-      return 0
-    }
-
     // If the student has registered to be absent or attending for this semester, the studyright is active
     if (termRegistrations && termRegistrations.term_registrations) {
       const studyrightToUniOrgId = getUniOrgId(studyright.organisation_id)
