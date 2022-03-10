@@ -8,18 +8,51 @@ class CourseYearlyStatsCounter {
   }
 
   initProgramme(code, name) {
-    this.programmes[code] = { name, students: {}, passed: {}, credits: {} }
+    this.programmes[code] = {
+      name,
+      students: {},
+      enrollments: {},
+      enrollmentsByState: {
+        ENROLLED: 0,
+        NOT_ENROLLED: 0,
+        REJECTED: 0,
+        CONFIRMED: 0,
+        ABORTED_BY_STUDENT: 0,
+        ABORTED_BY_TEACHER: 0,
+        PROCESSING: 0,
+      },
+      passed: {},
+      credits: {},
+    }
   }
 
   initFacultyYear(code) {
     const year = `${1949 + Number(code)}-${1950 + Number(code)}`
-    this.facultyStats[code] = { year, allStudents: [], allPassed: [], faculties: {}, allCredits: 0 }
+    this.facultyStats[code] = {
+      year,
+      allStudents: [],
+      enrollments: [],
+      enrollmentsByState: {
+        ENROLLED: 0,
+        NOT_ENROLLED: 0,
+        REJECTED: 0,
+        CONFIRMED: 0,
+        ABORTED_BY_STUDENT: 0,
+        ABORTED_BY_TEACHER: 0,
+        PROCESSING: 0,
+      },
+      allPassed: [],
+      faculties: {},
+      allCredits: 0,
+    }
   }
 
   initFaculty(yearcode, faculty_code, organization) {
     this.facultyStats[yearcode].faculties[faculty_code] = {
       name: organization.name,
       students: [],
+      enrollments: [],
+      enrollmentsByState: {},
       passed: [],
       credits: 0,
     }
@@ -44,6 +77,16 @@ class CourseYearlyStatsCounter {
           neverPassed: [],
         },
         studentnumbers: [],
+      },
+      enrollments: [],
+      enrollmentsByState: {
+        ENROLLED: 0,
+        NOT_ENROLLED: 0,
+        REJECTED: 0,
+        CONFIRMED: 0,
+        ABORTED_BY_STUDENT: 0,
+        ABORTED_BY_TEACHER: 0,
+        PROCESSING: 0,
       },
       yearcode,
     }
@@ -91,9 +134,62 @@ class CourseYearlyStatsCounter {
     }
   }
 
+  markStudyProgrammeEnrollment(
+    code,
+    name,
+    studentnumber,
+    yearcode,
+    state,
+    enrollment_date_time,
+    faculty_code,
+    organization
+  ) {
+    const enrollment = {
+      studentnumber,
+      state,
+      enrollment_date_time,
+    }
+    if (!this.programmes[code]) {
+      this.initProgramme(code, name)
+    }
+    if (!this.facultyStats[yearcode]) {
+      this.initFacultyYear(yearcode)
+    }
+
+    if (faculty_code && !this.facultyStats[yearcode].faculties[faculty_code]) {
+      this.initFaculty(yearcode, faculty_code, organization)
+    }
+
+    this.programmes[code].enrollments[yearcode] = this.programmes[code].enrollments[yearcode] || []
+    this.programmes[code].enrollments[yearcode].push(enrollment)
+
+    if (!faculty_code) return
+
+    this.facultyStats[yearcode].enrollments.push(enrollment)
+    this.facultyStats[yearcode].faculties[faculty_code].enrollments.push(studentnumber)
+
+    this.facultyStats[yearcode].enrollmentsByState[state] += 1
+    this.facultyStats[yearcode].faculties[faculty_code].enrollmentsByState[state] += 1
+  }
+
   markStudyProgrammes(studentnumber, programmes, yearcode, passed, credit) {
     programmes.forEach(({ code, name, faculty_code, organization }) => {
       this.markStudyProgramme(code, name, studentnumber, yearcode, passed, credit, faculty_code, organization)
+    })
+  }
+
+  markStudyProgrammesEnrollment(studentnumber, programmes, yearcode, state, enrollment_date_time) {
+    programmes.forEach(({ code, name, faculty_code, organization }) => {
+      this.markStudyProgrammeEnrollment(
+        code,
+        name,
+        studentnumber,
+        yearcode,
+        state,
+        enrollment_date_time,
+        faculty_code,
+        organization
+      )
     })
   }
 
@@ -102,6 +198,13 @@ class CourseYearlyStatsCounter {
       this.initGroup(groupcode, groupname, coursecode, yearcode)
     }
     this.markCreditToAttempts(studentnumber, passed, grade, groupcode)
+  }
+
+  markEnrollmentToGroup(studentnumber, state, enrollment_date_time, groupcode, groupname, coursecode, yearcode) {
+    if (!this.groups[groupcode]) this.initGroup(groupcode, groupname, coursecode, yearcode)
+
+    this.groups[groupcode].enrollments.push({ studentnumber, state, enrollment_date_time })
+    this.groups[groupcode].enrollmentsByState[state] += 1
   }
 
   markCreditToAttempts(studentnumber, passed, grade, groupcode) {

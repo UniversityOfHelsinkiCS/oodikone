@@ -187,23 +187,46 @@ const SingleCourseStats = ({
     }
   }
 
+  const countEnrollmentStates = filteredEnrollments =>
+    filteredEnrollments.reduce((acc, enrollment) => {
+      if (acc[enrollment.state] === undefined) acc[enrollment.state] = 0
+      acc[enrollment.state] += 1
+      return acc
+    }, {})
+
   const statsForProgrammes = (progCodes, name) => {
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const formattedStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated }) => {
+      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated, enrollments }) => {
         const attempts = countAttemptStats(allAttempts, filter)
         const students = countStudentStats(allStudents, filter)
+        const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
         const parsedName = separate ? getTextIn(name, language) : name
+        const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
+        const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentnumber, state }) => {
+          if (state !== 'ENROLLED') return false
+          const hasFailed = allAttempts.categories.failed
+            ? allAttempts.categories.failed.includes(studentnumber)
+            : false
+          const hasPassed = allAttempts.categories.passed
+            ? allAttempts.categories.passed.includes(studentnumber)
+            : false
+          return !hasFailed && !hasPassed
+        })
         return {
           code,
           name: parsedName,
           attempts,
           students,
           coursecode,
+          enrollments: filteredEnrollments,
+          totalEnrollments: filteredEnrollments.length,
+          enrolledStudentsWithNoGrade: enrolledStudentsWithNoGrade.length,
           rowObfuscated: obfuscated,
           userHasAccessToAllStats,
+          enrollmentsByState,
         }
       })
 
@@ -266,6 +289,7 @@ const SingleCourseStats = ({
           comparisonProgrammes.length === 1 ? getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
         )
       : undefined
+
     return {
       primary: pstats || undefined,
       comparison: cstats || undefined,
