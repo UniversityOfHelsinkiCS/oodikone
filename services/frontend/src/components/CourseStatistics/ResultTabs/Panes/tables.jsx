@@ -9,7 +9,7 @@ import selectors from '../../../../selectors/courseStats'
 import UnifyRadioButtons from '../UnifyRadioButtons'
 
 export const TablesSettings = ({ value, onChange, availableStats }) => {
-  const { viewMode, showDetails, showGrades } = value
+  const { viewMode, showDetails, showGrades, showEnrollments } = value
 
   return (
     <div>
@@ -45,6 +45,16 @@ export const TablesSettings = ({ value, onChange, availableStats }) => {
             disabled={viewMode !== 'ATTEMPTS'}
             checked={showGrades}
             onChange={() => onChange({ ...value, showGrades: !showGrades })}
+          />
+        </Menu.Item>
+        <Menu.Item>
+          <Radio
+            toggle
+            label="Show enrollment details"
+            data-cy="enrollmentToggle"
+            disabled={viewMode !== 'STUDENT'}
+            checked={showEnrollments}
+            onChange={() => onChange({ ...value, showEnrollments: !showEnrollments })}
           />
         </Menu.Item>
 

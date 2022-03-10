@@ -47,7 +47,7 @@ const PaneContent = ({
           {datasets
             .filter(i => i)
             .map(data => (
-              <div style={{ flexGrow: 1, flexBasis: 1 }}>
+              <div style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
                 <h3>{data.name}</h3>
                 <Component data={data} settings={settings} {...rest} />
               </div>
@@ -73,7 +73,7 @@ const ResultTabs = ({ primary, comparison, history, separate, availableStats }) 
     {
       label: 'Tables',
       icon: 'table',
-      initialSettings: { showDetails: false, viewMode: 'STUDENT', separate },
+      initialSettings: { showDetails: false, showEnrollments: false, viewMode: 'STUDENT', separate },
       settings: TablesSettings,
       component: Tables,
     },

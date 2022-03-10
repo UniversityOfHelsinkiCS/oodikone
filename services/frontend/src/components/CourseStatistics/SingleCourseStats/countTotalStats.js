@@ -34,9 +34,16 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         ? acc.students.categories.neverPassed + neverPassed
         : acc.students.categories.neverPassed
 
+      const { enrollmentsByState } = acc
+      curr.enrollments.forEach(({ state }) => {
+        enrollmentsByState[state] += 1
+      })
+
       return {
         ...acc,
         coursecode: curr.coursecode,
+        totalEnrollments: acc.totalEnrollments + curr.totalEnrollments,
+        enrolledStudentsWithNoGrade: acc.enrolledStudentsWithNoGrade + curr.enrolledStudentsWithNoGrade,
         attempts: { categories: { passed, failed }, grades: cgrades },
         students: {
           categories: {
@@ -45,6 +52,7 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
             neverPassed: newNeverPassed,
           },
         },
+        enrollmentsByState: { ...enrollmentsByState },
       }
     },
     {
@@ -69,6 +77,17 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         passRate: 0,
         failRate: 0,
         total: 0,
+      },
+      totalEnrollments: 0,
+      enrolledStudentsWithNoGrade: 0,
+      enrollmentsByState: {
+        ENROLLED: 0,
+        NOT_ENROLLED: 0,
+        REJECTED: 0,
+        CONFIRMED: 0,
+        ABORTED_BY_STUDENT: 0,
+        ABORTED_BY_TEACHER: 0,
+        PROCESSING: 0,
       },
       studentnumbers: [],
     }

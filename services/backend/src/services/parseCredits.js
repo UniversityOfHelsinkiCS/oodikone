@@ -65,4 +65,4 @@ const parseCredit = (credit, anonymizationSalt) => {
   }
 }
 
-module.exports = { parseCredit }
+module.exports = { parseCredit, formatStudyrightElement }
