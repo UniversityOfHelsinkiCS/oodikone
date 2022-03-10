@@ -372,7 +372,7 @@ describe('Course Statistics tests', () => {
       ['2017-2018', 39, 32, 7, '82.05 %'],
     ]
 
-    cy.contains('#CourseStatPanes a.item', 'Attempts').click()
+    //cy.contains('#CourseStatPanes a.item', 'Attempts').click()
     cy.get('#CourseStatPanes table>tbody').within(() => {
       attemptsTableContents.forEach((values, trIndex) => {
         cy.get('tr')
