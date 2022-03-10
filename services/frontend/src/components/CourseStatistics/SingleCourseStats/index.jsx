@@ -199,7 +199,7 @@ const SingleCourseStats = ({
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const formattedStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated, enrollments }) => {
+      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated, enrollments = [] }) => {
         const attempts = countAttemptStats(allAttempts, filter)
         const students = countStudentStats(allStudents, filter)
         const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
