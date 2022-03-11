@@ -182,6 +182,8 @@ const enrollmentsForCourses = async (codes, anonymizationSalt, unification) => {
       studentnumber: {
         [Op.ne]: null,
       },
+      enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
+      state: ['ENROLLED', 'CONFIRMED', 'REJECTED', 'ABORTED_BY_STUDENT', 'ABORTED_BY_TEACHER'],
       [Op.or]: [{ is_open }, { is_open: null }],
     },
   })
@@ -299,46 +301,12 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
   }
 
   enrollments.forEach(enrollment => {
-    const {
-      studentnumber,
-      semestercode,
-      semestername,
-      yearcode,
-      yearname,
-      programmes,
-      coursecode,
-      state,
-      enrollment_date_time,
-    } = enrollment
+    const { studentnumber, semestercode, semestername, yearcode, yearname, coursecode, state, enrollment_date_time } =
+      enrollment
 
     const groupcode = separate ? semestercode : yearcode
     const groupname = separate ? semestername : yearname
-    const unknownProgramme = [
-      {
-        code: 'OTHER',
-        name: {
-          en: 'Other',
-          fi: 'Muu',
-          sv: 'Andra',
-        },
-        faculty_code: 'OTHER',
-        organization: {
-          name: {
-            en: 'Other',
-            fi: 'Muu',
-            sv: 'Andra',
-          },
-        },
-      },
-    ]
 
-    counter.markStudyProgrammesEnrollment(
-      studentnumber,
-      programmes.length === 0 ? unknownProgramme : programmes,
-      yearcode,
-      state,
-      enrollment_date_time
-    )
     counter.markEnrollmentToGroup(
       studentnumber,
       state,

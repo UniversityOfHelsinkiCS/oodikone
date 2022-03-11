@@ -187,12 +187,15 @@ const SingleCourseStats = ({
     }
   }
 
-  const countEnrollmentStates = filteredEnrollments =>
-    filteredEnrollments.reduce((acc, enrollment) => {
-      if (acc[enrollment.state] === undefined) acc[enrollment.state] = 0
-      acc[enrollment.state] += 1
+  const countEnrollmentStates = filteredEnrollments => {
+    const combined = { CONFIRMED: 'ENROLLED', ABORTED_BY_TEACHER: 'ABORTED', ABORTED_BY_STUDENT: 'ABORTED' }
+    return filteredEnrollments.reduce((acc, enrollment) => {
+      const state = combined[enrollment.state] || enrollment.state
+      if (acc[state] === undefined) acc[state] = 0
+      acc[state] += 1
       return acc
     }, {})
+  }
 
   const statsForProgrammes = (progCodes, name) => {
     const { statistics } = stats
