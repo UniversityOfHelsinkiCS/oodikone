@@ -5,12 +5,18 @@ import _ from 'lodash'
 
 import './studentInfoCard.css'
 
+const enrolmentTypes = {
+  1: 'Presnet',
+  2: 'Absent',
+  3: 'Passive',
+}
+
 const getEnrollmentStatus = (semester, season) => {
   if (semester.name.en.includes('Spring') && season === 'SPRING') {
-    return semester.enrollmenttype === 1 ? 'Present' : 'Absent'
+    return enrolmentTypes[semester.enrollmenttype]
   }
   if (semester.name.en.includes('Autumn') && season === 'FALL') {
-    return semester.enrollmenttype === 1 ? 'Present' : 'Absent'
+    return enrolmentTypes[semester.enrollmenttype]
   }
   return 'Absent'
 }
