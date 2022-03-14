@@ -34,6 +34,7 @@ const countFilteredStudents = (stat, filter) =>
 
 const SingleCourseStats = ({
   stats,
+  availableStats,
   setSelectedCourse,
   clearSelectedCourse,
   history,
@@ -186,23 +187,49 @@ const SingleCourseStats = ({
     }
   }
 
+  const countEnrollmentStates = filteredEnrollments => {
+    const combined = { CONFIRMED: 'ENROLLED', ABORTED_BY_TEACHER: 'ABORTED', ABORTED_BY_STUDENT: 'ABORTED' }
+    return filteredEnrollments.reduce((acc, enrollment) => {
+      const state = combined[enrollment.state] || enrollment.state
+      if (acc[state] === undefined) acc[state] = 0
+      acc[state] += 1
+      return acc
+    }, {})
+  }
+
   const statsForProgrammes = (progCodes, name) => {
     const { statistics } = stats
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const formattedStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated }) => {
+      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated, enrollments = [] }) => {
         const attempts = countAttemptStats(allAttempts, filter)
         const students = countStudentStats(allStudents, filter)
+        const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
         const parsedName = separate ? getTextIn(name, language) : name
+        const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
+        const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentnumber, state }) => {
+          if (state !== 'ENROLLED') return false
+          const hasFailed = allAttempts.categories.failed
+            ? allAttempts.categories.failed.includes(studentnumber)
+            : false
+          const hasPassed = allAttempts.categories.passed
+            ? allAttempts.categories.passed.includes(studentnumber)
+            : false
+          return !hasFailed && !hasPassed
+        })
         return {
           code,
           name: parsedName,
           attempts,
           students,
           coursecode,
+          enrollments: filteredEnrollments,
+          totalEnrollments: filteredEnrollments.length,
+          enrolledStudentsWithNoGrade: enrolledStudentsWithNoGrade.length,
           rowObfuscated: obfuscated,
           userHasAccessToAllStats,
+          enrollmentsByState,
         }
       })
 
@@ -247,7 +274,6 @@ const SingleCourseStats = ({
 
   const filteredProgrammeStatistics = () => {
     const filter = p => validProgCode(p)
-
     const excludedProgrammes = getExcluded()
 
     const primaryProgrammes = primary
@@ -266,6 +292,7 @@ const SingleCourseStats = ({
           comparisonProgrammes.length === 1 ? getProgrammeName(comparisonProgrammes[0]) : 'Comparison'
         )
       : undefined
+
     return {
       primary: pstats || undefined,
       comparison: cstats || undefined,
@@ -324,6 +351,8 @@ const SingleCourseStats = ({
       return { ...e, students: [...students], size: students.size }
     })
     .filter(e => e.size > 0)
+  // console.log('stats.statistics: ', stats.statistics)
+
   if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
   const options = filteredProgrammes
@@ -389,7 +418,12 @@ const SingleCourseStats = ({
           </Form>
         </Segment>
       )}
-      <ResultTabs separate={separate} primary={statistics.primary} comparison={statistics.comparison} />
+      <ResultTabs
+        separate={separate}
+        primary={statistics.primary}
+        comparison={statistics.comparison}
+        availableStats={availableStats}
+      />
     </div>
   )
 }

@@ -12,15 +12,22 @@ import TSA from '../../../common/tsa'
 const ANALYTICS_CATEGORY = 'Course Statistics'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
-const PaneContent = ({ component: Component, settings: SettingsComponent, initialSettings, datasets, ...rest }) => {
+const PaneContent = ({
+  component: Component,
+  settings: SettingsComponent,
+  initialSettings,
+  datasets,
+  availableStats,
+  ...rest
+}) => {
   const [settings, setSettings] = useState(initialSettings)
-  const [splitDirection, setSplitDirection] = useState('column')
+  const [splitDirection, setSplitDirection] = useState('row')
 
   return (
     <Tab.Pane>
       <Segment basic>
         <div style={{ display: 'flex', marginBottom: '2em' }}>
-          <SettingsComponent value={settings} onChange={setSettings} />
+          <SettingsComponent value={settings} onChange={setSettings} availableStats={availableStats} />
           <div style={{ flexGrow: 1 }} />
           {datasets.filter(i => i).length > 1 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
@@ -40,7 +47,7 @@ const PaneContent = ({ component: Component, settings: SettingsComponent, initia
           {datasets
             .filter(i => i)
             .map(data => (
-              <div style={{ flexGrow: 1, flexBasis: 1 }}>
+              <div style={{ flexGrow: 1, flexBasis: 1, width: '100%' }}>
                 <h3>{data.name}</h3>
                 <Component data={data} settings={settings} {...rest} />
               </div>
@@ -51,7 +58,7 @@ const PaneContent = ({ component: Component, settings: SettingsComponent, initia
   )
 }
 
-const ResultTabs = ({ primary, comparison, history, separate }) => {
+const ResultTabs = ({ primary, comparison, history, separate, availableStats }) => {
   const [tab, setTab] = useTabs('cs_tab', 0, history)
   const { userHasAccessToAllStats } = primary
 
@@ -66,7 +73,7 @@ const ResultTabs = ({ primary, comparison, history, separate }) => {
     {
       label: 'Tables',
       icon: 'table',
-      initialSettings: { showDetails: false, viewMode: 'STUDENT', separate },
+      initialSettings: { showDetails: false, showEnrollments: false, viewMode: 'STUDENT', separate },
       settings: TablesSettings,
       component: Tables,
     },
@@ -96,6 +103,7 @@ const ResultTabs = ({ primary, comparison, history, separate }) => {
           userHasAccessToAllStats={userHasAccessToAllStats}
           initialSettings={initialSettings}
           datasets={[primary, comparison]}
+          availableStats={availableStats}
         />
       ),
     })

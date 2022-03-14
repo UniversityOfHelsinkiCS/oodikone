@@ -27,7 +27,6 @@ import teachersTopCategories from './teachersTopCategories'
 import courseSearch from './coursesearch'
 import courseStats from './coursestats'
 import courseSummaryForm from './coursesSummaryForm'
-import thesisCourses from './thesisCourses'
 import accessGroups from './accessGroups'
 import feedback from './feedback'
 import mandatoryCourseLabels from './mandatoryCourseLabels'
@@ -67,7 +66,6 @@ const store = configureStore({
     courseSearch,
     courseStats,
     courseSummaryForm,
-    thesisCourses,
     accessGroups,
     elementdetails,
     feedback,

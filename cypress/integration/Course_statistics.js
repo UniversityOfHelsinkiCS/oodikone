@@ -338,9 +338,18 @@ describe('Course Statistics tests', () => {
         cy.contains('Show population').should('be.enabled')
       })
     })
+
+    it('If no data available, unify toggle is disabled', () => {
+      cy.get("input[placeholder='Search by a course code']").type('AYCSM14111')
+      cy.contains('AYCSM14111').click()
+      cy.contains('Fetch statistics').should('be.enabled').click()
+      cy.contains('AYCSM14111 Avoin yo: Full Stack -websovelluskehitys: React Native')
+      cy.get('[data-cy=unify_radio_reqular]').find('input').should('be.disabled')
+      cy.get('[data-cy=unify_radio_unify]').find('input').should('not.be.disabled')
+    })
   })
 
-  it.only('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
+  it('Some features of Course Statistics are hidden for courseStatistics-users without other rights', () => {
     cy.init('/coursestatistics', 'onlycoursestatistics')
     cy.get('[data-cy=navbar-courseStatistics]').click()
     cy.get('[data-cy=course-code-input]').type('TKT20003')

@@ -43,6 +43,13 @@ const GradeDistribution = ({ flat }) => {
             key: 'name',
             title: 'Name',
             getRowVal: row => getTextIn(row.name),
+            cellProps: {
+              style: {
+                maxWidth: '20em',
+                whiteSpace: 'normal',
+                overflow: 'hidden',
+              },
+            },
           },
           {
             key: 'filter-toggle',

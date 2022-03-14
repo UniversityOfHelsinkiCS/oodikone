@@ -117,7 +117,7 @@ const absentStudents = async (studytrack, studentnumbers) => {
   return students
 }
 
-const allStudyrights = async (studytrack, since, studentnumbers) =>
+const allStudyrights = async (studytrack, studentnumbers) =>
   (
     await Studyright.findAll({
       include: [
@@ -239,7 +239,7 @@ const followingStudyrights = async (since, programmes, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const previousStudyrights = async (since, programmes, studentnumbers) =>
+const previousStudyrights = async (programmes, studentnumbers) =>
   (
     await Studyright.findAll({
       include: [

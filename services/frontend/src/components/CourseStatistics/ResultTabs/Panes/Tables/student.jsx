@@ -10,7 +10,7 @@ import { defineCellColor } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const getColumns = (showDetails, userHasAccessToAllStats, alternatives, separate) => {
+const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -86,21 +86,60 @@ const getColumns = (showDetails, userHasAccessToAllStats, alternatives, separate
       headerProps: { style: { borderLeft: '0' } },
       onlyInDetailedView: true,
     },
+    {
+      key: 'ENROLLMENTS',
+      title: 'Total Enrollments',
+      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.totalEnrollments),
+      getCellProps: s => defineCellColor(s),
+      onlyInEnrollmentView: true,
+    },
+    {
+      key: 'ENROLLMENTS_ENROLLED',
+      title: 'Enrolled',
+      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.enrollmentsByState.ENROLLED) || 0,
+      getCellProps: s => defineCellColor(s),
+      onlyInEnrollmentView: true,
+    },
+    {
+      key: 'ENROLLMENTS_MISSING_GRADE',
+      title: 'Enrolled no grade',
+      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.enrolledStudentsWithNoGrade),
+      getCellProps: s => defineCellColor(s),
+      onlyInEnrollmentView: true,
+    },
+    {
+      key: 'ENROLLMENTS_REJECTED',
+      title: 'Rejected',
+      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.enrollmentsByState.REJECTED) || 0,
+      getCellProps: s => defineCellColor(s),
+      onlyInEnrollmentView: true,
+    },
+    {
+      key: 'ENROLLMENTS_ABORTED',
+      title: 'Aborted',
+      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.enrollmentsByState.ABORTED) || 0,
+      getCellProps: s => defineCellColor(s),
+      onlyInEnrollmentView: true,
+    },
   ]
 
-  return columns.filter(column => showDetails || !column.onlyInDetailedView)
+  return columns.filter(column => {
+    if (showDetails && column.onlyInDetailedView) return true
+    if (showEnrollments && column.onlyInEnrollmentView) return true
+    return !column.onlyInDetailedView && !column.onlyInEnrollmentView
+  })
 }
 
 const StudentTable = ({
   data: { name, stats },
-  settings: { showDetails, separate },
+  settings: { showDetails, showEnrollments, separate },
   alternatives,
   userHasAccessToAllStats,
   headerVisible = false,
 }) => {
   const columns = useMemo(
-    () => getColumns(showDetails, userHasAccessToAllStats, alternatives, separate),
-    [showDetails, userHasAccessToAllStats, alternatives, separate]
+    () => getColumns(showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate),
+    [showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate]
   )
 
   return (

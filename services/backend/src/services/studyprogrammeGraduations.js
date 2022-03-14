@@ -78,9 +78,9 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
 }
 
 const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
-  let graduationAmounts = getYearsObject(years)
-  let graduationTimes = getYearsObject(years, true)
-  let totalAmounts = isAcademicYear ? getAcademicYearsObject(years) : getYearsObject(years)
+  let graduationAmounts = getYearsObject({ years })
+  let graduationTimes = getYearsObject({ years, emptyArrays: true })
+  let totalAmounts = isAcademicYear ? getAcademicYearsObject({ years }) : getYearsObject({ years })
 
   await Promise.all(
     years.map(async year => {
@@ -106,8 +106,8 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
   const comparisonValue = studyprogramme.includes('KH') ? 72 : 48
 
-  const medians = getYearsObject(years, true)
-  const means = getYearsObject(years, true)
+  const medians = getYearsObject({ years, emptyArrays: true })
+  const means = getYearsObject({ years, emptyArrays: true })
 
   // HighCharts graph require the data to have this format (ie. actual value, "empty value")
   years.forEach(year => {
@@ -151,10 +151,10 @@ const getProgrammesBeforeStarting = async ({ studyprogramme, since, years, isAca
 
   // Get studyrights for bachelor studyprogrammes. This excludes studytracks.
   const programmes = await getAllProgrammes()
-  let studyrightsBeforeMasters = await previousStudyrights(since, programmes, allStudents)
+  let studyrightsBeforeMasters = await previousStudyrights(programmes, allStudents)
   const studyprogrammeCodes = uniqBy(studyrightsBeforeMasters, 'code').map(s => ({ code: s.code, name: s.name }))
   const stats = {}
-  studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject(years) }))
+  studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject({ years }) }))
 
   // Map transfers to the Master's programme
   const transfers = await getTransferStudyrightMap(studyprogramme, since)
@@ -192,7 +192,7 @@ const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAc
   let studyrightsAfterThisProgramme = await followingStudyrights(since, programmes, graduatedStudents)
   const studyprogrammeCodes = uniqBy(studyrightsAfterThisProgramme, 'code').map(s => ({ code: s.code, name: s.name }))
   const stats = {}
-  studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject(years) }))
+  studyprogrammeCodes.forEach(c => (stats[c.code] = { ...c, ...getYearsObject({ years }) }))
 
   const transfers = await getTransferStudyrightMap(studyprogramme, since)
 
@@ -218,9 +218,8 @@ const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAc
   return graphAndTableStats
 }
 
-const getGraduationStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
-  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
-  const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
+const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => {
+  const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 

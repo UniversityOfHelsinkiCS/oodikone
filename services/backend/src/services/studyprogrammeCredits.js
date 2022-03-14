@@ -71,9 +71,8 @@ const getTransferredCreditStats = async ({ studyprogramme, since, years, isAcade
 
 // Fetches all credits for the studytrack and combines them into the statistics for the table
 // and graph in the studyprogramme overview
-const getCreditStatsForStudytrack = async ({ studyprogramme, yearType, specialGroups }) => {
-  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
-  const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
+const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
+  const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
@@ -82,7 +81,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, yearType, specialGr
   const transferred = await getTransferredCreditStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
-  const titles = tableTitles['credits'][specialGroups]
+  const titles = tableTitles['credits'][includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED']
 
   const tableStats = reversedYears.map(year =>
     includeAllSpecials

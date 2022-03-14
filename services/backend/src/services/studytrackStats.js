@@ -9,7 +9,6 @@ const {
   getYearsArray,
   getPercentage,
   getYearsObject,
-  getAcademicYearsObject,
   getCorrectStudentnumbers,
   getCreditThresholds,
   getCreditGraphStats,
@@ -79,8 +78,7 @@ const getGraduationTimeStats = async ({
 // Goes through the programme and all its studytracks for the said year and adds the wanted stats to the data objects
 const getStudytrackDataForTheYear = async ({
   studyprogramme,
-  special,
-  includeGraduated,
+  settings,
   studytracks,
   studytrackNames,
   year,
@@ -89,6 +87,8 @@ const getStudytrackDataForTheYear = async ({
   creditThresholdKeys,
   creditThresholdAmounts,
 }) => {
+  const { specialGroups: includeAllSpecials, graduated: includeGraduated, yearsCombined } = settings
+  const { startDate, endDate } = getAcademicYearDates(year, yearsCombined)
   const {
     mainStatsByYear,
     mainStatsByTrack,
@@ -100,7 +100,6 @@ const getStudytrackDataForTheYear = async ({
     totalAmounts,
     emptyTracks,
   } = data
-  const { startDate, endDate } = getAcademicYearDates(year)
 
   await Promise.all(
     studytracks.map(async track => {
@@ -110,19 +109,19 @@ const getStudytrackDataForTheYear = async ({
         codes,
         startDate,
         endDate,
-        includeAllSpecials: special,
+        includeAllSpecials,
         includeGraduated,
       })
 
       // Get all the studyrights and students for the calculations
-      const all = await allStudyrights(track, null, studentnumbers)
+      const all = await allStudyrights(track, studentnumbers)
       const students = await studytrackStudents(studentnumbers)
       const studentData = getStudentData(students, creditThresholdKeys, creditThresholdAmounts)
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const enrolled = await enrolledStudents(track, startDate, studentnumbers)
       const absent = await absentStudents(track, studentnumbers)
       const cancelled = all.filter(s => s.canceldate !== null && s.canceldate !== undefined)
-      const graduated = await graduatedStudyRights(track, null, studentnumbers)
+      const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
       if (all.length === 0) {
@@ -137,14 +136,14 @@ const getStudytrackDataForTheYear = async ({
       // Count stats for the credit progress table for the year per track
       creditTableStats[track] = [
         ...creditTableStats[track],
-        [`${year} - ${year + 1}`, all.length, ...creditThresholdKeys.map(threshold => studentData[threshold])],
+        [year, all.length, ...creditThresholdKeys.map(threshold => studentData[threshold])],
       ]
 
       // Count stats for the main studytrack table grouped by tracks
       mainStatsByTrack[track] = [
         ...mainStatsByTrack[track],
         [
-          `${year} - ${year + 1}`,
+          year,
           all.length,
           getPercentage(all.length, all.length),
           started.length,
@@ -170,9 +169,7 @@ const getStudytrackDataForTheYear = async ({
       mainStatsByYear[year] = [
         ...mainStatsByYear[year],
         [
-          studytrackNames[track]?.name['fi']
-            ? `${studytrackNames[track]?.name['fi']}, ${track}`
-            : `${year} - ${year + 1}`,
+          studytrackNames[track]?.name['fi'] ? `${studytrackNames[track]?.name['fi']}, ${track}` : year,
           all.length,
           getPercentage(all.length, all.length),
           started.length,
@@ -195,9 +192,9 @@ const getStudytrackDataForTheYear = async ({
       ]
 
       // Count stats for the graduation time charts grouped by year
-      totalAmounts[track][`${year} - ${year + 1}`] = await all.length
+      totalAmounts[track][year] = await all.length
       await getGraduationTimeStats({
-        year: `${year} - ${year + 1}`,
+        year,
         graduated,
         studyprogramme,
         track,
@@ -224,7 +221,7 @@ const getStudytrackOptions = (studyprogramme, studytrackNames, studytracks, empt
 
 // Creates empty objects for each statistic type, which are then updated with the studytrack data
 const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
-  const mainStatsByYear = getYearsObject(years, true)
+  const mainStatsByYear = getYearsObject({ years, emptyArrays: true })
   const mainStatsByTrack = {}
   const creditGraphStats = {}
   const creditTableStats = {}
@@ -238,10 +235,10 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
     mainStatsByTrack[track] = []
     creditGraphStats[track] = getCreditGraphStats(studyprogramme, years)
     creditTableStats[track] = []
-    graduationMedianTime[track] = getAcademicYearsObject(years, true)
-    graduationMeanTime[track] = getAcademicYearsObject(years, true)
-    graduationAmounts[track] = getAcademicYearsObject(years)
-    totalAmounts[track] = getAcademicYearsObject(years)
+    graduationMedianTime[track] = getYearsObject({ years, emptyArrays: true })
+    graduationMeanTime[track] = getYearsObject({ years, emptyArrays: true })
+    graduationAmounts[track] = getYearsObject({ years })
+    totalAmounts[track] = getYearsObject({ years })
   })
 
   return {
@@ -258,12 +255,10 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
 }
 
 // Combines all the data for the Populations and Studytracks -view
-const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, specialGroups }) => {
+const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings }) => {
   const isAcademicYear = true
-  const special = specialGroups === 'SPECIAL_INCLUDED'
-  const includeGraduated = graduated === 'GRADUATED_INCLUDED'
   const since = getStartDate(studyprogramme, isAcademicYear)
-  const years = getYearsArray(since.getFullYear())
+  const years = getYearsArray(since.getFullYear(), isAcademicYear, settings.yearsCombined)
 
   const associations = await getAssociations()
   const studytracks = associations.programmes[studyprogramme]
@@ -279,8 +274,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
     years.map(async year => {
       return await getStudytrackDataForTheYear({
         studyprogramme,
-        special,
-        includeGraduated,
+        settings,
         studytracks,
         studytrackNames,
         year,
@@ -296,7 +290,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
 
   return {
     id: studyprogramme,
-    years: getYearsArray(since.getFullYear(), isAcademicYear),
+    years: getYearsArray(since.getFullYear(), isAcademicYear, settings.yearsCombined),
     mainStatsByTrack: data.mainStatsByTrack,
     mainStatsByYear: data.mainStatsByYear,
     creditTableStats: data.creditTableStats,
@@ -306,7 +300,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, graduated, 
     graduationAmounts: data.graduationAmounts,
     totalAmounts: data.totalAmounts,
     studytrackOptions,
-    includeGraduated,
+    includeGraduated: settings.graduated,
     populationTitles: tableTitles['studytracks'],
     creditTableTitles: tableTitles['creditProgress'][studyprogramme.includes('KH') ? 'bachelor' : 'master'],
   }

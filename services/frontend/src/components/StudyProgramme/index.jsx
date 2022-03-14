@@ -28,6 +28,7 @@ const StudyProgramme = props => {
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduated, setGraduated] = useState(false)
+  const [combined, setCombined] = useState(false)
 
   useTitle('Study programmes')
 
@@ -62,6 +63,8 @@ const StudyProgramme = props => {
           setSpecialGroups={setSpecialGroups}
           graduated={graduated}
           setGraduated={setGraduated}
+          combined={combined}
+          setCombined={setCombined}
         />
       ),
     })

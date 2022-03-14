@@ -1,15 +1,47 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: weekly
-    time: "03:00"
-  open-pull-requests-limit: 10
-  target-branch: "trunk"
-- package-ecosystem: "github-actions"
-  directory: "/"
-  schedule:
-    interval: weekly
-    time: "03:00"
-  target-branch: "trunk"
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      time: '03:00'
+    labels:
+      - 'dependencies'
+      - 'infra'
+  - package-ecosystem: npm
+    directory: '/updater/sis-updater-scheduler'
+    schedule:
+      interval: weekly
+      time: '03:00'
+    labels:
+      - 'dependencies'
+      - 'updater'
+  - package-ecosystem: npm
+    directory: '/updater/sis-updater-worker'
+    schedule:
+      interval: weekly
+      time: '03:00'
+    labels:
+      - 'dependencies'
+      - 'updater'
+  - package-ecosystem: npm
+    directory: '/services/backend'
+    schedule:
+      interval: weekly
+      time: '03:00'
+    labels:
+      - 'dependencies'
+      - 'back'
+  - package-ecosystem: npm
+    directory: '/services/frontend'
+    schedule:
+      interval: weekly
+      time: '03:00'
+    labels:
+      - 'dependencies'
+      - 'front'
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: weekly
+      time: '03:00'

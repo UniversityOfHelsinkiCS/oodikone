@@ -87,8 +87,9 @@ const formatTransfer = transfer => {
   }
 }
 
-const getYearsArray = (since, isAcademicYear) => {
+const getYearsArray = (since, isAcademicYear, yearsCombined) => {
   const years = []
+  if (yearsCombined) return [`${since} - ${new Date().getFullYear()}`]
   for (let i = since; i <= new Date().getFullYear(); i++) {
     const year = isAcademicYear ? `${i} - ${i + 1}` : i
     years.push(year)
@@ -96,7 +97,7 @@ const getYearsArray = (since, isAcademicYear) => {
   return years
 }
 
-const getYearsObject = (years, emptyArrays = false) => {
+const getYearsObject = ({ years, emptyArrays = false }) => {
   let yearsObject = {}
   for (const year of years) {
     yearsObject = { ...yearsObject, [year]: emptyArrays ? [] : 0 }
@@ -104,7 +105,7 @@ const getYearsObject = (years, emptyArrays = false) => {
   return yearsObject
 }
 
-const getAcademicYearsObject = (years, emptyArrays = false) => {
+const getAcademicYearsObject = ({ years, emptyArrays = false }) => {
   let yearsObject = {}
   for (const year of years) {
     yearsObject = { ...yearsObject, [`${year} - ${year + 1}`]: emptyArrays ? [] : 0 }
@@ -115,7 +116,7 @@ const getAcademicYearsObject = (years, emptyArrays = false) => {
 const getStatsBasis = years => {
   return {
     graphStats: new Array(years.length).fill(0),
-    tableStats: getYearsObject(years),
+    tableStats: getYearsObject({ years }),
   }
 }
 
