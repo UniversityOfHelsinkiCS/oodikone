@@ -104,20 +104,6 @@ const MandatoryCourseLabels = sequelizeKone.define('mandatory_course_labels', {
   },
 })
 
-const ThesisCourse = sequelizeKone.define('thesis_courses', {
-  programmeCode: {
-    primaryKey: true,
-    type: Sequelize.STRING,
-  },
-  courseCode: {
-    primaryKey: true,
-    type: Sequelize.STRING,
-  },
-  thesisType: {
-    type: Sequelize.ENUM([ThesisTypeEnums.BACHELOR, ThesisTypeEnums.MASTER]),
-  },
-})
-
 const CustomPopulationSearch = sequelizeKone.define('custom_population_searches', {
   id: {
     primaryKey: true,
@@ -173,7 +159,6 @@ module.exports = {
   MandatoryCourse,
   TagStudent,
   Tag,
-  ThesisCourse,
   ThesisTypeEnums,
   MandatoryCourseLabels,
   CustomPopulationSearch,

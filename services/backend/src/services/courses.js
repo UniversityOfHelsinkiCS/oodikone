@@ -8,12 +8,14 @@ const {
   Studyright,
   Semester,
   Organization,
+  Enrollment,
 } = require('../models')
 
 const { parseCredit } = require('./parseCredits')
 const Op = Sequelize.Op
 const { CourseYearlyStatsCounter } = require('./course_yearly_stats_counter')
 const { sortMainCode, getSortRank } = require('../util/utils')
+const { parseEnrollment } = require('./parseEnrollments')
 
 const byNameOrCode = (searchTerm, language) =>
   Course.findAll({
@@ -124,6 +126,71 @@ const creditsForCourses = async (codes, anonymizationSalt, unification) => {
   return parsedCredits
 }
 
+const enrollmentsForCourses = async (codes, anonymizationSalt, unification) => {
+  let is_open = false
+
+  if (unification === 'open') is_open = true
+
+  if (unification === 'unify') {
+    is_open = {
+      [Op.in]: [false, true],
+    }
+  }
+
+  const enrollments = await Enrollment.findAll({
+    include: [
+      {
+        model: Student,
+        attributes: ['studentnumber'],
+        include: {
+          model: StudyrightElement,
+          attributes: ['code', 'startdate'],
+          include: [
+            {
+              model: ElementDetail,
+              attributes: ['name', 'type'],
+              where: {
+                type: {
+                  [Op.eq]: 20,
+                },
+              },
+            },
+            {
+              model: Studyright,
+              attributes: ['prioritycode', 'faculty_code'],
+              where: {
+                prioritycode: {
+                  [Op.eq]: 1,
+                },
+              },
+              include: {
+                model: Organization,
+              },
+            },
+          ],
+        },
+      },
+      {
+        model: Semester,
+        attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
+      },
+    ],
+    where: {
+      course_code: {
+        [Op.in]: codes,
+      },
+      studentnumber: {
+        [Op.ne]: null,
+      },
+      enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
+      state: ['ENROLLED', 'CONFIRMED', 'REJECTED', 'ABORTED_BY_STUDENT', 'ABORTED_BY_TEACHER'],
+      [Op.or]: [{ is_open }, { is_open: null }],
+    },
+  })
+
+  return enrollments.map(enrollment => parseEnrollment(enrollment, anonymizationSalt))
+}
+
 const bySearchTerm = async (term, language) => {
   const formatCourse = course => ({
     name: course.name[language],
@@ -175,8 +242,9 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
     codes = codes.filter(course => !isOpenUniCourseCode(course))
   }
 
-  const [credits, course] = await Promise.all([
+  const [credits, enrollments, course] = await Promise.all([
     creditsForCourses(codes, anonymizationSalt, unification),
+    enrollmentsForCourses(codes, anonymizationSalt, unification),
     Course.findOne({
       where: {
         code: coursecode,
@@ -231,6 +299,25 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
     counter.markCreditToGroup(studentnumber, passed, grade, groupcode, groupname, coursecode, yearcode)
     counter.markCreditToStudentCategories(studentnumber, passed, attainment_date, groupcode)
   }
+
+  enrollments.forEach(enrollment => {
+    const { studentnumber, semestercode, semestername, yearcode, yearname, coursecode, state, enrollment_date_time } =
+      enrollment
+
+    const groupcode = separate ? semestercode : yearcode
+    const groupname = separate ? semestername : yearname
+
+    counter.markEnrollmentToGroup(
+      studentnumber,
+      state,
+      enrollment_date_time,
+      groupcode,
+      groupname,
+      coursecode,
+      yearcode
+    )
+  })
+
   const statistics = counter.getFinalStatistics(anonymizationSalt)
 
   return {

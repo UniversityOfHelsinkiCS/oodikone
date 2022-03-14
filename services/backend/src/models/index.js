@@ -17,6 +17,7 @@ const Transfer = require('./transfer')
 const ProgrammeModule = require('./programmeModule')
 const ProgrammeModuleChild = require('./programmeModuleChild')
 const ExcludedCourse = require('./excludedCourse')
+const Enrollment = require('./enrollment')
 
 CourseType.hasMany(Course, { foreignKey: 'coursetypecode', sourceKey: 'coursetypecode' })
 Course.belongsTo(CourseType, { foreignKey: 'coursetypecode', targetKey: 'coursetypecode' })
@@ -88,6 +89,12 @@ Studyright.hasMany(Transfer, { foreignKey: 'studyrightid', sourceKey: 'studyrigh
 Transfer.belongsTo(ElementDetail, { as: 'source', foreignKey: 'sourcecode' })
 Transfer.belongsTo(ElementDetail, { as: 'target', foreignKey: 'targetcode' })
 
+Enrollment.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(Enrollment, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
+Enrollment.belongsTo(Course, { foreignKey: 'course_id' })
+Course.hasMany(Enrollment, { foreignKey: 'course_id' })
+Enrollment.belongsTo(Semester, { foreignKey: { name: 'semester_composite', allowNull: false } })
+
 ProgrammeModule.belongsToMany(ProgrammeModule, {
   as: 'parents',
   through: ProgrammeModuleChild,
@@ -121,4 +128,5 @@ module.exports = {
   ProgrammeModule,
   ProgrammeModuleChild,
   ExcludedCourse,
+  Enrollment,
 }

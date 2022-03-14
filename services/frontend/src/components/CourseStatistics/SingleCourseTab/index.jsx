@@ -11,6 +11,7 @@ const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
   const [selection, setSelection] = useState(selected)
   const { language } = useLanguage()
   const stats = useSelector(selectors.getCourseStats)
+  const availableStats = useSelector(selectors.getAvailableStats)
   const courses = useSelector(selectors.getCourses).map(({ code, name }) => ({
     key: code,
     value: code,
@@ -23,6 +24,7 @@ const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
   }, [selected])
 
   if (!stats[selection]) return null
+
   return (
     <div>
       <Segment>
@@ -51,7 +53,13 @@ const SingleCourseTab = ({ selected, userHasAccessToAllStats }) => {
           </Label.Group>
         </Form>
       </Segment>
-      {selection && <SingleCourseStats stats={stats[selection]} userHasAccessToAllStats={userHasAccessToAllStats} />}
+      {selection && (
+        <SingleCourseStats
+          stats={stats[selection]}
+          userHasAccessToAllStats={userHasAccessToAllStats}
+          availableStats={availableStats[selected]}
+        />
+      )}
     </div>
   )
 }
