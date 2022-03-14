@@ -453,7 +453,8 @@ const studentnumbersWithAllStudyrightElements = async (
   // - filter out all students who haven't enrolled for semester
   // - filter out all students who have enrolled for both semesters but whose studyright has ended
   // - don't use above filtering to graduated students
-  if (!cancelledStudents) {
+  // eslint-disable-next-line no-constant-condition
+  if (false && !cancelledStudents) {
     const { semestercode } = await getCurrentSemester()
 
     const enrolments = await SemesterEnrollment.findAll({
