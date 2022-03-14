@@ -20,3 +20,55 @@
 .ui.striped.table thead .sortable-table-date-picker .rdt tr {
   background-color: white !important;
 }
+
+.ok-sortable-table th .column-tools {
+  align-items: center;
+  display: flex;
+  background-color: white;
+  position: absolute;
+}
+
+.ok-sortable-table th > div > .column-tools.floating {
+  opacity: 0 !important;
+  top: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.ok-sortable-table th > div > .column-tools.fixed {
+  padding: 0 0.5em;
+}
+
+.ok-sortable-table th:hover > div > .column-tools.floating {
+  opacity: 1 !important;
+  padding: 0 0.5em;
+}
+
+.ok-sortable-table th:hover > div > .column-tools.floating::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  content: '';
+  background: linear-gradient(to left, white, transparent);
+  width: 20px;
+  right: 100%;
+}
+
+.ok-sortable-table th > div > .column-tools.dangling {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ok-sortable-table th:hover > div > .column-tools.dangling {
+  pointer-events: all;
+  background-color: #f4f4f4;
+  top: calc(100% - 2em + 1px);
+  padding: 0 0.5em;
+  opacity: 1;
+  left: 100%;
+  z-index: 2;
+  height: 2em;
+  right: initial;
+  border: 1px solid #e8e8e9;
+  border-left: none;
+}
