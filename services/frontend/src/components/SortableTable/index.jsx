@@ -1,6 +1,6 @@
 /* eslint-disable no-return-assign */
 
-import React, { useState, useMemo, useReducer, useContext, useCallback } from 'react'
+import React, { useRef, useState, useMemo, useReducer, useContext, useCallback } from 'react'
 import { Icon, Dropdown } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
@@ -199,7 +199,79 @@ const ColumnFilters = {
   range: RangeColumnFilter,
 }
 
+const SizeMeasurer = ({ as = 'div', onSizeChange, children, ...rest }) => {
+  const monitorRef = useRef(
+    new window.ResizeObserver(entries => {
+      onSizeChange(entries[0].borderBoxSize[0])
+    })
+  )
+
+  const targetRef = useRef()
+
+  const target = useCallback(node => {
+    if (node) {
+      monitorRef.current.observe(node)
+    } else {
+      monitorRef.current.unobserve(targetRef.current)
+    }
+
+    targetRef.current = node
+  }, [])
+
+  /* useLayoutEffect(() => {
+    const rect = targetRef.current.getBoundingClientRect();
+
+    onSizeChange({
+      inlineSize: rect.width,
+      blockSize: rect.height,
+    });
+  }, [onSizeChange]); */
+
+  const Container = as
+
+  return (
+    <Container {...rest} ref={target} style={{ ...rest.style }}>
+      {children}
+    </Container>
+  )
+}
+
+const Orientable = ({ orientation, children, ...rest }) => {
+  const containerRef = useRef()
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      <SizeMeasurer
+        {...rest}
+        onSizeChange={size => {
+          const [width, height] =
+            orientation === 'vertical' ? [size.blockSize, size.inlineSize] : [size.inlineSize, size.blockSize]
+
+          if (containerRef.current) {
+            containerRef.current.style.width = `${width}px`
+            containerRef.current.style.height = `${height}px`
+          }
+        }}
+        style={{
+          position: 'absolute',
+          left: orientation === 'vertical' ? '100%' : '0',
+          transformOrigin: '0% 0%',
+          transform: orientation === 'vertical' ? 'rotate(90deg)' : 'initial',
+          ...rest?.style,
+        }}
+      >
+        {children}
+      </SizeMeasurer>
+    </div>
+  )
+}
+
 const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
+  const cellSize = useRef()
+  const titleSize = useRef()
+  const toolsSize = useRef()
+  const [toolsMode, setToolsMode] = useState('fixed')
+
   const { sort } = state
 
   const filterColumnKey = column.mergeHeader ? column.children[0].key : column.key
@@ -228,6 +300,43 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
     })
   }
 
+  const isFilterActive =
+    isActive && isActive(state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions())
+  const isSortingActive = !!sort
+
+  const evaluateSizes = () => {
+    const cellWidth = cellSize?.current?.inlineSize
+    const titleWidth = titleSize?.current?.inlineSize
+    const toolsWidth = toolsSize?.current?.inlineSize
+
+    if (cellWidth === undefined || titleWidth === undefined || toolsWidth === undefined) {
+      return
+    }
+
+    if (toolsWidth > cellWidth) {
+      setToolsMode('dangling')
+    } else if (titleWidth + toolsWidth > cellWidth) {
+      setToolsMode('floating')
+    } else {
+      setToolsMode('fixed')
+    }
+  }
+
+  const onCellSizeChange = size => {
+    cellSize.current = size
+    evaluateSizes()
+  }
+
+  const onTitleSizeChange = size => {
+    titleSize.current = size
+    evaluateSizes()
+  }
+
+  const onToolsSizeChange = size => {
+    toolsSize.current = size
+    evaluateSizes()
+  }
+
   return (
     <th
       colSpan={colSpan}
@@ -235,10 +344,28 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
       style={{
         ...style,
         cursor: sortable ? 'pointer' : 'initial',
+        verticalAlign: column.vertical ? 'top' : 'center',
+        position: 'relative',
       }}
     >
-      <div
-        style={{ display: 'flex', alignItems: 'center' }}
+      {toolsMode !== 'fixed' && (isFilterActive || isSortingActive) && (
+        <div
+          style={{
+            borderWidth: '7px',
+            borderStyle: 'solid',
+            borderColor: 'transparent transparent rgb(33, 133, 208)',
+            position: 'absolute',
+            bottom: 0,
+            right: '-7px',
+          }}
+        />
+      )}
+      <SizeMeasurer
+        onSizeChange={onCellSizeChange}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
         onClick={() => {
           if (sortable) {
             dispatch({
@@ -248,52 +375,58 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
           }
         }}
       >
-        <span style={{ flexGrow: 1, marginRight: '0.5em' }}>{column.title}</span>
-        {sortable && (!hasChildren || column.mergeHeader) && (
-          <Icon
-            name={sortIcon}
-            style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
-          />
-        )}
-        {filterable && (!hasChildren || column.mergeHeader) && (
-          <Dropdown
-            icon="filter"
-            style={{
-              color:
-                isActive &&
-                isActive(state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions())
-                  ? 'rgb(33, 133, 208)'
-                  : '#bbb',
-              top: '1px',
-            }}
+        <SizeMeasurer onSizeChange={onTitleSizeChange}>
+          <Orientable
+            orientation={column.vertical ? 'vertical' : 'horizontal'}
+            style={{ flexGrow: 1, marginRight: '0.5em' }}
           >
-            <Dropdown.Menu onClick={evt => evt.stopPropagation()}>
-              <FilterComponent
-                dispatch={filterComponentDispatch}
-                column={column}
-                options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
-              />
-              <Dropdown.Divider />
-              <Dropdown.Item
-                active={sort === 'asc'}
-                onClick={() =>
-                  dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
-                }
-              >
-                Sort: Ascending
-              </Dropdown.Item>
-              <Dropdown.Item
-                active={sort === 'desc'}
-                onClick={() =>
-                  dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'desc' } })
-                }
-              >
-                Sort: Descending
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        )}
-      </div>
+            {column.title}
+          </Orientable>
+        </SizeMeasurer>
+        <div style={{ flexGrow: 1 }} />
+        <SizeMeasurer onSizeChange={onToolsSizeChange} className={`column-tools ${toolsMode}`}>
+          {sortable && (!hasChildren || column.mergeHeader) && (
+            <Icon
+              name={sortIcon}
+              style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
+            />
+          )}
+          {filterable && (!hasChildren || column.mergeHeader) && (
+            <Dropdown
+              icon="filter"
+              style={{
+                color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb',
+                top: '1px',
+              }}
+            >
+              <Dropdown.Menu onClick={evt => evt.stopPropagation()}>
+                <FilterComponent
+                  dispatch={filterComponentDispatch}
+                  column={column}
+                  options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
+                />
+                <Dropdown.Divider />
+                <Dropdown.Item
+                  active={sort === 'asc'}
+                  onClick={() =>
+                    dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
+                  }
+                >
+                  Sort: Ascending
+                </Dropdown.Item>
+                <Dropdown.Item
+                  active={sort === 'desc'}
+                  onClick={() =>
+                    dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'desc' } })
+                  }
+                >
+                  Sort: Descending
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
+        </SizeMeasurer>
+      </SizeMeasurer>
     </th>
   )
 }
@@ -652,7 +785,7 @@ const SortableTable = ({
     })
   }
 
-  const classNames = ['ui', 'table', 'collapsing', 'striped', 'celled']
+  const classNames = ['ui', 'table', 'collapsing', 'striped', 'celled', 'ok-sortable-table']
 
   if (singleLine) {
     classNames.push('single', 'line')
