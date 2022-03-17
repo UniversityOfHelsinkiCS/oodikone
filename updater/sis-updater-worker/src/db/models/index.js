@@ -10,6 +10,7 @@ const CreditType = require('./creditType')
 const Credit = require('./credit')
 const CreditTeacher = require('./creditTeacher')
 const ElementDetail = require('./elementDetail')
+const Studyplan = require('./studyplan')
 const StudyrightExtent = require('./studyrightExtent')
 const Studyright = require('./studyright')
 const StudyrightElement = require('./studyrightElement')
@@ -61,6 +62,9 @@ Teacher.belongsToMany(Credit, { through: CreditTeacher, foreignKey: 'teacher_id'
 
 Organization.hasMany(Studyright, { foreignKey: 'facultyCode', sourceKey: 'code' })
 Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', sourceKey: 'code' })
+
+Studyplan.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
+Student.hasMany(Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
 Studyright.belongsTo(Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
@@ -118,6 +122,7 @@ module.exports = {
   Credit,
   CreditTeacher,
   ElementDetail,
+  Studyplan,
   StudyrightExtent,
   Studyright,
   StudyrightElement,
