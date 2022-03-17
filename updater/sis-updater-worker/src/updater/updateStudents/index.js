@@ -10,6 +10,7 @@ const {
   Transfer,
   CourseProvider,
   Enrollment,
+  Studyplan,
 } = require('../../db/models')
 const {
   selectFromByIds,
@@ -26,6 +27,7 @@ const {
   semesterEnrollmentMapper,
   courseProviderMapper,
   enrollmentMapper,
+  studyplanMapper,
 } = require('../mapper')
 const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
@@ -172,15 +174,23 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
 const updateStudents = async personIds => {
   await loadMapsIfNeeded()
 
-  const [students, studyrightSnapshots, attainments, termRegistrations, studyRightPrimalities, enrollments] =
-    await Promise.all([
-      selectFromByIds('persons', personIds),
-      selectFromByIds('studyrights', personIds, 'person_id'),
-      selectFromByIds('attainments', personIds, 'person_id'),
-      selectFromByIds('term_registrations', personIds, 'student_id'),
-      selectFromByIds('study_right_primalities', personIds, 'student_id'),
-      selectFromByIds('enrolments', personIds, 'person_id'),
-    ])
+  const [
+    students,
+    studyrightSnapshots,
+    attainments,
+    termRegistrations,
+    studyRightPrimalities,
+    enrollments,
+    studyplans,
+  ] = await Promise.all([
+    selectFromByIds('persons', personIds),
+    selectFromByIds('studyrights', personIds, 'person_id'),
+    selectFromByIds('attainments', personIds, 'person_id'),
+    selectFromByIds('term_registrations', personIds, 'student_id'),
+    selectFromByIds('study_right_primalities', personIds, 'student_id'),
+    selectFromByIds('enrolments', personIds, 'person_id'),
+    selectFromByIds('plans', personIds, 'user_id'),
+  ])
 
   const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
 
@@ -225,8 +235,83 @@ const updateStudents = async personIds => {
     updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber),
     updateEnrollments(enrollments, personIdToStudentNumber),
+    updateStudyplans(studyplans, personIdToStudentNumber),
     await bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
   ])
+}
+
+const updateStudyplans = async (studyplansAll, personIdToStudentNumber) => {
+  const studyplans = studyplansAll.filter(plan => plan.primary)
+
+  const programmeModules = await selectFromByIds(
+    'modules',
+    flatten(studyplans.map(plan => plan.module_selections.map(module => module.moduleId)))
+  )
+
+  const programmeModuleIdToType = programmeModules.reduce((res, cur) => {
+    res[cur.id] = cur.type
+    return res
+  }, {})
+
+  const programmeModuleIdToCode = programmeModules.reduce((res, cur) => {
+    res[cur.id] = cur.code
+    return res
+  }, {})
+
+  const childModules = studyplans.reduce((res, cur) => {
+    cur.module_selections.forEach(module => {
+      if (!res[module.parentModuleId]) {
+        res[module.parentModuleId] = new Set()
+      }
+      res[module.parentModuleId].add(module.moduleId)
+    })
+    return res
+  }, {})
+
+  const findDegreeProgrammes = programId => {
+    if (programmeModuleIdToType[programId] === 'DegreeProgramme') return [programId]
+    if (!childModules[programId]) return []
+
+    const programmes = []
+    childModules[programId].forEach(child => {
+      programmes.push(...findDegreeProgrammes(child))
+    })
+    return programmes
+  }
+
+  const studyplanIdToDegreeProgrammes = studyplans.reduce((res, cur) => {
+    res[cur.id] = findDegreeProgrammes(cur.root_id)
+    return res
+  }, {})
+
+  const moduleIdToParentDegreeProgramme = {}
+  const mapParentDegreeProgrammes = (moduleId, degreeProgrammeId) => {
+    moduleIdToParentDegreeProgramme[moduleId] = degreeProgrammeId
+    if (!childModules[moduleId]) return
+
+    childModules[moduleId].forEach(child => {
+      mapParentDegreeProgrammes(child, degreeProgrammeId)
+    })
+  }
+
+  studyplans.forEach(plan => {
+    studyplanIdToDegreeProgrammes[plan.id].forEach(programmeId => {
+      mapParentDegreeProgrammes(programmeId, programmeId)
+    })
+  })
+
+  const mapStudyplan = studyplanMapper(
+    personIdToStudentNumber,
+    programmeModuleIdToCode,
+    studyplanIdToDegreeProgrammes,
+    moduleIdToParentDegreeProgramme
+  )
+
+  const mappedStudyplans = flatten(studyplans.map(mapStudyplan))
+
+  await Studyplan.bulkCreate(mappedStudyplans, {
+    ignoreDuplicates: true,
+  })
 }
 
 const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
