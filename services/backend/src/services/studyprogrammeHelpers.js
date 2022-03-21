@@ -218,8 +218,12 @@ const getBachelorCreditGraphStats = years => ({
     name: '120-149 credits',
     data: getEmptyArray(years.length),
   },
-  mte150: {
-    name: 'More than 150 credits',
+  lte180: {
+    name: '150-179 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte180: {
+    name: 'More than 180 credits',
     data: getEmptyArray(years.length),
   },
 })
@@ -245,8 +249,12 @@ const getMasterCreditGraphStats = years => ({
     name: '260-279 credits',
     data: getEmptyArray(years.length),
   },
-  mte280: {
-    name: 'More than 280 credits',
+  lte300: {
+    name: '280-299 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte300: {
+    name: 'More than 300 credits',
     data: getEmptyArray(years.length),
   },
 })
@@ -254,10 +262,10 @@ const getMasterCreditGraphStats = years => ({
 const getCreditGraphStats = (studyprogramme, years) =>
   studyprogramme.includes('KH') ? getBachelorCreditGraphStats(years) : getMasterCreditGraphStats(years)
 
-const bachelorCreditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'mte150']
-const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'mte280']
-const bachelorCreditAmounts = [30, 60, 90, 120, 150, 150]
-const masterCreditAmounts = [200, 220, 240, 260, 280, 280]
+const bachelorCreditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'lte180', 'mte180']
+const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'lte300', 'mte300']
+const bachelorCreditAmounts = [30, 60, 90, 120, 150, 180, 180]
+const masterCreditAmounts = [200, 220, 240, 260, 280, 300, 300]
 
 const getCreditThresholds = studyprogramme => {
   if (studyprogramme.includes('KH')) {
@@ -284,7 +292,8 @@ const tableTitles = {
       '60-89 credits',
       '90-119 credits',
       '120-149 credits',
-      '> 150 credits',
+      '150-179 credits',
+      '> 180 credits',
     ],
     master: [
       '',
@@ -294,7 +303,8 @@ const tableTitles = {
       '220-239 credits',
       '240-259 credits',
       '260-279 credits',
-      '> 280 credits',
+      '280-299 credits',
+      '> 300 credits',
     ],
   },
   studytracks: [
