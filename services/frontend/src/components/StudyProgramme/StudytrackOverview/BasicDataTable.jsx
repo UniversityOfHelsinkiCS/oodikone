@@ -9,6 +9,8 @@ const DataTable = ({ data, titles, track }) => {
 
   const copy = [...data[track]]
   const sortedData = copy.sort((a, b) => {
+    if (a[0] === 'Total') return -1
+    if (b[0] === 'Total') return 1
     if (a[0] < b[0]) return -1
     if (a[0] > b[0]) return 1
     return 0
@@ -31,7 +33,9 @@ const DataTable = ({ data, titles, track }) => {
           {sortedData.map(array => (
             <Table.Row key={`random-year-key-${Math.random()}`}>
               {array.map(value => (
-                <Table.Cell key={`random-key-${Math.random()}`}>{value}</Table.Cell>
+                <Table.Cell className={array[0] === 'Total' && 'total-row-cell'} key={`random-key-${Math.random()}`}>
+                  {value}
+                </Table.Cell>
               ))}
             </Table.Row>
           ))}

@@ -67,56 +67,28 @@ const updateBasicView = async code => {
 }
 
 const updateStudytrackView = async code => {
-  const specialGraduatedCombined = {
+  const specialGraduated = {
     graduated: 'GRADUATED_INCLUDED',
     specialGroups: 'SPECIAL_INCLUDED',
-    yearsCombined: 'YEARS_COMBINED',
   }
-  const specialExcludedGraduatedCombined = {
+  const specialExcludedGraduated = {
     graduated: 'GRADUATED_INCLUDED',
     specialGroups: 'SPECIAL_INCLUDED',
-    yearsCombined: 'YEARS_SEPARATED',
   }
-  const specialGraduatedExcludedCombined = {
+  const specialGraduatedExcluded = {
     graduated: 'GRADUATED_INCLUDED',
     specialGroups: 'SPECIAL_INCLUDED',
-    yearsCombined: 'YEARS_COMBINED',
   }
-  const specialExcludedGraduatedExcludedCombined = {
+  const specialExcludedGraduatedExcluded = {
     graduated: 'GRADUATED_INCLUDED',
     specialGroups: 'SPECIAL_INCLUDED',
-    yearsCombined: 'YEARS_COMBINED',
-  }
-  const specialGraduatedSeparated = {
-    graduated: 'GRADUATED_INCLUDED',
-    specialGroups: 'SPECIAL_INCLUDED',
-    yearsCombined: 'YEARS_COMBINED',
-  }
-  const specialExcludedGraduatedSeparated = {
-    graduated: 'GRADUATED_INCLUDED',
-    specialGroups: 'SPECIAL_INCLUDED',
-    yearsCombined: 'YEARS_SEPARATED',
-  }
-  const specialGraduatedExcludedSeparated = {
-    graduated: 'GRADUATED_INCLUDED',
-    specialGroups: 'SPECIAL_INCLUDED',
-    yearsCombined: 'YEARS_COMBINED',
-  }
-  const specialExcludedGraduatedExcludedSeparated = {
-    graduated: 'GRADUATED_INCLUDED',
-    specialGroups: 'SPECIAL_INCLUDED',
-    yearsCombined: 'YEARS_COMBINED',
   }
 
   const options = [
-    specialGraduatedCombined,
-    specialExcludedGraduatedCombined,
-    specialGraduatedExcludedCombined,
-    specialExcludedGraduatedExcludedCombined,
-    specialGraduatedSeparated,
-    specialExcludedGraduatedSeparated,
-    specialGraduatedExcludedSeparated,
-    specialExcludedGraduatedExcludedSeparated,
+    specialGraduated,
+    specialExcludedGraduated,
+    specialGraduatedExcluded,
+    specialExcludedGraduatedExcluded,
   ]
 
   for (const option of options) {
@@ -126,10 +98,9 @@ const updateStudytrackView = async code => {
         settings: {
           specialGroups: option.specialGroups === 'SPECIAL_INCLUDED',
           graduated: option.graduated === 'GRADUATED_INCLUDED',
-          yearsCombined: option.yearsCombined === 'YEARS_COMBINED',
         },
       })
-      await setStudytrackStats(stats, option.graduated, option.specialGroups, option.yearsCombined)
+      await setStudytrackStats(stats, option.graduated, option.specialGroups)
     } catch (e) {
       logger.error(e)
     }

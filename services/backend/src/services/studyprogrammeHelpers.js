@@ -89,7 +89,8 @@ const formatTransfer = transfer => {
 
 const getYearsArray = (since, isAcademicYear, yearsCombined) => {
   const years = []
-  if (yearsCombined) return [`${since} - ${new Date().getFullYear()}`]
+  const allYears = 'Total'
+  if (yearsCombined) years.push(allYears)
   for (let i = since; i <= new Date().getFullYear(); i++) {
     const year = isAcademicYear ? `${i} - ${i + 1}` : i
     years.push(year)
