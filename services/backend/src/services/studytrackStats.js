@@ -37,7 +37,8 @@ const getStudentData = (students, thresholdKeys, thresholdAmounts) => {
     data[thresholdKeys[2]] += creditcount >= thresholdAmounts[1] && creditcount < thresholdAmounts[2] ? 1 : 0
     data[thresholdKeys[3]] += creditcount >= thresholdAmounts[2] && creditcount < thresholdAmounts[3] ? 1 : 0
     data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
-    data[thresholdKeys[5]] += creditcount >= thresholdAmounts[5] ? 1 : 0
+    data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] && creditcount < thresholdAmounts[5] ? 1 : 0
+    data[thresholdKeys[6]] += creditcount >= thresholdAmounts[6] ? 1 : 0
   })
   return data
 }
