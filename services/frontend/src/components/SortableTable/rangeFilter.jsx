@@ -1,9 +1,41 @@
-import React, { useCallback, useMemo, useContext } from 'react'
+import React, { useCallback, useMemo, useEffect, useState, useRef, useContext } from 'react'
 
 import _ from 'lodash'
 import { Slider } from 'react-semantic-ui-range'
 import { Input } from 'semantic-ui-react'
 import { SortableTableContext, getColumnValue } from './common'
+
+const useDebounce = (value, timeout, onChange) => {
+  const [innerValue, setInnerValue] = useState(value)
+
+  useEffect(() => {
+    if (innerValue !== value) {
+      setInnerValue(value)
+    }
+  }, [value])
+
+  const timeoutRef = useRef(null)
+
+  useEffect(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+
+    const id = setTimeout(() => onChange(innerValue), timeout)
+
+    timeoutRef.current = id
+
+    return () => clearTimeout(id)
+  }, [innerValue, timeout, onChange])
+
+  return [innerValue, setInnerValue]
+}
+
+const DebouncedInput = ({ value, onChange, timeout, ...props }) => {
+  const [innerValue, setInnerValue] = useDebounce(value, timeout, onChange)
+
+  return <Input value={innerValue} onChange={evt => setInnerValue(evt.target.value)} {...props} />
+}
 
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   const { values } = useContext(SortableTableContext)
@@ -19,32 +51,36 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   }, [options.range, min, max])
 
   const onChange = useCallback(
-    _.debounce(range =>
-      dispatch({
-        type: 'SET_RANGE',
-        payload: { range },
-      })
+    _.debounce(
+      range =>
+        dispatch({
+          type: 'SET_RANGE',
+          payload: { range },
+        }),
+      1000
     ),
-    1000
+    [dispatch]
   )
 
+  const [range, setRange] = useDebounce(value, 100, onChange)
+
   const minOnChange = useCallback(
-    evt =>
+    newValue =>
       dispatch({
         type: 'SET_RANGE',
         payload: {
-          range: [parseInt(evt.target.value, 10), value[1]],
+          range: [parseInt(newValue, 10), value[1]],
         },
       }),
     [value[1]]
   )
 
   const maxOnChange = useCallback(
-    evt =>
+    newValue =>
       dispatch({
         type: 'SET_RANGE',
         payload: {
-          range: [value[0], parseInt(evt.target.value, 10)],
+          range: [value[0], parseInt(newValue, 10)],
         },
       }),
     [value[0]]
@@ -54,22 +90,22 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
     <div style={{ padding: '0.4em 0.75em' }}>
       <div style={{ color: 'black', fontWeight: 'normal', margin: '0.3em 0 0.5em 0' }}>Select value range:</div>
       <Slider
-        value={value}
+        value={range}
         settings={{
           start: [min, max],
           min,
           max,
           step: 1,
-          onChange,
+          onChange: setRange,
         }}
         multiple
         color="blue"
       />
 
       <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.5em' }}>
-        <Input value={value[0]} style={{ flexShrink: 1, width: '5em' }} onChange={minOnChange} />
+        <DebouncedInput timeout={200} value={value[0]} style={{ flexShrink: 1, width: '5em' }} onChange={minOnChange} />
         <span style={{ margin: '0 0.5em' }}>&mdash;</span>
-        <Input value={value[1]} style={{ flexShrink: 1, width: '5em' }} onChange={maxOnChange} />
+        <DebouncedInput timeout={200} value={value[1]} style={{ flexShrink: 1, width: '5em' }} onChange={maxOnChange} />
       </div>
     </div>
   )
