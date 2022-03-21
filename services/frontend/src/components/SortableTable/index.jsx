@@ -748,8 +748,8 @@ const SortableTable = ({
   const [columnSpans, columnDepth] = useMemo(() => computeColumnSpans(columns), [columns])
 
   const values = useMemo(
-    () => _.mapValues(ValueVisitor.visit(data, Object.values(columns)).values, set => [...set]),
-    [data, columns]
+    () => _.mapValues(ValueVisitor.visit(data, Object.values(columnsByKey)).values, set => [...set]),
+    [data, columnsByKey]
   )
 
   const headers = useMemo(
