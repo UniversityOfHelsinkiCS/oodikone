@@ -37,6 +37,7 @@
 
 .ok-sortable-table th > div > .column-tools.fixed {
   padding: 0 0.5em;
+  right: 0;
 }
 
 .ok-sortable-table th:hover > div > .column-tools.floating {
