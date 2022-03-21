@@ -9,9 +9,11 @@ const getKey = year => `${year}-${Math.random()}`
 
 const shouldBeHidden = (hidePercentages, value) => hidePercentages && typeof value === 'string' && value.includes('%')
 
+const getCellClass = value => (value === 'Total' ? 'total-row-cell' : '')
+
 const getFirstCell = (yearlyData, year, show, studyprogramme) => {
   return (
-    <Table.Cell key={getKey(year)}>
+    <Table.Cell key={getKey(year)} className={getCellClass(year)}>
       {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
       <PopulationLink studyprogramme={studyprogramme} year={year} />
@@ -25,7 +27,7 @@ const getSingleTrackRow = ({ row, studyprogramme, code, hidePercentages }) => {
       {row.map((value, index) => (
         <>
           {shouldBeHidden(hidePercentages, value) ? null : (
-            <Table.Cell textAlign="left" key={getKey(row[0])}>
+            <Table.Cell textAlign="left" className={getCellClass(row[0])} key={getKey(row[0])}>
               {value}
               {index === 0 && <PopulationLink studyprogramme={studyprogramme} year={row[0]} studytrack={code} />}
             </Table.Cell>
@@ -49,7 +51,7 @@ const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks, h
           ) : (
             <>
               {shouldBeHidden(hidePercentages, value) ? null : (
-                <Table.Cell key={getKey(value)} textAlign="left">
+                <Table.Cell className={getCellClass(row[0])} key={getKey(value)} textAlign="left">
                   {value}
                 </Table.Cell>
               )}
@@ -77,7 +79,7 @@ const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks, h
           ) : (
             <>
               {shouldBeHidden(hidePercentages, value) ? null : (
-                <Table.Cell textAlign="left" key={getKey(row[0])}>
+                <Table.Cell className={getCellClass(row[0])} textAlign="left" key={getKey(row[0])}>
                   {value}
                 </Table.Cell>
               )}
@@ -96,6 +98,8 @@ const sortTrackDataByYear = data => {
 
   const copy = [...data]
   const sortedData = copy.sort((a, b) => {
+    if (a[0] === 'Total') return -1
+    if (b[0] === 'Total') return 1
     if (a[0] < b[0]) return -1
     if (a[0] > b[0]) return 1
     return 0
@@ -113,6 +117,7 @@ const sortMainDataByYear = data => {
     if (arrays.length) {
       const copy = [...arrays]
       const sortedYear = copy.sort((a, b) => {
+        if (a[0] === 'Total') return 1
         if (a[0] < b[0]) return 1
         if (a[0] > b[0]) return -1
         return 0

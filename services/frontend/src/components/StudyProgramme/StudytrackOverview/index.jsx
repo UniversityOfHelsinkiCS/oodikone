@@ -13,26 +13,16 @@ import Toggle from '../Toggle'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
-const StudytrackOverview = ({
-  studyprogramme,
-  specialGroups,
-  setSpecialGroups,
-  graduated,
-  setGraduated,
-  combined,
-  setCombined,
-}) => {
+const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, graduated, setGraduated }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const [showMeanTime, setShowMeanTime] = useState(true)
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
-  const yearsCombined = combined ? 'YEARS_COMBINED' : 'YEARS_SEPARATED'
   const stats = useGetStudytrackStatsQuery({
     id: studyprogramme,
     specialGroups: special,
     graduated: grad,
-    yearsCombined,
   })
 
   useEffect(() => {
@@ -79,14 +69,6 @@ const StudytrackOverview = ({
               secondLabel="Graduated excluded"
               value={graduated}
               setValue={setGraduated}
-            />
-            <Toggle
-              cypress="AllStudentsToggles"
-              toolTips={toolTips.GraduatedToggle}
-              firstLabel="Show by year"
-              secondLabel="Show all years combined"
-              value={combined}
-              setValue={setCombined}
             />
           </div>
           {getDivider(
