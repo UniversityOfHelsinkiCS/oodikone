@@ -50,9 +50,8 @@ export const TablesSettings = ({ value, onChange, availableStats }) => {
         <Menu.Item>
           <Radio
             toggle
-            label="Show enrollment details"
+            label="Show enrollments"
             data-cy="enrollmentToggle"
-            disabled={viewMode !== 'STUDENT'}
             checked={showEnrollments}
             onChange={() => onChange({ ...value, showEnrollments: !showEnrollments })}
           />

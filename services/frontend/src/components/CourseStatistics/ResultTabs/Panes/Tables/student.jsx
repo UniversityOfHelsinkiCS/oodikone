@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import qs from 'query-string'
 import { Link } from 'react-router-dom'
-import { Header, Icon, Item } from 'semantic-ui-react'
+import { Header, Icon, Item, Popup } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { uniq } from 'lodash'
 import { string, object, arrayOf, bool } from 'prop-types'
@@ -9,6 +9,23 @@ import SortableTable from '../../../../SortableTable'
 import { defineCellColor } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
+
+const styles = {
+  help: {
+    opacity: 0.5,
+    marginLeft: '0.5rem',
+  },
+}
+
+const TitleWithHelp = ({ title, helpText }) =>
+  !helpText ? (
+    title
+  ) : (
+    <>
+      {title}
+      <Popup trigger={<Icon circular name="help" style={styles.help} size="small" />} content={helpText} />
+    </>
+  )
 
 const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate) => {
   const showPopulation = (yearcode, years) => {
@@ -44,15 +61,53 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
     },
     {
       key: 'TOTAL',
-      title: 'Total Students',
-      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.total),
+      title: (
+        <TitleWithHelp
+          title={showEnrollments ? 'Total Students' : 'Graded students'}
+          helpText={showEnrollments ? 'Total count of students, including enrolled students with no grade.' : null}
+        />
+      ),
+      getRowVal: s => {
+        if (s.rowObfuscated) return '5 or less students'
+        if (showEnrollments) return s.students.withEnrollments.total
+        return s.students.total
+      },
       getCellProps: s => defineCellColor(s),
+    },
+    {
+      key: 'TOTAL_PASSED',
+      title: 'Passed',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.totalPassed || 0),
+      getCellProps: s => defineCellColor(s),
+      headerProps: { style: { borderLeft: '0' } },
+    },
+    {
+      key: 'TOTAL_FAILED',
+      title: 'Failed',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.totalFailed || 0),
+      getCellProps: s => defineCellColor(s),
+      headerProps: { style: { borderLeft: '0' } },
+    },
+    {
+      key: 'ENROLLMENTS_MISSING_GRADE',
+      title: (
+        <TitleWithHelp
+          title="Enrolled no grade"
+          helpText="Total count of students with a valid enrollment and no passing or failing grade."
+        />
+      ),
+      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.enrolledStudentsWithNoGrade),
+      getCellProps: s => defineCellColor(s),
+      onlyInEnrollmentView: true,
     },
     {
       key: 'PASS_RATE',
       title: 'Pass-%',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.passRate),
-      getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.passRate || 0)),
+      getRowVal: s => {
+        if (s.rowObfuscated) return '5 or less students'
+        if (showEnrollments) return formatPercentage(s.students.withEnrollments.passRate)
+        return formatPercentage(s.students.passRate)
+      },
       getCellProps: s => defineCellColor(s),
     },
     {
@@ -77,49 +132,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.failRate),
       getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
       getCellProps: s => defineCellColor(s),
-    },
-    {
-      key: 'NEVER PASSED',
-      title: 'Yet to Pass',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.neverPassed || 0),
-      getCellProps: s => defineCellColor(s),
-      headerProps: { style: { borderLeft: '0' } },
       onlyInDetailedView: true,
-    },
-    {
-      key: 'ENROLLMENTS',
-      title: 'Total Enrollments',
-      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.totalEnrollments),
-      getCellProps: s => defineCellColor(s),
-      onlyInEnrollmentView: true,
-    },
-    {
-      key: 'ENROLLMENTS_ENROLLED',
-      title: 'Enrolled',
-      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.enrollmentsByState.ENROLLED) || 0,
-      getCellProps: s => defineCellColor(s),
-      onlyInEnrollmentView: true,
-    },
-    {
-      key: 'ENROLLMENTS_MISSING_GRADE',
-      title: 'Enrolled no grade',
-      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.enrolledStudentsWithNoGrade),
-      getCellProps: s => defineCellColor(s),
-      onlyInEnrollmentView: true,
-    },
-    {
-      key: 'ENROLLMENTS_REJECTED',
-      title: 'Rejected',
-      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.enrollmentsByState.REJECTED) || 0,
-      getCellProps: s => defineCellColor(s),
-      onlyInEnrollmentView: true,
-    },
-    {
-      key: 'ENROLLMENTS_ABORTED',
-      title: 'Aborted',
-      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.enrollmentsByState.ABORTED) || 0,
-      getCellProps: s => defineCellColor(s),
-      onlyInEnrollmentView: true,
     },
   ]
 

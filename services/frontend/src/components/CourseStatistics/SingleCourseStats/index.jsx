@@ -171,30 +171,76 @@ const SingleCourseStats = ({
     }
   }
 
-  const countStudentStats = (allstudents, filter) => {
+  const countStudentStats = (allstudents, enrolledNoGrade = 0, filter) => {
     const categories = countFilteredStudents(allstudents.categories, filter)
 
     const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = categories
     const total = passedFirst + passedEventually + neverPassed
     const passRate = (passedFirst + passedEventually) / total
     const failRate = neverPassed / total
+    const withEnrollments = {
+      total: total + enrolledNoGrade,
+      passRate: (passedFirst + passedEventually) / (total + enrolledNoGrade),
+      failRate: (neverPassed + enrolledNoGrade) / (total + enrolledNoGrade),
+    }
 
     return {
+      totalPassed: passedFirst + passedEventually,
+      totalFailed: neverPassed,
       categories,
       passRate,
       failRate,
       total,
+      withEnrollments,
     }
   }
 
   const countEnrollmentStates = filteredEnrollments => {
     const combined = { CONFIRMED: 'ENROLLED', ABORTED_BY_TEACHER: 'ABORTED', ABORTED_BY_STUDENT: 'ABORTED' }
-    return filteredEnrollments.reduce((acc, enrollment) => {
-      const state = combined[enrollment.state] || enrollment.state
-      if (acc[state] === undefined) acc[state] = 0
-      acc[state] += 1
-      return acc
-    }, {})
+    return filteredEnrollments.reduce(
+      (acc, enrollment) => {
+        const state = combined[enrollment.state] || enrollment.state
+        if (acc[state] === undefined) acc[state] = 0
+        acc[state] += 1
+        return acc
+      },
+      {
+        ENROLLED: 0,
+        REJECTED: 0,
+        ABORTED: 0,
+      }
+    )
+  }
+
+  const countAttemptEnrollmentStats = (filteredEnrollments, displayEnrollments) => {
+    const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
+    const totalEnrollments = displayEnrollments ? filteredEnrollments.length : undefined
+    if (!displayEnrollments)
+      Object.keys(enrollmentsByState).forEach(k => {
+        enrollmentsByState[k] = undefined
+      })
+    return { enrollmentsByState, totalEnrollments }
+  }
+
+  const countStudentEnrollmentStats = (allAttempts, filteredEnrollments, displayEnrollments) => {
+    const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentnumber, state }) => {
+      if (state !== 'ENROLLED') return false
+      const hasFailed = allAttempts.categories.failed ? allAttempts.categories.failed.includes(studentnumber) : false
+      const hasPassed = allAttempts.categories.passed ? allAttempts.categories.passed.includes(studentnumber) : false
+      return !hasFailed && !hasPassed
+    })
+    const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
+    if (!displayEnrollments) {
+      Object.keys(enrollmentsByState).forEach(k => {
+        enrollmentsByState[k] = undefined
+      })
+      return { enrolledStudentsWithNoGrade: undefined, enrollmentsByState, totalEnrollments: undefined }
+    }
+    return {
+      enrolledStudentsWithNoGrade: enrolledStudentsWithNoGrade.length,
+      enrollmentsByState,
+      totalEnrollments: filteredEnrollments.length,
+    }
   }
 
   const statsForProgrammes = (progCodes, name) => {
@@ -202,36 +248,39 @@ const SingleCourseStats = ({
     const filter = belongsToAtLeastOneProgramme(progCodes)
     const formattedStats = statistics
       .filter(isStatInYearRange)
-      .map(({ code, name, students: allStudents, attempts: allAttempts, coursecode, obfuscated, enrollments = [] }) => {
-        const attempts = countAttemptStats(allAttempts, filter)
-        const students = countStudentStats(allStudents, filter)
-        const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
-        const parsedName = separate ? getTextIn(name, language) : name
-        const enrollmentsByState = countEnrollmentStates(filteredEnrollments)
-        const enrolledStudentsWithNoGrade = filteredEnrollments.filter(({ studentnumber, state }) => {
-          if (state !== 'ENROLLED') return false
-          const hasFailed = allAttempts.categories.failed
-            ? allAttempts.categories.failed.includes(studentnumber)
-            : false
-          const hasPassed = allAttempts.categories.passed
-            ? allAttempts.categories.passed.includes(studentnumber)
-            : false
-          return !hasFailed && !hasPassed
-        })
-        return {
+      .map(
+        ({
           code,
-          name: parsedName,
-          attempts,
-          students,
+          name,
+          students: allStudents,
+          attempts: allAttempts,
           coursecode,
-          enrollments: filteredEnrollments,
-          totalEnrollments: filteredEnrollments.length,
-          enrolledStudentsWithNoGrade: enrolledStudentsWithNoGrade.length,
-          rowObfuscated: obfuscated,
-          userHasAccessToAllStats,
-          enrollmentsByState,
+          obfuscated,
+          enrollments = [],
+          allEnrollments = [],
+        }) => {
+          const displayEnrollments = parseInt(name.split('-')[0], 10) >= 2021 // Display enrollments only for Sisu era
+          const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
+          const filteredAllEnrollments = allEnrollments.filter(({ studentnumber }) => filter(studentnumber))
+
+          const attempts = countAttemptStats(allAttempts, filter)
+          const attemptsEnrollments = countAttemptEnrollmentStats(filteredAllEnrollments, displayEnrollments)
+          const studentsEnrollments = countStudentEnrollmentStats(allAttempts, filteredEnrollments, displayEnrollments)
+          const students = countStudentStats(allStudents, studentsEnrollments.enrolledStudentsWithNoGrade, filter)
+          const parsedName = separate ? getTextIn(name, language) : name
+
+          return {
+            name: parsedName,
+            students: { ...students, ...studentsEnrollments },
+            attempts: { ...attempts, ...attemptsEnrollments },
+            enrollments: filteredEnrollments,
+            code,
+            coursecode,
+            rowObfuscated: obfuscated,
+            userHasAccessToAllStats,
+          }
         }
-      })
+      )
 
     const totals = countTotalStats(formattedStats, userHasAccessToAllStats)
 
