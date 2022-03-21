@@ -258,8 +258,9 @@ const SingleCourseStats = ({
           obfuscated,
           enrollments = [],
           allEnrollments = [],
+          yearcode,
         }) => {
-          const displayEnrollments = parseInt(name.split('-')[0], 10) >= 2021 // Display enrollments only for Sisu era
+          const displayEnrollments = yearcode >= 72 // Display enrollments only for Sisu era
           const filteredEnrollments = enrollments.filter(({ studentnumber }) => filter(studentnumber))
           const filteredAllEnrollments = allEnrollments.filter(({ studentnumber }) => filter(studentnumber))
 
