@@ -200,7 +200,7 @@ describe('Studyprogramme overview', () => {
   })
 
   /* Studytrack overview -tests*/
-  describe('Basic information -view works for basic user', () => {
+  describe('Studytrack overview works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
     })
