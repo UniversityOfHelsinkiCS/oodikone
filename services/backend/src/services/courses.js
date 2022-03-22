@@ -328,7 +328,16 @@ const yearlyStatsOfNew = async (coursecode, separate, unification, anonymization
   }
 }
 
-const maxYearsToCreatePopulationFrom = async coursecodes => {
+const maxYearsToCreatePopulationFrom = async (coursecodes, unifyCourses) => {
+  let is_open = false
+
+  if (unifyCourses === 'openStats') is_open = true
+
+  if (unifyCourses === 'unifyStats') {
+    is_open = {
+      [Op.in]: [false, true],
+    }
+  }
   const maxAttainmentDate = new Date(
     Math.max(
       ...(
@@ -343,6 +352,7 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
       ).map(c => new Date(c.max_attainment_date).getTime())
     )
   )
+
   const attainmentThreshold = new Date(maxAttainmentDate.getFullYear(), 0, 1)
   attainmentThreshold.setFullYear(attainmentThreshold.getFullYear() - 6)
 
@@ -354,6 +364,7 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
       attainment_date: {
         [Op.gt]: attainmentThreshold,
       },
+      is_open,
     },
     order: [['attainment_date', 'ASC']],
   })
@@ -377,14 +388,12 @@ const maxYearsToCreatePopulationFrom = async coursecodes => {
   return maxYearsToCreatePopulationFrom
 }
 
-const courseYearlyStats = async (coursecodes, separate, unifyOpenUniCourses, anonymizationSalt) => {
-  const [unify, reqular, open] = ['unify', 'reqular', 'open']
-
+const courseYearlyStats = async (coursecodes, separate, anonymizationSalt) => {
   const statsReqular = await Promise.all(
     coursecodes.map(async code => {
-      const unifyStats = await yearlyStatsOfNew(code, separate, unify, anonymizationSalt)
-      const reqularStats = await yearlyStatsOfNew(code, separate, reqular, anonymizationSalt)
-      const openStats = await yearlyStatsOfNew(code, separate, open, anonymizationSalt)
+      const unifyStats = await yearlyStatsOfNew(code, separate, 'unify', anonymizationSalt)
+      const reqularStats = await yearlyStatsOfNew(code, separate, 'reqular', anonymizationSalt)
+      const openStats = await yearlyStatsOfNew(code, separate, 'open', anonymizationSalt)
 
       return { unifyStats, reqularStats, openStats }
     })

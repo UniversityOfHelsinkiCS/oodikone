@@ -274,7 +274,7 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
 })
 
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
-  const { coursecodes, from, to, separate: sep } = req.query
+  const { coursecodes, from, to, separate: sep, unifyCourses } = req.query
   const {
     user: { id, isAdmin, studentsUserCanAccess: allStudentsUserCanAccess },
   } = req
@@ -293,7 +293,13 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   }
 
   const semesters = ['FALL', 'SPRING']
-  const studentnumbers = await Student.findByCourseAndSemesters(JSON.parse(coursecodes), from, to, separate)
+  const studentnumbers = await Student.findByCourseAndSemesters(
+    JSON.parse(coursecodes),
+    from,
+    to,
+    separate,
+    unifyCourses
+  )
   const result = await Population.optimizedStatisticsOf(
     {
       // Useless, because studentnumbers are already filtered above by from & to.

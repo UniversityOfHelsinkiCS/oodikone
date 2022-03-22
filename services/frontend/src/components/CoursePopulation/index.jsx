@@ -47,7 +47,7 @@ const CoursePopulation = ({
   getSemestersDispatch,
   semesters,
   getFacultiesDispatch,
-  unifyOpen,
+  unifyCourses,
 }) => {
   const { language } = useLanguage()
   const [codes, setCodes] = useState([])
@@ -100,9 +100,9 @@ const CoursePopulation = ({
 
   useEffect(() => {
     if (semesters.years && semesters.semesters) {
-      const { coursecodes, from, to, years, years2, separate } = queryParamsFromUrl(history.location)
+      const { coursecodes, from, to, years, years2, separate, unifyCourses } = queryParamsFromUrl(history.location)
       const parsedCourseCodes = JSON.parse(coursecodes)
-      getCoursePopulationDispatch({ coursecodes, from, to, onProgress, separate })
+      getCoursePopulationDispatch({ coursecodes, from, to, onProgress, separate, unifyCourses })
       getSingleCourseStatsDispatch({
         fromYear: from,
         toYear: to,
@@ -124,8 +124,8 @@ const CoursePopulation = ({
     }
   }, [semesters])
 
-  const avoin = getUnifyTextIn(unifyOpen)
-  const header = courseData ? `${avoin} ${getTextIn(courseData.name, language)} ${headerYears}` : null
+  const avoin = getUnifyTextIn(unifyCourses)
+  const header = courseData ? `${getTextIn(courseData.name, language)} ${headerYears} ${avoin}` : null
 
   const subHeader = codes.join(', ')
 
@@ -370,7 +370,7 @@ const mapStateToProps = ({ singleCourseStats, populations, semesters, courseSear
     studentData: populations.data,
     pending: populations.pending,
     courseData: singleCourseStats.stats?.[courseSearch.openOrReqular],
-    unifyOpen: courseSearch.openOrReqular,
+    unifyCourses: courseSearch.openOrReqular,
     semesters: semesters.data,
     elementDetails: populations?.data?.elementdetails?.data,
   }

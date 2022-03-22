@@ -31,7 +31,7 @@ const UnifyRadioButtons = ({ availableStats }) => {
           </Form.Field>
           <Form.Field>
             <Radio
-              label={availableStats.open ? 'open uni' : 'open uni (no data)'}
+              label={availableStats.open ? 'open' : 'open (no data)'}
               name="radioGroup"
               value="openStats"
               checked={openOrReqular === 'openStats'}
@@ -42,7 +42,7 @@ const UnifyRadioButtons = ({ availableStats }) => {
           </Form.Field>
           <Form.Field>
             <Radio
-              label={availableStats.unify ? 'unified' : 'unified (no data)'}
+              label={availableStats.unify ? 'both' : 'both (no data)'}
               name="radioGroup"
               value="unifyStats"
               checked={openOrReqular === 'unifyStats'}

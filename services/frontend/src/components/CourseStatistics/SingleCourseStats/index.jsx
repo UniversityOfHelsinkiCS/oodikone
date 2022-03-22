@@ -401,7 +401,6 @@ const SingleCourseStats = ({
       return { ...e, students: [...students], size: students.size }
     })
     .filter(e => e.size > 0)
-  // console.log('stats.statistics: ', stats.statistics)
 
   if (stats.statistics.length < 1) return <Segment>No data for selected course</Segment>
 
