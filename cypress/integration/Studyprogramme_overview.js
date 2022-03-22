@@ -303,6 +303,27 @@ describe('Studyprogramme overview', () => {
           166,
           '97.1 %',
         ],
+        [
+          'Total',
+          431,
+          '100.0 %',
+          431,
+          '100.0 %',
+          0,
+          '0 %',
+          0,
+          '0 %',
+          33,
+          '7.7 %',
+          54,
+          '12.5 %',
+          328,
+          '76.1 %',
+          103,
+          '23.9 %',
+          425,
+          '98.6 %',
+        ],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackOverview')
@@ -316,6 +337,7 @@ describe('Studyprogramme overview', () => {
         ['2019 - 2020', 86, 13, 15, 32, 11, 2, 0, 13],
         ['2018 - 2019', 162, 7, 16, 35, 33, 27, 18, 26],
         ['2017 - 2018', 171, 10, 22, 18, 22, 24, 27, 48],
+        ['Total', 431, 35, 55, 87, 66, 55, 45, 88],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
