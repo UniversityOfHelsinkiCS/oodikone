@@ -74,16 +74,16 @@ export default createFilter({
   isActive: ({ selected }) => selected.length > 0,
 
   filter: (student, { selected, args }) => {
-    const activeAt = _.get(args, 'activeAt')
+    const activeAt = _.get(args, 'activeAt', moment())
 
     return student.studyrights
       .flatMap(sr => sr.studyright_elements)
       .filter(
         sre =>
-          sre.element_detail?.type === 30 &&
-          (activeAt ? moment(activeAt).isBetween(sre.startdate, sre.enddate, 'day', '[]') : true)
+          sre.element_detail.type === 30 &&
+          (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate, 'day', '[]'))
       )
-      .map(sre => sre.element_detail?.code)
+      .map(sre => sre.element_detail.code)
       .some(code => selected.includes(code))
   },
 
