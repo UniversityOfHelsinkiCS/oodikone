@@ -99,33 +99,51 @@ const byId = async id => {
   return student
 }
 
-const findByCourseAndSemesters = async (coursecodes, from, to, separate) =>
-  (
+const getUnifyStatus = unifyCourses => {
+  switch (unifyCourses) {
+    case 'unifyStats':
+      return [true, false]
+
+    case 'openStats':
+      return [true]
+
+    case 'reqularStats':
+      return [false]
+
+    default:
+      return [true]
+  }
+}
+
+const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses) => {
+  const unifyStatus = getUnifyStatus(unifyCourses)
+  return (
     await sequelize.query(
       `
-  SELECT
-    studentnumber
-  FROM student
-  INNER JOIN credit ON
-    student.studentnumber=credit.student_studentnumber
+    SELECT
+      studentnumber
+      FROM student
+      INNER JOIN credit ON
+      student.studentnumber=credit.student_studentnumber
   WHERE
-    course_code IN (:coursecodes) AND
-    attainment_date
+  course_code IN (:coursecodes) AND
+  attainment_date
   BETWEEN
-    (select startdate FROM semesters where ${
-      separate ? 'semestercode' : 'yearcode'
-    }=:minYearCode ORDER BY semestercode LIMIT 1) AND
-    (select enddate FROM semesters where ${
-      separate ? 'semestercode' : 'yearcode'
-    }=:maxYearCode ORDER BY semestercode DESC LIMIT 1);
-`,
+  (select startdate FROM semesters where ${
+    separate ? 'semestercode' : 'yearcode'
+  }=:minYearCode ORDER BY semestercode LIMIT 1) AND
+  (select enddate FROM semesters where ${separate ? 'semestercode' : 'yearcode'}=:maxYearCode AND 
+  is_open IN (:isOpen)
+  ORDER BY semestercode DESC LIMIT 1);
+  `,
       {
-        replacements: { coursecodes, minYearCode: from, maxYearCode: to },
+        replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: unifyStatus },
         type: sequelize.QueryTypes.SELECT,
         raw: true,
       }
     )
   ).map(st => st.studentnumber)
+}
 
 const findByTag = async tag => {
   return (

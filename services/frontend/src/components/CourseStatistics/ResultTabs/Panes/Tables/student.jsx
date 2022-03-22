@@ -27,7 +27,7 @@ const TitleWithHelp = ({ title, helpText }) =>
     </>
   )
 
-const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate) => {
+const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate, unifyCourses) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -35,6 +35,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
       coursecodes: JSON.stringify(uniq(alternatives)),
       years,
       separate,
+      unifyCourses,
     }
     const searchString = qs.stringify(queryObject)
     return `/coursepopulation?${searchString}`
@@ -147,12 +148,13 @@ const StudentTable = ({
   data: { name, stats },
   settings: { showDetails, showEnrollments, separate },
   alternatives,
+  unifyCourses,
   userHasAccessToAllStats,
   headerVisible = false,
 }) => {
   const columns = useMemo(
-    () => getColumns(showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate),
-    [showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate]
+    () => getColumns(showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate, unifyCourses),
+    [showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate, unifyCourses]
   )
 
   return (

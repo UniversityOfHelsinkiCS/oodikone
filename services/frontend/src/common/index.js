@@ -101,16 +101,16 @@ export const getTextIn = (texts, language) => {
   return null
 }
 
-export const getUnifyTextIn = unify => {
-  switch (unify) {
+export const getUnifyTextIn = unifyCourses => {
+  switch (unifyCourses) {
     case 'reqularStats':
-      return ''
+      return '(normal)'
 
     case 'openStats':
-      return 'Open University: '
+      return '(open)'
 
     case 'unifyStats':
-      return 'Unified with open uni: '
+      return '(Open and normal)'
 
     default:
       return ''
