@@ -81,12 +81,12 @@ const getRow = ({
         {row.map((value, index) =>
           index === 0 ? (
             <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={getKey(row[0])}>
-              {value} {_.findKey(studytracks, value)}
+              {value} {_.findKey(studytracks, value.split(',')[0])}
               <PopulationLink
                 studyprogramme={studyprogramme}
                 year={year}
                 years={calendarYears}
-                studytrack={_.findKey(studytracks, s => s === value)}
+                studytrack={_.findKey(studytracks, s => s === value.split(',')[0])}
               />
             </Table.Cell>
           ) : (
