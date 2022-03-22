@@ -9,25 +9,29 @@ const getKey = year => `${year}-${Math.random()}`
 
 const shouldBeHidden = (hidePercentages, value) => hidePercentages && typeof value === 'string' && value.includes('%')
 
-const getFirstCell = (yearlyData, year, show, studyprogramme) => {
+const getCellClass = value => (value === 'Total' ? 'total-row-cell' : '')
+
+const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears }) => {
   return (
-    <Table.Cell key={getKey(year)}>
+    <Table.Cell key={getKey(year)} className={getCellClass(year)}>
       {yearlyData.length > 1 && <Icon name={`${show ? 'angle down' : 'angle right'}`} />}
       {year}
-      <PopulationLink studyprogramme={studyprogramme} year={year} />
+      <PopulationLink studyprogramme={studyprogramme} year={year} years={calendarYears} />
     </Table.Cell>
   )
 }
 
-const getSingleTrackRow = ({ row, studyprogramme, code, hidePercentages }) => {
+const getSingleTrackRow = ({ row, studyprogramme, code, hidePercentages, calendarYears }) => {
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
       {row.map((value, index) => (
         <>
           {shouldBeHidden(hidePercentages, value) ? null : (
-            <Table.Cell textAlign="left" key={getKey(row[0])}>
+            <Table.Cell textAlign="left" className={getCellClass(row[0])} key={getKey(row[0])}>
               {value}
-              {index === 0 && <PopulationLink studyprogramme={studyprogramme} year={row[0]} studytrack={code} />}
+              {index === 0 && (
+                <PopulationLink studyprogramme={studyprogramme} year={row[0]} studytrack={code} years={calendarYears} />
+              )}
             </Table.Cell>
           )}
         </>
@@ -36,7 +40,17 @@ const getSingleTrackRow = ({ row, studyprogramme, code, hidePercentages }) => {
   )
 }
 
-const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks, hidePercentages, years }) => {
+const getRow = ({
+  yearlyData,
+  row,
+  show,
+  setShow,
+  studyprogramme,
+  studytracks,
+  hidePercentages,
+  years,
+  calendarYears,
+}) => {
   const year = yearlyData && yearlyData[0] && yearlyData[0][0]
 
   // Get row for the studyprogramme
@@ -45,11 +59,11 @@ const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks, h
       <Table.Row key={getKey(row[0])} className="header-row" onClick={() => setShow(!show)}>
         {row.map((value, index) =>
           index === 0 ? (
-            getFirstCell(yearlyData, row[0], show, studyprogramme)
+            getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears })
           ) : (
             <>
               {shouldBeHidden(hidePercentages, value) ? null : (
-                <Table.Cell key={getKey(value)} textAlign="left">
+                <Table.Cell className={getCellClass(row[0])} key={getKey(value)} textAlign="left">
                   {value}
                 </Table.Cell>
               )}
@@ -71,13 +85,14 @@ const getRow = ({ yearlyData, row, show, setShow, studyprogramme, studytracks, h
               <PopulationLink
                 studyprogramme={studyprogramme}
                 year={year}
+                years={calendarYears}
                 studytrack={_.findKey(studytracks, s => s === value)}
               />
             </Table.Cell>
           ) : (
             <>
               {shouldBeHidden(hidePercentages, value) ? null : (
-                <Table.Cell textAlign="left" key={getKey(row[0])}>
+                <Table.Cell className={getCellClass(row[0])} textAlign="left" key={getKey(row[0])}>
                   {value}
                 </Table.Cell>
               )}
@@ -96,6 +111,8 @@ const sortTrackDataByYear = data => {
 
   const copy = [...data]
   const sortedData = copy.sort((a, b) => {
+    if (a[0] === 'Total') return -1
+    if (b[0] === 'Total') return 1
     if (a[0] < b[0]) return -1
     if (a[0] > b[0]) return 1
     return 0
@@ -113,6 +130,7 @@ const sortMainDataByYear = data => {
     if (arrays.length) {
       const copy = [...arrays]
       const sortedYear = copy.sort((a, b) => {
+        if (a[0] === 'Total') return 1
         if (a[0] < b[0]) return 1
         if (a[0] > b[0]) return -1
         return 0
@@ -141,6 +159,10 @@ const StudytrackDataTable = ({
 
   const sortedMainStats = sortMainDataByYear(Object.values(dataOfAllTracks))
   const sortedTrackStats = sortTrackDataByYear(dataOfSingleTrack)
+  const calendarYears = years.reduce((all, year) => {
+    if (year === 'Total') return all
+    return all.concat(Number(year.slice(0, 4)))
+  }, [])
 
   return (
     <div className="datatable">
@@ -169,11 +191,21 @@ const StudytrackDataTable = ({
         <Table.Body>
           {singleTrack
             ? sortedTrackStats.map(row =>
-                getSingleTrackRow({ row, studyprogramme, code: singleTrack, hidePercentages })
+                getSingleTrackRow({ row, studyprogramme, code: singleTrack, hidePercentages, years, calendarYears })
               )
             : sortedMainStats?.map(yearlyData =>
                 yearlyData.map(row =>
-                  getRow({ yearlyData, row, studyprogramme, show, setShow, studytracks, hidePercentages, years })
+                  getRow({
+                    yearlyData,
+                    row,
+                    studyprogramme,
+                    show,
+                    setShow,
+                    studytracks,
+                    hidePercentages,
+                    years,
+                    calendarYears,
+                  })
                 )
               )}
         </Table.Body>

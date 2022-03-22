@@ -57,15 +57,7 @@ class CourseYearlyStatsCounter {
         studentnumbers: [],
       },
       enrollments: [],
-      enrollmentsByState: {
-        ENROLLED: 0,
-        NOT_ENROLLED: 0,
-        REJECTED: 0,
-        CONFIRMED: 0,
-        ABORTED_BY_STUDENT: 0,
-        ABORTED_BY_TEACHER: 0,
-        PROCESSING: 0,
-      },
+      allEnrollments: [],
       yearcode,
     }
   }
@@ -143,14 +135,15 @@ class CourseYearlyStatsCounter {
   markEnrollmentToGroup(studentnumber, state, enrollment_date_time, groupcode, groupname, coursecode, yearcode) {
     if (!this.groups[groupcode]) this.initGroup(groupcode, groupname, coursecode, yearcode)
 
-    this.groups[groupcode].enrollmentsByState[state] += 1 // not used?
+    const enrollment = { studentnumber, state, enrollment_date_time }
+    this.groups[groupcode].allEnrollments.push(enrollment)
     const oldEnrollment = this.groups[groupcode].enrollments.find(e => e.studentnumber === studentnumber)
     if (!oldEnrollment) return this.groups[groupcode].enrollments.push({ studentnumber, state, enrollment_date_time })
     if (oldEnrollment.state === 'ENROLLED' || oldEnrollment.state === 'CONFIRMED') return
     if (state !== 'ENROLLED' || state !== 'CONFIRMED') return
     this.groups[groupcode].enrollments = this.groups[groupcode].enrollments
       .filter(e => e.studentnumber !== studentnumber)
-      .concat([{ studentnumber, state, enrollment_date_time }])
+      .concat([enrollment])
   }
 
   markCreditToAttempts(studentnumber, passed, grade, groupcode) {

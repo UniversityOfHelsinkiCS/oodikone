@@ -532,13 +532,17 @@ const studentnumbersWithAllStudyrightElements = async (
     return acc
   }, {})
 
+  // Take the newest studytrack primarily by latest starting date in the track, secondarily by the latest enddate
   const filteredStudentnumbers = studentnumbers.filter(studentnumber => {
-    const newestStudytrack = sortBy(formattedStudytracks[studentnumber], ['enddate', 'startdate']).reverse()[0]
+    const newestStudytrack = sortBy(formattedStudytracks[studentnumber], ['startdate', 'enddate']).reverse()[0]
     if (!newestStudytrack) return false
     return studyRights.includes(newestStudytrack.code)
   })
 
-  let studentnumberlist = filteredStudentnumbers.length > 0 ? filteredStudentnumbers : studentnumbers
+  // Use the filtered list, if the search includes studytracks
+  // Then the studyrights length is > 1, which means that there is [studyright, studytrack].
+  // When searching only for studyprogramme, there is [studyright]
+  let studentnumberlist = studyRights.length > 1 ? filteredStudentnumbers : studentnumbers
 
   // fetch students that have transferred out of the programme and filter out these studentnumbers
   if (!transferredOutStudents) {

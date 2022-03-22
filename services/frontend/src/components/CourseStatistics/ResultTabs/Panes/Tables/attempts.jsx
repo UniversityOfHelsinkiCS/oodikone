@@ -3,7 +3,7 @@ import qs from 'query-string'
 import _, { uniq } from 'lodash'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Header, Icon, Item } from 'semantic-ui-react'
+import { Header, Icon, Item, Popup } from 'semantic-ui-react'
 
 import SortableTable from '../../../../SortableTable'
 import { defineCellColor, getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
@@ -15,6 +15,20 @@ const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
   getRowContent,
   getCellProps: s => defineCellColor(s),
 })
+
+const styles = {
+  help: {
+    opacity: 0.5,
+    marginLeft: '0.5rem',
+  },
+}
+
+const TitleWithHelp = ({ title, helpText }) => (
+  <>
+    {title}
+    <Popup trigger={<Icon circular name="help" style={styles.help} size="small" />} content={helpText} />
+  </>
+)
 
 const getTableData = (stats, notThesisGrades, isRelative) =>
   stats.map(stat => {
@@ -37,6 +51,8 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
       coursecode,
       passed: stat.attempts.categories.passed,
       failed: stat.attempts.categories.failed,
+      enrollmentsByState: stat.attempts.enrollmentsByState,
+      totalEnrollments: stat.attempts.totalEnrollments,
       passRate: stat.attempts.passRate,
       attempts,
       rowObfuscated,
@@ -70,7 +86,7 @@ const getGradeColumns = (notThesisGrades, addHTAndTT) => {
 
 const AttemptsTable = ({
   data: { stats, name },
-  settings: { showGrades, separate },
+  settings: { showGrades, showEnrollments, separate },
   alternatives,
   isRelative,
   userHasAccessToAllStats,
@@ -130,6 +146,35 @@ const AttemptsTable = ({
       timeColumn,
       getSortableColumn('ATTEMPTS', 'Total attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
       ...getGradeColumns(notThesisGrades, includesHTOrTT(stats)),
+    ]
+  }
+
+  if (showEnrollments) {
+    columns = [
+      ...columns,
+      getSortableColumn(
+        'TOTAL_ENROLLMENTS',
+        <TitleWithHelp
+          title="Total enrollments"
+          helpText="All enrollments, including all rejected and aborted states."
+        />,
+        s => (s.rowObfuscated ? 'NA' : s.totalEnrollments)
+      ),
+      getSortableColumn(
+        'ENROLLMENTS_ENROLLED',
+        <TitleWithHelp title="Enrolled" helpText="All enrollments with enrolled or confirmed state." />,
+        s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ENROLLED)
+      ),
+      getSortableColumn(
+        'ENROLLMENTS_REJECTED',
+        <TitleWithHelp title="Rejected" helpText="All enrollments with rejected state." />,
+        s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.REJECTED)
+      ),
+      getSortableColumn(
+        'ENROLLMENTS_ABORTED',
+        <TitleWithHelp title="Aborted" helpText="All enrollments with aborted by student or teacher state." />,
+        s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ABORTED)
+      ),
     ]
   }
 
