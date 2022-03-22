@@ -60,7 +60,7 @@ const PopulationStatistics = () => {
       allSemesters: allSemesters ?? [],
       language,
     }),
-    studyTrackFilter,
+    studyTrackFilter({ code: programmeCode }),
     programmeFilter,
   ]
 
