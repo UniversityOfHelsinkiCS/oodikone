@@ -100,6 +100,12 @@
   flex-grow: 2;
 }
 
+.studytrack-overview .datatable .total-row-cell,
+.studytrack-overview .table-container .total-row-cell {
+  border-top: 3px solid rgb(189, 180, 180);
+  font-weight: bold;
+}
+
 .studytrack-overview .studytrack-selector {
   margin: 60px 60px 30px 60px;
 }
