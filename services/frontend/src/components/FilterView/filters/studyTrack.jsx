@@ -5,15 +5,21 @@ import moment from 'moment'
 import _ from 'lodash'
 import createFilter from './createFilter'
 
-const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt }) => {
+const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt, code }) => {
   const { selected } = options
 
-  const activeAtMoment = activeAt ? moment(activeAt) : moment()
+  const activeAtMoment = activeAt && moment(activeAt)
 
   const dropdownOptions = _.chain(withoutSelf())
     .flatMap(student => student.studyrights)
-    .flatMap(sr => sr.studyright_elements)
-    .filter(sre => sre.element_detail.type === 30 && activeAtMoment.isBetween(sre.startdate, sre.enddate, 'day', '[]'))
+    .map(sr => sr.studyright_elements)
+    .filter(sre => sre.some(e => e.code === code))
+    .flatMap()
+    .filter(
+      sre =>
+        sre.element_detail?.type === 30 &&
+        (activeAtMoment ? activeAtMoment.isBetween(sre.startdate, sre.enddate, 'day', '[]') : true)
+    )
     .map(sre => sre.element_detail)
     .keyBy('code')
     .values()
@@ -68,18 +74,20 @@ export default createFilter({
   isActive: ({ selected }) => selected.length > 0,
 
   filter: (student, { selected, args }) => {
-    const activeAt = _.get(args, 'activeAt', moment())
+    const activeAt = _.get(args, 'activeAt')
 
     return student.studyrights
       .flatMap(sr => sr.studyright_elements)
       .filter(
         sre =>
-          sre.element_detail.type === 30 &&
-          (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate, 'day', '[]'))
+          sre.element_detail?.type === 30 &&
+          (activeAt ? moment(activeAt).isBetween(sre.startdate, sre.enddate, 'day', '[]') : true)
       )
-      .map(sre => sre.element_detail.code)
+      .map(sre => sre.element_detail?.code)
       .some(code => selected.includes(code))
   },
 
-  render: (props, { args }) => <StudyTrackFilterCard {...props} activeAt={_.get(args, 'activeAt')} />,
+  render: (props, { args }) => (
+    <StudyTrackFilterCard {...props} code={_.get(args, 'code')} activeAt={_.get(args, 'activeAt')} />
+  ),
 })
