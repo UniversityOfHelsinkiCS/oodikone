@@ -532,8 +532,9 @@ const studentnumbersWithAllStudyrightElements = async (
     return acc
   }, {})
 
+  // Take the newest studytrack primarily by latest starting date in the track, secondarily by the latest enddate
   const filteredStudentnumbers = studentnumbers.filter(studentnumber => {
-    const newestStudytrack = sortBy(formattedStudytracks[studentnumber], ['enddate', 'startdate']).reverse()[0]
+    const newestStudytrack = sortBy(formattedStudytracks[studentnumber], ['startdate', 'enddate']).reverse()[0]
     if (!newestStudytrack) return false
     return studyRights.includes(newestStudytrack.code)
   })
