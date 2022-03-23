@@ -40,12 +40,14 @@
   right: 0;
 }
 
-.ok-sortable-table th:hover > div > .column-tools.floating {
+.ok-sortable-table th:hover > div > .column-tools.floating,
+.ok-sortable-table th.filter-menu-open > div > .column-tools.floating {
   opacity: 1 !important;
   padding: 0 0.5em;
 }
 
-.ok-sortable-table th:hover > div > .column-tools.floating::before {
+.ok-sortable-table th:hover > div > .column-tools.floating::before,
+.ok-sortable-table th.filter-menu-open > div > .column-tools.floating::before {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -60,7 +62,8 @@
   pointer-events: none;
 }
 
-.ok-sortable-table th:hover > div > .column-tools.dangling {
+.ok-sortable-table th:hover > div > .column-tools.dangling,
+.ok-sortable-table th.filter-menu-open > div > .column-tools.dangling {
   pointer-events: all;
   background-color: #f4f4f4;
   top: calc(100% - 2em + 1px);
