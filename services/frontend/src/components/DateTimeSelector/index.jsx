@@ -4,7 +4,9 @@ import 'moment/locale/fi'
 import { Icon, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import { useGetSemestersQuery } from 'redux/semesters'
-import { getTextIn } from '../common'
+import { getTextIn } from '../../common'
+
+import './style.css'
 
 const semesterListStyles = {
   maxHeight: '10em',
@@ -38,9 +40,10 @@ const DateTime = ({ value, onChange, before, after, showSemesters }) => {
             }}
             style={{
               height: '1.75em',
-              background: value && value.isSame(date, 'day') ? '#428bca' : 'inherit',
+              background: value && value.isSame(date, 'day') ? '#428bca' : undefined,
               color: value && value.isSame(date, 'day') ? 'white' : 'inherit',
             }}
+            className="date-picker-semester-button"
           >
             {label}
           </button>
