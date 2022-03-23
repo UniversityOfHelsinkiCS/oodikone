@@ -8,8 +8,8 @@ import { SortableTableContext, getColumnValue } from './common'
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   const { values } = useContext(SortableTableContext)
 
-  const min = _.min(values[column.key])
-  const max = _.max(values[column.key])
+  const min = _.min(values[column.key].filter(_.isNumber)) ?? 0
+  const max = _.max(values[column.key].filter(_.isNumber)) ?? 0
 
   const value = useMemo(() => {
     if (options.range) {
