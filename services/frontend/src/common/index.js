@@ -110,7 +110,7 @@ export const getUnifyTextIn = unifyCourses => {
       return '(open)'
 
     case 'unifyStats':
-      return '(Open and normal)'
+      return '(open and normal)'
 
     default:
       return ''

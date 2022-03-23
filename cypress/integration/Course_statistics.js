@@ -156,7 +156,7 @@ describe('Course Statistics tests', () => {
       cy.contains('TKT20003')
 
       cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
-      cy.contains('Population of course Unified with open uni: Käyttöjärjestelmät 2019-2020')
+      cy.contains('Population of course Käyttöjärjestelmät 2019-2020 (open and normal')
       cy.contains('TKT20003')
 
       cy.contains('Students (127)').click()
@@ -170,7 +170,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('TKT20001, 58131, AYTKT20001 Tietorakenteet ja algoritmit')
       cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
-      cy.contains('Population of course Unified with open uni: Tietorakenteet ja algoritmit 2018-2019')
+      cy.contains('Population of course Tietorakenteet ja algoritmit 2018-2019 (open and normal)')
       cy.contains('Students (204)').click()
       cy.contains('td', '010262566').siblings().contains('4')
       cy.contains('td', '010674989').siblings().contains('1')
