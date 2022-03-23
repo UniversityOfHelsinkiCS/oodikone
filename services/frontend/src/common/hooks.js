@@ -277,6 +277,18 @@ export const useDebounce = (value, timeout, onChange) => {
 
   const timeoutRef = useRef(null)
 
+  useEffect(() => {
+    if (!isEqual(value, innerValue)) {
+      setInnerValue(value)
+      setDirty(false)
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
+  }, [value])
+
   const setValue = useCallback(
     value => {
       setInnerValue(value)
