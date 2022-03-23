@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Segment, Header, Accordion, Message } from 'semantic-ui-react'
 import _ from 'lodash'
 import scrollToComponent from 'react-scroll-to-component'
+import semestersApi from 'redux/semesters'
 import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
@@ -33,10 +34,10 @@ import CustomPopulationSearch from './CustomPopulationSearch'
 import UnihowDataExport from './UnihowDataExport'
 
 const selectCustomPopulationData = createSelector(
-  state => state.semesters.data,
+  semestersApi.endpoints.getSemesters.select(),
   state => state.populations.data,
   (semesters, populations) => ({
-    allSemesters: semesters?.semesters ?? [],
+    allSemesters: semesters?.data?.semesters ?? [],
     custompop: populations?.students ?? [],
   })
 )

@@ -59,7 +59,7 @@ const PopulationStatistics = () => {
     tagsFilter,
     creditDateFilter,
     enrollmentStatusFilter({
-      allSemesters: allSemesters ?? [],
+      allSemesters: allSemesters?.semesters ?? [],
       language,
     }),
     studyTrackFilter({ code: programmeCode }),

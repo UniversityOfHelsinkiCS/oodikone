@@ -14,3 +14,5 @@ const semestersApi = RTKApi.injectEndpoints({
 })
 
 export const { useGetSemestersQuery } = semestersApi
+
+export default semestersApi
