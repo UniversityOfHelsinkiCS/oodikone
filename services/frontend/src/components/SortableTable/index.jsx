@@ -445,13 +445,14 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
               open={filterMenuOpen}
               onOpen={() => setFilterMenuOpen(true)}
               onClose={() => setFilterMenuOpen(false)}
+              closeOnBlur={false}
               style={{
                 color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb',
                 top: '1px',
               }}
               lazyLoad
             >
-              <Dropdown.Menu onClick={evt => evt.stopPropagation()}>
+              <Dropdown.Menu>
                 <FilterComponent
                   dispatch={filterComponentDispatch}
                   column={column}
