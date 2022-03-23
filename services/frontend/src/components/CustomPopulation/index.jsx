@@ -8,7 +8,6 @@ import { useProgress, useTitle } from '../../common/hooks'
 import infotooltips from '../../common/InfoToolTips'
 import { getCustomPopulationSearches } from '../../redux/customPopulationSearch'
 import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
-import { getSemesters } from '../../redux/semesters'
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import CustomPopulationCourses from './CustomPopulationCourses'
@@ -55,7 +54,6 @@ const CustomPopulation = () => {
   useTitle('Custom population')
 
   useEffect(() => {
-    dispatch(getSemesters())
     dispatch(getCustomPopulationSearches())
   }, [])
 

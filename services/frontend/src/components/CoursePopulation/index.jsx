@@ -10,7 +10,7 @@ import { getCoursePopulation } from '../../redux/populations'
 import { getSingleCourseStats } from '../../redux/singleCourseStats'
 import { useGetStudentListCourseStatisticsQuery } from '../../redux/populationCourses'
 import { getFaculties } from '../../redux/faculties'
-import { getSemesters } from '../../redux/semesters'
+import { useGetSemestersQuery } from '../../redux/semesters'
 import { getElementDetails } from '../../redux/elementdetails'
 import PopulationStudents from '../PopulationStudents'
 import CoursePopulationGradeDist from './CoursePopulationGradeDist'
@@ -44,8 +44,6 @@ const CoursePopulation = ({
   pending,
   history,
   courseData,
-  getSemestersDispatch,
-  semesters,
   getFacultiesDispatch,
   unifyCourses,
 }) => {
@@ -75,9 +73,10 @@ const CoursePopulation = ({
     studentNumbers: studentData.students ? studentData.students.map(student => student.studentNumber) : [],
   })
 
+  const { data: semesters = {} } = useGetSemestersQuery()
+
   useEffect(() => {
     getElementDetails()
-    getSemestersDispatch()
   }, [])
 
   useEffect(() => {
@@ -365,13 +364,12 @@ const CustomPopulationCoursesWrapper = props => {
   return <CustomPopulationCourses {...props} courses={courseStatistics} />
 }
 
-const mapStateToProps = ({ singleCourseStats, populations, semesters, courseSearch }) => {
+const mapStateToProps = ({ singleCourseStats, populations, courseSearch }) => {
   return {
     studentData: populations.data,
     pending: populations.pending,
     courseData: singleCourseStats.stats?.[courseSearch.openOrReqular],
     unifyCourses: courseSearch.openOrReqular,
-    semesters: semesters.data,
     elementDetails: populations?.data?.elementdetails?.data,
   }
 }
@@ -380,7 +378,6 @@ export default withRouter(
   connect(mapStateToProps, {
     getCoursePopulationDispatch: getCoursePopulation,
     getSingleCourseStatsDispatch: getSingleCourseStats,
-    getSemestersDispatch: getSemesters,
     getFacultiesDispatch: getFaculties,
     getElementDetails,
   })(CoursePopulation)

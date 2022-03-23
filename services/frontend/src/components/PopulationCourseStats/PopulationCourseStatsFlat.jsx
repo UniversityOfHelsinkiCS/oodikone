@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Table, Form, Input, Tab, Icon } from 'semantic-ui-react'
 import { orderBy, debounce } from 'lodash'
+import { useGetSemestersQuery } from 'redux/semesters'
 import { clearCourseStats } from '../../redux/coursestats'
 import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
@@ -86,8 +87,10 @@ const initialState = props => ({
 
 const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFilter = true }) => {
   const dispatch = useDispatch()
-  const { years } = useSelector(({ semesters }) => semesters.data)
+  const semesterRequest = useGetSemestersQuery()
   const { language } = useLanguage()
+
+  const years = semesterRequest.isLoading ? [] : semesterRequest.data.years
 
   const props = {
     courses,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Segment, Header, Form, Grid, Button, Popup } from 'semantic-ui-react'
 import { shape, string, arrayOf, objectOf, oneOfType, number, func, bool } from 'prop-types'
 import { connect } from 'react-redux'
@@ -15,7 +15,7 @@ import ProgrammeDropdown from '../ProgrammeDropdown'
 import selectors, { ALL } from '../../../selectors/courseStats'
 import YearFilter from '../SearchForm/YearFilter'
 import { getTextIn } from '../../../common'
-import { getSemesters } from '../../../redux/semesters'
+import { useGetSemestersQuery } from '../../../redux/semesters'
 import TSA from '../../../common/tsa'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import countTotalStats from './countTotalStats'
@@ -40,9 +40,6 @@ const SingleCourseStats = ({
   history,
   location,
   stats: { coursecode },
-  getSemesters,
-  years,
-  semesters,
   programmes,
   maxYearsToCreatePopulationFrom,
   getMaxYearsToCreatePopulationFrom,
@@ -55,6 +52,28 @@ const SingleCourseStats = ({
   const [toYear, setToYear] = useState(0)
   const [separate, setSeparate] = useState(null)
 
+  const { data: semesterData } = useGetSemestersQuery()
+
+  const { semesters, years } = useMemo(() => {
+    const semesters = Object.values(semesterData?.semesters ?? {})
+      .map(({ semestercode, name, yearcode }) => ({
+        key: semestercode,
+        texts: Object.values(name),
+        value: yearcode,
+      }))
+      .reverse()
+
+    const years = Object.values(semesterData?.years ?? {})
+      .map(({ yearcode, yearname }) => ({
+        key: yearcode,
+        text: yearname,
+        value: yearcode,
+      }))
+      .reverse()
+
+    return { semesters, years }
+  }, [semesterData])
+
   const parseQueryFromUrl = () => {
     const { separate } = qs.parse(location.search)
     return {
@@ -63,7 +82,6 @@ const SingleCourseStats = ({
   }
 
   useEffect(() => {
-    if (years.length === 0 || semesters.length === 0) getSemesters()
     if (location.search) {
       const { separate } = parseQueryFromUrl()
       setSeparate(separate)
@@ -502,12 +520,9 @@ SingleCourseStats.propTypes = {
     coursecode: string,
   }).isRequired,
   programmes: arrayOf(shape({})).isRequired,
-  years: arrayOf(shape({})).isRequired,
-  semesters: arrayOf(shape({})).isRequired,
   location: shape({}).isRequired,
   setSelectedCourse: func.isRequired,
   clearSelectedCourse: func.isRequired,
-  getSemesters: func.isRequired,
   history: shape({
     push: func,
   }).isRequired,
@@ -517,23 +532,8 @@ SingleCourseStats.propTypes = {
 }
 
 const mapStateToProps = state => {
-  const { semesters = [], years = [] } = state.semesters.data
   return {
     programmes: selectors.getAllStudyProgrammes(state),
-    years: Object.values(years)
-      .map(({ yearcode, yearname }) => ({
-        key: yearcode,
-        text: yearname,
-        value: yearcode,
-      }))
-      .reverse(),
-    semesters: Object.values(semesters)
-      .map(({ semestercode, name, yearcode }) => ({
-        key: semestercode,
-        texts: Object.values(name),
-        value: yearcode,
-      }))
-      .reverse(),
     maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom,
   }
 }
@@ -541,7 +541,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
   setSelectedCourse,
   clearSelectedCourse,
-  getSemesters,
   getMaxYearsToCreatePopulationFrom,
 }
 

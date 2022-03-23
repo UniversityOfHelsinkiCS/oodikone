@@ -20,7 +20,6 @@ import graphSpinner from './graphSpinner'
 import settings from './settings'
 import teachers from './teachers'
 import providers from './providers'
-import semesters from './semesters'
 import teacherStatistics from './teacherStatistics'
 import teachersTop from './teachersTop'
 import teachersTopCategories from './teachersTopCategories'
@@ -59,7 +58,6 @@ const store = configureStore({
     settings,
     teachers,
     providers,
-    semesters,
     teacherStatistics,
     teachersTop,
     teachersTopCategories,
