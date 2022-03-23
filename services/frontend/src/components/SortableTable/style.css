@@ -26,6 +26,7 @@
   display: flex;
   background-color: white;
   position: absolute;
+  padding: 0 0.5em;
 }
 
 .ok-sortable-table th > div > .column-tools.floating {
@@ -36,7 +37,6 @@
 }
 
 .ok-sortable-table th > div > .column-tools.fixed {
-  padding: 0 0.5em;
   right: 0;
 }
 
