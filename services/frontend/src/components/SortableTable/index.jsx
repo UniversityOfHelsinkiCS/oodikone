@@ -1,6 +1,15 @@
 /* eslint-disable no-return-assign */
 
-import React, { useRef, useState, useMemo, useReducer, useContext, useCallback, useLayoutEffect } from 'react'
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+  useReducer,
+  useContext,
+  useCallback,
+  useLayoutEffect,
+} from 'react'
 import { Icon, Dropdown } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
@@ -237,13 +246,26 @@ const SizeMeasurer = ({ as = 'div', onSizeChange, children, ...rest }) => {
 }
 
 const Orientable = ({ orientation, children, ...rest }) => {
+  const sizeRef = useRef()
   const containerRef = useRef()
+
+  useEffect(() => {
+    if (sizeRef.current && containerRef.current) {
+      const size = sizeRef.current
+      const [width, height] =
+        orientation === 'vertical' ? [size.blockSize, size.inlineSize] : [size.inlineSize, size.blockSize]
+
+      containerRef.current.style.width = `${width}px`
+      containerRef.current.style.height = `${height}px`
+    }
+  }, [orientation, containerRef, sizeRef])
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>
       <SizeMeasurer
         {...rest}
         onSizeChange={size => {
+          sizeRef.current = size
           const [width, height] =
             orientation === 'vertical' ? [size.blockSize, size.inlineSize] : [size.inlineSize, size.blockSize]
 
