@@ -216,7 +216,7 @@ describe('Population Statistics', () => {
 
 describe('Course Statistics', () => {
   const pathToDSAndAlgoSpring2019 =
-    '/coursepopulation?coursecodes=%5B%22TKT20001%22%2C%2258131%22%5D&from=138&separate=true&to=138&years=Kev%C3%A4t%202019'
+    '/coursepopulation?coursecodes=%5B%22TKT20001%22%2C%2258131%22%5D&from=138&separate=true&to=138&years=Kev%C3%A4t%202019&unifyCourses=unifyStats'
   const defaultAmountOfStudents = 118
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
