@@ -86,7 +86,7 @@ const FigureContainer = ({ children, style }) => {
           height: '100% !important',
         }}
       >
-        <div style={{ inset: 0, position: 'absolute', zIndex: 910, height: '100000vh' }}>
+        <div style={{ inset: 0, position: 'absolute', zIndex: 9004, height: '100000vh' }}>
           <Card
             fluid
             style={{ position: 'sticky', margin: 0, inset: 0, height: '100vh', border: 'none', borderRadius: 0 }}
