@@ -271,6 +271,43 @@ export const useLanguage = () => {
   return language
 }
 
+export const useDebounce = (value, timeout, onChange) => {
+  const [innerValue, setInnerValue] = useState(value)
+  const [dirty, setDirty] = useState(false)
+
+  const timeoutRef = useRef(null)
+
+  const setValue = useCallback(
+    value => {
+      setInnerValue(value)
+      setDirty(true)
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        onChange(value)
+        setDirty(false)
+      }, timeout)
+    },
+    [innerValue, setInnerValue, timeoutRef, onChange, timeout]
+  )
+
+  const flush = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+
+    onChange(innerValue)
+    setDirty(false)
+  }, [timeoutRef, onChange, innerValue])
+
+  return [innerValue, setValue, flush, dirty]
+}
+
 // From: https://www.joshwcomeau.com/snippets/react-hooks/use-toggle/
 export const useToggle = (initialValue = false) => {
   const [value, setValue] = useState(initialValue)
