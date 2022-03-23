@@ -251,6 +251,7 @@ const GeneralTab = ({
     creditsSinceStart: {
       key: 'creditsSinceStart',
       title: creditColumnTitle,
+      filterType: 'range',
       getRowVal: s => {
         const credits = getStudentTotalCredits(s)
         return credits
@@ -282,6 +283,7 @@ const GeneralTab = ({
     allCredits: {
       key: 'allCredits',
       title: 'All Credits',
+      filterType: 'range',
       getRowVal: s => s.credits,
     },
     transferredFrom: {
@@ -360,6 +362,7 @@ const GeneralTab = ({
     startYear: {
       key: 'startYear',
       title: 'Start Year at Uni',
+      filterType: 'range',
       getRowVal: s => (!s.obfuscated ? moment(s.started).year : ''),
     },
     option: containsOption && {

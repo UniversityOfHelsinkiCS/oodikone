@@ -98,6 +98,7 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
           {
             key: 'LASTLOGIN',
             title: 'Last login',
+            filterType: 'date',
             getRowVal: user => (user.last_login ? user.last_login : 'Not saved'),
             getRowContent: user =>
               user.last_login ? (

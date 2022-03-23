@@ -10,6 +10,7 @@ import CourseFilterToggle from '../CourseFilterToggle'
 const semesterColumn = (year, semester, cumulative) => ({
   key: `semester-${year}-${semester}`,
   cellProps: { style: { textAlign: 'right' } },
+  filterType: 'range',
   title: semester,
   getRowVal: row =>
     ((cumulative ? row?.stats?.passingSemestersCumulative : row?.stats?.passingSemesters) ?? {})[
@@ -95,18 +96,21 @@ const PassingSemesters = () => {
           {
             key: 'students',
             title: 'Students',
+            filterType: 'range',
             getRowVal: row => row.stats?.students,
             cellProps: { style: { textAlign: 'right' } },
           },
           {
             key: 'passed',
             title: 'Passed',
+            filterType: 'range',
             getRowVal: row => row.stats?.passed,
             cellProps: { style: { textAlign: 'right' } },
           },
           {
             key: 'passed-before',
             title: 'Before 1st year',
+            filterType: 'range',
             getRowVal: row =>
               (cumulativeStats ? row.stats?.passingSemesters : row.stats?.passingSemestersCumulative)?.BEFORE,
             cellProps: { style: { textAlign: 'right' } },

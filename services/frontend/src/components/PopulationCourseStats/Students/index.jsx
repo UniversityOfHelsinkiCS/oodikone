@@ -139,6 +139,7 @@ const Students = ({ filteredStudents }) => {
         children: pagedStudents.map(student => ({
           key: `student-${student.studentnumber}`,
           title: `${namesVisible ? student.name : student.studentnumber}`,
+          vertical: true,
           getRowVal: (row, isGroup) =>
             isGroup
               ? countCompleted(row.courses, student.studentnumber)

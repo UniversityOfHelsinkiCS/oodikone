@@ -5,6 +5,13 @@
   justify-content: center;
 }
 
+.searchContainer .contentSegment {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .searchInput {
   width: 100%;
   max-width: 750px;
