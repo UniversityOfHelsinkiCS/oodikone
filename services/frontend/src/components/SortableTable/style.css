@@ -26,7 +26,7 @@
   display: flex;
   background-color: white;
   position: absolute;
-  padding: 0 0.5em;
+  padding: 0 0.78571429em;
 }
 
 .ok-sortable-table th > div > .column-tools.floating {
@@ -43,7 +43,6 @@
 .ok-sortable-table th:hover > div > .column-tools.floating,
 .ok-sortable-table th.filter-menu-open > div > .column-tools.floating {
   opacity: 1 !important;
-  padding: 0 0.5em;
 }
 
 .ok-sortable-table th:hover > div > .column-tools.floating::before,

@@ -10,7 +10,7 @@ import React, {
   useCallback,
   useLayoutEffect,
 } from 'react'
-import { Icon, Dropdown } from 'semantic-ui-react'
+import { Icon, Popup, Dropdown } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import produce from 'immer'
@@ -379,6 +379,10 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
     evaluateSizes()
   }
 
+  const helpIcon = (
+    <Icon name="question circle outline" style={{ opacity: 0.5, display: 'inline-block', marginRight: 0 }} />
+  )
+
   return (
     <th
       colSpan={colSpan}
@@ -421,9 +425,10 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
         <SizeMeasurer onSizeChange={onTitleSizeChange}>
           <Orientable
             orientation={column.vertical ? 'vertical' : 'horizontal'}
-            style={{ flexGrow: 1, marginRight: '0.5em' }}
+            style={{ flexGrow: 1, marginRight: '0.5em', display: 'flex', alignItems: 'center', gap: '0.5em' }}
           >
             {column.title}
+            {column.helpText && helpIcon}
           </Orientable>
         </SizeMeasurer>
         <div style={{ flexGrow: 1 }} />
@@ -472,6 +477,7 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
               </Dropdown.Menu>
             </Dropdown>
           )}
+          {column.helpText && <Popup position="top center" trigger={helpIcon} content={column.helpText} />}
         </SizeMeasurer>
       </SizeMeasurer>
     </th>
