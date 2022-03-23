@@ -565,17 +565,12 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
   return rows.map(cells => <tr>{cells}</tr>)
 }
 
-const getInitialState = (defaultSort, columns) => () => ({
-  columnOptions: _.chain(columns)
-    .map(({ key }) => [
-      key,
-      {
-        filterOptions: undefined,
-        sort: defaultSort?.[0] === key ? defaultSort?.[1] : null,
+const getInitialState = defaultSort => () => ({
+  columnOptions: !defaultSort
+    ? {}
+    : {
+        [defaultSort[0]]: { filterOptions: undefined, sort: defaultSort[1] },
       },
-    ])
-    .fromPairs()
-    .value(),
   expandedGroups: [],
 })
 

@@ -155,7 +155,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Käyttöjärjestelmät')
       cy.contains('TKT20003')
 
-      cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
+      cy.get(':nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2019-2020 (open and normal')
       cy.contains('TKT20003')
 
@@ -169,7 +169,7 @@ describe('Course Statistics tests', () => {
       cy.contains(/^TKT20001, AYTKT20001$/).click()
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('TKT20001, 58131, AYTKT20001 Tietorakenteet ja algoritmit')
-      cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
+      cy.get(':nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Population of course Tietorakenteet ja algoritmit 2018-2019 (open and normal)')
       cy.contains('Students (204)').click()
       cy.contains('td', '010262566').siblings().contains('4')
@@ -182,7 +182,7 @@ describe('Course Statistics tests', () => {
       cy.contains('Fetch statistics').should('be.enabled').click()
       cy.contains('TKT20003, 582219 Käyttöjärjestelmät')
       cy.get('[data-cy=unify_radio_reqular]').click()
-      cy.get(':nth-child(3) > :nth-child(1) > div > .item > .level').click()
+      cy.get(':nth-child(3) > :nth-child(2) .level').click()
       cy.contains('Population of course Käyttöjärjestelmät 2019-2020')
       cy.contains('Language distribution').click()
       cy.contains('td', 'finnish').siblings().contains('122')
@@ -204,28 +204,28 @@ describe('Course Statistics tests', () => {
       const yearRange = { from: '2000-2001', to: '2020-2021' }
       const attemptsTableContents = [
         // [time, passed, failed, passrate]
-        ['Total', 511, 486, 25],
+        ['Total', null, 511, 486, 25],
       ]
 
       const attemptsTableContentsOpen = [
         // [time, passed, failed, passrate]
-        ['Total', 175, 175, 0],
+        ['Total', null, 175, 175, 0],
       ]
 
       const attemptsTableContentsReqular = [
         // [time, passed, failed, passrate]
-        ['Total', 312, 298, 14],
+        ['Total', null, 312, 298, 14],
       ]
 
       const gradesTableContents = [
         // [time, attempts, 0, 1, 2, 3, 4, 5, other passed]
-        ['Total', 511, 25, 11, 17, 21, 59, 365, 13],
-        ['2020-2021', 1, 0, 0, 0, 0, 0, 1, 0],
-        ['2019-2020', 54, 4, 3, 1, 3, 4, 39, 0],
-        ['2018-2019', 154, 7, 2, 6, 5, 15, 119, 0],
-        ['2017-2018', 186, 9, 3, 5, 6, 16, 139, 8],
-        ['2016-2017', 71, 2, 1, 2, 5, 13, 48, 0],
-        ['2015-2016', 21, 1, 1, 1, 0, 7, 8, 3],
+        ['Total', null, 511, 25, 11, 17, 21, 59, 365, 13],
+        ['2020-2021', null, 1, 0, 0, 0, 0, 0, 1, 0],
+        ['2019-2020', null, 54, 4, 3, 1, 3, 4, 39, 0],
+        ['2018-2019', null, 154, 7, 2, 6, 5, 15, 119, 0],
+        ['2017-2018', null, 186, 9, 3, 5, 6, 16, 139, 8],
+        ['2016-2017', null, 71, 2, 1, 2, 5, 13, 48, 0],
+        ['2015-2016', null, 21, 1, 1, 1, 0, 7, 8, 3],
       ]
 
       it('shows stats', () => {
@@ -252,6 +252,7 @@ describe('Course Statistics tests', () => {
               .eq(trIndex)
               .within(() => {
                 values.forEach((value, tdIndex) => {
+                  if (value === null) return
                   cy.get('td').eq(tdIndex).contains(value)
                 })
               })
@@ -265,6 +266,7 @@ describe('Course Statistics tests', () => {
               .eq(trIndex)
               .within(() => {
                 values.forEach((value, tdIndex) => {
+                  if (value === null) return
                   cy.get('td').eq(tdIndex).contains(value)
                 })
               })
@@ -289,6 +291,7 @@ describe('Course Statistics tests', () => {
               .eq(trIndex)
               .within(() => {
                 values.forEach((value, tdIndex) => {
+                  if (value === null) return
                   cy.get('td').eq(tdIndex).contains(value)
                 })
               })
@@ -364,12 +367,12 @@ describe('Course Statistics tests', () => {
     const attemptsTableContents = [
       // [time, passed, failed, passrate]
       // ['Total', 288, 213, 75, '73.96 %'],
-      ['Total', 295, 216, 79, '73.22 %'],
       // ['2020-2021', '5 or less students', 'NA', 'NA', 'NA'],
-      ['2020-2021', 5, 2, 3, '40.00 %'],
-      ['2019-2020', 164, 121, 43, '73.78 %'],
-      ['2018-2019', 85, 60, 25, '70.59 %'],
-      ['2017-2018', 39, 32, 7, '82.05 %'],
+      ['Total', null, 295, 216, 79, '73.22 %'],
+      ['2020-2021', null, 5, 2, 3, '40.00 %'],
+      ['2019-2020', null, 164, 121, 43, '73.78 %'],
+      ['2018-2019', null, 85, 60, 25, '70.59 %'],
+      ['2017-2018', null, 39, 32, 7, '82.05 %'],
     ]
 
     cy.contains('#CourseStatPanes a.item', 'Attempts').click()
@@ -379,6 +382,7 @@ describe('Course Statistics tests', () => {
           .eq(trIndex)
           .within(() => {
             values.forEach((value, tdIndex) => {
+              if (value === null) return
               cy.get('td').eq(tdIndex).contains(value)
             })
           })

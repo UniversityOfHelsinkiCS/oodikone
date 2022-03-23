@@ -55,7 +55,7 @@ const SingleCourseStats = ({
   const { data: semesterData } = useGetSemestersQuery()
 
   const { semesters, years } = useMemo(() => {
-    const semesters = Object.values(semesterData?.semesters ?? {})
+    const semesters = Object.values(semesterData?.semesters ?? [])
       .map(({ semestercode, name, yearcode }) => ({
         key: semestercode,
         texts: Object.values(name),
@@ -63,7 +63,7 @@ const SingleCourseStats = ({
       }))
       .reverse()
 
-    const years = Object.values(semesterData?.years ?? {})
+    const years = Object.values(semesterData?.years ?? [])
       .map(({ yearcode, yearname }) => ({
         key: yearcode,
         text: yearname,

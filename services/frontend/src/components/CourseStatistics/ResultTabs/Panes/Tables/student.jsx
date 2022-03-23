@@ -33,7 +33,8 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
         {
           key: 'TIME',
           title: 'Time',
-          getRowVal: s => s.name,
+          getRowVal: s => (s.name === 'Total' ? -1 : s.name),
+          formatValue: v => (v === -1 ? 'Total' : v),
           getRowExportVal: s => s.name,
           getRowContent: s => (
             <div style={{ whiteSpace: 'nowrap' }}>
@@ -103,13 +104,13 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
       title: 'Pass-%',
       getRowValue: s => {
         if (s.rowObfuscated) return 0
-        if (showEnrollments) return formatPercentage(s.students.withEnrollments.passRate) * 100
-        return formatPercentage(s.students.passRate) * 100
+        if (showEnrollments) return s.students.withEnrollments.passRate * 100
+        return s.students.passRate * 100
       },
       getRowContent: s => {
         if (s.rowObfuscated) return '5 or less students'
-        if (showEnrollments) return formatPercentage(s.students.withEnrollments.passRate) * 100
-        return formatPercentage(s.students.passRate) * 100
+        if (showEnrollments) return formatPercentage(s.students.withEnrollments.passRate)
+        return formatPercentage(s.students.passRate)
       },
       filterType: 'range',
       cellProps: { style: { textAlign: 'right' } },
