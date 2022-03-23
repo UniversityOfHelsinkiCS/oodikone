@@ -1,6 +1,6 @@
 /* eslint-disable no-return-assign */
 
-import React, { useRef, useState, useMemo, useReducer, useContext, useCallback } from 'react'
+import React, { useRef, useState, useMemo, useReducer, useContext, useCallback, useLayoutEffect } from 'react'
 import { Icon, Dropdown } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
@@ -270,7 +270,27 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
   const cellSize = useRef()
   const titleSize = useRef()
   const toolsSize = useRef()
+  const [filterMenuOpen, setFilterMenuOpen] = useState(true)
   const [toolsMode, setToolsMode] = useState('fixed')
+
+  useLayoutEffect(() => {
+    /**
+     * This is a horrible horrible hack and is required in order for the Slider component to render
+     * correctly on the initial render. The Slider component uses getBoundingClientRect internally to position
+     * stuff and this method always returns a 0x0 rectangle if the node it is called on is hidden.
+     * (e.g. as in this case, when the dropdown is closed)
+     *
+     * For this reason, we keep the dropdowns open for the initial render and immediately close them
+     * before the user can see a thing. useLayoutEffect is executed after the virtual-DOM has been rendered
+     * and the layout has been calculated but before the execution is handed back to the browser for rendering
+     * the DOM to the screen.
+     *
+     * The call to setFilterMenuOpen triggers an immediate re-render and the DOM with the open menus is never
+     * rendered to the screen.
+     */
+
+    setFilterMenuOpen(false)
+  }, [])
 
   const { sort } = state
 
@@ -347,6 +367,7 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
         verticalAlign: column.vertical ? 'top' : 'center',
         position: 'relative',
       }}
+      className={filterMenuOpen ? 'filter-menu-open' : 'filter-menu-closed'}
     >
       {toolsMode !== 'fixed' && (isFilterActive || isSortingActive) && (
         <div
@@ -394,10 +415,14 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
           {filterable && (!hasChildren || column.mergeHeader) && (
             <Dropdown
               icon="filter"
+              open={filterMenuOpen}
+              onOpen={() => setFilterMenuOpen(true)}
+              onClose={() => setFilterMenuOpen(false)}
               style={{
                 color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb',
                 top: '1px',
               }}
+              lazyLoad
             >
               <Dropdown.Menu onClick={evt => evt.stopPropagation()}>
                 <FilterComponent
