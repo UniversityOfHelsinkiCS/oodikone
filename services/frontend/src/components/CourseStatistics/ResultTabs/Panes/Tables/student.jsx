@@ -43,22 +43,37 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
 
   const columns = [
     {
-      key: 'TIME',
-      title: 'Time',
-      getRowVal: s => s.code,
-      getRowExportVal: s => s.name,
-      getRowContent: s => (
-        <div style={{ whiteSpace: 'nowrap' }}>
-          {s.name}
-          {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
-          {s.name !== 'Total' && userHasAccessToAllStats && (
-            <Item as={Link} to={showPopulation(s.code, s.name, s)}>
-              <Icon name="level up alternate" />
-            </Item>
-          )}
-        </div>
-      ),
-      getCellProps: s => defineCellColor(s),
+      key: 'TIME-PARENT',
+      merge: true,
+      mergeHeader: true,
+      children: [
+        {
+          key: 'TIME',
+          title: 'Time',
+          getRowVal: s => s.name,
+          getRowExportVal: s => s.name,
+          getRowContent: s => (
+            <div style={{ whiteSpace: 'nowrap' }}>
+              {s.name}
+              {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+            </div>
+          ),
+          getCellProps: s => defineCellColor(s),
+        },
+        {
+          key: 'TIME-ICON',
+          export: false,
+          getRowContent: s => (
+            <>
+              {s.name !== 'Total' && userHasAccessToAllStats && (
+                <Item as={Link} to={showPopulation(s.code, s.name, s)}>
+                  <Icon name="level up alternate" />
+                </Item>
+              )}
+            </>
+          ),
+        },
+      ],
     },
     {
       key: 'TOTAL',
@@ -68,7 +83,14 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
           helpText={showEnrollments ? 'Total count of students, including enrolled students with no grade.' : null}
         />
       ),
+      cellProps: { style: { textAlign: 'right' } },
+      filterType: 'range',
       getRowVal: s => {
+        if (s.rowObfuscated) return 5
+        if (showEnrollments) return s.students.withEnrollments.total
+        return s.students.total
+      },
+      getRowContent: s => {
         if (s.rowObfuscated) return '5 or less students'
         if (showEnrollments) return s.students.withEnrollments.total
         return s.students.total
@@ -104,17 +126,26 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
     {
       key: 'PASS_RATE',
       title: 'Pass-%',
-      getRowVal: s => {
-        if (s.rowObfuscated) return '5 or less students'
-        if (showEnrollments) return formatPercentage(s.students.withEnrollments.passRate)
-        return formatPercentage(s.students.passRate)
+      getRowValue: s => {
+        if (s.rowObfuscated) return 0
+        if (showEnrollments) return formatPercentage(s.students.withEnrollments.passRate) * 100
+        return formatPercentage(s.students.passRate) * 100
       },
+      getRowContent: s => {
+        if (s.rowObfuscated) return '5 or less students'
+        if (showEnrollments) return formatPercentage(s.students.withEnrollments.passRate) * 100
+        return formatPercentage(s.students.passRate) * 100
+      },
+      filterType: 'range',
+      cellProps: { style: { textAlign: 'right' } },
       getCellProps: s => defineCellColor(s),
     },
     {
       key: 'PASS_FIRST',
       title: 'On First Attempt',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedFirst || 0),
+      filterType: 'range',
+      cellProps: { style: { textAlign: 'right' } },
+      getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.categories.passedFirst || 0) * 100),
       getCellProps: s => defineCellColor(s),
       headerProps: { style: { borderLeft: '0' } },
       onlyInDetailedView: true,
@@ -122,7 +153,9 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
     {
       key: 'PASS_EVENTUALLY',
       title: 'Eventually',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedEventually || 0),
+      filterType: 'range',
+      cellProps: { style: { textAlign: 'right' } },
+      getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.categories.passedEventually || 0) * 100),
       getCellProps: s => defineCellColor(s),
       headerProps: { style: { borderLeft: '0' } },
       onlyInDetailedView: true,
@@ -130,7 +163,9 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
     {
       key: 'FAIL_RATE',
       title: 'Fail-%',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.failRate),
+      filterType: 'range',
+      cellProps: { style: { textAlign: 'right' } },
+      getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.failRate || 0) * 100),
       getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
       getCellProps: s => defineCellColor(s),
       onlyInDetailedView: true,

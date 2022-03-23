@@ -95,18 +95,21 @@ const PassFail = ({ flat }) => {
                 key: 'passed-n',
                 title: 'Total',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.passed ?? 0,
               },
               {
                 key: 'passed-after-retry',
                 title: 'After Retry',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.retryPassed ?? 0,
               },
               {
                 key: 'passed-percentage',
                 title: 'Passed-%',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.percentage ?? 0,
                 formatValue: value =>
                   value &&
@@ -126,12 +129,14 @@ const PassFail = ({ flat }) => {
                 key: 'failed-n',
                 title: 'Total',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.failed ?? 0,
               },
               {
                 key: 'failed-many',
                 title: 'Multiple Times',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.failedMany ?? 0,
               },
             ],
@@ -144,12 +149,14 @@ const PassFail = ({ flat }) => {
                 key: 'attempts-n',
                 title: 'Total',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.attempts,
               },
               {
                 key: 'attempts-per-student',
                 title: 'per Student',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.perStudent,
                 formatValue: value =>
                   new Intl.NumberFormat('fi-FI', { maximumFractionDigits: 2, minimumFractionDigits: 2 }).format(value),
@@ -164,6 +171,7 @@ const PassFail = ({ flat }) => {
                 key: 'passed-of-population',
                 title: 'Passed',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.passedOfPopulation,
                 formatValue: value =>
                   new Intl.NumberFormat('fi-FI', {
@@ -176,6 +184,7 @@ const PassFail = ({ flat }) => {
                 key: 'attempted-of-population',
                 title: 'Attempted',
                 cellStyle: { textAlign: 'right' },
+                filterType: 'range',
                 getRowVal: row => row.stats?.triedOfPopulation,
                 formatValue: value =>
                   new Intl.NumberFormat('fi-FI', {

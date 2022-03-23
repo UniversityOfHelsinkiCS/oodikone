@@ -165,6 +165,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
     {
       key: 'students',
       title: 'Students',
+      filterType: 'range',
       getRowVal: group => group.members?.length || 0,
       getRowContent: group => group.members?.length || 0,
       cellProps: {

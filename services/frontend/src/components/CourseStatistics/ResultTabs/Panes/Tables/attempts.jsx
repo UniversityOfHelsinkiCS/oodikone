@@ -13,6 +13,8 @@ const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
   title,
   getRowVal,
   getRowContent,
+  filterType: 'range',
+  cellProps: { style: { textAlign: 'right' } },
   getCellProps: s => defineCellColor(s),
 })
 
@@ -110,22 +112,37 @@ const AttemptsTable = ({
   }
 
   const timeColumn = {
-    ...getSortableColumn(
-      'TIME',
-      'Time',
-      s => s.code,
-      s => (
-        <div>
-          {s.name}
-          {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
-          {s.name !== 'Total' && userHasAccessToAllStats && (
+    key: 'TIME-PARENT',
+    merge: true,
+    mergeHeader: true,
+    children: [
+      {
+        ...getSortableColumn(
+          'TIME',
+          'Time',
+          s => s.code,
+          s => (
+            <div>
+              {s.name}
+              {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+            </div>
+          )
+        ),
+        cellProps: {},
+        filterType: 'default',
+      },
+      {
+        key: 'TIME-ICON',
+        export: false,
+        getRowContent: s =>
+          s.name !== 'Total' &&
+          userHasAccessToAllStats && (
             <Item as={Link} to={showPopulation(s.code, s.name, s)}>
               <Icon name="level up alternate" />
             </Item>
-          )}
-        </div>
-      )
-    ),
+          ),
+      },
+    ],
   }
 
   let columns = [

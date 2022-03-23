@@ -90,16 +90,22 @@ const GradeDistribution = ({ flat }) => {
           {
             key: 'attempts',
             title: 'Attempts',
+            cellProps: { style: { textAlign: 'right' } },
+            filterType: 'range',
             getRowVal: row => row.attempts,
           },
           ..._.range(0, 6).map(grade => ({
             key: `grade-${grade}`,
             title: `${grade}`,
-            getRowVal: row => row.grades[grade]?.count ?? 0,
+            cellProps: { style: { textAlign: 'right' } },
+            filterType: 'range',
+            getRowVal: row => row.grades?.[grade]?.count ?? 0,
           })),
           {
             key: 'other-passed',
             title: 'Other Passed',
+            cellProps: { style: { textAlign: 'right' } },
+            filterType: 'range',
             getRowVal: row => row.otherPassed,
           },
         ],
