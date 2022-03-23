@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { createSelector } from '@reduxjs/toolkit'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
+import { useGetSemestersQuery } from 'redux/semesters'
 import PopulationDetails from '../PopulationDetails'
 import { useLanguage, useTitle } from '../../common/hooks'
 import FilterView from '../FilterView'
@@ -40,9 +41,10 @@ const PopulationStatistics = () => {
   const history = useHistory()
   const { query, queryIsSet, isLoading, students } = useSelector(selectPopulations)
   const courses = useSelector(store => store.populationCourses.data?.coursestatistics)
-  const allSemesters = useSelector(store => store.semesters.data?.semesters)
 
   useTitle('Population statistics')
+
+  const { data: allSemesters } = useGetSemestersQuery()
 
   const programmeCode = query?.studyRights?.programme
 

@@ -3,7 +3,7 @@ import Datetime from 'react-datetime'
 import 'moment/locale/fi'
 import { Icon, Button } from 'semantic-ui-react'
 import moment from 'moment'
-import { useSelector } from 'react-redux'
+import { useGetSemestersQuery } from 'redux/semesters'
 import { getTextIn } from '../common'
 
 const semesterListStyles = {
@@ -16,7 +16,8 @@ const semesterListStyles = {
 
 const DateTime = ({ value, onChange, before, after, showSemesters }) => {
   const datetimeRef = useRef()
-  const allSemesters = useSelector(store => store.semesters.data?.semesters)
+  const semesterRequest = useGetSemestersQuery()
+  const allSemesters = semesterRequest.isLaoding ? [] : semesterRequest.data.semesters
 
   return (
     <Datetime

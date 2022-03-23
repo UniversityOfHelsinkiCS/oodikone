@@ -16,11 +16,11 @@ import {
   useGetStudyGuidanceGroupPopulationCoursesQuery,
 } from 'redux/studyGuidanceGroups'
 import { useHistory } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { useToggle } from 'common/hooks'
 import StudyGuidanceGroupPopulationCourses from './StudyGuidanceGroupPopulationCourses'
 import { startYearToAcademicYear, Wrapper, StyledMessage } from './common'
-import { getSemesters } from '../../redux/semesters'
+import { useGetSemestersQuery } from '../../redux/semesters'
 import FilterView from '../FilterView'
 
 const createAcademicYearStartDate = year => new Date(year, 7, 1)
@@ -66,12 +66,6 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
     setNewestIndex,
     isMounted,
   })
-
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(getSemesters())
-  }, [])
 
   const togglePanel = index => {
     const currentActiveIndex = new Set(activeIndex)
@@ -197,12 +191,8 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
 }
 
 const SingleStudyGroupFilterView = props => {
-  const dispatch = useDispatch()
-  const allSemesters = useSelector(state => state.semesters.data?.semesters)
-
-  useEffect(() => {
-    dispatch(getSemesters())
-  }, [])
+  const semesterQuery = useGetSemestersQuery()
+  const allSemesters = semesterQuery.data?.semesters
 
   const viewFilters = [
     filters.enrollmentStatusFilter({

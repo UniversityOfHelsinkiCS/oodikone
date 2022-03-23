@@ -8,7 +8,7 @@ import moment from 'moment'
 import { withRouter } from 'react-router-dom'
 
 import { getStudent, removeStudentSelection, resetStudent } from '../../../redux/students'
-import { getSemesters } from '../../../redux/semesters'
+import { useGetSemestersQuery } from '../../../redux/semesters'
 import StudentInfoCard from '../StudentInfoCard'
 import { bachelorHonoursProgrammes as bachelorCodes, getNewestProgramme } from '../../../common'
 import { clearCourseStats } from '../../../redux/coursestats'
@@ -26,12 +26,10 @@ const StudentDetails = ({
   Programmes,
   studentNumber,
   getStudent,
-  semesters,
   student: { semesterenrollments },
   resetStudent,
   removeStudentSelection,
   getProgrammes,
-  getSemesters,
   pending,
   error,
   fetching,
@@ -43,9 +41,10 @@ const StudentDetails = ({
   const [studyrightid, setStudyrightid] = useState('')
   const [honoursCode, setHonoursCode] = useState(null)
 
+  const { data: semesters } = useGetSemestersQuery()
+
   useEffect(() => {
     getProgrammes()
-    getSemesters()
   }, [])
 
   useEffect(() => {
@@ -75,7 +74,7 @@ const StudentDetails = ({
 
   const getAbsentYears = () => {
     semesterenrollments.sort((a, b) => a.semestercode - b.semestercode)
-    const acualSemesters = semesters.semesters
+    const acualSemesters = semesters?.semesters ?? {}
 
     if (!acualSemesters) return []
 
@@ -233,12 +232,7 @@ StudentDetails.propTypes = {
   pending: bool.isRequired,
   error: bool.isRequired,
   fetching: bool.isRequired,
-  getSemesters: func.isRequired,
   getProgrammes: func.isRequired,
-  semesters: shape({
-    semesters: shape({}),
-    years: shape({}),
-  }).isRequired,
 }
 
 StudentDetails.defaultProps = {
@@ -246,11 +240,10 @@ StudentDetails.defaultProps = {
   studentNumber: '',
 }
 
-const mapStateToProps = ({ students, semesters, populationProgrammes }) => ({
+const mapStateToProps = ({ students, populationProgrammes }) => ({
   student: students.data.find(student => student.studentNumber === students.selected),
   pending: students.pending,
   error: students.error,
-  semesters: semesters.data,
   fetching: students.fetching,
   Programmes: populationProgrammes.data || {},
 })
@@ -260,7 +253,6 @@ const mapDispatchToProps = {
   clearCourseStats,
   resetStudent,
   getStudent,
-  getSemesters,
   getProgrammes,
 }
 

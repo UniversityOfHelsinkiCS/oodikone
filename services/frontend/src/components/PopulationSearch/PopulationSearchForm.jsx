@@ -13,7 +13,6 @@ import { getPopulationStatistics, clearPopulations } from '../../redux/populatio
 import { getPopulationCourses } from '../../redux/populationCourses'
 import { getPopulationSelectedStudentCourses, clearSelected } from '../../redux/populationSelectedStudentCourses'
 import { getMandatoryCourses } from '../../redux/populationMandatoryCourses'
-import { getSemesters } from '../../redux/semesters'
 
 import { getProgrammes } from '../../redux/populationProgrammes'
 import { momentFromFormat, reformatDate, textAndDescriptionSearch, getTextIn, cancelablePromise } from '../../common'
@@ -53,7 +52,7 @@ const PopulationSearchForm = props => {
 
   const { query, isLoading, momentYear } = totalState
 
-  const { studyProgrammes, location, semesters, queries, history, language, onProgress } = props
+  const { studyProgrammes, location, queries, history, language, onProgress } = props
 
   const parseQueryFromUrl = () => {
     const initial = initialQuery()
@@ -136,9 +135,9 @@ const PopulationSearchForm = props => {
       setState({ query: initialQuery() })
       props.getProgrammes()
     }
-    if (!semesters.years) {
+    /* if (!semesters.years) {
       props.getSemesters()
-    }
+    } */
     if (location.search) {
       fetchPopulationFromUrlParams()
     }
@@ -451,11 +450,10 @@ const PopulationSearchForm = props => {
   )
 }
 
-const mapStateToProps = ({ semesters, settings, populations, populationProgrammes }) => {
+const mapStateToProps = ({ settings, populations, populationProgrammes }) => {
   const { language } = settings
   const { pending } = populationProgrammes
   return {
-    semesters: semesters.data,
     language,
     queries: populations.query || {},
     studyProgrammes: populationProgrammes.data.programmes || {},
@@ -471,7 +469,6 @@ export default withRouter(
     getMandatoryCourses,
     getProgrammes,
     setLoading,
-    getSemesters,
     clearSelected,
     clearPopulations,
   })(PopulationSearchForm)

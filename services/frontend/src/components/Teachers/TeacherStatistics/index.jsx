@@ -5,22 +5,13 @@ import { Form, Segment, Dropdown, Button, Message } from 'semantic-ui-react'
 import moment from 'moment'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { getProviders } from '../../../redux/providers'
-import { getSemesters } from '../../../redux/semesters'
+import { useGetSemestersQuery } from '../../../redux/semesters'
 import { getTeacherStatistics } from '../../../redux/teacherStatistics'
 import TeacherStatisticsTable from '../TeacherStatisticsTable'
 import { getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 
-const TeacherStatistics = ({
-  getProviders,
-  getSemesters,
-  getTeacherStatistics,
-  semesters,
-  providers,
-  statistics,
-  pending,
-  history,
-}) => {
+const TeacherStatistics = ({ getProviders, getTeacherStatistics, providers, statistics, pending, history }) => {
   const { language } = useLanguage()
   const [semesterStart, setSemesterStart] = useState(null)
   const [semesterEnd, setSemesterEnd] = useState(null)
@@ -29,9 +20,20 @@ const TeacherStatistics = ({
   const [provs, setProviders] = useState([])
   const { rights, isAdmin } = useGetAuthorizedUserQuery()
 
+  const { data: semesterData } = useGetSemestersQuery()
+
+  const semesters = !semesterData?.semesters
+    ? []
+    : Object.values(semesterData?.semesters)
+        .reverse()
+        .map(({ semestercode, name }, idx) => ({
+          key: idx,
+          value: semestercode,
+          text: name.en,
+        }))
+
   useEffect(() => {
     getProviders()
-    getSemesters()
   }, [])
 
   const setStartSemester = (_, { value }) => {
@@ -165,17 +167,7 @@ const TeacherStatistics = ({
 
 const mapStateToProps = state => {
   const { providers, teacherStatistics } = state
-  const { semesters } = state.semesters.data
   const providerOptions = providers.data.map(prov => ({ key: prov.code, value: prov.code, name: prov.name }))
-  const semesterOptions = !semesters
-    ? []
-    : Object.values(semesters)
-        .reverse()
-        .map(({ semestercode, name }, idx) => ({
-          key: idx,
-          value: semestercode,
-          text: name.en,
-        }))
   const statistics = Object.values(teacherStatistics.data).map(teacher => ({
     id: teacher.id,
     name: teacher.name,
@@ -186,7 +178,6 @@ const mapStateToProps = state => {
   }))
   return {
     providers: providerOptions,
-    semesters: semesterOptions,
     statistics,
     pending: teacherStatistics.pending,
     error: teacherStatistics.error,
@@ -195,6 +186,5 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps, {
   getProviders,
-  getSemesters,
   getTeacherStatistics,
 })(withRouter(TeacherStatistics))

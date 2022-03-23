@@ -1,10 +1,16 @@
-import itemreducer from './common/itemreducer'
-import { callController } from '../apiConnection/index'
+/* eslint-disable import/prefer-default-export */
 
-const prefix = 'GET_SEMESTERS_'
+import { RTKApi } from 'apiConnection'
 
-export const getSemesters = () => callController('/semesters/codes', prefix)
+const semestersApi = RTKApi.injectEndpoints({
+  tagTypes: ['Semester'],
+  endpoints: builder => ({
+    getSemesters: builder.query({
+      query: () => '/semesters/codes',
+      providesTags: ['Semester'],
+    }),
+  }),
+  overrideExisting: false,
+})
 
-const reducer = itemreducer(prefix, { data: {} })
-
-export default reducer
+export const { useGetSemestersQuery } = semestersApi
