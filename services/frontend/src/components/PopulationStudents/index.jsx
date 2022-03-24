@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import _, { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
 import { useSelector, useDispatch } from 'react-redux'
 import { Icon, Tab, Grid, Item, Dropdown } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
-import { orderBy, uniqBy, sortBy, isNumber } from 'lodash'
+
 import scrollToComponent from 'react-scroll-to-component'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
-import { getTextIn } from '../../common'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import { useTabChangeAnalytics, usePrevious } from '../../common/hooks'
 
 import { getTagsByStudytrackAction } from '../../redux/tags'
@@ -25,51 +26,7 @@ import infotoolTips from '../../common/InfoToolTips'
 
 const sendAnalytics = sendEvent.populationStudents
 
-const PopulationStudents = ({
-  language,
-  filteredStudents,
-  studentToTargetCourseDateMap,
-  dataExport,
-  contentToInclude,
-  coursecode = [],
-  variant,
-  studyGuidanceGroup,
-}) => {
-  const [state, setState] = useState({})
-  const studentRef = useRef()
-  const dispatch = useDispatch()
-  const { namesVisible: showNames, studentlistVisible: showList } = useSelector(({ settings }) => settings)
-  const { data: tags } = useSelector(({ tags }) => tags)
-  const { query } = useSelector(({ populations }) => populations)
-  const queryStudyrights = query ? Object.values(query.studyRights) : []
-  const { data: mandatoryCourses } = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses)
-  const { data: populationCourses } = useSelector(({ populationCourses }) => populationCourses)
-  const prevShowList = usePrevious(showList)
-  const { isAdmin } = useGetAuthorizedUserQuery()
-  const admin = isAdmin
-  const { handleTabChange } = useTabChangeAnalytics(
-    ANALYTICS_CATEGORIES.populationStudents,
-    'Change students table tab'
-  )
-
-  useEffect(() => {
-    if (tags && tags.length > 0) return
-    const queryStudyright = queryStudyrights[0]
-
-    if (queryStudyright) {
-      dispatch(getTagsByStudytrackAction(queryStudyright))
-      dispatch(getStudentTagsByStudytrackAction(queryStudyright))
-    }
-
-    setState({ ...state, admin })
-  }, [])
-
-  useEffect(() => {
-    if (!prevShowList && showList) {
-      scrollToComponent(studentRef.current, { align: 'bottom' })
-    }
-  }, [prevShowList])
-
+const getMandatoryPassed = (mandatoryCourses, populationCourses) => {
   const mandatoryCodes = mandatoryCourses.filter(course => course.visible && course.visible.visibility).map(c => c.code)
   let mandatoryPassed = {}
 
@@ -106,52 +63,41 @@ const PopulationStudents = ({
     }, {})
   }
 
-  const renderStudentTable = () => {
-    const verticalTitle = title => <div className="verticalTitle">{title}</div>
+  return mandatoryPassed
+}
 
-    const hasPassedMandatory = (studentNumber, code) =>
-      mandatoryPassed[code] && mandatoryPassed[code].includes(studentNumber)
+const CoursesTable = ({ students }) => {
+  const { getTextIn } = useLanguage()
+  const namesVisible = useSelector(state => state?.settings?.namesVisible)
+  const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
+  const populationCourses = useSelector(state => state?.populationCourses?.data)
 
-    const totalMandatoryPassed = studentNumber => {
-      mandatoryCourses.reduce((acc, m) => {
-        return hasPassedMandatory(studentNumber, m.code) ? acc + 1 : acc
-      }, 0)
-    }
+  const mandatoryPassed = useMemo(
+    () => getMandatoryPassed(mandatoryCourses, populationCourses),
+    [mandatoryCourses, populationCourses]
+  )
 
-    const nameColumns = showNames
-      ? [
-          {
-            key: 'lastname',
-            title: 'last name',
-            getRowVal: s => (s.total ? null : s.lastname),
-            cellProps: { title: 'last name' },
-            child: true,
-          },
-          {
-            key: 'firstname',
-            title: 'given names',
-            getRowVal: s => (s.total ? null : s.firstnames),
-            cellProps: { title: 'first names' },
-            child: true,
-          },
-          {
-            key: 'email',
-            title: 'email',
-            getRowVal: s => (s.total ? null : s.email),
-            cellProps: { title: 'emails' },
-            child: true,
-          },
-        ]
-      : []
-    nameColumns.push(
+  const hasPassedMandatory = useCallback(
+    (studentNumber, code) => mandatoryPassed[code] && mandatoryPassed[code].includes(studentNumber),
+    [mandatoryPassed]
+  )
+
+  const totalMandatoryPassed = useCallback(
+    studentNumber => _.sumBy(mandatoryCourses, ({ code }) => hasPassedMandatory(studentNumber, code)),
+    [mandatoryCourses, hasPassedMandatory]
+  )
+
+  const columns = useMemo(() => {
+    const nameColumns = [
       {
         key: 'studentnumber-parent',
         mergeHeader: true,
-        merge: true,
+        // merge: true,
         title: 'Student Number',
         children: [
           {
             key: 'studentnumber',
+            title: 'Student Number',
             cellProps: { title: 'student number' },
             getRowVal: s => (s.total ? '*' : s.studentNumber),
             getRowContent: s => (s.total ? 'Summary:' : s.studentNumber),
@@ -159,6 +105,7 @@ const PopulationStudents = ({
           },
           {
             key: 'icon',
+            title: 'Icon',
             export: false,
             getRowVal: s =>
               !s.total && (
@@ -179,7 +126,9 @@ const PopulationStudents = ({
       },
       {
         key: 'totalpassed',
-        title: verticalTitle('total passed'),
+        title: 'Total Passed',
+        filterType: 'range',
+        vertical: true,
         getRowVal: s =>
           s.total
             ? Object.values(s)
@@ -188,8 +137,34 @@ const PopulationStudents = ({
             : totalMandatoryPassed(s.studentNumber),
         cellProps: { title: 'total passed' },
         child: true,
-      }
-    )
+      },
+    ]
+
+    if (namesVisible) {
+      nameColumns.push(
+        {
+          key: 'lastname',
+          title: 'last name',
+          getRowVal: s => (s.total ? null : s.lastname),
+          cellProps: { title: 'last name' },
+          child: true,
+        },
+        {
+          key: 'firstname',
+          title: 'given names',
+          getRowVal: s => (s.total ? null : s.firstnames),
+          cellProps: { title: 'first names' },
+          child: true,
+        },
+        {
+          key: 'email',
+          title: 'email',
+          getRowVal: s => (s.total ? null : s.email),
+          cellProps: { title: 'emails' },
+          child: true,
+        }
+      )
+    }
 
     const mandatoryCourseLabels = []
 
@@ -209,16 +184,6 @@ const PopulationStudents = ({
       ['asc']
     )
 
-    const mandatoryTitle = m => {
-      return (
-        <>
-          {getTextIn(m.name, language)}
-          <br />
-          {m.code}
-        </>
-      )
-    }
-
     const { visibleLabels, visibleCourseCodes } = mandatoryCourses.reduce(
       (acc, cur) => {
         if (cur.visible && cur.visible.visibility) {
@@ -233,13 +198,13 @@ const PopulationStudents = ({
 
     const getTotalRowVal = (t, m) => t[m.code]
 
-    const labelColumns = []
-    labelColumns.push(
+    const columns = []
+
+    columns.push(
       {
         key: 'general',
         title: <b>Labels:</b>,
         parent: true,
-        headerProps: { colSpan: nameColumns.length, style: { textAlign: 'right' } },
         children: nameColumns,
       },
       ...sortedlabels
@@ -247,16 +212,11 @@ const PopulationStudents = ({
         .map(e => ({
           key: e.id,
           title: (
-            <div style={{ overflowX: 'hidden' }}>
-              <div style={{ width: 0 }}>{e.label}</div>
+            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <div>{e.code}</div>
+              <div style={{ color: 'gray', fontWeight: 'normal' }}>{e.id}</div>
             </div>
           ),
-          parent: true,
-          headerProps: {
-            colSpan: labelToMandatoryCourses[e.label].length,
-            title: e.label,
-            ordernumber: e.orderNumber,
-          },
           children: sortBy(labelToMandatoryCourses[e.label], [
             m => {
               const res = m.code.match(/\d+/)
@@ -267,9 +227,21 @@ const PopulationStudents = ({
             .filter(course => visibleCourseCodes.has(course.code))
             .map(m => ({
               key: `${m.label ? m.label.label : 'fix'}-${m.code}`, // really quick and dirty fix
-              title: verticalTitle(mandatoryTitle(m)),
-              cellProps: { title: `${m.code}, ${getTextIn(m.name, language)}` },
-              headerProps: { title: `${m.code}, ${getTextIn(m.name, language)}` },
+              title: (
+                <div style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}>
+                  <div>{m.code}</div>
+                  <div style={{ color: 'gray', fontWeight: 'normal' }}>{getTextIn(m.name)}</div>
+                </div>
+              ),
+              vertical: true,
+              cellProps: {
+                title: `${m.code}, ${getTextIn(m.name)}`,
+                style: {
+                  verticalAlign: 'middle',
+                  textAlign: 'center',
+                },
+              },
+              headerProps: { title: `${m.code}, ${getTextIn(m.name)}` },
               getRowVal: s =>
                 s.total ? getTotalRowVal(s, m) : JSON.stringify(hasPassedMandatory(s.studentNumber, m.code)),
               getRowContent: s => {
@@ -283,9 +255,11 @@ const PopulationStudents = ({
         }))
     )
 
-    const mandatoryCourseColumns = [...labelColumns]
+    return columns
+  }, [namesVisible, mandatoryCourses, getTextIn])
 
-    const totals = filteredStudents.reduce(
+  const data = useMemo(() => {
+    const totals = students.reduce(
       (acc, s) => {
         const passedCourses = new Set()
         mandatoryCourses.forEach(m => {
@@ -297,120 +271,177 @@ const PopulationStudents = ({
       },
       mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
     )
-    const mandatoryCourseData = [totals, ...filteredStudents]
 
-    const panesAvailable = [
-      {
-        menuItem: 'General',
-        render: () => (
-          <Tab.Pane>
-            <GeneralTab
-              variant={variant}
-              filteredStudents={filteredStudents}
-              studentToTargetCourseDateMap={studentToTargetCourseDateMap}
-              coursecode={coursecode}
-              studyGuidanceGroup={studyGuidanceGroup}
+    return [totals, ...students]
+  }, [students, mandatoryCourses, hasPassedMandatory])
+
+  return (
+    <Tab.Pane>
+      <div style={{ display: 'flex' }}>
+        <div style={{ maxHeight: '80vh', width: '100%' }}>
+          {mandatoryCourses.length > 0 && (
+            <SortableTable
+              title={`Courses of population's students`}
+              getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
+              tableProps={{
+                celled: true,
+                compact: 'very',
+                padded: false,
+                collapsing: true,
+                basic: true,
+                striped: true,
+                singleLine: true,
+                textAlign: 'center',
+              }}
+              columns={columns}
+              data={data}
             />
-          </Tab.Pane>
-        ),
-      },
-      {
-        menuItem: 'Courses',
-        render: () => (
-          <Tab.Pane>
-            <div style={{ display: 'flex' }}>
-              <div style={{ maxHeight: '80vh', width: '100%' }}>
-                {mandatoryCourses.length > 0 && (
-                  <SortableTable
-                    title={`Courses of population's students`}
-                    getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
-                    tableProps={{
-                      celled: true,
-                      compact: 'very',
-                      padded: false,
-                      collapsing: true,
-                      basic: true,
-                      striped: true,
-                      singleLine: true,
-                      textAlign: 'center',
-                    }}
-                    collapsingHeaders
-                    showNames={showNames}
-                    columns={mandatoryCourseColumns}
-                    data={mandatoryCourseData}
-                  />
-                )}
-              </div>
-            </div>
-          </Tab.Pane>
-        ),
-      },
-      {
-        menuItem: 'Tags',
-        render: () => (
-          <Tab.Pane>
-            <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
-              {tags.length === 0 && (
-                <div
-                  style={{
-                    paddingLeft: '10px',
-                    minHeight: '300px',
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                >
-                  <h3>
-                    No tags defined. You can define them{' '}
-                    <Link
-                      to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=6`}
-                      onClick={() => {
-                        sendAnalytics('No tags defined button clicked', 'Tags tab')
-                      }}
-                    >
-                      here
-                    </Link>
-                    .
-                  </h3>
-                </div>
-              )}
-              {tags.length > 0 && (
-                <>
-                  <TagPopulation
-                    tags={tags}
-                    selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
-                    studytrack={queryStudyrights[0]}
-                  />
-                  <TagList studytrack={queryStudyrights[0]} selectedStudents={filteredStudents} />
-                </>
-              )}
-            </div>
-          </Tab.Pane>
-        ),
-      },
-    ]
-
-    const panes = panesAvailable.filter(pane => contentToInclude.panesToInclude.includes(pane.menuItem))
-
-    return (
-      <>
-        <Grid columns="two">
-          <Grid.Column>
-            <StudentNameVisibilityToggle />
-          </Grid.Column>
-          {dataExport && (
-            <Grid.Column textAlign="right">
-              <Dropdown text="Export Data" icon="save" button labeled className="icon" direction="left">
-                <Dropdown.Menu>{dataExport}</Dropdown.Menu>
-              </Dropdown>
-            </Grid.Column>
           )}
-        </Grid>
-        <Tab onTabChange={handleTabChange} panes={panes} data-cy="student-table-tabs" />
-      </>
-    )
-  }
+        </div>
+      </div>
+    </Tab.Pane>
+  )
+}
+
+const Panes = ({
+  filteredStudents,
+  tags,
+  visiblePanes,
+  dataExport,
+  variant,
+  studentToTargetCourseDateMap,
+  coursecode,
+  studyGuidanceGroup,
+  queryStudyrights,
+}) => {
+  const { handleTabChange } = useTabChangeAnalytics(
+    ANALYTICS_CATEGORIES.populationStudents,
+    'Change students table tab'
+  )
+
+  const panesAvailable = [
+    {
+      menuItem: 'General',
+      render: () => (
+        <Tab.Pane>
+          <GeneralTab
+            variant={variant}
+            filteredStudents={filteredStudents}
+            studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+            coursecode={coursecode}
+            studyGuidanceGroup={studyGuidanceGroup}
+          />
+        </Tab.Pane>
+      ),
+    },
+    {
+      menuItem: 'Courses',
+      render: () => <CoursesTable students={filteredStudents} />,
+    },
+    {
+      menuItem: 'Tags',
+      render: () => (
+        <Tab.Pane>
+          <div style={{ overflowX: 'auto', maxHeight: '80vh' }}>
+            {tags.length === 0 && (
+              <div
+                style={{
+                  paddingLeft: '10px',
+                  minHeight: '300px',
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <h3>
+                  No tags defined. You can define them{' '}
+                  <Link
+                    to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=6`}
+                    onClick={() => {
+                      sendAnalytics('No tags defined button clicked', 'Tags tab')
+                    }}
+                  >
+                    here
+                  </Link>
+                  .
+                </h3>
+              </div>
+            )}
+            {tags.length > 0 && (
+              <>
+                <TagPopulation
+                  tags={tags}
+                  selectedStudents={filteredStudents.map(stu => stu.studentNumber)}
+                  studytrack={queryStudyrights[0]}
+                />
+                <TagList studytrack={queryStudyrights[0]} selectedStudents={filteredStudents} />
+              </>
+            )}
+          </div>
+        </Tab.Pane>
+      ),
+    },
+  ]
+
+  const panes = panesAvailable.filter(pane => visiblePanes.includes(pane.menuItem))
+
+  return (
+    <>
+      <Grid columns="two">
+        <Grid.Column>
+          <StudentNameVisibilityToggle />
+        </Grid.Column>
+        {dataExport && (
+          <Grid.Column textAlign="right">
+            <Dropdown text="Export Data" icon="save" button labeled className="icon" direction="left">
+              <Dropdown.Menu>{dataExport}</Dropdown.Menu>
+            </Dropdown>
+          </Grid.Column>
+        )}
+      </Grid>
+      <Tab onTabChange={handleTabChange} panes={panes} data-cy="student-table-tabs" />
+    </>
+  )
+}
+
+const PopulationStudents = ({
+  filteredStudents,
+  studentToTargetCourseDateMap,
+  dataExport,
+  contentToInclude,
+  coursecode = [],
+  variant,
+  studyGuidanceGroup,
+}) => {
+  const [state, setState] = useState({})
+  const studentRef = useRef()
+  const dispatch = useDispatch()
+  const { studentlistVisible: showList } = useSelector(({ settings }) => settings)
+  const { data: tags } = useSelector(({ tags }) => tags)
+  const { query } = useSelector(({ populations }) => populations)
+  const queryStudyrights = query ? Object.values(query.studyRights) : []
+  const prevShowList = usePrevious(showList)
+  const { isAdmin } = useGetAuthorizedUserQuery()
+  const admin = isAdmin
+
+  useEffect(() => {
+    if (tags && tags.length > 0) return
+    const queryStudyright = queryStudyrights[0]
+
+    if (queryStudyright) {
+      dispatch(getTagsByStudytrackAction(queryStudyright))
+      dispatch(getStudentTagsByStudytrackAction(queryStudyright))
+    }
+
+    setState({ ...state, admin })
+  }, [])
+
+  useEffect(() => {
+    if (!prevShowList && showList) {
+      scrollToComponent(studentRef.current, { align: 'bottom' })
+    }
+  }, [prevShowList])
 
   if (filteredStudents.length === 0) return null
 
@@ -420,7 +451,17 @@ const PopulationStudents = ({
         <InfoBox content={contentToInclude.infotoolTipContent} />
       </span>
       {admin ? <CheckStudentList students={filteredStudents.map(stu => stu.studentNumber)} /> : null}
-      {renderStudentTable()}
+      <Panes
+        filteredStudents={filteredStudents}
+        queryStudyrights={queryStudyrights}
+        visiblePanes={contentToInclude.panesToInclude}
+        dataExport={dataExport}
+        variant={variant}
+        studentToTargetCourseDateMap={studentToTargetCourseDateMap}
+        tags={tags}
+        studyGuidanceGroup={studyGuidanceGroup}
+        coursecode={coursecode}
+      />
     </>
   )
 }
