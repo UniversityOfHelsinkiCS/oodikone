@@ -81,6 +81,39 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
       <Input
         icon="search"
         iconPosition="left"
+        onKeyDown={evt => {
+          if (evt.keyCode === 13) {
+            const visibleValues = _.uniq(values).filter(value => search === '' || `${value}`.indexOf(search) > -1)
+
+            const visibleTypes = _.chain(valueFilters)
+              .filter(f => _.includes(visibleValues, f.value))
+              .map('type')
+              .uniq()
+              .value()
+
+            let newType = 'include'
+
+            if (visibleTypes.length <= 1) {
+              const [type] = visibleTypes
+
+              if (type === 'include') {
+                newType = 'exclude'
+              } else if (type === 'exclude') {
+                newType = null
+              } else {
+                newType = 'include'
+              }
+            }
+
+            dispatch({
+              type: 'SET_VALUE_FILTERS',
+              payload: { column: column.key, values: visibleValues, type: newType },
+            })
+
+            evt.preventDefault()
+            evt.stopPropagation()
+          }
+        }}
         onClick={e => e.stopPropagation()}
         value={search}
         onChange={evt => setSearch(evt.target.value)}
@@ -113,6 +146,20 @@ export default {
       } else {
         options.valueFilters.push({ value: payload.value, type: 'include' })
       }
+    } else if (type === 'SET_VALUE_FILTERS') {
+      payload.values.forEach(value => {
+        const i = options.valueFilters.findIndex(vf => vf.value === value)
+
+        if (i > -1) {
+          if (payload.type === null) {
+            options.valueFilters.splice(i, 1)
+          } else {
+            options.valueFilters[i].type = payload.type
+          }
+        } else {
+          options.valueFilters.push({ value, type: payload.type })
+        }
+      })
     }
   },
 
