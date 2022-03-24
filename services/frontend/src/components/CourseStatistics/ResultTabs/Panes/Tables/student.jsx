@@ -42,7 +42,6 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
               {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
             </div>
           ),
-          getCellProps: s => defineCellColor(s),
         },
         {
           key: 'TIME-ICON',
@@ -63,7 +62,12 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
       key: 'TOTAL',
       title: showEnrollments ? 'Total Students' : 'Graded students',
       helpText: showEnrollments ? 'Total count of students, including enrolled students with no grade.' : null,
-      cellProps: { style: { textAlign: 'right' } },
+      cellProps: s => ({
+        style: {
+          textAlign: 'right',
+          color: s.rowObfuscated ? 'gray' : 'inherit',
+        },
+      }),
       filterType: 'range',
       getRowVal: s => {
         if (s.rowObfuscated) return 5
@@ -81,22 +85,35 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
       key: 'TOTAL_PASSED',
       title: 'Passed',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.totalPassed || 0),
-      getCellProps: s => defineCellColor(s),
-      headerProps: { style: { borderLeft: '0' } },
+      cellProps: s => ({
+        style: {
+          textAlign: 'right',
+          color: s.rowObfuscated ? 'gray' : 'inherit',
+        },
+      }),
     },
     {
       key: 'TOTAL_FAILED',
       title: 'Failed',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.totalFailed || 0),
-      getCellProps: s => defineCellColor(s),
-      headerProps: { style: { borderLeft: '0' } },
+      cellProps: s => ({
+        style: {
+          textAlign: 'right',
+          color: s.rowObfuscated ? 'gray' : 'inherit',
+        },
+      }),
     },
     {
       key: 'ENROLLMENTS_MISSING_GRADE',
       title: 'Enrolled no grade',
       helpText: 'Total count of students with a valid enrollment and no passing or failing grade.',
       getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.enrolledStudentsWithNoGrade),
-      getCellProps: s => defineCellColor(s),
+      cellProps: s => ({
+        style: {
+          textAlign: 'right',
+          color: s.rowObfuscated ? 'gray' : 'inherit',
+        },
+      }),
       onlyInEnrollmentView: true,
     },
     {
@@ -113,37 +130,51 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
         return formatPercentage(s.students.passRate)
       },
       filterType: 'range',
-      cellProps: { style: { textAlign: 'right' } },
-      getCellProps: s => defineCellColor(s),
+      cellProps: s => ({
+        style: {
+          textAlign: 'right',
+          color: s.rowObfuscated ? 'gray' : 'inherit',
+        },
+      }),
     },
     {
       key: 'PASS_FIRST',
       title: 'On First Attempt',
       filterType: 'range',
-      cellProps: { style: { textAlign: 'right' } },
       getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.categories.passedFirst || 0) * 100),
-      getCellProps: s => defineCellColor(s),
-      headerProps: { style: { borderLeft: '0' } },
+      cellProps: s => ({
+        style: {
+          textAlign: 'right',
+          color: s.rowObfuscated ? 'gray' : 'inherit',
+        },
+      }),
       onlyInDetailedView: true,
     },
     {
       key: 'PASS_EVENTUALLY',
       title: 'Eventually',
       filterType: 'range',
-      cellProps: { style: { textAlign: 'right' } },
       getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.categories.passedEventually || 0) * 100),
-      getCellProps: s => defineCellColor(s),
-      headerProps: { style: { borderLeft: '0' } },
+      cellProps: s => ({
+        style: {
+          textAlign: 'right',
+          color: s.rowObfuscated ? 'gray' : 'inherit',
+        },
+      }),
       onlyInDetailedView: true,
     },
     {
       key: 'FAIL_RATE',
       title: 'Fail-%',
       filterType: 'range',
-      cellProps: { style: { textAlign: 'right' } },
       getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.failRate || 0) * 100),
       getRowContent: s => (s.rowObfuscated ? 'NA' : formatPercentage(s.students.failRate || 0)),
-      getCellProps: s => defineCellColor(s),
+      cellProps: s => ({
+        style: {
+          textAlign: 'right',
+          color: s.rowObfuscated ? 'gray' : 'inherit',
+        },
+      }),
       onlyInDetailedView: true,
     },
   ]
