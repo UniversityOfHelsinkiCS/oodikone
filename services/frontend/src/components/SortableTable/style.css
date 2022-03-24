@@ -66,7 +66,6 @@
   pointer-events: all;
   background-color: #f4f4f4;
   top: calc(100% - 2em + 1px);
-  padding: 0 0.5em;
   opacity: 1;
   left: 100%;
   z-index: 2;

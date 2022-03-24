@@ -293,7 +293,22 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
   const titleSize = useRef()
   const toolsSize = useRef()
   const [filterMenuOpen, setFilterMenuOpen] = useState(true)
-  const [toolsMode, setToolsMode] = useState('fixed')
+  const [dynamicToolsMode, setToolsMode] = useState('fixed')
+  const [forcedTitleWidth, setForcedTitleWidth] = useState()
+
+  let toolsMode = dynamicToolsMode
+
+  if (column.forceToolsMode) {
+    toolsMode = column.forceToolsMode
+  }
+
+  const noDangling = column.noDangling || column.helpText
+
+  useEffect(() => {
+    if (!noDangling && forcedTitleWidth) {
+      setForcedTitleWidth(undefined)
+    }
+  }, [column.noDangling, column.helpText])
 
   useLayoutEffect(() => {
     /**
@@ -356,7 +371,11 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
     }
 
     if (toolsWidth > cellWidth) {
-      setToolsMode('dangling')
+      if (!noDangling) {
+        setToolsMode('dangling')
+      } else {
+        setForcedTitleWidth(toolsWidth)
+      }
     } else if (titleWidth + toolsWidth > cellWidth) {
       setToolsMode('floating')
     } else {
@@ -380,7 +399,10 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
   }
 
   const helpIcon = (
-    <Icon name="question circle outline" style={{ opacity: 0.5, display: 'inline-block', marginRight: 0 }} />
+    <Icon
+      name="question circle outline"
+      style={{ opacity: 0.5, display: 'inline-block', marginRight: 0, flexShrink: 0 }}
+    />
   )
 
   return (
@@ -425,10 +447,21 @@ const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
         <SizeMeasurer onSizeChange={onTitleSizeChange}>
           <Orientable
             orientation={column.vertical ? 'vertical' : 'horizontal'}
-            style={{ flexGrow: 1, marginRight: '0.5em', display: 'flex', alignItems: 'center', gap: '0.5em' }}
+            style={{
+              flexGrow: 1,
+              display: 'flex',
+              alignItems: 'center',
+              minWidth: forcedTitleWidth,
+            }}
           >
             {column.title}
-            {column.helpText && helpIcon}
+            {column.helpText && forcedTitleWidth && <div style={{ flexGrow: 1 }} />}
+            {column.helpText && (
+              <Icon
+                name="question circle outline"
+                style={{ opacity: 0.5, display: 'inline-block', marginRight: 0, marginLeft: '0.5em', flexShrink: 0 }}
+              />
+            )}
           </Orientable>
         </SizeMeasurer>
         <div style={{ flexGrow: 1 }} />
@@ -544,6 +577,7 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
 
       rows[currentDepth].push(
         <ColumnHeader
+          key={column.key}
           colSpan={columnSpans[column.key]}
           rowSpan={rowspan}
           style={style}
