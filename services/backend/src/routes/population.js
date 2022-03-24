@@ -387,8 +387,23 @@ router.get('/v3/populationstatistics/studyprogrammes/unfiltered', async (req, re
 
 router.get('/v3/populationstatistics/maxYearsToCreatePopulationFrom', async (req, res) => {
   const { courseCodes } = req.query
-  const maxYearsToCreatePopulationFrom = await CourseService.maxYearsToCreatePopulationFrom(JSON.parse(courseCodes))
-  return res.json(maxYearsToCreatePopulationFrom)
+  const maxYearsToCreatePopulationFromOpen = await CourseService.maxYearsToCreatePopulationFrom(
+    JSON.parse(courseCodes),
+    'openStats'
+  )
+  const maxYearsToCreatePopulationFromUni = await CourseService.maxYearsToCreatePopulationFrom(
+    JSON.parse(courseCodes),
+    'reqularStats'
+  )
+  const maxYearsToCreatePopulationFromBoth = await CourseService.maxYearsToCreatePopulationFrom(
+    JSON.parse(courseCodes),
+    'unifyStats'
+  )
+  return res.json({
+    openCourses: maxYearsToCreatePopulationFromOpen,
+    uniCourses: maxYearsToCreatePopulationFromUni,
+    unifyCourses: maxYearsToCreatePopulationFromBoth,
+  })
 })
 
 module.exports = router

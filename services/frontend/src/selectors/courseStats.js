@@ -43,6 +43,22 @@ const getAvailableStats = createSelector([courseStatsSelector], courseStats => {
 
 const selectedCourseSelector = state => state.singleCourseStats.selectedCourse
 
+const getMaxYearsToCreatePopulationFrom = createSelector(
+  [singleCourseStatsSelector, openOrReqularSelector],
+  (singleCourseStats, openOrReqular) => {
+    switch (openOrReqular) {
+      case 'openStats':
+        return singleCourseStats.maxYearsToCreatePopulationFrom.openCourses
+      case 'reqularStats':
+        return singleCourseStats.maxYearsToCreatePopulationFrom.uniCourses
+      case 'unifyStats':
+        return singleCourseStats.maxYearsToCreatePopulationFrom.unifyCourses
+      default:
+        return singleCourseStats.maxYearsToCreatePopulationFrom.unifyCourses
+    }
+  }
+)
+
 const getQueryInfo = createSelector([getCourseStats], stats => {
   const courseStats = Object.values(stats)
   const semesters = {}
@@ -216,4 +232,5 @@ export default {
   summaryStatistics,
   ALL,
   getQueryInfo,
+  getMaxYearsToCreatePopulationFrom,
 }
