@@ -141,9 +141,7 @@ const inactiveStudents = async (studytrack, studentnumbers) =>
       where: {
         student_studentnumber: whereStudents(studentnumbers),
         active: 0,
-        enddate: {
-          [Op.gte]: new Date(),
-        },
+        graduated: 0,
       },
     })
   ).map(formatStudyright)
