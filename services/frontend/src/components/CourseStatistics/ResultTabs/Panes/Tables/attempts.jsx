@@ -1,12 +1,12 @@
 import React from 'react'
 import qs from 'query-string'
-import _, { uniq } from 'lodash'
+import _, { uniq, flatten } from 'lodash'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Header, Icon, Item, Popup } from 'semantic-ui-react'
 
 import SortableTable from '../../../../SortableTable'
-import { defineCellColor, getGradeSpread, getThesisGradeSpread, isThesisGrades, THESIS_GRADE_KEYS } from '../util'
+import { defineCellColor, getGradeSpread, getThesisGradeSpread, isThesisGrades, sortGrades } from '../util'
 
 const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
   key,
@@ -32,7 +32,7 @@ const TitleWithHelp = ({ title, helpText }) => (
   </>
 )
 
-const getTableData = (stats, notThesisGrades, isRelative) =>
+const getTableData = (stats, useThesisGrades, isRelative) =>
   stats.map(stat => {
     const {
       name,
@@ -43,9 +43,9 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
     } = stat
 
     const attempts = Object.values(grades).reduce((cur, acc) => acc + cur, 0)
-    const gradeSpread = notThesisGrades
-      ? getGradeSpread([grades], isRelative)
-      : getThesisGradeSpread([grades], isRelative)
+    const gradeSpread = useThesisGrades
+      ? getThesisGradeSpread([grades], isRelative)
+      : getGradeSpread([grades], isRelative)
 
     return {
       name,
@@ -62,29 +62,38 @@ const getTableData = (stats, notThesisGrades, isRelative) =>
     }
   })
 
-const includesHTOrTT = stats =>
-  stats.some(({ attempts }) => ['HT', 'TT'].some(grade => Object.keys(attempts.grades).includes(grade)))
+const resolveGrades = stats => {
+  const failedGrades = ['eisa', 'hyl.', 'hyl', '0', 'luop']
+  const otherPassedGrades = ['hyv.', 'hyv']
 
-const getGradeColumns = (notThesisGrades, addHTAndTT) => {
-  if (!notThesisGrades) return THESIS_GRADE_KEYS.map(k => getSortableColumn(k, k, s => (s.rowObfuscated ? 'NA' : s[k])))
-  const columns = [
-    getSortableColumn('0', '0', s => (s.rowObfuscated ? 'NA' : s['0'])),
-    getSortableColumn('1', '1', s => (s.rowObfuscated ? 'NA' : s['1'])),
-    getSortableColumn('2', '2', s => (s.rowObfuscated ? 'NA' : s['2'])),
-    getSortableColumn('3', '3', s => (s.rowObfuscated ? 'NA' : s['3'])),
-    getSortableColumn('4', '4', s => (s.rowObfuscated ? 'NA' : s['4'])),
-    getSortableColumn('5', '5', s => (s.rowObfuscated ? 'NA' : s['5'])),
-    getSortableColumn('OTHER_PASSED', 'Other passed', s => (s.rowObfuscated ? 'NA' : s['Hyv.'])),
+  const allGrades = [
+    '0',
+    ...flatten(
+      stats.map(({ attempts }) =>
+        [...Object.keys(attempts.grades)].map(grade => {
+          const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
+          if (failedGrades.includes(parsedGrade.toLowerCase())) return '0'
+          if (parsedGrade === 'LA') return 'LUB' // merge LA and LUB grades
+          return parsedGrade
+        })
+      )
+    ),
   ]
-  if (addHTAndTT)
-    columns.splice(
-      6,
-      0,
-      getSortableColumn('HT', 'HT', s => (s.rowObfuscated ? 'NA' : s.HT)),
-      getSortableColumn('TT', 'TT', s => (s.rowObfuscated ? 'NA' : s.TT))
-    )
-  return columns
+
+  // If any of grades 1-5 is present, make sure that full the grade scale is present
+  if (allGrades.filter(grade => ['1', '2', '3', '4', '5'].includes(grade)).length)
+    allGrades.push(...['1', '2', '3', '4', '5'])
+  const grades = [...new Set(allGrades)]
+
+  return grades.sort(sortGrades).map(grade => {
+    if (grade === '0') return { key: grade, title: 'Failed' }
+    if (otherPassedGrades.includes(grade.toLowerCase())) return { key: grade, title: 'Other passed' }
+    return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
+  })
 }
+
+const getGradeColumns = grades =>
+  grades.map(({ key, title }) => getSortableColumn(key, title, s => (s.rowObfuscated ? 'NA' : s[key] || 0)))
 
 const AttemptsTable = ({
   data: { stats, name },
@@ -97,7 +106,7 @@ const AttemptsTable = ({
   const {
     attempts: { grades },
   } = stats[0]
-  const notThesisGrades = !isThesisGrades(grades)
+  const useThesisGrades = isThesisGrades(grades)
 
   const showPopulation = (yearcode, years) => {
     const queryObject = {
@@ -158,13 +167,12 @@ const AttemptsTable = ({
     ),
   ]
 
-  if (showGrades) {
+  if (showGrades)
     columns = [
       timeColumn,
       getSortableColumn('ATTEMPTS', 'Total attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
-      ...getGradeColumns(notThesisGrades, includesHTOrTT(stats)),
+      ...getGradeColumns(resolveGrades(stats)),
     ]
-  }
 
   if (showEnrollments) {
     columns = [
@@ -195,7 +203,7 @@ const AttemptsTable = ({
     ]
   }
 
-  const data = getTableData(stats, notThesisGrades, isRelative)
+  const data = getTableData(stats, useThesisGrades, isRelative)
 
   return (
     <div>
