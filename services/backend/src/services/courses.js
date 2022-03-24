@@ -338,6 +338,7 @@ const maxYearsToCreatePopulationFrom = async (coursecodes, unifyCourses) => {
       [Op.in]: [false, true],
     }
   }
+
   const maxAttainmentDate = new Date(
     Math.max(
       ...(

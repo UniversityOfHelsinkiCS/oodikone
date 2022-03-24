@@ -526,7 +526,7 @@ SingleCourseStats.propTypes = {
   history: shape({
     push: func,
   }).isRequired,
-  getMaxYearsToCreatePopulationFrom: func.isRequired,
+  getMaxYearsToCreatePopulationFrom: Number.isRequired,
   maxYearsToCreatePopulationFrom: number.isRequired,
   userHasAccessToAllStats: bool.isRequired,
 }
@@ -534,7 +534,7 @@ SingleCourseStats.propTypes = {
 const mapStateToProps = state => {
   return {
     programmes: selectors.getAllStudyProgrammes(state),
-    maxYearsToCreatePopulationFrom: state.singleCourseStats.maxYearsToCreatePopulationFrom,
+    maxYearsToCreatePopulationFrom: selectors.getMaxYearsToCreatePopulationFrom(state),
   }
 }
 
