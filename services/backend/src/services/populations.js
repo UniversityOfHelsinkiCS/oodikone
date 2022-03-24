@@ -376,8 +376,6 @@ const studentnumbersWithAllStudyrightElements = async (
   transferredToStudents,
   graduatedStudents
 ) => {
-  // eslint-disable-line
-
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
 
@@ -392,12 +390,6 @@ const studentnumbersWithAllStudyrightElements = async (
   }
   if (!nondegreeStudents) {
     filteredExtents.push(33, 99, 14, 13)
-  }
-
-  // If inactive studyrights are not included, take only those studyrights which are in active-state
-  // OR the student has not graduated from the studyright and the studyright is marked inactive
-  if (!inactiveStudents) {
-    studyrightWhere = { ...studyrightWhere, [Op.or]: [{ active: 1 }, { [Op.and]: [{ active: 0 }, { graduated: 0 }] }] }
   }
 
   let studentWhere = {}
@@ -416,7 +408,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   const students = await Studyright.findAll({
-    attributes: ['student_studentnumber', 'graduated', 'enddate'],
+    attributes: ['student_studentnumber', 'graduated', 'enddate', 'active'],
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -537,6 +529,12 @@ const studentnumbersWithAllStudyrightElements = async (
     ).map(s => s.studentnumber)
 
     studentnumberlist = studentnumberlist.filter(sn => !transfersOut.includes(sn))
+  }
+
+  // If inactive studyrights are not included, take only those studyrights which are in active-state
+  // OR the student has not graduated from the studyright and the studyright is marked inactive
+  if (!inactiveStudents) {
+    studentnumberlist = [...new Set(students.filter(s => s.active || s.graduated).map(s => s.student_studentnumber))]
   }
 
   // fetch students that have transferred to the programme and filter out these studentnumbers
