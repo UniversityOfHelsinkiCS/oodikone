@@ -34,7 +34,6 @@ const getFromRapo = async (urlStart, urlEnd) => {
 const known_problems_in_oodikone = {
   KH30_001: ['013896191'],
   KH40_003: ['013200457'],
-  KH60_001: ['014984109', '014855814', '014865260', '014967537'],
   KH55_001: ['013195834', '015119708', '015138336'],
 }
 
@@ -358,7 +357,7 @@ const main = async () => {
   }
 
   //await programme_diff_year('KH55_001', 'H55', 2021, true)
-  //await programme_diff('KH55_001', 'H55', true)
+  //await programme_diff('KH60_001', 'H60', true)
 }
 
 main().then(() => process.exit(0))
