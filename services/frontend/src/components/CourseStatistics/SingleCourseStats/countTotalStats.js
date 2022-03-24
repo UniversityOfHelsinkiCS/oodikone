@@ -10,10 +10,12 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       const cgrades = acc.attempts.grades
 
       Object.keys(curr.attempts.grades).forEach(grade => {
-        if (!cgrades[grade]) cgrades[grade] = 0
-        cgrades[grade] += curr.attempts.grades[grade]
+        let parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
+        if (parsedGrade === 'LA') parsedGrade = 'LUB' // merge LA and LUB grades
+        if (!cgrades[parsedGrade]) cgrades[parsedGrade] = 0
+        cgrades[parsedGrade] += curr.attempts.grades[grade]
 
-        if (['EISA', 'Hyl.', 'HYL', '0', 'LUOP'].includes(grade)) {
+        if (['EISA', 'Hyl.', 'HYL', '0', 'LUOP'].includes(parsedGrade.toLowerCase())) {
           failed += curr.attempts.grades[grade]
         } else {
           passed += curr.attempts.grades[grade]

@@ -1,5 +1,23 @@
 import { arrayOf, number, oneOfType, shape, string, oneOf } from 'prop-types'
 
+const gradesMap = {
+  0: 0,
+  1: 10,
+  2: 20,
+  3: 30,
+  4: 40,
+  5: 50,
+  'Hyv.': 60,
+  I: 0,
+  A: 1,
+  LUB: 2,
+  NSLA: 3,
+  CL: 4,
+  MCLA: 5,
+  ECLA: 6,
+  L: 7,
+}
+
 export const viewModeNames = {
   STUDENT: 'Students',
   ATTEMPTS: 'Attempts',
@@ -23,6 +41,8 @@ export const viewModeType = oneOf(Object.values(viewModeNames))
 
 export const THESIS_GRADE_KEYS = ['I', 'A', 'NSLA', 'LUB', 'CL', 'MCLA', 'ECLA', 'L']
 
+export const sortGrades = (a, b) => gradesMap[a] - gradesMap[b]
+
 export const isThesisGrades = grades => Object.keys(grades).some(k => THESIS_GRADE_KEYS.includes(k))
 
 export const isThesisSeries = series => series && series.some(s => isThesisGrades(s))
@@ -39,13 +59,20 @@ export const getThesisGradeSpread = (series, isRelative) => {
     NSLA: [],
     A: [],
     I: [],
+    0: [],
+    1: [],
+    2: [],
+    3: [],
+    4: [],
+    5: [],
   }
   const newSeries = series.reduce(
     (acc, cur, i) => {
       const currentEntries = Object.entries(cur)
 
       currentEntries.forEach(([k, v]) => {
-        acc[k].push(v)
+        const merged = k === 'LA' ? 'LUB' : k
+        acc[merged].push(v)
       })
 
       Object.entries(acc).forEach(([k, v]) => {
@@ -94,7 +121,8 @@ export const getGradeSpread = (series, isRelative) => {
         if (failedKeys.includes(k.toLowerCase())) {
           failed += v
         } else {
-          acc[k].push(v)
+          const parsedGrade = Number(k) ? Math.round(Number(k)) : k
+          acc[parsedGrade].push(v)
         }
       })
       acc[0].push(failed)
