@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react'
 import { Icon, Card, Dropdown, Portal, Popup } from 'semantic-ui-react'
+import { createHtmlPortalNode, InPortal, OutPortal } from 'react-reverse-portal'
 
 import './styles.css'
 
@@ -63,21 +64,43 @@ const Content = ({ children, ...rest }) => {
 const FigureContainer = ({ children, style }) => {
   const [isFullscreen, setFullscreen] = useState(false)
 
+  const portalNode = useMemo(
+    () =>
+      createHtmlPortalNode({
+        attributes: {
+          class: 'ui card fluid',
+        },
+      }),
+    []
+  )
+
   useEffect(() => {
     if (isFullscreen) {
       document.body.classList.add('figure-fullscreen')
+      portalNode.element.style = `
+        position: sticky;
+        margin: 0;
+        inset: 0;
+        height: 100vh;
+        border: none;
+        border-radius: 0;
+      `
     } else {
       document.body.classList.remove('figure-fullscreen')
+      portalNode.element.style = `
+        overflow: hidden;
+        maxHeight: 100%;
+      `
+      Object.assign(portalNode.element.style, style)
     }
 
     return () => document.body.classList.remove('figure-fullscreen')
-  }, [isFullscreen])
+  }, [isFullscreen, portalNode])
 
   return (
     <FigureContext.Provider value={{ isFullscreen, setFullscreen }}>
-      <Card fluid style={{ overflow: 'hidden', maxHeight: '100%', ...style }}>
-        {children}
-      </Card>
+      <InPortal node={portalNode}>{children}</InPortal>
+      {!isFullscreen && <OutPortal node={portalNode} />}
       <Portal
         open={isFullscreen}
         onClose={() => setFullscreen(false)}
@@ -87,12 +110,7 @@ const FigureContainer = ({ children, style }) => {
         }}
       >
         <div style={{ inset: 0, position: 'absolute', zIndex: 9004, height: '100000vh' }}>
-          <Card
-            fluid
-            style={{ position: 'sticky', margin: 0, inset: 0, height: '100vh', border: 'none', borderRadius: 0 }}
-          >
-            {isFullscreen && children}
-          </Card>
+          {isFullscreen && <OutPortal node={portalNode} />}
         </div>
       </Portal>
     </FigureContext.Provider>
