@@ -228,13 +228,13 @@ class PopulationSearchHistory extends Component {
           />
           <Form.Checkbox
             className="populationStatisticsRadio"
-            key="CANCELLED"
+            key="INACTIVE"
             label="Students who haven't enrolled present nor absent"
-            value="CANCELLED"
+            value="INACTIVE"
             name="studentStatusGroup"
-            checked={studentStatuses.includes('CANCELLED')}
+            checked={studentStatuses.includes('INACTIVE')}
             onChange={this.handleStudentStatusSelection}
-            data-cy="toggle-cancelled"
+            data-cy="toggle-inactive"
           />
           <Form.Checkbox
             className="populationStatisticsRadio"
