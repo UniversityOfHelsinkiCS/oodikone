@@ -121,10 +121,10 @@ describe('Population Statistics tests', () => {
 
       cy.contains('Credit accumulation (for 149 students)')
 
-      // spring + fall and include cancelled
+      // spring + fall and include inactive
       cy.get('[data-cy=advanced-toggle]').click()
       cy.cs('toggle-spring').click()
-      cy.cs('toggle-cancelled').click()
+      cy.cs('toggle-inactive').click()
       cy.contains('Fetch population').click()
 
       cy.contains('Credit accumulation (for 170 students)')

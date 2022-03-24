@@ -39,7 +39,7 @@ const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags })
             <div>{`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}</div>
             <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
             <div>
-              {studentStatuses.includes('CANCELLED') ? 'Includes ' : 'Excludes '}
+              {studentStatuses.includes('INACTIVE') ? 'Includes ' : 'Excludes '}
               students who haven't enrolled present nor absent
             </div>
             <div>
