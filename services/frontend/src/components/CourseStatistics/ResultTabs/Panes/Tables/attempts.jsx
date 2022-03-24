@@ -3,34 +3,21 @@ import qs from 'query-string'
 import _, { uniq, flatten } from 'lodash'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { Header, Icon, Item, Popup } from 'semantic-ui-react'
+import { Header, Icon, Item } from 'semantic-ui-react'
 
 import SortableTable from '../../../../SortableTable'
-import { defineCellColor, getGradeSpread, getThesisGradeSpread, isThesisGrades, sortGrades } from '../util'
+import { getGradeSpread, getThesisGradeSpread, isThesisGrades, sortGrades } from '../util'
 
-const getSortableColumn = (key, title, getRowVal, getRowContent) => ({
-  key,
-  title,
-  getRowVal,
-  getRowContent,
+const getSortableColumn = opts => ({
   filterType: 'range',
-  cellProps: { style: { textAlign: 'right' } },
-  getCellProps: s => defineCellColor(s),
+  cellProps: s => ({
+    style: {
+      textAlign: 'right',
+      color: s.rowObfuscated ? 'gray' : 'inherit',
+    },
+  }),
+  ...opts,
 })
-
-const styles = {
-  help: {
-    opacity: 0.5,
-    marginLeft: '0.5rem',
-  },
-}
-
-const TitleWithHelp = ({ title, helpText }) => (
-  <>
-    {title}
-    <Popup trigger={<Icon circular name="help" style={styles.help} size="small" />} content={helpText} />
-  </>
-)
 
 const getTableData = (stats, useThesisGrades, isRelative) =>
   stats.map(stat => {
@@ -93,7 +80,13 @@ const resolveGrades = stats => {
 }
 
 const getGradeColumns = grades =>
-  grades.map(({ key, title }) => getSortableColumn(key, title, s => (s.rowObfuscated ? 'NA' : s[key] || 0)))
+  grades.map(({ key, title }) =>
+    getSortableColumn({
+      key,
+      title,
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s[key] || 0),
+    })
+  )
 
 const AttemptsTable = ({
   data: { stats, name },
@@ -125,21 +118,19 @@ const AttemptsTable = ({
     merge: true,
     mergeHeader: true,
     children: [
-      {
-        ...getSortableColumn(
-          'TIME',
-          'Time',
-          s => s.code,
-          s => (
-            <div>
-              {s.name}
-              {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
-            </div>
-          )
-        ),
-        cellProps: {},
+      getSortableColumn({
+        key: 'TIME',
+        title: 'Time',
         filterType: 'default',
-      },
+        cellProps: {},
+        getRowVal: s => s.code,
+        getRowContent: s => (
+          <div>
+            {s.name}
+            {s.name === 'Total' && !userHasAccessToAllStats && <strong>*</strong>}
+          </div>
+        ),
+      }),
       {
         key: 'TIME-ICON',
         export: false,
@@ -156,50 +147,67 @@ const AttemptsTable = ({
 
   let columns = [
     timeColumn,
-    getSortableColumn('ATTEMPTS', 'Total attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
-    getSortableColumn('PASSED', 'Passed', s => (s.rowObfuscated ? 'NA' : s.passed)),
-    getSortableColumn('FAILED', 'Failed', s => (s.rowObfuscated ? 'NA' : s.failed)),
-    getSortableColumn(
-      'PASSRATE',
-      'Pass rate',
-      s => (s.rowObfuscated ? 'NA' : s.passRate),
-      s => (s.rowObfuscated ? 'NA' : `${Number(s.passRate || 0).toFixed(2)} %`)
-    ),
+    getSortableColumn({
+      key: 'ATTEMPTS',
+      title: 'Total attempts',
+      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts),
+    }),
+    getSortableColumn({
+      key: 'PASSED',
+      title: 'Passed',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.passed),
+    }),
+    getSortableColumn({
+      key: 'FAILED',
+      title: 'Failed',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.failed),
+    }),
+    getSortableColumn({
+      key: 'PASSRATE',
+      title: 'Pass rate',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.passRate),
+      getRowContent: s => (s.rowObfuscated ? 'NA' : `${Number(s.passRate || 0).toFixed(2)} %`),
+    }),
   ]
 
   if (showGrades)
     columns = [
       timeColumn,
-      getSortableColumn('ATTEMPTS', 'Total attempts', s => (s.rowObfuscated ? '5 or less students' : s.attempts)),
+      getSortableColumn({
+        key: 'ATTEMPTS',
+        title: 'Total attempts',
+        getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.attempts),
+      }),
       ...getGradeColumns(resolveGrades(stats)),
     ]
 
   if (showEnrollments) {
     columns = [
       ...columns,
-      getSortableColumn(
-        'TOTAL_ENROLLMENTS',
-        <TitleWithHelp
-          title="Total enrollments"
-          helpText="All enrollments, including all rejected and aborted states."
-        />,
-        s => (s.rowObfuscated ? 'NA' : s.totalEnrollments)
-      ),
-      getSortableColumn(
-        'ENROLLMENTS_ENROLLED',
-        <TitleWithHelp title="Enrolled" helpText="All enrollments with enrolled or confirmed state." />,
-        s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ENROLLED)
-      ),
-      getSortableColumn(
-        'ENROLLMENTS_REJECTED',
-        <TitleWithHelp title="Rejected" helpText="All enrollments with rejected state." />,
-        s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.REJECTED)
-      ),
-      getSortableColumn(
-        'ENROLLMENTS_ABORTED',
-        <TitleWithHelp title="Aborted" helpText="All enrollments with aborted by student or teacher state." />,
-        s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ABORTED)
-      ),
+      getSortableColumn({
+        key: 'TOTAL_ENROLLMENTS',
+        title: 'Total enrollments',
+        helpText: 'All enrollments, including all rejected and aborted states.',
+        getRowVal: s => (s.rowObfuscated ? 'NA' : s.totalEnrollments),
+      }),
+      getSortableColumn({
+        key: 'ENROLLMENTS_ENROLLED',
+        title: 'Enrolled',
+        helpText: 'All enrollments with enrolled or confirmed state.',
+        getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ENROLLED),
+      }),
+      getSortableColumn({
+        key: 'ENROLLMENTS_REJECTED',
+        title: 'Rejected',
+        helpText: 'All enrollments with rejected state.',
+        getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.REJECTED),
+      }),
+      getSortableColumn({
+        key: 'ENROLLMENTS_ABORTED',
+        title: 'Aborted',
+        helpText: 'All enrollments with aborted by student or teacher state.',
+        getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ABORTED),
+      }),
     ]
   }
 
