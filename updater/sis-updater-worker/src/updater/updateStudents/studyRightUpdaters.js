@@ -51,7 +51,7 @@ const updateStudyRights = async (
         if (!curr || !curr.studyTerm) return res
         const { studyTerm, termRegistrationType } = curr
         const { semestercode } = getSemester(studyrightToUniOrgId, studyTerm.studyYearStartYear, studyTerm.termIndex)
-        if (['ATTENDING', 'ABSENT'].includes(termRegistrationType)) {
+        if (['ATTENDING', 'NONATTENDING'].includes(termRegistrationType)) {
           return res.concat(semestercode)
         }
         return res
