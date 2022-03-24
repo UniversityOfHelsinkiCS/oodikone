@@ -20,6 +20,7 @@ const {
   startedStudyrights,
   enrolledStudents,
   absentStudents,
+  inactiveStudents,
   graduatedStudyRights,
 } = require('./studyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
@@ -123,7 +124,7 @@ const getStudytrackDataForTheYear = async ({
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const enrolled = await enrolledStudents(track, startDate, studentnumbers)
       const absent = await absentStudents(track, studentnumbers)
-      const cancelled = all.filter(s => s.canceldate !== null && s.canceldate !== undefined)
+      const inactive = await inactiveStudents(track, studentnumbers)
       const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
@@ -155,8 +156,8 @@ const getStudytrackDataForTheYear = async ({
           getPercentage(enrolled.length, all.length),
           absent.length,
           getPercentage(absent.length, all.length),
-          cancelled.length,
-          getPercentage(cancelled.length, all.length),
+          inactive.length,
+          getPercentage(inactive.length, all.length),
           graduated.length,
           getPercentage(graduated.length, all.length),
           studentData.male,
@@ -181,8 +182,8 @@ const getStudytrackDataForTheYear = async ({
           getPercentage(enrolled.length, all.length),
           absent.length,
           getPercentage(absent.length, all.length),
-          cancelled.length,
-          getPercentage(cancelled.length, all.length),
+          inactive.length,
+          getPercentage(inactive.length, all.length),
           graduated.length,
           getPercentage(graduated.length, all.length),
           studentData.male,

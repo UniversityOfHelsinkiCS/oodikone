@@ -117,6 +117,37 @@ const absentStudents = async (studytrack, studentnumbers) => {
   return students
 }
 
+const inactiveStudents = async (studytrack, studentnumbers) =>
+  (
+    await Studyright.findAll({
+      include: [
+        {
+          model: StudyrightElement,
+          required: true,
+          include: {
+            model: ElementDetail,
+            required: true,
+            where: {
+              code: studytrack,
+            },
+          },
+        },
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
+      where: {
+        student_studentnumber: whereStudents(studentnumbers),
+        active: 0,
+        enddate: {
+          [Op.gte]: new Date(),
+        },
+      },
+    })
+  ).map(formatStudyright)
+
 const allStudyrights = async (studytrack, studentnumbers) =>
   (
     await Studyright.findAll({
@@ -427,6 +458,7 @@ module.exports = {
   studytrackStudents,
   enrolledStudents,
   absentStudents,
+  inactiveStudents,
   allStudyrights,
   startedStudyrights,
   graduatedStudyRights,

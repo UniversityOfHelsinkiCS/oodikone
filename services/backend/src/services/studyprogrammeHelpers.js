@@ -6,7 +6,7 @@ const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials, includeGraduated = true }) => {
   let studentnumbers = []
   const exchangeStudents = includeAllSpecials
-  const cancelledStudents = includeAllSpecials
+  const inactiveStudents = includeAllSpecials
   const nondegreeStudents = includeAllSpecials
   const transferredOutStudents = includeAllSpecials
   const transferredToStudents = !includeAllSpecials
@@ -17,7 +17,7 @@ const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllS
     startDate,
     endDate,
     exchangeStudents,
-    cancelledStudents,
+    inactiveStudents,
     nondegreeStudents,
     transferredOutStudents,
     null,
@@ -126,12 +126,10 @@ const isMajorStudentCredit = (studyright, attainment_date) =>
   (studyright.prioritycode === 1 || studyright.prioritycode === 30) && // Is studyright state = MAIN or state = GRADUATED
   studyright.studystartdate && // The student has started studying in the programme
   studyright.studystartdate <= attainment_date && // Has the credit been attained after studying in the programme started
-  studyright.enddate >= attainment_date && // Has the credit been attained before the studyright ended
-  (!studyright.canceldate || studyright.canceldate >= attainment_date) // If the studyright was cancelled, was the credit attained before it was cancelled
+  studyright.enddate >= attainment_date // Has the credit been attained before the studyright ended
 
 const isSpecialGroupCredit = (studyright, attainment_date, transfers) => {
   if (!studyright) return true // If there is no studyright matching the credit, is not a major student credit
-  if (studyright.canceldate) return true // Cancelled studyrights are in the special groups
   if (studyright.studystartdate > attainment_date) return true // Credits before the studyright started are not major student credits
   if (studyright.enddate && attainment_date > studyright.enddate) return true // Credits after studyright are not major student credits
   if ([7, 9, 16, 34, 33, 99, 14, 13].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
@@ -278,7 +276,7 @@ const getCreditThresholds = studyprogramme => {
 const tableTitles = {
   basics: {
     SPECIAL_EXCLUDED: ['', 'Started studying', 'Graduated'],
-    SPECIAL_INCLUDED: ['', 'Started studying', 'Graduated', 'Cancelled', 'Transferred away', 'Transferred to'],
+    SPECIAL_INCLUDED: ['', 'Started studying', 'Graduated', 'Inactive', 'Transferred away', 'Transferred to'],
   },
   credits: {
     SPECIAL_EXCLUDED: ['', 'Total', 'Major students credits', 'Transferred credits'],
@@ -314,7 +312,7 @@ const tableTitles = {
     'Started studying',
     'Currently enrolled',
     'Absent',
-    'Cancelled',
+    'Inactive',
     'Graduated',
     'Men',
     'Women',
