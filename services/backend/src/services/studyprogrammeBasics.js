@@ -8,11 +8,11 @@ const {
   tableTitles,
 } = require('./studyprogrammeHelpers')
 const {
-  allStudyrights,
   graduatedStudyRights,
   startedStudyrights,
   transfersAway,
   transfersTo,
+  inactiveStudents,
 } = require('./studyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
 
@@ -64,17 +64,23 @@ const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear,
   return { graphStats, tableStats }
 }
 
-const getCancelledStats = async ({ studyprogramme, years, isAcademicYear }) => {
-  const studyrights = await allStudyrights(studyprogramme)
+const getInactiveStats = async ({ studyprogramme, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
 
-  studyrights.forEach(({ canceldate }) => {
-    if (canceldate !== null && canceldate !== undefined) {
-      const cancelYear = defineYear(canceldate, isAcademicYear)
-      graphStats[indexOf(years, cancelYear)] += 1
-      tableStats[cancelYear] += 1
-    }
-  })
+  await Promise.all(
+    years.map(async year => {
+      const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
+      const studentnumbersOfTheYear = await getCorrectStudentnumbers({
+        codes: [studyprogramme],
+        startDate,
+        endDate,
+        includeAllSpecials,
+      })
+      const studyrights = await inactiveStudents(studyprogramme, studentnumbersOfTheYear)
+      graphStats[indexOf(years, year)] += studyrights.length
+      tableStats[year] += studyrights.length
+    })
+  )
 
   return { graphStats, tableStats }
 }
@@ -113,7 +119,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, settings }) => {
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
   const started = await getStartedStats(queryParameters)
   const graduated = await getGraduatedStats(queryParameters)
-  const cancelled = await getCancelledStats(queryParameters)
+  const inactive = await getInactiveStats(queryParameters)
   const transferredAway = await getTransferredAwayStats(queryParameters)
   const transferredTo = await getTransferredToStats(queryParameters)
 
@@ -125,7 +131,7 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, settings }) => {
           year,
           started.tableStats[year],
           graduated.tableStats[year],
-          cancelled.tableStats[year],
+          inactive.tableStats[year],
           transferredAway.tableStats[year],
           transferredTo.tableStats[year],
         ]
@@ -146,8 +152,8 @@ const getBasicStatsForStudytrack = async ({ studyprogramme, settings }) => {
             data: graduated.graphStats,
           },
           {
-            name: 'Cancelled',
-            data: cancelled.graphStats,
+            name: 'Inactive',
+            data: inactive.graphStats,
           },
           {
             name: 'Transferred away',
