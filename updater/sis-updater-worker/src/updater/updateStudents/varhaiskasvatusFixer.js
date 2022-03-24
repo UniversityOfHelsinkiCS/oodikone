@@ -1,6 +1,28 @@
 const { Studyright, StudyrightElement } = require('../../db/models')
 const { selectFromByIds } = require('../../db')
 
+const fixVarhaiskasvatusGraduations = async studentsToBeFixed => {
+  const students = await selectFromByIds('persons', studentsToBeFixed)
+
+  for (const student of students) {
+    const bsc = await Studyright.findOne({
+      where: {
+        student_studentnumber: student.student_number,
+      },
+      include: {
+        model: StudyrightElement,
+        where: {
+          code: 'KH60_001',
+        },
+      },
+    })
+
+    bsc.enddate = new Date(graduationsThatNeedToBeFixed.find(s => s.id === student.id).date)
+    bsc.graduated = 1
+    await bsc.save()
+  }
+}
+
 const fixVarhaiskasvatusStudyRights = async studentsToBeFixed => {
   const students = await selectFromByIds('persons', studentsToBeFixed)
   for (const student of students) {
@@ -54,7 +76,16 @@ const studentsThatNeedToBeFixed = [
   { id: 'hy-hlo-62121710', started: '2020-12-19' },
 ]
 
+const graduationsThatNeedToBeFixed = [
+  { id: 'hy-hlo-121306201', date: '2021-09-09' },
+  { id: 'hy-hlo-125516474', date: '2021-09-03' },
+  { id: 'hy-hlo-120791479', date: '2021-09-10' },
+  { id: 'hy-hlo-125585515', date: '2021-09-02' },
+]
+
 module.exports = {
   fixVarhaiskasvatusStudyRights,
+  fixVarhaiskasvatusGraduations,
   studentsThatNeedToBeFixed,
+  graduationsThatNeedToBeFixed,
 }
