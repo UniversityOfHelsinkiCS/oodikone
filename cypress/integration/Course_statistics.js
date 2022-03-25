@@ -304,6 +304,7 @@ describe('Course Statistics tests', () => {
               .eq(trIndex)
               .within(() => {
                 values.forEach((value, tdIndex) => {
+                  if (value === null) return
                   cy.get('td').eq(tdIndex).contains(value)
                 })
               })
