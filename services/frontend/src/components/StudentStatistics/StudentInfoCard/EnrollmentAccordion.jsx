@@ -6,7 +6,7 @@ import _ from 'lodash'
 import './studentInfoCard.css'
 
 const enrolmentTypes = {
-  1: 'Presnet',
+  1: 'Present',
   2: 'Absent',
   3: 'Passive',
 }
