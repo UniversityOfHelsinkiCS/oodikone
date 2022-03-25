@@ -19,7 +19,7 @@ const semesterListStyles = {
 const DateTime = ({ value, onChange, before, after, showSemesters }) => {
   const datetimeRef = useRef()
   const semesterRequest = useGetSemestersQuery()
-  const allSemesters = semesterRequest.isLaoding ? [] : semesterRequest.data.semesters
+  const allSemesters = semesterRequest.isLoading ? [] : semesterRequest.data.semesters
 
   return (
     <Datetime

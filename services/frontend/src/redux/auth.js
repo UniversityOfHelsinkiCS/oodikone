@@ -33,7 +33,6 @@ const { useLoginQuery } = authorizationApi
 
 export const useGetAuthorizedUserQuery = () => {
   const { data, isLoading, error, ...rest } = useLoginQuery()
-
   if (isLoading || error) return { data, isLoading, error, ...rest }
 
   const { user } = data
