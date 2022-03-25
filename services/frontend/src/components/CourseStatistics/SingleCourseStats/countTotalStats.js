@@ -15,7 +15,7 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         if (!cgrades[parsedGrade]) cgrades[parsedGrade] = 0
         cgrades[parsedGrade] += curr.attempts.grades[grade]
 
-        if (['EISA', 'Hyl.', 'HYL', '0', 'LUOP'].includes(parsedGrade.toLowerCase())) {
+        if (['eisa', 'hyl.', 'hyl', '0', 'luop'].includes(parsedGrade.toLowerCase())) {
           failed += curr.attempts.grades[grade]
         } else {
           passed += curr.attempts.grades[grade]
