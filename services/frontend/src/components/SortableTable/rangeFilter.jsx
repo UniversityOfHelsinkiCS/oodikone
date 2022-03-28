@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useContextSelector } from 'use-context-selector'
 import { Range, getTrackBackground } from 'react-range'
 import _ from 'lodash'
@@ -8,6 +8,8 @@ import { SortableTableContext, getColumnValue } from './common'
 
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   const values = useContextSelector(SortableTableContext, ctx => ctx.values[column.key]) ?? []
+  const [dirtyMin, setDirtyMin] = useState(null)
+  const [dirtyMax, setDirtyMax] = useState(null)
 
   const min = _.min(values.filter(_.isNumber)) ?? 0
   const max = _.max(values.filter(_.isNumber)) ?? 0
@@ -41,9 +43,33 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
     }
   }
 
-  const minOnChange = useCallback(newValue => handleChange([parseInt(newValue.target.value, 10), range[1]]), [range[1]])
+  const minOnChange = useCallback(
+    newValue => {
+      const numValue = parseInt(newValue.target.value, 10)
 
-  const maxOnChange = useCallback(newValue => handleChange([range[0], parseInt(newValue.target.value, 10)]), [range[0]])
+      if (Number.isNaN(numValue)) {
+        setDirtyMin(newValue.target.value)
+      } else {
+        setDirtyMin(null)
+        handleChange([numValue, range[1]])
+      }
+    },
+    [range[1]]
+  )
+
+  const maxOnChange = useCallback(
+    newValue => {
+      const numValue = parseInt(newValue.target.value, 10)
+
+      if (Number.isNaN(numValue)) {
+        setDirtyMax(newValue.target.value)
+      } else {
+        setDirtyMax(null)
+        handleChange([range[0], numValue])
+      }
+    },
+    [range[0]]
+  )
 
   if (min === max) return null
 
@@ -112,14 +138,16 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
 
       <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.5em' }}>
         <Input
-          value={range[0]}
+          error={dirtyMin !== null}
+          value={dirtyMin ?? range[0]}
           style={{ flexShrink: 1, width: '5em' }}
           onChange={minOnChange}
           onFocus={e => e.stopPropagation()}
         />
         <span style={{ margin: '0 0.5em' }}>&mdash;</span>
         <Input
-          value={range[1]}
+          error={dirtyMax !== null}
+          value={dirtyMax ?? range[1]}
           style={{ flexShrink: 1, width: '5em' }}
           onChange={maxOnChange}
           onFocus={e => e.stopPropagation()}
