@@ -6,7 +6,6 @@ const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials, includeGraduated = true }) => {
   let studentnumbers = []
   const exchangeStudents = includeAllSpecials
-  const inactiveStudents = includeAllSpecials
   const nondegreeStudents = includeAllSpecials
   const transferredOutStudents = includeAllSpecials
   const transferredToStudents = !includeAllSpecials
@@ -17,7 +16,6 @@ const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllS
     startDate,
     endDate,
     exchangeStudents,
-    inactiveStudents,
     nondegreeStudents,
     transferredOutStudents,
     null,
