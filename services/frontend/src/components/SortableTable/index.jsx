@@ -1,15 +1,8 @@
 /* eslint-disable no-return-assign */
 
-import React, {
-  useRef,
-  useState,
-  useEffect,
-  useMemo,
-  useReducer,
-  useCallback,
-} from 'react'
+import React, { useRef, useState, useEffect, useMemo, useReducer, useCallback } from 'react'
 import { useContext, useContextSelector } from 'use-context-selector'
-import { Icon, Popup, Dropdown } from 'semantic-ui-react'
+import { Icon, Popup } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import produce from 'immer'
@@ -287,19 +280,17 @@ const Orientable = ({ orientation, children, ...rest }) => {
   )
 }
 
+const getDefaultColumnOptions = () => ({
+  valueFilters: [],
+})
+
 const ColumnHeader = ({ columnKey, displayColumnKey, ...props }) => {
-  const storedState = useContextSelector(SortableTableContext, ctx => ctx.state.columnOptions[displayColumnKey]);
-  const colSpan = useContextSelector(SortableTableContext, ctx => ctx.columnSpans[columnKey]);
+  const storedState = useContextSelector(SortableTableContext, ctx => ctx.state.columnOptions[displayColumnKey])
+  const colSpan = useContextSelector(SortableTableContext, ctx => ctx.columnSpans[columnKey])
 
-  const state = useMemo(() => storedState ?? getDefaultColumnOptions(), [storedState]);
+  const state = useMemo(() => storedState ?? getDefaultColumnOptions(), [storedState])
 
-  return (
-    <ColumnHeaderContent
-      state={state}
-      colSpan={colSpan}
-      {...props}
-    />
-  );
+  return <ColumnHeaderContent state={state} colSpan={colSpan} {...props} />
 }
 
 const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowSpan, style }) => {
@@ -468,53 +459,65 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
             />
           )}
           {filterable && (!hasChildren || column.mergeHeader) && (
-            <Dropdown
-              icon="filter"
+            <Popup
+              offset={[-3, 0]}
+              trigger={<Icon name="filter" style={{ color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb' }} />}
+              position="bottom center"
               open={filterMenuOpen}
-              onOpen={() => setFilterMenuOpen(true)}
-              onClose={() => setFilterMenuOpen(false)}
-              closeOnBlur={false}
-              style={{
-                color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb',
-                top: '1px',
+              onOpen={e => {
+                if (e?.stopPropagation) {
+                  e.stopPropagation()
+                }
+
+                setFilterMenuOpen(true)
               }}
-              lazyLoad
+              onClose={e => {
+                if (e?.stopPropagation) {
+                  e.stopPropagation()
+                }
+
+                setFilterMenuOpen(false)
+              }}
+              on="click"
+              className="filter-menu"
+              hideOnScroll={false}
+              style={{ padding: 0, zIndex: 9005 }}
+              hoverable
             >
-              <Dropdown.Menu>
+              <div onClick={e => e.stopPropagation()}>
                 <FilterComponent
                   dispatch={filterComponentDispatch}
                   column={column}
                   options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
                 />
-                <Dropdown.Divider />
-                <Dropdown.Item
-                  active={sort === 'asc'}
-                  onClick={() =>
-                    dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
-                  }
-                >
-                  Sort: Ascending
-                </Dropdown.Item>
-                <Dropdown.Item
-                  active={sort === 'desc'}
-                  onClick={() =>
-                    dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'desc' } })
-                  }
-                >
-                  Sort: Descending
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
+                <div className="actions">
+                  <div
+                    className="item"
+                    active={sort === 'asc'}
+                    onClick={() =>
+                      dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
+                    }
+                  >
+                    Sort: Ascending
+                  </div>
+                  <div
+                    className="item"
+                    active={sort === 'desc'}
+                    onClick={() =>
+                      dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'desc' } })
+                    }
+                  >
+                    Sort: Descending
+                  </div>
+                </div>
+              </div>
+            </Popup>
           )}
           {column.helpText && <Popup position="top center" trigger={helpIcon} content={column.helpText} />}
         </SizeMeasurer>
       </SizeMeasurer>
     </th>
   )
-}
-
-const getDefaultColumnOptions = () => ({
-  valueFilters: [],
 })
 
 const resolveDisplayColumn = column => {
@@ -829,10 +832,7 @@ const SortableTable = ({
     [data, columnsByKey]
   )
 
-  const headers = useMemo(
-    () => createHeaders(columns, columnDepth, dispatch),
-    [columns, columnDepth]
-  )
+  const headers = useMemo(() => createHeaders(columns, columnDepth, dispatch), [columns, columnDepth])
 
   const sortedData = useMemo(
     () => SortingFilteringVisitor.mutate(data, columnsByKey, state, ColumnFilters),
