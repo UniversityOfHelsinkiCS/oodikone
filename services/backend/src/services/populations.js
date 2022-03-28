@@ -369,7 +369,6 @@ const studentnumbersWithAllStudyrightElements = async (
   startDate,
   endDate,
   exchangeStudents,
-  inactiveStudents,
   nondegreeStudents,
   transferredOutStudents,
   tag,
@@ -531,12 +530,6 @@ const studentnumbersWithAllStudyrightElements = async (
     studentnumberlist = studentnumberlist.filter(sn => !transfersOut.includes(sn))
   }
 
-  // If inactive studyrights are not included, take only those studyrights which are in active-state
-  // OR the student has not graduated from the studyright and the studyright is marked inactive
-  if (!inactiveStudents) {
-    studentnumberlist = [...new Set(students.filter(s => s.active || s.graduated).map(s => s.student_studentnumber))]
-  }
-
   // fetch students that have transferred to the programme and filter out these studentnumbers
   if (transferredToStudents) {
     const transfersTo = (
@@ -605,13 +598,11 @@ const parseQueryParams = query => {
     ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}`
     : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
-  const inactiveStudents = true
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
   const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
 
   return {
     exchangeStudents,
-    inactiveStudents,
     nondegreeStudents,
     transferredStudents,
     // if someone passes something falsy like null as the studyright, remove it so it doesn't break
@@ -813,22 +804,13 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   if (
     formattedQueryParams.studentStatuses &&
     !formattedQueryParams.studentStatuses.every(
-      status => status === 'INACTIVE' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+      status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
     )
   ) {
-    return { error: 'Student status should be either INACTIVE or EXCHANGE or NONDEGREE or TRANSFERRED' }
+    return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
   }
-  const {
-    studyRights,
-    startDate,
-    months,
-    endDate,
-    exchangeStudents,
-    inactiveStudents,
-    nondegreeStudents,
-    transferredStudents,
-    tag,
-  } = parseQueryParams(formattedQueryParams)
+  const { studyRights, startDate, months, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
+    parseQueryParams(formattedQueryParams)
 
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
@@ -840,7 +822,6 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         formattedStartDate,
         endDate,
         exchangeStudents,
-        inactiveStudents,
         nondegreeStudents,
         transferredStudents
       )
@@ -934,15 +915,7 @@ const findMainCourse = async code => {
 
 const bottlenecksOf = async (query, studentnumberlist) => {
   const isValidRequest = async (query, params) => {
-    const {
-      studyRights,
-      startDate,
-      endDate,
-      exchangeStudents,
-      inactiveStudents,
-      nondegreeStudents,
-      transferredStudents,
-    } = params
+    const { studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
 
     if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
       return { error: 'Semester should be either SPRING OR FALL' }
@@ -950,10 +923,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     if (
       query.studentStatuses &&
       !query.studentStatuses.every(
-        status => status === 'INACTIVE' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+        status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
       )
     ) {
-      return { error: 'Student status should be either INACTIVE or EXCHANGE or NONDEGREE or TRANSFERRED' }
+      return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
     }
     if (query.selectedStudents) {
       const allStudents = await studentnumbersWithAllStudyrightElements(
@@ -961,7 +934,6 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         startDate,
         endDate,
         exchangeStudents,
-        inactiveStudents,
         nondegreeStudents,
         transferredStudents,
         query.tag
@@ -977,17 +949,8 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const getStudentsAndCourses = async (selectedStudents, studentnumberlist) => {
     if (!studentnumberlist) {
-      const {
-        months,
-        studyRights,
-        startDate,
-        endDate,
-        exchangeStudents,
-        inactiveStudents,
-        nondegreeStudents,
-        transferredStudents,
-        tag,
-      } = params
+      const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
+        params
       const studentnumbers =
         selectedStudents ||
         (await studentnumbersWithAllStudyrightElements(
@@ -995,7 +958,6 @@ const bottlenecksOf = async (query, studentnumberlist) => {
           startDate,
           endDate,
           exchangeStudents,
-          inactiveStudents,
           nondegreeStudents,
           transferredStudents,
           tag
