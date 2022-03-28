@@ -1,6 +1,7 @@
-import React, { createContext, useState, useContext, useEffect } from 'react'
+import React, { createContext, useState, useCallback, useContext, useEffect } from 'react'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { LANGUAGE_CODES } from '../../constants'
+import { getTextIn } from '../../common'
 import { callApi } from '../../apiConnection'
 
 const LanguageContext = createContext([[], () => {}])
@@ -26,6 +27,9 @@ export const LanguageProvider = ({ children }) => {
 
 export default () => {
   const [state, setState] = useContext(LanguageContext)
+
+  const getTextInWrapped = useCallback(text => getTextIn(text, state), [state])
+
   const setLanguage = newLanguage => {
     if (!LANGUAGE_CODES.includes(newLanguage)) {
       throw new Error('Illegal language code passed to useLanguage hook!')
@@ -35,5 +39,9 @@ export default () => {
     callApi('/language', 'post', { language: newLanguage })
   }
 
-  return { language: state, setLanguage }
+  return {
+    language: state,
+    setLanguage,
+    getTextIn: getTextInWrapped,
+  }
 }
