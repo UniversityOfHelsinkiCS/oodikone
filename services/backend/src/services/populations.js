@@ -10,6 +10,7 @@ const {
   Studyright,
   StudyrightExtent,
   ElementDetail,
+  Studyplan,
   CourseType,
   SemesterEnrollment,
   Semester,
@@ -47,6 +48,7 @@ const formatStudentForPopulationStatistics = (
     abbreviatedname,
     email,
     studyrights,
+    studyplans,
     semester_enrollments,
     transfers,
     updatedAt,
@@ -105,6 +107,7 @@ const formatStudentForPopulationStatistics = (
     starting: moment(started).isBetween(startDateMoment, endDateMoment, null, '[]'),
     option,
     birthdate,
+    studyplans,
   }
 }
 
@@ -249,6 +252,11 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
               },
             },
           },
+        },
+        {
+          model: Studyplan,
+          attributes: ['included_courses', 'programme_code'],
+          separate: true,
         },
       ],
       where: {
@@ -856,6 +864,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     formattedQueryParams,
     optionData
   )
+
   return formattedStudents
 }
 

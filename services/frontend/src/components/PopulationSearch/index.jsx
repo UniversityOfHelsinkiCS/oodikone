@@ -9,7 +9,7 @@ import InfoBox from '../Info/InfoBox'
 import { useProgress } from '../../common/hooks'
 import infotoolTips from '../../common/InfoToolTips'
 
-const PopulationSearch = ({ populationFound, history, location, loading }) => {
+const PopulationSearch = ({ populationFound, history, location, loading, onlyHopsCredits, setOnlyHopsCredits }) => {
   const { onProgress, progress } = useProgress(loading)
 
   const title = populationFound && history.location.search ? 'Population' : 'Search for population'
@@ -31,7 +31,19 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
                 </Button>
               </Link>
             </Form.Field>
+            <Form.Field>
+              <Form.Radio
+                data-cy="advanced-toggle"
+                toggle
+                checked={onlyHopsCredits}
+                onClick={() => {
+                  setOnlyHopsCredits(!onlyHopsCredits)
+                }}
+                label="Show only credits included in study plan"
+              />
+            </Form.Field>
           </Form.Group>
+
           <PopulationSearchHistory history={history} />
         </Form>
       )}
