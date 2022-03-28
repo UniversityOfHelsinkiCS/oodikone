@@ -1,4 +1,5 @@
 const sequelize = require('sequelize')
+const moment = require('moment')
 const { Op } = sequelize
 const {
   Credit,
@@ -117,35 +118,6 @@ const absentStudents = async (studytrack, studentnumbers) => {
   return students
 }
 
-const inactiveStudents = async (studytrack, studentnumbers) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          include: {
-            model: ElementDetail,
-            required: true,
-            where: {
-              code: studytrack,
-            },
-          },
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        student_studentnumber: whereStudents(studentnumbers),
-        active: 0,
-        graduated: 0,
-      },
-    })
-  ).map(formatStudyright)
-
 const allStudyrights = async (studytrack, studentnumbers) =>
   (
     await Studyright.findAll({
@@ -231,6 +203,40 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
       },
     })
   ).map(formatStudyright)
+
+const inactiveStudyrights = async (studytrack, studentnumbers) => {
+  const now = moment(new Date())
+  const inactiveOrExpired = (
+    await Studyright.findAll({
+      include: [
+        {
+          model: StudyrightElement,
+          required: true,
+          include: {
+            model: ElementDetail,
+            required: true,
+            where: {
+              code: studytrack,
+            },
+          },
+        },
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
+      where: {
+        student_studentnumber: whereStudents(studentnumbers),
+        graduated: 0,
+      },
+    })
+  )
+    .filter(s => s.active === 0 || (s.enddate && moment(s.enddate).isBefore(now)))
+    .map(formatStudyright)
+
+  return inactiveOrExpired
+}
 
 const followingStudyrights = async (since, programmes, studentnumbers) =>
   (
@@ -456,10 +462,10 @@ module.exports = {
   studytrackStudents,
   enrolledStudents,
   absentStudents,
-  inactiveStudents,
   allStudyrights,
   startedStudyrights,
   graduatedStudyRights,
+  inactiveStudyrights,
   previousStudyrights,
   followingStudyrights,
   transfersAway,

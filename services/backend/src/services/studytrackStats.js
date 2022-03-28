@@ -18,9 +18,9 @@ const {
   studytrackStudents,
   allStudyrights,
   startedStudyrights,
+  inactiveStudyrights,
   enrolledStudents,
   absentStudents,
-  inactiveStudents,
   graduatedStudyRights,
 } = require('./studyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
@@ -124,7 +124,7 @@ const getStudytrackDataForTheYear = async ({
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const enrolled = await enrolledStudents(track, startDate, studentnumbers)
       const absent = await absentStudents(track, studentnumbers)
-      const inactive = await inactiveStudents(track, studentnumbers)
+      const inactive = await inactiveStudyrights(track, studentnumbers)
       const graduated = await graduatedStudyRights(track, startDate, studentnumbers)
 
       // If the track has no stats for that year, it should be removed from the table and dropdown options
