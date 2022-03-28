@@ -605,7 +605,7 @@ const parseQueryParams = query => {
     ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}`
     : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
-  const inactiveStudents = studentStatuses && studentStatuses.includes('INACTIVE')
+  const inactiveStudents = true
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
   const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
 
