@@ -509,6 +509,12 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
                   >
                     Sort: Descending
                   </div>
+                  <div
+                    className="item"
+                    onClick={() => dispatch({ type: 'RESET_COLUMN_FILTER', payload: { column: filterColumnKey } })}
+                  >
+                    Reset column filter
+                  </div>
                 </div>
               </div>
             </Popup>
@@ -610,6 +616,11 @@ const tableStateReducer = (...args) =>
     ;({
       RESET_FILTERS: () => {
         state.columnOptions = getInitialState(...args)().columnOptions
+      },
+      RESET_COLUMN_FILTER: () => {
+        if (state.columnOptions[payload.column]) {
+          state.columnOptions[payload.column].filterOptions = undefined
+        }
       },
       COLUMN_FILTER_EVENT: () => {
         const { initialOptions, reduce } = ColumnFilters[payload.filterType]
