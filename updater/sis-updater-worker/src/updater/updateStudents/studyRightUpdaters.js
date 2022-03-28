@@ -1,6 +1,6 @@
 const { educationTypeToExtentcode } = require('../shared')
 const { isBaMa } = require('../../utils')
-const { get, sortBy, sortedUniqBy, orderBy, uniqBy } = require('lodash')
+const { get, sortBy, sortedUniqBy, orderBy, uniqBy, flatMap } = require('lodash')
 const { ElementDetail, Studyright, StudyrightElement } = require('../../db/models')
 const { selectFromByIds, bulkCreate, selectAllFrom } = require('../../db')
 const {
@@ -42,12 +42,11 @@ const updateStudyRights = async (
     if (['RESCINDED', 'CANCELLED_BY_ADMINISTRATION', 'PASSIVE'].includes(studyright.state)) {
       return 0
     }
-
     // If the student has registered to be absent or attending for this semester, the studyright is active
-    if (termRegistrations && termRegistrations.term_registrations) {
+    if (termRegistrations) {
       const studyrightToUniOrgId = getUniOrgId(studyright.organisation_id)
 
-      const activeSemesters = termRegistrations.term_registrations.reduce((res, curr) => {
+      const activeSemesters = termRegistrations.reduce((res, curr) => {
         if (!curr || !curr.studyTerm) return res
         const { studyTerm, termRegistrationType } = curr
         const { semestercode } = getSemester(studyrightToUniOrgId, studyTerm.studyYearStartYear, studyTerm.termIndex)
@@ -139,7 +138,8 @@ const updateStudyRights = async (
 
   const formattedStudyRights = latestStudyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
-    const termRegistrations = personsTermRegistrations.find(t => t.study_right_id === studyright.id)
+    const termRegistrations = flatMap(personsTermRegistrations, 'term_registrations')
+
     if (!studyRightEducation) return acc
 
     if (isBaMa(studyRightEducation)) {
