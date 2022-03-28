@@ -1,15 +1,13 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { useContextSelector } from 'use-context-selector'
-import { Range, getTrackBackground } from 'react-range'
 import _ from 'lodash'
-import { Input, Icon } from 'semantic-ui-react'
+import { Icon } from 'semantic-ui-react'
 import { useDebounce } from 'common/hooks'
+import RangeSelector from 'components/RangeSelector'
 import { SortableTableContext, getColumnValue } from './common'
 
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
   const values = useContextSelector(SortableTableContext, ctx => ctx.values[column.key]) ?? []
-  const [dirtyMin, setDirtyMin] = useState(null)
-  const [dirtyMax, setDirtyMax] = useState(null)
 
   const min = _.min(values.filter(_.isNumber)) ?? 0
   const max = _.max(values.filter(_.isNumber)) ?? 0
@@ -43,38 +41,6 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
     }
   }
 
-  const minOnChange = useCallback(
-    newValue => {
-      const numValue = parseInt(newValue.target.value, 10)
-
-      if (Number.isNaN(numValue)) {
-        setDirtyMin(newValue.target.value)
-      } else {
-        setDirtyMin(null)
-        handleChange([numValue, range[1]])
-      }
-    },
-    [range[1]]
-  )
-
-  const maxOnChange = useCallback(
-    newValue => {
-      const numValue = parseInt(newValue.target.value, 10)
-
-      if (Number.isNaN(numValue)) {
-        setDirtyMax(newValue.target.value)
-      } else {
-        setDirtyMax(null)
-        handleChange([range[0], numValue])
-      }
-    },
-    [range[0]]
-  )
-
-  if (min === max) return null
-
-  const rangeValues = [_.clamp(range[0], min, max), _.clamp(range[1], min, max)]
-
   return (
     <div
       style={{ padding: '0.4em 0.75em', marginBottom: '0.5em' }}
@@ -88,71 +54,7 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
         </div>
         {dirty && <Icon loading name="spinner" />}
       </div>
-      <Range
-        step={1}
-        min={min}
-        max={max}
-        values={rangeValues}
-        onChange={handleChange}
-        renderTrack={({ props, children }) => (
-          <div
-            {...props}
-            onMouseDown={evt => {
-              evt.stopPropagation()
-              props.onMouseDown(evt)
-              return false
-            }}
-            tabIndex=""
-            style={{
-              ...props.style,
-              height: '3px',
-              width: 'calc(100% - 13px)',
-              borderRadius: '10px',
-              margin: '1em 6px 1.5em 6px',
-              background: getTrackBackground({
-                min,
-                max,
-                values: rangeValues,
-                colors: ['#f2f2f2', 'rgb(33, 133, 208)', '#f2f2f2'],
-              }),
-            }}
-          >
-            {children}
-          </div>
-        )}
-        renderThumb={({ props }) => (
-          <div
-            {...props}
-            tabIndex=""
-            style={{
-              ...props.style,
-              height: '13px',
-              width: '13px',
-              backgroundColor: '#f2f2f2',
-              border: '3px solid rgb(33, 133, 208)',
-              borderRadius: '10px',
-            }}
-          />
-        )}
-      />
-
-      <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.5em' }}>
-        <Input
-          error={dirtyMin !== null}
-          value={dirtyMin ?? range[0]}
-          style={{ flexShrink: 1, width: '5em' }}
-          onChange={minOnChange}
-          onFocus={e => e.stopPropagation()}
-        />
-        <span style={{ margin: '0 0.5em' }}>&mdash;</span>
-        <Input
-          error={dirtyMax !== null}
-          value={dirtyMax ?? range[1]}
-          style={{ flexShrink: 1, width: '5em' }}
-          onChange={maxOnChange}
-          onFocus={e => e.stopPropagation()}
-        />
-      </div>
+      <RangeSelector min={min} max={max} onChange={handleChange} value={range} />
     </div>
   )
 }
