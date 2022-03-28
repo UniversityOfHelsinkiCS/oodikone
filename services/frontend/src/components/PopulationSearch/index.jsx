@@ -33,7 +33,6 @@ const PopulationSearch = ({ populationFound, history, location, loading, onlyHop
             </Form.Field>
             <Form.Field>
               <Form.Radio
-                data-cy="advanced-toggle"
                 toggle
                 checked={onlyHopsCredits}
                 onClick={() => {
