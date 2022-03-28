@@ -3,7 +3,6 @@
 import { RTKApi } from 'apiConnection'
 
 const semestersApi = RTKApi.injectEndpoints({
-  tagTypes: ['Semester'],
   endpoints: builder => ({
     getSemesters: builder.query({
       query: () => '/semesters/codes',
