@@ -1,0 +1,111 @@
+import React, { useState, useCallback } from 'react'
+import { Range, getTrackBackground } from 'react-range'
+import _ from 'lodash'
+import { Input } from 'semantic-ui-react'
+
+const RangeSelector = ({ min, max, value, onChange }) => {
+  const [dirtyMin, setDirtyMin] = useState(null)
+  const [dirtyMax, setDirtyMax] = useState(null)
+
+  const minOnChange = useCallback(
+    newValue => {
+      const numValue = parseInt(newValue.target.value, 10)
+
+      if (Number.isNaN(numValue)) {
+        setDirtyMin(newValue.target.value)
+      } else {
+        setDirtyMin(null)
+        onChange([numValue, value[1]])
+      }
+    },
+    [value[1]]
+  )
+
+  const maxOnChange = useCallback(
+    newValue => {
+      const numValue = parseInt(newValue.target.value, 10)
+
+      if (Number.isNaN(numValue)) {
+        setDirtyMax(newValue.target.value)
+      } else {
+        setDirtyMax(null)
+        onChange([value[0], numValue])
+      }
+    },
+    [value[0]]
+  )
+
+  const rangeValues = [_.clamp(value[0], min, max), _.clamp(value[1], min, max)]
+
+  return (
+    <div>
+      <Range
+        step={1}
+        min={min}
+        max={max}
+        values={rangeValues}
+        onChange={onChange}
+        renderTrack={({ props, children }) => (
+          <div
+            {...props}
+            onMouseDown={evt => {
+              evt.stopPropagation()
+              props.onMouseDown(evt)
+              return false
+            }}
+            tabIndex=""
+            style={{
+              ...props.style,
+              height: '3px',
+              width: 'calc(100% - 13px)',
+              borderRadius: '10px',
+              margin: '1em 6px 1.5em 6px',
+              background: getTrackBackground({
+                min,
+                max,
+                values: rangeValues,
+                colors: ['#f2f2f2', 'rgb(33, 133, 208)', '#f2f2f2'],
+              }),
+            }}
+          >
+            {children}
+          </div>
+        )}
+        renderThumb={({ props }) => (
+          <div
+            {...props}
+            tabIndex=""
+            style={{
+              ...props.style,
+              height: '13px',
+              width: '13px',
+              backgroundColor: '#f2f2f2',
+              border: '3px solid rgb(33, 133, 208)',
+              borderRadius: '10px',
+            }}
+          />
+        )}
+      />
+
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: '0.5em' }}>
+        <Input
+          error={dirtyMin !== null}
+          value={dirtyMin ?? value[0]}
+          style={{ flexShrink: 1, width: '5em' }}
+          onChange={minOnChange}
+          onFocus={e => e.stopPropagation()}
+        />
+        <span style={{ margin: '0 0.5em' }}>&mdash;</span>
+        <Input
+          error={dirtyMax !== null}
+          value={dirtyMax ?? value[1]}
+          style={{ flexShrink: 1, width: '5em' }}
+          onChange={maxOnChange}
+          onFocus={e => e.stopPropagation()}
+        />
+      </div>
+    </div>
+  )
+}
+
+export default RangeSelector
