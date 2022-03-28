@@ -10,9 +10,9 @@ const {
 const {
   graduatedStudyRights,
   startedStudyrights,
+  inactiveStudyrights,
   transfersAway,
   transfersTo,
-  inactiveStudents,
 } = require('./studyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
 
@@ -76,7 +76,7 @@ const getInactiveStats = async ({ studyprogramme, years, isAcademicYear, include
         endDate,
         includeAllSpecials,
       })
-      const studyrights = await inactiveStudents(studyprogramme, studentnumbersOfTheYear)
+      const studyrights = await inactiveStudyrights(studyprogramme, studentnumbersOfTheYear)
       graphStats[indexOf(years, year)] += studyrights.length
       tableStats[year] += studyrights.length
     })
