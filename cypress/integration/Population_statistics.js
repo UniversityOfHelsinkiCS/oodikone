@@ -80,7 +80,7 @@ describe('Population Statistics tests', () => {
 
       cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
       // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(15000) // a bit hacky way, wait until ui is ready
+      cy.wait(25000) // a bit hacky way, wait until ui is ready
       cy.get('[data-cy=toggle-group-module-TKT1]').click()
       cy.contains('td', 'TKT10002').siblings().find('i.level.up').click()
       cy.wait('@coursePage')
