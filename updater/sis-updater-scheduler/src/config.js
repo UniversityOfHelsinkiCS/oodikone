@@ -7,7 +7,7 @@ module.exports.isDev = process.env.NODE_ENV === 'development'
 module.exports.SECRET_TOKEN = process.env.SECRET_TOKEN
 module.exports.REDIS_TOTAL_META_KEY = 'TOTAL_META'
 module.exports.REDIS_TOTAL_STUDENTS_KEY = 'TOTAL_STUDENTS'
-module.exports.DEV_SCHEDULE_COUNT = null
+module.exports.DEV_SCHEDULE_COUNT = 1000
 module.exports.REDIS_LAST_HOURLY_SCHEDULE = 'LAST_HOURLY_SCHEDULE'
 module.exports.REDIS_LATEST_MESSAGE_RECEIVED = 'LATEST_MESSAGE_RECEIVED'
 module.exports.LATEST_MESSAGE_RECEIVED_THRESHOLD = 1000 * 60 * 5
