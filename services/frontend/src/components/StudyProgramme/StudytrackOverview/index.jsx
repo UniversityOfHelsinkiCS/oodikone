@@ -15,7 +15,7 @@ import '../studyprogramme.css'
 
 const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, graduated, setGraduated }) => {
   const toolTips = InfotoolTips.Studyprogramme
-  const [showMeanTime, setShowMeanTime] = useState(true)
+  const [showMeanTime, setShowMeanTime] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
@@ -109,8 +109,8 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
             <>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               <Toggle
-                firstLabel="Mean time"
-                secondLabel="Median time"
+                firstLabel="Median time"
+                secondLabel="Mean time"
                 value={showMeanTime}
                 setValue={setShowMeanTime}
               />
@@ -120,7 +120,11 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
                     cypress={`${year.slice(0, 4)}-AverageGraduationTimes`}
                     key={year}
                     year={year}
-                    data={stats?.data?.graduationMedianTime[track][year]}
+                    data={
+                      showMeanTime
+                        ? stats?.data?.graduationMeanTime[track][year]
+                        : stats?.data?.graduationMedianTime[track][year]
+                    }
                     graduationAmount={stats?.data?.graduationAmounts[track][year]}
                     totalAmount={stats?.data?.totalAmounts[track][year]}
                     studyprogramme={studyprogramme}
