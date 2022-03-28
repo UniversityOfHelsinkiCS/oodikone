@@ -14,7 +14,7 @@ import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
 const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
-  const [showMeanTime, setShowMeanTime] = useState(true)
+  const [showMeanTime, setShowMeanTime] = useState(false)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -126,8 +126,8 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               <Toggle
                 cypress="GraduationTimeToggle"
-                firstLabel="Mean time"
-                secondLabel="Median time"
+                firstLabel="Median time"
+                secondLabel="Mean time"
                 value={showMeanTime}
                 setValue={setShowMeanTime}
               />
