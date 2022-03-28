@@ -250,7 +250,7 @@ const GeneralTab = ({
     },
     creditsInHops: {
       key: 'creditsInHops',
-      title: 'HOPS credits',
+      title: 'Credits in study plan',
       getRowVal: s => {
         return s.hopsCredits
       },
