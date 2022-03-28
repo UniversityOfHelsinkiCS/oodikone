@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable class-methods-use-this */
 
-import { createContext } from 'react'
+import { createContext } from 'use-context-selector'
 
 const DataItemTypeKey = Symbol('DATA_ITEM_TYPE')
 

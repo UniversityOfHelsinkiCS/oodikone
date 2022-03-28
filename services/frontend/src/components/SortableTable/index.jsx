@@ -6,9 +6,9 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
-  useContext,
   useCallback,
 } from 'react'
+import { useContext, useContextSelector } from 'use-context-selector'
 import { Icon, Popup, Dropdown } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
@@ -287,7 +287,22 @@ const Orientable = ({ orientation, children, ...rest }) => {
   )
 }
 
-const ColumnHeader = ({ column, state, dispatch, colSpan, rowSpan, style }) => {
+const ColumnHeader = ({ columnKey, displayColumnKey, ...props }) => {
+  const storedState = useContextSelector(SortableTableContext, ctx => ctx.state.columnOptions[displayColumnKey]);
+  const colSpan = useContextSelector(SortableTableContext, ctx => ctx.columnSpans[columnKey]);
+
+  const state = useMemo(() => storedState ?? getDefaultColumnOptions(), [storedState]);
+
+  return (
+    <ColumnHeaderContent
+      state={state}
+      colSpan={colSpan}
+      {...props}
+    />
+  );
+}
+
+const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowSpan, style }) => {
   const cellSize = useRef()
   const titleSize = useRef()
   const toolsSize = useRef()
@@ -520,7 +535,7 @@ const resolveDisplayColumn = column => {
   return resolveDisplayColumn(displayColumn)
 }
 
-const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatch, values) => {
+const createHeaders = (columns, columnDepth, dispatch) => {
   let stack = _.clone(columns)
 
   const rows = _.range(0, columnDepth).map(() => [])
@@ -558,13 +573,12 @@ const createHeaders = (columns, columnSpans, columnDepth, columnOptions, dispatc
       rows[currentDepth].push(
         <ColumnHeader
           key={column.key}
-          colSpan={columnSpans[column.key]}
+          columnKey={column.key}
+          displayColumnKey={displayColumn.key}
           rowSpan={rowspan}
           style={style}
           column={displayColumn}
-          state={columnOptions[displayColumn.key] ?? getDefaultColumnOptions()}
           dispatch={dispatch}
-          values={values[displayColumn.key]}
         />
       )
     }
@@ -816,8 +830,8 @@ const SortableTable = ({
   )
 
   const headers = useMemo(
-    () => createHeaders(columns, columnSpans, columnDepth, state.columnOptions, dispatch, values),
-    [columns, columnSpans, columnDepth, state.columnOptions, dispatch, values]
+    () => createHeaders(columns, columnDepth, dispatch),
+    [columns, columnDepth]
   )
 
   const sortedData = useMemo(
