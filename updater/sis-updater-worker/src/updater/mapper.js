@@ -357,6 +357,28 @@ const enrollmentMapper =
     }
   }
 
+const studyplanMapper =
+  (
+    personIdToStudentNumber,
+    programmeModuleIdToCode,
+    studyplanIdToDegreeProgrammes,
+    moduleIdToParentDegreeProgramme,
+    courseUnitIdToCode
+  ) =>
+  studyplan => {
+    const studentnumber = personIdToStudentNumber[studyplan.user_id]
+
+    return studyplanIdToDegreeProgrammes[studyplan.id].map(programmeId => {
+      return {
+        studentnumber,
+        programme_code: programmeModuleIdToCode[programmeId],
+        included_courses: studyplan.course_unit_selections
+          .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
+          .map(courseUnit => courseUnitIdToCode[courseUnit.courseUnitId]),
+      }
+    })
+  }
+
 module.exports = {
   studentMapper,
   mapTeacher,
@@ -368,4 +390,5 @@ module.exports = {
   mapSemester,
   mapStudyrightExtent,
   enrollmentMapper,
+  studyplanMapper,
 }

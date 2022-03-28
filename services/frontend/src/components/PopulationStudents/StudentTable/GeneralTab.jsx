@@ -248,6 +248,13 @@ const GeneralTab = ({
         },
       ],
     },
+    creditsInHops: {
+      key: 'creditsInHops',
+      title: 'Credits in study plan',
+      getRowVal: s => {
+        return s.hopsCredits
+      },
+    },
     creditsSinceStart: {
       key: 'creditsSinceStart',
       title: creditColumnTitle,
@@ -487,6 +494,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     customPopulation: ['programme', 'startYear'],
     coursePopulation: ['gradeForSingleCourse', 'programme', 'passDate', 'language', 'startYear'],
     population: [
+      'creditsInHops',
       'creditsSinceStart',
       'transferredFrom',
       'priority',
