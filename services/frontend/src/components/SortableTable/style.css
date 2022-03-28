@@ -74,3 +74,74 @@
   border: 1px solid #e8e8e9;
   border-left: none;
 }
+
+.filter-menu {
+  position: absolute;
+  outline: 0;
+  top: 100%;
+  min-width: -webkit-max-content;
+  min-width: -moz-max-content;
+  margin: 0;
+  padding: 0 0;
+  background: #fff;
+  font-size: 1em;
+  text-shadow: none;
+  text-align: left;
+  -webkit-box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+  box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.28571429rem;
+  -webkit-transition: opacity 0.1s ease;
+  transition: opacity 0.1s ease;
+  z-index: 11;
+  will-change: transform, opacity;
+  max-width: 15em;
+}
+
+.filter-menu > div > .ui.input {
+  margin: 1.14285714rem 0.78571429rem;
+  width: calc(100% - 2 * 0.78571429rem);
+}
+
+.filter-menu .scrolling.menu {
+  position: static;
+  overflow-y: auto;
+  border: none;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  min-width: 100% !important;
+  width: auto !important;
+  border-top: 1px solid rgba(34, 36, 38, 0.15);
+  max-height: 15.42857143rem;
+}
+
+.filter-menu .actions {
+  border-top: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+.filter-menu .item {
+  position: relative;
+  cursor: pointer;
+  display: block;
+  border: none;
+  height: auto;
+  text-align: left;
+  border-top: none;
+  line-height: 1em;
+  color: rgba(0, 0, 0, 0.87);
+  padding: 0.78571429rem 1.14285714rem !important;
+  font-size: 1rem;
+  text-transform: none;
+  font-weight: 400;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  -webkit-touch-callout: none;
+}
+
+.filter-menu .item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.95);
+  z-index: 13;
+}

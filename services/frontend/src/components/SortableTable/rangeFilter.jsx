@@ -51,7 +51,7 @@ const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
 
   return (
     <div
-      style={{ padding: '0.4em 0.75em' }}
+      style={{ padding: '0.4em 0.75em', marginBottom: '0.5em' }}
       onClick={evt => evt.stopPropagation()}
       onMouseDown={evt => evt.stopPropagation()}
       onMouseUp={evt => evt.stopPropagation()}

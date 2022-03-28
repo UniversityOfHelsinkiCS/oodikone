@@ -103,7 +103,6 @@ const FigureContainer = ({ children, style }) => {
       {!isFullscreen && <OutPortal node={portalNode} />}
       <Portal
         open={isFullscreen}
-        onClose={() => setFullscreen(false)}
         style={{
           width: '100% !important',
           height: '100% !important',
