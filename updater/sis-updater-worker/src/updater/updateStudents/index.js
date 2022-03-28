@@ -247,6 +247,10 @@ const updateStudyplans = async (studyplansAll, personIdToStudentNumber) => {
     'modules',
     flatten(studyplans.map(plan => plan.module_selections.map(module => module.moduleId)))
   )
+  const courseUnits = await selectFromByIds(
+    'course_units',
+    Array.from(new Set(flatten(studyplans.map(plan => plan.course_unit_selections.map(cu => cu.courseUnitId)))))
+  )
 
   const programmeModuleIdToType = programmeModules.reduce((res, cur) => {
     res[cur.id] = cur.type
@@ -254,6 +258,11 @@ const updateStudyplans = async (studyplansAll, personIdToStudentNumber) => {
   }, {})
 
   const programmeModuleIdToCode = programmeModules.reduce((res, cur) => {
+    res[cur.id] = cur.code
+    return res
+  }, {})
+
+  const courseUnitIdToCode = courseUnits.reduce((res, cur) => {
     res[cur.id] = cur.code
     return res
   }, {})
@@ -304,14 +313,16 @@ const updateStudyplans = async (studyplansAll, personIdToStudentNumber) => {
     personIdToStudentNumber,
     programmeModuleIdToCode,
     studyplanIdToDegreeProgrammes,
-    moduleIdToParentDegreeProgramme
+    moduleIdToParentDegreeProgramme,
+    courseUnitIdToCode
   )
 
   const mappedStudyplans = flatten(studyplans.map(mapStudyplan))
 
-  await Studyplan.bulkCreate(mappedStudyplans, {
-    ignoreDuplicates: true,
-  })
+  mappedStudyplans.reduce(async (p, studyplan) => {
+    await p
+    return await Studyplan.upsert(studyplan)
+  }, Promise.resolve())
 }
 
 const updateEnrollments = async (enrollments, personIdToStudentNumber) => {

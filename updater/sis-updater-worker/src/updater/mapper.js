@@ -358,7 +358,13 @@ const enrollmentMapper =
   }
 
 const studyplanMapper =
-  (personIdToStudentNumber, programmeModuleIdToCode, studyplanIdToDegreeProgrammes, moduleIdToParentDegreeProgramme) =>
+  (
+    personIdToStudentNumber,
+    programmeModuleIdToCode,
+    studyplanIdToDegreeProgrammes,
+    moduleIdToParentDegreeProgramme,
+    courseUnitIdToCode
+  ) =>
   studyplan => {
     const studentnumber = personIdToStudentNumber[studyplan.user_id]
 
@@ -368,7 +374,7 @@ const studyplanMapper =
         programme_code: programmeModuleIdToCode[programmeId],
         included_courses: studyplan.course_unit_selections
           .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
-          .map(courseUnit => courseUnit.courseUnitId),
+          .map(courseUnit => courseUnitIdToCode[courseUnit.courseUnitId]),
       }
     })
   }
