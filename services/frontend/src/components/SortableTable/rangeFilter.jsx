@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useContext } from 'react'
+import React, { useCallback, useMemo } from 'react'
+import { useContextSelector } from 'use-context-selector'
 import { Range, getTrackBackground } from 'react-range'
 import _ from 'lodash'
 import { Input, Icon } from 'semantic-ui-react'
@@ -6,10 +7,10 @@ import { useDebounce } from 'common/hooks'
 import { SortableTableContext, getColumnValue } from './common'
 
 const RangeColumnFilterComponent = ({ column, options, dispatch }) => {
-  const { values } = useContext(SortableTableContext)
+  const values = useContextSelector(SortableTableContext, ctx => ctx.values[column.key]) ?? []
 
-  const min = _.min(values[column.key].filter(_.isNumber)) ?? 0
-  const max = _.max(values[column.key].filter(_.isNumber)) ?? 0
+  const min = _.min(values.filter(_.isNumber)) ?? 0
+  const max = _.max(values.filter(_.isNumber)) ?? 0
 
   const value = useMemo(() => {
     if (options.range) {

@@ -1,4 +1,5 @@
-import React, { useMemo, useState, useContext } from 'react'
+import React, { useMemo, useState } from 'react'
+import { useContextSelector } from 'use-context-selector'
 import _ from 'lodash'
 import { Icon, Input, Dropdown } from 'semantic-ui-react'
 import { SortableTableContext, getColumnValue } from './common'
@@ -15,9 +16,8 @@ const VALUE_FILTER_FUNCTIONS = {
 
 const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
   const [search, setSearch] = useState('')
-  const ctx = useContext(SortableTableContext)
+  const values = useContextSelector(SortableTableContext, ctx => ctx.values[column.key] ?? [])
   const { valueFilters } = options
-  const values = ctx.values?.[column.key] ?? []
 
   const valueItems = useMemo(() => {
     if (!values) {
