@@ -42,13 +42,13 @@ describe('Studyprogramme overview', () => {
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       const years = getEmptyYears()
       const tableContents = [
-        // [Year, Started, Graduated, Cancelled, Transferred Away, Transferred to]
-        ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        [2021, 0, 0, 0, 1, 0],
-        [2020, 12, 36, 16, 3, 2],
-        [2019, 87, 17, 14, 0, 1],
-        [2018, 161, 1, 3, 0, 0],
-        [2017, 171, 0, 0, 0, 0],
+        // [Year, Started, Graduated, Transferred Away, Transferred to]
+        ...years.map(year => [year, 0, 0, 0, 0]),
+        [2021, 0, 0, 1, 0],
+        [2020, 12, 36, 3, 2],
+        [2019, 87, 17, 0, 1],
+        [2018, 161, 1, 0, 0],
+        [2017, 171, 0, 0, 0],
       ]
 
       cy.checkTableStats(tableContents, 'StudentsOfTheStudyprogramme')
@@ -134,13 +134,13 @@ describe('Studyprogramme overview', () => {
       const isAcademicYear = true
       const years = getEmptyYears(isAcademicYear)
       const studentTableContents = [
-        // [Year, Started, Graduated, Cancelled, Transferred away, Transferred to]
-        ...years.map(year => [year, 0, 0, 0, 0, 0]),
-        ['2021 - 2022', 0, 0, 0, 0, 0],
-        ['2020 - 2021', 5, 0, 1, 0, 0],
-        ['2019 - 2020', 27, 0, 1, 0, 0],
-        ['2018 - 2019', 4, 0, 0, 0, 0],
-        ['2017 - 2018', 0, 0, 0, 0, 0],
+        // [Year, Started, Graduated, Transferred away, Transferred to]
+        ...years.map(year => [year, 0, 0, 0, 0]),
+        ['2021 - 2022', 0, 0, 0, 0],
+        ['2020 - 2021', 5, 0, 0, 0],
+        ['2019 - 2020', 27, 0, 0, 0],
+        ['2018 - 2019', 4, 0, 0, 0],
+        ['2017 - 2018', 0, 0, 0, 0],
       ]
 
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
@@ -187,7 +187,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Graph-2019-AverageGraduationTimes]')
         .should('contain', '2019')
         .should('contain', 'n = 17')
-        .should('contain', '22 kk')
+        .should('contain', '23 kk')
 
       cy.get('[data-cy=Graph-ProgrammesBeforeOrAfter')
         .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')
@@ -250,8 +250,8 @@ describe('Studyprogramme overview', () => {
           '0 %',
           0,
           '0 %',
-          1,
-          '1.2 %',
+          0,
+          '0 %',
           1,
           '1.2 %',
           65,
@@ -271,8 +271,8 @@ describe('Studyprogramme overview', () => {
           '0 %',
           0,
           '0 %',
-          11,
-          '6.8 %',
+          0,
+          '0 %',
           11,
           '6.8 %',
           118,
@@ -292,8 +292,8 @@ describe('Studyprogramme overview', () => {
           '0 %',
           0,
           '0 %',
-          21,
-          '12.3 %',
+          3,
+          '1.8 %',
           42,
           '24.6 %',
           135,
@@ -313,8 +313,8 @@ describe('Studyprogramme overview', () => {
           '0 %',
           0,
           '0 %',
-          33,
-          '7.7 %',
+          3,
+          '0.7 %',
           54,
           '12.5 %',
           328,
