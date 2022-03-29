@@ -2,6 +2,7 @@ const { Op } = require('sequelize')
 const moment = require('moment')
 const { sortBy } = require('lodash')
 const { sortMainCode } = require('../util/utils')
+const { getCurrentSemester } = require('../services/semesters')
 
 const {
   Student,
@@ -220,7 +221,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'enddate',
             'extentcode',
             'graduated',
-            'active',
+            'canceldate',
             'prioritycode',
             'faculty_code',
             'studystartdate',
@@ -369,12 +370,15 @@ const studentnumbersWithAllStudyrightElements = async (
   startDate,
   endDate,
   exchangeStudents,
+  cancelledStudents,
   nondegreeStudents,
   transferredOutStudents,
   tag,
   transferredToStudents,
   graduatedStudents
 ) => {
+  // eslint-disable-line
+
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
 
@@ -389,6 +393,9 @@ const studentnumbersWithAllStudyrightElements = async (
   }
   if (!nondegreeStudents) {
     filteredExtents.push(33, 99, 14, 13)
+  }
+  if (!cancelledStudents) {
+    studyrightWhere.canceldate = null
   }
 
   let studentWhere = {}
@@ -407,7 +414,7 @@ const studentnumbersWithAllStudyrightElements = async (
   }
 
   const students = await Studyright.findAll({
-    attributes: ['student_studentnumber', 'graduated', 'enddate', 'active'],
+    attributes: ['student_studentnumber', 'graduated', 'enddate'],
     include: {
       model: StudyrightElement,
       attributes: [],
@@ -449,6 +456,44 @@ const studentnumbersWithAllStudyrightElements = async (
   })
 
   let studentnumbers = [...new Set(students.map(s => s.student_studentnumber))]
+
+  // Oodi canceldates don't match SIS studyright statuses, so
+  // - filter out all students who haven't enrolled for semester
+  // - filter out all students who have enrolled for both semesters but whose studyright has ended
+  // - don't use above filtering to graduated students
+  // eslint-disable-next-line no-constant-condition
+  if (false && !cancelledStudents) {
+    const { semestercode } = await getCurrentSemester()
+
+    const enrolments = await SemesterEnrollment.findAll({
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers,
+        },
+        semestercode,
+        enrollment_date: {
+          [Op.not]: null,
+        },
+        enrollmenttype: {
+          [Op.not]: 3,
+        },
+      },
+    })
+
+    const studentsByStudentnumber = students.reduce((res, curr) => {
+      res[curr.student_studentnumber] = curr
+      return res
+    }, {})
+
+    const today = new Date()
+    const graduated = [...new Set(students.filter(s => s.graduated).map(s => s.student_studentnumber))]
+
+    const enrolledStudentnumbers = enrolments
+      .map(e => e.studentnumber)
+      .filter(s => new Date(studentsByStudentnumber[s].enddate) >= today)
+
+    studentnumbers = [...new Set(graduated.concat(enrolledStudentnumbers))]
+  }
 
   // bit hacky solution, but this is used to filter out studentnumbers who have since changed studytracks
   const rights = await Studyright.findAll({
@@ -598,11 +643,13 @@ const parseQueryParams = query => {
     ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}`
     : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
+  const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
   const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
 
   return {
     exchangeStudents,
+    cancelledStudents,
     nondegreeStudents,
     transferredStudents,
     // if someone passes something falsy like null as the studyright, remove it so it doesn't break
@@ -804,13 +851,22 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   if (
     formattedQueryParams.studentStatuses &&
     !formattedQueryParams.studentStatuses.every(
-      status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+      status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
     )
   ) {
-    return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
+    return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE or TRANSFERRED' }
   }
-  const { studyRights, startDate, months, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
-    parseQueryParams(formattedQueryParams)
+  const {
+    studyRights,
+    startDate,
+    months,
+    endDate,
+    exchangeStudents,
+    cancelledStudents,
+    nondegreeStudents,
+    transferredStudents,
+    tag,
+  } = parseQueryParams(formattedQueryParams)
 
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
@@ -822,6 +878,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         formattedStartDate,
         endDate,
         exchangeStudents,
+        cancelledStudents,
         nondegreeStudents,
         transferredStudents
       )
@@ -915,7 +972,15 @@ const findMainCourse = async code => {
 
 const bottlenecksOf = async (query, studentnumberlist) => {
   const isValidRequest = async (query, params) => {
-    const { studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
+    const {
+      studyRights,
+      startDate,
+      endDate,
+      exchangeStudents,
+      cancelledStudents,
+      nondegreeStudents,
+      transferredStudents,
+    } = params
 
     if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
       return { error: 'Semester should be either SPRING OR FALL' }
@@ -923,10 +988,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     if (
       query.studentStatuses &&
       !query.studentStatuses.every(
-        status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+        status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
       )
     ) {
-      return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
+      return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE or TRANSFERRED' }
     }
     if (query.selectedStudents) {
       const allStudents = await studentnumbersWithAllStudyrightElements(
@@ -934,6 +999,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         startDate,
         endDate,
         exchangeStudents,
+        cancelledStudents,
         nondegreeStudents,
         transferredStudents,
         query.tag
@@ -949,8 +1015,17 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const getStudentsAndCourses = async (selectedStudents, studentnumberlist) => {
     if (!studentnumberlist) {
-      const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
-        params
+      const {
+        months,
+        studyRights,
+        startDate,
+        endDate,
+        exchangeStudents,
+        cancelledStudents,
+        nondegreeStudents,
+        transferredStudents,
+        tag,
+      } = params
       const studentnumbers =
         selectedStudents ||
         (await studentnumbersWithAllStudyrightElements(
@@ -958,6 +1033,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
           startDate,
           endDate,
           exchangeStudents,
+          cancelledStudents,
           nondegreeStudents,
           transferredStudents,
           tag
