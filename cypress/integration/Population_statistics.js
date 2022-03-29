@@ -71,7 +71,7 @@ describe('Population Statistics tests', () => {
 
       cy.get('.card').within(() => {
         cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.contains('Sample size: 170 students')
+        cy.contains('Sample size: 149 students')
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
