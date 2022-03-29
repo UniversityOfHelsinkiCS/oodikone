@@ -111,7 +111,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
   const orgSeries = [
     {
       color: '#7f8c8d',
-      name: 'tällä hetkellä peruutettu',
+      name: 'tällä hetkellä passiivinen',
       data: data.map(entry => ({
         y: entry.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
@@ -264,7 +264,7 @@ const sorters = {
   '4v tahti': (a, b) => a.students4y - b.students4y,
   '3v tahti': (a, b) => a.students3y - b.students3y,
   'ei tahdissa': (a, b) => countNotInTarget(a) + a.currentlyCancelled - (countNotInTarget(b) + b.currentlyCancelled),
-  peruutettu: (a, b) => a.currentlyCancelled - b.currentlyCancelled,
+  passiivinen: (a, b) => a.currentlyCancelled - b.currentlyCancelled,
 }
 
 const ClickableChart = React.memo(({ data, sorter, isSideways, clickHandler }) => {
