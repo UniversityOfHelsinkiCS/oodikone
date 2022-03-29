@@ -6,9 +6,9 @@ export default {
   
   **4 vuoden tahdissa** olevat opiskelijat 45op × ((tämä päivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet,
   
-  **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - peruutettu).
+  **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - passiivinen).
 
-  **peruutettu**, jos opinto-oikeus merkattu perutuksi
+  **passiivinen**, jos opinto-oikeus on päättynyt tai opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle, eikä opiskelija ole vielä valmistunut. 
     
   **Include only at least once enrolled students** suodattaa pois opiskelijat jotka eivät ole ollenkaan ilmoittautunut. 
   Vakiona opiskelijat jotka eivät ole ilmoittautunut millekkään lukuvuodelle (läsnä tai poissa olevaksi)
@@ -24,9 +24,9 @@ export default {
   
   **4 vuoden tahdissa** olevat opiskelijat 45op × ((tämä päivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet,
   
-  **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - peruutettu).
+  **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - passiivinen).
 
-  **peruutettu**, jos opinto-oikeus merkattu perutuksi
+  **passiivinen**, jos opinto-oikeus on päättynyt tai opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle, eikä opiskelija ole vielä valmistunut. 
   
   **Include only at least once enrolled students** suodattaa pois opiskelijat,
   jotka eivät ole ollenkaan ilmoittautunut. Vakiona opiskelijat, jotka eivät ole ilmoittautunut millekkään lukuvuodelle (läsnä tai poissa olevaksi) on sisällytetty laskuihin.
@@ -41,11 +41,11 @@ export default {
   
   **4 vuoden tahdissa** olevat opiskelijat 45op × ((tarkastuspäivä - aloituspäivä) / 365) ≤ opiskelijan opintopisteet,
 
-  **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - peruutettu). 
+  **ei tahdissa** = (kaikki opiskelijat - 3v - 4v - passiivinen). 
   
   **Tarkastuspäivät** ovat 31.7, 30.11 ja 1.4 joka vuodelle.
 
-  **peruutettu**, jos opinto-oikeus merkattu perutuksi
+  **passiivinen**, jos opinto-oikeus on päättynyt tai opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle, eikä opiskelija ole vielä valmistunut. 
 
   **Include attainments attained before the studyright start** laskee mukaan opiskelijan ennen opinto-oikeuden alkua saadut opintopisteet.
   Vakiona opintopisteet ennen opinto-oikeutta suodatetaan pois.

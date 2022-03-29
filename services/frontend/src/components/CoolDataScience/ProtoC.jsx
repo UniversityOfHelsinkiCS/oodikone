@@ -124,7 +124,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
   const series = [
     {
       color: '#7f8c8d',
-      name: 'tällä hetkellä peruutettu',
+      name: 'tällä hetkellä passiivinen',
       data: sortedData.map(data => ({
         y: data.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
@@ -311,7 +311,7 @@ const makeNonClickableChartConfig = programme => {
   const series = [
     {
       color: '#7f8c8d',
-      name: 'tällä hetkellä peruutettu',
+      name: 'tällä hetkellä passiivinen',
       data: programme.studytracks.map(p => ({
         y: p.currentlyCancelled,
         // pass % of total as z so we can display it in the tooltip
@@ -450,7 +450,7 @@ const sorters = {
   'ei tahdissa': (a, b) =>
     (countNotInTarget(a) + a.currentlyCancelled) / a.totalStudents -
     (countNotInTarget(b) + b.currentlyCancelled) / b.totalStudents,
-  peruutettu: (a, b) => a.currentlyCancelled / a.totalStudents - b.currentlyCancelled / b.totalStudents
+  passiivinen: (a, b) => a.currentlyCancelled / a.totalStudents - b.currentlyCancelled / b.totalStudents
 }
 
 const OrgChart = React.memo(({ orgs, onOrgClicked }) => {
@@ -606,7 +606,7 @@ const ProtoC = ({
           <Icon style={{ marginLeft: '10px', color: '#6ab04c' }} name="circle" size="small" /> 3v tahdissa
           <Icon style={{ marginLeft: '10px', color: '#f9ca24' }} name="circle" size="small" /> 4v tahdissa
           <Icon style={{ marginLeft: '10px', color: '#ff7979' }} name="circle" size="small" /> ei tahdissa
-          <Icon style={{ marginLeft: '10px', color: '#7f8c8d' }} name="circle" size="small" /> tällä hetkellä peruutettu
+          <Icon style={{ marginLeft: '10px', color: '#7f8c8d' }} name="circle" size="small" /> tällä hetkellä passiivinen
         </span>
       </div>
       <div align="center">
