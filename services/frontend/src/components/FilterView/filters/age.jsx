@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { Form, Label, Input } from 'semantic-ui-react'
+import React, { useMemo, useCallback } from 'react'
+import RangeSelector from 'components/RangeSelector'
+import { useDebounce } from 'common/hooks'
+import _ from 'lodash'
 import createFilter from './createFilter'
 
 export const contextKey = 'ageFilter'
@@ -15,79 +17,27 @@ const getAge = toDate => {
   return age
 }
 
-const AgeFilterCard = ({ options, onOptionsChange }) => {
-  const [currentValue, setCurrentValue] = useState(options)
-  const [updatedAt, setUpdatedAt] = useState(null)
+const AgeFilterCard = ({ options, onOptionsChange, bounds }) => {
+  const { min, max } = bounds
 
-  // const { currentValue, setCurrentValue } = useAgeFilter()
-  // const { addFilter, removeFilter, activeFilters } = useFilters()
+  const onChange = useCallback(
+    ([min, max]) => {
+      onOptionsChange({ min, max })
+    },
+    [onOptionsChange]
+  )
 
-  const labels = { min: 'At Least', max: 'Less Than' }
+  const value = useMemo(() => [options.min ?? min, options.max ?? max], [options.min, options.max, min, max])
 
-  const now = () => new Date().getTime()
-
-  const updateFilters = () => {
-    const { min, max } = currentValue
-
-    onOptionsChange({
-      min: min === '' ? null : parseInt(min, 10),
-      max: max === '' ? null : parseInt(max, 10),
-    })
-  }
-
-  useEffect(() => {
-    const { min, max } = options
-
-    setCurrentValue({
-      min: min !== null ? min : currentValue.min,
-      max: max !== null ? max : currentValue.max,
-    })
-  }, [options.min, options.max])
-
-  // Update filters automatically 2 sec after value change.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (updatedAt !== null && now() - updatedAt > 1900) {
-        updateFilters()
-        setUpdatedAt(null)
-      }
-    }, 2000)
-    return () => clearTimeout(timer)
-  }, [updatedAt])
-
-  const onChange =
-    key =>
-    (_, { value }) => {
-      setCurrentValue(prev => ({ ...prev, [key]: value }))
-      setUpdatedAt(now())
-    }
-
-  const onKeyDown = event => {
-    if (event.keyCode === 13) {
-      event.preventDefault()
-      setUpdatedAt(null)
-      updateFilters()
-    }
-  }
+  const [range, setRange] = useDebounce(value, 1000, onChange)
 
   return (
-    <Form>
+    <div>
+      <p>Valitse ikähaitari, jolle asettuvat opiskelijat näytetään:</p>
       <div className="card-content">
-        {Object.keys(currentValue).map(key => (
-          <Form.Field key={`total-age-filter-${key}`}>
-            <Label style={{ marginBottom: '0.5rem' }}>{labels[key]}</Label>
-            <Input
-              size="mini"
-              onChange={onChange(key)}
-              value={currentValue[key] ?? ''}
-              onKeyDown={onKeyDown}
-              data-cy={`ageFilter-${key}`}
-              style={{ width: '100px' }}
-            />
-          </Form.Field>
-        ))}
+        {min < max && <RangeSelector min={min} max={max} onChange={setRange} value={range} />}
       </div>
-    </Form>
+    </div>
   )
 }
 
@@ -101,6 +51,15 @@ export default createFilter({
 
   isActive: ({ min, max }) => min !== null || max !== null,
 
+  precompute: ({ students }) => {
+    const ages = students.map(s => getAge(s.birthdate)).filter(age => !Number.isNaN(age))
+
+    return {
+      min: _.min(ages),
+      max: _.max(ages),
+    }
+  },
+
   filter: (student, { min, max }) => {
     const age = getAge(student.birthdate)
 
@@ -108,12 +67,12 @@ export default createFilter({
       return false
     }
 
-    if (max !== null && max <= age) {
+    if (max !== null && max < age) {
       return false
     }
 
     return true
   },
 
-  component: AgeFilterCard,
+  render: (props, { precomputed }) => <AgeFilterCard {...props} bounds={precomputed} />,
 })

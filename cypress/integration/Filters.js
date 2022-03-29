@@ -17,6 +17,28 @@ const clearSingleDropdownSelection = dataCyAttribute => {
   cy.cs(dataCyAttribute).find('i.clear').click({ force: true })
 }
 
+const testRangeFilter = (parentEl, min, max, expected) => {
+  cy.cs(parentEl)
+    .cs('range-selector-min')
+    .find('input')
+    .invoke('val')
+    .then(initialMin => {
+      cy.cs(parentEl)
+        .cs('range-selector-max')
+        .find('input')
+        .invoke('val')
+        .then(initialMax => {
+          cy.cs(parentEl).cs('range-selector-min').find('input').type(`{selectall}{backspace}${min}`).blur()
+          cy.cs(parentEl).cs('range-selector-max').find('input').type(`{selectall}{backspace}${max}`).blur()
+
+          checkFilteringResult(expected)
+
+          cy.cs(parentEl).cs('range-selector-min').find('input').type(`{selectall}{backspace}${initialMin}`).blur()
+          cy.cs(parentEl).cs('range-selector-max').find('input').type(`{selectall}{backspace}${initialMax}`).blur()
+        })
+    })
+}
+
 // Helper tool to create pre and post steps for each filter step. Created to avoid copypasting clicking and checking
 // to every it-function. Reason behind using test function wrapper is that Cypresses internal beforeEach / afterEach
 // functions don't take any parameters and using global object for matching test step name seemed overcomplicated.
@@ -125,21 +147,13 @@ describe('Population Statistics', () => {
 
   it('Credit filter works', () => {
     runTestStepWithPreAndPostParts('CreditsEarned', () => {
-      cy.cs('credit-filter-min').type('50')
-      cy.cs('credit-filter-max').type('150')
-      checkFilteringResult(116)
-      cy.cs('credit-filter-min').clear()
-      cy.cs('credit-filter-max').clear()
+      testRangeFilter('CreditsEarned-filter-card', 50, 150, 116)
     })
   })
 
   it('Age filter works', () => {
     runTestStepWithPreAndPostParts('Age', () => {
-      cy.cs('ageFilter-min').type('20')
-      cy.cs('ageFilter-max').type('40')
-      checkFilteringResult(40)
-      cy.cs('ageFilter-min').find('input').clear()
-      cy.cs('ageFilter-max').find('input').clear()
+      testRangeFilter('Age-filter-card', 20, 40, 45)
     })
   })
 
@@ -264,11 +278,7 @@ describe('Course Statistics', () => {
 
   it('Age filter works', () => {
     runTestStepWithPreAndPostParts('Age', () => {
-      cy.cs('ageFilter-min').type('20')
-      cy.cs('ageFilter-max').type('40')
-      checkFilteringResult(31)
-      cy.cs('ageFilter-min').find('input').clear()
-      cy.cs('ageFilter-max').find('input').clear()
+      testRangeFilter('Age-filter-card', 20, 40, 35)
     })
   })
 
@@ -329,11 +339,7 @@ describe('Custom Population Statistics', () => {
 
   it('Age filter works', () => {
     runTestStepWithPreAndPostParts('Age', () => {
-      cy.cs('ageFilter-min').type('20')
-      cy.cs('ageFilter-max').type('30')
-      checkFilteringResult(1)
-      cy.cs('ageFilter-min').find('input').clear()
-      cy.cs('ageFilter-max').find('input').clear()
+      testRangeFilter('Age-filter-card', 20, 30, 1)
     })
   })
 
