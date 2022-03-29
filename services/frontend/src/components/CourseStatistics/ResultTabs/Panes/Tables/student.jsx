@@ -84,6 +84,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
     {
       key: 'TOTAL_PASSED',
       title: 'Passed',
+      filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.totalPassed || 0),
       cellProps: s => ({
         style: {
@@ -95,6 +96,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
     {
       key: 'TOTAL_FAILED',
       title: 'Failed',
+      filterType: 'range',
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.totalFailed || 0),
       cellProps: s => ({
         style: {
@@ -106,8 +108,10 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
     {
       key: 'ENROLLMENTS_MISSING_GRADE',
       title: 'Enrolled no grade',
+      filterType: 'range',
       helpText: 'Total count of students with a valid enrollment and no passing or failing grade.',
-      getRowVal: s => (s.rowObfuscated ? '5 or less students' : s.students.enrolledStudentsWithNoGrade),
+      getRowVal: s => (s.rowObfuscated ? 5 : s.students.enrolledStudentsWithNoGrade),
+      getRowContent: s => (s.rowObfuscated ? '5 or less students' : s.students.enrolledStudentsWithNoGrade),
       cellProps: s => ({
         style: {
           textAlign: 'right',
@@ -119,7 +123,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
     {
       key: 'PASS_RATE',
       title: 'Pass-%',
-      getRowValue: s => {
+      getRowVal: s => {
         if (s.rowObfuscated) return 0
         if (showEnrollments) return s.students.withEnrollments.passRate * 100
         return s.students.passRate * 100
