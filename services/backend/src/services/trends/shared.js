@@ -84,7 +84,7 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
                 studyright.student_studentnumber studentnumber,
                 credit.credits credits,
                 CASE
-                    WHEN studyright.canceldate IS NOT NULL AND studyright.graduated != 1 THEN 1
+                    WHEN studyright.graduated = 0 AND (studyright.active = 0 OR studyright.enddate < NOW()) THEN 1
                     ELSE 0
                 END currently_cancelled
             FROM
