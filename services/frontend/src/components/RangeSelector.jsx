@@ -3,7 +3,7 @@ import { Range, getTrackBackground } from 'react-range'
 import _ from 'lodash'
 import { Input } from 'semantic-ui-react'
 
-const RangeSelector = ({ min, max, value, onChange }) => {
+const RangeSelector = ({ min, max, value, onChange, disabled = false }) => {
   const [dirtyMin, setDirtyMin] = useState(null)
   const [dirtyMax, setDirtyMax] = useState(null)
 
@@ -37,18 +37,22 @@ const RangeSelector = ({ min, max, value, onChange }) => {
 
   const rangeValues = [_.clamp(value[0], min, max), _.clamp(value[1], min, max)]
 
-  if (Number.isNaN(min) || Number.isNaN(max) || Number.isNaN(rangeValues[0]) || Number.isNaN(rangeValues[1])) {
-    return <>Invalid range</>
-  }
+  const isDisabled =
+    disabled ||
+    Number.isNaN(min) ||
+    Number.isNaN(max) ||
+    Number.isNaN(rangeValues[0]) ||
+    Number.isNaN(rangeValues[1]) ||
+    min >= max
 
   return (
     <div>
       <Range
         step={1}
-        min={min}
-        max={max}
-        values={rangeValues}
-        onChange={onChange}
+        min={isDisabled ? 0 : min}
+        max={isDisabled ? 1 : max}
+        values={isDisabled ? [0, 1] : rangeValues}
+        onChange={isDisabled ? _.noop : onChange}
         renderTrack={({ props, children }) => (
           <div
             {...props}
@@ -65,10 +69,10 @@ const RangeSelector = ({ min, max, value, onChange }) => {
               borderRadius: '10px',
               margin: '1em 6px 1.5em 6px',
               background: getTrackBackground({
-                min,
-                max,
-                values: rangeValues,
-                colors: ['#f2f2f2', 'rgb(33, 133, 208)', '#f2f2f2'],
+                min: isDisabled ? 0 : min,
+                max: isDisabled ? 1 : max,
+                values: isDisabled ? [0, 1] : rangeValues,
+                colors: isDisabled ? ['#f2f2f2', '#f2f2f2', '#f2f2f2'] : ['#f2f2f2', 'rgb(33, 133, 208)', '#f2f2f2'],
               }),
             }}
           >
@@ -84,7 +88,7 @@ const RangeSelector = ({ min, max, value, onChange }) => {
               height: '13px',
               width: '13px',
               backgroundColor: '#f2f2f2',
-              border: '3px solid rgb(33, 133, 208)',
+              border: isDisabled ? '#f2f2f2' : '3px solid rgb(33, 133, 208)',
               borderRadius: '10px',
             }}
           />
@@ -95,6 +99,7 @@ const RangeSelector = ({ min, max, value, onChange }) => {
         <Input
           error={dirtyMin !== null}
           value={dirtyMin ?? value[0]}
+          disabled={isDisabled}
           style={{ flexShrink: 1, width: '5em' }}
           onChange={minOnChange}
           onFocus={e => e.stopPropagation()}
@@ -106,6 +111,7 @@ const RangeSelector = ({ min, max, value, onChange }) => {
           error={dirtyMax !== null}
           value={dirtyMax ?? value[1]}
           style={{ flexShrink: 1, width: '5em' }}
+          disabled={isDisabled}
           onChange={maxOnChange}
           onFocus={e => e.stopPropagation()}
           onBlur={() => setDirtyMax(null)}
