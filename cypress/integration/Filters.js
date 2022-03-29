@@ -217,11 +217,7 @@ describe('Population Statistics', () => {
       runTestStepWithPreAndPostParts('Age', () => {
         const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
         getCard().cs('option-graduated-true').click()
-        cy.cs('ageFilter-min').type('20')
-        cy.cs('ageFilter-max').type('30')
-        checkFilteringResult(11)
-        cy.cs('ageFilter-min').find('input').clear()
-        cy.cs('ageFilter-max').find('input').clear()
+        testRangeFilter('Age-filter-card', 20, 30, 11)
         getCard().cs('option-all').click()
       })
     })
@@ -311,11 +307,7 @@ describe('Course Statistics', () => {
     runTestStepWithPreAndPostParts('Grade', () => {
       runTestStepWithPreAndPostParts('Age', () => {
         cy.cs('gradeFilter-3').click()
-        cy.cs('ageFilter-min').type('20')
-        cy.cs('ageFilter-max').type('30')
-        checkFilteringResult(1)
-        cy.cs('ageFilter-min').find('input').clear()
-        cy.cs('ageFilter-max').find('input').clear()
+        testRangeFilter('Age-filter-card', 20, 30, 1)
         cy.cs('gradeFilter-3').click()
       })
     })
