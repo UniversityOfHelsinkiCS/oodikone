@@ -37,6 +37,10 @@ const RangeSelector = ({ min, max, value, onChange }) => {
 
   const rangeValues = [_.clamp(value[0], min, max), _.clamp(value[1], min, max)]
 
+  if (Number.isNaN(min) || Number.isNaN(max) || Number.isNaN(rangeValues[0]) || Number.isNaN(rangeValues[1])) {
+    return <>Invalid range</>
+  }
+
   return (
     <div>
       <Range
@@ -94,6 +98,8 @@ const RangeSelector = ({ min, max, value, onChange }) => {
           style={{ flexShrink: 1, width: '5em' }}
           onChange={minOnChange}
           onFocus={e => e.stopPropagation()}
+          onBlur={() => setDirtyMin(null)}
+          data-cy="range-selector-min"
         />
         <span style={{ margin: '0 0.5em' }}>&mdash;</span>
         <Input
@@ -102,6 +108,8 @@ const RangeSelector = ({ min, max, value, onChange }) => {
           style={{ flexShrink: 1, width: '5em' }}
           onChange={maxOnChange}
           onFocus={e => e.stopPropagation()}
+          onBlur={() => setDirtyMax(null)}
+          data-cy="range-selector-max"
         />
       </div>
     </div>

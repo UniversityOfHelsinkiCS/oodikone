@@ -1,86 +1,30 @@
-import React, { useState, useEffect } from 'react'
-import { Form, Input, Label } from 'semantic-ui-react'
+import RangeSelector from 'components/RangeSelector'
+import React, { useMemo } from 'react'
+import _ from 'lodash'
+import { useDebounce } from 'common/hooks'
 import { getStudentTotalCredits } from '../../../common'
 import createFilter from './createFilter'
 
 export const contextKey = 'creditFilter'
-const labels = { min: 'At Least', max: 'Less Than' }
 
-const CreditsEarnedFilterCard = ({ options, onOptionsChange }) => {
-  const [localOptions, setLocalOptions] = useState(options)
-  const { min, max } = localOptions
-  const [updatedAt, setUpdatedAt] = useState(null)
+const CreditsEarnedFilterCard = ({ options, onOptionsChange, bounds }) => {
+  const { min, max } = bounds
 
-  const now = () => new Date().getTime()
-
-  const updateFilters = () => {
-    onOptionsChange({
-      min: min === '' ? null : min,
-      max: max === '' ? null : max,
-    })
+  const onChange = ([min, max]) => {
+    onOptionsChange({ min, max })
   }
 
-  // Update filters automatically 2 sec after value change.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (updatedAt && now() - updatedAt > 1900) {
-        updateFilters()
-        setUpdatedAt(null)
-      }
-    }, 2000)
+  const value = useMemo(() => [options.min ?? min, options.max ?? max], [options.min, options.max, min, max])
 
-    return () => clearTimeout(timer)
-  }, [updatedAt])
-
-  // Listen for external filtering requests (from credit stats table rows).
-  // TODO: Reimplement using something else
-  /* useEffect(() => {
-    Object.keys(currentValue).forEach(key => {
-      const newValue = requestedValue[key] === null ? '' : requestedValue[key]
-      const name = names[key]
-      setCurrentValue({ [key]: String(newValue) })
-
-      if (newValue === '') {
-        removeFilter(name)
-      } else {
-        addFilter(name, filterFunctions(newValue)[key])
-      }
-    })
-  }, [requestedValue]) */
-
-  const onChange =
-    key =>
-    (_, { value }) => {
-      setLocalOptions({ ...localOptions, [key]: value })
-      setUpdatedAt(now())
-    }
-
-  const onKeyDown = event => {
-    if (event.keyCode === 13) {
-      event.preventDefault()
-      setUpdatedAt(null)
-      updateFilters()
-    }
-  }
+  const [range, setRange] = useDebounce(value, 1000, onChange)
 
   return (
-    <Form>
+    <div>
+      <p>Valitse opintopistehaitari, jolle asettuvat opiskelijat näytetään:</p>
       <div className="card-content">
-        {['min', 'max'].map(key => (
-          <Form.Field key={`total-credits-filter-${key}`}>
-            <Label style={{ marginBottom: '0.5rem' }}>{labels[key]}</Label>
-            <Input
-              size="mini"
-              onChange={onChange(key)}
-              value={localOptions[key]}
-              onKeyDown={onKeyDown}
-              data-cy={`credit-filter-${key}`}
-              style={{ width: '100px' }}
-            />
-          </Form.Field>
-        ))}
+        {min < max && <RangeSelector min={min} max={max} onChange={setRange} value={range} />}
       </div>
-    </Form>
+    </div>
   )
 }
 
@@ -96,6 +40,15 @@ export default createFilter({
 
   isActive: ({ min, max }) => min !== null || max !== null,
 
+  precompute: ({ students }) => {
+    const credits = students.map(getStudentTotalCredits).filter(n => !Number.isNaN(n))
+
+    return {
+      max: _.max(credits),
+      min: _.min(credits),
+    }
+  },
+
   filter(student, { min, max }) {
     const credits = getStudentTotalCredits(student)
 
@@ -103,12 +56,12 @@ export default createFilter({
       return false
     }
 
-    if (max !== null && credits >= max) {
+    if (max !== null && credits > max) {
       return false
     }
 
     return true
   },
 
-  component: CreditsEarnedFilterCard,
+  render: (props, { precomputed }) => <CreditsEarnedFilterCard {...props} bounds={precomputed} />,
 })
