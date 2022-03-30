@@ -73,15 +73,15 @@ const updateStudytrackView = async code => {
   }
   const specialExcludedGraduated = {
     graduated: 'GRADUATED_INCLUDED',
-    specialGroups: 'SPECIAL_INCLUDED',
+    specialGroups: 'SPECIAL_EXCLUDED',
   }
   const specialGraduatedExcluded = {
-    graduated: 'GRADUATED_INCLUDED',
+    graduated: 'GRADUATED_EXCLUDED',
     specialGroups: 'SPECIAL_INCLUDED',
   }
   const specialExcludedGraduatedExcluded = {
-    graduated: 'GRADUATED_INCLUDED',
-    specialGroups: 'SPECIAL_INCLUDED',
+    graduated: 'GRADUATED_EXCLUDED',
+    specialGroups: 'SPECIAL_EXCLUDED',
   }
 
   const options = [
