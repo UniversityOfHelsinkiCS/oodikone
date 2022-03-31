@@ -111,13 +111,12 @@ const getUnifyStatus = unifyCourses => {
       return [false]
 
     default:
-      return [true]
+      return [true, false]
   }
 }
 
-const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses) => {
-  const unifyStatus = getUnifyStatus(unifyCourses)
-  return (
+const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses = 'unifyStats') =>
+  (
     await sequelize.query(
       `
     SELECT
@@ -137,13 +136,12 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCo
   ORDER BY semestercode DESC LIMIT 1);
   `,
       {
-        replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: unifyStatus },
+        replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: getUnifyStatus(unifyCourses) },
         type: sequelize.QueryTypes.SELECT,
         raw: true,
       }
     )
   ).map(st => st.studentnumber)
-}
 
 const findByTag = async tag => {
   return (
