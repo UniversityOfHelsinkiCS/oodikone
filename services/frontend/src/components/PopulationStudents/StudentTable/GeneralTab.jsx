@@ -291,7 +291,7 @@ const GeneralTab = ({
       key: 'allCredits',
       title: 'All Credits',
       filterType: 'range',
-      getRowVal: s => s.credits,
+      getRowVal: s => s.allCredits,
     },
     transferredFrom: {
       key: 'transferredFrom',

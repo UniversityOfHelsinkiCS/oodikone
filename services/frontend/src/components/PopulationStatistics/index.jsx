@@ -86,6 +86,7 @@ const PopulationStatistics = () => {
       return {
         ...student,
         hopsCredits,
+        allCredits: student.credits,
       }
 
     return {
@@ -93,6 +94,7 @@ const PopulationStatistics = () => {
       courses: hopsCourses,
       hopsCredits,
       credits: hopsCredits,
+      allCredits: student.credits,
     }
   }
 
