@@ -18,3 +18,8 @@ module.exports.EXIT_AFTER_IMMEDIATES = process.env.EXIT_AFTER_IMMEDIATES === 'ye
 module.exports.SCHEDULE_IMMEDIATE = (process.env.SCHEDULE_IMMEDIATE || 'none').split(',')
 module.exports.ENABLE_WORKER_REPORTING =
   module.exports.EXIT_AFTER_IMMEDIATES || process.env.ENABLE_WORKER_REPORTING === 'yes'
+
+// Sentry
+module.exports.sentryRelease = process.env.SENTRY_RELEASE || ''
+module.exports.sentryEnvironment = process.env.SENTRY_ENVIRONMENT || ''
+module.exports.runningInCI = process.env.CI === 'true'

@@ -3,6 +3,7 @@ const { logger } = require('./utils/logger')
 const { set: redisSet } = require('./utils/redis')
 const { schedule: scheduleCron } = require('./utils/cron')
 const { stan } = require('./utils/stan')
+const initializeSentry = require('./utils/sentry')
 const {
   isDev,
   REDIS_LAST_WEEKLY_SCHEDULE,
@@ -12,6 +13,8 @@ const {
 } = require('./config')
 const { startServer } = require('./server')
 const { scheduleHourly, scheduleWeekly, schedulePrePurge, schedulePurge, isUpdaterActive } = require('./scheduler')
+
+initializeSentry()
 
 stan.on('error', e => {
   logger.error({ message: 'NATS connection failed', meta: e.stack })
