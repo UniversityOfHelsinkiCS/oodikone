@@ -16,9 +16,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
+      - name: 'Extract release version'
+        # Github context (e.g. github.ref) only has ref formatted as /refs/tags/vX.X.X
+        # This steps extracts release version from GITHUB_REF env var
+        # See: https://github.community/t/how-to-get-just-the-tag-name/16241/10
+        id: extract_version
+        run: echo ::set-output name=VERSION::"${GITHUB_REF#refs/tags/}"
       - name: 'Build the image'
         uses: docker/build-push-action@v2
         with:
+          build-args: |
+            SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
+            SENTRY_ENVIRONMENT=production
           context: updater/sis-updater-worker/
           target: production
           push: false
@@ -37,9 +46,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
+      - name: 'Extract release version'
+        # Github context (e.g. github.ref) only has ref formatted as /refs/tags/vX.X.X
+        # This steps extracts release version from GITHUB_REF env var
+        # See: https://github.community/t/how-to-get-just-the-tag-name/16241/10
+        id: extract_version
+        run: echo ::set-output name=VERSION::"${GITHUB_REF#refs/tags/}"
       - name: 'Build the image'
         uses: docker/build-push-action@v2
         with:
+          build-args: |
+            SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
+            SENTRY_ENVIRONMENT=production
           context: updater/sis-updater-scheduler/
           target: production
           push: false
@@ -129,6 +147,25 @@ jobs:
           push: true
           tags: toska/sis-updater-worker:latest
           target: production
+      - name: 'Extract release version'
+        # Github context (e.g. github.ref) only has ref formatted as /refs/tags/vX.X.X
+        # This steps extracts release version from GITHUB_REF env var
+        # See: https://github.community/t/how-to-get-just-the-tag-name/16241/10
+        id: extract_version
+        run: echo ::set-output name=VERSION::"${GITHUB_REF#refs/tags/}"
+      - name: 'Create Sentry release'
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_URL: ${{ secrets.SENTRY_URL }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: toska
+          SENTRY_PROJECT: updater
+        with:
+          environment: production
+          set_commits: 'skip'
+          sourcemaps: './build/static/js'
+          url_prefix: '~/static/js'
+          version: ${{ steps.extract_version.outputs.VERSION }}
       - name: 'Send notification to slack'
         uses: UniversityOfHelsinkiCS/slackbot-action@v1.4.2
         with:
