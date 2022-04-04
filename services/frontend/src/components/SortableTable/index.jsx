@@ -203,7 +203,11 @@ const ColumnFilters = {
 const SizeMeasurer = ({ as = 'div', onSizeChange, children, ...rest }) => {
   const monitorRef = useRef(
     new window.ResizeObserver(entries => {
-      onSizeChange(entries[0].borderBoxSize[0])
+      if (Array.isArray(entries[0].borderBoxSize)) {
+        onSizeChange(entries[0].borderBoxSize[0])
+      } else {
+        onSizeChange(entries[0].borderBoxSize)
+      }
     })
   )
 
