@@ -4,6 +4,7 @@ import { useTabChangeAnalytics } from '../../../common/hooks'
 import InfoBox from '../../Info/InfoBox'
 import StatisticsTab from './StatisticsTab'
 import CreditsGainedTab from './CreditsGainedTab'
+import CreditDistributionDevelopment from './CreditDistributionDevelopment'
 import infotooltips from '../../../common/InfoToolTips'
 import './creditGainStats.css'
 
@@ -20,6 +21,14 @@ const CreditGainStats = ({ filteredStudents, query }) => {
     return (
       <Tab.Pane attached={false}>
         <StatisticsTab allStudents={filteredStudents} query={query} />
+      </Tab.Pane>
+    )
+  }, [filteredStudents])
+
+  const renderDistributionDevelopment = useCallback(() => {
+    return (
+      <Tab.Pane attached={false}>
+        <CreditDistributionDevelopment students={filteredStudents} query={query} />
       </Tab.Pane>
     )
   }, [filteredStudents])
@@ -41,6 +50,10 @@ const CreditGainStats = ({ filteredStudents, query }) => {
             {
               menuItem: 'Statistics',
               render: renderQuartersTab,
+            },
+            {
+              menuItem: 'Distribution Development',
+              render: renderDistributionDevelopment,
             },
           ]}
           data-cy="credit-stats-tab"
