@@ -369,7 +369,6 @@ const studentnumbersWithAllStudyrightElements = async (
   startDate,
   endDate,
   exchangeStudents,
-  cancelledStudents,
   nondegreeStudents,
   transferredOutStudents,
   tag,
@@ -601,13 +600,11 @@ const parseQueryParams = query => {
     ? `${moment(year, 'YYYY').add(1, 'years').format('YYYY')}-${semesterEnd[semesters.find(s => s === 'SPRING')]}`
     : `${year}-${semesterEnd[semesters.find(s => s === 'FALL')]}`
   const exchangeStudents = studentStatuses && studentStatuses.includes('EXCHANGE')
-  const cancelledStudents = studentStatuses && studentStatuses.includes('CANCELLED')
   const nondegreeStudents = studentStatuses && studentStatuses.includes('NONDEGREE')
   const transferredStudents = studentStatuses && studentStatuses.includes('TRANSFERRED')
 
   return {
     exchangeStudents,
-    cancelledStudents,
     nondegreeStudents,
     transferredStudents,
     // if someone passes something falsy like null as the studyright, remove it so it doesn't break
@@ -809,22 +806,13 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   if (
     formattedQueryParams.studentStatuses &&
     !formattedQueryParams.studentStatuses.every(
-      status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+      status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
     )
   ) {
-    return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE or TRANSFERRED' }
+    return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
   }
-  const {
-    studyRights,
-    startDate,
-    months,
-    endDate,
-    exchangeStudents,
-    cancelledStudents,
-    nondegreeStudents,
-    transferredStudents,
-    tag,
-  } = parseQueryParams(formattedQueryParams)
+  const { studyRights, startDate, months, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
+    parseQueryParams(formattedQueryParams)
 
   // db startdate is formatted to utc so need to change it when querying
   const formattedStartDate = new Date(moment.tz(startDate, 'Europe/Helsinki').format()).toUTCString()
@@ -836,7 +824,6 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
         formattedStartDate,
         endDate,
         exchangeStudents,
-        cancelledStudents,
         nondegreeStudents,
         transferredStudents
       )
@@ -930,15 +917,7 @@ const findMainCourse = async code => {
 
 const bottlenecksOf = async (query, studentnumberlist) => {
   const isValidRequest = async (query, params) => {
-    const {
-      studyRights,
-      startDate,
-      endDate,
-      exchangeStudents,
-      cancelledStudents,
-      nondegreeStudents,
-      transferredStudents,
-    } = params
+    const { studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
 
     if (!query.semesters.every(semester => semester === 'FALL' || semester === 'SPRING')) {
       return { error: 'Semester should be either SPRING OR FALL' }
@@ -946,10 +925,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     if (
       query.studentStatuses &&
       !query.studentStatuses.every(
-        status => status === 'CANCELLED' || status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
+        status => status === 'EXCHANGE' || status === 'NONDEGREE' || status === 'TRANSFERRED'
       )
     ) {
-      return { error: 'Student status should be either CANCELLED or EXCHANGE or NONDEGREE or TRANSFERRED' }
+      return { error: 'Student status should be either EXCHANGE or NONDEGREE or TRANSFERRED' }
     }
     if (query.selectedStudents) {
       const allStudents = await studentnumbersWithAllStudyrightElements(
@@ -957,7 +936,6 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         startDate,
         endDate,
         exchangeStudents,
-        cancelledStudents,
         nondegreeStudents,
         transferredStudents,
         query.tag
@@ -973,17 +951,8 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const getStudentsAndCourses = async (selectedStudents, studentnumberlist) => {
     if (!studentnumberlist) {
-      const {
-        months,
-        studyRights,
-        startDate,
-        endDate,
-        exchangeStudents,
-        cancelledStudents,
-        nondegreeStudents,
-        transferredStudents,
-        tag,
-      } = params
+      const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
+        params
       const studentnumbers =
         selectedStudents ||
         (await studentnumbersWithAllStudyrightElements(
@@ -991,7 +960,6 @@ const bottlenecksOf = async (query, studentnumberlist) => {
           startDate,
           endDate,
           exchangeStudents,
-          cancelledStudents,
           nondegreeStudents,
           transferredStudents,
           tag
