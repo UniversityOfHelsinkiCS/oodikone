@@ -71,7 +71,7 @@ describe('Population Statistics tests', () => {
 
       cy.get('.card').within(() => {
         cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.contains('Sample size: 149 students')
+        cy.contains('Sample size: 170 students')
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
@@ -91,7 +91,7 @@ describe('Population Statistics tests', () => {
 
     it("Empty 'tags' tab has a link to the page where tags can be created", () => {
       cy.visit(pathToCSBach2017)
-      cy.contains('Students (149)').click()
+      cy.contains('Students (170)').click()
       cy.get('[data-cy=student-table-tabs]').contains('Tags').click()
       cy.contains('No tags defined. You can define them here.').find('a').click()
       cy.contains('Tags').click()
@@ -120,7 +120,7 @@ describe('Population Statistics tests', () => {
 
       cy.contains('Fetch population').click()
 
-      cy.contains('Credit accumulation (for 149 students)')
+      cy.contains('Credit accumulation (for 170 students)')
 
       // spring + fall
       cy.get('[data-cy=advanced-toggle]').click()
@@ -140,7 +140,7 @@ describe('Population Statistics tests', () => {
       const limits = [1, ..._.range(1, 4).map(p => Math.ceil(months * ((p * 15) / 12))), null]
       const ranges = _.range(1, limits.length).map(i => _.slice(limits, i - 1, i + 1))
 
-      cy.get('.credits-gained-table').should('contain', '(n=149)')
+      cy.get('.credits-gained-table').should('contain', '(n=170)')
 
       for (const [start, end] of ranges) {
         let value = 'credits'
@@ -159,7 +159,7 @@ describe('Population Statistics tests', () => {
       cy.get("[data-cy='credits-gained-table-body'] td:nth-child(3)").then($els => {
         const sum = [...$els].map($el => parseInt($el.innerText)).reduce((a, b) => a + b, 0)
 
-        expect(sum).to.equal(149)
+        expect(sum).to.equal(170)
       })
 
       cy.get("[data-cy='credits-gained-table-Ei valintatapaa']").should('not.exist')
@@ -182,10 +182,10 @@ describe('Population Statistics tests', () => {
       cy.contains('Credit statistics').click({ force: true })
       cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
 
-      cy.get("[data-cy='credit-stats-table-name-header']").should('contain', 'Statistic for n = 149 Students')
-      cy.get("[data-cy='credit-stats-mean']").should('contain', '123.89')
-      cy.get("[data-cy='credit-stats-stdev']").should('contain', '61.32')
-      cy.get("[data-cy='credit-stats-min']").should('contain', '11')
+      cy.get("[data-cy='credit-stats-table-name-header']").should('contain', 'Statistic for n = 170 Students')
+      cy.get("[data-cy='credit-stats-mean']").should('contain', '114.75')
+      cy.get("[data-cy='credit-stats-stdev']").should('contain', '65.53')
+      cy.get("[data-cy='credit-stats-min']").should('contain', '5')
       cy.get("[data-cy='credit-stats-max']").should('contain', '314')
     })
   })
@@ -198,7 +198,7 @@ describe('Population Statistics tests', () => {
       const existing = '010113437'
       const nonExisting = '66666666'
       cy.visit(pathToCSBach2017)
-      cy.contains('Students (149)').click()
+      cy.contains('Students (170)').click()
       cy.contains(existing)
       cy.contains(nonExisting).should('not.exist')
       cy.contains('button', 'Check studentnumbers').click()
