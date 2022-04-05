@@ -9,9 +9,6 @@ Studyright.init(
       primaryKey: true,
       type: STRING,
     },
-    canceldate: {
-      type: DATE,
-    },
     startdate: {
       type: DATE,
     },
