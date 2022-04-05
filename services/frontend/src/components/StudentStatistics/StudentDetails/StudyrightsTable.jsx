@@ -42,7 +42,6 @@ const StudyrightsTable = ({
     return {
       studyrightid: studyright.studyrightid,
       graduated: studyright.graduated,
-      canceldate: studyright.canceldate,
       enddate: studyright.enddate,
       elements: { programmes, studytracks },
     }
@@ -63,12 +62,12 @@ const StudyrightsTable = ({
   }
 
   const renderGraduated = c => {
-    if (c.canceldate)
-      return (
-        <div>
-          <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p>
-        </div>
-      )
+    // if (c.canceldate)
+    //   return (
+    //     <div>
+    //       <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p>
+    //     </div>
+    //   )
     if (c.graduated)
       return (
         <div>
