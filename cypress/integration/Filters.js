@@ -69,7 +69,7 @@ const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
 describe('Population Statistics', () => {
   const pathToCSBach2018 =
     '/populations?months=36&semesters=FALL&semesters=SPRING&studyRights={%22programme%22%3A%22KH50_005%22}&tag&year=2018'
-  const defaultAmountOfStudents = 148
+  const defaultAmountOfStudents = 159
   const runTestStepWithPreAndPostParts = createRunTestStepWithPreAndPostPartsFunction(defaultAmountOfStudents)
 
   before(() => {
@@ -140,29 +140,29 @@ describe('Population Statistics', () => {
     runTestStepWithPreAndPostParts('EnrollmentStatus', () => {
       cy.cs('enrollmentStatusFilter-status').selectFromDropdown(0)
       cy.cs('enrollmentStatusFilter-semesters').selectFromDropdown(0)
-      checkFilteringResult(137)
+      checkFilteringResult(148)
       clearSemanticUIMultipleDropDownSelection('enrollmentStatusFilter-semesters')
     })
   })
 
   it('Credit filter works', () => {
     runTestStepWithPreAndPostParts('CreditsEarned', () => {
-      testRangeFilter('CreditsEarned-filter-card', 50, 150, 116)
+      testRangeFilter('CreditsEarned-filter-card', 50, 150, 118)
     })
   })
 
   it('Age filter works', () => {
     runTestStepWithPreAndPostParts('Age', () => {
-      testRangeFilter('Age-filter-card', 20, 40, 45)
+      testRangeFilter('Age-filter-card', 20, 40, 49)
     })
   })
 
   it('Gender filter works', () => {
     runTestStepWithPreAndPostParts('Gender', () => {
       cy.cs('genderFilter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(36)
+      checkFilteringResult(42)
       cy.cs('genderFilter-dropdown').selectFromDropdown(1)
-      checkFilteringResult(112)
+      checkFilteringResult(117)
       cy.cs('genderFilter-dropdown').selectFromDropdown(2)
       checkFilteringResult(0)
       cy.cs('genderFilter-dropdown').selectFromDropdown(3)
@@ -177,7 +177,7 @@ describe('Population Statistics', () => {
       checkFilteringResult(1)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
       cy.cs('startYearAtUni-dropdown').selectFromDropdown(7)
-      checkFilteringResult(141)
+      checkFilteringResult(152)
       clearSemanticUIMultipleDropDownSelection('startYearAtUni-dropdown')
     })
   })
