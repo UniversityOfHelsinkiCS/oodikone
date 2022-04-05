@@ -75,8 +75,9 @@ const calculateTotalCreditsFromAttainments = attainments => {
 
 const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
   const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
+
   // Filter out test student from oodi data
-  if (student_number === '012023965' || !student_number) return null
+  if (student_number === '012023965') return null
 
   const gender_code = parseGender(gender_urn)
 
