@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "@sentry/node": "^6.19.2",
-    "@sentry/tracing": "^6.19.2",
     "async": "^3.2.3",
     "axios": "^0.21.4",
     "cron": "^1.8.2",
@@ -21,7 +20,8 @@
     "pg": "^7.18.2",
     "redis": "^3.1.2",
     "winston": "^3.6.0",
-    "winston-log2gelf": "^2.4.0"
+    "winston-log2gelf": "^2.4.0",
+    "winston-sentry-log": "^1.0.26"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
