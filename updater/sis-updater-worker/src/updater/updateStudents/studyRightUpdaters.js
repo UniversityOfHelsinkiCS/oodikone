@@ -148,7 +148,6 @@ const updateStudyRights = async (
         prioritycode: parsePriorityCode(studyright, 1, true),
         active: parseActivity(studyright, termRegistrations),
         enddate: parseEndDate(studyright, 1, true),
-        canceldate: null,
       })
 
       const studyRightMast = mapStudyright(studyright, {
@@ -156,7 +155,6 @@ const updateStudyRights = async (
         prioritycode: parsePriorityCode(studyright, 2, true),
         active: parseActivity(studyright, termRegistrations),
         enddate: parseEndDate(studyright, 2, true),
-        canceldate: null,
         studyrightid: `${studyright.id}-2`,
         graduated: studyright.study_right_graduation && studyright.study_right_graduation.phase2GraduationDate ? 1 : 0,
         studystartdate: studyright.study_right_graduation
@@ -172,7 +170,6 @@ const updateStudyRights = async (
         prioritycode: parsePriorityCode(studyright),
         active: parseActivity(studyright, termRegistrations),
         enddate: parseEndDate(studyright),
-        canceldate: null,
       })
 
       acc.push(mappedStudyright)
