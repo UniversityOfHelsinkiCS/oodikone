@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "@sentry/node": "^6.19.4",
-    "@sentry/tracing": "^6.19.4",
     "async": "^3.2.3",
     "knex": "0.20.10",
     "lodash": "^4.17.21",
@@ -18,7 +17,8 @@
     "sequelize": "^5.22.5",
     "umzug": "^2.3.0",
     "winston": "^3.6.0",
-    "winston-log2gelf": "^2.4.0"
+    "winston-log2gelf": "^2.4.0",
+    "winston-sentry-log": "^1.0.26"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
