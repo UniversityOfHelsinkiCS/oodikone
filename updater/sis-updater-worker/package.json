@@ -6,6 +6,8 @@
     "dev": "nodemon ./src/index.js"
   },
   "dependencies": {
+    "@sentry/node": "^6.19.4",
+    "@sentry/tracing": "^6.19.4",
     "async": "^3.2.3",
     "knex": "0.20.10",
     "lodash": "^4.17.21",
