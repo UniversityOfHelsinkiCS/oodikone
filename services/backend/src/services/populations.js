@@ -220,6 +220,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'enddate',
             'extentcode',
             'graduated',
+            'active',
             'prioritycode',
             'faculty_code',
             'studystartdate',
