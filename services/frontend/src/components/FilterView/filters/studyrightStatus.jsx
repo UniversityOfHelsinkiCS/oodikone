@@ -34,11 +34,11 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange }) => {
             style={{ margin: '0.5rem 0' }}
           />
           <Radio
-            label="Passive studyright"
+            label="Inactive studyright"
             name="radioGroup"
             checked={active === false}
             onChange={toggle(false)}
-            data-cy="option-passive"
+            data-cy="option-inactive"
           />
         </Form.Field>
       </div>
@@ -54,18 +54,18 @@ export default createFilter({
   info: filterInfo.studyrightStatus,
 
   defaultOptions: {
-    studyrightStatus: null,
+    active: null,
   },
 
-  isActive: ({ studyrightStatus }) => studyrightStatus !== null,
+  isActive: ({ active }) => active !== null,
 
   filter: (student, { active }, { args }) => {
     const { code } = args
-    const now = new Date()
+    const now = moment(new Date())
 
     const status = s => {
-      if (active === true) return s.active && s.enddate && moment(s.enddate).isAfter(now) // Studyright is active if the student has enrolled (absent or present) for this semester and the studyright has not yet ended
-      if (active === false) return !s.graduated && (!s.active || (s.enddate && moment(s.enddate).isBefore(now))) // Studyright is inactive if the student has not enrolled for this semester or the studyright has expired
+      if (active === true) return s.active === 1 && ((s.enddate && moment(s.enddate).isAfter(now)) || !s.enddate) // Studyright is active if the student has enrolled (absent or present) for this semester and the studyright has not yet ended
+      if (active === false) return !s.graduated && (s.active === 0 || (s.enddate && moment(s.enddate).isBefore(now))) // Studyright is inactive if the student has not enrolled for this semester or the studyright has expired
       return true
     }
 
