@@ -10,3 +10,8 @@ module.exports.REDIS_TOTAL_STUDENTS_KEY = 'TOTAL_STUDENTS'
 module.exports.REDIS_TOTAL_META_DONE_KEY = 'TOTAL_META_DONE'
 module.exports.REDIS_TOTAL_STUDENTS_DONE_KEY = 'TOTAL_STUDENTS_DONE'
 module.exports.REDIS_LATEST_MESSAGE_RECEIVED = 'LATEST_MESSAGE_RECEIVED'
+
+// Sentry
+module.exports.sentryRelease = process.env.SENTRY_RELEASE || ''
+module.exports.sentryEnvironment = process.env.SENTRY_ENVIRONMENT || ''
+module.exports.runningInCI = process.env.CI === 'true'

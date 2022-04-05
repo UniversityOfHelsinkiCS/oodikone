@@ -6,6 +6,7 @@ const { postUpdate } = require('./postUpdate')
 const { purge, prePurge, purgeByStudentNumber } = require('./updater/purge')
 const { get: redisGet, set: redisSet } = require('./utils/redis')
 const { logger } = require('./utils/logger')
+const initializeSentry = require('./utils/sentry')
 const {
   SIS_UPDATER_SCHEDULE_CHANNEL,
   SIS_PURGE_CHANNEL,
@@ -17,6 +18,8 @@ const {
   REDIS_TOTAL_STUDENTS_DONE_KEY,
   REDIS_LATEST_MESSAGE_RECEIVED,
 } = require('./config')
+
+initializeSentry()
 
 const handleMessage = messageHandler => async msg => {
   let data = null
