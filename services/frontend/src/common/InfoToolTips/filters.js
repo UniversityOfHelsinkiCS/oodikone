@@ -4,6 +4,11 @@ export default {
     short:
       'Suodata opiskelijoita sen mukaan ovatko he ilmoittautuneet läsnä- tai poissaoleviksi kyseiselle lukukaudelle',
   },
+  studyrightStatus: {
+    label: 'Rajaa opiskelijoita opinto-oikeuden statuksen mukaan',
+    short:
+      'Opinto-oikeus on aktiivinen, mikäli opiskelija on ilmoittautunut läsnä- tai poissaolevaksi tälle lukukaudelle ja opinto-oikeus ei ole vielä päättynyt. Opinto-oikeus on passiivinen, jos opiskelija ei ole ilmoittautunut läsnä- tai poissaolevaksi tälle lukukaudelle tai opinto-oikeus on vanhentunut.',
+  },
   transferred: {
     label: 'Include and exclude students from this program',
     short:
