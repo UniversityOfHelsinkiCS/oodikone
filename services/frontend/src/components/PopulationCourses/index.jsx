@@ -9,7 +9,7 @@ import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import infotooltips from '../../common/InfoToolTips'
 
-const PopulationCourses = ({ query = {}, filteredStudents }) => {
+const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYear }) => {
   const [showByStudytrack, setShowByStudytrack] = useState(true)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
   const dispatch = useDispatch()
@@ -24,6 +24,7 @@ const PopulationCourses = ({ query = {}, filteredStudents }) => {
         ...query,
         studyRights: [query.studyRights.programme],
         selectedStudents: filteredStudents.map(s => s.studentNumber),
+        selectedStudentsByYear,
       })
     )
   }, [query, filteredStudents])

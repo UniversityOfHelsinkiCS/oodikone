@@ -15,7 +15,15 @@ import infotooltips from '../../common/InfoToolTips'
 
 const sendAnalytics = sendEvent.populationStatistics
 
-const PopulationDetails = ({ allStudents, filteredStudents, queryIsSet, isLoading, query, dataExport }) => {
+const PopulationDetails = ({
+  allStudents,
+  filteredStudents,
+  queryIsSet,
+  isLoading,
+  query,
+  dataExport,
+  selectedStudentsByYear,
+}) => {
   const { language } = useLanguage()
   const [activeIndex, setActiveIndex] = useLocalStorage('populationActiveIndex', [])
   const creditGraphRef = useRef()
@@ -101,7 +109,7 @@ const PopulationDetails = ({ allStudents, filteredStudents, queryIsSet, isLoadin
       },
       onTitleClick: () => handleClick(1),
       content: {
-        content: !query.years ? (
+        content: !query?.years ? (
           <div ref={creditGainRef}>
             <CreditGainStats query={query} filteredStudents={filteredStudents} />
           </div>
@@ -137,7 +145,12 @@ const PopulationDetails = ({ allStudents, filteredStudents, queryIsSet, isLoadin
       content: {
         content: (
           <div ref={courseTableRef}>
-            <PopulationCourses query={query} allStudents={allStudents} filteredStudents={filteredStudents} />
+            <PopulationCourses
+              query={query}
+              allStudents={allStudents}
+              filteredStudents={filteredStudents}
+              selectedStudentsByYear={selectedStudentsByYear}
+            />
           </div>
         ),
       },
