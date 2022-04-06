@@ -11,6 +11,8 @@ const makePopulationsToData = createSelector([getPopulations], populations => {
   const selectedStudents = samples.length > 0 ? samples.map(({ studentNumber }) => studentNumber) : []
   const years = []
   const selectedStudentsByYear = {}
+  const queryIsSet = !!query
+  const isLoading = pending === true
 
   if (samples.length > 0) {
     samples.forEach(student => {
@@ -22,7 +24,7 @@ const makePopulationsToData = createSelector([getPopulations], populations => {
     })
   }
 
-  return { samples, selectedStudents, complemented, programme, selectedStudentsByYear }
+  return { samples, selectedStudents, complemented, programme, selectedStudentsByYear, queryIsSet, isLoading, query }
 })
 
 export default {

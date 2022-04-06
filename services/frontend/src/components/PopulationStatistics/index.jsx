@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
-import { createSelector } from '@reduxjs/toolkit'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 import { useGetSemestersQuery } from 'redux/semesters'
+import populationToData from 'selectors/populationDetails'
 import PopulationDetails from '../PopulationDetails'
 import { useLanguage, useTitle } from '../../common/hooks'
 import FilterView from '../FilterView'
@@ -26,22 +26,16 @@ import {
   studyrightStatusFilter,
 } from '../FilterView/filters'
 
-const selectPopulations = createSelector(
-  ({ populations }) => populations,
-  populations => ({
-    query: populations.query ?? {},
-    queryIsSet: !!populations.query,
-    isLoading: populations.pending === true,
-    students: populations.data.students ?? [],
-  })
-)
-
 const PopulationStatistics = () => {
   const location = useLocation()
   const language = useLanguage()
   const history = useHistory()
-  const { query, queryIsSet, isLoading, students } = useSelector(selectPopulations)
+  // const { query, queryIsSet, isLoading, students } = useSelector(selectPopulations)
   const courses = useSelector(store => store.populationCourses.data?.coursestatistics)
+  const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(
+    populationToData.makePopulationsToData
+  )
+
   const [onlyHopsCredits, setOnlyHopsCredits] = useState(false)
 
   useTitle('Population statistics')
@@ -104,7 +98,7 @@ const PopulationStatistics = () => {
     <FilterView
       name="PopulationStatistics"
       filters={filters}
-      students={students.map(mapStudents) ?? []}
+      students={samples.map(mapStudents) ?? []}
       displayTray={location.search !== ''}
       initialOptions={{
         [transferredToProgrammeFilter.key]: {
@@ -130,7 +124,8 @@ const PopulationStatistics = () => {
                 query={query}
                 isLoading={isLoading}
                 dataExport={<DataExport students={filteredStudents} />}
-                allStudents={students}
+                allStudents={samples}
+                selectedStudentsByYear={selectedStudentsByYear}
                 filteredStudents={filteredStudents}
               />
             ) : null}

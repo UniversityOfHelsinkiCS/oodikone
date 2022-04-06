@@ -1004,11 +1004,6 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     const sortedMaincourse = await findMainCourse(course.code)
     if (sortedMaincourse) maincourse = sortedMaincourse
 
-    /*  if (isOpenUniCourseCode) {
-      const nonOpen = unifyOpenUniversity(course.code)
-      const response = await findOneByCode(nonOpen)
- */
-
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
     }
