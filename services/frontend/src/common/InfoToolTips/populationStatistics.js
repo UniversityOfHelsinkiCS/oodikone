@@ -41,6 +41,12 @@ export default {
   + **Min ja Max** kertovat pienimmän ja suurimman opintopistemäärän, jotka jollain opiskelijoilla kyseisessä populaatiossa on.
 
   Mikäli valintatapatieto kyseiselle populaatiolle on saatavissa, näytetään myös samat statistiikat per valintatapa.  
+
+  **Distribution Development**
+
+  Pylväsdiagrammi kertoo opiskelijoiden jakauman opintopistehaarukoihin kalenterivuosittain, lukuvuosittain tai lukukausittain eriteltynä. Valmistuneita opiskelijoita ei sisällytetä valmistumisen jälkeisiin pylväisiin.
+
+  **Cumulative**-valinnan ollessa käytössä kunkin opiskelijan kaikki aiemmat opintopisteet lasketaan mukaan opintopistemäärään. Muutoin vain pylvästä vastaavalla aikavälillä kirjatut opintopisteet otetaan huomioon.
   `,
   CoursesOfPopulation: `**Courses of population**
 
