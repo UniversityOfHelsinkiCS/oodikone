@@ -145,7 +145,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
       key: 'PASS_FIRST',
       title: 'On First Attempt',
       filterType: 'range',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.categories.passedFirst || 0) * 100),
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedFirst || 0),
       cellProps: s => ({
         style: {
           textAlign: 'right',
@@ -158,7 +158,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
       key: 'PASS_EVENTUALLY',
       title: 'Eventually',
       filterType: 'range',
-      getRowVal: s => (s.rowObfuscated ? 'NA' : (s.students.categories.passedEventually || 0) * 100),
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.categories.passedEventually || 0),
       cellProps: s => ({
         style: {
           textAlign: 'right',
