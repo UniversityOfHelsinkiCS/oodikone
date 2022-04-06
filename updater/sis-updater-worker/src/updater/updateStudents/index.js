@@ -209,7 +209,10 @@ const updateStudents = async personIds => {
 
   const attainmentsToBeExluced = getAttainmentsToBeExcluded()
 
-  const mappedStudents = students.map(studentMapper(attainments, parsedStudyrightSnapshots, attainmentsToBeExluced))
+  const mappedStudents = students
+    .filter(s => s.student_number)
+    .map(studentMapper(attainments, parsedStudyrightSnapshots, attainmentsToBeExluced))
+
   await bulkCreate(Student, mappedStudents)
 
   const [moduleGroupIdToCode, formattedStudyRights] = await Promise.all([
