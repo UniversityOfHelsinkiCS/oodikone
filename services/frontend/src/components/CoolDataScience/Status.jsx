@@ -22,7 +22,7 @@ const settingDefinitions = _.map(
     {
       key: 'showByYear',
       type: 'checkbox',
-      defaultValue: false,
+      defaultValue: true,
     },
     {
       key: 'showYearlyValues',
