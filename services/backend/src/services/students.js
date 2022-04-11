@@ -179,7 +179,7 @@ const formatStudent = async ({
   createdAt,
   tags,
 }) => {
-  const toCourse = ({ id, grade, credits, credittypecode, attainment_date, course, isStudyModule }) => {
+  const toCourse = ({ id, grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
     try {
       course = course.get()
     } catch (e) {
@@ -205,6 +205,7 @@ const formatStudent = async ({
       credits,
       credittypecode,
       isStudyModuleCredit: isStudyModule,
+      isOpenCourse: is_open,
     }
   }
 

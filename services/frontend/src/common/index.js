@@ -101,6 +101,36 @@ export const getTextIn = (texts, language) => {
   return null
 }
 
+export const getTextInWithOpen = (texts, language, isOpenCourse) => {
+  const prefixes = ['Avoin', 'Öppna', 'Open']
+  if (texts) {
+    const lanText = texts[language] || texts.fi || texts.en || texts.sv || Object.values(texts)[0]
+    const splitText = lanText.split(':')
+    if (prefixes.some(word => splitText[0].startsWith(word))) {
+      splitText.shift()
+    }
+    const newText = [...splitText].join()
+
+    if (isOpenCourse) {
+      switch (language) {
+        case 'fi':
+          return `${prefixes[0]} yo: ${newText}`
+
+        case 'sv':
+          return `${prefixes[1]} uni: ${newText}`
+
+        case 'en':
+          return `${prefixes[2]} uni: ${newText}`
+
+        default:
+          return `${prefixes[0]} yo: ${newText}`
+      }
+    }
+    return newText
+  }
+  return null
+}
+
 export const getUnifyTextIn = unifyCourses => {
   switch (unifyCourses) {
     case 'reqularStats':
