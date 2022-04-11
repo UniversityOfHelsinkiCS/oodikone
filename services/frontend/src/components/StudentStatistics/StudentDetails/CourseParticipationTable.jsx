@@ -3,7 +3,7 @@ import { func, shape, string } from 'prop-types'
 import { Divider, Icon, Header, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 
-import { byDateDesc, reformatDate, getTextIn } from '../../../common'
+import { byDateDesc, reformatDate, getTextInWithOpen } from '../../../common'
 import StudentCourseTable from '../StudentCourseTable'
 
 const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
@@ -14,7 +14,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
   const courseRowsByAcademicYear = {}
 
   student.courses.sort(byDateDesc).forEach(c => {
-    const { date, grade, credits, course, isStudyModuleCredit, passed, credittypecode } = c
+    const { date, grade, credits, isOpenCourse, course, isStudyModuleCredit, passed, credittypecode } = c
     let icon = null
 
     if (isStudyModuleCredit) {
@@ -36,8 +36,10 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
       courseRowsByAcademicYear[`${new Date(date).getFullYear() - 1}-${new Date(date).getFullYear()}`].push([
         reformatDate(date, 'DD.MM.YYYY'),
         `${
-          isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)
-        } ${credittypecode === 7 ? `, ${course.code} (korotettu)` : `(${course.code})`}`,
+          isStudyModuleCredit
+            ? `${getTextInWithOpen(course.name, language, isOpenCourse)} [Study Module]`
+            : getTextInWithOpen(course.name, language, isOpenCourse)
+        } ${credittypecode === 7 ? ` (${course.code}) (korotettu)` : `(${course.code})`}`,
         <div>
           {icon}
           {grade}
@@ -54,7 +56,9 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
       courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`].push([
         reformatDate(date, 'DD.MM.YYYY'),
         `${
-          isStudyModuleCredit ? `${getTextIn(course.name, language)} [Study Module]` : getTextIn(course.name, language)
+          isStudyModuleCredit
+            ? `${getTextInWithOpen(course.name, language, isOpenCourse)} [Study Module]`
+            : getTextInWithOpen(course.name, language, isOpenCourse)
         } ${credittypecode === 7 ? `, ${course.code} (korotettu)` : `(${course.code})`}`,
         <div>
           {icon}
