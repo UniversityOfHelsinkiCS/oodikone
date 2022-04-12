@@ -80,8 +80,6 @@ const getTransferredCreditStats = async ({ studyprogramme, since, years, isAcade
   return { graphStats, tableStats }
 }
 
-const isData = data => data.some(d => d.graphStats.length)
-
 // Fetches all credits for the studytrack and combines them into the statistics for the table
 // and graph in the studyprogramme overview
 const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
@@ -95,7 +93,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const titles = tableTitles['credits'][includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED']
-  const dataFound = isData([majors, nonMajors, transferred])
+  const dataFound = [majors, nonMajors, transferred].some(d => d.graphStats.length)
 
   if (!dataFound) return null
 

@@ -79,7 +79,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
         <>
           {!studyprogramme.includes('KH') && !studyprogramme.includes('MH') && (
             <Message>
-              Please note, that the data is not complete only for current Master's and Bachelor's programmes
+              Please note, that the data is complete only for current Master's and Bachelor's programmes
             </Message>
           )}
           {basics.isSuccess && basics.data && (
@@ -148,27 +148,29 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                   />
                 ))}
               </div>
-              <>
-                {getDivider(
-                  studyprogramme.includes('KH')
-                    ? 'Primary master programme studies after this programme'
-                    : 'Primary bachelor programme studies before this programme',
-                  'ProgrammesBeforeOrAfter'
-                )}
-                <div className="section-container">
-                  <StackedBarChart
-                    cypress="ProgrammesBeforeOrAfter"
-                    wideTable
-                    data={graduations?.data?.programmesBeforeOrAfterGraphStats}
-                    labels={graduations?.data?.years}
-                  />
-                  <DataTable
-                    wideTable
-                    data={graduations?.data?.programmesBeforeOrAfterTableStats}
-                    titles={graduations?.data?.programmesBeforeOrAfterTitles}
-                  />
-                </div>
-              </>
+              {graduations?.data?.programmesBeforeOrAfterGraphStats && (
+                <>
+                  {getDivider(
+                    studyprogramme.includes('KH')
+                      ? 'Primary master programme studies after this programme'
+                      : 'Primary bachelor programme studies before this programme',
+                    'ProgrammesBeforeOrAfter'
+                  )}
+                  <div className="section-container">
+                    <StackedBarChart
+                      cypress="ProgrammesBeforeOrAfter"
+                      wideTable
+                      data={graduations?.data?.programmesBeforeOrAfterGraphStats}
+                      labels={graduations?.data?.years}
+                    />
+                    <DataTable
+                      wideTable
+                      data={graduations?.data?.programmesBeforeOrAfterTableStats}
+                      titles={graduations?.data?.programmesBeforeOrAfterTitles}
+                    />
+                  </div>
+                </>
+              )}
             </>
           )}
         </>
