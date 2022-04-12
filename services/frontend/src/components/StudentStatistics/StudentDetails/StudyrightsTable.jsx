@@ -124,15 +124,6 @@ const StudyrightsTable = ({
       return <>-</>
     }
 
-    const getCredits = courseCode => {
-      const course = student.allCourses.find(course => course.course_code === courseCode)
-
-      // Should never be null, fix some day
-      if (!course) return 0
-
-      return course.credits
-    }
-
     const getCompletedCredits = courseCode => {
       const course = student.courses.find(course => course.course_code === courseCode)
 
@@ -142,10 +133,10 @@ const StudyrightsTable = ({
     }
 
     const courses = studyplans.map(sp => sp.included_courses).flat()
-    const totalCredits = courses.reduce((acc, course) => getCredits(course) + acc, 0)
+    const totalCredits = programmeCodes[0].includes('KH') ? 180 : 120
     const completedCredits = courses.reduce((acc, course) => getCompletedCredits(course) + acc, 0)
 
-    return <>{((completedCredits / Math.max(totalCredits, 1)) * 100).toFixed(0)}%</>
+    return <>{(Math.min(1, completedCredits / Math.max(totalCredits, 1)) * 100).toFixed(0)}%</>
   }
 
   return (
