@@ -211,6 +211,7 @@ const formatStudent = async ({
 
   studyrights = studyrights || []
   semester_enrollments = semester_enrollments || []
+  studyplans = studyplans || []
   const semesterenrollments = semester_enrollments.map(
     ({ semestercode, enrollmenttype, name, yearname, startYear }) => ({
       yearname,
@@ -238,7 +239,7 @@ const formatStudent = async ({
 
   const allCourses = await sequelize.query(
     'SELECT DISTINCT ON(course_code) course_code, credits FROM credit WHERE course_code IN (:hopsCourses)',
-    { replacements: { hopsCourses } }
+    { replacements: { hopsCourses: hopsCourses.concat('id-to-fill-array') } }
   )
 
   return {
@@ -264,7 +265,7 @@ const formatStudent = async ({
 const withId = async id => {
   try {
     const result = await byId(id)
-    return formatStudent(result)
+    return await formatStudent(result)
   } catch (e) {
     logger.error({ message: 'error when fetching single student', meta: e })
     return {
@@ -317,7 +318,7 @@ const bySearchTerm = async searchterm => {
       [Op.or]: [nameLike(terms), studentnumberLike(terms)],
     },
   })
-  return matches.map(formatStudent)
+  return await Promise.all(matches.map(async s => await formatStudent(s)))
 }
 
 const bySearchTermAndStudentNumbers = async (searchterm, studentnumbers) => {
@@ -332,7 +333,7 @@ const bySearchTermAndStudentNumbers = async (searchterm, studentnumbers) => {
       },
     },
   })
-  return matches.map(formatStudent)
+  return await Promise.all(matches.map(async s => await formatStudent(s)))
 }
 
 const filterStudentnumbersByAccessrights = async (studentnumbers, codes) =>
