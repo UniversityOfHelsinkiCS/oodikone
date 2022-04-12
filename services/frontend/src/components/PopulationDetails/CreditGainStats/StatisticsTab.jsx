@@ -1,5 +1,5 @@
 import React from 'react'
-import { Divider, Grid, Label } from 'semantic-ui-react'
+import { Divider, Grid } from 'semantic-ui-react'
 
 import StatisticsTable from './StatisticsTable'
 
@@ -37,12 +37,7 @@ const StatisticsTab = ({ allStudents, query }) => {
       </Grid.Row>
       {admissionTypesAvailable && (
         <>
-          <Divider horizontal>
-            By admission type
-            <Label style={{ marginLeft: '1rem', marginBottom: '0.5rem' }} color="red">
-              NEW!
-            </Label>
-          </Divider>
+          <Divider horizontal>By admission type</Divider>
           <Grid.Row>{admissionTypes.map(type => getStatisticsTable(type))}</Grid.Row>
         </>
       )}

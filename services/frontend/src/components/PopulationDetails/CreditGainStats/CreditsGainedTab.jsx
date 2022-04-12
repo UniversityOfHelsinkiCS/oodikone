@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Icon, Grid, Label } from 'semantic-ui-react'
+import { Divider, Icon, Grid } from 'semantic-ui-react'
 
 import CreditsGainedTable from './CreditsGainedTable'
 
@@ -46,9 +46,6 @@ const CreditsGainedTab = ({ allStudents, query }) => {
           onClick={() => setShow(!show)}
         >
           By admission type <Icon name={`angle ${show ? 'down' : 'right'}`} />
-          <Label style={{ marginLeft: '1rem', marginBottom: '0.5rem' }} color="red">
-            NEW!
-          </Label>
         </Divider>
       )}
       {show && <Grid.Row>{admissionTypes.map(type => getCreditsGainedTable(type))}</Grid.Row>}
