@@ -20,7 +20,7 @@ const StudyrightsTable = ({
 
   const { programmes } = Programmes
   const programmeCodes = programmes ? Object.keys(programmes) : []
-  const studyRightHeaders = ['Programme', 'Study Track', 'Graduated']
+  const studyRightHeaders = ['Programme', 'Study Track', 'Graduated', 'Completed']
 
   const studyRightRows = student.studyrights.map(studyright => {
     const programmes = sortBy(studyright.studyright_elements, 'enddate')
@@ -116,6 +116,38 @@ const StudyrightsTable = ({
         </p>
       ))
 
+  const renderCompletionPercent = (c, student) => {
+    const programmeCodes = c.elements.programmes.filter(filterDuplicates).map(programme => programme.code)
+    const studyplans = student.studyplans.filter(sp => programmeCodes.includes(sp.programme_code))
+
+    if (studyplans.length === 0) {
+      return <>-</>
+    }
+
+    const getCredits = courseCode => {
+      const course = student.allCourses.find(course => course.course_code === courseCode)
+
+      // Should never be null, fix some day
+      if (!course) return 0
+
+      return course.credits
+    }
+
+    const getCompletedCredits = courseCode => {
+      const course = student.courses.find(course => course.course_code === courseCode)
+
+      if (!course) return 0
+
+      return course.credits
+    }
+
+    const courses = studyplans.map(sp => sp.included_courses).flat()
+    const totalCredits = courses.reduce((acc, course) => getCredits(course) + acc, 0)
+    const completedCredits = courses.reduce((acc, course) => getCompletedCredits(course) + acc, 0)
+
+    return <>{((completedCredits / Math.max(totalCredits, 1)) * 100).toFixed(0)}%</>
+  }
+
   return (
     <>
       <Divider horizontal style={{ padding: '20px' }}>
@@ -143,6 +175,7 @@ const StudyrightsTable = ({
                     <Table.Cell>{c.elements.programmes.length > 0 && renderProgrammes(c)}</Table.Cell>
                     <Table.Cell>{renderStudytracks(c)}</Table.Cell>
                     <Table.Cell>{renderGraduated(c)}</Table.Cell>
+                    <Table.Cell>{renderCompletionPercent(c, student)}</Table.Cell>
                   </Table.Row>
                 )
               }

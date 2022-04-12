@@ -12,6 +12,7 @@ const {
   ElementDetail,
   SemesterEnrollment,
   Semester,
+  Studyplan,
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
@@ -56,6 +57,10 @@ const byId = async id => {
         },
         {
           model: SemesterEnrollment,
+        },
+        {
+          model: Studyplan,
+          attributes: ['included_courses', 'programme_code'],
         },
       ],
     }),
@@ -156,7 +161,7 @@ const findByTag = async tag => {
   ).map(st => st.studentnumber)
 }
 
-const formatStudent = ({
+const formatStudent = async ({
   firstnames,
   lastname,
   studentnumber,
@@ -169,6 +174,7 @@ const formatStudent = ({
   studyrights,
   semester_enrollments,
   transfers,
+  studyplans,
   updatedAt,
   createdAt,
   tags,
@@ -227,6 +233,13 @@ const formatStudent = ({
     .map(toCourse)
     .filter(c => c.course.name !== 'missing')
 
+  const hopsCourses = studyplans.map(sp => sp.included_courses).flat()
+
+  const allCourses = await sequelize.query(
+    'SELECT DISTINCT ON(course_code) course_code, credits FROM credit WHERE course_code IN (:hopsCourses)',
+    { replacements: { hopsCourses } }
+  )
+
   return {
     firstnames,
     lastname,
@@ -241,6 +254,8 @@ const formatStudent = ({
     email,
     semesterenrollments,
     updatedAt: updatedAt || createdAt,
+    studyplans,
+    allCourses: allCourses[0],
     tags,
   }
 }
