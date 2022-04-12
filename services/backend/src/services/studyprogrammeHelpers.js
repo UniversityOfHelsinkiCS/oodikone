@@ -163,6 +163,9 @@ const getStartDate = (studyprogramme, isAcademicYear) => {
   return new Date('2017-01-01')
 }
 
+const alltimeStartDate = new Date('1900-01-01')
+const alltimeEndDate = new Date()
+
 // There are 9 course_unit_types
 // 1. urn:code:course-unit-type:regular
 // 2. urn:code:course-unit-type:bachelors-thesis
@@ -336,6 +339,8 @@ module.exports = {
   getMean,
   defineYear,
   getStartDate,
+  alltimeStartDate,
+  alltimeEndDate,
   getThesisType,
   getPercentage,
   getBachelorCreditGraphStats,
