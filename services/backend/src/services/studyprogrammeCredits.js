@@ -51,6 +51,13 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
     }
   })
 
+  if (majors.graphStats.every(year => year === 0) && nonMajors.graphStats.every(year => year === 0)) {
+    return {
+      majors: { graphStats: [], tableStats: {} },
+      nonMajors: { graphStats: [], tableStats: {} },
+    }
+  }
+
   return { majors, nonMajors }
 }
 
@@ -66,8 +73,14 @@ const getTransferredCreditStats = async ({ studyprogramme, since, years, isAcade
     tableStats[attainmentYear] += credits || 0
   })
 
+  if (graphStats.every(year => year === 0)) {
+    return { graphStats: [], tableStats: {} }
+  }
+
   return { graphStats, tableStats }
 }
+
+const isData = data => data.some(d => d.graphStats.length)
 
 // Fetches all credits for the studytrack and combines them into the statistics for the table
 // and graph in the studyprogramme overview
@@ -82,6 +95,9 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
   const titles = tableTitles['credits'][includeAllSpecials ? 'SPECIAL_INCLUDED' : 'SPECIAL_EXCLUDED']
+  const dataFound = isData([majors, nonMajors, transferred])
+
+  if (!dataFound) return null
 
   const tableStats = reversedYears.map(year =>
     includeAllSpecials
@@ -100,24 +116,26 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
         ]
   )
 
+  const graphStats = [
+    {
+      name: 'Major students credits',
+      data: majors.graphStats,
+    },
+    {
+      name: 'Non-major students credits',
+      data: nonMajors.graphStats,
+    },
+    {
+      name: 'Transferred credits',
+      data: transferred.graphStats,
+    },
+  ]
+
   return {
     id: studyprogramme,
     years,
     tableStats,
-    graphStats: [
-      {
-        name: 'Major students credits',
-        data: majors.graphStats,
-      },
-      {
-        name: 'Non-major students credits',
-        data: nonMajors.graphStats,
-      },
-      {
-        name: 'Transferred credits',
-        data: transferred.graphStats,
-      },
-    ],
+    graphStats,
     titles,
   }
 }
