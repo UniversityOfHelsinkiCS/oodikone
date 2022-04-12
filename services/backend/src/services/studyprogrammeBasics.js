@@ -37,24 +37,20 @@ const getStartedStats = async ({ studyprogramme, since, years, isAcademicYear, i
 const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
 
-  await Promise.all(
-    years.map(async year => {
-      const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
-      const studentnumbersOfTheYear = await getCorrectStudentnumbers({
-        codes: [studyprogramme],
-        startDate,
-        endDate,
-        includeAllSpecials,
-      })
+  const studentnumbersOfTheYear = await getCorrectStudentnumbers({
+    codes: [studyprogramme],
+    startDate: getStartDate(studyprogramme, isAcademicYear),
+    endDate: new Date(),
+    includeAllSpecials,
+  })
 
-      const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
-      studyrights.forEach(({ enddate }) => {
-        const graduationYear = defineYear(enddate, isAcademicYear)
-        graphStats[indexOf(years, graduationYear)] += 1
-        tableStats[graduationYear] += 1
-      })
-    })
-  )
+  const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
+  studyrights.forEach(({ enddate }) => {
+    const graduationYear = defineYear(enddate, isAcademicYear)
+    graphStats[indexOf(years, graduationYear)] += 1
+    tableStats[graduationYear] += 1
+  })
+
   return { graphStats, tableStats }
 }
 

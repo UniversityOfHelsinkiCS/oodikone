@@ -7,7 +7,6 @@ const {
   getStatsBasis,
   defineYear,
   getYearsObject,
-  getAcademicYearsObject,
   getYearsArray,
   getMedian,
   getMean,
@@ -22,30 +21,25 @@ const {
   allStudyrights,
   allTransfers,
 } = require('./studyprogramme')
-const { getYearStartAndEndDates } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
 
 const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
 
-  await Promise.all(
-    years.map(async year => {
-      const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
-      const studentnumbersOfTheYear = await getCorrectStudentnumbers({
-        codes: [studyprogramme],
-        startDate,
-        endDate,
-        includeAllSpecials,
-      })
+  const studentnumbers = await getCorrectStudentnumbers({
+    codes: [studyprogramme],
+    startDate: getStartDate(studyprogramme, isAcademicYear),
+    endDate: new Date(),
+    includeAllSpecials,
+  })
 
-      const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
-      studyrights.forEach(({ enddate }) => {
-        const graduationYear = defineYear(enddate, isAcademicYear)
-        graphStats[indexOf(years, graduationYear)] += 1
-        tableStats[graduationYear] += 1
-      })
-    })
-  )
+  const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)
+  studyrights.forEach(({ enddate }) => {
+    const graduationYear = defineYear(enddate, isAcademicYear)
+    graphStats[indexOf(years, graduationYear)] += 1
+    tableStats[graduationYear] += 1
+  })
+
   return { graphStats, tableStats }
 }
 
@@ -54,25 +48,20 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
   const thesisType = getThesisType(studyprogramme)
   const { graphStats, tableStats } = getStatsBasis(years)
 
-  await Promise.all(
-    years.map(async year => {
-      const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
-      const studentnumbersOfTheYear = await getCorrectStudentnumbers({
-        codes: [studyprogramme],
-        startDate,
-        endDate,
-        includeAllSpecials,
-      })
+  const studentnumbers = await getCorrectStudentnumbers({
+    codes: [studyprogramme],
+    startDate: getStartDate(studyprogramme, isAcademicYear),
+    endDate: new Date(),
+    includeAllSpecials,
+  })
 
-      const credits = await getThesisCredits(providercode, since, thesisType, studentnumbersOfTheYear)
+  const credits = await getThesisCredits(providercode, since, thesisType, studentnumbers)
 
-      credits?.forEach(({ attainment_date }) => {
-        const attainmentYear = defineYear(attainment_date, isAcademicYear)
-        graphStats[indexOf(years, attainmentYear)] += 1
-        tableStats[attainmentYear] += 1
-      })
-    })
-  )
+  credits?.forEach(({ attainment_date }) => {
+    const attainmentYear = defineYear(attainment_date, isAcademicYear)
+    graphStats[indexOf(years, attainmentYear)] += 1
+    tableStats[attainmentYear] += 1
+  })
 
   return { graphStats, tableStats }
 }
@@ -80,29 +69,22 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
 const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   let graduationAmounts = getYearsObject({ years })
   let graduationTimes = getYearsObject({ years, emptyArrays: true })
-  let totalAmounts = isAcademicYear ? getAcademicYearsObject({ years }) : getYearsObject({ years })
 
-  await Promise.all(
-    years.map(async year => {
-      const { startDate, endDate } = getYearStartAndEndDates(year, isAcademicYear)
-      const studentnumbersOfTheYear = await getCorrectStudentnumbers({
-        codes: [studyprogramme],
-        startDate,
-        endDate,
-        includeAllSpecials,
-      })
+  const studentnumbers = await getCorrectStudentnumbers({
+    codes: [studyprogramme],
+    startDate: getStartDate(studyprogramme, isAcademicYear),
+    endDate: new Date(),
+    includeAllSpecials,
+  })
 
-      const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
-      totalAmounts[year] = studentnumbersOfTheYear.length
+  const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)
 
-      studyrights.forEach(({ enddate, studystartdate }) => {
-        const graduationYear = defineYear(enddate, isAcademicYear)
-        const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
-        graduationAmounts[graduationYear] += 1
-        graduationTimes[graduationYear] = [...graduationTimes[graduationYear], timeToGraduation]
-      })
-    })
-  )
+  studyrights.forEach(({ enddate, studystartdate }) => {
+    const graduationYear = defineYear(enddate, isAcademicYear)
+    const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
+    graduationAmounts[graduationYear] += 1
+    graduationTimes[graduationYear] = [...graduationTimes[graduationYear], timeToGraduation]
+  })
   // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
   const comparisonValue = studyprogramme.includes('KH') ? 72 : 48
 
@@ -122,7 +104,7 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
       ['', comparisonValue - mean],
     ]
   })
-  return { medians, means, graduationAmounts, totalAmounts }
+  return { medians, means, graduationAmounts }
 }
 
 // Creates (studyrightid, transfer)-map out of programmes transfers
@@ -255,7 +237,6 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
     graduationMedianTime: graduationTimeStats.medians,
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
-    totalAmounts: graduationTimeStats.totalAmounts,
     programmesBeforeOrAfterTableStats: programmesBeforeOrAfter.tableStats,
     programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter.graphStats,
     programmesBeforeOrAfterTitles,
