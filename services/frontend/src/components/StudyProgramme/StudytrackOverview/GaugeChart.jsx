@@ -8,6 +8,7 @@ const GaugeChart = ({ cypress, data, year, graduationAmount, totalAmount, studyp
   const thresholdValues = studyprogramme.includes('KH') ? [36, 41] : [24, 27]
 
   const getColor = data => {
+    if (!studyprogramme.includes('KH') && !studyprogramme.includes('MH')) return ['#1d44a1', '#EBECF0']
     if (data <= thresholdValues[0]) return ['#90A959', '#EBECF0']
     if (data > thresholdValues[0] && data <= thresholdValues[1]) return ['#FEE191', '#EBECF0']
     return ['#FB6962', '#EBECF0']
