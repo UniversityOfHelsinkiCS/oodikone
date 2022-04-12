@@ -133,7 +133,8 @@ const StudyrightsTable = ({
     }
 
     const courses = studyplans.map(sp => sp.included_courses).flat()
-    const totalCredits = programmeCodes[0].includes('KH') ? 180 : 120
+    const totalCredits =
+      programmeCodes[0].includes('KH') || ['MH03_001', 'MH03_003'].includes(programmeCodes[0]) ? 180 : 120
     const completedCredits = courses.reduce((acc, course) => getCompletedCredits(course) + acc, 0)
 
     return <>{(Math.min(1, completedCredits / Math.max(totalCredits, 1)) * 100).toFixed(0)}%</>
