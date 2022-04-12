@@ -12,6 +12,8 @@ const {
   getMean,
   getStartDate,
   getThesisType,
+  alltimeStartDate,
+  alltimeEndDate,
 } = require('./studyprogrammeHelpers')
 const {
   graduatedStudyRights,
@@ -28,8 +30,8 @@ const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear,
 
   const studentnumbers = await getCorrectStudentnumbers({
     codes: [studyprogramme],
-    startDate: getStartDate(studyprogramme, isAcademicYear),
-    endDate: new Date(),
+    startDate: alltimeStartDate,
+    endDate: alltimeEndDate,
     includeAllSpecials,
   })
 
@@ -50,8 +52,8 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
 
   const studentnumbers = await getCorrectStudentnumbers({
     codes: [studyprogramme],
-    startDate: getStartDate(studyprogramme, isAcademicYear),
-    endDate: new Date(),
+    startDate: alltimeStartDate,
+    endDate: alltimeEndDate,
     includeAllSpecials,
   })
 
@@ -72,8 +74,8 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
 
   const studentnumbers = await getCorrectStudentnumbers({
     codes: [studyprogramme],
-    startDate: getStartDate(studyprogramme, isAcademicYear),
-    endDate: new Date(),
+    startDate: alltimeStartDate,
+    endDate: alltimeEndDate,
     includeAllSpecials,
   })
 

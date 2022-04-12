@@ -6,6 +6,8 @@ const {
   getYearsArray,
   getStartDate,
   tableTitles,
+  alltimeStartDate,
+  alltimeEndDate,
 } = require('./studyprogrammeHelpers')
 const { graduatedStudyRights, startedStudyrights, transfersAway, transfersTo } = require('./studyprogramme')
 const { getYearStartAndEndDates } = require('../util/semester')
@@ -39,8 +41,8 @@ const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear,
 
   const studentnumbersOfTheYear = await getCorrectStudentnumbers({
     codes: [studyprogramme],
-    startDate: getStartDate(studyprogramme, isAcademicYear),
-    endDate: new Date(),
+    startDate: alltimeStartDate,
+    endDate: alltimeEndDate,
     includeAllSpecials,
   })
 
