@@ -244,8 +244,8 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
     graduationMedianTime: graduationTimeStats.medians,
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
-    programmesBeforeOrAfterTableStats: programmesBeforeOrAfter ? programmesBeforeOrAfter.tableStats : null,
-    programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter ? programmesBeforeOrAfter.graphStats : null,
+    programmesBeforeOrAfterTableStats: programmesBeforeOrAfter?.tableStats,
+    programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter?.graphStats,
     programmesBeforeOrAfterTitles,
   }
 }

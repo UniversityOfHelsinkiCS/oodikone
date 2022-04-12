@@ -79,7 +79,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
         <>
           {!studyprogramme.includes('KH') && !studyprogramme.includes('MH') && (
             <Message>
-              Please note, that the data is complete only for current Master's and Bachelor's programmes
+              Please note, that the data is complete only for current Bachelor, Masters and Doctoral programmes
             </Message>
           )}
           {basics.isSuccess && basics.data && (
