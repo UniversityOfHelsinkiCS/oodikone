@@ -202,6 +202,12 @@ const getProgrammesAfterGraduation = async ({ studyprogramme, since, years, isAc
   return graphAndTableStats
 }
 
+const getProgrammesBeforeOrAfter = async (studyprogramme, queryParameters) => {
+  if (studyprogramme.includes('KH')) return await getProgrammesAfterGraduation(queryParameters)
+  if (studyprogramme.includes('MH')) return await getProgrammesBeforeStarting(queryParameters)
+  return null
+}
+
 const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => {
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
@@ -209,11 +215,10 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
 
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
   const thesis = await getThesisStats(queryParameters)
+
   const graduated = await getGraduatedStats(queryParameters)
   const graduationTimeStats = await getGraduationTimeStats(queryParameters)
-  const programmesBeforeOrAfter = studyprogramme.includes('KH')
-    ? await getProgrammesAfterGraduation(queryParameters)
-    : await getProgrammesBeforeStarting(queryParameters)
+  const programmesBeforeOrAfter = await getProgrammesBeforeOrAfter(studyprogramme, queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
 
@@ -239,12 +244,8 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
     graduationMedianTime: graduationTimeStats.medians,
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
-    programmesBeforeOrAfterTableStats: programmesBeforeOrAfter.tableStats.length
-      ? programmesBeforeOrAfter.tableStats
-      : null,
-    programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter.graphStats.length
-      ? programmesBeforeOrAfter.graphStats
-      : null,
+    programmesBeforeOrAfterTableStats: programmesBeforeOrAfter ? programmesBeforeOrAfter.tableStats : null,
+    programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter ? programmesBeforeOrAfter.graphStats : null,
     programmesBeforeOrAfterTitles,
   }
 }

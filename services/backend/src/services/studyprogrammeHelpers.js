@@ -259,19 +259,58 @@ const getMasterCreditGraphStats = years => ({
   },
 })
 
-const getCreditGraphStats = (studyprogramme, years) =>
-  studyprogramme.includes('KH') ? getBachelorCreditGraphStats(years) : getMasterCreditGraphStats(years)
+const getDoctoralCreditGraphStats = years => ({
+  lte50: {
+    name: 'Less than 50 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte100: {
+    name: '50-99 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte150: {
+    name: '100-149 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte200: {
+    name: '150-199 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte250: {
+    name: '200-249 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte300: {
+    name: '250-299 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte300: {
+    name: 'More than 300 credits',
+    data: getEmptyArray(years.length),
+  },
+})
+
+const getCreditGraphStats = (studyprogramme, years) => {
+  if (studyprogramme.includes('KH')) return getBachelorCreditGraphStats(years)
+  if (studyprogramme.includes('MH')) return getMasterCreditGraphStats(years)
+  return getDoctoralCreditGraphStats(years)
+}
 
 const bachelorCreditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'lte180', 'mte180']
 const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'lte300', 'mte300']
+const doctoralCreditThresholds = ['lte50', 'lte100', 'lte150', 'lte200', 'lte250', 'lte300', 'mte300']
 const bachelorCreditAmounts = [30, 60, 90, 120, 150, 180, 180]
 const masterCreditAmounts = [200, 220, 240, 260, 280, 300, 300]
+const doctoralCreditAmounts = [50, 100, 150, 200, 250, 300, 300]
 
 const getCreditThresholds = studyprogramme => {
   if (studyprogramme.includes('KH')) {
     return { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
   }
-  return { creditThresholdKeys: masterCreditThresholds, creditThresholdAmounts: masterCreditAmounts }
+  if (studyprogramme.includes('MH')) {
+    return { creditThresholdKeys: masterCreditThresholds, creditThresholdAmounts: masterCreditAmounts }
+  }
+  return { creditThresholdKeys: doctoralCreditThresholds, creditThresholdAmounts: doctoralCreditAmounts }
 }
 
 const tableTitles = {
@@ -306,6 +345,17 @@ const tableTitles = {
       '280-299 credits',
       '> 300 credits',
     ],
+    doctoral: [
+      '',
+      'All',
+      '< 50 credits',
+      '50-99 credits',
+      '100-149 credits',
+      '150-199 credits',
+      '200-249 credits',
+      '250-299 credits',
+      '> 300 credits',
+    ],
   },
   studytracks: [
     '',
@@ -321,8 +371,11 @@ const tableTitles = {
   ],
 }
 
-const getCreditProgressTableTitles = studyprogramme =>
-  studyprogramme.includes('KH') ? tableTitles.bachelorCreditProgress : tableTitles.masterCreditProgress
+const getCreditProgressTableTitles = studyprogramme => {
+  if (studyprogramme.includes('KH')) return tableTitles.creditProgress.bachelor
+  if (studyprogramme.includes('MH')) return tableTitles.creditProgress.master
+  return tableTitles.creditProgress.doctoral
+}
 
 module.exports = {
   getCorrectStudentnumbers,
@@ -345,6 +398,7 @@ module.exports = {
   getPercentage,
   getBachelorCreditGraphStats,
   getMasterCreditGraphStats,
+  getDoctoralCreditGraphStats,
   getCreditGraphStats,
   getCreditThresholds,
   tableTitles,

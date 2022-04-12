@@ -13,6 +13,7 @@ const {
   getCreditThresholds,
   getCreditGraphStats,
   tableTitles,
+  getCreditProgressTableTitles,
 } = require('./studyprogrammeHelpers')
 const {
   studytrackStudents,
@@ -137,6 +138,7 @@ const getStudytrackDataForTheYear = async ({
       creditThresholdKeys.forEach(
         threshold => (creditGraphStats[track][threshold].data[indexOf(years, year)] = studentData[threshold])
       )
+
       // Count stats for the credit progress table for the year per track
       creditTableStats[track] = [
         ...creditTableStats[track],
@@ -308,7 +310,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
     studytrackOptions,
     includeGraduated: settings.graduated,
     populationTitles: tableTitles['studytracks'],
-    creditTableTitles: tableTitles['creditProgress'][studyprogramme.includes('KH') ? 'bachelor' : 'master'],
+    creditTableTitles: getCreditProgressTableTitles(studyprogramme),
   }
 }
 
