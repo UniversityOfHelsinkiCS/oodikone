@@ -363,18 +363,24 @@ const studyplanMapper =
     programmeModuleIdToCode,
     studyplanIdToDegreeProgrammes,
     moduleIdToParentDegreeProgramme,
-    courseUnitIdToCode
+    courseUnitIdToCode,
+    moduleIdToAttainment,
+    getCourseCodesFromAttainment
   ) =>
   studyplan => {
     const studentnumber = personIdToStudentNumber[studyplan.user_id]
 
     return studyplanIdToDegreeProgrammes[studyplan.id].map(programmeId => {
+      const graduated = !!moduleIdToAttainment[programmeId]
+
       return {
         studentnumber,
         programme_code: programmeModuleIdToCode[programmeId],
-        included_courses: studyplan.course_unit_selections
-          .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
-          .map(courseUnit => courseUnitIdToCode[courseUnit.courseUnitId]),
+        included_courses: graduated
+          ? getCourseCodesFromAttainment(moduleIdToAttainment[programmeId])
+          : studyplan.course_unit_selections
+              .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
+              .map(courseUnit => courseUnitIdToCode[courseUnit.courseUnitId]),
       }
     })
   }
