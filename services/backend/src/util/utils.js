@@ -1,5 +1,5 @@
-const mapToProviders = elementDetails =>
-  elementDetails.map(r => {
+const mapToProviders = elementDetails => {
+  return elementDetails.map(r => {
     const isNumber = str => !Number.isNaN(Number(str))
     if (r.includes('_')) {
       const [left, right] = r.split('_')
@@ -8,8 +8,13 @@ const mapToProviders = elementDetails =>
       const providercode = `${prefix}0-${suffix}`
       return providercode
     }
+    if (/^(T)[0-9]{6}$/.test(r)) {
+      const numbers = r.substring(1)
+      return `7${numbers}`
+    }
     return r
   })
+}
 
 // sort substitutions so that main code is first
 const newLetterBasedCode = /^[A-Za-z]/ // new letter based codes come first
