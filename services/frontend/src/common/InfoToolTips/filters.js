@@ -7,7 +7,7 @@ export default {
   studyrightStatus: {
     label: 'Rajaa opiskelijoita opinto-oikeuden statuksen mukaan',
     short:
-      'Opinto-oikeus on aktiivinen, mikäli opiskelija on ilmoittautunut läsnä- tai poissaolevaksi tälle lukukaudelle ja opinto-oikeus ei ole vielä päättynyt. \n Opinto-oikeus on passiivinen, jos opiskelija ei ole ilmoittautunut läsnä- tai poissaolevaksi tälle lukukaudelle tai opinto-oikeus on vanhentunut.',
+      'Opinto-oikeus on aktiivinen, mikäli opiskelija on ilmoittautunut läsnä- tai poissaolevaksi tälle lukukaudelle ja opinto-oikeus ei ole vielä päättynyt. \n Opinto-oikeus on passiivinen, jos opiskelija ei ole ilmoittautunut läsnä- tai poissaolevaksi tälle lukukaudelle tai opinto-oikeus on vanhentunut. Valmistuneet opiskelijat on suodatettu pois molemmista kategorioista.',
   },
   transferred: {
     label: 'Include and exclude students from this program',
