@@ -40,18 +40,22 @@ class CourseStatsCounter {
       triedOfPopulation: undefined,
       passingSemesters: this.initializePassingSemesters(),
     }
+    this.enrollments = {
+      enrolledNoGrade: new Set(),
+      semesters: this.initializePassingSemesters({}),
+    }
     this.grades = {}
   }
 
-  initializePassingSemesters() {
+  initializePassingSemesters(initialValue = 0) {
     const passingSemesters = {
-      BEFORE: 0,
-      LATER: 0,
+      BEFORE: initialValue,
+      LATER: initialValue,
     }
 
     for (let i = 0; i < 7; i++) {
-      passingSemesters[fall[i]] = 0
-      passingSemesters[spring[i]] = 0
+      passingSemesters[fall[i]] = initialValue
+      passingSemesters[spring[i]] = initialValue
     }
 
     return passingSemesters
@@ -89,6 +93,13 @@ class CourseStatsCounter {
     } else if (failed) {
       this.markFailedGrade(studentnumber)
     }
+  }
+
+  markEnrollment(studentnumber, state, semester) {
+    if (!this.enrollments[state]) this.enrollments[state] = new Set()
+    this.enrollments[state].add(studentnumber)
+    if (!this.enrollments.semesters[semester][state]) this.enrollments.semesters[semester][state] = new Set()
+    this.enrollments.semesters[semester][state].add(studentnumber)
   }
 
   failedBefore(studentnumber) {
@@ -173,6 +184,10 @@ class CourseStatsCounter {
   getFinalStats() {
     const stats = this.stats
     const students = this.students
+    const allStudents = Object.keys(students.all)
+    const totalEnrolledNoGrade = [...(this.enrollments.ENROLLED || [])].filter(
+      student => !allStudents.includes(student)
+    ).length
 
     stats.students = lengthOf(students.all)
     stats.passed = lengthOf(students.passed)
@@ -185,6 +200,9 @@ class CourseStatsCounter {
     stats.triedOfPopulation = percentageOf(stats.students, this.studentsInTotal)
     stats.perStudent = stats.attempts / (stats.passed + stats.failed)
     stats.passingSemestersCumulative = this.getPassingSemestersCumulative()
+    stats.totalStudents = stats.students + totalEnrolledNoGrade
+    stats.totalEnrolledNoGrade = totalEnrolledNoGrade
+    stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
     return {
       stats,
