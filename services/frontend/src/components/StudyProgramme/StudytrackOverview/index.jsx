@@ -46,6 +46,10 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
+  const noData = stats.isSuccess && stats.mainStatsByYear && !stats.mainStatsByYear.Total.length
+
+  if (noData) return <h3>There is no data available for the selected programme between 2017-2022</h3>
+
   return (
     <div className="studytrack-overview">
       {stats.isLoading || stats.isFetching ? (
