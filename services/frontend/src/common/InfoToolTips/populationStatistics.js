@@ -60,6 +60,7 @@ export default {
   **Taulukot**
   
   - **pass/fail** - oletusnäkymä, joka sisältää kurssisuoritukset, hylätyt sekä yritykset. Taulukon tiedot voi järjestää sarakkeita (n, after retry, percentage, many times, per student, passed ja attempted) klikkaamalla.
+  - **pass/fail w/ enrollments** - näkymä, joka sisältää suoritustiedot ilmoittautumisten kanssa. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
   - **grades** - arvosanajakauma.
   - **when passed** - kurssisuorituksen ajankohta. Huom.! *Passed*-sarakkeen kokonaissumma ei välttämättä täsmää puolivuosittaisten lukumäärien summan kanssa johtuen tuplakirjauksista Oodissa.
   `,

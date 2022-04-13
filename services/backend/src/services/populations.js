@@ -16,6 +16,7 @@ const {
   Semester,
   Transfer,
   StudyrightElement,
+  Enrollment,
 } = require('../models')
 const {
   dbConnections: { sequelize },
@@ -878,6 +879,18 @@ const findCourses = async (studentnumbers, beforeDate) => {
         model: CourseType,
         required: true,
       },
+      {
+        model: Enrollment,
+        attributes: ['course_code', 'studentnumber', 'state', 'enrollment_date_time', 'course_code'],
+        where: {
+          studentnumber: {
+            [Op.in]: studentnumbers,
+          },
+          enrollment_date_time: {
+            [Op.lt]: beforeDate,
+          },
+        },
+      },
     ],
   })
   return res
@@ -1018,6 +1031,10 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
       const semester = getPassingSemester(startYear, date)
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
+    })
+    course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
+      const semester = getPassingSemester(startYear, enrollment_date_time)
+      coursestats.markEnrollment(studentnumber, state, semester)
     })
     stats[maincourse.code] = coursestats
   }
