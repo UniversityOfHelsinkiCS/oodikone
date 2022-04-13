@@ -13,6 +13,8 @@ import InfoBox from '../../Info/InfoBox'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
+const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
+
 const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
   const [showMeanTime, setShowMeanTime] = useState(false)
   const toolTips = InfotoolTips.Studyprogramme
@@ -77,7 +79,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
         <Loader active style={{ marginTop: '10em' }} />
       ) : (
         <>
-          {!studyprogramme.includes('KH') && !studyprogramme.includes('MH') && (
+          {!isNewProgramme(studyprogramme) && (
             <Message>
               Please note, that the data is complete only for current Bachelor, Masters and Doctoral programmes
             </Message>
