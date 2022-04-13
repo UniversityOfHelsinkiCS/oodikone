@@ -185,7 +185,7 @@ const getThesisType = studyprogramme => {
     return ['urn:code:course-unit-type:bachelors-thesis']
   if (/^(T)[0-9]{6}$/.test(studyprogramme))
     return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
-  return 'thesis-type-not-defined'
+  return ['urn:code:course-unit-type:doctors-thesis', 'urn:code:course-unit-type:licentiate-thesis']
 }
 
 const getPercentage = (value, total) => {
