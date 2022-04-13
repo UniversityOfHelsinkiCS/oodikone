@@ -1,6 +1,8 @@
 const { redisClient } = require('../services/redis')
 const moment = require('moment')
 
+// Only new bachelor, masters and doctoral programmes get their data updated in redis every night, use redis for them
+const isUpdatedNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
 const createRedisKeyForBasicStats = (id, yearType, specialGroups) => `BASIC_STATS_${id}_${yearType}_${specialGroups}`
 const createRedisKeyForCreditStats = (id, yearType, specialGroups) => `CREDIT_STATS_${id}_${yearType}_${specialGroups}`
 const createRedisKeyForGraduationStats = (id, yearType, specialGroups) =>
@@ -9,6 +11,7 @@ const createRedisKeyForStudytrackStats = (id, graduated, specialGroups) =>
   `STUDYTRACK_STATS_${id}_${graduated}_${specialGroups}`
 
 const getBasicStats = async (id, yearType, specialGroups) => {
+  if (!isUpdatedNewProgramme(id)) return null
   const redisKey = createRedisKeyForBasicStats(id, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
@@ -23,12 +26,14 @@ const setBasicStats = async (data, yearType, specialGroups) => {
     status: 'DONE',
     lastUpdated: moment().format(),
   }
+  if (!isUpdatedNewProgramme(id)) return dataToRedis
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return dataToRedis
 }
 
 const getCreditStats = async (id, yearType, specialGroups) => {
+  if (!isUpdatedNewProgramme(id)) return null
   const redisKey = createRedisKeyForCreditStats(id, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
@@ -43,12 +48,14 @@ const setCreditStats = async (data, yearType, specialGroups) => {
     status: 'DONE',
     lastUpdated: moment().format(),
   }
+  if (!isUpdatedNewProgramme(id)) return dataToRedis
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return dataToRedis
 }
 
 const getGraduationStats = async (id, yearType, specialGroups) => {
+  if (!isUpdatedNewProgramme(id)) return null
   const redisKey = createRedisKeyForGraduationStats(id, yearType, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
@@ -63,12 +70,14 @@ const setGraduationStats = async (data, yearType, specialGroups) => {
     status: 'DONE',
     lastUpdated: moment().format(),
   }
+  if (!isUpdatedNewProgramme(id)) return dataToRedis
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return dataToRedis
 }
 
 const getStudytrackStats = async (id, graduated, specialGroups) => {
+  if (!isUpdatedNewProgramme(id)) return null
   const redisKey = createRedisKeyForStudytrackStats(id, graduated, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
@@ -83,6 +92,7 @@ const setStudytrackStats = async (data, graduated, specialGroups) => {
     status: 'DONE',
     lastUpdated: moment().format(),
   }
+  if (!isUpdatedNewProgramme(id)) return dataToRedis
   const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
   if (setOperationStatus !== 'OK') return null
   return dataToRedis

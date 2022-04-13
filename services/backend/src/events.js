@@ -25,7 +25,9 @@ const refreshStudyrightAssociations = async () => {
 
 const refreshNewOverviews = async () => {
   logger.info('Refreshing studyprogramme and studytrack overview statistics for all programmes')
-  const codes = (await getAllProgrammes()).map(p => p.code).filter(code => code.includes('KH') || code.includes('MH'))
+  const codes = (await getAllProgrammes())
+    .map(p => p.code)
+    .filter(code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code))
   let ready = 0
   for (const code of codes) {
     try {
