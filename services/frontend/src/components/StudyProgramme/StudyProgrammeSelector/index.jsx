@@ -11,6 +11,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
   const [filter, setFilter] = useState('')
   const [bachelorProgrammes, setBachelorProgrammes] = useState([])
   const [masterProgrammes, setMasterProgrammes] = useState([])
+  const [doctoralProgrammes, setDoctoralProgrammes] = useState([])
   const [otherProgrammes, setOtherProgrammes] = useState([])
   const handleFilterChange = debounce(value => {
     setFilter(value)
@@ -20,6 +21,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
     if (studyprogrammes) {
       const filteredBachelorProgrammes = []
       const filteredMasterProgrammes = []
+      const filtereDoctoralProgrammes = []
       const filteredOtherProgrammes = []
 
       const filteredStudyprogrammes = studyprogrammes.filter(programme => {
@@ -39,12 +41,15 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
           filteredMasterProgrammes.push(programme)
         } else if (programme.code.includes('KH')) {
           filteredBachelorProgrammes.push(programme)
+        } else if (/^(T)[0-9]{6}$/.test(programme.code)) {
+          filtereDoctoralProgrammes.push(programme)
         } else {
           filteredOtherProgrammes.push(programme)
         }
       })
       setBachelorProgrammes(filteredBachelorProgrammes)
       setMasterProgrammes(filteredMasterProgrammes)
+      setDoctoralProgrammes(filtereDoctoralProgrammes)
       setOtherProgrammes(filteredOtherProgrammes)
     }
   }, [filter, studyprogrammes])
@@ -136,10 +141,20 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
           />
         </>
       ) : null}
-
+      {doctoralProgrammes.length > 0 ? (
+        <>
+          <Header>Doctoral programmes</Header>
+          <SortableTable
+            figure={false}
+            columns={headers}
+            getRowKey={programme => programme.code}
+            data={doctoralProgrammes}
+          />
+        </>
+      ) : null}
       {otherProgrammes.length > 0 ? (
         <>
-          <Header>Doctoral programmes and old programmes</Header>
+          <Header>Specialization programmes and old programmes</Header>
           <SortableTable
             figure={false}
             columns={headers}
