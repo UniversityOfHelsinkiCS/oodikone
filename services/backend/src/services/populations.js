@@ -880,6 +880,7 @@ const findCourses = async (studentnumbers, beforeDate) => {
         required: true,
       },
       {
+        required: false,
         model: Enrollment,
         attributes: ['course_code', 'studentnumber', 'state', 'enrollment_date_time', 'course_code'],
         where: {
