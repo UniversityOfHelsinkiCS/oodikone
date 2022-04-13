@@ -33,7 +33,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
         {
           key: 'TIME',
           title: 'Time',
-          getRowVal: s => (s.name === 'Total' ? -1 : s.name),
+          getRowVal: s => (s.name === 'Total' ? -1 : s.code),
           formatValue: v => (v === -1 ? 'Total' : v),
           getRowExportVal: s => s.name,
           getRowContent: s => (
