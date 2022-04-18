@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Segment, Button } from 'semantic-ui-react'
+import { Segment, Button, Popup } from 'semantic-ui-react'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
@@ -12,39 +12,64 @@ import infotooltips from '../../common/InfoToolTips'
 const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYear }) => {
   const [showByStudytrack, setShowByStudytrack] = useState(true)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
+  const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses)
   const dispatch = useDispatch()
 
   const populationSelectedStudentCourses = useSelector(
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
 
-  useEffect(() => {
+  const fetch = courses => {
     dispatch(
       getPopulationSelectedStudentCourses({
         ...query,
         studyRights: [query.studyRights.programme],
         selectedStudents: filteredStudents.map(s => s.studentNumber),
         selectedStudentsByYear,
+        courses,
       })
     )
-  }, [query, filteredStudents])
+  }
+
+  useEffect(() => {
+    if (!mandatoryCourses.pending) fetch(mandatoryCourses.data.map(({ code }) => code))
+  }, [query, filteredStudents, mandatoryCourses])
 
   const selectedPopulationCourses = populationSelectedStudentCourses.data
     ? populationSelectedStudentCourses
     : populationCourses
 
-  const { pending } = selectedPopulationCourses
+  const pending = populationSelectedStudentCourses.pending || populationCourses.pending
 
   const changeStructure = () => {
+    if (showByStudytrack) fetch() // Need to fetch full stats when toggling from study track to most attained courses
     setShowByStudytrack(!showByStudytrack)
+  }
+
+  const renderToggleStructureButton = () => {
+    if (showByStudytrack)
+      return (
+        <Popup
+          trigger={
+            <Button primary onClick={changeStructure} style={{ marginLeft: '1em' }}>
+              Show the most attained courses
+            </Button>
+          }
+          content="Warning: fetching the data might take more than a century"
+        />
+      )
+
+    return (
+      <Button primary onClick={changeStructure} style={{ marginLeft: '1em' }}>
+        Show by programme structure
+      </Button>
+    )
   }
 
   return (
     <Segment basic>
       <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
-      <Button primary onClick={changeStructure} style={{ marginLeft: '1em' }}>
-        {showByStudytrack === true ? 'Show the most attained courses' : 'Show by programme structure'}
-      </Button>
+      {renderToggleStructureButton()}
       {query.studyRights.programme && <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />}
 
       <SegmentDimmer isLoading={pending} />
@@ -57,7 +82,7 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
         />
       ) : (
         <CustomPopulationCourses
-          courses={selectedPopulationCourses.data}
+          courses={pending ? null : selectedPopulationCourses.data}
           filteredStudents={filteredStudents}
           showFilter={false}
         />
