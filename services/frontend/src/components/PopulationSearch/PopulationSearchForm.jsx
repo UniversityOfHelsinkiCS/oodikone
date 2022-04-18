@@ -98,16 +98,13 @@ const PopulationSearchForm = props => {
 
   const fetchPopulation = async query => {
     const formattedQueryParams = formatQueryParamsToArrays(query, ['semesters', 'studentStatuses', 'years'])
-    const queryCodes = Object.values(query.studyRights).filter(e => e != null)
     const uuid = uuidv4()
-    const request = { ...formattedQueryParams, studyRights: queryCodes, uuid }
     setState({ isLoading: true })
     props.setLoading()
     props.clearSelected()
     fetchPopulationPromises.current = cancelablePromise(
       Promise.all([
         props.getPopulationStatistics({ ...formattedQueryParams, uuid, onProgress }),
-        props.getPopulationCourses(request),
         [],
         props.getMandatoryCourses(formattedQueryParams.studyRights.programme),
       ])

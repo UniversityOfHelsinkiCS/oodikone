@@ -11,6 +11,7 @@ export const getPopulationSelectedStudentCourses = ({
   years,
   tag,
   selectedStudentsByYear,
+  courses = [],
 }) => {
   const route = '/v2/populationstatistics/courses'
   const prefix = 'GET_POPULATION_SELECTEDSTUDENTS_COURSES_'
@@ -36,6 +37,7 @@ export const getPopulationSelectedStudentCourses = ({
     tag,
     selectedStudentsByYear,
     years,
+    courses,
   }
   return callController(route, prefix, body, 'post', query)
 }

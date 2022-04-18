@@ -857,9 +857,11 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   return formattedStudents
 }
 
-const findCourses = async (studentnumbers, beforeDate) => {
+const findCourses = async (studentnumbers, beforeDate, courses = []) => {
+  const codesFilter = courses.length ? { code: courses } : {}
   const res = await Course.findAll({
     attributes: ['code', 'name', 'coursetypecode', 'substitutions'],
+    where: { ...codesFilter },
     include: [
       {
         required: true,
@@ -963,7 +965,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
     return null
   }
 
-  const getStudentsAndCourses = async (selectedStudents, studentnumberlist) => {
+  const getStudentsAndCourses = async (selectedStudents, studentnumberlist, courseCodes) => {
     if (!studentnumberlist) {
       const { months, studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents, tag } =
         params
@@ -984,7 +986,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         return numbers
       }, {})
 
-      const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months))
+      const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
       return [allstudents, courses]
     } else {
       const allstudents = studentnumberlist.reduce((numbers, num) => {
@@ -997,7 +999,7 @@ const bottlenecksOf = async (query, studentnumberlist) => {
   }
   const params = parseQueryParams(query)
   const [[allstudents, courses], error] = await Promise.all([
-    getStudentsAndCourses(query.selectedStudents, studentnumberlist),
+    getStudentsAndCourses(query.selectedStudents, studentnumberlist, query.courses),
     isValidRequest(query, params),
   ])
   if (error) return error
