@@ -75,8 +75,8 @@ const hasGraduatedBefore = (student, programme, date) => {
   return sr.graduated && moment(date).isAfter(sr.enddate)
 }
 
-const getChartData = (students, timeSlots, order, programme, cumulative) => {
-  const limitBreaks = cumulative ? LIMITS_CUMULATIVE : LIMITS_NON_CUMULATIVE
+const getChartData = (students, timeSlots, order, programme, limitScale, cumulative) => {
+  const limitBreaks = (cumulative ? LIMITS_CUMULATIVE : LIMITS_NON_CUMULATIVE).map(lb => lb * limitScale)
 
   let limits = _.range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
 
@@ -176,9 +176,11 @@ const CreditDistributionDevelopment = ({ students, query }) => {
   }, [timeDivision, months, semestersQuery, getTextIn])
 
   const seriesList = useMemo(() => {
+    const limitScale = timeDivision === TimeDivision.SEMESTER ? 0.5 : 1.0
+
     return [
-      getChartData(students, timeSlots, stackOrdering, programme, false),
-      getChartData(students, timeSlots, stackOrdering, programme, true),
+      getChartData(students, timeSlots, stackOrdering, programme, limitScale, false),
+      getChartData(students, timeSlots, stackOrdering, programme, limitScale, true),
     ]
   }, [students, timeSlots, stackOrdering, programme])
 
