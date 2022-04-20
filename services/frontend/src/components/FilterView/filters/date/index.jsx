@@ -48,11 +48,11 @@ export default createFilter({
 
   filter(student, { startDate, endDate }) {
     student.courses = student.courses.filter(course => {
-      if (startDate && startDate.isAfter(course.date)) {
+      if (startDate && startDate.isAfter(course.date, 'day')) {
         return false
       }
 
-      if (endDate && endDate.isBefore(course.date)) {
+      if (endDate && endDate.isBefore(course.date, 'day')) {
         return false
       }
 
