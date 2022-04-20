@@ -27,7 +27,7 @@ const PopulationStatisticsLink = ({ studytrack, studyprogramme, year }) => {
 
 const TotalPopulationLink = ({ studytrack, studyprogramme, years }) => {
   const yearsString = years.join('&years=')
-  const months = getMonths(Math.min(...years.map(year => Number(year.value))))
+  const months = getMonths(Math.min(...years.map(year => Number(year))))
   const href = studytrack
     ? `/populations?months=${months}&semesters=FALL&semesters=` +
       `SPRING&studyRights=%7B"programme"%3A"${studyprogramme}"%2C"studyTrack"%3A"${studytrack}"%7D&year=${years[0].value}&years=${yearsString}`
