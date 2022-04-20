@@ -3,6 +3,7 @@ const { getBasicStatsForStudytrack } = require('../services/studyprogrammeBasics
 const { getCreditStatsForStudytrack } = require('../services/studyprogrammeCredits')
 const { getGraduationStatsForStudytrack } = require('../services/studyprogrammeGraduations')
 const { getStudytrackStatsForStudyprogramme } = require('../services/studytrackStats')
+const { getStudyprogrammeCoursesForStudytrack } = require('../services/studyprogrammeCourses')
 const {
   getBasicStats,
   setBasicStats,
@@ -57,6 +58,7 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
     let data = null
     try {
       data = await getCreditStats(code, yearType, specialGroups)
+      data = null
     } catch (e) {
       logger.error(`Failed to get code ${code} credit stats`)
     }
@@ -109,6 +111,28 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
     return res.json(data)
   } else {
     res.status(422).end()
+  }
+})
+
+router.get('/v2/studyprogrammes/:id/courseStats', async (req, res) => {
+  const code = req.params.id
+  if (code) {
+    let data = null
+    try {
+      data = null
+    } catch (e) {
+      logger.error(`Failed to get code ${code} graduation stats`)
+    }
+    if (!data) {
+      try {
+        data = await getStudyprogrammeCoursesForStudytrack(code)
+      } catch (e) {
+        logger.error(`Failed to get code ${code} programme courses stats: ${e}`)
+      }
+      return res.json(data)
+    } else {
+      res.status(422).end()
+    }
   }
 })
 
