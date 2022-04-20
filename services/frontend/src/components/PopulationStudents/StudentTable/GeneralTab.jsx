@@ -193,19 +193,71 @@ const GeneralTab = ({
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
-  let creditColumnTitle = 'Credits Since Start of Studyright'
+  let creditColumnTitle = 'Since Start of Studyright'
 
   if (creditDateFilterOptions) {
     const { startDate, endDate } = creditDateFilterOptions
 
     if (startDate && !endDate) {
-      creditColumnTitle = `Credits Since ${moment(startDate).format('DD.MM.YYYY')}`
+      creditColumnTitle = `Since ${moment(startDate).format('DD.MM.YYYY')}`
     } else if (endDate && !startDate) {
-      creditColumnTitle = `Credits Before ${moment(endDate).format('DD.MM.YYYY')}`
+      creditColumnTitle = `Before ${moment(endDate).format('DD.MM.YYYY')}`
     } else if (endDate && startDate) {
-      creditColumnTitle = `Credits Between ${moment(startDate).format('DD.MM.YYYY')} and ${moment(endDate).format(
+      creditColumnTitle = `Between ${moment(startDate).format('DD.MM.YYYY')} and ${moment(endDate).format(
         'DD.MM.YYYY'
       )}`
+    }
+  }
+
+  let creditsColumn = null
+  const creditColumnKeys = columnKeysToInclude.filter(k => k.indexOf('credits.') === 0)
+
+  const availableCreditsColumns = {
+    all: sole => ({
+      key: 'credits-all',
+      title: sole ? 'All Credits' : 'All',
+      filterType: 'range',
+      getRowVal: s => s.credits,
+    }),
+    hops: sole => ({
+      key: 'credits-hops',
+      title: sole ? 'Credits in HOPS' : 'HOPS',
+      filterType: 'range',
+      getRowVal: s => {
+        return s.hopsCredits
+      },
+    }),
+    studyright: sole => ({
+      key: 'credits-studyright',
+      title: sole ? `Credits ${creditColumnTitle}` : creditColumnTitle,
+      filterType: 'range',
+      getRowVal: s => {
+        const credits = getStudentTotalCredits(s)
+        return credits
+      },
+    }),
+    startYear: sole => ({
+      key: 'credits-startYear',
+      title: `${sole ? 'Credits ' : ''}Since ${group?.tags?.year}`,
+      filterType: 'range',
+      getRowVal: s => {
+        const credits = getStudentTotalCredits({
+          ...s,
+          courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags?.year, 7, 1)),
+        })
+        return credits
+      },
+    }),
+  }
+
+  if (creditColumnKeys.length === 1) {
+    const key = creditColumnKeys[0].split('.')[1]
+    creditsColumn = availableCreditsColumns[key](true)
+  } else if (creditColumnKeys.length > 1) {
+    creditsColumn = {
+      key: 'credits-parent',
+      title: 'Credits',
+      children: creditColumnKeys.map(key => availableCreditsColumns[key.split('.')[1]](false)),
     }
   }
 
@@ -248,33 +300,7 @@ const GeneralTab = ({
         },
       ],
     },
-    creditsInHops: {
-      key: 'creditsInHops',
-      title: 'Credits in study plan',
-      getRowVal: s => {
-        return s.hopsCredits
-      },
-    },
-    creditsSinceStart: {
-      key: 'creditsSinceStart',
-      title: creditColumnTitle,
-      filterType: 'range',
-      getRowVal: s => {
-        const credits = getStudentTotalCredits(s)
-        return credits
-      },
-    },
-    creditsSinceStartByYear: {
-      key: 'creditsSinceStartByYear',
-      title: `credits since ${group?.tags?.year}`,
-      getRowVal: s => {
-        const credits = getStudentTotalCredits({
-          ...s,
-          courses: s.courses.filter(c => new Date(c.date) > new Date(group?.tags?.year, 7, 1)),
-        })
-        return credits
-      },
-    },
+    credits: creditsColumn,
     gradeForSingleCourse: {
       key: 'gradeForSingleCourse',
       title: 'Grade',
@@ -286,12 +312,6 @@ const GeneralTab = ({
         }
         return ''
       },
-    },
-    allCredits: {
-      key: 'allCredits',
-      title: 'All Credits',
-      filterType: 'range',
-      getRowVal: s => s.allCredits,
     },
     transferredFrom: {
       key: 'transferredFrom',
@@ -433,18 +453,18 @@ const GeneralTab = ({
   }
   // Columns are shown in order they're declared above. JS guarantees this order of keys
   // to stay for non-integer keys
-  const orderOfColumns = Object.keys(columnsAvailable).reduce(
+  const orderOfColumns = Object.values(columnsAvailable).reduce(
     (acc, curr, ind) => ({
       ...acc,
-      [curr]: ind,
+      [curr.key]: ind,
     }),
     {}
   )
 
   const columns = _.chain(columnKeysToInclude)
     .map(colKey => columnsAvailable[colKey])
-    .sortBy(col => orderOfColumns[col.key])
     .filter(col => !!col)
+    .sortBy(col => orderOfColumns[col.key])
     .value()
 
   return (
@@ -482,7 +502,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   const getStudyGuidanceGroupColumns = () => {
     const cols = ['programme', 'startYear']
-    if (studyGuidanceGroup?.tags?.year) cols.push('creditsSinceStartByYear')
+    if (studyGuidanceGroup?.tags?.year) cols.push('credits.startYear')
     if (studyGuidanceGroup?.tags?.studyProgramme) cols.push('studyStartDate', 'studyStartDateActual', 'endDate')
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
       cols.push('admissionType')
@@ -494,9 +514,9 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     customPopulation: ['programme', 'startYear'],
     coursePopulation: ['gradeForSingleCourse', 'programme', 'passDate', 'language', 'startYear'],
     population: [
-      'creditsInHops',
-      'creditsSinceStart',
       'transferredFrom',
+      'credits.hops',
+      'credits.studyright',
       'priority',
       'extent',
       'studyStartDate',
@@ -508,7 +528,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
     studyGuidanceGroupPopulation: getStudyGuidanceGroupColumns(),
   }
 
-  const baseColumns = ['studentnumber-parent', 'allCredits', 'tags', 'updatedAt', 'option']
+  const baseColumns = ['credits', 'credits.all', 'studentnumber-parent', 'tags', 'updatedAt', 'option']
   const nameColumnsToAdd = namesVisible ? ['email', 'copyEmail', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'studyStartDate', 'updatedAt']
 

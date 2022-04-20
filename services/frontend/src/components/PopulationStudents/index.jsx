@@ -234,6 +234,7 @@ const CoursesTable = ({ students }) => {
                 </div>
               ),
               vertical: true,
+              forceToolsMode: 'dangling',
               cellProps: {
                 title: `${m.code}, ${getTextIn(m.name)}`,
                 style: {
