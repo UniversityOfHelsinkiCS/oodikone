@@ -364,7 +364,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
       if (!noDangling) {
         setToolsMode('dangling')
       } else {
-        setForcedTitleWidth(toolsWidth)
+        setForcedTitleWidth(toolsWidth - (cellWidth - titleWidth))
       }
     } else if (titleWidth + toolsWidth > cellWidth) {
       setToolsMode('floating')
@@ -396,54 +396,49 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
   )
 
   return (
-    <th
+    <SizeMeasurer
+      as="th"
       colSpan={colSpan}
       rowSpan={rowSpan}
+      onSizeChange={onCellSizeChange}
+      className={filterMenuOpen ? 'filter-menu-open' : 'filter-menu-closed'}
       style={{
         ...style,
         cursor: sortable ? 'pointer' : 'initial',
         verticalAlign: column.vertical ? 'top' : 'center',
         position: 'relative',
+        overflow: toolsMode === 'floating' ? 'hidden' : '',
       }}
-      className={filterMenuOpen ? 'filter-menu-open' : 'filter-menu-closed'}
+      onClick={() => {
+        if (sortable) {
+          dispatch({
+            type: 'TOGGLE_COLUMN_SORT',
+            payload: { column: filterColumnKey },
+          })
+        }
+      }}
     >
-      {toolsMode !== 'fixed' && (isFilterActive || isSortingActive) && (
-        <div
-          style={{
-            borderWidth: '7px',
-            borderStyle: 'solid',
-            borderColor: 'transparent transparent rgb(33, 133, 208)',
-            position: 'absolute',
-            bottom: 0,
-            right: '-7px',
-          }}
-        />
-      )}
-      <SizeMeasurer
-        onSizeChange={onCellSizeChange}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-        }}
-        onClick={() => {
-          if (sortable) {
-            dispatch({
-              type: 'TOGGLE_COLUMN_SORT',
-              payload: { column: filterColumnKey },
-            })
-          }
-        }}
-      >
-        <SizeMeasurer onSizeChange={onTitleSizeChange}>
-          <Orientable
-            orientation={column.vertical ? 'vertical' : 'horizontal'}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {toolsMode !== 'fixed' && (isFilterActive || isSortingActive) && (
+          <div
             style={{
-              flexGrow: 1,
-              display: 'flex',
-              alignItems: 'center',
-              minWidth: forcedTitleWidth,
+              borderWidth: '7px',
+              borderStyle: 'solid',
+              borderColor: 'transparent transparent rgb(33, 133, 208)',
+              position: 'absolute',
+              bottom: 0,
+              right: '-7px',
             }}
-          >
+          />
+        )}
+        <Orientable
+          orientation={column.vertical ? 'vertical' : 'horizontal'}
+          style={{
+            flexGrow: 1,
+            minWidth: forcedTitleWidth,
+          }}
+        >
+          <SizeMeasurer onSizeChange={onTitleSizeChange} style={{ display: 'inline-flex', alignItems: 'center' }}>
             {column.title}
             {column.helpText && forcedTitleWidth && <div style={{ flexGrow: 1 }} />}
             {column.helpText && (
@@ -452,8 +447,8 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
                 style={{ opacity: 0.5, display: 'inline-block', marginRight: 0, marginLeft: '0.5em', flexShrink: 0 }}
               />
             )}
-          </Orientable>
-        </SizeMeasurer>
+          </SizeMeasurer>
+        </Orientable>
         <div style={{ flexGrow: 1 }} />
         <SizeMeasurer onSizeChange={onToolsSizeChange} className={`column-tools ${toolsMode}`}>
           {sortable && (!hasChildren || column.mergeHeader) && (
@@ -525,8 +520,8 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
           )}
           {column.helpText && <Popup position="top center" trigger={helpIcon} content={column.helpText} />}
         </SizeMeasurer>
-      </SizeMeasurer>
-    </th>
+      </div>
+    </SizeMeasurer>
   )
 })
 
