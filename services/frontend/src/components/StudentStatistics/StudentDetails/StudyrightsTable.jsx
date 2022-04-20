@@ -127,7 +127,7 @@ const StudyrightsTable = ({
     const getCompletedCredits = courseCode => {
       const course = student.courses.find(course => course.course_code === courseCode)
 
-      if (!course) return 0
+      if (!course || !course.passed) return 0
 
       return course.credits
     }
