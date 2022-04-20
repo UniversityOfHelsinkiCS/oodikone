@@ -149,7 +149,16 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
                 studyright.extentcode = 1 -- Bachelor's
                 AND org.code NOT IN ('01', 'H02955')
                 AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
-                AND studyright.studystartdate IN ('2017-08-01 00:00:00+00', '2018-08-01 00:00:00+00', '2019-08-01 00:00:00+00')
+                AND studyright.studystartdate = ANY (
+                  SELECT MAKE_TIMESTAMPTZ(generate_series, 8, 1, 0, 0, 0)
+                  FROM generate_series(
+                    2017,
+                    CASE
+                      WHEN DATE_PART('month', NOW()) < 8 THEN DATE_PART('year', NOW())::integer - 2
+                      ELSE DATE_PART('year', NOW())::integer - 1
+                    END
+                  )
+                )
                 AND element_details.type IN (20,30) -- programme
                 ${!!codes && codes.length > 0 ? 'AND element_details.code IN (:codes)' : ''}
                 AND transfers.studyrightid IS NULL -- Not transferred within faculty
