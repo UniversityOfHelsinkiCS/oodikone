@@ -22,7 +22,7 @@ const baseSettings = {
 const sendEmail = async (options = {}) => {
   if (!isProduction) throw new ApplicationError('Email sending is disabled in development mode.')
   if (!pateToken) throw new ApplicationError('Email sending failed because pate token is missing.')
-  await pateClient.post('/', options)
+  return await pateClient.post('/', options)
 }
 
 const sendFeedbackToToska = async ({ feedbackContent, user }) => {
