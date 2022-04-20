@@ -365,8 +365,8 @@ const getProgrammesStudyrights = async studyprogramme =>
     })
   ).map(formatStudyright)
 
-const getCreditsForStudyProgramme = async (provider, since) =>
-  await Credit.findAll({
+const getCreditsForStudyProgramme = async (provider, since) => {
+  const res = await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
     include: {
       model: Course,
@@ -395,6 +395,78 @@ const getCreditsForStudyProgramme = async (provider, since) =>
       },
     },
   })
+  return res
+}
+
+/* const getStudentsForProgrammeCourses = async provider => {
+  console.log('provider: ', provider)
+  const res = await Credit.findAll({
+    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+    include: [
+      {
+        model: Course,
+        attributes: ['code'],
+        required: true,
+        where: {
+          is_study_module: false,
+        },
+        include: {
+          model: Organization,
+          required: true,
+          where: {
+            code: provider,
+          },
+        },
+      },
+      { model: Student, required: true, attributes: ['firstnames', 'lastname'] },
+    ],
+    where: {
+      credittypecode: {
+        [Op.notIn]: [10, 9, 7],
+      },
+      isStudyModule: {
+        [Op.not]: true,
+      },
+      attainment_date: {
+        [Op.between]: ['2020-08-01 00:00:00+00', '2021-07-31 00:00:00+00'],
+      },
+    },
+  })
+  return res
+} */
+
+const getStudentsForProgrammeCourses = async provider => {
+  const res = await Course.findAll({
+    attributes: ['code'],
+    include: [
+      {
+        model: Organization,
+        attributes: [],
+        required: true,
+        where: {
+          code: provider,
+        },
+      },
+      {
+        model: Credit,
+        attributes: ['student_studentnumber'],
+        include: { model: Student, required: true, attributes: ['studentnumber', 'firstnames', 'lastname'] },
+        where: {
+          credittypecode: {
+            [Op.notIn]: [10, 9, 7],
+          },
+          isStudyModule: {
+            [Op.not]: true,
+          },
+          attainment_date: {
+            [Op.between]: ['2020-08-01 00:00:00+00', '2021-07-31 00:00:00+00'],
+          },
+        },
+      },
+    ],
+  })
+  return res
+}
 
 const getTransferredCredits = async (provider, since) =>
   await Credit.findAll({
@@ -475,4 +547,5 @@ module.exports = {
   getCreditsForStudyProgramme,
   getTransferredCredits,
   getThesisCredits,
+  getStudentsForProgrammeCourses,
 }
