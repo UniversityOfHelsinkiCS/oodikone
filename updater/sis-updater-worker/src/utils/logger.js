@@ -1,22 +1,20 @@
 const winston = require('winston')
 const sentry = require('winston-sentry-log')
-const { isDev, sentryRelease, sentryEnvironment, runningInCI } = require('../config')
+const { isDev, sentryRelease, sentryEnvironment } = require('../config')
 const { combine, timestamp, printf, splat } = winston.format
 
 let transports = []
 
-if (!sentryRelease || !sentryEnvironment || runningInCI) {
-  const options = {
-    config: {
-      dsn: 'https://5fe012d12b7448d3b937f20ea941a8e5@sentry.cs.helsinki.fi/10',
-      environment: sentryEnvironment,
-      release: sentryRelease,
-    },
-    level: 'error',
-  }
-
-  transports.push(new sentry(options))
+const options = {
+  config: {
+    dsn: 'https://5fe012d12b7448d3b937f20ea941a8e5@sentry.cs.helsinki.fi/10',
+    environment: sentryEnvironment,
+    release: sentryRelease,
+  },
+  level: 'error',
 }
+
+transports.push(new sentry(options))
 
 if (isDev) {
   const devFormat = printf(
