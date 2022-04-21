@@ -60,7 +60,7 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
     })
   } catch (e) {
     if (entities.length === 1) {
-      logger.error({ message: 'Updater error', meta: { stack: e.stack, entity: entities[0] } })
+      logger.error({ message: e.message, meta: { stack: e.stack, entity: entities[0] } })
       return
     }
 
