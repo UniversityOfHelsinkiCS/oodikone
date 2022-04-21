@@ -1,6 +1,10 @@
-const sequelize = require('sequelize')
+const _ = require('lodash')
+const Sequelize = require('sequelize')
+const {
+  dbConnections: { sequelize },
+} = require('../database/connection')
 const moment = require('moment')
-const { Op } = sequelize
+const { Op } = Sequelize
 const {
   Credit,
   Course,
@@ -412,7 +416,8 @@ const getCreditsForStudyProgramme = async (provider, since) => {
         },
         include: {
           model: Organization,
-          required: true,
+          attributes: [],
+          // required: true,
           where: {
             code: provider,
           },
@@ -435,37 +440,52 @@ const getCreditsForStudyProgramme = async (provider, since) => {
   return res
 } */
 
-const getStudentsForProgrammeCourses = async provider => {
-  const res = await Course.findAll({
-    attributes: ['code'],
-    include: [
-      {
-        model: Organization,
-        attributes: [],
-        required: true,
-        where: {
-          code: provider,
-        },
-      },
-      {
-        model: Credit,
-        attributes: ['student_studentnumber'],
-        include: { model: Student, required: true, attributes: ['studentnumber', 'firstnames', 'lastname'] },
-        where: {
-          credittypecode: {
-            [Op.notIn]: [10, 9, 7],
+const getStudentsForProgrammeCourses = async (from, to, providerCode) => {
+  // console.log('from: ', from)
+  // console.log('to: ', to)
+  // console.log('providerCode: ', providerCode)
+  try {
+    const res = await Course.findAll({
+      attributes: ['code', 'id', [sequelize.fn('COUNT', sequelize.col('student_studentnumber')), 'total']],
+      include: [
+        {
+          model: Organization,
+          attributes: [],
+          required: true,
+          where: {
+            code: providerCode,
           },
-          isStudyModule: {
-            [Op.not]: true,
-          },
-          attainment_date: {
-            [Op.between]: ['2020-08-01 00:00:00+00', '2021-07-31 00:00:00+00'],
+          through: {
+            attributes: [],
           },
         },
-      },
-    ],
-  })
-  return res
+        {
+          model: Credit,
+          attributes: [],
+          // include: [{ model: Student, required: false, attributes: ['lastname'] }],
+          where: {
+            credittypecode: {
+              [Op.notIn]: [10, 9, 7],
+            },
+            isStudyModule: {
+              [Op.not]: true,
+            },
+            attainment_date: {
+              [Op.between]: [from, to],
+            },
+          },
+        },
+      ],
+      raw: true,
+      group: ['course.code', 'course.id'],
+      // logging: console.log,
+    })
+    const result = res.map(course => ({ ...course, total: parseInt(course.total) }))
+    return result
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error: ', e)
+  }
 }
 
 const getTransferredCredits = async (provider, since) =>
@@ -530,6 +550,23 @@ const getThesisCredits = async (provider, since, thesisType, studentnumbers) =>
     },
   })
 
+const getCurrentStudyYearStartDate = _.memoize(
+  async unixMillis =>
+    new Date(
+      (
+        await sequelize.query(
+          `
+      SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < :a ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
+      `,
+          {
+            type: sequelize.QueryTypes.SELECT,
+            replacements: { a: new Date(unixMillis) },
+          }
+        )
+      )[0].startdate
+    )
+)
+
 module.exports = {
   studytrackStudents,
   enrolledStudents,
@@ -548,4 +585,5 @@ module.exports = {
   getTransferredCredits,
   getThesisCredits,
   getStudentsForProgrammeCourses,
+  getCurrentStudyYearStartDate,
 }
