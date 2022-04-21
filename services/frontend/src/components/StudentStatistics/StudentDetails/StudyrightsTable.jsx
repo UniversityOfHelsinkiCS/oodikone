@@ -125,14 +125,17 @@ const StudyrightsTable = ({
     }
 
     const getCompletedCredits = courseCode => {
-      const course = student.courses.find(course => course.course_code === courseCode)
+      const courses = student.courses.filter(course => course.course_code === courseCode && course.passed)
 
-      if (!course || !course.passed) return 0
+      if (courses.length === 0) {
+        return 0
+      }
 
-      return course.credits
+      return Math.max(...courses.map(course => course.credits))
     }
 
     const courses = studyplans.map(sp => sp.included_courses).flat()
+
     const totalCredits =
       programmeCodes[0].includes('KH') || ['MH03_001', 'MH03_003'].includes(programmeCodes[0]) ? 180 : 120
     const completedCredits = courses.reduce((acc, course) => getCompletedCredits(course) + acc, 0)
