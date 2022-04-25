@@ -3,15 +3,16 @@ import DataVisitor from './DataVisitor'
 import { getColumnValue } from './common'
 
 export default class ValueVisitor extends DataVisitor {
-  constructor(columns) {
+  constructor(columns, exportMode = false) {
     super()
     this.columns = columns
+    this.exportMode = exportMode
     this.values = _.fromPairs(_.map(columns, c => [c.key, new Set()]))
   }
 
   visitRow(ctx) {
     this.columns.forEach(column => {
-      const value = getColumnValue(ctx, column)
+      const value = getColumnValue(ctx, column, this.exportMode)
       this.values[column.key].add(value)
     })
   }

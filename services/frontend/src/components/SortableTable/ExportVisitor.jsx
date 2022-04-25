@@ -1,13 +1,6 @@
 import _ from 'lodash'
 import DataVisitor from './DataVisitor'
-import { getColumnValue } from './common'
-
-const getColumnTitle = column => {
-  return [...(column.parents ?? []), column]
-    .filter(c => c.title)
-    .map(c => c.title)
-    .join(' - ')
-}
+import { getColumnTitle, getColumnValue } from './common'
 
 export default class ExportVisitor extends DataVisitor {
   constructor(columns) {
@@ -18,7 +11,7 @@ export default class ExportVisitor extends DataVisitor {
 
   visitRow(ctx) {
     const row = _.chain(this.columns)
-      .map(column => [getColumnTitle(column), getColumnValue(ctx, column)])
+      .map(column => [getColumnTitle(column), getColumnValue(ctx, column, true)])
       .fromPairs()
       .value()
 
