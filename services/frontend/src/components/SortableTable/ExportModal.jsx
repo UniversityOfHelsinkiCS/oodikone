@@ -5,7 +5,7 @@ import React, { useState, useMemo } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
 import _ from 'lodash'
 import xlsx from 'xlsx'
-import { getDataItemType, DataItemType } from './common'
+import { getColumnTitle, getDataItemType, DataItemType } from './common'
 import ValueVisitor from './ValueVisitor'
 import ExportVisitor from './ExportVisitor'
 
@@ -51,19 +51,12 @@ const flattenData = data => {
   return flat
 }
 
-const getColumnTitle = column => {
-  return [...(column.parents ?? []), column]
-    .filter(c => c.title)
-    .map(c => c.title)
-    .join(' - ')
-}
-
 const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
   const exportColumns = useMemo(() => getExportColumns(columns), [columns])
   const flatData = useMemo(() => flattenData(data), [data])
   const [selected, setSelected] = useState(_.uniq(_.map(exportColumns, 'key')))
 
-  const sampledValues = useMemo(() => ValueVisitor.visit(data, exportColumns).sample(10), [exportColumns, data])
+  const sampledValues = useMemo(() => ValueVisitor.visit(data, exportColumns, true).sample(10), [exportColumns, data])
 
   const handleExport = () => {
     const columns = exportColumns.filter(ec => _.includes(selected, ec.key))

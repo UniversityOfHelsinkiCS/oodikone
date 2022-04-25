@@ -28,10 +28,22 @@ export const group = (definition, children) => {
   }
 }
 
-export const getColumnValue = (ctx, column) => {
+export const getColumnValue = (ctx, column, exportMode = false) => {
+  if (exportMode && column.getRowExportVal) {
+    return column.getRowExportVal(ctx.item, ctx.isGroup, ctx.parents)
+  }
+
   if (column.getRowVal) {
     return column.getRowVal(ctx.item, ctx.isGroup, ctx.parents)
   }
 
   return null
+}
+
+export const getColumnTitle = column => {
+  return [...(column.parents ?? []), column]
+    .filter(c => c.textTitle !== null || (c.textTitle ?? c.title))
+    .map(c => c.textTitle ?? c.title)
+    .filter(c => typeof c === 'string')
+    .join(' - ')
 }

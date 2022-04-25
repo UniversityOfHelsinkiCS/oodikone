@@ -204,6 +204,7 @@ const CoursesTable = ({ students }) => {
       {
         key: 'general',
         title: <b>Labels:</b>,
+        textTitle: null,
         parent: true,
         children: nameColumns,
       },
@@ -217,6 +218,7 @@ const CoursesTable = ({ students }) => {
               <div style={{ color: 'gray', fontWeight: 'normal' }}>{e.id}</div>
             </div>
           ),
+          textTitle: e.code,
           children: sortBy(labelToMandatoryCourses[e.label], [
             m => {
               const res = m.code.match(/\d+/)
@@ -233,6 +235,7 @@ const CoursesTable = ({ students }) => {
                   <div style={{ color: 'gray', fontWeight: 'normal' }}>{getTextIn(m.name)}</div>
                 </div>
               ),
+              textTitle: m.code,
               vertical: true,
               forceToolsMode: 'dangling',
               cellProps: {
@@ -243,8 +246,20 @@ const CoursesTable = ({ students }) => {
                 },
               },
               headerProps: { title: `${m.code}, ${getTextIn(m.name)}` },
-              getRowVal: s =>
-                s.total ? getTotalRowVal(s, m) : JSON.stringify(hasPassedMandatory(s.studentNumber, m.code)),
+              getRowVal: s => {
+                if (s.total) {
+                  return getTotalRowVal(s, m)
+                }
+
+                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : 'Not passed'
+              },
+              getRowExportVal: s => {
+                if (s.total) {
+                  return getTotalRowVal(s, m)
+                }
+
+                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : 'Not passed'
+              },
               getRowContent: s => {
                 if (s.total) return getTotalRowVal(s, m)
                 return hasPassedMandatory(s.studentNumber, m.code) ? <Icon fitted name="check" color="green" /> : null
