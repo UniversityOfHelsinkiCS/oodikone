@@ -312,7 +312,12 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   }
 
   const getCourseCodesFromAttainment = attainment => {
-    if (attainment.course_unit_id) return [courseUnitIdToCode[attainment.course_unit_id]]
+    if (attainment.code) {
+      return [attainment.code.split('-').slice(0, -1).join('-')]
+    }
+    if (attainment.course_unit_id) {
+      return [courseUnitIdToCode[attainment.course_unit_id]]
+    }
 
     if (attainment.nodes) {
       return flatten(
