@@ -7,7 +7,7 @@ import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import produce from 'immer'
 import ExportModal from './ExportModal'
-import { group, getDataItemType, SortableTableContext, DataItemType } from './common'
+import { row, group, getDataItemType, SortableTableContext, DataItemType } from './common'
 import DefaultColumnFilter from './defaultFilter'
 import DateColumnFilter from './dateFilter'
 import RangeColumnFilter from './rangeFilter'
@@ -838,7 +838,10 @@ const SortableTable = ({
   const [columnSpans, columnDepth] = useMemo(() => computeColumnSpans(columns), [columns])
 
   const values = useMemo(
-    () => _.mapValues(ValueVisitor.visit(data, Object.values(columnsByKey)).values, set => [...set]),
+    () =>
+      _.mapValues(ValueVisitor.visit(data, Object.values(columnsByKey), { honourIgnoreFilters: true }).values, set => [
+        ...set,
+      ]),
     [data, columnsByKey]
   )
 
@@ -955,6 +958,6 @@ const SortableTable = ({
   )
 }
 
-export { group }
+export { group, row }
 
 export default SortableTable
