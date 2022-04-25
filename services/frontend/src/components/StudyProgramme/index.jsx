@@ -70,11 +70,12 @@ const StudyProgramme = props => {
         menuItem: 'Update statistics',
         render: () => <UpdateView studyprogramme={studyProgrammeId} />,
       })
+
+      panes.push({
+        menuItem: 'Degree Courses',
+        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
+      })
     }
-    panes.push({
-      menuItem: 'Degree Courses',
-      render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
-    })
     panes.push({
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />,
