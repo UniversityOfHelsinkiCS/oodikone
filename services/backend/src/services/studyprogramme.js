@@ -1,6 +1,10 @@
-const sequelize = require('sequelize')
+const _ = require('lodash')
+const Sequelize = require('sequelize')
+const {
+  dbConnections: { sequelize },
+} = require('../database/connection')
 const moment = require('moment')
-const { Op } = sequelize
+const { Op } = Sequelize
 const {
   Credit,
   Course,
@@ -365,8 +369,8 @@ const getProgrammesStudyrights = async studyprogramme =>
     })
   ).map(formatStudyright)
 
-const getCreditsForStudyProgramme = async (provider, since) =>
-  await Credit.findAll({
+const getCreditsForStudyProgramme = async (provider, since) => {
+  const res = await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
     include: {
       model: Course,
@@ -395,6 +399,94 @@ const getCreditsForStudyProgramme = async (provider, since) =>
       },
     },
   })
+  return res
+}
+
+/* const getStudentsForProgrammeCourses = async provider => {
+  console.log('provider: ', provider)
+  const res = await Credit.findAll({
+    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+    include: [
+      {
+        model: Course,
+        attributes: ['code'],
+        required: true,
+        where: {
+          is_study_module: false,
+        },
+        include: {
+          model: Organization,
+          attributes: [],
+          // required: true,
+          where: {
+            code: provider,
+          },
+        },
+      },
+      { model: Student, required: true, attributes: ['firstnames', 'lastname'] },
+    ],
+    where: {
+      credittypecode: {
+        [Op.notIn]: [10, 9, 7],
+      },
+      isStudyModule: {
+        [Op.not]: true,
+      },
+      attainment_date: {
+        [Op.between]: ['2020-08-01 00:00:00+00', '2021-07-31 00:00:00+00'],
+      },
+    },
+  })
+  return res
+} */
+
+const getStudentsForProgrammeCourses = async (from, to, providerCode) => {
+  // console.log('from: ', from)
+  // console.log('to: ', to)
+  // console.log('providerCode: ', providerCode)
+  try {
+    const res = await Course.findAll({
+      attributes: ['code', 'id', [sequelize.fn('COUNT', sequelize.col('student_studentnumber')), 'total']],
+      include: [
+        {
+          model: Organization,
+          attributes: [],
+          required: true,
+          where: {
+            code: providerCode,
+          },
+          through: {
+            attributes: [],
+          },
+        },
+        {
+          model: Credit,
+          attributes: [],
+          // include: [{ model: Student, required: false, attributes: ['lastname'] }],
+          where: {
+            credittypecode: {
+              [Op.notIn]: [10, 9, 7],
+            },
+            isStudyModule: {
+              [Op.not]: true,
+            },
+            attainment_date: {
+              [Op.between]: [from, to],
+            },
+          },
+        },
+      ],
+      raw: true,
+      group: ['course.code', 'course.id'],
+      // logging: console.log,
+    })
+    const result = res.map(course => ({ ...course, total: parseInt(course.total) }))
+    return result
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error: ', e)
+  }
+}
 
 const getTransferredCredits = async (provider, since) =>
   await Credit.findAll({
@@ -458,6 +550,23 @@ const getThesisCredits = async (provider, since, thesisType, studentnumbers) =>
     },
   })
 
+const getCurrentStudyYearStartDate = _.memoize(
+  async unixMillis =>
+    new Date(
+      (
+        await sequelize.query(
+          `
+      SELECT startdate FROM SEMESTERS s WHERE yearcode = (SELECT yearcode FROM SEMESTERS WHERE startdate < :a ORDER BY startdate DESC LIMIT 1) ORDER BY startdate LIMIT 1;
+      `,
+          {
+            type: sequelize.QueryTypes.SELECT,
+            replacements: { a: new Date(unixMillis) },
+          }
+        )
+      )[0].startdate
+    )
+)
+
 module.exports = {
   studytrackStudents,
   enrolledStudents,
@@ -475,4 +584,6 @@ module.exports = {
   getCreditsForStudyProgramme,
   getTransferredCredits,
   getThesisCredits,
+  getStudentsForProgrammeCourses,
+  getCurrentStudyYearStartDate,
 }

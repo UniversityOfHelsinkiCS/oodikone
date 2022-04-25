@@ -7,6 +7,7 @@ import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import BasicOverview from './BasicOverview'
 import StudytrackOverview from './StudytrackOverview'
+import ProgrammeCoursesOverview from './programmeCoursesOverview'
 import UpdateView from './UpdateView'
 import '../PopulationQueryCard/populationQueryCard.css'
 import { getTextIn } from '../../common'
@@ -65,16 +66,21 @@ const StudyProgramme = props => {
         />
       ),
     })
+    panes.push({
+      menuItem: 'Programme courses (NEW)',
+      render: () => <ProgrammeCoursesOverview />,
+    })
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
         render: () => <UpdateView studyprogramme={studyProgrammeId} />,
       })
+
+      panes.push({
+        menuItem: 'Degree Courses',
+        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
+      })
     }
-    panes.push({
-      menuItem: 'Degree Courses',
-      render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
-    })
     panes.push({
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />,
