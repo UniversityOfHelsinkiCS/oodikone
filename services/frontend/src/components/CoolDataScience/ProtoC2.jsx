@@ -7,6 +7,7 @@ import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-
 import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
+import moment from 'moment'
 import TSA from '../../common/tsa'
 import InfoToolTips from '../../common/InfoToolTips'
 import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
@@ -15,6 +16,8 @@ HighchartsCustomEvents(Highcharts)
 
 const ANALYTICS_CATEGORY = 'Trends'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
+
+const upToYear = moment().isBefore({ day: 1, month: 7 }) ? moment().year() - 2 : moment().year() - 1
 
 const defaultConfig = () => {
   return {
@@ -423,7 +426,7 @@ const ProtoC = ({
     return (
       <Segment>
         <div align="center">
-          <h2>Prototyyppi: Tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
+          <h2>Prototyyppi: Tavoiteaikaerittely, 2017-{upToYear} aloittaneet</h2>
         </div>
         <div align="center" style={{ marginTop: '10px' }}>
           <Button.Group>
@@ -479,7 +482,7 @@ const ProtoC = ({
   return (
     <Segment>
       <div align="center">
-        <h2>Kandiohjelmat: Tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
+        <h2>Kandiohjelmat: Tavoiteaikaerittely, 2017-{upToYear} aloittaneet</h2>
       </div>
       <DrilldownMessage />
       <div align="center" style={{ marginTop: '10px' }}>

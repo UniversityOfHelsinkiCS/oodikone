@@ -11,11 +11,16 @@ import TSA from '../../common/tsa'
 import InfoToolTips from '../../common/InfoToolTips'
 import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
 import ReactMarkdown from 'react-markdown'
+import moment from 'moment'
 
 HighchartsCustomEvents(Highcharts)
 
 const ANALYTICS_CATEGORY = 'Trends'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
+
+const upToYear = moment().isBefore({ day: 1, month: 7 })
+  ? moment().year() - 2
+  : moment().year() - 1
 
 const defaultConfig = (pointer = true) => {
   return {
@@ -70,9 +75,8 @@ const defaultConfig = (pointer = true) => {
             function round(x) {
               return Math.round(x * 100) / 100
             }
-            return `${point.index + 1}, ${point.category}, ${point.y}, ${round(point.percentage)}%, ${
-              point.series.name
-            }`
+            return `${point.index + 1}, ${point.category}, ${point.y}, ${round(point.percentage)}%, ${point.series.name
+              }`
           }
         }
       }
@@ -266,9 +270,8 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
     },
     yAxis: {
       title: {
-        text: ` ${
-          org ? `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${org.name}` : '% tiedekunnan opiskelijoista'
-        }`
+        text: ` ${org ? `2017-{upToYear} aloittaneet uudet kandiopiskelijat<br/>${org.name}` : '% tiedekunnan opiskelijoista'
+          }`
       }
     },
     series
@@ -347,7 +350,7 @@ const makeNonClickableChartConfig = programme => {
 
   return Highcharts.merge(defaultConfig(false), {
     title: {
-      text: `2017-2019 aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
+      text: `2017-{upToYear} aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
     },
     xAxis: {
       categories: programme.studytracks.map(data => data.name),
@@ -649,7 +652,7 @@ const ProtoC = ({
   return (
     <Segment>
       <div align="center">
-        <h2>Kandiohjelmat: Suhteellinen tavoiteaikaerittely, 2017-2019 aloittaneet</h2>
+        <h2>Kandiohjelmat: Suhteellinen tavoiteaikaerittely, 2017-{upToYear} aloittaneet</h2>
       </div>
       <DrilldownMessage />
       <SorterButtons />
