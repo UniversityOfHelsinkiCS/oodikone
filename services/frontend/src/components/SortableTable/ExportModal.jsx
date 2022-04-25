@@ -56,7 +56,10 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
   const flatData = useMemo(() => flattenData(data), [data])
   const [selected, setSelected] = useState(_.uniq(_.map(exportColumns, 'key')))
 
-  const sampledValues = useMemo(() => ValueVisitor.visit(data, exportColumns, true).sample(10), [exportColumns, data])
+  const sampledValues = useMemo(
+    () => ValueVisitor.visit(data, exportColumns, { exportMode: true }).sample(10),
+    [exportColumns, data]
+  )
 
   const handleExport = () => {
     const columns = exportColumns.filter(ec => _.includes(selected, ec.key))

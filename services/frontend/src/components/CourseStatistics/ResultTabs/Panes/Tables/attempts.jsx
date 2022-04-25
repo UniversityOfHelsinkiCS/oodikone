@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
+import { row } from 'components/SortableTable'
 import SortableTable from '../../../../SortableTable'
 import { getGradeSpread, getThesisGradeSpread, isThesisGrades, sortGrades } from '../util'
 
@@ -34,7 +35,7 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
       ? getThesisGradeSpread([grades], isRelative)
       : getGradeSpread([grades], isRelative)
 
-    return {
+    const mapped = {
       name,
       code,
       coursecode,
@@ -47,6 +48,12 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
       rowObfuscated,
       ..._.mapValues(gradeSpread, x => x[0]),
     }
+
+    if (mapped.name === 'Total') {
+      return row(mapped, { ignoreFilters: true })
+    }
+
+    return mapped
   })
 
 const resolveGrades = stats => {
@@ -121,9 +128,10 @@ const AttemptsTable = ({
       getSortableColumn({
         key: 'TIME',
         title: 'Time',
-        filterType: 'default',
+        filterType: 'range',
         cellProps: {},
-        getRowVal: s => s.code,
+        getRowVal: s => s.code + (2011 - 62),
+        getRowExportVal: s => s.name,
         getRowContent: s => (
           <div>
             {s.name}

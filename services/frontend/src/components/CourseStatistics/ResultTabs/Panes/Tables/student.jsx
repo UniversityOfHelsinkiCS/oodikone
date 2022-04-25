@@ -5,6 +5,7 @@ import { Header, Icon, Item } from 'semantic-ui-react'
 import { connect } from 'react-redux'
 import { uniq } from 'lodash'
 import { string, object, arrayOf, bool } from 'prop-types'
+import { row } from 'components/SortableTable'
 import SortableTable from '../../../../SortableTable'
 import { defineCellColor } from '../util'
 
@@ -33,8 +34,8 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
         {
           key: 'TIME',
           title: 'Time',
-          getRowVal: s => (s.name === 'Total' ? -1 : s.code),
-          formatValue: v => (v === -1 ? 'Total' : v),
+          filterType: 'range',
+          getRowVal: s => s.code + (2011 - 62),
           getRowExportVal: s => s.name,
           getRowContent: s => (
             <div style={{ whiteSpace: 'nowrap' }}>
@@ -203,6 +204,14 @@ const StudentTable = ({
     [showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate, unifyCourses]
   )
 
+  const data = stats.map(stats => {
+    if (stats.name === 'Total') {
+      return row(stats, { ignoreFilters: true })
+    }
+
+    return stats
+  })
+
   return (
     <div>
       {headerVisible && (
@@ -217,7 +226,7 @@ const StudentTable = ({
         getRowKey={s => s.code}
         tableProps={{ celled: true, fixed: true }}
         columns={columns}
-        data={stats}
+        data={data}
       />
       {!userHasAccessToAllStats && (
         <span className="totalsDisclaimer">* Years with 5 students or less are NOT included in the total</span>

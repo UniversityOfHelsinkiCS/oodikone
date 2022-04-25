@@ -4,6 +4,7 @@
 import { createContext } from 'use-context-selector'
 
 const DataItemTypeKey = Symbol('DATA_ITEM_TYPE')
+const RowOptionsKey = Symbol('ROW_OPTIONS')
 
 export const SortableTableContext = createContext(null)
 
@@ -26,6 +27,17 @@ export const group = (definition, children) => {
     children,
     [DataItemTypeKey]: DataItemType.Group,
   }
+}
+
+export const row = (data, options = {}) => {
+  return {
+    ...data,
+    [RowOptionsKey]: options,
+  }
+}
+
+export const getRowOptions = data => {
+  return data[RowOptionsKey] ?? {}
 }
 
 export const getColumnValue = (ctx, column, exportMode = false) => {

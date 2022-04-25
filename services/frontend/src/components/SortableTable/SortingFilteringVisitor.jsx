@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import DataVisitor from './DataVisitor'
-import { getColumnValue } from './common'
+import { getColumnValue, getRowOptions } from './common'
 
 export default class SortingFilteringVisitor extends DataVisitor {
   constructor(columns, state, filterTypes) {
@@ -50,6 +50,10 @@ export default class SortingFilteringVisitor extends DataVisitor {
   }
 
   visitRow(ctx) {
+    if (getRowOptions(ctx.item).ignoreFilters) {
+      return ctx.item
+    }
+
     const passes = _.chain(this.state.columnOptions)
       .toPairs()
       .filter(([, options]) => options.filterOptions !== undefined)

@@ -14,7 +14,7 @@ import { getStudentTagsByStudytrackAction } from '../../redux/tagstudent'
 
 import StudentNameVisibilityToggle from '../StudentNameVisibilityToggle'
 import '../PopulationCourseStats/populationCourseStats.css'
-import SortableTable from '../SortableTable'
+import SortableTable, { row } from '../SortableTable'
 import InfoBox from '../Info/InfoBox'
 import CheckStudentList from './CheckStudentList'
 import TagPopulation from '../TagPopulation'
@@ -288,7 +288,7 @@ const CoursesTable = ({ students }) => {
       mandatoryCourses.reduce((acc, e) => ({ ...acc, [e.code]: 0 }), { total: true })
     )
 
-    return [totals, ...students]
+    return [row(totals, { ignoreFilters: true }), ...students]
   }, [students, mandatoryCourses, hasPassedMandatory])
 
   return (
