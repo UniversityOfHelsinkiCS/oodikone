@@ -284,6 +284,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     from: new Date(startTime - diff * YEAR_TO_MILLISECONDS),
     to: new Date(startTime - (diff - 1) * YEAR_TO_MILLISECONDS),
   })
+
   const yearlyAccCreditsPromises = makeYearlyCreditsPromises(
     startYear,
     yearRange,
