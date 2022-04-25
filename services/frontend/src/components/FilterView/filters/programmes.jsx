@@ -7,6 +7,12 @@ import { getTextIn } from '../../../common'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import createFilter from './createFilter'
 
+const NO_PROGRAMME = {
+  code: '00000',
+  name: { en: 'No programme', fi: 'Ei ohjelmaa' },
+  startdate: '',
+}
+
 const ProgrammeFilterCard = ({
   options,
   onOptionsChange,
@@ -45,20 +51,23 @@ const ProgrammeFilterCard = ({
   const dropdownOptions = useMemo(
     () =>
       _.chain(visibleProgrammes)
-        .concat(selectedProgrammes.map(code => programmes.find(p => p.code === code)))
-        .map(program => ({
-          key: `programme-filter-value-${program.code}`,
-          text: getTextIn(program.name, language),
-          value: program.code,
-          content: (
-            <>
-              {getTextIn(program.name, language)}{' '}
-              <span style={{ color: 'rgb(136, 136, 136)', whiteSpace: 'nowrap' }}>
-                ({program.studentCount} students)
-              </span>
-            </>
-          ),
-        }))
+        .concat(selectedProgrammes.map(code => programmes.find(p => p && p.code === code)))
+        .map(program => {
+          const code = program?.code ?? NO_PROGRAMME.code
+          const name = program?.name ?? NO_PROGRAMME.name
+          const studentCount = program?.studentCount ?? -1
+          return {
+            key: `programme-filter-value-${code}`,
+            text: getTextIn(name, language),
+            value: code,
+            content: (
+              <>
+                {getTextIn(name, language)}{' '}
+                <span style={{ color: 'rgb(136, 136, 136)', whiteSpace: 'nowrap' }}>({studentCount} students)</span>
+              </>
+            ),
+          }
+        })
         .uniqBy('value')
         .sort((a, b) => a.text.localeCompare(b.text))
         .value(),
@@ -162,7 +171,10 @@ const createStudentToProgrammeMap = (students, studyRightPredicate) => {
   const studentProgrammePairs = []
 
   students.forEach(student => {
-    getStudentProgrammes(student).forEach(programme => {
+    const studentProgrammes = getStudentProgrammes(student)
+    if (!studentProgrammes.length)
+      studentProgrammePairs.push({ student, programme: { ...NO_PROGRAMME, element_detail: { ...NO_PROGRAMME } } })
+    studentProgrammes.forEach(programme => {
       studentProgrammePairs.push({ student, programme })
     })
   })
@@ -180,7 +192,7 @@ const createStudentToProgrammeMap = (students, studyRightPredicate) => {
 
 const MODE_PREDICATES = {
   any: () => true,
-  active: (_, sre) => moment().isBetween(sre.startdate, sre.enddate, 'day', '[]'),
+  active: (_, sre) => sre.code === NO_PROGRAMME.code || moment().isBetween(sre.startdate, sre.enddate, 'day', '[]'),
 }
 
 const filter = createFilter({
