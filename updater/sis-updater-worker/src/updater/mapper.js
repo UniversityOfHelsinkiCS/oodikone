@@ -164,16 +164,27 @@ const creditMapper =
 
     let course_id = !isModule(type) ? courseUnitIdToCourseGroupId[course_unit_id] : module_group_id
 
-    // check if ay code or no ay code but ay studyright
     let is_open = false
-    if (study_right_id !== null && course_code) {
+
+    // check if ay code or ay studyright or ay responsible organisation
+    if (course_code) {
       if (!isModule(type)) {
         if (course_code.match(/^AY?(.+?)(?:en|fi|sv)?$/)) {
           is_open = true
         } else {
-          const organisationName = studyrightIdToOrganisationsName[study_right_id]
-          if (organisationName) {
-            if (organisationName['fi'].startsWith('Avoin yliopisto')) {
+          if (study_right_id !== null) {
+            const organisationName = studyrightIdToOrganisationsName[study_right_id]
+            if (organisationName) {
+              if (organisationName['fi'].startsWith('Avoin yliopisto')) {
+                is_open = true
+              }
+            }
+          } else {
+            if (
+              organisations
+                .filter(({ roleUrn }) => roleUrn === 'urn:code:organisation-role:responsible-organisation')
+                .some(org => org.organisationid === 'hy-org-48645785')
+            ) {
               is_open = true
             }
           }
@@ -183,8 +194,6 @@ const creditMapper =
 
     // These are leaf attainments that have no other attainments attached to them
     const isStudyModule = nodes && nodes[0] !== undefined
-
-    // console.log('isOpen: ', is_open)
 
     return {
       id: id,
