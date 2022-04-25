@@ -56,7 +56,13 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
         return (
           <Dropdown.Item
             icon={<Icon name={icon} style={{ color }} />}
-            text={text ? `${text}` : <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>}
+            text={
+              text !== undefined && text !== null ? (
+                `${text}`
+              ) : (
+                <span style={{ color: 'gray', fontStyle: 'italic' }}>Empty</span>
+              )
+            }
             onClick={evt => {
               dispatch({
                 type: 'CYCLE_VALUE_FILTER',
