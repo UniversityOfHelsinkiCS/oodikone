@@ -108,7 +108,7 @@ const FigureContainer = ({ children, style }) => {
           height: '100% !important',
         }}
       >
-        <div style={{ inset: 0, position: 'absolute', zIndex: 9004, height: '100000vh' }}>
+        <div style={{ inset: 0, position: 'absolute', zIndex: 900, height: '100000vh' }}>
           {isFullscreen && <OutPortal node={portalNode} />}
         </div>
       </Portal>
