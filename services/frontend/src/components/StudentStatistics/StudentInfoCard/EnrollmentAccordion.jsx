@@ -10,6 +10,7 @@ const enrolmentTypes = {
   2: 'Absent',
   3: 'Passive',
 }
+const curDate = new Date()
 
 const getEnrollmentStatus = (semester, season) => {
   if (semester.name.en.includes('Spring') && season === 'SPRING') {
@@ -34,6 +35,10 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
     return groupedEnrollments[b][0].semestercode - groupedEnrollments[a][0].semestercode
   })
 
+  if (curDate < new Date(curDate.getFullYear(), 7, 1)) {
+    sortedKeys.shift()
+  }
+
   return (
     <div className={active ? 'enrollmentAccordion' : ''}>
       <Accordion>
@@ -53,8 +58,7 @@ const EnrollmentAccordion = ({ semesterEnrollments }) => {
             <Table.Body>
               {sortedKeys.map(key => {
                 const semester = groupedEnrollments[key]
-                const date = new Date()
-                return semester[0].startYear <= date.getFullYear() ? (
+                return semester[0].startYear <= curDate.getFullYear() ? (
                   <Table.Row key={key}>
                     <Table.Cell>{key}</Table.Cell>
 
