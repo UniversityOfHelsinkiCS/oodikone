@@ -3,6 +3,7 @@ const { getBasicStatsForStudytrack } = require('../services/studyprogrammeBasics
 const { getCreditStatsForStudytrack } = require('../services/studyprogrammeCredits')
 const { getGraduationStatsForStudytrack } = require('../services/studyprogrammeGraduations')
 const { getStudytrackStatsForStudyprogramme } = require('../services/studytrackStats')
+const { getStudyprogrammeCoursesForStudytrack } = require('../services/studyprogrammeCourses')
 const {
   getBasicStats,
   setBasicStats,
@@ -57,6 +58,7 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
     let data = null
     try {
       data = await getCreditStats(code, yearType, specialGroups)
+      data = null
     } catch (e) {
       logger.error(`Failed to get code ${code} credit stats`)
     }
@@ -109,6 +111,40 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
     return res.json(data)
   } else {
     res.status(422).end()
+  }
+})
+
+router.get('/v2/studyprogrammes/:id/courseStats', async (req, res) => {
+  const code = req.params.id
+  // const { date: unixMillis, showByYear = false } = req.query
+  // const date = new Date(Number(unixMillis))
+  const date = new Date()
+  const endOfToday = new Date()
+  endOfToday.setHours(23, 59, 59, 999)
+
+  if (isNaN(date.getTime()) || date.getTime() > endOfToday.getTime()) {
+    return res.status(400).json({ error: 'Invalid date' })
+  }
+  // End of day
+  date.setHours(23, 59, 59, 999)
+
+  if (code) {
+    let data = null
+    try {
+      data = null
+    } catch (e) {
+      logger.error(`Failed to get code ${code} graduation stats`)
+    }
+    if (!data) {
+      try {
+        data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code)
+      } catch (e) {
+        logger.error(`Failed to get code ${code} programme courses stats: ${e}`)
+      }
+      return res.json(data)
+    } else {
+      res.status(422).end()
+    }
   }
 })
 
