@@ -36,6 +36,12 @@ import FilterView from '../FilterView'
 import useLanguage from '../LanguagePicker/useLanguage'
 import { queryParamsFromUrl } from '../../common/query'
 
+const NO_PROGRAMME = {
+  code: '00000',
+  name: { en: 'No programme', fi: 'Ei ohjelmaa' },
+  startdate: '',
+}
+
 const CoursePopulation = ({
   getCoursePopulationDispatch,
   getSingleCourseStatsDispatch,
@@ -301,7 +307,7 @@ const CoursePopulation = ({
       .max()
       .value()
 
-    return moment(date).isBetween(sre.startdate, sre.enddate, 'day', '[]')
+    return sre.code === NO_PROGRAMME.code || moment(date).isBetween(sre.startdate, sre.enddate, 'day', '[]')
   }
 
   return (

@@ -24,6 +24,9 @@ const studyprogrammeApi = RTKApi.injectEndpoints({
     updateStudytrackView: builder.query({
       query: ({ id }) => `/v2/studyprogrammes/${id}/update_studytrackview`,
     }),
+    getProgrammeCoursesStats: builder.query({
+      query: ({ id, academicyear }) => `/v2/studyprogrammes/${id}/coursestats?academicyear=${academicyear}`,
+    }),
   }),
   overrideExisting: false,
 })
@@ -35,4 +38,5 @@ export const {
   useGetStudytrackStatsQuery,
   useUpdateBasicViewQuery,
   useUpdateStudytrackViewQuery,
+  useGetProgrammeCoursesStatsQuery,
 } = studyprogrammeApi
