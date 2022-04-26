@@ -97,7 +97,7 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
           acc[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
         }
       }
-      if (!acc[curr.faculty_code]['yearly'][data.year])
+      if (!acc[curr.faculty_code]?.['yearly'][data.year])
         acc[curr.faculty_code]['yearly'][data.year] = { acc: 0, total: 0 }
       // init programme
       if (!acc[curr.faculty_code]['drill'][curr.code]) {
