@@ -66,10 +66,7 @@ const StudyProgramme = props => {
         />
       ),
     })
-    panes.push({
-      menuItem: 'Programme courses (NEW)',
-      render: () => <ProgrammeCoursesOverview />,
-    })
+
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
@@ -77,10 +74,22 @@ const StudyProgramme = props => {
       })
 
       panes.push({
-        menuItem: 'Degree Courses',
-        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
+        menuItem: 'Programme courses (NEW)',
+        render: () => (
+          <ProgrammeCoursesOverview
+            academicYear={academicYear}
+            studyProgramme={studyProgrammeId}
+            setAcademicYear={setAcademicYear}
+          />
+        ),
       })
     }
+
+    panes.push({
+      menuItem: 'Degree Courses',
+      render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
+    })
+
     panes.push({
       menuItem: 'Tags',
       render: () => <Tags studyprogramme={studyProgrammeId} />,

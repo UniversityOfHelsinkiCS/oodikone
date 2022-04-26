@@ -114,8 +114,9 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
   }
 })
 
-router.get('/v2/studyprogrammes/:id/courseStats', async (req, res) => {
+router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
   const code = req.params.id
+  const showByYear = req.query?.academicyear
   // const { date: unixMillis, showByYear = false } = req.query
   // const date = new Date(Number(unixMillis))
   const date = new Date()
@@ -137,7 +138,7 @@ router.get('/v2/studyprogrammes/:id/courseStats', async (req, res) => {
     }
     if (!data) {
       try {
-        data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code)
+        data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear)
       } catch (e) {
         logger.error(`Failed to get code ${code} programme courses stats: ${e}`)
       }
