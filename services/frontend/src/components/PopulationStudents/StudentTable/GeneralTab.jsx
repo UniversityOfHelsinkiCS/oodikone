@@ -217,7 +217,7 @@ const GeneralTab = ({
       key: 'credits-all',
       title: sole ? 'All Credits' : 'All',
       filterType: 'range',
-      getRowVal: s => s.credits,
+      getRowVal: s => s.allCredits,
     }),
     hops: sole => ({
       key: 'credits-hops',
