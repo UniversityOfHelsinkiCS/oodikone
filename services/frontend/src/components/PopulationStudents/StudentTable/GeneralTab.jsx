@@ -114,6 +114,8 @@ const GeneralTab = ({
     return studentTags.join(', ')
   }
 
+  const semesterEnrollments = enrollments => enrollments.filter(e => e.enrollmenttype === 1).length
+
   const mainProgramme = (studyrights, studentNumber) => {
     const programme = getNewestProgramme(
       studyrights,
@@ -333,6 +335,11 @@ const GeneralTab = ({
       title: 'extent',
       getRowVal: s => extentCodes(s.studyrights),
     },
+    semesterEnrollments: {
+      key: 'semesterEnrollments',
+      title: 'semesters',
+      getRowVal: s => semesterEnrollments(s.semesterenrollments),
+    },
     tags: {
       key: 'tags',
       title: 'Tags',
@@ -519,6 +526,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
       'credits.studyright',
       'priority',
       'extent',
+      'semesterEnrollments',
       'studyStartDate',
       'studyStartDateActual',
       'endDate',

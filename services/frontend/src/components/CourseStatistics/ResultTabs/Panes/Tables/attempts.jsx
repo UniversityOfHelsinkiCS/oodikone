@@ -1,24 +1,13 @@
 import React from 'react'
 import qs from 'query-string'
-import _, { uniq, flatten } from 'lodash'
+import _, { uniq } from 'lodash'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { Header, Icon, Item } from 'semantic-ui-react'
 
 import { row } from 'components/SortableTable'
 import SortableTable from '../../../../SortableTable'
-import { getGradeSpread, getThesisGradeSpread, isThesisGrades, sortGrades } from '../util'
-
-const getSortableColumn = opts => ({
-  filterType: 'range',
-  cellProps: s => ({
-    style: {
-      textAlign: 'right',
-      color: s.rowObfuscated ? 'gray' : 'inherit',
-    },
-  }),
-  ...opts,
-})
+import { getGradeSpread, getThesisGradeSpread, isThesisGrades, resolveGrades, getSortableColumn } from '../util'
 
 const getTableData = (stats, useThesisGrades, isRelative) =>
   stats.map(stat => {
@@ -55,36 +44,6 @@ const getTableData = (stats, useThesisGrades, isRelative) =>
 
     return mapped
   })
-
-const resolveGrades = stats => {
-  const failedGrades = ['eisa', 'hyl.', 'hyl', '0', 'luop']
-  const otherPassedGrades = ['hyv.', 'hyv']
-
-  const allGrades = [
-    '0',
-    ...flatten(
-      stats.map(({ attempts }) =>
-        [...Object.keys(attempts.grades)].map(grade => {
-          const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
-          if (failedGrades.includes(parsedGrade.toLowerCase())) return '0'
-          if (parsedGrade === 'LA') return 'LUB' // merge LA and LUB grades
-          return parsedGrade
-        })
-      )
-    ),
-  ]
-
-  // If any of grades 1-5 is present, make sure that full the grade scale is present
-  if (allGrades.filter(grade => ['1', '2', '3', '4', '5'].includes(grade)).length)
-    allGrades.push(...['1', '2', '3', '4', '5'])
-  const grades = [...new Set(allGrades)]
-
-  return grades.sort(sortGrades).map(grade => {
-    if (grade === '0') return { key: grade, title: 'Failed' }
-    if (otherPassedGrades.includes(grade.toLowerCase())) return { key: grade, title: 'Other passed' }
-    return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
-  })
-}
 
 const getGradeColumns = grades =>
   grades.map(({ key, title }) =>

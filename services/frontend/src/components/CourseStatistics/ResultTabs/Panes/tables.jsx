@@ -42,7 +42,6 @@ export const TablesSettings = ({ value, onChange, availableStats }) => {
             toggle
             label="Show grades"
             data-cy="gradeToggle"
-            disabled={viewMode !== 'ATTEMPTS'}
             checked={showGrades}
             onChange={() => onChange({ ...value, showGrades: !showGrades })}
           />
