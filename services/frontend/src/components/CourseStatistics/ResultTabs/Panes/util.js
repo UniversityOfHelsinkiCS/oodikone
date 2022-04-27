@@ -1,4 +1,5 @@
 import { arrayOf, number, oneOfType, shape, string, oneOf } from 'prop-types'
+import { flatten } from 'lodash'
 
 const gradesMap = {
   0: 0,
@@ -48,6 +49,47 @@ export const isThesisGrades = grades => Object.keys(grades).some(k => THESIS_GRA
 export const isThesisSeries = series => series && series.some(s => isThesisGrades(s))
 
 export const absoluteToRelative = all => (p, i) => p / all[i] || 0
+
+export const resolveGrades = stats => {
+  const failedGrades = ['eisa', 'hyl.', 'hyl', '0', 'luop']
+  const otherPassedGrades = ['hyv.', 'hyv']
+
+  const allGrades = [
+    '0',
+    ...flatten(
+      stats.map(({ students }) =>
+        [...Object.keys(students.grades)].map(grade => {
+          const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
+          if (failedGrades.includes(parsedGrade.toLowerCase())) return '0'
+          if (parsedGrade === 'LA') return 'LUB' // merge LA and LUB grades
+          return parsedGrade
+        })
+      )
+    ),
+  ]
+
+  // If any of grades 1-5 is present, make sure that full the grade scale is present
+  if (allGrades.filter(grade => ['1', '2', '3', '4', '5'].includes(grade)).length)
+    allGrades.push(...['1', '2', '3', '4', '5'])
+  const grades = [...new Set(allGrades)]
+
+  return grades.sort(sortGrades).map(grade => {
+    if (grade === '0') return { key: grade, title: 'Failed' }
+    if (otherPassedGrades.includes(grade.toLowerCase())) return { key: grade, title: 'Other passed' }
+    return { key: grade, title: grade.charAt(0).toUpperCase() + grade.slice(1) }
+  })
+}
+
+export const getSortableColumn = opts => ({
+  filterType: 'range',
+  cellProps: s => ({
+    style: {
+      textAlign: 'right',
+      color: s.rowObfuscated ? 'gray' : 'inherit',
+    },
+  }),
+  ...opts,
+})
 
 export const getThesisGradeSpread = (series, isRelative) => {
   const thesisGradeAccumulator = {
