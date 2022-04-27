@@ -1,3 +1,9 @@
+const parseGrade = grade => {
+  const parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
+  if (parsedGrade === 'LA') return 'LUB' // merge LA and LUB grades
+  return parsedGrade
+}
+
 const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
   const totals = formattedStats.reduce(
     (acc, curr) => {
@@ -8,10 +14,10 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
       let { passed } = acc.attempts.categories
       let { failed } = acc.attempts.categories
       const cgrades = acc.attempts.grades
+      const bestEffortGrades = acc.students.grades
 
       Object.keys(curr.attempts.grades).forEach(grade => {
-        let parsedGrade = Number(grade) ? Math.round(Number(grade)).toString() : grade
-        if (parsedGrade === 'LA') parsedGrade = 'LUB' // merge LA and LUB grades
+        const parsedGrade = parseGrade(grade)
         if (!cgrades[parsedGrade]) cgrades[parsedGrade] = 0
         cgrades[parsedGrade] += curr.attempts.grades[grade]
 
@@ -20,6 +26,12 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
         } else {
           passed += curr.attempts.grades[grade]
         }
+      })
+
+      Object.keys(curr.students.grades).forEach(grade => {
+        const parsedGrade = parseGrade(grade)
+        if (!bestEffortGrades[parsedGrade]) bestEffortGrades[parsedGrade] = 0
+        bestEffortGrades[parsedGrade] += curr.students.grades[grade]
       })
 
       const { passedFirst, passedEventually, neverPassed } = curr.students.categories
@@ -66,6 +78,7 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
             passedEventually: newPassedEventually,
             neverPassed: newNeverPassed,
           },
+          grades: bestEffortGrades,
           enrollmentsByState: { ...acc.students.enrollmentsByState },
           withEnrollments: {
             total: acc.students.withEnrollments.total + curr.students.withEnrollments.total,
@@ -99,6 +112,7 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
           passedEventually: 0,
           neverPassed: 0,
         },
+        grades: {},
         passRate: 0,
         failRate: 0,
         total: 0,

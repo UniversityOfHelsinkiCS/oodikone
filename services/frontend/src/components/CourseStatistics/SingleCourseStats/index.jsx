@@ -191,7 +191,7 @@ const SingleCourseStats = ({
 
   const countStudentStats = (allstudents, enrolledNoGrade = 0, filter) => {
     const categories = countFilteredStudents(allstudents.categories, filter)
-
+    const grades = countFilteredStudents(allstudents.grades, filter)
     const { passedFirst = 0, passedEventually = 0, neverPassed = 0 } = categories
     const total = passedFirst + passedEventually + neverPassed
     const passRate = (passedFirst + passedEventually) / total
@@ -210,6 +210,7 @@ const SingleCourseStats = ({
       failRate,
       total,
       withEnrollments,
+      grades,
     }
   }
 
