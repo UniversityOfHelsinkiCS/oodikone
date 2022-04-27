@@ -54,6 +54,7 @@ class CourseYearlyStatsCounter {
           passedEventually: [],
           neverPassed: [],
         },
+        grades: {},
         studentnumbers: [],
       },
       enrollments: [],
@@ -130,6 +131,7 @@ class CourseYearlyStatsCounter {
       this.initGroup(groupcode, groupname, coursecode, yearcode)
     }
     this.markCreditToAttempts(studentnumber, passed, grade, groupcode)
+    this.markBestEffortGrade(studentnumber, passed, grade, groupcode)
   }
 
   markEnrollmentToGroup(studentnumber, state, enrollment_date_time, groupcode, groupname, coursecode, yearcode) {
@@ -158,6 +160,19 @@ class CourseYearlyStatsCounter {
     } else {
       categories.failed.push(studentnumber)
     }
+  }
+
+  markBestEffortGrade(studentnumber, passed, grade, groupcode) {
+    const current = this.groups[groupcode].students.grades[studentnumber]
+
+    if (!current) {
+      this.groups[groupcode].students.grades[studentnumber] = { grade, passed }
+      return
+    }
+
+    if (current.passed && !passed) return
+    if (current.passed && Number(current.grade) >= Number(grade)) return
+    this.groups[groupcode].students.grades[studentnumber] = { grade, passed }
   }
 
   markCreditToStudentCategories(studentnumber, passed, attainment_date, groupcode) {
@@ -225,8 +240,17 @@ class CourseYearlyStatsCounter {
     }
 
     const groupStatistics = Object.values(this.groups).map(({ ...rest }) => {
+      const { students } = rest
+      const grades = {}
+      Object.keys(students.grades).forEach(student => {
+        const { grade, passed } = students.grades[student]
+        const parsed = passed ? grade : '0'
+        if (!grades[parsed]) grades[parsed] = []
+        grades[parsed].push(student)
+      })
       const normalStats = {
         ...rest,
+        students: { ...students, grades },
       }
 
       if (anonymizationSalt && normalStats.students.studentnumbers.length < 6) {

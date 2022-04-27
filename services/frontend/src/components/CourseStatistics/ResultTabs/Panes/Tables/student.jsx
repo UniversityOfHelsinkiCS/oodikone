@@ -7,11 +7,30 @@ import { uniq } from 'lodash'
 import { string, object, arrayOf, bool } from 'prop-types'
 import { row } from 'components/SortableTable'
 import SortableTable from '../../../../SortableTable'
-import { defineCellColor } from '../util'
+import { defineCellColor, resolveGrades, getSortableColumn } from '../util'
 
 const formatPercentage = p => `${(p * 100).toFixed(2)} %`
 
-const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate, unifyCourses) => {
+const getGradeColumns = grades =>
+  grades.map(({ key, title }) =>
+    getSortableColumn({
+      key,
+      title,
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.students.grades[key] || 0),
+      onlyInGradeView: true,
+    })
+  )
+
+const getColumns = (
+  stats,
+  showDetails,
+  showEnrollments,
+  showGrades,
+  userHasAccessToAllStats,
+  alternatives,
+  separate,
+  unifyCourses
+) => {
   const showPopulation = (yearcode, years) => {
     const queryObject = {
       from: yearcode,
@@ -93,6 +112,7 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
           color: s.rowObfuscated ? 'gray' : 'inherit',
         },
       }),
+      hideWhenGradesVisible: true,
     },
     {
       key: 'TOTAL_FAILED',
@@ -105,7 +125,9 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
           color: s.rowObfuscated ? 'gray' : 'inherit',
         },
       }),
+      hideWhenGradesVisible: true,
     },
+    ...getGradeColumns(resolveGrades(stats)),
     {
       key: 'ENROLLMENTS_MISSING_GRADE',
       title: 'Enrolled no grade',
@@ -187,21 +209,33 @@ const getColumns = (showDetails, showEnrollments, userHasAccessToAllStats, alter
   return columns.filter(column => {
     if (showDetails && column.onlyInDetailedView) return true
     if (showEnrollments && column.onlyInEnrollmentView) return true
-    return !column.onlyInDetailedView && !column.onlyInEnrollmentView
+    if (showGrades && column.onlyInGradeView) return true
+    if (showGrades && column.hideWhenGradesVisible) return false
+    return !column.onlyInDetailedView && !column.onlyInEnrollmentView && !column.onlyInGradeView
   })
 }
 
 const StudentTable = ({
   data: { name, stats },
-  settings: { showDetails, showEnrollments, separate },
+  settings: { showDetails, showEnrollments, separate, showGrades },
   alternatives,
   unifyCourses,
   userHasAccessToAllStats,
   headerVisible = false,
 }) => {
   const columns = useMemo(
-    () => getColumns(showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate, unifyCourses),
-    [showDetails, showEnrollments, userHasAccessToAllStats, alternatives, separate, unifyCourses]
+    () =>
+      getColumns(
+        stats,
+        showDetails,
+        showEnrollments,
+        showGrades,
+        userHasAccessToAllStats,
+        alternatives,
+        separate,
+        unifyCourses
+      ),
+    [stats, showDetails, showEnrollments, showGrades, userHasAccessToAllStats, alternatives, separate, unifyCourses]
   )
 
   const data = stats.map(stats => {
