@@ -8,6 +8,8 @@ const StudyrightService = require('../services/studyrights')
 const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
+const { mapToProviders } = require('../util/utils')
+
 const { ApplicationError } = require('../util/customErrors')
 
 const filterPersonalTags = (population, userId) => {
@@ -276,7 +278,7 @@ router.get('/v3/populationstatisticsbytag', async (req, res) => {
 router.get('/v3/populationstatisticsbycourse', async (req, res) => {
   const { coursecodes, from, to, separate: sep, unifyCourses } = req.query
   const {
-    user: { id, isAdmin, studentsUserCanAccess: allStudentsUserCanAccess },
+    user: { id, isAdmin, studentsUserCanAccess: allStudentsUserCanAccess, rights },
   } = req
   const separate = sep ? JSON.parse(sep) : false
 
@@ -311,10 +313,15 @@ router.get('/v3/populationstatisticsbycourse', async (req, res) => {
     },
     studentnumbers
   )
+  let courseproviders = []
+  if (!isAdmin) {
+    courseproviders = await CourseService.getCourseProvidersForCourses(JSON.parse(coursecodes))
+  }
+  const rightsMappedToProviders = mapToProviders(rights)
+  const found = courseproviders.some(r => rightsMappedToProviders.includes(r))
 
-  const studentsUserCanAccess = isAdmin
-    ? new Set(studentnumbers)
-    : new Set(_.intersection(studentnumbers, allStudentsUserCanAccess))
+  const studentsUserCanAccess =
+    isAdmin || found ? new Set(studentnumbers) : new Set(_.intersection(studentnumbers, allStudentsUserCanAccess))
 
   const randomHash = crypto.randomBytes(12).toString('hex')
   const obfuscateStudent = ({ studyrights, studentNumber, courses, gender_code }) => ({

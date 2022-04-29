@@ -486,6 +486,23 @@ const byNameAndOrCodeLike = async (name, code) => {
   return { courses }
 }
 
+const getCourseProvidersForCourses = async codes => {
+  return (
+    await Organization.findAll({
+      attributes: ['code'],
+      include: {
+        model: Course,
+        where: {
+          code: {
+            [Op.in]: codes,
+          },
+        },
+      },
+      raw: true,
+    })
+  ).map(({ code }) => code)
+}
+
 module.exports = {
   byCode,
   byName,
@@ -498,4 +515,5 @@ module.exports = {
   unifyOpenUniversity,
   allCodeAlternatives,
   findOneByCode,
+  getCourseProvidersForCourses,
 }
