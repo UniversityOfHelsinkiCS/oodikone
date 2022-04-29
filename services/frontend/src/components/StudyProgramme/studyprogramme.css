@@ -13,14 +13,16 @@
 }
 
 .studytrack-overview .toggle-container,
-.studyprogramme-overview .toggle-container {
+.studyprogramme-overview .toggle-container,
+.studyprogramme-courses .toggle-container {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 1em;
 }
 
-.studyprogramme-overview .radio-toggle {
+.studyprogramme-overview .radio-toggle,
+.studyprogramme-courses .radio-toggle {
   display: flex;
   justify-content: center;
   margin: 20px 35px 20px 35px;
@@ -33,7 +35,8 @@
 }
 
 .studytrack-overview .toggle-label,
-.studyprogramme-overview .toggle-label {
+.studyprogramme-overview .toggle-label,
+.studyprogramme-courses .toggle-label {
   cursor: pointer;
   padding-left: 0.5em;
   padding-right: 0.5em;
@@ -41,7 +44,8 @@
 }
 
 .studytrack-overview .toggle-label-checked,
-.studyprogramme-overview .toggle-label-checked {
+.studyprogramme-overview .toggle-label-checked,
+.studyprogramme-courses .toggle-label-checked {
   cursor: pointer;
   padding-left: 0.5em;
   padding-right: 0.5em;
@@ -51,8 +55,10 @@
 
 .studytrack-overview .ui.toggle.checkbox input:checked ~ label::before,
 .studyprogramme-overview .ui.toggle.checkbox input:checked ~ label::before,
+.studyprogramme-courses .ui.toggle.checkbox input:checked ~ label::before,
 .studytrack-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
-.studyprogramme-overview .ui.toggle.checkbox input:focus:checked ~ label::before {
+.studyprogramme-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
+.studyprogramme-courses .ui.toggle.checkbox input:focus:checked ~ label::before {
   background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
