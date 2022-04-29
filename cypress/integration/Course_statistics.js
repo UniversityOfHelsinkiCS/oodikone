@@ -313,7 +313,7 @@ describe('Course Statistics tests', () => {
         cy.get('[data-cy=unify_radio_unify]').click()
       })
 
-      it('after changing time range shows same stats', () => {
+      it('After changing time range shows same stats', () => {
         const newYearRange = { from: '2016-2017', to: '2019-2020' }
         cy.get("div[name='fromYear']")
           .click()
@@ -350,6 +350,13 @@ describe('Course Statistics tests', () => {
       cy.contains('AYCSM14111 Avoin yo: Full Stack -websovelluskehitys: React Native')
       cy.get('[data-cy=unify_radio_reqular]').find('input').should('be.disabled')
       cy.get('[data-cy=unify_radio_unify]').find('input').should('not.be.disabled')
+    })
+
+    it('Has right to see all the sudents, because course provider is TKT', () => {
+      cy.visit('coursestatistics?courseCodes=%5B%22TKT10004%22%5D&cs_tab=0&separate=false')
+      cy.get('tbody > :nth-child(3) > :nth-child(2) .level').click()
+      cy.contains('Students (154)').click()
+      cy.contains('015224224')
     })
   })
 
