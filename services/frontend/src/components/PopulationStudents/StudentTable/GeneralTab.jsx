@@ -338,6 +338,7 @@ const GeneralTab = ({
     semesterEnrollments: {
       key: 'semesterEnrollments',
       title: 'semesters',
+      helpText: 'Number of present semesters',
       getRowVal: s => semesterEnrollments(s.semesterenrollments),
     },
     tags: {
