@@ -50,7 +50,7 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
 
   const [yearlyStudentByCourse] = await Promise.all([Promise.all(yearlyStudentByCoursePromises)])
 
-  return yearlyStudentByCourse
+  return yearlyStudentByCourse.flat()
 }
 
 module.exports = { getStudyprogrammeCoursesForStudytrack }
