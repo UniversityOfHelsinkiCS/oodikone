@@ -53,7 +53,6 @@ const SingleCourseStats = ({
   const [separate, setSeparate] = useState(null)
 
   const { data: semesterData } = useGetSemestersQuery()
-
   const { semesters, years } = useMemo(() => {
     const semesters = Object.values(semesterData?.semesters ?? [])
       .map(({ semestercode, name, yearcode }) => ({

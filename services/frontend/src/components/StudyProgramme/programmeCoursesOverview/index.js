@@ -12,20 +12,23 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
   })
   const [fromYear, setFromYear] = useState(null)
   const [toYear, setToYear] = useState(null)
-  const [years, setYears] = useState(null)
+  const [years, setYears] = useState({})
 
+  // fromYear and toYear initial values are calculated from data and hence useEffect
   useEffect(() => {
     if (data) {
-      const yearcodes = data.map(s => s.year)
+      const yearcodes = data?.map(s => s.year)
       const initFromYear = min(yearcodes)
       const initToYear = max(yearcodes)
-      setFromYear(initFromYear)
-      setToYear(initToYear)
-      const tempYears = []
+      if (!fromYear) setFromYear(initFromYear)
+      if (!toYear) setToYear(initToYear)
+      const normal = []
+      const academic = []
       for (let i = initFromYear; i <= initToYear; i++) {
-        tempYears.push({ key: i, text: i.toString(), value: i })
+        normal.push({ key: i, text: i.toString(), value: i })
+        academic.push({ key: i, text: `${i}-${i + 1}`, value: i })
       }
-      setYears(tempYears)
+      setYears({ normal, academic })
     }
   }, [data])
 
@@ -33,41 +36,24 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
     return <Loader active style={{ marginTop: '10em' }} />
   }
 
-  /* const yearcodes = data.map(s => s.yearcode)
-  const initFromYear = min(yearcodes)
-  const initToYear = max(yearcodes)
-  setFromYear(initFromYear)
-  setToYear(initToYear) */
-
   if (error) return <h3>Something went wrong, please try refreshing the page.</h3>
 
-  /*   const filteredYearsAndSemesters = () => {
-    const yearcodes = data.map(s => s.yearcode)
-    const from = min(yearcodes)
-    const to = max(yearcodes)
-    if (from == null || to == null) {
-      return {
-        filteredYears: years,
-        filteredSemesters: semesters,
-      }
-    }
+  const handleYearChange = (e, { name, value }) => {
+    if (name === 'fromYear' && value <= toYear) setFromYear(value)
+    else if (name === 'toYear' && value >= fromYear) setToYear(value)
 
-    const timeFilter = ({ value }) => value >= from && value <= to
-    return {
-      filteredYears: years.filter(timeFilter),
-      filteredSemesters: semesters.filter(timeFilter),
-    }
-  } */
+    // sendAnalytics('Changed time frame', 'Course stats')
+  }
 
   return (
     <div className="studyprogramme-courses">
       <Segment style={{ marginTop: '1rem' }}>
         <Header as="h4">Time range</Header>
         <CoursesYearFilter
-          years={years}
+          years={academicYear ? years.academic : years.normal}
           fromYear={fromYear}
           toYear={toYear}
-          handleChange={null}
+          handleChange={handleYearChange}
           academicYear={academicYear}
           setAcademicYear={setAcademicYear}
         />
