@@ -1,13 +1,15 @@
 @media only screen and (min-width: 3240px) {
   .studytrack-overview,
-  .studyprogramme-overview {
+  .studyprogramme-overview,
+  .studyprogramme-courses {
     max-width: 80%;
   }
 }
 
 @media only screen and (min-width: 3240px) {
   .studytrack-overview .section-container,
-  .studyprogramme-overview .section-container {
+  .studyprogramme-overview .section-container,
+  .studyprogramme-courses .section-container {
     justify-content: center !important;
   }
 }
