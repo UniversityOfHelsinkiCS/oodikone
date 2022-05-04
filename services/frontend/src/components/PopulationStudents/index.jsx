@@ -27,6 +27,7 @@ import infotoolTips from '../../common/InfoToolTips'
 const sendAnalytics = sendEvent.populationStudents
 
 const getMandatoryPassed = (mandatoryCourses, populationCourses) => {
+  if (!mandatoryCourses || !populationCourses) return {}
   const mandatoryCodes = mandatoryCourses.filter(course => course.visible && course.visible.visibility).map(c => c.code)
   let mandatoryPassed = {}
 
@@ -70,7 +71,7 @@ const CoursesTable = ({ students }) => {
   const { getTextIn } = useLanguage()
   const namesVisible = useSelector(state => state?.settings?.namesVisible)
   const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
-  const populationCourses = useSelector(state => state?.populationCourses?.data)
+  const { data: populationCourses, pending } = useSelector(state => state?.populationSelectedStudentCourses)
 
   const mandatoryPassed = useMemo(
     () => getMandatoryPassed(mandatoryCourses, populationCourses),
@@ -292,7 +293,7 @@ const CoursesTable = ({ students }) => {
   }, [students, mandatoryCourses, hasPassedMandatory])
 
   return (
-    <Tab.Pane>
+    <Tab.Pane loading={pending}>
       <div style={{ display: 'flex' }}>
         <div style={{ maxHeight: '80vh', width: '100%' }}>
           {mandatoryCourses.length > 0 && (
