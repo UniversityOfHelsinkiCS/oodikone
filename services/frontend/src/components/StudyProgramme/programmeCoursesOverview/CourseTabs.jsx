@@ -25,7 +25,7 @@ const CourseTabs = ({ data }) => {
 
   return (
     <div>
-      <Tab id="CourseStatPanes" panes={panes} />
+      <Tab id="CourseStatPanes" panes={panes} data-cy="CourseTabs" />
     </div>
   )
 }

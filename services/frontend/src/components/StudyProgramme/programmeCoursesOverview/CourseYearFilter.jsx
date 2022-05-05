@@ -7,7 +7,7 @@ const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academicYear 
   const toolTips = InfotoolTips.Studyprogramme
   return (
     <>
-      <div className="toggle-container">
+      <div className="toggle-container" data-cy="CoursesYearFilter">
         <div style={{ marginTop: '0.5rem' }}>
           <Form>
             <Form.Group inline>

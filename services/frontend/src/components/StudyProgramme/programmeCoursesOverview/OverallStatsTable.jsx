@@ -30,7 +30,7 @@ const OverallStatsTable = ({ data }) => {
   const columns = useMemo(() => getColumns(), [data])
 
   return (
-    <div>
+    <div data-cy="CoursesSortableTable">
       <SortableTable
         title={`Student statistics for group `}
         defaultSort={['name', 'asc']}
