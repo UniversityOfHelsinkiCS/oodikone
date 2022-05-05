@@ -362,6 +362,33 @@ describe('Studyprogramme overview', () => {
     })
   })
 
+  /* Programme courses -tests*/
+  describe('Programme courses works for basic user', () => {
+    beforeEach(() => {
+      cy.init('/study-programme', 'admin') // Remove admin when the tab is made visible to normal users
+    })
+
+    it('Programme courses -tab loads', () => {
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.get('.attached').contains('Programme courses').click()
+      cy.get('[data-cy=CoursesYearFilter]')
+      cy.get('[data-cy=CourseTabs]')
+    })
+
+    it('Programme course list contains correct courses in alphabetical order', () => {
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.get('.attached').contains('Programme courses').click()
+
+      cy.get('[data-cy=CoursesSortableTable]').within(() => {
+        cy.get('tr').eq(1).contains('Aineopintojen harjoitustyö: Tietokantasovellus')
+        cy.get('tr').eq(5).contains('DevOps with Docker')
+        cy.get('tr').eq(-1).contains('Äidinkielinen viestintä')
+      })
+    })
+
+    // TO-DO add tests for sorting and the upcoming credit statistics
+  })
+
   /* Tag-tests*/
   describe('Basic information -view works for basic user', () => {
     beforeEach(() => {
