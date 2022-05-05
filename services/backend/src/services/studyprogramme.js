@@ -446,7 +446,7 @@ const getStudentsForProgrammeCourses = async (from, to, providerCode) => {
   // console.log('providerCode: ', providerCode)
   try {
     const res = await Course.findAll({
-      attributes: ['code', 'id', [sequelize.fn('COUNT', sequelize.col('student_studentnumber')), 'total']],
+      attributes: ['code', 'id', 'name', [sequelize.fn('COUNT', sequelize.col('student_studentnumber')), 'total']],
       include: [
         {
           model: Organization,

@@ -1,7 +1,8 @@
 import React from 'react'
 import { Tab, Segment } from 'semantic-ui-react'
+import OverallStatsTable from './OverallStatsTable'
 
-const CourseTabs = () => {
+const CourseTabs = ({ data }) => {
   const paneTypes = [
     {
       label: 'Tables',
@@ -17,9 +18,11 @@ const CourseTabs = () => {
     render: () => (
       <Tab.Pane>
         <Segment basic>KISSA</Segment>
+        <OverallStatsTable data={data} />
       </Tab.Pane>
     ),
   }))
+
   return (
     <div>
       <Tab id="CourseStatPanes" panes={panes} />
