@@ -45,6 +45,21 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
     // sendAnalytics('Changed time frame', 'Course stats')
   }
 
+  const filterDataByYear = (data, fromYear, toYear) => {
+    const temp = data
+      .filter(c => c.year >= fromYear && c.year <= toYear)
+      .reduce((acc, curr) => {
+        if (!acc[curr.code]) {
+          acc[curr.code] = { ...curr }
+        }
+
+        acc[curr.code].total += curr.total
+
+        return acc
+      }, {})
+    return Object.values(temp)
+  }
+
   return (
     <div className="studyprogramme-courses">
       <Segment style={{ marginTop: '1rem' }}>
@@ -58,7 +73,7 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
           setAcademicYear={setAcademicYear}
         />
       </Segment>
-      <CourseTabs />
+      <CourseTabs data={filterDataByYear(data, fromYear, toYear)} />
     </div>
   )
 }
