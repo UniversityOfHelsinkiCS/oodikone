@@ -33,7 +33,7 @@ const OverallStatsTable = ({ data }) => {
     <div>
       <SortableTable
         title={`Student statistics for group `}
-        // defaultSort={['TIME', 'desc']}
+        defaultSort={['name', 'asc']}
         defaultdescending
         getRowKey={course => course.code}
         // tableProps={{ celled: true, fixed: true }}
