@@ -31,7 +31,7 @@ const PopulationStatistics = () => {
   const language = useLanguage()
   const history = useHistory()
   // const { query, queryIsSet, isLoading, students } = useSelector(selectPopulations)
-  const courses = useSelector(store => store.populationCourses.data?.coursestatistics)
+  const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const { query, queryIsSet, isLoading, selectedStudentsByYear, samples } = useSelector(
     populationToData.makePopulationsToData
   )
