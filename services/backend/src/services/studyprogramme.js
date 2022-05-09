@@ -442,7 +442,7 @@ const getCreditsForStudyProgramme = async (provider, since) => {
 
 const getStudentsForProgrammeCourses = async (from, to, providerCode) => {
   // console.log('from: ', from)
-  // console.log('to: ', to)
+  //  console.log('to: ', to)
   // console.log('providerCode: ', providerCode)
   try {
     const res = await Course.findAll({
@@ -478,8 +478,8 @@ const getStudentsForProgrammeCourses = async (from, to, providerCode) => {
       ],
       raw: true,
       group: ['course.code', 'course.id'],
-      // logging: console.log,
     })
+
     const result = res.map(course => ({ ...course, total: parseInt(course.total) }))
     return result
   } catch (e) {
