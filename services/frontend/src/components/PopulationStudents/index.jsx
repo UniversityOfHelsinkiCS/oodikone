@@ -117,7 +117,7 @@ const CoursesTable = ({ students }) => {
                     sendAnalytics('Student details button clicked', 'Mandatory courses table')
                   }}
                 >
-                  <Icon name="level up alternate" />
+                  <Icon name="user outline" />
                 </Item>
               ),
             cellProps: { className: 'iconCell' },
