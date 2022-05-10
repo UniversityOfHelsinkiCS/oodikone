@@ -284,7 +284,7 @@ const GeneralTab = ({
           headerProps: { colSpan: 2 },
         },
         {
-          key: 'icon',
+          key: 'oodikonelink',
           export: false,
           getRowVal: s =>
             !s.obfuscated && (
@@ -295,7 +295,25 @@ const GeneralTab = ({
                   sendAnalytics('Student details button clicked', 'General tab')
                 }}
               >
-                <Icon name="level up alternate" />
+                <Icon name="user outline" />
+              </Item>
+            ),
+          cellProps: { className: 'iconCellNoPointer' },
+        },
+        {
+          key: 'sisulink',
+          export: false,
+          getRowVal: s =>
+            !s.obfuscated && (
+              <Item
+                as="a"
+                href={`https://sis-helsinki.funidata.fi/tutor/role/staff/student/${s.sis_person_id}/tutoring`}
+                onClick={() => {
+                  sendAnalytics('Student link to Sisu clicked', 'General tab')
+                }}
+              >
+                <Icon name="external alternate" />
+                Sisu
               </Item>
             ),
           cellProps: { className: 'iconCellNoPointer' },

@@ -61,6 +61,7 @@ const formatStudentForPopulationStatistics = (
     tags,
     option,
     birthdate,
+    sis_person_id,
   },
   credits,
   startDate,
@@ -109,6 +110,7 @@ const formatStudentForPopulationStatistics = (
     option,
     birthdate,
     studyplans,
+    sis_person_id,
   }
 }
 
@@ -203,6 +205,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'updatedAt',
         'gender_code',
         'birthdate',
+        'sis_person_id',
         /* 'gender_fi',
         'gender_sv',
         'gender_en' */
