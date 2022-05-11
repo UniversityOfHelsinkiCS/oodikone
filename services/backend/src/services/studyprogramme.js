@@ -509,6 +509,67 @@ const getOwnStudentsForProgrammeCourses = async (from, to, providerCode, studypr
   }))
 }
 
+const getOtherStudentsForProgrammeCourses = async (from, to, providerCode, studyprogramme) => {
+  // console.log('provider code: ', providerCode)
+  // console.log('studyprogramme: ', studyprogramme)
+  const res = await sequelize.query(
+    `
+    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
+    INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
+    INNER JOIN course co ON cr.course_code = co.code
+    INNER JOIN course_providers cp ON cp.coursecode = co.id
+    INNER JOIN organization o ON o.id = cp.organizationcode
+    WHERE cr.attainment_date BETWEEN :from AND :to
+    AND o.code = :providerCode
+    AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
+    AND cr.credittypecode IN (4, 9)
+    AND (se.code != :studyprogramme AND cr.attainment_date BETWEEN se.startdate AND se.enddate)
+    GROUP BY co.id, co.code;
+      `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { from, to, providerCode, studyprogramme },
+    }
+  )
+  return res.map(course => ({
+    code: course.code,
+    name: course.name,
+    year: course.year,
+    totalOthers: parseInt(course.total),
+  }))
+}
+
+const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, providerCode) => {
+  const res = await sequelize.query(
+    `
+    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
+    INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
+    INNER JOIN course co ON cr.course_code = co.code
+    INNER JOIN course_providers cp ON cp.coursecode = co.id
+    INNER JOIN organization o ON o.id = cp.organizationcode
+    WHERE cr.attainment_date BETWEEN :from AND :to
+    AND o.code = :providerCode
+    AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
+    AND cr.credittypecode IN (4, 9)
+    AND cr.student_studentnumber NOT IN
+      (SELECT student_studentnumber FROM studyright
+      WHERE studyright.student_studentnumber = cr.student_studentnumber
+      AND cr.attainment_date BETWEEN studyright.startdate AND studyright.enddate)
+    GROUP BY co.id, co.code;
+      `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { from, to, providerCode },
+    }
+  )
+  return res.map(course => ({
+    code: course.code,
+    name: course.name,
+    year: course.year,
+    totalWithout: parseInt(course.total),
+  }))
+}
+
 const getTransferredCredits = async (provider, since) =>
   await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date'],
@@ -608,4 +669,6 @@ module.exports = {
   getStudentsForProgrammeCourses,
   getCurrentStudyYearStartDate,
   getOwnStudentsForProgrammeCourses,
+  getStudentsWithoutStudyrightForProgrammeCourses,
+  getOtherStudentsForProgrammeCourses,
 }

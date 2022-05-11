@@ -24,9 +24,21 @@ const getColumns = language => {
     },
     {
       key: 'totalOwn',
-      title: 'Current programme student',
+      title: 'Programme studyright',
       getRowVal: course => course.totalOwn,
       getRowContent: course => course.totalOwn,
+    },
+    {
+      key: 'totalWithout',
+      title: 'No studyright',
+      getRowVal: course => course.totalWithout,
+      getRowContent: course => course.totalWithout,
+    },
+    {
+      key: 'totalOthers',
+      title: 'Other studyright',
+      getRowVal: course => course.totalOthers,
+      getRowContent: course => course.totalOthers,
     },
   ]
 

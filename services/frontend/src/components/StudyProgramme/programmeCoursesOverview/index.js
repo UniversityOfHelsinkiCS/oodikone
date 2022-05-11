@@ -54,6 +54,8 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
         } else {
           acc[curr.code].totalAll += curr.totalAll
           acc[curr.code].totalOwn += curr.totalOwn
+          acc[curr.code].totalWithout += curr.totalWithout
+          acc[curr.code].totalOther += curr.totalOthers
         }
         return acc
       }, {})
