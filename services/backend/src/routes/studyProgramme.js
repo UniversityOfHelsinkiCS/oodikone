@@ -117,8 +117,6 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
 router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
   const code = req.params.id
   const showByYear = req.query?.academicyear
-  // const { date: unixMillis, showByYear = false } = req.query
-  // const date = new Date(Number(unixMillis))
   const date = new Date()
   const endOfToday = new Date()
   endOfToday.setHours(23, 59, 59, 999)

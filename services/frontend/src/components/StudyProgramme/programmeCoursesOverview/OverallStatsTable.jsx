@@ -16,10 +16,16 @@ const getColumns = () => {
       getRowContent: course => course.name.fi,
     },
     {
-      key: 'total',
-      title: 'Total',
-      getRowVal: course => course.total,
-      getRowContent: course => course.total,
+      key: 'totalAll',
+      title: 'All students',
+      getRowVal: course => course.totalAll,
+      getRowContent: course => course.totalAll,
+    },
+    {
+      key: 'totalOwn',
+      title: 'Current programme student',
+      getRowVal: course => course.totalOwn,
+      getRowContent: course => course.totalOwn,
     },
   ]
 
@@ -32,7 +38,7 @@ const OverallStatsTable = ({ data }) => {
   return (
     <div data-cy="CoursesSortableTable">
       <SortableTable
-        title={`Student statistics for group `}
+        title={`Student statistics for studyprogramme courses `}
         defaultSort={['name', 'asc']}
         defaultdescending
         getRowKey={course => course.code}
