@@ -63,7 +63,13 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
 
   const res = [...yearlyStudentByCourse.flat(), ...yearlyProgrammeStudents.flat()].reduce((acc, curr) => {
     if (!acc[curr.code + curr.year]) {
-      acc[curr.code + curr.year] = { ...curr }
+      acc[curr.code + curr.year] = {
+        code: curr.code,
+        name: curr.name,
+        year: curr.year,
+        totalAll: curr.totalAll | 0,
+        totalOwn: curr.totalOwn | 0,
+      }
     }
     acc[curr.code + curr.year] = _.merge(acc[curr.code + curr.year], curr)
     return acc
