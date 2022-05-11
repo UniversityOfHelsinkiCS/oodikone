@@ -98,7 +98,6 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
           acc[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
         } else {
           Sentry.captureException(new Error(`Failed to find org for faculty code: ${curr.faculty_code}`))
-          return
         }
       }
       if (!acc[curr.faculty_code]['yearly'][data.year]) {
@@ -139,7 +138,6 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
           mankeled[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
         } else {
           Sentry.captureException(new Error(`Failed to find org for faculty code: ${curr.faculty_code}`))
-          return
         }
       }
       // if no accumulated init programme
