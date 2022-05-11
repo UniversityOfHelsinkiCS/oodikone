@@ -1,7 +1,8 @@
-import React, { useMemo } from 'react'
+import React from 'react'
+import useLanguage from '../../LanguagePicker/useLanguage'
 import SortableTable from '../../SortableTable'
 
-const getColumns = () => {
+const getColumns = language => {
   const columns = [
     {
       key: 'code',
@@ -12,8 +13,8 @@ const getColumns = () => {
     {
       key: 'name',
       title: 'Name',
-      getRowVal: course => course.name.fi,
-      getRowContent: course => course.name.fi,
+      getRowVal: course => course.name[language],
+      getRowContent: course => course.name[language],
     },
     {
       key: 'totalAll',
@@ -33,7 +34,7 @@ const getColumns = () => {
 }
 
 const OverallStatsTable = ({ data }) => {
-  const columns = useMemo(() => getColumns(), [data])
+  const { language } = useLanguage()
 
   return (
     <div data-cy="CoursesSortableTable">
@@ -43,7 +44,7 @@ const OverallStatsTable = ({ data }) => {
         defaultdescending
         getRowKey={course => course.code}
         // tableProps={{ celled: true, fixed: true }}
-        columns={columns}
+        columns={getColumns(language)}
         data={data}
       />
     </div>
