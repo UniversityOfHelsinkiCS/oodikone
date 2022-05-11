@@ -16,7 +16,16 @@ const saveToRedis = async (data, REDIS_KEY, expire = false) => {
   }
 }
 
-const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNonEnrolled }) => {
+const getTargetStudentCounts = async ({
+  codes,
+  includeOldAttainments,
+  excludeNonEnrolled,
+  startYear = 2017,
+  endYear = 2020,
+}) => {
+  // only pick studyrights during which the student has enrolled at least once, whether it's
+  // a present or non-present enrollment
+
   return await sequelize.query(
     `
     SELECT
@@ -25,39 +34,42 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
         ss.programme_code "programmeCode",
         ss.programme_name "programmeName",
         ss.programme_type "programmeType",
-        COUNT(ss.studentnumber) "programmeTotalStudents",
-        SUM(
-             public.is_in_target(
-                 CURRENT_TIMESTAMP,
-                 ss.studystartdate,
-                 public.next_date_occurrence(ss.studystartdate), -- e.g if studystartdate = 2017-07-31 and it's now 2020-02-02, this returns 2020-07-31. However, if it's now 2020-11-01 (we've passed the date already), it returns 2021-07-31.
-                 ss.credits,
-                 CASE
-                     -- HAX: instead of trying to guess which category the student is in if
-                     --      the studyright is currently cancelled, just make the target HUGE
-                     --      so we can subtract these from the non-goal students
-                     WHEN ss.currently_cancelled = 1 THEN 999999999
-                     -- credit target: 60 credits per year since starting
-                     ELSE 60 * ceil(EXTRACT(EPOCH FROM (now() - ss.studystartdate) / 365) / 86400)
-                 END
-             )
+        0 AS "students3y",
+        COUNT(ss.studentnumber) FILTER (
+          WHERE
+            public.is_in_target(
+                CURRENT_TIMESTAMP,
+                ss.studystartdate,
+                public.next_date_occurrence(ss.studystartdate), -- e.g if studystartdate = 2017-07-31 and it's now 2020-02-02, this returns 2020-07-31. However, if it's now 2020-11-01 (we've passed the date already), it returns 2021-07-31.
+                ss.credits,
+                CASE
+                    -- HAX: instead of trying to guess which category the student is in if
+                    --      the studyright is currently cancelled, just make the target HUGE
+                    --      so we can subtract these from the non-goal students
+                    WHEN ss.currently_cancelled = 1 THEN 999999999
+                    -- credit target: 60 credits per year since starting
+                    ELSE 60 * ceil(EXTRACT(EPOCH FROM (now() - ss.studystartdate) / 365) / 86400)
+                END
+            ) = 1
         ) "students3y",
-        SUM(
-             public.is_in_target(
-                 CURRENT_TIMESTAMP,
-                 ss.studystartdate,
-                 public.next_date_occurrence(ss.studystartdate),
-                 ss.credits,
-                 CASE
-                     -- HAX: instead of trying to guess which category the student is in if
-                     --      the studyright is currently cancelled, just make the target HUGE
-                     --      so we can subtract these from the non-goal students
-                     WHEN ss.currently_cancelled = 1 THEN 999999999
-                     -- credit target: 45 credits per year since starting
-                     ELSE 45 * ceil(EXTRACT(EPOCH FROM (now() - ss.studystartdate) / 365) / 86400)
-                 END
-             )
+        COUNT(ss.studentnumber) FILTER (
+          WHERE
+            public.is_in_target(
+                CURRENT_TIMESTAMP,
+                ss.studystartdate,
+                public.next_date_occurrence(ss.studystartdate),
+                ss.credits,
+                CASE
+                    -- HAX: instead of trying to guess which category the student is in if
+                    --      the studyright is currently cancelled, just make the target HUGE
+                    --      so we can subtract these from the non-goal students
+                    WHEN ss.currently_cancelled = 1 THEN 999999999
+                    -- credit target: 45 credits per year since starting
+                    ELSE 45 * ceil(EXTRACT(EPOCH FROM (now() - ss.studystartdate) / 365) / 86400)
+                END
+            ) = 1
         ) "students4y",
+        COUNT(ss.studentnumber) "programmeTotalStudents",
         SUM(ss.currently_cancelled) "currentlyCancelled"
     FROM (
         SELECT
@@ -68,101 +80,16 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
             programme_type,
             studystartdate,
             studentnumber,
-            SUM(credits) credits,
+            SUM(credits) FILTER (WHERE NOT credits.is_old OR :include_old_attainments) credits,
             CASE
                 WHEN SUM(currently_cancelled) > 0 THEN 1
                 ELSE 0
             END currently_cancelled
-        FROM (
-            SELECT
-                org.code org_code,
-                org.name->>'fi' org_name,
-                element_details.code programme_code,
-                element_details.name->>'fi' programme_name,
-                element_details.type programme_type,
-                studyright.studystartdate studystartdate,
-                studyright.student_studentnumber studentnumber,
-                credit.credits credits,
-                CASE
-                    WHEN studyright.graduated = 0 AND (studyright.active = 0 OR studyright.enddate < NOW()) THEN 1
-                    ELSE 0
-                END currently_cancelled
-            FROM
-                organization org
-                ${
-                  excludeNonEnrolled
-                    ? `
-                -- only pick studyrights during which the student has enrolled at least once, whether it's
-                -- a present or non-present enrollment
-                INNER JOIN (
-                  SELECT DISTINCT -- remove duplicate join rows from se with DISTINCT
-                      studyright.*
-                  FROM
-                      studyright
-                      INNER JOIN (
-                          SELECT
-                              studentnumber,
-                              startdate
-                          FROM
-                              semester_enrollments
-                              INNER JOIN semesters
-                                  ON semester_enrollments.semestercode = semesters.semestercode
-                      ) se
-                          ON se.studentnumber = studyright.student_studentnumber
-                  WHERE
-                      se.startdate IS NOT NULL
-                      AND se.startdate >= studyright.studystartdate
-                ) studyright
-                    ON org.code = studyright.faculty_code`
-                    : `
-                INNER JOIN studyright
-                      ON org.code = studyright.faculty_code`
-                }
-                
-                INNER JOIN (
-                    -- HACK: fix updater writing duplicates where enddate has changed
-                    SELECT DISTINCT ON (studyrightid, startdate, code, studentnumber)
-                        *
-                    FROM studyright_elements
-                ) s_elements
-                    ON studyright.studyrightid = s_elements.studyrightid
-                INNER JOIN element_details
-                    ON s_elements.code = element_details.code
-                LEFT JOIN transfers
-                    ON studyright.studyrightid = transfers.studyrightid
-                LEFT JOIN LATERAL (
-                    SELECT
-                        student_studentnumber,
-                        attainment_date,
-                        credits
-                    FROM credit
-                    WHERE credit.credittypecode IN (4, 9) -- Completed or Transferred
-                        AND (credit."isStudyModule" = false OR credit."isStudyModule" IS NULL)
-                        ${
-                          includeOldAttainments
-                            ? ''
-                            : "AND credit.attainment_date >= studyright.studystartdate -- only include credits attained during studyright's time"
-                        }
-                ) credit
-                    ON credit.student_studentnumber = studyright.student_studentnumber
-            WHERE
-                studyright.extentcode = 1 -- Bachelor's
-                AND org.code NOT IN ('01', 'H02955')
-                AND studyright.prioritycode IN (1, 30) -- Primary or Graduated
-                AND studyright.studystartdate = ANY (
-                  SELECT MAKE_TIMESTAMPTZ(generate_series, 8, 1, 0, 0, 0)
-                  FROM generate_series(
-                    2017,
-                    CASE
-                      WHEN DATE_PART('month', NOW()) < 8 THEN DATE_PART('year', NOW())::integer - 2
-                      ELSE DATE_PART('year', NOW())::integer - 1
-                    END
-                  )
-                )
-                AND element_details.type IN (20,30) -- programme
-                ${!!codes && codes.length > 0 ? 'AND element_details.code IN (:codes)' : ''}
-                AND transfers.studyrightid IS NULL -- Not transferred within faculty
-        ) s
+        FROM organization_yearly_credits credits
+        WHERE
+          (NOT :exclude_non_enrolled OR credits.enrollment_exists) AND
+          (:ignore_codes OR credits.programme_code IN (:codes)) AND
+          credits.startyear BETWEEN :start_year AND :end_year
         GROUP BY (1,2), (3,4) ,5 , 6, 7
     ) ss
     GROUP BY (1, 2), (3, 4), 5;
@@ -170,7 +97,12 @@ const getTargetStudentCounts = async ({ codes, includeOldAttainments, excludeNon
     {
       type: sequelize.QueryTypes.SELECT,
       replacements: {
-        codes: codes,
+        codes: !codes || codes.length === 0 ? ['DUMMY'] : codes,
+        ignore_codes: !codes || codes.length === 0,
+        exclude_non_enrolled: excludeNonEnrolled,
+        start_year: startYear,
+        end_year: endYear,
+        include_old_attainments: includeOldAttainments,
       },
     }
   )
