@@ -13,7 +13,7 @@ module.exports = {
           JOIN studyright ON org.code = studyright.faculty_code
           JOIN credit ON credit.student_studentnumber = studyright.student_studentnumber
           WHERE credit.credittypecode IN (4, 9) AND
-            credit."isStudyModule" = false OR credit."isStudyModule" IS NULL)
+            (credit."isStudyModule" = false OR credit."isStudyModule" IS NULL)
         ), studyright_enrollment_exists AS (
           SELECT
             studyrightid,
