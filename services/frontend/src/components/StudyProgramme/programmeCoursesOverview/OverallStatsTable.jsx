@@ -35,7 +35,6 @@ const getColumns = language => {
 
 const OverallStatsTable = ({ data }) => {
   const { language } = useLanguage()
-
   return (
     <div data-cy="CoursesSortableTable">
       <SortableTable
