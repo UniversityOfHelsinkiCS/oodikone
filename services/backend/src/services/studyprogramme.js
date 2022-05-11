@@ -402,48 +402,7 @@ const getCreditsForStudyProgramme = async (provider, since) => {
   return res
 }
 
-/* const getStudentsForProgrammeCourses = async provider => {
-  console.log('provider: ', provider)
-  const res = await Credit.findAll({
-    attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
-    include: [
-      {
-        model: Course,
-        attributes: ['code'],
-        required: true,
-        where: {
-          is_study_module: false,
-        },
-        include: {
-          model: Organization,
-          attributes: [],
-          // required: true,
-          where: {
-            code: provider,
-          },
-        },
-      },
-      { model: Student, required: true, attributes: ['firstnames', 'lastname'] },
-    ],
-    where: {
-      credittypecode: {
-        [Op.notIn]: [10, 9, 7],
-      },
-      isStudyModule: {
-        [Op.not]: true,
-      },
-      attainment_date: {
-        [Op.between]: ['2020-08-01 00:00:00+00', '2021-07-31 00:00:00+00'],
-      },
-    },
-  })
-  return res
-} */
-
 const getStudentsForProgrammeCourses = async (from, to, providerCode) => {
-  // console.log('from: ', from)
-  //  console.log('to: ', to)
-  // console.log('providerCode: ', providerCode)
   try {
     const res = await Course.findAll({
       attributes: ['code', 'id', 'name', [sequelize.fn('COUNT', sequelize.col('student_studentnumber')), 'total']],
@@ -480,12 +439,47 @@ const getStudentsForProgrammeCourses = async (from, to, providerCode) => {
       group: ['course.code', 'course.id'],
     })
 
-    const result = res.map(course => ({ ...course, total: parseInt(course.total) }))
+    const result = res.map(course => ({
+      code: course.code,
+      name: course.name,
+      year: course.year,
+      totalAll: parseInt(course.total),
+    }))
     return result
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error: ', e)
   }
+}
+
+const getOwnStudentsForProgrammeCourses = async (from, to, providerCode, studyprogramme) => {
+  // console.log('provider code: ', providerCode)
+  // console.log('studyprogramme: ', studyprogramme)
+  const res = await sequelize.query(
+    `
+    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
+    INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
+    INNER JOIN course co ON cr.course_code = co.code
+    INNER JOIN course_providers cp ON cp.coursecode = co.id
+    INNER JOIN organization o ON o.id = cp.organizationcode
+    WHERE cr.attainment_date BETWEEN :from AND :to
+    AND o.code = :providerCode
+    AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
+    AND cr.credittypecode IN (4, 9)
+    AND (se.code = :studyprogramme AND cr.attainment_date BETWEEN se.startdate AND se.enddate)
+    GROUP BY co.id, co.code;
+      `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { from, to, providerCode, studyprogramme },
+    }
+  )
+  return res.map(course => ({
+    code: course.code,
+    name: course.name,
+    year: course.year,
+    totalOwn: parseInt(course.total),
+  }))
 }
 
 const getTransferredCredits = async (provider, since) =>
@@ -586,4 +580,5 @@ module.exports = {
   getThesisCredits,
   getStudentsForProgrammeCourses,
   getCurrentStudyYearStartDate,
+  getOwnStudentsForProgrammeCourses,
 }

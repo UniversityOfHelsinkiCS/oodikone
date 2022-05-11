@@ -1,5 +1,5 @@
 import React from 'react'
-import { Tab, Segment } from 'semantic-ui-react'
+import { Tab } from 'semantic-ui-react'
 import OverallStatsTable from './OverallStatsTable'
 
 const CourseTabs = ({ data }) => {
@@ -17,7 +17,6 @@ const CourseTabs = ({ data }) => {
     menuItem: { icon, content: label },
     render: () => (
       <Tab.Pane>
-        <Segment basic>KISSA</Segment>
         <OverallStatsTable data={data} />
       </Tab.Pane>
     ),
