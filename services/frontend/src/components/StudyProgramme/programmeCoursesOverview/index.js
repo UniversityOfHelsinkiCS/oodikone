@@ -51,15 +51,14 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
       .reduce((acc, curr) => {
         if (!acc[curr.code]) {
           acc[curr.code] = { ...curr }
+        } else {
+          acc[curr.code].totalAll += curr.totalAll
+          acc[curr.code].totalOwn += curr.totalOwn
         }
-        acc[curr.code].totalAll += curr.totalAll
-        acc[curr.code].totalOwn += curr.totalOwn
-
         return acc
       }, {})
     return Object.values(temp)
   }
-
   return (
     <div className="studyprogramme-courses">
       <Segment style={{ marginTop: '1rem' }}>
