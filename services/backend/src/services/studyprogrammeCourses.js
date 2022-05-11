@@ -4,6 +4,8 @@ const {
   getStudentsForProgrammeCourses,
   getCurrentStudyYearStartDate,
   getOwnStudentsForProgrammeCourses,
+  getStudentsWithoutStudyrightForProgrammeCourses,
+  getOtherStudentsForProgrammeCourses,
 } = require('./studyprogramme')
 const { mapToProviders } = require('../util/utils')
 
@@ -26,6 +28,12 @@ const makeYearlyPromises = (years, providerCode, academicYear, type, studyprogra
             break
           case 'ownStudents':
             result = await getOwnStudentsForProgrammeCourses(from, to, providerCode, studyprogramme)
+            break
+          case 'withoutStudyright':
+            result = await getStudentsWithoutStudyrightForProgrammeCourses(from, to, providerCode)
+            break
+          case 'otherStudents':
+            result = await getOtherStudentsForProgrammeCourses(from, to, providerCode, studyprogramme)
             break
           default:
             result = await getStudentsForProgrammeCourses(from, to, providerCode)
@@ -55,13 +63,38 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     'ownStudents',
     studyprogramme
   )
+  const yearlyStudentsWithoutStudyrightPromises = makeYearlyPromises(
+    yearRange,
+    providerCode,
+    academicYear,
+    'withoutStudyright'
+  )
+  const yearlyOtherProgrammeStudentsPromises = makeYearlyPromises(
+    yearRange,
+    providerCode,
+    academicYear,
+    'otherStudents',
+    studyprogramme
+  )
 
-  const [yearlyStudentByCourse, yearlyProgrammeStudents] = await Promise.all([
+  const [
+    yearlyStudentByCourse,
+    yearlyProgrammeStudents,
+    yearlyStudentsWithoutStudyright,
+    yearlyOtherProgrammeStudents,
+  ] = await Promise.all([
     Promise.all(yearlyStudentByCoursePromises),
     Promise.all(yearlyProgrammeStudentsPromises),
+    Promise.all(yearlyStudentsWithoutStudyrightPromises),
+    Promise.all(yearlyOtherProgrammeStudentsPromises),
   ])
 
-  const res = [...yearlyStudentByCourse.flat(), ...yearlyProgrammeStudents.flat()].reduce((acc, curr) => {
+  const res = [
+    ...yearlyStudentByCourse.flat(),
+    ...yearlyProgrammeStudents.flat(),
+    ...yearlyStudentsWithoutStudyright.flat(),
+    ...yearlyOtherProgrammeStudents.flat(),
+  ].reduce((acc, curr) => {
     if (!acc[curr.code + curr.year]) {
       acc[curr.code + curr.year] = {
         code: curr.code,
@@ -69,6 +102,8 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
         year: curr.year,
         totalAll: curr.totalAll | 0,
         totalOwn: curr.totalOwn | 0,
+        totalWithout: curr.totalWithout | 0,
+        totalOthers: curr.totalOthers | 0,
       }
     }
     acc[curr.code + curr.year] = _.merge(acc[curr.code + curr.year], curr)
