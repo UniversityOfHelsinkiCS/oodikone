@@ -1,4 +1,5 @@
 const _ = require('lodash')
+const Sentry = require('@sentry/node')
 const {
   dbConnections: { sequelize },
 } = require('../../database/connection')
@@ -96,6 +97,7 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
         if (org) {
           acc[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
         } else {
+          Sentry.captureException(new Error(`Failed to find org for faculty code: ${curr.faculty_code}`))
           return
         }
       }
@@ -133,7 +135,12 @@ const calculateStatusGraduated = async (unixMillis, showByYear) => {
       // if no accumulated init faculty
       if (!mankeled[curr.faculty_code]) {
         const org = orgs.find(o => o.code === curr.faculty_code)
-        mankeled[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
+        if (org) {
+          mankeled[curr.faculty_code] = { name: org.name, yearly: {}, drill: {} }
+        } else {
+          Sentry.captureException(new Error(`Failed to find org for faculty code: ${curr.faculty_code}`))
+          return
+        }
       }
       // if no accumulated init programme
       if (!mankeled[curr.faculty_code]['drill'][curr.code]) {
