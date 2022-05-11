@@ -1,16 +1,27 @@
-import { callController } from '../apiConnection'
+import { RTKApi, callController } from '../apiConnection'
 
-export const getProtoC = ({ includeOldAttainments, excludeNonEnrolled }) => {
+export const getProtoC = ({ includeOldAttainments, excludeNonEnrolled, startYear, endYear }) => {
   const route = '/cool-data-science/proto-c-data'
   const prefix = 'GET_PROTOC_'
-  const params = { include_old_attainments: includeOldAttainments, exclude_non_enrolled: excludeNonEnrolled }
+  const params = {
+    include_old_attainments: includeOldAttainments,
+    startYear,
+    endYear,
+    exclude_non_enrolled: excludeNonEnrolled,
+  }
   return callController(route, prefix, [], 'get', null, params)
 }
 
-export const getProtoCProgramme = ({ includeOldAttainments, excludeNonEnrolled, code }) => {
+export const getProtoCProgramme = ({ includeOldAttainments, excludeNonEnrolled, startYear, endYear, code }) => {
   const route = '/cool-data-science/proto-c-data-programme'
   const prefix = 'GET_PROTOC_PROGRAMME_'
-  const params = { include_old_attainments: includeOldAttainments, exclude_non_enrolled: excludeNonEnrolled, code }
+  const params = {
+    include_old_attainments: includeOldAttainments,
+    startYear,
+    endYear,
+    exclude_non_enrolled: excludeNonEnrolled,
+    code,
+  }
   return callController(route, prefix, [], 'get', null, params)
 }
 
@@ -269,5 +280,38 @@ const reducer = (
       return state
   }
 }
+
+const coolDataScienceApi = RTKApi.injectEndpoints({
+  endpoints: builder => ({
+    getProtoC: builder.query({
+      query: ({ includeOldAttainments, excludeNonEnrolled, startYear, endYear }) => ({
+        url: '/cool-data-science/proto-c-data',
+        method: 'GET',
+        params: {
+          include_old_attainments: includeOldAttainments,
+          exclude_non_enrolled: excludeNonEnrolled,
+          startYear,
+          endYear,
+        },
+      }),
+    }),
+
+    getProtoCProgramme: builder.query({
+      query: ({ includeOldAttainments, excludeNonEnrolled, startYear, endYear, code }) => ({
+        url: '/cool-data-science/proto-c-data-programme',
+        method: 'GET',
+        params: {
+          include_old_attainments: includeOldAttainments,
+          exclude_non_enrolled: excludeNonEnrolled,
+          startYear,
+          endYear,
+          code,
+        },
+      }),
+    }),
+  }),
+})
+
+export const { useGetProtoCQuery, useGetProtoCProgrammeQuery } = coolDataScienceApi
 
 export default reducer

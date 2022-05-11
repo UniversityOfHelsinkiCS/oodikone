@@ -1,13 +1,6 @@
 const { CronJob } = require('cron')
 const moment = require('moment')
-const {
-  refreshProtoC,
-  refreshStatus,
-  refreshStatusGraduated,
-  refreshUber,
-  refreshProtoCProgramme,
-  getStartYears,
-} = require('./services/trends')
+const { refreshStatus, refreshStatusGraduated, refreshUber, getStartYears } = require('./services/trends')
 const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { updateBasicView, updateStudytrackView } = require('./services/studyprogrammeUpdates')
@@ -15,6 +8,9 @@ const { findAndSaveTeachers } = require('./services/topteachers')
 const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
+const {
+  dbConnections: { sequelize },
+} = require('./database/connection')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -46,19 +42,6 @@ const refreshTeacherLeaderboard = async () => {
   // refresh this and previous year
   const currentSemestersYearCode = (await getCurrentSemester()).getDataValue('yearcode')
   await findAndSaveTeachers(currentSemestersYearCode - 1, currentSemestersYearCode)
-}
-
-const refreshProtoCtoRedis = async () => {
-  logger.info('Refreshing CDS ProtoC')
-  const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false' }
-  const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false' }
-  const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true' }
-  const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true' }
-  await refreshProtoC(defaultQuery)
-  await refreshProtoC(onlyOld)
-  await refreshProtoC(onlyEnr)
-  await refreshProtoC(bothToggles)
-  logger.info('Refreshing CDS ProtoC doned')
 }
 
 const refreshStatusToRedis = async () => {
@@ -97,28 +80,8 @@ const refreshUberToRedis = async () => {
   logger.info(`Refreshing CDS Uber data doned`)
 }
 
-const refreshProtoCProgrammeToRedis = async () => {
-  const codes = (await getAllProgrammes()).map(p => p.code).filter(code => code.includes('KH'))
-  for (const code of codes) {
-    logger.info(`Refreshing ProtoCProgramme code ${code}`)
-    const defaultQuery = { include_old_attainments: 'false', exclude_non_enrolled: 'false', code }
-    const onlyOld = { include_old_attainments: 'true', exclude_non_enrolled: 'false', code }
-    const onlyEnr = { include_old_attainments: 'false', exclude_non_enrolled: 'true', code }
-    const bothToggles = { include_old_attainments: 'true', exclude_non_enrolled: 'true', code }
-    const queries = [defaultQuery, onlyOld, onlyEnr, bothToggles]
-    for (const query of queries) {
-      try {
-        await refreshProtoCProgramme(query)
-      } catch (e) {
-        logger.error({
-          message: `Error when refreshing ProtocProgramme code ${code}, query ${Object.keys({ query })[0]}`,
-          meta: e,
-        }) // object.keys is hax to print query variable name
-      }
-    }
-    logger.info(`Refreshing ProtoCProgramme code ${code} doned`)
-  }
-  logger.info(`Refreshing protocprogramme doned`)
+const refreshProtoCMaterializedView = async () => {
+  await sequelize.query('REFRESH MATERIALIZED VIEW organization_yearly_credits')
 }
 
 const refreshStatistics = async () => {
@@ -131,7 +94,7 @@ const refreshStatistics = async () => {
 }
 
 const refreshTrends = async () => {
-  const trendfuncs = [refreshProtoCtoRedis, refreshStatusToRedis, refreshUberToRedis, refreshProtoCProgrammeToRedis]
+  const trendfuncs = [refreshProtoCMaterializedView, refreshStatusToRedis, refreshUberToRedis]
   logger.info('Refreshing trends')
   for (const func of trendfuncs) {
     await func()

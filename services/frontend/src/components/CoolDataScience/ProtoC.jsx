@@ -3,15 +3,16 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { connect } from 'react-redux'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Checkbox, Button, Message, Icon } from 'semantic-ui-react'
+import { Menu, Segment, Loader, Dimmer, Checkbox, Button, Message, Icon, Dropdown } from 'semantic-ui-react'
 import _ from 'lodash'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import TSA from '../../common/tsa'
 import InfoToolTips from '../../common/InfoToolTips'
-import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
+import { useGetProtoCQuery, getProtoC, getProtoCProgramme, useGetProtoCProgrammeQuery } from '../../redux/coolDataScience'
 import ReactMarkdown from 'react-markdown'
 import moment from 'moment'
+import RangeSelector from 'components/RangeSelector'
 
 HighchartsCustomEvents(Highcharts)
 
@@ -60,6 +61,9 @@ const defaultConfig = (pointer = true) => {
       reversed: false
     },
     plotOptions: {
+      series: {
+        animation: false
+      },
       area: {
         cursor: pointer ? 'pointer' : undefined,
         fillOpacity: 0.5,
@@ -84,7 +88,7 @@ const defaultConfig = (pointer = true) => {
   }
 }
 
-const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
+const makeClickableChartConfig = (sortedData, onPointClicked, org, [startYear, endYear]) => {
   const addPointClickHandler = serie => {
     serie.point = {
       events: {
@@ -270,7 +274,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
     },
     yAxis: {
       title: {
-        text: ` ${org ? `2017-{upToYear} aloittaneet uudet kandiopiskelijat<br/>${org.name}` : '% tiedekunnan opiskelijoista'
+        text: ` ${org ? `${startYear}-${endYear} aloittaneet uudet kandiopiskelijat<br/>${org.name}` : '% tiedekunnan opiskelijoista'
           }`
       }
     },
@@ -278,7 +282,7 @@ const makeClickableChartConfig = (sortedData, onPointClicked, org) => {
   })
 }
 
-const makeNonClickableChartConfig = programme => {
+const makeNonClickableChartConfig = (programme, [startYear, endYear]) => {
   const addMouseOverHandler = serie => {
     serie.point = {
       events: {
@@ -350,7 +354,7 @@ const makeNonClickableChartConfig = programme => {
 
   return Highcharts.merge(defaultConfig(false), {
     title: {
-      text: `2017-{upToYear} aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
+      text: `${startYear}-${endYear} aloittaneet uudet kandiopiskelijat<br/>${programme.name}`
     },
     xAxis: {
       categories: programme.studytracks.map(data => data.name),
@@ -456,21 +460,26 @@ const sorters = {
   passiivinen: (a, b) => a.currentlyCancelled / a.totalStudents - b.currentlyCancelled / b.totalStudents
 }
 
-const OrgChart = React.memo(({ orgs, onOrgClicked }) => {
-  return <ReactHighcharts highcharts={Highcharts} config={makeClickableChartConfig(orgs, onOrgClicked)} />
-})
-
-const ProgrammeChart = React.memo(({ programmes, onProgrammeClicked, org }) => {
+const OrgChart = React.memo(({ orgs, onOrgClicked, yearRange }) => {
   return (
-    <ReactHighcharts highcharts={Highcharts} config={makeClickableChartConfig(programmes, onProgrammeClicked, org)} />
+    <ReactHighcharts
+      highcharts={Highcharts}
+      config={makeClickableChartConfig(orgs, onOrgClicked, undefined, yearRange)}
+    />
   )
 })
 
-const StudytrackChart = React.memo(({ programme }) => {
-  return <ReactHighcharts highcharts={Highcharts} config={makeNonClickableChartConfig(programme)} />
+const ProgrammeChart = React.memo(({ programmes, onProgrammeClicked, org, yearRange }) => {
+  return (
+    <ReactHighcharts highcharts={Highcharts} config={makeClickableChartConfig(programmes, onProgrammeClicked, org, yearRange)} />
+  )
 })
 
-const ProgrammeDrilldown = ({ org, sorter, sortDir, onProgrammeClicked }) => {
+const StudytrackChart = React.memo(({ programme, yearRange }) => {
+  return <ReactHighcharts highcharts={Highcharts} config={makeNonClickableChartConfig(programme, yearRange)} />
+})
+
+const ProgrammeDrilldown = ({ org, sorter, sortDir, onProgrammeClicked, yearRange }) => {
   const orgSortedProgrammes = useMemo(() => {
     return { ...org, programmes: [...org.programmes].sort((a, b) => sorters[sorter](a, b) * sortDir) }
   }, [org, sorter, sortDir])
@@ -479,12 +488,13 @@ const ProgrammeDrilldown = ({ org, sorter, sortDir, onProgrammeClicked }) => {
     <ProgrammeChart
       programmes={orgSortedProgrammes.programmes}
       onProgrammeClicked={onProgrammeClicked}
+      yearRange={yearRange}
       org={orgSortedProgrammes}
     />
   )
 }
 
-const StudytrackDrilldown = ({ programme, sorter, sortDir }) => {
+const StudytrackDrilldown = ({ programme, sorter, sortDir, yearRange }) => {
   if (!programme.studytracks || programme.studytracks.length < 1)
     return (
       <Segment>
@@ -494,49 +504,54 @@ const StudytrackDrilldown = ({ programme, sorter, sortDir }) => {
   const programmeSortedStudytracks = useMemo(() => {
     return { ...programme, studytracks: [...programme.studytracks].sort((a, b) => sorters[sorter](a, b) * sortDir) }
   }, [programme, sorter, sortDir])
-  return <StudytrackChart programme={programmeSortedStudytracks} />
+  return <StudytrackChart programme={programmeSortedStudytracks} yearRange={yearRange} />
 }
 
 const ProtoC = ({
   programme,
-  getProtoCDispatch,
-  getProtoCProgrammeDispatch,
-  protoC,
-  protoCProgramme,
-  loadingProtoC,
-  loadingProtoCProgramme
 }) => {
+  const [firstLoad, setFirstLoad] = useState(true)
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
-  const [drilldownOrg, setDrilldownOrg] = useState(null)
-  const [drilldownProgramme, setDrilldownProgramme] = useState(null)
+  const [drilldownOrgCode, setDrilldownOrgCode] = useState(null)
+  const [drilldownProgrammeCode, setDrilldownProgrammeCode] = useState(null)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
 
-  useEffect(() => {
-    const load = async () => {
-      if (!!programme) {
-        getProtoCProgrammeDispatch({
-          includeOldAttainments: includeOldAttainments.toString(),
-          excludeNonEnrolled: excludeNonEnrolled.toString(),
-          code: programme
-        })
-      } else {
-        getProtoCDispatch({
-          includeOldAttainments: includeOldAttainments.toString(),
-          excludeNonEnrolled: excludeNonEnrolled.toString()
-        })
-      }
-    }
-    load()
-  }, [includeOldAttainments, excludeNonEnrolled])
+  const [yearRange, setYearRange] = useState([2017, upToYear])
+  const [startYear, endYear] = yearRange
 
-  useEffect(() => {
-    if (!!programme) {
-      setDrilldownProgramme(protoCProgramme)
-    }
-  }, [protoCProgramme])
+  const { data: protoC, isLoading: loadingProtoC, isFetching: fetchingProtoC } = useGetProtoCQuery({
+    excludeNonEnrolled,
+    includeOldAttainments,
+    startYear,
+    endYear,
+  })
+
+  const { date: protoCProgramme, isLoading: loadingProtoCProgramme, isFetching: fetchingProtoCProgramme } = useGetProtoCProgrammeQuery({
+    includeOldAttainments: includeOldAttainments.toString(),
+    excludeNonEnrolled: excludeNonEnrolled.toString(),
+    code: programme,
+    startYear,
+    endYear,
+  })
+
+  const drilldownOrg = useMemo(
+    () => protoC
+      ? Object.values(protoC).find(org => org.code === drilldownOrgCode)
+      : null,
+    [drilldownOrgCode, protoC],
+  )
+
+  const drilldownProgramme = useMemo(
+    () => protoC
+      ? Object.values(protoC)
+        .find(org => org.code === drilldownOrgCode)
+        ?.programmes?.find?.(prog => prog.code === drilldownProgrammeCode)
+      : null,
+    [drilldownOrgCode, drilldownProgrammeCode, protoC],
+  )
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
@@ -549,13 +564,13 @@ const ProtoC = ({
   }, [])
 
   const handleOrgClicked = useCallback(org => {
-    setDrilldownOrg(org)
-    setDrilldownProgramme(null)
+    setDrilldownOrgCode(org.code)
+    setDrilldownProgrammeCode(null)
     sendAnalytics('C Org drilldown clicked', 'ProtoC')
   }, [])
 
   const handleProgrammeClicked = useCallback(programme => {
-    setDrilldownProgramme(programme)
+    setDrilldownProgrammeCode(programme.code)
     sendAnalytics('C Programme drilldown clicked', 'ProtoC')
   }, [])
 
@@ -580,14 +595,39 @@ const ProtoC = ({
       return a > b ? 1 : -1
     })
 
+  const RangeButtons = () => (
+    <div align="center" style={{ marginTop: '15px' }}>
+      <Menu compact>
+        <Menu.Item>
+          Started between
+        </Menu.Item>
+        <Dropdown
+          className="link item"
+          value={startYear}
+          onChange={(_, { value }) => setYearRange([value, endYear])}
+          options={_.range(2017, upToYear + 1).map((year) => ({ key: year, value: year, text: year, disabled: year > endYear }))}
+        />
+        <Menu.Item>
+          and
+        </Menu.Item>
+        <Dropdown
+          className="link item"
+          value={endYear}
+          onChange={(_, { value }) => setYearRange([startYear, value])}
+          options={_.range(2017, upToYear + 1).map((year) => ({ key: year, value: year, text: year, disabled: year < startYear }))}
+        />
+      </Menu>
+    </div>
+  )
+
   const SorterButtons = () => (
     <div align="center" style={{ marginTop: '15px' }}>
-      <Button.Group>
-        <Button style={{ cursor: 'default' }} active color="black">
+      <Menu compact>
+        <Menu.Item style={{ cursor: 'default' }} active color="black">
           Sort by:
-        </Button>
+        </Menu.Item>
         {sorterNames.map(sorterName => (
-          <Button
+          <Menu.Item
             basic={sorter !== sorterName}
             color={sorter === sorterName ? 'blue' : 'black'}
             key={sorterName}
@@ -598,7 +638,7 @@ const ProtoC = ({
             content={sorterName}
           />
         ))}
-      </Button.Group>
+      </Menu>
     </div>
   )
   // legend and checkboxes, custom legend because highcharts is pita
@@ -640,9 +680,9 @@ const ProtoC = ({
       <Segment>
         <SorterButtons />
         <Segment placeholder={loadingProtoC || loadingProtoCProgramme} vertical>
-          <Dimmer inverted active={loadingProtoC || loadingProtoCProgramme} />
-          <Loader active={loadingProtoC || loadingProtoCProgramme} />
-          <StudytrackDrilldown programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
+          <Dimmer inverted active={fetchingProtoC || fetchingProtoCProgramme} />
+          <Loader active={fetchingProtoC || fetchingProtoCProgramme} />
+          <StudytrackDrilldown yearRange={yearRange} programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
         </Segment>
         <RenderBelowGraph />
       </Segment>
@@ -652,26 +692,37 @@ const ProtoC = ({
   return (
     <Segment>
       <div align="center">
-        <h2>Kandiohjelmat: Suhteellinen tavoiteaikaerittely, 2017-{upToYear} aloittaneet</h2>
+        <h2>Kandiohjelmat: Suhteellinen tavoiteaikaerittely, {startYear}-{endYear} aloittaneet</h2>
       </div>
       <DrilldownMessage />
-      <SorterButtons />
+      <div style={{ display: 'flex', gapX: 15, gapY: 0, justifyContent: 'center', flexFlow: 'wrap' }}>
+        <RangeButtons />
+        <SorterButtons />
+      </div>
       <Segment placeholder={loadingProtoC || loadingProtoCProgramme} vertical>
-        <Dimmer inverted active={loadingProtoC || loadingProtoCProgramme} />
-        <Loader active={loadingProtoC || loadingProtoCProgramme} />
-        {!(loadingProtoC || loadingProtoCProgramme) && protoC && (
-          <OrgChart orgs={sortedOrgs} onOrgClicked={handleOrgClicked} />
-        )}
-        {!(loadingProtoC || loadingProtoCProgramme) && protoC && drilldownOrg && (
+        <Dimmer inverted active={fetchingProtoC || fetchingProtoCProgramme} />
+        <Loader active={fetchingProtoC || fetchingProtoCProgramme} />
+        <OrgChart
+          orgs={sortedOrgs}
+          onOrgClicked={handleOrgClicked}
+          yearRange={yearRange}
+        />
+        {drilldownOrg && (
           <ProgrammeDrilldown
             org={drilldownOrg}
             sorter={sorter}
             sortDir={sortDir}
+            yearRange={yearRange}
             onProgrammeClicked={handleProgrammeClicked}
           />
         )}
         {!(loadingProtoC || loadingProtoCProgramme) && protoC && drilldownProgramme && (
-          <StudytrackDrilldown programme={drilldownProgramme} sorter={sorter} sortDir={sortDir} />
+          <StudytrackDrilldown
+            programme={drilldownProgramme}
+            sorter={sorter}
+            sortDir={sortDir}
+            yearRange={yearRange}
+          />
         )}
       </Segment>
       <RenderBelowGraph />
@@ -682,14 +733,4 @@ const ProtoC = ({
   )
 }
 
-const mapStateToProps = ({ coolDataScience }) => ({
-  protoC: coolDataScience.data.protoC || {},
-  protoCProgramme: coolDataScience.data.protoCProgramme || {},
-  loadingProtoC: coolDataScience.pending.protoC,
-  loadingProtoCProgramme: coolDataScience.pending.protoCProgramme
-})
-
-export default connect(
-  mapStateToProps,
-  { getProtoCDispatch: getProtoC, getProtoCProgrammeDispatch: getProtoCProgramme }
-)(ProtoC)
+export default ProtoC

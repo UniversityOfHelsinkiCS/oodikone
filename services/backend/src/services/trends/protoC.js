@@ -2,15 +2,28 @@ const _ = require('lodash')
 const { getRedisCDS, saveToRedis, getTargetStudentCounts } = require('./shared')
 const { getAssociations } = require('../studyrights')
 
-const REDIS_KEY_PROTOC = 'PROTOC_DATA_V2'
+const REDIS_KEY_PROTOC = 'PROTOC_DATA_V3.3'
 const REDIS_KEY_PROTOC_PROGRAMME = 'PROTOC_PROGRAMME_DATA_V2'
+
+const tryParseInt = (number, defaultValue) => {
+  try {
+    return parseInt(number, 10)
+  } catch (e) {
+    return defaultValue
+  }
+}
 
 const calculateProtoC = async query => {
   const associations = await getAssociations()
 
+  const startYear = tryParseInt(query.startYear, null)
+  const endYear = tryParseInt(query.endYear, null)
+
   const data = await getTargetStudentCounts({
     includeOldAttainments: query.include_old_attainments === 'true',
     excludeNonEnrolled: query.exclude_non_enrolled === 'true',
+    startYear,
+    endYear,
   })
 
   const programmeData = data.filter(d => d.programmeType !== 30)
@@ -97,10 +110,16 @@ const calculateProtoCProgramme = async query => {
   const codes = associations.programmes[query.code]
     ? [...associations.programmes[query.code].studytracks, query.code]
     : []
+
+  const startYear = tryParseInt(query.startYear, null)
+  const endYear = tryParseInt(query.endYear, null)
+
   const data = await getTargetStudentCounts({
-    codes: codes,
+    codes,
     includeOldAttainments: query.include_old_attainments === 'true',
     excludeNonEnrolled: query.exclude_non_enrolled === 'true',
+    startYear,
+    endYear,
   })
 
   const programmeData = data.find(d => d.programmeType === 20)
@@ -157,10 +176,10 @@ const calculateProtoCProgramme = async query => {
 }
 
 const getProtoC = async (query, doRefresh = false) => {
-  const { include_old_attainments, exclude_non_enrolled } = query
+  const { include_old_attainments, exclude_non_enrolled, startYear, endYear } = query
 
   // redis keys for different queries
-  const KEY = `${REDIS_KEY_PROTOC}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
+  const KEY = `${REDIS_KEY_PROTOC}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}_FROM_${startYear}_TO_${endYear}`
   const protoC = await getRedisCDS(KEY)
   if (!protoC || doRefresh) {
     const data = await calculateProtoC(query)
@@ -172,8 +191,8 @@ const getProtoC = async (query, doRefresh = false) => {
 
 // used for studytrack view
 const getProtoCProgramme = async (query, doRefresh = false) => {
-  const { include_old_attainments, exclude_non_enrolled, code } = query
-  const KEY = `${REDIS_KEY_PROTOC_PROGRAMME}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}`
+  const { include_old_attainments, exclude_non_enrolled, code, startYear, endYear } = query
+  const KEY = `${REDIS_KEY_PROTOC_PROGRAMME}_CODE_${code}_OLD_${include_old_attainments.toUpperCase()}_ENR_${exclude_non_enrolled.toUpperCase()}_FROM_${startYear}_TO_${endYear}`
   const protoCProgramme = await getRedisCDS(KEY)
 
   if (!protoCProgramme || doRefresh) {

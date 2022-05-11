@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
-import PropTypes, { func, bool, shape, string } from 'prop-types'
-import { connect } from 'react-redux'
+import React, { useState, useCallback, useMemo } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
-import { Segment, Loader, Dimmer, Checkbox, Button, Message } from 'semantic-ui-react'
+import _ from 'lodash'
+import { Dropdown, Menu, Segment, Loader, Dimmer, Checkbox, Message } from 'semantic-ui-react'
 import ReactMarkdown from 'react-markdown'
 import HighchartsCustomEvents from 'highcharts-custom-events'
 
 import moment from 'moment'
 import TSA from '../../common/tsa'
 import InfoToolTips from '../../common/InfoToolTips'
-import { getProtoC, getProtoCProgramme } from '../../redux/coolDataScience'
+import { useGetProtoCQuery, useGetProtoCProgrammeQuery } from '../../redux/coolDataScience'
 
 HighchartsCustomEvents(Highcharts)
 
@@ -171,7 +170,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
             const { chart } = this
             chart.myLabel.destroy()
             const clickedLabel = data.find(entry => entry.name === this.value)
-            if (clickedLabel) clickHandler(clickedLabel.programmes || clickedLabel.studytracks)
+            if (clickedLabel) clickHandler(clickedLabel)
             sendAnalytics('Drilldown clicked', 'ProtoC2')
           },
           mouseover() {
@@ -251,7 +250,7 @@ const makeConfig = (data, sorter, type = 'column', clickHandler) => {
                 // clicked on top-level, drill down
                 sendAnalytics('Org drilldown clicked', 'ProtoC2')
                 const datapoint = data.find(entry => entry.code === point.custom.code)
-                clickHandler(datapoint.programmes || datapoint.studytracks)
+                clickHandler(datapoint)
               }
             },
           },
@@ -293,78 +292,60 @@ NonClickableChart.defaultProps = {
   isSideways: false,
 }
 
-NonClickableChart.propTypes = {
-  data: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string,
-      code: PropTypes.string,
-      students3y: PropTypes.number,
-      students4y: PropTypes.number,
-      totalStudents: PropTypes.number,
-      currentlyCancelled: PropTypes.number,
-    })
-  ).isRequired,
-  sorter: PropTypes.func.isRequired,
-  isSideways: PropTypes.bool,
-}
-
 ClickableChart.defaultProps = {
   isSideways: false,
 }
 
-ClickableChart.propTypes = {
-  data: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string,
-      code: PropTypes.string,
-      students3y: PropTypes.number,
-      students4y: PropTypes.number,
-      totalStudents: PropTypes.number,
-      currentlyCancelled: PropTypes.number,
-    })
-  ).isRequired,
-  sorter: PropTypes.func.isRequired,
-  clickHandler: func.isRequired,
-  isSideways: PropTypes.bool,
-}
-
-const ProtoC = ({
-  getProtoCDispatch,
-  getProtoCProgrammeDispatch,
-  data,
-  isLoading,
-  programme = 'KH50_005',
-  protoCProgrammeData,
-  protoCProgrammeLoading,
-}) => {
+const ProtoC = ({ programme = 'KH50_005' }) => {
   const [sorter, setSorter] = useState('3v tahti')
   const [sortDir, setSortDir] = useState(1)
-  const [drilldownOrg, setDrilldownOrg] = useState(null)
-  const [drilldownProgramme, setDrilldownProgramme] = useState(null)
+  const [drilldownOrgCode, setDrilldownOrgCode] = useState(null)
+  const [drilldownProgrammeCode, setDrilldownProgrammeCode] = useState(null)
 
   const [includeOldAttainments, setIncludeOldAttainments] = useState(false)
   const [excludeNonEnrolled, setExcludeNonEnrolled] = useState(false)
 
-  useEffect(() => {
-    if (programme) {
-      getProtoCProgrammeDispatch({
-        includeOldAttainments: includeOldAttainments.toString(),
-        excludeNonEnrolled: excludeNonEnrolled.toString(),
-        code: programme,
-      })
-    } else {
-      getProtoCDispatch({
-        includeOldAttainments: includeOldAttainments.toString(),
-        excludeNonEnrolled: excludeNonEnrolled.toString(),
-      })
-    }
-  }, [includeOldAttainments, excludeNonEnrolled])
+  const [yearRange, setYearRange] = useState([2017, upToYear])
+  const [startYear, endYear] = yearRange
 
-  useEffect(() => {
-    if (programme) {
-      setDrilldownProgramme(protoCProgrammeData.studytracks)
+  const { data, isLoading, isFetching } = useGetProtoCQuery({
+    excludeNonEnrolled,
+    includeOldAttainments,
+    startYear,
+    endYear,
+  })
+
+  const {
+    data: protoCProgrammeData,
+    isLoading: protoCProgrammeLoading,
+    isFetching: protoCProgrammeFetching,
+  } = useGetProtoCProgrammeQuery(
+    {
+      includeOldAttainments: includeOldAttainments.toString(),
+      excludeNonEnrolled: excludeNonEnrolled.toString(),
+      code: programme,
+      startYear,
+      endYear,
+    },
+    {
+      skip: !programme,
     }
-  }, [protoCProgrammeData])
+  )
+
+  const drilldownOrg = useMemo(
+    () => (data ? Object.values(data).find(org => org.code === drilldownOrgCode) : null),
+    [drilldownOrgCode, data]
+  )
+
+  const drilldownProgramme = useMemo(
+    () =>
+      data
+        ? Object.values(data)
+            .find(org => org.code === drilldownOrgCode)
+            ?.programmes?.find?.(prog => prog.code === drilldownProgrammeCode)
+        : null,
+    [drilldownOrgCode, drilldownProgrammeCode, data]
+  )
 
   const handleOldAttainmentToggled = useCallback(() => {
     setIncludeOldAttainments(previous => !previous)
@@ -383,19 +364,21 @@ const ProtoC = ({
   }, [data, currentSorter])
 
   const sortedProgrammes = useMemo(() => {
-    return (drilldownOrg || []).sort(currentSorter)
+    return [...(drilldownOrg?.programmes || [])].sort(currentSorter)
   }, [drilldownOrg, currentSorter])
 
   const sortedStudytracks = useMemo(() => {
-    return (drilldownProgramme || []).sort(currentSorter)
-  }, [drilldownProgramme, currentSorter])
+    const studytracks = programme ? protoCProgrammeData?.studytracks : drilldownProgramme?.studytracks
+
+    return [...(studytracks || [])].sort(currentSorter)
+  }, [programme, drilldownProgramme, protoCProgrammeData, currentSorter])
 
   const drilldownOrgClick = useCallback(org => {
-    setDrilldownOrg(org)
+    setDrilldownOrgCode(org.code)
   })
 
   const drilldownProgrammeClick = useCallback(programme => {
-    setDrilldownProgramme(programme)
+    setDrilldownProgrammeCode(programme.code)
   })
 
   const { CoolDataScience } = InfoToolTips
@@ -426,15 +409,46 @@ const ProtoC = ({
     return (
       <Segment>
         <div align="center">
-          <h2>Prototyyppi: Tavoiteaikaerittely, 2017-{upToYear} aloittaneet</h2>
+          <h2>
+            Prototyyppi: Tavoiteaikaerittely, {startYear}-{endYear} aloittaneet
+          </h2>
         </div>
-        <div align="center" style={{ marginTop: '10px' }}>
-          <Button.Group>
-            <Button style={{ cursor: 'default' }} active color="black">
+        <div
+          align="center"
+          style={{ marginTop: '10px', display: 'flex', gap: '10px 20px', flexFlow: 'wrap', justifyContent: 'center' }}
+        >
+          <Menu compact>
+            <Menu.Item>Started between</Menu.Item>
+            <Dropdown
+              className="link item"
+              value={startYear}
+              onChange={(_, { value }) => setYearRange([value, endYear])}
+              options={_.range(2017, upToYear + 1).map(year => ({
+                key: year,
+                value: year,
+                text: year,
+                disabled: year > endYear,
+              }))}
+            />
+            <Menu.Item>and</Menu.Item>
+            <Dropdown
+              className="link item"
+              value={endYear}
+              onChange={(_, { value }) => setYearRange([startYear, value])}
+              options={_.range(2017, upToYear + 1).map(year => ({
+                key: year,
+                value: year,
+                text: year,
+                disabled: year < startYear,
+              }))}
+            />
+          </Menu>
+          <Menu compact>
+            <Menu.Item style={{ cursor: 'default' }} active color="black">
               Sort by:
-            </Button>
+            </Menu.Item>
             {sorterNames.map(sorterName => (
-              <Button
+              <Menu.Item
                 basic={sorter !== sorterName}
                 color={sorter === sorterName ? 'blue' : 'black'}
                 key={sorterName}
@@ -445,11 +459,11 @@ const ProtoC = ({
                 content={sorterName}
               />
             ))}
-          </Button.Group>
+          </Menu>
         </div>
         <Segment placeholder={isLoading} vertical>
-          <Dimmer inverted active={isLoading} />
-          <Loader active={isLoading} />
+          <Dimmer inverted active />
+          <Loader active />
           {!protoCProgrammeLoading && protoCProgrammeData && (
             <>
               <NonClickableChart data={drilldownProgramme} sorter={currentSorter} isSideways />
@@ -479,19 +493,54 @@ const ProtoC = ({
     )
   }
 
+  const [studytracksLoading, studytracksFetching] = !programme
+    ? [isLoading, isFetching]
+    : [protoCProgrammeLoading, protoCProgrammeFetching]
+
   return (
     <Segment>
       <div align="center">
-        <h2>Kandiohjelmat: Tavoiteaikaerittely, 2017-{upToYear} aloittaneet</h2>
+        <h2>
+          Kandiohjelmat: Tavoiteaikaerittely, {startYear}-{endYear} aloittaneet
+        </h2>
       </div>
       <DrilldownMessage />
-      <div align="center" style={{ marginTop: '10px' }}>
-        <Button.Group>
-          <Button style={{ cursor: 'default' }} active color="black">
+      <div
+        align="center"
+        style={{ marginTop: '10px', display: 'flex', gap: '10px 20px', flexFlow: 'wrap', justifyContent: 'center' }}
+      >
+        <Menu compact>
+          <Menu.Item>Started between</Menu.Item>
+          <Dropdown
+            className="link item"
+            value={startYear}
+            onChange={(_, { value }) => setYearRange([value, endYear])}
+            options={_.range(2017, upToYear + 1).map(year => ({
+              key: year,
+              value: year,
+              text: year,
+              disabled: year > endYear,
+            }))}
+          />
+          <Menu.Item>and</Menu.Item>
+          <Dropdown
+            className="link item"
+            value={endYear}
+            onChange={(_, { value }) => setYearRange([startYear, value])}
+            options={_.range(2017, upToYear + 1).map(year => ({
+              key: year,
+              value: year,
+              text: year,
+              disabled: year < startYear,
+            }))}
+          />
+        </Menu>
+        <Menu compact>
+          <Menu.Item style={{ cursor: 'default' }} active color="black">
             Sort by:
-          </Button>
+          </Menu.Item>
           {sorterNames.map(sorterName => (
-            <Button
+            <Menu.Item
               basic={sorter !== sorterName}
               color={sorter === sorterName ? 'blue' : 'black'}
               key={sorterName}
@@ -502,11 +551,11 @@ const ProtoC = ({
               content={sorterName}
             />
           ))}
-        </Button.Group>
+        </Menu>
       </div>
       <Segment placeholder={isLoading} vertical>
-        <Dimmer inverted active={isLoading} />
-        <Loader active={isLoading} />
+        <Dimmer inverted active={isFetching} />
+        <Loader active={isFetching} />
         {!isLoading && data && (
           <>
             <ClickableChart data={sortedOrgs} sorter={currentSorter} isSideways clickHandler={drilldownOrgClick} />
@@ -518,9 +567,17 @@ const ProtoC = ({
                 clickHandler={drilldownProgrammeClick}
               />
             )}
-            {drilldownProgramme && <NonClickableChart data={sortedStudytracks} sorter={currentSorter} isSideways />}
           </>
         )}
+      </Segment>
+      {drilldownProgramme && (
+        <Segment placeholder={studytracksLoading} vertical>
+          <Dimmer inverted active={studytracksFetching} />
+          <Loader active={studytracksFetching} />
+          <NonClickableChart data={sortedStudytracks} sorter={currentSorter} isSideways />
+        </Segment>
+      )}
+      <Segment>
         <div align="center">
           <Checkbox
             label="Include only at least once enrolled students"
@@ -549,24 +606,4 @@ ProtoC.defaultProps = {
   programme: '',
 }
 
-ProtoC.propTypes = {
-  isLoading: bool.isRequired,
-  data: shape({}).isRequired,
-  getProtoCDispatch: func.isRequired,
-  getProtoCProgrammeDispatch: func.isRequired,
-  protoCProgrammeLoading: bool.isRequired,
-  protoCProgrammeData: shape({}).isRequired,
-  programme: string,
-}
-
-const mapStateToProps = ({ coolDataScience }) => ({
-  data: coolDataScience.data.protoC,
-  protoCProgrammeData: coolDataScience.data.protoCProgramme,
-  isLoading: coolDataScience.pending.protoC,
-  protoCProgrammeLoading: coolDataScience.pending.protoCProgramme,
-})
-
-export default connect(mapStateToProps, {
-  getProtoCDispatch: getProtoC,
-  getProtoCProgrammeDispatch: getProtoCProgramme,
-})(ProtoC)
+export default ProtoC
