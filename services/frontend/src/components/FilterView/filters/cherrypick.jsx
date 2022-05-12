@@ -93,6 +93,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
         <div style={{ width: '1px', alignSelf: 'stretch', backgroundColor: '#e6e6e7' }} />
         <IconButton
           name="plus"
+          title="Add to list"
           onClick={() => {
             const parts = inputValue.split(/[^0-9]+/)
             onChange(_.union(value, parts))
@@ -101,13 +102,14 @@ const EditableList = ({ value, onChange, renderLabel }) => {
         />
         <IconButton
           name="minus"
+          title="Remove from list"
           onClick={() => {
             const parts = inputValue.split(/[^0-9]+/)
             onChange(_.difference(value, parts))
             setInput('')
           }}
         />
-        <IconButton name="trash alternate outline" onClick={() => onChange([])} />
+        <IconButton title="Clear list" name="trash alternate outline" onClick={() => onChange([])} />
       </div>
     </div>
   )
