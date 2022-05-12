@@ -195,6 +195,7 @@ const SingleStudyGroupFilterView = props => {
   const allSemesters = semesterQuery.data?.semesters
 
   const viewFilters = [
+    filters.cherrypickFilter,
     filters.enrollmentStatusFilter({
       allSemesters: allSemesters ?? [],
       language: props.language,

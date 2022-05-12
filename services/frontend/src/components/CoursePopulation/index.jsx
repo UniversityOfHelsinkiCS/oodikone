@@ -31,6 +31,7 @@ import {
   startYearAtUniFilter,
   programmeFilter,
   studyTrackFilter,
+  cherrypickFilter,
 } from '../FilterView/filters'
 import FilterView from '../FilterView'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -315,6 +316,7 @@ const CoursePopulation = ({
       name="CoursePopulation"
       filters={[
         genderFilter,
+        cherrypickFilter,
         ageFilter,
         courseFilter({ courses: courseStatistics?.coursestatistics }),
         creditsEarnedFilter,
