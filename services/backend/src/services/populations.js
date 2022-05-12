@@ -860,8 +860,13 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
   return formattedStudents
 }
 
+const getSubstitutions = async codes => {
+  const courses = await Course.findAll({ where: { code: codes }, attributes: ['code', 'substitutions'], raw: true })
+  return [...new Set(courses.map(({ code, substitutions }) => [code, ...substitutions]).flat())]
+}
+
 const findCourses = async (studentnumbers, beforeDate, courses = []) => {
-  const codesFilter = courses.length ? { code: courses } : {}
+  const codesFilter = courses.length ? { code: await getSubstitutions(courses) } : {}
   const res = await Course.findAll({
     attributes: ['code', 'name', 'coursetypecode', 'substitutions'],
     where: { ...codesFilter },
