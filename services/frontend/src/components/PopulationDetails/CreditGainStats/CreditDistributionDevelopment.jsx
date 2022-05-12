@@ -7,7 +7,9 @@ import chroma from 'chroma-js'
 import { useLocation } from 'react-router-dom'
 import { useGetSemestersQuery } from 'redux/semesters'
 import useLanguage from 'components/LanguagePicker/useLanguage'
+import { cherrypickFilter } from 'components/FilterView/filters'
 import { getMonths } from '../../../common/query'
+import useFilters from '../../FilterView/useFilters'
 
 const StackOrdering = {
   ASCENDING: 'asc',
@@ -87,7 +89,9 @@ const getChartData = (students, timeSlots, order, programme, limitScale, cumulat
     colors = _.reverse(colors)
   }
 
-  const data = new Array(limits.length).fill().map(() => new Array(timeSlots.length).fill(0))
+  const data = new Array(limits.length)
+    .fill()
+    .map(() => new Array(timeSlots.length).fill().map(() => ({ y: 0, custom: { students: [] } })))
 
   const studentCredits = students.map(s => splitStudentCredits(s, timeSlots, cumulative))
 
@@ -95,12 +99,13 @@ const getChartData = (students, timeSlots, order, programme, limitScale, cumulat
     students
       .map((student, i) => [student, i])
       .filter(([student]) => !programme || !hasGraduatedBefore(student, programme, slot.start))
-      .forEach(([, studentIndex]) => {
+      .forEach(([student, studentIndex]) => {
         const credits = studentCredits[studentIndex][timeSlotIndex]
         const rangeIndex = limits.findIndex(
           ([min, max]) => (min === undefined || credits > min) && (max === undefined || credits <= max)
         )
-        data[rangeIndex][timeSlotIndex] += 1
+        data[rangeIndex][timeSlotIndex].y += 1
+        data[rangeIndex][timeSlotIndex].custom.students.push(student.studentNumber)
       })
   })
 
@@ -130,6 +135,7 @@ const CreditDistributionDevelopment = ({ students, query }) => {
   const months = getMonths(useLocation())
   const semestersQuery = useGetSemestersQuery()
   const { getTextIn } = useLanguage()
+  const { filterDispatch } = useFilters()
 
   const programme = query?.studyRights?.programme
 
@@ -216,6 +222,16 @@ const CreditDistributionDevelopment = ({ students, query }) => {
         stacking: 'normal',
         dataLabels: {
           enabled: true,
+        },
+      },
+      series: {
+        cursor: 'pointer',
+        point: {
+          events: {
+            click(e) {
+              filterDispatch(cherrypickFilter.actions.addToAllowlist(e.point.custom.students))
+            },
+          },
         },
       },
     },
