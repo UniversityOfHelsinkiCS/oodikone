@@ -38,7 +38,7 @@ const StudentInfoCard = ({ student }) => {
           <div>
             {name}
             {student.studentNumber}
-            <p>
+            <div data-cy="sisulink">
               <Item
                 as="a"
                 href={`https://sis-helsinki.funidata.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
@@ -47,7 +47,7 @@ const StudentInfoCard = ({ student }) => {
                 <Icon name="external alternate" />
                 Sisu
               </Item>
-            </p>
+            </div>
           </div>
           <Icon name="remove" className="controlIcon" onClick={onRemove} />
         </Card.Header>

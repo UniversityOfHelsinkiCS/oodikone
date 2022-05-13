@@ -11,6 +11,7 @@ describe('Student Statistics tests', () => {
     firstnames: 'Matti Jaakko',
     lastname: 'Nieminen',
     studentnumber: '010654019',
+    sis_person_id: 'hy-hlo-84830887',
   }
 
   it('Student statistics search form is usable', () => {
@@ -70,6 +71,14 @@ describe('Student Statistics tests', () => {
       })
     cy.url().should('include', '/coursestatistics')
     cy.contains('Introduction to Machine Learning')
+  })
+
+  it('Has correct Sisu link', () => {
+    cy.get('.prompt').type(student.studentnumber)
+    cy.contains('td a', student.studentnumber).click()
+    cy.get('[data-cy=sisulink] > a')
+      .should('have.attr', 'href')
+      .and('include', 'https://sis-helsinki.funidata.fi/tutor/role/staff/student/hy-hlo-84830887/basic/basic-info')
   })
 
   it('Searching with bad inputs doesnt yield results', () => {
