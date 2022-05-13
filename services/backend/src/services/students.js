@@ -178,6 +178,7 @@ const formatStudent = async ({
   updatedAt,
   createdAt,
   tags,
+  sis_person_id,
 }) => {
   const toCourse = ({ id, grade, credits, credittypecode, is_open, attainment_date, course, isStudyModule }) => {
     try {
@@ -259,6 +260,7 @@ const formatStudent = async ({
     studyplans,
     allCourses: allCourses[0],
     tags,
+    sis_person_id: sis_person_id,
   }
 }
 

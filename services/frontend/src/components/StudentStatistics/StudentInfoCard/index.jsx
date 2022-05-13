@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Icon, Button } from 'semantic-ui-react'
+import { Card, Icon, Button, Item } from 'semantic-ui-react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
@@ -38,6 +38,16 @@ const StudentInfoCard = ({ student }) => {
           <div>
             {name}
             {student.studentNumber}
+            <p>
+              <Item
+                as="a"
+                href={`https://sis-helsinki.funidata.fi/tutor/role/staff/student/${student.sis_person_id}/basic/basic-info`}
+                target="_blank"
+              >
+                <Icon name="external alternate" />
+                Sisu
+              </Item>
+            </p>
           </div>
           <Icon name="remove" className="controlIcon" onClick={onRemove} />
         </Card.Header>
