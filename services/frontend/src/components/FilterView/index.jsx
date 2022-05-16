@@ -134,7 +134,9 @@ const FilterView = ({ children, name, filters: pFilters, students, displayTray: 
         <div style={{ zIndex: 1, alignSelf: 'flex-start', position: 'sticky', top: '1rem' }}>
           {displayTray && <FilterTray />}
         </div>
-        <div style={{ flexGrow: 1 }}>{typeof children === 'function' ? children(filteredStudents) : children}</div>
+        <div style={{ flexGrow: 1, minWidth: 0 }}>
+          {typeof children === 'function' ? children(filteredStudents) : children}
+        </div>
       </div>
     </FilterViewContext.Provider>
   )
