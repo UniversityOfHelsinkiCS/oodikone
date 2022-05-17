@@ -22,7 +22,7 @@ const getAllStudyprogrammeCourses = async studyprogramme => {
   // console.log('normal courses: ', normalCourses)
   return normalCourses.reduce((acc, curr) => {
     acc.push(curr.code)
-    if (curr.substitutions.includes('AY' + curr.code)) {
+    if (curr.substitutions && curr.substitutions.includes('AY' + curr.code)) {
       acc.push('AY' + curr.code)
     }
     return acc
