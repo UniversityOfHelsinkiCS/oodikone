@@ -452,34 +452,61 @@ const getCreditsForStudyProgramme = async (provider, since) => {
   }
 } */
 
-const getStudentsForProgrammeCourses = async (from, to, providerCode) => {
-  const res = await sequelize.query(
-    `
+const getAllProgrammeCourses = async providerCode => {
+  const res = await Course.findAll({
+    attributes: ['code', 'substitutions'],
+    include: [
+      {
+        model: Organization,
+        attributes: [],
+        required: true,
+        where: {
+          code: providerCode,
+        },
+        through: {
+          attributes: [],
+        },
+      },
+    ],
+    raw: true,
+  })
+  return res
+}
+
+const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
+  try {
+    const res = await sequelize.query(
+      `
     SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
     INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
     INNER JOIN course co ON cr.course_code = co.code
     INNER JOIN course_providers cp ON cp.coursecode = co.id
     INNER JOIN organization o ON o.id = cp.organizationcode
     WHERE cr.attainment_date BETWEEN :from AND :to
-    AND o.code = :providerCode
+    AND cr.course_code IN (:programmeCourses)
     AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
     AND cr.credittypecode IN (4, 9)
     GROUP BY co.id, co.code;
       `,
-    {
-      type: sequelize.QueryTypes.SELECT,
-      replacements: { from, to, providerCode },
-    }
-  )
-  return res.map(course => ({
-    code: course.code,
-    name: course.name,
-    year: course.year,
-    totalAll: parseInt(course.total),
-  }))
+      {
+        type: sequelize.QueryTypes.SELECT,
+        replacements: { from, to, programmeCourses /*providerCode */ },
+      }
+    )
+    // console.log('1: ', res.length)
+    return res.map(course => ({
+      code: course.code,
+      name: course.name,
+      year: course.year,
+      totalAll: parseInt(course.total),
+    }))
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e)
+  }
 }
 
-const getOwnStudentsForProgrammeCourses = async (from, to, providerCode, studyprogramme) => {
+const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {
   // console.log('provider code: ', providerCode)
   // console.log('studyprogramme: ', studyprogramme)
   const res = await sequelize.query(
@@ -490,7 +517,7 @@ const getOwnStudentsForProgrammeCourses = async (from, to, providerCode, studypr
     INNER JOIN course_providers cp ON cp.coursecode = co.id
     INNER JOIN organization o ON o.id = cp.organizationcode
     WHERE cr.attainment_date BETWEEN :from AND :to
-    AND o.code = :providerCode
+    AND cr.course_code IN (:programmeCourses)
     AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
     AND cr.credittypecode IN (4, 9)
     AND (se.code = :studyprogramme AND cr.attainment_date BETWEEN se.startdate AND se.enddate)
@@ -498,9 +525,10 @@ const getOwnStudentsForProgrammeCourses = async (from, to, providerCode, studypr
       `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { from, to, providerCode, studyprogramme },
+      replacements: { from, to, programmeCourses, studyprogramme },
     }
   )
+  // console.log('2: ', res.length)
   return res.map(course => ({
     code: course.code,
     name: course.name,
@@ -509,7 +537,7 @@ const getOwnStudentsForProgrammeCourses = async (from, to, providerCode, studypr
   }))
 }
 
-const getOtherStudentsForProgrammeCourses = async (from, to, providerCode, studyprogramme) => {
+const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {
   // console.log('provider code: ', providerCode)
   // console.log('studyprogramme: ', studyprogramme)
   const res = await sequelize.query(
@@ -520,7 +548,7 @@ const getOtherStudentsForProgrammeCourses = async (from, to, providerCode, study
     INNER JOIN course_providers cp ON cp.coursecode = co.id
     INNER JOIN organization o ON o.id = cp.organizationcode
     WHERE cr.attainment_date BETWEEN :from AND :to
-    AND o.code = :providerCode
+    AND cr.course_code IN (:programmeCourses)
     AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
     AND cr.credittypecode IN (4, 9)
     AND (se.code != :studyprogramme AND cr.attainment_date BETWEEN se.startdate AND se.enddate)
@@ -528,9 +556,10 @@ const getOtherStudentsForProgrammeCourses = async (from, to, providerCode, study
       `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { from, to, providerCode, studyprogramme },
+      replacements: { from, to, programmeCourses, studyprogramme },
     }
   )
+  // console.log('3: ', res.length)
   return res.map(course => ({
     code: course.code,
     name: course.name,
@@ -539,7 +568,7 @@ const getOtherStudentsForProgrammeCourses = async (from, to, providerCode, study
   }))
 }
 
-const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, providerCode) => {
+const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, programmeCourses) => {
   const res = await sequelize.query(
     `
     SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
@@ -548,7 +577,7 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, provide
     INNER JOIN course_providers cp ON cp.coursecode = co.id
     INNER JOIN organization o ON o.id = cp.organizationcode
     WHERE cr.attainment_date BETWEEN :from AND :to
-    AND o.code = :providerCode
+    AND cr.course_code IN (:programmeCourses)
     AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
     AND cr.credittypecode IN (4, 9)
     AND cr.student_studentnumber NOT IN
@@ -559,9 +588,10 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, provide
       `,
     {
       type: sequelize.QueryTypes.SELECT,
-      replacements: { from, to, providerCode },
+      replacements: { from, to, programmeCourses },
     }
   )
+  // console.log('4: ', res.length)
   return res.map(course => ({
     code: course.code,
     name: course.name,
@@ -671,4 +701,5 @@ module.exports = {
   getOwnStudentsForProgrammeCourses,
   getStudentsWithoutStudyrightForProgrammeCourses,
   getOtherStudentsForProgrammeCourses,
+  getAllProgrammeCourses,
 }

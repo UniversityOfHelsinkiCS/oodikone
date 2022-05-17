@@ -6,6 +6,7 @@ const {
   getOwnStudentsForProgrammeCourses,
   getStudentsWithoutStudyrightForProgrammeCourses,
   getOtherStudentsForProgrammeCourses,
+  getAllProgrammeCourses,
 } = require('./studyprogramme')
 const { mapToProviders } = require('../util/utils')
 
@@ -13,7 +14,23 @@ const getCurrentYearStartDate = () => {
   return new Date(new Date().getFullYear(), 0, 1)
 }
 
-const makeYearlyPromises = (years, providerCode, academicYear, type, studyprogramme) => {
+const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
+
+const getAllStudyprogrammeCourses = async studyprogramme => {
+  const providerCode = mapToProviders([studyprogramme])[0]
+  const normalCourses = await getAllProgrammeCourses(providerCode)
+  // console.log('normal courses: ', normalCourses)
+  return normalCourses.reduce((acc, curr) => {
+    acc.push(curr.code)
+    if (curr.substitutions.includes('AY' + curr.code)) {
+      acc.push('AY' + curr.code)
+    }
+    return acc
+  }, [])
+}
+
+const makeYearlyPromises = (years, academicYear, type, programmeCourses, studyprogramme) => {
+  // console.log('programme courses: ', programmeCourses)
   return years.map(
     year =>
       new Promise(async res => {
@@ -24,19 +41,19 @@ const makeYearlyPromises = (years, providerCode, academicYear, type, studyprogra
 
         switch (type) {
           case 'allStudents':
-            result = await getStudentsForProgrammeCourses(from, to, providerCode)
+            result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
             break
           case 'ownStudents':
-            result = await getOwnStudentsForProgrammeCourses(from, to, providerCode, studyprogramme)
+            result = await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyprogramme)
             break
           case 'withoutStudyright':
-            result = await getStudentsWithoutStudyrightForProgrammeCourses(from, to, providerCode)
+            result = await getStudentsWithoutStudyrightForProgrammeCourses(from, to, programmeCourses)
             break
           case 'otherStudents':
-            result = await getOtherStudentsForProgrammeCourses(from, to, providerCode, studyprogramme)
+            result = await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyprogramme)
             break
           default:
-            result = await getStudentsForProgrammeCourses(from, to, providerCode)
+            result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
         }
 
         res(
@@ -49,31 +66,31 @@ const makeYearlyPromises = (years, providerCode, academicYear, type, studyprogra
   )
 }
 
-const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme, academicYear) => {
-  const providerCode = mapToProviders([studyprogramme])[0]
+const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme, academicYear, programmeCourses) => {
+  // const providerCode = mapToProviders([studyprogramme])[0]
   const startDate = academicYear == 'true' ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
   const startYear = startDate.getFullYear()
   const yearRange = _.range(2017, startYear + 1)
 
-  const yearlyStudentByCoursePromises = makeYearlyPromises(yearRange, providerCode, academicYear, 'allStudents')
+  const yearlyStudentByCoursePromises = makeYearlyPromises(yearRange, academicYear, 'allStudents', programmeCourses)
   const yearlyProgrammeStudentsPromises = makeYearlyPromises(
     yearRange,
-    providerCode,
     academicYear,
     'ownStudents',
+    programmeCourses,
     studyprogramme
   )
   const yearlyStudentsWithoutStudyrightPromises = makeYearlyPromises(
     yearRange,
-    providerCode,
     academicYear,
-    'withoutStudyright'
+    'withoutStudyright',
+    programmeCourses
   )
   const yearlyOtherProgrammeStudentsPromises = makeYearlyPromises(
     yearRange,
-    providerCode,
     academicYear,
     'otherStudents',
+    programmeCourses,
     studyprogramme
   )
 
@@ -89,7 +106,7 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     Promise.all(yearlyOtherProgrammeStudentsPromises),
   ])
 
-  const res = [
+  const allCourses = [
     ...yearlyStudentByCourse.flat(),
     ...yearlyProgrammeStudents.flat(),
     ...yearlyStudentsWithoutStudyright.flat(),
@@ -109,7 +126,28 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     acc[curr.code + curr.year] = _.merge(acc[curr.code + curr.year], curr)
     return acc
   }, {})
-  return Object.values(res)
+
+  // merge normal and AY codes if courses match
+  const ayCourses = Object.keys(allCourses).filter(c => c.startsWith('AY'))
+
+  ayCourses.forEach(ayCourse => {
+    const normCode = isOpenUniCourseCode(ayCourse)[1]
+
+    if (allCourses[normCode]) {
+      allCourses[normCode] = {
+        code: allCourses[normCode].code,
+        name: allCourses[normCode].name,
+        year: allCourses[normCode].year,
+        totalAll: (allCourses[normCode].totalAll + allCourses[ayCourse].totalAll) | 0,
+        totalOwn: (allCourses[normCode].totalOwn + allCourses[ayCourse].totalOwn) | 0,
+        totalWithout: (allCourses[normCode].totalWithout + allCourses[ayCourse].totalWithout) | 0,
+        totalOthers: (allCourses[normCode].totalOthers + allCourses[ayCourse].totaOthers) | 0,
+      }
+      delete allCourses[ayCourse]
+    }
+  })
+
+  return Object.values(allCourses)
 }
 
-module.exports = { getStudyprogrammeCoursesForStudytrack }
+module.exports = { getStudyprogrammeCoursesForStudytrack, getAllStudyprogrammeCourses }

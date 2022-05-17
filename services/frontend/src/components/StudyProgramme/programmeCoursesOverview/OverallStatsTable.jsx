@@ -6,7 +6,7 @@ const getColumns = language => {
   const columns = [
     {
       key: 'code',
-      title: 'Code',
+      title: 'Code ',
       getRowVal: course => course.code,
       getRowContent: course => course.code,
     },
