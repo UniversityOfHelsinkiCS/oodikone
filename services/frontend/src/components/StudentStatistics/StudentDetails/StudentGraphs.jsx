@@ -10,9 +10,14 @@ import TSA from '../../../common/tsa'
 const ANALYTICS_CATEGORY = 'Student stats'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
-const getEarliestAttainmentDate = ({ courses }) =>
-  courses.filter(({ credittypecode }) => credittypecode !== 10).sort((a, b) => new Date(a.date) - new Date(b.date))[0]
-    .date
+const getEarliestAttainmentDate = ({ courses }) => {
+  if (!courses) return null
+  const sorted = courses
+    .filter(({ credittypecode }) => credittypecode !== 10)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+  if (!sorted.length) return null
+  return sorted[0].date
+}
 
 const resolveGraphStartDate = (student, graphYearStart, selectedStudyRight, studyRightTargetStart) => {
   const earliestAttainmentDate = getEarliestAttainmentDate(student)
