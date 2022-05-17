@@ -10,7 +10,7 @@ import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
 import CreditGraphTooltip from '../CreditGraphTooltip'
-import { reformatDate, getTextIn } from '../../common'
+import { reformatDate, getTextIn, getStudyRightElementTargetDates } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
 import { DISPLAY_DATE_FORMAT, API_DATE_FORMAT } from '../../constants'
 
@@ -29,6 +29,7 @@ const createGraphOptions = ({
   onPointClicked,
   startDate,
   endDate,
+  graduations,
 }) => {
   const tooltip = {
     shared: false,
@@ -38,7 +39,7 @@ const createGraphOptions = ({
   if (singleStudent) {
     Object.assign(tooltip, {
       formatter() {
-        tooltipFormatter(this)
+        return tooltipFormatter(this)
       },
       useHTML: true,
       style: {
@@ -90,6 +91,15 @@ const createGraphOptions = ({
       ordinal: false,
       min: startDate,
       max: endDate,
+      plotLines: graduations.map(({ value }) => ({
+        value,
+        color: '#a333c8',
+        width: 2,
+        dashStyle: 'dash',
+        label: {
+          text: `Graduation`,
+        },
+      })),
     },
     series: seriesData,
     chart: {
@@ -101,6 +111,10 @@ const createGraphOptions = ({
 
 const sortCoursesByDate = courses =>
   [...courses].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+
+const filterCoursesByStudyPlan = (plan, courses) =>
+  // eslint-disable-next-line camelcase
+  !plan ? courses : courses.filter(({ course_code }) => plan.included_courses.includes(course_code))
 
 const filterCoursesByDate = (courses, date) => courses.filter(c => moment(c.date).isSameOrAfter(moment(date)))
 
@@ -142,7 +156,7 @@ const createGoalSeries = (starting, ending, absences) => {
     .filter(a => a.startdate >= starting || (a.startdate <= starting && a.enddate >= starting))
     .reduce((res, { startdate, enddate }) => {
       const targetCreditsBeforeAbsence =
-        (Math.ceil(getXAxisMonth(moment(startdate), moment(starting))) - totalAbsenceMonths) * (55 / 12)
+        (Math.ceil(getXAxisMonth(moment(startdate), moment(starting))) - totalAbsenceMonths) * (60 / 12)
       if (enddate < ending) {
         res.push([startdate, targetCreditsBeforeAbsence])
         res.push([enddate, targetCreditsBeforeAbsence])
@@ -157,7 +171,7 @@ const createGoalSeries = (starting, ending, absences) => {
     zoneStart
   )
 
-  const lastCredits = (lastMonth - totalAbsenceMonths) * (55 / 12)
+  const lastCredits = (lastMonth - totalAbsenceMonths) * (60 / 12)
   const data = [...[[starting, 0], ...absencePoints, [ending, lastCredits]].sort((a, b) => a[0] - b[0])]
 
   return {
@@ -173,14 +187,29 @@ const createGoalSeries = (starting, ending, absences) => {
   }
 }
 
-const createStudentCreditLines = (students, singleStudent) =>
-  students.map(student => {
-    const { started, studyrightStart } = student
+// eslint-disable-next-line camelcase
+const resolveStudyRightElement = ({ studyright_elements }) => {
+  // eslint-disable-next-line camelcase
+  if (!studyright_elements || !studyright_elements.length) return {}
+  return studyright_elements.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0] || {}
+}
 
-    const startDate = students.length === 1 ? started : studyrightStart
+const createStudentCreditLines = (students, singleStudent, selectedStartDate, studyRightId) =>
+  students.map(student => {
+    const { studyrightStart } = student
+
+    const startDate = singleStudent ? selectedStartDate : studyrightStart
+    const { code } = resolveStudyRightElement(
+      student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId) || {}
+    )
 
     const { points } = _.flow(
       sortCoursesByDate,
+      courses =>
+        filterCoursesByStudyPlan(
+          student.studyplans.find(p => p.programme_code === code),
+          courses
+        ),
       courses => filterCoursesByDate(courses, startDate),
       _.reduce(
         ({ credits, points }, course) => {
@@ -217,26 +246,54 @@ const createStudentCreditLines = (students, singleStudent) =>
     }
   })
 
-const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, startDate, endDate }) => {
+const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, startDate, endDate, studyRightId }) => {
   const history = useHistory()
   const chartRef = useRef()
   const language = useLanguage()
   const [graphHeight, setGraphHeight] = useState(600)
+  const selectedStudyRight =
+    singleStudent && studyRightId
+      ? students[0].studyrights.find(({ studyrightid }) => studyrightid === studyRightId)
+      : null
 
-  const seriesData = useMemo(() => createStudentCreditLines(students, singleStudent), [students, singleStudent])
+  const seriesData = useMemo(
+    () => createStudentCreditLines(students, singleStudent, startDate, studyRightId),
+    [students, singleStudent, startDate, studyRightId]
+  )
 
   if (singleStudent) {
-    const starting = _.chain(students[0].studyrights || students[0].courses)
-      .map(elem => new Date(elem.startdate || elem.date))
-      .sortBy()
-      .head()
-      .defaultTo(new Date())
-      .value()
-      .getTime()
-    const ending = endDate ? new Date(endDate).getTime() : new Date().getTime()
+    const filteredAbsences = selectedStudyRight
+      ? absences.filter(({ startdate }) => startdate >= new Date(selectedStudyRight.startdate).getTime())
+      : absences
+    const startDate = selectedStudyRight
+      ? selectedStudyRight.studyright_elements
+          // eslint-disable-next-line camelcase
+          .filter(({ element_detail }) => element_detail.type === 20)
+          .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0].startdate
+      : _.chain(students[0].studyrights || students[0].courses)
+          .map(elem => new Date(elem.startdate || elem.date))
+          .sortBy()
+          .head()
+          .defaultTo(new Date())
+          .value()
+          .getTime()
+    const [, studyRightTargetEnd] = getStudyRightElementTargetDates(selectedStudyRight, absences)
+    const ending = selectedStudyRight
+      ? new Date(studyRightTargetEnd).getTime()
+      : new Date(endDate || new Date()).getTime()
+    const starting = new Date(startDate).getTime()
 
-    seriesData.push(createGoalSeries(starting, ending, absences))
+    seriesData.push(createGoalSeries(starting, ending, filteredAbsences))
   }
+
+  const graduations = singleStudent
+    ? students[0].studyrights
+        .filter(({ graduated }) => graduated)
+        // eslint-disable-next-line camelcase
+        .map(({ enddate }) => ({
+          value: new Date(enddate).getTime(),
+        }))
+    : []
 
   const options = createGraphOptions({
     singleStudent,
@@ -250,6 +307,7 @@ const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, 
         history.push(`/students/${point.series.name}`)
       }
     },
+    graduations,
   })
 
   const makeGraphSizeButton = (height, label) => (

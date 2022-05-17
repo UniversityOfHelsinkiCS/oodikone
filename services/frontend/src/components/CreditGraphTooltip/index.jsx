@@ -1,6 +1,6 @@
 import React from 'react'
 import { Card, Icon } from 'semantic-ui-react'
-import { bool, arrayOf, object } from 'prop-types'
+import { arrayOf, object } from 'prop-types'
 
 import './creditGraphTooltip.css'
 
@@ -53,8 +53,7 @@ const getCardDescription = (credits, grade, passed, isStudyModuleCredit) => (
 )
 
 const CreditGraphTooltip = props => {
-  const { active } = props
-  if (active && props.payload && props.payload.length > 0) {
+  if (props.payload && props.payload.length > 0) {
     const { payload } = props
     const { name } = payload[0]
     const { title, credits, date, grade, passed, isStudyModuleCredit } = payload[0].payload
@@ -72,12 +71,10 @@ const CreditGraphTooltip = props => {
 }
 
 CreditGraphTooltip.defaultProps = {
-  active: false,
   payload: [],
 }
 
 CreditGraphTooltip.propTypes = {
-  active: bool,
   payload: arrayOf(object),
 }
 

@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react'
 import { func, shape, string } from 'prop-types'
 
-import { Divider, Table, Icon, Header, Item } from 'semantic-ui-react'
+import { Divider, Table, Icon, Header, Item, Segment, Button, Popup } from 'semantic-ui-react'
 import { sortBy } from 'lodash'
 
 import { Link } from 'react-router-dom'
 
-import { reformatDate, getTextIn } from '../../../common'
+import { reformatDate, getTextIn, getTargetCreditsForProgramme } from '../../../common'
 
 const StudyrightsTable = ({
   Programmes,
@@ -31,6 +31,7 @@ const StudyrightsTable = ({
         studystartdate: studyright.studystartdate,
         enddate: programme.enddate,
         name: getTextIn(programme.element_detail.name, language),
+        isFilterable: student.studyplans.map(plan => plan.programme_code).includes(programme.element_detail.code),
       }))
     const studytracks = sortBy(studyright.studyright_elements, 'enddate')
       .filter(e => e.element_detail.type === 30)
@@ -139,21 +140,21 @@ const StudyrightsTable = ({
 
     const courses = studyplans.map(sp => sp.included_courses).flat()
 
-    const totalCredits =
-      programmeCodes[0].includes('KH') || ['MH03_001', 'MH03_003'].includes(programmeCodes[0]) ? 180 : 120
+    const totalCredits = getTargetCreditsForProgramme(programmeCodes[0])
     const completedCredits = courses.reduce((acc, course) => getCompletedCredits(course) + acc, 0)
 
     return <>{(Math.min(1, completedCredits / Math.max(totalCredits, 1)) * 100).toFixed(0)}%</>
   }
 
   return (
-    <>
+    <Segment basic>
       <Divider horizontal style={{ padding: '20px' }}>
-        <Header as="h4">Studyrights</Header>
+        <Header as="h4">Filter credits by study right</Header>
       </Divider>
       <Table className="fixed-header">
         <Table.Header>
           <Table.Row>
+            <Table.HeaderCell />
             {studyRightHeaders.map(header => (
               <Table.HeaderCell key={header}>{header}</Table.HeaderCell>
             ))}
@@ -164,12 +165,37 @@ const StudyrightsTable = ({
             .reverse()
             .map(c => {
               if (c.elements.programmes.length > 0) {
+                const rowIsFilterable = c.elements.programmes.some(p => p.isFilterable)
                 return (
                   <Table.Row
-                    active={c.studyrightid === studyrightid}
+                    style={{ cursor: rowIsFilterable ? 'pointer' : 'not-allowed' }}
                     key={c.studyrightid}
-                    onClick={() => handleStartDateChange(c.elements, c.studyrightid)}
+                    onClick={() => (rowIsFilterable ? handleStartDateChange(c.elements, c.studyrightid) : null)}
                   >
+                    <Table.Cell>
+                      <Popup
+                        content={
+                          rowIsFilterable
+                            ? `Display credits included in the study plan of this study right`
+                            : 'This study right does not have a study plan'
+                        }
+                        size="mini"
+                        trigger={
+                          <div>
+                            <Button
+                              onClick={() => handleStartDateChange(c.elements, c.studyrightid)}
+                              size="mini"
+                              basic={c.studyrightid !== studyrightid}
+                              primary={c.studyrightid === studyrightid}
+                              disabled={!rowIsFilterable}
+                              icon
+                            >
+                              <Icon name="filter" />
+                            </Button>
+                          </div>
+                        }
+                      />
+                    </Table.Cell>
                     <Table.Cell>{c.elements.programmes.length > 0 && renderProgrammes(c)}</Table.Cell>
                     <Table.Cell>{renderStudytracks(c)}</Table.Cell>
                     <Table.Cell>{renderGraduated(c)}</Table.Cell>
@@ -181,7 +207,7 @@ const StudyrightsTable = ({
             })}
         </Table.Body>
       </Table>
-    </>
+    </Segment>
   )
 }
 

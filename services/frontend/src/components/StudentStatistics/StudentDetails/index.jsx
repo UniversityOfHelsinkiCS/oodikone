@@ -181,6 +181,7 @@ const StudentDetails = ({
         graphYearStart={graphYearStart}
         semesters={semesters}
         language={language}
+        studyRightId={studyrightid}
       />
       <TagsTable student={student} language={language} />
       <StudyrightsTable

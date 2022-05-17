@@ -4,17 +4,61 @@ import { flattenDeep } from 'lodash'
 import Highcharts from 'highcharts/highstock'
 import ReactHighcharts from 'react-highcharts'
 import CreditAccumulationGraphHighCharts from '../../CreditAccumulationGraphHighCharts'
-import { byDateDesc, reformatDate, getTextIn } from '../../../common'
+import { byDateDesc, reformatDate, getTextIn, getStudyRightElementTargetDates } from '../../../common'
 import TSA from '../../../common/tsa'
 
 const ANALYTICS_CATEGORY = 'Student stats'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
-const CreditsGraph = ({ graphYearStart, student, absences }) => {
-  const selectedStart = new Date(graphYearStart ?? student.started)
-  const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
-  const endDate = dates.length > 0 ? Math.max(...dates) : new Date().getTime()
+const getEarliestAttainmentDate = ({ courses }) =>
+  courses.filter(({ credittypecode }) => credittypecode !== 10).sort((a, b) => new Date(a.date) - new Date(b.date))[0]
+    .date
 
+const resolveGraphStartDate = (student, graphYearStart, selectedStudyRight, studyRightTargetStart) => {
+  const earliestAttainmentDate = getEarliestAttainmentDate(student)
+  if (!selectedStudyRight)
+    return Math.min(new Date(earliestAttainmentDate).getTime(), new Date(graphYearStart || new Date()).getTime())
+
+  const studyRightElement = selectedStudyRight.studyright_elements.sort(
+    (a, b) => new Date(b.startdate) - new Date(a.startdate)
+  )[0]
+  const studyPlan = student.studyplans.find(p => p.programme_code === studyRightElement.code)
+  const filteredCourses = studyPlan
+    ? // eslint-disable-next-line camelcase
+      student.courses.filter(({ course_code }) => studyPlan.included_courses.includes(course_code))
+    : []
+
+  return Math.min(
+    ...flattenDeep(filteredCourses.map(c => c.date)).map(d => new Date(d).getTime()),
+    new Date(studyRightTargetStart).getTime()
+  )
+}
+
+const resolveGraphEndDate = (dates, selectedStudyRight, student, studyRightTargetEnd) => {
+  if (!selectedStudyRight) return Math.max(...(dates || []), new Date().getTime())
+  const studyRightElement = selectedStudyRight.studyright_elements.sort(
+    (a, b) => new Date(b.startdate) - new Date(a.startdate)
+  )[0]
+  const studyPlan = student.studyplans.find(p => p.programme_code === studyRightElement.code)
+  const filteredCourses = studyPlan
+    ? // eslint-disable-next-line camelcase
+      student.courses.filter(({ course_code }) => studyPlan.included_courses.includes(course_code))
+    : []
+
+  return Math.max(
+    new Date(studyRightTargetEnd).getTime(),
+    ...flattenDeep(filteredCourses.map(({ date }) => new Date(date).getTime()))
+  )
+}
+
+const CreditsGraph = ({ graphYearStart, student, absences, studyRightId }) => {
+  const selectedStudyRight = student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId)
+  const dates = flattenDeep(student.courses.map(c => c.date)).map(d => new Date(d).getTime())
+  const [studyRightTargetStart, studyRightTargetEnd] = getStudyRightElementTargetDates(selectedStudyRight, absences)
+  const selectedStart = new Date(
+    resolveGraphStartDate(student, graphYearStart, selectedStudyRight, studyRightTargetStart)
+  )
+  const endDate = resolveGraphEndDate(dates, selectedStudyRight, student, studyRightTargetEnd)
   return (
     <CreditAccumulationGraphHighCharts
       singleStudent
@@ -22,6 +66,7 @@ const CreditsGraph = ({ graphYearStart, student, absences }) => {
       startDate={selectedStart}
       endDate={endDate}
       absences={absences}
+      studyRightId={studyRightId}
     />
   )
 }
@@ -184,13 +229,18 @@ const GradeGraph = ({ student, semesters, language }) => {
   )
 }
 
-const StudentGraphs = ({ student, absences, graphYearStart, semesters, language }) => {
+const StudentGraphs = ({ student, absences, graphYearStart, semesters, language, studyRightId }) => {
   const panes = [
     {
       menuItem: 'Credit graph',
       render: () => (
         <Tab.Pane>
-          <CreditsGraph absences={absences} student={student} graphYearStart={graphYearStart} />
+          <CreditsGraph
+            absences={absences}
+            student={student}
+            graphYearStart={graphYearStart}
+            studyRightId={studyRightId}
+          />
         </Tab.Pane>
       ),
     },

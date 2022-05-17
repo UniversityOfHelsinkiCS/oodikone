@@ -261,6 +261,78 @@ export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBo
   return maxBy(grades, grade => grade.value)
 }
 
+const getEarliestStudyRightElement = studyright => {
+  if (!studyright) return null
+  return (
+    studyright.studyright_elements
+      // eslint-disable-next-line camelcase
+      .filter(({ element_detail }) => element_detail.type === 20)
+      .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0]
+  )
+}
+
+export const getTargetCreditsForProgramme = code => {
+  if (code === 'MH30_001') return 360
+  if (code === 'MH30_003') return 330
+  if (code === 'MH30_004') return 150
+  if (code === 'MH90_001') return 180
+  if (code.includes('MH')) return 120
+  return 180
+}
+
+const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12)
+
+/**
+ * Get start and end dates for study right element. For bachelor a 3 year target is used
+ * and for masters a 2 year target. Any absences within the study right element extends the end date.
+ * If any absence is in the start of study right element the start date is postponed.
+ */
+export const getStudyRightElementTargetDates = (studyRight, absences = []) => {
+  const studyRightElement = getEarliestStudyRightElement(studyRight)
+  if (!studyRightElement) return []
+  const { code, startdate: sreStartDate, enddate: sreEndDate } = studyRightElement
+  const months = getMonthsForDegree(code)
+  const end =
+    code.includes('KH') || code.includes('ba') || ['MH30_001', 'MH30_003'].includes(code)
+      ? moment(sreStartDate).add(months, 'months').set('month', 7).endOf('month')
+      : moment(sreStartDate).add(months, 'months')
+
+  if (!absences) return [new Date(sreStartDate), new Date(end)]
+  const absencesWithinStudyRightElement = absences.filter(
+    ({ startdate, enddate }) =>
+      startdate >= new Date(sreStartDate).getTime() && enddate <= new Date(sreEndDate).getTime()
+  )
+
+  if (!absencesWithinStudyRightElement.length) return [new Date(sreStartDate), new Date(end)]
+
+  const absenceInStartOfStudyRight = absencesWithinStudyRightElement.find(
+    ({ startdate }) => new Date(sreStartDate).getTime() === startdate
+  )
+  const absentMonthsDuringStudy = Math.round(
+    absencesWithinStudyRightElement
+      .filter(({ startdate, enddate }) => {
+        if (!absenceInStartOfStudyRight) return true
+        return startdate !== absenceInStartOfStudyRight.startdate && enddate !== absenceInStartOfStudyRight.enddate
+      })
+      .reduce((acc, absent) => {
+        const { startdate, enddate } = absent
+        const diff = moment(startdate).diff(moment(enddate), 'days') / 30
+        return acc + Math.abs(diff)
+      }, 0)
+  )
+  const absentMonthsBeforeStudy = absenceInStartOfStudyRight
+    ? Math.round(
+        Math.abs(
+          moment(absenceInStartOfStudyRight.startdate).diff(moment(absenceInStartOfStudyRight.enddate), 'days') / 30
+        )
+      )
+    : 0
+  return [
+    new Date(moment(sreStartDate).add(absentMonthsBeforeStudy, 'months')),
+    new Date(end.add(absentMonthsDuringStudy + absentMonthsBeforeStudy, 'months')),
+  ]
+}
+
 export const validateInputLength = (input, minLength) => input && input.trim().length >= minLength
 
 export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
