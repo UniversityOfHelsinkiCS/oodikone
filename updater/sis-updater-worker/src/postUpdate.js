@@ -32,6 +32,10 @@ const handleUpdateEnding = async (doneKey, totalKey) => {
 }
 
 const postUpdate = async (updateMsg, currentChunkStartTime) => {
+  if (!updateMsg.entityIds) {
+    return
+  }
+
   const studentsToBeFixed = intersection(
     updateMsg.entityIds || [],
     studentsThatNeedToBeFixed.map(s => s.id)

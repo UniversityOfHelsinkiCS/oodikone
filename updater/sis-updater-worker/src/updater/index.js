@@ -9,6 +9,7 @@ const {
   updateCourseTypes,
   updateCreditTypes,
   updateStudyrightExtents,
+  updateTrends,
 } = require('./updateMeta')
 
 const idToHandler = {
@@ -24,6 +25,7 @@ const idToHandler = {
 
 const update = async ({ entityIds, type }) => {
   const updateHandler = idToHandler[type]
+
   switch (type) {
     case 'students':
       return await updateHandler(entityIds)
@@ -41,6 +43,8 @@ const update = async ({ entityIds, type }) => {
       return await updateHandler(await selectFromByIds(type, entityIds))
     case 'programme_modules':
       return await updateHandler(entityIds)
+    case 'trends':
+      return await updateTrends()
   }
 }
 

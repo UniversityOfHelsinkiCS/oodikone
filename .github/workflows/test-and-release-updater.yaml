@@ -87,6 +87,11 @@ jobs:
         env:
           SCHEDULE_IMMEDIATE: hourly
           EXIT_AFTER_IMMEDIATES: yes
+      - name: 'Run daily jobs'
+        run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
+        env:
+          SCHEDULE_IMMEDIATE: daily
+          EXIT_AFTER_IMMEDIATES: yes
       - name: 'Run weekly jobs'
         run: docker-compose --file docker-compose.ci.yml run sis-updater-scheduler npm start
         env:

@@ -35,12 +35,9 @@ const IMPORTER_TABLES = {
   studyRightPrimalities: 'study_right_primalities',
 }
 
-const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
-  const redisKey = type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
-  await redisIncrementBy(redisKey, entityIds.length)
-
+const schedule = async (args, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
   if (!ENABLE_WORKER_REPORTING) {
-    stan.publish(channel, JSON.stringify({ entityIds, type }))
+    stan.publish(channel, JSON.stringify(args))
     return
   }
 
@@ -80,8 +77,14 @@ const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNE
 
     completionChannel.on('message', messageHandler)
 
-    stan.publish(channel, JSON.stringify({ id, entityIds, type }))
+    stan.publish(channel, JSON.stringify({ ...args, id }))
   })
+}
+
+const createJobs = async (entityIds, type, channel = SIS_UPDATER_SCHEDULE_CHANNEL) => {
+  const redisKey = type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
+  await redisIncrementBy(redisKey, entityIds.length)
+  await schedule({ entityIds, type }, channel)
 }
 
 const scheduleFromDb = async ({
@@ -282,6 +285,19 @@ const schedulePurge = async () => {
   }
 }
 
+const scheduleTrends = async () => {
+  await schedule({ type: 'trends' })
+}
+
+const scheduleDaily = async () => {
+  try {
+    await scheduleTrends()
+  } catch (e) {
+    logger.error({ message: 'Daily scheduling failed', meta: e.stack })
+    throw e
+  }
+}
+
 module.exports = {
   scheduleMeta,
   scheduleStudents,
@@ -290,6 +306,7 @@ module.exports = {
   scheduleWeekly,
   schedulePrePurge,
   schedulePurge,
+  scheduleDaily,
   scheduleByStudentNumbers,
   scheduleByCourseCodes,
   isUpdaterActive,
