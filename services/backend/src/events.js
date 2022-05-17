@@ -8,9 +8,6 @@ const { findAndSaveTeachers } = require('./services/topteachers')
 const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
-const {
-  dbConnections: { sequelize },
-} = require('./database/connection')
 
 const schedule = (cronTime, func) => new CronJob({ cronTime, onTick: func, start: true, timeZone: 'Europe/Helsinki' })
 
@@ -80,10 +77,6 @@ const refreshUberToRedis = async () => {
   logger.info(`Refreshing CDS Uber data doned`)
 }
 
-const refreshProtoCMaterializedView = async () => {
-  await sequelize.query('REFRESH MATERIALIZED VIEW organization_yearly_credits')
-}
-
 const refreshStatistics = async () => {
   const statfuncs = [refreshStudyrightAssociations, refreshTeacherLeaderboard]
   logger.info('Refreshing statistics')
@@ -94,7 +87,7 @@ const refreshStatistics = async () => {
 }
 
 const refreshTrends = async () => {
-  const trendfuncs = [refreshProtoCMaterializedView, refreshStatusToRedis, refreshUberToRedis]
+  const trendfuncs = [refreshStatusToRedis, refreshUberToRedis]
   logger.info('Refreshing trends')
   for (const func of trendfuncs) {
     await func()

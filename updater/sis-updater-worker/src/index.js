@@ -80,6 +80,8 @@ const handleInfoMessage = async infoMsg => {
 }
 
 const isAllowedToUpdateMsg = async updateMsg => {
+  if (!updateMsg.entityIds) return true
+
   const doneKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_DONE_KEY : REDIS_TOTAL_META_DONE_KEY
   const totalKey = updateMsg.type === 'students' ? REDIS_TOTAL_STUDENTS_KEY : REDIS_TOTAL_META_KEY
 
