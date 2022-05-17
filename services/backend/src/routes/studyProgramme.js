@@ -3,7 +3,10 @@ const { getBasicStatsForStudytrack } = require('../services/studyprogrammeBasics
 const { getCreditStatsForStudytrack } = require('../services/studyprogrammeCredits')
 const { getGraduationStatsForStudytrack } = require('../services/studyprogrammeGraduations')
 const { getStudytrackStatsForStudyprogramme } = require('../services/studytrackStats')
-const { getStudyprogrammeCoursesForStudytrack } = require('../services/studyprogrammeCourses')
+const {
+  getStudyprogrammeCoursesForStudytrack,
+  getAllStudyprogrammeCourses,
+} = require('../services/studyprogrammeCourses')
 const {
   getBasicStats,
   setBasicStats,
@@ -117,6 +120,8 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
 router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
   const code = req.params.id
   const showByYear = req.query?.academicyear
+  const programmeCourses = await getAllStudyprogrammeCourses(code)
+  // console.log('programme coursese: ', programmeCourses)
   const date = new Date()
   const endOfToday = new Date()
   endOfToday.setHours(23, 59, 59, 999)
@@ -132,11 +137,11 @@ router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
     try {
       data = null
     } catch (e) {
-      logger.error(`Failed to get code ${code} graduation stats`)
+      logger.error(`Failed to get code ${code} programme courses`)
     }
     if (!data) {
       try {
-        data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear)
+        data = await getStudyprogrammeCoursesForStudytrack(date.getTime(), code, showByYear, programmeCourses)
       } catch (e) {
         logger.error(`Failed to get code ${code} programme courses stats: ${e}`)
       }
