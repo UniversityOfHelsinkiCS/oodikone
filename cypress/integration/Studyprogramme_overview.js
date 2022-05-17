@@ -381,7 +381,6 @@ describe('Studyprogramme overview', () => {
 
       cy.get('[data-cy=CoursesSortableTable]').within(() => {
         cy.get('tr').eq(1).contains('Aineopintojen harjoitustyö: Tietokantasovellus')
-        cy.get('tr').eq(7).contains('DevOps with Docker')
         cy.get('tr').eq(-1).contains('Äidinkielinen viestintä')
       })
     })
