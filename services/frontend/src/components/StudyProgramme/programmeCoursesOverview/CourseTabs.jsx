@@ -3,6 +3,7 @@ import { Tab } from 'semantic-ui-react'
 import OverallStatsTable from './OverallStatsTable'
 
 const CourseTabs = ({ data }) => {
+  // console.log('course tabs data: ', data)
   const paneTypes = [
     {
       label: 'Tables',
