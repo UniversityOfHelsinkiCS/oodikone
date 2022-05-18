@@ -26,6 +26,9 @@
   display: flex;
   background-color: white;
   position: absolute;
+}
+
+.ok-sortable-table th .column-tools > div {
   padding: 0 0.78571429em;
 }
 

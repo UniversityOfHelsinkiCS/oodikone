@@ -391,11 +391,9 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
   )
 
   return (
-    <SizeMeasurer
-      as="th"
+    <th
       colSpan={colSpan}
       rowSpan={rowSpan}
-      onSizeChange={onCellSizeChange}
       className={filterMenuOpen ? 'filter-menu-open' : 'filter-menu-closed'}
       style={{
         ...style,
@@ -413,7 +411,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         }
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <SizeMeasurer onSizeChange={onCellSizeChange} style={{ display: 'flex', alignItems: 'center' }}>
         {toolsMode !== 'fixed' && (isFilterActive || isSortingActive) && (
           <div
             style={{
@@ -456,77 +454,82 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         </Orientable>
         <div style={{ flexGrow: 1 }} />
         <SizeMeasurer onSizeChange={onToolsSizeChange} className={`column-tools ${toolsMode}`}>
-          {sortable && (!hasChildren || column.mergeHeader) && (
-            <Icon
-              name={sortIcon}
-              style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
-            />
-          )}
-          {filterable && (!hasChildren || column.mergeHeader) && (
-            <Popup
-              offset={[-3, 0]}
-              trigger={<Icon name="filter" style={{ color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb' }} />}
-              position="bottom center"
-              open={filterMenuOpen}
-              onOpen={e => {
-                if (e?.stopPropagation) {
-                  e.stopPropagation()
-                }
+          <div>
+            {sortable && (!hasChildren || column.mergeHeader) && (
+              <Icon
+                name={sortIcon}
+                style={{ color: sort ? 'rgb(33, 133, 208)' : '#bbb', position: 'relative', top: '-1px' }}
+              />
+            )}
+            {filterable && (!hasChildren || column.mergeHeader) && (
+              <Popup
+                offset={[-3, 0]}
+                trigger={<Icon name="filter" style={{ color: isFilterActive ? 'rgb(33, 133, 208)' : '#bbb' }} />}
+                position="bottom center"
+                open={filterMenuOpen}
+                onOpen={e => {
+                  if (e?.stopPropagation) {
+                    e.stopPropagation()
+                  }
 
-                setFilterMenuOpen(true)
-              }}
-              onClose={e => {
-                if (e?.stopPropagation) {
-                  e.stopPropagation()
-                }
+                  setFilterMenuOpen(true)
+                }}
+                onClose={e => {
+                  if (e?.stopPropagation) {
+                    e.stopPropagation()
+                  }
 
-                setFilterMenuOpen(false)
-              }}
-              on="click"
-              className="filter-menu"
-              hideOnScroll={false}
-              style={{ padding: 0, zIndex: 9005 }}
-              hoverable
-            >
-              <div onClick={e => e.stopPropagation()}>
-                <FilterComponent
-                  dispatch={filterComponentDispatch}
-                  column={column}
-                  options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
-                />
-                <div className="actions">
-                  <div
-                    className="item"
-                    active={sort === 'asc'}
-                    onClick={() =>
-                      dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
-                    }
-                  >
-                    Sort: Ascending
-                  </div>
-                  <div
-                    className="item"
-                    active={sort === 'desc'}
-                    onClick={() =>
-                      dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'desc' } })
-                    }
-                  >
-                    Sort: Descending
-                  </div>
-                  <div
-                    className="item"
-                    onClick={() => dispatch({ type: 'RESET_COLUMN_FILTER', payload: { column: filterColumnKey } })}
-                  >
-                    Reset column filter
+                  setFilterMenuOpen(false)
+                }}
+                on="click"
+                className="filter-menu"
+                hideOnScroll={false}
+                style={{ padding: 0, zIndex: 9005 }}
+                hoverable
+              >
+                <div onClick={e => e.stopPropagation()}>
+                  <FilterComponent
+                    dispatch={filterComponentDispatch}
+                    column={column}
+                    options={state.filterOptions ?? ColumnFilters[column.filterType ?? 'default'].initialOptions()}
+                  />
+                  <div className="actions">
+                    <div
+                      className="item"
+                      active={sort === 'asc'}
+                      onClick={() =>
+                        dispatch({ type: 'TOGGLE_COLUMN_SORT', payload: { column: filterColumnKey, direction: 'asc' } })
+                      }
+                    >
+                      Sort: Ascending
+                    </div>
+                    <div
+                      className="item"
+                      active={sort === 'desc'}
+                      onClick={() =>
+                        dispatch({
+                          type: 'TOGGLE_COLUMN_SORT',
+                          payload: { column: filterColumnKey, direction: 'desc' },
+                        })
+                      }
+                    >
+                      Sort: Descending
+                    </div>
+                    <div
+                      className="item"
+                      onClick={() => dispatch({ type: 'RESET_COLUMN_FILTER', payload: { column: filterColumnKey } })}
+                    >
+                      Reset column filter
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Popup>
-          )}
-          {column.helpText && <Popup position="top center" trigger={helpIcon} content={column.helpText} />}
+              </Popup>
+            )}
+            {column.helpText && <Popup position="top center" trigger={helpIcon} content={column.helpText} />}
+          </div>
         </SizeMeasurer>
-      </div>
-    </SizeMeasurer>
+      </SizeMeasurer>
+    </th>
   )
 })
 
