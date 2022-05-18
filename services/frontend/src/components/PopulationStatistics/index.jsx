@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
@@ -25,6 +25,7 @@ import {
   programmeFilter,
   studyrightStatusFilter,
   cherrypickFilter,
+  hopsFilter,
 } from '../FilterView/filters'
 
 const PopulationStatistics = () => {
@@ -37,8 +38,6 @@ const PopulationStatistics = () => {
     populationToData.makePopulationsToData
   )
 
-  const [onlyHopsCredits, setOnlyHopsCredits] = useState(false)
-
   useTitle('Population statistics')
 
   const { data: allSemesters } = useGetSemestersQuery()
@@ -47,6 +46,7 @@ const PopulationStatistics = () => {
 
   const filters = [
     cherrypickFilter,
+    hopsFilter({ programmeCode }),
     genderFilter,
     ageFilter,
     courseFilter({ courses }),
@@ -73,34 +73,31 @@ const PopulationStatistics = () => {
     )
   }
 
-  const mapStudents = student => {
-    const hops = student.studyplans.find(plan => plan.programme_code === programmeCode)
-    const courses = new Set(hops ? hops.included_courses : [])
+  const students = useMemo(() => {
+    if (!samples) {
+      return []
+    }
 
-    const hopsCourses = student.courses.filter(course => courses.has(course.course_code))
-    const hopsCredits = hopsCourses.reduce((acc, cur) => acc + cur.credits, 0)
+    return samples.map(student => {
+      const hops = student.studyplans.find(plan => plan.programme_code === programmeCode)
+      const courses = new Set(hops ? hops.included_courses : [])
 
-    if (!onlyHopsCredits)
+      const hopsCourses = student.courses.filter(course => courses.has(course.course_code))
+      const hopsCredits = hopsCourses.reduce((acc, cur) => acc + cur.credits, 0)
+
       return {
         ...student,
-        hopsCredits,
         allCredits: student.credits,
+        hopsCredits,
       }
-
-    return {
-      ...student,
-      courses: hopsCourses,
-      hopsCredits,
-      credits: hopsCredits,
-      allCredits: student.credits,
-    }
-  }
+    })
+  }, [samples, programmeCode])
 
   return (
     <FilterView
       name="PopulationStatistics"
       filters={filters}
-      students={samples.map(mapStudents) ?? []}
+      students={students}
       displayTray={location.search !== ''}
       initialOptions={{
         [transferredToProgrammeFilter.key]: {
@@ -114,12 +111,7 @@ const PopulationStatistics = () => {
             Population statistics
           </Header>
           <Segment className="contentSegment">
-            <PopulationSearch
-              history={history}
-              location={location}
-              onlyHopsCredits={onlyHopsCredits}
-              setOnlyHopsCredits={setOnlyHopsCredits}
-            />
+            <PopulationSearch history={history} location={location} />
             {location.search !== '' ? (
               <PopulationDetails
                 queryIsSet={queryIsSet}
