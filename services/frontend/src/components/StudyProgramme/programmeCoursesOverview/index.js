@@ -46,6 +46,7 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
   }
 
   const filterDataByYear = (data, fromYear, toYear) => {
+    // console.log('data: ', data)
     const temp = data
       .filter(c => c.year >= fromYear && c.year <= toYear)
       .reduce((acc, curr) => {
