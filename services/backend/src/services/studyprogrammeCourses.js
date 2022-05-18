@@ -116,10 +116,11 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
       acc[curr.code] = {
         code: curr.code,
         name: curr.name,
+        years: {},
       }
     }
-    if (!acc[curr.code][curr.year]) {
-      acc[curr.code][curr.year] = {
+    if (!acc[curr.code]['years'][curr.year]) {
+      acc[curr.code]['years'][curr.year] = {
         totalAllStudents: 0,
         totalAllCredits: 0,
         totalProgrammeStudents: 0,
@@ -132,22 +133,22 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     }
     switch (curr.type) {
       case 'total':
-        acc[curr.code][curr.year]['totalAllStudents'] += curr.totalAllStudents
-        acc[curr.code][curr.year]['totalAllCredits'] += curr.totalAllcredits
+        acc[curr.code]['years'][curr.year]['totalAllStudents'] += curr.totalAllStudents
+        acc[curr.code]['years'][curr.year]['totalAllCredits'] += curr.totalAllcredits
         break
       case 'ownProgramme':
-        acc[curr.code][curr.year]['totalProgrammeStudents'] += curr.totalProgrammeStudents
-        acc[curr.code][curr.year]['totalProgrammeCredits'] += curr.totalProgrammeCredits
+        acc[curr.code]['years'][curr.year]['totalProgrammeStudents'] += curr.totalProgrammeStudents
+        acc[curr.code]['years'][curr.year]['totalProgrammeCredits'] += curr.totalProgrammeCredits
         break
 
       case 'otherProgramme':
-        acc[curr.code][curr.year]['totalOtherProgrammeStudents'] += curr.totalOtherProgrammeStudents
-        acc[curr.code][curr.year]['totalOtherProgrammeCredits'] += curr.totalOtherProgrammeCredits
+        acc[curr.code]['years'][curr.year]['totalOtherProgrammeStudents'] += curr.totalOtherProgrammeStudents
+        acc[curr.code]['years'][curr.year]['totalOtherProgrammeCredits'] += curr.totalOtherProgrammeCredits
         break
 
       case 'noStudyright':
-        acc[curr.code][curr.year]['totalWithoutStudyrightStudents'] += curr.totalWithoutStudyrightStudents
-        acc[curr.code][curr.year]['totalWithoutStudyrightCredits'] += curr.totalWithoutStudyrightCredits
+        acc[curr.code]['years'][curr.year]['totalWithoutStudyrightStudents'] += curr.totalWithoutStudyrightStudents
+        acc[curr.code]['years'][curr.year]['totalWithoutStudyrightCredits'] += curr.totalWithoutStudyrightCredits
         break
     }
 
@@ -171,12 +172,13 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
       const mergedCourse = {}
       mergedCourse['code'] = allCourses[normCode].code
       mergedCourse['name'] = allCourses[normCode].name
+      mergedCourse['years'] = {}
 
       yearRange
         .filter(year => year <= maxYear)
         .forEach(year => {
-          if (!allCourses[normCode][year]) {
-            mergedCourse[year] = {
+          if (!allCourses[normCode]['years'][year]) {
+            mergedCourse['years'][year] = {
               totalAllStudents: 0,
               totalAllCredits: 0,
               totalProgrammeStudents: 0,
@@ -187,12 +189,13 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
               totalWithoutStudyrightCredits: 0,
             }
           } else {
-            mergedCourse[year] = { ...allCourses[normCode][year] }
+            mergedCourse['years'][year] = { ...allCourses[normCode]['years'][year] }
           }
 
-          if (allCourses[ayCourse][year]) {
+          if (allCourses[ayCourse]['years'][year]) {
             properties.forEach(prop => {
-              mergedCourse[year][prop] = mergedCourse[year][prop] + allCourses[ayCourse][year][prop]
+              mergedCourse['years'][year][prop] =
+                mergedCourse['years'][year][prop] + allCourses[ayCourse]['years'][year][prop]
             })
           }
         })

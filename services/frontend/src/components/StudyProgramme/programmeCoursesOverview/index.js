@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { min, max } from 'lodash'
+import { min, max, range } from 'lodash'
 import { useGetProgrammeCoursesStatsQuery } from 'redux/studyProgramme'
 import { Loader, Segment, Header } from 'semantic-ui-react'
 import CourseTabs from './CourseTabs'
@@ -17,9 +17,9 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
   // fromYear and toYear initial values are calculated from data and hence useEffect
   useEffect(() => {
     if (data) {
-      const yearcodes = data?.map(s => s.year)
-      const initFromYear = min(yearcodes)
-      const initToYear = max(yearcodes)
+      const yearcodes = [...new Set(data.map(s => Object.keys(s.years)).flat())]
+      const initFromYear = Number(min(yearcodes))
+      const initToYear = Number(max(yearcodes))
       if (!fromYear) setFromYear(initFromYear)
       if (!toYear) setToYear(initToYear)
       const normal = []
@@ -31,7 +31,6 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
       setYears({ normal, academic })
     }
   }, [data])
-
   if (isLoading) {
     return <Loader active style={{ marginTop: '10em' }} />
   }
@@ -46,22 +45,49 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
   }
 
   const filterDataByYear = (data, fromYear, toYear) => {
-    // console.log('data: ', data)
-    const temp = data
-      .filter(c => c.year >= fromYear && c.year <= toYear)
-      .reduce((acc, curr) => {
-        if (!acc[curr.code]) {
-          acc[curr.code] = { ...curr }
-        } else {
-          acc[curr.code].totalAll += curr.totalAll
-          acc[curr.code].totalOwn += curr.totalOwn
-          acc[curr.code].totalWithout += curr.totalWithout
-          acc[curr.code].totalOther += curr.totalOthers
+    const yearRange = range(fromYear, Number(toYear) + 1)
+    const filteredAndmergedCourses = data
+      .filter(c => {
+        const arr = Object.keys(c.years).some(key => yearRange.includes(Number(key)))
+        return arr
+      })
+      .map(course => {
+        const values = Object.entries(course.years).reduce(
+          (acc, curr) => {
+            if (yearRange.includes(Number(curr[0]))) {
+              acc.totalAllStudents += curr[1].totalAllStudents
+              acc.totalAllCredits += curr[1].totalAllCredits
+              acc.totalProgrammeStudents += curr[1].totalProgrammeStudents
+              acc.totalProgrammeCredits += curr[1].totalProgrammeCredits
+              acc.totalOtherProgrammeStudents += curr[1].totalOtherProgrammeStudents
+              acc.totalOtherProgrammeCredits += curr[1].totalOtherProgrammeCredits
+              acc.totalWithoutStudyrightStudents += curr[1].totalWithoutStudyrightStudents
+              acc.totalWithoutStudyrightCredits += curr[1].totalWithoutStudyrightCredits
+            }
+
+            return acc
+          },
+          {
+            totalAllStudents: 0,
+            totalAllCredits: 0,
+            totalProgrammeStudents: 0,
+            totalProgrammeCredits: 0,
+            totalOtherProgrammeStudents: 0,
+            totalOtherProgrammeCredits: 0,
+            totalWithoutStudyrightStudents: 0,
+            totalWithoutStudyrightCredits: 0,
+          }
+        )
+        return {
+          ...values,
+          code: course.code,
+          name: course.name,
         }
-        return acc
-      }, {})
-    return Object.values(temp)
+      })
+
+    return filteredAndmergedCourses
   }
+
   return (
     <div className="studyprogramme-courses">
       <Segment style={{ marginTop: '1rem' }}>
