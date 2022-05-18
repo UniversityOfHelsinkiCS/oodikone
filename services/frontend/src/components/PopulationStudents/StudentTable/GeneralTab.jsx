@@ -425,50 +425,56 @@ const GeneralTab = ({
       getRowVal: s => (s.option ? getTextIn(s.option.name, language) : ''),
     },
     email: {
+      mergeHeader: true,
+      merge: true,
       key: 'email',
-      title: (
-        <>
-          email
-          <Popup
-            trigger={<Icon link name="copy" onClick={copyToClipboardAll} style={{ float: 'right' }} />}
-            content="Copied email list!"
-            on="click"
-            open={popupStates['0']}
-            onClose={() => handlePopupClose('0')}
-            onOpen={() => handlePopupOpen('0')}
-            position="top right"
-          />
-        </>
-      ),
-      getRowVal: s => s.email,
-      headerProps: { colSpan: 2 },
-    },
-    copyEmail: {
-      key: 'copyEmail',
-      getRowVal: s =>
-        s.email && !s.obfuscated ? (
-          <Popup
-            trigger={
-              <Icon
-                link
-                name="copy outline"
-                onClick={() => {
-                  copyToClipboard(s.email)
-                  sendAnalytics("Copy student's email to clipboard", "Copy student's email to clipboard")
-                }}
-                style={{ float: 'right' }}
+      children: [
+        {
+          key: 'emailValue',
+          title: (
+            <>
+              email
+              <Popup
+                trigger={<Icon link name="copy" onClick={copyToClipboardAll} style={{ float: 'right' }} />}
+                content="Copied email list!"
+                on="click"
+                open={popupStates['0']}
+                onClose={() => handlePopupClose('0')}
+                onOpen={() => handlePopupOpen('0')}
+                position="top right"
               />
-            }
-            content="Email copied!"
-            on="click"
-            open={popupStates[s.studentNumber]}
-            onClose={() => handlePopupClose(s.studentNumber)}
-            onOpen={() => handlePopupOpen(s.studentNumber)}
-            position="top right"
-          />
-        ) : null,
-      headerProps: { onClick: null, sorted: null },
-      cellProps: { className: 'iconCellNoPointer' },
+            </>
+          ),
+          getRowVal: s => s.email,
+        },
+        {
+          key: 'copyEmail',
+          getRowVal: s =>
+            s.email && !s.obfuscated ? (
+              <Popup
+                trigger={
+                  <Icon
+                    link
+                    name="copy outline"
+                    onClick={() => {
+                      copyToClipboard(s.email)
+                      sendAnalytics("Copy student's email to clipboard", "Copy student's email to clipboard")
+                    }}
+                    style={{ float: 'right' }}
+                  />
+                }
+                content="Email copied!"
+                on="click"
+                open={popupStates[s.studentNumber]}
+                onClose={() => handlePopupClose(s.studentNumber)}
+                onOpen={() => handlePopupOpen(s.studentNumber)}
+                position="top right"
+              />
+            ) : null,
+          headerProps: { onClick: null, sorted: null },
+          cellProps: { className: 'iconCellNoPointer' },
+        },
+      ],
     },
     updatedAt: {
       key: 'updatedAt',
@@ -557,7 +563,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   }
 
   const baseColumns = ['credits', 'credits.all', 'studentnumber-parent', 'tags', 'updatedAt', 'option']
-  const nameColumnsToAdd = namesVisible ? ['email', 'copyEmail', 'lastname', 'firstname'] : []
+  const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
   const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'studyStartDate', 'updatedAt']
 
   const columnKeysToInclude = _.chain(baseColumns)
