@@ -19,7 +19,6 @@ const isOpenUniCourseCode = code => code.match(/^AY?(.+?)(?:en|fi|sv)?$/)
 const getAllStudyprogrammeCourses = async studyprogramme => {
   const providerCode = mapToProviders([studyprogramme])[0]
   const normalCourses = await getAllProgrammeCourses(providerCode)
-  // console.log('normal courses: ', normalCourses)
   return normalCourses.reduce((acc, curr) => {
     acc.push(curr.code)
     if (curr.substitutions && curr.substitutions.includes('AY' + curr.code)) {
@@ -30,7 +29,6 @@ const getAllStudyprogrammeCourses = async studyprogramme => {
 }
 
 const makeYearlyPromises = (years, academicYear, type, programmeCourses, studyprogramme) => {
-  // console.log('programme courses: ', programmeCourses)
   return years.map(
     year =>
       new Promise(async res => {
@@ -106,47 +104,102 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     Promise.all(yearlyOtherProgrammeStudentsPromises),
   ])
 
+  let maxYear = 0
   const allCourses = [
     ...yearlyStudentByCourse.flat(),
     ...yearlyProgrammeStudents.flat(),
     ...yearlyStudentsWithoutStudyright.flat(),
     ...yearlyOtherProgrammeStudents.flat(),
   ].reduce((acc, curr) => {
-    if (!acc[curr.code + curr.year]) {
-      acc[curr.code + curr.year] = {
+    if (curr.year > maxYear) maxYear = curr.year
+    if (!acc[curr.code]) {
+      acc[curr.code] = {
         code: curr.code,
         name: curr.name,
-        year: curr.year,
-        totalAll: curr.totalAll | 0,
-        totalOwn: curr.totalOwn | 0,
-        totalWithout: curr.totalWithout | 0,
-        totalOthers: curr.totalOthers | 0,
       }
     }
-    acc[curr.code + curr.year] = _.merge(acc[curr.code + curr.year], curr)
+    if (!acc[curr.code][curr.year]) {
+      acc[curr.code][curr.year] = {
+        totalAllStudents: 0,
+        totalAllCredits: 0,
+        totalProgrammeStudents: 0,
+        totalProgrammeCredits: 0,
+        totalOtherProgrammeStudents: 0,
+        totalOtherProgrammeCredits: 0,
+        totalWithoutStudyrightStudents: 0,
+        totalWithoutStudyrightCredits: 0,
+      }
+    }
+    switch (curr.type) {
+      case 'total':
+        acc[curr.code][curr.year]['totalAllStudents'] += curr.totalAllStudents
+        acc[curr.code][curr.year]['totalAllCredits'] += curr.totalAllcredits
+        break
+      case 'ownProgramme':
+        acc[curr.code][curr.year]['totalProgrammeStudents'] += curr.totalProgrammeStudents
+        acc[curr.code][curr.year]['totalProgrammeCredits'] += curr.totalProgrammeCredits
+        break
+
+      case 'otherProgramme':
+        acc[curr.code][curr.year]['totalOtherProgrammeStudents'] += curr.totalOtherProgrammeStudents
+        acc[curr.code][curr.year]['totalOtherProgrammeCredits'] += curr.totalOtherProgrammeCredits
+        break
+
+      case 'noStudyright':
+        acc[curr.code][curr.year]['totalWithoutStudyrightStudents'] += curr.totalWithoutStudyrightStudents
+        acc[curr.code][curr.year]['totalWithoutStudyrightCredits'] += curr.totalWithoutStudyrightCredits
+        break
+    }
+
     return acc
   }, {})
-
-  // merge normal and AY codes if courses match
   const ayCourses = Object.keys(allCourses).filter(c => c.startsWith('AY'))
-
+  const properties = [
+    'totalAllStudents',
+    'totalAllCredits',
+    'totalProgrammeStudents',
+    'totalProgrammeCredits',
+    'totalOtherProgrammeStudents',
+    'totalOtherProgrammeCredits',
+    'totalWithoutStudyrightStudents',
+    'totalWithoutStudyrightCredits',
+  ]
   ayCourses.forEach(ayCourse => {
     const normCode = isOpenUniCourseCode(ayCourse)[1]
 
     if (allCourses[normCode]) {
-      allCourses[normCode] = {
-        code: allCourses[normCode].code,
-        name: allCourses[normCode].name,
-        year: allCourses[normCode].year,
-        totalAll: (allCourses[normCode].totalAll + allCourses[ayCourse].totalAll) | 0,
-        totalOwn: (allCourses[normCode].totalOwn + allCourses[ayCourse].totalOwn) | 0,
-        totalWithout: (allCourses[normCode].totalWithout + allCourses[ayCourse].totalWithout) | 0,
-        totalOthers: (allCourses[normCode].totalOthers + allCourses[ayCourse].totaOthers) | 0,
-      }
+      const mergedCourse = {}
+      mergedCourse['code'] = allCourses[normCode].code
+      mergedCourse['name'] = allCourses[normCode].name
+
+      yearRange
+        .filter(year => year <= maxYear)
+        .forEach(year => {
+          if (!allCourses[normCode][year]) {
+            mergedCourse[year] = {
+              totalAllStudents: 0,
+              totalAllCredits: 0,
+              totalProgrammeStudents: 0,
+              totalProgrammeCredits: 0,
+              totalOtherProgrammeStudents: 0,
+              totalOtherProgrammeCredits: 0,
+              totalWithoutStudyrightStudents: 0,
+              totalWithoutStudyrightCredits: 0,
+            }
+          } else {
+            mergedCourse[year] = { ...allCourses[normCode][year] }
+          }
+
+          if (allCourses[ayCourse][year]) {
+            properties.forEach(prop => {
+              mergedCourse[year][prop] = mergedCourse[year][prop] + allCourses[ayCourse][year][prop]
+            })
+          }
+        })
+      allCourses[normCode] = mergedCourse
       delete allCourses[ayCourse]
     }
   })
-
   return Object.values(allCourses)
 }
 
