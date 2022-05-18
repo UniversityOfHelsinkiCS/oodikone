@@ -327,11 +327,6 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
 
   const sortable = column.sortable !== false
   const filterable = column.filterable !== false
-
-  if (!column.title) {
-    return <></>
-  }
-
   const hasChildren = column.children && column.children.length > 0
 
   const { component: FilterComponent, isActive } = ColumnFilters[column.filterType ?? 'default']
@@ -436,18 +431,28 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
           style={{
             flexGrow: 1,
             minWidth: forcedTitleWidth,
+            display: 'flex',
+            alignItems: 'center',
           }}
         >
           <SizeMeasurer onSizeChange={onTitleSizeChange} style={{ display: 'inline-flex', alignItems: 'center' }}>
             {column.title}
-            {column.helpText && forcedTitleWidth && <div style={{ flexGrow: 1 }} />}
-            {column.helpText && (
+            {column.helpText && !forcedTitleWidth && (
               <Icon
                 name="question circle outline"
                 style={{ opacity: 0.5, display: 'inline-block', marginRight: 0, marginLeft: '0.5em', flexShrink: 0 }}
               />
             )}
           </SizeMeasurer>
+          {column.helpText && forcedTitleWidth && (
+            <>
+              <div style={{ flexGrow: 1 }} />
+              <Icon
+                name="question circle outline"
+                style={{ opacity: 0.5, display: 'inline-block', marginRight: 0, marginLeft: '0.5em', flexShrink: 0 }}
+              />
+            </>
+          )}
         </Orientable>
         <div style={{ flexGrow: 1 }} />
         <SizeMeasurer onSizeChange={onToolsSizeChange} className={`column-tools ${toolsMode}`}>
