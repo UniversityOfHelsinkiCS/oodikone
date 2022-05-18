@@ -19,6 +19,10 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
 
+  const queryHasBeenUpdated = () => {
+    return populationSelectedStudentCourses.query.selectedStudents?.length === filteredStudents.length
+  }
+
   const fetch = courses => {
     dispatch(
       getPopulationSelectedStudentCourses({
@@ -32,11 +36,7 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
   }
 
   useEffect(() => {
-    if (
-      !mandatoryCourses.pending &&
-      !populationSelectedStudentCourses.data &&
-      !populationSelectedStudentCourses.pending
-    )
+    if (!mandatoryCourses.pending && !queryHasBeenUpdated() && !populationSelectedStudentCourses.pending)
       fetch(mandatoryCourses.data.map(({ code }) => code))
   }, [query, filteredStudents, mandatoryCourses, populationSelectedStudentCourses])
 
