@@ -29,7 +29,7 @@ const CourseYearFilter = ({ years, fromYear, toYear, handleChange, academicYear 
                 options={fromYear ? years.filter(({ value }) => value >= fromYear) : years}
                 selection
                 inline
-                placeholder="Select academic year"
+                placeholder="Select ending year"
                 onChange={handleChange}
                 value={toYear}
                 selectOnBlur={false}

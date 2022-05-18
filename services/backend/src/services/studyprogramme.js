@@ -477,7 +477,8 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
   try {
     const res = await sequelize.query(
       `
-    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
+    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total_students, 
+    SUM(cr.credits) AS total_credits, co.code, co.name FROM credit cr
     INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
     INNER JOIN course co ON cr.course_code = co.code
     INNER JOIN course_providers cp ON cp.coursecode = co.id
@@ -498,7 +499,9 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
       code: course.code,
       name: course.name,
       year: course.year,
-      totalAll: parseInt(course.total),
+      totalAllStudents: parseInt(course.total_students),
+      totalAllcredits: parseInt(course.total_credits),
+      type: 'total',
     }))
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -511,7 +514,8 @@ const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, stu
   // console.log('studyprogramme: ', studyprogramme)
   const res = await sequelize.query(
     `
-    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
+    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total_students, 
+    SUM(cr.credits) AS total_credits, co.code, co.name FROM credit cr
     INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
     INNER JOIN course co ON cr.course_code = co.code
     INNER JOIN course_providers cp ON cp.coursecode = co.id
@@ -533,7 +537,9 @@ const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, stu
     code: course.code,
     name: course.name,
     year: course.year,
-    totalOwn: parseInt(course.total),
+    totalProgrammeStudents: parseInt(course.total_students),
+    totalProgrammeCredits: parseInt(course.total_credits),
+    type: 'ownProgramme',
   }))
 }
 
@@ -542,7 +548,8 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
   // console.log('studyprogramme: ', studyprogramme)
   const res = await sequelize.query(
     `
-    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
+    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total_students, 
+    SUM(cr.credits) AS total_credits, co.code, co.name FROM credit cr
     INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
     INNER JOIN course co ON cr.course_code = co.code
     INNER JOIN course_providers cp ON cp.coursecode = co.id
@@ -564,14 +571,17 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
     code: course.code,
     name: course.name,
     year: course.year,
-    totalOthers: parseInt(course.total),
+    totalOtherProgrammeStudents: parseInt(course.total_students),
+    totalOtherProgrammeCredits: parseInt(course.total_credits),
+    type: 'otherProgramme',
   }))
 }
 
 const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, programmeCourses) => {
   const res = await sequelize.query(
     `
-    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total, co.code, co.name FROM credit cr
+    SELECT COUNT(DISTINCT(cr.student_studentnumber)) AS total_students, 
+    SUM(cr.credits) AS total_credits, co.code, co.name FROM credit cr
     INNER JOIN studyright_elements se ON se.studentnumber = cr.student_studentnumber
     INNER JOIN course co ON cr.course_code = co.code
     INNER JOIN course_providers cp ON cp.coursecode = co.id
@@ -596,7 +606,9 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, program
     code: course.code,
     name: course.name,
     year: course.year,
-    totalWithout: parseInt(course.total),
+    totalWithoutStudyrightStudents: parseInt(course.total_students),
+    totalWithoutStudyrightCredits: parseInt(course.total_credits),
+    type: 'noStudyright',
   }))
 }
 
