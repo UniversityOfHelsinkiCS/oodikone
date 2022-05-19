@@ -125,7 +125,7 @@ const GeneralTab = ({
 
   const semesterEnrollments = enrollments => enrollments.filter(e => e.enrollmenttype === 1).length
 
-  const mainProgramme = (studyrights, studentNumber, enrollments) => {
+  const mainProgramme = (studyrights, studentNumber, enrollments = []) => {
     const programme = getNewestProgramme(
       studyrights,
       studentNumber,
@@ -449,7 +449,7 @@ const GeneralTab = ({
     enrollmentDate: {
       key: 'enrollmentDate',
       title: 'Enrollment date',
-      getRowVal: s => s.enrollments.find(c => coursecode.includes(c.course_code))?.enrollment_date_time ?? '',
+      getRowVal: s => s.enrollments?.find(c => coursecode.includes(c.course_code))?.enrollment_date_time ?? '',
       formatValue: value => (value ? reformatDate(new Date(value), 'YYYY-MM-DD') : 'No enrollment'),
     },
     language: {
