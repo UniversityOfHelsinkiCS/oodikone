@@ -64,11 +64,11 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
   )
 }
 
-const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme, academicYear, programmeCourses) => {
-  // const providerCode = mapToProviders([studyprogramme])[0]
+const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme, academicYear) => {
   const startDate = academicYear == 'true' ? await getCurrentStudyYearStartDate(unixMillis) : getCurrentYearStartDate()
   const startYear = startDate.getFullYear()
   const yearRange = _.range(2017, startYear + 1)
+  const programmeCourses = await getAllStudyprogrammeCourses(studyprogramme)
 
   const yearlyStudentByCoursePromises = makeYearlyPromises(yearRange, academicYear, 'allStudents', programmeCourses)
   const yearlyProgrammeStudentsPromises = makeYearlyPromises(
