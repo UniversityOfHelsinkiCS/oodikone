@@ -33,14 +33,14 @@ const CustomPopulationProgrammeDist = ({
           populationStatistics.elementdetails.data
         )
         if (programme && programme.code === '00000') {
-          const filteredEnrollments = student.enrollments
+          const filteredEnrollments = (student.enrollments || [])
             // eslint-disable-next-line camelcase
             .filter(({ course_code }) => coursecode.includes(course_code))
             .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
           programme = getNewestProgramme(
             student.studyrights,
             student.studentNumber,
-            { [student.studentNumber]: filteredEnrollments[0].enrollment_date_time },
+            { [student.studentNumber]: (filteredEnrollments[0] || {}).enrollment_date_time },
             populationStatistics.elementdetails.data
           )
         }
