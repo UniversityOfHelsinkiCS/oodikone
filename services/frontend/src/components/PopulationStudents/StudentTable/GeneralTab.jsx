@@ -272,7 +272,10 @@ const GeneralTab = ({
       title: sole ? `Credits ${creditColumnTitle}` : creditColumnTitle,
       filterType: 'range',
       getRowVal: s => {
-        const credits = getStudentTotalCredits(s)
+        const credits = getStudentTotalCredits({
+          ...s,
+          courses: s.courses.filter(c => new Date(c.date) >= new Date(studentToStudyrightStartMap[s.studentNumber])),
+        })
         return credits
       },
     }),
