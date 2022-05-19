@@ -126,19 +126,78 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCo
       `
     SELECT
       studentnumber
-      FROM student
-      INNER JOIN credit ON
-      student.studentnumber=credit.student_studentnumber
-  WHERE
-  course_code IN (:coursecodes) AND
-  attainment_date
-  BETWEEN
-  (select startdate FROM semesters where ${
-    separate ? 'semestercode' : 'yearcode'
-  }=:minYearCode ORDER BY semestercode LIMIT 1) AND
-  (select enddate FROM semesters where ${separate ? 'semestercode' : 'yearcode'}=:maxYearCode AND 
-  is_open IN (:isOpen)
-  ORDER BY semestercode DESC LIMIT 1);
+    FROM
+      student s
+    WHERE
+      EXISTS (
+        SELECT
+          1
+        FROM
+          credit c
+        WHERE
+          c.student_studentnumber = s.studentnumber
+          AND c.course_code IN (:coursecodes)
+          AND c.is_open IN (:isOpen)
+          AND c.attainment_date BETWEEN (
+            SELECT
+              startdate
+            FROM
+              semesters
+            WHERE
+              ${separate ? 'semestercode' : 'yearcode'} = :minYearCode
+            ORDER BY
+              semestercode
+            LIMIT
+              1
+          )
+          AND (
+            SELECT
+              enddate
+            FROM
+              semesters
+            WHERE
+              ${separate ? 'semestercode' : 'yearcode'} = :maxYearCode
+            ORDER BY
+              semestercode DESC
+            LIMIT
+              1
+          )
+      )
+      OR EXISTS (
+        SELECT
+          1
+        FROM
+          enrollment e
+        WHERE
+          e.studentnumber = s.studentnumber
+          AND e.course_code IN (:coursecodes)
+          AND e.enrollment_date_time BETWEEN (
+            SELECT
+              startdate
+            FROM
+              semesters
+            WHERE
+              ${separate ? 'semestercode' : 'yearcode'} = :minYearCode
+            ORDER BY
+              semestercode
+            LIMIT
+              1
+          )
+          AND (
+            SELECT
+              enddate
+            FROM
+              semesters
+            WHERE
+              ${separate ? 'semestercode' : 'yearcode'} = :maxYearCode
+            ORDER BY
+              semestercode DESC
+            LIMIT
+              1
+          )
+          AND e.enrollment_date_time >= '2021-05-31'
+          AND e.state IN ('ENROLLED', 'CONFIRMED')
+      );
   `,
       {
         replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: getUnifyStatus(unifyCourses) },

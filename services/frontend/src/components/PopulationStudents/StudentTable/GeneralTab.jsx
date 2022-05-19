@@ -7,7 +7,14 @@ import { useSelector } from 'react-redux'
 import SortableTable from 'components/SortableTable'
 import useFilters from 'components/FilterView/useFilters'
 import creditDateFilter from 'components/FilterView/filters/date'
-import { getStudentTotalCredits, getTextIn, getNewestProgramme, reformatDate, copyToClipboard } from 'common'
+import {
+  getStudentTotalCredits,
+  getTextIn,
+  getNewestProgramme,
+  reformatDate,
+  copyToClipboard,
+  getHighestGradeOfCourseBetweenRange,
+} from 'common'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
@@ -21,6 +28,8 @@ const GeneralTab = ({
   studentToTargetCourseDateMap,
   coursecode,
   filteredStudents,
+  from,
+  to,
 }) => {
   const { language } = useLanguage()
   const { useFilterSelector } = useFilters()
@@ -116,17 +125,27 @@ const GeneralTab = ({
 
   const semesterEnrollments = enrollments => enrollments.filter(e => e.enrollmenttype === 1).length
 
-  const mainProgramme = (studyrights, studentNumber) => {
+  const mainProgramme = (studyrights, studentNumber, enrollments) => {
     const programme = getNewestProgramme(
       studyrights,
       studentNumber,
       studentToTargetCourseDateMap,
       populationStatistics.elementdetails.data
     )
-    if (programme) {
+    if (programme && programme.code !== '00000') {
       return programme.name
     }
-    return null
+    const filteredEnrollments = enrollments
+      // eslint-disable-next-line camelcase
+      .filter(({ course_code }) => coursecode.includes(course_code))
+      .sort((a, b) => new Date(b.enrollment_date_time) - new Date(a.enrollment_date_time))
+    if (!filteredEnrollments.length) return null
+    return getNewestProgramme(
+      studyrights,
+      studentNumber,
+      { [studentNumber]: filteredEnrollments[0].enrollment_date_time },
+      populationStatistics.elementdetails.data
+    ).name
   }
 
   const studentToStudyrightStartMap = selectedStudents.reduce((res, sn) => {
@@ -166,6 +185,25 @@ const GeneralTab = ({
     return new Date(studyRightStart).getTime() > new Date(studyRightStartActual).getTime()
       ? studyRightStart
       : studyRightStartActual
+  }
+
+  const getStarted = ({ obfuscated, started }) => {
+    if (obfuscated || !started) return ''
+    return moment(started).get('year')
+  }
+
+  const getGradeAndDate = s => {
+    const courses = s.courses.filter(c => coursecode.includes(c.course_code))
+    const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
+    if (!highestGrade) return { grade: '-', date: '', language: '' }
+    const { date, language } = courses
+      .filter(c => c.grade === highestGrade.grade)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))[0]
+    return {
+      grade: highestGrade.grade,
+      date,
+      language,
+    }
   }
 
   const copyToClipboardAll = () => {
@@ -219,7 +257,7 @@ const GeneralTab = ({
       key: 'credits-all',
       title: sole ? 'All Credits' : 'All',
       filterType: 'range',
-      getRowVal: s => s.allCredits,
+      getRowVal: s => s.allCredits || s.credits,
     }),
     hops: sole => ({
       key: 'credits-hops',
@@ -326,12 +364,8 @@ const GeneralTab = ({
       key: 'gradeForSingleCourse',
       title: 'Grade',
       getRowVal: s => {
-        const grade = s.courses.filter(c => coursecode.includes(c.course_code))
-        if (grade) {
-          grade.sort((a, b) => (moment(a.date).isBefore(b.date) ? 1 : -1))
-          return grade[0].grade
-        }
-        return ''
+        const { grade } = getGradeAndDate(s)
+        return grade
       },
     },
     transferredFrom: {
@@ -400,24 +434,37 @@ const GeneralTab = ({
     programme: {
       key: 'programme',
       title: 'Study Programme',
-      getRowVal: s => getTextIn(mainProgramme(s.studyrights, s.studentNumber), language) || 'No programme',
+      getRowVal: s =>
+        getTextIn(mainProgramme(s.studyrights, s.studentNumber, s.enrollments), language) || 'No programme',
     },
     passDate: {
       key: 'passDate',
       title: 'Attainment date',
-      getRowVal: s => s.courses.find(c => coursecode.includes(c.course_code)).date,
-      formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
+      getRowVal: s => {
+        const { date } = getGradeAndDate(s)
+        return date
+      },
+      formatValue: value => (value ? reformatDate(new Date(value), 'YYYY-MM-DD') : 'No attainment'),
+    },
+    enrollmentDate: {
+      key: 'enrollmentDate',
+      title: 'Enrollment date',
+      getRowVal: s => s.enrollments.find(c => coursecode.includes(c.course_code))?.enrollment_date_time ?? '',
+      formatValue: value => (value ? reformatDate(new Date(value), 'YYYY-MM-DD') : 'No enrollment'),
     },
     language: {
       key: 'language',
       title: 'Language',
-      getRowVal: s => s.courses.find(c => coursecode.includes(c.course_code)).language,
+      getRowVal: s => {
+        const { language } = getGradeAndDate(s)
+        return language
+      },
     },
     startYear: {
       key: 'startYear',
       title: 'Start Year at Uni',
       filterType: 'range',
-      getRowVal: s => (!s.obfuscated ? moment(s.started).year : ''),
+      getRowVal: s => getStarted(s),
     },
     option: containsOption && {
       key: 'option',
@@ -545,7 +592,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   const columnsByVariant = {
     customPopulation: ['programme', 'startYear'],
-    coursePopulation: ['gradeForSingleCourse', 'programme', 'passDate', 'language', 'startYear'],
+    coursePopulation: ['gradeForSingleCourse', 'programme', 'passDate', 'enrollmentDate', 'language', 'startYear'],
     population: [
       'transferredFrom',
       'credits.hops',

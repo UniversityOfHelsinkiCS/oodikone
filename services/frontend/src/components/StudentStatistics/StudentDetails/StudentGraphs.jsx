@@ -24,9 +24,9 @@ const resolveGraphStartDate = (student, graphYearStart, selectedStudyRight, stud
   if (!selectedStudyRight)
     return Math.min(new Date(earliestAttainmentDate).getTime(), new Date(graphYearStart || new Date()).getTime())
 
-  const studyRightElement = selectedStudyRight.studyright_elements.sort(
-    (a, b) => new Date(b.startdate) - new Date(a.startdate)
-  )[0]
+  const studyRightElement = selectedStudyRight.studyright_elements
+    .filter(e => e.element_detail.type === 20)
+    .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
   const studyPlan = student.studyplans.find(p => p.programme_code === studyRightElement.code)
   const filteredCourses = studyPlan
     ? // eslint-disable-next-line camelcase
