@@ -222,6 +222,7 @@ const CoursePopulation = ({
             <CustomPopulationProgrammeDist
               studentToTargetCourseDateMap={studentToTargetCourseDateMap}
               samples={filtered}
+              coursecode={codes}
               selectedStudents={filtered.map(s => s.studentNumber)}
             />
           </div>
