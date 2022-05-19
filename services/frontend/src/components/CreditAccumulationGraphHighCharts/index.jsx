@@ -250,6 +250,18 @@ const createStudentCreditLines = (students, singleStudent, selectedStartDate, st
     }
   })
 
+const filterGraduations = (student, selectedStudyRight) => {
+  const graduated = student.studyrights.filter(({ graduated }) => graduated)
+  // eslint-disable-next-line camelcase
+  if (!selectedStudyRight)
+    return graduated.map(({ enddate }) => ({
+      value: new Date(enddate).getTime(),
+    }))
+  const selectedGraduation = graduated.find(({ id }) => id === selectedStudyRight.id)
+  if (!selectedGraduation) return []
+  return [{ value: new Date(selectedGraduation.enddate).getTime() }]
+}
+
 const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, startDate, endDate, studyRightId }) => {
   const history = useHistory()
   const chartRef = useRef()
@@ -290,14 +302,7 @@ const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, 
     seriesData.push(createGoalSeries(starting, ending, filteredAbsences))
   }
 
-  const graduations = singleStudent
-    ? students[0].studyrights
-        .filter(({ graduated }) => graduated)
-        // eslint-disable-next-line camelcase
-        .map(({ enddate }) => ({
-          value: new Date(enddate).getTime(),
-        }))
-    : []
+  const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
 
   const options = createGraphOptions({
     singleStudent,
