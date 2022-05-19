@@ -17,9 +17,10 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
 
       samples.forEach(student => {
         const courses = student.courses.filter(c => codes.includes(c.course_code))
-        const hasEnrollment = student.enrollments.some(
-          e => codes.includes(e.course_code) && moment(e.enrollment_date_time).isBetween(moment(from), moment(to))
-        )
+        const hasEnrollment =
+          student.enrollments?.some(
+            e => codes.includes(e.course_code) && moment(e.enrollment_date_time).isBetween(moment(from), moment(to))
+          ) ?? false
         const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
         if (!highestGrade && hasEnrollment) {
           if (!grades['No grade']) grades['No grade'] = []
