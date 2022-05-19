@@ -330,6 +330,8 @@ const Panes = ({
   coursecode,
   studyGuidanceGroup,
   queryStudyrights,
+  from,
+  to,
 }) => {
   const { handleTabChange } = useTabChangeAnalytics(
     ANALYTICS_CATEGORIES.populationStudents,
@@ -347,6 +349,8 @@ const Panes = ({
             studentToTargetCourseDateMap={studentToTargetCourseDateMap}
             coursecode={coursecode}
             studyGuidanceGroup={studyGuidanceGroup}
+            from={from}
+            to={to}
           />
         </Tab.Pane>
       ),
@@ -430,6 +434,8 @@ const PopulationStudents = ({
   coursecode = [],
   variant,
   studyGuidanceGroup,
+  from,
+  to,
 }) => {
   const [state, setState] = useState({})
   const studentRef = useRef()
@@ -478,6 +484,8 @@ const PopulationStudents = ({
         tags={tags}
         studyGuidanceGroup={studyGuidanceGroup}
         coursecode={coursecode}
+        from={from}
+        to={to}
       />
     </>
   )

@@ -261,6 +261,12 @@ export const getHighestGradeOfCourseBetweenRange = (courses, lowerBound, upperBo
   return maxBy(grades, grade => grade.value)
 }
 
+export const getHighestGradeOrEnrollmentOfCourseBetweenRange = (courses, enrollments, lowerBound, upperBound) => {
+  const grade = getHighestGradeOfCourseBetweenRange(courses, lowerBound, upperBound)
+  if (!grade) return enrollments.length ? { grade: 'No grade' } : undefined
+  return grade
+}
+
 const getEarliestStudyRightElement = studyright => {
   if (!studyright) return null
   return (
@@ -314,6 +320,7 @@ export const getStudyRightElementTargetDates = (studyRight, absences = []) => {
         if (!absenceInStartOfStudyRight) return true
         return startdate !== absenceInStartOfStudyRight.startdate && enddate !== absenceInStartOfStudyRight.enddate
       })
+      .filter(({ startdate }) => startdate < new Date(end).getTime())
       .reduce((acc, absent) => {
         const { startdate, enddate } = absent
         const diff = moment(startdate).diff(moment(enddate), 'days') / 30

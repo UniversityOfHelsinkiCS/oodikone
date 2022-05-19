@@ -291,6 +291,8 @@ const CoursePopulation = ({
               coursePopulation
               language={language}
               coursecode={codes}
+              from={dateFrom}
+              to={dateTo}
             />
           </div>
         ),

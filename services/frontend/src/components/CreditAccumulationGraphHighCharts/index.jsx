@@ -191,7 +191,11 @@ const createGoalSeries = (starting, ending, absences) => {
 const resolveStudyRightElement = ({ studyright_elements }) => {
   // eslint-disable-next-line camelcase
   if (!studyright_elements || !studyright_elements.length) return {}
-  return studyright_elements.sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0] || {}
+  return (
+    studyright_elements
+      .filter(e => e.element_detail.type === 20)
+      .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0] || {}
+  )
 }
 
 const createStudentCreditLines = (students, singleStudent, selectedStartDate, studyRightId) =>

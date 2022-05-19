@@ -63,6 +63,7 @@ const formatStudentForPopulationStatistics = (
     birthdate,
     sis_person_id,
   },
+  enrollments,
   credits,
   startDate,
   endDate,
@@ -97,6 +98,7 @@ const formatStudentForPopulationStatistics = (
     studentNumber: studentnumber,
     credits: creditcount || 0,
     courses: credits[studentnumber] ? credits[studentnumber].map(toCourse) : [],
+    enrollments: enrollments[studentnumber],
     name: abbreviatedname,
     transfers: transfers || [],
     gender_code,
@@ -179,8 +181,8 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
     : creditsOfStudentOther
 
   if (studentnumbers.length === 0)
-    return { students: [], credits: [], extents: [], semesters: [], elementdetails: [], courses: [] }
-  const [courses, students, credits, extents, semesters, elementdetails] = await Promise.all([
+    return { students: [], enrollments: [], credits: [], extents: [], semesters: [], elementdetails: [], courses: [] }
+  const [courses, enrollments, students, credits, extents, semesters, elementdetails] = await Promise.all([
     Course.findAll({
       attributes: [sequelize.literal('DISTINCT ON("code") code'), 'name', 'coursetypecode'],
       include: [
@@ -190,6 +192,19 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
           where: creditsOfStudent,
         },
       ],
+      raw: true,
+    }),
+    Enrollment.findAll({
+      attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber'],
+      where: {
+        enrollment_date_time: {
+          [Op.between]: [attainmentDateFrom, endDate],
+        },
+        studentnumber: {
+          [Op.in]: studentnumbers,
+        },
+        state: ['ENROLLED', 'CONFIRMED'],
+      },
       raw: true,
     }),
     Student.findAll({
@@ -342,7 +357,7 @@ EXISTS (SELECT 1 FROM studyright_elements WHERE studentnumber IN (:studentnumber
     student.tags = studentNumberToTags[student.studentnumber] || []
   })
 
-  return { students, credits, extents, semesters, elementdetails, courses }
+  return { students, enrollments, credits, extents, semesters, elementdetails, courses }
 }
 
 const count = (column, count, distinct = false) => {
@@ -713,7 +728,7 @@ const getOptionsForStudents = async (students, code, level) => {
 }
 
 const formatStudentsForApi = async (
-  { students, credits, extents, semesters, elementdetails, courses },
+  { students, enrollments, credits, extents, semesters, elementdetails, courses },
   startDate,
   endDate,
   { studyRights },
@@ -734,6 +749,11 @@ const formatStudentsForApi = async (
     acc[e.student_studentnumber].push(e)
     return acc
   }, {})
+  enrollments = enrollments.reduce((acc, e) => {
+    acc[e.studentnumber] = acc[e.studentnumber] || []
+    acc[e.studentnumber].push(e)
+    return acc
+  }, {})
   const result = students.reduce(
     (stats, student) => {
       student.transfers.forEach(transfer => {
@@ -747,7 +767,15 @@ const formatStudentsForApi = async (
       if (student.studentnumber in optionData) student.option = optionData[student.studentnumber]
       else student.option = null
       stats.students.push(
-        formatStudentForPopulationStatistics(student, credits, startDate, endDate, startDateMoment, endDateMoment)
+        formatStudentForPopulationStatistics(
+          student,
+          enrollments,
+          credits,
+          startDate,
+          endDate,
+          startDateMoment,
+          endDateMoment
+        )
       )
       return stats
     },
@@ -841,16 +869,17 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     optionData = await getOptionsForStudents(studentnumbers, code, 'BSC')
   }
 
-  const { students, credits, extents, semesters, elementdetails, courses } = await getStudentsIncludeCoursesBetween(
-    studentnumbers,
-    startDate,
-    dateMonthsFromNow(startDate, months),
-    studyRights,
-    tag
-  )
+  const { students, enrollments, credits, extents, semesters, elementdetails, courses } =
+    await getStudentsIncludeCoursesBetween(
+      studentnumbers,
+      startDate,
+      dateMonthsFromNow(startDate, months),
+      studyRights,
+      tag
+    )
 
   const formattedStudents = await formatStudentsForApi(
-    { students, credits, extents, semesters, elementdetails, courses },
+    { students, enrollments, credits, extents, semesters, elementdetails, courses },
     startDate,
     endDate,
     formattedQueryParams,

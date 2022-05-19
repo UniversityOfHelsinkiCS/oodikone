@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Progress, Table } from 'semantic-ui-react'
 import { intersection, orderBy } from 'lodash'
 import { shape, bool, arrayOf, string, number } from 'prop-types'
+import moment from 'moment'
 import { getHighestGradeOfCourseBetweenRange } from '../../../common'
 import ExternalGradeFilterToggle from './ExternalGradeFilterToggle'
 
@@ -16,7 +17,14 @@ const CoursePopulationCreditDist = ({ singleCourseStats, pending, selectedStuden
 
       samples.forEach(student => {
         const courses = student.courses.filter(c => codes.includes(c.course_code))
+        const hasEnrollment = student.enrollments.some(
+          e => codes.includes(e.course_code) && moment(e.enrollment_date_time).isBetween(moment(from), moment(to))
+        )
         const highestGrade = getHighestGradeOfCourseBetweenRange(courses, from, to)
+        if (!highestGrade && hasEnrollment) {
+          if (!grades['No grade']) grades['No grade'] = []
+          grades['No grade'].push(student.studentNumber)
+        }
 
         if (highestGrade) {
           if (!grades[highestGrade.grade]) {

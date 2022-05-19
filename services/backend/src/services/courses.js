@@ -183,7 +183,7 @@ const enrollmentsForCourses = async (codes, anonymizationSalt, unification) => {
         [Op.ne]: null,
       },
       enrollment_date_time: { [Op.gte]: new Date('2021-05-31') },
-      state: ['ENROLLED', 'CONFIRMED', 'REJECTED', 'ABORTED_BY_STUDENT', 'ABORTED_BY_TEACHER'],
+      state: ['ENROLLED', 'CONFIRMED'],
       [Op.or]: [{ is_open }, { is_open: null }],
     },
   })
