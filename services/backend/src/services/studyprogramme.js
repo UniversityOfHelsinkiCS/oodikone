@@ -523,7 +523,7 @@ const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, stu
     WHERE cr.attainment_date BETWEEN :from AND :to
     AND cr.course_code IN (:programmeCourses)
     AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
-    AND cr.credittypecode IN (4, 9)
+    AND cr.credittypecode = 4
     AND (se.code = :studyprogramme AND cr.attainment_date BETWEEN se.startdate AND se.enddate)
     GROUP BY co.id, co.code;
       `,
@@ -557,7 +557,7 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
     WHERE cr.attainment_date BETWEEN :from AND :to
     AND cr.course_code IN (:programmeCourses)
     AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
-    AND cr.credittypecode IN (4, 9)
+    AND cr.credittypecode = 4
     AND (se.code != :studyprogramme AND cr.attainment_date BETWEEN se.startdate AND se.enddate)
     GROUP BY co.id, co.code;
       `,
@@ -589,7 +589,7 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, program
     WHERE cr.attainment_date BETWEEN :from AND :to
     AND cr.course_code IN (:programmeCourses)
     AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
-    AND cr.credittypecode IN (4, 9)
+    AND cr.credittypecode = 4
     AND cr.student_studentnumber NOT IN
       (SELECT student_studentnumber FROM studyright
       WHERE studyright.student_studentnumber = cr.student_studentnumber
