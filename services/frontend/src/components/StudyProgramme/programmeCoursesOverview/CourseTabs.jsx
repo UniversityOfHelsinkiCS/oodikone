@@ -1,9 +1,9 @@
 import React from 'react'
 import { Tab } from 'semantic-ui-react'
 import OverallStatsTable from './OverallStatsTable'
+import Toggle from '../Toggle'
 
-const CourseTabs = ({ data }) => {
-  // console.log('course tabs data: ', data)
+const CourseTabs = ({ data, showStudents, handleShowStudentsChange }) => {
   const paneTypes = [
     {
       label: 'Tables',
@@ -18,7 +18,15 @@ const CourseTabs = ({ data }) => {
     menuItem: { icon, content: label },
     render: () => (
       <Tab.Pane>
-        <OverallStatsTable data={data} />
+        <Toggle
+          cypress="courses_yearToggle"
+          toolTips={null}
+          firstLabel="Show credits"
+          secondLabel="Show students"
+          value={showStudents}
+          setValue={handleShowStudentsChange}
+        />
+        <OverallStatsTable data={data} showStudents={showStudents} />
       </Tab.Pane>
     ),
   }))
