@@ -89,7 +89,7 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
         <CustomPopulationCourses
           courses={pending ? null : selectedPopulationCourses.data}
           filteredStudents={filteredStudents}
-          showFilter={false}
+          showFilter
         />
       )}
     </Segment>

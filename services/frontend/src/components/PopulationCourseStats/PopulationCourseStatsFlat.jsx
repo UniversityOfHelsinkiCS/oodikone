@@ -97,6 +97,7 @@ const PopulationCourseStatsFlat = ({ courses, pending, filteredStudents, showFil
     pending,
     populationCourses: courses,
     selectedStudents: filteredStudents,
+    filteredStudents,
     showFilter,
     years,
   }
