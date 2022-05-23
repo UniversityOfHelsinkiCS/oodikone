@@ -206,6 +206,17 @@ const GeneralTab = ({
     }
   }
 
+  const getEnrollmentDate = s => {
+    const enrollments =
+      s.enrollments
+        ?.filter(e => coursecode.includes(e.course_code))
+        ?.filter(
+          e => new Date(e.enrollment_date_time) >= new Date(from) && new Date(e.enrollment_date_time) < new Date(to)
+        ) ?? null
+    if (!enrollments || !enrollments.length) return ''
+    return enrollments[0].enrollment_date_time
+  }
+
   const copyToClipboardAll = () => {
     const studentsInfo = selectedStudents.map(number => students[number])
     const emails = studentsInfo.filter(s => s.email && !s.obfuscated).map(s => s.email)
@@ -452,7 +463,7 @@ const GeneralTab = ({
     enrollmentDate: {
       key: 'enrollmentDate',
       title: 'Enrollment date',
-      getRowVal: s => s.enrollments?.find(c => coursecode.includes(c.course_code))?.enrollment_date_time ?? '',
+      getRowVal: s => getEnrollmentDate(s),
       formatValue: value => (value ? reformatDate(new Date(value), 'YYYY-MM-DD') : 'No enrollment'),
     },
     language: {
