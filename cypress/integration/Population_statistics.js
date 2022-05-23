@@ -133,6 +133,7 @@ describe('Population Statistics tests', () => {
     it('Credit Statistics, Credits Gained tab works', () => {
       cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
       cy.contains('Credit statistics').click()
+      cy.contains('Credits Gained').click()
       cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the population')
 
       const months = Math.ceil(moment.duration(moment().diff(moment('2017-08-1'))).asMonths())
@@ -169,6 +170,7 @@ describe('Population Statistics tests', () => {
       cy.visit(pathToCSMaster2019)
       cy.cs('filtered-students')
       cy.contains('Credit statistics')
+      cy.contains('Credits Gained').click()
       cy.get("[data-cy='credit-statistics']").click()
       cy.get('.credits-gained-divider').click()
       cy.get("[data-cy='credits-gained-table-Avoin väylä']").should('exist')
