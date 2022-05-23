@@ -120,85 +120,55 @@ const getUnifyStatus = unifyCourses => {
   }
 }
 
-const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses = 'unifyStats') =>
-  (
+const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses = 'unifyStats') => {
+  const { startdate } = await Semester.findOne({
+    where: {
+      [separate ? 'semestercode' : 'yearcode']: from,
+    },
+    order: ['semestercode'],
+    limit: 1,
+    raw: true,
+  })
+  const { enddate } = await Semester.findOne({
+    where: {
+      [separate ? 'semestercode' : 'yearcode']: to,
+    },
+    order: [['semestercode', 'DESC']],
+    limit: 1,
+    raw: true,
+  })
+  return (
     await sequelize.query(
       `
-    SELECT
-      studentnumber
-    FROM
-      student s
-    WHERE
-      EXISTS (
-        SELECT
-          1
-        FROM
-          credit c
-        WHERE
-          c.student_studentnumber = s.studentnumber
-          AND c.course_code IN (:coursecodes)
-          AND c.is_open IN (:isOpen)
-          AND c.attainment_date BETWEEN (
-            SELECT
-              startdate
-            FROM
-              semesters
-            WHERE
-              ${separate ? 'semestercode' : 'yearcode'} = :minYearCode
-            ORDER BY
-              semestercode
-            LIMIT
-              1
-          )
-          AND (
-            SELECT
-              enddate
-            FROM
-              semesters
-            WHERE
-              ${separate ? 'semestercode' : 'yearcode'} = :maxYearCode
-            ORDER BY
-              semestercode DESC
-            LIMIT
-              1
-          )
-      )
-      OR EXISTS (
-        SELECT
-          1
-        FROM
-          enrollment e
-        WHERE
-          e.studentnumber = s.studentnumber
-          AND e.course_code IN (:coursecodes)
-          AND e.enrollment_date_time BETWEEN (
-            SELECT
-              startdate
-            FROM
-              semesters
-            WHERE
-              ${separate ? 'semestercode' : 'yearcode'} = :minYearCode
-            ORDER BY
-              semestercode
-            LIMIT
-              1
-          )
-          AND (
-            SELECT
-              enddate
-            FROM
-              semesters
-            WHERE
-              ${separate ? 'semestercode' : 'yearcode'} = :maxYearCode
-            ORDER BY
-              semestercode DESC
-            LIMIT
-              1
-          )
-          AND e.enrollment_date_time >= '2021-05-31'
-          AND e.state IN ('ENROLLED', 'CONFIRMED')
-      );
-  `,
+  SELECT
+    studentnumber
+  FROM
+    student s
+  WHERE
+    EXISTS (
+      SELECT
+        1
+      FROM
+        credit c
+      WHERE
+        c.student_studentnumber = s.studentnumber
+        AND c.course_code IN (:coursecodes)
+        AND c.is_open IN (:isOpen)
+        AND c.attainment_date BETWEEN '${startdate.toISOString()}' AND '${enddate.toISOString()}'
+    )
+    OR EXISTS (
+      SELECT
+        1
+      FROM
+        enrollment e
+      WHERE
+        e.studentnumber = s.studentnumber
+        AND e.course_code IN (:coursecodes)
+        AND e.enrollment_date_time BETWEEN '${startdate.toISOString()}' AND '${enddate.toISOString()}'
+        AND e.enrollment_date_time >= '2021-05-31'
+        AND e.state IN ('ENROLLED', 'CONFIRMED')
+    );
+`,
       {
         replacements: { coursecodes, minYearCode: from, maxYearCode: to, isOpen: getUnifyStatus(unifyCourses) },
         type: sequelize.QueryTypes.SELECT,
@@ -206,6 +176,7 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCo
       }
     )
   ).map(st => st.studentnumber)
+}
 
 const findByTag = async tag => {
   return (
