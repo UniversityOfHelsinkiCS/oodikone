@@ -29,9 +29,10 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
         normal.push({ key: i, text: i.toString(), value: i })
         academic.push({ key: i, text: `${i}-${i + 1}`, value: i })
       }
-      setYears({ normal, academic })
+      if (!fromYear && !toYear) setYears({ normal, academic })
     }
   }, [data])
+
   if (isLoading) {
     return <Loader active style={{ marginTop: '10em' }} />
   }
