@@ -40,6 +40,7 @@ const CreditGainStats = ({ filteredStudents, query }) => {
       <InfoBox content={infotooltips.PopulationStatistics.CreditStatistics} />
       {filteredStudents && (
         <Tab
+          defaultActiveIndex={2}
           onTabChange={handleTabChange}
           menu={{ pointing: true }}
           panes={[
