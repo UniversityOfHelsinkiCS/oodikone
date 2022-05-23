@@ -13,6 +13,7 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
   const [fromYear, setFromYear] = useState(null)
   const [toYear, setToYear] = useState(null)
   const [years, setYears] = useState({})
+  const [showStudents, setShowStudents] = useState(false)
 
   // fromYear and toYear initial values are calculated from data and hence useEffect
   useEffect(() => {
@@ -40,8 +41,6 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
   const handleYearChange = (e, { name, value }) => {
     if (name === 'fromYear' && value <= toYear) setFromYear(value)
     else if (name === 'toYear' && value >= fromYear) setToYear(value)
-
-    // sendAnalytics('Changed time frame', 'Course stats')
   }
 
   const filterDataByYear = (data, fromYear, toYear) => {
@@ -101,7 +100,14 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
           setAcademicYear={setAcademicYear}
         />
       </Segment>
-      <CourseTabs data={filterDataByYear(data, fromYear, toYear)} />
+      <Segment style={{ marginTop: '1rem' }}>
+        <Header as="h4">Show credits</Header>
+      </Segment>
+      <CourseTabs
+        data={filterDataByYear(data, fromYear, toYear)}
+        showStudents={showStudents}
+        handleShowStudentsChange={setShowStudents}
+      />
     </div>
   )
 }
