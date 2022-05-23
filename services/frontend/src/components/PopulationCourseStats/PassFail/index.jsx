@@ -219,7 +219,7 @@ const PassFail = ({ flat }) => {
         )
       )
       .value()
-  }, [modules])
+  }, [modules, courseStatistics])
 
   return (
     <>
