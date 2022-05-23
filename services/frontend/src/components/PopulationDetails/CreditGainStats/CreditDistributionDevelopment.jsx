@@ -130,7 +130,7 @@ function tooltipFormatter() {
 
 const CreditDistributionDevelopment = ({ students, query }) => {
   const [cumulative, setCumulative] = useState(false)
-  const [timeDivision, setTimeDivision] = useState(TimeDivision.ACADEMIC_YEAR)
+  const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.ASCENDING)
   const months = getMonths(useLocation())
   const semestersQuery = useGetSemestersQuery()
