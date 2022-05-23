@@ -77,12 +77,17 @@ const hasGraduatedBefore = (student, programme, date) => {
   return sr.graduated && moment(date).isAfter(sr.enddate)
 }
 
+const GRADUATED = Symbol('GRADUATED')
+
 const getChartData = (students, timeSlots, order, programme, limitScale, cumulative) => {
   const limitBreaks = (cumulative ? LIMITS_CUMULATIVE : LIMITS_NON_CUMULATIVE).map(lb => lb * limitScale)
 
   let limits = _.range(0, limitBreaks.length + 1).map(i => [limitBreaks[i - 1], limitBreaks[i]])
 
   let colors = chroma.scale(['#f8696b', '#f5e984', '#63be7a']).colors(limits.length)
+
+  limits.push(GRADUATED)
+  colors.push('#dedede')
 
   if (order === StackOrdering.ASCENDING) {
     limits = _.reverse(limits)
@@ -98,23 +103,42 @@ const getChartData = (students, timeSlots, order, programme, limitScale, cumulat
   timeSlots.forEach((slot, timeSlotIndex) => {
     students
       .map((student, i) => [student, i])
-      .filter(([student]) => !programme || !hasGraduatedBefore(student, programme, slot.start))
       .forEach(([student, studentIndex]) => {
+        const hasGraduated = programme && hasGraduatedBefore(student, programme, slot.start)
         const credits = studentCredits[studentIndex][timeSlotIndex]
-        const rangeIndex = limits.findIndex(
-          ([min, max]) => (min === undefined || credits > min) && (max === undefined || credits <= max)
-        )
+
+        const rangeIndex = hasGraduated
+          ? limits.indexOf(GRADUATED)
+          : limits.findIndex(limit => {
+              if (limit === GRADUATED) {
+                return false
+              }
+
+              const [min, max] = limit
+
+              return (min === undefined || credits > min) && (max === undefined || credits <= max)
+            })
+
         data[rangeIndex][timeSlotIndex].y += 1
         data[rangeIndex][timeSlotIndex].custom.students.push(student.studentNumber)
       })
   })
 
   const series = data.map((slots, limitN) => {
-    const [min, max] = limits[limitN]
     const color = colors[limitN]
 
+    const limit = limits[limitN]
+    let name
+
+    if (limit === GRADUATED) {
+      name = 'Graduated'
+    } else {
+      const [min, max] = limit
+      name = `${min ?? '0'} - ${max ?? '∞'}`
+    }
+
     return {
-      name: `${min ?? '0'} - ${max ?? '∞'}`,
+      name,
       data: slots,
       color,
     }
@@ -129,7 +153,7 @@ function tooltipFormatter() {
 }
 
 const CreditDistributionDevelopment = ({ students, query }) => {
-  const [cumulative, setCumulative] = useState(false)
+  const [cumulative, setCumulative] = useState(true)
   const [timeDivision, setTimeDivision] = useState(TimeDivision.SEMESTER)
   const [stackOrdering, setStackOrdering] = useState(StackOrdering.ASCENDING)
   const months = getMonths(useLocation())
