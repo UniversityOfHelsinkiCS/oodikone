@@ -14,3 +14,42 @@
 .enrollmentAccordion {
   margin-bottom: 10px;
 }
+
+.help-icon {
+  opacity: 0.5 !important;
+  margin-left: 0.75rem !important;
+  margin-bottom: 5px !important;
+}
+
+.enrollment-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.enrollment-label {
+  border-radius: 0.28rem;
+  box-shadow: 0 1px 3px 0 #d4d4d5, 0 0 0 1px #d4d4d5;
+  display: inline-block;
+  margin-left: 0.75rem;
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  min-height: 15px;
+}
+
+.label-present {
+  background-color: #96d7c3;
+}
+
+.label-absent {
+  background-color: #ffb300;
+}
+
+.label-absent-statutory {
+  background-color: #8e24aa;
+}
+
+.label-passive {
+  background-color: #e53935;
+}
