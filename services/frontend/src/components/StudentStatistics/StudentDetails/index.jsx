@@ -101,16 +101,18 @@ const StudentDetails = ({
       let runningSemestercode = semesterenrollments[0].semestercode
       while (runningSemestercode <= latestSemester) {
         if (!mappedSemesterenrollments[runningSemestercode])
-          patchedSemesterenrollments.push({ semestercode: runningSemestercode, enrollmenttype: 2 })
+          patchedSemesterenrollments.push({ semestercode: runningSemestercode, enrollmenttype: -1 })
         else patchedSemesterenrollments.push(mappedSemesterenrollments[runningSemestercode])
         runningSemestercode++
       }
     }
 
-    const formatAbsence = ({ semestercode }) => {
+    const formatAbsence = ({ semestercode, enrollmenttype, statutoryAbsence }) => {
       const { startdate, enddate } = mappedSemesters[semestercode]
       return {
         semestercode,
+        enrollmenttype,
+        statutoryAbsence,
         startdate: new Date(startdate).getTime(),
         enddate: new Date(enddate).getTime(),
       }
@@ -119,15 +121,26 @@ const StudentDetails = ({
     const mergeAbsences = absences => {
       const res = []
       let currentSemestercode = -1
+      let currentType = 0
+      let currentStatutory = 0
       if (absences.length) {
         res.push(absences[0])
         currentSemestercode = absences[0].semestercode
+        currentType = absences[0].enrollmenttype
+        currentStatutory = absences[0].statutoryAbsence
       }
       absences.forEach((absence, i) => {
         if (i === 0) return
-        if (absence.semestercode === currentSemestercode + 1) res[res.length - 1].enddate = absence.enddate
+        if (
+          absence.semestercode === currentSemestercode + 1 &&
+          absence.enrollmenttype === currentType &&
+          absence.statutoryAbsence === currentStatutory
+        )
+          res[res.length - 1].enddate = absence.enddate
         else res.push(absence)
         currentSemestercode = absence.semestercode
+        currentType = absence.enrollmenttype
+        currentStatutory = absence.statutoryAbsence
       })
       return res
     }

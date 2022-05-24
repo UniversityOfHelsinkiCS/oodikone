@@ -151,29 +151,44 @@ const singleStudentTooltipFormatter = (point, student, language) => {
 const createGoalSeries = (starting, ending, absences) => {
   const lastMonth = Math.ceil(getXAxisMonth(moment(ending), moment(starting)))
 
+  const getColor = (i, type, statutoryAbsence) => {
+    if (i % 2 === 0) return '#96d7c3'
+    if (statutoryAbsence) return '#8e24aa'
+    if (type === 2) return '#ffb300'
+    if (type === -1) return '#e0e0e0'
+    return '#e53935'
+  }
+
   let totalAbsenceMonths = 0
+  let previousTargetCreditsBeforeAbsence = 0
   const absencePoints = absences
     .filter(a => a.startdate >= starting || (a.startdate <= starting && a.enddate >= starting))
-    .reduce((res, { startdate, enddate }) => {
+    .reduce((res, { startdate, enddate, enrollmenttype, statutoryAbsence }) => {
       const targetCreditsBeforeAbsence =
-        (Math.ceil(getXAxisMonth(moment(startdate), moment(starting))) - totalAbsenceMonths) * (60 / 12)
-      if (enddate < ending) {
-        res.push([startdate, targetCreditsBeforeAbsence])
-        res.push([enddate, targetCreditsBeforeAbsence])
-        totalAbsenceMonths += moment(enddate).diff(moment(startdate), 'months')
-      }
+        (Math.abs(moment(startdate).diff(moment(starting), 'months')) - totalAbsenceMonths) * (60 / 12)
+      const newCredits =
+        targetCreditsBeforeAbsence - previousTargetCreditsBeforeAbsence > 5 // Snap to previous credits when absent type changes
+          ? targetCreditsBeforeAbsence
+          : previousTargetCreditsBeforeAbsence
+      previousTargetCreditsBeforeAbsence = newCredits
+      res.push([startdate, newCredits, enrollmenttype, statutoryAbsence])
+      res.push([enddate, newCredits, enrollmenttype, statutoryAbsence])
+      totalAbsenceMonths += moment(enddate).diff(moment(startdate), 'months')
       return res
     }, [])
 
   const zoneStart = absencePoints.length ? [absencePoints[0][0]] : []
-  const zones = absencePoints.reduce(
-    (acc, [start], i) => [...acc, { value: start, color: i % 2 === 0 ? '#96d7c3' : 'red' }],
-    zoneStart
-  )
+  const zones = absencePoints.reduce((acc, [start, , enrollmenttype, statutoryAbsence], i) => {
+    return [...acc, { value: start, color: getColor(i, enrollmenttype, statutoryAbsence) }]
+  }, zoneStart)
 
   const lastCredits = (lastMonth - totalAbsenceMonths) * (60 / 12)
-  const data = [...[[starting, 0], ...absencePoints, [ending, lastCredits]].sort((a, b) => a[0] - b[0])]
-
+  const endingCredits = absences.some(a => moment(ending).isBetween(moment(a.startdate), moment(a.enddate)))
+    ? absencePoints[absencePoints.length - 1][1]
+    : lastCredits
+  const data = [...[[starting, 0], ...absencePoints, [ending, endingCredits]].sort((a, b) => a[0] - b[0])].filter(
+    r => r[0] <= ending
+  )
   return {
     name: SINGLE_GRAPH_GOAL_SERIES_NAME,
     data,
@@ -257,7 +272,7 @@ const filterGraduations = (student, selectedStudyRight) => {
     return graduated.map(({ enddate }) => ({
       value: new Date(enddate).getTime(),
     }))
-  const selectedGraduation = graduated.find(({ id }) => id === selectedStudyRight.id)
+  const selectedGraduation = graduated.find(({ studyrightid }) => studyrightid === selectedStudyRight.studyrightid)
   if (!selectedGraduation) return []
   return [{ value: new Date(selectedGraduation.enddate).getTime() }]
 }

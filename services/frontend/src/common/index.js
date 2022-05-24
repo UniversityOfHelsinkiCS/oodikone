@@ -296,7 +296,7 @@ const getMonthsForDegree = code => getTargetCreditsForProgramme(code) / (60 / 12
 export const getStudyRightElementTargetDates = (studyRight, absences = []) => {
   const studyRightElement = getEarliestStudyRightElement(studyRight)
   if (!studyRightElement) return []
-  const { code, startdate: sreStartDate, enddate: sreEndDate } = studyRightElement
+  const { code, startdate: sreStartDate } = studyRightElement
   const months = getMonthsForDegree(code)
   const end =
     code.includes('KH') || code.includes('ba') || ['MH30_001', 'MH30_003'].includes(code)
@@ -305,8 +305,7 @@ export const getStudyRightElementTargetDates = (studyRight, absences = []) => {
 
   if (!absences) return [new Date(sreStartDate), new Date(end)]
   const absencesWithinStudyRightElement = absences.filter(
-    ({ startdate, enddate }) =>
-      startdate >= new Date(sreStartDate).getTime() && enddate <= new Date(sreEndDate).getTime()
+    ({ startdate, enddate }) => startdate >= new Date(sreStartDate).getTime() && enddate <= new Date(end).getTime()
   )
 
   if (!absencesWithinStudyRightElement.length) return [new Date(sreStartDate), new Date(end)]

@@ -244,12 +244,13 @@ const formatStudent = async ({
   semester_enrollments = semester_enrollments || []
   studyplans = studyplans || []
   const semesterenrollments = semester_enrollments.map(
-    ({ semestercode, enrollmenttype, name, yearname, startYear }) => ({
+    ({ semestercode, enrollmenttype, name, yearname, startYear, statutory_absence: statutoryAbsence }) => ({
       yearname,
       name,
       startYear,
       semestercode,
       enrollmenttype,
+      statutoryAbsence,
     })
   )
 
