@@ -1,6 +1,11 @@
 import React from 'react'
+import { Item, Icon } from 'semantic-ui-react'
+import { Link } from 'react-router-dom'
+import sendEvent from '../../../common/sendEvent'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import SortableTable from '../../SortableTable'
+
+const sendAnalytics = sendEvent.populationStatistics
 
 const getColumns = (language, showStudents) => {
   let columns = null
@@ -8,9 +13,34 @@ const getColumns = (language, showStudents) => {
     columns = [
       {
         key: 'code',
-        title: 'Code ',
-        getRowVal: course => course.code,
-        getRowContent: course => course.code,
+        mergeHeader: true,
+        merge: true,
+        children: [
+          {
+            key: 'course_code',
+            title: 'Code ',
+            export: false,
+            getRowVal: course => course.code,
+            getRowContent: course => course.code,
+          },
+          {
+            key: 'go-to-course',
+            export: false,
+            getRowContent: course => (
+              <Item
+                as={Link}
+                to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                  course.code
+                )}"]&separate=false&unifyOpenUniCourses=false`}
+              >
+                <Icon
+                  name="level up alternate"
+                  onClick={() => sendAnalytics('Courses of Population course stats button clicked', course.code)}
+                />
+              </Item>
+            ),
+          },
+        ],
       },
       {
         key: 'name',
@@ -50,9 +80,34 @@ const getColumns = (language, showStudents) => {
     columns = [
       {
         key: 'code',
-        title: 'Code ',
-        getRowVal: course => course.code,
-        getRowContent: course => course.code,
+        mergeHeader: true,
+        merge: true,
+        children: [
+          {
+            key: 'course_code',
+            title: 'Code ',
+            export: false,
+            getRowVal: course => course.code,
+            getRowContent: course => course.code,
+          },
+          {
+            key: 'go-to-course',
+            export: false,
+            getRowContent: course => (
+              <Item
+                as={Link}
+                to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                  course.code
+                )}"]&separate=false&unifyOpenUniCourses=false`}
+              >
+                <Icon
+                  name="level up alternate"
+                  onClick={() => sendAnalytics('Courses of Population course stats button clicked', course.code)}
+                />
+              </Item>
+            ),
+          },
+        ],
       },
       {
         key: 'name',
