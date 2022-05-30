@@ -8,12 +8,12 @@ import AttemptsTable from './Tables/attempts'
 import selectors from '../../../../selectors/courseStats'
 import UnifyRadioButtons from '../UnifyRadioButtons'
 
-export const TablesSettings = ({ value, onChange, availableStats }) => {
-  const { viewMode, showDetails, showGrades, showEnrollments } = value
+export const TablesSettings = ({ value, onChange, availableStats, onSeparateChange }) => {
+  const { viewMode, showDetails, showGrades, separate } = value
 
   return (
     <div>
-      <Menu secondary>
+      <Menu style={{ flexWrap: 'wrap' }} secondary>
         {Object.entries(viewModeNames).map(([key, name]) => (
           <Menu.Item
             key={key}
@@ -49,10 +49,10 @@ export const TablesSettings = ({ value, onChange, availableStats }) => {
         <Menu.Item>
           <Radio
             toggle
-            label="Show enrollments"
-            data-cy="enrollmentToggle"
-            checked={showEnrollments}
-            onChange={() => onChange({ ...value, showEnrollments: !showEnrollments })}
+            label="Separate by semesters"
+            data-cy="separateToggle"
+            checked={separate}
+            onChange={() => onSeparateChange(!separate)}
           />
         </Menu.Item>
 

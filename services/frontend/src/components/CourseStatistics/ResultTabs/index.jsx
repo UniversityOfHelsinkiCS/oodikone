@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
 import { Tab, Segment, Menu, Icon } from 'semantic-ui-react'
 import { withRouter } from 'react-router-dom'
+import qs from 'query-string'
+import { useDispatch, useSelector } from 'react-redux'
+import { getCourseStats } from 'redux/coursestats'
 import { PassRate, PassRateSettings } from './Panes/passRate'
 import { Distribution, DistributionSettings } from './Panes/distribution'
 import { Tables, TablesSettings } from './Panes/tables'
-import { useTabs } from '../../../common/hooks'
+import { useProgress, useTabs } from '../../../common/hooks'
 
 import './resultTabs.css'
 import TSA from '../../../common/tsa'
@@ -18,16 +21,27 @@ const PaneContent = ({
   initialSettings,
   datasets,
   availableStats,
+  updateQuery,
   ...rest
 }) => {
   const [settings, setSettings] = useState(initialSettings)
   const [splitDirection, setSplitDirection] = useState('row')
 
+  const toggleSeparate = separate => {
+    setSettings({ ...settings, separate })
+    updateQuery(separate)
+  }
+
   return (
     <Tab.Pane>
       <Segment basic>
         <div style={{ display: 'flex', marginBottom: '2em' }}>
-          <SettingsComponent value={settings} onChange={setSettings} availableStats={availableStats} />
+          <SettingsComponent
+            value={settings}
+            onChange={setSettings}
+            onSeparateChange={toggleSeparate}
+            availableStats={availableStats}
+          />
           <div style={{ flexGrow: 1 }} />
           {datasets.filter(i => i).length > 1 && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1em' }}>
@@ -58,9 +72,13 @@ const PaneContent = ({
   )
 }
 
-const ResultTabs = ({ primary, comparison, history, separate, availableStats }) => {
+const ResultTabs = ({ primary, comparison, history, separate, availableStats, location }) => {
   const [tab, setTab] = useTabs('cs_tab', 0, history)
   const { userHasAccessToAllStats } = primary
+  const courseStats = useSelector(({ courseStats }) => courseStats)
+  const { pending: loading } = courseStats
+  const { onProgress } = useProgress(loading)
+  const dispatch = useDispatch()
 
   const handleTabChange = (...params) => {
     const { activeIndex } = params[1]
@@ -69,11 +87,23 @@ const ResultTabs = ({ primary, comparison, history, separate, availableStats }) 
     setTab(...params)
   }
 
+  const updateSeparate = separate => {
+    const { courseCodes, ...params } = qs.parse(location.search)
+    const query = {
+      ...params,
+      courseCodes: JSON.parse(courseCodes),
+      separate,
+    }
+    dispatch(getCourseStats(query, onProgress))
+    const queryToString = { ...query, courseCodes: JSON.stringify(query.courseCodes) }
+    history.replace({ search: qs.stringify(queryToString) })
+  }
+
   const paneTypes = [
     {
       label: 'Tables',
       icon: 'table',
-      initialSettings: { showDetails: false, showEnrollments: false, viewMode: 'STUDENT', separate },
+      initialSettings: { showDetails: false, viewMode: 'STUDENT', separate },
       settings: TablesSettings,
       component: Tables,
     },
@@ -100,6 +130,7 @@ const ResultTabs = ({ primary, comparison, history, separate, availableStats }) 
         <PaneContent
           component={Component}
           settings={SettingsComponent}
+          updateQuery={updateSeparate}
           userHasAccessToAllStats={userHasAccessToAllStats}
           initialSettings={initialSettings}
           datasets={[primary, comparison]}
@@ -110,9 +141,9 @@ const ResultTabs = ({ primary, comparison, history, separate, availableStats }) 
   )
 
   return (
-    <div>
+    <Segment loading={loading} basic>
       <Tab id="CourseStatPanes" panes={panes} onTabChange={handleTabChange} activeIndex={tab} />
-    </div>
+    </Segment>
   )
 }
 

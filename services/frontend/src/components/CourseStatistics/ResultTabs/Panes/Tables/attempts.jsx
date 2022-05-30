@@ -56,7 +56,7 @@ const getGradeColumns = grades =>
 
 const AttemptsTable = ({
   data: { stats, name },
-  settings: { showGrades, showEnrollments, separate },
+  settings: { showGrades, separate },
   alternatives,
   isRelative,
   userHasAccessToAllStats,
@@ -135,6 +135,30 @@ const AttemptsTable = ({
       getRowVal: s => (s.rowObfuscated ? 'NA' : s.passRate),
       getRowContent: s => (s.rowObfuscated ? 'NA' : `${Number(s.passRate || 0).toFixed(2)} %`),
     }),
+    getSortableColumn({
+      key: 'TOTAL_ENROLLMENTS',
+      title: 'Total enrollments',
+      helpText: 'All enrollments, including all rejected and aborted states.',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.totalEnrollments),
+    }),
+    getSortableColumn({
+      key: 'ENROLLMENTS_ENROLLED',
+      title: 'Enrolled',
+      helpText: 'All enrollments with enrolled or confirmed state.',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ENROLLED),
+    }),
+    getSortableColumn({
+      key: 'ENROLLMENTS_REJECTED',
+      title: 'Rejected',
+      helpText: 'All enrollments with rejected state.',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.REJECTED),
+    }),
+    getSortableColumn({
+      key: 'ENROLLMENTS_ABORTED',
+      title: 'Aborted',
+      helpText: 'All enrollments with aborted by student or teacher state.',
+      getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ABORTED),
+    }),
   ]
 
   if (showGrades)
@@ -147,36 +171,6 @@ const AttemptsTable = ({
       }),
       ...getGradeColumns(resolveGrades(stats)),
     ]
-
-  if (showEnrollments) {
-    columns = [
-      ...columns,
-      getSortableColumn({
-        key: 'TOTAL_ENROLLMENTS',
-        title: 'Total enrollments',
-        helpText: 'All enrollments, including all rejected and aborted states.',
-        getRowVal: s => (s.rowObfuscated ? 'NA' : s.totalEnrollments),
-      }),
-      getSortableColumn({
-        key: 'ENROLLMENTS_ENROLLED',
-        title: 'Enrolled',
-        helpText: 'All enrollments with enrolled or confirmed state.',
-        getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ENROLLED),
-      }),
-      getSortableColumn({
-        key: 'ENROLLMENTS_REJECTED',
-        title: 'Rejected',
-        helpText: 'All enrollments with rejected state.',
-        getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.REJECTED),
-      }),
-      getSortableColumn({
-        key: 'ENROLLMENTS_ABORTED',
-        title: 'Aborted',
-        helpText: 'All enrollments with aborted by student or teacher state.',
-        getRowVal: s => (s.rowObfuscated ? 'NA' : s.enrollmentsByState.ABORTED),
-      }),
-    ]
-  }
 
   const data = getTableData(stats, useThesisGrades, isRelative)
 
