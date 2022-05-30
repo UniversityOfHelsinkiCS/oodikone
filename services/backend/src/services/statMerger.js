@@ -26,7 +26,7 @@ const populationCourseStatsMerger = multiyearstats => {
         stats.coursestatistics[index].stats.retryPassed += c.stats.retryPassed
 
         stats.coursestatistics[index].stats.perStudent =
-          (stats.coursestatistics[index].stats.attempts / stats.coursestatistics[index].stats.students) * 100
+          stats.coursestatistics[index].stats.attempts / stats.coursestatistics[index].stats.students
 
         stats.coursestatistics[index].stats.percentage =
           (stats.coursestatistics[index].stats.passed / stats.coursestatistics[index].stats.students) * 100
