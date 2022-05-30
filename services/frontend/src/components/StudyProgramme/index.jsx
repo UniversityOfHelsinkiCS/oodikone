@@ -41,7 +41,7 @@ const StudyProgramme = props => {
     const { studyProgrammeId } = match.params
     const panes = []
     panes.push({
-      menuItem: 'Basic information (NEW)',
+      menuItem: 'Basic information',
       render: () => (
         <BasicOverview
           studyprogramme={studyProgrammeId}
@@ -54,7 +54,7 @@ const StudyProgramme = props => {
       ),
     })
     panes.push({
-      menuItem: 'Studytracks and student populations (NEW)',
+      menuItem: 'Studytracks and student populations',
       render: () => (
         <StudytrackOverview
           studyprogramme={studyProgrammeId}
@@ -74,7 +74,7 @@ const StudyProgramme = props => {
       })
 
       panes.push({
-        menuItem: 'Programme courses (NEW)',
+        menuItem: 'Programme courses',
         render: () => (
           <ProgrammeCoursesOverview
             academicYear={academicYear}
