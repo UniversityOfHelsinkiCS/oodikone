@@ -100,6 +100,13 @@ const SingleCourseStats = ({
   }, [])
 
   useEffect(() => {
+    if (location.search) {
+      const { separate } = parseQueryFromUrl()
+      setSeparate(separate)
+    }
+  }, [location.search])
+
+  useEffect(() => {
     if (primary.every(c => !programmes.map(p => p.key).includes(c))) {
       setPrimary([ALL.value])
     }

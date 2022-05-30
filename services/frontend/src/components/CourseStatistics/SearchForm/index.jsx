@@ -169,12 +169,6 @@ const SearchForm = props => {
     return Promise.resolve()
   }
 
-  const onToggleSeparateStatistics = () => {
-    const newValue = !state.separate
-    setState({ ...state, separate: newValue })
-    sendAnalytics('Toggle Separate stats for spring & fall', `${newValue}`)
-  }
-
   const courses = matchingCourses.filter(c => !selectedCourses[c.code])
 
   const disabled = isLoading || Object.keys(selectedCourses).length === 0
@@ -241,26 +235,18 @@ const SearchForm = props => {
                 selectedTable
               />
               {!noSelectedCourses && (
-                <>
-                  <Form.Checkbox
-                    label="Separate statistics for Spring and Fall semesters"
-                    name="separate"
-                    onChange={onToggleSeparateStatistics}
-                    checked={separate}
-                  />
-                  <Form.Button
-                    type="button"
-                    disabled={disabled}
-                    fluid
-                    size="huge"
-                    primary
-                    basic
-                    positive
-                    content="Fetch statistics"
-                    onClick={onSubmitFormClick}
-                    data-cy="fetch-stats-button"
-                  />
-                </>
+                <Form.Button
+                  type="button"
+                  disabled={disabled}
+                  fluid
+                  size="huge"
+                  primary
+                  basic
+                  positive
+                  content="Fetch statistics"
+                  onClick={onSubmitFormClick}
+                  data-cy="fetch-stats-button"
+                />
               )}
             </div>
             <CourseTable
