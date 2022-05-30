@@ -13,7 +13,7 @@
     "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
     "i": "^0.3.7",
-    "knex": "0.20.10",
+    "knex": "2.1.0",
     "lodash": "^4.17.21",
     "node-nats-streaming": "^0.2.6",
     "npm": "^6.14.16",
