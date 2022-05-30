@@ -101,9 +101,6 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
           setAcademicYear={setAcademicYear}
         />
       </Segment>
-      <Segment style={{ marginTop: '1rem' }}>
-        <Header as="h4">Show credits</Header>
-      </Segment>
       <CourseTabs
         data={filterDataByYear(data, fromYear, toYear)}
         showStudents={showStudents}
