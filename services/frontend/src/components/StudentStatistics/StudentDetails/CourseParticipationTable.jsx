@@ -3,18 +3,25 @@ import { func, shape, string } from 'prop-types'
 import { Divider, Icon, Header, Item } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 
-import { byDateDesc, reformatDate, getTextInWithOpen } from '../../../common'
+import { byDateDesc, reformatDate, getTextInWithOpen, resolveStudyPlan } from '../../../common'
 import StudentCourseTable from '../StudentCourseTable'
 
-const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
+const isInStudyPlan = (plan, code) => plan && plan.included_courses.includes(code)
+
+const CourseParticipationTable = ({ student, language, clearCourseStats, studyrightid }) => {
   if (!student) return null
 
   const courseHeaders = ['Date', 'Course', 'Grade', 'Credits', '']
 
   const courseRowsByAcademicYear = {}
 
+  const studyRight = student.studyrights.find(s => s.studyrightid === studyrightid)
+  const plan = resolveStudyPlan(student.studyplans, studyRight)
+
   student.courses.sort(byDateDesc).forEach(c => {
     const { date, grade, credits, isOpenCourse, course, isStudyModuleCredit, passed, credittypecode } = c
+    const isIncluded = isInStudyPlan(plan, course.code)
+
     let icon = null
 
     if (isStudyModuleCredit) {
@@ -34,6 +41,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
 
     if (new Date(date).getMonth() < 7) {
       courseRowsByAcademicYear[`${new Date(date).getFullYear() - 1}-${new Date(date).getFullYear()}`].push([
+        isIncluded,
         reformatDate(date, 'DD.MM.YYYY'),
         `${
           isStudyModuleCredit
@@ -54,6 +62,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats }) => {
       ])
     } else {
       courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`].push([
+        isIncluded,
         reformatDate(date, 'DD.MM.YYYY'),
         `${
           isStudyModuleCredit

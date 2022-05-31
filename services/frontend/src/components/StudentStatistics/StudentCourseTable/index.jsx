@@ -21,19 +21,25 @@ const getWidth = index => {
 
 const getTableBody = rows => (
   <Table.Body>
-    {rows.map((row, i) => (
-      <Table.Row
-        // eslint-disable-next-line react/no-array-index-key
-        key={`row-${i}`}
-      >
-        {Object.values(row).map((value, index) => (
+    {rows.map((row, i) => {
+      const [highlight, ...rest] = Object.values(row)
+      const style = highlight ? { backgroundColor: '#e8f4ff' } : null
+
+      return (
+        <Table.Row
+          style={style}
           // eslint-disable-next-line react/no-array-index-key
-          <Table.Cell width={getWidth(index)} key={`cell-${index}`}>
-            {value}
-          </Table.Cell>
-        ))}
-      </Table.Row>
-    ))}
+          key={`row-${i}`}
+        >
+          {rest.map((value, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Table.Cell width={getWidth(index)} key={`cell-${index}`}>
+              {value}
+            </Table.Cell>
+          ))}
+        </Table.Row>
+      )
+    })}
   </Table.Body>
 )
 

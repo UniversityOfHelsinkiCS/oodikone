@@ -345,6 +345,16 @@ export const splitByEmptySpace = str => str.replace(/\s\s+/g, ' ').split(' ')
 
 export const isNewHYStudyProgramme = code => !!(code && code.match(/^[A-Z]*[0-9]*_[0-9]*$/))
 
+export const resolveStudyPlan = (studyPlans, studyRight) => {
+  if (!studyRight) return null
+  const { code } =
+    studyRight.studyright_elements
+      .filter(e => e.element_detail.type === 20)
+      .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0] || {}
+  if (!code) return null
+  return studyPlans.find(p => p.programme_code === code)
+}
+
 // These are the new Bachelor's programmes in Matlu, that have BH possibility
 export const bachelorHonoursProgrammes = [
   'KH50_001',
