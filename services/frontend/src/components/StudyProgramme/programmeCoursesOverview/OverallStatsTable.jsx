@@ -58,7 +58,7 @@ const getColumns = (language, showStudents) => {
       },
 
       {
-        key: 'totalProgramme',
+        key: 'totalOwnProgramme',
         title: 'Programme students',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
@@ -129,9 +129,10 @@ const getColumns = (language, showStudents) => {
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalAllCredits,
+        getRowContent: course => course.totalAllCredits,
       },
       {
-        key: 'totalProgramme',
+        key: 'totalOwnProgramme',
         title: 'Programme credits',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
@@ -169,7 +170,7 @@ const OverallStatsTable = ({ data, showStudents }) => {
         defaultSort={['name', 'asc']}
         defaultdescending
         getRowKey={course => course.code}
-        // tableProps={{ celled: true, fixed: true }}
+        tableProps={{ celled: true, fixed: true }}
         columns={getColumns(language, showStudents)}
         data={data}
       />
