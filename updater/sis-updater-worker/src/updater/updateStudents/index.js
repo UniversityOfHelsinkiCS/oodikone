@@ -246,12 +246,18 @@ const updateStudents = async personIds => {
 const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber) => {
   const studyplans = studyplansAll.filter(plan => plan.primary)
 
+  const attainments = await selectFromByIds('attainments', personIds, 'person_id')
+
   const programmeModules = await selectFromByIds(
     'modules',
-    flatten(studyplans.map(plan => plan.module_selections.map(module => module.moduleId)))
+    Array.from(
+      new Set(
+        flatten(studyplans.map(plan => plan.module_selections.map(module => module.moduleId))).concat(
+          ...attainments.filter(a => a.module_id).map(a => a.module_id)
+        )
+      )
+    )
   )
-
-  const attainments = await selectFromByIds('attainments', personIds, 'person_id')
 
   const courseUnits = await selectFromByIds(
     'course_units',
@@ -312,22 +318,18 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   }
 
   const getCourseCodesFromAttainment = attainment => {
-    if (attainment.code) {
-      return [attainment.code.split('-').slice(0, -1).join('-')]
-    }
-    if (attainment.course_unit_id) {
-      return [courseUnitIdToCode[attainment.course_unit_id]]
-    }
+    if (attainment.code) return [attainment.code.split('-').slice(0, -1).join('-')]
 
-    if (attainment.nodes) {
+    if (attainment.nodes && attainment.nodes.length)
       return flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
           .map(node => getCourseCodesFromAttainment(attainmentIdToAttainment[node.attainmentId]))
       )
-    }
 
-    return []
+    const { course_unit_id, module_id } = attainment
+    const code = courseUnitIdToCode[course_unit_id] || programmeModuleIdToCode[module_id]
+    return code || []
   }
 
   const studyplanIdToDegreeProgrammes = studyplans.reduce((res, cur) => {
