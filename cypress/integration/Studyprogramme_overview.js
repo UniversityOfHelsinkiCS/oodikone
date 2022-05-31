@@ -366,26 +366,71 @@ describe('Studyprogramme overview', () => {
   describe('Programme courses works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme', 'admin') // Remove admin when the tab is made visible to normal users
-    })
-
-    it('Programme courses -tab loads', () => {
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Programme courses').click()
+    })
+
+    it('content loads', () => {
       cy.get('[data-cy=CoursesYearFilter]')
       cy.get('[data-cy=CourseTabs]')
     })
 
-    it('Programme course list contains correct courses in alphabetical order', () => {
-      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
-      cy.get('.attached').contains('Programme courses').click()
+    it('time range selection works', () => {
+      cy.get('[data-cy=fromYear]').click().contains('2018').click()
 
+      cy.get('[data-cy=toYear').click().contains('2019').click()
+
+      cy.get('[data-cy=CoursesSortableTable]').within(() => {
+        cy.get('tr').eq(1).contains('684')
+      })
+    })
+
+    it('calendar year -> academic year toggle works', () => {
+      cy.get('[data-cy=fromYear]').click().contains('2018').click()
+
+      cy.get('[data-cy=toYear').click().contains('2019').click()
+
+      cy.get('[data-cy=CoursesSortableTable]').within(() => {
+        cy.get('tr').eq(1).contains('684')
+      })
+
+      cy.get('[data-cy=calendarAcademicYearToggle]').first().click()
+
+      cy.get('[data-cy=CoursesSortableTable]').within(() => {
+        cy.get('tr').eq(1).contains('772')
+      })
+    })
+
+    it('contains correct courses in alphabetical order', () => {
       cy.get('[data-cy=CoursesSortableTable]').within(() => {
         cy.get('tr').eq(1).contains('Aineopintojen harjoitustyö: Tietokantasovellus')
         cy.get('tr').eq(-1).contains('Äidinkielinen viestintä')
       })
     })
 
-    // TO-DO add tests for sorting and the upcoming credit statistics
+    it('different sorting options work', () => {
+      cy.get('[data-cy=CoursesSortableTable]').within(() => {
+        // Test sorting by different columns
+        cy.get('th').eq(0).click()
+        cy.get('tr').eq(1).contains('Tietojenkäsittelytieteen kisälliopetus: Java-ohjelmointi')
+        cy.get('th').eq(1).click()
+        cy.get('tr').eq(1).contains('Äidinkielinen viestintä')
+        cy.get('th').eq(2).click()
+        cy.get('tr').eq(1).contains('Tietorakenteet ja algoritmit')
+      })
+    })
+
+    it('show credits -> show students toggle works', () => {
+      cy.get('[data-cy=CoursesSortableTable]').within(() => {
+        cy.get('tr').eq(1).contains('1068')
+      })
+
+      cy.get('[data-cy=creditsStudentsToggle]').first().click()
+
+      cy.get('[data-cy=CoursesSortableTable]').within(() => {
+        cy.get('tr').eq(1).contains('267')
+      })
+    })
   })
 
   /* Tag-tests*/
