@@ -551,7 +551,8 @@ const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, program
       AND cr.course_code IN (:programmeCourses)
       AND cr.credittypecode = 4
       AND cr.student_studentnumber NOT IN
-        (SELECT student_studentnumber FROM studyright_elements
+        (
+        SELECT student_studentnumber FROM studyright_elements
         WHERE studyright_elements.studentnumber = cr.student_studentnumber
         AND cr.attainment_date BETWEEN studyright_elements.startdate AND studyright_elements.enddate)
       )
