@@ -365,7 +365,7 @@ describe('Studyprogramme overview', () => {
   /* Programme courses -tests*/
   describe('Programme courses works for basic user', () => {
     beforeEach(() => {
-      cy.init('/study-programme', 'admin') // Remove admin when the tab is made visible to normal users
+      cy.init('/study-programme')
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Programme courses').click()
     })

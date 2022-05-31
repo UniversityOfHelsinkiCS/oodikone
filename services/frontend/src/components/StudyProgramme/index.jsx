@@ -66,22 +66,21 @@ const StudyProgramme = props => {
         />
       ),
     })
+    panes.push({
+      menuItem: 'Programme courses',
+      render: () => (
+        <ProgrammeCoursesOverview
+          academicYear={academicYear}
+          studyProgramme={studyProgrammeId}
+          setAcademicYear={setAcademicYear}
+        />
+      ),
+    })
 
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
         render: () => <UpdateView studyprogramme={studyProgrammeId} />,
-      })
-
-      panes.push({
-        menuItem: 'Programme courses',
-        render: () => (
-          <ProgrammeCoursesOverview
-            academicYear={academicYear}
-            studyProgramme={studyProgrammeId}
-            setAcademicYear={setAcademicYear}
-          />
-        ),
       })
     }
 
