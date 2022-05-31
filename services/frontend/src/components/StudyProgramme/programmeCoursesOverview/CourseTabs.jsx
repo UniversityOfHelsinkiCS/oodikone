@@ -19,7 +19,7 @@ const CourseTabs = ({ data, showStudents, handleShowStudentsChange }) => {
     render: () => (
       <Tab.Pane>
         <Toggle
-          cypress="courses_yearToggle"
+          cypress="creditsStudentsToggle"
           toolTips={null}
           firstLabel="Show credits"
           secondLabel="Show students"
