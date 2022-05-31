@@ -206,7 +206,12 @@ const StudentDetails = ({
         studyrightid={studyrightid}
       />
       {honoursCode && <BachelorHonours student={student} absentYears={getAbsentYears()} programmeCode={honoursCode} />}
-      <CourseParticipationTable student={student} language={language} clearCourseStats={clearCourseStats} />
+      <CourseParticipationTable
+        student={student}
+        language={language}
+        clearCourseStats={clearCourseStats}
+        studyrightid={studyrightid}
+      />
     </Segment>
   )
 }
