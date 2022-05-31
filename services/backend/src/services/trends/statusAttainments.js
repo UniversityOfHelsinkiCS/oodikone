@@ -200,11 +200,14 @@ const getTotalOpenUniCreditsOfCoursesBetween = async (a, b, alias = 'sum', alias
     INNER JOIN organization o ON o.id = cp.organizationcode
     AND cr.attainment_date BETWEEN :a AND :b
     AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
-    AND cr.credittypecode IN (4, 9) AND cp.organizationcode = 'hy-org-48645785'
+    AND cr.credittypecode IN (4, 9) 
+    AND cr.is_open = true
     AND cr.student_studentnumber NOT IN
-      (SELECT student_studentnumber FROM studyright
-      WHERE studyright.student_studentnumber = cr.student_studentnumber
-      AND cr.attainment_date BETWEEN studyright.startdate AND studyright.enddate)
+        (
+        SELECT student_studentnumber FROM studyright_elements
+        WHERE studyright_elements.studentnumber = cr.student_studentnumber
+        AND cr.attainment_date BETWEEN studyright_elements.startdate AND studyright_elements.enddate
+      )
     GROUP BY co.id, o.code -- HAVING SUM(cr.credits) > 0
     `,
     {
@@ -343,7 +346,7 @@ const calculateStatusStatistics = async (unixMillis, showByYear) => {
     if (!regexresult) return code
     return regexresult[1]
   }
-
+  // console.log('yearly open uni acc credits: ', yearlyOpenUniAccCredits)
   const fromAyToNormalCourses = [
     ...new Set(_.flatten(yearlyOpenUniAccCredits).map(c => unifyOpenUniversity(c.code))),
     ...new Set(_.flatten(yearlyOpenUniTotalCredits).map(c => unifyOpenUniversity(c.code))),
