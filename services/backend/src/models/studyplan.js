@@ -1,4 +1,4 @@
-const { Model, DATE, ARRAY, STRING, INTEGER } = require('sequelize')
+const { Model, DATE, ARRAY, STRING } = require('sequelize')
 const { dbConnections } = require('../database/connection')
 
 class Studyplan extends Model {}
@@ -7,8 +7,7 @@ Studyplan.init(
   {
     id: {
       primaryKey: true,
-      type: INTEGER,
-      autoIncrement: true,
+      type: STRING,
       allowNull: false,
     },
     studentnumber: {
@@ -19,13 +18,11 @@ Studyplan.init(
       },
       onUpdate: 'cascade',
       onDelete: 'cascade',
-      unique: 'source', // This and programme_code create a composite key for this table.
       allowNull: false,
     },
     programme_code: {
       type: STRING,
       allowNull: false,
-      unique: 'source',
     },
     included_courses: {
       type: ARRAY(STRING),

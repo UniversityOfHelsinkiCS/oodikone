@@ -329,7 +329,8 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
 
     const { course_unit_id, module_id } = attainment
     const code = courseUnitIdToCode[course_unit_id] || programmeModuleIdToCode[module_id]
-    return code || []
+    if (!code) return []
+    return [code]
   }
 
   const studyplanIdToDegreeProgrammes = studyplans.reduce((res, cur) => {
@@ -360,15 +361,12 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     moduleIdToParentDegreeProgramme,
     courseUnitIdToCode,
     moduleIdToAttainment,
+    attainmentIdToAttainment,
     getCourseCodesFromAttainment
   )
 
   const mappedStudyplans = flatten(studyplans.map(mapStudyplan))
-
-  mappedStudyplans.reduce(async (p, studyplan) => {
-    await p
-    return await Studyplan.upsert(studyplan)
-  }, Promise.resolve())
+  await bulkCreate(Studyplan, mappedStudyplans)
 }
 
 const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
