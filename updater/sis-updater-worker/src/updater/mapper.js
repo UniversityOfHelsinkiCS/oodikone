@@ -39,6 +39,8 @@ const validTypes = [
 
 const now = new Date()
 
+const sanitizeCourseCode = code => (code.split('-').length > 2 ? code.split('-').slice(0, -1).join('-') : code)
+
 const calculateTotalCreditsFromAttainments = attainments => {
   const totalCredits = attainments.reduce((sum, att) => {
     // Misregistrations are not counted to the total
@@ -374,6 +376,7 @@ const studyplanMapper =
     moduleIdToParentDegreeProgramme,
     courseUnitIdToCode,
     moduleIdToAttainment,
+    attainmentIdToAttainment,
     getCourseCodesFromAttainment
   ) =>
   studyplan => {
@@ -381,15 +384,22 @@ const studyplanMapper =
 
     return studyplanIdToDegreeProgrammes[studyplan.id].map(programmeId => {
       const graduated = !!moduleIdToAttainment[programmeId]
-
+      const id = `${studentnumber}-${programmeModuleIdToCode[programmeId]}`
+      const courseUnitSelections = studyplan.course_unit_selections
+        .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
+        .map(courseUnit => courseUnitIdToCode[courseUnit.courseUnitId])
+      const customCourseUnitSelections = studyplan.custom_course_unit_attainment_selections
+        .filter(({ parentModuleId }) => moduleIdToParentDegreeProgramme[parentModuleId] === programmeId)
+        .map(({ customCourseUnitAttainmentId }) => (attainmentIdToAttainment[customCourseUnitAttainmentId] || {}).code)
+        .map(sanitizeCourseCode)
+        .filter(c => !!c)
       return {
+        id,
         studentnumber,
         programme_code: programmeModuleIdToCode[programmeId],
         included_courses: graduated
           ? getCourseCodesFromAttainment(moduleIdToAttainment[programmeId])
-          : studyplan.course_unit_selections
-              .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
-              .map(courseUnit => courseUnitIdToCode[courseUnit.courseUnitId]),
+          : courseUnitSelections.concat(customCourseUnitSelections),
       }
     })
   }
