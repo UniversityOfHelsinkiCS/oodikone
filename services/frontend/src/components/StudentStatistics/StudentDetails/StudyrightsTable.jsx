@@ -124,9 +124,7 @@ const StudyrightsTable = ({
     const programmeCodes = c.elements.programmes.filter(filterDuplicates).map(programme => programme.code)
     const studyplans = student.studyplans.filter(sp => programmeCodes.includes(sp.programme_code))
 
-    if (studyplans.length === 0 || (!programmeCodes[0].includes('KH') && !programmeCodes[0].includes('MH'))) {
-      return <>-</>
-    }
+    if (!studyplans.length) return <>-</>
 
     const getCompletedCredits = courseCode => {
       const courses = student.courses.filter(course => course.course_code === courseCode && course.passed)
