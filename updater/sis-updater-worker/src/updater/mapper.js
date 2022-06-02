@@ -390,7 +390,11 @@ const studyplanMapper =
       const id = `${studentnumber}-${programmeModuleIdToCode[programmeId]}`
       const courseUnitSelections = studyplan.course_unit_selections
         .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
-        .map(courseUnit => courseUnitIdToCode[courseUnit.courseUnitId])
+        .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
+        .map(({ substitutedBy, courseUnitId }) => {
+          if (substitutedBy.length) return courseUnitIdToCode[substitutedBy[0]]
+          return courseUnitIdToCode[courseUnitId]
+        })
       const customCourseUnitSelections = studyplan.custom_course_unit_attainment_selections
         .filter(({ parentModuleId }) => moduleIdToParentDegreeProgramme[parentModuleId] === programmeId)
         .map(({ customCourseUnitAttainmentId }) => (attainmentIdToAttainment[customCourseUnitAttainmentId] || {}).code)
