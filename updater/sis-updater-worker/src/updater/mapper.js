@@ -39,7 +39,10 @@ const validTypes = [
 
 const now = new Date()
 
-const sanitizeCourseCode = code => (code.split('-').length > 2 ? code.split('-').slice(0, -1).join('-') : code)
+const sanitizeCourseCode = code => {
+  if (!code || code.split('-').length <= 2) return null
+  return code.split('-').slice(0, -1).join('-')
+}
 
 const calculateTotalCreditsFromAttainments = attainments => {
   const totalCredits = attainments.reduce((sum, att) => {
