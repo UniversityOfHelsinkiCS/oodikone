@@ -173,7 +173,7 @@ const createGoalSeries = (starting, ending, absences) => {
       previousTargetCreditsBeforeAbsence = newCredits
       res.push([startdate, newCredits, enrollmenttype, statutoryAbsence])
       res.push([enddate, newCredits, enrollmenttype, statutoryAbsence])
-      totalAbsenceMonths += moment(enddate).diff(moment(startdate), 'months')
+      totalAbsenceMonths += Math.abs(moment(enddate).diff(moment(startdate), 'months'))
       return res
     }, [])
 
@@ -293,9 +293,6 @@ const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, 
   )
 
   if (singleStudent) {
-    const filteredAbsences = selectedStudyRight
-      ? absences.filter(({ startdate }) => startdate >= new Date(selectedStudyRight.startdate).getTime())
-      : absences
     const startDate = selectedStudyRight
       ? selectedStudyRight.studyright_elements
           // eslint-disable-next-line camelcase
@@ -313,6 +310,9 @@ const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, 
       ? new Date(studyRightTargetEnd).getTime()
       : new Date(endDate || new Date()).getTime()
     const starting = new Date(startDate).getTime()
+    const filteredAbsences = selectedStudyRight
+      ? absences.filter(({ startdate, enddate }) => startdate >= starting && enddate <= ending)
+      : absences
 
     seriesData.push(createGoalSeries(starting, ending, filteredAbsences))
   }
