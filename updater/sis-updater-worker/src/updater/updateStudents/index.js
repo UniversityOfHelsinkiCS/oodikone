@@ -1,5 +1,5 @@
 const { Op } = require('sequelize')
-const { flatten, uniqBy, sortBy, groupBy, orderBy, has, get, uniq } = require('lodash')
+const { flatten, uniqBy, sortBy, groupBy, orderBy, has, get, uniq, flattenDeep } = require('lodash')
 const {
   Course,
   Student,
@@ -260,13 +260,20 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     )
   )
 
+  const courseUnitSelections = flatten(studyplans.map(plan => plan.course_unit_selections.map(cu => cu.courseUnitId)))
+  const courseUnitSelectionSubstitutedBy = flattenDeep(
+    studyplans.map(plan =>
+      plan.course_unit_selections.filter(cu => cu.substitutedBy.length).map(cu => cu.substitutedBy.map(sub => sub))
+    )
+  )
+
   const courseUnits = await selectFromByIds(
     'course_units',
     Array.from(
       new Set(
-        flatten(studyplans.map(plan => plan.course_unit_selections.map(cu => cu.courseUnitId))).concat(
-          ...attainments.filter(a => a.course_unit_id).map(a => a.course_unit_id)
-        )
+        courseUnitSelections
+          .concat(courseUnitSelectionSubstitutedBy)
+          .concat(...attainments.filter(a => a.course_unit_id).map(a => a.course_unit_id))
       )
     )
   )
