@@ -283,9 +283,10 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     return res
   }, {})
 
-  const moduleIdToAttainment = attainments.reduce((res, cur) => {
-    if (cur.module_id) res[cur.module_id] = cur
-
+  const graduationsMap = attainments.reduce((res, attainment) => {
+    if (!attainment.module_id) return res
+    if (!res[attainment.module_id]) res[attainment.module_id] = {}
+    res[attainment.module_id][attainment.person_id] = attainment
     return res
   }, {})
 
@@ -369,7 +370,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     studyplanIdToDegreeProgrammes,
     moduleIdToParentDegreeProgramme,
     courseUnitIdToCode,
-    moduleIdToAttainment,
+    graduationsMap,
     attainmentIdToAttainment,
     getCourseCodesFromAttainment
   )
