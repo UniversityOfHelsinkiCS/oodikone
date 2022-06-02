@@ -419,4 +419,5 @@ module.exports = {
   mapStudyrightExtent,
   enrollmentMapper,
   studyplanMapper,
+  sanitizeCourseCode,
 }
