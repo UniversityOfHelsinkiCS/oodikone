@@ -28,6 +28,7 @@ const {
   courseProviderMapper,
   enrollmentMapper,
   studyplanMapper,
+  sanitizeCourseCode,
 } = require('../mapper')
 const { dbConnections } = require('../../db/connection')
 const { isBaMa } = require('../../utils')
@@ -318,7 +319,8 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   }
 
   const getCourseCodesFromAttainment = attainment => {
-    if (attainment.code) return [attainment.code.split('-').slice(0, -1).join('-')]
+    if (!attainment) return []
+    if (attainment.code) return [sanitizeCourseCode(attainment.code)]
 
     if (attainment.nodes && attainment.nodes.length)
       return flatten(
