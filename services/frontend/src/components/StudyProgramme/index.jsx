@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useHistory, withRouter } from 'react-router-dom'
 import { connect, useDispatch, useSelector } from 'react-redux'
-import { Header, Segment, Tab } from 'semantic-ui-react'
+import { Header, Segment, Tab, Label, Menu } from 'semantic-ui-react'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
 import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
@@ -67,7 +67,12 @@ const StudyProgramme = props => {
       ),
     })
     panes.push({
-      menuItem: 'Programme courses',
+      menuItem: (
+        <Menu.Item key="Programme courses">
+          Programme courses
+          <Label color="green">New!</Label>
+        </Menu.Item>
+      ),
       render: () => (
         <ProgrammeCoursesOverview
           academicYear={academicYear}
