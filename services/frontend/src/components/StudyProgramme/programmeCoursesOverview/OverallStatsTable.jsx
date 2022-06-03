@@ -1,11 +1,14 @@
 import React from 'react'
 import { Item, Icon } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
+import InfoToolTips from 'common/InfoToolTips'
 import sendEvent from '../../../common/sendEvent'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import SortableTable from '../../SortableTable'
 
 const sendAnalytics = sendEvent.populationStatistics
+
+const toolTips = InfoToolTips.Studyprogramme
 
 const getColumns = (language, showStudents) => {
   let columns = null
@@ -67,21 +70,22 @@ const getColumns = (language, showStudents) => {
       },
 
       {
-        key: 'totalWithoutStudyright',
-        title: 'Open students',
-        cellStyle: { textAlign: 'right' },
-        filterType: 'range',
-        getRowVal: course => course.totalWithoutStudyrightStudents,
-        getRowContent: course => course.totalWithoutStudyrightStudents,
-      },
-
-      {
         key: 'totalOtherProgramme',
         title: 'Other programme students',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalOtherProgrammeStudents,
         getRowContent: course => course.totalOtherProgrammeStudents,
+      },
+
+      {
+        key: 'totalWithoutStudyright',
+        title: 'Non-degree students',
+        helpText: toolTips.NonDegree,
+        cellStyle: { textAlign: 'right' },
+        filterType: 'range',
+        getRowVal: course => course.totalWithoutStudyrightStudents,
+        getRowContent: course => course.totalWithoutStudyrightStudents,
       },
     ]
   } else {
@@ -140,20 +144,21 @@ const getColumns = (language, showStudents) => {
         getRowContent: course => course.totalProgrammeCredits,
       },
       {
-        key: 'totalWithoutStudyright',
-        title: 'Open credits',
-        cellStyle: { textAlign: 'right' },
-        filterType: 'range',
-        getRowVal: course => course.totalWithoutStudyrightCredits,
-        getRowContent: course => course.totalWithoutStudyrightCredits,
-      },
-      {
         key: 'totalOtherProgramme',
         title: 'Other programme credits',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalOtherProgrammeCredits,
         getRowContent: course => course.totalOtherProgrammeCredits,
+      },
+      {
+        key: 'totalWithoutStudyright',
+        title: 'Non-degree credits',
+        helpText: toolTips.NonDegree,
+        cellStyle: { textAlign: 'right' },
+        filterType: 'range',
+        getRowVal: course => course.totalWithoutStudyrightCredits,
+        getRowContent: course => course.totalWithoutStudyrightCredits,
       },
     ]
   }
