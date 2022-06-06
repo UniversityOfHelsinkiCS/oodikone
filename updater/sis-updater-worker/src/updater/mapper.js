@@ -378,30 +378,31 @@ const studyplanMapper =
   (
     personIdToStudentNumber,
     programmeModuleIdToCode,
-    studyplanIdToDegreeProgrammes,
-    moduleIdToParentDegreeProgramme,
+    moduleIdToParentModuleCode,
     courseUnitIdToCode,
     graduationsMap,
     attainmentIdToAttainment,
     courseUnitIdToAttainment,
+    studyPlanIdToDegrees,
     getCourseCodesFromAttainment,
     getAttainmentsFromAttainment
   ) =>
   studyplan => {
     const studentnumber = personIdToStudentNumber[studyplan.user_id]
-
-    return studyplanIdToDegreeProgrammes[studyplan.id].map(programmeId => {
+    return studyPlanIdToDegrees[studyplan.id].map(programmeId => {
+      const code = programmeModuleIdToCode[programmeId]
+      if (!code) return null
       const graduated = graduationsMap[programmeId] && graduationsMap[programmeId][studyplan.user_id]
-      const id = `${studentnumber}-${programmeModuleIdToCode[programmeId]}`
+      const id = `${studentnumber}-${code}`
       const courseUnitSelections = studyplan.course_unit_selections
-        .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
+        .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
         .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
         .map(({ substitutedBy, courseUnitId }) => {
           if (substitutedBy.length) return courseUnitIdToCode[substitutedBy[0]]
           return courseUnitIdToCode[courseUnitId]
         })
       const customCourseUnitSelections = studyplan.custom_course_unit_attainment_selections
-        .filter(({ parentModuleId }) => moduleIdToParentDegreeProgramme[parentModuleId] === programmeId)
+        .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId] === code)
         .map(({ customCourseUnitAttainmentId }) => (attainmentIdToAttainment[customCourseUnitAttainmentId] || {}).code)
         .map(sanitizeCourseCode)
         .filter(c => !!c)
@@ -409,16 +410,21 @@ const studyplanMapper =
       const attainmentsToCalculate = graduated
         ? getAttainmentsFromAttainment(graduationsMap[programmeId][studyplan.user_id])
         : studyplan.custom_course_unit_attainment_selections
-            .filter(({ parentModuleId }) => moduleIdToParentDegreeProgramme[parentModuleId] === programmeId)
+            .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId] === code)
             .map(({ customCourseUnitAttainmentId }) => attainmentIdToAttainment[customCourseUnitAttainmentId])
             .concat(
               flatten(
                 studyplan.course_unit_selections
-                  .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
+                  .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
                   .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
                   .map(({ substitutedBy, courseUnitId }) => {
-                    if (substitutedBy.length) return courseUnitIdToAttainment[substitutedBy[0]]
+                    if (substitutedBy.length)
+                      return courseUnitIdToAttainment[substitutedBy[0]]
+                        ? courseUnitIdToAttainment[substitutedBy[0]][studyplan.user_id]
+                        : []
                     return courseUnitIdToAttainment[courseUnitId]
+                      ? courseUnitIdToAttainment[courseUnitId][studyplan.user_id]
+                      : []
                   })
               )
             )
@@ -428,7 +434,7 @@ const studyplanMapper =
         id,
         studentnumber,
         completed_credits,
-        programme_code: programmeModuleIdToCode[programmeId],
+        programme_code: code,
         included_courses: graduated
           ? getCourseCodesFromAttainment(graduationsMap[programmeId][studyplan.user_id])
           : courseUnitSelections.concat(customCourseUnitSelections),
