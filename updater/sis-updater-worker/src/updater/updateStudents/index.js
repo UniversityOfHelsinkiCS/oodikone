@@ -239,25 +239,41 @@ const updateStudents = async personIds => {
     updateAttainments(attainments, personIdToStudentNumber, attainmentsToBeExluced),
     updateTermRegistrations(termRegistrations, personIdToStudentNumber),
     updateEnrollments(enrollments, personIdToStudentNumber),
-    updateStudyplans(studyplans, personIds, personIdToStudentNumber),
+    updateStudyplans(studyplans, personIds, personIdToStudentNumber, groupedStudyRightSnapshots),
     await bulkCreate(Transfer, mappedTransfers, null, ['studyrightid']),
   ])
 }
 
-const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber) => {
+const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
   const studyplans = studyplansAll.filter(plan => plan.primary)
 
   const attainments = await selectFromByIds('attainments', personIds, 'person_id')
 
-  const programmeModules = await selectFromByIds(
-    'modules',
-    Array.from(
-      new Set(
-        flatten(studyplans.map(plan => plan.module_selections.map(module => module.moduleId))).concat(
-          ...attainments.filter(a => a.module_id).map(a => a.module_id)
-        )
-      )
+  const programmeModules = (
+    await selectFromByIds(
+      'modules',
+      Array.from(new Set(flatten(studyplans.map(plan => plan.module_selections.map(module => module.moduleId)))))
     )
+  ).concat(
+    await selectFromByIds(
+      'modules',
+      attainments.map(a => a.module_group_id).filter(id => !!id),
+      'group_id'
+    )
+  )
+  const educationHasStudyRight = Object.keys(groupedStudyRightSnapshots).reduce((acc, k) => {
+    const sorted = groupedStudyRightSnapshots[k]
+      .filter(s => new Date(s.snapshot_date_time) <= new Date())
+      .sort((a, b) => new Date(b.snapshot_date_time) - new Date(a.snapshot_date_time))
+    if (!sorted.length) return acc
+    const { education_id, person_id } = sorted[0]
+    if (!acc[education_id]) acc[education_id] = {}
+    acc[education_id][person_id] = true
+    return acc
+  }, {})
+
+  const filteredPlans = studyplans.filter(
+    p => educationHasStudyRight[p.root_id] && educationHasStudyRight[p.root_id][p.user_id]
   )
 
   const courseUnitSelections = flatten(studyplans.map(plan => plan.course_unit_selections.map(cu => cu.courseUnitId)))
@@ -285,13 +301,14 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
 
   const courseUnitIdToAttainment = attainments.reduce((res, cur) => {
     if (!cur.course_unit_id) return res
-    if (!res[cur.course_unit_id]) res[cur.course_unit_id] = []
-    res[cur.course_unit_id].push(cur)
+    if (!res[cur.course_unit_id]) res[cur.course_unit_id] = {}
+    if (!res[cur.course_unit_id][cur.person_id]) res[cur.course_unit_id][cur.person_id] = []
+    res[cur.course_unit_id][cur.person_id].push(cur)
     return res
   }, {})
 
   const graduationsMap = attainments.reduce((res, attainment) => {
-    if (!attainment.module_id) return res
+    if (!attainment.module_id || attainment.type !== 'DegreeProgrammeAttainment') return res
     if (!res[attainment.module_id]) res[attainment.module_id] = {}
     res[attainment.module_id][attainment.person_id] = attainment
     return res
@@ -303,6 +320,11 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
   }, {})
 
   const programmeModuleIdToCode = programmeModules.reduce((res, cur) => {
+    res[cur.id] = cur.code
+    return res
+  }, {})
+
+  const programmeModuleGroupIdToCode = programmeModules.reduce((res, cur) => {
     res[cur.id] = cur.code
     return res
   }, {})
@@ -345,7 +367,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
       )
 
     const { course_unit_id, module_id } = attainment
-    const code = courseUnitIdToCode[course_unit_id] || programmeModuleIdToCode[module_id]
+    const code = courseUnitIdToCode[course_unit_id] || programmeModuleGroupIdToCode[module_id]
     if (!code) return []
     return [code]
   }
@@ -381,21 +403,37 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     })
   })
 
+  const studyPlanIdToDegrees = filteredPlans.reduce((res, cur) => {
+    const degreeProgrammeModules = cur.module_selections.filter(({ parentModuleId }) => parentModuleId === cur.root_id)
+    res[cur.id] = degreeProgrammeModules.map(({ moduleId }) => moduleId)
+    return res
+  }, {})
+
+  const moduleIdToParentModuleCode = Object.keys(moduleIdToParentDegreeProgramme).reduce((acc, cur) => {
+    const parent = moduleIdToParentDegreeProgramme[cur]
+    acc[cur] = programmeModuleGroupIdToCode[parent]
+    return acc
+  }, {})
+
   const mapStudyplan = studyplanMapper(
     personIdToStudentNumber,
     programmeModuleIdToCode,
-    studyplanIdToDegreeProgrammes,
-    moduleIdToParentDegreeProgramme,
+    moduleIdToParentModuleCode,
     courseUnitIdToCode,
     graduationsMap,
     attainmentIdToAttainment,
     courseUnitIdToAttainment,
+    studyPlanIdToDegrees,
     getCourseCodesFromAttainment,
     getAttainmentsFromAttainment
   )
 
-  const mappedStudyplans = flatten(studyplans.map(mapStudyplan))
-  await bulkCreate(Studyplan, mappedStudyplans)
+  const mappedPlans = flatten(
+    filteredPlans
+      .filter(p => educationHasStudyRight[p.root_id] && educationHasStudyRight[p.root_id][p.user_id])
+      .map(mapStudyplan)
+  ).filter(p => !!p)
+  await bulkCreate(Studyplan, mappedPlans)
 }
 
 const updateEnrollments = async (enrollments, personIdToStudentNumber) => {
