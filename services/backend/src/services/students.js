@@ -60,7 +60,7 @@ const byId = async id => {
         },
         {
           model: Studyplan,
-          attributes: ['included_courses', 'programme_code'],
+          attributes: ['included_courses', 'programme_code', 'completed_credits'],
         },
       ],
     }),

@@ -71,13 +71,13 @@ const StudyrightsTable = ({
     //   )
     if (c.graduated)
       return (
-        <div>
+        <div style={{ display: 'flex' }}>
           <Icon name="check circle outline" color="green" />
           <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
         </div>
       )
     return (
-      <div style={{ padding: '.5em 0' }}>
+      <div style={{ padding: '.5em 0', splay: 'flex' }}>
         <Icon name="circle outline" color="red" />
       </div>
     )
@@ -122,26 +122,19 @@ const StudyrightsTable = ({
 
   const renderCompletionPercent = (c, student) => {
     const programmeCodes = c.elements.programmes.filter(filterDuplicates).map(programme => programme.code)
-    const studyplans = student.studyplans.filter(sp => programmeCodes.includes(sp.programme_code))
+    const studyplan = student.studyplans.find(sp => programmeCodes.includes(sp.programme_code))
 
-    if (!studyplans.length) return <>-</>
+    if (!studyplan) return <>-</>
 
-    const getCompletedCredits = courseCode => {
-      const courses = student.courses.filter(course => course.course_code === courseCode && course.passed)
-
-      if (courses.length === 0) {
-        return 0
-      }
-
-      return Math.max(...courses.map(course => course.credits))
-    }
-
-    const courses = studyplans.map(sp => sp.included_courses).flat()
-
+    const { completed_credits: completedCredits } = studyplan
+    const credits = completedCredits || 0
     const totalCredits = getTargetCreditsForProgramme(programmeCodes[0])
-    const completedCredits = courses.reduce((acc, course) => getCompletedCredits(course) + acc, 0)
-
-    return <>{(Math.min(1, completedCredits / Math.max(totalCredits, 1)) * 100).toFixed(0)}%</>
+    const completedPercentage = Math.min(1, credits / Math.max(totalCredits, 1)) * 100
+    return (
+      <>
+        {completedPercentage.toFixed(0)}% ({credits}cr)
+      </>
+    )
   }
 
   return (
