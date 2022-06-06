@@ -1,4 +1,4 @@
-const { sortBy, mapValues } = require('lodash')
+const { sortBy, mapValues, flatten } = require('lodash')
 const { getMinMaxDate } = require('../utils')
 const {
   educationTypeToExtentcode,
@@ -40,8 +40,11 @@ const validTypes = [
 const now = new Date()
 
 const sanitizeCourseCode = code => {
-  if (!code || code.split('-').length <= 2) return null
-  return code.split('-').slice(0, -1).join('-')
+  if (!code) return null
+  const suffix = String(code.split('-').slice(-1))
+  // Custom course unit attainments includes an Oodi surrogate in the end of course code
+  if (suffix.match(/^[0-9]+$/) !== null && suffix.length > 3) return code.split('-').slice(0, -1).join('-')
+  return code
 }
 
 const calculateTotalCreditsFromAttainments = attainments => {
@@ -380,7 +383,9 @@ const studyplanMapper =
     courseUnitIdToCode,
     graduationsMap,
     attainmentIdToAttainment,
-    getCourseCodesFromAttainment
+    courseUnitIdToAttainment,
+    getCourseCodesFromAttainment,
+    getAttainmentsFromAttainment
   ) =>
   studyplan => {
     const studentnumber = personIdToStudentNumber[studyplan.user_id]
@@ -400,9 +405,29 @@ const studyplanMapper =
         .map(({ customCourseUnitAttainmentId }) => (attainmentIdToAttainment[customCourseUnitAttainmentId] || {}).code)
         .map(sanitizeCourseCode)
         .filter(c => !!c)
+
+      const attainmentsToCalculate = graduated
+        ? getAttainmentsFromAttainment(graduationsMap[programmeId][studyplan.user_id])
+        : studyplan.custom_course_unit_attainment_selections
+            .filter(({ parentModuleId }) => moduleIdToParentDegreeProgramme[parentModuleId] === programmeId)
+            .map(({ customCourseUnitAttainmentId }) => attainmentIdToAttainment[customCourseUnitAttainmentId])
+            .concat(
+              flatten(
+                studyplan.course_unit_selections
+                  .filter(courseUnit => moduleIdToParentDegreeProgramme[courseUnit.parentModuleId] === programmeId)
+                  .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
+                  .map(({ substitutedBy, courseUnitId }) => {
+                    if (substitutedBy.length) return courseUnitIdToAttainment[substitutedBy[0]]
+                    return courseUnitIdToAttainment[courseUnitId]
+                  })
+              )
+            )
+            .filter(a => !!a)
+      const completed_credits = calculateTotalCreditsFromAttainments(attainmentsToCalculate)
       return {
         id,
         studentnumber,
+        completed_credits,
         programme_code: programmeModuleIdToCode[programmeId],
         included_courses: graduated
           ? getCourseCodesFromAttainment(graduationsMap[programmeId][studyplan.user_id])
