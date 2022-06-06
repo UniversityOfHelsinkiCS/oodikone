@@ -79,12 +79,7 @@ const PopulationStatistics = () => {
     }
 
     return samples.map(student => {
-      const hops = student.studyplans.find(plan => plan.programme_code === programmeCode)
-      const courses = new Set(hops ? hops.included_courses : [])
-
-      const hopsCourses = student.courses.filter(course => courses.has(course.course_code))
-      const hopsCredits = hopsCourses.reduce((acc, cur) => acc + cur.credits, 0)
-
+      const hopsCredits = student.studyplans.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
       return {
         ...student,
         allCredits: student.credits,
