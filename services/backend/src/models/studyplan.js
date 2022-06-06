@@ -1,4 +1,4 @@
-const { Model, DATE, ARRAY, STRING } = require('sequelize')
+const { Model, DATE, ARRAY, STRING, INTEGER } = require('sequelize')
 const { dbConnections } = require('../database/connection')
 
 class Studyplan extends Model {}
@@ -26,6 +26,9 @@ Studyplan.init(
     },
     included_courses: {
       type: ARRAY(STRING),
+    },
+    completed_credits: {
+      type: INTEGER,
     },
     createdAt: {
       type: DATE,
