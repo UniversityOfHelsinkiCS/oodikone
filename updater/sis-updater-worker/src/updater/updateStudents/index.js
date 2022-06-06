@@ -283,6 +283,13 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     return res
   }, {})
 
+  const courseUnitIdToAttainment = attainments.reduce((res, cur) => {
+    if (!cur.course_unit_id) return res
+    if (!res[cur.course_unit_id]) res[cur.course_unit_id] = []
+    res[cur.course_unit_id].push(cur)
+    return res
+  }, {})
+
   const graduationsMap = attainments.reduce((res, attainment) => {
     if (!attainment.module_id) return res
     if (!res[attainment.module_id]) res[attainment.module_id] = {}
@@ -343,6 +350,16 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     return [code]
   }
 
+  const getAttainmentsFromAttainment = attainment => {
+    if (attainment.nodes && attainment.nodes.length)
+      return flatten(
+        attainment.nodes
+          .filter(node => node.attainmentId)
+          .map(node => getAttainmentsFromAttainment(attainmentIdToAttainment[node.attainmentId]))
+      )
+    return [attainment]
+  }
+
   const studyplanIdToDegreeProgrammes = studyplans.reduce((res, cur) => {
     res[cur.id] = findDegreeProgrammes(cur.root_id)
     return res
@@ -372,7 +389,9 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     courseUnitIdToCode,
     graduationsMap,
     attainmentIdToAttainment,
-    getCourseCodesFromAttainment
+    courseUnitIdToAttainment,
+    getCourseCodesFromAttainment,
+    getAttainmentsFromAttainment
   )
 
   const mappedStudyplans = flatten(studyplans.map(mapStudyplan))
