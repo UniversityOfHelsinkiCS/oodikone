@@ -7,6 +7,7 @@ module.exports = {
       allowNull: true,
     })
   },
+
   down: async queryInterface => {
     await queryInterface.deleteColumn('studyplan', 'completed_credits')
   },

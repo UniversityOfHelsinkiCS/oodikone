@@ -125,6 +125,7 @@ const StudyrightsTable = ({
     const studyplan = student.studyplans.find(sp => programmeCodes.includes(sp.programme_code))
 
     if (!studyplan) return <>-</>
+
     const { completed_credits: completedCredits } = studyplan
     const credits = completedCredits || 0
     const totalCredits = getTargetCreditsForProgramme(programmeCodes[0])
