@@ -41,10 +41,12 @@ const now = new Date()
 
 const sanitizeCourseCode = code => {
   if (!code) return null
-  const suffix = String(code.split('-').slice(-1))
   // Custom course unit attainments includes an Oodi surrogate in the end of course code
-  if (suffix.match(/^[0-9]+$/) !== null && suffix.length > 3) return code.split('-').slice(0, -1).join('-')
-  return code
+  const codeParts = code.split('-')
+  if (!codeParts.length) return code
+  if (codeParts.length === 1) return codeParts[0]
+  if (codeParts[1].length < 7) return `${codeParts[0]}-${codeParts[1]}`
+  return codeParts[0]
 }
 
 const calculateTotalCreditsFromAttainments = attainments => {
