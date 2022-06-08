@@ -357,7 +357,9 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
 
   const getCourseCodesFromAttainment = attainment => {
     if (!attainment) return []
-    if (attainment.code) return [sanitizeCourseCode(attainment.code)]
+    if (attainment.code && attainment.type === 'CustomCourseUnitAttainment')
+      return [sanitizeCourseCode(attainment.code)]
+    if (attainment.code) return [attainment.code]
 
     if (attainment.nodes && attainment.nodes.length)
       return flatten(
