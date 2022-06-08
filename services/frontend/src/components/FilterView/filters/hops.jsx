@@ -21,7 +21,7 @@ export default createFilter({
 
   title: 'HOPS',
 
-  priority: 100,
+  priority: 200,
 
   defaultOptions: {
     active: false,
@@ -31,13 +31,19 @@ export default createFilter({
 
   filter: (student, { active }, { args }) => {
     const hops = student.studyplans.find(plan => plan.programme_code === args.programmeCode)
+    if (!hops) {
+      if (active) {
+        student.courses = []
+        student.credits = 0
+      }
+      return true
+    }
     const courses = new Set(hops ? hops.included_courses : [])
-
     const hopsCourses = student.courses.filter(course => courses.has(course.course_code))
 
     if (active) {
       student.courses = hopsCourses
-      student.credits = student.hopsCredits
+      student.credits = hops.completed_credits
     }
 
     return true
