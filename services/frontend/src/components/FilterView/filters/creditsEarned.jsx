@@ -50,7 +50,7 @@ export default createFilter({
   },
 
   filter(student, { min, max }) {
-    const credits = getStudentTotalCredits(student)
+    const { credits } = student
 
     if (min !== null && credits < min) {
       return false
