@@ -143,7 +143,7 @@ router.post('/v2/populationstatistics/coursesbytag', async (req, res) => {
 router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, res) => {
   const {
     user: { isAdmin, studentsUserCanAccess },
-    body: { studentnumberlist: studentnumbersInReq },
+    body: { studentnumberlist: studentnumbersInReq, studentCountLimit, ...query },
   } = req
 
   if (!studentnumbersInReq) {
@@ -154,10 +154,11 @@ router.post('/v2/populationstatistics/coursesbystudentnumberlist', async (req, r
 
   const result = await Population.bottlenecksOf(
     {
-      year: 1900,
-      studyRights: [],
-      semesters: ['FALL', 'SPRING'],
-      months: 10000,
+      year: query?.year ?? 1900,
+      studyRights: query?.studyRights ?? [],
+      semesters: query?.semesters ?? ['FALL', 'SPRING'],
+      months: query?.months ?? 10000,
+      studentCountLimit,
     },
     studentnumberlist
   )
