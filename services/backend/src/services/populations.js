@@ -1,7 +1,7 @@
-const { Op } = require('sequelize')
+const Sequelize = require('sequelize')
+const { Op } = Sequelize
 const moment = require('moment')
-const { sortBy } = require('lodash')
-const { sortMainCode } = require('../util/utils')
+const { sortBy, keyBy } = require('lodash')
 
 const {
   Student,
@@ -11,7 +11,6 @@ const {
   StudyrightExtent,
   ElementDetail,
   Studyplan,
-  CourseType,
   SemesterEnrollment,
   Semester,
   Transfer,
@@ -894,45 +893,63 @@ const getSubstitutions = async codes => {
   return [...new Set(courses.map(({ code, substitutions }) => [code, ...substitutions]).flat())]
 }
 
-const findCourses = async (studentnumbers, beforeDate, courses = []) => {
-  const codesFilter = courses.length ? { code: await getSubstitutions(courses) } : {}
-  const res = await Course.findAll({
-    attributes: ['code', 'name', 'coursetypecode', 'substitutions'],
-    where: { ...codesFilter },
-    include: [
-      {
-        required: true,
-        model: Credit,
-        attributes: ['grade', 'student_studentnumber', 'credittypecode', 'attainment_date', 'course_code'],
-        where: {
-          student_studentnumber: {
-            [Op.in]: studentnumbers,
-          },
-          attainment_date: {
-            [Op.lt]: beforeDate,
-          },
-        },
+const findCourses = async (studentnumbers, beforeDate, courses = [], studentCountLimit = 0) => {
+  const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
+
+  const res = await sequelize.query(
+    `
+      SELECT DISTINCT ON (course.id)
+        course.code,
+        course.name,
+        course.coursetypecode,
+        course.substitutions,
+        course.main_course_code,
+        course_types.name AS course_type,
+        credit.data AS credits,
+        enrollment.data AS enrollments
+      FROM course
+      INNER JOIN (
+        SELECT
+          course_code,
+          ARRAY_AGG(JSON_BUILD_OBJECT(
+            'grade', grade,
+            'student_studentnumber', student_studentnumber,
+            'credittypecode', credittypecode,
+            'course_code', course_code
+          )) AS data
+        FROM credit
+        WHERE student_studentnumber IN (:studentnumbers) AND attainment_date < :beforeDate
+        GROUP BY credit.course_code
+        HAVING COUNT(DISTINCT credit.student_studentnumber) >= :studentCountLimit
+      ) credit ON credit.course_code = course.code
+      INNER JOIN course_types ON course_types.coursetypecode = course.coursetypecode
+      LEFT JOIN (
+        SELECT
+          course_id,
+          ARRAY_AGG(JSON_BUILD_OBJECT(
+            'studentnumber', studentnumber,
+            'state', state,
+            'enrollment_date_time', enrollment_date_time
+          )) AS data
+        FROM enrollment
+        WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate
+        GROUP BY enrollment.course_id
+      ) enrollment ON enrollment.course_id = course.id 
+      WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
+      -- GROUP BY 1, 2, 3, 4, 5, 6
+    `,
+    {
+      replacements: {
+        studentnumbers: studentnumbers.length > 0 ? studentnumbers : ['DUMMY'],
+        beforeDate,
+        studentCountLimit,
+        courseCodes,
+        skipCourseCodeFilter: courses.length === 0,
       },
-      {
-        attributes: ['coursetypecode', 'name'],
-        model: CourseType,
-        required: true,
-      },
-      {
-        required: false,
-        model: Enrollment,
-        attributes: ['course_code', 'studentnumber', 'state', 'enrollment_date_time', 'course_code'],
-        where: {
-          studentnumber: {
-            [Op.in]: studentnumbers,
-          },
-          enrollment_date_time: {
-            [Op.lt]: beforeDate,
-          },
-        },
-      },
-    ],
-  })
+      type: sequelize.QueryTypes.SELECT,
+    }
+  )
+
   return res
 }
 
@@ -947,26 +964,6 @@ const parseCreditInfo = credit => ({
   improvedGrade: Credit.improved(credit),
   date: credit.attainment_date,
 })
-
-const findMainCourse = async code => {
-  const course = await Course.findOne({
-    where: { code: code },
-  })
-
-  let result = []
-
-  if (course.substitutions) {
-    const sortedCourses = sortMainCode([...course.substitutions, code])
-    result = await Course.findOne({
-      attributes: ['code', 'name'],
-      where: { code: sortedCourses[0] },
-    })
-  } else {
-    return course
-  }
-
-  return result
-}
 
 const bottlenecksOf = async (query, studentnumberlist) => {
   const isValidRequest = async (query, params) => {
@@ -1023,14 +1020,22 @@ const bottlenecksOf = async (query, studentnumberlist) => {
         return numbers
       }, {})
 
-      const courses = await findCourses(studentnumbers, dateMonthsFromNow(startDate, months), courseCodes)
+      const courses = await findCourses(
+        studentnumbers,
+        dateMonthsFromNow(startDate, months),
+        courseCodes,
+        query.studentCountLimit
+      )
       return [allstudents, courses]
     } else {
+      const { months, startDate } = params
+      const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
+
       const allstudents = studentnumberlist.reduce((numbers, num) => {
         numbers[num] = true
         return numbers
       }, {})
-      const courses = await findCourses(studentnumberlist, new Date())
+      const courses = await findCourses(studentnumberlist, beforeDate, courseCodes, query.studentCountLimit)
       return [allstudents, courses]
     }
   }
@@ -1050,12 +1055,19 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   const startYear = parseInt(query.year, 10)
   const allstudentslength = Object.keys(allstudents).length
+  const coursesByCode = keyBy(courses, 'code')
 
   for (const course of courses) {
     let { course_type } = course
     let maincourse = course
-    const sortedMaincourse = await findMainCourse(course.code)
-    if (sortedMaincourse) maincourse = sortedMaincourse
+
+    if (course.main_course_code && course.main_course_code !== course.code) {
+      let newmain = coursesByCode[course.main_course_code]
+
+      if (newmain) {
+        maincourse = newmain
+      }
+    }
 
     if (!stats[maincourse.code]) {
       stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
@@ -1072,10 +1084,14 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       const semester = getPassingSemester(startYear, date)
       coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
     })
-    course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
-      const semester = getPassingSemester(startYear, enrollment_date_time)
-      coursestats.markEnrollment(studentnumber, state, semester)
-    })
+
+    if (course.enrollments) {
+      course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
+        const semester = getPassingSemester(startYear, enrollment_date_time)
+        coursestats.markEnrollment(studentnumber, state, semester)
+      })
+    }
+
     stats[maincourse.code] = coursestats
   }
 
