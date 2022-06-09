@@ -4,6 +4,7 @@ import { useLocation, useHistory } from 'react-router-dom'
 import { Header, Segment } from 'semantic-ui-react'
 import { useGetSemestersQuery } from 'redux/semesters'
 import populationToData from 'selectors/populationDetails'
+import { getStudentTotalCredits } from 'common'
 import PopulationDetails from '../PopulationDetails'
 import { useLanguage, useTitle } from '../../common/hooks'
 import FilterView from '../FilterView'
@@ -80,10 +81,12 @@ const PopulationStatistics = () => {
 
     return samples.map(student => {
       const hopsCredits = student.studyplans.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
+      const credits = getStudentTotalCredits(student)
       return {
         ...student,
         allCredits: student.credits,
         hopsCredits,
+        credits,
       }
     })
   }, [samples, programmeCode])

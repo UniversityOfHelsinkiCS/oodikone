@@ -2,12 +2,11 @@ import React, { useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Table } from 'semantic-ui-react'
 import { getMonths } from '../../../common/query'
-import { getStudentTotalCredits } from '../../../common'
 import CollapsibleCreditRow from './CollapsibleCreditRow'
 
 const CreditsGainedTable = ({ filteredStudents, type }) => {
   const months = getMonths(useLocation())
-  const creditList = useMemo(() => filteredStudents.map(student => getStudentTotalCredits(student)), [filteredStudents])
+  const creditList = useMemo(() => filteredStudents.map(student => student.credits), [filteredStudents])
 
   if (!filteredStudents || !filteredStudents.length || !type) return null
 

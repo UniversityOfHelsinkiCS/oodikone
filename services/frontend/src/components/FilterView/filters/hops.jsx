@@ -21,7 +21,7 @@ export default createFilter({
 
   title: 'HOPS',
 
-  priority: 200,
+  priority: -200,
 
   defaultOptions: {
     active: false,
