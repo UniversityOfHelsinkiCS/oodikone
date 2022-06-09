@@ -2,6 +2,7 @@ const { sortBy, uniqBy, flatten, groupBy } = require('lodash')
 const { Organization, Course, CourseType, CourseProvider, CreditType, StudyrightExtent } = require('../db/models')
 const { selectFromByIdsOrderBy, bulkCreate } = require('../db')
 const { dbConnections } = require('../db/connection')
+const _ = require('lodash')
 const { courseProviderMapper, courseMapper, mapCourseType, mapStudyrightExtent } = require('./mapper')
 
 const updateOrganisations = async organisations => {
@@ -16,6 +17,7 @@ const updateStudyModules = async studyModules => {
     'module_id',
     'attainment_date'
   )
+
   const courseIdToAttainments = groupBy(attainments, 'module_id')
   const groupIdToCourse = groupBy(hyStudyModules, 'group_id')
 
@@ -29,11 +31,37 @@ const updateCourseUnits = async courseUnits => {
     'course_unit_id',
     'attainment_date'
   )
+
   const courseIdToAttainments = groupBy(attainments, 'course_unit_id')
   const groupIdToCourse = groupBy(courseUnits, 'group_id')
 
   await updateCourses(courseIdToAttainments, groupIdToCourse)
 }
+
+// sort substitutions so that main code is first
+const newLetterBasedCode = /^[A-Za-z]/ // new letter based codes come first
+const oldNumericCode = /^\d/ // old numeric codes come second
+const openUniCode = /^AY?(.+?)(?:en|fi|sv)?$/ // open university codes come last
+const openUniCodeA = /A\d/ // open university with just A come last
+const digi = /DIGI-A?(.+?)(?:en|fi|sv)?$/ // digi-a goes on top courses goes third
+const bscsCode = /BSCS??/
+
+const codeRegexes = [openUniCodeA, openUniCode, bscsCode, oldNumericCode, newLetterBasedCode, digi]
+
+// Compile the above RegEx'es into one. This saves considerable amount of time
+// compared to executing each one independently.
+const codeRegex = RegExp(codeRegexes.map(r => `(${r.source})`).join('|'))
+
+const getSubstitutionPriority = _.memoize(code => {
+  const match = codeRegex.exec(code)
+
+  if (!match) {
+    return 3 // if no hit, put before open uni courses
+  }
+
+  // Use the index of the first matched and captured subgroup as the priority
+  return match.splice(1).findIndex(x => x !== undefined)
+})
 
 const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
   const courseProviders = []
@@ -75,7 +103,13 @@ const updateCourses = async (courseIdToAttainments, groupIdToCourse) => {
 
       if (subs) newSubstitutions.push(subs.dataValues.code)
     }
+
     course.substitutions = newSubstitutions
+
+    const sortedSubstitutions = [course.code, ...course.substitutions]
+      .map(code => [code, getSubstitutionPriority(code)])
+      .sort((a, b) => b[1] - a[1])
+    course.mainCourseCode = sortedSubstitutions[0][0]
   }
 
   await bulkCreate(Course, courses)
