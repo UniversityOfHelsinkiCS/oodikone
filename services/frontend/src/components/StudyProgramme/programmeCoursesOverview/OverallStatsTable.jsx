@@ -62,7 +62,7 @@ const getColumns = (language, showStudents) => {
 
       {
         key: 'totalOwnProgramme',
-        title: 'Programme students',
+        title: 'Major students',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalProgrammeStudents,
@@ -71,7 +71,7 @@ const getColumns = (language, showStudents) => {
 
       {
         key: 'totalOtherProgramme',
-        title: 'Other programme students',
+        title: 'Non-major students',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalOtherProgrammeStudents,
@@ -129,7 +129,7 @@ const getColumns = (language, showStudents) => {
       },
       {
         key: 'total',
-        title: 'All credits',
+        title: 'Total credits',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalAllCredits,
@@ -137,7 +137,7 @@ const getColumns = (language, showStudents) => {
       },
       {
         key: 'totalOwnProgramme',
-        title: 'Programme credits',
+        title: 'Major credits',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalProgrammecredits,
@@ -145,7 +145,7 @@ const getColumns = (language, showStudents) => {
       },
       {
         key: 'totalOtherProgramme',
-        title: 'Other programme credits',
+        title: 'Non-major credits',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
         getRowVal: course => course.totalOtherProgrammeCredits,
