@@ -128,13 +128,10 @@ const StudyrightsTable = ({
 
     const { completed_credits: completedCredits } = studyplan
     const credits = completedCredits || 0
+    if (c.graduated) return `${credits}cr`
     const totalCredits = getTargetCreditsForProgramme(programmeCodes[0])
-    const completedPercentage = Math.min(1, credits / Math.max(totalCredits, 1)) * 100
-    return (
-      <>
-        {completedPercentage.toFixed(0)}% ({credits}cr)
-      </>
-    )
+    const completedPercentage = `${(Math.min(1, credits / Math.max(totalCredits, 1)) * 100).toFixed(0)}%`
+    return `${completedPercentage} (${credits}cr)`
   }
 
   return (
