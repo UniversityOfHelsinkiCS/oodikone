@@ -50,6 +50,10 @@ Course.init(
     course_unit_type: {
       type: STRING,
     },
+    mainCourseCode: {
+      field: 'main_course_code',
+      type: STRING,
+    },
   },
   {
     underscored: false,
