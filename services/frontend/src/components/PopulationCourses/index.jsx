@@ -50,7 +50,6 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
     : populationCourses
 
   const pending = populationSelectedStudentCourses.pending || populationCourses.pending
-
   const changeStructure = () => {
     if (showByStudytrack) fetch() // Need to fetch full stats when toggling from study track to most attained courses
     setShowByStudytrack(!showByStudytrack)
