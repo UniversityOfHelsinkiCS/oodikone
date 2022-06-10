@@ -36,7 +36,12 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
   }
 
   useEffect(() => {
-    if (!mandatoryCourses.pending && !queryHasBeenUpdated() && !populationSelectedStudentCourses.pending)
+    if (
+      !mandatoryCourses.pending &&
+      !queryHasBeenUpdated() &&
+      !populationSelectedStudentCourses.pending &&
+      mandatoryCourses.data
+    )
       fetch(mandatoryCourses.data.map(({ code }) => code))
   }, [query, filteredStudents, mandatoryCourses, populationSelectedStudentCourses])
 
