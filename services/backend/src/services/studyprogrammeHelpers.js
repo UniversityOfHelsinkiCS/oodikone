@@ -320,7 +320,14 @@ const tableTitles = {
   },
   credits: {
     SPECIAL_EXCLUDED: ['', 'Total', 'Major students credits', 'Transferred credits'],
-    SPECIAL_INCLUDED: ['', 'Total', 'Major students credits', 'Non major students credits', 'Transferred credits'],
+    SPECIAL_INCLUDED: [
+      '',
+      'Total',
+      'Major students credits',
+      'Non major students credits',
+      'Non degree students credits',
+      'Transferred credits',
+    ],
   },
   creditProgress: {
     bachelor: [
