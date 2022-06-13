@@ -33,6 +33,7 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
 
   let majors = getStatsBasis(years)
   let nonMajors = getStatsBasis(years)
+  let nonDegree = getStatsBasis(years)
 
   credits.forEach(({ student_studentnumber, attainment_date, credits }) => {
     const studyright = studyrights.find(studyright => studyright.studentnumber == student_studentnumber)
@@ -45,20 +46,28 @@ const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicY
     if (isMajorStudentCredit(studyright, attainment_date)) {
       majors.graphStats[indexOf(years, attainmentYear)] += credits || 0
       majors.tableStats[attainmentYear] += credits || 0
+    } else if (!studyright) {
+      nonDegree.graphStats[indexOf(years, attainmentYear)] += credits || 0
+      nonDegree.tableStats[attainmentYear] += credits || 0
     } else {
       nonMajors.graphStats[indexOf(years, attainmentYear)] += credits || 0
       nonMajors.tableStats[attainmentYear] += credits || 0
     }
   })
 
-  if (majors.graphStats.every(year => year === 0) && nonMajors.graphStats.every(year => year === 0)) {
+  if (
+    majors.graphStats.every(year => year === 0) &&
+    nonMajors.graphStats.every(year => year === 0) &&
+    nonDegree.graphStats.every(year => year === 0)
+  ) {
     return {
       majors: { graphStats: [], tableStats: {} },
       nonMajors: { graphStats: [], tableStats: {} },
+      nonDegree: { graphStats: [], tablestats: {} },
     }
   }
 
-  return { majors, nonMajors }
+  return { majors, nonMajors, nonDegree }
 }
 
 // Fetches all the credits with the type "transferred / hyväksiluettu" and divides them by year
@@ -88,7 +97,7 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
   const queryParameters = { studyprogramme, since, years, isAcademicYear, includeAllSpecials }
-  const { majors, nonMajors } = await getRegularCreditStats(queryParameters)
+  const { majors, nonMajors, nonDegree } = await getRegularCreditStats(queryParameters)
   const transferred = await getTransferredCreditStats(queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
@@ -101,14 +110,21 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
     includeAllSpecials
       ? [
           year,
-          majors.tableStats[year] + nonMajors.tableStats[year] + transferred.tableStats[year],
+          majors.tableStats[year] +
+            nonMajors.tableStats[year] +
+            transferred.tableStats[year] +
+            nonDegree.tableStats[year],
           majors.tableStats[year],
           nonMajors.tableStats[year],
+          nonDegree.tableStats[year],
           transferred.tableStats[year],
         ]
       : [
           year,
-          majors.tableStats[year] + nonMajors.tableStats[year] + transferred.tableStats[year],
+          majors.tableStats[year] +
+            nonMajors.tableStats[year] +
+            transferred.tableStats[year] +
+            nonDegree.tableStats[year],
           majors.tableStats[year],
           transferred.tableStats[year],
         ]
@@ -122,6 +138,10 @@ const getCreditStatsForStudytrack = async ({ studyprogramme, settings }) => {
     {
       name: 'Non-major students credits',
       data: nonMajors.graphStats,
+    },
+    {
+      name: 'Non-degree credits',
+      data: nonDegree.graphStats,
     },
     {
       name: 'Transferred credits',
