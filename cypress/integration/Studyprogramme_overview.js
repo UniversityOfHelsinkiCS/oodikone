@@ -58,13 +58,13 @@ describe('Studyprogramme overview', () => {
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       const years = getEmptyYears()
       const tableContents = [
-        // [Year, Total, Major credits, Non-major credits, Transferred credits]
-        ...years.map(year => [year, 0, 0, 0, 0]),
-        [2021, 0, 0, 0, 0],
-        [2020, 4928, 548, 4213, 167],
-        [2019, 7737, 1644, 5744, 349],
-        [2018, 6730, 1820, 4638, 272],
-        [2017, 2900, 788, 1724, 388],
+        // [Year, Total, Major credits, Non-major credits, Non-degree credits, Transferred credits]
+        ...years.map(year => [year, 0, 0, 0, 0, 0]),
+        [2021, 0, 0, 0, 0, 0],
+        [2020, 4928, 548, 4213, 0, 167],
+        [2019, 7737, 1644, 5744, 0, 349],
+        [2018, 6730, 1820, 4633, 5, 272],
+        [2017, 2900, 788, 1724, 0, 388],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -146,13 +146,13 @@ describe('Studyprogramme overview', () => {
       cy.checkTableStats(studentTableContents, 'StudentsOfTheStudyprogramme')
 
       const creditTableContents = [
-        // [Year, Total, Major students credits, Non-major students credits, Transferred credits]
+        // [Year, Total, Major students credits, Non-major students credits, Non-degree credits, Transferred credits]
         ...years.map(year => [year, 0, 0, 0, 0]),
         ['2021 - 2022', 0, 0, 0, 0],
         ['2020 - 2021', 0, 0, 0, 0],
-        ['2019 - 2020', 338.5, 0, 331, 7.5],
-        ['2018 - 2019', 173, 0, 173, 0],
-        ['2017 - 2018', 42, 0, 42, 0],
+        ['2019 - 2020', 338.5, 0, 221, 110, 7.5],
+        ['2018 - 2019', 173, 0, 74, 99, 0],
+        ['2017 - 2018', 42, 0, 35, 7, 0],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
