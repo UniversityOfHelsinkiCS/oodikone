@@ -307,8 +307,8 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     return res
   }, {})
 
-  const graduationsMap = attainments.reduce((res, attainment) => {
-    if (!attainment.module_id || attainment.type !== 'DegreeProgrammeAttainment') return res
+  const moduleAttainments = attainments.reduce((res, attainment) => {
+    if (!attainment.module_id) return res
     if (!res[attainment.module_id]) res[attainment.module_id] = {}
     res[attainment.module_id][attainment.person_id] = attainment
     return res
@@ -359,14 +359,13 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     if (!attainment) return []
     if (attainment.code && attainment.type === 'CustomCourseUnitAttainment')
       return [sanitizeCourseCode(attainment.code)]
-    if (attainment.code) return [attainment.code]
-
     if (attainment.nodes && attainment.nodes.length)
       return flatten(
         attainment.nodes
           .filter(node => node.attainmentId)
           .map(node => getCourseCodesFromAttainment(attainmentIdToAttainment[node.attainmentId]))
       )
+    if (attainment.code) return [attainment.code]
 
     const { course_unit_id, module_id } = attainment
     const code = courseUnitIdToCode[course_unit_id] || programmeModuleGroupIdToCode[module_id]
@@ -422,7 +421,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     programmeModuleIdToCode,
     moduleIdToParentModuleCode,
     courseUnitIdToCode,
-    graduationsMap,
+    moduleAttainments,
     attainmentIdToAttainment,
     courseUnitIdToAttainment,
     studyPlanIdToDegrees,

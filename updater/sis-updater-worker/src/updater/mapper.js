@@ -1,4 +1,4 @@
-const { sortBy, mapValues, flatten } = require('lodash')
+const { sortBy, mapValues, flatten, uniqBy } = require('lodash')
 const { getMinMaxDate } = require('../utils')
 const {
   educationTypeToExtentcode,
@@ -382,7 +382,7 @@ const studyplanMapper =
     programmeModuleIdToCode,
     moduleIdToParentModuleCode,
     courseUnitIdToCode,
-    graduationsMap,
+    moduleAttainments,
     attainmentIdToAttainment,
     courseUnitIdToAttainment,
     studyPlanIdToDegrees,
@@ -394,7 +394,7 @@ const studyplanMapper =
     return studyPlanIdToDegrees[studyplan.id].map(programmeId => {
       const code = programmeModuleIdToCode[programmeId]
       if (!code) return null
-      const graduated = graduationsMap[programmeId] && graduationsMap[programmeId][studyplan.user_id]
+      const graduated = moduleAttainments[programmeId] && moduleAttainments[programmeId][studyplan.user_id]
       const id = `${studentnumber}-${code}`
       const courseUnitSelections = studyplan.course_unit_selections
         .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
@@ -409,28 +409,53 @@ const studyplanMapper =
         .map(sanitizeCourseCode)
         .filter(c => !!c)
 
-      const attainmentsToCalculate = graduated
-        ? getAttainmentsFromAttainment(graduationsMap[programmeId][studyplan.user_id])
-        : studyplan.custom_course_unit_attainment_selections
-            .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId] === code)
-            .map(({ customCourseUnitAttainmentId }) => attainmentIdToAttainment[customCourseUnitAttainmentId])
-            .concat(
-              flatten(
-                studyplan.course_unit_selections
-                  .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
-                  .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
-                  .map(({ substitutedBy, courseUnitId }) => {
-                    if (substitutedBy.length)
-                      return courseUnitIdToAttainment[substitutedBy[0]]
-                        ? courseUnitIdToAttainment[substitutedBy[0]][studyplan.user_id]
+      const coursesFromAttainedModules = flatten(
+        studyplan.module_selections
+          .filter(
+            ({ moduleId }) =>
+              moduleIdToParentModuleCode[moduleId] === code &&
+              moduleAttainments[moduleId] &&
+              moduleAttainments[moduleId][studyplan.user_id]
+          )
+          .map(({ moduleId }) => getCourseCodesFromAttainment(moduleAttainments[moduleId][studyplan.user_id]))
+      )
+      const attainmentsToCalculate = uniqBy(
+        graduated
+          ? getAttainmentsFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
+          : studyplan.custom_course_unit_attainment_selections
+              .filter(({ parentModuleId }) => moduleIdToParentModuleCode[parentModuleId] === code)
+              .map(({ customCourseUnitAttainmentId }) => attainmentIdToAttainment[customCourseUnitAttainmentId])
+              .concat(
+                flatten(
+                  studyplan.course_unit_selections
+                    .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
+                    .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
+                    .map(({ substitutedBy, courseUnitId }) => {
+                      if (substitutedBy.length)
+                        return courseUnitIdToAttainment[substitutedBy[0]]
+                          ? courseUnitIdToAttainment[substitutedBy[0]][studyplan.user_id]
+                          : []
+                      return courseUnitIdToAttainment[courseUnitId]
+                        ? courseUnitIdToAttainment[courseUnitId][studyplan.user_id]
                         : []
-                    return courseUnitIdToAttainment[courseUnitId]
-                      ? courseUnitIdToAttainment[courseUnitId][studyplan.user_id]
-                      : []
-                  })
+                    })
+                )
               )
-            )
-            .filter(a => !!a)
+              .concat(
+                flatten(
+                  studyplan.module_selections
+                    .filter(
+                      ({ moduleId }) =>
+                        moduleIdToParentModuleCode[moduleId] === code &&
+                        moduleAttainments[moduleId] &&
+                        moduleAttainments[moduleId][studyplan.user_id]
+                    )
+                    .map(({ moduleId }) => getAttainmentsFromAttainment(moduleAttainments[moduleId][studyplan.user_id]))
+                )
+              )
+              .filter(a => !!a),
+        'id'
+      )
       const completed_credits = calculateTotalCreditsFromAttainments(attainmentsToCalculate)
       return {
         id,
@@ -438,8 +463,8 @@ const studyplanMapper =
         completed_credits,
         programme_code: code,
         included_courses: graduated
-          ? getCourseCodesFromAttainment(graduationsMap[programmeId][studyplan.user_id])
-          : courseUnitSelections.concat(customCourseUnitSelections),
+          ? getCourseCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
+          : courseUnitSelections.concat(customCourseUnitSelections).concat(coursesFromAttainedModules),
       }
     })
   }
