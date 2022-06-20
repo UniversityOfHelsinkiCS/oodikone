@@ -118,7 +118,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
                 {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
               </Button>
             )}
-            <CreditAccumulationGraphHighCharts students={students} />
+            <CreditAccumulationGraphHighCharts students={students} customPopulation />
           </div>
         ),
       },
