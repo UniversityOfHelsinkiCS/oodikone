@@ -319,6 +319,7 @@ const CreditAccumulationGraphHighCharts = ({
   endDate,
   studyRightId,
   programmeCode,
+  customPopulation = false,
 }) => {
   const history = useHistory()
   const chartRef = useRef()
@@ -374,11 +375,26 @@ const CreditAccumulationGraphHighCharts = ({
 
   const getGraphStart = () => {
     if (startDate) return new Date(startDate).getTime()
-    const studyRightStart = new Date(students[0].studyrightStart).getTime()
+    if (customPopulation)
+      return Math.min(
+        ..._.flatten(
+          students.map(({ courses }) => {
+            return courses.map(({ date }) => new Date(date).getTime())
+          })
+        )
+      )
+    const studyRightStart = new Date(students[0]?.studyrightStart ?? new Date()).getTime()
     if (studyPlanFilterIsActive && cutStudyPlanCredits) return studyRightStart
     if (studyPlanFilterIsActive)
       return Math.min(..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
-    return studyRightStart
+    return Math.min(
+      studyRightStart,
+      ..._.flatten(
+        students.map(({ courses }) => {
+          return courses.map(({ date }) => new Date(date).getTime())
+        })
+      )
+    )
   }
 
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []

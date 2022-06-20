@@ -142,7 +142,7 @@ const CustomPopulationContent = ({ students, custompop }) => {
       content: {
         content: (
           <div ref={creditGainRef}>
-            <CreditAccumulationGraphHighCharts students={students} />
+            <CreditAccumulationGraphHighCharts students={students} customPopulation />
           </div>
         ),
       },
