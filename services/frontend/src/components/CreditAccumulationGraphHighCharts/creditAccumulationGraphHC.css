@@ -3,6 +3,9 @@
   margin-bottom: 15px !important;
 }
 
-.graphOptions {
-  float: right;
+.graph-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0;
 }

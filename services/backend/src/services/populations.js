@@ -147,10 +147,24 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
   if (tag) studentnumbers = studentnumbersWithTag
 
   const attainmentDateFrom = tag ? moment(startDate).year(tag.year) : startDate
+  const studyPlans = await Studyplan.findAll({
+    where: { studentnumber: studentnumbers },
+    attributes: ['included_courses'],
+    raw: true,
+  })
+  const studyPlanCourses = Array.from(new Set([...studyPlans.map(plan => plan.included_courses)].flat()))
+
   const creditsOfStudentOther = {
-    attainment_date: {
-      [Op.between]: [attainmentDateFrom, endDate],
-    },
+    [Op.or]: [
+      {
+        attainment_date: {
+          [Op.between]: [attainmentDateFrom, endDate],
+        },
+      },
+      {
+        course_code: studyPlanCourses,
+      },
+    ],
     student_studentnumber: {
       [Op.in]: studentnumbers,
     },
@@ -169,7 +183,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       },
       {
         course_code: {
-          [Op.in]: ['375063', '339101'],
+          [Op.in]: ['375063', '339101'].concat(studyPlanCourses),
         },
       },
     ],
@@ -181,6 +195,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
 
   if (studentnumbers.length === 0)
     return { students: [], enrollments: [], credits: [], extents: [], semesters: [], elementdetails: [], courses: [] }
+
   const [courses, enrollments, students, credits, extents, semesters, elementdetails] = await Promise.all([
     Course.findAll({
       attributes: [sequelize.literal('DISTINCT ON("code") code'), 'name', 'coursetypecode'],

@@ -3,12 +3,13 @@ import { renderToString } from 'react-dom/server'
 import moment from 'moment'
 import { useHistory } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
-import { Button } from 'semantic-ui-react'
+import { Button, Radio } from 'semantic-ui-react'
 import boostcanvas from 'highcharts/modules/boost-canvas'
 import _ from 'lodash/fp'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
+import { useSelector } from 'react-redux'
 import CreditGraphTooltip from '../CreditGraphTooltip'
 import { reformatDate, getTextIn, getStudyRightElementTargetDates } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -30,6 +31,7 @@ const createGraphOptions = ({
   startDate,
   endDate,
   graduations,
+  studyRightStartLine,
 }) => {
   const tooltip = {
     shared: false,
@@ -91,15 +93,27 @@ const createGraphOptions = ({
       ordinal: false,
       min: startDate,
       max: endDate,
-      plotLines: graduations.map(({ value }) => ({
-        value,
-        color: '#a333c8',
-        width: 2,
-        dashStyle: 'dash',
-        label: {
-          text: `Graduation`,
-        },
-      })),
+      plotLines: graduations
+        .map(value => ({
+          value,
+          color: '#a333c8',
+          width: 2,
+          dashStyle: 'dash',
+          label: {
+            text: `Graduation`,
+          },
+        }))
+        .concat(
+          studyRightStartLine.map(value => ({
+            value,
+            color: 'red',
+            width: 3,
+            dashStyle: 'dash',
+            label: {
+              text: `Population study start`,
+            },
+          }))
+        ),
     },
     series: seriesData,
     chart: {
@@ -117,6 +131,45 @@ const filterCoursesByStudyPlan = (plan, courses) =>
   !plan ? courses : courses.filter(({ course_code }) => plan.included_courses.includes(course_code))
 
 const filterCoursesByDate = (courses, date) => courses.filter(c => moment(c.date).isSameOrAfter(moment(date)))
+
+const filterCourses = (student, singleStudent, byStudyPlanOfCode, cutStudyPlanCredits, startDate) => {
+  if (byStudyPlanOfCode && cutStudyPlanCredits)
+    return filterCoursesByDate(
+      filterCoursesByStudyPlan(
+        student.studyplans.find(p => p.programme_code === byStudyPlanOfCode),
+        student.courses
+      ),
+      student.studyrightStart
+    )
+  if (byStudyPlanOfCode)
+    return filterCoursesByStudyPlan(
+      student.studyplans.find(p => p.programme_code === byStudyPlanOfCode),
+      student.courses
+    )
+  if (singleStudent) return student.courses
+  return filterCoursesByDate(student.courses, startDate)
+}
+
+const reduceCreditsToPoints = ({ credits, points, singleStudent }, course) => {
+  const gainedCredits = course.passed && !course.isStudyModuleCredit ? course.credits : 0
+
+  const point = {
+    x: new Date(course.date).getTime(),
+    y: credits + gainedCredits,
+  }
+
+  if (singleStudent) {
+    Object.assign(point, {
+      name: course.course_code,
+    })
+  }
+
+  return {
+    points: [...points, point],
+    credits: credits + gainedCredits,
+    singleStudent,
+  }
+}
 
 const getXAxisMonth = (date, startDate) =>
   Math.max(moment(date, API_DATE_FORMAT).diff(moment(startDate, API_DATE_FORMAT), 'days') / 30, 0)
@@ -213,7 +266,15 @@ const resolveStudyRightElement = ({ studyright_elements }) => {
   )
 }
 
-const createStudentCreditLines = (students, singleStudent, selectedStartDate, studyRightId) =>
+const createStudentCreditLines = (
+  students,
+  singleStudent,
+  selectedStartDate,
+  studyRightId,
+  studyPlanFilterIsActive,
+  cutStudyPlanCredits,
+  programmeCode
+) =>
   students.map(student => {
     const { studyrightStart } = student
 
@@ -221,37 +282,13 @@ const createStudentCreditLines = (students, singleStudent, selectedStartDate, st
     const { code } = resolveStudyRightElement(
       student.studyrights.find(({ studyrightid }) => studyrightid === studyRightId) || {}
     )
+    const studyPlanProgrammeCode = singleStudent ? code : studyPlanFilterIsActive && programmeCode
 
     const { points } = _.flow(
+      () => filterCourses(student, singleStudent, studyPlanProgrammeCode, cutStudyPlanCredits, startDate),
+      courses => [...courses].filter(({ date }) => new Date(date) <= new Date()),
       sortCoursesByDate,
-      courses =>
-        filterCoursesByStudyPlan(
-          student.studyplans.find(p => p.programme_code === code),
-          courses
-        ),
-      courses => filterCoursesByDate(courses, startDate),
-      _.reduce(
-        ({ credits, points }, course) => {
-          const gainedCredits = course.passed && !course.isStudyModuleCredit ? course.credits : 0
-
-          const point = {
-            x: new Date(course.date).getTime(),
-            y: credits + gainedCredits,
-          }
-
-          if (singleStudent) {
-            Object.assign(point, {
-              name: course.course_code,
-            })
-          }
-
-          return {
-            points: [...points, point],
-            credits: credits + gainedCredits,
-          }
-        },
-        { credits: 0, points: [] }
-      )
+      courses => courses.reduce(reduceCreditsToPoints, { credits: 0, points: [], singleStudent })
     )(student.courses)
 
     return {
@@ -268,28 +305,46 @@ const createStudentCreditLines = (students, singleStudent, selectedStartDate, st
 const filterGraduations = (student, selectedStudyRight) => {
   const graduated = student.studyrights.filter(({ graduated }) => graduated)
   // eslint-disable-next-line camelcase
-  if (!selectedStudyRight)
-    return graduated.map(({ enddate }) => ({
-      value: new Date(enddate).getTime(),
-    }))
+  if (!selectedStudyRight) return graduated.map(({ enddate }) => new Date(enddate).getTime())
   const selectedGraduation = graduated.find(({ studyrightid }) => studyrightid === selectedStudyRight.studyrightid)
   if (!selectedGraduation) return []
-  return [{ value: new Date(selectedGraduation.enddate).getTime() }]
+  return [new Date(selectedGraduation.enddate).getTime()]
 }
 
-const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, startDate, endDate, studyRightId }) => {
+const CreditAccumulationGraphHighCharts = ({
+  students,
+  singleStudent,
+  absences,
+  startDate,
+  endDate,
+  studyRightId,
+  programmeCode,
+}) => {
   const history = useHistory()
   const chartRef = useRef()
   const language = useLanguage()
-  const [graphHeight, setGraphHeight] = useState(600)
+  const { active: studyPlanFilterIsActive } = useSelector(
+    state => state.filters?.views?.PopulationStatistics?.hops?.options ?? {}
+  )
+  const [graphHeight, setGraphHeight] = useState(700)
+  const [cutStudyPlanCredits, setCutStudyPlanCredits] = useState(false)
   const selectedStudyRight =
     singleStudent && studyRightId
       ? students[0].studyrights.find(({ studyrightid }) => studyrightid === studyRightId)
       : null
 
   const seriesData = useMemo(
-    () => createStudentCreditLines(students, singleStudent, startDate, studyRightId),
-    [students, singleStudent, startDate, studyRightId]
+    () =>
+      createStudentCreditLines(
+        students,
+        singleStudent,
+        startDate,
+        studyRightId,
+        studyPlanFilterIsActive,
+        cutStudyPlanCredits,
+        programmeCode
+      ),
+    [students, singleStudent, startDate, studyRightId, studyPlanFilterIsActive, programmeCode, cutStudyPlanCredits]
   )
 
   if (singleStudent) {
@@ -317,13 +372,24 @@ const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, 
     seriesData.push(createGoalSeries(starting, ending, filteredAbsences))
   }
 
+  const getGraphStart = () => {
+    if (startDate) return new Date(startDate).getTime()
+    const studyRightStart = new Date(students[0].studyrightStart).getTime()
+    if (studyPlanFilterIsActive && cutStudyPlanCredits) return studyRightStart
+    if (studyPlanFilterIsActive)
+      return Math.min(..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
+    return studyRightStart
+  }
+
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
+  const studyRightStartLine =
+    !singleStudent && studyPlanFilterIsActive ? [new Date(students[0].studyrightStart).getTime()] : []
 
   const options = createGraphOptions({
     singleStudent,
     seriesData,
     graphHeight,
-    startDate: startDate ? new Date(startDate).getTime() : undefined,
+    startDate: getGraphStart(),
     endDate,
     tooltipFormatter: point => singleStudent && singleStudentTooltipFormatter(point, students[0], language),
     onPointClicked: point => {
@@ -332,6 +398,7 @@ const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, 
       }
     },
     graduations,
+    studyRightStartLine,
   })
 
   const makeGraphSizeButton = (height, label) => (
@@ -340,10 +407,23 @@ const CreditAccumulationGraphHighCharts = ({ students, singleStudent, absences, 
 
   return (
     <div className="graphContainer">
-      <div className="graphOptions">
-        {makeGraphSizeButton(400, 'Small')}
-        {makeGraphSizeButton(600, 'Medium')}
-        {makeGraphSizeButton(1000, 'Large')}
+      <div className="graph-options">
+        <div>
+          {!singleStudent && studyPlanFilterIsActive ? (
+            <Radio
+              checked={cutStudyPlanCredits}
+              onChange={() => setCutStudyPlanCredits(!cutStudyPlanCredits)}
+              label="Display credits from study right start"
+              toggle
+            />
+          ) : null}
+        </div>
+
+        <div>
+          {makeGraphSizeButton(400, 'Small')}
+          {makeGraphSizeButton(600, 'Medium')}
+          {makeGraphSizeButton(1000, 'Large')}
+        </div>
       </div>
 
       <ReactHighstock highcharts={Highcharts} ref={chartRef} constructorType="stockChart" config={options} />
