@@ -929,6 +929,7 @@ const findCourses = async (studentnumbers, beforeDate, courses = [], studentCoun
           ARRAY_AGG(JSON_BUILD_OBJECT(
             'grade', grade,
             'student_studentnumber', student_studentnumber,
+            'attainment_date', attainment_date,
             'credittypecode', credittypecode,
             'course_code', course_code
           )) AS data
