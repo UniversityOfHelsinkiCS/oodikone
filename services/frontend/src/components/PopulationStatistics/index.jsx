@@ -81,7 +81,9 @@ const PopulationStatistics = () => {
 
     return samples.map(student => {
       const hopsCredits = student.studyplans.find(plan => plan.programme_code === programmeCode)?.completed_credits ?? 0
-      const credits = getStudentTotalCredits(student)
+      const studyrightStartDate = new Date(student.studyrightStart)
+      const courses = student.courses.filter(({ date }) => new Date(date) >= studyrightStartDate)
+      const credits = getStudentTotalCredits({ courses })
       return {
         ...student,
         allCredits: student.credits,

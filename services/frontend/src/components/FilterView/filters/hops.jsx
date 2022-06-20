@@ -30,22 +30,23 @@ export default createFilter({
   isActive: ({ active }) => active,
 
   filter: (student, { active }, { args }) => {
-    const hops = student.studyplans.find(plan => plan.programme_code === args.programmeCode)
-    if (!hops) {
-      if (active) {
+    const { studyrightStart, studyplans } = student
+    const studyrightStartDate = new Date(studyrightStart)
+    const hops = studyplans.find(plan => plan.programme_code === args.programmeCode)
+    if (active) {
+      if (!hops) {
         student.courses = []
         student.credits = 0
+        return true
       }
-      return true
-    }
-    const courses = new Set(hops ? hops.included_courses : [])
-    const hopsCourses = student.courses.filter(course => courses.has(course.course_code))
-
-    if (active) {
+      const courses = new Set(hops ? hops.included_courses : [])
+      const hopsCourses = student.courses.filter(course => courses.has(course.course_code))
       student.courses = hopsCourses
       student.credits = hops.completed_credits
+      return true
     }
-
+    const courses = student.courses.filter(({ date }) => new Date(date) >= studyrightStartDate)
+    student.courses = courses
     return true
   },
 

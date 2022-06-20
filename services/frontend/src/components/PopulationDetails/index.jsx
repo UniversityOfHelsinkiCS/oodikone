@@ -62,6 +62,7 @@ const PopulationDetails = ({
         title="Id"
         trayOpen={() => {}}
         language={language}
+        programmeCode={query?.studyRights?.programme}
       />
     )
     return (
