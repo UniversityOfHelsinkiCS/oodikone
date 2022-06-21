@@ -87,7 +87,11 @@ const StudyrightsTable = ({
     new Date(c.startdate).getTime() > new Date(c.studystartdate).getTime() ? c.startdate : c.studystartdate
 
   // End dates of study rights are semi-open intervals, subtract 1 day to get acual end date
-  const getAcualEndDate = endDate => (endDate ? new Date(endDate).setDate(new Date(endDate).getDate() - 1) : null)
+  const getAcualEndDate = (endDate, graduated) => {
+    if (!endDate) return null
+    if (graduated) return new Date(endDate)
+    return new Date(endDate).setDate(new Date(endDate).getDate() - 1)
+  }
 
   const renderProgrammes = c =>
     sortBy(c.elements.programmes.filter(filterDuplicates), 'startdate')
@@ -95,7 +99,7 @@ const StudyrightsTable = ({
       .map(programme => (
         <p key={`${programme.name}-${programme.startdate}`}>
           {`${programme.name} (${reformatDate(getActualStartDate(programme), 'DD.MM.YYYY')} - ${reformatDate(
-            getAcualEndDate(programme.enddate),
+            getAcualEndDate(programme.enddate, c.graduated),
             'DD.MM.YYYY'
           )})`}
           {programmeCodes.includes(programme.code) && (
@@ -113,7 +117,7 @@ const StudyrightsTable = ({
       .map(studytrack => (
         <p key={studytrack.name}>
           {`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(
-            getAcualEndDate(studytrack.enddate),
+            getAcualEndDate(studytrack.enddate, c.graduated),
             'DD.MM.YYYY'
           )})`}
           <br />{' '}
