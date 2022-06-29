@@ -9,7 +9,6 @@ import _ from 'lodash/fp'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
-import { useSelector } from 'react-redux'
 import CreditGraphTooltip from '../CreditGraphTooltip'
 import { reformatDate, getTextIn, getStudyRightElementTargetDates } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -132,14 +131,21 @@ const filterCoursesByStudyPlan = (plan, courses) =>
 
 const filterCoursesByDate = (courses, date) => courses.filter(c => moment(c.date).isSameOrAfter(moment(date)))
 
-const filterCourses = (student, singleStudent, byStudyPlanOfCode, cutStudyPlanCredits, startDate) => {
+const filterCourses = (
+  student,
+  singleStudent,
+  byStudyPlanOfCode,
+  cutStudyPlanCredits,
+  startDate,
+  customStudyStartYear
+) => {
   if (byStudyPlanOfCode && cutStudyPlanCredits)
     return filterCoursesByDate(
       filterCoursesByStudyPlan(
         student.studyplans.find(p => p.programme_code === byStudyPlanOfCode),
         student.courses
       ),
-      student.studyrightStart
+      customStudyStartYear || student.studyrightStart
     )
   if (byStudyPlanOfCode)
     return filterCoursesByStudyPlan(
@@ -273,7 +279,8 @@ const createStudentCreditLines = (
   studyRightId,
   studyPlanFilterIsActive,
   cutStudyPlanCredits,
-  programmeCode
+  programmeCode,
+  customStudyStartYear
 ) =>
   students.map(student => {
     const { studyrightStart } = student
@@ -285,7 +292,15 @@ const createStudentCreditLines = (
     const studyPlanProgrammeCode = singleStudent ? code : studyPlanFilterIsActive && programmeCode
 
     const { points } = _.flow(
-      () => filterCourses(student, singleStudent, studyPlanProgrammeCode, cutStudyPlanCredits, startDate),
+      () =>
+        filterCourses(
+          student,
+          singleStudent,
+          studyPlanProgrammeCode,
+          cutStudyPlanCredits,
+          startDate,
+          customStudyStartYear
+        ),
       courses => [...courses].filter(({ date }) => new Date(date) <= new Date()),
       sortCoursesByDate,
       courses => courses.reduce(reduceCreditsToPoints, { credits: 0, points: [], singleStudent })
@@ -320,13 +335,13 @@ const CreditAccumulationGraphHighCharts = ({
   studyRightId,
   programmeCode,
   customPopulation = false,
+  studyPlanFilterIsActive,
+  customStudyStartYear,
 }) => {
   const history = useHistory()
   const chartRef = useRef()
   const language = useLanguage()
-  const { active: studyPlanFilterIsActive } = useSelector(
-    state => state.filters?.views?.PopulationStatistics?.hops?.options ?? {}
-  )
+
   const [graphHeight, setGraphHeight] = useState(700)
   const [cutStudyPlanCredits, setCutStudyPlanCredits] = useState(false)
   const selectedStudyRight =
@@ -343,9 +358,19 @@ const CreditAccumulationGraphHighCharts = ({
         studyRightId,
         studyPlanFilterIsActive,
         cutStudyPlanCredits,
-        programmeCode
+        programmeCode,
+        customStudyStartYear
       ),
-    [students, singleStudent, startDate, studyRightId, studyPlanFilterIsActive, programmeCode, cutStudyPlanCredits]
+    [
+      students,
+      singleStudent,
+      startDate,
+      studyRightId,
+      studyPlanFilterIsActive,
+      programmeCode,
+      cutStudyPlanCredits,
+      customStudyStartYear,
+    ]
   )
 
   if (singleStudent) {
@@ -372,6 +397,13 @@ const CreditAccumulationGraphHighCharts = ({
 
     seriesData.push(createGoalSeries(starting, ending, filteredAbsences))
   }
+  const getStudyRightStart = () => {
+    if (customStudyStartYear) return new Date(customStudyStartYear).getTime()
+    const studyRightStartFromStudent = new Date(students[0]?.studyrightStart ?? new Date(null))
+    if (studyRightStartFromStudent.getFullYear() < 2000)
+      return Math.min(..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
+    return studyRightStartFromStudent.getTime()
+  }
 
   const getGraphStart = () => {
     if (startDate) return new Date(startDate).getTime()
@@ -383,7 +415,7 @@ const CreditAccumulationGraphHighCharts = ({
           })
         )
       )
-    const studyRightStart = new Date(students[0]?.studyrightStart ?? new Date()).getTime()
+    const studyRightStart = getStudyRightStart()
     if (studyPlanFilterIsActive && cutStudyPlanCredits) return studyRightStart
     if (studyPlanFilterIsActive)
       return Math.min(..._.flatten(students.map(({ courses }) => courses.map(({ date }) => new Date(date).getTime()))))
@@ -392,7 +424,9 @@ const CreditAccumulationGraphHighCharts = ({
 
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
   const studyRightStartLine =
-    !singleStudent && studyPlanFilterIsActive ? [new Date(students[0].studyrightStart).getTime()] : []
+    !singleStudent && studyPlanFilterIsActive
+      ? [new Date(customStudyStartYear || students[0].studyrightStart).getTime()]
+      : []
 
   const options = createGraphOptions({
     singleStudent,

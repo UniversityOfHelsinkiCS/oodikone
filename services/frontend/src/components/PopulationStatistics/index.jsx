@@ -103,6 +103,9 @@ const PopulationStatistics = () => {
         [transferredToProgrammeFilter.key]: {
           transferred: false,
         },
+        [hopsFilter.key]: {
+          studyStart: (students[0] || {}).studyrightStart,
+        },
       }}
     >
       {filteredStudents => (

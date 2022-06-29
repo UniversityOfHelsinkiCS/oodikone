@@ -1,6 +1,8 @@
 import React, { useRef } from 'react'
 import { connect } from 'react-redux'
 import { Accordion } from 'semantic-ui-react'
+import useFilters from 'components/FilterView/useFilters'
+import studyPlanFilter from 'components/FilterView/filters/hops'
 import { useLocalStorage } from '../../common/hooks'
 
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
@@ -53,8 +55,10 @@ const PopulationDetails = ({
      */
   }
 
-  const renderCreditGainGraphs = () => {
+  const RenderCreditGainGraphs = () => {
     const { CreditAccumulation } = infotooltips.PopulationStatistics
+    const { useFilterSelector } = useFilters()
+    const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
     const graphs = (
       <CreditAccumulationGraphHighCharts
@@ -63,6 +67,7 @@ const PopulationDetails = ({
         trayOpen={() => {}}
         language={language}
         programmeCode={query?.studyRights?.programme}
+        studyPlanFilterIsActive={studyPlanFilterIsActive}
       />
     )
     return (
@@ -93,7 +98,7 @@ const PopulationDetails = ({
       },
       onTitleClick: () => handleClick(0),
       content: {
-        content: <div ref={creditGraphRef}>{renderCreditGainGraphs()}</div>,
+        content: <div ref={creditGraphRef}>{RenderCreditGainGraphs()}</div>,
       },
     },
     {

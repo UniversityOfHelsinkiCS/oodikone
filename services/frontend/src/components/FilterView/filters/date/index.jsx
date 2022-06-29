@@ -30,7 +30,7 @@ const CreditDateFilterCard = ({ options, onOptionsChange }) => {
   )
 }
 
-export default createFilter({
+const filter = createFilter({
   key: 'CreditDate',
 
   title: 'Date of Course Credits',
@@ -62,5 +62,14 @@ export default createFilter({
     return true
   },
 
+  selectors: {
+    // eslint-disable-next-line no-unused-vars
+    selectedStartDate: ({ startDate }, _) => startDate,
+  },
+
   component: CreditDateFilterCard,
 })
+
+export default filter
+
+export const { selectedStartDate } = filter.selectors
