@@ -102,7 +102,7 @@ const CustomPopulationContent = ({ students, custompop }) => {
   const populations = useSelector(state => state.populations)
   const { customPopulationFlag } = populations
 
-  const { progress } = useProgress(populations.loading)
+  const { progress } = useProgress(populations.pending)
 
   const { data: courseStats } = useGetStudentListCourseStatisticsQuery({
     studentNumbers: students.map(s => s.studentNumber),
