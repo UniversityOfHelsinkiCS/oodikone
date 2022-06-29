@@ -1,17 +1,58 @@
 import React from 'react'
-import { Radio } from 'semantic-ui-react'
+import { Radio, Button } from 'semantic-ui-react'
+import useFilters from 'components/FilterView/useFilters'
+import moment from 'moment'
 import createFilter from './createFilter'
+import creditDateFilter, { selectedStartDate } from './date'
 
 const HopsFilterCard = ({ options, onOptionsChange }) => {
+  const { filterDispatch, useFilterSelector } = useFilters()
+  const selectedCreditStartDate = useFilterSelector(selectedStartDate(''))
+
   return (
-    <div
-      style={{ display: 'flex', alignItems: 'center', gap: '1em', cursor: 'pointer' }}
-      onClick={() => {
-        onOptionsChange({ active: !options.active })
-      }}
-    >
-      <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.active} />
-      <div>Show only credits included in study plan</div>
+    <div>
+      <div
+        style={{ display: 'flex', alignItems: 'center', gap: '1em', cursor: 'pointer' }}
+        onClick={() => {
+          if (
+            selectedCreditStartDate &&
+            options.studyStart &&
+            options.clearCreditDate &&
+            new Date(selectedCreditStartDate) > new Date(options.studyStart) &&
+            !options.active
+          )
+            filterDispatch(
+              creditDateFilter.actions.setOptions({
+                startDate: null,
+                endDate: null,
+              })
+            )
+          onOptionsChange({ ...options, active: !options.active })
+        }}
+      >
+        <Radio style={{ width: '3.5rem', flexShrink: 0 }} toggle checked={options.active} />
+        <div>Show only credits included in study plan</div>
+      </div>
+      {options.studyStart ? (
+        <Button
+          content="Cut credits to study start"
+          onClick={() =>
+            filterDispatch(
+              creditDateFilter.actions.setOptions({
+                startDate: moment(options.studyStart),
+                endDate: null,
+              })
+            )
+          }
+          disabled={!options.active}
+          className="credit-date-filter-input"
+          size="mini"
+          style={{
+            margin: '0.5rem',
+            whiteSpace: 'nowrap',
+          }}
+        />
+      ) : null}
     </div>
   )
 }
@@ -19,7 +60,7 @@ const HopsFilterCard = ({ options, onOptionsChange }) => {
 export default createFilter({
   key: 'hops',
 
-  title: 'HOPS',
+  title: 'Personal Study Plan',
 
   priority: -200,
 

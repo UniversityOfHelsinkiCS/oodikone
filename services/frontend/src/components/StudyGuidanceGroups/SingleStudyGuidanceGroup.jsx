@@ -10,6 +10,7 @@ import scrollToComponent from 'react-scroll-to-component'
 import SegmentDimmer from 'components/SegmentDimmer'
 import useFilters from 'components/FilterView/useFilters'
 import creditDateFilter from 'components/FilterView/filters/date'
+import studyPlanFilter from 'components/FilterView/filters/hops'
 import { useFilteredAndFormattedElementDetails } from 'redux/elementdetails'
 import {
   useGetStudyGuidanceGroupPopulationQuery,
@@ -59,6 +60,7 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
   )
 
   const creditDateFilterActive = useFilterSelector(creditDateFilter.selectors.isActive)
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
   const [coursesStructuredByProgramme, toggleCoursesStructuredByProgramme] = useToggleAndSetNewestIndex({
     defaultValue: !!group.tags?.studyProgramme,
@@ -99,6 +101,8 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
     togglePanel(0)
   }, [population])
 
+  const customStudyStartYear = group?.tags?.year ? new Date(`${group.tags.year}-07-31`) : null
+
   const createPanels = students => [
     {
       key: 0,
@@ -118,7 +122,12 @@ const SingleStudyGroupContent = ({ filteredStudents, population, group, language
                 {creditDateFilterActive ? 'Show all credits' : 'Show starting from associated year'}
               </Button>
             )}
-            <CreditAccumulationGraphHighCharts students={students} customPopulation />
+            <CreditAccumulationGraphHighCharts
+              students={students}
+              studyPlanFilterIsActive={studyPlanFilterIsActive}
+              programmeCode={group?.tags?.studyProgramme}
+              customStudyStartYear={customStudyStartYear}
+            />
           </div>
         ),
       },
@@ -201,6 +210,7 @@ const SingleStudyGroupFilterView = props => {
       language: props.language,
     }),
     filters.ageFilter,
+    filters.hopsFilter({ programmeCode: props.group?.tags?.studyProgramme }),
     filters.genderFilter,
     filters.startYearAtUniFilter,
     filters.tagsFilter,
@@ -251,6 +261,10 @@ const SingleStudyGroupFilterView = props => {
   if (props.group?.tags?.year) {
     initialOptions[filters.creditDateFilter.key] = {
       startDate: moment(createAcademicYearStartDate(props.group.tags?.year)),
+    }
+    initialOptions[filters.hopsFilter.key] = {
+      studyStart: props.group?.tags?.year ? `${props.group.tags.year}-07-31` : null,
+      clearCreditDate: true,
     }
   }
 
