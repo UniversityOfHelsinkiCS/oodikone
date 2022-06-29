@@ -108,6 +108,11 @@ const creditsForCourses = async (codes, anonymizationSalt, unification) => {
       {
         model: Semester,
         attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
+        where: {
+          startdate: {
+            [Op.lte]: new Date(),
+          },
+        },
       },
     ],
     where: {
@@ -173,6 +178,11 @@ const enrollmentsForCourses = async (codes, anonymizationSalt, unification) => {
       {
         model: Semester,
         attributes: ['semestercode', 'name', 'yearcode', 'yearname'],
+        where: {
+          startdate: {
+            [Op.lte]: new Date(),
+          },
+        },
       },
     ],
     where: {
@@ -187,7 +197,6 @@ const enrollmentsForCourses = async (codes, anonymizationSalt, unification) => {
       [Op.or]: [{ is_open }, { is_open: null }],
     },
   })
-
   return enrollments.map(enrollment => parseEnrollment(enrollment, anonymizationSalt))
 }
 
