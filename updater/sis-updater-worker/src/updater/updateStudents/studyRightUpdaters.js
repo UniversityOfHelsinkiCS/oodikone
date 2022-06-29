@@ -272,7 +272,7 @@ const updateStudyRightElements = async (
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
-        let startDate = snapshot.first_snapshot_date_time
+        let startDate = snapshot.first_snapshot_date_time || snapshot.valid.startDate
 
         // fix for varhaiskasvatus, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
         if (
