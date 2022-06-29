@@ -9,7 +9,7 @@ const FilterActiveNote = () => {
 
   const handleClick = () => {
     setClicked(true)
-    filterDispatch(transferredToProgrammeFilter.actions.clear())
+    filterDispatch(transferredToProgrammeFilter.actions.set(null))
   }
 
   if (clicked) return true
