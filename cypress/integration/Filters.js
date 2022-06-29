@@ -153,7 +153,7 @@ describe('Population Statistics', () => {
 
   it('Age filter works', () => {
     runTestStepWithPreAndPostParts('Age', () => {
-      testRangeFilter('Age-filter-card', 20, 40, 49)
+      testRangeFilter('Age-filter-card', 20, 40, 47)
     })
   })
 
@@ -217,7 +217,7 @@ describe('Population Statistics', () => {
       runTestStepWithPreAndPostParts('Age', () => {
         const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
         getCard().cs('option-graduated-true').click()
-        testRangeFilter('Age-filter-card', 20, 30, 11)
+        testRangeFilter('Age-filter-card', 20, 30, 1)
         getCard().cs('option-all').click()
       })
     })
@@ -274,7 +274,7 @@ describe('Course Statistics', () => {
 
   it('Age filter works', () => {
     runTestStepWithPreAndPostParts('Age', () => {
-      testRangeFilter('Age-filter-card', 20, 40, 35)
+      testRangeFilter('Age-filter-card', 20, 40, 33)
     })
   })
 
