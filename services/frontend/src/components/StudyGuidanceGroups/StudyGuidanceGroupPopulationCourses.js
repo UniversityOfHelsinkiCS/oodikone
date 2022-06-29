@@ -38,12 +38,7 @@ const StudyGuidanceGroupPopulationCourses = ({
       {showStructured ? (
         <PopulationCourseStats courses={courses} pending={false} filteredStudents={filteredStudents} />
       ) : (
-        <PopulationCourseStatsFlat
-          courses={courses}
-          pending={false}
-          filteredStudents={filteredStudents}
-          showFilter={false}
-        />
+        <PopulationCourseStatsFlat courses={courses} pending={false} filteredStudents={filteredStudents} />
       )}
       {pending && <SegmentDimmer isLoading={pending} />}
     </Segment>

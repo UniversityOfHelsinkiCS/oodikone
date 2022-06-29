@@ -58,5 +58,11 @@ export default createFilter({
 
   filter: (student, { transferred }) => student.transferredStudyright === transferred,
 
+  actions: {
+    set: (options, value) => {
+      options.transferred = value
+    },
+  },
+
   component: TransferredToProgrammeFilterCard,
 })
