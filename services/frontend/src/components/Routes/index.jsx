@@ -39,6 +39,7 @@ const CustomPopulation = React.lazy(() => retry(() => import('../CustomPopulatio
 const Updater = React.lazy(() => retry(() => import('../Updater')))
 const Trends = React.lazy(() => retry(() => import('../Trends')))
 const StudyGuidanceGroups = React.lazy(() => retry(() => import('../StudyGuidanceGroups')))
+const FacultyStatistics = React.lazy(() => retry(() => import('../FacultyStatistics')))
 
 const routes = {
   students: '/students/:studentNumber?',
@@ -51,6 +52,7 @@ const routes = {
   updater: '/updater',
   trends: '/trends',
   studyGuidanceGroups: '/studyguidancegroups/:groupid?',
+  faculties: '/faculties/:facultyCode?',
 }
 
 const Routes = () => (
@@ -60,6 +62,7 @@ const Routes = () => (
       <Route exact path={routes.feedback} component={Feedback} />
       <Route path={routes.trends} component={Trends} />
       <ProtectedRoute requireUserHasRights exact path="/populations" component={Populations} />
+      <ProtectedRoute requiredRoles={['admin']} exact path="/faculties/:facultyCode?" component={FacultyStatistics} />
       <ProtectedRoute
         requireUserHasRights
         exact
