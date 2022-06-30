@@ -9,6 +9,7 @@ import LanguagePicker from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
 
 const allNavigationItems = {
+  faculty: { path: '/faculties', key: 'faculties', label: 'Faculties', reqRights: ['admin'] },
   populations: {
     key: 'studyProgramme',
     label: 'Study programme',
