@@ -32,7 +32,7 @@ const CustomPopulationProgrammeDist = ({
           studentToTargetCourseDateMap,
           populationStatistics.elementdetails.data
         )
-        if (programme && programme.code === '00000') {
+        if (programme && programme.code === '00000' && coursecode) {
           const filteredEnrollments = (student.enrollments || [])
             // eslint-disable-next-line camelcase
             .filter(({ course_code }) => coursecode.includes(course_code))

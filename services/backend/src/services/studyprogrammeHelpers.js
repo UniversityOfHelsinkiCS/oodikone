@@ -33,6 +33,15 @@ const defineStartDate = (studyright_elements, studystartdate) => {
   return studystartdate
 }
 
+const resolveStudyRightCode = studyright_elements => {
+  if (!studyright_elements) return null
+  const studyRightElement = studyright_elements
+    .filter(sre => sre.element_detail.type === 20)
+    .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
+  if (studyRightElement) return studyRightElement.code
+  return null
+}
+
 const formatStudyright = studyright => {
   const {
     studyrightid,
@@ -57,7 +66,7 @@ const formatStudyright = studyright => {
     prioritycode,
     extentcode,
     studentnumber: student.studentnumber,
-    code: studyright_elements?.length ? studyright_elements[0].code : null,
+    code: resolveStudyRightCode(studyright_elements),
     name:
       studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
         ? studyright_elements[0].element_detail.name
@@ -119,21 +128,36 @@ const getStatsBasis = years => {
   }
 }
 
-const isMajorStudentCredit = (studyright, attainment_date) =>
-  studyright &&
-  (studyright.prioritycode === 1 || studyright.prioritycode === 30) && // Is studyright state = MAIN or state = GRADUATED
-  studyright.studystartdate && // The student has started studying in the programme
-  studyright.studystartdate <= attainment_date && // Has the credit been attained after studying in the programme started
-  studyright.enddate >= attainment_date // Has the credit been attained before the studyright ended
+const isMajorStudentCredit = (studyrights, attainment_date, code) =>
+  studyrights.some(studyright => {
+    if (!studyright) return false
+    if (studyright.code !== code) return false
+    if (!studyright.graduated) return new Date(attainment_date) >= new Date(studyright.studystartdate)
+    return (
+      new Date(attainment_date) >= new Date(studyright.studystartdate) &&
+      new Date(attainment_date) <= new Date(studyright.enddate)
+    )
+  })
 
-const isSpecialGroupCredit = (studyright, attainment_date, transfers) => {
-  if (!studyright) return true // If there is no studyright matching the credit, is not a major student credit
-  if (studyright.studystartdate > attainment_date) return true // Credits before the studyright started are not major student credits
-  if (studyright.enddate && attainment_date > studyright.enddate) return true // Credits after studyright are not major student credits
-  if ([7, 9, 16, 34, 33, 99, 14, 13].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
-  if (transfers.includes(studyright.studyrightid)) return true // Excludes both transfers in and out of the programme
-  return false
-}
+const isNonMajorCredit = (studyrights, attainment_date) =>
+  studyrights.some(studyright => {
+    if (!studyright) return false
+    if (!studyright.graduated) return new Date(attainment_date) >= new Date(studyright.studystartdate)
+    return (
+      new Date(attainment_date) >= new Date(studyright.studystartdate) &&
+      new Date(attainment_date) <= new Date(studyright.enddate)
+    )
+  })
+
+const isSpecialGroupCredit = (studyrights, attainment_date, transfers) =>
+  studyrights.some(studyright => {
+    if (!studyright) return true // If there is no studyright matching the credit, is not a major student credit
+    if (studyright.studystartdate > attainment_date) return true // Credits before the studyright started are not major student credits
+    if (studyright.enddate && attainment_date > studyright.enddate) return true // Credits after studyright are not major student credits
+    if ([7, 9, 16, 34, 33, 99, 14, 13].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
+    if (transfers.includes(studyright.studyrightid)) return true // Excludes both transfers in and out of the programme
+    return false
+  })
 
 const getMedian = values => {
   if (values.length === 0) return 0
@@ -410,4 +434,5 @@ module.exports = {
   getCreditThresholds,
   tableTitles,
   getCreditProgressTableTitles,
+  isNonMajorCredit,
 }

@@ -5,16 +5,18 @@ const {
   getStatsBasis,
   defineYear,
   isMajorStudentCredit,
+  isNonMajorCredit,
   getYearsArray,
   getStartDate,
   isSpecialGroupCredit,
   tableTitles,
 } = require('./studyprogrammeHelpers')
 const {
-  getProgrammesStudyrights,
+  getStudyRights,
   getCreditsForStudyProgramme,
   getTransferredCredits,
   allTransfers,
+  getCourseCodesForStudyProgramme,
 } = require('./studyprogramme')
 
 // Fetches all the credits for the studyprogramme and divides them into major-students and non-major students credits
@@ -22,36 +24,38 @@ const {
 // If special groups are excluded, the transfer students are filtered away from the major-students as well
 const getRegularCreditStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const providercode = mapToProviders([studyprogramme])[0]
-  let studyrights = await getProgrammesStudyrights(studyprogramme, since)
+  const courses = await getCourseCodesForStudyProgramme(providercode)
+  const credits = await getCreditsForStudyProgramme(courses, since)
+  const students = [...new Set(credits.map(({ student_studentnumber }) => student_studentnumber))]
+
+  //let studyrights = await getProgrammesStudyrights(studyprogramme, since)
+  let studyrights = await getStudyRights(students, since)
   const transfers = (await allTransfers(studyprogramme, since)).map(t => t.studyrightid)
-
   if (!includeAllSpecials) {
-    studyrights.filter(s => !transfers.includes(s.studyrightid))
+    studyrights = studyrights.filter(s => !transfers.includes(s.studyrightid))
   }
-
-  const credits = await getCreditsForStudyProgramme(providercode, since)
 
   let majors = getStatsBasis(years)
   let nonMajors = getStatsBasis(years)
   let nonDegree = getStatsBasis(years)
 
   credits.forEach(({ student_studentnumber, attainment_date, credits }) => {
-    const studyright = studyrights.find(studyright => studyright.studentnumber == student_studentnumber)
+    const studentStudyrights = studyrights.filter(studyright => studyright.studentnumber === student_studentnumber)
     const attainmentYear = defineYear(attainment_date, isAcademicYear)
 
-    if (!includeAllSpecials && isSpecialGroupCredit(studyright, attainment_date, transfers)) {
+    if (!includeAllSpecials && isSpecialGroupCredit(studentStudyrights, attainment_date, transfers)) {
       return
     }
 
-    if (isMajorStudentCredit(studyright, attainment_date)) {
+    if (isMajorStudentCredit(studentStudyrights, attainment_date, studyprogramme)) {
       majors.graphStats[indexOf(years, attainmentYear)] += credits || 0
       majors.tableStats[attainmentYear] += credits || 0
-    } else if (!studyright) {
-      nonDegree.graphStats[indexOf(years, attainmentYear)] += credits || 0
-      nonDegree.tableStats[attainmentYear] += credits || 0
-    } else {
+    } else if (isNonMajorCredit(studentStudyrights, attainment_date, studyprogramme)) {
       nonMajors.graphStats[indexOf(years, attainmentYear)] += credits || 0
       nonMajors.tableStats[attainmentYear] += credits || 0
+    } else {
+      nonDegree.graphStats[indexOf(years, attainmentYear)] += credits || 0
+      nonDegree.tableStats[attainmentYear] += credits || 0
     }
   })
 
