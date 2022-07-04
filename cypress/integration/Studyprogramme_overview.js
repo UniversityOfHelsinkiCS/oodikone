@@ -61,10 +61,10 @@ describe('Studyprogramme overview', () => {
         // [Year, Total, Major credits, Non-major credits, Non-degree credits, Transferred credits]
         ...years.map(year => [year, 0, 0, 0, 0, 0]),
         [2021, 0, 0, 0, 0, 0],
-        [2020, 4928, 548, 4213, 0, 167],
-        [2019, 7737, 1644, 5744, 0, 349],
-        [2018, 6730, 1820, 4633, 5, 272],
-        [2017, 2900, 788, 1724, 0, 388],
+        [2020, 5860, 5591, 102, 0, 167],
+        [2019, 8696, 7737, 587, 23, 349],
+        [2018, 7818, 6584, 857, 105, 272],
+        [2017, 3085, 2492, 158, 47, 388],
       ]
 
       cy.checkTableStats(tableContents, 'CreditsProducedByTheStudyprogramme')
@@ -150,9 +150,9 @@ describe('Studyprogramme overview', () => {
         ...years.map(year => [year, 0, 0, 0, 0]),
         ['2021 - 2022', 0, 0, 0, 0],
         ['2020 - 2021', 0, 0, 0, 0],
-        ['2019 - 2020', 338.5, 0, 221, 110, 7.5],
-        ['2018 - 2019', 173, 0, 74, 99, 0],
-        ['2017 - 2018', 42, 0, 35, 7, 0],
+        ['2019 - 2020', 338.5, 177, 154, 0, 7.5],
+        ['2018 - 2019', 173, 0, 173, 0, 0],
+        ['2017 - 2018', 42, 0, 42, 0, 0],
       ]
 
       cy.checkTableStats(creditTableContents, 'CreditsProducedByTheStudyprogramme')
@@ -171,8 +171,8 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Major students credits')
         .should('contain', 'Non-major students credits')
         .should('contain', 'Transferred credits')
-        .should('contain', 788)
-        .should('contain', 1820)
+        .should('contain', 857)
+        .should('contain', 587)
 
       cy.get('[data-cy=Graph-GraduatedAndThesisWritersOfTheProgramme')
         .should('contain', 'Graduated students')
