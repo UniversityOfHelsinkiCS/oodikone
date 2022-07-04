@@ -1,0 +1,139 @@
+@media only screen and (min-width: 3240px) {
+  .programmes-overview,
+  .faculty-overview,
+  .faculty-courses {
+    max-width: 80%;
+  }
+}
+
+@media only screen and (min-width: 3240px) {
+  .programmes-overview .section-container,
+  .faculty-overview .section-container,
+  .faculty-courses .section-container {
+    justify-content: center !important;
+  }
+}
+
+.programmes-overview .toggle-container,
+.faculty-overview .toggle-container,
+.faculty-courses .toggle-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1em;
+}
+
+.faculty-overview .radio-toggle,
+.faculty-courses .radio-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 20px 35px 20px 35px;
+}
+
+.programmes-overview .radio-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 0 35px 70px 35px;
+}
+
+.programmes-overview .toggle-label,
+.faculty-overview .toggle-label,
+.faculty-courses .toggle-label {
+  cursor: pointer;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-weight: bold;
+}
+
+.programmes-overview .toggle-label-checked,
+.faculty-overview .toggle-label-checked,
+.faculty-courses .toggle-label-checked {
+  cursor: pointer;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  font-weight: bold;
+  opacity: 0.5;
+}
+
+.programmes-overview .ui.toggle.checkbox input:checked ~ label::before,
+.faculty-overview .ui.toggle.checkbox input:checked ~ label::before,
+.faculty-courses .ui.toggle.checkbox input:checked ~ label::before,
+.programmes-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
+.faculty-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
+.faculty-courses .ui.toggle.checkbox input:focus:checked ~ label::before {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.faculty-overview .divider {
+  margin-top: 4em;
+}
+
+.programmes-overview .section-container,
+.faculty-overview .section-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.programmes-overview .section-container-centered,
+.faculty-overview .section-container-centered {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.programmes-overview .graph-container,
+.faculty-overview .graph-container {
+  min-width: 50%;
+  height: 500px;
+}
+
+.programmes-overview .graph-container-narrow,
+.faculty-overview .graph-container-narrow {
+  min-width: 40%;
+  height: 500px;
+}
+
+.programmes-overview .table-container,
+.faculty-overview .table-container {
+  max-width: 45%;
+  margin-left: 1em;
+  flex-grow: 2;
+}
+
+.programmes-overview .table-container-wide,
+.faculty-overview .table-container-wide {
+  max-width: 55%;
+  margin-left: 1em;
+  flex-grow: 2;
+}
+
+.programmes-overview .datatable .total-row-cell,
+.programmes-overview .table-container .total-row-cell {
+  border-top: 3px solid rgb(189, 180, 180);
+  font-weight: bold;
+}
+
+.programmes-overview .programmes-selector {
+  margin: 60px 60px 30px 60px;
+}
+
+.programmes-overview .header-row {
+  font-weight: bold;
+}
+
+.programmes-overview .datatable {
+  margin: 2em 0 5em 0;
+}
+
+.programmes-overview .no-data-message {
+  margin: 20px 0;
+}
+
+.update-view {
+  margin: 2em 0;
+}
+
+.update-view .button-container {
+  margin: 1em 0;
+}
