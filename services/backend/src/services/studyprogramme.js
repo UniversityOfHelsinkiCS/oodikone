@@ -369,7 +369,33 @@ const getProgrammesStudyrights = async studyprogramme =>
     })
   ).map(formatStudyright)
 
-const getCreditsForStudyProgramme = async (provider, since) => {
+const getStudyRights = async students =>
+  (
+    await Studyright.findAll({
+      attributes: ['studyrightid', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode'],
+      where: {
+        studentStudentnumber: students,
+      },
+      include: [
+        {
+          model: StudyrightElement,
+          include: {
+            model: ElementDetail,
+            where: {
+              type: 20,
+            },
+          },
+        },
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
+    })
+  ).map(formatStudyright)
+
+const getCreditsForStudyProgramme = async (codes, since) => {
   const res = await Credit.findAll({
     attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
     include: {
@@ -378,13 +404,7 @@ const getCreditsForStudyProgramme = async (provider, since) => {
       required: true,
       where: {
         is_study_module: false,
-      },
-      include: {
-        model: Organization,
-        required: true,
-        where: {
-          code: provider,
-        },
+        code: codes,
       },
     },
     where: {
@@ -400,6 +420,28 @@ const getCreditsForStudyProgramme = async (provider, since) => {
     },
   })
   return res
+}
+
+const getCourseCodesForStudyProgramme = async provider => {
+  const coursesByProvider = await Course.findAll({
+    attributes: ['code', 'substitutions'],
+    where: {
+      is_study_module: false,
+    },
+    include: {
+      model: Organization,
+      required: true,
+      where: {
+        code: provider,
+      },
+    },
+  })
+  const coursesWithOpenUniSubstitutions = coursesByProvider.map(({ code, substitutions }) => {
+    if (!substitutions || !substitutions.length) return [code]
+    const alternatives = [`AY-${code}`, `AY${code}`, `A-${code}`]
+    return [code].concat(substitutions.filter(sub => alternatives.includes(sub)))
+  })
+  return coursesWithOpenUniSubstitutions.flat()
 }
 
 const getAllProgrammeCourses = async providerCode => {
@@ -676,4 +718,6 @@ module.exports = {
   getStudentsWithoutStudyrightForProgrammeCourses,
   getOtherStudentsForProgrammeCourses,
   getAllProgrammeCourses,
+  getStudyRights,
+  getCourseCodesForStudyProgramme,
 }

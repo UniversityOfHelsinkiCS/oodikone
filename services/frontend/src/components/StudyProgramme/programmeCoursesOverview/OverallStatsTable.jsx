@@ -140,7 +140,7 @@ const getColumns = (language, showStudents) => {
         title: 'Major credits',
         cellStyle: { textAlign: 'right' },
         filterType: 'range',
-        getRowVal: course => course.totalProgrammecredits,
+        getRowVal: course => course.totalProgrammeCredits,
         getRowContent: course => course.totalProgrammeCredits,
       },
       {
