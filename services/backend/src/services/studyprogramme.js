@@ -257,7 +257,7 @@ const followingStudyrights = async (since, programmes, studentnumbers) =>
           include: [
             {
               model: ElementDetail,
-              attributes: ['name'],
+              attributes: ['name', 'code', 'type'],
             },
           ],
           attributes: ['code'],
@@ -293,7 +293,7 @@ const previousStudyrights = async (programmes, studentnumbers) =>
           include: [
             {
               model: ElementDetail,
-              attributes: ['name'],
+              attributes: ['name', 'code', 'type'],
             },
           ],
           attributes: ['code'],
