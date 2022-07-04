@@ -1,12 +1,15 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { withRouter, useHistory } from 'react-router-dom'
-import { Segment, Header } from 'semantic-ui-react'
+import { Segment, Header, Tab } from 'semantic-ui-react'
 import { getFaculties } from 'redux/faculties'
 import { getTextIn } from 'common'
-import { useTitle } from '../../common/hooks'
+import { useTabs, useTitle } from '../../common/hooks'
 import FacultySelector from './facultySelector'
+import BasicOverview from './BasicOverview'
+import ProgrammeOverview from './FacultyProgrammeOverview'
 import useLanguage from '../LanguagePicker/useLanguage'
+// import TSA from '../../common/tsa'
 
 const FacultyStatistics = props => {
   useTitle('Faculties')
@@ -17,9 +20,27 @@ const FacultyStatistics = props => {
   const faculty = facultyCode && faculties.find(f => f.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name, language)
 
+  const [tab, setTab] = useTabs('p_tab', 0, history)
+  const [academicYear, setAcademicYear] = useState(false)
+  const [specialGroups, setSpecialGroups] = useState(false)
+
   useEffect(() => {
     if (faculties.length === 0) getFaculties()
   }, [])
+
+  // useEffect(() => {
+  //   if (!facultyName) {
+  //     return
+  //   }
+
+  //   TSA.Matomo.sendEvent('Faculty Usage', 'faculty overview', facultyName)
+  //   TSA.Influx.sendEvent({
+  //     group: 'Faculty Usage',
+  //     name: 'faculty overview',
+  //     label: facultyName,
+  //     value: 1,
+  //   })
+  // }, [facultyName])
 
   const handleSelect = useCallback(
     faculty => {
@@ -27,6 +48,30 @@ const FacultyStatistics = props => {
     },
     [history]
   )
+
+  const getPanes = () => {
+    const panes = [
+      {
+        menuItem: 'Basic information',
+        render: () => (
+          <BasicOverview
+            faculty={faculty}
+            academicYear={academicYear}
+            setAcademicYear={setAcademicYear}
+            specialGroups={specialGroups}
+            setSpecialGroups={setSpecialGroups}
+          />
+        ),
+      },
+      {
+        menuItem: 'Programmes and student populations',
+        render: () => <ProgrammeOverview />,
+      },
+    ]
+    return panes
+  }
+
+  const panes = getPanes()
 
   if (!facultyCode)
     return (
@@ -47,6 +92,7 @@ const FacultyStatistics = props => {
           <Header textAlign="center">{facultyName}</Header>
           <span>{facultyCode}</span>
         </div>
+        <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
       </Segment>
     </div>
   )
