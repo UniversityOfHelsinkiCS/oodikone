@@ -98,8 +98,10 @@ const FacultyStatistics = props => {
   )
 }
 
+const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
+
 const mapStateToProps = state => ({
-  faculties: state.faculties.data,
+  faculties: state.faculties.data.filter(f => !ignore.includes(f.code)),
 })
 
 export default connect(mapStateToProps, { getFaculties })(withRouter(FacultyStatistics))
