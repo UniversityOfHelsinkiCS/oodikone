@@ -33,6 +33,8 @@ export const getStudentCredits = (student, start, end, cumulative, includeTransf
 }
 
 export const splitStudentCredits = (student, timeSlots, cumulative) => {
+  if (!timeSlots.length) return {}
+
   let timeSlotN = 0
 
   const results = new Array(timeSlots.length).fill(0)
