@@ -91,7 +91,7 @@ const FacultySelector = ({ faculties, selected, language }) => {
   }
 
   return (
-    <>
+    <div data-cy="select-faculty">
       <Form>
         Filter faculties:
         <Form.Input onChange={e => handleFilterChange(e.target.value)} width="4" />
@@ -107,7 +107,7 @@ const FacultySelector = ({ faculties, selected, language }) => {
           />
         </>
       ) : null}
-    </>
+    </div>
   )
 }
 
