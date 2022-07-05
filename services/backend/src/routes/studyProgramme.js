@@ -34,7 +34,7 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
       includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
     },
   })
-  await setBasicStats(updated, yearType, specialGroups)
+  if (updated) await setBasicStats(updated, yearType, specialGroups)
   return res.json(updated)
 })
 
@@ -54,7 +54,7 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
       includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
     },
   })
-  await setCreditStats(updatedStats, yearType, specialGroups)
+  if (updatedStats) await setCreditStats(updatedStats, yearType, specialGroups)
   return res.json(updatedStats)
 })
 
@@ -74,7 +74,7 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
       includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
     },
   })
-  await setGraduationStats(updatedStats, yearType, specialGroups)
+  if (updatedStats) await setGraduationStats(updatedStats, yearType, specialGroups)
   return res.json(updatedStats)
 })
 
@@ -109,7 +109,7 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
       specialGroups: specialGroups === 'SPECIAL_INCLUDED',
     },
   })
-  await setStudytrackStats(updated, graduated, specialGroups)
+  if (updated) await setStudytrackStats(updated, graduated, specialGroups)
   return res.json(updated)
 })
 
