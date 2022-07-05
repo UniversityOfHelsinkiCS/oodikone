@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { connect } from 'react-redux'
 import { withRouter, useHistory } from 'react-router-dom'
-import { Segment, Header, Tab } from 'semantic-ui-react'
-import { getFaculties } from 'redux/faculties'
+import { Segment, Header, Tab, Loader } from 'semantic-ui-react'
+import { useGetFacultiesQuery } from 'redux/facultyStats'
 import { getTextIn } from 'common'
 import { useTabs, useTitle } from '../../common/hooks'
 import FacultySelector from './facultySelector'
@@ -11,11 +10,16 @@ import ProgrammeOverview from './FacultyProgrammeOverview'
 import useLanguage from '../LanguagePicker/useLanguage'
 import TSA from '../../common/tsa'
 
+const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
+
 const FacultyStatistics = props => {
   useTitle('Faculties')
   const history = useHistory()
   const { language } = useLanguage()
-  const { match, faculties, getFaculties } = props
+  const allFaculties = useGetFacultiesQuery()
+  const faculties = allFaculties.isSuccess && allFaculties.data.filter(f => !ignore.includes(f.code))
+
+  const { match } = props
   const { facultyCode } = match.params
   const faculty = facultyCode && faculties.find(f => f.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name, language)
@@ -23,10 +27,6 @@ const FacultyStatistics = props => {
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
-
-  useEffect(() => {
-    if (faculties.length === 0) getFaculties()
-  }, [])
 
   useEffect(() => {
     if (!facultyName) {
@@ -48,6 +48,10 @@ const FacultyStatistics = props => {
     },
     [history]
   )
+
+  if (allFaculties.isLoading || allFaculties.isFetching) {
+    return <Loader active style={{ marginTop: '10em' }} />
+  }
 
   const getPanes = () => {
     const panes = [
@@ -98,10 +102,4 @@ const FacultyStatistics = props => {
   )
 }
 
-const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
-
-const mapStateToProps = state => ({
-  faculties: state.faculties.data.filter(f => !ignore.includes(f.code)),
-})
-
-export default connect(mapStateToProps, { getFaculties })(withRouter(FacultyStatistics))
+export default withRouter(FacultyStatistics)

@@ -2,6 +2,9 @@ import { RTKApi } from 'apiConnection'
 
 const facultystatsApi = RTKApi.injectEndpoints({
   endpoints: builder => ({
+    getFaculties: builder.query({
+      query: () => '/faculties',
+    }),
     getBasicStats: builder.query({
       query: ({ id, yearType, specialGroups }) =>
         `/faculties/${id}/basicstats?year_type=${yearType}&special_groups=${specialGroups}`,
@@ -14,4 +17,4 @@ const facultystatsApi = RTKApi.injectEndpoints({
   overrideExisting: false,
 })
 
-export const { useGetBasicStatsQuery, useGetCreditStatsQuery } = facultystatsApi
+export const { useGetFacultiesQuery, useGetBasicStatsQuery, useGetCreditStatsQuery } = facultystatsApi
