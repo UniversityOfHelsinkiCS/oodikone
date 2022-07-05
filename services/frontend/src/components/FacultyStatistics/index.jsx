@@ -9,7 +9,7 @@ import FacultySelector from './facultySelector'
 import BasicOverview from './BasicOverview'
 import ProgrammeOverview from './FacultyProgrammeOverview'
 import useLanguage from '../LanguagePicker/useLanguage'
-// import TSA from '../../common/tsa'
+import TSA from '../../common/tsa'
 
 const FacultyStatistics = props => {
   useTitle('Faculties')
@@ -28,19 +28,19 @@ const FacultyStatistics = props => {
     if (faculties.length === 0) getFaculties()
   }, [])
 
-  // useEffect(() => {
-  //   if (!facultyName) {
-  //     return
-  //   }
+  useEffect(() => {
+    if (!facultyName) {
+      return
+    }
 
-  //   TSA.Matomo.sendEvent('Faculty Usage', 'faculty overview', facultyName)
-  //   TSA.Influx.sendEvent({
-  //     group: 'Faculty Usage',
-  //     name: 'faculty overview',
-  //     label: facultyName,
-  //     value: 1,
-  //   })
-  // }, [facultyName])
+    TSA.Matomo.sendEvent('Faculty Usage', 'faculty overview', facultyName)
+    TSA.Influx.sendEvent({
+      group: 'Faculty Usage',
+      name: 'faculty overview',
+      label: facultyName,
+      value: 1,
+    })
+  }, [facultyName])
 
   const handleSelect = useCallback(
     faculty => {

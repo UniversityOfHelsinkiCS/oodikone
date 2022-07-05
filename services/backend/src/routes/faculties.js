@@ -2,7 +2,6 @@ const router = require('express').Router()
 const { faculties, degreeProgrammeCodesOfFaculty } = require('../services/organisations')
 const { getCreditStats, setCreditStats } = require('../services/analyticsService')
 const { getCreditStatsForStudytrack } = require('../services/studyprogrammeCredits')
-const logger = require('../util/logger')
 
 router.get('/faculties', async (req, res) => {
   const facultyList = await faculties()
@@ -41,7 +40,6 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
   let transferred = []
 
   const programmes = await degreeProgrammeCodesOfFaculty(code)
-
   // get programme grades and combine them per year
   if (programmes) {
     for (const prog of programmes) {
@@ -88,29 +86,18 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
 })
 
 const getProgrammeCredits = async (code, yearType, specialGroups) => {
-  // like '/v2/studyprogrammes/:id/creditstats'
-  let data = null
-  try {
-    data = await getCreditStats(code, yearType, specialGroups)
-    data = null
-  } catch (e) {
-    logger.error(`Failed to get code ${code} credit stats`)
-  }
-  if (!data) {
-    try {
-      const result = await getCreditStatsForStudytrack({
-        studyprogramme: code,
-        settings: {
-          isAcademicYear: yearType === 'ACADEMIC_YEAR',
-          includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
-        },
-      })
-      data = await setCreditStats(result, yearType, specialGroups)
-    } catch (e) {
-      logger.error(`Failed to update code ${code} credit stats`)
-    }
-  }
-  return data
+  const data = await getCreditStats(code, yearType, specialGroups)
+  if (data) return data
+  const updatedStats = await getCreditStatsForStudytrack({
+    studyprogramme: code,
+    settings: {
+      isAcademicYear: yearType === 'ACADEMIC_YEAR',
+      includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
+    },
+  })
+  if (!updatedStats) return undefined
+  await setCreditStats(updatedStats, yearType, specialGroups)
+  return updatedStats
 }
 
 module.exports = router
