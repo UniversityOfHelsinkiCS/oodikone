@@ -22,31 +22,20 @@ router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
 
-  if (code) {
-    let data = null
-    try {
-      data = await getBasicStats(code, yearType, specialGroups)
-    } catch (e) {
-      logger.error(`Failed to get code ${code} basic stats: ${e}`)
-    }
-    if (!data) {
-      try {
-        const result = await getBasicStatsForStudytrack({
-          studyprogramme: req.params.id,
-          settings: {
-            isAcademicYear: yearType === 'ACADEMIC_YEAR',
-            includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
-          },
-        })
-        data = await setBasicStats(result, yearType, specialGroups)
-      } catch (e) {
-        logger.error(`Failed to update code ${code} basic stats: ${e}`)
-      }
-    }
-    return res.json(data)
-  } else {
-    res.status(422).end()
-  }
+  if (!code) return res.status(422).end()
+
+  const data = await getBasicStats(code, yearType, specialGroups)
+  if (data) return res.json(data)
+
+  const updated = await getBasicStatsForStudytrack({
+    studyprogramme: req.params.id,
+    settings: {
+      isAcademicYear: yearType === 'ACADEMIC_YEAR',
+      includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
+    },
+  })
+  await setBasicStats(updated, yearType, specialGroups)
+  return res.json(updated)
 })
 
 router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
@@ -54,32 +43,19 @@ router.get('/v2/studyprogrammes/:id/creditstats', async (req, res) => {
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
 
-  if (code) {
-    let data = null
-    try {
-      data = await getCreditStats(code, yearType, specialGroups)
-      data = null
-    } catch (e) {
-      logger.error(`Failed to get code ${code} credit stats`)
-    }
-    if (!data) {
-      try {
-        const result = await getCreditStatsForStudytrack({
-          studyprogramme: req.params.id,
-          settings: {
-            isAcademicYear: yearType === 'ACADEMIC_YEAR',
-            includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
-          },
-        })
-        data = await setCreditStats(result, yearType, specialGroups)
-      } catch (e) {
-        logger.error(`Failed to update code ${code} credit stats`)
-      }
-    }
-    return res.json(data)
-  } else {
-    res.status(422).end()
-  }
+  if (!code) return res.status(422).end()
+
+  const data = await getCreditStats(code, yearType, specialGroups)
+  if (data) return res.json(data)
+  const updatedStats = await getCreditStatsForStudytrack({
+    studyprogramme: req.params.id,
+    settings: {
+      isAcademicYear: yearType === 'ACADEMIC_YEAR',
+      includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
+    },
+  })
+  await setCreditStats(updatedStats, yearType, specialGroups)
+  return res.json(updatedStats)
 })
 
 router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
@@ -87,31 +63,19 @@ router.get('/v2/studyprogrammes/:id/graduationstats', async (req, res) => {
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
 
-  if (code) {
-    let data = null
-    try {
-      data = await getGraduationStats(code, yearType, specialGroups)
-    } catch (e) {
-      logger.error(`Failed to get code ${code} graduation stats`)
-    }
-    if (!data) {
-      try {
-        const result = await getGraduationStatsForStudytrack({
-          studyprogramme: req.params.id,
-          settings: {
-            isAcademicYear: yearType === 'ACADEMIC_YEAR',
-            includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
-          },
-        })
-        data = await setGraduationStats(result, yearType, specialGroups)
-      } catch (e) {
-        logger.error(`Failed to update code ${code} graduation stats`)
-      }
-    }
-    return res.json(data)
-  } else {
-    res.status(422).end()
-  }
+  if (!code) return res.status(422).end()
+
+  const data = await getGraduationStats(code, yearType, specialGroups)
+  if (data) return res.json(data)
+  const updatedStats = await getGraduationStatsForStudytrack({
+    studyprogramme: req.params.id,
+    settings: {
+      isAcademicYear: yearType === 'ACADEMIC_YEAR',
+      includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
+    },
+  })
+  await setGraduationStats(updatedStats, yearType, specialGroups)
+  return res.json(updatedStats)
 })
 
 router.get('/v2/studyprogrammes/:id/coursestats', async (req, res) => {
@@ -133,31 +97,20 @@ router.get('/v2/studyprogrammes/:id/studytrackstats', async (req, res) => {
   const graduated = req.query?.graduated
   const specialGroups = req.query?.special_groups
 
-  if (code) {
-    let data = null
-    try {
-      data = await getStudytrackStats(code, graduated, specialGroups)
-    } catch (e) {
-      logger.error(`Failed to get code ${code} studytrack stats: ${e}`)
-    }
-    if (!data) {
-      try {
-        const result = await getStudytrackStatsForStudyprogramme({
-          studyprogramme: code,
-          settings: {
-            graduated: graduated === 'GRADUATED_INCLUDED',
-            specialGroups: specialGroups === 'SPECIAL_INCLUDED',
-          },
-        })
-        data = await setStudytrackStats(result, graduated, specialGroups)
-      } catch (e) {
-        logger.error(`Failed to update code ${code} studytrack stats: ${e}`)
-      }
-    }
-    return res.json(data)
-  } else {
-    res.status(422).end()
-  }
+  if (!code) return res.status(422).end()
+
+  const data = await getStudytrackStats(code, graduated, specialGroups)
+  if (data) return res.json(data)
+
+  const updated = await getStudytrackStatsForStudyprogramme({
+    studyprogramme: code,
+    settings: {
+      graduated: graduated === 'GRADUATED_INCLUDED',
+      specialGroups: specialGroups === 'SPECIAL_INCLUDED',
+    },
+  })
+  await setStudytrackStats(updated, graduated, specialGroups)
+  return res.json(updated)
 })
 
 router.get('/v2/studyprogrammes/:id/update_basicview', async (req, res) => {
