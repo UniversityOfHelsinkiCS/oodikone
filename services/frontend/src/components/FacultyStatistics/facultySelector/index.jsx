@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { debounce } from 'lodash'
 import { connect } from 'react-redux'
-import { Loader, Message, Header, Form } from 'semantic-ui-react'
+import { Message, Header, Form } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 
@@ -34,7 +34,6 @@ const FacultySelector = ({ faculties, selected, language }) => {
   }, [filter, faculties])
 
   if (selected) return null
-  if (!faculties) return <Loader active>Loading</Loader>
 
   const headers = [
     {

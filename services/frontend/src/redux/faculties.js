@@ -1,5 +1,8 @@
 import { callController } from '../apiConnection'
 
+// Implemented also in './facultyStats'
+// Use that for new stuff or switch while refactoring
+
 export const getFaculties = () => {
   const route = '/faculties'
   const prefix = 'GET_FACULTIES_'
