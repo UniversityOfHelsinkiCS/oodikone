@@ -67,6 +67,7 @@ const formatStudyright = studyright => {
     extentcode,
     studentnumber: student.studentnumber,
     code: resolveStudyRightCode(studyright_elements),
+    studyrightElements: studyright_elements,
     name:
       studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
         ? studyright_elements[0].element_detail.name
