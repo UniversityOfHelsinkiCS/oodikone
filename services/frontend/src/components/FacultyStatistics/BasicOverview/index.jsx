@@ -1,7 +1,8 @@
 import React from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
-import { useGetCreditStatsQuery } from 'redux/facultyStats'
+import { useGetCreditStatsQuery, useGetBasicStatsQuery } from 'redux/facultyStats'
+// import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
 import StackedBarChart from 'components/StudyProgramme/BasicOverview/StackedBarChart'
 import DataTable from 'components/StudyProgramme/BasicOverview/DataTable'
 import Toggle from '../../StudyProgramme/Toggle'
@@ -14,6 +15,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, specialGroups, setSp
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const credits = useGetCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
+  const basics = useGetBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -26,9 +28,10 @@ const Overview = ({ faculty, academicYear, setAcademicYear, specialGroups, setSp
       {/* <InfoBox content={toolTips[toolTipText]} /> */}
     </>
   )
-  const isFetchingOrLoading = credits.isLoading || credits.isFetching
+  const isFetchingOrLoading = credits.isLoading || credits.isFetching || basics.isLoading || basics.isFetching
 
-  const isError = credits.isError || (credits.isSuccess && !credits.data)
+  const isError =
+    (basics.isError && credits.isError) || (basics.isSuccess && !basics.data && credits.isSuccess && !credits.data)
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
@@ -57,6 +60,19 @@ const Overview = ({ faculty, academicYear, setAcademicYear, specialGroups, setSp
         <Loader active style={{ marginTop: '10em' }} />
       ) : (
         <>
+          {basics.isSuccess && basics.data && (
+            <>
+              {getDivider('Students of the faculty', 'StudentsOfTheFaculty')}
+              <div className="section-container">
+                {/* <LineGraph cypress="StudentsOfTheFaculty" data={basics?.data} />
+                <DataTable
+                  cypress="StudentsOfTheFaculty"
+                  data={basics?.data?.tableStats}
+                  titles={basics?.data?.titles}
+                /> */}
+              </div>
+            </>
+          )}
           {credits.isSuccess && credits.data && (
             <>
               {getDivider('Credits produced by the faculty', 'CreditsProducedByTheFaculty')}
