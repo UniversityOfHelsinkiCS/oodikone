@@ -91,11 +91,11 @@ const groupStudyrightSnapshots = studyrightSnapshots => {
     // Get snapshot date time from oldest snapshot where date time is available. If no date
     // times are available (e.g. all are null), take study start date of the oldest one
     const parseSnapshotDateTime = snapshots => {
-      let oldestFirst = [...snapshots]
-      oldestFirst.reverse()
-      const firstWithSnapshotDateTime = oldestFirst.find(s => !!s.snapshot_date_time)
-      if (firstWithSnapshotDateTime) return firstWithSnapshotDateTime.snapshot_date_time
-      return oldestFirst[0].study_start_date
+      const oldestFirst = snapshots
+        .filter(s => !!s.snapshot_date_time)
+        .sort((a, b) => new Date(a.snapshot_date_time) - new Date(b.snapshot_date_time))
+      if (oldestFirst.length) return oldestFirst[0].snapshot_date_time
+      return null
     }
 
     const snapshotsWithRightDate = Object.keys(groupedByPhases).map(key => {
@@ -155,7 +155,7 @@ const parseTransfers = async (groupedStudyRightSnapshots, moduleGroupIdToCode, p
         id: `${mappedId}-${snapshot.modification_ordinal}-${sourcecode}-${targetcode}`,
         sourcecode,
         targetcode,
-        transferdate: new Date(snapshot.snapshot_date_time),
+        transferdate: new Date(snapshot.first_snapshot_date_time || snapshot.snapshot_date_time),
         studentnumber: personIdToStudentNumber[snapshot.person_id],
         studyrightid: mappedId,
       })
