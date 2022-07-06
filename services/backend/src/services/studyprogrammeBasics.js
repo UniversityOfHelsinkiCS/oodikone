@@ -47,10 +47,16 @@ const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear,
   })
 
   const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbersOfTheYear)
-  studyrights.forEach(({ enddate }) => {
-    const graduationYear = defineYear(enddate, isAcademicYear)
-    graphStats[indexOf(years, graduationYear)] += 1
-    tableStats[graduationYear] += 1
+  studyrights.forEach(({ enddate, studyrightElements }) => {
+    // Check that the study right element ending to graduation belong to study programme
+    const elements = studyrightElements.filter(
+      sre => new Date(sre.enddate).toDateString() === new Date(enddate).toDateString()
+    )
+    if (elements.length) {
+      const graduationYear = defineYear(enddate, isAcademicYear)
+      graphStats[indexOf(years, graduationYear)] += 1
+      tableStats[graduationYear] += 1
+    }
   })
 
   return { graphStats, tableStats }
