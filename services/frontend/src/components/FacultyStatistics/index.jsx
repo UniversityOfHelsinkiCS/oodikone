@@ -17,11 +17,11 @@ const FacultyStatistics = props => {
   const history = useHistory()
   const { language } = useLanguage()
   const allFaculties = useGetFacultiesQuery()
-  const faculties = allFaculties.isSuccess && allFaculties.data.filter(f => !ignore.includes(f.code))
+  const faculties = allFaculties?.data && allFaculties.data.filter(f => !ignore.includes(f.code))
 
   const { match } = props
   const { facultyCode } = match.params
-  const faculty = facultyCode && faculties.find(f => f.code === facultyCode)
+  const faculty = faculties && facultyCode && faculties.find(f => f.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name, language)
 
   const [tab, setTab] = useTabs('p_tab', 0, history)
