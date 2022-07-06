@@ -214,7 +214,6 @@ const updateStudyRightElements = async (
       const transfer = transfersByStudyRightId[studyrightid]
       if (code === transfer.sourcecode) {
         enddate = new Date(transfer.transferdate)
-        enddate.setDate(enddate.getDate() - 1)
       } else if (code === transfer.targetcode) {
         startdate = transfer.transferdate
       }
@@ -272,6 +271,8 @@ const updateStudyRightElements = async (
         const studentnumber = personIdToStudentNumber[mainStudyRight.person_id]
 
         // according to Eija Airio this is the right way to get the date... at least when studyright has changed
+        // clarification: when education changes in the study right we need to get the start date from
+        // the _first_ snapshot as it is the date when the transfer is happened.
         let startDate = snapshot.first_snapshot_date_time || snapshot.valid.startDate
 
         // fix for varhaiskasvatus, see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/2741
