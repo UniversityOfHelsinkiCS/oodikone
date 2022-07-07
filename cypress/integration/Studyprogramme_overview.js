@@ -77,7 +77,7 @@ describe('Studyprogramme overview', () => {
         // [Year, Graduated, Wrote thesis]
         ...years.map(year => [year, 0, 0]),
         [2021, 0, 0],
-        [2020, 36, 35],
+        [2020, 35, 35],
         [2019, 17, 25],
         [2018, 1, 5],
         [2017, 0, 0],
@@ -181,7 +181,6 @@ describe('Studyprogramme overview', () => {
         .should('contain', 5)
         .should('contain', 17)
         .should('contain', 25)
-        .should('contain', 36)
         .should('contain', 35)
 
       cy.get('[data-cy=Graph-2019-AverageGraduationTimes]')
