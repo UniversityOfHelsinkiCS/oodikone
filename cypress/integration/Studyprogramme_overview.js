@@ -45,7 +45,7 @@ describe('Studyprogramme overview', () => {
         // [Year, Started, Graduated, Transferred Away, Transferred to]
         ...years.map(year => [year, 0, 0, 0, 0]),
         [2021, 0, 0, 1, 0],
-        [2020, 12, 36, 3, 2],
+        [2020, 12, 35, 3, 2],
         [2019, 87, 17, 0, 1],
         [2018, 161, 1, 0, 0],
         [2017, 171, 0, 0, 0],
