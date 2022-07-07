@@ -30,7 +30,7 @@ jobs:
           cache-from: type=registry,ref=toska/sis-updater-worker:latest
           cache-to: type=inline
       - name: 'Store built image'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: /tmp/worker.tar
 
@@ -54,7 +54,7 @@ jobs:
           cache-from: type=registry,ref=toska/sis-updater-scheduler:latest
           cache-to: type=inline
       - name: 'Store built image'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: /tmp/scheduler.tar
 

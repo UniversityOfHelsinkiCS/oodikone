@@ -69,7 +69,7 @@ jobs:
           target: production
           outputs: type=docker,dest=/tmp/backend.tar
       - name: 'Upload image for other jobs'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: /tmp/backend.tar
 
@@ -99,7 +99,7 @@ jobs:
           target: production
           outputs: type=docker,dest=/tmp/frontend.tar
       - name: 'Upload image for other jobs'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           path: /tmp/frontend.tar
 
@@ -230,7 +230,7 @@ jobs:
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Cypress videos
@@ -274,7 +274,7 @@ jobs:
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Cypress videos
@@ -318,7 +318,7 @@ jobs:
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Cypress videos
@@ -362,7 +362,7 @@ jobs:
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Cypress videos
@@ -406,7 +406,7 @@ jobs:
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Cypress videos
@@ -450,7 +450,7 @@ jobs:
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Cypress videos
@@ -496,7 +496,7 @@ jobs:
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Cypress videos
@@ -540,7 +540,7 @@ jobs:
         env:
           CYPRESS_baseUrl: http://localhost:1337
       - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: Cypress videos
