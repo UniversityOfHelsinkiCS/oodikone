@@ -6,8 +6,9 @@ import { arrayOf, string, bool, shape } from 'prop-types'
 import { Loader, Message, Header, Form } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
-const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
+const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
   const [filter, setFilter] = useState('')
   const [bachelorProgrammes, setBachelorProgrammes] = useState([])
   const [masterProgrammes, setMasterProgrammes] = useState([])
@@ -16,6 +17,8 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
   const handleFilterChange = debounce(value => {
     setFilter(value)
   }, 500)
+
+  const { language } = useLanguage()
 
   useEffect(() => {
     if (studyprogrammes) {
@@ -170,7 +173,6 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected, language }) => {
 StudyProgrammeSelector.propTypes = {
   studyprogrammes: arrayOf(shape({ name: shape({}), code: string })),
   selected: bool.isRequired,
-  language: string.isRequired,
 }
 
 StudyProgrammeSelector.defaultProps = {
