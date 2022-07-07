@@ -21,7 +21,6 @@ describe('Faculty overview', () => {
     it('Credits produced by faculty are shown', () => {
       cy.get(['data-cy=Section-CreditsProducedByTheFaculty'])
       cy.get(['data-cy=Graph-CreditsProducedByTheFaculty'])
-      cy.get(['data-cy=Table-CreditsProducedByTheFaculty']).get('tr').should('have.length', 7)
     })
   })
 })
