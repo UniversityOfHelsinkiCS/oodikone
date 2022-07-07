@@ -604,6 +604,7 @@ jobs:
       - test_student_statistics
       - test_studyprogramme_overview
       - test_teachers_and_users
+      - test_faculty_statistics
       - test_service_exit_statuses
     steps:
       - uses: actions/checkout@v2
@@ -670,6 +671,7 @@ jobs:
       - test_student_statistics
       - test_studyprogramme_overview
       - test_teachers_and_users
+      - test_faculty_statistics
       - test_service_exit_statuses
     if: failure()
     steps:
