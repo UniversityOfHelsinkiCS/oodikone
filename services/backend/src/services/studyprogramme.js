@@ -321,8 +321,6 @@ const transfersAway = async (studytrack, since) =>
         },
         sourcecode: studytrack,
       },
-      distinct: true,
-      col: 'studentnumber',
     })
   ).map(formatTransfer)
 
@@ -335,8 +333,6 @@ const transfersTo = async (studytrack, since) =>
         },
         targetcode: studytrack,
       },
-      distinct: true,
-      col: 'studentnumber',
     })
   ).map(formatTransfer)
 
