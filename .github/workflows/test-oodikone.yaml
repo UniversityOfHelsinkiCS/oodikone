@@ -116,7 +116,7 @@ jobs:
               - 'updater/sis-updater-worker/src/db/migrations/**'
               - '.github/workflows/test-oodikone.yaml'
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -149,7 +149,7 @@ jobs:
       - name: 'Load built backend image'
         run: docker load --input /tmp/artifact/backend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -182,7 +182,7 @@ jobs:
       - name: 'Load built backend image'
         run: docker load --input /tmp/artifact/backend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -215,7 +215,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -259,7 +259,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -303,7 +303,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -347,7 +347,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -391,7 +391,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -435,7 +435,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -479,7 +479,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -525,7 +525,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -571,7 +571,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to toska docker registry'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: registry.toska.cs.helsinki.fi
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
@@ -616,7 +616,7 @@ jobs:
           docker load --input /tmp/artifact/backend.tar
           docker load --input /tmp/artifact/frontend.tar
       - name: 'Login to DockerHub'
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
