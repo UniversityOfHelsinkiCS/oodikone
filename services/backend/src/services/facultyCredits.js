@@ -70,18 +70,22 @@ const isFacultyNonMajorCredit = (studyrights, attainment_date, facultyProgrammes
   studyrights.forEach(studyright => {
     if (studyright) {
       if (!studyright.graduated && new Date(attainment_date) >= new Date(studyright.studystartdate)) {
-        right = studyright
+        if (!right) right = studyright.code
+        else if (right && !facultyProgrammes.includes(right) && facultyProgrammes.includes(studyright.code))
+          right = studyright.code
       } else {
         if (
           new Date(attainment_date) >= new Date(studyright.studystartdate) &&
           new Date(attainment_date) <= new Date(studyright.enddate)
         ) {
-          right = studyright
+          if (!right) right = studyright.code
+          else if (right && !facultyProgrammes.includes(right) && facultyProgrammes.includes(studyright.code))
+            right = studyright.code
         }
       }
     }
   })
-  return facultyProgrammes.includes(right.code)
+  return facultyProgrammes.includes(right)
 }
 
 // Fetches all the credits for the studyprogramme and divides them into major-students and non-major faculty students
