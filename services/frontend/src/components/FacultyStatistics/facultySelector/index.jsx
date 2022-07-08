@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { debounce } from 'lodash'
-import { connect } from 'react-redux'
 import { Message, Header, Form } from 'semantic-ui-react'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 
-const FacultySelector = ({ faculties, selected, language }) => {
+const FacultySelector = ({ faculties, selected }) => {
   const [filter, setFilter] = useState('')
   const [filteredFaculties, setFilteredFaculties] = useState([])
+  const { language } = useLanguage()
 
   const handleFilterChange = debounce(value => {
     setFilter(value)
@@ -111,12 +112,4 @@ const FacultySelector = ({ faculties, selected, language }) => {
   )
 }
 
-const mapStateToProps = ({ settings }) => {
-  const { language } = settings
-
-  return {
-    language,
-  }
-}
-
-export default connect(mapStateToProps, null)(FacultySelector)
+export default FacultySelector
