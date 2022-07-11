@@ -88,8 +88,8 @@ const isFacultyNonMajorCredit = (studyrights, attainment_date, facultyProgrammes
   return facultyProgrammes.includes(right)
 }
 
-// Fetches all the credits for the studyprogramme and divides them into major-students and non-major faculty students
-// and non-major other faculty students credits
+// Fetches all the credits for the studyprogramme and divides them into major-students, non-major faculty students,
+// non-major other faculty students adn non-degree student credits
 // Division is done on the basis that whether the student had a primary studyright to the programme on the attainment_date
 const getFacultyRegularCreditStats = async ({
   studyprogramme,
@@ -231,7 +231,7 @@ const getFacultyCreditStatsForStudytrack = async ({ studyprogramme, facultyProgr
 }
 
 const getProgrammeCredits = async (code, yearType, specialGroups, facultyProgrammes) => {
-  // redis?
+  // redis for faculty? Create faculty versions for out-commented functions
   // const data = await getCreditStats(code, yearType, specialGroups)
   // if (data) return data
   const updatedStats = await getFacultyCreditStatsForStudytrack({

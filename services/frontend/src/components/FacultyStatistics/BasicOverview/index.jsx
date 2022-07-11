@@ -10,10 +10,10 @@ import InfoBox from '../../Info/InfoBox'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
 
-const Overview = ({ faculty, academicYear, setAcademicYear, specialGroups, setSpecialGroups }) => {
+const Overview = ({ faculty, academicYear, setAcademicYear }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
+  const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const credits = useGetCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
   const basics = useGetBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
 
@@ -45,14 +45,6 @@ const Overview = ({ faculty, academicYear, setAcademicYear, specialGroups, setSp
           secondLabel="Academic year"
           value={academicYear}
           setValue={setAcademicYear}
-        />
-        <Toggle
-          cypress="StudentToggle"
-          toolTips={toolTips.StudentToggle}
-          firstLabel="All studyrights"
-          secondLabel="Special studyrights excluded"
-          value={specialGroups}
-          setValue={setSpecialGroups}
         />
       </div>
 
