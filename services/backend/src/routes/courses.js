@@ -28,10 +28,9 @@ router.get('/v3/courseyearlystats', async (req, res) => {
     return res.status(403).json({ error: 'No programmes so no access to course stats' })
   }
 
-  const { codes, separate: sep, unifyOpenUniCourses: unify } = req.query
+  const { codes, separate: sep } = req.query
 
   const separate = !sep ? false : JSON.parse(sep)
-  const unifyOpenUniCourses = !unify ? false : JSON.parse(unify)
   if (!codes) {
     res.status(422).send('Missing required query parameters')
   } else {
@@ -39,7 +38,7 @@ router.get('/v3/courseyearlystats', async (req, res) => {
     // and users with rights to any specific study programmes
     const anonymize = allowedRoles !== 'admin' && rights.length < 1
     const anonymizationSalt = anonymize ? crypto.randomBytes(12).toString('hex') : null
-    const results = await Course.courseYearlyStats(codes, separate, unifyOpenUniCourses, anonymizationSalt)
+    const results = await Course.courseYearlyStats(codes, separate, anonymizationSalt)
     res.json(results)
   }
 })
