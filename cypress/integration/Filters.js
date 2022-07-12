@@ -2,6 +2,8 @@
 
 // const baseUrl = Cypress.config().baseUrl
 
+const MOCKED_DATE = new Date(2022, 6, 12).getTime()
+
 const checkFilteringResult = studentCount => {
   cy.contains(`Students (${studentCount})`)
 }
@@ -152,6 +154,7 @@ describe('Population Statistics', () => {
   })
 
   it('Age filter works', () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 40, 47)
     })
@@ -213,6 +216,7 @@ describe('Population Statistics', () => {
   })
 
   it('Filter combinations work', () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('GraduatedFromProgramme', () => {
       runTestStepWithPreAndPostParts('Age', () => {
         const getCard = () => cy.cs('GraduatedFromProgramme-filter-card')
@@ -273,6 +277,7 @@ describe('Course Statistics', () => {
   })
 
   it('Age filter works', () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 40, 33)
     })
@@ -304,6 +309,7 @@ describe('Course Statistics', () => {
   })
 
   it('Filter combinations work', () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Grade', () => {
       runTestStepWithPreAndPostParts('Age', () => {
         cy.cs('gradeFilter-3').click()
@@ -330,6 +336,7 @@ describe('Custom Population Statistics', () => {
   })
 
   it('Age filter works', () => {
+    cy.clock(MOCKED_DATE, ['Date'])
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 30, 1)
     })
