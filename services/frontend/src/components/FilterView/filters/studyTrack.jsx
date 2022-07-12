@@ -76,15 +76,27 @@ export default createFilter({
   filter: (student, { selected, args }) => {
     const activeAt = _.get(args, 'activeAt', moment())
 
-    return student.studyrights
-      .flatMap(sr => sr.studyright_elements)
-      .filter(
-        sre =>
-          sre.element_detail.type === 30 &&
-          (!activeAt || moment(activeAt).isBetween(sre.startdate, sre.enddate, 'day', '[]'))
-      )
-      .map(sre => sre.element_detail.code)
-      .some(code => selected.includes(code))
+    return (
+      student.studyrights
+        // eslint-disable-next-line camelcase
+        .filter(({ studyright_elements, graduated }) =>
+          studyright_elements.some(
+            sre =>
+              sre.element_detail.type === 30 &&
+              (!activeAt ||
+                moment(activeAt).isBetween(
+                  moment(sre.startdate),
+                  graduated ? moment() : moment(sre.enddate),
+                  'day',
+                  '[]'
+                ))
+          )
+        )
+        // eslint-disable-next-line camelcase
+        .flatMap(({ studyright_elements }) => studyright_elements)
+        .map(sre => sre.element_detail.code)
+        .some(code => selected.includes(code))
+    )
   },
 
   render: (props, { args }) => (
