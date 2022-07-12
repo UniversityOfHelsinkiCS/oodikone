@@ -2,7 +2,7 @@ import React from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
 import { useGetCreditStatsQuery, useGetBasicStatsQuery } from 'redux/facultyStats'
-// import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
+import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
 import StackedBarChart from 'components/StudyProgramme/BasicOverview/StackedBarChart'
 import DataTable from 'components/StudyProgramme/BasicOverview/DataTable'
 import Toggle from '../../StudyProgramme/Toggle'
@@ -16,6 +16,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
   const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const credits = useGetCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
   const basics = useGetBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
+  // console.log({ basics })
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -56,12 +57,12 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
             <>
               {getDivider('Students of the faculty', 'StudentsOfTheFaculty')}
               <div className="section-container">
-                {/* <LineGraph cypress="StudentsOfTheFaculty" data={basics?.data} />
+                <LineGraph cypress="StudentsOfTheFaculty" data={basics?.data} />
                 <DataTable
                   cypress="StudentsOfTheFaculty"
                   data={basics?.data?.tableStats}
                   titles={basics?.data?.titles}
-                /> */}
+                />
               </div>
             </>
           )}
