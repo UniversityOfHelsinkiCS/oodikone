@@ -70,6 +70,8 @@ const getAccessToAll = async accessLevel => {
 }
 
 const getLomakeAccess = async user => {
+  if (!user.iamGroups) user.iamGroups = user.iam_groups
+
   const access = {}
   const { access: iamAccess } = getIAMRights(user.iamGroups)
 
