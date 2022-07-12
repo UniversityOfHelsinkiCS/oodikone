@@ -76,6 +76,11 @@ const User = sequelizeUser.define(
     email: { type: Sequelize.STRING },
     language: { type: Sequelize.STRING },
     sisu_person_id: { type: Sequelize.STRING },
+    iam_groups: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+      allowNull: false,
+      defaultValue: [],
+    },
     last_login: { type: Sequelize.DATE },
   },
   {
