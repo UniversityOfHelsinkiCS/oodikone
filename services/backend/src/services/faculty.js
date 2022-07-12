@@ -3,10 +3,6 @@ const { Op } = Sequelize
 const { Studyright, Student } = require('../models')
 const { formatStudyright } = require('./studyprogrammeHelpers')
 
-// const whereStudents = studentnumbers => {
-//   return studentnumbers ? studentnumbers : { [Op.not]: null }
-// }
-
 const startedStudyrights = async (faculty, since) =>
   (
     await Studyright.findAll({
