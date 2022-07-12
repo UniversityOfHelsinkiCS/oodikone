@@ -1,6 +1,10 @@
 const router = require('express').Router()
 const { faculties, degreeProgrammeCodesOfFaculty } = require('../services/organisations')
-const { combineFacultyCredits, combineFacultyBasics } = require('../services/facultyCredits')
+const { combineFacultyBasics } = require('../services/facultyBasics')
+const { combineFacultyCredits } = require('../services/facultyCredits')
+
+// Faculty uses a lot of tools designed for Study programme.
+// Some of them have been copied here and slightly edited for faculty purpose.
 
 router.get('/faculties', async (req, res) => {
   const facultyList = await faculties()
@@ -21,48 +25,35 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
     years: [],
     tableStats: [],
     graphStats: [],
-    titles: ['', 'Started studying', 'Graduated'],
+    titles: ['', 'Started studying', 'Graduated', 'Tranferred away', 'Transferred to'],
     status: 'DONE',
     lastUpdated: '',
   }
 
   const programmes = await degreeProgrammeCodesOfFaculty(code)
   if (programmes) {
-    await combineFacultyBasics(allBasics, programmes, yearType, specialGroups, counts, years)
+    await combineFacultyBasics(allBasics, code, programmes, yearType, specialGroups, counts, years)
   }
 
-  let started = []
-  let graduated = []
-  let away = []
-  let to = []
+  // let started = []
+  // let graduated = []
+  // let away = []
+  // let to = []
 
-  if (specialGroups === 'SPECIAL_INCLUDED') {
-    allBasics.titles = allBasics.titles.concat(['Transferred away', 'Transferred to'])
+  // years.forEach(year => {
+  //   started.push(counts[year][0])
+  //   graduated.push(counts[year][1])
+  //   away.push(counts[year][2])
+  //   to.push(counts[year][3])
+  // })
 
-    years.forEach(year => {
-      started.push(counts[year][0])
-      graduated.push(counts[year][1])
-      away.push(counts[year][2])
-      to.push(counts[year][3])
-    })
+  // allBasics.graphStats = [
+  //   { name: 'Started', data: started },
+  //   { name: 'Graduated', data: graduated },
+  //   { name: 'Tranferred away', data: away },
+  //   { name: 'Transferred to', data: to },
+  // ]
 
-    allBasics.graphStats = [
-      { name: 'Started', data: started },
-      { name: 'Graduated', data: graduated },
-      { name: 'Tranferred away', data: away },
-      { name: 'Transferred to', data: to },
-    ]
-  } else {
-    years.forEach(year => {
-      started.push(counts[year][0])
-      graduated.push(counts[year][1])
-    })
-
-    allBasics.graphStats = [
-      { name: 'Started', data: started },
-      { name: 'Graduated', data: graduated },
-    ]
-  }
   return res.json(allBasics)
 })
 

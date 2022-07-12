@@ -1,6 +1,4 @@
 const { indexOf } = require('lodash')
-const { getBasicStats, setBasicStats } = require('./analyticsService')
-const { getBasicStatsForStudytrack } = require('./studyprogrammeBasics')
 const { mapToProviders } = require('../util/utils')
 const {
   getStatsBasis,
@@ -18,52 +16,6 @@ const {
   allTransfers,
   getCourseCodesForStudyProgramme,
 } = require('./studyprogramme')
-
-// Faculty uses a lot of tools designed for Study programme.
-// Some of them have been copied here and slightly edited for faculty purpose.
-
-const combineFacultyBasics = async (allBasics, programmes, yearType, specialGroups, counts, years) => {
-  for (const prog of programmes) {
-    const data = await getProgrammeBasics(prog, yearType, specialGroups)
-    if (data) {
-      if (!allBasics.lastUpdated || new Date(data.lastUpdated) > new Date(allBasics.lastUpdated))
-        allBasics.lastUpdated = data.lastUpdated
-
-      data.tableStats.forEach(row => {
-        if (!(row[0] in counts)) {
-          counts[row[0]] = row.slice(1)
-          years.push(row[0])
-        } else {
-          counts[row[0]] = row.slice(1).map((value, i) => {
-            return counts[row[0]][i] + value
-          })
-        }
-      })
-    }
-  }
-  // save table stats and graph stats
-  years.forEach(year => {
-    allBasics.tableStats.push([year, ...counts[year]])
-  })
-
-  years.sort()
-  allBasics.years = years
-}
-
-const getProgrammeBasics = async (code, yearType, specialGroups) => {
-  const data = await getBasicStats(code, yearType, specialGroups)
-  if (data) return data
-
-  const updated = await getBasicStatsForStudytrack({
-    studyprogramme: code,
-    settings: {
-      isAcademicYear: yearType === 'ACADEMIC_YEAR',
-      includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
-    },
-  })
-  if (updated) await setBasicStats(updated, yearType, specialGroups)
-  return updated
-}
 
 const isFacultyNonMajorCredit = (studyrights, attainment_date, facultyProgrammes) => {
   let right = ''
@@ -275,4 +227,4 @@ const combineFacultyCredits = async (allCredits, programmes, yearType, specialGr
   allCredits.years = years
 }
 
-module.exports = { combineFacultyBasics, combineFacultyCredits, getFacultyCreditStatsForStudytrack }
+module.exports = { combineFacultyCredits, getFacultyCreditStatsForStudytrack }
