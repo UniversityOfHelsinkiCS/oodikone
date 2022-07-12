@@ -7,6 +7,7 @@ const { sendNotificationAboutNewUser } = require('../services/mailservice')
 const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = require('../services/studyGuidanceGroups')
 const _ = require('lodash')
 const { User, UserElementDetails, AccessGroup, UserFaculties, sequelizeUser } = require('../models/models_user')
+const { getOrganizationAccess } = require('../util/organizationAccess')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const hyOneGroup = 'hy-one'
@@ -191,7 +192,15 @@ const formatUser = async userFromDb => {
   const rights = _.uniqBy([...programmes, ...enrichProgrammesFromFaculties(faculties)])
 
   const {
-    dataValues: { id, username: userId, full_name: name, email, language, sisu_person_id: sisPersonId },
+    dataValues: {
+      id,
+      username: userId,
+      full_name: name,
+      email,
+      language,
+      sisu_person_id: sisPersonId,
+      iam_groups: iamGroups,
+    },
   } = userFromDb
 
   const studentsUserCanAccess = _.uniqBy(
@@ -205,6 +214,7 @@ const formatUser = async userFromDb => {
     name,
     language,
     sisPersonId, //
+    iamGroups,
     email,
     is_enabled: true, // this is probably not needed: is here mainly because old userservice created users for every logged in user, even if they hadn't correct iamgroups
     rights,
@@ -240,6 +250,7 @@ const getUser = async ({ username, name, email, iamGroups, sisId }) => {
     email,
     language,
     sisu_person_id: sisId,
+    iam_groups: iamGroups,
     last_login: new Date(),
   })
 
@@ -266,12 +277,14 @@ const getUser = async ({ username, name, email, iamGroups, sisId }) => {
       ).map(({ id }) => id)
     )
   }
+  const iamRights = Object.keys(await getOrganizationAccess(formattedUser))
 
   if (isNewUser) await sendNotificationAboutNewUser({ userId: username, userFullName: name })
 
   const toReturn = {
     ...formattedUser,
     roles: newAccessGroups,
+    iamRights,
   }
   userDataCache.set(username, toReturn)
   return toReturn
