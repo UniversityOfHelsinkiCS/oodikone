@@ -24,13 +24,15 @@ const ANALYTICS_CATEGORY = 'Course Statistics'
 const sendAnalytics = (action, name, value) => TSA.Matomo.sendEvent(ANALYTICS_CATEGORY, action, name, value)
 
 const countFilteredStudents = (stat, filter) =>
-  Object.entries(stat).reduce((acc, entry) => {
-    const [category, students] = entry
-    return {
-      ...acc,
-      [category]: students.filter(filter).length,
-    }
-  }, {})
+  stat
+    ? Object.entries(stat).reduce((acc, entry) => {
+        const [category, students] = entry
+        return {
+          ...acc,
+          [category]: students.filter(filter).length,
+        }
+      }, {})
+    : {}
 
 const SingleCourseStats = ({
   stats,
