@@ -3,6 +3,7 @@ const { ApplicationError } = require('../util/customErrors')
 const { getUser, getMockedUser } = require('../services/userService')
 const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
+const { relevantIAMs } = require('../../config/IAMConfig')
 
 const parseIamGroups = iamGroups => iamGroups?.split(';').filter(Boolean) ?? []
 
@@ -24,7 +25,7 @@ const currentUserMiddleware = async (req, _res, next) => {
     throw new ApplicationError('Not enough data in request headers', 403, { logoutUrl })
   }
 
-  const iamGroups = parseIamGroups(hygroupcn)
+  const iamGroups = parseIamGroups(hygroupcn).filter(iam => relevantIAMs.includes(iam))
 
   if (!hasRequiredIamGroup(iamGroups)) {
     throw new ApplicationError('User does not have required iam group', 403, { logoutUrl })
