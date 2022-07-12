@@ -1,4 +1,4 @@
-const { StudyrightElement, Credit, Course } = require('../../db/models')
+const { StudyrightElement, Credit, Course, Transfer } = require('../../db/models')
 const { Op } = require('sequelize')
 const { selectFromByIds } = require('../../db')
 
@@ -18,6 +18,27 @@ const getCodesToFix = async () => {
   })
   return codes.map(({ code }) => code)
 }
+
+const cleanTransfers = studentNumbers =>
+  Transfer.destroy({
+    where: {
+      studentnumber: studentNumbers,
+      [Op.or]: [
+        {
+          sourcecode: { [Op.startsWith]: '2_KH' },
+        },
+        {
+          sourcecode: { [Op.startsWith]: '2_MH' },
+        },
+        {
+          targetcode: { [Op.startsWith]: '2_KH' },
+        },
+        {
+          targetcode: { [Op.startsWith]: '2_MH' },
+        },
+      ],
+    },
+  })
 
 /**
  * Fix references on duplicate study programmes. Codes like 2_MH* or 2_KH* in
@@ -66,6 +87,7 @@ const fix = async students => {
       credit.course_code = credit.course_code.replace('2_', '')
       return credit.save()
     }),
+    cleanTransfers(studentNumbers),
   ])
   return true
 }
