@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const _ = require('lodash')
 const Organization = require('../models/organization')
 const { getIAMRights } = require('./IAMRights')
@@ -47,7 +48,7 @@ const getOrganizationAccessFromIamGroups = user => {
   )
 
   Object.keys(iamAccess).forEach(code => {
-    access[normalizeOrganizationCode(code)] = iamAccess[code]
+    access[code] = iamAccess[code]
   })
 
   return access
@@ -59,7 +60,6 @@ const organizationIsRelevant = organization => {
   return code.includes('-') || RELEVANT_ORGANIZATION_CODES.includes(code)
 }
 
-// eslint-disable-next-line no-unused-vars
 const getAccessToAll = async accessLevel => {
   const access = {}
   const allOrganizations = await Organization.findAll({ attributes: ['code'] })
@@ -75,7 +75,7 @@ const getLomakeAccess = async user => {
 
   if (!_.isObject(iamAccess)) return access
   Object.keys(iamAccess).forEach(code => {
-    access[normalizeOrganizationCode(code)] = iamAccess[code]
+    access[code] = iamAccess[code]
   })
   return access
 }
