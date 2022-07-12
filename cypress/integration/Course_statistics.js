@@ -374,10 +374,8 @@ describe('Course Statistics tests', () => {
 
     const attemptsTableContents = [
       // [time, passed, failed, passrate]
-      // ['Total', 288, 213, 75, '73.96 %'],
-      // ['2020-2021', '5 or less students', 'NA', 'NA', 'NA'],
-      ['Total', null, 295, 216, 79, '73.22 %'],
-      ['2020-2021', null, 5, 2, 3, '40.00 %'],
+      ['Total', 288, 213, 75, '73.96 %'],
+      ['2020-2021', '5 or less students', 'NA', 'NA', 'NA'],
       ['2019-2020', null, 164, 121, 43, '73.78 %'],
       ['2018-2019', null, 85, 60, 25, '70.59 %'],
       ['2017-2018', null, 39, 32, 7, '82.05 %'],
