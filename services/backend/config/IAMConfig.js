@@ -354,6 +354,13 @@ const dekaaniFacultyMap = {
   'hy-eltdk-dekanaatti': 'eläinlääketieteellinen',
 }
 
+const oodikoneIams = [
+  'grp-oodikone-staging-users',
+  'grp-oodikone-basic-staging-users',
+  'grp-oodikone-users',
+  'grp-oodikone-basic-users',
+]
+
 const universityWideGroups = ['hy-ypa-opa-opintoasiainpaallikot', 'hy-rehtoraatti']
 
 const superAdminGroups = ['grp-toska']
@@ -410,6 +417,7 @@ const relevantIAMs = []
   .concat(superAdminGroups)
   .concat(adminGroups)
   .concat(employeeGroups)
+  .concat(oodikoneIams)
 
 module.exports = {
   isSuperAdminIam,
