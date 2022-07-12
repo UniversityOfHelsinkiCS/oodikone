@@ -25,7 +25,7 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
     years: [],
     tableStats: [],
     graphStats: [],
-    titles: ['', 'Started studying', 'Graduated', 'Tranferred away', 'Transferred to'],
+    titles: ['', 'Started studying', 'Graduated', 'Transferred away', 'Transferred to'],
     status: 'DONE',
     lastUpdated: '',
   }
@@ -34,25 +34,6 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
   if (programmes) {
     await combineFacultyBasics(allBasics, code, programmes, yearType, specialGroups, counts, years)
   }
-
-  // let started = []
-  // let graduated = []
-  // let away = []
-  // let to = []
-
-  // years.forEach(year => {
-  //   started.push(counts[year][0])
-  //   graduated.push(counts[year][1])
-  //   away.push(counts[year][2])
-  //   to.push(counts[year][3])
-  // })
-
-  // allBasics.graphStats = [
-  //   { name: 'Started', data: started },
-  //   { name: 'Graduated', data: graduated },
-  //   { name: 'Tranferred away', data: away },
-  //   { name: 'Transferred to', data: to },
-  // ]
 
   return res.json(allBasics)
 })

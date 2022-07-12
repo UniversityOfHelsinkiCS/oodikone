@@ -3,21 +3,6 @@ const { startedStudyrights } = require('./faculty')
 const { getGraduatedStats } = require('./studyprogrammeBasics')
 const { getStatsBasis, getYearsArray, defineYear } = require('./studyprogrammeHelpers')
 
-// const getProgrammeBasics = async (code, yearType, specialGroups) => {
-//   const data = await getBasicStats(code, yearType, specialGroups)
-//   if (data) return data
-
-//   const updated = await getBasicStatsForStudytrack({
-//     studyprogramme: code,
-//     settings: {
-//       isAcademicYear: yearType === 'ACADEMIC_YEAR',
-//       includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
-//     },
-//   })
-//   if (updated) await setBasicStats(updated, yearType, specialGroups)
-//   return updated
-// }
-
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
   // choose only the earlier started one, so we don't count start of masters as starting in faculty
@@ -45,7 +30,7 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType, sp
   const { graphStats, tableStats } = getStatsBasis(yearsArray)
   const parameters = { since, years: yearsArray, isAcademicYear, includeAllSpecials }
 
-  // started studying
+  // Started studying in faculty
   const studyrights = await startedStudyrights(faculty, since)
   const filteredStudyrights = filterDuplicateStudyrights(studyrights)
 
@@ -58,13 +43,10 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType, sp
 
   Object.keys(tableStats).forEach(year => {
     counts[year] = [tableStats[year]]
-    years.push(year)
+    years.push(Number(year))
   })
-  // console.log('**************')
-  // console.log(allBasics)
-  //console.log('counts at first', counts)
+
   // Graduated
-  // console.log(programmes)
   for (const studyprogramme of programmes) {
     const graduated = await getGraduatedStats({ studyprogramme, ...parameters })
     if (graduated) {
@@ -72,40 +54,20 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType, sp
         if (counts[year][1] === undefined) counts[year].push(graduated.tableStats[year])
         else counts[year][1] += graduated.tableStats[year]
       })
-      // console.log(studyprogramme)
-      // console.log('graduated', graduated)
-      // console.log('counts', counts)
     }
   }
+  let graduated = []
+  for (const year of years) {
+    graduated.push(counts[year][1])
+  }
+  allBasics.graphStats.push({ name: 'Graduated', data: graduated })
+
+  // combine tablestats from all categories
+  allBasics.years = years
+  years.forEach(year => {
+    allBasics.tableStats.push([year, ...counts[year]])
+  })
+  allBasics.tableStats.reverse()
 }
 
 module.exports = { combineFacultyBasics }
-
-// const combineFacultyBasics = async (allBasics, programmes, yearType, specialGroups, counts, years) => {
-//   console.log(counts)
-//   for (const prog of programmes) {
-//     const data = await getProgrammeBasics(prog, yearType, specialGroups)
-//     if (data) {
-//       if (!allBasics.lastUpdated || new Date(data.lastUpdated) > new Date(allBasics.lastUpdated))
-//         allBasics.lastUpdated = data.lastUpdated
-
-//       data.tableStats.forEach(row => {
-//         if (!(row[0] in counts)) {
-//           counts[row[0]] = row.slice(1)
-//           years.push(row[0])
-//         } else {
-//           counts[row[0]] = row.slice(1).map((value, i) => {
-//             return counts[row[0]][i] + value
-//           })
-//         }
-//       })
-//     }
-//   }
-//   // save table stats and graph stats
-//   years.forEach(year => {
-//     allBasics.tableStats.push([year, ...counts[year]])
-//   })
-
-//   years.sort()
-//   allBasics.years = years
-// }
