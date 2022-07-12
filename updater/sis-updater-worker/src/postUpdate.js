@@ -7,6 +7,7 @@ const {
   studentsThatNeedToBeFixed,
   graduationsThatNeedToBeFixed,
 } = require('./updater/updateStudents/varhaiskasvatusFixer')
+const studentProgrammeModuleFixer = require('./updater/updateStudents/studentProgrammeModuleFixer')
 
 const {
   REDIS_TOTAL_META_KEY,
@@ -35,6 +36,8 @@ const postUpdate = async (updateMsg, currentChunkStartTime) => {
   if (!updateMsg.entityIds) {
     return
   }
+
+  if (updateMsg.entityIds.length) await studentProgrammeModuleFixer(updateMsg.entityIds)
 
   const studentsToBeFixed = intersection(
     updateMsg.entityIds || [],
