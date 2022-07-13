@@ -14,12 +14,9 @@ router.get('/faculties', async (req, res) => {
 router.get('/faculties/:id/basicstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
-  const specialGroups = req.query?.special_groups
 
   if (!code) return res.status(422).end()
 
-  let counts = {}
-  let years = []
   let allBasics = {
     id: code,
     years: [],
@@ -40,7 +37,7 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
 
   const programmes = await degreeProgrammeCodesOfFaculty(code)
   if (programmes) {
-    await combineFacultyBasics(allBasics, code, programmes, yearType, specialGroups, counts, years)
+    await combineFacultyBasics(allBasics, code, programmes, yearType)
   }
 
   return res.json(allBasics)
