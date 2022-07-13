@@ -43,7 +43,7 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType, sp
 
   Object.keys(startedTableStats).forEach(year => {
     counts[year] = [startedTableStats[year]]
-    years.push(Number(year))
+    years.push(year)
   })
 
   // Graduated
