@@ -27,15 +27,16 @@ const filterDuplicateStudyrights = studyrights => {
   return Object.values(rightsToCount)
 }
 
-const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) => {
-  let counts = {}
-  let years = []
-  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
-  const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
-  const yearsArray = getYearsArray(since.getFullYear(), isAcademicYear)
-  let { graphStats, tableStats } = getStatsBasis(yearsArray)
-
-  // Started studying in faculty
+const getFacultyStarters = async (
+  faculty,
+  since,
+  isAcademicYear,
+  yearsArray,
+  graphStats,
+  tableStats,
+  counts,
+  allBasics
+) => {
   const startedGraphStats = [...graphStats]
   const startedTableStats = { ...tableStats }
   const studyrights = await startedStudyrights(faculty, since)
@@ -50,10 +51,19 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) =>
 
   Object.keys(startedTableStats).forEach(year => {
     counts[year] = [startedTableStats[year]]
-    years.push(year)
   })
+}
 
-  // Graduated in faculty
+const getFacultyGraduates = async (
+  faculty,
+  since,
+  isAcademicYear,
+  yearsArray,
+  graphStats,
+  tableStats,
+  allBasics,
+  counts
+) => {
   const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
   const graduatedTableStats = {}
   Object.keys(tableStats).forEach(year => (graduatedTableStats[year] = [0, 0, 0, 0, 0]))
@@ -89,8 +99,18 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) =>
   Object.keys(graduatedTableStats).forEach(year => {
     counts[year] = counts[year].concat(graduatedTableStats[year])
   })
+}
 
-  // Transfers
+const getFacultyTransfers = async (
+  programmes,
+  since,
+  isAcademicYear,
+  yearsArray,
+  graphStats,
+  tableStats,
+  allBasics,
+  counts
+) => {
   const insideTransfers = await transferredInsideFaculty(programmes, since)
   const awayTransfers = await transferredAway(programmes, since)
   const toTransfers = await transferredTo(programmes, since)
@@ -124,8 +144,27 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) =>
   Object.keys(transferTableStats).forEach(year => {
     counts[year] = counts[year].concat(transferTableStats[year])
   })
+}
 
-  // combine tablestats from all categories
+const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) => {
+  let counts = {}
+  let years = []
+  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
+  const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
+  const yearsArray = getYearsArray(since.getFullYear(), isAcademicYear)
+  const { graphStats, tableStats } = getStatsBasis(yearsArray)
+  Object.keys(tableStats).forEach(year => years.push(year))
+
+  // Started studying in faculty
+  await getFacultyStarters(faculty, since, isAcademicYear, yearsArray, graphStats, tableStats, counts, allBasics)
+
+  // Graduated in faculty
+  await getFacultyGraduates(faculty, since, isAcademicYear, yearsArray, graphStats, tableStats, allBasics, counts)
+
+  // Transfers
+  await getFacultyTransfers(programmes, since, isAcademicYear, yearsArray, graphStats, tableStats, allBasics, counts)
+
+  // combine tableStats from all categories
   allBasics.years = years
   years.forEach(year => {
     allBasics.tableStats.push([year, ...counts[year]])
