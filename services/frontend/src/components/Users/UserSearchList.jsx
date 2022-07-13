@@ -83,6 +83,21 @@ const UserSearchList = ({ enabledOnly, users, error, elementdetails }) => {
             },
           },
           {
+            key: 'IAMGROUPS',
+            title: 'IAM groups',
+            getRowContent: user => (
+              <Label.Group>
+                {user.iam_groups
+                  .slice()
+                  .sort()
+                  .map(iam => (
+                    <Label key={iam} content={iam} />
+                  ))}
+              </Label.Group>
+            ),
+            getRowVal: user => user.iam_groups.slice().sort(),
+          },
+          {
             key: 'OODIACCESS',
             title: 'Has access',
             getRowVal: user => user.is_enabled,
