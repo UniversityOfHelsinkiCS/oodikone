@@ -16,7 +16,6 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
   const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const credits = useGetCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
   const basics = useGetBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
-  // console.log({ basics })
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -25,7 +24,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
           {title}
         </Divider>
       </div>
-      <InfoBox content="Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan." />
+      <InfoBox content="Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Kaikki valmistuneet -lukumäärä sisältää kaikki mahdolliset suoritetuksi merkityt opiskeluoikeudet." />
       {/* <InfoBox content={toolTips[toolTipText]} /> */}
     </>
   )
