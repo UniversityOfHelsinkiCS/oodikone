@@ -23,4 +23,25 @@ const startedStudyrights = async (faculty, since) =>
     })
   ).map(formatStudyright)
 
-module.exports = { startedStudyrights }
+const graduatedStudyrights = async (faculty, since) =>
+  (
+    await Studyright.findAll({
+      include: [
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+      ],
+      where: {
+        faculty_code: faculty,
+        enddate: {
+          [Op.gte]: since,
+        },
+        graduated: 1,
+        student_studentnumber: { [Op.not]: null },
+      },
+    })
+  ).map(formatStudyright)
+
+module.exports = { startedStudyrights, graduatedStudyrights }
