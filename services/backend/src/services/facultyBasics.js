@@ -1,5 +1,11 @@
 const { indexOf } = require('lodash')
-const { startedStudyrights, graduatedStudyrights } = require('./faculty')
+const {
+  startedStudyrights,
+  graduatedStudyrights,
+  transferredInsideFaculty,
+  transferredAway,
+  transferredTo,
+} = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('./studyprogrammeHelpers')
 
 const filterDuplicateStudyrights = studyrights => {
@@ -82,6 +88,41 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) =>
 
   Object.keys(graduatedTableStats).forEach(year => {
     counts[year] = counts[year].concat(graduatedTableStats[year])
+  })
+
+  // Transfers
+  const insideTransfers = await transferredInsideFaculty(programmes, since)
+  const awayTransfers = await transferredAway(programmes, since)
+  const toTransfers = await transferredTo(programmes, since)
+
+  const transferGraphStats = [[...graphStats], [...graphStats], [...graphStats]]
+  const transferTableStats = {}
+  Object.keys(tableStats).forEach(year => (transferTableStats[year] = [0, 0, 0]))
+
+  insideTransfers.forEach(({ transferdate }) => {
+    const transferYear = defineYear(transferdate, isAcademicYear)
+    transferGraphStats[0][indexOf(yearsArray, transferYear)] += 1
+    transferTableStats[transferYear][0] += 1
+  })
+
+  awayTransfers.forEach(({ transferdate }) => {
+    const transferYear = defineYear(transferdate, isAcademicYear)
+    transferGraphStats[1][indexOf(yearsArray, transferYear)] += 1
+    transferTableStats[transferYear][1] += 1
+  })
+
+  toTransfers.forEach(({ transferdate }) => {
+    const transferYear = defineYear(transferdate, isAcademicYear)
+    transferGraphStats[2][indexOf(yearsArray, transferYear)] += 1
+    transferTableStats[transferYear][2] += 1
+  })
+
+  allBasics.graphStats.push({ name: 'Transferred inside', data: transferGraphStats[0] })
+  allBasics.graphStats.push({ name: 'Transferred away', data: transferGraphStats[1] })
+  allBasics.graphStats.push({ name: 'Transferred to', data: transferGraphStats[2] })
+
+  Object.keys(transferTableStats).forEach(year => {
+    counts[year] = counts[year].concat(transferTableStats[year])
   })
 
   // combine tablestats from all categories
