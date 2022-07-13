@@ -50,19 +50,49 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType, sp
   const graduatedGraphStats = [...graphStats]
   const graduatedTableStats = { ...tableStats }
 
+  const bachelorGraphStats = [...graphStats]
+  const bachelorTableStats = { ...tableStats }
+  const masterGraphStats = [...graphStats]
+  const masterTableStats = { ...tableStats }
+  const doctorGraphStats = [...graphStats]
+  const doctorTableStats = { ...tableStats }
+  const otherGraphStats = [...graphStats]
+  const otherTableStats = { ...tableStats }
+
   const graduatedRights = await graduatedStudyrights(faculty, since)
-  const filteredGraduates = graduatedRights.filter(({ extentcode }) => [1, 2, 4].includes(extentcode))
-  filteredGraduates.forEach(({ enddate }) => {
+  graduatedRights.forEach(({ enddate, extentcode }) => {
     const endYear = defineYear(enddate, isAcademicYear)
     graduatedGraphStats[indexOf(yearsArray, endYear)] += 1
     graduatedTableStats[endYear] += 1
+
+    if (extentcode === 1) {
+      bachelorGraphStats[indexOf(yearsArray, endYear)] += 1
+      bachelorTableStats[endYear] += 1
+    } else if (extentcode === 2) {
+      masterGraphStats[indexOf(yearsArray, endYear)] += 1
+      masterTableStats[endYear] += 1
+    } else if (extentcode === 4) {
+      doctorGraphStats[indexOf(yearsArray, endYear)] += 1
+      doctorTableStats[endYear] += 1
+    } else {
+      otherGraphStats[indexOf(yearsArray, endYear)] += 1
+      otherTableStats[endYear] += 1
+    }
   })
 
-  allBasics.graphStats.push({ name: 'Graduated', data: graduatedGraphStats })
+  allBasics.graphStats.push({ name: 'All graduated', data: graduatedGraphStats })
+  allBasics.graphStats.push({ name: 'Graduated bachelors', data: bachelorGraphStats })
+  allBasics.graphStats.push({ name: 'Graduated masters', data: masterGraphStats })
+  allBasics.graphStats.push({ name: 'Graduated doctors', data: doctorGraphStats })
+  allBasics.graphStats.push({ name: 'Other graduations', data: otherGraphStats })
+
   Object.keys(graduatedTableStats).forEach(year => {
     counts[year].push(graduatedTableStats[year])
+    counts[year].push(bachelorTableStats[year])
+    counts[year].push(masterTableStats[year])
+    counts[year].push(doctorTableStats[year])
+    counts[year].push(otherTableStats[year])
   })
-
   // combine tablestats from all categories
   allBasics.years = years
   years.forEach(year => {
