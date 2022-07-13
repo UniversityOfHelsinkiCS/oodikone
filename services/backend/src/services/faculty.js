@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
-const { Studyright, Student } = require('../models')
-const { formatStudyright } = require('./studyprogrammeHelpers')
+const { Studyright, Student, Transfer } = require('../models')
+const { formatStudyright, formatTransfer } = require('./studyprogrammeHelpers')
 
 const startedStudyrights = async (faculty, since) =>
   (
@@ -44,4 +44,47 @@ const graduatedStudyrights = async (faculty, since) =>
     })
   ).map(formatStudyright)
 
-module.exports = { startedStudyrights, graduatedStudyrights }
+const transferredInsideFaculty = async (programmes, since) =>
+  (
+    await Transfer.findAll({
+      where: {
+        transferdate: {
+          [Op.gte]: since,
+        },
+        sourcecode: programmes,
+        targetcode: programmes,
+      },
+    })
+  ).map(formatTransfer)
+
+const transferredAway = async (programmes, since) =>
+  (
+    await Transfer.findAll({
+      where: {
+        transferdate: {
+          [Op.gte]: since,
+        },
+        sourcecode: programmes,
+        targetcode: {
+          [Op.notIn]: programmes,
+        },
+      },
+    })
+  ).map(formatTransfer)
+
+const transferredTo = async (programmes, since) =>
+  (
+    await Transfer.findAll({
+      where: {
+        transferdate: {
+          [Op.gte]: since,
+        },
+        sourcecode: {
+          [Op.notIn]: programmes,
+        },
+        targetcode: programmes,
+      },
+    })
+  ).map(formatTransfer)
+
+module.exports = { startedStudyrights, graduatedStudyrights, transferredInsideFaculty, transferredAway, transferredTo }
