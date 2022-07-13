@@ -21,16 +21,17 @@ const filterDuplicateStudyrights = studyrights => {
   return Object.values(rightsToCount)
 }
 
-const combineFacultyBasics = async (allBasics, faculty, programmes, yearType, specialGroups, counts, years) => {
+const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) => {
+  let counts = {}
+  let years = []
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const yearsArray = getYearsArray(since.getFullYear(), isAcademicYear)
   let { graphStats, tableStats } = getStatsBasis(yearsArray)
 
+  // Started studying in faculty
   const startedGraphStats = [...graphStats]
   const startedTableStats = { ...tableStats }
-
-  // Started studying in faculty
   const studyrights = await startedStudyrights(faculty, since)
   const filteredStudyrights = filterDuplicateStudyrights(studyrights)
 
@@ -46,53 +47,43 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType, sp
     years.push(year)
   })
 
-  // Graduated
-  const graduatedGraphStats = [...graphStats]
-  const graduatedTableStats = { ...tableStats }
-
-  const bachelorGraphStats = [...graphStats]
-  const bachelorTableStats = { ...tableStats }
-  const masterGraphStats = [...graphStats]
-  const masterTableStats = { ...tableStats }
-  const doctorGraphStats = [...graphStats]
-  const doctorTableStats = { ...tableStats }
-  const otherGraphStats = [...graphStats]
-  const otherTableStats = { ...tableStats }
+  // Graduated in faculty
+  const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
+  const graduatedTableStats = {}
+  Object.keys(tableStats).forEach(year => (graduatedTableStats[year] = [0, 0, 0, 0, 0]))
 
   const graduatedRights = await graduatedStudyrights(faculty, since)
+
   graduatedRights.forEach(({ enddate, extentcode }) => {
     const endYear = defineYear(enddate, isAcademicYear)
-    graduatedGraphStats[indexOf(yearsArray, endYear)] += 1
-    graduatedTableStats[endYear] += 1
+    graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
+    graduatedTableStats[endYear][0] += 1
 
     if (extentcode === 1) {
-      bachelorGraphStats[indexOf(yearsArray, endYear)] += 1
-      bachelorTableStats[endYear] += 1
+      graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
+      graduatedTableStats[endYear][1] += 1
     } else if (extentcode === 2) {
-      masterGraphStats[indexOf(yearsArray, endYear)] += 1
-      masterTableStats[endYear] += 1
+      graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
+      graduatedTableStats[endYear][2] += 1
     } else if (extentcode === 4) {
-      doctorGraphStats[indexOf(yearsArray, endYear)] += 1
-      doctorTableStats[endYear] += 1
+      graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
+      graduatedTableStats[endYear][3] += 1
     } else {
-      otherGraphStats[indexOf(yearsArray, endYear)] += 1
-      otherTableStats[endYear] += 1
+      graduatedGraphStats[4][indexOf(yearsArray, endYear)] += 1
+      graduatedTableStats[endYear][4] += 1
     }
   })
 
-  allBasics.graphStats.push({ name: 'All graduated', data: graduatedGraphStats })
-  allBasics.graphStats.push({ name: 'Graduated bachelors', data: bachelorGraphStats })
-  allBasics.graphStats.push({ name: 'Graduated masters', data: masterGraphStats })
-  allBasics.graphStats.push({ name: 'Graduated doctors', data: doctorGraphStats })
-  allBasics.graphStats.push({ name: 'Other graduations', data: otherGraphStats })
+  allBasics.graphStats.push({ name: 'All graduated', data: graduatedGraphStats[0] })
+  allBasics.graphStats.push({ name: 'Graduated bachelors', data: graduatedGraphStats[1] })
+  allBasics.graphStats.push({ name: 'Graduated masters', data: graduatedGraphStats[2] })
+  allBasics.graphStats.push({ name: 'Graduated doctors', data: graduatedGraphStats[3] })
+  allBasics.graphStats.push({ name: 'Other graduations', data: graduatedGraphStats[4] })
 
   Object.keys(graduatedTableStats).forEach(year => {
-    counts[year].push(graduatedTableStats[year])
-    counts[year].push(bachelorTableStats[year])
-    counts[year].push(masterTableStats[year])
-    counts[year].push(doctorTableStats[year])
-    counts[year].push(otherTableStats[year])
+    counts[year] = counts[year].concat(graduatedTableStats[year])
   })
+
   // combine tablestats from all categories
   allBasics.years = years
   years.forEach(year => {
