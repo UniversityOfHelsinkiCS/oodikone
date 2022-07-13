@@ -1,7 +1,7 @@
 import React from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
-import { useGetCreditStatsQuery, useGetBasicStatsQuery } from 'redux/facultyStats'
+import { useGetFacultyCreditStatsQuery, useGetFacultyBasicStatsQuery } from 'redux/facultyStats'
 import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
 import StackedBarChart from 'components/StudyProgramme/BasicOverview/StackedBarChart'
 import DataTable from 'components/StudyProgramme/BasicOverview/DataTable'
@@ -14,8 +14,8 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const credits = useGetCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
-  const basics = useGetBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
+  const credits = useGetFacultyCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
+  const basics = useGetFacultyBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
 
   const getDivider = (title, toolTipText) => (
     <>
