@@ -39,7 +39,7 @@ const allNavigationItems = {
 }
 
 const NavigationBar = () => {
-  const { isLoading, rights, mockedBy, userId, roles, isAdmin } = useGetAuthorizedUserQuery()
+  const { isLoading, rights, iamRights, mockedBy, userId, roles, isAdmin } = useGetAuthorizedUserQuery()
   const showAsUser = useShowAsUser()
   const [logout] = useLogoutMutation()
 
@@ -48,7 +48,7 @@ const NavigationBar = () => {
     if (isLoading) return visibleNavigationItems
     Object.keys(allNavigationItems).forEach(key => {
       if (key === 'populations') {
-        if (!isAdmin && rights.length === 0) return
+        if (!isAdmin && rights.length === 0 && iamRights.length === 0) return
       }
       if (key === 'students' || key === 'customPopulations') {
         if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) return

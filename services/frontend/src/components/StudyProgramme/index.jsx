@@ -24,7 +24,7 @@ const StudyProgramme = props => {
   const history = useHistory()
   const programmes = useSelector(state => state.populationProgrammes?.data?.programmes)
   const { language } = useLanguage()
-  const { isAdmin } = useGetAuthorizedUserQuery()
+  const { isAdmin, rights } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
@@ -89,15 +89,16 @@ const StudyProgramme = props => {
       })
     }
 
-    panes.push({
-      menuItem: 'Degree Courses',
-      render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
-    })
-
-    panes.push({
-      menuItem: 'Tags',
-      render: () => <Tags studyprogramme={studyProgrammeId} />,
-    })
+    if (isAdmin || rights.includes(studyProgrammeId)) {
+      panes.push({
+        menuItem: 'Degree Courses',
+        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
+      })
+      panes.push({
+        menuItem: 'Tags',
+        render: () => <Tags studyprogramme={studyProgrammeId} />,
+      })
+    }
     return panes
   }
 
