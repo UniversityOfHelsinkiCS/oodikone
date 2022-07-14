@@ -377,13 +377,13 @@ router.post('/v3/populationstatisticsbystudentnumbers', async (req, res) => {
 
 router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   const {
-    user: { rights, roles },
+    user: { rights, iamRights, roles },
   } = req
   if (roles?.includes('admin')) {
     const studyrights = await StudyrightService.getAssociations()
     res.json(studyrights)
   } else {
-    const studyrights = await StudyrightService.getFilteredAssociations(rights)
+    const studyrights = await StudyrightService.getFilteredAssociations(rights.concat(iamRights))
     res.json(studyrights)
   }
 })
