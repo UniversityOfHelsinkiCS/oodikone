@@ -4,6 +4,7 @@ import { Accordion } from 'semantic-ui-react'
 import useFilters from 'components/FilterView/useFilters'
 import studyPlanFilter from 'components/FilterView/filters/hops'
 import { useLocalStorage } from '../../common/hooks'
+import { useGetAuthorizedUserQuery } from '../../redux/auth'
 
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
@@ -28,6 +29,7 @@ const PopulationDetails = ({
 }) => {
   const { language } = useLanguage()
   const [activeIndex, setActiveIndex] = useLocalStorage('populationActiveIndex', [])
+  const { isLoading: authLoading, rights, isAdmin } = useGetAuthorizedUserQuery()
   const creditGraphRef = useRef()
   const creditGainRef = useRef()
   const courseTableRef = useRef()
@@ -86,6 +88,8 @@ const PopulationDetails = ({
     return <Message negative content="No statistics found for the given query." />
   } */
 
+  const onlyIamRights = !authLoading && !isAdmin && !rights.includes(query?.studyRights?.programme)
+
   const panels = [
     {
       key: 0,
@@ -138,7 +142,7 @@ const PopulationDetails = ({
         content: <AgeStats filteredStudents={filteredStudents} query={query} />,
       },
     },
-    {
+    !onlyIamRights && {
       key: 3,
       title: {
         content: (
@@ -161,7 +165,7 @@ const PopulationDetails = ({
         ),
       },
     },
-    {
+    !onlyIamRights && {
       key: 4,
       title: {
         content: (
