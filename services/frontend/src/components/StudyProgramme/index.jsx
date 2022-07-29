@@ -66,21 +66,6 @@ const StudyProgramme = props => {
         />
       ),
     })
-    panes.push({
-      menuItem: (
-        <Menu.Item key="Programme courses">
-          Programme courses
-          <Label color="green">New!</Label>
-        </Menu.Item>
-      ),
-      render: () => (
-        <ProgrammeCoursesOverview
-          academicYear={academicYear}
-          studyProgramme={studyProgrammeId}
-          setAcademicYear={setAcademicYear}
-        />
-      ),
-    })
 
     if (isAdmin) {
       panes.push({
@@ -90,6 +75,21 @@ const StudyProgramme = props => {
     }
 
     if (isAdmin || rights.includes(studyProgrammeId)) {
+      panes.push({
+        menuItem: (
+          <Menu.Item key="Programme courses">
+            Programme courses
+            <Label color="green">New!</Label>
+          </Menu.Item>
+        ),
+        render: () => (
+          <ProgrammeCoursesOverview
+            academicYear={academicYear}
+            studyProgramme={studyProgrammeId}
+            setAcademicYear={setAcademicYear}
+          />
+        ),
+      })
       panes.push({
         menuItem: 'Degree Courses',
         render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
