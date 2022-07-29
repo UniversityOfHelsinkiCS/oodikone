@@ -180,13 +180,13 @@ router.get('/v3/populationstatistics', async (req, res) => {
     return
   }
   let studyRights = null
-  try {
-    studyRights = JSON.parse(studyRightsJSON)
-    const {
-      user: { rights, isAdmin },
-    } = req
+  studyRights = JSON.parse(studyRightsJSON)
+  const {
+    user: { rights, iamRights, isAdmin },
+  } = req
 
-    if (!isAdmin && !rights.includes(studyRights.programme)) {
+  try {
+    if (!isAdmin && !rights.includes(studyRights.programme) && !iamRights.includes(studyRights.programme)) {
       res.status(403).json([])
       return
     }
@@ -230,6 +230,27 @@ router.get('/v3/populationstatistics', async (req, res) => {
       Sentry.captureException(new Error(result.error))
       res.status(400).end()
       return
+    }
+
+    // Obfuscate if user has only iam rights
+    if (!isAdmin && !rights.includes(studyRights.programme)) {
+      const randomHash = crypto.randomBytes(12).toString('hex')
+      result.students = result.students.map(student => {
+        const studentNumberHash = crypto.createHash('md5').update(`${student.studentNumber}${randomHash}`).digest('hex')
+        const obfuscatedBirthDate = new Date(new Date(student.birthdate).setMonth(0, 0)) // only birth year for age distribution
+        return {
+          ...student,
+          firstnames: '',
+          lastname: '',
+          started: null,
+          studentNumber: studentNumberHash,
+          name: '',
+          email: '',
+          tags: [],
+          birthdate: obfuscatedBirthDate,
+          obfuscated: true,
+        }
+      })
     }
 
     res.json(filterPersonalTags(result, user.id))
