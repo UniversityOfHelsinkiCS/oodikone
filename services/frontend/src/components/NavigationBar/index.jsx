@@ -43,11 +43,6 @@ const NavigationBar = () => {
   const showAsUser = useShowAsUser()
   const [logout] = useLogoutMutation()
 
-  // Remove population tab for user with only IAM rights, delete when limited access ready
-  if (!isLoading && !isAdmin && rights.length === 0 && iamRights.length !== 0) {
-    delete allNavigationItems.populations.items[0]
-  }
-
   const refreshNavigationRoutes = () => {
     const visibleNavigationItems = {}
     if (isLoading) return visibleNavigationItems
