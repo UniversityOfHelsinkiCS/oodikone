@@ -22,6 +22,7 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
     years: [],
     tableStats: [],
     graphStats: [],
+    startedProgrammes: {},
     titles: [
       '',
       'Started studying',
@@ -60,6 +61,7 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
     years: [],
     tableStats: [],
     graphStats: [],
+    programmeTableStats: {},
     titles: [
       '',
       'Total',
@@ -95,6 +97,7 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
     { name: 'Non-major other faculty students credits', data: otherNonMajor },
     { name: 'Non-degree credits', data: nonDegree },
   ]
+
   return res.json(allCredits)
 })
 

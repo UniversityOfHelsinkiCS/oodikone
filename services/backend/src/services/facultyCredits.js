@@ -116,7 +116,7 @@ const getFacultyRegularCreditStats = async ({
 
 // Fetches all credits for the studytrack and combines them into statistics
 // These are for the faculty view which differs from study programme overview
-// (no tranfers, non majors split to in- and outside-faculty)
+// (no transfers, non majors split to in- and outside-faculty)
 const getFacultyCreditStatsForStudytrack = async ({ studyprogramme, facultyProgrammes, settings }) => {
   const { isAcademicYear, includeAllSpecials } = settings
   const since = getStartDate(studyprogramme, isAcademicYear)
@@ -203,6 +203,7 @@ const combineFacultyCredits = async (allCredits, programmes, yearType, specialGr
   for (const prog of programmes) {
     const data = await getProgrammeCredits(prog, yearType, specialGroups, programmes)
     if (data) {
+      allCredits.programmeTableStats[prog] = data.tableStats
       if (!allCredits.lastUpdated || new Date(data.lastUpdated) > new Date(allCredits.lastUpdated))
         allCredits.lastUpdated = data.lastUpdated
 

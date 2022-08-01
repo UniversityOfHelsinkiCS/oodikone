@@ -41,13 +41,21 @@ const getFacultyStarters = async (
   const startedTableStats = { ...tableStats }
   const studyrights = await startedStudyrights(faculty, since)
   const filteredStudyrights = filterDuplicateStudyrights(studyrights)
+  const programmeTableStats = {}
 
-  filteredStudyrights.forEach(({ studystartdate }) => {
+  filteredStudyrights.forEach(({ studystartdate, startedProgramme }) => {
     const startYear = defineYear(studystartdate, isAcademicYear)
     startedGraphStats[indexOf(yearsArray, startYear)] += 1
     startedTableStats[startYear] += 1
+
+    if (!(startedProgramme in programmeTableStats)) {
+      programmeTableStats[startedProgramme] = { ...tableStats }
+    }
+    programmeTableStats[startedProgramme][startYear] += 1
   })
+
   allBasics.graphStats.push({ name: 'Started studying', data: startedGraphStats })
+  allBasics.startedProgrammes = programmeTableStats
 
   Object.keys(startedTableStats).forEach(year => {
     counts[year] = [startedTableStats[year]]
