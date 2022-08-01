@@ -8,6 +8,10 @@ updates:
     labels:
       - 'dependencies'
       - 'infra'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
   - package-ecosystem: npm
     directory: '/updater/sis-updater-scheduler'
     schedule:
@@ -16,6 +20,10 @@ updates:
     labels:
       - 'dependencies'
       - 'updater'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
   - package-ecosystem: npm
     directory: '/updater/sis-updater-worker'
     schedule:
@@ -24,6 +32,10 @@ updates:
     labels:
       - 'dependencies'
       - 'updater'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
   - package-ecosystem: npm
     directory: '/services/backend'
     schedule:
@@ -32,6 +44,10 @@ updates:
     labels:
       - 'dependencies'
       - 'back'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
   - package-ecosystem: npm
     directory: '/services/frontend'
     schedule:
@@ -40,6 +56,10 @@ updates:
     labels:
       - 'dependencies'
       - 'front'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
