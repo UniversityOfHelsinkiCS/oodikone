@@ -1,0 +1,46 @@
+name: 'Run tests'
+description: 'Runs Cypress tests for individual spec'
+
+inputs:
+  spec:
+    required: true
+    description: 'Path to Cypress file'
+
+runs:
+  using: composite
+  steps:
+    - name: 'Download images'
+      uses: actions/download-artifact@v3
+      with:
+        path: /tmp/
+    - name: 'Load built images'
+      shell: bash
+      run: |
+        docker load --input /tmp/artifact/backend.tar
+        docker load --input /tmp/artifact/frontend.tar
+    - name: 'Login to toska docker registry'
+      uses: docker/login-action@v2
+      with:
+        registry: registry.toska.cs.helsinki.fi
+        username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
+        password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
+    - name: 'Run services, pull rest of the needed images'
+      shell: bash
+      run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
+    - name: 'Run cypress'
+      uses: cypress-io/github-action@v2
+      with:
+        browser: chrome
+        spec: ${{ inputs.spec }}
+      env:
+        CYPRESS_baseUrl: http://localhost:1337
+    - name: 'Upload video if tests fail'
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: Cypress videos
+        path: ./cypress/videos/*
+    - name: 'Print logs on failure'
+      shell: bash
+      if: failure()
+      run: docker-compose --file docker-compose.ci.yml logs

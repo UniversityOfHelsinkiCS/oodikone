@@ -9,7 +9,7 @@ module.exports = {
   '*.css': files => `stylelint --fix ${files.join(' ')}`,
   Dockerfile: files => `${dockerCmdBase} hadolint/hadolint:v2.7.0 hadolint ${relativeFilePaths(files)}`,
   '*.sh': files => `${dockerCmdBase} koalaman/shellcheck:v0.7.2 ${relativeFilePaths(files)} -x`,
-  '.github/workflows/*': files => `npm run actionlint ${relativeFilePaths(files)}`,
+  '.github/{workflows,actions}/*': files => `npm run actionlint ${relativeFilePaths(files)}`,
   'docker-compose*': files => {
     const composeFiles = file => {
       if (['docker-compose.ci.yml', 'docker-compose.test.yml'].some(f => file.includes(f))) {
