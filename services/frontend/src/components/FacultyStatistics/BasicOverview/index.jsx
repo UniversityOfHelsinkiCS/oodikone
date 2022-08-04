@@ -5,6 +5,7 @@ import { useGetFacultyCreditStatsQuery, useGetFacultyBasicStatsQuery } from 'red
 import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
 import StackedBarChart from 'components/StudyProgramme/BasicOverview/StackedBarChart'
 import DataTable from 'components/StudyProgramme/BasicOverview/DataTable'
+import InteractiveDataTable from '../InteractiveDataView'
 import Toggle from '../../StudyProgramme/Toggle'
 import InfoBox from '../../Info/InfoBox'
 import InfotoolTips from '../../../common/InfoToolTips'
@@ -74,9 +75,10 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                   data={credits?.data?.graphStats}
                   labels={credits?.data?.years}
                 />
-                <DataTable
+                <InteractiveDataTable
                   cypress="CreditsProducedByTheFaculty"
-                  data={credits?.data?.tableStats}
+                  dataStats={credits?.data?.tableStats}
+                  dataProgrammeStats={credits?.data?.programmeTableStats}
                   titles={credits?.data?.titles}
                 />
               </div>
