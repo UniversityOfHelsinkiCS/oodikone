@@ -1,17 +1,17 @@
 import React from 'react'
-import { Table, Button } from 'semantic-ui-react'
+import { Table } from 'semantic-ui-react'
 import CollapsedStackedBar from './CollapsedStackedBar'
+import ToggleTableView from './ToggleTableView'
 
 const InteractiveDataTable = ({ cypress, dataStats, dataProgrammeStats, titles, wideTable }) => {
   if (!dataStats || !titles || !dataProgrammeStats) return null
 
-  const handleClick = () => {}
-
+  const yearRef = React.createRef()
   return (
     <div className={`table-container${wideTable ? '-wide' : ''}`}>
       <Table data-cy={`Table-${cypress}`} celled>
         <Table.Header>
-          <Table.Row>
+          <Table.Row key={`randow-header-row-${Math.random()}`}>
             {titles?.map(title => (
               <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
             ))}
@@ -21,32 +21,24 @@ const InteractiveDataTable = ({ cypress, dataStats, dataProgrammeStats, titles, 
         <Table.Body>
           {dataStats?.map((yearArray, yearIndex) => (
             <>
-              <Table.Row key={`random-year-key-${Math.random()}`}>
-                {yearArray?.map((value, index) => (
-                  <>
-                    {index === 0 ? (
-                      <Table.Cell key={`random-yearcell-key-${Math.random()}`}>
-                        <Button key={`button-random-key-${Math.random()}`} onClick={handleClick}>
-                          {yearArray[0]}
-                        </Button>
-                      </Table.Cell>
-                    ) : (
-                      <Table.Cell key={`random-cell-key-${Math.random()}`}>{value}</Table.Cell>
-                    )}
-                  </>
-                ))}
-              </Table.Row>
-              <Table.Row rowSpan={100} key={`random-stacked-bar-${Math.random()}`}>
-                <Table.Cell colSpan={100}>
+              <ToggleTableView
+                key={`toggle-${yearArray[0]}-${Math.random()}`}
+                yearArray={yearArray}
+                show={`Show stats ${yearArray[0]}`}
+                hide="Hide"
+                ref={yearRef}
+              >
+                <Table.Cell key={`stack-cell${Math.random()}`} colSpan={100}>
                   <CollapsedStackedBar
                     data={Object.keys(dataProgrammeStats)?.map(programme =>
                       dataProgrammeStats[programme][yearIndex].slice(2)
                     )}
                     labels={Object.keys(dataProgrammeStats)?.map(programme => programme)}
                     names={titles.slice(2)}
+                    key={`stack-${yearArray[0]}-${Math.random()}`}
                   />
                 </Table.Cell>
-              </Table.Row>
+              </ToggleTableView>
             </>
           ))}
         </Table.Body>
