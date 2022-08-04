@@ -20,26 +20,24 @@ const InteractiveDataTable = ({ cypress, dataStats, dataProgrammeStats, titles, 
 
         <Table.Body>
           {dataStats?.map((yearArray, yearIndex) => (
-            <>
-              <ToggleTableView
-                key={`toggle-${yearArray[0]}-${Math.random()}`}
-                yearArray={yearArray}
-                show={`Show stats ${yearArray[0]}`}
-                hide="Hide"
-                ref={yearRef}
-              >
-                <Table.Cell key={`stack-cell${Math.random()}`} colSpan={100}>
-                  <CollapsedStackedBar
-                    data={Object.keys(dataProgrammeStats)?.map(programme =>
-                      dataProgrammeStats[programme][yearIndex].slice(2)
-                    )}
-                    labels={Object.keys(dataProgrammeStats)?.map(programme => programme)}
-                    names={titles.slice(2)}
-                    key={`stack-${yearArray[0]}-${Math.random()}`}
-                  />
-                </Table.Cell>
-              </ToggleTableView>
-            </>
+            <ToggleTableView
+              key={`toggle-${yearArray[0]}-${Math.random()}`}
+              yearArray={yearArray}
+              show={`Show stats ${yearArray[0]}`}
+              hide="Hide"
+              ref={yearRef}
+            >
+              <Table.Cell key={`stack-cell${Math.random()}`} colSpan={100}>
+                <CollapsedStackedBar
+                  data={Object.keys(dataProgrammeStats)?.map(programme =>
+                    dataProgrammeStats[programme][yearIndex].slice(2)
+                  )}
+                  labels={Object.keys(dataProgrammeStats)?.map(programme => programme)}
+                  names={titles.slice(2)}
+                  key={`stack-${Math.random()}`}
+                />
+              </Table.Cell>
+            </ToggleTableView>
           ))}
         </Table.Body>
       </Table>

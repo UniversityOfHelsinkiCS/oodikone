@@ -11,7 +11,7 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
     .map((obj, idx) => ({ name: names[idx], data: obj }))
     .reverse()
 
-  const flexHeight = labels.length < 5 ? `${(1 / 4) * 100}%` : `${labels.length * (1 / 25) * 100}%`
+  const flexHeight = labels.length < 5 ? `${(1 / 4) * 100}%` : `${labels.length * (1 / 28) * 100}%`
   const defaultConfig = {
     chart: {
       type: 'bar',
