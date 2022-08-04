@@ -92,8 +92,6 @@ describe('Custom population tests', () => {
 
   describe('Custom population searching', () => {
     it('Finds a proper population', () => {
-      cy.contains('Fail test')
-
       cy.fixture('customPopulations').then(({ studentNumbersForCSStudentsSet1 }) => {
         const students = studentNumbersForCSStudentsSet1
         searchFor(students)
