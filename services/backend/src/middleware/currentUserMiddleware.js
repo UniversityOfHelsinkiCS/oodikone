@@ -4,10 +4,12 @@ const { getUser, getMockedUser } = require('../services/userService')
 const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
 const { relevantIAMs } = require('../../config/IAMConfig')
+const { getOrganizationAccess } = require('../util/organizationAccess')
 
 const parseIamGroups = iamGroups => iamGroups?.split(';').filter(Boolean) ?? []
 
-const hasRequiredIamGroup = iamGroups => _.intersection(iamGroups, requiredGroup).length > 0
+const hasRequiredIamGroup = (iamGroups, iamRights) =>
+  _.intersection(iamGroups, requiredGroup).length > 0 || iamRights.length > 0
 
 const currentUserMiddleware = async (req, _res, next) => {
   const {
@@ -27,7 +29,9 @@ const currentUserMiddleware = async (req, _res, next) => {
 
   const iamGroups = parseIamGroups(hygroupcn).filter(iam => relevantIAMs.includes(iam))
 
-  if (!hasRequiredIamGroup(iamGroups)) {
+  const iamRights = Object.keys(await getOrganizationAccess({ iamGroups }))
+
+  if (!hasRequiredIamGroup(iamGroups, iamRights)) {
     throw new ApplicationError('User does not have required iam group', 403, { logoutUrl })
   }
 
