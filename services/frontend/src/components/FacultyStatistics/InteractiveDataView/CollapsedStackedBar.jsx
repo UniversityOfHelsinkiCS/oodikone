@@ -6,13 +6,18 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
-  const dataTranspose = transpose(data).map((obj, idx) => ({ name: names[idx], data: obj }))
+
+  const dataTranspose = transpose(data)
+    .map((obj, idx) => ({ name: names[idx], data: obj }))
+    .reverse()
+
+  const flexHeight = labels.length < 5 ? `${(1 / 4) * 100}%` : `${labels.length * (1 / 25) * 100}%`
   const defaultConfig = {
     chart: {
       type: 'bar',
       marginTop: 20,
-      height: 800,
-      width: 1000,
+      height: flexHeight,
+      padding: 2,
     },
     credits: {
       text: 'oodikone | TOSKA',
@@ -54,13 +59,18 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
       borderWidth: 1,
       shadow: false,
     },
+    tooltip: {
+      shared: true,
+    },
     plotOptions: {
       series: {
         stacking: 'normal',
+        pointWidth: 25,
         dataLabels: {
           enabled: true,
         },
-        reversed: true,
+        groupPadding: 4,
+        pointPadding: 4,
       },
     },
   }
