@@ -104,7 +104,6 @@ jobs:
         with:
           path: /tmp/frontend.tar
 
-
   build_and_push_anon_sis_db:
     name: 'Build anon sis-db and push to toska hub if new migrations have been added'
     runs-on: ubuntu-latest
@@ -252,38 +251,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: 'Download images'
-        uses: actions/download-artifact@v3
+      - name: 'Run tests'
+        uses: ./.github/actions/run-tests
         with:
-          path: /tmp/
-      - name: 'Load built images'
-        run: |
-          docker load --input /tmp/artifact/backend.tar
-          docker load --input /tmp/artifact/frontend.tar
-      - name: 'Login to toska docker registry'
-        uses: docker/login-action@v2
-        with:
-          registry: registry.toska.cs.helsinki.fi
-          username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
-          password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-      - name: 'Run services, pull rest of the needed images'
-        run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
-      - name: 'Run cypress'
-        uses: cypress-io/github-action@v2
-        with:
-          browser: chrome
           spec: cypress/integration/Custom_population.js
-        env:
-          CYPRESS_baseUrl: http://localhost:1337
-      - name: 'Upload video if tests fail'
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: Cypress videos
-          path: ./cypress/videos/*
-      - name: 'Print logs on failure'
-        if: failure()
-        run: docker-compose --file docker-compose.ci.yml logs
 
   test_population_statistics:
     name: 'Test population statistics'
