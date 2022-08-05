@@ -11,11 +11,11 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
     .map((obj, idx) => ({ name: names[idx], data: obj }))
     .reverse()
 
-  const flexHeight = labels.length < 5 ? `${(1 / 4) * 100}%` : `${labels.length * (1 / 28) * 100}%`
+  const flexHeight = labels.length < 6 ? `${(1 / 3) * 100}%` : `${labels.length * (1 / 22) * 100}%`
   const defaultConfig = {
     chart: {
       type: 'bar',
-      marginTop: 20,
+      marginTop: 40,
       height: flexHeight,
       padding: 2,
     },
@@ -48,10 +48,10 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
       },
     },
     legend: {
-      layout: 'vertical',
-      align: 'right',
-      x: -20,
-      verticalAlign: 'bottom',
+      layout: 'horizontal',
+      align: 'left',
+      x: 70,
+      verticalAlign: 'top',
       y: -10,
       floating: true,
       backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
@@ -69,8 +69,6 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
         dataLabels: {
           enabled: true,
         },
-        groupPadding: 4,
-        pointPadding: 4,
       },
     },
   }
