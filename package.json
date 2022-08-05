@@ -31,7 +31,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.17.0",
     "@babel/plugin-syntax-jsx": "^7.16.7",
-    "concurrently": "^6.5.1",
+    "concurrently": "^7.3.0",
     "cypress": "^10.4.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",
@@ -44,14 +44,14 @@
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-react": "^7.29.3",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "husky": "^7.0.4",
-    "lint-staged": "^11.2.6",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
     "node-actionlint": "^1.2.2",
     "prettier": "^2.5.1",
-    "stylelint": "^13.13.1",
-    "stylelint-config-prettier": "^8.0.2",
-    "stylelint-config-standard": "^22.0.0",
-    "stylelint-prettier": "^1.2.0"
+    "stylelint": "^14.9.1",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-standard": "^26.0.0",
+    "stylelint-prettier": "^2.0.0"
   },
   "dependencies": {
     "lodash": "^4.17.21",
