@@ -23,7 +23,14 @@
     "no-shadow": "off",
     "react/jsx-props-no-spreading": "off",
     "react/jsx-filename-extension": "off",
-    "no-async-promise-executor": "off",
+    "react/function-component-definition": [
+      2,
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ],
+    "default-param-last": "off",
     "no-implied-eval": "off",
     "react/state-in-constructor": "off",
     "react/static-property-placement": "off",

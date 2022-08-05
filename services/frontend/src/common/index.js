@@ -41,7 +41,7 @@ export const byName = (a, b) => a.name.localeCompare(b.name)
 
 export const byCodeDesc = (a, b) => b.code.localeCompare(a.code)
 
-export const studyRightRegex = new RegExp(/.*master|bachelor|doctor|licentiate|specialist.*/)
+export const studyRightRegex = /.*master|bachelor|doctor|licentiate|specialist.*/
 
 export const studyrightElementTypes = { programme: 20, speciality: 30 }
 
@@ -150,8 +150,8 @@ export const getUnifyTextIn = unifyCourses => {
 export const cancelablePromise = promise => {
   let hasCanceled = false
 
+  // eslint-disable-next-line no-async-promise-executor
   const wrappedPromise = new Promise(async (res, rej) => {
-    // eslint-disable-line no-async-promise-executor
     try {
       await promise
       if (hasCanceled) res(false)

@@ -5,6 +5,7 @@ const studyGuidanceGroupsApi = RTKApi.injectEndpoints({
     getAllStudyGuidanceGroups: builder.query({
       query: () => '/studyguidancegroups',
       providesTags: result => [
+        // eslint-disable-next-line no-unsafe-optional-chaining
         ...result?.map(({ id }) => ({ type: 'StudyGuidanceGroups', id })),
         { type: 'StudyGuidanceGroups', id: 'LIST' },
       ],
