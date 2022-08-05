@@ -1,3 +1,4 @@
+/* eslint-disable babel/no-invalid-this, class-methods-use-this */
 import React, { Component, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, object, bool, arrayOf } from 'prop-types'
