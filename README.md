@@ -108,7 +108,7 @@ There are three types of tests in this project: static tests with eslint/prettie
 
 - Cypress
   - can be launched in interactive mode with `npm run cypress open`. `package.json` defines entrypoint `npm run cypress` so you can basically run cypress with any arguments you want
-  - are defined in cypress -folder and cypress.json
+  - are defined in cypress -folder and cypress.config.json
   - whole cypress test stack takes about 15 to 20 mins to run. Since tests are ran in our Github actions CI pipe, you're encouraged to take advantage of this instead of running all tests locally.
   - There are some different user types and cypress commands defined for testing. Take a look at these when debugging tests.
 - Jest

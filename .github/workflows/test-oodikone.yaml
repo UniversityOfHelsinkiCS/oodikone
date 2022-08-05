@@ -7,7 +7,7 @@ on:
     paths:
       - '.github/workflows/test-oodikone.yaml'
       - 'cypress/**'
-      - 'cypress.json'
+      - 'cypress.config.json'
       - 'services/**'
       - '!services/backend/src/rapodiff.js'
       - 'docker-compose.ci.yml'
@@ -212,7 +212,7 @@ jobs:
         with:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-          spec: cypress/integration/Course_statistics.js
+          spec: cypress/e2e/Course_statistics.js
 
   test_custom_population:
     name: 'Test custom population'
@@ -230,7 +230,7 @@ jobs:
         with:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-          spec: cypress/integration/Custom_population.js
+          spec: cypress/e2e/Custom_population.js
 
   test_population_statistics:
     name: 'Test population statistics'
@@ -248,7 +248,7 @@ jobs:
         with:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-          spec: cypress/integration/Population_statistics.js
+          spec: cypress/e2e/Population_statistics.js
 
   test_filters:
     name: 'Test filters'
@@ -266,7 +266,7 @@ jobs:
         with:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-          spec: cypress/integration/Filters.js
+          spec: cypress/e2e/Filters.js
 
   test_student_statistics:
     name: 'Test student statistics'
@@ -284,7 +284,7 @@ jobs:
         with:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-          spec: cypress/integration/Student_statistics.js
+          spec: cypress/e2e/Student_statistics.js
 
   test_studyprogramme_overview:
     name: 'Test studyprogramme overview'
@@ -302,7 +302,7 @@ jobs:
         with:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-          spec: cypress/integration/Studyprogramme_overview.js
+          spec: cypress/e2e/Studyprogramme_overview.js
 
   test_teachers_and_users:
     name: 'Test teachers and users'
@@ -321,8 +321,8 @@ jobs:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
           spec: |
-            cypress/integration/Teachers.js
-            cypress/integration/Users.js
+            cypress/e2e/Teachers.js
+            cypress/e2e/Users.js
 
   test_faculty_statistics:
     name: 'Test faculty statistics'
@@ -340,7 +340,7 @@ jobs:
         with:
           username: ${{ secrets.TOSKAREGISTRY_USERNAME }}
           password: ${{ secrets.TOSKAREGISTRY_PASSWORD }}
-          spec: cypress/integration/Faculty_statistics.js
+          spec: cypress/e2e/Faculty_statistics.js
 
   # === Other tests ===
 
