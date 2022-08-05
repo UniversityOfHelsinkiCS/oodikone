@@ -41,6 +41,7 @@ const elementDetailsApi = RTKApi.injectEndpoints({
     getAllElementDetails: builder.query({
       query: () => '/elementdetails/all',
       providesTags: result => [
+        // eslint-disable-next-line no-unsafe-optional-chaining
         ...result?.map(({ id }) => ({ type: 'StudyGuidanceGroups', id })),
         { type: 'StudyGuidanceGroups', id: 'LIST' },
       ],
