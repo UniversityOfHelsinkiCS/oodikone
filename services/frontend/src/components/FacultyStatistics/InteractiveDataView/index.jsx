@@ -21,13 +21,13 @@ const InteractiveDataTable = ({ cypress, dataStats, dataProgrammeStats, titles, 
         <Table.Body>
           {dataStats?.map((yearArray, yearIndex) => (
             <ToggleTableView
-              key={`toggle-${yearArray[0]}-${Math.random()}`}
               yearArray={yearArray}
-              show={`Show stats ${yearArray[0]}`}
-              hide="Hide"
+              cypress={cypress}
+              yearIndex={yearIndex}
               ref={yearRef}
+              key={`togglable-${Math.random()}`}
             >
-              <Table.Cell key={`stack-cell${Math.random()}`} colSpan={100}>
+              <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`} colSpan={100}>
                 <CollapsedStackedBar
                   data={Object.keys(dataProgrammeStats)?.map(programme =>
                     dataProgrammeStats[programme][yearIndex].slice(2)

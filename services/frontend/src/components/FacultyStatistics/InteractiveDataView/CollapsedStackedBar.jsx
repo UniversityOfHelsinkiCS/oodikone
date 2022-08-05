@@ -17,6 +17,9 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
       type: 'bar',
       marginTop: 40,
       height: flexHeight,
+      scrollablePlotArea: {
+        minWidth: 650,
+      },
       padding: 2,
     },
     credits: {
@@ -50,7 +53,7 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
     legend: {
       layout: 'horizontal',
       align: 'left',
-      x: 70,
+      x: 40,
       verticalAlign: 'top',
       y: -10,
       floating: true,
