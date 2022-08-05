@@ -34,7 +34,7 @@ runs:
       shell: bash
       run: docker-compose --file docker-compose.ci.yml up --detach --no-recreate
     - name: 'Run cypress'
-      uses: cypress-io/github-action@v2
+      uses: cypress-io/github-action@v4
       with:
         browser: chrome
         spec: ${{ inputs.spec }}
