@@ -27,13 +27,13 @@
 .faculty-courses .radio-toggle {
   display: flex;
   justify-content: center;
-  margin: 20px 35px 20px 35px;
+  margin: 20px 35px;
 }
 
 .programmes-overview .radio-toggle {
   display: flex;
   justify-content: center;
-  margin: 0 35px 70px 35px;
+  margin: 0 35px 70px;
 }
 
 .programmes-overview .toggle-label,
@@ -61,7 +61,7 @@
 .programmes-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
 .faculty-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
 .faculty-courses .ui.toggle.checkbox input:focus:checked ~ label::before {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgb(0 0 0 / 5%) !important;
 }
 
 .faculty-overview .divider {
@@ -110,12 +110,12 @@
 
 .programmes-overview .datatable .total-row-cell,
 .programmes-overview .table-container .total-row-cell {
-  border-top: 3px solid rgb(189, 180, 180);
+  border-top: 3px solid rgb(189 180 180);
   font-weight: bold;
 }
 
 .programmes-overview .programmes-selector {
-  margin: 60px 60px 30px 60px;
+  margin: 60px 60px 30px;
 }
 
 .programmes-overview .header-row {
@@ -123,7 +123,7 @@
 }
 
 .programmes-overview .datatable {
-  margin: 2em 0 5em 0;
+  margin: 2em 0 5em;
 }
 
 .programmes-overview .no-data-message {

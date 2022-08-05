@@ -27,13 +27,13 @@
 .studyprogramme-courses .radio-toggle {
   display: flex;
   justify-content: center;
-  margin: 20px 35px 20px 35px;
+  margin: 20px 35px;
 }
 
 .studytrack-overview .radio-toggle {
   display: flex;
   justify-content: center;
-  margin: 0 35px 70px 35px;
+  margin: 0 35px 70px;
 }
 
 .studytrack-overview .toggle-label,
@@ -61,7 +61,7 @@
 .studytrack-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
 .studyprogramme-overview .ui.toggle.checkbox input:focus:checked ~ label::before,
 .studyprogramme-courses .ui.toggle.checkbox input:focus:checked ~ label::before {
-  background-color: rgba(0, 0, 0, 0.05) !important;
+  background-color: rgb(0 0 0 / 5%) !important;
 }
 
 .studyprogramme-overview .divider {
@@ -110,12 +110,12 @@
 
 .studytrack-overview .datatable .total-row-cell,
 .studytrack-overview .table-container .total-row-cell {
-  border-top: 3px solid rgb(189, 180, 180);
+  border-top: 3px solid rgb(189 180 180);
   font-weight: bold;
 }
 
 .studytrack-overview .studytrack-selector {
-  margin: 60px 60px 30px 60px;
+  margin: 60px 60px 30px;
 }
 
 .studytrack-overview .header-row {
@@ -123,7 +123,7 @@
 }
 
 .studytrack-overview .datatable {
-  margin: 2em 0 5em 0;
+  margin: 2em 0 5em;
 }
 
 .studytrack-overview .no-data-message {
