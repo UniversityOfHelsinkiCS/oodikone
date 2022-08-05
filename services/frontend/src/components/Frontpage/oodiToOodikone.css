@@ -6,6 +6,7 @@ blockquote {
   position: relative;
   padding: 40px 20px;
 }
+
 blockquote::before {
   content: open-quote;
   top: 0;

@@ -1,3 +1,5 @@
+/* stylelint-disable number-max-precision */
+
 .ui.table .sortable-table-date-picker {
   color: black;
   font-weight: normal;
@@ -85,14 +87,14 @@
   min-width: -webkit-max-content;
   min-width: -moz-max-content;
   margin: 0;
-  padding: 0 0;
+  padding: 0;
   background: #fff;
   font-size: 1em;
   text-shadow: none;
   text-align: left;
-  -webkit-box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
-  box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
-  border: 1px solid rgba(34, 36, 38, 0.15);
+  -webkit-box-shadow: 0 2px 3px 0 rgb(34 36 38 / 15%);
+  box-shadow: 0 2px 3px 0 rgb(34 36 38 / 15%);
+  border: 1px solid rgb(34 36 38 / 15%);
   border-radius: 0.28571429rem;
   -webkit-transition: opacity 0.1s ease;
   transition: opacity 0.1s ease;
@@ -116,12 +118,12 @@
   margin: 0 !important;
   min-width: 100% !important;
   width: auto !important;
-  border-top: 1px solid rgba(34, 36, 38, 0.15);
+  border-top: 1px solid rgb(34 36 38 / 15%);
   max-height: 15.42857143rem;
 }
 
 .filter-menu .actions {
-  border-top: 1px solid rgba(34, 36, 38, 0.15);
+  border-top: 1px solid rgb(34 36 38 / 15%);
 }
 
 .filter-menu .item {
@@ -133,7 +135,7 @@
   text-align: left;
   border-top: none;
   line-height: 1em;
-  color: rgba(0, 0, 0, 0.87);
+  color: rgb(0 0 0 / 87%);
   padding: 0.78571429rem 1.14285714rem !important;
   font-size: 1rem;
   text-transform: none;
@@ -144,7 +146,7 @@
 }
 
 .filter-menu .item:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 0.95);
+  background: rgb(0 0 0 / 5%);
+  color: rgb(0 0 0 / 95%);
   z-index: 13;
 }

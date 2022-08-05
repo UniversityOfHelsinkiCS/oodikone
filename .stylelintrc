@@ -13,6 +13,10 @@
         "ignorePseudoClasses": ["global"]
       }
     ],
-    "prettier/prettier": true
+    "prettier/prettier": true,
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "value-no-vendor-prefix": null,
+    "property-no-vendor-prefix": null
   }
 }
