@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React, { useState, useRef, useMemo } from 'react'
 import { renderToString } from 'react-dom/server'
 import moment from 'moment'
@@ -261,9 +262,7 @@ const createGoalSeries = (starting, ending, absences) => {
   }
 }
 
-// eslint-disable-next-line camelcase
 const resolveStudyRightElement = ({ studyright_elements }) => {
-  // eslint-disable-next-line camelcase
   if (!studyright_elements || !studyright_elements.length) return {}
   return (
     studyright_elements
