@@ -8,6 +8,15 @@ const resolveStudyRightCode = studyright_elements => {
   return null
 }
 
+const resolveGraduatedCode = studyright_elements => {
+  if (!studyright_elements) return null
+  const studyRightElement = studyright_elements
+    .filter(sre => sre.element_detail.type === 20)
+    .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
+  if (studyRightElement) return studyRightElement.code
+  return null
+}
+
 const facultyFormatStudyright = studyright => {
   const {
     studyrightid,
@@ -33,7 +42,8 @@ const facultyFormatStudyright = studyright => {
     extentcode,
     studentnumber: student.studentnumber,
     startedProgramme: resolveStudyRightCode(studyright_elements),
-    // studyrightElements: studyright_elements,
+    graduatedProgramme: resolveGraduatedCode(studyright_elements),
+    //studyrightElements: studyright_elements,
     // name:
     //   studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
     //     ? studyright_elements[0].element_detail.name

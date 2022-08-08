@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
 const { ElementDetail, Studyright, StudyrightElement, Student, Transfer } = require('../models')
-const { formatTransfer, formatStudyright } = require('./studyprogrammeHelpers')
+const { formatTransfer } = require('./studyprogrammeHelpers')
 const { facultyFormatStudyright } = require('./facultyHelpers')
 
 const startedStudyrights = async (faculty, since) =>
@@ -41,6 +41,14 @@ const graduatedStudyrights = async (faculty, since) =>
           attributes: ['studentnumber'],
           required: true,
         },
+        {
+          model: StudyrightElement,
+          required: true,
+          include: {
+            model: ElementDetail,
+            required: true,
+          },
+        },
       ],
       where: {
         faculty_code: faculty,
@@ -51,7 +59,7 @@ const graduatedStudyrights = async (faculty, since) =>
         student_studentnumber: { [Op.not]: null },
       },
     })
-  ).map(formatStudyright)
+  ).map(facultyFormatStudyright)
 
 const transferredInsideFaculty = async (programmes, since) =>
   (
