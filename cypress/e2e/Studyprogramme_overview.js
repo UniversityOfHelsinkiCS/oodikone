@@ -499,4 +499,40 @@ describe('Studyprogramme overview', () => {
       cy.contains(name).should('not.exist')
     })
   })
+
+  describe('IAM user', () => {
+    beforeEach(() => {
+      cy.init('/study-programme', 'onlyiamrights')
+    })
+
+    it('can access programme and correct tabs are visible', () => {
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
+
+      cy.contains('Basic information')
+      cy.contains('Studytracks and student populations')
+
+      cy.contains('Update statistics').should('not.exist')
+      cy.contains('Degree Courses').should('not.exist')
+    })
+
+    it('can access basic information', () => {
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.contains('Basic information').click()
+
+      cy.get('[data-cy=Section-StudentsOfTheStudyprogramme]')
+      cy.get('[data-cy=Section-CreditsProducedByTheStudyprogramme]')
+      cy.get('[data-cy=Section-GraduatedAndThesisWritersOfTheProgramme]')
+      cy.get('[data-cy=Section-ProgrammesBeforeOrAfter]')
+      cy.get('[data-cy=Section-AverageGraduationTimes]')
+    })
+
+    it('can access studytracks', () => {
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
+      cy.get('.attached').contains('Studytracks and student populations').click()
+
+      cy.get('[data-cy=Section-StudytrackOverview]')
+      cy.get('[data-cy=Section-StudytrackProgress]')
+      cy.get('[data-cy=Section-AverageGraduationTimes]')
+    })
+  })
 })
