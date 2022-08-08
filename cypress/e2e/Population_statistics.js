@@ -224,6 +224,8 @@ describe('Population Statistics tests', () => {
     })
 
     it('Population statistics is visible', () => {
+      cy.reload()
+
       cy.get('.card').within(() => {
         cy.contains('Tietojenkäsittelytieteen kandiohjelma')
         cy.contains('Sample size: 170 students')

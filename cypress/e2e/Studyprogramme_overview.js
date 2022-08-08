@@ -506,6 +506,8 @@ describe('Studyprogramme overview', () => {
     })
 
     it('can access programme and correct tabs are visible', () => {
+      cy.reload()
+
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
 
       cy.contains('Basic information')
