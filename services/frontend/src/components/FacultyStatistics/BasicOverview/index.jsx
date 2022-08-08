@@ -64,6 +64,20 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                   cypress="StudentsOfTheFaculty"
                   data={basics?.data?.studentInfo.tableStats}
                   titles={basics?.data?.studentInfo.titles}
+                  labels={credits?.data?.years}
+                />
+              </div>
+            </>
+          )}
+          {basics.isSuccess && basics.data && (
+            <>
+              {getDivider('Graduated and thesis writers of the faculty', 'GraduatedAndThesisWritersOfTheFaculty')}
+              <div className="section-container">
+                <LineGraph cypress="GradustionsOfTheFaculty" data={basics?.data.graduationInfo} />
+                <DataTable
+                  cypress="GraduationsOfTheFaculty"
+                  data={basics?.data?.graduationInfo.tableStats}
+                  titles={basics?.data?.graduationInfo.titles}
                 />
               </div>
             </>
