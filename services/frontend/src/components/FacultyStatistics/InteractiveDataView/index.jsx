@@ -30,10 +30,10 @@ const InteractiveDataTable = ({ cypress, dataStats, dataProgrammeStats, titles, 
               <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`} colSpan={100}>
                 <CollapsedStackedBar
                   data={Object.keys(dataProgrammeStats)?.map(programme =>
-                    dataProgrammeStats[programme][yearIndex]?.slice(1)
+                    dataProgrammeStats[programme][yearIndex]?.slice(2)
                   )}
                   labels={Object.keys(dataProgrammeStats)?.map(programme => programme)}
-                  names={titles?.slice(1)}
+                  names={titles?.slice(2)}
                   key={`stack-${Math.random()}`}
                 />
               </Table.Cell>
