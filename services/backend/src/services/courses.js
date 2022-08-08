@@ -449,7 +449,8 @@ const codeLikeTerm = code =>
     ? undefined
     : {
         code: {
-          [Op.iLike]: `%${code.trim()}%`,
+          // Starts with code or has AY/A in front of the code
+          [Op.regexp]: `^(AY|ay|A|a)?${code}`,
         },
       }
 
