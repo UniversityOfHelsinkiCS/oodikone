@@ -27,26 +27,23 @@ describe('Faculty overview', () => {
   describe('Study programme information', () => {
     beforeEach(() => {
       cy.init('/faculties', 'admin')
-      cy.contains('td', 'H90').click()
+      cy.contains('td', 'H80').click()
     })
 
     it('Study programme credit information is not visible in the beginning', () => {
       cy.get('table[data-cy="Table-CreditsProducedByTheFaculty"]').should('be.visible')
-      /* GitHub Actions does not found the following cells for some reasons at the moment.
-      Will be fixed on 8.8.
+
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-0"]').should('not.be.visible')
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-1"]').should('not.be.visible')
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-2"]').should('not.be.visible')
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-3"]').should('not.be.visible')
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-4"]').should('not.be.visible')
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-5"]').should('not.be.visible')
-      */
     })
 
     it('Study programme credit information can be toggled', () => {
       cy.get('table[data-cy="Table-CreditsProducedByTheFaculty"]').should('be.visible')
-      /* GitHub Actions does not found the following cells for some reasons at the moment.
-      Will be fixed on 8.8.
+
       cy.get('button[data-cy="Button-CreditsProducedByTheFaculty-0"]').click()
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-0"]').should('be.visible')
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-1"]').should('not.be.visible')
@@ -68,7 +65,6 @@ describe('Faculty overview', () => {
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-3"]').should('be.visible')
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-4"]').should('not.be.visible')
       cy.get('td[data-cy="Cell-CreditsProducedByTheFaculty-5"]').should('not.be.visible')
-      */
     })
   })
 })
