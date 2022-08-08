@@ -17,6 +17,8 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
   const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const credits = useGetFacultyCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
   const basics = useGetFacultyBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
+  // basic.data.studentsInfo --> data for students of faculty table
+  // basics.data.graduationInfo --> data for graduated and thesis writers table
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -57,11 +59,11 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
             <>
               {getDivider('Students of the faculty', 'StudentsOfTheFaculty')}
               <div className="section-container">
-                <LineGraph cypress="StudentsOfTheFaculty" data={basics?.data} />
+                <LineGraph cypress="StudentsOfTheFaculty" data={basics?.data.studentInfo} />
                 <DataTable
                   cypress="StudentsOfTheFaculty"
-                  data={basics?.data?.tableStats}
-                  titles={basics?.data?.titles}
+                  data={basics?.data?.studentInfo.tableStats}
+                  titles={basics?.data?.studentInfo.titles}
                 />
               </div>
             </>
