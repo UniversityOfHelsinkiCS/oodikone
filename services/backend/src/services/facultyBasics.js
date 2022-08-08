@@ -54,7 +54,7 @@ const getFacultyStarters = async (
     programmeTableStats[startedProgramme][startYear] += 1
   })
 
-  allBasics.graphStats.push({ name: 'Started studying', data: startedGraphStats })
+  allBasics.studentInfo.graphStats.push({ name: 'Started studying', data: startedGraphStats })
   allBasics.startedProgrammes = programmeTableStats
 
   Object.keys(startedTableStats).forEach(year => {
@@ -98,11 +98,11 @@ const getFacultyGraduates = async (
     }
   })
 
-  allBasics.graphStats.push({ name: 'All graduated', data: graduatedGraphStats[0] })
-  allBasics.graphStats.push({ name: 'Graduated bachelors', data: graduatedGraphStats[1] })
-  allBasics.graphStats.push({ name: 'Graduated masters', data: graduatedGraphStats[2] })
-  allBasics.graphStats.push({ name: 'Graduated doctors', data: graduatedGraphStats[3] })
-  allBasics.graphStats.push({ name: 'Other graduations', data: graduatedGraphStats[4] })
+  allBasics.studentInfo.graphStats.push({ name: 'All graduated', data: graduatedGraphStats[0] })
+  allBasics.studentInfo.graphStats.push({ name: 'Graduated bachelors', data: graduatedGraphStats[1] })
+  allBasics.studentInfo.graphStats.push({ name: 'Graduated masters', data: graduatedGraphStats[2] })
+  allBasics.studentInfo.graphStats.push({ name: 'Graduated doctors', data: graduatedGraphStats[3] })
+  allBasics.studentInfo.graphStats.push({ name: 'Other graduations', data: graduatedGraphStats[4] })
 
   Object.keys(graduatedTableStats).forEach(year => {
     counts[year] = counts[year].concat(graduatedTableStats[year])
@@ -145,9 +145,9 @@ const getFacultyTransfers = async (
     transferTableStats[transferYear][2] += 1
   })
 
-  allBasics.graphStats.push({ name: 'Transferred inside', data: transferGraphStats[0] })
-  allBasics.graphStats.push({ name: 'Transferred away', data: transferGraphStats[1] })
-  allBasics.graphStats.push({ name: 'Transferred to', data: transferGraphStats[2] })
+  allBasics.studentInfo.graphStats.push({ name: 'Transferred inside', data: transferGraphStats[0] })
+  allBasics.studentInfo.graphStats.push({ name: 'Transferred away', data: transferGraphStats[1] })
+  allBasics.studentInfo.graphStats.push({ name: 'Transferred to', data: transferGraphStats[2] })
 
   Object.keys(transferTableStats).forEach(year => {
     counts[year] = counts[year].concat(transferTableStats[year])
@@ -175,9 +175,9 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) =>
   // combine tableStats from all categories
   allBasics.years = years
   years.forEach(year => {
-    allBasics.tableStats.push([year, ...counts[year]])
+    allBasics.studentInfo.tableStats.push([year, ...counts[year]])
   })
-  allBasics.tableStats.reverse()
+  allBasics.studentInfo.tableStats.reverse()
 }
 
 module.exports = { combineFacultyBasics }
