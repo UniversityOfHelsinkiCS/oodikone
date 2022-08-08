@@ -7,15 +7,16 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
 
-  const dataTranspose = transpose(data)
-    .map((obj, idx) => ({ name: names[idx], data: obj }))
-    .reverse()
-
+  const dataTranspose = data
+    ? transpose(data)
+        .map((obj, idx) => ({ name: names[idx], data: obj }))
+        .reverse()
+    : null
   const flexHeight = labels.length < 6 ? `${(1 / 3) * 100}%` : `${labels.length * (1 / 22) * 100}%`
   const defaultConfig = {
     chart: {
       type: 'bar',
-      marginTop: 40,
+      marginTop: 50,
       height: flexHeight,
       scrollablePlotArea: {
         minWidth: 650,
@@ -76,6 +77,9 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
     },
   }
 
+  if (!dataTranspose) {
+    return <>No data provided</>
+  }
   return <ReactHighcharts config={defaultConfig} />
 }
 
