@@ -55,7 +55,8 @@ const getFacultyStarters = async (
   })
 
   allBasics.studentInfo.graphStats.push({ name: 'Started studying', data: startedGraphStats })
-  allBasics.startedProgrammes = programmeTableStats
+  //allBasics.startedProgrammes = programmeTableStats
+  // console.log(programmeTableStats)
 
   Object.keys(startedTableStats).forEach(year => {
     counts[year] = [startedTableStats[year]]
@@ -76,26 +77,37 @@ const getFacultyGraduates = async (
   const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
   const graduatedTableStats = {}
   Object.keys(tableStats).forEach(year => (graduatedTableStats[year] = [0, 0, 0, 0, 0]))
+  const programmeTableStats = {}
 
   const graduatedRights = await graduatedStudyrights(faculty, since)
 
-  graduatedRights.forEach(({ enddate, extentcode }) => {
+  graduatedRights.forEach(({ enddate, extentcode, graduatedProgramme }) => {
     const endYear = defineYear(enddate, isAcademicYear)
     graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
     graduatedTableStats[endYear][0] += 1
 
+    if (!(graduatedProgramme in programmeTableStats)) {
+      programmeTableStats[graduatedProgramme] = {}
+      Object.keys(tableStats).forEach(year => (programmeTableStats[graduatedProgramme][year] = [0, 0, 0, 0, 0]))
+    }
+    programmeTableStats[graduatedProgramme][endYear][0] += 1
+
     if (extentcode === 1) {
       graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][1] += 1
+      programmeTableStats[graduatedProgramme][endYear][1] += 1
     } else if (extentcode === 2) {
       graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][2] += 1
+      programmeTableStats[graduatedProgramme][endYear][2] += 1
     } else if (extentcode === 4) {
       graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][3] += 1
+      programmeTableStats[graduatedProgramme][endYear][3] += 1
     } else {
       graduatedGraphStats[4][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][4] += 1
+      programmeTableStats[graduatedProgramme][endYear][4] += 1
     }
   })
 
