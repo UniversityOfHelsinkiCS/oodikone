@@ -59,12 +59,14 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
             <>
               {getDivider('Students of the faculty', 'StudentsOfTheFaculty')}
               <div className="section-container">
-                <LineGraph cypress="StudentsOfTheFaculty" data={basics?.data.studentInfo} />
+                <LineGraph
+                  cypress="StudentsOfTheFaculty"
+                  data={{ ...basics?.data.studentInfo, years: basics.data.years }}
+                />
                 <DataTable
                   cypress="StudentsOfTheFaculty"
                   data={basics?.data?.studentInfo.tableStats}
                   titles={basics?.data?.studentInfo.titles}
-                  labels={credits?.data?.years}
                 />
               </div>
             </>
@@ -73,9 +75,12 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
             <>
               {getDivider('Graduated and thesis writers of the faculty', 'GraduatedAndThesisWritersOfTheFaculty')}
               <div className="section-container">
-                <LineGraph cypress="GradustionsOfTheFaculty" data={basics?.data.graduationInfo} />
+                <LineGraph
+                  cypress="GraduatedAndThesisWritersOfTheFaculty"
+                  data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
+                />
                 <DataTable
-                  cypress="GraduationsOfTheFaculty"
+                  cypress="GraduatedAndThesisWritersOfTheFaculty"
                   data={basics?.data?.graduationInfo.tableStats}
                   titles={basics?.data?.graduationInfo.titles}
                 />
