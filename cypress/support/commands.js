@@ -43,7 +43,23 @@ const norightsUserHeaders = {
   hypersonsisuid: 'hy-hlo-0000000',
 }
 
-const userHeaders = [adminUserHeaders, basicUserHeaders, onlycoursestatisticsUserHeaders, norightsUserHeaders]
+const onlyIamRightsUserHeaders = {
+  uid: 'onlyiamrights',
+  displayname: 'Only IAM rights user',
+  'shib-session-id': 'mock-cypress-session',
+  hygroupcn: 'hy-employees;hy-mltdk-tkt-jory',
+  edupersonaffiliation: 'member',
+  mail: 'grp-toska+mockonlyiamrightsuser@helsinki.fi',
+  hypersonsisuid: 'hy-hlo-1111111',
+}
+
+const userHeaders = [
+  adminUserHeaders,
+  basicUserHeaders,
+  onlycoursestatisticsUserHeaders,
+  norightsUserHeaders,
+  onlyIamRightsUserHeaders,
+]
 
 /**
  Set up headers to login, set up correct user (admin / basic / etc.) and open given path.
