@@ -217,4 +217,28 @@ describe('Population Statistics tests', () => {
       })
     })
   })
+
+  describe('when using IAM user', () => {
+    beforeEach(() => {
+      cy.init(pathToCSBach2017, 'onlyiamrights')
+    })
+
+    it('Population statistics is visible', () => {
+      cy.get('.card').within(() => {
+        cy.contains('Tietojenkäsittelytieteen kandiohjelma')
+        cy.contains('Sample size: 170 students')
+        cy.contains('Excludes exchange students')
+        cy.contains('Excludes students with non-degree study right')
+        cy.contains('Excludes students who have transferred out of this programme')
+      })
+
+      cy.contains('Credit accumulation (for 170 students)')
+      cy.contains('Credit statistics')
+    })
+
+    it('Students tab is not available', () => {
+      cy.contains('Students (170)').should('not.exist')
+      // TODO: somehow check that obfuscation works
+    })
+  })
 })
