@@ -200,10 +200,12 @@ const getProgrammeCredits = async (code, yearType, specialGroups, facultyProgram
 }
 
 const combineFacultyCredits = async (allCredits, programmes, yearType, specialGroups, counts, years) => {
+  const progCodes = programmes.map(p => p.code)
   for (const prog of programmes) {
-    const data = await getProgrammeCredits(prog, yearType, specialGroups, programmes)
+    const data = await getProgrammeCredits(prog.code, yearType, specialGroups, progCodes)
     if (data) {
-      allCredits.programmeTableStats[prog] = data.tableStats
+      allCredits.programmeNames[prog.code] = prog.name
+      allCredits.programmeTableStats[prog.code] = data.tableStats
       if (!allCredits.lastUpdated || new Date(data.lastUpdated) > new Date(allCredits.lastUpdated))
         allCredits.lastUpdated = data.lastUpdated
 
