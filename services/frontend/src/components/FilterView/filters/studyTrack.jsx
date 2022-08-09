@@ -12,6 +12,7 @@ const StudyTrackFilterCard = ({ options, onOptionsChange, withoutSelf, activeAt,
   const activeAtMoment = activeAt && moment(activeAt)
 
   const dropdownOptions = _.chain(withoutSelf())
+    .filter(student => !student.transferredStudyright)
     .flatMap(student => student.studyrights)
     .map(sr => sr.studyright_elements)
     .filter(sre => sre.some(e => e.code === code))
