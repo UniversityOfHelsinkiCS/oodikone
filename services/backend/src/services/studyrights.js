@@ -1,7 +1,7 @@
 const {
   dbConnections: { sequelize },
 } = require('../database/connection')
-const { Studyright, StudyrightElement, ElementDetail } = require('../models')
+const { Studyright, StudyrightElement, ElementDetail, Transfer } = require('../models')
 const moment = require('moment')
 const { redisClient } = require('../services/redis')
 const _ = require('lodash')
@@ -187,6 +187,10 @@ const StudyRightType = {
 
 const calculateAssociationsFromDb = async (chunksize = 100000) => {
   // bottlenecked by Studyright.findAll in associatedStudyrightElements()
+  const transfers = await Transfer.findAll({
+    attributes: ['studyrightid'],
+  })
+  const transferedStudyrightIds = transfers.map(transfer => transfer.studyrightid)
   const getSemester = momentstartdate => {
     if (momentstartdate < moment(`${momentstartdate.utc().year()}-07-31 21:00:00+00`)) return 'SPRING'
     return 'FALL'
@@ -247,8 +251,12 @@ const calculateAssociationsFromDb = async (chunksize = 100000) => {
                     name: e.name,
                     code: e.code,
                   }
-                  if (!associations.programmes[code].studytracks.includes(e.code))
+                  if (
+                    !associations.programmes[code].studytracks.includes(e.code) &&
+                    !transferedStudyrightIds.includes(e.studyrightid)
+                  ) {
                     associations.programmes[code].studytracks.push(e.code)
+                  }
                 }
                 associations.studyTracks[e.code] = associations.studyTracks[e.code] || {
                   type: e.type,
