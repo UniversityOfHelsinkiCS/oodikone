@@ -51,4 +51,9 @@ const facultyFormatStudyright = studyright => {
   }
 }
 
-module.exports = { facultyFormatStudyright }
+const facultyFormatProgramme = programme => {
+  const { code, name } = programme
+  return { code, name }
+}
+
+module.exports = { facultyFormatStudyright, facultyFormatProgramme }
