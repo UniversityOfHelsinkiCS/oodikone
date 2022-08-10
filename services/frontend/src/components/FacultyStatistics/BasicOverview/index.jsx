@@ -38,6 +38,12 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
+  const sortAlphabeticallyDesc = programmes => {
+    const sortedProgrammes = Object.keys(programmes)
+      .sort()
+      .reduce((sorted, key) => ({ ...sorted, [key]: programmes[key] }), {})
+    return sortedProgrammes
+  }
   return (
     <div className="faculty-overview">
       <div className="toggle-container">
@@ -99,7 +105,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                 <InteractiveDataTable
                   cypress="CreditsProducedByTheFaculty"
                   dataStats={credits?.data?.tableStats}
-                  dataProgrammeStats={credits?.data?.programmeTableStats}
+                  dataProgrammeStats={sortAlphabeticallyDesc(credits?.data?.programmeTableStats)}
                   programmeNames={credits?.data?.programmeNames}
                   titles={credits?.data?.titles}
                   language="fi"

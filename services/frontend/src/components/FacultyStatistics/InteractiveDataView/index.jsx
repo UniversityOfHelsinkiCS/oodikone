@@ -44,7 +44,6 @@ const InteractiveDataTable = ({
                   longLabels={programmeNames}
                   language={language}
                   names={titles?.slice(2)}
-                  key={`stack-${Math.random()}`}
                 />
               </Table.Cell>
             </ToggleTableView>
