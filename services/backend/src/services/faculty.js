@@ -9,8 +9,7 @@ const {
   Student,
   Transfer,
 } = require('../models')
-const { formatTransfer } = require('./studyprogrammeHelpers')
-const { facultyFormatStudyright, facultyFormatProgramme } = require('./facultyHelpers')
+const { facultyFormatStudyright, facultyFormatProgramme, formatFacultyTransfer } = require('./facultyHelpers')
 
 const startedStudyrights = async (faculty, since) =>
   (
@@ -80,7 +79,7 @@ const transferredInsideFaculty = async (programmes, since) =>
         targetcode: programmes,
       },
     })
-  ).map(formatTransfer)
+  ).map(formatFacultyTransfer)
 
 const transferredAway = async (programmes, since) =>
   (
@@ -95,7 +94,7 @@ const transferredAway = async (programmes, since) =>
         },
       },
     })
-  ).map(formatTransfer)
+  ).map(formatFacultyTransfer)
 
 const transferredTo = async (programmes, since) =>
   (
@@ -110,7 +109,7 @@ const transferredTo = async (programmes, since) =>
         targetcode: programmes,
       },
     })
-  ).map(formatTransfer)
+  ).map(formatFacultyTransfer)
 
 const degreeProgrammesOfFaculty = async facultyCode =>
   (
@@ -125,6 +124,15 @@ const degreeProgrammesOfFaculty = async facultyCode =>
     })
   ).map(facultyFormatProgramme)
 
+const getProgrammeName = async programme => {
+  return await ElementDetail.findOne({
+    attributes: ['name'],
+    where: {
+      code: programme,
+    },
+  })
+}
+
 module.exports = {
   startedStudyrights,
   graduatedStudyrights,
@@ -132,4 +140,5 @@ module.exports = {
   transferredAway,
   transferredTo,
   degreeProgrammesOfFaculty,
+  getProgrammeName,
 }
