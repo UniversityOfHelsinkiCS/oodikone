@@ -111,18 +111,29 @@ const StudyrightsTable = ({
         </p>
       ))
 
-  const renderStudytracks = c =>
-    sortBy(c.elements.studytracks.filter(filterDuplicates), 'startdate')
+  const renderStudytracks = c => {
+    const studytracks = c.elements.studytracks.filter(filterDuplicates)
+
+    return sortBy(c.elements.programmes.filter(filterDuplicates), 'startdate')
       .reverse()
-      .map(studytrack => (
-        <p key={studytrack.name}>
-          {`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(
-            getAcualEndDate(studytrack.enddate, c.graduated),
-            'DD.MM.YYYY'
-          )})`}
-          <br />{' '}
-        </p>
-      ))
+      .map(programme => {
+        const studytrack = studytracks.find(studytrack => studytrack.startdate === programme.startdate)
+
+        return studytrack ? (
+          <p key={studytrack.name}>
+            {`${studytrack.name} (${reformatDate(studytrack.startdate, 'DD.MM.YYYY')} - ${reformatDate(
+              getAcualEndDate(studytrack.enddate, c.graduated),
+              'DD.MM.YYYY'
+            )})`}
+            <br />{' '}
+          </p>
+        ) : (
+          <p>
+            <br />{' '}
+          </p>
+        )
+      })
+  }
 
   const renderCompletionPercent = (c, student) => {
     const programmeCodes = c.elements.programmes.filter(filterDuplicates).map(programme => programme.code)
