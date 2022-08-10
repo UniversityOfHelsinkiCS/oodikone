@@ -3,7 +3,15 @@ import { Table } from 'semantic-ui-react'
 import CollapsedStackedBar from './CollapsedStackedBar'
 import ToggleTableView from './ToggleTableView'
 
-const InteractiveDataTable = ({ cypress, dataStats, dataProgrammeStats, titles, wideTable }) => {
+const InteractiveDataTable = ({
+  cypress,
+  dataStats,
+  dataProgrammeStats,
+  programmeNames,
+  titles,
+  wideTable,
+  language,
+}) => {
   if (!dataStats || !titles || !dataProgrammeStats) return null
 
   const yearRef = React.createRef()
@@ -33,6 +41,8 @@ const InteractiveDataTable = ({ cypress, dataStats, dataProgrammeStats, titles, 
                     dataProgrammeStats[programme][yearIndex]?.slice(2)
                   )}
                   labels={Object.keys(dataProgrammeStats)?.map(programme => programme)}
+                  longLabels={programmeNames}
+                  language={language}
                   names={titles?.slice(2)}
                   key={`stack-${Math.random()}`}
                 />
