@@ -2,7 +2,7 @@ import React from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 
-const CollapsedStackedBar = ({ data, labels, names }) => {
+const CollapsedStackedBar = ({ data, labels, longLabels, names, language }) => {
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
@@ -54,7 +54,7 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
     legend: {
       layout: 'horizontal',
       align: 'left',
-      x: 40,
+      x: 20,
       verticalAlign: 'top',
       y: -10,
       floating: true,
@@ -65,6 +65,16 @@ const CollapsedStackedBar = ({ data, labels, names }) => {
     },
     tooltip: {
       shared: true,
+      backgroundColor: 'white',
+      formatter() {
+        // eslint-disable-next-line react/no-this-in-sfc
+        let tooltipString = `<b>${longLabels[this.x][language]}</b><br /><p>${this.x}</p><br />`
+        // eslint-disable-next-line react/no-this-in-sfc
+        this.points.forEach(point => {
+          tooltipString += `<span style="color:${point.color}">●</span> <b>${point.series.name}: ${point.y}</b> <br />`
+        })
+        return tooltipString
+      },
     },
     plotOptions: {
       series: {

@@ -100,7 +100,9 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                   cypress="CreditsProducedByTheFaculty"
                   dataStats={credits?.data?.tableStats}
                   dataProgrammeStats={credits?.data?.programmeTableStats}
+                  programmeNames={credits?.data?.programmeNames}
                   titles={credits?.data?.titles}
+                  language="fi"
                 />
               </div>
             </>
