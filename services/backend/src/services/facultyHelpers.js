@@ -43,11 +43,21 @@ const facultyFormatStudyright = studyright => {
     studentnumber: student.studentnumber,
     startedProgramme: resolveStudyRightCode(studyright_elements),
     graduatedProgramme: resolveGraduatedCode(studyright_elements),
-    //studyrightElements: studyright_elements,
+    studyrightElements: studyright_elements,
     // name:
     //   studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
     //     ? studyright_elements[0].element_detail.name
     //     : null,
+  }
+}
+
+const formatFacultyTransfer = transfer => {
+  const { sourcecode, targetcode, transferdate, studyrightid } = transfer
+  return {
+    sourcecode,
+    targetcode,
+    transferdate,
+    studyrightid,
   }
 }
 
@@ -56,4 +66,4 @@ const facultyFormatProgramme = programme => {
   return { code, name }
 }
 
-module.exports = { facultyFormatStudyright, facultyFormatProgramme }
+module.exports = { facultyFormatStudyright, facultyFormatProgramme, formatFacultyTransfer }

@@ -21,11 +21,12 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
   let allBasics = {
     id: code,
     years: [],
+    programmeNames: {},
     studentInfo: {
       tableStats: [],
       graphStats: [],
       titles: ['', 'Started studying', 'All graduated', 'Transferred inside', 'Transferred away', 'Transferred to'],
-      programmeTableStats: {}, // koodi: [[2022, x, x, x,],[2021, x,x,x,x],...]
+      programmeTableStats: {},
     },
     graduationInfo: {
       tableStats: [],
@@ -41,7 +42,6 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
   if (programmes) {
     await combineFacultyBasics(allBasics, code, programmes, yearType)
   }
-
   return res.json(allBasics)
 })
 
