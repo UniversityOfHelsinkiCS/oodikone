@@ -393,7 +393,7 @@ const iamToOrganisationCode = iam => {
 
 const kosuIamToFaculties = iam => {
   const faculties = kosuFacultyMap[iam]
-  if (!faculties?.length > 0) return []
+  if (!Array.isArray(faculties) || !faculties.length) return []
 
   return faculties.map(f => facultyMap[f])
 }
