@@ -352,6 +352,10 @@ const PopulationCourseStats = props => {
   if (pending) {
     return null
   }
+
+  if (props.onlyIamRights) {
+    panes.pop()
+  }
   return (
     <div>
       <PopulationCourseContext.Provider value={contextValue}>
