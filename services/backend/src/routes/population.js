@@ -9,6 +9,7 @@ const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
 const { mapToProviders } = require('../util/utils')
+const { encrypt } = require('../services/encrypt')
 
 const { ApplicationError } = require('../util/customErrors')
 
@@ -234,16 +235,15 @@ router.get('/v3/populationstatistics', async (req, res) => {
 
     // Obfuscate if user has only iam rights
     if (!isAdmin && !rights.includes(studyRights.programme)) {
-      const randomHash = crypto.randomBytes(12).toString('hex')
       result.students = result.students.map(student => {
-        const studentNumberHash = crypto.createHash('md5').update(`${student.studentNumber}${randomHash}`).digest('hex')
+        const encryptedStudentNumber = encrypt(student.studentNumber)
         const obfuscatedBirthDate = new Date(new Date(student.birthdate).setMonth(0, 0)) // only birth year for age distribution
         return {
           ...student,
           firstnames: '',
           lastname: '',
           started: null,
-          studentNumber: studentNumberHash,
+          studentNumber: encryptedStudentNumber,
           name: '',
           email: '',
           tags: [],
