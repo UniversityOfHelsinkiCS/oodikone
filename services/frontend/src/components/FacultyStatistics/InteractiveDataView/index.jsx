@@ -11,9 +11,36 @@ const InteractiveDataTable = ({
   titles,
   wideTable,
   language,
+  sliceStart,
 }) => {
   if (!dataStats || !titles || !dataProgrammeStats) return null
 
+  /* Calculation works as follows
+   1. Calculate difference between current and previous year: current year - previous year
+   2. Calculations are done for the values starting from the index 2 (index 0: year, index 1: total)
+   3. Last year, currently 2017 is initialized to zeros
+   4. A new object with programme names as keys and the difference array as value is created
+  */
+  const calculatDiffToPrevYear = programmeData => {
+    const differenceMatrix = Object.keys(programmeData).reduce(
+      (differenceMatrix, programme) => ({
+        ...differenceMatrix,
+        [programme]: programmeData[programme].map((_yearlyValues, yearIndex) =>
+          yearIndex < programmeData[programme].length - 1
+            ? programmeData[programme][yearIndex]
+                .slice(sliceStart)
+                .map((val, idx) => val - programmeData[programme][yearIndex + 1][idx + sliceStart])
+            : new Array(programmeData[programme][yearIndex].length - sliceStart).fill(0)
+        ),
+      }),
+      {}
+    )
+    return differenceMatrix
+  }
+  const sortKeysAlphabeticallyAsc = programmeKeys => {
+    return programmeKeys.sort((a, b) => a.localeCompare(b))
+  }
+  const differenceToPrevYears = calculatDiffToPrevYear(dataProgrammeStats)
   const yearRef = React.createRef()
   return (
     <div className={`table-container${wideTable ? '-wide' : ''}`}>
@@ -37,13 +64,20 @@ const InteractiveDataTable = ({
             >
               <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`} colSpan={100}>
                 <CollapsedStackedBar
-                  data={Object.keys(dataProgrammeStats)?.map(programme =>
-                    dataProgrammeStats[programme][yearIndex]?.slice(2)
+                  data={sortKeysAlphabeticallyAsc(Object.keys(dataProgrammeStats))?.map(programme =>
+                    dataProgrammeStats[programme][yearIndex].slice(sliceStart)
                   )}
-                  labels={Object.keys(dataProgrammeStats)?.map(programme => programme)}
+                  labels={sortKeysAlphabeticallyAsc(Object.keys(dataProgrammeStats))}
+                  differenceData={Object.keys(differenceToPrevYears)?.reduce(
+                    (yearlyObject, programme) => ({
+                      ...yearlyObject,
+                      [programme]: differenceToPrevYears[programme][yearIndex],
+                    }),
+                    {}
+                  )}
                   longLabels={programmeNames}
                   language={language}
-                  names={titles?.slice(2)}
+                  names={titles?.slice(sliceStart)}
                 />
               </Table.Cell>
             </ToggleTableView>

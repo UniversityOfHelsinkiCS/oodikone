@@ -3,7 +3,7 @@ import { Button, Icon, Table, Label } from 'semantic-ui-react'
 
 const BasicRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, styles }) => {
   return (
-    <Table.Row style={styles} key={`random-year-key-${Math.random()}`}>
+    <Table.Row style={styles} key={`Basic-row-${cypress}-${yearIndex}`}>
       {yearArray?.map((value, idx) => (
         <Table.Cell key={`random-button-cell-key-${Math.random()}`}>
           {idx === 0 ? (
