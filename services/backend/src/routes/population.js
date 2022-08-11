@@ -54,7 +54,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
         }
         const newMonths = (upperYearBound - Number(year)) * 12
         const query = { ...req.body, year, months: newMonths }
-        const coursestatistics = Population.bottlenecksOf(query)
+        const coursestatistics = Population.bottlenecksOf(query, null, encrypted)
         return coursestatistics
       })
     )
@@ -69,7 +69,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
   } else {
     if (encrypted) req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
 
-    const result = await Population.bottlenecksOf(req.body)
+    const result = await Population.bottlenecksOf(req.body, null, encrypted)
 
     if (result.error) {
       Sentry.captureException(new Error(result.error))

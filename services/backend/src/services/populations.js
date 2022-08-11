@@ -24,6 +24,7 @@ const { Tag, TagStudent } = require('../models/models_kone')
 const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
+const { encrypt } = require('../services/encrypt')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -981,7 +982,7 @@ const parseCreditInfo = credit => ({
   date: credit.attainment_date,
 })
 
-const bottlenecksOf = async (query, studentnumberlist) => {
+const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
   const isValidRequest = async (query, params) => {
     const { studyRights, startDate, endDate, exchangeStudents, nondegreeStudents, transferredStudents } = params
 
@@ -1055,6 +1056,22 @@ const bottlenecksOf = async (query, studentnumberlist) => {
       return [allstudents, courses]
     }
   }
+
+  const encryptStudentnumbers = bottlenecks => {
+    for (const course in bottlenecks.coursestatistics) {
+      const encryptedStudentStats = {}
+      for (const data in bottlenecks.coursestatistics[course].students) {
+        encryptedStudentStats[data] = {}
+        const studentnumbers = Object.keys(bottlenecks.coursestatistics[course].students[data])
+        studentnumbers.forEach(studentnumber => {
+          encryptedStudentStats[data][encrypt(studentnumber).encryptedData] =
+            bottlenecks.coursestatistics[course].students[data][studentnumber]
+        })
+      }
+      bottlenecks.coursestatistics[course].students = encryptedStudentStats
+    }
+  }
+
   const params = parseQueryParams(query)
   const [[allstudents, courses], error] = await Promise.all([
     getStudentsAndCourses(query.selectedStudents, studentnumberlist, query.courses),
@@ -1113,6 +1130,8 @@ const bottlenecksOf = async (query, studentnumberlist) => {
 
   bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
   bottlenecks.allStudents = allstudentslength
+
+  if (encryptdata) encryptStudentnumbers(bottlenecks)
 
   return bottlenecks
 }
