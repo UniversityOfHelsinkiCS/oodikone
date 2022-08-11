@@ -9,7 +9,7 @@ import FilterDegreeCoursesModal from './FilterDegreeCoursesModal'
 import { getPopulationSelectedStudentCourses } from '../../redux/populationSelectedStudentCourses'
 import infotooltips from '../../common/InfoToolTips'
 
-const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYear }) => {
+const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYear, onlyIamRights }) => {
   const [showByStudytrack, setShowByStudytrack] = useState(true)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses)
@@ -23,12 +23,17 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
     return populationSelectedStudentCourses.query.selectedStudents?.length === filteredStudents.length
   }
 
+  const getSelectedStudents = students =>
+    onlyIamRights
+      ? students.map(({ studentNumber, iv }) => ({ encryptedData: studentNumber, iv }))
+      : students.map(student => student.studentNumber)
+
   const fetch = courses => {
     dispatch(
       getPopulationSelectedStudentCourses({
         ...query,
         studyRights: [query.studyRights.programme],
-        selectedStudents: filteredStudents.map(s => s.studentNumber),
+        selectedStudents: getSelectedStudents(filteredStudents),
         selectedStudentsByYear,
         courses,
       })

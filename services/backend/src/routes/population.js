@@ -236,14 +236,15 @@ router.get('/v3/populationstatistics', async (req, res) => {
     // Obfuscate if user has only iam rights
     if (!isAdmin && !rights.includes(studyRights.programme)) {
       result.students = result.students.map(student => {
-        const encryptedStudentNumber = encrypt(student.studentNumber)
+        const { iv, encryptedData } = encrypt(student.studentNumber)
         const obfuscatedBirthDate = new Date(new Date(student.birthdate).setMonth(0, 0)) // only birth year for age distribution
         return {
           ...student,
           firstnames: '',
           lastname: '',
           started: null,
-          studentNumber: encryptedStudentNumber,
+          iv,
+          studentNumber: encryptedData,
           name: '',
           email: '',
           tags: [],
