@@ -505,7 +505,7 @@ describe('Studyprogramme overview', () => {
       cy.init('/study-programme', 'onlyiamrights')
     })
 
-    it('can access programme and correct tabs are visible', () => {
+    it.skip('can access programme and correct tabs are visible', () => {
       cy.reload()
 
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
@@ -517,7 +517,7 @@ describe('Studyprogramme overview', () => {
       cy.contains('Degree Courses').should('not.exist')
     })
 
-    it('can access basic information', () => {
+    it.skip('can access basic information', () => {
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.contains('Basic information').click()
 
@@ -528,7 +528,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Section-AverageGraduationTimes]')
     })
 
-    it('can access studytracks', () => {
+    it.skip('can access studytracks', () => {
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and student populations').click()
 
