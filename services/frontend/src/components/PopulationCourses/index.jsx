@@ -93,6 +93,7 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
           courses={selectedPopulationCourses.data}
           pending={pending}
           filteredStudents={filteredStudents}
+          onlyIamRights={onlyIamRights}
         />
       ) : (
         <CustomPopulationCourses
