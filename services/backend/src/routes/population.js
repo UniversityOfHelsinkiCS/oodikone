@@ -9,7 +9,7 @@ const TagService = require('../services/tags')
 const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
 const { mapToProviders } = require('../util/utils')
-const { encrypt } = require('../services/encrypt')
+const { encrypt, decrypt } = require('../services/encrypt')
 
 const { ApplicationError } = require('../util/customErrors')
 
@@ -37,6 +37,10 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
   if (req.body.months == null) {
     req.body.months = 12
+  }
+
+  if (req.body.selectedStudents[0].encryptedData) {
+    req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
   }
 
   if (req.body.years) {
