@@ -8,10 +8,7 @@ const {
   getProgrammeName,
 } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('./studyprogrammeHelpers')
-
-const findRightProgrammeName = (programme, studyrightElements) => {
-  return studyrightElements.find(element => element.element_detail.code === programme).element_detail.name
-}
+const { findRightProgramme } = require('./facultyHelpers')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
@@ -62,18 +59,19 @@ const getFacultyStarters = async (
   const filteredStudyrights = filterDuplicateStudyrights(studyrights)
   const programmeTableStats = {}
 
-  filteredStudyrights.forEach(({ studystartdate, startedProgramme, studyrightElements }) => {
+  filteredStudyrights.forEach(({ studystartdate, studyrightElements }) => {
+    const { programme, programmeName } = findRightProgramme(studyrightElements, 'started')
     const startYear = defineYear(studystartdate, isAcademicYear)
     startedGraphStats[indexOf(yearsArray, startYear)] += 1
     startedTableStats[startYear] += 1
 
-    if (!(startedProgramme in programmeTableStats)) {
-      programmeTableStats[startedProgramme] = { ...tableStats }
+    if (!(programme in programmeTableStats)) {
+      programmeTableStats[programme] = { ...tableStats }
     }
-    programmeTableStats[startedProgramme][startYear] += 1
+    programmeTableStats[programme][startYear] += 1
 
-    if (!(startedProgramme in allBasics.programmeNames)) {
-      allBasics.programmeNames[startedProgramme] = findRightProgrammeName(startedProgramme, studyrightElements)
+    if (!(programme in allBasics.programmeNames)) {
+      allBasics.programmeNames[programme] = programmeName
     }
   })
 
@@ -104,37 +102,38 @@ const getFacultyGraduates = async (
 
   const graduatedRights = await graduatedStudyrights(faculty, since)
 
-  graduatedRights.forEach(({ enddate, extentcode, graduatedProgramme, studyrightElements }) => {
+  graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
+    const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
     const endYear = defineYear(enddate, isAcademicYear)
     graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
     graduatedTableStats[endYear][0] += 1
 
-    if (!(graduatedProgramme in programmeTableStats)) {
-      programmeTableStats[graduatedProgramme] = {}
-      Object.keys(tableStats).forEach(year => (programmeTableStats[graduatedProgramme][year] = [0, 0, 0, 0, 0]))
+    if (!(programme in programmeTableStats)) {
+      programmeTableStats[programme] = {}
+      Object.keys(tableStats).forEach(year => (programmeTableStats[programme][year] = [0, 0, 0, 0, 0]))
     }
-    programmeTableStats[graduatedProgramme][endYear][0] += 1
+    programmeTableStats[programme][endYear][0] += 1
 
     if (extentcode === 1) {
       graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][1] += 1
-      programmeTableStats[graduatedProgramme][endYear][1] += 1
+      programmeTableStats[programme][endYear][1] += 1
     } else if (extentcode === 2) {
       graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][2] += 1
-      programmeTableStats[graduatedProgramme][endYear][2] += 1
+      programmeTableStats[programme][endYear][2] += 1
     } else if (extentcode === 4) {
       graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][3] += 1
-      programmeTableStats[graduatedProgramme][endYear][3] += 1
+      programmeTableStats[programme][endYear][3] += 1
     } else {
       graduatedGraphStats[4][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][4] += 1
-      programmeTableStats[graduatedProgramme][endYear][4] += 1
+      programmeTableStats[programme][endYear][4] += 1
     }
 
-    if (!(graduatedProgramme in allBasics.programmeNames)) {
-      allBasics.programmeNames[graduatedProgramme] = findRightProgrammeName(graduatedProgramme, studyrightElements)
+    if (!(programme in allBasics.programmeNames)) {
+      allBasics.programmeNames[programme] = programmeName
     }
   })
 
