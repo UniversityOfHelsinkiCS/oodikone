@@ -1,20 +1,26 @@
-const resolveStudyRightCode = studyright_elements => {
-  if (!studyright_elements) return null
-  const studyRightElement = studyright_elements
-    .filter(sre => sre.element_detail.type === 20)
-    .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0]
-  // this way round counts to old programmes, other way around to new programmes
-  if (studyRightElement) return studyRightElement.code
-  return null
-}
+const findRightProgramme = (studyrightElements, mode) => {
+  let programme = ''
+  let programmeName = ''
+  let studyRightElement = null
 
-const resolveGraduatedCode = studyright_elements => {
-  if (!studyright_elements) return null
-  const studyRightElement = studyright_elements
-    .filter(sre => sre.element_detail.type === 20)
-    .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
-  if (studyRightElement) return studyRightElement.code
-  return null
+  if (studyrightElements) {
+    if (mode === 'started') {
+      studyRightElement = studyrightElements
+        .filter(sre => sre.element_detail.type === 20)
+        .sort((a, b) => new Date(a.startdate) - new Date(b.startdate))[0]
+      // this way round counts to old programmes, other way around to new programmes
+    } else {
+      // graduated
+      studyRightElement = studyrightElements
+        .filter(sre => sre.element_detail.type === 20)
+        .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]
+    }
+    if (studyRightElement) {
+      programme = studyRightElement.code
+      programmeName = studyRightElement.element_detail.name
+    }
+  }
+  return { programme, programmeName }
 }
 
 const facultyFormatStudyright = studyright => {
@@ -41,13 +47,7 @@ const facultyFormatStudyright = studyright => {
     prioritycode,
     extentcode,
     studentnumber: student.studentnumber,
-    startedProgramme: resolveStudyRightCode(studyright_elements),
-    graduatedProgramme: resolveGraduatedCode(studyright_elements),
     studyrightElements: studyright_elements,
-    // name:
-    //   studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
-    //     ? studyright_elements[0].element_detail.name
-    //     : null,
   }
 }
 
@@ -66,4 +66,4 @@ const facultyFormatProgramme = programme => {
   return { code, name }
 }
 
-module.exports = { facultyFormatStudyright, facultyFormatProgramme, formatFacultyTransfer }
+module.exports = { findRightProgramme, facultyFormatStudyright, facultyFormatProgramme, formatFacultyTransfer }
