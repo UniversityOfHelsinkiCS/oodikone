@@ -25,13 +25,13 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
     studentInfo: {
       tableStats: [],
       graphStats: [],
-      titles: ['', 'Started studying', 'All graduated', 'Transferred inside', 'Transferred away', 'Transferred to'],
+      titles: ['', 'Started studying', 'Graduated', 'Transferred inside', 'Transferred away', 'Transferred to'],
       programmeTableStats: {},
     },
     graduationInfo: {
       tableStats: [],
       graphStats: [],
-      titles: ['', 'All graduations', 'Bachelors', 'Masters', 'Doctors', 'Other graduations'],
+      titles: ['', 'All graduations', 'Bachelors', 'Masters', 'Doctors', 'Others'],
       programmeTableStats: {},
     },
     status: 'DONE',
