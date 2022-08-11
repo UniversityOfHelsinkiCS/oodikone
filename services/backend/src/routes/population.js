@@ -39,16 +39,18 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     req.body.months = 12
   }
 
-  if (req.body.selectedStudents[0].encryptedData) {
-    req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
-  }
+  const encrypted = req.body.selectedStudents[0].encryptedData
 
   if (req.body.years) {
     const upperYearBound = new Date().getFullYear() + 1
     const multicoursestatPromises = Promise.all(
       req.body.years.map(year => {
         if (req.body.selectedStudentsByYear) {
-          req.body.selectedStudents = req.body.selectedStudentsByYear[year]
+          req.body.selectedStudents = encrypted
+            ? req.body.selectedStudents
+                .filter(({ encryptedData }) => req.body.selectedStudentsByYear[year].includes(encryptedData))
+                .map(decrypt)
+            : req.body.selectedStudentsByYear[year]
         }
         const newMonths = (upperYearBound - Number(year)) * 12
         const query = { ...req.body, year, months: newMonths }
@@ -65,6 +67,8 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
 
     res.json(result)
   } else {
+    if (encrypted) req.body.selectedStudents = req.body.selectedStudents.map(decrypt)
+
     const result = await Population.bottlenecksOf(req.body)
 
     if (result.error) {
