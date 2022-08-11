@@ -3,13 +3,15 @@ import React from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 
+const colors = ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#2b908f', '#f45b5b', '#91e8e1']
+
 const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differenceData }) => {
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
 
   const dataTranspose = transpose(data)
-    .map((obj, idx) => ({ name: names[idx], data: obj }))
+    .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
     .reverse()
 
   const differenceArray = Object.keys(differenceData).reduce(
