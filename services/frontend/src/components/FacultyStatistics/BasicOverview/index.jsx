@@ -4,7 +4,6 @@ import { Divider, Loader } from 'semantic-ui-react'
 import { useGetFacultyCreditStatsQuery, useGetFacultyBasicStatsQuery } from 'redux/facultyStats'
 import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
 import StackedBarChart from 'components/StudyProgramme/BasicOverview/StackedBarChart'
-import DataTable from 'components/StudyProgramme/BasicOverview/DataTable'
 import InteractiveDataTable from '../InteractiveDataView'
 import Toggle from '../../StudyProgramme/Toggle'
 import InfoBox from '../../Info/InfoBox'
@@ -38,12 +37,6 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
-  const sortAlphabeticallyDesc = programmes => {
-    const sortedProgrammes = Object.keys(programmes)
-      .sort()
-      .reduce((sorted, key) => ({ ...sorted, [key]: programmes[key] }), {})
-    return sortedProgrammes
-  }
   return (
     <div className="faculty-overview">
       <div className="toggle-container">
@@ -69,26 +62,14 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                   cypress="StudentsOfTheFaculty"
                   data={{ ...basics?.data.studentInfo, years: basics.data.years }}
                 />
-                <DataTable
+                <InteractiveDataTable
                   cypress="StudentsOfTheFaculty"
-                  data={basics?.data?.studentInfo.tableStats}
+                  dataStats={basics?.data?.studentInfo.tableStats}
+                  dataProgrammeStats={basics?.data?.studentInfo.programmeTableStats}
+                  programmeNames={basics?.data?.programmeNames}
                   titles={basics?.data?.studentInfo.titles}
-                />
-              </div>
-            </>
-          )}
-          {basics.isSuccess && basics.data && (
-            <>
-              {getDivider('Graduated and thesis writers of the faculty', 'GraduatedAndThesisWritersOfTheFaculty')}
-              <div className="section-container">
-                <LineGraph
-                  cypress="GraduatedAndThesisWritersOfTheFaculty"
-                  data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
-                />
-                <DataTable
-                  cypress="GraduatedAndThesisWritersOfTheFaculty"
-                  data={basics?.data?.graduationInfo.tableStats}
-                  titles={basics?.data?.graduationInfo.titles}
+                  sliceStart={1}
+                  language="fi"
                 />
               </div>
             </>
@@ -105,9 +86,30 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                 <InteractiveDataTable
                   cypress="CreditsProducedByTheFaculty"
                   dataStats={credits?.data?.tableStats}
-                  dataProgrammeStats={sortAlphabeticallyDesc(credits?.data?.programmeTableStats)}
+                  dataProgrammeStats={credits?.data?.programmeTableStats}
                   programmeNames={credits?.data?.programmeNames}
                   titles={credits?.data?.titles}
+                  sliceStart={2}
+                  language="fi"
+                />
+              </div>
+            </>
+          )}
+          {basics.isSuccess && basics.data && (
+            <>
+              {getDivider('Graduated and thesis writers of the faculty', 'GraduatedAndThesisWritersOfTheFaculty')}
+              <div className="section-container">
+                <LineGraph
+                  cypress="GraduatedAndThesisWritersOfTheFaculty"
+                  data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
+                />
+                <InteractiveDataTable
+                  cypress="GraduatedAndThesisWritersOfTheFaculty"
+                  dataStats={basics?.data?.graduationInfo.tableStats}
+                  dataProgrammeStats={basics?.data?.graduationInfo.programmeTableStats}
+                  programmeNames={basics?.data?.programmeNames}
+                  titles={basics?.data?.graduationInfo.titles}
+                  sliceStart={2}
                   language="fi"
                 />
               </div>
