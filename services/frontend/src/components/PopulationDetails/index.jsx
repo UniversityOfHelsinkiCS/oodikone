@@ -142,7 +142,7 @@ const PopulationDetails = ({
         content: <AgeStats filteredStudents={filteredStudents} query={query} />,
       },
     },
-    !onlyIamRights && {
+    {
       key: 3,
       title: {
         content: (
@@ -160,6 +160,7 @@ const PopulationDetails = ({
               allStudents={allStudents}
               filteredStudents={filteredStudents}
               selectedStudentsByYear={selectedStudentsByYear}
+              onlyIamRights={onlyIamRights}
             />
           </div>
         ),
