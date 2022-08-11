@@ -138,13 +138,13 @@ const getFacultyGraduates = async (
     }
   })
 
-  allBasics.studentInfo.graphStats.push({ name: 'All graduated', data: graduatedGraphStats[0] })
+  allBasics.studentInfo.graphStats.push({ name: 'Graduated', data: graduatedGraphStats[0] })
 
-  allBasics.graduationInfo.graphStats.push({ name: 'All graduated', data: graduatedGraphStats[0] })
-  allBasics.graduationInfo.graphStats.push({ name: 'Graduated bachelors', data: graduatedGraphStats[1] })
-  allBasics.graduationInfo.graphStats.push({ name: 'Graduated masters', data: graduatedGraphStats[2] })
-  allBasics.graduationInfo.graphStats.push({ name: 'Graduated doctors', data: graduatedGraphStats[3] })
-  allBasics.graduationInfo.graphStats.push({ name: 'Other graduations', data: graduatedGraphStats[4] })
+  allBasics.graduationInfo.graphStats.push({ name: 'All graduations', data: graduatedGraphStats[0] })
+  allBasics.graduationInfo.graphStats.push({ name: 'Bachelors', data: graduatedGraphStats[1] })
+  allBasics.graduationInfo.graphStats.push({ name: 'Masters', data: graduatedGraphStats[2] })
+  allBasics.graduationInfo.graphStats.push({ name: 'Doctors', data: graduatedGraphStats[3] })
+  allBasics.graduationInfo.graphStats.push({ name: 'Others', data: graduatedGraphStats[4] })
 
   programmeData['graduated'] = programmeTableStats
 
