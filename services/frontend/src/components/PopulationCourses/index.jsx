@@ -84,7 +84,9 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
     <Segment basic>
       <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
       {renderToggleStructureButton()}
-      {query.studyRights.programme && <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />}
+      {query.studyRights.programme && !onlyIamRights && (
+        <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />
+      )}
 
       <SegmentDimmer isLoading={pending} />
       {showByStudytrack ? (
