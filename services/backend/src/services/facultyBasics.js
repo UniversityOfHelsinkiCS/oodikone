@@ -291,7 +291,7 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) =>
       if (code in programmeData.graduated) {
         studentInfo[code][year] = studentInfo[code][year].concat([programmeData.graduated[code][year][0]])
         if (!(code in graduationInfo)) graduationInfo[code] = {}
-        graduationInfo[code][year] = [year, ...programmeData.graduated[code][year].slice(1)]
+        graduationInfo[code][year] = [year, ...programmeData.graduated[code][year]]
       } else {
         studentInfo[code][year] = studentInfo[code][year].concat([0])
       }
