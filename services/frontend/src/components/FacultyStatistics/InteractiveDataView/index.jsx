@@ -8,6 +8,7 @@ const InteractiveDataTable = ({
   dataStats,
   dataProgrammeStats,
   programmeNames,
+  sortedKeys,
   titles,
   wideTable,
   language,
@@ -37,9 +38,7 @@ const InteractiveDataTable = ({
     )
     return differenceMatrix
   }
-  const sortKeysAlphabeticallyAsc = programmeKeys => {
-    return programmeKeys.sort((a, b) => a.localeCompare(b))
-  }
+
   const differenceToPrevYears = calculatDiffToPrevYear(dataProgrammeStats)
   const yearRef = React.createRef()
   return (
@@ -64,10 +63,8 @@ const InteractiveDataTable = ({
             >
               <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`} colSpan={100}>
                 <CollapsedStackedBar
-                  data={sortKeysAlphabeticallyAsc(Object.keys(dataProgrammeStats))?.map(programme =>
-                    dataProgrammeStats[programme][yearIndex].slice(sliceStart)
-                  )}
-                  labels={sortKeysAlphabeticallyAsc(Object.keys(dataProgrammeStats))}
+                  data={sortedKeys?.map(programme => dataProgrammeStats[programme][yearIndex].slice(sliceStart))}
+                  labels={sortedKeys}
                   differenceData={Object.keys(differenceToPrevYears)?.reduce(
                     (yearlyObject, programme) => ({
                       ...yearlyObject,
