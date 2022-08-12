@@ -23,11 +23,11 @@ const createModuleAggregateRow = ({ definition, children }) => ({
   },
 })
 
-const PassFail = ({ flat }) => {
+const PassFail = ({ flat, onlyIamRights }) => {
   const { modules, courseStatistics, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const columns = [
       {
         key: 'course',
         title: 'Course',
@@ -197,9 +197,11 @@ const PassFail = ({ flat }) => {
           },
         ],
       },
-    ],
-    [onGoToCourseStatisticsClick]
-  )
+    ]
+    if (onlyIamRights) columns[0].children[0].children.pop()
+
+    return columns
+  }, [onGoToCourseStatisticsClick])
 
   const data = useMemo(() => {
     if (flat) {
