@@ -39,7 +39,7 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
     req.body.months = 12
   }
 
-  const encrypted = req.body.selectedStudents[0].encryptedData
+  const encrypted = req.body.selectedStudents[0]?.encryptedData
 
   if (req.body.years) {
     const upperYearBound = new Date().getFullYear() + 1
