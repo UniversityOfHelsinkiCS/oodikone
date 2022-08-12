@@ -31,7 +31,11 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     if (change > 0) return `+${change.toString()}`
     return change
   }
-  const flexHeight = labels.length < 6 ? `${(1 / 3) * 100}%` : `${labels.length * (1 / 22) * 100}%`
+  const getFlexHeight = len => {
+    if (len < 6) return `${(1 / 3) * 100}%`
+    if (len < 15) return `${len * (1 / 16) * 100}%`
+    return `${len * (1 / 20) * 100}%`
+  }
 
   const getColor = change => {
     if (change > 0) return '#6ab04c'
@@ -44,10 +48,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     chart: {
       type: 'bar',
       marginTop: 60,
-      height: flexHeight,
-      scrollablePlotArea: {
-        minWidth: 700,
-      },
+      height: getFlexHeight(labels.length),
       padding: 2,
     },
     credits: {

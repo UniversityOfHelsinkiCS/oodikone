@@ -16,6 +16,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
   const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const credits = useGetFacultyCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
   const basics = useGetFacultyBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
+  // const thesisWriters = useGetFacultyThesisStatsQuery({ id: faculty?.code, yearType })
   // basic.data.studentsInfo --> data for students of faculty table
   // basics.data.graduationInfo --> data for graduated and thesis writers table
 
@@ -37,6 +38,22 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
+  /*
+  Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Numbers
+  */
+  const sortProgrammeKeys = programmeKeys => {
+    return programmeKeys.sort((a, b) => {
+      if (/^K-|FI/.test(a) && !/^K-|FI/.test(b) && !/^\d/.test(a) && !/^\d/.test(b)) return 1
+      if (!/^K-|FI/.test(a) && /^K-|FI/.test(b) && !/^\d/.test(a) && !/^\d/.test(b)) return -1
+      if (/^\d/.test(a) && !/^\d/.test(b)) return 1
+      if (!/^\d/.test(a) && /^\d/.test(b)) return -1
+      if (/^LI/.test(a) && /^MH|T-/.test(b)) return 1
+      if (/^MH|T-/.test(a) && /^LI/.test(b)) return -1
+      if (/^\d/.test(a) && /^\d/.test(b) && /\d$/.test(a) && !/\d$/.test(b)) return 1
+      if (/^\d/.test(a) && /^\d/.test(b) && !/\d$/.test(a) && /\d$/.test(b)) return -1
+      return a.localeCompare(b)
+    })
+  }
   return (
     <div className="faculty-overview">
       <div className="toggle-container">
@@ -67,6 +84,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                   dataStats={basics?.data?.studentInfo.tableStats}
                   dataProgrammeStats={basics?.data?.studentInfo.programmeTableStats}
                   programmeNames={basics?.data?.programmeNames}
+                  sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.studentInfo.programmeTableStats))}
                   titles={basics?.data?.studentInfo.titles}
                   sliceStart={1}
                   language="fi"
@@ -88,6 +106,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                   dataStats={credits?.data?.tableStats}
                   dataProgrammeStats={credits?.data?.programmeTableStats}
                   programmeNames={credits?.data?.programmeNames}
+                  sortedKeys={sortProgrammeKeys(Object.keys(credits?.data?.programmeTableStats))}
                   titles={credits?.data?.titles}
                   sliceStart={2}
                   language="fi"
@@ -108,6 +127,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                   dataStats={basics?.data?.graduationInfo.tableStats}
                   dataProgrammeStats={basics?.data?.graduationInfo.programmeTableStats}
                   programmeNames={basics?.data?.programmeNames}
+                  sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.graduationInfo.programmeTableStats))}
                   titles={basics?.data?.graduationInfo.titles}
                   sliceStart={2}
                   language="fi"
