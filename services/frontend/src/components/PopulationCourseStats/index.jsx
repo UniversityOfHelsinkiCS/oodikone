@@ -294,7 +294,11 @@ const PopulationCourseStats = props => {
       menuItem: 'pass/fail',
       render: () => (
         <Tab.Pane className="menuTab">
-          <PassFail expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
+          <PassFail
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
+            onlyIamRights={props.onlyIamRights}
+          />
         </Tab.Pane>
       ),
     },
@@ -302,7 +306,11 @@ const PopulationCourseStats = props => {
       menuItem: 'pass/fail w/ enrollments ',
       render: () => (
         <Tab.Pane className="menuTab">
-          <PassFailEnrollments expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
+          <PassFailEnrollments
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
+            onlyIamRights={props.onlyIamRights}
+          />
         </Tab.Pane>
       ),
     },
@@ -310,7 +318,11 @@ const PopulationCourseStats = props => {
       menuItem: 'grades',
       render: () => (
         <Tab.Pane className="menuTab">
-          <GradeDistribution expandedGroups={expandedGroups} toggleGroupExpansion={toggleGroupExpansion} />
+          <GradeDistribution
+            expandedGroups={expandedGroups}
+            toggleGroupExpansion={toggleGroupExpansion}
+            onlyIamRights={props.onlyIamRights}
+          />
         </Tab.Pane>
       ),
     },
@@ -323,6 +335,7 @@ const PopulationCourseStats = props => {
             courseStatistics={courseStatistics}
             expandedGroups={expandedGroups}
             toggleGroupExpansion={toggleGroupExpansion}
+            onlyIamRights={props.onlyIamRights}
           />
         </Tab.Pane>
       ),

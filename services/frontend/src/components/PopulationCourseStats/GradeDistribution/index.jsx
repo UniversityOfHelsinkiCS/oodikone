@@ -29,11 +29,11 @@ const mapCourseData = course => ({
   },
 })
 
-const GradeDistribution = ({ flat }) => {
+const GradeDistribution = ({ flat, onlyIamRights }) => {
   const { modules, courseStatistics, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const columns = [
       {
         key: 'name-parent',
         mergeHeader: true,
@@ -110,9 +110,12 @@ const GradeDistribution = ({ flat }) => {
           },
         ],
       },
-    ],
-    [onGoToCourseStatisticsClick]
-  )
+    ]
+
+    if (onlyIamRights) columns[0].children.pop()
+
+    return columns
+  }, [onGoToCourseStatisticsClick])
 
   const data = useMemo(() => {
     if (flat) {

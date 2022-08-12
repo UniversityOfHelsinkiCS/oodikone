@@ -34,12 +34,12 @@ const yearColumn = (year, cumulative) => ({
   children: [semesterColumn(year, 'Fall', cumulative), semesterColumn(year, 'Spring', cumulative)],
 })
 
-const PassingSemesters = () => {
+const PassingSemesters = ({ onlyIamRights }) => {
   const { modules, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
 
-  const columns = useMemo(
-    () => [
+  const columns = useMemo(() => {
+    const columns = [
       {
         key: 'course-name',
         mergeHeader: true,
@@ -118,9 +118,12 @@ const PassingSemesters = () => {
           ..._.range(0, 6).map(i => yearColumn(i, cumulativeStats)),
         ],
       },
-    ],
-    [cumulativeStats, onGoToCourseStatisticsClick]
-  )
+    ]
+
+    if (onlyIamRights) columns[0].children.pop()
+
+    return columns
+  }, [cumulativeStats, onGoToCourseStatisticsClick])
 
   const data = useMemo(
     () =>
