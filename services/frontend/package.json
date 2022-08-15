@@ -6,7 +6,7 @@
     "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^1.8.0",
+    "@reduxjs/toolkit": "^1.8.4",
     "@sentry/browser": "^6.18.2",
     "@sentry/tracing": "^6.18.2",
     "axios": "^0.21.4",
