@@ -332,11 +332,11 @@ describe('Studyprogramme overview', () => {
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and student populations').click()
       const tableContents = [
-        ['2020 - 2021', 12, 5, 2, 2, 0, 2, 0, 1],
-        ['2019 - 2020', 86, 13, 15, 32, 11, 2, 0, 13],
-        ['2018 - 2019', 162, 7, 16, 35, 33, 27, 18, 26],
-        ['2017 - 2018', 171, 10, 22, 18, 22, 24, 27, 48],
-        ['Total', 431, 35, 55, 87, 66, 55, 45, 88],
+        ['2020 - 2021', 12, 12, 0, 0, 0, 0, 0, 0],
+        ['2019 - 2020', 86, 26, 34, 21, 5, 0, 0, 0],
+        ['2018 - 2019', 162, 10, 27, 47, 36, 26, 12, 4],
+        ['2017 - 2018', 171, 20, 21, 26, 22, 22, 33, 27],
+        ['Total', 431, 51, 64, 97, 79, 55, 51, 34],
       ]
 
       cy.checkTableStats(tableContents, 'StudytrackProgress')
@@ -350,9 +350,9 @@ describe('Studyprogramme overview', () => {
         .should('contain', 'Less than 30 credits')
         .should('contain', '30-59 credits')
         .should('contain', 'More than 180 credits')
-        .should('contain', '5.8%') // The percentage for less than 30 credits in 2017-2018, to check that the graph renders
-        .should('contain', '4.3%') // The percentage for less than 30 credits in 2018-2019
-        .should('contain', '15.1%') // The percentage for less than 30 credits in 2019-2020
+        .should('contain', '11.7%') // The percentage for less than 30 credits in 2017-2018, to check that the graph renders
+        .should('contain', '6.2%') // The percentage for less than 30 credits in 2018-2019
+        .should('contain', '30.2%') // The percentage for less than 30 credits in 2019-2020
 
       cy.get('[data-cy=Graph-2018-AverageGraduationTimes]')
         .should('contain', '2018 - 2019')
