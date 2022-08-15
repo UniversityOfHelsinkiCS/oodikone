@@ -26,11 +26,15 @@ const {
 } = require('./studyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
 
-const getStudentData = (students, thresholdKeys, thresholdAmounts) => {
+const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) => {
   let data = { female: 0, male: 0, finnish: 0 }
   thresholdKeys.forEach(t => (data[t] = 0))
 
-  students.forEach(({ gender_code, home_country_en, creditcount }) => {
+  students.forEach(({ gender_code, home_country_en, credits }) => {
+    const creditcount = credits
+      .filter(credit => moment(credit.attainment_date).isAfter(startDate))
+      .reduce((prev, curr) => (prev += curr.credits), 0)
+
     data.male += gender_code === '1' ? 1 : 0
     data.female += gender_code === '2' ? 1 : 0
     data.finnish += home_country_en === 'Finland' ? 1 : 0
@@ -121,7 +125,7 @@ const getStudytrackDataForTheYear = async ({
       // Get all the studyrights and students for the calculations
       const all = await allStudyrights(track, studentnumbers)
       const students = await studytrackStudents(studentnumbers)
-      const studentData = getStudentData(students, creditThresholdKeys, creditThresholdAmounts)
+      const studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
       const started = await startedStudyrights(track, startDate, studentnumbers)
       const enrolled = await enrolledStudents(track, startDate, studentnumbers)
       const absent = await absentStudents(track, studentnumbers)

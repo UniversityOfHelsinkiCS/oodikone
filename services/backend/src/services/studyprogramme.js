@@ -31,6 +31,19 @@ const sinceDate = since => {
 const studytrackStudents = async studentnumbers =>
   (
     await Student.findAll({
+      include: {
+        model: Credit,
+        separate: true,
+        attributes: ['credits', 'attainment_date'],
+        where: {
+          isStudyModule: {
+            [Op.eq]: null,
+          },
+          credittypecode: {
+            [Op.in]: [4, 9],
+          },
+        },
+      },
       where: {
         studentnumber: {
           [Op.in]: studentnumbers,
