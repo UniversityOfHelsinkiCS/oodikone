@@ -1,7 +1,11 @@
 import React from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
 
-import { useGetFacultyCreditStatsQuery, useGetFacultyBasicStatsQuery } from 'redux/facultyStats'
+import {
+  useGetFacultyCreditStatsQuery,
+  useGetFacultyBasicStatsQuery,
+  useGetFacultyThesisStatsQuery,
+} from 'redux/facultyStats'
 import LineGraph from 'components/StudyProgramme/BasicOverview/LineGraph'
 import StackedBarChart from 'components/StudyProgramme/BasicOverview/StackedBarChart'
 import InteractiveDataTable from '../InteractiveDataView'
@@ -16,7 +20,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
   const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const credits = useGetFacultyCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
   const basics = useGetFacultyBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
-  // const thesisWriters = useGetFacultyThesisStatsQuery({ id: faculty?.code, yearType })
+  const thesisWriters = useGetFacultyThesisStatsQuery({ id: faculty?.code, yearType })
   // basic.data.studentsInfo --> data for students of faculty table
   // basics.data.graduationInfo --> data for graduated and thesis writers table
 
@@ -31,10 +35,22 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
       {/* <InfoBox content={toolTips[toolTipText]} /> */}
     </>
   )
-  const isFetchingOrLoading = credits.isLoading || credits.isFetching || basics.isLoading || basics.isFetching
+  const isFetchingOrLoading =
+    credits.isLoading ||
+    credits.isFetching ||
+    basics.isLoading ||
+    basics.isFetching ||
+    thesisWriters.isLoading ||
+    thesisWriters.isFetching
 
   const isError =
-    (basics.isError && credits.isError) || (basics.isSuccess && !basics.data && credits.isSuccess && !credits.data)
+    (basics.isError && credits.isError && thesisWriters.isError) ||
+    (basics.isSuccess &&
+      !basics.data &&
+      credits.isSuccess &&
+      !credits.data &&
+      thesisWriters.isSuccess &&
+      !thesisWriters.data)
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 

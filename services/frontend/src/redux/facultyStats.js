@@ -13,8 +13,16 @@ const facultystatsApi = RTKApi.injectEndpoints({
       query: ({ id, yearType, specialGroups }) =>
         `/faculties/${id}/creditstats?year_type=${yearType}&special_groups=${specialGroups}`,
     }),
+    getFacultyThesisStats: builder.query({
+      query: ({ id, yearType }) => `/faculties/${id}/thesisstats?year_type=${yearType}`,
+    }),
   }),
   overrideExisting: false,
 })
 
-export const { useGetFacultiesQuery, useGetFacultyBasicStatsQuery, useGetFacultyCreditStatsQuery } = facultystatsApi
+export const {
+  useGetFacultiesQuery,
+  useGetFacultyBasicStatsQuery,
+  useGetFacultyCreditStatsQuery,
+  useGetFacultyThesisStatsQuery,
+} = facultystatsApi
