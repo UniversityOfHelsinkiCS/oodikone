@@ -66,4 +66,22 @@ const facultyFormatProgramme = programme => {
   return { code, name }
 }
 
-module.exports = { findRightProgramme, facultyFormatStudyright, facultyFormatProgramme, formatFacultyTransfer }
+const formatFacultyThesisWriter = credit => {
+  const { course_code, credits, attainment_date, student_studentnumber, course } = credit
+  return {
+    course_code,
+    credits,
+    attainment_date,
+    student_studentnumber,
+    courseUnitType: course.course_unit_type,
+    organizations: course.organizations.map(organization => organization.code),
+  }
+}
+
+module.exports = {
+  findRightProgramme,
+  facultyFormatStudyright,
+  facultyFormatProgramme,
+  formatFacultyTransfer,
+  formatFacultyThesisWriter,
+}

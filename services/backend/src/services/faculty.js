@@ -8,8 +8,15 @@ const {
   StudyrightElement,
   Student,
   Transfer,
+  Credit,
+  Course,
 } = require('../models')
-const { facultyFormatStudyright, facultyFormatProgramme, formatFacultyTransfer } = require('./facultyHelpers')
+const {
+  facultyFormatStudyright,
+  facultyFormatProgramme,
+  formatFacultyTransfer,
+  formatFacultyThesisWriter,
+} = require('./facultyHelpers')
 
 const startedStudyrights = async (faculty, since) =>
   (
@@ -133,6 +140,45 @@ const getProgrammeName = async programme => {
   })
 }
 
+const thesisWriters = async (providers, since, thesisTypes) =>
+  (
+    await Credit.findAll({
+      attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+      include: {
+        model: Course,
+        attributes: ['code', 'course_unit_type'],
+        required: true,
+        where: {
+          course_unit_type: {
+            [Op.in]: thesisTypes,
+          },
+        },
+        include: {
+          model: Organization,
+          attributes: ['code'],
+          required: true,
+          where: {
+            code: {
+              [Op.in]: providers,
+            },
+          },
+        },
+      },
+      where: {
+        credittypecode: {
+          [Op.notIn]: [10, 9, 7],
+        },
+        isStudyModule: {
+          [Op.not]: true,
+        },
+        attainment_date: {
+          [Op.gte]: since,
+        },
+        student_studentnumber: { [Op.not]: null },
+      },
+    })
+  ).map(formatFacultyThesisWriter)
+
 module.exports = {
   startedStudyrights,
   graduatedStudyrights,
@@ -141,4 +187,5 @@ module.exports = {
   transferredTo,
   degreeProgrammesOfFaculty,
   getProgrammeName,
+  thesisWriters,
 }

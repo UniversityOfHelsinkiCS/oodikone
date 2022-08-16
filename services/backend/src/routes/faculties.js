@@ -3,6 +3,7 @@ const { faculties, degreeProgrammeCodesOfFaculty } = require('../services/organi
 const { combineFacultyBasics } = require('../services/facultyBasics')
 const { combineFacultyCredits } = require('../services/facultyCredits')
 const { degreeProgrammesOfFaculty } = require('../services/faculty')
+const { combineFacultyThesisWriters } = require('../services/facultyThesisWriters')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
@@ -98,6 +99,31 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
   ]
 
   return res.json(allCredits)
+})
+
+router.get('/faculties/:id/thesisstats', async (req, res) => {
+  const code = req.params.id
+  const yearType = req.query?.year_type
+
+  if (!code) return res.status(422).end()
+
+  let allThesisWriters = {
+    id: code,
+    years: [],
+    tableStats: [],
+    graphStats: [],
+    programmeTableStats: {},
+    titles: ['', 'All thesis writers', 'Bachelors', 'Masters', 'Doctors', 'Others'],
+    status: 'Done',
+    lastUpdated: '',
+  }
+
+  const programmes = await degreeProgrammesOfFaculty(code)
+  if (programmes) {
+    await combineFacultyThesisWriters(allThesisWriters, programmes, code, yearType)
+  }
+
+  return res.json(allThesisWriters)
 })
 
 module.exports = router
