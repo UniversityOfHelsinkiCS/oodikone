@@ -104,7 +104,7 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
 router.get('/faculties/:id/thesisstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
-
+  //const specialGroups = 'SPECIAL_INCLUDED'
   if (!code) return res.status(422).end()
 
   let allThesisWriters = {
@@ -114,6 +114,7 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
     graphStats: [],
     programmeTableStats: {},
     titles: ['', 'All thesis writers', 'Bachelors', 'Masters', 'Doctors', 'Others'],
+    programmeNames: {},
     status: 'Done',
     lastUpdated: '',
   }
