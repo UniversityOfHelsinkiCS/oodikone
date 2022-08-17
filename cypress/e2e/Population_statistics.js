@@ -223,7 +223,7 @@ describe('Population Statistics tests', () => {
       cy.init(pathToCSBach2017, 'onlyiamrights')
     })
 
-    it.skip('Population statistics is visible', () => {
+    it('Population statistics is visible', () => {
       cy.reload()
 
       cy.get('.card').within(() => {
@@ -238,7 +238,7 @@ describe('Population Statistics tests', () => {
       cy.contains('Credit statistics')
     })
 
-    it.skip('Students tab is not available', () => {
+    it('Students tab is not available', () => {
       cy.contains('Students (170)').should('not.exist')
       // TODO: somehow check that obfuscation works
     })
