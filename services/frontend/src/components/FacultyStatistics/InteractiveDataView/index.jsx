@@ -13,6 +13,7 @@ const InteractiveDataTable = ({
   wideTable,
   language,
   sliceStart,
+  extraHeight,
 }) => {
   if (!dataStats || !titles || !dataProgrammeStats) return null
 
@@ -75,6 +76,7 @@ const InteractiveDataTable = ({
                   longLabels={programmeNames}
                   language={language}
                   names={titles?.slice(sliceStart)}
+                  extraHeight={extraHeight}
                 />
               </Table.Cell>
             </ToggleTableView>

@@ -40,7 +40,6 @@ const ToggleTableView = React.forwardRef((props, ref) => {
     return toggleVisibility
   })
   const chartRowStyles = {
-    rowSpan: 100,
     display: visible ? '' : 'none',
   }
   const basicRowStyles = {
