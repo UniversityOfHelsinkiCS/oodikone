@@ -84,8 +84,9 @@ const getFacultyThesisWritersForStudyTrack = async (allThesisWriters, facultyPro
     queryParameters
   )
 
-  const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
-  allThesisWriters.years = reversedYears
+  allThesisWriters.years = years.map(year => year.toString())
+  const reversedYears = years.reverse()
+
   allThesisWriters.tableStats = reversedYears.map(year => [
     year,
     bachelors.tableStats[year] + masters.tableStats[year] + doctors.tableStats[year],

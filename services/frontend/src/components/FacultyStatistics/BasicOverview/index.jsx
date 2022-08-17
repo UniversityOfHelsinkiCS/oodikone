@@ -124,6 +124,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
                   programmeNames={credits?.data?.programmeNames}
                   sortedKeys={sortProgrammeKeys(Object.keys(credits?.data?.programmeTableStats))}
                   titles={credits?.data?.titles}
+                  extraHeight="EXTRA HEIGHT"
                   sliceStart={2}
                   language="fi"
                 />
@@ -132,20 +133,42 @@ const Overview = ({ faculty, academicYear, setAcademicYear }) => {
           )}
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider('Graduated and thesis writers of the faculty', 'GraduatedAndThesisWritersOfTheFaculty')}
+              {getDivider('Graduated of the faculty', 'GraduatedOfTheFaculty')}
               <div className="section-container">
                 <LineGraph
-                  cypress="GraduatedAndThesisWritersOfTheFaculty"
+                  cypress="GraduatedOfTheFaculty"
                   data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
                 />
                 <InteractiveDataTable
-                  cypress="GraduatedAndThesisWritersOfTheFaculty"
+                  cypress="GraduatedOfTheFaculty"
                   dataStats={basics?.data?.graduationInfo.tableStats}
                   dataProgrammeStats={basics?.data?.graduationInfo.programmeTableStats}
                   programmeNames={basics?.data?.programmeNames}
                   sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.graduationInfo.programmeTableStats))}
                   titles={basics?.data?.graduationInfo.titles}
                   sliceStart={2}
+                  language="fi"
+                />
+              </div>
+            </>
+          )}
+          {thesisWriters.isSuccess && thesisWriters.data && (
+            <>
+              {getDivider('Thesis writers of the faculty', 'ThesisWritersOfTheFaculty')}
+              <div className="section-container">
+                <LineGraph
+                  cypress="ThesisWritersOfTheFaculty"
+                  data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}
+                />
+                <InteractiveDataTable
+                  cypress="ThesisWritersOfTheFaculty"
+                  dataStats={thesisWriters?.data.tableStats}
+                  dataProgrammeStats={thesisWriters?.data.programmeTableStats}
+                  programmeNames={thesisWriters?.data.programmeNames}
+                  sortedKeys={sortProgrammeKeys(Object.keys(thesisWriters?.data.programmeTableStats))}
+                  titles={thesisWriters?.data?.titles}
+                  sliceStart={2}
+                  extraHeight="EXTRA HEIGHT"
                   language="fi"
                 />
               </div>

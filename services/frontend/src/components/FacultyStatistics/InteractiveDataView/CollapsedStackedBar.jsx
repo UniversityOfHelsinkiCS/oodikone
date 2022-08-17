@@ -5,11 +5,19 @@ import ReactHighcharts from 'react-highcharts'
 
 const colors = ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#2b908f', '#f45b5b', '#91e8e1']
 
-const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differenceData }) => {
+const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differenceData, extraHeight }) => {
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
 
+  const needsExtra = extraHeight === 'EXTRA HEIGHT'
+  const manyProgrammes =
+    labels.includes('KH57_001') ||
+    labels.includes('KH50_001') ||
+    labels.includes('KH70_001') ||
+    labels.includes('KH40_001') ||
+    labels.includes('KH30_001') ||
+    labels.includes('KH80_001')
   const dataTranspose = transpose(data)
     .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
     .reverse()
@@ -31,10 +39,13 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     if (change > 0) return `+${change.toString()}`
     return change
   }
-  const getFlexHeight = len => {
-    if (len < 6) return `${(1 / 3) * 100}%`
-    if (len < 15) return `${len * (1 / 16) * 100}%`
-    return `${len * (1 / 20) * 100}%`
+
+  // point width is 24 px different multipliers adjusts the height.
+  const getFlexHeight = (len, needsExtra, manyProgrammes, labels) => {
+    if (labels.includes('KH74_001')) return `${len * 24 * 5}px`
+    if (needsExtra && manyProgrammes) return `${len * 24 * 1.5}px`
+    if (needsExtra) return `${len * 24 * 2.5}px`
+    return `${len * 24 * 1.5}px`
   }
 
   const getColor = change => {
@@ -48,8 +59,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     chart: {
       type: 'bar',
       marginTop: 60,
-      height: getFlexHeight(labels.length),
-      padding: 2,
+      height: getFlexHeight(labels.length, needsExtra, manyProgrammes, labels),
     },
     credits: {
       text: 'oodikone | TOSKA',
@@ -113,7 +123,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     plotOptions: {
       series: {
         stacking: 'normal',
-        pointWidth: 25,
+        pointWidth: 24,
         dataLabels: {
           enabled: true,
           fontSize: '24px',
