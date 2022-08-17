@@ -1,8 +1,8 @@
 const router = require('express').Router()
-const { faculties, degreeProgrammeCodesOfFaculty } = require('../services/organisations')
+const { faculties } = require('../services/organisations')
 const { combineFacultyBasics } = require('../services/facultyBasics')
 const { combineFacultyCredits } = require('../services/facultyCredits')
-const { degreeProgrammesOfFaculty } = require('../services/faculty')
+const { degreeProgrammesOfFaculty, findFacultyProgrammeCodes } = require('../services/faculty')
 const { combineFacultyThesisWriters } = require('../services/facultyThesisWriters')
 
 // Faculty uses a lot of tools designed for Study programme.
@@ -39,7 +39,8 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
     lastUpdated: '',
   }
 
-  const programmes = await degreeProgrammeCodesOfFaculty(code)
+  const programmes = await findFacultyProgrammeCodes(code)
+
   if (programmes) {
     await combineFacultyBasics(allBasics, code, programmes, yearType)
   }

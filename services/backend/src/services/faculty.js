@@ -16,6 +16,7 @@ const {
   facultyFormatProgramme,
   formatFacultyTransfer,
   formatFacultyThesisWriter,
+  formatOrganization,
 } = require('./facultyHelpers')
 
 const startedStudyrights = async (faculty, since) =>
@@ -140,6 +141,25 @@ const getProgrammeName = async programme => {
   })
 }
 
+const facultyOgranizationId = async faculty => {
+  return await Organization.findOne({
+    attributes: ['id'],
+    where: {
+      code: faculty,
+    },
+  })
+}
+
+const getChildOrganizations = async facultyId =>
+  (
+    await Organization.findAll({
+      attributes: ['id', 'name', 'code', 'parent_id'],
+      where: {
+        parent_id: facultyId,
+      },
+    })
+  ).map(formatOrganization)
+
 const thesisWriters = async (providers, since, thesisTypes) =>
   (
     await Credit.findAll({
@@ -179,6 +199,37 @@ const thesisWriters = async (providers, since, thesisTypes) =>
     })
   ).map(formatFacultyThesisWriter)
 
+// Some programme modules are not directly associated to a faculty (organization).
+// Some have intermediate organizations, such as department, so the connection must be diggeg up
+const findFacultyProgrammeCodes = async faculty => {
+  let allProgrammes = []
+  let allProgrammeCodes = []
+
+  const directAssociationProgrammes = await degreeProgrammesOfFaculty(faculty)
+
+  allProgrammes = allProgrammes.concat(directAssociationProgrammes)
+  allProgrammeCodes = allProgrammeCodes.concat(directAssociationProgrammes.map(prog => prog.code))
+
+  // find faculty's organization id and its direct child organizations
+  const { id } = await facultyOgranizationId(faculty)
+  const facultyChildOrganizations = await getChildOrganizations(id)
+
+  // get programme modules that have a found child as organization(_id)
+  for (const org of facultyChildOrganizations) {
+    const childAssociationProgrammes = await degreeProgrammesOfFaculty(org.code)
+    if (childAssociationProgrammes.length > 0) {
+      childAssociationProgrammes.forEach(prog => {
+        if (!(prog.code in allProgrammeCodes)) {
+          allProgrammes = allProgrammes.concat([prog])
+          allProgrammeCodes = allProgrammeCodes.concat([prog.code])
+        }
+      })
+    }
+  }
+
+  return allProgrammeCodes
+}
+
 module.exports = {
   startedStudyrights,
   graduatedStudyrights,
@@ -188,4 +239,5 @@ module.exports = {
   degreeProgrammesOfFaculty,
   getProgrammeName,
   thesisWriters,
+  findFacultyProgrammeCodes,
 }

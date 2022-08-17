@@ -78,10 +78,16 @@ const formatFacultyThesisWriter = credit => {
   }
 }
 
+const formatOrganization = org => {
+  const { id, name, code, parent_id } = org
+  return { id, name, code, parentId: parent_id }
+}
+
 module.exports = {
   findRightProgramme,
   facultyFormatStudyright,
   facultyFormatProgramme,
   formatFacultyTransfer,
   formatFacultyThesisWriter,
+  formatOrganization,
 }
