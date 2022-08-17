@@ -132,15 +132,6 @@ const degreeProgrammesOfFaculty = async facultyCode =>
     })
   ).map(facultyFormatProgramme)
 
-const getProgrammeName = async programme => {
-  return await ElementDetail.findOne({
-    attributes: ['name'],
-    where: {
-      code: programme,
-    },
-  })
-}
-
 const facultyOgranizationId = async faculty => {
   return await Organization.findOne({
     attributes: ['id'],
@@ -227,7 +218,7 @@ const findFacultyProgrammeCodes = async faculty => {
     }
   }
 
-  return allProgrammeCodes
+  return allProgrammes
 }
 
 module.exports = {
@@ -237,7 +228,6 @@ module.exports = {
   transferredAway,
   transferredTo,
   degreeProgrammesOfFaculty,
-  getProgrammeName,
   thesisWriters,
   findFacultyProgrammeCodes,
 }

@@ -5,7 +5,6 @@ const {
   transferredInsideFaculty,
   transferredAway,
   transferredTo,
-  getProgrammeName,
 } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('./studyprogrammeHelpers')
 const { findRightProgramme } = require('./facultyHelpers')
@@ -29,7 +28,7 @@ const filterDuplicateStudyrights = studyrights => {
   return Object.values(rightsToCount)
 }
 
-const addProgramme = async (stats, programme, tableStats, transferYear, index, allBasics) => {
+const addProgramme = async (stats, programme, tableStats, transferYear, index, allBasics, facultyProgrammes) => {
   if (!(programme in stats)) {
     stats[programme] = {}
     Object.keys(tableStats).forEach(year => (stats[programme][year] = [0, 0, 0]))
@@ -37,7 +36,7 @@ const addProgramme = async (stats, programme, tableStats, transferYear, index, a
   stats[programme][transferYear][index] += 1
 
   if (!(programme in allBasics.programmeNames)) {
-    const { name } = await getProgrammeName(programme)
+    const name = facultyProgrammes.filter(prog => prog.code === programme)?.name
     allBasics.programmeNames[programme] = name
   }
 }
@@ -164,9 +163,10 @@ const getFacultyTransfers = async (
   counts,
   programmeData
 ) => {
-  const insideTransfers = await transferredInsideFaculty(programmes, since)
-  const awayTransfers = await transferredAway(programmes, since)
-  const toTransfers = await transferredTo(programmes, since)
+  const programmeCodes = programmes.map(prog => prog.code)
+  const insideTransfers = await transferredInsideFaculty(programmeCodes, since)
+  const awayTransfers = await transferredAway(programmeCodes, since)
+  const toTransfers = await transferredTo(programmeCodes, since)
 
   const transferGraphStats = [[...graphStats], [...graphStats], [...graphStats]]
   const transferTableStats = {}
@@ -178,20 +178,20 @@ const getFacultyTransfers = async (
     const transferYear = defineYear(transferdate, isAcademicYear)
     transferGraphStats[0][indexOf(yearsArray, transferYear)] += 1
     transferTableStats[transferYear][0] += 1
-    await addProgramme(programmeTableStats, targetcode, tableStats, transferYear, 0, allBasics)
+    await addProgramme(programmeTableStats, targetcode, tableStats, transferYear, 0, allBasics, programmes)
   }
   for (const { transferdate, sourcecode } of awayTransfers) {
     const transferYear = defineYear(transferdate, isAcademicYear)
     transferGraphStats[1][indexOf(yearsArray, transferYear)] += 1
     transferTableStats[transferYear][1] += 1
-    await addProgramme(programmeTableStats, sourcecode, tableStats, transferYear, 1, allBasics)
+    await addProgramme(programmeTableStats, sourcecode, tableStats, transferYear, 1, allBasics, programmes)
   }
 
   for (const { transferdate, targetcode } of toTransfers) {
     const transferYear = defineYear(transferdate, isAcademicYear)
     transferGraphStats[2][indexOf(yearsArray, transferYear)] += 1
     transferTableStats[transferYear][2] += 1
-    await addProgramme(programmeTableStats, targetcode, tableStats, transferYear, 2, allBasics)
+    await addProgramme(programmeTableStats, targetcode, tableStats, transferYear, 2, allBasics, programmes)
   }
 
   allBasics.studentInfo.graphStats.push({ name: 'Transferred inside', data: transferGraphStats[0] })
