@@ -127,6 +127,11 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
         dataLabels: {
           enabled: true,
           fontSize: '24px',
+          filter: {
+            property: 'y',
+            operator: '>',
+            value: 2,
+          },
         },
       },
     },
