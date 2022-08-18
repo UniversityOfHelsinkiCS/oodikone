@@ -35,7 +35,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
     if (!(programme.code in programmeCounts)) {
       programmeCounts[programme.code] = {}
       Object.keys(bachelors.tableStats).forEach(year => (programmeCounts[programme.code][year] = [0, 0, 0, 0, 0]))
-      programmeNames = { ...programmeNames, ...programme }
+      programmeNames[programme.code] = programme.name
     }
     programmeCounts[programme.code][thesisYear][0] += 1
 
