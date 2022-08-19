@@ -411,7 +411,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=CoursesSortableTable]').within(() => {
         // Test sorting by different columns
         cy.get('th').eq(0).click()
-        cy.get('tr').eq(1).contains('Tietojenkäsittelytieteen kisälliopetus: Java-ohjelmointi')
+        cy.get('tr').eq(2).contains('Tietojenkäsittelytieteen kisälliopetus: Java-ohjelmointi')
         cy.get('th').eq(1).click()
         cy.get('tr').eq(1).contains('Äidinkielinen viestintä')
         cy.get('th').eq(2).click()
