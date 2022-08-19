@@ -590,6 +590,36 @@ const getOtherStudentsForProgrammeCourses = async (from, to, programmeCourses, s
   }))
 }
 
+const getTransferStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
+  const res = await sequelize.query(
+    `
+    WITH Dist AS (
+      SELECT DISTINCT cr.student_studentnumber AS student, cr.credits AS credits,
+      co.code AS code, co.name AS course_name FROM credit cr
+      INNER JOIN course co ON cr.course_code = co.code
+      WHERE cr.attainment_date BETWEEN :from AND :to
+      AND (cr."isStudyModule" = false OR cr."isStudyModule" IS NULL)
+      AND cr.course_code IN (:programmeCourses)
+      AND cr.credittypecode = 9
+      )
+      SELECT COUNT(student) AS total_students, SUM(credits) AS total_credits, code, course_name
+      FROM Dist
+      GROUP BY dist.code, course_name;
+      `,
+    {
+      type: sequelize.QueryTypes.SELECT,
+      replacements: { from, to, programmeCourses },
+    }
+  )
+  return res.map(course => ({
+    code: course.code,
+    name: course.course_name,
+    totalTransferStudents: parseInt(course.total_students),
+    totalTransferCredits: parseInt(course.total_credits),
+    type: 'transfer',
+  }))
+}
+
 const getStudentsWithoutStudyrightForProgrammeCourses = async (from, to, programmeCourses) => {
   const res = await sequelize.query(
     `
@@ -729,4 +759,5 @@ module.exports = {
   getAllProgrammeCourses,
   getStudyRights,
   getCourseCodesForStudyProgramme,
+  getTransferStudentsForProgrammeCourses,
 }

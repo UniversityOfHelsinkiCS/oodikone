@@ -59,7 +59,6 @@ const getColumns = (language, showStudents) => {
         getRowVal: course => course.totalAllStudents,
         getRowContent: course => course.totalAllStudents,
       },
-
       {
         key: 'totalOwnProgramme',
         title: 'Major students',
@@ -68,7 +67,6 @@ const getColumns = (language, showStudents) => {
         getRowVal: course => course.totalProgrammeStudents,
         getRowContent: course => course.totalProgrammeStudents,
       },
-
       {
         key: 'totalOtherProgramme',
         title: 'Non-major students',
@@ -77,7 +75,6 @@ const getColumns = (language, showStudents) => {
         getRowVal: course => course.totalOtherProgrammeStudents,
         getRowContent: course => course.totalOtherProgrammeStudents,
       },
-
       {
         key: 'totalWithoutStudyright',
         title: 'Non-degree students',
@@ -86,6 +83,15 @@ const getColumns = (language, showStudents) => {
         filterType: 'range',
         getRowVal: course => course.totalWithoutStudyrightStudents,
         getRowContent: course => course.totalWithoutStudyrightStudents,
+      },
+      {
+        key: 'transfer',
+        title: 'Transferred students',
+        helpText: toolTips.TransferredCourses,
+        cellStyle: { textAlign: 'right' },
+        filterType: 'range',
+        getRowVal: course => course.totalTransferStudents,
+        getRowContent: course => course.totalTransferStudents,
       },
     ]
   } else {
@@ -159,6 +165,15 @@ const getColumns = (language, showStudents) => {
         filterType: 'range',
         getRowVal: course => course.totalWithoutStudyrightCredits,
         getRowContent: course => course.totalWithoutStudyrightCredits,
+      },
+      {
+        key: 'totalTransfer',
+        title: 'Transferred credits',
+        helpText: toolTips.TransferredCredits,
+        cellStyle: { textAlign: 'right' },
+        filterType: 'range',
+        getRowVal: course => course.totalTransferCredits,
+        getRowContent: course => course.totalTransferCredits,
       },
     ]
   }

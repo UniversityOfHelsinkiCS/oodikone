@@ -5,6 +5,7 @@ const {
   getCurrentStudyYearStartDate,
   getOwnStudentsForProgrammeCourses,
   getStudentsWithoutStudyrightForProgrammeCourses,
+  getTransferStudentsForProgrammeCourses,
   getOtherStudentsForProgrammeCourses,
   getAllProgrammeCourses,
 } = require('./studyprogramme')
@@ -50,6 +51,9 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
           case 'otherStudents':
             result = await getOtherStudentsForProgrammeCourses(from, to, programmeCourses, studyprogramme)
             break
+          case 'transfer':
+            result = await getTransferStudentsForProgrammeCourses(from, to, programmeCourses)
+            break
           default:
             result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
         }
@@ -92,16 +96,26 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     studyprogramme
   )
 
+  const yearlyTransferStudentsPromises = makeYearlyPromises(
+    yearRange,
+    academicYear,
+    'transfer',
+    programmeCourses,
+    studyprogramme
+  )
+
   const [
     yearlyStudentByCourse,
     yearlyProgrammeStudents,
     yearlyStudentsWithoutStudyright,
     yearlyOtherProgrammeStudents,
+    yearlyTransferStudents,
   ] = await Promise.all([
     Promise.all(yearlyStudentByCoursePromises),
     Promise.all(yearlyProgrammeStudentsPromises),
     Promise.all(yearlyStudentsWithoutStudyrightPromises),
     Promise.all(yearlyOtherProgrammeStudentsPromises),
+    Promise.all(yearlyTransferStudentsPromises),
   ])
 
   let maxYear = 0
@@ -110,6 +124,7 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     ...yearlyProgrammeStudents.flat(),
     ...yearlyStudentsWithoutStudyright.flat(),
     ...yearlyOtherProgrammeStudents.flat(),
+    ...yearlyTransferStudents.flat(),
   ].reduce((acc, curr) => {
     if (curr.year > maxYear) maxYear = curr.year
     if (!acc[curr.code]) {
@@ -129,6 +144,8 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
         totalOtherProgrammeCredits: 0,
         totalWithoutStudyrightStudents: 0,
         totalWithoutStudyrightCredits: 0,
+        totalTransferStudents: 0,
+        totalTransferCredits: 0,
       }
     }
     switch (curr.type) {
@@ -140,16 +157,17 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
         acc[curr.code]['years'][curr.year]['totalProgrammeStudents'] += curr.totalProgrammeStudents
         acc[curr.code]['years'][curr.year]['totalProgrammeCredits'] += curr.totalProgrammeCredits
         break
-
       case 'otherProgramme':
         acc[curr.code]['years'][curr.year]['totalOtherProgrammeStudents'] += curr.totalOtherProgrammeStudents
         acc[curr.code]['years'][curr.year]['totalOtherProgrammeCredits'] += curr.totalOtherProgrammeCredits
         break
-
       case 'noStudyright':
         acc[curr.code]['years'][curr.year]['totalWithoutStudyrightStudents'] += curr.totalWithoutStudyrightStudents
         acc[curr.code]['years'][curr.year]['totalWithoutStudyrightCredits'] += curr.totalWithoutStudyrightCredits
         break
+      case 'transfer':
+        acc[curr.code]['years'][curr.year]['totalTransferStudents'] += curr.totalTransferStudents
+        acc[curr.code]['years'][curr.year]['totalTransferCredits'] += curr.totalTransferCredits
     }
 
     return acc
@@ -164,6 +182,8 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
     'totalOtherProgrammeCredits',
     'totalWithoutStudyrightStudents',
     'totalWithoutStudyrightCredits',
+    'totalTransferCredits',
+    'totalTransferStudents',
   ]
   ayCourses.forEach(ayCourse => {
     const normCode = isOpenUniCourseCode(ayCourse)[1]
@@ -187,6 +207,8 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
               totalOtherProgrammeCredits: 0,
               totalWithoutStudyrightStudents: 0,
               totalWithoutStudyrightCredits: 0,
+              totalTransferCredits: 0,
+              totalTransferStudents: 0,
             }
           } else {
             mergedCourse['years'][year] = { ...allCourses[normCode]['years'][year] }

@@ -80,4 +80,10 @@ export default {
   NonDegree: `
   Opiskelijat, joilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
   `,
+  TransferredCourses: `
+  Sisältää opiskelijat, jotka ovat suorittaneet kyseisenä vuonna hyväksiluettuja opintopisteitä tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet
+  `,
+  TransferredCredits: `
+  Sisältää opintopisteet, jotka ovat suoritettu kyseisenä vuonna, ja hyväksiluettu tähän koulutusohjelmaan. Mukana ovat kaikenlaisilla opinto-oikeuksilla hyväksiluetut opintopisteet
+  `,
 }
