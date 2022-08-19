@@ -40,7 +40,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     return change
   }
 
-  // point width is 24 px different multipliers adjusts the height.
+  // Point width is 24 px different multipliers adjusts the height.
   const getFlexHeight = (len, needsExtra, manyProgrammes, labels) => {
     if (labels.includes('KH74_001')) return `${len * 24 * 5}px`
     if (needsExtra && manyProgrammes) return `${len * 24 * 1.5}px`
@@ -109,7 +109,9 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
       backgroundColor: 'white',
       fontSize: '25px',
       formatter() {
-        let tooltipString = `<b>${longLabels[this.x][language]}</b><br /><p>${this.x}</p><br />`
+        let tooltipString = `<b>${longLabels[this.x] ? longLabels[this.x][language] : ''}</b><br /><p>${
+          this.x
+        }</p><br />`
         const diffArray = differenceArray[this.x]
         this.points.forEach(point => {
           tooltipString += `<span style="color:${point.color}">●</span> <b>${point.series.name}: ${point.y}</b>
