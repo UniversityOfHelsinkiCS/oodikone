@@ -63,6 +63,8 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
               acc.totalOtherProgrammeCredits += curr[1].totalOtherProgrammeCredits
               acc.totalWithoutStudyrightStudents += curr[1].totalWithoutStudyrightStudents
               acc.totalWithoutStudyrightCredits += curr[1].totalWithoutStudyrightCredits
+              acc.totalTransferCredits += curr[1].totalTransferCredits
+              acc.totalTransferStudents += curr[1].totalTransferStudents
             }
 
             return acc
@@ -76,6 +78,8 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
             totalOtherProgrammeCredits: 0,
             totalWithoutStudyrightStudents: 0,
             totalWithoutStudyrightCredits: 0,
+            totalTransferCredits: 0,
+            totalTransferStudents: 0,
           }
         )
         return {

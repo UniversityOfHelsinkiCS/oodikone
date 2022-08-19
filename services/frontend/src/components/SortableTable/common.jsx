@@ -45,7 +45,7 @@ export const getColumnValue = (ctx, column, exportMode = false) => {
     return column.getRowExportVal(ctx.item, ctx.isGroup, ctx.parents)
   }
 
-  if (column.getRowVal) {
+  if (column && column.getRowVal) {
     return column.getRowVal(ctx.item, ctx.isGroup, ctx.parents)
   }
 
