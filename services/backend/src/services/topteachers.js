@@ -43,7 +43,7 @@ const getCategoriesAndYears = async () => {
 
 const creditsWithTeachersForYear = yearcode =>
   Credit.findAll({
-    attributes: ['id', 'credits', 'credittypecode', 'isStudyModule'],
+    attributes: ['id', 'credits', 'credittypecode', 'isStudyModule', 'is_open'],
     include: [
       {
         model: Semester,
@@ -106,21 +106,20 @@ const findTopTeachers = async yearcode => {
   credits
     .filter(isRegularCourse)
     .map(credit => {
-      const { credits, course, credittypecode } = credit
+      const { credits, credittypecode, is_open } = credit
       const teachers = credit.teachers
         .filter(({ id }) => !id.includes('hy-hlo-org')) // Remove faculties from the leaderboards
         .map(({ id, name }) => ({ id, name }))
       const passed = Credit.passed(credit) || Credit.improved(credit)
       const failed = Credit.failed(credit)
       const transferred = credittypecode === 9
-      const isOpenUni = course.code[0] === 'A'
-      return { passed, failed, credits, teachers, isOpenUni, transferred }
+      return { passed, failed, credits, teachers, is_open, transferred }
     })
     .forEach(credit => {
-      const { passed, failed, credits, teachers, isOpenUni, transferred } = credit
+      const { passed, failed, credits, teachers, is_open, transferred } = credit
       teachers.forEach(teacher => {
         all[teacher.id] = updatedStats(all, teacher, passed, failed, credits, transferred)
-        if (isOpenUni) {
+        if (is_open) {
           openuni[teacher.id] = updatedStats(openuni, teacher, passed, failed, credits, transferred)
         }
       })
