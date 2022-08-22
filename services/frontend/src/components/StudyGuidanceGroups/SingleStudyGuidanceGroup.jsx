@@ -286,6 +286,8 @@ const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgramm
     history.push('/studyguidancegroups')
   }
 
+  if (!group) return null
+
   return (
     <>
       <Wrapper isLoading={isLoading}>
@@ -316,21 +318,15 @@ const SingleStudyGuidanceGroupContainer = ({ group }) => {
 
   if (!group) {
     return (
-      <SingleStudyGroupViewWrapper>
-        <StyledMessage>
-          Couldn't find group with this id! Please check that id is correct and you have rights to this study guidance
-          group.
-        </StyledMessage>
-      </SingleStudyGroupViewWrapper>
+      <StyledMessage>
+        Couldn't find group with this id! Please check that id is correct and you have rights to this study guidance
+        group.
+      </StyledMessage>
     )
   }
 
-  if (groupStudentNumbers.length === 0) {
-    return (
-      <SingleStudyGroupViewWrapper>
-        <StyledMessage>This study guidance group doesn't contain any students.</StyledMessage>
-      </SingleStudyGroupViewWrapper>
-    )
+  if (!groupStudentNumbers.length) {
+    return <StyledMessage>This study guidance group doesn't contain any students.</StyledMessage>
   }
 
   return (
