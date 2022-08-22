@@ -3,6 +3,7 @@ import CoolDataScience from './coolDataScience'
 import CourseStatistics from './courseStatistics'
 import CoursePopulation from './coursePopulation'
 import Studyprogramme from './studyprogramme'
+import Faculty from './faculty'
 
 export default {
   PopulationStatistics,
@@ -10,4 +11,5 @@ export default {
   CourseStatistics,
   CoursePopulation,
   Studyprogramme,
+  Faculty,
 }

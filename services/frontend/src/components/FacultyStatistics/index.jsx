@@ -26,7 +26,7 @@ const FacultyStatistics = props => {
 
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
-
+  const [studyProgrammes, setStudyProgrammes] = useState(false)
   useEffect(() => {
     if (!facultyName) {
       return
@@ -56,7 +56,15 @@ const FacultyStatistics = props => {
     const panes = [
       {
         menuItem: 'Basic information',
-        render: () => <BasicOverview faculty={faculty} academicYear={academicYear} setAcademicYear={setAcademicYear} />,
+        render: () => (
+          <BasicOverview
+            faculty={faculty}
+            academicYear={academicYear}
+            setAcademicYear={setAcademicYear}
+            studyProgrammes={studyProgrammes}
+            setStudyProgrammes={setStudyProgrammes}
+          />
+        ),
       },
       {
         menuItem: 'Programmes and student populations',
