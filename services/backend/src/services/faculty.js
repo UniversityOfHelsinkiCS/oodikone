@@ -126,7 +126,9 @@ const degreeProgrammesOfFaculty = async facultyCode =>
       include: {
         model: Organization,
         where: {
-          code: facultyCode,
+          code: {
+            [Op.startsWith]: facultyCode,
+          },
         },
       },
     })
@@ -191,7 +193,7 @@ const thesisWriters = async (providers, since, thesisTypes) =>
   ).map(formatFacultyThesisWriter)
 
 // Some programme modules are not directly associated to a faculty (organization).
-// Some have intermediate organizations, such as department, so the connection must be diggeg up
+// Some have intermediate organizations, such as department, so the connection must be digged up
 const findFacultyProgrammeCodes = async faculty => {
   let allProgrammes = []
   let allProgrammeCodes = []
@@ -205,7 +207,7 @@ const findFacultyProgrammeCodes = async faculty => {
   const { id } = await facultyOgranizationId(faculty)
   const facultyChildOrganizations = await getChildOrganizations(id)
 
-  // get programme modules that have a found child as organization(_id)
+  // get programme modules that have a faculty child as organization(_id)
   for (const org of facultyChildOrganizations) {
     const childAssociationProgrammes = await degreeProgrammesOfFaculty(org.code)
     if (childAssociationProgrammes.length > 0) {
@@ -215,6 +217,22 @@ const findFacultyProgrammeCodes = async faculty => {
           allProgrammeCodes = allProgrammeCodes.concat([prog.code])
         }
       })
+    } else {
+      // dig deeper
+      const grandChildren = await getChildOrganizations(org.id)
+      if (grandChildren.length > 0) {
+        for (const gcOrg of grandChildren) {
+          const associatedProgrammes = await degreeProgrammesOfFaculty(gcOrg.code)
+          if (associatedProgrammes.length > 0) {
+            associatedProgrammes.forEach(prog => {
+              if (!(prog.code in allProgrammeCodes)) {
+                allProgrammes = allProgrammes.concat([prog])
+                allProgrammeCodes = allProgrammeCodes.concat([prog.code])
+              }
+            })
+          }
+        }
+      }
     }
   }
 
