@@ -36,7 +36,7 @@ const addProgramme = async (stats, programme, tableStats, transferYear, index, a
   stats[programme][transferYear][index] += 1
 
   if (!(programme in allBasics.programmeNames)) {
-    const name = facultyProgrammes.filter(prog => prog.code === programme)?.name
+    const name = facultyProgrammes.filter(prog => prog.code === programme)[0]?.name
     allBasics.programmeNames[programme] = name
   }
 }
