@@ -48,7 +48,11 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
         if (req.body.selectedStudentsByYear) {
           req.body.selectedStudents = encrypted
             ? req.body.selectedStudents
-                .filter(({ encryptedData }) => req.body.selectedStudentsByYear[year].includes(encryptedData))
+                .filter(
+                  ({ encryptedData }) =>
+                    req.body.selectedStudentsByYear[year] &&
+                    req.body.selectedStudentsByYear[year].includes(encryptedData)
+                )
                 .map(decrypt)
             : req.body.selectedStudentsByYear[year]
         }
