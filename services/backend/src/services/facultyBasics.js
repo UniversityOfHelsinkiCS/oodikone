@@ -137,8 +137,7 @@ const getFacultyGraduates = async (
   })
 
   allBasics.studentInfo.graphStats.push({ name: 'Graduated', data: graduatedGraphStats[0] })
-  // Is this needed in graph
-  // allBasics.graduationInfo.graphStats.push({ name: 'All graduations', data: graduatedGraphStats[0] })
+
   allBasics.graduationInfo.graphStats.push({ name: 'Bachelors', data: graduatedGraphStats[1] })
   allBasics.graduationInfo.graphStats.push({ name: 'Masters', data: graduatedGraphStats[2] })
   allBasics.graduationInfo.graphStats.push({ name: 'Doctors', data: graduatedGraphStats[3] })
