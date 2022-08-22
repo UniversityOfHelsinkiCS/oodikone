@@ -293,7 +293,7 @@ const SingleStudyGroupViewWrapper = ({ group, language, isLoading, studyProgramm
         <Divider />
         <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
           <Header size="medium" style={{ marginRight: 'auto' }}>
-            {group.name && language && getTextIn(group.name, language)}
+            {group && group.name && language && getTextIn(group.name, language)}
           </Header>
           {group.tags?.studyProgramme && (
             <Label tag content={studyProgrammes.find(p => p.value === group.tags.studyProgramme)?.text} color="blue" />
