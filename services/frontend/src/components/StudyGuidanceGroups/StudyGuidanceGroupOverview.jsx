@@ -42,10 +42,11 @@ const cellContent = { flexGrow: 1 }
 
 const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) => {
   const [changeStudyGuidanceGroupTags, { isLoading }] = useChangeStudyGuidanceGroupTagsMutation()
+  const { language } = useSelector(({ settings }) => settings)
 
   const onSubmit = values => {
     changeStudyGuidanceGroupTags({ groupId: group.id, tags: values })
-    if (group.tags?.[tagName]) toggleEdit()
+    toggleEdit()
   }
 
   return (
@@ -57,7 +58,7 @@ const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) =>
       >
         {formik => (
           <>
-            <Modal.Header>Edit {prettifyCamelCase(tagName)}</Modal.Header>
+            <Modal.Header>{getTextIn(group.name, language)}</Modal.Header>
             <Modal.Content>
               <AssociateTagForm group={group} tagName={tagName} selectFieldItems={selectFieldItems} formik={formik} />
             </Modal.Content>
@@ -174,7 +175,9 @@ const TagCell = ({ tagName, group, studyProgrammes }) => {
             <Button icon="pencil" onClick={() => toggleEdit()} size="tiny" />
           </div>
         </div>
-      ) : null}
+      ) : (
+        <Button content={`Add ${prettifyCamelCase(tagName)}`} icon="add" onClick={() => toggleEdit()} size="tiny" />
+      )}
     </>
   )
 }
