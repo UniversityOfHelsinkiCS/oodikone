@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link, useHistory } from 'react-router-dom'
 import { Formik } from 'formik'
-import { Form, Button, Icon } from 'semantic-ui-react'
+import { Form, Button, Icon, Modal } from 'semantic-ui-react'
 import Datetime from 'react-datetime'
 import { getTextIn, textAndDescriptionSearch } from 'common'
 import { useChangeStudyGuidanceGroupTagsMutation } from 'redux/studyGuidanceGroups'
@@ -40,84 +40,111 @@ const prettifyCamelCase = str => {
 const cellWrapper = { display: 'flex', gap: '8px', width: '100%' }
 const cellContent = { flexGrow: 1 }
 
-const AssociateTagForm = ({ group, tagName, toggleEdit, selectFieldItems }) => {
+const EditTagModal = ({ group, tagName, toggleEdit, selectFieldItems, open }) => {
   const [changeStudyGuidanceGroupTags, { isLoading }] = useChangeStudyGuidanceGroupTagsMutation()
+
+  const onSubmit = values => {
+    changeStudyGuidanceGroupTags({ groupId: group.id, tags: values })
+    if (group.tags?.[tagName]) toggleEdit()
+  }
+
   return (
-    <div>
+    <Modal onClose={toggleEdit} open={open}>
       <Formik
         initialValues={{ [tagName]: '' }}
-        onSubmit={values => {
-          changeStudyGuidanceGroupTags({ groupId: group.id, tags: values })
-          if (group.tags?.[tagName]) toggleEdit()
-        }}
+        onSubmit={values => onSubmit(values)}
         validate={values => (!values[tagName] ? { [tagName]: `${tagName} is required` } : {})}
       >
         {formik => (
-          <Form onSubmit={formik.handleSubmit} style={{ ...cellWrapper, alignItems: 'center' }}>
-            <div style={cellContent}>
-              {tagName === 'studyProgramme' ? (
-                <Form.Select
-                  name={tagName}
-                  search={textAndDescriptionSearch}
-                  fluid
-                  placeholder={
-                    selectFieldItems.find(p => p.value === group.tags?.[tagName])?.text || 'Select study programme'
-                  }
-                  options={selectFieldItems}
-                  closeOnChange
-                  value={formik.values[tagName]}
-                  onChange={(_, value) => formik.setFieldValue(tagName, value?.value)}
-                />
-              ) : (
-                <Datetime
-                  className="studyguidancegroupoverview__yeartagselector"
-                  name={tagName}
-                  dateFormat="YYYY"
-                  timeFormat={false}
-                  initialvalue={group.tags?.[tagName]}
-                  inputProps={{ readOnly: true }}
-                  renderYear={(props, year) => {
-                    const shiftBy = 2 // fix to start from 2017 instead of 2019
-                    const shiftedProps = {
-                      ...props,
-                      key: props.key - shiftBy,
-                      'data-value': props['data-value'] - shiftBy,
-                    }
-                    const formattedAndShiftedYear = startYearToAcademicYear(year - shiftBy)
-                    return <td {...shiftedProps}> {formattedAndShiftedYear}</td>
-                  }}
-                  renderInput={({ value, ...rest }) => {
-                    return (
-                      <div>
-                        <input value={startYearToAcademicYear(value)} placeholder="Select year" {...rest} />
-                      </div>
-                    )
-                  }}
-                  closeOnSelect
-                  value={formik.values[tagName]}
-                  onChange={value => formik.setFieldValue(tagName, value?.format('YYYY'))}
-                />
-              )}
-            </div>
-            <div style={{ ...cellContent, flexGrow: 0 }}>
-              <Button type="submit" style={{ margin: '0' }} disabled={isLoading}>
-                Add {prettifyCamelCase(tagName)}
-              </Button>
-            </div>
-            {group.tags?.[tagName] && (
-              <div style={cellContent}>
-                <Button icon type="button" style={{ margin: '0' }} onClick={() => toggleEdit()}>
-                  Close
-                  <Icon name="close" />
-                </Button>
-              </div>
-            )}
-          </Form>
+          <>
+            <Modal.Header>Edit {prettifyCamelCase(tagName)}</Modal.Header>
+            <Modal.Content>
+              <AssociateTagForm group={group} tagName={tagName} selectFieldItems={selectFieldItems} formik={formik} />
+            </Modal.Content>
+            <Modal.Actions>
+              <Button content="Cancel" labelPosition="right" icon="trash" onClick={toggleEdit} negative />
+              <Button
+                content="Save"
+                type="submit"
+                labelPosition="right"
+                icon="checkmark"
+                onClick={formik.handleSubmit}
+                disabled={isLoading}
+                positive
+              />
+            </Modal.Actions>
+          </>
         )}
       </Formik>
-    </div>
+    </Modal>
   )
 }
+
+const AssociateTagForm = ({ group, tagName, selectFieldItems, formik }) => (
+  <>
+    <p>
+      {tagName === 'studyProgramme'
+        ? `Edit associated study programme for this group:`
+        : `Edit associated starting year for this group:`}
+    </p>
+    <Form onSubmit={formik.handleSubmit} style={{ ...cellWrapper, alignItems: 'center' }}>
+      <div style={cellContent}>
+        {tagName === 'studyProgramme' ? (
+          <Form.Select
+            name={tagName}
+            search={textAndDescriptionSearch}
+            fluid
+            placeholder={
+              selectFieldItems.find(p => p.value === group.tags?.[tagName])?.text || 'Select study programme'
+            }
+            options={selectFieldItems}
+            closeOnChange
+            value={formik.values[tagName]}
+            onChange={(_, value) => formik.setFieldValue(tagName, value?.value)}
+          />
+        ) : (
+          <Datetime
+            className="studyguidancegroupoverview__yeartagselector"
+            name={tagName}
+            dateFormat="YYYY"
+            timeFormat={false}
+            initialvalue={group.tags?.[tagName]}
+            inputProps={{ readOnly: true }}
+            renderYear={(props, year) => {
+              const shiftBy = 2 // fix to start from 2017 instead of 2019
+              const formattedAndShiftedYear = startYearToAcademicYear(year - shiftBy)
+              const shiftedProps = {
+                ...props,
+                key: props.key - shiftBy,
+                className:
+                  `${formik.values[tagName]}` === formattedAndShiftedYear.substring(0, 4)
+                    ? 'rdtYear rdtActive'
+                    : 'rdtYear',
+                'data-value': props['data-value'] - shiftBy,
+              }
+              return <td {...shiftedProps}> {formattedAndShiftedYear}</td>
+            }}
+            renderInput={({ value, ...rest }) => {
+              return (
+                <div>
+                  <input
+                    value={startYearToAcademicYear(value)}
+                    placeholder="Select year"
+                    style={{ maxWidth: 400 }}
+                    {...rest}
+                  />
+                </div>
+              )
+            }}
+            closeOnSelect
+            value={formik.values[tagName]}
+            onChange={value => formik.setFieldValue(tagName, value?.format('YYYY'))}
+          />
+        )}
+      </div>
+    </Form>
+  </>
+)
 
 const TagCell = ({ tagName, group, studyProgrammes }) => {
   const [showEdit, toggleEdit] = useToggle()
@@ -131,17 +158,24 @@ const TagCell = ({ tagName, group, studyProgrammes }) => {
         throw Error(`Wrong tagname: ${tagName}`)
     }
   }
-  return group.tags?.[tagName] && !showEdit ? (
-    <div style={{ ...cellWrapper, alignItems: 'baseline' }}>
-      <p style={{ ...cellContent, textAlign: 'center' }}>{getText()}</p>
-      <div style={{ ...cellContent, flexGrow: 0 }}>
-        <Button type="button" onClick={() => toggleEdit()}>
-          Edit {prettifyCamelCase(tagName)}
-        </Button>
-      </div>
-    </div>
-  ) : (
-    <AssociateTagForm group={group} tagName={tagName} toggleEdit={toggleEdit} selectFieldItems={studyProgrammes} />
+  return (
+    <>
+      <EditTagModal
+        group={group}
+        tagName={tagName}
+        toggleEdit={toggleEdit}
+        selectFieldItems={studyProgrammes}
+        open={showEdit}
+      />
+      {group.tags?.[tagName] ? (
+        <div style={{ ...cellWrapper, alignItems: 'baseline' }}>
+          <p style={{ ...cellContent, textAlign: 'center' }}>{getText()}</p>
+          <div style={{ ...cellContent, flexGrow: 0 }}>
+            <Button icon="pencil" onClick={() => toggleEdit()} size="tiny" />
+          </div>
+        </div>
+      ) : null}
+    </>
   )
 }
 
@@ -203,7 +237,7 @@ const StudyGuidanceGroupOverview = ({ groups }) => {
           lisäominaisuuksia.{' '}
         </p>
       </StyledMessage>
-      <SortableTable figure={false} columns={headers} getRowKey={group => group.id} data={groups} />
+      <SortableTable figure={false} columns={headers} getRowKey={group => group.id} data={groups} singleLine={false} />
     </>
   )
 }
