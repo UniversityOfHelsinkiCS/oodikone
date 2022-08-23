@@ -129,4 +129,24 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
   return res.json(allThesisWriters)
 })
 
+router.get('/faculties/:id/graduationtimes', async (req, res) => {
+  const code = req.params.id
+  const mode = req.query?.mode
+  const excludeOld = req.query?.excludeOld
+
+  if (!code) return res.status(422).end()
+
+  if (mode === 'all') {
+    // find times for faculty and individual programmes
+    if (excludeOld) {
+      // don't count for old programmes
+    }
+  } else {
+    // just faculty-wide average in enough
+  }
+
+  const programmes = await findFacultyProgrammeCodes(code)
+  return res.json(programmes)
+})
+
 module.exports = router
