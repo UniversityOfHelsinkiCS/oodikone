@@ -68,7 +68,7 @@ const FacultyStatistics = props => {
       },
       {
         menuItem: 'Programmes and student populations',
-        render: () => <ProgrammeOverview />,
+        render: () => <ProgrammeOverview faculty={faculty} />,
       },
     ]
     return panes

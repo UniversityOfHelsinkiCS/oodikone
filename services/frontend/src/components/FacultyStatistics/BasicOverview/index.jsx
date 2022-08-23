@@ -23,8 +23,6 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
   const credits = useGetFacultyCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
   const basics = useGetFacultyBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
   const thesisWriters = useGetFacultyThesisStatsQuery({ id: faculty?.code, yearType })
-  // basic.data.studentsInfo --> data for students of faculty table
-  // basics.data.graduationInfo --> data for graduated and thesis writers table
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -131,7 +129,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
       </div>
 
       {isFetchingOrLoading ? (
-        <Loader active style={{ marginTop: '10em' }} />
+        <Loader active style={{ marginTop: '15em' }} />
       ) : (
         <>
           {basics.isSuccess && basics.data && (
