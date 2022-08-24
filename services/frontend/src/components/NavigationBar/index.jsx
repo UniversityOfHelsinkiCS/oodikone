@@ -9,6 +9,7 @@ import LanguagePicker from '../LanguagePicker'
 import { isDev, adminerUrls } from '../../conf'
 
 const allNavigationItems = {
+  trends: { path: '/trends', key: 'trends', label: 'Trends' },
   faculty: { path: '/faculties', key: 'faculties', label: 'Faculties', reqRights: ['admin'] },
   populations: {
     key: 'studyProgramme',
@@ -18,11 +19,10 @@ const allNavigationItems = {
       { path: '/study-programme', key: 'overview', label: 'Overview' },
     ],
   },
-  students: { path: '/students', key: 'students', label: 'Student statistics' },
   courseStatistics: { path: '/coursestatistics', key: 'courseStatistics', label: 'Course statistics' },
+  students: { path: '/students', key: 'students', label: 'Student statistics' },
   teachers: { path: '/teachers', key: 'teachers', label: 'Teachers', reqRights: ['teachers'] },
   users: { path: '/users', key: 'users', label: 'Users', reqRights: ['admin'] },
-  trends: { path: '/trends', key: 'trends', label: 'Trends' },
   studyGuidanceGroups: {
     path: '/studyguidancegroups',
     key: 'studyGuidanceGroups',
