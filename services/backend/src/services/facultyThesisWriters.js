@@ -1,10 +1,10 @@
 const { indexOf } = require('lodash')
 const { mapToProviders } = require('../util/utils')
-const { thesisWriters } = require('./faculty')
+const { thesisWriters, facultyOgranizationId } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('./studyprogrammeHelpers')
 
-const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes }) => {
-  const programmeProviders = facultyProgrammes.reduce(
+const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, code }) => {
+  let programmeProviders = facultyProgrammes.reduce(
     (results, studyprogramme) => ({
       ...results,
       [mapToProviders([studyprogramme.code])[0]]: { ...studyprogramme },
@@ -12,6 +12,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
     {}
   )
 
+  const { id } = await facultyOgranizationId(code)
   const thesisTypes = [
     'urn:code:course-unit-type:bachelors-thesis',
     'urn:code:course-unit-type:masters-thesis',
@@ -19,9 +20,8 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
     'urn:code:course-unit-type:licentiate-thesis',
     'urn:code:course-unit-type:bachelors-thesis-seminar',
     'urn:code:course-unit-type:masters-thesis-seminar',
-    '',
   ]
-  const thesisCourseCodes = await thesisWriters(Object.keys(programmeProviders), since, thesisTypes)
+  const thesisCourseCodes = await thesisWriters(id, Object.keys(programmeProviders), since, thesisTypes)
   let bachelors = getStatsBasis(years)
   let masters = getStatsBasis(years)
   let doctors = getStatsBasis(years)
@@ -31,7 +31,10 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
 
   thesisCourseCodes.forEach(({ attainment_date, courseUnitType, organizations }) => {
     const thesisYear = defineYear(attainment_date, isAcademicYear)
-    const programme = programmeProviders[organizations[0]]
+    let programme = programmeProviders[organizations[0].code]
+    if (!programme) {
+      programme = organizations[0]
+    }
     if (!(programme.code in programmeCounts)) {
       programmeCounts[programme.code] = {}
       Object.keys(bachelors.tableStats).forEach(year => (programmeCounts[programme.code][year] = [0, 0, 0, 0, 0]))
@@ -57,7 +60,6 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       programmeCounts[programme.code][thesisYear][4] += 1
     }
   })
-
   if (
     bachelors.graphStats.every(year => year === 0) &&
     masters.graphStats.every(year => year === 0) &&
@@ -72,6 +74,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       programmeCounts: {},
     }
   }
+
   return { bachelors, masters, doctors, licentiates, programmeCounts, programmeNames }
 }
 
@@ -79,17 +82,16 @@ const getFacultyThesisWritersForStudyTrack = async (allThesisWriters, facultyPro
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
 
-  const queryParameters = { since, years, isAcademicYear, facultyProgrammes }
+  const queryParameters = { since, years, isAcademicYear, code, facultyProgrammes }
   const { bachelors, masters, doctors, licentiates, programmeCounts, programmeNames } = await getFacultyThesisWriters(
     queryParameters
   )
 
   allThesisWriters.years = years.map(year => year.toString())
   const reversedYears = years.reverse()
-
   allThesisWriters.tableStats = reversedYears.map(year => [
     year,
-    bachelors.tableStats[year] + masters.tableStats[year] + doctors.tableStats[year],
+    bachelors.tableStats[year] + masters.tableStats[year] + doctors.tableStats[year] + licentiates.tableStats[year],
     bachelors.tableStats[year],
     masters.tableStats[year],
     doctors.tableStats[year],
@@ -100,13 +102,13 @@ const getFacultyThesisWritersForStudyTrack = async (allThesisWriters, facultyPro
   allThesisWriters.graphStats.push({ name: 'Doctors', data: doctors.graphStats })
   allThesisWriters.graphStats.push({ name: 'Others', data: licentiates.graphStats })
 
-  facultyProgrammes.forEach(programme => {
+  Object.keys(programmeNames).forEach(programmeCode => {
     reversedYears.forEach(year => {
-      if (programme.code in programmeCounts) {
-        if (!(programme.code in allThesisWriters.programmeTableStats)) {
-          allThesisWriters.programmeTableStats[programme.code] = []
+      if (programmeCode in programmeCounts) {
+        if (!(programmeCode in allThesisWriters.programmeTableStats)) {
+          allThesisWriters.programmeTableStats[programmeCode] = []
         }
-        allThesisWriters.programmeTableStats[programme.code].push([year, ...programmeCounts[programme.code][year]])
+        allThesisWriters.programmeTableStats[programmeCode].push([year, ...programmeCounts[programmeCode][year]])
       }
     })
   })
