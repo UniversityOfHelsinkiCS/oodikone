@@ -7,11 +7,10 @@ const createRedisKeyForBasicStats = (id, yearType) => `FACULTY_BASIC_STATS_${id}
 // const createRedisKeyForGraduationTimeStats = (id, mode, excludeOld) =>
 //  `FACULTY_GRADUATION_TIME_STATS_${id}_${mode}_${excludeOld}`
 
-const setFacultyProgrammes = async data => {
-  const { id } = data
+const setFacultyProgrammes = async (id, data) => {
   const redisKey = createRedisKeyForFacultyProgrammes(id)
   const dataToRedis = {
-    ...data,
+    data: data,
     status: 'DONE',
     lastUpdated: moment().format(),
   }

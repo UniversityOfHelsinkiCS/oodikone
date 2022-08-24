@@ -4,9 +4,18 @@ const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
 const { findFacultyProgrammeCodes } = require('../services/faculty/faculty') // degreeProgrammesOfFaculty,
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
+const { getFacultyProgrammes, setFacultyProgrammes } = require('../services/faculty/facultyService')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
+
+const getProgrammes = async code => {
+  const programmes = await getFacultyProgrammes(code)
+  if (programmes) return programmes.datas
+  const updatedProgrammes = await findFacultyProgrammeCodes(code)
+  if (updatedProgrammes) await setFacultyProgrammes(code, updatedProgrammes)
+  return updatedProgrammes
+}
 
 router.get('/faculties', async (req, res) => {
   const facultyList = await faculties()
@@ -39,7 +48,7 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
     lastUpdated: '',
   }
 
-  const programmes = await findFacultyProgrammeCodes(code)
+  const programmes = await getProgrammes(code)
 
   if (programmes) {
     await combineFacultyBasics(allBasics, code, programmes, yearType)
@@ -74,7 +83,7 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
     status: 'DONE',
     lastUpdated: '',
   }
-  const programmes = await findFacultyProgrammeCodes(code)
+  const programmes = await getProgrammes(code)
 
   if (programmes) {
     await combineFacultyCredits(allCredits, programmes, yearType, specialGroups, counts, years)
@@ -118,10 +127,8 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
     status: 'Done',
     lastUpdated: '',
   }
-  // the old way
-  //const programmes = await degreeProgrammesOfFaculty(code)
-  // This is the way
-  const programmes = await findFacultyProgrammeCodes(code)
+
+  const programmes = await await getProgrammes(code)
   if (programmes) {
     await combineFacultyThesisWriters(allThesisWriters, programmes, code, yearType)
   }
@@ -145,7 +152,7 @@ router.get('/faculties/:id/graduationtimes', async (req, res) => {
     // just faculty-wide average in enough
   }
 
-  const programmes = await findFacultyProgrammeCodes(code)
+  const programmes = await await getProgrammes(code) // findFacultyProgrammeCodes(code)
   return res.json(programmes)
 })
 
