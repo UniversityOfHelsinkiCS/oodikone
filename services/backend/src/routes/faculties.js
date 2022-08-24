@@ -2,9 +2,16 @@ const router = require('express').Router()
 const { faculties } = require('../services/organisations')
 const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
-const { findFacultyProgrammeCodes } = require('../services/faculty/faculty') // degreeProgrammesOfFaculty,
+const { findFacultyProgrammeCodes } = require('../services/faculty/faculty')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
-const { getFacultyProgrammes, setFacultyProgrammes } = require('../services/faculty/facultyService')
+const {
+  getFacultyProgrammes,
+  setFacultyProgrammes,
+  getBasicStats,
+  setBasicStats,
+  getCreditStats,
+  setCreditStats,
+} = require('../services/faculty/facultyService')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
@@ -28,32 +35,17 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
 
   if (!code) return res.status(422).end()
 
-  let allBasics = {
-    id: code,
-    years: [],
-    programmeNames: {},
-    studentInfo: {
-      tableStats: [],
-      graphStats: [],
-      titles: ['', 'Started studying', 'Graduated', 'Transferred inside', 'Transferred away', 'Transferred to'],
-      programmeTableStats: {},
-    },
-    graduationInfo: {
-      tableStats: [],
-      graphStats: [],
-      titles: ['', 'All graduations', 'Bachelors', 'Masters', 'Doctors', 'Others'],
-      programmeTableStats: {},
-    },
-    status: 'DONE',
-    lastUpdated: '',
-  }
+  const data = await getBasicStats(code, yearType)
+  if (data) return res.json(data)
 
   const programmes = await getProgrammes(code)
+  if (!programmes) return res.status(422).end()
 
-  if (programmes) {
-    await combineFacultyBasics(allBasics, code, programmes.data, yearType)
+  let updatedStats = await combineFacultyBasics(code, programmes.data, yearType)
+  if (updatedStats) {
+    updatedStats = await setBasicStats(updatedStats, yearType)
   }
-  return res.json(allBasics)
+  return res.json(updatedStats)
 })
 
 router.get('/faculties/:id/creditstats', async (req, res) => {
@@ -63,51 +55,18 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
 
   if (!code) return res.status(422).end()
 
-  let counts = {}
-  let years = []
-  let allCredits = {
-    id: code,
-    years: [],
-    tableStats: [],
-    graphStats: [],
-    programmeTableStats: {},
-    programmeNames: {},
-    titles: [
-      '',
-      'Total',
-      'Major students credits',
-      'Non-major faculty students credits',
-      'Non-major other faculty students credits',
-      'Non-degree student credits',
-    ],
-    status: 'DONE',
-    lastUpdated: '',
-  }
+  const data = await getCreditStats(code, yearType)
+  if (data) return res.json(data)
+
   const programmes = await getProgrammes(code)
+  if (!programmes) return res.status(422).end()
 
-  if (programmes) {
-    await combineFacultyCredits(allCredits, programmes.data, yearType, specialGroups, counts, years)
+  let updatedStats = await combineFacultyCredits(code, programmes.data, yearType, specialGroups)
+  if (updatedStats) {
+    updatedStats = await setCreditStats(updatedStats, yearType)
   }
-  let majors = []
-  let facultyNonMajor = []
-  let otherNonMajor = []
-  let nonDegree = []
 
-  years.forEach(year => {
-    majors.push(counts[year][1])
-    facultyNonMajor.push(counts[year][2])
-    otherNonMajor.push(counts[year][3])
-    nonDegree.push(counts[year][4])
-  })
-
-  allCredits.graphStats = [
-    { name: 'Major students credits', data: majors },
-    { name: 'Non-major faculty students credits', data: facultyNonMajor },
-    { name: 'Non-major other faculty students credits', data: otherNonMajor },
-    { name: 'Non-degree credits', data: nonDegree },
-  ]
-
-  return res.json(allCredits)
+  return res.json(updatedStats)
 })
 
 router.get('/faculties/:id/thesisstats', async (req, res) => {

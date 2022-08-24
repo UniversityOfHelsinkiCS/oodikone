@@ -204,7 +204,7 @@ const getFacultyTransfers = async (
   })
 }
 
-const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) => {
+const combineFacultyBasics = async (faculty, programmes, yearType) => {
   let counts = {}
   let countsGraduations = {}
   let years = []
@@ -214,6 +214,24 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) =>
   const yearsArray = getYearsArray(since.getFullYear(), isAcademicYear)
   const { graphStats, tableStats } = getStatsBasis(yearsArray)
   Object.keys(tableStats).forEach(year => years.push(year))
+
+  let allBasics = {
+    id: faculty,
+    years: [],
+    programmeNames: {},
+    studentInfo: {
+      tableStats: [],
+      graphStats: [],
+      titles: ['', 'Started studying', 'Graduated', 'Transferred inside', 'Transferred away', 'Transferred to'],
+      programmeTableStats: {},
+    },
+    graduationInfo: {
+      tableStats: [],
+      graphStats: [],
+      titles: ['', 'All graduations', 'Bachelors', 'Masters', 'Doctors', 'Others'],
+      programmeTableStats: {},
+    },
+  }
 
   // Started studying in faculty
   await getFacultyStarters(
@@ -310,6 +328,8 @@ const combineFacultyBasics = async (allBasics, faculty, programmes, yearType) =>
   Object.keys(graduationInfo).forEach(prog => {
     allBasics.graduationInfo.programmeTableStats[prog] = Object.values(graduationInfo[prog]).reverse()
   })
+
+  return allBasics
 }
 
 module.exports = { combineFacultyBasics }
