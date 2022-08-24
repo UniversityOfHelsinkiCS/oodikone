@@ -109,9 +109,9 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
       backgroundColor: 'white',
       fontSize: '25px',
       formatter() {
-        let tooltipString = `<b>${longLabels[this.x] ? longLabels[this.x][language] : ''}</b><br /><p>${
-          this.x
-        }</p><br />`
+        let tooltipString = `<b>${
+          longLabels[this.x] && longLabels[this.x][language] ? longLabels[this.x][language] : longLabels[this.x].fi
+        }</b><br /><p>${this.x}</p><br />`
         const diffArray = differenceArray[this.x]
         this.points.forEach(point => {
           tooltipString += `<span style="color:${point.color}">●</span> <b>${point.series.name}: ${point.y}</b>

@@ -14,7 +14,7 @@ import InfoBox from '../../Info/InfoBox'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
 
-const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, setStudyProgrammes }) => {
+const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, setStudyProgrammes, language }) => {
   const toolTips = InfotoolTips.Studyprogramme
   const toolTipsProgramme = InfotoolTips.Faculty
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
@@ -155,7 +155,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.studentInfo.programmeTableStats))}
                   titles={basics?.data?.studentInfo.titles}
                   sliceStart={1}
-                  language="fi"
+                  language={language}
                 />
               </div>
             </>
@@ -178,7 +178,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   titles={credits?.data?.titles}
                   extraHeight="EXTRA HEIGHT"
                   sliceStart={2}
-                  language="fi"
+                  language={language}
                 />
               </div>
             </>
@@ -199,7 +199,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.graduationInfo.programmeTableStats))}
                   titles={basics?.data?.graduationInfo.titles}
                   sliceStart={2}
-                  language="fi"
+                  language={language}
                 />
               </div>
             </>
@@ -221,7 +221,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   titles={thesisWriters?.data?.titles}
                   sliceStart={2}
                   extraHeight="EXTRA HEIGHT"
-                  language="fi"
+                  language={language}
                 />
               </div>
             </>

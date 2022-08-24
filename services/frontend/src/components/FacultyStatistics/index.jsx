@@ -63,6 +63,7 @@ const FacultyStatistics = props => {
             setAcademicYear={setAcademicYear}
             studyProgrammes={studyProgrammes}
             setStudyProgrammes={setStudyProgrammes}
+            language={language}
           />
         ),
       },
