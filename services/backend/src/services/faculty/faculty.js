@@ -10,7 +10,7 @@ const {
   Transfer,
   Credit,
   Course,
-} = require('../models')
+} = require('../../models')
 const {
   facultyFormatStudyright,
   facultyFormatProgramme,

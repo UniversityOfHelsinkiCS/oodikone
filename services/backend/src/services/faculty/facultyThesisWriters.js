@@ -1,7 +1,7 @@
 const { indexOf } = require('lodash')
-const { mapToProviders } = require('../util/utils')
+const { mapToProviders } = require('../../util/utils')
 const { thesisWriters, facultyOgranizationId } = require('./faculty')
-const { getStatsBasis, getYearsArray, defineYear } = require('./studyprogrammeHelpers')
+const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
 
 const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, code }) => {
   let programmeProviders = facultyProgrammes.reduce(

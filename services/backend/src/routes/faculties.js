@@ -1,9 +1,9 @@
 const router = require('express').Router()
 const { faculties } = require('../services/organisations')
-const { combineFacultyBasics } = require('../services/facultyBasics')
-const { combineFacultyCredits } = require('../services/facultyCredits')
-const { findFacultyProgrammeCodes } = require('../services/faculty') // degreeProgrammesOfFaculty,
-const { combineFacultyThesisWriters } = require('../services/facultyThesisWriters')
+const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
+const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
+const { findFacultyProgrammeCodes } = require('../services/faculty/faculty') // degreeProgrammesOfFaculty,
+const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
