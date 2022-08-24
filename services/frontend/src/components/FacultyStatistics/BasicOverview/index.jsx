@@ -90,13 +90,20 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
     return false
   }
 
+  const findKeyOrder = (a, b) => {
+    if (testKey(a) - testKey(b) === 0) {
+      return a.localeCompare(b)
+    }
+    return testKey(a) - testKey(b)
+  }
+
   const sortProgrammeKeys = programmeKeys => {
     if (studyProgrammeType === 'ALL_PROGRAMMES')
       return programmeKeys.sort((a, b) => {
-        return testKey(a) - testKey(b)
+        return findKeyOrder(a, b)
       })
     return programmeKeys.filter(isNewProgramme).sort((a, b) => {
-      return testKey(a) - testKey(b)
+      return findKeyOrder(a, b)
     })
   }
 
