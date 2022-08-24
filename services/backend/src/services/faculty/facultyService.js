@@ -3,7 +3,7 @@ const moment = require('moment')
 
 const createRedisKeyForFacultyProgrammes = id => `FACULTY_PROGRAMMES_${id}`
 const createRedisKeyForBasicStats = (id, yearType) => `FACULTY_BASIC_STATS_${id}_${yearType}`
-//const createRedisKeyForCreditStats = (id, yearType) => `FACULTY_CREDIT_STATS_${id}_${yearType}`
+const createRedisKeyForCreditStats = (id, yearType) => `FACULTY_CREDIT_STATS_${id}_${yearType}`
 // const createRedisKeyForGraduationTimeStats = (id, mode, excludeOld) =>
 //  `FACULTY_GRADUATION_TIME_STATS_${id}_${mode}_${excludeOld}`
 
@@ -46,4 +46,31 @@ const getBasicStats = async (id, yearType) => {
   return JSON.parse(dataFromRedis)
 }
 
-module.exports = { setFacultyProgrammes, getFacultyProgrammes, setBasicStats, getBasicStats }
+const setCreditStats = async (data, yearType) => {
+  const { id } = data
+  const redisKey = createRedisKeyForCreditStats(id, yearType)
+  const dataToRedis = {
+    ...data,
+    status: 'DONE',
+    lastUpdated: moment().format(),
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
+  return dataToRedis
+}
+
+const getCreditStats = async (id, yearType) => {
+  const redisKey = createRedisKeyForCreditStats(id, yearType)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
+}
+
+module.exports = {
+  setFacultyProgrammes,
+  getFacultyProgrammes,
+  setBasicStats,
+  getBasicStats,
+  setCreditStats,
+  getCreditStats,
+}

@@ -183,9 +183,6 @@ const getFacultyCreditStatsForStudytrack = async ({ studyprogramme, facultyProgr
 }
 
 const getProgrammeCredits = async (code, yearType, specialGroups, facultyProgrammes) => {
-  // redis for faculty? Create faculty versions for out-commented functions
-  // const data = await getCreditStats(code, yearType, specialGroups)
-  // if (data) return data
   const updatedStats = await getFacultyCreditStatsForStudytrack({
     studyprogramme: code,
     facultyProgrammes,
@@ -195,11 +192,29 @@ const getProgrammeCredits = async (code, yearType, specialGroups, facultyProgram
     },
   })
 
-  // if (updatedStats) await setCreditStats(updatedStats, yearType, specialGroups)
   return updatedStats
 }
 
-const combineFacultyCredits = async (allCredits, programmes, yearType, specialGroups, counts, years) => {
+const combineFacultyCredits = async (faculty, programmes, yearType, specialGroups) => {
+  let counts = {}
+  let years = []
+  let allCredits = {
+    id: faculty,
+    years: [],
+    tableStats: [],
+    graphStats: [],
+    programmeTableStats: {},
+    programmeNames: {},
+    titles: [
+      '',
+      'Total',
+      'Major students credits',
+      'Non-major faculty students credits',
+      'Non-major other faculty students credits',
+      'Non-degree student credits',
+    ],
+  }
+
   const progCodes = programmes.map(p => p.code)
   for (const prog of programmes) {
     const data = await getProgrammeCredits(prog.code, yearType, specialGroups, progCodes)
@@ -228,6 +243,27 @@ const combineFacultyCredits = async (allCredits, programmes, yearType, specialGr
 
   years.sort()
   allCredits.years = years
+
+  let majors = []
+  let facultyNonMajor = []
+  let otherNonMajor = []
+  let nonDegree = []
+
+  years.forEach(year => {
+    majors.push(counts[year][1])
+    facultyNonMajor.push(counts[year][2])
+    otherNonMajor.push(counts[year][3])
+    nonDegree.push(counts[year][4])
+  })
+
+  allCredits.graphStats = [
+    { name: 'Major students credits', data: majors },
+    { name: 'Non-major faculty students credits', data: facultyNonMajor },
+    { name: 'Non-major other faculty students credits', data: otherNonMajor },
+    { name: 'Non-degree credits', data: nonDegree },
+  ]
+
+  return allCredits
 }
 
 module.exports = { combineFacultyCredits, getFacultyCreditStatsForStudytrack }
