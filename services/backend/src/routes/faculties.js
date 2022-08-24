@@ -11,7 +11,7 @@ const { getFacultyProgrammes, setFacultyProgrammes } = require('../services/facu
 
 const getProgrammes = async code => {
   const programmes = await getFacultyProgrammes(code)
-  if (programmes) return programmes.datas
+  if (programmes) return programmes
   const updatedProgrammes = await findFacultyProgrammeCodes(code)
   if (updatedProgrammes) await setFacultyProgrammes(code, updatedProgrammes)
   return updatedProgrammes
@@ -51,7 +51,7 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
   const programmes = await getProgrammes(code)
 
   if (programmes) {
-    await combineFacultyBasics(allBasics, code, programmes, yearType)
+    await combineFacultyBasics(allBasics, code, programmes.data, yearType)
   }
   return res.json(allBasics)
 })
@@ -86,7 +86,7 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
   const programmes = await getProgrammes(code)
 
   if (programmes) {
-    await combineFacultyCredits(allCredits, programmes, yearType, specialGroups, counts, years)
+    await combineFacultyCredits(allCredits, programmes.data, yearType, specialGroups, counts, years)
   }
   let majors = []
   let facultyNonMajor = []
@@ -128,9 +128,9 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
     lastUpdated: '',
   }
 
-  const programmes = await await getProgrammes(code)
+  const programmes = await getProgrammes(code)
   if (programmes) {
-    await combineFacultyThesisWriters(allThesisWriters, programmes, code, yearType)
+    await combineFacultyThesisWriters(allThesisWriters, programmes.data, code, yearType)
   }
 
   return res.json(allThesisWriters)
@@ -152,8 +152,8 @@ router.get('/faculties/:id/graduationtimes', async (req, res) => {
     // just faculty-wide average in enough
   }
 
-  const programmes = await await getProgrammes(code) // findFacultyProgrammeCodes(code)
-  return res.json(programmes)
+  const programmes = await getProgrammes(code)
+  return res.json(programmes.data)
 })
 
 module.exports = router
