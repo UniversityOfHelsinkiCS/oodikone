@@ -6,7 +6,7 @@ const {
   transferredAway,
   transferredTo,
 } = require('./faculty')
-const { getStatsBasis, getYearsArray, defineYear } = require('./studyprogrammeHelpers')
+const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
 const { findRightProgramme } = require('./facultyHelpers')
 
 const filterDuplicateStudyrights = studyrights => {

@@ -1,5 +1,5 @@
 const { indexOf } = require('lodash')
-const { mapToProviders } = require('../util/utils')
+const { mapToProviders } = require('../../util/utils')
 const {
   getStatsBasis,
   defineYear,
@@ -9,13 +9,13 @@ const {
   getStartDate,
   isSpecialGroupCredit,
   tableTitles,
-} = require('./studyprogrammeHelpers')
+} = require('../studyprogrammeHelpers')
 const {
   getStudyRights,
   getCreditsForStudyProgramme,
   allTransfers,
   getCourseCodesForStudyProgramme,
-} = require('./studyprogramme')
+} = require('../studyprogramme')
 
 const isFacultyNonMajorCredit = (studyrights, attainment_date, facultyProgrammes) => {
   let right = ''
