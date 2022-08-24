@@ -28,8 +28,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
   let licentiates = getStatsBasis(years)
   let programmeCounts = {}
   let programmeNames = {}
-
-  thesisCourseCodes.forEach(({ attainment_date, courseUnitType, organizations }) => {
+  thesisCourseCodes?.forEach(({ attainment_date, courseUnitType, organizations }) => {
     const thesisYear = defineYear(attainment_date, isAcademicYear)
     let programme = programmeProviders[organizations[0].code]
     if (!programme) {
@@ -60,20 +59,6 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       programmeCounts[programme.code][thesisYear][4] += 1
     }
   })
-  if (
-    bachelors.graphStats.every(year => year === 0) &&
-    masters.graphStats.every(year => year === 0) &&
-    doctors.graphStats.every(year => year === 0) &&
-    licentiates.graphStats.every(year => year === 0)
-  ) {
-    return {
-      bachelors: { graphStats: [], tableStats: {} },
-      masters: { graphStats: [], tableStats: {} },
-      doctors: { graphStats: [], tableStats: {} },
-      licentiates: { graphStats: [], tableStats: {} },
-      programmeCounts: {},
-    }
-  }
 
   return { bachelors, masters, doctors, licentiates, programmeCounts, programmeNames }
 }
@@ -102,9 +87,11 @@ const getFacultyThesisWritersForStudyTrack = async (allThesisWriters, facultyPro
   allThesisWriters.graphStats.push({ name: 'Doctors', data: doctors.graphStats })
   allThesisWriters.graphStats.push({ name: 'Others', data: licentiates.graphStats })
 
-  Object.keys(programmeNames).forEach(programmeCode => {
+  // ProgrammeNames contains at the moment the name of the department that is not in facultyProgrammes
+  const programmes = programmeNames ? Object.keys(programmeNames) : facultyProgrammes.map(programme => programme.code)
+  programmes.forEach(programmeCode => {
     reversedYears.forEach(year => {
-      if (programmeCode in programmeCounts) {
+      if (programmeCounts && programmeCode in programmeCounts) {
         if (!(programmeCode in allThesisWriters.programmeTableStats)) {
           allThesisWriters.programmeTableStats[programmeCode] = []
         }
