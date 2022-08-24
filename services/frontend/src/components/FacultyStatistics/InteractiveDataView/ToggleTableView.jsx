@@ -42,26 +42,15 @@ const ToggleTableView = React.forwardRef((props, ref) => {
   const chartRowStyles = {
     display: visible ? '' : 'none',
   }
-  const basicRowStyles = {
-    display: visible ? 'none' : '',
-  }
+
   return (
     <React.Fragment key={`random-fragment-key-${Math.random()}`}>
       <BasicRow
-        icon="chevron right"
+        icon={visible ? 'chevron down' : 'chevron right'}
         yearArray={props.yearArray}
-        cypress={`Show-${props.cypress}`}
+        cypress={visible ? `Hide-${props.cypress}` : `Show-${props.cypress}`}
         yearIndex={props.yearIndex}
         toggleVisibility={toggleVisibility}
-        styles={basicRowStyles}
-      />
-      <BasicRow
-        icon="chevron down"
-        yearArray={props.yearArray}
-        cypress={`Hide-${props.cypress}`}
-        yearIndex={props.yearIndex}
-        toggleVisibility={toggleVisibility}
-        styles={chartRowStyles}
       />
       <Table.Row key={`stack-row-key-${Math.random()}`} style={chartRowStyles}>
         {props.children}
