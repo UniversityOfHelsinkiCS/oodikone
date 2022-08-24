@@ -12,8 +12,8 @@ const { getFacultyProgrammes, setFacultyProgrammes } = require('../services/facu
 const getProgrammes = async code => {
   const programmes = await getFacultyProgrammes(code)
   if (programmes) return programmes
-  const updatedProgrammes = await findFacultyProgrammeCodes(code)
-  if (updatedProgrammes) await setFacultyProgrammes(code, updatedProgrammes)
+  let updatedProgrammes = await findFacultyProgrammeCodes(code)
+  if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes)
   return updatedProgrammes
 }
 
