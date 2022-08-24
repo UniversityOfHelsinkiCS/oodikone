@@ -19,6 +19,8 @@ const InteractiveDataTable = ({
   const [sortbyColumn, setSortByColumn] = useState(0)
   const [columnNumber, sortValuesByColumn] = useState(0)
 
+  const yearRef = React.createRef()
+
   useEffect(() => {
     const keys = {}
     if (!(columnNumber === 0)) {
@@ -68,7 +70,7 @@ const InteractiveDataTable = ({
   }))
 
   const differenceToPrevYears = calculatDiffToPrevYear(dataProgrammeStats)
-  const yearRef = React.createRef()
+
   return (
     <div className={`table-container${wideTable ? '-wide' : ''}`}>
       <Table data-cy={`Table-${cypress}`} celled>
