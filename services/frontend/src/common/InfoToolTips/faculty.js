@@ -1,6 +1,6 @@
 export default {
   ProgrammeToggle: `
-    New study programmes: Näyttää vuosittaisissa ohjelmakohtaisissa kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.
+    New study programmes: Näyttää kaikissa luvuissa ja kuvaajissa pelkästään uuden opetussuunnitelman ohjelmat.
     
-    All programmes: Näyttää vuosittaisissa ohjelmakohtaisissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.`,
+    All programmes: Näyttää kaikissa luvuissa ja kuvaajissa kuvaajissa myös vanhan opetussuunnitelman ohjelmat.`,
 }

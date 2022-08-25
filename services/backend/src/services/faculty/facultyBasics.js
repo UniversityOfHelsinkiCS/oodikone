@@ -50,7 +50,9 @@ const getFacultyStarters = async (
   tableStats,
   counts,
   allBasics,
-  programmeData
+  programmeData,
+  wantedProgrammeCodes,
+  programmeFilter
 ) => {
   const startedGraphStats = [...graphStats]
   const startedTableStats = { ...tableStats }
@@ -60,17 +62,19 @@ const getFacultyStarters = async (
 
   filteredStudyrights.forEach(({ studystartdate, studyrightElements }) => {
     const { programme, programmeName } = findRightProgramme(studyrightElements, 'started')
-    const startYear = defineYear(studystartdate, isAcademicYear)
-    startedGraphStats[indexOf(yearsArray, startYear)] += 1
-    startedTableStats[startYear] += 1
+    if (programmeFilter === 'ALL_PROGRAMMES' || wantedProgrammeCodes.includes(programme)) {
+      const startYear = defineYear(studystartdate, isAcademicYear)
+      startedGraphStats[indexOf(yearsArray, startYear)] += 1
+      startedTableStats[startYear] += 1
 
-    if (!(programme in programmeTableStats)) {
-      programmeTableStats[programme] = { ...tableStats }
-    }
-    programmeTableStats[programme][startYear] += 1
+      if (!(programme in programmeTableStats)) {
+        programmeTableStats[programme] = { ...tableStats }
+      }
+      programmeTableStats[programme][startYear] += 1
 
-    if (!(programme in allBasics.programmeNames)) {
-      allBasics.programmeNames[programme] = programmeName
+      if (!(programme in allBasics.programmeNames)) {
+        allBasics.programmeNames[programme] = programmeName
+      }
     }
   })
 
@@ -92,7 +96,9 @@ const getFacultyGraduates = async (
   allBasics,
   counts,
   countsGraduations,
-  programmeData
+  programmeData,
+  wantedProgrammeCodes,
+  programmeFilter
 ) => {
   const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
   const graduatedTableStats = {}
@@ -103,36 +109,38 @@ const getFacultyGraduates = async (
 
   graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
     const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
-    const endYear = defineYear(enddate, isAcademicYear)
-    graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
-    graduatedTableStats[endYear][0] += 1
+    if (programmeFilter === 'ALL_PROGRAMMES' || wantedProgrammeCodes.includes(programme)) {
+      const endYear = defineYear(enddate, isAcademicYear)
+      graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
+      graduatedTableStats[endYear][0] += 1
 
-    if (!(programme in programmeTableStats)) {
-      programmeTableStats[programme] = {}
-      Object.keys(tableStats).forEach(year => (programmeTableStats[programme][year] = [0, 0, 0, 0, 0]))
-    }
-    programmeTableStats[programme][endYear][0] += 1
+      if (!(programme in programmeTableStats)) {
+        programmeTableStats[programme] = {}
+        Object.keys(tableStats).forEach(year => (programmeTableStats[programme][year] = [0, 0, 0, 0, 0]))
+      }
+      programmeTableStats[programme][endYear][0] += 1
 
-    if (extentcode === 1) {
-      graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
-      graduatedTableStats[endYear][1] += 1
-      programmeTableStats[programme][endYear][1] += 1
-    } else if (extentcode === 2) {
-      graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
-      graduatedTableStats[endYear][2] += 1
-      programmeTableStats[programme][endYear][2] += 1
-    } else if (extentcode === 4) {
-      graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
-      graduatedTableStats[endYear][3] += 1
-      programmeTableStats[programme][endYear][3] += 1
-    } else {
-      graduatedGraphStats[4][indexOf(yearsArray, endYear)] += 1
-      graduatedTableStats[endYear][4] += 1
-      programmeTableStats[programme][endYear][4] += 1
-    }
+      if (extentcode === 1) {
+        graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
+        graduatedTableStats[endYear][1] += 1
+        programmeTableStats[programme][endYear][1] += 1
+      } else if (extentcode === 2) {
+        graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
+        graduatedTableStats[endYear][2] += 1
+        programmeTableStats[programme][endYear][2] += 1
+      } else if (extentcode === 4) {
+        graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
+        graduatedTableStats[endYear][3] += 1
+        programmeTableStats[programme][endYear][3] += 1
+      } else {
+        graduatedGraphStats[4][indexOf(yearsArray, endYear)] += 1
+        graduatedTableStats[endYear][4] += 1
+        programmeTableStats[programme][endYear][4] += 1
+      }
 
-    if (!(programme in allBasics.programmeNames)) {
-      allBasics.programmeNames[programme] = programmeName
+      if (!(programme in allBasics.programmeNames)) {
+        allBasics.programmeNames[programme] = programmeName
+      }
     }
   })
 
@@ -153,6 +161,8 @@ const getFacultyGraduates = async (
 
 const getFacultyTransfers = async (
   programmes,
+  programmeCodes,
+  allProgrammeCodes,
   since,
   isAcademicYear,
   yearsArray,
@@ -162,10 +172,9 @@ const getFacultyTransfers = async (
   counts,
   programmeData
 ) => {
-  const programmeCodes = programmes.map(prog => prog.code)
-  const insideTransfers = await transferredInsideFaculty(programmeCodes, since)
-  const awayTransfers = await transferredAway(programmeCodes, since)
-  const toTransfers = await transferredTo(programmeCodes, since)
+  const insideTransfers = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
+  const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
+  const toTransfers = await transferredTo(programmeCodes, allProgrammeCodes, since)
 
   const transferGraphStats = [[...graphStats], [...graphStats], [...graphStats]]
   const transferTableStats = {}
@@ -204,7 +213,7 @@ const getFacultyTransfers = async (
   })
 }
 
-const combineFacultyBasics = async (faculty, programmes, yearType) => {
+const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeCodes, programmeFilter) => {
   let counts = {}
   let countsGraduations = {}
   let years = []
@@ -214,6 +223,7 @@ const combineFacultyBasics = async (faculty, programmes, yearType) => {
   const yearsArray = getYearsArray(since.getFullYear(), isAcademicYear)
   const { graphStats, tableStats } = getStatsBasis(yearsArray)
   Object.keys(tableStats).forEach(year => years.push(year))
+  const wantedProgrammeCodes = programmes.map(prog => prog.code)
 
   let allBasics = {
     id: faculty,
@@ -243,7 +253,9 @@ const combineFacultyBasics = async (faculty, programmes, yearType) => {
     tableStats,
     counts,
     allBasics,
-    programmeData
+    programmeData,
+    wantedProgrammeCodes,
+    programmeFilter
   )
 
   // Graduated in faculty
@@ -257,12 +269,16 @@ const combineFacultyBasics = async (faculty, programmes, yearType) => {
     allBasics,
     counts,
     countsGraduations,
-    programmeData
+    programmeData,
+    wantedProgrammeCodes,
+    programmeFilter
   )
 
   // Transfers
   await getFacultyTransfers(
     programmes,
+    wantedProgrammeCodes,
+    allProgrammeCodes,
     since,
     isAcademicYear,
     yearsArray,

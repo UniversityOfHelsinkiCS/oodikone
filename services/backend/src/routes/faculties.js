@@ -5,22 +5,25 @@ const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
 const { findFacultyProgrammeCodes } = require('../services/faculty/faculty')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
 const {
-  getFacultyProgrammes,
+  //getFacultyProgrammes,
   setFacultyProgrammes,
-  getBasicStats,
+  // getBasicStats,
   setBasicStats,
-  getCreditStats,
+  // getCreditStats,
   setCreditStats,
 } = require('../services/faculty/facultyService')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
 
-const getProgrammes = async code => {
-  const programmes = await getFacultyProgrammes(code)
-  if (programmes) return programmes
-  let updatedProgrammes = await findFacultyProgrammeCodes(code)
+const getProgrammes = async (code, programmeFilter) => {
+  // tieto redisiin
+
+  //const programmes = await getFacultyProgrammes(code)
+  //if (programmes) return programmes
+  let updatedProgrammes = await findFacultyProgrammeCodes(code, programmeFilter)
   if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes)
+
   return updatedProgrammes
 }
 
@@ -32,16 +35,32 @@ router.get('/faculties', async (req, res) => {
 router.get('/faculties/:id/basicstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
+  const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
 
-  const data = await getBasicStats(code, yearType)
-  if (data) return res.json(data)
+  // const data = await getBasicStats(code, yearType)
+  // if (data) return res.json(data)
 
-  const programmes = await getProgrammes(code)
-  if (!programmes) return res.status(422).end()
+  const wantedProgrammes = await getProgrammes(code, programmeFilter)
+  if (!wantedProgrammes) return res.status(422).end()
 
-  let updatedStats = await combineFacultyBasics(code, programmes.data, yearType)
+  //all programmes are required for correct sorting of transfers
+  let allProgrammeCodes = []
+  if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
+    const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
+    allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))
+  } else {
+    wantedProgrammes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
+  }
+
+  let updatedStats = await combineFacultyBasics(
+    code,
+    wantedProgrammes.data,
+    yearType,
+    allProgrammeCodes,
+    programmeFilter
+  )
   if (updatedStats) {
     updatedStats = await setBasicStats(updatedStats, yearType)
   }
@@ -51,14 +70,15 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
 router.get('/faculties/:id/creditstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
-  const specialGroups = 'SPECIAL_INCLUDED' // req.query?.special_groups
+  const specialGroups = req.query?.special_groups
+  const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
 
-  const data = await getCreditStats(code, yearType)
-  if (data) return res.json(data)
+  // const data = await getCreditStats(code, yearType)
+  // if (data) return res.json(data)
 
-  const programmes = await getProgrammes(code)
+  const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
 
   let updatedStats = await combineFacultyCredits(code, programmes.data, yearType, specialGroups)
@@ -72,7 +92,9 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
 router.get('/faculties/:id/thesisstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
-  //const specialGroups = 'SPECIAL_INCLUDED'
+  //const specialGroups = req.query?.special_groups
+  const programmeFilter = req.query?.programme_filter
+
   if (!code) return res.status(422).end()
 
   let allThesisWriters = {
@@ -87,7 +109,7 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
     lastUpdated: '',
   }
 
-  const programmes = await getProgrammes(code)
+  const programmes = await getProgrammes(code, programmeFilter)
   if (programmes) {
     await combineFacultyThesisWriters(allThesisWriters, programmes.data, code, yearType)
   }
@@ -99,6 +121,7 @@ router.get('/faculties/:id/graduationtimes', async (req, res) => {
   const code = req.params.id
   const mode = req.query?.mode
   const excludeOld = req.query?.excludeOld
+  const programmeFilter = 'ALL_PROGRAMMES'
 
   if (!code) return res.status(422).end()
 
@@ -111,7 +134,7 @@ router.get('/faculties/:id/graduationtimes', async (req, res) => {
     // just faculty-wide average in enough
   }
 
-  const programmes = await getProgrammes(code)
+  const programmes = await getProgrammes(code, programmeFilter)
   return res.json(programmes.data)
 })
 
