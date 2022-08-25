@@ -76,20 +76,20 @@ const graduatedStudyrights = async (faculty, since) =>
     })
   ).map(facultyFormatStudyright)
 
-const transferredInsideFaculty = async (programmes, since) =>
+const transferredInsideFaculty = async (programmes, allProgrammeCodes, since) =>
   (
     await Transfer.findAll({
       where: {
         transferdate: {
           [Op.gte]: since,
         },
-        sourcecode: programmes,
+        sourcecode: allProgrammeCodes,
         targetcode: programmes,
       },
     })
   ).map(formatFacultyTransfer)
 
-const transferredAway = async (programmes, since) =>
+const transferredAway = async (programmes, allProgrammeCodes, since) =>
   (
     await Transfer.findAll({
       where: {
@@ -98,13 +98,13 @@ const transferredAway = async (programmes, since) =>
         },
         sourcecode: programmes,
         targetcode: {
-          [Op.notIn]: programmes,
+          [Op.notIn]: allProgrammeCodes,
         },
       },
     })
   ).map(formatFacultyTransfer)
 
-const transferredTo = async (programmes, since) =>
+const transferredTo = async (programmes, allProgrammeCodes, since) =>
   (
     await Transfer.findAll({
       where: {
@@ -112,7 +112,7 @@ const transferredTo = async (programmes, since) =>
           [Op.gte]: since,
         },
         sourcecode: {
-          [Op.notIn]: programmes,
+          [Op.notIn]: allProgrammeCodes,
         },
         targetcode: programmes,
       },
@@ -195,9 +195,20 @@ const thesisWriters = async (facultyId, providers, since, thesisTypes) =>
     })
   ).map(formatFacultyThesisWriter)
 
+const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
+
+const isNewProgramme = code => {
+  for (let i = 0; i < newProgrammes.length; i++) {
+    if (newProgrammes[i].test(code)) {
+      return true
+    }
+  }
+  return false
+}
+
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
-const findFacultyProgrammeCodes = async faculty => {
+const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   let allProgrammes = []
   let allProgrammeCodes = []
 
@@ -237,6 +248,10 @@ const findFacultyProgrammeCodes = async faculty => {
         }
       }
     }
+  }
+
+  if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
+    allProgrammes = allProgrammes.filter(prog => isNewProgramme(prog.code))
   }
 
   return allProgrammes

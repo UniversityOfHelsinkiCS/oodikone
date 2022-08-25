@@ -1,5 +1,5 @@
 import React from 'react'
-import { Divider, Loader, Header } from 'semantic-ui-react'
+import { Divider, Loader } from 'semantic-ui-react'
 
 import {
   useGetFacultyCreditStatsQuery,
@@ -18,11 +18,22 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
   const toolTips = InfotoolTips.Studyprogramme
   const toolTipsProgramme = InfotoolTips.Faculty
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
-  const studyProgrammeType = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
+  const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
-  const credits = useGetFacultyCreditStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
-  const basics = useGetFacultyBasicStatsQuery({ id: faculty?.code, yearType, specialGroups: special })
-  const thesisWriters = useGetFacultyThesisStatsQuery({ id: faculty?.code, yearType })
+  const credits = useGetFacultyCreditStatsQuery({
+    id: faculty?.code,
+    yearType,
+    studyProgrammeFilter,
+    specialGroups: special,
+  })
+  const basics = useGetFacultyBasicStatsQuery({
+    id: faculty?.code,
+    yearType,
+    studyProgrammeFilter,
+    specialGroups: special,
+  })
+
+  const thesisWriters = useGetFacultyThesisStatsQuery({ id: faculty?.code, yearType, studyProgrammeFilter })
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -57,54 +68,55 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
   /*
   Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Numbers
   */
-  const regexValuesAll = [
-    /^KH/,
-    /^MH/,
-    /^T/,
-    /^LI/,
-    /^K-/,
-    /^FI/,
-    /^00901$/,
-    /^00910$/,
-    /^\d.*a$/,
-    /^Y/,
-    /\d$/,
-    /^\d.*e$/,
-  ]
-  const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
+  // const regexValuesAll = [
+  //   /^KH/,
+  //   /^MH/,
+  //   /^T/,
+  //   /^LI/,
+  //   /^K-/,
+  //   /^FI/,
+  //   /^00901$/,
+  //   /^00910$/,
+  //   /^\d.*a$/,
+  //   /^Y/,
+  //   /\d$/,
+  //   /^\d.*e$/,
+  // ]
+  // const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
 
-  const testKey = value => {
-    for (let i = 0; i < regexValuesAll.length; i++) {
-      if (regexValuesAll[i].test(value)) {
-        return i
-      }
-    }
-    return 6
-  }
-  const isNewProgramme = value => {
-    for (let i = 0; i < newProgrammes.length; i++) {
-      if (newProgrammes[i].test(value)) {
-        return true
-      }
-    }
-    return false
-  }
+  // const testKey = value => {
+  //   for (let i = 0; i < regexValuesAll.length; i++) {
+  //     if (regexValuesAll[i].test(value)) {
+  //       return i
+  //     }
+  //   }
+  //   return 6
+  // }
+  // const isNewProgramme = value => {
+  //   for (let i = 0; i < newProgrammes.length; i++) {
+  //     if (newProgrammes[i].test(value)) {
+  //       return true
+  //     }
+  //   }
+  //   return false
+  // }
 
-  const findKeyOrder = (a, b) => {
-    if (testKey(a) - testKey(b) === 0) {
-      return a.localeCompare(b)
-    }
-    return testKey(a) - testKey(b)
-  }
+  // const findKeyOrder = (a, b) => {
+  //   if (testKey(a) - testKey(b) === 0) {
+  //     return a.localeCompare(b)
+  //   }
+  //   return testKey(a) - testKey(b)
+  // }
 
   const sortProgrammeKeys = programmeKeys => {
-    if (studyProgrammeType === 'ALL_PROGRAMMES')
-      return programmeKeys.sort((a, b) => {
-        return findKeyOrder(a, b)
-      })
-    return programmeKeys.filter(isNewProgramme).sort((a, b) => {
-      return findKeyOrder(a, b)
-    })
+    return programmeKeys
+    // if (studyProgrammeFilter === 'ALL_PROGRAMMES')
+    //   return programmeKeys.sort((a, b) => {
+    //     return findKeyOrder(a, b)
+    //   })
+    // return programmeKeys.filter(isNewProgramme).sort((a, b) => {
+    //   return findKeyOrder(a, b)
+    // })
   }
 
   return (
@@ -118,13 +130,6 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
           value={academicYear}
           setValue={setAcademicYear}
         />
-      </div>
-      <div className="header-container-above-toggle">
-        <Header size="small" color="grey">
-          Select study programmes shown in programme level visualizations:
-        </Header>
-      </div>
-      <div className="toggle-container-with-title-above">
         <Toggle
           cypress="ProgrammeToggle"
           toolTips={toolTipsProgramme.ProgrammeToggle}
