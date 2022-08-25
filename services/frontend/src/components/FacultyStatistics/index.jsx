@@ -10,14 +10,12 @@ import ProgrammeOverview from './FacultyProgrammeOverview'
 import useLanguage from '../LanguagePicker/useLanguage'
 import TSA from '../../common/tsa'
 
-const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
-
 const FacultyStatistics = props => {
   useTitle('Faculties')
   const history = useHistory()
   const { language } = useLanguage()
   const allFaculties = useGetFacultiesQuery()
-  const faculties = allFaculties?.data && allFaculties.data.filter(f => !ignore.includes(f.code))
+  const faculties = allFaculties?.data
 
   const { match } = props
   const { facultyCode } = match.params
