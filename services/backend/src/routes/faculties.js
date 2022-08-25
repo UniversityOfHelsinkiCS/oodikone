@@ -5,11 +5,11 @@ const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
 const { findFacultyProgrammeCodes } = require('../services/faculty/faculty')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
 const {
-  //getFacultyProgrammes,
+  getFacultyProgrammes,
   setFacultyProgrammes,
-  // getBasicStats,
+  getBasicStats,
   setBasicStats,
-  // getCreditStats,
+  getCreditStats,
   setCreditStats,
 } = require('../services/faculty/facultyService')
 
@@ -17,12 +17,10 @@ const {
 // Some of them have been copied here and slightly edited for faculty purpose.
 
 const getProgrammes = async (code, programmeFilter) => {
-  // tieto redisiin
-
-  //const programmes = await getFacultyProgrammes(code)
-  //if (programmes) return programmes
+  const programmes = await getFacultyProgrammes(code, programmeFilter)
+  if (programmes) return programmes
   let updatedProgrammes = await findFacultyProgrammeCodes(code, programmeFilter)
-  if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes)
+  if (updatedProgrammes) updatedProgrammes = await setFacultyProgrammes(code, updatedProgrammes, programmeFilter)
 
   return updatedProgrammes
 }
@@ -39,8 +37,8 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
 
   if (!code) return res.status(422).end()
 
-  // const data = await getBasicStats(code, yearType)
-  // if (data) return res.json(data)
+  const data = await getBasicStats(code, yearType, programmeFilter)
+  if (data) return res.json(data)
 
   const wantedProgrammes = await getProgrammes(code, programmeFilter)
   if (!wantedProgrammes) return res.status(422).end()
@@ -62,7 +60,7 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
     programmeFilter
   )
   if (updatedStats) {
-    updatedStats = await setBasicStats(updatedStats, yearType)
+    updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter)
   }
   return res.json(updatedStats)
 })
@@ -75,15 +73,15 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
 
   if (!code) return res.status(422).end()
 
-  // const data = await getCreditStats(code, yearType)
-  // if (data) return res.json(data)
+  const data = await getCreditStats(code, yearType, programmeFilter)
+  if (data) return res.json(data)
 
   const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
 
   let updatedStats = await combineFacultyCredits(code, programmes.data, yearType, specialGroups)
   if (updatedStats) {
-    updatedStats = await setCreditStats(updatedStats, yearType)
+    updatedStats = await setCreditStats(updatedStats, yearType, programmeFilter)
   }
 
   return res.json(updatedStats)
