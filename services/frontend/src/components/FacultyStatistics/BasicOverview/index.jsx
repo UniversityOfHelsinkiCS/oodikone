@@ -68,55 +68,55 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
   /*
   Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Numbers
   */
-  // const regexValuesAll = [
-  //   /^KH/,
-  //   /^MH/,
-  //   /^T/,
-  //   /^LI/,
-  //   /^K-/,
-  //   /^FI/,
-  //   /^00901$/,
-  //   /^00910$/,
-  //   /^\d.*a$/,
-  //   /^Y/,
-  //   /\d$/,
-  //   /^\d.*e$/,
-  // ]
-  // const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
+  const regexValuesAll = [
+    /^KH/,
+    /^MH/,
+    /^T/,
+    /^LI/,
+    /^K-/,
+    /^FI/,
+    /^00901$/,
+    /^00910$/,
+    /^\d.*a$/,
+    /^Y/,
+    /\d$/,
+    /^\d.*e$/,
+  ]
+  const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
 
-  // const testKey = value => {
-  //   for (let i = 0; i < regexValuesAll.length; i++) {
-  //     if (regexValuesAll[i].test(value)) {
-  //       return i
-  //     }
-  //   }
-  //   return 6
-  // }
-  // const isNewProgramme = value => {
-  //   for (let i = 0; i < newProgrammes.length; i++) {
-  //     if (newProgrammes[i].test(value)) {
-  //       return true
-  //     }
-  //   }
-  //   return false
-  // }
+  const testKey = value => {
+    for (let i = 0; i < regexValuesAll.length; i++) {
+      if (regexValuesAll[i].test(value)) {
+        return i
+      }
+    }
+    return 6
+  }
+  const isNewProgramme = value => {
+    for (let i = 0; i < newProgrammes.length; i++) {
+      if (newProgrammes[i].test(value)) {
+        return true
+      }
+    }
+    return false
+  }
 
-  // const findKeyOrder = (a, b) => {
-  //   if (testKey(a) - testKey(b) === 0) {
-  //     return a.localeCompare(b)
-  //   }
-  //   return testKey(a) - testKey(b)
-  // }
+  const findKeyOrder = (a, b) => {
+    if (testKey(a) - testKey(b) === 0) {
+      return a.localeCompare(b)
+    }
+    return testKey(a) - testKey(b)
+  }
 
   const sortProgrammeKeys = programmeKeys => {
-    return programmeKeys
-    // if (studyProgrammeFilter === 'ALL_PROGRAMMES')
-    //   return programmeKeys.sort((a, b) => {
-    //     return findKeyOrder(a, b)
-    //   })
-    // return programmeKeys.filter(isNewProgramme).sort((a, b) => {
-    //   return findKeyOrder(a, b)
-    // })
+    // no need to filter out old progs in front anymore
+    if (studyProgrammeFilter === 'ALL_PROGRAMMES')
+      return programmeKeys.sort((a, b) => {
+        return findKeyOrder(a, b)
+      })
+    return programmeKeys.filter(isNewProgramme).sort((a, b) => {
+      return findKeyOrder(a, b)
+    })
   }
 
   return (
