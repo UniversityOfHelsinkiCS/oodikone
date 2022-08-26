@@ -5,6 +5,7 @@ import { useGetFacultyGraduationTimesQuery } from 'redux/facultyStats'
 import Toggle from '../../StudyProgramme/Toggle'
 import InfoBox from '../../Info/InfoBox'
 import ProgrammeSelector from './ProgrammeSelector'
+import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
 
 const getDivider = (title, toolTipText) => (
@@ -19,11 +20,11 @@ const getDivider = (title, toolTipText) => (
   </>
 )
 
-const FacultyProgrammeOverview = ({ faculty }) => {
+const FacultyProgrammeOverview = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
+  const toolTipsProgramme = InfotoolTips.Faculty
   const [programme, setProgramme] = useState(faculty)
-  const [excludeOld, setExcludeOld] = useState(true)
-  // const list = excludeOld ? 'EXCLUDE_OLD' : 'INCLUDE_OLD'
-  const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, mode: 'all', excludeOld })
+  const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
+  const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, studyProgrammeFilter })
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -35,12 +36,12 @@ const FacultyProgrammeOverview = ({ faculty }) => {
     <div className="programmes-overview">
       <div className="toggle-container">
         <Toggle
-          cypress="excludeOldToggle"
-          tooltips="Piilota vanhat ohjelmat listasta"
-          firstLabel="List all programmes"
-          secondLabel="List only new programmes"
-          value={excludeOld}
-          setValue={setExcludeOld}
+          cypress="ProgrammeToggle"
+          toolTips={toolTipsProgramme.ProgrammeToggle}
+          firstLabel="New study programmes"
+          secondLabel="All study programmes"
+          value={studyProgrammes}
+          setValue={setStudyProgrammes}
         />
       </div>
 
