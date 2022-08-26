@@ -2,11 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { withRouter, useHistory } from 'react-router-dom'
 import { Segment, Header, Tab, Loader } from 'semantic-ui-react'
 import { useGetFacultiesQuery } from 'redux/facultyStats'
+import { useGetAuthorizedUserQuery } from 'redux/auth'
 import { getTextIn } from 'common'
 import { useTabs, useTitle } from '../../common/hooks'
 import FacultySelector from './facultySelector'
 import BasicOverview from './BasicOverview'
 import ProgrammeOverview from './FacultyProgrammeOverview'
+import UpdateView from './UpdateView'
 import useLanguage from '../LanguagePicker/useLanguage'
 import TSA from '../../common/tsa'
 
@@ -22,9 +24,11 @@ const FacultyStatistics = props => {
   const faculty = faculties && facultyCode && faculties.find(f => f.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name, language)
 
+  const { isAdmin } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
+
   useEffect(() => {
     if (!facultyName) {
       return
@@ -67,9 +71,22 @@ const FacultyStatistics = props => {
       },
       {
         menuItem: 'Programmes and student populations',
-        render: () => <ProgrammeOverview faculty={faculty} />,
+        render: () => (
+          <ProgrammeOverview
+            faculty={faculty}
+            studyProgrammes={studyProgrammes}
+            setStudyProgrammes={setStudyProgrammes}
+          />
+        ),
       },
     ]
+    if (isAdmin) {
+      panes.push({
+        menuItem: 'Update statistics',
+        render: () => <UpdateView faculty={faculty?.code} />,
+      })
+    }
+
     return panes
   }
 

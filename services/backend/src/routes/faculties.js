@@ -4,6 +4,7 @@ const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
 const { findFacultyProgrammeCodes } = require('../services/faculty/faculty')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
+const { updateFacultyOverview } = require('../services/faculty/facultyUpdates')
 const {
   getFacultyProgrammes,
   setFacultyProgrammes,
@@ -12,6 +13,7 @@ const {
   getCreditStats,
   setCreditStats,
 } = require('../services/faculty/facultyService')
+const logger = require('../util/logger')
 
 // Faculty uses a lot of tools designed for Study programme.
 // Some of them have been copied here and slightly edited for faculty purpose.
@@ -118,23 +120,32 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
 
 router.get('/faculties/:id/graduationtimes', async (req, res) => {
   const code = req.params.id
-  const mode = req.query?.mode
-  const excludeOld = req.query?.excludeOld
-  const programmeFilter = 'ALL_PROGRAMMES'
+  const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
 
-  if (mode === 'all') {
-    // find times for faculty and individual programmes
-    if (excludeOld) {
-      // don't count for old programmes
-    }
+  if (programmeFilter === 'ALL_PROGRAMMES') {
+    // find times for faculty and all individual programmes
   } else {
-    // just faculty-wide average in enough
+    // find times for faculty and new individual programmes
   }
 
   const programmes = await getProgrammes(code, programmeFilter)
   return res.json(programmes.data)
+})
+
+router.get('/faculties/:id/update_basicview', async (req, res) => {
+  const code = req.params.id
+  if (code) {
+    let result = null
+    try {
+      result = await updateFacultyOverview(code)
+    } catch (e) {
+      logger.error(`Failed to update faculty ${code} basic tab stats: ${e}`)
+    }
+    return res.json(result)
+  }
+  return res.status(422).end()
 })
 
 module.exports = router
