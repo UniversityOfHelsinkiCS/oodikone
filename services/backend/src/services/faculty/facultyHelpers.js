@@ -84,6 +84,17 @@ const formatOrganization = org => {
   return { id, name, code, parentId: parent_id }
 }
 
+const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
+
+const isNewProgramme = code => {
+  for (let i = 0; i < newProgrammes.length; i++) {
+    if (newProgrammes[i].test(code)) {
+      return true
+    }
+  }
+  return false
+}
+
 module.exports = {
   findRightProgramme,
   facultyFormatStudyright,
@@ -91,4 +102,5 @@ module.exports = {
   formatFacultyTransfer,
   formatFacultyThesisWriter,
   formatOrganization,
+  isNewProgramme,
 }

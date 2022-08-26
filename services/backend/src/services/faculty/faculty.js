@@ -17,6 +17,7 @@ const {
   formatFacultyTransfer,
   formatFacultyThesisWriter,
   formatOrganization,
+  isNewProgramme,
 } = require('./facultyHelpers')
 
 const startedStudyrights = async (faculty, since) =>
@@ -194,17 +195,6 @@ const thesisWriters = async (facultyId, providers, since, thesisTypes) =>
       },
     })
   ).map(formatFacultyThesisWriter)
-
-const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
-
-const isNewProgramme = code => {
-  for (let i = 0; i < newProgrammes.length; i++) {
-    if (newProgrammes[i].test(code)) {
-      return true
-    }
-  }
-  return false
-}
 
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
