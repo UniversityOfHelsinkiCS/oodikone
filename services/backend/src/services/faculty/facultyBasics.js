@@ -7,7 +7,7 @@ const {
   transferredTo,
 } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
-const { findRightProgramme } = require('./facultyHelpers')
+const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
@@ -51,7 +51,6 @@ const getFacultyStarters = async (
   counts,
   allBasics,
   programmeData,
-  wantedProgrammeCodes,
   programmeFilter
 ) => {
   const startedGraphStats = [...graphStats]
@@ -62,7 +61,7 @@ const getFacultyStarters = async (
 
   filteredStudyrights.forEach(({ studystartdate, studyrightElements }) => {
     const { programme, programmeName } = findRightProgramme(studyrightElements, 'started')
-    if (programmeFilter === 'ALL_PROGRAMMES' || wantedProgrammeCodes.includes(programme)) {
+    if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
       const startYear = defineYear(studystartdate, isAcademicYear)
       startedGraphStats[indexOf(yearsArray, startYear)] += 1
       startedTableStats[startYear] += 1
@@ -97,7 +96,6 @@ const getFacultyGraduates = async (
   counts,
   countsGraduations,
   programmeData,
-  wantedProgrammeCodes,
   programmeFilter
 ) => {
   const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
@@ -109,7 +107,7 @@ const getFacultyGraduates = async (
 
   graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
     const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
-    if (programmeFilter === 'ALL_PROGRAMMES' || wantedProgrammeCodes.includes(programme)) {
+    if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
       const endYear = defineYear(enddate, isAcademicYear)
       graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][0] += 1
@@ -254,7 +252,6 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
     counts,
     allBasics,
     programmeData,
-    wantedProgrammeCodes,
     programmeFilter
   )
 
@@ -270,7 +267,6 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
     counts,
     countsGraduations,
     programmeData,
-    wantedProgrammeCodes,
     programmeFilter
   )
 
