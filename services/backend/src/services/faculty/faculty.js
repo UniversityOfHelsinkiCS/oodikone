@@ -154,13 +154,13 @@ const getChildOrganizations = async facultyId =>
     })
   ).map(formatOrganization)
 
-const thesisWriters = async (facultyId, providers, since, thesisTypes) =>
+const thesisWriters = async (providers, since, thesisTypes) =>
   (
     await Credit.findAll({
       attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
       include: {
         model: Course,
-        attributes: ['code', 'course_unit_type', 'main_course_code'],
+        attributes: ['code', 'course_unit_type'],
         required: true,
         where: {
           course_unit_type: {
@@ -172,11 +172,8 @@ const thesisWriters = async (facultyId, providers, since, thesisTypes) =>
           attributes: ['name', 'code'],
           required: true,
           where: {
-            [Op.or]: {
-              parent_id: facultyId,
-              code: {
-                [Op.in]: providers,
-              },
+            code: {
+              [Op.in]: providers,
             },
           },
         },

@@ -1,9 +1,9 @@
 const { indexOf } = require('lodash')
 const { mapToProviders } = require('../../util/utils')
-const { thesisWriters, facultyOgranizationId } = require('./faculty')
+const { thesisWriters } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
 
-const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, code }) => {
+const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes }) => {
   let programmeProviders = facultyProgrammes.reduce(
     (results, studyprogramme) => ({
       ...results,
@@ -12,16 +12,13 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
     {}
   )
 
-  const { id } = await facultyOgranizationId(code)
   const thesisTypes = [
     'urn:code:course-unit-type:bachelors-thesis',
     'urn:code:course-unit-type:masters-thesis',
     'urn:code:course-unit-type:doctors-thesis',
     'urn:code:course-unit-type:licentiate-thesis',
-    'urn:code:course-unit-type:bachelors-thesis-seminar',
-    'urn:code:course-unit-type:masters-thesis-seminar',
   ]
-  const thesisCourseCodes = await thesisWriters(id, Object.keys(programmeProviders), since, thesisTypes)
+  const thesisCourseCodes = await thesisWriters(Object.keys(programmeProviders), since, thesisTypes)
   let bachelors = getStatsBasis(years)
   let masters = getStatsBasis(years)
   let doctors = getStatsBasis(years)
@@ -41,11 +38,11 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
     }
     programmeCounts[programme.code][thesisYear][0] += 1
 
-    if (courseUnitType === thesisTypes[0] || courseUnitType == thesisTypes[4]) {
+    if (courseUnitType === thesisTypes[0]) {
       bachelors.graphStats[indexOf(years, thesisYear)] += 1
       bachelors.tableStats[thesisYear] += 1
       programmeCounts[programme.code][thesisYear][1] += 1
-    } else if (courseUnitType === thesisTypes[1] || courseUnitType == thesisTypes[5]) {
+    } else if (courseUnitType === thesisTypes[1]) {
       masters.graphStats[indexOf(years, thesisYear)] += 1
       masters.tableStats[thesisYear] += 1
       programmeCounts[programme.code][thesisYear][2] += 1
@@ -59,7 +56,6 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       programmeCounts[programme.code][thesisYear][4] += 1
     }
   })
-
   return { bachelors, masters, doctors, licentiates, programmeCounts, programmeNames }
 }
 
@@ -103,7 +99,18 @@ const getFacultyThesisWritersForStudyTrack = async (allThesisWriters, facultyPro
   allThesisWriters.programmeNames = programmeNames
 }
 
-const combineFacultyThesisWriters = async (allThesisWriters, facultyProgrammes, faculty, yearType) => {
+const combineFacultyThesisWriters = async (facultyProgrammes, faculty, yearType) => {
+  let allThesisWriters = {
+    id: faculty,
+    years: [],
+    tableStats: [],
+    graphStats: [],
+    programmeTableStats: {},
+    titles: ['', 'All thesis writers', 'Bachelors', 'Masters', 'Doctors', 'Others'],
+    programmeNames: {},
+    status: 'Done',
+    lastUpdated: '',
+  }
   const isAcademicYear = yearType === 'ACADEMIC_YEAR' ? true : false
   await getFacultyThesisWritersForStudyTrack(allThesisWriters, facultyProgrammes, faculty, isAcademicYear)
 

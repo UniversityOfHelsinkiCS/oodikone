@@ -97,25 +97,16 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
   const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
-
-  let allThesisWriters = {
-    id: code,
-    years: [],
-    tableStats: [],
-    graphStats: [],
-    programmeTableStats: {},
-    titles: ['', 'All thesis writers', 'Bachelors', 'Masters', 'Doctors', 'Others'],
-    programmeNames: {},
-    status: 'Done',
-    lastUpdated: '',
-  }
+  // const data = await getThesisWritersStats(code, yearType, programmeFilter)
+  // if (data) return res.json(data)
 
   const programmes = await getProgrammes(code, programmeFilter)
-  if (programmes) {
-    await combineFacultyThesisWriters(allThesisWriters, programmes.data, code, yearType)
-  }
-
-  return res.json(allThesisWriters)
+  if (!programmes) return res.status(422).end()
+  const updateStats = await combineFacultyThesisWriters(programmes.data, code, yearType)
+  // if (updateThesisWriters) {
+  //  updateStats = await setThesisWritersStats(updateStats, yearType, programmeFilter)
+  // }
+  return res.json(updateStats)
 })
 
 router.get('/faculties/:id/graduationtimes', async (req, res) => {
