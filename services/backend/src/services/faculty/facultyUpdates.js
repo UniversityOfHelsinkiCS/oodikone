@@ -62,8 +62,8 @@ const updateFacultyOverview = async faculty => {
     } catch (e) {
       logger.error(e)
     }
-    return 'OK'
   }
+  return 'OK'
 }
 
 module.exports = { updateFacultyOverview }

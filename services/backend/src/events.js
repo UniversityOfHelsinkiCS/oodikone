@@ -5,8 +5,8 @@ const { refreshAssociationsInRedis } = require('./services/studyrights')
 const { getAllProgrammes } = require('./services/studyrights')
 const { updateBasicView, updateStudytrackView } = require('./services/studyprogrammeUpdates')
 const { findAndSaveTeachers } = require('./services/topteachers')
-// const { faculties } = require('./services/organisations')
-// const { updateFacultyOverview } = require('./services/faculty/facultyUpdates')
+const { faculties } = require('./services/organisations')
+const { updateFacultyOverview } = require('./services/faculty/facultyUpdates')
 const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
@@ -18,21 +18,22 @@ const refreshStudyrightAssociations = async () => {
   logger.info('Studyright associations refreshed!')
 }
 
-// const refreshFaculty = async () => {
-//   logger.info('Refreshing faculty overview statistics for all faculties')
-//   const facultyList = (await faculties()).filter(f => !['Y', 'H99', 'Y01', 'H92', 'H930'].includes(f.code))
-//   let ready = 0
-//   for (const faculty of facultyList) {
-//     try {
-//       await updateFacultyOverview(faculty)
-//       ready += 1
-//     } catch (e) {
-//       logger.error({ message: `Failed to update stats for faculty ${faculty}`, meta: e })
-//     }
-//     logger.info(`${ready}/${facultyList.length} faculties done`)
-//   }
-//   logger.info('Faculty stats refreshed!')
-// }
+const refreshFaculties = async () => {
+  logger.info('Refreshing faculty overview statistics for all faculties')
+  const facultyList = (await faculties()).filter(f => !['Y', 'H99', 'Y01', 'H92', 'H930'].includes(f.code))
+  let ready = 0
+
+  for (const faculty of facultyList) {
+    try {
+      await updateFacultyOverview(faculty.code)
+      ready += 1
+    } catch (e) {
+      logger.error({ message: `Failed to update stats for faculty ${faculty?.code}`, meta: e })
+    }
+    logger.info(`${ready}/${facultyList.length} faculties done`)
+  }
+  logger.info('Faculty stats refreshed!')
+}
 
 const refreshNewOverviews = async () => {
   logger.info('Refreshing studyprogramme and studytrack overview statistics for all programmes')
@@ -118,7 +119,7 @@ const startCron = () => {
     logger.info('Cronjob for refreshing stats started: runs at 3am every day.')
     // refresh 3am every day
     schedule('0 3 * * *', async () => {
-      for (const func of [refreshStatistics, refreshTrends, refreshNewOverviews]) {
+      for (const func of [refreshStatistics, refreshTrends, refreshNewOverviews, refreshFaculties]) {
         await func()
       }
     })
@@ -129,4 +130,5 @@ module.exports = {
   startCron,
   refreshStatistics,
   refreshTrends,
+  refreshFaculties,
 }
