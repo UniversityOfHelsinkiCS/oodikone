@@ -82,7 +82,6 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
     /\d$/,
     /^\d.*e$/,
   ]
-  const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
 
   const testKey = value => {
     for (let i = 0; i < regexValuesAll.length; i++) {
@@ -92,30 +91,13 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
     }
     return 6
   }
-  const isNewProgramme = value => {
-    for (let i = 0; i < newProgrammes.length; i++) {
-      if (newProgrammes[i].test(value)) {
-        return true
-      }
-    }
-    return false
-  }
-
-  const findKeyOrder = (a, b) => {
-    if (testKey(a) - testKey(b) === 0) {
-      return a.localeCompare(b)
-    }
-    return testKey(a) - testKey(b)
-  }
 
   const sortProgrammeKeys = programmeKeys => {
-    // no need to filter out old progs in front anymore
-    if (studyProgrammeFilter === 'ALL_PROGRAMMES')
-      return programmeKeys.sort((a, b) => {
-        return findKeyOrder(a, b)
-      })
-    return programmeKeys.filter(isNewProgramme).sort((a, b) => {
-      return findKeyOrder(a, b)
+    return programmeKeys.sort((a, b) => {
+      if (testKey(a) - testKey(b) === 0) {
+        return a.localeCompare(b)
+      }
+      return testKey(a) - testKey(b)
     })
   }
 
@@ -161,6 +143,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   titles={basics?.data?.studentInfo.titles}
                   sliceStart={1}
                   language={language}
+                  yearsVisible={Array(basics?.data?.studentInfo.tableStats.length).fill(false)}
                 />
               </div>
             </>
@@ -184,6 +167,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   extraHeight="EXTRA HEIGHT"
                   sliceStart={2}
                   language={language}
+                  yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
                 />
               </div>
             </>
@@ -205,6 +189,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   titles={basics?.data?.graduationInfo.titles}
                   sliceStart={2}
                   language={language}
+                  yearsVisible={Array(basics?.data?.graduationInfo.tableStats.length).fill(false)}
                 />
               </div>
             </>
@@ -227,6 +212,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   sliceStart={2}
                   extraHeight="EXTRA HEIGHT"
                   language={language}
+                  yearsVisible={Array(thesisWriters?.data.tableStats.length).fill(false)}
                 />
               </div>
             </>

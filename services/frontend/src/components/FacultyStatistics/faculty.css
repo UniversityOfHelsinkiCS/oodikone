@@ -23,20 +23,6 @@
   margin-top: 1em;
 }
 
-.faculty-overview .header-container-above-toggle {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 0.5em;
-}
-
-.faculty-overview .toggle-container-with-title-above {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 0;
-}
-
 .faculty-overview .radio-toggle,
 .faculty-courses .radio-toggle {
   display: flex;
