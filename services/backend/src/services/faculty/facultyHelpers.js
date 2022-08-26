@@ -74,7 +74,6 @@ const formatFacultyThesisWriter = credit => {
     attainment_date,
     student_studentnumber,
     courseUnitType: course.course_unit_type,
-    courseMainCode: course.main_course_code,
     organizations: course.organizations.map(organization => ({ code: organization.code, name: organization.name })),
   }
 }
