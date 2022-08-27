@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Table, Menu } from 'semantic-ui-react'
+import { Table, Menu, Button, Popup } from 'semantic-ui-react'
+import xlsx from 'xlsx'
 import CollapsedStackedBar from './CollapsedStackedBar'
 import BasicRow from './BasicRow'
 
@@ -10,11 +11,11 @@ const InteractiveDataTable = ({
   programmeNames,
   sortedKeys,
   titles,
-  wideTable,
   language,
   sliceStart,
   extraHeight,
   yearsVisible,
+  shortNames,
 }) => {
   const [keyOrder, setkeyOrder] = useState({})
   const [sorter, setSorter] = useState('Programme')
@@ -66,42 +67,69 @@ const InteractiveDataTable = ({
     )
     return differenceMatrix
   }
+  const headers = titles.map(title => ({ label: title === '' ? 'Year' : title, key: title === '' ? 'Year' : title }))
+  const csvData = Object.keys(dataProgrammeStats).reduce(
+    (results, programme) => [
+      ...results,
+      ...dataProgrammeStats[programme].map(yearRow => {
+        return {
+          Programme: programme,
+          Name: programmeNames[programme][language]
+            ? programmeNames[programme][language]
+            : programmeNames[programme][language],
+          ...yearRow.reduce((result, value, valueIndex) => ({ ...result, [headers[valueIndex].key]: value }), {}),
+        }
+      }),
+    ],
+    []
+  )
 
   const handleClick = (sorterName, nameIndex) => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
     setSelectedIndex(nameIndex)
   }
+
+  const downloadCsv = () => {
+    const book = xlsx.utils.book_new()
+    const sheet = xlsx.utils.json_to_sheet(csvData)
+    xlsx.utils.book_append_sheet(book, sheet)
+    xlsx.writeFile(book, `${cypress}.xlsx`)
+  }
+
   const toggleVisibility = yearIndex => {
     const arrayToModify = [...visible]
     arrayToModify[yearIndex] = !visible[yearIndex]
     setVisible(arrayToModify)
   }
 
-  const sorterNames = titles.map(title => (title === '' ? 'Programme' : title))
+  const sorterNames = shortNames || titles.map(title => (title === '' ? 'Programme' : title))
 
   const differenceToPrevYears = calculatDiffToPrevYear(dataProgrammeStats)
 
   return (
     <div>
       <Menu compact>
-        <Menu.Item style={{ cursor: 'default' }} active color="black">
+        <Menu.Item style={{ cursor: 'default', borderRadius: '1px', padding: '5px' }} active color="black">
           Sort by:
         </Menu.Item>
         {sorterNames.map((sorterName, nameIndex) => (
           <Menu.Item
-            position="left"
             color={sorter === sorterName ? 'blue' : 'black'}
             key={sorterName}
             active={sorter === sorterName}
             onClick={() => handleClick(sorterName, nameIndex)}
-            style={{ borderRadius: '1px', fontSize: '16px', padding: '5px' }}
+            style={{ borderRadius: '1px', fontSize: '14px', padding: '5px' }}
             icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
             content={sorterName}
           />
         ))}
       </Menu>
-      <div className={`table-container${wideTable ? '-wide' : ''}`}>
+      <Popup
+        content="Download statistics as csv"
+        trigger={<Button icon="download" onClick={downloadCsv} style={{ backgroundColor: 'white', borderRadius: 0 }} />}
+      />
+      <div className="table-container-wide">
         <Table data-cy={`Table-${cypress}`} celled>
           <Table.Header>
             <Table.Row key={`randow-header-row-${Math.random()}`}>
