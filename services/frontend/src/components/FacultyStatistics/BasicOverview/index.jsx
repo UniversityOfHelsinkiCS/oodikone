@@ -15,8 +15,7 @@ import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
 
 const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, setStudyProgrammes, language }) => {
-  const toolTips = InfotoolTips.Studyprogramme
-  const toolTipsProgramme = InfotoolTips.Faculty
+  const toolTips = InfotoolTips.Faculty
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -42,8 +41,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
           {title}
         </Divider>
       </div>
-      <InfoBox content="Sisältää opintopisteet suoritusvuosittain. Suoritukset on jaoteltu Sisussa näkyvän kurssin suorituspäivän mukaan. Kaikki valmistuneet -lukumäärä sisältää kaikki mahdolliset suoritetuksi merkityt opiskeluoikeudet." />
-      {/* <InfoBox content={toolTips[toolTipText]} /> */}
+      <InfoBox content={toolTips[toolTipText]} />
     </>
   )
   const isFetchingOrLoading =
@@ -123,7 +121,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
         />
         <Toggle
           cypress="ProgrammeToggle"
-          toolTips={toolTipsProgramme.ProgrammeToggle}
+          toolTips={toolTips.ProgrammeToggle}
           firstLabel="New study programmes"
           secondLabel="All study programmes"
           value={studyProgrammes}
