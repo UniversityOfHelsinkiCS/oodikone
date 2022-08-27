@@ -17,6 +17,9 @@ const UpdateView = ({ faculty }) => {
     <div className="update-view">
       <div className="button-container">
         <h4>Update data on Basic information -view</h4>
+        <p>
+          <i>(For large faculties this can take a couple of minutes)</i>
+        </p>
         <Button disabled={basicTabStats.isLoading} color="blue" onClick={() => setSkipBasic(false)}>
           Update
         </Button>
