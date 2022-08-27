@@ -101,6 +101,15 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
     })
   }
 
+  const creditShortTitles = [
+    'Programme',
+    'Total',
+    'Major',
+    'Non-major faculty',
+    'Non-major other faculty',
+    'Non-degree',
+  ]
+
   return (
     <div className="faculty-overview">
       <div className="toggle-container">
@@ -168,6 +177,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   sliceStart={2}
                   language={language}
                   yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
+                  shortNames={creditShortTitles}
                 />
               </div>
             </>
