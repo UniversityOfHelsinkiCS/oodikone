@@ -2,7 +2,8 @@ const logger = require('../../util/logger')
 const { findFacultyProgrammeCodes } = require('./faculty')
 const { combineFacultyBasics } = require('./facultyBasics')
 const { combineFacultyCredits } = require('./facultyCredits')
-const { setFacultyProgrammes, setBasicStats, setCreditStats } = require('./facultyService')
+const { combineFacultyThesiswriters } = require('./facultyThesisWriters')
+const { setFacultyProgrammes, setBasicStats, setCreditStats, setThesisWritersStats } = require('./facultyService')
 
 const updateFacultyOverview = async faculty => {
   const calendarNew = {
@@ -59,6 +60,13 @@ const updateFacultyOverview = async faculty => {
         'SPECIAL_INCLUDED'
       )
       await setCreditStats(updatedCredits, yearType, programmeFilter)
+
+      const updateThesisWriters = await combineFacultyThesiswriters(
+        faculty,
+        programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes,
+        yearType
+      )
+      await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter)
     } catch (e) {
       logger.error(e)
     }
