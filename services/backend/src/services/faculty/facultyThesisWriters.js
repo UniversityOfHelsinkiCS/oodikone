@@ -106,7 +106,7 @@ const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType)
     tableStats: [],
     graphStats: [],
     programmeTableStats: {},
-    titles: ['', 'All thesis writers', 'Bachelors', 'Masters', 'Doctors', 'Others'],
+    titles: ['', 'All', 'Bachelors', 'Masters', 'Doctors', 'Others'],
     programmeNames: {},
     status: 'Done',
     lastUpdated: '',
