@@ -450,7 +450,7 @@ const codeLikeTerm = code =>
     : {
         code: {
           // Starts with code or has AY/A in front of the code
-          [Op.regexp]: `^(AY|ay|A|a)?${code}`,
+          [Op.iRegexp]: `^(AY|ay|A|a)?${code}`,
         },
       }
 
