@@ -38,13 +38,17 @@ const GeneralTab = ({
   const sendAnalytics = sendEvent.populationStudents
   const { data: semesterData } = useGetSemestersQuery()
 
-  const fromSemester = Object.values(semesterData.semesters)
-    .filter(({ startdate }) => new Date(startdate) <= new Date(from))
-    .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]?.semestercode
+  const fromSemester = from
+    ? Object.values(semesterData.semesters)
+        .filter(({ startdate }) => new Date(startdate) <= new Date(from))
+        .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]?.semestercode
+    : null
 
-  const toSemester = Object.values(semesterData.semesters)
-    .filter(({ enddate }) => new Date(enddate) >= new Date(to))
-    .sort((a, b) => new Date(a.enddate) - new Date(b.enddate))[0]?.semestercode
+  const toSemester = to
+    ? Object.values(semesterData.semesters)
+        .filter(({ enddate }) => new Date(enddate) >= new Date(to))
+        .sort((a, b) => new Date(a.enddate) - new Date(b.enddate))[0]?.semestercode
+    : null
 
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
 
