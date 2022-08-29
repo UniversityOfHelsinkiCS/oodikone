@@ -210,7 +210,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
       raw: true,
     }),
     Enrollment.findAll({
-      attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber'],
+      attributes: ['course_code', 'state', 'enrollment_date_time', 'studentnumber', 'semestercode'],
       where: {
         enrollment_date_time: {
           [Op.between]: [attainmentDateFrom, endDate],

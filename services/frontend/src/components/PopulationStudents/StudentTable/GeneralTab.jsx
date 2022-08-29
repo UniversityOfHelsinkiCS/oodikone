@@ -17,6 +17,7 @@ import {
 } from 'common'
 import { useGetStudyGuidanceGroupPopulationQuery } from 'redux/studyGuidanceGroups'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { useGetSemestersQuery } from 'redux/semesters'
 import { PRIORITYCODE_TEXTS } from '../../../constants'
 import sendEvent from '../../../common/sendEvent'
 import useLanguage from '../../LanguagePicker/useLanguage'
@@ -35,6 +36,15 @@ const GeneralTab = ({
   const { useFilterSelector } = useFilters()
   const [popupStates, setPopupStates] = useState({})
   const sendAnalytics = sendEvent.populationStudents
+  const { data: semesterData } = useGetSemestersQuery()
+
+  const fromSemester = Object.values(semesterData.semesters)
+    .filter(({ startdate }) => new Date(startdate) <= new Date(from))
+    .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0]?.semestercode
+
+  const toSemester = Object.values(semesterData.semesters)
+    .filter(({ enddate }) => new Date(enddate) >= new Date(to))
+    .sort((a, b) => new Date(a.enddate) - new Date(b.enddate))[0]?.semestercode
 
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
 
@@ -210,9 +220,7 @@ const GeneralTab = ({
     const enrollments =
       s.enrollments
         ?.filter(e => coursecode.includes(e.course_code))
-        ?.filter(
-          e => new Date(e.enrollment_date_time) >= new Date(from) && new Date(e.enrollment_date_time) < new Date(to)
-        ) ?? null
+        ?.filter(e => e.semestercode >= fromSemester && e.semestercode <= toSemester) ?? null
     if (!enrollments || !enrollments.length) return ''
     return enrollments[0].enrollment_date_time
   }

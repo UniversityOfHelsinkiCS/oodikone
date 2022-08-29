@@ -121,7 +121,7 @@ const getUnifyStatus = unifyCourses => {
 }
 
 const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCourses = 'unifyStats') => {
-  const { startdate } = await Semester.findOne({
+  const { startdate, semestercode: fromSemester } = await Semester.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: from,
     },
@@ -129,7 +129,7 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCo
     limit: 1,
     raw: true,
   })
-  const { enddate } = await Semester.findOne({
+  const { enddate, semestercode: toSemester } = await Semester.findOne({
     where: {
       [separate ? 'semestercode' : 'yearcode']: to,
     },
@@ -164,7 +164,7 @@ const findByCourseAndSemesters = async (coursecodes, from, to, separate, unifyCo
       WHERE
         e.studentnumber = s.studentnumber
         AND e.course_code IN (:coursecodes)
-        AND e.enrollment_date_time BETWEEN '${startdate.toISOString()}' AND '${enddate.toISOString()}'
+        AND e.semestercode BETWEEN ${fromSemester} AND ${toSemester}
         AND e.enrollment_date_time >= '2021-05-31'
         AND e.state IN ('ENROLLED', 'CONFIRMED')
     );
