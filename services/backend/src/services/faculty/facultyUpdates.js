@@ -2,7 +2,7 @@ const logger = require('../../util/logger')
 const { findFacultyProgrammeCodes } = require('./faculty')
 const { combineFacultyBasics } = require('./facultyBasics')
 const { combineFacultyCredits } = require('./facultyCredits')
-const { combineFacultyThesiswriters } = require('./facultyThesisWriters')
+const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
 const { setFacultyProgrammes, setBasicStats, setCreditStats, setThesisWritersStats } = require('./facultyService')
 
 const updateFacultyOverview = async faculty => {
@@ -61,9 +61,9 @@ const updateFacultyOverview = async faculty => {
       )
       await setCreditStats(updatedCredits, yearType, programmeFilter)
 
-      const updateThesisWriters = await combineFacultyThesiswriters(
+      const updateThesisWriters = await combineFacultyThesisWriters(
         faculty,
-        programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes,
+        programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
         yearType
       )
       await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter)

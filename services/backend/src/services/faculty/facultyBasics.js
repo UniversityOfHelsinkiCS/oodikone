@@ -236,7 +236,7 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
     graduationInfo: {
       tableStats: [],
       graphStats: [],
-      titles: ['', 'All graduations', 'Bachelors', 'Masters', 'Doctors', 'Others'],
+      titles: ['', 'All', 'Bachelors', 'Masters', 'Doctors', 'Others'],
       programmeTableStats: {},
     },
   }
