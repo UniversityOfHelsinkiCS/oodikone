@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Table, Menu, Button, Popup } from 'semantic-ui-react'
-import xlsx from 'xlsx'
+import { Table, Menu } from 'semantic-ui-react'
 import CollapsedStackedBar from './CollapsedStackedBar'
 import BasicRow from './BasicRow'
 
@@ -18,7 +17,7 @@ const InteractiveDataTable = ({
   shortNames,
 }) => {
   const [keyOrder, setkeyOrder] = useState({})
-  const [sorter, setSorter] = useState('Programme')
+  const [sorter, setSorter] = useState('Code')
   const [sortDir, setSortDir] = useState(1)
   const [sortbyColumn, setSortByColumn] = useState(0)
   const [columnIndex, setSelectedIndex] = useState(0)
@@ -67,34 +66,11 @@ const InteractiveDataTable = ({
     )
     return differenceMatrix
   }
-  const headers = titles.map(title => ({ label: title === '' ? 'Year' : title, key: title === '' ? 'Year' : title }))
-  const csvData = Object.keys(dataProgrammeStats).reduce(
-    (results, programme) => [
-      ...results,
-      ...dataProgrammeStats[programme].map(yearRow => {
-        return {
-          Programme: programme,
-          Name: programmeNames[programme][language]
-            ? programmeNames[programme][language]
-            : programmeNames[programme][language],
-          ...yearRow.reduce((result, value, valueIndex) => ({ ...result, [headers[valueIndex].key]: value }), {}),
-        }
-      }),
-    ],
-    []
-  )
 
   const handleClick = (sorterName, nameIndex) => {
     if (sorterName === sorter) setSortDir(-1 * sortDir)
     setSorter(sorterName)
     setSelectedIndex(nameIndex)
-  }
-
-  const downloadCsv = () => {
-    const book = xlsx.utils.book_new()
-    const sheet = xlsx.utils.json_to_sheet(csvData)
-    xlsx.utils.book_append_sheet(book, sheet)
-    xlsx.writeFile(book, `${cypress}.xlsx`)
   }
 
   const toggleVisibility = yearIndex => {
@@ -103,7 +79,7 @@ const InteractiveDataTable = ({
     setVisible(arrayToModify)
   }
 
-  const sorterNames = shortNames || titles.map(title => (title === '' ? 'Programme' : title))
+  const sorterNames = shortNames || titles.map(title => (title === '' ? 'Code' : title))
 
   const differenceToPrevYears = calculatDiffToPrevYear(dataProgrammeStats)
 
@@ -119,20 +95,16 @@ const InteractiveDataTable = ({
             key={sorterName}
             active={sorter === sorterName}
             onClick={() => handleClick(sorterName, nameIndex)}
-            style={{ borderRadius: '1px', fontSize: '14px', padding: '5px' }}
+            style={{ borderRadius: '1px', fontSize: '16px', padding: '5px' }}
             icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
             content={sorterName}
           />
         ))}
       </Menu>
-      <Popup
-        content="Download statistics as csv"
-        trigger={<Button icon="download" onClick={downloadCsv} style={{ backgroundColor: 'white', borderRadius: 0 }} />}
-      />
-      <div className="table-container-wide">
+      <div className="table-container">
         <Table data-cy={`Table-${cypress}`} celled>
           <Table.Header>
-            <Table.Row key={`randow-header-row-${Math.random()}`}>
+            <Table.Row key={`randow-header-row-${Math.random()}`} textAlign="center">
               {titles?.map(title => (
                 <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
               ))}

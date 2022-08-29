@@ -1,6 +1,6 @@
 import React from 'react'
-import { Divider, Loader } from 'semantic-ui-react'
-
+import { Divider, Loader, Popup, Button } from 'semantic-ui-react'
+import xlsx from 'xlsx'
 import {
   useGetFacultyCreditStatsQuery,
   useGetFacultyBasicStatsQuery,
@@ -31,37 +31,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
     studyProgrammeFilter,
     specialGroups: special,
   })
-
   const thesisWriters = useGetFacultyThesisStatsQuery({ id: faculty?.code, yearType, studyProgrammeFilter })
-
-  const getDivider = (title, toolTipText) => (
-    <>
-      <div className="divider">
-        <Divider data-cy={`Section-${toolTipText}`} horizontal>
-          {title}
-        </Divider>
-      </div>
-      <InfoBox content={toolTips[toolTipText]} />
-    </>
-  )
-  const isFetchingOrLoading =
-    credits.isLoading ||
-    credits.isFetching ||
-    basics.isLoading ||
-    basics.isFetching ||
-    thesisWriters.isLoading ||
-    thesisWriters.isFetching
-
-  const isError =
-    (basics.isError && credits.isError && thesisWriters.isError) ||
-    (basics.isSuccess &&
-      !basics.data &&
-      credits.isSuccess &&
-      !credits.data &&
-      thesisWriters.isSuccess &&
-      !thesisWriters.data)
-
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
   /*
   Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Numbers
@@ -98,14 +68,84 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
       return testKey(a) - testKey(b)
     })
   }
+  const downloadCsv = (titles, tableStats, programmeStats, programmeNames, toolTipText) => {
+    const headers = titles.map(title => ({ label: title === '' ? 'Year' : title, key: title === '' ? 'Year' : title }))
+    const csvData = sortProgrammeKeys(Object.keys(programmeStats)).reduce(
+      (results, programme) => [
+        ...results,
+        ...programmeStats[programme].map(yearRow => {
+          return {
+            Programme: programme,
+            Name: programmeNames[programme][language]
+              ? programmeNames[programme][language]
+              : programmeNames[programme].fi,
+            ...yearRow.reduce((result, value, valueIndex) => ({ ...result, [headers[valueIndex].key]: value }), {}),
+          }
+        }),
+      ],
+      []
+    )
 
-  const creditShortTitles = [
-    'Programme',
-    'Total',
-    'Major',
-    'Non-major faculty',
-    'Non-major other faculty',
-    'Non-degree',
+    const tableStatsAsCsv = tableStats.map(yearArray =>
+      yearArray.reduce((result, value, yearIndex) => ({ ...result, [headers[yearIndex].key]: value }), {})
+    )
+
+    const book = xlsx.utils.book_new()
+    const tableSheet = xlsx.utils.json_to_sheet(tableStatsAsCsv)
+    xlsx.utils.book_append_sheet(book, tableSheet, 'TableStats')
+    const sheet = xlsx.utils.json_to_sheet(csvData)
+    xlsx.utils.book_append_sheet(book, sheet, 'ProgrammeStats')
+    xlsx.writeFile(book, `${faculty.code}-${toolTipText}.xlsx`)
+  }
+
+  const getDivider = (title, toolTipText, titles, tableStats, programmeStats, programmeNames) => (
+    <>
+      <div className="divider">
+        <Divider data-cy={`Section-${toolTipText}`} horizontal>
+          {title}
+        </Divider>
+      </div>
+      <InfoBox content={toolTips[toolTipText]} />
+      <Popup
+        content="Download statistics as csv"
+        trigger={
+          <Button
+            icon="download"
+            floated="right"
+            onClick={() => downloadCsv(titles, tableStats, programmeStats, programmeNames, toolTipText)}
+            style={{ backgroundColor: 'white', borderRadius: 0 }}
+          />
+        }
+      />
+    </>
+  )
+  const isFetchingOrLoading =
+    credits.isLoading ||
+    credits.isFetching ||
+    basics.isLoading ||
+    basics.isFetching ||
+    thesisWriters.isLoading ||
+    thesisWriters.isFetching
+
+  const isError =
+    (basics.isError && credits.isError && thesisWriters.isError) ||
+    (basics.isSuccess &&
+      !basics.data &&
+      credits.isSuccess &&
+      !credits.data &&
+      thesisWriters.isSuccess &&
+      !thesisWriters.data)
+
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+
+  const creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree']
+  const transferShortNames = [
+    'Code',
+    'Started',
+    'Graduated',
+    'Transferred inside',
+    'Transferred away',
+    'Transferred to',
   ]
 
   return (
@@ -135,12 +175,21 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
         <>
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider('Students of the faculty', 'StudentsOfTheFaculty')}
+              {getDivider(
+                'Students of the faculty',
+                'StudentsOfTheFaculty',
+                basics?.data?.studentInfo.titles,
+                basics?.data?.studentInfo.tableStats,
+                basics?.data?.studentInfo.programmeTableStats,
+                basics?.data?.programmeNames
+              )}
               <div className="section-container">
-                <LineGraph
-                  cypress="StudentsOfTheFaculty"
-                  data={{ ...basics?.data.studentInfo, years: basics.data.years }}
-                />
+                <div className="graph-container-narrow">
+                  <LineGraph
+                    cypress="StudentsOfTheFaculty"
+                    data={{ ...basics?.data.studentInfo, years: basics.data.years }}
+                  />
+                </div>
                 <InteractiveDataTable
                   cypress="StudentsOfTheFaculty"
                   dataStats={basics?.data?.studentInfo.tableStats}
@@ -151,19 +200,30 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                   sliceStart={1}
                   language={language}
                   yearsVisible={Array(basics?.data?.studentInfo.tableStats.length).fill(false)}
+                  shortNames={transferShortNames}
                 />
               </div>
             </>
           )}
           {credits.isSuccess && credits.data && (
             <>
-              {getDivider('Credits produced by the faculty', 'CreditsProducedByTheFaculty')}
+              {getDivider(
+                'Credits produced by the faculty',
+                'CreditsProducedByTheFaculty',
+                credits?.data?.titles,
+                credits?.data?.tableStats,
+                credits?.data?.programmeTableStats,
+                credits?.data?.programmeNames
+              )}
               <div className="section-container">
-                <StackedBarChart
-                  cypress="CreditsProducedByTheSFaculty"
-                  data={credits?.data?.graphStats}
-                  labels={credits?.data?.years}
-                />
+                <div className="graph-container-narrow">
+                  <StackedBarChart
+                    cypress="CreditsProducedByTheSFaculty"
+                    data={credits?.data?.graphStats}
+                    labels={credits?.data?.years}
+                    wideTable="narrow"
+                  />
+                </div>
                 <InteractiveDataTable
                   cypress="CreditsProducedByTheFaculty"
                   dataStats={credits?.data?.tableStats}
@@ -182,12 +242,21 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
           )}
           {basics.isSuccess && basics.data && (
             <>
-              {getDivider('Graduated of the faculty', 'GraduatedOfTheFaculty')}
+              {getDivider(
+                'Graduated of the faculty',
+                'GraduatedOfTheFaculty',
+                basics?.data?.graduationInfo.titles,
+                basics?.data?.graduationInfo.tableStats,
+                basics?.data?.graduationInfo.programmeTableStats,
+                basics?.data?.programmeNames
+              )}
               <div className="section-container">
-                <LineGraph
-                  cypress="GraduatedOfTheFaculty"
-                  data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
-                />
+                <div className="graph-container-narrow">
+                  <LineGraph
+                    cypress="GraduatedOfTheFaculty"
+                    data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
+                  />
+                </div>
                 <InteractiveDataTable
                   cypress="GraduatedOfTheFaculty"
                   dataStats={basics?.data?.graduationInfo.tableStats}
@@ -204,12 +273,21 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
           )}
           {thesisWriters.isSuccess && thesisWriters.data && (
             <>
-              {getDivider('Thesis writers of the faculty', 'ThesisWritersOfTheFaculty')}
+              {getDivider(
+                'Thesis writers of the faculty',
+                'ThesisWritersOfTheFaculty',
+                thesisWriters?.data?.titles,
+                thesisWriters?.data.tableStats,
+                thesisWriters?.data.programmeTableStats,
+                thesisWriters?.data?.programmeNames
+              )}
               <div className="section-container">
-                <LineGraph
-                  cypress="ThesisWritersOfTheFaculty"
-                  data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}
-                />
+                <div className="graph-container-narrow">
+                  <LineGraph
+                    cypress="ThesisWritersOfTheFaculty"
+                    data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}
+                  />
+                </div>
                 <InteractiveDataTable
                   cypress="ThesisWritersOfTheFaculty"
                   dataStats={thesisWriters?.data.tableStats}
