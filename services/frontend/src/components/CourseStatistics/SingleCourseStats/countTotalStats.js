@@ -65,7 +65,7 @@ const countTotalStats = (formattedStats, userHasAccessToAllStats) => {
           categories: { passed, failed },
           grades: cgrades,
           enrollmentsByState: { ...acc.attempts.enrollmentsByState },
-          totalEnrollments: acc.students.totalEnrollments + (curr.students.totalEnrollments || 0),
+          totalEnrollments: acc.attempts.totalEnrollments + (curr.attempts.totalEnrollments || 0),
         },
         students: {
           totalEnrollments: acc.students.totalEnrollments + (curr.students.totalEnrollments || 0),
