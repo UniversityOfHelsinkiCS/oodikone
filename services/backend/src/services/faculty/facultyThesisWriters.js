@@ -99,7 +99,7 @@ const getFacultyThesisWritersForStudyTrack = async (allThesisWriters, facultyPro
   allThesisWriters.programmeNames = programmeNames
 }
 
-const combineFacultyThesisWriters = async (facultyProgrammes, faculty, yearType) => {
+const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType) => {
   let allThesisWriters = {
     id: faculty,
     years: [],

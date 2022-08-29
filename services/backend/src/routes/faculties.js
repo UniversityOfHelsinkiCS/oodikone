@@ -12,6 +12,8 @@ const {
   setBasicStats,
   getCreditStats,
   setCreditStats,
+  getThesisWritersStats,
+  setThesisWritersStats,
 } = require('../services/faculty/facultyService')
 const logger = require('../util/logger')
 
@@ -97,15 +99,15 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
   const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
-  // const data = await getThesisWritersStats(code, yearType, programmeFilter)
-  // if (data) return res.json(data)
+  const data = await getThesisWritersStats(code, yearType, programmeFilter)
+  if (data) return res.json(data)
 
   const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
-  const updateStats = await combineFacultyThesisWriters(programmes.data, code, yearType)
-  // if (updateThesisWriters) {
-  //  updateStats = await setThesisWritersStats(updateStats, yearType, programmeFilter)
-  // }
+  let updateStats = await combineFacultyThesisWriters(code, programmes.data, yearType)
+  if (updateStats) {
+    updateStats = await setThesisWritersStats(updateStats, yearType, programmeFilter)
+  }
   return res.json(updateStats)
 })
 
