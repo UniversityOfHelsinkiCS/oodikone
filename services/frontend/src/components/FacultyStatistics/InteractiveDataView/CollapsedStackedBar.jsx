@@ -3,7 +3,7 @@ import React from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 
-const colors = ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#2b908f', '#f45b5b', '#91e8e1']
+const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
 const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differenceData, extraHeight }) => {
   const transpose = matrix => {

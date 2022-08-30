@@ -5,8 +5,7 @@ import '../studyprogramme.css'
 const ReactHighcharts = require('react-highcharts')
 require('highcharts-exporting')(ReactHighcharts.Highcharts)
 
-// const colors = ['#003E65', '#1392c2', '#E68825', '#333737', '#036415']
-const colors = ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#2b908f', '#f45b5b', '#91e8e1']
+const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
 const LineGraph = ({ cypress, data }) => {
   const dataWithColors = data?.graphStats.map((series, index) => ({
