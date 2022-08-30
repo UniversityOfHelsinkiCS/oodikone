@@ -3,8 +3,7 @@ import React from 'react'
 
 const ReactHighcharts = require('react-highcharts')
 
-// const colors = ['#003E65', '#1392c2', '#036415', '#bdc2c7', '#E68825', '#333737', '#54997b', '#195f8a']
-const colors = ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#2b908f', '#f45b5b', '#91e8e1']
+const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
 const StackedBarChart = ({ cypress, data, labels, wideTable }) => {
   const dataWithColors = data?.map((series, index) => ({ ...series, color: colors[index] }))

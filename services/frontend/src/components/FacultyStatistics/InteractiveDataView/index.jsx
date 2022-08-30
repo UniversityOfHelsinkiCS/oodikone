@@ -15,6 +15,7 @@ const InteractiveDataTable = ({
   extraHeight,
   yearsVisible,
   shortNames,
+  studentsTable,
 }) => {
   const [keyOrder, setkeyOrder] = useState({})
   const [sorter, setSorter] = useState('Code')
@@ -141,6 +142,7 @@ const InteractiveDataTable = ({
                     language={language}
                     names={titles?.slice(sliceStart)}
                     extraHeight={extraHeight}
+                    studentsTable={studentsTable}
                   />
                 </Table.Cell>
               </Table.Row>
