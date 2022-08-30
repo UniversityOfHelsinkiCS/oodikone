@@ -1,3 +1,4 @@
+/* eslint-disable react/no-this-in-sfc */
 import React from 'react'
 
 const ReactHighcharts = require('react-highcharts')
@@ -18,6 +19,7 @@ const StackedBarChart = ({ cypress, data, labels, wideTable }) => {
     },
     xAxis: {
       categories: labels,
+      allowDecimals: false,
     },
     chart: {
       type: 'column',
@@ -40,6 +42,10 @@ const StackedBarChart = ({ cypress, data, labels, wideTable }) => {
         stacking: 'normal',
         dataLabels: {
           enabled: true,
+          formatter() {
+            if (Number.isInteger(this.y)) return `${this.y}`
+            return `${this.y.toFixed(1)}`
+          },
         },
       },
     },

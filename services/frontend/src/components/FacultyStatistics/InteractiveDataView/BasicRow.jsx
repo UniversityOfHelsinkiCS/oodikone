@@ -1,6 +1,10 @@
 import React from 'react'
 import { Button, Icon, Table, Label } from 'semantic-ui-react'
 
+const roundValue = value => {
+  return Number.isInteger(value) ? value : value.toFixed(1)
+}
+
 const BasicRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, styles }) => {
   return (
     <Table.Row style={styles} key={`Basic-row-${cypress}-${yearIndex}`}>
@@ -22,7 +26,7 @@ const BasicRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, style
               </Label>
             </Button>
           ) : (
-            value
+            roundValue(value)
           )}
         </Table.Cell>
       ))}
