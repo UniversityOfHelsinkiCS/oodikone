@@ -139,14 +139,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
   const creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree']
-  const transferShortNames = [
-    'Code',
-    'Started',
-    'Graduated',
-    'Transferred inside',
-    'Transferred away',
-    'Transferred to',
-  ]
+  const transferShortNames = ['Code', 'Started', 'Graduated', 'Transferred in', 'Transferred away', 'Transferred to']
 
   return (
     <div className="faculty-overview">
@@ -190,18 +183,20 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                     data={{ ...basics?.data.studentInfo, years: basics.data.years }}
                   />
                 </div>
-                <InteractiveDataTable
-                  cypress="StudentsOfTheFaculty"
-                  dataStats={basics?.data?.studentInfo.tableStats}
-                  dataProgrammeStats={basics?.data?.studentInfo.programmeTableStats}
-                  programmeNames={basics?.data?.programmeNames}
-                  sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.studentInfo.programmeTableStats))}
-                  titles={basics?.data?.studentInfo.titles}
-                  sliceStart={1}
-                  language={language}
-                  yearsVisible={Array(basics?.data?.studentInfo.tableStats.length).fill(false)}
-                  shortNames={transferShortNames}
-                />
+                <div className="table-container-wide">
+                  <InteractiveDataTable
+                    cypress="StudentsOfTheFaculty"
+                    dataStats={basics?.data?.studentInfo.tableStats}
+                    dataProgrammeStats={basics?.data?.studentInfo.programmeTableStats}
+                    programmeNames={basics?.data?.programmeNames}
+                    sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.studentInfo.programmeTableStats))}
+                    titles={basics?.data?.studentInfo.titles}
+                    sliceStart={1}
+                    language={language}
+                    yearsVisible={Array(basics?.data?.studentInfo.tableStats.length).fill(false)}
+                    shortNames={transferShortNames}
+                  />
+                </div>
               </div>
             </>
           )}
@@ -224,19 +219,21 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                     wideTable="narrow"
                   />
                 </div>
-                <InteractiveDataTable
-                  cypress="CreditsProducedByTheFaculty"
-                  dataStats={credits?.data?.tableStats}
-                  dataProgrammeStats={credits?.data?.programmeTableStats}
-                  programmeNames={credits?.data?.programmeNames}
-                  sortedKeys={sortProgrammeKeys(Object.keys(credits?.data?.programmeTableStats))}
-                  titles={credits?.data?.titles}
-                  extraHeight="EXTRA HEIGHT"
-                  sliceStart={2}
-                  language={language}
-                  yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
-                  shortNames={creditShortTitles}
-                />
+                <div className="table-container-wide">
+                  <InteractiveDataTable
+                    cypress="CreditsProducedByTheFaculty"
+                    dataStats={credits?.data?.tableStats}
+                    dataProgrammeStats={credits?.data?.programmeTableStats}
+                    programmeNames={credits?.data?.programmeNames}
+                    sortedKeys={sortProgrammeKeys(Object.keys(credits?.data?.programmeTableStats))}
+                    titles={credits?.data?.titles}
+                    extraHeight="EXTRA HEIGHT"
+                    sliceStart={2}
+                    language={language}
+                    yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
+                    shortNames={creditShortTitles}
+                  />
+                </div>
               </div>
             </>
           )}
@@ -251,7 +248,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                 basics?.data?.programmeNames
               )}
               <div className="section-container">
-                <div className="graph-container-narrow">
+                <div className="graph-container">
                   <LineGraph
                     cypress="GraduatedOfTheFaculty"
                     data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
@@ -282,7 +279,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                 thesisWriters?.data?.programmeNames
               )}
               <div className="section-container">
-                <div className="graph-container-narrow">
+                <div className="graph-container">
                   <LineGraph
                     cypress="ThesisWritersOfTheFaculty"
                     data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}

@@ -85,7 +85,7 @@ const InteractiveDataTable = ({
 
   return (
     <div>
-      <Menu compact>
+      <Menu compact attached="top">
         <Menu.Item style={{ cursor: 'default', borderRadius: '1px', padding: '5px' }} active color="black">
           Sort by:
         </Menu.Item>
@@ -95,61 +95,59 @@ const InteractiveDataTable = ({
             key={sorterName}
             active={sorter === sorterName}
             onClick={() => handleClick(sorterName, nameIndex)}
-            style={{ borderRadius: '1px', fontSize: '16px', padding: '5px' }}
+            style={{ borderRadius: '1px', fontSize: '14px', padding: '5px' }}
             icon={sortDir === 1 ? 'triangle down' : 'triangle up'}
             content={sorterName}
           />
         ))}
       </Menu>
-      <div className="table-container">
-        <Table data-cy={`Table-${cypress}`} celled>
-          <Table.Header>
-            <Table.Row key={`randow-header-row-${Math.random()}`} textAlign="center">
-              {titles?.map(title => (
-                <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
-              ))}
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {dataStats?.map((yearArray, yearIndex) => (
-              <React.Fragment key={`random-fragment-key-${Math.random()}`}>
-                <BasicRow
-                  icon={visible[yearIndex] ? 'chevron down' : 'chevron right'}
-                  yearArray={yearArray}
-                  cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
-                  yearIndex={yearIndex}
-                  toggleVisibility={() => toggleVisibility(yearIndex)}
-                />
-                <Table.Row key={`stack-row-key-${Math.random()}`} style={{ display: visible[yearIndex] ? '' : 'none' }}>
-                  <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`} colSpan={100}>
-                    <CollapsedStackedBar
-                      data={
-                        sortbyColumn === 0
-                          ? sortedKeys?.map(programme => dataProgrammeStats[programme][yearIndex].slice(sliceStart))
-                          : keyOrder[yearIndex]?.map(programme =>
-                              dataProgrammeStats[programme][yearIndex].slice(sliceStart)
-                            )
-                      }
-                      labels={sortbyColumn === 0 ? sortedKeys : keyOrder[yearIndex]}
-                      differenceData={Object.keys(differenceToPrevYears)?.reduce(
-                        (yearlyObject, programme) => ({
-                          ...yearlyObject,
-                          [programme]: differenceToPrevYears[programme][yearIndex],
-                        }),
-                        {}
-                      )}
-                      longLabels={programmeNames}
-                      language={language}
-                      names={titles?.slice(sliceStart)}
-                      extraHeight={extraHeight}
-                    />
-                  </Table.Cell>
-                </Table.Row>
-              </React.Fragment>
+      <Table data-cy={`Table-${cypress}`} celled>
+        <Table.Header>
+          <Table.Row key={`randow-header-row-${Math.random()}`} textAlign="center">
+            {titles?.map(title => (
+              <Table.HeaderCell key={title}>{title}</Table.HeaderCell>
             ))}
-          </Table.Body>
-        </Table>
-      </div>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {dataStats?.map((yearArray, yearIndex) => (
+            <React.Fragment key={`random-fragment-key-${Math.random()}`}>
+              <BasicRow
+                icon={visible[yearIndex] ? 'chevron down' : 'chevron right'}
+                yearArray={yearArray}
+                cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
+                yearIndex={yearIndex}
+                toggleVisibility={() => toggleVisibility(yearIndex)}
+              />
+              <Table.Row key={`stack-row-key-${Math.random()}`} style={{ display: visible[yearIndex] ? '' : 'none' }}>
+                <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} key={`stack-cell${Math.random()}`} colSpan={100}>
+                  <CollapsedStackedBar
+                    data={
+                      sortbyColumn === 0
+                        ? sortedKeys?.map(programme => dataProgrammeStats[programme][yearIndex].slice(sliceStart))
+                        : keyOrder[yearIndex]?.map(programme =>
+                            dataProgrammeStats[programme][yearIndex].slice(sliceStart)
+                          )
+                    }
+                    labels={sortbyColumn === 0 ? sortedKeys : keyOrder[yearIndex]}
+                    differenceData={Object.keys(differenceToPrevYears)?.reduce(
+                      (yearlyObject, programme) => ({
+                        ...yearlyObject,
+                        [programme]: differenceToPrevYears[programme][yearIndex],
+                      }),
+                      {}
+                    )}
+                    longLabels={programmeNames}
+                    language={language}
+                    names={titles?.slice(sliceStart)}
+                    extraHeight={extraHeight}
+                  />
+                </Table.Cell>
+              </Table.Row>
+            </React.Fragment>
+          ))}
+        </Table.Body>
+      </Table>
     </div>
   )
 }

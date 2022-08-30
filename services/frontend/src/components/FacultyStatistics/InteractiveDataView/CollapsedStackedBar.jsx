@@ -97,7 +97,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
       fontSize: '24px',
       x: 20,
       verticalAlign: 'top',
-      y: -20,
+      y: -10,
       floating: true,
       backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
       borderColor: '#CCC',
