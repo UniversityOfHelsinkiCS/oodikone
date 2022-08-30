@@ -4,6 +4,7 @@ const { combineFacultyBasics } = require('../services/faculty/facultyBasics')
 const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
 const { findFacultyProgrammeCodes } = require('../services/faculty/faculty')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
+const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
 const { updateFacultyOverview } = require('../services/faculty/facultyUpdates')
 const {
   getFacultyProgrammes,
@@ -113,18 +114,14 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
 
 router.get('/faculties/:id/graduationtimes', async (req, res) => {
   const code = req.params.id
-  const programmeFilter = req.query?.programme_filter
+  //const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
 
-  if (programmeFilter === 'ALL_PROGRAMMES') {
-    // find times for faculty and all individual programmes
-  } else {
-    // find times for faculty and new individual programmes
-  }
-
-  const programmes = await getProgrammes(code, programmeFilter)
-  return res.json(programmes.data)
+  // const programmes = await getProgrammes(code, programmeFilter)
+  const result = await countGraduationTimes(code)
+  // currently counts all programmes
+  return res.json(result)
 })
 
 router.get('/faculties/:id/update_basicview', async (req, res) => {
