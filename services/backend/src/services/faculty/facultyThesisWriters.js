@@ -81,7 +81,7 @@ const getFacultyThesisWritersForStudyTrack = async (allThesisWriters, facultyPro
   allThesisWriters.graphStats.push({ name: 'Bachelors', data: bachelors.graphStats })
   allThesisWriters.graphStats.push({ name: 'Masters', data: masters.graphStats })
   allThesisWriters.graphStats.push({ name: 'Doctors', data: doctors.graphStats })
-  allThesisWriters.graphStats.push({ name: 'Others', data: licentiates.graphStats })
+  allThesisWriters.graphStats.push({ name: 'Licentiates', data: licentiates.graphStats })
 
   // ProgrammeNames contains at the moment the name of the department that is not in facultyProgrammes
   const programmes = programmeNames ? Object.keys(programmeNames) : facultyProgrammes.map(programme => programme.code)
@@ -106,7 +106,7 @@ const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType)
     tableStats: [],
     graphStats: [],
     programmeTableStats: {},
-    titles: ['', 'All', 'Bachelors', 'Masters', 'Doctors', 'Others'],
+    titles: ['', 'All', 'Bachelors', 'Masters', 'Doctors', 'Licentiates'],
     programmeNames: {},
     status: 'Done',
     lastUpdated: '',
