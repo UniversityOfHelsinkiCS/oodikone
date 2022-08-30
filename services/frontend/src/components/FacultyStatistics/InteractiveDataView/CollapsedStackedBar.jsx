@@ -97,7 +97,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
       fontSize: '24px',
       x: 20,
       verticalAlign: 'top',
-      y: -10,
+      y: -20,
       floating: true,
       backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
       borderColor: '#CCC',
@@ -128,6 +128,10 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
         pointWidth: 24,
         dataLabels: {
           enabled: true,
+          formatter() {
+            if (Number.isInteger(this.y)) return `${this.y}`
+            return `${this.y.toFixed(1)}`
+          },
           fontSize: '24px',
           filter: {
             property: 'y',
