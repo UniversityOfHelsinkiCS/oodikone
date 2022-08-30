@@ -119,6 +119,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
             diffArray[point.series.name]
           )}</span>)<br />`
         })
+        tooltipString += `<b>Total: ${this.points.reduce((prev, current) => prev + current.y, 0)}</b>`
         return tooltipString
       },
     },
