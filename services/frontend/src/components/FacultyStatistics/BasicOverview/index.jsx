@@ -1,5 +1,5 @@
 import React from 'react'
-import { Divider, Loader, Popup, Button } from 'semantic-ui-react'
+import { Divider, Loader, Popup, Button, Message } from 'semantic-ui-react'
 import xlsx from 'xlsx'
 import {
   useGetFacultyCreditStatsQuery,
@@ -166,6 +166,12 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
         <Loader active style={{ marginTop: '15em' }} />
       ) : (
         <>
+          {studyProgrammeFilter === 'ALL_PROGRAMMES' && (
+            <Message>
+              Please note, that the data is complete only for current Bachelor, Masters and Doctoral programmes.
+              Especially, credits and thesis writers contain only data for current programmes.
+            </Message>
+          )}
           {basics.isSuccess && basics.data && (
             <>
               {getDivider(
