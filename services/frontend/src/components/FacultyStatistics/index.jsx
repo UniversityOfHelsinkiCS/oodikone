@@ -70,7 +70,9 @@ const FacultyStatistics = props => {
           />
         ),
       },
-      {
+    ]
+    if (isAdmin) {
+      panes.push({
         menuItem: 'Programmes and student populations',
         render: () => (
           <ProgrammeOverview
@@ -79,8 +81,8 @@ const FacultyStatistics = props => {
             setStudyProgrammes={setStudyProgrammes}
           />
         ),
-      },
-    ]
+      })
+    }
 
     if (isAdmin) {
       panes.push({
