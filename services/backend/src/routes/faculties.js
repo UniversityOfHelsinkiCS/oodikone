@@ -30,13 +30,13 @@ const getProgrammes = async (code, programmeFilter) => {
   return updatedProgrammes
 }
 
-router.get('/faculties', async (req, res) => {
+router.get('/', async (req, res) => {
   const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
   const facultyList = (await faculties()).filter(f => !ignore.includes(f.code))
   res.json(facultyList)
 })
 
-router.get('/faculties/:id/basicstats', async (req, res) => {
+router.get('/:id/basicstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const programmeFilter = req.query?.programme_filter
@@ -71,7 +71,7 @@ router.get('/faculties/:id/basicstats', async (req, res) => {
   return res.json(updatedStats)
 })
 
-router.get('/faculties/:id/creditstats', async (req, res) => {
+router.get('/:id/creditstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const specialGroups = req.query?.special_groups
@@ -93,7 +93,7 @@ router.get('/faculties/:id/creditstats', async (req, res) => {
   return res.json(updatedStats)
 })
 
-router.get('/faculties/:id/thesisstats', async (req, res) => {
+router.get('/:id/thesisstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   //const specialGroups = req.query?.special_groups
@@ -112,7 +112,7 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
   return res.json(updateStats)
 })
 
-router.get('/faculties/:id/graduationtimes', async (req, res) => {
+router.get('/:id/graduationtimes', async (req, res) => {
   const code = req.params.id
   //const programmeFilter = req.query?.programme_filter
 
@@ -124,7 +124,7 @@ router.get('/faculties/:id/graduationtimes', async (req, res) => {
   return res.json(result)
 })
 
-router.get('/faculties/:id/update_basicview', async (req, res) => {
+router.get('/:id/update_basicview', async (req, res) => {
   const code = req.params.id
   if (code) {
     let result = null
