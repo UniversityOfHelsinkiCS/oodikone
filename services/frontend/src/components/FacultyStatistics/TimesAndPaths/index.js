@@ -64,13 +64,15 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
               />
               <div>
                 <GraduationTimes
-                  title="Bachelor 36 kk"
+                  level="bachelor"
+                  title="Bachelor (36 kk)"
                   years={graduationStats?.data?.years}
                   amounts={graduationStats?.data.graduationAmounts.bachelor}
                   data={showMeanTime ? graduationStats?.data?.means.bachelor : graduationStats?.data?.medians.bachelor}
                 />
                 <GraduationTimes
-                  title="Bachelor + Master 72 kk"
+                  level="bcMsCombo"
+                  title="Bachelor + Master (60 kk)"
                   years={graduationStats?.data?.years}
                   amounts={graduationStats?.data.graduationAmounts.bcMsCombo}
                   data={
@@ -78,19 +80,22 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   }
                 />
                 <GraduationTimes
-                  title="Master 24"
+                  level="master"
+                  title="Master (24 kk)"
                   years={graduationStats?.data?.years}
                   amounts={graduationStats?.data.graduationAmounts.master}
                   data={showMeanTime ? graduationStats?.data?.means?.master : graduationStats?.data?.medians?.master}
                 />
                 <GraduationTimes
-                  title="Doctor 48"
+                  level="doctor"
+                  title="Doctor (48 kk)"
                   years={graduationStats?.data?.years}
                   amounts={graduationStats?.data.graduationAmounts.doctor}
                   data={showMeanTime ? graduationStats?.data?.means?.doctor : graduationStats?.data?.medians?.doctor}
                 />
                 <GraduationTimes
-                  title="Licensiate 78"
+                  level="licentiate"
+                  title="Licentiate (78 kk)"
                   years={graduationStats?.data?.years}
                   amounts={graduationStats?.data.graduationAmounts.licentiate}
                   data={
