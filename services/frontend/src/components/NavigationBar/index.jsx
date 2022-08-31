@@ -10,7 +10,7 @@ import { isDev, adminerUrls } from '../../conf'
 
 const allNavigationItems = {
   trends: { path: '/trends', key: 'trends', label: 'Trends' },
-  faculty: { path: '/faculties', key: 'faculties', label: 'Faculties', reqRights: ['admin'] },
+  faculty: { path: '/faculties', key: 'faculties', label: 'Faculties', reqRights: ['admin', 'facultyStatistics'] },
   populations: {
     key: 'studyProgramme',
     label: 'Study programme',
