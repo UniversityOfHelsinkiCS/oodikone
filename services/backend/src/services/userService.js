@@ -10,6 +10,7 @@ const { User, UserElementDetails, AccessGroup, UserFaculties, sequelizeUser } = 
 const { getOrganizationAccess } = require('../util/organizationAccess')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
+const facultyStatisticsGroup = 'grp-oodikone-users'
 const hyOneGroup = 'hy-one'
 const toskaGroup = 'grp-toska'
 
@@ -265,6 +266,8 @@ const getUser = async ({ username, name, email, iamGroups, sisId }) => {
   let newAccessGroups = []
   if (await checkStudyGuidanceGroupsAccess(sisId)) newAccessGroups.push('studyGuidanceGroups')
   if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
+  if (iamGroups.includes(facultyStatisticsGroup) || iamGroups.some(element => /-jory$/.test(element)))
+    newAccessGroups.push('facultyStatistics')
   if (iamGroups.includes(hyOneGroup) || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
   if (iamGroups.includes(toskaGroup) || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
   if (_.difference(newAccessGroups, currentAccessGroups).length > 0) {
