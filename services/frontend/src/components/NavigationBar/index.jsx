@@ -10,7 +10,7 @@ import { isDev, adminerUrls } from '../../conf'
 
 const allNavigationItems = {
   trends: { path: '/trends', key: 'trends', label: 'Trends' },
-  faculty: { path: '/faculties', key: 'faculties', label: 'Faculties', reqRights: ['facultyStatistics'] },
+  faculty: { path: '/faculties', key: 'faculties', label: 'Faculties' },
   populations: {
     key: 'studyProgramme',
     label: 'Study programme',
@@ -54,7 +54,7 @@ const NavigationBar = () => {
         if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) return
       } else if (key === 'courseStatistics') {
         if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length === 0) return
-      } else if (key === 'facultyStatistics') {
+      } else if (key === 'faculty') {
         if (!checkUserAccess(['facultyStatistics', 'admin'], roles) && rights.length === 0) return
       }
       const { reqRights } = allNavigationItems[key]
