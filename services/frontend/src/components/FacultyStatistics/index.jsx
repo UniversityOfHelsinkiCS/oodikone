@@ -8,6 +8,7 @@ import { useTabs, useTitle } from '../../common/hooks'
 import FacultySelector from './facultySelector'
 import BasicOverview from './BasicOverview'
 import ProgrammeOverview from './FacultyProgrammeOverview'
+import TimesAndPathsView from './TimesAndPaths'
 import UpdateView from './UpdateView'
 import useLanguage from '../LanguagePicker/useLanguage'
 import TSA from '../../common/tsa'
@@ -80,6 +81,20 @@ const FacultyStatistics = props => {
         ),
       },
     ]
+
+    if (isAdmin) {
+      panes.push({
+        menuItem: 'Graduation times',
+        render: () => (
+          <TimesAndPathsView
+            faculty={faculty}
+            studyProgrammes={studyProgrammes}
+            setStudyProgrammes={setStudyProgrammes}
+          />
+        ),
+      })
+    }
+
     if (isAdmin) {
       panes.push({
         menuItem: 'Update statistics',
