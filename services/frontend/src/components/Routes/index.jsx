@@ -62,7 +62,13 @@ const Routes = () => (
       <Route exact path={routes.feedback} component={Feedback} />
       <Route path={routes.trends} component={Trends} />
       <ProtectedRoute requireUserHasRights exact path="/populations" component={Populations} />
-      <ProtectedRoute requiredRoles={['admin']} exact path="/faculties/:facultyCode?" component={FacultyStatistics} />
+      <ProtectedRoute
+        requiredRoles={['admin', 'facultyStatistics']}
+        requireUserHasRights
+        exact
+        path="/faculties/:facultyCode?"
+        component={FacultyStatistics}
+      />
       <ProtectedRoute
         requireUserHasRights
         exact
