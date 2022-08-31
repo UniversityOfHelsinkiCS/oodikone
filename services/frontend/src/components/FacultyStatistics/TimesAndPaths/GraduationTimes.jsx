@@ -1,11 +1,18 @@
 import React from 'react'
+import { Divider, Header } from 'semantic-ui-react'
 import GaugeChart from './GaugeChart'
 
-const GraduationTimes = ({ title, years, data, amounts }) => {
+const GraduationTimes = ({ title, years, data, amounts, level }) => {
   return (
     <>
-      <div>
-        <strong>{title}</strong>
+      <div className="divider">
+        <Header as="h4" floated="left">
+          {title}
+        </Header>
+        <Divider clearing />
+        {/* <Divider data-cy={`Title-${level}-degree`} clearing>
+          {title}
+        </Divider> */}
       </div>
       <div className="section-container-centered">
         {years.map(year => (
@@ -15,7 +22,7 @@ const GraduationTimes = ({ title, years, data, amounts }) => {
             year={year}
             data={data[year]}
             graduationAmount={amounts[year]}
-            studyprogramme="KH"
+            level={level}
           />
         ))}
       </div>

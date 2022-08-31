@@ -114,12 +114,12 @@ router.get('/faculties/:id/thesisstats', async (req, res) => {
 
 router.get('/faculties/:id/graduationtimes', async (req, res) => {
   const code = req.params.id
-  //const programmeFilter = req.query?.programme_filter
+  const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
 
   // const programmes = await getProgrammes(code, programmeFilter)
-  const result = await countGraduationTimes(code)
+  const result = await countGraduationTimes(code, programmeFilter)
   // currently counts all programmes
   return res.json(result)
 })

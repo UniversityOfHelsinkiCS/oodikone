@@ -13,7 +13,6 @@ import '../faculty.css'
 //         {title}
 //       </Divider>
 //     </div>
-//     <InfoBox content="Keskimääräiset valmistumisajat" />
 //     {/* <InfoBox content={toolTips[toolTipText]} /> */}
 //   </>
 // )
@@ -21,13 +20,7 @@ import '../faculty.css'
 const FacultyProgrammeOverview = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
   const toolTipsProgramme = InfotoolTips.Faculty
   // // const [programme, setProgramme] = useState(faculty)
-  // const [showMeanTime, setShowMeanTime] = useState(false)
   // const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
-  // const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, studyProgrammeFilter })
-
-  // const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
-
-  // const isError = graduationStats.isError || (graduationStats.isSuccess && !graduationStats.data)
 
   // if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
