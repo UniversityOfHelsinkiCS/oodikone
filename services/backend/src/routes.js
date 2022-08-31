@@ -57,7 +57,7 @@ module.exports = (app, url) => {
   app.use(url, tags)
   app.use(url, programmeModules)
   app.use(url, studyProgramme)
-  app.use(`${url}/faculties`, auth.roles(['admin', 'facultyStatistics']), faculties)
+  app.use(`${url}/faculties`, auth.roles(['facultyStatistics']), faculties)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
   app.use(`${url}/users`, auth.roles(['admin']), users)
