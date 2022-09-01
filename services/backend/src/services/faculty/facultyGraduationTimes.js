@@ -55,9 +55,8 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   for (const right of graduatedRights) {
     const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
     const { programme } = findRightProgramme(studyrightElements, 'graduated')
-    if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
-      if (!isNewProgramme(programme)) continue
-    }
+    if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
+
     const graduationYear = defineYear(enddate, isAcademicYear)
     let actualStartdate = startdate
     let level = null
@@ -80,10 +79,9 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     }
 
     const absoluteTimeToGraduation = moment(enddate).diff(moment(actualStartdate), 'months')
-
     const statutoryAbsences = await getStatutoryAbsences(studentnumber, actualStartdate, enddate)
-
     const timeToGraduation = absoluteTimeToGraduation - statutoryAbsences
+
     graduationAmounts[level][graduationYear] += 1
     graduationTimes[level][graduationYear] = [...graduationTimes[level][graduationYear], timeToGraduation]
   }
