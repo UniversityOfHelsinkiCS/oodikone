@@ -1,5 +1,5 @@
 const moment = require('moment')
-const { graduatedStudyrights, bachelorStudyright } = require('./faculty')
+const { graduatedStudyrights, bachelorStudyright, statutoryAbsences } = require('./faculty')
 const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
 const { getYearsArray, getYearsObject, getMean, getMedian, defineYear } = require('../studyprogrammeHelpers')
 
@@ -7,6 +7,14 @@ const findBachelorStartdate = async id => {
   const studyright = await bachelorStudyright(id)
   if (studyright) return studyright.studystartdate
   return null
+}
+const getStatutoryAbsences = async (studentnumber, startdate, enddate) => {
+  const absences = await statutoryAbsences(studentnumber, startdate, enddate)
+  if (absences.length) {
+    const absentMonths = absences.reduce((sum, ab) => sum + moment(ab.end).diff(moment(ab.start), 'months'), 0)
+    return absentMonths
+  }
+  return 0
 }
 
 const countGraduationTimes = async (faculty, programmeFilter) => {
@@ -38,9 +46,6 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     licentiate: 78 * 2,
   }
 
-  // To do:
-  // Huomioi tavoiteaikaa kuluttavat ja kuluttamattomat poissaolot
-
   // We count studyrights (vs. studyright_elements)
   // This way we get the whole time for a degree, even if the student was transferred to a new programme
   // E.g. started 8/2016 in old Bc, transferred to new 10/2020, graduated from new 1/2021 --> total 53 months (not 3)
@@ -48,46 +53,39 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   const graduatedRights = await graduatedStudyrights(faculty, since)
 
   for (const right of graduatedRights) {
-    const { enddate, studystartdate, studyrightid, extentcode, studyrightElements } = right
+    const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
     const { programme } = findRightProgramme(studyrightElements, 'graduated')
     if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
       if (!isNewProgramme(programme)) continue
     }
     const graduationYear = defineYear(enddate, isAcademicYear)
-
-    let absoluteTimeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
+    let actualStartdate = startdate
+    let level = null
 
     if (extentcode == 1) {
-      // count bachelor
-      graduationAmounts.bachelor[graduationYear] += 1
-      graduationTimes.bachelor[graduationYear] = [...graduationTimes.bachelor[graduationYear], absoluteTimeToGraduation]
+      level = 'bachelor'
     } else if (extentcode === 2) {
       if (studyrightid.slice(-2) === '-2') {
-        // Bachelor + master studyright
-        const bcStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
-        absoluteTimeToGraduation = moment(enddate).diff(moment(bcStartdate), 'months')
-        graduationAmounts.bcMsCombo[graduationYear] += 1
-        graduationTimes.bcMsCombo[graduationYear] = [
-          ...graduationTimes.bcMsCombo[graduationYear],
-          absoluteTimeToGraduation,
-        ]
+        level = 'bcMsCombo'
+        actualStartdate = await findBachelorStartdate(studyrightid.replace(/-2$/, '-1'))
       } else {
-        // Just master studyright
-        graduationAmounts.master[graduationYear] += 1
-        graduationTimes.master[graduationYear] = [...graduationTimes.master[graduationYear], absoluteTimeToGraduation]
+        level = 'master'
       }
     } else if (extentcode === 4) {
-      // doctor
-      graduationAmounts.doctor[graduationYear] += 1
-      graduationTimes.doctor[graduationYear] = [...graduationTimes.doctor[graduationYear], absoluteTimeToGraduation]
+      level = 'doctor'
     } else if (extentcode === 3) {
-      // licentiate
-      graduationAmounts.licentiate[graduationYear] += 1
-      graduationTimes.licentiate[graduationYear] = [
-        ...graduationTimes.licentiate[graduationYear],
-        absoluteTimeToGraduation,
-      ]
+      level = 'licentiate'
+    } else {
+      continue
     }
+
+    const absoluteTimeToGraduation = moment(enddate).diff(moment(actualStartdate), 'months')
+
+    const statutoryAbsences = await getStatutoryAbsences(studentnumber, actualStartdate, enddate)
+
+    const timeToGraduation = absoluteTimeToGraduation - statutoryAbsences
+    graduationAmounts[level][graduationYear] += 1
+    graduationTimes[level][graduationYear] = [...graduationTimes[level][graduationYear], timeToGraduation]
   }
 
   // HighCharts graph require the data to have this format (ie. actual value, "empty value")
