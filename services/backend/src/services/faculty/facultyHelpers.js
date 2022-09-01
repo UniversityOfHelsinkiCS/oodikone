@@ -35,11 +35,13 @@ const facultyFormatStudyright = studyright => {
     extentcode,
     student,
     studyright_elements,
+    startdate,
   } = studyright
 
   return {
     studyrightid,
     studystartdate,
+    startdate,
     enddate,
     givendate,
     graduated,
@@ -83,6 +85,11 @@ const formatOrganization = org => {
   return { id, name, code, parentId: parent_id }
 }
 
+const formatAbsence = absence => {
+  const { semestercode, semester } = absence
+  return { semestercode, start: semester.startdate, end: semester.enddate }
+}
+
 const newProgrammes = [/^KH/, /^MH/, /^T/, /^LI/, /^K-/, /^FI/, /^00901$/, /^00910$/]
 
 const isNewProgramme = code => {
@@ -101,5 +108,6 @@ module.exports = {
   formatFacultyTransfer,
   formatFacultyThesisWriter,
   formatOrganization,
+  formatAbsence,
   isNewProgramme,
 }
