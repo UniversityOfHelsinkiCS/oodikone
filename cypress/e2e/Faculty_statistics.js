@@ -34,7 +34,7 @@ describe('Faculty overview', () => {
       cy.contains('td', 'H80').click()
     })
     it('Basic information tab show all graphs and tables', () => {
-      cy.get('[data-cy="Section-CreditsProducedByTheFaculty"]').should('be.visible')
+      cy.get('[data-cy="Table-CreditsProducedByTheFaculty"]').should('be.visible')
       cy.get('[data-cy="Graph-CreditsProducedByTheFaculty"]').should('be.visible')
       cy.get('[data-cy="Table-ThesisWritersOfTheFaculty"]').should('be.visible')
       cy.get('[data-cy="Graph-ThesisWritersOfTheFaculty"]').should('be.visible')
@@ -118,6 +118,16 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="Cell-CreditsProducedByTheFaculty-3"]').should('be.visible')
       cy.get('[data-cy="Cell-CreditsProducedByTheFaculty-4"]').should('not.be.visible')
       cy.get('[data-cy="Cell-CreditsProducedByTheFaculty-5"]').should('not.be.visible')
+    })
+
+    it('Graph stays open when sorted', () => {
+      cy.get('[data-cy="Table-CreditsProducedByTheFaculty"]').should('be.visible')
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(10000)
+      cy.get('[data-cy="Button-Show-CreditsProducedByTheFaculty-0"]').click()
+      cy.get('[data-cy="Cell-CreditsProducedByTheFaculty-0"]').should('be.visible')
+      cy.get('[data-cy="Menu-CreditsProducedByTheFaculty-Total"]').click()
+      cy.get('[data-cy="Cell-CreditsProducedByTheFaculty-0"]').should('be.visible')
     })
   })
 })
