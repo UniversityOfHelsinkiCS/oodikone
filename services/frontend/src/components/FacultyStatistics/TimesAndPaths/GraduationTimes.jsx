@@ -3,6 +3,8 @@ import { Divider, Header } from 'semantic-ui-react'
 import GaugeChart from './GaugeChart'
 
 const GraduationTimes = ({ title, years, data, amounts, level }) => {
+  if (!Object.values(amounts).some(a => a > 0)) return null
+
   return (
     <>
       <div className="divider">

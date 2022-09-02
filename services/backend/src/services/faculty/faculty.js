@@ -4,6 +4,8 @@ const {
   ElementDetail,
   Organization,
   ProgrammeModule,
+  Semester,
+  SemesterEnrollment,
   Studyright,
   StudyrightElement,
   Student,
@@ -17,6 +19,7 @@ const {
   formatFacultyTransfer,
   formatFacultyThesisWriter,
   formatOrganization,
+  formatAbsence,
   isNewProgramme,
 } = require('./facultyHelpers')
 
@@ -203,6 +206,29 @@ const thesisWriters = async (providers, since, thesisTypes) =>
     })
   ).map(formatFacultyThesisWriter)
 
+const statutoryAbsences = async (studentnumber, startdate, enddate) =>
+  (
+    await SemesterEnrollment.findAll({
+      attributes: ['semestercode'],
+      include: {
+        model: Semester,
+        attributes: ['startdate', 'enddate'],
+        where: {
+          startdate: {
+            [Op.gte]: startdate,
+          },
+          enddate: {
+            [Op.lte]: enddate,
+          },
+        },
+      },
+      where: {
+        studentnumber: studentnumber,
+        statutory_absence: true,
+      },
+    })
+  ).map(formatAbsence)
+
 // Some programme modules are not directly associated to a faculty (organization).
 // Some have intermediate organizations, such as department, so the connection must be digged up
 const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
@@ -265,4 +291,5 @@ module.exports = {
   thesisWriters,
   findFacultyProgrammeCodes,
   facultyOgranizationId,
+  statutoryAbsences,
 }
