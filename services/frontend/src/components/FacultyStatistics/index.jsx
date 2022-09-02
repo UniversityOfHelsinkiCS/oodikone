@@ -71,6 +71,8 @@ const FacultyStatistics = props => {
         ),
       },
     ]
+    // REMEMBER to change cypress test 'Correct tabs are shown', when visibility of
+    // Graduation times and Programmes and student Populations -tabs is changed for facultyStatistic users
     if (isAdmin) {
       panes.push({
         menuItem: 'Programmes and student populations',
@@ -122,7 +124,7 @@ const FacultyStatistics = props => {
     )
 
   return (
-    <div className="segmentContainer">
+    <div className="segmentContainer" data-cy="FacultySegmentContainer">
       <Segment className="contentSegment">
         <div align="center" style={{ padding: '30px' }}>
           <Header textAlign="center">{facultyName}</Header>
