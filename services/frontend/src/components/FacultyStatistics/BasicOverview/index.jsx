@@ -105,7 +105,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
           {title}
         </Divider>
       </div>
-      <InfoBox content={toolTips[toolTipText]} />
+      <InfoBox content={toolTips[toolTipText]} cypress={toolTipText} />
       <Popup
         content="Download statistics as csv"
         trigger={
@@ -167,8 +167,8 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
       ) : (
         <>
           {studyProgrammeFilter === 'ALL_PROGRAMMES' && (
-            <Message>
-              Please note, that the data is complete only for current Bachelor, Masters and Doctoral programmes.
+            <Message data-cy="FacultyProgrammesShownInfo">
+              Please note that the data is complete only for current Bachelor, Masters and Doctoral programmes.
               Especially, credits and thesis writers contain only data for current programmes.
             </Message>
           )}
@@ -219,7 +219,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
               <div className="section-container">
                 <div className="graph-container-narrow">
                   <StackedBarChart
-                    cypress="CreditsProducedByTheSFaculty"
+                    cypress="CreditsProducedByTheFaculty"
                     data={credits?.data?.graphStats}
                     labels={credits?.data?.years}
                     wideTable="narrow"
@@ -254,23 +254,25 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                 basics?.data?.programmeNames
               )}
               <div className="section-container">
-                <div className="graph-container">
+                <div className="graph-container-narrow">
                   <LineGraph
                     cypress="GraduatedOfTheFaculty"
                     data={{ ...basics?.data.graduationInfo, years: basics.data.years }}
                   />
                 </div>
-                <InteractiveDataTable
-                  cypress="GraduatedOfTheFaculty"
-                  dataStats={basics?.data?.graduationInfo.tableStats}
-                  dataProgrammeStats={basics?.data?.graduationInfo.programmeTableStats}
-                  programmeNames={basics?.data?.programmeNames}
-                  sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.graduationInfo.programmeTableStats))}
-                  titles={basics?.data?.graduationInfo.titles}
-                  sliceStart={2}
-                  language={language}
-                  yearsVisible={Array(basics?.data?.graduationInfo.tableStats.length).fill(false)}
-                />
+                <div className="table-container-wide">
+                  <InteractiveDataTable
+                    cypress="GraduatedOfTheFaculty"
+                    dataStats={basics?.data?.graduationInfo.tableStats}
+                    dataProgrammeStats={basics?.data?.graduationInfo.programmeTableStats}
+                    programmeNames={basics?.data?.programmeNames}
+                    sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.graduationInfo.programmeTableStats))}
+                    titles={basics?.data?.graduationInfo.titles}
+                    sliceStart={2}
+                    language={language}
+                    yearsVisible={Array(basics?.data?.graduationInfo.tableStats.length).fill(false)}
+                  />
+                </div>
               </div>
             </>
           )}
@@ -285,24 +287,26 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                 thesisWriters?.data?.programmeNames
               )}
               <div className="section-container">
-                <div className="graph-container">
+                <div className="graph-container-narrow">
                   <LineGraph
                     cypress="ThesisWritersOfTheFaculty"
                     data={{ ...thesisWriters?.data, years: thesisWriters?.data.years }}
                   />
                 </div>
-                <InteractiveDataTable
-                  cypress="ThesisWritersOfTheFaculty"
-                  dataStats={thesisWriters?.data.tableStats}
-                  dataProgrammeStats={thesisWriters?.data.programmeTableStats}
-                  programmeNames={thesisWriters?.data.programmeNames}
-                  sortedKeys={sortProgrammeKeys(Object.keys(thesisWriters?.data.programmeTableStats))}
-                  titles={thesisWriters?.data?.titles}
-                  sliceStart={2}
-                  extraHeight="EXTRA HEIGHT"
-                  language={language}
-                  yearsVisible={Array(thesisWriters?.data.tableStats.length).fill(false)}
-                />
+                <div className="table-container-wide">
+                  <InteractiveDataTable
+                    cypress="ThesisWritersOfTheFaculty"
+                    dataStats={thesisWriters?.data.tableStats}
+                    dataProgrammeStats={thesisWriters?.data.programmeTableStats}
+                    programmeNames={thesisWriters?.data.programmeNames}
+                    sortedKeys={sortProgrammeKeys(Object.keys(thesisWriters?.data.programmeTableStats))}
+                    titles={thesisWriters?.data?.titles}
+                    sliceStart={2}
+                    extraHeight="EXTRA HEIGHT"
+                    language={language}
+                    yearsVisible={Array(thesisWriters?.data.tableStats.length).fill(false)}
+                  />
+                </div>
               </div>
             </>
           )}
