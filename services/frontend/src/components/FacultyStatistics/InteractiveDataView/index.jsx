@@ -92,6 +92,7 @@ const InteractiveDataTable = ({
         </Menu.Item>
         {sorterNames.map((sorterName, nameIndex) => (
           <Menu.Item
+            data-cy={`Menu-${cypress}-${sorterName}`}
             color={sorter === sorterName ? 'blue' : 'black'}
             key={sorterName}
             active={sorter === sorterName}
