@@ -55,7 +55,7 @@ const NavigationBar = () => {
       } else if (key === 'courseStatistics') {
         if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length === 0) return
       } else if (key === 'faculty') {
-        if (!checkUserAccess(['facultyStatistics', 'admin'], roles) && rights.length === 0) return
+        if (!checkUserAccess(['facultyStatistics', 'admin'], roles)) return
       }
       const { reqRights } = allNavigationItems[key]
       if (!reqRights || reqRights.every(r => roles.includes(r))) {
