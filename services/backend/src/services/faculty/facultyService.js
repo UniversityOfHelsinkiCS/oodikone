@@ -2,14 +2,14 @@ const { redisClient } = require('../redis')
 const moment = require('moment')
 
 const createRedisKeyForFacultyProgrammes = (id, programmeFilter) => `FACULTY_PROGRAMMES_${id}_${programmeFilter}`
-const createRedisKeyForBasicStats = (id, yearType, programmeFilter) =>
-  `FACULTY_BASIC_STATS_${id}_${yearType}_${programmeFilter}`
-const createRedisKeyForCreditStats = (id, yearType, programmeFilter) =>
-  `FACULTY_CREDIT_STATS_${id}_${yearType}_${programmeFilter}`
+const createRedisKeyForBasicStats = (id, yearType, programmeFilter, specialGroups) =>
+  `FACULTY_BASIC_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
+const createRedisKeyForCreditStats = (id, yearType, programmeFilter, specialGroups) =>
+  `FACULTY_CREDIT_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
 // const createRedisKeyForGraduationTimeStats = (id, mode, programmeFilter) =>
 //  `FACULTY_GRADUATION_TIME_STATS_${id}_${mode}__${programmeFilter}`
-const createRedisKeyForThesiswriters = (id, yearType, programmeFilter) =>
-  `FACULTY_THESIS_WRITERS_STATS_${id}_${yearType}_${programmeFilter}`
+const createRedisKeyForThesiswriters = (id, yearType, programmeFilter, specialGroups) =>
+  `FACULTY_THESIS_WRITERS_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
 
 const setFacultyProgrammes = async (id, data, programmeFilter) => {
   const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
