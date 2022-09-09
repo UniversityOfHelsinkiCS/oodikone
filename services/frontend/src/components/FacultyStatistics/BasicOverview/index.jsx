@@ -14,11 +14,20 @@ import InfoBox from '../../Info/InfoBox'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
 
-const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, setStudyProgrammes, language }) => {
+const Overview = ({
+  faculty,
+  academicYear,
+  setAcademicYear,
+  studyProgrammes,
+  setStudyProgrammes,
+  specialGroups,
+  setSpecialGroups,
+  language,
+}) => {
   const toolTips = InfotoolTips.Faculty
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
-  const special = 'SPECIAL_INCLUDED' // specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
+  const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const credits = useGetFacultyCreditStatsQuery({
     id: faculty?.code,
     yearType,
@@ -31,7 +40,12 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
     studyProgrammeFilter,
     specialGroups: special,
   })
-  const thesisWriters = useGetFacultyThesisStatsQuery({ id: faculty?.code, yearType, studyProgrammeFilter })
+  const thesisWriters = useGetFacultyThesisStatsQuery({
+    id: faculty?.code,
+    yearType,
+    studyProgrammeFilter,
+    specialGroups: special,
+  })
 
   /*
   Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Numbers
@@ -138,8 +152,15 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
-  const creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree']
-  const transferShortNames = ['Code', 'Started', 'Graduated', 'Transferred in', 'Transferred away', 'Transferred to']
+  let creditShortTitles = []
+  let transferShortTitles = []
+  if (special === 'SPECIAL_INCLUDED') {
+    creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree']
+    transferShortTitles = ['Code', 'Started', 'Graduated', 'Transferred in', 'Transferred away', 'Transferred to']
+  } else {
+    creditShortTitles = ['Code', 'Major']
+    transferShortTitles = ['Code', 'Started', 'Graduated']
+  }
 
   return (
     <div className="faculty-overview">
@@ -160,6 +181,14 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
           value={studyProgrammes}
           setValue={setStudyProgrammes}
         />
+        <Toggle
+          cypress="StudentToggle"
+          toolTips={toolTips.StudentToggle}
+          firstLabel="All studyrights"
+          secondLabel="Special studyrights excluded"
+          value={specialGroups}
+          setValue={setSpecialGroups}
+        />
       </div>
 
       {isFetchingOrLoading ? (
@@ -170,6 +199,11 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
             <Message data-cy="FacultyProgrammesShownInfo">
               Please note that the data is complete only for current Bachelor, Masters and Doctoral programmes.
               Especially, credits and thesis writers contain only data for current programmes.
+            </Message>
+          )}
+          {special === 'SPECIAL_EXCLUDED' && (
+            <Message data-cy="FacultyExcludeSpecialsInfo">
+              Please note that the data might be inaccurate in some fields. Checking the values is in progress.
             </Message>
           )}
           {basics.isSuccess && basics.data && (
@@ -200,7 +234,7 @@ const Overview = ({ faculty, academicYear, setAcademicYear, studyProgrammes, set
                     sliceStart={1}
                     language={language}
                     yearsVisible={Array(basics?.data?.studentInfo.tableStats.length).fill(false)}
-                    shortNames={transferShortNames}
+                    shortNames={transferShortTitles}
                   />
                 </div>
               </div>

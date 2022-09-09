@@ -156,7 +156,7 @@ const isSpecialGroupCredit = (studyrights, attainment_date, transfers) =>
     if (!studyright) return true // If there is no studyright matching the credit, is not a major student credit
     if (studyright.studystartdate > attainment_date) return true // Credits before the studyright started are not major student credits
     if (studyright.enddate && attainment_date > studyright.enddate) return true // Credits after studyright are not major student credits
-    if ([7, 9, 16, 34, 33, 99, 14, 13].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
+    if ([7, 9, 16, 34, 22, 99, 14, 13].includes(studyright.extentcode)) return true // Excludes non-degree studyrights and exchange students
     if (transfers.includes(studyright.studyrightid)) return true // Excludes both transfers in and out of the programme
     return false
   })
@@ -350,8 +350,8 @@ const tableTitles = {
       '',
       'Total',
       'Major students credits',
-      'Non major students credits',
-      'Non degree students credits',
+      'Non-major students credits',
+      'Non-degree students credits',
       'Transferred credits',
     ],
   },
