@@ -81,6 +81,20 @@ router.post('/v2/populationstatistics/courses', async (req, res) => {
       return
     }
 
+    //These cause problems in front (where they were originally calculated)
+    // Do them here for the moment
+    for (const course of result.coursestatistics) {
+      // course.students.notParticipated = {}
+      course.students.didNotPass = {}
+
+      for (const student of Object.keys(course.students.all)) {
+        if (
+          !Object.keys(course.students.passed).includes(student) &&
+          !Object.keys(course.students.retryPassed).includes(student)
+        )
+          course.students.didNotPass[student] = true
+      }
+    }
     res.json(result)
   }
 })
