@@ -10,8 +10,18 @@ const filterTexts = {
   [FilterType.PASSED_AFTER_FAILURE]: { label: 'Passed After Failure' },
   [FilterType.FAILED]: { label: 'Failed' },
   [FilterType.FAILED_MANY_TIMES]: { label: 'Failed Multiple Times' },
-  [FilterType.NOT_PARTICIPATED]: { label: 'Not Participated' },
+  // [FilterType.NOT_PARTICIPATED]: { label: 'Not Participated' },
   [FilterType.DID_NOT_PASS]: { label: "Didn't Pass" },
+}
+// a bandaid solution to prevent oodikone crashing
+const translate = {
+  ALL: 'all',
+  PASSED: 'passed',
+  PASSED_AFTER_FAILURE: 'retryPassed',
+  FAILED: 'failed',
+  FAILED_MANY_TIMES: 'failedMany',
+  NOT_PARTICIPATED: 'notParticipated',
+  DID_NOT_PASS: 'didNotPass',
 }
 
 const CourseCard = ({ course, filterType, onChange }) => {
@@ -27,7 +37,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
   return (
     <>
       <Label style={{ marginTop: '0.5rem' }}>
-        {getTextIn(course.name, language)}
+        {getTextIn(course.course.name, language)}
 
         <Dropdown
           text={filterTexts[filterType].label}
@@ -35,7 +45,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
           fluid
           className="mini"
           button
-          data-cy={`${name}-${course.code}-dropdown`}
+          data-cy={`${name}-${course.course.code}-dropdown`}
           style={{ marginTop: '0.5rem' }}
         >
           <Dropdown.Menu>
@@ -50,6 +60,8 @@ const CourseCard = ({ course, filterType, onChange }) => {
                   />
                 )
               }
+              if (Object.keys(course?.students[translate[type]]).length === 0)
+                return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} disabled />
               return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} />
             })}
           </Dropdown.Menu>
@@ -60,7 +72,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
           size="tiny"
           onClick={clear}
           icon
-          data-cy={`${name}-${course.code}-clear`}
+          data-cy={`${name}-${course.course.code}-clear`}
           style={{ marginTop: '0.5rem' }}
         >
           <Icon name="close" />
