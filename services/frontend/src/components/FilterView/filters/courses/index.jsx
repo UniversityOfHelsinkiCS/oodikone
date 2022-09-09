@@ -62,7 +62,7 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
       />
       {Object.entries(courseFilters).map(([code]) => (
         <CourseCard
-          course={courseStats[code].course}
+          course={courseStats[code]}
           filterType={courseFilters[code] ?? FilterType.ALL}
           onChange={type => setCourseFilter(code, type)}
           key={`course-filter-selected-course-${code}`}
@@ -83,9 +83,10 @@ const filterFunctions = {
   [FilterType.PASSED_AFTER_FAILURE]: createFilterFunc('retryPassed'),
   [FilterType.FAILED]: createFilterFunc('failed'),
   [FilterType.FAILED_MANY_TIMES]: createFilterFunc('failedMany'),
-  [FilterType.NOT_PARTICIPATED]: createFilterFunc('all', true),
-  [FilterType.DID_NOT_PASS]: ({ studentNumber }, { students }) =>
-    !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
+  [FilterType.DID_NOT_PASS]: createFilterFunc('didNotPass'),
+  // [FilterType.NOT_PARTICIPATED]: createFilterFunc('all', true),
+  // [FilterType.DID_NOT_PASS]: ({ studentNumber }, { students }) =>
+  //   !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
 }
 
 const filter = createFilter({
