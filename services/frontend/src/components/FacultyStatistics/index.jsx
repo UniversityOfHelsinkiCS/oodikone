@@ -29,6 +29,7 @@ const FacultyStatistics = props => {
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
+  const [specialGroups, setSpecialGroups] = useState(false)
 
   useEffect(() => {
     if (!facultyName) {
@@ -66,6 +67,8 @@ const FacultyStatistics = props => {
             setAcademicYear={setAcademicYear}
             studyProgrammes={studyProgrammes}
             setStudyProgrammes={setStudyProgrammes}
+            specialGroups={specialGroups}
+            setSpecialGroups={setSpecialGroups}
             language={language}
           />
         ),

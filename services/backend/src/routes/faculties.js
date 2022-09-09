@@ -40,10 +40,11 @@ router.get('/:id/basicstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
   const programmeFilter = req.query?.programme_filter
+  const specialGroups = req.query?.special_groups
 
   if (!code) return res.status(422).end()
 
-  const data = await getBasicStats(code, yearType, programmeFilter)
+  const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
 
   const wantedProgrammes = await getProgrammes(code, programmeFilter)
@@ -63,10 +64,11 @@ router.get('/:id/basicstats', async (req, res) => {
     wantedProgrammes.data,
     yearType,
     allProgrammeCodes,
-    programmeFilter
+    programmeFilter,
+    specialGroups
   )
   if (updatedStats) {
-    updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter)
+    updatedStats = await setBasicStats(updatedStats, yearType, programmeFilter, specialGroups)
   }
   return res.json(updatedStats)
 })
@@ -79,7 +81,7 @@ router.get('/:id/creditstats', async (req, res) => {
 
   if (!code) return res.status(422).end()
 
-  const data = await getCreditStats(code, yearType, programmeFilter)
+  const data = await getCreditStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
 
   const programmes = await getProgrammes(code, programmeFilter)
@@ -87,7 +89,7 @@ router.get('/:id/creditstats', async (req, res) => {
 
   let updatedStats = await combineFacultyCredits(code, programmes.data, yearType, specialGroups)
   if (updatedStats) {
-    updatedStats = await setCreditStats(updatedStats, yearType, programmeFilter)
+    updatedStats = await setCreditStats(updatedStats, yearType, programmeFilter, specialGroups)
   }
 
   return res.json(updatedStats)
@@ -96,18 +98,18 @@ router.get('/:id/creditstats', async (req, res) => {
 router.get('/:id/thesisstats', async (req, res) => {
   const code = req.params.id
   const yearType = req.query?.year_type
-  //const specialGroups = req.query?.special_groups
+  const specialGroups = req.query?.special_groups
   const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
-  const data = await getThesisWritersStats(code, yearType, programmeFilter)
+  const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
 
   const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
-  let updateStats = await combineFacultyThesisWriters(code, programmes.data, yearType)
+  let updateStats = await combineFacultyThesisWriters(code, programmes.data, yearType, specialGroups)
   if (updateStats) {
-    updateStats = await setThesisWritersStats(updateStats, yearType, programmeFilter)
+    updateStats = await setThesisWritersStats(updateStats, yearType, programmeFilter, specialGroups)
   }
   return res.json(updateStats)
 })

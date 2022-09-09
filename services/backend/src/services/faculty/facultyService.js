@@ -30,9 +30,9 @@ const getFacultyProgrammes = async (id, programmeFilter) => {
   return JSON.parse(dataFromRedis)
 }
 
-const setBasicStats = async (data, yearType, programmeFilter) => {
+const setBasicStats = async (data, yearType, programmeFilter, specialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForBasicStats(id, yearType, programmeFilter)
+  const redisKey = createRedisKeyForBasicStats(id, yearType, programmeFilter, specialGroups)
   const dataToRedis = {
     ...data,
     status: 'DONE',
@@ -43,16 +43,16 @@ const setBasicStats = async (data, yearType, programmeFilter) => {
   return dataToRedis
 }
 
-const getBasicStats = async (id, yearType, programmeFilter) => {
-  const redisKey = createRedisKeyForBasicStats(id, yearType, programmeFilter)
+const getBasicStats = async (id, yearType, programmeFilter, specialGroups) => {
+  const redisKey = createRedisKeyForBasicStats(id, yearType, programmeFilter, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setCreditStats = async (data, yearType, programmeFilter) => {
+const setCreditStats = async (data, yearType, programmeFilter, specialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForCreditStats(id, yearType, programmeFilter)
+  const redisKey = createRedisKeyForCreditStats(id, yearType, programmeFilter, specialGroups)
   const dataToRedis = {
     ...data,
     status: 'DONE',
@@ -63,16 +63,16 @@ const setCreditStats = async (data, yearType, programmeFilter) => {
   return dataToRedis
 }
 
-const getCreditStats = async (id, yearType, programmeFilter) => {
-  const redisKey = createRedisKeyForCreditStats(id, yearType, programmeFilter)
+const getCreditStats = async (id, yearType, programmeFilter, specialGroups) => {
+  const redisKey = createRedisKeyForCreditStats(id, yearType, programmeFilter, specialGroups)
   const dataFromRedis = await redisClient.getAsync(redisKey)
   if (!dataFromRedis) return null
   return JSON.parse(dataFromRedis)
 }
 
-const setThesisWritersStats = async (data, yearType, programmeFilter) => {
+const setThesisWritersStats = async (data, yearType, programmeFilter, specialGroups) => {
   const { id } = data
-  const redisKey = createRedisKeyForThesiswriters(id, yearType, programmeFilter)
+  const redisKey = createRedisKeyForThesiswriters(id, yearType, programmeFilter, specialGroups)
   const dataToRedis = {
     ...data,
     status: 'DONE',

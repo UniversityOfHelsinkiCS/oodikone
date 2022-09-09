@@ -23,7 +23,20 @@ const {
   isNewProgramme,
 } = require('./facultyHelpers')
 
-const startedStudyrights = async (faculty, since) =>
+const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
+  const awayTransfers = (await transferredAway(programmeCodes, allProgrammeCodes, since)).map(t => t.studyrightid)
+  const toTransfers = (await transferredTo(programmeCodes, allProgrammeCodes, since)).map(t => t.studyrightid)
+  const transferredToOrAway = [...toTransfers, ...awayTransfers]
+  return transferredToOrAway
+}
+
+const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) => {
+  const transfersInside = (await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)).map(
+    t => t.studyrightid
+  )
+  return transfersInside
+}
+const startedStudyrights = async (faculty, since, studyRightWhere) =>
   (
     await Studyright.findAll({
       include: [
@@ -47,11 +60,12 @@ const startedStudyrights = async (faculty, since) =>
           [Op.gte]: since,
         },
         student_studentnumber: { [Op.not]: null },
+        ...studyRightWhere,
       },
     })
   ).map(facultyFormatStudyright)
 
-const graduatedStudyrights = async (faculty, since) =>
+const graduatedStudyrights = async (faculty, since, studyrightWhere) =>
   (
     await Studyright.findAll({
       include: [
@@ -76,6 +90,7 @@ const graduatedStudyrights = async (faculty, since) =>
         },
         graduated: 1,
         student_studentnumber: { [Op.not]: null },
+        ...studyrightWhere,
       },
     })
   ).map(facultyFormatStudyright)
@@ -167,13 +182,13 @@ const getChildOrganizations = async facultyId =>
     })
   ).map(formatOrganization)
 
-const thesisWriters = async (providers, since, thesisTypes) =>
+const thesisWriters = async (provider, since, thesisTypes, students) =>
   (
     await Credit.findAll({
-      attributes: ['id', 'course_code', 'credits', 'attainment_date', 'student_studentnumber'],
+      attributes: ['id', 'course_code', 'attainment_date', 'student_studentnumber'],
       include: {
         model: Course,
-        attributes: ['code', 'course_unit_type'],
+        attributes: ['course_unit_type'],
         required: true,
         where: {
           course_unit_type: {
@@ -182,26 +197,22 @@ const thesisWriters = async (providers, since, thesisTypes) =>
         },
         include: {
           model: Organization,
-          attributes: ['name', 'code'],
+          attributes: [],
           required: true,
           where: {
-            code: {
-              [Op.in]: providers,
-            },
+            code: provider,
           },
         },
       },
       where: {
-        credittypecode: {
-          [Op.notIn]: [10, 9, 7],
-        },
+        credittypecode: 4,
         isStudyModule: {
           [Op.not]: true,
         },
         attainment_date: {
           [Op.gte]: since,
         },
-        student_studentnumber: { [Op.not]: null },
+        student_studentnumber: students.length > 0 ? students : { [Op.not]: null },
       },
     })
   ).map(formatFacultyThesisWriter)
@@ -292,4 +303,6 @@ module.exports = {
   findFacultyProgrammeCodes,
   facultyOgranizationId,
   statutoryAbsences,
+  getTransferredToAndAway,
+  getTransferredInside,
 }
