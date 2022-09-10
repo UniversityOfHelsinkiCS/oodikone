@@ -138,14 +138,7 @@ const getFacultyCreditStatsForStudytrack = async ({ studyprogramme, facultyProgr
           otherNonMajors.tableStats[year],
           nonDegree.tableStats[year],
         ]
-      : [
-          year,
-          majors.tableStats[year] +
-            facultyNonMajors.tableStats[year] +
-            otherNonMajors.tableStats[year] +
-            nonDegree.tableStats[year],
-          majors.tableStats[year],
-        ]
+      : [year, majors.tableStats[year], majors.tableStats[year]]
   )
 
   const graphStats = includeAllSpecials

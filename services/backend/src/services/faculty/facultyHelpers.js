@@ -1,3 +1,6 @@
+const Sequelize = require('sequelize')
+const { Op } = Sequelize
+
 const findRightProgramme = (studyrightElements, mode) => {
   let programme = ''
   let programmeName = ''
@@ -100,6 +103,26 @@ const isNewProgramme = code => {
   return false
 }
 
+const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
+  if (transfersToOrAwayStudyrights.includes(s.studyrightid)) return true
+  if (insideTransfersStudyrights.includes(s.studyrightid) && new Date(s.studystartdate) < new Date('2017-08-01'))
+    return true
+  return false
+}
+
+const getExtentFilter = includeAllSpecials => {
+  const filteredExtents = [16] // always filter out secondary subject students
+  if (!includeAllSpecials) {
+    filteredExtents.push(7, 34, 22, 99, 14, 13, 9)
+  }
+  let studyrightWhere = {
+    extentcode: {
+      [Op.notIn]: filteredExtents,
+    },
+  }
+  return studyrightWhere
+}
+
 module.exports = {
   findRightProgramme,
   facultyFormatStudyright,
@@ -109,4 +132,6 @@ module.exports = {
   formatOrganization,
   formatAbsence,
   isNewProgramme,
+  checkTransfers,
+  getExtentFilter,
 }

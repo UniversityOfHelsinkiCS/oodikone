@@ -71,14 +71,12 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
 const getFacultyThesisWritersForStudyTrack = async (
   allThesisWriters,
   facultyProgrammes,
-  faculty,
   isAcademicYear,
   includeAllSpecials
 ) => {
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
-
-  const queryParameters = { since, years, isAcademicYear, faculty, facultyProgrammes, includeAllSpecials }
+  const queryParameters = { since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }
   const { bachelors, masters, doctors, licentiates, programmeCounts, programmeNames } = await getFacultyThesisWriters(
     queryParameters
   )
