@@ -1,6 +1,4 @@
 const { indexOf } = require('lodash')
-const Sequelize = require('sequelize')
-const { Op } = Sequelize
 const {
   startedStudyrights,
   graduatedStudyrights,
@@ -11,7 +9,8 @@ const {
   getTransferredInside,
 } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
-const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
+const { findRightProgramme, isNewProgramme, checkTransfers, getExtentFilter } = require('./facultyHelpers')
+
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
   // choose only the earlier started one, so we don't count start of masters as starting in faculty
@@ -31,12 +30,6 @@ const filterDuplicateStudyrights = studyrights => {
   return Object.values(rightsToCount)
 }
 
-const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
-  if (transfersToOrAwayStudyrights.includes(s.studyrightid)) return true
-  if (insideTransfersStudyrights.includes(s.studyrightid) && new Date(s.studystartdate) < new Date('2017-08-01'))
-    return true
-  return false
-}
 const addProgramme = async (
   stats,
   programme,
@@ -78,25 +71,15 @@ const getFacultyStarters = async (
   programmeFilter,
   includeAllSpecials
 ) => {
-  const filteredExtents = [16] // always filter out secondary subject students
-  if (!includeAllSpecials) {
-    filteredExtents.push(7, 34, 22, 99, 14, 13, 9)
-  }
-  let studyrightWhere = {
-    extentcode: {
-      [Op.notIn]: filteredExtents,
-    },
-  }
   const startedGraphStats = [...graphStats]
   const startedTableStats = { ...tableStats }
+  const studyrightWhere = getExtentFilter(includeAllSpecials)
   const studyrights = await startedStudyrights(faculty, since, studyrightWhere)
   let filteredStudyrights = filterDuplicateStudyrights(studyrights)
   const programmeTableStats = {}
   if (!includeAllSpecials) {
     filteredStudyrights = filteredStudyrights.filter(
-      s =>
-        !transfersToOrAwayStudyrights.includes(s.studyrightid) ||
-        !(insideTransfersStudyrights.includes(s.studyrightid) && new Date(s.studystartdate) < new Date('2017-08-01'))
+      s => !checkTransfers(s, insideTransfersStudyrights, transfersToOrAwayStudyrights)
     )
   }
 
@@ -147,16 +130,7 @@ const getFacultyGraduates = async (
   const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
   const graduatedTableStats = {}
 
-  const filteredExtents = [16] // always filter out secondary subject students
-  if (!includeAllSpecials) {
-    filteredExtents.push(7, 34, 22, 99, 14, 13)
-  }
-  let studyrightWhere = {
-    extentcode: {
-      [Op.notIn]: filteredExtents,
-    },
-  }
-
+  let studyrightWhere = getExtentFilter(includeAllSpecials)
   let graduatedRights = await graduatedStudyrights(faculty, since, studyrightWhere)
   const programmeTableStats = {}
 
@@ -234,7 +208,7 @@ const getFacultyTransfers = async (
   includeAllSpecials
 ) => {
   const insideTransfers = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-
+  // Filter still away those  that have started studying before 1.8.2017
   let transferGraphStats = []
   let transferTableStats = {}
   if (includeAllSpecials) {
