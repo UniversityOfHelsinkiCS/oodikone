@@ -54,8 +54,14 @@ describe('Faculty overview', () => {
 
     it('Toggle years works', () => {
       cy.get('[data-cy="Table-CreditsProducedByTheFaculty"]').should('contain', '2022')
+      cy.get('[data-cy="Table-ThesisWritersOfTheFaculty"]').should('contain', '2022')
+      cy.get('[data-cy="Table-StudentsOfTheFaculty"]').should('contain', '2022')
+      cy.get('[data-cy="Table-GraduatedOfTheFaculty"]').should('contain', '2022')
       cy.get('[data-cy="YearToggle"]').click()
       cy.get('[data-cy="Table-CreditsProducedByTheFaculty"]').should('contain', '2022 - 2023')
+      cy.get('[data-cy="Table-ThesisWritersOfTheFaculty"]').should('contain', '2022 - 2023')
+      cy.get('[data-cy="Table-StudentsOfTheFaculty"]').should('contain', '2022 - 2023')
+      cy.get('[data-cy="Table-GraduatedOfTheFaculty"]').should('contain', '2022 - 2023')
     })
 
     it('Toggle programmes works', () => {
