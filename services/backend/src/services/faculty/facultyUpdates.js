@@ -6,27 +6,61 @@ const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
 const { setFacultyProgrammes, setBasicStats, setCreditStats, setThesisWritersStats } = require('./facultyService')
 
 const updateFacultyOverview = async faculty => {
-  const calendarNew = {
+  const calendarNewSpecial = {
     yearType: 'CALENDAR_YEAR',
     programmeFilter: 'NEW_STUDY_PROGRAMMES',
+    specialGroups: 'SPECIAL_INCLUDED',
+  }
+  const calendarNewSpecialOut = {
+    yearType: 'CALENDAR_YEAR',
+    programmeFilter: 'NEW_STUDY_PROGRAMMES',
+    specialGroups: 'SPECIAL_EXCLUDED',
   }
 
-  const calendarAll = {
+  const calendarAllSpecial = {
     yearType: 'CALENDAR_YEAR',
     programmeFilter: 'ALL_PROGRAMMES',
+    specialGroups: 'SPECIAL_INCLUDED',
   }
-
-  const academicNew = {
+  const calendarAllSpecialOut = {
+    yearType: 'CALENDAR_YEAR',
+    programmeFilter: 'ALL_PROGRAMMES',
+    specialGroups: 'SPECIAL_EXCLUDED',
+  }
+  const academicNewSpecial = {
     yearType: 'ACADEMIC_YEAR',
     programmeFilter: 'NEW_STUDY_PROGRAMMES',
+    specialGroups: 'SPECIAL_INCLUDED',
   }
 
-  const academicAll = {
+  const academicAllSpecial = {
     yearType: 'ACADEMIC_YEAR',
     programmeFilter: 'ALL_PROGRAMMES',
+    specialGroups: 'SPECIAL_INCLUDED',
   }
 
-  const options = [calendarNew, calendarAll, academicNew, academicAll]
+  const academicNewSpecialOut = {
+    yearType: 'ACADEMIC_YEAR',
+    programmeFilter: 'NEW_STUDY_PROGRAMMES',
+    specialGroups: 'SPECIAL_EXCLUDED',
+  }
+
+  const academicAllSpecialOut = {
+    yearType: 'ACADEMIC_YEAR',
+    programmeFilter: 'ALL_PROGRAMMES',
+    specialGroups: 'SPECIAL_EXCLUDED',
+  }
+
+  const options = [
+    calendarNewSpecial,
+    calendarAllSpecial,
+    academicNewSpecial,
+    academicAllSpecial,
+    calendarNewSpecialOut,
+    calendarAllSpecialOut,
+    academicNewSpecialOut,
+    academicAllSpecialOut,
+  ]
   let allProgrammes = []
   let newProgrammes = []
   let allProgrammeCodes = []
@@ -42,31 +76,33 @@ const updateFacultyOverview = async faculty => {
   }
 
   for (const option of options) {
-    const { yearType, programmeFilter } = option
+    const { yearType, programmeFilter, specialGroups } = option
     try {
       const updatedStudentInfo = await combineFacultyBasics(
         faculty,
         programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
         yearType,
         allProgrammeCodes,
-        programmeFilter
+        programmeFilter,
+        specialGroups
       )
-      await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter)
+      await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter, option.specialGroups)
 
       const updatedCredits = await combineFacultyCredits(
         faculty,
         programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
         yearType,
-        'SPECIAL_INCLUDED'
+        specialGroups
       )
-      await setCreditStats(updatedCredits, yearType, programmeFilter)
+      await setCreditStats(updatedCredits, yearType, programmeFilter, specialGroups)
 
       const updateThesisWriters = await combineFacultyThesisWriters(
         faculty,
         programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-        yearType
+        yearType,
+        specialGroups
       )
-      await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter)
+      await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter, specialGroups)
     } catch (e) {
       logger.error(e)
     }

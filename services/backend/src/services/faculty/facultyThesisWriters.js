@@ -96,7 +96,6 @@ const getFacultyThesisWritersForStudyTrack = async (
   allThesisWriters.graphStats.push({ name: 'Doctors', data: doctors.graphStats })
   allThesisWriters.graphStats.push({ name: 'Licentiates', data: licentiates.graphStats })
 
-  // ProgrammeNames contains at the moment the name of the department that is not in facultyProgrammes
   const programmes = programmeNames ? Object.keys(programmeNames) : facultyProgrammes.map(programme => programme.code)
   programmes.forEach(programmeCode => {
     reversedYears.forEach(year => {
@@ -124,7 +123,7 @@ const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType,
     status: 'Done',
     lastUpdated: '',
   }
-  const isAcademicYear = yearType === 'ACADEMIC_YEAR' ? true : false
+  const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
 
   await getFacultyThesisWritersForStudyTrack(allThesisWriters, facultyProgrammes, isAcademicYear, includeAllSpecials)
