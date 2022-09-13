@@ -32,6 +32,7 @@ const accessLogger = morgan((tokens, req, res) => {
     ..._.omit(meta, ['studentsUserCanAccess']),
     // pass this as a custom field so we can filter by it in graylog
     isUsageStats: true,
+    onlyIamRights: !user.isAdmin && user.roles.length === 0 && user.rights.length === 0,
   })
 })
 
