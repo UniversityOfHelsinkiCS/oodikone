@@ -208,7 +208,7 @@ const getFacultyTransfers = async (
   includeAllSpecials
 ) => {
   const insideTransfers = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-  // Filter still away those  that have started studying before 1.8.2017
+  // Filter still away those  that have started studying before 1.8.2017, when include all specials false.
   let transferGraphStats = []
   let transferTableStats = {}
   if (includeAllSpecials) {

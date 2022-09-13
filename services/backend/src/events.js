@@ -25,10 +25,10 @@ const refreshFaculties = async () => {
 
   for (const faculty of facultyList) {
     try {
-      await updateFacultyOverview(faculty.code)
+      await updateFacultyOverview(faculty.code, 'ALL')
       ready += 1
     } catch (e) {
-      logger.error({ message: `Failed to update stats for faculty ${faculty?.code}`, meta: e })
+      logger.error({ message: `Failed to update stats for faculty ${faculty?.code} with type ALL`, meta: e })
     }
     logger.info(`${ready}/${facultyList.length} faculties done`)
   }

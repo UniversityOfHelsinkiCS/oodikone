@@ -56,9 +56,7 @@ const getFacultyRegularCreditStats = async ({
   const students = [...new Set(credits.map(({ student_studentnumber }) => student_studentnumber))]
 
   let studyrights = await getStudyRights(students)
-
   const transfers = (await allTransfers(studyprogramme, since)).map(t => t.studyrightid).filter(s => s !== 'undefined')
-
   if (!includeAllSpecials) {
     studyrights = studyrights.filter(s => !transfers.includes(s.studyrightid))
   }

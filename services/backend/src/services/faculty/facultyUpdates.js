@@ -5,7 +5,7 @@ const { combineFacultyCredits } = require('./facultyCredits')
 const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
 const { setFacultyProgrammes, setBasicStats, setCreditStats, setThesisWritersStats } = require('./facultyService')
 
-const updateFacultyOverview = async faculty => {
+const updateFacultyOverview = async (faculty, statsType) => {
   const calendarNewSpecial = {
     yearType: 'CALENDAR_YEAR',
     programmeFilter: 'NEW_STUDY_PROGRAMMES',
@@ -78,31 +78,35 @@ const updateFacultyOverview = async faculty => {
   for (const option of options) {
     const { yearType, programmeFilter, specialGroups } = option
     try {
-      const updatedStudentInfo = await combineFacultyBasics(
-        faculty,
-        programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-        yearType,
-        allProgrammeCodes,
-        programmeFilter,
-        specialGroups
-      )
-      await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter, option.specialGroups)
-
-      const updatedCredits = await combineFacultyCredits(
-        faculty,
-        programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-        yearType,
-        specialGroups
-      )
-      await setCreditStats(updatedCredits, yearType, programmeFilter, specialGroups)
-
-      const updateThesisWriters = await combineFacultyThesisWriters(
-        faculty,
-        programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-        yearType,
-        specialGroups
-      )
-      await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter, specialGroups)
+      if (statsType === 'ALL' || statsType === 'STUDENT') {
+        const updatedStudentInfo = await combineFacultyBasics(
+          faculty,
+          programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
+          yearType,
+          allProgrammeCodes,
+          programmeFilter,
+          specialGroups
+        )
+        await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter, option.specialGroups)
+      }
+      if (statsType === 'ALL' || statsType === 'CREDITS') {
+        const updatedCredits = await combineFacultyCredits(
+          faculty,
+          programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
+          yearType,
+          specialGroups
+        )
+        await setCreditStats(updatedCredits, yearType, programmeFilter, specialGroups)
+      }
+      if (statsType === 'ALL' || statsType === 'THESIS') {
+        const updateThesisWriters = await combineFacultyThesisWriters(
+          faculty,
+          programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
+          yearType,
+          specialGroups
+        )
+        await setThesisWritersStats(updateThesisWriters, yearType, programmeFilter, specialGroups)
+      }
     } catch (e) {
       logger.error(e)
     }
