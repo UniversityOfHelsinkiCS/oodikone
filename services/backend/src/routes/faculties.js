@@ -128,16 +128,16 @@ router.get('/:id/graduationtimes', async (req, res) => {
 
 router.get('/:id/update_basicview', async (req, res) => {
   const code = req.params.id
+  const statsType = req.query?.stats_type
   if (code) {
     let result = null
     try {
-      result = await updateFacultyOverview(code)
+      result = await updateFacultyOverview(code, statsType)
     } catch (e) {
-      logger.error(`Failed to update faculty ${code} basic tab stats: ${e}`)
+      logger.error(`Failed to update faculty ${code} basic tab stats for ${statsType}: ${e}`)
     }
     return res.json(result)
   }
   return res.status(422).end()
 })
-
 module.exports = router

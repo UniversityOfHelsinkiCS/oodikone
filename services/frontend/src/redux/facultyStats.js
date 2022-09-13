@@ -22,7 +22,7 @@ const facultystatsApi = RTKApi.injectEndpoints({
         `/faculties/${id}/graduationtimes?programme_filter=${studyProgrammeFilter}`,
     }),
     updateFacultyBasicView: builder.query({
-      query: ({ id }) => `/faculties/${id}/update_basicview`,
+      query: ({ id, statsType }) => `/faculties/${id}/update_basicview?stats_type=${statsType}`,
     }),
   }),
   overrideExisting: false,
