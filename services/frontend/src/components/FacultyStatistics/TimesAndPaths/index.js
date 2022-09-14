@@ -27,6 +27,9 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
   const [showMeanTime, setShowMeanTime] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, studyProgrammeFilter })
+  const data = showMeanTime ? graduationStats?.data?.result.means : graduationStats?.data?.result.medians
+  const years = graduationStats?.data?.result?.years
+  const goals = graduationStats?.data?.result?.goals
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -65,42 +68,57 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
               <div>
                 <GraduationTimes
                   level="bachelor"
-                  title="Bachelor (36 kk)"
-                  years={graduationStats?.data?.years}
-                  amounts={graduationStats?.data.graduationAmounts.bachelor}
-                  data={showMeanTime ? graduationStats?.data?.means.bachelor : graduationStats?.data?.medians.bachelor}
+                  title="Bachelor"
+                  data={data?.bachelor}
+                  years={years}
+                  goal={goals?.bachelor}
+                  // years={graduationStats?.data?.years}
+                  // amounts={graduationStats?.data.graduationAmounts.bachelor}
+                  // data={showMeanTime ? graduationStats?.data?.means.bachelor : graduationStats?.data?.medians.bachelor}
                 />
                 <GraduationTimes
                   level="bcMsCombo"
-                  title="Bachelor + Master (60 kk)"
-                  years={graduationStats?.data?.years}
-                  amounts={graduationStats?.data.graduationAmounts.bcMsCombo}
-                  data={
-                    showMeanTime ? graduationStats?.data?.means?.bcMsCombo : graduationStats?.data?.medians?.bcMsCombo
-                  }
+                  title="Bachelor + Master"
+                  data={data?.bcMsCombo}
+                  years={years}
+                  goal={goals?.bcMsCombo}
+                  // years={graduationStats?.data?.years}
+                  // amounts={graduationStats?.data.graduationAmounts.bcMsCombo}
+                  // data={
+                  //   showMeanTime ? graduationStats?.data?.means?.bcMsCombo : graduationStats?.data?.medians?.bcMsCombo
+                  // }
                 />
                 <GraduationTimes
                   level="master"
-                  title="Master (24 kk)"
-                  years={graduationStats?.data?.years}
-                  amounts={graduationStats?.data.graduationAmounts.master}
-                  data={showMeanTime ? graduationStats?.data?.means?.master : graduationStats?.data?.medians?.master}
+                  title="Master"
+                  data={data?.master}
+                  years={years}
+                  goal={goals?.master}
+                  // years={graduationStats?.data?.years}
+                  // amounts={graduationStats?.data.graduationAmounts.master}
+                  // data={showMeanTime ? graduationStats?.data?.means?.master : graduationStats?.data?.medians?.master}
                 />
                 <GraduationTimes
                   level="doctor"
-                  title="Doctor (48 kk)"
-                  years={graduationStats?.data?.years}
-                  amounts={graduationStats?.data.graduationAmounts.doctor}
-                  data={showMeanTime ? graduationStats?.data?.means?.doctor : graduationStats?.data?.medians?.doctor}
+                  title="Doctor"
+                  data={data?.doctor}
+                  years={years}
+                  goal={goals?.doctor}
+                  // years={graduationStats?.data?.years}
+                  // amounts={graduationStats?.data.graduationAmounts.doctor}
+                  // data={showMeanTime ? graduationStats?.data?.means?.doctor : graduationStats?.data?.medians?.doctor}
                 />
                 <GraduationTimes
                   level="licentiate"
-                  title="Licentiate (78 kk)"
-                  years={graduationStats?.data?.years}
-                  amounts={graduationStats?.data.graduationAmounts.licentiate}
-                  data={
-                    showMeanTime ? graduationStats?.data?.means?.licentiate : graduationStats?.data?.medians?.licentiate
-                  }
+                  title="Licentiate"
+                  data={data?.licentiate}
+                  years={years}
+                  goal={goals?.licentiate}
+                  // years={graduationStats?.data?.years}
+                  // amounts={graduationStats?.data.graduationAmounts.licentiate}
+                  // data={
+                  //   showMeanTime ? graduationStats?.data?.means?.licentiate : graduationStats?.data?.medians?.licentiate
+                  // }
                 />
               </div>
             </>
