@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = true, year }) => {
+const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = true, year, label }) => {
   const maxValue = data.reduce((max, { y }) => {
     return y > max ? y : max
   }, goal * 2)
@@ -12,6 +12,13 @@ const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = t
       width: 700,
     },
     title: { text: '' },
+    tooltip: {
+      // eslint-disable-next-line
+      formatter: function() {
+        // eslint-disable-next-line
+        return this.x + ': ' + this.y + ' months' ;
+      },
+    },
     plotOptions: {
       series: {
         dataLabels: {
@@ -19,6 +26,7 @@ const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = t
           inside: true,
         },
         pointPadding: 0.0,
+
         // groupPadding: 0.1,
       },
     },
@@ -62,7 +70,7 @@ const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = t
     ],
     xAxis: {
       categories,
-      title: { text: facultyGraph ? 'Graduation year' : 'Programme' },
+      title: { text: facultyGraph ? label : 'Programme' },
     },
     yAxis: {
       min: 0,
