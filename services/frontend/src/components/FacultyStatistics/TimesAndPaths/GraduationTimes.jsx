@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 import BarChart from './BarChart'
 
-const GraduationTimes = ({ title, years, data, level, goal }) => {
+const GraduationTimes = ({ title, years, data, level, goal, label }) => {
   const [programmeData, setProgrammeData] = useState(null)
   if (!data.some(a => a.amount > 0)) return null
 
@@ -24,7 +24,7 @@ const GraduationTimes = ({ title, years, data, level, goal }) => {
       setProgrammeData(null)
     }
   }
-
+  // TODO clean up inline styling
   return (
     <>
       <Divider data-cy={`Section-${level}`} horizontal>
@@ -32,7 +32,7 @@ const GraduationTimes = ({ title, years, data, level, goal }) => {
       </Divider>
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '100px' }}>
-          <BarChart categories={years} data={data} level={level} goal={goal} handleClick={handleClick} />
+          <BarChart categories={years} data={data} level={level} goal={goal} handleClick={handleClick} label={label} />
           {programmeData === null ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Message compact>Click a bar to view that year's programme level breakdown.</Message>

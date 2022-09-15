@@ -95,6 +95,35 @@ const graduatedStudyrights = async (faculty, since, studyrightWhere) =>
     })
   ).map(facultyFormatStudyright)
 
+const graduatedStudyrightsByStartYear = async (faculty, since) =>
+  (
+    await Studyright.findAll({
+      include: [
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+        {
+          model: StudyrightElement,
+          required: true,
+          include: {
+            model: ElementDetail,
+            required: true,
+          },
+        },
+      ],
+      where: {
+        faculty_code: faculty,
+        startdate: {
+          [Op.gte]: since,
+        },
+        graduated: 1,
+        student_studentnumber: { [Op.not]: null },
+      },
+    })
+  ).map(facultyFormatStudyright)
+
 const bachelorStudyright = async id => {
   return await Studyright.findOne({
     attributes: ['studystartdate'],
@@ -294,6 +323,7 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
 module.exports = {
   startedStudyrights,
   graduatedStudyrights,
+  graduatedStudyrightsByStartYear,
   bachelorStudyright,
   transferredInsideFaculty,
   transferredAway,

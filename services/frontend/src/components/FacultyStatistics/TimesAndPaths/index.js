@@ -23,11 +23,15 @@ const getDivider = (title, toolTipText) => (
 const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
   const toolTipsProgramme = InfotoolTips.Faculty
   const [showMeanTime, setShowMeanTime] = useState(false)
+  const [groupByGradYear, setGroupByGradYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, studyProgrammeFilter })
-  const data = showMeanTime ? graduationStats?.data?.result.means : graduationStats?.data?.result.medians
-  const years = graduationStats?.data?.result?.years
-  const goals = graduationStats?.data?.result?.goals
+
+  const groupBy = groupByGradYear ? 'byGradYear' : 'byStartYear'
+  const label = groupByGradYear ? 'Graduation year' : 'Start year'
+  const data = showMeanTime ? graduationStats?.data?.[groupBy].means : graduationStats?.data?.[groupBy].medians
+  const years = graduationStats?.data?.years
+  const goals = graduationStats?.data?.goals
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -55,13 +59,22 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
           {graduationStats.isSuccess && graduationStats.data && (
             <>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
-              <Toggle
-                cypress="GraduationTimeToggle"
-                firstLabel="Median time"
-                secondLabel="Mean time"
-                value={showMeanTime}
-                setValue={setShowMeanTime}
-              />
+              <div className="toggle-container">
+                <Toggle
+                  cypress="GroupByToggle"
+                  firstLabel="Group by: Starting year"
+                  secondLabel="Graduation year"
+                  value={groupByGradYear}
+                  setValue={setGroupByGradYear}
+                />
+                <Toggle
+                  cypress="GraduationTimeToggle"
+                  firstLabel="Median time"
+                  secondLabel="Mean time"
+                  value={showMeanTime}
+                  setValue={setShowMeanTime}
+                />
+              </div>
               <div>
                 <GraduationTimes
                   level="bachelor"
@@ -69,6 +82,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   data={data?.bachelor}
                   years={years}
                   goal={goals?.bachelor}
+                  label={label}
                 />
                 <GraduationTimes
                   level="bcMsCombo"
@@ -76,15 +90,31 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   data={data?.bcMsCombo}
                   years={years}
                   goal={goals?.bcMsCombo}
+                  label={label}
                 />
-                <GraduationTimes level="master" title="Master" data={data?.master} years={years} goal={goals?.master} />
-                <GraduationTimes level="doctor" title="Doctor" data={data?.doctor} years={years} goal={goals?.doctor} />
+                <GraduationTimes
+                  level="master"
+                  title="Master"
+                  data={data?.master}
+                  years={years}
+                  goal={goals?.master}
+                  label={label}
+                />
+                <GraduationTimes
+                  level="doctor"
+                  title="Doctor"
+                  data={data?.doctor}
+                  years={years}
+                  goal={goals?.doctor}
+                  label={label}
+                />
                 <GraduationTimes
                   level="licentiate"
                   title="Licentiate"
                   data={data?.licentiate}
                   years={years}
                   goal={goals?.licentiate}
+                  label={label}
                 />
               </div>
             </>
