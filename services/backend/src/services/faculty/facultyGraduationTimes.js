@@ -28,11 +28,27 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   let medians = {}
   let means = {}
 
+  let result = {
+    years: [...years].reverse(),
+    means: {},
+    medians: {},
+    goals: {
+      bachelor: 36,
+      bcMsCombo: 60,
+      master: 24,
+      doctor: 48,
+      // Fix differrent cases?
+      licentiate: 78,
+    },
+  }
+
   levels.forEach(level => {
     graduationAmounts[level] = getYearsObject({ years })
     graduationTimes[level] = getYearsObject({ years, emptyArrays: true })
     medians[level] = getYearsObject({ years, emptyArrays: true })
     means[level] = getYearsObject({ years, emptyArrays: true })
+    result.medians[level] = []
+    result.means[level] = []
   })
 
   // the max amount of months in the graph, depends on programme type
@@ -86,11 +102,12 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     graduationTimes[level][graduationYear] = [...graduationTimes[level][graduationYear], timeToGraduation]
   }
 
-  // HighCharts graph require the data to have this format (ie. actual value, "empty value")
-  years.forEach(year => {
+  result.years.forEach(year => {
     levels.forEach(level => {
       const median = getMedian(graduationTimes[level][year])
       const mean = getMean(graduationTimes[level][year])
+      result.medians[level] = [...result.medians[level], { y: median, amount: graduationAmounts[level][year] }]
+      result.means[level] = [...result.means[level], { y: mean, amount: graduationAmounts[level][year] }]
       medians[level][year] = [
         ['', median],
         ['', comparisonValues[level] - median],
@@ -102,7 +119,23 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     })
   })
 
-  return { medians, means, graduationAmounts, years, levels }
+  // // HighCharts graph require the data to have this format (ie. actual value, "empty value")
+  // years.forEach(year => {
+  //   levels.forEach(level => {
+  //     const median = getMedian(graduationTimes[level][year])
+  //     const mean = getMean(graduationTimes[level][year])
+  //     medians[level][year] = [
+  //       ['', median],
+  //       ['', comparisonValues[level] - median],
+  //     ]
+  //     means[level][year] = [
+  //       ['', mean],
+  //       ['', comparisonValues[level] - mean],
+  //     ]
+  //   })
+  // })
+
+  return { medians, means, graduationAmounts, years, levels, result }
 }
 
 module.exports = { countGraduationTimes }
