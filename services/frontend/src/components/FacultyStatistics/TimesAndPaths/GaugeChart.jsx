@@ -17,7 +17,6 @@ const GaugeChart = ({ cypress, data, year, graduationAmount, level }) => {
   const thresholdValues = allTresholds[level]
 
   const getColor = data => {
-    // if (!studyprogramme.includes('KH') && !studyprogramme.includes('MH')) return ['#1d44a1', '#EBECF0']
     if (data <= thresholdValues[0]) return ['#90A959', '#EBECF0']
     if (data > thresholdValues[0] && data <= thresholdValues[1]) return ['#FEE191', '#EBECF0']
     return ['#FB6962', '#EBECF0']
@@ -29,14 +28,14 @@ const GaugeChart = ({ cypress, data, year, graduationAmount, level }) => {
       plotBackgroundColor: null,
       plotBorderWidth: 0,
       plotShadow: false,
-      width: 260,
-      height: 300,
+      width: 234, // 208 234 260,
+      height: 270, // 240 270 300,
     },
     title: {
       text: `${data[0][1]} kk`,
       align: 'center',
       verticalAlign: 'middle',
-      y: 60,
+      y: 50,
     },
     subtitle: {
       text: `${year}<br/> n = ${graduationAmount}`,
@@ -44,6 +43,8 @@ const GaugeChart = ({ cypress, data, year, graduationAmount, level }) => {
         fontWeight: 'bold',
         fontSize: '15px',
       },
+
+      verticalAlign: 'top',
     },
     credits: {
       text: '',
