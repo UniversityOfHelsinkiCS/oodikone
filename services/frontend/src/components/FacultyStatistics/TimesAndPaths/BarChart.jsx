@@ -44,7 +44,7 @@ const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = t
             color: '#90A959',
           },
           {
-            value: goal + 6.1,
+            value: goal + 12.1,
             color: '#FEE191',
           },
           {

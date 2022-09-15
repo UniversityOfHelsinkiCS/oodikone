@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
-// import GaugeChart from './GaugeChart'
 import BarChart from './BarChart'
 
 const GraduationTimes = ({ title, years, data, level, goal }) => {
@@ -51,18 +50,6 @@ const GraduationTimes = ({ title, years, data, level, goal }) => {
           )}
         </div>
       </div>
-      {/* <div className="section-container-centered">
-        {years.map(year => (
-          <GaugeChart
-            cypress={`${year}-AverageGraduationTimes`}
-            key={year}
-            year={year}
-            data={data[year]}
-            graduationAmount={amounts[year]}
-            level={level}
-          />
-        ))}
-      </div> */}
     </>
   )
 }
