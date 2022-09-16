@@ -27,12 +27,16 @@ const accessLogger = morgan((tokens, req, res) => {
     'ms',
   ].join(' ')
 
+  const usingIamRights = user.iamRights.some(programmeCode => tokens['url'](req, res).includes(programmeCode))
+  const onlyIamRights = !user.isAdmin && user.rights.length === 0
+
   logger.info(message, {
     // don't log student list which might be huge
     ..._.omit(meta, ['studentsUserCanAccess']),
     // pass this as a custom field so we can filter by it in graylog
     isUsageStats: true,
-    onlyIamRights: !user.isAdmin && user.roles.length === 0 && user.rights.length === 0,
+    // needed for Grafana IAM users panel
+    isIamRights: onlyIamRights || usingIamRights,
   })
 })
 

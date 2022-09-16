@@ -192,7 +192,9 @@ const formatUser = async userFromDb => {
 
   const rights = _.uniqBy([...programmes, ...enrichProgrammesFromFaculties(faculties)])
 
-  const iamRights = Object.keys(await getOrganizationAccess(userFromDb))
+  const iamRights = Object.keys(await getOrganizationAccess(userFromDb)).filter(
+    programmeCode => !rights.includes(programmeCode)
+  )
 
   const {
     dataValues: {
