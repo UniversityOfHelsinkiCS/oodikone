@@ -8,20 +8,8 @@ import GraduationTimes from './GraduationTimes'
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
 
-const getDivider = (title, toolTipText) => (
-  <>
-    <div className="divider">
-      <Divider data-cy={`Section-${toolTipText}`} horizontal>
-        {title}
-      </Divider>
-    </div>
-    <InfoBox content="Keskimääräiset valmistumisajat" />
-    {/* <InfoBox content={toolTips[toolTipText]} /> */}
-  </>
-)
-
 const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
-  const toolTipsProgramme = InfotoolTips.Faculty
+  const toolTips = InfotoolTips.Faculty
   const [showMeanTime, setShowMeanTime] = useState(false)
   const [groupByGradYear, setGroupByGradYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
@@ -39,12 +27,23 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
+  const getDivider = (title, toolTipText) => (
+    <>
+      <div className="divider">
+        <Divider data-cy={`Section-${toolTipText}`} horizontal>
+          {title}
+        </Divider>
+      </div>
+      <InfoBox content={toolTips[toolTipText]} />
+    </>
+  )
+
   return (
     <div className="programmes-overview">
       <div className="toggle-container">
         <Toggle
           cypress="ProgrammeToggle"
-          toolTips={toolTipsProgramme.ProgrammeToggle}
+          toolTips={toolTips.ProgrammeToggle}
           firstLabel="New study programmes"
           secondLabel="All study programmes"
           value={studyProgrammes}
