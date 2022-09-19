@@ -20,6 +20,9 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
   const data = showMeanTime ? graduationStats?.data?.[groupBy].means : graduationStats?.data?.[groupBy].medians
   const years = graduationStats?.data?.years
   const goals = graduationStats?.data?.goals
+  const programmeData = showMeanTime
+    ? graduationStats?.data?.[groupBy].programmes.means
+    : graduationStats?.data?.[groupBy].programmes.medians
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -82,6 +85,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   years={years}
                   goal={goals?.bachelor}
                   label={label}
+                  levelProgrammeData={programmeData?.bachelor}
                 />
                 <GraduationTimes
                   level="bcMsCombo"
@@ -90,6 +94,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   years={years}
                   goal={goals?.bcMsCombo}
                   label={label}
+                  levelProgrammeData={programmeData?.bcMsCombo}
                 />
                 <GraduationTimes
                   level="master"
@@ -98,6 +103,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   years={years}
                   goal={goals?.master}
                   label={label}
+                  levelProgrammeData={programmeData?.master}
                 />
                 <GraduationTimes
                   level="doctor"
@@ -106,6 +112,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   years={years}
                   goal={goals?.doctor}
                   label={label}
+                  levelProgrammeData={programmeData?.doctor}
                 />
                 <GraduationTimes
                   level="licentiate"
@@ -114,6 +121,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   years={years}
                   goal={goals?.licentiate}
                   label={label}
+                  levelProgrammeData={programmeData?.licentiate}
                 />
               </div>
             </>
