@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = true, year, label }) => {
+const BarChart = ({ data, categories, goal, handleClick, facultyGraph = true, year, label }) => {
   const maxValue = data.reduce((max, { y }) => {
     return y > max ? y : max
   }, goal * 2)
@@ -10,8 +10,9 @@ const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = t
     chart: {
       type: 'bar',
       width: 700,
+      margin: [70, 0],
     },
-    title: { text: '' },
+    title: { text: ' ' },
     tooltip: {
       // eslint-disable-next-line
       formatter: function() {
@@ -62,7 +63,7 @@ const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = t
         point: {
           events: {
             click(e) {
-              handleClick(e, level, facultyGraph)
+              handleClick(e, facultyGraph)
             },
           },
         },
@@ -70,7 +71,13 @@ const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = t
     ],
     xAxis: {
       categories,
-      title: { text: facultyGraph ? label : 'Programme' },
+      title: {
+        text: facultyGraph ? label : 'Programme',
+        align: 'high',
+        offset: 0,
+        rotation: 0,
+        y: -10,
+      },
     },
     yAxis: {
       min: 0,
@@ -99,7 +106,8 @@ const BarChart = ({ data, categories, goal, handleClick, level, facultyGraph = t
     },
   }
 
-  if (!facultyGraph) config.title.text = `Year ${year} [EXAMPLE DATA]`
+  if (!facultyGraph) config.title.text = `Year ${year} by ${label.toLowerCase()}`
+
   return (
     <div>
       <ReactHighcharts config={config} />

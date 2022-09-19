@@ -2,23 +2,17 @@ import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 import BarChart from './BarChart'
 
-const GraduationTimes = ({ title, years, data, level, goal, label }) => {
+const GraduationTimes = ({ title, years, data, level, goal, label, levelProgrammeData }) => {
   const [programmeData, setProgrammeData] = useState(null)
   if (!data.some(a => a.amount > 0)) return null
 
-  const handleClick = (e, level, isFacultyGraph) => {
-    // console.log(e.point.category, level)
+  const handleClick = (e, isFacultyGraph) => {
     if (isFacultyGraph) {
+      const year = e.point.category
       setProgrammeData({
-        data: [
-          { y: 40, amount: 23 },
-          { y: 35, amount: 100 },
-          { y: 46.5, amount: 84 },
-          { y: 38, amount: 24 },
-          { y: 45, amount: 7 },
-        ],
-        categories: ['KH001', 'KH002', 'KH003', 'KH004', 'KH005'],
-        year: e.point.category,
+        data: levelProgrammeData[year]?.data,
+        categories: levelProgrammeData[year]?.programmes,
+        year,
       })
     } else {
       setProgrammeData(null)
@@ -32,7 +26,7 @@ const GraduationTimes = ({ title, years, data, level, goal, label }) => {
       </Divider>
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '100px' }}>
-          <BarChart categories={years} data={data} level={level} goal={goal} handleClick={handleClick} label={label} />
+          <BarChart categories={years} data={data} goal={goal} handleClick={handleClick} label={label} />
           {programmeData === null ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Message compact>Click a bar to view that year's programme level breakdown</Message>
@@ -41,11 +35,11 @@ const GraduationTimes = ({ title, years, data, level, goal, label }) => {
             <BarChart
               categories={programmeData?.categories}
               data={programmeData?.data}
-              level={level}
-              goal={36}
+              goal={goal}
               facultyGraph={false}
               handleClick={handleClick}
               year={programmeData?.year}
+              label={label}
             />
           )}
         </div>
