@@ -21,6 +21,14 @@ const facultystatsApi = RTKApi.injectEndpoints({
       query: ({ id, studyProgrammeFilter }) =>
         `/faculties/${id}/graduationtimes?programme_filter=${studyProgrammeFilter}`,
     }),
+    getFacultyProgressStats: builder.query({
+      query: ({ id, studyProgrammeFilter }) =>
+        `/faculties/${id}/progressstats?programme_filter=${studyProgrammeFilter}`,
+    }),
+    // getFacultyStudentStats: builder.query({
+    //  query: ({ id, studyProgrammeFilter }) =>
+    //    `/faculties/${id}/studentstats?programme_filter=${studyProgrammeFilter}`,
+    // }),
     updateFacultyBasicView: builder.query({
       query: ({ id, statsType }) => `/faculties/${id}/update_basicview?stats_type=${statsType}`,
     }),
@@ -34,5 +42,6 @@ export const {
   useGetFacultyCreditStatsQuery,
   useGetFacultyThesisStatsQuery,
   useGetFacultyGraduationTimesQuery,
+  useGetFacultyProgressStatsQuery,
   useUpdateFacultyBasicViewQuery,
 } = facultystatsApi

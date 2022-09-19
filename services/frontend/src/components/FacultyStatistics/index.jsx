@@ -79,13 +79,7 @@ const FacultyStatistics = props => {
     if (isAdmin) {
       panes.push({
         menuItem: 'Programmes and student populations',
-        render: () => (
-          <ProgrammeOverview
-            faculty={faculty}
-            studyProgrammes={studyProgrammes}
-            setStudyProgrammes={setStudyProgrammes}
-          />
-        ),
+        render: () => <ProgrammeOverview faculty={faculty} language={language} />,
       })
     }
 
