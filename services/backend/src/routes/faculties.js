@@ -33,6 +33,7 @@ const getProgrammes = async (code, programmeFilter) => {
 router.get('/', async (req, res) => {
   const ignore = ['Y', 'H99', 'Y01', 'H92', 'H930']
   const facultyList = (await faculties()).filter(f => !ignore.includes(f.code))
+  facultyList.sort((a, b) => (a.name.fi > b.name.fi ? 1 : -1))
   res.json(facultyList)
 })
 

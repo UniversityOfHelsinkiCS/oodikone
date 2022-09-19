@@ -21,6 +21,10 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
   const { language } = useLanguage()
 
   useEffect(() => {
+    if (studyprogrammes?.length > 0) studyprogrammes.sort((a, b) => (a.code > b.code ? 1 : -1))
+  }, [studyprogrammes])
+
+  useEffect(() => {
     if (studyprogrammes) {
       const filteredBachelorProgrammes = []
       const filteredMasterProgrammes = []
