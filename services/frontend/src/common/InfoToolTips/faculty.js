@@ -39,4 +39,32 @@ export default {
   All studyrights: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.\n
   Special studyrights excluded: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.
   `,
+
+  // Graduation times
+  GroupByToggle: `Group by: Starting year: Valmistuneet opiskelijat on jaoteltu opinto-oikeuden alkuvuoden mukaan.\n
+  Graduation year: Valmistuneet opiskelijat on ryhmitelty opintojen valmistumisvuoden perusteella.`,
+  AverageGraduationTimes: `
+  Opiskelijoiden keskimääräiset valmistumisajat tutkintotasoittain. 
+
+  - Bachelor: Kandidaatin tutkinnon suoritusajat
+  - Bachelor + Master: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi valmistuneiden suoritusajat
+  - Master: Pelkällä maisterintutkinnon opinto-oikeudella opiskelleiden suoritusajat
+  - Doctor: Tohtorin tutkinnon suoritusajat
+  - Licentiate: Lisensiaatin tutkinnon suoritusajat
+
+  Valmistumisajoista on **vähennetty lakisääteiset poissaolot**. Vihreä katkoviiva kuvastaa tavoiteaikaa. 
+  Vihreä palkki merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
+  ja punainen yli vuoden tavoiteajan ylitystä.
+
+  Säädöt:
+
+  **Starting year**. Ryhmittelee tulokset opiskelijoiden opinto-oikeuden alkamisvuosittain. Näyttää siis vuonna xxxx aloittaneiden opiskelijoiden keskimääräiset valmistumisajat. Luvut voivat elää, koska osa vuonna xxxx 
+  aloittaneiden opiskelijoiden opinnoista voi olla edelleen kesken.
+
+  **Graduation year**: Ryhmittelee tulokset valmistumisvuosittain. Näyttää siis vuonna xxxx valmistuneiden opiskelijoiden keskimääräiset valmistumisajat. 
+  Luvut ovat lopullisia (kuluva vuosi poislukien), sillä edeltäville vuosille ei tule uusia valmistumisia.
+
+  **Median time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
+
+  **Mean time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina.`,
 }

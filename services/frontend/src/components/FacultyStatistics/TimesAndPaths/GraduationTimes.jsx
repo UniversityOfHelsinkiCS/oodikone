@@ -35,7 +35,7 @@ const GraduationTimes = ({ title, years, data, level, goal, label }) => {
           <BarChart categories={years} data={data} level={level} goal={goal} handleClick={handleClick} label={label} />
           {programmeData === null ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <Message compact>Click a bar to view that year's programme level breakdown.</Message>
+              <Message compact>Click a bar to view that year's programme level breakdown</Message>
             </div>
           ) : (
             <BarChart
