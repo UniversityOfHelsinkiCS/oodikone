@@ -116,8 +116,13 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
   let mastersTableStats = new Array(yearsArray.length)
   let doctoralTableStats = new Array(yearsArray.length)
 
-  // eslint-disable-next-line no-unused-vars
   const reversedYears = [...yearsArray].reverse()
+  reversedYears.forEach(year => {
+    bachelorsTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    mastersTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0, 0, 0]
+    doctoralTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0, 0, 0]
+  })
+
   for (const programme of programmes.data) {
     let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(programme.code)
     if (!creditThresholdKeys) return
@@ -146,27 +151,20 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
         }
 
         const studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
-        bachelorsTableStats[indexOf(reversedYears, year)] = [
-          year,
-          all.length,
-          ...creditThresholdKeys.map(key => studentData[key]),
-        ]
-
+        bachelorsTableStats[indexOf(reversedYears, year)][1] += all.length || 0
         if (year !== 'Total') {
           bachelorsProgrammeStats[programme.code][indexOf(reversedYears, year)] = creditThresholdKeys.map(
             key => studentData[key]
           )
         }
         for (const key of Object.keys(studentData)) {
-          allBachelorGraphStats[key].data[indexOf(yearsArray, year)] = studentData[key]
+          bachelorsTableStats[indexOf(reversedYears, year)][indexOf(Object.keys(studentData), key) + 2] +=
+            studentData[key] || 0
+          allBachelorGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key]
         }
       } else if (programme.code.includes('MH')) {
         const studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
-        mastersTableStats[indexOf(reversedYears, year)] = [
-          year,
-          all.length,
-          ...creditThresholdKeys.map(key => studentData[key]),
-        ]
+        mastersTableStats[indexOf(reversedYears, year)][1] += all.length || 0
         if (!(programme.code in mastersProgrammeStats)) {
           mastersProgrammeStats[programme.code] = new Array(reversedYears.length - 1)
         }
@@ -176,15 +174,13 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
           )
         }
         for (const key of Object.keys(studentData)) {
-          allMastersGraphStats[key].data[indexOf(yearsArray, year)] = studentData[key]
+          mastersTableStats[indexOf(reversedYears, year)][indexOf(Object.keys(studentData), key) + 2] +=
+            studentData[key] || 0
+          allMastersGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key]
         }
       } else {
         const studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
-        doctoralTableStats[indexOf(reversedYears, year)] = [
-          year,
-          all.length,
-          ...creditThresholdKeys.map(key => studentData[key]),
-        ]
+        doctoralTableStats[indexOf(reversedYears, year)][1] += all.length || 0
         if (!(programme.code in doctoralProgrammeStats)) {
           doctoralProgrammeStats[programme.code] = new Array(reversedYears.length - 1)
         }
@@ -194,7 +190,9 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
           )
         }
         for (const key of Object.keys(studentData)) {
-          allDoctoralGraphStats[key].data[indexOf(yearsArray, year)] = studentData[key]
+          doctoralTableStats[indexOf(reversedYears, year)][indexOf(Object.keys(studentData), key) + 2] +=
+            studentData[key] || 0
+          allDoctoralGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key]
         }
       }
     }
