@@ -13,7 +13,7 @@ const ProgrammeProgressChart = ({ data, labels, longLabels, names, language }) =
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
 
-  const colors = getColors(labels.length)
+  const colors = getColors(data[0].length)
   const dataTranspose = transpose(data)
     .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
     .reverse()
