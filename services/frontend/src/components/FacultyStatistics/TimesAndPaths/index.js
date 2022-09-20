@@ -23,6 +23,8 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
   const programmeData = showMeanTime
     ? graduationStats?.data?.[groupBy].programmes.means
     : graduationStats?.data?.[groupBy].programmes.medians
+  const programmeNames = graduationStats?.data?.programmeNames
+  const commonProps = { years, label, programmeNames, showMeanTime }
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -82,46 +84,41 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   level="bachelor"
                   title="Bachelor"
                   data={data?.bachelor}
-                  years={years}
                   goal={goals?.bachelor}
-                  label={label}
                   levelProgrammeData={programmeData?.bachelor}
+                  {...commonProps}
                 />
                 <GraduationTimes
                   level="bcMsCombo"
                   title="Bachelor + Master"
                   data={data?.bcMsCombo}
-                  years={years}
                   goal={goals?.bcMsCombo}
-                  label={label}
                   levelProgrammeData={programmeData?.bcMsCombo}
+                  {...commonProps}
                 />
                 <GraduationTimes
                   level="master"
                   title="Master"
                   data={data?.master}
-                  years={years}
                   goal={goals?.master}
-                  label={label}
                   levelProgrammeData={programmeData?.master}
+                  {...commonProps}
                 />
                 <GraduationTimes
                   level="doctor"
                   title="Doctor"
                   data={data?.doctor}
-                  years={years}
                   goal={goals?.doctor}
-                  label={label}
                   levelProgrammeData={programmeData?.doctor}
+                  {...commonProps}
                 />
                 <GraduationTimes
                   level="licentiate"
                   title="Licentiate"
                   data={data?.licentiate}
-                  years={years}
                   goal={goals?.licentiate}
-                  label={label}
                   levelProgrammeData={programmeData?.licentiate}
+                  {...commonProps}
                 />
               </div>
             </>

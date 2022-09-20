@@ -1,9 +1,21 @@
 import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 import BarChart from './BarChart'
+import useLanguage from '../../LanguagePicker/useLanguage'
 
-const GraduationTimes = ({ title, years, data, level, goal, label, levelProgrammeData }) => {
+const GraduationTimes = ({
+  title,
+  years,
+  data,
+  level,
+  goal,
+  label,
+  levelProgrammeData,
+  programmeNames,
+  showMeanTime,
+}) => {
   const [programmeData, setProgrammeData] = useState(null)
+  const { language } = useLanguage()
   if (!data.some(a => a.amount > 0)) return null
 
   const handleClick = (e, isFacultyGraph) => {
@@ -26,7 +38,15 @@ const GraduationTimes = ({ title, years, data, level, goal, label, levelProgramm
       </Divider>
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '100px' }}>
-          <BarChart categories={years} data={data} goal={goal} handleClick={handleClick} label={label} />
+          <BarChart
+            categories={years}
+            data={data}
+            goal={goal}
+            handleClick={handleClick}
+            label={label}
+            programmeNames={programmeNames}
+            showMeanTime={showMeanTime}
+          />
           {programmeData === null ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Message compact>Click a bar to view that year's programme level breakdown</Message>
@@ -40,6 +60,9 @@ const GraduationTimes = ({ title, years, data, level, goal, label, levelProgramm
               handleClick={handleClick}
               year={programmeData?.year}
               label={label}
+              programmeNames={programmeNames}
+              language={language}
+              showMeanTime={showMeanTime}
             />
           )}
         </div>
