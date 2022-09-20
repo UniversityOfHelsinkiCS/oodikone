@@ -8,6 +8,7 @@ const {
   getDoctoralCreditGraphStats,
   getYearsArray,
   getCorrectStudentnumbers,
+  tableTitles,
 } = require('../studyprogrammeHelpers')
 const { studytrackStudents, allStudyrights } = require('../studyprogramme')
 
@@ -58,60 +59,23 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
     bachelorsGraphStats: {},
     mastersGraphStats: {},
     doctoralGraphStats: {},
-    bachelorTitles: [
-      '',
-      'All',
-      '< 15 credits',
-      '15-30 credits',
-      '30-59 credits',
-      '60-89 credits',
-      '90-119 credits',
-      '120-149 credits',
-      '150-179 credits',
-      '> 180 credits',
-    ],
-    mastersTitles: [
-      '',
-      'All',
-      '< 200 credits',
-      '200-219 credits',
-      '220-239 credits',
-      '240-259 credits',
-      '260-279 credits',
-      '280-299 credits',
-      '> 300 credits',
-    ],
-    doctoralTitles: [
-      '',
-      'All',
-      '< 50 credits',
-      '50-99 credits',
-      '100-149 credits',
-      '150-199 credits',
-      '200-249 credits',
-      '250-299 credits',
-      '> 300 credits',
-    ],
+    bachelorTitles: tableTitles.creditProgress.bachelor,
+    mastersTitles: tableTitles.creditProgress.master,
+    doctoralTitles: tableTitles.creditProgress.doctoral,
     programmeNames: programmes.data.reduce((obj, dataItem) => ({ ...obj, [dataItem.code]: dataItem.name }), {}),
     bachelorsProgrammeStats: {},
     mastersProgrammeStats: {},
     doctoralProgrammeStats: {},
   }
 
-  const bachelorstats = getBachelorCreditGraphStats(yearsArray)
-  let allBachelorGraphStats = {
-    lte15: {
-      name: 'Less than 15 credits',
-      data: new Array(yearsArray.length).fill(0),
-    },
-    ...bachelorstats,
-  }
+  let allBachelorGraphStats = getBachelorCreditGraphStats(yearsArray)
   let allMastersGraphStats = getMasterCreditGraphStats(yearsArray)
   let allDoctoralGraphStats = getDoctoralCreditGraphStats(yearsArray)
 
   let bachelorsProgrammeStats = {}
   let mastersProgrammeStats = {}
   let doctoralProgrammeStats = {}
+
   let bachelorsTableStats = new Array(yearsArray.length)
   let mastersTableStats = new Array(yearsArray.length)
   let doctoralTableStats = new Array(yearsArray.length)
@@ -126,10 +90,6 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
   for (const programme of programmes.data) {
     let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(programme.code)
     if (!creditThresholdKeys) return
-    if (programme.code.includes('KH')) {
-      creditThresholdKeys = ['lte15', ...creditThresholdKeys]
-      creditThresholdAmounts = [15, ...creditThresholdAmounts]
-    }
 
     for (const year of reversedYears) {
       const { startDate, endDate } = getAcademicYearDates(year, since)
@@ -145,25 +105,26 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
 
       const all = await allStudyrights(programme.code, studentnumbers)
       const students = await studytrackStudents(studentnumbers)
+      const studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
+
       if (programme.code.includes('KH')) {
         if (!(programme.code in bachelorsProgrammeStats)) {
           bachelorsProgrammeStats[programme.code] = new Array(reversedYears.length - 1)
         }
 
-        const studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
         bachelorsTableStats[indexOf(reversedYears, year)][1] += all.length || 0
+
         if (year !== 'Total') {
           bachelorsProgrammeStats[programme.code][indexOf(reversedYears, year)] = creditThresholdKeys.map(
             key => studentData[key]
           )
         }
         for (const key of Object.keys(studentData)) {
-          bachelorsTableStats[indexOf(reversedYears, year)][indexOf(Object.keys(studentData), key) + 2] +=
+          bachelorsTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
             studentData[key] || 0
-          allBachelorGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key]
+          allBachelorGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key] || 0
         }
       } else if (programme.code.includes('MH')) {
-        const studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
         mastersTableStats[indexOf(reversedYears, year)][1] += all.length || 0
         if (!(programme.code in mastersProgrammeStats)) {
           mastersProgrammeStats[programme.code] = new Array(reversedYears.length - 1)
@@ -174,12 +135,11 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
           )
         }
         for (const key of Object.keys(studentData)) {
-          mastersTableStats[indexOf(reversedYears, year)][indexOf(Object.keys(studentData), key) + 2] +=
+          mastersTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
             studentData[key] || 0
-          allMastersGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key]
+          allMastersGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key] || 0
         }
       } else {
-        const studentData = getStudentData(startDate, students, creditThresholdKeys, creditThresholdAmounts)
         doctoralTableStats[indexOf(reversedYears, year)][1] += all.length || 0
         if (!(programme.code in doctoralProgrammeStats)) {
           doctoralProgrammeStats[programme.code] = new Array(reversedYears.length - 1)
@@ -190,9 +150,9 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
           )
         }
         for (const key of Object.keys(studentData)) {
-          doctoralTableStats[indexOf(reversedYears, year)][indexOf(Object.keys(studentData), key) + 2] +=
+          doctoralTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
             studentData[key] || 0
-          allDoctoralGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key]
+          allDoctoralGraphStats[key].data[indexOf(yearsArray, year)] += studentData[key] || 0
         }
       }
     }
