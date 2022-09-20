@@ -226,7 +226,7 @@ const getEmptyArray = length => new Array(length).fill(0)
 
 const getBachelorCreditGraphStats = years => ({
   lte15: {
-    name: 'Less than 15 credit',
+    name: 'Less than 15 credits',
     data: getEmptyArray(years.length),
   },
   lte30: {
