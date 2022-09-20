@@ -30,7 +30,6 @@ const updateBasicView = async code => {
   }
 
   const options = [specialCalendar, specialAcademic, specialExcludedCalendar, specialExcludedAcademic]
-
   for (const option of options) {
     try {
       const basicStats = await getBasicStatsForStudytrack({
@@ -62,8 +61,8 @@ const updateBasicView = async code => {
     } catch (e) {
       logger.error(e)
     }
-    return 'OK'
   }
+  return 'OK'
 }
 
 const updateStudytrackView = async code => {
