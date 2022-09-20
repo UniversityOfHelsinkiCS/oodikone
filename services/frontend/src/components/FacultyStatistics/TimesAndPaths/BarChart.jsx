@@ -26,24 +26,27 @@ const BarChart = ({
     },
     title: { text: ' ' },
     tooltip: {
+      backgroundColor: 'white',
+      fontSize: '25px',
       // eslint-disable-next-line
       formatter: function() {
         const sortingText =
           label === 'Start year'
             ? `<b>From class of ${facultyGraph ? this.x : year}, ${this.point.amount} students have graduated</b>`
-            : `<b>${this.point.amount} students graduated in year ${this.x}</b>`
+            : `<b>${this.point.amount} students graduated in year ${facultyGraph ? this.x : year}</b>`
         // eslint-disable-next-line prettier/prettier
-        const text = `<br /><p>${sortingText}, <br /><b>${showMeanTime ? 'mean' : 'median'} study time: ${this.y} months</p></b>`
+        const timeText = `<br /><p>${sortingText}, <br /><b>${showMeanTime ? 'mean' : 'median'} study time: ${this.y} months</p></b>`
+        const statistics = `<br /><p>${this.point.statistics.onTime} graduated on time</p><br />
+          <p>${this.point.statistics.yearOver} graduated max year overtime</p>
+          <br /><p>${this.point.statistics.wayOver} graduated over year late</p>`
 
         if (!facultyGraph)
           return `<b>${
             programmeNames[this.x]?.[language] ? programmeNames[this.x]?.[language] : programmeNames[this.x]?.fi
-          }</b>${text}`
-        const statistics = `<br /><p>${this.point.statistics.onTime} graduated on time</p><br />
-          <p>${this.point.statistics.yearOver} graduated max year overtime</p>
-          <br /><p>${this.point.statistics.wayOver} graduated over year late</p>`
+          }</b><br />${this.x}${timeText}${statistics}`
+
         // eslint-disable-next-line
-        return `${text}${statistics}` ;
+        return `${timeText}${statistics}` ;
       },
     },
     plotOptions: {

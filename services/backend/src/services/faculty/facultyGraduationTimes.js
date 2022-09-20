@@ -158,6 +158,7 @@ const countByStartYear = async (faculty, since, years, yearsList, levels, progra
         for (const prog of programmeCodes) {
           const progMedian = getMedian(programmes[level][year][prog].graduationTimes)
           const progMean = getMean(programmes[level][year][prog].graduationTimes)
+          const progStatistics = countTimeCategories(programmes[level][year][prog].graduationTimes, goals[level])
 
           byStartYear.programmes.medians[level][year].programmes = [
             ...byStartYear.programmes.medians[level][year].programmes,
@@ -165,7 +166,7 @@ const countByStartYear = async (faculty, since, years, yearsList, levels, progra
           ]
           byStartYear.programmes.medians[level][year].data = [
             ...byStartYear.programmes.medians[level][year].data,
-            { y: progMedian, amount: programmes[level][year][prog].graduationAmounts },
+            { y: progMedian, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
           ]
 
           byStartYear.programmes.means[level][year].programmes = [
@@ -174,7 +175,7 @@ const countByStartYear = async (faculty, since, years, yearsList, levels, progra
           ]
           byStartYear.programmes.means[level][year].data = [
             ...byStartYear.programmes.means[level][year].data,
-            { y: progMean, amount: programmes[level][year][prog].graduationAmounts },
+            { y: progMean, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
           ]
         }
       }
@@ -263,6 +264,7 @@ const countByGraduationYear = async (
         for (const prog of programmeCodes) {
           const progMedian = getMedian(programmes[level][year][prog].graduationTimes)
           const progMean = getMean(programmes[level][year][prog].graduationTimes)
+          const progStatistics = countTimeCategories(programmes[level][year][prog].graduationTimes, goals[level])
 
           byGradYear.programmes.medians[level][year].programmes = [
             ...byGradYear.programmes.medians[level][year].programmes,
@@ -270,7 +272,7 @@ const countByGraduationYear = async (
           ]
           byGradYear.programmes.medians[level][year].data = [
             ...byGradYear.programmes.medians[level][year].data,
-            { y: progMedian, amount: programmes[level][year][prog].graduationAmounts },
+            { y: progMedian, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
           ]
 
           byGradYear.programmes.means[level][year].programmes = [
@@ -279,7 +281,7 @@ const countByGraduationYear = async (
           ]
           byGradYear.programmes.means[level][year].data = [
             ...byGradYear.programmes.means[level][year].data,
-            { y: progMean, amount: programmes[level][year][prog].graduationAmounts },
+            { y: progMean, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
           ]
         }
       }
