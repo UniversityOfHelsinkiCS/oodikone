@@ -14,20 +14,18 @@ const GraduationTimes = ({
   programmeNames,
   showMeanTime,
 }) => {
-  const [programmeData, setProgrammeData] = useState(null)
+  const [programmeData, setProgrammeData] = useState(false)
+  const [year, setYear] = useState(null)
   const { language } = useLanguage()
   if (!data.some(a => a.amount > 0)) return null
 
   const handleClick = (e, isFacultyGraph) => {
     if (isFacultyGraph) {
-      const year = e.point.category
-      setProgrammeData({
-        data: levelProgrammeData[year]?.data,
-        categories: levelProgrammeData[year]?.programmes,
-        year,
-      })
+      setYear(e.point.category)
+      setProgrammeData(true)
     } else {
-      setProgrammeData(null)
+      setProgrammeData(false)
+      setYear(null)
     }
   }
   // TODO clean up inline styling
@@ -47,18 +45,18 @@ const GraduationTimes = ({
             programmeNames={programmeNames}
             showMeanTime={showMeanTime}
           />
-          {programmeData === null ? (
+          {!programmeData ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Message compact>Click a bar to view that year's programme level breakdown</Message>
             </div>
           ) : (
             <BarChart
-              categories={programmeData?.categories}
-              data={programmeData?.data}
+              categories={levelProgrammeData[year]?.programmes}
+              data={levelProgrammeData[year]?.data}
               goal={goal}
               facultyGraph={false}
               handleClick={handleClick}
-              year={programmeData?.year}
+              year={year} // programmeData?.year}
               label={label}
               programmeNames={programmeNames}
               language={language}
