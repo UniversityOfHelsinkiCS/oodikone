@@ -9,11 +9,17 @@ const getColors = len => {
 }
 
 const ProgrammeProgressChart = ({ data, labels, longLabels, names, language }) => {
+  if (!data || data.length === 0)
+    return (
+      <>
+        <b>No data available</b>
+      </>
+    )
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
 
-  const colors = getColors(data[0].length)
+  const colors = getColors(data[0]?.length || 6)
   const dataTranspose = transpose(data)
     .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
     .reverse()
