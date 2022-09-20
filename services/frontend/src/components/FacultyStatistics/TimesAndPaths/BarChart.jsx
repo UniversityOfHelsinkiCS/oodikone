@@ -1,7 +1,19 @@
+/* eslint-disable react/no-this-in-sfc */
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({ data, categories, goal, handleClick, facultyGraph = true, year, label }) => {
+const BarChart = ({
+  data,
+  categories,
+  goal,
+  handleClick,
+  facultyGraph = true,
+  year,
+  label,
+  programmeNames,
+  language = null,
+  showMeanTime,
+}) => {
   const maxValue = data.reduce((max, { y }) => {
     return y > max ? y : max
   }, goal * 2)
@@ -16,8 +28,18 @@ const BarChart = ({ data, categories, goal, handleClick, facultyGraph = true, ye
     tooltip: {
       // eslint-disable-next-line
       formatter: function() {
+        const sortingText =
+          label === 'Start year'
+            ? `From class of ${facultyGraph ? this.x : year}, ${this.point.amount} students have graduated`
+            : `${this.point.amount} students graduated in year ${this.x}`
+        // eslint-disable-next-line prettier/prettier
+        const text = `<br /> <p>${sortingText}, <br />${showMeanTime ? 'mean' : 'median'} study time: ${this.y} months</p>`
+        if (!facultyGraph)
+          return `<b>${
+            programmeNames[this.x]?.[language] ? programmeNames[this.x]?.[language] : programmeNames[this.x]?.fi
+          }</b>${text}`
         // eslint-disable-next-line
-        return this.x + ': ' + this.y + ' months' ;
+        return text ;
       },
     },
     plotOptions: {

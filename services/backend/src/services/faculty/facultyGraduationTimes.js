@@ -79,7 +79,7 @@ const addGraduation = async (
   ]
 }
 
-const countByStartYear = async (faculty, since, years, yearsList, levels, programmeFilter) => {
+const countByStartYear = async (faculty, since, years, yearsList, levels, programmeFilter, programmeNames) => {
   let graduationAmounts = {}
   let graduationTimes = {}
   let programmes = getProgrammeObjectBasis(yearsList, levels)
@@ -101,8 +101,12 @@ const countByStartYear = async (faculty, since, years, yearsList, levels, progra
   const graduatedRights = await graduatedStudyrightsByStartYear(faculty, since)
   for (const right of graduatedRights) {
     const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
-    const { programme } = findRightProgramme(studyrightElements, 'graduated')
+    const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
     if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
+
+    if (!(programme in programmeNames)) {
+      programmeNames[programme] = programmeName
+    }
 
     const startYear = defineYear(startdate, false)
     await addGraduation(
@@ -165,7 +169,7 @@ const countByStartYear = async (faculty, since, years, yearsList, levels, progra
   return byStartYear
 }
 
-const countByGraduationYear = async (faculty, since, years, yearsList, levels, programmeFilter) => {
+const countByGraduationYear = async (faculty, since, years, yearsList, levels, programmeFilter, programmeNames) => {
   let graduationAmounts = {}
   let graduationTimes = {}
   let programmes = getProgrammeObjectBasis(yearsList, levels)
@@ -189,8 +193,12 @@ const countByGraduationYear = async (faculty, since, years, yearsList, levels, p
 
   for (const right of graduatedRights) {
     const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
-    const { programme } = findRightProgramme(studyrightElements, 'graduated')
+    const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
     if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
+
+    if (!(programme in programmeNames)) {
+      programmeNames[programme] = programmeName
+    }
 
     const graduationYear = defineYear(enddate, false)
     await addGraduation(
@@ -255,6 +263,7 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const yearsList = getYearsArray(since.getFullYear(), isAcademicYear)
   const levels = ['bachelor', 'bcMsCombo', 'master', 'doctor', 'licentiate']
+  const programmeNames = {}
 
   const years = [...yearsList].reverse()
   const goals = {
@@ -269,10 +278,18 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   // We count studyrights (vs. studyright_elements)
   // This way we get the whole time for a degree, even if the student was transferred to a new programme
   // E.g. started 8/2016 in old Bc, transferred to new 10/2020, graduated from new 1/2021 --> total 53 months (not 3)
-  const byGradYear = await countByGraduationYear(faculty, since, years, yearsList, levels, programmeFilter)
-  const byStartYear = await countByStartYear(faculty, since, years, yearsList, levels, programmeFilter)
+  const byGradYear = await countByGraduationYear(
+    faculty,
+    since,
+    years,
+    yearsList,
+    levels,
+    programmeFilter,
+    programmeNames
+  )
+  const byStartYear = await countByStartYear(faculty, since, years, yearsList, levels, programmeFilter, programmeNames)
 
-  return { years, goals, byGradYear, byStartYear }
+  return { years, goals, byGradYear, byStartYear, programmeNames }
 }
 
 module.exports = { countGraduationTimes }
