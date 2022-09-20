@@ -30,16 +30,20 @@ const BarChart = ({
       formatter: function() {
         const sortingText =
           label === 'Start year'
-            ? `From class of ${facultyGraph ? this.x : year}, ${this.point.amount} students have graduated`
-            : `${this.point.amount} students graduated in year ${this.x}`
+            ? `<b>From class of ${facultyGraph ? this.x : year}, ${this.point.amount} students have graduated</b>`
+            : `<b>${this.point.amount} students graduated in year ${this.x}</b>`
         // eslint-disable-next-line prettier/prettier
-        const text = `<br /> <p>${sortingText}, <br />${showMeanTime ? 'mean' : 'median'} study time: ${this.y} months</p>`
+        const text = `<br /><p>${sortingText}, <br /><b>${showMeanTime ? 'mean' : 'median'} study time: ${this.y} months</p></b>`
+
         if (!facultyGraph)
           return `<b>${
             programmeNames[this.x]?.[language] ? programmeNames[this.x]?.[language] : programmeNames[this.x]?.fi
           }</b>${text}`
+        const statistics = `<br /><p>${this.point.statistics.onTime} graduated on time</p><br />
+          <p>${this.point.statistics.yearOver} graduated max year overtime</p>
+          <br /><p>${this.point.statistics.wayOver} graduated over year late</p>`
         // eslint-disable-next-line
-        return text ;
+        return `${text}${statistics}` ;
       },
     },
     plotOptions: {
