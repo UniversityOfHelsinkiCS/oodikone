@@ -151,7 +151,7 @@ const isNonMajorCredit = (studyrights, attainment_date) =>
     )
   })
 
-const isSpecialGroupCredit = (studyrights, attainment_date, transfers) =>
+const isSpecialGroupCredit = (studyrights, attainment_date, transfers) => {
   studyrights.some(studyright => {
     if (!studyright) return true // If there is no studyright matching the credit, is not a major student credit
     if (studyright.studystartdate > attainment_date) return true // Credits before the studyright started are not major student credits
@@ -160,6 +160,7 @@ const isSpecialGroupCredit = (studyrights, attainment_date, transfers) =>
     if (transfers.includes(studyright.studyrightid)) return true // Excludes both transfers in and out of the programme
     return false
   })
+}
 
 const getMedian = values => {
   if (values.length === 0) return 0
@@ -224,8 +225,12 @@ const getPercentage = (value, total) => {
 const getEmptyArray = length => new Array(length).fill(0)
 
 const getBachelorCreditGraphStats = years => ({
+  lte15: {
+    name: 'Less than 15 credit',
+    data: getEmptyArray(years.length),
+  },
   lte30: {
-    name: 'Less than 30 credits',
+    name: '15-29 credits',
     data: getEmptyArray(years.length),
   },
   lte60: {
@@ -285,6 +290,33 @@ const getMasterCreditGraphStats = years => ({
   },
 })
 
+const getOnlyMasterCreditGraphStats = years => ({
+  lte15: {
+    name: 'Less than 15 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte30: {
+    name: '15-29 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte60: {
+    name: '30-59 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte90: {
+    name: '60-89 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte120: {
+    name: '90-119 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte120: {
+    name: 'More than 120 credits',
+    data: getEmptyArray(years.length),
+  },
+})
+
 const getDoctoralCreditGraphStats = years => ({
   lte50: {
     name: 'Less than 50 credits',
@@ -322,11 +354,13 @@ const getCreditGraphStats = (studyprogramme, years) => {
   return getDoctoralCreditGraphStats(years)
 }
 
-const bachelorCreditThresholds = ['lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'lte180', 'mte180']
+const bachelorCreditThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'lte180', 'mte180']
 const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'lte300', 'mte300']
+// const onlyMasterCredtThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'mte120']
 const doctoralCreditThresholds = ['lte50', 'lte100', 'lte150', 'lte200', 'lte250', 'lte300', 'mte300']
-const bachelorCreditAmounts = [30, 60, 90, 120, 150, 180, 180]
+const bachelorCreditAmounts = [15, 30, 60, 90, 120, 150, 180, 180]
 const masterCreditAmounts = [200, 220, 240, 260, 280, 300, 300]
+// const onlyMasterCreditAmounts = [15, 30, 60, 90, 120, 120]
 const doctoralCreditAmounts = [50, 100, 150, 200, 250, 300, 300]
 
 const getCreditThresholds = studyprogramme => {
@@ -359,7 +393,8 @@ const tableTitles = {
     bachelor: [
       '',
       'All',
-      '< 30 credits',
+      '< 15 credits',
+      '15-29 credits',
       '30-59 credits',
       '60-89 credits',
       '90-119 credits',
@@ -377,6 +412,16 @@ const tableTitles = {
       '260-279 credits',
       '280-299 credits',
       '> 300 credits',
+    ],
+    masterOnly: [
+      '',
+      'All',
+      '< 15 credits',
+      '15-29 credits',
+      '30-59 credits',
+      '60-89 credits',
+      '90-119 credits',
+      '> 120 credits',
     ],
     doctoral: [
       '',
@@ -432,6 +477,7 @@ module.exports = {
   getBachelorCreditGraphStats,
   getMasterCreditGraphStats,
   getDoctoralCreditGraphStats,
+  getOnlyMasterCreditGraphStats,
   getCreditGraphStats,
   getCreditThresholds,
   tableTitles,

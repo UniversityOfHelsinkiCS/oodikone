@@ -44,7 +44,13 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) =>
     data[thresholdKeys[3]] += creditcount >= thresholdAmounts[2] && creditcount < thresholdAmounts[3] ? 1 : 0
     data[thresholdKeys[4]] += creditcount >= thresholdAmounts[3] && creditcount < thresholdAmounts[4] ? 1 : 0
     data[thresholdKeys[5]] += creditcount >= thresholdAmounts[4] && creditcount < thresholdAmounts[5] ? 1 : 0
-    data[thresholdKeys[6]] += creditcount >= thresholdAmounts[6] ? 1 : 0
+    // bachelor programme has more columns than master and doctoral programmes
+    if (thresholdKeys.length > 7) {
+      data[thresholdKeys[6]] += creditcount >= thresholdAmounts[5] && creditcount < thresholdAmounts[6] ? 1 : 0
+      data[thresholdKeys[7]] += creditcount >= thresholdAmounts[6] ? 1 : 0
+    } else {
+      data[thresholdKeys[6]] += creditcount >= thresholdAmounts[5] ? 1 : 0
+    }
   })
   return data
 }

@@ -33,7 +33,10 @@ const DataTable = ({ data, titles, track }) => {
           {sortedData.map(array => (
             <Table.Row key={`random-year-key-${Math.random()}`}>
               {array.map(value => (
-                <Table.Cell className={array[0] === 'Total' && 'total-row-cell'} key={`random-key-${Math.random()}`}>
+                <Table.Cell
+                  className={array[0] === 'Total' ? 'total-row-cell' : ''}
+                  key={`random-key-${Math.random()}`}
+                >
                   {value}
                 </Table.Cell>
               ))}
