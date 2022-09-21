@@ -24,7 +24,8 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
     ? graduationStats?.data?.[groupBy].programmes.means
     : graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
-  const commonProps = { years, label, programmeNames, showMeanTime }
+  const classSizes = graduationStats?.data?.classSizes
+  const commonProps = { years, label, programmeNames, showMeanTime, classSizes }
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -94,6 +95,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                   data={data?.bcMsCombo}
                   goal={goals?.bcMsCombo}
                   levelProgrammeData={programmeData?.bcMsCombo}
+                  groupBy={groupBy}
                   {...commonProps}
                 />
                 <GraduationTimes
