@@ -13,10 +13,20 @@ const BarChart = ({
   programmeNames,
   language = null,
   showMeanTime,
+  classSizes,
+  level,
 }) => {
   const maxValue = data.reduce((max, { y }) => {
     return y > max ? y : max
   }, goal * 2)
+
+  const getClassSize = category => {
+    if (facultyGraph) return classSizes[category]
+    if (level === 'master' || level === 'bcMsCombo') {
+      return classSizes[category][level][year]
+    }
+    return classSizes[category][year]
+  }
 
   const config = {
     chart: {
@@ -32,7 +42,9 @@ const BarChart = ({
       formatter: function() {
         const sortingText =
           label === 'Start year'
-            ? `<b>From class of ${facultyGraph ? this.x : year}, ${this.point.amount} students have graduated</b>`
+            ? `<b>From class of ${facultyGraph ? this.x : year}, ${this.point.amount}/${getClassSize(
+                this.x
+              )} students have graduated</b>`
             : `<b>${this.point.amount} students graduated in year ${facultyGraph ? this.x : year}</b>`
         // eslint-disable-next-line prettier/prettier
         const timeText = `<br /><p>${sortingText}, <br /><b>${showMeanTime ? 'mean' : 'median'} study time: ${this.y} months</p></b>`

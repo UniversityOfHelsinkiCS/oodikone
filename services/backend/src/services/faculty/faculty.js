@@ -95,7 +95,7 @@ const graduatedStudyrights = async (faculty, since, studyrightWhere) =>
     })
   ).map(facultyFormatStudyright)
 
-const graduatedStudyrightsByStartYear = async (faculty, since) =>
+const studyrightsByRightStartYear = async (faculty, since, graduated = 1) =>
   (
     await Studyright.findAll({
       include: [
@@ -118,7 +118,7 @@ const graduatedStudyrightsByStartYear = async (faculty, since) =>
         startdate: {
           [Op.gte]: since,
         },
-        graduated: 1,
+        graduated: graduated,
         student_studentnumber: { [Op.not]: null },
       },
     })
@@ -323,7 +323,7 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
 module.exports = {
   startedStudyrights,
   graduatedStudyrights,
-  graduatedStudyrightsByStartYear,
+  studyrightsByRightStartYear,
   bachelorStudyright,
   transferredInsideFaculty,
   transferredAway,

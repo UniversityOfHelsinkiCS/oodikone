@@ -13,6 +13,8 @@ const GraduationTimes = ({
   levelProgrammeData,
   programmeNames,
   showMeanTime,
+  classSizes,
+  groupBy,
 }) => {
   const [programmeData, setProgrammeData] = useState(false)
   const [year, setYear] = useState(null)
@@ -35,6 +37,14 @@ const GraduationTimes = ({
         {title}
       </Divider>
       <div>
+        {level === 'bcMsCombo' && groupBy === 'byStartYear' && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Message compact>
+              Class sizes for recent years are not reliable as students might still lack relevant master studies data in
+              Sisu
+            </Message>
+          </div>
+        )}
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '100px' }}>
           <BarChart
             categories={years}
@@ -44,6 +54,7 @@ const GraduationTimes = ({
             label={label}
             programmeNames={programmeNames}
             showMeanTime={showMeanTime}
+            classSizes={classSizes?.[level]}
           />
           {!programmeData ? (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -56,11 +67,13 @@ const GraduationTimes = ({
               goal={goal}
               facultyGraph={false}
               handleClick={handleClick}
-              year={year} // programmeData?.year}
+              year={year}
               label={label}
               programmeNames={programmeNames}
               language={language}
               showMeanTime={showMeanTime}
+              classSizes={classSizes?.programmes}
+              level={level}
             />
           )}
         </div>
