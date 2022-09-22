@@ -349,7 +349,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Graph-StudytrackProgress]')
         .should('contain', 'Less than 15 credits')
         .should('contain', '30-59 credits')
-        .should('contain', 'More than 180 credits')
+        .should('contain', '180 or more credits')
         .should('contain', '2.9%') // The percentage for less than 15 credits in 2017-2018, to check that the graph renders
         .should('contain', '4.9%') // The percentage for 15-29 credits in 2018-2019
         .should('contain', '11.6%') // The percentage for less than 15 credits in 2019-2020
