@@ -1,6 +1,6 @@
 import React from 'react'
 import { Divider, Loader } from 'semantic-ui-react'
-import { useGetFacultyProgressStatsQuery } from 'redux/facultyStats'
+import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from 'redux/facultyStats'
 import FacultyProgressTable from './FacultyProgressTable'
 import FacultyBarChart from './FacultyBarChart'
 // import Toggle from '../../StudyProgramme/Toggle'
@@ -23,13 +23,17 @@ const getDivider = (title, toolTipText) => (
 
 const FacultyProgrammeOverview = ({ faculty, language }) => {
   // const toolTipsProgramme = InfotoolTips.Faculty
-  // const [programme, setProgramme] = useState(faculty)
   const studyProgrammeFilter = 'NEW_STUDY_PROGRAMMES'
   const progressStats = useGetFacultyProgressStatsQuery({ id: faculty?.code, studyProgrammeFilter })
+  const studentStats = useGetFacultyStudentStatsQuery({ id: faculty.code, studyProgrammeFilter })
 
   const isFetchingOrLoading = progressStats.isLoading || progressStats.isFetching
 
-  const isError = progressStats.isError || (progressStats.isSuccess && !progressStats.data)
+  const isError =
+    progressStats.isError ||
+    studentStats.isError ||
+    (progressStats.isSuccess && !progressStats.data) ||
+    (studentStats.isSuccess && !studentStats.data)
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   /*
@@ -75,9 +79,9 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
         <Loader active style={{ marginTop: '15em' }} />
       ) : (
         <div className="programmes-overview">
-          {/* {placeholderdata && (
+          {studentStats && studentStats.data && (
             <>{getDivider('Students of the faculty By Starting year', 'StudentsOfTheFacultyByStartingYear')}</>
-          )} */}
+          )}
           {progressStats.isSuccess && progressStats.data && (
             <>
               {getDivider(

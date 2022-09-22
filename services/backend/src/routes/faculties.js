@@ -7,7 +7,7 @@ const { combineFacultyThesisWriters } = require('../services/faculty/facultyThes
 const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
 const { updateFacultyOverview } = require('../services/faculty/facultyUpdates')
 const { getFacultyStudentProgress } = require('../services/faculty/facultyStudentProgress')
-//const { getFacultyStudents } = require('../services/faculty/facultyStudents')
+const { getFacultyStudents } = require('../services/faculty/facultyStudents')
 
 const {
   getFacultyProgrammes,
@@ -131,24 +131,26 @@ router.get('/:id/graduationtimes', async (req, res) => {
 })
 
 router.get('/:id/progressstats', async (req, res) => {
-  const faculty = req.params.id
+  const code = req.params.id
   const programmeFilter = req.query.programme_filter
 
-  if (!faculty) return res.status(422).end()
-  const programmes = await getProgrammes(faculty, programmeFilter)
-  const progressStats = await getFacultyStudentProgress(faculty, programmes)
+  if (!code) return res.status(422).end()
+  const programmes = await getProgrammes(code, programmeFilter)
+  const progressStats = await getFacultyStudentProgress(code, programmes)
   return res.json(progressStats)
 })
 
-// router.get('/:id/studentstats', async (req, res) => {
-//   const code = req.params.id
-//   const programmeFilter = req.query.programme_filter
+router.get('/:id/studentstats', async (req, res) => {
+  const code = req.params.id
+  const programmeFilter = req.query.programme_filter
+  const specialGroups = 'INCLUDE_SPECIALS'
+  const graduated = 'INCLUDE_GRADUATED'
 
-//   if (!code) return res.status(422).end()
-//   const programmes = await getProgrammes(code, programmeFilter)
-//   const studentStats = await getFacultyStudents(code, programmes)
-//   return res.json(studentStats)
-// })
+  if (!code) return res.status(422).end()
+  const programmes = await getProgrammes(code, programmeFilter)
+  const studentStats = await getFacultyStudents(code, programmes, specialGroups, graduated)
+  return res.json(studentStats)
+})
 
 router.get('/:id/update_basicview', async (req, res) => {
   const code = req.params.id
