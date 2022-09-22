@@ -2,7 +2,6 @@ const { mean } = require('lodash')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 
 // Helper functions
-
 const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials, includeGraduated = true }) => {
   let studentnumbers = []
   const exchangeStudents = includeAllSpecials
@@ -254,7 +253,7 @@ const getBachelorCreditGraphStats = years => ({
     data: getEmptyArray(years.length),
   },
   mte180: {
-    name: 'More than 180 credits',
+    name: '180 or more credits',
     data: getEmptyArray(years.length),
   },
 })
@@ -285,7 +284,7 @@ const getMasterCreditGraphStats = years => ({
     data: getEmptyArray(years.length),
   },
   mte300: {
-    name: 'More than 300 credits',
+    name: '300 or more credits',
     data: getEmptyArray(years.length),
   },
 })
@@ -312,7 +311,7 @@ const getOnlyMasterCreditGraphStats = years => ({
     data: getEmptyArray(years.length),
   },
   mte120: {
-    name: 'More than 120 credits',
+    name: '120 or more credits',
     data: getEmptyArray(years.length),
   },
 })
@@ -343,7 +342,7 @@ const getDoctoralCreditGraphStats = years => ({
     data: getEmptyArray(years.length),
   },
   mte300: {
-    name: 'More than 300 credits',
+    name: '300 or more credits',
     data: getEmptyArray(years.length),
   },
 })
@@ -356,7 +355,7 @@ const getCreditGraphStats = (studyprogramme, years) => {
 
 const bachelorCreditThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'lte180', 'mte180']
 const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'lte300', 'mte300']
-// const onlyMasterCredtThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'mte120']
+// const onlyMasterCreditThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'mte120']
 const doctoralCreditThresholds = ['lte50', 'lte100', 'lte150', 'lte200', 'lte250', 'lte300', 'mte300']
 const bachelorCreditAmounts = [15, 30, 60, 90, 120, 150, 180, 180]
 const masterCreditAmounts = [200, 220, 240, 260, 280, 300, 300]
@@ -400,7 +399,7 @@ const tableTitles = {
       '90-119 credits',
       '120-149 credits',
       '150-179 credits',
-      '> 180 credits',
+      '>= 180 credits',
     ],
     master: [
       '',
@@ -411,7 +410,7 @@ const tableTitles = {
       '240-259 credits',
       '260-279 credits',
       '280-299 credits',
-      '> 300 credits',
+      '>= 300 credits',
     ],
     masterOnly: [
       '',
@@ -421,7 +420,7 @@ const tableTitles = {
       '30-59 credits',
       '60-89 credits',
       '90-119 credits',
-      '> 120 credits',
+      '>= 120 credits',
     ],
     doctoral: [
       '',
@@ -432,7 +431,7 @@ const tableTitles = {
       '150-199 credits',
       '200-249 credits',
       '250-299 credits',
-      '> 300 credits',
+      '>= 300 credits',
     ],
   },
   studytracks: [
