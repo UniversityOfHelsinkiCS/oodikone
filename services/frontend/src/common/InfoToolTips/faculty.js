@@ -56,6 +56,10 @@ export default {
   Vihreä palkki merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
   ja punainen yli vuoden tavoiteajan ylitystä.
 
+  Palkissa oleva lukumäärä kertoo **montako opiskelijaa** kuhunkin valmistuneiden ryhmään kuuluu. 
+  Tarkastellessa valmistumisaikoja aloitusvuosittain palkissa näkyy myös **kuinka suuri osa** kyseisenä vuonna tiedekuntaan/opinto-ohjelmaan opinto-oikeuden saaneista on valmistunut.
+
+
   Säädöt:
 
   **Starting year**. Ryhmittelee tulokset opiskelijoiden opinto-oikeuden alkamisvuosittain. Näyttää siis vuonna xxxx aloittaneiden opiskelijoiden keskimääräiset valmistumisajat. Luvut voivat elää, koska osa vuonna xxxx 
