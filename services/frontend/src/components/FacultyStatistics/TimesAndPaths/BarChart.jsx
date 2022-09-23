@@ -28,6 +28,40 @@ const BarChart = ({
     return classSizes[category][year]
   }
 
+  const getPercentage = (amount, category) => {
+    const percent = Math.round((amount / getClassSize(category)) * 100 * 10) / 10
+    return Number.isNaN(percent) ? 0 : percent
+  }
+
+  const getDataLabel = (amount, category) => {
+    if (label === 'Start year') {
+      return `${amount} student${amount === 1 ? '' : 's'} (${getPercentage(amount, category)} %)`
+    }
+    return `${amount} student${amount === 1 ? '' : 's'}`
+  }
+
+  const getTooltipText = (category, amount, y, statistics) => {
+    const sortingText =
+      label === 'Start year'
+        ? `<b>From class of ${facultyGraph ? category : year}, ${amount}/${getClassSize(
+            category
+          )} students have graduated</b>`
+        : `<b>${amount} students graduated in year ${facultyGraph ? category : year}</b>`
+    const timeText = `<br /><p>${sortingText}, <br /><b>${
+      showMeanTime ? 'mean' : 'median'
+    } study time: ${y} months</p></b>`
+    const statisticsText = `<br /><p>${statistics.onTime} graduated on time</p><br />
+        <p>${statistics.yearOver} graduated max year overtime</p>
+        <br /><p>${statistics.wayOver} graduated over year late</p>`
+
+    if (!facultyGraph)
+      return `<b>${
+        programmeNames[category]?.[language] ? programmeNames[category]?.[language] : programmeNames[category]?.fi
+      }</b><br />${category}${timeText}${statisticsText}`
+
+    return `${timeText}${statisticsText}`
+  }
+
   const config = {
     chart: {
       type: 'bar',
@@ -40,25 +74,7 @@ const BarChart = ({
       fontSize: '25px',
       // eslint-disable-next-line
       formatter: function() {
-        const sortingText =
-          label === 'Start year'
-            ? `<b>From class of ${facultyGraph ? this.x : year}, ${this.point.amount}/${getClassSize(
-                this.x
-              )} students have graduated</b>`
-            : `<b>${this.point.amount} students graduated in year ${facultyGraph ? this.x : year}</b>`
-        // eslint-disable-next-line prettier/prettier
-        const timeText = `<br /><p>${sortingText}, <br /><b>${showMeanTime ? 'mean' : 'median'} study time: ${this.y} months</p></b>`
-        const statistics = `<br /><p>${this.point.statistics.onTime} graduated on time</p><br />
-          <p>${this.point.statistics.yearOver} graduated max year overtime</p>
-          <br /><p>${this.point.statistics.wayOver} graduated over year late</p>`
-
-        if (!facultyGraph)
-          return `<b>${
-            programmeNames[this.x]?.[language] ? programmeNames[this.x]?.[language] : programmeNames[this.x]?.fi
-          }</b><br />${this.x}${timeText}${statistics}`
-
-        // eslint-disable-next-line
-        return `${timeText}${statistics}` ;
+        return getTooltipText(this.x, this.point.amount, this.y, this.point.statistics)
       },
     },
     plotOptions: {
@@ -66,6 +82,7 @@ const BarChart = ({
         dataLabels: {
           enabled: true,
           inside: true,
+          overflow: 'allow',
         },
         pointPadding: 0.0,
 
@@ -78,14 +95,17 @@ const BarChart = ({
         dataLabels: [
           {
             align: 'left',
-            format: '{point.amount} students',
             color: '#EBECF0',
+            // eslint-disable-next-line
+            formatter: function () {
+              return getDataLabel(this.point.amount, this.x)
+            },
           },
-          {
-            align: 'right',
-            format: '{y}',
-            color: '#EBECF0',
-          },
+          // {
+          //   align: 'right',
+          //   format: '{y}',
+          //   color: '#EBECF0',
+          // },
         ],
         showInLegend: false,
         zones: [
@@ -135,10 +155,6 @@ const BarChart = ({
           width: 2,
           value: goal,
           dashStyle: 'shortDash',
-          // label: {
-          //   text: `${goal}`, // 'optimal',
-          //   verticalAlign: 'bottom',
-          // },
         },
       ],
     },
