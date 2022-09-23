@@ -15,13 +15,13 @@ const BasicRow = ({ icon, yearArray, cypress, yearIndex, toggleVisibility, style
               as="div"
               onClick={toggleVisibility}
               labelPosition="right"
-              style={{ backgroundColor: 'white', borderRadius: 0 }}
+              style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}
               data-cy={`Button-${cypress}-${yearIndex}`}
             >
-              <Button icon style={{ backgroundColor: 'white', borderRadius: 0 }}>
+              <Button icon style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}>
                 <Icon name={icon} />
               </Button>
-              <Label as="a" style={{ backgroundColor: 'white', borderRadius: 0 }}>
+              <Label as="a" style={{ backgroundColor: 'white', borderRadius: 0, padding: 0, margin: 0 }}>
                 {value}
               </Label>
             </Button>

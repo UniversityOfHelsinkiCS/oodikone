@@ -174,7 +174,7 @@ const StudytrackDataTable = ({
       />
       <Table data-cy="Table-StudytrackOverview" celled>
         <Table.Header>
-          <Table.Row>
+          <Table.Row key="Table-Studytrack-Titles">
             {titles.map((title, index) => (
               <Table.HeaderCell
                 key={title}

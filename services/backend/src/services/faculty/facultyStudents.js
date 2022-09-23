@@ -29,7 +29,7 @@ const getStudentData = students => {
 }
 
 // Goes through the faculty and its study programmes for the year
-const getFacultyDataForYear = async ({ programmes, since, settings, year, programmeTableStats }) => {
+const getFacultyDataForYear = async ({ programmes, since, settings, year, years, programmeTableStats }) => {
   const { includeAllSpecials, includeGraduated } = settings
   const { startDate, endDate } = getAcademicYearDates(year, since)
 
@@ -53,7 +53,7 @@ const getFacultyDataForYear = async ({ programmes, since, settings, year, progra
     })
 
     // Get all the studyrights and students for the calculations
-    const all = await allStudyrights(programme.code, studentnumbers)
+    let all = await allStudyrights(programme.code, studentnumbers)
     const students = await studytrackStudents(studentnumbers)
     const studentData = getStudentData(students)
     const started = await startedStudyrights(programme.code, startDate, studentnumbers)
@@ -61,35 +61,32 @@ const getFacultyDataForYear = async ({ programmes, since, settings, year, progra
     const absent = await absentStudents(programme.code, studentnumbers)
     const inactive = await inactiveStudyrights(programme.code, studentnumbers)
     const graduated = await graduatedStudyRights(programme.code, startDate, studentnumbers)
-    // if (all.length === 0) {
-    //   return
-    // }
-    // Count stats for the programme
-    if (!(programme.code in programmeTableStats)) programmeTableStats[programme.code] = []
 
-    programmeTableStats[programme.code] = [
-      ...programmeTableStats[programme.code],
-      [
-        year,
-        all.length,
-        getPercentage(all.length, all.length),
-        started.length,
-        getPercentage(started.length, all.length),
-        enrolled.length,
-        getPercentage(enrolled.length, all.length),
-        absent.length,
-        getPercentage(absent.length, all.length),
-        inactive.length,
-        getPercentage(inactive.length, all.length),
-        graduated.length,
-        getPercentage(graduated.length, all.length),
-        studentData.male,
-        getPercentage(studentData.male, all.length),
-        studentData.female,
-        getPercentage(studentData.female, all.length),
-        studentData.finnish,
-        getPercentage(studentData.finnish, all.length),
-      ],
+    // Count stats for the programme
+    if (!(programme.code in programmeTableStats)) {
+      programmeTableStats[programme.code] = years.reduce((resultObj, yearKey) => {
+        return { ...resultObj, [yearKey]: [] }
+      }, {})
+    }
+
+    programmeTableStats[programme.code][year] = [
+      all.length,
+      started.length,
+      getPercentage(started.length, all.length),
+      enrolled.length,
+      getPercentage(enrolled.length, all.length),
+      absent.length,
+      getPercentage(absent.length, all.length),
+      inactive.length,
+      getPercentage(inactive.length, all.length),
+      graduated.length,
+      getPercentage(graduated.length, all.length),
+      studentData.male,
+      getPercentage(studentData.male, all.length),
+      studentData.female,
+      getPercentage(studentData.female, all.length),
+      studentData.finnish,
+      getPercentage(studentData.finnish, all.length),
     ]
 
     total += all.length
@@ -130,12 +127,11 @@ const getFacultyStudents = async (code, programmes, specialGroups, graduated) =>
   let programmeTableStats = {}
 
   for (const year of years.reverse()) {
-    const queryParams = { programmes, since, settings, year, programmeTableStats }
+    const queryParams = { programmes, since, settings, year, years, programmeTableStats }
     const totals = await getFacultyDataForYear(queryParams)
     facultyTableStats[year] = [
       year,
       totals.total,
-      getPercentage(totals.total, totals.total),
       totals.allStarted,
       getPercentage(totals.allStarted, totals.total),
       totals.allEnrolled,
@@ -157,6 +153,7 @@ const getFacultyStudents = async (code, programmes, specialGroups, graduated) =>
 
   const studentsData = {
     id: code,
+    years: years,
     facultyTableStats: facultyTableStats,
     programmeStats: programmeTableStats,
     titles: tableTitles['studytracks'],

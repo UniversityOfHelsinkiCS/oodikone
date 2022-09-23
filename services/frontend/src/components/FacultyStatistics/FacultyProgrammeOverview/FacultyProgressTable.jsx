@@ -39,7 +39,7 @@ const FacultyProgressTable = ({
             <React.Fragment key={`random-fragment-key-${Math.random()}`}>
               {yearIndex < lenOfYearArray ? (
                 <BasicRow
-                  icon={visible[yearIndex] ? 'chevron down' : 'chevron right'}
+                  icon={visible[yearIndex] ? 'angle down' : 'angle right'}
                   yearArray={yearArray}
                   cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
                   yearIndex={yearIndex}

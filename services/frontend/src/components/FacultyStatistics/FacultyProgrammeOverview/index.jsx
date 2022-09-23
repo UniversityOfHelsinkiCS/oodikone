@@ -7,6 +7,7 @@ import FacultyBarChart from './FacultyBarChart'
 import InfoBox from '../../Info/InfoBox'
 // import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
+import FacultyStudentDataTable from './FacultyStudentDataTable'
 
 // const toolTips = InfotoolTips.Faculty
 
@@ -34,7 +35,6 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
     studentStats.isError ||
     (progressStats.isSuccess && !progressStats.data) ||
     (studentStats.isSuccess && !studentStats.data)
-
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   /*
   Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Numbers
@@ -80,7 +80,21 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
       ) : (
         <div className="programmes-overview">
           {studentStats && studentStats.data && (
-            <>{getDivider('Students of the faculty By Starting year', 'StudentsOfTheFacultyByStartingYear')}</>
+            <>
+              {getDivider('Students of the faculty By Starting year', 'StudentsOfTheFacultyByStartingYear')}
+              <div>
+                <FacultyStudentDataTable
+                  tableStats={studentStats?.data.facultyTableStats}
+                  programmeStats={studentStats?.data.programmeStats}
+                  programmeNames={studentStats?.data.programmeNames}
+                  titles={studentStats?.data.titles}
+                  years={studentStats?.data.years}
+                  sortedKeys={sortProgrammeKeys(Object.keys(studentStats?.data.programmeStats))}
+                  language={language}
+                  cypress="FacultyStudentStatsTable"
+                />
+              </div>
+            </>
           )}
           {progressStats.isSuccess && progressStats.data && (
             <>
