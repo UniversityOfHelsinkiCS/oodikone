@@ -95,7 +95,10 @@ const BarChart = ({
         dataLabels: [
           {
             align: 'left',
-            color: '#EBECF0',
+            color: '#424949',
+            style: {
+              textOutline: 'none',
+            },
             // eslint-disable-next-line
             formatter: function () {
               return getDataLabel(this.point.amount, this.x)
