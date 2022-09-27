@@ -127,6 +127,34 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
                 </div>
               </div>
               {getDivider(
+                'Progress of bachelor-master students of the faculty by starting year',
+                'ProgressOfMasterStudentsOfTheFacultyByStartingYear'
+              )}
+              <div className="section-container">
+                <div className="graph-container">
+                  <FacultyBarChart
+                    cypress="FacultybachelorMastersProgress"
+                    data={{
+                      id: faculty.code,
+                      stats: progressStats?.data.bcMsGraphStats,
+                      years: progressStats?.data.years,
+                    }}
+                  />
+                </div>
+                <div className="table-container">
+                  <FacultyProgressTable
+                    data={progressStats?.data.bcMsTableStats}
+                    programmeStats={progressStats?.data.bcMsProgrammeStats}
+                    titles={progressStats?.data.bcMsTitles}
+                    sortedKeys={sortProgrammeKeys(Object.keys(progressStats?.data.bcMsProgrammeStats))}
+                    progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
+                    programmeNames={progressStats?.data.programmeNames}
+                    language={language}
+                    cypress="FacultyBachelorsProgressTable"
+                  />
+                </div>
+              </div>
+              {getDivider(
                 'Progress of master students of the faculty by starting year',
                 'ProgressOfMasterStudentsOfTheFacultyByStartingYear'
               )}
