@@ -154,116 +154,11 @@ const getClassSizes = async (faculty, since, classSizes, programmeFilter, years)
   }
 }
 
-const countByStartYear = async (faculty, since, years, yearsList, levels, programmeFilter, programmeNames, goals) => {
+const count = async (faculty, since, years, yearsList, levels, programmeFilter, programmeNames, goals, mode) => {
   let graduationAmounts = {}
   let graduationTimes = {}
   let programmes = getProgrammeObjectBasis(yearsList, levels)
-  let byStartYear = {
-    means: {},
-    medians: {},
-    programmes: {
-      medians: getProgrammeObjectBasis(yearsList, levels),
-      means: getProgrammeObjectBasis(yearsList, levels),
-    },
-  }
-  levels.forEach(level => {
-    graduationAmounts[level] = getYearsObject({ years: yearsList })
-    graduationTimes[level] = getYearsObject({ years: yearsList, emptyArrays: true })
-    byStartYear.medians[level] = []
-    byStartYear.means[level] = []
-  })
-
-  const graduatedRights = await studyrightsByRightStartYear(faculty, since)
-  for (const right of graduatedRights) {
-    const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
-    const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
-    if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
-
-    if (!(programme in programmeNames)) {
-      programmeNames[programme] = programmeName
-    }
-
-    const startYear = defineYear(startdate, false)
-    await addGraduation(
-      extentcode,
-      startdate,
-      studyrightid,
-      enddate,
-      studentnumber,
-      graduationAmounts,
-      graduationTimes,
-      startYear,
-      programmes,
-      programme
-    )
-  }
-
-  years.forEach(year => {
-    levels.forEach(level => {
-      const median = getMedian(graduationTimes[level][year])
-      const mean = getMean(graduationTimes[level][year])
-      const statistics = countTimeCategories(graduationTimes[level][year], goals[level])
-
-      byStartYear.medians[level] = [
-        ...byStartYear.medians[level],
-        { y: median, amount: graduationAmounts[level][year], statistics },
-      ]
-      byStartYear.means[level] = [
-        ...byStartYear.means[level],
-        { y: mean, amount: graduationAmounts[level][year], statistics },
-      ]
-
-      // Programme level breakdown
-      byStartYear.programmes.medians[level][year] = { programmes: [], data: [] }
-      byStartYear.programmes.means[level][year] = { programmes: [], data: [] }
-      const programmeCodes = Object.keys(programmes[level][year])
-      sortProgrammes(programmeCodes)
-
-      if (programmeCodes.length > 0) {
-        for (const prog of programmeCodes) {
-          const progMedian = getMedian(programmes[level][year][prog].graduationTimes)
-          const progMean = getMean(programmes[level][year][prog].graduationTimes)
-          const progStatistics = countTimeCategories(programmes[level][year][prog].graduationTimes, goals[level])
-
-          byStartYear.programmes.medians[level][year].programmes = [
-            ...byStartYear.programmes.medians[level][year].programmes,
-            prog,
-          ]
-          byStartYear.programmes.medians[level][year].data = [
-            ...byStartYear.programmes.medians[level][year].data,
-            { y: progMedian, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
-          ]
-
-          byStartYear.programmes.means[level][year].programmes = [
-            ...byStartYear.programmes.means[level][year].programmes,
-            prog,
-          ]
-          byStartYear.programmes.means[level][year].data = [
-            ...byStartYear.programmes.means[level][year].data,
-            { y: progMean, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
-          ]
-        }
-      }
-    })
-  })
-
-  return byStartYear
-}
-
-const countByGraduationYear = async (
-  faculty,
-  since,
-  years,
-  yearsList,
-  levels,
-  programmeFilter,
-  programmeNames,
-  goals
-) => {
-  let graduationAmounts = {}
-  let graduationTimes = {}
-  let programmes = getProgrammeObjectBasis(yearsList, levels)
-  let byGradYear = {
+  let data = {
     means: {},
     medians: {},
     programmes: {
@@ -275,13 +170,18 @@ const countByGraduationYear = async (
   levels.forEach(level => {
     graduationAmounts[level] = getYearsObject({ years: yearsList })
     graduationTimes[level] = getYearsObject({ years: yearsList, emptyArrays: true })
-    byGradYear.medians[level] = []
-    byGradYear.means[level] = []
+    data.medians[level] = []
+    data.means[level] = []
   })
 
-  const graduatedRights = await graduatedStudyrights(faculty, since)
+  let studyrights = null
+  if (mode === 'gradYear') {
+    studyrights = await graduatedStudyrights(faculty, since)
+  } else {
+    studyrights = await studyrightsByRightStartYear(faculty, since)
+  }
 
-  for (const right of graduatedRights) {
+  for (const right of studyrights) {
     const { enddate, startdate, studyrightid, extentcode, studyrightElements, studentnumber } = right
     const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
     if (programmeFilter === 'NEW_STUDY_PROGRAMMES' && !isNewProgramme(programme)) continue
@@ -290,7 +190,13 @@ const countByGraduationYear = async (
       programmeNames[programme] = programmeName
     }
 
-    const graduationYear = defineYear(enddate, false)
+    let year = null
+    if (mode === 'gradYear') {
+      year = defineYear(enddate, false)
+    } else {
+      year = defineYear(startdate, false)
+    }
+
     await addGraduation(
       extentcode,
       startdate,
@@ -299,7 +205,7 @@ const countByGraduationYear = async (
       studentnumber,
       graduationAmounts,
       graduationTimes,
-      graduationYear,
+      year,
       programmes,
       programme
     )
@@ -310,18 +216,12 @@ const countByGraduationYear = async (
       const median = getMedian(graduationTimes[level][year])
       const mean = getMean(graduationTimes[level][year])
       const statistics = countTimeCategories(graduationTimes[level][year], goals[level])
-      byGradYear.medians[level] = [
-        ...byGradYear.medians[level],
-        { y: median, amount: graduationAmounts[level][year], statistics },
-      ]
-      byGradYear.means[level] = [
-        ...byGradYear.means[level],
-        { y: mean, amount: graduationAmounts[level][year], statistics },
-      ]
+      data.medians[level] = [...data.medians[level], { y: median, amount: graduationAmounts[level][year], statistics }]
+      data.means[level] = [...data.means[level], { y: mean, amount: graduationAmounts[level][year], statistics }]
 
       // Programme level breakdown
-      byGradYear.programmes.medians[level][year] = { programmes: [], data: [] }
-      byGradYear.programmes.means[level][year] = { programmes: [], data: [] }
+      data.programmes.medians[level][year] = { programmes: [], data: [] }
+      data.programmes.means[level][year] = { programmes: [], data: [] }
       const programmeCodes = Object.keys(programmes[level][year])
       sortProgrammes(programmeCodes)
 
@@ -331,21 +231,15 @@ const countByGraduationYear = async (
           const progMean = getMean(programmes[level][year][prog].graduationTimes)
           const progStatistics = countTimeCategories(programmes[level][year][prog].graduationTimes, goals[level])
 
-          byGradYear.programmes.medians[level][year].programmes = [
-            ...byGradYear.programmes.medians[level][year].programmes,
-            prog,
-          ]
-          byGradYear.programmes.medians[level][year].data = [
-            ...byGradYear.programmes.medians[level][year].data,
+          data.programmes.medians[level][year].programmes = [...data.programmes.medians[level][year].programmes, prog]
+          data.programmes.medians[level][year].data = [
+            ...data.programmes.medians[level][year].data,
             { y: progMedian, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
           ]
 
-          byGradYear.programmes.means[level][year].programmes = [
-            ...byGradYear.programmes.means[level][year].programmes,
-            prog,
-          ]
-          byGradYear.programmes.means[level][year].data = [
-            ...byGradYear.programmes.means[level][year].data,
+          data.programmes.means[level][year].programmes = [...data.programmes.means[level][year].programmes, prog]
+          data.programmes.means[level][year].data = [
+            ...data.programmes.means[level][year].data,
             { y: progMean, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
           ]
         }
@@ -353,7 +247,7 @@ const countByGraduationYear = async (
     })
   })
 
-  return byGradYear
+  return data
 }
 
 const countGraduationTimes = async (faculty, programmeFilter) => {
@@ -376,7 +270,8 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   // We count studyrights (vs. studyright_elements)
   // This way we get the whole time for a degree, even if the student was transferred to a new programme
   // E.g. started 8/2016 in old Bc, transferred to new 10/2020, graduated from new 1/2021 --> total 53 months (not 3)
-  const byGradYear = await countByGraduationYear(
+
+  const byGradYear = await count(
     faculty,
     since,
     years,
@@ -384,9 +279,10 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     levels,
     programmeFilter,
     programmeNames,
-    goals
+    goals,
+    'gradYear'
   )
-  const byStartYear = await countByStartYear(
+  const byStartYear = await count(
     faculty,
     since,
     years,
@@ -394,7 +290,8 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     levels,
     programmeFilter,
     programmeNames,
-    goals
+    goals,
+    'startYear'
   )
 
   const classSizes = getProgrammeObjectBasis(yearsList, levels, false)
