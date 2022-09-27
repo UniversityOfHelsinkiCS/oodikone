@@ -41,6 +41,17 @@ const countTimeCategories = (times, goal) => {
   return statistics
 }
 
+const sortProgrammes = codes => {
+  const check = code => {
+    if (isNaN(code[0])) return -1
+    return 1
+  }
+  codes.sort((a, b) => {
+    if (check(a) === check(b)) return a.localeCompare(b)
+    return check(a) - check(b)
+  })
+}
+
 const addGraduation = async (
   extentcode,
   startdate,
@@ -206,7 +217,7 @@ const countByStartYear = async (faculty, since, years, yearsList, levels, progra
       byStartYear.programmes.medians[level][year] = { programmes: [], data: [] }
       byStartYear.programmes.means[level][year] = { programmes: [], data: [] }
       const programmeCodes = Object.keys(programmes[level][year])
-      programmeCodes.sort()
+      sortProgrammes(programmeCodes)
 
       if (programmeCodes.length > 0) {
         for (const prog of programmeCodes) {
@@ -312,7 +323,7 @@ const countByGraduationYear = async (
       byGradYear.programmes.medians[level][year] = { programmes: [], data: [] }
       byGradYear.programmes.means[level][year] = { programmes: [], data: [] }
       const programmeCodes = Object.keys(programmes[level][year])
-      programmeCodes.sort()
+      sortProgrammes(programmeCodes)
 
       if (programmeCodes.length > 0) {
         for (const prog of programmeCodes) {
