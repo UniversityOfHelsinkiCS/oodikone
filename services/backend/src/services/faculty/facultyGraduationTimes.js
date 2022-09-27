@@ -3,6 +3,7 @@ const {
   graduatedStudyrights,
   studyrightsByRightStartYear,
   bachelorStudyright,
+  hasMasterRight,
   statutoryAbsences,
 } = require('./faculty')
 const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
@@ -50,6 +51,18 @@ const sortProgrammes = codes => {
     if (check(a) === check(b)) return a.localeCompare(b)
     return check(a) - check(b)
   })
+}
+const hasMS = async (programme, elements, studyrightid) => {
+  // Only bachelor: socCom, kasvatustiede - varhaiskasvatus track, farmasia - only Bc = farmaseutti,
+  if (programme === 'KH74_001') return false
+  if (programme === 'KH60_001') {
+    return !elements.some(el => ['EDUK-VO', '0371', '620050-ba', '620030-ba'].includes(el.dataValues.code))
+  }
+  if (programme === 'KH55_001') {
+    const result = await hasMasterRight(studyrightid.replace(/-1$/, '-2'))
+    if (!result) return false
+  }
+  return true
 }
 
 const addGraduation = async (
@@ -104,9 +117,9 @@ const addGraduation = async (
 const getClassSizes = async (faculty, since, classSizes, programmeFilter, years) => {
   const studyrights = await studyrightsByRightStartYear(faculty, since, [0, 1])
 
-  // get all recieved studyrights for each year
+  // get all received studyrights for each year
   // a transferred student is counted into new programmes class size i.e.
-  // students who recieved studyright on year X and graduated/will be graduating from programme Y
+  // students who received studyright on year X and graduated/will be graduating from programme Y
   // if we only counted those who started fresh in the new programme we could get a bigger number of graduates
   // than the class size, as the graduatation time count only looks at a degree as whole studyright
   for (const right of studyrights) {
@@ -133,8 +146,17 @@ const getClassSizes = async (faculty, since, classSizes, programmeFilter, years)
     } else {
       continue
     }
+
     const startYear = defineYear(actualStartdate, false)
-    classSizes[level][startYear] += 1
+
+    // On faculty level, count started bachelor rights to BcMsCombo as well  --> useful class size even if master studies have yet not started
+    // On programme level BcMsCombo sizes are iffy as many students haven't started masters yet --> no Ms programme element to count
+    if (level !== 'bcMsCombo') {
+      classSizes[level][startYear] += 1
+      if (level === 'bachelor' && (await hasMS(programme, studyrightElements, studyrightid))) {
+        classSizes['bcMsCombo'][startYear] += 1
+      }
+    }
 
     if (!(programme in classSizes.programmes)) {
       if (extentcode === 2) {

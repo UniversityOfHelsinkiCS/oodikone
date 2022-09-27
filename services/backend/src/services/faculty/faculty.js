@@ -134,6 +134,15 @@ const bachelorStudyright = async id => {
   })
 }
 
+const hasMasterRight = async id => {
+  return await Studyright.findOne({
+    where: {
+      studyrightid: id,
+      extentcode: 2,
+    },
+  })
+}
+
 const transferredInsideFaculty = async (programmes, allProgrammeCodes, since) =>
   (
     await Transfer.findAll({
@@ -325,6 +334,7 @@ module.exports = {
   graduatedStudyrights,
   studyrightsByRightStartYear,
   bachelorStudyright,
+  hasMasterRight,
   transferredInsideFaculty,
   transferredAway,
   transferredTo,
