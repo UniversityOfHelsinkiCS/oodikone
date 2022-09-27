@@ -41,7 +41,7 @@ const BarChart = ({
   }
 
   const getHeight = () => {
-    const t = categories.length > 10 ? 35 : 55
+    const t = categories.length > 8 ? 35 : 55
     return categories.length * t + 100
   }
 
