@@ -40,8 +40,8 @@ const GraduationTimes = ({
         {level === 'bcMsCombo' && groupBy === 'byStartYear' && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Message compact>
-              Class sizes for recent years are not reliable as students might still lack relevant master studies data in
-              Sisu
+              Programme class sizes for recent years are not reliable as students might still lack relevant master
+              studies data in Sisu
             </Message>
           </div>
         )}
