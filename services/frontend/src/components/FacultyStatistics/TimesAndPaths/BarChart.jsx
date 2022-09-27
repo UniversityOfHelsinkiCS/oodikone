@@ -40,6 +40,11 @@ const BarChart = ({
     return `${amount} student${amount === 1 ? '' : 's'}`
   }
 
+  const getHeight = () => {
+    const t = categories.length > 10 ? 35 : 55
+    return categories.length * t + 100
+  }
+
   const getTooltipText = (category, amount, y, statistics) => {
     const sortingText =
       label === 'Start year'
@@ -67,6 +72,7 @@ const BarChart = ({
       type: 'bar',
       width: 700,
       margin: [70, 0],
+      height: getHeight(),
     },
     title: { text: ' ' },
     tooltip: {
