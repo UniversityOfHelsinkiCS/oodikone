@@ -3,7 +3,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Dropdown } from 'semantic-ui-react'
 import xlsx from 'xlsx'
-import { getStudentTotalCredits, getTextIn, reformatDate } from '../../common'
+import { getTextIn, reformatDate } from '../../common'
 import sendEvent from '../../common/sendEvent'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -14,30 +14,28 @@ export default ({ students }) => {
   const { language } = useLanguage()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const populationStatistics = useSelector(({ populations }) => populations.data)
+  const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
   const queryStudyrights = useSelector(({ populations }) =>
     populations.query ? Object.values(populations.query.studyRights) : []
   )
+
   const queryYear = useSelector(({ populations }) => populations?.query?.year)
 
   // FIXME:
-  const mandatoryPassed = useSelector(({ populationCourses, populationMandatoryCourses }) => {
-    const mandatoryCodes = populationMandatoryCourses.data
+  const mandatoryPassed = () => {
+    const mandatoryCodes = mandatoryCourses
       .filter(course => course.visible && course.visible.visibility)
       .map(c => c.code)
-
-    let mandatoryPassed = {}
-
-    if (populationCourses.data.coursestatistics) {
-      const courses = populationCourses.data.coursestatistics
-      mandatoryPassed = mandatoryCodes.reduce((obj, code) => {
-        const foundCourse = !!courses.find(c => c.course.code === code)
+    let mandatoryPassedCourses = {}
+    if (courses) {
+      mandatoryPassedCourses = mandatoryCodes.reduce((obj, code) => {
+        const foundCourse = courses.find(c => c.course.code === code)
         obj[code] = foundCourse ? Object.keys(courses.find(c => c.course.code === code).students.passed) : null
         return obj
       }, {})
     }
-
-    return mandatoryPassed
-  })
+    return mandatoryPassedCourses
+  }
 
   const transferFrom = s => getTextIn(populationStatistics.elementdetails.data[s.transferSource].name, language)
 
@@ -115,27 +113,28 @@ export default ({ students }) => {
     return res
   }
 
-  const hasPassedMandatory = (studentNumber, code) =>
-    mandatoryPassed[code] && mandatoryPassed[code].includes(studentNumber)
-
-  const totalMandatoryPassed = studentNumber =>
-    mandatoryCourses.reduce((acc, m) => (hasPassedMandatory(studentNumber, m.code) ? acc + 1 : acc), 0)
-
+  const hasPassedMandatory = (studentNumber, code, codes) => {
+    return codes[code] && codes[code].includes(studentNumber)
+  }
+  const totalMandatoryPassed = (studentNumber, codes) => {
+    return mandatoryCourses.reduce((acc, m) => (hasPassedMandatory(studentNumber, m.code, codes) ? acc + 1 : acc), 0)
+  }
   const generateWorkbook = () => {
+    const codes = mandatoryPassed()
     const sortedMandatory = sortBy(mandatoryCourses, [
       m => {
         const res = m.code.match(/\d+/)
         return res ? Number(res[0]) : Number.MAX_VALUE
       },
     ])
-
     const worksheet = xlsx.utils.json_to_sheet(
       students.map(s => ({
         'last name': s.lastname,
         'given names': s.firstnames,
         'student number': s.studentNumber,
-        'credits since start': getStudentTotalCredits(s),
-        'all credits': s.credits,
+        'all credits': s.allCredits,
+        'hops credits': s.hopsCredits,
+        'credits since start': s.credits,
         email: s.email,
         'transferred from': s.transferredStudyright ? transferFrom(s) : '',
         priority: priorityText(s.studyrights),
@@ -147,9 +146,9 @@ export default ({ students }) => {
         'started in studyright': reformatDate(getStartedInStudyright(s.studyrights), 'YYYY-MM-DD'),
         'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
-        'mandatory total passed': totalMandatoryPassed(s.studentNumber),
+        'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes),
         ...sortedMandatory.reduce((acc, m) => {
-          acc[`${getTextIn(m.name, language)}\n${m.code}`] = hasPassedMandatory(s.studentNumber, m.code)
+          acc[`${getTextIn(m.name, language)}\n${m.code}`] = hasPassedMandatory(s.studentNumber, m.code, codes)
           return acc
         }, {}),
       }))
