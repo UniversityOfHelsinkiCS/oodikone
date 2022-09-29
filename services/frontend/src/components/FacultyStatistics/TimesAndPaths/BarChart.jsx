@@ -15,7 +15,27 @@ const BarChart = ({
   showMeanTime,
   classSizes,
   level,
+  goalExceptions,
 }) => {
+  let modData = null
+  if (!facultyGraph && goalExceptions.needed && ['master', 'bcMsCombo'].includes(level)) {
+    // change colors for longer medicine goal times
+    modData = JSON.parse(JSON.stringify(data))
+    for (let i = 0; i < modData.length; i++) {
+      if (Object.keys(goalExceptions).includes(categories[i])) {
+        const realGoal = goal + goalExceptions[categories[i]]
+        if (modData[i].y <= realGoal) {
+          modData[i].color = '#90A959'
+        } else if (modData[i].y <= realGoal + 12) {
+          modData[i].color = '#FEE191'
+        } else {
+          modData[i].color = '#FB6962'
+        }
+        modData[i].realGoal = realGoal
+      }
+    }
+  }
+
   const maxValue = data.reduce((max, { y }) => {
     return y > max ? y : max
   }, goal * 2)
@@ -45,7 +65,7 @@ const BarChart = ({
     return categories.length * t + 100
   }
 
-  const getTooltipText = (category, amount, y, statistics) => {
+  const getTooltipText = (category, amount, y, statistics, realGoal) => {
     const sortingText =
       label === 'Start year'
         ? `<b>From class of ${facultyGraph ? category : year}, ${amount}/${getClassSize(
@@ -59,11 +79,12 @@ const BarChart = ({
         <p>${statistics.yearOver} graduated max year overtime</p>
         <br /><p>${statistics.wayOver} graduated over year late</p>`
 
-    if (!facultyGraph)
+    if (!facultyGraph) {
+      const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} months **</b></p>` : ''
       return `<b>${
         programmeNames[category]?.[language] ? programmeNames[category]?.[language] : programmeNames[category]?.fi
-      }</b><br />${category}${timeText}${statisticsText}`
-
+      }</b><br />${category}${timeText}${statisticsText}${goalText}`
+    }
     return `${timeText}${statisticsText}`
   }
 
@@ -80,7 +101,7 @@ const BarChart = ({
       fontSize: '25px',
       // eslint-disable-next-line
       formatter: function() {
-        return getTooltipText(this.x, this.point.amount, this.y, this.point.statistics)
+        return getTooltipText(this.x, this.point.amount, this.y, this.point.statistics, this.point?.realGoal)
       },
     },
     plotOptions: {
@@ -91,13 +112,11 @@ const BarChart = ({
           overflow: 'allow',
         },
         pointPadding: 0.0,
-
-        // groupPadding: 0.1,
       },
     },
     series: [
       {
-        data,
+        data: modData || data,
         dataLabels: [
           {
             align: 'left',
@@ -110,11 +129,6 @@ const BarChart = ({
               return getDataLabel(this.point.amount, this.x)
             },
           },
-          // {
-          //   align: 'right',
-          //   format: '{y}',
-          //   color: '#EBECF0',
-          // },
         ],
         showInLegend: false,
         zones: [
