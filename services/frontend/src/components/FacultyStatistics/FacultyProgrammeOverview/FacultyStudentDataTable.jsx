@@ -90,7 +90,7 @@ const FacultyStudentDataTable = ({
                   sortedKeys.map(programme => {
                     return (
                       <Table.Row className="regular-row" key={`${year}-regular-row-${Math.random()}`}>
-                        <Table.Cell key={`${year}-${programme}`}>
+                        <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={`${year}-${programme}`}>
                           <b>
                             {programme}
                             <br />
