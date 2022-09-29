@@ -7,7 +7,7 @@ import Toggle from '../Toggle'
 
 const getKey = year => `${year}-${Math.random()}`
 
-const shouldBeHidden = (hidePercentages, value) => hidePercentages && typeof value === 'string' && value.includes('%')
+const shouldBeHidden = (showPercentages, value) => !showPercentages && typeof value === 'string' && value.includes('%')
 
 const getCellClass = value => (value === 'Total' ? 'total-row-cell' : '')
 
@@ -21,12 +21,12 @@ const getFirstCell = ({ yearlyData, year, show, studyprogramme, calendarYears })
   )
 }
 
-const getSingleTrackRow = ({ row, studyprogramme, code, hidePercentages, calendarYears }) => {
+const getSingleTrackRow = ({ row, studyprogramme, code, showPercentages, calendarYears }) => {
   return (
     <Table.Row key={getKey(row[0])} className="regular-row">
       {row.map((value, index) => (
         <>
-          {shouldBeHidden(hidePercentages, value) ? null : (
+          {shouldBeHidden(showPercentages, value) ? null : (
             <Table.Cell textAlign="left" className={getCellClass(row[0])} key={getKey(row[0])}>
               {value}
               {index === 0 && (
@@ -47,7 +47,7 @@ const getRow = ({
   setShow,
   studyprogramme,
   studytracks,
-  hidePercentages,
+  showPercentages,
   years,
   calendarYears,
 }) => {
@@ -62,7 +62,7 @@ const getRow = ({
             getFirstCell({ yearlyData, year: row[0], show, studyprogramme, calendarYears })
           ) : (
             <>
-              {shouldBeHidden(hidePercentages, value) ? null : (
+              {shouldBeHidden(showPercentages, value) ? null : (
                 <Table.Cell className={getCellClass(row[0])} key={getKey(value)} textAlign="left">
                   {value}
                 </Table.Cell>
@@ -91,7 +91,7 @@ const getRow = ({
             </Table.Cell>
           ) : (
             <>
-              {shouldBeHidden(hidePercentages, value) ? null : (
+              {shouldBeHidden(showPercentages, value) ? null : (
                 <Table.Cell className={getCellClass(row[0])} textAlign="left" key={getKey(row[0])}>
                   {value}
                 </Table.Cell>
@@ -153,7 +153,7 @@ const StudytrackDataTable = ({
   years,
 }) => {
   const [show, setShow] = useState(false)
-  const [hidePercentages, setHidePercentages] = useState(false)
+  const [showPercentages, setShowPercentages] = useState(false)
 
   if (!dataOfAllTracks && !dataOfSingleTrack) return null
 
@@ -167,10 +167,10 @@ const StudytrackDataTable = ({
   return (
     <div className="datatable">
       <Toggle
-        firstLabel="Show percentages"
-        secondLabel="Hide percentages"
-        value={hidePercentages}
-        setValue={setHidePercentages}
+        firstLabel="Hide percentages"
+        secondLabel="Show percentages"
+        value={showPercentages}
+        setValue={setShowPercentages}
       />
       <Table data-cy="Table-StudytrackOverview" celled>
         <Table.Header>
@@ -178,7 +178,7 @@ const StudytrackDataTable = ({
             {titles.map((title, index) => (
               <Table.HeaderCell
                 key={title}
-                colSpan={index === 0 || hidePercentages ? 1 : 2}
+                colSpan={index === 0 || !showPercentages ? 1 : 2}
                 textAlign="left"
                 style={{ fontWeight: 'bold' }}
               >
@@ -191,7 +191,7 @@ const StudytrackDataTable = ({
         <Table.Body>
           {singleTrack
             ? sortedTrackStats.map(row =>
-                getSingleTrackRow({ row, studyprogramme, code: singleTrack, hidePercentages, years, calendarYears })
+                getSingleTrackRow({ row, studyprogramme, code: singleTrack, showPercentages, years, calendarYears })
               )
             : sortedMainStats?.map(yearlyData =>
                 yearlyData.map(row =>
@@ -202,7 +202,7 @@ const StudytrackDataTable = ({
                     show,
                     setShow,
                     studytracks,
-                    hidePercentages,
+                    showPercentages,
                     years,
                     calendarYears,
                   })

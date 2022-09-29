@@ -14,7 +14,7 @@ const FacultyStudentDataTable = ({
   cypress,
 }) => {
   const [yearsVisible, setVisible] = useState(new Array(years.length).fill(false))
-  const [hidePercentages, setHidePercentages] = useState(true)
+  const [showPercentages, setShowPercentages] = useState(false)
 
   const calendarYears = years.reduce((all, year) => {
     if (year === 'Total') return all
@@ -32,8 +32,8 @@ const FacultyStudentDataTable = ({
       <Toggle
         firstLabel="Hide percentages"
         secondLabel="Show percentages"
-        value={!hidePercentages}
-        setValue={setHidePercentages}
+        value={showPercentages}
+        setValue={setShowPercentages}
       />
       <Table data-cy="Table-StudytrackOverview" celled>
         <Table.Header>
@@ -41,7 +41,7 @@ const FacultyStudentDataTable = ({
             {titles.map((title, index) => (
               <Table.HeaderCell
                 key={title}
-                colSpan={index === 0 || index === 1 || hidePercentages ? 1 : 2}
+                colSpan={index === 0 || index === 1 || !showPercentages ? 1 : 2}
                 textAlign="left"
                 style={{ fontWeight: 'bold' }}
               >
@@ -76,7 +76,7 @@ const FacultyStudentDataTable = ({
                           </Button>
                         </Table.Cell>
                       )
-                    if (hidePercentages && typeof value === 'string' && value.includes('%')) return null
+                    if (!showPercentages && typeof value === 'string' && value.includes('%')) return null
                     if ([1, 4, 5, 8, 9, 12, 13, 16, 17].includes(valueIdx))
                       return (
                         <Table.Cell style={{ backgroundColor: '#f9f9f9' }} key={`${year}-cell-color-${Math.random()}`}>
@@ -102,7 +102,7 @@ const FacultyStudentDataTable = ({
                         </Table.Cell>
                         {programmeStats[programme][year].map((value, valIdx) => {
                           if (
-                            hidePercentages &&
+                            !showPercentages &&
                             typeof value === 'string' &&
                             (value.includes('%') || value.includes('NA'))
                           )
