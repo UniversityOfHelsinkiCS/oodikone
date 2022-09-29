@@ -133,18 +133,20 @@ router.get('/:id/graduationtimes', async (req, res) => {
 router.get('/:id/progressstats', async (req, res) => {
   const code = req.params.id
   const programmeFilter = req.query.programme_filter
+  const specialGroups = req.query?.special_groups
+  const graduated = req.query?.graduated
 
   if (!code) return res.status(422).end()
   const programmes = await getProgrammes(code, programmeFilter)
-  const progressStats = await getFacultyStudentProgress(code, programmes)
+  const progressStats = await getFacultyStudentProgress(code, programmes, specialGroups, graduated)
   return res.json(progressStats)
 })
 
 router.get('/:id/studentstats', async (req, res) => {
   const code = req.params.id
   const programmeFilter = req.query.programme_filter
-  const specialGroups = 'INCLUDE_SPECIALS'
-  const graduated = 'INCLUDE_GRADUATED'
+  const specialGroups = req.query?.special_groups
+  const graduated = req.query?.graduated
 
   if (!code) return res.status(422).end()
   const programmes = await getProgrammes(code, programmeFilter)

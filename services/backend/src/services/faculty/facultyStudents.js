@@ -32,16 +32,18 @@ const getStudentData = students => {
 const getFacultyDataForYear = async ({ programmes, since, settings, year, years, programmeTableStats }) => {
   const { includeAllSpecials, includeGraduated } = settings
   const { startDate, endDate } = getAcademicYearDates(year, since)
-
-  let total = 0
-  let allStarted = 0
-  let allEnrolled = 0
-  let allAbsent = 0
-  let allInactive = 0
-  let allGraduated = 0
-  let allFinnish = 0
-  let allFemale = 0
-  let allMale = 0
+  // Totals for the year into table stats
+  const totals = {
+    total: 0,
+    allStarted: 0,
+    allEnrolled: 0,
+    allAbsent: 0,
+    allInactive: 0,
+    allGraduated: 0,
+    allFinnish: 0,
+    allFemale: 0,
+    allMale: 0,
+  }
 
   for (const programme of programmes.data) {
     const studentnumbers = await getCorrectStudentnumbers({
@@ -89,36 +91,26 @@ const getFacultyDataForYear = async ({ programmes, since, settings, year, years,
       getPercentage(studentData.finnish, all.length),
     ]
 
-    total += all.length
-    allStarted += started.length
-    allEnrolled += enrolled.length
-    allAbsent += absent.length
-    allInactive += inactive.length
-    allGraduated += graduated.length
-    allFemale += studentData.female
-    allMale += studentData.male
-    allFinnish += studentData.finnish
+    totals.total += all.length
+    totals.allStarted += started.length
+    totals.allEnrolled += enrolled.length
+    totals.allAbsent += absent.length
+    totals.allInactive += inactive.length
+    totals.allGraduated += graduated.length
+    totals.allFemale += studentData.female
+    totals.allMale += studentData.male
+    totals.allFinnish += studentData.finnish
   }
-  // Add totals for the year into table stats
-  const totals = {
-    total,
-    allStarted,
-    allEnrolled,
-    allAbsent,
-    allInactive,
-    allGraduated,
-    allMale,
-    allFemale,
-    allFinnish,
-  }
+
   return totals
 }
 
-// Combines all the data for the Populations and Studytracks -view
+// Combines all the data for faculty students table
 const getFacultyStudents = async (code, programmes, specialGroups, graduated) => {
+  // Only academic years are considered
   const isAcademicYear = true
-  const includeAllSpecials = specialGroups === 'INCLUDE_SPECIALS'
-  const includeGraduated = graduated === 'INCLUDE_GRADUATED'
+  const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
+  const includeGraduated = graduated === 'GRADUATED_INCLUDED'
   const includeYearsCombined = true
   const since = getStartDate(code, isAcademicYear)
   const years = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)

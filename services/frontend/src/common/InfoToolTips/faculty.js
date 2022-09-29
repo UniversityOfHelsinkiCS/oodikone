@@ -71,4 +71,16 @@ export default {
   **Median time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
 
   **Mean time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina.`,
+
+  // Faculty Student population
+  GraduatedToggle: `
+  Graduated included: Valinnassa ovat mukana ohjelmasta jo valmistuneet opiskelijat.
+
+  Graduated excluded: Valinnasta on poistettu ohjelmasta jo valmistuneet opiskelijat.
+  `,
+  StudentsStatsOfTheFaculty: ``,
+  BachelorsProgress: ``,
+  BachelorMastersProgress: ``,
+  MastersProgress: ``,
+  DoctoralProgress: ``,
 }

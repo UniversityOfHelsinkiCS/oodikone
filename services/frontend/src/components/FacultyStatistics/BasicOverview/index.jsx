@@ -12,6 +12,7 @@ import InteractiveDataTable from '../InteractiveDataView'
 import Toggle from '../../StudyProgramme/Toggle'
 import InfoBox from '../../Info/InfoBox'
 import InfotoolTips from '../../../common/InfoToolTips'
+import sortProgrammeKeys from '../facultyHelpers'
 import '../faculty.css'
 
 const Overview = ({
@@ -47,41 +48,6 @@ const Overview = ({
     specialGroups: special,
   })
 
-  /*
-  Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Numbers
-  */
-  const regexValuesAll = [
-    /^KH/,
-    /^MH/,
-    /^T/,
-    /^LI/,
-    /^K-/,
-    /^FI/,
-    /^00901$/,
-    /^00910$/,
-    /^\d.*a$/,
-    /^Y/,
-    /\d$/,
-    /^\d.*e$/,
-  ]
-
-  const testKey = value => {
-    for (let i = 0; i < regexValuesAll.length; i++) {
-      if (regexValuesAll[i].test(value)) {
-        return i
-      }
-    }
-    return 6
-  }
-
-  const sortProgrammeKeys = programmeKeys => {
-    return programmeKeys.sort((a, b) => {
-      if (testKey(a) - testKey(b) === 0) {
-        return a.localeCompare(b)
-      }
-      return testKey(a) - testKey(b)
-    })
-  }
   const downloadCsv = (titles, tableStats, programmeStats, programmeNames, toolTipText) => {
     const headers = titles.map(title => ({ label: title === '' ? 'Year' : title, key: title === '' ? 'Year' : title }))
     const csvData = sortProgrammeKeys(Object.keys(programmeStats)).reduce(
