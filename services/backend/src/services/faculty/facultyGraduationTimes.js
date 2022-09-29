@@ -289,8 +289,20 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
     bcMsCombo: 60,
     master: 24,
     doctor: 48,
-    // Fix differrent cases?
     licentiate: 78,
+    exceptions: {
+      MH30_004: 6, //months more
+      '420420-ma': 6,
+      MH30_001: 12,
+      '320011-ma': 12,
+      '320001-ma': 12,
+      MH30_003: 12,
+      '320002-ma': 12,
+    },
+  }
+
+  if (faculty === 'H90') {
+    goals.bcMsCombo += 12
   }
 
   // We count studyrights (vs. studyright_elements)
