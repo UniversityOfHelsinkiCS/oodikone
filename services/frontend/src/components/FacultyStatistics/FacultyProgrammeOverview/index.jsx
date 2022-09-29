@@ -3,30 +3,48 @@ import { Divider, Loader } from 'semantic-ui-react'
 import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from 'redux/facultyStats'
 import FacultyProgressTable from './FacultyProgressTable'
 import FacultyBarChart from './FacultyBarChart'
-// import Toggle from '../../StudyProgramme/Toggle'
+import Toggle from '../../StudyProgramme/Toggle'
 import InfoBox from '../../Info/InfoBox'
-// import InfotoolTips from '../../../common/InfoToolTips'
+import InfotoolTips from '../../../common/InfoToolTips'
 import '../faculty.css'
 import FacultyStudentDataTable from './FacultyStudentDataTable'
+import sortProgrammeKeys from '../facultyHelpers'
 
-// const toolTips = InfotoolTips.Faculty
-
-const getDivider = (title, toolTipText) => (
+const getDivider = (title, toolTipText, content) => (
   <>
     <div className="divider">
       <Divider data-cy={`Section-${toolTipText}`} horizontal>
         {title}
       </Divider>
     </div>
-    <InfoBox content="To be done" />
+    <InfoBox content={content} />
   </>
 )
 
-const FacultyProgrammeOverview = ({ faculty, language }) => {
-  // const toolTipsProgramme = InfotoolTips.Faculty
+const FacultyProgrammeOverview = ({
+  faculty,
+  language,
+  graduatedGroup,
+  setGraduatedGroup,
+  specialGroups,
+  setSpecialGroups,
+}) => {
+  const toolTips = InfotoolTips.Faculty
   const studyProgrammeFilter = 'NEW_STUDY_PROGRAMMES'
-  const progressStats = useGetFacultyProgressStatsQuery({ id: faculty?.code, studyProgrammeFilter })
-  const studentStats = useGetFacultyStudentStatsQuery({ id: faculty.code, studyProgrammeFilter })
+  const specials = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
+  const graduated = graduatedGroup ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
+  const progressStats = useGetFacultyProgressStatsQuery({
+    id: faculty?.code,
+    studyProgrammeFilter,
+    specialGroups: specials,
+    graduated,
+  })
+  const studentStats = useGetFacultyStudentStatsQuery({
+    id: faculty.code,
+    studyProgrammeFilter,
+    specialGroups: specials,
+    graduated,
+  })
 
   const isFetchingOrLoading = progressStats.isLoading || progressStats.isFetching
 
@@ -36,52 +54,38 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
     (progressStats.isSuccess && !progressStats.data) ||
     (studentStats.isSuccess && !studentStats.data)
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  /*
-  Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Numbers
-  */
-  const regexValuesAll = [
-    /^KH/,
-    /^MH/,
-    /^T/,
-    /^LI/,
-    /^K-/,
-    /^FI/,
-    /^00901$/,
-    /^00910$/,
-    /^\d.*a$/,
-    /^Y/,
-    /\d$/,
-    /^\d.*e$/,
-  ]
-
-  const testKey = value => {
-    for (let i = 0; i < regexValuesAll.length; i++) {
-      if (regexValuesAll[i].test(value)) {
-        return i
-      }
-    }
-    return 6
-  }
-
-  const sortProgrammeKeys = programmeKeys => {
-    return programmeKeys.sort((a, b) => {
-      if (testKey(a) - testKey(b) === 0) {
-        return a.localeCompare(b)
-      }
-      return testKey(a) - testKey(b)
-    })
-  }
-  // Toggles in studytrans ans student populations
 
   return (
-    <div className="programmes-overview">
+    <div className="faculty-overview">
+      <div className="toggle-container">
+        <Toggle
+          cypress="StudentToggle"
+          toolTips={toolTips.StudentToggle}
+          firstLabel="All studyrights"
+          secondLabel="Special studyrights excluded"
+          value={specialGroups}
+          setValue={setSpecialGroups}
+        />
+        <Toggle
+          cypress="GraduatedToggle"
+          toolTips={toolTips.GraduatedToggle}
+          firstLabel="Graduated included"
+          secondLabel="Graduated excluded"
+          value={graduatedGroup}
+          setValue={setGraduatedGroup}
+        />
+      </div>
       {isFetchingOrLoading ? (
         <Loader active style={{ marginTop: '15em' }} />
       ) : (
         <div className="programmes-overview">
           {studentStats && studentStats.data && (
             <>
-              {getDivider('Students of the faculty By Starting year', 'StudentsOfTheFacultyByStartingYear')}
+              {getDivider(
+                'Students of the faculty By Starting year',
+                'StudentsOfTheFacultyByStartingYear',
+                toolTips.StudentsStatsOfTheFaculty
+              )}
               <div>
                 <FacultyStudentDataTable
                   tableStats={studentStats?.data.facultyTableStats}
@@ -100,7 +104,8 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
             <>
               {getDivider(
                 'Progress of bachelor students of the faculty by starting year',
-                'ProgressOfBachelorStudentsOfTheFacultyByStartingYear'
+                'ProgressOfBachelorStudentsOfTheFacultyByStartingYear',
+                toolTips.BachelorsProgress
               )}
               <div className="section-container">
                 <div className="graph-container">
@@ -128,7 +133,8 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
               </div>
               {getDivider(
                 'Progress of bachelor-master students of the faculty by starting year',
-                'ProgressOfMasterStudentsOfTheFacultyByStartingYear'
+                'ProgressOfMasterStudentsOfTheFacultyByStartingYear',
+                toolTips.BachelorMastersProgress
               )}
               <div className="section-container">
                 <div className="graph-container">
@@ -156,7 +162,8 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
               </div>
               {getDivider(
                 'Progress of master students of the faculty by starting year',
-                'ProgressOfMasterStudentsOfTheFacultyByStartingYear'
+                'ProgressOfMasterStudentsOfTheFacultyByStartingYear',
+                toolTips.MastersProgress
               )}
               <div className="section-container">
                 <div className="graph-container">
@@ -184,7 +191,8 @@ const FacultyProgrammeOverview = ({ faculty, language }) => {
               </div>
               {getDivider(
                 'Progress of doctoral students of the faculty by starting year',
-                'ProgressOfDoctoralStudentsOfTheFacultyByStartingYear'
+                'ProgressOfDoctoralStudentsOfTheFacultyByStartingYear',
+                toolTips.DoctoralProgress
               )}
               <div className="section-container">
                 <div className="graph-container">

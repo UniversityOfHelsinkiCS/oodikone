@@ -14,7 +14,7 @@ const FacultyStudentDataTable = ({
   cypress,
 }) => {
   const [yearsVisible, setVisible] = useState(new Array(years.length).fill(false))
-  const [hidePercentages, setHidePercentages] = useState(false)
+  const [hidePercentages, setHidePercentages] = useState(true)
 
   const calendarYears = years.reduce((all, year) => {
     if (year === 'Total') return all
@@ -30,9 +30,9 @@ const FacultyStudentDataTable = ({
   return (
     <div className="datatable">
       <Toggle
-        firstLabel="Show percentages"
-        secondLabel="Hide percentages"
-        value={hidePercentages}
+        firstLabel="Hide percentages"
+        secondLabel="Show percentages"
+        value={!hidePercentages}
         setValue={setHidePercentages}
       />
       <Table data-cy="Table-StudytrackOverview" celled>

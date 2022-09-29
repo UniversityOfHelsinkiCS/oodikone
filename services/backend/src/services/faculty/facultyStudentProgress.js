@@ -42,32 +42,13 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) =>
   return data
 }
 
-const getFacultyStudentProgress = async (faculty, programmes) => {
+const getFacultyStudentProgress = async (faculty, programmes, specialGroups, graduated) => {
   const since = new Date('2017-08-01')
   const isAcademicYear = true
   const includeYearsCombined = true
+  const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
+  const includeGraduated = graduated === 'GRADUATED_INCLUDED'
   const yearsArray = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)
-  const facultyProgressStats = {
-    id: faculty,
-    years: yearsArray,
-    bachelorsTableStats: [],
-    bcMsTableStats: [],
-    mastersTableStats: [],
-    doctoralTableStats: [],
-    bachelorsGraphStats: {},
-    bcMsGraphStats: {},
-    mastersGraphStats: {},
-    doctoralGraphStats: {},
-    bachelorTitles: tableTitles.creditProgress.bachelor,
-    bcMsTitles: tableTitles.creditProgress.master,
-    mastersTitles: tableTitles.creditProgress.masterOnly,
-    doctoralTitles: tableTitles.creditProgress.doctoral,
-    programmeNames: programmes.data.reduce((obj, dataItem) => ({ ...obj, [dataItem.code]: dataItem.name }), {}),
-    bachelorsProgrammeStats: {},
-    bcMsProgrammeStats: {},
-    mastersProgrammeStats: {},
-    doctoralProgrammeStats: {},
-  }
 
   let allBachelorGraphStats = getBachelorCreditGraphStats(yearsArray)
   let allBsMsGraphstats = getMasterCreditGraphStats(yearsArray)
@@ -98,13 +79,11 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
 
     for (const year of reversedYears) {
       const { startDate, endDate } = getAcademicYearDates(year, since)
-      const specialGroups = true
-      const includeGraduated = true
       const studentnumbers = await getCorrectStudentnumbers({
         codes: [programme.code],
         startDate,
         endDate,
-        specialGroups,
+        includeAllSpecials,
         includeGraduated,
       })
 
@@ -192,20 +171,28 @@ const getFacultyStudentProgress = async (faculty, programmes) => {
       }
     }
   }
-  facultyProgressStats.bachelorsTableStats = bachelorsTableStats
-  facultyProgressStats.mastersTableStats = mastersTableStats
-  facultyProgressStats.bcMsTableStats = bachelorMastersTableStats
-  facultyProgressStats.doctoralTableStats = doctoralTableStats
 
-  facultyProgressStats.doctoralProgrammeStats = doctoralProgrammeStats
-  facultyProgressStats.mastersProgrammeStats = mastersProgrammeStats
-  facultyProgressStats.bcMsProgrammeStats = bcMsProgrammeStats
-  facultyProgressStats.bachelorsProgrammeStats = bachelorsProgrammeStats
-
-  facultyProgressStats.bachelorsGraphStats = allBachelorGraphStats
-  facultyProgressStats.mastersGraphStats = allMastersGraphStats
-  facultyProgressStats.bcMsGraphStats = allBsMsGraphstats
-  facultyProgressStats.doctoralGraphStats = allDoctoralGraphStats
+  const facultyProgressStats = {
+    id: faculty,
+    years: yearsArray,
+    bachelorsTableStats: bachelorsTableStats,
+    bcMsTableStats: bachelorMastersTableStats,
+    mastersTableStats: mastersTableStats,
+    doctoralTableStats: doctoralTableStats,
+    bachelorsGraphStats: allBachelorGraphStats,
+    bcMsGraphStats: allBsMsGraphstats,
+    mastersGraphStats: allMastersGraphStats,
+    doctoralGraphStats: allDoctoralGraphStats,
+    bachelorTitles: tableTitles.creditProgress.bachelor,
+    bcMsTitles: tableTitles.creditProgress.master,
+    mastersTitles: tableTitles.creditProgress.masterOnly,
+    doctoralTitles: tableTitles.creditProgress.doctoral,
+    programmeNames: programmes.data.reduce((obj, dataItem) => ({ ...obj, [dataItem.code]: dataItem.name }), {}),
+    bachelorsProgrammeStats: bachelorsProgrammeStats,
+    bcMsProgrammeStats: bcMsProgrammeStats,
+    mastersProgrammeStats: mastersProgrammeStats,
+    doctoralProgrammeStats: doctoralProgrammeStats,
+  }
   return facultyProgressStats
 }
 module.exports = { getFacultyStudentProgress }

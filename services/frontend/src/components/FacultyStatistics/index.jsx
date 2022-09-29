@@ -30,6 +30,7 @@ const FacultyStatistics = props => {
   const [academicYear, setAcademicYear] = useState(false)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
+  const [graduatedGroup, setGraduatedGroup] = useState(false)
 
   useEffect(() => {
     if (!facultyName) {
@@ -79,7 +80,16 @@ const FacultyStatistics = props => {
     if (isAdmin) {
       panes.push({
         menuItem: 'Programmes and student populations',
-        render: () => <ProgrammeOverview faculty={faculty} language={language} />,
+        render: () => (
+          <ProgrammeOverview
+            faculty={faculty}
+            language={language}
+            graduatedGroup={graduatedGroup}
+            setGraduatedGroup={setGraduatedGroup}
+            specialGroups={specialGroups}
+            setSpecialGroups={setSpecialGroups}
+          />
+        ),
       })
     }
 
