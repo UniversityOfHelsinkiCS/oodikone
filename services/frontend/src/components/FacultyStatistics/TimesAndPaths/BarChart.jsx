@@ -34,9 +34,6 @@ const BarChart = ({
   }
 
   const getDataLabel = (amount, category) => {
-    if (amount === 0) {
-      return ''
-    }
     if (label === 'Start year') {
       return `${amount} graduated (${getPercentage(amount, category)} % of class)`
     }
