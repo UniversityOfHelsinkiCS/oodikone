@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 import BarChart from './BarChart'
 import useLanguage from '../../LanguagePicker/useLanguage'
+import '../faculty.css'
 
 const GraduationTimes = ({
   title,
@@ -38,14 +39,14 @@ const GraduationTimes = ({
       </Divider>
       <div>
         {level === 'bcMsCombo' && groupBy === 'byStartYear' && (
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <div className="graduations-message">
             <Message compact>
               Programme class sizes for recent years are not reliable as students might still lack relevant master
               studies data in Sisu
             </Message>
           </div>
         )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '100px' }}>
+        <div className="graduations-chart-container">
           <BarChart
             categories={years}
             data={data}
@@ -57,7 +58,7 @@ const GraduationTimes = ({
             classSizes={classSizes?.[level]}
           />
           {!programmeData ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div className="graduations-message">
               <Message compact>Click a bar to view that year's programme level breakdown</Message>
             </div>
           ) : (

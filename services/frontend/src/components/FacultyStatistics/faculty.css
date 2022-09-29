@@ -137,3 +137,15 @@
 .update-view .button-container {
   margin: 1em 0;
 }
+
+.graduations-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.graduations-chart-container {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 100px;
+}
