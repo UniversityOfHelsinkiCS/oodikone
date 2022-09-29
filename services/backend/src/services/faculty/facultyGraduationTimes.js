@@ -53,14 +53,18 @@ const sortProgrammes = codes => {
   })
 }
 const hasMS = async (programme, elements, studyrightid) => {
-  // Only bachelor: socCom, kasvatustiede - varhaiskasvatus track, farmasia - only Bc = farmaseutti,
-  if (programme === 'KH74_001') return false
+  // Only bachelor studyright: socCom, kasvatustiede - varhaiskasvatus track, farmasia - applied only to Bc = farmaseutti,
+  if (['KH74_001', '620050-ba', '620030-ba', '520091-ba'].includes(programme)) {
+    return false
+  }
   if (programme === 'KH60_001') {
     return !elements.some(el => ['EDUK-VO', '0371', '620050-ba', '620030-ba'].includes(el.dataValues.code))
   }
   if (programme === 'KH55_001') {
     const result = await hasMasterRight(studyrightid.replace(/-1$/, '-2'))
-    if (!result) return false
+    if (!result) {
+      return false
+    }
   }
   return true
 }
