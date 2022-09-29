@@ -31,7 +31,7 @@ const GraduationTimes = ({
       setYear(null)
     }
   }
-  // TODO clean up inline styling
+
   return (
     <>
       <Divider data-cy={`Section-${level}`} horizontal>
