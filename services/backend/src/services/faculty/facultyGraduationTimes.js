@@ -33,7 +33,6 @@ const getStatutoryAbsences = async (studentnumber, startdate, enddate) => {
 
 const countTimeCategories = (times, goal) => {
   const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
-
   times.forEach(time => {
     if (time <= goal) statistics.onTime += 1
     else if (time <= goal + 12) statistics.yearOver += 1
@@ -84,7 +83,9 @@ const addGraduation = async (
   let actualStartdate = startdate
   let level = null
 
-  if (extentcode == 1) {
+  if (programme === 'MH30_001' || programme === 'MH30_003') {
+    level = 'bcMsCombo'
+  } else if (extentcode === 1) {
     level = 'bachelor'
   } else if (extentcode === 2) {
     if (studyrightid.slice(-2) === '-2') {
@@ -134,7 +135,9 @@ const getClassSizes = async (faculty, since, classSizes, programmeFilter, years)
     let actualStartdate = startdate
     let level = null
 
-    if (extentcode == 1) {
+    if (programme === 'MH30_001' || programme === 'MH30_003') {
+      level = 'bcMsCombo'
+    } else if (extentcode === 1) {
       level = 'bachelor'
     } else if (extentcode === 2) {
       if (studyrightid.slice(-2) === '-2') {
@@ -241,9 +244,7 @@ const count = async (faculty, since, years, yearsList, levels, programmeFilter, 
     levels.forEach(level => {
       const median = getMedian(graduationTimes[level][year])
       const mean = getMean(graduationTimes[level][year])
-      const statistics = countTimeCategories(graduationTimes[level][year], goals[level])
-      data.medians[level] = [...data.medians[level], { y: median, amount: graduationAmounts[level][year], statistics }]
-      data.means[level] = [...data.means[level], { y: mean, amount: graduationAmounts[level][year], statistics }]
+      const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
 
       // Programme level breakdown
       data.programmes.medians[level][year] = { programmes: [], data: [] }
@@ -255,12 +256,23 @@ const count = async (faculty, since, years, yearsList, levels, programmeFilter, 
         for (const prog of programmeCodes) {
           const progMedian = getMedian(programmes[level][year][prog].graduationTimes)
           const progMean = getMean(programmes[level][year][prog].graduationTimes)
-          const progStatistics = countTimeCategories(programmes[level][year][prog].graduationTimes, goals[level])
+
+          let goal = goals[level]
+          if (faculty === 'H30' && Object.keys(goals.exceptions).includes(prog)) {
+            goal += goals.exceptions[prog]
+          }
+
+          const progStatistics = countTimeCategories(programmes[level][year][prog].graduationTimes, goal)
+          Object.keys(progStatistics).forEach(key => (statistics[key] += progStatistics[key]))
 
           data.programmes.medians[level][year].programmes = [...data.programmes.medians[level][year].programmes, prog]
           data.programmes.medians[level][year].data = [
             ...data.programmes.medians[level][year].data,
-            { y: progMedian, amount: programmes[level][year][prog].graduationAmounts, statistics: progStatistics },
+            {
+              y: progMedian,
+              amount: programmes[level][year][prog].graduationAmounts,
+              statistics: progStatistics,
+            },
           ]
 
           data.programmes.means[level][year].programmes = [...data.programmes.means[level][year].programmes, prog]
@@ -270,6 +282,8 @@ const count = async (faculty, since, years, yearsList, levels, programmeFilter, 
           ]
         }
       }
+      data.medians[level] = [...data.medians[level], { y: median, amount: graduationAmounts[level][year], statistics }]
+      data.means[level] = [...data.means[level], { y: mean, amount: graduationAmounts[level][year], statistics }]
     })
   })
 

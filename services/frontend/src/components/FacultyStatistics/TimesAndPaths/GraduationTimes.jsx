@@ -16,6 +16,7 @@ const GraduationTimes = ({
   showMeanTime,
   classSizes,
   groupBy,
+  goalExceptions,
 }) => {
   const [programmeData, setProgrammeData] = useState(false)
   const [year, setYear] = useState(null)
@@ -43,6 +44,14 @@ const GraduationTimes = ({
             <Message compact>
               Programme class sizes for recent years are not reliable as students might still lack relevant master
               studies data in Sisu
+            </Message>
+          </div>
+        )}
+        {goalExceptions.needed && ['master', 'bcMsCombo'].includes(level) && (
+          <div className="graduations-message">
+            <Message compact>
+              <b>Different goal times</b> have been taken into account in all numbers and programme level bar coloring,
+              but the faculty level bar color is based on the typical goal time of {goal} months
             </Message>
           </div>
         )}
@@ -75,6 +84,7 @@ const GraduationTimes = ({
               showMeanTime={showMeanTime}
               classSizes={classSizes?.programmes}
               level={level}
+              goalExceptions={goalExceptions}
             />
           )}
         </div>
