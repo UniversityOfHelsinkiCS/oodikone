@@ -350,7 +350,7 @@ const countGraduationTimes = async (faculty, programmeFilter) => {
   classSizes['programmes'] = {}
   await getClassSizes(faculty, since, classSizes, programmeFilter, years)
 
-  return { years, goals, byGradYear, byStartYear, programmeNames, classSizes }
+  return { id: faculty, years, goals, byGradYear, byStartYear, programmeNames, classSizes }
 }
 
 module.exports = { countGraduationTimes }

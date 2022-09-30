@@ -18,6 +18,8 @@ const {
   setCreditStats,
   getThesisWritersStats,
   setThesisWritersStats,
+  getGraduationStats,
+  setGraduationStats,
 } = require('../services/faculty/facultyService')
 const logger = require('../util/logger')
 
@@ -123,11 +125,15 @@ router.get('/:id/graduationtimes', async (req, res) => {
   const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
-
-  // const programmes = await getProgrammes(code, programmeFilter)
-  const result = await countGraduationTimes(code, programmeFilter)
-  // currently counts all programmes
-  return res.json(result)
+  const data = await getGraduationStats(code, programmeFilter)
+  if (data) {
+    return res.json(data)
+  }
+  let updatedStats = await countGraduationTimes(code, programmeFilter)
+  if (updatedStats) {
+    updatedStats = await setGraduationStats(updatedStats, programmeFilter)
+  }
+  return res.json(updatedStats)
 })
 
 router.get('/:id/progressstats', async (req, res) => {
