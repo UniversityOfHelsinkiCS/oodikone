@@ -10,6 +10,10 @@ const createRedisKeyForCreditStats = (id, yearType, programmeFilter, specialGrou
 //  `FACULTY_GRADUATION_TIME_STATS_${id}_${mode}__${programmeFilter}`
 const createRedisKeyForThesiswriters = (id, yearType, programmeFilter, specialGroups) =>
   `FACULTY_THESIS_WRITERS_STATS_${id}_${yearType}_${programmeFilter}_${specialGroups}`
+const createRediskeyForFacultyProgress = (id, special_groups, graduated) =>
+  `FACULTY_PROGRESS_STATS_${id}_${special_groups}_${graduated}`
+const createRediskeyForFacultyStudents = (id, special_groups, graduated) =>
+  `FACULTY_STUDENTS_STATS_${id}_${special_groups}_${graduated}`
 
 const setFacultyProgrammes = async (id, data, programmeFilter) => {
   const redisKey = createRedisKeyForFacultyProgrammes(id, programmeFilter)
@@ -89,6 +93,46 @@ const getThesisWritersStats = async (id, yearType, programmeFilter, specialGroup
   return JSON.parse(dataFromRedis)
 }
 
+const getFacultyProgressStats = async (id, specialGroups, graduated) => {
+  const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
+}
+
+const setFacultyProgressStats = async (data, specialGroups, graduated) => {
+  const { id } = data
+  const redisKey = createRediskeyForFacultyProgress(id, specialGroups, graduated)
+  const dataToRedis = {
+    ...data,
+    status: 'DONE',
+    lastUpdated: moment().format(),
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
+  return dataToRedis
+}
+
+const getFacultyStudentStats = async (id, specialGroups, graduated) => {
+  const redisKey = createRediskeyForFacultyStudents(id, specialGroups, graduated)
+  const dataFromRedis = await redisClient.getAsync(redisKey)
+  if (!dataFromRedis) return null
+  return JSON.parse(dataFromRedis)
+}
+
+const setFacultyStudentStats = async (data, specialGroups, graduated) => {
+  const { id } = data
+  const redisKey = createRediskeyForFacultyStudents(id, specialGroups, graduated)
+  const dataToRedis = {
+    ...data,
+    status: 'DONE',
+    lastUpdated: moment().format(),
+  }
+  const setOperationStatus = await redisClient.setAsync(redisKey, JSON.stringify(dataToRedis))
+  if (setOperationStatus !== 'OK') return null
+  return dataToRedis
+}
+
 module.exports = {
   setFacultyProgrammes,
   getFacultyProgrammes,
@@ -98,4 +142,8 @@ module.exports = {
   getCreditStats,
   setThesisWritersStats,
   getThesisWritersStats,
+  getFacultyProgressStats,
+  setFacultyProgressStats,
+  getFacultyStudentStats,
+  setFacultyStudentStats,
 }

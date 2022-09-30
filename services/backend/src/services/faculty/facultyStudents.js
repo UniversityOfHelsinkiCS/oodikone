@@ -45,7 +45,7 @@ const getFacultyDataForYear = async ({ programmes, since, settings, year, years,
     allMale: 0,
   }
 
-  for (const programme of programmes.data) {
+  for (const programme of programmes) {
     const studentnumbers = await getCorrectStudentnumbers({
       codes: [programme.code],
       startDate,
@@ -106,7 +106,7 @@ const getFacultyDataForYear = async ({ programmes, since, settings, year, years,
 }
 
 // Combines all the data for faculty students table
-const getFacultyStudents = async (code, programmes, specialGroups, graduated) => {
+const combineFacultyStudents = async (code, programmes, specialGroups, graduated) => {
   // Only academic years are considered
   const isAcademicYear = true
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
@@ -149,9 +149,9 @@ const getFacultyStudents = async (code, programmes, specialGroups, graduated) =>
     facultyTableStats: facultyTableStats,
     programmeStats: programmeTableStats,
     titles: tableTitles['studytracks'],
-    programmeNames: programmes.data.reduce((obj, dataItem) => ({ ...obj, [dataItem.code]: dataItem.name }), {}),
+    programmeNames: programmes.reduce((obj, dataItem) => ({ ...obj, [dataItem.code]: dataItem.name }), {}),
   }
   return studentsData
 }
 
-module.exports = { getFacultyStudents }
+module.exports = { combineFacultyStudents }

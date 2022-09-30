@@ -6,7 +6,7 @@ const { getAllProgrammes } = require('./services/studyrights')
 const { updateBasicView, updateStudytrackView } = require('./services/studyprogrammeUpdates')
 const { findAndSaveTeachers } = require('./services/topteachers')
 const { faculties } = require('./services/organisations')
-const { updateFacultyOverview } = require('./services/faculty/facultyUpdates')
+const { updateFacultyOverview, updateFacultyProgressOverview } = require('./services/faculty/facultyUpdates')
 const { isProduction } = require('./conf-backend')
 const { getCurrentSemester } = require('./services/semesters')
 const logger = require('./util/logger')
@@ -26,6 +26,7 @@ const refreshFaculties = async () => {
   for (const faculty of facultyList) {
     try {
       await updateFacultyOverview(faculty.code, 'ALL')
+      await updateFacultyProgressOverview(faculty.code)
       ready += 1
     } catch (e) {
       logger.error({ message: `Failed to update stats for faculty ${faculty?.code} with type ALL`, meta: e })

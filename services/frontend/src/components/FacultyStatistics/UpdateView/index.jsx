@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Button, Icon, Loader } from 'semantic-ui-react'
-import { useUpdateFacultyBasicViewQuery } from '../../../redux/facultyStats'
+import { useUpdateFacultyBasicViewQuery, useUpdateFacultyProgressViewQuery } from '../../../redux/facultyStats'
 
 const getStatusIcon = stats => {
   if (stats.isLoading) return <Loader active />
@@ -13,6 +13,7 @@ const UpdateView = ({ faculty }) => {
   const [skipBasic, setSkipBasic] = useState(true)
   const [skipCredits, setSkipCredits] = useState(true)
   const [skipThesis, setSkipThesis] = useState(true)
+  const [skipProgressTab, setSkipProgressTab] = useState(true)
   const basicBasicTabStats = useUpdateFacultyBasicViewQuery({ id: faculty, statsType: 'STUDENT' }, { skip: skipBasic })
 
   const creditsBasicTabStats = useUpdateFacultyBasicViewQuery(
@@ -20,11 +21,11 @@ const UpdateView = ({ faculty }) => {
     { skip: skipCredits }
   )
   const thesisBasicTabStats = useUpdateFacultyBasicViewQuery({ id: faculty, statsType: 'THESIS' }, { skip: skipThesis })
-
+  const progressViewStats = useUpdateFacultyProgressViewQuery({ id: faculty }, { skip: skipProgressTab })
   return (
     <div className="update-view">
       <div className="button-container">
-        <h3>Update data</h3>
+        <h3>Update data in Basic information -tab</h3>
         <p>
           <i>(For large faculties updates can take a couple of minutes)</i>
         </p>
@@ -43,6 +44,11 @@ const UpdateView = ({ faculty }) => {
           Update
         </Button>
         {getStatusIcon(thesisBasicTabStats)}
+        <h3>Update data in Progress and student populations -tab</h3>
+        <Button disabled={progressViewStats.isLoading} color="blue" onClick={() => setSkipProgressTab(false)}>
+          Update
+        </Button>
+        {getStatusIcon(progressViewStats)}
       </div>
     </div>
   )

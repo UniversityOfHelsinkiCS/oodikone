@@ -3,7 +3,16 @@ const { findFacultyProgrammeCodes } = require('./faculty')
 const { combineFacultyBasics } = require('./facultyBasics')
 const { combineFacultyCredits } = require('./facultyCredits')
 const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
-const { setFacultyProgrammes, setBasicStats, setCreditStats, setThesisWritersStats } = require('./facultyService')
+const {
+  setFacultyProgrammes,
+  setBasicStats,
+  setCreditStats,
+  setThesisWritersStats,
+  setFacultyProgressStats,
+  setFacultyStudentStats,
+} = require('./facultyService')
+const { combineFacultyStudentProgress } = require('./facultyStudentProgress')
+const { combineFacultyStudents } = require('./facultyStudents')
 
 const updateFacultyOverview = async (faculty, statsType) => {
   const calendarNewSpecial = {
@@ -114,4 +123,55 @@ const updateFacultyOverview = async (faculty, statsType) => {
   return 'OK'
 }
 
-module.exports = { updateFacultyOverview }
+const updateFacultyProgressOverview = async faculty => {
+  const specialGraduated = {
+    specialGroups: 'SPECIAL_INCLUDED',
+    graduated: 'GRADUATED_INCLUDED',
+  }
+  const specialNotGraduated = {
+    specialGroups: 'SPECIAL_INCLUDED',
+    graduated: 'GRADUATED_EXCLUDED',
+  }
+  const notSpecialGraduated = {
+    specialGroups: 'SPECIAL_EXCLUDED',
+    graduated: 'GRADUATED_INCLUDED',
+  }
+  const notSpecialNotGraduated = {
+    specialGroups: 'SPECIAL_EXCLUDED',
+    graduated: 'GRADUATED_EXCLUDED',
+  }
+  const options = [specialGraduated, specialNotGraduated, notSpecialGraduated, notSpecialNotGraduated]
+
+  let newProgrammes = []
+  try {
+    const onlyNew = await findFacultyProgrammeCodes(faculty, 'NEW_STUDY_PROGRAMMES')
+    newProgrammes = await setFacultyProgrammes(faculty, onlyNew, 'NEW_STUDY_PROGRAMMES')
+  } catch (e) {
+    logger.error(e)
+  }
+
+  for (const option of options) {
+    const { specialGroups, graduated } = option
+    try {
+      const updateFacultyProgressStats = await combineFacultyStudentProgress(
+        faculty,
+        newProgrammes.data,
+        specialGroups,
+        graduated
+      )
+      await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
+      const updateFacultyStudentStats = await combineFacultyStudents(
+        faculty,
+        newProgrammes.data,
+        specialGroups,
+        graduated
+      )
+      await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
+    } catch (e) {
+      logger.error(e)
+    }
+  }
+  return 'OK'
+}
+
+module.exports = { updateFacultyOverview, updateFacultyProgressOverview }
