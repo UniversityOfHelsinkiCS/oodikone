@@ -5,9 +5,9 @@ const { combineFacultyCredits } = require('../services/faculty/facultyCredits')
 const { findFacultyProgrammeCodes } = require('../services/faculty/faculty')
 const { combineFacultyThesisWriters } = require('../services/faculty/facultyThesisWriters')
 const { countGraduationTimes } = require('../services/faculty/facultyGraduationTimes')
-const { updateFacultyOverview } = require('../services/faculty/facultyUpdates')
-const { getFacultyStudentProgress } = require('../services/faculty/facultyStudentProgress')
-const { getFacultyStudents } = require('../services/faculty/facultyStudents')
+const { updateFacultyOverview, updateFacultyProgressOverview } = require('../services/faculty/facultyUpdates')
+const { combineFacultyStudentProgress } = require('../services/faculty/facultyStudentProgress')
+const { combineFacultyStudents } = require('../services/faculty/facultyStudents')
 
 const {
   getFacultyProgrammes,
@@ -18,6 +18,10 @@ const {
   setCreditStats,
   getThesisWritersStats,
   setThesisWritersStats,
+  getFacultyStudentStats,
+  setFacultyStudentStats,
+  getFacultyProgressStats,
+  setFacultyProgressStats,
 } = require('../services/faculty/facultyService')
 const logger = require('../util/logger')
 
@@ -137,9 +141,15 @@ router.get('/:id/progressstats', async (req, res) => {
   const graduated = req.query?.graduated
 
   if (!code) return res.status(422).end()
+  const data = await getFacultyProgressStats(code, specialGroups, graduated)
+  if (data) return res.json(data)
   const programmes = await getProgrammes(code, programmeFilter)
-  const progressStats = await getFacultyStudentProgress(code, programmes, specialGroups, graduated)
-  return res.json(progressStats)
+  if (!programmes) return res.status(422).end()
+  let updateStats = await combineFacultyStudentProgress(code, programmes.data, specialGroups, graduated)
+  if (updateStats) {
+    updateStats = await setFacultyProgressStats(updateStats, specialGroups, graduated)
+  }
+  return res.json(updateStats)
 })
 
 router.get('/:id/studentstats', async (req, res) => {
@@ -149,9 +159,16 @@ router.get('/:id/studentstats', async (req, res) => {
   const graduated = req.query?.graduated
 
   if (!code) return res.status(422).end()
+
+  const data = await getFacultyStudentStats(code, specialGroups, graduated)
+  if (data) return res.json(data)
   const programmes = await getProgrammes(code, programmeFilter)
-  const studentStats = await getFacultyStudents(code, programmes, specialGroups, graduated)
-  return res.json(studentStats)
+  if (!programmes) return res.status(422).end()
+  let updateStats = await combineFacultyStudents(code, programmes.data, specialGroups, graduated)
+  if (updateStats) {
+    updateStats = await setFacultyStudentStats(updateStats, specialGroups, graduated)
+  }
+  return res.json(updateStats)
 })
 
 router.get('/:id/update_basicview', async (req, res) => {
@@ -163,6 +180,20 @@ router.get('/:id/update_basicview', async (req, res) => {
       result = await updateFacultyOverview(code, statsType)
     } catch (e) {
       logger.error(`Failed to update faculty ${code} basic tab stats for ${statsType}: ${e}`)
+    }
+    return res.json(result)
+  }
+  return res.status(422).end()
+})
+
+router.get('/:id/update_progressview', async (req, res) => {
+  const code = req.params.id
+  if (code) {
+    let result = null
+    try {
+      result = await updateFacultyProgressOverview(code)
+    } catch (e) {
+      logger.error(`Failed to update faculty ${code} progress tab stats: ${e}`)
     }
     return res.json(result)
   }

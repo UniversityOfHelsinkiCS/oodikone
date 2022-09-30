@@ -8,7 +8,7 @@ const getSemester = date => (isSpring(date) ? 'SPRING' : 'FALL')
 
 const semesterStart = {
   SPRING: '01-01',
-  FALL: '07-31',
+  FALL: '08-01',
 }
 
 const semesterEnd = {
