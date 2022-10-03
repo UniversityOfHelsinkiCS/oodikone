@@ -25,12 +25,13 @@ const FacultyStatistics = props => {
   const faculty = faculties && facultyCode && faculties.find(f => f.code === facultyCode)
   const facultyName = faculty && getTextIn(faculty.name, language)
 
-  const { isAdmin } = useGetAuthorizedUserQuery()
+  const { isAdmin, rights, iamRights } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [studyProgrammes, setStudyProgrammes] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduatedGroup, setGraduatedGroup] = useState(false)
+  const hasRequiredRights = rights.length > 0 || iamRights.length > 0 || isAdmin
 
   useEffect(() => {
     if (!facultyName) {
@@ -86,7 +87,7 @@ const FacultyStatistics = props => {
       },
     ]
     // REMEMBER to change cypress test 'Correct tabs are shown', when visibility of
-    // Graduation times and Programmes and student Populations -tabs is changed for facultyStatistic users
+    // Programmes and student Populations -tabs is changed for facultyStatistic users
     if (isAdmin) {
       panes.push({
         menuItem: 'Programmes and student populations',
@@ -98,6 +99,7 @@ const FacultyStatistics = props => {
             setGraduatedGroup={setGraduatedGroup}
             specialGroups={specialGroups}
             setSpecialGroups={setSpecialGroups}
+            hasRequiredRights={hasRequiredRights}
           />
         ),
       })
