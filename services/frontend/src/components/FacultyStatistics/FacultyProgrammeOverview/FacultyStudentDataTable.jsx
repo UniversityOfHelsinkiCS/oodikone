@@ -12,6 +12,7 @@ const FacultyStudentDataTable = ({
   sortedKeys,
   language,
   cypress,
+  hasRequiredRights,
 }) => {
   const [yearsVisible, setVisible] = useState(new Array(years.length).fill(false))
   const [showPercentages, setShowPercentages] = useState(false)
@@ -98,7 +99,9 @@ const FacultyStudentDataTable = ({
                               ? programmeNames[programme][language]
                               : programmeNames[programme].fi}
                           </b>
-                          <PopulationLink studyprogramme={programme} year={year} years={calendarYears} />
+                          {hasRequiredRights && (
+                            <PopulationLink studyprogramme={programme} year={year} years={calendarYears} />
+                          )}
                         </Table.Cell>
                         {programmeStats[programme][year].map((value, valIdx) => {
                           if (
