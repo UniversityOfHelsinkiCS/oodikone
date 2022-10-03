@@ -3,7 +3,14 @@ const { findFacultyProgrammeCodes } = require('./faculty')
 const { combineFacultyBasics } = require('./facultyBasics')
 const { combineFacultyCredits } = require('./facultyCredits')
 const { combineFacultyThesisWriters } = require('./facultyThesisWriters')
-const { setFacultyProgrammes, setBasicStats, setCreditStats, setThesisWritersStats } = require('./facultyService')
+const { countGraduationTimes } = require('./facultyGraduationTimes')
+const {
+  setFacultyProgrammes,
+  setBasicStats,
+  setCreditStats,
+  setThesisWritersStats,
+  setGraduationStats,
+} = require('./facultyService')
 
 const updateFacultyOverview = async (faculty, statsType) => {
   const calendarNewSpecial = {
@@ -110,6 +117,15 @@ const updateFacultyOverview = async (faculty, statsType) => {
     } catch (e) {
       logger.error(e)
     }
+  }
+
+  try {
+    const updatedTimesAll = await countGraduationTimes(faculty, 'ALL_PROGRAMMES')
+    await setGraduationStats(updatedTimesAll, 'ALL_PROGRAMMES')
+    const updatedTimesNew = await countGraduationTimes(faculty, 'NEW_STUDY_PROGRAMMES')
+    await setGraduationStats(updatedTimesNew, 'NEW_STUDY_PROGRAMMES')
+  } catch (e) {
+    logger.error(e)
   }
   return 'OK'
 }
