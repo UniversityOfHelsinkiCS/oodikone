@@ -109,6 +109,7 @@ describe('Population Statistics tests', () => {
       cy.contains('Fetch population').click()
 
       // moar waiting hack
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(10000)
 
       cy.contains('No statistics found for the given query.')
@@ -185,7 +186,7 @@ describe('Population Statistics tests', () => {
       cy.get("[data-cy='credit-stats-tab'] > .menu > :nth-child(2)").click()
 
       cy.get("[data-cy='credit-stats-table-name-header']").should('contain', 'Statistic for n = 170 Students')
-      cy.get("[data-cy='credit-stats-mean']").should('contain', '114.75')
+      cy.get("[data-cy='credit-stats-mean']").should('contain', '114.74')
       cy.get("[data-cy='credit-stats-stdev']").should('contain', '65.53')
       cy.get("[data-cy='credit-stats-min']").should('contain', '5')
       cy.get("[data-cy='credit-stats-max']").should('contain', '314')

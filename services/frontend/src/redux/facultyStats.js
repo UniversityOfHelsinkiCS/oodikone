@@ -32,6 +32,9 @@ const facultystatsApi = RTKApi.injectEndpoints({
     updateFacultyBasicView: builder.query({
       query: ({ id, statsType }) => `/faculties/${id}/update_basicview?stats_type=${statsType}`,
     }),
+    updateFacultyProgressView: builder.query({
+      query: ({ id }) => `/faculties/${id}/update_progressview`,
+    }),
   }),
   overrideExisting: false,
 })
@@ -45,4 +48,5 @@ export const {
   useGetFacultyProgressStatsQuery,
   useGetFacultyStudentStatsQuery,
   useUpdateFacultyBasicViewQuery,
+  useUpdateFacultyProgressViewQuery,
 } = facultystatsApi

@@ -42,7 +42,7 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) =>
   return data
 }
 
-const getFacultyStudentProgress = async (faculty, programmes, specialGroups, graduated) => {
+const combineFacultyStudentProgress = async (faculty, programmes, specialGroups, graduated) => {
   const since = new Date('2017-08-01')
   const isAcademicYear = true
   const includeYearsCombined = true
@@ -73,7 +73,7 @@ const getFacultyStudentProgress = async (faculty, programmes, specialGroups, gra
     doctoralTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0, 0, 0]
   })
 
-  for (const programme of programmes.data) {
+  for (const programme of programmes) {
     let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(programme.code)
     if (!creditThresholdKeys) return
 
@@ -96,7 +96,6 @@ const getFacultyStudentProgress = async (faculty, programmes, specialGroups, gra
           bachelorsProgrammeStats[programme.code] = new Array(reversedYears.length - 1)
         }
         bachelorsTableStats[indexOf(reversedYears, year)][1] += all.length || 0
-
         if (year !== 'Total') {
           bachelorsProgrammeStats[programme.code][indexOf(reversedYears, year)] = creditThresholdKeys.map(
             key => studentData[key]
@@ -187,7 +186,7 @@ const getFacultyStudentProgress = async (faculty, programmes, specialGroups, gra
     bcMsTitles: tableTitles.creditProgress.master,
     mastersTitles: tableTitles.creditProgress.masterOnly,
     doctoralTitles: tableTitles.creditProgress.doctoral,
-    programmeNames: programmes.data.reduce((obj, dataItem) => ({ ...obj, [dataItem.code]: dataItem.name }), {}),
+    programmeNames: programmes.reduce((obj, dataItem) => ({ ...obj, [dataItem.code]: dataItem.name }), {}),
     bachelorsProgrammeStats: bachelorsProgrammeStats,
     bcMsProgrammeStats: bcMsProgrammeStats,
     mastersProgrammeStats: mastersProgrammeStats,
@@ -195,4 +194,4 @@ const getFacultyStudentProgress = async (faculty, programmes, specialGroups, gra
   }
   return facultyProgressStats
 }
-module.exports = { getFacultyStudentProgress }
+module.exports = { combineFacultyStudentProgress }
