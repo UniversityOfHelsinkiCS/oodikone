@@ -94,44 +94,13 @@ export default {
 
   Yläosan valikosta on mahdollista valita tarkasteluun yhden opinto-ohjelman opiskelijat tietylle vuodelle. Sekä opiskelijoiden yleistiedot että edistyminen opintopisteittäin
   kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.`,
-  BachelorsProgress: `
-  Kuvaa tiedekuntaan kuuluvien kandiohjelman opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
+  StudentProgress: `
+  Kuvaa tiedekuntaan kuuluvien eri ohjemien opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
   
-  HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
-
-  Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, erillisopinto-oikeudella opiskelevat ja ohjelmaan siirtyneet.   
-
-  Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.
-  
-  **Total** Kuvaa opiskelijoinden opintopisteiden määrien kertymää alkaen 1.8.2017. Luvut ovat isompia kuin vuosittain lasketut, sillä nyt opiskelijoiden 1.8.2017 alkaen 
-  suoritetut opintopisteet lasketaan mukaan, vaikka ne olisi suoritettu ennen varsinaista opinto-oikeuden alkua.
-  `,
-  BachelorMastersProgress: `
-  Kuvaa tiedekuntaan kuuluvien kandi-maisteriohjelman opinto-oikeudella varustettujen opiskelijoiden etenemistä maisterivaiheessa opintopisteissä mitattuna. Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
-  
-  HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
-
-  Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, erillisopinto-oikeudella opiskelevat ja ohjelmaan siirtyneet.   
-
-  Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.
-  
-  **Total** Kuvaa opiskelijoinden opintopisteiden määrien kertymää alkaen 1.8.2017. Luvut ovat isompia kuin vuosittain lasketut, sillä nyt opiskelijoiden 1.8.2017 alkaen 
-  suoritetut opintopisteet lasketaan mukaan, vaikka ne olisi suoritettu ennen varsinaista opinto-oikeuden alkua.
-  `,
-  MastersProgress: `
-  Kuvaa tiedekuntaan kuuluvien pelkän maisteriohjelman opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2022-2023 aloittaneiden opintopistejakaumaa.
-  
-  HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
-
-  Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, erillisopinto-oikeudella opiskelevat ja ohjelmaan siirtyneet.   
-
-  Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.
-  
-  **Total** Kuvaa opiskelijoinden opintopisteiden määrien kertymää alkaen 1.8.2017. Luvut ovat isompia kuin vuosittain lasketut, sillä nyt opiskelijoiden 1.8.2017 alkaen 
-  suoritetut opintopisteet lasketaan mukaan, vaikka ne olisi suoritettu ennen varsinaista opinto-oikeuden alkua.
-  `,
-  DoctoralProgress: `
-  Kuvaa tiedekuntaan kuuluvien tohtori- ja lisentiaattiohjelman opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2022-2023 aloittaneiden opintopistejakaumaa.
+  - Bachelor: Kandidaatin opinto-oikeudella varustettujen opiskelijoiden eteneminen
+  - Bachelor + Master: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi ohjelmiin siirtyneiden etenenminen
+  - Master: Pelkällä maisterintutkinnon opinto-oikeudella varustettujen opiskelleiden eteneminen 
+  - Doctor: Tohtorin ja lisensiaatin opinto-oikeudella varustettujen opiskelijoiden eteneminen
   
   HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
 

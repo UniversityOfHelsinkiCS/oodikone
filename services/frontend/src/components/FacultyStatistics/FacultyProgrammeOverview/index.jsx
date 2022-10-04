@@ -186,7 +186,7 @@ const FacultyProgrammeOverview = ({
                   />
                 </div>
               </div>
-              {getDivider('Doctor', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+              {getDivider('Doctor and licentiates', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
               <div className="section-container">
                 <div className="graph-container">
                   <FacultyBarChart
