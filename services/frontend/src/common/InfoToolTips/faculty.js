@@ -108,7 +108,7 @@ export default {
 
   Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.
   
-  **Total** Kuvaa opiskelijoinden opintopisteiden määrien kertymää alkaen 1.8.2017. Luvut ovat isompia kuin vuosittain lasketut, sillä nyt opiskelijoiden 1.8.2017 alkaen 
+  **Total** Kuvaa opiskelijoinden opintopisteiden määrien kertymää alkaen 1.8.2017. Luvut ovat isompia kuin vuosittain lasketut, sillä nyt kaikki 1.8.2017 jälkeen 
   suoritetut opintopisteet lasketaan mukaan, vaikka ne olisi suoritettu ennen varsinaista opinto-oikeuden alkua.
   `,
 }
