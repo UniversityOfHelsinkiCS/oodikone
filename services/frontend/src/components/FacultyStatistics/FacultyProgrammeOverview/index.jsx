@@ -28,7 +28,7 @@ const FacultyProgrammeOverview = ({
   setGraduatedGroup,
   specialGroups,
   setSpecialGroups,
-  hasRequiredRights,
+  requiredRights,
 }) => {
   const toolTips = InfotoolTips.Faculty
   const studyProgrammeFilter = 'NEW_STUDY_PROGRAMMES'
@@ -98,7 +98,7 @@ const FacultyProgrammeOverview = ({
                   sortedKeys={sortProgrammeKeys(Object.keys(studentStats?.data.programmeStats))}
                   language={language}
                   cypress="FacultyStudentStatsTable"
-                  hasRequiredRights={hasRequiredRights}
+                  requiredRights={requiredRights}
                 />
               </div>
             </>

@@ -31,8 +31,7 @@ const FacultyStatistics = props => {
   const [studyProgrammes, setStudyProgrammes] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduatedGroup, setGraduatedGroup] = useState(false)
-  const hasRequiredRights = rights.length > 0 || iamRights.length > 0 || isAdmin
-
+  const requiredRights = { rights, iamRights, isAdmin }
   useEffect(() => {
     if (!facultyName) {
       return
@@ -85,7 +84,7 @@ const FacultyStatistics = props => {
             setGraduatedGroup={setGraduatedGroup}
             specialGroups={specialGroups}
             setSpecialGroups={setSpecialGroups}
-            hasRequiredRights={hasRequiredRights}
+            requiredRights={requiredRights}
           />
         ),
       },
