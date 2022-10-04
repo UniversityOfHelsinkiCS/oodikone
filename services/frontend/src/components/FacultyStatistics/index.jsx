@@ -76,20 +76,6 @@ const FacultyStatistics = props => {
         ),
       },
       {
-        menuItem: 'Graduation times',
-        render: () => (
-          <TimesAndPathsView
-            faculty={faculty}
-            studyProgrammes={studyProgrammes}
-            setStudyProgrammes={setStudyProgrammes}
-          />
-        ),
-      },
-    ]
-    // REMEMBER to change cypress test 'Correct tabs are shown', when visibility of
-    // Programmes and student Populations -tabs is changed for facultyStatistic users
-    if (isAdmin) {
-      panes.push({
         menuItem: 'Programmes and student populations',
         render: () => (
           <ProgrammeOverview
@@ -102,8 +88,18 @@ const FacultyStatistics = props => {
             hasRequiredRights={hasRequiredRights}
           />
         ),
-      })
-    }
+      },
+      {
+        menuItem: 'Graduation times',
+        render: () => (
+          <TimesAndPathsView
+            faculty={faculty}
+            studyProgrammes={studyProgrammes}
+            setStudyProgrammes={setStudyProgrammes}
+          />
+        ),
+      },
+    ]
 
     if (isAdmin) {
       panes.push({
