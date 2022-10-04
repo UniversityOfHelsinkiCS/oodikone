@@ -21,7 +21,6 @@ export default ({ students }) => {
 
   const queryYear = useSelector(({ populations }) => populations?.query?.year)
 
-  // FIXME:
   const mandatoryPassed = () => {
     const mandatoryCodes = mandatoryCourses
       .filter(course => course.visible && course.visible.visibility)

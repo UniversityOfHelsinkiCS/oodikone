@@ -17,7 +17,7 @@ const getDivider = (title, toolTipText, content) => (
         {title}
       </Divider>
     </div>
-    <InfoBox content={content} />
+    {content === 'no-infobox' ? null : <InfoBox content={content} />}
   </>
 )
 
@@ -47,7 +47,8 @@ const FacultyProgrammeOverview = ({
     graduated,
   })
 
-  const isFetchingOrLoading = progressStats.isLoading || progressStats.isFetching
+  const isFetchingOrLoading =
+    progressStats.isLoading || progressStats.isFetching || studentStats.isLoading || studentStats.isFetching
 
   const isError =
     progressStats.isError ||
@@ -102,13 +103,15 @@ const FacultyProgrammeOverview = ({
               </div>
             </>
           )}
+
           {progressStats.isSuccess && progressStats.data && (
             <>
               {getDivider(
-                'Progress of bachelor students of the faculty by starting year',
-                'ProgressOfBachelorStudentsOfTheFacultyByStartingYear',
-                toolTips.BachelorsProgress
+                'Progress of students of the faculty ',
+                'BachelorStudentsOfTheFacultyByStartingYear',
+                toolTips.StudentProgress
               )}
+              {getDivider('Bachelor', 'BachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
               <div className="section-container">
                 <div className="graph-container">
                   <FacultyBarChart
@@ -133,15 +136,11 @@ const FacultyProgrammeOverview = ({
                   />
                 </div>
               </div>
-              {getDivider(
-                'Progress of bachelor-master students of the faculty by starting year',
-                'ProgressOfMasterStudentsOfTheFacultyByStartingYear',
-                toolTips.BachelorMastersProgress
-              )}
+              {getDivider('Bachelor + Master', 'ProgressOfBachelorMaster', 'no-infobox')}
               <div className="section-container">
                 <div className="graph-container">
                   <FacultyBarChart
-                    cypress="FacultybachelorMastersProgress"
+                    cypress="FacultyBachelorMastersProgress"
                     data={{
                       id: faculty.code,
                       stats: progressStats?.data.bcMsGraphStats,
@@ -158,15 +157,11 @@ const FacultyProgrammeOverview = ({
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}
-                    cypress="FacultyBachelorsProgressTable"
+                    cypress="FacultyBachelorMasterProgressTable"
                   />
                 </div>
               </div>
-              {getDivider(
-                'Progress of master students of the faculty by starting year',
-                'ProgressOfMasterStudentsOfTheFacultyByStartingYear',
-                toolTips.MastersProgress
-              )}
+              {getDivider('Master', 'MasterStudentsOfTheFacultyByStartingYear', 'no-infobox')}
               <div className="section-container">
                 <div className="graph-container">
                   <FacultyBarChart
@@ -191,11 +186,7 @@ const FacultyProgrammeOverview = ({
                   />
                 </div>
               </div>
-              {getDivider(
-                'Progress of doctoral students of the faculty by starting year',
-                'ProgressOfDoctoralStudentsOfTheFacultyByStartingYear',
-                toolTips.DoctoralProgress
-              )}
+              {getDivider('Doctor', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
               <div className="section-container">
                 <div className="graph-container">
                   <FacultyBarChart

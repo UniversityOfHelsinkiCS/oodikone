@@ -47,8 +47,7 @@ describe('Faculty overview', () => {
     it('Correct tabs are shown', () => {
       cy.get('[data-cy="FacultySegmentContainer"]').should('contain', 'Basic information')
       cy.get('[data-cy="FacultySegmentContainer"]').should('contain', 'Graduation times')
-      // Fix these when access is gained for facultyStatistics users
-      cy.get('[data-cy="FacultySegmentContainer"]').should('not.contain', 'Programmes and student populations')
+      cy.get('[data-cy="FacultySegmentContainer"]').should('contain', 'Programmes and student populations')
       cy.get('[data-cy="FacultySegmentContainer"]').should('not.contain', 'Update statistics')
     })
 
