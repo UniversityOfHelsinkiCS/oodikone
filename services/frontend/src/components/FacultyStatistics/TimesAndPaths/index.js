@@ -11,12 +11,12 @@ import '../faculty.css'
 const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
   const toolTips = InfotoolTips.Faculty
   const [showMeanTime, setShowMeanTime] = useState(false)
-  const [groupByGradYear, setGroupByGradYear] = useState(false)
+  const [groupByStartYear, setGroupByStartYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, studyProgrammeFilter })
 
-  const groupBy = groupByGradYear ? 'byGradYear' : 'byStartYear'
-  const label = groupByGradYear ? 'Graduation year' : 'Start year'
+  const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'
+  const label = groupByStartYear ? 'Start year' : 'Graduation year'
   const data = showMeanTime ? graduationStats?.data?.[groupBy].means : graduationStats?.data?.[groupBy].medians
   const years = graduationStats?.data?.years
   const goals = graduationStats?.data?.goals
@@ -68,10 +68,10 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
               <div className="toggle-container">
                 <Toggle
                   cypress="GroupByToggle"
-                  firstLabel="Group by: Starting year"
-                  secondLabel="Graduation year"
-                  value={groupByGradYear}
-                  setValue={setGroupByGradYear}
+                  firstLabel="Group by: Graduation year"
+                  secondLabel="Starting year"
+                  value={groupByStartYear}
+                  setValue={setGroupByStartYear}
                 />
                 <Toggle
                   cypress="GraduationTimeToggle"
