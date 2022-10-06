@@ -23,7 +23,7 @@ const Header = ({ children, actions, contextItems }) => {
           />
         }
         on="hover"
-        position="bottom"
+        position="bottom left"
       >
         Toggle Fullscreen
       </Popup>
