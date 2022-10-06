@@ -13,11 +13,11 @@ const admissionTypes = [
   null,
 ]
 
-const CreditsGainedTab = ({ allStudents, query }) => {
+const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions }) => {
   const [show, setShow] = useState(false)
   if (!allStudents || !allStudents.length || !query) return null
 
-  const { studyRights } = query
+  const { studyRights, year } = query
 
   const filterFunction = (student, type) =>
     student.studyrights.some(
@@ -26,7 +26,14 @@ const CreditsGainedTab = ({ allStudents, query }) => {
 
   const getCreditsGainedTable = type => {
     const filteredStudents = allStudents.filter(s => filterFunction(s, type))
-    return <CreditsGainedTable type={type || 'Ei valintatapaa'} filteredStudents={filteredStudents} />
+    return (
+      <CreditsGainedTable
+        type={type || 'Ei valintatapaa'}
+        filteredStudents={filteredStudents}
+        year={year}
+        creditDateFilterOptions={creditDateFilterOptions}
+      />
+    )
   }
 
   const admissionTypesAvailable = !allStudents.every(s => filterFunction(s, null))
@@ -35,7 +42,12 @@ const CreditsGainedTab = ({ allStudents, query }) => {
     <Grid>
       <Grid.Row>
         <Grid.Column width={16} data-cy="credits-gained-main-table">
-          <CreditsGainedTable type="All students of the population" filteredStudents={allStudents} />
+          <CreditsGainedTable
+            type="All students of the population"
+            filteredStudents={allStudents}
+            year={year}
+            creditDateFilterOptions={creditDateFilterOptions}
+          />
         </Grid.Column>
       </Grid.Row>
       {admissionTypesAvailable && (

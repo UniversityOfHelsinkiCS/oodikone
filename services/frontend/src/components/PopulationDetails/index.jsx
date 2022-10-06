@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { Accordion } from 'semantic-ui-react'
 import useFilters from 'components/FilterView/useFilters'
 import studyPlanFilter from 'components/FilterView/filters/hops'
+import { creditDateFilter } from 'components/FilterView/filters'
 import { useLocalStorage } from '../../common/hooks'
 import { useGetAuthorizedUserQuery } from '../../redux/auth'
 
@@ -34,6 +35,8 @@ const PopulationDetails = ({
   const creditGainRef = useRef()
   const courseTableRef = useRef()
   const studentTableRef = useRef()
+  const { useFilterSelector } = useFilters()
+  const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
 
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
@@ -121,7 +124,11 @@ const PopulationDetails = ({
       content: {
         content: !query?.years ? (
           <div ref={creditGainRef}>
-            <CreditGainStats query={query} filteredStudents={filteredStudents} />
+            <CreditGainStats
+              query={query}
+              filteredStudents={filteredStudents}
+              creditDateFilterOptions={creditDateFilterOptions}
+            />
           </div>
         ) : (
           <div>This table is omitted when searching population of multiple years</div>

@@ -8,11 +8,15 @@ import CreditDistributionDevelopment from './CreditDistributionDevelopment'
 import infotooltips from '../../../common/InfoToolTips'
 import './creditGainStats.css'
 
-const CreditGainStats = ({ filteredStudents, query }) => {
+const CreditGainStats = ({ filteredStudents, query, creditDateFilterOptions }) => {
   const renderCreditsGainTab = useCallback(() => {
     return (
       <Tab.Pane attached={false}>
-        <CreditsGainedTab allStudents={filteredStudents} query={query} />
+        <CreditsGainedTab
+          allStudents={filteredStudents}
+          query={query}
+          creditDateFilterOptions={creditDateFilterOptions}
+        />
       </Tab.Pane>
     )
   }, [filteredStudents])
