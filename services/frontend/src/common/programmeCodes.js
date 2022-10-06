@@ -130,4 +130,8 @@ export default {
   T923105: 'domast',
   T923106: 'matrena',
   T923107: 'docs',
+  // manually added programs with no IAM, either abolished, or special co-operation programmes
+  MH50_014: 'ech',
+  MH40_013: 'mkk',
+  MH70_010: 'imes',
 }
