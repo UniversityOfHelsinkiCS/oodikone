@@ -179,6 +179,12 @@ const BarChart = ({
           value: goal,
           dashStyle: 'shortDash',
         },
+        {
+          color: '#FEE191',
+          width: 2,
+          value: goal + 12,
+          dashStyle: 'shortDash',
+        },
       ],
     },
     credits: {

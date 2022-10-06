@@ -41,8 +41,9 @@ export default {
   `,
 
   // Graduation times
-  GroupByToggle: `Group by: Starting year: Valmistuneet opiskelijat on jaoteltu opinto-oikeuden alkuvuoden mukaan.\n
-  Graduation year: Valmistuneet opiskelijat on ryhmitelty opintojen valmistumisvuoden perusteella.`,
+  GroupByToggle: `Graduation year: Valmistuneet opiskelijat on ryhmitelty opintojen valmistumisvuoden perusteella.\n
+    Group by: Starting year: Valmistuneet opiskelijat on jaoteltu opinto-oikeuden alkuvuoden mukaan.
+  `,
   AverageGraduationTimes: `
   Opiskelijoiden keskimääräiset valmistumisajat tutkintotasoittain. 
 
@@ -52,8 +53,10 @@ export default {
   - Doctor: Tohtorin tutkinnon suoritusajat
   - Licentiate: Lisensiaatin tutkinnon suoritusajat
 
-  Valmistumisajoista on **vähennetty lakisääteiset poissaolot**. Vihreä katkoviiva kuvastaa tavoiteaikaa. 
-  Vihreä palkki merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
+  Valmistumisajoista on **vähennetty lakisääteiset poissaolot**. 
+
+  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.\n
+  Vihreä **vaakapalkki** merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
   ja punainen yli vuoden tavoiteajan ylitystä.
 
   Palkissa oleva lukumäärä kertoo **montako opiskelijaa** kuhunkin valmistuneiden ryhmään kuuluu. 
@@ -62,11 +65,11 @@ export default {
 
   Säädöt:
 
-  **Starting year**. Ryhmittelee tulokset opiskelijoiden opinto-oikeuden alkamisvuosittain. Näyttää siis vuonna xxxx aloittaneiden opiskelijoiden keskimääräiset valmistumisajat. Luvut voivat elää, koska osa vuonna xxxx 
-  aloittaneiden opiskelijoiden opinnoista voi olla edelleen kesken.
-
   **Graduation year**: Ryhmittelee tulokset valmistumisvuosittain. Näyttää siis vuonna xxxx valmistuneiden opiskelijoiden keskimääräiset valmistumisajat. 
   Luvut ovat lopullisia (kuluva vuosi poislukien), sillä edeltäville vuosille ei tule uusia valmistumisia.
+
+  **Starting year**. Ryhmittelee tulokset opiskelijoiden opinto-oikeuden alkamisvuosittain. Näyttää siis vuonna xxxx aloittaneiden opiskelijoiden keskimääräiset valmistumisajat. Luvut voivat elää, koska osa vuonna xxxx 
+  aloittaneiden opiskelijoiden opinnoista voi olla edelleen kesken.
 
   **Median time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
 
