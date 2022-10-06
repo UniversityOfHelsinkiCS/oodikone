@@ -102,7 +102,7 @@ export default {
   
   - Bachelor: Kandidaatin opinto-oikeudella varustettujen opiskelijoiden eteneminen
   - Bachelor + Master: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi ohjelmiin siirtyneiden etenenminen
-  - Master: Pelkällä maisterintutkinnon opinto-oikeudella varustettujen opiskelleiden eteneminen 
+  - Master: Pelkällä maisterintutkinnon opinto-oikeudella varustettujen opiskelijoiden eteneminen 
   - Doctor: Tohtorin ja lisensiaatin opinto-oikeudella varustettujen opiskelijoiden eteneminen
   
   HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
