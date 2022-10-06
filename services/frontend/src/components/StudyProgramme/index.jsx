@@ -14,6 +14,7 @@ import { getTextIn } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
+import codes from '../../common/programmeCodes'
 
 import { getProgrammes } from '../../redux/populationProgrammes'
 
@@ -145,7 +146,9 @@ const StudyProgramme = props => {
       <Segment className="contentSegment">
         <div align="center" style={{ padding: '30px' }}>
           <Header textAlign="center">{programmeName}</Header>
-          <span>{studyProgrammeId}</span>
+          <span>
+            {codes[studyProgrammeId] ? `${codes[studyProgrammeId].toUpperCase()} - ` : ''} {studyProgrammeId}
+          </span>
         </div>
         <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
       </Segment>

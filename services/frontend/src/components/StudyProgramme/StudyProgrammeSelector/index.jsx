@@ -7,6 +7,7 @@ import { Loader, Message, Header, Form } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 import useLanguage from '../../LanguagePicker/useLanguage'
+import codes from '../../../common/programmeCodes'
 
 const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
   const [filter, setFilter] = useState('')
@@ -35,11 +36,13 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
         if (programme.name[language])
           return (
             programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
-            programme.name[language].toLowerCase().includes(filter.toLocaleLowerCase())
+            programme.name[language].toLowerCase().includes(filter.toLocaleLowerCase()) ||
+            (codes[programme.code] && codes[programme.code].toLowerCase().includes(filter.toLocaleLowerCase()))
           )
         return (
           programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
-          programme.name.fi.toLowerCase().includes(filter.toLocaleLowerCase())
+          programme.name.fi.toLowerCase().includes(filter.toLocaleLowerCase()) ||
+          (codes[programme.code] && codes[programme.code].toLowerCase().includes(filter.toLocaleLowerCase()))
         )
       })
 
@@ -81,6 +84,30 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           to={`/study-programme/${prog.code}`}
         >
           {prog.code}
+        </Link>
+      ),
+      cellProps: {
+        style: {
+          padding: '0',
+        },
+      },
+    },
+    {
+      key: 'programmeId',
+      title: 'id',
+      getRowVal: prog => (codes[prog.code] ? codes[prog.code] : prog.code),
+      getRowContent: prog => (
+        <Link
+          style={{
+            color: 'black',
+            display: 'inline-block',
+            width: '100%',
+            height: '100%',
+            padding: '.78571429em .78571429em',
+          }}
+          to={`/study-programme/${prog.code}`}
+        >
+          {codes[prog.code] ? codes[prog.code].toUpperCase() : ''}
         </Link>
       ),
       cellProps: {
