@@ -87,21 +87,6 @@ describe('Population Statistics', () => {
     })
   })
 
-  it('Programme defaults to "Active Study Right" mode', () => {
-    runTestStepWithPreAndPostParts('Programme', () => {
-      cy.cs('Programme-filter-mode-selector').children().eq(0).should('contain', 'Active Study Right')
-    })
-  })
-
-  it('Programme filter works', () => {
-    runTestStepWithPreAndPostParts('Programme', () => {
-      const card = cy.cs('Programme-filter-card')
-      const programmeDropdown = card.cs('Programme-filter-dropdown').selectFromDropdown(0)
-      checkFilteringResult(5)
-      programmeDropdown.get('i.delete').click()
-    })
-  })
-
   // The test does not work since it tries to filter by "Ravitsemustiede"-studytrack when checking
   // CS Bachelor students. Now that the irrelevant studytracks have been removed, the test fails.
   // So fix this
