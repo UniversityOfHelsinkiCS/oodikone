@@ -23,7 +23,6 @@ import {
   creditDateFilter,
   enrollmentStatusFilter,
   studyTrackFilter,
-  programmeFilter,
   studyrightStatusFilter,
   cherrypickFilter,
   hopsFilter,
@@ -62,7 +61,6 @@ const PopulationStatistics = () => {
       language,
     }),
     studyTrackFilter({ code: programmeCode }),
-    programmeFilter,
     studyrightStatusFilter({ code: programmeCode }),
   ]
 
