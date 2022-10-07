@@ -31,7 +31,7 @@ const CollapsibleCreditRow = ({ min, max, studentCount, filteredLength, months }
         <Table.Cell collapsing>
           <ExternalCreditFilterToggle min={min} max={max} />
         </Table.Cell>
-        <Table.Cell>
+        <Table.Cell key={`${min} ≤ credits`}>
           {max === 0 ? 0 : `${min} ≤ credits`}
           {max > 0 && ` < ${max}`}
           {isCollapsible && <Icon name={isCollapsed ? 'caret down' : 'caret right'} color="grey" />}
