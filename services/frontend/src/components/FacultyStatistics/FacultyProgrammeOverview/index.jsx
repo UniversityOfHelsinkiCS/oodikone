@@ -133,6 +133,7 @@ const FacultyProgrammeOverview = ({
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}
                     cypress="FacultyBachelorsProgressTable"
+                    progressTitles={progressStats?.data.yearlyBachelorTitles}
                   />
                 </div>
               </div>
@@ -158,6 +159,7 @@ const FacultyProgrammeOverview = ({
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}
                     cypress="FacultyBachelorMasterProgressTable"
+                    progressTitles={progressStats?.data.yearlyBcMsTitles}
                   />
                 </div>
               </div>
@@ -183,6 +185,7 @@ const FacultyProgrammeOverview = ({
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}
                     cypress="FacultyBachelorsProgressTable"
+                    progressTitles={progressStats?.data.yearlyMasterTitles}
                   />
                 </div>
               </div>

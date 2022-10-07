@@ -81,15 +81,19 @@ const ProgrammeProgressChart = ({ data, labels, longLabels, names, language }) =
     plotOptions: {
       series: {
         stacking: 'percent',
-        pointWidth: 24,
+        pointWidth: 20,
         dataLabels: {
           enabled: true,
           format: '{point.percentage:.1f}%',
-          fontSize: '24px',
+          color: '#000000',
+          align: 'left',
+          style: {
+            textOutline: 'none',
+          },
           filter: {
-            property: 'y',
+            property: 'percentage',
             operator: '>',
-            value: 2,
+            value: 3,
           },
         },
       },

@@ -77,7 +77,8 @@ const FacultyStudentDataTable = ({
                           </Button>
                         </Table.Cell>
                       )
-                    if (!showPercentages && typeof value === 'string' && value.includes('%')) return null
+                    if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA')))
+                      return null
                     if ([1, 4, 5, 8, 9, 12, 13, 16, 17].includes(valueIdx))
                       return (
                         <Table.Cell style={{ backgroundColor: '#f9f9f9' }} key={`${year}-cell-color-${Math.random()}`}>
