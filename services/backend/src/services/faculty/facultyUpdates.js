@@ -164,13 +164,6 @@ const updateFacultyProgressOverview = async faculty => {
   for (const option of options) {
     const { specialGroups, graduated } = option
     try {
-      const updateFacultyProgressStats = await combineFacultyStudentProgress(
-        faculty,
-        newProgrammes.data,
-        specialGroups,
-        graduated
-      )
-      await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
       const updateFacultyStudentStats = await combineFacultyStudents(
         faculty,
         newProgrammes.data,
@@ -178,6 +171,13 @@ const updateFacultyProgressOverview = async faculty => {
         graduated
       )
       await setFacultyStudentStats(updateFacultyStudentStats, specialGroups, graduated)
+      const updateFacultyProgressStats = await combineFacultyStudentProgress(
+        faculty,
+        newProgrammes.data,
+        specialGroups,
+        graduated
+      )
+      await setFacultyProgressStats(updateFacultyProgressStats, specialGroups, graduated)
     } catch (e) {
       logger.error(e)
     }

@@ -12,11 +12,10 @@ const FacultyProgressTable = ({
   programmeNames,
   language,
   cypress,
+  progressTitles,
 }) => {
   const [visible, setVisible] = useState(progressYearsVisible)
-
   if (!data) return null
-
   const toggleVisibility = yearIndex => {
     const arrayToModify = [...visible]
     arrayToModify[yearIndex] = !visible[yearIndex]
@@ -63,7 +62,7 @@ const FacultyProgressTable = ({
                       longLabels={programmeNames}
                       labels={sortedKeys}
                       language={language}
-                      names={titles?.slice(2)}
+                      names={progressTitles ? progressTitles[yearIndex] : titles?.slice(2)}
                     />
                   </Table.Cell>
                 </Table.Row>

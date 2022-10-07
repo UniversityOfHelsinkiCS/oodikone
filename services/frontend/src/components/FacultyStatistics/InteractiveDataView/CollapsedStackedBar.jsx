@@ -126,9 +126,10 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     plotOptions: {
       series: {
         stacking: 'normal',
-        pointWidth: 24,
+        pointWidth: 20,
         dataLabels: {
           enabled: true,
+          align: 'left',
           formatter() {
             if (Number.isInteger(this.y)) return `${this.y}`
             return `${this.y.toFixed(1)}`
