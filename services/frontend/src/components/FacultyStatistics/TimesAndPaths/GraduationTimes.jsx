@@ -25,7 +25,7 @@ const GraduationTimes = ({
 
   const handleClick = (e, isFacultyGraph) => {
     if (isFacultyGraph) {
-      setYear(e.point.category)
+      setYear(e.point.name)
       setProgrammeData(true)
     } else {
       setProgrammeData(false)
@@ -58,7 +58,7 @@ const GraduationTimes = ({
         <div className="graduations-chart-container">
           <BarChart
             categories={years}
-            data={data}
+            rawData={data}
             goal={goal}
             handleClick={handleClick}
             label={label}
@@ -73,7 +73,7 @@ const GraduationTimes = ({
           ) : (
             <BarChart
               categories={levelProgrammeData[year]?.programmes}
-              data={levelProgrammeData[year]?.data}
+              rawData={levelProgrammeData[year]?.data}
               goal={goal}
               facultyGraph={false}
               handleClick={handleClick}
