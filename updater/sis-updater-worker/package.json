@@ -16,11 +16,11 @@
     "redis-lock": "^0.1.4",
     "sequelize": "^5.22.5",
     "umzug": "^2.3.0",
-    "winston": "^3.6.0",
+    "winston": "^3.8.2",
     "winston-log2gelf": "^2.4.0",
     "winston-sentry-log": "^1.0.26"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.20"
   }
 }
