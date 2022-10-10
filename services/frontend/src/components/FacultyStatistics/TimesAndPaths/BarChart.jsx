@@ -1,9 +1,10 @@
 /* eslint-disable react/no-this-in-sfc */
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
+import codes from '../../../common/programmeCodes'
 
 const BarChart = ({
-  data,
+  rawData,
   categories,
   goal,
   handleClick,
@@ -17,6 +18,16 @@ const BarChart = ({
   level,
   goalExceptions,
 }) => {
+  const data = JSON.parse(JSON.stringify(rawData))
+  for (let i = 0; i < data.length; i++) {
+    if (Object.keys(codes).includes(categories[i])) {
+      data[i].name = codes[categories[i]].toUpperCase()
+    } else {
+      data[i].name = categories[i]
+    }
+    data[i].code = categories[i]
+  }
+
   let modData = null
   if (!facultyGraph && goalExceptions.needed && ['master', 'bcMsCombo'].includes(level)) {
     // change colors for longer medicine goal times
@@ -34,6 +45,22 @@ const BarChart = ({
         modData[i].realGoal = realGoal
       }
     }
+  }
+  const sortData = data => {
+    const check = name => {
+      if (Number.isNaN(Number(name[0]))) return -1
+      return 1
+    }
+    data.sort((a, b) => {
+      if (check(a.name) === check(b.name)) return a.name.localeCompare(b.name)
+      return check(a.name) - check(b.name)
+    })
+  }
+
+  if (modData) {
+    sortData(modData)
+  } else if (!facultyGraph) {
+    sortData(data)
   }
 
   const maxValue = data.reduce((max, { y }) => {
@@ -65,13 +92,11 @@ const BarChart = ({
     return categories.length * t + 100
   }
 
-  const getTooltipText = (category, amount, y, statistics, realGoal) => {
+  const getTooltipText = (name, code, amount, y, statistics, realGoal) => {
     const sortingText =
       label === 'Start year'
-        ? `<b>From class of ${facultyGraph ? category : year}, ${amount}/${getClassSize(
-            category
-          )} students have graduated</b>`
-        : `<b>${amount} students graduated in year ${facultyGraph ? category : year}</b>`
+        ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
+        : `<b>${amount} students graduated in year ${facultyGraph ? name : year}</b>`
     const timeText = `<br /><p>${sortingText}, <br /><b>${
       showMeanTime ? 'mean' : 'median'
     } study time: ${y} months</p></b>`
@@ -82,8 +107,8 @@ const BarChart = ({
     if (!facultyGraph) {
       const goalText = realGoal ? `<br /><p><b>** Exceptional goal time: ${realGoal} months **</b></p>` : ''
       return `<b>${
-        programmeNames[category]?.[language] ? programmeNames[category]?.[language] : programmeNames[category]?.fi
-      }</b><br />${category}${timeText}${statisticsText}${goalText}`
+        programmeNames[code]?.[language] ? programmeNames[code]?.[language] : programmeNames[code]?.fi
+      }</b><br />${code}${timeText}${statisticsText}${goalText}`
     }
     return `${timeText}${statisticsText}`
   }
@@ -101,7 +126,14 @@ const BarChart = ({
       fontSize: '25px',
       // eslint-disable-next-line
       formatter: function() {
-        return getTooltipText(this.x, this.point.amount, this.y, this.point.statistics, this.point?.realGoal)
+        return getTooltipText(
+          this.point.name,
+          this.point.code,
+          this.point.amount,
+          this.y,
+          this.point.statistics,
+          this.point?.realGoal
+        )
       },
     },
     plotOptions: {
@@ -126,7 +158,7 @@ const BarChart = ({
             },
             // eslint-disable-next-line
             formatter: function () {
-              return getDataLabel(this.point.amount, this.x)
+              return getDataLabel(this.point.amount, this.point.code ? this.point.code : this.point.name)
             },
           },
         ],
@@ -154,7 +186,7 @@ const BarChart = ({
       },
     ],
     xAxis: {
-      categories,
+      type: 'category',
       title: {
         text: facultyGraph ? label : 'Programme',
         align: 'high',
