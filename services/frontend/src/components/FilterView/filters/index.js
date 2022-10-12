@@ -13,7 +13,7 @@ import date from './date'
 import enrollmentStatus from './enrollmentStatus'
 import studyTrack from './studyTrack'
 import studyrightStatus from './studyrightStatus'
-import cherrypick from './cherrypick'
+import studentNumber from './studentNumber'
 import hops from './hops'
 
 export const genderFilter = gender
@@ -31,5 +31,5 @@ export const creditDateFilter = date
 export const enrollmentStatusFilter = enrollmentStatus
 export const studyTrackFilter = studyTrack
 export const studyrightStatusFilter = studyrightStatus
-export const cherrypickFilter = cherrypick
+export const studentNumberFilter = studentNumber
 export const hopsFilter = hops
