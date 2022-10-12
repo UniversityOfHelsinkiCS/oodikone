@@ -21,6 +21,6 @@ export default {
   studentNumber: {
     label: null,
     short:
-      'Rajaa yksittäisiä opiskelijoita pois tilastoista (blocklist) tai näytä vain määritellyt opiskelijat (allowlist). Vain täsmälliset opiskelijanumerot toimivat.',
+      '(ent. cherry-picker) Rajaa yksittäisiä opiskelijoita pois tilastoista (blocklist) tai näytä vain määritellyt opiskelijat (allowlist). Vain täsmälliset opiskelijanumerot toimivat.',
   },
 }
