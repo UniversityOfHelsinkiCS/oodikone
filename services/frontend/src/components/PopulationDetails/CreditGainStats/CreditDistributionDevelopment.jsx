@@ -7,7 +7,7 @@ import chroma from 'chroma-js'
 import { useLocation } from 'react-router-dom'
 import { useGetSemestersQuery } from 'redux/semesters'
 import useLanguage from 'components/LanguagePicker/useLanguage'
-import { cherrypickFilter } from 'components/FilterView/filters'
+import { studentNumberFilter } from 'components/FilterView/filters'
 import { getMonths } from '../../../common/query'
 import useFilters from '../../FilterView/useFilters'
 
@@ -255,7 +255,7 @@ const CreditDistributionDevelopment = ({ students, query }) => {
         point: {
           events: {
             click(e) {
-              filterDispatch(cherrypickFilter.actions.addToAllowlist(e.point.custom.students))
+              filterDispatch(studentNumberFilter.actions.addToAllowlist(e.point.custom.students))
             },
           },
         },

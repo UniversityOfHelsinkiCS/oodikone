@@ -18,7 +18,7 @@ export default {
     label: null,
     short: 'Rajaa kurssisuorituksia tietyn ajanjakson mukaan. Tämä rajaus ei muuta opiskelijoiden määrää',
   },
-  cherrypicker: {
+  studentNumber: {
     label: null,
     short:
       'Rajaa yksittäisiä opiskelijoita pois tilastoista (blocklist) tai näytä vain määritellyt opiskelijat (allowlist). Vain täsmälliset opiskelijanumerot toimivat.',

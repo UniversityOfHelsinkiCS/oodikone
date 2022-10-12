@@ -115,7 +115,7 @@ const EditableList = ({ value, onChange, renderLabel }) => {
   )
 }
 
-const CherryPickFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
+const StudentNumberFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
   const students = withoutSelf()
 
   const swapLists = () => {
@@ -177,16 +177,16 @@ const CherryPickFilterCard = ({ options, onOptionsChange, withoutSelf }) => {
 }
 
 export default createFilter({
-  key: 'CherryPick',
+  key: 'studentNumber',
 
-  title: 'Cherry-picker',
+  title: 'Student number',
 
   defaultOptions: {
     allowlist: [],
     blocklist: [],
   },
 
-  info: filterInfo.cherrypicker,
+  info: filterInfo.studentNumber,
 
   isActive: ({ allowlist, blocklist }) => allowlist.length > 0 || blocklist.length > 0,
 
@@ -198,7 +198,7 @@ export default createFilter({
     )
   },
 
-  render: props => <CherryPickFilterCard {...props} />,
+  render: props => <StudentNumberFilterCard {...props} />,
 
   actions: {
     addToAllowlist: (options, students) => {

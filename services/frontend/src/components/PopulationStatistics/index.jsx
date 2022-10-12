@@ -24,7 +24,7 @@ import {
   enrollmentStatusFilter,
   studyTrackFilter,
   studyrightStatusFilter,
-  cherrypickFilter,
+  studentNumberFilter,
   hopsFilter,
 } from '../FilterView/filters'
 
@@ -45,7 +45,7 @@ const PopulationStatistics = () => {
   const programmeCode = query?.studyRights?.programme
 
   const filters = [
-    cherrypickFilter,
+    studentNumberFilter,
     hopsFilter({ programmeCode }),
     genderFilter,
     ageFilter,
