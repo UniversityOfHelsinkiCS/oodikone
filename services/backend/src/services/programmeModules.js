@@ -38,8 +38,14 @@ const byProgrammeCode = async code => {
     },
   })
 
+  // filter out possible duplicates
+  const filtered = result.filter(
+    (course, index, array) =>
+      array.findIndex(c => c.id == course.id && c.code == course.code && c.label_code == course.label_code) == index
+  )
+
   // this labels the modules to match the old system in frontend
-  const labeled = result.map(module => {
+  const labeled = filtered.map(module => {
     const label = {
       id: module.label_name.fi,
       label: `${module.label_code}\n${module.label_name.fi}`,
