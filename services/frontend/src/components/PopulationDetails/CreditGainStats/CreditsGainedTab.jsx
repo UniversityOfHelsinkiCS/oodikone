@@ -43,7 +43,7 @@ const CreditsGainedTab = ({ allStudents, query, creditDateFilterOptions }) => {
       <Grid.Row>
         <Grid.Column width={16} data-cy="credits-gained-main-table">
           <CreditsGainedTable
-            type="All students of the population"
+            type="All students of the class"
             filteredStudents={allStudents}
             year={year}
             creditDateFilterOptions={creditDateFilterOptions}
