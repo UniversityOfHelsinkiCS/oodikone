@@ -14,7 +14,6 @@ import { getTextIn } from '../../common'
 import { useTabs, useTitle } from '../../common/hooks'
 import TSA from '../../common/tsa'
 import Tags from './Tags'
-import codes from '../../common/programmeCodes'
 
 import { getProgrammes } from '../../redux/populationProgrammes'
 
@@ -113,6 +112,7 @@ const StudyProgramme = props => {
   const { match } = props
   const { studyProgrammeId } = match.params
   const programmeName = programmes?.[studyProgrammeId] && getTextIn(programmes?.[studyProgrammeId].name, language)
+  const programmeLetterId = programmes?.[studyProgrammeId]?.progId
   const panes = getPanes()
 
   useEffect(() => {
@@ -147,7 +147,7 @@ const StudyProgramme = props => {
         <div align="center" style={{ padding: '30px' }}>
           <Header textAlign="center">{programmeName}</Header>
           <span>
-            {codes[studyProgrammeId] ? `${codes[studyProgrammeId].toUpperCase()} - ` : ''} {studyProgrammeId}
+            {programmeLetterId ? `${programmeLetterId} - ` : ''} {studyProgrammeId}
           </span>
         </div>
         <Tab panes={panes} activeIndex={tab} onTabChange={setTab} />
