@@ -470,6 +470,13 @@ const mapCodesToIds = data => {
   }
 }
 
+const getId = code => {
+  if (Object.keys(codes).includes(code)) {
+    return codes[code].toUpperCase()
+  }
+  return ''
+}
+
 module.exports = {
   getCorrectStudentnumbers,
   formatStudyright,
@@ -500,4 +507,5 @@ module.exports = {
   getOnlyMasterThresholds,
   isNonMajorCredit,
   mapCodesToIds,
+  getId,
 }
