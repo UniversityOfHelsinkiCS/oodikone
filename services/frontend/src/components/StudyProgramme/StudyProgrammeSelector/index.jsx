@@ -7,7 +7,6 @@ import { Loader, Message, Header, Form } from 'semantic-ui-react'
 import { getTextIn } from '../../../common'
 import SortableTable from '../../SortableTable'
 import useLanguage from '../../LanguagePicker/useLanguage'
-import codes from '../../../common/programmeCodes'
 
 const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
   const [filter, setFilter] = useState('')
@@ -37,12 +36,12 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           return (
             programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
             programme.name[language].toLowerCase().includes(filter.toLocaleLowerCase()) ||
-            (codes[programme.code] && codes[programme.code].toLowerCase().includes(filter.toLocaleLowerCase()))
+            (programme.progId && programme.progId.toLowerCase().includes(filter.toLocaleLowerCase()))
           )
         return (
           programme.code.toLowerCase().includes(filter.toLocaleLowerCase()) ||
           programme.name.fi.toLowerCase().includes(filter.toLocaleLowerCase()) ||
-          (codes[programme.code] && codes[programme.code].toLowerCase().includes(filter.toLocaleLowerCase()))
+          (programme.progId && programme.progId.toLowerCase().includes(filter.toLocaleLowerCase()))
         )
       })
 
@@ -95,7 +94,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
     {
       key: 'programmeId',
       title: 'id',
-      getRowVal: prog => (codes[prog.code] ? codes[prog.code] : prog.code),
+      getRowVal: prog => prog.progId ?? `${prog.code}-id`,
       getRowContent: prog => (
         <Link
           style={{
@@ -107,7 +106,7 @@ const StudyProgrammeSelector = ({ studyprogrammes, selected }) => {
           }}
           to={`/study-programme/${prog.code}`}
         >
-          {codes[prog.code] ? codes[prog.code].toUpperCase() : ''}
+          {prog.progId ?? ''}
         </Link>
       ),
       cellProps: {
