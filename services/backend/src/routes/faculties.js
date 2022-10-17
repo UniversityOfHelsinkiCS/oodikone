@@ -18,7 +18,7 @@ const {
   setCreditStats,
   getThesisWritersStats,
   setThesisWritersStats,
-  //getGraduationStats,
+  getGraduationStats,
   setGraduationStats,
   getFacultyStudentStats,
   setFacultyStudentStats,
@@ -129,10 +129,10 @@ router.get('/:id/graduationtimes', async (req, res) => {
   const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
-  // const data = await getGraduationStats(code, programmeFilter)
-  // if (data) {
-  //   return res.json(data)
-  // }
+  const data = await getGraduationStats(code, programmeFilter)
+  if (data) {
+    return res.json(data)
+  }
   let updatedStats = await countGraduationTimes(code, programmeFilter)
   if (updatedStats) {
     updatedStats = await setGraduationStats(updatedStats, programmeFilter)
