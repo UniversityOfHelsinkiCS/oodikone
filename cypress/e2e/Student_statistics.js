@@ -93,7 +93,7 @@ describe('Student Statistics tests', () => {
     cy.get('.prompt').type(student.studentnumber)
     cy.contains('td a', student.studentnumber).click()
     cy.get('i.level.up.alternate.icon').eq(0).click()
-    cy.contains('Population statistics')
+    cy.contains('Class statistics')
     cy.contains('Tietojenkäsittelytieteen kandiohjelma')
   })
 })
