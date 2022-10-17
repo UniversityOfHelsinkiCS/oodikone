@@ -38,7 +38,7 @@ const PopulationStatistics = () => {
     populationToData.makePopulationsToData
   )
 
-  useTitle('Population statistics')
+  useTitle('Class statistics')
 
   const { data: allSemesters } = useGetSemestersQuery()
 
@@ -109,7 +109,7 @@ const PopulationStatistics = () => {
       {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header className="segmentTitle" size="large">
-            Population statistics
+            Class statistics
           </Header>
           <Segment className="contentSegment">
             <PopulationSearch history={history} location={location} />
