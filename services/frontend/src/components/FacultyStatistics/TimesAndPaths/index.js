@@ -18,7 +18,6 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
   const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'
   const label = groupByStartYear ? 'Start year' : 'Graduation year'
   const data = showMeanTime ? graduationStats?.data?.[groupBy].means : graduationStats?.data?.[groupBy].medians
-  const years = graduationStats?.data?.years
   const goals = graduationStats?.data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty?.code === 'H30' }
   const programmeData = showMeanTime
@@ -26,7 +25,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
     : graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { years, label, programmeNames, showMeanTime, classSizes, goalExceptions }
+  const commonProps = { label, programmeNames, showMeanTime, classSizes, goalExceptions }
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 

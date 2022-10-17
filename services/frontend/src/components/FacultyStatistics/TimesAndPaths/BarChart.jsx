@@ -1,11 +1,9 @@
 /* eslint-disable react/no-this-in-sfc */
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
-import codes from '../../../common/programmeCodes'
 
 const BarChart = ({
-  rawData,
-  categories,
+  data,
   goal,
   handleClick,
   facultyGraph = true,
@@ -18,23 +16,13 @@ const BarChart = ({
   level,
   goalExceptions,
 }) => {
-  const data = JSON.parse(JSON.stringify(rawData))
-  for (let i = 0; i < data.length; i++) {
-    if (Object.keys(codes).includes(categories[i])) {
-      data[i].name = codes[categories[i]].toUpperCase()
-    } else {
-      data[i].name = categories[i]
-    }
-    data[i].code = categories[i]
-  }
-
   let modData = null
   if (!facultyGraph && goalExceptions.needed && ['master', 'bcMsCombo'].includes(level)) {
     // change colors for longer medicine goal times
     modData = JSON.parse(JSON.stringify(data))
     for (let i = 0; i < modData.length; i++) {
-      if (Object.keys(goalExceptions).includes(categories[i])) {
-        const realGoal = goal + goalExceptions[categories[i]]
+      if (Object.keys(goalExceptions).includes(modData[i].code)) {
+        const realGoal = goal + goalExceptions[modData[i].code]
         if (modData[i].y <= realGoal) {
           modData[i].color = '#90A959'
         } else if (modData[i].y <= realGoal + 12) {
@@ -45,22 +33,6 @@ const BarChart = ({
         modData[i].realGoal = realGoal
       }
     }
-  }
-  const sortData = data => {
-    const check = name => {
-      if (Number.isNaN(Number(name[0]))) return -1
-      return 1
-    }
-    data.sort((a, b) => {
-      if (check(a.name) === check(b.name)) return a.name.localeCompare(b.name)
-      return check(a.name) - check(b.name)
-    })
-  }
-
-  if (modData) {
-    sortData(modData)
-  } else if (!facultyGraph) {
-    sortData(data)
   }
 
   const maxValue = data.reduce((max, { y }) => {
@@ -88,8 +60,8 @@ const BarChart = ({
   }
 
   const getHeight = () => {
-    const t = categories.length > 8 ? 35 : 55
-    return categories.length * t + 100
+    const t = data.length > 8 ? 35 : 55
+    return data.length * t + 100
   }
 
   const getTooltipText = (name, code, amount, y, statistics, realGoal) => {
