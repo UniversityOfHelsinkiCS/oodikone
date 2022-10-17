@@ -21,6 +21,7 @@ const {
   formatOrganization,
   formatAbsence,
   isNewProgramme,
+  mapCodesToIds,
 } = require('./facultyHelpers')
 
 const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
@@ -325,6 +326,8 @@ const findFacultyProgrammeCodes = async (faculty, programmeFilter) => {
   if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
     allProgrammes = allProgrammes.filter(prog => isNewProgramme(prog.code))
   }
+
+  mapCodesToIds(allProgrammes)
 
   return allProgrammes
 }
