@@ -70,7 +70,7 @@ const ProgrammeProgressChart = ({ data, labels, longLabels, names, language }) =
       formatter() {
         let tooltipString = `<b>${
           longLabels[this.x] && longLabels[this.x][language] ? longLabels[this.x][language] : longLabels[this.x].fi
-        }</b><br /><p>${this.x}</p><br />`
+        } </b><br /><p>${this.x} - ${longLabels[this.x]?.code}</p><br />`
         this.points.forEach(point => {
           tooltipString += `<span style="color:${point.color}">●</span> <b>${point.series.name}: ${point.y}</b>
           </span><br />`

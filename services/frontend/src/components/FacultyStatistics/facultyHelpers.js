@@ -1,5 +1,7 @@
 /*
-  Order of the programme keys: KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Numbers
+  Order of the programme keys (such as TKT, PSYK) is chosen by "old" code:
+  KH -> MH -> T -> FI -> K- -> Numbers containing letters at end -> Y- -> Number
+  Take
 */
 const regexValuesAll = [
   /^KH/,
@@ -27,10 +29,13 @@ const testKey = value => {
 
 const sortProgrammeKeys = programmeKeys => {
   return programmeKeys.sort((a, b) => {
-    if (testKey(a) - testKey(b) === 0) {
-      return a.localeCompare(b)
+    if (testKey(a[1]) - testKey(b[1]) === 0 && testKey(a[0]) - testKey(b[0])) {
+      return a[1].localeCompare(b[1])
     }
-    return testKey(a) - testKey(b)
+    if (testKey(a[1]) - testKey(b[1]) === 0) {
+      return a[0].localeCompare(b[0])
+    }
+    return testKey(a[1]) - testKey(b[1])
   })
 }
 

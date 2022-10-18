@@ -53,10 +53,8 @@ router.get('/:id/basicstats', async (req, res) => {
   const specialGroups = req.query?.special_groups
 
   if (!code) return res.status(422).end()
-
   const data = await getBasicStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
-
   const wantedProgrammes = await getProgrammes(code, programmeFilter)
   if (!wantedProgrammes) return res.status(422).end()
 
@@ -90,7 +88,6 @@ router.get('/:id/creditstats', async (req, res) => {
   const programmeFilter = req.query?.programme_filter
 
   if (!code) return res.status(422).end()
-
   const data = await getCreditStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
 
@@ -114,7 +111,6 @@ router.get('/:id/thesisstats', async (req, res) => {
   if (!code) return res.status(422).end()
   const data = await getThesisWritersStats(code, yearType, programmeFilter, specialGroups)
   if (data) return res.json(data)
-
   const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
   let updateStats = await combineFacultyThesisWriters(code, programmes.data, yearType, specialGroups)
@@ -165,7 +161,6 @@ router.get('/:id/studentstats', async (req, res) => {
   const graduated = req.query?.graduated
 
   if (!code) return res.status(422).end()
-
   const data = await getFacultyStudentStats(code, specialGroups, graduated)
   if (data) return res.json(data)
   const programmes = await getProgrammes(code, programmeFilter)
