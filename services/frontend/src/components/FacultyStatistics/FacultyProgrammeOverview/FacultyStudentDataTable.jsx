@@ -94,7 +94,7 @@ const FacultyStudentDataTable = ({
                       <Table.Row className="regular-row" key={`${year}-regular-row-${Math.random()}`}>
                         <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={`${year}-${programme}`}>
                           <b>
-                            {programme}
+                            {programme} - {programmeNames[programme].code}
                             <br />
                             {programmeNames[programme][language]
                               ? programmeNames[programme][language]

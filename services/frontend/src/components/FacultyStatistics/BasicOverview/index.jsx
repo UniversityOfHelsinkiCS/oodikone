@@ -195,7 +195,12 @@ const Overview = ({
                     dataStats={basics?.data?.studentInfo.tableStats}
                     dataProgrammeStats={basics?.data?.studentInfo.programmeTableStats}
                     programmeNames={basics?.data?.programmeNames}
-                    sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.studentInfo.programmeTableStats))}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(basics?.data?.studentInfo.programmeTableStats).map(obj => [
+                        obj,
+                        basics?.data?.programmeNames[obj].code,
+                      ])
+                    ).map(listObj => listObj[0])}
                     titles={basics?.data?.studentInfo.titles}
                     sliceStart={1}
                     language={language}
@@ -231,7 +236,12 @@ const Overview = ({
                     dataStats={credits?.data?.tableStats}
                     dataProgrammeStats={credits?.data?.programmeTableStats}
                     programmeNames={credits?.data?.programmeNames}
-                    sortedKeys={sortProgrammeKeys(Object.keys(credits?.data?.programmeTableStats))}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(credits?.data.programmeTableStats).map(obj => [
+                        obj,
+                        credits?.data?.programmeNames[obj].code,
+                      ])
+                    ).map(listObj => listObj[0])}
                     titles={credits?.data?.titles}
                     extraHeight="EXTRA HEIGHT"
                     sliceStart={2}
@@ -266,7 +276,12 @@ const Overview = ({
                     dataStats={basics?.data?.graduationInfo.tableStats}
                     dataProgrammeStats={basics?.data?.graduationInfo.programmeTableStats}
                     programmeNames={basics?.data?.programmeNames}
-                    sortedKeys={sortProgrammeKeys(Object.keys(basics?.data?.graduationInfo.programmeTableStats))}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(basics?.data?.graduationInfo.programmeTableStats).map(obj => [
+                        obj,
+                        basics?.data?.programmeNames[obj].code,
+                      ])
+                    ).map(listObj => listObj[0])}
                     titles={basics?.data?.graduationInfo.titles}
                     sliceStart={2}
                     language={language}
@@ -299,7 +314,12 @@ const Overview = ({
                     dataStats={thesisWriters?.data.tableStats}
                     dataProgrammeStats={thesisWriters?.data.programmeTableStats}
                     programmeNames={thesisWriters?.data.programmeNames}
-                    sortedKeys={sortProgrammeKeys(Object.keys(thesisWriters?.data.programmeTableStats))}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(thesisWriters?.data.programmeTableStats).map(obj => [
+                        obj,
+                        thesisWriters?.data?.programmeNames[obj].code,
+                      ])
+                    ).map(listObj => listObj[0])}
                     titles={thesisWriters?.data?.titles}
                     sliceStart={2}
                     extraHeight="EXTRA HEIGHT"
