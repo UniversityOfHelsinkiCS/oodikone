@@ -6,7 +6,9 @@ import { useGetSemestersQuery } from 'redux/semesters'
 import populationToData from 'selectors/populationDetails'
 import { getStudentTotalCredits } from 'common'
 import PopulationDetails from '../PopulationDetails'
-import { useLanguage, useTitle } from '../../common/hooks'
+import { useTitle } from '../../common/hooks'
+import useLanguage from '../LanguagePicker/useLanguage'
+import { getTextIn } from '../../common'
 import FilterView from '../FilterView'
 import PopulationSearch from '../PopulationSearch'
 import DataExport from './DataExport'
@@ -30,7 +32,7 @@ import {
 
 const PopulationStatistics = () => {
   const location = useLocation()
-  const language = useLanguage()
+  const { language } = useLanguage()
   const history = useHistory()
   // const { query, queryIsSet, isLoading, students } = useSelector(selectPopulations)
   const courses = useSelector(store => store.populationSelectedStudentCourses.data?.coursestatistics)
@@ -43,6 +45,8 @@ const PopulationStatistics = () => {
   const { data: allSemesters } = useGetSemestersQuery()
 
   const programmeCode = query?.studyRights?.programme
+  const programmes = useSelector(store => store.populationProgrammes?.data?.programmes)
+  const programmeName = programmes && programmeCode ? programmes[programmeCode]?.name : ''
 
   const filters = [
     studentNumberFilter,
@@ -91,6 +95,11 @@ const PopulationStatistics = () => {
     })
   }, [samples, programmeCode])
 
+  const title =
+    location.search === ''
+      ? 'Class statistics'
+      : `${getTextIn(programmeName, language)} ${query?.year} - ${Number(query?.year) + 1}`
+
   return (
     <FilterView
       name="PopulationStatistics"
@@ -108,9 +117,15 @@ const PopulationStatistics = () => {
     >
       {filteredStudents => (
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
-          <Header className="segmentTitle" size="large">
-            Class statistics
+          <Header className="segmentTitle" size="large" align="center">
+            {title}
+            {location.search !== '' && (
+              <Header.Subheader>
+                studytime {query?.months} months, class size {students.length} students
+              </Header.Subheader>
+            )}
           </Header>
+
           <Segment className="contentSegment">
             <PopulationSearch history={history} location={location} />
             {location.search !== '' ? (

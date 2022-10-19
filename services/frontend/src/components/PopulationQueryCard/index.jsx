@@ -10,10 +10,8 @@ import useLanguage from '../LanguagePicker/useLanguage'
 
 const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags }) => {
   const { language } = useLanguage()
-  const { uuid, year, semesters, months, studentStatuses, tag, years } = query
+  const { uuid, year, semesters, months, studentStatuses, tag } = query
   const tagname = tag && tags.length > 0 ? tags.find(t => t.tag_id === tag).tagname : ''
-  const lowestYear = query.years ? Math.min(...query.years.map(year => Number(year))) : null
-  const highestYear = query.years ? Math.max(...query.years.map(year => Number(year))) : null
   const { students } = population
   const header = units.map(u => getTextIn(u.name, language)).join(', ')
   const semesterList = semesters.map(s => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase()).join(', ')
@@ -23,19 +21,10 @@ const PopulationQueryCard = ({ population, query, removeSampleFn, units, tags })
       <>
         <Card className="cardContainer">
           <Card.Header className="cardHeader">
-            <div>{header}</div>
+            <div>Result details</div>
           </Card.Header>
           <Card.Meta>
-            <div className="dateItem">
-              <Icon name="calendar" size="small" />
-              {!years
-                ? `${semesterList} /
-                ${year}-${Number(year) + 1}, showing ${months} months.`
-                : `${semesterList} /
-                started during ${lowestYear}-${highestYear}`}
-            </div>
             {tag ? <div>{`Tagged with: ${tagname}`}</div> : null}
-            <div>Sample size: {students.length} students</div>
             <div>{`Updated at ${reformatDate(minBy(students, 'updatedAt').updatedAt, DISPLAY_DATE_FORMAT)} `}</div>
             <div>{studentStatuses.includes('EXCHANGE') ? 'Includes' : 'Excludes'} exchange students</div>
             <div>
