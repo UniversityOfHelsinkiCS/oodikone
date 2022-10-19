@@ -227,10 +227,10 @@ describe('Population Statistics tests', () => {
 
     it('Population statistics is visible', () => {
       cy.reload()
-      cy.get('.header').within(() => {
-        cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.contains('class size 170 students')
-      })
+
+      cy.contains('Tietojenkäsittelytieteen kandiohjelma')
+      cy.contains('class size 170 students')
+
       cy.get('.card').within(() => {
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
