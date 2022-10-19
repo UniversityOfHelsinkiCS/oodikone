@@ -31,26 +31,24 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
 
       {location.search !== '' && !loading && (
         <Form>
-          <Form.Group inline>
-            <Form.Field>
-              <Link to="/populations">
-                <Button icon labelPosition="left" color="blue">
-                  <Icon name="left arrow" />
-                  Search new class
-                </Button>
-              </Link>
-            </Form.Field>
-            <Form.Field>
-              <Form.Radio
-                toggle
-                checked={onlyHopsCredits}
-                onClick={() => {
-                  filterDispatch(hopsFilter.actions.toggle())
-                }}
-                label="Show only credits included in study plan"
-              />
-            </Form.Field>
-          </Form.Group>
+          <Form.Field>
+            <Link to="/populations">
+              <Button icon labelPosition="left" color="blue">
+                <Icon name="left arrow" />
+                Search new class
+              </Button>
+            </Link>
+          </Form.Field>
+          <Form.Field>
+            <Form.Radio
+              toggle
+              checked={onlyHopsCredits}
+              onClick={() => {
+                filterDispatch(hopsFilter.actions.toggle())
+              }}
+              label="Show only credits included in study plan"
+            />
+          </Form.Field>
 
           <PopulationSearchHistory history={history} />
         </Form>
