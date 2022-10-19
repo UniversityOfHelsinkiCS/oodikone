@@ -58,7 +58,7 @@ describe('Population Statistics tests', () => {
         .contains('Tietojenkäsittelytieteen kandiohjelma')
         .click()
       cy.contains('See class').click()
-      cy.contains('Class statistics')
+      cy.contains('class size')
       cy.contains('Tietojenkäsittelytieteen kandiohjelma')
     })
 
@@ -68,10 +68,11 @@ describe('Population Statistics tests', () => {
       // This advanced settings does not work correctly
       // see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3552
       // setPopStatsUntil('toukokuu 2020')
-
-      cy.get('.card').within(() => {
+      cy.get('.header').within(() => {
         cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.contains('Sample size: 170 students')
+        cy.contains('class size 170 students')
+      })
+      cy.get('.card').within(() => {
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
@@ -226,10 +227,11 @@ describe('Population Statistics tests', () => {
 
     it('Population statistics is visible', () => {
       cy.reload()
-
-      cy.get('.card').within(() => {
+      cy.get('.header').within(() => {
         cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.contains('Sample size: 170 students')
+        cy.contains('class size 170 students')
+      })
+      cy.get('.card').within(() => {
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
