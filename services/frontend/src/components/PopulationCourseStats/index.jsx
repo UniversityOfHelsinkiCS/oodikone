@@ -10,7 +10,6 @@ import './populationCourseStats.css'
 import { PopulationCourseContext } from './PopulationCourseContext'
 import sendEvent from '../../common/sendEvent'
 import GradeDistribution from './GradeDistribution'
-import PassFail from './PassFail'
 import PassFailEnrollments from './PassFailEnrollments'
 import Students from './Students'
 import { getTextIn } from '../../common'
@@ -292,18 +291,6 @@ const PopulationCourseStats = props => {
   const panes = [
     {
       menuItem: 'pass/fail',
-      render: () => (
-        <Tab.Pane className="menuTab">
-          <PassFail
-            expandedGroups={expandedGroups}
-            toggleGroupExpansion={toggleGroupExpansion}
-            onlyIamRights={props.onlyIamRights}
-          />
-        </Tab.Pane>
-      ),
-    },
-    {
-      menuItem: 'pass/fail w/ enrollments ',
       render: () => (
         <Tab.Pane className="menuTab">
           <PassFailEnrollments
