@@ -832,6 +832,9 @@ const SortableTable = ({
       type: 'SET_UNFOLDED_GROUPS',
       payload: { groups },
     })
+    if (toggleGroupExpansion) {
+      toggleGroupExpansion('', false, groups)
+    }
   }, [data])
 
   const handleFoldAllGroups = useCallback(() => {
@@ -839,6 +842,9 @@ const SortableTable = ({
       type: 'SET_UNFOLDED_GROUPS',
       payload: { groups: [] },
     })
+    if (toggleGroupExpansion) {
+      toggleGroupExpansion('', true)
+    }
   }, [data])
 
   const [columns, columnsByKey] = useMemo(() => {

@@ -242,16 +242,24 @@ const PopulationCourseStats = props => {
     setFilterFields({ ...filterFields, [field]: '' })
   }
 
-  const toggleGroupExpansion = code => {
-    const newExpandedGroups = new Set(expandedGroups)
-    if (newExpandedGroups.has(code)) {
-      newExpandedGroups.delete(code)
-      sendAnalytics('Courses of Population collapsed group', code)
+  const toggleGroupExpansion = (code, close = false, all = null) => {
+    if (all) {
+      sendAnalytics('Courses of Population expanded all groups', '')
+      setExpandedGroups(new Set(all))
+    } else if (close) {
+      sendAnalytics('Courses of Population collapsed all groups', '')
+      setExpandedGroups(new Set())
     } else {
-      newExpandedGroups.add(code)
-      sendAnalytics('Courses of Population expanded group', code)
+      const newExpandedGroups = new Set(expandedGroups)
+      if (newExpandedGroups.has(code)) {
+        newExpandedGroups.delete(code)
+        sendAnalytics('Courses of Population collapsed group', code)
+      } else {
+        newExpandedGroups.add(code)
+        sendAnalytics('Courses of Population expanded group', code)
+      }
+      setExpandedGroups(newExpandedGroups)
     }
-    setExpandedGroups(newExpandedGroups)
   }
 
   const getFilterValue = field => (field in filterFields ? filterFields[field] || '' : '')
