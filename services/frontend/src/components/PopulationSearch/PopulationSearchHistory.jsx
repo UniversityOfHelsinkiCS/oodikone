@@ -248,7 +248,7 @@ class PopulationSearchHistory extends Component {
         </Form.Field>
         <Form.Field style={{ marginTop: '15px' }}>
           <Button type="button" onClick={this.pushQueryToUrl}>
-            Fetch population with new settings
+            Fetch class with new settings
           </Button>
         </Form.Field>
       </Form.Group>

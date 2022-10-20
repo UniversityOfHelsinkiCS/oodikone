@@ -45,9 +45,9 @@ const getFacultyDataForYear = async ({ programmes, since, settings, year, years,
     allMale: 0,
   }
 
-  for (const programme of programmes) {
+  for (const { progId, code } of programmes) {
     const studentnumbers = await getCorrectStudentnumbers({
-      codes: [programme.code],
+      codes: [code],
       startDate,
       endDate,
       includeAllSpecials,
@@ -55,23 +55,23 @@ const getFacultyDataForYear = async ({ programmes, since, settings, year, years,
     })
 
     // Get all the studyrights and students for the calculations
-    let all = await allStudyrights(programme.code, studentnumbers)
+    let all = await allStudyrights(code, studentnumbers)
     const students = await studytrackStudents(studentnumbers)
     const studentData = getStudentData(students)
-    const started = await startedStudyrights(programme.code, startDate, studentnumbers)
-    const enrolled = await enrolledStudents(programme.code, startDate, studentnumbers)
-    const absent = await absentStudents(programme.code, studentnumbers)
-    const inactive = await inactiveStudyrights(programme.code, studentnumbers)
-    const graduated = await graduatedStudyRights(programme.code, startDate, studentnumbers)
+    const started = await startedStudyrights(code, startDate, studentnumbers)
+    const enrolled = await enrolledStudents(code, startDate, studentnumbers)
+    const absent = await absentStudents(code, studentnumbers)
+    const inactive = await inactiveStudyrights(code, studentnumbers)
+    const graduated = await graduatedStudyRights(code, startDate, studentnumbers)
 
     // Count stats for the programme
-    if (!(programme.code in programmeTableStats)) {
-      programmeTableStats[programme.code] = years.reduce((resultObj, yearKey) => {
+    if (!(progId in programmeTableStats)) {
+      programmeTableStats[progId] = years.reduce((resultObj, yearKey) => {
         return { ...resultObj, [yearKey]: [] }
       }, {})
     }
 
-    programmeTableStats[programme.code][year] = [
+    programmeTableStats[progId][year] = [
       all.length,
       started.length,
       getPercentage(started.length, all.length),
@@ -149,7 +149,10 @@ const combineFacultyStudents = async (code, programmes, specialGroups, graduated
     facultyTableStats: facultyTableStats,
     programmeStats: programmeTableStats,
     titles: tableTitles['studytracks'],
-    programmeNames: programmes.reduce((obj, dataItem) => ({ ...obj, [dataItem.code]: dataItem.name }), {}),
+    programmeNames: programmes.reduce(
+      (obj, dataItem) => ({ ...obj, [dataItem.progId]: { code: dataItem.code, ...dataItem.name } }),
+      {}
+    ),
   }
   return studentsData
 }

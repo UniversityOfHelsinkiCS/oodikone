@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize')
 const { Op } = Sequelize
+const { codes } = require('../../../config/programmeCodes')
 
 const findRightProgramme = (studyrightElements, mode) => {
   let programme = ''
@@ -123,6 +124,18 @@ const getExtentFilter = includeAllSpecials => {
   return studyrightWhere
 }
 
+const mapCodesToIds = data => {
+  // Add programme id e.g. TKT
+  const keys = Object.keys(codes)
+  for (const prog of data) {
+    if (keys.includes(prog.code)) {
+      prog.progId = codes[prog.code].toUpperCase()
+    } else {
+      prog.progId = prog.code
+    }
+  }
+}
+
 module.exports = {
   findRightProgramme,
   facultyFormatStudyright,
@@ -134,4 +147,5 @@ module.exports = {
   isNewProgramme,
   checkTransfers,
   getExtentFilter,
+  mapCodesToIds,
 }

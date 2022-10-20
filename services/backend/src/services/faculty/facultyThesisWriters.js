@@ -25,7 +25,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
   let programmeCounts = {}
   let programmeNames = {}
 
-  for (const { code, name } of facultyProgrammes) {
+  for (const { progId, code, name } of facultyProgrammes) {
     const provider = mapToProviders([code])[0]
     const students = await getCorrectStudentnumbers({
       codes: [code],
@@ -37,30 +37,30 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
     thesisCourseCodes?.forEach(({ attainment_date, courseUnitType }) => {
       const thesisYear = defineYear(attainment_date, isAcademicYear)
 
-      if (!(code in programmeCounts)) {
-        programmeCounts[code] = {}
+      if (!(progId in programmeCounts)) {
+        programmeCounts[progId] = {}
 
-        Object.keys(bachelors.tableStats).forEach(year => (programmeCounts[code][year] = [0, 0, 0, 0, 0]))
-        programmeNames[code] = name
+        Object.keys(bachelors.tableStats).forEach(year => (programmeCounts[progId][year] = [0, 0, 0, 0, 0]))
+        programmeNames[progId] = { ...name, code: code }
       }
-      programmeCounts[code][thesisYear][0] += 1
+      programmeCounts[progId][thesisYear][0] += 1
 
       if (courseUnitType === thesisTypes[0]) {
         bachelors.graphStats[indexOf(years, thesisYear)] += 1
         bachelors.tableStats[thesisYear] += 1
-        programmeCounts[code][thesisYear][1] += 1
+        programmeCounts[progId][thesisYear][1] += 1
       } else if (courseUnitType === thesisTypes[1]) {
         masters.graphStats[indexOf(years, thesisYear)] += 1
         masters.tableStats[thesisYear] += 1
-        programmeCounts[code][thesisYear][2] += 1
+        programmeCounts[progId][thesisYear][2] += 1
       } else if (courseUnitType === thesisTypes[2]) {
         doctors.graphStats[indexOf(years, thesisYear)] += 1
         doctors.tableStats[thesisYear] += 1
-        programmeCounts[code][thesisYear][3] += 1
+        programmeCounts[progId][thesisYear][3] += 1
       } else if (courseUnitType === thesisTypes[3]) {
         licentiates.graphStats[indexOf(years, thesisYear)] += 1
         licentiates.tableStats[thesisYear] += 1
-        programmeCounts[code][thesisYear][4] += 1
+        programmeCounts[progId][thesisYear][4] += 1
       }
     })
   }
@@ -97,13 +97,13 @@ const getFacultyThesisWritersForStudyTrack = async (
   allThesisWriters.graphStats.push({ name: 'Licentiates', data: licentiates.graphStats })
 
   const programmes = programmeNames ? Object.keys(programmeNames) : facultyProgrammes.map(programme => programme.code)
-  programmes.forEach(programmeCode => {
+  programmes.forEach(programmeId => {
     reversedYears.forEach(year => {
-      if (programmeCounts && programmeCode in programmeCounts) {
-        if (!(programmeCode in allThesisWriters.programmeTableStats)) {
-          allThesisWriters.programmeTableStats[programmeCode] = []
+      if (programmeCounts && programmeId in programmeCounts) {
+        if (!(programmeId in allThesisWriters.programmeTableStats)) {
+          allThesisWriters.programmeTableStats[programmeId] = []
         }
-        allThesisWriters.programmeTableStats[programmeCode].push([year, ...programmeCounts[programmeCode][year]])
+        allThesisWriters.programmeTableStats[programmeId].push([year, ...programmeCounts[programmeId][year]])
       }
     })
   })

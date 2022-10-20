@@ -10,6 +10,7 @@ const CourseService = require('../services/courses')
 const StatMergeService = require('../services/statMerger')
 const { mapToProviders } = require('../util/utils')
 const { encrypt, decrypt } = require('../services/encrypt')
+const { mapCodesToIds } = require('../services/studyprogrammeHelpers')
 
 const { ApplicationError } = require('../util/customErrors')
 
@@ -429,9 +430,11 @@ router.get('/v3/populationstatistics/studyprogrammes', async (req, res) => {
   } = req
   if (roles?.includes('admin')) {
     const studyrights = await StudyrightService.getAssociations()
+    mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   } else {
     const studyrights = await StudyrightService.getFilteredAssociations(rights.concat(iamRights))
+    mapCodesToIds(studyrights.programmes)
     res.json(studyrights)
   }
 })

@@ -15,37 +15,40 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
   const { onProgress, progress } = useProgress(loading)
   const { filterDispatch, useFilterSelector } = useFilters()
 
-  const title = populationFound && history.location.search ? 'Population' : 'Search for population'
+  const title = populationFound && history.location.search ? null : 'Search for class'
   const onlyHopsCredits = useFilterSelector(hopsFilter.selectors.isActive)
 
   return (
     <Segment>
-      <Header size="medium">{title}</Header>
-      {(!populationFound || !history.location.search) && <InfoBox content={infotoolTips.PopulationStatistics.Search} />}
+      {title && <Header size="medium">{title}</Header>}
+      {(!populationFound || !history.location.search) && (
+        <>
+          <InfoBox content={infotoolTips.PopulationStatistics.Search} />
+          <Divider />
+        </>
+      )}
       <PopulationSearchForm onProgress={onProgress} />
-      <Divider />
+
       {location.search !== '' && !loading && (
         <Form>
-          <Form.Group inline>
-            <Form.Field>
-              <Link to="/populations">
-                <Button icon labelPosition="left" color="blue">
-                  <Icon name="left arrow" />
-                  New Population Search
-                </Button>
-              </Link>
-            </Form.Field>
-            <Form.Field>
-              <Form.Radio
-                toggle
-                checked={onlyHopsCredits}
-                onClick={() => {
-                  filterDispatch(hopsFilter.actions.toggle())
-                }}
-                label="Show only credits included in study plan"
-              />
-            </Form.Field>
-          </Form.Group>
+          <Form.Field>
+            <Link to="/populations">
+              <Button icon labelPosition="left" color="blue">
+                <Icon name="left arrow" />
+                Search new class
+              </Button>
+            </Link>
+          </Form.Field>
+          <Form.Field>
+            <Form.Radio
+              toggle
+              checked={onlyHopsCredits}
+              onClick={() => {
+                filterDispatch(hopsFilter.actions.toggle())
+              }}
+              label="Show only credits included in study plan"
+            />
+          </Form.Field>
 
           <PopulationSearchHistory history={history} />
         </Form>

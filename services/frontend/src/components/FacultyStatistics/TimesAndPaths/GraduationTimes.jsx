@@ -6,7 +6,6 @@ import '../faculty.css'
 
 const GraduationTimes = ({
   title,
-  years,
   data,
   level,
   goal,
@@ -57,8 +56,7 @@ const GraduationTimes = ({
         )}
         <div className="graduations-chart-container">
           <BarChart
-            categories={years}
-            rawData={data}
+            data={data}
             goal={goal}
             handleClick={handleClick}
             label={label}
@@ -72,8 +70,7 @@ const GraduationTimes = ({
             </div>
           ) : (
             <BarChart
-              categories={levelProgrammeData[year]?.programmes}
-              rawData={levelProgrammeData[year]?.data}
+              data={levelProgrammeData[year]?.data}
               goal={goal}
               facultyGraph={false}
               handleClick={handleClick}

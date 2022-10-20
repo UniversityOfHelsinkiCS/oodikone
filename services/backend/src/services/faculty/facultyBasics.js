@@ -10,6 +10,7 @@ const {
 } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
 const { findRightProgramme, isNewProgramme, checkTransfers, getExtentFilter } = require('./facultyHelpers')
+const { codes } = require('../../../config/programmeCodes')
 
 const filterDuplicateStudyrights = studyrights => {
   // bachelor+master students have two studyrights (separated by two last digits in studyrightid)
@@ -40,19 +41,18 @@ const addProgramme = async (
   facultyProgrammes,
   includeAllSpecials
 ) => {
-  if (!(programme in stats)) {
-    stats[programme] = {}
+  let { progId, name, code } = facultyProgrammes.filter(prog => prog.code === programme)[0]
+  if (!(progId in stats)) {
+    stats[progId] = {}
     if (includeAllSpecials) {
-      Object.keys(tableStats).forEach(year => (stats[programme][year] = [0, 0, 0]))
+      Object.keys(tableStats).forEach(year => (stats[progId][year] = [0, 0, 0]))
     } else {
-      Object.keys(tableStats).forEach(year => (stats[programme][year] = [0]))
+      Object.keys(tableStats).forEach(year => (stats[progId][year] = [0]))
     }
   }
-  stats[programme][transferYear][index] += 1
-
-  if (!(programme in allBasics.programmeNames)) {
-    const name = facultyProgrammes.filter(prog => prog.code === programme)[0]?.name
-    allBasics.programmeNames[programme] = name
+  stats[progId][transferYear][index] += 1
+  if (!(progId in allBasics.programmeNames)) {
+    allBasics.programmeNames[progId] = { ...name, code: code }
   }
 }
 
@@ -76,6 +76,7 @@ const getFacultyStarters = async (
   const studyrightWhere = getExtentFilter(includeAllSpecials)
   const studyrights = await startedStudyrights(faculty, since, studyrightWhere)
   let filteredStudyrights = filterDuplicateStudyrights(studyrights)
+  const keys = Object.keys(codes)
   const programmeTableStats = {}
   if (!includeAllSpecials) {
     filteredStudyrights = filteredStudyrights.filter(
@@ -85,6 +86,11 @@ const getFacultyStarters = async (
 
   filteredStudyrights.forEach(({ studystartdate, studyrightElements }) => {
     const { programme, programmeName } = findRightProgramme(studyrightElements, 'started')
+    let programmeId = programme
+
+    if (keys.includes(programme)) {
+      programmeId = codes[programme].toUpperCase()
+    }
 
     if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
       const startYear = defineYear(studystartdate, isAcademicYear)
@@ -92,13 +98,13 @@ const getFacultyStarters = async (
       startedGraphStats[indexOf(yearsArray, startYear)] += 1
       startedTableStats[startYear] += 1
 
-      if (!(programme in programmeTableStats)) {
-        programmeTableStats[programme] = { ...tableStats }
+      if (!(programmeId in programmeTableStats)) {
+        programmeTableStats[programmeId] = { ...tableStats }
       }
-      programmeTableStats[programme][startYear] += 1
+      programmeTableStats[programmeId][startYear] += 1
 
-      if (!(programme in allBasics.programmeNames)) {
-        allBasics.programmeNames[programme] = programmeName
+      if (!(programmeId in allBasics.programmeNames)) {
+        allBasics.programmeNames[programmeId] = { ...programmeName, code: programme }
       }
     }
   })
@@ -129,7 +135,7 @@ const getFacultyGraduates = async (
 ) => {
   const graduatedGraphStats = [[...graphStats], [...graphStats], [...graphStats], [...graphStats], [...graphStats]]
   const graduatedTableStats = {}
-
+  const keys = Object.keys(codes)
   let studyrightWhere = getExtentFilter(includeAllSpecials)
   let graduatedRights = await graduatedStudyrights(faculty, since, studyrightWhere)
   const programmeTableStats = {}
@@ -140,40 +146,44 @@ const getFacultyGraduates = async (
       s => !checkTransfers(s, insideTransfersStudyrights, transfersToOrAwayStudyrights)
     )
   }
-
   graduatedRights.forEach(({ enddate, extentcode, studyrightElements }) => {
     const { programme, programmeName } = findRightProgramme(studyrightElements, 'graduated')
+    let programmeId = programme
+
+    if (keys.includes(programme)) {
+      programmeId = codes[programme].toUpperCase()
+    }
     if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
       const endYear = defineYear(enddate, isAcademicYear)
       graduatedGraphStats[0][indexOf(yearsArray, endYear)] += 1
       graduatedTableStats[endYear][0] += 1
 
-      if (!(programme in programmeTableStats)) {
-        programmeTableStats[programme] = {}
-        Object.keys(tableStats).forEach(year => (programmeTableStats[programme][year] = [0, 0, 0, 0, 0]))
+      if (!(programmeId in programmeTableStats)) {
+        programmeTableStats[programmeId] = {}
+        Object.keys(tableStats).forEach(year => (programmeTableStats[programmeId][year] = [0, 0, 0, 0, 0]))
       }
-      programmeTableStats[programme][endYear][0] += 1
+      programmeTableStats[programmeId][endYear][0] += 1
 
       if (extentcode === 1) {
         graduatedGraphStats[1][indexOf(yearsArray, endYear)] += 1
         graduatedTableStats[endYear][1] += 1
-        programmeTableStats[programme][endYear][1] += 1
+        programmeTableStats[programmeId][endYear][1] += 1
       } else if (extentcode === 2) {
         graduatedGraphStats[2][indexOf(yearsArray, endYear)] += 1
         graduatedTableStats[endYear][2] += 1
-        programmeTableStats[programme][endYear][2] += 1
+        programmeTableStats[programmeId][endYear][2] += 1
       } else if (extentcode === 4) {
         graduatedGraphStats[3][indexOf(yearsArray, endYear)] += 1
         graduatedTableStats[endYear][3] += 1
-        programmeTableStats[programme][endYear][3] += 1
+        programmeTableStats[programmeId][endYear][3] += 1
       } else {
         graduatedGraphStats[4][indexOf(yearsArray, endYear)] += 1
         graduatedTableStats[endYear][4] += 1
-        programmeTableStats[programme][endYear][4] += 1
+        programmeTableStats[programmeId][endYear][4] += 1
       }
 
-      if (!(programme in allBasics.programmeNames)) {
-        allBasics.programmeNames[programme] = programmeName
+      if (!(programmeId in allBasics.programmeNames)) {
+        allBasics.programmeNames[programmeId] = { code: programme, ...programmeName }
       }
     }
   })

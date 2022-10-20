@@ -24,8 +24,8 @@ describe('Population Statistics tests', () => {
     })
 
     it('Population statistics search form is usable', () => {
-      cy.contains('See population').should('be.disabled')
-      cy.contains('Search for population')
+      cy.contains('See class').should('be.disabled')
+      cy.contains('Search for class')
       cy.contains('Class of')
         .parent()
         .within(() => {
@@ -47,7 +47,7 @@ describe('Population Statistics tests', () => {
         .children()
         .contains('Tietojenkäsittelytieteen maisteriohjelma')
         .click()
-      cy.contains('See population').should('be.enabled')
+      cy.contains('See class').should('be.enabled')
     })
 
     it('Searching for population really shows population', () => {
@@ -57,8 +57,8 @@ describe('Population Statistics tests', () => {
         .children()
         .contains('Tietojenkäsittelytieteen kandiohjelma')
         .click()
-      cy.contains('See population').click()
-      cy.contains('Population statistics')
+      cy.contains('See class').click()
+      cy.contains('class size')
       cy.contains('Tietojenkäsittelytieteen kandiohjelma')
     })
 
@@ -68,16 +68,17 @@ describe('Population Statistics tests', () => {
       // This advanced settings does not work correctly
       // see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3552
       // setPopStatsUntil('toukokuu 2020')
-
-      cy.get('.card').within(() => {
+      cy.get('.header').within(() => {
         cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.contains('Sample size: 170 students')
+        cy.contains('class size 170 students')
+      })
+      cy.get('.card').within(() => {
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')
       })
       cy.cs('filtered-students')
-      cy.contains('Courses of population').click()
+      cy.contains('Courses of class').click()
 
       cy.intercept('/api/v3/courseyearlystats**').as('coursePage')
       // eslint-disable-next-line cypress/no-unnecessary-waiting
@@ -106,7 +107,7 @@ describe('Population Statistics tests', () => {
       cy.contains('Statistics until')
       // only spring
       cy.cs('toggle-fall').click()
-      cy.contains('Fetch population').click()
+      cy.contains('Fetch class').click()
 
       // moar waiting hack
       // eslint-disable-next-line cypress/no-unnecessary-waiting
@@ -119,14 +120,14 @@ describe('Population Statistics tests', () => {
       cy.cs('toggle-fall').click()
       cy.cs('toggle-spring').click()
 
-      cy.contains('Fetch population').click()
+      cy.contains('Fetch class').click()
 
       cy.contains('Credit accumulation (for 170 students)')
 
       // spring + fall
       cy.get('[data-cy=advanced-toggle]').click()
       cy.cs('toggle-spring').click()
-      cy.contains('Fetch population').click()
+      cy.contains('Fetch class').click()
 
       cy.contains('Credit accumulation (for 170 students)')
     })
@@ -135,7 +136,7 @@ describe('Population Statistics tests', () => {
       cy.selectStudyProgramme('Tietojenkäsittelytieteen kandiohjelma')
       cy.contains('Credit statistics').click()
       cy.contains('Credits Gained').click()
-      cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the population')
+      cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the class')
 
       const months = Math.ceil(moment.duration(moment().diff(moment('2017-08-1'))).asMonths())
 
@@ -227,9 +228,10 @@ describe('Population Statistics tests', () => {
     it('Population statistics is visible', () => {
       cy.reload()
 
+      cy.contains('Tietojenkäsittelytieteen kandiohjelma')
+      cy.contains('class size 170 students')
+
       cy.get('.card').within(() => {
-        cy.contains('Tietojenkäsittelytieteen kandiohjelma')
-        cy.contains('Sample size: 170 students')
         cy.contains('Excludes exchange students')
         cy.contains('Excludes students with non-degree study right')
         cy.contains('Excludes students who have transferred out of this programme')

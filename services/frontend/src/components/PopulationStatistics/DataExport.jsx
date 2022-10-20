@@ -147,7 +147,7 @@ export default ({ students }) => {
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes),
         ...sortedMandatory.reduce((acc, m) => {
-          acc[`${getTextIn(m.name, language)}\n${m.code}`] = hasPassedMandatory(s.studentNumber, m.code, codes)
+          acc[`${getTextIn(m.name, language)} ${m.code}`] = hasPassedMandatory(s.studentNumber, m.code, codes)
           return acc
         }, {}),
       }))

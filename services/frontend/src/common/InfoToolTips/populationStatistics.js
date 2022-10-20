@@ -48,7 +48,7 @@ export default {
 
   **Cumulative**-valinnan ollessa käytössä kunkin opiskelijan kaikki aiemmat opintopisteet lasketaan mukaan opintopistemäärään. Muutoin vain pylvästä vastaavalla aikavälillä kirjatut opintopisteet otetaan huomioon.
   `,
-  CoursesOfPopulation: `**Courses of population**
+  CoursesOfPopulation: `**Courses of class**
 
   Tämä taulukko sisältää näkyvissä olevien opiskelijoiden kaikki kurssisuoritukset.
   
