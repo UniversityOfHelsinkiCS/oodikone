@@ -16,6 +16,7 @@ Student.init(
     creditcount: { type: INTEGER },
     dateofuniversityenrollment: { type: DATE },
     email: { type: STRING },
+    secondary_email: { type: String },
     national_student_number: { type: STRING },
     country_fi: { type: STRING },
     country_sv: { type: STRING },
