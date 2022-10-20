@@ -193,7 +193,7 @@ class PopulationSearchHistory extends Component {
 
         {!populations.query.tag ? (
           <Form.Field style={{ marginTop: '15px' }}>
-            <b>Semesters</b>
+            <b>Starting semesters</b>
             <Form.Checkbox
               className="populationStatisticsRadio"
               key="FALL"
@@ -218,7 +218,8 @@ class PopulationSearchHistory extends Component {
         ) : null}
         <Form.Field style={{ marginTop: '15px' }}>
           <b>Include</b>
-          <Form.Checkbox
+          {/* Hide buggy options for now */}
+          {/* <Form.Checkbox
             className="populationStatisticsRadio"
             key="EXCHANGE"
             label="Exchange students"
@@ -235,7 +236,7 @@ class PopulationSearchHistory extends Component {
             name="studentStatusGroup"
             checked={studentStatuses.includes('NONDEGREE')}
             onChange={this.handleStudentStatusSelection}
-          />
+          /> */}
           <Form.Checkbox
             className="populationStatisticsRadio"
             key="TRANSFERRED"
