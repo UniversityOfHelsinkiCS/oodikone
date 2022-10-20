@@ -1,6 +1,6 @@
 // Map programme codes to "letter indentifier"
 
-export default {
+const codes = {
   KH10_001: 'tuk',
   MH10_001: 'tum',
   KH20_001: 'on',
@@ -135,3 +135,5 @@ export default {
   MH40_013: 'mkk',
   MH70_010: 'imes',
 }
+
+module.exports = { codes }

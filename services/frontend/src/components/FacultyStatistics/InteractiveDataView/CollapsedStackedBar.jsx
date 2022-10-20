@@ -11,13 +11,6 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
   }
 
   const needsExtra = extraHeight === 'EXTRA HEIGHT'
-  const manyProgrammes =
-    labels.includes('KH57_001') ||
-    labels.includes('KH50_001') ||
-    labels.includes('KH70_001') ||
-    labels.includes('KH40_001') ||
-    labels.includes('KH30_001') ||
-    labels.includes('KH80_001')
   const dataTranspose = transpose(data)
     .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))
     .reverse()
@@ -41,11 +34,15 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
   }
 
   // Point width is 24 px different multipliers adjusts the height.
-  const getFlexHeight = (len, needsExtra, manyProgrammes, labels) => {
-    if (labels.includes('KH74_001')) return `${len * 24 * 5}px`
-    if (needsExtra && manyProgrammes) return `${len * 24 * 1.5}px`
-    if (needsExtra) return `${len * 24 * 2.5}px`
-    return `${len * 24 * 1.5}px`
+  const getFlexHeight = (len, needsExtra) => {
+    if (len > 7 && needsExtra) return `${len * 24 * 1.5}px`
+    if (len > 5 && !needsExtra) return `${len * 24 * 1.5}px`
+    if (needsExtra && len <= 2) return `${len * 24 * 6}px`
+    if (needsExtra && len <= 4) return `${len * 24 * 3}px`
+    if (needsExtra) return `${len * 24 * 2}px`
+    if (len <= 2) return `${len * 24 * 5}px`
+    if (len <= 4) return `${len * 24 * 3}px`
+    return `${len * 24}px`
   }
 
   const getColor = change => {
@@ -59,7 +56,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     chart: {
       type: 'bar',
       marginTop: 60,
-      height: getFlexHeight(labels.length, needsExtra, manyProgrammes, labels),
+      height: getFlexHeight(labels.length, needsExtra),
     },
     credits: {
       text: 'oodikone | TOSKA',
@@ -111,7 +108,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
       formatter() {
         let tooltipString = `<b>${
           longLabels[this.x] && longLabels[this.x][language] ? longLabels[this.x][language] : longLabels[this.x].fi
-        }</b><br /><p>${this.x}</p><br />`
+        }</b><br /><p>${this.x} - ${longLabels[this.x]?.code}</p><br />`
         const diffArray = differenceArray[this.x]
         this.points.forEach(point => {
           tooltipString += `<span style="color:${point.color}">●</span> <b>${point.series.name}: ${point.y}</b>

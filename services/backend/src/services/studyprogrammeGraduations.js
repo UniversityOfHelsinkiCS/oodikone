@@ -14,6 +14,7 @@ const {
   getThesisType,
   alltimeStartDate,
   alltimeEndDate,
+  getId,
 } = require('./studyprogrammeHelpers')
 const {
   graduatedStudyRights,
@@ -126,7 +127,7 @@ const getTransferStudyrightMap = async (studyprogramme, since) => {
 const formatStats = (stats, years) => {
   const tableStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
-    .map(p => [p.code, p.name['fi'], ...years.map(year => p[year])])
+    .map(p => [p.code, getId(p.code), p.name['fi'], ...years.map(year => p[year])])
 
   const graphStats = Object.values(stats)
     .filter(p => years.map(year => p[year]).find(started => started !== 0)) // Filter out programmes with no-one started between the selected years
@@ -229,7 +230,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
 
   const titles = ['', 'Graduated', 'Wrote thesis']
-  const programmesBeforeOrAfterTitles = ['Code', 'Programme', ...years]
+  const programmesBeforeOrAfterTitles = ['Code', 'Id', 'Programme', ...years]
   const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
 
   return {

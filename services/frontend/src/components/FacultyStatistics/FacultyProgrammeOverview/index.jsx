@@ -95,7 +95,12 @@ const FacultyProgrammeOverview = ({
                   programmeNames={studentStats?.data.programmeNames}
                   titles={studentStats?.data.titles}
                   years={studentStats?.data.years}
-                  sortedKeys={sortProgrammeKeys(Object.keys(studentStats?.data.programmeStats))}
+                  sortedKeys={sortProgrammeKeys(
+                    Object.keys(studentStats?.data.programmeStats).map(obj => [
+                      obj,
+                      studentStats?.data?.programmeNames[obj].code,
+                    ])
+                  ).map(listObj => listObj[0])}
                   language={language}
                   cypress="FacultyStudentStatsTable"
                   requiredRights={requiredRights}
@@ -128,7 +133,12 @@ const FacultyProgrammeOverview = ({
                     data={progressStats?.data.bachelorsTableStats}
                     programmeStats={progressStats?.data.bachelorsProgrammeStats}
                     titles={progressStats?.data.bachelorTitles}
-                    sortedKeys={sortProgrammeKeys(Object.keys(progressStats?.data.bachelorsProgrammeStats))}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(progressStats?.data.bachelorsProgrammeStats).map(obj => [
+                        obj,
+                        progressStats?.data?.programmeNames[obj].code,
+                      ])
+                    ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}
@@ -154,7 +164,12 @@ const FacultyProgrammeOverview = ({
                     data={progressStats?.data.bcMsTableStats}
                     programmeStats={progressStats?.data.bcMsProgrammeStats}
                     titles={progressStats?.data.bcMsTitles}
-                    sortedKeys={sortProgrammeKeys(Object.keys(progressStats?.data.bcMsProgrammeStats))}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(progressStats?.data.bcMsProgrammeStats).map(obj => [
+                        obj,
+                        progressStats?.data?.programmeNames[obj].code,
+                      ])
+                    ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}
@@ -180,7 +195,12 @@ const FacultyProgrammeOverview = ({
                     data={progressStats?.data.mastersTableStats}
                     programmeStats={progressStats?.data.mastersProgrammeStats}
                     titles={progressStats?.data.mastersTitles}
-                    sortedKeys={sortProgrammeKeys(Object.keys(progressStats?.data.mastersProgrammeStats))}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(progressStats?.data.mastersProgrammeStats).map(obj => [
+                        obj,
+                        progressStats?.data?.programmeNames[obj].code,
+                      ])
+                    ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}
@@ -206,7 +226,12 @@ const FacultyProgrammeOverview = ({
                     data={progressStats?.data.doctoralTableStats}
                     programmeStats={progressStats?.data.doctoralProgrammeStats}
                     titles={progressStats?.data.doctoralTitles}
-                    sortedKeys={sortProgrammeKeys(Object.keys(progressStats?.data.doctoralProgrammeStats))}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(progressStats?.data.doctoralProgrammeStats).map(obj => [
+                        obj,
+                        progressStats?.data?.programmeNames[obj].code,
+                      ])
+                    ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}

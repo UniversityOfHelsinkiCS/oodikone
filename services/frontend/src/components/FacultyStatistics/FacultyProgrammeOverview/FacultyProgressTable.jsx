@@ -34,7 +34,7 @@ const FacultyProgressTable = ({
         </Table.Header>
 
         <Table.Body>
-          {data.map((yearArray, yearIndex) => (
+          {data?.map((yearArray, yearIndex) => (
             <React.Fragment key={`random-fragment-key-${Math.random()}`}>
               {yearIndex < lenOfYearArray ? (
                 <BasicRow
@@ -46,7 +46,7 @@ const FacultyProgressTable = ({
                 />
               ) : (
                 <Table.Row>
-                  {yearArray.map(value => (
+                  {yearArray?.map(value => (
                     <Table.Cell key={`last-row-${Math.random()}`}>{value}</Table.Cell>
                   ))}
                 </Table.Row>

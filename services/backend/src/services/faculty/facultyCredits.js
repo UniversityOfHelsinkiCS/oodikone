@@ -220,8 +220,8 @@ const combineFacultyCredits = async (faculty, programmes, yearType, specialGroup
   for (const prog of programmes) {
     const data = await getProgrammeCredits(prog.code, yearType, specialGroups, progCodes)
     if (data) {
-      allCredits.programmeNames[prog.code] = prog.name
-      allCredits.programmeTableStats[prog.code] = data.tableStats
+      allCredits.programmeNames[prog.progId] = { code: prog.code, ...prog.name }
+      allCredits.programmeTableStats[prog.progId] = data.tableStats
       if (!allCredits.lastUpdated || new Date(data.lastUpdated) > new Date(allCredits.lastUpdated))
         allCredits.lastUpdated = data.lastUpdated
 

@@ -1,5 +1,6 @@
 const { mean } = require('lodash')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
+const { codes } = require('../../config/programmeCodes')
 
 // Helper functions
 const getCorrectStudentnumbers = async ({ codes, startDate, endDate, includeAllSpecials, includeGraduated = true }) => {
@@ -457,6 +458,25 @@ const getCreditProgressTableTitles = studyprogramme => {
   return tableTitles.creditProgress.doctoral
 }
 
+const mapCodesToIds = data => {
+  // Add programme id e.g. TKT
+  const keys = Object.keys(codes)
+  const progs = Object.keys(data)
+
+  for (const prog of progs) {
+    if (keys.includes(prog)) {
+      data[prog].progId = codes[prog].toUpperCase()
+    }
+  }
+}
+
+const getId = code => {
+  if (Object.keys(codes).includes(code)) {
+    return codes[code].toUpperCase()
+  }
+  return ''
+}
+
 module.exports = {
   getCorrectStudentnumbers,
   formatStudyright,
@@ -486,4 +506,6 @@ module.exports = {
   getCreditProgressTableTitles,
   getOnlyMasterThresholds,
   isNonMajorCredit,
+  mapCodesToIds,
+  getId,
 }

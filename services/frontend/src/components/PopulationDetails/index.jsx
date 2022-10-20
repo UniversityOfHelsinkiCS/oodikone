@@ -154,7 +154,7 @@ const PopulationDetails = ({
       title: {
         content: (
           <span style={{ paddingTop: '1vh', paddingBottom: '1vh', color: 'black', fontSize: 'large' }}>
-            Courses of population
+            Courses of class
           </span>
         ),
       },
