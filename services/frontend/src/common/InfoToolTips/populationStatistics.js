@@ -1,7 +1,8 @@
 export default {
   Advanced: `**Semesters:**  Jos haluaa tarkastella vain syyslukukaudella tai kevätlukukaudella aloittaneita, haluttu ajanjakso valitaan tästä.
 
-  **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat ja erillisopinto-oikeudella opiskelevat. Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.`,
+  **Include:** Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois ohjelmasta poissiirtyneet opiskelijat. Heidät voi sisällyttää mukaan lisäämällä ruksin ja noutamalla tulokset uudestaan (Fetch class with new settings).`,
+  // Koulutusohjelmapopulaatiosta on oletusarvoisesti suodatettu pois vaihto-opiskelijat ja erillisopinto-oikeudella opiskelevat. Näitä ryhmiä voi sisällyttää mukaan lisäämällä ruksin haluamaansa kohtaan.
   QueryCard: `**Valitun koulutusohjelmavuosikurssin perustiedot.**
   
   **Sample size** luku sisältää läsnä- ja poissaolevaksi ilmoittautuneet opiskelijat, muttei "excludes"-ryhmiä, jotka voi määritellä "advanced settings" -kohdasta.
