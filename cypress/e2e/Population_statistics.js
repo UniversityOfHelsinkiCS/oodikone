@@ -1,4 +1,5 @@
 /// <reference types="Cypress" />
+// Now "Class statistics" in UI
 
 const moment = require('moment')
 const _ = require('lodash')
