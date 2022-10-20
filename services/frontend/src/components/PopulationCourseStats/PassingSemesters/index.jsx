@@ -35,7 +35,7 @@ const yearColumn = (year, cumulative) => ({
 })
 
 const PassingSemesters = ({ onlyIamRights }) => {
-  const { modules, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+  const { modules, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } = UsePopulationCourseContext()
   const [cumulativeStats, setCumulativeStats] = useState(false)
 
   const columns = useMemo(() => {
@@ -154,6 +154,8 @@ const PassingSemesters = ({ onlyIamRights }) => {
         }
         columns={columns}
         data={data}
+        toggleGroupExpansion={toggleGroupExpansion}
+        expandedGroups={expandedGroups}
       />
     </div>
   )

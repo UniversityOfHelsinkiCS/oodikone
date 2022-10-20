@@ -9,7 +9,8 @@ import { getTextIn } from '../../../common'
 import { useStudentNameVisibility } from '../../StudentNameVisibilityToggle'
 
 const Students = ({ filteredStudents }) => {
-  const { courseStatistics, onGoToCourseStatisticsClick, modules } = UsePopulationCourseContext()
+  const { courseStatistics, onGoToCourseStatisticsClick, modules, toggleGroupExpansion, expandedGroups } =
+    UsePopulationCourseContext()
   const { visible: namesVisible, toggle: toggleStudentNames } = useStudentNameVisibility()
   const [page, setPage] = useState(0)
 
@@ -181,6 +182,8 @@ const Students = ({ filteredStudents }) => {
         }
         columns={columns}
         data={data}
+        toggleGroupExpansion={toggleGroupExpansion}
+        expandedGroups={expandedGroups}
       />
     </div>
   )
