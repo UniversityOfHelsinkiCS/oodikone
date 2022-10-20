@@ -609,13 +609,13 @@ const createHeaders = (columns, columnDepth, dispatch) => {
   return rows.map(cells => <tr>{cells}</tr>)
 }
 
-const getInitialState = defaultSort => () => ({
+const getInitialState = (defaultSort, expandedGroups) => () => ({
   columnOptions: !defaultSort
     ? {}
     : {
         [defaultSort[0]]: { filterOptions: undefined, sort: defaultSort[1] },
       },
-  expandedGroups: [],
+  expandedGroups: !expandedGroups ? [] : Array.from(expandedGroups), // [],
 })
 
 const tableStateReducer = (...args) =>
@@ -801,9 +801,15 @@ const SortableTable = ({
   contextMenuItems: pContextMenuItems,
   singleLine = true,
   figure = true,
+  toggleGroupExpansion,
+  expandedGroups,
 }) => {
   const [exportModalOpen, setExportModalOpen] = useState(false)
-  const [state, dispatch] = useReducer(tableStateReducer(defaultSort), null, getInitialState(defaultSort))
+  const [state, dispatch] = useReducer(
+    tableStateReducer(defaultSort),
+    null,
+    getInitialState(defaultSort, expandedGroups)
+  )
   const groupDepth = useMemo(() => calculateGroupDepth(data), [data])
 
   const toggleGroup = useCallback(
@@ -812,6 +818,9 @@ const SortableTable = ({
         type: 'TOGGLE_GROUP',
         payload: { group: groupKey },
       })
+      if (toggleGroupExpansion) {
+        toggleGroupExpansion(groupKey)
+      }
     },
     [dispatch]
   )

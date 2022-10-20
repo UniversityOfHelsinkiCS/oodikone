@@ -30,7 +30,8 @@ const mapCourseData = course => ({
 })
 
 const GradeDistribution = ({ flat, onlyIamRights }) => {
-  const { modules, courseStatistics, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+  const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
+    UsePopulationCourseContext()
 
   const columns = useMemo(() => {
     const columns = [
@@ -147,7 +148,13 @@ const GradeDistribution = ({ flat, onlyIamRights }) => {
 
   return (
     <>
-      <SortableTable title="Grade distribution of courses" data={data} columns={columns} />
+      <SortableTable
+        title="Grade distribution of courses"
+        data={data}
+        columns={columns}
+        toggleGroupExpansion={toggleGroupExpansion}
+        expandedGroups={expandedGroups}
+      />
     </>
   )
 }

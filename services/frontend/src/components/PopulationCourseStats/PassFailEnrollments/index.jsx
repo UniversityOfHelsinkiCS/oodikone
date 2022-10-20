@@ -27,7 +27,8 @@ const createModuleAggregateRow = ({ definition, children }) => ({
 })
 
 const PassFailEnrollments = ({ flat, onlyIamRights }) => {
-  const { modules, courseStatistics, onGoToCourseStatisticsClick } = UsePopulationCourseContext()
+  const { modules, courseStatistics, onGoToCourseStatisticsClick, toggleGroupExpansion, expandedGroups } =
+    UsePopulationCourseContext()
 
   const columns = useMemo(() => {
     const columns = [
@@ -236,6 +237,8 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
         title="Pass and fail statistics of courses with course enrollment details"
         data={data}
         columns={columns}
+        toggleGroupExpansion={toggleGroupExpansion}
+        expandedGroups={expandedGroups}
       />
     </>
   )

@@ -286,6 +286,8 @@ const PopulationCourseStats = props => {
     sortCriteria,
     reversed,
     courses,
+    toggleGroupExpansion,
+    expandedGroups,
   }
 
   const panes = [
