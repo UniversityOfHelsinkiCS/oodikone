@@ -100,10 +100,14 @@ const FacultyStudentDataTable = ({
                               ? programmeNames[programme][language]
                               : programmeNames[programme].fi}
                           </b>
-                          {(requiredRights.rights?.includes(programme) ||
+                          {(requiredRights.rights?.includes(programmeNames[programme].code) ||
                             requiredRights.isAdmin ||
-                            requiredRights.IAMrights?.includes(programme)) && (
-                            <PopulationLink studyprogramme={programme} year={year} years={calendarYears} />
+                            requiredRights.IAMrights?.includes(programmeNames[programme].code)) && (
+                            <PopulationLink
+                              studyprogramme={programmeNames[programme].code}
+                              year={year}
+                              years={calendarYears}
+                            />
                           )}
                         </Table.Cell>
                         {programmeStats[programme][year].map((value, valIdx) => {
