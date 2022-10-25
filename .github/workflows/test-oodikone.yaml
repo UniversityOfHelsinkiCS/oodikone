@@ -83,7 +83,7 @@ jobs:
       - uses: docker/setup-buildx-action@v2
       - name: 'Get current time'
         id: get_current_time
-        run: echo ::set-output name=NOW::"$(date --iso-8601=seconds)"
+        run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
       - name: 'Build image and export it'
         uses: docker/build-push-action@v3
         with:
