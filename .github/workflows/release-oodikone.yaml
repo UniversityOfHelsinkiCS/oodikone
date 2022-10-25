@@ -21,7 +21,7 @@ jobs:
         # This steps extracts release version from GITHUB_REF env var
         # See: https://github.community/t/how-to-get-just-the-tag-name/16241/10
         id: extract_version
-        run: echo ::set-output name=VERSION::"${GITHUB_REF#refs/tags/}"
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       - name: 'Build and push'
         uses: docker/build-push-action@v3
         with:
@@ -50,13 +50,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: 'Get current time'
         id: get_current_time
-        run: echo ::set-output name=NOW::"$(date --iso-8601=seconds)"
+        run: echo "NOW=$(date --iso-8601=seconds)" >> $GITHUB_OUTPUT
       - name: 'Extract release version'
         # Github context (e.g. github.ref) only has ref formatted as /refs/tags/vX.X.X
         # This steps extracts release version from GITHUB_REF env var
         # See: https://github.community/t/how-to-get-just-the-tag-name/16241/10
         id: extract_version
-        run: echo ::set-output name=VERSION::"${GITHUB_REF#refs/tags/}"
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       - name: 'Build and push'
         uses: docker/build-push-action@v3
         with:
