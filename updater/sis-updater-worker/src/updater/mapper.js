@@ -84,7 +84,17 @@ const calculateTotalCreditsFromAttainments = attainments => {
 }
 
 const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => student => {
-  const { last_name, first_names, student_number, primary_email, gender_urn, oppija_id, date_of_birth, id } = student
+  const {
+    last_name,
+    first_names,
+    student_number,
+    primary_email,
+    secondary_email,
+    gender_urn,
+    oppija_id,
+    date_of_birth,
+    id,
+  } = student
 
   // Filter out test student from oodi data
   if (student_number === '012023965') return null
@@ -112,6 +122,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced) => stud
     abbreviatedname: `${last_name} ${first_names}`.trim(),
     studentnumber: student_number,
     email: primary_email,
+    secondary_email: secondary_email,
     gender_code,
     national_student_number: oppija_id,
     birthdate: date_of_birth,
