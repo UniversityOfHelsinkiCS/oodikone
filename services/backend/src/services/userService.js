@@ -13,6 +13,7 @@ const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
 const hyOneGroup = 'hy-one'
 const toskaGroup = 'grp-toska'
+const openUniGroup = 'hy-ypa-opa-dojo'
 
 // Max 25 users can be stored in the cache
 const userDataCache = new LRU({
@@ -272,6 +273,7 @@ const getUser = async ({ username, name, email, iamGroups, sisId }) => {
     newAccessGroups.push('facultyStatistics')
   if (iamGroups.includes(hyOneGroup) || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
   if (iamGroups.includes(toskaGroup) || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
+  if (iamGroups.includes(openUniGroup)) newAccessGroups.push('openUniSearch')
   if (_.difference(newAccessGroups, currentAccessGroups).length > 0) {
     userFromDb.setAccessgroup(
       (
