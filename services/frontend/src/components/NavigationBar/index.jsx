@@ -30,9 +30,12 @@ const allNavigationItems = {
     reqRights: ['studyGuidanceGroups'],
   },
   customPopulations: {
-    path: '/custompopulation',
     key: 'customPopulation',
     label: 'Custom populations',
+    items: [
+      { path: '/custompopulation', key: 'custom search', label: 'Search by Studentnumbers' },
+      { path: '/openunipopulation', key: 'openUniSearch', label: 'Fetch Open Uni Students by Courses' },
+    ],
   },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['admin'] },
   feedback: { path: '/feedback', key: 'feedback', label: 'Give feedback' },
@@ -81,17 +84,20 @@ const NavigationBar = () => {
       items ? (
         <Menu.Item as={Dropdown} key={`menu-item-drop-${key}`} tabIndex="-1" text={label} data-cy={`navbar-${key}`}>
           <Dropdown.Menu>
-            {items.map(i => (
-              <Dropdown.Item
-                as={NavLink}
-                key={`menu-item-${i.path}`}
-                to={i.path}
-                tabIndex="-1"
-                data-cy={`navbar-${i.key}`}
-              >
-                {i.label}
-              </Dropdown.Item>
-            ))}
+            {items.map(
+              i =>
+                !(!checkUserAccess(['openUniSearch', 'admin'], roles) && i.key === 'openUniSearch') && (
+                  <Dropdown.Item
+                    as={NavLink}
+                    key={`menu-item-${i.path}`}
+                    to={i.path}
+                    tabIndex="-1"
+                    data-cy={`navbar-${i.key}`}
+                  >
+                    {i.label}
+                  </Dropdown.Item>
+                )
+            )}
           </Dropdown.Menu>
         </Menu.Item>
       ) : (
