@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Message } from 'semantic-ui-react'
+import { Message, Icon } from 'semantic-ui-react'
 import OpenUniPopulationResults from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
 // import useLanguage from '../LanguagePicker/useLanguage'
@@ -10,8 +10,7 @@ import CustomOpenUniSearch from './CustomOpenUniSearch'
 const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')
   const [courses, setCourses] = useState([])
-  // const history = useHistory()
-  // const language = useLanguage
+  // const language = useLanguage()
 
   return (
     <div className="segmentContainer">
@@ -20,6 +19,13 @@ const CustomOpenUniPopulation = () => {
         <p>
           Here you can create custom population using a list of courses. Clicking the blue custom population button will
           open a modal where you can enter a list of courses.
+          <br />
+          <Icon fitted name="check" color="green" />: Student passed the course.
+          <br />
+          <Icon fitted name="times" color="red" />: Student has enrolled to the course but did not pass is.
+          <br />
+          Empty cell: Student has not any enrollment for the course.
+          <br />
         </p>
       </Message>
       <CustomOpenUniSearch setCourses={setCourses} />

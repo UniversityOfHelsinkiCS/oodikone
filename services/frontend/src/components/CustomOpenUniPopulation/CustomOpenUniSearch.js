@@ -28,7 +28,7 @@ const CustomOpenUniSearch = ({ setCourses }) => {
     <Modal
       trigger={
         <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="custom-pop-search-button">
-          Fetch Students
+          Fetch Open Uni Students
         </Button>
       }
       open={modal}
