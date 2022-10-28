@@ -6,6 +6,7 @@ import { Icon, Popup } from 'semantic-ui-react'
 import FigureContainer from 'components/FigureContainer'
 import _ from 'lodash'
 import produce from 'immer'
+import { v4 as uuidv4 } from 'uuid'
 import ExportModal from './ExportModal'
 import { row, group, getDataItemType, SortableTableContext, DataItemType } from './common'
 import DefaultColumnFilter from './defaultFilter'
@@ -113,18 +114,21 @@ const Row = ({ data, isGroup, parents }) => {
 
     if (content !== undefined && content !== null) {
       cells.push(
-        <td colSpan={columnSpans[column.key]} {...cellProps}>
+        <td colSpan={columnSpans[column.key]} key={uuidv4()} {...cellProps}>
           <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
         </td>
       )
     } else if (column.children && column.children.length > 0) {
       stack.splice(0, 0, ...column.children.map((c, i) => ({ ...c, childIndex: i })))
     } else {
-      cells.push(<td {...cellProps} />)
+      cells.push(<td key={uuidv4()} {...cellProps} />)
     }
   }
-
-  return <tr className={isGroup ? 'group-header-row' : ''}>{cells}</tr>
+  return (
+    <tr key={uuidv4()} className={isGroup ? 'group-header-row' : ''}>
+      {cells}
+    </tr>
+  )
 }
 
 const mergeColumnDefinitions = (original, overlay) => {
@@ -606,7 +610,7 @@ const createHeaders = (columns, columnDepth, dispatch) => {
     }
   }
 
-  return rows.map(cells => <tr>{cells}</tr>)
+  return rows.map(cells => <tr key={uuidv4()}>{cells}</tr>)
 }
 
 const getInitialState = (defaultSort, expandedGroups) => () => ({
@@ -913,7 +917,7 @@ const SortableTable = ({
       <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>{headers}</thead>
       <tbody>
         {sortedData.map(item => (
-          <DataItem item={item} key={item.key} />
+          <DataItem item={item} key={`${item.key}-${uuidv4()}`} />
         ))}
       </tbody>
     </table>

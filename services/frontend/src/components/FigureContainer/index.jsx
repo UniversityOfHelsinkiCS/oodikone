@@ -32,7 +32,9 @@ const Header = ({ children, actions, contextItems }) => {
           <Dropdown position="bottom center" direction="left" icon="ellipsis vertical">
             <Dropdown.Menu>
               {contextItems.map(({ label, onClick }) => (
-                <Dropdown.Item onClick={onClick}>{label}</Dropdown.Item>
+                <Dropdown.Item key={label} onClick={onClick}>
+                  {label}
+                </Dropdown.Item>
               ))}
             </Dropdown.Menu>
           </Dropdown>
