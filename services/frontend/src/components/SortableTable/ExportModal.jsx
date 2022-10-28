@@ -5,6 +5,7 @@ import React, { useState, useMemo } from 'react'
 import { Modal, Table, Button, Checkbox } from 'semantic-ui-react'
 import _ from 'lodash'
 import xlsx from 'xlsx'
+import { v4 as uuidv4 } from 'uuid'
 import { getColumnTitle, getDataItemType, DataItemType } from './common'
 import ValueVisitor from './ValueVisitor'
 import ExportVisitor from './ExportVisitor'
@@ -106,13 +107,15 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
 
         <Table celled striped>
           <Table.Header>
-            <Table.HeaderCell />
-            <Table.HeaderCell>Column</Table.HeaderCell>
-            <Table.HeaderCell>Sample Values</Table.HeaderCell>
+            <Table.Row>
+              <Table.HeaderCell />
+              <Table.HeaderCell>Column</Table.HeaderCell>
+              <Table.HeaderCell>Sample Values</Table.HeaderCell>
+            </Table.Row>
           </Table.Header>
           <Table.Body>
             {exportColumns.map(column => (
-              <Table.Row key={column.key} onClick={() => toggleSelection(column.key)} style={{ cursor: 'pointer' }}>
+              <Table.Row key={uuidv4()} onClick={() => toggleSelection(column.key)} style={{ cursor: 'pointer' }}>
                 <Table.Cell collapsing verticalAlign="middle">
                   <Checkbox checked={_.includes(selected, column.key)} />
                 </Table.Cell>
@@ -121,6 +124,7 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
                   <div style={{ width: '0' }}>
                     {sampledValues[column.key].map(value => (
                       <span
+                        key={uuidv4()}
                         style={{
                           border: '1px solid #dedede',
                           borderRadius: '3px',

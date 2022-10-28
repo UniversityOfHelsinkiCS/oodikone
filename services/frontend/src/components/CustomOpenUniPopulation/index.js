@@ -22,10 +22,12 @@ const CustomOpenUniPopulation = () => {
           <br />
           <Icon fitted name="check" color="green" />: Student passed the course.
           <br />
-          <Icon fitted name="times" color="red" />: Student has enrolled to the course but did not pass is.
+          <Icon fitted name="times" color="red" />: Student has enrolled but did not pass the course.
           <br />
           Empty cell: Student has not any enrollment for the course.
           <br />
+          View under progress: Student population may still contain some students that have had studyright during the
+          course registration, but the studyright is currently ended.
         </p>
       </Message>
       <CustomOpenUniSearch setCourses={setCourses} />
