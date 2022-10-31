@@ -381,7 +381,8 @@ describe('Studyprogramme overview', () => {
 
       cy.go('back')
       cy.go('back')
-
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(10000)
       deleteTag(name)
 
       cy.contains('Student statistics').click()
