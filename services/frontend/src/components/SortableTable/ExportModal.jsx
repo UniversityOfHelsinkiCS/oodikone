@@ -87,6 +87,10 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
   return (
     <Modal onOpen={onOpen} onClose={onClose} open={open}>
       <Modal.Header>Export to Excel</Modal.Header>
+      <Modal.Actions>
+        <Button content="Cancel" onClick={() => onClose()} />
+        <Button primary content="Export" onClick={() => handleExport()} />
+      </Modal.Actions>
       <Modal.Content>
         <p>
           Exporting {flatData.length} rows into an Excel (.xlsx) file. Choose which columns you want to include in the
@@ -107,7 +111,7 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
 
         <Table celled striped>
           <Table.Header>
-            <Table.Row>
+            <Table.Row key="TitleRow">
               <Table.HeaderCell />
               <Table.HeaderCell>Column</Table.HeaderCell>
               <Table.HeaderCell>Sample Values</Table.HeaderCell>
@@ -115,7 +119,7 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
           </Table.Header>
           <Table.Body>
             {exportColumns.map(column => (
-              <Table.Row key={uuidv4()} onClick={() => toggleSelection(column.key)} style={{ cursor: 'pointer' }}>
+              <Table.Row key={column.key} onClick={() => toggleSelection(column.key)} style={{ cursor: 'pointer' }}>
                 <Table.Cell collapsing verticalAlign="middle">
                   <Checkbox checked={_.includes(selected, column.key)} />
                 </Table.Cell>
@@ -144,10 +148,6 @@ const ExportModal = ({ open, onOpen, onClose, data, columns }) => {
           </Table.Body>
         </Table>
       </Modal.Content>
-      <Modal.Actions>
-        <Button content="Cancel" onClick={() => onClose()} />
-        <Button primary content="Export" onClick={() => handleExport()} />
-      </Modal.Actions>
     </Modal>
   )
 }
