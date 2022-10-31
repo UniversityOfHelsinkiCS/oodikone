@@ -115,12 +115,12 @@ const combineFacultyStudentProgress = async (faculty, programmes, specialGroups,
         [0, null],
       ]
     }
-    if (months >= 20) {
+    if (months >= 24) {
       masterlimits = [
-        [Math.ceil(20 * (60 / 12)), null],
-        [Math.ceil(20 * (45 / 12)), Math.ceil(20 * (60 / 12))],
-        [Math.ceil(20 * (30 / 12)), Math.ceil(20 * (45 / 12))],
-        [Math.ceil(20 * (15 / 12)), Math.ceil(20 * (30 / 12))],
+        [Math.ceil(24 * (60 / 12)), null],
+        [Math.ceil(24 * (45 / 12)), Math.ceil(24 * (60 / 12))],
+        [Math.ceil(24 * (30 / 12)), Math.ceil(24 * (45 / 12))],
+        [Math.ceil(24 * (15 / 12)), Math.ceil(24 * (30 / 12))],
         [1, Math.ceil(20 * (15 / 12))],
         [0, null],
       ]
