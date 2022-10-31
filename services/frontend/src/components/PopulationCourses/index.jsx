@@ -45,7 +45,7 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
       !mandatoryCourses.pending &&
       !queryHasBeenUpdated() &&
       !populationSelectedStudentCourses.pending &&
-      mandatoryCourses.data
+      mandatoryCourses.data.length > 0
     )
       fetch(mandatoryCourses.data.map(({ code }) => code))
   }, [query, filteredStudents, mandatoryCourses, populationSelectedStudentCourses])
