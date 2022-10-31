@@ -114,21 +114,17 @@ const Row = ({ data, isGroup, parents }) => {
 
     if (content !== undefined && content !== null) {
       cells.push(
-        <td colSpan={columnSpans[column.key]} key={uuidv4()} {...cellProps}>
+        <td colSpan={columnSpans[column.key]} key={column.key + cellProps.title} {...cellProps}>
           <ColumnContent column={column} data={data} isGroup={isGroup} parents={parents} />
         </td>
       )
     } else if (column.children && column.children.length > 0) {
       stack.splice(0, 0, ...column.children.map((c, i) => ({ ...c, childIndex: i })))
     } else {
-      cells.push(<td key={uuidv4()} {...cellProps} />)
+      cells.push(<td key={`${column.key}-else-${cellProps.title}`} {...cellProps} />)
     }
   }
-  return (
-    <tr key={uuidv4()} className={isGroup ? 'group-header-row' : ''}>
-      {cells}
-    </tr>
-  )
+  return <tr className={isGroup ? 'group-header-row' : ''}>{cells}</tr>
 }
 
 const mergeColumnDefinitions = (original, overlay) => {
@@ -609,7 +605,6 @@ const createHeaders = (columns, columnDepth, dispatch) => {
       stack = [...children, ...stack]
     }
   }
-
   return rows.map(cells => <tr key={uuidv4()}>{cells}</tr>)
 }
 
@@ -917,7 +912,7 @@ const SortableTable = ({
       <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>{headers}</thead>
       <tbody>
         {sortedData.map(item => (
-          <DataItem item={item} key={`${item.key}-${uuidv4()}`} />
+          <DataItem item={item} key={uuidv4()} />
         ))}
       </tbody>
     </table>

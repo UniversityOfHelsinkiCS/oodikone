@@ -212,7 +212,7 @@ const CoursesTable = ({ students }) => {
       ...sortedlabels
         .filter(({ code }) => visibleLabels.has(code))
         .map(e => ({
-          key: e.id,
+          key: e.id + e.code,
           title: (
             <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
               <div>{e.code}</div>
@@ -252,14 +252,14 @@ const CoursesTable = ({ students }) => {
                   return getTotalRowVal(s, m)
                 }
 
-                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : 'Not passed'
+                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : ''
               },
               getRowExportVal: s => {
                 if (s.total) {
                   return getTotalRowVal(s, m)
                 }
 
-                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : 'Not passed'
+                return hasPassedMandatory(s.studentNumber, m.code) ? 'Passed' : ''
               },
               getRowContent: s => {
                 if (s.total) return getTotalRowVal(s, m)
