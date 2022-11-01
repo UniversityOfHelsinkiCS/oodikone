@@ -84,7 +84,8 @@ const NavigationBar = () => {
   const showSearch = item => {
     if (item.key === 'class' || item.key === 'overview') return true
     if (checkUserAccess(['openUniSearch', 'admin'], roles) && item.key === 'openUniSearch') return true
-    if (checkUserAccess(['studyGuidanceGroups', 'admin'], roles) && item.key === 'customSearch') return true
+    if ((checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0) && item.key === 'customSearch')
+      return true
     return false
   }
 

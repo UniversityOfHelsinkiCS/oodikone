@@ -138,7 +138,8 @@ describe('Population Statistics tests', () => {
       cy.contains('Credit statistics').click()
       cy.contains('Credits Gained').click()
       cy.get("[data-cy='credits-gained-main-table']").should('contain', 'All students of the class')
-      const months = Math.round(moment.duration(moment().diff(moment('2017-08-01'))).asMonths())
+      const today = moment().endOf('month')
+      const months = Math.round(moment.duration(moment(today).diff(moment('2017-08-01'))).asMonths())
       const limits = [1, ..._.range(1, 4).map(p => Math.ceil(months * ((p * 15) / 12))), null]
       const ranges = _.range(1, limits.length).map(i => _.slice(limits, i - 1, i + 1))
 
