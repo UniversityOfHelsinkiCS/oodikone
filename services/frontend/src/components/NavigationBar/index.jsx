@@ -33,7 +33,7 @@ const allNavigationItems = {
     key: 'customPopulation',
     label: 'Custom populations',
     items: [
-      { path: '/custompopulation', key: 'custom search', label: 'Search by Studentnumbers' },
+      { path: '/custompopulation', key: 'customSearch', label: 'Search by Studentnumbers' },
       { path: '/openunipopulation', key: 'openUniSearch', label: 'Fetch Open Uni Students by Courses' },
     ],
   },
@@ -53,8 +53,11 @@ const NavigationBar = () => {
       if (key === 'populations') {
         if (!isAdmin && rights.length === 0 && iamRights.length === 0) return
       }
-      if (key === 'students' || key === 'customPopulations') {
+      if (key === 'students') {
         if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) return
+      }
+      if (key === 'customPopulations') {
+        if (!checkUserAccess(['admin', 'studyGuidanceGroups', 'OpenUniSearch'], roles) && rights.length === 0) return
       } else if (key === 'courseStatistics') {
         if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length === 0) return
       } else if (key === 'faculty') {
@@ -78,6 +81,12 @@ const NavigationBar = () => {
       </span>
     </Menu.Item>
   )
+  const showSearch = item => {
+    if (item.key === 'class' || item.key === 'overview') return true
+    if (checkUserAccess(['openUniSearch', 'admin'], roles) && item.key === 'openUniSearch') return true
+    if (checkUserAccess(['studyGuidanceGroups', 'admin'], roles) && item.key === 'customSearch') return true
+    return false
+  }
 
   const renderNavigationRoutes = () =>
     Object.values(visibleNavigationItems).map(({ items, path, key, label, tag }) =>
@@ -86,7 +95,7 @@ const NavigationBar = () => {
           <Dropdown.Menu>
             {items.map(
               i =>
-                !(!checkUserAccess(['openUniSearch', 'admin'], roles) && i.key === 'openUniSearch') && (
+                showSearch(i) && (
                   <Dropdown.Item
                     as={NavLink}
                     key={`menu-item-${i.path}`}
