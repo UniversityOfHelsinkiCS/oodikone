@@ -16,7 +16,7 @@ const updateStudyRights = async (
   groupedStudyRightSnapshots,
   personIdToStudentNumber,
   personIdToStudyRightIdToPrimality,
-  personsTermRegistrations
+  allTermRegistrations
 ) => {
   const currentSemester = getSemesterByDate(new Date())
 
@@ -138,6 +138,10 @@ const updateStudyRights = async (
 
   const formattedStudyRights = latestStudyRights.reduce((acc, studyright) => {
     const studyRightEducation = getEducation(studyright.education_id)
+
+    const personsTermRegistrations = allTermRegistrations.filter(
+      registration => registration.study_right_id === studyright.id
+    )
     const termRegistrations = flatMap(personsTermRegistrations, 'term_registrations')
 
     if (!studyRightEducation) return acc
