@@ -339,6 +339,8 @@ const doctoralSchoolMap = {
 
 const opetusVaradekaani = 'hy-varadekaanit-opetus'
 
+const universityServices = 'hy-ypa-opa-dojo'
+
 const dekaaniFacultyMap = {
   'hy-ttdk-dekanaatti': 'teologinen',
   'hy-oiktdk-dekanaatti': 'oikeustieteellinen',
@@ -411,6 +413,7 @@ const relevantIAMs = []
   .concat(Object.keys(kosuFacultyMap))
   .concat(Object.keys(dekaaniFacultyMap))
   .concat(opetusVaradekaani)
+  .concat(universityServices)
   .concat(doctoralIams)
   .concat(Object.keys(doctoralSchoolMap))
   .concat(universityWideGroups)
