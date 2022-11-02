@@ -57,7 +57,7 @@ const NavigationBar = () => {
         if (!checkUserAccess(['admin', 'studyGuidanceGroups'], roles) && rights.length === 0) return
       }
       if (key === 'customPopulations') {
-        if (!checkUserAccess(['admin', 'studyGuidanceGroups', 'OpenUniSearch'], roles) && rights.length === 0) return
+        if (!checkUserAccess(['admin', 'studyGuidanceGroups', 'openUniSearch'], roles) && rights.length === 0) return
       } else if (key === 'courseStatistics') {
         if (!checkUserAccess(['courseStatistics', 'admin'], roles) && rights.length === 0) return
       } else if (key === 'faculty') {
