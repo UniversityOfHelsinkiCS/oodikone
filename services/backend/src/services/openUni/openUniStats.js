@@ -4,7 +4,7 @@ const { getCredits, getStudyRights, getEnrollments, getStudentInfo } = require('
 const uniq = objects => [...new Set(objects)]
 
 const getCustomOpenUniCourses = async courseCodes => {
-  const ayCourseCodes = courseCodes.map(courseCode => 'AY-' + courseCode)
+  const ayCourseCodes = courseCodes.map(courseCode => 'AY' + courseCode)
   const allCourseCodes = courseCodes.concat(ayCourseCodes)
   const allCredits = await getCredits(allCourseCodes)
   const allEnrollments = await getEnrollments(allCourseCodes)
@@ -39,35 +39,39 @@ const getCustomOpenUniCourses = async courseCodes => {
       }
       for (const { course_code, attainment_date, student_studentnumber } of allCredits) {
         if (student_studentnumber === studentnumber) {
-          if (!(course_code in studentStats[studentnumber].courseInfo)) {
-            studentStats[studentnumber].courseInfo[course_code] = {
+          let courseCode = course_code
+          if (course_code.startsWith('AY')) courseCode = course_code.replace('AY', '')
+          if (!(courseCode in studentStats[studentnumber].courseInfo)) {
+            studentStats[studentnumber].courseInfo[courseCode] = {
               enrolledPassed: null,
               enrolledNotPassed: [],
               notEnrolled: false,
             }
           }
-          studentStats[studentnumber].courseInfo[course_code].enrolledPassed = attainment_date
+          studentStats[studentnumber].courseInfo[courseCode].enrolledPassed = attainment_date
         }
       }
       for (const { enrollmentStudentnumber, course_code, enrollment_date_time } of allEnrollments) {
         if (enrollmentStudentnumber === studentnumber) {
-          if (!(course_code in studentStats[studentnumber].courseInfo)) {
-            studentStats[studentnumber].courseInfo[course_code] = {
+          let courseCode = course_code
+          if (course_code.startsWith('AY')) courseCode = course_code.replace('AY', '')
+          if (!(courseCode in studentStats[studentnumber].courseInfo)) {
+            studentStats[studentnumber].courseInfo[courseCode] = {
               enrolledPassed: null,
               enrolledNotPassed: [],
               notEnrolled: false,
             }
           }
-          if (!studentStats[studentnumber].courseInfo[course_code].enrolledPassed && studentnumber === studentnumber) {
+          if (!studentStats[studentnumber].courseInfo[courseCode].enrolledPassed && studentnumber === studentnumber) {
             // enrolledPassed, enrolledNotPassed, notEnrolled
-            studentStats[studentnumber].courseInfo[course_code].enrolledNotPassed.push(enrollment_date_time)
+            studentStats[studentnumber].courseInfo[courseCode].enrolledNotPassed.push(enrollment_date_time)
           }
           if (
-            studentStats[studentnumber].courseInfo[course_code].enrolledNotPassed.length === 0 &&
-            !studentStats[studentnumber].courseInfo[course_code].enrolledPassed &&
+            studentStats[studentnumber].courseInfo[courseCode].enrolledNotPassed.length === 0 &&
+            !studentStats[studentnumber].courseInfo[courseCode].enrolledPassed &&
             studentnumber === studentnumber
           ) {
-            studentStats[studentnumber].courseInfo[course_code].notEnrolled = true
+            studentStats[studentnumber].courseInfo[courseCode].notEnrolled = true
           }
         }
       }
