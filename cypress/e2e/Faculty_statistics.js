@@ -136,7 +136,7 @@ describe('Faculty overview', () => {
     })
   })
 
-  describe.only('Average graduation times', () => {
+  describe('Average graduation times', () => {
     beforeEach(() => {
       cy.init('/faculties')
       cy.contains('td', 'H60').click()
