@@ -199,7 +199,7 @@ const BarChart = ({
   if (!facultyGraph) config.title.text = `Year ${year} by ${label.toLowerCase()}`
 
   return (
-    <div>
+    <div className={`${facultyGraph ? 'faculty' : 'programmes'}-graph`}>
       <ReactHighcharts config={config} />
     </div>
   )

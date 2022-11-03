@@ -33,10 +33,8 @@ const GraduationTimes = ({
   }
 
   return (
-    <>
-      <Divider data-cy={`Section-${level}`} horizontal>
-        {title}
-      </Divider>
+    <div className={`graduation-times-${level}`} data-cy={`Section-${level}`}>
+      <Divider horizontal>{title}</Divider>
       <div>
         {level === 'bcMsCombo' && groupBy === 'byStartYear' && (
           <div className="graduations-message">
@@ -86,7 +84,7 @@ const GraduationTimes = ({
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
