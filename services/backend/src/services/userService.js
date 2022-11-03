@@ -274,7 +274,12 @@ const getUser = async ({ username, name, email, iamGroups, sisId }) => {
   if (iamGroups.includes(hyOneGroup) || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
   if (iamGroups.includes(toskaGroup) || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
   if (iamGroups.includes(openUniGroup)) newAccessGroups.push('openUniSearch')
-  if (_.difference(newAccessGroups, currentAccessGroups).length > 0) {
+  // In the difference method "the order and references of result values are determined by the first array." https://lodash.com/docs/4.17.15#difference
+  // Both directions needs to be checked in order to update roles when the access should no longer exists.
+  if (
+    _.difference(newAccessGroups, currentAccessGroups).length > 0 ||
+    _.difference(currentAccessGroups, newAccessGroups).length > 0
+  ) {
     userFromDb.setAccessgroup(
       (
         await AccessGroup.findAll({
