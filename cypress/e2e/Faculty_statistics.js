@@ -135,4 +135,89 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="Cell-CreditsProducedByTheFaculty-0"]').should('be.visible')
     })
   })
+
+  describe.only('Average graduation times', () => {
+    beforeEach(() => {
+      cy.init('/faculties')
+      cy.contains('td', 'H60').click()
+      cy.contains('Graduation times').click()
+    })
+
+    it('User can view graduation graphs', () => {
+      cy.get('[data-cy="Section-AverageGraduationTimes"]').should('be.visible')
+      cy.get('[data-cy="Section-bachelor"]').should('be.visible')
+      cy.get('[data-cy="Section-master"]').should('be.visible')
+      cy.get('[data-cy="Section-master"]').within(() => {
+        cy.contains('Graduation year').should('be.visible')
+        cy.contains('.message', "Click a bar to view that year's programme level breakdown").should('be.visible')
+      })
+    })
+
+    it('Graphs display data', () => {
+      cy.get('[data-cy="Section-bachelor"]').within(() => {
+        cy.get('div[class="faculty-graph"]')
+        cy.contains('1 graduated').should('have.length', 1)
+        cy.contains('1 graduated').trigger('mouseover')
+        cy.contains('1 students graduated in year 2019')
+        cy.contains('median study time: 40 months')
+        cy.contains('0 graduated on time')
+        cy.contains('1 graduated max year overtime')
+
+        cy.contains('1 graduated').click()
+        cy.contains('Year 2019 by graduation year')
+        cy.get('div[class="programmes-graph"]').should('be.visible')
+        cy.get('div[class="programmes-graph"]').within(() => {
+          cy.contains('EDUK')
+          cy.contains('1 graduated').trigger('mouseover')
+          cy.contains('Kasvatustieteiden kandiohjelma')
+          cy.contains('KH60_001')
+        })
+      })
+
+      cy.get('[data-cy="Section-master"]').within(() => {
+        cy.get('div[class="faculty-graph"]')
+        cy.contains('1 graduated').should('have.length', 1)
+        cy.contains('1 graduated').trigger('mouseover')
+        cy.contains('1 students graduated in year 2020')
+        cy.contains('median study time: 25 months')
+        cy.contains('0 graduated over year late')
+        cy.contains('1 graduated max year overtime')
+
+        cy.contains('1 graduated').click()
+        cy.contains('Year 2020 by graduation year')
+        cy.get('div[class="programmes-graph"]').should('be.visible')
+        cy.get('div[class="programmes-graph"]').within(() => {
+          cy.contains('EDUM')
+          cy.contains('1 graduated').trigger('mouseover')
+          cy.contains('Kasvatustieteiden maisteriohjelma')
+          cy.contains('MH60_001')
+        })
+      })
+    })
+
+    it('Graduation times grouping and time types can be toggled', () => {
+      cy.get('[data-cy="GroupByToggle"]').click()
+      cy.get('[data-cy="Section-bachelor"]').should('not.exist')
+      cy.get('[data-cy="Section-master"]').should('be.visible')
+
+      cy.get('[data-cy="Section-master"]').within(() => {
+        cy.get('div[class="faculty-graph"]')
+        cy.contains('1 graduated (100 % of class)').should('have.length', 1)
+        cy.contains('1 graduated').trigger('mouseover')
+        cy.contains('From class of 2018, 1/undefined students have graduated')
+      })
+
+      cy.get('[data-cy="GraduationTimeToggle"]').click()
+      cy.get('[data-cy="Section-master"]').within(() => {
+        cy.contains('1 graduated (100 % of class)').click()
+        cy.get('div[class="programmes-graph"]').should('be.visible')
+        cy.get('div[class="programmes-graph"]').within(() => {
+          cy.contains('Year 2018 by start year')
+          cy.contains('1 graduated').trigger('mouseover')
+          cy.contains('From class of 2018, 1/1 students have graduated')
+          cy.contains('mean study time: 25 months')
+        })
+      })
+    })
+  })
 })
