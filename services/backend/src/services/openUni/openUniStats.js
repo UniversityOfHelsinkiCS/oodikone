@@ -19,8 +19,8 @@ const getCustomOpenUniCourses = async courseCodes => {
   const studentsWithCurrentStudyRight = allStudyrights
     .filter(
       right =>
-        moment(right.startdate).isBetween('2020-08-01', moment()) ||
-        (moment(right.startdate).isSameOrBefore('2020-08-01') && moment(right.enddate).isSameOrAfter(moment())) ||
+        moment(right.startdate).isBetween('2017-08-01', moment()) ||
+        (moment(right.startdate).isSameOrBefore('2017-08-01') && moment(right.enddate).isSameOrAfter(moment())) ||
         moment(right.enddate).isSameOrBefore(moment())
     )
     .map(right => right.studyrightStudentnumber)

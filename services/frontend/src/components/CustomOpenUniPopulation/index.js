@@ -22,16 +22,18 @@ const CustomOpenUniPopulation = () => {
           <br />
           <Icon fitted name="check" color="green" />: Student passed the course.
           <br />
-          <Icon fitted name="times" color="red" />: Student has enrolled but did not pass the course.
+          <Icon fitted name="times" color="red" />: Student has enrolled but has not passed the course.
           <br />
-          Empty cell: Student has not any enrollment for the course.
+          <b>Empty cell</b>: Student has no enrollments for the course.
           <br />
-          View under progress: Student population may still contain some students that have had studyright during the
-          course registration, but the studyright is currently ended.
+          View under progress: At the moment the list contains enrollments from 1.8.2017 to 1.8.2022, and the credits
+          starting from 1.8.2017 to current date. The idea is to change this to be defined by the user.
         </p>
       </Message>
       <CustomOpenUniSearch setCourses={setCourses} />
-      {courses.length > 0 && <OpenUniPopulationResults courses={courses} />}
+      <div style={{ paddingTop: 10, paddingBottom: 10 }}>
+        {courses.length > 0 && <OpenUniPopulationResults courses={courses} />}
+      </div>
     </div>
   )
 }
