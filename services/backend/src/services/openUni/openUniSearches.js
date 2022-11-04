@@ -16,7 +16,7 @@ const getCredits = async courseCodes =>
           [Op.in]: ['1', '2', '3', '4', '5', 'Hyv.'],
         },
         attainment_date: {
-          [Op.gte]: moment('8-1-2020', 'MM-DD-YYYY').toDate(),
+          [Op.gte]: moment('8-1-2017', 'MM-DD-YYYY').toDate(),
         },
       },
     })
@@ -27,7 +27,7 @@ const getStudentInfo = async students =>
     await Student.findAll({
       where: {
         studentnumber: {
-          [Op.in]: students.length > 0 ? students : { [Op.not]: null },
+          [Op.in]: students,
         },
       },
     })
@@ -44,7 +44,7 @@ const getEnrollments = async courseCodes =>
         enrollment_date_time: {
           [Op.and]: {
             [Op.lte]: moment('8-1-2022', 'MM-DD-YYYY').toDate(),
-            [Op.gte]: moment('8-1-2020', 'MM-DD-YYYY').toDate(),
+            [Op.gte]: moment('8-1-2017', 'MM-DD-YYYY').toDate(),
           },
         },
       },

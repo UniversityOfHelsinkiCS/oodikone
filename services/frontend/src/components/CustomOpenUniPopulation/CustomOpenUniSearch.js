@@ -39,10 +39,10 @@ const CustomOpenUniSearch = ({ setCourses }) => {
         <Form>
           <h2> Fetch open uni course population</h2>
           <Form.Field>
-            <em> Insert course code(s).</em>
+            <em>Insert course code(s). At the moment the information shown is fetched starting from 1.8.2017.</em>
             <TextArea
               value={input}
-              placeholder="TKT-12345, PSYK-12345"
+              placeholder="TKT12345, PSYK-123"
               onChange={e => setInput(e.target.value)}
               data-cy="student-no-input"
             />
