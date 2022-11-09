@@ -3,11 +3,11 @@ const { getCredits, getStudyRights, getEnrollments, getStudentInfo } = require('
 
 const uniq = objects => [...new Set(objects)]
 
-const getCustomOpenUniCourses = async courseCodes => {
+const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
   const ayCourseCodes = courseCodes.map(courseCode => 'AY' + courseCode)
   const allCourseCodes = courseCodes.concat(ayCourseCodes)
-  const allCredits = await getCredits(allCourseCodes)
-  const allEnrollments = await getEnrollments(allCourseCodes)
+  const allCredits = await getCredits(allCourseCodes, startdate)
+  const allEnrollments = await getEnrollments(allCourseCodes, startdate, enddate)
   const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentnumber))
 
   const allStudyrights = await getStudyRights(students)
@@ -19,8 +19,8 @@ const getCustomOpenUniCourses = async courseCodes => {
   const studentsWithCurrentStudyRight = allStudyrights
     .filter(
       right =>
-        moment(right.startdate).isBetween('2017-08-01', moment()) ||
-        (moment(right.startdate).isSameOrBefore('2017-08-01') && moment(right.enddate).isSameOrAfter(moment())) ||
+        moment(right.startdate).isBetween(startdate, moment()) ||
+        (moment(right.startdate).isSameOrBefore(startdate) && moment(right.enddate).isSameOrAfter(moment())) ||
         moment(right.enddate).isSameOrBefore(moment())
     )
     .map(right => right.studyrightStudentnumber)

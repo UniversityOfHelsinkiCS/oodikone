@@ -9,7 +9,7 @@ import CustomOpenUniSearch from './CustomOpenUniSearch'
 
 const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')
-  const [courses, setCourses] = useState([])
+  const [fieldValues, setValues] = useState({})
   // const language = useLanguage()
 
   return (
@@ -26,13 +26,12 @@ const CustomOpenUniPopulation = () => {
           <br />
           <b>Empty cell</b>: Student has no enrollments for the course.
           <br />
-          View under progress: At the moment the list contains enrollments from 1.8.2017 to 1.8.2022, and the credits
-          starting from 1.8.2017 to current date. The idea is to change this to be defined by the user.
+          View under progress.
         </p>
       </Message>
-      <CustomOpenUniSearch setCourses={setCourses} />
+      <CustomOpenUniSearch setValues={setValues} />
       <div style={{ paddingTop: 10, paddingBottom: 10 }}>
-        {courses.length > 0 && <OpenUniPopulationResults courses={courses} />}
+        {fieldValues && fieldValues.courseList?.length > 0 && <OpenUniPopulationResults fieldValues={fieldValues} />}
       </div>
     </div>
   )

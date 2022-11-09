@@ -4,8 +4,9 @@ import { Loader, Icon } from 'semantic-ui-react'
 import { useGetOpenUniCourseStudentsQuery } from 'redux/openUniPopulations'
 import SortableTable from 'components/SortableTable'
 
-const OpenUniPopulationResults = ({ courses }) => {
-  const openUniStudentStats = useGetOpenUniCourseStudentsQuery({ courses })
+const OpenUniPopulationResults = ({ fieldValues }) => {
+  const { courseList, startdate, enddate } = fieldValues
+  const openUniStudentStats = useGetOpenUniCourseStudentsQuery({ courseList, startdate, enddate })
   const isFetchingOrLoading = openUniStudentStats.isLoading || openUniStudentStats.isFetching
   const isError = openUniStudentStats.isError || (openUniStudentStats.isSuccess && !openUniStudentStats.data)
 
@@ -70,7 +71,7 @@ const OpenUniPopulationResults = ({ courses }) => {
     return ''
   }
 
-  const labelsToCourses = courses.reduce((acc, course) => [...acc, { label: course }], [])
+  const labelsToCourses = courseList.reduce((acc, course) => [...acc, { label: course }], [])
   const columns = []
 
   columns.push(
@@ -148,7 +149,7 @@ const OpenUniPopulationResults = ({ courses }) => {
       ) : (
         <div style={{ display: 'flex' }}>
           <div style={{ maxHeight: '80vh', width: '100%' }}>
-            {courses.length > 0 && (
+            {courseList.length > 0 && (
               <SortableTable
                 title="Students Open Uni"
                 getRowKey={s => s.studentNumber}

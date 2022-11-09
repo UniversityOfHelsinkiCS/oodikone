@@ -1,10 +1,9 @@
 const { Credit, Enrollment, Studyright, Student } = require('../../models')
 const { mapOpenCredits, mapOpenEnrollments, mapStundentInfo, mapStudyRights } = require('./openUniHelpers')
-const moment = require('moment')
 const { Op } = require('sequelize')
 
 // 1. iteration: time is hardcoded. Check hyväksytty grades
-const getCredits = async courseCodes =>
+const getCredits = async (courseCodes, startdate) =>
   (
     await Credit.findAll({
       where: {
@@ -16,7 +15,7 @@ const getCredits = async courseCodes =>
           [Op.in]: ['1', '2', '3', '4', '5', 'Hyv.'],
         },
         attainment_date: {
-          [Op.gte]: moment('8-1-2017', 'MM-DD-YYYY').toDate(),
+          [Op.gte]: startdate,
         },
       },
     })
@@ -33,7 +32,7 @@ const getStudentInfo = async students =>
     })
   ).map(mapStundentInfo)
 
-const getEnrollments = async courseCodes =>
+const getEnrollments = async (courseCodes, startdate, enddate) =>
   (
     await Enrollment.findAll({
       where: {
@@ -43,8 +42,8 @@ const getEnrollments = async courseCodes =>
         is_open: true,
         enrollment_date_time: {
           [Op.and]: {
-            [Op.lte]: moment('8-1-2022', 'MM-DD-YYYY').toDate(),
-            [Op.gte]: moment('8-1-2017', 'MM-DD-YYYY').toDate(),
+            [Op.lte]: enddate,
+            [Op.gte]: startdate,
           },
         },
       },
