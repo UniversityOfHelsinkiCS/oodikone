@@ -1,4 +1,4 @@
-const { Model, STRING, DATE, INTEGER } = require('sequelize')
+const { Model, STRING, DATE, INTEGER, BOOLEAN } = require('sequelize')
 const { dbConnections } = require('../connection')
 
 class Student extends Model {}
@@ -26,6 +26,7 @@ Student.init(
     home_country_en: { type: STRING },
     gender_code: { type: INTEGER },
     sis_person_id: { type: STRING },
+    dissemination_info_allowed: { type: BOOLEAN },
     createdAt: {
       type: DATE,
     },
