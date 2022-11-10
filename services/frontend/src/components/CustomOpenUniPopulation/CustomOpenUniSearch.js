@@ -65,9 +65,7 @@ const CustomOpenUniSearch = ({ setValues }) => {
             />
           </Form.Field>
           <Form.Field>
-            <em>Select ending:</em>
-            <br />
-            <em>Enrollments are fetched until selected day.</em>
+            <em>Select ending for enrollments:</em>
             <br />
             <em>Attainments are fetched until today.</em>
             <Datetime
