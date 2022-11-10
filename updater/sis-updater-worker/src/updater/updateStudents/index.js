@@ -183,6 +183,7 @@ const updateStudents = async personIds => {
     studyRightPrimalities,
     enrollments,
     studyplans,
+    disclosures,
   ] = await Promise.all([
     selectFromByIds('persons', personIds),
     selectFromByIds('studyrights', personIds, 'person_id'),
@@ -191,6 +192,7 @@ const updateStudents = async personIds => {
     selectFromByIds('study_right_primalities', personIds, 'student_id'),
     selectFromByIds('enrolments', personIds, 'person_id'),
     selectFromByIds('plans', personIds, 'user_id'),
+    selectFromByIds('disclosures', personIds, 'person_id'),
   ])
 
   const parsedStudyrightSnapshots = parseStudyrightSnapshots(studyrightSnapshots)
@@ -209,10 +211,9 @@ const updateStudents = async personIds => {
   }, {})
 
   const attainmentsToBeExluced = getAttainmentsToBeExcluded()
-
   const mappedStudents = students
     .filter(s => s.student_number)
-    .map(studentMapper(attainments, parsedStudyrightSnapshots, attainmentsToBeExluced))
+    .map(studentMapper(attainments, parsedStudyrightSnapshots, attainmentsToBeExluced, disclosures))
 
   await bulkCreate(Student, mappedStudents)
 
