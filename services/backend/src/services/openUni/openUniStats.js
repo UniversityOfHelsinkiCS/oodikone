@@ -27,7 +27,14 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
   const uniqueStudentsWithCurrentStudyRight = uniq(studentsWithCurrentStudyRight)
 
   const studentStats = {}
-  for (const { studentnumber, email, secondary_email } of studentInfo) {
+  const getEmptyCourseInfo = () => {
+    return {
+      enrolledPassed: null,
+      enrolledNotPassed: [],
+      notEnrolled: false,
+    }
+  }
+  for (const { studentnumber, email, secondary_email, dissemination_info_allowed } of studentInfo) {
     // Check if the student has existing studyright: if yes, then stop here
     if (!uniqueStudentsWithCurrentStudyRight.includes(studentnumber)) {
       if (!(studentnumber in studentStats)) {
@@ -35,6 +42,9 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
           courseInfo: {},
           email: email,
           secondaryEmail: secondary_email,
+          disseminationInfoAllowed: dissemination_info_allowed,
+          passedTotal: 0,
+          enrolledTotal: 0,
         }
       }
       for (const { course_code, attainment_date, student_studentnumber } of allCredits) {
@@ -42,13 +52,10 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
           let courseCode = course_code
           if (course_code.startsWith('AY')) courseCode = course_code.replace('AY', '')
           if (!(courseCode in studentStats[studentnumber].courseInfo)) {
-            studentStats[studentnumber].courseInfo[courseCode] = {
-              enrolledPassed: null,
-              enrolledNotPassed: [],
-              notEnrolled: false,
-            }
+            studentStats[studentnumber].courseInfo[courseCode] = getEmptyCourseInfo()
           }
           studentStats[studentnumber].courseInfo[courseCode].enrolledPassed = attainment_date
+          studentStats[studentnumber].passedTotal += 1
         }
       }
       for (const { enrollmentStudentnumber, course_code, enrollment_date_time } of allEnrollments) {
@@ -56,15 +63,12 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
           let courseCode = course_code
           if (course_code.startsWith('AY')) courseCode = course_code.replace('AY', '')
           if (!(courseCode in studentStats[studentnumber].courseInfo)) {
-            studentStats[studentnumber].courseInfo[courseCode] = {
-              enrolledPassed: null,
-              enrolledNotPassed: [],
-              notEnrolled: false,
-            }
+            studentStats[studentnumber].courseInfo[courseCode] = getEmptyCourseInfo()
           }
           if (!studentStats[studentnumber].courseInfo[courseCode].enrolledPassed && studentnumber === studentnumber) {
             // enrolledPassed, enrolledNotPassed, notEnrolled
             studentStats[studentnumber].courseInfo[courseCode].enrolledNotPassed.push(enrollment_date_time)
+            studentStats[studentnumber].enrolledTotal += 1
           }
           if (
             studentStats[studentnumber].courseInfo[courseCode].enrolledNotPassed.length === 0 &&

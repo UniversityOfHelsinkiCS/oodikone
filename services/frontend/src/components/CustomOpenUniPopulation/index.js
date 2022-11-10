@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Message, Icon } from 'semantic-ui-react'
+import moment from 'moment'
 import OpenUniPopulationResults from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
 // import useLanguage from '../LanguagePicker/useLanguage'
@@ -14,7 +15,7 @@ const CustomOpenUniPopulation = () => {
 
   return (
     <div className="segmentContainer">
-      <Message style={{ maxWidth: '800px' }}>
+      <Message style={{ maxWidth: '800px', fontSize: '16px' }}>
         <Message.Header>Open uni student population</Message.Header>
         <p>
           Here you can create custom population using a list of courses. Clicking the blue custom population button will
@@ -30,7 +31,15 @@ const CustomOpenUniPopulation = () => {
         </p>
       </Message>
       <CustomOpenUniSearch setValues={setValues} />
-      <div style={{ paddingTop: 10, paddingBottom: 10 }}>
+      <div style={{ paddingTop: '25px', paddingBottom: '10px', fontSize: '20px' }}>
+        {fieldValues && fieldValues.courseList?.length > 0 && (
+          <b>
+            Beginning of the search for all fields: {moment(fieldValues.startdate).format('DD.MM.YYYY')} <br />
+            End of the search for enrollments: {moment(fieldValues.enddate).format('DD.MM.YYYY')}
+          </b>
+        )}
+      </div>
+      <div style={{ paddingTop: '25px' }}>
         {fieldValues && fieldValues.courseList?.length > 0 && <OpenUniPopulationResults fieldValues={fieldValues} />}
       </div>
     </div>

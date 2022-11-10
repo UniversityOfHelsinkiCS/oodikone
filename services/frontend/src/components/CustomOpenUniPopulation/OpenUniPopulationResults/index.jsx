@@ -22,9 +22,14 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
       title: 'Student Number',
       children: [
         {
-          key: s => `studentnumber-${s.studentnumber}`,
+          key: 'studentnumber-child',
           title: 'Student Number',
-          cellProps: { title: 'student number' },
+          cellProps: {
+            style: {
+              verticalAlign: 'middle',
+              textAlign: 'center',
+            },
+          },
           getRowVal: s => s.studentnumber,
           getRowContent: s => s.studentnumber,
           child: true,
@@ -33,22 +38,67 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
     },
   ]
 
-  const emailColumns = [
+  const statisticColumns = [
     {
-      key: s => `email-${s.email}`,
-      title: 'Email',
-      getRowVal: s => (s.email ? s.email : ''),
-      getRowContent: s => (s.email ? s.email : ''),
-      cellProps: { title: 'Email' },
+      key: 'passed',
+      title: 'Passed',
+      cellProps: {
+        style: {
+          verticalAlign: 'middle',
+          textAlign: 'center',
+        },
+      },
+      headerProps: { title: 'Passed' },
+      getRowVal: s => s.passedTotal,
+      getRowContent: s => s.passedTotal,
       child: true,
     },
     {
-      key: s => `secondary_email-${s.secondaryEmail}`,
+      key: 'unfinished',
+      title: 'Unfinished',
+      headerProps: { title: 'Unfinished' },
+      getRowVal: s => s.enrolledTotal,
+      getRowContent: s => s.enrolledTotal,
+      cellProps: {
+        style: {
+          verticalAlign: 'middle',
+          textAlign: 'center',
+        },
+      },
+      child: true,
+    },
+  ]
+
+  const informationColumns = [
+    {
+      key: 'email-child',
+      title: 'Email',
+      getRowVal: s => (s.email ? s.email : ''),
+      getRowContent: s => (s.email ? s.email : ''),
+      headerProps: { title: 'Email' },
+      child: true,
+    },
+    {
+      key: 'secondary_email-child',
       title: 'Secondary Email',
       getRowVal: s => (s.secondaryEmail ? s.secondaryEmail : ''),
       getRowContent: s => (s.secondaryEmail ? s.secondaryEmail : ''),
-      cellProps: { title: 'Secodary Email' },
+      headerProps: { title: 'Secondary Email' },
       child: true,
+    },
+    {
+      key: 'disseminationInfoAllowed',
+      title: 'Marketing allowed',
+      getRowVal: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
+      getRowContent: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
+      headerProps: { title: 'Marketing allowed' },
+      child: true,
+      cellProps: {
+        style: {
+          verticalAlign: 'middle',
+          textAlign: 'center',
+        },
+      },
     },
   ]
   const findRowContent = (s, courseCode) => {
@@ -99,7 +149,6 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
         vertical: false,
         forceToolsMode: 'dangling',
         cellProps: {
-          title: `${course.label}`, // , ${getTextIn(m.name)}`
           style: {
             verticalAlign: 'middle',
             textAlign: 'center',
@@ -107,9 +156,6 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
         },
         headerProps: { title: `${course.label}` }, // ${getTextIn(m.name)}` },
         getRowVal: s => {
-          return findRowValue(s, course.label)
-        },
-        getRowExportVal: s => {
           return findRowValue(s, course.label)
         },
         getRowContent: s => {
@@ -121,11 +167,18 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
       })),
     },
     {
-      key: 'emails',
-      title: <b>Email Adresses:</b>,
+      key: 'statistics',
+      title: <b>Total of:</b>,
       textTitle: null,
       parent: true,
-      children: emailColumns,
+      children: statisticColumns,
+    },
+    {
+      key: 'information',
+      title: <b>Information:</b>,
+      textTitle: null,
+      parent: true,
+      children: informationColumns,
     }
   )
 
@@ -137,17 +190,20 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
         courseInfo: { ...openUniStudentStats?.data[student].courseInfo },
         email: openUniStudentStats?.data[student].email,
         secondaryEmail: openUniStudentStats?.data[student].secondaryEmail,
+        disseminationInfoAllowed: openUniStudentStats?.data[student].disseminationInfoAllowed,
+        enrolledTotal: openUniStudentStats?.data[student].enrolledTotal,
+        passedTotal: openUniStudentStats?.data[student].passedTotal,
       },
     ],
     []
   )
 
   return (
-    <div>
+    <div style={{ paddingBottom: '50px' }}>
       {isFetchingOrLoading ? (
         <Loader active style={{ marginTop: '15em' }} />
       ) : (
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', paddingBottom: '10px' }}>
           <div style={{ maxHeight: '80vh', width: '100%' }}>
             {courseList.length > 0 && (
               <SortableTable
