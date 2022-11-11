@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Message, Icon } from 'semantic-ui-react'
 import moment from 'moment'
@@ -6,12 +6,22 @@ import OpenUniPopulationResults from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
 // import useLanguage from '../LanguagePicker/useLanguage'
 import CustomOpenUniSearch from './CustomOpenUniSearch'
-// import TSA from '../../common/tsa'
+import TSA from '../../common/tsa'
 
 const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')
   const [fieldValues, setValues] = useState({})
   // const language = useLanguage()
+  useEffect(() => {
+    if (fieldValues && fieldValues.courseList?.length > 0) {
+      TSA.Influx.sendEvent({
+        group: 'Custom Open Uni Usage',
+        name: 'open uni populations',
+        label: 'openUniPopulations',
+        value: 1,
+      })
+    }
+  }, [fieldValues])
 
   return (
     <div className="segmentContainer">

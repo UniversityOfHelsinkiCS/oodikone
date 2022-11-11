@@ -88,10 +88,10 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
     },
     {
       key: 'disseminationInfoAllowed',
-      title: 'Marketing allowed',
+      title: 'Marketing Allowed',
       getRowVal: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
       getRowContent: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
-      headerProps: { title: 'Marketing allowed' },
+      headerProps: { title: 'Marketing Allowed' },
       child: true,
       cellProps: {
         style: {
