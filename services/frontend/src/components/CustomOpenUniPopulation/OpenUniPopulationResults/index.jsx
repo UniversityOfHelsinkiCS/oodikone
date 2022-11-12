@@ -71,6 +71,20 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
 
   const informationColumns = [
     {
+      key: 'disseminationInfoAllowed',
+      title: 'Marketing Allowed',
+      getRowVal: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
+      getRowContent: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
+      headerProps: { title: 'Marketing Allowed' },
+      child: true,
+      cellProps: {
+        style: {
+          verticalAlign: 'middle',
+          textAlign: 'center',
+        },
+      },
+    },
+    {
       key: 'email-child',
       title: 'Email',
       getRowVal: s => (s.email ? s.email : ''),
@@ -85,20 +99,6 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
       getRowContent: s => (s.secondaryEmail ? s.secondaryEmail : ''),
       headerProps: { title: 'Secondary Email' },
       child: true,
-    },
-    {
-      key: 'disseminationInfoAllowed',
-      title: 'Marketing Allowed',
-      getRowVal: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
-      getRowContent: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
-      headerProps: { title: 'Marketing Allowed' },
-      child: true,
-      cellProps: {
-        style: {
-          verticalAlign: 'middle',
-          textAlign: 'center',
-        },
-      },
     },
   ]
   const findRowContent = (s, courseCode) => {
