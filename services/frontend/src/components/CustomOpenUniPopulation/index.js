@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { withRouter } from 'react-router-dom'
-import { Message, Icon } from 'semantic-ui-react'
+import { Message, Icon, Loader } from 'semantic-ui-react'
 import moment from 'moment'
+import { useGetSavedSearchesQuery } from 'redux/openUniPopulations'
 import OpenUniPopulationResults from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
 // import useLanguage from '../LanguagePicker/useLanguage'
@@ -12,6 +13,10 @@ const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')
   const [fieldValues, setValues] = useState({})
   // const language = useLanguage()
+  const savedSearches = useGetSavedSearchesQuery()
+  const isFetchingOrLoading = savedSearches.isLoading || savedSearches.isFetching
+  const isError = savedSearches.isError || (savedSearches.isSuccess && !savedSearches.data)
+
   useEffect(() => {
     if (fieldValues && fieldValues.courseList?.length > 0) {
       TSA.Influx.sendEvent({
@@ -23,6 +28,8 @@ const CustomOpenUniPopulation = () => {
     }
   }, [fieldValues])
 
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
   return (
     <div className="segmentContainer">
       <Message style={{ maxWidth: '800px', fontSize: '16px' }}>
@@ -40,7 +47,7 @@ const CustomOpenUniPopulation = () => {
           View under progress.
         </p>
       </Message>
-      <CustomOpenUniSearch setValues={setValues} />
+      <CustomOpenUniSearch setValues={setValues} savedSearches={savedSearches.data} />
       <div style={{ paddingTop: '25px', paddingBottom: '10px', fontSize: '20px' }}>
         {fieldValues && fieldValues.courseList?.length > 0 && (
           <b>

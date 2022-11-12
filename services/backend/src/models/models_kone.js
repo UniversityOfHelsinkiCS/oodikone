@@ -121,6 +121,28 @@ const CustomPopulationSearch = sequelizeKone.define('custom_population_searches'
   },
 })
 
+const OpenUniPopulationSearch = sequelizeKone.define(
+  'open_uni_population_searches',
+  {
+    id: {
+      primaryKey: true,
+      type: Sequelize.BIGINT,
+      autoIncrement: true,
+    },
+    userId: {
+      type: Sequelize.BIGINT,
+    },
+    name: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    courseCodes: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
+  },
+  { underscored: true, timestamps: true }
+)
+
 const StudyGuidanceGroupTag = sequelizeKone.define(
   'study_guidance_group_tags',
   {
@@ -162,6 +184,7 @@ module.exports = {
   ThesisTypeEnums,
   MandatoryCourseLabels,
   CustomPopulationSearch,
+  OpenUniPopulationSearch,
   sequelizeKone,
   ExcludedCourse,
   StudyGuidanceGroupTag,

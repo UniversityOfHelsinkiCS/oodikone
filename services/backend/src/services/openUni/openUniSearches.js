@@ -1,4 +1,5 @@
 const { Credit, Enrollment, Studyright, Student } = require('../../models')
+const { OpenUniPopulationSearch } = require('../../models/models_kone')
 const { mapOpenCredits, mapOpenEnrollments, mapStundentInfo, mapStudyRights } = require('./openUniHelpers')
 const { Op } = require('sequelize')
 
@@ -68,4 +69,51 @@ const getStudyRights = async students =>
     })
   ).map(mapStudyRights)
 
-module.exports = { getCredits, getEnrollments, getStudyRights, getStudentInfo }
+const getOpenUniSearchesByUser = async userId => {
+  return await OpenUniPopulationSearch.findAll({
+    where: {
+      userId,
+    },
+  })
+}
+
+const createOpenUniPopulationSearch = async (userId, name, courseCodes) => {
+  return await OpenUniPopulationSearch.create({
+    userId,
+    name,
+    courseCodes,
+  })
+}
+
+const updateOpenUniPopulationSearch = async (userId, id, courseCodes) => {
+  const searchToUpdate = await OpenUniPopulationSearch.findOne({
+    where: {
+      userId: userId,
+      id: id,
+    },
+  })
+
+  if (!searchToUpdate) return null
+
+  return await searchToUpdate.update({ courseCodes })
+}
+
+const deleteOpenUniSearch = async (userId, id) => {
+  return await OpenUniPopulationSearch.destroy({
+    where: {
+      userId: userId,
+      id: id,
+    },
+  })
+}
+
+module.exports = {
+  getCredits,
+  getEnrollments,
+  getStudyRights,
+  getStudentInfo,
+  getOpenUniSearchesByUser,
+  createOpenUniPopulationSearch,
+  updateOpenUniPopulationSearch,
+  deleteOpenUniSearch,
+}
