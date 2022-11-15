@@ -1,6 +1,12 @@
-const { Credit, Enrollment, Studyright, Student } = require('../../models')
+const { Credit, Enrollment, Studyright, Student, Course } = require('../../models')
 const { OpenUniPopulationSearch } = require('../../models/models_kone')
-const { mapOpenCredits, mapOpenEnrollments, mapStundentInfo, mapStudyRights } = require('./openUniHelpers')
+const {
+  mapOpenCredits,
+  mapOpenEnrollments,
+  mapStundentInfo,
+  mapStudyRights,
+  mapCourseInfo,
+} = require('./openUniHelpers')
 const { Op } = require('sequelize')
 
 // 1. iteration: time is hardcoded. Check hyväksytty grades
@@ -51,6 +57,18 @@ const getEnrollments = async (courseCodes, startdate, enddate) =>
     })
   ).map(mapOpenEnrollments)
 
+const getCourseNames = async courseCodes =>
+  (
+    await Course.findAll({
+      attributes: ['code', 'name'],
+      where: {
+        code: {
+          [Op.in]: courseCodes,
+        },
+      },
+    })
+  ).map(mapCourseInfo)
+
 const getStudyRights = async students =>
   (
     await Studyright.findAll({
@@ -94,7 +112,6 @@ const updateOpenUniPopulationSearch = async (userId, id, courseCodes) => {
   })
 
   if (!searchToUpdate) return null
-
   return await searchToUpdate.update({ courseCodes })
 }
 
@@ -112,6 +129,7 @@ module.exports = {
   getEnrollments,
   getStudyRights,
   getStudentInfo,
+  getCourseNames,
   getOpenUniSearchesByUser,
   createOpenUniPopulationSearch,
   updateOpenUniPopulationSearch,

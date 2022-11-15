@@ -3,16 +3,16 @@ import moment from 'moment'
 import { Loader, Icon } from 'semantic-ui-react'
 import { useGetOpenUniCourseStudentsQuery } from 'redux/openUniPopulations'
 import SortableTable from 'components/SortableTable'
+import useLanguage from 'components/LanguagePicker/useLanguage'
 
 const OpenUniPopulationResults = ({ fieldValues }) => {
   const { courseList, startdate, enddate } = fieldValues
   const openUniStudentStats = useGetOpenUniCourseStudentsQuery({ courseList, startdate, enddate })
   const isFetchingOrLoading = openUniStudentStats.isLoading || openUniStudentStats.isFetching
   const isError = openUniStudentStats.isError || (openUniStudentStats.isSuccess && !openUniStudentStats.data)
-
+  const { language } = useLanguage()
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
-  // const { getTextIn } = useLanguage()
 
   const studentNbrColumn = [
     {
@@ -111,7 +111,8 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
 
   const findRowValue = (s, courseCode) => {
     if (s.courseInfo[courseCode] === undefined) return ''
-    if (s.courseInfo[courseCode].notEnrolled) return ''
+    if (s.courseInfo[courseCode].enrolledNotPassed.length === 0 && s.courseInfo[courseCode].enrolledPassed === null)
+      return ''
     if (s.courseInfo[courseCode].enrolledNotPassed.length > 0)
       return s.courseInfo[courseCode].enrolledNotPassed
         .map((dat, idx) => `Enrollment ${idx + 1}: ${moment(dat).format('DD-MM-YYYY')}`)
@@ -121,9 +122,8 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
     return ''
   }
 
-  const labelsToCourses = courseList.reduce((acc, course) => [...acc, { label: course }], [])
+  const labelsToCourses = openUniStudentStats?.data.courses
   const columns = []
-
   columns.push(
     {
       key: 'general',
@@ -134,27 +134,28 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
     },
     {
       key: 'Courses',
-      title: <b>Fetched Courses:</b>,
+      title: <b>Courses:</b>,
       textTitle: null,
       parent: true,
       children: labelsToCourses.map(course => ({
-        key: `${course.label}-child`,
+        key: `${course.label}-${course.name[language]}`,
         title: (
           <div style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}>
             <div>{course.label}</div>
-            {/* <div style={{ color: 'gray', fontWeight: 'normal' }}>{getTextIn(m.name)}</div> */}
+            {/* <div style={{ color: 'gray', fontWeight: 'normal' }}>{course.name[language]}</div> */}
           </div>
         ),
-        textTitle: course.label,
+        textTitle: `${course.label}-${course.name[language]}`,
         vertical: false,
         forceToolsMode: 'dangling',
         cellProps: {
+          title: `${course.label}, ${course.name[language]}`,
           style: {
             verticalAlign: 'middle',
             textAlign: 'center',
           },
         },
-        headerProps: { title: `${course.label}` }, // ${getTextIn(m.name)}` },
+        headerProps: { title: `${course.label}-${course.name[language]}` },
         getRowVal: s => {
           return findRowValue(s, course.label)
         },
@@ -182,17 +183,17 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
     }
   )
 
-  const data = Object.keys(openUniStudentStats?.data).reduce(
+  const data = Object.keys(openUniStudentStats?.data.students).reduce(
     (acc, student) => [
       ...acc,
       {
         studentnumber: student,
-        courseInfo: { ...openUniStudentStats?.data[student].courseInfo },
-        email: openUniStudentStats?.data[student].email,
-        secondaryEmail: openUniStudentStats?.data[student].secondaryEmail,
-        disseminationInfoAllowed: openUniStudentStats?.data[student].disseminationInfoAllowed,
-        enrolledTotal: openUniStudentStats?.data[student].enrolledTotal,
-        passedTotal: openUniStudentStats?.data[student].passedTotal,
+        courseInfo: { ...openUniStudentStats?.data.students[student].courseInfo },
+        email: openUniStudentStats?.data.students[student].email,
+        secondaryEmail: openUniStudentStats?.data.students[student].secondaryEmail,
+        disseminationInfoAllowed: openUniStudentStats?.data.students[student].disseminationInfoAllowed,
+        enrolledTotal: openUniStudentStats?.data.students[student].enrolledTotal,
+        passedTotal: openUniStudentStats?.data.students[student].passedTotal,
       },
     ],
     []
@@ -207,7 +208,9 @@ const OpenUniPopulationResults = ({ fieldValues }) => {
           <div style={{ maxHeight: '80vh', width: '100%' }}>
             {courseList.length > 0 && (
               <SortableTable
-                title="Students Open Uni"
+                title={`Open Uni Student Population (${
+                  Object.keys(openUniStudentStats?.data.students).length
+                } students)`}
                 getRowKey={s => s.studentNumber}
                 tableProps={{
                   celled: true,
