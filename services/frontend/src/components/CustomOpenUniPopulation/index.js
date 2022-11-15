@@ -50,10 +50,17 @@ const CustomOpenUniPopulation = () => {
       <CustomOpenUniSearch setValues={setValues} savedSearches={savedSearches.data} />
       <div style={{ paddingTop: '25px', paddingBottom: '10px', fontSize: '20px' }}>
         {fieldValues && fieldValues.courseList?.length > 0 && (
-          <b>
-            Beginning of the search for all fields: {moment(fieldValues.startdate).format('DD.MM.YYYY')} <br />
-            End of the search for enrollments: {moment(fieldValues.enddate).format('DD.MM.YYYY')}
-          </b>
+          <p>
+            <span style={{ color: '#484848' }}>Beginning of the search for all fields:</span>
+            <span style={{ paddingLeft: '10px', fontWeight: '600' }}>
+              {moment(fieldValues.startdate).format('DD.MM.YYYY')}
+            </span>
+            <br />
+            <span style={{ color: '#484848' }}>End of the search for enrollments:</span>
+            <span style={{ paddingLeft: '26px', fontWeight: '600' }}>
+              {moment(fieldValues.enddate).format('DD.MM.YYYY')}
+            </span>
+          </p>
         )}
       </div>
       <div style={{ paddingTop: '25px' }}>

@@ -1,5 +1,5 @@
 const moment = require('moment')
-const { getCredits, getStudyRights, getEnrollments, getStudentInfo } = require('./openUniSearches')
+const { getCredits, getStudyRights, getEnrollments, getStudentInfo, getCourseNames } = require('./openUniSearches')
 
 const uniq = objects => [...new Set(objects)]
 
@@ -9,6 +9,7 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
   const allCredits = await getCredits(allCourseCodes, startdate)
   const allEnrollments = await getEnrollments(allCourseCodes, startdate, enddate)
   const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentnumber))
+  const courses = await getCourseNames(courseCodes)
 
   const allStudyrights = await getStudyRights(students)
   const studentInfo = await getStudentInfo(students)
@@ -31,15 +32,15 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
     return {
       enrolledPassed: null,
       enrolledNotPassed: [],
-      notEnrolled: false,
     }
   }
+
   for (const { studentnumber, email, secondary_email, dissemination_info_allowed } of studentInfo) {
     // Check if the student has existing studyright: if yes, then stop here
     if (!uniqueStudentsWithCurrentStudyRight.includes(studentnumber)) {
       if (!(studentnumber in studentStats)) {
         studentStats[studentnumber] = {
-          courseInfo: {},
+          courseInfo: courseCodes.reduce((acc, code) => ({ ...acc, [code]: getEmptyCourseInfo() }), {}),
           email: email,
           secondaryEmail: secondary_email,
           disseminationInfoAllowed: dissemination_info_allowed,
@@ -47,41 +48,32 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
           enrolledTotal: 0,
         }
       }
+      const passedCourses = []
+      const unfinishedCourses = []
       for (const { course_code, attainment_date, student_studentnumber } of allCredits) {
         if (student_studentnumber === studentnumber) {
-          let courseCode = course_code
-          if (course_code.startsWith('AY')) courseCode = course_code.replace('AY', '')
-          if (!(courseCode in studentStats[studentnumber].courseInfo)) {
-            studentStats[studentnumber].courseInfo[courseCode] = getEmptyCourseInfo()
-          }
+          const courseCode = course_code.replace('AY', '')
           studentStats[studentnumber].courseInfo[courseCode].enrolledPassed = attainment_date
-          studentStats[studentnumber].passedTotal += 1
+          if (!passedCourses.includes(courseCode)) {
+            passedCourses.push(courseCode)
+          }
         }
       }
       for (const { enrollmentStudentnumber, course_code, enrollment_date_time } of allEnrollments) {
         if (enrollmentStudentnumber === studentnumber) {
-          let courseCode = course_code
-          if (course_code.startsWith('AY')) courseCode = course_code.replace('AY', '')
-          if (!(courseCode in studentStats[studentnumber].courseInfo)) {
-            studentStats[studentnumber].courseInfo[courseCode] = getEmptyCourseInfo()
-          }
+          const courseCode = course_code.replace('AY', '')
           if (!studentStats[studentnumber].courseInfo[courseCode].enrolledPassed && studentnumber === studentnumber) {
-            // enrolledPassed, enrolledNotPassed, notEnrolled
             studentStats[studentnumber].courseInfo[courseCode].enrolledNotPassed.push(enrollment_date_time)
-            studentStats[studentnumber].enrolledTotal += 1
-          }
-          if (
-            studentStats[studentnumber].courseInfo[courseCode].enrolledNotPassed.length === 0 &&
-            !studentStats[studentnumber].courseInfo[courseCode].enrolledPassed &&
-            studentnumber === studentnumber
-          ) {
-            studentStats[studentnumber].courseInfo[courseCode].notEnrolled = true
+            if (!unfinishedCourses.includes(courseCode)) unfinishedCourses.push(courseCode)
           }
         }
       }
+      studentStats[studentnumber].passedTotal = passedCourses.length
+      studentStats[studentnumber].enrolledTotal = unfinishedCourses.length
     }
   }
-  return studentStats
+  const openUniStats = { students: studentStats, courses: courses }
+  return openUniStats
 }
 
 module.exports = { getCustomOpenUniCourses }

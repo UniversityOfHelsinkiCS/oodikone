@@ -60,14 +60,10 @@ const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
 
   const onClicker = e => {
     e.preventDefault()
-    let courseList = input
-    if (!Array.isArray(input)) {
-      courseList = input
-        .split(',')
-        .map(code => code.trim().toUpperCase())
-        .filter(code => code.length > 0)
-    }
-
+    const courseList = input
+      .split(',')
+      .map(code => code.trim().toUpperCase())
+      .filter(code => code.length > 0)
     setValues({
       courseList,
       startdate: moment(startdate).toISOString(),
@@ -78,6 +74,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
 
   const onDelete = () => {
     deleteOpenUniCourseSearch({ id: selectedSearchId })
+    clearForm()
   }
 
   const onSelectSearch = selectedId => {
@@ -88,7 +85,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
     const { id: selectedSearchId } = selectedId
     const selectedSearch = searchList.find(search => search.id === selectedSearchId)
     if (selectedSearch) {
-      setInput(selectedSearch.courseList)
+      setInput(selectedSearch.courseList.join(', '))
       setName(selectedSearch.name)
       setSelectedSearchId(selectedSearch.id)
     }

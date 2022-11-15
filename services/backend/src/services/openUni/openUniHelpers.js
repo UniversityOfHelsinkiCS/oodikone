@@ -35,4 +35,13 @@ const mapStudyRights = studyright => {
     studyrightStudentnumber: student.studentnumber,
   }
 }
-module.exports = { mapOpenCredits, mapOpenEnrollments, mapStundentInfo, mapStudyRights }
+
+const mapCourseInfo = course => {
+  const { code, name } = course
+  return {
+    label: code,
+    name,
+  }
+}
+
+module.exports = { mapOpenCredits, mapOpenEnrollments, mapStundentInfo, mapStudyRights, mapCourseInfo }
