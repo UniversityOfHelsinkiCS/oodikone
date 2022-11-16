@@ -95,6 +95,7 @@ const getFacultyRegularCreditStats = async ({
       nonDegree.tableStats[attainmentYear] += credits || 0
     }
   })
+
   if (
     majors.graphStats.every(year => year === 0) &&
     facultyNonMajors.graphStats.every(year => year === 0) &&
@@ -191,7 +192,7 @@ const getProgrammeCredits = async (code, yearType, specialGroups, facultyProgram
   return updatedStats
 }
 
-const combineFacultyCredits = async (faculty, programmes, yearType, specialGroups) => {
+const combineFacultyCredits = async (faculty, programmes, allProgrammes, yearType, specialGroups) => {
   let counts = {}
   let years = []
   const titles =
@@ -216,7 +217,7 @@ const combineFacultyCredits = async (faculty, programmes, yearType, specialGroup
     titles,
   }
 
-  const progCodes = programmes.map(p => p.code)
+  const progCodes = allProgrammes.map(p => p.code)
   for (const prog of programmes) {
     const data = await getProgrammeCredits(prog.code, yearType, specialGroups, progCodes)
     if (data) {
@@ -237,6 +238,7 @@ const combineFacultyCredits = async (faculty, programmes, yearType, specialGroup
       })
     }
   }
+
   // save table stats and graph stats
   years.forEach(year => {
     allCredits.tableStats.push([year, ...counts[year]])

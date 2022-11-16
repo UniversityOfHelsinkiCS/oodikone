@@ -94,7 +94,10 @@ router.get('/:id/creditstats', async (req, res) => {
   const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
 
-  let updatedStats = await combineFacultyCredits(code, programmes.data, yearType, specialGroups)
+  // list of all programmes is also needed in classification of credits
+  const allProgrammes = programmeFilter === 'ALL_PROGRAMMES' ? programmes : await getProgrammes(code, 'ALL_PROGRAMMES')
+
+  let updatedStats = await combineFacultyCredits(code, programmes.data, allProgrammes.data, yearType, specialGroups)
   if (updatedStats) {
     updatedStats = await setCreditStats(updatedStats, yearType, programmeFilter, specialGroups)
   }
