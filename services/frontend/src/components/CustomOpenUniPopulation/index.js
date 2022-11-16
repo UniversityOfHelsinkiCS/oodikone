@@ -57,7 +57,7 @@ const CustomOpenUniPopulation = () => {
             </span>
             <br />
             <span style={{ color: '#484848' }}>End of the search for enrollments:</span>
-            <span style={{ paddingLeft: '26px', fontWeight: '600' }}>
+            <span style={{ paddingLeft: '30px', fontWeight: '600' }}>
               {moment(fieldValues.enddate).format('DD.MM.YYYY')}
             </span>
           </p>
