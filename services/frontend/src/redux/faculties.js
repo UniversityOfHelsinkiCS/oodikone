@@ -4,7 +4,7 @@ import { callController } from '../apiConnection'
 // Use that for new stuff or switch while refactoring
 
 export const getFaculties = () => {
-  const route = '/faculties'
+  const route = '/faculties-only'
   const prefix = 'GET_FACULTIES_'
   return callController(route, prefix)
 }

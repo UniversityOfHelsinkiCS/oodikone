@@ -67,7 +67,7 @@ const Routes = () => (
       <ProtectedRoute
         requiredRoles={['admin', 'facultyStatistics']}
         exact
-        path="/faculties/:facultyCode?"
+        path={routes.faculties}
         component={FacultyStatistics}
       />
       <ProtectedRoute
