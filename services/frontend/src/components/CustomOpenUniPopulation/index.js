@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { Message, Icon, Loader } from 'semantic-ui-react'
 import moment from 'moment'
 import { useGetSavedSearchesQuery } from 'redux/openUniPopulations'
 import OpenUniPopulationResults from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
-// import useLanguage from '../LanguagePicker/useLanguage'
+import useLanguage from '../LanguagePicker/useLanguage'
 import CustomOpenUniSearch from './CustomOpenUniSearch'
 import TSA from '../../common/tsa'
 
 const CustomOpenUniPopulation = () => {
   useTitle('Custom open uni population')
   const [fieldValues, setValues] = useState({})
-  // const language = useLanguage()
+  const { language } = useLanguage()
+  const location = useLocation()
+  const history = useHistory()
   const savedSearches = useGetSavedSearchesQuery()
   const isFetchingOrLoading = savedSearches.isLoading || savedSearches.isFetching
   const isError = savedSearches.isError || (savedSearches.isSuccess && !savedSearches.data)
@@ -47,7 +49,12 @@ const CustomOpenUniPopulation = () => {
           View under progress.
         </p>
       </Message>
-      <CustomOpenUniSearch setValues={setValues} savedSearches={savedSearches.data} />
+      <CustomOpenUniSearch
+        setValues={setValues}
+        savedSearches={savedSearches.data}
+        location={location}
+        history={history}
+      />
       <div style={{ paddingTop: '25px', paddingBottom: '10px', fontSize: '20px' }}>
         {fieldValues && fieldValues.courseList?.length > 0 && (
           <p>
@@ -64,7 +71,9 @@ const CustomOpenUniPopulation = () => {
         )}
       </div>
       <div style={{ paddingTop: '25px' }}>
-        {fieldValues && fieldValues.courseList?.length > 0 && <OpenUniPopulationResults fieldValues={fieldValues} />}
+        {fieldValues && fieldValues.courseList?.length > 0 && (
+          <OpenUniPopulationResults fieldValues={fieldValues} language={language} />
+        )}
       </div>
     </div>
   )

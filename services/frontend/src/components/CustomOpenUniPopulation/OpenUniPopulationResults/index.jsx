@@ -3,14 +3,12 @@ import moment from 'moment'
 import { Loader, Icon } from 'semantic-ui-react'
 import { useGetOpenUniCourseStudentsQuery } from 'redux/openUniPopulations'
 import SortableTable from 'components/SortableTable'
-import useLanguage from 'components/LanguagePicker/useLanguage'
 
-const OpenUniPopulationResults = ({ fieldValues }) => {
+const OpenUniPopulationResults = ({ fieldValues, language }) => {
   const { courseList, startdate, enddate } = fieldValues
   const openUniStudentStats = useGetOpenUniCourseStudentsQuery({ courseList, startdate, enddate })
   const isFetchingOrLoading = openUniStudentStats.isLoading || openUniStudentStats.isFetching
   const isError = openUniStudentStats.isError || (openUniStudentStats.isSuccess && !openUniStudentStats.data)
-  const { language } = useLanguage()
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
 

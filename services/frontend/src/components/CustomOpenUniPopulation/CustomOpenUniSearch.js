@@ -2,6 +2,7 @@ import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import Datetime from 'react-datetime'
 import { Modal, Form, Button, TextArea } from 'semantic-ui-react'
+import qs from 'query-string'
 import SearchHistory from 'components/SearchHistory'
 import {
   useCreateOpenUniCourseSearchMutation,
@@ -9,7 +10,7 @@ import {
   useUpdateOpenUniCourseSearchMutation,
 } from 'redux/openUniPopulations'
 
-const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
+const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [searchList, setSearches] = useState(savedSearches)
@@ -23,6 +24,18 @@ const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
     useCreateOpenUniCourseSearchMutation()
   const [deleteOpenUniCourseSearch, { isLoading: deleteIsLoading, data: deletedData }] =
     useDeleteOpenUniCourseSearchMutation()
+
+  const parseQueryFromUrl = () => {
+    const { courseList, startdate, enddate } = qs.parse(location.search)
+    let courseCodes = courseList
+    if (!Array.isArray(courseList)) courseCodes = [courseList]
+    const query = {
+      courseList: courseCodes,
+      startdate,
+      enddate,
+    }
+    return query
+  }
 
   useEffect(() => {
     if (updatedData) {
@@ -45,6 +58,20 @@ const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
     }
   }, [deletedData])
 
+  useEffect(() => {
+    if (location.search) {
+      const query = parseQueryFromUrl()
+      setValues(query)
+    }
+  }, [location.search])
+
+  const pushQueryToUrl = query => {
+    setImmediate(() => {
+      const searchString = qs.stringify(query)
+      history.push({ search: searchString })
+    })
+  }
+
   const clearForm = () => {
     setInput('')
     setName('')
@@ -64,11 +91,12 @@ const CustomOpenUniSearch = ({ setValues, savedSearches }) => {
       .split(',')
       .map(code => code.trim().toUpperCase())
       .filter(code => code.length > 0)
-    setValues({
+    const query = {
       courseList,
       startdate: moment(startdate).toISOString(),
       enddate: moment(enddate).toISOString(),
-    })
+    }
+    pushQueryToUrl(query)
     handleClose()
   }
 
