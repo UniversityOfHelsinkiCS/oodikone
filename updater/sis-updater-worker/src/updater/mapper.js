@@ -109,8 +109,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced, disclos
   const openUniDisseminationOfInfo = disclosures.filter(
     d => d.person_id === id && d.disclosure_category_id === 'hy-luovutusehto-6'
   )
-  const disseminationInfoAllowed =
-    openUniDisseminationOfInfo.length > 0 ? openUniDisseminationOfInfo[0].authorized : false
+  const marketingAllowed = openUniDisseminationOfInfo.length > 0 ? openUniDisseminationOfInfo[0].authorized : null
 
   const studyRightsOfStudent = studyRights.filter(SR => SR.person_id === id)
   const dateofuniversityenrollment =
@@ -140,7 +139,7 @@ const studentMapper = (attainments, studyRights, attainmentsToBeExluced, disclos
     home_country_sv: home_country ? home_country.name.sv : null,
     home_country_en: home_country ? home_country.name.en : null,
     sis_person_id: id,
-    dissemination_info_allowed: disseminationInfoAllowed,
+    dissemination_info_allowed: marketingAllowed,
   }
 }
 
