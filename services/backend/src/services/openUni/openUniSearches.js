@@ -19,7 +19,7 @@ const getCredits = async (courseCodes, startdate) =>
         },
         is_open: true,
         grade: {
-          [Op.in]: ['1', '2', '3', '4', '5', 'Hyv.'],
+          [Op.in]: ['1', '2', '3', '4', '5', 'Hyv.', 'hyv', 'HT', 'TT'],
         },
         attainment_date: {
           [Op.gte]: startdate,
