@@ -26,13 +26,13 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
     useDeleteOpenUniCourseSearchMutation()
 
   const parseQueryFromUrl = () => {
-    const { courseList, startdate, enddate } = qs.parse(location.search)
-    let courseCodes = courseList
-    if (!Array.isArray(courseList)) courseCodes = [courseList]
+    const { courseCode, startdate, enddate } = qs.parse(location.search)
+    let courseCodes = courseCode
+    if (!Array.isArray(courseCode)) courseCodes = [courseCode]
     const query = {
       courseList: courseCodes,
-      startdate,
-      enddate,
+      startdate: moment(startdate, 'DD-MM-YYYY').toISOString(),
+      enddate: moment(enddate, 'DD-MM-YYYY').toISOString(),
     }
     return query
   }
@@ -59,7 +59,9 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
   }, [deletedData])
 
   useEffect(() => {
-    if (location.search) {
+    if (!location.search) {
+      setValues({})
+    } else {
       const query = parseQueryFromUrl()
       setValues(query)
     }
@@ -92,9 +94,9 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
       .map(code => code.trim().toUpperCase())
       .filter(code => code.length > 0)
     const query = {
-      courseList,
-      startdate: moment(startdate).toISOString(),
-      enddate: moment(enddate).toISOString(),
+      courseCode: courseList,
+      startdate: moment(startdate).format('DD-MM-YYYY'),
+      enddate: moment(enddate).format('DD-MM-YYYY'),
     }
     pushQueryToUrl(query)
     handleClose()

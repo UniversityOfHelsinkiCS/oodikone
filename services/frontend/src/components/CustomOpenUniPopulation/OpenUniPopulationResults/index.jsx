@@ -67,12 +67,18 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
     },
   ]
 
+  const getDisseminationInfoAllowed = s => {
+    if (s.disseminationInfoAllowed === null) return 'unknown'
+    if (s.disseminationInfoAllowed) return 'yes'
+    return 'no'
+  }
+
   const informationColumns = [
     {
       key: 'disseminationInfoAllowed',
       title: 'Marketing Allowed',
-      getRowVal: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
-      getRowContent: s => (s.disseminationInfoAllowed ? 'yes' : 'no'),
+      getRowVal: s => getDisseminationInfoAllowed(s),
+      getRowContent: s => getDisseminationInfoAllowed(s),
       headerProps: { title: 'Marketing Allowed' },
       child: true,
       cellProps: {
@@ -119,8 +125,31 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
       return `Passed: ${moment(s.courseInfo[courseCode].enrolledPassed).format('DD-MM-YYYY')}`
     return ''
   }
+  const findProp = (s, courseCode) => {
+    const propObj = {
+      title: '',
+      style: {
+        verticalAlign: 'middle',
+        textAlign: 'center',
+      },
+    }
+    if (s.courseInfo[courseCode] === undefined) return propObj
+    if (s.courseInfo[courseCode].enrolledNotPassed.length === 0 && s.courseInfo[courseCode].enrolledPassed === null)
+      return propObj
+    if (s.courseInfo[courseCode].enrolledNotPassed.length > 0)
+      return {
+        ...propObj,
+        title: `Enrollments: ${s.courseInfo[courseCode].enrolledNotPassed
+          .map(dat => moment(dat).format('DD-MM-YYYY'))
+          .join(', ')}`,
+      }
+    if (s.courseInfo[courseCode].enrolledPassed !== null)
+      return { ...propObj, title: `Passed: ${moment(s.courseInfo[courseCode].enrolledPassed).format('DD-MM-YYYY')}` }
+    return { ...propObj, title: '' }
+  }
 
-  const labelsToCourses = openUniStudentStats?.data.courses
+  const unOrderedlabels = openUniStudentStats?.data.courses
+  const labelsToCourses = [...unOrderedlabels].sort((a, b) => a.label.localeCompare(b.label))
   const columns = []
   columns.push(
     {
@@ -146,13 +175,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
         textTitle: `${course.label}-${course.name[language]}`,
         vertical: false,
         forceToolsMode: 'dangling',
-        cellProps: {
-          title: `${course.label}, ${course.name[language]}`,
-          style: {
-            verticalAlign: 'middle',
-            textAlign: 'center',
-          },
-        },
+        cellProps: s => findProp(s, course.label),
         headerProps: { title: `${course.label}-${course.name[language]}` },
         getRowVal: s => {
           return findRowValue(s, course.label)
@@ -203,7 +226,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
         <Loader active style={{ marginTop: '15em' }} />
       ) : (
         <div style={{ display: 'flex', paddingBottom: '10px' }}>
-          <div style={{ maxHeight: '80vh', width: '100%' }}>
+          <div style={{ maxHeight: '70vh', width: '100%' }}>
             {courseList.length > 0 && (
               <SortableTable
                 title={`Open Uni Student Population (${
