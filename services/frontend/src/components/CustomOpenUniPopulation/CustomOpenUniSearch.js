@@ -10,7 +10,7 @@ import {
   useUpdateOpenUniCourseSearchMutation,
 } from 'redux/openUniPopulations'
 
-const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) => {
+const CustomOpenUniSearch = ({ setValues, savedSearches, history }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [searchList, setSearches] = useState(savedSearches)
@@ -24,18 +24,6 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
     useCreateOpenUniCourseSearchMutation()
   const [deleteOpenUniCourseSearch, { isLoading: deleteIsLoading, data: deletedData }] =
     useDeleteOpenUniCourseSearchMutation()
-
-  const parseQueryFromUrl = () => {
-    const { courseCode, startdate, enddate } = qs.parse(location.search)
-    let courseCodes = courseCode
-    if (!Array.isArray(courseCode)) courseCodes = [courseCode]
-    const query = {
-      courseList: courseCodes,
-      startdate: moment(startdate, 'DD-MM-YYYY').toISOString(),
-      enddate: moment(enddate, 'DD-MM-YYYY').toISOString(),
-    }
-    return query
-  }
 
   useEffect(() => {
     if (updatedData) {
@@ -57,15 +45,6 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
       setSearches(filteredsearches)
     }
   }, [deletedData])
-
-  useEffect(() => {
-    if (!location.search) {
-      setValues({})
-    } else {
-      const query = parseQueryFromUrl()
-      setValues(query)
-    }
-  }, [location.search])
 
   const pushQueryToUrl = query => {
     setImmediate(() => {
@@ -98,6 +77,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
       startdate: moment(startdate).format('DD-MM-YYYY'),
       enddate: moment(enddate).format('DD-MM-YYYY'),
     }
+    setValues({ courseList, startdate: startdate.toISOString(), enddate: enddate.toISOString() })
     pushQueryToUrl(query)
     handleClose()
   }
