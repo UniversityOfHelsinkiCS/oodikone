@@ -10,7 +10,7 @@ import {
   useUpdateOpenUniCourseSearchMutation,
 } from 'redux/openUniPopulations'
 
-const CustomOpenUniSearch = ({ setValues, savedSearches, history }) => {
+const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) => {
   const [modal, setModal] = useState(false)
   const [input, setInput] = useState('')
   const [searchList, setSearches] = useState(savedSearches)
@@ -52,7 +52,28 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, history }) => {
       history.push({ search: searchString })
     })
   }
+  const parseQueryFromUrl = () => {
+    const { courseCode, startdate, enddate } = qs.parse(location.search)
+    let courseCodes = courseCode
+    if (!Array.isArray(courseCode)) courseCodes = [courseCode]
+    const query = {
+      courseList: courseCodes,
+      startdate: moment(startdate, 'DD-MM-YYYY').toISOString(),
+      enddate: moment(enddate, 'DD-MM-YYYY').endOf('day').toISOString(),
+    }
+    return query
+  }
 
+  useEffect(() => {
+    setImmediate(() => {
+      if (!location.search) {
+        setValues({})
+      } else {
+        const query = parseQueryFromUrl()
+        setValues(query)
+      }
+    })
+  }, [location.search])
   const clearForm = () => {
     setInput('')
     setName('')

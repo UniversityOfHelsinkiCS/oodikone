@@ -238,7 +238,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
         setData({ data, columns })
       })
     }
-  }, [fieldValues, openUniStudentStats])
+  }, [openUniStudentStats])
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
