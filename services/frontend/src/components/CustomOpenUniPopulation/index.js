@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import { Message, Icon, Loader } from 'semantic-ui-react'
 import moment from 'moment'
-import qs from 'query-string'
 import { useGetSavedSearchesQuery } from 'redux/openUniPopulations'
 import OpenUniPopulationResults from './OpenUniPopulationResults'
 import { useTitle } from '../../common/hooks'
@@ -31,28 +30,6 @@ const CustomOpenUniPopulation = () => {
     }
   }, [fieldValues])
 
-  const parseQueryFromUrl = () => {
-    const { courseCode, startdate, enddate } = qs.parse(location.search)
-    let courseCodes = courseCode
-    if (!Array.isArray(courseCode)) courseCodes = [courseCode]
-    const query = {
-      courseList: courseCodes,
-      startdate: moment(startdate, 'DD-MM-YYYY').toISOString(),
-      enddate: moment(enddate, 'DD-MM-YYYY').endOf('day').toISOString(),
-    }
-    return query
-  }
-
-  useEffect(() => {
-    setImmediate(() => {
-      if (!location.search) {
-        setValues({})
-      } else {
-        const query = parseQueryFromUrl()
-        setValues(query)
-      }
-    })
-  }, [location.search])
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
   if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
   return (
