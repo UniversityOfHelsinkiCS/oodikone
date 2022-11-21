@@ -1,17 +1,28 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import { Loader, Icon } from 'semantic-ui-react'
 import { useGetOpenUniCourseStudentsQuery } from 'redux/openUniPopulations'
 import SortableTable from 'components/SortableTable'
 
-const OpenUniPopulationResults = ({ fieldValues, language }) => {
-  const { courseList, startdate, enddate } = fieldValues
-  const openUniStudentStats = useGetOpenUniCourseStudentsQuery({ courseList, startdate, enddate })
-  const isFetchingOrLoading = openUniStudentStats.isLoading || openUniStudentStats.isFetching
-  const isError = openUniStudentStats.isError || (openUniStudentStats.isSuccess && !openUniStudentStats.data)
-  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
-  if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
+const getTableData = studentsData => {
+  return Object.keys(studentsData).reduce(
+    (acc, student) => [
+      ...acc,
+      {
+        studentnumber: student,
+        courseInfo: { ...studentsData[student].courseInfo },
+        email: studentsData[student].email,
+        secondaryEmail: studentsData[student].secondaryEmail,
+        disseminationInfoAllowed: studentsData[student].disseminationInfoAllowed,
+        enrolledTotal: studentsData[student].enrolledTotal,
+        passedTotal: studentsData[student].passedTotal,
+      },
+    ],
+    []
+  )
+}
 
+const getColumns = (labelsToCourses, language) => {
   const studentNbrColumn = [
     {
       key: 'studentnumber-parent',
@@ -50,6 +61,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
       getRowVal: s => s.passedTotal,
       getRowContent: s => s.passedTotal,
       child: true,
+      childOf: 'Passed',
     },
     {
       key: 'unfinished',
@@ -64,6 +76,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
         },
       },
       child: true,
+      childOf: 'Unfinished',
     },
   ]
 
@@ -81,6 +94,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
       getRowContent: s => getDisseminationInfoAllowed(s),
       headerProps: { title: 'Marketing Allowed' },
       child: true,
+      childOf: 'Marketing Allowed',
       cellProps: {
         style: {
           verticalAlign: 'middle',
@@ -94,6 +108,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
       getRowVal: s => (s.email ? s.email : ''),
       getRowContent: s => (s.email ? s.email : ''),
       headerProps: { title: 'Email' },
+      childOf: 'Email',
       child: true,
     },
     {
@@ -102,6 +117,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
       getRowVal: s => (s.secondaryEmail ? s.secondaryEmail : ''),
       getRowContent: s => (s.secondaryEmail ? s.secondaryEmail : ''),
       headerProps: { title: 'Secondary Email' },
+      childOf: 'Secondary Email',
       child: true,
     },
   ]
@@ -118,9 +134,9 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
     if (s.courseInfo[courseCode].enrolledNotPassed.length === 0 && s.courseInfo[courseCode].enrolledPassed === null)
       return ''
     if (s.courseInfo[courseCode].enrolledNotPassed.length > 0)
-      return s.courseInfo[courseCode].enrolledNotPassed
-        .map((dat, idx) => `Enrollment ${idx + 1}: ${moment(dat).format('DD-MM-YYYY')}`)
-        .join(' ')
+      return `Enrollments: ${s.courseInfo[courseCode].enrolledNotPassed
+        .map(dat => moment(dat).format('DD-MM-YYYY'))
+        .join(', ')}`
     if (s.courseInfo[courseCode].enrolledPassed !== null)
       return `Passed: ${moment(s.courseInfo[courseCode].enrolledPassed).format('DD-MM-YYYY')}`
     return ''
@@ -148,8 +164,6 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
     return { ...propObj, title: '' }
   }
 
-  const unOrderedlabels = openUniStudentStats?.data.courses
-  const labelsToCourses = [...unOrderedlabels].sort((a, b) => a.label.localeCompare(b.label))
   const columns = []
   columns.push(
     {
@@ -203,53 +217,54 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
       children: informationColumns,
     }
   )
+  return columns
+}
 
-  const data = Object.keys(openUniStudentStats?.data.students).reduce(
-    (acc, student) => [
-      ...acc,
-      {
-        studentnumber: student,
-        courseInfo: { ...openUniStudentStats?.data.students[student].courseInfo },
-        email: openUniStudentStats?.data.students[student].email,
-        secondaryEmail: openUniStudentStats?.data.students[student].secondaryEmail,
-        disseminationInfoAllowed: openUniStudentStats?.data.students[student].disseminationInfoAllowed,
-        enrolledTotal: openUniStudentStats?.data.students[student].enrolledTotal,
-        passedTotal: openUniStudentStats?.data.students[student].passedTotal,
-      },
-    ],
-    []
-  )
+const OpenUniPopulationResults = ({ fieldValues, language }) => {
+  const { courseList, startdate, enddate } = fieldValues
+  const [tableData, setData] = useState({ data: [], columns: [] })
+
+  const openUniStudentStats = useGetOpenUniCourseStudentsQuery({ courseList, startdate, enddate })
+  const isFetchingOrLoading = openUniStudentStats.isLoading || openUniStudentStats.isFetching
+  const isError = openUniStudentStats.isError || (openUniStudentStats.isSuccess && !openUniStudentStats.data)
+
+  useEffect(() => {
+    if (!isError && !isFetchingOrLoading) {
+      const unOrderedlabels = openUniStudentStats?.data.courses
+      const labelsToCourses = [...unOrderedlabels].sort((a, b) => a.label.localeCompare(b.label))
+      setImmediate(() => {
+        const data = getTableData(openUniStudentStats?.data.students)
+        const columns = getColumns(labelsToCourses, language)
+        setData({ data, columns })
+      })
+    }
+  }, [fieldValues, openUniStudentStats])
+
+  if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+  if (isFetchingOrLoading) return <Loader active style={{ marginTop: '15em' }} />
 
   return (
     <div style={{ paddingBottom: '50px' }}>
-      {isFetchingOrLoading ? (
-        <Loader active style={{ marginTop: '15em' }} />
-      ) : (
-        <div style={{ display: 'flex', paddingBottom: '10px' }}>
-          <div style={{ maxHeight: '70vh', width: '100%' }}>
-            {courseList.length > 0 && (
-              <SortableTable
-                title={`Open Uni Student Population (${
-                  Object.keys(openUniStudentStats?.data.students).length
-                } students)`}
-                getRowKey={s => s.studentNumber}
-                tableProps={{
-                  celled: true,
-                  compact: 'very',
-                  padded: false,
-                  collapsing: true,
-                  basic: true,
-                  striped: true,
-                  singleLine: true,
-                  textAlign: 'center',
-                }}
-                columns={columns}
-                data={data}
-              />
-            )}
-          </div>
-        </div>
-      )}
+      <div style={{ maxHeight: '80vh', width: '100%' }}>
+        {courseList.length > 0 && (
+          <SortableTable
+            title={`Open Uni Student Population (${Object.keys(openUniStudentStats?.data.students).length} students)`}
+            getRowKey={s => s.studentNumber}
+            tableProps={{
+              celled: true,
+              compact: 'very',
+              padded: false,
+              collapsing: true,
+              basic: true,
+              striped: true,
+              singleLine: true,
+              textAlign: 'center',
+            }}
+            columns={tableData.columns}
+            data={tableData.data}
+          />
+        )}
+      </div>
     </div>
   )
 }
