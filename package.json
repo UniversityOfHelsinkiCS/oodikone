@@ -34,7 +34,7 @@
     "@babel/plugin-syntax-jsx": "^7.16.7",
     "concurrently": "^7.4.0",
     "cypress": "^10.9.0",
-    "eslint": "^8.25.0",
+    "eslint": "^8.28.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-babel": "^5.3.1",
