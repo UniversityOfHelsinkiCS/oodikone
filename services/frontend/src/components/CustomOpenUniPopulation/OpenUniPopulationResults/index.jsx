@@ -129,16 +129,18 @@ const getColumns = (labelsToCourses, language) => {
     return null
   }
 
-  const findRowValue = (s, courseCode) => {
+  const findRowValue = (s, courseCode, hidden = false) => {
     if (s.courseInfo[courseCode] === undefined) return ''
     if (s.courseInfo[courseCode].enrolledNotPassed.length === 0 && s.courseInfo[courseCode].enrolledPassed === null)
       return ''
-    if (s.courseInfo[courseCode].enrolledNotPassed.length > 0)
+    if (s.courseInfo[courseCode].enrolledNotPassed.length > 0 && hidden)
       return `Enrollments: ${s.courseInfo[courseCode].enrolledNotPassed
         .map(dat => moment(dat).format('DD-MM-YYYY'))
         .join(', ')}`
-    if (s.courseInfo[courseCode].enrolledPassed !== null)
+    if (s.courseInfo[courseCode].enrolledPassed !== null && hidden)
       return `Passed: ${moment(s.courseInfo[courseCode].enrolledPassed).format('DD-MM-YYYY')}`
+    if (s.courseInfo[courseCode].enrolledNotPassed.length > 0) return 'Unfinished'
+    if (s.courseInfo[courseCode].enrolledPassed !== null) return 'Passed'
     return ''
   }
   const findProp = (s, courseCode) => {
@@ -164,6 +166,53 @@ const getColumns = (labelsToCourses, language) => {
     return propObj
   }
 
+  const columnsToShow = labelsToCourses.map(course => ({
+    key: `${course.label}-${course.name[language]}`,
+    title: (
+      <div style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}>
+        <div>{course.label}</div>
+        {/* <div style={{ color: 'gray', fontWeight: 'normal' }}>{course.name[language]}</div> */}
+      </div>
+    ),
+    textTitle: `${course.label}-${course.name[language]}`,
+    vertical: false,
+    forceToolsMode: 'dangling',
+    cellProps: s => findProp(s, course.label),
+    headerProps: { title: `${course.label}-${course.name[language]}` },
+    getRowVal: s => {
+      return findRowValue(s, course.label)
+    },
+    getRowContent: s => {
+      return findRowContent(s, course.label)
+    },
+    child: true,
+    childOf: course.label,
+    code: course.label,
+  }))
+
+  const columnsToHide = labelsToCourses.map(course => ({
+    key: `hidden-${course.label}-${course.name[language]}`,
+    export: true,
+    forceToolsMode: 'none',
+    textTitle: `h-${course.label}-${course.name[language]}`,
+    headerProps: {
+      title: `h-${course.label}-${course.name[language]}`,
+      style: {
+        display: 'none',
+      },
+    },
+    cellProps: {
+      style: {
+        display: 'none',
+      },
+    },
+    getRowVal: s => {
+      return findRowValue(s, course.label, true)
+    },
+    child: true,
+    code: `hidden ${course.label}`,
+  }))
+
   const columns = []
   columns.push(
     {
@@ -178,29 +227,7 @@ const getColumns = (labelsToCourses, language) => {
       title: <b>Courses:</b>,
       textTitle: null,
       parent: true,
-      children: labelsToCourses.map(course => ({
-        key: `${course.label}-${course.name[language]}`,
-        title: (
-          <div style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}>
-            <div>{course.label}</div>
-            {/* <div style={{ color: 'gray', fontWeight: 'normal' }}>{course.name[language]}</div> */}
-          </div>
-        ),
-        textTitle: `${course.label}-${course.name[language]}`,
-        vertical: false,
-        forceToolsMode: 'dangling',
-        cellProps: s => findProp(s, course.label),
-        headerProps: { title: `${course.label}-${course.name[language]}` },
-        getRowVal: s => {
-          return findRowValue(s, course.label)
-        },
-        getRowContent: s => {
-          return findRowContent(s, course.label)
-        },
-        child: true,
-        childOf: course.label,
-        code: course.label,
-      })),
+      children: columnsToShow,
     },
     {
       key: 'statistics',
@@ -215,6 +242,14 @@ const getColumns = (labelsToCourses, language) => {
       textTitle: null,
       parent: true,
       children: informationColumns,
+    },
+    {
+      key: 'hiddencourses',
+      title: '',
+      mergeHeader: true,
+      textTitle: null,
+      parent: true,
+      children: columnsToHide,
     }
   )
   return columns
