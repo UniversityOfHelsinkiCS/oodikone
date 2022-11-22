@@ -17,6 +17,12 @@ import GroupKeyVisitor from './GroupKeyVisitor'
 import ValueVisitor from './ValueVisitor'
 import './style.css'
 
+const getKey = data => {
+  if (data.studentnumber) return data.studentnumber
+  if (data.id) return data.id
+  return uuidv4()
+}
+
 const computeColumnSpans = columns => {
   const stack = _.cloneDeep(columns)
   const spans = {}
@@ -124,7 +130,12 @@ const Row = ({ data, isGroup, parents }) => {
       cells.push(<td key={`${column.key}-else-${cellProps.title}`} {...cellProps} />)
     }
   }
-  return <tr className={isGroup ? 'group-header-row' : ''}>{cells}</tr>
+
+  return (
+    <tr className={isGroup ? 'group-header-row' : ''} key={getKey(data)}>
+      {cells}
+    </tr>
+  )
 }
 
 const mergeColumnDefinitions = (original, overlay) => {
@@ -401,6 +412,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
         verticalAlign: column.vertical ? 'top' : 'center',
         position: 'relative',
         overflow: toolsMode === 'floating' ? 'hidden' : '',
+        display: toolsMode === 'none' ? 'none' : '',
       }}
       onClick={() => {
         if (sortable) {
@@ -605,7 +617,8 @@ const createHeaders = (columns, columnDepth, dispatch) => {
       stack = [...children, ...stack]
     }
   }
-  return rows.map(cells => <tr key={uuidv4()}>{cells}</tr>)
+  // eslint-disable-next-line react/no-array-index-key
+  return rows.map((cells, idx) => <tr key={idx}>{cells}</tr>)
 }
 
 const getInitialState = (defaultSort, expandedGroups) => () => ({
@@ -912,7 +925,7 @@ const SortableTable = ({
       <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>{headers}</thead>
       <tbody>
         {sortedData.map(item => (
-          <DataItem item={item} key={uuidv4()} />
+          <DataItem key={`dataItem-${getKey(item)}`} item={item} />
         ))}
       </tbody>
     </table>
