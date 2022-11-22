@@ -161,7 +161,7 @@ const getColumns = (labelsToCourses, language) => {
       }
     if (s.courseInfo[courseCode].enrolledPassed !== null)
       return { ...propObj, title: `Passed: ${moment(s.courseInfo[courseCode].enrolledPassed).format('DD-MM-YYYY')}` }
-    return { ...propObj, title: '' }
+    return propObj
   }
 
   const columns = []

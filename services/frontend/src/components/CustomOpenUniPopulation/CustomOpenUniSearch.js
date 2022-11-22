@@ -89,10 +89,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
 
   const onClicker = e => {
     e.preventDefault()
-    const courseList = input
-      .split(',')
-      .map(code => code.trim().toUpperCase())
-      .filter(code => code.length > 0)
+    const courseList = input.split(/[\s,]+/).map(code => code.trim().toUpperCase())
     const query = {
       courseCode: courseList,
       startdate: moment(startdate).format('DD-MM-YYYY'),
@@ -123,10 +120,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
   }
 
   const onSave = () => {
-    const courseList = input
-      .split(',')
-      .map(code => code.trim().toUpperCase())
-      .filter(code => code.length > 0)
+    const courseList = input.split(/[\s,]+/).map(code => code.trim().toUpperCase())
     if (selectedSearchId !== '') {
       updateOpenUniCourseSearch({ id: selectedSearchId, courseList })
     } else {
