@@ -62,7 +62,6 @@ const PopulationDetails = ({
 
   const RenderCreditGainGraphs = () => {
     const { CreditAccumulation } = infotooltips.PopulationStatistics
-    const { useFilterSelector } = useFilters()
     const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
 
     const graphs = (
