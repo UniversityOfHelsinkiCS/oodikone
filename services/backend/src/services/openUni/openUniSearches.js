@@ -13,14 +13,12 @@ const { Op } = require('sequelize')
 const getCredits = async (courseCodes, startdate) =>
   (
     await Credit.findAll({
+      attributes: ['course_code', 'student_studentnumber', 'grade', 'attainment_date'],
       where: {
         course_code: {
           [Op.in]: courseCodes,
         },
         is_open: true,
-        grade: {
-          [Op.in]: ['1', '2', '3', '4', '5', 'Hyv.', 'hyv.', 'HT', 'TT'],
-        },
         attainment_date: {
           [Op.gte]: startdate,
         },

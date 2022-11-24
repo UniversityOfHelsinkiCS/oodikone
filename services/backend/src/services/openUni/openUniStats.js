@@ -3,6 +3,17 @@ const { getCredits, getStudyRights, getEnrollments, getStudentInfo, getCourseNam
 
 const uniq = objects => [...new Set(objects)]
 
+const calulateTotalsForStudent = async (studentStats, studentnumber) => {
+  Object.keys(studentStats[studentnumber].courseInfo).forEach(course => {
+    if (studentStats[studentnumber].courseInfo[course].status.passed) {
+      studentStats[studentnumber].totals.passed += 1
+    } else if (studentStats[studentnumber].courseInfo[course].status.failed) {
+      studentStats[studentnumber].totals.failed += 1
+    } else if (studentStats[studentnumber].courseInfo[course].status.unfinished) {
+      studentStats[studentnumber].totals.unfinished += 1
+    }
+  })
+}
 const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
   const ayCourseCodes = courseCodes.map(courseCode => 'AY' + courseCode)
   const allCourseCodes = courseCodes.concat(ayCourseCodes)
@@ -10,6 +21,8 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
   const allEnrollments = await getEnrollments(allCourseCodes, startdate, enddate)
   const students = uniq(allEnrollments.map(enrollment => enrollment.enrollmentStudentnumber))
   const courses = await getCourseNames(courseCodes)
+  const passedGrades = ['1', '2', '3', '4', '5', 'Hyv.', 'hyv.', 'HT', 'TT']
+  const failedGrades = ['Hyl.', 'HYL', '0']
 
   const allStudyrights = await getStudyRights(students)
   const studentInfo = await getStudentInfo(students)
@@ -30,8 +43,11 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
   const studentStats = {}
   const getEmptyCourseInfo = () => {
     return {
-      enrolledPassed: null,
-      enrolledNotPassed: [],
+      status: {
+        passed: null,
+        failed: null,
+        unfinished: null,
+      },
     }
   }
 
@@ -44,32 +60,45 @@ const getCustomOpenUniCourses = async (courseCodes, startdate, enddate) => {
           email: email,
           secondaryEmail: secondary_email,
           disseminationInfoAllowed: dissemination_info_allowed,
-          passedTotal: 0,
-          enrolledTotal: 0,
+          totals: { passed: 0, failed: 0, unfinished: 0 },
         }
       }
-      const passedCourses = []
-      const unfinishedCourses = []
-      for (const { course_code, attainment_date, student_studentnumber } of allCredits) {
+      for (const { course_code, attainment_date, student_studentnumber, grade } of allCredits) {
         if (student_studentnumber === studentnumber) {
           const courseCode = course_code.replace('AY', '')
-          studentStats[studentnumber].courseInfo[courseCode].enrolledPassed = attainment_date
-          if (!passedCourses.includes(courseCode)) {
-            passedCourses.push(courseCode)
+          if (
+            passedGrades.includes(grade) &&
+            (!studentStats[studentnumber].courseInfo[courseCode].status.passed ||
+              moment(studentStats[studentnumber].courseInfo[courseCode].status.passed).isBefore(attainment_date, 'day'))
+          ) {
+            studentStats[studentnumber].courseInfo[courseCode].status.passed = attainment_date
+          } else if (
+            failedGrades.includes(grade) &&
+            !studentStats[studentnumber].courseInfo[courseCode].status.passed &&
+            (!studentStats[studentnumber].courseInfo[courseCode].status.failed ||
+              moment(studentStats[studentnumber].courseInfo[courseCode].status.failed).isBefore(attainment_date, 'day'))
+          ) {
+            studentStats[studentnumber].courseInfo[courseCode].status.failed = attainment_date
           }
         }
       }
       for (const { enrollmentStudentnumber, course_code, enrollment_date_time } of allEnrollments) {
         if (enrollmentStudentnumber === studentnumber) {
           const courseCode = course_code.replace('AY', '')
-          if (!studentStats[studentnumber].courseInfo[courseCode].enrolledPassed && studentnumber === studentnumber) {
-            studentStats[studentnumber].courseInfo[courseCode].enrolledNotPassed.push(enrollment_date_time)
-            if (!unfinishedCourses.includes(courseCode)) unfinishedCourses.push(courseCode)
+          if (
+            !studentStats[studentnumber].courseInfo[courseCode].status.passed &&
+            !studentStats[studentnumber].courseInfo[courseCode].status.failed &&
+            (!studentStats[studentnumber].courseInfo[courseCode].status.unfinished ||
+              moment(studentStats[studentnumber].courseInfo[courseCode].status.unfinished).isBefore(
+                enrollment_date_time,
+                'day'
+              ))
+          ) {
+            studentStats[studentnumber].courseInfo[courseCode].status.unfinished = enrollment_date_time
           }
         }
       }
-      studentStats[studentnumber].passedTotal = passedCourses.length
-      studentStats[studentnumber].enrolledTotal = unfinishedCourses.length
+      await calulateTotalsForStudent(studentStats, studentnumber)
     }
   }
   const openUniStats = { students: studentStats, courses: courses }
