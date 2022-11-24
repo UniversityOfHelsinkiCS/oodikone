@@ -115,7 +115,7 @@ const getColumns = (labelsToCourses, language) => {
     if (s.courseInfo[courseCode] === undefined) return null
     if (s.courseInfo[courseCode].status.passed) return <Icon fitted name="check" color="green" />
     if (s.courseInfo[courseCode].status.failed) return <Icon fitted name="times" color="red" />
-    if (s.courseInfo[courseCode].status.unfinished) return <Icon fitted name="minus" color="#a9a9a9" />
+    if (s.courseInfo[courseCode].status.unfinished) return <Icon fitted name="minus" color="grey" />
     return null
   }
 
