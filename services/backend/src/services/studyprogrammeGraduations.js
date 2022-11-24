@@ -15,6 +15,7 @@ const {
   alltimeStartDate,
   alltimeEndDate,
   getId,
+  getGoal,
 } = require('./studyprogrammeHelpers')
 const {
   graduatedStudyRights,
@@ -100,6 +101,10 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   const medians = getYearsObject({ years, emptyArrays: true })
   const means = getYearsObject({ years, emptyArrays: true })
 
+  const goal = getGoal(studyprogramme)
+
+  const times = { medians: [], means: [], goal }
+
   // HighCharts graph require the data to have this format (ie. actual value, "empty value")
   years.forEach(year => {
     const median = getMedian(graduationTimes[year])
@@ -113,7 +118,16 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
       ['', comparisonValue - mean],
     ]
   })
-  return { medians, means, graduationAmounts }
+
+  const rev = [...years].reverse()
+  for (const year of rev) {
+    const median = getMedian(graduationTimes[year])
+    const mean = getMean(graduationTimes[year])
+    times.medians = [...times.medians, { y: median, amount: graduationAmounts[year], name: year }]
+    times.means = [...times.means, { y: mean, amount: graduationAmounts[year], name: year }]
+  }
+
+  return { medians, means, graduationAmounts, times }
 }
 
 // Creates (studyrightid, transfer)-map out of programmes transfers
@@ -224,7 +238,9 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
   const thesis = await getThesisStats(queryParameters)
 
   const graduated = await getGraduatedStats(queryParameters)
+
   const graduationTimeStats = await getGraduationTimeStats(queryParameters)
+
   const programmesBeforeOrAfter = await getProgrammesBeforeOrAfter(studyprogramme, queryParameters)
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
@@ -251,6 +267,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
     graduationMedianTime: graduationTimeStats.medians,
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
+    graduationTimes: graduationTimeStats.times,
     programmesBeforeOrAfterTableStats: programmesBeforeOrAfter?.tableStats,
     programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter?.graphStats,
     programmesBeforeOrAfterTitles,

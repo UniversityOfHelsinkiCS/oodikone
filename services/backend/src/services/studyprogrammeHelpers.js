@@ -477,6 +477,26 @@ const getId = code => {
   return ''
 }
 
+const getGoal = programme => {
+  // bcMsCombo: 60,
+  if (programme.includes('KH')) {
+    return 36
+  }
+  if (programme.includes('MH')) {
+    if (programme === 'MH30_004') {
+      return 24 + 6
+    }
+    if (['MH30_001', 'MH30_003'].includes(programme)) {
+      return 24 + 12
+    }
+    return 24
+  }
+  if (programme.includes('T')) {
+    return 48
+  }
+  return 78 //licentiate
+}
+
 module.exports = {
   getCorrectStudentnumbers,
   formatStudyright,
@@ -508,4 +528,5 @@ module.exports = {
   isNonMajorCredit,
   mapCodesToIds,
   getId,
+  getGoal,
 }
