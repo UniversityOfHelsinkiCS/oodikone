@@ -443,7 +443,8 @@ const GeneralTab = ({
       key: 'endDate',
       title: 'graduation date',
       filterType: 'date',
-      getRowVal: s => new Date(studentToStudyrightEndMap[s.studentNumber]),
+      getRowVal: s =>
+        studentToStudyrightEndMap[s.studentNumber] ? new Date(studentToStudyrightEndMap[s.studentNumber]) : '',
       getRowContent: s =>
         studentToStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
