@@ -48,6 +48,7 @@ const formatStudentForPopulationStatistics = (
     creditcount,
     abbreviatedname,
     email,
+    phone_number,
     studyrights,
     studyplans,
     semester_enrollments,
@@ -66,7 +67,6 @@ const formatStudentForPopulationStatistics = (
   enrollments,
   credits,
   startDate,
-  endDate,
   startDateMoment,
   endDateMoment
 ) => {
@@ -104,6 +104,7 @@ const formatStudentForPopulationStatistics = (
     gender_code,
     gender: { gender_en, gender_fi, gender_sv },
     email,
+    phoneNumber: phone_number,
     semesterenrollments: semester_enrollments || [],
     updatedAt: updatedAt || createdAt,
     tags: tags || [],
@@ -232,6 +233,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'creditcount',
         'abbreviatedname',
         'email',
+        'phone_number',
         'updatedAt',
         'gender_code',
         'birthdate',
@@ -782,15 +784,7 @@ const formatStudentsForApi = async (
       if (student.studentnumber in optionData) student.option = optionData[student.studentnumber]
       else student.option = null
       stats.students.push(
-        formatStudentForPopulationStatistics(
-          student,
-          enrollments,
-          credits,
-          startDate,
-          endDate,
-          startDateMoment,
-          endDateMoment
-        )
+        formatStudentForPopulationStatistics(student, enrollments, credits, startDate, startDateMoment, endDateMoment)
       )
       return stats
     },

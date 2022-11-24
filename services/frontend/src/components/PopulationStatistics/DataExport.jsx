@@ -134,6 +134,7 @@ export default ({ students }) => {
         'all credits': s.allCredits,
         'hops credits': s.hopsCredits,
         'credits since start': s.credits,
+        'phone number': s.phoneNumber,
         email: s.email,
         'transferred from': s.transferredStudyright ? transferFrom(s) : '',
         priority: priorityText(s.studyrights),
