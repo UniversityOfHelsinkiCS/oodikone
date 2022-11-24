@@ -1,9 +1,10 @@
 const mapOpenCredits = credit => {
-  const { course_code, attainment_date, student_studentnumber } = credit
+  const { course_code, attainment_date, student_studentnumber, grade } = credit
   return {
     course_code,
     attainment_date,
     student_studentnumber,
+    grade,
   }
 }
 
@@ -28,7 +29,6 @@ const mapOpenEnrollments = enrollment => {
 
 const mapStudyRights = studyright => {
   const { enddate, startdate, student } = studyright
-
   return {
     startdate,
     enddate,
