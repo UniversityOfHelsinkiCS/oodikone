@@ -18,6 +18,7 @@ Student.init(
     email: { type: STRING },
     secondary_email: { type: STRING },
     national_student_number: { type: STRING },
+    phone_number: { type: STRING },
     country_fi: { type: STRING },
     country_sv: { type: STRING },
     country_en: { type: STRING },
