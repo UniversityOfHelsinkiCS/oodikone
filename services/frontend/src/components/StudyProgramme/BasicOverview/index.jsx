@@ -6,6 +6,7 @@ import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
 import GaugeChart from './GaugeChart'
+// import TimeBarChart from './TimeBarChart'
 import DataTable from './DataTable'
 import Toggle from '../Toggle'
 import InfoBox from '../../Info/InfoBox'
@@ -149,6 +150,13 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                     studyprogramme={studyprogramme}
                   />
                 ))}
+                {/* <TimeBarChart
+                  data={
+                    showMeanTime ? graduations?.data?.graduationTimes.means : graduations?.data?.graduationTimes.medians
+                  }
+                  goal={graduations?.data.graduationTimes.goal}
+                  showMeanTime={showMeanTime}
+                /> */}
               </div>
               {graduations?.data?.programmesBeforeOrAfterGraphStats && (
                 <>
