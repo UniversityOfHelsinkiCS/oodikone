@@ -181,10 +181,12 @@ describe('Studyprogramme overview', () => {
         .should('contain', 25)
         .should('contain', 35)
 
-      cy.get('[data-cy=Graph-2019-AverageGraduationTimes]')
-        .should('contain', '2019')
-        .should('contain', 'n = 17')
-        .should('contain', '23 kk')
+      cy.get('[data-cy=graduation-times-graph]').within(() => {
+        cy.contains('Graduation year')
+        cy.contains('2019')
+        cy.contains('17 graduated').trigger('mouseover')
+        cy.contains('study time: 23 months')
+      })
 
       cy.get('[data-cy=Graph-ProgrammesBeforeOrAfter')
         .should('contain', 'Tietojenkäsittelytieteen maisteriohjelma')

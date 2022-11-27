@@ -130,7 +130,7 @@ const TimeBarChart = ({ data, goal, showMeanTime }) => {
   }
 
   return (
-    <div className="graduation-times-graph">
+    <div data-cy="graduation-times-graph">
       <ReactHighcharts config={config} />
     </div>
   )
