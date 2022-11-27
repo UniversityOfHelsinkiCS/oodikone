@@ -5,8 +5,8 @@ import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQue
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
-import GaugeChart from './GaugeChart'
-// import TimeBarChart from './TimeBarChart'
+// import GaugeChart from './GaugeChart'
+import TimeBarChart from './TimeBarChart'
 import DataTable from './DataTable'
 import Toggle from '../Toggle'
 import InfoBox from '../../Info/InfoBox'
@@ -135,7 +135,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                 setValue={setShowMeanTime}
               />
               <div className="section-container-centered">
-                {graduations?.data?.years.map(year => (
+                {/* {graduations?.data?.years.map(year => (
                   <GaugeChart
                     cypress={`${year}-AverageGraduationTimes`}
                     key={year}
@@ -149,14 +149,14 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                     totalAmount={graduations?.data?.totalAmounts?.[year]}
                     studyprogramme={studyprogramme}
                   />
-                ))}
-                {/* <TimeBarChart
+                ))} */}
+                <TimeBarChart
                   data={
                     showMeanTime ? graduations?.data?.graduationTimes.means : graduations?.data?.graduationTimes.medians
                   }
                   goal={graduations?.data.graduationTimes.goal}
                   showMeanTime={showMeanTime}
-                /> */}
+                />
               </div>
               {graduations?.data?.programmesBeforeOrAfterGraphStats && (
                 <>
