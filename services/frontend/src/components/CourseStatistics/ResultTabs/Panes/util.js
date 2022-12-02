@@ -107,11 +107,11 @@ export const getThesisGradeSpread = (series, isRelative) => {
     3: [],
     4: [],
     5: [],
+    'Hyv.': [],
   }
   const newSeries = series.reduce(
     (acc, cur, i) => {
       const currentEntries = Object.entries(cur)
-
       currentEntries.forEach(([k, v]) => {
         const merged = k === 'LA' ? 'LUB' : k
         acc[merged].push(v)
