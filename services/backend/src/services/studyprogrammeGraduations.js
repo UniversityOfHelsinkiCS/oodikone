@@ -25,7 +25,36 @@ const {
   allStudyrights,
   allTransfers,
 } = require('./studyprogramme')
+const { bachelorStudyright } = require('./faculty/faculty')
 const { getAllProgrammes } = require('./studyrights')
+
+const countTimeCategories = (times, goal) => {
+  const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
+  times.forEach(time => {
+    if (time <= goal) statistics.onTime += 1
+    else if (time <= goal + 12) statistics.yearOver += 1
+    else statistics.wayOver += 1
+  })
+  return statistics
+}
+
+const checkStartdate = async (id, studyStartDate) => {
+  if (id.slice(-2) === '-1') {
+    return studyStartDate
+  }
+  const studyright = await bachelorStudyright(id.replace(/-2$/, '-1'))
+  if (studyright) return studyright.studystartdate
+  return null
+}
+
+const addGraduation = async (studyright, isAcademicYear, amounts, times) => {
+  const studyStartDate = await checkStartdate(studyright.studyrightid, studyright.studystartdate)
+  const graduationYear = defineYear(studyright.enddate, isAcademicYear)
+
+  const timeToGraduation = moment(studyright.enddate).diff(moment(studyStartDate), 'months')
+  amounts[graduationYear] += 1
+  times[graduationYear] = [...times[graduationYear], timeToGraduation]
+}
 
 const getGraduatedStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   const { graphStats, tableStats } = getStatsBasis(years)
@@ -79,6 +108,10 @@ const getThesisStats = async ({ studyprogramme, since, years, isAcademicYear, in
 const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademicYear, includeAllSpecials }) => {
   let graduationAmounts = getYearsObject({ years })
   let graduationTimes = getYearsObject({ years, emptyArrays: true })
+  // for bc+ms combo
+  const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
+  let graduationAmountsCombo = getYearsObject({ years })
+  let graduationTimesCombo = getYearsObject({ years, emptyArrays: true })
 
   const studentnumbers = await getCorrectStudentnumbers({
     codes: [studyprogramme],
@@ -89,21 +122,28 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
 
   const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)
 
-  studyrights.forEach(({ enddate, studystartdate }) => {
-    const graduationYear = defineYear(enddate, isAcademicYear)
-    const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
-    graduationAmounts[graduationYear] += 1
-    graduationTimes[graduationYear] = [...graduationTimes[graduationYear], timeToGraduation]
-  })
+  // for masters, separate bc+ms combo from just ms students (except some medical progs)
+  if (doCombo) {
+    for (const right of studyrights) {
+      if (right.studyrightid.slice(-2) === '-2') {
+        await addGraduation(right, isAcademicYear, graduationAmountsCombo, graduationTimesCombo)
+      } else {
+        await addGraduation(right, isAcademicYear, graduationAmounts, graduationTimes)
+      }
+    }
+  } else {
+    studyrights.forEach(({ enddate, studystartdate }) => {
+      const graduationYear = defineYear(enddate, isAcademicYear)
+      const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
+      graduationAmounts[graduationYear] += 1
+      graduationTimes[graduationYear] = [...graduationTimes[graduationYear], timeToGraduation]
+    })
+  }
   // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
   const comparisonValue = studyprogramme.includes('KH') ? 72 : 48
 
   const medians = getYearsObject({ years, emptyArrays: true })
   const means = getYearsObject({ years, emptyArrays: true })
-
-  const goal = getGoal(studyprogramme)
-
-  const times = { medians: [], means: [], goal }
 
   // HighCharts graph require the data to have this format (ie. actual value, "empty value")
   years.forEach(year => {
@@ -119,15 +159,34 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
     ]
   })
 
+  // new version
+  const goal = getGoal(studyprogramme)
+  const times = { medians: [], means: [], goal }
+  const comboTimes = { medians: [], means: [], goal: goal + 36 }
+
   const rev = [...years].reverse()
   for (const year of rev) {
     const median = getMedian(graduationTimes[year])
     const mean = getMean(graduationTimes[year])
-    times.medians = [...times.medians, { y: median, amount: graduationAmounts[year], name: year }]
-    times.means = [...times.means, { y: mean, amount: graduationAmounts[year], name: year }]
-  }
+    const statistics = countTimeCategories(graduationTimes[year], goal)
+    times.medians = [...times.medians, { y: median, amount: graduationAmounts[year], name: year, statistics }]
+    times.means = [...times.means, { y: mean, amount: graduationAmounts[year], name: year, statistics }]
 
-  return { medians, means, graduationAmounts, times }
+    if (doCombo) {
+      const median = getMedian(graduationTimesCombo[year])
+      const mean = getMean(graduationTimesCombo[year])
+      const statistics = countTimeCategories(graduationTimesCombo[year], goal + 36)
+      comboTimes.medians = [
+        ...comboTimes.medians,
+        { y: median, amount: graduationAmountsCombo[year], name: year, statistics },
+      ]
+      comboTimes.means = [
+        ...comboTimes.means,
+        { y: mean, amount: graduationAmountsCombo[year], name: year, statistics },
+      ]
+    }
+  }
+  return { medians, means, graduationAmounts, times, doCombo, comboTimes }
 }
 
 // Creates (studyrightid, transfer)-map out of programmes transfers
@@ -268,6 +327,8 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
     graduationMeanTime: graduationTimeStats.means,
     graduationAmounts: graduationTimeStats.graduationAmounts,
     graduationTimes: graduationTimeStats.times,
+    doCombo: graduationTimeStats.doCombo,
+    comboTimes: graduationTimeStats.comboTimes,
     programmesBeforeOrAfterTableStats: programmesBeforeOrAfter?.tableStats,
     programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter?.graphStats,
     programmesBeforeOrAfterTitles,

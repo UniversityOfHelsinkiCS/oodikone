@@ -478,23 +478,25 @@ const getId = code => {
 }
 
 const getGoal = programme => {
-  // bcMsCombo: 60,
-  if (programme.includes('KH')) {
+  if (programme.startsWith('KH') || programme.endsWith('-ba')) {
     return 36
   }
-  if (programme.includes('MH')) {
-    if (programme === 'MH30_004') {
+  if (programme.startsWith('MH') || programme.endsWith('-ma')) {
+    if (['MH30_004', '420420-ma'].includes(programme)) {
       return 24 + 6
     }
-    if (['MH30_001', 'MH30_003'].includes(programme)) {
-      return 24 + 12
+    if (['MH30_001', 'MH30_003', '320011-ma', '320001-ma', '320002-ma'].includes(programme)) {
+      return 36 + 24 + 12 // medical, no separate bachelor
     }
     return 24
   }
   if (programme.includes('T')) {
     return 48
   }
-  return 78 //licentiate
+  if (programme.startsWith('LI')) {
+    return 78
+  }
+  return 48 //unknown, likely old doctor or licentiate
 }
 
 module.exports = {
