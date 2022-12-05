@@ -5,7 +5,6 @@ import { func, shape, object, bool, arrayOf } from 'prop-types'
 import { Form, Button } from 'semantic-ui-react'
 import moment from 'moment'
 import qs from 'query-string'
-import Datetime from 'react-datetime'
 import { get as lodashGet } from 'lodash'
 import PopulationQueryCard from '../PopulationQueryCard'
 import { removePopulation } from '../../redux/populations'
@@ -88,15 +87,6 @@ class PopulationSearchHistory extends Component {
     return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
   }
 
-  getMonths = (year, end, term) => {
-    if (moment.isMoment(end)) {
-      const lastDayOfMonth = moment(end).endOf('month')
-      const start = term === 'FALL' ? `${year}-08-01` : `${year}-01-01`
-      return Math.round(moment.duration(moment(lastDayOfMonth).diff(moment(start))).asMonths())
-    }
-    return -1
-  }
-
   handleSemesterSelection = (e, { value }) => {
     const { query } = this.state
     const semesters = query.semesters.includes(value)
@@ -126,24 +116,6 @@ class PopulationSearchHistory extends Component {
     })
   }
 
-  handleMonthsChange = value => {
-    const { query } = this.state
-    const months = this.getMonths(query.year, value, query.semesters.includes('FALL') ? 'FALL' : 'SPRING')
-    this.setState({
-      query: {
-        ...query,
-        months,
-      },
-    })
-  }
-
-  getMonthValue = (year, months) => {
-    const start = `${year}-08-01`
-    return moment(start)
-      .add(months - 1, 'months')
-      .format('MMMM YYYY')
-  }
-
   pushQueryToUrl = () => {
     const { studyRights, tag, years } = this.props.populations.query
     const { studentStatuses, semesters, months, year } = this.state.query
@@ -162,8 +134,6 @@ class PopulationSearchHistory extends Component {
     this.props.history.push({ search: searchString })
   }
 
-  getMinSelection = (year, semester) => (semester === 'FALL' ? `${year}-08-01` : `${year}-01-01`)
-
   removePopulation = uuid => this.props.removePopulation(uuid)
 
   renderAdvancedSettingsSelector = () => {
@@ -176,21 +146,6 @@ class PopulationSearchHistory extends Component {
 
     return (
       <Form.Group style={{ flexDirection: 'column' }}>
-        <Form.Field error={query.months < 0}>
-          <b>Statistics until</b>
-          <Datetime
-            dateFormat="MMMM YYYY"
-            closeOnSelect
-            defaultValue={this.getMonthValue(query.year, query.months)}
-            onChange={value => this.handleMonthsChange(value)}
-            isValidDate={current =>
-              current.isBefore(moment()) &&
-              current.isAfter(this.getMinSelection(query.year, query.semesters[1] || query.semesters[0]))
-            }
-            className="adv-stats-until"
-          />
-        </Form.Field>
-
         {!populations.query.tag ? (
           <Form.Field style={{ marginTop: '15px' }}>
             <b>Starting semesters</b>
