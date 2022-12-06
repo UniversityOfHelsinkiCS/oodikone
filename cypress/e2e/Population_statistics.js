@@ -105,7 +105,6 @@ describe('Population Statistics tests', () => {
     it.skip('Advanced settings work', () => {
       cy.visit(pathToCSBach2017)
       cy.get('[data-cy=advanced-toggle]').click()
-      cy.contains('Statistics until')
       // only spring
       cy.cs('toggle-fall').click()
       cy.contains('Fetch class').click()
