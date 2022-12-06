@@ -234,17 +234,20 @@ const getFacultyTransfers = async (
   for (const { transferdate, targetcode } of insideTransfers) {
     const transferYear = defineYear(transferdate, isAcademicYear)
     transferGraphStats[0][indexOf(yearsArray, transferYear)] += 1
-    transferTableStats[transferYear][0] += 1
-    await addProgramme(
-      programmeTableStats,
-      targetcode,
-      tableStats,
-      transferYear,
-      0,
-      allBasics,
-      programmes,
-      includeAllSpecials
-    )
+    // LAASTARI 1, FIX THIS
+    if (transferYear < 2023) {
+      transferTableStats[transferYear][0] += 1
+      await addProgramme(
+        programmeTableStats,
+        targetcode,
+        tableStats,
+        transferYear,
+        0,
+        allBasics,
+        programmes,
+        includeAllSpecials
+      )
+    }
   }
   if (includeAllSpecials) {
     const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
@@ -252,34 +255,40 @@ const getFacultyTransfers = async (
 
     for (const { transferdate, sourcecode } of awayTransfers) {
       const transferYear = defineYear(transferdate, isAcademicYear)
-      transferGraphStats[1][indexOf(yearsArray, transferYear)] += 1
-      transferTableStats[transferYear][1] += 1
-      await addProgramme(
-        programmeTableStats,
-        sourcecode,
-        tableStats,
-        transferYear,
-        1,
-        allBasics,
-        programmes,
-        includeAllSpecials
-      )
+      // LAASTARI 2 FIX THIS
+      if (transferYear < 2023) {
+        transferGraphStats[1][indexOf(yearsArray, transferYear)] += 1
+        transferTableStats[transferYear][1] += 1
+        await addProgramme(
+          programmeTableStats,
+          sourcecode,
+          tableStats,
+          transferYear,
+          1,
+          allBasics,
+          programmes,
+          includeAllSpecials
+        )
+      }
     }
 
     for (const { transferdate, targetcode } of toTransfers) {
       const transferYear = defineYear(transferdate, isAcademicYear)
-      transferGraphStats[2][indexOf(yearsArray, transferYear)] += 1
-      transferTableStats[transferYear][2] += 1
-      await addProgramme(
-        programmeTableStats,
-        targetcode,
-        tableStats,
-        transferYear,
-        2,
-        allBasics,
-        programmes,
-        includeAllSpecials
-      )
+      // LAASTARI 3 FIX THIS
+      if (transferYear < 2023) {
+        transferGraphStats[2][indexOf(yearsArray, transferYear)] += 1
+        transferTableStats[transferYear][2] += 1
+        await addProgramme(
+          programmeTableStats,
+          targetcode,
+          tableStats,
+          transferYear,
+          2,
+          allBasics,
+          programmes,
+          includeAllSpecials
+        )
+      }
     }
   }
 
