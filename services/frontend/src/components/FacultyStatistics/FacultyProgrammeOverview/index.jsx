@@ -178,37 +178,41 @@ const FacultyProgrammeOverview = ({
                   />
                 </div>
               </div>
-              {getDivider('Master', 'MasterStudentsOfTheFacultyByStartingYear', 'no-infobox')}
-              <div className="section-container">
-                <div className="graph-container">
-                  <FacultyBarChart
-                    cypress="FacultyMastersProgress"
-                    data={{
-                      id: faculty.code,
-                      stats: progressStats?.data.mastersGraphStats,
-                      years: progressStats?.data.years,
-                    }}
-                  />
-                </div>
-                <div className="table-container">
-                  <FacultyProgressTable
-                    data={progressStats?.data.mastersTableStats}
-                    programmeStats={progressStats?.data.mastersProgrammeStats}
-                    titles={progressStats?.data.mastersTitles}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(progressStats?.data.mastersProgrammeStats).map(obj => [
-                        obj,
-                        progressStats?.data?.programmeNames[obj].code,
-                      ])
-                    ).map(listObj => listObj[0])}
-                    progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
-                    programmeNames={progressStats?.data.programmeNames}
-                    language={language}
-                    cypress="FacultyBachelorsProgressTable"
-                    progressTitles={progressStats?.data.yearlyMasterTitles}
-                  />
-                </div>
-              </div>
+              {!(faculty.code === 'H90') && (
+                <>
+                  {getDivider('Master', 'MasterStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+                  <div className="section-container">
+                    <div className="graph-container">
+                      <FacultyBarChart
+                        cypress="FacultyMastersProgress"
+                        data={{
+                          id: faculty.code,
+                          stats: progressStats?.data.mastersGraphStats,
+                          years: progressStats?.data.years,
+                        }}
+                      />
+                    </div>
+                    <div className="table-container">
+                      <FacultyProgressTable
+                        data={progressStats?.data.mastersTableStats}
+                        programmeStats={progressStats?.data.mastersProgrammeStats}
+                        titles={progressStats?.data.mastersTitles}
+                        sortedKeys={sortProgrammeKeys(
+                          Object.keys(progressStats?.data.mastersProgrammeStats).map(obj => [
+                            obj,
+                            progressStats?.data?.programmeNames[obj].code,
+                          ])
+                        ).map(listObj => listObj[0])}
+                        progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
+                        programmeNames={progressStats?.data.programmeNames}
+                        language={language}
+                        cypress="FacultyBachelorsProgressTable"
+                        progressTitles={progressStats?.data.yearlyMasterTitles}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
               {getDivider('Doctor and licentiate', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
               <div className="section-container">
                 <div className="graph-container">
