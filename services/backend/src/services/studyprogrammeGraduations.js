@@ -25,18 +25,8 @@ const {
   allStudyrights,
   allTransfers,
 } = require('./studyprogramme')
-const { bachelorStudyright } = require('./faculty/faculty')
+const { countTimeCategories, bachelorStudyright } = require('./graduationHelpers')
 const { getAllProgrammes } = require('./studyrights')
-
-const countTimeCategories = (times, goal) => {
-  const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
-  times.forEach(time => {
-    if (time <= goal) statistics.onTime += 1
-    else if (time <= goal + 12) statistics.yearOver += 1
-    else statistics.wayOver += 1
-  })
-  return statistics
-}
 
 const checkStartdate = async (id, studyStartDate) => {
   if (id.slice(-2) === '-1') {
