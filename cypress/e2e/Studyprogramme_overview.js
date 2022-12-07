@@ -204,7 +204,7 @@ describe('Studyprogramme overview', () => {
     it('are split into two graphs', () => {
       cy.init('/study-programme', 'admin')
       // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(10000)
+      cy.wait(5000)
       cy.contains('a', 'Kasvatustieteiden maisteriohjelma').click({ force: true })
       cy.get('[data-cy=graduation-times-graphMaster]').within(() => {
         cy.contains('Graduation year')
