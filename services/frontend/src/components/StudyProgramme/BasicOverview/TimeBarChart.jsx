@@ -19,17 +19,16 @@ const TimeBarChart = ({ data, goal, showMeanTime, title }) => {
     return data.length * t + 100
   }
 
-  const getTooltipText = (amount, y, year) => {
+  const getTooltipText = (amount, y, year, statistics) => {
     const sortingText = `<b>${amount} students graduated in year ${year}</b>`
     const timeText = `<br /><p>${sortingText}, <br /><b>${
       showMeanTime ? 'mean' : 'median'
     } study time: ${y} months</p></b>`
-    // const statisticsText = `<br /><p>${statistics.onTime} graduated on time</p><br />
-    //     <p>${statistics.yearOver} graduated max year overtime</p>
-    //     <br /><p>${statistics.wayOver} graduated over year late</p>`
+    const statisticsText = `<br /><p>${statistics.onTime} graduated on time</p><br />
+        <p>${statistics.yearOver} graduated max year overtime</p>
+        <br /><p>${statistics.wayOver} graduated over year late</p>`
 
-    // return `${timeText}${statisticsText}`
-    return timeText
+    return `${timeText}${statisticsText}`
   }
 
   const config = {
@@ -45,7 +44,7 @@ const TimeBarChart = ({ data, goal, showMeanTime, title }) => {
       fontSize: '25px',
       // eslint-disable-next-line
       formatter: function() {
-        return getTooltipText(this.point.amount, this.y, this.point.name) // , this.point.statistics)
+        return getTooltipText(this.point.amount, this.y, this.point.name, this.point.statistics)
       },
     },
     plotOptions: {
