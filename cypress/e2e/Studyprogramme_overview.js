@@ -186,6 +186,8 @@ describe('Studyprogramme overview', () => {
         cy.contains('2019')
         cy.contains('17 graduated').trigger('mouseover')
         cy.contains('study time: 23 months')
+        cy.contains('17 graduated on time')
+        cy.contains('0 graduated max year overtime')
       })
 
       cy.get('[data-cy=Graph-ProgrammesBeforeOrAfter')
@@ -195,6 +197,31 @@ describe('Studyprogramme overview', () => {
         .should('contain', 1)
         .should('contain', 4)
         .should('contain', 13)
+    })
+  })
+
+  describe.only('Graduation times of master programmes', () => {
+    it('are split into two graphs', () => {
+      cy.init('/study-programme', 'admin')
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(10000)
+      cy.contains('a', 'Kasvatustieteiden maisteriohjelma').click({ force: true })
+      cy.get('[data-cy=graduation-times-graphMaster]').within(() => {
+        cy.contains('Graduation year')
+        cy.contains('2020')
+        cy.contains('24 graduated').trigger('mouseover')
+        cy.contains('study time: 21.5 months')
+        cy.contains('21 graduated on time')
+        cy.contains('3 graduated max year overtime')
+      })
+
+      cy.get('[data-cy=graduation-times-graphBachelor]').within(() => {
+        cy.contains('Graduation year')
+        cy.contains('2020')
+        cy.contains('0 graduated').trigger('mouseover')
+        cy.contains('study time: 0 months')
+        cy.contains('0 graduated on time')
+      })
     })
   })
 
