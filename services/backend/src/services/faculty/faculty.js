@@ -125,6 +125,41 @@ const studyrightsByRightStartYear = async (faculty, since, graduated = 1) =>
     })
   ).map(facultyFormatStudyright)
 
+const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEnd, code, extent, graduated) =>
+  (
+    await Studyright.findAll({
+      include: [
+        {
+          model: Student,
+          attributes: ['studentnumber'],
+          required: true,
+        },
+        {
+          model: StudyrightElement,
+          required: true,
+          where: {
+            startdate: {
+              [Op.between]: [academicYearStart, academicYearEnd],
+            },
+            code: code,
+          },
+          include: {
+            model: ElementDetail,
+            required: true,
+          },
+        },
+      ],
+      where: {
+        faculty_code: faculty,
+        extentcode: extent,
+        graduated: {
+          [Op.in]: graduated,
+        },
+        student_studentnumber: { [Op.not]: null },
+      },
+    })
+  ).map(facultyFormatStudyright)
+
 const bachelorStudyright = async id => {
   return await Studyright.findOne({
     attributes: ['studystartdate'],
@@ -348,4 +383,5 @@ module.exports = {
   statutoryAbsences,
   getTransferredToAndAway,
   getTransferredInside,
+  getStudyRightsByExtent,
 }
