@@ -25,7 +25,7 @@ const {
   allStudyrights,
   allTransfers,
 } = require('./studyprogramme')
-const { countTimeCategories, bachelorStudyright } = require('./graduationHelpers')
+const { countTimeCategories, bachelorStudyright, getStatutoryAbsences } = require('./graduationHelpers')
 const { getAllProgrammes } = require('./studyrights')
 
 const checkStartdate = async (id, studyStartDate) => {
@@ -38,10 +38,13 @@ const checkStartdate = async (id, studyStartDate) => {
 }
 
 const addGraduation = async (studyright, isAcademicYear, amounts, times) => {
-  const studyStartDate = await checkStartdate(studyright.studyrightid, studyright.studystartdate)
+  const studyStartdate = await checkStartdate(studyright.studyrightid, studyright.studystartdate)
   const graduationYear = defineYear(studyright.enddate, isAcademicYear)
 
-  const timeToGraduation = moment(studyright.enddate).diff(moment(studyStartDate), 'months')
+  const totalTimeToGraduation = moment(studyright.enddate).diff(moment(studyStartdate), 'months')
+  const statutoryAbsences = await getStatutoryAbsences(studyright.studentnumber, studyStartdate, studyright.enddate)
+  const timeToGraduation = totalTimeToGraduation - statutoryAbsences
+
   amounts[graduationYear] += 1
   times[graduationYear] = [...times[graduationYear], timeToGraduation]
 }
@@ -113,22 +116,14 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   const studyrights = await graduatedStudyRights(studyprogramme, since, studentnumbers)
 
   // for masters, separate bc+ms combo from just ms students (except some medical progs)
-  if (doCombo) {
-    for (const right of studyrights) {
-      if (right.studyrightid.slice(-2) === '-2') {
-        await addGraduation(right, isAcademicYear, graduationAmountsCombo, graduationTimesCombo)
-      } else {
-        await addGraduation(right, isAcademicYear, graduationAmounts, graduationTimes)
-      }
+  for (const right of studyrights) {
+    if (doCombo && right.studyrightid.slice(-2) === '-2') {
+      await addGraduation(right, isAcademicYear, graduationAmountsCombo, graduationTimesCombo)
+    } else {
+      await addGraduation(right, isAcademicYear, graduationAmounts, graduationTimes)
     }
-  } else {
-    studyrights.forEach(({ enddate, studystartdate }) => {
-      const graduationYear = defineYear(enddate, isAcademicYear)
-      const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
-      graduationAmounts[graduationYear] += 1
-      graduationTimes[graduationYear] = [...graduationTimes[graduationYear], timeToGraduation]
-    })
   }
+
   // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
   const comparisonValue = studyprogramme.includes('KH') ? 72 : 48
 
