@@ -289,7 +289,36 @@ const getMasterCreditGraphStats = years => ({
     data: getEmptyArray(years.length),
   },
 })
-
+const getVetenaryCreditGraphStats = years => ({
+  lte210: {
+    name: 'Less than 210 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte240: {
+    name: '210-239 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte270: {
+    name: '240-269 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte300: {
+    name: '270-299 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte330: {
+    name: '300-329 credits',
+    data: getEmptyArray(years.length),
+  },
+  lte360: {
+    name: '330-359 credits',
+    data: getEmptyArray(years.length),
+  },
+  mte360: {
+    name: '360 or more credits',
+    data: getEmptyArray(years.length),
+  },
+})
 const getOnlyMasterCreditGraphStats = years => ({
   lte15: {
     name: 'Less than 15 credits',
@@ -362,11 +391,15 @@ const bachelorCreditAmounts = [15, 30, 60, 90, 120, 150, 180, 180]
 const masterCreditAmounts = [200, 220, 240, 260, 280, 300, 300]
 const onlyMasterCreditAmounts = [15, 30, 60, 90, 120, 120]
 const doctoralCreditAmounts = [50, 100, 150, 200, 250, 300, 300]
-
+const vetenaryCreditThresholds = ['lte210', 'lte240', 'lte270', 'lte300', 'lte330', 'lte360', 'mte360']
+const vetenaryCreditAmounts = [210, 240, 270, 300, 330, 360, 360]
 const getOnlyMasterThresholds = () => {
   return { msOnlyCreditThresholdKeys: onlyMasterCreditThresholds, msOnlyCreditThresholdAmount: onlyMasterCreditAmounts }
 }
 const getCreditThresholds = studyprogramme => {
+  if (studyprogramme === 'MH90_001') {
+    return { creditThresholdKeys: vetenaryCreditThresholds, creditThresholdAmounts: vetenaryCreditAmounts }
+  }
   if (studyprogramme.includes('KH')) {
     return { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
   }
@@ -520,6 +553,7 @@ module.exports = {
   getPercentage,
   getBachelorCreditGraphStats,
   getMasterCreditGraphStats,
+  getVetenaryCreditGraphStats,
   getDoctoralCreditGraphStats,
   getOnlyMasterCreditGraphStats,
   getCreditGraphStats,
