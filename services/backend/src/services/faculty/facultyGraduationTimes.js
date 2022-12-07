@@ -1,14 +1,9 @@
 const moment = require('moment')
-const {
-  graduatedStudyrights,
-  studyrightsByRightStartYear,
-  bachelorStudyright,
-  hasMasterRight,
-  statutoryAbsences,
-} = require('./faculty')
+const { graduatedStudyrights, studyrightsByRightStartYear, hasMasterRight } = require('./faculty')
 const { findRightProgramme, isNewProgramme } = require('./facultyHelpers')
 const { getYearsArray, getYearsObject, getMean, getMedian, defineYear } = require('../studyprogrammeHelpers')
 const { codes } = require('../../../config/programmeCodes')
+const { bachelorStudyright, countTimeCategories, getStatutoryAbsences } = require('../graduationHelpers')
 
 const sortProgrammes = data => {
   const check = name => {
@@ -46,25 +41,6 @@ const getProgrammeObjectBasis = (years, levels, emptyObject = true) => {
     (acc, level) => ({ ...acc, [level]: years.reduce((acc, year) => ({ ...acc, [year]: emptyObject ? {} : 0 }), {}) }),
     {}
   )
-}
-
-const getStatutoryAbsences = async (studentnumber, startdate, enddate) => {
-  const absences = await statutoryAbsences(studentnumber, startdate, enddate)
-  if (absences.length) {
-    const absentMonths = absences.reduce((sum, ab) => sum + moment(ab.end).diff(moment(ab.start), 'months'), 0)
-    return absentMonths
-  }
-  return 0
-}
-
-const countTimeCategories = (times, goal) => {
-  const statistics = { onTime: 0, yearOver: 0, wayOver: 0 }
-  times.forEach(time => {
-    if (time <= goal) statistics.onTime += 1
-    else if (time <= goal + 12) statistics.yearOver += 1
-    else statistics.wayOver += 1
-  })
-  return statistics
 }
 
 const hasMS = async (programme, elements, studyrightid) => {
