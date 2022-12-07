@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const TimeBarChart = ({ data, goal, showMeanTime }) => {
+const TimeBarChart = ({ data, goal, showMeanTime, title }) => {
   const maxValue = data.reduce((max, { y }) => {
     return y > max ? y : max
   }, goal * 2)
@@ -39,7 +39,7 @@ const TimeBarChart = ({ data, goal, showMeanTime }) => {
       margin: [70, 0],
       height: getHeight(),
     },
-    title: { text: ' ' },
+    title: { text: title },
     tooltip: {
       backgroundColor: 'white',
       fontSize: '25px',

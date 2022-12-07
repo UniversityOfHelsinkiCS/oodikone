@@ -24,6 +24,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
   const basics = useGetBasicStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
   const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
   const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
+  const doCombo = graduations?.data?.doCombo
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -134,7 +135,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                 value={showMeanTime}
                 setValue={setShowMeanTime}
               />
-              <div className="section-container-centered">
+              <div className={`section-container${doCombo ? '' : '-centered'}`}>
                 {/* {graduations?.data?.years.map(year => (
                   <GaugeChart
                     cypress={`${year}-AverageGraduationTimes`}
@@ -156,7 +157,16 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                   }
                   goal={graduations?.data.graduationTimes.goal}
                   showMeanTime={showMeanTime}
+                  title={doCombo ? 'Master studyright' : ' '}
                 />
+                {doCombo && (
+                  <TimeBarChart
+                    data={showMeanTime ? graduations?.data?.comboTimes.means : graduations?.data?.comboTimes.medians}
+                    goal={graduations?.data?.comboTimes?.goal}
+                    showMeanTime={showMeanTime}
+                    title="Bachelor + Master studyright"
+                  />
+                )}
               </div>
               {graduations?.data?.programmesBeforeOrAfterGraphStats && (
                 <>
