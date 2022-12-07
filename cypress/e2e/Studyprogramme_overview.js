@@ -200,7 +200,7 @@ describe('Studyprogramme overview', () => {
     })
   })
 
-  describe.only('Graduation times of master programmes', () => {
+  describe('Graduation times of master programmes', () => {
     it('are split into two graphs', () => {
       cy.init('/study-programme', 'admin')
       // eslint-disable-next-line cypress/no-unnecessary-waiting
