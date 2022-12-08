@@ -122,7 +122,7 @@ const studyrightsByRightStartYear = async (faculty, since, graduated = 1) =>
     })
   ).map(facultyFormatStudyright)
 
-const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEnd, code, extent, graduated) =>
+const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEnd, code, extents, graduated) =>
   (
     await Studyright.findAll({
       include: [
@@ -148,7 +148,9 @@ const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEn
       ],
       where: {
         faculty_code: faculty,
-        extentcode: extent,
+        extentcode: {
+          [Op.in]: extents,
+        },
         graduated: {
           [Op.in]: graduated,
         },

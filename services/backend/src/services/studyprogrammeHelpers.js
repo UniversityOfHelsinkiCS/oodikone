@@ -436,7 +436,7 @@ const tableTitles = {
       '90-119 credits',
       '120-149 credits',
       '150-179 credits',
-      '>= 180 credits',
+      '180 ≤ credits',
     ],
     master: [
       '',
@@ -447,7 +447,7 @@ const tableTitles = {
       '240-259 credits',
       '260-279 credits',
       '280-299 credits',
-      '>= 300 credits',
+      '300 ≤ credits',
     ],
     masterOnly: [
       '',
@@ -457,7 +457,7 @@ const tableTitles = {
       '30-59 credits',
       '60-89 credits',
       '90-119 credits',
-      '>= 120 credits',
+      '120 ≤ credits',
     ],
     doctoral: [
       '',
@@ -468,7 +468,7 @@ const tableTitles = {
       '150-199 credits',
       '200-249 credits',
       '250-299 credits',
-      '>= 300 credits',
+      '300 ≤ credits',
     ],
   },
   studytracks: [
