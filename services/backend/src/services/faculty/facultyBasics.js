@@ -1,4 +1,5 @@
 const { indexOf } = require('lodash')
+const moment = require('moment')
 const {
   startedStudyrights,
   graduatedStudyrights,
@@ -7,6 +8,7 @@ const {
   transferredTo,
   getTransferredToAndAway,
   getTransferredInside,
+  studyrightsByRightStartYear,
 } = require('./faculty')
 const { getStatsBasis, getYearsArray, defineYear } = require('../studyprogrammeHelpers')
 const { findRightProgramme, isNewProgramme, checkTransfers, getExtentFilter } = require('./facultyHelpers')
@@ -202,7 +204,18 @@ const getFacultyGraduates = async (
     countsGraduations[year] = graduatedTableStats[year]
   })
 }
-
+// If includeAllSpecial false, insidetransfers should contain only students started after 1.8.2017.
+const getInsideTransfers = async (programmeCodes, allProgrammeCodes, since, includeAllSpecials, faculty) => {
+  if (includeAllSpecials) {
+    return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
+  }
+  const insiders = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
+  const studyrights = (await studyrightsByRightStartYear(faculty, moment('2017-08-01', 'YYYY-MM-DD'))).map(
+    sr => sr.studyrightid
+  )
+  const filteredTransfers = insiders.filter(tr => studyrights.includes(tr.studyrightid))
+  return filteredTransfers
+}
 const getFacultyTransfers = async (
   programmes,
   programmeCodes,
@@ -215,10 +228,16 @@ const getFacultyTransfers = async (
   allBasics,
   counts,
   programmeData,
-  includeAllSpecials
+  includeAllSpecials,
+  faculty
 ) => {
-  const insideTransfers = await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
-  // Filter still away those  that have started studying before 1.8.2017, when include all specials false.
+  const insideTransfers = await getInsideTransfers(
+    programmeCodes,
+    allProgrammeCodes,
+    since,
+    includeAllSpecials,
+    faculty
+  )
   let transferGraphStats = []
   let transferTableStats = {}
   if (includeAllSpecials) {
@@ -234,8 +253,7 @@ const getFacultyTransfers = async (
   for (const { transferdate, targetcode } of insideTransfers) {
     const transferYear = defineYear(transferdate, isAcademicYear)
     transferGraphStats[0][indexOf(yearsArray, transferYear)] += 1
-    // LAASTARI 1, FIX THIS
-    if (transferYear < 2023 || isAcademicYear) {
+    if (isAcademicYear || !(transferYear > moment().year())) {
       transferTableStats[transferYear][0] += 1
       await addProgramme(
         programmeTableStats,
@@ -255,8 +273,7 @@ const getFacultyTransfers = async (
 
     for (const { transferdate, sourcecode } of awayTransfers) {
       const transferYear = defineYear(transferdate, isAcademicYear)
-      // LAASTARI 2 FIX THIS
-      if (transferYear < 2023 || isAcademicYear) {
+      if (isAcademicYear || !(transferYear > moment().year())) {
         transferGraphStats[1][indexOf(yearsArray, transferYear)] += 1
         transferTableStats[transferYear][1] += 1
         await addProgramme(
@@ -274,8 +291,7 @@ const getFacultyTransfers = async (
 
     for (const { transferdate, targetcode } of toTransfers) {
       const transferYear = defineYear(transferdate, isAcademicYear)
-      // LAASTARI 3 FIX THIS
-      if (transferYear < 2023 || isAcademicYear) {
+      if (isAcademicYear || !(transferYear > moment().year())) {
         transferGraphStats[2][indexOf(yearsArray, transferYear)] += 1
         transferTableStats[transferYear][2] += 1
         await addProgramme(
@@ -386,7 +402,8 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
     allBasics,
     counts,
     programmeData,
-    includeAllSpecials
+    includeAllSpecials,
+    faculty
   )
 
   // combine tableStats from all categories
@@ -432,7 +449,11 @@ const combineFacultyBasics = async (faculty, programmes, yearType, allProgrammeC
       if (code in programmeData.transferred) {
         studentInfo[code][year] = studentInfo[code][year].concat(programmeData.transferred[code][year])
       } else {
-        studentInfo[code][year] = studentInfo[code][year].concat([0, 0, 0])
+        if (includeAllSpecials) {
+          studentInfo[code][year] = studentInfo[code][year].concat([0, 0, 0])
+        } else {
+          studentInfo[code][year] = studentInfo[code][year].concat([0])
+        }
       }
     }
   })
