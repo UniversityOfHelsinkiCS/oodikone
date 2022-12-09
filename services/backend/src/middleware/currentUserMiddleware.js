@@ -5,6 +5,7 @@ const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
 const { relevantIAMs } = require('../../config/IAMConfig')
 const { getOrganizationAccess } = require('../util/organizationAccess')
+const logger = require('../util/logger')
 
 const parseIamGroups = iamGroups => iamGroups?.split(';').filter(Boolean) ?? []
 
@@ -32,6 +33,7 @@ const currentUserMiddleware = async (req, _res, next) => {
   const iamRights = Object.keys(await getOrganizationAccess({ iamGroups }))
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
+    logger.error({ message: 'User does not have required iam group', meta: { iamGroups, iamRights } })
     throw new ApplicationError('User does not have required iam group', 403, { logoutUrl })
   }
 
