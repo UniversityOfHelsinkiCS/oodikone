@@ -28,21 +28,21 @@ const {
 const { countTimeCategories, bachelorStudyright, getStatutoryAbsences } = require('./graduationHelpers')
 const { getAllProgrammes } = require('./studyrights')
 
-const checkStartdate = async (id, studyStartDate) => {
+const checkStartdate = async (id, startdate) => {
   if (id.slice(-2) === '-1') {
-    return studyStartDate
+    return startdate
   }
   const studyright = await bachelorStudyright(id.replace(/-2$/, '-1'))
-  if (studyright) return studyright.studystartdate
+  if (studyright) return studyright.startdate
   return null
 }
 
 const addGraduation = async (studyright, isAcademicYear, amounts, times) => {
-  const studyStartdate = await checkStartdate(studyright.studyrightid, studyright.studystartdate)
+  const startdate = await checkStartdate(studyright.studyrightid, studyright.startdate)
   const graduationYear = defineYear(studyright.enddate, isAcademicYear)
 
-  const totalTimeToGraduation = moment(studyright.enddate).diff(moment(studyStartdate), 'months')
-  const statutoryAbsences = await getStatutoryAbsences(studyright.studentnumber, studyStartdate, studyright.enddate)
+  const totalTimeToGraduation = moment(studyright.enddate).diff(moment(startdate), 'months')
+  const statutoryAbsences = await getStatutoryAbsences(studyright.studentnumber, startdate, studyright.enddate)
   const timeToGraduation = totalTimeToGraduation - statutoryAbsences
 
   amounts[graduationYear] += 1

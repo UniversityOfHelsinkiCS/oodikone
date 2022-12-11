@@ -58,7 +58,7 @@ const getStatutoryAbsences = async (studentnumber, startdate, enddate) => {
 
 const bachelorStudyright = async id => {
   return await Studyright.findOne({
-    attributes: ['studystartdate'],
+    attributes: ['startdate'],
     where: {
       studyrightid: id,
       extentcode: 1,
