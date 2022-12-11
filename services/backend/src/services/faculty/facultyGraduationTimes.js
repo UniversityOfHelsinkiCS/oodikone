@@ -32,7 +32,7 @@ const getSortedProgIds = progs => {
 
 const findBachelorStartdate = async id => {
   const studyright = await bachelorStudyright(id)
-  if (studyright) return studyright.studystartdate
+  if (studyright) return studyright.startdate
   return null
 }
 

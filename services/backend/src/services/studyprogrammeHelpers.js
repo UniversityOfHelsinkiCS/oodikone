@@ -45,6 +45,7 @@ const resolveStudyRightCode = studyright_elements => {
 const formatStudyright = studyright => {
   const {
     studyrightid,
+    startdate,
     studystartdate,
     enddate,
     givendate,
@@ -58,6 +59,7 @@ const formatStudyright = studyright => {
 
   return {
     studyrightid,
+    startdate,
     studystartdate: defineStartDate(studyright_elements, studystartdate),
     enddate,
     givendate,

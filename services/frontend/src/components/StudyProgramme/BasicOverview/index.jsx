@@ -151,14 +151,6 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                     studyprogramme={studyprogramme}
                   />
                 ))} */}
-                <TimeBarChart
-                  data={
-                    showMeanTime ? graduations?.data?.graduationTimes.means : graduations?.data?.graduationTimes.medians
-                  }
-                  goal={graduations?.data.graduationTimes.goal}
-                  showMeanTime={showMeanTime}
-                  title={doCombo ? 'Master studyright' : ' '}
-                />
                 {doCombo && (
                   <TimeBarChart
                     data={showMeanTime ? graduations?.data?.comboTimes.means : graduations?.data?.comboTimes.medians}
@@ -167,6 +159,14 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                     title="Bachelor + Master studyright"
                   />
                 )}
+                <TimeBarChart
+                  data={
+                    showMeanTime ? graduations?.data?.graduationTimes.means : graduations?.data?.graduationTimes.medians
+                  }
+                  goal={graduations?.data.graduationTimes.goal}
+                  showMeanTime={showMeanTime}
+                  title={doCombo ? 'Master studyright' : ' '}
+                />
               </div>
               {graduations?.data?.programmesBeforeOrAfterGraphStats && (
                 <>
