@@ -19,6 +19,7 @@ const {
 } = require('./studyprogrammeHelpers')
 const {
   graduatedStudyRights,
+  startedStudyRightsByStartdate,
   getThesisCredits,
   followingStudyrights,
   previousStudyrights,
@@ -153,6 +154,76 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   return { times, doCombo, comboTimes }
 }
 
+const getGraduationTimeStatsByStartYear = async ({
+  studyprogramme,
+  since,
+  years,
+  isAcademicYear,
+  includeAllSpecials,
+}) => {
+  let amounts = getYearsObject({ years })
+  let gradTimes = getYearsObject({ years, emptyArrays: true })
+  let classSizes = getYearsObject({ years })
+  // for bc+ms combo
+  // const doCombo = studyprogramme.startsWith('MH') && !['MH30_001', 'MH30_003'].includes(studyprogramme)
+  // let amountsCombo = getYearsObject({ years })
+  // let timesCombo = getYearsObject({ years, emptyArrays: true })
+  // let classSizesCombo = getYearsObject({ years })
+
+  const studentnumbers = await getCorrectStudentnumbers({
+    codes: [studyprogramme],
+    startDate: since,
+    endDate: alltimeEndDate,
+    includeAllSpecials,
+  })
+  const studyrights = await startedStudyRightsByStartdate(studyprogramme, since, studentnumbers)
+
+  for (const right of studyrights) {
+    const startYear = defineYear(right.startdate, isAcademicYear)
+    classSizes[startYear] += 1
+    // if (right.prioritycode !== 1 && right.prioritycode !== 30) {
+    //   console.log(right)
+    // }
+    if (right.graduated) {
+      const totalTimeToGraduation = moment(right.enddate).diff(moment(right.startdate), 'months')
+      const statutoryAbsences = await getStatutoryAbsences(right.studentnumber, right.startdate, right.enddate)
+      const timeToGraduation = totalTimeToGraduation - statutoryAbsences
+
+      amounts[startYear] += 1
+      gradTimes[startYear] = [...gradTimes[startYear], timeToGraduation]
+    }
+  }
+
+  const goal = getGoal(studyprogramme)
+  const times = { medians: [], means: [], goal }
+  const comboTimes = { medians: [], means: [], goal: goal + 36 }
+
+  const rev = [...years].reverse()
+  for (const year of rev) {
+    const median = getMedian(gradTimes[year])
+    const mean = getMean(gradTimes[year])
+    const statistics = countTimeCategories(gradTimes[year], goal)
+    times.medians = [
+      ...times.medians,
+      { y: median, amount: amounts[year], name: year, statistics, classSize: classSizes[year] },
+    ]
+    times.means = [
+      ...times.means,
+      { y: mean, amount: amounts[year], name: year, statistics, classSize: classSizes[year] },
+    ]
+
+    // if (doCombo) {
+    //   const median = getMedian(timesCombo[year])
+    //   const mean = getMean(timesCombo[year])
+    //   const statistics = countTimeCategories(timesCombo[year], goal + 36)
+    //   comboTimes.medians = [...comboTimes.medians, { y: median, amount: amountsCombo[year], name: year, statistics }]
+    //   comboTimes.means = [...comboTimes.means, { y: mean, amount: amountsCombo[year], name: year, statistics }]
+    // }
+  }
+
+  return { times, comboTimes }
+}
+
 // Creates (studyrightid, transfer)-map out of programmes transfers
 const getTransferStudyrightMap = async (studyprogramme, since) => {
   const transfers = await allTransfers(studyprogramme, since)
@@ -263,6 +334,7 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
   const graduated = await getGraduatedStats(queryParameters)
 
   const graduationTimeStats = await getGraduationTimeStats(queryParameters)
+  const graduationTimeStatsByStartYear = await getGraduationTimeStatsByStartYear(queryParameters)
 
   const programmesBeforeOrAfter = await getProgrammesBeforeOrAfter(studyprogramme, queryParameters)
 
@@ -290,6 +362,8 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
     graduationTimes: graduationTimeStats.times,
     doCombo: graduationTimeStats.doCombo,
     comboTimes: graduationTimeStats.comboTimes,
+    graduationTimesByStartYear: graduationTimeStatsByStartYear.times,
+    comboTimesByStartYear: graduationTimeStatsByStartYear.comboTimes,
     programmesBeforeOrAfterTableStats: programmesBeforeOrAfter?.tableStats,
     programmesBeforeOrAfterGraphStats: programmesBeforeOrAfter?.graphStats,
     programmesBeforeOrAfterTitles,
