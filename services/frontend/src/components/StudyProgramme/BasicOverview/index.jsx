@@ -5,7 +5,6 @@ import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQue
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
-// import GaugeChart from './GaugeChart'
 import TimeBarChart from './TimeBarChart'
 import DataTable from './DataTable'
 import Toggle from '../Toggle'
@@ -136,21 +135,6 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                 setValue={setShowMeanTime}
               />
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
-                {/* {graduations?.data?.years.map(year => (
-                  <GaugeChart
-                    cypress={`${year}-AverageGraduationTimes`}
-                    key={year}
-                    year={year}
-                    data={
-                      showMeanTime
-                        ? graduations?.data?.graduationMeanTime?.[year]
-                        : graduations?.data?.graduationMedianTime?.[year]
-                    }
-                    graduationAmount={graduations?.data?.graduationAmounts?.[year]}
-                    totalAmount={graduations?.data?.totalAmounts?.[year]}
-                    studyprogramme={studyprogramme}
-                  />
-                ))} */}
                 {doCombo && (
                   <TimeBarChart
                     data={showMeanTime ? graduations?.data?.comboTimes.means : graduations?.data?.comboTimes.medians}

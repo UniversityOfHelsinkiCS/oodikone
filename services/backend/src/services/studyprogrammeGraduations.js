@@ -124,27 +124,6 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
     }
   }
 
-  // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
-  const comparisonValue = studyprogramme.includes('KH') ? 72 : 48
-
-  const medians = getYearsObject({ years, emptyArrays: true })
-  const means = getYearsObject({ years, emptyArrays: true })
-
-  // HighCharts graph require the data to have this format (ie. actual value, "empty value")
-  years.forEach(year => {
-    const median = getMedian(graduationTimes[year])
-    const mean = getMean(graduationTimes[year])
-    medians[year] = [
-      ['', median],
-      ['', comparisonValue - median],
-    ]
-    means[year] = [
-      ['', mean],
-      ['', comparisonValue - mean],
-    ]
-  })
-
-  // new version
   const goal = getGoal(studyprogramme)
   const times = { medians: [], means: [], goal }
   const comboTimes = { medians: [], means: [], goal: goal + 36 }
@@ -171,7 +150,7 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
       ]
     }
   }
-  return { medians, means, graduationAmounts, times, doCombo, comboTimes }
+  return { times, doCombo, comboTimes }
 }
 
 // Creates (studyrightid, transfer)-map out of programmes transfers
@@ -308,9 +287,6 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
         data: thesis.graphStats,
       },
     ],
-    graduationMedianTime: graduationTimeStats.medians,
-    graduationMeanTime: graduationTimeStats.means,
-    graduationAmounts: graduationTimeStats.graduationAmounts,
     graduationTimes: graduationTimeStats.times,
     doCombo: graduationTimeStats.doCombo,
     comboTimes: graduationTimeStats.comboTimes,
