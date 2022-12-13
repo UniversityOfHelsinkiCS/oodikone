@@ -101,9 +101,6 @@ const getGraduationTimeStats = async ({
     ...graduationTimes[track].means,
     { y: mean, amount: graduationAmounts[track][year], name: year, statistics },
   ]
-  // console.log(track, year)
-  // console.log(graduationTimes)
-  // console.log(graduationTimes[track].medians)
 }
 
 // Goes through the programme and all its studytracks for the said year and adds the wanted stats to the data objects
