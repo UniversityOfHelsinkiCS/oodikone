@@ -14,6 +14,7 @@ const {
   getCreditGraphStats,
   tableTitles,
   getCreditProgressTableTitles,
+  getGoal,
 } = require('./studyprogrammeHelpers')
 const {
   studytrackStudents,
@@ -25,6 +26,7 @@ const {
   graduatedStudyRights,
 } = require('./studyprogramme')
 const { getAcademicYearDates } = require('../util/semester')
+const { countTimeCategories } = require('./graduationHelpers')
 
 const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) => {
   let data = { female: 0, male: 0, finnish: 0 }
@@ -63,21 +65,22 @@ const getGraduationTimeStats = async ({
   graduationMeanTime,
   graduationMedianTime,
   graduationAmounts,
+  graduationTimes,
 }) => {
   // Count how long each student took to graduate
-  let graduationTimes = []
-  graduated.forEach(({ enddate, studystartdate }) => {
-    const timeToGraduation = moment(enddate).diff(moment(studystartdate), 'months')
+  let times = []
+  graduated.forEach(({ enddate, startdate }) => {
+    const timeToGraduation = moment(enddate).diff(moment(startdate), 'months')
     graduationAmounts[track][year] += 1
-    graduationTimes = [...graduationTimes, timeToGraduation]
+    times = [...times, timeToGraduation]
   })
 
   // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
   const comparisonValue = studyprogramme.includes('KH') ? 72 : 48
 
   // HighCharts graph requires the data to have this format (ie. actual value, "empty value")
-  const median = getMedian(graduationTimes)
-  const mean = getMean(graduationTimes)
+  const median = getMedian(times)
+  const mean = getMean(times)
   graduationMedianTime[track][year] = [
     ['', median],
     ['', comparisonValue - median],
@@ -86,6 +89,21 @@ const getGraduationTimeStats = async ({
     ['', mean],
     ['', comparisonValue - mean],
   ]
+  if (year === 'Total') {
+    return
+  }
+  const statistics = countTimeCategories(times, graduationTimes.goal)
+  graduationTimes[track].medians = [
+    ...graduationTimes[track].medians,
+    { y: median, amount: graduationAmounts[track][year], name: year, statistics },
+  ]
+  graduationTimes[track].means = [
+    ...graduationTimes[track].means,
+    { y: mean, amount: graduationAmounts[track][year], name: year, statistics },
+  ]
+  // console.log(track, year)
+  // console.log(graduationTimes)
+  // console.log(graduationTimes[track].medians)
 }
 
 // Goes through the programme and all its studytracks for the said year and adds the wanted stats to the data objects
@@ -112,6 +130,7 @@ const getStudytrackDataForTheYear = async ({
     graduationMeanTime,
     graduationMedianTime,
     graduationAmounts,
+    graduationTimes,
     totalAmounts,
     emptyTracks,
   } = data
@@ -208,6 +227,9 @@ const getStudytrackDataForTheYear = async ({
       ]
 
       // Count stats for the graduation time charts grouped by year
+      if (!(track in graduationTimes)) {
+        graduationTimes[track] = { medians: [], means: [] }
+      }
       totalAmounts[track][year] = await all.length
       await getGraduationTimeStats({
         year,
@@ -217,9 +239,18 @@ const getStudytrackDataForTheYear = async ({
         graduationMedianTime,
         graduationMeanTime,
         graduationAmounts,
+        graduationTimes,
       })
     })
   )
+  Object.keys(graduationTimes).forEach(track => {
+    if (track !== 'goal') {
+      const sortedMedians = graduationTimes[track].medians.sort((a, b) => b.name.localeCompare(a.name))
+      const sortedMeans = graduationTimes[track].means.sort((a, b) => b.name.localeCompare(a.name))
+      graduationTimes[track].medians = sortedMedians
+      graduationTimes[track].means = sortedMeans
+    }
+  })
 }
 
 // Defines the studytrack names for the studytrack selector
@@ -244,6 +275,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
   const graduationMedianTime = {}
   const graduationMeanTime = {}
   const graduationAmounts = {}
+  const graduationTimes = { goal: getGoal(studyprogramme) }
   const totalAmounts = {}
   const emptyTracks = new Map()
 
@@ -265,6 +297,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
     graduationMedianTime,
     graduationMeanTime,
     graduationAmounts,
+    graduationTimes,
     totalAmounts,
     emptyTracks,
   }
