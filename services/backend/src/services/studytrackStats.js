@@ -66,6 +66,7 @@ const getGraduationTimeStats = async ({
   graduationMedianTime,
   graduationAmounts,
   graduationTimes,
+  classSize,
 }) => {
   // Count how long each student took to graduate
   let times = []
@@ -95,11 +96,11 @@ const getGraduationTimeStats = async ({
   const statistics = countTimeCategories(times, graduationTimes.goal)
   graduationTimes[track].medians = [
     ...graduationTimes[track].medians,
-    { y: median, amount: graduationAmounts[track][year], name: year, statistics },
+    { y: median, amount: graduationAmounts[track][year], name: year, statistics, classSize },
   ]
   graduationTimes[track].means = [
     ...graduationTimes[track].means,
-    { y: mean, amount: graduationAmounts[track][year], name: year, statistics },
+    { y: mean, amount: graduationAmounts[track][year], name: year, statistics, classSize },
   ]
 }
 
@@ -237,6 +238,7 @@ const getStudytrackDataForTheYear = async ({
         graduationMeanTime,
         graduationAmounts,
         graduationTimes,
+        classSize: totalAmounts[track][year],
       })
     })
   )

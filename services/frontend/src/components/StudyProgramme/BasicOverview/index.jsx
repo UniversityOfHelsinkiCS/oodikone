@@ -5,7 +5,7 @@ import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQue
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
-import TimeBarChart from './TimeBarChart'
+import TimeBarChart from '../TimeBarChart'
 import DataTable from './DataTable'
 import Toggle from '../Toggle'
 import InfoBox from '../../Info/InfoBox'
@@ -17,6 +17,8 @@ const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(
 
 const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
   const [showMeanTime, setShowMeanTime] = useState(false)
+  // eslint-disable-next-line no-unused-vars
+  const [showByStartYear, setShowByStartYear] = useState(false)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -24,6 +26,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
   const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
   const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
   const doCombo = graduations?.data?.doCombo
+  const timesData = showByStartYear ? graduations?.data?.graduationTimesByStartYear : graduations?.data?.graduationTimes
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -127,13 +130,23 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                 />
               </div>
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
-              <Toggle
-                cypress="GraduationTimeToggle"
-                firstLabel="Median time"
-                secondLabel="Mean time"
-                value={showMeanTime}
-                setValue={setShowMeanTime}
-              />
+              <div className="toggle-container">
+                <Toggle
+                  cypress="GraduationTimeToggle"
+                  firstLabel="Median time"
+                  secondLabel="Mean time"
+                  value={showMeanTime}
+                  setValue={setShowMeanTime}
+                />
+                {/* <Toggle
+                  cypress="GroupByToggle"
+                  firstLabel="Group by: Graduation year"
+                  secondLabel="Starting Year"
+                  value={showByStartYear}
+                  setValue={setShowByStartYear}
+                /> */}
+              </div>
+
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
                 {doCombo && (
                   <TimeBarChart
@@ -141,15 +154,15 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                     goal={graduations?.data?.comboTimes?.goal}
                     showMeanTime={showMeanTime}
                     title="Bachelor + Master studyright"
+                    byStartYear={showByStartYear}
                   />
                 )}
                 <TimeBarChart
-                  data={
-                    showMeanTime ? graduations?.data?.graduationTimes.means : graduations?.data?.graduationTimes.medians
-                  }
+                  data={showMeanTime ? timesData.means : timesData.medians}
                   goal={graduations?.data.graduationTimes.goal}
                   showMeanTime={showMeanTime}
                   title={doCombo ? 'Master studyright' : ' '}
+                  byStartYear={showByStartYear}
                 />
               </div>
               {graduations?.data?.programmesBeforeOrAfterGraphStats && (

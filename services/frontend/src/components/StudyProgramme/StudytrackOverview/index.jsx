@@ -5,10 +5,10 @@ import { useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import InfoBox from '../../Info/InfoBox'
 import BarChart from './BarChart'
 import BasicDataTable from './BasicDataTable'
-import GaugeChart from './GaugeChart'
 import StudytrackDataTable from './StudytrackDataTable'
 import StudytrackSelector from './StudytrackSelector'
 import Toggle from '../Toggle'
+import TimeBarChart from '../TimeBarChart'
 
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
@@ -119,21 +119,17 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
                 setValue={setShowMeanTime}
               />
               <div className="section-container-centered">
-                {stats?.data?.years.map(year => (
-                  <GaugeChart
-                    cypress={`${year.slice(0, 4)}-AverageGraduationTimes`}
-                    key={year}
-                    year={year}
-                    data={
-                      showMeanTime
-                        ? stats?.data?.graduationMeanTime[track][year]
-                        : stats?.data?.graduationMedianTime[track][year]
-                    }
-                    graduationAmount={stats?.data?.graduationAmounts[track][year]}
-                    totalAmount={stats?.data?.totalAmounts[track][year]}
-                    studyprogramme={studyprogramme}
-                  />
-                ))}
+                <TimeBarChart
+                  data={
+                    showMeanTime
+                      ? stats?.data?.graduationTimes[track].means
+                      : stats?.data?.graduationTimes[track].medians
+                  }
+                  goal={stats?.data?.graduationTimes.goal}
+                  showMeanTime={showMeanTime}
+                  byStartYear
+                  title={' '}
+                />
               </div>
             </>
           )}
