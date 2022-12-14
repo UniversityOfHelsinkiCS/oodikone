@@ -274,10 +274,13 @@ describe('Studyprogramme overview', () => {
         .should('contain', '5.6%') // The percentage for 15-29 credits in 2018-2019
         .should('contain', '12.8%') // The percentage for less than 15 credits in 2019-2020
 
-      cy.get('[data-cy=Graph-2018-AverageGraduationTimes]')
-        .should('contain', '2018 - 2019')
-        .should('contain', 'n = 11 / 162')
-        .should('contain', '22 kk')
+      cy.get('[data-cy=graduation-times-graph]').within(() => {
+        cy.contains('Start year')
+        cy.contains('2019 - 2020')
+        cy.contains('42 graduated').trigger('mouseover')
+        cy.contains('study time: 31.5 months')
+        cy.contains('39 graduated on time')
+      })
     })
   })
 
