@@ -3,6 +3,10 @@ import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
 const TimeBarChart = ({ data, goal, showMeanTime, title, byStartYear }) => {
+  if (!data) {
+    return <></>
+  }
+
   const maxValue = data.reduce((max, { y }) => {
     return y > max ? y : max
   }, goal * 2)
