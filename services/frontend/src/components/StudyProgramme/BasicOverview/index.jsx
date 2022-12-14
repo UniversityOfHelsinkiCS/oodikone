@@ -150,7 +150,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
                 {doCombo && (
                   <TimeBarChart
-                    data={showMeanTime ? graduations?.data?.comboTimes.means : graduations?.data?.comboTimes.medians}
+                    data={showMeanTime ? graduations?.data?.comboTimes?.means : graduations?.data?.comboTimes?.medians}
                     goal={graduations?.data?.comboTimes?.goal}
                     showMeanTime={showMeanTime}
                     title="Bachelor + Master studyright"
@@ -158,8 +158,8 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                   />
                 )}
                 <TimeBarChart
-                  data={showMeanTime ? timesData.means : timesData.medians}
-                  goal={graduations?.data.graduationTimes.goal}
+                  data={showMeanTime ? timesData?.means : timesData?.medians}
+                  goal={graduations?.data.graduationTimes?.goal}
                   showMeanTime={showMeanTime}
                   title={doCombo ? 'Master studyright' : ' '}
                   byStartYear={showByStartYear}
