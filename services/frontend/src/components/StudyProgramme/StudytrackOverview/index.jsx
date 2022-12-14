@@ -111,7 +111,7 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
           </div>
           {stats?.isSuccess && stats?.data?.includeGraduated && (
             <>
-              {getDivider('Average graduation times', 'AverageGraduationTimes')}
+              {getDivider('Average graduation times', 'AverageGraduationTimesStudytracks')}
               <Toggle
                 firstLabel="Median time"
                 secondLabel="Mean time"
