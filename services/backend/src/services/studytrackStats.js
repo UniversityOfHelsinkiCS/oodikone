@@ -57,17 +57,11 @@ const getStudentData = (startDate, students, thresholdKeys, thresholdAmounts) =>
   return data
 }
 
-const getGraduationTimeStats = async ({
-  year,
-  graduated,
-  studyprogramme,
-  track,
-  graduationMeanTime,
-  graduationMedianTime,
-  graduationAmounts,
-  graduationTimes,
-  classSize,
-}) => {
+const getGraduationTimeStats = async ({ year, graduated, track, graduationAmounts, graduationTimes, classSize }) => {
+  if (year === 'Total') {
+    return
+  }
+
   // Count how long each student took to graduate
   let times = []
   graduated.forEach(({ enddate, startdate }) => {
@@ -76,24 +70,10 @@ const getGraduationTimeStats = async ({
     times = [...times, timeToGraduation]
   })
 
-  // The maximum amount of months in the graph depends on the studyprogramme intended graduation time
-  const comparisonValue = studyprogramme.includes('KH') ? 72 : 48
-
-  // HighCharts graph requires the data to have this format (ie. actual value, "empty value")
   const median = getMedian(times)
   const mean = getMean(times)
-  graduationMedianTime[track][year] = [
-    ['', median],
-    ['', comparisonValue - median],
-  ]
-  graduationMeanTime[track][year] = [
-    ['', mean],
-    ['', comparisonValue - mean],
-  ]
-  if (year === 'Total') {
-    return
-  }
   const statistics = countTimeCategories(times, graduationTimes.goal)
+
   graduationTimes[track].medians = [
     ...graduationTimes[track].medians,
     { y: median, amount: graduationAmounts[track][year], name: year, statistics, classSize },
@@ -125,8 +105,6 @@ const getStudytrackDataForTheYear = async ({
     mainStatsByTrack,
     creditGraphStats,
     creditTableStats,
-    graduationMeanTime,
-    graduationMedianTime,
     graduationAmounts,
     graduationTimes,
     totalAmounts,
@@ -232,10 +210,7 @@ const getStudytrackDataForTheYear = async ({
       await getGraduationTimeStats({
         year,
         graduated,
-        studyprogramme,
         track,
-        graduationMedianTime,
-        graduationMeanTime,
         graduationAmounts,
         graduationTimes,
         classSize: totalAmounts[track][year],
@@ -271,8 +246,6 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
   const mainStatsByTrack = {}
   const creditGraphStats = {}
   const creditTableStats = {}
-  const graduationMedianTime = {}
-  const graduationMeanTime = {}
   const graduationAmounts = {}
   const graduationTimes = { goal: getGoal(studyprogramme) }
   const totalAmounts = {}
@@ -282,8 +255,6 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
     mainStatsByTrack[track] = []
     creditGraphStats[track] = getCreditGraphStats(studyprogramme, years)
     creditTableStats[track] = []
-    graduationMedianTime[track] = getYearsObject({ years, emptyArrays: true })
-    graduationMeanTime[track] = getYearsObject({ years, emptyArrays: true })
     graduationAmounts[track] = getYearsObject({ years })
     totalAmounts[track] = getYearsObject({ years })
   })
@@ -293,8 +264,6 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
     mainStatsByTrack,
     creditGraphStats,
     creditTableStats,
-    graduationMedianTime,
-    graduationMeanTime,
     graduationAmounts,
     graduationTimes,
     totalAmounts,
