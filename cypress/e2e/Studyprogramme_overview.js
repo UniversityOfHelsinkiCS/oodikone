@@ -237,7 +237,7 @@ describe('Studyprogramme overview', () => {
     it('Studytracks and student populations -tab loads', () => {
       cy.get('[data-cy=Section-StudytrackOverview]')
       cy.get('[data-cy=Section-StudytrackProgress]')
-      cy.get('[data-cy=Section-AverageGraduationTimes]')
+      cy.get('[data-cy=Section-AverageGraduationTimesStudytracks]')
     })
 
     it('Students of the studyprogramme are shown correctly', () => {
@@ -458,7 +458,7 @@ describe('Studyprogramme overview', () => {
 
       cy.get('[data-cy=Section-StudytrackOverview]')
       cy.get('[data-cy=Section-StudytrackProgress]')
-      cy.get('[data-cy=Section-AverageGraduationTimes]')
+      cy.get('[data-cy=Section-AverageGraduationTimesStudytracks]')
     })
   })
 })
