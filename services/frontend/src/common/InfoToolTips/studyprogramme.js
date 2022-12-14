@@ -41,11 +41,29 @@ export default {
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
   `,
   AverageGraduationTimes: `
-  **Median time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina. Luku sisältää mahdolliset poissaolokuukaudet.
+  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
 
-  **Mean time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina. Luku sisältää mahdolliset poissaolokuukaudet.
+  **Mean time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina.
   
-  n = **valmistuneet opiskelijat / kaikki ohjelmassa kyseisenä vuonna alkaneet opinto-oikeudet**. Kandiohjelmissa tavoiteaika on 36 kk, maisteriohjelmissa 24 kk`,
+  Valmistumisajoista on vähennetty lakisääteiset poissaolot.
+  
+  Yksittäinen palkki kertoo, kuinka moni opiskelija on valmistunut kyseisenä vuonna.
+  
+  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.\n
+  Vihreä **vaakapalkki** merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
+  ja punainen yli vuoden tavoiteajan ylitystä.`,
+  AverageGraduationTimesStudytracks: `
+  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
+
+  **Mean time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina.
+  
+  Valmistumisajoista on vähennetty lakisääteiset poissaolot.
+  
+  Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukukautena aloittaneista** opiskelijoista on valmistunut sekä heidän prosentuaalinen osuutensa koko vuosikurssista.
+  
+  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.\n
+  Vihreä **vaakapalkki** merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
+  ja punainen yli vuoden tavoiteajan ylitystä.`,
   ProgrammesBeforeOrAfter: `
   **Mikäli valittuna on kandiohjelma:** Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
 
