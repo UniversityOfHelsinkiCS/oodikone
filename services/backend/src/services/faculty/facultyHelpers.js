@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize')
+const moment = require('moment')
 const { Op } = Sequelize
 const { codes } = require('../../../config/programmeCodes')
 
@@ -56,7 +57,15 @@ const facultyFormatStudyright = studyright => {
     studyrightElements: studyright_elements,
   }
 }
-
+const facultyProgrammeStudents = student => {
+  const { studentnumber, home_country_en, gender_code, semester_enrollments } = student
+  return {
+    studentnumber,
+    home_country_en,
+    gender_code,
+    semesters: semester_enrollments.map(s => s.dataValues),
+  }
+}
 const formatFacultyTransfer = transfer => {
   const { sourcecode, targetcode, transferdate, studyrightid } = transfer
   return {
@@ -100,9 +109,9 @@ const isNewProgramme = code => {
 }
 
 const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
-  if (transfersToOrAwayStudyrights.includes(s.studyrightid)) return true
-  if (insideTransfersStudyrights.includes(s.studyrightid) && new Date(s.studystartdate) < new Date('2017-08-01'))
+  if (insideTransfersStudyrights.includes(s.studyrightid) && moment(s.startdate).isBefore('2017-08-01', 'YYYY-MM-DD'))
     return true
+  if (transfersToOrAwayStudyrights.includes(s.studyrightid)) return true
   return false
 }
 
@@ -142,4 +151,5 @@ module.exports = {
   checkTransfers,
   getExtentFilter,
   mapCodesToIds,
+  facultyProgrammeStudents,
 }

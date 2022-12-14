@@ -6,6 +6,7 @@ const {
   ProgrammeModule,
   Studyright,
   StudyrightElement,
+  SemesterEnrollment,
   Student,
   Transfer,
   Credit,
@@ -19,6 +20,7 @@ const {
   formatOrganization,
   isNewProgramme,
   mapCodesToIds,
+  facultyProgrammeStudents,
 } = require('./facultyHelpers')
 
 const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
@@ -135,14 +137,20 @@ const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEn
           model: StudyrightElement,
           required: true,
           where: {
-            startdate: {
-              [Op.between]: [academicYearStart, academicYearEnd],
-            },
             code: code,
+            startdate: {
+              [Op.and]: {
+                [Op.gte]: academicYearStart,
+                [Op.lte]: academicYearEnd,
+              },
+            },
           },
           include: {
             model: ElementDetail,
             required: true,
+            where: {
+              type: 20,
+            },
           },
         },
       ],
@@ -158,6 +166,21 @@ const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEn
       },
     })
   ).map(facultyFormatStudyright)
+
+const getStudentsByStudentnumbers = async studentnumbers =>
+  (
+    await Student.findAll({
+      where: {
+        studentnumber: {
+          [Op.in]: studentnumbers,
+        },
+      },
+      include: {
+        model: SemesterEnrollment,
+        attributes: ['semestercode', 'enrollmenttype'],
+      },
+    })
+  ).map(facultyProgrammeStudents)
 
 const hasMasterRight = async id => {
   return await Studyright.findOne({
@@ -348,4 +371,5 @@ module.exports = {
   getTransferredToAndAway,
   getTransferredInside,
   getStudyRightsByExtent,
+  getStudentsByStudentnumbers,
 }

@@ -144,13 +144,28 @@ router.get('/:id/progressstats', async (req, res) => {
   const programmeFilter = req.query.programme_filter
   const specialGroups = req.query?.special_groups
   const graduated = req.query?.graduated
+  const programmes = await getProgrammes(code, programmeFilter)
+  if (!programmes) return res.status(422).end()
 
+  //all programmes are required for correct sorting of transfers
+  let allProgrammeCodes = []
+  if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
+    const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
+    allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))
+  } else {
+    programmes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
+  }
   if (!code) return res.status(422).end()
   const data = await getFacultyProgressStats(code, specialGroups, graduated)
   if (data) return res.json(data)
-  const programmes = await getProgrammes(code, programmeFilter)
-  if (!programmes) return res.status(422).end()
-  let updateStats = await combineFacultyStudentProgress(code, programmes.data, specialGroups, graduated)
+
+  let updateStats = await combineFacultyStudentProgress(
+    code,
+    programmes.data,
+    allProgrammeCodes,
+    specialGroups,
+    graduated
+  )
   if (updateStats) {
     updateStats = await setFacultyProgressStats(updateStats, specialGroups, graduated)
   }
@@ -168,7 +183,15 @@ router.get('/:id/studentstats', async (req, res) => {
   if (data) return res.json(data)
   const programmes = await getProgrammes(code, programmeFilter)
   if (!programmes) return res.status(422).end()
-  let updateStats = await combineFacultyStudents(code, programmes.data, specialGroups, graduated)
+  //all programmes are required for correct sorting of transfers
+  let allProgrammeCodes = []
+  if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
+    const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
+    allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))
+  } else {
+    programmes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
+  }
+  let updateStats = await combineFacultyStudents(code, programmes.data, allProgrammeCodes, specialGroups, graduated)
   if (updateStats) {
     updateStats = await setFacultyStudentStats(updateStats, specialGroups, graduated)
   }
