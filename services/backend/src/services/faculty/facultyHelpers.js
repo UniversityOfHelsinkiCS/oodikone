@@ -1,5 +1,4 @@
 const Sequelize = require('sequelize')
-const moment = require('moment')
 const { Op } = Sequelize
 const { codes } = require('../../../config/programmeCodes')
 
@@ -109,10 +108,7 @@ const isNewProgramme = code => {
 }
 
 const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
-  if (insideTransfersStudyrights.includes(s.studyrightid) && moment(s.startdate).isBefore('2017-08-01', 'YYYY-MM-DD'))
-    return true
-  if (transfersToOrAwayStudyrights.includes(s.studyrightid)) return true
-  return false
+  return insideTransfersStudyrights.includes(s.studyrightid) || transfersToOrAwayStudyrights.includes(s.studyrightid)
 }
 
 const getExtentFilter = includeAllSpecials => {

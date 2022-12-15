@@ -1,4 +1,5 @@
 const moment = require('moment')
+const { Op } = require('sequelize')
 const { getStartDate, getYearsArray, getPercentage, getYearsObject, tableTitles } = require('../studyprogrammeHelpers')
 const { getAcademicYearDates } = require('../../util/semester')
 const {
@@ -34,6 +35,7 @@ const getFacultyDataForYear = async ({
 }) => {
   const { includeAllSpecials, includeGraduated } = settings
   const { startDate, endDate } = getAcademicYearDates(year, since)
+
   // Totals for the year into table stats
   let extents = [1, 2, 3, 4]
   let graduated = [0]
@@ -55,10 +57,33 @@ const getFacultyDataForYear = async ({
     allMale: 0,
   }
   const programmeCodes = programmes.map(pr => pr.code)
-  const toAndAwayTransfers = await getTransferredToAndAway(programmeCodes, allProgrammeCodes, startDate)
-  const insideTransfers = await getTransferredInside(programmeCodes, allProgrammeCodes, since)
+  const start = moment('2017-08-01', 'YYYY-MM-DD')
+  const toAndAwayTransfers = await getTransferredToAndAway(programmeCodes, allProgrammeCodes, start)
+  const insideTransfers = await getTransferredInside(programmeCodes, allProgrammeCodes, start)
   for (const { progId, code } of programmes) {
-    const allStudyrights = await getStudyRightsByExtent(faculty, startDate, endDate, code, extents, graduated)
+    let elementStart = {}
+    let studyrightStart = {}
+    const startDateWhere = {
+      startdate: {
+        [Op.and]: {
+          [Op.gte]: startDate,
+          [Op.lte]: endDate,
+        },
+      },
+    }
+    if (code.includes('MH')) {
+      elementStart = startDateWhere
+    } else {
+      studyrightStart = startDateWhere
+    }
+    const allStudyrights = await getStudyRightsByExtent(
+      faculty,
+      elementStart,
+      studyrightStart,
+      code,
+      extents,
+      graduated
+    )
     let studyrights = allStudyrights
     if (!includeAllSpecials) {
       studyrights = allStudyrights.filter(s => !checkTransfers(s, insideTransfers, toAndAwayTransfers))
@@ -66,6 +91,7 @@ const getFacultyDataForYear = async ({
     // Get all the studyrights and students for the calculations
     const currentSemester = await getCurrentSemester()
     const studentNbrs = studyrights.map(sr => sr.studentnumber)
+
     const students = await getStudentsByStudentnumbers(studentNbrs)
     const studentData = getStudentData(students)
     const started = students
@@ -120,19 +146,16 @@ const getFacultyDataForYear = async ({
     totals.allMale += studentData.male
     totals.allFinnish += studentData.finnish
   }
-
   return totals
 }
 
 // Combines all the data for faculty students table
 const combineFacultyStudents = async (code, programmes, allProgrammeCodes, specialGroups, graduated) => {
   // Only academic years are considered
-  const isAcademicYear = true
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
   const includeGraduated = graduated === 'GRADUATED_INCLUDED'
-  const includeYearsCombined = true
-  const since = getStartDate(code, isAcademicYear)
-  const years = getYearsArray(since.getFullYear(), isAcademicYear, includeYearsCombined)
+  const since = getStartDate(code, true)
+  const years = getYearsArray(since.getFullYear(), true, true)
   const settings = { includeAllSpecials, includeGraduated }
   let facultyTableStats = getYearsObject({ years, emptyArrays: true })
   let programmeTableStats = {}
