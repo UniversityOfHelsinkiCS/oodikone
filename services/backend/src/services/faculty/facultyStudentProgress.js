@@ -13,7 +13,8 @@ const {
   getVetenaryCreditGraphStats,
 } = require('../studyprogrammeHelpers')
 const { studytrackStudents } = require('../studyprogramme')
-const { getStudyRightsByExtent, transferredAway, transferredTo, transferredInsideFaculty } = require('./faculty')
+const { getStudyRightsByExtent, getTransferredInside, getTransferredToAndAway } = require('./faculty')
+const { checkTransfers } = require('./facultyHelpers')
 
 const getStudentData = (
   startDate,
@@ -90,17 +91,9 @@ const createYearlyTitles = (start, limitList) => {
 }
 
 const filterOutTransfers = async (studyrights, programmes, allProgrammeCodes, since) => {
-  const transferredIn = (await transferredTo(programmes, allProgrammeCodes, since)).map(tr => tr.studyrightid)
-  const transferredOut = (await transferredAway(programmes, allProgrammeCodes, since)).map(tr => tr.studyrightid)
-  const transferredInside = (await transferredInsideFaculty(programmes, allProgrammeCodes, since)).map(
-    tr => tr.studyrightid
-  )
-  const filteredStudyrights = studyrights.filter(
-    sr =>
-      !transferredIn.includes(sr.studyrightid) &&
-      !transferredOut.includes(sr.studyrightid) &&
-      !(transferredInside.includes(sr.studyrightid) && moment(sr.startdate).isBefore('2017-08-01', 'YYYY-MM-DD'))
-  )
+  const transferredInAndOut = await getTransferredToAndAway(programmes, allProgrammeCodes, since)
+  const insideTransfers = await getTransferredInside(programmes, allProgrammeCodes, since)
+  const filteredStudyrights = studyrights.filter(sr => !checkTransfers(sr, insideTransfers, transferredInAndOut))
   return filteredStudyrights
 }
 
