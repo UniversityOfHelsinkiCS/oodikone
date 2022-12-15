@@ -381,6 +381,7 @@ const getDoctoralCreditGraphStats = years => ({
 
 const getCreditGraphStats = (studyprogramme, years) => {
   if (studyprogramme.includes('KH')) return getBachelorCreditGraphStats(years)
+  if (studyprogramme === 'MH90_001') return getVetenaryCreditGraphStats(years)
   if (studyprogramme.includes('MH')) return getMasterCreditGraphStats(years)
   return getDoctoralCreditGraphStats(years)
 }
