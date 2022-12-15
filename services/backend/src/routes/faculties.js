@@ -149,12 +149,9 @@ router.get('/:id/progressstats', async (req, res) => {
 
   //all programmes are required for correct sorting of transfers
   let allProgrammeCodes = []
-  if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
-    const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
-    allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))
-  } else {
-    programmes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
-  }
+  const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
+  allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))
+
   if (!code) return res.status(422).end()
   const data = await getFacultyProgressStats(code, specialGroups, graduated)
   if (data) return res.json(data)
@@ -185,12 +182,9 @@ router.get('/:id/studentstats', async (req, res) => {
   if (!programmes) return res.status(422).end()
   //all programmes are required for correct sorting of transfers
   let allProgrammeCodes = []
-  if (programmeFilter === 'NEW_STUDY_PROGRAMMES') {
-    const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
-    allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))
-  } else {
-    programmes?.data.forEach(prog => allProgrammeCodes.push(prog.code))
-  }
+  const allProgs = await getProgrammes(code, 'ALL_PROGRAMMES')
+  allProgs?.data.forEach(prog => allProgrammeCodes.push(prog.code))
+
   let updateStats = await combineFacultyStudents(code, programmes.data, allProgrammeCodes, specialGroups, graduated)
   if (updateStats) {
     updateStats = await setFacultyStudentStats(updateStats, specialGroups, graduated)

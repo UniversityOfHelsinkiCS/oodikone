@@ -124,7 +124,7 @@ const studyrightsByRightStartYear = async (faculty, since, graduated = 1) =>
     })
   ).map(facultyFormatStudyright)
 
-const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEnd, code, extents, graduated) =>
+const getStudyRightsByExtent = async (faculty, elementStart, studyrightStart, code, extents, graduated) =>
   (
     await Studyright.findAll({
       include: [
@@ -138,12 +138,7 @@ const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEn
           required: true,
           where: {
             code: code,
-            startdate: {
-              [Op.and]: {
-                [Op.gte]: academicYearStart,
-                [Op.lte]: academicYearEnd,
-              },
-            },
+            ...elementStart,
           },
           include: {
             model: ElementDetail,
@@ -162,6 +157,8 @@ const getStudyRightsByExtent = async (faculty, academicYearStart, academicYearEn
         graduated: {
           [Op.in]: graduated,
         },
+        studystartdate: { [Op.not]: null },
+        ...studyrightStart,
         student_studentnumber: { [Op.not]: null },
       },
     })
@@ -171,9 +168,7 @@ const getStudentsByStudentnumbers = async studentnumbers =>
   (
     await Student.findAll({
       where: {
-        studentnumber: {
-          [Op.in]: studentnumbers,
-        },
+        studentnumber: studentnumbers,
       },
       include: {
         model: SemesterEnrollment,
