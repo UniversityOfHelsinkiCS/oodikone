@@ -31,12 +31,13 @@ const FacultyStudentDataTable = ({
   return (
     <div className="datatable">
       <Toggle
+        cypress="HidePercentagesToggle"
         firstLabel="Hide percentages"
         secondLabel="Show percentages"
         value={showPercentages}
         setValue={setShowPercentages}
       />
-      <Table data-cy="Table-StudytrackOverview" celled>
+      <Table data-cy={cypress} celled>
         <Table.Header>
           <Table.Row>
             {titles.map((title, index) => (

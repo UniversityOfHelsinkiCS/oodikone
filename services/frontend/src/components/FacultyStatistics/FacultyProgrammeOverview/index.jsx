@@ -10,14 +10,14 @@ import '../faculty.css'
 import FacultyStudentDataTable from './FacultyStudentDataTable'
 import sortProgrammeKeys from '../facultyHelpers'
 
-const getDivider = (title, toolTipText, content) => (
+const getDivider = (title, toolTipText, content, cypress) => (
   <>
     <div className="divider">
       <Divider data-cy={`Section-${toolTipText}`} horizontal>
         {title}
       </Divider>
     </div>
-    {content === 'no-infobox' ? null : <InfoBox content={content} />}
+    {content === 'no-infobox' ? null : <InfoBox content={content} cypress={cypress} />}
   </>
 )
 
@@ -86,7 +86,8 @@ const FacultyProgrammeOverview = ({
               {getDivider(
                 'Students of the faculty By Starting year',
                 'StudentsOfTheFacultyByStartingYear',
-                toolTips.StudentsStatsOfTheFaculty
+                toolTips.StudentsStatsOfTheFaculty,
+                'InfoFacultyStudentTable'
               )}
               <div>
                 <FacultyStudentDataTable
@@ -114,7 +115,8 @@ const FacultyProgrammeOverview = ({
               {getDivider(
                 'Progress of students of the faculty ',
                 'BachelorStudentsOfTheFacultyByStartingYear',
-                toolTips.StudentProgress
+                toolTips.StudentProgress,
+                'InfoFacultyProgress'
               )}
               {getDivider('Bachelor', 'BachelorStudentsOfTheFacultyByStartingYear', 'no-infobox')}
               <div className="section-container">
@@ -206,7 +208,7 @@ const FacultyProgrammeOverview = ({
                         progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                         programmeNames={progressStats?.data.programmeNames}
                         language={language}
-                        cypress="FacultyBachelorsProgressTable"
+                        cypress="FacultyMastersProgressTable"
                         progressTitles={progressStats?.data.yearlyMasterTitles}
                       />
                     </div>
@@ -239,7 +241,7 @@ const FacultyProgrammeOverview = ({
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
                     language={language}
-                    cypress="FacultyBachelorsProgressTable"
+                    cypress="FacultyDoctoralProgressTable"
                   />
                 </div>
               </div>
