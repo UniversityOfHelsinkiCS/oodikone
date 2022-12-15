@@ -220,4 +220,78 @@ describe('Faculty overview', () => {
       })
     })
   })
+
+  describe('Faculty Progress and student population -tab', () => {
+    beforeEach(() => {
+      cy.init('/faculties')
+      cy.contains('td', 'H50').click()
+      cy.contains('Programmes and student populations').click()
+    })
+
+    it('User can view studentdata table without %', () => {
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'NA')
+    })
+    it('User can view studentdata table with %', () => {
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
+      cy.get('[data-cy="HidePercentagesToggle"]').click()
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'NA')
+    })
+
+    it('Percentage Graphs exists', () => {
+      cy.get('[data-cy="Graph-FacultyBachelorsProgress"]').should('be.visible')
+      cy.get('[data-cy="Graph-FacultyBachelorMastersProgress"]').should('be.visible')
+      cy.get('[data-cy="Graph-FacultyMastersProgress"]').should('be.visible')
+      cy.get('[data-cy="Graph-FacultyBachelorsProgress"]').should('be.visible')
+    })
+    // Following two tests just test that nothig goes broken after toggling
+    // No data for testing that the data actual changes as supposed
+    it('Graduations can be excluded', () => {
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
+      cy.get('[data-cy="StudentToggle"]').click()
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
+    })
+
+    it('Transfers can be excluded', () => {
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
+      cy.get('[data-cy="GraduatedToggle"]').click()
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
+    })
+
+    it('Progress tables exists', () => {
+      cy.get('[data-cy="FacultyBachelorsProgressTable"]').should('be.visible')
+      cy.get('[data-cy="FacultyBachelorMasterProgressTable"]').should('be.visible')
+      cy.get('[data-cy="FacultyMastersProgressTable"]').should('be.visible')
+      cy.get('[data-cy="FacultyBachelorsProgressTable"]').should('be.visible')
+    })
+
+    it('Progress tables can be toggled', () => {
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-0"]').should('not.be.visible')
+      cy.get('[data-cy="Button-Show-FacultyBachelorsProgressTable-0"]').click()
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-0"]').should('be.visible')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-1"]').should('not.be.visible')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-2"]').should('not.be.visible')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-3"]').should('not.be.visible')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-4"]').should('not.be.visible')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-5"]').should('not.be.visible')
+      cy.get('[data-cy="Button-Hide-FacultyBachelorsProgressTable-0"]').click()
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-0"]').should('not.be.visible')
+    })
+
+    it('Sudent statstable can be toggled', () => {
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT - KH50_005')
+      cy.get('[data-cy="Button-FacultyStudentStatsTable-0"]').click()
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'TKT - KH50_005')
+      cy.get('[data-cy="Button-FacultyStudentStatsTable-0"]').click()
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT - KH50_005')
+    })
+
+    it('Progress infobox can be toggled', () => {
+      cy.get('[data-cy="InfoFacultyProgress-info-content"]').should('not.exist')
+      cy.get('[data-cy="InfoFacultyProgress-open-info"]').click()
+      cy.get('[data-cy="InfoFacultyProgress-info-content"]').should('be.visible')
+      cy.get('[data-cy="InfoFacultyProgress-close-info"]').click()
+      cy.get('[data-cy="InfoFacultyProgress-info-content"]').should('not.exist')
+    })
+  })
 })
