@@ -230,11 +230,11 @@ describe('Studyprogramme overview', () => {
     beforeEach(() => {
       cy.init('/study-programme')
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
-      cy.get('.attached').contains('Studytracks and student populations').click()
+      cy.get('.attached').contains('Studytracks and class statistics').click()
     })
 
     // If the backend breaks for one of the sections, the section header is not rendered and this will fail
-    it('Studytracks and student populations -tab loads', () => {
+    it('Studytracks and class statistics -tab loads', () => {
       cy.get('[data-cy=Section-StudytrackOverview]')
       cy.get('[data-cy=Section-StudytrackProgress]')
       cy.get('[data-cy=Section-AverageGraduationTimesStudytracks]')
@@ -435,7 +435,7 @@ describe('Studyprogramme overview', () => {
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
 
       cy.contains('Basic information')
-      cy.contains('Studytracks and student populations')
+      cy.contains('Studytracks and class statistics')
 
       cy.contains('Update statistics').should('not.exist')
       cy.contains('Degree Courses').should('not.exist')
@@ -454,7 +454,7 @@ describe('Studyprogramme overview', () => {
 
     it('can access studytracks', () => {
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
-      cy.get('.attached').contains('Studytracks and student populations').click()
+      cy.get('.attached').contains('Studytracks and class statistics').click()
 
       cy.get('[data-cy=Section-StudytrackOverview]')
       cy.get('[data-cy=Section-StudytrackProgress]')
