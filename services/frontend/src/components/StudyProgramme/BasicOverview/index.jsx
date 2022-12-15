@@ -17,8 +17,6 @@ const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(
 
 const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
   const [showMeanTime, setShowMeanTime] = useState(false)
-  // eslint-disable-next-line no-unused-vars
-  const [showByStartYear, setShowByStartYear] = useState(false)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -26,7 +24,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
   const credits = useGetCreditStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
   const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, specialGroups: special })
   const doCombo = graduations?.data?.doCombo
-  const timesData = showByStartYear ? graduations?.data?.graduationTimesByStartYear : graduations?.data?.graduationTimes
+  const timesData = graduations?.data?.graduationTimes
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -138,13 +136,6 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                   value={showMeanTime}
                   setValue={setShowMeanTime}
                 />
-                {/* <Toggle
-                  cypress="GroupByToggle"
-                  firstLabel="Group by: Graduation year"
-                  secondLabel="Starting Year"
-                  value={showByStartYear}
-                  setValue={setShowByStartYear}
-                /> */}
               </div>
 
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
@@ -154,7 +145,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                     goal={graduations?.data?.comboTimes?.goal}
                     showMeanTime={showMeanTime}
                     title="Bachelor + Master studyright"
-                    byStartYear={showByStartYear}
+                    byStartYear={false}
                   />
                 )}
                 <TimeBarChart
@@ -162,7 +153,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
                   goal={graduations?.data.graduationTimes?.goal}
                   showMeanTime={showMeanTime}
                   title={doCombo ? 'Master studyright' : ' '}
-                  byStartYear={showByStartYear}
+                  byStartYear={false}
                 />
               </div>
               {graduations?.data?.programmesBeforeOrAfterGraphStats && (

@@ -219,36 +219,6 @@ const graduatedStudyRights = async (studytrack, since, studentnumbers) =>
     })
   ).map(formatStudyright)
 
-const startedStudyRightsByStartdate = async (studytrack, since, studentnumbers) =>
-  (
-    await Studyright.findAll({
-      include: [
-        {
-          model: StudyrightElement,
-          required: true,
-          include: {
-            model: ElementDetail,
-            required: true,
-            where: {
-              code: studytrack,
-            },
-          },
-        },
-        {
-          model: Student,
-          attributes: ['studentnumber'],
-          required: true,
-        },
-      ],
-      where: {
-        startdate: {
-          [Op.gte]: since,
-        },
-        student_studentnumber: whereStudents(studentnumbers),
-      },
-    })
-  ).map(formatStudyright)
-
 const inactiveStudyrights = async (studytrack, studentnumbers) => {
   const now = moment(new Date())
   const inactiveOrExpired = (
@@ -769,7 +739,6 @@ module.exports = {
   allStudyrights,
   startedStudyrights,
   graduatedStudyRights,
-  startedStudyRightsByStartdate,
   inactiveStudyrights,
   previousStudyrights,
   followingStudyrights,
