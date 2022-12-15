@@ -54,7 +54,7 @@ const StudyProgramme = props => {
       ),
     })
     panes.push({
-      menuItem: 'Studytracks and student populations',
+      menuItem: 'Studytracks and class statistics',
       render: () => (
         <StudytrackOverview
           studyprogramme={studyProgrammeId}
