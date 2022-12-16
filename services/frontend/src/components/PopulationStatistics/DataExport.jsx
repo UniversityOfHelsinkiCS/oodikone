@@ -73,11 +73,6 @@ export default ({ students }) => {
     return studyright?.startdate ? studyright.startdate : ''
   }
 
-  const getStartedInStudyright = studyrights => {
-    const studyright = findCorrectStudyright(studyrights)
-    return studyright?.studystartdate ? studyright.studystartdate : ''
-  }
-
   const getAdmissionType = studyrights => {
     const studyright = findCorrectStudyright(studyrights)
     return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
@@ -143,7 +138,6 @@ export default ({ students }) => {
         tags: tags(s.tags),
         'start year at university': reformatDate(s.started, 'YYYY'),
         'start of studyright': reformatDate(getStartOfStudyright(s.studyrights), 'YYYY-MM-DD'),
-        'started in studyright': reformatDate(getStartedInStudyright(s.studyrights), 'YYYY-MM-DD'),
         'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes),
