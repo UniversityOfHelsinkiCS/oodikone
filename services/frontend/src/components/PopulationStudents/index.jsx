@@ -145,21 +145,21 @@ const CoursesTable = ({ students }) => {
       nameColumns.push(
         {
           key: 'lastname',
-          title: 'last name',
+          title: 'Last name',
           getRowVal: s => (s.total ? null : s.lastname),
           cellProps: { title: 'last name' },
           child: true,
         },
         {
           key: 'firstname',
-          title: 'given names',
+          title: 'Given names',
           getRowVal: s => (s.total ? null : s.firstnames),
           cellProps: { title: 'first names' },
           child: true,
         },
         {
           key: 'email',
-          title: 'email',
+          title: 'Email',
           getRowVal: s => (s.total ? null : s.email),
           cellProps: { title: 'emails' },
           child: true,

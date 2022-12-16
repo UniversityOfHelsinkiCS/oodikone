@@ -173,14 +173,6 @@ const GeneralTab = ({
     return res
   }, {})
 
-  const studentToStudyrightActualStartMap = selectedStudents.reduce((res, sn) => {
-    const targetStudyright = students[sn].studyrights.find(studyright =>
-      studyright.studyright_elements.some(e => e.code === programmeCode)
-    )
-    res[sn] = targetStudyright ? targetStudyright.studystartdate : null
-    return res
-  }, {})
-
   const studentToStudyrightEndMap = selectedStudents.reduce((res, sn) => {
     const targetStudyright = students[sn].studyrights.find(studyright =>
       studyright.studyright_elements.some(e => e.code === programmeCode)
@@ -188,18 +180,6 @@ const GeneralTab = ({
     res[sn] = targetStudyright && targetStudyright.graduated === 1 ? targetStudyright.enddate : null
     return res
   }, {})
-
-  const getActualStartDate = studentNumber => {
-    const studyRightStart = studentToStudyrightStartMap[studentNumber]
-    const studyRightStartActual = studentToStudyrightActualStartMap[studentNumber]
-
-    if (!studyRightStart) return studyRightStartActual
-    if (!studyRightStartActual) return studyRightStart
-
-    return new Date(studyRightStart).getTime() > new Date(studyRightStartActual).getTime()
-      ? studyRightStart
-      : studyRightStartActual
-  }
 
   const getStarted = ({ obfuscated, started }) => {
     if (obfuscated || !started) return ''
@@ -329,8 +309,8 @@ const GeneralTab = ({
 
   // All columns components user is able to use
   const columnsAvailable = {
-    lastname: { key: 'lastname', title: 'last name', getRowVal: s => s.lastname },
-    firstname: { key: 'firstname', title: 'given names', getRowVal: s => s.firstnames },
+    lastname: { key: 'lastname', title: 'Last name', getRowVal: s => s.lastname },
+    firstname: { key: 'firstname', title: 'Given names', getRowVal: s => s.firstnames },
     'studentnumber-parent': {
       key: 'studentnumber-parent',
       mergeHeader: true,
@@ -406,17 +386,17 @@ const GeneralTab = ({
     },
     priority: {
       key: 'priority',
-      title: 'priority',
+      title: 'Priority',
       getRowVal: s => priorityText(s.studyrights),
     },
     extent: {
       key: 'extent',
-      title: 'extent',
+      title: 'Extent',
       getRowVal: s => extentCodes(s.studyrights),
     },
     semesterEnrollments: {
       key: 'semesterEnrollments',
-      title: 'semesters',
+      title: 'Semesters',
       helpText: 'Number of present semesters',
       getRowVal: s => semesterEnrollments(s.semesterenrollments),
     },
@@ -427,21 +407,14 @@ const GeneralTab = ({
     },
     studyStartDate: {
       key: 'studyStartDate',
-      title: 'start of studyright',
+      title: 'Start of studyright',
       filterType: 'date',
       getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]),
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
     },
-    studyStartDateActual: {
-      key: 'studyStartDateActual',
-      title: 'started in studyright',
-      filterType: 'date',
-      formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
-      getRowVal: s => new Date(getActualStartDate(s.studentNumber)),
-    },
     endDate: {
       key: 'endDate',
-      title: 'graduation date',
+      title: 'Graduation date',
       filterType: 'date',
       getRowVal: s =>
         studentToStudyrightEndMap[s.studentNumber] ? new Date(studentToStudyrightEndMap[s.studentNumber]) : '',
@@ -452,7 +425,7 @@ const GeneralTab = ({
     },
     admissionType: shouldShowAdmissionType && {
       key: 'admissionType',
-      title: 'admission type',
+      title: 'Admission type',
       getRowVal: s => {
         const studyright = s.studyrights.find(sr => sr.studyright_elements.some(e => e.code === programmeCode))
         return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
@@ -507,7 +480,7 @@ const GeneralTab = ({
           key: 'emailValue',
           title: (
             <>
-              email
+              Email
               <Popup
                 trigger={<Icon link name="copy" onClick={copyToClipboardAll} style={{ float: 'right' }} />}
                 content="Copied email list!"
