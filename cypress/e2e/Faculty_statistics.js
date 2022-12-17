@@ -1,11 +1,9 @@
 /// <reference types="Cypress" />
 
-// Change admin to regular user when feature is ready for general use
-
 describe('Faculty overview', () => {
   describe('Faculty can be selected', () => {
     it('Faculties are listed and one can be chosen', () => {
-      cy.init('/faculties', 'admin')
+      cy.init('/faculties')
       cy.get('[data-cy=select-faculty]').contains('td', 'H10')
       cy.contains('td', 'H99').should('not.exist')
       cy.contains('td', 'H90').click()
