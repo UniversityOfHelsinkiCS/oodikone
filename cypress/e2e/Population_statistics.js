@@ -1,18 +1,7 @@
 /// <reference types="Cypress" />
 // Now "Class statistics" in UI
-
 const moment = require('moment')
 const _ = require('lodash')
-
-// const setPopStatsUntil = (until, includeSettings = []) => {
-//   cy.contains('Advanced settings').siblings().get('[data-cy=advanced-toggle]').click()
-//   includeSettings.forEach(setting => {
-//     cy.contains('Advanced settings').parent().siblings().contains(setting).click()
-//   })
-//   cy.get('.adv-stats-until > .form-control').click().clear().type(until)
-//   cy.contains('Fetch population with new settings').click()
-//   cy.contains('Advanced settings')
-// }
 
 describe('Population Statistics tests', () => {
   const pathToCSBach2017 =
@@ -22,6 +11,18 @@ describe('Population Statistics tests', () => {
   describe('when using basic user', () => {
     beforeEach(() => {
       cy.init('/populations')
+    })
+
+    it('Population statistics search infobox works', () => {
+      cy.get('[data-cy="PopulationSearch-info-content"]').should('not.exist')
+      cy.get('[data-cy="PopulationSearch-open-info"]').click()
+      cy.get('[data-cy="PopulationSearch-info-content"]').should('be.visible')
+      cy.get('[data-cy="PopulationSearch-info-content"]').should(
+        'contain',
+        'lukuvuosi, jolloin opiskelija on ilmoittautunut'
+      )
+      cy.get('[data-cy="PopulationSearch-close-info"]').click()
+      cy.get('[data-cy="PopulationSearch-info-content"]').should('not.exist')
     })
 
     it('Population statistics search form is usable', () => {
@@ -66,9 +67,6 @@ describe('Population Statistics tests', () => {
     it('Population statistics is usable on general level', () => {
       cy.visit(pathToCSBach2017)
       cy.cs('filtered-students')
-      // This advanced settings does not work correctly
-      // see https://github.com/UniversityOfHelsinkiCS/oodikone/issues/3552
-      // setPopStatsUntil('toukokuu 2020')
       cy.get('.header').within(() => {
         cy.contains('Tietojenkäsittelytieteen kandiohjelma')
         cy.contains('class size 170 students')

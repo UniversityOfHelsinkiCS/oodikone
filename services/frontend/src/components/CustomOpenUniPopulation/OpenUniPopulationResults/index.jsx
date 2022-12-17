@@ -225,16 +225,18 @@ const getColumns = (labelsToCourses, language) => {
       textTitle: null,
       parent: true,
       children: informationColumns,
-    },
-    {
+    }
+  )
+  if (labelsToCourses.length > 0) {
+    columns.push({
       key: 'hiddencourses',
       title: '',
       mergeHeader: true,
       textTitle: null,
       parent: true,
       children: columnsToHide,
-    }
-  )
+    })
+  }
   return columns
 }
 
@@ -263,7 +265,7 @@ const OpenUniPopulationResults = ({ fieldValues, language }) => {
 
   return (
     <div style={{ paddingBottom: '50px' }}>
-      <div style={{ maxHeight: '80vh', width: '100%' }}>
+      <div style={{ maxHeight: '80vh', width: '100%' }} data-cy="open-uni-table-div">
         {courseList.length > 0 && (
           <SortableTable
             title={`Open Uni Student Population (${Object.keys(openUniStudentStats?.data.students).length} students)`}

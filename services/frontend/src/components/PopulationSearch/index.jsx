@@ -23,7 +23,7 @@ const PopulationSearch = ({ populationFound, history, location, loading }) => {
       {title && <Header size="medium">{title}</Header>}
       {(!populationFound || !history.location.search) && (
         <>
-          <InfoBox content={infotoolTips.PopulationStatistics.Search} />
+          <InfoBox content={infotoolTips.PopulationStatistics.Search} cypress="PopulationSearch" />
           <Divider />
         </>
       )}

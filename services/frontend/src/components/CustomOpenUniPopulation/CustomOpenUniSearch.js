@@ -130,7 +130,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
   return (
     <Modal
       trigger={
-        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="custom-pop-search-button">
+        <Button size="small" color="blue" onClick={() => setModal(true)} data-cy="open-uni-search-button">
           Fetch Open Uni Students
         </Button>
       }
@@ -142,7 +142,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
         <Form>
           <h2> Fetch open uni course population</h2>
           <Form.Field>
-            <Form.Field>
+            <Form.Field data-cy="search-name">
               <em> Insert name for this population if you wish to save it </em>
               <Form.Input
                 disabled={selectedSearchId !== ''}
@@ -152,12 +152,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
               />
             </Form.Field>
             <em>Insert course code(s)</em>
-            <TextArea
-              value={input}
-              placeholder="TKT12345, PSYK-123"
-              onChange={e => setInput(e.target.value)}
-              data-cy="s-no-input"
-            />
+            <TextArea value={input} placeholder="TKT12345, PSYK-123" onChange={e => setInput(e.target.value)} />
           </Form.Field>
           <SearchHistory
             header="Saved populations"
@@ -170,7 +165,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
             updateItem={() => null}
             handleSearch={onSelectSearch}
           />
-          <Form.Field>
+          <Form.Field data-cy="begin-of-search">
             <em>Select beginning</em>
             <Datetime
               value={startdate}
@@ -181,7 +176,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
               closeOnSelect
             />
           </Form.Field>
-          <Form.Field>
+          <Form.Field data-cy="end-of-search">
             <em>Select ending for enrollments:</em>
             <br />
             <em>Attainments are fetched until today.</em>
@@ -198,6 +193,7 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
       </Modal.Content>
       <Modal.Actions>
         <Button
+          data-cy="save-search"
           disabled={!name || updateIsLoading || createIsLoading}
           loading={updateIsLoading || createIsLoading}
           floated="left"
