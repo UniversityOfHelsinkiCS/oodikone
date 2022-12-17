@@ -417,6 +417,7 @@ jobs:
       - test_studyprogramme_overview
       - test_teachers_and_users
       - test_faculty_statistics
+      - test_open_uni_search
       - test_service_exit_statuses
     steps:
       - uses: actions/checkout@v3
