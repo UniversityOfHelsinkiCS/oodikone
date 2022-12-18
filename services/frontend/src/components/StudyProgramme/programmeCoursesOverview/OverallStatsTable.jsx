@@ -22,7 +22,7 @@ const getColumns = (language, showStudents) => {
           {
             key: 'course_code',
             title: 'Code ',
-            export: false,
+            export: true,
             getRowVal: course => course.code,
             getRowContent: course => course.code,
           },
