@@ -3,7 +3,6 @@ const { ApplicationError } = require('../util/customErrors')
 const { getUser, getMockedUser } = require('../services/userService')
 const { requiredGroup } = require('../conf-backend')
 const _ = require('lodash')
-const { relevantIAMs } = require('../../config/IAMConfig')
 const { getOrganizationAccess } = require('../util/organizationAccess')
 const logger = require('../util/logger')
 
@@ -28,8 +27,7 @@ const currentUserMiddleware = async (req, _res, next) => {
     throw new ApplicationError('Not enough data in request headers', 403, { logoutUrl })
   }
 
-  const iamGroups = parseIamGroups(hygroupcn).filter(iam => relevantIAMs.includes(iam))
-
+  const iamGroups = parseIamGroups(hygroupcn)
   const iamRights = Object.keys(await getOrganizationAccess({ iamGroups }))
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
