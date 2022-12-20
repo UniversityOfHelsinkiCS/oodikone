@@ -193,10 +193,6 @@ const formatUser = async userFromDb => {
 
   const rights = _.uniqBy([...programmes, ...enrichProgrammesFromFaculties(faculties)])
 
-  const iamRights = Object.keys(await getOrganizationAccess(userFromDb)).filter(
-    programmeCode => !rights.includes(programmeCode)
-  )
-
   const {
     dataValues: {
       id,
@@ -224,7 +220,6 @@ const formatUser = async userFromDb => {
     email,
     is_enabled: true, // this is probably not needed: is here mainly because old userservice created users for every logged in user, even if they hadn't correct iamgroups
     rights,
-    iamRights,
     roles: accessGroups,
     studentsUserCanAccess, // studentnumbers used in various parts of backend. For admin this is usually empty, since no programmes / faculties are set.
     isAdmin: accessGroups.includes('admin'),
@@ -235,15 +230,25 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
   if (userDataCache.has(userToMock)) {
     return userDataCache.get(userToMock)
   }
+
+  const userFromDb = await byUsername(userToMock)
+  const formattedUser = await formatUser(userFromDb)
+
+  const iamRights = Object.keys(await getOrganizationAccess(userFromDb)).filter(
+    programmeCode => !formattedUser.rights.includes(programmeCode)
+  )
+
   const toReturn = {
-    ...(await formatUser(await byUsername(userToMock))),
+    ...formattedUser,
+    iamRights,
     mockedBy,
   }
   userDataCache.set(userToMock, toReturn)
+
   return toReturn
 }
 
-const getUser = async ({ username, name, email, iamGroups, sisId }) => {
+const getUser = async ({ username, name, email, iamGroups, iamRights, sisId }) => {
   if (userDataCache.has(username)) {
     return userDataCache.get(username)
   }
@@ -297,6 +302,7 @@ const getUser = async ({ username, name, email, iamGroups, sisId }) => {
 
   const toReturn = {
     ...formattedUser,
+    iamRights,
     roles: newAccessGroups,
   }
   userDataCache.set(username, toReturn)
