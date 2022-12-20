@@ -42,6 +42,7 @@ const currentUserMiddleware = async (req, _res, next) => {
     name,
     email,
     iamGroups,
+    iamRights,
     sisId,
   })
 
