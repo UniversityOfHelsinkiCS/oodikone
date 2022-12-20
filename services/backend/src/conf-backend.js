@@ -16,6 +16,9 @@ const requiredGroup = isStaging
 // Pate
 const pateToken = process.env.PATE_API_TOKEN || ''
 
+// Jami
+const jamiUrl = isDev ? 'http://jami:3003/' : 'https://importer.cs.helsinki.fi/api/auth'
+
 // Importer client
 const importerToken = process.env.IMPORTER_DB_API_TOKEN || ''
 
@@ -79,6 +82,7 @@ module.exports = {
   sentryEnvironment,
   isProduction,
   pateToken,
+  jamiUrl,
   baseUrl,
   frontUrl,
   backendPort,

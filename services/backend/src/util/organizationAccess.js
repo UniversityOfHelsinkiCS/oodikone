@@ -2,7 +2,7 @@
 const _ = require('lodash')
 const Sentry = require('@sentry/node')
 
-const { runningInCI, isProduction } = require('../conf-backend')
+const { runningInCI } = require('../conf-backend')
 const logger = require('./logger')
 const { getJamiClient } = require('../util/jamiClient')
 const jamiClient = getJamiClient()
@@ -14,7 +14,6 @@ const getIAMAccessFromJami = async (user, attempt = 1) => {
     const { data: iamAccess } = await jamiClient.post('/', {
       userId,
       iamGroups,
-      noLogging: !isProduction,
     })
 
     return iamAccess
