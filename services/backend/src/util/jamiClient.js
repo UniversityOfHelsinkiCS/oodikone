@@ -1,12 +1,12 @@
 const axios = require('axios')
-const { importerToken } = require('../conf-backend')
+const { importerToken, jamiUrl } = require('../conf-backend')
 const logger = require('./logger')
 
 const jamiClient = axios.create({
   params: {
     token: importerToken,
   },
-  baseURL: 'https://importer.cs.helsinki.fi/api/auth',
+  baseURL: jamiUrl,
 })
 
 const getJamiClient = () => {

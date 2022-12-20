@@ -168,6 +168,16 @@ services:
     volumes:
       - user-db-data:/data
 
+  jami:
+    <<: *defaults
+    image: toska/jami
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+    ports:
+      - 3003:3003
+    container_name: jami
+
 volumes:
   backend-nodemod:
   frontend-nodemod:
