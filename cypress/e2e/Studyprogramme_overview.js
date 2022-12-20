@@ -427,12 +427,12 @@ describe('Studyprogramme overview', () => {
   describe('IAM user', () => {
     beforeEach(() => {
       cy.init('/study-programme', 'onlyiamrights')
+
+      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').dblclick()
     })
 
     it('can access programme and correct tabs are visible', () => {
       cy.reload()
-
-      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
 
       cy.contains('Basic information')
       cy.contains('Studytracks and class statistics')
@@ -442,7 +442,6 @@ describe('Studyprogramme overview', () => {
     })
 
     it('can access basic information', () => {
-      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.contains('Basic information').click()
 
       cy.get('[data-cy=Section-StudentsOfTheStudyprogramme]')
@@ -453,7 +452,6 @@ describe('Studyprogramme overview', () => {
     })
 
     it('can access studytracks', () => {
-      cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and class statistics').click()
 
       cy.get('[data-cy=Section-StudytrackOverview]')
