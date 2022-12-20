@@ -2,7 +2,6 @@
 const _ = require('lodash')
 const Sentry = require('@sentry/node')
 
-const { runningInCI } = require('../conf-backend')
 const logger = require('./logger')
 const { getJamiClient } = require('../util/jamiClient')
 const jamiClient = getJamiClient()
@@ -30,7 +29,7 @@ const getIAMAccessFromJami = async (user, attempt = 1) => {
 }
 
 const getAccessFromIAMs = async user => {
-  if (runningInCI || user.iamGroups.length === 0) return {}
+  if (user.iamGroups.length === 0) return {}
 
   const access = {}
 
