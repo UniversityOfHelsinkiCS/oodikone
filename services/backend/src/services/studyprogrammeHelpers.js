@@ -349,32 +349,24 @@ const getOnlyMasterCreditGraphStats = years => ({
 })
 
 const getDoctoralCreditGraphStats = years => ({
-  lte50: {
-    name: 'Less than 50 credits',
+  lte10: {
+    name: 'Less than 10 credits',
     data: getEmptyArray(years.length),
   },
-  lte100: {
-    name: '50-99 credits',
+  lte20: {
+    name: '10-19 credits',
     data: getEmptyArray(years.length),
   },
-  lte150: {
-    name: '100-149 credits',
+  lte30: {
+    name: '20-29 credits',
     data: getEmptyArray(years.length),
   },
-  lte200: {
-    name: '150-199 credits',
+  lte40: {
+    name: '30-39 credits',
     data: getEmptyArray(years.length),
   },
-  lte250: {
-    name: '200-249 credits',
-    data: getEmptyArray(years.length),
-  },
-  lte300: {
-    name: '250-299 credits',
-    data: getEmptyArray(years.length),
-  },
-  mte300: {
-    name: '300 or more credits',
+  mte40: {
+    name: '40 or more credits',
     data: getEmptyArray(years.length),
   },
 })
@@ -389,11 +381,11 @@ const getCreditGraphStats = (studyprogramme, years) => {
 const bachelorCreditThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'lte120', 'lte150', 'lte180', 'mte180']
 const masterCreditThresholds = ['lte200', 'lte220', 'lte240', 'lte260', 'lte280', 'lte300', 'mte300']
 const onlyMasterCreditThresholds = ['lte15', 'lte30', 'lte60', 'lte90', 'lte120', 'mte120']
-const doctoralCreditThresholds = ['lte50', 'lte100', 'lte150', 'lte200', 'lte250', 'lte300', 'mte300']
+const doctoralCreditThresholds = ['lte10', 'lte20', 'lte30', 'lte40', 'mte40']
 const bachelorCreditAmounts = [15, 30, 60, 90, 120, 150, 180, 180]
 const masterCreditAmounts = [200, 220, 240, 260, 280, 300, 300]
 const onlyMasterCreditAmounts = [15, 30, 60, 90, 120, 120]
-const doctoralCreditAmounts = [50, 100, 150, 200, 250, 300, 300]
+const doctoralCreditAmounts = [10, 20, 30, 40, 40]
 const vetenaryCreditThresholds = ['lte210', 'lte240', 'lte270', 'lte300', 'lte330', 'lte360', 'mte360']
 const vetenaryCreditAmounts = [210, 240, 270, 300, 330, 360, 360]
 const getOnlyMasterThresholds = () => {
@@ -462,17 +454,7 @@ const tableTitles = {
       '90-119 credits',
       '120 ≤ credits',
     ],
-    doctoral: [
-      '',
-      'All',
-      '< 50 credits',
-      '50-99 credits',
-      '100-149 credits',
-      '150-199 credits',
-      '200-249 credits',
-      '250-299 credits',
-      '300 ≤ credits',
-    ],
+    doctoral: ['', 'All', '< 10 credits', '10-19 credits', '20-29 credits', '30-39 credits', '40 ≤ credits'],
   },
   studytracks: [
     '',

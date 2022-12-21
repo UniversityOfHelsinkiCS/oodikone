@@ -111,10 +111,10 @@ const sortTrackDataByYear = data => {
 
   const copy = [...data]
   const sortedData = copy.sort((a, b) => {
-    if (a[0] === 'Total') return -1
-    if (b[0] === 'Total') return 1
-    if (a[0] < b[0]) return -1
-    if (a[0] > b[0]) return 1
+    if (a[0] === 'Total') return 1
+    if (b[0] === 'Total') return -1
+    if (a[0] < b[0]) return 1
+    if (a[0] > b[0]) return -1
     return 0
   })
 
@@ -131,6 +131,7 @@ const sortMainDataByYear = data => {
       const copy = [...arrays]
       const sortedYear = copy.sort((a, b) => {
         if (a[0] === 'Total') return 1
+        if (b[0] === 'Total') return -1
         if (a[0] < b[0]) return 1
         if (a[0] > b[0]) return -1
         return 0
@@ -187,28 +188,29 @@ const StudytrackDataTable = ({
             ))}
           </Table.Row>
         </Table.Header>
-
-        <Table.Body>
-          {singleTrack
-            ? sortedTrackStats.map(row =>
-                getSingleTrackRow({ row, studyprogramme, code: singleTrack, showPercentages, years, calendarYears })
-              )
-            : sortedMainStats?.map(yearlyData =>
-                yearlyData.map(row =>
-                  getRow({
-                    yearlyData,
-                    row,
-                    studyprogramme,
-                    show,
-                    setShow,
-                    studytracks,
-                    showPercentages,
-                    years,
-                    calendarYears,
-                  })
+        {(sortedMainStats || sortedTrackStats) && (
+          <Table.Body>
+            {singleTrack
+              ? sortedTrackStats.map(row =>
+                  getSingleTrackRow({ row, studyprogramme, code: singleTrack, showPercentages, years, calendarYears })
                 )
-              )}
-        </Table.Body>
+              : sortedMainStats?.map(yearlyData =>
+                  yearlyData.map(row =>
+                    getRow({
+                      yearlyData,
+                      row,
+                      studyprogramme,
+                      show,
+                      setShow,
+                      studytracks,
+                      showPercentages,
+                      years,
+                      calendarYears,
+                    })
+                  )
+                )}
+          </Table.Body>
+        )}
       </Table>
     </div>
   )

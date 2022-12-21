@@ -109,7 +109,7 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
               titles={stats?.data?.creditTableTitles}
             />
           </div>
-          {stats?.isSuccess && stats?.data?.includeGraduated && (
+          {stats?.isSuccess && stats?.data?.includeGraduated && stats?.data?.graduationTimes[track] && (
             <>
               {getDivider('Average graduation times', 'AverageGraduationTimesStudytracks')}
               <Toggle

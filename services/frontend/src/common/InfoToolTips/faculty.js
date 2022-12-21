@@ -85,11 +85,11 @@ export default {
   Kuvaa tiedekunnan ohjelmissa opiskelevien opiskelijoden tilastoja. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
   
   HUOM!
-  **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna.
-  **Currently enrolled** Sisältää kaikki tällä hetkellä läsnäolevat olevat opiskelija.
-  **Absent** Sisältää kaikki lakisääteisistä syistä poissaolevat opiskelijat.
-  **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
-  **Inactive** Sisältää kaikki opinto-oikeudet, jotka ovat alkaneet kyseisenä vuonna, mutta jotka ovat sittemmin vanhentuneet ilman, että opiskelija on valmistunut ohjelmasta. Sisältää myös opinto-oikeudet,
+  - **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna.
+  - **Currently enrolled** Sisältää kaikki tällä hetkellä läsnäolevat olevat opiskelija.
+  - **Absent** Sisältää kaikki lakisääteisistä syistä poissaolevat opiskelijat.
+  - **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
+  - **Inactive** Sisältää kaikki opinto-oikeudet, jotka ovat alkaneet kyseisenä vuonna, mutta jotka ovat sittemmin vanhentuneet ilman, että opiskelija on valmistunut ohjelmasta. Sisältää myös opinto-oikeudet,
   joissa opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle.
   
   Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, ohjelmaan ja siitä pois siirtyneet opiskelijat sekä erillisopinto-oikeudella opiskelevat.
@@ -110,8 +110,5 @@ export default {
   Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, erillisopinto-oikeudella opiskelevat ja ohjelmaan siirtyneet.   
 
   Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.
-  
-  **Total** Kuvaa opiskelijoinden opintopisteiden määrien kertymää alkaen 1.8.2017. Luvut ovat isompia kuin vuosittain lasketut, sillä nyt kaikki 1.8.2017 jälkeen 
-  suoritetut opintopisteet lasketaan mukaan, vaikka ne olisi suoritettu ennen varsinaista opinto-oikeuden alkua.
   `,
 }

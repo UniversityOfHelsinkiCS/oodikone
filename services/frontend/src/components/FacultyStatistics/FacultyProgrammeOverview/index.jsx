@@ -133,10 +133,10 @@ const FacultyProgrammeOverview = ({
                 <div className="table-container">
                   <FacultyProgressTable
                     data={progressStats?.data.bachelorsTableStats}
-                    programmeStats={progressStats?.data.bachelorsProgrammeStats}
+                    programmeStats={progressStats?.data.bachelorsProgStats}
                     titles={progressStats?.data.bachelorTitles}
                     sortedKeys={sortProgrammeKeys(
-                      Object.keys(progressStats?.data.bachelorsProgrammeStats).map(obj => [
+                      Object.keys(progressStats?.data.bachelorsProgStats).map(obj => [
                         obj,
                         progressStats?.data?.programmeNames[obj].code,
                       ])
@@ -164,10 +164,10 @@ const FacultyProgrammeOverview = ({
                 <div className="table-container">
                   <FacultyProgressTable
                     data={progressStats?.data.bcMsTableStats}
-                    programmeStats={progressStats?.data.bcMsProgrammeStats}
+                    programmeStats={progressStats?.data.bcMsProgStats}
                     titles={progressStats?.data.bcMsTitles}
                     sortedKeys={sortProgrammeKeys(
-                      Object.keys(progressStats?.data.bcMsProgrammeStats).map(obj => [
+                      Object.keys(progressStats?.data.bcMsProgStats).map(obj => [
                         obj,
                         progressStats?.data?.programmeNames[obj].code,
                       ])
@@ -197,10 +197,10 @@ const FacultyProgrammeOverview = ({
                     <div className="table-container">
                       <FacultyProgressTable
                         data={progressStats?.data.mastersTableStats}
-                        programmeStats={progressStats?.data.mastersProgrammeStats}
+                        programmeStats={progressStats?.data.mastersProgStats}
                         titles={progressStats?.data.mastersTitles}
                         sortedKeys={sortProgrammeKeys(
-                          Object.keys(progressStats?.data.mastersProgrammeStats).map(obj => [
+                          Object.keys(progressStats?.data.mastersProgStats).map(obj => [
                             obj,
                             progressStats?.data?.programmeNames[obj].code,
                           ])
@@ -230,10 +230,10 @@ const FacultyProgrammeOverview = ({
                 <div className="table-container">
                   <FacultyProgressTable
                     data={progressStats?.data.doctoralTableStats}
-                    programmeStats={progressStats?.data.doctoralProgrammeStats}
+                    programmeStats={progressStats?.data.doctoralProgStats}
                     titles={progressStats?.data.doctoralTitles}
                     sortedKeys={sortProgrammeKeys(
-                      Object.keys(progressStats?.data.doctoralProgrammeStats).map(obj => [
+                      Object.keys(progressStats?.data.doctoralProgStats).map(obj => [
                         obj,
                         progressStats?.data?.programmeNames[obj].code,
                       ])

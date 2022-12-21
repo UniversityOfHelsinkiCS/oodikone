@@ -13,7 +13,7 @@ const InfoBox = ({ content, cypress }) => {
       <div className="content-container" data-cy={`${cypress}-info-content`}>
         <Icon name="info circle" size="huge" />
         <Message.Content className="ok-infobox content">
-          <ReactMarkdown escapeHtml={false}>{content}</ReactMarkdown>
+          <ReactMarkdown>{content}</ReactMarkdown>
         </Message.Content>
       </div>
       <Button onClick={toggleOpen} className="ok-infobox-close" data-cy={`${cypress}-close-info`}>
