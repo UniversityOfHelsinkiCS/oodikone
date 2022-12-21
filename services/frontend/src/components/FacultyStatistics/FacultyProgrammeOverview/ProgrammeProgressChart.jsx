@@ -4,6 +4,7 @@ import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 
 const getColors = len => {
+  if (len < 6) return ['#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
   if (len < 8) return ['#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
   return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
 }
