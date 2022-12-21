@@ -17,11 +17,6 @@ const FacultyStudentDataTable = ({
   const [yearsVisible, setVisible] = useState(new Array(years.length).fill(false))
   const [showPercentages, setShowPercentages] = useState(false)
 
-  const calendarYears = years.reduce((all, year) => {
-    if (year === 'Total') return all
-    return all.concat(Number(year.slice(0, 4)))
-  }, [])
-
   const toggleVisibility = yearIndex => {
     const arrayToModify = [...yearsVisible]
     arrayToModify[yearIndex] = !yearsVisible[yearIndex]
@@ -104,11 +99,7 @@ const FacultyStudentDataTable = ({
                           {(requiredRights.rights?.includes(programmeNames[programme].code) ||
                             requiredRights.isAdmin ||
                             requiredRights.IAMrights?.includes(programmeNames[programme].code)) && (
-                            <PopulationLink
-                              studyprogramme={programmeNames[programme].code}
-                              year={year}
-                              years={calendarYears}
-                            />
+                            <PopulationLink studyprogramme={programmeNames[programme].code} year={year} />
                           )}
                         </Table.Cell>
                         {programmeStats[programme][year].map((value, valIdx) => {
