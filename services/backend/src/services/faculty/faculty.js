@@ -24,18 +24,48 @@ const {
 } = require('./facultyHelpers')
 
 const getTransferredToAndAway = async (programmeCodes, allProgrammeCodes, since) => {
-  const awayTransfers = (await transferredAway(programmeCodes, allProgrammeCodes, since)).map(t => t.studyrightid)
-  const toTransfers = (await transferredTo(programmeCodes, allProgrammeCodes, since)).map(t => t.studyrightid)
-  const transferredToOrAway = [...toTransfers, ...awayTransfers]
-  return transferredToOrAway
+  const awayTransfers = await transferredAway(programmeCodes, allProgrammeCodes, since)
+  const toTransfers = await transferredTo(programmeCodes, allProgrammeCodes, since)
+  return [...toTransfers, ...awayTransfers]
 }
 
 const getTransferredInside = async (programmeCodes, allProgrammeCodes, since) => {
-  const transfersInside = (await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)).map(
-    t => t.studyrightid
-  )
-  return transfersInside
+  return await transferredInsideFaculty(programmeCodes, allProgrammeCodes, since)
 }
+
+const getTransfers = async (programmeCode, allProgrammeCodes, since, end) => {
+  return await transferredFaculty(programmeCode, allProgrammeCodes, since, end)
+}
+
+const transferredFaculty = async (programme, allProgrammeCodes, since, end) =>
+  (
+    await Transfer.findAll({
+      where: {
+        transferdate: {
+          [Op.between]: [since, end],
+        },
+        [Op.or]: [
+          {
+            sourcecode: allProgrammeCodes,
+            targetcode: programme,
+          },
+          {
+            sourcecode: programme,
+            targetcode: {
+              [Op.notIn]: allProgrammeCodes,
+            },
+          },
+          {
+            sourcecode: {
+              [Op.notIn]: allProgrammeCodes,
+            },
+            targetcode: programme,
+          },
+        ],
+      },
+    })
+  ).map(formatFacultyTransfer)
+
 const startedStudyrights = async (faculty, since, studyRightWhere) =>
   (
     await Studyright.findAll({
@@ -367,4 +397,5 @@ module.exports = {
   getTransferredInside,
   getStudyRightsByExtent,
   getStudentsByStudentnumbers,
+  getTransfers,
 }
