@@ -468,6 +468,20 @@ const tableTitles = {
     'Women',
     'Finnish',
   ],
+  programmes: [
+    '',
+    'All',
+    'Started studying',
+    'Currently enrolled',
+    'Absent',
+    'Inactive',
+    'Graduated',
+    'Men',
+    'Women',
+    'Other/Unknown',
+    'Finnish',
+    'Other',
+  ],
 }
 
 const getCreditProgressTableTitles = studyprogramme => {

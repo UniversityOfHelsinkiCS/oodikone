@@ -66,12 +66,13 @@ const facultyProgrammeStudents = student => {
   }
 }
 const formatFacultyTransfer = transfer => {
-  const { sourcecode, targetcode, transferdate, studyrightid } = transfer
+  const { sourcecode, targetcode, transferdate, studyrightid, studentnumber } = transfer
   return {
     sourcecode,
     targetcode,
     transferdate,
     studyrightid,
+    studentnumber,
   }
 }
 
@@ -108,7 +109,11 @@ const isNewProgramme = code => {
 }
 
 const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrights) => {
-  return insideTransfersStudyrights.includes(s.studyrightid) || transfersToOrAwayStudyrights.includes(s.studyrightid)
+  const allTransfers = [
+    ...insideTransfersStudyrights.map(sr => sr.studentnumber),
+    ...transfersToOrAwayStudyrights.map(sr => sr.studentnumber),
+  ]
+  return allTransfers.includes(s.studyrightid)
 }
 
 const getExtentFilter = includeAllSpecials => {
