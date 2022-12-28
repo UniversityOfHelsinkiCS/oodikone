@@ -104,7 +104,7 @@ const updateFacultyOverview = async (faculty, statsType) => {
         const updatedCredits = await combineFacultyCredits(
           faculty,
           programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
-          allProgrammeCodes,
+          allProgrammes.data,
           yearType,
           specialGroups
         )
