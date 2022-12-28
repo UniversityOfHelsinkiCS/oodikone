@@ -73,6 +73,7 @@ const addTotalsProgramme = (programmeTableStats, progId, year, totals) => {
     getPercentage(totals.allOtherCountries, totals.total),
   ]
 }
+
 const getStudentData = (students, facultyExtra, year, code) => {
   let data = { female: 0, male: 0, finnish: 0, otherCountries: 0, otherUnknown: 0 }
   students.forEach(({ gender_code, home_country_en }) => {
@@ -155,9 +156,8 @@ const getFacultyDataForYear = async ({
     )
     let studyrights = allStudyrights
     let allStudents = []
-    if (!includeAllSpecials) {
-      studyrights = allStudyrights.filter(s => !checkTransfers(s, allTransfers, allTransfers))
-    }
+
+    studyrights = allStudyrights.filter(s => !checkTransfers(s, allTransfers, allTransfers))
     if (includeAllSpecials) {
       allStudents = [...new Set([...allTransfers.map(sr => sr.studentnumber).filter(smbr => smbr !== null)])]
     }
@@ -190,29 +190,21 @@ const getFacultyDataForYear = async ({
         return { ...resultObj, [yearKey]: [] }
       }, {})
     }
-    programmeTableStats[progId][year] = [
-      students.length,
-      started.length,
-      getPercentage(started.length, students.length),
-      enrolled.length,
-      getPercentage(enrolled.length, students.length),
-      absent.length,
-      getPercentage(absent.length, students.length),
-      inactive.length,
-      getPercentage(inactive.length, students.length),
-      graduatedStudents.length,
-      getPercentage(graduatedStudents.length, students.length),
-      studentData.male,
-      getPercentage(studentData.male, students.length),
-      studentData.female,
-      getPercentage(studentData.female, students.length),
-      studentData.otherUnknown,
-      getPercentage(studentData.other + studentData.unknown, students.length),
-      studentData.finnish,
-      getPercentage(studentData.finnish, students.length),
-      studentData.otherCountries,
-      getPercentage(studentData.otherCountries, students.length),
-    ]
+    const yearTotals = {
+      total: students.length,
+      allStarted: started.length,
+      allEnrolled: enrolled.length,
+      allAbsent: absent.length,
+      allInactive: inactive.length,
+      allGraduated: graduatedStudents.length,
+      allMale: studentData.male,
+      allFemale: studentData.female,
+      allOtherUnknown: studentData.otherUnknown,
+      allFinnish: studentData.finnish,
+      allOtherCountries: studentData.otherCountries,
+    }
+    addTotalsProgramme(programmeTableStats, progId, year, yearTotals)
+
     totals.total += students.length
     totals.allStarted += started.length
     totals.allEnrolled += enrolled.length

@@ -113,7 +113,7 @@ const checkTransfers = (s, insideTransfersStudyrights, transfersToOrAwayStudyrig
     ...insideTransfersStudyrights.map(sr => sr.studentnumber),
     ...transfersToOrAwayStudyrights.map(sr => sr.studentnumber),
   ]
-  return allTransfers.includes(s.studyrightid)
+  return allTransfers.includes(s.studentnumber)
 }
 
 const getExtentFilter = includeAllSpecials => {
