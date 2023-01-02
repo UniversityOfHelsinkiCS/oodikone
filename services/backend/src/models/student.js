@@ -25,7 +25,7 @@ Student.init(
     home_country_fi: { type: STRING },
     home_country_sv: { type: STRING },
     home_country_en: { type: STRING },
-    gender_code: { type: INTEGER },
+    gender_code: { type: STRING },
     sis_person_id: { type: STRING },
     dissemination_info_allowed: { type: BOOLEAN },
     createdAt: {
