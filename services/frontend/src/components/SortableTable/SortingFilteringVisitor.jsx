@@ -26,6 +26,14 @@ export default class SortingFilteringVisitor extends DataVisitor {
         const va = getColumnValue(pCtx.withItem(a), column)
         const vb = getColumnValue(pCtx.withItem(b), column)
 
+        if (va === 'Not saved') {
+          return 0
+        }
+
+        if (va !== 'Not saved' && vb === 'Not saved') {
+          return -1
+        }
+
         if (va === vb) {
           return 0
         }
