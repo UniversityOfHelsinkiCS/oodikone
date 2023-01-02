@@ -7,11 +7,11 @@ const { getJamiClient } = require('../util/jamiClient')
 const jamiClient = getJamiClient()
 
 const getIAMAccessFromJami = async (user, attempt = 1) => {
-  const { userId, iamGroups } = user
+  const { id, iamGroups } = user
 
   try {
     const { data: iamAccess } = await jamiClient.post('/', {
-      userId,
+      userId: id,
       iamGroups,
     })
 
