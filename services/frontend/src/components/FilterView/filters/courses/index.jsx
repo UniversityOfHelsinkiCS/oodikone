@@ -15,7 +15,6 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
   const { courseFilters } = options
   const { language } = useLanguage()
   const name = 'course-filter-card'
-
   // Wrestle course stats into something semantic-ui eats without throwing up.
   const makeLabel = cs => `${cs.course.code} - ${getTextIn(cs.course.name, language)}`
   const dropdownOptions = Object.values(courseStats)
@@ -81,9 +80,9 @@ const filterFunctions = {
   [FilterType.ALL]: createFilterFunc('all'),
   [FilterType.PASSED]: createFilterFunc('passed'),
   [FilterType.PASSED_AFTER_FAILURE]: createFilterFunc('retryPassed'),
-  [FilterType.FAILED]: createFilterFunc('failed'),
-  [FilterType.FAILED_MANY_TIMES]: createFilterFunc('failedMany'),
-  [FilterType.DID_NOT_PASS]: createFilterFunc('didNotPass'),
+  // [FilterType.FAILED]: createFilterFunc('failed'),
+  // [FilterType.FAILED_MANY_TIMES]: createFilterFunc('failedMany'),
+  // [FilterType.DID_NOT_PASS]: createFilterFunc('didNotPass'),
   // [FilterType.NOT_PARTICIPATED]: createFilterFunc('all', true),
   // [FilterType.DID_NOT_PASS]: ({ studentNumber }, { students }) =>
   //   !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
@@ -103,9 +102,7 @@ const filter = createFilter({
   filter(student, { courseFilters }, { precomputed: courseMap }) {
     return Object.entries(courseFilters).reduce((result, [code, filterType]) => {
       const stats = courseMap[code]
-
       if (!stats) return false
-
       return result && filterFunctions[filterType](student, stats)
     }, true)
   },
