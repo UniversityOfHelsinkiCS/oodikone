@@ -8,10 +8,10 @@ const filterTexts = {
   [FilterType.ALL]: { label: 'All' },
   [FilterType.PASSED]: { label: 'Passed' },
   [FilterType.PASSED_AFTER_FAILURE]: { label: 'Passed After Failure' },
-  [FilterType.FAILED]: { label: 'Failed' },
-  [FilterType.FAILED_MANY_TIMES]: { label: 'Failed Multiple Times' },
+  // [FilterType.FAILED]: { label: 'Failed' },
+  // [FilterType.FAILED_MANY_TIMES]: { label: 'Failed Multiple Times' },
   // [FilterType.NOT_PARTICIPATED]: { label: 'Not Participated' },
-  [FilterType.DID_NOT_PASS]: { label: "Didn't Pass" },
+  // [FilterType.DID_NOT_PASS]: { label: "Didn't Pass" },
 }
 // a bandaid solution to prevent oodikone crashing
 const translate = {
@@ -25,6 +25,8 @@ const translate = {
 }
 
 const CourseCard = ({ course, filterType, onChange }) => {
+  // Object.entries(filterTexts).map(([type, { label, info }]) => console.log(type, label, translate[type]))
+  // console.log('course', course)
   const { language } = useLanguage()
   const name = 'courseFilter'
 
@@ -37,7 +39,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
   return (
     <>
       <Label style={{ marginTop: '0.5rem' }}>
-        {getTextIn(course.course.name, language)}
+        {getTextIn(course?.course?.name, language)}
 
         <Dropdown
           text={filterTexts[filterType].label}
@@ -60,7 +62,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
                   />
                 )
               }
-              if (Object.keys(course?.students[translate[type]]).length === 0)
+              if (course?.students[translate[type]] && Object.keys(course?.students[translate[type]]).length === 0)
                 return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} disabled />
               return <Dropdown.Item key={label} text={label} value={type} onClick={onClick} />
             })}
