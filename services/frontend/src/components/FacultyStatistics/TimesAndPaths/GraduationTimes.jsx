@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
-import BarChart from './BarChart'
+import MedianBarChart from './MedianBarChart'
+// import BreakdownBarChart from './BreakdownBarChart'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import '../faculty.css'
 
@@ -53,7 +54,7 @@ const GraduationTimes = ({
           </div>
         )}
         <div className="graduations-chart-container">
-          <BarChart
+          <MedianBarChart
             data={data}
             goal={goal}
             handleClick={handleClick}
@@ -67,7 +68,7 @@ const GraduationTimes = ({
               <Message compact>Click a bar to view that year's programme level breakdown</Message>
             </div>
           ) : (
-            <BarChart
+            <MedianBarChart
               data={levelProgrammeData[year]?.data}
               goal={goal}
               facultyGraph={false}
@@ -83,6 +84,10 @@ const GraduationTimes = ({
             />
           )}
         </div>
+        {/* <div className="graduations-chart-container">
+          <BreakdownBarChart data={data} />
+          {programmeData && <BreakdownBarChart data={levelProgrammeData[year]?.data} />}
+        </div> */}
       </div>
     </div>
   )
