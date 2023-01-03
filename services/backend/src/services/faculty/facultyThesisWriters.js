@@ -26,6 +26,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
   let programmeNames = {}
 
   for (const { progId, code, name } of facultyProgrammes) {
+    if (code === 'MH70_008_2') continue
     const provider = mapToProviders([code])[0]
     const students = await getCorrectStudentnumbers({
       codes: [code],
@@ -33,6 +34,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       endDate: alltimeEndDate,
       includeAllSpecials,
     })
+
     const thesisCourseCodes = await thesisWriters(provider, since, thesisTypes, students)
     thesisCourseCodes?.forEach(({ attainment_date, courseUnitType }) => {
       const thesisYear = defineYear(attainment_date, isAcademicYear)
@@ -68,7 +70,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
   return { bachelors, masters, doctors, licentiates, programmeCounts, programmeNames }
 }
 
-const getFacultyThesisWritersForStudyTrack = async (
+const getFacultyThesisWritersForProgrammes = async (
   allThesisWriters,
   facultyProgrammes,
   isAcademicYear,
@@ -126,7 +128,7 @@ const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType,
   const isAcademicYear = yearType === 'ACADEMIC_YEAR'
   const includeAllSpecials = specialGroups === 'SPECIAL_INCLUDED'
 
-  await getFacultyThesisWritersForStudyTrack(allThesisWriters, facultyProgrammes, isAcademicYear, includeAllSpecials)
+  await getFacultyThesisWritersForProgrammes(allThesisWriters, facultyProgrammes, isAcademicYear, includeAllSpecials)
 
   return allThesisWriters
 }
