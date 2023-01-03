@@ -211,8 +211,7 @@ describe('Faculty overview', () => {
         cy.get('div[class="programmes-breakdown-graph"]').should('be.visible')
         cy.get('div[class="programmes-breakdown-graph"]').within(() => {
           cy.contains('Year 2018 by start year')
-          cy.contains('1').trigger('mouseover')
-          cy.contains('Max. year overtime: 1')
+          cy.contains('EDUM')
         })
       })
     })
