@@ -1,9 +1,109 @@
 import React, { useState } from 'react'
 import { Divider, Message } from 'semantic-ui-react'
 import MedianBarChart from './MedianBarChart'
-// import BreakdownBarChart from './BreakdownBarChart'
+import BreakdownBarChart from './BreakdownBarChart'
 import useLanguage from '../../LanguagePicker/useLanguage'
 import '../faculty.css'
+
+const MedianDisplay = ({
+  handleClick,
+  data,
+  level,
+  goal,
+  label,
+  levelProgrammeData,
+  programmeNames,
+  classSizes,
+  groupBy,
+  goalExceptions,
+  year,
+  language,
+  programmeData,
+}) => {
+  return (
+    <div>
+      {level === 'bcMsCombo' && groupBy === 'byStartYear' && (
+        <div className="graduations-message">
+          <Message compact>
+            Programme class sizes for recent years are not reliable as students might still lack relevant master studies
+            data in Sisu
+          </Message>
+        </div>
+      )}
+      {goalExceptions.needed && ['master', 'bcMsCombo'].includes(level) && (
+        <div className="graduations-message">
+          <Message compact>
+            <b>Different goal times</b> have been taken into account in all numbers and programme level bar coloring,
+            but the faculty level bar color is based on the typical goal time of {goal} months
+          </Message>
+        </div>
+      )}
+      <div className="graduations-chart-container">
+        <MedianBarChart
+          data={data}
+          goal={goal}
+          handleClick={handleClick}
+          label={label}
+          programmeNames={programmeNames}
+          classSizes={classSizes?.[level]}
+        />
+        {!programmeData ? (
+          <div className="graduations-message">
+            <Message compact>Click a bar to view that year's programme level breakdown</Message>
+          </div>
+        ) : (
+          <MedianBarChart
+            data={levelProgrammeData[year]?.data}
+            goal={goal}
+            facultyGraph={false}
+            handleClick={handleClick}
+            year={year}
+            label={label}
+            programmeNames={programmeNames}
+            language={language}
+            classSizes={classSizes?.programmes}
+            level={level}
+            goalExceptions={goalExceptions}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+const BreakdownDislay = ({
+  handleClick,
+  data,
+  label,
+  levelProgrammeData,
+  programmeNames,
+  year,
+  language,
+  programmeData,
+}) => {
+  return (
+    <div>
+      <div className="graduations-chart-container">
+        <BreakdownBarChart data={data} handleClick={handleClick} label={label} />
+        {!programmeData ? (
+          <div className="graduations-message">
+            <Message compact>Click a bar to view that year's programme level breakdown</Message>
+          </div>
+        ) : (
+          <BreakdownBarChart
+            data={levelProgrammeData[year]?.data}
+            handleClick={handleClick}
+            facultyGraph={false}
+            year={year}
+            label={label}
+            programmeNames={programmeNames}
+            language={language}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
 
 const GraduationTimes = ({
   title,
@@ -13,7 +113,7 @@ const GraduationTimes = ({
   label,
   levelProgrammeData,
   programmeNames,
-  showMeanTime,
+  showBreakdown,
   classSizes,
   groupBy,
   goalExceptions,
@@ -23,9 +123,9 @@ const GraduationTimes = ({
   const { language } = useLanguage()
   if (!data.some(a => a.amount > 0)) return null
 
-  const handleClick = (e, isFacultyGraph) => {
+  const handleClick = (e, isFacultyGraph, seriesCategory = null) => {
     if (isFacultyGraph) {
-      setYear(e.point.name)
+      setYear(seriesCategory || e.point.name)
       setProgrammeData(true)
     } else {
       setProgrammeData(false)
@@ -36,59 +136,35 @@ const GraduationTimes = ({
   return (
     <div className={`graduation-times-${level}`} data-cy={`Section-${level}`}>
       <Divider horizontal>{title}</Divider>
-      <div>
-        {level === 'bcMsCombo' && groupBy === 'byStartYear' && (
-          <div className="graduations-message">
-            <Message compact>
-              Programme class sizes for recent years are not reliable as students might still lack relevant master
-              studies data in Sisu
-            </Message>
-          </div>
-        )}
-        {goalExceptions.needed && ['master', 'bcMsCombo'].includes(level) && (
-          <div className="graduations-message">
-            <Message compact>
-              <b>Different goal times</b> have been taken into account in all numbers and programme level bar coloring,
-              but the faculty level bar color is based on the typical goal time of {goal} months
-            </Message>
-          </div>
-        )}
-        <div className="graduations-chart-container">
-          <MedianBarChart
-            data={data}
-            goal={goal}
-            handleClick={handleClick}
-            label={label}
-            programmeNames={programmeNames}
-            showMeanTime={showMeanTime}
-            classSizes={classSizes?.[level]}
-          />
-          {!programmeData ? (
-            <div className="graduations-message">
-              <Message compact>Click a bar to view that year's programme level breakdown</Message>
-            </div>
-          ) : (
-            <MedianBarChart
-              data={levelProgrammeData[year]?.data}
-              goal={goal}
-              facultyGraph={false}
-              handleClick={handleClick}
-              year={year}
-              label={label}
-              programmeNames={programmeNames}
-              language={language}
-              showMeanTime={showMeanTime}
-              classSizes={classSizes?.programmes}
-              level={level}
-              goalExceptions={goalExceptions}
-            />
-          )}
-        </div>
-        {/* <div className="graduations-chart-container">
-          <BreakdownBarChart data={data} />
-          {programmeData && <BreakdownBarChart data={levelProgrammeData[year]?.data} />}
-        </div> */}
-      </div>
+      {showBreakdown ? (
+        <BreakdownDislay
+          handleClick={handleClick}
+          data={data}
+          level={level}
+          label={label}
+          levelProgrammeData={levelProgrammeData}
+          programmeNames={programmeNames}
+          year={year}
+          language={language}
+          programmeData={programmeData}
+        />
+      ) : (
+        <MedianDisplay
+          handleClick={handleClick}
+          data={data}
+          level={level}
+          goal={goal}
+          label={label}
+          levelProgrammeData={levelProgrammeData}
+          programmeNames={programmeNames}
+          classSizes={classSizes}
+          groupBy={groupBy}
+          goalExceptions={goalExceptions}
+          year={year}
+          language={language}
+          programmeData={programmeData}
+        />
+      )}
     </div>
   )
 }
