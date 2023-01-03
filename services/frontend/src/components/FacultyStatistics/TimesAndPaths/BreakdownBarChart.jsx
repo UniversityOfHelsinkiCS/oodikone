@@ -1,17 +1,8 @@
+/* eslint-disable react/no-this-in-sfc */
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({
-  data,
-  // handleClick,
-  facultyGraph = true,
-  // year,
-  // label,
-  // programmeNames,
-  // language = null,
-  // showMeanTime,
-  // level,
-}) => {
+const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, programmeNames, language = null }) => {
   const statData = [
     { name: 'On time', color: '#90A959', data: [] },
     { name: 'Max. year overtime', color: '#FEE191', data: [] },
@@ -19,6 +10,7 @@ const BarChart = ({
   ]
 
   let categories = []
+  const codeMap = {}
 
   // eslint-disable-next-line no-restricted-syntax
   for (const item of data) {
@@ -26,11 +18,24 @@ const BarChart = ({
     statData[1].data = [...statData[1].data, item.statistics.yearOver]
     statData[2].data = [...statData[2].data, item.statistics.wayOver]
     categories = [...categories, item.name]
+    if (!facultyGraph) {
+      codeMap[item.name || item.code] = item.code
+    }
   }
 
   const getHeight = () => {
     const t = data.length > 8 ? 80 : 110
     return data.length * t + 100
+  }
+
+  const getTooltipText = (programmeId, seriesName, amount) => {
+    if (!facultyGraph) {
+      const code = codeMap[programmeId]
+      return `<b>${
+        programmeNames[code]?.[language] ? programmeNames[code]?.[language] : programmeNames[code]?.fi
+      }</b><br />${code}<br /><b>${seriesName}</b>: ${amount}`
+    }
+    return `<b>${seriesName}</b>: ${amount}`
   }
 
   const config = {
@@ -41,10 +46,20 @@ const BarChart = ({
     },
     title: { text: ' ' },
     series: statData,
+    tooltip: {
+      backgroundColor: 'white',
+      fontSize: '25px',
+      // outside: true,
+      // eslint-disable-next-line
+      formatter: function() {
+        return getTooltipText(this.x, this.series.name, this.y)
+      },
+    },
     xAxis: {
+      type: 'category',
       categories,
       title: {
-        text: 'Graduation year', // facultyGraph ? label : 'Programme',
+        text: facultyGraph ? label : 'Programme',
         align: 'high',
         offset: 0,
         rotation: 0,
@@ -82,9 +97,17 @@ const BarChart = ({
       series: {
         pointWidth: data.length > 8 ? 16 : 20,
         groupPadding: 0.15,
+        point: {
+          events: {
+            click(e) {
+              handleClick(e, facultyGraph, categories[this.x])
+            },
+          },
+        },
       },
     },
   }
+  if (!facultyGraph) config.title.text = `Year ${year} by ${label.toLowerCase()}`
 
   return (
     <div className={`${facultyGraph ? 'faculty' : 'programmes'}-breakdown-graph`}>

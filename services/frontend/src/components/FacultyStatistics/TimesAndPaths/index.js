@@ -10,22 +10,20 @@ import '../faculty.css'
 
 const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
   const toolTips = InfotoolTips.Faculty
-  const [showMeanTime, setShowMeanTime] = useState(false)
+  const [showBreakdown, setShowBreakdown] = useState(false)
   const [groupByStartYear, setGroupByStartYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, studyProgrammeFilter })
 
   const groupBy = groupByStartYear ? 'byStartYear' : 'byGradYear'
   const label = groupByStartYear ? 'Start year' : 'Graduation year'
-  const data = showMeanTime ? graduationStats?.data?.[groupBy].means : graduationStats?.data?.[groupBy].medians
+  const data = graduationStats?.data?.[groupBy].medians
   const goals = graduationStats?.data?.goals
   const goalExceptions = { ...goals?.exceptions, needed: faculty?.code === 'H30' }
-  const programmeData = showMeanTime
-    ? graduationStats?.data?.[groupBy].programmes.means
-    : graduationStats?.data?.[groupBy].programmes.medians
+  const programmeData = graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { label, programmeNames, showMeanTime, classSizes, goalExceptions }
+  const commonProps = { label, programmeNames, showBreakdown, classSizes, goalExceptions }
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -74,10 +72,10 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
                 />
                 <Toggle
                   cypress="GraduationTimeToggle"
-                  firstLabel="Median time"
-                  secondLabel="Mean time"
-                  value={showMeanTime}
-                  setValue={setShowMeanTime}
+                  firstLabel="Show: Median times"
+                  secondLabel="Breakdown"
+                  value={showBreakdown}
+                  setValue={setShowBreakdown}
                 />
               </div>
               <div>
