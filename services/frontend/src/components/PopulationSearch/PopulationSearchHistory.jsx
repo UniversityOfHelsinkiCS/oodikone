@@ -57,26 +57,24 @@ const PopulationSearchHistory = props => {
   const [months, setMonths] = useState(props.populations.query?.months ? props.populations.query?.months : 0)
 
   const handleSemesterSelection = (e, { value }) => {
-    e.preventDefault()
     const newSemesters = semesters.includes(value) ? semesters.filter(s => s !== value) : [...semesters, value]
-    if (props.tags.length < 1) {
+    if (!props.populations.query.tag) {
       setSemesters(newSemesters)
       setMonths(getMonths(props.populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'))
     }
   }
 
   const handleStudentStatusSelection = (e, { value }) => {
-    e.preventDefault()
     setStudentStatus(
       studentStatuses.includes(value) ? studentStatuses.filter(s => s !== value) : [...studentStatuses, value]
     )
   }
 
   const pushQueryToUrl = () => {
-    const { studyRights, tags, year } = props.populations.query
+    const { studyRights, tag, year } = props.populations.query
 
     const queryObject = {
-      tags,
+      tag,
       year,
       months,
       studentStatuses,
