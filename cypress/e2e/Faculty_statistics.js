@@ -207,13 +207,12 @@ describe('Faculty overview', () => {
 
       cy.get('[data-cy="GraduationTimeToggle"]').click()
       cy.get('[data-cy="Section-master"]').within(() => {
-        cy.contains('1 graduated (100 % of class)').click()
-        cy.get('div[class="programmes-graph"]').should('be.visible')
-        cy.get('div[class="programmes-graph"]').within(() => {
+        cy.contains('1').click()
+        cy.get('div[class="programmes-breakdown-graph"]').should('be.visible')
+        cy.get('div[class="programmes-breakdown-graph"]').within(() => {
           cy.contains('Year 2018 by start year')
-          cy.contains('1 graduated').trigger('mouseover')
-          cy.contains('From class of 2018, 1/1 students have graduated')
-          cy.contains('mean study time: 25 months')
+          cy.contains('1').trigger('mouseover')
+          cy.contains('Max. year overtime: 1')
         })
       })
     })
