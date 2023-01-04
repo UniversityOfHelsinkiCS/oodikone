@@ -9,13 +9,14 @@ import StudytrackDataTable from './StudytrackDataTable'
 import StudytrackSelector from './StudytrackSelector'
 import Toggle from '../Toggle'
 import MedianTimeBarChart from '../MedianTimeBarChart'
+import BreakdownBarChart from '../BreakdownBarChart'
 
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
 
 const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, graduated, setGraduated }) => {
   const toolTips = InfotoolTips.Studyprogramme
-  const [showMeanTime, setShowMeanTime] = useState(false)
+  const [showBreakdown, setShowBreakdown] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
@@ -114,22 +115,22 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
               {getDivider('Average graduation times', 'AverageGraduationTimesStudytracks')}
               <Toggle
                 firstLabel="Median time"
-                secondLabel="Mean time"
-                value={showMeanTime}
-                setValue={setShowMeanTime}
+                secondLabel="Breakdown"
+                value={showBreakdown}
+                setValue={setShowBreakdown}
               />
               <div className="section-container-centered">
-                <MedianTimeBarChart
-                  data={
-                    showMeanTime
-                      ? stats?.data?.graduationTimes[track].means
-                      : stats?.data?.graduationTimes[track].medians
-                  }
-                  goal={stats?.data?.graduationTimes.goal}
-                  showMeanTime={showMeanTime}
-                  byStartYear
-                  title={' '}
-                />
+                {!showBreakdown ? (
+                  <MedianTimeBarChart
+                    data={stats?.data?.graduationTimes[track].medians}
+                    goal={stats?.data?.graduationTimes.goal}
+                    showMeanTime={showBreakdown}
+                    byStartYear
+                    title={' '}
+                  />
+                ) : (
+                  <BreakdownBarChart data={stats?.data?.graduationTimes[track].medians} title={' '} byStartYear />
+                )}
               </div>
             </>
           )}
