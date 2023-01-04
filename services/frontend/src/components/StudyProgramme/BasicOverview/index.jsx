@@ -162,7 +162,7 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
               <div className="toggle-container">
                 <Toggle
                   cypress="GraduationTimeToggle"
-                  firstLabel="Show: Median time"
+                  firstLabel="Median time"
                   secondLabel="Breakdown"
                   value={showBreakdown}
                   setValue={setShowBreakdown}
