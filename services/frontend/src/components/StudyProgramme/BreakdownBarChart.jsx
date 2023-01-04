@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({ data, title }) => {
+const BarChart = ({ data, title, byStartYear = false }) => {
   const statData = [
     { name: 'On time', color: '#90A959', data: [] },
     { name: 'Max. year overtime', color: '#FEE191', data: [] },
@@ -49,7 +49,7 @@ const BarChart = ({ data, title }) => {
       type: 'category',
       categories,
       title: {
-        text: 'Graduation year',
+        text: byStartYear ? 'Start year' : 'Graduation year',
         align: 'high',
         offset: 0,
         rotation: 0,
