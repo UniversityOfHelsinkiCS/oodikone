@@ -8,7 +8,7 @@ import BasicDataTable from './BasicDataTable'
 import StudytrackDataTable from './StudytrackDataTable'
 import StudytrackSelector from './StudytrackSelector'
 import Toggle from '../Toggle'
-import TimeBarChart from '../TimeBarChart'
+import MedianTimeBarChart from '../MedianTimeBarChart'
 
 import InfotoolTips from '../../../common/InfoToolTips'
 import '../studyprogramme.css'
@@ -119,7 +119,7 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
                 setValue={setShowMeanTime}
               />
               <div className="section-container-centered">
-                <TimeBarChart
+                <MedianTimeBarChart
                   data={
                     showMeanTime
                       ? stats?.data?.graduationTimes[track].means
