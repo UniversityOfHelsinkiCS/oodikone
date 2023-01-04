@@ -25,7 +25,7 @@ const BarChart = ({ data, title, byStartYear = false }) => {
   }
 
   const getTooltipText = (seriesName, amount) => {
-    return `<b>${seriesName}</b>: ${amount}`
+    return `<b>Graduated ${seriesName}</b>: ${amount} ${amount === 1 ? 'student' : 'students'}`
   }
 
   const config = {
@@ -42,7 +42,7 @@ const BarChart = ({ data, title, byStartYear = false }) => {
       // outside: true,
       // eslint-disable-next-line
       formatter: function() {
-        return getTooltipText(this.x, this.series.name, this.y)
+        return getTooltipText(this.series.name, this.y)
       },
     },
     xAxis: {

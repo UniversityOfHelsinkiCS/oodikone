@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const TimeBarChart = ({ data, goal, showMeanTime, title, byStartYear }) => {
+const TimeBarChart = ({ data, goal, title, byStartYear }) => {
   if (!data) {
     return <></>
   }
@@ -33,9 +33,7 @@ const TimeBarChart = ({ data, goal, showMeanTime, title, byStartYear }) => {
       ? `<b>From class of ${year}, ${amount}/${classSize} students have graduated</b>`
       : `<b>${amount} students graduated in year ${year}</b>`
 
-    const timeText = `<br /><p>${sortingText}, <br /><b>${
-      showMeanTime ? 'mean' : 'median'
-    } study time: ${y} months</p></b>`
+    const timeText = `<br /><p>${sortingText}, <br /><b>median study time: ${y} months</p></b>`
 
     const statisticsText = `<br /><p>${statistics.onTime} graduated on time</p><br />
         <p>${statistics.yearOver} graduated max year overtime</p>
