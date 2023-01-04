@@ -4,7 +4,6 @@ const moment = require('moment')
 const { getAssociations } = require('./studyrights')
 const {
   getMedian,
-  getMean,
   getStartDate,
   getYearsArray,
   getPercentage,
@@ -77,16 +76,11 @@ const getGraduationTimeStats = async ({ year, graduated, track, graduationAmount
   })
 
   const median = getMedian(times)
-  const mean = getMean(times)
   const statistics = countTimeCategories(times, graduationTimes.goal)
 
   graduationTimes[track].medians = [
     ...graduationTimes[track].medians,
     { y: median, amount: graduationAmounts[track][year], name: year, statistics, classSize },
-  ]
-  graduationTimes[track].means = [
-    ...graduationTimes[track].means,
-    { y: mean, amount: graduationAmounts[track][year], name: year, statistics, classSize },
   ]
 }
 
@@ -247,7 +241,7 @@ const getStudytrackDataForTheYear = async ({
 
       // Count stats for the graduation time charts grouped by year
       if (!(track in graduationTimes)) {
-        graduationTimes[track] = { medians: [], means: [] }
+        graduationTimes[track] = { medians: [] }
       }
       totalAmounts[track][year] = all.length
       await getGraduationTimeStats({
@@ -263,9 +257,7 @@ const getStudytrackDataForTheYear = async ({
   Object.keys(graduationTimes).forEach(track => {
     if (track !== 'goal') {
       const sortedMedians = graduationTimes[track].medians.sort((a, b) => b.name.localeCompare(a.name))
-      const sortedMeans = graduationTimes[track].means.sort((a, b) => b.name.localeCompare(a.name))
       graduationTimes[track].medians = sortedMedians
-      graduationTimes[track].means = sortedMeans
     }
   })
 }
