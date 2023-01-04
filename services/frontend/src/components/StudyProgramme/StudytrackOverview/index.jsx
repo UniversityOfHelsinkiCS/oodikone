@@ -124,9 +124,8 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
                   <MedianTimeBarChart
                     data={stats?.data?.graduationTimes[track].medians}
                     goal={stats?.data?.graduationTimes.goal}
-                    showMeanTime={showBreakdown}
-                    byStartYear
                     title={' '}
+                    byStartYear
                   />
                 ) : (
                   <BreakdownBarChart data={stats?.data?.graduationTimes[track].medians} title={' '} byStartYear />

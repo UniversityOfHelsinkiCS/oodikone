@@ -5,7 +5,7 @@ import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQue
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
-import TimeBarChart from '../MedianTimeBarChart'
+import MedianTimeBarChart from '../MedianTimeBarChart'
 import BreakdownBarChart from '../BreakdownBarChart'
 import DataTable from './DataTable'
 import Toggle from '../Toggle'
@@ -41,18 +41,16 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
   const displayMedian = () => (
     <>
       {doCombo && (
-        <TimeBarChart
+        <MedianTimeBarChart
           data={graduations?.data?.comboTimes?.medians}
           goal={graduations?.data?.comboTimes?.goal}
-          showMeanTime={showBreakdown}
           title="Bachelor + Master studyright"
           byStartYear={false}
         />
       )}
-      <TimeBarChart
+      <MedianTimeBarChart
         data={timesData?.medians}
         goal={graduations?.data.graduationTimes?.goal}
-        showMeanTime={showBreakdown}
         title={doCombo ? 'Master studyright' : ' '}
         byStartYear={false}
       />
