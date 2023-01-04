@@ -5,7 +5,16 @@ import ReactHighcharts from 'react-highcharts'
 
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
 
-const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differenceData, extraHeight }) => {
+const CollapsedStackedBar = ({
+  data,
+  labels,
+  longLabels,
+  names,
+  plotLinePlaces,
+  language,
+  differenceData,
+  extraHeight,
+}) => {
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
@@ -32,6 +41,15 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
     if (change > 0) return `+${change.toString()}`
     return change
   }
+
+  const chartPlotLinePlaces = plotLinePlaces
+    ? plotLinePlaces.map(val => ({
+        color: '#90A959',
+        width: 2,
+        value: val + 0.5,
+        dashStyle: 'shortDash',
+      }))
+    : []
 
   // Point width is 24 px different multipliers adjusts the height.
   const getFlexHeight = (len, needsExtra) => {
@@ -73,6 +91,7 @@ const CollapsedStackedBar = ({ data, labels, longLabels, names, language, differ
       title: {
         text: '',
       },
+      plotLines: chartPlotLinePlaces,
       fontSize: '24px',
     },
     yAxis: {
