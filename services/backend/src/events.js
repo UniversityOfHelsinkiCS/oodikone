@@ -38,9 +38,16 @@ const refreshFaculties = async () => {
 
 const refreshNewOverviews = async () => {
   logger.info('Refreshing studyprogramme and studytrack overview statistics for all programmes')
+  // Filters out old programmes and special ones like Fitech studies. Filters also out the programmes starting with
+  // 2_ or ending with _2. Those programmes are mapped to correct programme (studentProgrammeModuleFixer.js)
   const codes = (await getAllProgrammes())
     .map(p => p.code)
-    .filter(code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code))
+    .filter(
+      code =>
+        (code.includes('KH') && !code.startsWith('2_KH') && !code.endsWith('_2')) ||
+        (code.includes('MH') && !code.startsWith('2_MH') && !code.endsWith('_2')) ||
+        /^(T)[0-9]{6}$/.test(code)
+    )
   let ready = 0
   for (const code of codes) {
     try {
