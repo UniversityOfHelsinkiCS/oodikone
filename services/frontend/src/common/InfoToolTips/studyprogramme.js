@@ -43,7 +43,7 @@ export default {
   AverageGraduationTimes: `
   **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
 
-  **Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin..
+  **Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
   
   Valmistumisajoista on vähennetty lakisääteiset poissaolot.
   
@@ -53,11 +53,11 @@ export default {
   Vihreä **vaakapalkki** merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
   ja punainen yli vuoden tavoiteajan ylitystä.`,
   AverageGraduationTimesStudytracks: `
-  Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukukautena aloittaneista** opiskelijoista on valmistunut sekä heidän prosentuaalinen osuutensa koko vuosikurssista.
+  Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukukautena aloittaneista** opiskelijoista on valmistunut .
 
-  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
+  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalinen osuutensa koko vuosikurssista.
 
-  **Mean time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina.
+  **Breakdown**: Näyttää, kuinka moni kyseisenä lukukautena aloittaneista, jo valmistuneista, opiskelijoista on valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
   
   Valmistumisajoista on vähennetty lakisääteiset poissaolot.
   
