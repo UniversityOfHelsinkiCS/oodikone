@@ -43,7 +43,7 @@ export default {
   AverageGraduationTimes: `
   **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
 
-  **Mean time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina.
+  **Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin..
   
   Valmistumisajoista on vähennetty lakisääteiset poissaolot.
   
