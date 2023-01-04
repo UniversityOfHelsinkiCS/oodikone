@@ -9,6 +9,7 @@ const InteractiveDataTable = ({
   dataProgrammeStats,
   programmeNames,
   sortedKeys,
+  plotLinePlaces,
   titles,
   language,
   sliceStart,
@@ -132,6 +133,7 @@ const InteractiveDataTable = ({
                           )
                     }
                     labels={sortbyColumn === 0 ? sortedKeys : keyOrder[yearIndex]}
+                    plotLinePlaces={plotLinePlaces}
                     differenceData={Object.keys(differenceToPrevYears)?.reduce(
                       (yearlyObject, programme) => ({
                         ...yearlyObject,
