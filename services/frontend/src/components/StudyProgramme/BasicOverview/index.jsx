@@ -5,7 +5,8 @@ import { useGetBasicStatsQuery, useGetCreditStatsQuery, useGetGraduationStatsQue
 import LineGraph from './LineGraph'
 import StackedBarChart from './StackedBarChart'
 import BarChart from './BarChart'
-import TimeBarChart from '../TimeBarChart'
+import TimeBarChart from '../MedianTimeBarChart'
+import BreakdownBarChart from '../BreakdownBarChart'
 import DataTable from './DataTable'
 import Toggle from '../Toggle'
 import InfoBox from '../../Info/InfoBox'
@@ -16,7 +17,7 @@ import '../studyprogramme.css'
 const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
 
 const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
-  const [showMeanTime, setShowMeanTime] = useState(false)
+  const [showBreakdown, setShowBreakdown] = useState(false)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -34,6 +35,36 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
         </Divider>
       </div>
       <InfoBox content={toolTips[toolTipText]} />
+    </>
+  )
+
+  const displayMedian = () => (
+    <>
+      {doCombo && (
+        <TimeBarChart
+          data={graduations?.data?.comboTimes?.medians}
+          goal={graduations?.data?.comboTimes?.goal}
+          showMeanTime={showBreakdown}
+          title="Bachelor + Master studyright"
+          byStartYear={false}
+        />
+      )}
+      <TimeBarChart
+        data={timesData?.medians}
+        goal={graduations?.data.graduationTimes?.goal}
+        showMeanTime={showBreakdown}
+        title={doCombo ? 'Master studyright' : ' '}
+        byStartYear={false}
+      />
+    </>
+  )
+
+  const displayBreakdown = () => (
+    <>
+      {doCombo && (
+        <BreakdownBarChart data={graduations?.data?.comboTimes?.medians} title="Bachelor + Master studyright" />
+      )}
+      <BreakdownBarChart data={timesData?.medians} title={doCombo ? 'Master studyright' : ' '} />
     </>
   )
 
@@ -131,30 +162,14 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
               <div className="toggle-container">
                 <Toggle
                   cypress="GraduationTimeToggle"
-                  firstLabel="Median time"
-                  secondLabel="Mean time"
-                  value={showMeanTime}
-                  setValue={setShowMeanTime}
+                  firstLabel="Show: Median time"
+                  secondLabel="Breakdown"
+                  value={showBreakdown}
+                  setValue={setShowBreakdown}
                 />
               </div>
-
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
-                {doCombo && (
-                  <TimeBarChart
-                    data={showMeanTime ? graduations?.data?.comboTimes?.means : graduations?.data?.comboTimes?.medians}
-                    goal={graduations?.data?.comboTimes?.goal}
-                    showMeanTime={showMeanTime}
-                    title="Bachelor + Master studyright"
-                    byStartYear={false}
-                  />
-                )}
-                <TimeBarChart
-                  data={showMeanTime ? timesData?.means : timesData?.medians}
-                  goal={graduations?.data.graduationTimes?.goal}
-                  showMeanTime={showMeanTime}
-                  title={doCombo ? 'Master studyright' : ' '}
-                  byStartYear={false}
-                />
+                {showBreakdown ? displayBreakdown() : displayMedian()}
               </div>
               {graduations?.data?.programmesBeforeOrAfterGraphStats && (
                 <>
