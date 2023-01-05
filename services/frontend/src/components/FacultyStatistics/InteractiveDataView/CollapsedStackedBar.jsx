@@ -45,9 +45,20 @@ const CollapsedStackedBar = ({
   const chartPlotLinePlaces = plotLinePlaces
     ? plotLinePlaces.map(val => ({
         color: '#90A959',
-        width: 2,
-        value: val + 0.5,
-        dashStyle: 'shortDash',
+        width: 1,
+        value: val[0] - 0.5,
+        dashStyle: 'solid',
+        label: {
+          text: val[1],
+          style: {
+            color: 'black',
+            fontWeight: 'bold',
+            fontSize: 14,
+          },
+          align: 'right',
+          x: 0,
+          y: 5,
+        },
       }))
     : []
 

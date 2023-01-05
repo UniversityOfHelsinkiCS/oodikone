@@ -29,14 +29,32 @@ const InteractiveDataTable = ({
     const keys = {}
     if (!(columnIndex === 0)) {
       const numbersOfYears = dataStats.length
-      const data = Object.entries(dataProgrammeStats)
+      const data = sortedKeys?.map(programme => [programme, dataProgrammeStats[programme]])
+      const groupIndices = plotLinePlaces.length > 0 ? plotLinePlaces.map(val => val[0]) : []
       for (let yearIdx = 0; yearIdx < numbersOfYears; yearIdx++) {
-        const yearlySortedKeys = data
-          .sort((a, b) => {
-            if (sortDir === -1) return a[1][yearIdx][columnIndex] - b[1][yearIdx][columnIndex]
-            return b[1][yearIdx][columnIndex] - a[1][yearIdx][columnIndex]
-          })
-          .map(yearlyProgrammes => yearlyProgrammes[0])
+        let yearlySortedKeys = []
+        if (groupIndices.length > 0) {
+          for (let i = 0; i < groupIndices.length; i++) {
+            const ending = i === groupIndices.length - 1 ? data.length : groupIndices[i + 1]
+            yearlySortedKeys = [
+              ...yearlySortedKeys,
+              ...data
+                .slice(groupIndices[i], ending)
+                .sort((a, b) => {
+                  if (sortDir === -1) return a[1][yearIdx][columnIndex] - b[1][yearIdx][columnIndex]
+                  return b[1][yearIdx][columnIndex] - a[1][yearIdx][columnIndex]
+                })
+                .map(yearlyProgrammes => yearlyProgrammes[0]),
+            ]
+          }
+        } else {
+          yearlySortedKeys = data
+            .sort((a, b) => {
+              if (sortDir === -1) return a[1][yearIdx][columnIndex] - b[1][yearIdx][columnIndex]
+              return b[1][yearIdx][columnIndex] - a[1][yearIdx][columnIndex]
+            })
+            .map(yearlyProgrammes => yearlyProgrammes[0])
+        }
         keys[yearIdx] = yearlySortedKeys
       }
     }
