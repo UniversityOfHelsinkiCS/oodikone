@@ -1,5 +1,5 @@
 /* eslint-disable babel/no-invalid-this, class-methods-use-this */
-import React, { Component, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { func, shape, object, bool, arrayOf } from 'prop-types'
 import { Form, Button } from 'semantic-ui-react'
@@ -41,84 +41,37 @@ const PopulationsQueryTSA = ({ programmeCode, unitData }) => {
   return null
 }
 
-class PopulationSearchHistory extends Component {
-  static propTypes = {
-    removePopulation: func.isRequired,
-    populations: shape({
-      pending: bool,
-      error: bool,
-      data: shape({}),
-      query: object,
-    }).isRequired,
-    units: object, // eslint-disable-line
-    tags: arrayOf(shape({})).isRequired,
-    history: shape({}).isRequired,
-  }
+const getMonths = (year, term) => {
+  const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
+  return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
+}
 
-  constructor() {
-    super()
-    this.state = {
-      showAdvancedSettings: false,
-      query: {
-        studentStatuses: [],
-        semesters: ['FALL', 'SPRING'],
-        months: 0,
-      },
+const PopulationSearchHistory = props => {
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
+  const [semesters, setSemesters] = useState(
+    props.populations.query?.semesters ? props.populations.query?.semesters : ['FALL', 'SPRING']
+  )
+  const [studentStatuses, setStudentStatus] = useState(
+    props.populations.query?.studentStatuses ? props.populations.query?.studentStatuses : []
+  )
+  const [months, setMonths] = useState(props.populations.query?.months ? props.populations.query?.months : 0)
+
+  const handleSemesterSelection = (e, { value }) => {
+    const newSemesters = semesters.includes(value) ? semesters.filter(s => s !== value) : [...semesters, value]
+    if (!props.populations.query.tag) {
+      setSemesters(newSemesters)
+      setMonths(getMonths(props.populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'))
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { query } = this.state
-    if (nextProps.populations.query) {
-      this.setState({
-        query: {
-          ...query,
-          months: nextProps.populations.query.months,
-          year: nextProps.populations.query.year,
-          semesters: nextProps.populations.query.semesters,
-          studentStatuses: nextProps.populations.query.studentStatuses || [],
-        },
-      })
-    }
+  const handleStudentStatusSelection = (e, { value }) => {
+    setStudentStatus(
+      studentStatuses.includes(value) ? studentStatuses.filter(s => s !== value) : [...studentStatuses, value]
+    )
   }
 
-  months = (year, term) => {
-    const start = term === 'FALL' ? `${year}-08-01` : moment(`${year}-01-01`).add(1, 'years')
-    return Math.ceil(moment.duration(moment().diff(moment(start))).asMonths())
-  }
-
-  handleSemesterSelection = (e, { value }) => {
-    const { query } = this.state
-    const semesters = query.semesters.includes(value)
-      ? query.semesters.filter(s => s !== value)
-      : [...query.semesters, value]
-    if (!query.tag) {
-      this.setState({
-        query: {
-          ...query,
-          semesters,
-          months: this.months(this.props.populations.query.year, semesters.includes('FALL') ? 'FALL' : 'SPRING'),
-        },
-      })
-    }
-  }
-
-  handleStudentStatusSelection = (e, { value }) => {
-    const { query } = this.state
-    const studentStatuses = query.studentStatuses.includes(value)
-      ? query.studentStatuses.filter(s => s !== value)
-      : [...query.studentStatuses, value]
-    this.setState({
-      query: {
-        ...query,
-        studentStatuses,
-      },
-    })
-  }
-
-  pushQueryToUrl = () => {
-    const { studyRights, tag, years } = this.props.populations.query
-    const { studentStatuses, semesters, months, year } = this.state.query
+  const pushQueryToUrl = () => {
+    const { studyRights, tag, year } = props.populations.query
 
     const queryObject = {
       tag,
@@ -127,22 +80,18 @@ class PopulationSearchHistory extends Component {
       studentStatuses,
       semesters,
       studyRights: JSON.stringify(studyRights),
-      years,
     }
     const searchString = qs.stringify(queryObject)
-
-    this.props.history.push({ search: searchString })
+    props.history.push({ search: searchString })
   }
 
-  removePopulation = uuid => this.props.removePopulation(uuid)
+  const removeThisPopulation = uuid => props.removePopulation(uuid)
 
-  renderAdvancedSettingsSelector = () => {
-    if (!this.state.showAdvancedSettings) {
+  const renderAdvancedSettingsSelector = () => {
+    if (!showAdvancedSettings) {
       return null
     }
-    const { query } = this.state
-    const { populations } = this.props
-    const { semesters, studentStatuses } = query
+    const { populations } = props
 
     return (
       <Form.Group style={{ flexDirection: 'column' }}>
@@ -156,7 +105,7 @@ class PopulationSearchHistory extends Component {
               value="FALL"
               name="semesterGroup"
               checked={semesters.includes('FALL')}
-              onChange={this.handleSemesterSelection}
+              onChange={handleSemesterSelection}
               data-cy="toggle-fall"
             />
             <Form.Checkbox
@@ -166,22 +115,22 @@ class PopulationSearchHistory extends Component {
               value="SPRING"
               name="semesterGroup"
               checked={semesters.includes('SPRING')}
-              onChange={this.handleSemesterSelection}
+              onChange={handleSemesterSelection}
               data-cy="toggle-spring"
             />
           </Form.Field>
         ) : null}
         <Form.Field style={{ marginTop: '15px' }}>
           <b>Include</b>
-          {/* Hide buggy options for now */}
-          {/* <Form.Checkbox
+          {/* Investigate why not working 
+            <Form.Checkbox
             className="populationStatisticsRadio"
             key="EXCHANGE"
             label="Exchange students"
             value="EXCHANGE"
             name="studentStatusGroup"
             checked={studentStatuses.includes('EXCHANGE')}
-            onChange={this.handleStudentStatusSelection}
+            onChange={handleStudentStatusSelection}
           />
           <Form.Checkbox
             className="populationStatisticsRadio"
@@ -190,7 +139,7 @@ class PopulationSearchHistory extends Component {
             value="NONDEGREE"
             name="studentStatusGroup"
             checked={studentStatuses.includes('NONDEGREE')}
-            onChange={this.handleStudentStatusSelection}
+            onChange={handleStudentStatusSelection}
           /> */}
           <Form.Checkbox
             className="populationStatisticsRadio"
@@ -199,11 +148,11 @@ class PopulationSearchHistory extends Component {
             value="TRANSFERRED"
             name="studentStatusGroup"
             checked={studentStatuses.includes('TRANSFERRED')}
-            onChange={this.handleStudentStatusSelection}
+            onChange={handleStudentStatusSelection}
           />
         </Form.Field>
         <Form.Field style={{ marginTop: '15px' }}>
-          <Button type="button" onClick={this.pushQueryToUrl}>
+          <Button type="button" onClick={pushQueryToUrl}>
             Fetch class with new settings
           </Button>
         </Form.Field>
@@ -211,9 +160,8 @@ class PopulationSearchHistory extends Component {
     )
   }
 
-  renderQueryCards = () => {
-    const { populations, units, tags } = this.props
-    const { showAdvancedSettings } = this.state
+  const renderQueryCards = () => {
+    const { populations, units, tags } = props
     const { Advanced, QueryCard } = infotooltips.PopulationStatistics
 
     if (!units.data.programmes || !populations.query || !populations.data.students) {
@@ -232,7 +180,7 @@ class PopulationSearchHistory extends Component {
             query={populations.query}
             queryId={0}
             units={[units.data.programmes[programmeCode], units.data.studyTracks[studyTrackCode]].filter(Boolean)}
-            removeSampleFn={this.removePopulation}
+            removeSampleFn={removeThisPopulation}
             updating={populations.updating}
             tags={tags}
           />
@@ -247,23 +195,32 @@ class PopulationSearchHistory extends Component {
                 data-cy="advanced-toggle"
                 toggle
                 checked={showAdvancedSettings}
-                onClick={() => {
-                  this.setState({ showAdvancedSettings: !showAdvancedSettings })
-                }}
+                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
                 label="Advanced settings"
               />
             </Form.Field>
           </Form.Group>
-          <div>{this.renderAdvancedSettingsSelector()}</div>
+          <div>{renderAdvancedSettingsSelector()}</div>
           <div>{showAdvancedSettings ? <InfoBox content={Advanced} /> : <FilterActiveNote />}</div>
         </div>
       </div>
     )
   }
 
-  render() {
-    return <div className="historyContainer">{this.renderQueryCards()}</div>
-  }
+  return <div className="historyContainer">{renderQueryCards()}</div>
+}
+
+PopulationSearchHistory.propTypes = {
+  removePopulation: func.isRequired,
+  populations: shape({
+    pending: bool,
+    error: bool,
+    data: shape({}),
+    query: object,
+  }).isRequired,
+  units: object, // eslint-disable-line
+  tags: arrayOf(shape({})).isRequired,
+  history: shape({}).isRequired,
 }
 
 const mapStateToProps = ({ populations, populationProgrammes, tags }) => ({

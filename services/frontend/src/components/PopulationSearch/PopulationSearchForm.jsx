@@ -132,9 +132,6 @@ const PopulationSearchForm = props => {
       setState({ query: initialQuery() })
       props.getProgrammes()
     }
-    /* if (!semesters.years) {
-      props.getSemesters()
-    } */
     if (location.search) {
       fetchPopulationFromUrlParams()
     }

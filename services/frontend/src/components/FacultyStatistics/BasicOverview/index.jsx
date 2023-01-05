@@ -128,6 +128,26 @@ const Overview = ({
     transferShortTitles = ['Code', 'Started', 'Graduated']
   }
 
+  const getChartPlotLinePlaces = programmeKeys => {
+    const plotLinePlaces = []
+    for (let i = 0; i < programmeKeys.length - 1; i++) {
+      if (
+        (programmeKeys[i][1].startsWith('KH') && programmeKeys[i + 1][1].startsWith('MH')) ||
+        (programmeKeys[i][1].startsWith('MH') && programmeKeys[i + 1][1].startsWith('KH')) ||
+        (programmeKeys[i][1].startsWith('MH') && programmeKeys[i + 1][1].startsWith('T')) ||
+        ((programmeKeys[i][1].startsWith('T') || programmeKeys[i][1].startsWith('LIS')) &&
+          (programmeKeys[i + 1][1].startsWith('KH') || programmeKeys[i + 1][1].startsWith('MH'))) ||
+        ((programmeKeys[i][1].startsWith('T') ||
+          programmeKeys[i][1].startsWith('LIS') ||
+          programmeKeys[i][1].startsWith('KH') ||
+          programmeKeys[i][1].startsWith('MH')) &&
+          programmeKeys[i + 1][1].startsWith('K-'))
+      ) {
+        plotLinePlaces.push(i)
+      }
+    }
+    return plotLinePlaces
+  }
   return (
     <div className="faculty-overview">
       <div className="toggle-container">
@@ -199,8 +219,18 @@ const Overview = ({
                       Object.keys(basics?.data?.studentInfo.programmeTableStats).map(obj => [
                         obj,
                         basics?.data?.programmeNames[obj].code,
-                      ])
+                      ]),
+                      faculty.code
                     ).map(listObj => listObj[0])}
+                    plotLinePlaces={getChartPlotLinePlaces(
+                      sortProgrammeKeys(
+                        Object.keys(basics?.data?.studentInfo.programmeTableStats).map(obj => [
+                          obj,
+                          basics?.data?.programmeNames[obj].code,
+                        ]),
+                        faculty.code
+                      )
+                    )}
                     titles={basics?.data?.studentInfo.titles}
                     sliceStart={1}
                     language={language}
@@ -240,8 +270,18 @@ const Overview = ({
                       Object.keys(credits?.data.programmeTableStats).map(obj => [
                         obj,
                         credits?.data?.programmeNames[obj].code,
-                      ])
+                      ]),
+                      faculty.code
                     ).map(listObj => listObj[0])}
+                    plotLinePlaces={getChartPlotLinePlaces(
+                      sortProgrammeKeys(
+                        Object.keys(credits?.data?.programmeTableStats).map(obj => [
+                          obj,
+                          credits?.data?.programmeNames[obj].code,
+                        ]),
+                        faculty.code
+                      )
+                    )}
                     titles={credits?.data?.titles}
                     extraHeight="EXTRA HEIGHT"
                     sliceStart={2}
@@ -280,8 +320,18 @@ const Overview = ({
                       Object.keys(basics?.data?.graduationInfo.programmeTableStats).map(obj => [
                         obj,
                         basics?.data?.programmeNames[obj].code,
-                      ])
+                      ]),
+                      faculty.code
                     ).map(listObj => listObj[0])}
+                    plotLinePlaces={getChartPlotLinePlaces(
+                      sortProgrammeKeys(
+                        Object.keys(basics?.data?.graduationInfo.programmeTableStats).map(obj => [
+                          obj,
+                          basics?.data?.programmeNames[obj].code,
+                        ]),
+                        faculty.code
+                      )
+                    )}
                     titles={basics?.data?.graduationInfo.titles}
                     sliceStart={2}
                     language={language}
@@ -318,8 +368,18 @@ const Overview = ({
                       Object.keys(thesisWriters?.data.programmeTableStats).map(obj => [
                         obj,
                         thesisWriters?.data?.programmeNames[obj].code,
-                      ])
+                      ]),
+                      faculty.code
                     ).map(listObj => listObj[0])}
+                    plotLinePlaces={getChartPlotLinePlaces(
+                      sortProgrammeKeys(
+                        Object.keys(thesisWriters?.data?.programmeTableStats).map(obj => [
+                          obj,
+                          thesisWriters?.data?.programmeNames[obj].code,
+                        ]),
+                        faculty.code
+                      )
+                    )}
                     titles={thesisWriters?.data?.titles}
                     sliceStart={2}
                     extraHeight="EXTRA HEIGHT"

@@ -9,7 +9,6 @@ const {
   getYearsObject,
   getYearsArray,
   getMedian,
-  getMean,
   getStartDate,
   getThesisType,
   alltimeStartDate,
@@ -125,28 +124,21 @@ const getGraduationTimeStats = async ({ studyprogramme, since, years, isAcademic
   }
 
   const goal = getGoal(studyprogramme)
-  const times = { medians: [], means: [], goal }
-  const comboTimes = { medians: [], means: [], goal: goal + 36 }
+  const times = { medians: [], goal }
+  const comboTimes = { medians: [], goal: goal + 36 }
 
   const rev = [...years].reverse()
   for (const year of rev) {
     const median = getMedian(graduationTimes[year])
-    const mean = getMean(graduationTimes[year])
     const statistics = countTimeCategories(graduationTimes[year], goal)
     times.medians = [...times.medians, { y: median, amount: graduationAmounts[year], name: year, statistics }]
-    times.means = [...times.means, { y: mean, amount: graduationAmounts[year], name: year, statistics }]
 
     if (doCombo) {
       const median = getMedian(graduationTimesCombo[year])
-      const mean = getMean(graduationTimesCombo[year])
       const statistics = countTimeCategories(graduationTimesCombo[year], goal + 36)
       comboTimes.medians = [
         ...comboTimes.medians,
         { y: median, amount: graduationAmountsCombo[year], name: year, statistics },
-      ]
-      comboTimes.means = [
-        ...comboTimes.means,
-        { y: mean, amount: graduationAmountsCombo[year], name: year, statistics },
       ]
     }
   }

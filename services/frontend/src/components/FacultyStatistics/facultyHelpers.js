@@ -27,10 +27,16 @@ const testKey = value => {
   return 6
 }
 
-const sortProgrammeKeys = programmeKeys => {
+const sortProgrammeKeys = (programmeKeys, faculty) => {
   try {
     return programmeKeys.sort((a, b) => {
-      if (testKey(a[1]) - testKey(b[1]) === 0 && testKey(a[0]) - testKey(b[0])) {
+      if (a[1].includes(faculty) && !b[1].includes(faculty)) return -1
+      if (!a[1].includes(faculty) && b[1].includes(faculty)) return 1
+      if (a[1].startsWith('T') && !b[1].includes(faculty)) return -1
+      if (!a[1].includes(faculty) && b[1].startsWith('T')) return 1
+      if (a[1].startsWith('LIS') && !b[1].includes(faculty)) return -1
+      if (!a[1].includes(faculty) && b[1].startsWith('LIS')) return 1
+      if (testKey(a[1]) - testKey(b[1]) === 0 && testKey(a[0]) - testKey(b[0]) === 0) {
         return a[1].localeCompare(b[1])
       }
       if (testKey(a[1]) - testKey(b[1]) === 0) {
