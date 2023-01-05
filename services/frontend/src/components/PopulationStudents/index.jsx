@@ -239,12 +239,18 @@ const CoursesTable = ({ students }) => {
               textTitle: m.code,
               vertical: true,
               forceToolsMode: 'dangling',
-              cellProps: {
-                title: `${m.code}, ${getTextIn(m.name)}`,
-                style: {
-                  verticalAlign: 'middle',
-                  textAlign: 'center',
-                },
+              cellProps: s => {
+                const studentGrade = s.courses
+                  ? `\nGrade: ${s.courses.find(course => course.course_code === m.code)?.grade}`
+                  : null
+                const studentCode = s.studentNumber ? `\nStudent number:  ${s.studentNumber}` : ``
+                return {
+                  title: `${m.code}, ${getTextIn(m.name)}${studentCode} ${studentGrade}`,
+                  style: {
+                    verticalAlign: 'middle',
+                    textAlign: 'center',
+                  },
+                }
               },
               headerProps: { title: `${m.code}, ${getTextIn(m.name)}` },
               getRowVal: s => {

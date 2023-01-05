@@ -575,7 +575,7 @@ const createHeaders = (columns, columnDepth, dispatch) => {
     const [column] = stack.splice(0, 1)
 
     if (column.parent?.mergeHeader) {
-      continue; // eslint-disable-line
+      continue // eslint-disable-line
     }
 
     const currentDepth = column.depth ?? 0
