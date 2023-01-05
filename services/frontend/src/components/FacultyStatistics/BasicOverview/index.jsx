@@ -137,6 +137,7 @@ const Overview = ({
   }
 
   const getChartPlotLinePlaces = programmeKeys => {
+    if (programmeKeys.length === 0) return []
     let key = programmeKeys[0][1].slice(0, 2)
     if (!['KH', 'MH', 'T', 'LIS'].includes(key)) {
       key = 'OTHER'
