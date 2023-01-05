@@ -100,7 +100,8 @@ const FacultyProgrammeOverview = ({
                     Object.keys(studentStats?.data.programmeStats).map(obj => [
                       obj,
                       studentStats?.data?.programmeNames[obj].code,
-                    ])
+                    ]),
+                    faculty.code
                   ).map(listObj => listObj[0])}
                   language={language}
                   cypress="FacultyStudentStatsTable"
@@ -139,7 +140,8 @@ const FacultyProgrammeOverview = ({
                       Object.keys(progressStats?.data.bachelorsProgStats).map(obj => [
                         obj,
                         progressStats?.data?.programmeNames[obj].code,
-                      ])
+                      ]),
+                      faculty.code
                     ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
@@ -170,7 +172,8 @@ const FacultyProgrammeOverview = ({
                       Object.keys(progressStats?.data.bcMsProgStats).map(obj => [
                         obj,
                         progressStats?.data?.programmeNames[obj].code,
-                      ])
+                      ]),
+                      faculty.code
                     ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
@@ -203,7 +206,8 @@ const FacultyProgrammeOverview = ({
                           Object.keys(progressStats?.data.mastersProgStats).map(obj => [
                             obj,
                             progressStats?.data?.programmeNames[obj].code,
-                          ])
+                          ]),
+                          faculty.code
                         ).map(listObj => listObj[0])}
                         progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                         programmeNames={progressStats?.data.programmeNames}
@@ -236,7 +240,8 @@ const FacultyProgrammeOverview = ({
                       Object.keys(progressStats?.data.doctoralProgStats).map(obj => [
                         obj,
                         progressStats?.data?.programmeNames[obj].code,
-                      ])
+                      ]),
+                      faculty.code
                     ).map(listObj => listObj[0])}
                     progressYearsVisible={Array(progressStats?.data.years.slice(1).length).fill(false)}
                     programmeNames={progressStats?.data.programmeNames}
