@@ -11,7 +11,6 @@ const BarChart = ({
   label,
   programmeNames,
   language = null,
-  showMeanTime,
   classSizes,
   level,
   goalExceptions,
@@ -69,9 +68,7 @@ const BarChart = ({
       label === 'Start year'
         ? `<b>From class of ${facultyGraph ? name : year}, ${amount}/${getClassSize(code)} students have graduated</b>`
         : `<b>${amount} students graduated in year ${facultyGraph ? name : year}</b>`
-    const timeText = `<br /><p>${sortingText}, <br /><b>${
-      showMeanTime ? 'mean' : 'median'
-    } study time: ${y} months</p></b>`
+    const timeText = `<br /><p>${sortingText}, <br /><b> median study time: ${y} months</p></b>`
     const statisticsText = `<br /><p>${statistics.onTime} graduated on time</p><br />
         <p>${statistics.yearOver} graduated max year overtime</p>
         <br /><p>${statistics.wayOver} graduated over year late</p>`
@@ -96,6 +93,7 @@ const BarChart = ({
     tooltip: {
       backgroundColor: 'white',
       fontSize: '25px',
+      // outside: true,
       // eslint-disable-next-line
       formatter: function() {
         return getTooltipText(

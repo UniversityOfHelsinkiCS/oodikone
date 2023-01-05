@@ -5,7 +5,7 @@ const { getAcademicYearDates } = require('../../util/semester')
 const { getStudyRightsByExtent, getStudentsByStudentnumbers, getTransfers } = require('./faculty')
 const { getCurrentSemester } = require('../semesters')
 const { checkTransfers } = require('./facultyHelpers')
-
+const { inactiveStudyrights, absentStudents } = require('../studyprogramme')
 const emptyTotals = () => {
   return {
     total: 0,
@@ -21,10 +21,8 @@ const emptyTotals = () => {
     allOtherCountries: 0,
   }
 }
-
-const addTotals = (facultyTableStats, year, totals) => {
-  facultyTableStats[year] = [
-    year,
+const toltalsCalculation = totals => {
+  return [
     totals.total,
     totals.allStarted,
     getPercentage(totals.allStarted, totals.total),
@@ -48,30 +46,11 @@ const addTotals = (facultyTableStats, year, totals) => {
     getPercentage(totals.allOtherCountries, totals.total),
   ]
 }
+const addTotals = (facultyTableStats, year, totals) => {
+  facultyTableStats[year] = [year, ...toltalsCalculation(totals)]
+}
 const addTotalsProgramme = (programmeTableStats, progId, year, totals) => {
-  programmeTableStats[progId][year] = [
-    totals.total,
-    totals.allStarted,
-    getPercentage(totals.allStarted, totals.total),
-    totals.allEnrolled,
-    getPercentage(totals.allEnrolled, totals.total),
-    totals.allAbsent,
-    getPercentage(totals.allAbsent, totals.total),
-    totals.allInactive,
-    getPercentage(totals.allInactive, totals.total),
-    totals.allGraduated,
-    getPercentage(totals.allGraduated, totals.total),
-    totals.allMale,
-    getPercentage(totals.allMale, totals.total),
-    totals.allFemale,
-    getPercentage(totals.allFemale, totals.total),
-    totals.allOtherUnknown,
-    getPercentage(totals.allOtherUnknown, totals.total),
-    totals.allFinnish,
-    getPercentage(totals.allFinnish, totals.total),
-    totals.allOtherCountries,
-    getPercentage(totals.allOtherCountries, totals.total),
-  ]
+  programmeTableStats[progId][year] = toltalsCalculation(totals)
 }
 
 const getStudentData = (students, facultyExtra, year, code) => {
@@ -169,17 +148,9 @@ const getFacultyDataForYear = async ({
     const students = await getStudentsByStudentnumbers(allStudents)
     const studentData = getStudentData(students, facultyExtra, year, code)
     const started = await getStudentsByStudentnumbers(studentNbrs)
-
-    const inactive = studyrights.filter(
-      s => s.graduated === 0 && (s.active === 0 || (s.enddate && moment(s.enddate).isBefore(moment(new Date()))))
-    )
+    const inactive = await inactiveStudyrights(code, studentNbrs)
     const graduatedStudents = studyrights.filter(sr => sr.graduated === 1)
-    const graduatedStudentNbrs = graduatedStudents.map(sr => sr.studentnumber)
-    const absent = students.filter(
-      s =>
-        !graduatedStudentNbrs.includes(s.studentnumber) &&
-        s.semesters.filter(semester => semester.semestercode === currentSemester.semestercode)[0]?.enrollmenttype === 2
-    )
+    const absent = await absentStudents(code, studentNbrs)
     const enrolled = students.filter(
       s =>
         s.semesters.filter(semester => semester.semestercode === currentSemester.semestercode)[0]?.enrollmenttype === 1

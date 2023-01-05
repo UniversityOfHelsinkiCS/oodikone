@@ -2,7 +2,7 @@
 import React from 'react'
 import ReactHighcharts from 'react-highcharts'
 
-const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, programmeNames, language = null }) => {
+const BarChart = ({ data, title, byStartYear = false }) => {
   const statData = [
     { name: 'On time', color: '#90A959', data: [] },
     { name: 'Max. year overtime', color: '#FEE191', data: [] },
@@ -10,7 +10,6 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
   ]
 
   let categories = []
-  const codeMap = {}
 
   // eslint-disable-next-line no-restricted-syntax
   for (const item of data) {
@@ -18,9 +17,6 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
     statData[1].data = [...statData[1].data, item.statistics.yearOver]
     statData[2].data = [...statData[2].data, item.statistics.wayOver]
     categories = [...categories, item.name]
-    if (!facultyGraph) {
-      codeMap[item.name || item.code] = item.code
-    }
   }
 
   const getHeight = () => {
@@ -28,14 +24,8 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
     return data.length * t + 100
   }
 
-  const getTooltipText = (programmeId, seriesName, amount) => {
-    if (!facultyGraph) {
-      const code = codeMap[programmeId]
-      return `<b>${
-        programmeNames[code]?.[language] ? programmeNames[code]?.[language] : programmeNames[code]?.fi
-      }</b><br />${code}<br /><b>${seriesName}</b>: ${amount}`
-    }
-    return `<b>${seriesName}</b>: ${amount}`
+  const getTooltipText = (seriesName, amount) => {
+    return `<b>Graduated ${seriesName}</b>: ${amount} ${amount === 1 ? 'student' : 'students'}`
   }
 
   const config = {
@@ -44,7 +34,7 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
       height: getHeight(),
       margin: [70, 0],
     },
-    title: { text: ' ' },
+    title: { text: title },
     series: statData,
     tooltip: {
       backgroundColor: 'white',
@@ -52,14 +42,14 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
       // outside: true,
       // eslint-disable-next-line
       formatter: function() {
-        return getTooltipText(this.x, this.series.name, this.y)
+        return getTooltipText(this.series.name, this.y)
       },
     },
     xAxis: {
       type: 'category',
       categories,
       title: {
-        text: facultyGraph ? label : 'Programme',
+        text: byStartYear ? 'Start year' : 'Graduation year',
         align: 'high',
         offset: 0,
         rotation: 0,
@@ -97,20 +87,12 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
       series: {
         pointWidth: data.length > 8 ? 16 : 20,
         groupPadding: 0.15,
-        point: {
-          events: {
-            click(e) {
-              handleClick(e, facultyGraph, categories[this.x])
-            },
-          },
-        },
       },
     },
   }
-  if (!facultyGraph) config.title.text = `Year ${year} by ${label.toLowerCase()}`
 
   return (
-    <div className={`${facultyGraph ? 'faculty' : 'programmes'}-breakdown-graph`}>
+    <div className={`graduation-times-graph${title.split(' ')[0]}`}>
       <ReactHighcharts config={config} />
     </div>
   )

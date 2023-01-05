@@ -73,7 +73,7 @@ export default {
 
   **Median time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
 
-  **Mean time**: Näyttää kyseisenä vuonna valmistuneiden opiskelijoiden opintojen keston **keskiarvon** kuukausina.`,
+  **Breakdown**: Näyttää, kuinka moni opiskelija valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.`,
 
   // Faculty Student population
   GraduatedToggle: `

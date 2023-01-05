@@ -11,16 +11,17 @@ const {
 } = require('./shared')
 
 // Keeping previous oodi logic:
-// 0 = Not known
-// 1 = Male
-// 2 = Female
-// 3 = Other
+// 0 = Not known 'urn:code:gender:not-known'
+// 1 = Male 'urn:code:gender:male'
+// 2 = Female 'urn:code:gender:female'
+// 3 = Other "urn:code:gender:other"
 // Oodi also had 9 = Määrittelemätön, but Sis doesn't have this data
 const parseGender = gender_urn => {
-  if (!gender_urn) return 0
-  if (gender_urn === 'urn:code:gender:male') return 1
-  if (gender_urn === 'urn:code:gender:female') return 2
-  return 3
+  if (gender_urn === 'urn:code:gender:not-known') return '0'
+  if (gender_urn === 'urn:code:gender:male') return '1'
+  if (gender_urn === 'urn:code:gender:female') return '2'
+  if (gender_urn === 'urn:code:gender:other') return '3'
+  return '0'
 }
 
 // "Included and substituted study modules" are not real study modules and the credits must be counted in student's total credits, etc

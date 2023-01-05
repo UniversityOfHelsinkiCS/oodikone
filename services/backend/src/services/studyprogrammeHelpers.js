@@ -1,4 +1,3 @@
-const { mean } = require('lodash')
 const { studentnumbersWithAllStudyrightElements } = require('./populations')
 const { codes } = require('../../config/programmeCodes')
 
@@ -170,11 +169,6 @@ const getMedian = values => {
   const half = Math.floor(values.length / 2)
   if (values.length % 2) return values[half]
   return (values[half - 1] + values[half]) / 2.0
-}
-
-const getMean = values => {
-  if (values.length === 0) return 0
-  return Math.round(mean(values))
 }
 
 const defineYear = (date, isAcademicYear) => {
@@ -543,7 +537,6 @@ module.exports = {
   isMajorStudentCredit,
   isSpecialGroupCredit,
   getMedian,
-  getMean,
   defineYear,
   getStartDate,
   alltimeStartDate,

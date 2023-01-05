@@ -219,6 +219,7 @@ const combineFacultyCredits = async (faculty, programmes, allProgrammes, yearTyp
 
   const progCodes = allProgrammes.map(p => p.code)
   for (const prog of programmes) {
+    if (prog.code === 'MH70_008_2') continue
     const data = await getProgrammeCredits(prog.code, yearType, specialGroups, progCodes)
     if (data) {
       allCredits.programmeNames[prog.progId] = { code: prog.code, ...prog.name }
