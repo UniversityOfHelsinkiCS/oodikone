@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import PopulationLink from 'components/StudyProgramme/StudytrackOverview/PopulationLink'
 import React, { useState } from 'react'
-import { Table, Button, Icon, Label } from 'semantic-ui-react'
+import { Table, Button, Icon, Label, Popup } from 'semantic-ui-react'
 import Toggle from '../../StudyProgramme/Toggle'
 
 const getStyle = idx => {
@@ -10,6 +10,21 @@ const getStyle = idx => {
   if (idx === 18) return { borderLeftWidth: 'thick' }
   return {}
 }
+
+const getTitlePopup = idx => {
+  if (idx === 0) return <p>All</p>
+  if ([1, 2].includes(idx)) return <p>Started studying</p>
+  if ([3, 4].includes(idx)) return <p>Currently enrolled</p>
+  if ([5, 6].includes(idx)) return <p>Absent</p>
+  if ([7, 8].includes(idx)) return <p>Inactive</p>
+  if ([9, 10].includes(idx)) return <p>Graduated</p>
+  if ([11, 12].includes(idx)) return <p>Men</p>
+  if ([13, 14].includes(idx)) return <p>Women</p>
+  if ([15, 16].includes(idx)) return <p>Other/Unknown</p>
+  if ([17, 18].includes(idx)) return <p>Finnish</p>
+  return <p>Other</p>
+}
+
 const FacultyStudentDataTable = ({
   tableStats,
   programmeStats,
@@ -29,6 +44,16 @@ const FacultyStudentDataTable = ({
     setVisible(arrayToModify)
   }
 
+  const getProgrammeCode = programme => {
+    return programme === programmeNames[programme].code ? (
+      <b>{programme}</b>
+    ) : (
+      <b>
+        {programme} - {programmeNames[programme].code}
+      </b>
+    )
+  }
+
   return (
     <div className="datatable">
       <Toggle
@@ -40,7 +65,7 @@ const FacultyStudentDataTable = ({
       />
       <Table data-cy={cypress} celled structured>
         <Table.Header>
-          <Table.Row>
+          <Table.Row key="FirstHeader">
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />
             <Table.HeaderCell colSpan={!showPercentages ? 4 : 8} style={{ borderLeftWidth: 'thick' }}>
               Status
@@ -52,9 +77,7 @@ const FacultyStudentDataTable = ({
               Country
             </Table.HeaderCell>
           </Table.Row>
-        </Table.Header>
-        <Table.Header>
-          <Table.Row>
+          <Table.Row key="secondHeader">
             {titles.map((title, index) => (
               <Table.HeaderCell
                 key={title}
@@ -80,6 +103,7 @@ const FacultyStudentDataTable = ({
                       return (
                         <Table.Cell key={`${year}-faculty-cell}`}>
                           <Button
+                            key={`${year}-studentsTableButton}`}
                             as="div"
                             onClick={() => toggleVisibility(yearIndex)}
                             labelPosition="right"
@@ -112,13 +136,14 @@ const FacultyStudentDataTable = ({
                     return (
                       <Table.Row className="regular-row" key={`${year}-regular-row-${programme}`}>
                         <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={`${year}-${programme}`}>
-                          <b>
-                            {programme} - {programmeNames[programme].code}
-                            <br />
-                            {programmeNames[programme][language]
-                              ? programmeNames[programme][language]
-                              : programmeNames[programme].fi}
-                          </b>
+                          <Popup
+                            content={
+                              programmeNames[programme][language]
+                                ? programmeNames[programme][language]
+                                : programmeNames[programme].fi
+                            }
+                            trigger={getProgrammeCode(programme)}
+                          />
                           {(requiredRights.rights?.includes(programmeNames[programme].code) ||
                             requiredRights.isAdmin ||
                             requiredRights.IAMrights?.includes(programmeNames[programme].code)) && (
@@ -133,9 +158,14 @@ const FacultyStudentDataTable = ({
                           )
                             return null
                           return (
-                            <Table.Cell key={`${year}-${programme}-color-${valIdx}`} style={getStyle(valIdx + 1)}>
-                              {value}
-                            </Table.Cell>
+                            <Popup
+                              content={getTitlePopup(valIdx)}
+                              trigger={
+                                <Table.Cell key={`${year}-${programme}-color-${valIdx}`} style={getStyle(valIdx + 1)}>
+                                  {value}
+                                </Table.Cell>
+                              }
+                            />
                           )
                         })}
                       </Table.Row>
