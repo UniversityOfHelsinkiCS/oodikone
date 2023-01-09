@@ -153,6 +153,12 @@ describe('Faculty overview', () => {
 
     it('Graphs display data', () => {
       cy.get('[data-cy="Section-bachelor"]').within(() => {
+        cy.get('div[class="faculty-breakdown-graph"]')
+      })
+
+      cy.get('[data-cy="GraduationTimeToggle"]').click()
+
+      cy.get('[data-cy="Section-bachelor"]').within(() => {
         cy.get('div[class="faculty-graph"]')
         cy.contains('1 graduated').should('have.length', 1)
         cy.contains('1 graduated').trigger('mouseover')
@@ -194,6 +200,7 @@ describe('Faculty overview', () => {
     })
 
     it('Graduation times grouping and time types can be toggled', () => {
+      cy.get('[data-cy="GraduationTimeToggle"]').click()
       cy.get('[data-cy="GroupByToggle"]').click()
       cy.get('[data-cy="Section-bachelor"]').should('not.exist')
       cy.get('[data-cy="Section-master"]').should('be.visible')
