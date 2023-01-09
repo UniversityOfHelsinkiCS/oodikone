@@ -92,10 +92,19 @@ const CustomOpenUniSearch = ({ setValues, savedSearches, location, history }) =>
     const courseList = input.split(/[\s,]+/).map(code => code.trim().toUpperCase())
     const query = {
       courseCode: courseList,
-      startdate: moment(startdate).format('DD-MM-YYYY'),
-      enddate: moment(enddate).format('DD-MM-YYYY'),
+      startdate: moment(startdate).isValid()
+        ? moment(startdate).format('DD-MM-YYYY')
+        : moment('01-08-2017', 'DD-MM-YYYY').format('DD-MM-YYYY'),
+      enddate: moment(enddate).isValid() ? moment(enddate).format('DD-MM-YYYY') : moment().format('DD-MM-YYYY'),
     }
-    setValues({ courseList, startdate: startdate.toISOString(), enddate: enddate.toISOString() })
+
+    setValues({
+      courseList,
+      startdate: moment(startdate).isValid()
+        ? moment(startdate).toISOString()
+        : moment('01-08-2017', 'DD-MM-YYYY').toISOString(),
+      enddate: moment(enddate).isValid() ? moment(enddate).toISOString() : moment().toISOString(),
+    })
     pushQueryToUrl(query)
     handleClose()
   }
