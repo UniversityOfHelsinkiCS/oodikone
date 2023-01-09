@@ -180,6 +180,7 @@ const FacultyProgrammeOverview = ({
                     language={language}
                     cypress="FacultyBachelorMasterProgressTable"
                     progressTitles={progressStats?.data.yearlyBcMsTitles}
+                    needsExtra={faculty.code === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
                   />
                 </div>
               </div>
@@ -214,6 +215,7 @@ const FacultyProgrammeOverview = ({
                         language={language}
                         cypress="FacultyMastersProgressTable"
                         progressTitles={progressStats?.data.yearlyMasterTitles}
+                        needsExtra={faculty.code === 'H60' ? 'NO EXTRA' : 'EXTRA HEIGHT'}
                       />
                     </div>
                   </div>

@@ -13,6 +13,7 @@ const FacultyProgressTable = ({
   language,
   cypress,
   progressTitles,
+  needsExtra = 'NO EXTRA',
 }) => {
   const [visible, setVisible] = useState(progressYearsVisible)
   if (!data) return null
@@ -21,6 +22,7 @@ const FacultyProgressTable = ({
     arrayToModify[yearIndex] = !visible[yearIndex]
     setVisible(arrayToModify)
   }
+
   const lenOfYearArray = data.length - 1
   return (
     <div>
@@ -63,6 +65,7 @@ const FacultyProgressTable = ({
                       labels={sortedKeys}
                       language={language}
                       names={progressTitles ? progressTitles[yearIndex] : titles?.slice(2)}
+                      needsExtra={needsExtra === 'EXTRA HEIGHT'}
                     />
                   </Table.Cell>
                 </Table.Row>
