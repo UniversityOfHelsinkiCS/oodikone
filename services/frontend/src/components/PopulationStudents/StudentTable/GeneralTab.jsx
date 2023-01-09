@@ -236,7 +236,7 @@ const GeneralTab = ({
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
-  let creditColumnTitle = 'Since Start of Studyright'
+  let creditColumnTitle = 'Since Start of Programme'
 
   if (creditDateFilterOptions) {
     const { startDate, endDate } = creditDateFilterOptions
