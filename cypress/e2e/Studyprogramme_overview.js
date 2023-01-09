@@ -181,6 +181,8 @@ describe('Studyprogramme overview', () => {
         .should('contain', 25)
         .should('contain', 35)
 
+      cy.get('[data-cy=graduation-times-graph-breakdown]')
+      cy.get('[data-cy=GraduationTimeToggle]').click()
       cy.get('[data-cy=graduation-times-graph]').within(() => {
         cy.contains('Graduation year')
         cy.contains('2019')
@@ -206,6 +208,11 @@ describe('Studyprogramme overview', () => {
       // eslint-disable-next-line cypress/no-unnecessary-waiting
       cy.wait(5000)
       cy.contains('a', 'Kasvatustieteiden maisteriohjelma').click({ force: true })
+
+      cy.get('[data-cy=graduation-times-graph-breakdownMaster]')
+      cy.get('[data-cy=graduation-times-graph-breakdownBachelor]')
+
+      cy.get('[data-cy=GraduationTimeToggle]').click()
       cy.get('[data-cy=graduation-times-graphMaster]').within(() => {
         cy.contains('Graduation year')
         cy.contains('2020')
@@ -273,6 +280,9 @@ describe('Studyprogramme overview', () => {
         .should('contain', '4.1%') // The percentage for less than 15 credits in 2017-2018, to check that the graph renders
         .should('contain', '5.6%') // The percentage for 15-29 credits in 2018-2019
         .should('contain', '12.8%') // The percentage for less than 15 credits in 2019-2020
+
+      cy.get('[data-cy=graduation-times-graph-breakdown]')
+      cy.get('[data-cy=GraduationTimeToggle]').click()
 
       cy.get('[data-cy=graduation-times-graph]').within(() => {
         cy.contains('Start year')

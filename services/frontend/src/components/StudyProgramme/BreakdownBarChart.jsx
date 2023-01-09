@@ -92,7 +92,7 @@ const BarChart = ({ data, title, byStartYear = false }) => {
   }
 
   return (
-    <div className={`graduation-times-graph${title.split(' ')[0]}`}>
+    <div data-cy={`graduation-times-graph-breakdown${title.split(' ')[0]}`}>
       <ReactHighcharts config={config} />
     </div>
   )
