@@ -44,16 +44,6 @@ const FacultyStudentDataTable = ({
     setVisible(arrayToModify)
   }
 
-  const getProgrammeCode = programme => {
-    return programme === programmeNames[programme].code ? (
-      <b>{programme}</b>
-    ) : (
-      <b>
-        {programme} - {programmeNames[programme].code}
-      </b>
-    )
-  }
-
   return (
     <div className="datatable">
       <Toggle
@@ -138,11 +128,17 @@ const FacultyStudentDataTable = ({
                         <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={`${year}-${programme}`}>
                           <Popup
                             content={
-                              programmeNames[programme][language]
-                                ? programmeNames[programme][language]
-                                : programmeNames[programme].fi
+                              programmeNames[programme][language] ? (
+                                <p>
+                                  {programmeNames[programme].code} - {programmeNames[programme][language]}
+                                </p>
+                              ) : (
+                                <p>
+                                  {programmeNames[programme].code} - {programmeNames[programme].fi}
+                                </p>
+                              )
                             }
-                            trigger={getProgrammeCode(programme)}
+                            trigger={<b>{programme}</b>}
                           />
                           {(requiredRights.rights?.includes(programmeNames[programme].code) ||
                             requiredRights.isAdmin ||
