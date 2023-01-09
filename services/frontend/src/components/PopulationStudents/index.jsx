@@ -89,7 +89,28 @@ const CoursesTable = ({ students }) => {
   )
 
   const columns = useMemo(() => {
-    const nameColumns = [
+    const nameColumns = []
+
+    if (namesVisible) {
+      nameColumns.push(
+        {
+          key: 'lastname',
+          title: 'Last name',
+          getRowVal: s => (s.total ? null : s.lastname),
+          cellProps: { title: 'last name' },
+          child: true,
+        },
+        {
+          key: 'firstname',
+          title: 'Given names',
+          getRowVal: s => (s.total ? null : s.firstnames),
+          cellProps: { title: 'first names' },
+          child: true,
+        }
+      )
+    }
+
+    nameColumns.push(
       {
         key: 'studentnumber-parent',
         mergeHeader: true,
@@ -138,34 +159,8 @@ const CoursesTable = ({ students }) => {
             : totalMandatoryPassed(s.studentNumber),
         cellProps: { title: 'total passed' },
         child: true,
-      },
-    ]
-
-    if (namesVisible) {
-      nameColumns.push(
-        {
-          key: 'lastname',
-          title: 'Last name',
-          getRowVal: s => (s.total ? null : s.lastname),
-          cellProps: { title: 'last name' },
-          child: true,
-        },
-        {
-          key: 'firstname',
-          title: 'Given names',
-          getRowVal: s => (s.total ? null : s.firstnames),
-          cellProps: { title: 'first names' },
-          child: true,
-        },
-        {
-          key: 'email',
-          title: 'Email',
-          getRowVal: s => (s.total ? null : s.email),
-          cellProps: { title: 'emails' },
-          child: true,
-        }
-      )
-    }
+      }
+    )
 
     const mandatoryCourseLabels = []
 
@@ -277,6 +272,14 @@ const CoursesTable = ({ students }) => {
             })),
         }))
     )
+
+    columns.push({
+      key: 'email',
+      title: 'Email',
+      getRowVal: s => (s.total ? null : s.email),
+      cellProps: { title: 'emails' },
+      child: true,
+    })
 
     return columns
   }, [namesVisible, mandatoryCourses, getTextIn])
