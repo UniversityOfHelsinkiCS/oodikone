@@ -24,7 +24,13 @@ const DefaultColumnFilterComponent = ({ column, options, dispatch }) => {
       return []
     }
     const t = _.uniq(values)
-      .filter(value => search === '' || `${value.toLowerCase()}`.indexOf(search.toLowerCase()) > -1)
+      .filter(
+        value =>
+          search === '' ||
+          (typeof value === 'string' &&
+            typeof search === 'string' &&
+            `${value.toLowerCase()}`.indexOf(search.toLowerCase()) > -1)
+      )
       .sort((a, b) => {
         if (typeof a === 'number' && typeof b === 'number') {
           return a - b
