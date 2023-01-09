@@ -24,6 +24,9 @@ const BarChart = ({ data, handleClick, facultyGraph = true, year = null, label, 
   }
 
   const getHeight = () => {
+    if (data.length === 1) {
+      return 250
+    }
     const t = data.length > 8 ? 80 : 110
     return data.length * t + 100
   }

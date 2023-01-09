@@ -153,6 +153,12 @@ describe('Faculty overview', () => {
 
     it('Graphs display data', () => {
       cy.get('[data-cy="Section-bachelor"]').within(() => {
+        cy.get('div[class="faculty-breakdown-graph"]')
+      })
+
+      cy.get('[data-cy="GraduationTimeToggle"]').click()
+
+      cy.get('[data-cy="Section-bachelor"]').within(() => {
         cy.get('div[class="faculty-graph"]')
         cy.contains('1 graduated').should('have.length', 1)
         cy.contains('1 graduated').trigger('mouseover')
@@ -194,6 +200,7 @@ describe('Faculty overview', () => {
     })
 
     it('Graduation times grouping and time types can be toggled', () => {
+      cy.get('[data-cy="GraduationTimeToggle"]').click()
       cy.get('[data-cy="GroupByToggle"]').click()
       cy.get('[data-cy="Section-bachelor"]').should('not.exist')
       cy.get('[data-cy="Section-master"]').should('be.visible')
@@ -226,12 +233,12 @@ describe('Faculty overview', () => {
 
     it('User can view studentdata table without %', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'NA')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', '0 %')
     })
     it('User can view studentdata table with %', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
       cy.get('[data-cy="HidePercentagesToggle"]').click()
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'NA')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', '0 %')
     })
 
     it('Percentage Graphs exists', () => {
@@ -275,11 +282,11 @@ describe('Faculty overview', () => {
     })
 
     it('Sudent statstable can be toggled', () => {
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT - KH50_005')
-      cy.get('[data-cy="Button-FacultyStudentStatsTable-0"]').click()
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'TKT - KH50_005')
-      cy.get('[data-cy="Button-FacultyStudentStatsTable-0"]').click()
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT - KH50_005')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT')
+      cy.get('[data-cy="Button-FacultyStudentStatsTable-3"]').click()
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'TKT')
+      cy.get('[data-cy="Button-FacultyStudentStatsTable-3"]').click()
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT')
     })
 
     it('Progress infobox can be toggled', () => {

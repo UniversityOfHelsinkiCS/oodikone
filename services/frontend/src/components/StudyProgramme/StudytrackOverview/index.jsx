@@ -16,7 +16,7 @@ import '../studyprogramme.css'
 
 const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, graduated, setGraduated }) => {
   const toolTips = InfotoolTips.Studyprogramme
-  const [showBreakdown, setShowBreakdown] = useState(false)
+  const [showMedian, setShowMedian] = useState(false)
   const [track, setTrack] = useState(studyprogramme)
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
@@ -114,13 +114,14 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
             <>
               {getDivider('Average graduation times', 'AverageGraduationTimesStudytracks')}
               <Toggle
-                firstLabel="Median time"
-                secondLabel="Breakdown"
-                value={showBreakdown}
-                setValue={setShowBreakdown}
+                cypress="GraduationTimeToggle"
+                firstLabel="Breakdown"
+                secondLabel="Median times"
+                value={showMedian}
+                setValue={setShowMedian}
               />
               <div className="section-container-centered">
-                {!showBreakdown ? (
+                {showMedian ? (
                   <MedianTimeBarChart
                     data={stats?.data?.graduationTimes[track].medians}
                     goal={stats?.data?.graduationTimes.goal}

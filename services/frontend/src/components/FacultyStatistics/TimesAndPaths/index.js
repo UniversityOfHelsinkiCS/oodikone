@@ -10,7 +10,7 @@ import '../faculty.css'
 
 const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => {
   const toolTips = InfotoolTips.Faculty
-  const [showBreakdown, setShowBreakdown] = useState(false)
+  const [showMedian, setShowMedian] = useState(false)
   const [groupByStartYear, setGroupByStartYear] = useState(false)
   const studyProgrammeFilter = studyProgrammes ? 'ALL_PROGRAMMES' : 'NEW_STUDY_PROGRAMMES'
   const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty?.code, studyProgrammeFilter })
@@ -23,7 +23,7 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
   const programmeData = graduationStats?.data?.[groupBy].programmes.medians
   const programmeNames = graduationStats?.data?.programmeNames
   const classSizes = graduationStats?.data?.classSizes
-  const commonProps = { label, programmeNames, showBreakdown, classSizes, goalExceptions }
+  const commonProps = { label, programmeNames, showMedian, classSizes, goalExceptions }
 
   const isFetchingOrLoading = graduationStats.isLoading || graduationStats.isFetching
 
@@ -64,18 +64,18 @@ const TimesAndPathsView = ({ faculty, studyProgrammes, setStudyProgrammes }) => 
               {getDivider('Average graduation times', 'AverageGraduationTimes')}
               <div className="toggle-container">
                 <Toggle
+                  cypress="GraduationTimeToggle"
+                  firstLabel="Breakdown"
+                  secondLabel="Median times"
+                  value={showMedian}
+                  setValue={setShowMedian}
+                />
+                <Toggle
                   cypress="GroupByToggle"
                   firstLabel="Group by: Graduation year"
                   secondLabel="Starting year"
                   value={groupByStartYear}
                   setValue={setGroupByStartYear}
-                />
-                <Toggle
-                  cypress="GraduationTimeToggle"
-                  firstLabel="Show: Median times"
-                  secondLabel="Breakdown"
-                  value={showBreakdown}
-                  setValue={setShowBreakdown}
                 />
               </div>
               <div>

@@ -113,7 +113,7 @@ const GraduationTimes = ({
   label,
   levelProgrammeData,
   programmeNames,
-  showBreakdown,
+  showMedian,
   classSizes,
   groupBy,
   goalExceptions,
@@ -136,7 +136,7 @@ const GraduationTimes = ({
   return (
     <div className={`graduation-times-${level}`} data-cy={`Section-${level}`}>
       <Divider horizontal>{title}</Divider>
-      {showBreakdown ? (
+      {!showMedian ? (
         <BreakdownDislay
           handleClick={handleClick}
           data={data}
