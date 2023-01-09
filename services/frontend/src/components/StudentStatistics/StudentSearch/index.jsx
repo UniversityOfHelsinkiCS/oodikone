@@ -91,9 +91,35 @@ const StudentSearch = ({
       // so that the loading spinner doesn't go on top of the search box
       return <div style={{ margin: 100 }} />
     }
+    // let studentsSorted = students
     if (students.length <= 0) {
       return <div>No search results or search term is not accurate enough</div>
     }
+
+    const studentsSorted = students.sort((a, b) => {
+      let aDateSplit = a.started.split('.')
+      let bDateSplit = b.started.split('.')
+      let aDate
+      let bDate
+      if (aDateSplit[0] === 'Unavailable') {
+        aDateSplit = null
+      } else {
+        aDate = new Date(aDateSplit[2], aDateSplit[1], aDateSplit[0])
+      }
+      if (bDateSplit[0] === 'Unavailable') {
+        bDateSplit = null
+      } else {
+        bDate = new Date(bDateSplit[2], bDateSplit[1], bDateSplit[0])
+      }
+      if (aDate && bDate) {
+        return bDate - aDate
+      }
+      if (aDate && !bDate) {
+        return -1
+      }
+
+      return 0
+    })
 
     const columns = [
       {
@@ -224,14 +250,13 @@ const StudentSearch = ({
 
       columns.splice(0, 0, ...nameColumns)
     }
-
     return (
       <SortableTable
         figure={false}
         getRowKey={s => s.studentNumber}
         tableProps={{ celled: false }}
         columns={columns}
-        data={students.slice(0, 200)}
+        data={studentsSorted.slice(0, 200)}
         chunkifyBy="studentNumber"
       />
     )
