@@ -275,11 +275,11 @@ describe('Faculty overview', () => {
     })
 
     it('Sudent statstable can be toggled', () => {
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT - KH50_005')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT')
       cy.get('[data-cy="Button-FacultyStudentStatsTable-0"]').click()
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'TKT - KH50_005')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'TKT')
       cy.get('[data-cy="Button-FacultyStudentStatsTable-0"]').click()
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT - KH50_005')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT')
     })
 
     it('Progress infobox can be toggled', () => {
