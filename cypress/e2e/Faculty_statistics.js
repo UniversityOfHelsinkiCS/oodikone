@@ -233,12 +233,12 @@ describe('Faculty overview', () => {
 
     it('User can view studentdata table without %', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'NA')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', '0 %')
     })
     it('User can view studentdata table with %', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
       cy.get('[data-cy="HidePercentagesToggle"]').click()
-      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'NA')
+      cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', '0 %')
     })
 
     it('Percentage Graphs exists', () => {
@@ -283,9 +283,9 @@ describe('Faculty overview', () => {
 
     it('Sudent statstable can be toggled', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT')
-      cy.get('[data-cy="Button-FacultyStudentStatsTable-0"]').click()
+      cy.get('[data-cy="Button-FacultyStudentStatsTable-3"]').click()
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('contain', 'TKT')
-      cy.get('[data-cy="Button-FacultyStudentStatsTable-0"]').click()
+      cy.get('[data-cy="Button-FacultyStudentStatsTable-3"]').click()
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('not.contain', 'TKT')
     })
 
