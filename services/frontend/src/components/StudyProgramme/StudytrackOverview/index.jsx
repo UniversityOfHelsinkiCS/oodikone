@@ -113,7 +113,13 @@ const StudytrackOverview = ({ studyprogramme, specialGroups, setSpecialGroups, g
           {stats?.isSuccess && stats?.data?.includeGraduated && stats?.data?.graduationTimes[track] && (
             <>
               {getDivider('Average graduation times', 'AverageGraduationTimesStudytracks')}
-              <Toggle firstLabel="Breakdown" secondLabel="Median times" value={showMedian} setValue={setShowMedian} />
+              <Toggle
+                cypress="GraduationTimeToggle"
+                firstLabel="Breakdown"
+                secondLabel="Median times"
+                value={showMedian}
+                setValue={setShowMedian}
+              />
               <div className="section-container-centered">
                 {showMedian ? (
                   <MedianTimeBarChart
