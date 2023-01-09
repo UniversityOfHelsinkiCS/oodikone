@@ -41,30 +41,30 @@ export default {
   **Graduated**: Sisältää kyseisenä vuonna valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.
   `,
   AverageGraduationTimes: `
-  **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
+  Yksittäinen palkki kertoo, kuinka moni opiskelija on valmistunut kyseisenä vuonna/lukuvuonna.
+
+  Vihreä **vaakapalkki** kuvaa tavoiteajassa (tai alle) valmistuneita, keltainen palkki korkeintaan vuoden tavoiteajasta myöhässä valmistuneita
+  ja punainen yli vuoden tavoiteajan ylittäneitä.
 
   **Breakdown**: Näyttää, kuinka moni kyseisenä kalenteri- tai lukuvuotena valmistuneista opiskelijoista valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
-  
-  Valmistumisajoista on vähennetty lakisääteiset poissaolot.
-  
-  Yksittäinen palkki kertoo, kuinka moni opiskelija on valmistunut kyseisenä vuonna.
-  
+
+  **Median time**: Näyttää kyseisenä kalenteri- tai lukuvuotena valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina.
   Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.\n
-  Vihreä **vaakapalkki** merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
-  ja punainen yli vuoden tavoiteajan ylitystä.`,
+
+  Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
   AverageGraduationTimesStudytracks: `
-  Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukukautena aloittaneista** opiskelijoista on valmistunut .
+  Yksittäinen palkki kertoo, kuinka moni kyseisenä **lukuvuotena ALOITTANEISTA** opiskelijoista on valmistunut.
 
-  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalinen osuutensa koko vuosikurssista.
+  Vihreä **vaakapalkki** kuvaa tavoiteajassa (tai alle) valmistuneita, keltainen palkki korkeintaan vuoden tavoiteajasta myöhässä valmistuneita
+  ja punainen yli vuoden tavoiteajan ylittäneitä.
 
-  **Breakdown**: Näyttää, kuinka moni kyseisenä lukukautena aloittaneista, jo valmistuneista, opiskelijoista on valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
+  **Breakdown**: Näyttää, kuinka moni kyseisenä lukuvuotena aloittaneista, jo valmistuneista, opiskelijoista on valmistui ajallaan, korkeintaan vuoden myöhässä tavoiteajasta tai tätä myöhemmin.
+
+  **Median time**: Näyttää valmistuneiden opiskelijoiden opintojen keston **mediaanin** kuukausina sekä heidän prosentuaalisen osuutensa koko vuosikurssista.
+  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.
   
-  Valmistumisajoista on vähennetty lakisääteiset poissaolot.
   
-  
-  Vihreä **katkoviiva** kuvastaa tavoiteaikaa. Keltainen katkoviiva on tavoiteaika + yksi vuosi.\n
-  Vihreä **vaakapalkki** merkitsee, että keskimääräinen valmistumisaika on alle tai yhtä kuin tavoiteaika, keltainen palkki merkitsee korkeintaan vuoden ylitystä
-  ja punainen yli vuoden tavoiteajan ylitystä.`,
+  Valmistumisajoista on vähennetty lakisääteiset poissaolot.`,
   ProgrammesBeforeOrAfter: `
   **Mikäli valittuna on kandiohjelma:** Sisältää maisteriohjelmat, joissa tämän kandiohjelman opiskelijat ovat aloittaneet valmistuttuaan kandeiksi. Vuosijaottelu on tehty maisteriohjelmassa aloittamisen perusteella.
 

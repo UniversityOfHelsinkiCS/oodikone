@@ -8,8 +8,19 @@ const getColors = len => {
   if (len < 8) return ['#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
   return ['#e66067', '#f57368', '#fb8c6e', '#fba678', '#dbda7d', '#9ec27c', '#60a866', '#008c59']
 }
-
-const ProgrammeProgressChart = ({ data, labels, longLabels, names, language }) => {
+// Point width is 24 px different multipliers adjusts the height.
+const getFlexHeight = (len, needsExtra) => {
+  if (len > 7 && needsExtra) return `${len * 24 * 1.5}px`
+  if (len > 5 && !needsExtra) return `${len * 24 * 1.5}px`
+  if (needsExtra && len <= 2) return `${len * 24 * 6}px`
+  if (needsExtra && len <= 4) return `${len * 24 * 3}px`
+  if (needsExtra) return `${len * 24 * 2}px`
+  if (len < 2) return `${len * 24 * 5}px`
+  if (len < 3) return `${len * 24 * 4}px`
+  if (len <= 4) return `${len * 24 * 3}px`
+  return `${len * 24}px`
+}
+const ProgrammeProgressChart = ({ data, labels, longLabels, names, language, needsExtra }) => {
   if (!data || data.length === 0)
     return (
       <>
@@ -30,6 +41,7 @@ const ProgrammeProgressChart = ({ data, labels, longLabels, names, language }) =
     chart: {
       type: 'bar',
       marginTop: 60,
+      height: getFlexHeight(labels.length, needsExtra),
     },
     credits: {
       text: 'oodikone | TOSKA',

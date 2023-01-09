@@ -17,7 +17,7 @@ import '../studyprogramme.css'
 const isNewProgramme = code => code.includes('KH') || code.includes('MH') || /^(T)[0-9]{6}$/.test(code)
 
 const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYear, setAcademicYear }) => {
-  const [showBreakdown, setShowBreakdown] = useState(false)
+  const [showMedian, setShowMedian] = useState(false)
   const toolTips = InfotoolTips.Studyprogramme
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const special = specialGroups ? 'SPECIAL_EXCLUDED' : 'SPECIAL_INCLUDED'
@@ -160,14 +160,14 @@ const Overview = ({ studyprogramme, specialGroups, setSpecialGroups, academicYea
               <div className="toggle-container">
                 <Toggle
                   cypress="GraduationTimeToggle"
-                  firstLabel="Median time"
-                  secondLabel="Breakdown"
-                  value={showBreakdown}
-                  setValue={setShowBreakdown}
+                  firstLabel="Breakdown"
+                  secondLabel="Median time"
+                  value={showMedian}
+                  setValue={setShowMedian}
                 />
               </div>
               <div className={`section-container${doCombo ? '' : '-centered'}`}>
-                {showBreakdown ? displayBreakdown() : displayMedian()}
+                {showMedian ? displayMedian() : displayBreakdown()}
               </div>
               {graduations?.data?.programmesBeforeOrAfterGraphStats && (
                 <>

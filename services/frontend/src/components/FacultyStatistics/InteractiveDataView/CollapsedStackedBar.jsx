@@ -1,6 +1,5 @@
 /* eslint-disable react/no-this-in-sfc */
 import React from 'react'
-import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
 
 const colors = ['#7cb5ec', '#90ed7d', '#434348', '#f7a35c', '#FFF000', '#2b908f', '#f45b5b', '#91e8e1']
@@ -45,9 +44,20 @@ const CollapsedStackedBar = ({
   const chartPlotLinePlaces = plotLinePlaces
     ? plotLinePlaces.map(val => ({
         color: '#90A959',
-        width: 2,
-        value: val + 0.5,
-        dashStyle: 'shortDash',
+        width: 1,
+        value: val[0] - 0.5,
+        dashStyle: 'solid',
+        label: {
+          text: val[1],
+          style: {
+            color: 'black',
+            fontWeight: 'bold',
+            fontSize: 14,
+          },
+          align: 'right',
+          x: 0,
+          y: 5,
+        },
       }))
     : []
 
@@ -102,7 +112,7 @@ const CollapsedStackedBar = ({
       stackLabels: {
         enabled: true,
         style: {
-          color: (Highcharts.defaultOptions.title.style && Highcharts.defaultOptions.title.style.color) || 'gray',
+          color: 'gray',
         },
         fontSize: '24px',
       },
@@ -115,7 +125,7 @@ const CollapsedStackedBar = ({
       verticalAlign: 'top',
       y: -10,
       floating: true,
-      backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || 'white',
+      backgroundColor: 'white',
       borderColor: '#CCC',
       borderWidth: 1,
       shadow: false,

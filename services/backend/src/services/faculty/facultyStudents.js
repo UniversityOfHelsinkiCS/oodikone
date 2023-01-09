@@ -244,7 +244,9 @@ const combineFacultyStudents = async (code, programmes, allProgrammeCodes, speci
       progTotals,
     }
     const totals = await getFacultyDataForYear(queryParams)
-    addTotals(facultyTableStats, year, totals)
+    if (totals.total !== 0) {
+      addTotals(facultyTableStats, year, totals)
+    }
   }
 
   addTotals(facultyTableStats, 'Total', allTotals)

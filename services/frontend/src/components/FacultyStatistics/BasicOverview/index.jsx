@@ -128,8 +128,21 @@ const Overview = ({
     transferShortTitles = ['Code', 'Started', 'Graduated']
   }
 
+  const options = {
+    KH: 'Bachelors',
+    MH: 'Masters',
+    T: 'Doctors and Licentiates',
+    LIS: 'Doctors and Licentiates',
+    OTHER: 'Other',
+  }
+
   const getChartPlotLinePlaces = programmeKeys => {
-    const plotLinePlaces = []
+    if (programmeKeys.length === 0) return []
+    let key = programmeKeys[0][1].slice(0, 2)
+    if (!['KH', 'MH', 'T', 'LIS'].includes(key)) {
+      key = 'OTHER'
+    }
+    const plotLinePlaces = [[0, options[key]]]
     for (let i = 0; i < programmeKeys.length - 1; i++) {
       if (
         (programmeKeys[i][1].startsWith('KH') && programmeKeys[i + 1][1].startsWith('MH')) ||
@@ -143,11 +156,31 @@ const Overview = ({
           programmeKeys[i][1].startsWith('MH')) &&
           programmeKeys[i + 1][1].startsWith('K-'))
       ) {
-        plotLinePlaces.push(i)
+        let key = programmeKeys[i + 1][1].slice(0, 2)
+        if (!['KH', 'MH'].includes(key)) {
+          const keyT = programmeKeys[i + 1][1].slice(0, 1)
+          const keyLis = programmeKeys[i + 1][1].slice(0, 3)
+          if (keyT === 'T') {
+            key = keyT
+          } else if (keyLis === 'LIS') {
+            key = keyLis
+          } else {
+            key = 'OTHER'
+          }
+        }
+        if (
+          !programmeKeys[i + 1][1].includes(faculty.code) &&
+          (programmeKeys[i + 1][1].startsWith('MH') || programmeKeys[i + 1][1].startsWith('KH'))
+        ) {
+          plotLinePlaces.push([i + 1, `${options[key]} secondary`])
+        } else {
+          plotLinePlaces.push([i + 1, options[key]])
+        }
       }
     }
     return plotLinePlaces
   }
+
   return (
     <div className="faculty-overview">
       <div className="toggle-container">
