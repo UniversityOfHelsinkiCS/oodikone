@@ -99,7 +99,7 @@ const FacultyProgrammeOverview = ({
                   sortedKeys={sortProgrammeKeys(
                     Object.keys(studentStats?.data.programmeStats).map(obj => [
                       obj,
-                      studentStats?.data?.programmeNames[obj].code,
+                      studentStats?.data?.programmeNames[obj]?.code,
                     ]),
                     faculty.code
                   ).map(listObj => listObj[0])}
@@ -221,7 +221,7 @@ const FacultyProgrammeOverview = ({
                   </div>
                 </>
               )}
-              {getDivider('Doctor and licentiate', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
+              {getDivider('Doctor', 'DoctoralStudentsOfTheFacultyByStartingYear', 'no-infobox')}
               <div className="section-container">
                 <div className="graph-container">
                   <FacultyBarChart
