@@ -53,6 +53,7 @@ const CollapsedStackedBar = ({
             color: 'black',
             fontWeight: 'bold',
             fontSize: 14,
+            position: 'absolute',
           },
           align: 'right',
           x: 0,
