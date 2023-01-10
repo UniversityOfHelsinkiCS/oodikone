@@ -87,7 +87,7 @@ export default {
   Kuvaa tiedekunnan ohjelmissa opiskelevien opiskelijoden tilastoja. Esimerkiksi 2020-2021 aloittaneiden opintopistejakaumaa.
   
   HUOM!
-  - **All** Sisältää kaikki opiskelijat, joiden opinto-oikeudella on aloituspäivä kyseisenä vuonna, riippumatta siitä, onko opiskelija aloittanut opiskelemaan ko. vuonna.
+  - **All** Sisältää opiskelijat, jotka siirtyneet ohjelmaan tai siitä ulos sekä aloittaneet ohjelmassa
   - **Currently enrolled** Sisältää kaikki tällä hetkellä läsnäolevat olevat opiskelija.
   - **Absent** Sisältää kaikki lakisääteisistä syistä poissaolevat opiskelijat.
   - **Started studying** Sisältää kaikki opiskelijat, jotka ovat aloittaneet opiskelemaan koulutusohjelmassa kyseisenä lukuvuonna.
@@ -95,22 +95,18 @@ export default {
   joissa opiskelija on laiminlyönyt ilmoittautumisen tälle lukukaudelle.
   
   Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, ohjelmaan ja siitä pois siirtyneet opiskelijat sekä erillisopinto-oikeudella opiskelevat.
-  Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. 
-
-  Yläosan valikosta on mahdollista valita tarkasteluun yhden opinto-ohjelman opiskelijat tietylle vuodelle. Sekä opiskelijoiden yleistiedot että edistyminen opintopisteittäin
-  kuvaavat tällöin kyseisen opintosuunnan opiskelijoita.`,
+  Taulukko näyttää myös näistä opiskelijoista miesten, naisten ja suomalaisten osuudet sekä valmistuneiden määrän. `,
   StudentProgress: `
   Kuvaa tiedekuntaan kuuluvien eri ohjemien opinto-oikeudella varustettujen opiskelijoiden etenemistä opintopisteissä mitattuna. Esimerkiksi 2021-2022 aloittaneiden opintopistejakaumaa.
   
   - Bachelor: Kandidaatin opinto-oikeudella varustettujen opiskelijoiden eteneminen
-  - Bachelor + Master: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi ohjelmiin siirtyneiden etenenminen
+  - Bachelor + Master: Kandi+maisteriopinto-oikeudella opiskelleiden ja siitä maisteriksi ohjelmiin siirtyneiden etenenminen. Aloitusvuodeksi on merkitty kandiohjelman aloitusvuosi. 
+    Opinto-ohjelmaksi on merkitty maisteriohjelma, johon opiskelija on siirtynyt kandiksi valmistumisen jälkeen.
   - Master: Pelkällä maisterintutkinnon opinto-oikeudella varustettujen opiskelijoiden eteneminen 
-  - Doctor: Tohtorin ja lisensiaatin opinto-oikeudella varustettujen opiskelijoiden eteneminen
+  - Doctor: Tohtorin opinto-oikeudella varustettujen opiskelijoiden eteneminen
   
-  HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet.
+  HUOM! Mukana ovat myös muuhun kuin valittuun koulutusohjelmaan tai opintosuuntaan tehdyt opintopisteet. Opintopisteet on laskettu opinto-oikeuden alkamisesta, eikä tällä hetkellä ota huomioon mahdollisia hyväksilukuja.
 
   Mukana ovat oletusarvoisesti myös vaihto-opiskelijat, erillisopinto-oikeudella opiskelevat ja ohjelmaan siirtyneet.   
-
-  Mikäli yläosan valikosta valittuna on jokin tietty opintosuunta, myös nämä graafit ja taulukot kuvaavat kyseisen opintosuunnan opiskelijoita.
   `,
 }
