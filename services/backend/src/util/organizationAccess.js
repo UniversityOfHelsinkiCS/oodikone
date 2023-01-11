@@ -1,39 +1,14 @@
 /* eslint-disable no-unused-vars */
 const _ = require('lodash')
-const Sentry = require('@sentry/node')
 
-const logger = require('./logger')
-const { getJamiClient } = require('../util/jamiClient')
-const jamiClient = getJamiClient()
-
-const getIAMAccessFromJami = async (user, attempt = 1) => {
-  const { id, iamGroups } = user
-
-  try {
-    const { data: iamAccess } = await jamiClient.post('/', {
-      userId: id,
-      iamGroups,
-    })
-
-    return iamAccess
-  } catch (error) {
-    if (attempt > 3) {
-      logger.error(error)
-      Sentry.captureException(error)
-
-      return {}
-    }
-
-    return getIAMAccessFromJami(user, attempt + 1)
-  }
-}
+const { getUserIamAccess } = require('./jami')
 
 const getAccessFromIAMs = async user => {
   if (user.iamGroups.length === 0) return {}
 
   const access = {}
 
-  const iamAccess = await getIAMAccessFromJami(user)
+  const iamAccess = await getUserIamAccess(user)
 
   if (!_.isObject(iamAccess)) return access
   Object.keys(iamAccess).forEach(code => {
