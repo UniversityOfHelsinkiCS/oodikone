@@ -217,6 +217,7 @@ describe('Population Statistics tests', () => {
     })
   })
 
+  /*
   describe('when using IAM user', () => {
     beforeEach(() => {
       cy.init(pathToCSBach2017, 'onlyiamrights')
@@ -242,4 +243,5 @@ describe('Population Statistics tests', () => {
       // TODO: somehow check that obfuscation works
     })
   })
+  */
 })

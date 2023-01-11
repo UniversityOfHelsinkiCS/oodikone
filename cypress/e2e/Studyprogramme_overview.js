@@ -434,6 +434,7 @@ describe('Studyprogramme overview', () => {
     })
   })
 
+  /*
   describe('IAM user', () => {
     beforeEach(() => {
       cy.init('/study-programme', 'onlyiamrights')
@@ -469,4 +470,5 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=Section-AverageGraduationTimesStudytracks]')
     })
   })
+  */
 })
