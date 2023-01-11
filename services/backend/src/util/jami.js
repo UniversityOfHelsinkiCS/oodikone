@@ -35,6 +35,21 @@ const getUserIamAccess = async (user, attempt = 1) => {
   }
 }
 
+const getUserIams = async userId => {
+  try {
+    const { data } = await jamiClient.get(`/${userId}`)
+
+    return data.iamGroups
+  } catch (error) {
+    if (error.response.status !== 404) {
+      logger.error('[Jami] error: ', error)
+      Sentry.captureException(error)
+    }
+
+    return []
+  }
+}
+
 const getAllUserAccess = async () => {
   const { data } = await jamiClient.get('/all-access')
 
@@ -56,5 +71,6 @@ testJami()
 
 module.exports = {
   getUserIamAccess,
+  getUserIams,
   getAllUserAccess,
 }
