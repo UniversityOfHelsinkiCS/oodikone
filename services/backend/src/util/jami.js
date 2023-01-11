@@ -35,6 +35,12 @@ const getUserIamAccess = async (user, attempt = 1) => {
   }
 }
 
+const getAllUserAccess = async () => {
+  const { data } = await jamiClient.get('/all-access')
+
+  return data
+}
+
 const testJami = async () => {
   try {
     await jamiClient.get('/ping', { timeout: 4000 })
@@ -50,4 +56,5 @@ testJami()
 
 module.exports = {
   getUserIamAccess,
+  getAllUserAccess,
 }
