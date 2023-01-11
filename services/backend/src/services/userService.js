@@ -8,7 +8,7 @@ const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = requir
 const _ = require('lodash')
 const { User, UserElementDetails, AccessGroup, UserFaculties, sequelizeUser } = require('../models/models_user')
 const { getOrganizationAccess } = require('../util/organizationAccess')
-const { getAllUserAccess } = require('../util/jami')
+const { getUserIams, getAllUserAccess } = require('../util/jami')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
@@ -239,6 +239,8 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
   }
 
   const userFromDb = await byUsername(userToMock)
+  userFromDb.iamGroups = await getUserIams(userFromDb.sisu_person_id)
+
   const formattedUser = await formatUser(userFromDb)
 
   const iamRights = Object.keys(await getOrganizationAccess(userFromDb)).filter(
