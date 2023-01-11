@@ -154,6 +154,10 @@ const getFacultyGraduates = async (
 
     if (keys.includes(programme)) {
       programmeId = codes[programme].toUpperCase()
+      if (programme === 'T923103') {
+        // Two ATM programmes
+        programmeId += '-DP'
+      }
     }
     if (programmeFilter === 'ALL_PROGRAMMES' || isNewProgramme(programme)) {
       const endYear = defineYear(enddate, isAcademicYear)
