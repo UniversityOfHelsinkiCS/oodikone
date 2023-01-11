@@ -217,8 +217,8 @@ describe('Population Statistics tests', () => {
     })
   })
 
-  // Fails in CI, not worth the effort to fix
-  /* describe('when using IAM user', () => {
+  /*
+  describe('when using IAM user', () => {
     beforeEach(() => {
       cy.init(pathToCSBach2017, 'onlyiamrights')
     })
@@ -242,5 +242,6 @@ describe('Population Statistics tests', () => {
       cy.contains('Students (170)').should('not.exist')
       // TODO: somehow check that obfuscation works
     })
-  }) */
+  })
+  */
 })
