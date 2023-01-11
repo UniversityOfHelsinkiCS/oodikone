@@ -10,6 +10,7 @@
 PROJECT_ROOT="$(git rev-parse --show-toplevel)"
 DUMP_DIR="$PROJECT_ROOT/.databasedumps"
 USER_DATA_FILE="$DUMP_DIR/hyuserdata"
+DOCKER_COMPOSE=$PROJECT_ROOT/docker-compose.yml
 
 ## Following the naming convention in docker-compose, these are names for database
 ## services. The real data databases inside service will have names suffixed by "-real".
@@ -100,6 +101,28 @@ reset_databases() {
   successmsg "Database setup finished"
 }
 
+reset_jami_data() {
+  local database="jami-db"
+  local pannu_url="svm-85.cs.helsinki.fi:/home/toska_user/most_recent_backup_store/jami.sql.gz"
+  local dump_destination="$DUMP_DIR/$database.sqz"
+
+  infomsg "Downloading Jami data"
+  scp -r -o ProxyCommand="ssh -l $username -W %h:%p melkki.cs.helsinki.fi" "$username@$pannu_url" "$dump_destination"
+
+  infomsg "Removing database and related volume"
+  docker volume rm oodikone_jami-data || warningmsg "This is okay, continuing"
+  docker-compose -f "$DOCKER_COMPOSE" down "$database"
+
+  infomsg "Starting postgres in the background"
+  docker-compose -f "$DOCKER_COMPOSE" up -d "$database"
+  retry docker-compose -f "$DOCKER_COMPOSE" exec "$database" pg_isready --dbname="postgres"
+
+  infomsg "Populating Jami"
+  docker exec -i "$database" /bin/bash -c "gunzip | psql -U postgres" < "$dump_destination"
+  docker-compose stop "$database"
+  msg ""
+}
+
 reset_all_real_data() {
   infomsg "Downloading real data dumps, asking for pannu password when needed"
   for i in ${!DATABASES[*]}; do
@@ -108,6 +131,7 @@ reset_all_real_data() {
     download_real_dump "$database" "$url"
   done
   reset_databases "${DATABASES[@]}"
+  reset_jami_data
 }
 
 reset_single_database() {
@@ -119,6 +143,7 @@ reset_single_database() {
     "sis-db"
     "sis-importer-db"
     "user-db"
+    "jami-db"
     "Return to main menu."
   )
 
@@ -143,6 +168,9 @@ reset_single_database() {
         "user-db")
           local database=$USER_DB_NAME
           local url=$USER_DB_REAL_DUMP_URL
+          break 2;;
+        "jami-db")
+          reset_jami_data
           break 2;;
         "Return to main menu.")
           break 2;;
