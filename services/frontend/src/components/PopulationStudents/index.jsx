@@ -235,7 +235,10 @@ const CoursesTable = ({ students }) => {
               vertical: true,
               forceToolsMode: 'dangling',
               cellProps: s => {
-                let grade = s.courses ? s.courses.find(course => course.course_code === m.code)?.grade : null
+                let grade = s.courses
+                  ? s.courses.find(course => course.course_code === m.code || course.course_code === `AY${m.code}`)
+                      ?.grade
+                  : null
                 grade =
                   s.courses && !grade && hasPassedMandatory(s.studentNumber, m.code)
                     ? s.courses.find(course => course.course_code === m.label_code)?.grade
