@@ -54,7 +54,7 @@ What different CLI options do:
 
 ### Documentation
 
-Folder `documention` currently contains some notes on sis-db schema and is meant as a place for storing useful information on Oodikone to make life easier for future developers. Feel free to add anything relevant!
+Folder `documentation` currently contains some notes on sis-db schema and is meant as a place for storing useful information on Oodikone to make life easier for future developers. Feel free to add anything relevant!
 
 ### Basics
 
