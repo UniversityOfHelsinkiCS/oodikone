@@ -53,7 +53,7 @@ const FacultyStudentDataTable = ({
         value={showPercentages}
         setValue={setShowPercentages}
       />
-      <Table data-cy={cypress} celled structured>
+      <Table data-cy={cypress} celled structured striped>
         <Table.Header>
           <Table.Row key="FirstHeader">
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />
@@ -123,7 +123,7 @@ const FacultyStudentDataTable = ({
                 </Table.Row>
                 {yearsVisible[yearIndex] &&
                   sortedKeys.map(programme => {
-                    return (
+                    return programmeStats[programme][year].length === 0 ? null : (
                       <Table.Row className="regular-row" key={`${year}-regular-row-${programme}`}>
                         <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={`${year}-${programme}`}>
                           <Popup

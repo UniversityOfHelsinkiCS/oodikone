@@ -32,13 +32,10 @@ const sortProgrammeKeys = (programmeKeys, faculty) => {
     return programmeKeys.sort((a, b) => {
       if (a[1].includes(faculty) && !b[1].includes(faculty)) return -1
       if (!a[1].includes(faculty) && b[1].includes(faculty)) return 1
-      if (a[1].startsWith('T') && !b[1].includes(faculty)) return -1
-      if (!a[1].includes(faculty) && b[1].startsWith('T')) return 1
-      if (a[1].startsWith('LIS') && !b[1].includes(faculty)) return -1
-      if (!a[1].includes(faculty) && b[1].startsWith('LIS')) return 1
-      if (testKey(a[1]) - testKey(b[1]) === 0 && testKey(a[0]) - testKey(b[0]) === 0) {
-        return a[1].localeCompare(b[1])
-      }
+      if (a[1].startsWith('T') && !b[1].includes(faculty) && !b[1].includes('T')) return -1
+      if (!a[1].includes(faculty) && b[1].startsWith('T') && !a[1].includes('T')) return 1
+      if (a[1].startsWith('LIS') && !b[1].includes(faculty) && !b[1].includes('LIS')) return -1
+      if (!a[1].includes(faculty) && b[1].startsWith('LIS') && !a[1].includes('LIS')) return 1
       if (testKey(a[1]) - testKey(b[1]) === 0) {
         return a[0].localeCompare(b[0])
       }

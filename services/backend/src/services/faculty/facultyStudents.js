@@ -88,6 +88,7 @@ const getFacultyDataForYear = async ({
   facultyExtra,
   allTotals,
   progTotals,
+  programmeNames,
 }) => {
   const { includeAllSpecials, includeGraduated } = settings
   const { startDate, endDate } = getAcademicYearDates(year, since)
@@ -102,7 +103,7 @@ const getFacultyDataForYear = async ({
   }
   const totals = emptyTotals()
 
-  for (const { progId, code } of programmes) {
+  for (const { progId, code, name } of programmes) {
     let elementStart = {}
     let studyrightStart = {}
     const start = moment(`${year.slice(0, 4)}-08-01`, 'YYYY-MM-DD')
@@ -156,11 +157,18 @@ const getFacultyDataForYear = async ({
         s.semesters.filter(semester => semester.semestercode === currentSemester.semestercode)[0]?.enrollmenttype === 1
     )
     // Count stats for the programme
+    if (students.length === 0) continue
     if (!(progId in programmeTableStats)) {
       programmeTableStats[progId] = years.reduce((resultObj, yearKey) => {
         return { ...resultObj, [yearKey]: [] }
       }, {})
+      progTotals[progId] = emptyTotals()
     }
+    if (!(progId in programmeNames)) {
+      programmeNames[progId] = { code: code, ...name }
+      progTotals[progId] = emptyTotals()
+    }
+
     const yearTotals = {
       total: students.length,
       allStarted: started.length,
@@ -226,8 +234,9 @@ const combineFacultyStudents = async (code, programmes, allProgrammeCodes, speci
   const facultyTableStats = getYearsObject({ years, emptyArrays: true })
   const programmeTableStats = {}
   const facultyExtra = years.reduce((acc, year) => ({ ...acc, [year]: {} }), {})
-  const progTotals = programmes.reduce((acc, row) => ({ ...acc, [row.progId]: emptyTotals() }), {})
+  const progTotals = {}
   const allTotals = emptyTotals()
+  const programmeNames = {}
   for (const year of years.reverse()) {
     if (year === 'Total') continue
     const queryParams = {
@@ -242,6 +251,7 @@ const combineFacultyStudents = async (code, programmes, allProgrammeCodes, speci
       facultyExtra,
       allTotals,
       progTotals,
+      programmeNames,
     }
     const totals = await getFacultyDataForYear(queryParams)
     if (totals.total !== 0) {
@@ -253,6 +263,7 @@ const combineFacultyStudents = async (code, programmes, allProgrammeCodes, speci
   Object.keys(progTotals).forEach(programme =>
     addTotalsProgramme(programmeTableStats, programme, 'Total', progTotals[programme])
   )
+
   const studentsData = {
     id: code,
     years: years,
@@ -260,10 +271,7 @@ const combineFacultyStudents = async (code, programmes, allProgrammeCodes, speci
     facultyTableStatsExtra: facultyExtra,
     programmeStats: programmeTableStats,
     titles: tableTitles['programmes'],
-    programmeNames: programmes.reduce(
-      (obj, dataItem) => ({ ...obj, [dataItem.progId]: { code: dataItem.code, ...dataItem.name } }),
-      {}
-    ),
+    programmeNames: programmeNames,
   }
   return studentsData
 }

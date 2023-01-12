@@ -11,22 +11,15 @@ const {
 } = require('../studyprogrammeHelpers')
 
 const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }) => {
-  const thesisTypes = [
-    'urn:code:course-unit-type:bachelors-thesis',
-    'urn:code:course-unit-type:masters-thesis',
-    'urn:code:course-unit-type:doctors-thesis',
-    'urn:code:course-unit-type:licentiate-thesis',
-  ]
+  const thesisTypes = ['urn:code:course-unit-type:bachelors-thesis', 'urn:code:course-unit-type:masters-thesis']
 
   let bachelors = getStatsBasis(years)
   let masters = getStatsBasis(years)
-  let doctors = getStatsBasis(years)
-  let licentiates = getStatsBasis(years)
   let programmeCounts = {}
   let programmeNames = {}
 
   for (const { progId, code, name } of facultyProgrammes) {
-    if (code === 'MH70_008_2') continue
+    if (code === 'MH70_008_2' || code.startsWith('LIS') || code.startsWith('T')) continue
     const provider = mapToProviders([code])[0]
     const students = await getCorrectStudentnumbers({
       codes: [code],
@@ -42,7 +35,7 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
       if (!(progId in programmeCounts)) {
         programmeCounts[progId] = {}
 
-        Object.keys(bachelors.tableStats).forEach(year => (programmeCounts[progId][year] = [0, 0, 0, 0, 0]))
+        Object.keys(bachelors.tableStats).forEach(year => (programmeCounts[progId][year] = [0, 0, 0]))
         programmeNames[progId] = { ...name, code: code }
       }
       programmeCounts[progId][thesisYear][0] += 1
@@ -55,19 +48,11 @@ const getFacultyThesisWriters = async ({ since, years, isAcademicYear, facultyPr
         masters.graphStats[indexOf(years, thesisYear)] += 1
         masters.tableStats[thesisYear] += 1
         programmeCounts[progId][thesisYear][2] += 1
-      } else if (courseUnitType === thesisTypes[2]) {
-        doctors.graphStats[indexOf(years, thesisYear)] += 1
-        doctors.tableStats[thesisYear] += 1
-        programmeCounts[progId][thesisYear][3] += 1
-      } else if (courseUnitType === thesisTypes[3]) {
-        licentiates.graphStats[indexOf(years, thesisYear)] += 1
-        licentiates.tableStats[thesisYear] += 1
-        programmeCounts[progId][thesisYear][4] += 1
       }
     })
   }
 
-  return { bachelors, masters, doctors, licentiates, programmeCounts, programmeNames }
+  return { bachelors, masters, programmeCounts, programmeNames }
 }
 
 const getFacultyThesisWritersForProgrammes = async (
@@ -79,24 +64,18 @@ const getFacultyThesisWritersForProgrammes = async (
   const since = isAcademicYear ? new Date('2017-08-01') : new Date('2017-01-01')
   const years = getYearsArray(since.getFullYear(), isAcademicYear)
   const queryParameters = { since, years, isAcademicYear, facultyProgrammes, includeAllSpecials }
-  const { bachelors, masters, doctors, licentiates, programmeCounts, programmeNames } = await getFacultyThesisWriters(
-    queryParameters
-  )
+  const { bachelors, masters, programmeCounts, programmeNames } = await getFacultyThesisWriters(queryParameters)
 
   allThesisWriters.years = years.map(year => year.toString())
   const reversedYears = years.reverse()
   allThesisWriters.tableStats = reversedYears.map(year => [
     year,
-    bachelors.tableStats[year] + masters.tableStats[year] + doctors.tableStats[year] + licentiates.tableStats[year],
+    bachelors.tableStats[year] + masters.tableStats[year],
     bachelors.tableStats[year],
     masters.tableStats[year],
-    doctors.tableStats[year],
-    licentiates.tableStats[year],
   ])
   allThesisWriters.graphStats.push({ name: 'Bachelors', data: bachelors.graphStats })
   allThesisWriters.graphStats.push({ name: 'Masters', data: masters.graphStats })
-  allThesisWriters.graphStats.push({ name: 'Doctors', data: doctors.graphStats })
-  allThesisWriters.graphStats.push({ name: 'Licentiates', data: licentiates.graphStats })
 
   const programmes = programmeNames ? Object.keys(programmeNames) : facultyProgrammes.map(programme => programme.code)
   programmes.forEach(programmeId => {
@@ -120,7 +99,7 @@ const combineFacultyThesisWriters = async (faculty, facultyProgrammes, yearType,
     tableStats: [],
     graphStats: [],
     programmeTableStats: {},
-    titles: ['', 'All', 'Bachelors', 'Masters', 'Doctors', 'Licentiates'],
+    titles: ['', 'All', 'Bachelors', 'Masters'],
     programmeNames: {},
     status: 'Done',
     lastUpdated: '',

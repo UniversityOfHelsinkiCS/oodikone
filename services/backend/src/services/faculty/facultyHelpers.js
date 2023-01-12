@@ -135,6 +135,9 @@ const mapCodesToIds = data => {
   for (const prog of data) {
     if (keys.includes(prog.code)) {
       prog.progId = codes[prog.code].toUpperCase()
+      if (prog.code === 'T923103') {
+        prog.progId = prog.progId + '-DP'
+      }
     } else {
       prog.progId = prog.code
     }

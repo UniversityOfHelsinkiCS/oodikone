@@ -21,7 +21,8 @@ const getSortedProgIds = progs => {
 
   for (const prog of progs) {
     if (Object.keys(codes).includes(prog)) {
-      programmes = [...programmes, { name: codes[prog].toUpperCase(), code: prog }]
+      const name = prog === 'T923103' ? codes[prog].toUpperCase() + '-DP' : codes[prog].toUpperCase()
+      programmes = [...programmes, { name: name, code: prog }]
     } else {
       programmes = [...programmes, { name: prog, code: prog }]
     }
