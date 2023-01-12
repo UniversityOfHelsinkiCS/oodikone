@@ -52,6 +52,10 @@ What different CLI options do:
 
 ![Oodikone architecture](Oodikone.png)
 
+### Documentation
+
+Folder `documention` currently contains some notes on sis-db schema and is meant as a place for storing useful information on Oodikone to make life easier for future developers. Feel free to add anything relevant!
+
 ### Basics
 
 The development environment is entirely configured in the `docker-compose.yml` file located in this repository. The file defines the services for oodikone's two main components: **oodikone** and **updater**.
