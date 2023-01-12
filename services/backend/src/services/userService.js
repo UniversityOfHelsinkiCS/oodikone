@@ -8,6 +8,7 @@ const { checkStudyGuidanceGroupsAccess, getAllStudentsUserHasInGroups } = requir
 const _ = require('lodash')
 const { User, UserElementDetails, AccessGroup, UserFaculties, sequelizeUser } = require('../models/models_user')
 const { getOrganizationAccess } = require('../util/organizationAccess')
+const { getUserIams, getAllUserAccess } = require('../util/jami')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
@@ -170,19 +171,25 @@ const getAccessGroups = async () => await AccessGroup.findAll()
 const enrichProgrammesFromFaculties = faculties =>
   facultiesAndProgrammesForTrends.filter(f => faculties.includes(f.faculty_code)).map(f => f.programme_code)
 
-const findAll = async () =>
-  (
-    await User.findAll({
-      include: userIncludes,
-    })
-  ).map(user => ({
+const findAll = async () => {
+  const allUsers = await User.findAll({
+    include: userIncludes,
+  })
+
+  const userAccess = await getAllUserAccess()
+
+  const formattedUsers = allUsers.map(user => ({
     ...user.get(),
     is_enabled: true,
+    iam_groups: userAccess.find(({ id }) => id === user.sisu_person_id)?.iamGroups || [],
     elementdetails: _.uniqBy([
       ...user.programme.map(p => p.elementDetailCode),
       ...enrichProgrammesFromFaculties(user.faculty.map(f => f.faculty_code)),
     ]),
   }))
+
+  return formattedUsers
+}
 
 const formatUser = async userFromDb => {
   const [accessGroups, programmes, faculties] = [
@@ -232,6 +239,8 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
   }
 
   const userFromDb = await byUsername(userToMock)
+  userFromDb.iamGroups = await getUserIams(userFromDb.sisu_person_id)
+
   const formattedUser = await formatUser(userFromDb)
 
   const iamRights = Object.keys(await getOrganizationAccess(userFromDb)).filter(
@@ -262,7 +271,6 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, sisId }) =
     email,
     language,
     sisu_person_id: sisId,
-    iam_groups: iamGroups,
     last_login: new Date(),
   })
 

@@ -66,11 +66,25 @@ services:
     <<: *defaults
     image: toska/jami
     environment:
-      - NODE_ENV=production
       - PORT=3003
+      - NODE_ENV=production
+      - POSTGRES_HOST=jami-db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=postgres
     ports:
       - 3003:3003
     container_name: jami
+
+  jami-db:
+    <<: *defaults
+    image: postgres:13.2
+    environment:
+      - PGDATA=/data
+      - POSTGRES_PASSWORD=postgres
+    container_name: jami-db
+    ports:
+      - 5433:5432
 
   nginx:
     image: nginx:latest
