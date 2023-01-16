@@ -460,7 +460,7 @@ const tableTitles = {
     'Graduated',
     'Men',
     'Women',
-    'Finnish',
+    'Finland',
   ],
   programmes: [
     '',
@@ -473,7 +473,7 @@ const tableTitles = {
     'Men',
     'Women',
     'Other/Unknown',
-    'Finnish',
+    'Finland',
     'Other',
   ],
 }
