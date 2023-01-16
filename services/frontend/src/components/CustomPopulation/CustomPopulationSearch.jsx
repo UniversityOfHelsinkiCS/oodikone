@@ -87,7 +87,7 @@ const CustomPopulationSearch = ({
 
   const onClicker = e => {
     e.preventDefault()
-    const studentnumbers = input.match(/[0-9]+/g)
+    const studentnumbers = input.match(/[0-9]+/g).map(sNumber => (sNumber.length === 8 ? `0${sNumber}` : sNumber))
     getCustomPopulationDispatch({ studentnumberlist: studentnumbers, onProgress })
     getCustomPopulationCoursesByStudentnumbers({ studentnumberlist: studentnumbers })
     selectCustomPopulationSearchDispatch(selectedSearchId || null)
