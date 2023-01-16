@@ -22,6 +22,8 @@ const getUserIamAccess = async (user, attempt = 1) => {
       iamGroups,
     })
 
+    delete iamAccess.specialGroup
+
     return iamAccess
   } catch (error) {
     if (attempt > 3) {
