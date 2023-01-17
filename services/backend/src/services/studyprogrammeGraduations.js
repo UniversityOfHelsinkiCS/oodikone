@@ -260,25 +260,39 @@ const getGraduationStatsForStudytrack = async ({ studyprogramme, settings }) => 
 
   const reversedYears = getYearsArray(since.getFullYear(), isAcademicYear).reverse()
 
-  const titles = ['', 'Graduated', 'Wrote thesis']
+  const titles =
+    studyprogramme.includes('LIS') || studyprogramme.includes('T')
+      ? ['', 'Graduated']
+      : ['', 'Graduated', 'Wrote thesis']
   const programmesBeforeOrAfterTitles = ['Code', 'Id', 'Programme', ...years]
-  const tableStats = reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
+  const tableStats =
+    studyprogramme.includes('LIS') || studyprogramme.includes('T')
+      ? reversedYears.map(year => [year, graduated.tableStats[year]])
+      : reversedYears.map(year => [year, graduated.tableStats[year], thesis.tableStats[year]])
 
   return {
     id: studyprogramme,
     years,
     tableStats,
     titles,
-    graphStats: [
-      {
-        name: 'Graduated students',
-        data: graduated.graphStats,
-      },
-      {
-        name: 'Wrote thesis',
-        data: thesis.graphStats,
-      },
-    ],
+    graphStats:
+      studyprogramme.includes('LIS') || studyprogramme.includes('T')
+        ? [
+            {
+              name: 'Graduated students',
+              data: graduated.graphStats,
+            },
+          ]
+        : [
+            {
+              name: 'Graduated students',
+              data: graduated.graphStats,
+            },
+            {
+              name: 'Wrote thesis',
+              data: thesis.graphStats,
+            },
+          ],
     graduationTimes: graduationTimeStats.times,
     doCombo: graduationTimeStats.doCombo,
     comboTimes: graduationTimeStats.comboTimes,
