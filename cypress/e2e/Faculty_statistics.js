@@ -247,8 +247,8 @@ describe('Faculty overview', () => {
       cy.get('[data-cy="Graph-FacultyMastersProgress"]').should('be.visible')
       cy.get('[data-cy="Graph-FacultyBachelorsProgress"]').should('be.visible')
     })
-    // Following two tests just test that nothig goes broken after toggling
-    // No data for testing that the data actual changes as supposed
+    // Following two tests just test that nothing goes broken after toggling
+    // No data for testing that data actual change as supposed
     it('Graduations can be excluded', () => {
       cy.get('[data-cy="FacultyStudentStatsTable"]').should('be.visible')
       cy.get('[data-cy="StudentToggle"]').click()
@@ -269,16 +269,16 @@ describe('Faculty overview', () => {
     })
 
     it('Progress tables can be toggled', () => {
-      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-0"]').should('not.be.visible')
-      cy.get('[data-cy="Button-Show-FacultyBachelorsProgressTable-0"]').click()
-      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-0"]').should('be.visible')
-      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-1"]').should('not.be.visible')
-      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-2"]').should('not.be.visible')
-      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-3"]').should('not.be.visible')
-      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-4"]').should('not.be.visible')
-      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-5"]').should('not.be.visible')
-      cy.get('[data-cy="Button-Hide-FacultyBachelorsProgressTable-0"]').click()
-      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-0"]').should('not.be.visible')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-6"]').should('not.be.visible')
+      cy.get('[data-cy="Button-Show-FacultyBachelorsProgressTable-6"]').click()
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-0"]').should('not.exist')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-1"]').should('not.exist')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-2"]').should('not.exist')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-3"]').should('not.exist')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-4"]').should('not.exist')
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-6"]').should('be.visible')
+      cy.get('[data-cy="Button-Hide-FacultyBachelorsProgressTable-6"]').click()
+      cy.get('[data-cy="Cell-FacultyBachelorsProgressTable-6"]').should('not.be.visible')
     })
 
     it('Sudent statstable can be toggled', () => {

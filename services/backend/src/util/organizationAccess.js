@@ -6,16 +6,16 @@ const { getUserIamAccess } = require('./jami')
 const getAccessFromIAMs = async user => {
   if (user.iamGroups.length === 0) return {}
 
+  const { iamAccess, specialGroup } = await getUserIamAccess(user)
+
   const access = {}
+  if (_.isObject(iamAccess)) {
+    Object.keys(iamAccess).forEach(code => {
+      access[code] = iamAccess[code]
+    })
+  }
 
-  const iamAccess = await getUserIamAccess(user)
-
-  if (!_.isObject(iamAccess)) return access
-  Object.keys(iamAccess).forEach(code => {
-    access[code] = iamAccess[code]
-  })
-
-  return access
+  return { access, specialGroup }
 }
 
 const getOrganizationAccess = async user => {
