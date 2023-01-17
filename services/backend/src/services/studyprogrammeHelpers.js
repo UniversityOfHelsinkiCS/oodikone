@@ -368,7 +368,7 @@ const getDoctoralCreditGraphStats = years => ({
 const getCreditGraphStats = (studyprogramme, years) => {
   if (studyprogramme.includes('KH')) return getBachelorCreditGraphStats(years)
   if (studyprogramme === 'MH90_001') return getVetenaryCreditGraphStats(years)
-  if (studyprogramme.includes('MH')) return getMasterCreditGraphStats(years)
+  if (studyprogramme.includes('MH')) return getOnlyMasterCreditGraphStats(years)
   return getDoctoralCreditGraphStats(years)
 }
 
@@ -382,8 +382,8 @@ const onlyMasterCreditAmounts = [15, 30, 60, 90, 120, 120]
 const doctoralCreditAmounts = [10, 20, 30, 40, 40]
 const vetenaryCreditThresholds = ['lte210', 'lte240', 'lte270', 'lte300', 'lte330', 'lte360', 'mte360']
 const vetenaryCreditAmounts = [210, 240, 270, 300, 330, 360, 360]
-const getOnlyMasterThresholds = () => {
-  return { msOnlyCreditThresholdKeys: onlyMasterCreditThresholds, msOnlyCreditThresholdAmount: onlyMasterCreditAmounts }
+const getBcMsThresholds = () => {
+  return { creditThresholdKeysBcMs: masterCreditThresholds, creditThresholdAmountsBcMs: masterCreditAmounts }
 }
 const getCreditThresholds = studyprogramme => {
   if (studyprogramme === 'MH90_001') {
@@ -393,7 +393,7 @@ const getCreditThresholds = studyprogramme => {
     return { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
   }
   if (studyprogramme.includes('MH')) {
-    return { creditThresholdKeys: masterCreditThresholds, creditThresholdAmounts: masterCreditAmounts }
+    return { creditThresholdKeys: onlyMasterCreditThresholds, creditThresholdAmounts: onlyMasterCreditAmounts }
   }
   return { creditThresholdKeys: doctoralCreditThresholds, creditThresholdAmounts: doctoralCreditAmounts }
 }
@@ -552,7 +552,7 @@ module.exports = {
   getCreditThresholds,
   tableTitles,
   getCreditProgressTableTitles,
-  getOnlyMasterThresholds,
+  getBcMsThresholds,
   isNonMajorCredit,
   mapCodesToIds,
   getId,
