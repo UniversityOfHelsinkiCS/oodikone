@@ -34,7 +34,7 @@ export default {
   **Non-degree student credits**: Sisältää tiedekuntaan suoritetut opintopisteet, joiden suorittajilla ei ole tutkinto-oikeutta Helsingin yliopistossa.
   `,
   GraduatedOfTheFaculty: `Sisältää kyseisenä vuonna tiedekunnasta valmistuneet opiskelijat riippumatta siitä, minä vuonna opiskeluoikeus ohjelmaan on myönnetty. Jaottelu on tehty opinto-oikeuden päättymispäivän (=valmistumispäivän) perusteella.`,
-  ThesisWritersOfTheFaculty: `Sisältää kyseisenä vuonna kandidaatintutkielman, pro gradu -tutkielman, väitöskirjan tai lisensiaatintyön hyväksytysti suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.`,
+  ThesisWritersOfTheFaculty: `Sisältää kyseisenä vuonna kandidaatintutkielman tai pro gradu -tutkielman suorittaneet opiskelijat. Mukana ei ole mahdollisia arvosanan korotuksia.`,
   StudentToggle: `
   All studyrights: Valinnassa ovat mukana vaihto-opiskelijat, erillisoikeudella opiskelevat ja ohjelmaan siirtyneet opiskelijat sekä ohjelmasta pois siirtyneet opiskelijat.\n
   Special studyrights excluded: Valinnasta ja kaikista luvuista on poissuljettu kaikki edellä mainitut erikoisryhmät.

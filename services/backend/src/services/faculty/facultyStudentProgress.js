@@ -143,6 +143,10 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
   let bachelorlimits = []
   let masterlimits = []
   let bcmslimits = []
+  const bachelorProgress = {}
+  const masterProgress = {}
+  const bcmsProgress = {}
+  const doctoralProgress = {}
   for (const year of reversedYears) {
     if (year === 'Total') continue
     const { startDate, endDate } = getAcademicYearDates(year, since)
@@ -158,20 +162,19 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
     } else {
       masterlimits = createLimits(months, 0)
     }
-    if (months >= 36 && faculty === 'H90') {
-      bcmslimits = createLimits(36, 180)
-    } else if (months >= 24) {
-      bcmslimits = createLimits(24, 180)
+    if (months >= 72 && faculty === 'H90') {
+      bcmslimits = createLimits(72, 0)
+    } else if (months >= 60) {
+      bcmslimits = createLimits(60, 0)
     } else {
-      bcmslimits = createLimits(months, 180)
+      bcmslimits = createLimits(months, 0)
     }
     progressStats.yearlyBachelorTitles = [...progressStats.yearlyBachelorTitles, createYearlyTitles(0, bachelorlimits)]
     progressStats.yearlyMasterTitles = [...progressStats.yearlyMasterTitles, createYearlyTitles(0, masterlimits)]
-    progressStats.yearlyBcMsTitles = [...progressStats.yearlyBcMsTitles, createYearlyTitles(180, bcmslimits)]
+    progressStats.yearlyBcMsTitles = [...progressStats.yearlyBcMsTitles, createYearlyTitles(0, bcmslimits)]
     const programmeCodes = programmes.map(prog => prog.code)
 
     for (const { progId, code, name } of programmes) {
-      if (code.includes('LIS')) continue
       let extentcodes = [1, 2, 3, 4]
       if (includeAllSpecials) {
         extentcodes = [...extentcodes, ...[7, 9, 34, 22, 99, 14, 13]]
@@ -206,12 +209,12 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
           'KH'
         )
 
-        if (!(progId in progressStats.bachelorsProgStats)) {
-          progressStats.bachelorsProgStats[progId] = new Array(reversedYears.length - 1)
+        if (!(progId in bachelorProgress)) {
+          bachelorProgress[progId] = new Array(reversedYears.length - 1)
         }
         progressStats.bachelorsTableStats[indexOf(reversedYears, year)][1] += students.length || 0
         progressStats.bachelorsTableStats[indexOf(reversedYears, 'Total')][1] += students.length || 0
-        progressStats.bachelorsProgStats[progId][indexOf(reversedYears, year)] = limitKeys.map(key => progData[key])
+        bachelorProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => progData[key])
         for (const key of Object.keys(studentData)) {
           progressStats.bachelorsTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
             studentData[key] || 0
@@ -253,14 +256,13 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
           limitKeys,
           'MH'
         )
-        if (!(progId in progressStats.mastersProgStats)) {
-          progressStats.mastersProgStats[progId] = new Array(reversedYears.length - 1)
+        if (!(progId in masterProgress)) {
+          masterProgress[progId] = new Array(reversedYears.length - 1)
+          bcmsProgress[progId] = new Array(reversedYears.length - 1)
         }
-        if (!(progId in progressStats.bcMsProgStats)) {
-          progressStats.bcMsProgStats[progId] = new Array(reversedYears.length - 1)
-        }
-        progressStats.mastersProgStats[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
-        progressStats.bcMsProgStats[progId][indexOf(reversedYears, year)] = limitKeys.map(key => bcMsProgdata[key])
+
+        masterProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
+        bcmsProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => bcMsProgdata[key])
         for (const key of Object.keys(msStudentdata)) {
           progressStats.mastersTableStats[indexOf(reversedYears, year)][indexOf(msOnlyCreditThresholdKeys, key) + 2] +=
             msStudentdata[key] || 0
@@ -285,12 +287,10 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
 
         progressStats.doctoralTableStats[indexOf(reversedYears, year)][1] += doctoralStudents.length || 0
         progressStats.doctoralTableStats[indexOf(reversedYears, 'Total')][1] += doctoralStudents.length || 0
-        if (!(progId in progressStats.doctoralProgStats)) {
-          progressStats.doctoralProgStats[progId] = new Array(reversedYears.length - 1)
+        if (!(progId in doctoralProgress)) {
+          doctoralProgress[progId] = new Array(reversedYears.length - 1)
         }
-        progressStats.doctoralProgStats[progId][indexOf(reversedYears, year)] = creditThresholdKeys.map(
-          key => data[key]
-        )
+        doctoralProgress[progId][indexOf(reversedYears, year)] = creditThresholdKeys.map(key => data[key])
 
         for (const key of Object.keys(data)) {
           progressStats.doctoralTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
@@ -304,6 +304,18 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
     }
   }
 
+  progressStats.bachelorsProgStats = Object.keys(bachelorProgress)
+    .filter(prog => !bachelorProgress[prog].every(year => year.every(value => value === 0)))
+    .reduce((result, prog) => ({ ...result, [prog]: bachelorProgress[prog] }), {})
+  progressStats.mastersProgStats = Object.keys(masterProgress)
+    .filter(prog => !masterProgress[prog].every(year => year.every(value => value === 0)))
+    .reduce((result, prog) => ({ ...result, [prog]: masterProgress[prog] }), {})
+  progressStats.bcMsProgStats = Object.keys(bcmsProgress)
+    .filter(prog => !bcmsProgress[prog].every(year => year.every(value => value === 0)))
+    .reduce((result, prog) => ({ ...result, [prog]: bcmsProgress[prog] }), {})
+  progressStats.doctoralProgStats = Object.keys(doctoralProgress)
+    .filter(prog => !doctoralProgress[prog].every(year => year.every(value => value === 0)))
+    .reduce((result, prog) => ({ ...result, [prog]: doctoralProgress[prog] }), {})
   return progressStats
 }
 module.exports = { combineFacultyStudentProgress }

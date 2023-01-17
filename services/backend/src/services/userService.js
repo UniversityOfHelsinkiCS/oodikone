@@ -12,9 +12,6 @@ const { getUserIams, getAllUserAccess } = require('../util/jami')
 
 const courseStatisticsGroup = 'grp-oodikone-basic-users'
 const facultyStatisticsGroup = 'grp-oodikone-users'
-const hyOneGroup = 'hy-one'
-const toskaGroup = 'grp-toska'
-const openUniGroup = 'hy-ypa-opa-dojo'
 
 // Max 25 users can be stored in the cache
 const userDataCache = new LRU({
@@ -243,13 +240,14 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
 
   const formattedUser = await formatUser(userFromDb)
 
-  const iamRights = Object.keys(await getOrganizationAccess(userFromDb)).filter(
-    programmeCode => !formattedUser.rights.includes(programmeCode)
-  )
+  const { access = {}, specialGroup = {} } = await getOrganizationAccess(userFromDb)
+
+  const iamRights = Object.keys(access).filter(programmeCode => !formattedUser.rights.includes(programmeCode))
 
   const toReturn = {
     ...formattedUser,
     iamRights,
+    specialGroup,
     mockedBy,
   }
   userDataCache.set(userToMock, toReturn)
@@ -257,7 +255,7 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
   return toReturn
 }
 
-const getUser = async ({ username, name, email, iamGroups, iamRights, sisId }) => {
+const getUser = async ({ username, name, email, iamGroups, iamRights, specialGroup, sisId }) => {
   if (userDataCache.has(username)) {
     return userDataCache.get(username)
   }
@@ -279,14 +277,16 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, sisId }) =
   const { roles: currentAccessGroups } = formattedUser
 
   // Modify accessgroups based on current groups and iamGroups
+  const { hyOne, superAdmin, openUni } = specialGroup
   let newAccessGroups = []
   if (await checkStudyGuidanceGroupsAccess(sisId)) newAccessGroups.push('studyGuidanceGroups')
   if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
   if (iamGroups.includes(facultyStatisticsGroup) || iamGroups.some(element => /-jory$/.test(element)))
     newAccessGroups.push('facultyStatistics')
-  if (iamGroups.includes(hyOneGroup) || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
-  if (iamGroups.includes(toskaGroup) || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
-  if (iamGroups.includes(openUniGroup)) newAccessGroups.push('openUniSearch')
+  if (hyOne || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
+  if (superAdmin || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
+  if (openUni) newAccessGroups.push('openUniSearch')
+
   // In the difference method "the order and references of result values are determined by the first array." https://lodash.com/docs/4.17.15#difference
   // Both directions needs to be checked in order to update roles when the access should no longer exists.
   if (

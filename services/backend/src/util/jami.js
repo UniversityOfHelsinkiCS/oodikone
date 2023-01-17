@@ -22,7 +22,10 @@ const getUserIamAccess = async (user, attempt = 1) => {
       iamGroups,
     })
 
-    return iamAccess
+    const { specialGroup } = iamAccess
+    delete iamAccess.specialGroup
+
+    return { iamAccess, specialGroup }
   } catch (error) {
     if (attempt > 3) {
       logger.error('[Jami] error: ', error)

@@ -36,44 +36,47 @@ const FacultyProgressTable = ({
         </Table.Header>
 
         <Table.Body>
-          {data?.map((yearArray, yearIndex) => (
-            <React.Fragment key={`random-fragment-key-${Math.random()}`}>
-              {yearIndex < lenOfYearArray ? (
-                <BasicRow
-                  icon={visible[yearIndex] ? 'angle down' : 'angle right'}
-                  yearArray={yearArray}
-                  cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
-                  yearIndex={yearIndex}
-                  toggleVisibility={() => toggleVisibility(yearIndex)}
-                />
-              ) : (
-                <Table.Row>
-                  {yearArray?.map(value => (
-                    <Table.Cell key={`last-row-${Math.random()}`}>{value}</Table.Cell>
-                  ))}
-                </Table.Row>
-              )}
-              {yearIndex < lenOfYearArray ? (
-                <Table.Row
-                  key={`${cypress}-row-${Math.random()}`}
-                  style={{ display: visible[yearIndex] ? '' : 'none' }}
-                >
-                  <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} colSpan={100}>
-                    <ProgrammeProgressChart
-                      data={sortedKeys?.map(programme => programmeStats[programme][yearIndex])}
-                      longLabels={programmeNames}
-                      labels={sortedKeys}
-                      language={language}
-                      names={progressTitles ? progressTitles[yearIndex] : titles?.slice(2)}
-                      needsExtra={needsExtra === 'EXTRA HEIGHT'}
+          {data?.map(
+            (yearArray, yearIndex) =>
+              yearArray?.slice(1).some(value => value !== 0) && (
+                <React.Fragment key={`random-fragment-key-${Math.random()}`}>
+                  {yearIndex < lenOfYearArray ? (
+                    <BasicRow
+                      icon={visible[yearIndex] ? 'angle down' : 'angle right'}
+                      yearArray={yearArray}
+                      cypress={visible[yearIndex] ? `Hide-${cypress}` : `Show-${cypress}`}
+                      yearIndex={yearIndex}
+                      toggleVisibility={() => toggleVisibility(yearIndex)}
                     />
-                  </Table.Cell>
-                </Table.Row>
-              ) : (
-                <></>
-              )}
-            </React.Fragment>
-          ))}
+                  ) : (
+                    <Table.Row>
+                      {yearArray?.map(value => (
+                        <Table.Cell key={`last-row-${Math.random()}`}>{value}</Table.Cell>
+                      ))}
+                    </Table.Row>
+                  )}
+                  {yearIndex < lenOfYearArray ? (
+                    <Table.Row
+                      key={`${cypress}-row-${Math.random()}`}
+                      style={{ display: visible[yearIndex] ? '' : 'none' }}
+                    >
+                      <Table.Cell data-cy={`Cell-${cypress}-${yearIndex}`} colSpan={100}>
+                        <ProgrammeProgressChart
+                          data={sortedKeys?.map(programme => programmeStats[programme][yearIndex])}
+                          longLabels={programmeNames}
+                          labels={sortedKeys}
+                          language={language}
+                          names={progressTitles ? progressTitles[yearIndex] : titles?.slice(2)}
+                          needsExtra={needsExtra === 'EXTRA HEIGHT'}
+                        />
+                      </Table.Cell>
+                    </Table.Row>
+                  ) : (
+                    <></>
+                  )}
+                </React.Fragment>
+              )
+          )}
         </Table.Body>
       </Table>
     </div>
