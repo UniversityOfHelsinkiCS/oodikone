@@ -692,7 +692,7 @@ const tableStateReducer = (...args) =>
           state.expandedGroups.push(group)
         }
       },
-    }[type]())
+    })[type]()
   })
 
 const injectParentPointers = columns => {
