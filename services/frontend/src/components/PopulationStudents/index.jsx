@@ -302,6 +302,7 @@ const CoursesTable = ({ students }) => {
         <div style={{ maxHeight: '80vh', width: '100%' }}>
           {mandatoryCourses.length > 0 && (
             <SortableTable
+              tableId="course-of-population-students"
               title={`Courses of population's students`}
               getRowKey={s => (s.total ? 'totals' : s.studentNumber)}
               tableProps={{

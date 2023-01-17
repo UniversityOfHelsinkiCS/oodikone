@@ -692,7 +692,7 @@ const tableStateReducer = (...args) =>
           state.expandedGroups.push(group)
         }
       },
-    })[type]()
+    }[type]())
   })
 
 const injectParentPointers = columns => {
@@ -801,6 +801,7 @@ const extractColumnKeys = columns => {
 }
 
 const SortableTable = ({
+  tableId,
   columns: pColumns,
   title,
   data,
@@ -921,7 +922,7 @@ const SortableTable = ({
   }
 
   const content = (
-    <table className={classNames.join(' ')} style={tableStyles}>
+    <table className={classNames.join(' ')} id={tableId} style={tableStyles}>
       <thead style={{ position: 'sticky', top: 0, zIndex: 1 }}>{headers}</thead>
       <tbody>
         {sortedData.map(item => (

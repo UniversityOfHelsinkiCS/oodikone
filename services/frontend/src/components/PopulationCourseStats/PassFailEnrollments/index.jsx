@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import CourseFilterToggle from '../CourseFilterToggle'
 import { UsePopulationCourseContext } from '../PopulationCourseContext'
 import { getTextIn } from '../../../common'
+import './passFailEnrollments.css'
 
 const createModuleAggregateRow = ({ definition, children }) => ({
   label_code: definition.module.code,
@@ -234,6 +235,7 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
   return (
     <>
       <SortableTable
+        tableId="pass-and-fail-statistics-of-courses"
         title="Pass and fail statistics of courses with course enrollment details"
         data={data}
         columns={columns}

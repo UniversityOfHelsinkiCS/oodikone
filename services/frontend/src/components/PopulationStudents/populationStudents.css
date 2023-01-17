@@ -20,31 +20,31 @@
   padding: 1px;
 }
 
-td.studentNumber:not(:first-child) {
+table#course-of-population-students td.studentNumber:not(:first-child) {
   padding: 0 !important;
 }
 
-.studentNumber div span {
+table#course-of-population-students .studentNumber div span {
   padding-left: 0.1em;
 }
 
-.studentNumber div a {
+table#course-of-population-students .studentNumber div a {
   padding-left: 0.7em;
 }
 
-table tbody tr td:nth-child(n + 1) {
+table#course-of-population-students tbody tr td:nth-child(n + 1) {
   z-index: -1;
 }
 
-table tbody tr:nth-child(2n) td:first-child {
+table#course-of-population-students tbody tr:nth-child(2n) td:first-child {
   position: sticky;
   left: 0;
-  background: rgb(230 230 230) !important;
+  background: rgb(242 242 242) !important;
   overflow: hidden;
   z-index: 0;
 }
 
-table tbody tr:nth-child(2n + 1) td:first-child {
+table#course-of-population-students tbody tr:nth-child(2n + 1) td:first-child {
   position: sticky;
   left: 0;
   background: white !important;
