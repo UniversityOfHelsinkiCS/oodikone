@@ -330,7 +330,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
   const totals = {}
   studytracks.forEach(async track => {
     mainStatsByTrack[track] = []
-    creditGraphStats[track] = getCreditGraphStats(studyprogramme, years)
+    creditGraphStats[track] = getCreditGraphStats(studyprogramme, years, true)
     creditTableStats[track] = []
     graduationAmounts[track] = getYearsObject({ years })
     totalAmounts[track] = getYearsObject({ years })
@@ -382,7 +382,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
   const studytrackNames = associations.studyTracks
 
   const data = getEmptyStatsObjects(years, studytracks, studyprogramme)
-  const { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(studyprogramme)
+  const { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(studyprogramme, true)
   const { creditThresholdKeysBcMs, creditThresholdAmountsBcMs } = getBcMsThresholds()
 
   const yearsReversed = [...years].reverse()
@@ -413,7 +413,10 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
       studytrackOptions,
       includeGraduated: settings.graduated,
       populationTitles: tableTitles['studytracks'],
-      creditTableTitles: tableTitles['creditProgress']['masterOnly'],
+      creditTableTitles:
+        studyprogramme === 'MH90_001'
+          ? tableTitles['creditProgress']['bachelor']
+          : getCreditProgressTableTitles(studyprogramme),
       creditTableTitlesBcMs: tableTitles['creditProgress']['master'],
     }
   }

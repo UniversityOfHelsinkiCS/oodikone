@@ -315,6 +315,7 @@ const getVetenaryCreditGraphStats = years => ({
     data: getEmptyArray(years.length),
   },
 })
+
 const getOnlyMasterCreditGraphStats = years => ({
   lte15: {
     name: 'Less than 15 credits',
@@ -365,9 +366,10 @@ const getDoctoralCreditGraphStats = years => ({
   },
 })
 
-const getCreditGraphStats = (studyprogramme, years) => {
+const getCreditGraphStats = (studyprogramme, years, studyprog = false) => {
   if (studyprogramme.includes('KH')) return getBachelorCreditGraphStats(years)
-  if (studyprogramme === 'MH90_001') return getVetenaryCreditGraphStats(years)
+  if (studyprogramme === 'MH90_001')
+    return studyprog ? getBachelorCreditGraphStats(years) : getVetenaryCreditGraphStats(years)
   if (studyprogramme.includes('MH')) return getOnlyMasterCreditGraphStats(years)
   return getDoctoralCreditGraphStats(years)
 }
@@ -385,9 +387,11 @@ const vetenaryCreditAmounts = [210, 240, 270, 300, 330, 360, 360]
 const getBcMsThresholds = () => {
   return { creditThresholdKeysBcMs: masterCreditThresholds, creditThresholdAmountsBcMs: masterCreditAmounts }
 }
-const getCreditThresholds = studyprogramme => {
+const getCreditThresholds = (studyprogramme, studyProg = false) => {
   if (studyprogramme === 'MH90_001') {
-    return { creditThresholdKeys: vetenaryCreditThresholds, creditThresholdAmounts: vetenaryCreditAmounts }
+    return studyProg
+      ? { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
+      : { creditThresholdKeys: vetenaryCreditThresholds, creditThresholdAmounts: vetenaryCreditAmounts }
   }
   if (studyprogramme.includes('KH')) {
     return { creditThresholdKeys: bachelorCreditThresholds, creditThresholdAmounts: bachelorCreditAmounts }
