@@ -28,7 +28,8 @@ const currentUserMiddleware = async (req, _res, next) => {
   }
 
   const iamGroups = parseIamGroups(hygroupcn)
-  const iamRights = Object.keys(await getOrganizationAccess({ iamGroups }))
+  const { access = {}, specialGroup = {} } = await getOrganizationAccess({ iamGroups })
+  const iamRights = Object.keys(access)
 
   if (!hasRequiredIamGroup(iamGroups, iamRights)) {
     logger.error({ message: 'User does not have required iam group', meta: { iamGroups, iamRights } })
@@ -41,6 +42,7 @@ const currentUserMiddleware = async (req, _res, next) => {
     email,
     iamGroups,
     iamRights,
+    specialGroup,
     sisId,
   })
 
