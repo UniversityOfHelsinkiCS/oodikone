@@ -113,38 +113,27 @@ const CoursesTable = ({ students }) => {
     nameColumns.push(
       {
         key: 'studentnumber-parent',
-        mergeHeader: true,
-        // merge: true,
         title: 'Student Number',
-        children: [
-          {
-            key: 'studentnumber',
-            title: 'Student Number',
-            cellProps: { title: 'student number' },
-            getRowVal: s => (s.total ? '*' : s.studentNumber),
-            getRowContent: s => (s.total ? 'Summary:' : s.studentNumber),
-            child: true,
-          },
-          {
-            key: 'icon',
-            title: 'Icon',
-            export: false,
-            getRowVal: s =>
-              !s.total && (
-                <Item
-                  as={Link}
-                  to={`/students/${s.studentNumber}`}
-                  onClick={() => {
-                    sendAnalytics('Student details button clicked', 'Mandatory courses table')
-                  }}
-                >
-                  <Icon name="user outline" />
-                </Item>
-              ),
-            cellProps: { className: 'iconCell' },
-            child: true,
-          },
-        ],
+        cellProps: { title: 'student number', className: 'studentNumber' },
+        getRowVal: s => (s.total ? '*' : s.studentNumber),
+        getRowContent: s =>
+          s.total ? (
+            'Summary:'
+          ) : (
+            <div>
+              <span>{s.studentNumber}</span>
+              <Item
+                as={Link}
+                to={`/students/${s.studentNumber}`}
+                onClick={() => {
+                  sendAnalytics('Student details button clicked', 'Mandatory courses table')
+                }}
+              >
+                <Icon style={{ borderLeft: '1em' }} name="user outline" />
+              </Item>
+            </div>
+          ),
+        child: true,
       },
       {
         key: 'totalpassed',
