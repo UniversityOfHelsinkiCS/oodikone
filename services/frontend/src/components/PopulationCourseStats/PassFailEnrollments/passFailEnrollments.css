@@ -1,0 +1,19 @@
+table#pass-and-fail-statistics-of-courses tbody tr td:nth-child(n + 1) {
+  z-index: -1;
+}
+
+table#pass-and-fail-statistics-of-courses tbody tr:nth-child(2n) td:nth-child(2) {
+  position: sticky;
+  left: 0;
+  background: rgb(242 242 242) !important;
+  overflow: hidden;
+  z-index: 0;
+}
+
+table#pass-and-fail-statistics-of-courses tbody tr:nth-child(2n + 1) td:nth-child(2) {
+  position: sticky;
+  left: 0;
+  background: white !important;
+  overflow: hidden;
+  z-index: 0;
+}
