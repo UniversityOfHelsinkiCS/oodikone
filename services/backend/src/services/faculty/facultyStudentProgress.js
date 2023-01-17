@@ -10,7 +10,7 @@ const {
   getYearsArray,
   tableTitles,
   getOnlyMasterCreditGraphStats,
-  getOnlyMasterThresholds,
+  getBcMsThresholds,
   getVetenaryCreditGraphStats,
 } = require('../studyprogrammeHelpers')
 const { studytrackStudents } = require('../studyprogramme')
@@ -237,21 +237,22 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
         progressStats.mastersTableStats[indexOf(reversedYears, 'Total')][1] += msStudents.length || 0
         progressStats.bcMsTableStats[indexOf(reversedYears, year)][1] += bcMsStudents.length || 0
         progressStats.bcMsTableStats[indexOf(reversedYears, 'Total')][1] += bcMsStudents.length || 0
+        const { creditThresholdKeysBcMs, creditThresholdAmountsBcMs } = getBcMsThresholds()
         const { data: bcMsStudentdata, progData: bcMsProgdata } = getStudentData(
           startDate,
           bcMsStudents,
-          creditThresholdKeys,
-          creditThresholdAmounts,
+          creditThresholdKeysBcMs,
+          creditThresholdAmountsBcMs,
           bcmslimits,
           limitKeys,
           'MH'
         )
-        const { msOnlyCreditThresholdKeys, msOnlyCreditThresholdAmount } = getOnlyMasterThresholds()
+
         const { data: msStudentdata, progData: msProgdata } = getStudentData(
           startDate,
           msStudents,
-          msOnlyCreditThresholdKeys,
-          msOnlyCreditThresholdAmount,
+          creditThresholdKeys,
+          creditThresholdAmounts,
           masterlimits,
           limitKeys,
           'MH'
@@ -264,18 +265,17 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
         masterProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
         bcmsProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => bcMsProgdata[key])
         for (const key of Object.keys(msStudentdata)) {
-          progressStats.mastersTableStats[indexOf(reversedYears, year)][indexOf(msOnlyCreditThresholdKeys, key) + 2] +=
+          progressStats.mastersTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
             msStudentdata[key] || 0
-          progressStats.mastersTableStats[indexOf(reversedYears, 'Total')][
-            indexOf(msOnlyCreditThresholdKeys, key) + 2
-          ] += msStudentdata[key] || 0
+          progressStats.mastersTableStats[indexOf(reversedYears, 'Total')][indexOf(creditThresholdKeys, key) + 2] +=
+            msStudentdata[key] || 0
           progressStats.mastersGraphStats[key].data[indexOf(yearsArray, year)] += msStudentdata[key] || 0
           progressStats.mastersGraphStats[key].data[indexOf(yearsArray, 'Total')] += msStudentdata[key] || 0
         }
         for (const key of Object.keys(bcMsStudentdata)) {
-          progressStats.bcMsTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeys, key) + 2] +=
+          progressStats.bcMsTableStats[indexOf(reversedYears, year)][indexOf(creditThresholdKeysBcMs, key) + 2] +=
             bcMsStudentdata[key] || 0
-          progressStats.bcMsTableStats[indexOf(reversedYears, 'Total')][indexOf(creditThresholdKeys, key) + 2] +=
+          progressStats.bcMsTableStats[indexOf(reversedYears, 'Total')][indexOf(creditThresholdKeysBcMs, key) + 2] +=
             bcMsStudentdata[key] || 0
           progressStats.bcMsGraphStats[key].data[indexOf(yearsArray, year)] += bcMsStudentdata[key] || 0
           progressStats.bcMsGraphStats[key].data[indexOf(yearsArray, 'Total')] += bcMsStudentdata[key] || 0
