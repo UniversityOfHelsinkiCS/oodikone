@@ -1,4 +1,4 @@
-import { sortBy } from 'lodash'
+import { flatten, sortBy } from 'lodash'
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Dropdown } from 'semantic-ui-react'
@@ -73,6 +73,18 @@ export default ({ students }) => {
     return studyright?.startdate ? studyright.startdate : ''
   }
 
+  const getStartedInProgramme = studyrights => {
+    const code = queryStudyrights[0]
+    if (!code || !studyrights) return ''
+    const element = flatten(
+      studyrights.reduce((acc, curr) => {
+        acc.push(curr.studyright_elements)
+        return acc
+      }, [])
+    ).filter(e => e.code === code)
+    return new Date(Math.max(new Date(element[0]?.startdate), new Date(getStartOfStudyright(studyrights))))
+  }
+
   const getAdmissionType = studyrights => {
     const studyright = findCorrectStudyright(studyrights)
     return studyright && studyright.admission_type ? studyright.admission_type : 'Ei valintatapaa'
@@ -138,6 +150,7 @@ export default ({ students }) => {
         tags: tags(s.tags),
         'start year at university': reformatDate(s.started, 'YYYY'),
         'start of studyright': reformatDate(getStartOfStudyright(s.studyrights), 'YYYY-MM-DD'),
+        'started in programme': reformatDate(getStartedInProgramme(s.studyrights), 'YYYY-MM-DD'),
         'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes),
