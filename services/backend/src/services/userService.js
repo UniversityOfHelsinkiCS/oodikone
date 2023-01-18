@@ -188,14 +188,14 @@ const findAll = async () => {
   return formattedUsers
 }
 
-const formatUser = async userFromDb => {
+const formatUser = async (userFromDb, extraRights) => {
   const [accessGroups, programmes, faculties] = [
     ['accessgroup', 'group_code'],
     ['programme', 'elementDetailCode'],
     ['faculty', 'faculty_code'],
   ].map(([field, code]) => userFromDb[field].map(entry => entry[code]))
 
-  const rights = _.uniqBy([...programmes, ...enrichProgrammesFromFaculties(faculties)])
+  const rights = _.uniqBy([...programmes, ...enrichProgrammesFromFaculties(faculties)]).concat(extraRights)
 
   const {
     dataValues: {
@@ -238,11 +238,11 @@ const getMockedUser = async ({ userToMock, mockedBy }) => {
   const userFromDb = await byUsername(userToMock)
   userFromDb.iamGroups = await getUserIams(userFromDb.sisu_person_id)
 
-  const formattedUser = await formatUser(userFromDb)
-
   const { access = {}, specialGroup = {} } = await getOrganizationAccess(userFromDb)
 
-  const iamRights = Object.keys(access).filter(programmeCode => !formattedUser.rights.includes(programmeCode))
+  const iamRights = Object.keys(access)
+
+  const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [])
 
   const toReturn = {
     ...formattedUser,
@@ -272,17 +272,17 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, specialGro
     last_login: new Date(),
   })
 
+  const { kosu, jory, hyOne, superAdmin, openUni } = specialGroup
+
   const userFromDb = await byUsername(username)
-  const formattedUser = await formatUser(userFromDb)
+  const formattedUser = await formatUser(userFromDb, kosu ? iamRights : [])
   const { roles: currentAccessGroups } = formattedUser
 
   // Modify accessgroups based on current groups and iamGroups
-  const { hyOne, superAdmin, openUni } = specialGroup
   let newAccessGroups = []
   if (await checkStudyGuidanceGroupsAccess(sisId)) newAccessGroups.push('studyGuidanceGroups')
   if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
-  if (iamGroups.includes(facultyStatisticsGroup) || iamGroups.some(element => /-jory$/.test(element)))
-    newAccessGroups.push('facultyStatistics')
+  if (jory || iamGroups.includes(facultyStatisticsGroup)) newAccessGroups.push('facultyStatistics')
   if (hyOne || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
   if (superAdmin || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
   if (openUni) newAccessGroups.push('openUniSearch')
