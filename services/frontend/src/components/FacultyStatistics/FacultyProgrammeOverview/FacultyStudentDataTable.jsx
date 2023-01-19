@@ -44,6 +44,11 @@ const FacultyStudentDataTable = ({
     setVisible(arrayToModify)
   }
 
+  const calendarYears = years.reduce((all, year) => {
+    if (year === 'Total') return all
+    return all.concat(Number(year.slice(0, 4)))
+  }, [])
+
   return (
     <div className="datatable">
       <Toggle
@@ -143,7 +148,11 @@ const FacultyStudentDataTable = ({
                           {(requiredRights.rights?.includes(programmeNames[programme].code) ||
                             requiredRights.isAdmin ||
                             requiredRights.IAMrights?.includes(programmeNames[programme].code)) && (
-                            <PopulationLink studyprogramme={programmeNames[programme].code} year={year} />
+                            <PopulationLink
+                              studyprogramme={programmeNames[programme].code}
+                              year={year}
+                              years={calendarYears}
+                            />
                           )}
                         </Table.Cell>
                         {programmeStats[programme][year].map((value, valIdx) => {

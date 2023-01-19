@@ -30,6 +30,10 @@ import {
   hopsFilter,
 } from '../FilterView/filters'
 
+const getYearText = year => {
+  if (year === 'All') return ''
+  return `${year} - ${Number(year) + 1}`
+}
 const PopulationStatistics = () => {
   const location = useLocation()
   const { language } = useLanguage()
@@ -96,9 +100,7 @@ const PopulationStatistics = () => {
   }, [samples, programmeCode])
 
   const title =
-    location.search === ''
-      ? 'Class statistics'
-      : `${getTextIn(programmeName, language)} ${query?.year} - ${Number(query?.year) + 1}`
+    location.search === '' ? 'Class statistics' : `${getTextIn(programmeName, language)} ${getYearText(query?.year)}`
 
   return (
     <FilterView
@@ -119,6 +121,9 @@ const PopulationStatistics = () => {
         <div className="segmentContainer" style={{ flexGrow: 1 }}>
           <Header className="segmentTitle" size="large" align="center">
             {title}
+            {location.search !== '' && query?.studyRights?.studyTrack && query?.studyRights?.studyTrack !== '' && (
+              <Header.Subheader> studytrack {query?.studyRights?.studyTrack}</Header.Subheader>
+            )}
             {location.search !== '' && (
               <Header.Subheader>
                 studytime {query?.months} months, class size {students.length} students

@@ -189,17 +189,19 @@ const PopulationSearchHistory = props => {
           </div>
         </div>
         <div style={{ marginLeft: '100px' }}>
-          <Form.Group>
-            <Form.Field>
-              <Form.Radio
-                data-cy="advanced-toggle"
-                toggle
-                checked={showAdvancedSettings}
-                onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-                label="Advanced settings"
-              />
-            </Form.Field>
-          </Form.Group>
+          {populations.query.year !== 'All' && (
+            <Form.Group>
+              <Form.Field>
+                <Form.Radio
+                  data-cy="advanced-toggle"
+                  toggle
+                  checked={showAdvancedSettings}
+                  onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+                  label="Advanced settings"
+                />
+              </Form.Field>
+            </Form.Group>
+          )}
           <div>{renderAdvancedSettingsSelector()}</div>
           <div>{showAdvancedSettings ? <InfoBox content={Advanced} /> : <FilterActiveNote />}</div>
         </div>
