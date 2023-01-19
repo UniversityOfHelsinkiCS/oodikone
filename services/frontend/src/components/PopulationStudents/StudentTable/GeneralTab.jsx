@@ -635,7 +635,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   const baseColumns = ['credits', 'credits.all', 'studentnumber-parent', 'tags', 'updatedAt', 'option']
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
-  const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'studyrightStart', 'studyStartDate', 'updatedAt']
+  const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'updatedAt']
 
   const columnKeysToInclude = _.chain(baseColumns)
     .union(columnsByVariant[variant])
