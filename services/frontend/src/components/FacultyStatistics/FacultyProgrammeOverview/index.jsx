@@ -1,5 +1,5 @@
 import React from 'react'
-import { Divider, Loader } from 'semantic-ui-react'
+import { Divider, Loader, Message } from 'semantic-ui-react'
 import { useGetFacultyProgressStatsQuery, useGetFacultyStudentStatsQuery } from 'redux/facultyStats'
 import FacultyProgressTable from './FacultyProgressTable'
 import FacultyBarChart from './FacultyBarChart'
@@ -179,6 +179,9 @@ const FacultyProgrammeOverview = ({
                 </div>
               </div>
               {getDivider('Bachelor + Master', 'ProgressOfBachelorMaster', 'no-infobox')}
+              <Message data-cy="FacultyProgrammesShownInfo">
+                The starting year is the studyright start in the bachelor programme.
+              </Message>
               <div className="section-container">
                 <div className="graph-container">
                   <FacultyBarChart
