@@ -251,7 +251,7 @@ const GeneralTab = ({
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
-  let creditColumnTitle = 'Since Start of Programme'
+  let creditColumnTitle = 'Since start in programme'
 
   if (creditDateFilterOptions) {
     const { startDate, endDate } = creditDateFilterOptions
@@ -399,27 +399,6 @@ const GeneralTab = ({
       title: 'Study Track',
       getRowVal: s => studytrack(s.studyrights).map(st => st.name)[0],
     },
-    priority: {
-      key: 'priority',
-      title: 'Priority',
-      getRowVal: s => priorityText(s.studyrights),
-    },
-    extent: {
-      key: 'extent',
-      title: 'Extent',
-      getRowVal: s => extentCodes(s.studyrights),
-    },
-    semesterEnrollments: {
-      key: 'semesterEnrollments',
-      title: 'Semesters',
-      helpText: 'Number of present semesters',
-      getRowVal: s => semesterEnrollments(s.semesterenrollments),
-    },
-    tags: {
-      key: 'tags',
-      title: 'Tags',
-      getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
-    },
     studyrightStart: {
       key: 'studyrightStart',
       title: 'Start of studyright',
@@ -444,6 +423,17 @@ const GeneralTab = ({
         studentToStudyrightEndMap[s.studentNumber]
           ? reformatDate(studentToStudyrightEndMap[s.studentNumber], 'YYYY-MM-DD')
           : '',
+    },
+    semesterEnrollments: {
+      key: 'semesterEnrollments',
+      title: 'Semesters',
+      helpText: 'Number of present semesters',
+      getRowVal: s => semesterEnrollments(s.semesterenrollments),
+    },
+    tags: {
+      key: 'tags',
+      title: 'Tags',
+      getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
     },
     admissionType: shouldShowAdmissionType && {
       key: 'admissionType',
@@ -492,6 +482,16 @@ const GeneralTab = ({
       key: 'option',
       title: cleanedQueryStudyrights.some(code => code.startsWith('MH')) ? 'Bachelor' : 'Master',
       getRowVal: s => (s.option ? getTextIn(s.option.name, language) : ''),
+    },
+    priority: {
+      key: 'priority',
+      title: 'Priority',
+      getRowVal: s => priorityText(s.studyrights),
+    },
+    extent: {
+      key: 'extent',
+      title: 'Extent',
+      getRowVal: s => extentCodes(s.studyrights),
     },
     email: {
       mergeHeader: true,
