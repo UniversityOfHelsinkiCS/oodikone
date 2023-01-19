@@ -335,20 +335,6 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
   }
 
   const studytrackOptions = getStudytrackOptions(studyprogramme, studytrackNames, studytracks, data.emptyTracks, years)
-  if (studyprogramme.includes('MH')) {
-    return {
-      id: studyprogramme,
-      years: years,
-      ...data,
-      studytrackOptions,
-      includeGraduated: settings.graduated,
-      populationTitles: tableTitles['studytracks'],
-      creditTableTitles:
-        studyprogramme === 'MH90_001'
-          ? tableTitles['creditProgress']['bachelor']
-          : tableTitles['creditProgress']['masterOnly'],
-    }
-  }
   return {
     id: studyprogramme,
     years: years,
@@ -356,7 +342,10 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
     studytrackOptions,
     includeGraduated: settings.graduated,
     populationTitles: tableTitles['studytracks'],
-    creditTableTitles: getCreditProgressTableTitles(studyprogramme),
+    creditTableTitles:
+      studyprogramme === 'MH90_001'
+        ? tableTitles['creditProgress']['bachelor']
+        : getCreditProgressTableTitles(studyprogramme),
   }
 }
 

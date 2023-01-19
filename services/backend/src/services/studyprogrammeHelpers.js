@@ -484,7 +484,7 @@ const tableTitles = {
 
 const getCreditProgressTableTitles = studyprogramme => {
   if (studyprogramme.includes('KH')) return tableTitles.creditProgress.bachelor
-  if (studyprogramme.includes('MH')) return tableTitles.creditProgress.master
+  if (studyprogramme.includes('MH')) return tableTitles.creditProgress.masterOnly
   return tableTitles.creditProgress.doctoral
 }
 
