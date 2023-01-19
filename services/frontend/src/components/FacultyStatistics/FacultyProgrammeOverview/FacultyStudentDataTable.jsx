@@ -11,6 +11,9 @@ const getStyle = idx => {
   return {}
 }
 
+const backgroundColors = { KH: '#ffffff', MH: '#f2f6f7', T: '#e7edee' }
+const backgroundColorsDarks = { KH: '#f9f9f9', MH: '#eeeeee', T: '#dddddd' }
+
 const getTitlePopup = idx => {
   if (idx === 0) return <p>All</p>
   if ([1, 2].includes(idx)) return <p>Started studying</p>
@@ -29,6 +32,7 @@ const FacultyStudentDataTable = ({
   tableStats,
   programmeStats,
   programmeNames,
+  tableLinePlaces,
   titles,
   years,
   sortedKeys,
@@ -44,10 +48,51 @@ const FacultyStudentDataTable = ({
     setVisible(arrayToModify)
   }
 
+  const getRowStyle = (idx, dark = false) => {
+    if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] <= idx)
+      return dark
+        ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[2][1]] }
+        : { backgroundColor: backgroundColors[tableLinePlaces[2][1]] }
+    if (tableLinePlaces.length >= 3 && tableLinePlaces[2][0] > idx && tableLinePlaces[1][0] <= idx)
+      return dark
+        ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[1][1]] }
+        : { backgroundColor: backgroundColors[tableLinePlaces[1][1]] }
+    if (tableLinePlaces.length >= 2 && tableLinePlaces[1][0] > idx && tableLinePlaces[0][0] <= idx)
+      return dark
+        ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
+        : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
+    return dark
+      ? { backgroundColor: backgroundColorsDarks[tableLinePlaces[0][1]] }
+      : { backgroundColor: backgroundColors[tableLinePlaces[0][1]] }
+  }
+
   const calendarYears = years.reduce((all, year) => {
     if (year === 'Total') return all
     return all.concat(Number(year.slice(0, 4)))
   }, [])
+
+  const getRows = (idx, programme, year) => {
+    return programmeStats[programme][year].map((value, valIdx) => {
+      if (!showPercentages && typeof value === 'string' && (value.includes('%') || value.includes('NA'))) return null
+      return (
+        <Popup
+          content={getTitlePopup(valIdx)}
+          trigger={
+            <Table.Cell
+              key={`${year}-${programme}-color-${valIdx}`}
+              style={
+                getStyle(valIdx + 1)?.backgroundColor
+                  ? { borderLeftWidth: getStyle(valIdx + 1).borderLeftWidth, ...getRowStyle(idx, true) }
+                  : { ...getStyle(valIdx + 1), ...getRowStyle(idx) }
+              }
+            >
+              {value}
+            </Table.Cell>
+          }
+        />
+      )
+    })
+  }
 
   return (
     <div className="datatable">
@@ -58,7 +103,7 @@ const FacultyStudentDataTable = ({
         value={showPercentages}
         setValue={setShowPercentages}
       />
-      <Table data-cy={cypress} celled structured striped>
+      <Table data-cy={cypress} celled structured>
         <Table.Header>
           <Table.Row key="FirstHeader">
             <Table.HeaderCell colSpan={!showPercentages ? 3 : 4} />
@@ -127,10 +172,14 @@ const FacultyStudentDataTable = ({
                   })}
                 </Table.Row>
                 {yearsVisible[yearIndex] &&
-                  sortedKeys.map(programme => {
+                  sortedKeys.map((programme, idx) => {
                     return programmeStats[programme][year].length === 0 ? null : (
                       <Table.Row className="regular-row" key={`${year}-regular-row-${programme}`}>
-                        <Table.Cell textAlign="left" style={{ paddingLeft: '50px' }} key={`${year}-${programme}`}>
+                        <Table.Cell
+                          textAlign="left"
+                          key={`${year}-${programme}`}
+                          style={{ paddingLeft: '50px', ...getRowStyle(idx) }}
+                        >
                           <Popup
                             content={
                               programmeNames[programme][language] ? (
@@ -155,24 +204,7 @@ const FacultyStudentDataTable = ({
                             />
                           )}
                         </Table.Cell>
-                        {programmeStats[programme][year].map((value, valIdx) => {
-                          if (
-                            !showPercentages &&
-                            typeof value === 'string' &&
-                            (value.includes('%') || value.includes('NA'))
-                          )
-                            return null
-                          return (
-                            <Popup
-                              content={getTitlePopup(valIdx)}
-                              trigger={
-                                <Table.Cell key={`${year}-${programme}-color-${valIdx}`} style={getStyle(valIdx + 1)}>
-                                  {value}
-                                </Table.Cell>
-                              }
-                            />
-                          )
-                        })}
+                        {getRows(idx, programme, year)}
                       </Table.Row>
                     )
                   })}
