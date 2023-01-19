@@ -14,8 +14,6 @@ const {
   tableTitles,
   getCreditProgressTableTitles,
   getGoal,
-  getMasterCreditGraphStats,
-  getBcMsThresholds,
 } = require('./studyprogrammeHelpers')
 const {
   studytrackStudents,
@@ -120,8 +118,6 @@ const getStudytrackDataForTheYear = async ({
   data,
   creditThresholdKeys,
   creditThresholdAmounts,
-  creditThresholdKeysBcMs,
-  creditThresholdAmountsBcMs,
 }) => {
   const { specialGroups: includeAllSpecials, graduated: includeGraduated } = settings
   const { startDate, endDate } = getAcademicYearDates(year, since)
@@ -130,9 +126,7 @@ const getStudytrackDataForTheYear = async ({
     mainStatsByYear,
     mainStatsByTrack,
     creditGraphStats,
-    creditGraphStatsBcMs,
     creditTableStats,
-    creditTableStatsBcMs,
     graduationAmounts,
     graduationTimes,
     totalAmounts,
@@ -194,74 +188,24 @@ const getStudytrackDataForTheYear = async ({
       }
 
       if (year !== 'Total') {
-        if (studyprogramme.includes('MH')) {
-          const studyrights = await allStudyrights(track, studentnumbers)
-          //const allMsStudents = studyrights
-          //  .filter(sr => sr.extentcode === 2 && sr.studyrightid.slice(-2) !== '-2')
-          //  .map(sr => sr.studentnumber)
-          const allBcMsStudents = studyrights
-            .filter(sr => sr.extentcode === 2 && sr.studyrightid.slice(-2) === '-2')
-            .map(sr => sr.studentnumber)
-          const bcMsStudents = await studytrackStudents(allBcMsStudents)
-          //const msStudents = await studytrackStudents(allMsStudents)
-          //const studentDataMaster = getStudentData(startDate, msStudents, creditThresholdKeys, creditThresholdAmounts)
-          const studentDataBcMs = getStudentData(
-            startDate,
-            bcMsStudents,
-            creditThresholdKeysBcMs,
-            creditThresholdAmountsBcMs
-          )
-          // Count stats for creditgraph for the year per track
-          creditThresholdKeys.forEach(
-            threshold => (creditGraphStats[track][threshold].data[indexOf(years, year)] += studentData[threshold])
-          )
-          creditThresholdKeys.forEach(
-            threshold => (creditGraphStats[track][threshold].data[indexOf(years, 'Total')] += studentData[threshold])
-          )
-          creditThresholdKeysBcMs.forEach(
-            threshold =>
-              (creditGraphStatsBcMs[track][threshold].data[indexOf(years, year)] += studentDataBcMs[threshold])
-          )
-          creditThresholdKeysBcMs.forEach(
-            threshold =>
-              (creditGraphStatsBcMs[track][threshold].data[indexOf(years, 'Total')] += studentDataBcMs[threshold])
-          )
-          // Count stats for the credit progress table for the year per track
-          creditTableStats[track] = [
-            [year, all.length, ...creditThresholdKeys.map(threshold => studentData[threshold])],
-            ...creditTableStats[track],
-          ]
-          creditTableStatsBcMs[track] = [
-            [year, bcMsStudents.length, ...creditThresholdKeysBcMs.map(threshold => studentDataBcMs[threshold])],
-            ...creditTableStatsBcMs[track],
-          ]
-        } else {
-          // Count stats for creditgraph for the year per track
-          creditThresholdKeys.forEach(
-            threshold => (creditGraphStats[track][threshold].data[indexOf(years, year)] += studentData[threshold])
-          )
-          creditThresholdKeys.forEach(
-            threshold => (creditGraphStats[track][threshold].data[indexOf(years, 'Total')] += studentData[threshold])
-          )
-          // Count stats for the credit progress table for the year per track
-          creditTableStats[track] = [
-            [year, all.length, ...creditThresholdKeys.map(threshold => studentData[threshold])],
-            ...creditTableStats[track],
-          ]
-        }
+        // Count stats for creditgraph for the year per track
+        creditThresholdKeys.forEach(
+          threshold => (creditGraphStats[track][threshold].data[indexOf(years, year)] += studentData[threshold])
+        )
+        creditThresholdKeys.forEach(
+          threshold => (creditGraphStats[track][threshold].data[indexOf(years, 'Total')] += studentData[threshold])
+        )
+        // Count stats for the credit progress table for the year per track
+        creditTableStats[track] = [
+          [year, all.length, ...creditThresholdKeys.map(threshold => studentData[threshold])],
+          ...creditTableStats[track],
+        ]
       } else {
         const totalCredits = creditTableStats[track].reduce(
           (a, b) => a.map((colVal, idx) => colVal + (b[idx] || 0)),
           Array(creditThresholdKeys.length + 2).fill(0)
         )
         creditTableStats[track] = [[year, ...totalCredits.slice(1)], ...creditTableStats[track]]
-        if (studyprogramme.includes('MH')) {
-          const totalCreditsBcMs = creditTableStatsBcMs[track].reduce(
-            (a, b) => a.map((colVal, idx) => colVal + (b[idx] || 0)),
-            Array(creditThresholdKeysBcMs.length + 2).fill(0)
-          )
-          creditTableStatsBcMs[track] = [[year, ...totalCreditsBcMs.slice(1)], ...creditTableStatsBcMs[track]]
-        }
       }
 
       // Count stats for the main studytrack table grouped by tracks
@@ -320,9 +264,7 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
   const mainStatsByYear = getYearsObject({ years, emptyArrays: true })
   const mainStatsByTrack = {}
   const creditGraphStats = {}
-  const creditGraphStatsBcMs = {}
   const creditTableStats = {}
-  const creditTableStatsBcMs = {}
   const graduationAmounts = {}
   const graduationTimes = { goal: getGoal(studyprogramme) }
   const totalAmounts = {}
@@ -345,20 +287,11 @@ const getEmptyStatsObjects = (years, studytracks, studyprogramme) => {
     }
   })
 
-  if (studyprogramme.includes('MH')) {
-    studytracks.forEach(async track => {
-      creditGraphStatsBcMs[track] = getMasterCreditGraphStats(years)
-      creditTableStatsBcMs[track] = []
-    })
-  }
-
   return {
     mainStatsByYear,
     mainStatsByTrack,
     creditGraphStats,
-    creditGraphStatsBcMs,
     creditTableStats,
-    creditTableStatsBcMs,
     graduationAmounts,
     graduationTimes,
     totalAmounts,
@@ -383,7 +316,6 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
 
   const data = getEmptyStatsObjects(years, studytracks, studyprogramme)
   const { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(studyprogramme, true)
-  const { creditThresholdKeysBcMs, creditThresholdAmountsBcMs } = getBcMsThresholds()
 
   const yearsReversed = [...years].reverse()
 
@@ -399,8 +331,6 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
       data,
       creditThresholdKeys,
       creditThresholdAmounts,
-      creditThresholdKeysBcMs,
-      creditThresholdAmountsBcMs,
     })
   }
 
@@ -416,8 +346,7 @@ const getStudytrackStatsForStudyprogramme = async ({ studyprogramme, settings })
       creditTableTitles:
         studyprogramme === 'MH90_001'
           ? tableTitles['creditProgress']['bachelor']
-          : getCreditProgressTableTitles(studyprogramme),
-      creditTableTitlesBcMs: tableTitles['creditProgress']['master'],
+          : tableTitles['creditProgress']['masterOnly'],
     }
   }
   return {
