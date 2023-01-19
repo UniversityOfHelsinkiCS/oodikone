@@ -27,7 +27,7 @@ const CourseParticipationTable = ({ student, language, clearCourseStats, studyri
     if (isStudyModuleCredit) {
       icon = <Icon name="certificate" color="purple" />
     } else if (c.credittypecode === 9) {
-      icon = <Icon name="file alternative outline" title="course approved" color="green" />
+      icon = <Icon name="file alternative outline" title="Credit transfer" color="green" />
     } else if (passed) {
       icon = <Icon name="check circle outline" color="green" />
     } else {
