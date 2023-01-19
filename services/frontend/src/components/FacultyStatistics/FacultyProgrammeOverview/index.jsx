@@ -20,7 +20,9 @@ const getDivider = (title, toolTipText, content, cypress) => (
     {content === 'no-infobox' ? null : <InfoBox content={content} cypress={cypress} />}
   </>
 )
-
+const getKey = (programmeKeys, idx) => {
+  return programmeKeys[idx][1].startsWith('T') ? 'T' : programmeKeys[idx][1].slice(0, 2)
+}
 const FacultyProgrammeOverview = ({
   faculty,
   language,
@@ -56,6 +58,22 @@ const FacultyProgrammeOverview = ({
     (progressStats.isSuccess && !progressStats.data) ||
     (studentStats.isSuccess && !studentStats.data)
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
+
+  const getTableLinePlaces = programmeKeys => {
+    if (programmeKeys.length === 0) return []
+    const key = getKey(programmeKeys, 0)
+    const plotLinePlaces = [[0, key]]
+    for (let i = 0; i < programmeKeys.length - 1; i++) {
+      if (
+        (programmeKeys[i][1].startsWith('KH') && programmeKeys[i + 1][1].startsWith('MH')) ||
+        (programmeKeys[i][1].startsWith('MH') && programmeKeys[i + 1][1].startsWith('T'))
+      ) {
+        const key = getKey(programmeKeys, i + 1)
+        plotLinePlaces.push([i + 1, key])
+      }
+    }
+    return plotLinePlaces
+  }
 
   return (
     <div className="faculty-overview">
@@ -103,6 +121,15 @@ const FacultyProgrammeOverview = ({
                     ]),
                     faculty.code
                   ).map(listObj => listObj[0])}
+                  tableLinePlaces={getTableLinePlaces(
+                    sortProgrammeKeys(
+                      Object.keys(studentStats?.data?.programmeStats).map(obj => [
+                        obj,
+                        studentStats?.data?.programmeNames[obj].code,
+                      ]),
+                      faculty.code
+                    )
+                  )}
                   language={language}
                   cypress="FacultyStudentStatsTable"
                   requiredRights={requiredRights}
