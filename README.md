@@ -50,7 +50,7 @@ What different CLI options do:
 
 ### Architecture
 
-![Oodikone architecture](Oodikone.png)
+![Oodikone architecture](./documentation/Oodikone.png)
 
 ### Documentation
 
