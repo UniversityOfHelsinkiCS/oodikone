@@ -8,6 +8,7 @@ import createFilter from './createFilter'
 const STATUS_OPTIONS = [
   { key: 'enrl-status-present', text: 'Present', value: 1 },
   { key: 'enrl-status-absent', text: 'Absent', value: 2 },
+  { key: 'enrl-status-inactive', text: 'Passive', value: 3 },
 ]
 
 const EnrollmentStatusFilterCard = ({ options, onOptionsChange, allSemesters, language, semesterCodes }) => {

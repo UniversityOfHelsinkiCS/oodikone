@@ -49,7 +49,7 @@ const StudyrightStatusFilterCard = ({ options, onOptionsChange }) => {
 export default createFilter({
   key: 'studyrightStatusFilter',
 
-  title: 'Studyright status',
+  title: 'Studyright Status',
 
   info: filterInfo.studyrightStatus,
 

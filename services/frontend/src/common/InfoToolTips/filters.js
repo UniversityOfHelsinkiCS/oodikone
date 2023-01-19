@@ -1,8 +1,8 @@
 export default {
   enrollmentStatus: {
-    label: 'Filter students present or absent',
+    label: 'Filter students present, absent or passive',
     short:
-      'Suodata opiskelijoita sen mukaan ovatko he ilmoittautuneet läsnä- tai poissaoleviksi kyseiselle lukukaudelle',
+      'Suodata opiskelijoita sen mukaan ovatko he joko ilmoittautuneet läsnä- tai poissaoleviksi tai jääneet passiivisiksi kyseiselle lukukaudelle. Huom. osa passiivisista opiskelijoista on jo valmistunut ko. ohjelmasta.',
   },
   studyrightStatus: {
     label: 'Rajaa opiskelijoita opinto-oikeuden statuksen mukaan',
