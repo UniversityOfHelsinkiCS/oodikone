@@ -163,13 +163,28 @@ const GeneralTab = ({
   }
 
   const studentToStudyrightStartMap = selectedStudents.reduce((res, sn) => {
+    const currentStudyright = students[sn].studyrights.find(studyright =>
+      studyright.studyright_elements.some(e => e.code === programmeCode)
+    )
+    if (currentStudyright?.studyrightid && currentStudyright.studyrightid.slice(-2) === '-2') {
+      const bachelorId = currentStudyright.studyrightid.replace(/-2$/, '-1')
+      const bacherlorStudyright = students[sn].studyrights.find(studyright => studyright.studyrightid === bachelorId)
+      res[sn] = bacherlorStudyright?.startdate || null
+    } else {
+      res[sn] = currentStudyright?.startdate || null
+    }
+    return res
+  }, {})
+
+  const studentToProgrammeStartMap = selectedStudents.reduce((res, sn) => {
     const targetStudyright = _.flatten(
       students[sn].studyrights.reduce((acc, curr) => {
         acc.push(curr.studyright_elements)
         return acc
       }, [])
     ).filter(e => e.code === programmeCode)
-    res[sn] = targetStudyright[0] ? targetStudyright[0].startdate : null
+    // clean up odd bachelor start dates, (givendate)
+    res[sn] = new Date(Math.max(new Date(targetStudyright[0]?.startdate), new Date(studentToStudyrightStartMap[sn])))
     return res
   }, {})
 
@@ -277,7 +292,7 @@ const GeneralTab = ({
       getRowVal: s => {
         const credits = getStudentTotalCredits({
           ...s,
-          courses: s.courses.filter(c => new Date(c.date) >= new Date(studentToStudyrightStartMap[s.studentNumber])),
+          courses: s.courses.filter(c => new Date(c.date) >= studentToProgrammeStartMap[s.studentNumber]),
         })
         return credits
       },
@@ -405,11 +420,18 @@ const GeneralTab = ({
       title: 'Tags',
       getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
     },
-    studyStartDate: {
-      key: 'studyStartDate',
+    studyrightStart: {
+      key: 'studyrightStart',
       title: 'Start of studyright',
       filterType: 'date',
-      getRowVal: s => new Date(studentToStudyrightStartMap[s.studentNumber]),
+      getRowVal: s => studentToStudyrightStartMap[s.studentNumber], // new Date(studentToStudyrightStartMap[s.studentNumber]),
+      formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
+    },
+    studyStartDate: {
+      key: 'studyStartDate',
+      title: 'Started in programme',
+      filterType: 'date',
+      getRowVal: s => studentToProgrammeStartMap[s.studentNumber],
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
     },
     endDate: {
@@ -583,7 +605,8 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
   const getStudyGuidanceGroupColumns = () => {
     const cols = ['programme', 'startYear']
     if (studyGuidanceGroup?.tags?.year) cols.push('credits.startYear')
-    if (studyGuidanceGroup?.tags?.studyProgramme) cols.push('studyStartDate', 'studyStartDateActual', 'endDate')
+    if (studyGuidanceGroup?.tags?.studyProgramme)
+      cols.push('studyrightStart', 'studyStartDate', 'studyStartDateActual', 'endDate')
     if (studyGuidanceGroup?.tags?.studyProgramme && studyGuidanceGroup?.tags?.year) {
       cols.push('admissionType')
     }
@@ -600,6 +623,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
       'priority',
       'extent',
       'semesterEnrollments',
+      'studyrightStart',
       'studyStartDate',
       'studyStartDateActual',
       'endDate',
@@ -611,7 +635,7 @@ const GeneralTabContainer = ({ studyGuidanceGroup, variant, ...props }) => {
 
   const baseColumns = ['credits', 'credits.all', 'studentnumber-parent', 'tags', 'updatedAt', 'option']
   const nameColumnsToAdd = namesVisible ? ['email', 'lastname', 'firstname'] : []
-  const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'studyStartDate', 'updatedAt']
+  const adminColumnsToFilter = isAdmin ? [] : ['priority', 'extent', 'studyrightStart', 'studyStartDate', 'updatedAt']
 
   const columnKeysToInclude = _.chain(baseColumns)
     .union(columnsByVariant[variant])
