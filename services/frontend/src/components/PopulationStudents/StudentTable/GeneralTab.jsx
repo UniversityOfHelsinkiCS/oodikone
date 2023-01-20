@@ -391,7 +391,7 @@ const GeneralTab = ({
     },
     transferredFrom: {
       key: 'transferredFrom',
-      title: 'Transferred From',
+      title: 'Transferred from',
       getRowVal: s => (s.transferredStudyright ? transferFrom(s) : ''),
     },
     studyTrack: containsStudyTracks && {
