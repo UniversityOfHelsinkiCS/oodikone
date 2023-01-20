@@ -125,7 +125,7 @@ const codes = {
   T922106: 'foodhealth',
   T923101: 'papu',
   T923102: 'geodoc',
-  T923103: 'atm',
+  T923103: 'atm-dp',
   T923104: 'chems',
   T923105: 'domast',
   T923106: 'matrena',
