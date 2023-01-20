@@ -692,7 +692,8 @@ const tableStateReducer = (...args) =>
           state.expandedGroups.push(group)
         }
       },
-    }[type]())
+      // eslint-disable-next-line prettier/prettier
+    })[type]()
   })
 
 const injectParentPointers = columns => {
