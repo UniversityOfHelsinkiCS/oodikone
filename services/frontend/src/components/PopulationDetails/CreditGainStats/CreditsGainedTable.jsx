@@ -1,9 +1,14 @@
 import moment from 'moment/moment'
 import React from 'react'
 import { Table } from 'semantic-ui-react'
+import studyPlanFilter from 'components/FilterView/filters/hops'
 import CollapsibleCreditRow from './CollapsibleCreditRow'
+import useFilters from '../../FilterView/useFilters'
 
 const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOptions }) => {
+  const { useFilterSelector } = useFilters()
+  const studyPlanFilterIsActive = useFilterSelector(studyPlanFilter.selectors.isActive)
+
   if (!filteredStudents || !filteredStudents.length || !type) return null
   let creditList = []
   const studentCount = (min, max = Infinity) =>
@@ -79,6 +84,18 @@ const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOpti
   ]
 
   const monthString = months === 1 ? 'Month' : 'Months'
+
+  const CreditsHeader = () => {
+    if (studyPlanFilterIsActive) {
+      return <p>All credits in studyplan</p>
+    }
+    return (
+      <p>
+        Gredits Gained Between <br /> {title} <br /> ({months} {monthString})
+      </p>
+    )
+  }
+
   return (
     <div className="credits-gained-table" data-cy={`credits-gained-table-${type}`}>
       <h3>{type}</h3>
@@ -87,7 +104,7 @@ const CreditsGainedTable = ({ filteredStudents, type, year, creditDateFilterOpti
           <Table.Row key={`credits-gained-table-${type}`}>
             <Table.HeaderCell collapsing />
             <Table.HeaderCell key={`${title}-${type}`}>
-              Gredits Gained Between <br /> {title} <br /> ({months} {monthString})
+              <CreditsHeader />
             </Table.HeaderCell>
             <Table.HeaderCell key={`credits-number-of-students-${type}`}>
               Number of Students
