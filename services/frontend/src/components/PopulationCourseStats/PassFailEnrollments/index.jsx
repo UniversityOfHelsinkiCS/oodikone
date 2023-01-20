@@ -94,7 +94,7 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
         children: [
           {
             key: 'total',
-            title: 'Total students',
+            title: 'Total\nstudents',
             helpText: 'Total count of students, including enrolled students with no grade.',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
@@ -116,7 +116,7 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
           },
           {
             key: 'totalEnrolledNoGrade',
-            title: 'Enrolled no grade',
+            title: 'Enrolled, \nno grade',
             helpText: 'Students with a valid enrollment and no passing or failing grade.',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
@@ -160,14 +160,14 @@ const PassFailEnrollments = ({ flat, onlyIamRights }) => {
           },
           {
             key: 'passed-after-retry',
-            title: 'Passed after retry',
+            title: 'Passed\nafter retry',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.retryPassed ?? 0,
           },
           {
             key: 'failed-many',
-            title: 'Failed multiple times',
+            title: 'Failed\nmultiple times',
             cellStyle: { textAlign: 'right' },
             filterType: 'range',
             getRowVal: row => row.stats?.failedMany ?? 0,
