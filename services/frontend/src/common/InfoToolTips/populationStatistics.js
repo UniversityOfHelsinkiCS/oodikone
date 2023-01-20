@@ -66,8 +66,8 @@ export default {
   
   **Taulukot**
   
-  - **pass/fail** - oletusnäkymä, joka sisältää kurssisuoritukset, hylätyt sekä yritykset. Taulukon tiedot voi järjestää sarakkeita (n, after retry, percentage, many times, per student, passed ja attempted) klikkaamalla.
-  - **pass/fail w/ enrollments** - näkymä, joka sisältää suoritustiedot ilmoittautumisten kanssa. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
+
+  - **pass/fail** - näkymä sisältää kurssisuoritukset, hylätyt sekä yritykset sekä ilmoittautumistiedot. Huom.! ilmoittautumistiedot ovat saatavilla vain Sisun käyttöönoton jälkeiseltä ajalta.
   - **grades** - arvosanajakauma.
   - **when passed** - kurssisuorituksen ajankohta. Huom.! *Passed*-sarakkeen kokonaissumma ei välttämättä täsmää puolivuosittaisten lukumäärien summan kanssa johtuen tuplakirjauksista Oodissa.
   `,
@@ -83,28 +83,64 @@ export default {
   Tägien ja opintosuuntien valinnat ovat siirtyneet tästä omiksi filtereikseen.
   Voit tehdä valinnat siirryttyäsi tarkastelemaan ohjelman tilastoja.
   `,
-  Students: `**Students**
+  StudentsGuidanceGroups: `**Students**
 
   Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
   
+  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "student statistic" -näkymään.
+  
+  Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
+
   **General**
   
-  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä nuolta, siirtyy "student statistic" näkymään valitun opiskelijan osalta.
+  Valikoituja selvennyksiä: 
+  - **Credits**
+    - **All**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson  ajalta.
+    - **Since ... ** listaa opiskelijan suoritetut opintopisteet määritellystä ajankohdasta alkaen
+  - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
+  - **Started in programme**: Opiskelijan valitussa ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1.
   
-  - **credits since ... :**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson / populaation ajalta.
-  - **all credits:** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
-  - **transferred from:** opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
-  - **studytracks:** opintosuunta
+  `,
+  StudentsClass: `**Students**
+
+  Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
   
-  **Mandatory Courses**
+  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "student statistic" -näkymään.
+  
+  Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
+
+  **General**
+  
+  Valikoituja selvennyksiä: 
+  - **Credits**
+    - **All**  listaa opiskelijan suoritetut opintopisteet valitun tarkastelujakson  ajalta
+    - **HOPS** listaa opiskelijan kaikki HOPSiin sijoitut opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
+    - **Since start in programme** listaa opiskelijan ohjelmassa aloittamisen jälkeen suoritut opintopisteet
+  - **Transferred from:** opiskelijan vanha koulutusohjelma, josta opiskelija on siirtynyt uuteen.
+  - **Start of studyright**: Opiskelijan valittuun ohjelmaan liittyvän opinto-oikeuden alkupäivä
+  - **Started in programme**: Opiskelijan ko. ohjelmassa aloituspäivämäärä. Kandi+maisteriopiskelijoille kandiksi valmistumispäivämäärä +1
+  - **Semesters**: Läsnäololukukausien lukumäärä
+  
+  **Courses**
   
   Tällä välilehdellä näkyy, mitä pakollisiksi määriteltyjä kursseja opiskelija on suorittanut.
-  Kurssit voi määrittää kohdassa "Study program" > "Overview" > haluttu koulutusohjelma. Scrollatessa kurssitaulukkoa alaspäin, kurssin nimen saa näkyviin viemällä kursorin halutun solun kohdalle.
+
   
   **Tags**
   
   Opiskelijoille voi luoda tag:eja ryhmittelyä varten kohdassa "Study Program" > "Overview" > haluttu koulutusohjelma.
   
+  `,
+  StudentsCustom: `**Students**
+
+  Taulukko näyttää oletusarvoisesti vain opiskelijanumerot, mutta harmaata liukukytkintä klikkaamalla saa näkyviin opiskelijoiden nimet.
+  
+  Klikkaamalla opiskelijanumeron vieressä olevaa sinistä henkilösymbolia, siirryt kyseisen opiskelijan "student statistic" -näkymään.
+  
+  Klikkaamalla "Sisu"-nuolta, siirryt tarkastelemaan opiskelijan tietoja Sisu-järjestelmässä.
+  
+  **All credits** listaa opiskelijan kaikki opintopisteet (myös aiemmat suoritukset, eli ne jotka tehty ennen valittuun tarkastelujaksoon ja populaatioon kuulumista)
+
   `,
   Filters: {
     Add: `Harmaata ”add” painiketta klikkaamalla aukeaa filters- eli suodatinvalikko, 

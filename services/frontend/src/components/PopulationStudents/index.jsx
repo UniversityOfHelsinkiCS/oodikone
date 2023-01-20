@@ -506,7 +506,7 @@ const PopulationStudentsContainer = ({ ...props }) => {
   const contentByVariant = {
     population: {
       panesToInclude: ['General', 'Courses', 'Tags'],
-      infotoolTipContent: infotoolTips.PopulationStatistics.Students,
+      infotoolTipContent: infotoolTips.PopulationStatistics.StudentsClass,
     },
     coursePopulation: {
       panesToInclude: ['General'],
@@ -514,11 +514,11 @@ const PopulationStudentsContainer = ({ ...props }) => {
     },
     customPopulation: {
       panesToInclude: ['General'],
-      infotoolTipContent: infotoolTips.PopulationStatistics.Students,
+      infotoolTipContent: infotoolTips.PopulationStatistics.StudentsCustom,
     },
     studyGuidanceGroupPopulation: {
       panesToInclude: ['General'],
-      infotoolTipContent: infotoolTips.PopulationStatistics.Students,
+      infotoolTipContent: infotoolTips.PopulationStatistics.StudentsGuidanceGroups,
     },
   }
 
