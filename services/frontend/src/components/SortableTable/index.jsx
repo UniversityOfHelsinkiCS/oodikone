@@ -446,7 +446,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
           }}
         >
           <SizeMeasurer onSizeChange={onTitleSizeChange} style={{ display: 'inline-flex', alignItems: 'center' }}>
-            {column.title}
+            <p style={{ whiteSpace: 'pre' }}>{column.title}</p>
             {column.helpText && !forcedTitleWidth && (
               <Icon
                 name="question circle outline"
@@ -692,7 +692,7 @@ const tableStateReducer = (...args) =>
           state.expandedGroups.push(group)
         }
       },
-    })[type]()
+    }[type]())
   })
 
 const injectParentPointers = columns => {

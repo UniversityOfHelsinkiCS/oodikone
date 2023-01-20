@@ -251,7 +251,7 @@ const GeneralTab = ({
 
   const shouldShowAdmissionType = parseInt(query?.year, 10) >= 2020 || parseInt(group?.tags?.year, 10) >= 2020
 
-  let creditColumnTitle = 'Since start in programme'
+  let creditColumnTitle = 'Since start\nin programme'
 
   if (creditDateFilterOptions) {
     const { startDate, endDate } = creditDateFilterOptions
@@ -401,14 +401,14 @@ const GeneralTab = ({
     },
     studyrightStart: {
       key: 'studyrightStart',
-      title: 'Start of studyright',
+      title: 'Start of\nstudyright',
       filterType: 'date',
       getRowVal: s => studentToStudyrightStartMap[s.studentNumber], // new Date(studentToStudyrightStartMap[s.studentNumber]),
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
     },
     studyStartDate: {
       key: 'studyStartDate',
-      title: 'Started in programme',
+      title: 'Started in\nprogramme',
       filterType: 'date',
       getRowVal: s => studentToProgrammeStartMap[s.studentNumber],
       formatValue: value => reformatDate(new Date(value), 'YYYY-MM-DD'),
