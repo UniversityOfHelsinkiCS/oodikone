@@ -17,7 +17,7 @@ const CollapsedStackedBar = ({
   const transpose = matrix => {
     return matrix.reduce((prev, next) => next.map((_item, i) => (prev[i] || []).concat(next[i])), [])
   }
-
+  if (names[0] === 'Started studying') names[0] += ' (new in faculty)'
   const needsExtra = extraHeight === 'EXTRA HEIGHT'
   const dataTranspose = transpose(data)
     .map((obj, idx) => ({ name: names[idx], data: obj, color: colors[idx] }))

@@ -111,7 +111,7 @@ const getFacultyStarters = async (
     }
   })
 
-  allBasics.studentInfo.graphStats.push({ name: 'Started studying', data: startedGraphStats })
+  allBasics.studentInfo.graphStats.push({ name: 'Started studying (new in faculty)', data: startedGraphStats })
   programmeData['started'] = programmeTableStats
 
   Object.keys(startedTableStats).forEach(year => {
