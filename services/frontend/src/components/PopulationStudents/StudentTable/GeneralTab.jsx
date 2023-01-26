@@ -389,11 +389,6 @@ const GeneralTab = ({
         return grade
       },
     },
-    transferredFrom: {
-      key: 'transferredFrom',
-      title: 'Transferred from',
-      getRowVal: s => (s.transferredStudyright ? transferFrom(s) : ''),
-    },
     studyTrack: containsStudyTracks && {
       key: 'studyTrack',
       title: 'Study Track',
@@ -426,14 +421,18 @@ const GeneralTab = ({
     },
     semesterEnrollments: {
       key: 'semesterEnrollments',
-      title: 'Semesters',
-      helpText: 'Number of present semesters',
+      title: 'Semesters\npresent',
       getRowVal: s => semesterEnrollments(s.semesterenrollments),
     },
     tags: {
       key: 'tags',
       title: 'Tags',
       getRowVal: s => (!s.obfuscated ? tags(s.tags) : ''),
+    },
+    transferredFrom: {
+      key: 'transferredFrom',
+      title: 'Transferred\nfrom',
+      getRowVal: s => (s.transferredStudyright ? transferFrom(s) : ''),
     },
     admissionType: shouldShowAdmissionType && {
       key: 'admissionType',
