@@ -19,7 +19,7 @@
     "immer": "^9.0.12",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
-    "path-to-regexp": "^0.1.7",
+    "path-to-regexp": "^0.2.5",
     "piwik-react-router": "^0.12.1",
     "prop-types": "^15.8.1",
     "qs": "^6.10.3",
