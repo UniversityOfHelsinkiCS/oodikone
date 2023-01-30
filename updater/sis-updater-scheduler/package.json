@@ -15,7 +15,7 @@
     "i": "^0.3.7",
     "knex": "0.20.10",
     "lodash": "^4.17.21",
-    "node-nats-streaming": "^0.2.6",
+    "node-nats-streaming": "^0.3.2",
     "npm": "^6.14.16",
     "pg": "^7.18.2",
     "redis": "^3.1.2",
