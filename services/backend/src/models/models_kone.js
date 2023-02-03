@@ -1,3 +1,4 @@
+const { STRING } = require('sequelize')
 const Sequelize = require('sequelize')
 const { sequelizeKone } = require('../database/connection')
 
@@ -143,6 +144,35 @@ const OpenUniPopulationSearch = sequelizeKone.define(
   { underscored: true, timestamps: true }
 )
 
+const StudyProgrammeCriteria = sequelizeKone.define(
+  'progress_criteria',
+  {
+    code: {
+      primaryKey: true,
+      type: STRING,
+    },
+    coursesYearOne: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
+    coursesYearTwo: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
+    coursesYearThree: {
+      type: Sequelize.ARRAY(Sequelize.STRING),
+    },
+    creditsYearOne: {
+      type: Sequelize.INTEGER,
+    },
+    creditsYearTwo: {
+      type: Sequelize.INTEGER,
+    },
+    creditsYearThree: {
+      type: Sequelize.INTEGER,
+    },
+  },
+  { underscored: true, timestamps: true }
+)
+
 const StudyGuidanceGroupTag = sequelizeKone.define(
   'study_guidance_group_tags',
   {
@@ -188,4 +218,5 @@ module.exports = {
   sequelizeKone,
   ExcludedCourse,
   StudyGuidanceGroupTag,
+  StudyProgrammeCriteria,
 }
