@@ -36,6 +36,18 @@ const StudyProgramme = props => {
     dispatch(getProgrammes())
   }, [])
 
+  const emptyProgressCriteria = {
+    courses: {
+      yearOne: [],
+      yearTwo: [],
+      yearThree: [],
+    },
+    credits: {
+      yearOne: 0,
+      yearTwo: 0,
+      yearThree: 0,
+    },
+  }
   const getPanes = () => {
     const { match } = props
     const { studyProgrammeId } = match.params
@@ -67,13 +79,6 @@ const StudyProgramme = props => {
       ),
     })
 
-    if (isAdmin) {
-      panes.push({
-        menuItem: 'Update statistics',
-        render: () => <UpdateView studyprogramme={studyProgrammeId} />,
-      })
-    }
-
     if (isAdmin || rights.includes(studyProgrammeId)) {
       panes.push({
         menuItem: <Menu.Item key="Programme courses">Programme courses</Menu.Item>,
@@ -87,11 +92,17 @@ const StudyProgramme = props => {
       })
       panes.push({
         menuItem: 'Degree Courses',
-        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} />,
+        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} emptyCriteria={emptyProgressCriteria} />,
       })
       panes.push({
         menuItem: 'Tags',
         render: () => <Tags studyprogramme={studyProgrammeId} />,
+      })
+    }
+    if (isAdmin) {
+      panes.push({
+        menuItem: 'Update statistics',
+        render: () => <UpdateView studyprogramme={studyProgrammeId} />,
       })
     }
     return panes
@@ -135,7 +146,6 @@ const StudyProgramme = props => {
         </Segment>
       </div>
     )
-
   return (
     <div className="segmentContainer">
       <Segment className="contentSegment">
