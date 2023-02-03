@@ -236,6 +236,8 @@ describe('Studyprogramme overview', () => {
   describe('Studytrack overview works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Studytracks and class statistics').click()
     })
@@ -298,6 +300,8 @@ describe('Studyprogramme overview', () => {
   describe('Programme courses works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Programme courses').click()
     })
@@ -374,6 +378,8 @@ describe('Studyprogramme overview', () => {
   describe('Basic information -view works for basic user', () => {
     beforeEach(() => {
       cy.init('/study-programme')
+      // eslint-disable-next-line cypress/no-unnecessary-waiting
+      cy.wait(10000)
       cy.contains('a', 'Tietojenkäsittelytieteen kandiohjelma').click()
       cy.get('.attached').contains('Tags').click()
     })
