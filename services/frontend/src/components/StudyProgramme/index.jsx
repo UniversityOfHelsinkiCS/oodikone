@@ -3,6 +3,7 @@ import { useHistory, withRouter } from 'react-router-dom'
 import { connect, useDispatch, useSelector } from 'react-redux'
 import { Header, Segment, Tab, Menu } from 'semantic-ui-react'
 import { useGetAuthorizedUserQuery } from 'redux/auth'
+import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
 import DegreeCoursesTable from './DegreeCourses'
 import StudyProgrammeSelector from './StudyProgrammeSelector'
 import BasicOverview from './BasicOverview'
@@ -23,31 +24,30 @@ const StudyProgramme = props => {
   const dispatch = useDispatch()
   const history = useHistory()
   const programmes = useSelector(state => state.populationProgrammes?.data?.programmes)
+  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: props.match.params.studyProgrammeId })
   const { language } = useLanguage()
   const { isAdmin, rights } = useGetAuthorizedUserQuery()
   const [tab, setTab] = useTabs('p_tab', 0, history)
   const [academicYear, setAcademicYear] = useState(false)
   const [specialGroups, setSpecialGroups] = useState(false)
   const [graduated, setGraduated] = useState(false)
-
+  const emptyCriteria = {
+    courses: { yearOne: [], yearTwo: [], yearThree: [] },
+    credits: { yearOne: 0, yearTwo: 0, yearThree: 0 },
+  }
+  const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
   useTitle('Study programmes')
 
   useEffect(() => {
     dispatch(getProgrammes())
   }, [])
 
-  const emptyProgressCriteria = {
-    courses: {
-      yearOne: [],
-      yearTwo: [],
-      yearThree: [],
-    },
-    credits: {
-      yearOne: 0,
-      yearTwo: 0,
-      yearThree: 0,
-    },
-  }
+  useEffect(() => {
+    if (progressCriteria.data) {
+      setCriteria(progressCriteria.data)
+    }
+  }, [progressCriteria.data])
+
   const getPanes = () => {
     const { match } = props
     const { studyProgrammeId } = match.params
@@ -92,7 +92,9 @@ const StudyProgramme = props => {
       })
       panes.push({
         menuItem: 'Degree Courses',
-        render: () => <DegreeCoursesTable studyProgramme={studyProgrammeId} emptyCriteria={emptyProgressCriteria} />,
+        render: () => (
+          <DegreeCoursesTable studyProgramme={studyProgrammeId} criteria={criteria} setCriteria={setCriteria} />
+        ),
       })
       panes.push({
         menuItem: 'Tags',
