@@ -1,5 +1,5 @@
 const router = require('express').Router()
-var moment = require('moment-timezone')
+const moment = require('moment-timezone')
 const { getCustomOpenUniCourses } = require('../services/openUni/openUniStats')
 const {
   getOpenUniSearches,

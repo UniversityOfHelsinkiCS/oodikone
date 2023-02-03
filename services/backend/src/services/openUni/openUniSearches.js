@@ -9,7 +9,6 @@ const {
 } = require('./openUniHelpers')
 const { Op } = require('sequelize')
 
-// 1. iteration: time is hardcoded. Check hyväksytty grades
 const getCredits = async (courseCodes, startdate) =>
   (
     await Credit.findAll({

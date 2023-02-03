@@ -240,7 +240,8 @@ const DegreeCourses = ({ studyProgramme, emptyCriteria, setExclusion, removeExcl
             <Message.Header>Change visibility of degree courses and select criteria for academic years</Message.Header>
             <p>
               Here you can change visibility of degree courses as and set course and credits criteria. Each academic
-              year have their own course and credits criteria.
+              year have their own course and credits criteria. The progress of the students by these criteria will be
+              shown in class statistics view. These statistics will be available at the latest at Friday on 10.2..
             </p>
           </Message>
           <Container>
