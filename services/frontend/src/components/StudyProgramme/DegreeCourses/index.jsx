@@ -3,7 +3,6 @@ import { connect, useSelector, useDispatch } from 'react-redux'
 import { string, func } from 'prop-types'
 import { Button, Label, Table, Icon, Dropdown, Container, Message, Form } from 'semantic-ui-react'
 import {
-  useGetProgressCriteriaQuery,
   useAddProgressCriteriaCourseMutation,
   useAddProgressCriteriaCreditsMutation,
 } from 'redux/programmeProgressCriteria'
@@ -19,32 +18,22 @@ import sendEvent from '../../../common/sendEvent'
 
 const sendAnalytics = sendEvent.degreeCourses
 
-const DegreeCourses = ({ studyProgramme, emptyCriteria, setExclusion, removeExclusion }) => {
+const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, removeExclusion }) => {
   const { language } = useLanguage()
   const dispatch = useDispatch()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
-  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
   const [visible, setVisible] = useState({})
   const [modules, setModules] = useState([])
   const [creditsLimit1, setCreditsLimit1] = useState('')
   const [creditsLimit2, setCreditsLimit2] = useState('')
   const [creditsLimit3, setCreditsLimit3] = useState('')
-  const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
+
   const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
   const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
 
   useEffect(() => {
     dispatch(getMandatoryCourses(studyProgramme, true))
   }, [])
-
-  useEffect(() => {
-    if (progressCriteria.data) {
-      setCriteria(progressCriteria.data)
-      setCreditsLimit1(progressCriteria.data.credits.yearOne)
-      setCreditsLimit2(progressCriteria.data.credits.yearTwo)
-      setCreditsLimit3(progressCriteria.data.credits.yearThree)
-    }
-  }, [progressCriteria.data])
 
   useEffect(() => {
     if (courseData) {
@@ -159,8 +148,15 @@ const DegreeCourses = ({ studyProgramme, emptyCriteria, setExclusion, removeExcl
   }
 
   const setCreditsLimitCriteria = () => {
-    const credits = { year1: creditsLimit1, year2: creditsLimit2, year3: creditsLimit3 }
+    const credits = {
+      year1: creditsLimit1 === '' ? criteria.credits.yearOne : creditsLimit1,
+      year2: creditsLimit2 === '' ? criteria.credits.yearTwo : creditsLimit2,
+      year3: creditsLimit3 === '' ? criteria.credits.yearThree : creditsLimit3,
+    }
     addProgressCriteriaCredits({ programmeCode: studyProgramme, credits })
+    setCreditsLimit1('')
+    setCreditsLimit2('')
+    setCreditsLimit3('')
   }
 
   const excludeAll = code => {
@@ -251,22 +247,19 @@ const DegreeCourses = ({ studyProgramme, emptyCriteria, setExclusion, removeExcl
                 <Form.Input
                   type="number"
                   fluid
-                  label="First year (12 months)"
-                  placeholder={criteria?.credits?.yearOne}
+                  label={`First year (12 months) last set: ${criteria?.credits?.yearOne}`}
                   onChange={e => setCreditsLimit1(e.target.value)}
                 />
                 <Form.Input
                   type="number"
                   fluid
-                  label="Second year (24 months)"
-                  placeholder={criteria?.credits?.yearTwo}
+                  label={`First year (12 months) last set: ${criteria?.credits?.yearTwo}`}
                   onChange={e => setCreditsLimit2(e.target.value)}
                 />
                 <Form.Input
                   type="number"
                   fluid
-                  label="Third year (36 months)"
-                  placeholder={criteria?.credits?.yearThree}
+                  label={`First year (12 months) last set: ${criteria?.credits?.yearThree}`}
                   onChange={e => setCreditsLimit3(e.target.value)}
                 />
               </Form.Group>
