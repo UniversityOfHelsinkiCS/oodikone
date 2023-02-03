@@ -26,10 +26,10 @@ const DegreeCourses = ({ studyProgramme, emptyCriteria, setExclusion, removeExcl
   const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: studyProgramme })
   const [visible, setVisible] = useState({})
   const [modules, setModules] = useState([])
-  const [creditsLimit1, setCreditsLimit1] = useState(0)
-  const [creditsLimit2, setCreditsLimit2] = useState(0)
-  const [creditsLimit3, setCreditsLimit3] = useState(0)
-  const [criteria, setCriteria] = useState(emptyCriteria)
+  const [creditsLimit1, setCreditsLimit1] = useState('')
+  const [creditsLimit2, setCreditsLimit2] = useState('')
+  const [creditsLimit3, setCreditsLimit3] = useState('')
+  const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
   const [addProgressCriteriaCourse, { data: courseData }] = useAddProgressCriteriaCourseMutation()
   const [addProgressCriteriaCredits, { data: creditsData }] = useAddProgressCriteriaCreditsMutation()
 
@@ -252,21 +252,21 @@ const DegreeCourses = ({ studyProgramme, emptyCriteria, setExclusion, removeExcl
                   type="number"
                   fluid
                   label="First year (12 months)"
-                  placeholder={creditsLimit1}
+                  placeholder={criteria?.credits?.yearOne}
                   onChange={e => setCreditsLimit1(e.target.value)}
                 />
                 <Form.Input
                   type="number"
                   fluid
                   label="Second year (24 months)"
-                  placeholder={creditsLimit2}
+                  placeholder={criteria?.credits?.yearTwo}
                   onChange={e => setCreditsLimit2(e.target.value)}
                 />
                 <Form.Input
                   type="number"
                   fluid
                   label="Third year (36 months)"
-                  placeholder={creditsLimit3}
+                  placeholder={criteria?.credits?.yearThree}
                   onChange={e => setCreditsLimit3(e.target.value)}
                 />
               </Form.Group>
