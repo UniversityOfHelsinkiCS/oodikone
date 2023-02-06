@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
       - name: 'Build the image'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           build-args: |
             SENTRY_RELEASE=${{ github.sha }}
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
       - name: 'Build the image'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           build-args: |
             SENTRY_RELEASE=${{ github.sha }}
@@ -122,7 +122,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: 'Build and push scheduler'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           cache-from: type=registry,ref=toska/sis-updater-scheduler:latest
           cache-to: type=inline
@@ -131,7 +131,7 @@ jobs:
           tags: toska/sis-updater-scheduler:latest
           target: production
       - name: 'Build and push worker'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           cache-from: type=registry,ref=toska/sis-updater-worker:latest
           cache-to: type=inline

@@ -23,7 +23,7 @@ jobs:
         id: extract_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       - name: 'Build and push'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           build-args: |
             SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
@@ -58,7 +58,7 @@ jobs:
         id: extract_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       - name: 'Build and push'
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           build-args: |
             SENTRY_RELEASE=${{ steps.extract_version.outputs.VERSION }}
