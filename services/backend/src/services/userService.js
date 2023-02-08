@@ -164,7 +164,7 @@ const updateUser = async (username, fields) => {
 
 const getAccessGroups = async () => await AccessGroup.findAll()
 
-const updateAccessGroups = async (username, sisId, iamGroups = [], specialGroup = {}) => {
+const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, sisId) => {
   const { jory, hyOne, superAdmin, openUni } = specialGroup
 
   const userFromDb = await byUsername(username)
@@ -174,7 +174,7 @@ const updateAccessGroups = async (username, sisId, iamGroups = [], specialGroup 
 
   // Modify accessgroups based on current groups and iamGroups
   let newAccessGroups = []
-  if (await checkStudyGuidanceGroupsAccess(sisId)) newAccessGroups.push('studyGuidanceGroups')
+  if (sisId && (await checkStudyGuidanceGroupsAccess(sisId))) newAccessGroups.push('studyGuidanceGroups')
   if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
   if (jory || iamGroups.includes(facultyStatisticsGroup)) newAccessGroups.push('facultyStatistics')
   if (hyOne || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
@@ -214,9 +214,9 @@ const findAll = async () => {
 
   const formattedUsers = await Promise.all(
     allUsers.map(async user => {
-      const { id, iamGroups, specialGroup } = userAccess.find(({ id }) => id === user.sisu_person_id) || {}
+      const { iamGroups, specialGroup } = userAccess.find(({ id }) => id === user.sisu_person_id) || {}
 
-      const { accessGroups } = await updateAccessGroups(user.username, id, iamGroups, specialGroup)
+      const { accessGroups } = await updateAccessGroups(user.username, iamGroups, specialGroup)
 
       return {
         ...user.get(),
@@ -321,7 +321,7 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, specialGro
   const userFromDb = await byUsername(username)
   const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [])
 
-  const { newAccessGroups } = await updateAccessGroups(username, sisId, iamGroups, specialGroup)
+  const { newAccessGroups } = await updateAccessGroups(username, iamGroups, specialGroup, sisId)
 
   if (isNewUser) await sendNotificationAboutNewUser({ userId: username, userFullName: name })
 
