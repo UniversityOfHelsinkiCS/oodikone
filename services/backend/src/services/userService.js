@@ -164,6 +164,43 @@ const updateUser = async (username, fields) => {
 
 const getAccessGroups = async () => await AccessGroup.findAll()
 
+const updateAccessGroups = async (username, sisId, iamGroups = [], specialGroup = {}) => {
+  const { jory, hyOne, superAdmin, openUni } = specialGroup
+
+  const userFromDb = await byUsername(username)
+  const formattedUser = await formatUser(userFromDb, [])
+
+  const { roles: currentAccessGroups } = formattedUser
+
+  // Modify accessgroups based on current groups and iamGroups
+  let newAccessGroups = []
+  if (await checkStudyGuidanceGroupsAccess(sisId)) newAccessGroups.push('studyGuidanceGroups')
+  if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
+  if (jory || iamGroups.includes(facultyStatisticsGroup)) newAccessGroups.push('facultyStatistics')
+  if (hyOne || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
+  if (superAdmin || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
+  if (openUni) newAccessGroups.push('openUniSearch')
+
+  const accessGroups = await AccessGroup.findAll({
+    where: {
+      group_code: {
+        [Op.in]: newAccessGroups,
+      },
+    },
+  })
+
+  // In the difference method "the order and references of result values are determined by the first array." https://lodash.com/docs/4.17.15#difference
+  // Both directions needs to be checked in order to update roles when the access should no longer exists.
+  if (
+    _.difference(newAccessGroups, currentAccessGroups).length > 0 ||
+    _.difference(currentAccessGroups, newAccessGroups).length > 0
+  ) {
+    userFromDb.setAccessgroup(accessGroups.map(({ id }) => id))
+  }
+
+  return { newAccessGroups, accessGroups }
+}
+
 // newer logic
 const enrichProgrammesFromFaculties = faculties =>
   facultiesAndProgrammesForTrends.filter(f => faculties.includes(f.faculty_code)).map(f => f.programme_code)
@@ -175,15 +212,24 @@ const findAll = async () => {
 
   const userAccess = await getAllUserAccess()
 
-  const formattedUsers = allUsers.map(user => ({
-    ...user.get(),
-    is_enabled: true,
-    iam_groups: userAccess.find(({ id }) => id === user.sisu_person_id)?.iamGroups || [],
-    elementdetails: _.uniqBy([
-      ...user.programme.map(p => p.elementDetailCode),
-      ...enrichProgrammesFromFaculties(user.faculty.map(f => f.faculty_code)),
-    ]),
-  }))
+  const formattedUsers = await Promise.all(
+    allUsers.map(async user => {
+      const { id, iamGroups, specialGroup } = userAccess.find(({ id }) => id === user.sisu_person_id) || {}
+
+      const { accessGroups } = await updateAccessGroups(user.username, id, iamGroups, specialGroup)
+
+      return {
+        ...user.get(),
+        is_enabled: true,
+        iam_groups: iamGroups || [],
+        elementdetails: _.uniqBy([
+          ...user.programme.map(p => p.elementDetailCode),
+          ...enrichProgrammesFromFaculties(user.faculty.map(f => f.faculty_code)),
+        ]),
+        accessgroup: accessGroups,
+      }
+    })
+  )
 
   return formattedUsers
 }
@@ -272,39 +318,10 @@ const getUser = async ({ username, name, email, iamGroups, iamRights, specialGro
     last_login: new Date(),
   })
 
-  const { kosu, jory, hyOne, superAdmin, openUni } = specialGroup
-
   const userFromDb = await byUsername(username)
-  const formattedUser = await formatUser(userFromDb, kosu ? iamRights : [])
-  const { roles: currentAccessGroups } = formattedUser
+  const formattedUser = await formatUser(userFromDb, specialGroup.kosu ? iamRights : [])
 
-  // Modify accessgroups based on current groups and iamGroups
-  let newAccessGroups = []
-  if (await checkStudyGuidanceGroupsAccess(sisId)) newAccessGroups.push('studyGuidanceGroups')
-  if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
-  if (jory || iamGroups.includes(facultyStatisticsGroup)) newAccessGroups.push('facultyStatistics')
-  if (hyOne || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
-  if (superAdmin || currentAccessGroups.includes('admin')) newAccessGroups.push('admin')
-  if (openUni) newAccessGroups.push('openUniSearch')
-
-  // In the difference method "the order and references of result values are determined by the first array." https://lodash.com/docs/4.17.15#difference
-  // Both directions needs to be checked in order to update roles when the access should no longer exists.
-  if (
-    _.difference(newAccessGroups, currentAccessGroups).length > 0 ||
-    _.difference(currentAccessGroups, newAccessGroups).length > 0
-  ) {
-    userFromDb.setAccessgroup(
-      (
-        await AccessGroup.findAll({
-          where: {
-            group_code: {
-              [Op.in]: newAccessGroups,
-            },
-          },
-        })
-      ).map(({ id }) => id)
-    )
-  }
+  const { newAccessGroups } = await updateAccessGroups(username, sisId, iamGroups, specialGroup)
 
   if (isNewUser) await sendNotificationAboutNewUser({ userId: username, userFullName: name })
 
