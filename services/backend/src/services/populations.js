@@ -1115,7 +1115,10 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
 
   if (error) return error
 
-  const substitutionCodes = Object.entries(courses).reduce((res, [, obj]) => [...res, ...obj.substitutions], [])
+  const substitutionCodes = Object.entries(courses).reduce(
+    (res, [, obj]) => [...res, ...(obj?.substitutions || [])],
+    []
+  )
   const codes = Object.keys(keyBy(courses, 'code')).map(code => code)
   const substitutionCourses = allCourses.filter(
     obj => substitutionCodes.includes(obj.code) && !codes.includes(obj.code)
