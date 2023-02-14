@@ -26,7 +26,9 @@ class CourseStatsCounter {
       failedMany: {},
       improvedPassedGrade: {},
       markedToSemester: {},
+      totalEnrolledNoGrade: {},
     }
+
     this.stats = {
       students: 0,
       passed: 0,
@@ -38,10 +40,10 @@ class CourseStatsCounter {
       percentage: undefined,
       passedOfPopulation: undefined,
       triedOfPopulation: undefined,
+      perStudent: undefined,
       passingSemesters: this.initializePassingSemesters(),
     }
     this.enrollments = {
-      enrolledNoGrade: new Set(),
       semesters: this.initializePassingSemesters({}),
     }
     this.grades = {}
@@ -187,8 +189,9 @@ class CourseStatsCounter {
     const allStudents = Object.keys(students.all)
     const totalEnrolledNoGrade = [...(this.enrollments.ENROLLED || [])].filter(
       student => !allStudents.includes(student)
-    ).length
-
+    )
+    students.totalEnrolledNoGrade = totalEnrolledNoGrade.reduce((acc, student) => ({ ...acc, [student]: true }), {})
+    students.all = { ...students.all, ...students.totalEnrolledNoGrade }
     stats.students = lengthOf(students.all)
     stats.passed = lengthOf(students.passed)
     stats.failed = lengthOf(students.failed)
@@ -200,8 +203,8 @@ class CourseStatsCounter {
     stats.triedOfPopulation = percentageOf(stats.students, this.studentsInTotal)
     stats.perStudent = stats.attempts / (stats.passed + stats.failed)
     stats.passingSemestersCumulative = this.getPassingSemestersCumulative()
-    stats.totalStudents = stats.students + totalEnrolledNoGrade
-    stats.totalEnrolledNoGrade = totalEnrolledNoGrade
+    stats.totalStudents = stats.students
+    stats.totalEnrolledNoGrade = totalEnrolledNoGrade.length
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
     return {
