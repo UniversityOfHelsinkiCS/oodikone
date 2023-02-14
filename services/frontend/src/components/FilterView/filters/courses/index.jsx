@@ -72,20 +72,19 @@ const CourseFilterCard = ({ courseStats, options, onOptionsChange }) => {
 }
 
 const createFilterFunc =
-  (key, invert = false) =>
-  ({ studentNumber }, { students }) =>
-    Object.keys(students[key]).includes(studentNumber) !== invert
+  key =>
+  ({ studentNumber }, { students }) => {
+    return Object.keys(students[key]).includes(studentNumber)
+  }
 
 const filterFunctions = {
   [FilterType.ALL]: createFilterFunc('all'),
   [FilterType.PASSED]: createFilterFunc('passed'),
   [FilterType.PASSED_AFTER_FAILURE]: createFilterFunc('retryPassed'),
-  // [FilterType.FAILED]: createFilterFunc('failed'),
-  // [FilterType.FAILED_MANY_TIMES]: createFilterFunc('failedMany'),
-  // [FilterType.DID_NOT_PASS]: createFilterFunc('didNotPass'),
-  // [FilterType.NOT_PARTICIPATED]: createFilterFunc('all', true),
-  // [FilterType.DID_NOT_PASS]: ({ studentNumber }, { students }) =>
-  //   !Object.keys(students.all).includes(studentNumber) || Object.keys(students.failed).includes(studentNumber),
+  [FilterType.FAILED]: createFilterFunc('failed'),
+  [FilterType.FAILED_MANY_TIMES]: createFilterFunc('failedMany'),
+  // [FilterType.ENROLLED_NO_GRADE]: createFilterFunc('totalEnrolledNoGrade'),
+  // [FilterType.NOT_PARTICIPATED]: createFilterFunc('all'),
 }
 
 const filter = createFilter({

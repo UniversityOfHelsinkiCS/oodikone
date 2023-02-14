@@ -8,10 +8,9 @@ const filterTexts = {
   [FilterType.ALL]: { label: 'All' },
   [FilterType.PASSED]: { label: 'Passed' },
   [FilterType.PASSED_AFTER_FAILURE]: { label: 'Passed After Failure' },
-  // [FilterType.FAILED]: { label: 'Failed' },
-  // [FilterType.FAILED_MANY_TIMES]: { label: 'Failed Multiple Times' },
-  // [FilterType.NOT_PARTICIPATED]: { label: 'Not Participated' },
-  // [FilterType.DID_NOT_PASS]: { label: "Didn't Pass" },
+  [FilterType.FAILED]: { label: 'Failed' },
+  [FilterType.FAILED_MANY_TIMES]: { label: 'Failed Multiple Times' },
+  // [FilterType.ENROLLED_NO_GRADE]: { label: 'Enrolled, No Grade' },
 }
 // a bandaid solution to prevent oodikone crashing
 const translate = {
@@ -20,13 +19,11 @@ const translate = {
   PASSED_AFTER_FAILURE: 'retryPassed',
   FAILED: 'failed',
   FAILED_MANY_TIMES: 'failedMany',
-  NOT_PARTICIPATED: 'notParticipated',
-  DID_NOT_PASS: 'didNotPass',
+  // ENROLLED_NO_GRADE: 'totalEnrolledNoGrade',
+  // NOT_PARTICIPATED: 'notParticipated',
 }
 
 const CourseCard = ({ course, filterType, onChange }) => {
-  // Object.entries(filterTexts).map(([type, { label, info }]) => console.log(type, label, translate[type]))
-  // console.log('course', course)
   const { language } = useLanguage()
   const name = 'courseFilter'
 
@@ -47,7 +44,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
           fluid
           className="mini"
           button
-          data-cy={`${name}-${course.course.code}-dropdown`}
+          data-cy={`${name}-${course?.course?.code}-dropdown`}
           style={{ marginTop: '0.5rem' }}
         >
           <Dropdown.Menu>
@@ -74,7 +71,7 @@ const CourseCard = ({ course, filterType, onChange }) => {
           size="tiny"
           onClick={clear}
           icon
-          data-cy={`${name}-${course.course.code}-clear`}
+          data-cy={`${name}-${course?.course?.code}-clear`}
           style={{ marginTop: '0.5rem' }}
         >
           <Icon name="close" />
