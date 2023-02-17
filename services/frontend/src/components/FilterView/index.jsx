@@ -7,32 +7,6 @@ import { selectViewFilters, setFilterOptions, resetViewFilters, resetFilter } fr
 import FilterViewContext from './FilterViewContext'
 import FilterTray from './FilterTray'
 
-/* const getFilterContext = (filter, students, options, precomputed) => ({
-  options: options[filter.key] ?? filter.defaultOptions,
-  students,
-  precomputed: precomputed[filter.key],
-})
-
-const precompute = (students, filters, options) =>
-  _.chain(filters)
-    .filter(({ precompute }) => precompute)
-    .map(({ key, precompute, defaultOptions }) => precompute({
-      students,
-      options: options[key] ?? defaultOptions,
-      precomputed: null,
-    }))
-    .fromPairs()
-    .value()
-
-const applyFilters = (students, filters, options, precomputed) => {
-  return filters
-    .map((filter) => [filter, { students, options: options[filter.key], precomputed: precomputed[filter.key] }])
-    .filter(([{ key, isActive }, ctx]) => isActive(options[key], ctx))
-    .reduce((students, [{ key, filter }, ctx]) => {
-      return students.filter(student => filter(student, options[key], precomputed[key]))
-    }, students)
-} */
-
 const resolveFilterOptions = (store, filters, initialOptions) => {
   return fp.flow(
     fp.map(({ key, defaultOptions }) => [
