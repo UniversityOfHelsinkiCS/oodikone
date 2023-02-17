@@ -174,7 +174,8 @@ const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, s
 
   // Modify accessgroups based on current groups and iamGroups
   let newAccessGroups = []
-  if (sisId && (await checkStudyGuidanceGroupsAccess(sisId))) newAccessGroups.push('studyGuidanceGroups')
+  if (currentAccessGroups.includes('studyGuidanceGroups') || (sisId && (await checkStudyGuidanceGroupsAccess(sisId))))
+    newAccessGroups.push('studyGuidanceGroups')
   if (iamGroups.includes(courseStatisticsGroup)) newAccessGroups.push('courseStatistics')
   if (jory || iamGroups.includes(facultyStatisticsGroup)) newAccessGroups.push('facultyStatistics')
   if (hyOne || currentAccessGroups.includes('teachers')) newAccessGroups.push('teachers')
