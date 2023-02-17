@@ -936,10 +936,52 @@ const getSubstitutions = async codes => {
   const courses = await Course.findAll({ where: { code: codes }, attributes: ['code', 'substitutions'], raw: true })
   return [...new Set(courses.map(({ code, substitutions }) => [code, ...substitutions]).flat())]
 }
-
+// This duplicate code is added here to ensure that we get the enrollments in cases no credits found for the selected students.
+const findCourseEnrollments = async (studentnumbers, beforeDate, courses = [], studentCountLimit = 0) => {
+  const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
+  const res = await sequelize.query(
+    `
+      SELECT DISTINCT ON (course.id)
+        course.code,
+        course.name,
+        course.coursetypecode,
+        course.substitutions,
+        course.main_course_code,
+        course_types.name AS course_type,
+        enrollment.data AS enrollments
+      FROM course
+      INNER JOIN course_types ON course_types.coursetypecode = course.coursetypecode
+      LEFT JOIN (
+        SELECT
+          course_id,
+          ARRAY_AGG(JSON_BUILD_OBJECT(
+            'studentnumber', studentnumber,
+            'state', state,
+            'enrollment_date_time', enrollment_date_time
+          )) AS data
+        FROM enrollment
+        WHERE enrollment.studentnumber IN (:studentnumbers) AND enrollment.enrollment_date_time < :beforeDate
+        GROUP BY enrollment.course_id
+        HAVING COUNT(DISTINCT enrollment.studentnumber) >= :studentCountLimit
+      ) enrollment ON enrollment.course_id = course.id 
+      WHERE :skipCourseCodeFilter OR course.code IN (:courseCodes)
+      -- GROUP BY 1, 2, 3, 4, 5, 6
+    `,
+    {
+      replacements: {
+        studentnumbers: studentnumbers.length > 0 ? studentnumbers : ['DUMMY'],
+        beforeDate,
+        studentCountLimit,
+        courseCodes,
+        skipCourseCodeFilter: courses.length === 0,
+      },
+      type: sequelize.QueryTypes.SELECT,
+    }
+  )
+  return res
+}
 const findCourses = async (studentnumbers, beforeDate, courses = [], studentCountLimit = 0) => {
   const courseCodes = courses.length > 0 ? await getSubstitutions(courses) : ['DUMMY']
-
   const res = await sequelize.query(
     `
       SELECT DISTINCT ON (course.id)
@@ -1064,14 +1106,22 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         numbers[num] = true
         return numbers
       }, {})
-
       const courses = await findCourses(
         studentnumbers,
         dateMonthsFromNow(startDate, months),
         courseCodes,
         query.studentCountLimit
       )
-      return [allstudents, courses]
+      const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
+      const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
+
+      const courseEnrollements = await findCourseEnrollments(
+        studentnumbers,
+        dateMonthsFromNow(startDate, months),
+        filteredCourseCodes,
+        query.studentCountLimit
+      )
+      return [allstudents, courses, courseEnrollements]
     } else {
       const { months, startDate } = params
       const beforeDate = months && startDate ? dateMonthsFromNow(startDate, months) : new Date()
@@ -1081,7 +1131,16 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         return numbers
       }, {})
       const courses = await findCourses(studentnumberlist, beforeDate, courseCodes, query.studentCountLimit)
-      return [allstudents, courses]
+      const foundCourseCodes = Object.keys(keyBy(courses, 'code'))
+      const filteredCourseCodes = courseCodes?.filter(code => !foundCourseCodes.includes(code))
+
+      const courseEnrollements = await findCourseEnrollments(
+        studentnumberlist,
+        dateMonthsFromNow(startDate, months),
+        filteredCourseCodes,
+        query.studentCountLimit
+      )
+      return [allstudents, courses, courseEnrollements]
     }
   }
 
@@ -1107,19 +1166,23 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         []
       )
     : []
-  const [[allstudents, courses], [, allCourses], error] = await Promise.all([
+  // To fix failed and enrolled, no grade filter options some not so clean and nice solutions were added
+  // Get the data with actual 1. courses and filtered students. 2. all students by year, if provided.
+  const [[allstudents, courses, courseEnrollements], [, allCourses], error] = await Promise.all([
     getStudentsAndCourses(query.selectedStudents, studentnumberlist, query.courses),
     getStudentsAndCourses(allStudentsByYears, null, query.courses),
     isValidRequest(query, params),
   ])
 
   if (error) return error
-
+  // Get the substitution codes for the fetch data by selscted students
   const substitutionCodes = Object.entries(courses).reduce(
     (res, [, obj]) => [...res, ...(obj?.substitutions || [])],
     []
   )
   const codes = Object.keys(keyBy(courses, 'code')).map(code => code)
+  // Filter substitution courses for fetched courses -> this avoid the situation in which there is only
+  // courses with old course codes. Frontend NEEDS in most cases the current course.
   const substitutionCourses = allCourses.filter(
     obj => substitutionCodes.includes(obj.code) && !codes.includes(obj.code)
   )
@@ -1129,7 +1192,6 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
   }
 
   const stats = {}
-
   const startYear = parseInt(query.year, 10)
   const allstudentslength = Object.keys(allstudents).length
   let coursesToLoop = courses.concat(substitutionCourses)
@@ -1152,24 +1214,61 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
     }
 
     const coursestats = stats[maincourse.code]
-
     coursestats.addCourseType(course_type.coursetypecode, course_type.name)
     coursestats.addCourseSubstitutions(course.substitutions)
     bottlenecks.coursetypes[course_type.coursetypecode] = course_type.name
+    if (course.enrollments) {
+      course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
+        if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {
+          const semester = getPassingSemester(startYear, enrollment_date_time)
+          coursestats.markEnrollment(studentnumber, state, semester, enrollment_date_time)
+        }
+      })
+    }
     course.credits.forEach(credit => {
       const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
       if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {
         const semester = getPassingSemester(startYear, date)
         coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
-        if (course.enrollments) {
-          course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
-            const semester = getPassingSemester(startYear, enrollment_date_time)
-            coursestats.markEnrollment(studentnumber, state, semester)
-          })
-        }
       }
     })
+
     stats[maincourse.code] = coursestats
+  }
+  // This ugliness here is to fix problem when Enrolled no grade is chosen. The sql query for fetching
+  // credits do not fetch enrollments if no credits found for selected students. This means that no stats for
+  // the selected course(s) were sent -> failure. This and other sql query ensures that enrollments are added
+  // in situations in which the course has not been added to statistic in the for loop above and contains enrollments
+  // for selected student.
+  for (const course of courseEnrollements) {
+    if (!course.enrollments) continue
+    let { coursetypecode, course_type } = course
+    let maincourse = course
+
+    if (course.main_course_code && course.main_course_code !== course.code) {
+      let newmain = coursesByCode[course.main_course_code]
+      if (newmain) {
+        maincourse = newmain
+      }
+    }
+    if (course.enrollments && !stats[maincourse.code]) {
+      stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
+      const coursestats = stats[maincourse.code]
+      coursestats.addCourseType(coursetypecode, course_type)
+      coursestats.addCourseSubstitutions(course.substitutions)
+      bottlenecks.coursetypes[coursetypecode] = course_type
+      course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
+        if (
+          (query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) ||
+          Object.keys(allstudents).includes(studentnumber)
+        ) {
+          const semester = getPassingSemester(startYear, enrollment_date_time)
+          coursestats.markEnrollment(studentnumber, state, semester, enrollment_date_time)
+        }
+      })
+
+      stats[maincourse.code] = coursestats
+    }
   }
 
   bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())

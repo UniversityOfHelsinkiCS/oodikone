@@ -83,8 +83,8 @@ const filterFunctions = {
   [FilterType.PASSED_AFTER_FAILURE]: createFilterFunc('retryPassed'),
   [FilterType.FAILED]: createFilterFunc('failed'),
   [FilterType.FAILED_MANY_TIMES]: createFilterFunc('failedMany'),
-  // [FilterType.ENROLLED_NO_GRADE]: createFilterFunc('totalEnrolledNoGrade'),
-  // [FilterType.NOT_PARTICIPATED]: createFilterFunc('all'),
+  [FilterType.ENROLLED_NO_GRADE]: createFilterFunc('enrolledNoGrade'),
+  // [FilterType.NOT_PARTICIPATED]: createFilterFunc('not_participated'),
 }
 
 const filter = createFilter({

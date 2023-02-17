@@ -10,7 +10,8 @@ const filterTexts = {
   [FilterType.PASSED_AFTER_FAILURE]: { label: 'Passed After Failure' },
   [FilterType.FAILED]: { label: 'Failed' },
   [FilterType.FAILED_MANY_TIMES]: { label: 'Failed Multiple Times' },
-  // [FilterType.ENROLLED_NO_GRADE]: { label: 'Enrolled, No Grade' },
+  [FilterType.ENROLLED_NO_GRADE]: { label: 'Enrolled, No Grade' },
+  // [FilterType.NOT_PARTICIPATED]: { label: 'Not Participated'},
 }
 // a bandaid solution to prevent oodikone crashing
 const translate = {
@@ -19,7 +20,7 @@ const translate = {
   PASSED_AFTER_FAILURE: 'retryPassed',
   FAILED: 'failed',
   FAILED_MANY_TIMES: 'failedMany',
-  // ENROLLED_NO_GRADE: 'totalEnrolledNoGrade',
+  ENROLLED_NO_GRADE: 'enrolledNoGrade',
   // NOT_PARTICIPATED: 'notParticipated',
 }
 

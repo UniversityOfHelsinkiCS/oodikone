@@ -26,7 +26,7 @@ class CourseStatsCounter {
       failedMany: {},
       improvedPassedGrade: {},
       markedToSemester: {},
-      totalEnrolledNoGrade: {},
+      enrolledNoGrade: {},
     }
 
     this.stats = {
@@ -79,11 +79,16 @@ class CourseStatsCounter {
     this.students.markedToSemester[studentnumber] = true
   }
 
+  removeFromEnrolledNoGrade(studentNumber) {
+    delete this.students.enrolledNoGrade[studentNumber]
+  }
+
   markCredit(studentnumber, grade, passed, failed, improved, semester) {
     // studentnumber = `${shajs('sha256').update(process.env.key + studentnumber).digest('hex')}`
     this.markAttempt()
     this.markGrade(grade, passed, failed, improved)
     this.markToAll(studentnumber)
+    this.removeFromEnrolledNoGrade(studentnumber)
     if (passed) {
       if (!this.students.markedToSemester[studentnumber]) {
         this.markPassedSemester(semester)
@@ -97,9 +102,14 @@ class CourseStatsCounter {
     }
   }
 
-  markEnrollment(studentnumber, state, semester) {
+  markEnrollment(studentnumber, state, semester, attainment_date) {
     if (!this.enrollments[state]) this.enrollments[state] = new Set()
     this.enrollments[state].add(studentnumber)
+    if (state === 'ENROLLED' && !this.students.enrolledNoGrade[studentnumber]) {
+      this.students.enrolledNoGrade[studentnumber] = attainment_date
+    } else if (state !== 'ENROLLED' && this.students.enrolledNoGrade[studentnumber] < attainment_date) {
+      this.removeFromEnrolledNoGrade(studentnumber)
+    }
     if (!this.enrollments.semesters[semester][state]) this.enrollments.semesters[semester][state] = new Set()
     this.enrollments.semesters[semester][state].add(studentnumber)
   }
@@ -186,12 +196,7 @@ class CourseStatsCounter {
   getFinalStats() {
     const stats = this.stats
     const students = this.students
-    const allStudents = Object.keys(students.all)
-    const totalEnrolledNoGrade = [...(this.enrollments.ENROLLED || [])].filter(
-      student => !allStudents.includes(student)
-    )
-    students.totalEnrolledNoGrade = totalEnrolledNoGrade.reduce((acc, student) => ({ ...acc, [student]: true }), {})
-    students.all = { ...students.all, ...students.totalEnrolledNoGrade }
+    students.all = { ...students.all, ...students.enrolledNoGrade }
     stats.students = lengthOf(students.all)
     stats.passed = lengthOf(students.passed)
     stats.failed = lengthOf(students.failed)
@@ -204,7 +209,7 @@ class CourseStatsCounter {
     stats.perStudent = stats.attempts / (stats.passed + stats.failed)
     stats.passingSemestersCumulative = this.getPassingSemestersCumulative()
     stats.totalStudents = stats.students
-    stats.totalEnrolledNoGrade = totalEnrolledNoGrade.length
+    stats.totalEnrolledNoGrade = lengthOf(students.enrolledNoGrade)
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
     return {
