@@ -53,7 +53,11 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
     setTagname(target.value)
   }
 
-  const deleteButton = tag => <Button onClick={() => setConfirm(tag)}>Delete</Button>
+  const deleteButton = tag => (
+    <Button negative onClick={() => setConfirm(tag)}>
+      Delete
+    </Button>
+  )
 
   const populationUrl = tag => {
     if (!tag.year) {
@@ -160,7 +164,11 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
               <label>Personal tag</label>
               <Form.Checkbox toggle checked={personal} onClick={() => setPersonal(!personal)} />
             </Form.Field>
-            <Button disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim())} onClick={handleSubmit}>
+            <Button
+              positive
+              disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim())}
+              onClick={handleSubmit}
+            >
               {' '}
               Create new tag{' '}
             </Button>
