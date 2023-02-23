@@ -165,7 +165,7 @@ const Tags = ({ createTag, deleteTag, getTagsByStudytrack, tags, studyprogramme 
               <Form.Checkbox toggle checked={personal} onClick={() => setPersonal(!personal)} />
             </Form.Field>
             <Button
-              positive
+              color="green"
               disabled={!tagname.trim() || tags.some(t => t.tagname === tagname.trim())}
               onClick={handleSubmit}
             >
