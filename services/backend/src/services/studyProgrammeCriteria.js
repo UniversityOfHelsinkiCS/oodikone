@@ -1,8 +1,8 @@
-const { StudyProgrammeCriteria } = require('../models/models_kone')
+const { ProgressCriteria } = require('../models/models_kone')
 const logger = require('../util/logger')
 
 const getCriteriaByStudyProgramme = code =>
-  StudyProgrammeCriteria.findOne({
+  ProgressCriteria.findOne({
     where: {
       code: code,
     },
@@ -35,7 +35,7 @@ const createCriteria = async (studyProgramme, coYear1, coYear2, coYear3, crYear1
     creditsYearThree: crYear3,
   }
   try {
-    const createdData = await StudyProgrammeCriteria.create(newProgrammeCriteria)
+    const createdData = await ProgressCriteria.create(newProgrammeCriteria)
     const criteria = formattedData(createdData)
     return criteria
   } catch (error) {

@@ -144,7 +144,7 @@ const OpenUniPopulationSearch = sequelizeKone.define(
   { underscored: true, timestamps: true }
 )
 
-const StudyProgrammeCriteria = sequelizeKone.define(
+const ProgressCriteria = sequelizeKone.define(
   'progress_criteria',
   {
     code: {
@@ -218,5 +218,5 @@ module.exports = {
   sequelizeKone,
   ExcludedCourse,
   StudyGuidanceGroupTag,
-  StudyProgrammeCriteria,
+  ProgressCriteria,
 }

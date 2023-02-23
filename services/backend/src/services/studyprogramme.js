@@ -19,6 +19,7 @@ const {
 } = require('../models')
 const { formatStudyright, formatStudent, formatTransfer } = require('./studyprogrammeHelpers')
 const { getCurrentSemester } = require('./semesters')
+const logger = require('../util/logger')
 
 const whereStudents = studentnumbers => {
   return studentnumbers ? studentnumbers : { [Op.not]: null }
@@ -504,7 +505,7 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
     }))
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(e)
+    logger.log(e)
   }
 }
 
@@ -534,7 +535,6 @@ const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, stu
     }
   )
   return res.map(course => {
-    // console.log('course: ', course)
     const res = {
       code: course.code,
       name: course.course_name,
