@@ -4,9 +4,9 @@ import { Accordion } from 'semantic-ui-react'
 import useFilters from 'components/FilterView/useFilters'
 import studyPlanFilter from 'components/FilterView/filters/hops'
 import { creditDateFilter } from 'components/FilterView/filters'
+import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
 import { useLocalStorage } from '../../common/hooks'
 import { useGetAuthorizedUserQuery } from '../../redux/auth'
-
 import CreditAccumulationGraphHighCharts from '../CreditAccumulationGraphHighCharts'
 import PopulationStudents from '../PopulationStudents'
 import PopulationCourses from '../PopulationCourses'
@@ -37,6 +37,7 @@ const PopulationDetails = ({
   const studentTableRef = useRef()
   const { useFilterSelector } = useFilters()
   const creditDateFilterOptions = useFilterSelector(creditDateFilter.selectors.selectOptions)
+  const criteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
 
   const handleClick = index => {
     const indexes = [...activeIndex].sort()
@@ -190,6 +191,9 @@ const PopulationDetails = ({
               language={language}
               filteredStudents={filteredStudents}
               dataExport={dataExport}
+              criteria={criteria?.data}
+              programmeCode={query?.studyRights?.programme}
+              year={query?.year}
             />
           </div>
         ),

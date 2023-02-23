@@ -19,6 +19,7 @@ import InfoBox from '../Info/InfoBox'
 import CheckStudentList from './CheckStudentList'
 import TagPopulation from '../TagPopulation'
 import TagList from '../TagList'
+import ProgressTable from './ProgressTable'
 import './populationStudents.css'
 import GeneralTab from './StudentTable/GeneralTab'
 import sendEvent, { ANALYTICS_CATEGORIES } from '../../common/sendEvent'
@@ -337,6 +338,8 @@ const Panes = ({
   queryStudyrights,
   from,
   to,
+  criteria,
+  months,
 }) => {
   const { handleTabChange } = useTabChangeAnalytics(
     ANALYTICS_CATEGORIES.populationStudents,
@@ -383,7 +386,7 @@ const Panes = ({
                 <h3>
                   No tags defined. You can define them{' '}
                   <Link
-                    to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=6`}
+                    to={`/study-programme/${queryStudyrights[0]}?p_m_tab=0&p_tab=4`}
                     onClick={() => {
                       sendAnalytics('No tags defined button clicked', 'Tags tab')
                     }}
@@ -406,6 +409,17 @@ const Panes = ({
             )}
           </div>
         </Tab.Pane>
+      ),
+    },
+    {
+      menuItem: 'Progress',
+      render: () => (
+        <ProgressTable
+          students={filteredStudents}
+          criteria={criteria}
+          months={months}
+          programme={queryStudyrights[0]}
+        />
       ),
     },
   ]
@@ -441,6 +455,7 @@ const PopulationStudents = ({
   studyGuidanceGroup,
   from,
   to,
+  criteria,
 }) => {
   const [state, setState] = useState({})
   const studentRef = useRef()
@@ -449,6 +464,7 @@ const PopulationStudents = ({
   const { data: tags } = useSelector(({ tags }) => tags)
   const { query } = useSelector(({ populations }) => populations)
   const queryStudyrights = query ? Object.values(query.studyRights) : []
+  const months = query ? query.months : 0
   const prevShowList = usePrevious(showList)
   const { isAdmin } = useGetAuthorizedUserQuery()
   const admin = isAdmin
@@ -472,7 +488,6 @@ const PopulationStudents = ({
   }, [prevShowList])
 
   if (filteredStudents.length === 0) return null
-
   return (
     <>
       <span style={{ marginRight: '0.5rem' }} ref={studentRef}>
@@ -487,10 +502,12 @@ const PopulationStudents = ({
         variant={variant}
         studentToTargetCourseDateMap={studentToTargetCourseDateMap}
         tags={tags}
+        criteria={criteria}
         studyGuidanceGroup={studyGuidanceGroup}
         coursecode={coursecode}
         from={from}
         to={to}
+        months={months}
       />
     </>
   )
@@ -498,14 +515,16 @@ const PopulationStudents = ({
 
 const PopulationStudentsContainer = ({ ...props }) => {
   const { variant } = props
-
   if (!['population', 'customPopulation', 'coursePopulation', 'studyGuidanceGroupPopulation'].includes(variant)) {
     throw new Error(`${variant} is not a proper variant!`)
   }
 
   const contentByVariant = {
     population: {
-      panesToInclude: ['General', 'Courses', 'Tags'],
+      panesToInclude:
+        props.year === 'All' || (props.programmeCode && !props.programmeCode.includes('KH'))
+          ? ['General', 'Courses', 'Tags']
+          : ['General', 'Courses', 'Tags', 'Progress'],
       infotoolTipContent: infotoolTips.PopulationStatistics.StudentsClass,
     },
     coursePopulation: {

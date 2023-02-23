@@ -25,7 +25,7 @@ const { CourseStatsCounter } = require('./course_stats_counter')
 const { getPassingSemester, semesterEnd, semesterStart } = require('../util/semester')
 const { getAllProgrammes } = require('./studyrights')
 const { encrypt } = require('../services/encrypt')
-// const { getCriteria } = require('./studyProgrammeCriteria')
+const { getCriteria } = require('./studyProgrammeCriteria')
 
 const enrolmentDates = () => {
   const query = 'SELECT DISTINCT s.dateOfUniversityEnrollment as date FROM Student s'
@@ -69,9 +69,10 @@ const formatStudentForPopulationStatistics = (
   credits,
   startDate,
   startDateMoment,
-  endDateMoment
+  endDateMoment,
+  criteria,
+  code
 ) => {
-  // ADD criteria && code
   const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule, language }) => {
     const attainment_date_normailized =
       attainment_date < startDate ? startDateMoment.clone().add(1, 'day').toISOString() : attainment_date
@@ -89,39 +90,38 @@ const formatStudentForPopulationStatistics = (
     }
   }
 
-  // const toProgressCriteria = () => {
-  //   const correctStudyplan = studyplans.filter(plan => plan.programme_code === code)
-  //   const criteriaFullfilled = {
-  //     year1: {
-  //       credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearOne,
-  //       courses: [],
-  //     },
-  //     year2: {
-  //       credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearTwo,
-  //       courses: [],
-  //     },
-  //     year3: {
-  //       credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearThree,
-  //       courses: [],
-  //     },
-  //   }
-  //   if (correctStudyplan.length > 0 && correctStudyplan[0].included_courses.length > 0 && criteria !== {}) {
-  //     correctStudyplan[0].included_courses.forEach(course => {
-  //       if (criteria?.courses?.yearOne.includes(course)) {
-  //         criteriaFullfilled.year1.courses.push(course)
-  //       }
-  //       if (criteria?.courses?.yearTwo.includes(course)) {
-  //         criteriaFullfilled.year2.courses.push(course)
-  //       }
-  //       if (criteria?.courses?.yearThree.includes(course)) {
-  //         criteriaFullfilled.year3.courses.push(course)
-  //       }
-  //     })
-  //   }
-  //   return criteriaFullfilled
-  // }
+  const toProgressCriteria = () => {
+    const correctStudyplan = studyplans.filter(plan => plan.programme_code === code)
+    const criteriaFullfilled = {
+      year1: {
+        credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearOne,
+        courses: [],
+      },
+      year2: {
+        credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearTwo,
+        courses: [],
+      },
+      year3: {
+        credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearThree,
+        courses: [],
+      },
+    }
+    if (correctStudyplan.length > 0 && correctStudyplan[0].included_courses.length > 0 && criteria !== {}) {
+      correctStudyplan[0].included_courses.forEach(course => {
+        if (criteria?.courses?.yearOne.includes(course)) {
+          criteriaFullfilled.year1.courses.push(course)
+        }
+        if (criteria?.courses?.yearTwo.includes(course)) {
+          criteriaFullfilled.year2.courses.push(course)
+        }
+        if (criteria?.courses?.yearThree.includes(course)) {
+          criteriaFullfilled.year3.courses.push(course)
+        }
+      })
+    }
+    return criteriaFullfilled
+  }
   studyrights = studyrights || []
-  // ADD     criteriaProgress: toProgressCriteria(),
   const started = dateofuniversityenrollment
   return {
     firstnames,
@@ -147,6 +147,7 @@ const formatStudentForPopulationStatistics = (
     birthdate,
     studyplans,
     sis_person_id,
+    criteriaProgress: toProgressCriteria(),
   }
 }
 
@@ -782,9 +783,10 @@ const formatStudentsForApi = async (
   startDate,
   endDate,
   { studyRights },
-  optionData
+  optionData,
+  criteria,
+  code
 ) => {
-  // ADD criteria and code above
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
   elementdetails = elementdetails.reduce(
@@ -817,9 +819,18 @@ const formatStudentsForApi = async (
       })
       if (student.studentnumber in optionData) student.option = optionData[student.studentnumber]
       else student.option = null
-      // add criteria and code
+
       stats.students.push(
-        formatStudentForPopulationStatistics(student, enrollments, credits, startDate, startDateMoment, endDateMoment)
+        formatStudentForPopulationStatistics(
+          student,
+          enrollments,
+          credits,
+          startDate,
+          startDateMoment,
+          endDateMoment,
+          criteria,
+          code
+        )
       )
       return stats
     },
@@ -905,12 +916,12 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
       )
   const code = studyRights[0] || ''
   let optionData = {}
-  // let criteria = {}
+  let criteria = {}
   if (code.includes('MH')) {
     optionData = await getOptionsForStudents(studentnumbers, code, 'MSC')
   } else if (code.includes('KH')) {
     optionData = await getOptionsForStudents(studentnumbers, code, 'BSC')
-    // criteria = await getCriteria(code)
+    criteria = await getCriteria(code)
   }
   const { students, enrollments, credits, extents, semesters, elementdetails, courses } =
     await getStudentsIncludeCoursesBetween(
@@ -920,13 +931,15 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
       studyRights,
       tag
     )
-  // add criteria and code
+
   const formattedStudents = await formatStudentsForApi(
     { students, enrollments, credits, extents, semesters, elementdetails, courses },
     startDate,
     endDate,
     formattedQueryParams,
-    optionData
+    optionData,
+    criteria,
+    code
   )
 
   return formattedStudents
