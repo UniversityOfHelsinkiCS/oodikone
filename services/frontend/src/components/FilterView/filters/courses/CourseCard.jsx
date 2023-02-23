@@ -7,9 +7,7 @@ import { FilterType } from './filterType'
 const filterTexts = {
   [FilterType.ALL]: { label: 'All' },
   [FilterType.PASSED]: { label: 'Passed' },
-  [FilterType.PASSED_AFTER_FAILURE]: { label: 'Passed After Failure' },
   [FilterType.FAILED]: { label: 'Failed' },
-  [FilterType.FAILED_MANY_TIMES]: { label: 'Failed Multiple Times' },
   [FilterType.ENROLLED_NO_GRADE]: { label: 'Enrolled, No Grade' },
   // [FilterType.NOT_PARTICIPATED]: { label: 'Not Participated'},
 }
@@ -17,9 +15,7 @@ const filterTexts = {
 const translate = {
   ALL: 'all',
   PASSED: 'passed',
-  PASSED_AFTER_FAILURE: 'retryPassed',
   FAILED: 'failed',
-  FAILED_MANY_TIMES: 'failedMany',
   ENROLLED_NO_GRADE: 'enrolledNoGrade',
   // NOT_PARTICIPATED: 'notParticipated',
 }

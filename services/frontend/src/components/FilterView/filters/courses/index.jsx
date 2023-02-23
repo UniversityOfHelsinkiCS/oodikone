@@ -80,9 +80,7 @@ const createFilterFunc =
 const filterFunctions = {
   [FilterType.ALL]: createFilterFunc('all'),
   [FilterType.PASSED]: createFilterFunc('passed'),
-  [FilterType.PASSED_AFTER_FAILURE]: createFilterFunc('retryPassed'),
   [FilterType.FAILED]: createFilterFunc('failed'),
-  [FilterType.FAILED_MANY_TIMES]: createFilterFunc('failedMany'),
   [FilterType.ENROLLED_NO_GRADE]: createFilterFunc('enrolledNoGrade'),
   // [FilterType.NOT_PARTICIPATED]: createFilterFunc('not_participated'),
 }
