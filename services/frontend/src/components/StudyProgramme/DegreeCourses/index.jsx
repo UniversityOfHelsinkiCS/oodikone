@@ -83,6 +83,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
 
   const setExclusionButton = course => (
     <Button
+      color="blue"
       onClick={() => {
         setExclusion(studyProgramme, [course.code])
         sendAnalytics('Set hidden button pressed', studyProgramme, course.name.fi)
@@ -93,6 +94,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   )
   const deleteButton = course => (
     <Button
+      color="blue"
       onClick={() => {
         removeExclusion(studyProgramme, [course.visible.id])
         sendAnalytics('Set visible button pressed', studyProgramme, course.name.fi)
@@ -104,6 +106,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
 
   const setCriteriaButton = (course, criterionYear) => (
     <Button
+      color="green"
       onClick={() => {
         const year = getYear(criterionYear)
         const courses = criteria.courses ? [...criteria.courses[year], course.code] : [course.code]
@@ -115,6 +118,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
   )
   const deleteCriteriaButton = (course, criterionYear) => (
     <Button
+      color="red"
       onClick={() => {
         const year = getYear(criterionYear)
         const filteredCourses = criteria?.courses[year]?.filter(courseCode => courseCode !== course.code)
@@ -177,6 +181,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
 
   const showAllButton = module => (
     <Button
+      color="blue"
       onClick={() => {
         deleteAll(module)
         sendAnalytics('ShowAllButton pressed', module)
@@ -188,6 +193,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
 
   const hideAllButton = module => (
     <Button
+      color="blue"
       onClick={() => {
         excludeAll(module)
         sendAnalytics('HideAllButton pressed', module)
@@ -236,9 +242,9 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
             <Message.Header>Change visibility of degree courses and select criteria for academic years</Message.Header>
             <p>
               Here you can change visibility of degree courses as and set course and credits criteria. Each academic
-              year have their own course and credits criteria. The progress of the students by these criteria will be
-              shown in class statistics view. These statistics will be available at the latest at Friday on 10.2..
+              year have their own course and credits criteria.
             </p>
+            <p>The progress of the students by these criteria will be shown in class statistics view.</p>
           </Message>
           <Container>
             <h5>Credit criteria</h5>
@@ -263,7 +269,7 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
                   onChange={e => setCreditsLimit3(e.target.value)}
                 />
               </Form.Group>
-              <Form.Button content="Save credit changes" onClick={setCreditsLimitCriteria} />
+              <Form.Button color="green" content="Save credit changes" onClick={setCreditsLimitCriteria} />
             </Form>
           </Container>
         </>
