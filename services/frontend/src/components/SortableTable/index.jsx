@@ -446,7 +446,7 @@ const ColumnHeaderContent = React.memo(({ column, colSpan, state, dispatch, rowS
           }}
         >
           <SizeMeasurer onSizeChange={onTitleSizeChange} style={{ display: 'inline-flex', alignItems: 'center' }}>
-            <p style={{ whiteSpace: 'pre' }}>{column.title}</p>
+            {typeof column.title === 'string' ? <p style={{ whiteSpace: 'pre' }}>{column.title}</p> : column.title}
             {column.helpText && !forcedTitleWidth && (
               <Icon
                 name="question circle outline"
