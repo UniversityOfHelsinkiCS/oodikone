@@ -435,7 +435,7 @@ const PopulationSearchForm = props => {
           </Grid.Row>
         </Grid>
         <Message error color="blue" header={errorText} />
-        <Form.Button onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
+        <Form.Button color="blue" onClick={handleSubmit} disabled={isQueryInvalid || query.months < 0}>
           See class
         </Form.Button>
         <SearchHistory items={searchHistory} updateItem={updateItemInSearchHistory} handleSearch={pushQueryToUrl} />
