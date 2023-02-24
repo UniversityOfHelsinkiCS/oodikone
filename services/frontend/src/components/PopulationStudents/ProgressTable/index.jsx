@@ -1,11 +1,15 @@
 import React, { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Tab, Item, Icon } from 'semantic-ui-react'
 import SortableTable from 'components/SortableTable'
 import sendEvent from 'common/sendEvent'
+import { getTextIn } from 'common'
+import { keyBy } from 'lodash'
 
 const sendAnalytics = sendEvent.populationStudents
 const ProgressTable = ({ criteria, students, months, programme }) => {
+  const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
   const hasPassedCriteria = (student, code, year) => {
     if (code.includes('Credits')) return student.criteriaProgress[year] && student.criteriaProgress[year].credits
     return student.criteriaProgress[year] && student.criteriaProgress[year].courses.includes(code)
@@ -36,10 +40,17 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       child: true,
     })
 
+    const courses = keyBy(mandatoryCourses, 'code')
     const labelCriteria = Object.keys(criteria.courses).reduce((acc, year) => {
       acc[year] = [
-        { code: `Credits: ${criteria.credits[year]}` },
-        ...criteria.courses[year].map(key => ({ code: key })),
+        { code: `Credits: ${criteria.credits[year]}`, name: '' },
+        ...[...criteria.courses[year]]
+          .sort((a, b) => a.localeCompare(b))
+          .map(courseCode => ({
+            code: courseCode,
+            name: courses[courseCode] ? courses[courseCode].name : '',
+          })),
+        { code: `Total`, name: '' },
       ]
       return acc
     }, {})
@@ -47,7 +58,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     const criteriaHeaders = [
       { title: months < 12 ? 'Academic Year 1 (in progress)' : 'Academic Year 1', year: 'year1', label: 'yearOne' },
       { title: months < 24 ? 'Academic Year 2 (in progress)' : 'Academic Year 2', year: 'year2', label: 'yearTwo' },
-      { title: months < 36 ? 'Academic Year 3 (in progress)' : 'Academic Year 2', year: 'year3', label: 'yearThree' },
+      { title: months < 36 ? 'Academic Year 3 (in progress)' : 'Academic Year 3', year: 'year3', label: 'yearThree' },
     ]
 
     const columns = []
@@ -55,19 +66,27 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       return labels.map(m => ({
         key: `${year}-${m.code}`,
         title: (
-          <div style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}>
+          <div
+            key={`${year}-${m.code}`}
+            style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
+          >
             <div>{m.code}</div>
+            <div style={{ color: 'gray', fontWeight: 'normal' }}>{getTextIn(m.name)}</div>
           </div>
         ),
-        textTitle: m.code,
+        textTitle: `${year}-${m.code}`,
+        vertical: m.name !== '',
         headerProps: { title: `${m.code}, ${year}` },
         getRowVal: s => {
+          if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
           return hasPassedCriteria(s, m.code, year) ? 'Passed' : ''
         },
         getRowExportVal: s => {
+          if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
           return hasPassedCriteria(s, m.code, year) ? 'Passed' : ''
         },
         getRowContent: s => {
+          if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
           return hasPassedCriteria(s, m.code, year) ? <Icon fitted name="check" color="green" /> : null
         },
         child: true,
@@ -122,8 +141,10 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     }
 
     return columns
-  }, [criteria, students])
-  const isCriteriaSet = criteria && Object.keys(criteria.courses).some(yearCourses => yearCourses.length > 0)
+  }, [criteria, students, mandatoryCourses, getTextIn])
+
+  const isCriteriaSet =
+    criteria && Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0)
   const data = useMemo(() => {
     return students
   }, [students])
@@ -131,10 +152,22 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     <Tab.Pane>
       <div style={{ display: 'flex' }}>
         <div style={{ maxHeight: '80vh', width: '100%' }}>
+          <h5>
+            Criteria can be changed{' '}
+            <Link
+              to={`/study-programme/${programme}?p_m_tab=0&p_tab=3`}
+              onClick={() => {
+                sendAnalytics('No criteria defined button clicked', 'Degree courses tab')
+              }}
+            >
+              here.
+            </Link>{' '}
+            Please refresh page after changes.
+          </h5>
           {isCriteriaSet ? (
             <SortableTable
               tableId="progress-of-population-students"
-              title={`Progress of population's students after predifend criteria`}
+              title={`Progress of population's students after predefined criteria`}
               getRowKey={s => s.studentNumber}
               tableProps={{
                 celled: true,
@@ -160,7 +193,8 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
                   }}
                 >
                   here.
-                </Link>
+                </Link>{' '}
+                Please refresh page after changes.
               </h3>
             </div>
           )}
