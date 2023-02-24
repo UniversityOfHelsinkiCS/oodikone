@@ -92,30 +92,37 @@ const formatStudentForPopulationStatistics = (
 
   const toProgressCriteria = () => {
     const correctStudyplan = studyplans.filter(plan => plan.programme_code === code)
+    const creditsDone = correctStudyplan[0]?.completed_credits || 0
     const criteriaFullfilled = {
       year1: {
-        credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearOne,
+        credits: creditsDone >= criteria?.credits?.yearOne,
         courses: [],
+        totalSatisfied: creditsDone >= criteria?.credits?.yearOne ? 1 : 0,
       },
       year2: {
-        credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearTwo,
+        credits: creditsDone >= criteria?.credits?.yearTwo,
         courses: [],
+        totalSatisfied: creditsDone >= criteria?.credits?.yearTwo ? 1 : 0,
       },
       year3: {
-        credits: correctStudyplan[0]?.completed_credits >= criteria?.credits?.yearThree,
+        credits: creditsDone >= criteria?.credits?.yearThree,
         courses: [],
+        totalSatisfied: creditsDone >= criteria?.credits?.yearThree ? 1 : 0,
       },
     }
     if (correctStudyplan.length > 0 && correctStudyplan[0].included_courses.length > 0 && criteria !== {}) {
       correctStudyplan[0].included_courses.forEach(course => {
         if (criteria?.courses?.yearOne.includes(course)) {
           criteriaFullfilled.year1.courses.push(course)
+          criteriaFullfilled.year1.totalSatisfied += 1
         }
         if (criteria?.courses?.yearTwo.includes(course)) {
           criteriaFullfilled.year2.courses.push(course)
+          criteriaFullfilled.year2.totalSatisfied += 1
         }
         if (criteria?.courses?.yearThree.includes(course)) {
           criteriaFullfilled.year3.courses.push(course)
+          criteriaFullfilled.year3.totalSatisfied += 1
         }
       })
     }
