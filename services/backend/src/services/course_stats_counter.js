@@ -79,16 +79,11 @@ class CourseStatsCounter {
     this.students.markedToSemester[studentnumber] = true
   }
 
-  removeFromEnrolledNoGrade(studentNumber) {
-    delete this.students.enrolledNoGrade[studentNumber]
-  }
-
   markCredit(studentnumber, grade, passed, failed, improved, semester) {
     // studentnumber = `${shajs('sha256').update(process.env.key + studentnumber).digest('hex')}`
     this.markAttempt()
     this.markGrade(grade, passed, failed, improved)
     this.markToAll(studentnumber)
-    this.removeFromEnrolledNoGrade(studentnumber)
     if (passed) {
       if (!this.students.markedToSemester[studentnumber]) {
         this.markPassedSemester(semester)
@@ -102,14 +97,9 @@ class CourseStatsCounter {
     }
   }
 
-  markEnrollment(studentnumber, state, semester, attainment_date) {
+  markEnrollment(studentnumber, state, semester) {
     if (!this.enrollments[state]) this.enrollments[state] = new Set()
     this.enrollments[state].add(studentnumber)
-    if (state === 'ENROLLED' && !this.students.enrolledNoGrade[studentnumber]) {
-      this.students.enrolledNoGrade[studentnumber] = attainment_date
-    } else if (state !== 'ENROLLED' && this.students.enrolledNoGrade[studentnumber] < attainment_date) {
-      this.removeFromEnrolledNoGrade(studentnumber)
-    }
     if (!this.enrollments.semesters[semester][state]) this.enrollments.semesters[semester][state] = new Set()
     this.enrollments.semesters[semester][state].add(studentnumber)
   }
@@ -196,7 +186,20 @@ class CourseStatsCounter {
   getFinalStats() {
     const stats = this.stats
     const students = this.students
-    students.all = { ...students.all, ...students.enrolledNoGrade }
+    const studs = this.enrollments
+      ? Object.keys(this.enrollments)
+          .filter(key => key !== 'ENROLLED' && key !== 'semesters')
+          .reduce((acc, key) => [...acc, ...[...this.enrollments[key]].map(studentnumber => studentnumber)], [])
+      : []
+    const allStudents = Object.keys(students.all).map(student => student)
+    const fileredEnrolledNoGrade = this.enrollments['ENROLLED']
+      ? [...this.enrollments['ENROLLED']]
+          .filter(student => !studs.includes(student) && !allStudents.includes(student))
+          .reduce((acc, student) => ({ ...acc, [student]: true }), {})
+      : {}
+
+    students.all = { ...students.all, ...fileredEnrolledNoGrade }
+    students.enrolledNoGrade = fileredEnrolledNoGrade
     stats.students = lengthOf(students.all)
     stats.passed = lengthOf(students.passed)
     stats.failed = lengthOf(students.failed)
@@ -209,7 +212,7 @@ class CourseStatsCounter {
     stats.perStudent = stats.attempts / (stats.passed + stats.failed)
     stats.passingSemestersCumulative = this.getPassingSemestersCumulative()
     stats.totalStudents = stats.students
-    stats.totalEnrolledNoGrade = lengthOf(students.enrolledNoGrade)
+    stats.totalEnrolledNoGrade = lengthOf(fileredEnrolledNoGrade)
     stats.percentageWithEnrollments = percentageOf(stats.passed, stats.totalStudents)
 
     return {
