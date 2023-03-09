@@ -220,7 +220,8 @@ const Overview = ({
           )}
           {special === 'SPECIAL_EXCLUDED' && (
             <Message data-cy="FacultyExcludeSpecialsInfo">
-              Please note: exluding the special studyrights does not have any affect to **credits** view.
+              Please note: exluding the special studyrights does not have any effects to credits produced by faculty
+              -view.
             </Message>
           )}
           {basics.isSuccess && basics.data && (
