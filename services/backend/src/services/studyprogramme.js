@@ -380,7 +380,7 @@ const getProgrammesStudyrights = async studyprogramme =>
 const getStudyRights = async students =>
   (
     await Studyright.findAll({
-      attributes: ['studyrightid', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode'],
+      attributes: ['studyrightid', 'startdate', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode'],
       where: {
         studentStudentnumber: students,
       },
@@ -416,9 +416,7 @@ const getCreditsForStudyProgramme = async (codes, since) => {
       },
     },
     where: {
-      credittypecode: {
-        [Op.notIn]: [10, 9, 7],
-      },
+      credittypecode: 4,
       isStudyModule: {
         [Op.not]: true,
       },

@@ -118,13 +118,11 @@ const Overview = ({
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
-  let creditShortTitles = []
+  const creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree']
   let transferShortTitles = []
   if (special === 'SPECIAL_INCLUDED') {
-    creditShortTitles = ['Code', 'Total', 'Major', 'Non-major', 'Non-major other', 'Non-degree']
     transferShortTitles = ['Code', 'Started', 'Graduated', 'Transferred in', 'Transferred away', 'Transferred to']
   } else {
-    creditShortTitles = ['Code', 'Major']
     transferShortTitles = ['Code', 'Started', 'Graduated']
   }
 
@@ -222,7 +220,7 @@ const Overview = ({
           )}
           {special === 'SPECIAL_EXCLUDED' && (
             <Message data-cy="FacultyExcludeSpecialsInfo">
-              Please note that the data might be inaccurate in some fields. Checking the values is in progress.
+              Please note: exluding the special studyrights does not have any affect to **credits** view.
             </Message>
           )}
           {basics.isSuccess && basics.data && (
@@ -269,58 +267,6 @@ const Overview = ({
                     language={language}
                     yearsVisible={Array(basics?.data?.studentInfo.tableStats.length).fill(false)}
                     shortNames={transferShortTitles}
-                  />
-                </div>
-              </div>
-            </>
-          )}
-          {credits.isSuccess && credits.data && (
-            <>
-              {getDivider(
-                'Credits produced by the faculty',
-                'CreditsProducedByTheFaculty',
-                credits?.data?.titles,
-                credits?.data?.tableStats,
-                credits?.data?.programmeTableStats,
-                credits?.data?.programmeNames
-              )}
-              <div className="section-container">
-                <div className="graph-container-narrow">
-                  <StackedBarChart
-                    cypress="CreditsProducedByTheFaculty"
-                    data={credits?.data?.graphStats}
-                    labels={credits?.data?.years}
-                    wideTable="narrow"
-                  />
-                </div>
-                <div className="table-container-wide">
-                  <InteractiveDataTable
-                    cypress="CreditsProducedByTheFaculty"
-                    dataStats={credits?.data?.tableStats}
-                    dataProgrammeStats={credits?.data?.programmeTableStats}
-                    programmeNames={credits?.data?.programmeNames}
-                    sortedKeys={sortProgrammeKeys(
-                      Object.keys(credits?.data.programmeTableStats).map(obj => [
-                        obj,
-                        credits?.data?.programmeNames[obj].code,
-                      ]),
-                      faculty.code
-                    ).map(listObj => listObj[0])}
-                    plotLinePlaces={getChartPlotLinePlaces(
-                      sortProgrammeKeys(
-                        Object.keys(credits?.data?.programmeTableStats).map(obj => [
-                          obj,
-                          credits?.data?.programmeNames[obj].code,
-                        ]),
-                        faculty.code
-                      )
-                    )}
-                    titles={credits?.data?.titles}
-                    extraHeight="EXTRA HEIGHT"
-                    sliceStart={2}
-                    language={language}
-                    yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
-                    shortNames={creditShortTitles}
                   />
                 </div>
               </div>
@@ -418,6 +364,58 @@ const Overview = ({
                     extraHeight="EXTRA HEIGHT"
                     language={language}
                     yearsVisible={Array(thesisWriters?.data.tableStats.length).fill(false)}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+          {credits.isSuccess && credits.data && (
+            <>
+              {getDivider(
+                'Credits produced by the faculty',
+                'CreditsProducedByTheFaculty',
+                credits?.data?.titles,
+                credits?.data?.tableStats,
+                credits?.data?.programmeTableStats,
+                credits?.data?.programmeNames
+              )}
+              <div className="section-container">
+                <div className="graph-container-narrow">
+                  <StackedBarChart
+                    cypress="CreditsProducedByTheFaculty"
+                    data={credits?.data?.graphStats}
+                    labels={credits?.data?.years}
+                    wideTable="narrow"
+                  />
+                </div>
+                <div className="table-container-wide">
+                  <InteractiveDataTable
+                    cypress="CreditsProducedByTheFaculty"
+                    dataStats={credits?.data?.tableStats}
+                    dataProgrammeStats={credits?.data?.programmeTableStats}
+                    programmeNames={credits?.data?.programmeNames}
+                    sortedKeys={sortProgrammeKeys(
+                      Object.keys(credits?.data.programmeTableStats).map(obj => [
+                        obj,
+                        credits?.data?.programmeNames[obj].code,
+                      ]),
+                      faculty.code
+                    ).map(listObj => listObj[0])}
+                    plotLinePlaces={getChartPlotLinePlaces(
+                      sortProgrammeKeys(
+                        Object.keys(credits?.data?.programmeTableStats).map(obj => [
+                          obj,
+                          credits?.data?.programmeNames[obj].code,
+                        ]),
+                        faculty.code
+                      )
+                    )}
+                    titles={credits?.data?.titles}
+                    extraHeight="EXTRA HEIGHT"
+                    sliceStart={2}
+                    language={language}
+                    yearsVisible={Array(credits?.data?.tableStats.length).fill(false)}
+                    shortNames={creditShortTitles}
                   />
                 </div>
               </div>

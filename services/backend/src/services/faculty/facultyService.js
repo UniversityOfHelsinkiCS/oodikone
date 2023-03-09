@@ -54,9 +54,9 @@ const getBasicStats = async (id, yearType, programmeFilter, specialGroups) => {
   return JSON.parse(dataFromRedis)
 }
 
-const setCreditStats = async (data, yearType, programmeFilter, specialGroups) => {
+const setCreditStats = async (data, yearType, programmeFilter) => {
   const { id } = data
-  const redisKey = createRedisKeyForCreditStats(id, yearType, programmeFilter, specialGroups)
+  const redisKey = createRedisKeyForCreditStats(id, yearType, programmeFilter)
   const dataToRedis = {
     ...data,
     status: 'DONE',
