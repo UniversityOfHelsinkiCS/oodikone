@@ -74,7 +74,7 @@ const FilterTray = () => {
           </div>
           {haveOptionsBeenChanged && (
             <div style={{ marginTop: '0.5rem', textAlign: 'center' }}>
-              <Button compact size="mini" onClick={resetFilters}>
+              <Button compact size="mini" onClick={resetFilters} data-cy="reset-all-filters">
                 Reset All Filters
               </Button>
             </div>
