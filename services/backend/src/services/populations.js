@@ -110,19 +110,22 @@ const formatStudentForPopulationStatistics = (
         totalSatisfied: creditsDone >= criteria?.credits?.yearThree ? 1 : 0,
       },
     }
-    if (correctStudyplan.length > 0 && correctStudyplan[0].included_courses.length > 0 && criteria !== {}) {
-      correctStudyplan[0].included_courses.forEach(course => {
-        if (criteria?.courses?.yearOne.includes(course)) {
-          criteriaFullfilled.year1.courses.push(course)
-          criteriaFullfilled.year1.totalSatisfied += 1
-        }
-        if (criteria?.courses?.yearTwo.includes(course)) {
-          criteriaFullfilled.year2.courses.push(course)
-          criteriaFullfilled.year2.totalSatisfied += 1
-        }
-        if (criteria?.courses?.yearThree.includes(course)) {
-          criteriaFullfilled.year3.courses.push(course)
-          criteriaFullfilled.year3.totalSatisfied += 1
+    if (criteria !== {}) {
+      const courses = credits[studentnumber] ? credits[studentnumber].map(toCourse) : []
+      courses.forEach(course => {
+        if (course.passed) {
+          if (criteria?.courses?.yearOne.includes(course.course_code)) {
+            criteriaFullfilled.year1.courses.push(course.course_code)
+            criteriaFullfilled.year1.totalSatisfied += 1
+          }
+          if (criteria?.courses?.yearTwo.includes(course.course_code)) {
+            criteriaFullfilled.year2.courses.push(course.course_code)
+            criteriaFullfilled.year2.totalSatisfied += 1
+          }
+          if (criteria?.courses?.yearThree.includes(course.course_code)) {
+            criteriaFullfilled.year3.courses.push(course.course_code)
+            criteriaFullfilled.year3.totalSatisfied += 1
+          }
         }
       })
     }
