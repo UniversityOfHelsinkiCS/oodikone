@@ -100,13 +100,12 @@ const updateFacultyOverview = async (faculty, statsType) => {
         )
         await setBasicStats(updatedStudentInfo, option.yearType, option.programmeFilter, option.specialGroups)
       }
-      if (statsType === 'ALL' || statsType === 'CREDITS') {
+      if ((statsType === 'ALL' || statsType === 'CREDITS') && specialGroups !== 'SPECIAL_EXCLUDED') {
         const updatedCredits = await combineFacultyCredits(
           faculty,
           programmeFilter === 'ALL_PROGRAMMES' ? allProgrammes.data : newProgrammes.data,
           allProgrammes.data,
-          yearType,
-          specialGroups
+          yearType
         )
         await setCreditStats(updatedCredits, yearType, programmeFilter, specialGroups)
       }
