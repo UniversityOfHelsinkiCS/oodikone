@@ -1,3 +1,4 @@
+/* eslint-disable cypress/no-unnecessary-waiting */
 /// <reference types="Cypress" />
 
 // const baseUrl = Cypress.config().baseUrl
@@ -49,8 +50,6 @@ const createRunTestStepWithPreAndPostPartsFunction = amountWithoutFiltering => {
     const card = cy.cs(`${filterName}-filter-card`)
 
     card.invoke('attr', 'data-open').then(open => {
-      console.log('open', open)
-
       const getHeader = () => cy.cs(`${filterName}-header`)
 
       if (open === 'false') {
@@ -325,6 +324,7 @@ describe('Custom Population Statistics', () => {
     runTestStepWithPreAndPostParts('Age', () => {
       testRangeFilter('Age-filter-card', 20, 30, 1)
     })
+    cy.cs('reset-all-filters').click()
   })
 
   it('Programme defaults to "Active Study Right" mode', () => {
@@ -340,6 +340,7 @@ describe('Custom Population Statistics', () => {
       checkFilteringResult(5)
       programmeDropdown.get('i.delete').click()
     })
+    cy.cs('reset-all-filters').click()
   })
 
   it('Gender filter works', () => {
