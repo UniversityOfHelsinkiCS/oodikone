@@ -1218,8 +1218,16 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
   const startYear = parseInt(query.year, 10)
   const allstudentslength = Object.keys(allstudents).length
   let coursesToLoop = courses.concat(substitutionCourses)
-  const coursesByCode = keyBy(coursesToLoop, 'code')
+  const codesList = coursesToLoop.map(course => course.code)
+  // This fix problem when Enrolled no grade is chosen. The sql query for fetching
+  // credits do not fetch enrollments if no credits found for selected students.
+  // This and other sql query ensures that enrollments are added.
+  const coursesOnlyWithEnrollments = courseEnrollements.filter(
+    course => !codesList.includes(course.code) && course.enrollments
+  )
+  coursesToLoop = coursesToLoop.concat(coursesOnlyWithEnrollments)
 
+  const coursesByCode = keyBy(coursesToLoop, 'code')
   for (const course of coursesToLoop) {
     let { course_type } = course
     let maincourse = course
@@ -1248,53 +1256,21 @@ const bottlenecksOf = async (query, studentnumberlist, encryptdata = false) => {
         }
       })
     }
-    course.credits.forEach(credit => {
-      const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
-      if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {
-        const semester = getPassingSemester(startYear, date)
-        coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
-      }
-    })
+    if (course.credits) {
+      course.credits.forEach(credit => {
+        const { studentnumber, passingGrade, improvedGrade, failingGrade, grade, date } = parseCreditInfo(credit)
+        if ((query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) || !query?.selectedStudents) {
+          const semester = getPassingSemester(startYear, date)
+          coursestats.markCredit(studentnumber, grade, passingGrade, failingGrade, improvedGrade, semester)
+        }
+      })
+    }
 
     stats[maincourse.code] = coursestats
   }
-  // This ugliness here is to fix problem when Enrolled no grade is chosen. The sql query for fetching
-  // credits do not fetch enrollments if no credits found for selected students. This means that no stats for
-  // the selected course(s) were sent -> failure. This and other sql query ensures that enrollments are added
-  // in situations in which the course has not been added to statistic in the for loop above and contains enrollments
-  // for selected student.
-  for (const course of courseEnrollements) {
-    if (!course.enrollments) continue
-    let { coursetypecode, course_type } = course
-    let maincourse = course
 
-    if (course.main_course_code && course.main_course_code !== course.code) {
-      let newmain = coursesByCode[course.main_course_code]
-      if (newmain) {
-        maincourse = newmain
-      }
-    }
-    if (course.enrollments && !stats[maincourse.code]) {
-      stats[maincourse.code] = new CourseStatsCounter(maincourse.code, maincourse.name, allstudentslength)
-      const coursestats = stats[maincourse.code]
-      coursestats.addCourseType(coursetypecode, course_type)
-      coursestats.addCourseSubstitutions(course.substitutions)
-      bottlenecks.coursetypes[coursetypecode] = course_type
-      course.enrollments.forEach(({ studentnumber, state, enrollment_date_time }) => {
-        if (
-          (query?.selectedStudents && query?.selectedStudents.includes(studentnumber)) ||
-          Object.keys(allstudents).includes(studentnumber)
-        ) {
-          const semester = getPassingSemester(startYear, enrollment_date_time)
-          coursestats.markEnrollment(studentnumber, state, semester, enrollment_date_time)
-        }
-      })
-
-      stats[maincourse.code] = coursestats
-    }
-  }
-
-  bottlenecks.coursestatistics = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
+  const allStats = Object.values(stats).map(coursestatistics => coursestatistics.getFinalStats())
+  bottlenecks.coursestatistics = allStats.filter(course => course.stats.students > 0)
   bottlenecks.allStudents = allstudentslength
 
   if (encryptdata) encryptStudentnumbers(bottlenecks)
