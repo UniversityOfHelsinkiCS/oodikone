@@ -26,6 +26,16 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       return <Icon fitted name="minus" title="Unfinished" color="grey" />
     return null
   }
+  const findCsvText = (s, courseCode, year) => {
+    if (courseCode.includes('Credits'))
+      return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? 'Passed' : ''
+    if (s.courses && s.courses.filter(course => course.course_code)[0]?.credittypecode === 9) return 'Credit transfer'
+    if (hasPassedCriteria(s, courseCode, year)) return 'Passed'
+    if (s.courses && s.courses.filter(course => course.course_code)[0]?.passed === false) return 'Failed'
+    // if (failedManyTimes) return <Icon fitted name="times" color="red" />
+    if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode)) return 'Unfinished'
+    return ''
+  }
   const columns = useMemo(() => {
     const studentColumn = []
 
@@ -90,11 +100,11 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         headerProps: { title: `${m.code}, ${year}` },
         getRowVal: s => {
           if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-          return hasPassedCriteria(s, m.code, year) ? 'Passed' : ''
+          return findCsvText(s, m.code, year)
         },
         getRowExportVal: s => {
           if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-          return hasPassedCriteria(s, m.code, year) ? 'Passed' : ''
+          return findCsvText(s, m.code, year)
         },
         getRowContent: s => {
           if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
