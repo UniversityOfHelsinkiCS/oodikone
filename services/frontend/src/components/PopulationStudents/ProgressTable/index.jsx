@@ -15,7 +15,12 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     return student.criteriaProgress[year] && student.criteriaProgress[year].courses.includes(code)
   }
   const findRowContent = (s, courseCode, year) => {
-    if (courseCode.includes('Credits')) return s.criteriaProgress[year] && s.criteriaProgress[year].credits
+    if (courseCode.includes('Credits'))
+      return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? (
+        <Icon fitted name="check" title="Checked" color="green" />
+      ) : (
+        ''
+      )
     if (s.courses && s.courses.filter(course => course.course_code)[0]?.credittypecode === 9)
       return <Icon name="file alternative outline" title="Credit transfer" color="blue" />
     if (hasPassedCriteria(s, courseCode, year)) return <Icon fitted name="check" title="Passed" color="green" />
