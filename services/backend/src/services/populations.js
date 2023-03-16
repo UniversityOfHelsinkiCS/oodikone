@@ -133,16 +133,10 @@ const formatStudentForPopulationStatistics = (
           firstAcademic += moment(course.date).isBetween(moment(startDate), moment(startDate).add(1, 'year'))
             ? course.credits
             : 0
-          secondAcademic += moment(course.date).isBetween(
-            moment(startDate).add(1, 'year'),
-            moment(startDate).add(2, 'year')
-          )
+          secondAcademic += moment(course.date).isBetween(moment(startDate), moment(startDate).add(2, 'year'))
             ? course.credits
             : 0
-          thirdAcademic += moment(course.date).isBetween(
-            moment(startDate).add(2, 'year'),
-            moment(startDate).add(3, 'year')
-          )
+          thirdAcademic += moment(course.date).isBetween(moment(startDate), moment(startDate).add(3, 'year'))
             ? course.credits
             : 0
         }
