@@ -49,6 +49,7 @@ const formatStudentForPopulationStatistics = (
     creditcount,
     abbreviatedname,
     email,
+    secondary_email,
     phone_number,
     studyrights,
     studyplans,
@@ -70,8 +71,7 @@ const formatStudentForPopulationStatistics = (
   startDate,
   startDateMoment,
   endDateMoment,
-  criteria,
-  code
+  criteria
 ) => {
   const toCourse = ({ grade, attainment_date, credits, course_code, credittypecode, isStudyModule, language }) => {
     const attainment_date_normailized =
@@ -91,46 +91,78 @@ const formatStudentForPopulationStatistics = (
   }
 
   const toProgressCriteria = () => {
-    const correctStudyplan = studyplans.filter(plan => plan.programme_code === code)
-    const creditsDone = correctStudyplan[0]?.completed_credits || 0
     const criteriaFullfilled = {
       year1: {
-        credits: creditsDone >= criteria?.credits?.yearOne,
-        courses: [],
-        totalSatisfied: creditsDone >= criteria?.credits?.yearOne ? 1 : 0,
+        credits: false,
+        totalSatisfied: 0,
       },
       year2: {
-        credits: creditsDone >= criteria?.credits?.yearTwo,
-        courses: [],
-        totalSatisfied: creditsDone >= criteria?.credits?.yearTwo ? 1 : 0,
+        credits: false,
+        totalSatisfied: 0,
       },
       year3: {
-        credits: creditsDone >= criteria?.credits?.yearThree,
-        courses: [],
-        totalSatisfied: creditsDone >= criteria?.credits?.yearThree ? 1 : 0,
+        credits: false,
+        totalSatisfied: 0,
       },
     }
+    let firstAcademic = 0
+    let secondAcademic = 0
+    let thirdAcademic = 0
     if (criteria !== {}) {
       const courses = credits[studentnumber] ? credits[studentnumber].map(toCourse) : []
       courses.forEach(course => {
         if (course.passed) {
-          if (criteria?.courses?.yearOne.includes(course.course_code)) {
-            criteriaFullfilled.year1.courses.push(course.course_code)
+          if (
+            criteria?.courses?.yearOne.includes(course.course_code) ||
+            criteria?.courses?.yearOne.some(c => criteria?.allCourses?.yearOne[c].includes(course.course_code))
+          ) {
             criteriaFullfilled.year1.totalSatisfied += 1
           }
-          if (criteria?.courses?.yearTwo.includes(course.course_code)) {
-            criteriaFullfilled.year2.courses.push(course.course_code)
+          if (
+            criteria?.courses?.yearTwo.includes(course.course_code) ||
+            criteria?.courses?.yearTwo.some(c => criteria?.allCourses?.yearTwo[c].includes(course.course_code))
+          ) {
             criteriaFullfilled.year2.totalSatisfied += 1
           }
-          if (criteria?.courses?.yearThree.includes(course.course_code)) {
-            criteriaFullfilled.year3.courses.push(course.course_code)
+          if (
+            criteria?.courses?.yearThree.includes(course.course_code) ||
+            criteria?.courses?.yearThree.some(c => criteria?.allCourses?.yearThree[c].includes(course.course_code))
+          ) {
             criteriaFullfilled.year3.totalSatisfied += 1
           }
+          firstAcademic += moment(course.date).isBetween(moment(startDate), moment(startDate).add(1, 'year'))
+            ? course.credits
+            : 0
+          secondAcademic += moment(course.date).isBetween(
+            moment(startDate).add(1, 'year'),
+            moment(startDate).add(2, 'year')
+          )
+            ? course.credits
+            : 0
+          thirdAcademic += moment(course.date).isBetween(
+            moment(startDate).add(2, 'year'),
+            moment(startDate).add(3, 'year')
+          )
+            ? course.credits
+            : 0
         }
       })
     }
+    if (firstAcademic >= criteria?.credits?.yearOne) {
+      criteriaFullfilled.year1.credits = true
+      criteriaFullfilled.year1.totalSatisfied += 1
+    }
+    if (secondAcademic >= criteria?.credits?.yearTwo) {
+      criteriaFullfilled.year2.credits = true
+      criteriaFullfilled.year2.totalSatisfied += 1
+    }
+    if (thirdAcademic >= criteria?.credits?.yearThree) {
+      criteriaFullfilled.year3.credits = true
+      criteriaFullfilled.year3.totalSatisfied += 1
+    }
     return criteriaFullfilled
   }
+
   studyrights = studyrights || []
   const started = dateofuniversityenrollment
   return {
@@ -147,6 +179,7 @@ const formatStudentForPopulationStatistics = (
     gender_code,
     gender: { gender_en, gender_fi, gender_sv },
     email,
+    secondaryEmail: secondary_email,
     phoneNumber: phone_number,
     semesterenrollments: semester_enrollments || [],
     updatedAt: updatedAt || createdAt,
@@ -277,6 +310,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         'creditcount',
         'abbreviatedname',
         'email',
+        'secondary_email',
         'phone_number',
         'updatedAt',
         'gender_code',
@@ -794,8 +828,7 @@ const formatStudentsForApi = async (
   endDate,
   { studyRights },
   optionData,
-  criteria,
-  code
+  criteria
 ) => {
   const startDateMoment = moment(startDate)
   const endDateMoment = moment(endDate)
@@ -838,8 +871,7 @@ const formatStudentsForApi = async (
           startDate,
           startDateMoment,
           endDateMoment,
-          criteria,
-          code
+          criteria
         )
       )
       return stats
@@ -948,8 +980,7 @@ const optimizedStatisticsOf = async (query, studentnumberlist) => {
     endDate,
     formattedQueryParams,
     optionData,
-    criteria,
-    code
+    criteria
   )
 
   return formattedStudents

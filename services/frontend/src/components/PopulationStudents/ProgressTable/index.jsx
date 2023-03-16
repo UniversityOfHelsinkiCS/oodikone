@@ -10,41 +10,42 @@ import { keyBy } from 'lodash'
 const sendAnalytics = sendEvent.populationStudents
 const ProgressTable = ({ criteria, students, months, programme }) => {
   const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
-  const hasPassedCriteria = (student, code, year) => {
-    if (code.includes('Credits')) return student.criteriaProgress[year] && student.criteriaProgress[year].credits
-    return student.criteriaProgress[year] && student.criteriaProgress[year].courses.includes(code)
-  }
-  const findRowContent = (s, courseCode, year) => {
+  const findRowContent = (s, courseCode, year, label) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? (
         <Icon fitted name="check" title="Checked" color="green" />
-      ) : (
-        ''
-      )
-    if (s.courses && s.courses.filter(course => course.course_code)[0]?.credittypecode === 9)
-      return <Icon name="exchange" title="Credit transfer" color="green" />
-    if (hasPassedCriteria(s, courseCode, year)) return <Icon fitted name="check" title="Passed" color="green" />
-    if (s.courses && s.courses.filter(course => course.course_code)[0]?.passed === false)
+      ) : null
+    const courses = s.courses.filter(
+      course => course.course_code === courseCode || criteria.allCourses[label][courseCode].includes(course.course_code)
+    )
+    if (courses && courses.some(course => course.credittypecode === 9))
+      return <Icon name="clipboard check" title="Credit transfer" color="green" />
+    if (courses && courses.some(course => course.passed))
+      return <Icon fitted name="check" title="Passed" color="green" />
+    if (courses && courses.some(course => course.passed === false))
       return <Icon fitted name="times" title="Failed" color="red" />
     // if (failedManyTimes) return <Icon fitted name="times" color="red" />
     if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode))
       return <Icon fitted name="minus" title="Unfinished" color="grey" />
     return null
   }
-  const findCsvText = (s, courseCode, year) => {
+  const findCsvText = (s, courseCode, year, label) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? 'Passed' : ''
-    if (s.courses && s.courses.filter(course => course.course_code)[0]?.credittypecode === 9) return 'Credit transfer'
-    if (hasPassedCriteria(s, courseCode, year)) return 'Passed'
-    if (s.courses && s.courses.filter(course => course.course_code)[0]?.passed === false) return 'Failed'
+    const courses = s.courses.filter(
+      course =>
+        course.course_code === courseCode || criteria?.allCourses[label][courseCode].includes(course.course_code)
+    )
+    if (courses && courses.some(course => course.credittypecode === 9)) return 'Credit transfer'
+    if (courses && courses.some(course => course.passed)) return 'Passed'
+    if (courses && courses.some(course => course.passed === false)) return 'Failed'
     // if (failedManyTimes) return <Icon fitted name="times" color="red" />
     if (s.enrollments && s.enrollments.map(course => course.course_code).includes(courseCode)) return 'Unfinished'
     return ''
   }
   const columns = useMemo(() => {
-    const studentColumn = []
-
-    studentColumn.push({
+    const studentColumns = []
+    studentColumns.push({
       key: 'studentnumber-parent',
       title: 'Student Number',
       cellProps: { title: 'student number', className: 'studentNumber' },
@@ -88,7 +89,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     ]
 
     const columns = []
-    const createContent = (labels, year) => {
+    const createContent = (labels, year, label) => {
       return labels.map(m => ({
         key: `${year}-${m.code}`,
         title: (
@@ -103,17 +104,18 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         textTitle: m.name === '' ? m.code : `${m.code}-${getTextIn(m.name)}`,
         vertical: m.name !== '',
         headerProps: { title: `${m.code}, ${year}` },
+        cellProps: { style: { verticalAlign: 'middle', textAlign: 'center' } },
         getRowVal: s => {
           if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-          return findCsvText(s, m.code, year)
+          return findCsvText(s, m.code, year, label)
         },
         getRowExportVal: s => {
           if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-          return findCsvText(s, m.code, year)
+          return findCsvText(s, m.code, year, label)
         },
         getRowContent: s => {
           if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
-          return findRowContent(s, m.code, year)
+          return findRowContent(s, m.code, year, label)
         },
         child: true,
       }))
@@ -125,7 +127,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         title: <b>Labels:</b>,
         textTitle: null,
         parent: true,
-        children: studentColumn,
+        children: studentColumns,
       },
       {
         key: criteriaHeaders[0].title,
@@ -136,7 +138,11 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         ),
         textTitle: null,
         parent: true,
-        children: createContent(labelCriteria[criteriaHeaders[0].label], criteriaHeaders[0].year),
+        children: createContent(
+          labelCriteria[criteriaHeaders[0].label],
+          criteriaHeaders[0].year,
+          criteriaHeaders[0].label
+        ),
       }
     )
     if (months > 12) {
@@ -149,7 +155,11 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         ),
         textTitle: null,
         parent: true,
-        children: createContent(labelCriteria[criteriaHeaders[1].label], criteriaHeaders[1].year),
+        children: createContent(
+          labelCriteria[criteriaHeaders[1].label],
+          criteriaHeaders[1].year,
+          criteriaHeaders[1].label
+        ),
       })
     }
     if (months > 24) {
@@ -162,7 +172,11 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         ),
         textTitle: null,
         parent: true,
-        children: createContent(labelCriteria[criteriaHeaders[2].label], criteriaHeaders[2].year),
+        children: createContent(
+          labelCriteria[criteriaHeaders[2].label],
+          criteriaHeaders[2].year,
+          criteriaHeaders[2].label
+        ),
       })
     }
     const columnsToHide = [
@@ -173,18 +187,10 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         textTitle: `Phone number`,
         headerProps: {
           title: `Phone number`,
-          style: {
-            display: 'none',
-          },
+          style: { display: 'none' },
         },
-        cellProps: {
-          style: {
-            display: 'none',
-          },
-        },
-        getRowVal: s => {
-          return s.phoneNumber
-        },
+        cellProps: { style: { display: 'none' } },
+        getRowVal: s => s.phoneNumber,
         child: true,
       },
       {
@@ -194,18 +200,49 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         textTitle: 'Email',
         headerProps: {
           title: `Email`,
-          style: {
-            display: 'none',
-          },
+          style: { display: 'none' },
         },
-        cellProps: {
-          style: {
-            display: 'none',
-          },
+        cellProps: { style: { display: 'none' } },
+        getRowVal: s => s.email,
+        child: true,
+      },
+      {
+        key: 'hidden-secondary-email',
+        export: true,
+        forceToolsMode: 'none',
+        textTitle: 'Secondary Email',
+        headerProps: {
+          title: `Secondary Email`,
+          style: { display: 'none' },
         },
-        getRowVal: s => {
-          return s.email
+        cellProps: { style: { display: 'none' } },
+        getRowVal: s => s.secondaryEmail,
+        child: true,
+      },
+      {
+        key: 'lastname',
+        title: 'Last name',
+        export: true,
+        forceToolsMode: 'none',
+        headerProps: {
+          title: `Last name`,
+          style: { display: 'none' },
         },
+        getRowVal: s => s.lastname,
+        cellProps: { style: { display: 'none' } },
+        child: true,
+      },
+      {
+        key: 'firstname',
+        title: 'Given names',
+        export: true,
+        forceToolsMode: 'none',
+        headerProps: {
+          title: `First name`,
+          style: { display: 'none' },
+        },
+        getRowVal: s => s.firstnames,
+        cellProps: { style: { display: 'none' } },
         child: true,
       },
     ]
@@ -262,7 +299,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             />
           ) : (
             <div>
-              <h3>There is no criteria available for this programme.</h3>
+              <h3>There is no criteria set for this programme.</h3>
             </div>
           )}
         </div>

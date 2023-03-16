@@ -1,4 +1,5 @@
 const { ProgressCriteria } = require('../models/models_kone')
+const { Course } = require('../models')
 const logger = require('../util/logger')
 
 const getCriteriaByStudyProgramme = code =>
@@ -8,12 +9,26 @@ const getCriteriaByStudyProgramme = code =>
     },
   })
 
-const formattedData = updatedData => {
+const getSubstitutions = async codes => {
+  if (codes === []) return []
+  const courses = await Course.findAll({ where: { code: codes }, attributes: ['code', 'substitutions'], raw: true })
+  return courses.reduce((acc, { code, substitutions }) => ({ ...acc, [code]: substitutions }), {})
+}
+
+const formattedData = async updatedData => {
+  const allCoursesOne = await getSubstitutions(updatedData.coursesYearOne)
+  const allCoursesTwo = await getSubstitutions(updatedData.coursesYearTwo)
+  const allCoursesThree = await getSubstitutions(updatedData.coursesYearThree)
   const criteria = {
     courses: {
       yearOne: updatedData.coursesYearOne,
       yearTwo: updatedData.coursesYearTwo,
       yearThree: updatedData.coursesYearThree,
+    },
+    allCourses: {
+      yearOne: allCoursesOne,
+      yearTwo: allCoursesTwo,
+      yearThree: allCoursesThree,
     },
     credits: {
       yearOne: updatedData.creditsYearOne,
@@ -36,8 +51,7 @@ const createCriteria = async (studyProgramme, coYear1, coYear2, coYear3, crYear1
   }
   try {
     const createdData = await ProgressCriteria.create(newProgrammeCriteria)
-    const criteria = formattedData(createdData)
-    return criteria
+    return await formattedData(createdData)
   } catch (error) {
     logger.error(`Create criteria failed: ${error}`)
   }
@@ -64,8 +78,7 @@ const saveYearlyCreditCriteria = async (studyProgramme, credits) => {
 
   try {
     const updatedData = await studyProgrammeToUpdate.update({ ...yearlyCredits })
-    const criteria = formattedData(updatedData)
-    return criteria
+    return await formattedData(updatedData)
   } catch (error) {
     logger.error(`Update yearly credit criteria failed: ${error}`)
   }
@@ -100,11 +113,28 @@ const saveYearlyCourseCriteria = async (studyProgramme, courses, year) => {
 
 const getCriteria = async studyProgramme => {
   const studyProgrammeCriteria = await getCriteriaByStudyProgramme(studyProgramme)
+  let allCoursesOne = []
+  let allCoursesTwo = []
+  let allCoursesThree = []
+  const coursesOne = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearOne : []
+  const coursesTwo = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearTwo : []
+  const coursesThree = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearThree : []
+  if (studyProgrammeCriteria) {
+    allCoursesOne = await getSubstitutions(coursesOne)
+    allCoursesTwo = await getSubstitutions(coursesTwo)
+    allCoursesThree = await getSubstitutions(coursesThree)
+  }
+
   const criteria = {
     courses: {
-      yearOne: studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearOne : [],
-      yearTwo: studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearTwo : [],
-      yearThree: studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearThree : [],
+      yearOne: coursesOne,
+      yearTwo: coursesTwo,
+      yearThree: coursesThree,
+    },
+    allCourses: {
+      yearOne: allCoursesOne,
+      yearTwo: allCoursesTwo,
+      yearThree: allCoursesThree,
     },
     credits: {
       yearOne: studyProgrammeCriteria ? studyProgrammeCriteria.creditsYearOne : 0,
