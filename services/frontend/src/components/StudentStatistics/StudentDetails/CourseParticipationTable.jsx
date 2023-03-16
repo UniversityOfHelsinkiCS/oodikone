@@ -27,11 +27,11 @@ const CourseParticipationTable = ({ student, language, clearCourseStats, studyri
     if (isStudyModuleCredit) {
       icon = <Icon name="certificate" color="purple" />
     } else if (c.credittypecode === 9) {
-      icon = <Icon name="file alternative outline" title="Credit transfer" color="green" />
+      icon = <Icon name="exhange" title="Credit transfer" color="green" />
     } else if (passed) {
-      icon = <Icon name="check circle outline" color="green" />
+      icon = <Icon name="check" color="green" />
     } else {
-      icon = <Icon name="circle outline" color="red" />
+      icon = <Icon name="times" color="red" />
     }
 
     if (!courseRowsByAcademicYear[`${new Date(date).getFullYear()}-${new Date(date).getFullYear() + 1}`]) {
