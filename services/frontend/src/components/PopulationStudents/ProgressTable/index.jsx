@@ -22,7 +22,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         ''
       )
     if (s.courses && s.courses.filter(course => course.course_code)[0]?.credittypecode === 9)
-      return <Icon name="file alternative outline" title="Credit transfer" color="blue" />
+      return <Icon name="exchange" title="Credit transfer" color="green" />
     if (hasPassedCriteria(s, courseCode, year)) return <Icon fitted name="check" title="Passed" color="green" />
     if (s.courses && s.courses.filter(course => course.course_code)[0]?.passed === false)
       return <Icon fitted name="times" title="Failed" color="red" />
