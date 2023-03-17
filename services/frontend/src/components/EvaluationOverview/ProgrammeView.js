@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Loader, Segment } from 'semantic-ui-react'
+import { Divider, Header, Loader, Segment } from 'semantic-ui-react'
 // import { useSelector } from 'react-redux'
 
 // import { getTextIn } from '../../common'
@@ -85,6 +85,13 @@ const ProgrammeView = ({ studyprogramme }) => {
 
   return (
     <>
+      <div align="center" style={{ padding: '30px' }}>
+        <Header textAlign="center">{studyprogramme}</Header>
+        {/* <Header textAlign="center">{programmeName}</Header>
+        <span>
+          {programmeLetterId ? `${programmeLetterId} - ` : ''} {studyProgrammeId}
+        </span> */}
+      </div>
       <div className="studyprogramme-overview">
         <div className="toggle-container">
           <Toggle
