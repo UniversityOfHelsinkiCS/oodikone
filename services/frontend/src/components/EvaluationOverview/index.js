@@ -8,7 +8,7 @@ import ProgrammeView from './ProgrammeView'
 const EvaluationOverview = props => {
   const { id, level } = props.match.params
 
-  if (!(level === 'programme' || level === 'faculty')) {
+  if (!(level === 'programme' || level === 'faculty') || !id) {
     return <Redirect to="/" />
   }
 
