@@ -41,6 +41,7 @@ const Trends = React.lazy(() => retry(() => import('../Trends')))
 const StudyGuidanceGroups = React.lazy(() => retry(() => import('../StudyGuidanceGroups')))
 const FacultyStatistics = React.lazy(() => retry(() => import('../FacultyStatistics')))
 const CustomOpenUniPopulations = React.lazy(() => retry(() => import('../CustomOpenUniPopulation')))
+const EvaluationOverview = React.lazy(() => retry(() => import('../EvaluationOverview')))
 
 const routes = {
   students: '/students/:studentNumber?',
@@ -55,6 +56,7 @@ const routes = {
   studyGuidanceGroups: '/studyguidancegroups/:groupid?',
   faculties: '/faculties/:facultyCode?',
   customOpenUniPopulation: '/openunipopulation',
+  evaluationOverview: '/evaluationoverview/:level?/:id?',
 }
 
 const Routes = () => (
@@ -112,6 +114,13 @@ const Routes = () => (
         exact
         path={routes.studyGuidanceGroups}
         component={StudyGuidanceGroups}
+      />
+      <ProtectedRoute
+        requiredRoles={['admin']}
+        requireUserHasRights
+        exact
+        path={routes.evaluationOverview}
+        component={EvaluationOverview}
       />
       <Redirect from="/cool-data-science" to="/trends" />
       <Redirect to="/" />
