@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Header, Loader, Segment } from 'semantic-ui-react'
+import { Divider, Header, Loader, Message, Segment } from 'semantic-ui-react'
 import { useGetEvaluationStatsQuery } from 'redux/studyProgramme'
 import { getTextIn } from '../../common'
 import useLanguage from '../LanguagePicker/useLanguage'
@@ -93,6 +93,31 @@ const ProgrammeView = ({ studyprogramme }) => {
           <Loader active style={{ marginTop: '10em' }} />
         ) : (
           <Segment className="contentSegment">
+            <Message info>
+              <Message.Header>This view is an abridged version of Oodikone's Studyprogramme Overview</Message.Header>
+              <p>
+                In these statistics, all special studyrights have been excluded, eg. exchange students and non-degree
+                students.
+              </p>
+              <p>
+                <b>
+                  You can find more statistics on this and other studyprogrammes of the university in main
+                  Studyprogramme Overview.{' '}
+                </b>
+                The full view includes details such as: how many have graduated or started in each programme and in its
+                studytracks; credits produced by the programme; population backgrounds and enrollment statuses.
+              </p>
+              <p>
+                Access the full Studyprogramme Overview by clicking 'Studyprogramme' in the top navigation bar and then
+                'Overview'. Alternatively, you can select 'Search by class' to explore studyprogrammes by starting class
+                with interactive statistics and visualizations.
+              </p>
+              <p>
+                {' '}
+                Note that both views have access restrictions. If you can't access either view and feel you should have
+                access, please contact grp-toska@helsinki.fi.
+              </p>
+            </Message>
             <div>
               {getDivider(`Progress of students of the studyprogramme by starting year`, 'StudytrackProgress')}
               <Toggle
