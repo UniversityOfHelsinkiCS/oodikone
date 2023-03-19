@@ -39,8 +39,8 @@ const CustomOpenUniPopulation = () => {
         <p>
           Here you can create custom population using a list of courses. Clicking the blue custom population button will
           open a modal where you can enter a list of courses. <br />
-          <Icon fitted name="check" color="green" />: Student passed the course. <br />
-          <Icon fitted name="times" color="red" />: Student failed the course. <br />
+          <Icon fitted name="check" color="green" />: Student has passed the course. <br />
+          <Icon fitted name="times" color="red" />: Student has failed the course. <br />
           <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
           course. <br />
           <b>Empty cell</b>: Student has no enrollments for the course. <br />

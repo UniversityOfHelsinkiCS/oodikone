@@ -129,6 +129,16 @@ export default {
   **Tags**
   
   Opiskelijoille voi luoda tag:eja ryhmittelyä varten kohdassa "Study Program" > "Overview" > haluttu koulutusohjelma.
+
+  **Progress**
+
+  Tämä näkymä on tällä hetkellä käytössä vain kandivaiheen opinto-ohjelmissa.
+  Tällä välilehdellä näkyy opintojen kehitys annettujen kriteerien mukaan akateemista vuotta kohti. Kurssi merkataan tehdyksi, jos sillä on suoritusmerkintä tai hyväksiluku 
+  minä tahansa lukuvuonna. Opintopistekriteerin täyttämiseen vaaditaan, että opintopisteet on suoritettu kyseisen akateemisen vuoden aikana.
+
+
+  **Huomaa**, että klikkaamalla taulukon yläreunassa olevaa kuvaketta, jossa on kolme pistettä, voit ladata itsellesi Excel tiedoston, joka sisältää lisäksi muita sarakkeita, kuten läsnäolon lukukausittain sekä yhteystiedot.
+  Yhteystietojen käyttö on kuitenkin sallittua vain opintoneuvontaan liittyvissä asiossa. 
   
   `,
   StudentsCustom: `**Students**
