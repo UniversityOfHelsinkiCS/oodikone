@@ -76,9 +76,11 @@ const FacultyView = ({ faculty }) => {
           students.
         </p>
         <p>
-          <b>You can find more statistics on this and all other faculties of the unersity in main Faculty view. </b>
+          <b>You can find more statistics on this and all other faculties of the university in main Faculty view. </b>
           The full view includes details such as: how many have graduated or started in each faculty and in its
-          programmes; credits produced by the faculty; populations backgrounds and enrollment statuses.
+          programmes; credits produced by the faculty; populations backgrounds and enrollment statuses. This view
+          provides statistics both on the whole faculty level and a breakdown of how they are spread among the faculty's
+          programmes.
         </p>
         <p>Access the full Faculty view by clicking 'Faculty' in the top navigation bar.</p>
       </Message>
