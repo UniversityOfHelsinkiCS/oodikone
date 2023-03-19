@@ -93,16 +93,6 @@ const ProgrammeView = ({ studyprogramme }) => {
         </span> */}
       </div>
       <div className="studyprogramme-overview">
-        <div className="toggle-container">
-          <Toggle
-            cypress="YearToggle"
-            toolTips={toolTips.YearToggle}
-            firstLabel="Calendar year"
-            secondLabel="Academic year"
-            value={academicYear}
-            setValue={setAcademicYear}
-          />
-        </div>
         {isFetchingOrLoading ? (
           <Loader active style={{ marginTop: '10em' }} />
         ) : (
@@ -137,6 +127,16 @@ const ProgrammeView = ({ studyprogramme }) => {
                       value={showMedian}
                       setValue={setShowMedian}
                     />
+                    <div className="toggle-container">
+                      <Toggle
+                        cypress="YearToggle"
+                        toolTips={toolTips.YearToggle}
+                        firstLabel="Calendar year"
+                        secondLabel="Academic year"
+                        value={academicYear}
+                        setValue={setAcademicYear}
+                      />
+                    </div>
                   </div>
                   <div className={`section-container${doCombo ? '' : '-centered'}`}>
                     {showMedian ? displayMedian() : displayBreakdown()}
