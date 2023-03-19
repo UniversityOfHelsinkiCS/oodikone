@@ -15,6 +15,7 @@ const {
   setStudytrackStats,
 } = require('../services/analyticsService')
 const { updateBasicView, updateStudytrackView } = require('../services/studyprogrammeUpdates')
+const { getProgrammeName } = require('../services/studyprogramme')
 const logger = require('../util/logger')
 
 router.get('/v2/studyprogrammes/:id/basicstats', async (req, res) => {
@@ -183,12 +184,15 @@ router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
     }
   }
 
+  const programmeName = await getProgrammeName(code)
+
   delete gradData.tableStats
   delete gradData.graphStats
   delete gradData.titles
 
   const data = {
     id: code,
+    programmeName: programmeName?.name,
     status: gradData?.status,
     lastUpdated: gradData.lastUpdated,
     graduations: gradData,

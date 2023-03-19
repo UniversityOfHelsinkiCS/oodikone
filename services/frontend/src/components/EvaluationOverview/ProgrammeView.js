@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
 import { Divider, Header, Loader, Segment } from 'semantic-ui-react'
-// import { useSelector } from 'react-redux'
-
-// import { getTextIn } from '../../common'
-// import useLanguage from '../LanguagePicker/useLanguage'
-// import { useGetGraduationStatsQuery, useGetStudytrackStatsQuery } from 'redux/studyProgramme'
 import { useGetEvaluationStatsQuery } from 'redux/studyProgramme'
+import { getTextIn } from '../../common'
+import useLanguage from '../LanguagePicker/useLanguage'
 import Toggle from '../StudyProgramme/Toggle'
 import InfoBox from '../Info/InfoBox'
 import MedianTimeBarChart from '../StudyProgramme/MedianTimeBarChart'
@@ -18,7 +15,7 @@ import InfotoolTips from '../../common/InfoToolTips'
 import '../StudyProgramme/studyprogramme.css'
 
 const ProgrammeView = ({ studyprogramme }) => {
-  // const { language } = useLanguage()
+  const { language } = useLanguage()
   const [showMedian, setShowMedian] = useState(false)
   const [academicYear, setAcademicYear] = useState(false)
   const [graduated, setGraduated] = useState(false)
@@ -33,6 +30,8 @@ const ProgrammeView = ({ studyprogramme }) => {
     specialGroups: 'SPECIAL_EXCLUDED',
     graduated: grad,
   })
+
+  const programmeName = statistics?.data?.programmeName && getTextIn(statistics?.data?.programmeName, language)
 
   const graduationData = statistics?.data?.graduations
   const progressData = statistics?.data?.progress
@@ -86,11 +85,8 @@ const ProgrammeView = ({ studyprogramme }) => {
   return (
     <>
       <div align="center" style={{ padding: '30px' }}>
-        <Header textAlign="center">{studyprogramme}</Header>
-        {/* <Header textAlign="center">{programmeName}</Header>
-        <span>
-          {programmeLetterId ? `${programmeLetterId} - ` : ''} {studyProgrammeId}
-        </span> */}
+        <Header textAlign="center">{programmeName}</Header>
+        <span>{studyprogramme}</span>
       </div>
       <div className="studyprogramme-overview">
         {isFetchingOrLoading ? (
