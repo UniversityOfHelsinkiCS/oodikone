@@ -4,7 +4,8 @@ import { Divider, Header, Loader, Segment } from 'semantic-ui-react'
 
 // import { getTextIn } from '../../common'
 // import useLanguage from '../LanguagePicker/useLanguage'
-import { useGetGraduationStatsQuery, useGetStudytrackStatsQuery } from 'redux/studyProgramme'
+// import { useGetGraduationStatsQuery, useGetStudytrackStatsQuery } from 'redux/studyProgramme'
+import { useGetEvaluationStatsQuery } from 'redux/studyProgramme'
 import Toggle from '../StudyProgramme/Toggle'
 import InfoBox from '../Info/InfoBox'
 import MedianTimeBarChart from '../StudyProgramme/MedianTimeBarChart'
@@ -26,15 +27,18 @@ const ProgrammeView = ({ studyprogramme }) => {
   const yearType = academicYear ? 'ACADEMIC_YEAR' : 'CALENDAR_YEAR'
   const grad = graduated ? 'GRADUATED_EXCLUDED' : 'GRADUATED_INCLUDED'
 
-  const stats = useGetStudytrackStatsQuery({
+  const statistics = useGetEvaluationStatsQuery({
     id: studyprogramme,
+    yearType,
     specialGroups: 'SPECIAL_EXCLUDED',
     graduated: grad,
   })
 
-  const graduations = useGetGraduationStatsQuery({ id: studyprogramme, yearType, specialGroups: 'SPECIAL_EXCLUDED' })
-  const doCombo = graduations?.data?.doCombo
-  const timesData = graduations?.data?.graduationTimes
+  const graduationData = statistics?.data?.graduations
+  const progressData = statistics?.data?.progress
+
+  const doCombo = graduationData?.doCombo
+  const timesData = graduationData?.graduationTimes
 
   const getDivider = (title, toolTipText) => (
     <>
@@ -51,15 +55,15 @@ const ProgrammeView = ({ studyprogramme }) => {
     <>
       {doCombo && (
         <MedianTimeBarChart
-          data={graduations?.data?.comboTimes?.medians}
-          goal={graduations?.data?.comboTimes?.goal}
+          data={graduationData?.comboTimes?.medians}
+          goal={graduationData?.comboTimes?.goal}
           title="Bachelor + Master studyright"
           byStartYear={false}
         />
       )}
       <MedianTimeBarChart
-        data={timesData?.medians}
-        goal={graduations?.data.graduationTimes?.goal}
+        data={graduationData?.graduationTimes?.medians}
+        goal={graduationData?.graduationTimes?.goal}
         title={doCombo ? 'Master studyright' : ' '}
         byStartYear={false}
       />
@@ -68,18 +72,14 @@ const ProgrammeView = ({ studyprogramme }) => {
 
   const displayBreakdown = () => (
     <>
-      {doCombo && (
-        <BreakdownBarChart data={graduations?.data?.comboTimes?.medians} title="Bachelor + Master studyright" />
-      )}
+      {doCombo && <BreakdownBarChart data={graduationData?.comboTimes?.medians} title="Bachelor + Master studyright" />}
       <BreakdownBarChart data={timesData?.medians} title={doCombo ? 'Master studyright' : ' '} />
     </>
   )
 
-  const isFetchingOrLoading = graduations.isLoading || graduations.isFetching || stats.isLoading || stats.isFetching
+  const isFetchingOrLoading = statistics.isLoading || statistics.isFetching
 
-  const isError =
-    (graduations.isError && stats.isError) ||
-    (graduations.isSuccess && !graduations.data && stats.isSuccess && !stats.data)
+  const isError = statistics.isError || (statistics.isSuccess && !statistics.data)
 
   if (isError) return <h3>Something went wrong, please try refreshing the page.</h3>
 
@@ -118,15 +118,15 @@ const ProgrammeView = ({ studyprogramme }) => {
                 setValue={setGraduated}
               />
               <div className="section-container">
-                <BarChart cypress="StudytrackProgress" data={stats?.data} track={studyprogramme} />
+                <BarChart cypress="StudytrackProgress" data={progressData?.graphData} track={studyprogramme} />
                 <BasicDataTable
                   cypress="StudytrackProgress"
-                  data={stats?.data?.creditTableStats}
+                  data={progressData?.creditTableStats}
                   track={studyprogramme}
-                  titles={stats?.data?.creditTableTitles}
+                  titles={progressData?.creditTableTitles}
                 />
               </div>
-              {graduations?.data?.programmesBeforeOrAfterGraphStats && (
+              {graduationData?.programmesBeforeOrAfterGraphStats && (
                 <>
                   {getDivider('Graduation times', 'AverageGraduationTimes')}
                   <div className="toggle-container">
@@ -151,13 +151,13 @@ const ProgrammeView = ({ studyprogramme }) => {
                     <StackedBarChart
                       cypress="ProgrammesBeforeOrAfter"
                       wideTable
-                      data={graduations?.data?.programmesBeforeOrAfterGraphStats}
-                      labels={graduations?.data?.years}
+                      data={graduationData?.programmesBeforeOrAfterGraphStats}
+                      labels={graduationData?.years}
                     />
                     <DataTable
                       wideTable
-                      data={graduations?.data?.programmesBeforeOrAfterTableStats}
-                      titles={graduations?.data?.programmesBeforeOrAfterTitles}
+                      data={graduationData?.programmesBeforeOrAfterTableStats}
+                      titles={graduationData?.programmesBeforeOrAfterTitles}
                     />
                   </div>
                 </>
