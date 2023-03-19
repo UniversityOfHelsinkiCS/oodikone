@@ -143,4 +143,70 @@ router.get('/v2/studyprogrammes/:id/update_studytrackview', async (req, res) => 
   }
 })
 
+router.get('/v2/studyprogrammes/:id/evaluationstats', async (req, res) => {
+  const code = req.params.id
+  const yearType = req.query?.year_type
+  const specialGroups = req.query?.special_groups
+  const graduated = req.query?.graduated
+
+  if (!code) return res.status(422).end()
+
+  // Statistics for Tilannekuvalomake view
+
+  let gradData = await getGraduationStats(code, yearType, specialGroups)
+  if (!gradData) {
+    const updatedStats = await getGraduationStatsForStudytrack({
+      studyprogramme: req.params.id,
+      settings: {
+        isAcademicYear: yearType === 'ACADEMIC_YEAR',
+        includeAllSpecials: specialGroups === 'SPECIAL_INCLUDED',
+      },
+    })
+    if (updatedStats) {
+      await setGraduationStats(updatedStats, yearType, specialGroups)
+      gradData = updatedStats
+    }
+  }
+
+  let progressData = await getStudytrackStats(code, graduated, specialGroups)
+  if (!progressData) {
+    const updated = await getStudytrackStatsForStudyprogramme({
+      studyprogramme: code,
+      settings: {
+        graduated: graduated === 'GRADUATED_INCLUDED',
+        specialGroups: specialGroups === 'SPECIAL_INCLUDED',
+      },
+    })
+    if (updated) {
+      await setStudytrackStats(updated, graduated, specialGroups)
+      progressData = updated
+    }
+  }
+
+  delete gradData.tableStats
+  delete gradData.graphStats
+  delete gradData.titles
+
+  const data = {
+    id: code,
+    status: gradData?.status,
+    lastUpdated: gradData.lastUpdated,
+    graduations: gradData,
+    progress: {
+      creditTableStats: {},
+      creditTableTitles: progressData?.creditTableTitles,
+      graphData: {
+        creditGraphStats: {},
+        id: progressData?.id,
+        years: progressData?.years,
+      },
+    },
+  }
+
+  data.progress.creditTableStats[code] = progressData?.creditTableStats[code]
+  data.progress.graphData.creditGraphStats[code] = progressData?.creditGraphStats[code]
+
+  return res.json(data)
+})
+
 module.exports = router
