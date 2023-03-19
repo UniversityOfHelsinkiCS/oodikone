@@ -119,8 +119,10 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             key={`${year}-${m.code}-${getTextIn(m.name)}`}
             style={{ maxWidth: '8em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
           >
-            <div>{m.code}</div>
-            <div style={{ color: 'gray', fontWeight: 'normal' }}>{getTextIn(m.name)}</div>
+            <div key={`${m.code}-${year}`}>{m.code}</div>
+            <div key={`${getTextIn(m.name)}`} style={{ color: 'gray', fontWeight: 'normal' }}>
+              {getTextIn(m.name)}
+            </div>
           </div>
         ),
         textTitle: m.name === '' ? m.code : `${m.code}-${getTextIn(m.name)}`,
