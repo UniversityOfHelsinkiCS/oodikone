@@ -115,7 +115,7 @@ const ProgrammeView = ({ studyprogramme }) => {
               <p>
                 {' '}
                 Note that both views have access restrictions. If you can't access either view and feel you should have
-                access, please contact grp-toska@helsinki.fi.
+                access, please contact oodikone@helsinki.fi.
               </p>
             </Message>
             <div>
