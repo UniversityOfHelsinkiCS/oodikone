@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Divider, Header, Loader } from 'semantic-ui-react'
+import { Divider, Header, Loader, Message } from 'semantic-ui-react'
 import {
   useGetFacultiesQuery,
   useGetFacultyProgressStatsQuery,
@@ -39,7 +39,7 @@ const FacultyView = ({ faculty }) => {
 
   const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty, studyProgrammeFilter })
 
-  const getDivider = (title, toolTipText, content = '', cypress = undefined) => (
+  const getDivider = (title, toolTipText, content, cypress = undefined) => (
     <>
       <div className="divider">
         <Divider data-cy={`Section-${toolTipText}`} horizontal>
@@ -69,6 +69,19 @@ const FacultyView = ({ faculty }) => {
         <Header textAlign="center">{facultyName}</Header>
         <span>{faculty}</span>
       </div>
+      <Message info>
+        <Message.Header>This view is an abridged version of Oodikone's Faculty Overview</Message.Header>
+        <p>
+          In these statistics, all special studyrights have been excluded, eg. exchange students and non-degree
+          students.
+        </p>
+        <p>
+          <b>You can find more statistics on this and all other faculties of the unersity in main Faculty view. </b>
+          The full view includes details such as: how many have graduated or started in each faculty and in its
+          programmes; credits produced by the faculty; populations backgrounds and enrollment statuses.
+        </p>
+        <p>Access the full Faculty view by clicking 'Faculty' in the top navigation bar.</p>
+      </Message>
       <div className="faculty-overview">
         {isFetchingOrLoading ? (
           <Loader active style={{ marginTop: '15em' }} />
@@ -102,7 +115,7 @@ const FacultyView = ({ faculty }) => {
             )}
             {graduationStats.isSuccess && graduationStats.data && (
               <>
-                {getDivider('Average graduation times', 'AverageGraduationTimes')}
+                {getDivider('Average graduation times', 'AverageGraduationTimes', toolTips.AverageGraduationTimes)}
                 <div className="toggle-container">
                   <Toggle
                     cypress="GraduationTimeToggle"
