@@ -12,6 +12,7 @@ const {
   Studyright,
   StudyrightElement,
   ElementDetail,
+  ProgrammeModule,
   Transfer,
   Student,
   SemesterEnrollment,
@@ -730,6 +731,15 @@ const getCurrentStudyYearStartDate = _.memoize(
     )
 )
 
+const getProgrammeName = async code => {
+  return ProgrammeModule.findOne({
+    attributes: ['name'],
+    where: {
+      code,
+    },
+  })
+}
+
 module.exports = {
   studytrackStudents,
   enrolledStudents,
@@ -756,4 +766,5 @@ module.exports = {
   getStudyRights,
   getCourseCodesForStudyProgramme,
   getTransferStudentsForProgrammeCourses,
+  getProgrammeName,
 }
