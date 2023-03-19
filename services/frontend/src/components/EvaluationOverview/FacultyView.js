@@ -39,7 +39,7 @@ const FacultyView = ({ faculty }) => {
 
   const graduationStats = useGetFacultyGraduationTimesQuery({ id: faculty, studyProgrammeFilter })
 
-  const getDivider = (title, toolTipText, content, cypress) => (
+  const getDivider = (title, toolTipText, content = '', cypress = undefined) => (
     <>
       <div className="divider">
         <Divider data-cy={`Section-${toolTipText}`} horizontal>
