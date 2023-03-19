@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Tab, Item, Icon } from 'semantic-ui-react'
+import { Tab, Item, Icon, Message } from 'semantic-ui-react'
 import SortableTable from 'components/SortableTable'
 import sendEvent from 'common/sendEvent'
 import { getTextIn } from 'common'
@@ -10,6 +10,7 @@ import { keyBy } from 'lodash'
 const sendAnalytics = sendEvent.populationStudents
 const ProgressTable = ({ criteria, students, months, programme }) => {
   const mandatoryCourses = useSelector(state => state?.populationMandatoryCourses?.data)
+  const namesVisible = useSelector(state => state?.settings?.namesVisible)
   const findRowContent = (s, courseCode, year, label) => {
     if (courseCode.includes('Credits'))
       return s.criteriaProgress[year] && s.criteriaProgress[year].credits ? (
@@ -45,6 +46,27 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
   }
   const columns = useMemo(() => {
     const studentColumns = []
+    if (namesVisible) {
+      studentColumns.push(
+        {
+          key: 'lastname_visible',
+          title: 'Last name',
+          getRowVal: s => s.lastname,
+          cellProps: { title: 'last name' },
+          export: false,
+          child: true,
+        },
+        {
+          key: 'firstname_visible',
+          title: 'Given names',
+          getRowVal: s => s.firstnames,
+          cellProps: { title: 'first names' },
+          export: false,
+          child: true,
+        }
+      )
+    }
+
     studentColumns.push({
       key: 'studentnumber-parent',
       title: 'Student Number',
@@ -94,17 +116,18 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         key: `${year}-${m.code}`,
         title: (
           <div
-            key={`${year}-${m.code}`}
-            style={{ maxWidth: '15em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
+            key={`${year}-${m.code}-${getTextIn(m.name)}`}
+            style={{ maxWidth: '8em', whiteSpace: 'normal', overflow: 'hidden', width: 'max-content' }}
           >
             <div>{m.code}</div>
             <div style={{ color: 'gray', fontWeight: 'normal' }}>{getTextIn(m.name)}</div>
           </div>
         ),
         textTitle: m.name === '' ? m.code : `${m.code}-${getTextIn(m.name)}`,
-        vertical: m.name !== '',
         headerProps: { title: `${m.code}, ${year}` },
-        cellProps: { style: { verticalAlign: 'middle', textAlign: 'center' } },
+        cellProps: {
+          style: { verticalAlign: 'middle', textAlign: 'center' },
+        },
         getRowVal: s => {
           if (m.code.includes('Total')) return s.criteriaProgress[year] ? s.criteriaProgress[year].totalSatisfied : 0
           return findCsvText(s, m.code, year, label)
@@ -220,8 +243,8 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         child: true,
       },
       {
-        key: 'lastname',
-        title: 'Last name',
+        key: 'lastname-hidden',
+        title: '',
         export: true,
         forceToolsMode: 'none',
         headerProps: {
@@ -233,8 +256,8 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         child: true,
       },
       {
-        key: 'firstname',
-        title: 'Given names',
+        key: 'firstname-hidden',
+        title: '',
         export: true,
         forceToolsMode: 'none',
         headerProps: {
@@ -256,7 +279,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
     })
 
     return columns
-  }, [criteria, students, mandatoryCourses, getTextIn])
+  }, [criteria, students, mandatoryCourses, getTextIn, namesVisible])
 
   const isCriteriaSet =
     criteria && Object.keys(criteria.courses).some(yearCourses => criteria.courses[yearCourses].length > 0)
@@ -279,20 +302,27 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             </Link>{' '}
             Please refresh page after changes.
           </h5>
+          <Message style={{ maxWidth: '800px', fontSize: '16px' }}>
+            <p>
+              <Icon fitted name="check" color="green" />: Student has passed the course.{' '}
+              <Icon fitted name="clipboard check" color="green" />: Student has credit transfer for the course. <br />
+              <Icon fitted name="times" color="red" />: Student has failed the course.{' '}
+              <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
+              course.
+            </p>
+          </Message>
           {isCriteriaSet ? (
             <SortableTable
+              style={{ height: '80vh' }}
               tableId="progress-of-population-students"
               title={`Progress of population's students after predefined criteria`}
               getRowKey={s => s.studentNumber}
               tableProps={{
-                celled: true,
-                compact: 'very',
-                padded: false,
                 collapsing: true,
                 basic: true,
-                striped: true,
-                singleLine: true,
-                textAlign: 'center',
+                compact: 'very',
+                padded: false,
+                celled: true,
               }}
               columns={columns}
               data={data}
