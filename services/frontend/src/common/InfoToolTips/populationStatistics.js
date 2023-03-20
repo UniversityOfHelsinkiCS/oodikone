@@ -137,7 +137,7 @@ export default {
   minä tahansa lukuvuonna. Opintopistekriteerin täyttämiseen vaaditaan, että opintopisteet on suoritettu kyseisen akateemisen vuoden aikana.
 
 
-  **Huomaa**, että klikkaamalla taulukon yläreunassa olevaa kuvaketta, jossa on kolme pistettä, voit ladata itsellesi Excel tiedoston, joka sisältää lisäksi muita sarakkeita, kuten läsnäolon lukukausittain sekä yhteystiedot.
+  **Huomaa**, että klikkaamalla taulukon yläreunassa olevaa kolme pistettä sisältävää kuvaketta, voit ladata itsellesi Excel tiedoston. Tiedosto sisältää lisäksi muita sarakkeita, kuten läsnäolon lukukausittain sekä yhteystiedot.
   Yhteystietojen käyttö on kuitenkin sallittua vain opintoneuvontaan liittyvissä asiossa. 
   
   `,
