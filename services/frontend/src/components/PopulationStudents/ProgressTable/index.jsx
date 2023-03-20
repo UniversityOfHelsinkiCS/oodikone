@@ -110,8 +110,13 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
       { title: months < 36 ? 'Academic Year 3 (in progress)' : 'Academic Year 3', year: 'year3', label: 'yearThree' },
     ]
 
+    const getEnrollmentValue = enrollmentObj => {
+      if (enrollmentObj?.enrollmenttype === 1) return 'Present'
+      if (enrollmentObj?.enrollmenttype === 2) return 'Absent'
+      return 'Inactive'
+    }
     const columns = []
-    const createContent = (labels, year, label) => {
+    const createContent = (labels, year, label, enrollStatusIdx) => {
       return labels.map(m => ({
         key: `${year}-${m.code}`,
         title: (
@@ -125,7 +130,10 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
             </div>
           </div>
         ),
-        textTitle: m.name === '' ? m.code : `${m.code}-${getTextIn(m.name)}`,
+        textTitle:
+          m.name === ''
+            ? `${m.code} ${enrollStatusIdx === 0 ? enrollStatusIdx + 1 : enrollStatusIdx}`
+            : `${m.code}-${getTextIn(m.name)}`,
         headerProps: { title: `${m.code}, ${year}` },
         cellProps: {
           style: { verticalAlign: 'middle', textAlign: 'center' },
@@ -166,43 +174,155 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         children: createContent(
           labelCriteria[criteriaHeaders[0].label],
           criteriaHeaders[0].year,
-          criteriaHeaders[0].label
+          criteriaHeaders[0].label,
+          0
         ),
+      },
+      {
+        key: 'hidden-1',
+        textTitle: null,
+        mergeHeader: true,
+        parent: true,
+        children: [
+          {
+            key: `absence-first-Fall`,
+            export: true,
+            forceToolsMode: 'none',
+            textTitle: `Enrollment Status FALL 1`,
+            cellProps: { style: { display: 'none' } },
+            getRowVal: s => getEnrollmentValue(s.semesterenrollments[0]),
+            child: true,
+          },
+          {
+            key: `absence-first-Spring`,
+            export: true,
+            forceToolsMode: 'none',
+            textTitle: `Enrollment Status SPRING 1`,
+            cellProps: { style: { display: 'none' } },
+            getRowVal: s => getEnrollmentValue(s.semesterenrollments[1]),
+            child: true,
+          },
+          {
+            key: 'second_academic',
+            export: true,
+            forceToolsMode: 'none',
+            textTitle: ' ',
+            cellProps: { style: { display: 'none' } },
+            getRowVal: () => ' ',
+            child: true,
+          },
+        ],
       }
     )
     if (months > 12) {
-      columns.push({
-        key: criteriaHeaders[1].title,
-        title: (
-          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-            <div>{criteriaHeaders[1].title}</div>
-          </div>
-        ),
-        textTitle: null,
-        parent: true,
-        children: createContent(
-          labelCriteria[criteriaHeaders[1].label],
-          criteriaHeaders[1].year,
-          criteriaHeaders[1].label
-        ),
-      })
+      columns.push(
+        {
+          key: criteriaHeaders[1].title,
+          title: (
+            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <div>{criteriaHeaders[1].title}</div>
+            </div>
+          ),
+          textTitle: null,
+          parent: true,
+          children: createContent(
+            labelCriteria[criteriaHeaders[1].label],
+            criteriaHeaders[1].year,
+            criteriaHeaders[1].label,
+            2
+          ),
+        },
+        {
+          key: 'hidden-2',
+          textTitle: null,
+          mergeHeader: true,
+          parent: true,
+          children: [
+            {
+              key: `absence-second-Fall`,
+              export: true,
+              forceToolsMode: 'none',
+              textTitle: `Enrollment Status FALL 2`,
+              cellProps: { style: { display: 'none' } },
+              getRowVal: s => getEnrollmentValue(s.semesterenrollments[2]),
+              child: true,
+            },
+            {
+              key: `absence-second-Spring`,
+              export: true,
+              forceToolsMode: 'none',
+              textTitle: `Enrollment Status SPRING 2`,
+              cellProps: { style: { display: 'none' } },
+              getRowVal: s => getEnrollmentValue(s.semesterenrollments[3]),
+              child: true,
+            },
+            {
+              key: 'third_academic',
+              export: true,
+              forceToolsMode: 'none',
+              textTitle: '  ',
+              cellProps: { style: { display: 'none' } },
+              getRowVal: () => ' ',
+              child: true,
+            },
+          ],
+        }
+      )
     }
     if (months > 24) {
-      columns.push({
-        key: criteriaHeaders[2].title,
-        title: (
-          <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
-            <div>{criteriaHeaders[2].title}</div>
-          </div>
-        ),
-        textTitle: null,
-        parent: true,
-        children: createContent(
-          labelCriteria[criteriaHeaders[2].label],
-          criteriaHeaders[2].year,
-          criteriaHeaders[2].label
-        ),
-      })
+      columns.push(
+        {
+          key: criteriaHeaders[2].title,
+          title: (
+            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
+              <div>{criteriaHeaders[2].title}</div>
+            </div>
+          ),
+          textTitle: null,
+          parent: true,
+          children: createContent(
+            labelCriteria[criteriaHeaders[2].label],
+            criteriaHeaders[2].year,
+            criteriaHeaders[2].label,
+            4
+          ),
+        },
+        {
+          key: 'hidden-3',
+          textTitle: null,
+          mergeHeader: true,
+          parent: true,
+          children: [
+            {
+              key: `absence-third-Fall`,
+              export: true,
+              forceToolsMode: 'none',
+              textTitle: `Enrollment Status FALL 3`,
+              cellProps: { style: { display: 'none' } },
+              getRowVal: s => getEnrollmentValue(s.semesterenrollments[4]),
+              child: true,
+            },
+            {
+              key: `absence-third-Spring`,
+              export: true,
+              forceToolsMode: 'none',
+              textTitle: `Enrollment Status SPRING 3`,
+              cellProps: { style: { display: 'none' } },
+              getRowVal: s => getEnrollmentValue(s.semesterenrollments[5]),
+              child: true,
+            },
+            {
+              key: 'empty',
+              export: true,
+              forceToolsMode: 'none',
+              textTitle: '   ',
+              cellProps: { style: { display: 'none' } },
+              getRowVal: () => ' ',
+              child: true,
+            },
+          ],
+        }
+      )
     }
     const columnsToHide = [
       {
@@ -210,10 +330,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         export: true,
         forceToolsMode: 'none',
         textTitle: `Phone number`,
-        headerProps: {
-          title: `Phone number`,
-          style: { display: 'none' },
-        },
+        headerProps: { style: { display: 'none' } },
         cellProps: { style: { display: 'none' } },
         getRowVal: s => s.phoneNumber,
         child: true,
@@ -223,10 +340,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         export: true,
         forceToolsMode: 'none',
         textTitle: 'Email',
-        headerProps: {
-          title: `Email`,
-          style: { display: 'none' },
-        },
+        headerProps: { style: { display: 'none' } },
         cellProps: { style: { display: 'none' } },
         getRowVal: s => s.email,
         child: true,
@@ -236,41 +350,33 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         export: true,
         forceToolsMode: 'none',
         textTitle: 'Secondary Email',
-        headerProps: {
-          title: `Secondary Email`,
-          style: { display: 'none' },
-        },
+        headerProps: { style: { display: 'none' } },
         cellProps: { style: { display: 'none' } },
         getRowVal: s => s.secondaryEmail,
         child: true,
       },
       {
         key: 'lastname-hidden',
-        title: '',
+        textTitle: 'Last Name',
         export: true,
         forceToolsMode: 'none',
-        headerProps: {
-          title: `Last name`,
-          style: { display: 'none' },
-        },
+        headerProps: { style: { display: 'none' } },
         getRowVal: s => s.lastname,
         cellProps: { style: { display: 'none' } },
         child: true,
       },
       {
         key: 'firstname-hidden',
-        title: '',
+        textTitle: 'First Names',
         export: true,
         forceToolsMode: 'none',
-        headerProps: {
-          title: `First name`,
-          style: { display: 'none' },
-        },
+        headerProps: { style: { display: 'none' } },
         getRowVal: s => s.firstnames,
         cellProps: { style: { display: 'none' } },
         child: true,
       },
     ]
+
     columns.push({
       key: 'hiddenFiles',
       title: '',
