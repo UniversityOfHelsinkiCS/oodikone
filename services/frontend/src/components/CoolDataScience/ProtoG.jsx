@@ -100,7 +100,7 @@ const Chart = React.memo(({ tickDates, snapshots }) => (
             return `${d.getDate()}.${d.getMonth()}.${d
               .getFullYear()
               .toString()
-              .substr(-2)}`
+              .substring(-2)}`
           }
         },
         tickPositions: tickDates.map(date => date.getTime()),
