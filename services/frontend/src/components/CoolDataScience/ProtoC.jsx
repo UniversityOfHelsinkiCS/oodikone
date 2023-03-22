@@ -628,7 +628,7 @@ const ProtoC = ({
         </Menu.Item>
         {sorterNames.map(sorterName => (
           <Menu.Item
-            basic={sorter !== sorterName}
+            basic={(sorter !== sorterName).toString()}
             color={sorter === sorterName ? 'blue' : 'black'}
             key={sorterName}
             active={sorter === sorterName}
@@ -727,7 +727,7 @@ const ProtoC = ({
       </Segment>
       <RenderBelowGraph />
       <Message>
-        <ReactMarkdown children={CoolDataScience.protoC} escapeHtml={false} />
+        <ReactMarkdown children={CoolDataScience.protoC} />
       </Message>
     </Segment>
   )

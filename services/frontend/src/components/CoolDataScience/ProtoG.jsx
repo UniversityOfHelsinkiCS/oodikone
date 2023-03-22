@@ -292,7 +292,7 @@ const ProtoG = ({ uberdata, years, isLoading, loadingYears, getUberDispatch, get
         )}
         <Message>
           {//eslint-disable-next-line react/no-children-prop
-            <ReactMarkdown children={CoolDataScience.protoC} escapeHtml={false} />
+            <ReactMarkdown children={CoolDataScience.protoC} />
           }
         </Message>
       </Segment>

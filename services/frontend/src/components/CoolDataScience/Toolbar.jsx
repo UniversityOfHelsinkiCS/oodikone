@@ -185,7 +185,7 @@ export default ({ value, changeSetting, settings, generalHelp }) => {
         <div style={{ padding: '1em' }}>
           {
             // eslint-disable-next-line react/no-children-prop
-            <ReactMarkdown children={unindent(generalHelp)} escapeHtml={false} />
+            <ReactMarkdown children={unindent(generalHelp)} />
           }
         </div>
         {settings.map(({ key, label, long }) => (
@@ -196,7 +196,7 @@ export default ({ value, changeSetting, settings, generalHelp }) => {
                 Valinta "<i>{label}</i>"
               </b>
               <div style={{ margin: '0.5em', fontSize: '0.9em' }}>
-                <ReactMarkdown escapeHtml={false}>{unindent(long ?? '')}</ReactMarkdown>
+                <ReactMarkdown>{unindent(long ?? '')}</ReactMarkdown>
               </div>
             </div>
           </div>
