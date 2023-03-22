@@ -15,7 +15,7 @@ const CourseTabs = ({ data, showStudents, handleShowStudentsChange }) => {
   ]
 
   const panes = paneTypes.map(({ icon, label }) => ({
-    menuItem: { icon, content: label },
+    menuItem: { icon, content: label, key: label },
     render: () => (
       <Tab.Pane>
         <Toggle
