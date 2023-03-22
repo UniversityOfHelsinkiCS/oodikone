@@ -15,83 +15,135 @@ const getColumns = (language, showStudents) => {
   if (showStudents) {
     columns = [
       {
-        key: 'code',
-        mergeHeader: true,
-        merge: true,
+        key: 'Course',
+        title: 'Course info',
+        parent: true,
         children: [
           {
-            key: 'course_code',
-            title: 'Code ',
-            export: true,
-            getRowVal: course => course.code,
-            getRowContent: course => course.code,
+            key: 'code',
+            mergeHeader: true,
+            merge: true,
+            children: [
+              {
+                key: 'course_code',
+                title: 'Code ',
+                export: true,
+                getRowVal: course => course.code,
+                getRowContent: course => course.code,
+              },
+              {
+                key: 'go-to-course',
+                export: false,
+                getRowContent: course => (
+                  <Item
+                    as={Link}
+                    to={`/coursestatistics?courseCodes=["${encodeURIComponent(
+                      course.code
+                    )}"]&separate=false&unifyOpenUniCourses=false`}
+                  >
+                    <Icon
+                      name="level up alternate"
+                      onClick={() => sendAnalytics('Courses of Population course stats button clicked', course.code)}
+                    />
+                  </Item>
+                ),
+              },
+            ],
           },
           {
-            key: 'go-to-course',
-            export: false,
-            getRowContent: course => (
-              <Item
-                as={Link}
-                to={`/coursestatistics?courseCodes=["${encodeURIComponent(
-                  course.code
-                )}"]&separate=false&unifyOpenUniCourses=false`}
-              >
-                <Icon
-                  name="level up alternate"
-                  onClick={() => sendAnalytics('Courses of Population course stats button clicked', course.code)}
-                />
-              </Item>
-            ),
+            key: 'name',
+            title: 'Name',
+            getRowVal: course => course.name[language],
+            getRowContent: course => course.name[language],
           },
         ],
       },
       {
-        key: 'name',
-        title: 'Name',
-        getRowVal: course => course.name[language],
-        getRowContent: course => course.name[language],
-      },
-      {
         key: 'total',
-        title: 'All students',
-        cellStyle: { textAlign: 'right' },
-        filterType: 'range',
-        getRowVal: course => course.totalAllStudents,
-        getRowContent: course => course.totalAllStudents,
+        title: '',
+        parent: true,
+        children: [
+          {
+            key: 'total',
+            title: 'Total',
+            cellStyle: { textAlign: 'right' },
+            filterType: 'range',
+            getRowVal: course => course.totalAllStudents,
+            getRowContent: course => course.totalAllStudents,
+          },
+        ],
       },
       {
-        key: 'totalOwnProgramme',
-        title: 'Major students',
-        cellStyle: { textAlign: 'right' },
-        filterType: 'range',
-        getRowVal: course => course.totalProgrammeStudents,
-        getRowContent: course => course.totalProgrammeStudents,
+        key: 'breakdown',
+        title: 'Breakdown of Total',
+        parent: true,
+        children: [
+          {
+            key: 'passed',
+            title: 'Passed',
+            cellStyle: { textAlign: 'right' },
+            filterType: 'range',
+            getRowVal: course => course.totalAllPassed,
+            getRowContent: course => course.totalAllPassed,
+          },
+          {
+            key: 'not-completed',
+            title: 'Not Completed',
+            helpText: toolTips.NotCompleted,
+            cellStyle: { textAlign: 'right' },
+            filterType: 'range',
+            getRowVal: course => course.totalAllNotCompleted,
+            getRowContent: course => course.totalAllNotCompleted,
+          },
+        ],
       },
       {
-        key: 'totalOtherProgramme',
-        title: 'Non-major students',
-        cellStyle: { textAlign: 'right' },
-        filterType: 'range',
-        getRowVal: course => course.totalOtherProgrammeStudents,
-        getRowContent: course => course.totalOtherProgrammeStudents,
+        key: 'breakdown-passed',
+        title: 'Breakdown Statistics of Passed Students',
+        parent: true,
+        children: [
+          {
+            key: 'totalOwnProgramme',
+            title: 'Major students',
+            cellStyle: { textAlign: 'right' },
+            filterType: 'range',
+            getRowVal: course => course.totalProgrammeStudents,
+            getRowContent: course => course.totalProgrammeStudents,
+          },
+          {
+            key: 'totalOtherProgramme',
+            title: 'Non-major students',
+            cellStyle: { textAlign: 'right' },
+            filterType: 'range',
+            getRowVal: course => course.totalOtherProgrammeStudents,
+            getRowContent: course => course.totalOtherProgrammeStudents,
+          },
+          {
+            key: 'totalWithoutStudyright',
+            title: 'Non-degree students',
+            helpText: toolTips.NonDegree,
+            cellStyle: { textAlign: 'right' },
+            filterType: 'range',
+            getRowVal: course => course.totalWithoutStudyrightStudents,
+            getRowContent: course => course.totalWithoutStudyrightStudents,
+          },
+        ],
       },
       {
-        key: 'totalWithoutStudyright',
-        title: 'Non-degree students',
-        helpText: toolTips.NonDegree,
-        cellStyle: { textAlign: 'right' },
-        filterType: 'range',
-        getRowVal: course => course.totalWithoutStudyrightStudents,
-        getRowContent: course => course.totalWithoutStudyrightStudents,
-      },
-      {
-        key: 'transfer',
-        title: 'Transferred students',
-        helpText: toolTips.TransferredCourses,
-        cellStyle: { textAlign: 'right' },
-        filterType: 'range',
-        getRowVal: course => course.totalTransferStudents,
-        getRowContent: course => course.totalTransferStudents,
+        key: 'exluded',
+        title: 'Not Included to Passed',
+        parent: true,
+        children: [
+          {
+            key: 'transfer',
+            title: 'Transferred students',
+            helpText: toolTips.TransferredCourses,
+            cellStyle: { textAlign: 'right' },
+            filterType: 'range',
+            getRowVal: course => course.totalTransferStudents,
+            getRowContent: course => course.totalTransferStudents,
+          },
+        ],
       },
     ]
   } else {

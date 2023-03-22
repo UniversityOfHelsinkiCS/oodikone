@@ -4,6 +4,7 @@ const {
   getStudentsForProgrammeCourses,
   getCurrentStudyYearStartDate,
   getOwnStudentsForProgrammeCourses,
+  getNotCompletedForProgrammeCourses,
   getStudentsWithoutStudyrightForProgrammeCourses,
   getTransferStudentsForProgrammeCourses,
   getOtherStudentsForProgrammeCourses,
@@ -39,8 +40,11 @@ const makeYearlyPromises = (years, academicYear, type, programmeCourses, studypr
         let result = null
 
         switch (type) {
-          case 'allStudents':
+          case 'passed':
             result = await getStudentsForProgrammeCourses(from, to, programmeCourses)
+            break
+          case 'notCompleted':
+            result = await getNotCompletedForProgrammeCourses(from, to, programmeCourses)
             break
           case 'ownStudents':
             result = await getOwnStudentsForProgrammeCourses(from, to, programmeCourses, studyprogramme)
@@ -74,7 +78,13 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
   const yearRange = _.range(2017, startYear + 1)
   const programmeCourses = await getAllStudyprogrammeCourses(studyprogramme)
 
-  const yearlyStudentByCoursePromises = makeYearlyPromises(yearRange, academicYear, 'allStudents', programmeCourses)
+  const yearlyPassedStudentByCoursePromises = makeYearlyPromises(yearRange, academicYear, 'passed', programmeCourses)
+  const yearlyNotCompletedStudentByCoursePromises = makeYearlyPromises(
+    yearRange,
+    academicYear,
+    'notCompleted',
+    programmeCourses
+  )
   const yearlyProgrammeStudentsPromises = makeYearlyPromises(
     yearRange,
     academicYear,
@@ -105,22 +115,24 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
   )
 
   const [
-    yearlyStudentByCourse,
+    yearlyPassedStudentByCourse,
+    yearlyNotCompletedStudentByCourse,
     yearlyProgrammeStudents,
     yearlyStudentsWithoutStudyright,
     yearlyOtherProgrammeStudents,
     yearlyTransferStudents,
   ] = await Promise.all([
-    Promise.all(yearlyStudentByCoursePromises),
+    Promise.all(yearlyPassedStudentByCoursePromises),
+    Promise.all(yearlyNotCompletedStudentByCoursePromises),
     Promise.all(yearlyProgrammeStudentsPromises),
     Promise.all(yearlyStudentsWithoutStudyrightPromises),
     Promise.all(yearlyOtherProgrammeStudentsPromises),
     Promise.all(yearlyTransferStudentsPromises),
   ])
-
   let maxYear = 0
   const allCourses = [
-    ...yearlyStudentByCourse.flat(),
+    ...yearlyPassedStudentByCourse.flat(),
+    ...yearlyNotCompletedStudentByCourse.flat(),
     ...yearlyProgrammeStudents.flat(),
     ...yearlyStudentsWithoutStudyright.flat(),
     ...yearlyOtherProgrammeStudents.flat(),
@@ -134,9 +146,12 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
         years: {},
       }
     }
+
     if (!acc[curr.code]['years'][curr.year]) {
       acc[curr.code]['years'][curr.year] = {
         totalAllStudents: 0,
+        totalPassed: 0,
+        totalNotCompleted: 0,
         totalAllCredits: 0,
         totalProgrammeStudents: 0,
         totalProgrammeCredits: 0,
@@ -149,9 +164,15 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
       }
     }
     switch (curr.type) {
-      case 'total':
-        acc[curr.code]['years'][curr.year]['totalAllStudents'] += curr.totalAllStudents
+      case 'passed':
+        acc[curr.code]['years'][curr.year]['totalPassed'] += curr.totalPassed
+        acc[curr.code]['years'][curr.year]['totalAllStudents'] += acc[curr.code]['years'][curr.year]['totalPassed']
         acc[curr.code]['years'][curr.year]['totalAllCredits'] += curr.totalAllcredits
+        break
+      case 'notCompleted':
+        acc[curr.code]['years'][curr.year]['totalNotCompleted'] += curr.totalNotCompleted
+        acc[curr.code]['years'][curr.year]['totalAllStudents'] +=
+          acc[curr.code]['years'][curr.year]['totalNotCompleted']
         break
       case 'ownProgramme':
         acc[curr.code]['years'][curr.year]['totalProgrammeStudents'] += curr.totalProgrammeStudents
@@ -175,6 +196,8 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
   const ayCourses = Object.keys(allCourses).filter(c => c.startsWith('AY'))
   const properties = [
     'totalAllStudents',
+    'totalPassed',
+    'totalNotCompleted',
     'totalAllCredits',
     'totalProgrammeStudents',
     'totalProgrammeCredits',
@@ -200,6 +223,8 @@ const getStudyprogrammeCoursesForStudytrack = async (unixMillis, studyprogramme,
           if (!allCourses[normCode]['years'][year]) {
             mergedCourse['years'][year] = {
               totalAllStudents: 0,
+              totalPassed: 0,
+              totalNotCompleted: 0,
               totalAllCredits: 0,
               totalProgrammeStudents: 0,
               totalProgrammeCredits: 0,

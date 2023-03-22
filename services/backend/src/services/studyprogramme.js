@@ -17,6 +17,7 @@ const {
   Student,
   SemesterEnrollment,
   Semester,
+  Enrollment,
 } = require('../models')
 const { formatStudyright, formatStudent, formatTransfer } = require('./studyprogrammeHelpers')
 const { getCurrentSemester } = require('./semesters')
@@ -498,16 +499,110 @@ const getStudentsForProgrammeCourses = async (from, to, programmeCourses) => {
       code: course.code,
       name: course.course_name,
       year: course.year,
-      totalAllStudents: parseInt(course.total_students),
+      totalPassed: parseInt(course.total_students),
       totalAllcredits: parseInt(course.total_credits),
-      type: 'total',
+      type: 'passed',
     }))
   } catch (e) {
     // eslint-disable-next-line no-console
     logger.log(e)
   }
 }
+const getNotCompletedForProgrammeCourses = async (from, to, programmeCourses) => {
+  try {
+    const enrollmentsCourses = await Enrollment.findAll({
+      attributes: ['studentnumber', 'course_code'],
+      where: {
+        course_code: {
+          [Op.in]: programmeCourses,
+        },
+        studentnumber: {
+          [Op.ne]: null,
+        },
+        enrollment_date_time: {
+          [Op.between]: [from, to],
+        },
+        state: 'ENROLLED',
+      },
+    })
+    const allEnrollments = {}
+    for (const { studentnumber, course_code } of enrollmentsCourses) {
+      if (!(course_code in allEnrollments)) {
+        allEnrollments[course_code] = []
+      }
+      allEnrollments[course_code].push(studentnumber)
+    }
 
+    const credits = await Credit.findAll({
+      attributes: ['id', 'course_code', 'student_studentnumber', 'credittypecode', 'attainment_date'],
+      include: {
+        model: Course,
+        attributes: ['code', 'name'],
+        required: true,
+        where: {
+          is_study_module: false,
+          code: programmeCourses,
+        },
+      },
+      where: {
+        credittypecode: [4, 7, 10],
+        isStudyModule: {
+          [Op.not]: true,
+        },
+        attainment_date: {
+          [Op.between]: [from, to],
+        },
+      },
+    })
+    const creditsObj = credits.map(credit => {
+      return {
+        code: credit.course_code,
+        studentnumber: credit.student_studentnumber,
+        credittype: credit.credittypecode,
+        courseName: credit.course.name,
+        year: moment(credit.attainment_date).year(),
+      }
+    })
+
+    const passedByCourseCodes = {}
+    const notCompletedByCourseCodes = {}
+    const courses = {}
+    for (const course of creditsObj) {
+      if (!(course.code in courses)) {
+        courses[course.code] = {
+          code: course.code,
+          name: course.courseName,
+          year: course.year,
+        }
+
+        passedByCourseCodes[course.code] = []
+        notCompletedByCourseCodes[course.code] = []
+      }
+      if ([4, 7].includes(course.credittype)) {
+        passedByCourseCodes[course.code].push(course.studentnumber)
+      }
+      if (
+        (allEnrollments[course.code]?.includes(course.studentnumber) || course.credittype === 10) &&
+        !passedByCourseCodes[course.code].includes(course.studentnumber)
+      ) {
+        notCompletedByCourseCodes[course.code].push(course.studentnumber)
+      }
+    }
+
+    return Object.keys(courses)
+      .reduce((acc, val) => [...acc, { ...courses[val] }], [])
+      .map(course => ({
+        code: course.code,
+        name: course.name,
+        year: course.year,
+        totalNotCompleted: [...new Set(notCompletedByCourseCodes[course.code])].length,
+        type: 'notCompleted',
+      }))
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    logger.log(e)
+  }
+}
 const getOwnStudentsForProgrammeCourses = async (from, to, programmeCourses, studyprogramme) => {
   const res = await sequelize.query(
     `
@@ -767,4 +862,5 @@ module.exports = {
   getCourseCodesForStudyProgramme,
   getTransferStudentsForProgrammeCourses,
   getProgrammeName,
+  getNotCompletedForProgrammeCourses,
 }
