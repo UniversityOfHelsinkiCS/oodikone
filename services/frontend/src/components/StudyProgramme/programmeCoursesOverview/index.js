@@ -56,6 +56,8 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
           (acc, curr) => {
             if (yearRange.includes(Number(curr[0]))) {
               acc.totalAllStudents += curr[1].totalAllStudents
+              acc.totalAllPassed += curr[1].totalPassed
+              acc.totalAllNotCompleted += curr[1].totalNotCompleted
               acc.totalAllCredits += curr[1].totalAllCredits
               acc.totalProgrammeStudents += curr[1].totalProgrammeStudents
               acc.totalProgrammeCredits += curr[1].totalProgrammeCredits
@@ -71,6 +73,8 @@ const ProgrammeCoursesOverview = ({ studyProgramme, academicYear, setAcademicYea
           },
           {
             totalAllStudents: 0,
+            totalAllPassed: 0,
+            totalAllNotCompleted: 0,
             totalAllCredits: 0,
             totalProgrammeStudents: 0,
             totalProgrammeCredits: 0,
