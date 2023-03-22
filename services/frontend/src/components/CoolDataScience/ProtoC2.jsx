@@ -1,3 +1,4 @@
+/* eslint-disable babel/no-invalid-this */
 import React, { useState, useCallback, useMemo } from 'react'
 import Highcharts from 'highcharts'
 import ReactHighcharts from 'react-highcharts'
@@ -449,7 +450,7 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
             </Menu.Item>
             {sorterNames.map(sorterName => (
               <Menu.Item
-                basic={sorter !== sorterName}
+                basic={(sorter !== sorterName).toString()}
                 color={sorter === sorterName ? 'blue' : 'black'}
                 key={sorterName}
                 active={sorter === sorterName}
@@ -485,7 +486,7 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
           <Message>
             {
               // eslint-disable-next-line react/no-children-prop
-              <ReactMarkdown children={CoolDataScience.protoC2} escapeHtml={false} />
+              <ReactMarkdown children={CoolDataScience.protoC2} />
             }
           </Message>
         </Segment>
@@ -541,7 +542,7 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
           </Menu.Item>
           {sorterNames.map(sorterName => (
             <Menu.Item
-              basic={sorter !== sorterName}
+              basic={(sorter !== sorterName).toString()}
               color={sorter === sorterName ? 'blue' : 'black'}
               key={sorterName}
               active={sorter === sorterName}
@@ -594,7 +595,7 @@ const ProtoC = ({ programme = 'KH50_005' }) => {
         <Message>
           {
             // eslint-disable-next-line react/no-children-prop
-            <ReactMarkdown children={CoolDataScience.protoC2} escapeHtml={false} />
+            <ReactMarkdown children={CoolDataScience.protoC2} />
           }
         </Message>
       </Segment>
