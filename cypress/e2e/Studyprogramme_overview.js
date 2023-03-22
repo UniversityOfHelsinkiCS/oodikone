@@ -369,7 +369,7 @@ describe('Studyprogramme overview', () => {
       cy.get('[data-cy=creditsStudentsToggle]').first().click()
 
       cy.get('[data-cy=CoursesSortableTable]').within(() => {
-        cy.get('tr').eq(1).contains('267')
+        cy.get('tr').eq(2).contains('267')
       })
     })
   })
