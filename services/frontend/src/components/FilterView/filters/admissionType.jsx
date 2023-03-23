@@ -17,7 +17,7 @@ const admissionTypeFilter = code => value => student =>
   student.studyrights.some(
     sr =>
       sr.studyright_elements.some(sre => sre.code === code) &&
-      (value === null ? !sr.admission_type : sr.admission_type === value)
+      (value === null || value === 'Ei valintatapaa' ? !sr.admission_type : sr.admission_type === value)
   )
 
 const AdmissionTypeFilterCard = ({ options, onOptionsChange, withoutSelf, code }) => {
