@@ -3,14 +3,14 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Dropdown } from 'semantic-ui-react'
 import xlsx from 'xlsx'
-import { getTextIn, reformatDate } from '../../common'
+import { getTextIn, reformatDate, getStudentTotalCredits } from '../../common'
 import sendEvent from '../../common/sendEvent'
 import { PRIORITYCODE_TEXTS } from '../../constants'
 import useLanguage from '../LanguagePicker/useLanguage'
 
 const sendAnalytics = sendEvent.populationStudents
 
-export default ({ students }) => {
+export default ({ students, programmeCode }) => {
   const { language } = useLanguage()
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const populationStatistics = useSelector(({ populations }) => populations.data)
@@ -133,14 +133,46 @@ export default ({ students }) => {
         return res ? Number(res[0]) : Number.MAX_VALUE
       },
     ])
+    // Exact same code in GeneralTab REFACTOR (function in common/index.js file?)
+    const studentToStudyrightStartMap = students.reduce((res, sn) => {
+      const currentStudyright = sn.studyrights?.find(studyright =>
+        studyright.studyright_elements.some(e => e.code === programmeCode)
+      )
+      if (currentStudyright?.studyrightid && currentStudyright.studyrightid.slice(-2) === '-2') {
+        const bachelorId = currentStudyright.studyrightid.replace(/-2$/, '-1')
+        const bacherlorStudyright = sn.studyrights.find(studyright => studyright.studyrightid === bachelorId)
+        res[sn.studentNumber] = bacherlorStudyright?.startdate || null
+      } else {
+        res[sn.studentNumber] = currentStudyright?.startdate || null
+      }
+      return res
+    }, {})
+
+    const studentToProgrammeStartMap = students.reduce((res, sn) => {
+      const targetStudyright = flatten(
+        sn.studyrights.reduce((acc, curr) => {
+          acc.push(curr.studyright_elements)
+          return acc
+        }, [])
+      ).filter(e => e.code === programmeCode)
+      // clean up odd bachelor start dates, (givendate)
+      res[sn.studentNumber] = new Date(
+        Math.max(new Date(targetStudyright[0]?.startdate), new Date(studentToStudyrightStartMap[sn.studentNumber]))
+      )
+      return res
+    }, {})
+
     const worksheet = xlsx.utils.json_to_sheet(
       students.map(s => ({
         'last name': s.lastname,
         'given names': s.firstnames,
         'student number': s.studentNumber,
-        'all credits': s.allCredits,
+        'all credits': s.allCredits ? s.allCredits : s.credits,
         'hops credits': s.hopsCredits,
-        'credits since start': s.credits,
+        'credits since start': getStudentTotalCredits({
+          ...s,
+          courses: s.courses.filter(c => new Date(c.date) >= studentToProgrammeStartMap[s.studentNumber]),
+        }),
         'phone number': s.phoneNumber,
         email: s.email,
         'transferred from': s.transferredStudyright ? transferFrom(s) : '',
