@@ -101,7 +101,6 @@ const PopulationStatistics = () => {
 
   const title =
     location.search === '' ? 'Class statistics' : `${getTextIn(programmeName, language)} ${getYearText(query?.year)}`
-
   return (
     <FilterView
       name="PopulationStatistics"
@@ -138,7 +137,7 @@ const PopulationStatistics = () => {
                 queryIsSet={queryIsSet}
                 query={query}
                 isLoading={isLoading}
-                dataExport={<DataExport students={filteredStudents} />}
+                dataExport={<DataExport students={filteredStudents} programmeCode={query?.studyRights?.programme} />}
                 allStudents={samples}
                 selectedStudentsByYear={selectedStudentsByYear}
                 filteredStudents={filteredStudents}
