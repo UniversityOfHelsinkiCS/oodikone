@@ -184,6 +184,7 @@ export default ({ students, programmeCode }) => {
         'start of studyright': reformatDate(getStartOfStudyright(s.studyrights), 'YYYY-MM-DD'),
         'started in programme': reformatDate(getStartedInProgramme(s.studyrights), 'YYYY-MM-DD'),
         'admission type': parseInt(queryYear, 10 >= 2020) ? getAdmissionType(s.studyrights) : undefined,
+        bachelor: s.option ? getTextIn(s.option.name, language) : '',
         'updated at': reformatDate(s.updatedAt, 'YYYY-MM-DD  hh:mm:ss'),
         'mandatory total passed': totalMandatoryPassed(s.studentNumber, codes),
         ...sortedMandatory.reduce((acc, m) => {
