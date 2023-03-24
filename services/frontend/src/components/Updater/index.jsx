@@ -54,7 +54,7 @@ const Updater = () => {
       </Form>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Form.Group>
-          <TextArea fluid onChange={(_, { value }) => setSISNums(value)} style={{ width: '98%' }} />
+          <TextArea onChange={(_, { value }) => setSISNums(value)} style={{ width: '98%' }} />
           <Form.Button
             onClick={updateSISPopulationStudents}
             content="Update students by student number"
@@ -85,7 +85,7 @@ const Updater = () => {
           />
         </Form.Group>
         <Form.Group>
-          <TextArea fluid onChange={(_, { value }) => setSISCourses(value)} style={{ width: '98%' }} />
+          <TextArea onChange={(_, { value }) => setSISCourses(value)} style={{ width: '98%' }} />
           <Form.Button onClick={updateSISCourses} content="Update courses by course code" icon="refresh" />
         </Form.Group>
       </div>
