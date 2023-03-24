@@ -31,6 +31,7 @@ const createGraphOptions = ({
   startDate,
   endDate,
   graduations,
+  transfers,
   studyRightStartLine,
 }) => {
   const tooltip = {
@@ -111,6 +112,17 @@ const createGraphOptions = ({
             dashStyle: 'dash',
             label: {
               text: `Population study start`,
+            },
+          }))
+        )
+        .concat(
+          transfers.map(value => ({
+            value,
+            color: '#cbd128',
+            width: 2,
+            dashStyle: 'dash',
+            label: {
+              text: `Transfer`,
             },
           }))
         ),
@@ -325,6 +337,12 @@ const filterGraduations = (student, selectedStudyRight) => {
   return [new Date(selectedGraduation.enddate).getTime()]
 }
 
+const filterTransfers = student => {
+  const transferTimes = student.transfers.map(transfer => new Date(transfer.transferdate).getTime())
+  const removeOverlapping = transferTimes.filter((transfer, i, a) => a.indexOf(transfer) === i)
+  return removeOverlapping
+}
+
 const CreditAccumulationGraphHighCharts = ({
   students,
   singleStudent,
@@ -422,6 +440,7 @@ const CreditAccumulationGraphHighCharts = ({
   }
 
   const graduations = singleStudent ? filterGraduations(students[0], selectedStudyRight) : []
+  const transfers = singleStudent ? filterTransfers(students[0]) : []
   const studyRightStartLine =
     !singleStudent && studyPlanFilterIsActive
       ? [new Date(customStudyStartYear || students[0].studyrightStart).getTime()]
@@ -440,6 +459,7 @@ const CreditAccumulationGraphHighCharts = ({
       }
     },
     graduations,
+    transfers,
     studyRightStartLine,
   })
 

@@ -13,6 +13,7 @@ const {
   SemesterEnrollment,
   Semester,
   Studyplan,
+  Transfer,
 } = require('../models')
 const { TagStudent, Tag } = require('../models/models_kone')
 const Op = Sequelize.Op
@@ -61,6 +62,9 @@ const byId = async id => {
         {
           model: Studyplan,
           attributes: ['included_courses', 'programme_code', 'completed_credits'],
+        },
+        {
+          model: Transfer,
         },
       ],
     }),
