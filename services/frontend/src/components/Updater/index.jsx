@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Header, Segment, Form, Button, TextArea } from 'semantic-ui-react'
+import { Segment, Form, Button, TextArea, Header } from 'semantic-ui-react'
 import { callApi } from '../../apiConnection'
 import { useTitle } from '../../common/hooks'
 
@@ -14,9 +14,9 @@ const Updater = () => {
   const apiCall = async (url, method, data) => {
     try {
       const response = await callApi(url, method, data)
-      setMessages(messages.concat(<div style={{ color: 'green' }}>{response.data.message}</div>))
+      setMessages(messages.concat({ message: response.data, color: 'green' }))
     } catch {
-      setMessages(messages.concat(<div style={{ color: 'red' }}>updater api error</div>))
+      setMessages(messages.concat({ message: 'Updater api error', color: 'red' }))
     }
   }
 
@@ -35,7 +35,6 @@ const Updater = () => {
   const updateSISCourses = () => apiCall('/updater/update/v2/courses', 'post', SISCourses.trim().split('\n'))
   const refreshAllTeacherLeaderboards = () => apiCall('/teachers/top', 'post')
   const refreshTrends = () => apiCall('/updater/refresh_trends', 'post')
-
   return (
     <Segment>
       <Form>
@@ -91,7 +90,14 @@ const Updater = () => {
       </div>
       <Segment>
         <Button content="Clear messages" onClick={() => setMessages([])} />
-        <Header>{messages}</Header>
+        {messages.map((message, i) => {
+          return (
+            // eslint-disable-next-line react/no-array-index-key
+            <Header key={i} style={{ color: message.color }}>
+              {message.message}
+            </Header>
+          )
+        })}
       </Segment>
     </Segment>
   )
