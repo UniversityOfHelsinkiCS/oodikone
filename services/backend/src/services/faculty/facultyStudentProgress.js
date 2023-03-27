@@ -116,11 +116,12 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
     doctoralTableStats: new Array(yearsArray.length),
     bachelorsGraphStats: getBachelorCreditGraphStats(yearsArray),
     bcMsGraphStats: faculty === 'H90' ? getVetenaryCreditGraphStats(yearsArray) : getMasterCreditGraphStats(yearsArray),
-    mastersGraphStats: getOnlyMasterCreditGraphStats(yearsArray),
+    mastersGraphStats:
+      faculty === 'H90' ? getBachelorCreditGraphStats(yearsArray) : getOnlyMasterCreditGraphStats(yearsArray),
     doctoralGraphStats: getDoctoralCreditGraphStats(yearsArray),
     bachelorTitles: tableTitles.creditProgress.bachelor,
     bcMsTitles: faculty === 'H90' ? titlesVet : tableTitles.creditProgress.master,
-    mastersTitles: tableTitles.creditProgress.masterOnly,
+    mastersTitles: faculty === 'H90' ? tableTitles.creditProgress.bachelor : tableTitles.creditProgress.masterOnly,
     doctoralTitles: tableTitles.creditProgress.doctoral,
     yearlyBachelorTitles: [],
     yearlyBcMsTitles: [],
@@ -139,6 +140,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
     progressStats.mastersTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0, 0]
     progressStats.doctoralTableStats[indexOf(reversedYears, year)] = [year, 0, 0, 0, 0, 0, 0]
   })
+
   const limitKeys = ['zero', 't5', 't4', 't3', 't2', 't1']
   let bachelorlimits = []
   let masterlimits = []
@@ -188,7 +190,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
         },
       }
       let studyrights = await getStudyRightsByExtent(faculty, {}, startDateWhere, code, extentcodes, graduationStatus)
-      let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code)
+      let { creditThresholdKeys, creditThresholdAmounts } = getCreditThresholds(code, true)
       if (!creditThresholdKeys) continue
       if (!(progId in progressStats.programmeNames)) {
         progressStats.programmeNames[progId] = { code: code, ...name }
@@ -237,7 +239,7 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
         progressStats.mastersTableStats[indexOf(reversedYears, 'Total')][1] += msStudents.length || 0
         progressStats.bcMsTableStats[indexOf(reversedYears, year)][1] += bcMsStudents.length || 0
         progressStats.bcMsTableStats[indexOf(reversedYears, 'Total')][1] += bcMsStudents.length || 0
-        const { creditThresholdKeysBcMs, creditThresholdAmountsBcMs } = getBcMsThresholds()
+        const { creditThresholdKeysBcMs, creditThresholdAmountsBcMs } = getBcMsThresholds(code)
         const { data: bcMsStudentdata, progData: bcMsProgdata } = getStudentData(
           startDate,
           bcMsStudents,
@@ -261,7 +263,6 @@ const combineFacultyStudentProgress = async (faculty, programmes, allProgrammeCo
           masterProgress[progId] = new Array(reversedYears.length - 1)
           bcmsProgress[progId] = new Array(reversedYears.length - 1)
         }
-
         masterProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => msProgdata[key])
         bcmsProgress[progId][indexOf(reversedYears, year)] = limitKeys.map(key => bcMsProgdata[key])
         for (const key of Object.keys(msStudentdata)) {
