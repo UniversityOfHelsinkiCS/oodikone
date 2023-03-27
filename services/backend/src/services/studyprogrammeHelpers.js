@@ -383,7 +383,9 @@ const onlyMasterCreditAmounts = [15, 30, 60, 90, 120, 120]
 const doctoralCreditAmounts = [10, 20, 30, 40, 40]
 const vetenaryCreditThresholds = ['lte210', 'lte240', 'lte270', 'lte300', 'lte330', 'lte360', 'mte360']
 const vetenaryCreditAmounts = [210, 240, 270, 300, 330, 360, 360]
-const getBcMsThresholds = () => {
+const getBcMsThresholds = programmeCode => {
+  if (programmeCode === 'MH90_001')
+    return { creditThresholdKeysBcMs: vetenaryCreditThresholds, creditThresholdAmountsBcMs: vetenaryCreditAmounts }
   return { creditThresholdKeysBcMs: masterCreditThresholds, creditThresholdAmountsBcMs: masterCreditAmounts }
 }
 const getCreditThresholds = (studyprogramme, studyProg = false) => {
