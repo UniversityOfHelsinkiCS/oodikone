@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Segment, Button, Popup } from 'semantic-ui-react'
+import { useGetProgressCriteriaQuery } from 'redux/programmeProgressCriteria'
 import SegmentDimmer from '../SegmentDimmer'
 import PopulationCourseStats from '../PopulationCourseStats'
 import CustomPopulationCourses from '../CustomPopulation/CustomPopulationCourses'
@@ -13,8 +14,13 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
   const [showByStudytrack, setShowByStudytrack] = useState(true)
   const populationCourses = useSelector(({ populationCourses }) => populationCourses)
   const mandatoryCourses = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses)
+  const progressCriteria = useGetProgressCriteriaQuery({ programmeCode: query?.studyRights?.programme })
   const dispatch = useDispatch()
-
+  const emptyCriteria = {
+    courses: { yearOne: [], yearTwo: [], yearThree: [] },
+    credits: { yearOne: 0, yearTwo: 0, yearThree: 0 },
+  }
+  const [criteria, setCriteria] = useState(progressCriteria?.data ? progressCriteria.data : emptyCriteria)
   const populationSelectedStudentCourses = useSelector(
     ({ populationSelectedStudentCourses }) => populationSelectedStudentCourses
   )
@@ -39,7 +45,11 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
       })
     )
   }
-
+  useEffect(() => {
+    if (progressCriteria.data) {
+      setCriteria(progressCriteria.data)
+    }
+  }, [progressCriteria.data])
   useEffect(() => {
     if (
       !mandatoryCourses.pending &&
@@ -85,7 +95,11 @@ const PopulationCourses = ({ query = {}, filteredStudents, selectedStudentsByYea
       <InfoBox content={infotooltips.PopulationStatistics.CoursesOfPopulation} />
       {renderToggleStructureButton()}
       {query.studyRights.programme && !onlyIamRights && (
-        <FilterDegreeCoursesModal studyProgramme={query.studyRights.programme} />
+        <FilterDegreeCoursesModal
+          studyProgramme={query.studyRights.programme}
+          criteria={criteria}
+          setCriteria={setCriteria}
+        />
       )}
 
       <SegmentDimmer isLoading={pending} />

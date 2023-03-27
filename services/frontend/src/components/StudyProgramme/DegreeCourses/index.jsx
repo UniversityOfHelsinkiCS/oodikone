@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { connect, useSelector, useDispatch } from 'react-redux'
-import { string, func } from 'prop-types'
+import { string, func, object } from 'prop-types'
 import { Button, Label, Table, Icon, Dropdown, Container, Message, Form } from 'semantic-ui-react'
 import {
   useAddProgressCriteriaCourseMutation,
@@ -158,9 +158,6 @@ const DegreeCourses = ({ studyProgramme, criteria, setCriteria, setExclusion, re
       year3: creditsLimit3 === '' ? criteria.credits.yearThree : creditsLimit3,
     }
     addProgressCriteriaCredits({ programmeCode: studyProgramme, credits })
-    setCreditsLimit1('')
-    setCreditsLimit2('')
-    setCreditsLimit3('')
   }
 
   const excludeAll = code => {
@@ -347,6 +344,8 @@ DegreeCourses.propTypes = {
   studyProgramme: string.isRequired,
   removeExclusion: func.isRequired,
   setExclusion: func.isRequired,
+  criteria: object.isRequired,
+  setCriteria: func.isRequired,
 }
 
 const mapStateToProps = ({ mandatoryCourseLabels }) => ({
