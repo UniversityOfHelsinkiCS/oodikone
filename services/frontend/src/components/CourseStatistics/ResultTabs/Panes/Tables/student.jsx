@@ -71,7 +71,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
     },
     {
       key: 'TOTAL',
-      title: 'Total Students',
+      title: 'Total\nStudents',
       helpText: 'Total count of students, including enrolled students with no grade.',
       cellProps: s => ({
         style: {
@@ -113,7 +113,7 @@ const getColumns = (stats, showDetails, showGrades, userHasAccessToAllStats, alt
     ...getGradeColumns(resolveGrades(stats)),
     {
       key: 'ENROLLMENTS_MISSING_GRADE',
-      title: 'Enrolled no grade',
+      title: 'Enrolled,\nno grade',
       filterType: 'range',
       helpText: 'Total count of students with a valid enrollment and no passing or failing grade.',
       getRowVal: s => (s.rowObfuscated ? 5 : s.students.enrolledStudentsWithNoGrade),
