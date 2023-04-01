@@ -247,7 +247,6 @@ const updateStudents = async personIds => {
 
 const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumber, groupedStudyRightSnapshots) => {
   const studyplans = studyplansAll.filter(plan => plan.primary)
-
   const attainments = await selectFromByIds('attainments', personIds, 'person_id')
 
   const programmeModules = (
@@ -270,6 +269,23 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     const { education_id, person_id } = sorted[0]
     if (!acc[education_id]) acc[education_id] = {}
     acc[education_id][person_id] = true
+    return acc
+  }, {})
+
+  const educationStudyrights = Object.keys(groupedStudyRightSnapshots).reduce((acc, k) => {
+    const sorted = groupedStudyRightSnapshots[k]
+      .filter(s => new Date(s.snapshot_date_time) <= new Date())
+      .sort((a, b) => new Date(b.snapshot_date_time) - new Date(a.snapshot_date_time))
+    if (!sorted.length) return acc
+    const { education_id, person_id, id } = sorted[0]
+    const educationType = getEducation(education_id)
+    const hasBaMa = educationType && isBaMa(educationType)
+    if (!acc[education_id]) acc[education_id] = {}
+    acc[education_id][person_id] = {
+      personId: person_id,
+      studyRightId: id,
+      hasBaMaEducation: hasBaMa,
+    }
     return acc
   }, {})
 
@@ -426,6 +442,7 @@ const updateStudyplans = async (studyplansAll, personIds, personIdToStudentNumbe
     attainmentIdToAttainment,
     courseUnitIdToAttainment,
     studyPlanIdToDegrees,
+    educationStudyrights,
     getCourseCodesFromAttainment,
     getAttainmentsFromAttainment
   )
@@ -582,7 +599,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
   const courseCodeToAyCodelessId = new Map()
 
   const coursesToBeCreated = new Map()
-  const coursesToBeUpdated = new Map()
   const courseProvidersToBeCreated = []
 
   // This mayhem fixes missing course_unit references for CustomCourseUnitAttainments.
@@ -736,6 +752,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
 
   const credits = fixedAttainments
     .filter(a => a !== null)
+    .filter(a => a.id !== null)
     .filter(
       a =>
         properAttainmentTypes.has(a.type) &&
@@ -755,7 +772,7 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     .filter(c => !!c)
 
   const courses = Array.from(coursesToBeCreated.values())
-  const coursesUpdate = Array.from(coursesToBeUpdated.values())
+
   await bulkCreate(Course, courses)
   await bulkCreate(Credit, credits)
   await bulkCreate(
@@ -770,7 +787,6 @@ const updateAttainments = async (attainments, personIdToStudentNumber, attainmen
     null,
     ['composite']
   )
-  await bulkCreate(Course, coursesUpdate)
 }
 
 const updateTeachers = async attainments => {

@@ -66,6 +66,9 @@ Studyright.belongsTo(Organization, { foreignKey: 'facultyCode', sourceKey: 'code
 Studyplan.belongsTo(Student, { foreignKey: 'studentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyplan, { foreignKey: 'studentnumber', sourceKey: 'studentnumber' })
 
+Studyplan.belongsTo(Studyright, { foreignKey: 'studyrightid', targetKey: 'studyrightid' })
+Studyright.hasMany(Studyplan, { foreignKey: 'studyrightid', sourceKey: 'studyrightid' })
+
 Studyright.belongsTo(Student, { foreignKey: 'studentStudentnumber', targetKey: 'studentnumber' })
 Student.hasMany(Studyright, { foreignKey: 'studentStudentnumber', sourceKey: 'studentnumber' })
 

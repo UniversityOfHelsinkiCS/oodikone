@@ -8,9 +8,9 @@ const getCodesToFix = async () => {
       code: {
         [Op.or]: [
           {
-            [Op.startsWith]: '2_KH',
+            [Op.startsWith]: '2\\_KH',
           },
-          { [Op.startsWith]: '2_MH' },
+          { [Op.startsWith]: '2\\_MH' },
         ],
       },
     },
@@ -25,28 +25,28 @@ const cleanTransfers = studentNumbers =>
       studentnumber: studentNumbers,
       [Op.or]: [
         {
-          sourcecode: { [Op.startsWith]: '2_KH' },
+          sourcecode: { [Op.startsWith]: '2\\_KH' },
         },
         {
-          sourcecode: { [Op.startsWith]: '2_MH' },
+          sourcecode: { [Op.startsWith]: '2\\_MH' },
         },
         {
-          targetcode: { [Op.startsWith]: '2_KH' },
+          targetcode: { [Op.startsWith]: '2\\_KH' },
         },
         {
-          targetcode: { [Op.startsWith]: '2_MH' },
+          targetcode: { [Op.startsWith]: '2\\_MH' },
         },
       ],
     },
   })
 
 /**
- * Fix references on duplicate study programmes. Codes like 2_MH* or 2_KH* in
+ * Fix references on duplicate study programmes. Codes like 2_MH* 2_KH* in
  * study rights and degree programme attainments will be converted to the main code.
  */
 const fix = async students => {
   const codes = await getCodesToFix()
-  if (!codes || !codes.length) return false
+  if (!codes || codes.length === 0) return true
   const studentsToFix = await selectFromByIds('persons', students)
   const studentNumbers = studentsToFix.map(s => s.student_number)
 
@@ -71,7 +71,6 @@ const fix = async students => {
       raw: true,
     }),
   ])
-
   const duplicateCodeToAcualCourseId = courses.reduce((acc, cur) => {
     acc[`2_${cur.code}`] = cur.id
     return acc
