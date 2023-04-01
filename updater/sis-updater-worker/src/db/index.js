@@ -1,8 +1,7 @@
-const { chunk } = require('lodash')
-const { eachLimit } = require('async')
 const { dbConnections } = require('./connection')
 const { logger } = require('../utils/logger')
 const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
+const { Studyplan, Credit } = require('./models')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
@@ -59,6 +58,7 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
       transaction,
     })
   } catch (e) {
+    logger.error(e)
     if (entities.length === 1) {
       logger.error({
         message: e.message,
@@ -66,9 +66,25 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
       })
       return
     }
-
-    const chunks = chunk(entities, Math.floor(entities.length / 2))
-    await eachLimit(chunks, 1, async c => await bulkCreate(model, c, transaction, properties))
+    for (const entity of entities) {
+      try {
+        await model.create(entity, {
+          updateOnDuplicate: getColumnsToUpdate(model, properties),
+          transaction,
+        })
+      } catch (error) {
+        if (model === Studyplan) {
+          logger(entity.studentnumber, entity.id)
+        } else if (model === Credit) {
+          logger(entity.student_studentnumber, entity.id)
+        } else {
+          logger.error({
+            message: `[UPDATER] Fallback could not create ${model} (${JSON.stringify(entity)})`,
+            meta: { stack: error.stack },
+          })
+        }
+      }
+    }
   }
 }
 

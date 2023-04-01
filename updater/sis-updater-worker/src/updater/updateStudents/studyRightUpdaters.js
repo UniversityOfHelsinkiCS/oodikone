@@ -19,7 +19,6 @@ const updateStudyRights = async (
   allTermRegistrations
 ) => {
   const currentSemester = getSemesterByDate(new Date())
-
   const studyrightMapper = (personIdToStudentNumber, admissionNamesById) => (studyright, overrideProps) => {
     const defaultProps = {
       studyrightid: `${studyright.id}-1`, // duplikaattifix
@@ -30,6 +29,7 @@ const updateStudyRights = async (
       graduated: studyright.study_right_graduation ? 1 : 0,
       studystartdate: studyright.valid.startDate,
       admissionType: admissionNamesById[studyright.admission_type_urn],
+      cancelled: studyright.study_right_cancellation !== null,
     }
     return {
       ...defaultProps,

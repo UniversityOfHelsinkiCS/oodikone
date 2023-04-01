@@ -405,16 +405,18 @@ const studyplanMapper =
     attainmentIdToAttainment,
     courseUnitIdToAttainment,
     studyPlanIdToDegrees,
+    educationStudyrights,
     getCourseCodesFromAttainment,
     getAttainmentsFromAttainment
   ) =>
   studyplan => {
     const studentnumber = personIdToStudentNumber[studyplan.user_id]
+    const studyrightId = educationStudyrights[studyplan.root_id][studyplan.user_id].studyRightId
     return studyPlanIdToDegrees[studyplan.id].map(programmeId => {
       const code = programmeModuleIdToCode[programmeId]
       if (!code) return null
       const graduated = moduleAttainments[programmeId] && moduleAttainments[programmeId][studyplan.user_id]
-      const id = `${studentnumber}-${code}`
+      const id = `${studentnumber}-${code}-${studyrightId}`
       const courseUnitSelections = studyplan.course_unit_selections
         .filter(courseUnit => moduleIdToParentModuleCode[courseUnit.parentModuleId] === code)
         .filter(({ substituteFor }) => !substituteFor.length) // Filter out CUs used to substitute another CU
@@ -476,14 +478,22 @@ const studyplanMapper =
         'id'
       )
       const completed_credits = calculateTotalCreditsFromAttainments(attainmentsToCalculate)
+
+      const includedCourses = graduated
+        ? getCourseCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
+        : courseUnitSelections.concat(customCourseUnitSelections).concat(coursesFromAttainedModules)
+      if (includedCourses.length === 0) return null
       return {
         id,
         studentnumber,
+        studyrightid:
+          code.includes('MH') && educationStudyrights[studyplan.root_id][studyplan.user_id].hasBaMaEducation
+            ? `${educationStudyrights[studyplan.root_id][studyplan.user_id].studyRightId}-2`
+            : `${educationStudyrights[studyplan.root_id][studyplan.user_id].studyRightId}-1`,
         completed_credits,
         programme_code: code,
-        included_courses: graduated
-          ? getCourseCodesFromAttainment(moduleAttainments[programmeId][studyplan.user_id])
-          : courseUnitSelections.concat(customCourseUnitSelections).concat(coursesFromAttainedModules),
+        included_courses: includedCourses,
+        sisu_id: studyplan.id,
       }
     })
   }
