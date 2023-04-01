@@ -54,6 +54,7 @@ const formatStudyright = studyright => {
     extentcode,
     student,
     studyright_elements,
+    cancelled,
   } = studyright
 
   return {
@@ -69,6 +70,7 @@ const formatStudyright = studyright => {
     studentnumber: student.studentnumber,
     code: resolveStudyRightCode(studyright_elements),
     studyrightElements: studyright_elements,
+    cancelled,
     name:
       studyright_elements?.length && studyright_elements[0].element_detail && studyright_elements[0].element_detail.name
         ? studyright_elements[0].element_detail.name
