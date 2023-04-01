@@ -73,7 +73,11 @@ export default createFilter({
   filter: (student, { active }, { args }) => {
     const { studyrightStart, studyplans } = student
     const studyrightStartDate = new Date(studyrightStart)
-    const hops = studyplans.find(plan => plan.programme_code === args.programmeCode)
+    const studyrights = student.studyrights.filter(sr => !sr.cancelled)?.map(sr => sr.studyrightid)
+    const hops = studyplans.find(
+      plan => plan.programme_code === args.programmeCode && studyrights.includes(plan.studyrightid)
+    )
+
     if (active) {
       if (!hops) {
         student.courses = []

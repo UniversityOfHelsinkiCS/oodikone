@@ -63,10 +63,10 @@ const StudyrightsTable = ({
   }
 
   const renderGraduated = c => {
-    // if (c.canceldate)
+    // if (c.cancelled)
     //   return (
     //     <div>
-    //       <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELED</p>
+    //       <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELLED</p>
     //     </div>
     //   )
     if (c.graduated)
@@ -137,8 +137,9 @@ const StudyrightsTable = ({
 
   const renderCompletionPercent = (c, student) => {
     const programmeCodes = c.elements.programmes.filter(filterDuplicates).map(programme => programme.code)
-    const studyplan = student.studyplans.find(sp => programmeCodes.includes(sp.programme_code))
-
+    const studyplan = student.studyplans.find(
+      sp => programmeCodes.includes(sp.programme_code) && sp.studyrightid === c.studyrightid
+    )
     if (!studyplan) return <>-</>
 
     const { completed_credits: completedCredits } = studyplan

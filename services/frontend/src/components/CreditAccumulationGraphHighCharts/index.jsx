@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom'
 import Highcharts from 'highcharts/highstock'
 import { Button, Radio } from 'semantic-ui-react'
 import boostcanvas from 'highcharts/modules/boost-canvas'
-import _ from 'lodash/fp'
+import _ from 'lodash'
 import boost from 'highcharts/modules/boost'
 import ReactHighstock from 'react-highcharts/ReactHighstock'
 import './creditAccumulationGraphHC.css'
@@ -150,19 +150,20 @@ const filterCourses = (
   byStudyPlanOfCode,
   cutStudyPlanCredits,
   startDate,
-  customStudyStartYear
+  customStudyStartYear,
+  studyrightid
 ) => {
   if (byStudyPlanOfCode && cutStudyPlanCredits)
     return filterCoursesByDate(
       filterCoursesByStudyPlan(
-        student.studyplans.find(p => p.programme_code === byStudyPlanOfCode),
+        student.studyplans.find(p => p.programme_code === byStudyPlanOfCode && p.studyrightid === studyrightid),
         student.courses
       ),
       customStudyStartYear || student.studyrightStart
     )
   if (byStudyPlanOfCode)
     return filterCoursesByStudyPlan(
-      student.studyplans.find(p => p.programme_code === byStudyPlanOfCode),
+      student.studyplans.find(p => p.programme_code === byStudyPlanOfCode && p.studyrightid === studyrightid),
       student.courses
     )
   if (singleStudent) return student.courses
@@ -310,7 +311,8 @@ const createStudentCreditLines = (
           studyPlanProgrammeCode,
           cutStudyPlanCredits,
           startDate,
-          customStudyStartYear
+          customStudyStartYear,
+          studyRightId
         ),
       courses => [...courses].filter(({ date }) => new Date(date) <= new Date()),
       sortCoursesByDate,

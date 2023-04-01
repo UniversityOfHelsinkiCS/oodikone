@@ -352,7 +352,7 @@ export const resolveStudyPlan = (studyPlans, studyRight) => {
       .filter(e => e.element_detail.type === 20)
       .sort((a, b) => new Date(b.startdate) - new Date(a.startdate))[0] || {}
   if (!code) return null
-  return studyPlans.find(p => p.programme_code === code)
+  return studyPlans.find(p => p.programme_code === code && p.studyrightid === studyRight.studyrightid)
 }
 
 // These are the new Bachelor's programmes in Matlu, that have BH possibility
