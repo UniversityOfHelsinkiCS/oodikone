@@ -333,6 +333,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
             'faculty_code',
             'studystartdate',
             'admission_type',
+            'cancelled',
           ],
           separate: true,
           include: [
@@ -363,7 +364,7 @@ const getStudentsIncludeCoursesBetween = async (studentnumbers, startDate, endDa
         },
         {
           model: Studyplan,
-          attributes: ['included_courses', 'programme_code', 'completed_credits'],
+          attributes: ['included_courses', 'programme_code', 'completed_credits', 'studyrightid'],
           separate: true,
         },
       ],

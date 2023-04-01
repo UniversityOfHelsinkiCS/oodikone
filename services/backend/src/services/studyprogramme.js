@@ -359,7 +359,7 @@ const allTransfers = async (studytrack, since) => {
 const getProgrammesStudyrights = async studyprogramme =>
   (
     await Studyright.findAll({
-      attributes: ['studyrightid', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode'],
+      attributes: ['studyrightid', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode', 'cancelled'],
       include: [
         {
           model: StudyrightElement,
@@ -382,7 +382,16 @@ const getProgrammesStudyrights = async studyprogramme =>
 const getStudyRights = async students =>
   (
     await Studyright.findAll({
-      attributes: ['studyrightid', 'startdate', 'studystartdate', 'enddate', 'graduated', 'prioritycode', 'extentcode'],
+      attributes: [
+        'studyrightid',
+        'startdate',
+        'studystartdate',
+        'enddate',
+        'graduated',
+        'prioritycode',
+        'extentcode',
+        'cancelled',
+      ],
       where: {
         studentStudentnumber: students,
       },

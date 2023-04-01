@@ -20,6 +20,16 @@ Studyplan.init(
       onDelete: 'cascade',
       allowNull: false,
     },
+    studyrightid: {
+      type: STRING,
+      references: {
+        model: 'studyright',
+        key: 'studyrightid',
+      },
+      onUpdate: 'cascade',
+      onDelete: 'cascade',
+      allowNull: false,
+    },
     programme_code: {
       type: STRING,
       allowNull: false,
@@ -29,6 +39,9 @@ Studyplan.init(
     },
     completed_credits: {
       type: INTEGER,
+    },
+    sisu_id: {
+      type: STRING,
     },
     createdAt: {
       type: DATE,
