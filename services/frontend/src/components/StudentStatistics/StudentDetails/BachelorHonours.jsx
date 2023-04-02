@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
-import { Divider, Table, Label, Header } from 'semantic-ui-react'
+import { Divider, Table, Label, Header, Accordion, Icon } from 'semantic-ui-react'
 
 import {
   bachelorHonoursProgrammes as bachelorCodes,
@@ -14,6 +14,8 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
   const mandatoryModules = useSelector(({ populationMandatoryCourses }) => populationMandatoryCourses.data)
   const [studentsModules, setModules] = useState([])
   const [otherModules, setOther] = useState([])
+  const [showMain, setShowMain] = useState(false)
+  const [showOther, setShowOther] = useState(false)
   const [studyStartDate, setStartDate] = useState('')
   const [honors, setHonors] = useState(false)
   const [graduated, setGraduated] = useState(false)
@@ -132,14 +134,28 @@ const BachelorHonours = ({ student, absentYears, programmeCode }) => {
       {inspection && <Label tag content="Might need further inspection" color="blue" />}
       {studentsModules.length > 0 ? (
         <>
-          <Header as="h4">Main modules</Header>
-          {dataTable(studentsModules)}
+          <Accordion>
+            <Accordion.Title active={showMain} index={0} onClick={() => setShowMain(!showMain)}>
+              <Header as="h4">
+                <Icon name="dropdown" />
+                Main modules
+              </Header>
+            </Accordion.Title>
+            <Accordion.Content active={showMain}>{dataTable(studentsModules)}</Accordion.Content>
+          </Accordion>
         </>
       ) : null}
       {otherModules.length > 0 ? (
         <>
-          <Header as="h4">Other modules</Header>
-          {dataTable(otherModules)}
+          <Accordion>
+            <Accordion.Title active={showOther} index={0} onClick={() => setShowOther(!showOther)}>
+              <Header as="h4">
+                <Icon name="dropdown" />
+                Other modules
+              </Header>
+            </Accordion.Title>
+            <Accordion.Content active={showOther}>{dataTable(otherModules)}</Accordion.Content>
+          </Accordion>
         </>
       ) : null}
     </>
