@@ -74,9 +74,9 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
         })
       } catch (error) {
         if (model === Studyplan) {
-          logger(entity.studentnumber, entity.id)
+          logger.error(entity.studentnumber, entity.id)
         } else if (model === Credit) {
-          logger(entity.student_studentnumber, entity.id)
+          logger.error(entity.student_studentnumber, entity.id)
         } else {
           logger.error({
             message: `[UPDATER] Fallback could not create ${model} (${JSON.stringify(entity)})`,
