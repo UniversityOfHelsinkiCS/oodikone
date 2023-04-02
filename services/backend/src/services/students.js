@@ -351,6 +351,20 @@ const studentnumberLike = terms => {
 const bySearchTerm = async searchterm => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
+    include: {
+      model: Studyright,
+      include: {
+        model: StudyrightElement,
+        include: {
+          model: ElementDetail,
+          where: {
+            type: {
+              [Op.in]: [10, 20, 30],
+            },
+          },
+        },
+      },
+    },
     where: {
       [Op.or]: [nameLike(terms), studentnumberLike(terms)],
     },
@@ -361,6 +375,20 @@ const bySearchTerm = async searchterm => {
 const bySearchTermAndStudentNumbers = async (searchterm, studentnumbers) => {
   const terms = splitByEmptySpace(searchterm)
   const matches = await Student.findAll({
+    include: {
+      model: Studyright,
+      include: {
+        model: StudyrightElement,
+        include: {
+          model: ElementDetail,
+          where: {
+            type: {
+              [Op.in]: [10, 20, 30],
+            },
+          },
+        },
+      },
+    },
     where: {
       [Op.and]: {
         [Op.or]: [nameLike(terms), studentnumberLike(terms)],

@@ -20,7 +20,7 @@ const StudyrightsTable = ({
 
   const { programmes } = Programmes
   const programmeCodes = programmes ? Object.keys(programmes) : []
-  const studyRightHeaders = ['Programme', 'Study Track', 'Graduated', 'Completed']
+  const studyRightHeaders = ['Programme', 'Study Track', 'Status', 'Completed']
 
   const studyRightRows = student.studyrights.map(studyright => {
     const programmes = sortBy(studyright.studyright_elements, 'enddate')
@@ -31,7 +31,9 @@ const StudyrightsTable = ({
         studystartdate: studyright.studystartdate,
         enddate: programme.enddate,
         name: getTextIn(programme.element_detail.name, language),
-        isFilterable: student.studyplans.map(plan => plan.programme_code).includes(programme.element_detail.code),
+        isFilterable:
+          !studyright.cancelled &&
+          student.studyplans.map(plan => plan.programme_code).includes(programme.element_detail.code),
       }))
     const studytracks = sortBy(studyright.studyright_elements, 'enddate')
       .filter(e => e.element_detail.type === 30)
@@ -44,6 +46,8 @@ const StudyrightsTable = ({
       studyrightid: studyright.studyrightid,
       graduated: studyright.graduated,
       enddate: studyright.enddate,
+      active: studyright.active,
+      cancelled: studyright.cancelled,
       elements: { programmes, studytracks },
     }
   })
@@ -62,23 +66,28 @@ const StudyrightsTable = ({
     return true
   }
 
-  const renderGraduated = c => {
-    // if (c.cancelled)
-    //   return (
-    //     <div>
-    //       <p style={{ color: 'red', fontWeight: 'bold' }}>CANCELLED</p>
-    //     </div>
-    //   )
-    if (c.graduated)
+  const renderStatus = c => {
+    if (c.cancelled)
       return (
         <div style={{ display: 'flex' }}>
-          <Icon name="check circle outline" color="green" />
-          <p>{reformatDate(c.enddate, 'DD.MM.YYYY')}</p>
+          <p style={{ color: 'black', fontWeight: 'bold' }}>CANCELLED</p>
+        </div>
+      )
+    if (c.graduated)
+      return (
+        <div>
+          <p style={{ color: 'green', fontWeight: 'bold' }}>GRADUATED</p>
+        </div>
+      )
+    if (c.active)
+      return (
+        <div style={{ display: 'flex' }}>
+          <p style={{ color: 'blue', fontWeight: 'bold' }}>ACTIVE</p>
         </div>
       )
     return (
-      <div style={{ padding: '.5em 0', splay: 'flex' }}>
-        <Icon name="circle outline" color="red" />
+      <div style={{ display: 'flex' }}>
+        <p style={{ color: 'red', fontWeight: 'bold' }}>INACTIVE</p>
       </div>
     )
   }
@@ -202,7 +211,7 @@ const StudyrightsTable = ({
                     </Table.Cell>
                     <Table.Cell>{c.elements.programmes.length > 0 && renderProgrammes(c)}</Table.Cell>
                     <Table.Cell>{renderStudytracks(c)}</Table.Cell>
-                    <Table.Cell>{renderGraduated(c)}</Table.Cell>
+                    <Table.Cell>{renderStatus(c)}</Table.Cell>
                     <Table.Cell>{renderCompletionPercent(c, student)}</Table.Cell>
                   </Table.Row>
                 )
