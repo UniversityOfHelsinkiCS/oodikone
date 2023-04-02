@@ -67,6 +67,7 @@ const StudentDetails = ({
       )
       // currently only for matlu
       const shouldRender = bachelorCodes.includes(newestBachelorProgramme.code)
+      if (!shouldRender && honoursCode !== null) setHonoursCode(null)
       if (shouldRender) dispatch(getMandatoryCourseModules(newestBachelorProgramme.code))
       if (shouldRender) setHonoursCode(newestBachelorProgramme.code)
     }
@@ -184,7 +185,6 @@ const StudentDetails = ({
       </Segment>
     )
   }
-
   return (
     <Segment className="contentSegment">
       <StudentInfoCard student={student} />
