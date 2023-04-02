@@ -5,14 +5,13 @@ import { connect } from 'react-redux'
 
 import { Search, Segment, Container } from 'semantic-ui-react'
 import moment from 'moment'
-
 import { findStudents, getStudent } from '../../../redux/students'
 import SegmentDimmer from '../../SegmentDimmer'
 import SortableTable from '../../SortableTable'
 import Timeout from '../../Timeout'
 import { makeFormatStudentRows } from '../../../selectors/students'
 
-import { containsOnlyNumbers, validateInputLength, splitByEmptySpace } from '../../../common'
+import { containsOnlyNumbers, validateInputLength, splitByEmptySpace, getTextIn } from '../../../common'
 
 const StudentSearch = ({
   getStudent,
@@ -23,12 +22,12 @@ const StudentSearch = ({
   findStudents,
   showNames,
   pending,
+  language,
 }) => {
   const [loading, setLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [searchStr, setSearchStr] = useState('')
   const location = useLocation()
-
   const resetComponent = () => {
     setLoading(false)
     setShowResults(false)
@@ -84,6 +83,20 @@ const StudentSearch = ({
     } else {
       resetComponent()
     }
+  }
+
+  const getStudyrights = s => {
+    if (s.studyrights) {
+      const elements = s.studyrights
+        .filter(sr => sr.active && !sr.graduated)
+        .reduce(
+          (res, sr) => [...res, ...sr.studyright_elements.map(elem => getTextIn(elem.element_detail.name, language))],
+          []
+        )
+      const sorted = elements.sort()
+      return sorted.reduce((res, name) => `${res}; ${name}`, '').slice(1)
+    }
+    return ''
   }
 
   const renderSearchResults = () => {
@@ -188,6 +201,17 @@ const StudentSearch = ({
             {s.credits}
           </Link>
         ),
+        cellProps: {
+          style: {
+            padding: '0',
+          },
+        },
+      },
+      {
+        key: 'studyrights',
+        title: 'Active Studyrights',
+        getRowVal: s => getStudyrights(s),
+        getRowContent: s => getStudyrights(s),
         cellProps: {
           style: {
             padding: '0',
