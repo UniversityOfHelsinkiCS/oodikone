@@ -1,7 +1,6 @@
 const { dbConnections } = require('./connection')
 const { logger } = require('../utils/logger')
 const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
-const { Studyplan, Credit } = require('./models')
 
 const selectFromByIds = async (table, ids, col = 'id') => dbConnections.knex(table).whereIn(col, ids)
 
@@ -58,7 +57,6 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
       transaction,
     })
   } catch (e) {
-    logger.error(e)
     if (entities.length === 1) {
       logger.error({
         message: e.message,
@@ -73,16 +71,7 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
           transaction,
         })
       } catch (error) {
-        if (model === Studyplan) {
-          logger.error({ student: entity.studentnumber, id: entity.id })
-        } else if (model === Credit) {
-          logger.error({ student: entity.student_studentnumber, id: entity.id })
-        } else {
-          logger.error({
-            message: `[UPDATER] Fallback could not create ${model} (${JSON.stringify(entity)})`,
-            meta: { stack: error.stack },
-          })
-        }
+        logger.error(`[UPDATER] could not create ${model} (${entity.id})`)
       }
     }
   }
