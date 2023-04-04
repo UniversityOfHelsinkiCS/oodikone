@@ -37,8 +37,8 @@ const CustomOpenUniPopulation = () => {
       <Message style={{ maxWidth: '800px', fontSize: '16px' }}>
         <Message.Header>Open uni student population</Message.Header>
         <p>
-          Here you can create custom population using a list of courses. Clicking the blue custom population button will
-          open a modal where you can enter a list of courses. <br />
+          Here you can create custom population using a list of courses. Clicking the blue button will open a modal
+          where you can enter a list of courses. <br />
           <Icon fitted name="check" color="green" />: Student has passed the course. <br />
           <Icon fitted name="times" color="red" />: Student has failed the course. <br />
           <Icon fitted name="minus" color="grey" />: Student has enrolled, but has not received any grade from the
