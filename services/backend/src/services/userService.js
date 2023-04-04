@@ -168,7 +168,7 @@ const updateAccessGroups = async (username, iamGroups = [], specialGroup = {}, s
   const { jory, hyOne, superAdmin, openUni } = specialGroup
 
   const userFromDb = await byUsername(username)
-  const formattedUser = await formatUser(userFromDb, [])
+  const formattedUser = await formatUser(userFromDb, [], Boolean(sisId))
 
   const { roles: currentAccessGroups } = formattedUser
 
@@ -235,7 +235,7 @@ const findAll = async () => {
   return formattedUsers
 }
 
-const formatUser = async (userFromDb, extraRights) => {
+const formatUser = async (userFromDb, extraRights, getStudentAccess = true) => {
   const [accessGroups, programmes, faculties] = [
     ['accessgroup', 'group_code'],
     ['programme', 'elementDetailCode'],
@@ -256,9 +256,13 @@ const formatUser = async (userFromDb, extraRights) => {
     },
   } = userFromDb
 
-  const studentsUserCanAccess = _.uniqBy(
-    (await Promise.all([getStudentnumbersByElementdetails(rights), getAllStudentsUserHasInGroups(sisPersonId)])).flat()
-  )
+  const studentsUserCanAccess = getStudentAccess
+    ? _.uniqBy(
+        (
+          await Promise.all([getStudentnumbersByElementdetails(rights), getAllStudentsUserHasInGroups(sisPersonId)])
+        ).flat()
+      )
+    : []
 
   // attribute naming is a bit confusing, but it's used so widely in oodikone, that it's not probably worth changing
   return {
