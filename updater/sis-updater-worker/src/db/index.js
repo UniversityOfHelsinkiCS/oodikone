@@ -1,3 +1,5 @@
+const { chunk } = require('lodash')
+const { eachLimit } = require('async')
 const { dbConnections } = require('./connection')
 const { logger } = require('../utils/logger')
 const { getLatestSnapshot, isActive, getActiveSnapshot } = require('../utils')
@@ -64,16 +66,8 @@ const bulkCreate = async (model, entities, transaction = null, properties = ['id
       })
       return
     }
-    for (const entity of entities) {
-      try {
-        await model.create(entity, {
-          updateOnDuplicate: getColumnsToUpdate(model, properties),
-          transaction,
-        })
-      } catch (error) {
-        logger.error(`[UPDATER] could not create ${model} (${entity.id})`)
-      }
-    }
+    const chunks = chunk(entities, Math.floor(entities.length / 2))
+    await eachLimit(chunks, 1, async c => await bulkCreate(model, c, transaction, properties))
   }
 }
 
