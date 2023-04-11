@@ -16,20 +16,16 @@ const getSubstitutions = async codes => {
 }
 
 const formattedData = async updatedData => {
-  const allCoursesOne = await getSubstitutions(updatedData.coursesYearOne)
-  const allCoursesTwo = await getSubstitutions(updatedData.coursesYearTwo)
-  const allCoursesThree = await getSubstitutions(updatedData.coursesYearThree)
+  const courseCodes = [...updatedData.coursesYearOne, ...updatedData.coursesYearTwo, ...updatedData.coursesYearThree]
+  const allCourses = await getSubstitutions(courseCodes)
+
   const criteria = {
     courses: {
       yearOne: updatedData.coursesYearOne,
       yearTwo: updatedData.coursesYearTwo,
       yearThree: updatedData.coursesYearThree,
     },
-    allCourses: {
-      yearOne: allCoursesOne,
-      yearTwo: allCoursesTwo,
-      yearThree: allCoursesThree,
-    },
+    allCourses,
     credits: {
       yearOne: updatedData.creditsYearOne,
       yearTwo: updatedData.creditsYearTwo,
@@ -113,16 +109,17 @@ const saveYearlyCourseCriteria = async (studyProgramme, courses, year) => {
 
 const getCriteria = async studyProgramme => {
   const studyProgrammeCriteria = await getCriteriaByStudyProgramme(studyProgramme)
-  let allCoursesOne = []
-  let allCoursesTwo = []
-  let allCoursesThree = []
   const coursesOne = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearOne : []
   const coursesTwo = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearTwo : []
   const coursesThree = studyProgrammeCriteria ? studyProgrammeCriteria.coursesYearThree : []
+  let allCourses = {}
   if (studyProgrammeCriteria) {
-    allCoursesOne = await getSubstitutions(coursesOne)
-    allCoursesTwo = await getSubstitutions(coursesTwo)
-    allCoursesThree = await getSubstitutions(coursesThree)
+    const courseCodes = [
+      ...studyProgrammeCriteria.coursesYearOne,
+      ...studyProgrammeCriteria.coursesYearTwo,
+      ...studyProgrammeCriteria.coursesYearThree,
+    ]
+    allCourses = await getSubstitutions(courseCodes)
   }
 
   const criteria = {
@@ -131,11 +128,7 @@ const getCriteria = async studyProgramme => {
       yearTwo: coursesTwo,
       yearThree: coursesThree,
     },
-    allCourses: {
-      yearOne: allCoursesOne,
-      yearTwo: allCoursesTwo,
-      yearThree: allCoursesThree,
-    },
+    allCourses,
     credits: {
       yearOne: studyProgrammeCriteria ? studyProgrammeCriteria.creditsYearOne : 0,
       yearTwo: studyProgrammeCriteria ? studyProgrammeCriteria.creditsYearTwo : 0,

@@ -89,20 +89,42 @@ const formatStudentForPopulationStatistics = (
       language,
     }
   }
+  // mappaa criteriacourses leikkaavuuksien mukaan vuosittain
+  // laita pvm
+  const criteriaCoursesBySubstitutions =
+    criteria?.allCourses !== {}
+      ? Object.keys(criteria.allCourses).reduce((acc, code) => {
+          acc[code] = code
+          criteria.allCourses[code].map(subst => (acc[subst] = code))
+          return acc
+        }, {})
+      : {}
 
   const toProgressCriteria = () => {
-    const criteriaFullfilled = {
+    const criteriaChecked = {
       year1: {
         credits: false,
         totalSatisfied: 0,
+        coursesSatisfied: criteria?.courses?.yearOne.reduce((acc, course) => {
+          acc[course] = null
+          return acc
+        }, {}),
       },
       year2: {
         credits: false,
         totalSatisfied: 0,
+        coursesSatisfied: criteria?.courses?.yearTwo?.reduce((acc, course) => {
+          acc[course] = null
+          return acc
+        }, {}),
       },
       year3: {
         credits: false,
         totalSatisfied: 0,
+        coursesSatisfied: criteria?.courses?.yearThree.reduce((acc, course) => {
+          acc[course] = null
+          return acc
+        }, {}),
       },
     }
     let firstAcademic = 0
@@ -112,23 +134,39 @@ const formatStudentForPopulationStatistics = (
       const courses = credits[studentnumber] ? credits[studentnumber].map(toCourse) : []
       courses.forEach(course => {
         if (course.passed) {
+          const correctCode = criteriaCoursesBySubstitutions[course.course_code]
           if (
             criteria?.courses?.yearOne.includes(course.course_code) ||
-            criteria?.courses?.yearOne.some(c => criteria?.allCourses?.yearOne[c].includes(course.course_code))
+            criteria?.courses?.yearOne.some(c => criteria?.allCourses[c].includes(course.course_code))
           ) {
-            criteriaFullfilled.year1.totalSatisfied += 1
+            if (
+              !criteriaChecked.year1.coursesSatisfied[correctCode] ||
+              new Date(criteriaChecked.year1.coursesSatisfied[correctCode]) > new Date(course.date)
+            ) {
+              criteriaChecked.year1.coursesSatisfied[correctCode] = course.date
+            }
           }
           if (
             criteria?.courses?.yearTwo.includes(course.course_code) ||
-            criteria?.courses?.yearTwo.some(c => criteria?.allCourses?.yearTwo[c].includes(course.course_code))
+            criteria?.courses?.yearTwo.some(c => criteria?.allCourses[c].includes(course.course_code))
           ) {
-            criteriaFullfilled.year2.totalSatisfied += 1
+            if (
+              !criteriaChecked.year2.coursesSatisfied[correctCode] ||
+              new Date(criteriaChecked.year2.coursesSatisfied[correctCode]) > new Date(course.date)
+            ) {
+              criteriaChecked.year2.coursesSatisfied[correctCode] = course.date
+            }
           }
           if (
             criteria?.courses?.yearThree.includes(course.course_code) ||
-            criteria?.courses?.yearThree.some(c => criteria?.allCourses?.yearThree[c].includes(course.course_code))
+            criteria?.courses?.yearThree.some(c => criteria?.allCourses[c].includes(course.course_code))
           ) {
-            criteriaFullfilled.year3.totalSatisfied += 1
+            if (
+              !criteriaChecked.year2.coursesSatisfied[correctCode] ||
+              new Date(criteriaChecked.year2.coursesSatisfied[correctCode]) > new Date(course.date)
+            ) {
+              criteriaChecked.year2.coursesSatisfied[correctCode] = course.date
+            }
           }
           firstAcademic += moment(course.date).isBetween(moment(startDate), moment(startDate).add(1, 'year'))
             ? course.credits
@@ -142,19 +180,23 @@ const formatStudentForPopulationStatistics = (
         }
       })
     }
+    criteriaChecked.year1.totalSatisfied =
+      Object.keys(criteriaChecked?.year1?.coursesSatisfied).filter(
+        course => criteriaChecked?.year1?.coursesSatisfied[course] !== null
+      ).length || 0
     if (firstAcademic >= criteria?.credits?.yearOne) {
-      criteriaFullfilled.year1.credits = true
-      criteriaFullfilled.year1.totalSatisfied += 1
+      criteriaChecked.year1.credits = true
+      criteriaChecked.year1.totalSatisfied += 1
     }
     if (secondAcademic >= criteria?.credits?.yearTwo) {
-      criteriaFullfilled.year2.credits = true
-      criteriaFullfilled.year2.totalSatisfied += 1
+      criteriaChecked.year2.credits = true
+      criteriaChecked.year2.totalSatisfied += 1
     }
     if (thirdAcademic >= criteria?.credits?.yearThree) {
-      criteriaFullfilled.year3.credits = true
-      criteriaFullfilled.year3.totalSatisfied += 1
+      criteriaChecked.year3.credits = true
+      criteriaChecked.year3.totalSatisfied += 1
     }
-    return criteriaFullfilled
+    return criteriaChecked
   }
 
   studyrights = studyrights || []
