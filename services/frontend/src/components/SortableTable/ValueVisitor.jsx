@@ -1,3 +1,4 @@
+/* eslint-disable babel/no-invalid-this */
 import _ from 'lodash'
 import DataVisitor from './DataVisitor'
 import { getColumnValue, getRowOptions } from './common'
