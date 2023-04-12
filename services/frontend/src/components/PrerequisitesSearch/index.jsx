@@ -32,6 +32,10 @@ const CompletedPrerequisites = () => {
           courses yet. Clicking the blue button will open the tool.
         </p>
         <p>
+          Notice that if you do not have the required rights to view the data of some students, those rows will omitted
+          from the results.
+        </p>
+        <p>
           <Icon fitted name="check" color="green" />: Student has completed the course with a passing grade. <br />
           <Icon fitted name="times" color="red" />: Student has not passed the course and has no enrollment for it.{' '}
           <br />

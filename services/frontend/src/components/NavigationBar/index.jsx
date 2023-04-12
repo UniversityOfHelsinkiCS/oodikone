@@ -35,7 +35,7 @@ const allNavigationItems = {
     items: [
       { path: '/custompopulation', key: 'customSearch', label: 'Search by Studentnumbers' },
       { path: '/openunipopulation', key: 'openUniSearch', label: 'Fetch Open Uni Students by Courses' },
-      { path: '/courseprerequisites', key: 'prerequisitesSearch', label: 'Check prerequisities' },
+      { path: '/courseprerequisites', key: 'prerequisitesSearch', label: 'Check completed prerequisities' },
     ],
   },
   updater: { path: '/updater', key: 'updater', label: 'Updater', reqRights: ['admin'] },
@@ -87,7 +87,7 @@ const NavigationBar = () => {
     if (checkUserAccess(['openUniSearch', 'admin'], roles) && item.key === 'openUniSearch') return true
     if ((checkUserAccess(['studyGuidanceGroups', 'admin'], roles) || rights.length > 0) && item.key === 'customSearch')
       return true
-    if (checkUserAccess(['admin'], roles) && item.key === 'prerequisitesSearch') return true
+    if (checkUserAccess(['studyGuidanceGroups', 'admin'], roles) && item.key === 'prerequisitesSearch') return true
     return false
   }
 
