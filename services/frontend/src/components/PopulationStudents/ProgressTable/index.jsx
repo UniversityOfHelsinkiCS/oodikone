@@ -319,7 +319,7 @@ const ProgressTable = ({ criteria, students, months, programme }) => {
         { title: months < 60 ? 'Academic Year 5 (in progress)' : 'Academic Year 5', year: 'year5', label: 'yearFive' },
         { title: months < 72 ? 'Academic Year 6 (in progress)' : 'Academic Year 6', year: 'year6', label: 'yearSix' }
       )
-      if (months > 32) {
+      if (months > 36) {
         columns.push(
           {
             key: criteriaHeaders[3].title,
