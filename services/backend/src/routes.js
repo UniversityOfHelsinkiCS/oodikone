@@ -33,7 +33,7 @@ const studyProgramme = require('./routes/studyProgramme')
 const customOpenUniSearch = require('./routes/customOpenUniSearch')
 const studyProgrammeCriteria = require('./routes/studyProgrammeCriteria')
 const initializeSentry = require('./util/sentry')
-
+const prerequisiteSearch = require('./routes/prerequisitesSearch')
 const errorMiddleware = require('./middleware/errorMiddleware')
 
 module.exports = (app, url) => {
@@ -61,6 +61,7 @@ module.exports = (app, url) => {
   app.use(url, studyProgramme)
   app.use(`${url}/programmecriteria`, studyProgrammeCriteria)
   app.use(`${url}/openunisearch`, auth.roles(['openUniSearch']), customOpenUniSearch)
+  app.use(`${url}/prerequisitesearch`, auth.roles(['admin']), prerequisiteSearch)
   app.use(`${url}/faculties`, auth.roles(['facultyStatistics']), faculties)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)
