@@ -52,9 +52,9 @@ const createCriteria = async (studyProgramme, courseObj, creditsObj) => {
     creditsYearOne: creditsObj.year1,
     creditsYearTwo: creditsObj.year2,
     creditsYearThree: creditsObj.year3,
-    creditsYearFour: creditsObj.year1,
-    creditsYearFive: creditsObj.year2,
-    creditsYearSix: creditsObj.year3,
+    creditsYearFour: creditsObj.year4,
+    creditsYearFive: creditsObj.year5,
+    creditsYearSix: creditsObj.year6,
   }
   try {
     const createdData = await ProgressCriteria.create(newProgrammeCriteria)
