@@ -61,7 +61,7 @@ module.exports = (app, url) => {
   app.use(url, studyProgramme)
   app.use(`${url}/programmecriteria`, studyProgrammeCriteria)
   app.use(`${url}/openunisearch`, auth.roles(['openUniSearch']), customOpenUniSearch)
-  app.use(`${url}/prerequisitesearch`, auth.roles(['admin']), prerequisiteSearch)
+  app.use(`${url}/prerequisitesearch`, auth.roles(['studyGuidanceGroups']), prerequisiteSearch)
   app.use(`${url}/faculties`, auth.roles(['facultyStatistics']), faculties)
   app.use(`${url}/updater`, auth.roles(['admin']), updater)
   app.use(`${url}/teachers`, auth.roles(['teachers']), teachers)

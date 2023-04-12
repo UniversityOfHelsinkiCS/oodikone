@@ -1,7 +1,6 @@
 import React, { Suspense } from 'react'
 import { Route, Switch, Redirect } from 'react-router-dom'
 import SegmentDimmer from 'components/SegmentDimmer'
-import CompletedPrerequisites from 'components/PrerequisitesSearch'
 import ProtectedRoute from './ProtectedRoute'
 
 // From https://dev.to/goenning/how-to-retry-when-react-lazy-fails-mb5
@@ -43,6 +42,7 @@ const StudyGuidanceGroups = React.lazy(() => retry(() => import('../StudyGuidanc
 const FacultyStatistics = React.lazy(() => retry(() => import('../FacultyStatistics')))
 const CustomOpenUniPopulations = React.lazy(() => retry(() => import('../CustomOpenUniPopulation')))
 const EvaluationOverview = React.lazy(() => retry(() => import('../EvaluationOverview')))
+const CompletedPrerequisites = React.lazy(() => retry(() => import('../PrerequisitesSearch')))
 
 const routes = {
   students: '/students/:studentNumber?',
@@ -111,7 +111,8 @@ const Routes = () => (
         component={CustomOpenUniPopulations}
       />
       <ProtectedRoute
-        requiredRoles={['admin']}
+        requiredRoles={['admin', 'studyGuidanceGroups']}
+        requireUserHasRights
         exact
         path={routes.searchPrerequisites}
         component={CompletedPrerequisites}
